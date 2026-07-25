@@ -31,7 +31,7 @@ judgment = "Bitwarden is a password manager; `list` dumps vault item contents (c
 bare = false
 tolerate_unknown_short = true
 standalone = ["--help", "--organizationid", "--pretty", "--quiet", "--raw", "--response", "--session", "--trash", "-h"]
-valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid", "--search", "--session", "--url"]
+valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid", "--search", "--session"]
 
 [[command.sub]]
 name = "get"

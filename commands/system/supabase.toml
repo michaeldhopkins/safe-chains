@@ -99,7 +99,7 @@ fact = "`inspect db` runs read-only diagnostic queries (bloat, blocking, locks, 
 source = "https://supabase.com/docs/reference/cli/supabase-inspect-db"
 # `inspect` takes a `db <query>` positional pair; the flags select the target database and output.
 standalone = ["--linked", "--local", "--debug", "--experimental", "--help", "-h"]
-valued = ["--db-url", "--output", "--project-ref", "--workdir", "-o"]
+valued = ["--output", "--project-ref", "--workdir", "-o"]
 
 # ── services: reports the running/latest service image versions for the project.
 [[command.sub]]
@@ -107,6 +107,8 @@ name = "services"
 profile = "remote-read"
 fact = "Lists the current and latest versions of the project's managed services; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-services"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── db: schema/data operations spanning local and (via --linked/--db-url) the remote database.
 [[command.sub]]
@@ -117,6 +119,8 @@ name = "pull"
 profile = "remote-read"
 fact = "Reads the remote database schema and writes the diff as a new local migration file; the remote interaction is a read."
 source = "https://supabase.com/docs/reference/cli/supabase-db-pull"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "dump"
 profile = "data-export"
@@ -125,24 +129,28 @@ fact = "Dumps the remote database schema (and, with --data-only, table data) to 
 source = "https://supabase.com/docs/reference/cli/supabase-db-dump"
 judgment = "A BULK remote read (can export all row data to the caller) — data-export, not a point read: scale=unbounded records the volume, disclosure=local-process the destination (the two together proxy the data's unknowable sensitivity). The -f/--file output form adds a path-gated local write, so a dump to a system path gates on locus while one to the worktree stays local."
 standalone = ["--data-only", "--keep-comments", "--linked", "--local", "--role-only", "--use-copy", "--debug", "--experimental", "--help", "-h"]
-valued = ["--db-url", "--exclude", "--password", "--project-ref", "--schema", "--workdir", "-p"]
+valued = ["--exclude", "--password", "--project-ref", "--schema", "--workdir", "-p"]
 [[command.sub.sub]]
 name = "diff"
 profile = "remote-read"
 fact = "Compares schemas (local containers or the linked remote database via --linked/--db-url) and prints the difference; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-db-diff"
 standalone = ["--linked", "--local", "--use-migra", "--use-pgadmin", "--use-pg-schema", "--debug", "--experimental", "--help", "-h"]
-valued = ["--db-url", "--file", "--project-ref", "--schema", "--workdir", "-f", "-s"]
+valued = ["--file", "--project-ref", "--schema", "--workdir", "-f", "-s"]
 [[command.sub.sub]]
 name = "lint"
 profile = "remote-read"
 fact = "Checks the database (local or --linked) for schema errors and prints findings; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-db-lint"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "push"
 profile = "remote-mutate"
 fact = "Applies pending local migrations to the linked remote database, altering its schema."
 source = "https://supabase.com/docs/reference/cli/supabase-db-push"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "reset"
 candidate = true
@@ -159,11 +167,15 @@ name = "list"
 profile = "remote-read"
 fact = "Shows migration history for local and (when linked) remote databases; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-migration-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "fetch"
 profile = "remote-read"
 fact = "Fetches migration files from the remote history table into the local project; the remote interaction is a read."
 source = "https://supabase.com/docs/reference/cli/supabase-migration-fetch"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "new"
 level = "SafeWrite"
@@ -174,6 +186,8 @@ name = "repair"
 profile = "remote-mutate"
 fact = "Updates the remote migration-history table to mark migrations as applied or reverted, reconciling drift."
 source = "https://supabase.com/docs/reference/cli/supabase-migration-repair"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "up"
 candidate = true
@@ -193,11 +207,15 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the project's deployed Edge Functions; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-functions-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "download"
 profile = "remote-read"
 fact = "Downloads a deployed function's source from the project to the local project; the remote interaction is a read."
 source = "https://supabase.com/docs/reference/cli/supabase-functions-download"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "new"
 level = "SafeWrite"
@@ -208,12 +226,16 @@ name = "deploy"
 profile = "remote-control"
 fact = "Bundles and uploads function code to Supabase's edge runtime, activating it in production."
 source = "https://supabase.com/docs/reference/cli/supabase-functions-deploy"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Removes a deployed function from the project via the management API."
 source = "https://supabase.com/docs/reference/cli/supabase-functions-delete"
 judgment = "Recoverable: the function is redeployable from its local source."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "serve"
 candidate = true
@@ -227,11 +249,15 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the organizations the caller belongs to; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-orgs-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Creates a new organization on the Supabase platform."
 source = "https://supabase.com/docs/reference/cli/supabase-orgs-create"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── projects.
 [[command.sub]]
@@ -242,23 +268,31 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the projects accessible to the caller; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-projects-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Provisions a new Supabase project (a managed Postgres instance); metered."
 source = "https://supabase.com/docs/reference/cli/supabase-projects-create"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes a Supabase project, permanently tearing down its database and all stored data."
 source = "https://supabase.com/docs/reference/cli/supabase-projects-delete"
 judgment = "Classified irreversible: project deletion removes the managed database and its data with no CLI-side restore path."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "api-keys"
 profile = "credential-read"
 fact = "Prints the project's API keys, including the anon and service_role key VALUES; the service_role key bypasses row-level security (full database admin)."
 source = "https://supabase.com/docs/reference/cli/supabase-projects-api-keys"
 judgment = "Credential exposure: the printed key material enters the caller's context. This is the narrowing of the projects group's read surface — list is a benign remote-read, api-keys reveals live secrets."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── branches: preview/database branches.
 [[command.sub]]
@@ -269,37 +303,51 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the project's preview branches; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "get"
 profile = "remote-read"
 fact = "Retrieves details of a specific preview branch; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Provisions a new preview branch (an isolated database environment); metered."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-create"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Updates a preview branch's configuration via the management API."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes a preview branch and its isolated environment."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-delete"
 judgment = "Recoverable: a branch is recreatable from the parent project and migrations."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "pause"
 profile = "remote-control"
 fact = "Suspends a running preview branch."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "unpause"
 profile = "remote-control"
 fact = "Resumes a paused preview branch."
 source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── domains: custom hostnames.
 [[command.sub]]
@@ -310,27 +358,37 @@ name = "get"
 profile = "remote-read"
 fact = "Retrieves the custom hostname configuration stored for the project; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-domains-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-mutate"
 fact = "Registers a custom hostname configuration for the project via the management API."
 source = "https://supabase.com/docs/reference/cli/supabase-domains-create"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "activate"
 profile = "remote-control"
 fact = "Reconfigures the project to serve requests on the custom hostname instead of the default subdomain."
 source = "https://supabase.com/docs/reference/cli/supabase-domains-activate"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "reverify"
 profile = "remote-mutate"
 fact = "Re-validates the custom hostname configuration on the platform."
 source = "https://supabase.com/docs/reference/cli/supabase-domains-reverify"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Removes the custom hostname configuration from the project."
 source = "https://supabase.com/docs/reference/cli/supabase-domains-delete"
 judgment = "Recoverable: the hostname can be re-created."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── vanity-subdomains.
 [[command.sub]]
@@ -341,22 +399,30 @@ name = "get"
 profile = "remote-read"
 fact = "Retrieves the project's current vanity subdomain configuration; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "check-availability"
 profile = "remote-read"
 fact = "Checks whether a desired vanity subdomain name is available; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-check-availability"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "activate"
 profile = "remote-mutate"
 fact = "Reconfigures the project to respond on the vanity subdomain."
 source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-activate"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes the vanity subdomain and reverts routing to the project ref."
 source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-delete"
 judgment = "Recoverable: the vanity subdomain can be re-activated."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── secrets: Edge Function environment secrets.
 [[command.sub]]
@@ -368,17 +434,23 @@ profile = "remote-read"
 fact = "Lists the project's secrets returning each secret's NAME and a SHA-256 DIGEST only; the management API never returns plaintext secret values."
 source = "https://supabase.com/docs/reference/cli/supabase-secrets-list"
 judgment = "Not credential-read: the digest is a hash, not the secret value, so no credential material enters the caller's context."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "set"
 profile = "remote-mutate"
 fact = "Stores or updates secret values in the linked project, exposed to Edge Functions as environment variables."
 source = "https://supabase.com/docs/reference/cli/supabase-secrets-set"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "unset"
 profile = "remote-destroy-recoverable"
 fact = "Removes named secrets from the linked project."
 source = "https://supabase.com/docs/reference/cli/supabase-secrets-unset"
 judgment = "Recoverable: a secret can be re-set."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── storage: object operations on Supabase Storage buckets.
 [[command.sub]]
@@ -389,6 +461,8 @@ name = "ls"
 profile = "remote-read"
 fact = "Lists objects in a Storage bucket; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-storage-ls"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "cp"
 candidate = true
@@ -421,18 +495,24 @@ name = "types"
 profile = "remote-read"
 fact = "Connects to the database (local or --linked/--db-url/--project-id) and prints typed definitions (TypeScript/Go/Swift/Python) matching its schema; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-gen-types"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "keys"
 profile = "credential-read"
 fact = "Generates and prints the project/branch API keys (anon, service_role, and publishable/secret keys) derived from the JWT secret."
 source = "https://supabase.com/docs/reference/cli/supabase-gen-keys"
 judgment = "Credential exposure: the emitted API-key values enter the caller's context."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "signing-key"
 profile = "credential-mint"
 fact = "Generates a new private JWT signing key (ES256 or RS256) for import into the dashboard or CLI use."
 source = "https://supabase.com/docs/reference/cli/supabase-gen-signing-key"
 judgment = "Mints fresh private key material returned to the caller; classified credential-mint though generation is local."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── snippets: saved SQL snippets.
 [[command.sub]]
@@ -443,11 +523,15 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the SQL snippets saved in the linked project; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-snippets-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "download"
 profile = "remote-read"
 fact = "Retrieves the SQL contents of a snippet by ID; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-snippets-download"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── sso: enterprise SAML single sign-on.
 [[command.sub]]
@@ -458,32 +542,44 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the SSO identity providers configured for the project; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-list"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "show"
 profile = "remote-read"
 fact = "Shows the configuration of a specific SSO provider; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-show"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "info"
 profile = "remote-read"
 fact = "Prints the project's SAML SSO metadata (issuer/ACS URLs); read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-info"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "add"
 profile = "remote-authorize"
 fact = "Registers a SAML identity provider for the project, changing who can authenticate."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-add"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-authorize"
 fact = "Modifies an existing SSO provider's settings, changing authentication trust."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "remove"
 profile = "remote-destroy-recoverable"
 fact = "Disconnects a SAML identity provider from the project."
 source = "https://supabase.com/docs/reference/cli/supabase-sso-remove"
 judgment = "Recoverable: the provider can be re-added."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── network-restrictions: database CIDR allowlist.
 [[command.sub]]
@@ -494,11 +590,15 @@ name = "get"
 profile = "remote-read"
 fact = "Displays the project's current database network restrictions; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-network-restrictions-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-authorize"
 fact = "Changes which IP/CIDR ranges may connect to the database (append or overwrite the allowlist) — a network access-control policy change."
 source = "https://supabase.com/docs/reference/cli/supabase-network-restrictions-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── network-bans: temporarily blocked IPs.
 [[command.sub]]
@@ -509,11 +609,15 @@ name = "get"
 profile = "remote-read"
 fact = "Lists the currently active network bans (temporarily blocked IPs); read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-network-bans-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "remove"
 profile = "remote-mutate"
 fact = "Unblocks (removes the ban on) specified IP addresses on the project."
 source = "https://supabase.com/docs/reference/cli/supabase-network-bans-remove"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── config: project settings as code.
 [[command.sub]]
@@ -524,6 +628,8 @@ name = "push"
 profile = "remote-mutate"
 fact = "Applies the local supabase/config.toml to the linked remote project, updating its settings."
 source = "https://supabase.com/docs/reference/cli/supabase-config-push"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── encryption: project root encryption key.
 [[command.sub]]
@@ -535,12 +641,16 @@ profile = "credential-read"
 fact = "Retrieves and prints the project's 64-character hex root encryption key."
 source = "https://supabase.com/docs/reference/cli/supabase-encryption-get-root-key"
 judgment = "Credential exposure: the root encryption key is secret material that enters the caller's context."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update-root-key"
 profile = "remote-mutate"
 fact = "Sets/rotates the project's root encryption key on the platform."
 source = "https://supabase.com/docs/reference/cli/supabase-encryption-update-root-key"
 judgment = "Writes secret material to the remote (secret-write); above the auto-approve line regardless of the exact archetype."
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── postgres-config: Postgres parameter overrides.
 [[command.sub]]
@@ -551,16 +661,22 @@ name = "get"
 profile = "remote-read"
 fact = "Retrieves the project's current Postgres configuration overrides; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Overrides Postgres configuration on the remote database (may destabilize it or override compute add-on tuning)."
 source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-mutate"
 fact = "Deletes specific Postgres config overrides, reverting them to defaults on the remote database."
 source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-delete"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── ssl-enforcement.
 [[command.sub]]
@@ -571,8 +687,12 @@ name = "get"
 profile = "remote-read"
 fact = "Retrieves the project's current SSL enforcement configuration; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-get"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-authorize"
 fact = "Enables or disables the requirement that database connections use SSL — a connection-security policy change."
 source = "https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-update"
+standalone = ["--create-ticket", "--debug", "--experimental", "--help", "--linked", "--local", "--yes", "-h"]
+valued = ["--dns-resolver", "--network-id", "--output", "--project-ref", "--workdir", "-o"]

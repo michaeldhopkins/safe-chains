@@ -22,6 +22,7 @@ profile = "credential-read"
 fact = "Reads the secret/data at a Vault path and prints it to stdout — Vault paths hold secret material (tokens, keys, credentials), which enters the caller's context."
 source = "https://developer.hashicorp.com/vault/docs/commands/read"
 judgment = "`vault read` is the secret-fetch command of a secrets manager; even where a path holds config, the conservative classification is credential exposure."
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "list"

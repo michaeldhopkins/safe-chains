@@ -20,11 +20,13 @@ name = "find-generic-password"
 profile = "credential-read"
 fact = "Searches the macOS keychain for a generic-password item and, with -w, prints the stored secret to stdout — a credential the caller can read."
 source = "https://ss64.com/mac/security.html — find-generic-password"
+standalone = ["--help", "-h"]
 [[command.sub]]
 name = "find-internet-password"
 profile = "credential-read"
 fact = "Searches the macOS keychain for an internet-password item and, with -w, prints the stored secret to stdout — a credential the caller can read."
 source = "https://ss64.com/mac/security.html — find-internet-password"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "list-keychains"

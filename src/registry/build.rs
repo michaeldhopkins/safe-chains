@@ -234,6 +234,21 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
         assert!(cited(&toml.fact), "{parent} sub `{}`: `profile` requires a `fact`", toml.name);
         assert!(cited(&toml.source), "{parent} sub `{}`: `profile` requires a `source`", toml.name);
         assert!(judged(&toml.judgment), "{parent} sub `{}`: `judgment`, if given, must not be blank", toml.name);
+        // A profiled sub must say what flags it accepts. The engine classifies it from its archetype
+        // without running the legacy flag walk, so an EMPTY list is not "nothing permitted" — before
+        // this was enforced it meant "everything permitted", and `git rebase --exec 'rm -rf /'`
+        // classified as an ordinary rebase. Declaring `tolerate_unknown_*` is the explicit way to say
+        // a surface is genuinely unbounded; saying nothing at all is not an option.
+        assert!(
+            !toml.standalone.is_empty()
+                || !toml.valued.is_empty()
+                || toml.tolerate_unknown_short == Some(true)
+                || toml.tolerate_unknown_long == Some(true)
+                || !toml.flag.is_empty(),
+            "{parent} sub `{}`: a profiled sub must declare its flag surface — list `standalone`/\
+             `valued`, or set `tolerate_unknown_long = true` if it is genuinely unbounded",
+            toml.name,
+        );
         // A profiled sub is a leaf: the engine classifies it by archetype, and its legacy kind is
         // forced to deny-all (below) — a nested Branching would sidestep that.
         assert!(toml.sub.is_empty(), "{parent} sub `{}`: a profiled sub must be a leaf (no nested subs)", toml.name);

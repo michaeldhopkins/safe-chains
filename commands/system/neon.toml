@@ -85,6 +85,8 @@ name = "me"
 profile = "remote-read"
 fact = "Shows the current authenticated user's account details, fetched from the Neon API."
 source = "https://neon.com/docs/reference/neon-cli — `neon me`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "auth"
@@ -111,6 +113,8 @@ name = "list"
 profile = "remote-read"
 fact = "Lists projects belonging to the account and projects shared with the user, from the Neon API."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "get"
 profile = "remote-read"
@@ -118,28 +122,36 @@ fact = "Retrieves details about a Neon project by ID from the API."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects get`"
 # Selection + the CLI's global output/auth options; all read-side.
 standalone = ["--help", "-h"]
-valued = ["--api-host", "--api-key", "--context-file", "--output", "--project-id", "-o"]
+valued = ["--context-file", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Provisions a new Neon project (compute, database, role, endpoint) via the API. JSON output returns connection_uri/connection_parameters that embed the role password and host."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects create`"
 judgment = "Classified remote-create for the provisioning it performs; note the create response also EXPOSES a role password. Above the auto-approve line on both counts."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Modifies project settings (name, compute units, connection restrictions) after creation via the API."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects update`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes a project from the account. Recoverable via `neon projects recover` within a 7-day deletion-recovery window; permanent after 7 days."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects delete` / `recover`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "recover"
 profile = "remote-mutate"
 fact = "Restores a deleted project within the 7-day deletion-recovery period, re-provisioning it via the API."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects recover`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "branches"
@@ -150,58 +162,80 @@ name = "list"
 profile = "remote-read"
 fact = "Lists branches in a Neon project from the API."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "get"
 profile = "remote-read"
 fact = "Retrieves details about a branch from the API."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches get`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "schema-diff"
 profile = "remote-read"
 fact = "Compares the latest schemas of two branches (or against a point in a branch's history) and prints the diff; read-only."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches schema-diff`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Creates a branch in a Neon project via the API. With --output json the response includes connection_uris whose connection_uri embeds the role password."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches create`"
 judgment = "Classified remote-create; the JSON create response also EXPOSES a role password. Above the auto-approve line on both counts."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "add-compute"
 profile = "remote-create"
 fact = "Adds a compute endpoint (or read replica) to an existing branch via the API; provisions metered infrastructure."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches add-compute`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "rename"
 profile = "remote-mutate"
 fact = "Renames a branch via the API."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches rename`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "reset"
 profile = "remote-mutate"
 fact = "Resets a child branch to the latest data from its parent, overwriting the child's diverged data. Documented as not reversible."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches reset`"
 judgment = "Overwrites data (a mutate/restore); classified remote-mutate rather than destroy because it re-derives state from the parent rather than deleting the branch. Above the auto-approve line either way."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "restore"
 profile = "remote-mutate"
 fact = "Restores a branch to a point in time from its own or another branch's history; --preserve-under-name can back up the prior state to a new branch first."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches restore`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "set-default"
 profile = "remote-mutate"
 fact = "Sets a branch as the project's default branch via the API."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches set-default`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "set-expiration"
 profile = "remote-mutate"
 fact = "Sets or updates the expiration date for a branch via the API."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches set-expiration`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes a branch. Documented as not reversible — the branch is permanently deleted."
 source = "https://neon.com/docs/reference/cli-branches — `neon branches delete`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "databases"
@@ -212,17 +246,23 @@ name = "list"
 profile = "remote-read"
 fact = "Lists databases within a branch from the API."
 source = "https://neon.com/docs/reference/cli-databases — `neon databases list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Creates a database within a branch via the API."
 source = "https://neon.com/docs/reference/cli-databases — `neon databases create`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes a database within a branch, dropping the database and its contents via the API."
 source = "https://neon.com/docs/reference/cli-databases — `neon databases delete`"
 judgment = "Classified irreversible: dropping a database destroys its data with no dedicated recovery command (a branch-level PITR restore, if in retention, would revert unrelated data too)."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "roles"
@@ -233,18 +273,24 @@ name = "list"
 profile = "remote-read"
 fact = "Lists Postgres roles in a branch from the API."
 source = "https://neon.com/docs/reference/cli-roles — `neon roles list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
 fact = "Creates a Postgres role via the API. Neon generates the role's password; table output masks it, but the role is a new login credential provisioned server-side."
 source = "https://neon.com/docs/reference/cli-roles — `neon roles create`"
 judgment = "Classified remote-create; the generated password may surface in JSON/API output, an added credential-exposure concern. Above the auto-approve line."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes a Postgres role from a branch via the API."
 source = "https://neon.com/docs/reference/cli-roles — `neon roles delete`"
 judgment = "Recoverable: a role can be recreated (a new password is then generated). No unique data is lost by removing the role itself."
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "operations"
@@ -255,6 +301,8 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the history of system operations for a project (audit/inspection); read-only."
 source = "https://neon.com/docs/reference/cli-operations — `neon operations list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "orgs"
@@ -265,6 +313,8 @@ name = "list"
 profile = "remote-read"
 fact = "Lists organizations the authenticated user belongs to, from the API."
 source = "https://neon.com/docs/reference/cli-orgs — `neon orgs list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "ip-allow"
@@ -274,33 +324,45 @@ name = "list"
 profile = "remote-read"
 fact = "Lists the IP addresses in the project's IP allowlist, from the API."
 source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow list`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "add"
 profile = "remote-authorize"
 fact = "Adds IP addresses to the project's IP allowlist, changing which hosts may connect. A --protected-only flag scopes the entry to protected branches."
 source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow add`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "remove"
 profile = "remote-authorize"
 fact = "Removes IP addresses from the project's IP allowlist, changing the network access policy."
 source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow remove`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "reset"
 profile = "remote-authorize"
 fact = "Replaces the entire IP allowlist with the specified addresses, or clears it if none are given — changes the network access policy wholesale."
 source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow reset`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "connection-string"
 profile = "credential-read"
 fact = "Prints a Postgres connection URL that, per the docs, \"includes the password for the specified role\" — a live credential value emitted to stdout."
 source = "https://neon.com/docs/reference/cli-connection-string — `neon connection-string`"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "cs"
 profile = "credential-read"
 fact = "Alias of `connection-string`: prints a Postgres connection URL that includes the role password."
 source = "https://neon.com/docs/reference/cli-connection-string — `neon connection-string` (alias `cs`)"
+standalone = ["--help", "--no-color", "--yes", "-h", "-y"]
+valued = ["--context-file", "--org-id", "--output", "--project-id", "-o"]
 
 [[command.sub]]
 name = "endpoints"

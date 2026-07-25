@@ -127,6 +127,8 @@ profile = "local-install-pinned"
 fact = "`npm ci` installs exactly the versions in package-lock.json (a hash-pinned lockfile), failing if it is out of sync — a reproducible install."
 source = "https://docs.npmjs.com/cli/commands/npm-ci"
 judgment = "Pinned by definition (lockfile); the scripts-off form runs no foreign code, so it is the safe local-install-pinned shape."
+standalone = ["--help", "--json", "--silent", "-h"]
+valued = ["--prefix", "--registry", "--workspace", "-w"]
 [[command.sub.flag]]
 name = "--ignore-scripts"
 when_absent = true
@@ -141,9 +143,13 @@ profile = "supply-chain-build"
 fact = "`npm install` resolves and installs dependencies, may UPDATE package-lock.json / add packages (floating, not reproducible), and runs lifecycle scripts by default — fetched code executes at install time."
 source = "https://docs.npmjs.com/cli/commands/npm-install"
 judgment = "Floating + script-running install = the supply-chain surface; not pinned like `ci`, so it stays supply-chain-build even with --ignore-scripts."
+standalone = ["--help", "--json", "--silent", "-h"]
+valued = ["--prefix", "--registry", "--workspace", "-w"]
 [[command.sub]]
 name = "i"
 aliases = ["add", "isntall"]
 profile = "supply-chain-build"
 fact = "Alias of `npm install` — floating dependency install that runs lifecycle scripts by default."
 source = "https://docs.npmjs.com/cli/commands/npm-install"
+standalone = ["--help", "--json", "--silent", "-h"]
+valued = ["--prefix", "--registry", "--workspace", "-w"]

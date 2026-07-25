@@ -24,6 +24,7 @@ profile = "decrypt-read"
 fact = "`sops decrypt FILE` decrypts the file and writes its PLAINTEXT to stdout (or in place with `--in-place`) — the decrypted secrets (keys, tokens, passwords) enter the caller's context."
 source = "https://github.com/getsops/sops#22encrypting-using-age"
 judgment = "Revealing a secrets file's decrypted contents to the model is a secret disclosure; conservative classification is decrypt-to-screen (credential exposure)."
+standalone = ["--help", "-h"]
 
 # `filestatus` reports only whether a file is already encrypted — a local metadata read, no plaintext.
 [[command.sub]]

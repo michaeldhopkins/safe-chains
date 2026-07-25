@@ -79,11 +79,15 @@ name = "create"
 profile = "remote-create"
 fact = "Creates a new service on Render (non-interactive mode), provisioning it on the control plane via the HTTPS API; the service is billed per its instance type."
 source = "https://render.com/docs/cli-reference — `render services create`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Updates configuration for an existing service on the Render control plane via the API."
 source = "https://render.com/docs/cli-reference — `render services update`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "deploys"
@@ -96,11 +100,15 @@ name = "create"
 profile = "remote-control"
 fact = "Triggers a deploy for the specified service on Render and streams logs in real time; rolls new code/config to the running service."
 source = "https://render.com/docs/cli-reference — `render deploys create`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "cancel"
 profile = "remote-control"
 fact = "Cancels a running deploy for a service via the Render API."
 source = "https://render.com/docs/cli-reference — `render deploys cancel`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "jobs"
@@ -114,11 +122,15 @@ profile = "remote-exec"
 fact = "Creates a one-off job for a service; the required startCommand specifies the command Render runs on a job instance that inherits the base service's build artifact and environment variables."
 source = "https://render.com/docs/one-off-jobs — Create job (startCommand); https://render.com/docs/cli-reference — `render jobs create`"
 judgment = "Runs caller-supplied code on Render infra with the service's full environment — arbitrary remote command execution, not merely a control signal."
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "cancel"
 profile = "remote-control"
 fact = "Cancels a running one-off job for a service via the Render API."
 source = "https://render.com/docs/cli-reference — `render jobs cancel`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "logs"
@@ -144,12 +156,16 @@ name = "restart"
 profile = "remote-control"
 fact = "Restarts a running service by resource ID, rebooting it via the Render control plane."
 source = "https://render.com/docs/cli-reference — `render restart`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "ssh"
 profile = "remote-exec"
 fact = "Opens an interactive SSH terminal session to a running service instance."
 source = "https://render.com/docs/cli — SSH into a service instance; https://render.com/docs/cli-reference — `render ssh`"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "psql"
@@ -157,6 +173,8 @@ profile = "remote-exec"
 fact = "Opens an interactive psql session to a managed Render Postgres database; can run arbitrary SQL (read and write, including DDL/DML) and accepts --command to execute SQL non-interactively."
 source = "https://render.com/docs/cli — psql; https://render.com/docs/cli-reference — `render psql`"
 judgment = "An interactive DB shell against remote data is arbitrary remote read/write; classified as remote code execution against the datastore, not a mere read."
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "pgcli"
@@ -164,6 +182,8 @@ profile = "remote-exec"
 fact = "Opens an interactive pgcli session to a managed Render Postgres database; arbitrary SQL read/write against remote data."
 source = "https://render.com/docs/cli-reference — `render pgcli`"
 judgment = "Same as psql: interactive remote DB shell = arbitrary remote read/write."
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "kv-cli"
@@ -171,6 +191,8 @@ profile = "remote-exec"
 fact = "Opens an interactive redis-cli or valkey-cli session for a managed Render Key Value instance; arbitrary command read/write against the remote store."
 source = "https://render.com/docs/cli-reference — `render kv-cli`"
 judgment = "Interactive remote Key Value shell = arbitrary remote read/write."
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
 
 [[command.sub]]
 name = "skills"

@@ -82,32 +82,44 @@ name = "create"
 profile = "remote-create"
 fact = "Creates a new application (an empty container for services) on the Koyeb control plane via the HTTPS API."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps create`"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 [[command.sub.sub]]
 name = "init"
 profile = "remote-create"
 fact = "Creates an application AND its first service in one call, deploying from a git repo or container image."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps init`"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Updates an existing application's settings on Koyeb via the API; the app keeps running."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps update`"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes the named application and all its services and deployments from Koyeb."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps delete`"
 judgment = "Classified recoverable, not irreversible: the app definition can be recreated and redeployed from source. Any app-held DATA (a managed database's contents) would make a specific sub irreversible — that lives on the addons/database subs, not here."
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 [[command.sub.sub]]
 name = "pause"
 profile = "remote-control"
 fact = "Pauses the application — stops its running services without deleting them; resumable."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps pause`"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 [[command.sub.sub]]
 name = "resume"
 profile = "remote-control"
 fact = "Resumes a paused application, restarting its services."
 source = "https://www.koyeb.com/docs/reference/cli — `koyeb apps resume`"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "-o"]
 
 [[command.sub]]
 name = "deployments"
