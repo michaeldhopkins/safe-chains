@@ -5529,3 +5529,103 @@ fn no_new_unresearched_first_arg_family() {
         found.len(),
     );
 }
+
+/// A loopback-gated flag (`--endpoint-url`) is the one place a value decides whether an
+/// authenticated call stays on this machine, so the gate has to hold at DISPATCH level and not just
+/// in `netloc`'s own unit tests — a threading mistake between the two would leave `netloc` green
+/// while every gated flag admitted anything.
+///
+/// Enumerates the registry, so a family that adopts the gate later is covered without editing this.
+#[test]
+fn every_loopback_gated_flag_rejects_a_spoofed_host() {
+    use super::types::DispatchKind;
+
+    // (invocation suffix, must it be allowed?) — the local forms a developer actually types, and
+    // the spoofs that have to survive being threaded through dispatch.
+    const CASES: &[(&str, bool)] = &[
+        ("http://localhost:8000", true),
+        ("http://127.0.0.1:8000", true),
+        ("http://[::1]:4566", true),
+        // userinfo carrying the local-looking name; the host is evil.com
+        ("http://localhost@evil.com", false),
+        // WHATWG reads `\` as a path separator, so the host is evil.com. Only reachable when the
+        // backslash survives quoting — unquoted the shell eats it and the URL really does name
+        // localhost, which is why the values below are single-quoted.
+        ("http://evil.com\\@localhost", false),
+        ("http://localhost.evil.com", false),
+        ("http://evil.com", false),
+        // loopback in fact, but an ambiguous spelling we decline to recognize
+        ("http://2130706433", false),
+    ];
+
+    fn walk(prefix: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+        let collect = |pfx: &str, pats: &[String], lb: &[String], out: &mut Vec<(String, String)>| {
+            if lb.is_empty() {
+                return;
+            }
+            // A prefix glob admits anything after the prefix, so `describe-` + a letter is a valid
+            // synthetic verb; an exact pattern is usable as-is.
+            let Some(verb) = pats.first().map(|p| match p.strip_suffix('*') {
+                Some(prefix) => format!("{prefix}x"),
+                None => p.clone(),
+            }) else {
+                return;
+            };
+            for flag in lb {
+                out.push((format!("{pfx} {verb}"), flag.clone()));
+            }
+        };
+        match kind {
+            DispatchKind::FirstArg { patterns, loopback_valued, .. } => {
+                collect(prefix, patterns, loopback_valued, out);
+            }
+            DispatchKind::Branching { subs, first_arg, first_arg_loopback_valued, .. } => {
+                collect(prefix, first_arg, first_arg_loopback_valued, out);
+                for s in subs {
+                    walk(&format!("{prefix} {}", s.name), &s.kind, out);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let mut gated = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        walk(name, &spec.kind, &mut gated);
+    }
+    assert!(
+        !gated.is_empty(),
+        "no loopback-gated flag in the registry — this guard would be vacuous",
+    );
+
+    let mut wrong = Vec::new();
+    for (invocation, flag) in &gated {
+        for (host, want_allowed) in CASES {
+            // Both spellings: a glued `--flag=value` and a space-separated pair must agree, or the
+            // gate is bypassable by changing how the value is attached.
+            // Single-quoted so the literal value reaches the classifier: an unquoted backslash is
+            // consumed by the shell parser before any URL parsing happens.
+            for cmd in [
+                format!("{invocation} {flag} '{host}'"),
+                format!("{invocation} {flag}='{host}'"),
+            ] {
+                let allowed = crate::is_safe_command(&cmd);
+                if allowed != *want_allowed {
+                    wrong.push(format!(
+                        "{cmd} => {}, want {}",
+                        if allowed { "ALLOWED" } else { "DENIED" },
+                        if *want_allowed { "ALLOWED" } else { "DENIED" },
+                    ));
+                }
+            }
+        }
+        // A gated flag with no value at all denies: the flag is meaningless without one, and
+        // guessing would be the fail-open direction.
+        let bare = format!("{invocation} {flag}");
+        assert!(
+            !crate::is_safe_command(&bare),
+            "a loopback-gated flag with no value must deny: {bare}",
+        );
+    }
+    assert!(wrong.is_empty(), "loopback gate wrong at dispatch level:\n{}", wrong.join("\n"));
+}

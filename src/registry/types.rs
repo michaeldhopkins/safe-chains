@@ -64,6 +64,11 @@ pub(super) struct TomlCommand {
     pub first_arg_standalone: Vec<String>,
     #[serde(default)]
     pub first_arg_valued: Vec<String>,
+    /// Flags admitted only when their VALUE names this machine (`--endpoint-url
+    /// http://localhost:8000`). Same arity as `first_arg_valued`; the value is classified by
+    /// `netloc::is_loopback`, and anything not positively recognized as loopback denies.
+    #[serde(default)]
+    pub first_arg_loopback_valued: Vec<String>,
     #[serde(default)]
     pub credential_first_arg: Vec<String>,
     /// Top-level classifying flags (`[[command.flag]]`): a flag whose PRESENCE classifies the WHOLE
@@ -495,6 +500,11 @@ pub(super) struct TomlSub {
     pub first_arg_standalone: Vec<String>,
     #[serde(default)]
     pub first_arg_valued: Vec<String>,
+    /// Flags admitted only when their VALUE names this machine (`--endpoint-url
+    /// http://localhost:8000`). Same arity as `first_arg_valued`; the value is classified by
+    /// `netloc::is_loopback`, and anything not positively recognized as loopback denies.
+    #[serde(default)]
+    pub first_arg_loopback_valued: Vec<String>,
     /// First-positional globs (`secret`, `secret/*`) that make this sub a CREDENTIAL-READ: matching
     /// denies, before the allow-glob. The value-dependent complement to `profile=credential-read`
     /// (whole sub) — `kubectl get secret/x`, `aws configure get aws_secret_access_key`.
@@ -783,6 +793,8 @@ pub(super) enum DispatchKind {
         /// `glob_presents_unlisted_flag`.
         standalone: Vec<String>,
         valued: Vec<String>,
+        /// Flags admitted only when their value is a loopback endpoint.
+        loopback_valued: Vec<String>,
     },
     RequireAny {
         require_any: Vec<String>,
@@ -801,6 +813,7 @@ pub(super) enum DispatchKind {
         /// Flags the `first_arg` glob family accepts, as in `DispatchKind::FirstArg`.
         first_arg_standalone: Vec<String>,
         first_arg_valued: Vec<String>,
+        first_arg_loopback_valued: Vec<String>,
         /// First-positional globs that classify the invocation as a credential-read (deny), checked
         /// after explicit subs and before the allow-glob. Empty for almost every command.
         credential_first_arg: Vec<String>,

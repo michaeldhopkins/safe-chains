@@ -134,13 +134,14 @@ pub(super) fn glob_presents_unlisted_flag(
     skip: usize,
     standalone: &[String],
     valued: &[String],
+    loopback_valued: &[String],
 ) -> bool {
-    if standalone.is_empty() && valued.is_empty() {
+    if standalone.is_empty() && valued.is_empty() && loopback_valued.is_empty() {
         return false;
     }
     let known =
         |f: &str| standalone.iter().any(|a| a == f) || valued.iter().any(|a| a == f);
-    for t in tokens.iter().skip(skip) {
+    for (idx, t) in tokens.iter().enumerate().skip(skip) {
         let s = t.as_str();
         if s == "--" {
             break;
@@ -149,6 +150,20 @@ pub(super) fn glob_presents_unlisted_flag(
             continue;
         }
         let head = s.split_once('=').map_or(s, |(f, _)| f);
+        // A loopback-gated flag is admitted only when its VALUE names this machine. `--endpoint-url
+        // http://localhost:8000` is a developer talking to their own service; the same flag pointed
+        // anywhere else redirects an authenticated request. A missing value denies — the flag is
+        // meaningless without one and guessing would be the fail-open direction.
+        if loopback_valued.iter().any(|a| a == head) {
+            let value = match s.split_once('=') {
+                Some((_, v)) => Some(v),
+                None => tokens.get(idx + 1).map(Token::as_str),
+            };
+            if value.is_some_and(crate::netloc::is_loopback) {
+                continue;
+            }
+            return true;
+        }
         if known(head) {
             continue;
         }
