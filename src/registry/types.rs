@@ -712,6 +712,20 @@ pub(super) struct SubSpec {
     pub profile: Option<String>,
     /// Escalating flags: each, when present, adds `classifies`'s capability to the resolved profile.
     pub flags: Vec<FlagProvenance>,
+    /// The sub's DECLARED flag allowlist, preserved for a PROFILED sub. Its legacy `kind` is forced
+    /// to deny-all at build time, but the engine classifies a profiled sub straight from its
+    /// archetype and never reaches that kind — so without keeping the lists here the declaration
+    /// would be discarded and ANY flag would ride along on the profile. That was a fail-OPEN:
+    /// `git rebase --exec 'rm -rf /'` and `supabase db dump --frobnicate` both classified as their
+    /// benign base profile. `sub_archetypes` validates presented flags against these.
+    pub allowed_standalone: Vec<String>,
+    pub allowed_valued: Vec<String>,
+    /// The sub's declared tolerance for flags it does not enumerate — the existing, explicit way to
+    /// say "this tool's flag surface is genuinely unbounded" (a cloud API's per-service options).
+    /// Preserved alongside the allowlist so the profiled path honors it: a sub that declares it stays
+    /// open BY DECLARATION (reviewable in the TOML) rather than by a silent engine default, and a sub
+    /// that does not — `git rebase`, where a flag changes the operation — enforces.
+    pub allowed_unknown: crate::policy::UnknownTolerance,
     /// If this sub was declared with `policy = "key"`, the referenced
     /// handler_policy name is preserved for docs rendering so a sub
     /// that points at a policy also shown in **Shared flag sets** can

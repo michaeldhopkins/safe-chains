@@ -99,7 +99,67 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
             out.push(flag.classifies.as_str());
         }
     }
+    // The profile fixes the TIER; it must not also decide what is ADMISSIBLE. Without this the
+    // archetype path bypassed the flag allowlist entirely and any flag rode along on the base
+    // profile — `git rebase --exec 'rm -rf /'` classified as an ordinary rebase. `unclassified` is
+    // the sanctioned fail-closed marker: it resolves to no archetype, so the engine emits a worst
+    // capability and the invocation denies.
+    if presents_unlisted_flag(tokens, sub) {
+        out.push("unclassified");
+    }
     Some(out)
+}
+
+/// Whether `tokens` carry a flag the profiled `sub` does not declare. Mirrors the legacy flag walk:
+/// `--long` matched whole or as `--long=value`, single-dash tokens split into clustered shorts, `--`
+/// ends the flag region. A sub that declares NO flags at all is treated as "not yet enumerated"
+/// rather than "nothing permitted", so this tightens only where a list exists — the global
+/// enforcement of the empty case is staged separately (see the backfill guard).
+fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
+    // A flag declared as an escalating `[[command.sub.flag]]` IS declared — it just carries a
+    // capability rather than sitting on the plain allowlist. Omitting it here would deny the very
+    // invocations the escalation exists to classify (`npm ci --ignore-scripts`, whose whole point is
+    // that its PRESENCE is the safe form).
+    let known = |f: &str| {
+        sub.allowed_standalone.iter().any(|a| a == f)
+            || sub.allowed_valued.iter().any(|a| a == f)
+            || sub.flags.iter().any(|d| d.name == f)
+            // An output-path flag is declared too — it names the write destination the engine
+            // path-gates (`supabase db dump -f dump.sql`), so it is admissible by construction.
+            || sub.output_path_flags.iter().any(|a| a == f)
+            || sub.destination_flag.as_deref() == Some(f)
+    };
+    for t in tokens.iter().skip(1) {
+        let s = t.as_str();
+        if s == "--" {
+            break;
+        }
+        if !s.starts_with('-') || s == "-" {
+            continue;
+        }
+        let head = s.split_once('=').map_or(s, |(f, _)| f);
+        if known(head) {
+            continue;
+        }
+        // An explicitly declared tolerance keeps the sub open for the shape it names — the
+        // established way to say "this surface is genuinely unbounded" (a cloud API's per-service
+        // options). Declared in the TOML, so it is reviewable, unlike the silent default it replaces.
+        use crate::policy::UnknownTolerance as U;
+        let tolerated = if s.starts_with("--") {
+            matches!(sub.allowed_unknown, U::Long | U::Both)
+        } else {
+            matches!(sub.allowed_unknown, U::Short | U::Both)
+        };
+        if tolerated {
+            continue;
+        }
+        // A single-dash multi-char token may be clustered shorts (`-abc` = `-a -b -c`).
+        if !s.starts_with("--") && s.len() > 2 && s[1..].chars().all(|c| known(&format!("-{c}"))) {
+            continue;
+        }
+        return true;
+    }
+    false
 }
 
 /// The facet archetypes a flat command's PRESENT top-level classifying flags (`[[command.flag]]`)
