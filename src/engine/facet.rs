@@ -24,12 +24,25 @@ pub trait FacetTerm: Copy + Eq + Sized + 'static {
     fn as_str(self) -> &'static str;
     /// Parse a term from its TOML spelling.
     fn from_term(s: &str) -> Option<Self>;
+    /// The term a level is LEAST likely to admit — the one `Capability::worst` carries on this axis.
+    ///
+    /// Not derivable from the term list, which is why it is declared. Most ordinals run
+    /// least-severe to most, so the ladder top is the hazard; but `Isolation` and `Pinning` are
+    /// TRUST ladders where higher is safer and a level FLOORS them (`>= namespace`, `>= version`),
+    /// so their hazard is the BOTTOM. And a categorical has no order at all: `TriggerKind::None`
+    /// means "not recurring", the benign case, while `Clock`/`Event` are what persist.
+    ///
+    /// Hand-writing this per axis inside `worst()` is what let it drift — it carried
+    /// `TriggerKind::None`, so a clause allowing only non-recurring triggers admitted the
+    /// fail-closed sentinel on that axis.
+    fn hazard() -> Self;
 }
 
 macro_rules! ordinal_term {
     (
         $(#[$meta:meta])*
         $name:ident { $first:ident => $fs:literal $(, $rest:ident => $rs:literal)* $(,)? }
+        $(hazard = $hz:ident;)?
     ) => {
         $(#[$meta])*
         #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -46,6 +59,14 @@ macro_rules! ordinal_term {
             fn from_term(s: &str) -> Option<Self> {
                 match s { $fs => Some(Self::$first), $($rs => Some(Self::$rest),)* _ => None }
             }
+            fn hazard() -> Self {
+                // An explicit `hazard =` short-circuits; otherwise the ladder top is the hazard,
+                // which is right for every severity ladder and wrong for the two trust ladders
+                // (they declare it).
+                $( return Self::$hz; )?
+                #[allow(unreachable_code)]
+                { *Self::all().last().expect("a facet has at least one term") }
+            }
         }
     };
 }
@@ -54,6 +75,7 @@ macro_rules! categorical_term {
     (
         $(#[$meta:meta])*
         $name:ident { $first:ident => $fs:literal $(, $rest:ident => $rs:literal)* $(,)? }
+        hazard = $hz:ident;
     ) => {
         $(#[$meta])*
         #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
@@ -70,6 +92,7 @@ macro_rules! categorical_term {
             fn from_term(s: &str) -> Option<Self> {
                 match s { $fs => Some(Self::$first), $($rs => Some(Self::$rest),)* _ => None }
             }
+            fn hazard() -> Self { Self::$hz }
         }
     };
 }
@@ -89,6 +112,7 @@ categorical_term! {
         Authorize => "authorize",   // change credentials/trust/access
         Control => "control",       // start/stop/signal processes, services, devices
     }
+    hazard = Execute;
 }
 
 // ── 2.2 Reach ──────────────────────────────────────────────────────────────────
@@ -133,6 +157,7 @@ categorical_term! {
         Pinned => "pinned",  // host/context/profile explicit on the command line
         Ambient => "ambient",
     }
+    hazard = Ambient;
 }
 
 ordinal_term! {
@@ -200,6 +225,7 @@ ordinal_term! {
         Vm => "vm",
         Ocap => "ocap",
     }
+    hazard = None;
 }
 
 // ── 2.3 Durability ─────────────────────────────────────────────────────────────
@@ -244,6 +270,7 @@ categorical_term! {
         Clock => "clock",   // cron, at
         Event => "event",   // watchexec, git hooks, .envrc on cd
     }
+    hazard = Clock;
 }
 
 // ── 2.4 Information exposure ────────────────────────────────────────────────────
@@ -286,6 +313,7 @@ categorical_term! {
         CrossProcess => "cross-process",       // lldb -p, /proc/*/mem
         Unknown => "unknown",
     }
+    hazard = Unknown;
 }
 
 categorical_term! {
@@ -295,6 +323,7 @@ categorical_term! {
         Own => "own",
         Cross => "cross",
     }
+    hazard = Cross;
 }
 
 // ── 2.5 Channel (network) ──────────────────────────────────────────────────────
@@ -352,6 +381,7 @@ categorical_term! {
         PrivateRegistry => "private-registry",
         Vendored => "vendored",
     }
+    hazard = UnverifiedUrl;
 }
 
 ordinal_term! {
@@ -363,6 +393,7 @@ ordinal_term! {
         HashVerified => "hash-verified",
         Digest => "digest",
     }
+    hazard = Floating;
 }
 
 categorical_term! {
@@ -376,6 +407,7 @@ categorical_term! {
         CallTime => "call-time",         // deps' code runs only when your program runs
         RunArtifact => "run-artifact",   // you execute the fetched binary/image
     }
+    hazard = InstallHook;
 }
 
 // ── 2.7 Resource ───────────────────────────────────────────────────────────────
@@ -533,47 +565,65 @@ impl Capability {
         out
     }
 
-    /// A maximally-severe capability — every axis at its worst term, so no well-formed
-    /// level admits it (`locus.local = kernel` alone denies it everywhere, v1.4 §4.3).
+    /// A maximally-severe capability — every axis at its declared `hazard`, so no level whose job
+    /// is to deny admits it. `yolo` DOES admit it, which is that level's whole meaning: a user who
+    /// selects "auto-approve everything" has opted out of the question this sentinel answers.
+    ///
+    /// Derived from `FacetTerm::hazard` rather than hand-written. The hand-written version drifted
+    /// on two axes — `persistence.trigger.kind` sat at `none` ("not recurring", the BENIGN case)
+    /// and the supply chain was absent, which satisfies every supply-chain constraint vacuously on
+    /// an allow clause. Neither was exploitable, because the denial rested on `locus.local =
+    /// kernel`; that it rested on a single axis at all is what
+    /// `the_sentinel_is_denied_even_with_any_one_axis_relaxed` now forbids.
     /// The resolver returns this when it cannot certify something (§0), keeping the
     /// engine from being *looser* than a strict classifier on a form it doesn't
     /// understand. Ordinal worsts are the ladder tops; categorical worsts are the
     /// hazardous term (`Channel::Unknown`, `Principal::Cross`).
     pub fn worst(because: impl Into<String>) -> Self {
         Self {
-            operation: Operation::Execute,
+            operation: Operation::hazard(),
             locus: Locus {
-                local: LocalLocus::Kernel,
-                remote: RemoteReach::Arbitrary,
-                binding: RemoteBinding::Ambient,
-                provenance: Provenance::Opaque,
+                local: LocalLocus::hazard(),
+                remote: RemoteReach::hazard(),
+                binding: RemoteBinding::hazard(),
+                provenance: Provenance::hazard(),
             },
-            scale: Scale::Unbounded,
-            retrieval: RetrievalGranularity::BulkContent,
-            authority: Authority::OtherUser,
-            isolation: Isolation::None,
-            reversibility: Reversibility::Irreversible,
+            scale: Scale::hazard(),
+            retrieval: RetrievalGranularity::hazard(),
+            authority: Authority::hazard(),
+            isolation: Isolation::hazard(),
+            reversibility: Reversibility::hazard(),
             persistence: Persistence {
-                level: PersistenceLevel::Installing,
-                trigger: Trigger { escape: TriggerEscape::Boot, kind: TriggerKind::None },
+                level: PersistenceLevel::hazard(),
+                trigger: Trigger { escape: TriggerEscape::hazard(), kind: TriggerKind::hazard() },
             },
             disclosure: Disclosure {
-                audience: DisclosureAudience::Public,
-                channel: Channel::Unknown,
-                principal: Principal::Cross,
+                audience: DisclosureAudience::hazard(),
+                channel: Channel::hazard(),
+                principal: Principal::hazard(),
             },
             secret: Secret {
-                level: SecretLevel::Transmits,
-                channel: Channel::Unknown,
-                principal: Principal::Cross,
+                level: SecretLevel::hazard(),
+                channel: Channel::hazard(),
+                principal: Principal::hazard(),
             },
             network: Network {
-                direction: NetDirection::InboundListen,
-                destination: NetDestination::Arbitrary,
-                payload: NetPayload::SendsHostData,
+                direction: NetDirection::hazard(),
+                destination: NetDestination::hazard(),
+                payload: NetPayload::hazard(),
             },
-            execution: Execution { trust: ExecutionTrust::NetworkSourced, supply_chain: None },
-            cost: Cost::Quota,
+            execution: Execution {
+                trust: ExecutionTrust::hazard(),
+                // PRESENT, not `None`. An absent supply chain satisfies every supply-chain
+                // constraint vacuously on the allow path, which would leave the install/RCE surface
+                // as the one axis where the fail-closed sentinel is not actually worst.
+                supply_chain: Some(SupplyChain {
+                    source: SupplySource::hazard(),
+                    pinning: Pinning::hazard(),
+                    exec_surface: ExecSurface::hazard(),
+                }),
+            },
+            cost: Cost::hazard(),
             because: because.into(),
         }
     }
