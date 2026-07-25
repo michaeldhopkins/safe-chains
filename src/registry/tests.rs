@@ -5520,7 +5520,7 @@ fn no_new_unresearched_first_arg_family() {
     );
 
     // Exact count, so migrating one family and adding another nets out visibly instead of silently.
-    const REMAINING: usize = 242;
+    const REMAINING: usize = 237;
     assert_eq!(
         found.len(),
         REMAINING,
