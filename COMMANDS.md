@@ -1122,7 +1122,15 @@ Aliases: `gas`
 - **docdb**: Allowed arguments: describe-*, get-*, list-*
 - **docdb-elastic**: Allowed arguments: describe-*, get-*, list-*
 - **ds**: Allowed arguments: describe-*, get-*, list-*
-- **dynamodb**: Allowed arguments: describe-*, list-*
+- **dynamodb create-table**
+- **dynamodb delete-item**
+- **dynamodb delete-table**
+- **dynamodb get-item**
+- **dynamodb put-item**
+- **dynamodb query**
+- **dynamodb scan**
+- **dynamodb update-item**
+- **dynamodb update-table**
 - **dynamodbstreams**: Allowed arguments: describe-*, get-*, list-*
 - **ebs get-snapshot-block**
 - **ec2 describe-instance-attribute**
