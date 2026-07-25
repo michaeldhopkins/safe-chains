@@ -343,6 +343,32 @@
 # first_arg_standalone = ["--debug", "--no-cli-pager"]
 # first_arg_valued = ["--output", "--query", "--region", "--table-name"]
 
+# LOOPBACK_VALUED / LOOPBACK_PROFILE (on a profiled sub) — the same endpoint
+# gate, plus the archetype the sub BECOMES when the endpoint is local.
+#
+# Pointed at an emulator, a cloud operation is a different operation, not the
+# same one with softened edges: remote-mutate carries `sends-host-data`,
+# `effortful` reversibility and (for create) `metered` cost, and every one of
+# those describes a cloud service that isn't in the picture. So the sub names
+# its local counterpart rather than the resolver patching facets by hand.
+#
+# loopback_valued alone   → the flag is admitted only when local; classification
+#                           is unchanged (right for reads, which already pass).
+# + loopback_profile      → a local destination also re-classifies the sub.
+#
+# DESTROY archetypes may not declare loopback_profile and the build refuses it.
+# The emulator claim is unverifiable — `ssh -L 8000:dynamodb.<region>.amazonaws
+# .com:443` makes localhost mean production — and being wrong about that is
+# recoverable for a write and not for a delete. Destroys may still declare
+# loopback_valued: the flag stays usable, it just buys no relaxation.
+
+# [[command.sub.sub]]
+# name = "put-item"
+# profile = "remote-mutate"                        # against the real service
+# loopback_valued = ["--endpoint-url"]
+# loopback_profile = "local-mutate-recoverable"    # against DynamoDB Local
+# valued = ["--table-name", "--item", "--region"]
+
 # CREDENTIAL_FIRST_ARG — the value-dependent credential-read gate. Same glob
 # syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
 # invocation as a credential exposure instead of allowing it. Checked after

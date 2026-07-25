@@ -208,6 +208,8 @@ pub(super) fn build_subs(
             eval_safe_required_flags: canonical.eval_safe_required_flags.clone(),
             network_destination: canonical.network_destination,
             destination_flag: canonical.destination_flag.clone(),
+        loopback_valued: canonical.loopback_valued.clone(),
+        loopback_profile: canonical.loopback_profile.clone(),
             output_path_flags: canonical.output_path_flags.clone(),
         });
     }
@@ -289,6 +291,37 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
     }
 }
 
+/// A `loopback_profile` says "pointed at this machine, the sub is THIS archetype instead". Two
+/// things must hold or the substitution is incoherent:
+///
+/// - it needs a `loopback_valued` flag, since nothing else can establish that the destination IS
+///   this machine;
+/// - a DESTROY archetype may not declare one. The emulator claim is unverifiable — `ssh -L
+///   8000:dynamodb.us-east-1.amazonaws.com:443` makes `localhost:8000` production — and a wrong
+///   guess is recoverable for a read or a write and not for a delete. Enforcing it here rather than
+///   with a runtime `if` means no future sub can opt out by accident.
+fn assert_loopback_profile_is_coherent(parent: &str, name: &str, toml: &TomlSub) {
+    let Some(local) = toml.loopback_profile.as_deref() else {
+        return;
+    };
+    assert!(
+        !toml.loopback_valued.is_empty(),
+        "{parent} sub `{name}`: `loopback_profile` requires a `loopback_valued` flag — without one \
+         nothing can establish that the destination is this machine",
+    );
+    let profile = toml.profile.as_deref().unwrap_or_default();
+    assert!(
+        !profile.contains("destroy"),
+        "{parent} sub `{name}`: `profile = \"{profile}\"` is a destroy archetype and may not \
+         declare `loopback_profile` — a loopback endpoint cannot be verified (an SSH tunnel makes \
+         localhost mean production), and that is only unrecoverable for destroy",
+    );
+    assert!(
+        !local.contains("destroy"),
+        "{parent} sub `{name}`: `loopback_profile = \"{local}\"` must not be a destroy archetype",
+    );
+}
+
 pub(super) fn build_sub(
     parent: &str,
     mut toml: TomlSub,
@@ -337,6 +370,9 @@ pub(super) fn build_sub(
     let network_destination = toml.network_destination.unwrap_or(false);
     let destination_flag = toml.destination_flag.clone();
     let output_path_flags = toml.output_path_flags.clone();
+    let loopback_valued = toml.loopback_valued.clone();
+    let loopback_profile = toml.loopback_profile.clone();
+    assert_loopback_profile_is_coherent(parent, &name, &toml);
     let valued_for_check = toml.valued.clone();
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
     assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values);
@@ -358,6 +394,8 @@ pub(super) fn build_sub(
         eval_safe_required_flags,
         network_destination,
         destination_flag,
+        loopback_valued,
+        loopback_profile,
         output_path_flags,
     }
 }

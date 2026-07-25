@@ -110,11 +110,6 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     Some(out)
 }
 
-/// Whether `tokens` carry a flag the profiled `sub` does not declare. Mirrors the legacy flag walk:
-/// `--long` matched whole or as `--long=value`, single-dash tokens split into clustered shorts, `--`
-/// ends the flag region. A sub that declares NO flags at all is treated as "not yet enumerated"
-/// rather than "nothing permitted", so this tightens only where a list exists — the global
-/// enforcement of the empty case is staged separately (see the backfill guard).
 /// Whether an invocation admitted by a `first_arg` GLOB carries a flag the family never declared.
 ///
 /// The glob path used to allow on the strength of the first positional alone and never look at the
@@ -175,6 +170,11 @@ pub(super) fn glob_presents_unlisted_flag(
     false
 }
 
+/// Whether `tokens` carry a flag the profiled `sub` does not declare. Mirrors the legacy flag walk:
+/// `--long` matched whole or as `--long=value`, single-dash tokens split into clustered shorts, `--`
+/// ends the flag region. A sub that declares NO flags at all is treated as "not yet enumerated"
+/// rather than "nothing permitted", so this tightens only where a list exists — the global
+/// enforcement of the empty case is staged separately (see the backfill guard).
 fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
     // A flag declared as an escalating `[[command.sub.flag]]` IS declared — it just carries a
     // capability rather than sitting on the plain allowlist. Omitting it here would deny the very
@@ -189,7 +189,7 @@ fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
             || sub.output_path_flags.iter().any(|a| a == f)
             || sub.destination_flag.as_deref() == Some(f)
     };
-    for t in tokens.iter().skip(1) {
+    for (idx, t) in tokens.iter().enumerate().skip(1) {
         let s = t.as_str();
         if s == "--" {
             break;
@@ -198,6 +198,18 @@ fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
             continue;
         }
         let head = s.split_once('=').map_or(s, |(f, _)| f);
+        // An endpoint flag is admitted only when it names THIS machine — see the identical rule on
+        // the glob path in `glob_presents_unlisted_flag`.
+        if sub.loopback_valued.iter().any(|a| a == head) {
+            let value = match s.split_once('=') {
+                Some((_, v)) => Some(v),
+                None => tokens.get(idx + 1).map(Token::as_str),
+            };
+            if value.is_some_and(crate::netloc::is_loopback) {
+                continue;
+            }
+            return true;
+        }
         if known(head) {
             continue;
         }
@@ -358,6 +370,25 @@ fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
 /// the glued short form `-fX` — the last mustn't be a bypass (`-f/etc/cron.d/job` reaching a system
 /// path would otherwise drop the write cap and auto-approve). A bare `-f` with no value is a
 /// malformed invocation the tool itself rejects, so a `None` there is harmless.
+/// The archetype this invocation becomes because a declared endpoint flag names THIS machine —
+/// `Some("local-mutate-recoverable")` for `put-item --endpoint-url http://localhost:8000`, `None`
+/// when no endpoint flag is present, it points elsewhere, or the sub declares no substitute.
+///
+/// Returning `None` for a non-loopback value is what keeps this independent of the admission check:
+/// even if `presents_unlisted_flag` were bypassed, the remote archetype would still be the one that
+/// classifies.
+pub(crate) fn sub_loopback_profile(tokens: &[Token]) -> Option<&'static str> {
+    let cmd = canonical_name(tokens.first()?.command_name());
+    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    let (sub, _rest) = walk_to_profiled_sub_rest(&tokens[1..], &spec.kind)?;
+    let local = sub.loopback_profile.as_ref()?;
+    sub.loopback_valued
+        .iter()
+        .filter_map(|f| flag_value(tokens, f))
+        .any(crate::netloc::is_loopback)
+        .then_some(local.as_str())
+}
+
 pub(crate) fn sub_output_path_token(tokens: &[Token]) -> Option<&str> {
     let cmd = canonical_name(tokens.first()?.command_name());
     let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;

@@ -124,9 +124,26 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     // Phase 1: a subcommand tagged with a facet archetype (`profile = …`) classifies as that
     // archetype's static capability — the derived, self-documenting successor to `candidate = true`.
     // Checked BEFORE command-level behavior, since a subcommand tool carries no `[command.behavior]`.
-    if let Some(names) = crate::registry::sub_archetypes(tokens) {
+    if let Some(mut names) = crate::registry::sub_archetypes(tokens) {
         if !trusted_command_path(arg0.as_str()) {
             return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
+        }
+        // An endpoint flag pointed at THIS machine makes the sub a DIFFERENT operation, not the same
+        // one with softened edges: `put-item --endpoint-url http://localhost:8000` writes to a
+        // process here, so `remote-mutate`'s `sends-host-data`, `effortful` reversibility and (for
+        // create) `metered` cost are all describing a cloud service that isn't in the picture. The
+        // sub names the archetype it becomes, so the substitution stays reviewable data rather than
+        // ad-hoc facet arithmetic at resolve time.
+        //
+        // Destroy archetypes may not declare a substitute at all — `assert_no_loopback_profile_on_
+        // destroy` refuses it at build time. We cannot verify the emulator claim (`ssh -L
+        // 8000:dynamodb.us-east-1.amazonaws.com:443` makes `localhost:8000` production, and no
+        // static classifier sees the tunnel), and that lie is only unrecoverable in the destroy
+        // direction.
+        if let Some(local) = crate::registry::sub_loopback_profile(tokens)
+            && let Some(first) = names.first_mut()
+        {
+            *first = local;
         }
         // One capability per archetype (the sub's profile + each present escalating flag); the level
         // algebra takes the max. Fail-closed: an unknown archetype name → a worst capability, so a
