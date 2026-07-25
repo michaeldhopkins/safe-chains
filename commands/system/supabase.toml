@@ -97,6 +97,9 @@ name = "inspect"
 profile = "remote-read"
 fact = "`inspect db` runs read-only diagnostic queries (bloat, blocking, locks, calls, outliers, table/index/role/db stats, replication-slots, vacuum-stats, long-running-queries) against the local or linked (--linked/--db-url) database; no mutation."
 source = "https://supabase.com/docs/reference/cli/supabase-inspect-db"
+# `inspect` takes a `db <query>` positional pair; the flags select the target database and output.
+standalone = ["--linked", "--local", "--debug", "--experimental", "--help", "-h"]
+valued = ["--db-url", "--output", "--project-ref", "--workdir", "-o"]
 
 # ── services: reports the running/latest service image versions for the project.
 [[command.sub]]
@@ -121,11 +124,15 @@ output_path_flags = ["-f", "--file"]
 fact = "Dumps the remote database schema (and, with --data-only, table data) to stdout or, with -f/--file, a local file; reads remote state, no mutation."
 source = "https://supabase.com/docs/reference/cli/supabase-db-dump"
 judgment = "A BULK remote read (can export all row data to the caller) — data-export, not a point read: scale=unbounded records the volume, disclosure=local-process the destination (the two together proxy the data's unknowable sensitivity). The -f/--file output form adds a path-gated local write, so a dump to a system path gates on locus while one to the worktree stays local."
+standalone = ["--data-only", "--keep-comments", "--linked", "--local", "--role-only", "--use-copy", "--debug", "--experimental", "--help", "-h"]
+valued = ["--db-url", "--exclude", "--password", "--project-ref", "--schema", "--workdir", "-p"]
 [[command.sub.sub]]
 name = "diff"
 profile = "remote-read"
 fact = "Compares schemas (local containers or the linked remote database via --linked/--db-url) and prints the difference; read-only."
 source = "https://supabase.com/docs/reference/cli/supabase-db-diff"
+standalone = ["--linked", "--local", "--use-migra", "--use-pgadmin", "--use-pg-schema", "--debug", "--experimental", "--help", "-h"]
+valued = ["--db-url", "--file", "--project-ref", "--schema", "--workdir", "-f", "-s"]
 [[command.sub.sub]]
 name = "lint"
 profile = "remote-read"

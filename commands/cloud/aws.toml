@@ -116,6 +116,8 @@ profile = "remote-read"
 fact = "Reads one instance attribute. With --attribute userData it returns the instance's UserData (base64), which routinely contains bootstrap secrets, credentials, and tokens; other attributes (instanceType, groupSet, …) are benign."
 source = "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instance-attribute.html"
 judgment = "Base read auto-approves; only --attribute userData escalates to credential-read (returns bootstrap secrets)."
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--attribute", "--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--endpoint-url", "--instance-id", "--output", "--profile", "--query", "--region"]
 [[command.sub.sub.flag]]
 name = "--attribute"
 value_prefix = "userData"
@@ -224,6 +226,9 @@ profile = "remote-read"
 fact = "Reads a Parameter Store parameter. With --with-decryption a SecureString is DECRYPTED, returning the plaintext secret (password/API key/token)."
 source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter.html"
 judgment = "The base read auto-approves; --with-decryption escalates to credential-read since it reveals the encrypted secret value."
+# The API's own selectors plus the AWS CLI global options (which apply to every operation).
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--endpoint-url", "--name", "--output", "--profile", "--query", "--region"]
 [[command.sub.sub.flag]]
 name = "--with-decryption"
 classifies = "credential-read"
@@ -246,6 +251,8 @@ profile = "remote-read"
 fact = "Reads the value history of a parameter. With --with-decryption SecureString values are DECRYPTED to plaintext secrets."
 source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter-history.html"
 judgment = "The base read auto-approves; --with-decryption escalates to credential-read."
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--endpoint-url", "--max-items", "--name", "--output", "--profile", "--query", "--region", "--starting-token"]
 [[command.sub.sub.flag]]
 name = "--with-decryption"
 classifies = "credential-read"
@@ -346,6 +353,8 @@ profile = "remote-read"
 fact = "Reads an API key's metadata. With --include-value the response includes the API key VALUE — a usable API credential."
 source = "https://docs.aws.amazon.com/cli/latest/reference/apigateway/get-api-key.html"
 judgment = "Base read auto-approves; --include-value escalates to credential-read (returns the key value)."
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--api-key", "--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--endpoint-url", "--output", "--profile", "--query", "--region"]
 [[command.sub.sub.flag]]
 name = "--include-value"
 classifies = "credential-read"
@@ -469,6 +478,8 @@ name = "get-connection"
 profile = "credential-read"
 fact = "Connection PASSWORD in clear text (JDBC/data-store connection credentials) — returned by default since HidePassword defaults to false"
 source = "https://docs.aws.amazon.com/cli/latest/reference/glue/get-connection.html"
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--domain-identifier", "--endpoint-url", "--identifier", "--name", "--output", "--profile", "--query", "--region"]
 [[command.sub.sub]]
 name = "get-connections"
 profile = "credential-read"
@@ -941,6 +952,8 @@ profile = "remote-read"
 fact = "Reads a connection's metadata. With --with-secret the response includes connectionCredentials (accessKeyId, secretAccessKey, sessionToken) for the external connection."
 source = "https://docs.aws.amazon.com/cli/latest/reference/datazone/get-connection.html"
 judgment = "Base read auto-approves; --with-secret escalates to credential-read (returns the connection's credentials)."
+standalone = ["--no-paginate", "--no-cli-pager", "--no-sign-request", "--debug", "--help"]
+valued = ["--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--domain-identifier", "--endpoint-url", "--identifier", "--output", "--profile", "--query", "--region"]
 [[command.sub.sub.flag]]
 name = "--with-secret"
 classifies = "credential-read"

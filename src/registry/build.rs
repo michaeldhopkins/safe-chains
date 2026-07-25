@@ -197,6 +197,11 @@ pub(super) fn build_subs(
             policy_ref: canonical.policy_ref.clone(),
             profile: canonical.profile.clone(),
             flags: canonical.flags.clone(),
+            // An alias must inherit the allowlist: an empty list reads as "not yet enumerated" and
+            // would let the alias spelling accept flags its canonical name rejects.
+            allowed_standalone: canonical.allowed_standalone.clone(),
+            allowed_valued: canonical.allowed_valued.clone(),
+            allowed_unknown: canonical.allowed_unknown,
             eval_safe: canonical.eval_safe,
             eval_safe_flags: canonical.eval_safe_flags.clone(),
             eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
@@ -294,6 +299,16 @@ pub(super) fn build_sub(
     // before the subcommand, so `sub_archetypes`'s walk stops early. In that case the legacy kind
     // MUST deny outright (fail-closed), never fall through to a permissive default: force bare off,
     // no flags, no positionals.
+    // Preserve the DECLARED lists before the legacy kind is zeroed: the engine classifies a profiled
+    // sub from its archetype without ever running the legacy flag walk, so these are the only copy
+    // that survives, and `sub_archetypes` validates against them.
+    let (allowed_standalone, allowed_valued) = (toml.standalone.clone(), toml.valued.clone());
+    let allowed_unknown = match (toml.tolerate_unknown_short.unwrap_or(false), toml.tolerate_unknown_long.unwrap_or(false)) {
+        (false, false) => UnknownTolerance::Strict,
+        (true, false) => UnknownTolerance::Short,
+        (false, true) => UnknownTolerance::Long,
+        (true, true) => UnknownTolerance::Both,
+    };
     if profile.is_some() {
         toml.bare = Some(false);
         toml.standalone = Vec::new();
@@ -319,6 +334,9 @@ pub(super) fn build_sub(
         policy_ref,
         profile,
         flags,
+        allowed_standalone,
+        allowed_valued,
+        allowed_unknown,
         eval_safe,
         eval_safe_flags,
         eval_safe_flag_values,
@@ -1038,7 +1056,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             .map(|(k, v)| (k, build_handler_policy(v)))
             .collect();
         let parent_name = toml.name.clone();
-        let subs = filter_candidates(toml.sub)
+        let subs: Vec<SubSpec> = filter_candidates(toml.sub)
             .flat_map(|s| build_subs(&parent_name, s, &handler_policies))
             .collect();
         let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));

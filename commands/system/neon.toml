@@ -116,6 +116,9 @@ name = "get"
 profile = "remote-read"
 fact = "Retrieves details about a Neon project by ID from the API."
 source = "https://neon.com/docs/reference/cli-projects — `neon projects get`"
+# Selection + the CLI's global output/auth options; all read-side.
+standalone = ["--help", "-h"]
+valued = ["--api-host", "--api-key", "--context-file", "--output", "--project-id", "-o"]
 [[command.sub.sub]]
 name = "create"
 profile = "remote-create"
