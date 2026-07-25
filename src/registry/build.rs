@@ -309,11 +309,16 @@ fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSu
         "{parent} sub `{name}`: `loopback_localizes` requires a `loopback_valued` flag — without \
          one nothing can establish that the destination is this machine",
     );
+    // Asked of the archetype's OPERATION facet, not of its name. A name test passes today only
+    // because every destroy archetype happens to be called `*destroy*`; a later `remote-wipe` or
+    // `bucket-purge` carrying `operation = "destroy"` would sail through it and localize. Deciding
+    // by name rather than behavior is the exact mistake this classifier exists to avoid.
     let profile = toml.profile.as_deref().unwrap_or_default();
+    let operation = crate::engine::archetype::archetype(profile).map(|c| c.operation);
     assert!(
-        !profile.contains("destroy"),
-        "{parent} sub `{name}`: `profile = \"{profile}\"` is a destroy archetype and may not set \
-         `loopback_localizes` — a loopback endpoint cannot be verified (an SSH tunnel makes \
+        operation != Some(crate::engine::facet::Operation::Destroy),
+        "{parent} sub `{name}`: `profile = \"{profile}\"` carries `operation = destroy` and may \
+         not set `loopback_localizes` — a loopback endpoint cannot be verified (an SSH tunnel makes \
          localhost mean production), and that is only unrecoverable for destroy",
     );
 }
