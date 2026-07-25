@@ -233,3 +233,130 @@ proptest! {
         prop_assert_eq!(level.admits_capability(&cap), level.nearest_miss(&cap).is_none());
     }
 }
+
+/// `base`, with the axis at index `i` replaced by `donor`'s term for that axis. Capabilities
+/// differing on EXACTLY one axis are the witnesses that matter for `set_facets` completeness, and
+/// independent random generation never produces them: with 27 axes, two arbitrary capabilities
+/// differ almost everywhere, so a missing axis is masked by the other 26 still differing. A first
+/// attempt at that property was vacuous for exactly this reason — dropping `network.payload` from
+/// `set_facets` did not fail it.
+///
+/// `AXIS_COUNT` must cover every axis; `every_axis_index_is_reachable` pins it.
+pub(crate) const AXIS_COUNT: usize = 24;
+
+/// A capability with EVERY axis off its zero term — the donor for reachability checking.
+///
+/// Not `Capability::worst()`, which leaves two axes at their default. For `isolation` that is
+/// correct (least isolation IS the worst). For `persistence.trigger.kind` it is `None` meaning "not
+/// recurring", while the hazardous terms are `Clock`/`Event` — inconsistent with `worst()`'s own
+/// pattern of choosing the hazardous term for a categorical (it does pick `Channel::Unknown` and
+/// `Principal::Cross`). Not exploitable: `worst()`'s deny guarantee rests on `locus.local = kernel`,
+/// which no level admits regardless. Recorded in TODO.md rather than changed here, since altering
+/// the fail-closed sentinel is not a test-fixture-sized decision.
+pub(crate) fn all_axes_non_default() -> Capability {
+    let mut c = Capability::worst("every axis off its zero term");
+    c.isolation = Isolation::Ocap;
+    c.persistence.trigger.kind = TriggerKind::Clock;
+    c
+}
+
+pub(crate) fn with_axis_from(base: &Capability, donor: &Capability, i: usize) -> Capability {
+    let mut c = base.clone();
+    match i {
+        0 => c.operation = donor.operation,
+        1 => c.locus.local = donor.locus.local,
+        2 => c.locus.remote = donor.locus.remote,
+        3 => c.locus.binding = donor.locus.binding,
+        4 => c.locus.provenance = donor.locus.provenance,
+        5 => c.scale = donor.scale,
+        6 => c.retrieval = donor.retrieval,
+        7 => c.authority = donor.authority,
+        8 => c.isolation = donor.isolation,
+        9 => c.reversibility = donor.reversibility,
+        10 => c.persistence.level = donor.persistence.level,
+        11 => c.persistence.trigger.escape = donor.persistence.trigger.escape,
+        12 => c.persistence.trigger.kind = donor.persistence.trigger.kind,
+        13 => c.disclosure.audience = donor.disclosure.audience,
+        14 => c.disclosure.channel = donor.disclosure.channel,
+        15 => c.disclosure.principal = donor.disclosure.principal,
+        16 => c.secret.level = donor.secret.level,
+        17 => c.secret.channel = donor.secret.channel,
+        18 => c.secret.principal = donor.secret.principal,
+        19 => c.network.direction = donor.network.direction,
+        20 => c.network.destination = donor.network.destination,
+        21 => c.network.payload = donor.network.payload,
+        22 => c.execution.trust = donor.execution.trust,
+        23 => c.cost = donor.cost,
+        _ => unreachable!("axis index out of range"),
+    }
+    c
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(3000))]
+
+    /// `set_facets` must distinguish any two capabilities that differ at all.
+    ///
+    /// It is a hand-written enumeration of 24 `push!` lines, and forgetting one is invisible: the
+    /// omitted axis simply never prints. That is not merely a cosmetic gap — `near_neighbours_are_
+    /// declared` computes archetype differences THROUGH `set_facets`, so a missing axis would make
+    /// two genuinely different archetypes look facet-identical, and the guard would demand they be
+    /// declared aliases. A false alias in the confusability catalog is exactly the wrong direction.
+    ///
+    /// Stated as "different capabilities have different facet lists", which fails the moment an
+    /// axis is added to `Capability` without being added here.
+    #[test]
+    fn set_facets_distinguishes_capabilities_differing_in_one_axis(
+        a in arb_capability(),
+        donor in arb_capability(),
+        i in 0..AXIS_COUNT,
+    ) {
+        let b = with_axis_from(&a, &donor, i);
+        // `because` is prose, not a facet, so it is deliberately outside this claim.
+        let same_point = Capability { because: String::new(), ..a.clone() }
+            == Capability { because: String::new(), ..b.clone() };
+        if !same_point {
+            prop_assert_ne!(
+                a.set_facets(),
+                b.set_facets(),
+                "capabilities differing only on axis {} render the same facet list — that axis is \
+                 missing from set_facets, which would also make near_neighbours_are_declared see \
+                 two different archetypes as a false alias",
+                i,
+            );
+        }
+    }
+
+    /// Every axis index really moves something, so `AXIS_COUNT` cannot drift below the number of
+    /// facets and quietly stop covering the tail — which would make the completeness property above
+    /// silently skip the uncovered axes.
+    #[test]
+    fn every_axis_index_is_reachable(i in 0..AXIS_COUNT) {
+        let zero = Capability::default();
+        prop_assert_ne!(
+            with_axis_from(&zero, &all_axes_non_default(), i).set_facets(),
+            zero.set_facets(),
+            "axis index {} changed nothing", i,
+        );
+    }
+
+    /// Every facet `set_facets` reports is one the capability genuinely carries at that term, and
+    /// every omitted axis really is at its zero. Guards the other direction: a `push!` line wired
+    /// to the wrong field would still distinguish capabilities while lying about which axis moved.
+    #[test]
+    fn set_facets_omits_exactly_the_zero_terms(cap in arb_capability()) {
+        let d = Capability::default();
+        let reported: std::collections::BTreeMap<_, _> = cap.set_facets().into_iter().collect();
+        // `operation` is always reported, by design, even at its zero term.
+        prop_assert!(reported.contains_key("operation"));
+        let baseline: std::collections::BTreeMap<_, _> = d.set_facets().into_iter().collect();
+        for (axis, term) in &baseline {
+            if *axis != "operation" {
+                prop_assert!(
+                    !reported.contains_key(axis) || reported[axis] != *term,
+                    "{axis} reported at its zero term {term}",
+                );
+            }
+        }
+    }
+}
