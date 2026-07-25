@@ -22,7 +22,13 @@ fn is_combined_short(s: &str) -> bool {
     bytes.len() > 2 && bytes[0] == b'-' && bytes[1] != b'-'
 }
 
-fn dispatch_first_arg(tokens: &[Token], patterns: &[String], level: SafetyLevel) -> Verdict {
+fn dispatch_first_arg(
+    tokens: &[Token],
+    patterns: &[String],
+    level: SafetyLevel,
+    standalone: &[String],
+    valued: &[String],
+) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
@@ -37,7 +43,13 @@ fn dispatch_first_arg(tokens: &[Token], patterns: &[String], level: SafetyLevel)
             arg_str == p
         }
     });
-    if matches { Verdict::Allowed(level) } else { Verdict::Denied }
+    if !matches {
+        return Verdict::Denied;
+    }
+    if super::glob_presents_unlisted_flag(tokens, 2, standalone, valued) {
+        return Verdict::Denied;
+    }
+    Verdict::Allowed(level)
 }
 
 fn dispatch_require_any(
@@ -121,15 +133,23 @@ fn skip_pre_flags(
     i
 }
 
+/// The first-positional GLOB arm of a `Branching`: which verbs it admits, at what level, the flags
+/// it accepts once admitted, and the verbs that instead mark the invocation a credential-read.
+struct GlobArm<'a> {
+    patterns: &'a [String],
+    level: SafetyLevel,
+    standalone: &'a [String],
+    valued: &'a [String],
+    credential: &'a [String],
+}
+
 fn dispatch_branching(
     tokens: &[Token],
     subs: &[SubSpec],
     bare_flags: &[String],
     bare_ok: bool,
     pre_flags: (&[String], &[String]),
-    first_arg: &[String],
-    first_arg_level: SafetyLevel,
-    credential_first_arg: &[String],
+    glob: &GlobArm<'_>,
 ) -> Verdict {
     let (pre_standalone, pre_valued) = pre_flags;
     let start = skip_pre_flags(tokens, pre_standalone, pre_valued, 1);
@@ -168,11 +188,14 @@ fn dispatch_branching(
         }
         None => arg.eq_ignore_ascii_case(p),
     };
-    if credential_first_arg.iter().any(|p| glob_match_ci(p)) {
+    if glob.credential.iter().any(|p| glob_match_ci(p)) {
         return Verdict::Denied;
     }
-    if !first_arg.is_empty() && first_arg.iter().any(|p| glob_match(p)) {
-        return Verdict::Allowed(first_arg_level);
+    if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {
+        if super::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued) {
+            return Verdict::Denied;
+        }
+        return Verdict::Allowed(glob.level);
     }
     Verdict::Denied
 }
@@ -241,19 +264,25 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
                 Verdict::Denied
             }
         }
-        DispatchKind::FirstArg { patterns, level } => {
-            dispatch_first_arg(tokens, patterns, *level)
+        DispatchKind::FirstArg { patterns, level, standalone, valued } => {
+            dispatch_first_arg(tokens, patterns, *level, standalone, valued)
         }
         DispatchKind::RequireAny { require_any, policy, level, accept_bare_help } => {
             dispatch_require_any(tokens, require_any, policy, *level, *accept_bare_help)
         }
         DispatchKind::Branching {
             subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
-            credential_first_arg,
+            first_arg_standalone, first_arg_valued, credential_first_arg,
         } => {
             dispatch_branching(
                 tokens, subs, bare_flags, *bare_ok, (pre_standalone, pre_valued),
-                first_arg, *first_arg_level, credential_first_arg,
+                &GlobArm {
+                    patterns: first_arg,
+                    level: *first_arg_level,
+                    standalone: first_arg_standalone,
+                    valued: first_arg_valued,
+                    credential: credential_first_arg,
+                },
             )
         }
         DispatchKind::WriteFlagged { policy, base_level, write_flags } => {

