@@ -5680,6 +5680,14 @@ fn a_loopback_delta_applies_only_to_a_recognized_local_destination() {
                 wrong.push(format!("{cmd} => ALLOWED, want DENIED"));
             }
         }
+        // After a `--` terminator the token is a POSITIONAL, so the endpoint is never set and the
+        // call goes wherever it would have gone. The admission walk already stops at `--`; if the
+        // value lookup does not, the two layers disagree and the sub localizes on an endpoint the
+        // tool will not use. That was live: it allowed a write to the real service.
+        let after_terminator = format!("{path} -- {flag} http://localhost:8000");
+        if crate::is_safe_command(&after_terminator) {
+            wrong.push(format!("{after_terminator} => ALLOWED, want DENIED (flag is past `--`)"));
+        }
     }
     assert!(
         wrong.is_empty(),

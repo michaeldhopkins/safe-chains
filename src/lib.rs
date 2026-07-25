@@ -79,8 +79,15 @@ pub use verdict::{SafetyLevel, Verdict};
 /// refused". Empty when no resolver claims the command — that is the answer too, since it means the
 /// legacy classifier decided and there are no facets to show.
 pub fn facet_breakdown(command: &str) -> String {
-    // One simple command only. A chain has a profile PER segment, and merging them would invent a
-    // capability set no resolver ever produced; `render()` above already breaks the chain down.
+    // One simple command only. `shell_words` has no idea what `&&` means, so on a chain it hands
+    // back one flat token list and the resolver reads the SECOND command's arguments as flags of
+    // the first — `aws dynamodb scan --table-name t && rm -rf /` produced a single worst-case
+    // profile belonging to neither segment. A diagnostic that invents a capability set no resolver
+    // emitted is worse than silence, and `render()` above already breaks the chain down per segment.
+    if cst::explain(command).segments.len() != 1 {
+        return "\n  (facet breakdown covers one command at a time; run --explain on a single segment)\n"
+            .to_string();
+    }
     let Ok(words) = shell_words::split(command) else {
         return String::new();
     };

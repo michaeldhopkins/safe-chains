@@ -353,7 +353,26 @@ pub(crate) fn sub_destination_token(tokens: &[Token]) -> Option<Option<&str>> {
     Some(rest.iter().map(Token::as_str).find(|t| !t.starts_with('-')))
 }
 
+/// A flag's value, but only from the FLAG REGION — tokens after a `--` terminator are positionals,
+/// not flags.
+///
+/// Used where finding a value makes the classification MORE PERMISSIVE, which is where a
+/// disagreement with the tool costs something. `presents_unlisted_flag` already stops at `--`, so
+/// without this the two layers disagreed: `put-item ... -- --endpoint-url http://localhost:8000`
+/// passed admission (the walk never saw the flag) AND localized (the value lookup did), classifying
+/// a call to the real service as a write to this machine.
+///
+/// The restrictive lookups deliberately do NOT use this. For `output_path_flags`, finding a path
+/// ADDS a path-gated write capability, so scanning past `--` errs toward more gating; switching
+/// them here would relax them. Each direction fails closed, which is why the asymmetry stands.
+fn flag_value_in_flag_region<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
+    let end = tokens.iter().position(|t| t.as_str() == "--").unwrap_or(tokens.len());
+    flag_value(&tokens[..end], flag)
+}
+
 /// A flag's value, glued (`--repo=VALUE`) or space-separated (`--repo VALUE`); `None` if absent.
+/// Scans the WHOLE token list — see `flag_value_in_flag_region` for the `--`-aware variant and why
+/// only the permissive callers use it.
 fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
     if let Some(v) = tokens.iter().find_map(|t| t.as_str().strip_prefix(flag).and_then(|r| r.strip_prefix('='))) {
         return Some(v);
@@ -391,7 +410,7 @@ pub(crate) fn sub_loopback_localizes(tokens: &[Token]) -> bool {
         && sub
             .loopback_valued
             .iter()
-            .filter_map(|f| flag_value(tokens, f))
+            .filter_map(|f| flag_value_in_flag_region(tokens, f))
             .any(crate::netloc::is_loopback)
 }
 
