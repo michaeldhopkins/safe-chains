@@ -111,17 +111,23 @@ name = "new"
 profile = "remote-create"
 fact = "Creates a new environment in the linked project via the API (optionally forking an existing environment's services and variables)."
 source = "https://docs.railway.com/reference/cli-api — `railway environment new`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-recoverable"
 fact = "Deletes an environment and the services/variables provisioned within it from the project via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway environment delete`"
 judgment = "Recoverable at the config layer — an environment is redeployable from source and re-created by name; any persistent VOLUME data an environment holds is the separate, higher volume-delete concern."
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "edit"
 profile = "remote-mutate"
 fact = "Renames or edits the configuration of an existing environment via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway environment`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "link"
 candidate = true
@@ -143,22 +149,30 @@ profile = "credential-read"
 fact = "`railway variable list` prints the linked service's environment variables INCLUDING their VALUES (--kv emits key=value). On Railway, env vars are the primary secret store (DATABASE_URL, API keys, passwords), so the plaintext secrets enter the caller's context."
 source = "https://docs.railway.com/reference/cli-api — `railway variable list`"
 judgment = "Reclassified from a plain read: it reveals secret VALUES, not just names (unlike a list-names read). Only the opt-in sealed-variables feature withholds values."
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "set"
 profile = "remote-mutate"
 fact = "Sets or updates one or more environment variables on the linked service/environment and triggers a redeploy so the new value takes effect on the live service."
 source = "https://docs.railway.com/reference/cli-api — `railway variable set`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-mutate"
 fact = "Removes an environment variable from the linked service/environment and triggers a redeploy."
 source = "https://docs.railway.com/reference/cli-api — `railway variable delete`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 
 [[command.sub]]
 name = "variables"
 profile = "credential-read"
 fact = "Legacy alias of `variable list` — prints the service's environment variables INCLUDING their plaintext VALUES (the secret store)."
 source = "https://docs.railway.com/reference/cli-api — `railway variables`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 
 [[command.sub]]
 name = "volume"
@@ -172,26 +186,36 @@ name = "add"
 profile = "remote-create"
 fact = "Provisions a new persistent volume and mounts it on a service in the linked environment via the API."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/volume.rs — `add`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes a volume and permanently destroys the data stored on it; the volume transitions to a pending-deletion/deleted state and the confirmation prompt offers no recovery path."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/volume.rs — `delete`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "update"
 profile = "remote-mutate"
 fact = "Renames or edits an existing volume's configuration via the API."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/volume.rs — `update`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "attach"
 profile = "remote-mutate"
 fact = "Mounts an unattached volume onto a service in the environment via the API."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/volume.rs — `attach`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "detach"
 profile = "remote-mutate"
 fact = "Detaches a volume from its currently-attached service while preserving the volume itself; reversible by re-attaching."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/volume.rs — `detach`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 
 [[command.sub]]
 name = "login"
@@ -228,6 +252,8 @@ name = "add"
 profile = "remote-create"
 fact = "Provisions a new service, database, or plugin into the linked project via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway add`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "agent"
 candidate = true
@@ -250,38 +276,52 @@ name = "create"
 profile = "remote-create"
 fact = "Creates a new object-storage bucket in the linked project/environment via the API (optional name and region)."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/bucket.rs — `create`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "credentials"
 profile = "credential-read"
 fact = "Prints the bucket's S3-compatible access key and secret key to stdout (key-value or JSON output); a `--reset` flag invalidates and rotates them. The command's own automation notes warn to avoid sharing the output."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/bucket.rs — `credentials`"
 judgment = "Reveals a live secret access-key value into the caller's context — the credential-read confidentiality surface. The `--reset` form additionally mints replacement material (credential-mint); both stay above the auto-approve line."
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "rename"
 profile = "remote-mutate"
 fact = "Changes the bucket's name via the API."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/bucket.rs — `rename`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes a bucket and, per the command's own documentation, permanently deletes all objects stored in it; no recovery path."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/bucket.rs — `delete`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "connect"
 profile = "remote-exec"
 fact = "Opens an interactive database shell (psql/mongosh/redis-cli/mysql) against the linked database with the live connection credentials injected, allowing arbitrary queries against remote data."
 source = "https://docs.railway.com/reference/cli-api — `railway connect`"
 judgment = "Interactive arbitrary query execution against a remote datastore, with credentials injected into the spawned client — treated as remote code execution."
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "delete"
 profile = "remote-destroy-irreversible"
 fact = "Deletes the linked project; the confirmation prompt states the action cannot be undone and schedules permanent deletion of the project and its resources."
 source = "https://github.com/railwayapp/cli/blob/master/src/commands/delete.rs — `railway delete`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "deploy"
 profile = "remote-create"
 fact = "Provisions a Railway template into the project, creating the template's services and resources via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway deploy`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "dev"
 candidate = true
@@ -290,11 +330,15 @@ name = "domain"
 profile = "remote-create"
 fact = "Generates and registers a public Railway (or custom) domain on the linked service via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway domain`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "down"
 profile = "remote-control"
 fact = "Removes/stops the most recent deployment of the linked service; recoverable by redeploying from source."
 source = "https://docs.railway.com/reference/cli-api — `railway down`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "functions"
 candidate = true
@@ -303,6 +347,8 @@ name = "init"
 profile = "remote-create"
 fact = "Creates a new Railway project (and links the current directory to it) via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway init`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "mcp"
 candidate = true
@@ -314,11 +360,15 @@ name = "redeploy"
 profile = "remote-control"
 fact = "Triggers a redeploy of the latest deployment of the linked service via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway redeploy`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "restart"
 profile = "remote-control"
 fact = "Restarts the running deployment of the linked service via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway restart`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "run"
 candidate = true
@@ -327,6 +377,8 @@ name = "scale"
 profile = "remote-mutate"
 fact = "Changes the replica count / scaling configuration of the linked service via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway scale`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "setup"
 candidate = true
@@ -341,6 +393,8 @@ name = "ssh"
 profile = "remote-exec"
 fact = "Opens an interactive shell (or runs a supplied command) inside the running service container over a WebSocket session — arbitrary remote code execution."
 source = "https://docs.railway.com/reference/cli-api — `railway ssh`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "starship"
 candidate = true
@@ -355,9 +409,13 @@ name = "up"
 profile = "remote-control"
 fact = "Uploads the current directory and triggers a deployment of the linked service via the API."
 source = "https://docs.railway.com/reference/cli-api — `railway up`"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]
 [[command.sub]]
 name = "upgrade"
 profile = "supply-chain-build"
 fact = "Downloads the latest Railway CLI release from the network and replaces the local CLI binary in place."
 source = "https://docs.railway.com/cli/upgrade — `railway upgrade`"
 judgment = "Fetches and installs a fresh executable from the network (self-replacing binary) — the supply-chain install surface; not auto-approved."
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--environment", "--project", "--service", "-e", "-p", "-s"]

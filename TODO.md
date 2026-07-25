@@ -1,5 +1,32 @@
 # TODO
 
+## Retire blanket flag tolerance (`tolerate_unknown_short/long`)
+
+Decision (2026-07-25): eventually remove the "any flag is fine" escape hatch. A sub that declares it
+accepts flags nobody researched, which is the same unresearched-assertion problem we just removed
+from the per-sub lists — only bigger, and it silently defeats the per-sub flag enforcement (a sub
+with `tolerate_unknown_long = true` accepts everything regardless of what it enumerated).
+
+Current exposure: **2,328** `tolerate_unknown_short = true` and **1,630** `tolerate_unknown_long =
+true`. Concentrated in the big cloud CLIs — az (700), gcloud (389), aws (247), oci (61) — plus jj
+(53), claude (37), notion (18), codex (17).
+
+Known live consequence: `systemctl status nginx -H remote.example.com` auto-approves. `-H` retargets
+systemctl to a REMOTE host over SSH, turning a local read into an operation on another system;
+`status` is a legacy sub whose author-declared `tolerate_unknown_short = true` lets `-H` through.
+
+Two distinct shapes, both bypassing per-sub enforcement:
+1. **A profiled sub that declares tolerance** — enumerates flags, then accepts anything anyway.
+2. **A `first_arg` GLOB family** — `aws s3api` matches `get-*`/`head-*`/`list-*`, so those actions are
+   never profiled subs at all and never reach the flag check. Verified: `aws s3api list-buckets
+   --frobnicate` and `aws s3api get-bucket-policy --frobnicate` both auto-approve. This is the wider
+   of the two: the guard cannot see these because there is no sub to attach to.
+
+Why it is deferred, not skipped: retiring it means enumerating thousands of per-service flags, and
+until a command is done its invocations start denying. Needs planning and batching like the
+re-research campaign — not a cleanup. The build already REFUSES a profiled sub that declares neither
+a flag list nor an explicit tolerance, so new subs cannot quietly join this pile.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
