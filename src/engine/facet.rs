@@ -112,7 +112,7 @@ categorical_term! {
         Authorize => "authorize",   // change credentials/trust/access
         Control => "control",       // start/stop/signal processes, services, devices
     }
-    hazard = Execute;
+    hazard = Communicate;
 }
 
 // ── 2.2 Reach ──────────────────────────────────────────────────────────────────
