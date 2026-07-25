@@ -318,6 +318,31 @@
 # first_arg_valued = ["--output", "--query", "--region", "--role-name"]
 #                                        # --endpoint-url/--profile absent by research
 
+# FIRST_ARG_LOOPBACK_VALUED — a flag admitted only when its VALUE names THIS
+# machine. Some flags are safe or unsafe depending entirely on where they point:
+# `--endpoint-url http://localhost:8000` is a developer talking to their own
+# emulator, while the same flag pointed elsewhere redirects an authenticated
+# request to a host of the caller's choosing. Listing the flag here says "the
+# destination decides" instead of forcing an all-or-nothing ruling on the flag.
+#
+# The value is classified by netloc::is_loopback, which is a positive recognizer
+# over a small vetted set — `localhost` and `*.localhost`, 127.0.0.0/8 in dotted
+# quad, and `::1`. Anything it does not positively recognize is remote, including
+# spellings that ARE loopback in fact (`http://2130706433`, `http://0177.0.0.1`):
+# recognizing them buys little and every added spelling is a chance to disagree
+# with how the tool itself parses. A missing value denies.
+#
+# Use it only where a local emulator is a real workflow for that tool. Prefer
+# omitting the flag entirely when it isn't — an absent flag denies, which is the
+# cheap and correct default.
+
+# [[command.sub]]
+# name = "dynamodb"
+# first_arg = ["describe-*", "list-*"]
+# first_arg_loopback_valued = ["--endpoint-url"]   # DynamoDB Local
+# first_arg_standalone = ["--debug", "--no-cli-pager"]
+# first_arg_valued = ["--output", "--query", "--region", "--table-name"]
+
 # CREDENTIAL_FIRST_ARG — the value-dependent credential-read gate. Same glob
 # syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
 # invocation as a credential exposure instead of allowing it. Checked after

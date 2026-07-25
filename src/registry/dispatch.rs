@@ -28,6 +28,7 @@ fn dispatch_first_arg(
     level: SafetyLevel,
     standalone: &[String],
     valued: &[String],
+    loopback_valued: &[String],
 ) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -46,7 +47,7 @@ fn dispatch_first_arg(
     if !matches {
         return Verdict::Denied;
     }
-    if super::glob_presents_unlisted_flag(tokens, 2, standalone, valued) {
+    if super::glob_presents_unlisted_flag(tokens, 2, standalone, valued, loopback_valued) {
         return Verdict::Denied;
     }
     Verdict::Allowed(level)
@@ -140,6 +141,7 @@ struct GlobArm<'a> {
     level: SafetyLevel,
     standalone: &'a [String],
     valued: &'a [String],
+    loopback_valued: &'a [String],
     credential: &'a [String],
 }
 
@@ -192,7 +194,9 @@ fn dispatch_branching(
         return Verdict::Denied;
     }
     if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {
-        if super::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued) {
+        if super::glob_presents_unlisted_flag(
+            tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued,
+        ) {
             return Verdict::Denied;
         }
         return Verdict::Allowed(glob.level);
@@ -264,15 +268,16 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
                 Verdict::Denied
             }
         }
-        DispatchKind::FirstArg { patterns, level, standalone, valued } => {
-            dispatch_first_arg(tokens, patterns, *level, standalone, valued)
+        DispatchKind::FirstArg { patterns, level, standalone, valued, loopback_valued } => {
+            dispatch_first_arg(tokens, patterns, *level, standalone, valued, loopback_valued)
         }
         DispatchKind::RequireAny { require_any, policy, level, accept_bare_help } => {
             dispatch_require_any(tokens, require_any, policy, *level, *accept_bare_help)
         }
         DispatchKind::Branching {
             subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
-            first_arg_standalone, first_arg_valued, credential_first_arg,
+            first_arg_standalone, first_arg_valued, first_arg_loopback_valued,
+            credential_first_arg,
         } => {
             dispatch_branching(
                 tokens, subs, bare_flags, *bare_ok, (pre_standalone, pre_valued),
@@ -281,6 +286,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
                     level: *first_arg_level,
                     standalone: first_arg_standalone,
                     valued: first_arg_valued,
+                    loopback_valued: first_arg_loopback_valued,
                     credential: credential_first_arg,
                 },
             )

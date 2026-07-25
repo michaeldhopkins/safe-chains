@@ -609,6 +609,7 @@ fn build_sub_kind(
             first_arg_level,
             first_arg_standalone: toml.first_arg_standalone,
             first_arg_valued: toml.first_arg_valued,
+            first_arg_loopback_valued: toml.first_arg_loopback_valued,
             credential_first_arg: toml.credential_first_arg,
         };
     }
@@ -691,6 +692,7 @@ fn build_policy_sub_kind(
             level,
             standalone: toml.first_arg_standalone,
             valued: toml.first_arg_valued,
+            loopback_valued: toml.first_arg_loopback_valued,
         };
     }
     if !toml.require_any.is_empty() {
@@ -1145,6 +1147,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                     first_arg: toml.first_arg,
                     first_arg_standalone: toml.first_arg_standalone,
                     first_arg_valued: toml.first_arg_valued,
+                    first_arg_loopback_valued: toml.first_arg_loopback_valued,
                     first_arg_level,
                     credential_first_arg: toml.credential_first_arg,
                 },
@@ -1207,6 +1210,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 first_arg_level,
                 first_arg_standalone: toml.first_arg_standalone,
                 first_arg_valued: toml.first_arg_valued,
+                first_arg_loopback_valued: toml.first_arg_loopback_valued,
                 credential_first_arg: toml.credential_first_arg,
             },
         };
@@ -1246,6 +1250,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 level,
                 standalone: toml.first_arg_standalone,
                 valued: toml.first_arg_valued,
+                loopback_valued: toml.first_arg_loopback_valued,
             },
         };
     }

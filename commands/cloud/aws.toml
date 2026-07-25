@@ -320,10 +320,14 @@ name = "dynamodb"
 first_arg = ["describe-*", "list-*"]
 # The glob covers table/backup/export METADATA only — `describe-*` and `list-*` describe schema,
 # throughput, indexes and stream settings. Row reads (`get-item`, `query`, `scan`, `batch-get-item`)
-# do not start with a globbed verb and are classified on their own terms. DELIBERATELY ABSENT:
-# `--endpoint-url` (note that DynamoDB Local legitimately uses it — but a local endpoint cannot be
-# distinguished from an attacker's by a static classifier, and the flag's presence is exactly what
-# redirects an authenticated call), `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+# do not start with a globbed verb and are classified on their own terms.
+#
+# `--endpoint-url` is loopback-gated rather than withheld: DynamoDB Local is the standard local
+# development story for this service, and `http://localhost:8000` never leaves the machine. Pointed
+# anywhere else the same flag redirects an authenticated call, so only the loopback spellings
+# `netloc::is_loopback` positively recognizes are admitted. DELIBERATELY ABSENT: `--profile`,
+# `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+first_arg_loopback_valued = ["--endpoint-url"]
 first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
 first_arg_valued = [
   "--backup-arn", "--backup-type", "--cli-binary-format", "--cli-connect-timeout",
