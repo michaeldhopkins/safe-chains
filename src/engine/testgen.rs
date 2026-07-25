@@ -601,13 +601,36 @@ fn a_declared_hazard_is_the_term_authored_levels_reject() {
     set_axis!("supply_chain.source", supply_source, SupplySource);
     set_axis!("supply_chain.exec_surface", exec_surface, ExecSurface);
 
+    // A partitioned axis still has evidence, just of a different shape: the hazardous term should
+    // be the one the FEWEST denying levels tolerate. Excluding the axis entirely (an earlier cut of
+    // this test) hid a poor declaration — `execute` was the hazard while `developer`, an everyday
+    // level, admits it, so a future level constraining only `operation` would have admitted the
+    // sentinel there.
+    let admitting_levels = |op: Operation| {
+        crate::engine::authoring::default_levels()
+            .iter()
+            .filter(|l| l.name != "yolo")
+            .filter(|l| l.allow.iter().any(|c| c.operation.as_ref().is_none_or(|s| s.contains(&op))))
+            .count()
+    };
+    let hz = Operation::hazard();
+    let hz_count = admitting_levels(hz);
+    for op in Operation::all() {
+        let n = admitting_levels(*op);
+        if n < hz_count {
+            wrong.push(format!(
+                "operation: declared hazard `{}` is tolerated by {hz_count} denying levels, but \
+                 `{}` is tolerated by only {n} — the hazard should be the least-tolerated term",
+                hz.as_str(),
+                op.as_str(),
+            ));
+        }
+    }
+
     assert!(wrong.is_empty(), "hazard declared against the evidence:\n  {}", wrong.join("\n  "));
-    // `operation` is deliberately absent above. Levels PARTITION their allow clauses by operation
-    // — one clause for observes, another for mutates — so every operation is admitted by some
-    // clause and rejected by others, and "the term levels reject" is not a well-defined question
-    // on that axis. Its declaration is held instead by
-    // `the_sentinel_is_denied_even_with_any_one_axis_relaxed`, which checks the thing that actually
-    // matters: that relaxing `operation` to `observe` still leaves the sentinel denied.
+    // `operation` is checked differently, below: levels PARTITION their allow clauses by operation
+    // — one clause for observes, another for mutates — so EVERY operation is admitted by some
+    // clause and rejected by others, and "the term no clause admits" has no answer there.
     //
     // Reported, not asserted: an axis no level constrains has no evidence either way, so its
     // declaration rests on the doc comment alone. Naming them keeps that visible instead of letting

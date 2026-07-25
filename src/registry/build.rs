@@ -301,6 +301,15 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
 ///   guess costs a stray write for a mutate and the data for a delete. Refusing it here rather than
 ///   relying on the resolver's runtime skip means no future sub opts out by accident.
 fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSub) {
+    // Both the admission gate (`presents_unlisted_flag`) and the delta (`sub_loopback_localizes`)
+    // are reached only through the PROFILED sub walk, so on an unprofiled sub the declaration is
+    // inert — the flag would simply be missing from the legacy lists and deny, with nothing saying
+    // why. Fails closed, but silently, which is its own kind of bug.
+    assert!(
+        toml.loopback_valued.is_empty() || toml.profile.is_some(),
+        "{parent} sub `{name}`: `loopback_valued` needs `profile` — the gate is only consulted on \
+         a profiled sub, so here it would do nothing at all",
+    );
     if !toml.loopback_localizes.unwrap_or(false) {
         return;
     }
