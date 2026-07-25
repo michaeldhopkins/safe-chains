@@ -3,15 +3,12 @@
 ## Loopback destinations — remaining work
 
 Shipped 2026-07-25: `netloc::is_loopback` recognizes a local destination, `loopback_valued` gates a
-flag on naming one, and `loopback_profile` substitutes a local archetype when it does. Applied to
-`aws dynamodb`. Decision was **per-service research, not a uniform rollout** — the mechanism is
-generic but each service has to earn it.
+flag on naming one, and `loopback_localizes` clears the destination-determined facets (remote reach,
+net direction, payload, metered cost) when it does — the facets describing the OPERATION are left
+alone, so the level algebra composes rather than needing a local twin of every remote archetype.
+Applied to `aws dynamodb`. Decision was **per-service research, not a uniform rollout** — the
+mechanism is generic but each service has to earn it.
 
-- **No local counterpart for a bulk read.** `dynamodb scan` is `bulk-object-read` (a filter applies
-  after the read, so its scale is the whole table) and denies even at `http://localhost:8000`.
-  Scanning a local emulator table is a routine dev action. Needs either a `local-bulk-read`
-  archetype or a judgment that reads don't need substitutes at all — every other read already passes
-  because `remote-read` is admitted.
 - **Services with a real local-emulator story, unresearched.** LocalStack fronts most of AWS on
   `http://localhost:4566`; `s3api`, `sqs`, `sns`, `lambda`, `logs`, `ssm` are the common ones. Each
   needs its write surface enumerated the way dynamodb's was — the gate alone does nothing for an
