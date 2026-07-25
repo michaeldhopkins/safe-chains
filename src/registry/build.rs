@@ -607,6 +607,8 @@ fn build_sub_kind(
             pre_valued: toml.valued,
             first_arg: toml.first_arg,
             first_arg_level,
+            first_arg_standalone: toml.first_arg_standalone,
+            first_arg_valued: toml.first_arg_valued,
             credential_first_arg: toml.credential_first_arg,
         };
     }
@@ -684,7 +686,12 @@ fn build_policy_sub_kind(
         };
     }
     if !toml.first_arg.is_empty() {
-        return DispatchKind::FirstArg { patterns: toml.first_arg, level };
+        return DispatchKind::FirstArg {
+            patterns: toml.first_arg,
+            level,
+            standalone: toml.first_arg_standalone,
+            valued: toml.first_arg_valued,
+        };
     }
     if !toml.require_any.is_empty() {
         return DispatchKind::RequireAny {
@@ -1136,6 +1143,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                     pre_valued: w.valued,
                     bare_ok: toml.bare.unwrap_or(false),
                     first_arg: toml.first_arg,
+                    first_arg_standalone: toml.first_arg_standalone,
+                    first_arg_valued: toml.first_arg_valued,
                     first_arg_level,
                     credential_first_arg: toml.credential_first_arg,
                 },
@@ -1196,6 +1205,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 bare_ok: toml.bare.unwrap_or(false),
                 first_arg: toml.first_arg,
                 first_arg_level,
+                first_arg_standalone: toml.first_arg_standalone,
+                first_arg_valued: toml.first_arg_valued,
                 credential_first_arg: toml.credential_first_arg,
             },
         };
@@ -1233,6 +1244,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
+                standalone: toml.first_arg_standalone,
+                valued: toml.first_arg_valued,
             },
         };
     }

