@@ -1,5 +1,30 @@
 # TODO
 
+## Loopback destinations — remaining work
+
+Shipped 2026-07-25: `netloc::is_loopback` recognizes a local destination, `loopback_valued` gates a
+flag on naming one, and `loopback_profile` substitutes a local archetype when it does. Applied to
+`aws dynamodb`. Decision was **per-service research, not a uniform rollout** — the mechanism is
+generic but each service has to earn it.
+
+- **No local counterpart for a bulk read.** `dynamodb scan` is `bulk-object-read` (a filter applies
+  after the read, so its scale is the whole table) and denies even at `http://localhost:8000`.
+  Scanning a local emulator table is a routine dev action. Needs either a `local-bulk-read`
+  archetype or a judgment that reads don't need substitutes at all — every other read already passes
+  because `remote-read` is admitted.
+- **Services with a real local-emulator story, unresearched.** LocalStack fronts most of AWS on
+  `http://localhost:4566`; `s3api`, `sqs`, `sns`, `lambda`, `logs`, `ssm` are the common ones. Each
+  needs its write surface enumerated the way dynamodb's was — the gate alone does nothing for an
+  operation that isn't in the registry.
+- **Other tools with an endpoint flag.** `docker --host tcp://127.0.0.1:2375` and `kubectl --server
+  https://127.0.0.1:6443` were identified as candidates; neither is researched.
+- **Spellings deliberately unrecognized.** `http://2130706433`, `0x7f000001`, `0177.0.0.1`, `127.1`
+  are loopback in fact and denied on principle (ambiguous parsing). Revisit only if a real workflow
+  needs one.
+- **The tunnel caveat is structural, not a bug.** `ssh -L 8000:<service>.amazonaws.com:443` makes
+  `localhost:8000` production and no static classifier can see it. This is why destroy archetypes
+  may not declare `loopback_profile`, enforced at build time.
+
 ## Retire blanket flag tolerance (`tolerate_unknown_short/long`)
 
 Decision (2026-07-25): eventually remove the "any flag is fine" escape hatch. A sub that declares it
