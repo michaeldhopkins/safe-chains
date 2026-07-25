@@ -417,9 +417,108 @@ standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
 valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
 [[command.sub]]
 name = "kms"
-first_arg = ["describe-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Batch 1: glob + blanket tolerance replaced with explicit sub-subs. The verb glob was a correct
+# claim about the OPERATIONS (KMS never exports symmetric key material, so every describe-/get-/list-
+# here is metadata or public material) but it consulted no flag list, so `--endpoint-url` redirected
+# an authenticated KMS call to an arbitrary host.
+#
+# Flag set follows the researched AWS-read convention already used by `ssm get-access-token` in this
+# file: response shaping and transport timeouts only. DELIBERATELY ABSENT on every operation below:
+# `--endpoint-url` (retargets the authenticated request), `--profile` (selects a different identity
+# to read as), `--ca-bundle` (substitutes the trust anchor), `--no-verify-ssl`, and
+# `--no-sign-request`.
+[[command.sub.sub]]
+name = "describe-key"
+profile = "remote-read"
+fact = "Returns metadata for a KMS key — ARN, key state, spec, usage, origin, rotation setting. No key material."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/describe-key.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--grant-tokens", "--key-id", "--output", "--query", "--region"]
+[[command.sub.sub]]
+name = "describe-custom-key-stores"
+profile = "remote-read"
+fact = "Lists custom key stores in the account with their connection state; returns no key material or credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/describe-custom-key-stores.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--custom-key-store-id", "--custom-key-store-name", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "get-key-policy"
+profile = "remote-read"
+fact = "Returns the key's resource policy document — an authorization description, not key material."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/get-key-policy.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--output", "--policy-name", "--query", "--region"]
+[[command.sub.sub]]
+name = "get-key-rotation-status"
+profile = "remote-read"
+fact = "Reports whether automatic rotation is enabled for a key, plus rotation period and next date."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/get-key-rotation-status.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--output", "--query", "--region"]
+[[command.sub.sub]]
+name = "get-public-key"
+profile = "remote-read"
+fact = "Returns the PUBLIC key of an asymmetric KMS key. The private half never leaves KMS and is not returned by any API."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/get-public-key.html"
+judgment = "Public key material is not a secret — it is published precisely so callers can verify or encrypt. Read, not credential-read."
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--grant-tokens", "--key-id", "--output", "--query", "--region"]
+[[command.sub.sub]]
+name = "get-parameters-for-import"
+profile = "remote-read"
+fact = "Returns a public wrapping key and an import token used to upload externally-generated key material. Both are inputs to a later import, not exported secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/get-parameters-for-import.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--output", "--query", "--region", "--wrapping-algorithm", "--wrapping-key-spec"]
+[[command.sub.sub]]
+name = "list-keys"
+profile = "remote-read"
+fact = "Lists key IDs and ARNs in the account and region."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-keys.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "list-aliases"
+profile = "remote-read"
+fact = "Lists key aliases and the key each resolves to."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-aliases.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "list-grants"
+profile = "remote-read"
+fact = "Lists the grants on a key — grantee principal, operations permitted, constraints. An authorization description."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-grants.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--grant-id", "--grantee-principal", "--key-id", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "list-retirable-grants"
+profile = "remote-read"
+fact = "Lists grants a given principal can retire."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-retirable-grants.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--retiring-principal", "--starting-token"]
+[[command.sub.sub]]
+name = "list-key-policies"
+profile = "remote-read"
+fact = "Lists the policy NAMES attached to a key (currently always `default`); the document itself comes from get-key-policy."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-key-policies.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "list-key-rotations"
+profile = "remote-read"
+fact = "Lists completed rotations of a key's material, with rotation type and date."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-key-rotations.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
+[[command.sub.sub]]
+name = "list-resource-tags"
+profile = "remote-read"
+fact = "Lists the tags on a KMS key."
+source = "https://docs.aws.amazon.com/cli/latest/reference/kms/list-resource-tags.html"
+standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--key-id", "--limit", "--marker", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
 
 [[command.sub]]
 name = "acm"

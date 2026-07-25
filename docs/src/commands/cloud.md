@@ -166,7 +166,19 @@
 - **kinesisanalytics**: Allowed arguments: describe-*, get-*, list-*
 - **kinesisanalyticsv2**: Allowed arguments: describe-*, get-*, list-*
 - **kinesisvideo**: Allowed arguments: describe-*, get-*, list-*
-- **kms**: Allowed arguments: describe-*, get-*, list-*
+- **kms describe-custom-key-stores**
+- **kms describe-key**
+- **kms get-key-policy**
+- **kms get-key-rotation-status**
+- **kms get-parameters-for-import**
+- **kms get-public-key**
+- **kms list-aliases**
+- **kms list-grants**
+- **kms list-key-policies**
+- **kms list-key-rotations**
+- **kms list-keys**
+- **kms list-resource-tags**
+- **kms list-retirable-grants**
 - **lakeformation get-temporary-data-location-credentials**
 - **lakeformation get-temporary-glue-partition-credentials**
 - **lakeformation get-temporary-glue-table-credentials**
