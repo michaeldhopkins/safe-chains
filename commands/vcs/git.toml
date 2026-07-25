@@ -21,6 +21,7 @@ destination_flag = "--repo"
 fact = "Transfers local commits to a remote repository over the network, updating the remote's refs; sends the committed content to the configured remote. The target may be a configured remote name, an inline URL, or an `ext::<cmd>` transport that runs a local command."
 source = "https://git-scm.com/docs/git-push"
 judgment = "The send target's provenance is classified onto locus.provenance: a bare remote name is `established`, an inline URL/scp-path is `literal`, a `$VAR` is `opaque`; `ext::<cmd>` runs a local command and worst-cases as RCE."
+standalone = ["--help", "-h"]
 [[command.sub.flag]]
 name = "--force"
 classifies = "remote-destroy-irreversible"
@@ -781,3 +782,68 @@ valued = [
     "--workdir",
     "-b", "-c", "-r", "-s", "-t", "-w",
 ]
+
+# ═══ Local working-copy operations ═══════════════════════════════════════════════════════════════
+# Re-researched 2026-07 against git 2.x under the facet taxonomy. Each declares a `profile`
+# (archetypes.toml) rather than a legacy `level`, so the tier is DERIVED from the facets and the
+# three-layer provenance below records what upstream documents (`fact`), our inference (`profile`),
+# and our stance where the docs don't decide (`judgment`).
+#
+# On HOOKS: commit/merge/rebase run .git/hooks/* — an `execution` capability, not part of the write
+# profile. It is contained by the region model, which freezes writes to `.git` (verified: a write to
+# .git/hooks/pre-commit denies), so an agent cannot author what it would run. The hook file itself
+# sits at `worktree-trusted`, inside developer's executor band.
+
+[[command.sub]]
+name = "switch"
+profile = "local-mutate-trivial"
+fact = "Switches HEAD to an existing branch, updating tracked files to match. git REFUSES to proceed when the switch would overwrite local modifications unless --force/--discard-changes/--merge is given; `git switch -` returns to the previous branch. -c/--create makes a new branch from the current HEAD."
+source = "https://git-scm.com/docs/git-switch"
+judgment = "The mildest possible worktree mutate: every resulting state is already in the object store, the inverse is one command, and git's own refusal makes data loss impossible — hence `trivial` rather than `recoverable`. The force family is deliberately omitted: --force/--discard-changes exist precisely to defeat that refusal and discard uncommitted work, which is a different (irreversible) capability."
+max_positional = 1
+standalone = ["--create", "--detach", "--guess", "--help", "--no-guess", "--no-track", "--track", "-c", "-d", "-h", "-t"]
+valued = ["--orphan"]
+
+[[command.sub]]
+name = "add"
+profile = "local-mutate-recoverable"
+fact = "Stages worktree content into the index. Does not alter working-tree files; the index entry it replaces is recoverable while the prior commit exists, and `git restore --staged` unstages."
+source = "https://git-scm.com/docs/git-add"
+judgment = "-f/--force only overrides ignore rules (stages a file .gitignore would skip) — it neither deletes nor overwrites working-tree data, so it stays inside the same recoverable profile rather than escalating."
+standalone = ["--all", "--dry-run", "--force", "--help", "--ignore-errors", "--intent-to-add", "--no-all", "--refresh", "--renormalize", "--update", "--verbose", "-A", "-N", "-f", "-h", "-n", "-u", "-v"]
+valued = ["--chmod", "--pathspec-from-file"]
+
+[[command.sub]]
+name = "mv"
+profile = "local-mutate-recoverable"
+fact = "Moves or renames a tracked file and stages the change; refuses to overwrite an existing destination unless -f/--force is given."
+source = "https://git-scm.com/docs/git-mv"
+judgment = "The moved content is tracked, so the pre-move state is in the object store — recoverable. -f can clobber an existing destination file, but a TRACKED destination is likewise recoverable from HEAD; the operands are path-gated, so an out-of-worktree destination is caught by locus, not by this profile."
+standalone = ["--dry-run", "--force", "--help", "--verbose", "-f", "-h", "-k", "-n", "-v"]
+
+[[command.sub]]
+name = "commit"
+profile = "local-mutate-recoverable"
+fact = "Records the staged index as a new commit on the current branch, running the pre-commit, prepare-commit-msg, commit-msg and post-commit hooks. --amend replaces the tip commit; the replaced commit stays reachable through the reflog for the gc grace period."
+source = "https://git-scm.com/docs/git-commit"
+judgment = "Editor-tier by the level model's own reckoning — its clause names `git commit` as the shape it intends. --amend is a rewrite rather than a plain append, but the superseded commit remains reflog-reachable, so it is recoverable, not destructive. --no-verify is admitted deliberately: it SKIPS hook execution, which narrows rather than widens what runs."
+standalone = ["--all", "--allow-empty", "--allow-empty-message", "--amend", "--dry-run", "--help", "--no-edit", "--no-post-rewrite", "--no-verify", "--quiet", "--short", "--signoff", "--verbose", "-a", "-h", "-n", "-q", "-s", "-v"]
+valued = ["--author", "--date", "--file", "--message", "--reuse-message", "--squash", "-C", "-F", "-m"]
+
+[[command.sub]]
+name = "merge"
+profile = "local-mutate-recoverable"
+fact = "Joins another history into the current branch, creating a merge commit (or fast-forwarding). Runs the pre-merge-commit and post-merge hooks. A conflicted merge leaves markers in the worktree; `git merge --abort` restores the pre-merge state."
+source = "https://git-scm.com/docs/git-merge"
+judgment = "An ADDITIVE history operation — it creates a commit rather than making one unreachable — so it is a mutate, not a destroy, and lands alongside commit. The pre-merge state is recoverable via --abort or ORIG_HEAD. Left at the same tier as commit deliberately: `git pull` is fetch+merge, and it would be incoherent for the composite to sit below its own component."
+standalone = ["--abort", "--continue", "--ff", "--ff-only", "--help", "--no-commit", "--no-edit", "--no-ff", "--no-verify", "--quiet", "--squash", "--stat", "--verbose", "-h", "-q", "-v"]
+valued = ["--into-name", "--log", "--message", "--strategy", "--strategy-option", "-X", "-m", "-s"]
+
+[[command.sub]]
+name = "rebase"
+profile = "local-destroy-recoverable"
+fact = "Replays commits onto a new base, producing NEW commit objects; the original commits become unreachable from any branch but remain in the reflog (and thus recoverable via ORIG_HEAD / `git rebase --abort`) until gc prunes them. Runs the pre-rebase and post-rewrite hooks."
+source = "https://git-scm.com/docs/git-rebase"
+judgment = "Classified as a DESTROY rather than a mutate: unlike merge it makes the previous commits unreachable, which is the facet that separates it from commit/merge and lifts it a tier. It is `recoverable` — not irreversible — because the reflog retains the originals, which is exactly the distinction from filter-branch (unbounded scale, and used precisely to make history unrecoverable). --exec/-x is omitted: it runs an arbitrary command per commit and needs delegation, not a blanket allow."
+standalone = ["--abort", "--autosquash", "--autostash", "--continue", "--edit-todo", "--fork-point", "--help", "--interactive", "--keep-base", "--no-autosquash", "--no-autostash", "--quiet", "--quit", "--root", "--skip", "--verbose", "-h", "-i", "-q", "-v"]
+valued = ["--onto", "--strategy", "--strategy-option", "-X", "-s"]
