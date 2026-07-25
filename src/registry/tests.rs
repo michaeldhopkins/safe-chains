@@ -1988,7 +1988,10 @@ use super::*;
             ("aws", "describe-secret"),           // ARN/name/rotation/tags/version stages — no SecretString
             ("aws", "list-secrets"),              // secret metadata list; API never returns values
             ("aws", "list-secret-version-ids"),   // version ids + staging labels; no value
-            ("gcloud", "secrets"),                // `versions access` dropped from first_arg
+            // gcloud `secrets` (Batch 1): first_arg glob replaced with explicit sub-subs — metadata
+            // reads are profiled remote-read, and `versions access` (the only payload-returning
+            // action) is profiled credential-read rather than merely omitted from a list.
+            ("gcloud", "secrets"),                // group name only; the payload read is classified
             // (Batch-0 TODOs now CLASSIFIED, so gone from here: basecamp `auth token` -> credential-read;
             //  istioctl `proxy-config secret` -> credential-read.)
         ];

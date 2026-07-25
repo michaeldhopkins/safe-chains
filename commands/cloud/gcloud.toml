@@ -29,11 +29,15 @@ name = "print-access-token"
 profile = "credential-read"
 fact = "Prints a valid OAuth2 access token for the active account to stdout — a bearer credential the holder can use to call Google APIs."
 source = "https://cloud.google.com/sdk/gcloud/reference/auth/print-access-token"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--configuration", "--format", "--project", "--verbosity"]
 [[command.sub.sub]]
 name = "print-identity-token"
 profile = "credential-read"
 fact = "Prints a valid OIDC identity token to stdout — a bearer credential asserting the account's identity to relying services."
 source = "https://cloud.google.com/sdk/gcloud/reference/auth/print-identity-token"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--configuration", "--format", "--project", "--verbosity"]
 
 [[command.sub]]
 name = "config"
@@ -838,12 +842,60 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 # `versions` DROPPED: it admitted `gcloud secrets versions access`, which PRINTS the secret value.
-# Only `describe`/`list` (metadata) auto-approve now — fail-closed. Batch 1 (gcloud) restructures into
-# explicit sub-subs (`versions access` -> credential-read, `versions list`/`describe` -> remote-read).
 name = "secrets"
-first_arg = ["describe", "list"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Batch 1: replaced `first_arg = ["describe", "list"]` + blanket tolerance with explicit sub-subs.
+# The exact-token first_arg was already fail-closed about WHICH actions it admitted, but it admitted
+# them without consulting any flag list, so `--impersonate-service-account` (act as another identity)
+# rode along on a secret-store read. `versions access` — the only action that returns plaintext — is
+# now denied by CLASSIFICATION rather than by omission from a list.
+#
+# Flags researched for these metadata reads: `--project`/`--format`/`--filter`/`--limit`/`--sort-by`
+# select and shape the response, `--quiet` suppresses prompts, `--account` picks among credentials
+# already in the local gcloud config. DELIBERATELY ABSENT: `--impersonate-service-account` (performs
+# the call as a DIFFERENT principal — an authority change on a secret store), `--access-token-file`
+# and `--credential-file-override` (supply outside credential material), `--verbosity=debug` is
+# allowed but `--log-http` is not (it prints request/response bodies, i.e. secret material for the
+# access path).
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the secrets in a project — names, labels, replication policy and rotation metadata. Secret Manager returns no payload data from this call; the payload requires `versions access`."
+source = "https://cloud.google.com/sdk/gcloud/reference/secrets/list"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--filter", "--format", "--limit", "--page-size", "--project", "--sort-by", "--verbosity"]
+
+[[command.sub.sub]]
+name = "describe"
+profile = "remote-read"
+fact = "Describes one secret's metadata — create time, labels, replication and rotation policy, ETag. It does not include any secret version payload."
+source = "https://cloud.google.com/sdk/gcloud/reference/secrets/describe"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--format", "--project", "--verbosity"]
+
+[[command.sub.sub]]
+name = "versions"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists a secret's versions with their state (enabled/disabled/destroyed) and create time; payloads are not returned."
+source = "https://cloud.google.com/sdk/gcloud/reference/secrets/versions/list"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--filter", "--format", "--limit", "--page-size", "--project", "--secret", "--sort-by", "--verbosity"]
+[[command.sub.sub.sub]]
+name = "describe"
+profile = "remote-read"
+fact = "Describes one secret version's metadata — state, create/destroy time, replication status. The payload is returned only by `versions access`."
+source = "https://cloud.google.com/sdk/gcloud/reference/secrets/versions/describe"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--account", "--format", "--project", "--secret", "--verbosity"]
+[[command.sub.sub.sub]]
+name = "access"
+profile = "credential-read"
+fact = "Prints the secret version's PAYLOAD — the stored secret material itself — to stdout."
+source = "https://cloud.google.com/sdk/gcloud/reference/secrets/versions/access"
+judgment = "Classified explicitly rather than left out of an allowlist: an exact-token first_arg kept it out by omission, which a later widening could silently undo. Naming it credential-read makes the denial survive any restructuring of its siblings."
+standalone = ["--help"]
 
 [[command.sub]]
 name = "endpoints"
