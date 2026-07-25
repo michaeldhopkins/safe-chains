@@ -186,10 +186,12 @@ mod tests {
         git_notes_list: "git notes list",
         git_worktree_help: "git worktree --help",
         git_worktree_help_h: "git worktree -h",
+        git_rebase_help: "git rebase --help",
     }
 
     denied! {
-        git_rebase_help_denied: "git rebase --help",
+        // (`git rebase --help` moved to the safe set when rebase gained a facet profile — it is a
+        // supported sub now, so its help form is an ordinary read.)
         git_push_help_denied: "git push --help",
         git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
         git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack malicious origin",

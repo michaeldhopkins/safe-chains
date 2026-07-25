@@ -25,11 +25,13 @@
 ### `git`
 <p class="cmd-url"><a href="https://git-scm.com/docs">https://git-scm.com/docs</a></p>
 
+- **add**
 - **blame**: Flags: --color-by-age, --color-lines, --help, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -h, -k, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --date, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
 - **branch**: Flags: --all, --help, --ignore-case, --list, --no-abbrev, --no-color, --no-column, --omit-empty, --remotes, --show-current, --verbose, -a, -h, -i, -l, -r, -v, -vv. Valued: --abbrev, --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort
 - **cat-file**: Flags: --batch-all-objects, --buffer, --filters, --follow-symlinks, --help, --mailmap, --textconv, --unordered, --use-mailmap, -Z, -e, -h, -p, -s, -t. Valued: --batch, --batch-check, --batch-command, --filter, --path
 - **check-ignore**: Flags: --help, --no-index, --non-matching, --quiet, --stdin, --verbose, -h, -n, -q, -v, -z
 - **cliff** (requires --no-exec): Flags: --bumped-version, --current, --help, --latest, --no-exec, --offline, --topo-order, --unreleased, --use-branch-tags, --verbose, --version, -V, -h, -l, -u, -v. Valued: --body, --bump, --config, --count-tags, --exclude-path, --from-context, --ignore-tags, --include-path, --repository, --skip-commit, --skip-tags, --sort, --strip, --tag, --tag-pattern, --with-commit, --with-tag-message, --workdir, -b, -c, -r, -s, -t, -w
+- **commit**
 - **config --get**
 - **config --get-all**
 - **config --get-regexp**
@@ -50,8 +52,10 @@
 - **ls-files**: Flags: --cached, --debug, --deduplicate, --deleted, --directory, --empty-directory, --eol, --error-unmatch, --exclude-standard, --full-name, --help, --ignored, --killed, --modified, --no-empty-directory, --others, --recurse-submodules, --resolve-undo, --sparse, --stage, --unmerged, -c, -d, -f, -h, -i, -k, -m, -o, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --exclude, --exclude-from, --exclude-per-directory, --format, --with-tree, -X, -x
 - **ls-remote**: Flags: --branches, --exit-code, --get-url, --help, --quiet, --refs, --symref, --tags, -b, -h, -q, -t. Valued: --server-option, --sort, -o
 - **ls-tree**: Flags: --full-name, --full-tree, --help, --long, --name-only, --name-status, --object-only, -d, -h, -l, -r, -t, -z. Valued: --abbrev, --format
+- **merge**
 - **merge-base**: Flags: --all, --fork-point, --help, --independent, --is-ancestor, --octopus, -a, -h
 - **merge-tree**: Flags: --allow-unrelated-histories, --help, --messages, --name-only, --quiet, --stdin, --trivial-merge, --write-tree, -h, -z. Valued: --merge-base, -X
+- **mv**
 - **name-rev**: Flags: --all, --always, --annotate-stdin, --help, --name-only, --tags, --undefined, -h. Valued: --exclude, --refs
 - **notes --help**
 - **notes -h**
@@ -59,6 +63,7 @@
 - **notes show**
 - **pull**: Flags: --all, --allow-unrelated-histories, --append, --autostash, --commit, --compact-summary, --dry-run, --edit, --ff, --ff-only, --force, --help, --ipv4, --ipv6, --keep, --no-autostash, --no-commit, --no-edit, --no-ff, --no-gpg-sign, --no-log, --no-rebase, --no-recurse-submodules, --no-show-forced-updates, --no-signoff, --no-squash, --no-stat, --no-tags, --no-verify, --no-verify-signatures, --progress, --prune, --quiet, --set-upstream, --show-forced-updates, --signoff, --squash, --stat, --tags, --verbose, --verify, --verify-signatures, -4, -6, -a, -e, -f, -h, -k, -n, -p, -q, -t, -v. Valued: --cleanup, --depth, --deepen, --filter, --gpg-sign, --jobs, --log, --rebase, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, --strategy, --strategy-option, --upload-pack, -S, -X, -j, -o, -r, -s
 - **push**
+- **rebase**
 - **reflog**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -s, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -G, -L, -S, -n
 - **remote get-url**: Flags: --push, --all, -h, --help
 - **remote show**: Flags: -n, -h, --help
@@ -71,6 +76,7 @@
 - **stash list**: Positional args accepted
 - **stash show**: Flags: --help, --patch, --stat, -h, -p, -u. Positional args accepted
 - **status**: Flags: --ahead-behind, --branch, --help, --ignore-submodules, --long, --no-ahead-behind, --no-renames, --null, --renames, --short, --show-stash, --verbose, -b, -h, -s, -v, -z. Valued: --column, --find-renames, --ignored, --porcelain, --untracked-files, -M, -u
+- **switch**
 - **symbolic-ref**: Flags: --help, --no-recurse, --quiet, --recurse, --short, -h, -q
 - **tag**: Flags: --help, --list, --no-color, --no-column, --verify, -h, -l, -v. Valued: --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort, -n
 - **verify-commit**: Flags: --help, --raw, --verbose, -h, -v
