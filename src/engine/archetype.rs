@@ -253,12 +253,31 @@ mod tests {
             // refused by developer. NOT yolo (it is not a credential read) and NOT reader (opaque bulk
             // content is above the everyday read band).
             ("bulk-object-read", "network-admin", "developer"),
+            // The LOCAL working-copy quartet — the mirror of the remote one, split on the same
+            // reversibility axis. Both mutates land at editor (differing only in how easily they
+            // undo, which the levels do not yet distinguish); the destroys split editor→developer
+            // →yolo exactly as reversibility worsens.
+            ("local-mutate-trivial", "editor", "reader"),
+            ("local-mutate-recoverable", "editor", "reader"),
+            ("local-destroy-recoverable", "developer", "editor"),
+            ("local-destroy-irreversible", "yolo", "developer"),
         ];
         for (name, admitted_by, refused_by) in cases {
             let p = Profile::of(vec![archetype(name).expect("archetype exists").clone()]);
             assert!(level(admitted_by).admits(&p), "{name} should be admitted by {admitted_by}");
             assert!(!level(refused_by).admits(&p), "{name} should be refused by {refused_by}");
         }
+
+        // COMPLETENESS. Without this, adding an archetype to archetypes.toml and forgetting the
+        // catalog row leaves it with NO level verification at all — it would ship classifying
+        // commands with nobody having checked where it lands. Enumerating the real catalog means a
+        // new archetype fails here until its landing is asserted above.
+        let uncovered: Vec<&str> =
+            names().filter(|n| !cases.iter().any(|(c, _, _)| c == n)).collect();
+        assert!(
+            uncovered.is_empty(),
+            "archetype(s) with no catalog row — add (name, admitted_by, refused_by) above: {uncovered:?}",
+        );
     }
 
     /// The whole point of Phase 1 for the WRITE side: every remote archetype that CHANGES remote

@@ -208,3 +208,42 @@ authority = "root"
 reversibility = "recoverable"
 persistence = { level = "transient" }
 because = "controls the lifecycle of running machine services as root (start/stop/restart/reload/kill) using existing config; transient and recoverable, no durable change"
+
+# ── LOCAL working-copy archetypes ────────────────────────────────────────────────────────────────
+# The catalog above grew out of cloud/credential work, so every profile in it is remote-, secret-, or
+# privilege-shaped. That left the ordinary LOCAL dev loop — the thing a VCS is — with no profile to
+# declare, which is why git's write surface sat in legacy `level`s or went undeclared entirely. These
+# four are the local mirror of the remote quartet: the same operation × reversibility split, at
+# `locus.local = worktree` instead of a remote. `execution` stays the default `self` — a command that
+# runs a hook or a build script emits that as a SEPARATE execute capability (gated by the executor
+# band), not as part of its write profile.
+
+[archetype.local-mutate-trivial]
+operation = "mutate"
+locus = { local = "worktree" }
+scale = "bounded"
+reversibility = "trivial"
+persistence = { level = "data" }
+because = "changes worktree files to a state already recorded elsewhere, and the inverse is one command away (git switch back); the tool itself refuses to proceed when it would overwrite uncommitted work, so no data can be lost"
+
+[archetype.local-mutate-recoverable]
+operation = "mutate"
+locus = { local = "worktree" }
+scale = "bounded"
+reversibility = "recoverable"
+persistence = { level = "data" }
+because = "creates or changes local working-copy data whose prior state is retrievable from the tool's own store (a commit, an index entry, a stash); undoing it is a normal operation, not a restore-from-backup"
+
+[archetype.local-destroy-recoverable]
+operation = "destroy"
+locus = { local = "worktree" }
+scale = "bounded"
+reversibility = "recoverable"
+because = "deletes a local reference or entry whose underlying object survives and is reachable again through the tool's own history (reflog/stash log) for a retention window; the DATA is not gone, only the pointer"
+
+[archetype.local-destroy-irreversible]
+operation = "destroy"
+locus = { local = "worktree" }
+scale = "bounded"
+reversibility = "irreversible"
+because = "discards local state that was never committed to any store — uncommitted edits, untracked files — so nothing can recover it; the defining case is the one a VCS explicitly does NOT protect"
