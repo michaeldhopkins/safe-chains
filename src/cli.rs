@@ -8,6 +8,10 @@ EXAMPLES:
   # See a per-segment breakdown of why a command does or doesn't approve:
   safe-chains --explain \"grep foo . && ./deploy.sh\"
 
+  # For a single command, --explain also shows the behavior it resolved to and
+  # names the facet that refused it (e.g. locus.remote = fixed):
+  safe-chains --explain \"aws dynamodb put-item --table-name t --item {}\"
+
   # Offer to support a command safe-chains doesn't recognize. This writes or
   # upgrades the local .safe-chains.toml, then prints the pin to hand-add to
   # ~/.config/safe-chains.toml so the definition takes effect:
@@ -50,7 +54,9 @@ pub struct Cli {
     #[arg(long, value_name = "ID")]
     pub session_id: Option<String>,
 
-    /// Print a per-segment breakdown of why a command would or would not auto-approve.
+    /// Print a per-segment breakdown of why a command would or would not auto-approve. For a
+    /// single command it also prints the behavior it resolved to and, when it does not approve,
+    /// names the facet that refused it.
     #[arg(long)]
     pub explain: bool,
 
