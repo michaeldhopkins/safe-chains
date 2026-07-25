@@ -260,7 +260,30 @@ pub(crate) fn all_axes_non_default() -> Capability {
     c
 }
 
+/// Compile-time exhaustiveness for the axis list.
+///
+/// Nothing else forces `with_axis_from`/`AXIS_COUNT` to grow when a facet is added to `Capability`.
+/// Without this, a new axis is simply never generated as a witness and
+/// `set_facets_distinguishes_capabilities_differing_in_one_axis` silently stops covering it —
+/// degrading precisely when a facet has just been added, which is when it matters most. Destructured
+/// with NO `..`, so adding a field anywhere in the capability record breaks this build instead.
+#[allow(unused_variables)]
+fn every_axis_is_enumerated(c: &Capability) {
+    let Capability {
+        operation, locus, scale, retrieval, authority, isolation, reversibility, persistence,
+        disclosure, secret, network, execution, cost, because,
+    } = c;
+    let Locus { local, remote, binding, provenance } = locus;
+    let Persistence { level, trigger } = persistence;
+    let Trigger { escape, kind } = trigger;
+    let Disclosure { audience, channel, principal } = disclosure;
+    let Secret { level: secret_level, channel: secret_channel, principal: secret_principal } = secret;
+    let Network { direction, destination, payload } = network;
+    let Execution { trust, supply_chain } = execution;
+}
+
 pub(crate) fn with_axis_from(base: &Capability, donor: &Capability, i: usize) -> Capability {
+    every_axis_is_enumerated(base);
     let mut c = base.clone();
     match i {
         0 => c.operation = donor.operation,
@@ -359,4 +382,25 @@ proptest! {
             }
         }
     }
+}
+
+/// `AXIS_COUNT` must match what `set_facets` can actually report.
+///
+/// The compile-time destructure forces an author to NOTICE a new facet; this forces the axis list
+/// to actually cover it. Without both, a facet could be added to `Capability` and to `set_facets`
+/// while `AXIS_COUNT` stayed put — leaving the new axis outside the range the completeness property
+/// samples, which fails silently rather than loudly.
+#[test]
+fn axis_count_matches_what_set_facets_reports() {
+    let cap = all_axes_non_default();
+    // `set_facets` flattens a present supply chain into three extra rows that are not independent
+    // axes of `with_axis_from` (it is one `Option` field), so they are not counted here.
+    let supply_rows = usize::from(cap.execution.supply_chain.is_some()) * 3;
+    assert_eq!(
+        cap.set_facets().len() - supply_rows,
+        AXIS_COUNT,
+        "set_facets reports {} axes (excluding supply-chain rows) but AXIS_COUNT is {AXIS_COUNT} — \
+         the completeness property samples 0..AXIS_COUNT, so any excess axis is never witnessed",
+        cap.set_facets().len() - supply_rows,
+    );
 }

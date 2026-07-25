@@ -198,7 +198,7 @@ mod tests {
             local in any::<bool>(),
             idx in 0usize..32,
             port in prop::sample::select(vec!["", ":1", ":8000", ":65535"]),
-            tail in prop::sample::select(vec!["", "/", "/p", "/p?q=1", "?q=1", "#f", "/@localhost", "#@localhost", "?@localhost"]),
+            tail in prop::sample::select(vec!["", "/", "/p", "/p?q=1", "?q=1", "#f", "/@localhost", "#@localhost", "?@localhost", "\\\\@localhost"]),
         ) {
             let pool = if local { LOCAL } else { REMOTE };
             let host = pool[idx % pool.len()];
@@ -230,8 +230,11 @@ mod tests {
         ) {
             let pool = if local { LOCAL } else { REMOTE };
             let host = format!("http://{}{}", pool[idx % pool.len()], port);
-            prop_assert_eq!(is_loopback(&host), is_loopback(&host.to_uppercase()));
-            prop_assert_eq!(is_loopback(&host), is_loopback(&host.to_lowercase()));
+            // Asserted against `local`, not merely against itself: a consistency-only claim is
+            // satisfied by an implementation that returns false for everything.
+            prop_assert_eq!(is_loopback(&host), local);
+            prop_assert_eq!(is_loopback(&host.to_uppercase()), local);
+            prop_assert_eq!(is_loopback(&host.to_lowercase()), local);
         }
 
         /// A recognized host stops being recognized the moment it becomes a LABEL of some other
@@ -267,10 +270,8 @@ mod tests {
         ) {
             let pool = if local { LOCAL } else { REMOTE };
             let host = pool[idx % pool.len()];
-            prop_assert_eq!(
-                is_loopback(&format!("http://{host}")),
-                is_loopback(&format!("http://{host}:{port}")),
-            );
+            prop_assert_eq!(is_loopback(&format!("http://{host}")), local);
+            prop_assert_eq!(is_loopback(&format!("http://{host}:{port}")), local);
         }
     }
 
