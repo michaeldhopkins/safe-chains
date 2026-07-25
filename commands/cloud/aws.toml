@@ -293,8 +293,21 @@ first_arg_valued = [
 [[command.sub]]
 name = "cloudformation"
 first_arg = ["describe-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# CloudFormation reads select a stack, change set, stack set or type and page. `get-template` and
+# `get-template-summary` return the template body — infrastructure source, and worth noting that
+# templates routinely embed parameter DEFAULTS; genuine secrets belong in SSM/Secrets Manager and
+# are referenced by ARN rather than inlined, so the template read is a config read, not a
+# credential read. DELIBERATELY ABSENT: `--endpoint-url`, `--profile`, `--ca-bundle`,
+# `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--call-as", "--change-set-name", "--cli-binary-format", "--cli-connect-timeout",
+  "--cli-read-timeout", "--color", "--export-name", "--logical-resource-id", "--max-items",
+  "--max-results", "--next-token", "--output", "--page-size", "--physical-resource-id",
+  "--query", "--region", "--stack-instance-account", "--stack-instance-region", "--stack-name",
+  "--stack-set-name", "--stack-status-filter", "--starting-token", "--template-body",
+  "--template-stage", "--template-summary-config", "--template-url", "--type", "--type-name",
+]
 
 [[command.sub]]
 name = "route53"
@@ -305,20 +318,49 @@ tolerate_unknown_long = true
 [[command.sub]]
 name = "dynamodb"
 first_arg = ["describe-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# The glob covers table/backup/export METADATA only — `describe-*` and `list-*` describe schema,
+# throughput, indexes and stream settings. Row reads (`get-item`, `query`, `scan`, `batch-get-item`)
+# do not start with a globbed verb and are classified on their own terms. DELIBERATELY ABSENT:
+# `--endpoint-url` (note that DynamoDB Local legitimately uses it — but a local endpoint cannot be
+# distinguished from an attacker's by a static classifier, and the flag's presence is exactly what
+# redirects an authenticated call), `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--backup-arn", "--backup-type", "--cli-binary-format", "--cli-connect-timeout",
+  "--cli-read-timeout", "--color", "--export-arn", "--exclusive-start-backup-arn",
+  "--exclusive-start-table-name", "--global-table-name", "--limit", "--max-items", "--max-results",
+  "--next-token", "--output", "--page-size", "--query", "--region", "--resource-arn",
+  "--starting-token", "--statement", "--table-name", "--time-range-lower-bound",
+  "--time-range-upper-bound",
+]
 
 [[command.sub]]
 name = "sqs"
 first_arg = ["get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# SQS reads select a queue and page. `get-queue-attributes` returns the queue's configuration
+# (redrive policy, visibility timeout, ARN) — not message bodies; consuming messages is
+# `receive-message`, which the glob does not admit. DELIBERATELY ABSENT: `--endpoint-url`,
+# `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--attribute-names", "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout",
+  "--color", "--max-items", "--max-results", "--next-token", "--output", "--page-size",
+  "--query", "--queue-name-prefix", "--queue-owner-aws-account-id", "--queue-url", "--region",
+  "--starting-token",
+]
 
 [[command.sub]]
 name = "sns"
 first_arg = ["get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# SNS reads select a topic, subscription, endpoint or platform application and page.
+# DELIBERATELY ABSENT: `--endpoint-url`, `--profile`, `--ca-bundle`, `--no-verify-ssl`,
+# `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--endpoint-arn",
+  "--max-items", "--next-token", "--output", "--page-size", "--phone-number", "--platform-application-arn",
+  "--query", "--region", "--resource-arn", "--starting-token", "--subscription-arn", "--topic-arn",
+]
 
 [[command.sub]]
 name = "cloudwatch"
@@ -329,8 +371,20 @@ tolerate_unknown_long = true
 [[command.sub]]
 name = "ssm"
 first_arg = ["describe-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# SSM reads select parameters, documents, instances, patch baselines and command invocations.
+# DELIBERATELY ABSENT beyond the usual transport set (`--endpoint-url`, `--profile`, `--ca-bundle`,
+# `--no-verify-ssl`, `--no-sign-request`): `--with-decryption`, which returns SecureString parameter
+# values decrypted — the whole point of a SecureString is that reading its name is not reading its
+# secret. The parameter-value reads (`get-parameter`, `get-parameters`, `get-parameters-by-path`)
+# are classified by their own sub-subs below, so the glob covers metadata reads only.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--association-id", "--baseline-id", "--cli-binary-format", "--cli-connect-timeout",
+  "--cli-read-timeout", "--color", "--command-id", "--document-version", "--filters",
+  "--instance-id", "--key", "--max-items", "--max-results", "--name", "--next-token",
+  "--output", "--page-size", "--parameter-filters", "--path", "--query", "--region",
+  "--starting-token", "--version-name",
+]
 [[command.sub.sub]]
 name = "get-access-token"
 profile = "credential-mint"
