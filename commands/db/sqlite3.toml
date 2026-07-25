@@ -1,9 +1,41 @@
 [[command]]
 name = "sqlite3"
-description = "SQLite shell — interactive SQL REPL on a database file (or `:memory:`). Bare invocation drops into the REPL. Positional SQL or -cmd runs against the database. -init runs an arbitrary SQL script at startup. Carve-out: --version / --help only — meaningful invocations execute SQL."
+description = """
+SQLite shell — interactive SQL REPL on a database file (or `:memory:`). Bare invocation drops into \
+the REPL. Positional SQL or -cmd runs against the database. -init runs an arbitrary SQL script at \
+startup. Carve-out: --version / --help only — meaningful invocations execute SQL.
+
+The carve-out is not conservatism about DML. Two properties of the CLI make a "read-only SQL" \
+allowlist impossible to express by inspecting the command string, both verified against 3.43.2:
+
+1. A positional may be a DOT-COMMAND, and `.shell` / `.system` run an arbitrary shell command. \
+`sqlite3 :memory: '.shell <cmd>'` executes `<cmd>` — the positional is a code-execution surface, \
+not just a query. `.import`, `.output`, `.once` and `.load` write files or load extensions.
+
+2. A statement that BEGINS with SELECT can still write to the filesystem. The CLI links the fileio \
+extension, so `SELECT writefile('/path', 'data')` creates the file and `readfile()` reads one back \
+into the result set. `-readonly` does not help: it opens the DATABASE read-only, while writefile \
+targets the filesystem.
+
+So the usual shape for a read-only subset — admit statements starting with SELECT — is a fail-open, \
+and admitting positionals at all concedes shell execution. A safe subset would need the CLI's own \
+SQL grammar rather than string matching, which is out of scope for a static classifier (AGENTS.md \
+§scope). An agent needing to query a database can use a language binding whose call site is \
+classifiable instead.
+"""
 url = "https://www.sqlite.org/cli.html"
-researched_version = "SQLite 3.x"
+researched_version = "SQLite 3.43.2 (probed locally 2026-07-25); CLI surface stable since 3.31"
 level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-help", "-version"]
+examples_safe = ["sqlite3 --version", "sqlite3 --help"]
+# The two surfaces that make a read-only subset unexpressible, pinned so a future widening has to
+# confront them rather than rediscover them.
+examples_denied = [
+  "sqlite3 :memory: '.shell rm -rf /'",
+  "sqlite3 app.db \"SELECT writefile('/etc/cron.d/job', 'x')\"",
+  "sqlite3 app.db 'SELECT 1'",
+  "sqlite3 -readonly app.db 'SELECT 1'",
+  "sqlite3 app.db",
+]
