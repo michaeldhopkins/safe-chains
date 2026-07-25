@@ -2511,6 +2511,7 @@ Aliases: `capacitor`
 - **run**: Runs this project's own code. Flags: --all-features, --frozen, --help, --ignore-rust-version, --locked, --no-default-features, --offline, --release, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --index, --limit, --registry
 - **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
+- **sweep**: Flags: --all, --dry-run, --file, --help, --hidden, --installed, --recursive, --stamp, --verbose, --version, -V, -a, -d, -f, -h, -i, -r, -s, -v. Valued: --maxsize, --time, --toolchains, -m, -t
 - **swift init**: Flags: --accept-all, --help, --macro, --plain, --silent, -h, -s, -y. Valued: --lib-type, --vcs
 - **swift package**: Flags: --accept-all, --all-features, --help, --no-default-features, --release, --silent, --skip-toolchains-check, --suppress-warnings, -h, -r, -s, -y. Valued: --features, --lib-type, --name, --platforms, -F, -n, -p
 - **swift**: Flags: --accept-all, --help, --silent, --version, -V, -h, -s, -y
@@ -2530,6 +2531,9 @@ Aliases: `capacitor`
 
 **Examples:**
 
+- `cargo sweep --time 5`
+- `cargo sweep -r --installed`
+- `cargo sweep --dry-run --maxsize 500`
 - `cargo run`
 - `cargo run --release`
 - `cargo run --bin server`
