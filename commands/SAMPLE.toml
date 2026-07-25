@@ -343,30 +343,38 @@
 # first_arg_standalone = ["--debug", "--no-cli-pager"]
 # first_arg_valued = ["--output", "--query", "--region", "--table-name"]
 
-# LOOPBACK_VALUED / LOOPBACK_PROFILE (on a profiled sub) — the same endpoint
-# gate, plus the archetype the sub BECOMES when the endpoint is local.
+# LOOPBACK_VALUED / LOOPBACK_LOCALIZES (on a profiled sub) — the same endpoint
+# gate, plus whether a local destination changes the CLASSIFICATION.
 #
-# Pointed at an emulator, a cloud operation is a different operation, not the
-# same one with softened edges: remote-mutate carries `sends-host-data`,
-# `effortful` reversibility and (for create) `metered` cost, and every one of
-# those describes a cloud service that isn't in the picture. So the sub names
-# its local counterpart rather than the resolver patching facets by hand.
+# The facets split into two kinds, and only one kind depends on where the call
+# goes. `remote-mutate` describes a cloud service in exactly four places: it
+# reaches a fixed remote, talks outbound, sends host data off the machine, and
+# bills. All four are false for http://localhost:8000. Everything else it says
+# — the operation, scale, retrieval, reversibility, persistence, disclosure —
+# describes what the call DOES and is just as true against an emulator.
+#
+# So `loopback_localizes` clears the destination facets and leaves the rest
+# alone. It does NOT swap in a "local" archetype: there would have to be a local
+# twin of every remote archetype, and a twin like local-mutate-recoverable
+# asserts `locus.local = worktree` and `persistence = data`, neither of which is
+# true of a container. Composing means a bulk read pointed at localhost is
+# automatically bulk-read-minus-the-network, with no new archetype to invent.
 #
 # loopback_valued alone   → the flag is admitted only when local; classification
 #                           is unchanged (right for reads, which already pass).
-# + loopback_profile      → a local destination also re-classifies the sub.
+# + loopback_localizes    → a local destination also clears those four facets.
 #
-# DESTROY archetypes may not declare loopback_profile and the build refuses it.
+# DESTROY archetypes may not set loopback_localizes and the build refuses it.
 # The emulator claim is unverifiable — `ssh -L 8000:dynamodb.<region>.amazonaws
-# .com:443` makes localhost mean production — and being wrong about that is
-# recoverable for a write and not for a delete. Destroys may still declare
+# .com:443` makes localhost mean production — and being wrong about that costs a
+# stray write for a mutate and the data for a delete. Destroys may still declare
 # loopback_valued: the flag stays usable, it just buys no relaxation.
 
 # [[command.sub.sub]]
 # name = "put-item"
-# profile = "remote-mutate"                        # against the real service
+# profile = "remote-mutate"                  # against the real service
 # loopback_valued = ["--endpoint-url"]
-# loopback_profile = "local-mutate-recoverable"    # against DynamoDB Local
+# loopback_localizes = true                  # against DynamoDB Local
 # valued = ["--table-name", "--item", "--region"]
 
 # CREDENTIAL_FIRST_ARG — the value-dependent credential-read gate. Same glob

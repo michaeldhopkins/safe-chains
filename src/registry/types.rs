@@ -493,11 +493,12 @@ pub(super) struct TomlSub {
     /// local emulator is a researched workflow for that service.
     #[serde(default)]
     pub loopback_valued: Vec<String>,
-    /// The archetype this sub becomes when a `loopback_valued` flag points it at this machine.
-    /// Substituted for `profile` by `resolve`. Absent = the sub keeps its remote classification
-    /// whatever the destination; that is mandatory for destroy archetypes and the build enforces it.
+    /// Whether a `loopback_valued` flag naming this machine re-classifies the sub: `resolve` clears
+    /// the destination-determined facets (remote reach, net direction, payload, metered cost) and
+    /// leaves everything describing the operation alone. Absent = the sub keeps its remote
+    /// classification whatever the destination; mandatory for destroy archetypes, build-enforced.
     #[serde(default)]
-    pub loopback_profile: Option<String>,
+    pub loopback_localizes: Option<bool>,
     #[serde(default)]
     pub nested_bare: Option<bool>,
     #[serde(default)]
@@ -792,9 +793,21 @@ pub(super) struct SubSpec {
     pub output_path_flags: Vec<String>,
     /// Endpoint flags gated on naming this machine; see `TomlSub::loopback_valued`.
     pub loopback_valued: Vec<String>,
-    /// Archetype substituted when a `loopback_valued` flag names this machine; see
-    /// `TomlSub::loopback_profile`.
-    pub loopback_profile: Option<String>,
+    /// What a loopback endpoint buys this sub; see `TomlSub::loopback_localizes`.
+    pub loopback_effect: LoopbackEffect,
+}
+
+/// What a recognized loopback destination buys a sub. Gating the FLAG and re-classifying the
+/// OPERATION are separate powers: a read only needs the former (it already passes), while a write
+/// needs the latter to stop looking like a call to a cloud service.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(super) enum LoopbackEffect {
+    /// The endpoint flag is admissible when local; the classification is untouched.
+    #[default]
+    AdmitOnly,
+    /// Also clears the facets the destination determines (remote reach, net direction, payload,
+    /// metered cost), leaving the ones describing the operation alone.
+    Localizes,
 }
 
 #[derive(Debug, Clone)]

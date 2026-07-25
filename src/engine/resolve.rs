@@ -124,7 +124,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     // Phase 1: a subcommand tagged with a facet archetype (`profile = …`) classifies as that
     // archetype's static capability — the derived, self-documenting successor to `candidate = true`.
     // Checked BEFORE command-level behavior, since a subcommand tool carries no `[command.behavior]`.
-    if let Some(mut names) = crate::registry::sub_archetypes(tokens) {
+    if let Some(names) = crate::registry::sub_archetypes(tokens) {
         if !trusted_command_path(arg0.as_str()) {
             return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
         }
@@ -140,11 +140,6 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         // 8000:dynamodb.us-east-1.amazonaws.com:443` makes `localhost:8000` production, and no
         // static classifier sees the tunnel), and that lie is only unrecoverable in the destroy
         // direction.
-        if let Some(local) = crate::registry::sub_loopback_profile(tokens)
-            && let Some(first) = names.first_mut()
-        {
-            *first = local;
-        }
         // One capability per archetype (the sub's profile + each present escalating flag); the level
         // algebra takes the max. Fail-closed: an unknown archetype name → a worst capability, so a
         // typo or `unclassified` can never silently pass (a proptest catches typos at test time).
@@ -179,6 +174,35 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         // profile is the remote read alone.
         if let Some(path) = crate::registry::sub_output_path_token(tokens) {
             caps.push(writes_export_file(classify_locus(path)));
+        }
+        // A declared endpoint flag naming THIS machine changes WHERE the call goes, so it changes
+        // exactly the facets the destination determines and nothing else. That boundary is the whole
+        // design: `remote-mutate` describes a cloud service in four places — it reaches a fixed
+        // remote, talks outbound, sends host data off the machine, and bills — and all four are
+        // false for `http://localhost:8000`. Its other facets (what the operation DOES: the
+        // operation itself, scale, retrieval, reversibility, persistence, disclosure) are properties
+        // of the call, not of its destination, and stay untouched.
+        //
+        // Composing rather than substituting a whole "local" archetype matters twice over: the
+        // remote archetypes do not each need a local twin, and nothing here asserts a fact the
+        // destination cannot establish. (An earlier cut swapped in `local-mutate-recoverable`, which
+        // claims `locus.local = worktree` and `persistence = data` — both untrue of a container.)
+        //
+        // DESTROY is skipped here and refused outright at build time by
+        // `assert_loopback_localizes_is_coherent`. The emulator claim is unverifiable: `ssh -L
+        // 8000:dynamodb.<region>.amazonaws.com:443` makes `localhost:8000` production and no static
+        // classifier sees the tunnel. Being wrong costs a stray write; being wrong about a delete
+        // costs the data.
+        if crate::registry::sub_loopback_localizes(tokens) {
+            for c in &mut caps {
+                if c.operation == Operation::Destroy {
+                    continue;
+                }
+                c.locus.remote = RemoteReach::None;
+                c.network.direction = NetDirection::Loopback;
+                c.network.payload = NetPayload::None;
+                c.cost = Cost::None;
+            }
         }
         return Some(Profile::of(caps));
     }
