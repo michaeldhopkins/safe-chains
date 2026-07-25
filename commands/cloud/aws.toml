@@ -351,7 +351,7 @@ profile = "remote-create"
 fact = "Creates a table with a key schema and throughput settings. Reversible by delete-table; against DynamoDB Local the whole dataset lives in a container or a local file."
 source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/create-table.html"
 loopback_valued = ["--endpoint-url"]
-loopback_profile = "local-mutate-recoverable"
+loopback_localizes = true
 standalone = ["--debug", "--help", "--no-cli-pager"]
 valued = [
   "--attribute-definitions", "--billing-mode", "--cli-binary-format", "--cli-connect-timeout",
@@ -366,7 +366,7 @@ profile = "remote-mutate"
 fact = "Writes one item, replacing any item with the same key. Overwrites silently unless a condition expression guards it."
 source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/put-item.html"
 loopback_valued = ["--endpoint-url"]
-loopback_profile = "local-mutate-recoverable"
+loopback_localizes = true
 standalone = ["--debug", "--help", "--no-cli-pager"]
 valued = [
   "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
@@ -381,7 +381,7 @@ profile = "remote-mutate"
 fact = "Edits attributes of one item, creating it if absent. An update expression may also REMOVE attributes, but the item itself survives."
 source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/update-item.html"
 loopback_valued = ["--endpoint-url"]
-loopback_profile = "local-mutate-recoverable"
+loopback_localizes = true
 standalone = ["--debug", "--help", "--no-cli-pager"]
 valued = [
   "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
@@ -396,7 +396,7 @@ profile = "remote-mutate"
 fact = "Changes a table's throughput, billing mode, indexes or stream settings. Does not remove item data."
 source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/update-table.html"
 loopback_valued = ["--endpoint-url"]
-loopback_profile = "local-mutate-recoverable"
+loopback_localizes = true
 standalone = ["--debug", "--help", "--no-cli-pager"]
 valued = [
   "--attribute-definitions", "--billing-mode", "--cli-binary-format", "--cli-connect-timeout",
@@ -436,10 +436,10 @@ valued = [
 ]
 [[command.sub.sub]]
 name = "scan"
-profile = "bulk-object-read"
+profile = "data-export"
 fact = "Reads EVERY item in a table or index. Unbounded by design — a filter expression is applied after the read, so it reduces what is returned but not what is scanned."
 source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/scan.html"
-judgment = "bulk-object-read rather than remote-read: the operation's scale is the whole table, so against the real service it is a full-dataset extraction regardless of the filter."
+judgment = "data-export, not bulk-object-read: the two differ on the `retrieval` axis, not on scale. A scan returns STRUCTURED items you asked for — records, the same shape as `supabase db dump` — whereas bulk-content means arbitrary opaque object bytes (an S3 object, an EBS block) the classifier cannot assess. Unbounded scale is shared by both and is not what separates them."
 loopback_valued = ["--endpoint-url"]
 standalone = ["--consistent-read", "--debug", "--help", "--no-cli-pager", "--no-consistent-read"]
 valued = [
