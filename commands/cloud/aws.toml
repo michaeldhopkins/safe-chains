@@ -127,8 +127,21 @@ valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", 
 [[command.sub]]
 name = "ec2"
 first_arg = ["describe-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# EC2's read surface is ~200 `describe-` operations that share one parameter idiom: a resource-id
+# list, `--filters`, and a paging cursor. `--dry-run` belongs here — it makes EC2 return an
+# authorization check instead of performing anything, which is strictly more conservative.
+# DELIBERATELY ABSENT: `--endpoint-url`, `--profile`, `--ca-bundle`, `--no-verify-ssl`,
+# `--no-sign-request`.
+first_arg_standalone = ["--debug", "--dry-run", "--help", "--no-cli-pager", "--no-dry-run", "--no-paginate"]
+first_arg_valued = [
+  "--architecture", "--attribute", "--availability-zone", "--cli-binary-format",
+  "--cli-connect-timeout", "--cli-read-timeout", "--color", "--executable-users", "--filters",
+  "--group-ids", "--group-names", "--image-ids", "--instance-ids", "--instance-types",
+  "--internet-gateway-ids", "--key-names", "--max-items", "--max-results", "--nat-gateway-ids",
+  "--network-interface-ids", "--next-token", "--output", "--owners", "--page-size", "--query",
+  "--region", "--resource-type", "--route-table-ids", "--security-group-ids", "--snapshot-ids",
+  "--starting-token", "--subnet-ids", "--volume-ids", "--vpc-ids",
+]
 
 [[command.sub.sub]]
 name = "describe-launch-template-versions"
@@ -185,8 +198,18 @@ valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", 
 [[command.sub]]
 name = "lambda"
 first_arg = ["get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Lambda reads select a function (optionally a version/alias via `--qualifier`) and page. The glob
+# covers the metadata reads only: `get-function` and `get-function-configuration` return the
+# function's Environment.Variables map in PLAINTEXT (routinely DB passwords and API keys), so they
+# are carved out as credential-read sub-subs below and the glob never sees them. DELIBERATELY
+# ABSENT: `--endpoint-url`, `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--event-source-arn", "--function-name", "--function-version", "--marker", "--master-region",
+  "--max-items", "--output", "--page-size", "--qualifier", "--query", "--region", "--resource",
+  "--starting-token", "--statement-id", "--uuid",
+]
 
 [[command.sub.sub]]
 name = "get-function"
@@ -235,14 +258,37 @@ first_arg_valued = [
 [[command.sub]]
 name = "ecs"
 first_arg = ["describe-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# ECS reads select a cluster and the resources within it (services, tasks, task definitions,
+# container instances) and page. DELIBERATELY ABSENT: `--endpoint-url`, `--profile`, `--ca-bundle`,
+# `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--cluster", "--color",
+  "--container-instance", "--container-instances", "--desired-status", "--family", "--filter",
+  "--include", "--launch-type", "--max-items", "--max-results", "--next-token", "--output",
+  "--page-size", "--query", "--region", "--scheduling-strategy", "--service", "--service-name",
+  "--services", "--sort", "--starting-token", "--started-by", "--status", "--task",
+  "--task-definition", "--task-definition-family", "--tasks",
+]
 
 [[command.sub]]
 name = "rds"
 first_arg = ["describe-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# RDS reads select an instance/cluster/snapshot/parameter-group and page with RDS's own cursor
+# spelling (`--marker`/`--max-records` rather than the CLI-generic pair). DELIBERATELY ABSENT:
+# `--endpoint-url`, `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
+first_arg_standalone = [
+  "--debug", "--help", "--include-public", "--include-shared", "--no-cli-pager",
+  "--no-include-public", "--no-include-shared", "--no-paginate",
+]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--db-cluster-identifier", "--db-cluster-parameter-group-name", "--db-cluster-snapshot-identifier",
+  "--db-instance-identifier", "--db-parameter-group-name", "--db-snapshot-identifier",
+  "--db-subnet-group-name", "--duration", "--engine", "--engine-version", "--event-categories",
+  "--filters", "--marker", "--max-items", "--max-records", "--output", "--page-size", "--query",
+  "--region", "--source-identifier", "--source-type", "--starting-token", "--snapshot-type",
+]
 
 [[command.sub]]
 name = "cloudformation"
