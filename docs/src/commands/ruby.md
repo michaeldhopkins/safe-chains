@@ -282,6 +282,7 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **assets:reveal**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **assets:reveal:full**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **cache:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **compile**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:fixtures:load**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:migrate**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
@@ -313,6 +314,13 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **tmp:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **tmp:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `rake compile`
+- `rake compile --trace`
+- `rake routes`
+- `rake db:migrate`
 
 ### `rbenv`
 <p class="cmd-url"><a href="https://github.com/rbenv/rbenv#readme">https://github.com/rbenv/rbenv#readme</a></p>
