@@ -338,6 +338,143 @@ first_arg_valued = [
   "--time-range-upper-bound",
 ]
 
+# DynamoDB's item surface, classified so the local-development loop works against DynamoDB Local
+# while the same commands against the real service keep their remote classification. Each declares
+# `loopback_valued = ["--endpoint-url"]`: the flag is admitted only with a loopback value, and a
+# loopback value re-classifies the non-destroy capabilities as local (see `resolve`'s loopback
+# modifier). The destroys declare it too — the flag stays admissible, but destroy is deliberately
+# NOT relaxed by it, because an SSH tunnel can make `localhost:8000` production and that lie is only
+# unrecoverable in the destroy direction.
+[[command.sub.sub]]
+name = "create-table"
+profile = "remote-create"
+fact = "Creates a table with a key schema and throughput settings. Reversible by delete-table; against DynamoDB Local the whole dataset lives in a container or a local file."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/create-table.html"
+loopback_valued = ["--endpoint-url"]
+loopback_profile = "local-mutate-recoverable"
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--attribute-definitions", "--billing-mode", "--cli-binary-format", "--cli-connect-timeout",
+  "--cli-read-timeout", "--color", "--deletion-protection-enabled", "--global-secondary-indexes",
+  "--key-schema", "--local-secondary-indexes", "--output", "--provisioned-throughput", "--query",
+  "--region", "--resource-policy", "--sse-specification", "--stream-specification", "--table-class",
+  "--table-name", "--tags", "--warm-throughput",
+]
+[[command.sub.sub]]
+name = "put-item"
+profile = "remote-mutate"
+fact = "Writes one item, replacing any item with the same key. Overwrites silently unless a condition expression guards it."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/put-item.html"
+loopback_valued = ["--endpoint-url"]
+loopback_profile = "local-mutate-recoverable"
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--condition-expression", "--expression-attribute-names", "--expression-attribute-values",
+  "--item", "--output", "--query", "--region", "--return-consumed-capacity",
+  "--return-item-collection-metrics", "--return-values", "--return-values-on-condition-check-failure",
+  "--table-name",
+]
+[[command.sub.sub]]
+name = "update-item"
+profile = "remote-mutate"
+fact = "Edits attributes of one item, creating it if absent. An update expression may also REMOVE attributes, but the item itself survives."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/update-item.html"
+loopback_valued = ["--endpoint-url"]
+loopback_profile = "local-mutate-recoverable"
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--condition-expression", "--expression-attribute-names", "--expression-attribute-values", "--key",
+  "--output", "--query", "--region", "--return-consumed-capacity",
+  "--return-item-collection-metrics", "--return-values", "--return-values-on-condition-check-failure",
+  "--table-name", "--update-expression",
+]
+[[command.sub.sub]]
+name = "update-table"
+profile = "remote-mutate"
+fact = "Changes a table's throughput, billing mode, indexes or stream settings. Does not remove item data."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/update-table.html"
+loopback_valued = ["--endpoint-url"]
+loopback_profile = "local-mutate-recoverable"
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--attribute-definitions", "--billing-mode", "--cli-binary-format", "--cli-connect-timeout",
+  "--cli-read-timeout", "--color", "--deletion-protection-enabled", "--global-secondary-index-updates",
+  "--output", "--provisioned-throughput", "--query", "--region", "--replica-updates",
+  "--sse-specification", "--stream-specification", "--table-class", "--table-name",
+  "--warm-throughput",
+]
+[[command.sub.sub]]
+name = "get-item"
+profile = "remote-read"
+fact = "Reads one item by primary key."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/get-item.html"
+loopback_valued = ["--endpoint-url"]
+standalone = ["--consistent-read", "--debug", "--help", "--no-cli-pager", "--no-consistent-read"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--expression-attribute-names", "--key", "--output", "--projection-expression", "--query",
+  "--region", "--return-consumed-capacity", "--table-name",
+]
+[[command.sub.sub]]
+name = "query"
+profile = "remote-read"
+fact = "Reads items matching a key condition on one partition, bounded by --limit and the 1 MB page size."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/query.html"
+loopback_valued = ["--endpoint-url"]
+standalone = [
+  "--consistent-read", "--debug", "--help", "--no-cli-pager", "--no-consistent-read",
+  "--no-scan-index-forward", "--scan-index-forward",
+]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--exclusive-start-key", "--expression-attribute-names", "--expression-attribute-values",
+  "--filter-expression", "--index-name", "--key-condition-expression", "--limit", "--max-items",
+  "--output", "--page-size", "--projection-expression", "--query", "--region",
+  "--return-consumed-capacity", "--select", "--starting-token", "--table-name",
+]
+[[command.sub.sub]]
+name = "scan"
+profile = "bulk-object-read"
+fact = "Reads EVERY item in a table or index. Unbounded by design — a filter expression is applied after the read, so it reduces what is returned but not what is scanned."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/scan.html"
+judgment = "bulk-object-read rather than remote-read: the operation's scale is the whole table, so against the real service it is a full-dataset extraction regardless of the filter."
+loopback_valued = ["--endpoint-url"]
+standalone = ["--consistent-read", "--debug", "--help", "--no-cli-pager", "--no-consistent-read"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--exclusive-start-key", "--expression-attribute-names", "--expression-attribute-values",
+  "--filter-expression", "--index-name", "--limit", "--max-items", "--output", "--page-size",
+  "--projection-expression", "--query", "--region", "--return-consumed-capacity", "--segment",
+  "--select", "--starting-token", "--table-name", "--total-segments",
+]
+[[command.sub.sub]]
+name = "delete-item"
+profile = "remote-destroy-recoverable"
+fact = "Removes one item by primary key. Recoverable only from a backup or point-in-time restore, neither of which is on by default."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/delete-item.html"
+loopback_valued = ["--endpoint-url"]
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--condition-expression", "--expression-attribute-names", "--expression-attribute-values", "--key",
+  "--output", "--query", "--region", "--return-consumed-capacity",
+  "--return-item-collection-metrics", "--return-values", "--return-values-on-condition-check-failure",
+  "--table-name",
+]
+[[command.sub.sub]]
+name = "delete-table"
+profile = "remote-destroy-irreversible"
+fact = "Drops the table and every item in it. Without an on-demand backup or point-in-time recovery configured beforehand, the data is gone."
+source = "https://docs.aws.amazon.com/cli/latest/reference/dynamodb/delete-table.html"
+loopback_valued = ["--endpoint-url"]
+standalone = ["--debug", "--help", "--no-cli-pager"]
+valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--output",
+  "--query", "--region", "--table-name",
+]
+
 [[command.sub]]
 name = "sqs"
 first_arg = ["get-*", "list-*"]
