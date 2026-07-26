@@ -95,11 +95,108 @@ Some variables are also value-sensitive rather than name-sensitive — `GIT_PAGE
 problem, so `eval_safe_flag_values`-style value constraints would be reusable, but it means a
 declaration is sometimes name + permitted values rather than a name alone.
 
-## If it is picked up later
+## The design that works: inspect a listed set, classify with existing rules
 
-1. Scope the per-command env surface for one heavyweight family first (`git` or `npm`), end to end,
-   including value-sensitive cases. That establishes the real cost per command before any commitment.
-2. Decide whether the universal, runtime-interpreted variables (`LD_PRELOAD`, `PATH`, `IFS`) belong
-   in per-command declarations at all. They are properties of the process rather than of any program,
-   so 1,603 omissions may be the right ANSWER by the wrong MODEL.
-3. Only then consider the default. The security fix and the friction change should land separately.
+Revised 2026-07-26. The earlier framing — "an undeclared env name does not auto-approve" — is an
+allowlist over an UNBOUNDED set (any program may read any variable), which is why it kept producing
+unacceptable friction. Invert it:
+
+- **Inspect only a listed set of variables.** That set is enumerable because it is defined by OS
+  loaders, shell standards and each tool's documentation — not by user creativity.
+- **Classify the VALUE with a rule we already have**, rather than judging the name.
+- **Everything else is untouched.** `FOO=bar ls` keeps working; absence of a variable changes
+  nothing. No new denials outside the list.
+
+Nothing is "forbidden". `GIT_DIR=/tmp/evil` denies because `/tmp` is out-of-worktree under the
+existing locus rules, not because `GIT_DIR` is on a naughty list.
+
+### The rules already exist
+
+| Value shape | Existing machinery | Verified behaviour |
+| --- | --- | --- |
+| a COMMAND | `command_verdict(value)` — the join-and-recurse `dispatch.rs:258` already does for `sudo X` | `cat` → allow, `sh -c evil` → deny, `vim` → allow |
+| a path supplying CODE | pathgate role `exec` (as `cargo --manifest-path`) | worktree → allow, `/tmp` → deny, `~` → deny |
+| a path read/written as DATA | pathgate roles `read` / `write` | worktree → allow, `/etc/cron.d` → deny |
+| an OPTION STRING | parse as that interpreter's flags; needs a researched allowlist per interpreter | see below |
+
+Recursion dissolves the value-sensitivity problem noted earlier: `GIT_PAGER=cat` and
+`GIT_PAGER='sh -c evil'` classify correctly with no allowlist, because "is this string a safe
+command" is a question already answered. Note one honest cost — `GIT_SSH_COMMAND='ssh -v'` denies,
+because bare `ssh` is not allowlisted. Erring closed, but not friction-free.
+
+## Measured injection vectors (all executed on this machine, 2026-07-26)
+
+Each was proved by running a marker file, not inferred from documentation:
+
+| Vector | Result |
+| --- | --- |
+| `NODE_OPTIONS="--require <file>"` | marker printed before main — **executes** |
+| `NODE_OPTIONS="--import file://<file>"` | marker printed before main — **executes** |
+| `RUBYOPT="-r<file>"` | **executes** |
+| `PERL5OPT="-I<dir> -MInject"` | **executes** |
+| `PYTHONPATH=<dir>` with `sitecustomize.py` | **executes** (Python auto-imports it at startup) |
+| `BASH_ENV=<file>` with `bash -c` | **executes** |
+| `PYTHONSTARTUP=<file>` with `python3 -c` | did NOT execute — interactive REPL only |
+| `DYLD_INSERT_LIBRARIES` against `/bin/ls` | stripped by SIP — no effect |
+| `DYLD_INSERT_LIBRARIES` against `~/.cargo/bin/…` | honored — loader aborts on a missing dylib |
+
+**Methodology note, and a caution for whoever picks this up.** The Node documentation states that
+`--require` and `--import` are disallowed in `NODE_OPTIONS` "for security reasons". On Node v22.17.0
+that is false: both load and execute. This note previously repeated the doc claim and nearly
+retracted a correct finding on the strength of it. Test the vector; do not trust the manual.
+
+## Enumeration by ecosystem
+
+**Verified as code-execution vectors.** Each needs value classification, not a boolean.
+
+| Ecosystem | Variables | Value shape |
+| --- | --- | --- |
+| loader | `LD_PRELOAD`, `LD_AUDIT`, `LD_LIBRARY_PATH`, `DYLD_INSERT_LIBRARIES`, `DYLD_LIBRARY_PATH`, `DYLD_FRAMEWORK_PATH` | code path (`exec` locus) |
+| shell | `BASH_ENV`, `ENV`, `PATH`, `IFS`, `SHELL` | code path / resolution order |
+| node | `NODE_OPTIONS`, `NODE_PATH`, `NODE_REPL_EXTERNAL_MODULE`, `NODE_EXTRA_CA_CERTS`, `NODE_TLS_REJECT_UNAUTHORIZED` | option string / code path / trust anchor |
+| ruby | `RUBYOPT`, `RUBYLIB`, `GEM_HOME`, `GEM_PATH`, `BUNDLE_GEMFILE` | option string / code path |
+| python | `PYTHONPATH`, `PYTHONHOME`, `PYTHONSTARTUP` (interactive only) | code path |
+| perl | `PERL5OPT`, `PERL5LIB`, `PERL5DB` | option string / code path |
+| git | `GIT_SSH_COMMAND`, `GIT_SSH`, `GIT_EXTERNAL_DIFF`, `GIT_EDITOR`, `GIT_SEQUENCE_EDITOR`, `GIT_PAGER`, `GIT_ASKPASS`, `GIT_PROXY_COMMAND` | command |
+| git | `GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY`, `GIT_ALTERNATE_OBJECT_DIRECTORIES`, `GIT_COMMON_DIR`, `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM`, `GIT_CONFIG_COUNT`/`_KEY_n`/`_VALUE_n` | data path / config injection |
+| cargo | `RUSTC_WRAPPER`, `RUSTC`, `CARGO_BUILD_RUSTC_WRAPPER`, `RUSTFLAGS`, and the whole `CARGO_*` config mirror | command / option string |
+| pager | `PAGER`, `LESSOPEN`, `LESSCLOSE`, `EDITOR`, `VISUAL` | command |
+| jvm | `JAVA_TOOL_OPTIONS`, `_JAVA_OPTIONS`, `CLASSPATH` | option string / code path |
+
+### The cargo finding, which motivates the whole exercise
+
+safe-chains ALREADY classifies `build.rustc-wrapper` as a code-execution key: `cargo build --config
+build.rustc-wrapper=/tmp/evil` is in `examples_denied` and denies. The env spelling of the same
+capability does not:
+
+    cargo build --config build.rustc-wrapper=/tmp/evil   DENY
+    RUSTC_WRAPPER=/tmp/evil cargo build                  ALLOW
+    CARGO_BUILD_RUSTC_WRAPPER=/tmp/evil cargo build      ALLOW
+
+The danger is not unknown here — it is documented in cargo.toml's own description. Only the spelling
+went unchecked. Cargo mirrors its entire config surface into `CARGO_*`, so every guarded `--config`
+key has an unguarded env twin. That pattern (a flag we gate, an env var we do not) is the thing to
+search for across the registry.
+
+## Option-string allowlists — the remaining research
+
+Three variables carry a FLAG STRING for an interpreter, so classifying them means parsing that
+interpreter's flags and allowing a researched subset. Verified dangerous flags:
+
+- `NODE_OPTIONS` — `--require`/`-r` and `--import` both execute (measured). `--experimental-loader`
+  and `--loader` are the same shape. Benign example measured: `--max-old-space-size=512`.
+- `RUBYOPT` — `-r` executes (measured). `-I` extends the load path, so it feeds `-r`.
+- `PERL5OPT` — `-M`/`-m` load a module, `-I` extends `@INC`; the pair executes (measured). `-d`
+  starts the debugger.
+
+What is NOT yet researched: the full permitted set for each, and which remaining flags are inert
+enough to allowlist. That is the real work item, and it is per-interpreter rather than per-command.
+`JAVA_TOOL_OPTIONS` and `RUSTFLAGS` are the same shape and unexamined.
+
+## Suggested order
+
+1. Land the two shapes that need NO new research, since both reuse existing rules end to end:
+   command-valued variables via `command_verdict`, and path-valued ones via the pathgate roles.
+2. Sweep the registry for flags we already gate that have an env twin (`RUSTC_WRAPPER` is one; there
+   will be more).
+3. Only then take the option-string allowlists, one interpreter at a time.
