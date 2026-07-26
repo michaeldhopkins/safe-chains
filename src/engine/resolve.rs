@@ -14,7 +14,7 @@ use crate::parse::{Token, has_flag};
 
 mod capability;
 mod flags;
-mod locus;
+pub(crate) mod locus;
 pub(crate) mod regions;
 #[cfg(test)]
 mod scenarios;

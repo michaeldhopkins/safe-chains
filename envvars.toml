@@ -1,0 +1,188 @@
+# Environment variables whose VALUE changes what a command does.
+#
+# `VAR=value cmd` is not `cmd`. A leading assignment can make the process run different code, load
+# code from a different place, or reach a different system — all without changing the command name
+# safe-chains classifies. This file is the researched list of variables where that is true, and the
+# SHAPE of each one's value so a rule we already have can judge it.
+#
+# ONLY THE NAMES LISTED HERE ARE INSPECTED. An unlisted assignment is ignored exactly as before, and
+# the absence of an assignment changes nothing. This file adds no denials outside itself — it is not
+# a switch that makes unknown environment variables suspicious. That property is deliberate and is
+# what makes the list safe to grow one entry at a time.
+#
+# Nothing here is "forbidden" either. `GIT_DIR=/tmp/evil` denies because `/tmp` is out-of-worktree
+# under the ordinary locus rules, and `GIT_PAGER=cat` passes because `cat` passes. The value is
+# classified; the name only says HOW.
+#
+# shape:
+#   command    the value is a command line → classified by `command_verdict`, the same recursion
+#              `sudo X` already uses. `GIT_PAGER=cat` allows, `GIT_PAGER='sh -c evil'` denies.
+#   exec-path  the value names a path SUPPLYING CODE → gated at the executor locus, like cargo's
+#              `--manifest-path`. Worktree allows; /tmp, home and system paths deny. This is not the
+#              read rule: `cat /tmp/x.so` is a fine read, while LOADING /tmp/x.so is not.
+#   data-path  the value names a path read or written as DATA → ordinary read/write locus.
+#
+# Every entry's `because` is the measured behaviour where one was taken; see
+# docs/design/env-prefix-classification.md for the probes. Entries marked `measured = false` are
+# enumerated from documentation because the toolchain was not installed to test against.
+
+# ── Dynamic loader ───────────────────────────────────────────────────────────
+# Injects code into the process before main. On macOS the DYLD_* pair is stripped by SIP for system
+# binaries but honored for user-installed ones (Homebrew/cargo/npm) — which is most of a dev
+# toolchain. LD_* is the Linux equivalent and is not restricted that way.
+[env.LD_PRELOAD]
+shape = "exec-path"
+because = "loads an arbitrary shared object into the process before main"
+[env.LD_AUDIT]
+shape = "exec-path"
+because = "loads an auditor library that observes and can alter symbol resolution"
+[env.LD_LIBRARY_PATH]
+shape = "exec-path"
+because = "prepends a library search directory, so a planted .so satisfies a normal link"
+[env.DYLD_INSERT_LIBRARIES]
+shape = "exec-path"
+because = "macOS loader injection; honored for user-installed binaries (measured)"
+[env.DYLD_LIBRARY_PATH]
+shape = "exec-path"
+because = "macOS library search path"
+[env.DYLD_FRAMEWORK_PATH]
+shape = "exec-path"
+because = "macOS framework search path"
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+[env.BASH_ENV]
+shape = "exec-path"
+because = "sourced by non-interactive bash before the script runs (measured: executes)"
+[env.ENV]
+shape = "exec-path"
+because = "the POSIX-sh equivalent of BASH_ENV"
+
+# ── Command substitution: the value IS a command ─────────────────────────────
+[env.GIT_SSH_COMMAND]
+shape = "command"
+because = "git runs this instead of ssh"
+[env.GIT_SSH]
+shape = "command"
+because = "older form of GIT_SSH_COMMAND"
+[env.GIT_EXTERNAL_DIFF]
+shape = "command"
+because = "git runs this instead of its own diff"
+[env.GIT_EDITOR]
+shape = "command"
+because = "git launches this for interactive operations"
+[env.GIT_SEQUENCE_EDITOR]
+shape = "command"
+because = "git launches this for the rebase todo list"
+[env.GIT_PAGER]
+shape = "command"
+because = "git pipes output through this"
+[env.GIT_ASKPASS]
+shape = "command"
+because = "git runs this to obtain credentials"
+[env.GIT_PROXY_COMMAND]
+shape = "command"
+because = "git runs this to open a connection"
+[env.EDITOR]
+shape = "command"
+because = "launched by many tools for interactive edits"
+[env.VISUAL]
+shape = "command"
+because = "as EDITOR"
+[env.PAGER]
+shape = "command"
+because = "output is piped through it"
+[env.LESSOPEN]
+shape = "command"
+because = "less runs this input preprocessor on the file it is asked to show"
+[env.LESSCLOSE]
+shape = "command"
+because = "less runs this after the preprocessor"
+[env.RUSTC_WRAPPER]
+shape = "command"
+because = "cargo invokes this in place of rustc (measured: executes). The flag spelling, --config build.rustc-wrapper, is already denied"
+[env.RUSTC_WORKSPACE_WRAPPER]
+shape = "command"
+because = "as RUSTC_WRAPPER, for workspace members"
+[env.CARGO_BUILD_RUSTC_WRAPPER]
+shape = "command"
+because = "the CARGO_* config-mirror spelling of RUSTC_WRAPPER"
+[env.RUSTC]
+shape = "command"
+because = "replaces the compiler cargo invokes"
+
+# ── Code-supplying paths ─────────────────────────────────────────────────────
+[env.PYTHONPATH]
+shape = "exec-path"
+because = "python auto-imports sitecustomize from this path at startup (measured: executes)"
+[env.PYTHONHOME]
+shape = "exec-path"
+because = "relocates the interpreter's own standard library"
+[env.PYTHONSTARTUP]
+shape = "exec-path"
+because = "executed at interactive interpreter start (measured: NOT executed for `python3 -c`)"
+[env.RUBYLIB]
+shape = "exec-path"
+because = "ruby load path, so a planted file satisfies a later require"
+[env.PERL5LIB]
+shape = "exec-path"
+because = "perl @INC, the lever that makes -M load attacker code"
+[env.NODE_PATH]
+shape = "exec-path"
+because = "node module search path"
+[env.NODE_REPL_EXTERNAL_MODULE]
+shape = "exec-path"
+because = "node loads this module in the REPL"
+[env.CLASSPATH]
+shape = "exec-path"
+measured = false
+because = "JVM class search path"
+[env.DOTNET_STARTUP_HOOKS]
+shape = "exec-path"
+because = "the .NET host loads this assembly before main (measured: load attempted)"
+[env.CORECLR_PROFILER_PATH]
+shape = "exec-path"
+measured = false
+because = "CoreCLR loads this native profiler library"
+[env.PHPRC]
+shape = "exec-path"
+because = "names a php.ini, which can set auto_prepend_file to execute code before every script (measured: executes)"
+[env.PHP_INI_SCAN_DIR]
+shape = "exec-path"
+because = "a directory of additional php.ini files, same effect as PHPRC (measured: executes)"
+[env.GIT_CONFIG_GLOBAL]
+shape = "exec-path"
+because = "git config can define aliases and core.pager, so a caller-controlled config file is code execution"
+[env.GIT_CONFIG_SYSTEM]
+shape = "exec-path"
+because = "as GIT_CONFIG_GLOBAL"
+[env.LUA_INIT]
+shape = "exec-path"
+measured = false
+because = "lua executes its contents, or the file named by a leading @, at interpreter start"
+[env.R_PROFILE_USER]
+shape = "exec-path"
+measured = false
+because = "R sources this at startup"
+
+# ── Data paths ───────────────────────────────────────────────────────────────
+# GIT_DIR and friends are exec-path, not data-path: a .git you point git at carries CONFIG, and git
+# config defines aliases and core.pager. Pointing git at a foreign repo therefore runs foreign code —
+# the same reasoning that makes cargo's --manifest-path an `exec` role rather than a read.
+[env.GIT_DIR]
+shape = "exec-path"
+because = "selects which repository — and therefore whose config, aliases and pager — git obeys"
+[env.GIT_WORK_TREE]
+shape = "exec-path"
+because = "retargets the working tree git acts on"
+[env.GIT_INDEX_FILE]
+shape = "data-path"
+because = "retargets the index"
+[env.GIT_OBJECT_DIRECTORY]
+shape = "data-path"
+because = "retargets object storage"
+[env.GIT_ALTERNATE_OBJECT_DIRECTORIES]
+shape = "data-path"
+because = "additional object directories to read"
+[env.GIT_COMMON_DIR]
+shape = "exec-path"
+because = "retargets the shared git dir, which holds config"
