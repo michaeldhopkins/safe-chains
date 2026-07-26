@@ -6,9 +6,19 @@ A live fail-open: `LD_PRELOAD=/tmp/evil.so ls`, `GIT_SSH_COMMAND='sh -c evil' gi
 `PATH=/tmp/evil ls` all auto-approve, because the classifier inspects env VALUES for substitutions
 but never the NAME. Found 2026-07-26 while looking at something else.
 
-**Deliberately not fixed.** Enforcing "an undeclared env name does not auto-approve" would deny far
-more than it starts allowing, and the per-command env-surface research that would size that has not
-been scoped. Evidence, the facet framing, the measured blast radius, and the one constraint any
+**Design settled 2026-07-26; not yet built.** The workable shape is NOT "an undeclared env name
+denies" (an allowlist over an unbounded set) but: inspect a LISTED set of variables, classify their
+VALUES with rules that already exist, and leave everything else untouched — no new denials, no
+friction. Command-valued vars recurse through `command_verdict`; path-valued ones use the pathgate
+`exec`/`read`/`write` roles. Both were verified to give correct answers already.
+
+Concrete motivating finding: safe-chains denies `cargo build --config build.rustc-wrapper=/tmp/evil`
+— it KNOWS that key executes code — while `RUSTC_WRAPPER=/tmp/evil cargo build` is allowed. Same
+capability, one spelling checked. Cargo mirrors its whole config surface into `CARGO_*`, so that
+pattern likely repeats across the registry.
+
+Remaining research is the option-string variables (`NODE_OPTIONS`, `RUBYOPT`, `PERL5OPT`,
+`JAVA_TOOL_OPTIONS`, `RUSTFLAGS`), which need a per-interpreter flag allowlist. Evidence, the facet framing, the measured blast radius, and the one constraint any
 design must respect (`VAR=x; cmd` statement assignments are a DIFFERENT mechanism from `VAR=x cmd`
 env prefixes, and path pinning depends on the former) are written up in
 **docs/design/env-prefix-classification.md**.
