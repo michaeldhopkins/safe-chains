@@ -82,7 +82,11 @@ impl Matcher {
         let Cmd::Simple(simple) = cmd else {
             return false;
         };
-        let normalized = check::normalize_for_matching(simple);
+        // `None` = no unambiguous rendering (an env value with whitespace); such a command matches
+        // no rule, rather than matching one it could be confused with.
+        let Some(normalized) = check::normalize_for_matching(simple) else {
+            return false;
+        };
         let normalized = normalized.trim();
         if normalized.is_empty() {
             return false;
@@ -295,11 +299,29 @@ mod tests {
         assert!(!p.matches_cmd(&cmd("git checkout develop")));
     }
 
+    /// REVERSED (2026-07-26). This previously asserted that the env prefix was STRIPPED, so
+    /// `Bash(bundle install)` also covered `RACK_ENV=test bundle install`. Convenient, but it means
+    /// a rule cannot distinguish forms the user needs distinguished: the same stripping made
+    /// `Bash(~/runner-scripts/x.sh:*)` cover `WRITE=1 ~/runner-scripts/x.sh`, pre-approving a
+    /// mutating run from a rule written for a dry one — and safe-chains answered `allow`, so the
+    /// harness never got to ask.
+    ///
+    /// The convenience is not lost: `RACK_ENV=test bundle install` still auto-approves, because
+    /// safe-chains knows `bundle install` on its own terms and never consults the user's rules for
+    /// it. What changed is only what a USER-WRITTEN rule covers, and now it covers what it says.
+    ///
+    /// Contrast `match_fd_redirect_stripped` below, which still strips: `2>&1` cannot change which
+    /// program runs or with what, so it does not make the invocation a different command.
     #[test]
-    fn match_env_prefix_stripped() {
+    fn match_env_prefix_is_not_stripped() {
         let mut p = empty();
         p.add_pattern("Bash(bundle install)");
-        assert!(p.matches_cmd(&cmd("RACK_ENV=test bundle install")));
+        assert!(!p.matches_cmd(&cmd("RACK_ENV=test bundle install")));
+        assert!(p.matches_cmd(&cmd("bundle install")));
+
+        let mut q = empty();
+        q.add_pattern("Bash(RACK_ENV=test bundle install)");
+        assert!(q.matches_cmd(&cmd("RACK_ENV=test bundle install")));
     }
 
     #[test]
@@ -557,5 +579,137 @@ mod tests {
         p.load_file(&path);
         assert!(p.matches_cmd(&cmd("npm test")));
         assert!(p.matches_cmd(&cmd("cargo test --release")));
+    }
+}
+
+/// An allow-rule must cover the command AS TYPED, including any leading `VAR=value`.
+///
+/// Dropping the assignments meant a rule written for one command silently covered a different one:
+/// `Bash(~/runner-scripts/x.sh:*)` matched `WRITE=1 ~/runner-scripts/x.sh`, so a rule intended for a
+/// dry run pre-approved the mutating run — and safe-chains emitted `permissionDecision: "allow"`,
+/// so the harness never got the chance to ask.
+///
+/// Note what is NOT claimed here: nothing distinguishes `WRITE` from `LD_PRELOAD` from `NODE_ENV`,
+/// and no environment variable is researched. The only rule is that a pattern matches what it
+/// describes. That keeps this independent of the (unscoped) env-classification work in
+/// `docs/design/env-prefix-classification.md`.
+#[cfg(test)]
+mod env_prefix_matching_tests {
+    use super::*;
+    use crate::cst;
+
+    fn cmd(s: &str) -> Cmd {
+        let script = cst::parse(s).unwrap_or_else(|| panic!("failed to parse: {s}"));
+        script.0[0].pipeline.commands[0].clone()
+    }
+
+    fn matcher(patterns: &[&str]) -> Matcher {
+        Matcher::from_allow_patterns(patterns)
+    }
+
+    #[test]
+    fn a_plain_command_still_matches_its_rule() {
+        let m = matcher(&["~/runner-scripts/x.sh:*"]);
+        assert!(m.matches_cmd(&cmd("~/runner-scripts/x.sh")));
+        assert!(m.matches_cmd(&cmd("~/runner-scripts/x.sh --dry-run")));
+    }
+
+    #[test]
+    fn an_env_prefix_does_not_match_a_rule_without_one() {
+        let m = matcher(&["~/runner-scripts/x.sh:*"]);
+        for c in [
+            "WRITE=1 ~/runner-scripts/x.sh",
+            "WRITE=1 ~/runner-scripts/x.sh --project p",
+            "PROJECT=p ~/runner-scripts/x.sh",
+            "LD_PRELOAD=/tmp/evil.so ~/runner-scripts/x.sh",
+        ] {
+            assert!(!m.matches_cmd(&cmd(c)), "rule without env matched: {c}");
+        }
+    }
+
+    #[test]
+    fn a_rule_that_declares_the_env_prefix_matches_it() {
+        // The form already in the user's settings for deliberately-approved mutations.
+        let m = matcher(&["WRITE=1 ~/runner-scripts/x.sh:*", "~/runner-scripts/x.sh:*"]);
+        assert!(m.matches_cmd(&cmd("WRITE=1 ~/runner-scripts/x.sh")));
+        assert!(m.matches_cmd(&cmd("WRITE=1 ~/runner-scripts/x.sh --force")));
+        assert!(m.matches_cmd(&cmd("~/runner-scripts/x.sh")));
+        // ...but only THAT assignment; a different one is a different command.
+        assert!(!m.matches_cmd(&cmd("WRITE=0 ~/runner-scripts/x.sh")));
+        assert!(!m.matches_cmd(&cmd("DEBUG=1 ~/runner-scripts/x.sh")));
+    }
+
+    #[test]
+    fn every_assignment_must_be_accounted_for() {
+        let m = matcher(&["A=1 tool:*"]);
+        assert!(m.matches_cmd(&cmd("A=1 tool")));
+        // A second assignment the rule never mentioned makes it a different command.
+        assert!(!m.matches_cmd(&cmd("A=1 B=2 tool")));
+        assert!(!m.matches_cmd(&cmd("B=2 A=1 tool")));
+    }
+
+    #[test]
+    fn an_exact_rule_behaves_the_same_as_a_glob_rule() {
+        let exact = matcher(&["tool run"]);
+        assert!(exact.matches_cmd(&cmd("tool run")));
+        assert!(!exact.matches_cmd(&cmd("WRITE=1 tool run")));
+    }
+
+    /// An env VALUE containing whitespace has no unambiguous flat rendering, and assignments sit
+    /// BEFORE the program name — so a value that swallows the rest of a pattern would let a rule
+    /// for one program match a different one. This was live for a few minutes during development:
+    /// `Bash(WRITE=1 ~/runner-scripts/x.sh:*)` matched `WRITE='1 ~/runner-scripts/x.sh' rm -rf /`,
+    /// which runs `rm`. Such a command now matches nothing.
+    #[test]
+    fn a_value_containing_whitespace_matches_no_rule() {
+        let m = matcher(&["WRITE=1 ~/runner-scripts/x.sh:*"]);
+        assert!(m.matches_cmd(&cmd("WRITE=1 ~/runner-scripts/x.sh --force")));
+        assert!(
+            !m.matches_cmd(&cmd("WRITE='1 ~/runner-scripts/x.sh' rm -rf /")),
+            "a spaced value smuggled the pattern and matched a different program",
+        );
+
+        // Same shape without the glob: two different programs must not share a rendering.
+        let n = matcher(&["FOO=bar baz ls"]);
+        assert!(n.matches_cmd(&cmd("FOO=bar baz ls")));   // runs `baz`
+        assert!(!n.matches_cmd(&cmd("FOO='bar baz' ls"))); // runs `ls`
+    }
+
+    /// Quoted WORDS keep matching — `git commit -m 'a message'` is ordinary, and a quoted argument
+    /// cannot change which program runs, since the program is the first word either way. Only the
+    /// pre-program assignments are refused.
+    #[test]
+    fn a_quoted_word_still_matches() {
+        let m = matcher(&["git commit -m:*"]);
+        assert!(m.matches_cmd(&cmd("git commit -m 'a message with spaces'")));
+    }
+
+    /// The property, over every rule shape the matcher supports: if a command matches a rule, then
+    /// the same command with ANY assignment prepended must not — unless the rule declares it.
+    /// Stated generally so a future pattern form cannot reintroduce the hole for one spelling.
+    #[test]
+    fn prepending_any_assignment_breaks_a_match_the_rule_does_not_declare() {
+        let rules = ["tool", "tool:*", "tool sub", "tool sub:*", "~/runner-scripts/x.sh:*"];
+        let commands = ["tool", "tool sub", "tool sub --flag", "~/runner-scripts/x.sh --flag"];
+        let assignments = ["WRITE=1", "PROJECT=p", "LD_PRELOAD=/tmp/e.so", "A=1"];
+
+        let mut checked = 0;
+        for rule in rules {
+            let m = matcher(&[rule]);
+            for c in commands {
+                if !m.matches_cmd(&cmd(c)) {
+                    continue; // only meaningful where the bare command DOES match
+                }
+                for a in assignments {
+                    let prefixed = format!("{a} {c}");
+                    assert!(
+                        !m.matches_cmd(&cmd(&prefixed)),
+                        "rule `{rule}` matched `{prefixed}` without declaring `{a}`",
+                    );
+                    checked += 1;
+                }
+            }
+        }
+        assert!(checked > 0, "no rule/command pair matched — the property would be vacuous");
     }
 }

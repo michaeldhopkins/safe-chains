@@ -414,8 +414,47 @@ fn has_any_substitution(cmd: &SimpleCmd) -> bool {
         || cmd.env.iter().any(|(_, v)| has_substitution(v))
 }
 
-pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> String {
-    cmd.words.iter().map(|w| w.eval()).collect::<Vec<_>>().join(" ")
+/// A command rendered for comparison against the user's own `Bash(...)` allow-rules.
+///
+/// Includes the LEADING ENV ASSIGNMENTS. Dropping them meant a rule written for one command
+/// silently covered a different one: `Bash(~/runner-scripts/x.sh:*)` matched
+/// `WRITE=1 ~/runner-scripts/x.sh`, so a rule intended for a dry run pre-approved the mutating run.
+/// The user had even written separate `Bash(WRITE=1 …)` entries — necessary at the harness's own
+/// matcher, and quietly redundant here.
+///
+/// The rule must describe the command as TYPED. That is not a judgement about which variable names
+/// are dangerous (nothing here knows `LD_PRELOAD` from `NODE_ENV`) — it is only the requirement that
+/// an allow-rule cover what it claims to. A command carrying an assignment therefore matches only a
+/// rule that carries it too, and otherwise falls through to the harness's normal approval flow.
+///
+/// This is the USER-ALLOWLIST path alone. safe-chains' own knowledge of a command is consulted
+/// first and short-circuits before reaching here, so `LD_PRELOAD=… ls` is unaffected — see
+/// `docs/design/env-prefix-classification.md` for that separate, unfixed hole.
+/// `None` when the command cannot be rendered UNAMBIGUOUSLY, which callers must treat as "matches
+/// nothing".
+///
+/// An env value containing whitespace has no unambiguous flat rendering: `WRITE='1 script.sh' rm
+/// -rf /` and `WRITE=1 script.sh rm -rf /` produce the same string, but the first runs `rm` and the
+/// second runs `script.sh`. Since assignments sit BEFORE the program name, a value that swallows
+/// the rest of a pattern lets a rule for one program match a different one —
+/// `Bash(WRITE=1 script.sh:*)` would match `WRITE='1 script.sh' rm -rf /`. Refusing to render is the
+/// only honest answer; the alternative is a rule that silently covers a program it never named.
+///
+/// Words with whitespace are NOT refused: `git commit -m 'a message'` is ordinary and a rule like
+/// `Bash(git commit -m:*)` should keep covering it. A quoted word can shift an argument boundary,
+/// which is a pre-existing looseness of this matcher, but it cannot change which program runs —
+/// the program is the first word either way.
+pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> Option<String> {
+    let mut parts = Vec::with_capacity(cmd.env.len() + cmd.words.len());
+    for (name, value) in &cmd.env {
+        let value = value.eval();
+        if value.chars().any(char::is_whitespace) {
+            return None;
+        }
+        parts.push(format!("{name}={value}"));
+    }
+    parts.extend(cmd.words.iter().map(|w| w.eval()));
+    Some(parts.join(" "))
 }
 
 pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
