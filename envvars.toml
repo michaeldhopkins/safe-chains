@@ -186,3 +186,34 @@ because = "additional object directories to read"
 [env.GIT_COMMON_DIR]
 shape = "exec-path"
 because = "retargets the shared git dir, which holds config"
+
+# ── Env twins of flags we already gate ───────────────────────────────────────
+# A tool that mirrors its config surface into the environment gives every guarded flag a second
+# spelling. Found by sweeping for "a flag we deny that has an environment form"; in each case the
+# danger was ALREADY documented in the command's own TOML and only the spelling went unchecked.
+
+# `cargo test --config target.<triple>.runner=X` is denied; the env spelling was not. The runner
+# executes the compiled test binary, so it is a plain command substitution. The `*` stands for the
+# target triple, which is why an exact-name table could not reach it.
+[env."CARGO_TARGET_*_RUNNER"]
+shape = "command"
+because = "cargo runs this to execute the built test/bench binary; the --config spelling is denied"
+[env."CARGO_TARGET_*_LINKER"]
+shape = "command"
+because = "cargo invokes this as the linker for that target"
+
+# `git -c <key>=<value>` is already classified PER KEY, with `core.pager`'s value recursed as a
+# command. The environment spelling splits one assignment across three variables
+# (GIT_CONFIG_COUNT / GIT_CONFIG_KEY_n / GIT_CONFIG_VALUE_n), so no single value can be judged on
+# its own — `GIT_CONFIG_VALUE_0` is a command when the paired key is `core.pager` and inert when it
+# is `user.name`. Presence denies, which matches the flag spelling: `git -c user.name=x log` already
+# denies because that key is not on git's permitted list.
+[env.GIT_CONFIG_COUNT]
+shape = "opaque"
+because = "injects arbitrary git config; the key/value pairing is split across other variables, so a single value cannot be certified"
+[env."GIT_CONFIG_KEY_*"]
+shape = "opaque"
+because = "as GIT_CONFIG_COUNT"
+[env."GIT_CONFIG_VALUE_*"]
+shape = "opaque"
+because = "as GIT_CONFIG_COUNT"
