@@ -138,6 +138,12 @@ Each was proved by running a marker file, not inferred from documentation:
 | `PERL5OPT="-I<dir> -MInject"` | **executes** |
 | `PYTHONPATH=<dir>` with `sitecustomize.py` | **executes** (Python auto-imports it at startup) |
 | `BASH_ENV=<file>` with `bash -c` | **executes** |
+| `PYTHONBREAKPOINT=<mod>.<callable>` | **executes** — arbitrary callable invoked by `breakpoint()` |
+| `PHPRC=<php.ini>` with `auto_prepend_file` | **executes** before every script |
+| `PHP_INI_SCAN_DIR=<dir>` with `auto_prepend_file` | **executes** |
+| `RUSTC_WRAPPER=<script> cargo build` | **executes** — invoked in place of rustc |
+| `RUSTFLAGS='-C linker=<script>'` | **executes** — invoked as the linker |
+| `DOTNET_STARTUP_HOOKS=<assembly>` | honored — host attempts the load and throws on a missing file |
 | `PYTHONSTARTUP=<file>` with `python3 -c` | did NOT execute — interactive REPL only |
 | `DYLD_INSERT_LIBRARIES` against `/bin/ls` | stripped by SIP — no effect |
 | `DYLD_INSERT_LIBRARIES` against `~/.cargo/bin/…` | honored — loader aborts on a missing dylib |
@@ -241,17 +247,58 @@ Allowlist candidates: the V8 tuning and diagnostics flags — `--max-old-space-s
 `--enable-source-maps` (both measured working) and similar. This is the variable needing the most
 careful list, because the accepted set is nearly everything.
 
-### RUSTFLAGS / CARGO_* (unverified execution, but the shape is clear)
+### Rust — MEASURED, both execute
 
-`-C linker=<path>` makes the compiler invoke an arbitrary binary as the linker; `-C link-arg`,
-`--extern` and `-Z` are the same family. Not executed here (it would require a real build), so it is
-enumerated rather than measured.
+Built a throwaway crate and ran cargo against it:
 
-### JAVA_TOOL_OPTIONS / _JAVA_OPTIONS (enumerated, not measured)
+- `RUSTC_WRAPPER=<script> cargo build` — the wrapper was invoked. Cargo runs it in place of rustc,
+  so it is a plain command substitution.
+- `RUSTFLAGS='-C linker=<script>' cargo build` — the script ran as the linker. `-C link-arg`,
+  `--extern` and `-Z` are the same family.
 
-`-javaagent:<jar>`, `-agentlib:`, `-agentpath:` and `-Xbootclasspath` all load code into every JVM
-started while the variable is set. Java is installed here but this was not probed; treat the list as
-enumerated only.
+### PHP — MEASURED, both execute (after a corrected probe)
+
+`PHPRC` names a php.ini and `PHP_INI_SCAN_DIR` names a directory of them; an ini setting
+`auto_prepend_file=<file>` executes that file before every script. Both injected.
+
+Worth recording the near-miss: the FIRST probe reported no injection, because `PHPRC` was pointed at
+a directory rather than the ini file AND `auto_prepend_file` does not apply to `php -r`. A negative
+probe result has to be validated (here: `php --ini` confirming the file was loaded) or it records a
+false "safe".
+
+### Python — a second vector beyond PYTHONPATH
+
+`PYTHONBREAKPOINT=<module>.<callable>` names an arbitrary callable invoked by `breakpoint()`.
+Measured: with the module on `PYTHONPATH`, the callable ran. Distinct from the `sitecustomize`
+vector, and it needs no file placed in a magic location.
+
+`PYTHONHOME` and `PYTHONEXECUTABLE` relocate the interpreter's own root and are enumerated but
+unprobed.
+
+### .NET — startup hooks honored
+
+`DOTNET_STARTUP_HOOKS=<assembly>` — the host attempted the load and threw
+`System.ArgumentException: Startup hook assembly … failed to load`, so the variable is honored and a
+real assembly would execute. `CORECLR_ENABLE_PROFILING` + `CORECLR_PROFILER_PATH` (loads a native
+profiler library) produced no observable signal via `dotnet --info`; enumerated, NOT verified.
+`DOTNET_ADDITIONAL_DEPS` is the same family and unprobed.
+
+### Not probed — toolchain absent on this machine
+
+Enumerated from documentation; each needs the same marker-file treatment somewhere it is installed.
+
+| Ecosystem | Variables | Why it matters |
+| --- | --- | --- |
+| Java | `JAVA_TOOL_OPTIONS`, `_JAVA_OPTIONS`, `JDK_JAVA_OPTIONS`, `CLASSPATH` | `-javaagent:<jar>`, `-agentlib:`, `-agentpath:`, `-Xbootclasspath/a:` load code into EVERY JVM started while set |
+| Go | `GOFLAGS`, `GOPATH`, `GOPROXY`, `GOTOOLCHAIN` | `GOFLAGS='-toolexec=<binary>'` makes the toolchain invoke an arbitrary binary — the direct analogue of `RUSTC_WRAPPER` |
+| Lua | `LUA_INIT`, `LUA_PATH`, `LUA_CPATH` | `LUA_INIT` executes its contents (or `@file`) at interpreter start |
+| R | `R_PROFILE_USER`, `R_HOME` | profile file sourced at startup |
+| Julia | `JULIA_LOAD_PATH`, `JULIA_DEPOT_PATH` | load-path injection |
+| Deno | `DENO_DIR`, `DENO_AUTH_TOKENS` | cache poisoning / credential |
+
+The pattern across every ecosystem is the same three shapes — run this command, load code from this
+path, or read these interpreter flags — which is why the classification plan does not grow with the
+number of languages. Each new ecosystem adds ROWS, not new rules.
 
 ## The pattern to sweep for: a gated flag with an ungated env twin
 
