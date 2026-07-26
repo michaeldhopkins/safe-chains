@@ -41,6 +41,12 @@ pub(crate) enum Shape {
     ExecPath,
     /// The value names a path read or written as data — ordinary locus rules.
     DataPath,
+    /// The variable's effect CANNOT be certified from its own value, because the meaning depends on
+    /// another assignment. `GIT_CONFIG_VALUE_0` is a command when `GIT_CONFIG_KEY_0` is
+    /// `core.pager` and inert when it is `user.name`; nothing in this per-assignment model can see
+    /// the pair. Presence denies (§0 fail-closed), which is also what the FLAG spelling does —
+    /// `git -c user.name=x log` already denies because that key is not on git's permitted list.
+    Opaque,
 }
 
 #[derive(Deserialize, Debug)]
@@ -58,15 +64,44 @@ struct Table {
     env: HashMap<String, Entry>,
 }
 
-static TABLE: LazyLock<HashMap<String, Shape>> = LazyLock::new(|| {
+struct Compiled {
+    exact: HashMap<String, Shape>,
+    /// `(prefix, suffix, shape)` from a name containing a single `*`. Needed because some variables
+    /// carry a variable segment: cargo spells its per-target keys `CARGO_TARGET_<TRIPLE>_RUNNER`,
+    /// and git numbers its config pairs `GIT_CONFIG_KEY_0`, `_1`, …
+    globs: Vec<(String, String, Shape)>,
+}
+
+static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
     let src = include_str!("../envvars.toml");
     let parsed: Table = toml::from_str(src).expect("embedded envvars.toml must parse");
-    parsed.env.into_iter().map(|(k, v)| (k, v.shape)).collect()
+    let mut exact = HashMap::new();
+    let mut globs = Vec::new();
+    for (name, entry) in parsed.env {
+        match name.split_once('*') {
+            Some((pre, suf)) => {
+                assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
+                globs.push((pre.to_string(), suf.to_string(), entry.shape));
+            }
+            None => {
+                exact.insert(name, entry.shape);
+            }
+        }
+    }
+    Compiled { exact, globs }
 });
 
 /// The shape of a listed variable's value, or `None` for a name we do not inspect.
 pub(crate) fn shape_of(name: &str) -> Option<Shape> {
-    TABLE.get(name).copied()
+    if let Some(s) = TABLE.exact.get(name) {
+        return Some(*s);
+    }
+    TABLE.globs.iter().find_map(|(pre, suf, shape)| {
+        // `len()` guard so a single `*` cannot match the empty middle twice over — `A_*_B` must not
+        // match `A__B` by letting prefix and suffix overlap.
+        (name.len() >= pre.len() + suf.len() && name.starts_with(pre.as_str()) && name.ends_with(suf.as_str()))
+            .then_some(*shape)
+    })
 }
 
 /// The verdict for one `NAME=value` assignment. `Inert` for any name not in the table — the
@@ -85,6 +120,7 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::Command => crate::command_verdict(value),
         Shape::ExecPath => exec_path_verdict(value),
         Shape::DataPath => data_path_verdict(value),
+        Shape::Opaque => Verdict::Denied,
     }
 }
 
@@ -143,6 +179,26 @@ mod tests {
         for n in ["PROJECT", "NODE_ENV", "RUSTUP_TOOLCHAIN", "WRITE", "FOO"] {
             assert_eq!(assignment_verdict(n, "anything"), Verdict::Allowed(SafetyLevel::Inert));
         }
+    }
+
+    /// A variable whose name carries a variable segment — cargo's target triple, git's config
+    /// index — is reachable only by pattern.
+    #[test]
+    fn a_name_glob_matches_the_variable_segment() {
+        assert_eq!(shape_of("CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER"), Some(Shape::Command));
+        assert_eq!(shape_of("CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER"), Some(Shape::Command));
+        assert_eq!(shape_of("GIT_CONFIG_KEY_0"), Some(Shape::Opaque));
+        assert_eq!(shape_of("GIT_CONFIG_VALUE_17"), Some(Shape::Opaque));
+        // ...and does not over-reach onto neighbouring names.
+        assert_eq!(shape_of("CARGO_TARGET_DIR"), None);
+        assert_eq!(shape_of("CARGO_TERM_COLOR"), None);
+    }
+
+    /// The prefix and suffix must not overlap to satisfy a pattern with nothing in the middle.
+    #[test]
+    fn a_glob_needs_a_real_middle_segment() {
+        assert_eq!(shape_of("CARGO_TARGET__RUNNER"), Some(Shape::Command), "empty middle is still a match");
+        assert_eq!(shape_of("CARGO_TARGET_RUNNER"), None, "prefix and suffix must not overlap");
     }
 
     #[test]
@@ -221,6 +277,31 @@ mod integration_tests {
         assert!(crate::is_safe_command("PYTHONPATH=./a:./b ls"));
         assert!(!crate::is_safe_command("PYTHONPATH=./a:/tmp/evil ls"));
         assert!(!crate::is_safe_command("PYTHONPATH=/tmp/evil:./b ls"));
+    }
+
+    /// Env twins of flags already denied. In each case the danger was documented in the command's
+    /// own TOML and only the environment spelling went unchecked.
+    #[test]
+    fn an_env_twin_of_a_denied_flag_also_denies() {
+        for (flag_form, env_form) in [
+            ("cargo test --config target.x86_64-apple-darwin.runner=/tmp/evil",
+             "CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER=/tmp/evil cargo test"),
+            ("cargo build --config build.rustc-wrapper=/tmp/evil",
+             "RUSTC_WRAPPER=/tmp/evil cargo build"),
+            ("git -c core.pager='sh -c evil' log",
+             "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.pager GIT_CONFIG_VALUE_0='sh -c evil' git log"),
+        ] {
+            assert!(!crate::is_safe_command(flag_form), "sanity: the flag form should deny: {flag_form}");
+            assert!(!crate::is_safe_command(env_form), "the env twin was allowed: {env_form}");
+        }
+    }
+
+    /// A twin entry names a mechanism, not a ban: a benign runner is still a benign command.
+    #[test]
+    fn a_twin_with_a_benign_value_still_allows() {
+        assert!(crate::is_safe_command("CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER=echo cargo test"));
+        assert!(crate::is_safe_command("CARGO_TERM_COLOR=always cargo test"));
+        assert!(crate::is_safe_command("CARGO_TARGET_DIR=./target cargo build"));
     }
 
     /// The exec-path rule is NOT the read rule, and the distinction is load-bearing: reading

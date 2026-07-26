@@ -316,7 +316,41 @@ Cargo mirrors its whole config surface into `CARGO_*`, so this is systematic the
 oversights. Other tools with the same habit (env mirrors of config keys) should be checked the same
 way — the search is "a flag we deny that has an environment spelling".
 
-## Suggested build order
+## Build status
+
+Steps 1–3 are BUILT (`envvars.toml` + `src/envvars.rs`, wired into `simple_verdict`). Every vector
+measured above now denies, and unlisted names remain untouched.
+
+The env-twin sweep found four more, all previously allowed, in each case with the danger already
+documented in the command's own TOML:
+
+| Flag form (already denied) | Env twin (was allowed) |
+| --- | --- |
+| `cargo build --config build.rustc-wrapper=…` | `RUSTC_WRAPPER=…`, `CARGO_BUILD_RUSTC_WRAPPER=…` |
+| `cargo test --config target.<triple>.runner=…` | `CARGO_TARGET_<TRIPLE>_RUNNER=…` |
+| (as above, linker) | `CARGO_TARGET_<TRIPLE>_LINKER=…` |
+| `git -c core.pager='sh -c evil'` | `GIT_CONFIG_COUNT` + `GIT_CONFIG_KEY_n` + `GIT_CONFIG_VALUE_n` |
+
+Two mechanisms were needed beyond the original three shapes:
+
+- **Name globs.** `CARGO_TARGET_<TRIPLE>_RUNNER` and `GIT_CONFIG_KEY_n` carry a variable segment, so
+  an exact-name table cannot reach them.
+- **`shape = "opaque"`.** `GIT_CONFIG_VALUE_0` is a command when the paired `GIT_CONFIG_KEY_0` is
+  `core.pager` and inert when it is `user.name`. The pairing is split across variables, so no single
+  value can be certified and presence denies. That matches the flag spelling, which already denies
+  `git -c user.name=x log` because the key is not on git's permitted list.
+
+Worth recording about git's `-c`: it ALREADY classifies per key and recurses the value —
+`git -c core.pager=cat log` allows while `git -c core.pager='sh -c evil' log` denies. The env work
+mirrors an approach the codebase had already taken rather than inventing one.
+
+## Remaining
+
+Only the option-string variables: `NODE_OPTIONS`, `RUBYOPT`, `PERL5OPT`, `JAVA_TOOL_OPTIONS`,
+`RUSTFLAGS`. `RUSTFLAGS='-C linker=/tmp/evil' cargo build` is still ALLOWED, which is the sharpest
+open case, since its `--config build.rustflags` twin denies.
+
+## Original build order
 
 1. **Command-valued variables** — `GIT_SSH_COMMAND`, `GIT_PAGER`, `EDITOR`, `LESSOPEN` and the rest.
    Recurse through `command_verdict`. No new research: verified that `cat` allows and `sh -c evil`
