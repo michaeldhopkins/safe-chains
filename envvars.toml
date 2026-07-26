@@ -217,3 +217,74 @@ because = "as GIT_CONFIG_COUNT"
 [env."GIT_CONFIG_VALUE_*"]
 shape = "opaque"
 because = "as GIT_CONFIG_COUNT"
+
+# ── Interpreter option strings ───────────────────────────────────────────────
+# These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
+# match a researched-inert prefix. The dangerous flags are never enumerated — a switch invented
+# tomorrow denies by not being listed, which is what keeps these entries from rotting.
+#
+# The accepted sets below were determined empirically (see the design note), not read from manuals:
+# the Node documentation's claim that --require and --import are refused in NODE_OPTIONS is false on
+# v22.17.0, where both load and execute.
+
+# Ruby refuses -e itself. The remaining code vectors are -r<file> and -I<dir>, both paths, so they
+# are excluded here and the invocation falls to approval rather than being path-classified — a
+# RUBYOPT is not the place to be loading worktree code from.
+[env.RUBYOPT]
+shape = "option-string"
+allowed = ["-w", "-W", "-v", "--verbose", "--debug", "-E", "-U", "-T", "--jit", "--yjit",
+           "--enable=", "--disable="]
+because = "ruby flag string; -r and -I load code (measured: -r executes)"
+
+# Perl refuses -e/-E itself. -I is the lever that makes -M/-m/-d: load attacker code, so it is
+# excluded; -M alone is confined to the installed @INC but is excluded too, since its danger is
+# entirely contextual.
+[env.PERL5OPT]
+shape = "option-string"
+allowed = ["-w", "-W", "-t", "-T", "-C", "-D"]
+because = "perl flag string; -I/-M/-m/-d: load code (measured: -I -MInject and -I -d:Inj execute)"
+
+# Node refuses only --eval/--print, so nearly everything else is accepted by the interpreter and the
+# allowlist has to be narrow. Three distinct danger classes are excluded: code loading (--require,
+# --import, --experimental-loader), a network-exposed debugger (--inspect*, which grants execution
+# to anyone who can reach the port), and permission-model relaxers (--allow-*).
+[env.NODE_OPTIONS]
+shape = "option-string"
+allowed = ["--max-old-space-size", "--max-semi-space-size", "--enable-source-maps",
+           "--stack-size", "--no-warnings", "--no-deprecation", "--trace-warnings",
+           "--trace-deprecation", "--unhandled-rejections", "--use-openssl-ca", "--use-bundled-ca",
+           "--disable-warning", "--title", "--v8-pool-size"]
+because = "node flag string; --require/--import execute (measured), --inspect exposes a debugger, --allow-* relax the permission model"
+
+# `--config build.rustflags=[...]` is already denied; this is its environment twin. -C linker= and
+# -C link-arg= invoke an arbitrary binary (measured: the linker ran), and -Z / --extern reach
+# further, so only the diagnostic and codegen-tuning flags are listed.
+[env.RUSTFLAGS]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Cincremental", "-Clto", "-D", "-W", "-A", "-F", "--cfg"]
+because = "rustc flag string; -C linker= runs an arbitrary binary (measured). The --config build.rustflags spelling is already denied"
+[env.CARGO_BUILD_RUSTFLAGS]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Cincremental", "-Clto", "-D", "-W", "-A", "-F", "--cfg"]
+because = "the CARGO_* config-mirror spelling of RUSTFLAGS"
+[env.RUSTDOCFLAGS]
+shape = "option-string"
+allowed = ["-D", "-W", "-A", "-F", "--cfg", "--document-private-items"]
+because = "rustdoc flag string, same family as RUSTFLAGS"
+
+# Loads an agent into EVERY JVM started while set. Not probed (no JDK here), so nothing is listed
+# as inert — presence falls to approval until someone measures it.
+[env.JAVA_TOOL_OPTIONS]
+shape = "option-string"
+allowed = []
+measured = false
+because = "-javaagent:/-agentlib:/-agentpath:/-Xbootclasspath load code into every JVM; unprobed, so nothing is allowlisted yet"
+[env._JAVA_OPTIONS]
+shape = "option-string"
+allowed = []
+measured = false
+because = "as JAVA_TOOL_OPTIONS"

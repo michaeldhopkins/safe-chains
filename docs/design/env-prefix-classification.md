@@ -344,11 +344,35 @@ Worth recording about git's `-c`: it ALREADY classifies per key and recurses the
 `git -c core.pager=cat log` allows while `git -c core.pager='sh -c evil' log` denies. The env work
 mirrors an approach the codebase had already taken rather than inventing one.
 
+Step 4 is also BUILT. `shape = "option-string"` parses the value as interpreter flags and requires
+every token to match a researched-inert prefix; anything else denies. Allowlist-shaped, so a switch
+invented tomorrow denies by not being listed — which matters because these variables carry the
+loader, debugger and permission flags and a denylist would rot.
+
+`-C key=value` and `-Ckey=value` are the same flag, so a lone short flag is joined to the following
+token before matching. That is not what stops `-C linker=/tmp/evil` today (a bare `-C` is not
+allowlisted, so the split form already denies) — it stops a FUTURE authoring error, where someone
+adds `-C` to permit `-C opt-level=3` and unwittingly admits every `-C` key.
+
+Now denied, all previously allowed: `RUSTFLAGS='-C linker=…'`, `CARGO_BUILD_RUSTFLAGS=…`,
+`NODE_OPTIONS='--require …'`/`--import`/`--inspect=0.0.0.0:9229`/`--allow-child-process`,
+`RUBYOPT='-r…'`, `PERL5OPT='-I… -M…'`, `PERL5OPT='-I… -d:…'`, `JAVA_TOOL_OPTIONS='-javaagent:…'`.
+
+Still allowed: `RUSTFLAGS='-D warnings'`, `-C opt-level=3`, `RUSTDOCFLAGS='-D warnings'`,
+`NODE_OPTIONS='--max-old-space-size=4096'`, `RUBYOPT='-w'`.
+
+`JAVA_TOOL_OPTIONS` and `_JAVA_OPTIONS` are listed with an EMPTY allowlist: no JDK here to probe, so
+nothing is asserted inert and any value falls to approval until someone measures it.
+
 ## Remaining
 
-Only the option-string variables: `NODE_OPTIONS`, `RUBYOPT`, `PERL5OPT`, `JAVA_TOOL_OPTIONS`,
-`RUSTFLAGS`. `RUSTFLAGS='-C linker=/tmp/evil' cargo build` is still ALLOWED, which is the sharpest
-open case, since its `--config build.rustflags` twin denies.
+Nothing from the original plan. What is left is coverage rather than mechanism:
+
+- **Unprobed ecosystems** — Java, Go (`GOFLAGS='-toolexec=…'`), Lua (`LUA_INIT`), R, Julia, and the
+  CoreCLR profiler pair. Entries carry `measured = false` where they exist at all; each needs a
+  marker file somewhere the toolchain is installed.
+- **Widening the option-string allowlists** as real usage turns up inert flags that were omitted. A
+  missing entry costs one approval, never a wrong verdict.
 
 ## Original build order
 

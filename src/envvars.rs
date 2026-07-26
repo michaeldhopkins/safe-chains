@@ -47,11 +47,20 @@ pub(crate) enum Shape {
     /// the pair. Presence denies (§0 fail-closed), which is also what the FLAG spelling does —
     /// `git -c user.name=x log` already denies because that key is not on git's permitted list.
     Opaque,
+    /// The value is a FLAG STRING for an interpreter (`RUBYOPT`, `NODE_OPTIONS`, `RUSTFLAGS`).
+    /// Every token must match a researched-inert prefix in the entry's `allowed` list; anything
+    /// else denies. Allowlist-shaped, and bounded because each interpreter's accepted set is small
+    /// and documented — ruby and perl even refuse `-e` themselves, so the eval vector is already
+    /// closed upstream.
+    OptionString,
 }
 
 #[derive(Deserialize, Debug)]
 struct Entry {
     shape: Shape,
+    /// For `option-string`: token prefixes that are inert. A token matching none of these denies.
+    #[serde(default)]
+    allowed: Vec<String>,
     #[allow(dead_code)] // authored rationale, carried for the docs and for review
     because: String,
     #[allow(dead_code)] // false = enumerated from docs, not probed on a live toolchain
@@ -64,12 +73,18 @@ struct Table {
     env: HashMap<String, Entry>,
 }
 
+#[derive(Clone)]
+pub(crate) struct Rule {
+    pub(crate) shape: Shape,
+    allowed: Vec<String>,
+}
+
 struct Compiled {
-    exact: HashMap<String, Shape>,
+    exact: HashMap<String, Rule>,
     /// `(prefix, suffix, shape)` from a name containing a single `*`. Needed because some variables
     /// carry a variable segment: cargo spells its per-target keys `CARGO_TARGET_<TRIPLE>_RUNNER`,
     /// and git numbers its config pairs `GIT_CONFIG_KEY_0`, `_1`, …
-    globs: Vec<(String, String, Shape)>,
+    globs: Vec<(String, String, Rule)>,
 }
 
 static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
@@ -81,33 +96,40 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
         match name.split_once('*') {
             Some((pre, suf)) => {
                 assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
-                globs.push((pre.to_string(), suf.to_string(), entry.shape));
+                globs.push((pre.to_string(), suf.to_string(),
+                            Rule { shape: entry.shape, allowed: entry.allowed }));
             }
             None => {
-                exact.insert(name, entry.shape);
+                exact.insert(name, Rule { shape: entry.shape, allowed: entry.allowed });
             }
         }
     }
     Compiled { exact, globs }
 });
 
-/// The shape of a listed variable's value, or `None` for a name we do not inspect.
-pub(crate) fn shape_of(name: &str) -> Option<Shape> {
-    if let Some(s) = TABLE.exact.get(name) {
-        return Some(*s);
+fn rule_of(name: &str) -> Option<&'static Rule> {
+    if let Some(r) = TABLE.exact.get(name) {
+        return Some(r);
     }
-    TABLE.globs.iter().find_map(|(pre, suf, shape)| {
+    TABLE.globs.iter().find_map(|(pre, suf, rule)| {
         // `len()` guard so a single `*` cannot match the empty middle twice over — `A_*_B` must not
         // match `A__B` by letting prefix and suffix overlap.
         (name.len() >= pre.len() + suf.len() && name.starts_with(pre.as_str()) && name.ends_with(suf.as_str()))
-            .then_some(*shape)
+            .then_some(rule)
     })
+}
+
+/// The shape of a listed variable's value, or `None` for a name we do not inspect. Test-only: the
+/// classifier itself goes through `rule_of`, which also carries the option-string allowlist.
+#[cfg(test)]
+pub(crate) fn shape_of(name: &str) -> Option<Shape> {
+    rule_of(name).map(|r| r.shape)
 }
 
 /// The verdict for one `NAME=value` assignment. `Inert` for any name not in the table — the
 /// overwhelmingly common case, and the reason this costs nothing for ordinary commands.
 pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
-    let Some(shape) = shape_of(name) else {
+    let Some(rule) = rule_of(name) else {
         return Verdict::Allowed(SafetyLevel::Inert);
     };
     // An EMPTY value un-sets the behaviour rather than pointing it anywhere: `GIT_PAGER=` disables
@@ -116,12 +138,47 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     if value.is_empty() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    match shape {
+    match rule.shape {
         Shape::Command => crate::command_verdict(value),
         Shape::ExecPath => exec_path_verdict(value),
         Shape::DataPath => data_path_verdict(value),
         Shape::Opaque => Verdict::Denied,
+        Shape::OptionString => option_string_verdict(value, &rule.allowed),
     }
+}
+
+/// Every token of an interpreter flag string must match a researched-inert prefix.
+///
+/// Allowlist-shaped on purpose: the dangerous flags never need enumerating, so a switch invented
+/// tomorrow denies by not being listed. That matters here more than elsewhere, because these
+/// variables carry the loader/debugger/permission flags — `--require`, `-C linker=`, `--inspect` —
+/// and the accepted sets are large enough that a denylist would rot.
+///
+/// `-C key=value` is accepted in both spellings: rust and friends allow `-C linker=x` and
+/// `-Clinker=x`, so a lone one-or-two-character flag is joined to the token after it before
+/// matching. Without that, allowing a bare `-C` would admit `-C linker=/tmp/evil`.
+fn option_string_verdict(value: &str, allowed: &[String]) -> Verdict {
+    let raw: Vec<&str> = value.split_whitespace().collect();
+    let mut tokens: Vec<String> = Vec::with_capacity(raw.len());
+    let mut i = 0;
+    while i < raw.len() {
+        let tok = raw[i];
+        // A bare short flag that takes a separate value (`-C opt-level=3`, `-I lib`) is glued to
+        // the next token so the pair is matched as one unit.
+        if tok.len() <= 2 && tok.starts_with('-') && i + 1 < raw.len() && !raw[i + 1].starts_with('-') {
+            tokens.push(format!("{tok}{}", raw[i + 1]));
+            i += 2;
+        } else {
+            tokens.push(tok.to_string());
+            i += 1;
+        }
+    }
+    for tok in &tokens {
+        if !allowed.iter().any(|a| tok.starts_with(a.as_str())) {
+            return Verdict::Denied;
+        }
+    }
+    Verdict::Allowed(SafetyLevel::Inert)
 }
 
 /// A path supplying CODE, judged at the EXECUTOR locus — the rule cargo's `--manifest-path` uses.
@@ -302,6 +359,57 @@ mod integration_tests {
         assert!(crate::is_safe_command("CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER=echo cargo test"));
         assert!(crate::is_safe_command("CARGO_TERM_COLOR=always cargo test"));
         assert!(crate::is_safe_command("CARGO_TARGET_DIR=./target cargo build"));
+    }
+
+    /// Interpreter flag strings: every token must be a researched-inert prefix.
+    #[test]
+    fn an_option_string_denies_a_flag_that_is_not_allowlisted() {
+        for cmd in [
+            // measured to execute, per the design note
+            "RUSTFLAGS='-C linker=/tmp/evil' cargo build",
+            "CARGO_BUILD_RUSTFLAGS='-Clinker=/tmp/evil' cargo build",
+            "NODE_OPTIONS='--require /tmp/inj.js' node app.js",
+            "NODE_OPTIONS='--import file:///tmp/inj.mjs' node app.js",
+            "RUBYOPT='-r/tmp/inj' ruby app.rb",
+            "PERL5OPT='-I/tmp -MInject' perl app.pl",
+            "PERL5OPT='-I/tmp -d:Inj' perl app.pl",
+            // not code loading, but equally out of scope for an auto-approval
+            "NODE_OPTIONS='--inspect=0.0.0.0:9229' node app.js",
+            "NODE_OPTIONS='--allow-child-process' node app.js",
+            "JAVA_TOOL_OPTIONS='-javaagent:/tmp/e.jar' java -version",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "an option-string vector was allowed: {cmd}");
+        }
+    }
+
+    /// The everyday spellings have to keep working, or the entry is friction with no gain.
+    #[test]
+    fn an_option_string_allows_the_researched_inert_flags() {
+        for cmd in [
+            "RUSTFLAGS='-D warnings' cargo build",
+            "RUSTFLAGS='-C opt-level=3' cargo build",
+            "RUSTFLAGS='-Copt-level=3 -Cdebuginfo=0' cargo build",
+            "RUSTDOCFLAGS='-D warnings' cargo doc",
+            "NODE_OPTIONS='--max-old-space-size=4096' node app.js",
+            "NODE_OPTIONS='--enable-source-maps' node app.js",
+            "RUBYOPT='-w' ruby app.rb",
+            // A trivial base command: `perl app.pl` denies on its own terms, so using it here would
+            // assert nothing about PERL5OPT. Isolating the variable is the point of the case.
+            "PERL5OPT='-w -T' ls",
+        ] {
+            assert!(crate::is_safe_command(cmd), "an inert flag string was denied: {cmd}");
+        }
+    }
+
+    /// `-C key=value` and `-Ckey=value` are the same flag, so the split spelling must not sneak a
+    /// denied key past by hiding it in the following token. Without joining, allowing a bare `-C`
+    /// would admit `-C linker=/tmp/evil`.
+    #[test]
+    fn a_split_short_flag_is_judged_as_one_unit() {
+        assert!(!crate::is_safe_command("RUSTFLAGS='-C linker=/tmp/evil' cargo build"));
+        assert!(!crate::is_safe_command("RUSTFLAGS='-Clinker=/tmp/evil' cargo build"));
+        assert!(crate::is_safe_command("RUSTFLAGS='-C opt-level=3' cargo build"));
+        assert!(crate::is_safe_command("RUSTFLAGS='-Copt-level=3' cargo build"));
     }
 
     /// The exec-path rule is NOT the read rule, and the distinction is load-bearing: reading
