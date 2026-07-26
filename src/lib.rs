@@ -59,6 +59,7 @@ pub mod cst;
 mod handler_property_tests;
 pub mod docs;
 pub mod engine;
+mod envvars;
 mod handlers;
 pub mod netloc;
 pub mod parse;

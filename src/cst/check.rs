@@ -578,6 +578,18 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     let word_sub_v = words_sub_verdict(&cmd.words);
     let sub_v = env_sub_v.combine(word_sub_v);
 
+    // A LISTED assignment is classified by its value (`envvars.toml`): `GIT_SSH_COMMAND` carries a
+    // command, `LD_PRELOAD` a path supplying code. An unlisted name is Inert, so this changes
+    // nothing for ordinary invocations — `FOO=bar ls` classifies exactly as `ls` does.
+    let env_name_v = cmd
+        .env
+        .iter()
+        .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
+    if let Verdict::Denied = env_name_v {
+        return Verdict::Denied;
+    }
+
     if let Verdict::Denied = sub_v {
         return Verdict::Denied;
     }
