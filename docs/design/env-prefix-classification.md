@@ -15,13 +15,23 @@ invisible. All of these auto-approve today:
 | Invocation | What the assignment does |
 | --- | --- |
 | `LD_PRELOAD=/tmp/evil.so ls` | loads an arbitrary shared object into the process |
-| `DYLD_INSERT_LIBRARIES=/tmp/evil.dylib cat notes.txt` | the same, on macOS |
+| `DYLD_INSERT_LIBRARIES=/tmp/evil.dylib <user-installed tool>` | the same, on macOS — but see the platform note below |
 | `GIT_SSH_COMMAND='sh -c evil' git status` | git runs that command instead of `ssh` |
 | `PATH=/tmp/evil ls` | every binary name resolves inside an attacker-chosen directory |
 | `GIT_DIR=/tmp/evil git log` | retargets which repository is read |
 
 `grep -rn 'LD_PRELOAD\|DYLD_INSERT\|GIT_SSH_COMMAND' src/` returns nothing: no env name appears
-anywhere in the source. The `PATH` case is worth singling out because AGENTS.md §scope already
+anywhere in the source.
+
+**Platform note, measured 2026-07-26 on macOS 15 with SIP enabled.** Loader injection is not uniform,
+and an earlier draft of this note got the example wrong. `DYLD_INSERT_LIBRARIES` is STRIPPED for
+system binaries — pointing it at a nonexistent dylib and running `/bin/ls` produces no complaint at
+all — so the `cat`/`ls` examples do not inject here. It IS honored for user-installed binaries: the
+same probe against `~/.cargo/bin/safe-chains` terminated with `dyld: terminating because inserted
+dylib could not be loaded`. Since an agent's toolchain is overwhelmingly Homebrew/cargo/npm rather
+than `/bin`, this narrows the example without narrowing the exposure. `LD_PRELOAD` proper is a Linux
+concern (CI, Linux users), and the non-loader vectors below — `PATH`, `GIT_SSH_COMMAND`, `GIT_DIR` —
+depend on no OS protection and work everywhere. The `PATH` case is worth singling out because AGENTS.md §scope already
 commits to worst-casing a name reached via a non-standard path (`./cat`, `/tmp/cat`); redefining
 `PATH` achieves the same shadowing without the spelling that triggers the guard.
 
