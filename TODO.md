@@ -1,5 +1,18 @@
 # TODO
 
+## Env prefixes are not classified (`VAR=value cmd`)
+
+A live fail-open: `LD_PRELOAD=/tmp/evil.so ls`, `GIT_SSH_COMMAND='sh -c evil' git status` and
+`PATH=/tmp/evil ls` all auto-approve, because the classifier inspects env VALUES for substitutions
+but never the NAME. Found 2026-07-26 while looking at something else.
+
+**Deliberately not fixed.** Enforcing "an undeclared env name does not auto-approve" would deny far
+more than it starts allowing, and the per-command env-surface research that would size that has not
+been scoped. Evidence, the facet framing, the measured blast radius, and the one constraint any
+design must respect (`VAR=x; cmd` statement assignments are a DIFFERENT mechanism from `VAR=x cmd`
+env prefixes, and path pinning depends on the former) are written up in
+**docs/design/env-prefix-classification.md**.
+
 ## Eleven facet axes have no authored level constraint
 
 Surfaced 2026-07-25 by `a_declared_hazard_is_the_term_authored_levels_reject`, which verifies each
