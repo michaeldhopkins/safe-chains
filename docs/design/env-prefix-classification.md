@@ -1,6 +1,8 @@
 # Env-prefix classification — findings, and why it is not built
 
-Status: **research only. Not scheduled.** Recorded 2026-07-26 so the evidence is not lost.
+Status: **research COMPLETE, build not started.** Recorded 2026-07-26. Every claim below about what
+executes was measured on this machine by running a marker file, not taken from documentation — which
+was wrong in at least one consequential place (see the NODE_OPTIONS note).
 
 A command may carry environment assignments before its name — `VAR=value cmd args`. safe-chains
 does not classify them. This note records what that costs, what a fix would need, and the reason the
@@ -178,25 +180,108 @@ went unchecked. Cargo mirrors its entire config surface into `CARGO_*`, so every
 key has an unguarded env twin. That pattern (a flag we gate, an env var we do not) is the thing to
 search for across the registry.
 
-## Option-string allowlists — the remaining research
+## Option-string allowlists — researched 2026-07-26
 
-Three variables carry a FLAG STRING for an interpreter, so classifying them means parsing that
-interpreter's flags and allowing a researched subset. Verified dangerous flags:
+Each interpreter was probed directly: a switch was placed in the variable and the interpreter run,
+recording whether it was refused, accepted, or observed to execute injected code.
 
-- `NODE_OPTIONS` — `--require`/`-r` and `--import` both execute (measured). `--experimental-loader`
-  and `--loader` are the same shape. Benign example measured: `--max-old-space-size=512`.
-- `RUBYOPT` — `-r` executes (measured). `-I` extends the load path, so it feeds `-r`.
-- `PERL5OPT` — `-M`/`-m` load a module, `-I` extends `@INC`; the pair executes (measured). `-d`
-  starts the debugger.
+### RUBYOPT (ruby 3.4.2)
 
-What is NOT yet researched: the full permitted set for each, and which remaining flags are inert
-enough to allowlist. That is the real work item, and it is per-interpreter rather than per-command.
-`JAVA_TOOL_OPTIONS` and `RUSTFLAGS` are the same shape and unexamined.
+Ruby enforces its own subset. **`-e` is REFUSED**, which removes the obvious eval vector.
 
-## Suggested order
+- accepted: `-w -W -v -d -r -I -E -U -T --jit --yjit --enable= --disable= --debug --verbose`
+- refused: `-e -a -c -n -p -s -x -y -C -F -i -l -S`
 
-1. Land the two shapes that need NO new research, since both reuse existing rules end to end:
-   command-valued variables via `command_verdict`, and path-valued ones via the pathgate roles.
-2. Sweep the registry for flags we already gate that have an env twin (`RUSTC_WRAPPER` is one; there
-   will be more).
-3. Only then take the option-string allowlists, one interpreter at a time.
+Code vectors, both taking a PATH — so both classify under the exec-locus rule with no new judgement:
+
+- `-r<file>` loads and executes. Measured: `RUBYOPT="-r<file>"` printed the marker before main.
+- `-I<dir>` extends the load path, which feeds `-r` and can shadow a stdlib module a later
+  `require` picks up.
+
+Allowlist candidates (inert w.r.t. code loading): `-w -W -v --verbose --debug -E -U -T --jit
+--yjit`. `--enable=`/`--disable=` toggle features rather than load code, but their VALUE should be
+checked rather than assumed.
+
+### PERL5OPT (perl 5.34.1)
+
+Also a subset. **`-e`/`-E` REFUSED.**
+
+- accepted: `-w -W -d -t -T -C -I -M -m -U -D`
+- refused: `-e -E -X -c -n -p -l -a -F -s -S -i`
+
+Code vectors, and the shapes differ in a way that matters:
+
+- `-M`/`-m` take a MODULE NAME, not a path — `-M/path/to/Inject` errors with "Module name required".
+  So alone they load from the standard `@INC`, i.e. installed code.
+- `-I<dir>` is therefore the real lever: it points `@INC` at attacker-chosen code, and `-I<dir>
+  -MInject` executed the marker.
+- `-d:Module` loads `Devel::Module` — a SEPARATE vector from `-M`. Measured: `-I<dir> -d:Inj`
+  executed the marker.
+- `-U` permits unsafe operations.
+
+Allowlist candidates: `-w -W -t -T -C -D` (`-t`/`-T` are taint modes and make things stricter).
+
+### NODE_OPTIONS (node v22.17.0) — the least restricted, and three distinct danger classes
+
+Node refuses very little: only `--eval`/`--print` (plus `--check`, `--input-type` and an entry point
+per its docs). **The documentation's claim that `--require`, `--import` and `--experimental-loader`
+are disallowed is FALSE on this version — all three were accepted, and `--require`/`--import` were
+observed executing an injected module before main.**
+
+1. **Code loading** (path values → exec locus): `--require`, `--import`, `--experimental-loader`,
+   `--loader`.
+2. **Network-exposed debugger** (→ remote code execution): `--inspect`, `--inspect-brk`,
+   `--inspect-port`. `--inspect=0.0.0.0:9229` was accepted, which grants full execution to anyone
+   who can reach the port. This class has no analogue in the other interpreters.
+3. **Permission-model relaxation**: `--experimental-permission`, `--allow-child-process`,
+   `--allow-fs-write`, `--allow-worker`, `--allow-addons` — all accepted. These REMOVE restrictions
+   the program may be relying on.
+
+Allowlist candidates: the V8 tuning and diagnostics flags — `--max-old-space-size`,
+`--enable-source-maps` (both measured working) and similar. This is the variable needing the most
+careful list, because the accepted set is nearly everything.
+
+### RUSTFLAGS / CARGO_* (unverified execution, but the shape is clear)
+
+`-C linker=<path>` makes the compiler invoke an arbitrary binary as the linker; `-C link-arg`,
+`--extern` and `-Z` are the same family. Not executed here (it would require a real build), so it is
+enumerated rather than measured.
+
+### JAVA_TOOL_OPTIONS / _JAVA_OPTIONS (enumerated, not measured)
+
+`-javaagent:<jar>`, `-agentlib:`, `-agentpath:` and `-Xbootclasspath` all load code into every JVM
+started while the variable is set. Java is installed here but this was not probed; treat the list as
+enumerated only.
+
+## The pattern to sweep for: a gated flag with an ungated env twin
+
+Two confirmed in cargo alone, and the danger was ALREADY documented in `cargo.toml` both times:
+
+    cargo build --config build.rustc-wrapper=/tmp/evil        DENY
+    RUSTC_WRAPPER=/tmp/evil cargo build                       ALLOW
+    CARGO_BUILD_RUSTC_WRAPPER=/tmp/evil cargo build           ALLOW
+
+    cargo build --config build.rustflags=["-Clinker=/tmp/evil"]   DENY
+    RUSTFLAGS='-C linker=/tmp/evil' cargo build                   ALLOW
+    CARGO_BUILD_RUSTFLAGS='-C linker=/tmp/evil' cargo build       ALLOW
+
+Cargo mirrors its whole config surface into `CARGO_*`, so this is systematic there rather than two
+oversights. Other tools with the same habit (env mirrors of config keys) should be checked the same
+way — the search is "a flag we deny that has an environment spelling".
+
+## Suggested build order
+
+1. **Command-valued variables** — `GIT_SSH_COMMAND`, `GIT_PAGER`, `EDITOR`, `LESSOPEN` and the rest.
+   Recurse through `command_verdict`. No new research: verified that `cat` allows and `sh -c evil`
+   denies.
+2. **Path-valued variables** — `LD_PRELOAD`, `PYTHONPATH`, `RUBYLIB`, `GIT_DIR`, `BASH_ENV`. Use the
+   pathgate `exec` role for anything supplying code, `read`/`write` for data. No new research:
+   verified worktree allows and `/tmp`/`~` deny under the exec role.
+3. **The env-twin sweep** — find flags already denied that have an environment spelling. Two known
+   in cargo; the search generalises.
+4. **Option-string variables** — `RUBYOPT` and `PERL5OPT` first, since their accepted sets are small
+   and their code vectors are path-shaped (so step 2's rule does most of the work). `NODE_OPTIONS`
+   last: it accepts nearly everything and carries three unrelated danger classes.
+
+Steps 1–3 need no judgement that has not already been made elsewhere in the classifier. Step 4 is
+where the genuinely new allowlists live.
