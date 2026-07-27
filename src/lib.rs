@@ -1,21 +1,25 @@
+// The generated test names spell the command and its flags verbatim, and FLAG CASE IS MEANINGFUL:
+// find takes both `-D` and `-d`, `-P` and `-p`, `-L` and `-l`, and commands like `asn1Decoding` and
+// `checkLocalKDC` are camel-case upstream. Lowercasing to satisfy `non_snake_case` would erase the
+// distinction the test exists to pin, so the generated items opt out instead.
 #[cfg(test)]
 macro_rules! safe {
     ($($name:ident: $cmd:expr),* $(,)?) => {
-        $(#[test] fn $name() { assert!(check($cmd), "expected safe: {}", $cmd); })*
+        $(#[test] #[allow(non_snake_case)] fn $name() { assert!(check($cmd), "expected safe: {}", $cmd); })*
     };
 }
 
 #[cfg(test)]
 macro_rules! denied {
     ($($name:ident: $cmd:expr),* $(,)?) => {
-        $(#[test] fn $name() { assert!(!check($cmd), "expected denied: {}", $cmd); })*
+        $(#[test] #[allow(non_snake_case)] fn $name() { assert!(!check($cmd), "expected denied: {}", $cmd); })*
     };
 }
 
 #[cfg(test)]
 macro_rules! inert {
     ($($name:ident: $cmd:expr),* $(,)?) => {
-        $(#[test] fn $name() {
+        $(#[test] #[allow(non_snake_case)] fn $name() {
             assert_eq!(
                 crate::command_verdict($cmd),
                 crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
@@ -28,7 +32,7 @@ macro_rules! inert {
 #[cfg(test)]
 macro_rules! safe_read {
     ($($name:ident: $cmd:expr),* $(,)?) => {
-        $(#[test] fn $name() {
+        $(#[test] #[allow(non_snake_case)] fn $name() {
             assert_eq!(
                 crate::command_verdict($cmd),
                 crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeRead),
@@ -41,7 +45,7 @@ macro_rules! safe_read {
 #[cfg(test)]
 macro_rules! safe_write {
     ($($name:ident: $cmd:expr),* $(,)?) => {
-        $(#[test] fn $name() {
+        $(#[test] #[allow(non_snake_case)] fn $name() {
             assert_eq!(
                 crate::command_verdict($cmd),
                 crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite),

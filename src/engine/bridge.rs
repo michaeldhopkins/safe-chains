@@ -92,6 +92,46 @@ fn to_legacy(level_name: &str) -> Option<SafetyLevel> {
     }
 }
 
+/// A human-readable account of what a command resolved to and, when the band rejects it, which
+/// facet said no.
+///
+/// The engine was write-only before this: `admits` answered yes/no and nothing reported the axis.
+/// Both a user asking "why was this denied" and an author debugging a resolver were left bisecting
+/// by editing facets and re-running — which is exactly how an incomplete loopback delta got
+/// mistaken for a flawed approach rather than a missing line.
+pub struct ProfileExplanation {
+    /// One entry per capability: its `because` and the facets it sets.
+    pub capabilities: Vec<(String, Vec<(&'static str, &'static str)>)>,
+    /// `(level name, why it refuses)` — absent when the band admits the profile.
+    pub blocked_by: Option<(String, FacetMismatch)>,
+}
+
+/// Resolve `tokens` and explain the result. `None` when no resolver claims the command, which is
+/// itself the answer: the engine never saw it and the legacy classifier decided.
+pub fn explain_profile(tokens: &[Token]) -> Option<ProfileExplanation> {
+    let profile = resolve::resolve(tokens)?;
+    let capabilities = profile
+        .capabilities
+        .iter()
+        .map(|c| (c.because.clone(), c.set_facets()))
+        .collect();
+
+    // Report against the MOST PERMISSIVE level in the auto-approve band. If the top of the band
+    // refuses a capability, every level below it does too, so its complaint is the binding one —
+    // a lower level's would just be the first of several walls.
+    let blocked_by = default_levels()
+        .iter()
+        .rfind(|l| to_legacy(&l.name).is_some())
+        .and_then(|top| {
+            profile
+                .capabilities
+                .iter()
+                .find_map(|c| top.nearest_miss(c).map(|m| (top.name.clone(), m)))
+        });
+
+    Some(ProfileExplanation { capabilities, blocked_by })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -284,6 +324,7 @@ mod tests {
     ///      examples_denied that resolves stays denied", since legacy denies it),
     ///   2. **justified** — every resolved capability cites a `because` (§5),
     ///   3. **total** — resolution and projection never panic.
+    ///
     /// It grows automatically as commands convert; today it exercises the resolvable
     /// commands and skips the rest. Only bare single commands are comparable at the leaf
     /// (chains/redirects/substitutions are the CST's job). The full per-facet completeness
@@ -362,44 +403,4 @@ mod tests {
         // the lower band is UNCHANGED — no eval-level context, projection still tightens cat to read.
         assert_eq!(crate::command_verdict("cat ./README.md"), Verdict::Allowed(SafetyLevel::SafeRead), "lower band untouched");
     }
-}
-
-/// A human-readable account of what a command resolved to and, when the band rejects it, which
-/// facet said no.
-///
-/// The engine was write-only before this: `admits` answered yes/no and nothing reported the axis.
-/// Both a user asking "why was this denied" and an author debugging a resolver were left bisecting
-/// by editing facets and re-running — which is exactly how an incomplete loopback delta got
-/// mistaken for a flawed approach rather than a missing line.
-pub struct ProfileExplanation {
-    /// One entry per capability: its `because` and the facets it sets.
-    pub capabilities: Vec<(String, Vec<(&'static str, &'static str)>)>,
-    /// `(level name, why it refuses)` — absent when the band admits the profile.
-    pub blocked_by: Option<(String, FacetMismatch)>,
-}
-
-/// Resolve `tokens` and explain the result. `None` when no resolver claims the command, which is
-/// itself the answer: the engine never saw it and the legacy classifier decided.
-pub fn explain_profile(tokens: &[Token]) -> Option<ProfileExplanation> {
-    let profile = resolve::resolve(tokens)?;
-    let capabilities = profile
-        .capabilities
-        .iter()
-        .map(|c| (c.because.clone(), c.set_facets()))
-        .collect();
-
-    // Report against the MOST PERMISSIVE level in the auto-approve band. If the top of the band
-    // refuses a capability, every level below it does too, so its complaint is the binding one —
-    // a lower level's would just be the first of several walls.
-    let blocked_by = default_levels()
-        .iter()
-        .rfind(|l| to_legacy(&l.name).is_some())
-        .and_then(|top| {
-            profile
-                .capabilities
-                .iter()
-                .find_map(|c| top.nearest_miss(c).map(|m| (top.name.clone(), m)))
-        });
-
-    Some(ProfileExplanation { capabilities, blocked_by })
 }

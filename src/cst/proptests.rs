@@ -611,7 +611,6 @@ proptest! {
 // ── Function/variable resolution: concrete cases ────────────────────────────────────────────────
 #[cfg(test)]
 mod resolution {
-    use super::super::*;
 
     fn workspace() -> crate::pathctx::Guard {
         crate::pathctx::enter(crate::pathctx::PathCtx {

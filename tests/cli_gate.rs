@@ -12,9 +12,14 @@ fn hook_stdout(payload: &str) -> String {
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
         .spawn()
-        .unwrap();
-    child.stdin.take().unwrap().write_all(payload.as_bytes()).unwrap();
-    let out = child.wait_with_output().unwrap();
+        .expect("spawn safe-chains");
+    child
+        .stdin
+        .take()
+        .expect("stdin was piped")
+        .write_all(payload.as_bytes())
+        .expect("write the hook payload");
+    let out = child.wait_with_output().expect("wait for safe-chains");
     String::from_utf8_lossy(&out.stdout).into_owned()
 }
 
@@ -35,7 +40,7 @@ fn exit_code(args: &[&str]) -> i32 {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status()
-        .unwrap()
+        .expect("run safe-chains")
         .code()
         .unwrap_or(-1)
 }

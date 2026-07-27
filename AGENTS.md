@@ -92,11 +92,18 @@ in the `rust-project` skill. This section is only what is specific to safe-chain
 ## Linting
 
 ```bash
-cargo clippy -- -D warnings
+cargo clippy --all-targets -- -D warnings
 cargo deny check licenses
 ```
 
 Must pass with no warnings before committing.
+
+**`--all-targets` is not optional.** Without it clippy checks only the library and binaries — every
+`#[cfg(test)]` module and everything under `tests/` is invisible to the lint pass. That is most of
+this repo: the property guards, the registry `every_*` sweeps and the corpus tests are where the
+safety argument actually lives, and they went unlinted long enough to accumulate a backlog. The lint
+config in `Cargo.toml` (`unwrap_used`, `collapsible-if`, `cognitive-complexity`, `too-many-lines`)
+is written for that code too.
 
 ## After changes
 

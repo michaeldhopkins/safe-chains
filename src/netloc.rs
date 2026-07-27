@@ -210,8 +210,8 @@ mod tests {
                 s.push_str(&format!("{userinfo}@"));
             }
             s.push_str(host);
-            s.push_str(&port);
-            s.push_str(&tail);
+            s.push_str(port);
+            s.push_str(tail);
             prop_assert_eq!(
                 is_loopback(&s),
                 local,
