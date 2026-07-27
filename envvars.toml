@@ -134,8 +134,7 @@ shape = "exec-path"
 because = "node loads this module in the REPL"
 [env.CLASSPATH]
 shape = "exec-path"
-measured = false
-because = "JVM class search path"
+because = "JVM class search path (measured: a planted class on it was loaded and run)"
 [env.DOTNET_STARTUP_HOOKS]
 shape = "exec-path"
 because = "the .NET host loads this assembly before main (measured: load attempted)"
@@ -155,14 +154,9 @@ because = "git config can define aliases and core.pager, so a caller-controlled 
 [env.GIT_CONFIG_SYSTEM]
 shape = "exec-path"
 because = "as GIT_CONFIG_GLOBAL"
-[env.LUA_INIT]
-shape = "exec-path"
-measured = false
-because = "lua executes its contents, or the file named by a leading @, at interpreter start"
 [env.R_PROFILE_USER]
 shape = "exec-path"
-measured = false
-because = "R sources this at startup"
+because = "R sources this at startup (measured: ran under Rscript)"
 
 # ── Data paths ───────────────────────────────────────────────────────────────
 # GIT_DIR and friends are exec-path, not data-path: a .git you point git at carries CONFIG, and git
@@ -220,8 +214,25 @@ because = "as GIT_CONFIG_COUNT"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
-# match a researched-inert prefix. The dangerous flags are never enumerated — a switch invented
+# match a researched-inert entry. The dangerous flags are never enumerated — a switch invented
 # tomorrow denies by not being listed, which is what keeps these entries from rotting.
+#
+# A PATH-VALUED FLAG GOES IN `path_flags`, NEVER IN `allowed`. `allowed` matches the flag NAME and
+# never looks at the value, so listing a path-valued flag there hands out an unclassified filesystem
+# target: `-Cincremental` was in `allowed` and admitted `RUSTFLAGS='-Cincremental=/etc/cron.d' cargo
+# build`, an out-of-worktree write, while the command-line spelling `cargo build --target-dir /etc/x`
+# was denied — the env-twin-of-a-guarded-flag bug this file exists to close.
+#
+# `path_flags = [{ flag = "-Cincremental", role = "write" }]` instead routes the VALUE through the
+# ordinary locus rules, so the env spelling and the flag spelling agree: in-worktree allows,
+# out-of-worktree denies. `role` is read or write, spelled as the registry's `PathRole` spells it.
+# An undeclared flag still denies, so this opens nothing by itself.
+#
+# AN ENTRY IS A WHOLE FLAG UNLESS IT ENDS IN `*`. `-mod` admits `-mod` and `-mod=vendor`, but NOT
+# `-modfile=/tmp/evil.mod`, which is a different flag that merely starts the same way. Write the `*`
+# only where the VALUE GLUES ONTO THE FLAG with no delimiter to stop it — `-Xmx*` for `-Xmx2g`, `-D*`
+# for rustc's `-Dwarnings`. Every `*` widens the entry to things nobody researched, so it is a claim
+# that nothing else in that tool shares the spelling; check before adding one.
 #
 # The accepted sets below were determined empirically (see the design note), not read from manuals:
 # the Node documentation's claim that --require and --import are refused in NODE_OPTIONS is false on
@@ -232,8 +243,8 @@ because = "as GIT_CONFIG_COUNT"
 # RUBYOPT is not the place to be loading worktree code from.
 [env.RUBYOPT]
 shape = "option-string"
-allowed = ["-w", "-W", "-v", "--verbose", "--debug", "-E", "-U", "-T", "--jit", "--yjit",
-           "--enable=", "--disable="]
+allowed = ["-w", "-W*", "-v", "--verbose", "--debug", "-E*", "-U", "-T*", "--jit", "--yjit",
+           "--enable=*", "--disable=*"]
 because = "ruby flag string; -r and -I load code (measured: -r executes)"
 
 # Perl refuses -e/-E itself. -I is the lever that makes -M/-m/-d: load attacker code, so it is
@@ -241,7 +252,7 @@ because = "ruby flag string; -r and -I load code (measured: -r executes)"
 # entirely contextual.
 [env.PERL5OPT]
 shape = "option-string"
-allowed = ["-w", "-W", "-t", "-T", "-C", "-D"]
+allowed = ["-w", "-W", "-t", "-T", "-C*", "-D*"]
 because = "perl flag string; -I/-M/-m/-d: load code (measured: -I -MInject and -I -d:Inj execute)"
 
 # Node refuses only --eval/--print, so nearly everything else is accepted by the interpreter and the
@@ -263,28 +274,124 @@ because = "node flag string; --require/--import execute (measured), --inspect ex
 shape = "option-string"
 allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
            "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
-           "-Cincremental", "-Clto", "-D", "-W", "-A", "-F", "--cfg"]
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
 because = "rustc flag string; -C linker= runs an arbitrary binary (measured). The --config build.rustflags spelling is already denied"
 [env.CARGO_BUILD_RUSTFLAGS]
 shape = "option-string"
 allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
            "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
-           "-Cincremental", "-Clto", "-D", "-W", "-A", "-F", "--cfg"]
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
 because = "the CARGO_* config-mirror spelling of RUSTFLAGS"
 [env.RUSTDOCFLAGS]
 shape = "option-string"
-allowed = ["-D", "-W", "-A", "-F", "--cfg", "--document-private-items"]
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
 because = "rustdoc flag string, same family as RUSTFLAGS"
 
-# Loads an agent into EVERY JVM started while set. Not probed (no JDK here), so nothing is listed
-# as inert — presence falls to approval until someone measures it.
+# Applies to EVERY JVM started while set. Enumerated from the Oracle java launcher reference, then
+# MEASURED on OpenJDK 26.0.2: all three variables were confirmed to execute a `-javaagent:` jar.
+#
+# `-XX:` CANNOT be a blanket prefix. Most -XX flags are GC/JIT tuning, but `-XX:OnError=<cmd>` and
+# `-XX:OnOutOfMemoryError=<cmd>` run a custom command — direct execution wearing the same prefix as
+# the harmless ones. BOTH were measured to run a script (OnOutOfMemoryError under a 16m heap;
+# OnError under -XX:+CrashOnOutOfMemoryError). So the tuning flags are listed individually.
+#
+# `-XX:+ScavengeBeforeFullGC` is kept although OpenJDK 26 reports it "Unrecognized" — it dates to the
+# ParallelGC era. An unrecognized VM option makes the JVM REFUSE TO START, so it cannot become a
+# route to execution, and users on older JDKs still get the flag.
+#
+# `-D<name>=<value>` is NOT allowlisted, despite tuning guides calling system properties harmless.
+# Properties reach security-relevant machinery (`java.rmi.server.codebase` historically enabled
+# remote class loading, `jdk.attach.allowAttachSelf` opens self-attach), and telling which is which
+# needs per-property research nobody has done.
+#
+# Excluded as code loaders: -javaagent:, -agentlib:, -agentpath:, -Xbootclasspath/a:, --module-path,
+# --upgrade-module-path, @argfile, -XX:VMOptionsFile=, -XX:CompilerDirectivesFile=.
+#
+# -cp/-classpath/--class-path are NOT excluded — they are GATED, on JDK_JAVA_OPTIONS only. They are
+# the flag spelling of CLASSPATH, which is already an `exec-path` entry, so refusing them here while
+# admitting `CLASSPATH=./lib` was the same one-spelling-checked inconsistency this file exists to
+# close; measured live on `mvn test` and `gradle build`, both of which auto-approve.
 [env.JAVA_TOOL_OPTIONS]
 shape = "option-string"
-allowed = []
-measured = false
-because = "-javaagent:/-agentlib:/-agentpath:/-Xbootclasspath load code into every JVM; unprobed, so nothing is allowlisted yet"
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
+because = "applies to every JVM started while set; -javaagent loads code and -XX:OnError/-XX:OnOutOfMemoryError run a command (all measured)"
 [env._JAVA_OPTIONS]
 shape = "option-string"
-allowed = []
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
+because = "as JAVA_TOOL_OPTIONS; takes precedence over it (measured: -javaagent ran)"
+[env.JDK_JAVA_OPTIONS]
+shape = "option-string"
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [
+  { flag = "-XX:HeapDumpPath", role = "write" },
+  # LAUNCHER options, accepted here and NOWHERE ELSE (measured on OpenJDK 26.0.2: `-cp` in
+  # JAVA_TOOL_OPTIONS/_JAVA_OPTIONS is "Unrecognized option" and the JVM refuses to start, while
+  # here it loaded and ran a planted class). Gated at the executor locus, so they agree with the
+  # CLASSPATH entry: `./lib` allows, `/tmp/evil` denies.
+  { flag = "-cp", role = "exec", sep = "space" },
+  { flag = "-classpath", role = "exec", sep = "space" },
+  { flag = "--class-path", role = "exec", sep = "space" },
+]
+because = "the LAUNCHER-processed spelling: a superset of JAVA_TOOL_OPTIONS that also takes -cp (measured: -javaagent ran; -cp ran a planted class)"
+
+# Go's default build flags, measured on go1.26.5. `-toolexec` invokes an arbitrary program in place
+# of the toolchain — the direct analogue of RUSTC_WRAPPER — `-exec` runs the built binary through
+# one, and `-overlay` maps disk paths to different backing files, substituting source before
+# compilation. `-toolexec` and `-overlay` were both confirmed: the overlay probe printed the planted
+# source, not the file on disk. `-ldflags`/`-gcflags` pass through to the linker and compiler and are
+# excluded for the reason RUSTFLAGS' `-C link-arg` is.
+#
+# The whole-flag rule matters most here: `-mod` must not admit `-modfile`, which was measured to
+# change the module the build resolves (`go list -m` reported the planted module name).
+[env.GOFLAGS]
+shape = "option-string"
+allowed = ["-v", "-x", "-n", "-count", "-tags", "-race", "-mod", "-short", "-timeout",
+           "-run", "-skip", "-buildvcs", "-trimpath", "-json"]
+because = "-toolexec runs an arbitrary program and -overlay substitutes source files before compilation (both measured); -exec runs the built binary through one"
+
+# LUA_INIT is code OR a path depending on its first character: a leading `@` names a file to run,
+# anything else IS Lua source executed at interpreter start. Both forms were measured to run on Lua
+# 5.5.0. One shape cannot express that, and Lua source is not something this classifier reads, so
+# presence denies.
+[env.LUA_INIT]
+shape = "opaque"
+because = "executes its contents as Lua, or runs the file named by a leading @, at interpreter start (measured: BOTH forms ran)"
+
+[env.JULIA_LOAD_PATH]
+shape = "exec-path"
+because = "julia module search path (measured: a planted module satisfied a `using` and ran)"
+[env.JULIA_DEPOT_PATH]
+shape = "exec-path"
+because = "the depot CONTAINS config/startup.jl, so pointing it anywhere runs that file at startup — no import needed (measured)"
+[env.CORECLR_ENABLE_PROFILING]
+shape = "opaque"
 measured = false
-because = "as JAVA_TOOL_OPTIONS"
+because = "arms the CoreCLR profiler pair; the library it loads is named by CORECLR_PROFILER_PATH, so neither value certifies alone"

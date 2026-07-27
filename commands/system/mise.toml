@@ -3,6 +3,13 @@ name = "mise"
 description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also provides environment variable management and a task runner. The full CLI can install/uninstall tool versions, modify config files, run arbitrary tasks, and self-update. The covered subcommands span a wide range: read-only queries (list, current, which, where, doctor, outdated, search, registry, latest, ls-remote, bin-paths, env, tool, completion, backends ls, tasks list/deps/info), config/settings management (config get/list/set, settings get/list/set/add/unset), plugin operations (plugins list/ls-remote/install/uninstall/update), task execution (tasks run/add/edit), cache management (cache path/clear/prune), and exec delegation (exec with --). The exec subcommand delegates to arbitrary downstream commands. Mise releases very frequently, often multiple times per week, with a YYYY.M.P versioning scheme; new subcommands appear regularly and coverage should be reviewed often."
 url = "https://mise.jdx.dev/cli/"
 researched_version = "v2026.5.3 (May 2026; YYYY.M.P scheme)"
+env_assignment_positionals = true
+# `mise set NAME=VALUE` writes the variable into mise.toml's [env], which mise then injects
+# into every command run in that directory — persistently, across sessions. That is the
+# `VAR=value cmd` prefix with a config file behind it, so the values are classified the same
+# way. Declared at command level rather than on the `set` sub, so any future sub that assigns a
+# variable is covered too; an unlisted NAME classifies Inert, so an unrelated assignment is
+# unaffected (`mise set FOO=bar` and `mise set NODE_ENV=production` still allow).
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
     "mise list",

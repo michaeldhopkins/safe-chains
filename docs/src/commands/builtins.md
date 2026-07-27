@@ -38,6 +38,12 @@ Aliases: `typeset`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `declare -p`
+- `declare -i count=5`
+- `declare -x FOO=bar`
+
 ### `exit`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/exit.1p.html">https://man7.org/linux/man-pages/man1/exit.1p.html</a></p>
 
@@ -50,6 +56,13 @@ Aliases: `typeset`
 - Allowed standalone flags: -f, -n, -p
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `export`
+- `export -p`
+- `export FOO=bar`
+- `export PATH_EXTRA=./bin`
 
 ### `false`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation</a></p>

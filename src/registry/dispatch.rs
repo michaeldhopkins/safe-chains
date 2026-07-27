@@ -342,7 +342,19 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 }
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
-    dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS)
+    let verdict = dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS);
+    if !spec.env_assignment_positionals {
+        return verdict;
+    }
+    // `export LD_PRELOAD=/tmp/evil.so` puts the variable in the environment of every command the
+    // shell spawns afterwards, so it is the `LD_PRELOAD=/tmp/evil.so cmd` prefix wearing different
+    // syntax. Classify each assignment the same way rather than letting the second spelling through.
+    tokens[1..]
+        .iter()
+        .filter(|t| !t.starts_with('-'))
+        .filter_map(|t| t.as_str().split_once('='))
+        .map(|(name, value)| crate::envvars::assignment_verdict(name, value))
+        .fold(verdict, Verdict::combine)
 }
 
 /// Dispatches a sub's kind directly, used by `registry::try_sub_dispatch`

@@ -3644,6 +3644,12 @@ Aliases: `typeset`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `declare -p`
+- `declare -i count=5`
+- `declare -x FOO=bar`
+
 ### `defaults`
 <p class="cmd-url"><a href="https://ss64.com/mac/defaults.html">https://ss64.com/mac/defaults.html</a></p>
 
@@ -4113,6 +4119,12 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 <p class="cmd-url"><a href="https://github.com/bkeepers/dotenv">https://github.com/bkeepers/dotenv</a></p>
 
 - Recursively validates the inner command.
+
+**Examples:**
+
+- `dotenv ls`
+- `dotenv -- ls`
+- `dotenv -f .env.test cat README.md`
 
 ### `dotnet`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/tools/">https://learn.microsoft.com/en-us/dotnet/core/tools/</a></p>
@@ -4696,6 +4708,13 @@ Aliases: `gexpand`
 - Allowed standalone flags: -f, -n, -p
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `export`
+- `export -p`
+- `export FOO=bar`
+- `export PATH_EXTRA=./bin`
 
 ### `expr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation</a></p>
@@ -14634,6 +14653,14 @@ Aliases: `gtar`
 
 - Allowed standalone flags: --color, --concurrency, --dry, --exit-code, --force, --global, --help, --init, --insecure, --interval, --json, --list, --list-all, --no-color, --offline, --parallel, --silent, --status, --summary, --verbose, --version, --watch, -C, -d, -f, -g, -h, -i, -j, -l, -n, -p, -s, -t, -v, -w, -a
 - Allowed valued flags: --dir, --output, --taskfile, -d, -o, -t
+
+**Examples:**
+
+- `task --list`
+- `task -l`
+- `task --list-all`
+- `task --version`
+- `task --dry --list`
 
 ### `taskinfo`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/taskinfo.1.html">https://keith.github.io/xcode-man-pages/taskinfo.1.html</a></p>

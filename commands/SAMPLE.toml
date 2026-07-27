@@ -93,6 +93,20 @@
 #                                        #   surface is genuinely unbounded.
 # # numeric_dash = true                  # optional; accepts -NUMBER shorthand
 #                                        #   (e.g. head -20 ≡ head -n 20).
+# # env_assignment_positionals = true    # optional; this command PUTS its
+#                                        #   NAME=VALUE positionals into the
+#                                        #   ENVIRONMENT (`export`, `declare -x`,
+#                                        #   `typeset -x`). Each assignment is
+#                                        #   then classified through
+#                                        #   envvars.toml, exactly as the
+#                                        #   `VAR=value cmd` prefix form is, so
+#                                        #   the two spellings of one capability
+#                                        #   cannot disagree. Without it,
+#                                        #   `export LD_PRELOAD=/tmp/evil.so`
+#                                        #   auto-approved while
+#                                        #   `LD_PRELOAD=/tmp/evil.so ls` denied.
+#                                        #   Set this on ANY command that exports
+#                                        #   a caller-named variable.
 #                                        #   Only for commands with POSIX -number legacy syntax.
 # standalone = [                         # flags that take no value
 #     "--count", "--help", "--recursive", "--version",
