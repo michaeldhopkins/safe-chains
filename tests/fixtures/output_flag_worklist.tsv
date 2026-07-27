@@ -52,8 +52,6 @@ ssh-keygen	-o
 stern	--output
 stern	-o
 svelte-check	--output
-task	--output
-task	-o
 tiff2ps	-o
 tiffcp	-o
 tiffdump	-o

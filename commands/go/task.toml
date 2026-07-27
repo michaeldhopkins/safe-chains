@@ -24,3 +24,10 @@ valued = [
     "--dir", "--output", "--taskfile",
     "-d", "-o", "-t",
 ]
+# A task NAME is a positional, and naming a task RUNS it — arbitrary shell out of Taskfile.yml,
+# which the description above already excludes from the safe surface. Without this cap the flag
+# allowlist was decorative: `task build` auto-approved while every peer runner (`npm run build`,
+# `make build`, `just build`, `rake build`, `mise run build`) denied.
+max_positional = 0
+examples_safe = ["task --list", "task -l", "task --list-all", "task --version", "task --dry --list"]
+examples_denied = ["task build", "task deploy", "task FOO=bar", "task default"]
