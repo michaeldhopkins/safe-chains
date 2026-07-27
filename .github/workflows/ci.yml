@@ -28,7 +28,7 @@ jobs:
         run: cargo test --locked
 
       - name: cargo clippy
-        run: cargo clippy --locked -- -D warnings
+        run: cargo clippy --locked --all-targets -- -D warnings
 
       - uses: taiki-e/install-action@cargo-deny
 

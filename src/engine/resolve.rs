@@ -1535,10 +1535,9 @@ mod tests {
             assert!(!inert().admits(&p), "it still reads a file: {args:?}");
         }
         // but the genuinely-dangerous long (--dereference-recursive, symlink escape) worst-cases
-        for args in [vec!["grep", "--dereference-recursive", "foo", "dir"]] {
-            let p = resolve(&toks(&args)).expect("grep");
-            assert!(!read_local().admits(&p), "dangerous long must worst-case: {args:?}");
-        }
+        let args = vec!["grep", "--dereference-recursive", "foo", "dir"];
+        let p = resolve(&toks(&args)).expect("grep");
+        assert!(!read_local().admits(&p), "dangerous long must worst-case: {args:?}");
         // PCRE flags now read-local (PCRE2 execs no code): -P short, --perl-regexp long, -oP combined.
         for args in [
             vec!["grep", "-P", "foo", "f"],

@@ -523,83 +523,97 @@ proptest! {
 /// admit the hazard while rejecting some other term of that axis. `Pinning >= version` rejects
 /// `floating` and admits `digest`, which pins the direction of that trust ladder from the level
 /// authoring rather than from a comment.
+/// The per-axis body of `a_declared_hazard_is_the_term_authored_levels_reject`, as a function
+/// rather than a macro: the check is identical on all 18 ordinal axes, and expanding it inline once
+/// per axis made the test read as one 109-branch function to any complexity metric while the
+/// authored form was always a flat table.
+#[cfg(test)]
+fn ord_axis_evidence<T: FacetTerm + Ord>(
+    name: &'static str,
+    get: impl Fn(&Clause) -> Option<OrdBound<T>>,
+    wrong: &mut Vec<String>,
+    unconstrained: &mut Vec<&'static str>,
+) {
+    let mut seen = false;
+    for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
+        for c in &level.allow {
+            let Some(bound) = get(c) else { continue };
+            seen = true;
+            let hz = T::hazard();
+            if bound.admits(hz) && T::all().iter().any(|t| !bound.admits(*t)) {
+                wrong.push(format!(
+                    "{}: `{}` admits the declared hazard `{}` while rejecting other terms — \
+                     the hazard is pointed the wrong way on this axis",
+                    name, level.name, hz.as_str(),
+                ));
+            }
+        }
+    }
+    if !seen {
+        unconstrained.push(name);
+    }
+}
+
+/// As `ord_axis_evidence`, for the categorical axes, where a clause carries a permitted SET rather
+/// than a bound.
+#[cfg(test)]
+fn set_axis_evidence<T: FacetTerm>(
+    name: &'static str,
+    get: impl Fn(&Clause) -> Option<&[T]>,
+    wrong: &mut Vec<String>,
+    unconstrained: &mut Vec<&'static str>,
+) {
+    let mut seen = false;
+    for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
+        for c in &level.allow {
+            let Some(set) = get(c) else { continue };
+            seen = true;
+            let hz = T::hazard();
+            if set.contains(&hz) && T::all().iter().any(|t| !set.contains(t)) {
+                wrong.push(format!(
+                    "{}: `{}` admits the declared hazard `{}` while rejecting other terms",
+                    name, level.name, hz.as_str(),
+                ));
+            }
+        }
+    }
+    if !seen {
+        unconstrained.push(name);
+    }
+}
+
 #[test]
 fn a_declared_hazard_is_the_term_authored_levels_reject() {
     let mut wrong = Vec::new();
     let mut unconstrained = Vec::new();
 
-    macro_rules! ord_axis {
-        ($name:literal, $field:ident, $ty:ty) => {
-            let mut seen = false;
-            for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
-                for c in &level.allow {
-                    let Some(bound) = c.$field else { continue };
-                    seen = true;
-                    let hz = <$ty as FacetTerm>::hazard();
-                    let admits_hazard = bound.admits(hz);
-                    let rejects_something = <$ty>::all().iter().any(|t| !bound.admits(*t));
-                    if admits_hazard && rejects_something {
-                        wrong.push(format!(
-                            "{}: `{}` admits the declared hazard `{}` while rejecting other terms — \
-                             the hazard is pointed the wrong way on this axis",
-                            $name, level.name, hz.as_str(),
-                        ));
-                    }
-                }
-            }
-            if !seen {
-                unconstrained.push($name);
-            }
-        };
-    }
-    macro_rules! set_axis {
-        ($name:literal, $field:ident, $ty:ty) => {
-            let mut seen = false;
-            for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
-                for c in &level.allow {
-                    let Some(set) = c.$field.as_ref() else { continue };
-                    seen = true;
-                    let hz = <$ty as FacetTerm>::hazard();
-                    if set.contains(&hz) && <$ty>::all().iter().any(|t| !set.contains(t)) {
-                        wrong.push(format!(
-                            "{}: `{}` admits the declared hazard `{}` while rejecting other terms",
-                            $name, level.name, hz.as_str(),
-                        ));
-                    }
-                }
-            }
-            if !seen {
-                unconstrained.push($name);
-            }
-        };
-    }
+    ord_axis_evidence("locus.local",                |c| c.local_locus, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("locus.remote",               |c| c.remote_reach, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("locus.provenance",           |c| c.provenance, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("scale",                      |c| c.scale, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("retrieval",                  |c| c.retrieval, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("authority",                  |c| c.authority, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("isolation",                  |c| c.isolation, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("reversibility",              |c| c.reversibility, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("persistence.level",          |c| c.persistence_level, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("persistence.trigger.escape", |c| c.trigger_escape, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("disclosure.audience",        |c| c.disclosure_audience, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("secret.level",               |c| c.secret_level, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.direction",          |c| c.net_direction, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.destination",        |c| c.net_destination, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.payload",            |c| c.net_payload, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("execution.trust",            |c| c.execution_trust, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("supply_chain.pinning",       |c| c.pinning, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("cost",                       |c| c.cost, &mut wrong, &mut unconstrained);
 
-    ord_axis!("locus.local", local_locus, LocalLocus);
-    ord_axis!("locus.remote", remote_reach, RemoteReach);
-    ord_axis!("locus.provenance", provenance, Provenance);
-    ord_axis!("scale", scale, Scale);
-    ord_axis!("retrieval", retrieval, RetrievalGranularity);
-    ord_axis!("authority", authority, Authority);
-    ord_axis!("isolation", isolation, Isolation);
-    ord_axis!("reversibility", reversibility, Reversibility);
-    ord_axis!("persistence.level", persistence_level, PersistenceLevel);
-    ord_axis!("persistence.trigger.escape", trigger_escape, TriggerEscape);
-    ord_axis!("disclosure.audience", disclosure_audience, DisclosureAudience);
-    ord_axis!("secret.level", secret_level, SecretLevel);
-    ord_axis!("network.direction", net_direction, NetDirection);
-    ord_axis!("network.destination", net_destination, NetDestination);
-    ord_axis!("network.payload", net_payload, NetPayload);
-    ord_axis!("execution.trust", execution_trust, ExecutionTrust);
-    ord_axis!("supply_chain.pinning", pinning, Pinning);
-    ord_axis!("cost", cost, Cost);
-    set_axis!("locus.binding", remote_binding, RemoteBinding);
-    set_axis!("persistence.trigger.kind", trigger_kind, TriggerKind);
-    set_axis!("disclosure.channel", disclosure_channel, Channel);
-    set_axis!("disclosure.principal", disclosure_principal, Principal);
-    set_axis!("secret.channel", secret_channel, Channel);
-    set_axis!("secret.principal", secret_principal, Principal);
-    set_axis!("supply_chain.source", supply_source, SupplySource);
-    set_axis!("supply_chain.exec_surface", exec_surface, ExecSurface);
+    set_axis_evidence("locus.binding",             |c| c.remote_binding.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("persistence.trigger.kind",  |c| c.trigger_kind.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("disclosure.channel",        |c| c.disclosure_channel.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("disclosure.principal",      |c| c.disclosure_principal.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("secret.channel",            |c| c.secret_channel.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("secret.principal",          |c| c.secret_principal.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("supply_chain.source",       |c| c.supply_source.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("supply_chain.exec_surface", |c| c.exec_surface.as_deref(), &mut wrong, &mut unconstrained);
 
     // A partitioned axis still has evidence, just of a different shape: the hazardous term should
     // be the one the FEWEST denying levels tolerate. Excluding the axis entirely (an earlier cut of

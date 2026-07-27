@@ -4515,7 +4515,7 @@ valued = ["--type"]
                 "eq" => toks(&["demo", "export", &format!("--format={value}")]),
                 _ => toks(&["demo", "export", "--format", &value]),
             };
-            let expected = allowed_values.iter().any(|v| *v == value.as_str());
+            let expected = allowed_values.contains(&value.as_str());
             let actual = super::is_eval_safe_for_spec(&spec, &tokens);
             proptest::prop_assert_eq!(
                 actual,
@@ -4749,21 +4749,21 @@ valued = ["--type"]
         assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-sk"])));
     }
 
-    /// H2 (clarification): the walker is intentionally INDEPENDENT of
-    /// dispatcher constraints like max_positional. Eval-safety is
-    /// gated end-to-end by `cst/check.rs::eval_verdict`, which runs
-    /// `word_sub_verdict` (full dispatcher validation) BEFORE the
-    /// walker. By the time the walker runs, the dispatcher has
-    /// already accepted the invocation. The walker only adds the
-    /// extra "is this tagged eval-safe" check on top.
-    ///
-    /// So a property like "walker accept => dispatcher accept" is
-    /// neither true (walker may accept token sequences the
-    /// dispatcher denies, like `cmd init a a` exceeding
-    /// max_positional) nor required for safety. The
-    /// `eval_verdict.combine(word_sub_verdict)` composition is what
-    /// guarantees end-to-end safety. We test that composition via the
-    /// `eval_*` tests in `src/tests.rs`, not here.
+    // H2 (clarification): the walker is intentionally INDEPENDENT of
+    // dispatcher constraints like max_positional. Eval-safety is
+    // gated end-to-end by `cst/check.rs::eval_verdict`, which runs
+    // `word_sub_verdict` (full dispatcher validation) BEFORE the
+    // walker. By the time the walker runs, the dispatcher has
+    // already accepted the invocation. The walker only adds the
+    // extra "is this tagged eval-safe" check on top.
+    //
+    // So a property like "walker accept => dispatcher accept" is
+    // neither true (walker may accept token sequences the
+    // dispatcher denies, like `cmd init a a` exceeding
+    // max_positional) nor required for safety. The
+    // `eval_verdict.combine(word_sub_verdict)` composition is what
+    // guarantees end-to-end safety. We test that composition via the
+    // `eval_*` tests in `src/tests.rs`, not here.
 
     /// H4: an unrecognized field inside a matrix block (e.g. a
     /// contributor putting `eval_safe = true` directly on a matrix
@@ -4896,26 +4896,22 @@ valued = ["--type"]
         );
     }
 
-    /// Behavioral guard over EVERY real `eval_safe` tag (the other eval_safe tests are build-time
-    /// schema checks on synthetic TOMLs). For each tag: (a) it TAKES EFFECT — `eval "$(cmd …)"` in
-    /// canonical form is allowed; and (b) it STAYS TIGHT — a flag the command itself accepts but that
-    /// is NOT in `eval_safe_flags` must break eval-safety (else the tag rubber-stamps everything).
-    /// Skips leaves needing a positional or a `eval_safe_flag_values` value we can't synthesize
-    /// (those bare forms aren't self-sufficiently eval-safe — e.g. `aws … export-credentials` whose
-    /// default `--format` is JSON, or `starship init <shell>`). Auto-covers every future tag.
-    #[test]
-    fn every_eval_safe_tag_takes_effect_and_stays_tight() {
-        use super::types::{TomlFile, TomlSub};
-        use crate::is_safe_command;
+    /// One `eval_safe`-tagged leaf in the registry, with the flag sets that decide whether an
+    /// invocation of it stays eval-safe.
+    struct Leaf {
+        path: Vec<String>,
+        flags: Vec<String>,
+        required: Vec<String>,
+        require_any: Vec<String>,
+        has_values: bool,
+        standalone: Vec<String>,
+    }
 
-        struct Leaf {
-            path: Vec<String>,
-            flags: Vec<String>,
-            required: Vec<String>,
-            require_any: Vec<String>,
-            has_values: bool,
-            standalone: Vec<String>,
-        }
+    /// Every eval-safe leaf, found by walking `commands/**/*.toml` so a newly tagged command is
+    /// covered without anyone adding a case. Split out of the test itself only for size — the
+    /// collection is mechanical, and the guard worth reading is what the test does with it.
+    fn eval_safe_leaves() -> Vec<Leaf> {
+        use super::types::{TomlFile, TomlSub};
 
         fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
             for e in std::fs::read_dir(dir).unwrap() {
@@ -4990,6 +4986,21 @@ valued = ["--type"]
                 );
             }
         }
+        leaves
+    }
+
+    /// Behavioral guard over EVERY real `eval_safe` tag (the other eval_safe tests are build-time
+    /// schema checks on synthetic TOMLs). For each tag: (a) it TAKES EFFECT — `eval "$(cmd …)"` in
+    /// canonical form is allowed; and (b) it STAYS TIGHT — a flag the command itself accepts but that
+    /// is NOT in `eval_safe_flags` must break eval-safety (else the tag rubber-stamps everything).
+    /// Skips leaves needing a positional or a `eval_safe_flag_values` value we can't synthesize
+    /// (those bare forms aren't self-sufficiently eval-safe — e.g. `aws … export-credentials` whose
+    /// default `--format` is JSON, or `starship init <shell>`). Auto-covers every future tag.
+    #[test]
+    fn every_eval_safe_tag_takes_effect_and_stays_tight() {
+        use crate::is_safe_command;
+
+        let leaves = eval_safe_leaves();
         assert!(!leaves.is_empty(), "expected the registry to contain eval_safe tags");
 
         const HELP: &[&str] = &["--help", "-h", "--version", "-V"];

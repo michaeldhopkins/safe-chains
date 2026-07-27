@@ -41,10 +41,15 @@ struct TomlDistinction {
     by: String,
 }
 
-/// `(name, distinguished_from, same_point_as)` for every archetype — the authored disambiguation,
-/// checked against the facets themselves by `near_neighbours_are_declared`.
+/// One archetype's authored disambiguation: its name, the `(other, axis)` pairs it declares itself
+/// distinguished from, and the archetype it declares itself facet-identical to.
 #[cfg(test)]
-fn declared_distinctions() -> Vec<(String, Vec<(String, String)>, Option<String>)> {
+type DeclaredDistinction = (String, Vec<(String, String)>, Option<String>);
+
+/// The authored disambiguation for every archetype — checked against the facets themselves by
+/// `near_neighbours_are_declared`.
+#[cfg(test)]
+fn declared_distinctions() -> Vec<DeclaredDistinction> {
     let set: TomlArchetypeSet =
         toml::from_str(include_str!("../../archetypes.toml")).expect("archetypes.toml parses");
     set.archetype
@@ -518,16 +523,15 @@ mod neighbour_tests {
             for b in &names[i + 1..] {
                 let d = differing_facets(archetype(a).unwrap(), archetype(b).unwrap());
                 match d.len() {
-                    0 => {
-                        // Same point in facet space: they classify identically, so the choice is
-                        // pure prose. Legitimate, but it has to be deliberate — otherwise an author
-                        // picks by coin-flip and a later facet edit to one silently diverges them.
-                        if same_of(a).as_deref() != Some(*b) || same_of(b).as_deref() != Some(*a) {
-                            problems.push(format!(
-                                "`{a}` and `{b}` are facet-IDENTICAL; both must declare \
-                                 `same_point_as` naming the other, or be given a real difference",
-                            ));
-                        }
+                    // Same point in facet space: they classify identically, so the choice is pure
+                    // prose. Legitimate, but it has to be deliberate — otherwise an author picks by
+                    // coin-flip and a later facet edit to one silently diverges them. A pair that
+                    // DOES declare it falls through to `_`, which is the no-op.
+                    0 if same_of(a).as_deref() != Some(*b) || same_of(b).as_deref() != Some(*a) => {
+                        problems.push(format!(
+                            "`{a}` and `{b}` are facet-IDENTICAL; both must declare \
+                             `same_point_as` naming the other, or be given a real difference",
+                        ));
                     }
                     1 => {
                         let axis = d[0];

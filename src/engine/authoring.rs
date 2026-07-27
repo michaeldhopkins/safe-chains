@@ -805,6 +805,9 @@ mod tests {
         assert_monotone_from(level(levels, "editor"), write_cap);
     }
 
+    /// A union level's name paired with the predicate matching the ONE capability it withholds.
+    type LevelGap = (&'static str, fn(&Capability) -> bool);
+
     // ── union-level completeness: flat DNF's failure mode is a silent gap ────────────
     //
     // A level authored as a UNION of allow clauses to mean "allow almost everything" must admit a
@@ -816,7 +819,7 @@ mod tests {
     proptest! {
         #[test]
         fn union_levels_admit_everything_but_their_declared_gap(cap in arb_capability()) {
-            let gaps: &[(&str, fn(&Capability) -> bool)] = &[
+            let gaps: &[LevelGap] = &[
                 // yolo withholds only `destroy · irreversible · unbounded` (rm -rf /), carved by
                 // the union of its allow clauses — never by a deny.
                 ("yolo", |c: &Capability| {
