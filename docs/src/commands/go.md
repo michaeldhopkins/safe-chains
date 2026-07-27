@@ -181,3 +181,11 @@
 - Allowed standalone flags: --color, --concurrency, --dry, --exit-code, --force, --global, --help, --init, --insecure, --interval, --json, --list, --list-all, --no-color, --offline, --parallel, --silent, --status, --summary, --verbose, --version, --watch, -C, -d, -f, -g, -h, -i, -j, -l, -n, -p, -s, -t, -v, -w, -a
 - Allowed valued flags: --dir, --output, --taskfile, -d, -o, -t
 
+**Examples:**
+
+- `task --list`
+- `task -l`
+- `task --list-all`
+- `task --version`
+- `task --dry --list`
+

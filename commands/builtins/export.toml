@@ -6,3 +6,6 @@ level = "Inert"
 bare = true
 tolerate_unknown_short = true
 standalone = ["-f", "-n", "-p"]
+env_assignment_positionals = true
+examples_safe = ["export", "export -p", "export FOO=bar", "export PATH_EXTRA=./bin"]
+examples_denied = ["export LD_PRELOAD=/tmp/evil.so", "export RUSTC_WRAPPER=/tmp/evil", "export GIT_DIR=/tmp/evil"]

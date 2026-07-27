@@ -15,14 +15,21 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
             return Verdict::Denied;
         }
     }
+    // The assignments `env` places in the child's environment are the `VAR=value cmd` prefix in
+    // another syntax, so they are classified identically — skipping them let `env
+    // LD_PRELOAD=/tmp/evil.so ls` through while the prefix spelling denied.
+    let mut assigned = Verdict::Allowed(SafetyLevel::Inert);
     while i < tokens.len() && !tokens[i].starts_with("-") && tokens[i].contains("=") {
+        if let Some((name, value)) = tokens[i].as_str().split_once('=') {
+            assigned = assigned.combine(crate::envvars::assignment_verdict(name, value));
+        }
         i += 1;
     }
     if i >= tokens.len() {
-        return Verdict::Allowed(SafetyLevel::Inert);
+        return assigned;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    crate::command_verdict(&inner)
+    assigned.combine(crate::command_verdict(&inner))
 }
 
 static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[

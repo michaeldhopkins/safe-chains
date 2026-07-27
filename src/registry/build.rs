@@ -1072,6 +1072,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         &eval_safe_required_flags,
     );
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref());
+    let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
     let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag);
     if toml.deny.unwrap_or(false) {
         return CommandSpec {
@@ -1090,6 +1091,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
                     standalone: Vec::new(),
@@ -1119,6 +1121,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         };
     }
@@ -1157,6 +1160,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::Custom {
                 handler_name,
                 doc_body: toml.doc_body,
@@ -1188,6 +1192,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 path_gate: toml.path_gate,
                 archetype_flags: archetype_flags.clone(),
                 behavior: behavior.clone(),
+                env_assignment_positionals,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub)
@@ -1221,6 +1226,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -1250,6 +1256,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)
@@ -1297,6 +1304,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -1324,6 +1332,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::WriteFlagged {
                 policy,
                 base_level: level,
@@ -1349,6 +1358,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            env_assignment_positionals,
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
@@ -1359,6 +1369,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     }
 
     CommandSpec {
+        env_assignment_positionals,
         name: toml.name,
         description: desc,
         aliases: toml.aliases,
@@ -1412,6 +1423,10 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
     map.retain(|_, s| s.name != spec.name);
     for alias in &spec.aliases {
         map.insert(alias.clone(), CommandSpec {
+            // Carried, not defaulted: `typeset` is an alias of `declare`, and dropping this here
+            // would let the alias put a variable into the environment unclassified while the
+            // canonical spelling denied.
+            env_assignment_positionals: spec.env_assignment_positionals,
             name: spec.name.clone(),
             description: spec.description.clone(),
             aliases: vec![],

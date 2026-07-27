@@ -576,19 +576,22 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         .map(|(_, v)| word_sub_verdict(v))
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
     let word_sub_v = words_sub_verdict(&cmd.words);
-    let sub_v = env_sub_v.combine(word_sub_v);
 
     // A LISTED assignment is classified by its value (`envvars.toml`): `GIT_SSH_COMMAND` carries a
     // command, `LD_PRELOAD` a path supplying code. An unlisted name is Inert, so this changes
     // nothing for ordinary invocations — `FOO=bar ls` classifies exactly as `ls` does.
+    //
+    // COMBINED, not merely checked for denial. An assignment that resolves to a LEVEL carries that
+    // level into the command: `RUSTFLAGS='-Cincremental=./x'` authorises a worktree write, so the
+    // invocation is a write even when the command word is inert. Propagating only `Denied` here
+    // meant `RUSTFLAGS='-Cincremental=./x' echo hi` passed at `paranoid`, while the same write
+    // spelled `touch ./x` did not.
     let env_name_v = cmd
         .env
         .iter()
         .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
-    if let Verdict::Denied = env_name_v {
-        return Verdict::Denied;
-    }
+    let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v);
 
     if let Verdict::Denied = sub_v {
         return Verdict::Denied;

@@ -7,3 +7,6 @@ level = "Inert"
 bare = true
 tolerate_unknown_short = true
 standalone = ["-A", "-F", "-a", "-f", "-g", "-i", "-l", "-n", "-p", "-r", "-t", "-u", "-x"]
+env_assignment_positionals = true
+examples_safe = ["declare -p", "declare -i count=5", "declare -x FOO=bar"]
+examples_denied = ["declare -x LD_PRELOAD=/tmp/evil.so", "declare -x PYTHONPATH=/tmp/inj"]

@@ -1,27 +1,67 @@
 # TODO
 
-## Env prefixes are not classified (`VAR=value cmd`)
+## Env prefixes — SHIPPED
 
-A live fail-open: `LD_PRELOAD=/tmp/evil.so ls`, `GIT_SSH_COMMAND='sh -c evil' git status` and
-`PATH=/tmp/evil ls` all auto-approve, because the classifier inspects env VALUES for substitutions
-but never the NAME. Found 2026-07-26 while looking at something else.
+`VAR=value cmd` classification is built (`envvars.toml` + `src/envvars.rs`); the original fail-opens
+`LD_PRELOAD=/tmp/evil.so ls` and `RUSTC_WRAPPER=/tmp/evil cargo build` now deny. Java, Go, Lua, Julia
+and R were probed on real toolchains. Design record, every probe and the per-ecosystem measurements
+are in **docs/design/env-prefix-classification.md**.
 
-**Design settled 2026-07-26; not yet built.** The workable shape is NOT "an undeclared env name
-denies" (an allowlist over an unbounded set) but: inspect a LISTED set of variables, classify their
-VALUES with rules that already exist, and leave everything else untouched — no new denials, no
-friction. Command-valued vars recurse through `command_verdict`; path-valued ones use the pathgate
-`exec`/`read`/`write` roles. Both were verified to give correct answers already.
+The last gap — `simple_verdict` propagated only `Denied` from an assignment and discarded its LEVEL,
+so `RUSTFLAGS='-Cincremental=./x' echo hi` passed at `paranoid` while the identical write spelled
+`touch ./x` did not — was fixed 2026-07-26 by combining the env verdict into `sub_v`. An env-spelled
+effect now classifies exactly as the command-spelled one does.
 
-Concrete motivating finding: safe-chains denies `cargo build --config build.rustc-wrapper=/tmp/evil`
-— it KNOWS that key executes code — while `RUSTC_WRAPPER=/tmp/evil cargo build` is allowed. Same
-capability, one spelling checked. Cargo mirrors its whole config surface into `CARGO_*`, so that
-pattern likely repeats across the registry.
+## HIGH: `dispatch_wrapper` skips valued flags without looking at their values
 
-Remaining research is the option-string variables (`NODE_OPTIONS`, `RUBYOPT`, `PERL5OPT`,
-`JAVA_TOOL_OPTIONS`, `RUSTFLAGS`), which need a per-interpreter flag allowlist. Evidence, the facet framing, the measured blast radius, and the one constraint any
-design must respect (`VAR=x; cmd` statement assignments are a DIFFERENT mechanism from `VAR=x cmd`
-env prefixes, and path pinning depends on the former) are written up in
-**docs/design/env-prefix-classification.md**.
+`dispatch_wrapper` consumes a valued flag with `i += 2` and never inspects the value. That is the
+same shape as the `env` handler bug (which walked past `NAME=VALUE` to reach the command) and the
+`-Cincremental` bug (which matched a flag name and ignored its path). Confirmed live, all
+auto-approved before this was written:
+
+    restic --password-command /tmp/evil snapshots     runs an arbitrary program
+    helmfile --helm-binary /tmp/evil list             runs an arbitrary binary
+    vite -c /tmp/evil.js build                        loads an arbitrary JS config (code)
+    sandbox-exec -f /tmp/evil.sb ls                   caller-chosen sandbox profile
+    dotenv -f /tmp/evil.env ls                        arbitrary env injection  [FIXED]
+
+Only `dotenv` is fixed, because it was the env-injection case; it now declares
+`[command.path_gate] flags = { "-f" = "exec", "-e" = "exec" }`, which keeps `.env.test` working and
+denies `/tmp/evil.env`. The rest are untouched. NOTE the mechanism already exists — `Role::Exec` on
+a `[command.path_gate]` is exactly the tool for most of these — so the campaign is per-flag research,
+not new machinery.
+
+`borg --rsh /tmp/evil` and `nix-env -f /tmp/evil.nix` deny, so this is not universal — which is
+exactly why it needs a per-flag pass rather than a blanket rule.
+
+**Shape of the work**, mirroring the env-prefix project: go through every `[command.wrapper]` (57 of
+them) and classify each entry in `valued` as inert, a path (with a role), or a command. Inert stays
+listed; a path gets a locus gate; a command recurses through `command_verdict`; anything unresearched
+comes off the list and falls to approval. `restic --password-command` and `borg --rsh` are the
+`RUSTC_WRAPPER` shape and should recurse. Needs a mechanism on the wrapper spec, since `valued` is
+today just a list of names.
+
+Found 2026-07-27 while reviewing the env-assignment work.
+
+## Follow-up: remaining JVM code-supplying flags (deliberately denied)
+
+`-cp`/`-classpath`/`--class-path` are DONE — gated at the executor locus on `JDK_JAVA_OPTIONS`, so
+they agree with the `CLASSPATH` entry. Measured: they are launcher options, accepted only there;
+`JAVA_TOOL_OPTIONS='-cp …'` is `Unrecognized option` and the JVM refuses to start.
+
+Still denied, each on purpose rather than by omission:
+
+- `-Xbootclasspath/a:<path>` — no environment twin admits it, so there is no inconsistency driving
+  it, and the bootstrap loader is a higher-privilege position than the app classpath. Adding it
+  would be widening the allowlist speculatively. It is also colon-joined, and `Sep` carries only
+  `equals` and `space` today, so adding the flag means adding the variant (and a test) with it.
+- `--module-path=<path>` / `--upgrade-module-path=<path>` — same: no env twin, so nothing to
+  reconcile. `sep = "equals"` already exists if a real need turns up.
+- `-XX:VMOptionsFile=<path>` — stays denied WHATEVER the path. It injects arbitrary VM options, so a
+  worktree file could carry `-javaagent`; that is config injection, the way `GIT_CONFIG_*` is, not a
+  path to gate.
+- `-javaagent:` / `-agentpath:` — instrument every class before main. Arguably worktree-own code by
+  the same argument as `-cp`, but the capability is broader and nothing forces the question yet.
 
 ## Eleven facet axes have no authored level constraint
 

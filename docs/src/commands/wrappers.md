@@ -5,6 +5,12 @@
 
 - Recursively validates the inner command.
 
+**Examples:**
+
+- `dotenv ls`
+- `dotenv -- ls`
+- `dotenv -f .env.test cat README.md`
+
 ### `env`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation</a></p>
 

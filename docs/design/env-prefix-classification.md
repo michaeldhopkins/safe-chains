@@ -283,18 +283,94 @@ real assembly would execute. `CORECLR_ENABLE_PROFILING` + `CORECLR_PROFILER_PATH
 profiler library) produced no observable signal via `dotnet --info`; enumerated, NOT verified.
 `DOTNET_ADDITIONAL_DEPS` is the same family and unprobed.
 
-### Not probed — toolchain absent on this machine
+### Measured: Java, Go, Lua, Julia, R
 
-Enumerated from documentation; each needs the same marker-file treatment somewhere it is installed.
+These five were first enumerated from documentation and shipped as `measured = false`. The
+toolchains were then installed (OpenJDK 26.0.2, go1.26.5, Lua 5.5.0, Julia 1.12.6, R 4.6.1) and every
+row probed with a marker file. **Every documented claim held**, and one was found to be understated.
 
-| Ecosystem | Variables | Why it matters |
+| Probe | Result |
+| --- | --- |
+| `JAVA_TOOL_OPTIONS='-javaagent:<jar>' java Hello.java` | agent's `premain` ran, marker written |
+| `_JAVA_OPTIONS` / `JDK_JAVA_OPTIONS`, same agent | both ran — all three spellings execute |
+| `JAVA_TOOL_OPTIONS='-Xmx16m -XX:OnOutOfMemoryError=<script>'` | script ran on heap exhaustion |
+| `-XX:+CrashOnOutOfMemoryError -XX:OnError=<script>` | script ran on the fatal error |
+| `CLASSPATH=<dir> java Run` | planted class loaded and ran |
+| `GOFLAGS='-toolexec=<script>' go build` | script invoked in place of the toolchain |
+| `GOFLAGS='-overlay=<json>' go run` | printed the **planted** source, not the file on disk |
+| `GOFLAGS='-modfile=<alt>' go list -m` | reported the planted module name |
+| `LUA_INIT='<lua source>'` and `LUA_INIT=@<file>` | **both** forms executed |
+| `JULIA_LOAD_PATH=<dir>` with a planted module | `using Evil` loaded and ran it |
+| `JULIA_DEPOT_PATH=<dir>` with `config/startup.jl` | ran at startup with **no import at all** |
+| `R_PROFILE_USER=<file> Rscript -e …` | sourced and ran |
+
+Two corrections came out of this:
+
+- **`JULIA_DEPOT_PATH` is stronger than "package depot, from which code is loaded."** The depot
+  *contains* `config/startup.jl`, so pointing it at a directory runs that file unconditionally at
+  interpreter start — no `using`, no import, nothing the script has to do. The entry now says so.
+- **`-XX:+ScavengeBeforeFullGC` is unrecognized on OpenJDK 26** (a ParallelGC-era flag). It is kept:
+  an unrecognized VM option makes the JVM refuse to start, so it cannot become a route to execution,
+  and users on older JDKs still get it. This is the "obsolete entries are fine if they stayed safe"
+  rule in AGENTS.md.
+
+The other 22 allowlisted JVM flags and all 14 allowlisted `GOFLAGS` entries were accepted without
+warning, so the allowlists are neither over- nor under-stated.
+
+Still unprobed, and still `measured = false`: `CORECLR_PROFILER_PATH` and `CORECLR_ENABLE_PROFILING`.
+`dotnet` IS installed — these need a native profiler `.dylib` to observe, which a marker file cannot
+stand in for. Also not yet researched at all: `GOPATH`/`GOPROXY`/`GOTOOLCHAIN`, `LUA_PATH`/`LUA_CPATH`,
+`R_HOME`, and Deno's `DENO_DIR`/`DENO_AUTH_TOKENS` — none of which have entries in `envvars.toml`.
+
+#### The JVM option string: why `-XX:` cannot be a prefix
+
+The obvious way to write the Java allowlist is `-Xm*` plus a blanket `-XX:`, since `-XX` is where the
+GC and JIT tuning lives and that is all anyone sets these variables for. It is wrong. Per the Oracle
+`java` launcher reference, `-XX:OnError=<cmd>` and `-XX:OnOutOfMemoryError=<cmd>` run "a custom
+command or a series of semicolon-separated commands" — **direct command execution wearing the same
+prefix as the harmless flags.** So the tuning flags are listed one at a time, and a `-XX:` invented
+later is denied until someone reads it.
+
+`-D<name>=<value>` is also excluded, against the tuning literature that calls system properties
+harmless. Properties reach security-relevant machinery — `java.rmi.server.codebase` historically
+enabled remote class loading, `jdk.attach.allowAttachSelf` opens self-attach — and sorting the
+harmless ones from the rest is per-property research nobody has done. Allowing `-D` wholesale on the
+strength of "properties are just configuration" would be the global shortcut this project has
+already decided against.
+
+Excluded as code loaders: `-javaagent:`, `-agentlib:`, `-agentpath:`, `-Xbootclasspath/a:`,
+`-cp`/`-classpath`, `--module-path`/`-p`, `--upgrade-module-path`, `@argfile`, `-XX:VMOptionsFile=`,
+`-XX:CompilerDirectivesFile=`.
+
+**The three are NOT one mechanism**, which is the easy assumption and a wrong one. Measured on
+OpenJDK 26.0.2:
+
+| Variable | Read by | `-cp ./lib` |
 | --- | --- | --- |
-| Java | `JAVA_TOOL_OPTIONS`, `_JAVA_OPTIONS`, `JDK_JAVA_OPTIONS`, `CLASSPATH` | `-javaagent:<jar>`, `-agentlib:`, `-agentpath:`, `-Xbootclasspath/a:` load code into EVERY JVM started while set |
-| Go | `GOFLAGS`, `GOPATH`, `GOPROXY`, `GOTOOLCHAIN` | `GOFLAGS='-toolexec=<binary>'` makes the toolchain invoke an arbitrary binary — the direct analogue of `RUSTC_WRAPPER` |
-| Lua | `LUA_INIT`, `LUA_PATH`, `LUA_CPATH` | `LUA_INIT` executes its contents (or `@file`) at interpreter start |
-| R | `R_PROFILE_USER`, `R_HOME` | profile file sourced at startup |
-| Julia | `JULIA_LOAD_PATH`, `JULIA_DEPOT_PATH` | load-path injection |
-| Deno | `DENO_DIR`, `DENO_AUTH_TOKENS` | cache poisoning / credential |
+| `JAVA_TOOL_OPTIONS` | the VM | `Unrecognized option`, JVM refuses to start |
+| `_JAVA_OPTIONS` | the VM | `Unrecognized option`, JVM refuses to start |
+| `JDK_JAVA_OPTIONS` | the **launcher** | loaded and ran a planted class |
+
+So `JDK_JAVA_OPTIONS` is a strict superset: it takes launcher options the other two reject. Their
+`allowed` lists are still kept byte-identical as a deliberate conservative choice — the intersection
+— and a guard fails if a future edit touches one and not the others. `JDK_JAVA_OPTIONS` carries the
+launcher-only path flags on top of that shared list.
+
+#### Go, Lua, Julia
+
+`GOFLAGS` is Go's `RUSTFLAGS`. `-toolexec` invokes an arbitrary program in place of the toolchain,
+`-exec` runs the built binary through one, and `-overlay` maps disk paths to different backing files
+— source substitution before compilation, with no flag that looks like it is loading anything.
+`-ldflags`/`-gcflags` pass through to the linker and compiler and are excluded for the reason
+`RUSTFLAGS`' `-C link-arg` is. Allowed: the test and build selectors (`-v -x -n -count -tags -race
+-mod -short -timeout -run -skip -buildvcs -trimpath -json`).
+
+`LUA_INIT` is `opaque` rather than a path, because it is Lua **source** unless it begins with `@`, in
+which case the remainder is a file to run. One shape cannot express "code or a path depending on the
+first byte", and Lua source is not something this classifier reads, so presence denies in both forms.
+
+`JULIA_LOAD_PATH` and `JULIA_DEPOT_PATH` are ordinary `exec-path`: code is loaded from them, so they
+follow the executor locus — in-worktree allows, `/tmp` and `~` do not.
 
 The pattern across every ecosystem is the same three shapes — run this command, load code from this
 path, or read these interpreter flags — which is why the classification plan does not grow with the
@@ -361,18 +437,147 @@ Now denied, all previously allowed: `RUSTFLAGS='-C linker=…'`, `CARGO_BUILD_RU
 Still allowed: `RUSTFLAGS='-D warnings'`, `-C opt-level=3`, `RUSTDOCFLAGS='-D warnings'`,
 `NODE_OPTIONS='--max-old-space-size=4096'`, `RUBYOPT='-w'`.
 
-`JAVA_TOOL_OPTIONS` and `_JAVA_OPTIONS` are listed with an EMPTY allowlist: no JDK here to probe, so
-nothing is asserted inert and any value falls to approval until someone measures it.
+The JVM trio, `GOFLAGS`, `LUA_INIT` and the Julia paths were added from documentation afterwards and
+later probed — see "Measured: Java, Go, Lua, Julia, R" above, in particular why `-XX:` is not a
+prefix and `-D` is not allowlisted. `JAVA_TOOL_OPTIONS='-Xmx2g'` and `GOFLAGS='-mod=readonly -v'`
+allow; the agent and toolexec vectors deny.
+
+### `starts_with` was the wrong matcher
+
+The first cut matched a token against the allowlist with `starts_with`, which is correct for a value
+that GLUES onto its flag — `-Xmx2g`, `-Dwarnings`, `-verbose:gc` — and wrong for everything else. It
+silently admitted any longer flag that happened to share a listed one's spelling:
+
+    GOFLAGS='-modfile=/tmp/evil.mod' go list ./...      admitted by `-mod`
+    GOFLAGS='-vet=off' go vet ./...                     admitted by `-v`
+
+Neither flag was researched; both were admitted by an accident of naming. `-modfile` names an
+alternate `go.mod`, so it redirects module resolution — and `go list` and `go vet` **are**
+allowlisted, so this was reachable rather than theoretical. Later confirmed on go1.26.5:
+`GOFLAGS='-modfile=<alt>' go list -m` reports the planted module, not the real one.
+
+No mechanical rule separates the two cases. "The character after the match must not be a letter"
+would fix `-mod`/`-modfile` and break rustc's `-D warnings`, which glues a letter for the same
+reason. So the author states it: **an entry is a whole flag unless it ends in `*`.** `-mod` admits
+`-mod` and `-mod=vendor` but not `-modfile=…`; `-Xmx*` admits `-Xmx2g`. Every `*` is a claim that
+nothing else in that tool shares the spelling, which is a thing a reviewer can check.
+
+`every_option_string_entry_obeys_its_own_star` walks the real table and asserts each entry does what
+its spelling says — a starred entry accepts an extension of itself, a bare one rejects it — so a
+future entry is covered without anyone remembering to add a case.
+
+### The duplicate-key incident
+
+Adding `LUA_INIT` a second time (as `opaque`, having already listed it as `exec-path`) made the whole
+`envvars.toml` fail to parse, and **every listed variable denied** — including `-Xmx2g`. Two things
+are worth keeping from that:
+
+- The failure was **fail-closed and loud**: a broken table denies rather than allows, and
+  `the_table_parses_and_covers_the_measured_vectors` fails outright. TOML's duplicate-key rejection
+  is doing real work here; a format that silently took the last definition would have left one
+  variable quietly misclassified instead.
+- It was found by running the BINARY before running the suite. The suite had it. Probe the built
+  binary to confirm behaviour, not to discover it.
+
+### A path-valued flag is gated, not excluded
+
+Review found `-Cincremental` sitting in RUSTFLAGS' `allowed` list. `allowed` matches the flag NAME
+and never looks at the value, so:
+
+    RUSTFLAGS='-Cincremental=/etc/cron.d' cargo build     allowed
+    cargo build --target-dir /etc/x                       denied
+
+— the env twin of a guarded flag, reintroduced inside the file built to close that class.
+
+The first fix was to remove the flag and forbid path-valued entries outright, on the grounds that
+classifying the value would need a path-detector heuristic, which §0 forbids. **That was an
+over-correction and it was wrong.** §0 forbids a *heuristic* detector where unrecognized input is
+safe by omission. Declaring in the TOML that a named flag takes a write path, and routing that value
+through the existing locus rules, is explicit and fail-closed — the opposite of a hidden denylist.
+
+So an option-string entry may now carry `path_flags`, spelled as the registry already spells the
+same idea (`PathFlag` / `PathRole`, roles `read` and `write`):
+
+    path_flags = [{ flag = "-Cincremental", role = "write" }]
+
+The value goes through `write_target_verdict`, so the env spelling and the command-line spelling give
+the same answer: `./target/inc` allows, `/etc/cron.d` denies. `-XX:HeapDumpPath` is declared the same
+way, which is what makes `-XX:+HeapDumpOnOutOfMemoryError` usable without handing out an arbitrary
+write target for a 15MB image of process memory.
+
+Three properties keep it honest, each red-demoed:
+
+- **It opens nothing by itself.** An undeclared flag is still judged by `allowed`, where it is
+  absent, so it denies — with or without a value. `-XX:VMOptionsFile`, `-Cprofile-use` and
+  `-overlay` are unaffected.
+- **A declared flag must not also be in `allowed`.** `allowed` is checked second and matches on the
+  name alone, so a flag in both would reach the ungated branch. A structural test walks the real
+  table and fails if any entry does that.
+- **No value means no gate, so it denies.** `-Cincremental` and `-Cincremental=` are both refused
+  rather than treated as a bare flag.
+
+### An assignment's level, not just its denial
+
+`cst/check.rs::simple_verdict` computed the env verdict, checked it for `Denied`, and threw the
+LEVEL away. So a listed assignment could deny, but never make an otherwise-inert invocation count as
+a write or an execution:
+
+    touch ./x                               DENY at paranoid
+    RUSTFLAGS='-Cincremental=./x' echo hi   ALLOW at paranoid   ← the same worktree write
+    PYTHONPATH=./lib echo hi                ALLOW at reader     ← worktree code on the import path
+
+Fixed by combining the env verdict into `sub_v` rather than special-casing its denial, so every
+return path carries it. The env spelling and the command spelling now classify identically, and the
+guard asserts the LEVEL rather than allow/deny — an allow/deny assertion passes either way, which is
+why the gap survived the first round of tests.
+
+`PYTHONPATH`/`CLASSPATH` land at `developer` rather than `editor`, which is right: putting code where
+an interpreter will import it is an execution capability, not a write.
+
+### The classpath flags: one capability, two spellings
+
+`CLASSPATH` is an `exec-path` entry, so `CLASSPATH=./lib mvn test` allows and `CLASSPATH=/tmp/evil
+mvn test` denies. The flag spelling denied unconditionally:
+
+    CLASSPATH=./lib mvn test                     allowed
+    JDK_JAVA_OPTIONS='-cp ./lib' mvn test        denied     ← same capability
+
+Live rather than theoretical: `mvn test`, `gradle build`, `./gradlew build` and `java -version` all
+auto-approve, and all launch a JVM that reads these variables.
+
+Fixed with a `path_flags` entry at `role = "exec"`, which routes the value through
+`execute_file_verdict` — the same function the `exec-path` shape uses, so the two spellings cannot
+disagree by construction. A classpath is a `:`-separated LIST and is gated element-wise, so
+`-cp ./lib:/tmp/evil` denies on the second entry.
+
+**Only `JDK_JAVA_OPTIONS` carries them**, and that asymmetry is measured, not stylistic: `-cp` is a
+launcher option, so in the VM-read pair it is `Unrecognized option` and the JVM refuses to start.
+Listing it there would have allowed a form that cannot run.
+
+Two separator styles had to be added to express this, and each entry declares its own `sep`, measured
+per flag: `-cp <path>` is space-separated and `-cp=<path>` is rejected, while `--module-path=<path>`
+is the reverse. A space-separated flag will not consume a `-`-prefixed token as its value — `java`
+rejects that outright ("`-cp` requires class path specification"), and swallowing it would take a
+token out of the flag path unvalidated.
+
+Colon-joined flags (`-Xbootclasspath/a:<path>`) exist, but no entry declares one, so that variant is
+deliberately absent rather than written ahead of a use: an unexercised branch in a classifier is a
+branch nothing has ever checked.
 
 ## Remaining
 
-Nothing from the original plan. What is left is coverage rather than mechanism:
+Nothing from the original plan, and the ecosystem sweep is done. What is left is coverage rather than
+mechanism:
 
-- **Unprobed ecosystems** — Java, Go (`GOFLAGS='-toolexec=…'`), Lua (`LUA_INIT`), R, Julia, and the
-  CoreCLR profiler pair. Entries carry `measured = false` where they exist at all; each needs a
-  marker file somewhere the toolchain is installed.
+- **The CoreCLR profiler pair** — `CORECLR_PROFILER_PATH` and `CORECLR_ENABLE_PROFILING` are the
+  only rows still `measured = false`. `dotnet` is installed; what a marker file cannot stand in for
+  is a native profiler `.dylib`, which is what the pair actually loads.
+- **Variables with no entry yet** — `GOPATH`/`GOPROXY`/`GOTOOLCHAIN`, `LUA_PATH`/`LUA_CPATH`,
+  `R_HOME`, `DENO_DIR`/`DENO_AUTH_TOKENS`. These are candidates the sweep named but never researched,
+  so they are ignored like any unlisted name. New research, not validation.
 - **Widening the option-string allowlists** as real usage turns up inert flags that were omitted. A
-  missing entry costs one approval, never a wrong verdict.
+  missing entry costs one approval, never a wrong verdict — which is why erring narrow is right for
+  the rows that were never measured.
 
 ## Original build order
 

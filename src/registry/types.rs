@@ -28,6 +28,11 @@ pub(super) struct TomlCommand {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
+    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`).
+    /// Each one is classified through `envvars.toml`, exactly as the `VAR=value cmd` prefix form is,
+    /// so the two spellings of one capability cannot disagree.
+    #[serde(default)]
+    pub env_assignment_positionals: Option<bool>,
     /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`.
     /// Build panics if any TOML still sets this — see SAMPLE.toml for the
     /// migration guidance. Kept on the deserializer struct so the panic
@@ -631,6 +636,11 @@ pub struct CommandSpec {
     /// by `registry::command_behavior` → `engine::resolve::resolve_behavior`. When present,
     /// the engine classifies this command from its declared facets instead of a Rust resolver.
     pub(super) behavior: Option<BehaviorSpec>,
+    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
+    /// `declare -x`). `dispatch_spec` then classifies each through `envvars::assignment_verdict`
+    /// and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
+    /// `LD_PRELOAD=/tmp/evil.so ls` does.
+    pub(super) env_assignment_positionals: bool,
     pub(super) kind: DispatchKind,
 }
 
