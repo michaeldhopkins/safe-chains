@@ -2,6 +2,16 @@
 name = "dotenv"
 description = "Command wrapper that loads environment variables from .env files before executing a child command. The dotenv process itself is read-only — it reads .env files and injects variables into the child's environment. The safety of the overall invocation depends entirely on the inner command being delegated to. The -f flag controls which .env files are loaded; -o overwrites existing ENV variables, which could alter the behavior of the inner command in subtle ways."
 url = "https://github.com/bkeepers/dotenv"
+examples_safe = ["dotenv ls", "dotenv -- ls", "dotenv -f .env.test cat README.md"]
+examples_denied = ["dotenv -f /tmp/evil.env ls", "dotenv -e /tmp/evil.env ls", "dotenv -f /etc/shadow ls"]
+# `-f`/`-e` name the file whose contents BECOME the child's environment, so an ungated path was
+# arbitrary env injection with the variable names never appearing in the command string —
+# `dotenv -f /tmp/evil.env ls` defeated envvars.toml entirely. Gated at the EXECUTOR locus rather
+# than removed: `.env.test` and `.env.local` are the tool's whole point, and `read`/`write` would
+# admit `/tmp` (see pathgate::Role::Exec). An env file selects the code a process runs.
 [command.wrapper]
 valued = ["-c", "-e", "-f", "-v"]
 separator = "--"
+
+[command.path_gate]
+flags = { "-f" = "exec", "-e" = "exec" }
