@@ -8,6 +8,22 @@ fn write_sep(f: &mut fmt::Formatter<'_>, trailing_op: Option<ListOp>) -> fmt::Re
     Ok(())
 }
 
+fn write_case_arm(f: &mut fmt::Formatter<'_>, arm: &CaseArm) -> fmt::Result {
+    f.write_str(" ")?;
+    for (i, p) in arm.patterns.iter().enumerate() {
+        if i > 0 {
+            f.write_str("|")?;
+        }
+        write!(f, "{p}")?;
+    }
+    f.write_str(") ")?;
+    // `Script`'s Display terminates a trailing `Semi` itself, and `;;` is a token rather than a
+    // separator, so it is written detached: `write_body` here would render `a;` + `;;` = `a;;;`,
+    // which is not the same tree.
+    write!(f, "{}", arm.body)?;
+    f.write_str(" ;;")
+}
+
 fn write_redirs(f: &mut fmt::Formatter<'_>, redirs: &[Redir]) -> fmt::Result {
     for r in redirs {
         write!(f, " {r}")?;
@@ -83,14 +99,23 @@ impl fmt::Display for Cmd {
                 }
                 Ok(())
             }
+            // `Script`'s Display already terminates a trailing `Semi` statement, so `write_sep`
+            // supplies the `;` only when it is missing. Appending one unconditionally emitted
+            // `{ echo hi;; }`, which re-parsed as the same tree only while `;;` meant nothing.
             Cmd::BraceGroup { body, redirs } => {
-                write!(f, "{{ {body}; }}")?;
+                write!(f, "{{ {body}")?;
+                write_sep(f, body.0.last().and_then(|s| s.op))?;
+                f.write_str(" }")?;
                 for r in redirs {
                     write!(f, " {r}")?;
                 }
                 Ok(())
             }
-            Cmd::FunctionDef { name, body } => write!(f, "{name}() {{ {body}; }}"),
+            Cmd::FunctionDef { name, body } => {
+                write!(f, "{name}() {{ {body}")?;
+                write_sep(f, body.0.last().and_then(|s| s.op))?;
+                f.write_str(" }")
+            }
             Cmd::For { var, items, body, redirs } => {
                 write!(f, "for {var}")?;
                 if !items.is_empty() {
@@ -138,6 +163,14 @@ impl fmt::Display for Cmd {
                     write_body(f, eb)?;
                 }
                 f.write_str(" fi")?;
+                write_redirs(f, redirs)
+            }
+            Cmd::Case { subject, arms, redirs } => {
+                write!(f, "case {subject} in")?;
+                for arm in arms {
+                    write_case_arm(f, arm)?;
+                }
+                f.write_str(" esac")?;
                 write_redirs(f, redirs)
             }
             Cmd::DoubleBracket { words, redirs } => {
@@ -218,6 +251,10 @@ impl fmt::Display for Redir {
             Redir::Read { fd, target } => {
                 if *fd != 0 { write!(f, "{fd}")?; }
                 write!(f, "< {target}")
+            }
+            Redir::ReadWrite { fd, target } => {
+                if *fd != 0 { write!(f, "{fd}")?; }
+                write!(f, "<> {target}")
             }
             Redir::HereStr(w) => write!(f, "<<< {w}"),
             Redir::HereDoc { delimiter, strip_tabs } => {
