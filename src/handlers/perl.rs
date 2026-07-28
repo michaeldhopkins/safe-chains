@@ -414,37 +414,37 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
             i += 2;
             continue;
         }
-        // `-i` takes an OPTIONAL glued suffix (`-i.bak`), so it always ends its cluster. Note this
-        // before `-e` handling: `-pi -e` and `-pie` are the same request spelled two ways.
-        if let Some(at) = flags.find('i') {
-            scan.in_place = true;
-            // Everything after `i` is the backup suffix, not more flags — unless the cluster is
-            // `…i…e`, which perl reads as suffix `…e`, so no code follows either way.
-            if flags[..at].ends_with('e') || flags[..at].ends_with('E') {
-                // `-ei` — code came first and the `i` is inside that cluster's suffix position.
-                return None;
-            }
-            if flags.ends_with('e') || flags.ends_with('E') {
-                // Ambiguous spelling (`-ie`): perl treats `e` as part of the suffix. Not modeled.
-                return None;
-            }
-            i += 1;
-            continue;
-        }
-        if flags.ends_with('e') || flags.ends_with('E') {
-            has_code = true;
-            match tokens.get(i + 1) {
-                Some(code) => {
-                    if !perl_code_is_safe(code) {
-                        code_all_safe = false;
+        // Scan the cluster LEFT TO RIGHT, because both `-e` and `-i` swallow the rest of it and
+        // which one wins is decided by which comes first. `-eprint` is `-e` with the code `print`;
+        // `-i.bake` is `-i` with the backup suffix `.bake`; `-pie` is `-p -i` with the suffix `e`,
+        // which is why it carries no code and cannot be an in-place edit of an inspected one-liner.
+        // Reading the cluster as a set instead made `-i.bake` unparseable and `-eprint` opaque.
+        let mut consumed_next = false;
+        for (at, c) in flags.char_indices() {
+            match c {
+                'e' | 'E' => {
+                    has_code = true;
+                    let glued = &flags[at + 1..];
+                    let code = if glued.is_empty() {
+                        consumed_next = true;
+                        tokens.get(i + 1).cloned()
+                    } else {
+                        Some(Token::from_raw(glued.to_string()))
+                    };
+                    match code {
+                        Some(code) if perl_code_is_safe(&code) => {}
+                        _ => code_all_safe = false,
                     }
+                    break;
                 }
-                None => code_all_safe = false,
+                'i' => {
+                    scan.in_place = true;
+                    break;
+                }
+                _ => {}
             }
-            i += 2;
-            continue;
         }
-        i += 1;
+        i += 1 + usize::from(consumed_next);
     }
     if has_code && code_all_safe {
         scan.code = PerlCode::Inspectable;
@@ -509,6 +509,15 @@ mod tests {
         perl_inplace_worktree: "perl -i -pe 's/foo/bar/' file.txt",
         perl_inplace_backup_worktree: "perl -i.bak -pe 's/foo/bar/' file.txt",
         perl_inplace_pi_worktree: "perl -pi -e 's/foo/bar/' ./app/x.rb",
+        // `-i` swallows the REST of its cluster as the backup suffix, so a suffix that happens to
+        // contain an `e` is still just a suffix. Reading the cluster as a set of letters instead
+        // made this unparseable.
+        perl_inplace_suffix_containing_e: "perl -i.bake -pe 's/foo/bar/' file.txt",
+        perl_inplace_suffix_orig: "perl -i.orig -pe 's/foo/bar/' file.txt",
+        // `-e` likewise swallows the rest of its cluster, so glued code is the same request as
+        // separated code and must classify the same way.
+        perl_glued_code: "perl -eprint file.txt",
+        perl_glued_code_with_p: "perl -peprint file.txt",
     }
 
     denied! {
@@ -518,6 +527,10 @@ mod tests {
         perl_inplace_home_denied: "perl -i.bak -pe 's/foo/bar/' ~/.bashrc",
         perl_read_secret_denied: "perl -pe 's/foo/bar/' ~/.ssh/id_rsa",
         perl_read_system_denied: "perl -ne 'print' /etc/shadow",
+        // Glued code goes through the same identifier gate as separated code.
+        perl_glued_code_unsafe_denied: "perl -esystem(\"rm\") file.txt",
+        // `-pie` is `-p -i` with the backup SUFFIX `e`, not `-p -i -e`. So it carries no
+        // inspectable one-liner at all, and the token after it is a file rather than code.
         perl_pie_inplace_denied: "perl -pie 's/foo/bar/' file.txt",
         perl_system_denied: "perl -e 'system(\"rm -rf /\")'",
         perl_exec_denied: "perl -e 'exec(\"bad\")'",

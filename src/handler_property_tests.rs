@@ -348,6 +348,13 @@ const DECLARED_SUB_CASES: &[&str] = &[
     "OUT=$(fd d {p}); cat \"$OUT/x\"",
     "OUT=$(fd d {p}); echo hi > \"$OUT/x\"",
     "OUT=$(fd d {p}); cat < \"$OUT/x\"",
+    // A path-GATED output flag. `pathgate` decides whether a value is an operand worth gating, and
+    // it asked `is_unpinnable` — which a declared substitution stopped being, so the value skipped
+    // the gate entirely and `asciidoctor -o $(fd a /etc)` shipped an ungated write. That is the
+    // SSH-key-injection class the 1.0 review closed, briefly reopened for tagged substitutions.
+    "asciidoctor -o $(fd a {p}) in.adoc",
+    "dot -o $(fd a {p}) g.dot",
+    "gs -o $(fd a {p}) in.ps",
 ];
 
 // Suffixes appended to a BOUNDED substitution. Descending stays inside the tagged locus, but
