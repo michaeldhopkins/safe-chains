@@ -311,7 +311,7 @@ fn strip_inert_string_text(code: &str) -> String {
     String::from_utf8(out).unwrap_or_default()
 }
 
-fn perl_code_is_safe(token: &Token) -> bool {
+pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
     let no_strings = strip_inert_string_text(token.as_str());
     if no_strings.contains('`') {
         return false;
@@ -348,20 +348,64 @@ fn perl_code_is_safe(token: &Token) -> bool {
     true
 }
 
-pub fn is_safe_perl(tokens: &[Token]) -> bool {
+/// What a `perl` invocation asks for, once its flag grammar is walked: whether every `-e`/`-E`
+/// one-liner passed the identifier gate, whether `-i` turns the operands into in-place rewrites,
+/// and which operands are the FILES. The engine (`resolve_perl`) gates those files by locus; this
+/// scan only reports them, because "which token is a file" is perl-grammar knowledge and "may this
+/// path be read/written" is engine knowledge.
+pub(crate) struct PerlScan {
+    /// Where the code came from and whether it could be read.
+    pub code: PerlCode,
+    /// `-i[SUFFIX]` — the file operands are rewritten in place rather than read.
+    pub in_place: bool,
+    /// Operands left after the flag walk. With `-e` these are input files; without it the first
+    /// would be a SCRIPT file, which [`PerlCode::Opaque`] already refuses.
+    pub files: Vec<String>,
+}
+
+/// What perl was asked to run.
+#[derive(PartialEq, Eq)]
+pub(crate) enum PerlCode {
+    /// `--version` / `--help` and friends — reports on perl itself, running nothing.
+    None,
+    /// A `-e`/`-E` one-liner was present AND every one passed [`perl_code_is_safe`].
+    Inspectable,
+    /// No readable one-liner: either the code is a script FILE operand, or it used identifiers
+    /// outside the modeled vocabulary. Both are arbitrary execution.
+    Opaque,
+}
+
+/// Walk `perl`'s flag grammar. `None` when a token shape isn't modeled, so the caller worst-cases
+/// rather than guessing which operands were files.
+pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
+    let mut scan = PerlScan { code: PerlCode::Opaque, in_place: false, files: Vec::new() };
     if tokens.len() == 2 && tokens[1].is_one_of(&["--version", "--help", "-v", "-V"]) {
-        return true;
+        scan.code = PerlCode::None;
+        return Some(scan);
     }
 
     let mut has_code = false;
+    let mut code_all_safe = true;
+    let mut flags_done = false;
     let mut i = 1;
     while i < tokens.len() {
         let token = &tokens[i];
-        if token.starts_with("--") || !token.starts_with("-") {
+        if flags_done || !token.starts_with("-") || *token == "-" {
+            scan.files.push(token.as_str().to_string());
+            i += 1;
+            continue;
+        }
+        if *token == "--" {
+            flags_done = true;
+            i += 1;
+            continue;
+        }
+        if token.starts_with("--") {
             i += 1;
             continue;
         }
         let flags = &token.as_str()[1..];
+        // `-Mmodule` / `-Idir` glued, and their split forms, consume a value rather than an operand.
         if flags.len() > 1 && matches!(flags.as_bytes()[0], b'M' | b'm' | b'I') {
             i += 1;
             continue;
@@ -370,24 +414,58 @@ pub fn is_safe_perl(tokens: &[Token]) -> bool {
             i += 2;
             continue;
         }
-        if flags.ends_with('e') || flags.ends_with('E') {
-            let before_e = &flags[..flags.len() - 1];
-            if before_e.contains('i') {
-                return false;
+        // `-i` takes an OPTIONAL glued suffix (`-i.bak`), so it always ends its cluster. Note this
+        // before `-e` handling: `-pi -e` and `-pie` are the same request spelled two ways.
+        if let Some(at) = flags.find('i') {
+            scan.in_place = true;
+            // Everything after `i` is the backup suffix, not more flags — unless the cluster is
+            // `…i…e`, which perl reads as suffix `…e`, so no code follows either way.
+            if flags[..at].ends_with('e') || flags[..at].ends_with('E') {
+                // `-ei` — code came first and the `i` is inside that cluster's suffix position.
+                return None;
             }
+            if flags.ends_with('e') || flags.ends_with('E') {
+                // Ambiguous spelling (`-ie`): perl treats `e` as part of the suffix. Not modeled.
+                return None;
+            }
+            i += 1;
+            continue;
+        }
+        if flags.ends_with('e') || flags.ends_with('E') {
             has_code = true;
-            if tokens.get(i + 1).is_some_and(|t| !perl_code_is_safe(t)) {
-                return false;
+            match tokens.get(i + 1) {
+                Some(code) => {
+                    if !perl_code_is_safe(code) {
+                        code_all_safe = false;
+                    }
+                }
+                None => code_all_safe = false,
             }
             i += 2;
             continue;
         }
-        if flags.contains('i') {
-            return false;
-        }
         i += 1;
     }
-    has_code
+    if has_code && code_all_safe {
+        scan.code = PerlCode::Inspectable;
+    }
+    Some(scan)
+}
+
+/// The LEGACY verdict, kept at its historical answer: code-gated, `-i` refused outright, operands
+/// unexamined. It is dead for `perl` itself — `commands/perl/perl.toml` declares a behavior, so
+/// `engine_verdict(…).unwrap_or(legacy)` always resolves through the hook — and it stays frozen
+/// precisely so the never-looser corpus gate has a stable floor to compare the engine against.
+/// The engine is the one that reads operands, because it is the layer that owns locus.
+pub fn is_safe_perl(tokens: &[Token]) -> bool {
+    match scan_perl(tokens) {
+        Some(scan) => match scan.code {
+            PerlCode::None => true,
+            PerlCode::Inspectable => !scan.in_place,
+            PerlCode::Opaque => false,
+        },
+        None => false,
+    }
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -397,16 +475,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     }
 }
 
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![
-        CommandDoc::handler("perl",
-            "https://perldoc.perl.org/perl",
-            "Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. \
-             Requires -e/-E flag. Code is validated against a safe identifier allowlist.",
-            "text"),
-    ]
-}
 
 #[cfg(test)]
 mod tests {
@@ -438,13 +506,18 @@ mod tests {
         perl_match_after_unless: "perl -ne 'print unless /^#/' file.txt",
         perl_module_flag: "perl -MList::Util -e 'print length \"test\"'",
         perl_include_flag: "perl -Ilib -e 'print \"ok\\n\"'",
+        perl_inplace_worktree: "perl -i -pe 's/foo/bar/' file.txt",
+        perl_inplace_backup_worktree: "perl -i.bak -pe 's/foo/bar/' file.txt",
+        perl_inplace_pi_worktree: "perl -pi -e 's/foo/bar/' ./app/x.rb",
     }
 
     denied! {
         perl_script_file_denied: "perl script.pl",
         perl_no_e_flag_denied: "perl -n file.txt",
-        perl_inplace_denied: "perl -i -pe 's/foo/bar/' file.txt",
-        perl_inplace_backup_denied: "perl -i.bak -pe 's/foo/bar/' file.txt",
+        perl_inplace_system_denied: "perl -i -pe 's/foo/bar/' /etc/hosts",
+        perl_inplace_home_denied: "perl -i.bak -pe 's/foo/bar/' ~/.bashrc",
+        perl_read_secret_denied: "perl -pe 's/foo/bar/' ~/.ssh/id_rsa",
+        perl_read_system_denied: "perl -ne 'print' /etc/shadow",
         perl_pie_inplace_denied: "perl -pie 's/foo/bar/' file.txt",
         perl_system_denied: "perl -e 'system(\"rm -rf /\")'",
         perl_exec_denied: "perl -e 'exec(\"bad\")'",

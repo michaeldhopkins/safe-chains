@@ -10964,9 +10964,16 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `perl`
-<p class="cmd-url"><a href="https://perldoc.perl.org/perl">https://perldoc.perl.org/perl</a></p>
+<p class="cmd-url"><a href="https://perldoc.perl.org/perlrun">https://perldoc.perl.org/perlrun</a></p>
 
-- Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E flag. Code is validated against a safe identifier allowlist.
+- Edits its file operands in place within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `perl -pe s/foo/bar/ ./file.txt`
+- `perl -ne print ./file.txt`
+- `perl --version`
 
 ### `pest`
 <p class="cmd-url"><a href="https://pestphp.com/docs/cli-api-reference">https://pestphp.com/docs/cli-api-reference</a></p>

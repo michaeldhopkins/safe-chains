@@ -1,0 +1,32 @@
+[[command]]
+name = "perl"
+description = "General-purpose interpreter. Everything about its risk profile is decided by two independent things: WHAT CODE it runs and WHICH FILES that code is pointed at. The code arrives either as a `-e`/`-E` one-liner on the command line (inspectable) or as a script file operand (opaque — `perl deploy.pl` can do anything perl can, which is `system`, `exec`, backticks/`qx`, `open` for write, socket I/O, and `eval` of a string built at runtime). An inspectable one-liner restricted to pure built-ins — the `s///`/`tr///` transforms, `print`, `split`/`join`, the numeric and list functions — performs no I/O of its own beyond the implicit read-and-print loop that `-n`/`-p` wrap around it. The file operands are the other half: under `-n`/`-p` perl opens each operand and streams it, so the operands are ordinary content reads regardless of how inert the one-liner is (`perl -pe 's/a/b/' ~/.ssh/id_rsa` is a credential read, not a no-op). `-i[SUFFIX]` flips that loop from read-and-print to READ-AND-REWRITE: each operand is replaced by the transformed text, in place, with the original kept only if a backup suffix was given — an unrecoverable overwrite otherwise. `-M`/`-m` load a module at startup, whose import block is module-supplied code, and `-I` only alters where modules are found. No network of its own; `-w`/`-l`/`-a`/`-F`/`-0` change diagnostics or record splitting and not what is touched. Perl 5 is famously frozen — the option grammar has been stable for two decades and is not a moving target."
+url = "https://perldoc.perl.org/perlrun"
+researched_version = "Perl 5.42 (perlrun)"
+level = "SafeRead"
+bare = false
+# The engine hook is authoritative and gates by locus. perl ALSO has a legacy `is_safe_perl`
+# handler (a coarser classifier on the dead legacy path) which refuses `-i` outright and never
+# looks at operands; the engine is smarter on both counts — it admits an in-place edit of a
+# worktree file and refuses a read of `/etc/shadow`. Examples here stay within cases both agree
+# on, so the never-looser corpus gate holds; the `perl -i` worktree case is covered by the
+# `perl_i_worktree_vs_system` resolver test.
+examples_safe = [
+  "perl -pe s/foo/bar/ ./file.txt",
+  "perl -ne print ./file.txt",
+  "perl --version",
+]
+examples_denied = [
+  "perl -pe s/a/b/ /etc/shadow",
+  "perl -pi -e s/a/b/ /etc/hosts",
+  "perl ./script.pl",
+]
+
+# perl's `-e` argument is arbitrary code that must be scanned against an identifier allowlist, and
+# `-i` retroactively reclassifies operands the flag walk has already passed — irreducible token
+# logic a declaration can't express, so a thin `perl` hook does it. The hook reports which operands
+# are files and whether they are read or rewritten; locus gating stays in the engine.
+[command.behavior]
+operation = "mutate"
+positionals = "none"
+hook = "perl"

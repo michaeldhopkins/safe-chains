@@ -435,11 +435,6 @@ Aliases: `gpaste`
 - Allowed valued flags: -d, --delimiters
 - Bare invocation allowed
 
-### `perl`
-<p class="cmd-url"><a href="https://perldoc.perl.org/perl">https://perldoc.perl.org/perl</a></p>
-
-- Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E flag. Code is validated against a safe identifier allowlist.
-
 ### `pr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation</a></p>
 

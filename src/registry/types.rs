@@ -731,6 +731,7 @@ pub(crate) enum BehaviorHook {
     Dd,
     Tar,
     Sed,
+    Perl,
 }
 
 /// Runtime form of a `[[command.sub.flag]]` — the engine-relevant part of an escalating flag: its
