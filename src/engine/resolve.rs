@@ -25,7 +25,7 @@ use capability::{
 };
 use flags::{walk_positionals, walk_value};
 use locus::{classify_locus, read_locus, write_locus};
-pub(crate) use locus::{hidden_peer_reach, is_unpinnable, reads_secret};
+pub(crate) use locus::{hidden_peer_reach, is_substitution_value, is_unpinnable, reads_secret};
 
 /// For `for VAR in ITEMS; do …$VAR…`, the representatives to bind `$VAR` to in the body: the
 /// worst-READ item and the worst-WRITE item of the list (they can differ, so a read and a
@@ -1274,17 +1274,22 @@ fn candidate_roots<'a>(args: &'a [String], valued: &[String]) -> Vec<&'a str> {
         if std::mem::take(&mut skip_value) {
             continue;
         }
-        if let Some(rest) = a.strip_prefix('-') {
-            if !rest.is_empty() && !a.contains('=') && valued.iter().any(|v| v == a) {
-                skip_value = true;
+        if a.starts_with('-') {
+            // `valued` declares "this flag's value is NOT a path" (a count, a separator), so its
+            // value is skipped in BOTH spellings. Handling only the separated form denied
+            // `head --lines=5` while `head -n 5` passed — the same operation, two spellings.
+            let (head, glued_value) = match a.split_once('=') {
+                Some((h, v)) => (h, Some(v)),
+                None => (a.as_str(), None),
+            };
+            if valued.iter().any(|v| v == head) {
+                skip_value = glued_value.is_none();
+                continue;
             }
-            // A value glued to the flag still names a root. After `=` the whole value counts —
+            // Otherwise a glued value can still name a root. After `=` the whole value counts —
             // keying on `/` alone missed `--search-path=~`, the same blind spot as the shape test.
             // Without an `=`, a glued short value starts at the first path-ish character.
-            let glued = a
-                .split_once('=')
-                .map(|(_, v)| v)
-                .or_else(|| a.find(['/', '~']).map(|i| &a[i..]));
+            let glued = glued_value.or_else(|| a.find(['/', '~']).map(|i| &a[i..]));
             if let Some(v) = glued.filter(|v| !v.is_empty()) {
                 roots.push(v);
             }
@@ -2138,6 +2143,49 @@ mod tests {
             }
         }
         assert!(probed > 0, "no command declares [command.output] — the guard is vacuous");
+    }
+
+    /// Enumerated over the REGISTRY: a flag declared `valued` on `[command.output]` means "this
+    /// value is not a path", and BOTH spellings must agree. Handling only the separated form denied
+    /// `head --lines=5` while `head -n 5` passed — one operation, two spellings, two answers, which
+    /// is the false-deny class the flag-form equivalence guards exist to kill.
+    #[test]
+    fn output_valued_flags_agree_across_spellings() {
+        use crate::registry::types::OutputLocus;
+        let mut checked = 0usize;
+        for name in crate::registry::toml_command_names() {
+            let Some(spec) = crate::registry::command_output_locus(name) else { continue };
+            for flag in &spec.valued {
+                // An invalidating flag voids the claim by design, so it is not a spelling case.
+                if spec.invalidated_by.contains(flag) {
+                    continue;
+                }
+                // Two things are load-bearing about the probe shape, and without EITHER the
+                // guard silently passes a broken skip:
+                //  - a PRODUCER stage, because a lone `stdin` command walks back off the end of
+                //    the pipeline and reports `None` whether or not it saw a file operand, hiding
+                //    the difference entirely;
+                //  - a TRAILING OPERAND, because a glued form that over-skips (swallowing the
+                //    next argument as if it were a separated value) is indistinguishable from a
+                //    correct one until there is a next argument to lose.
+                // Together they expose the over-skip as a file operand going missing — which for
+                // a `stdin` claim is a fail-open: contents get classified as if they were paths.
+                let producer = match spec.locus_from {
+                    OutputLocus::Stdin => "fd a app/ | ",
+                    _ => "",
+                };
+                for tail in ["", " /etc/hosts"] {
+                    let separated = sub_locus(&format!("{producer}{name} {flag} 5{tail}"));
+                    let glued = sub_locus(&format!("{producer}{name} {flag}=5{tail}"));
+                    assert_eq!(
+                        separated, glued,
+                        "{name} {flag} (tail {tail:?}): separated {separated:?}, glued {glued:?}",
+                    );
+                    checked += 1;
+                }
+            }
+        }
+        assert!(checked > 0, "no output claim declares a valued flag — the guard is vacuous");
     }
 
     /// The default is unpinnable. A command that has NOT been researched for its output locus must
