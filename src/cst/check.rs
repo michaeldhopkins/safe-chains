@@ -529,6 +529,20 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
         Cmd::DoubleBracket { words, redirs } => {
             words_sub_verdict(words).combine(redirect_verdict(redirs))
         }
+        // Which arm runs is decided at runtime, so — exactly as for `If` — every arm body counts
+        // and the case is only as safe as its worst arm. The patterns are matched, never executed,
+        // but the SUBJECT is expanded, so its substitutions are gated like any other word.
+        Cmd::Case { subject, arms, redirs } => {
+            let redir_v = redirect_verdict(redirs);
+            if let Verdict::Denied = redir_v {
+                return Verdict::Denied;
+            }
+            let mut v = redir_v.combine(word_sub_verdict(subject));
+            for arm in arms {
+                v = v.combine(words_sub_verdict(&arm.patterns)).combine(script_verdict(&arm.body));
+            }
+            v
+        }
         // Defining a function has NO effect — Inert regardless of the body. The body's safety is
         // evaluated only when the function is CALLED (resolved in `simple_verdict`), so an UNCALLED
         // definition never denies on its body.
@@ -779,7 +793,8 @@ fn is_bare_literal_char(c: char) -> bool {
 
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
     redirs.iter().all(|r| match r {
-        Redir::Write { target, .. } => target.eval() == "/dev/null",
+        // `<>` opens for writing too, so it faces the same `/dev/null`-only bar as `>`.
+        Redir::Write { target, .. } | Redir::ReadWrite { target, .. } => target.eval() == "/dev/null",
         Redir::Read { .. }
         | Redir::HereStr(_)
         | Redir::HereDoc { .. }
@@ -797,31 +812,49 @@ fn is_safe_write_target(path: &str) -> bool {
     crate::engine::resolve::write_target_verdict(path).is_allowed()
 }
 
+/// The verdict for a redirect that OPENS `target` for writing.
+fn write_face(target: &Word) -> Verdict {
+    let t = target.eval();
+    if t == "/dev/null" {
+        // Inert: no side effect, no promotion.
+        Verdict::Allowed(SafetyLevel::Inert)
+    } else if is_safe_write_target(&t) {
+        Verdict::Allowed(SafetyLevel::SafeWrite)
+    } else {
+        Verdict::Denied
+    }
+}
+
+/// The verdict for a redirect that OPENS `target` for reading. Gates the SOURCE by its read locus,
+/// like an operand read: `cat < /etc/shadow` must deny just as `cat /etc/shadow` does. A
+/// substitution-derived source names an unknowable file → fail-closed to Denied.
+fn read_face(target: &Word) -> Verdict {
+    if has_substitution(target) {
+        Verdict::Denied
+    } else {
+        crate::engine::resolve::read_content_verdict(&target.eval())
+    }
+}
+
 pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
     let mut level = Verdict::Allowed(SafetyLevel::Inert);
     for r in redirs {
         match r {
             Redir::Write { target, .. } => {
                 level = level.combine(word_sub_verdict(target));
-                let t = target.eval();
-                if t == "/dev/null" {
-                    // Inert: no side effect, no promotion.
-                } else if is_safe_write_target(&t) {
-                    level = level.combine(Verdict::Allowed(SafetyLevel::SafeWrite));
-                } else {
-                    level = level.combine(Verdict::Denied);
-                }
+                level = level.combine(write_face(target));
             }
             Redir::Read { target, .. } => {
                 level = level.combine(word_sub_verdict(target));
-                // Gate the SOURCE by its read locus, like an operand read: `cat < /etc/shadow`
-                // must deny just as `cat /etc/shadow` does. A substitution-derived source names
-                // an unknowable file → fail-closed to Denied.
-                if has_substitution(target) {
-                    level = level.combine(Verdict::Denied);
-                } else {
-                    level = level.combine(crate::engine::resolve::read_content_verdict(&target.eval()));
-                }
+                level = level.combine(read_face(target));
+            }
+            // `<>` opens the target BOTH ways, so it takes both gates. Taking only one would let
+            // the other face through: the write gate alone misses reading a secret, and the read
+            // gate alone misses overwriting a file that is merely readable.
+            Redir::ReadWrite { target, .. } => {
+                level = level.combine(word_sub_verdict(target));
+                level = level.combine(write_face(target));
+                level = level.combine(read_face(target));
             }
             Redir::HereStr(word) => {
                 level = level.combine(word_sub_verdict(word));
@@ -935,6 +968,19 @@ mod tests {
         assign_subshell: "(x=1)",
         assign_in_subshell_with_cmd: "(x=1; ls)",
 
+        case_single_arm: "case x in x) echo a;; esac",
+        case_alternation: "case $x in a|b) ls;; *) echo n;; esac",
+        case_paren_prefixed_pattern: "case \"$1\" in (start) ls;; (stop) pwd;; esac",
+        case_last_arm_without_terminator: "case x in x) echo a; esac",
+        case_empty_body: "case x in x) ;; esac",
+        case_multiline: "case \"$1\" in\n  start)\n    ls -la\n    ;;\n  *)\n    echo usage\n    ;;\nesac",
+        case_in_substitution: "echo $(case A in *) echo a;; esac)",
+        case_nested_in_if: "if true; then case x in a) ls;; esac; fi",
+        clobber_redirect: "ls >| out.txt",
+        clobber_redirect_fd: "ls 1>| out.txt",
+        readwrite_redirect: "ls <> f.txt",
+        readwrite_redirect_devnull: "ls <> /dev/null",
+
         subshell_echo: "(echo hello)",
         subshell_ls: "(ls)",
         subshell_chain: "(ls && echo done)",
@@ -1017,6 +1063,18 @@ mod tests {
         curl_post: "curl -X POST https://example.com",
         node_foreign_app: "node /tmp/app.js",
 
+
+        // A case is only as safe as its worst arm — which arm runs is a runtime decision.
+        case_unsafe_only_arm: "case x in *) rm -rf /;; esac",
+        case_unsafe_second_arm: "case x in a) ls;; b) rm -rf /;; esac",
+        case_unsafe_last_arm_no_terminator: "case x in a) ls;; b) rm -rf / ; esac",
+        case_arm_reads_secret: "case x in a) cat /etc/shadow;; esac",
+        case_unsafe_in_substitution: "echo $(case A in *) rm -rf /;; esac)",
+        // `>|` is an overwrite; `<>` opens for BOTH read and write, so each face is gated.
+        clobber_redirect_system: "ls >| /etc/hosts",
+        clobber_redirect_ssh_key: "ls >| ~/.ssh/authorized_keys",
+        readwrite_redirect_system: "ls <> /etc/hosts",
+        readwrite_redirect_secret: "ls <> ~/.ssh/id_rsa",
 
         redirect_target_subst_rm: "echo hello > $(rm -rf /)",
         redirect_target_backtick_rm: "echo hello > `rm -rf /`",

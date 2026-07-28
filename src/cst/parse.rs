@@ -107,7 +107,17 @@ fn ws(input: &mut &str) -> ModalResult<()> {
 
 fn sep(input: &mut &str) -> ModalResult<()> {
     loop {
-        take_while(0.., [' ', '\t', ';', '\n']).void().parse_next(input)?;
+        // Consume separators one at a time so a `;;` stays intact: it terminates a case arm, and
+        // eating its first `;` here would let the arm's body run on into the next arm's pattern.
+        while let Some(c) = input.chars().next() {
+            if input.starts_with(";;") {
+                return Ok(());
+            }
+            if !matches!(c, ' ' | '\t' | ';' | '\n') {
+                break;
+            }
+            *input = &input[c.len_utf8()..];
+        }
         if input.starts_with('#') {
             comment(input)?;
         } else {
@@ -132,11 +142,14 @@ fn eat_keyword(input: &mut &str, kw: &str) -> ModalResult<()> {
     Ok(())
 }
 
-const SCRIPT_STOPS: &[&str] = &["do", "done", "elif", "else", "fi", "then"];
+const SCRIPT_STOPS: &[&str] = &["do", "done", "elif", "else", "esac", "fi", "then"];
 
 fn at_script_stop(input: &str) -> bool {
     input.starts_with(')')
         || input.starts_with('}')
+        // `;;` ends a case arm's body. Without this a body script would run on into the next arm's
+        // pattern and read it as a command.
+        || input.starts_with(";;")
         || SCRIPT_STOPS.iter().any(|kw| {
             input.starts_with(kw)
                 && !input
@@ -191,7 +204,9 @@ fn list_op(input: &mut &str) -> ModalResult<ListOp> {
         "&&".value(ListOp::And),
         "||".value(ListOp::Or),
         '\n'.value(ListOp::Semi),
-        ';'.value(ListOp::Semi),
+        // `;;` is a case-arm terminator, not a statement separator — matching the first `;` here
+        // would let the body swallow it and continue into the next arm.
+        (';', not(';')).value(ListOp::Semi),
         ('&', not('>')).value(ListOp::Amp),
     ))
     .parse_next(input)
@@ -227,6 +242,7 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
         while_cmd,
         until_cmd,
         if_cmd,
+        case_cmd,
         double_bracket_cmd,
         function_def,
         simple_cmd.map(Cmd::Simple),
@@ -409,10 +425,24 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
             src: fd.unwrap_or(1),
             dst,
         }),
+        // `>|` (POSIX 2.7.2) overrides `noclobber`. The override is about whether the shell
+        // REFUSES an existing file, not about what lands there, so it classifies as the plain
+        // overwrite it is. Must precede `>` or the `|` reads as a pipe into an empty command.
+        preceded(">|", (ws, word)).map(move |(_, target)| Redir::Write {
+            fd: fd.unwrap_or(1),
+            target,
+            append: false,
+        }),
         preceded('>', (ws, word)).map(move |(_, target)| Redir::Write {
             fd: fd.unwrap_or(1),
             target,
             append: false,
+        }),
+        // `<>` (POSIX 2.7.5) opens the target for BOTH reading and writing. Must precede `<`,
+        // which would otherwise match and leave `>` to start a bogus second redirect.
+        preceded("<>", (ws, word)).map(move |(_, target)| Redir::ReadWrite {
+            fd: fd.unwrap_or(0),
+            target,
         }),
         preceded('<', (ws, word)).map(move |(_, target)| Redir::Read {
             fd: fd.unwrap_or(0),
@@ -643,7 +673,12 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     // there. `<<` covers `<<`, `<<-`, and `<<<`; the latter (herestring) is inline and would be fine,
     // but taking the fallback for it is merely slower, never wrong.
     let interior = &body[..rel];
-    if !interior.contains("<<") {
+    // `case` has the same hazard as a heredoc: the `)` closing an arm's pattern is not a nesting
+    // paren, so `find_sub_close` stops at `$(case A in *)` and the truncated interior still parses
+    // "clean" — as a simple command whose words are `case A in *`. A wrong-but-clean fast parse is
+    // worse than a slow one, so hand any interior mentioning `case` to the grammar fallback. The
+    // test is deliberately the bare substring: a literal word `case` merely costs a slower path.
+    if !interior.contains("<<") && !interior.contains("case") {
         let mut fast: &str = interior;
         if let Ok(parsed) = script.parse_next(&mut fast) {
             ws.parse_next(&mut fast)?;
@@ -855,6 +890,59 @@ fn cond_then_body(input: &mut &str) -> ModalResult<Branch> {
     sep.parse_next(input)?;
     let body = script.parse_next(input)?;
     Ok(Branch { cond, body })
+}
+
+/// `case WORD in [(] PATTERN [| PATTERN]… ) BODY ;; … esac` (POSIX 2.9.4.3).
+fn case_cmd(input: &mut &str) -> ModalResult<Cmd> {
+    eat_keyword(input, "case")?;
+    ws.parse_next(input)?;
+    let subject = word.parse_next(input)?;
+    blank.parse_next(input)?;
+    eat_keyword(input, "in")?;
+
+    let mut arms = Vec::new();
+    loop {
+        blank.parse_next(input)?;
+        if eat_keyword(input, "esac").is_ok() {
+            break;
+        }
+        let arm = case_arm.parse_next(input)?;
+        let had_terminator = opt(";;").parse_next(input)?.is_some();
+        arms.push(arm);
+        // POSIX lets the LAST arm omit `;;`, and only the last. Anything else here is malformed —
+        // backtrack rather than guess, so a shape we don't understand fails closed.
+        if !had_terminator {
+            blank.parse_next(input)?;
+            eat_keyword(input, "esac")?;
+            break;
+        }
+    }
+
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::Case { subject, arms, redirs })
+}
+
+fn case_arm(input: &mut &str) -> ModalResult<CaseArm> {
+    blank.parse_next(input)?;
+    opt('(').parse_next(input)?;
+    let mut patterns = Vec::new();
+    loop {
+        ws.parse_next(input)?;
+        patterns.push(word.parse_next(input)?);
+        ws.parse_next(input)?;
+        if opt('|').parse_next(input)?.is_none() {
+            break;
+        }
+    }
+    ')'.parse_next(input)?;
+    let body = script.parse_next(input)?;
+    blank.parse_next(input)?;
+    Ok(CaseArm { patterns, body })
+}
+
+/// Whitespace including newlines, but NOT `;` — used where a `;;` must stay visible to the caller.
+fn blank(input: &mut &str) -> ModalResult<()> {
+    take_while(0.., [' ', '\t', '\n']).void().parse_next(input)
 }
 
 fn double_bracket_cmd(input: &mut &str) -> ModalResult<Cmd> {

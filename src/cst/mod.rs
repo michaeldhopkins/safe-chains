@@ -65,6 +65,14 @@ pub enum Cmd {
         words: Vec<Word>,
         redirs: Vec<Redir>,
     },
+    /// `case WORD in PATTERN) BODY ;; … esac` (POSIX 2.9.4.3). Which arm runs depends on a value
+    /// resolved at runtime, so — like [`Cmd::If`] — every arm body is classified and the command
+    /// is only as safe as its worst arm.
+    Case {
+        subject: Word,
+        arms: Vec<CaseArm>,
+        redirs: Vec<Redir>,
+    },
     /// `name() { body }` (or `function name { body }`). Defining a function has NO effect — it is
     /// classified Inert. The body's safety matters only when the function is CALLED (resolved in
     /// `check`), so it is stored, not flattened.
@@ -77,6 +85,14 @@ pub enum Cmd {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Branch {
     pub cond: Script,
+    pub body: Script,
+}
+
+/// One `PATTERN|PATTERN) BODY ;;` arm of a [`Cmd::Case`]. The patterns are glob words matched
+/// against the subject; they are never executed, so only `body` carries risk.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CaseArm {
+    pub patterns: Vec<Word>,
     pub body: Script,
 }
 
@@ -110,6 +126,13 @@ pub enum Redir {
         append: bool,
     },
     Read {
+        fd: u32,
+        target: Word,
+    },
+    /// `<>` — the target is opened for reading AND writing (POSIX 2.7.5), so it is gated on both
+    /// faces. Neither alone is sufficient: the write gate would miss the disclosure of reading a
+    /// secret, and the read gate would miss the overwrite.
+    ReadWrite {
         fd: u32,
         target: Word,
     },
@@ -245,6 +268,17 @@ impl Cmd {
                 words: words.iter().map(|w| w.normalize()).collect(),
                 redirs: normalize_redirs(redirs),
             },
+            Cmd::Case { subject, arms, redirs } => Cmd::Case {
+                subject: subject.normalize(),
+                arms: arms
+                    .iter()
+                    .map(|a| CaseArm {
+                        patterns: a.patterns.iter().map(|w| w.normalize()).collect(),
+                        body: a.body.normalize_as_body(),
+                    })
+                    .collect(),
+                redirs: normalize_redirs(redirs),
+            },
             Cmd::FunctionDef { name, body } => Cmd::FunctionDef {
                 name: name.clone(),
                 body: body.normalize_as_body(),
@@ -277,6 +311,10 @@ fn normalize_redirs(redirs: &[Redir]) -> Vec<Redir> {
                 append: *append,
             },
             Redir::Read { fd, target } => Redir::Read {
+                fd: *fd,
+                target: target.normalize(),
+            },
+            Redir::ReadWrite { fd, target } => Redir::ReadWrite {
                 fd: *fd,
                 target: target.normalize(),
             },

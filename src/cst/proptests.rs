@@ -132,10 +132,26 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
         ).prop_map(|(branches, else_body)| Cmd::If { branches, else_body, redirs: vec![] }),
         1 => prop::collection::vec(arb_word(0), 1..4)
             .prop_map(|words| Cmd::DoubleBracket { words, redirs: vec![] }),
+        1 => (
+            arb_word(0),
+            prop::collection::vec(
+                (prop::collection::vec(arb_case_pattern(), 1..3), arb_script(depth - 1))
+                    .prop_map(|(patterns, body)| CaseArm { patterns, body }),
+                1..3,
+            ),
+        ).prop_map(|(subject, arms)| Cmd::Case { subject, arms, redirs: vec![] }),
         1 => (arb_func_name(), arb_script(depth - 1))
             .prop_map(|(name, body)| Cmd::FunctionDef { name, body }),
     ]
     .boxed()
+}
+
+/// A case-arm pattern: a glob word carrying no `|` or `)`, which are the arm's own delimiters and
+/// would re-parse as structure rather than as part of the pattern.
+fn arb_case_pattern() -> impl Strategy<Value = Word> {
+    prop::string::string_regex("[a-z*?][a-z0-9*?.-]{0,5}")
+        .expect("valid regex")
+        .prop_map(|s| Word(vec![WordPart::Lit(s)]))
 }
 
 /// A function name: an identifier that isn't a shell keyword (so `for(){…}` isn't generated, keeping
