@@ -77,6 +77,14 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     // A bound `for`-loop variable expands to its list's representative item first (its read or
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
     let expanded = crate::pathctx::expand_vars(path, want_write);
+    // A substitution whose inner command declared what its stdout can name carries that locus in
+    // its sentinel. Read it AFTER expansion — a bound variable (`OUT=$(fd d ~); cat "$OUT/x"`)
+    // still spells the tag `$OUT` here, so checking first saw no tag, fell through, and then
+    // classified the expanded sentinel as an ordinary relative path. It must still come BEFORE the
+    // `$`/unpinnable guard, which is the answer for an UNDECLARED substitution, not a declared one.
+    if let Some(tagged) = tagged_substitution_locus(&expanded) {
+        return tagged;
+    }
     let resolved = crate::pathctx::resolve(&expanded);
     let canonical = canonicalize(&resolved);
     if is_unpinnable(&canonical) {
@@ -175,6 +183,27 @@ pub(crate) fn hidden_peer_reach(path: &str) -> bool {
 pub(crate) fn is_unpinnable(path: &str) -> bool {
     path.contains('$') || path.contains("__SAFE_CHAINS_CMDSUB__") || is_parent_escape(path)
 }
+
+/// The locus carried by a BOUNDED substitution sentinel, if `path` holds one.
+///
+/// The sentinel usually appears as a path COMPONENT (`$(fd … app/)/lib`), so the trailing text is
+/// checked too: descending (`/lib`) cannot leave the tagged locus, but climbing can
+/// (`$(pwd)/../..`), and a second unpinnable piece re-opens the hole the tag closed. Either one
+/// collapses the whole path back to `machine`.
+fn tagged_substitution_locus(path: &str) -> Option<LocalLocus> {
+    use crate::engine::facet::FacetTerm;
+    let at = path.find(crate::cst::eval::TAGGED_PREFIX)?;
+    let after = &path[at + crate::cst::eval::TAGGED_PREFIX.len()..];
+    let (term, rest) = after.split_once("__")?;
+    let locus = LocalLocus::from_term(&term.to_lowercase().replace('_', "-"))?;
+    let residue = format!("{}{rest}", &path[..at]);
+    if residue.contains('$') || residue.contains(UNPINNABLE_MARK) || is_parent_escape(&residue) {
+        return Some(LocalLocus::Machine);
+    }
+    Some(locus)
+}
+
+const UNPINNABLE_MARK: &str = "__SAFE_CHAINS_CMDSUB__";
 
 fn is_parent_escape(path: &str) -> bool {
     path == ".." || path.starts_with("../") || path.contains("/../") || path.ends_with("/..")

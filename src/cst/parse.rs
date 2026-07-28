@@ -1276,7 +1276,13 @@ mod tests {
     #[test]
     fn cmd_substitution() { assert!(matches!(&simple(&p("echo $(ls)")).words[1].0[0], WordPart::CmdSub(_))); }
     #[test]
-    fn backtick_substitution() { assert_eq!(simple(&p("ls `pwd`")).words[1].eval(), "__SAFE_CHAINS_CMDSUB__"); }
+    fn backtick_substitution() {
+        // `pwd` declares `[command.output]`, so its value is bounded rather than worst-cased —
+        // and a backtick must reach that the same way `$( … )` does.
+        assert_eq!(simple(&p("ls `pwd`")).words[1].eval(), "__SAFE_CHAINS_CMDSUB_WORKTREE__");
+        // An undeclared inner command keeps the opaque sentinel.
+        assert_eq!(simple(&p("ls `hostname`")).words[1].eval(), "__SAFE_CHAINS_CMDSUB__");
+    }
     #[test]
     fn nested_substitution() {
         if let WordPart::CmdSub(inner) = &simple(&p("echo $(echo $(ls))")).words[1].0[0] {

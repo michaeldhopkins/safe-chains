@@ -771,6 +771,55 @@
 # moment to fill it in, not before.
 
 # ─────────────────────────────────────────────────────────────────────
+# [command.output] — what this command's STDOUT can NAME
+# ─────────────────────────────────────────────────────────────────────
+#
+# Decides whether a `$( … )` around this command yields a BOUNDED path
+# or the unknowable default. Absent (the normal case) means unpinnable:
+# the substitution worst-cases to `machine` and denies, as it always has.
+#
+# This is NOT "is the command safe to run" — the two have nothing to do
+# with each other, and conflating them is a fail-open. `echo` is as safe
+# as a command gets and `$(echo /etc/shadow)` still names a credential
+# file. Declare this ONLY when you have researched what the command
+# prints, and never for a command whose output is caller-supplied text.
+#
+# locus_from:
+#   "operands" — output names paths beneath the command's own path
+#                operands; locus = the worst read locus over them, or
+#                the cwd when there are none. (fd, find)
+#   "cwd"      — output names the working directory. (pwd)
+#   "stdin"    — output is a SUBSET of what it was piped, so it carries
+#                the previous pipeline stage's locus. Applies only while
+#                the command has no file operand — `head f.txt` prints
+#                that file's CONTENTS, which are not paths.
+#                (head, tail, sort, uniq)
+#
+# invalidated_by: flags under which the claim does NOT hold, because
+#   they change what stdout CONTAINS. Research these per command —
+#   an omitted one is a fail-open. `fd -x cat {}` prints file bodies,
+#   `fd -l` prints `ls -l` rows, `uniq -c` prefixes counts, `sort -o`
+#   diverts stdout to a file. Always include the usage-printing flags
+#   (`--help`/`--version`), whose text is not a path either.
+#
+# valued: this command's value-taking flags, so a VALUE is not counted
+#   as an operand (`head -n 5` takes no file). Needed by "stdin", whose
+#   whole test is "does it have a file operand"; harmless to omit under
+#   "operands", where an over-counted root only ever denies.
+#
+# Every remaining argument counts as a root — deliberately, including
+# ones that carry no `/` or `.`. Do NOT reintroduce a path-shape test
+# here: a bare `~` passes none of them, and skipping it let
+# `cat $(fd pat ~)` sweep the home directory while reporting worktree.
+#
+# [command.output]
+# locus_from = "operands"
+# valued = ["--max-depth", "--exclude"]
+# invalidated_by = ["-x", "--exec", "-l", "--format", "--help", "--version"]
+#
+# See docs/design/behavioral-taxonomy-substitution-locus.md.
+
+# ─────────────────────────────────────────────────────────────────────
 # EVAL_SAFE — tag invocations safe to substitute inside `eval "$(...)"`
 # ─────────────────────────────────────────────────────────────────────
 #

@@ -306,7 +306,75 @@ const OUT_OF_WORKSPACE: &[&str] = &[
     "../../escape.txt",
 ];
 
+/// The roots a DECLARED substitution is probed on: everything above, plus a bare `~`.
+///
+/// `~` is separated out rather than added to `OUT_OF_WORKSPACE` because adding it there fails the
+/// pre-existing operand guards on `rg`, `awk` and `mlr`, which admit a bare `~` operand today
+/// (`rg x ~` searches `$HOME` and prints matching content). That is a real but SEPARATE over-
+/// approval, untouched by the substitution work — see TODO.md. Here `~` is load-bearing: it is
+/// exactly the spelling that slipped the path-shape test in `candidate_roots`.
+const DECLARED_SUB_ROOTS: &[&str] = &[
+    "/etc/hosts",
+    "/etc/passwd",
+    "/root/.bashrc",
+    "~/.ssh/id_rsa",
+    "~/.bashrc",
+    "~",
+    "../outside.txt",
+];
+
+// A substitution whose inner command DECLARED its output locus (`[command.output]`) evaluates to a
+// bounded sentinel rather than the worst-cased one. These templates put that sentinel in an operand
+// and a redirect slot; `{p}` is the inner command's search ROOT, so a hot root must still deny —
+// admitting the value must never admit more than reading the root itself would.
+const DECLARED_SUB_CASES: &[&str] = &[
+    "cat $(fd pat {p})",
+    "cat $(fd -a pat {p})",
+    "cat $(fd pat {p} | head -1)",
+    "cat $(fd pat {p} | sort | head -1)",
+    "grep -rn foo $(fd pat {p})",
+    "cat `fd pat {p}`",
+    "echo hi > $(fd pat {p})",
+    "cat $(fd --search-path={p} pat)",
+    "cat $(fd --base-directory {p} pat)",
+    "cat $(fd -E{p} pat)",
+    // Nesting composes — a tagged sentinel classifies like the path it stands for — so a hot root
+    // must still surface through an inner substitution rather than being laundered by the outer.
+    "cat $(fd pat $(fd d {p}))",
+    "cat $(fd a $(fd b $(fd c {p})))",
+    // Bound to a variable first. This is its own path through the classifier — the value is
+    // frozen at assignment and re-expanded at use — and it leaked once: the tag was read before
+    // expansion, so `$OUT` still hid it and the expanded sentinel classified as a relative path.
+    "OUT=$(fd d {p}); cat \"$OUT/x\"",
+    "OUT=$(fd d {p}); echo hi > \"$OUT/x\"",
+    "OUT=$(fd d {p}); cat < \"$OUT/x\"",
+];
+
+// Suffixes appended to a BOUNDED substitution. Descending stays inside the tagged locus, but
+// climbing leaves it, and a second unpinnable piece re-opens the hole the tag closed — so these
+// must all deny even though `$(pwd)` itself is worktree.
+const TAGGED_RESIDUE_CASES: &[&str] = &[
+    "cat $(pwd)/../../../etc/shadow",
+    "cat $(pwd)/../../..",
+    "cat $(pwd)/$SECRET",
+    "cat $(pwd)/$(hostname)",
+    "echo hi > $(pwd)/../../../etc/hosts",
+];
+
 proptest! {
+    /// A declared output-locus claim must never admit a substitution whose root is out of the
+    /// workspace. This is the fail-open the feature risks: the value is admitted at the tagged
+    /// rung, so an under-counted root would auto-approve a read of `/etc`.
+    #[test]
+    fn declared_substitutions_deny_out_of_workspace_roots(
+        template in proptest::sample::select(DECLARED_SUB_CASES.to_vec()),
+        target in proptest::sample::select(DECLARED_SUB_ROOTS.to_vec()),
+    ) {
+        let line = template.replace("{p}", target);
+        let allowed = command_verdict_in(&line, workspace()).is_allowed();
+        prop_assert!(!allowed, "substitution over an out-of-workspace root was allowed: `{}`", line);
+    }
+
     /// A write-enabling flag or script command must never allow a write outside the workspace.
     #[test]
     fn write_mode_flags_deny_out_of_workspace_targets(
@@ -316,6 +384,16 @@ proptest! {
         let line = template.replace("{p}", target);
         let allowed = command_verdict_in(&line, workspace()).is_allowed();
         prop_assert!(!allowed, "out-of-workspace write was allowed: `{}`", line);
+    }
+
+    /// Text appended to a BOUNDED substitution cannot escape its tag. Descending is fine; climbing
+    /// out or splicing in a second unpinnable piece must collapse back to a denial.
+    #[test]
+    fn tagged_substitution_residue_cannot_escape(
+        line in proptest::sample::select(TAGGED_RESIDUE_CASES.to_vec()),
+    ) {
+        let allowed = command_verdict_in(line, workspace()).is_allowed();
+        prop_assert!(!allowed, "residue escaped the substitution's tag: `{}`", line);
     }
 
     /// A read command naming a file inside an argument must not disclose an out-of-workspace file.

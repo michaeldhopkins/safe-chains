@@ -27,3 +27,12 @@ standalone = [
     "--verbose", "--version", "--zero-terminated",
 ]
 valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+
+# The suffix counterpart of head's rule: `… | tail -1` emits a SUBSET of the piped lines and
+# carries that stage's locus, and only while filtering a stream (a file operand makes it print
+# contents, which the `stdin` rule refuses). `-f`/`-F` keep reading appended lines from the same
+# stream, so they do not change what the output IS.
+[command.output]
+locus_from = "stdin"
+valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+invalidated_by = ["--help", "--version", "-h", "-V"]

@@ -25,3 +25,13 @@ standalone = [
     "--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated",
 ]
 valued = ["-c", "-n", "--bytes", "--lines"]
+
+# `… | head -1` is the common way to take one path off a producer, so head's stdout is a SUBSET of
+# what it was piped and carries that stage's locus. Only while it is filtering a stream: given a
+# file operand it prints that file's CONTENTS instead, which the `stdin` rule already refuses.
+# `-c` truncates to bytes, which can only shorten a path (never climb out of its root), so it does
+# not invalidate. `--help`/`--version` print usage rather than input lines.
+[command.output]
+locus_from = "stdin"
+valued = ["-c", "-n", "--bytes", "--lines"]
+invalidated_by = ["--help", "--version", "-h", "-V"]

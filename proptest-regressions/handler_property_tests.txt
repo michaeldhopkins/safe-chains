@@ -7,3 +7,4 @@
 cc 22a0478940f005b5e829dc642a7c7f848b779a163897899eb59e8295264a5381 # shrinks to entry = ("sed '{c}' f.txt", ["1e id", "e cat /etc/passwd", "s/x/y/e"])
 cc 544ddb53e39951480d76c70e954091f058a8a65999e6c454c470ab14beb49645 # shrinks to combo = ("sed", "-e", "--expression", "file.txt", "s/a/b/")
 cc bd3bfe6657afb35305c514d11c59d55ec1ad78255783865e0364f1fd909cd1d8 # shrinks to cmd = "magick", args = []
+cc d1e95758c27a60ea480b4b7a4243bdd0cbed1caaef487d507c7d7c3e87980c82 # shrinks to template = "cat $(fd --search-path={p} pat)", target = "/etc/hosts"

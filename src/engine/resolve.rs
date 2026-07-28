@@ -1162,6 +1162,139 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     Profile::of(caps)
 }
 
+/// The locus of the paths a `$( … )` can PRODUCE, or `None` when nothing bounds them.
+///
+/// This is a different question from "is the inner command safe to run", and conflating the two is
+/// a fail-open: `echo` is inert and `$(echo /etc/shadow)` still names a credential file. So a
+/// command only gets an answer here if it has declared one (`[command.output]`); everything else
+/// stays unpinnable, exactly as before. See docs/design/behavioral-taxonomy-substitution-locus.md.
+pub(crate) fn substitution_locus(script: &crate::cst::Script) -> Option<LocalLocus> {
+    // A pipeline's VALUE is its last stage's stdout; the earlier stages feed it and are verdicted
+    // separately as usual. Pass-through filters (`… | head -1`) emit a SUBSET of what they were
+    // given, so walking back over them reaches the stage that actually produced the paths.
+    let [stmt] = script.0.as_slice() else { return None };
+    let cmds = &stmt.pipeline.commands;
+    let mut idx = cmds.len().checked_sub(1)?;
+    loop {
+        match stage_output_locus(cmds.get(idx)?)? {
+            StageOutput::Locus(l) => return Some(l),
+            StageOutput::PassThrough => idx = idx.checked_sub(1)?,
+        }
+    }
+}
+
+enum StageOutput {
+    Locus(LocalLocus),
+    /// This stage only filters; ask the stage before it.
+    PassThrough,
+}
+
+fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
+    let crate::cst::Cmd::Simple(simple) = cmd else { return None };
+    let words: Vec<String> = simple.words.iter().map(crate::cst::Word::eval).collect();
+    use crate::registry::types::OutputLocus;
+    let (name, args) = words.split_first()?;
+    // A resolvable name reached from a non-standard path (`./fd`) may not be the real tool, so it
+    // gets no output-locus claim — the same spoof rule `resolve` applies to the command itself.
+    if !trusted_command_path(name) {
+        return None;
+    }
+    let token = Token::from_raw(name.clone());
+    let canonical = crate::registry::canonical_name(token.command_name());
+    let rule = crate::registry::command_output_locus(canonical)?;
+    // A flag that changes what stdout CONTAINS (`fd -x cat {}` prints file bodies, `fd -l` prints
+    // `ls -l` rows) voids the claim — the output is no longer a path at all.
+    if args.iter().any(|a| flag_present(a, &rule.invalidated_by)) {
+        return None;
+    }
+
+    match rule.locus_from {
+        // The cwd is the workspace root by construction (the harness passes it), so `$(pwd)` is a
+        // worktree path. `pathctx` is what decides whether the cwd itself escaped the root.
+        OutputLocus::Cwd => Some(StageOutput::Locus(read_locus("."))),
+        // Output descends the command's own path operands, so it is bounded by their worst read
+        // locus. `fd x app/ lib/` → worktree; `fd x /` → machine.
+        OutputLocus::Operands => {
+            // ANY unpinnable argument voids the claim, checked before the path-shape filter and
+            // over every argument rather than the ones that look like roots. A `$VAR` root carries
+            // no `/`, so shape-filtering first read `fd pat $SECRET` as having no root at all and
+            // reported worktree — while the command searches wherever `$SECRET` points.
+            if args.iter().any(|a| is_unpinnable(a)) {
+                return None;
+            }
+            let roots = candidate_roots(args, &rule.valued);
+            // No path operand means the command searches `.` (`fd pattern`), which is the cwd.
+            let worst = roots.iter().map(|r| read_locus(r)).max().unwrap_or_else(|| read_locus("."));
+            Some(StageOutput::Locus(worst))
+        }
+        // Only a filter when it is filtering: given a file operand it prints that file's CONTENTS,
+        // which are caller-controlled text and no kind of path.
+        OutputLocus::Stdin => {
+            if candidate_roots(args, &rule.valued).is_empty() {
+                Some(StageOutput::PassThrough)
+            } else {
+                None
+            }
+        }
+    }
+}
+
+/// Whether `arg` is one of `flags`, in any spelling that carries a value (`-x`, `--exec`,
+/// `--exec=…`). A short flag may also be CLUSTERED (`-lx`), so single-char forms are matched
+/// against the cluster's letters.
+fn flag_present(arg: &str, flags: &[String]) -> bool {
+    let head = arg.split('=').next().unwrap_or(arg);
+    flags.iter().any(|f| {
+        if head == f {
+            return true;
+        }
+        match (f.strip_prefix('-'), arg.strip_prefix('-')) {
+            (Some(letter), Some(cluster)) if f.len() == 2 && !arg.starts_with("--") => {
+                cluster.contains(letter)
+            }
+            _ => false,
+        }
+    })
+}
+
+/// Every argument that could name a search ROOT, over-approximated on purpose.
+///
+/// Under-counting here is a fail-OPEN — a missed root means a lower locus than the command actually
+/// reaches — so EVERY non-flag argument counts, plus any path glued to a flag
+/// (`--search-path=/etc`, `-E/etc/x`). Over-counting only ever raises the locus, which denies.
+///
+/// It deliberately does NOT ask whether an argument looks like a path. That test (`looks_like_path`)
+/// keys on a `/` or a `.`, so a bare `~` failed it and `cat $(fd pat ~)` auto-approved a sweep of
+/// the home directory as though it were worktree-local. A shape heuristic cannot be the last word
+/// on a question whose wrong answer opens a hole.
+fn candidate_roots<'a>(args: &'a [String], valued: &[String]) -> Vec<&'a str> {
+    let mut roots = Vec::new();
+    let mut skip_value = false;
+    for a in args {
+        if std::mem::take(&mut skip_value) {
+            continue;
+        }
+        if let Some(rest) = a.strip_prefix('-') {
+            if !rest.is_empty() && !a.contains('=') && valued.iter().any(|v| v == a) {
+                skip_value = true;
+            }
+            // A value glued to the flag still names a root. After `=` the whole value counts —
+            // keying on `/` alone missed `--search-path=~`, the same blind spot as the shape test.
+            // Without an `=`, a glued short value starts at the first path-ish character.
+            let glued = a
+                .split_once('=')
+                .map(|(_, v)| v)
+                .or_else(|| a.find(['/', '~']).map(|i| &a[i..]));
+            if let Some(v) = glued.filter(|v| !v.is_empty()) {
+                roots.push(v);
+            }
+            continue;
+        }
+        roots.push(a.as_str());
+    }
+    roots
+}
+
 fn resolve_perl(tokens: &[Token]) -> Profile {
     // perl's `-e` one-liner is arbitrary code, so the identifier gate in `handlers::perl` decides
     // whether the CODE is inert. What that gate cannot do is judge the OPERANDS: it never looked at
@@ -1930,6 +2063,96 @@ mod tests {
     /// second was missing — `perl -pe 's/a/b/' /etc/shadow` auto-approved, because the handler
     /// judged only the code — so the read cases below are the regression, and the `-i` cases are
     /// the capability the missing gate had been standing in for.
+    /// Parse `line` and ask what a `$( … )` around it would evaluate to.
+    #[cfg(test)]
+    fn sub_locus(line: &str) -> Option<LocalLocus> {
+        let script = crate::cst::parse(line).expect("parses");
+        substitution_locus(&script)
+    }
+
+    /// Fail-closed, enumerated over the REGISTRY: every `[command.output]` claim is probed on a HOT
+    /// root, and must never report a locus below what reading that root reports. This is the
+    /// fail-open the whole feature risks — a missed search root means the substitution is admitted
+    /// at worktree while the command actually reaches `/etc`. The `match` is EXHAUSTIVE, so a new
+    /// `OutputLocus` variant must state how it is probed or the build breaks.
+    ///
+    /// Red→green: drop the glued-value branch from `candidate_roots` and
+    /// `fd --search-path=/etc x` stops reporting machine.
+    #[test]
+    fn every_output_claim_is_bounded_by_its_roots() {
+        use crate::registry::types::OutputLocus;
+
+        let mut probed = 0usize;
+        for name in crate::registry::toml_command_names() {
+            let Some(spec) = crate::registry::command_output_locus(name) else { continue };
+            probed += 1;
+            match spec.locus_from {
+                OutputLocus::Operands => {
+                    // `~` is here as a named case, not just inside HOT_PATHS, because it is the
+                    // spelling that actually got through: it carries neither `/` nor `.`, so the
+                    // path-SHAPE test skipped it and `cat $(fd pat ~)` swept the home directory
+                    // while reporting worktree.
+                    let hot_roots: Vec<&str> =
+                        HOT_PATHS.iter().copied().chain(["~", "~/.ssh"]).collect();
+                    for hot in hot_roots {
+                        // Every spelling a root can arrive in: bare operand, separated flag value,
+                        // glued long value, glued short value. Missing any is the fail-open.
+                        for line in [
+                            format!("{name} pat {hot}"),
+                            format!("{name} --base-directory {hot} pat"),
+                            format!("{name} --search-path={hot} pat"),
+                            format!("{name} -E{hot} pat"),
+                        ] {
+                            let got = sub_locus(&line);
+                            let want = read_locus(hot);
+                            assert!(
+                                got.is_none_or(|l| l >= want),
+                                "`{line}`: reported {got:?}, but reading {hot} is {want:?}",
+                            );
+                        }
+                    }
+                    // A substitution in a root slot is unknowable — no claim.
+                    assert_eq!(sub_locus(&format!("{name} pat $(hostname)")), None, "{name}: nested sub");
+                }
+                // Its output is the cwd, which takes no root operand; the guard that matters is
+                // that it does not somehow report BELOW the cwd's own locus.
+                OutputLocus::Cwd => {
+                    assert_eq!(sub_locus(name), Some(read_locus(".")), "{name}: bare");
+                }
+                // A filter only filters while it has no file operand — given one it prints that
+                // file's CONTENTS, which are not paths and must void the claim.
+                OutputLocus::Stdin => {
+                    for hot in HOT_PATHS {
+                        assert_eq!(
+                            sub_locus(&format!("{name} {hot}")),
+                            None,
+                            "{name}: a file operand makes it print contents, not paths",
+                        );
+                    }
+                }
+            }
+            // Every flag the command declares as invalidating must actually void the claim.
+            for flag in &spec.invalidated_by {
+                let line = format!("{name} {flag} pat");
+                assert_eq!(sub_locus(&line), None, "`{line}`: {flag} is declared invalidating");
+            }
+        }
+        assert!(probed > 0, "no command declares [command.output] — the guard is vacuous");
+    }
+
+    /// The default is unpinnable. A command that has NOT been researched for its output locus must
+    /// keep the opaque sentinel, so the feature can only ever widen through a deliberate
+    /// declaration — never by a command happening to look read-only.
+    #[test]
+    fn undeclared_commands_get_no_output_claim() {
+        // `echo` is the load-bearing case: as safe as a command gets, and its output is whatever
+        // the caller typed. If it ever acquires a claim, `cat $(echo /etc/shadow)` opens up.
+        for line in ["echo /etc/shadow", "hostname", "cat ./f", "ls", "git rev-parse --show-toplevel"] {
+            assert_eq!(sub_locus(line), None, "`{line}` must have no output claim");
+        }
+        assert!(!crate::is_safe_command("cat $(echo /etc/shadow)"), "echo must not bound its output");
+    }
+
     #[test]
     fn perl_i_worktree_vs_system() {
         use crate::engine::bridge::project;
