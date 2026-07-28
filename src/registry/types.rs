@@ -168,6 +168,36 @@ pub(super) struct TomlCommand {
     /// fallback the engine already overrides.
     #[serde(default)]
     pub behavior: Option<TomlBehavior>,
+    /// What this command's STDOUT can name (`[command.output]`) — the axis that decides whether a
+    /// `$(…)` around it yields a bounded path or an unknowable one. Absent (the default) means
+    /// unpinnable: the substitution worst-cases exactly as it always has. See
+    /// docs/design/behavioral-taxonomy-substitution-locus.md.
+    #[serde(default)]
+    pub output: Option<TomlOutput>,
+}
+
+/// `[command.output]` — a researched claim about where this command's stdout can POINT. It is a
+/// separate axis from every facet: how safe a command is to RUN says nothing about what its output
+/// names (`echo` is inert and `$(echo /etc/shadow)` names a credential file), so this is declared
+/// per command or not at all.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct TomlOutput {
+    /// `operands` — output names paths beneath the command's own path operands (`fd`, `git
+    /// ls-files`); `cwd` — output names the working directory (`pwd`).
+    pub locus_from: String,
+    /// Flags under which the claim does NOT hold, because they change what stdout CONTAINS.
+    /// `fd -x cat {}` prints file contents rather than paths, and `fd -l` prints `ls -l` rows —
+    /// neither is a path any more, so the locus rule cannot describe them. Any of these present
+    /// makes the substitution unpinnable again.
+    #[serde(default)]
+    pub invalidated_by: Vec<String>,
+    /// Value-taking flags, so their VALUE is not mistaken for an operand (`head -n 5` takes no
+    /// file). Carried here rather than read off the legacy top-level `valued` for the same reason
+    /// `[command.behavior]` carries its own grammar: this claim is researched as a unit, and a
+    /// silently-shared list would let an unrelated edit change what counts as a root.
+    #[serde(default)]
+    pub valued: Vec<String>,
 }
 
 /// A command's declarative facet behavior (`[command.behavior]`). Field values that name a
@@ -636,6 +666,10 @@ pub struct CommandSpec {
     /// by `registry::command_behavior` → `engine::resolve::resolve_behavior`. When present,
     /// the engine classifies this command from its declared facets instead of a Rust resolver.
     pub(super) behavior: Option<BehaviorSpec>,
+    /// Lowered `[command.output]` — read by `registry::command_output_locus` →
+    /// `engine::resolve::substitution_locus`, which decides whether a `$(…)` around this command
+    /// yields a bounded path instead of the unpinnable sentinel.
+    pub(super) output: Option<OutputSpec>,
     /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
     /// `declare -x`). `dispatch_spec` then classifies each through `envvars::assignment_verdict`
     /// and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
@@ -719,6 +753,29 @@ pub(crate) enum ScaleModel {
     Single,
     /// Count, glob, or a recursion flag widen it (`breadth_scale`) — rm/mkdir.
     Breadth,
+}
+
+/// Runtime form of `[command.output]`: how to derive the locus of a command's stdout.
+#[derive(Debug, Clone)]
+pub(crate) struct OutputSpec {
+    pub locus_from: OutputLocus,
+    /// Flags that void the claim (see `TomlOutput::invalidated_by`).
+    pub invalidated_by: Vec<String>,
+    /// Value-taking flags (see `TomlOutput::valued`).
+    pub valued: Vec<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum OutputLocus {
+    /// Beneath the command's own path operands — the worst `read_locus` over them, or the cwd
+    /// when it has none (`fd pattern` with no root searches `.`).
+    Operands,
+    /// The working directory itself (`pwd`).
+    Cwd,
+    /// A subset of what it was piped (`head -1`, `sort`, `uniq`) — so the locus is the PREVIOUS
+    /// pipeline stage's. Only when the command has no path operand: `head f.txt` prints the
+    /// contents of a file rather than filtering a stream, and contents are not paths.
+    Stdin,
 }
 
 /// A named thin resolver hook for irreducible token logic a declaration can't express — a

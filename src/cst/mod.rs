@@ -1,6 +1,6 @@
 pub(crate) mod check;
 mod display;
-mod eval;
+pub(crate) mod eval;
 mod explain;
 mod parse;
 #[cfg(test)]

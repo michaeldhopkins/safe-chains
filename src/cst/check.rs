@@ -241,11 +241,23 @@ fn statement_assignments(pipeline: &Pipeline) -> Vec<(String, String)> {
 /// sentinel — a substitution (`$(…)`), an unbound var, or a reassignment-to-uncertain all fail here.
 fn certain_value(word: &Word) -> String {
     let raw = crate::pathctx::expand_vars(&word.eval(), false).into_owned();
-    if raw.contains('$') || raw.contains("__SAFE_CHAINS_") {
+    // A TAGGED substitution sentinel is certain enough to BIND: it already classifies to a known
+    // locus, so `OUT=$(pwd); … > "$OUT/raw/x"` gates the write at the worktree rather than
+    // fail-closing on a value it can in fact bound. Every other marker stays uncertain.
+    if raw.contains('$') || is_opaque_value(&raw) {
         UNCERTAIN_VALUE.to_string()
     } else {
         raw
     }
+}
+
+/// Whether an evaluated word carries a marker the classifier CANNOT bound: the opaque command
+/// substitution, a process substitution (a `/dev/fd` pipe), or arithmetic. Deliberately not a
+/// `__SAFE_CHAINS_` prefix test, which would also catch the tagged (bounded) substitution.
+pub(crate) fn is_opaque_value(raw: &str) -> bool {
+    ["__SAFE_CHAINS_CMDSUB__", "__SAFE_CHAINS_PROCSUB__", "__SAFE_CHAINS_ARITH__"]
+        .iter()
+        .any(|m| raw.contains(m))
 }
 
 #[cfg(test)]
@@ -829,10 +841,14 @@ fn write_face(target: &Word) -> Verdict {
 /// like an operand read: `cat < /etc/shadow` must deny just as `cat /etc/shadow` does. A
 /// substitution-derived source names an unknowable file → fail-closed to Denied.
 fn read_face(target: &Word) -> Verdict {
-    if has_substitution(target) {
+    let t = target.eval();
+    // Keyed on the EVALUATED value rather than on "is there a substitution part", so a
+    // substitution whose inner command declared its output locus (`< $(pwd)/f`) is gated by that
+    // locus, while an undeclared one still fail-closes on its opaque marker.
+    if is_opaque_value(&t) {
         Verdict::Denied
     } else {
-        crate::engine::resolve::read_content_verdict(&target.eval())
+        crate::engine::resolve::read_content_verdict(&t)
     }
 }
 

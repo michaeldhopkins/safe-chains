@@ -83,6 +83,15 @@ pub(crate) fn command_behavior(cmd: &str) -> Option<&'static crate::registry::ty
         .and_then(|spec| spec.behavior.as_ref())
 }
 
+/// What `cmd`'s stdout can name, when that has been researched and declared (`[command.output]`).
+/// `None` — the default for every command — keeps a `$(cmd …)` unpinnable.
+pub(crate) fn command_output_locus(cmd: &str) -> Option<&'static crate::registry::types::OutputSpec> {
+    CUSTOM_REGISTRY
+        .get(cmd)
+        .or_else(|| TOML_REGISTRY.get(cmd))
+        .and_then(|spec| spec.output.as_ref())
+}
+
 /// The facet archetypes (`archetypes.toml`) the subcommand `tokens` resolve to — the Phase-1
 /// `profile = …` classification plus a capability for every present escalating `[[command.sub.flag]]`
 /// (`git push` → `[vcs-sync]`; `git push --force` → `[vcs-sync, remote-destroy-irreversible]`). The

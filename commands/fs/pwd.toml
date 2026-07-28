@@ -7,3 +7,11 @@ level = "Inert"
 bare = true
 max_positional = 0
 standalone = ["--help", "--version", "-L", "-P", "-V", "-h"]
+
+# pwd's stdout is the working directory itself, so `grep -rn foo $(pwd)` is a worktree read rather
+# than an unknowable one. `-L`/`-P` choose the logical or physical spelling of the SAME directory,
+# so neither widens it. `--help`/`--version` print usage rather than a path; they invalidate the
+# claim so the text is never mistaken for one.
+[command.output]
+locus_from = "cwd"
+invalidated_by = ["--help", "--version", "-h", "-V"]

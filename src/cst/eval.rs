@@ -13,6 +13,10 @@ pub fn eval_word(word: &Word) -> String {
 /// → deny) rather than a DoS.
 const BRACE_EXPANSION_CAP: usize = 256;
 const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
+/// Prefix of the BOUNDED substitution sentinel. Deliberately not a prefix-match of [`UNPINNABLE`]
+/// (`…CMDSUB_WORKTREE__` does not contain `…CMDSUB__`), so the fail-closed guard keyed on the
+/// latter can never fire on a declared substitution, nor vice versa.
+pub(crate) const TAGGED_PREFIX: &str = "__SAFE_CHAINS_CMDSUB_";
 
 /// Expand a word to the literal words bash would produce, chiefly via UNQUOTED brace expansion
 /// (`{/etc/shadow,x}` → two words). Quoted / escaped / substituted parts are fixed (bash does not
@@ -136,6 +140,18 @@ fn split_top_commas(s: &str) -> Vec<String> {
     parts
 }
 
+/// The placeholder a substitution's value evaluates to: the bounded, locus-tagged form when the
+/// inner command declared what its stdout can name, else the opaque worst-cased one.
+fn sub_sentinel(inner: &super::Script) -> String {
+    match crate::engine::resolve::substitution_locus(inner) {
+        Some(locus) => {
+            use crate::engine::facet::FacetTerm;
+            format!("{TAGGED_PREFIX}{}__", locus.as_str().to_uppercase().replace('-', "_"))
+        }
+        None => UNPINNABLE.to_string(),
+    }
+}
+
 fn eval_part(part: &WordPart, out: &mut String) {
     match part {
         WordPart::Lit(s) => out.push_str(s),
@@ -146,9 +162,16 @@ fn eval_part(part: &WordPart, out: &mut String) {
                 eval_part(p, out);
             }
         }
-        // Command substitution / backtick: the output becomes the operand VALUE — an
-        // unknowable path, so the classifier must worst-case it (see locus::is_unpinnable).
-        WordPart::CmdSub(_) | WordPart::Backtick(_) => out.push_str("__SAFE_CHAINS_CMDSUB__"),
+        // Command substitution / backtick: the output becomes the operand VALUE. That value is
+        // unknowable in general, so the default is a sentinel the classifier worst-cases (see
+        // locus::is_unpinnable). When the inner command has DECLARED what its stdout can name
+        // (`[command.output]`), the value is bounded by that locus instead and gets a tagged
+        // sentinel — see docs/design/behavioral-taxonomy-substitution-locus.md.
+        WordPart::CmdSub(inner) => out.push_str(&sub_sentinel(inner)),
+        WordPart::Backtick(raw) => match super::parse(raw) {
+            Some(inner) => out.push_str(&sub_sentinel(&inner)),
+            None => out.push_str(UNPINNABLE),
+        },
         // Process substitution: the operand is a /dev/fd pipe; its safety is the INNER command
         // (checked separately by word_sub_verdict), not an unknowable path — so a distinct
         // placeholder that classifies as an ordinary (worktree) operand.

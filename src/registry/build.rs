@@ -861,6 +861,21 @@ fn assert_fallback_requires_handler(toml: &TomlCommand) {
 /// resolved to its enum here (via `FacetTerm::from_term`); an unknown term PANICS naming the
 /// command, so a typo fails the build (the registry loads in a test) rather than silently
 /// mis-classifying. `None` when the command declares no behavior.
+fn lower_output(name: &str, o: Option<&TomlOutput>) -> Option<OutputSpec> {
+    let o = o?;
+    let locus_from = match o.locus_from.as_str() {
+        "operands" => OutputLocus::Operands,
+        "cwd" => OutputLocus::Cwd,
+        "stdin" => OutputLocus::Stdin,
+        other => panic!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin)"),
+    };
+    Some(OutputSpec {
+        locus_from,
+        invalidated_by: o.invalidated_by.clone(),
+        valued: o.valued.clone(),
+    })
+}
+
 fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> {
     use crate::engine::facet::{FacetTerm, Operation};
     let b = b?;
@@ -1073,6 +1088,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         &eval_safe_required_flags,
     );
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref());
+    let output = lower_output(&toml.name, toml.output.as_ref());
     let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
     let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag);
     if toml.deny.unwrap_or(false) {
@@ -1092,6 +1108,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
@@ -1122,6 +1139,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         };
@@ -1161,6 +1179,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::Custom {
                 handler_name,
@@ -1193,6 +1212,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 path_gate: toml.path_gate,
                 archetype_flags: archetype_flags.clone(),
                 behavior: behavior.clone(),
+                output,
                 env_assignment_positionals,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
@@ -1227,6 +1247,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
@@ -1257,6 +1278,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
@@ -1305,6 +1327,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
@@ -1333,6 +1356,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::WriteFlagged {
                 policy,
@@ -1359,6 +1383,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             path_gate: toml.path_gate,
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
+            output,
             env_assignment_positionals,
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
@@ -1386,6 +1411,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         path_gate: toml.path_gate,
         archetype_flags,
         behavior,
+        output,
         kind: DispatchKind::Policy {
             policy,
             level,
@@ -1446,6 +1472,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
             path_gate: None,
             archetype_flags: Vec::new(),
             behavior: None,
+            output: None,
             kind: spec.kind.clone(),
         });
     }

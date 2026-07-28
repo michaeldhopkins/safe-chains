@@ -16,3 +16,11 @@ valued = [
     "--all-repeated", "--check-chars", "--group",
     "--skip-chars", "--skip-fields",
 ]
+
+# Deduplicating adjacent lines emits a SUBSET of the piped lines, so stdout carries that stage's
+# locus. `-c`/`--count` prefixes each line with a count, and `--group`/`-D`/`--all-repeated` insert
+# separator lines — in both cases a line is no longer just a path, so the claim is void.
+[command.output]
+locus_from = "stdin"
+valued = ["-f", "-s", "-w", "--check-chars", "--skip-chars", "--skip-fields"]
+invalidated_by = ["-c", "--count", "-D", "--all-repeated", "--group", "--help", "--version", "-h", "-V"]

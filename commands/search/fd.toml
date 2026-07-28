@@ -20,6 +20,16 @@ examples_denied = [
     "fd --evil",
 ]
 
+# What fd's STDOUT names, so `rg … $(fd -a x app/)` is bounded by fd's own search roots instead of
+# worst-cased. fd prints one matched PATH per line, always beneath the roots it was given (`-a` only
+# makes those absolute; it does not widen the search). The invalidating flags are the ones that stop
+# the output being paths at all: `-x`/`-X` print the INNER command's output (`fd -x cat {}` prints
+# file bodies), `-l` prints `ls -l` rows, `--format` is an arbitrary template, and `--hyperlink`
+# wraps each path in terminal escapes.
+[command.output]
+locus_from = "operands"
+invalidated_by = ["-x", "--exec", "-X", "--exec-batch", "-l", "--list-details", "--format", "--hyperlink"]
+
 [command.fallback]
 level = "Inert"
 bare = true

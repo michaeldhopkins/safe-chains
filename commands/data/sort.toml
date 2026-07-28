@@ -21,3 +21,17 @@ valued = [
     "--random-source", "--sort", "--temporary-directory",
     "-S", "-T", "-k", "-t",
 ]
+
+# Sorting reorders the piped lines without inventing new ones, so stdout is a permutation of the
+# input and carries that stage's locus — `$(fd … | sort | head -1)`. The invalidating flags are the
+# ones that stop the output being the input: `--files0-from` reads its line set from a FILE rather
+# than the stream, `-o`/`--output` diverts stdout to a file (leaving nothing to substitute), and
+# `-c`/`-C`/`--check` print a diagnostic instead of the lines.
+[command.output]
+locus_from = "stdin"
+valued = [
+    "--batch-size", "--buffer-size", "--field-separator", "--key", "--parallel",
+    "--random-source", "--sort", "--temporary-directory",
+    "-S", "-T", "-k", "-t",
+]
+invalidated_by = ["--files0-from", "-o", "--output", "-c", "-C", "--check", "--help", "--version", "-h", "-V"]
