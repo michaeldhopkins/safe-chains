@@ -177,7 +177,11 @@ mod tests {
         // interpreter payloads that execute shell commands — the mini-language is opaque.
         "perl -e 'system(\"rm -rf /\")'",
         "perl -e 'unlink glob \"*\"'",
-        "perl -pi -e 's/a/b/' file",
+        // `-i` rewrites each operand in place. A worktree file is the ordinary refactor and is
+        // admitted; what must never pass is the same edit aimed out of the workspace.
+        "perl -pi -e 's/a/b/' /etc/hosts",
+        "perl -pi -e 's/a/b/' ~/.bashrc",
+        "perl -pe 's/a/b/' /etc/shadow",
         "awk 'BEGIN{system(\"rm -rf /\")}'",
         "ruby -e 'system(\"rm -rf /\")'",
         "python3 -c 'import os; os.system(\"rm -rf /\")'",

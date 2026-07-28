@@ -537,6 +537,7 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
             BehaviorHook::Dd => resolve_dd(tokens),
             BehaviorHook::Tar => resolve_tar(tokens),
             BehaviorHook::Sed => resolve_sed(tokens),
+            BehaviorHook::Perl => resolve_perl(tokens),
         };
     }
     // No path operands (echo): a pure stdout emitter, handled BEFORE the flag walk — echo has no
@@ -1158,6 +1159,41 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     } else {
         caps.extend(reads_to_model(&files, scale));
     }
+    Profile::of(caps)
+}
+
+fn resolve_perl(tokens: &[Token]) -> Profile {
+    // perl's `-e` one-liner is arbitrary code, so the identifier gate in `handlers::perl` decides
+    // whether the CODE is inert. What that gate cannot do is judge the OPERANDS: it never looked at
+    // them, which is why `perl -pe s/a/b/ /etc/shadow` used to read a credential file and print it
+    // to the model. Both halves are needed — an inert one-liner over a system file is still an
+    // exfiltration, and a worktree file rewritten by unmodeled code is still RCE.
+    use crate::handlers::perl::PerlCode;
+    let Some(scan) = crate::handlers::perl::scan_perl(tokens) else {
+        return worst("perl: unmodeled flag cluster — worst-cased (§0)");
+    };
+    match scan.code {
+        PerlCode::None => {
+            let mut c = Capability::new(Operation::Observe);
+            c.disclosure.audience = DisclosureAudience::LocalProcess;
+            c.because = "perl: reports its own version/usage".to_string();
+            return Profile::of(vec![c]);
+        }
+        // No `-e`/`-E` means the first operand is a SCRIPT FILE whose contents we cannot inspect
+        // (like `sed -f`, `awk -f`, `bash x.sh`), and a failed identifier gate means the one-liner
+        // reached outside the modeled vocabulary. Neither is separable from arbitrary execution.
+        PerlCode::Opaque => return worst("perl: no inspectable -e/-E one-liner — worst-cased (§0)"),
+        PerlCode::Inspectable => {}
+    }
+    // A sweeping in-place edit (`perl -pi -e … *`) is bounded but not single; locus still binds
+    // each operand, so breadth widens the blast radius without ever admitting a system path.
+    let files: Vec<&str> = scan.files.iter().map(String::as_str).collect();
+    let scale = breadth_scale(&files, false);
+    let caps: Vec<Capability> = if scan.in_place {
+        files.iter().map(|f| mutates(classify_locus(f), scale, "perl -i edits the file in place")).collect()
+    } else {
+        reads_to_model(&files, scale)
+    };
     Profile::of(caps)
 }
 
@@ -1889,6 +1925,59 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["tar", "zf", "backup.tar"])).expect("tar")), Verdict::Denied, "no mode letter");
     }
 
+    /// perl's two gates are independent and BOTH are required: the identifier allowlist decides
+    /// whether the one-liner is inert, locus decides whether the operands may be touched. The
+    /// second was missing — `perl -pe 's/a/b/' /etc/shadow` auto-approved, because the handler
+    /// judged only the code — so the read cases below are the regression, and the `-i` cases are
+    /// the capability the missing gate had been standing in for.
+    #[test]
+    fn perl_i_worktree_vs_system() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // No -i: the operands are content reads, gated by READ locus.
+        let read = resolve(&toks(&["perl", "-pe", "s/x/y/", "./foo"])).expect("perl");
+        assert_eq!(read.capabilities[0].operation, Operation::Observe, "no -i → read");
+        assert_eq!(project(&read), Verdict::Allowed(SafetyLevel::SafeRead), "perl read");
+
+        // -i flips them to in-place MUTATES, admitted only in the worktree.
+        let edit = resolve(&toks(&["perl", "-pi", "-e", "s/x/y/", "./foo"])).expect("perl");
+        assert_eq!(edit.capabilities[0].operation, Operation::Mutate, "-i → in-place write");
+        assert_eq!(project(&edit), Verdict::Allowed(SafetyLevel::SafeWrite), "perl -i worktree");
+        let glued = resolve(&toks(&["perl", "-i.bak", "-pe", "s/x/y/", "./foo"])).expect("perl");
+        assert_eq!(glued.capabilities[0].operation, Operation::Mutate, "-i.bak is still in-place");
+
+        // THE REGRESSION: an inert one-liner does not license the operand. Reads above the
+        // worktree deny, exactly as `cat` and `sed` already did.
+        for cmd in [
+            vec!["perl", "-pe", "s/a/b/", "/etc/shadow"],
+            vec!["perl", "-ne", "print", "~/.ssh/id_rsa"],
+            vec!["perl", "-pe", "s/a/b/", "/etc/passwd"],
+            vec!["perl", "-pe", "s/a/b/", "$CONFIG"], // unpinnable
+            vec!["perl", "-pi", "-e", "s/a/b/", "/etc/hosts"],
+            vec!["perl", "-pi", "-e", "s/a/b/", "~/.bashrc"],
+            vec!["perl", "-pi", "-e", "s/a/b/", "../outside"],
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("perl")), Verdict::Denied, "{cmd:?} must deny");
+        }
+
+        // Opaque code is refused whatever the operand: no `-e` means the first operand is a script
+        // file we cannot read, and a failed identifier gate means the one-liner left the vocabulary.
+        for cmd in [
+            vec!["perl", "./script.pl"],
+            vec!["perl", "-n", "./file.txt"],
+            vec!["perl", "-e", "system(\"rm -rf /\")", "./foo"],
+            vec!["perl", "-pie", "s/a/b/", "./foo"], // ambiguous suffix spelling — unmodeled
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("perl")), Verdict::Denied, "{cmd:?} must deny");
+        }
+
+        // A worktree-scoped sweep is bounded, not single — scored honestly, still admitted.
+        let glob = resolve(&toks(&["perl", "-pi", "-e", "s/a/b/", "*"])).expect("perl");
+        assert_eq!(glob.capabilities[0].scale, Scale::Bounded, "a glob is a bounded blast radius");
+        assert_eq!(project(&glob), Verdict::Allowed(SafetyLevel::SafeWrite), "perl -i * (worktree)");
+    }
+
     #[test]
     fn sed_i_flips_read_to_write_and_locus_stops_system_wide_damage() {
         use crate::engine::bridge::project;
@@ -2431,8 +2520,8 @@ mod tests {
     /// none-role printer; `dd`/`tar`/`sed` are hook commands; `grep` is a hook + pattern-then-read;
     /// the other 10 are the plain positional coreutils.
     const EXPECTED_BEHAVIOR_COMMANDS: &[&str] = &[
-        "cat", "cp", "dd", "echo", "grep", "head", "ln", "mkdir", "mv", "rm", "sed", "tail",
-        "tar", "touch", "wc",
+        "cat", "cp", "dd", "echo", "grep", "head", "ln", "mkdir", "mv", "perl", "rm", "sed",
+        "tail", "tar", "touch", "wc",
     ];
 
     /// The behavior roster is exactly `EXPECTED_BEHAVIOR_COMMANDS` — no command silently lost its
@@ -2484,6 +2573,9 @@ mod tests {
             BehaviorHook::Dd => vec![inv(&["if=@", "of=./safe"]), inv(&["if=./safe", "of=@"])],
             BehaviorHook::Tar => vec![inv(&["cf", "./s.tar", "@"]), inv(&["cf", "@", "./s"]), inv(&["tf", "@"])],
             BehaviorHook::Sed => vec![inv(&["s/x/y/", "@"]), inv(&["-i", "s/x/y/", "@"])],
+            BehaviorHook::Perl => {
+                vec![inv(&["-pe", "s/x/y/", "@"]), inv(&["-pi", "-e", "s/x/y/", "@"])]
+            }
         }
     }
 

@@ -273,7 +273,26 @@ const WRITE_MODE_CASES: &[&str] = &[
 
 // The read counterpart: a command that READS a `{p}` named inside an argument must not disclose an
 // out-of-workspace / secret file. `sed 'r /etc/shadow'` is the class.
-const READ_MODE_CASES: &[&str] = &["sed 'r {p}' input.txt", "sed 'R {p}' input.txt"];
+//
+// The second group is the operand form, and it is here because a real fail-open lived in it:
+// `perl -pe 's/a/b/' /etc/shadow` auto-approved, because the perl handler gated the CODE against an
+// identifier allowlist and never looked at the file operands at all. An inert one-liner is only
+// half the question — under `-n`/`-p` the interpreter still opens each operand and prints it, so a
+// benign transform over a credential file is a credential read. Every inline interpreter that wraps
+// an implicit read loop belongs here, so a newly-added one is caught by this guard rather than by a
+// user noticing the prompt never came.
+const READ_MODE_CASES: &[&str] = &[
+    "sed 'r {p}' input.txt",
+    "sed 'R {p}' input.txt",
+    "perl -pe 's/a/b/' {p}",
+    "perl -ne 'print' {p}",
+    "perl -0pe 's/a/b/' {p}",
+    "perl -lpe 's/a/b/' {p}",
+    "sed 's/a/b/' {p}",
+    "awk '{print}' {p}",
+    "ruby -pe 'puts' {p}",
+    "mlr --csv cat {p}",
+];
 
 // Targets outside the /work workspace. Deliberately excludes /tmp and /dev (admitted scratch loci).
 const OUT_OF_WORKSPACE: &[&str] = &[

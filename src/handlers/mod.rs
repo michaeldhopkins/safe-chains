@@ -109,7 +109,6 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(android::command_docs());
     docs.extend(network::command_docs());
     docs.extend(system::command_docs());
-    docs.extend(perl::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(fuzzy::command_docs());
     docs.extend(shell::command_docs());

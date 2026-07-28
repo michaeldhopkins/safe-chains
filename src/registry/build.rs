@@ -885,7 +885,8 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> 
         Some("dd") => Some(BehaviorHook::Dd),
         Some("tar") => Some(BehaviorHook::Tar),
         Some("sed") => Some(BehaviorHook::Sed),
-        Some(other) => panic!("command '{name}': unknown behavior hook `{other}` (known: grep, dd, tar, sed)"),
+        Some("perl") => Some(BehaviorHook::Perl),
+        Some(other) => panic!("command '{name}': unknown behavior hook `{other}` (known: grep, dd, tar, sed, perl)"),
     };
     let (short, long) = split_flag_forms(&b.standalone);
     let (valued_short, valued_long) = split_flag_forms(&b.valued);
