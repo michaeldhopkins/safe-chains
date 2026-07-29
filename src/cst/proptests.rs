@@ -607,6 +607,22 @@ proptest! {
         prop_assert!(check::check_redirects(&cmd.redirs));
     }
 
+    /// A heredoc body is DATA. Its bytes must not reach back into the grammar that encloses it —
+    /// neither to break the parse (an apostrophe in `the shell's grammar` once opened a quote that
+    /// swallowed the substitution's `)`, so every commit message with a contraction silently failed
+    /// to auto-approve) nor to inject a command. So the verdict must be identical for every body.
+    #[test]
+    fn a_heredoc_body_cannot_change_the_verdict(body in "[ -~]{0,80}") {
+        prop_assume!(body.trim() != "EOF");
+        let baseline = "git commit -m \"$(cat <<'EOF'\nmessage\nEOF\n)\"";
+        prop_assert!(crate::is_safe_command(baseline), "baseline must approve or this is vacuous");
+        let with_body = format!("git commit -m \"$(cat <<'EOF'\n{body}\nEOF\n)\"");
+        prop_assert!(
+            crate::is_safe_command(&with_body),
+            "heredoc body changed the verdict: {body:?}"
+        );
+    }
+
     #[test]
     fn unicode_prefix_never_matches_allowlist(
         prefix in "[\\u{0080}-\\u{FFFF}]{1,3}",
