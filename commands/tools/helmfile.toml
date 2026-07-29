@@ -6,7 +6,9 @@ researched_version = "helmfile 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
 [command.path_gate]
-flags = { "--output-dir" = "write" }
+# `--helm-binary` names the helm executable helmfile shells out to, so its value is the program
+# that runs — `exec` withholds `/tmp` and home, where `read`/`write` would admit them.
+flags = { "--output-dir" = "write", "--helm-binary" = "exec" }
 
 [command.wrapper]
 standalone = ["--allow-no-matching-release", "--debug", "--disable-force-update", "--enable-live-output", "--no-color", "--quiet", "--strict-parsing"]

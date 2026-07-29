@@ -19,20 +19,31 @@ same shape as the `env` handler bug (which walked past `NAME=VALUE` to reach the
 `-Cincremental` bug (which matched a flag name and ignored its path). Confirmed live, all
 auto-approved before this was written:
 
-    restic --password-command /tmp/evil snapshots     runs an arbitrary program
-    helmfile --helm-binary /tmp/evil list             runs an arbitrary binary
-    vite -c /tmp/evil.js build                        loads an arbitrary JS config (code)
-    sandbox-exec -f /tmp/evil.sb ls                   caller-chosen sandbox profile
-    dotenv -f /tmp/evil.env ls                        arbitrary env injection  [FIXED]
+    restic --password-command /tmp/evil snapshots     runs an arbitrary program        [FIXED]
+    helmfile --helm-binary /tmp/evil list             runs an arbitrary binary         [FIXED]
+    vite -c /tmp/evil.js build                        loads an arbitrary JS config     [FIXED]
+    sandbox-exec -f /tmp/evil.sb ls                   caller-chosen sandbox profile    [FIXED]
+    dotenv -f /tmp/evil.env ls                        arbitrary env injection          [FIXED]
+    borg --rsh /tmp/evil check repo                   runs it to reach the repo        [FIXED]
+    borg --remote-path /tmp/evil list repo            borg executable on the far side  [FIXED]
 
-Only `dotenv` is fixed, because it was the env-injection case; it now declares
-`[command.path_gate] flags = { "-f" = "exec", "-e" = "exec" }`, which keeps `.env.test` working and
-denies `/tmp/evil.env`. The rest are untouched. NOTE the mechanism already exists — `Role::Exec` on
-a `[command.path_gate]` is exactly the tool for most of these — so the campaign is per-flag research,
-not new machinery.
+All seven now declare a `[command.path_gate]` with role `exec`, which withholds `/tmp` and home
+where `read`/`write` would admit them, while keeping the in-workspace spelling
+(`vite -c ./vite.config.js`, `borg --rsh ./bin/myssh`) working. The mechanism needed no extension —
+`Role::Exec` on a `[command.path_gate]` was already the right tool.
 
-`borg --rsh /tmp/evil` and `nix-env -f /tmp/evil.nix` deny, so this is not universal — which is
-exactly why it needs a per-flag pass rather than a blanket rule.
+CORRECTION (2026-07-29): this section previously recorded "`borg --rsh /tmp/evil` denies, so this is
+not universal". That was WRONG, and instructively so — the probe behind it omitted borg's required
+repository positional, so the refusal came from the missing argument, not from any gate. With the
+positional supplied, `borg --rsh /tmp/evil check repo` auto-approved and ran `/tmp/evil`. A deny
+observed without checking that the command otherwise WORKS proves nothing; the guards added for this
+class assert both directions for that reason.
+
+The same section cited `nix-env -f /tmp/evil.nix` as a second example of "already denies". It does
+deny — but so does a bare `nix-env -q`, because nix-env is not auto-approved in any form, so the
+refusal says nothing about whether `-f` is gated. Both halves of that sentence were evidence of
+nothing. Whether nix-env's `-f` needs a gate is still OPEN and becomes a real question the moment
+any nix-env invocation is allowed.
 
 **Shape of the work**, mirroring the env-prefix project: go through every `[command.wrapper]` (57 of
 them) and classify each entry in `valued` as inert, a path (with a role), or a command. Inert stays

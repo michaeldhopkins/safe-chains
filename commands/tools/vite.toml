@@ -9,6 +9,11 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 standalone = ["--clearScreen", "--debug", "--filter", "--force", "--profile", "-d", "-f"]
 valued = ["--base", "--config", "--logLevel", "--mode", "-c", "-l", "-m"]
 
+# A vite config is JavaScript that vite EVALUATES, so `--config`/`-c` select code to run rather
+# than data to read.
+[command.path_gate]
+flags = { "--config" = "exec", "-c" = "exec" }
+
 [[command.sub]]
 name = "build"
 level = "SafeWrite"

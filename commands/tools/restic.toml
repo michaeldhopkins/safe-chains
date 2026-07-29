@@ -8,7 +8,9 @@ bare_flags = ["--help", "--version", "-h"]
 # The certificate/password files restic reads. --repo and --repo-file identify the repository
 # (local path or remote URL) and stay ungated; --password-command is a command, not a path.
 [command.path_gate]
-flags = { "--cacert" = "read", "--tls-client-cert" = "read", "--password-file" = "read" }
+# `--password-command` is RUN to obtain the repository password, so its value is a program, not a
+# file to read. `exec` (not `read`) is what withholds `/tmp`, where a downloaded script lands.
+flags = { "--cacert" = "read", "--tls-client-cert" = "read", "--password-file" = "read", "--password-command" = "exec" }
 
 [command.wrapper]
 standalone = ["--cleanup-cache", "--no-cache", "--no-lock", "--quiet", "--verbose"]
