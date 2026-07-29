@@ -216,6 +216,16 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         process::exit(0);
     };
 
+    // A blank command is nothing to classify, so there is nothing to approve. Emitting `allow`
+    // asserted "all commands in chain are safe utilities" about ZERO commands, and on the harnesses
+    // whose `allow` is authoritative that SUPPRESSES the user's prompt. The risk is not the empty
+    // command itself — it runs nothing — but the shape: if a harness ever carries the real command
+    // in a field this target does not read, we would grant on the blank we extracted while the
+    // harness ran the command we never saw. Abstaining costs a prompt; granting costs everything.
+    if input.command.trim().is_empty() {
+        process::exit(0);
+    }
+
     // HP-19: install the harness cwd/root so relative paths resolve against the real
     // directory for the whole evaluation (verdict and explainer). Most harnesses send `cwd`
     // but no distinct project `root`; default root to cwd so the workspace boundary (and the
