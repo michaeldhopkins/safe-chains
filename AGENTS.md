@@ -83,11 +83,21 @@ in the `rust-project` skill. This section is only what is specific to safe-chain
     NO `examples_safe`/`examples_denied`, so nothing seeds it and byte mutation never synthesizes
     `glab mr list`. Adding examples is the **cheapest coverage win** and doubles as a
     `toml_examples_match_dispatch` guard. Prefer this before anything fancier.
-  - **Out-of-scope layers** — `targets/*` (hook-envelope I/O), `cst/explain.rs` + `cst/display.rs`
-    (the `--explain` renderer), `docs.rs`/`registry/docs.rs`, and `suggest.rs` sit at ~0% because
-    `is_safe_command` never calls them. They are not blind spots of the `parse` target; reaching
-    them needs a **new** target (a hook-envelope target for `targets/`, an `explain` target for the
-    CST renderer). Don't chase these by seeding `parse`.
+  - **Out-of-scope layers** — `targets/*` (hook-envelope I/O), `docs.rs`/`registry/docs.rs`, and
+    `suggest.rs` sit at ~0% because `is_safe_command` never calls them. They are not blind spots of
+    the `parse` target; reaching them needs a **new** target (a hook-envelope target for
+    `targets/`). Don't chase these by seeding `parse`.
+  - **`cst/explain.rs` + `cst/display.rs` no longer need a target of their own.** The `parse` fuzz
+    target still does not reach them — it calls `is_safe_command` — so their FUZZ coverage is
+    unchanged and this bullet is not a claim about the corpus. What changed is that the two
+    property guards in `handler_property_tests.rs`, which already generate adversarial command
+    strings, now also call the renderer.
+    `arbitrary_command_strings_never_panic` and `classifier_terminates_on_adversarial_input` now
+    run `explain(&line).render()` alongside `command_verdict`, so the renderer is held to the same
+    never-panics / never-hangs / deterministic contract. That matters because the layer is not
+    merely cosmetic: `--explain` is user-facing AND renders the hook's injected context, where a
+    panic is a crash — which for a PreToolUse hook fails OPEN. Extending a corpus beat building a
+    target; check that before reaching for new machinery on the layers above.
 
 ## Linting
 
