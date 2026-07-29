@@ -147,6 +147,63 @@ pub struct HookInput {
     pub session_id: Option<String>,
 }
 
+/// Append `entry` to `settings[outer][event]`, creating the path when absent.
+///
+/// Refuses — rather than overwriting — when an existing key has the wrong TYPE. Four targets wrote
+/// this by hand as `entry(k).or_insert_with(…).as_object_mut().expect("created above as an
+/// object")`, and the message says why it looked safe: it reads as if the key had just been
+/// created. `or_insert_with` returns the EXISTING value, so a settings file carrying
+/// `"hooks": "something"` made `--setup` PANIC — and under `--auto-detect` that aborts the whole
+/// run, so every target after it goes uninstalled.
+///
+/// Erroring beats replacing. The value is the user's, an unreadable one usually means a
+/// hand-edit or a schema we don't know, and silently rewriting config we did not understand is
+/// not ours to do. `install` writes only on `Ok`, so the file is left untouched either way.
+pub(crate) fn append_hook_entry(
+    settings: &mut serde_json::Value,
+    outer: &str,
+    event: &str,
+    entry: serde_json::Value,
+) -> Result<(), String> {
+    use serde_json::json;
+    if !settings.is_object() {
+        *settings = json!({});
+    }
+    let Some(obj) = settings.as_object_mut() else {
+        unreachable!("settings was just set to an object");
+    };
+    let hooks = obj.entry(outer).or_insert_with(|| json!({}));
+    let Some(hooks) = hooks.as_object_mut() else {
+        return Err(format!(
+            "`{outer}` is {}, expected an object — leaving the file unchanged",
+            json_kind(&obj[outer])
+        ));
+    };
+    let slot = hooks.entry(event).or_insert_with(|| json!([]));
+    if !slot.is_array() {
+        return Err(format!(
+            "`{outer}.{event}` is {}, expected an array — leaving the file unchanged",
+            json_kind(slot)
+        ));
+    }
+    let Some(arr) = slot.as_array_mut() else {
+        unreachable!("just checked it is an array");
+    };
+    arr.push(entry);
+    Ok(())
+}
+
+fn json_kind(v: &serde_json::Value) -> &'static str {
+    match v {
+        serde_json::Value::Null => "null",
+        serde_json::Value::Bool(_) => "a boolean",
+        serde_json::Value::Number(_) => "a number",
+        serde_json::Value::String(_) => "a string",
+        serde_json::Value::Array(_) => "an array",
+        serde_json::Value::Object(_) => "an object",
+    }
+}
+
 /// Read a harness project-root env var from the hook process environment (set by the
 /// harness, not the agent's shell — see HARNESS-BEHAVIORS.md). Empty → `None`.
 pub(crate) fn env_root(var: &str) -> Option<String> {
@@ -215,6 +272,59 @@ pub fn allow_reason(verdict: Verdict) -> &'static str {
             "All commands in chain are safe utilities (includes code execution)"
         }
         _ => "All commands in chain are safe utilities",
+    }
+}
+
+#[cfg(test)]
+mod append_hook_entry_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn creates_the_path_when_absent() {
+        let mut s = json!({});
+        append_hook_entry(&mut s, "hooks", "PreToolUse", json!({"matcher": "Bash"})).unwrap();
+        assert_eq!(s["hooks"]["PreToolUse"][0]["matcher"], "Bash");
+    }
+
+    #[test]
+    fn appends_beside_an_existing_entry() {
+        let mut s = json!({"hooks": {"PreToolUse": [{"matcher": "Other"}]}});
+        append_hook_entry(&mut s, "hooks", "PreToolUse", json!({"matcher": "Bash"})).unwrap();
+        let arr = s["hooks"]["PreToolUse"].as_array().unwrap();
+        assert_eq!(arr.len(), 2, "the user's existing hook must survive");
+        assert_eq!(arr[0]["matcher"], "Other");
+    }
+
+    /// The panic this replaced: `entry(k).or_insert_with(…).as_object_mut().expect(…)` reads as if
+    /// the key was just created, but `or_insert_with` returns the EXISTING value. A settings file
+    /// with `"hooks": "x"` crashed `--setup` — and under `--auto-detect` that aborted the whole run.
+    #[test]
+    fn refuses_a_wrong_typed_outer_key_without_panicking() {
+        for wrong in [json!("a string"), json!([1, 2]), json!(7), json!(null)] {
+            let mut s = json!({ "hooks": wrong });
+            let before = s.clone();
+            let err = append_hook_entry(&mut s, "hooks", "PreToolUse", json!({})).unwrap_err();
+            assert!(err.contains("expected an object"), "unhelpful error: {err}");
+            assert_eq!(s, before, "the user's value must be left alone, not replaced");
+        }
+    }
+
+    #[test]
+    fn refuses_a_wrong_typed_event_key_without_panicking() {
+        let mut s = json!({"hooks": {"PreToolUse": "a string"}});
+        let before = s.clone();
+        let err = append_hook_entry(&mut s, "hooks", "PreToolUse", json!({})).unwrap_err();
+        assert!(err.contains("expected an array"), "unhelpful error: {err}");
+        assert_eq!(s, before, "the user's value must be left alone, not replaced");
+    }
+
+    #[test]
+    fn replaces_a_non_object_root() {
+        // A file whose ROOT is not an object carries nothing to preserve.
+        let mut s = json!("garbage");
+        append_hook_entry(&mut s, "hooks", "PreToolUse", json!({"matcher": "Bash"})).unwrap();
+        assert_eq!(s["hooks"]["PreToolUse"][0]["matcher"], "Bash");
     }
 }
 
