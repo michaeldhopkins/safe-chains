@@ -8,3 +8,7 @@ cc 22a0478940f005b5e829dc642a7c7f848b779a163897899eb59e8295264a5381 # shrinks to
 cc 544ddb53e39951480d76c70e954091f058a8a65999e6c454c470ab14beb49645 # shrinks to combo = ("sed", "-e", "--expression", "file.txt", "s/a/b/")
 cc bd3bfe6657afb35305c514d11c59d55ec1ad78255783865e0364f1fd909cd1d8 # shrinks to cmd = "magick", args = []
 cc d1e95758c27a60ea480b4b7a4243bdd0cbed1caaef487d507c7d7c3e87980c82 # shrinks to template = "cat $(fd --search-path={p} pat)", target = "/etc/hosts"
+cc ddaaa600524ed64aa3466df77a864e7b10baa7c7b843220dba2efca81744137c # shrinks to template = "cat $(pwd)/$(fd d {p})", target = "/etc/hosts"
+cc 4d073eee11c7a9fdc564c874718432671f8acf263cd9b5c883c980074b834cf9 # shrinks to ctx = "cat {}", sub = "$(fd pat {root})", root = "/work", witness_pick = 315
+cc 7dc11667d40d0193cca76ee87dab4eb57731751effd68bedb0497f1aefd67e3c # shrinks to ctx = "cat {}", sub = "$(fd pat {root})", root = "/work", witness_pick = 180, suffix_pick = 47
+cc e0c279e0bc49bd5d1cec36f32b25178725c72bc8898712a79dcc2e8e1d5f0078 # shrinks to ctx = "cat {}", sub = "$(fd pat {root})", root = "~", witness_pick = 0, suffix_pick = 51

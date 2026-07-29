@@ -690,3 +690,21 @@ reads and writes, which is what the profile says. If the gate's vocabulary ever 
 identifier with side effects, the fix belongs in the gate, not in a capability here. There is also
 no precedent for an admitted `executes(caller-inline)`: `bash -c 'ls'` approves via the shell
 handler re-validating the inner command, not via a capability.
+
+## Generalize the abstraction-soundness property beyond substitutions
+
+`substitution_is_never_more_permissive_than_a_path_it_could_produce` (handler_property_tests.rs)
+encodes one obligation: an abstraction over a set of concrete paths must never classify more
+permissively than the worst path in that set. It currently covers `$(…)` only, but the classifier
+abstracts paths in several other places, and each is the same shape of hazard:
+
+- `$VAR` bindings and the `UNCERTAIN_VALUE` sentinel,
+- `for`-loop variables (`loop_reprs` representatives),
+- `find … -exec {}` / `xargs` operand binding,
+- glob operands (`*` standing for a set of files),
+- `while read VAR` stdin-item representatives.
+
+Each has a natural concretization set, so each can reuse the harness: pick the abstraction, pick a
+concrete member, assert the abstraction is no more permissive. Worth doing — this property caught
+all four historical substitution fail-opens with no hand-written expectations, including two that
+had taken a full review each to spot.

@@ -549,6 +549,17 @@ fn adjacent_role(path: &str) -> Option<Role> {
 /// shield already denies it — but it lets the overreach nudge say *why* a peer path is frozen
 /// (hidden-in-peer) instead of the misleading generic "outside the working directory". `path` is in
 /// the same `~`-form `adjacent_role` sees.
+/// Every region PATH the model declares, straight from `regions/default.toml`. Test-only, and it
+/// exists so the abstraction-soundness property draws its witnesses from the region table rather
+/// than from a hand-picked list: a newly-protected path becomes a witness the moment it is
+/// declared, without anyone remembering to extend a corpus.
+#[cfg(test)]
+pub(crate) fn declared_region_paths() -> Vec<String> {
+    let src = include_str!("../../../regions/default.toml");
+    let file: RegionsFile = toml::from_str(src).expect("regions/default.toml is invalid TOML");
+    file.region.into_iter().map(|r| r.path).collect()
+}
+
 pub(crate) fn is_hidden_peer(path: &str) -> bool {
     matches!(peer_kind(path), PeerKind::Hidden)
 }
