@@ -714,3 +714,22 @@ DONE when: each harness's PreToolUse envelope is checked for a tool-identifying 
 TUI, dump a real envelope for a non-shell tool). Either add the field and the filter — the guard
 picks it up as soon as `sample_envelope` returns `Some` — or record in HARNESS-BEHAVIORS.md that the
 envelope genuinely has none.
+
+## `--setup` silently rewrites a wrong-typed key on codex / cursor / antigravity
+
+Four targets (claude, qwen, droid, gemini) used to PANIC when an existing settings file had e.g.
+`"hooks": "a string"`; they now go through `targets::append_hook_entry`, which reports the problem
+and leaves the file untouched. Codex, cursor and antigravity never panicked because they guard with
+`if !hooks.is_object() { *hooks = json!({}); }` — they REPLACE the user's value instead.
+
+Replacing is milder than crashing but is still a silent destructive edit to a file we did not
+write. An unreadable value usually means a hand-edit or a schema we do not know, and the same
+argument that made the other four refuse applies here.
+
+Not folded into the panic fix on purpose: those three have shipped, tested behaviour and two of
+them nest differently (antigravity puts `PreToolUse` at the top level, with no outer key), so
+`append_hook_entry` does not drop straight in.
+
+DONE when: all seven refuse rather than overwrite — either by generalizing `append_hook_entry` to
+an optional outer key, or by each guarding in place — and a test asserts the pre-existing value
+survives, the way `refuses_a_wrong_typed_outer_key_without_panicking` does for the shared helper.
