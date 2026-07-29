@@ -99,6 +99,14 @@ pub fn is_go_local_package(token: &str) -> bool {
 /// like `Tiltfile` is a valid filename in cwd but the heuristic
 /// rejects it to avoid swallowing flag-less subcommands. Callers
 /// that want bare-name acceptance should match a sub block instead.
+///
+/// A leading `~` counts, and its absence was a hole rather than part of the conservatism: the
+/// shell expands `~`, `~/x` and `~user` to a home directory, so all four are paths — but a BARE
+/// `~` carries neither `/` nor `.`, so it failed the test and every consumer that pre-filters on
+/// it skipped the operand entirely. `rg x ~` searched `$HOME` and printed matches to the model
+/// while `rg x ~/` denied; `od ~`, `tee ~`, `shred ~` and `awk '{print}' ~` did the same. The
+/// commands whose programs legitimately contain `~` (awk's match operator, an rg pattern) exclude
+/// it by POSITION before reaching here, so recognizing it costs them nothing.
 pub fn looks_like_path(token: &str) -> bool {
     if token.is_empty() {
         return false;
@@ -106,7 +114,7 @@ pub fn looks_like_path(token: &str) -> bool {
     if token.starts_with('-') {
         return token == "-";
     }
-    token.contains('/') || token.contains('.')
+    token.starts_with('~') || token.contains('/') || token.contains('.')
 }
 
 pub trait FlagSet {
