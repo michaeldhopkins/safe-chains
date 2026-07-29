@@ -660,12 +660,20 @@ fn find_sub_close(body: &str) -> Option<usize> {
 /// and which `find_sub_close` does not model. When the bounded interior does not parse cleanly we
 /// re-run the EXACT old grammar over the full body, preserving classification for those inputs. The
 /// fallback is the recursive shape, but the per-parse work budget (`MAX_PARSE_WORK_*`) bounds it, so
-/// it cannot reintroduce the hang. A `None` from `find_sub_close` means no unquoted `)` exists at all
-/// — the grammar could not close the sub either — so we fail fast without the fallback.
+/// it cannot reintroduce the hang. A `None` from `find_sub_close` normally means no unquoted `)`
+/// exists at all — the grammar could not close the sub either — so we fail fast. The exception is a
+/// heredoc: its body is data the scanner reads as code, so a lone apostrophe in prose (`the shell's
+/// grammar`) opens a quote that never closes and swallows the real `)`. `git commit -m "$(cat <<EOF`
+/// with any contraction in the message lands here, so `None` + a heredoc operator takes the grammar
+/// fallback — which drains the body correctly — rather than failing the whole parse.
 fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     let body = &input[open_len..];
     let Some(rel) = find_sub_close(body) else {
-        return backtrack();
+        return if body.contains("<<") {
+            sub_body_via_grammar(input, body)
+        } else {
+            backtrack()
+        };
     };
     // A heredoc body is drained out-of-band (`drain_pending_heredocs`) and can run PAST `rel`, so the
     // bounded interior would be truncated mid-heredoc and still parse "clean" — the fast path is
@@ -688,6 +696,12 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
             }
         }
     }
+    sub_body_via_grammar(input, body)
+}
+
+/// The EXACT old grammar over the full body: it drains heredocs and tracks `case` arms, so it finds
+/// a close that `find_sub_close`'s byte scan places wrongly or misses. Bounded by `MAX_PARSE_WORK_*`.
+fn sub_body_via_grammar<'a>(input: &mut &'a str, body: &'a str) -> ModalResult<Script> {
     let mut rest: &str = body;
     ws.parse_next(&mut rest)?;
     let parsed = script.parse_next(&mut rest)?;
