@@ -593,6 +593,90 @@ fn every_target_emits_its_decision_at_the_declared_field() {
     assert!(failures.is_empty(), "decision-field contract violations:\n{}", failures.join("\n"));
 }
 
+/// No target's `install` may PANIC on, or silently rewrite, a config file it cannot understand.
+///
+/// `--setup` merges into a file the user owns. Two failure modes were live here, both from the
+/// same shape — `entry(k).or_insert_with(…)` returns the EXISTING value, so a key already present
+/// with the wrong type never gets replaced by the default:
+///
+///   - cursor PANICKED (`.expect("hooks key was created above as an object")`). Under
+///     `--auto-detect` that aborts the whole run, so every target after it went UNINSTALLED while
+///     the user saw a success line for the ones before it — the installer silently failing to
+///     install the protection.
+///   - codex silently REPLACED the wrong-typed value with an empty one, destroying whatever the
+///     user had written there.
+///
+/// The corruptions are derived from each target's OWN freshly-written config rather than
+/// hand-listed, so a target whose schema changes keeps being probed at the keys it actually uses.
+#[test]
+fn no_target_install_panics_or_clobbers_an_unreadable_config() {
+    use serde_json::Value;
+
+    /// Every top-level and second-level key of `installed`, replaced by a string, plus whole-file
+    /// shapes that are not objects at all.
+    fn corruptions(installed: &Value) -> Vec<String> {
+        let mut out = vec!["\"just a string\"".to_string(), "[]".to_string(), "42".to_string()];
+        if let Some(obj) = installed.as_object() {
+            for (k, v) in obj {
+                let mut c = installed.clone();
+                c[k] = Value::String("corrupted".into());
+                out.push(c.to_string());
+                for inner in v.as_object().into_iter().flatten().map(|(ik, _)| ik) {
+                    let mut c = installed.clone();
+                    c[k][inner] = Value::String("corrupted".into());
+                    out.push(c.to_string());
+                }
+            }
+        }
+        out
+    }
+
+    let mut exercised = 0;
+    let mut failures = Vec::new();
+    for target in safe_chains::targets::registry() {
+        let home = tempfile::tempdir().expect("tempdir");
+        for dir in target.detect_paths(home.path()) {
+            let _ = std::fs::create_dir_all(&dir);
+        }
+        // A fresh install tells us which file this target owns and what shape it writes.
+        let Ok(safe_chains::targets::InstallOutcome::Installed { path }) = target.install(home.path())
+        else {
+            continue;
+        };
+        let Ok(text) = std::fs::read_to_string(&path) else { continue };
+        let Ok(installed): Result<Value, _> = serde_json::from_str(&text) else { continue };
+
+        for corrupt in corruptions(&installed) {
+            std::fs::write(&path, &corrupt).expect("write corrupt config");
+            let before = std::fs::read(&path).expect("read back");
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                target.install(home.path())
+            }));
+            let name = target.name();
+            match result {
+                Err(_) => failures.push(format!("{name}: PANICKED on config `{corrupt}`")),
+                Ok(Err(_)) => {
+                    let after = std::fs::read(&path).expect("read after");
+                    if before != after {
+                        failures.push(format!("{name}: refused but still rewrote `{corrupt}`"));
+                    }
+                }
+                Ok(Ok(_)) => {
+                    // Accepting is fine only if the result is still parseable — never a file
+                    // mangled into something the harness would reject.
+                    let after = std::fs::read_to_string(&path).expect("read after");
+                    if serde_json::from_str::<Value>(&after).is_err() {
+                        failures.push(format!("{name}: wrote invalid JSON from `{corrupt}`"));
+                    }
+                }
+            }
+            exercised += 1;
+        }
+    }
+    assert!(exercised > 0, "no target install was exercised; the guard would be vacuous");
+    assert!(failures.is_empty(), "install robustness:\n  {}", failures.join("\n  "));
+}
+
 /// No target may ANSWER a blank command with an approval.
 ///
 /// An empty or whitespace-only command is nothing to classify, so approving it asserted "all
