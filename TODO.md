@@ -677,9 +677,13 @@ Impact today is limited to commands that OPEN their extra positionals. `tilt` di
 /etc/evil.erb` was admitted — and now carries `[command.path_gate] positional = "exec"` instead,
 which composes with the grammar rather than replacing it. The interpreters (python3/ruby/node/go)
 are unaffected: their trailing tokens are argv for workspace-local code, which the execution-origin
-model trusts by design. `karma` is the one left worth checking — its positionals are config files it
-reads.
+model trusts by design. `karma` had the same gap — `karma start ./ok.conf.js /etc/evil.conf.js` was admitted — and now
+carries the same `path_gate`.
 
-DONE when: `dispatch_executor` enforces the policy over the pre-script prefix (and
-`tilt a.erb b.erb` still denies with tilt's `path_gate` removed), OR every `executor = "file"`
-command that opens extra positionals declares a `path_gate` and a guard asserts that pairing.
+The structural half is now guarded: `capped_file_executors_declare_a_path_gate` (registry/tests.rs)
+fails if any command declares a File executor WITH `max_positional` but no `path_gate`, so the next
+one cannot inherit the hole silently.
+
+DONE when: `dispatch_executor` enforces the policy over the pre-script prefix, and
+`tilt a.erb b.erb` still denies with tilt's `path_gate` removed. Until then the guard is the
+backstop, not the fix.

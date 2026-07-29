@@ -1753,6 +1753,7 @@ Aliases: `python`
 - `tilt --type=erb template.erb`
 - `tilt --layout layout.erb page.erb`
 - `tilt -y layout.erb page.erb`
+- `tilt get pod --kubeconfig ./kube.yaml`
 - `tilt page.erb -t erb`
 - `tilt version`
 - `tilt version --help`

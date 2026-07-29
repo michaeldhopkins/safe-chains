@@ -628,9 +628,10 @@ fn site_witnesses(root: &str, reach: Reach) -> Vec<String> {
 #[test]
 fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
     let mut violations = Vec::new();
-    let mut constrained = 0usize;
+    let mut unconstrained_sites = Vec::new();
 
     for site in ABSTRACTION_SITES {
+        let mut constrained = 0usize;
         for (op, shell_construct) in ABSTRACTION_OPS {
             if *shell_construct && !site.takes_shell_ops {
                 continue;
@@ -653,9 +654,19 @@ fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
                 }
             }
         }
+        // PER SITE, not once overall. A global count is satisfied by whichever site happens to
+        // produce cases, so a site whose templates stopped parsing — a renamed flag, a grammar
+        // change — would sit there contributing nothing while the test stayed green and appeared
+        // to cover it.
+        if constrained == 0 {
+            unconstrained_sites.push(site.name);
+        }
     }
 
-    assert!(constrained > 0, "no witness was refused — the property is vacuous");
+    assert!(
+        unconstrained_sites.is_empty(),
+        "these sites produced no refused witness, so the property is vacuous for them: {unconstrained_sites:?}",
+    );
     assert!(
         violations.is_empty(),
         "an abstraction was more permissive than a path it could denote ({} cases):\n{}",

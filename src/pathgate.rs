@@ -123,6 +123,16 @@ pub(crate) fn central_flag_gates() -> Vec<(String, String, Role)> {
         .collect()
 }
 
+/// Whether `pathgates.toml` declares ANY central gate for `cmd` — the flat lists included. Used by
+/// the capped-File-executor guard, where a gate declared centrally is as good as a co-located one.
+#[cfg(test)]
+pub(crate) fn central_role_exists(cmd: &str) -> bool {
+    GATES.roles.contains_key(cmd)
+        || GATES.read.contains(cmd)
+        || GATES.read_after_first.contains(cmd)
+        || GATES.write.contains(cmd)
+}
+
 /// Whether `pathgates.toml`'s central `[roles.<cmd>]` declares a role for `flag`. The other half
 /// of the conservation check (a command's gate may live centrally rather than in its own TOML).
 #[cfg(test)]
