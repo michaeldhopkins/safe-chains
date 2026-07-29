@@ -528,6 +528,71 @@ fn copilot_hook_denies_unsafe_via_double_decode() {
 /// override the user's own allowlist), is a silent fail-open. Only Claude asserted these before;
 /// this pins them for all targets so a new one can't regress uncaught (the qwen/droid
 /// `render_context` overrides had no such test).
+/// Every decision a target emits sits at the field THAT harness reads, and at no other's.
+///
+/// The existing contract guard checks the decision VALUE (`"deny"` appears). It cannot see the
+/// thing `HARNESS-BEHAVIORS.md` warns is the silent failure: the field NAME. A harness ignores an
+/// unknown key and falls back to its own permissions, so a target emitting Claude's nesting to
+/// Cursor still lets commands run — it just never decides anything, and looks fine.
+///
+/// The per-target assertions that existed were hand-written and scattered (some here, some in each
+/// target's unit tests), so a NEW target could ship with none. `decision_pointer` has no default,
+/// so a new target must declare its contract; this walks the registry and holds every emission to
+/// it.
+///
+/// The negative half is the one that catches a copy-paste: the decision must NOT also be readable
+/// at another target's pointer. Compared as POINTERS, not substrings — Claude's
+/// `/hookSpecificOutput/permissionDecision` and Copilot's flat `/permissionDecision` share a leaf
+/// name and are still different contracts.
+#[test]
+fn every_target_emits_its_decision_at_the_declared_field() {
+    use safe_chains::Verdict;
+    let mut failures = Vec::new();
+    let mut checked = 0usize;
+
+    let pointers: Vec<&'static str> = safe_chains::targets::registry()
+        .iter()
+        .filter_map(|t| t.hook_format().map(|f| f.decision_pointer()))
+        .collect();
+
+    for target in safe_chains::targets::registry() {
+        let Some(fmt) = target.hook_format() else { continue };
+        let name = target.name();
+        let mine = fmt.decision_pointer();
+
+        let emissions = [
+            ("render_response(Allowed)", fmt.render_response(Verdict::Allowed(safe_chains::SafetyLevel::Inert)).stdout),
+            ("render_deny", fmt.render_deny("blocked").stdout),
+            ("render_ask", fmt.render_ask("confirm").stdout),
+        ];
+        for (what, stdout) in emissions {
+            if stdout.trim().is_empty() {
+                continue; // abstaining is a valid contract; only a DECISION must be well-placed
+            }
+            let Ok(v) = serde_json::from_str::<serde_json::Value>(&stdout) else {
+                failures.push(format!("{name}: {what} emitted non-JSON `{stdout}`"));
+                continue;
+            };
+            checked += 1;
+            if v.pointer(mine).and_then(|d| d.as_str()).is_none() {
+                failures.push(format!(
+                    "{name}: {what} has no decision at its declared pointer `{mine}` -> `{stdout}`"
+                ));
+            }
+            for other in &pointers {
+                if *other != mine && v.pointer(other).is_some() {
+                    failures.push(format!(
+                        "{name}: {what} ALSO decides at `{other}`, another harness's field -> `{stdout}`"
+                    ));
+                }
+            }
+        }
+    }
+
+    assert!(checked > 0, "no target emitted a decision — the guard is vacuous");
+    assert!(failures.is_empty(), "decision-field contract violations:\n{}", failures.join("\n"));
+}
+
 #[test]
 fn every_target_hook_contract_is_fail_safe() {
     use safe_chains::Verdict;

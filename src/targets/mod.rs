@@ -32,6 +32,20 @@ pub trait HookFormat: Send + Sync {
 
     fn render_response(&self, verdict: Verdict) -> HookResponse;
 
+    /// The JSON pointer this harness reads its decision from.
+    ///
+    /// Deliberately has NO default: getting the field wrong fails SILENTLY — the harness ignores
+    /// the unknown key and falls back to its own permissions, so a mis-wired target still lets
+    /// commands run and looks like it works while never deciding anything. Requiring the
+    /// declaration means a new target cannot be added without stating its contract, and
+    /// `every_target_emits_its_decision_at_the_declared_field` checks every emission against it —
+    /// including that the decision does NOT appear at another harness's pointer, which is what a
+    /// copy-pasted target looks like.
+    ///
+    /// Note the leaf name alone is not the contract: Claude nests
+    /// `/hookSpecificOutput/permissionDecision` while Copilot uses a flat `/permissionDecision`.
+    fn decision_pointer(&self) -> &'static str;
+
     /// Surface explanatory context to the model on a non-approval *without*
     /// changing the permission decision (the command still flows through the
     /// tool's normal approval path, and the user's own allowlist still applies).

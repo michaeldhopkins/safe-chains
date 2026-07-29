@@ -93,6 +93,10 @@ impl HookFormat for CodexHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/hookSpecificOutput/permissionDecision" // mirrors Claude's nesting
+    }
+
     fn render_response(&self, _verdict: Verdict) -> HookResponse {
         // SAFE command → emit nothing. Codex has no `grant`: `permissionDecision:"allow"` is
         // rejected as unsupported on v0.144.3 (docs list it, but it errored — version drift), and

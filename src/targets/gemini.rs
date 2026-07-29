@@ -108,6 +108,10 @@ impl HookFormat for GeminiHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/decision" // not permissionDecision
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         if verdict.is_allowed() {
             let reason = allow_reason(verdict);
