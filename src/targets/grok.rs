@@ -96,6 +96,10 @@ impl HookFormat for GrokHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/decision" // top level, camelCase envelope in
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         // A safe command → `allow`. Grok treats a hook `allow` as "declines to deny", NOT a grant:
         // the command still runs grok's own permission gauntlet and may prompt (so safe-chains cannot

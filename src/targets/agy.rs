@@ -110,6 +110,10 @@ impl HookFormat for AntigravityHookFormat {
         Ok(HookInput { command, root: cwd.clone(), cwd, session_id: None })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/decision" // flat object; agy reads a top-level decision
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         // SAFE command → `allow`. agy 1.1.2 does not honor this to skip its own confirmation, but
         // it's semantically correct + future-proof, and agy fails CLOSED on a missing decision, so

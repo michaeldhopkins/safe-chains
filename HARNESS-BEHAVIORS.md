@@ -68,7 +68,11 @@ Two consequences that shape everything else:
 The field name and accepted values differ per harness. Getting the field name
 wrong fails *silently* — the harness ignores the unknown key and falls back to
 its own permissions, so a mis-wired target looks like it "works" (commands still
-run) while never actually auto-approving. Tests assert the exact field.
+run) while never actually auto-approving. The field is DECLARED per
+target as `HookFormat::decision_pointer` (no default, so a new target must state it) and
+`every_target_emits_its_decision_at_the_declared_field` holds every emission to it — including
+that the decision does not ALSO appear at another harness's pointer, which is what a copy-pasted
+target looks like.
 
 | Target  | Tool / matcher          | Envelope shape                         | Decision field      | Values honored        | Timeout unit |
 |---------|-------------------------|----------------------------------------|---------------------|-----------------------|--------------|

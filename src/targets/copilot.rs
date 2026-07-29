@@ -118,6 +118,10 @@ impl HookFormat for CopilotHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/permissionDecision" // FLAT, not nested — same leaf name as Claude
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         // Copilot honors BOTH `allow` and `deny` — VERIFIED LIVE (v1.0.71): a hook `allow` auto-runs
         // the command and even suppresses copilot's own directory-access prompt; a hook `deny` blocks

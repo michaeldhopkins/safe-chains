@@ -96,6 +96,10 @@ impl HookFormat for ClaudeHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/hookSpecificOutput/permissionDecision" // nested under hookSpecificOutput
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         if verdict.is_allowed() {
             let reason = allow_reason(verdict);

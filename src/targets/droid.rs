@@ -102,6 +102,10 @@ impl HookFormat for DroidHookFormat {
         })
     }
 
+    fn decision_pointer(&self) -> &'static str {
+        "/hookSpecificOutput/permissionDecision" // mirrors Claude's nesting
+    }
+
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         if verdict.is_allowed() {
             let reason = allow_reason(verdict);
