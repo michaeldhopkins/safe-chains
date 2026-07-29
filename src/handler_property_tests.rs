@@ -612,6 +612,15 @@ const ABSTRACTION_SITES: &[AbstractionSite] = &[
         // to a file called `{}` — a different command from the one being modelled.
         takes_shell_ops: false,
     },
+    // A relative path after a `cd` is an abstraction over the joined path, and the classifier has
+    // to track the move. It did not: an unresolvable target (`cd ~`, `cd $HOME`) left the PREVIOUS
+    // cwd in place, so `cd ~/.aws && cat credentials` was judged as a worktree read.
+    AbstractionSite {
+        name: "relative path after cd",
+        build: |op, root| format!("cd {root} && {}", op.replace('@', "plain.txt")),
+        reach: Reach::Visible,
+        takes_shell_ops: true,
+    },
     AbstractionSite {
         name: "while read from find",
         build: |op, root| {
@@ -687,6 +696,36 @@ fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
         violations.len(),
         violations.join("\n"),
     );
+}
+
+/// A `cd` whose target cannot be resolved must leave the cwd UNKNOWN, not unchanged.
+///
+/// The generative site covers targets spellable as roots. These are the ones that are not: a
+/// variable, another user's home, an undeclared substitution. All three used to return "no new cwd"
+/// from `join_cwd`, which the caller reads as "no cd happened" — so the shell moved and the
+/// classifier went on judging relative paths against the workspace it had left.
+#[test]
+fn an_unresolvable_cd_makes_later_relative_paths_unpinnable() {
+    let cases = [
+        "cd $HOME && echo hi > .bashrc",
+        "cd $HOME/.aws && cat credentials",
+        "cd \"$SOMEDIR\" && rm -rf x",
+        "cd ~root && cat f",
+        "cd $(hostname) && cat f",
+        "cd $(hostname) && echo hi > f",
+    ];
+    let leaked: Vec<_> =
+        cases.iter().filter(|c| command_verdict_in(c, workspace()).is_allowed()).collect();
+    assert!(leaked.is_empty(), "an unresolvable cd was treated as no cd: {leaked:?}");
+
+    // Non-vacuity both ways: a RESOLVABLE cd still works, and a DECLARED substitution still carries
+    // its locus rather than being lumped in with the unpinnable cases.
+    for allowed in ["cd ./sub && echo hi > f.txt", "cd $(pwd) && cat f"] {
+        assert!(
+            command_verdict_in(allowed, workspace()).is_allowed(),
+            "`{allowed}` must still be allowed — the fix is aimed at UNRESOLVABLE targets only",
+        );
+    }
 }
 
 /// A substitution must never be MORE PERMISSIVE than a concrete path it could produce.

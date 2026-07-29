@@ -339,18 +339,63 @@ pub fn resolve(path: &str) -> Cow<'_, str> {
     resolved.map_or(Cow::Borrowed(path), Cow::Owned)
 }
 
-/// Resolve a `cd` target to a new absolute working directory, or `None` if it can't be
-/// pinned statically (`cd`, `cd -`, `cd ~…`, `cd $VAR`) — the caller then leaves the running
-/// cwd unchanged. `cur` is the current cwd, needed to resolve a *relative* target. Used by
-/// intra-line `cd` tracking (HP-19 #2).
+/// The cwd after a `cd` whose target cannot be pinned. It looks like a path AND is unpinnable, so
+/// every later relative path resolved against it worst-cases in both gate layers.
+pub(crate) const UNRESOLVED_CWD: &str = "/__SAFE_CHAINS_CMDSUB__";
+
+/// Resolve a `cd` target to a new working directory. `cur` is the current cwd, needed for a
+/// *relative* target. Used by intra-line `cd` tracking (HP-19 #2).
+///
+/// A target that cannot be pinned yields [`UNRESOLVED_CWD`], NOT `None`. This used to return `None`
+/// for `~…` and `$VAR`, and the caller reads `None` as "no cd happened" and keeps the previous cwd
+/// — so the `cd` was silently ignored and every later relative path was judged against a workspace
+/// the shell had already left. `cd ~/.aws && cat credentials` and `cd ~/.claude && echo … >
+/// settings.json` both auto-approved that way, the second writing the very file the allowlist
+/// bridge trusts. `None` now means only what the caller can act on: `cd_target` already returned
+/// `None` for "not a cd" (bare `cd`, `cd -`), so reaching here means the shell definitely moved.
+///
+/// `~`/`~/…` are EXPANDED rather than blanket-refused, because they are pinnable — that keeps
+/// `cd ~/.aws && cat credentials` gated as the credential read it is instead of coarsely denying
+/// everything downstream.
 pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
-    if target.starts_with('~') || target.contains('$') {
-        return None; // home / unpinnable
+    let expanded = match expand_home(target) {
+        Some(t) => t,
+        None => return Some(UNRESOLVED_CWD.to_string()), // `~` with no HOME
+    };
+    // Another user's home, a variable, an UNDECLARED substitution: the shell moved somewhere we
+    // cannot name. Fail closed rather than pretend it stayed put.
+    //
+    // A DECLARED substitution (`cd $(pwd)`) is deliberately not in that set. Its sentinel carries a
+    // locus, so letting it through the joins below keeps the cwd at that locus — `cd $(pwd) && cat
+    // f` stays a worktree read, while `cd $(fd d /etc) && cat f` is a machine one. Refusing both
+    // would have been sound but needlessly coarse.
+    if expanded.starts_with('~')
+        || expanded.contains('$')
+        || crate::cst::check::is_opaque_value(&expanded)
+    {
+        return Some(UNRESOLVED_CWD.to_string());
     }
-    if target.starts_with('/') {
-        return Some(lexical_join("/", target)); // absolute — normalize
+    if expanded.starts_with('/') {
+        return Some(lexical_join("/", &expanded)); // absolute — normalize
     }
-    cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, target)) // relative
+    // Relative with no known base: the base was already unknown before the `cd`, so this changes
+    // nothing about how later paths are judged. Left as "no update" rather than tightened, so the
+    // fix stays aimed at the hole (a cd to a KNOWN-elsewhere place being dropped).
+    cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, &expanded))
+}
+
+/// `~` / `~/rest` expanded against `$HOME`. `~user` is left alone (we cannot resolve another user's
+/// home); `None` only when `~` is used and `$HOME` is unusable.
+fn expand_home(target: &str) -> Option<Cow<'_, str>> {
+    let rest = match target {
+        "~" => "",
+        t => match t.strip_prefix("~/") {
+            Some(r) => r,
+            None => return Some(Cow::Borrowed(target)),
+        },
+    };
+    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'))?;
+    Some(Cow::Owned(if rest.is_empty() { home } else { format!("{home}/{rest}") }))
 }
 
 /// Express an absolute `abs` path relative to `root`: `.` if it IS the root, a root-relative path
