@@ -34,6 +34,17 @@ impl Target for AntigravityTarget {
         "Antigravity CLI (agy)"
     }
 
+    fn shell_tool_name(&self) -> &'static str {
+        "run_command" // the payload name; the UI labels it "Bash"
+    }
+
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(
+            r#"{{"toolCall":{{"name":"{tool}","args":{{"CommandLine":"{command}"}}}},"workspacePaths":["/w"]}}"#
+        ))
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".gemini/antigravity-cli")]
     }
@@ -85,6 +96,11 @@ struct ToolArgs {
 
 #[derive(Deserialize)]
 struct ToolCall {
+    /// The tool being called. Documented and live-verified in HARNESS-BEHAVIORS.md: the UI labels
+    /// the shell tool "Bash" but the payload says `run_command`, and agy's matcher keys on this.
+    /// Optional, so an envelope without it still parses.
+    #[serde(default)]
+    name: Option<String>,
     #[serde(default)]
     args: Option<ToolArgs>,
 }
@@ -101,8 +117,15 @@ impl HookFormat for AntigravityHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
         let env: AntigravityEnvelope =
             serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
-        let command = env
-            .tool_call
+        let tool_call = env.tool_call;
+        // Self-filter on the tool. agy is ASK-capable, so deciding on a foreign call escalates a
+        // tool that was never analysed to a human prompt. Absent name still passes.
+        if let Some(name) = tool_call.as_ref().and_then(|t| t.name.as_deref())
+            && name != "run_command"
+        {
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
+        }
+        let command = tool_call
             .and_then(|t| t.args)
             .and_then(|a| a.command_line)
             .ok_or_else(|| ParseError { message: "no toolCall.args.CommandLine".into() })?;
