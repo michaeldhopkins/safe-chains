@@ -691,20 +691,21 @@ identifier with side effects, the fix belongs in the gate, not in a capability h
 no precedent for an admitted `executes(caller-inline)`: `bash -c 'ls'` approves via the shell
 handler re-validating the inner command, not via a capability.
 
-## Generalize the abstraction-soundness property beyond substitutions
+## Sweep vs aim: the policy the soundness property had to be taught
 
-`substitution_is_never_more_permissive_than_a_path_it_could_produce` (handler_property_tests.rs)
-encodes one obligation: an abstraction over a set of concrete paths must never classify more
-permissively than the worst path in that set. It currently covers `$(…)` only, but the classifier
-abstracts paths in several other places, and each is the same shape of hazard:
+Recorded because it took a wrong turn to find, and the next person generalizing the abstraction-
+soundness property will hit it too.
 
-- `$VAR` bindings and the `UNCERTAIN_VALUE` sentinel,
-- `for`-loop variables (`loop_reprs` representatives),
-- `find … -exec {}` / `xargs` operand binding,
-- glob operands (`*` standing for a set of files),
-- `while read VAR` stdin-item representatives.
+The classifier deliberately admits `rm -rf app` while refusing `rm -rf app/.git`, though both
+delete `app/.git`. The worktree-trusted rung guards against POINTING at `.git`/`.envrc` — planting
+a hook is code injection — and not against a broad sweep passing over them, which the `scale` facet
+covers and which `grep -r`, `rm -rf build/` and every recursive tool depend on.
 
-Each has a natural concretization set, so each can reuse the harness: pick the abstraction, pick a
-concrete member, assert the abstraction is no more permissive. Worth doing — this property caught
-all four historical substitution fail-opens with no hand-written expectations, including two that
-had taken a full review each to spot.
+So a hidden descendant is NOT in any abstraction's concretization set in
+`no_abstraction_is_more_permissive_than_a_path_it_could_denote`. A first draft included them and
+produced 272 "violations", every one a `find`/`while read` sweep reading an `app/.ssh` that the
+same policy admits via `grep -r pattern app`. Those were the test asserting a stricter policy than
+the one that exists. The aim dimension is probed by pointing ROOTS at hidden/hot locations instead.
+
+If that policy is ever revisited — e.g. a credential store inside the worktree should defeat a
+sweep — the witness sets are where to change it, and the property will then report the real list.

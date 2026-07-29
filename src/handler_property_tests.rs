@@ -421,8 +421,12 @@ const TRUSTED_WRITE_VIA_SUB_CASES: &[&str] = &[
 // moment it is declared. That is what makes this catch the `.git/hooks/pre-commit` class without
 // anyone having thought of git hooks.
 
-/// Roots a declared substitution can be pointed at, spanning the loci that matter.
-const ABSTRACTION_ROOTS: &[&str] = &["app", "/etc", "~", "~/.ssh", "..", "/work"];
+/// Roots an abstraction can be pointed at. Spans the loci that matter AND the AIM dimension: a
+/// root that is itself hidden/trusted (`app/.git`, `app/.envrc`) or a credential store is how an
+/// operation POINTS at the frozen rung, which is the thing the rung exists to refuse — as opposed
+/// to a sweep passing over it, which policy admits (see `Reach`).
+const ABSTRACTION_ROOTS: &[&str] =
+    &["app", "/etc", "~", "~/.ssh", "..", "/work", "app/.git", "app/.envrc", "app/.ssh"];
 
 /// Contexts that consume a path, spanning the OPERATIONS that gate differently — a plain read, all
 /// three write-redirect modes, a copy destination, a path-gated output flag, a loop body, and a
@@ -498,6 +502,170 @@ fn fd_claim_assumption_holds() {
              smaller set than fd can actually produce",
         );
     }
+}
+
+// ── Abstraction soundness, generalized ─────────────────────────────────────────────────────────
+//
+// A substitution is not the only place the classifier replaces a concrete path with an
+// approximation. A `$VAR` binding, a `for`-loop variable, a glob, `find -exec {}` and a
+// `while read` variable all do it, and every one of them owes the same obligation. This is the
+// substitution property applied to each site, with the site's own concretization set.
+//
+// Getting that set right IS the test. Too large and it reports paths the abstraction cannot
+// reach; too small and it stops seeing real laundering. The one thing that separates these sites
+// is whether they traverse HIDDEN files, and it is decisive: a shell glob never matches a leading
+// dot, so `app/*` cannot be `app/.git`, while `find app` walks straight into it.
+
+/// What a site's abstraction is AIMED at beneath a root.
+///
+/// Aim, not reach — and the distinction is the project's policy, established by a pair the
+/// classifier already decides: `rm -rf app` is admitted while `rm -rf app/.git` is refused, though
+/// both delete `app/.git`. The trusted rung guards against POINTING at `.git`/`.envrc` (planting a
+/// hook is code injection); it does not try to stop a broad worktree sweep from passing over them,
+/// because that is what the `scale` facet is for and because refusing it would take `grep -r`,
+/// `rm -rf build/` and every recursive tool with it.
+///
+/// So a hidden descendant is deliberately NOT in any concretization set here. An earlier draft put
+/// it in and produced 272 "violations" — all of them `find -exec` and `while read` sweeps reading
+/// an `app/.ssh` that the very same policy admits via `grep -r pattern app`. Those were the test
+/// asserting a stricter policy than the one that exists, not findings. The AIM dimension is probed
+/// instead by pointing the roots themselves at hidden and hot locations.
+#[derive(Clone, Copy, PartialEq)]
+enum Reach {
+    /// Exactly the root — a literal bound to a variable or listed in a loop.
+    Exact,
+    /// Descendants the abstraction can name individually. No hidden component: shell globs do not
+    /// match a leading dot, `fd` skips hidden entries, and for a sweep the hidden files it walks
+    /// are blast radius rather than aim (see above).
+    Visible,
+}
+
+struct AbstractionSite {
+    name: &'static str,
+    /// Builds the abstract command. `op` carries an `@` path slot — `@` rather than `{}` because
+    /// `find -exec` spends `{}` on its own operand.
+    build: fn(op: &str, root: &str) -> String,
+    reach: Reach,
+    /// Whether this site can carry a shell-construct op (see `ABSTRACTION_OPS`).
+    takes_shell_ops: bool,
+}
+
+/// Operations that gate differently, so a site is probed on each face rather than on reads alone.
+/// The second field marks an op that is a SHELL construct rather than a command: a redirect binds
+/// at the shell level, so `find … -exec echo hi > {} ;` redirects find's own output to a file named
+/// `{}` instead of writing each match. Composing those with `find -exec` probes a command nobody
+/// wrote, so the site skips them.
+const ABSTRACTION_OPS: &[(&str, bool)] = &[
+    ("cat @", false),
+    ("echo hi > @", true),
+    ("cp ./src.txt @", false),
+    ("rm -rf @", false),
+    ("asciidoctor -o @ in.adoc", false),
+];
+
+const ABSTRACTION_SITES: &[AbstractionSite] = &[
+    AbstractionSite {
+        name: "command substitution",
+        build: |op, root| op.replace('@', &format!("$(fd pat {root})")),
+        reach: Reach::Visible,
+        takes_shell_ops: true,
+    },
+    AbstractionSite {
+        name: "variable binding",
+        build: |op, root| format!("X={root}; {}", op.replace('@', "\"$X\"")),
+        reach: Reach::Exact,
+        takes_shell_ops: true,
+    },
+    AbstractionSite {
+        name: "for-loop over a literal",
+        build: |op, root| format!("for f in {root}; do {}; done", op.replace('@', "\"$f\"")),
+        reach: Reach::Exact,
+        takes_shell_ops: true,
+    },
+    AbstractionSite {
+        name: "glob operand",
+        build: |op, root| op.replace('@', &format!("{root}/*")),
+        reach: Reach::Visible,
+        takes_shell_ops: true,
+    },
+    AbstractionSite {
+        name: "for-loop over a glob",
+        build: |op, root| format!("for f in {root}/*; do {}; done", op.replace('@', "\"$f\"")),
+        reach: Reach::Visible,
+        takes_shell_ops: true,
+    },
+    AbstractionSite {
+        name: "find -exec",
+        build: |op, root| format!("find {root} -exec {} ;", op.replace('@', "{}")),
+        reach: Reach::Visible,
+        // A redirect binds at the shell, so `find … -exec echo hi > {} ;` sends find's own output
+        // to a file called `{}` — a different command from the one being modelled.
+        takes_shell_ops: false,
+    },
+    AbstractionSite {
+        name: "while read from find",
+        build: |op, root| {
+            format!("find {root} -type f | while read f; do {}; done", op.replace('@', "\"$f\""))
+        },
+        reach: Reach::Visible,
+        takes_shell_ops: true,
+    },
+];
+
+/// The concrete paths a site AIMS at beneath `root`. Hidden descendants are excluded on purpose —
+/// they are blast radius rather than aim, and the AIM cases arrive as hidden ROOTS instead.
+fn site_witnesses(root: &str, reach: Reach) -> Vec<String> {
+    let mut out = vec![root.to_string()];
+    if reach == Reach::Exact {
+        return out;
+    }
+    out.push(format!("{root}/plain.txt"));
+    out.push(format!("{root}/sub/plain.txt"));
+    out
+}
+
+/// Every abstraction site owes the same obligation the substitution one does: it must never be
+/// more permissive than a concrete path it could denote.
+///
+/// Exhaustive for the same reason — the space is small and sampling already proved able to miss
+/// the one pairing that mattered.
+#[test]
+fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
+    let mut violations = Vec::new();
+    let mut constrained = 0usize;
+
+    for site in ABSTRACTION_SITES {
+        for (op, shell_construct) in ABSTRACTION_OPS {
+            if *shell_construct && !site.takes_shell_ops {
+                continue;
+            }
+            for root in ABSTRACTION_ROOTS {
+                let abstracted = (site.build)(op, root);
+                let abstract_allowed = command_verdict_in(&abstracted, workspace()).is_allowed();
+                for witness in site_witnesses(root, site.reach) {
+                    let concrete = op.replace('@', &witness);
+                    if command_verdict_in(&concrete, workspace()).is_allowed() {
+                        continue;
+                    }
+                    constrained += 1;
+                    if abstract_allowed {
+                        violations.push(format!(
+                            "  [{}] `{concrete}` denies but `{abstracted}` allows",
+                            site.name,
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    assert!(constrained > 0, "no witness was refused — the property is vacuous");
+    assert!(
+        violations.is_empty(),
+        "an abstraction was more permissive than a path it could denote ({} cases):\n{}",
+        violations.len(),
+        violations.join("\n"),
+    );
 }
 
 /// A substitution must never be MORE PERMISSIVE than a concrete path it could produce.

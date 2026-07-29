@@ -304,9 +304,25 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
     let through = || input.unwrap_or(UNKNOWN_ITEM).to_string();
     match name.as_str() {
         // find/fd emit paths UNDER their roots — the child of the worst root carries its locus.
+        //
+        // "Worst" by BOTH faces, not by whether the read is allowed. Selecting on `source_ok`
+        // dropped any root that merely reads fine, so `find app/.git` fell through to `.` and
+        // `find app/.git | while read f; do echo hi > "$f"; done` wrote into the frozen rung that
+        // `echo hi > app/.git/config` refuses. `.git` is exactly the path that reads fine and must
+        // not be written, so a read-face test could never see it.
         "find" | "fd" | "fdfind" => {
             let roots = find_roots(&args);
-            let base = roots.iter().find(|r| !source_ok(r)).copied().unwrap_or(".");
+            let base = roots
+                .iter()
+                .max_by_key(|r| {
+                    let (read, write) = (
+                        crate::engine::resolve::locus::read_locus(r),
+                        crate::engine::resolve::locus::write_locus(r),
+                    );
+                    read.max(write)
+                })
+                .copied()
+                .unwrap_or(".");
             format!("{}/sc_item", base.trim_end_matches('/'))
         }
         // ls emits cwd-relative BASENAMES (worktree) unless `-d` echoes its (possibly absolute) args.
