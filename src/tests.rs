@@ -1785,6 +1785,61 @@ fn workspace_overreach_distinguishes_hidden_peer_from_outside() {
     assert!(matches!(outside, Some((_, ReachReason::OutsideWorkspace))), "above parent → OutsideWorkspace, got {outside:?}");
 }
 
+/// The denial explanation must name a path the command actually USES. A heredoc body is data, so
+/// text inside one can never be the reach — the nudge once read the raw token stream and reported
+/// `git commit -m "$(cat <<'EOF' … /etc/hosts … EOF)"` as "reaches /etc/hosts", stating a false
+/// reason AND advising the reader to grant a path the command never touched.
+#[test]
+fn a_heredoc_body_is_never_reported_as_the_reach() {
+    use crate::pathctx::{enter, PathCtx};
+    let Ok(home) = std::env::var("HOME") else { return };
+    if !home.starts_with('/') {
+        return;
+    }
+    let ws = format!("{home}/projects/scproj");
+    let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });
+
+    for path in ["/etc/hosts", "~/.ssh/id_rsa", "/etc/shadow"] {
+        // Both the bare heredoc and the shape the bug actually arrived in: a heredoc nested inside
+        // a command substitution, i.e. every `git commit -m "$(cat <<'EOF' … EOF)"` message.
+        for prose in [
+            format!("notacommand <<'EOF'\nplease read {path} for context\nEOF"),
+            format!("notacommand -m \"$(cat <<'EOF'\nplease read {path} for context\nEOF\n)\""),
+        ] {
+            assert_eq!(
+                crate::workspace_overreach(&prose),
+                None,
+                "{path} inside a heredoc body is data, not a reach: `{prose}`"
+            );
+        }
+        // Non-vacuity, and the regression guard: moving to the CST once DROPPED redirect targets,
+        // which the raw token split had caught. Every position the shell actually opens or passes
+        // the path in must still be reported, or "no reach named" silently understates a denial.
+        for shape in [
+            "notacommand {p}",
+            "notacommand > {p}",
+            "notacommand >> {p}",
+            "notacommand < {p}",
+            "notacommand <> {p}",
+            "notacommand <<< {p}",
+            "( notacommand {p} )",
+            "{{ notacommand {p} ; }}",
+            "if true; then notacommand {p}; fi",
+            "for x in {p}; do notacommand $x; done",
+            "while true; do notacommand {p}; done",
+            "case x in a) notacommand {p};; esac",
+            "f() {{ notacommand {p}; }}",
+            "notacommand $(echo {p})",
+        ] {
+            let cmd = shape.replace("{p}", path);
+            assert!(
+                crate::workspace_overreach(&cmd).is_some(),
+                "{path} must be reported as the reach in `{cmd}`"
+            );
+        }
+    }
+}
+
 // ── Pre-go-live adversarial-review fixes ────────────────────────────────────────────────────
 
 // The Homebrew g-alias path-gate bypass: a GNU-coreutils alias (`gcat`, `gtee`, `gshred`) was
