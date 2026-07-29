@@ -81,18 +81,27 @@ fn arb_heredoc_delimiter() -> impl Strategy<Value = String> {
 }
 
 fn arb_write_mode() -> impl Strategy<Value = WriteMode> {
-    prop_oneof![Just(WriteMode::Truncate), Just(WriteMode::Append), Just(WriteMode::Clobber)]
+    prop_oneof![
+        Just(WriteMode::Truncate),
+        Just(WriteMode::Append),
+        Just(WriteMode::Clobber),
+        Just(WriteMode::TruncateBoth),
+        Just(WriteMode::AppendBoth),
+    ]
 }
 
 fn arb_redir() -> BoxedStrategy<Redir> {
     prop_oneof![
+        // `&>`/`&>>` carry no descriptor, so they are generated only with fd 1 — the shape the
+        // parser can produce and the renderer can round-trip.
         (0..3u32, arb_word(0), arb_write_mode()).prop_map(|(fd, target, mode)| {
-            Redir::Write { fd, target, mode }
+            let both = matches!(mode, WriteMode::TruncateBoth | WriteMode::AppendBoth);
+            Redir::Write { fd: if both { 1 } else { fd }, target, mode }
         }),
         (0..3u32, arb_word(0)).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
         (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
-            Redir::HereDoc { delimiter, strip_tabs }
+            Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) }
         }),
         (0..3u32, prop_oneof!["0", "1", "2", "-"].prop_map(String::from))
             .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
@@ -231,7 +240,7 @@ fn arb_safe_redir() -> BoxedStrategy<Redir> {
         (0..3u32, arb_dev_null_word()).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
         (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
-            Redir::HereDoc { delimiter, strip_tabs }
+            Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) }
         }),
         (0..3u32, prop_oneof!["0", "1", "2"].prop_map(String::from))
             .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
@@ -593,7 +602,7 @@ proptest! {
         delimiter in arb_heredoc_delimiter(),
         strip_tabs in any::<bool>(),
     ) {
-        let redir = Redir::HereDoc { delimiter, strip_tabs };
+        let redir = Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) };
         prop_assert!(check::check_redirects(&[redir]));
 
         let cmd = SimpleCmd {
@@ -602,6 +611,7 @@ proptest! {
             redirs: vec![Redir::HereDoc {
                 delimiter: "EOF".to_string(),
                 strip_tabs: false,
+                body: Word(Vec::new()),
             }],
         };
         prop_assert!(check::check_redirects(&cmd.redirs));

@@ -245,11 +245,16 @@ impl fmt::Display for Redir {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Redir::Write { fd, target, mode } => {
-                if *fd != 1 { write!(f, "{fd}")?; }
+                // `&>`/`&>>` name both streams by construction and take no descriptor prefix —
+                // `2&> f` is not a redirect, and rendering one would not re-parse.
+                let both = matches!(mode, WriteMode::TruncateBoth | WriteMode::AppendBoth);
+                if *fd != 1 && !both { write!(f, "{fd}")?; }
                 let op = match mode {
                     WriteMode::Truncate => ">",
                     WriteMode::Append => ">>",
                     WriteMode::Clobber => ">|",
+                    WriteMode::TruncateBoth => "&>",
+                    WriteMode::AppendBoth => "&>>",
                 };
                 write!(f, "{op} {target}")
             }
@@ -262,7 +267,7 @@ impl fmt::Display for Redir {
                 write!(f, "<> {target}")
             }
             Redir::HereStr(w) => write!(f, "<<< {w}"),
-            Redir::HereDoc { delimiter, strip_tabs } => {
+            Redir::HereDoc { delimiter, strip_tabs, .. } => {
                 if *strip_tabs { write!(f, "<<-{delimiter}") } else { write!(f, "<<{delimiter}") }
             }
             Redir::DupFd { src, dst } => {

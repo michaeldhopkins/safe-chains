@@ -128,6 +128,12 @@ pub enum WriteMode {
     Truncate,
     /// `>>` — append.
     Append,
+    /// `&>` (and the equivalent `>&FILE`) — stdout AND stderr to the file, truncating. Both
+    /// streams land on ONE target, so the locus gate has exactly one path to judge, the same as
+    /// `>`; the variant exists so `--explain` echoes the operator that was typed.
+    TruncateBoth,
+    /// `&>>` — stdout AND stderr to the file, appending.
+    AppendBoth,
     /// `>|` — truncate, overriding `noclobber` (POSIX 2.7.2).
     Clobber,
 }
@@ -154,6 +160,11 @@ pub enum Redir {
     HereDoc {
         delimiter: String,
         strip_tabs: bool,
+        /// The body's parsed EXPANSIONS. A heredoc body is data only when the delimiter is quoted
+        /// (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, `<<E"O"F`); with a bare `<<EOF` the shell expands the
+        /// body exactly as it would a double-quoted string, so `$(…)` and backticks in it RUN.
+        /// Empty when the delimiter is quoted, so a quoted body stays pure data.
+        body: Word,
     },
     DupFd {
         src: u32,

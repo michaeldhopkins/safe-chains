@@ -212,8 +212,11 @@ fn list_op(input: &mut &str) -> ModalResult<ListOp> {
     .parse_next(input)
 }
 
+/// A pipe. `|&` (bash) pipes stdout AND stderr into the next command; what flows through the pipe
+/// does not change which commands run, so it classifies exactly as `|`. Matched before the bare
+/// `|` so the `&` is not left to start a bogus background statement. `||` stays an OR, not a pipe.
 fn pipe_sep(input: &mut &str) -> ModalResult<()> {
-    (ws, '|', not('|'), ws).void().parse_next(input)
+    (ws, alt(("|&".void(), ('|', not('|')).void())), ws).void().parse_next(input)
 }
 
 // === Pipeline ===
@@ -392,6 +395,11 @@ fn simple_cmd(input: &mut &str) -> ModalResult<SimpleCmd> {
 }
 
 fn at_cmd_end(input: &str) -> bool {
+    // `&>`/`&>>` REDIRECT this command; only a bare `&` backgrounds it and ends it. Without this
+    // the command stopped at the `&` and the redirect parser never saw the operator at all.
+    if input.starts_with("&>") {
+        return false;
+    }
     input.is_empty()
         || matches!(
             input.as_bytes().first(),
@@ -421,9 +429,29 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
             target,
             mode: WriteMode::Append,
         }),
+        // `&>>` / `&>` send stdout AND stderr to a FILE (bash). `&>` must follow `&>>` so the
+        // append form is not read as a truncate followed by a stray `>`.
+        preceded("&>>", (ws, word)).map(|(_, target)| Redir::Write {
+            fd: 1,
+            target,
+            mode: WriteMode::AppendBoth,
+        }),
+        preceded("&>", (ws, word)).map(|(_, target)| Redir::Write {
+            fd: 1,
+            target,
+            mode: WriteMode::TruncateBoth,
+        }),
         preceded(">&", fd_target).map(move |dst| Redir::DupFd {
             src: fd.unwrap_or(1),
             dst,
+        }),
+        // `>&WORD` where WORD is not a file descriptor is the older spelling of `&>`: it opens a
+        // FILE for both streams. It must follow the `>&`-fd form, so `>&2` stays a descriptor dup
+        // rather than a write to a file named `2`.
+        preceded(">&", (ws, word)).map(|(_, target)| Redir::Write {
+            fd: 1,
+            target,
+            mode: WriteMode::TruncateBoth,
         }),
         // `>|` (POSIX 2.7.2) overrides `noclobber`. The override is about whether the shell
         // REFUSES an existing file, not about what lands there, so it classifies as the plain
@@ -456,7 +484,15 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
     "<<".parse_next(input)?;
     let strip_tabs = opt('-').parse_next(input)?.is_some();
     ws.parse_next(input)?;
-    let delimiter = heredoc_delimiter.parse_next(input)?;
+    let (delimiter, expands) = heredoc_delimiter.parse_next(input)?;
+    // With a BARE delimiter the shell expands the body, so `cat <<EOF` with `$(rm -rf /)` in it
+    // runs that command. The body is looked up now (it is already present in `input`, after this
+    // line) rather than at drain time, so the expansions land on the redirect that owns them.
+    let body = if expands {
+        heredoc_body_word(input, &delimiter, strip_tabs)?
+    } else {
+        Word(Vec::new())
+    };
     // Bash semantics: the heredoc body lives on lines AFTER the
     // command line is finished, not immediately after `<<DELIM`. The
     // command line can continue with more redirects, a pipe, etc.
@@ -468,7 +504,65 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
             strip_tabs,
         });
     });
-    Ok(Redir::HereDoc { delimiter, strip_tabs })
+    Ok(Redir::HereDoc { delimiter, strip_tabs, body })
+}
+
+/// This heredoc's body, parsed for the expansions the shell performs on it.
+///
+/// Bodies begin after the CURRENT line, and a heredoc declared earlier on the same line
+/// (`cat <<A <<B`) owns an earlier body — so the pending queue is replayed to find where this
+/// one starts. Reads without consuming; `drain_pending_heredocs` still does the consuming.
+///
+/// FAILS CLOSED: a body that does not parse (a lone backtick opens a substitution that is never
+/// closed) refuses the whole parse, which denies. That matches the shell, which reports
+/// `unexpected EOF while looking for matching backquote` and runs nothing.
+fn heredoc_body_word(input: &str, delimiter: &str, strip_tabs: bool) -> ModalResult<Word> {
+    let Some(nl) = input.find('\n') else {
+        return Ok(Word(Vec::new())); // no body yet; the drain will fail the parse
+    };
+    let mut rest = &input[nl + 1..];
+    let priors: Vec<PendingHeredoc> = PENDING_HEREDOCS.with(|q| q.borrow().clone());
+    for prior in &priors {
+        let Some((_, after)) = split_heredoc_body(rest, &prior.delimiter, prior.strip_tabs) else {
+            return Ok(Word(Vec::new()));
+        };
+        rest = after;
+    }
+    let Some((body, _)) = split_heredoc_body(rest, delimiter, strip_tabs) else {
+        return Ok(Word(Vec::new()));
+    };
+    let mut text = body;
+    let parts: Vec<WordPart> = repeat(0.., heredoc_part).parse_next(&mut text)?;
+    if !text.is_empty() {
+        return backtrack();
+    }
+    Ok(Word(parts))
+}
+
+/// A heredoc body expands like a double-quoted string, with one difference that matters: `"` and
+/// `'` are ORDINARY characters there, so `'$(id)'` in a body still runs `id`. Skipping quoted spans
+/// the way `find_sub_close` does would therefore miss a live substitution.
+fn is_heredoc_literal(c: char) -> bool {
+    !matches!(c, '"' | '\\' | '`' | '$')
+}
+
+fn heredoc_part(input: &mut &str) -> ModalResult<WordPart> {
+    if input.is_empty() {
+        return backtrack();
+    }
+    if input.starts_with('"') {
+        *input = &input[1..];
+        return Ok(WordPart::Lit("\"".to_string()));
+    }
+    alt((
+        dq_escape,
+        arith_sub,
+        cmd_sub,
+        backtick_part,
+        dollar_lit(is_heredoc_literal),
+        lit(is_heredoc_literal),
+    ))
+    .parse_next(input)
 }
 
 #[derive(Debug, Clone)]
@@ -496,7 +590,23 @@ fn drain_pending_heredocs(input: &mut &str) {
 }
 
 fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> bool {
-    let s = *input;
+    match split_heredoc_body(input, delimiter, strip_tabs) {
+        Some((_, rest)) => {
+            *input = rest;
+            true
+        }
+        None => false,
+    }
+}
+
+/// Split at the delimiter line: `(body, rest-after-the-delimiter-line)`, or `None` when the
+/// delimiter never appears. `strip_tabs` (`<<-`) strips leading TABS only, matching the shell —
+/// spaces do not terminate a `<<-` body.
+fn split_heredoc_body<'a>(
+    s: &'a str,
+    delimiter: &str,
+    strip_tabs: bool,
+) -> Option<(&'a str, &'a str)> {
     let bytes = s.as_bytes();
     let mut line_start = 0;
     while line_start <= bytes.len() {
@@ -504,39 +614,77 @@ fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> boo
             Some(rel) => line_start + rel,
             None => bytes.len(),
         };
-        let line_bytes = &bytes[line_start..line_end];
-        let line = if strip_tabs {
-            std::str::from_utf8(line_bytes)
-                .unwrap_or("")
-                .trim_start_matches('\t')
-        } else {
-            std::str::from_utf8(line_bytes).unwrap_or("")
-        };
+        let line = &s[line_start..line_end];
+        let line = if strip_tabs { line.trim_start_matches('\t') } else { line };
         if line == delimiter {
-            // Advance past the delimiter line + its newline.
             let advance = line_end + usize::from(line_end < bytes.len());
-            *input = &s[advance..];
-            return true;
+            return Some((&s[..line_start], &s[advance..]));
         }
         if line_end >= bytes.len() {
-            return false;
+            return None;
         }
         line_start = line_end + 1;
     }
-    false
+    None
 }
 
 fn reset_heredoc_queue() {
     PENDING_HEREDOCS.with(|q| q.borrow_mut().clear());
 }
 
-fn heredoc_delimiter(input: &mut &str) -> ModalResult<String> {
+/// The delimiter, and whether the body EXPANDS. Any quoting or escaping anywhere in the delimiter
+/// suppresses expansion (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, `<<E"O"F`); only a wholly bare word leaves
+/// the body live. Reported as a flag because that single bit decides whether the body is data or
+/// code, and treating a quoted body as code would over-deny every ordinary commit message.
+fn heredoc_delimiter(input: &mut &str) -> ModalResult<(String, bool)> {
     alt((
-        delimited('\'', take_while(0.., |c| c != '\''), '\'').map(|s: &str| s.to_string()),
-        delimited('"', take_while(0.., |c| c != '"'), '"').map(|s: &str| s.to_string()),
-        take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_').map(|s: &str| s.to_string()),
+        delimited('\'', take_while(0.., |c| c != '\''), '\'').map(|s: &str| (s.to_string(), false)),
+        delimited('"', take_while(0.., |c| c != '"'), '"').map(|s: &str| (s.to_string(), false)),
+        escaped_delimiter,
+        take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_')
+            .map(|s: &str| (s.to_string(), true)),
     ))
     .parse_next(input)
+}
+
+/// A delimiter carrying a backslash or an inner quote — `<<\EOF`, `<<E"O"F`, `<<EO'F'`. The shell
+/// treats ANY such quoting as suppressing expansion over the WHOLE delimiter, so these parse to the
+/// unquoted spelling with expansion off. Without this they failed to parse at all, denying a valid
+/// (and, being unexpanded, entirely inert) heredoc.
+fn escaped_delimiter(input: &mut &str) -> ModalResult<(String, bool)> {
+    let mut rest = *input;
+    let mut name = String::new();
+    let mut quoted = false;
+    loop {
+        let mut chars = rest.chars();
+        match chars.next() {
+            Some('\\') => match chars.next() {
+                Some(c) => {
+                    name.push(c);
+                    quoted = true;
+                    rest = &rest[1 + c.len_utf8()..];
+                }
+                None => break,
+            },
+            Some(q @ ('\'' | '"')) => {
+                let inner_end = rest[1..].find(q).map(|i| i + 1);
+                let Some(end) = inner_end else { break };
+                name.push_str(&rest[1..end]);
+                quoted = true;
+                rest = &rest[end + 1..];
+            }
+            Some(c) if c.is_ascii_alphanumeric() || c == '_' => {
+                name.push(c);
+                rest = &rest[c.len_utf8()..];
+            }
+            _ => break,
+        }
+    }
+    if !quoted || name.is_empty() {
+        return backtrack();
+    }
+    *input = rest;
+    Ok((name, false))
 }
 
 fn fd_prefix(input: &mut &str) -> ModalResult<u32> {
@@ -1238,7 +1386,7 @@ mod tests {
     }
     #[test]
     fn heredoc_bare() {
-        assert!(matches!(&simple(&p("cat <<EOF")).redirs[0], Redir::HereDoc { delimiter, strip_tabs: false } if delimiter == "EOF"));
+        assert!(matches!(&simple(&p("cat <<EOF")).redirs[0], Redir::HereDoc { delimiter, strip_tabs: false, .. } if delimiter == "EOF"));
     }
     #[test]
     fn heredoc_with_content() {
