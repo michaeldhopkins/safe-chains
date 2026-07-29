@@ -90,4 +90,6 @@ valued = [
 ]
 
 [command.path_gate]
-flags = { "--password-file" = "read" }
+# `--rsh`/`-e` is the remote SHELL rsync EXECUTES to reach the far side, so its value is a
+# program. A bare name (`-e ssh`) resolves on $PATH and stays trusted; a path into /tmp does not.
+flags = { "--password-file" = "read", "--rsh" = "exec", "-e" = "exec" }

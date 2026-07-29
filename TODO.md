@@ -52,6 +52,32 @@ comes off the list and falls to approval. `restic --password-command` and `borg 
 `RUSTC_WRAPPER` shape and should recurse. Needs a mechanism on the wrapper spec, since `valued` is
 today just a list of names.
 
+SECOND PASS (2026-07-29): the guard written for the first pass walked only `[command.wrapper]` —
+307 flags — while `valued` also appears at top level (8,491), on each sub (5,825) and on a fallback
+(45). Seven more executor flags were live outside it, all confirmed auto-approving with a working
+baseline invocation:
+
+    rsync --rsh /tmp/evil ./src/ ./dst/          the remote shell rsync executes
+    rsync -e /tmp/evil ./src/ ./dst/             same flag, short spelling
+    gotestsum --raw-command /tmp/evil            replaces the test command
+    gotestsum --post-run-command /tmp/evil       run after the test run
+    mypy --python-executable /tmp/evil ./src     mypy runs it to inspect the env
+    pip-sync --python-executable /tmp/evil       invoked to perform the install
+    kustomize build --helm-command /tmp/evil ./k the helm executable it shells out to
+    steep check --steep-command /tmp/evil        the steep executable re-invoked
+
+All gated with role `exec`; `rsync -e ssh` (a bare name on $PATH) still approves, which is the form
+that actually matters. The guard now walks all four locations.
+
+STILL OPEN — the part names cannot find. Every flag above advertised itself (`-rsh`, `-command`,
+`-executable`). A flag whose name hides what it does is invisible to the ratchet: `vite --config`
+evaluates JavaScript and `sandbox-exec -f` picks the sandbox profile, and both were found only
+because they were already written down here. Candidates seen but NOT researched: `alembic --config`
+(the ini selects an `env.py` that runs), `i18n-tasks --config` (ERB-evaluated YAML), `helm/flux
+--kubeconfig` (a kubeconfig can carry a `users[].user.exec` credential plugin), `workon --config`.
+Each needs the per-flag research this section describes — the ~14,600 valued flags cannot be swept
+by name alone.
+
 Found 2026-07-27 while reviewing the env-assignment work.
 
 ## Follow-up: remaining JVM code-supplying flags (deliberately denied)

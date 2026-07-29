@@ -29,3 +29,8 @@ write_flags = [
     "--junitfile", "--junitfile-hide-empty-pkg",
     "--rerun-fails-report",
 ]
+
+# `--raw-command` REPLACES the test command with the given program and `--post-run-command` runs
+# one afterwards, so both values are programs rather than data.
+[command.path_gate]
+flags = { "--raw-command" = "exec", "--post-run-command" = "exec" }

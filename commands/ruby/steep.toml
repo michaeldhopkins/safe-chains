@@ -160,3 +160,7 @@ candidate = true
 [[command.sub]]
 name = "prototype"
 candidate = true
+
+# `--steep-command` names the steep executable the subcommand re-invokes.
+[command.path_gate]
+flags = { "--steep-command" = "exec" }

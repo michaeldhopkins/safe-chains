@@ -2625,22 +2625,39 @@ use super::*;
     /// Regression guard: `examples_safe`/`examples_denied` must appear
     /// before any `[[command.sub]]` or `[command.fallback]` table in
     /// each TOML file. TOML semantics scope inline keys to the
-    /// A wrapper flag whose NAME says its value is a program must gate that value at the EXECUTOR
-    /// locus.
+    /// A flag whose NAME says its value is a program must gate that value at the EXECUTOR locus.
     ///
     /// `dispatch_wrapper` consumes a valued flag and never looks at the value, so a flag naming a
     /// program auto-approved any path — `borg --rsh /tmp/evil check repo` ran `/tmp/evil`. `read`
     /// or `write` is not enough: both ADMIT `/tmp`, which is exactly where a fetched script lands.
     /// Only `exec` withholds it.
     ///
-    /// A ratchet over names, so a wrapper flag added later inherits the requirement. It cannot
+    /// Walks EVERY place a `valued` list can appear — the command, its wrapper, its fallback and
+    /// each sub. The first version walked only the wrapper: 307 flags of ~14,600, which is how
+    /// `rsync --rsh` and six more stayed ungated while the guard passed.
+    ///
+    /// A ratchet over names, so a flag added later inherits the requirement. It cannot
     /// catch a flag whose name does not advertise what it does (`vite --config` evaluates
     /// JavaScript, `sandbox-exec -f` picks the sandbox profile) — those are gated, but by research,
     /// not by this guard. The behavioural corpus below pins them.
     #[test]
-    fn an_executor_named_wrapper_flag_is_gated_at_the_executor_locus() {
+    fn an_executor_named_flag_is_gated_at_the_executor_locus() {
         use std::fs;
         use std::path::PathBuf;
+
+        /// Flags the NAME rule catches whose value is not a program at all. Reviewed individually;
+        /// gating these would be a false claim and would break the legitimate spelling. The list
+        /// may only shrink.
+        const NOT_A_PROGRAM: &[(&str, &str, &str)] = &[
+            ("fossil diff", "--diff-binary", "a BOOLEAN: whether to diff binary files"),
+            ("git cat-file", "--batch-command", "a MODE: read commands from stdin"),
+            ("pip install", "--no-binary", "package selectors like `:all:`, not paths"),
+            ("pip install", "--only-binary", "package selectors like `:all:`, not paths"),
+            ("pip download", "--no-binary", "package selectors like `:all:`, not paths"),
+            ("pip download", "--only-binary", "package selectors like `:all:`, not paths"),
+            ("mysqldump", "--init-command", "SQL run by the SERVER, not a local program"),
+            ("xcodebuild", "-find-executable", "PRINTS the path of a named tool; runs nothing"),
+        ];
 
         fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
             for entry in fs::read_dir(dir).unwrap() {
@@ -2656,7 +2673,6 @@ use super::*;
             }
         }
 
-        /// Names that state the value is a program to run.
         fn names_an_executor(flag: &str) -> bool {
             let f = flag.trim_start_matches('-');
             f == "rsh"
@@ -2665,6 +2681,21 @@ use super::*;
                 || f.ends_with("-interpreter")
                 || f.ends_with("-shell")
                 || f.ends_with("-executable")
+        }
+
+        fn valued_of(v: &toml::Value) -> Vec<String> {
+            v.get("valued")
+                .and_then(|x| x.as_array())
+                .map(|a| a.iter().filter_map(|f| f.as_str().map(String::from)).collect())
+                .unwrap_or_default()
+        }
+
+        fn gate_of(v: &toml::Value, flag: &str) -> Option<String> {
+            v.get("path_gate")
+                .and_then(|g| g.get("flags"))
+                .and_then(|f| f.get(flag))
+                .and_then(|r| r.as_str())
+                .map(String::from)
         }
 
         let mut files = Vec::new();
@@ -2678,31 +2709,48 @@ use super::*;
             let Ok(parsed) = toml::from_str::<toml::Value>(&source) else { continue };
             let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
             for cmd in commands {
-                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-                let Some(valued) =
-                    cmd.get("wrapper").and_then(|w| w.get("valued")).and_then(|v| v.as_array())
-                else {
-                    continue;
-                };
-                let gate = cmd.get("path_gate").and_then(|g| g.get("flags"));
-                for flag in valued.iter().filter_map(|f| f.as_str()) {
-                    if !names_an_executor(flag) {
-                        continue;
+                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("?").to_string();
+
+                // Every place a `valued` list can appear: the command itself, its wrapper, its
+                // fallback grammar, and each sub. The first version of this guard walked ONLY the
+                // wrapper — 307 flags out of the ~14,600 that exist — so `rsync --rsh`,
+                // `gotestsum --raw-command` and five more sat outside it, ungated.
+                let mut scopes: Vec<(String, &toml::Value)> = vec![(name.clone(), cmd)];
+                for key in ["wrapper", "fallback"] {
+                    if let Some(v) = cmd.get(key) {
+                        scopes.push((name.clone(), v));
                     }
-                    checked += 1;
-                    let role = gate.and_then(|g| g.get(flag)).and_then(|r| r.as_str());
-                    if role != Some("exec") {
-                        failures.push(format!(
-                            "{}: `{name} {flag}` names a program but its path_gate role is {:?} \
-                             (needs \"exec\"; read/write would admit /tmp)",
-                            path.display(),
-                            role
-                        ));
+                }
+                if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
+                    for sub in subs {
+                        let sname = sub.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+                        scopes.push((format!("{name} {sname}"), sub));
+                    }
+                }
+
+                for (label, scope) in scopes {
+                    for flag in valued_of(scope) {
+                        if !names_an_executor(&flag) {
+                            continue;
+                        }
+                        if NOT_A_PROGRAM.iter().any(|(c, f, _)| *c == label && *f == flag) {
+                            continue;
+                        }
+                        checked += 1;
+                        let role = gate_of(scope, &flag).or_else(|| gate_of(cmd, &flag));
+                        if role.as_deref() != Some("exec") {
+                            failures.push(format!(
+                                "{}: `{label} {flag}` names a program but its path_gate role is \
+                                 {role:?} (needs \"exec\"; read/write would admit /tmp). If its \
+                                 value is NOT a program, add it to NOT_A_PROGRAM with the reason.",
+                                path.display()
+                            ));
+                        }
                     }
                 }
             }
         }
-        assert!(checked > 0, "no executor-named wrapper flag was examined; guard is vacuous");
+        assert!(checked > 0, "no executor-named flag was examined; guard is vacuous");
         assert!(failures.is_empty(), "ungated executor flags:\n  {}", failures.join("\n  "));
     }
 

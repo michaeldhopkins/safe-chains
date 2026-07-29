@@ -18,3 +18,7 @@ valued = [
     "--package", "--python-executable", "--python-version",
     "-m", "-p",
 ]
+
+# mypy RUNS this interpreter to inspect the target environment, so the value is a program.
+[command.path_gate]
+flags = { "--python-executable" = "exec" }
