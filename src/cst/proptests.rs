@@ -80,10 +80,14 @@ fn arb_heredoc_delimiter() -> impl Strategy<Value = String> {
     prop::string::string_regex("[A-Z_][A-Z0-9_]{0,5}").expect("valid regex")
 }
 
+fn arb_write_mode() -> impl Strategy<Value = WriteMode> {
+    prop_oneof![Just(WriteMode::Truncate), Just(WriteMode::Append), Just(WriteMode::Clobber)]
+}
+
 fn arb_redir() -> BoxedStrategy<Redir> {
     prop_oneof![
-        (0..3u32, arb_word(0), any::<bool>()).prop_map(|(fd, target, append)| {
-            Redir::Write { fd, target, append }
+        (0..3u32, arb_word(0), arb_write_mode()).prop_map(|(fd, target, mode)| {
+            Redir::Write { fd, target, mode }
         }),
         (0..3u32, arb_word(0)).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
@@ -221,8 +225,8 @@ fn arb_dev_null_word() -> impl Strategy<Value = Word> {
 
 fn arb_safe_redir() -> BoxedStrategy<Redir> {
     prop_oneof![
-        (0..3u32, arb_dev_null_word(), any::<bool>()).prop_map(|(fd, target, append)| {
-            Redir::Write { fd, target, append }
+        (0..3u32, arb_dev_null_word(), arb_write_mode()).prop_map(|(fd, target, mode)| {
+            Redir::Write { fd, target, mode }
         }),
         (0..3u32, arb_dev_null_word()).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
@@ -539,7 +543,7 @@ proptest! {
                 && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".envrc")
         }),
         fd in 0..3u32,
-        append in any::<bool>(),
+        mode in arb_write_mode(),
     ) {
         let cmd = SimpleCmd {
             env: vec![],
@@ -547,7 +551,7 @@ proptest! {
             redirs: vec![Redir::Write {
                 fd,
                 target: Word(vec![WordPart::Lit(target)]),
-                append,
+                mode,
             }],
         };
         prop_assert!(!check::check_redirects(&cmd.redirs));
@@ -568,12 +572,12 @@ proptest! {
             arb_env_name().prop_map(|n| format!("../{n}")),
             arb_env_name().prop_map(|n| format!("$HOME/.ssh/{n}")),
         ],
-        append in any::<bool>(),
+        mode in arb_write_mode(),
     ) {
         let redirs = vec![Redir::Write {
             fd: 1,
             target: Word(vec![WordPart::Lit(target)]),
-            append,
+            mode,
         }];
         prop_assert_eq!(check::redirect_verdict(&redirs), crate::verdict::Verdict::Denied);
     }

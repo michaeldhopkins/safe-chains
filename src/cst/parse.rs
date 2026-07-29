@@ -419,7 +419,7 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
         preceded(">>", (ws, word)).map(move |(_, target)| Redir::Write {
             fd: fd.unwrap_or(1),
             target,
-            append: true,
+            mode: WriteMode::Append,
         }),
         preceded(">&", fd_target).map(move |dst| Redir::DupFd {
             src: fd.unwrap_or(1),
@@ -431,12 +431,12 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
         preceded(">|", (ws, word)).map(move |(_, target)| Redir::Write {
             fd: fd.unwrap_or(1),
             target,
-            append: false,
+            mode: WriteMode::Clobber,
         }),
         preceded('>', (ws, word)).map(move |(_, target)| Redir::Write {
             fd: fd.unwrap_or(1),
             target,
-            append: false,
+            mode: WriteMode::Truncate,
         }),
         // `<>` (POSIX 2.7.5) opens the target for BOTH reading and writing. Must precede `<`,
         // which would otherwise match and leave `>` to start a bogus second redirect.
@@ -1121,7 +1121,7 @@ mod tests {
     #[test]
     fn brace_group_with_append_redirect() {
         if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; } >> log.txt").0[0].pipeline.commands[0] {
-            assert!(matches!(redirs[0], Redir::Write { append: true, .. }));
+            assert!(matches!(redirs[0], Redir::Write { mode: WriteMode::Append, .. }));
         } else { panic!("expected BraceGroup"); }
     }
     #[test]
@@ -1212,7 +1212,7 @@ mod tests {
         let s = p("echo hello > /dev/null");
         let cmd = simple(&s);
         assert_eq!(cmd.words.len(), 2);
-        assert!(matches!(&cmd.redirs[0], Redir::Write { fd: 1, append: false, .. }));
+        assert!(matches!(&cmd.redirs[0], Redir::Write { fd: 1, mode: WriteMode::Truncate, .. }));
     }
     #[test]
     fn redirect_stderr() {

@@ -118,12 +118,26 @@ pub enum WordPart {
     Arith(String),
 }
 
+/// How an output redirect opens its target. All three land the same bytes somewhere, so they
+/// classify identically — the distinction is kept so `--explain` can echo the command the user
+/// actually typed rather than a normalized one. Mutually exclusive by construction: `>>|` is not
+/// a redirect, and a bool pair would let a generator build one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WriteMode {
+    /// `>` — truncate.
+    Truncate,
+    /// `>>` — append.
+    Append,
+    /// `>|` — truncate, overriding `noclobber` (POSIX 2.7.2).
+    Clobber,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Redir {
     Write {
         fd: u32,
         target: Word,
-        append: bool,
+        mode: WriteMode,
     },
     Read {
         fd: u32,
@@ -305,10 +319,10 @@ fn normalize_redirs(redirs: &[Redir]) -> Vec<Redir> {
     redirs
         .iter()
         .map(|r| match r {
-            Redir::Write { fd, target, append } => Redir::Write {
+            Redir::Write { fd, target, mode } => Redir::Write {
                 fd: *fd,
                 target: target.normalize(),
-                append: *append,
+                mode: *mode,
             },
             Redir::Read { fd, target } => Redir::Read {
                 fd: *fd,
