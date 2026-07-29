@@ -26,9 +26,20 @@ examples_denied = [
 # the output being paths at all: `-x`/`-X` print the INNER command's output (`fd -x cat {}` prints
 # file bodies), `-l` prints `ls -l` rows, `--format` is an arbitrary template, and `--hyperlink`
 # wraps each path in terminal escapes.
+#
+# The second group of invalidating flags is about WHICH paths fd can reach, not what it prints.
+# Every worktree-trusted region is hidden — `.git` and `.envrc` (regions/default.toml) — so by
+# default fd cannot name one: hidden entries are skipped and `.git` is ignored besides. These flags
+# lift that, and then an unknown output filename might BE `.envrc`, which a write must not touch.
+# The classifier only sees the search root, not the filenames, so it cannot tell the difference
+# afterwards — the claim has to be dropped up front.
 [command.output]
 locus_from = "operands"
-invalidated_by = ["-x", "--exec", "-X", "--exec-batch", "-l", "--list-details", "--format", "--hyperlink"]
+invalidated_by = [
+    "-x", "--exec", "-X", "--exec-batch", "-l", "--list-details", "--format", "--hyperlink",
+    "-H", "--hidden", "-I", "--no-ignore", "-u", "--unrestricted",
+    "--no-ignore-vcs", "--no-ignore-parent", "--no-require-git",
+]
 
 [command.fallback]
 level = "Inert"

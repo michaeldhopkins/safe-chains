@@ -342,6 +342,11 @@ const DECLARED_SUB_CASES: &[&str] = &[
     // must still surface through an inner substitution rather than being laundered by the outer.
     "cat $(fd pat $(fd d {p}))",
     "cat $(fd a $(fd b $(fd c {p})))",
+    // TWO substitutions in one word, the hot one SECOND. Reading only the leading tag classified
+    // everything after it as ordinary text, so a worktree tag in front hid a machine tag behind.
+    "cat $(pwd)/$(fd d {p})",
+    "echo hi > $(pwd)/$(fd d {p})",
+    "cat $(fd d app/)/$(fd d {p})",
     // Bound to a variable first. This is its own path through the classifier — the value is
     // frozen at assignment and re-expanded at use — and it leaked once: the tag was read before
     // expansion, so `$OUT` still hid it and the expanded sentinel classified as a relative path.
@@ -355,6 +360,11 @@ const DECLARED_SUB_CASES: &[&str] = &[
     "asciidoctor -o $(fd a {p}) in.adoc",
     "dot -o $(fd a {p}) g.dot",
     "gs -o $(fd a {p}) in.ps",
+    // A loop over the substitution's results. `loop_reprs` binds the loop variable to the list's
+    // worst item, so a hot root must reach the body's `$f` rather than being flattened away.
+    "for f in $(fd a {p}); do cat $f; done",
+    "for f in $(fd a {p}); do echo hi > $f; done",
+    "for f in $(fd a {p}); do cat \"$f\"; done",
 ];
 
 // Suffixes appended to a BOUNDED substitution. Descending stays inside the tagged locus, but
@@ -367,6 +377,180 @@ const TAGGED_RESIDUE_CASES: &[&str] = &[
     "cat $(pwd)/$(hostname)",
     "echo hi > $(pwd)/../../../etc/hosts",
 ];
+
+/// Writes into the worktree-TRUSTED rung, reached through a bounded substitution. The tag says
+/// where the substitution's own value points; it says nothing about what is appended to it, and
+/// reporting the tag alone let `echo hi > $(pwd)/.git/hooks/pre-commit` plant an auto-executing
+/// git hook that the literal spelling denies. Reads are deliberately absent — the rung is
+/// read-ok/write-frozen, so `cat $(pwd)/.git/config` is expected to pass.
+const TRUSTED_WRITE_VIA_SUB_CASES: &[&str] = &[
+    "echo hi > $(pwd)/.git/hooks/pre-commit",
+    "echo hi > $(pwd)/.git/config",
+    "echo hi > $(pwd)/.envrc",
+    "echo hi >> $(pwd)/.envrc",
+    "echo hi >| $(pwd)/.git/config",
+    "OUT=$(pwd); echo hi > \"$OUT/.git/hooks/pre-commit\"",
+    "for f in $(pwd); do echo hi > $f/.envrc; done",
+    "cp ./x $(pwd)/.git/config",
+    // An unknown FILENAME from a hidden-capable search could itself be `.envrc`, and the
+    // classifier only ever sees the search root — so the claim is dropped at the flag instead.
+    "echo hi > $(fd -H x app/)",
+    "echo hi > $(fd -u x app/)",
+    "echo hi > $(fd --no-ignore x app/)",
+    "for f in $(fd -H x app/); do echo hi > $f; done",
+];
+
+// ── Abstraction soundness ──────────────────────────────────────────────────────────────────────
+//
+// Every hole found in the substitution work was one mistake wearing different clothes: a bound
+// computed for ONE PART of a path being applied to the WHOLE path. The operand's shape stood in
+// for the root; the root's rung stood in for everything beneath it; the first tag stood in for the
+// rest of the word; `is_unpinnable` stood in for "is this an operand at all". Each was fixed by a
+// corpus entry that required IMAGINING the failure first, which is why there were four of them.
+//
+// The general property needs no imagination. A substitution is an ABSTRACTION over a set of
+// concrete paths, so soundness is the usual abstract-interpretation obligation:
+//
+//     verdict(ctx[$(…)])  must be no more permissive than  verdict(ctx[c])
+//     for every concrete c the substitution could produce
+//
+// The expectation therefore comes from the LITERAL spelling — already correct and heavily tested —
+// instead of from a hand-written expected value. Over-denial stays legal; only laundering fails.
+//
+// Witness suffixes come from `regions/default.toml`, so a newly-protected region is probed the
+// moment it is declared. That is what makes this catch the `.git/hooks/pre-commit` class without
+// anyone having thought of git hooks.
+
+/// Roots a declared substitution can be pointed at, spanning the loci that matter.
+const ABSTRACTION_ROOTS: &[&str] = &["app", "/etc", "~", "~/.ssh", "..", "/work"];
+
+/// Contexts that consume a path, spanning the OPERATIONS that gate differently — a plain read, all
+/// three write-redirect modes, a copy destination, a path-gated output flag, a loop body, and a
+/// variable binding. `{}` is the path slot.
+const ABSTRACTION_CONTEXTS: &[&str] = &[
+    "cat {}",
+    "echo hi > {}",
+    "echo hi >> {}",
+    "echo hi >| {}",
+    "cat < {}",
+    "cp ./src.txt {}",
+    "asciidoctor -o {} in.adoc",
+    "for f in {}; do cat $f; done",
+    "for f in {}; do echo hi > $f; done",
+    "OUT={}; cat \"$OUT\"",
+    "OUT={}; echo hi > \"$OUT\"",
+];
+
+/// Every spelling that puts `{root}` in front of a declared substitution.
+const ABSTRACTION_SUBS: &[&str] = &[
+    "$(fd pat {root})",
+    "$(fd -a pat {root})",
+    "`fd pat {root}`",
+    "$(fd pat {root} | head -1)",
+    "$(fd pat {root} | sort | uniq)",
+    "$(fd --base-directory {root} pat)",
+    "$(fd --search-path={root} pat)",
+];
+
+/// The concrete paths `$(fd pat {root})` could actually print — the substitution's concretization
+/// set γ. Only NON-HIDDEN paths beneath `root`, because default fd skips hidden entries, which is
+/// the same fact `fd.toml` encodes by voiding its claim under `-H`/`-u`/`--no-ignore`. Widening γ
+/// past what the claim allows produces false positives, not findings; `fd_claim_assumption_holds`
+/// checks the coupling rather than trusting this comment.
+fn abstraction_witnesses(root: &str) -> Vec<String> {
+    ["", "/plain.txt", "/sub/plain.txt"].iter().map(|s| format!("{root}{s}")).collect()
+}
+
+/// Literal text appended AFTER the path expression — the residue that the tag says nothing about,
+/// and where `$(pwd)/.git/hooks/pre-commit` lived. Drawn from the region table so a newly-declared
+/// protected path becomes a probe the moment it exists, rather than when someone remembers it.
+fn abstraction_suffixes() -> Vec<String> {
+    let mut out = vec![String::new()];
+    for region in crate::engine::resolve::regions::declared_region_paths() {
+        // Only the ANCHORLESS entries make sense beneath another directory — those are exactly the
+        // model's "nests at any depth" regions (`.git`, `.envrc`). A `/etc/…` or `~/.ssh` entry is
+        // anchored somewhere specific, and pasting it after a path yields `/work/~/.config/gh`,
+        // which is a nonsense string rather than a reachable file.
+        if region.starts_with('/') || region.starts_with('~') || region.contains('*') {
+            continue;
+        }
+        let rel = region.trim_end_matches('/');
+        if rel.is_empty() {
+            continue;
+        }
+        out.push(format!("/{rel}"));
+        out.push(format!("/{rel}/inner"));
+    }
+    out
+}
+
+/// The witness set above assumes default `fd` cannot print a hidden path. That is only true while
+/// `fd.toml` voids its output claim under the hidden/no-ignore flags — so assert it, rather than
+/// leaving the property's soundness argument resting on a comment.
+#[test]
+fn fd_claim_assumption_holds() {
+    let spec = crate::registry::command_output_locus("fd").expect("fd declares [command.output]");
+    for flag in ["-H", "--hidden", "-u", "--unrestricted", "-I", "--no-ignore"] {
+        assert!(
+            spec.invalidated_by.iter().any(|f| f == flag),
+            "fd's output claim must be voided by `{flag}`: the abstraction-soundness witnesses \
+             assume default fd cannot print a hidden path, so without this the property probes a \
+             smaller set than fd can actually produce",
+        );
+    }
+}
+
+/// A substitution must never be MORE PERMISSIVE than a concrete path it could produce.
+///
+/// The general form of every substitution fail-open found so far. It needs no hand-written
+/// expectation: the literal spelling — already correct and heavily tested — IS the expectation, so
+/// a laundering bug shows up without anyone having imagined that particular route to it.
+///
+/// EXHAUSTIVE rather than sampled, deliberately. As a `proptest` over the same space this passed
+/// against a reintroduced pathgate bug: the space is ~10k combinations, proptest draws 256, and the
+/// one pairing that mattered (`asciidoctor -o` with an `/etc` root) simply never came up. A finite
+/// cross-product this cheap should be enumerated — it also makes the red demos deterministic.
+///
+/// Red→green, all four historical bugs, each caught with its corpus entries removed: the shape
+/// test on roots, the pathgate `is_unpinnable` key, the pre-expansion tag read, and the
+/// unclassified residue.
+#[test]
+fn substitution_is_never_more_permissive_than_a_path_it_could_produce() {
+    let suffixes = abstraction_suffixes();
+    let mut violations = Vec::new();
+    let mut constrained = 0usize;
+
+    for ctx in ABSTRACTION_CONTEXTS {
+        for root in ABSTRACTION_ROOTS {
+            for suffix in &suffixes {
+                for witness in abstraction_witnesses(root) {
+                    let concrete = ctx.replace("{}", &format!("{witness}{suffix}"));
+                    // Only a witness the classifier REFUSES constrains the abstraction; an allowed
+                    // one says nothing, since a different witness may still force the denial.
+                    if command_verdict_in(&concrete, workspace()).is_allowed() {
+                        continue;
+                    }
+                    constrained += 1;
+                    for sub in ABSTRACTION_SUBS {
+                        let path = format!("{}{suffix}", sub.replace("{root}", root));
+                        let abstracted = ctx.replace("{}", &path);
+                        if command_verdict_in(&abstracted, workspace()).is_allowed() {
+                            violations.push(format!("  `{concrete}` denies but `{abstracted}` allows"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    assert!(constrained > 0, "no witness was refused — the property is vacuous");
+    assert!(
+        violations.is_empty(),
+        "a substitution was more permissive than a path it could produce ({} cases):\n{}",
+        violations.len(),
+        violations.join("\n"),
+    );
+}
 
 proptest! {
     /// A declared output-locus claim must never admit a substitution whose root is out of the
@@ -401,6 +585,17 @@ proptest! {
     ) {
         let allowed = command_verdict_in(line, workspace()).is_allowed();
         prop_assert!(!allowed, "residue escaped the substitution's tag: `{}`", line);
+    }
+
+    /// A bounded substitution must not launder a write into the worktree-trusted rung. The tag
+    /// bounds the substitution's VALUE; it says nothing about text appended to it, nor about an
+    /// unknown filename a hidden-capable search may return.
+    #[test]
+    fn substitution_cannot_launder_a_trusted_write(
+        line in proptest::sample::select(TRUSTED_WRITE_VIA_SUB_CASES.to_vec()),
+    ) {
+        let allowed = command_verdict_in(line, workspace()).is_allowed();
+        prop_assert!(!allowed, "trusted-rung write laundered through a substitution: `{}`", line);
     }
 
     /// A read command naming a file inside an argument must not disclose an out-of-workspace file.

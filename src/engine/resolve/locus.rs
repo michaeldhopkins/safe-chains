@@ -82,10 +82,20 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     // still spells the tag `$OUT` here, so checking first saw no tag, fell through, and then
     // classified the expanded sentinel as an ordinary relative path. It must still come BEFORE the
     // `$`/unpinnable guard, which is the answer for an UNDECLARED substitution, not a declared one.
-    if let Some(tagged) = tagged_substitution_locus(&expanded) {
-        return tagged;
+    if let Some((tag, rewritten)) = tagged_substitution(&expanded) {
+        // The tag bounds where the substitution's own VALUE can point. The text AROUND it is an
+        // ordinary path and has to be classified as one: reporting the tag alone said "worktree"
+        // for `$(pwd)/.git/hooks/pre-commit` and laundered a git-hook write past the frozen tier
+        // that the literal spelling denies.
+        return tag.max(classify_resolved(&rewritten, want_write));
     }
-    let resolved = crate::pathctx::resolve(&expanded);
+    classify_resolved(&expanded, want_write)
+}
+
+/// The ordinary path classification: resolve against cwd/root, canonicalize, fail closed on an
+/// unpinnable spelling, then read the region model's face.
+fn classify_resolved(expanded: &str, want_write: bool) -> LocalLocus {
+    let resolved = crate::pathctx::resolve(expanded);
     let canonical = canonicalize(&resolved);
     if is_unpinnable(&canonical) {
         return LocalLocus::Machine;
@@ -93,6 +103,11 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     let role = classify_region(&canonical);
     if want_write { role.write_locus } else { role.read_locus }
 }
+
+/// A path component standing in for a substitution's value while the SURROUNDING text is
+/// classified. Deliberately an ordinary relative name, so it contributes nothing of its own and the
+/// region model reads the residue exactly as it would in a literal path.
+const SUB_STANDIN: &str = "sc_substitution_value";
 
 /// Normalize path SPELLINGS that name the same file so the region model — chiefly the
 /// exact-match config pin and the grant/shield lookups, which compare by string — can't be
@@ -184,23 +199,45 @@ pub(crate) fn is_unpinnable(path: &str) -> bool {
     path.contains('$') || path.contains("__SAFE_CHAINS_CMDSUB__") || is_parent_escape(path)
 }
 
-/// The locus carried by a BOUNDED substitution sentinel, if `path` holds one.
+/// The locus carried by a BOUNDED substitution sentinel, plus the path to classify in its place.
 ///
-/// The sentinel usually appears as a path COMPONENT (`$(fd … app/)/lib`), so the trailing text is
-/// checked too: descending (`/lib`) cannot leave the tagged locus, but climbing can
-/// (`$(pwd)/../..`), and a second unpinnable piece re-opens the hole the tag closed. Either one
-/// collapses the whole path back to `machine`.
-fn tagged_substitution_locus(path: &str) -> Option<LocalLocus> {
+/// The sentinel usually appears as a path COMPONENT (`$(fd … app/)/lib`, `$(pwd)/.git/config`), so
+/// the surrounding text matters as much as the tag: descending can reach a DIFFERENT rung than the
+/// tag names, climbing can leave it entirely (`$(pwd)/../..`), and a second unpinnable piece
+/// re-opens the hole the tag closed. The returned path has the sentinel replaced by a plain
+/// component so the caller can run the ordinary region classification over the rest and take the
+/// worse of the two.
+fn tagged_substitution(path: &str) -> Option<(LocalLocus, String)> {
     use crate::engine::facet::FacetTerm;
-    let at = path.find(crate::cst::eval::TAGGED_PREFIX)?;
-    let after = &path[at + crate::cst::eval::TAGGED_PREFIX.len()..];
-    let (term, rest) = after.split_once("__")?;
-    let locus = LocalLocus::from_term(&term.to_lowercase().replace('_', "-"))?;
-    let residue = format!("{}{rest}", &path[..at]);
-    if residue.contains('$') || residue.contains(UNPINNABLE_MARK) || is_parent_escape(&residue) {
-        return Some(LocalLocus::Machine);
+    let prefix_len = crate::cst::eval::TAGGED_PREFIX.len();
+    // EVERY tag in the word, not just the first. One word can hold several substitutions
+    // (`$(pwd)/$(fd d /etc)`), and taking only the leading one classified the rest as ordinary
+    // text — so a worktree tag in front hid a machine tag behind it.
+    let mut worst: Option<LocalLocus> = None;
+    let mut out = String::with_capacity(path.len());
+    let mut rest = path;
+    while let Some(at) = rest.find(crate::cst::eval::TAGGED_PREFIX) {
+        let after = &rest[at + prefix_len..];
+        // A token shaped like our sentinel that does not parse as one is not an ordinary filename
+        // either — fail closed rather than let it through as text.
+        let Some((term, tail)) = after.split_once("__") else {
+            return Some((LocalLocus::Machine, String::new()));
+        };
+        let Some(locus) = LocalLocus::from_term(&term.to_lowercase().replace('_', "-")) else {
+            return Some((LocalLocus::Machine, String::new()));
+        };
+        out.push_str(&rest[..at]);
+        out.push_str(SUB_STANDIN);
+        worst = Some(worst.map_or(locus, |w: LocalLocus| w.max(locus)));
+        rest = tail;
     }
-    Some(locus)
+    let worst = worst?;
+    out.push_str(rest);
+    // Anything the region model cannot see through still fails closed here.
+    if out.contains('$') || out.contains(UNPINNABLE_MARK) {
+        return Some((LocalLocus::Machine, String::new()));
+    }
+    Some((worst, out))
 }
 
 const UNPINNABLE_MARK: &str = "__SAFE_CHAINS_CMDSUB__";
