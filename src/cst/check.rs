@@ -87,6 +87,12 @@ thread_local! {
     /// clones (small); a thread-local can't borrow the CST. Latest definition wins.
     static FUNCTIONS: std::cell::RefCell<Vec<(String, Script)>> =
         const { std::cell::RefCell::new(Vec::new()) };
+    /// Function names whose CURRENT body we cannot attribute — redefined inside a compound, where
+    /// the shell keeps the new body but we cannot say which one ran. `lookup_function` reports them
+    /// as unknown, so a call falls through to ordinary dispatch and denies (fail-closed) rather
+    /// than resolving to a stale, more permissive definition.
+    static POISONED_FUNCS: std::cell::RefCell<Vec<String>> =
+        const { std::cell::RefCell::new(Vec::new()) };
     /// Names currently being resolved — bounds recursion (direct AND mutual) and total call depth,
     /// so `f(){ f; }` or a deep chain can't blow the stack; hitting the bound denies (fail-closed).
     static RESOLVING: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
@@ -114,7 +120,16 @@ fn define_function(name: String, body: Script) -> FuncScope {
 }
 
 fn lookup_function(name: &str) -> Option<Script> {
+    if POISONED_FUNCS.with(|p| p.borrow().iter().any(|n| n == name)) {
+        return None; // body unknown — deny rather than use a stale one
+    }
     FUNCTIONS.with(|f| f.borrow().iter().rev().find(|(n, _)| n == name).map(|(_, b)| b.clone()))
+}
+
+/// Mark `name`'s body unknown for the rest of this evaluation. Not scoped by a guard: the shell's
+/// redefinition is not scoped either, and every classification starts with a fresh thread-local.
+fn poison_function(name: String) {
+    POISONED_FUNCS.with(|p| p.borrow_mut().push(name));
 }
 
 struct ResolveScope;
@@ -178,18 +193,134 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
             let _cwd = crate::pathctx::enter_cwd(running.clone());
             per_stmt(stmt)
         });
+        let effects = shell_effects(&stmt.pipeline);
         let next = cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
         if next.is_some() {
             running = next;
+        } else if effects.cwd {
+            // The shell may have moved somewhere we cannot name — a `cd` inside a compound or a
+            // called function, or a bare `cd`/`cd -`. Keeping the old cwd would judge later
+            // relative paths against a directory the shell has left.
+            running = Some(crate::pathctx::UNRESOLVED_CWD.to_string());
         }
         for (name, value) in statement_assignments(&stmt.pipeline) {
             _vars.push(crate::pathctx::enter_var(name, value));
+        }
+        // Rebinds the shell keeps but we cannot attribute — a `VAR=…` or `name() {…}` inside a
+        // compound or a called function. Pushed AFTER the precise bindings above so the uncertain
+        // value wins for that name; a statement handled precisely contributes nothing here.
+        for name in effects.vars {
+            _vars.push(crate::pathctx::enter_var(name, UNCERTAIN_VALUE.to_string()));
+        }
+        for name in effects.funcs {
+            poison_function(name);
         }
         if let [Cmd::FunctionDef { name, body }] = stmt.pipeline.commands.as_slice() {
             _funcs.push(define_function(name.clone(), body.clone()));
         }
     }
     out
+}
+
+/// How deep to chase function bodies. Bounded so a recursive definition cannot spin; hitting the
+/// bound reports a possible effect, which fails closed.
+const MAX_CD_SCAN_DEPTH: usize = 16;
+
+/// What running a statement may do to the CURRENT shell's state that we cannot attribute exactly.
+///
+/// bash isolates such effects in exactly two places — a SUBSHELL, and a stage of a multi-command
+/// pipeline. Everywhere else (brace group, `if`, `for`, `while`, `case`, a called function) a `cd`,
+/// a `VAR=…` or a `name() {…}` takes effect in the current shell and outlives the construct. The
+/// precise handling matches only statement-level forms, so all of those escaped tracking:
+/// `{ cd ~/.aws; }; cat credentials` was judged as a worktree read, and
+/// `VAR=./ok; { VAR=/etc/shadow; }; cat $VAR` kept the stale binding. Both are fail-OPEN — the
+/// stale state is the permissive one.
+///
+/// Whether the effect happened is unknowable (a branch may not be taken, a loop may not run), so
+/// the caller marks the cwd and the named bindings UNCERTAIN rather than guessing a value.
+#[derive(Default)]
+struct ShellEffects {
+    cwd: bool,
+    vars: Vec<String>,
+    funcs: Vec<String>,
+}
+
+/// The effects of one statement. Empty for a multi-stage pipeline, whose stages are subshells.
+fn shell_effects(pipeline: &Pipeline) -> ShellEffects {
+    let mut out = ShellEffects::default();
+    if let [only] = pipeline.commands.as_slice() {
+        // `seen` memoizes function bodies. Without it `f0(){ f1; f1; }; f1(){ f2; f2; }; …` costs
+        // 2^depth traversals — a depth cap bounds depth but not FAN-OUT, the same blow-up the
+        // classifier's own work budget exists for. Caught by the termination guard.
+        let mut seen = Vec::new();
+        scan_effects(only, MAX_CD_SCAN_DEPTH, &mut seen, &mut out);
+    }
+    out
+}
+
+fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
+    let Some(depth) = depth.checked_sub(1) else {
+        out.cwd = true; // out of budget — assume the worst
+        return;
+    };
+    match cmd {
+        Cmd::Simple(s) => {
+            let Some(name) = s.words.first().map(Word::eval) else {
+                return; // a bare `VAR=x` — handled precisely by `statement_assignments`
+            };
+            if name == "cd" {
+                out.cwd = true;
+                return;
+            }
+            // A CALL runs the body in THIS shell, so its effects escape with it.
+            if seen.contains(&name) {
+                return;
+            }
+            if let Some(body) = lookup_function(&name) {
+                seen.push(name);
+                scan_script_effects(&body, depth, seen, out);
+            }
+        }
+        // The two constructs the shell really does isolate, plus forms that run nothing.
+        Cmd::Subshell { .. } | Cmd::DoubleBracket { .. } | Cmd::FunctionDef { .. } => {}
+        Cmd::BraceGroup { body, .. } | Cmd::For { body, .. } => {
+            scan_script_effects(body, depth, seen, out);
+        }
+        Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
+            scan_script_effects(cond, depth, seen, out);
+            scan_script_effects(body, depth, seen, out);
+        }
+        Cmd::If { branches, else_body, .. } => {
+            for b in branches {
+                scan_script_effects(&b.cond, depth, seen, out);
+                scan_script_effects(&b.body, depth, seen, out);
+            }
+            if let Some(e) = else_body {
+                scan_script_effects(e, depth, seen, out);
+            }
+        }
+        Cmd::Case { arms, .. } => {
+            for a in arms {
+                scan_script_effects(&a.body, depth, seen, out);
+            }
+        }
+    }
+}
+
+/// Every statement of a body that the shell would run in the current shell: its assignments and
+/// function definitions rebind here, and its commands are scanned in turn.
+fn scan_script_effects(script: &Script, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
+    for st in &script.0 {
+        for (name, _) in statement_assignments(&st.pipeline) {
+            out.vars.push(name);
+        }
+        if let [Cmd::FunctionDef { name, .. }] = st.pipeline.commands.as_slice() {
+            out.funcs.push(name.clone());
+        }
+        if let [only] = st.pipeline.commands.as_slice() {
+            scan_effects(only, depth, seen, out);
+        }
+    }
 }
 
 /// The target of a statement-level `cd DIR` (a single simple command named `cd`), for cwd

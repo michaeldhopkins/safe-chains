@@ -698,6 +698,105 @@ fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
     );
 }
 
+/// State a compound REBINDS escapes with it, exactly as a `cd` does.
+///
+/// A `VAR=…` or `name() {…}` inside a brace group, `if`, `for`, `while`, `case` or a called
+/// function changes the current shell — the classifier kept the STALE value, which is the
+/// permissive one: `VAR=./ok; { VAR=/etc/shadow; }; cat $VAR` read the shadow file while being
+/// judged against `./ok`. Same construct table as the `cd` guard, so the three kinds of shell state
+/// cannot drift apart.
+#[test]
+fn a_rebind_inside_a_compound_invalidates_the_stale_value() {
+    let compounds = [
+        "{ REBIND; }",
+        "if true; then REBIND; fi",
+        "if false; then :; else REBIND; fi",
+        "for i in 1; do REBIND; done",
+        "while true; do REBIND; done",
+        "case x in x) REBIND;; esac",
+        "fn() { REBIND; }; fn",
+    ];
+    let mut leaked = Vec::new();
+    for c in compounds {
+        // A variable rebound to a hot path.
+        let var = format!("VAR=./ok; {}; cat $VAR", c.replace("REBIND", "VAR=/etc/shadow"));
+        if command_verdict_in(&var, workspace()).is_allowed() {
+            leaked.push(var);
+        }
+        // A function redefined to a dangerous body.
+        let func = format!(
+            "g() {{ cat ./ok; }}; {}; g",
+            c.replace("REBIND", "g() { cat /etc/shadow; }")
+        );
+        if command_verdict_in(&func, workspace()).is_allowed() {
+            leaked.push(func);
+        }
+    }
+    assert!(leaked.is_empty(), "a stale binding survived a rebind:\n  {}", leaked.join("\n  "));
+
+    // A SUBSHELL really does discard the rebind, so the original value must survive — otherwise
+    // "invalidate on any assignment anywhere" would satisfy the half above.
+    assert!(
+        command_verdict_in("VAR=./ok; (VAR=/etc/shadow); cat $VAR", workspace()).is_allowed(),
+        "a subshell rebind must not invalidate the outer binding",
+    );
+    // And precise statement-level binding is untouched.
+    assert!(command_verdict_in("VAR=./ok; cat $VAR", workspace()).is_allowed());
+    assert!(!command_verdict_in("VAR=/etc/shadow; cat $VAR", workspace()).is_allowed());
+}
+
+/// A `cd` that escapes its construct must be tracked; one that cannot must not be.
+///
+/// bash isolates a `cd` in exactly two places — a SUBSHELL and a stage of a multi-command pipeline.
+/// Everywhere else (brace group, `if`, `for`, `while`, `case`, a called function) it changes the
+/// current shell, so the effect outlives the construct. Tracking only matched a bare single-command
+/// `cd` statement, so `{ cd ~/.aws; }; cat credentials` was judged as a worktree read.
+///
+/// Enumerated over the CONSTRUCTS rather than by example, so a form nobody thought to type is
+/// covered, and asserted in BOTH directions: the escaping ones must gate a later relative path, the
+/// isolating ones must not (or "deny everything after any cd" would pass the first half).
+#[test]
+fn a_cd_is_tracked_exactly_where_the_shell_would_keep_it() {
+    // `{}` is the `cd`; the trailing read is judged against wherever the shell now is.
+    let escapes = [
+        "{ CD; }; cat plain.txt",
+        "if true; then CD; fi; cat plain.txt",
+        "if false; then :; else CD; fi; cat plain.txt",
+        "for i in 1; do CD; done; cat plain.txt",
+        "while true; do CD; done; cat plain.txt",
+        "until false; do CD; done; cat plain.txt",
+        "case x in x) CD;; esac; cat plain.txt",
+        "fn() { CD; }; fn; cat plain.txt",
+        "{ { CD; }; }; cat plain.txt",
+        "if true; then { for i in 1; do CD; done; }; fi; cat plain.txt",
+    ];
+    let mut leaked = Vec::new();
+    for tmpl in escapes {
+        let line = tmpl.replace("CD", "cd /etc");
+        if command_verdict_in(&line, workspace()).is_allowed() {
+            leaked.push(line);
+        }
+    }
+    assert!(leaked.is_empty(), "a cd that changes the shell was not tracked:\n  {}", leaked.join("\n  "));
+
+    // The two constructs bash really does isolate. A `cd` inside them must NOT gate what follows,
+    // or the guard above would be satisfied by refusing everything after any `cd` at all.
+    for isolating in ["(cd /etc); cat plain.txt", "cd /etc | cat; cat plain.txt"] {
+        assert!(
+            command_verdict_in(isolating, workspace()).is_allowed(),
+            "`{isolating}` isolates its cd — the following read must stay a worktree read",
+        );
+    }
+
+    // And a compound with no `cd` at all must be untouched by any of this.
+    for plain in ["{ cat ./x; }", "if true; then cat ./x; fi", "fn() { cat ./x; }; fn"] {
+        assert!(
+            command_verdict_in(plain, workspace()).is_allowed(),
+            "`{plain}` contains no cd and must be unaffected",
+        );
+    }
+}
+
 /// A `cd` whose target cannot be resolved must leave the cwd UNKNOWN, not unchanged.
 ///
 /// The generative site covers targets spellable as roots. These are the ones that are not: a
