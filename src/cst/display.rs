@@ -244,9 +244,14 @@ impl fmt::Display for WordPart {
 impl fmt::Display for Redir {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Redir::Write { fd, target, append } => {
+            Redir::Write { fd, target, mode } => {
                 if *fd != 1 { write!(f, "{fd}")?; }
-                if *append { write!(f, ">> {target}") } else { write!(f, "> {target}") }
+                let op = match mode {
+                    WriteMode::Truncate => ">",
+                    WriteMode::Append => ">>",
+                    WriteMode::Clobber => ">|",
+                };
+                write!(f, "{op} {target}")
             }
             Redir::Read { fd, target } => {
                 if *fd != 0 { write!(f, "{fd}")?; }
