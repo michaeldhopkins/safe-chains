@@ -687,3 +687,29 @@ one cannot inherit the hole silently.
 DONE when: `dispatch_executor` enforces the policy over the pre-script prefix, and
 `tilt a.erb b.erb` still denies with tilt's `path_gate` removed. Until then the guard is the
 backstop, not the fix.
+
+## Three targets cannot self-filter on the tool — verify their envelopes
+
+`no_target_decides_on_a_foreign_tool` requires a target to abstain when the envelope names a tool
+other than its shell tool. Six targets do. Three are exempt because their envelope, as we model it,
+carries NO tool identifier at all:
+
+- **cursor** — flat `{command, cwd, workspace_roots}`; nothing names the tool.
+- **grok** — `{toolInput:{command}, workspaceRoot, cwd, sessionId}`; HARNESS-BEHAVIORS.md's live
+  verification lists no tool field.
+- **antigravity** — `{toolCall:{args:{commandLine}}, workspacePaths}`; `toolCall` may well carry a
+  `name` upstream, but we do not deserialize one and it is not recorded as verified.
+
+They were NOT given an invented field name: HARNESS-BEHAVIORS.md's rule is that the harness wins and
+these contracts were verified live, so guessing a key here is exactly the mistake that fails
+silently. All three rely on their configured matcher instead, which is what every target did until
+now.
+
+Risk while exempt: cursor and grok are deny-harnesses, so a foreign-tool envelope can only produce
+an over-deny, not a grant. Antigravity is Ask-capable, so it could escalate a non-shell call to a
+human prompt — noisy, not unsafe.
+
+DONE when: each harness's PreToolUse envelope is checked for a tool-identifying field (drive the
+TUI, dump a real envelope for a non-shell tool). Either add the field and the filter — the guard
+picks it up as soon as `sample_envelope` returns `Some` — or record in HARNESS-BEHAVIORS.md that the
+envelope genuinely has none.

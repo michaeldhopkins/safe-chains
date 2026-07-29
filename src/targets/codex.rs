@@ -17,6 +17,11 @@ impl Target for CodexTarget {
         "Codex (OpenAI)"
     }
 
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(r#"{{"tool_name":"{tool}","tool_input":{{"command":"{command}"}}}}"#))
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".codex")]
     }
@@ -74,6 +79,10 @@ struct ToolInput {
 
 #[derive(Deserialize)]
 struct CodexHookEnvelope {
+    /// Optional so a harness that omits it still works; when present and naming another tool we
+    /// abstain (see parse_input).
+    #[serde(default)]
+    tool_name: Option<String>,
     tool_input: ToolInput,
     #[serde(default)]
     cwd: Option<String>,
@@ -84,6 +93,13 @@ impl HookFormat for CodexHookFormat {
         let envelope: CodexHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
             message: e.to_string(),
         })?;
+        // Self-filter on the tool: the hook can be delivered for a non-shell call by a
+        // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
+        if let Some(name) = &envelope.tool_name
+            && name != "Bash"
+        {
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
+        }
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
