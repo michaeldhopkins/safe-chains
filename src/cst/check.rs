@@ -823,8 +823,10 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 /// becomes several arguments at run time, and when a piece starts with `-` the command's flag
 /// allowlist was simply never shown it:
 ///
-///     VAR="--exec rm"; fd pat $VAR        ran `rm` on every match
-///     VAR="-exec rm {} ;"; find . $VAR    deleted the tree
+/// ```text
+/// VAR="--exec rm"; fd pat $VAR        ran `rm` on every match
+/// VAR="-exec rm {} ;"; find . $VAR    deleted the tree
+/// ```
 ///
 /// Splitting for LOCUS (see `locus::classify_local`) does not help here, because the danger is not
 /// where a path points — it is a capability the grammar would have refused outright.
