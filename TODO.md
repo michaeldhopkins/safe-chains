@@ -753,3 +753,27 @@ DONE when: `--suggest` validates the existing file before merging, and on failur
 error and writes nothing (the block can still be printed for the user to place by hand). A test
 should assert the malformed file is byte-unchanged, as
 `refuses_a_wrong_typed_outer_key_without_panicking` does for the install path.
+
+## Re-tokenize split words instead of refusing them
+
+An unquoted expansion whose value holds whitespace becomes several arguments at run time. Two
+dimensions were leaking and are now handled differently:
+
+- **Paths** — `locus::classify_local` classifies each split piece and takes the worst, so
+  `VAR="x /etc/shadow"; cat $VAR` denies while `VAR="-rf ./sub"; rm $VAR` keeps its real locus.
+- **Flags** — `check::smuggles_a_flag` REFUSES outright, because the danger (`fd --exec rm`,
+  `find -exec rm {} \;`) is a capability the grammar would have rejected, not a place a path points.
+
+Refusing costs a false deny on a value that hides a harmless flag: `VAR="-rf ./sub"; rm $VAR` is an
+ordinary worktree delete and now prompts. Pinned as an accepted trade in
+`an_unquoted_expansion_is_split_into_words`.
+
+The precise fix is to re-tokenize: `Word::expand` already turns one word into many for brace
+expansion, and feeding split pieces through it would let each command's own flag grammar judge them
+— no refusal, no over-deny. The blocker is that a bound value carries SEPARATE read and write
+representatives for loop variables (`loop_reprs`), so tokenization would have to choose a face
+before the face is known.
+
+DONE when: `Word::expand` splits unquoted variable expansions, `VAR="-rf ./sub"; rm $VAR` is allowed
+again while `VAR="--exec rm"; fd pat $VAR` still denies, and `smuggles_a_flag` is deleted rather
+than left as a second gate.

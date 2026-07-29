@@ -73,7 +73,34 @@ fn url_escapes_cwd(url: &str) -> bool {
     false
 }
 
+/// Default IFS. An UNQUOTED expansion whose value contains one of these is split by the shell into
+/// several words, so one operand in the CST becomes several arguments at run time.
+const IFS_WHITESPACE: [char; 3] = [' ', '\t', '\n'];
+
 fn classify_local(path: &str, want_write: bool) -> LocalLocus {
+    let whole = classify_one(path, want_write);
+
+    // WORD SPLITTING. A variable holding whitespace expands to several words, and the classifier
+    // saw one: `VAR="-rf /"; rm $VAR` was read as a single odd-looking operand and approved, while
+    // the shell runs `rm -rf /`. `A="x /etc/shadow"; cat $A` read the shadow file the same way —
+    // and note it turned on ORDER, since `"/etc/shadow x"` denied by starting at a hot region. So
+    // each piece is classified in its own right and the worst wins.
+    //
+    // Combined with the unsplit answer rather than replacing it, so this can only ever tighten:
+    // a value that happens to name a real file containing a space keeps whatever it classified as
+    // before. Splitting terminates in one level — no piece contains whitespace.
+    let expanded = crate::pathctx::expand_vars(path, want_write);
+    if !expanded.contains(IFS_WHITESPACE) {
+        return whole;
+    }
+    expanded
+        .split(IFS_WHITESPACE)
+        .filter(|piece| !piece.is_empty())
+        .map(|piece| classify_one(piece, want_write))
+        .fold(whole, LocalLocus::max)
+}
+
+fn classify_one(path: &str, want_write: bool) -> LocalLocus {
     // A bound `for`-loop variable expands to its list's representative item first (its read or
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
     let expanded = crate::pathctx::expand_vars(path, want_write);

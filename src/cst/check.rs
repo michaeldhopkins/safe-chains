@@ -809,9 +809,48 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     if tokens.is_empty() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
+    if smuggles_a_flag(cmd) {
+        return Verdict::Denied;
+    }
 
     let cmd_v = leaf_verdict(&tokens);
     sub_v.combine(cmd_v).combine(redir_v)
+}
+
+/// Whether an operand hides a FLAG behind an unquoted expansion.
+///
+/// The word-splitting problem again, on the dimension the locus gate cannot see. One CST word
+/// becomes several arguments at run time, and when a piece starts with `-` the command's flag
+/// allowlist was simply never shown it:
+///
+///     VAR="--exec rm"; fd pat $VAR        ran `rm` on every match
+///     VAR="-exec rm {} ;"; find . $VAR    deleted the tree
+///
+/// Splitting for LOCUS (see `locus::classify_local`) does not help here, because the danger is not
+/// where a path points — it is a capability the grammar would have refused outright.
+///
+/// This refuses rather than re-tokenizing. Re-tokenizing would be more precise, and the machinery
+/// is close at hand (`Word::expand` already turns one word into many for brace expansion) — but a
+/// bound value carries SEPARATE read and write representatives for loop variables, so feeding it
+/// back into tokenization would have to pick a face before the face is known. Refusing costs a
+/// prompt on `VAR="-rf ./sub"; rm $VAR`, which is a rare way to write a command; see TODO.md.
+///
+/// Only UNQUOTED expansions split, so `cat "$VAR"` with a spacey filename is untouched — a quoted
+/// expansion is one word to the shell too.
+fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
+    cmd.words.iter().skip(1).any(|w| {
+        // A top-level `Lit` is the unquoted case; a `DQuote` part is not split by the shell.
+        w.0.iter().any(|part| {
+            let WordPart::Lit(raw) = part else { return false };
+            if !raw.contains('$') {
+                return false;
+            }
+            let expanded = crate::pathctx::expand_vars(raw, false);
+            expanded.split([' ', '\t', '\n']).skip(1).any(|piece| piece.starts_with('-'))
+                || (expanded.split([' ', '\t', '\n']).count() > 1
+                    && expanded.starts_with('-'))
+        })
+    })
 }
 
 /// The command leaf's verdict. The behavioral-capability engine is authoritative for every

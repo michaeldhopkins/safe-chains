@@ -698,6 +698,61 @@ fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
     );
 }
 
+/// An unquoted expansion whose value holds whitespace becomes SEVERAL words at run time.
+///
+/// The classifier read one operand where the shell builds many, so a dangerous argument could be
+/// smuggled through any command by parking it in a variable: `VAR="-rf /"; rm $VAR` auto-approved
+/// and runs `rm -rf /`. It turned on ORDER, too — `"/etc/shadow x"` denied only because it happened
+/// to start at a hot region, while `"x /etc/shadow"` passed.
+///
+/// Enumerated over the BINDING KINDS (assignment, function argument, loop variable), so a new way
+/// of binding a value inherits the check, and over payloads drawn from the same hot-path corpus the
+/// rest of the suite uses.
+#[test]
+fn an_unquoted_expansion_is_split_into_words() {
+    let bindings: &[&str] = &[
+        "VAR=\"PAYLOAD\"; rm $VAR",
+        "fn() { rm $1; }; fn \"PAYLOAD\"",
+        "for v in \"PAYLOAD\"; do rm $v; done",
+        "VAR=\"PAYLOAD\"; cat $VAR",
+    ];
+    // Each is one word plus a hot path: harmless read as a single token, dangerous once split.
+    let payloads: Vec<String> = OUT_OF_WORKSPACE
+        .iter()
+        .flat_map(|hot| [format!("x {hot}"), format!("-rf {hot}"), format!("{hot} x")])
+        .collect();
+
+    let mut leaked = Vec::new();
+    for tmpl in bindings {
+        for payload in &payloads {
+            let line = tmpl.replace("PAYLOAD", payload);
+            if command_verdict_in(&line, workspace()).is_allowed() {
+                leaked.push(line);
+            }
+        }
+    }
+    assert!(leaked.is_empty(), "a split word escaped classification:\n  {}", leaked.join("\n  "));
+
+    // Non-vacuity: these must still pass, or "deny anything involving a variable" would satisfy
+    // the half above. A QUOTED spacey value is included deliberately — the shell does not split it,
+    // so neither do we.
+    //
+    // `VAR="-rf ./sub"; rm $VAR` is NOT here, and its absence is a decision rather than an
+    // oversight: it stays inside the workspace and used to pass, but it hides a flag, and
+    // `smuggles_a_flag` refuses those without inspecting where they point. Buying back that case
+    // means re-tokenizing the split words so the flag grammar sees them — see TODO.md.
+    for ok in [
+        "VAR=./ok.txt; cat $VAR",
+        "VAR=\"a b\"; cat \"$VAR\"",
+        "for f in ./a ./b; do cat $f; done",
+    ] {
+        assert!(
+            command_verdict_in(ok, workspace()).is_allowed(),
+            "`{ok}` stays in the workspace and must still be allowed",
+        );
+    }
+}
+
 /// State a compound REBINDS escapes with it, exactly as a `cd` does.
 ///
 /// A `VAR=…` or `name() {…}` inside a brace group, `if`, `for`, `while`, `case` or a called
