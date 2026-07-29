@@ -593,6 +593,69 @@ fn every_target_emits_its_decision_at_the_declared_field() {
     assert!(failures.is_empty(), "decision-field contract violations:\n{}", failures.join("\n"));
 }
 
+/// No target may ANSWER a blank command with an approval.
+///
+/// An empty or whitespace-only command is nothing to classify, so approving it asserted "all
+/// commands in chain are safe utilities" about ZERO commands — and where `allow` is authoritative
+/// (Claude, Qwen, Cursor) that silently replaces the user's prompt. The exposure is not the empty
+/// command, which runs nothing, but the shape: a harness that carries the real command in a field
+/// the target does not read would be granted on the blank we extracted.
+///
+/// The envelope table is checked against the registry, so a target added later fails this test
+/// until it is listed rather than quietly escaping the guard.
+#[test]
+fn no_target_approves_a_blank_command() {
+    // One envelope per hook target, in that harness's real schema, with `{CMD}` for the command.
+    // `sample_envelope` is cfg(test)-only and so invisible here; the completeness assertion below
+    // is what keeps this table honest — a new hook target fails the test until it is listed.
+    const ENVELOPES: &[(&str, &str)] = &[
+        ("claude", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("codex", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("gemini", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("qwen", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("droid", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("copilot", r#"{"toolName":"Bash","toolArgs":"{\"command\":\"{CMD}\"}"}"#),
+        (
+            "antigravity",
+            r#"{"toolCall":{"name":"Bash","args":{"CommandLine":"{CMD}"}},"workspacePaths":["/w"]}"#,
+        ),
+        ("cursor", r#"{"command":"{CMD}","cwd":"/w","workspace_roots":["/w"]}"#),
+        ("grok", r#"{"tool_input":{"command":"{CMD}"},"cwd":"/w"}"#),
+    ];
+
+    let mut failures = Vec::new();
+    for (name, template) in ENVELOPES {
+        for blank in ["", "   "] {
+            let envelope = template.replace("{CMD}", blank);
+            let (stdout, _stderr, code) = run_hook(&["hook", name], &envelope);
+            if code != 0 {
+                failures.push(format!("{name}: blank command exited {code} (a crash fails OPEN)"));
+            }
+            for token in ["\"allow\"", "\"approve\""] {
+                if stdout.contains(token) {
+                    failures.push(format!("{name}: blank command approved -> `{stdout}`"));
+                }
+            }
+        }
+        // Non-vacuity: the same envelope with a REAL safe command must still reach a verdict, or
+        // the rows above would pass simply because the envelope never parsed.
+        let (stdout, _, _) = run_hook(&["hook", name], &template.replace("{CMD}", "ls"));
+        if stdout.trim().is_empty() && matches!(*name, "claude" | "qwen" | "cursor") {
+            failures.push(format!("{name}: envelope no longer parses; the blank check is vacuous"));
+        }
+    }
+
+    for target in safe_chains::targets::registry() {
+        if target.hook_format().is_some() && !ENVELOPES.iter().any(|(n, _)| *n == target.name()) {
+            failures.push(format!(
+                "{}: hook target missing from this guard's envelope table",
+                target.name()
+            ));
+        }
+    }
+    assert!(failures.is_empty(), "blank-command contract:\n  {}", failures.join("\n  "));
+}
+
 #[test]
 fn every_target_hook_contract_is_fail_safe() {
     use safe_chains::Verdict;
