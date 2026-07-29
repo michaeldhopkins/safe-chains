@@ -16,6 +16,29 @@ pub mod qwen;
 pub trait Target: Send + Sync {
     fn name(&self) -> &'static str;
 
+    /// The harness's SHELL tool — the only tool this hook should decide about. Droid's is
+    /// `Execute`, Gemini's `run_shell_command`; most are `Bash`. Defaults to `Bash`, the common
+    /// case.
+    fn shell_tool_name(&self) -> &'static str {
+        "Bash"
+    }
+
+    /// A sample envelope this target's `parse_input` accepts, naming `tool`, or `None` when the
+    /// harness's envelope carries NO tool identifier.
+    ///
+    /// `None` is a researched claim, not a default: it says the envelope has no field naming the
+    /// tool, so the hook cannot tell a shell call from any other and must rely on its configured
+    /// matcher alone. `Some` obliges the target to abstain on a foreign tool —
+    /// `no_target_decides_on_a_foreign_tool` holds it to that in both directions.
+    ///
+    /// Test-only; each target knows its own envelope shape, and a generic one cannot stand in for
+    /// nine different schemas (Copilot nests `toolArgs` as a JSON STRING, Antigravity uses
+    /// `toolCall.args.commandLine`, Grok is camelCase).
+    #[cfg(test)]
+    fn sample_envelope(&self, _tool: &str, _command: &str) -> Option<String> {
+        None
+    }
+
     fn display_name(&self) -> &'static str;
 
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf>;
@@ -192,5 +215,56 @@ pub fn allow_reason(verdict: Verdict) -> &'static str {
             "All commands in chain are safe utilities (includes code execution)"
         }
         _ => "All commands in chain are safe utilities",
+    }
+}
+
+#[cfg(test)]
+mod tool_filter_tests {
+    use super::*;
+
+    /// No target decides on a tool that is not its shell tool.
+    ///
+    /// The hook is wired with a matcher (`Bash`, `Execute`, `run_shell_command`), so normally only
+    /// shell calls arrive. But a matcher is configuration: it can be hand-edited, and grok is
+    /// documented to auto-load `~/.claude/settings.json`, which hands Claude's hook a foreign
+    /// envelope. Deciding on a `Read`/`Write`/`Edit` call grants or vetoes a tool whose semantics
+    /// were never analysed — and for the ALLOW-capable targets that is a grant, issued on the
+    /// strength of a `command` field the tool does not even have. Four targets did exactly that.
+    ///
+    /// Driven by each target's OWN `sample_envelope`, because nine harnesses have nine schemas and
+    /// a generic probe silently fails to parse (which looks like a pass). A target whose envelope
+    /// carries no tool identifier returns `None` and is exempt — a researched claim, recorded per
+    /// target, not a default.
+    #[test]
+    fn no_target_decides_on_a_foreign_tool() {
+        let mut failures = Vec::new();
+        let mut checked = 0usize;
+        for target in registry() {
+            let Some(fmt) = target.hook_format() else { continue };
+            let Some(shell) = target.sample_envelope(target.shell_tool_name(), "ls") else {
+                continue; // envelope carries no tool identifier — cannot self-filter
+            };
+            let name = target.name();
+            // The shell tool must still parse, or "reject everything" would satisfy the negative
+            // half and look like a working filter.
+            if let Err(e) = fmt.parse_input(&shell) {
+                failures.push(format!(
+                    "{name}: rejected its own shell tool `{}`: {}",
+                    target.shell_tool_name(),
+                    e.message
+                ));
+            }
+            for foreign in ["Read", "Write", "Edit", "WebFetch"] {
+                let Some(env) = target.sample_envelope(foreign, "rm -rf /") else { continue };
+                checked += 1;
+                if fmt.parse_input(&env).is_ok() {
+                    failures.push(format!(
+                        "{name}: parsed a `{foreign}` envelope instead of abstaining"
+                    ));
+                }
+            }
+        }
+        assert!(checked > 0, "no target was probed — the guard is vacuous");
+        assert!(failures.is_empty(), "foreign-tool decisions:\n{}", failures.join("\n"));
     }
 }

@@ -17,6 +17,15 @@ impl Target for GeminiTarget {
         "Gemini CLI"
     }
 
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(r#"{{"tool_name":"{tool}","tool_input":{{"command":"{command}"}}}}"#))
+    }
+
+    fn shell_tool_name(&self) -> &'static str {
+        "run_shell_command"
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".gemini")]
     }

@@ -17,6 +17,18 @@ impl Target for CopilotTarget {
         "GitHub Copilot CLI"
     }
 
+    fn shell_tool_name(&self) -> &'static str {
+        "bash" // lowercase — Copilot's tool name, not Claude's `Bash`
+    }
+
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        // `toolArgs` is a nested JSON STRING, not an object.
+        Some(format!(
+            r#"{{"toolName":"{tool}","toolArgs":"{{\"command\":\"{command}\"}}"}}"#
+        ))
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         // Copilot reads hooks from per-repo `<repo>/.github/hooks/*.json` OR the user-global
         // `~/.copilot/hooks/` (or `$COPILOT_HOME/hooks/`); upstream's hooks-configuration docs say

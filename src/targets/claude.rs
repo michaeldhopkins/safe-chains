@@ -17,6 +17,11 @@ impl Target for ClaudeTarget {
         "Claude Code"
     }
 
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(r#"{{"tool_name":"{tool}","tool_input":{{"command":"{command}"}}}}"#))
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".claude")]
     }
@@ -74,6 +79,10 @@ struct ToolInput {
 
 #[derive(Deserialize)]
 struct ClaudeHookEnvelope {
+    /// Present in every real envelope; optional so a harness that omits it still works. When it IS
+    /// present and names a different tool, we abstain — see `parse_input`.
+    #[serde(default)]
+    tool_name: Option<String>,
     tool_input: ToolInput,
     #[serde(default)]
     cwd: Option<String>,
@@ -88,6 +97,17 @@ impl HookFormat for ClaudeHookFormat {
         let envelope: ClaudeHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
             message: e.to_string(),
         })?;
+        // Self-filter on the tool, as gemini/copilot/cursor already do. The configured matcher is
+        // `Bash`, so normally only shell calls arrive — but a hand-edited matcher, or grok
+        // auto-loading `~/.claude/settings.json`, can deliver others, and this target is
+        // ALLOW-capable: emitting `permissionDecision: allow` for a `Read`/`Write`/`Edit` call
+        // grants permission on a tool whose semantics were never analysed. Absent tool_name still
+        // passes, so a harness that omits the field is unaffected.
+        if let Some(name) = &envelope.tool_name
+            && name != "Bash"
+        {
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
+        }
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,

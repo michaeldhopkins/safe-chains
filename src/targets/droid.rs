@@ -17,6 +17,15 @@ impl Target for DroidTarget {
         "Factory Droid"
     }
 
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(r#"{{"tool_name":"{tool}","tool_input":{{"command":"{command}"}}}}"#))
+    }
+
+    fn shell_tool_name(&self) -> &'static str {
+        "Execute" // droid's shell tool is not `Bash`
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".factory")]
     }
@@ -83,6 +92,10 @@ struct ToolInput {
 
 #[derive(Deserialize)]
 struct DroidHookEnvelope {
+    /// Optional so a harness that omits it still works; when present and naming another tool we
+    /// abstain (see parse_input).
+    #[serde(default)]
+    tool_name: Option<String>,
     tool_input: ToolInput,
     #[serde(default)]
     cwd: Option<String>,
@@ -93,6 +106,13 @@ impl HookFormat for DroidHookFormat {
         let envelope: DroidHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
             message: e.to_string(),
         })?;
+        // Self-filter on the tool: the hook can be delivered for a non-shell call by a
+        // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
+        if let Some(name) = &envelope.tool_name
+            && name != "Execute"
+        {
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
+        }
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
