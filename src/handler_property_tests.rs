@@ -1074,6 +1074,14 @@ const EXECUTOR_FLAGS: &[(&str, &str)] = &[
     ("vite -c {p} build", "a vite config is JavaScript that vite evaluates"),
     ("vite --config {p} build", "same, long spelling"),
     ("sandbox-exec -f {p} ls", "the profile deciding what the sandboxed process may do"),
+    ("rsync --rsh {p} ./src/ ./dst/", "the remote shell rsync executes"),
+    ("rsync -e {p} ./src/ ./dst/", "same flag, short spelling"),
+    ("gotestsum --raw-command {p}", "replaces the test command with this program"),
+    ("gotestsum --post-run-command {p}", "run after the test run"),
+    ("mypy --python-executable {p} ./src", "mypy runs it to inspect the environment"),
+    ("pip-sync --python-executable {p}", "pip-sync invokes it to install"),
+    ("kustomize build --helm-command {p} ./k", "the helm executable kustomize shells out to"),
+    ("steep check --steep-command {p}", "the steep executable the subcommand re-invokes"),
 ];
 
 proptest! {

@@ -12,3 +12,7 @@ valued = ["--env", "--helm-command", "--mount", "--output", "-o"]
 [[command.sub]]
 name = "version"
 standalone = ["--help", "--short", "-h"]
+
+# `--helm-command` names the helm executable kustomize shells out to when inflating a chart.
+[command.path_gate]
+flags = { "--helm-command" = "exec" }
