@@ -48,7 +48,6 @@ mod tests {
         ruby_short_list: "tilt -l",
         ruby_render_extension: "tilt template.erb",
         ruby_render_subdir: "tilt views/index.haml",
-        ruby_render_absolute: "tilt /tmp/page.md",
         ruby_render_stdin: "tilt -",
         ruby_render_with_type_long: "tilt --type erb template.erb",
         ruby_render_with_type_short: "tilt -t erb template.erb",
@@ -89,6 +88,15 @@ mod tests {
 
         // Ruby tilt: bare-word file form (rejected — could be a K8s sub)
         bare_word_first: "tilt foo",
+
+        // A template is CODE (ERB/Haml is Ruby), so the positional is an executor and takes the
+        // executor locus gate — a foreign template denies exactly as `ruby /tmp/x.rb` does. `/tmp`
+        // is the drop-and-run case and is refused even though it is a writable scratch locus.
+        ruby_render_foreign_tmp: "tilt /tmp/page.md",
+        ruby_render_foreign_system: "tilt /etc/page.erb",
+        ruby_render_foreign_home: "tilt ~/page.erb",
+        ruby_render_foreign_home_bare: "tilt ~",
+        ruby_render_foreign_parent: "tilt ../outside/page.erb",
         bare_word_render: "tilt template",
 
         // Unknown flags

@@ -464,6 +464,11 @@ pub(super) fn dispatch_executor(
             // A declared shape the executor path must satisfy (`go run` → `go-package`):
             // a remote import path is not a worktree executor, so it denies here.
             Some(first) if shape.is_some_and(|s| !s.matches(first)) => Verdict::Denied,
+            // Only the locus, NOT `check_owned`. For an interpreter every token after the script
+            // is the SCRIPT's argv (`python3 ./task.py --flag arg`), so the command's own flag
+            // grammar cannot describe it. The cost is that `max_positional` goes unenforced here
+            // — see TODO.md; a command that needs its positionals gated declares a `path_gate`
+            // with the `exec` role instead of relying on this.
             Some(first) => crate::engine::resolve::execute_file_verdict(first),
             None if check_owned(tokens, policy) => Verdict::Allowed(level),
             None => Verdict::Denied,

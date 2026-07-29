@@ -658,3 +658,28 @@ existing one, and the value-add was the proptests + one operation-aware mechanis
   The operation-aware `handler` mechanism is guarded by pathgate_handler_names_resolve (name ⟺ fn) and
   proptests: ar/textutil "write is never more permissive than read" + "ops classify regardless of
   modifiers", with operation_aware_read_write_divergence_is_real pinning the .git/config case.
+
+## `dispatch_executor` skips the flag policy when a positional is present
+
+`ExecutorKind::File` returns `execute_file_verdict(first)` INSTEAD of `check_owned(tokens, policy)`,
+so for any command declaring `executor = "file"` the flag policy — `max_positional`, the
+standalone/valued allowlists — goes unenforced as soon as the first positional resolves. Only
+positional COUNT and later positionals are affected; an unknown flag still denies, because it stops
+`first_positional` resolving. (`ExecutorKind::Project` always checks the policy; `File` not doing so
+looks like an oversight rather than a distinction.)
+
+It cannot simply start calling `check_owned`: for an interpreter every token after the script is the
+SCRIPT's argv (`python3 ./task.py --flag arg`), which the command's own grammar cannot describe.
+That was tried and it false-denied. The fix is either to apply the policy to the tokens up to and
+including the executor positional, or to declare which commands pass trailing args through.
+
+Impact today is limited to commands that OPEN their extra positionals. `tilt` did — `tilt ./ok.erb
+/etc/evil.erb` was admitted — and now carries `[command.path_gate] positional = "exec"` instead,
+which composes with the grammar rather than replacing it. The interpreters (python3/ruby/node/go)
+are unaffected: their trailing tokens are argv for workspace-local code, which the execution-origin
+model trusts by design. `karma` is the one left worth checking — its positionals are config files it
+reads.
+
+DONE when: `dispatch_executor` enforces the policy over the pre-script prefix (and
+`tilt a.erb b.erb` still denies with tilt's `path_gate` removed), OR every `executor = "file"`
+command that opens extra positionals declares a `path_gate` and a guard asserts that pairing.
