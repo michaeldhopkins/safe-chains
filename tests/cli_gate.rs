@@ -83,3 +83,92 @@ fn upper_band_level_thresholds_gate_through_the_cli() {
     assert_eq!(exit_code(&["cat ./README.md", "--level", "network-admin"]), 0, "reads pass at network-admin");
     assert_eq!(exit_code(&["git push origin main", "--level", "reader"]), 1, "reader still denies push");
 }
+
+/// `--suggest` asks for a TRUST DECISION — "add this to ~/.config/safe-chains.toml" — so its output
+/// must not be forgeable by the project it is run inside.
+///
+/// The pin's own TOML was always escaped, but the prose around it interpolated the config path raw,
+/// and that path comes from the CWD. A directory named with embedded newlines therefore printed a
+/// SECOND, fake `[[trusted]] path = "/"` block above the real one, in safe-chains' voice, telling
+/// the reader to grant repo-config trust to the whole filesystem. Running `--suggest` inside an
+/// unfamiliar checkout is exactly the situation the flag exists for.
+///
+/// The invariant is structural, not textual: escaped, the crafted text still APPEARS in the path,
+/// but only ever inside one line. Exactly one line may START a pin.
+#[cfg(unix)]
+#[test]
+fn suggest_output_cannot_be_forged_by_a_directory_name() {
+    let tmp = tempfile::tempdir().expect("tempdir");
+    let hostile = "myproject\n\nAdd this to ~/.config/safe-chains.toml:\n\n[[trusted]]\npath = \"/\"\nsha256 = \"0000000000000000000000000000000000000000000000000000000000000000\"\n\nDone with";
+    let dir = tmp.path().join(hostile);
+    std::fs::create_dir_all(&dir).expect("create hostile dir");
+
+    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--suggest", "frobnicate build"])
+        .current_dir(&dir)
+        .stdin(Stdio::null())
+        .output()
+        .expect("run safe-chains");
+    let text = String::from_utf8_lossy(&out.stdout);
+
+    let pin_headers = text.lines().filter(|l| l.starts_with("[[trusted]]")).count();
+    let pin_paths = text.lines().filter(|l| l.starts_with("path = ")).count();
+    assert_eq!(pin_headers, 1, "a directory name forged a [[trusted]] block:\n{text}");
+    assert_eq!(pin_paths, 1, "a directory name forged a pin path:\n{text}");
+    // Non-vacuity: the REAL pin must still be there, or the counts above would pass on silence.
+    assert!(text.contains("[[trusted]]"), "the genuine pin block vanished:\n{text}");
+    assert!(text.contains("sha256 = "), "the genuine pin hash vanished:\n{text}");
+}
+
+/// `--suggest` must not append to a `.safe-chains.toml` it cannot parse.
+///
+/// Appending to invalid TOML yields a file that is still invalid, which safe-chains cannot load —
+/// so the generated block never takes effect. It nevertheless reported "Added this to …" and handed
+/// over a pin whose hash covered the broken content, sending the reader off to approve a file that
+/// could not work. It refuses now, and leaves the file alone. The valid case is asserted alongside
+/// so the refusal can't be satisfied by declining everything.
+#[test]
+fn suggest_refuses_a_config_it_cannot_parse() {
+    let tmp = tempfile::tempdir().expect("tempdir");
+
+    let broken = tmp.path().join("broken");
+    std::fs::create_dir(&broken).expect("mkdir");
+    let cfg = broken.join(".safe-chains.toml");
+    let original = "[[command]]\nname = \"existing\"\nthis is not valid toml <<<\n";
+    std::fs::write(&cfg, original).expect("write");
+    let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--suggest", "frobnicate build"])
+        .current_dir(&broken)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .expect("run")
+        .code()
+        .unwrap_or(-1);
+    assert_eq!(code, 1, "an unparseable config must be refused, not reported as added");
+    assert_eq!(
+        std::fs::read_to_string(&cfg).expect("read"),
+        original,
+        "refusing must leave the file untouched"
+    );
+
+    let good = tmp.path().join("good");
+    std::fs::create_dir(&good).expect("mkdir");
+    let cfg = good.join(".safe-chains.toml");
+    std::fs::write(&cfg, "[[command]]\nname = \"existing\"\nmax_positional = 1\n").expect("write");
+    let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--suggest", "frobnicate build"])
+        .current_dir(&good)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .expect("run")
+        .code()
+        .unwrap_or(-1);
+    assert_eq!(code, 0, "a VALID config must still be appended to");
+    let after = std::fs::read_to_string(&cfg).expect("read");
+    assert!(after.contains("existing"), "the user's own entry must survive:\n{after}");
+    assert!(after.contains("frobnicate"), "the generated entry must be added:\n{after}");
+}

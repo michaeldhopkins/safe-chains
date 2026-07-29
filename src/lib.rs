@@ -265,7 +265,7 @@ pub enum ReachReason {
 /// DISPLAYED without changing the bytes, which is the same forgery by other means.
 ///
 /// This neutralizes our own OUTPUT. It is not a check on the command and decides nothing.
-pub(crate) fn sanitize_display(s: &str) -> String {
+pub fn sanitize_display(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
         match c {

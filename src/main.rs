@@ -100,9 +100,30 @@ fn emit_suggestion(
     let canonical = std::fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
     let pin = suggest::pin_block(&canonical.to_string_lossy(), &hash);
 
+    // This path comes from the CWD, so a directory name chosen by whoever wrote the project picks
+    // the bytes. `--suggest` is exactly what someone runs inside an unfamiliar checkout, and its
+    // output ASKS FOR A TRUST DECISION — "add this to ~/.config/safe-chains.toml". Interpolated raw,
+    // a directory named with newlines printed a second, forged `[[trusted]] path = "/"` block above
+    // the real one, in our voice. `pin_block` escapes its own TOML; the prose around it did not.
+    let shown = safe_chains::sanitize_display(&target.display().to_string());
+
+    // Appending to a file that is not valid TOML produces a file that is still not valid TOML —
+    // and safe-chains cannot load one, so the block would never take effect. Reporting "Added
+    // this to …" and handing over a pin for it sends the reader off to approve something that
+    // cannot work, and the hash pins the broken content. Refuse and say what is wrong instead.
+    if !existing.trim().is_empty()
+        && let Err(e) = toml::from_str::<toml::Value>(&existing)
+    {
+        eprintln!(
+            "{shown} isn't valid TOML ({e}), so adding to it would leave a file safe-chains can't \
+             load. Fix or move that file, then re-run. The block to add is:\n\n{block}"
+        );
+        process::exit(1);
+    }
+
     match std::fs::write(&target, &merged) {
         Ok(()) => {
-            println!("Added this to {}:\n\n{block}", target.display());
+            println!("Added this to {shown}:\n\n{block}");
             println!(
                 "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
                  (which safe-chains never edits):\n\n{pin}"
@@ -110,9 +131,7 @@ fn emit_suggestion(
             println!(
                 "The level defaults to \"SafeWrite\" — edit it to \"SafeRead\" (runs code, no \
                  artifacts) or \"Inert\" (read-only) if that fits the tool. Any later edit to \
-                 {} changes its hash: recompute with `shasum -a 256 {}` and update the pin.",
-                target.display(),
-                target.display(),
+                 {shown} changes its hash: recompute with `shasum -a 256 {shown}` and update the pin."
             );
             if !also_recognized.is_empty() {
                 println!(
@@ -126,9 +145,8 @@ fn emit_suggestion(
         }
         Err(e) => {
             eprintln!(
-                "Couldn't write {} ({e}). Add this block to a `.safe-chains.toml` yourself:\n\n{block}\n\
-                 then pin it in ~/.config/safe-chains.toml:\n\n{pin}",
-                target.display()
+                "Couldn't write {shown} ({e}). Add this block to a `.safe-chains.toml` yourself:\n\n{block}\n\
+                 then pin it in ~/.config/safe-chains.toml:\n\n{pin}"
             );
             process::exit(1);
         }
