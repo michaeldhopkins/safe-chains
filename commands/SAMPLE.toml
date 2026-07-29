@@ -817,6 +817,11 @@
 # valued = ["--max-depth", "--exclude"]
 # invalidated_by = ["-x", "--exec", "-l", "--format", "--help", "--version"]
 #
+# Declared in the built-in registry or the write-protected user config only — a repo-level
+# `.safe-chains.toml` cannot carry it. Unlike every other per-command field, this one is
+# TRANSITIVE: it widens whatever CONSUMES the output, so declaring it on `echo` is really a
+# statement that `cat $(echo /etc/shadow)` may run.
+#
 # See docs/design/behavioral-taxonomy-substitution-locus.md.
 
 # ─────────────────────────────────────────────────────────────────────
