@@ -688,26 +688,27 @@ DONE when: `dispatch_executor` enforces the policy over the pre-script prefix, a
 `tilt a.erb b.erb` still denies with tilt's `path_gate` removed. Until then the guard is the
 backstop, not the fix.
 
-## Three targets cannot self-filter on the tool — verify their envelopes
+## Two targets cannot self-filter on the tool — verify their envelopes
 
 `no_target_decides_on_a_foreign_tool` requires a target to abstain when the envelope names a tool
-other than its shell tool. Six targets do. Three are exempt because their envelope, as we model it,
-carries NO tool identifier at all:
+other than its shell tool. Seven targets do. Two are exempt because their envelope, as we model it,
+carries NO tool identifier:
 
 - **cursor** — flat `{command, cwd, workspace_roots}`; nothing names the tool.
 - **grok** — `{toolInput:{command}, workspaceRoot, cwd, sessionId}`; HARNESS-BEHAVIORS.md's live
-  verification lists no tool field.
-- **antigravity** — `{toolCall:{args:{commandLine}}, workspacePaths}`; `toolCall` may well carry a
-  `name` upstream, but we do not deserialize one and it is not recorded as verified.
+  verification records no tool field.
 
-They were NOT given an invented field name: HARNESS-BEHAVIORS.md's rule is that the harness wins and
-these contracts were verified live, so guessing a key here is exactly the mistake that fails
-silently. All three rely on their configured matcher instead, which is what every target did until
-now.
+Neither was given an invented field name. HARNESS-BEHAVIORS.md's rule is that the harness wins and
+these contracts were verified live, so guessing a key is the mistake that fails silently. Both rely
+on their configured matcher, which is what every target did until recently.
 
-Risk while exempt: cursor and grok are deny-harnesses, so a foreign-tool envelope can only produce
-an over-deny, not a grant. Antigravity is Ask-capable, so it could escalate a non-shell call to a
-human prompt — noisy, not unsafe.
+Risk while exempt: both are deny-harnesses, so a foreign-tool envelope can only produce an
+over-deny, never a grant.
+
+(Antigravity was on this list and should not have been. Its identifier is `toolCall.name` =
+`run_command`, documented AND live-verified in HARNESS-BEHAVIORS.md — we simply were not
+deserializing it. Now filtered. The lesson for the two below: check the doc before assuming the
+field is absent.)
 
 DONE when: each harness's PreToolUse envelope is checked for a tool-identifying field (drive the
 TUI, dump a real envelope for a non-shell tool). Either add the field and the filter — the guard
