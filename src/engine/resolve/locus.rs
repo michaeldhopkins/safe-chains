@@ -77,26 +77,37 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     // A bound `for`-loop variable expands to its list's representative item first (its read or
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
     let expanded = crate::pathctx::expand_vars(path, want_write);
-    // A substitution whose inner command declared what its stdout can name carries that locus in
-    // its sentinel. Read it AFTER expansion — a bound variable (`OUT=$(fd d ~); cat "$OUT/x"`)
-    // still spells the tag `$OUT` here, so checking first saw no tag, fell through, and then
-    // classified the expanded sentinel as an ordinary relative path. It must still come BEFORE the
-    // `$`/unpinnable guard, which is the answer for an UNDECLARED substitution, not a declared one.
-    if let Some((tag, rewritten)) = tagged_substitution(&expanded) {
-        // The tag bounds where the substitution's own VALUE can point. The text AROUND it is an
-        // ordinary path and has to be classified as one: reporting the tag alone said "worktree"
-        // for `$(pwd)/.git/hooks/pre-commit` and laundered a git-hook write past the frozen tier
-        // that the literal spelling denies.
-        return tag.max(classify_resolved(&rewritten, want_write));
-    }
-    classify_resolved(&expanded, want_write)
+
+    // A declared substitution's locus rides in its sentinel, and the sentinel can enter the path at
+    // TWO points. Both are checked, and the worst wins along with the ordinary classification of
+    // whatever surrounds it — the tag bounds where the substitution's own VALUE points and says
+    // nothing about the text around it (`$(pwd)/.git/hooks/pre-commit`).
+    //
+    //  1. In the OPERAND, visible once variables are expanded. Checking before expansion missed a
+    //     bound variable, which still spells the tag `$OUT` at this point.
+    let (operand_tag, base) = match tagged_substitution(&expanded) {
+        Some((tag, rewritten)) => (Some(tag), Cow::Owned(rewritten)),
+        None => (None, expanded),
+    };
+
+    //  2. In the CWD, which only appears once `resolve` joins it on — so it is invisible above.
+    //     Reachable since `cd $(…)` began carrying a locus instead of being silently ignored:
+    //     `cd $(fd d /etc) && cat f` classified `f` as an ordinary relative name and approved a
+    //     read under /etc. Same ordering mistake as (1), one layer further down.
+    let resolved = crate::pathctx::resolve(&base);
+    let (cwd_tag, base) = match tagged_substitution(&resolved) {
+        Some((tag, rewritten)) => (Some(tag), Cow::Owned(rewritten)),
+        None => (None, resolved),
+    };
+
+    let plain = classify_pinned(&base, want_write);
+    [operand_tag, cwd_tag].into_iter().flatten().fold(plain, LocalLocus::max)
 }
 
-/// The ordinary path classification: resolve against cwd/root, canonicalize, fail closed on an
-/// unpinnable spelling, then read the region model's face.
-fn classify_resolved(expanded: &str, want_write: bool) -> LocalLocus {
-    let resolved = crate::pathctx::resolve(expanded);
-    let canonical = canonicalize(&resolved);
+/// Classify an ALREADY-resolved path: canonicalize, fail closed on an unpinnable spelling, then
+/// read the region model's face.
+fn classify_pinned(resolved: &str, want_write: bool) -> LocalLocus {
+    let canonical = canonicalize(resolved);
     if is_unpinnable(&canonical) {
         return LocalLocus::Machine;
     }
