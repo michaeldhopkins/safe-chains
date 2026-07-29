@@ -45,14 +45,14 @@ impl Target for CursorTarget {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
             }
 
-            add_hook(&mut settings, binary);
+            add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n"))
                 .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = json!({"version": 1});
-            add_hook(&mut settings, binary);
+            add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n"))
                 .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
@@ -160,27 +160,18 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         })
 }
 
-fn add_hook(settings: &mut Value, binary: &str) {
+fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
+    // cursor's file carries a schema `version` next to the hooks, so it is seeded before the shared
+    // helper runs (the helper only ever creates the hook path itself).
     if !settings.is_object() {
         *settings = json!({"version": 1});
     }
-    let Some(obj) = settings.as_object_mut() else {
-        unreachable!("settings was just set to an object");
-    };
-    if !obj.contains_key("version") {
+    if let Some(obj) = settings.as_object_mut()
+        && !obj.contains_key("version")
+    {
         obj.insert("version".to_string(), json!(1));
     }
-    let hooks = obj
-        .entry("hooks")
-        .or_insert_with(|| json!({}))
-        .as_object_mut()
-        .expect("hooks key was created above as an object");
-    let before_shell = hooks
-        .entry("beforeShellExecution")
-        .or_insert_with(|| json!([]))
-        .as_array_mut()
-        .expect("beforeShellExecution was created above as an array");
-    before_shell.push(hook_entry(binary));
+    super::append_hook_entry(settings, "hooks", "beforeShellExecution", hook_entry(binary))
 }
 
 #[cfg(test)]

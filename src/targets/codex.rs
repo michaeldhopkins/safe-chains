@@ -50,14 +50,14 @@ impl Target for CodexTarget {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
             }
 
-            add_hook(&mut settings, binary);
+            add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n"))
                 .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
-            add_hook(&mut settings, binary);
+            add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n"))
                 .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
@@ -177,29 +177,15 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         })
 }
 
-fn add_hook(settings: &mut Value, binary: &str) {
-    if !settings.is_object() {
-        *settings = json!({});
-    }
-    let obj = settings.as_object_mut().expect("settings was just set to an object");
-    // Codex nests lifecycle events under a top-level `hooks` object (NOT Claude's flat
-    // `PreToolUse` key) — a flat key makes Codex reject the whole file. See developers.openai.com/codex/hooks.
-    let hooks = obj.entry("hooks").or_insert_with(|| json!({}));
-    if !hooks.is_object() {
-        *hooks = json!({});
-    }
-    let pre_tool_use = hooks
-        .as_object_mut()
-        .expect("hooks was just set to an object")
-        .entry("PreToolUse")
-        .or_insert_with(|| json!([]));
-    if !pre_tool_use.is_array() {
-        *pre_tool_use = json!([]);
-    }
-    pre_tool_use
-        .as_array_mut()
-        .expect("PreToolUse was just set to an array")
-        .push(hook_entry(binary));
+/// Codex nests lifecycle events under a top-level `hooks` object (NOT Claude's flat `PreToolUse`
+/// key) — a flat key makes Codex reject the whole file. See developers.openai.com/codex/hooks.
+///
+/// This used to REPLACE a wrong-typed `hooks` or `PreToolUse` value with an empty one, destroying
+/// whatever the user had there without saying so. The shared helper refuses instead: an unreadable
+/// value is usually a hand-edit or a schema we don't know, and rewriting config we did not
+/// understand is not ours to do.
+fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
+    super::append_hook_entry(settings, "hooks", "PreToolUse", hook_entry(binary))
 }
 
 #[cfg(test)]
