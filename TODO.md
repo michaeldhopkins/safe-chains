@@ -304,6 +304,27 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
 
 ## Post-1.0 (deferred, not blocking 1.0)
 
+- **ANSI-C quoting (`$'…'`) is unmodeled, so every use of it denies.** Found 2026-07-28 by a
+  differential sweep against `bash -n`. The parser has no `$'…'` token: simple cases survive by
+  accident (the `$` is dropped and `'…'` parses as an ordinary single-quoted string), but the
+  quoting rules differ, so `echo $'don\'t'` fails to parse outright — in `$'…'` a `\'` is an
+  ESCAPED quote, while in `'…'` a `'` always closes. Uniformly fail-closed today: even
+  `cat $'README.md'` denies, so nothing is mis-approved and there is no hurry.
+
+  The cost is over-denial of real idioms — `sort -t$'\t'`, `IFS=$'\n'`, `grep $'\t'`.
+
+  Deliberately NOT fixed inline with the heredoc work, because decoding `$'…'` means decoding
+  escapes (`\x2f`, `\057`, `\n`), and that is a new PATH-NORMALIZATION surface: `cat $'\x2f\x65\x74\x63/shadow'`
+  must classify as `/etc/shadow`, not as an opaque literal. Adding the token without the decoding
+  would turn today's uniform deny into a hole. Verified current behavior is safe: the hex and octal
+  spellings of `/etc/shadow` and of `../outside.txt` all deny.
+
+  **Done when:** `$'…'` is a real `WordPart` whose escapes are decoded before locus classification;
+  `sort -t$'\t' file` and `echo $'don\'t'` approve; every escape spelling of an out-of-workspace
+  path still denies, guarded by a property test over encoded/plain path pairs (the encoded form must
+  never be more permissive than the literal one — the abstraction-soundness shape already used in
+  `handler_property_tests`).
+
 - **Em-dash sweep of command descriptions.** The hand-written guide docs (`docs/src/*.md`) and
   `README.md` are em-dash-free (done 2026-07). The generated Command Reference still carries them: 26
   em-dashes surface in `COMMANDS.md`, sourced from the `description` field of ~560 of 1257 command
