@@ -676,25 +676,17 @@ Blocked on nothing; deliberately out of scope for the substitution work. `DECLAR
 `handler_property_tests.rs` carries the `~` case today; when this is fixed, `~` should move into
 the shared `OUT_OF_WORKSPACE` and that separate list can go away.
 
-## Substitution locus: gaps left open deliberately
+## Resolved: perl carries no `execute` capability, on purpose
 
-Follow-ups from the adversarial review of `[command.output]`. All three are fail-CLOSED today, so
-they are over-denies or cosmetic, not holes.
+Investigated and rejected, recorded so it is not re-raised. `perl -e 'print 1'` resolves to a
+profile with no `execute` capability, which looks like an omission — perl plainly runs code. Adding
+`executes(caller-inline)` was tried and **denies at every band**, which takes out every perl
+one-liner including the in-place edits the hook exists to admit.
 
-- **`for f in $(fd a app/); do cat $f; done` denies.** `engine::resolve::loop_reprs` decides a loop
-  item is unknowable with `s.contains("__SAFE_CHAINS_")` — a PREFIX test, so it catches the bounded
-  tagged sentinel too and floors the loop variable at `machine`. `cat $(fd a app/)` approves while
-  the loop form does not, which will read as arbitrary to a user. The fix is to swap that test for
-  `check::is_opaque_value`, but it WIDENS, so it wants its own guard: every fail-open found in this
-  feature so far has been in exactly such a widening.
-
-- **`>|` renders as `>` in `--explain`.** It parses to `Redir::Write { append: false }` because the
-  clobber-override is not a classification difference. Round-trips fine (same tree), but the
-  per-segment breakdown echoes a command the user did not type. Needs a `clobber` field on
-  `Redir::Write` carried through Display — a schema change for a cosmetic gain.
-
-- **`perl -e 'print 1'` resolves to an EMPTY capability profile.** With no file operands there are
-  no capabilities at all, so it projects as inert. It does RUN code, and the identifier allowlist
-  is what bounds it; arguably it should carry an `execute` capability with caller-inline trust so
-  the profile says what it does rather than saying nothing. Inherited from the pre-engine handler,
-  which returned `Inert` outright — not a regression, but the engine port is the moment to model it.
+The reason it denies is that `execute` describes running code of UNKNOWN content, and by the time
+the profile is built the identifier gate has established the opposite: the one-liner reaches
+nothing but pure built-ins — no I/O, no exec, no network. What remains observable is the operand
+reads and writes, which is what the profile says. If the gate's vocabulary ever admits an
+identifier with side effects, the fix belongs in the gate, not in a capability here. There is also
+no precedent for an admitted `executes(caller-inline)`: `bash -c 'ls'` approves via the shell
+handler re-validating the inner command, not via a capability.

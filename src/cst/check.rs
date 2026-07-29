@@ -984,6 +984,16 @@ mod tests {
         assign_subshell: "(x=1)",
         assign_in_subshell_with_cmd: "(x=1; ls)",
 
+        // A loop over a BOUNDED substitution. These are the positive half of the substitution
+        // rule: the deny corpus only asserts that hot roots are refused, which a blanket refusal
+        // would satisfy vacuously — so without these, reverting `loop_reprs` to its old
+        // `__SAFE_CHAINS_` prefix test would silently re-deny the whole form and stay green.
+        loop_over_bounded_sub: "for f in $(fd a app/); do cat $f; done",
+        loop_over_bounded_sub_quoted: "for f in $(fd a app/); do cat \"$f\"; done",
+        loop_over_bounded_sub_write: "for f in $(fd a app/); do echo hi > $f; done",
+        loop_over_bounded_sub_pipeline: "for f in $(fd a app/ | head -3); do cat $f; done",
+        loop_over_pwd: "for f in $(pwd); do cat $f; done",
+
         case_single_arm: "case x in x) echo a;; esac",
         case_alternation: "case $x in a|b) ls;; *) echo n;; esac",
         case_paren_prefixed_pattern: "case \"$1\" in (start) ls;; (stop) pwd;; esac",
@@ -1079,6 +1089,12 @@ mod tests {
         curl_post: "curl -X POST https://example.com",
         node_foreign_app: "node /tmp/app.js",
 
+
+        // The loop inherits the substitution's locus, so a hot root reaches the body's `$f`.
+        loop_over_system_sub: "for f in $(fd a /etc); do cat $f; done",
+        loop_over_home_sub: "for f in $(fd a ~); do cat $f; done",
+        loop_over_undeclared_sub: "for f in $(hostname); do cat $f; done",
+        loop_over_bounded_sub_escaping_body: "for f in $(pwd); do cat $f/../../etc/shadow; done",
 
         // A case is only as safe as its worst arm — which arm runs is a runtime decision.
         case_unsafe_only_arm: "case x in *) rm -rf /;; esac",
