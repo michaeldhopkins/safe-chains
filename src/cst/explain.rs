@@ -239,11 +239,17 @@ fn header(total: usize, denied: usize) -> String {
     format!("safe-chains: not auto-approved — {denied} of {total} segments are not on the allowlist:\n")
 }
 
+/// One `✓`/`✗` line. The echoed text is command-derived, so it is neutralized first: a raw newline
+/// in it let a command forge an entire extra line carrying our own `✓` marker (see
+/// [`crate::sanitize_display`]).
 fn render_line(s: &SegmentReport) -> String {
     let mark = if s.verdict.is_allowed() { '✓' } else { '✗' };
+    let text = crate::sanitize_display(&s.text);
     match &s.culprit {
-        Some(culprit) if !s.verdict.is_allowed() => format!("  {mark}  {}   ({culprit})\n", s.text),
-        _ => format!("  {mark}  {}\n", s.text),
+        Some(culprit) if !s.verdict.is_allowed() => {
+            format!("  {mark}  {text}   ({})\n", crate::sanitize_display(culprit))
+        }
+        _ => format!("  {mark}  {text}\n"),
     }
 }
 
