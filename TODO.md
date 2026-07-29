@@ -658,20 +658,3 @@ existing one, and the value-add was the proptests + one operation-aware mechanis
   The operation-aware `handler` mechanism is guarded by pathgate_handler_names_resolve (name ⟺ fn) and
   proptests: ar/textutil "write is never more permissive than read" + "ops classify regardless of
   modifiers", with operation_aware_read_write_divergence_is_real pinning the .git/config case.
-
-## A bare `~` operand is admitted by rg / awk / mlr
-
-`rg x ~`, `awk '{print}' ~` and `mlr --csv cat ~` auto-approve, while `cat ~`, `head ~`, `grep x ~`,
-`sed 's/a/b/' ~` and `perl -pe 's/a/b/' ~` all correctly deny. `rg x ~` recursively searches `$HOME`
-and prints matching file content to the model, so this is a disclosure over-approval, not a
-listing.
-
-Found while widening the substitution-locus corpus (2026-07-28); NOT caused by it — it reproduces
-on the commit before. The three commands share the trait that they have no `[command.behavior]`
-block, so the engine's locus gate never sees their operands, which is the same structural gap that
-let `perl -pe 's/a/b/' /etc/shadow` through. The fix is presumably the same shape: port them to
-`[command.behavior]`.
-
-Blocked on nothing; deliberately out of scope for the substitution work. `DECLARED_SUB_ROOTS` in
-`handler_property_tests.rs` carries the `~` case today; when this is fixed, `~` should move into
-the shared `OUT_OF_WORKSPACE` and that separate list can go away.

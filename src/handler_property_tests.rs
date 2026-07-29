@@ -292,9 +292,20 @@ const READ_MODE_CASES: &[&str] = &[
     "awk '{print}' {p}",
     "ruby -pe 'puts' {p}",
     "mlr --csv cat {p}",
+    // Path-GATED readers, not engine-resolved ones. They pre-filter operands through
+    // `looks_like_path`, so they are the shape that missed a bare `~` — worth holding here rather
+    // than trusting the gate to keep seeing them.
+    "rg x {p}",
+    "od {p}",
+    "shred {p}",
 ];
 
 // Targets outside the /work workspace. Deliberately excludes /tmp and /dev (admitted scratch loci).
+//
+// A BARE `~` is here on purpose and is the one spelling that carries neither `/` nor `.`, so it is
+// what any surviving path-SHAPE test fails to see. It briefly lived in a separate list because
+// adding it here failed the `rg`/`awk`/`mlr` guards — those were not corpus noise but a real
+// over-approval in `looks_like_path`, now fixed, so the lists are one again.
 const OUT_OF_WORKSPACE: &[&str] = &[
     "/etc/hosts",
     "/etc/passwd",
@@ -302,25 +313,10 @@ const OUT_OF_WORKSPACE: &[&str] = &[
     "/usr/local/bin/x",
     "~/.ssh/id_rsa",
     "~/.bashrc",
+    "~",
+    "~root",
     "../outside.txt",
     "../../escape.txt",
-];
-
-/// The roots a DECLARED substitution is probed on: everything above, plus a bare `~`.
-///
-/// `~` is separated out rather than added to `OUT_OF_WORKSPACE` because adding it there fails the
-/// pre-existing operand guards on `rg`, `awk` and `mlr`, which admit a bare `~` operand today
-/// (`rg x ~` searches `$HOME` and prints matching content). That is a real but SEPARATE over-
-/// approval, untouched by the substitution work — see TODO.md. Here `~` is load-bearing: it is
-/// exactly the spelling that slipped the path-shape test in `candidate_roots`.
-const DECLARED_SUB_ROOTS: &[&str] = &[
-    "/etc/hosts",
-    "/etc/passwd",
-    "/root/.bashrc",
-    "~/.ssh/id_rsa",
-    "~/.bashrc",
-    "~",
-    "../outside.txt",
 ];
 
 // A substitution whose inner command DECLARED its output locus (`[command.output]`) evaluates to a
@@ -727,7 +723,7 @@ proptest! {
     #[test]
     fn declared_substitutions_deny_out_of_workspace_roots(
         template in proptest::sample::select(DECLARED_SUB_CASES.to_vec()),
-        target in proptest::sample::select(DECLARED_SUB_ROOTS.to_vec()),
+        target in proptest::sample::select(OUT_OF_WORKSPACE.to_vec()),
     ) {
         let line = template.replace("{p}", target);
         let allowed = command_verdict_in(&line, workspace()).is_allowed();
