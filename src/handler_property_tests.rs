@@ -1064,6 +1064,52 @@ proptest! {
     }
 }
 
+/// Flags whose VALUE is a program the command runs, as `(with `{p}` for the path, …)`. A wrapper
+/// flag is consumed without inspecting its value, so each of these auto-approved any path.
+const EXECUTOR_FLAGS: &[(&str, &str)] = &[
+    ("borg --rsh {p} check repo", "borg runs it to reach the repository"),
+    ("borg --remote-path {p} list repo", "the borg executable on the far side"),
+    ("restic --password-command {p} snapshots", "run to obtain the repo password"),
+    ("helmfile --helm-binary {p} list", "the helm executable helmfile shells out to"),
+    ("vite -c {p} build", "a vite config is JavaScript that vite evaluates"),
+    ("vite --config {p} build", "same, long spelling"),
+    ("sandbox-exec -f {p} ls", "the profile deciding what the sandboxed process may do"),
+];
+
+proptest! {
+    /// A flag naming a PROGRAM is gated on where that program lives.
+    ///
+    /// These are `dispatch_wrapper` flags: it consumes a valued flag and never looks at the value,
+    /// so every one of them approved `/tmp/evil` — a downloaded script's landing spot. The gate has
+    /// to be `exec`, not `read`/`write`, because those admit `/tmp`.
+    ///
+    /// Asserted in BOTH directions. A deny-only check passes just as well when the command stops
+    /// working altogether, and `borg --rsh` looked gated for exactly that reason: the probe that
+    /// recorded it as denied had omitted borg's required repository positional, so the refusal came
+    /// from the missing argument rather than from the flag.
+    #[test]
+    fn a_flag_naming_a_program_is_gated_on_where_that_program_lives(
+        case in proptest::sample::select(EXECUTOR_FLAGS.to_vec()),
+    ) {
+        let (template, why) = case;
+        for foreign in ["/tmp/evil", "~/.ssh/evil", "/etc/evil"] {
+            let line = template.replace("{p}", foreign);
+            prop_assert!(
+                !is_safe_command(&line),
+                "foreign executor auto-approved ({why}): `{}`",
+                line
+            );
+        }
+        // The workspace spelling must still work, or the deny above proves nothing.
+        let local = template.replace("{p}", "./bin/tool");
+        prop_assert!(
+            is_safe_command(&local),
+            "gating broke the legitimate in-workspace form ({why}): `{}`",
+            local
+        );
+    }
+}
+
 /// Payloads that try to forge safe-chains' own output from inside a command. Each embeds a
 /// newline plus a convincing imitation of a rendered line.
 const FORGERY_PAYLOADS: &[&str] = &[

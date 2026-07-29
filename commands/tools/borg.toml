@@ -16,6 +16,12 @@ examples_safe = [
 standalone = ["--bypass-lock", "--consider-checkpoints", "--debug", "--info", "--lock-wait", "--no-cache-sync", "--progress", "--show-rc", "--show-version", "--verbose", "--warning"]
 valued = ["--bypass-lock", "--debug-topic", "--lock-wait", "--remote-path", "--remote-ratelimit", "--rsh", "--umask"]
 
+# `--rsh` is the command borg RUNS to reach the repository (default `ssh`), and `--remote-path`
+# is the borg executable invoked on the far side. Both name a program, so both take the executor
+# gate: `read`/`write` would admit `/tmp`, which is exactly where a fetched script lands.
+[command.path_gate]
+flags = { "--rsh" = "exec", "--remote-path" = "exec" }
+
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]

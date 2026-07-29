@@ -6,3 +6,8 @@ researched_version = "macOS 14 (deprecated; surface frozen)"
 
 [command.wrapper]
 valued = ["-D", "-f", "-n", "-p"]
+
+# `-f` names the sandbox PROFILE that decides what the wrapped process may do; a caller-chosen
+# profile out of the workspace defeats the point of the sandbox.
+[command.path_gate]
+flags = { "-f" = "exec" }

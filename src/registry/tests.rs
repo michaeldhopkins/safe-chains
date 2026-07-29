@@ -2625,6 +2625,87 @@ use super::*;
     /// Regression guard: `examples_safe`/`examples_denied` must appear
     /// before any `[[command.sub]]` or `[command.fallback]` table in
     /// each TOML file. TOML semantics scope inline keys to the
+    /// A wrapper flag whose NAME says its value is a program must gate that value at the EXECUTOR
+    /// locus.
+    ///
+    /// `dispatch_wrapper` consumes a valued flag and never looks at the value, so a flag naming a
+    /// program auto-approved any path — `borg --rsh /tmp/evil check repo` ran `/tmp/evil`. `read`
+    /// or `write` is not enough: both ADMIT `/tmp`, which is exactly where a fetched script lands.
+    /// Only `exec` withholds it.
+    ///
+    /// A ratchet over names, so a wrapper flag added later inherits the requirement. It cannot
+    /// catch a flag whose name does not advertise what it does (`vite --config` evaluates
+    /// JavaScript, `sandbox-exec -f` picks the sandbox profile) — those are gated, but by research,
+    /// not by this guard. The behavioural corpus below pins them.
+    #[test]
+    fn an_executor_named_wrapper_flag_is_gated_at_the_executor_locus() {
+        use std::fs;
+        use std::path::PathBuf;
+
+        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap() {
+                let entry = entry.unwrap();
+                let path = entry.path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+                {
+                    out.push(path);
+                }
+            }
+        }
+
+        /// Names that state the value is a program to run.
+        fn names_an_executor(flag: &str) -> bool {
+            let f = flag.trim_start_matches('-');
+            f == "rsh"
+                || f.ends_with("-binary")
+                || f.ends_with("-command")
+                || f.ends_with("-interpreter")
+                || f.ends_with("-shell")
+                || f.ends_with("-executable")
+        }
+
+        let mut files = Vec::new();
+        walk(std::path::Path::new("commands"), &mut files);
+        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+
+        let mut checked = 0;
+        let mut failures = Vec::new();
+        for path in &files {
+            let source = fs::read_to_string(path).unwrap();
+            let Ok(parsed) = toml::from_str::<toml::Value>(&source) else { continue };
+            let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
+            for cmd in commands {
+                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+                let Some(valued) =
+                    cmd.get("wrapper").and_then(|w| w.get("valued")).and_then(|v| v.as_array())
+                else {
+                    continue;
+                };
+                let gate = cmd.get("path_gate").and_then(|g| g.get("flags"));
+                for flag in valued.iter().filter_map(|f| f.as_str()) {
+                    if !names_an_executor(flag) {
+                        continue;
+                    }
+                    checked += 1;
+                    let role = gate.and_then(|g| g.get(flag)).and_then(|r| r.as_str());
+                    if role != Some("exec") {
+                        failures.push(format!(
+                            "{}: `{name} {flag}` names a program but its path_gate role is {:?} \
+                             (needs \"exec\"; read/write would admit /tmp)",
+                            path.display(),
+                            role
+                        ));
+                    }
+                }
+            }
+        }
+        assert!(checked > 0, "no executor-named wrapper flag was examined; guard is vacuous");
+        assert!(failures.is_empty(), "ungated executor flags:\n  {}", failures.join("\n  "));
+    }
+
     /// most-recently-opened table, so examples written *after* a
     /// nested table silently get attached to that table and dropped
     /// from the command. Walks every `commands/**/*.toml` and asserts
