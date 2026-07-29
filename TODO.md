@@ -733,3 +733,23 @@ them nest differently (antigravity puts `PreToolUse` at the top level, with no o
 DONE when: all seven refuse rather than overwrite — either by generalizing `append_hook_entry` to
 an optional outer key, or by each guarding in place — and a test asserts the pre-existing value
 survives, the way `refuses_a_wrong_typed_outer_key_without_panicking` does for the shared helper.
+
+## `--suggest` appends to a `.safe-chains.toml` it cannot parse
+
+`emit_suggestion` reads the existing file with `unwrap_or_default()`, merges the generated block in,
+writes it back, reports "Added this to …", and prints a `[[trusted]]` pin. It never checks that the
+existing content parses. Given a malformed file it produces a still-malformed one and tells the user
+to pin it.
+
+That used to chain into a fail-open: a pinned invalid file made `load_toml` panic on every
+invocation, hook included, which lets the harness proceed. The panic half is fixed — such a file is
+now skipped with a message — so the remaining damage is that `--suggest` claims success while
+producing a file that will never load, and hands over a pin for it.
+
+Same shape as the `--setup` panic already fixed: don't write into a config whose existing content we
+could not read.
+
+DONE when: `--suggest` validates the existing file before merging, and on failure reports the parse
+error and writes nothing (the block can still be printed for the user to place by hand). A test
+should assert the malformed file is byte-unchanged, as
+`refuses_a_wrong_typed_outer_key_without_panicking` does for the install path.

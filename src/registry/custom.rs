@@ -103,6 +103,49 @@ fn repo_is_trusted(repo_file: &Path, bytes: &[u8], trusted: &[TrustedEntry]) -> 
     })
 }
 
+/// Load a USER-SUPPLIED custom TOML without letting a bad one take the process down.
+///
+/// `load_toml` panics on anything it cannot validate — an unparseable file, an unknown behavior
+/// hook, a bad enum value; there are ~40 such assertions. That is right for the built-in
+/// `commands/*.toml`, which are compiled in and validated at build time: a panic there is a broken
+/// build. It is wrong for a file a USER wrote. A single typo in `~/.config/safe-chains.toml` made
+/// EVERY invocation abort with exit 101 — including the hook, and a crashed PreToolUse hook means
+/// the harness proceeds, so an ordinary mistake silently disabled safe-chains altogether.
+///
+/// Skipping the file fails SAFE: the custom definitions do not load, so nothing is widened, and the
+/// built-in registry keeps deciding. The message goes to stderr rather than stdout so it cannot be
+/// mistaken for a hook decision.
+fn load_custom_file(source: &str, category: &str, path: &Path) -> Vec<CommandSpec> {
+    // Check SYNTAX first, so the common failure — a typo — is reported without a panic at all.
+    // `toml::Value` accepts any well-formed document, so this only rejects what `load_toml` would
+    // have aborted on, and its error carries the line and column.
+    if let Err(e) = toml::from_str::<toml::Value>(source) {
+        return skip(path, &e.to_string());
+    }
+    // Everything else `load_toml` refuses — an unknown behavior hook, a bad enum value, ~40
+    // assertions — still panics, so it is caught here and its message recovered for the report.
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| load_toml(source, category))) {
+        Ok(specs) => specs,
+        Err(payload) => {
+            let why = payload
+                .downcast_ref::<String>()
+                .map(String::as_str)
+                .or_else(|| payload.downcast_ref::<&str>().copied())
+                .unwrap_or("unrecognized command definition");
+            skip(path, why)
+        }
+    }
+}
+
+fn skip(path: &Path, why: &str) -> Vec<CommandSpec> {
+    eprintln!(
+        "safe-chains: ignoring {} — {why}\n  Built-in commands are unaffected; fix the file to \
+         re-enable your custom ones.",
+        path.display()
+    );
+    Vec::new()
+}
+
 /// Strip the fields a REPO-level custom TOML may not carry.
 ///
 /// `[command.output]` is dropped for the reason `level` is never read from a repo file. Every other
@@ -132,7 +175,7 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
     if let Some(path) = find_user_custom()
         && let Ok(source) = fs::read_to_string(&path)
     {
-        for spec in load_toml(&source, "custom-user") {
+        for spec in load_custom_file(&source, "custom-user", &path) {
             insert_spec(map, spec);
         }
         trusted = parse_trusted(&source);
@@ -143,7 +186,7 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
         && repo_is_trusted(&repo_file, &bytes, &trusted)
         && let Ok(source) = std::str::from_utf8(&bytes)
     {
-        for spec in load_toml(source, "custom-project") {
+        for spec in load_custom_file(source, "custom-project", &repo_file) {
             insert_spec(map, repo_scoped(spec));
         }
     }
@@ -152,6 +195,34 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A user-supplied config that safe-chains cannot validate must be SKIPPED, never fatal.
+    ///
+    /// `load_toml` panics on ~40 conditions — that is correct for the built-in `commands/*.toml`,
+    /// which are compiled in and validated at build time. Applied to a file the USER wrote it was a
+    /// fail-OPEN: one typo in `~/.config/safe-chains.toml` aborted every invocation with exit 101,
+    /// the hook included, and a crashed PreToolUse hook lets the harness proceed. So an ordinary
+    /// mistake silently disabled safe-chains entirely.
+    #[test]
+    fn an_invalid_custom_config_is_skipped_not_fatal() {
+        let path = Path::new("/tmp/does-not-matter.toml");
+        // Bad SYNTAX — caught before any panic, so the message carries line/column.
+        let specs = load_custom_file("this is not valid toml [[[", "custom-user", path);
+        assert!(specs.is_empty(), "an unparseable file must contribute no commands");
+
+        // Valid syntax, invalid CONTENT — reaches `load_toml`'s assertions and is caught there.
+        let bogus = "[[command]]\nname = \"zz\"\nlevel = \"Inert\"\n\n\
+                     [command.behavior]\noperation = \"observe\"\npositionals = \"read\"\n\
+                     hook = \"bogus\"\n";
+        let specs = load_custom_file(bogus, "custom-user", path);
+        assert!(specs.is_empty(), "an unvalidatable file must contribute no commands");
+
+        // Non-vacuity: a GOOD file still loads, so "always returns empty" cannot pass this.
+        let good = "[[command]]\nname = \"frobnicate\"\nlevel = \"Inert\"\nbare = true\n";
+        let specs = load_custom_file(good, "custom-user", path);
+        assert_eq!(specs.len(), 1, "a valid custom file must still load");
+        assert_eq!(specs[0].name, "frobnicate");
+    }
 
     /// A repo file cannot carry `[command.output]`. The field is a TRANSITIVE grant — it widens
     /// whatever consumes the command's output, not the command itself — so declaring it on `echo`
