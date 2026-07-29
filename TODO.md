@@ -675,37 +675,3 @@ let `perl -pe 's/a/b/' /etc/shadow` through. The fix is presumably the same shap
 Blocked on nothing; deliberately out of scope for the substitution work. `DECLARED_SUB_ROOTS` in
 `handler_property_tests.rs` carries the `~` case today; when this is fixed, `~` should move into
 the shared `OUT_OF_WORKSPACE` and that separate list can go away.
-
-## Resolved: perl carries no `execute` capability, on purpose
-
-Investigated and rejected, recorded so it is not re-raised. `perl -e 'print 1'` resolves to a
-profile with no `execute` capability, which looks like an omission — perl plainly runs code. Adding
-`executes(caller-inline)` was tried and **denies at every band**, which takes out every perl
-one-liner including the in-place edits the hook exists to admit.
-
-The reason it denies is that `execute` describes running code of UNKNOWN content, and by the time
-the profile is built the identifier gate has established the opposite: the one-liner reaches
-nothing but pure built-ins — no I/O, no exec, no network. What remains observable is the operand
-reads and writes, which is what the profile says. If the gate's vocabulary ever admits an
-identifier with side effects, the fix belongs in the gate, not in a capability here. There is also
-no precedent for an admitted `executes(caller-inline)`: `bash -c 'ls'` approves via the shell
-handler re-validating the inner command, not via a capability.
-
-## Sweep vs aim: the policy the soundness property had to be taught
-
-Recorded because it took a wrong turn to find, and the next person generalizing the abstraction-
-soundness property will hit it too.
-
-The classifier deliberately admits `rm -rf app` while refusing `rm -rf app/.git`, though both
-delete `app/.git`. The worktree-trusted rung guards against POINTING at `.git`/`.envrc` — planting
-a hook is code injection — and not against a broad sweep passing over them, which the `scale` facet
-covers and which `grep -r`, `rm -rf build/` and every recursive tool depend on.
-
-So a hidden descendant is NOT in any abstraction's concretization set in
-`no_abstraction_is_more_permissive_than_a_path_it_could_denote`. A first draft included them and
-produced 272 "violations", every one a `find`/`while read` sweep reading an `app/.ssh` that the
-same policy admits via `grep -r pattern app`. Those were the test asserting a stricter policy than
-the one that exists. The aim dimension is probed by pointing ROOTS at hidden/hot locations instead.
-
-If that policy is ever revisited — e.g. a credential store inside the worktree should defeat a
-sweep — the witness sets are where to change it, and the property will then report the real list.
