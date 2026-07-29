@@ -15014,7 +15014,6 @@ Aliases: `[`
 - `tilt -l`
 - `tilt template.erb`
 - `tilt views/index.haml`
-- `tilt /tmp/page.md`
 - `tilt -`
 - `tilt --type erb template.erb`
 - `tilt -t erb template.erb`

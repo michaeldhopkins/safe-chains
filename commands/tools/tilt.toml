@@ -16,7 +16,6 @@ examples_safe = [
   "tilt -l",
   "tilt template.erb",
   "tilt views/index.haml",
-  "tilt /tmp/page.md",
   "tilt -",
   "tilt --type erb template.erb",
   "tilt -t erb template.erb",
@@ -55,6 +54,10 @@ examples_denied = [
   "tilt a.erb b.erb",
   "tilt version foo",
   "tilt doctor --evil",
+  "tilt /tmp/page.md",
+  "tilt /etc/page.erb",
+  "tilt ~/page.erb",
+  "tilt ../outside/page.erb",
 ]
 
 # K8s tilt diagnostic subs. The handler dispatches these via
@@ -100,12 +103,24 @@ level = "SafeRead"
 standalone = ["--help", "--no-headers", "--show-labels", "--watch", "-A", "-h", "-w"]
 valued = ["--context", "--field-selector", "--kubeconfig", "--namespace", "--output", "--selector", "-l", "-n", "-o"]
 
-# Ruby tilt fallback grammar. Engaged when no K8s sub matches. Accepts
-# at most one positional and requires it to look like a path (contains
-# `/`, `.`, or is `-` for stdin) so bare-word tokens like `up` or
-# `template` — which would be K8s tilt subs we deliberately don't
-# allowlist — are rejected. Inert because rendering a template doesn't
-# touch the network or modify state.
+# Rendering a template RUNS the code inside it — an ERB/Haml/Slim file is Ruby — so a positional
+# is an EXECUTOR and takes the executor locus gate: a workspace-local template is the dev loop, a
+# foreign one (`/etc/x.erb`, `~/x.erb`, `/tmp/x.erb`, `../outside/x`) is not. Nothing gated this
+# before; `positional_shape` looks like it does but answers a different question — it rejects bare
+# words like `tilt up`, which are unallowlisted K8s subcommands rather than paths.
+#
+# Declared as a path_gate rather than `fallback.executor` deliberately. The executor path returns
+# the locus verdict INSTEAD of the flag-policy check, which would drop `max_positional` and let
+# `tilt a.erb b.erb` through; the gate composes with the grammar instead of replacing it, and it
+# gates EVERY positional rather than only the first.
+[command.path_gate]
+positional = "exec"
+
+# Ruby tilt fallback grammar. Engaged when no K8s sub matches. Accepts at most one positional and
+# requires it to look like a path (contains `/`, `.`, `~`, or is `-` for stdin) so bare-word tokens
+# like `up` or `template` — which would be K8s tilt subs we deliberately don't allowlist — are
+# rejected. The level stays Inert because it describes the RENDER; what the template may execute is
+# bounded by the executor gate above, not by this number.
 [command.fallback]
 level = "Inert"
 bare = true
