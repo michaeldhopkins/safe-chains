@@ -346,20 +346,25 @@ fn operand_words(command: &str) -> Option<Vec<String>> {
 /// inner command runs, so `notacommand $(cat /etc/shadow)` really does read the file, even though
 /// `expand()` renders the substitution as an opaque stand-in and hides the path.
 fn collect_word(word: &cst::Word, out: &mut Vec<String>) {
-    use cst::WordPart;
     out.extend(word.expand());
     for part in &word.0 {
-        match part {
-            WordPart::CmdSub(script) | WordPart::ProcSub(script) => {
-                collect_script_words(script, out);
-            }
-            WordPart::DQuote(inner) => collect_word(inner, out),
-            WordPart::Lit(_)
-            | WordPart::Escape(_)
-            | WordPart::SQuote(_)
-            | WordPart::Backtick(_)
-            | WordPart::Arith(_) => {}
-        }
+        collect_part_subs(part, out);
+    }
+}
+
+/// The words of any command SUBSTITUTION inside a word part, and nothing else — the part's own
+/// literal text is the caller's business, because whether it counts as an operand depends on where
+/// the word came from (a heredoc body's literal text never does).
+fn collect_part_subs(part: &cst::WordPart, out: &mut Vec<String>) {
+    use cst::WordPart;
+    match part {
+        WordPart::CmdSub(script) | WordPart::ProcSub(script) => collect_script_words(script, out),
+        WordPart::DQuote(inner) => collect_word(inner, out),
+        WordPart::Lit(_)
+        | WordPart::Escape(_)
+        | WordPart::SQuote(_)
+        | WordPart::Backtick(_)
+        | WordPart::Arith(_) => {}
     }
 }
 
@@ -382,7 +387,15 @@ fn collect_redir_words(redirs: &[cst::Redir], out: &mut Vec<String>) {
             | Redir::Read { target, .. }
             | Redir::ReadWrite { target, .. }
             | Redir::HereStr(target) => collect_word(target, out),
-            Redir::HereDoc { .. } | Redir::DupFd { .. } => {}
+            // Only the body's SUBSTITUTIONS, never its literal text. Behind a bare delimiter a
+            // `$(cat /etc/shadow)` in the body really runs, so it is a reach worth naming; the
+            // prose around it is data and naming it would state a false reason for the denial.
+            Redir::HereDoc { body, .. } => {
+                for part in &body.0 {
+                    collect_part_subs(part, out);
+                }
+            }
+            Redir::DupFd { .. } => {}
         }
     }
 }

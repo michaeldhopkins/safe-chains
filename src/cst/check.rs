@@ -1063,7 +1063,13 @@ pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
             Redir::HereStr(word) => {
                 level = level.combine(word_sub_verdict(word));
             }
-            Redir::HereDoc { .. } | Redir::DupFd { .. } => {}
+            // A heredoc body is inert ONLY behind a quoted delimiter. With a bare `<<EOF` the shell
+            // expands the body, so a substitution in it runs and is classified exactly like one in
+            // any other word. `body` is empty for the quoted spellings, so this is a no-op there.
+            Redir::HereDoc { body, .. } => {
+                level = level.combine(word_sub_verdict(body));
+            }
+            Redir::DupFd { .. } => {}
         }
     }
     level

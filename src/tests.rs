@@ -1805,6 +1805,9 @@ fn a_heredoc_body_is_never_reported_as_the_reach() {
         for prose in [
             format!("notacommand <<'EOF'\nplease read {path} for context\nEOF"),
             format!("notacommand -m \"$(cat <<'EOF'\nplease read {path} for context\nEOF\n)\""),
+            // A BARE delimiter expands the body, but prose in it is still only text — the
+            // expansion makes substitutions live, not literals.
+            format!("notacommand <<EOF\nplease read {path} for context\nEOF"),
         ] {
             assert_eq!(
                 crate::workspace_overreach(&prose),
