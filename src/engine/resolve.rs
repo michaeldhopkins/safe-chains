@@ -31,8 +31,13 @@ pub(crate) use locus::{hidden_peer_reach, is_substitution_value, is_unpinnable, 
 /// worst-READ item and the worst-WRITE item of the list (they can differ, so a read and a
 /// write of `$VAR` each get their list's worst case). `$VAR` then inherits the list's locus
 /// per operation — the `find … {}`→path binding, one layer up. `None` for an empty list, which
-/// leaves `$VAR` fail-closed (machine). An item coming from a command substitution / arithmetic
-/// is unpinnable, so it worst-cases to machine via a `$`-carrying sentinel representative.
+/// leaves `$VAR` fail-closed (machine). An item the classifier cannot bound — an UNDECLARED command
+/// substitution, a process substitution, arithmetic — worst-cases to machine via a `$`-carrying
+/// sentinel representative. An item from a substitution whose inner command DECLARED its output
+/// locus is bounded, so it is classified like any other path: `for f in $(fd a app/)` reads the
+/// worktree, and `for f in $(fd a /etc)` still lands at machine because that is what the tag says.
+/// (The test here used to be a `__SAFE_CHAINS_` PREFIX match, which caught the bounded sentinel too
+/// and made the loop form deny while the bare `cat $(fd a app/)` was allowed.)
 pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     if items.is_empty() {
         return None;
@@ -40,7 +45,7 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     let faced: Vec<(String, LocalLocus, LocalLocus)> = items
         .iter()
         .map(|s| {
-            if s.contains("__SAFE_CHAINS_") {
+            if crate::cst::check::is_opaque_value(s) {
                 ("$loop_sub".to_string(), LocalLocus::Machine, LocalLocus::Machine)
             } else {
                 (s.clone(), read_locus(s), write_locus(s))
@@ -1327,6 +1332,15 @@ fn resolve_perl(tokens: &[Token]) -> Profile {
     // each operand, so breadth widens the blast radius without ever admitting a system path.
     let files: Vec<&str> = scan.files.iter().map(String::as_str).collect();
     let scale = breadth_scale(&files, false);
+    // No `execute` capability, deliberately. perl does run code, so recording one looks more
+    // honest — but it is the wrong model here and the experiment says so: an
+    // `executes(caller-inline)` capability denies at every band, which would take out every perl
+    // one-liner including the in-place edits this hook exists to admit. The reason it denies is
+    // that the `execute` rung describes running code of UNKNOWN content, and by this point the
+    // identifier gate has already established the opposite — the one-liner reaches nothing but
+    // pure built-ins, no I/O, no exec, no network. What remains observable is the operand reads
+    // and writes below, and those ARE the profile. If the gate's vocabulary ever admits an
+    // identifier with side effects, the fix belongs in the gate, not in a capability here.
     let caps: Vec<Capability> = if scan.in_place {
         files.iter().map(|f| mutates(classify_locus(f), scale, "perl -i edits the file in place")).collect()
     } else {
