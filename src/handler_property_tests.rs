@@ -111,6 +111,16 @@ proptest! {
         let a = command_verdict(&line).is_allowed();
         let b = command_verdict(&line).is_allowed();
         prop_assert_eq!(a, b, "nondeterministic verdict for `{}`", line.escape_debug().to_string());
+
+        // The EXPLAIN path on the same input. `is_safe_command` never calls it, so the fuzz target
+        // and every guard above leave `cst/explain.rs` and `cst/display.rs` unexercised — a
+        // documented blind spot (see AGENTS.md, "out-of-scope layers"). It is not an unreachable
+        // one: `--explain` is user-facing AND renders the hook's injected context, where a panic is
+        // a crash, which for a PreToolUse hook fails open. Rendering is included because Display is
+        // the other uncovered file, and a formatter that panics is as fatal as a parser that does.
+        let e1 = crate::cst::explain(&line).render();
+        let e2 = crate::cst::explain(&line).render();
+        prop_assert_eq!(e1, e2, "nondeterministic explain for `{}`", line.escape_debug().to_string());
     }
 }
 
@@ -124,6 +134,10 @@ fn finishes_within(input: &str, budget: std::time::Duration) -> bool {
     std::thread::spawn(move || {
         let done = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             let _ = command_verdict(&owned);
+            // Same budget for the EXPLAIN path. It walks the CST a second time and renders it, so
+            // a super-linear blow-up there hangs the hook just as one in the classifier would —
+            // and nothing else in the suite times it.
+            let _ = crate::cst::explain(&owned).render();
         }));
         if done.is_ok() {
             let _ = tx.send(());
