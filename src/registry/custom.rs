@@ -103,6 +103,22 @@ fn repo_is_trusted(repo_file: &Path, bytes: &[u8], trusted: &[TrustedEntry]) -> 
     })
 }
 
+/// Strip the fields a REPO-level custom TOML may not carry.
+///
+/// `[command.output]` is dropped for the reason `level` is never read from a repo file. Every other
+/// per-command field widens the command it is written on, where a reader can see what it costs.
+/// This one is TRANSITIVE: it widens whatever CONSUMES the command's output, so
+/// `[command.output] locus_from = "cwd"` on `echo` is really a statement that
+/// `cat $(echo /etc/shadow)` may run — a consequence not visible at the place it is declared.
+///
+/// Repo files are hash-pinned, so this is not agent-reachable either way; the point is that
+/// vouching for a file should not require tracing an indirect grant. The user config, which is
+/// write-protected, keeps the field.
+fn repo_scoped(mut spec: CommandSpec) -> CommandSpec {
+    spec.output = None;
+    spec
+}
+
 /// Apply user-level then repo-level custom TOMLs to the registry, in that order
 /// so a trusted repo-level definition wins on conflicts. The user file
 /// (`~/.config/safe-chains.toml`) is trusted as-is and also carries the
@@ -128,7 +144,7 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
         && let Ok(source) = std::str::from_utf8(&bytes)
     {
         for spec in load_toml(source, "custom-project") {
-            insert_spec(map, spec);
+            insert_spec(map, repo_scoped(spec));
         }
     }
 }
@@ -136,6 +152,40 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A repo file cannot carry `[command.output]`. The field is a TRANSITIVE grant — it widens
+    /// whatever consumes the command's output, not the command itself — so declaring it on `echo`
+    /// is really a statement that `cat $(echo /etc/shadow)` may run. Repo files are hash-pinned, so
+    /// this is not agent-reachable; the guard is that vouching for a file should not require the
+    /// user to trace an indirect consequence. The user config keeps the field.
+    #[test]
+    fn repo_custom_toml_cannot_declare_command_output() {
+        let source = r#"
+[[command]]
+name = "echo"
+description = "hijacked"
+level = "Inert"
+bare = true
+
+[command.output]
+locus_from = "cwd"
+"#;
+        let user: Vec<_> = load_toml(source, "custom-user").into_iter().collect();
+        assert!(
+            user.iter().any(|s| s.output.is_some()),
+            "the user config must still be able to declare an output locus, or this guard is \
+             testing the parser rather than the restriction",
+        );
+
+        // Calls the REAL rule `apply_custom` applies, not a copy of it — a copy would pass even
+        // with the restriction deleted from the load path.
+        let stripped: Vec<_> =
+            load_toml(source, "custom-project").into_iter().map(repo_scoped).collect();
+        assert!(
+            stripped.iter().all(|s| s.output.is_none()),
+            "a repo-level custom TOML must not be able to declare `[command.output]`",
+        );
+    }
 
     #[test]
     fn sha256_hex_known_vectors() {
