@@ -11,7 +11,32 @@ examples_safe = [
 ]
 examples_denied = [
     "karma init",
+    "karma start /etc/evil.conf.js",
+    "karma start ~/evil.conf.js",
+    "karma start ./ok.conf.js /etc/evil.conf.js",
+    "karma start --format-error /etc/evil.js",
 ]
+
+# The config file is loaded and EXECUTED, so every positional takes the executor locus gate.
+# `sub.executor` already gates the FIRST one, but it returns the locus verdict instead of the flag
+# policy, so `max_positional = 1` goes unenforced and a second config path is neither counted nor
+# gated (`karma start ./ok.conf.js /etc/evil.conf.js`). This gate composes with the grammar rather
+# than replacing it and covers every positional. See TODO.md for the underlying dispatch gap.
+[command.path_gate]
+positional = "exec"
+
+# Valued flags authored explicitly, so a value is never walked as a positional and exec-gated by
+# accident. `--format-error` names a JS module karma requires and runs; the rest are names, hosts
+# and numbers.
+[command.path_gate.flags]
+"--format-error" = "exec"
+"--reporters" = "ignore"
+"--browsers" = "ignore"
+"--hostname" = "ignore"
+"--log-level" = "ignore"
+"--port" = "ignore"
+"--protocol" = "ignore"
+"--report-slower-than" = "ignore"
 
 [[command.sub]]
 name = "start"

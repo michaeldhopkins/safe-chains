@@ -22,6 +22,7 @@ examples_safe = [
   "tilt --type=erb template.erb",
   "tilt --layout layout.erb page.erb",
   "tilt -y layout.erb page.erb",
+  "tilt get pod --kubeconfig ./kube.yaml",
   "tilt page.erb -t erb",
   "tilt version",
   "tilt version --help",
@@ -58,6 +59,8 @@ examples_denied = [
   "tilt /etc/page.erb",
   "tilt ~/page.erb",
   "tilt ../outside/page.erb",
+  "tilt ./ok.erb /etc/evil.erb",
+  "tilt --layout /etc/evil.erb page.erb",
 ]
 
 # K8s tilt diagnostic subs. The handler dispatches these via
@@ -115,6 +118,29 @@ valued = ["--context", "--field-selector", "--kubeconfig", "--namespace", "--out
 # gates EVERY positional rather than only the first.
 [command.path_gate]
 positional = "exec"
+
+# The valued flags, authored rather than left to fall through. An undeclared valued flag's VALUE is
+# walked as if it were a positional, so it inherits `exec` — which lands the right verdict for
+# `--layout` by luck and the wrong REASON for `--kubeconfig`, a file tilt READS. Declaring the roles
+# also tells the walker these flags consume a value, so a type name or a selector is never mistaken
+# for a path in the first place.
+[command.path_gate.flags]
+# A layout is itself a template, and tilt renders it — so it executes.
+"--layout" = "exec"
+"-y" = "exec"
+# Read as configuration, never executed.
+"--kubeconfig" = "read"
+# Names, selectors and output formats — not paths.
+"--type" = "ignore"
+"-t" = "ignore"
+"--context" = "ignore"
+"--field-selector" = "ignore"
+"--namespace" = "ignore"
+"--output" = "ignore"
+"--selector" = "ignore"
+"-l" = "ignore"
+"-n" = "ignore"
+"-o" = "ignore"
 
 # Ruby tilt fallback grammar. Engaged when no K8s sub matches. Accepts at most one positional and
 # requires it to look like a path (contains `/`, `.`, `~`, or is `-` for stdin) so bare-word tokens

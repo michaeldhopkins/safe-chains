@@ -2319,6 +2319,64 @@ use super::*;
         }
     }
 
+    /// A `File` executor that also caps its positionals must carry a `path_gate`.
+    ///
+    /// `dispatch_executor` returns the executor's LOCUS verdict instead of running the flag policy
+    /// (it has to — for an interpreter the tokens after the script are the script's argv, which the
+    /// command's grammar cannot describe). The side effect is that `max_positional` goes unenforced
+    /// on that path and any positional past the first is neither counted nor locus-gated. A command
+    /// that bothered to declare a cap means it, so it needs the gate that composes with the grammar
+    /// rather than replacing it.
+    ///
+    /// This is the structural half of the TODO.md entry on that dispatch gap: it cannot fix the
+    /// dispatch, but it stops the next `executor = "file"` command from inheriting the hole
+    /// silently. `tilt` and `karma` both shipped it — `tilt ./ok.erb /etc/evil.erb` and
+    /// `karma start ./ok.conf.js /etc/evil.conf.js` were admitted.
+    #[test]
+    fn capped_file_executors_declare_a_path_gate() {
+        use crate::registry::types::{ExecutorKind, SubSpec};
+        let mut failures = Vec::new();
+        let mut checked = 0usize;
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // alias entries share the canonical spec
+            }
+            // A capped File executor can sit on the command itself, on a `[[command.sub]]` (karma's
+            // `start`, reached through `Branching`), or on a handler's fallback (an interpreter).
+            let sub_is_capped = |s: &SubSpec| {
+                matches!(
+                    &s.kind,
+                    DispatchKind::Executor { policy, kind: ExecutorKind::File, .. }
+                        if policy.max_positional.is_some()
+                )
+            };
+            let capped_file_executor = match &spec.kind {
+                DispatchKind::Executor { policy, kind: ExecutorKind::File, .. } => {
+                    policy.max_positional.is_some()
+                }
+                DispatchKind::Branching { subs, .. } => subs.iter().any(sub_is_capped),
+                DispatchKind::Custom { fallback, subs, .. } => {
+                    fallback.as_ref().is_some_and(|f| {
+                        f.executor == Some(ExecutorKind::File) && f.policy.max_positional.is_some()
+                    }) || subs.iter().any(sub_is_capped)
+                }
+                _ => false,
+            };
+            if !capped_file_executor {
+                continue;
+            }
+            checked += 1;
+            if spec.path_gate.is_none() && !crate::pathgate::central_role_exists(name) {
+                failures.push(format!(
+                    "{name}: declares a File executor with max_positional but no path_gate, so its \
+                     cap is dropped on the executor path and extra positionals ship ungated"
+                ));
+            }
+        }
+        assert!(checked > 0, "no capped File executor found — the guard is vacuous");
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
