@@ -69,6 +69,34 @@ baseline invocation:
 All gated with role `exec`; `rsync -e ssh` (a bare name on $PATH) still approves, which is the form
 that actually matters. The guard now walks all four locations.
 
+FOURTH PASS (2026-07-29) — the gates were bypassable by RESPELLING. Every executor flag gated in
+the passes above had an environment twin that was not gated, so the flag gate read as closed while
+the same operation sailed through:
+
+    BORG_RSH=/tmp/evil borg check repo                    (--rsh was gated)
+    BORG_REMOTE_PATH=/tmp/evil borg list repo             (--remote-path was gated)
+    RESTIC_PASSWORD_COMMAND=/tmp/evil restic snapshots     (--password-command was gated)
+    RSYNC_RSH=/tmp/evil rsync ./src/ ./dst/               (--rsh/-e was gated)
+    KUBECONFIG=/tmp/evil.yaml kubectl get pods            (a kubeconfig can carry users[].user.exec)
+
+All now classified in envvars.toml with `shape = "exec-path"` — the LOCUS-based shape, not
+`command`, so the two spellings agree: a bare `ssh` stays trusted, `/tmp/evil` does not. The classic
+env-exec vectors (NODE_OPTIONS, PYTHONSTARTUP, PERL5OPT, BASH_ENV, LESSOPEN, PAGER, GIT_SSH_COMMAND)
+were already covered; the gap was only the twins of tool-specific flags.
+
+NEW MECHANISM — `twin_flag` / `twin_base` on an envvars entry, naming the flag spelling of the same
+thing. `a_tagged_env_var_classifies_the_same_as_its_flag_twin` holds both spellings to the same
+verdict across a foreign path, a workspace path and a bare name, and refuses a pair that never
+discriminates. It fails in BOTH directions, which is how it caught kubectl over-denying relative to
+its twin. Tag every new executor flag that has an env form.
+
+REMAINING in this class: the tag only checks pairs someone DECLARED. Nothing discovers an undeclared
+pair — the four above were found by hand, by asking "what is the env spelling of this flag?" for
+each flag gated. A generator that proposes candidate env names per gated flag (TOOL_FLAG, FLAG) and
+reports unlisted ones would turn that into a sweep. Also unmodelled: `kubectl --kubeconfig` is not a
+known flag at all, so it denies as unknown rather than by gate — an over-deny to fix when kubectl's
+flag surface is next researched.
+
 THIRD PASS (2026-07-29) — the part names cannot find, partly closed. The predicate that works for
 this half is the TOOL, not the flag: a build/task runner whose config file is CODE. Eight more were
 live, all confirmed with a working baseline:
