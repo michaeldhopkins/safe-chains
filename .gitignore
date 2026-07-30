@@ -21,4 +21,6 @@ docs/book/
 # run adds noise without adding coverage.
 fuzz/corpus/equivalence/
 fuzz/corpus/hook_envelope/
+fuzz/corpus/explain_render/
+fuzz/corpus/suggest_roundtrip/
 fuzz/artifacts/

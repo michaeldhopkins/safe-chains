@@ -9,6 +9,8 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
+# The suggest target judges its own output by parsing it back.
+toml = "0.9"
 
 [dependencies.safe-chains]
 path = ".."
@@ -35,6 +37,20 @@ bench = false
 [[bin]]
 name = "hook_envelope"
 path = "fuzz_targets/hook_envelope.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "explain_render"
+path = "fuzz_targets/explain_render.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "suggest_roundtrip"
+path = "fuzz_targets/suggest_roundtrip.rs"
 test = false
 doc = false
 bench = false
