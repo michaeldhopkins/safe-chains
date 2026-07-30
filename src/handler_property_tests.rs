@@ -154,8 +154,24 @@ fn finishes_within(input: &str, budget: std::time::Duration) -> bool {
 /// awk, git -c) — must classify within the budget.
 #[test]
 fn classifier_terminates_on_adversarial_input() {
-    let budget = std::time::Duration::from_millis(1500);
     let n = 100_000;
+    // CALIBRATED budget, not a wall-clock constant. The failure modes this guard exists for are
+    // super-linear blow-ups — `a$(a<(a` × 14 ran over THIRTY SECONDS, the perl re-scan was O(n²).
+    // A fixed 1.5s encoded one laptop's speed instead: every 100k-byte entry costs ~0.4s here, and
+    // on a CI runner 3-4x slower that lands on the threshold, so the suite failed on whichever
+    // entry happened to be scheduled worst — backticks, which are not even the most expensive.
+    //
+    // Calibrating against a plain linear input of the SAME size states the real rule: an entry may
+    // cost a constant multiple of linear, not a power of it. The floor keeps the bound meaningful
+    // when the baseline is tiny.
+    let baseline = {
+        let plain = "a".repeat(n);
+        let start = std::time::Instant::now();
+        let _ = command_verdict(&plain);
+        let _ = crate::cst::explain(&plain).render();
+        start.elapsed()
+    };
+    let budget = std::cmp::max(std::time::Duration::from_millis(1500), baseline * 8);
     let corpus: Vec<String> = vec![
         "(".repeat(n), ")".repeat(n), "$(".repeat(n / 2), "`".repeat(n),
         "\"".repeat(n), "'".repeat(n), "{".repeat(n), "}".repeat(n), "[".repeat(n),
@@ -206,7 +222,11 @@ fn classifier_terminates_on_adversarial_input() {
             slow.push(format!("len {} starting `{}`", input.len(), head.escape_debug()));
         }
     }
-    assert!(slow.is_empty(), "classifier hung/panicked (>{budget:?}) on:\n  {}", slow.join("\n  "));
+    assert!(
+        slow.is_empty(),
+        "classifier hung/panicked (>{budget:?}, calibrated from a {baseline:?} linear baseline) on:\n  {}",
+        slow.join("\n  ")
+    );
 }
 
 /// The same termination contract, enforced over the COMMITTED fuzz corpus (`fuzz/corpus/parse/seed-*`)
