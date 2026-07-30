@@ -112,6 +112,35 @@ struct Entry {
     #[allow(dead_code)] // false = enumerated from docs, not probed on a live toolchain
     #[serde(default)]
     measured: Option<bool>,
+    /// The FLAG spelling of the same thing, as an invocation template with `{v}` for the value —
+    /// e.g. `rsync -e {v} ./src/ ./dst/` for `RSYNC_RSH`.
+    ///
+    /// Gating one spelling and not the other is not a partial fix: the ungated spelling is a
+    /// complete bypass, and the gated one reads as closed while it is not. Every executor flag
+    /// gated in the registry was bypassable through its env twin until these were paired.
+    #[allow(dead_code)] // read by the twin-pairing guard (cfg(test))
+    #[serde(default)]
+    twin_flag: Option<String>,
+    /// The command the variable prefixes, for building the env spelling of the same invocation —
+    /// e.g. `rsync ./src/ ./dst/`. Required with `twin_flag`.
+    #[allow(dead_code)] // read by the twin-pairing guard (cfg(test))
+    #[serde(default)]
+    twin_base: Option<String>,
+}
+
+/// Declared (env-name, flag-template, base-command) triples, for the pairing guard. Re-parses the
+/// embedded TOML because the compiled table keeps only what classification needs.
+#[cfg(test)]
+pub(crate) fn declared_twins() -> Vec<(String, String, String)> {
+    let parsed: Table =
+        toml::from_str(include_str!("../envvars.toml")).expect("embedded envvars.toml must parse");
+    let mut out: Vec<(String, String, String)> = parsed
+        .env
+        .into_iter()
+        .filter_map(|(name, e)| Some((name, e.twin_flag?, e.twin_base?)))
+        .collect();
+    out.sort();
+    out
 }
 
 #[derive(Deserialize, Debug)]
@@ -347,6 +376,47 @@ mod tests {
         ] {
             assert!(shape_of(name).is_some(), "envvars.toml is missing a measured vector: {name}");
         }
+    }
+
+    /// A variable tagged with its FLAG twin must classify the same as that flag, value for value.
+    ///
+    /// Gating one spelling and leaving the other open is not a partial fix — the open spelling is a
+    /// complete bypass, and the closed one reads as done while it is not. Every executor flag gated
+    /// in the registry was reachable through its environment twin until these were paired:
+    /// `borg --rsh /tmp/evil` denied while `BORG_RSH=/tmp/evil borg` sailed through.
+    ///
+    /// Checks EQUALITY rather than "both deny", so it fails in both directions: an env twin that
+    /// stays open, and a flag that over-denies a value its twin accepts. The corpus spans a foreign
+    /// path, a workspace path and a bare name, and the pair must discriminate between them — a
+    /// tag whose two sides agree only by refusing everything proves nothing.
+    #[test]
+    fn a_tagged_env_var_classifies_the_same_as_its_flag_twin() {
+        let twins = super::declared_twins();
+        assert!(!twins.is_empty(), "no env/flag twins are declared; the guard would be vacuous");
+
+        let mut failures = Vec::new();
+        for (name, flag_tmpl, base) in &twins {
+            let mut verdicts = Vec::new();
+            for value in ["/tmp/evil", "./bin/tool", "ssh"] {
+                let flag_form = flag_tmpl.replace("{v}", value);
+                let env_form = format!("{name}={value} {base}");
+                let by_flag = crate::is_safe_command(&flag_form);
+                let by_env = crate::is_safe_command(&env_form);
+                if by_flag != by_env {
+                    failures.push(format!(
+                        "{name}: `{flag_form}` -> {by_flag} but `{env_form}` -> {by_env}"
+                    ));
+                }
+                verdicts.push(by_flag);
+            }
+            if verdicts.iter().all(|v| *v) || verdicts.iter().all(|v| !*v) {
+                failures.push(format!(
+                    "{name}: the pair never discriminates (every value classifies the same), so \
+                     agreement between the spellings proves nothing"
+                ));
+            }
+        }
+        assert!(failures.is_empty(), "env/flag twin mismatches:\n  {}", failures.join("\n  "));
     }
 
     #[test]

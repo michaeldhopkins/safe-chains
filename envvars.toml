@@ -22,6 +22,14 @@
 #              read rule: `cat /tmp/x.so` is a fine read, while LOADING /tmp/x.so is not.
 #   data-path  the value names a path read or written as DATA → ordinary read/write locus.
 #
+# An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
+#   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
+#   twin_base = "rsync ./src/ ./dst/"          the command the variable prefixes
+# `a_tagged_env_var_classifies_the_same_as_its_flag_twin` then holds the two spellings to the SAME
+# verdict for a foreign path, a workspace path and a bare name. Tag every pair: gating one spelling
+# and leaving the other open is a complete bypass that reads as a closed gate — which is exactly how
+# `borg --rsh /tmp/evil` came to deny while `BORG_RSH=/tmp/evil borg` was approved.
+
 # Every entry's `because` is the measured behaviour where one was taken; see
 # docs/design/env-prefix-classification.md for the probes. Entries marked `measured = false` are
 # enumerated from documentation because the toolchain was not installed to test against.
@@ -395,3 +403,33 @@ because = "the depot CONTAINS config/startup.jl, so pointing it anywhere runs th
 shape = "opaque"
 measured = false
 because = "arms the CoreCLR profiler pair; the library it loads is named by CORECLR_PROFILER_PATH, so neither value certifies alone"
+
+# ── Env twins of executor FLAGS ──────────────────────────────────────────────
+# Each of these is the environment spelling of a flag that is already gated at the
+# executor locus. Gating one spelling and not the other is not a partial fix: the
+# ungated spelling is a complete bypass, and the flag gate reads as closed while it
+# is not. `exec-path` (not `command`) so both spellings judge the value the same
+# way — a bare name on $PATH stays trusted, a path into /tmp does not.
+[env.BORG_RSH]
+shape = "exec-path"
+twin_flag = "borg --rsh {v} check repo"
+twin_base = "borg check repo"
+because = "borg runs this instead of ssh to reach the repository (the --rsh twin)"
+[env.BORG_REMOTE_PATH]
+shape = "exec-path"
+twin_flag = "borg --remote-path {v} list repo"
+twin_base = "borg list repo"
+because = "the borg executable invoked on the far side (the --remote-path twin)"
+[env.RESTIC_PASSWORD_COMMAND]
+shape = "exec-path"
+twin_flag = "restic --password-command {v} snapshots"
+twin_base = "restic snapshots"
+because = "restic runs this to obtain the repository password (the --password-command twin)"
+[env.RSYNC_RSH]
+shape = "exec-path"
+twin_flag = "rsync -e {v} ./src/ ./dst/"
+twin_base = "rsync ./src/ ./dst/"
+because = "the remote shell rsync executes (the --rsh/-e twin)"
+[env.KUBECONFIG]
+shape = "exec-path"
+because = "a kubeconfig can carry a users[].user.exec credential plugin the client RUNS (the --kubeconfig twin)"
