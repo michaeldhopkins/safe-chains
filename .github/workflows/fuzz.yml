@@ -337,3 +337,62 @@ jobs:
           name: fuzz-coverage-html
           path: coverage-html
           if-no-files-found: warn
+
+  # The two property targets, kept OFF the `parse` pipeline above on purpose. They have a different
+  # input domain — `equivalence` consumes a flag VALUE and `hook_envelope` a hook envelope — so the
+  # registry-derived seeds and dictionary that make `parse` effective do not apply, and they need no
+  # sharding at this size. Self-contained so a change here cannot break the pipeline that works.
+  #
+  # What they assert is a PROPERTY of the verdict, not just "did not crash": a semantics-preserving
+  # respelling must not change it, and a target must never emit a grant it was not asked for. That
+  # is the class `parse` structurally cannot see, because it discards the verdict.
+  property-targets:
+    name: Fuzz (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false # one target finding a bug must not cancel the other
+      matrix:
+        target: [equivalence, hook_envelope]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-fuzz
+        uses: taiki-e/install-action@cargo-fuzz
+
+      # Each target keeps its OWN corpus, so the two accumulate coverage independently and adding
+      # both at once costs nothing beyond the wall-clock of one extra runner.
+      - name: Restore corpus
+        uses: actions/cache/restore@v4
+        with:
+          path: fuzz/corpus/${{ matrix.target }}
+          key: fuzz-corpus-${{ matrix.target }}-
+          restore-keys: fuzz-corpus-${{ matrix.target }}-
+
+      - name: Fuzz
+        env:
+          DURATION: ${{ github.event.inputs.max_total_time || '3600' }}
+        run: |
+          mkdir -p fuzz/corpus/${{ matrix.target }} fuzz/artifacts/${{ matrix.target }}
+          cargo +nightly fuzz run ${{ matrix.target }} --target "$TRIPLE" -- \
+            -max_total_time="$DURATION" \
+            -artifact_prefix=fuzz/artifacts/${{ matrix.target }}/ \
+            fuzz/corpus/${{ matrix.target }}
+
+      - name: Save corpus
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: fuzz/corpus/${{ matrix.target }}
+          key: fuzz-corpus-${{ matrix.target }}-${{ github.run_id }}
+
+      - name: Upload findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-findings-${{ matrix.target }}
+          path: fuzz/artifacts/${{ matrix.target }}
+          if-no-files-found: ignore

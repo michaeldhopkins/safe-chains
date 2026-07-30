@@ -412,21 +412,25 @@ because = "arms the CoreCLR profiler pair; the library it loads is named by CORE
 # way — a bare name on $PATH stays trusted, a path into /tmp does not.
 [env.BORG_RSH]
 shape = "exec-path"
+single_value = true
 twin_flag = "borg --rsh {v} check repo"
 twin_base = "borg check repo"
 because = "borg runs this instead of ssh to reach the repository (the --rsh twin)"
 [env.BORG_REMOTE_PATH]
 shape = "exec-path"
+single_value = true
 twin_flag = "borg --remote-path {v} list repo"
 twin_base = "borg list repo"
 because = "the borg executable invoked on the far side (the --remote-path twin)"
 [env.RESTIC_PASSWORD_COMMAND]
 shape = "exec-path"
+single_value = true
 twin_flag = "restic --password-command {v} snapshots"
 twin_base = "restic snapshots"
 because = "restic runs this to obtain the repository password (the --password-command twin)"
 [env.RSYNC_RSH]
 shape = "exec-path"
+single_value = true
 twin_flag = "rsync -e {v} ./src/ ./dst/"
 twin_base = "rsync ./src/ ./dst/"
 because = "the remote shell rsync executes (the --rsh/-e twin)"

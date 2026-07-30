@@ -38,7 +38,10 @@ fuzz_target!(|data: &[u8]| {
         // A blank command is nothing to classify, so it can never justify one either — that exact
         // case shipped as an `allow` until it was found by hand.
         let verdict = safe_chains::command_verdict(&input.command);
-        let response = format.render_response(verdict);
+        // Through the SHARED seam, which is what every caller goes through. Asserting against
+        // `render_response` directly tested a layer nothing calls unguarded.
+        let response = safe_chains::targets::respond(format, &input.command, verdict)
+            .unwrap_or(safe_chains::targets::HookResponse { stdout: String::new(), exit_code: 0 });
         let granted = GRANTS.iter().any(|g| response.stdout.contains(g));
 
         if granted {

@@ -324,34 +324,34 @@ in the clear), `ssm --with-decryption` (decrypts SecureString values), `s3api --
 (supplies caller-held key material). Every family also withholds `--endpoint-url`, `--profile`,
 `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
 
-## Two new fuzz targets — BOTH found real bugs immediately, neither is wired into nightly yet
+## Two new fuzz targets — both bugs FIXED, both wired into nightly
 
-Added 2026-07-30: `fuzz/fuzz_targets/equivalence.rs` and `fuzz/fuzz_targets/hook_envelope.rs`. Both
-build and run under `cargo +nightly fuzz run <target>`. Neither is in `.github/workflows/fuzz.yml`
-yet, because both are RED against genuine findings and a nightly that starts red gets ignored.
+Added and enabled 2026-07-30. `equivalence` (semantics-preserving respelling cannot change the
+verdict) and `hook_envelope` (a target never emits a grant it was not asked for). Both ran red on
+day one against real bugs; both are green now and run nightly from the `property-targets` job, each
+with its own corpus so they accumulate coverage independently.
 
-WHAT THEY FOUND, within a minute each:
+FIXED — the two gates are now ONE rule. `path_gate` role `exec` and envvars `shape = "exec-path"`
+were separate implementations and had drifted: the env side always split a value on `:`, the flag
+side never did, so `BORG_RSH=x:/tmp/evil` denied while `borg --rsh x:/tmp/evil` was approved.
+`engine::resolve::worst_path_element` is now the single rule both call.
 
-1. `equivalence` — a CLASS of disagreements between the two implementations of the executor locus
-   rule: `path_gate` role `exec` (flag form) and envvars `shape = "exec-path"` (env form). First
-   example `borg --rsh :/:` approves while `BORG_RSH=:/: borg` refuses. Every case seen so far is
-   fail-CLOSED (the env side over-denies; `:/:` is a relative path, so the flag side is right), but
-   it is a class, not an edge case — parking values one at a time would be whack-a-mole and would
-   hide the signal. THE FIX IS TO UNIFY THE TWO GATES on one implementation, then enable the target.
-   Note what this says about the hand-written twin guard: it tries three values and passed. Three
-   values is not a proof.
+The interesting part was the DIRECTION. Making the flag side split too broke every `curl` test in
+the suite, because a URL is not a path list (`https://example.com` split to `https` +
+`//example.com`). The two sides differ because the VALUE TYPES differ, not because the rule did: a
+search path is a list, `BORG_RSH` is a command. So list-ness is now explicit — splitting is the
+default and `single_value = true` is the opt-out — and the direction matters: a real list judged
+whole is a FAIL-OPEN, while a single value split is merely stricter.
 
-2. `hook_envelope` — cursor emits `permission: "allow"` for a BLANK command at the FORMAT layer.
-   The shipped binary is safe: the blank check added earlier sits in `main.rs` and was verified
-   end-to-end. But the invariant lives in the wrong place — `render_response` owns the decision
-   contract and knows nothing about blankness, so a second caller reintroduces the bug, and the
-   integration guard passes only because it drives the binary. Move the check into the format layer
-   (or into a shared entry point both go through), then enable the target.
+FIXED — the blank-command rule moved to `targets::respond`, the shared decision seam. It was in
+`main.rs`, so the shipped binary was safe while `render_response` (public, and the owner of the
+decision contract) knew nothing about blankness. Any second caller reintroduced it, and the
+integration guard passed only because it drives the binary.
 
-TO WIRE THEM UP once green: `.github/workflows/fuzz.yml` hardcodes `parse` in the build step, the
-artifact paths, the shard matrix, the corpus/dict paths and the coverage job. Parameterise those
-over a target matrix (`parse`, `equivalence`, `hook_envelope`); each target keeps its own corpus
-directory, so they accumulate coverage independently and adding both at once costs nothing extra.
+Worth keeping in mind: the hand-written twin guard tried three values and passed. The fuzzer needed
+a fourth (`:/:`). The guard's corpus is now thirteen values spanning colons, traversal, roots and
+bare names, and `worst_path_element_splits_only_a_list_and_never_a_url` pins the rule directly,
+including that splitting can only ever be STRICTER than judging whole.
 
 ## Fuzzing finds availability bugs only — two targets worth adding
 

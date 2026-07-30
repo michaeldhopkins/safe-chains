@@ -234,15 +234,6 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         process::exit(0);
     };
 
-    // A blank command is nothing to classify, so there is nothing to approve. Emitting `allow`
-    // asserted "all commands in chain are safe utilities" about ZERO commands, and on the harnesses
-    // whose `allow` is authoritative that SUPPRESSES the user's prompt. The risk is not the empty
-    // command itself — it runs nothing — but the shape: if a harness ever carries the real command
-    // in a field this target does not read, we would grant on the blank we extracted while the
-    // harness ran the command we never saw. Abstaining costs a prompt; granting costs everything.
-    if input.command.trim().is_empty() {
-        process::exit(0);
-    }
 
     // HP-19: install the harness cwd/root so relative paths resolve against the real
     // directory for the whole evaluation (verdict and explainer). Most harnesses send `cwd`
@@ -260,10 +251,15 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
     // `<= threshold` gate as the CLI's `--level`. The pathctx (cwd/root) is already installed above.
     let (threshold, engine_level) = safe_chains::configured_hook_ceiling();
     let verdict = safe_chains::command_verdict_ceilinged(&input.command, threshold, engine_level);
-    if verdict.is_allowed() {
-        let response = format.render_response(verdict);
+    // `respond` owns the grant rule, including that a BLANK command grants nothing: it classifies
+    // as inert, but inert-about-nothing is not something to approve. Routed through the shared seam
+    // so the rule cannot be bypassed by reaching for `render_response` directly.
+    if let Some(response) = targets::respond(format, &input.command, verdict) {
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
+    }
+    if verdict.is_allowed() {
+        process::exit(0); // safe, but not grantable (blank) — abstain silently
     }
 
     // Coverage fallback: the built-in/pattern classifier (also honoring the user's own

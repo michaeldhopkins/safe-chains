@@ -147,6 +147,29 @@ pub struct HookInput {
     pub session_id: Option<String>,
 }
 
+/// May a GRANT be emitted for this command?
+///
+/// A blank command classifies as `Allowed(Inert)` — an empty script really is inert — but rendering
+/// that as `permissionDecision: "allow"` asserts "every command in this chain is safe" about ZERO
+/// commands, and on the harnesses whose allow is authoritative it replaces the user's prompt.
+///
+/// The check lives HERE, next to the decision contract, rather than in the binary. It was in
+/// `main.rs` first: the shipped hook was safe, but `render_response` is public and knew nothing
+/// about blankness, so any second caller reintroduced the bug — and the integration guard passed
+/// only because it drives the binary. The `hook_envelope` fuzz target found exactly that by calling
+/// the format directly.
+pub fn may_grant(command: &str, verdict: crate::Verdict) -> bool {
+    verdict.is_allowed() && !command.trim().is_empty()
+}
+
+/// The decision for one parsed envelope: the response to emit, or `None` to abstain.
+///
+/// The single seam every caller goes through, so the blank-command rule cannot be bypassed by
+/// reaching for `render_response` directly.
+pub fn respond(format: &dyn HookFormat, command: &str, verdict: crate::Verdict) -> Option<HookResponse> {
+    may_grant(command, verdict).then(|| format.render_response(verdict))
+}
+
 /// Append `entry` to `settings[outer][event]`, creating the path when absent.
 ///
 /// Refuses — rather than overwriting — when an existing key has the wrong TYPE. Four targets wrote

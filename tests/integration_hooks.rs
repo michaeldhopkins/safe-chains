@@ -677,6 +677,53 @@ fn no_target_install_panics_or_clobbers_an_unreadable_config() {
     assert!(failures.is_empty(), "install robustness:\n  {}", failures.join("\n  "));
 }
 
+/// The shared decision seam refuses a grant for a blank command, for EVERY target.
+///
+/// This is the unit-level counterpart to the end-to-end guard below. The rule used to live in
+/// `main.rs`, so the binary was safe while `render_response` — which is public and owns the
+/// decision contract — knew nothing about blankness. The `hook_envelope` fuzz target found that by
+/// calling the format directly; the fix moved the rule to `targets::respond`, and this pins it
+/// there rather than in whichever caller happens to be tested.
+#[test]
+fn the_decision_seam_never_grants_on_a_blank_command() {
+    use safe_chains::targets::{may_grant, respond};
+    use safe_chains::Verdict;
+
+    let safe = safe_chains::command_verdict("ls");
+    assert!(safe.is_allowed(), "precondition: `ls` classifies safe");
+
+    for blank in ["", "   ", "\t", "\n", " \t \n "] {
+        assert!(!may_grant(blank, safe), "blank {blank:?} must not be grantable");
+    }
+    // Non-vacuity: a real command with the same verdict IS grantable, so the guard above cannot
+    // pass merely because nothing is ever granted.
+    assert!(may_grant("ls", safe), "a real safe command must stay grantable");
+    // A denied verdict is never grantable regardless of the command text.
+    assert!(!may_grant("ls", Verdict::Denied), "a denied verdict must never grant");
+
+    let mut checked = 0;
+    for target in safe_chains::targets::registry() {
+        let Some(format) = target.hook_format() else { continue };
+        checked += 1;
+        for blank in ["", "   ", "\n"] {
+            assert!(
+                respond(format, blank, safe).is_none(),
+                "{}: respond() produced a decision for a blank command",
+                target.name()
+            );
+        }
+        // And the same target does produce one for a real safe command, or the check is empty.
+        let real = respond(format, "ls", safe);
+        assert!(
+            real.is_some(),
+            "{}: respond() produced nothing for a real safe command; the blank check above proves \
+             nothing",
+            target.name()
+        );
+    }
+    assert!(checked > 0, "no hook target was exercised; the guard would be vacuous");
+}
+
 /// No target may ANSWER a blank command with an approval.
 ///
 /// An empty or whitespace-only command is nothing to classify, so approving it asserted "all
