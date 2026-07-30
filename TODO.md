@@ -424,22 +424,36 @@ nothing against the bug class that actually dominates.
 
 Neither needs new machinery — `cargo fuzz` is already wired, sharded and merging corpora nightly.
 
-## `--version` is missing from 2,394 subs — a DECISION, not a sweep to run blind
+## `--version`: research EVERY instance individually — DECIDED, do not sweep
 
-Surfaced 2026-07-30 triaging real captured commands: `cargo deny --version` prompted because the
-`deny` sub lists `--help`/`-h` and not `--version`. Fixed there, because cargo-deny genuinely
-supports it. The pattern is registry-wide: 2,394 subs accept `--help` but not `--version`.
+Decision (2026-07-30, user): we will not add globally-accepted flags. 2,394 subs accept `--help`
+without `--version`, and that count is NOT a work item to batch — each one is researched against
+the tool it belongs to or it stays off the list. An omitted flag merely prompts; a wrongly-asserted
+one lies about what the tool accepts.
 
-NOT swept, deliberately. The standing rule is to research a flag FOR the command in question rather
-than rule it safe across a CLI's subs — an omitted flag merely prompts, a wrongly-asserted one
-lies. `--version` is inert wherever it EXISTS, and asserting it where it does not mostly yields a
-usage error rather than an unsafe action, so the risk of a blanket add is low but not zero: a tool
-that treats an unknown flag as a positional would change behaviour.
+Done under that rule: `cargo deny --version`, MEASURED against the installed cargo-deny 0.19.0
+(prints `cargo-deny 0.19.0`, exit 0) rather than assumed from the clap convention.
 
-The decision to make: either (a) accept the residual and add `--version` wherever `--help` is
-already listed, on the argument that both are the same class of inert self-description, or (b) keep
-per-command research and let these prompt. Worth deciding once rather than meeting it one prompt at
-a time.
+## wasm-pack `build` is `candidate` — deliberate, but worth re-deciding
+
+`commands/wasm/wasm-pack.toml` marks every meaningful sub `candidate = true`, on the stated
+grounds that "meaningful invocations execute Rust at build time" (build.rs, proc-macros). That is a
+considered call, not a gap, so it was left alone.
+
+But it sits oddly beside `cargo build`, which IS allowed at SafeWrite and executes build.rs and
+proc-macros identically. If executing build.rs is acceptable for cargo it is hard to argue it is
+disqualifying for wasm-pack. Two additional facts from reading `wasm-pack build --help` at 0.15.0,
+which should inform whichever way it goes:
+
+  - `--mode` DEFAULTS to `normal`, which downloads and installs the wasm-bindgen and wasm-opt
+    binaries when missing. That is closer to `npm install` than to `cargo build`: it installs
+    executables, not just source. `--mode no-install` is the form that does not.
+  - `--panic-unwind` states outright that it installs a nightly toolchain, `rust-src` and the
+    wasm32 target via rustup — a toolchain install as a side effect of a build flag.
+
+So a defensible middle is to admit `build` only in its non-installing form, gating `--out-dir` as a
+write, and leave `--panic-unwind` off. That needs the flag-conditional mechanism the npm `ci` entry
+already uses (`when_absent`), not a plain sub listing.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 

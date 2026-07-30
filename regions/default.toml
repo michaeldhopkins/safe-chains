@@ -231,6 +231,11 @@ role = "package-content"
 note = "nvm-installed node runtimes and their global node_modules."
 researched = "2026-07-30"
 [[region]]
+path = "~/.local/bin/"
+role = "package-content"
+note = "Installed user-level executables (mise/pipx/cargo-install shims). Reading one — `strings`, `cat` on a wrapper script — discloses an installed tool, not machine state. Writes stay denied: this is where a planted binary would go."
+researched = "2026-07-30"
+[[region]]
 path = "~/.local/share/mise/installs/"
 role = "package-content"
 note = "mise-installed tool versions. Scoped to installs/ so it cannot reach mise's own config or state."
