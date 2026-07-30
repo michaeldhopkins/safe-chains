@@ -69,6 +69,30 @@ baseline invocation:
 All gated with role `exec`; `rsync -e ssh` (a bare name on $PATH) still approves, which is the form
 that actually matters. The guard now walks all four locations.
 
+FIFTH PASS (2026-07-29) — a TAG for the config-is-code class, plus one more finding.
+
+`marp --config-file` / `-c` (marp.config.js is JavaScript Node executes) and `--engine` (a JS module
+marp loads) were ungated; both now carry `exec`. Found not by name but by a registry-internal
+differential: flags declared `standalone` in one command while `valued` in many others.
+
+NEW TAG — `CONFIG_IS_CODE` in `a_config_flag_on_a_code_config_tool`. The fact that a TOOL executes
+its config is declared once, per tool, and the guard derives the obligation for every
+config-selecting flag on it (`-c`, `--config`, `--config-file`, `--noxfile`, `--conf-dir`,
+`--engine`, `--format`, `--formatter`). Adding a config flag to a listed tool now FAILS until it is
+gated, instead of waiting for someone to remember that tool. Currently covers webpack, vite, eslint,
+stylelint, marp, nox, sphinx-build, mkdocs. Extend the list as tools are researched — jest, vitest
+and cmake are gated but not yet listed; rollup, babel, gulp, grunt, playwright, cypress, storybook,
+tailwind, commitlint and prettier are config-is-code but not currently auto-approved at all, so they
+carry no exposure until one of them is allowed.
+
+OPEN QUESTION (not a defect count) — 234 scopes declare the SAME flag in both `standalone` and
+`valued`. SAMPLE.toml defines `standalone` as "flags that take no value", so the two declarations
+contradict each other and only one can be honoured; marp was one of them. But many entries look like
+deliberate modelling of an OPTIONAL value (`zstd --long` vs `--long=27`, `7z -r` vs `-r-`), which the
+schema has no way to express. Before treating any of these as bugs, decide what the schema means
+here: either support optional-value flags explicitly, or make the overlap a build error. A guard
+written against the current ambiguity would encode a convention nobody has chosen.
+
 FOURTH PASS (2026-07-29) — the gates were bypassable by RESPELLING. Every executor flag gated in
 the passes above had an environment twin that was not gated, so the flag gate read as closed while
 the same operation sailed through:
