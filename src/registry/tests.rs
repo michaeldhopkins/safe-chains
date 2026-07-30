@@ -2625,6 +2625,107 @@ use super::*;
     /// Regression guard: `examples_safe`/`examples_denied` must appear
     /// before any `[[command.sub]]` or `[command.fallback]` table in
     /// each TOML file. TOML semantics scope inline keys to the
+    /// On a tool whose CONFIG FILE IS CODE, every config-selecting flag must be gated at the
+    /// executor locus.
+    ///
+    /// This is the half no name rule can find: the flag is called `--config`, and the file it names
+    /// is a program the tool runs. The usable predicate is the TOOL — a runner whose config format
+    /// is executable — so the fact is declared here, per tool, and the guard derives the obligation.
+    /// Every entry below was a live fail-open when it was added: `webpack -c /tmp/evil.js` and
+    /// `marp --config-file /tmp/evil.js` auto-approved and ran that file.
+    ///
+    /// The point of the table is that ADDING a config flag to a listed tool now fails until it is
+    /// gated, instead of waiting for someone to think of that tool again.
+    #[test]
+    fn a_config_flag_on_a_code_config_tool_is_gated() {
+        use std::fs;
+        use std::path::PathBuf;
+
+        /// Tools whose config file is executed, with the reason. Grows as tools are researched.
+        const CONFIG_IS_CODE: &[(&str, &str)] = &[
+            ("webpack", "webpack.config.js is JavaScript webpack evaluates"),
+            ("vite", "a vite config is JavaScript vite evaluates"),
+            ("eslint", "eslint.config.js / .eslintrc.js is JavaScript"),
+            ("stylelint", "stylelint.config.js is JavaScript"),
+            ("marp", "marp.config.js / .marprc.js is JavaScript Node executes"),
+            ("nox", "a noxfile is Python nox imports and runs"),
+            ("sphinx-build", "the conf dir holds conf.py, executed as Python"),
+            ("mkdocs", "mkdocs.yml can declare `hooks:` Python modules"),
+        ];
+
+        /// A flag that SELECTS the config (or the engine/formatter module loaded with it).
+        fn selects_config(flag: &str) -> bool {
+            let f = flag.trim_start_matches('-');
+            f == "c" || f == "config" || f == "config-file" || f == "noxfile"
+                || f == "conf-dir" || f == "engine" || f == "format" || f == "formatter"
+        }
+
+        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap() {
+                let entry = entry.unwrap();
+                let path = entry.path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+                {
+                    out.push(path);
+                }
+            }
+        }
+
+        let mut files = Vec::new();
+        walk(std::path::Path::new("commands"), &mut files);
+        let mut seen: Vec<&str> = Vec::new();
+        let mut checked = 0;
+        let mut failures = Vec::new();
+
+        for path in &files {
+            let Ok(parsed) = toml::from_str::<toml::Value>(&fs::read_to_string(path).unwrap())
+            else {
+                continue;
+            };
+            let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
+            for cmd in commands {
+                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("");
+                let Some((tool, why)) = CONFIG_IS_CODE.iter().find(|(t, _)| *t == name) else {
+                    continue;
+                };
+                seen.push(tool);
+                let gate = cmd.get("path_gate").and_then(|g| g.get("flags"));
+                // Sub-scopes carry their own `valued`; a config flag on any of them counts.
+                let mut scopes = vec![cmd.clone()];
+                if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
+                    scopes.extend(subs.iter().cloned());
+                }
+                for scope in scopes {
+                    let Some(valued) = scope.get("valued").and_then(|v| v.as_array()) else {
+                        continue;
+                    };
+                    for flag in valued.iter().filter_map(|f| f.as_str()) {
+                        if !selects_config(flag) {
+                            continue;
+                        }
+                        checked += 1;
+                        let role = gate.and_then(|g| g.get(flag)).and_then(|r| r.as_str());
+                        if role != Some("exec") {
+                            failures.push(format!(
+                                "{}: `{name} {flag}` selects config on a tool where config is CODE \
+                                 ({why}), but its path_gate role is {role:?} — needs \"exec\"",
+                                path.display()
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        for (tool, _) in CONFIG_IS_CODE {
+            assert!(seen.contains(tool), "CONFIG_IS_CODE lists `{tool}`, which no TOML defines");
+        }
+        assert!(checked > 0, "no config flag was examined; guard is vacuous");
+        assert!(failures.is_empty(), "ungated config-as-code flags:\n  {}", failures.join("\n  "));
+    }
+
     /// A flag whose NAME says its value is a program must gate that value at the EXECUTOR locus.
     ///
     /// `dispatch_wrapper` consumes a valued flag and never looks at the value, so a flag naming a

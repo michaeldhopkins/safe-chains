@@ -32,3 +32,9 @@ valued = [
     "--themeSet", "--title", "--url",
     "-c", "-I", "-o",
 ]
+
+# marp reads `marp.config.js` / `.marprc.js` — JavaScript that Node EXECUTES — and `--engine` names
+# a JS module marp loads as its rendering engine. Both select code rather than data. `--theme` and
+# `--themeSet` are CSS and stay ordinary reads.
+[command.path_gate]
+flags = { "--config-file" = "exec", "-c" = "exec", "--engine" = "exec" }
