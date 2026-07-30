@@ -1214,6 +1214,85 @@ proptest! {
     }
 }
 
+/// Every read-admitted package-content root, and every credential-shield segment.
+const ADMIT_ROOTS: &[&str] = &[
+    "/usr/share", "/usr/include", "/usr/lib", "/usr/local/share", "/usr/local/include",
+    "/usr/local/lib", "/opt/homebrew/share", "/opt/homebrew/include", "/opt/homebrew/lib",
+    "/Library/Developer/CommandLineTools", "/nix/store/abc", "~/.cargo/registry",
+    "~/.rustup/toolchains", "~/go/pkg/mod", "~/.nvm/versions", "~/.local/share/mise/installs",
+];
+const SHIELD_SEGMENTS: &[&str] = &[".ssh", ".aws", ".gnupg"];
+/// The machine-local halves of those same roots — where every audited leak lived.
+const MACHINE_LOCAL: &[&str] = &["etc", "var"];
+
+proptest! {
+    /// An admit prefix can never widen the credential shield, at any depth.
+    ///
+    /// Specificity ranks exact ≫ prefix ≫ segment, so EVERY subtree admit outranked the shield's
+    /// segment match. Making package content readable turned that ordering into a live hole:
+    /// `/usr/share/.ssh/id_rsa` was approved. Generated over root × shield × depth because the
+    /// hole was not specific to one pairing — it followed from the ordering, so any new admit
+    /// node would have reopened it.
+    #[test]
+    fn no_admit_root_widens_the_shield(
+        root in proptest::sample::select(ADMIT_ROOTS.to_vec()),
+        shield in proptest::sample::select(SHIELD_SEGMENTS.to_vec()),
+        depth in 0usize..3,
+    ) {
+        let mid = "sub/".repeat(depth);
+        let path = format!("{root}/{mid}{shield}/secret");
+        prop_assert!(
+            !is_safe_command(&format!("cat {path}")),
+            "an admit prefix widened the credential shield: `cat {}`",
+            path
+        );
+    }
+
+    /// Reading package content is admitted; WRITING it is not.
+    ///
+    /// The whole justification for admitting these is that the content is public by construction —
+    /// a man page, a vendored crate README. That argument covers disclosure and nothing else, so
+    /// the write face must stay shut or the change has quietly widened what the agent can alter.
+    #[test]
+    fn package_content_reads_admit_but_writes_do_not(
+        root in proptest::sample::select(ADMIT_ROOTS.to_vec()),
+        depth in 0usize..3,
+    ) {
+        let mid = "pkg/".repeat(depth);
+        let path = format!("{root}/{mid}README.md");
+        prop_assert!(
+            is_safe_command(&format!("cat {path}")),
+            "package content should read: `cat {}`", path
+        );
+        for write in [format!("rm -rf {path}"), format!("echo x > {path}")] {
+            prop_assert!(
+                !is_safe_command(&write),
+                "package content must not be writable: `{}`", write
+            );
+        }
+    }
+
+    /// The machine-local half of an admitted root stays refused.
+    ///
+    /// This is the cut the design rests on. The previous admit map was retired because it took
+    /// whole roots, and an audit found Homebrew service configs under `etc` and auth tokens under
+    /// `var`. Admitting `share`/`lib`/`include` while refusing `etc`/`var` is what keeps those
+    /// findings out, so it is asserted rather than assumed.
+    #[test]
+    fn the_machine_local_half_of_an_admitted_root_stays_refused(
+        root in proptest::sample::select(
+            ["/usr", "/usr/local", "/opt/homebrew"].to_vec()
+        ),
+        local in proptest::sample::select(MACHINE_LOCAL.to_vec()),
+    ) {
+        let path = format!("{root}/{local}/service/secrets.conf");
+        prop_assert!(
+            !is_safe_command(&format!("cat {path}")),
+            "machine-local config under an admitted root was approved: `cat {}`", path
+        );
+    }
+}
+
 /// Targets spanning in-workspace and out-of-workspace, so the equivalence can fail either way.
 const REDIRECT_TARGETS: &[&str] = &[
     "./out.txt",

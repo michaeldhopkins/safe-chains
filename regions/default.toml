@@ -52,6 +52,12 @@ read_locus = "process"
 write_locus = "process"
 reads_secret = false
 
+[role.package-content]
+description = "Distributed package CONTENT — docs, headers, libraries, vendored module sources. Read-admitted; writes stay denied."
+read_locus = "adjacent"
+write_locus = "machine"
+reads_secret = false
+
 [role.credential-store]
 description = "Known credential/secret stores. Denied, and a user grant may NOT widen them (the shield)."
 read_locus = "machine"
@@ -131,6 +137,104 @@ path = "/dev/fd/"
 role = "standard-stream"
 note = "Per-process file-descriptor pseudo-files (process substitution). Process-local."
 researched = "2026-07-12"
+
+# ── Package CONTENT: read-admitted, writes still denied. ───────────────────────────────────────
+#
+# The retreat deleted a broad admit map because an adversarial audit found it leaking — macOS
+# `/Library/Keychains/System.keychain`, Homebrew `/usr/local/etc/*` service configs, `/var/log/*`
+# auth tokens. That map failed because it admitted whole ROOTS, and a root is HETEROGENEOUS:
+# `/usr/local` holds distributed package files next to machine-local config and state.
+#
+# These nodes cut at the layer the FHS already separates. `share`/`include`/`lib` is content a
+# PACKAGE MANAGER put there; `etc` and `var` are this machine's config and state, which is where
+# every audited leak lived. None of the three audit findings matches a prefix below: `/Library`
+# is admitted only at `Developer/CommandLineTools/`, `etc` is never admitted at any root, and
+# `/var` is not a root here at all.
+#
+# The argument for reading these at all: the content is public by construction. A crate README
+# under `~/.cargo/registry` is published on crates.io; a man page ships in the OS. Refusing the
+# local copy while the same bytes are a network fetch away is friction without a matching risk.
+# WRITES stay denied — this widens disclosure only, not the ability to alter what runs.
+[[region]]
+path = "/usr/share/"
+role = "package-content"
+note = "OS-distributed docs, man pages, locale data. Sibling `/usr/etc` does not exist; config lives in /etc, which is NOT admitted."
+researched = "2026-07-30"
+[[region]]
+path = "/usr/include/"
+role = "package-content"
+note = "System C headers — compiler input, no machine state."
+researched = "2026-07-30"
+[[region]]
+path = "/usr/lib/"
+role = "package-content"
+note = "OS-distributed libraries."
+researched = "2026-07-30"
+[[region]]
+path = "/usr/local/share/"
+role = "package-content"
+note = "Locally-installed package docs/data. Deliberately NOT /usr/local/etc, which the admit-audit found holding Homebrew service secrets."
+researched = "2026-07-30"
+[[region]]
+path = "/usr/local/include/"
+role = "package-content"
+note = "Locally-installed headers."
+researched = "2026-07-30"
+[[region]]
+path = "/usr/local/lib/"
+role = "package-content"
+note = "Locally-installed libraries."
+researched = "2026-07-30"
+[[region]]
+path = "/opt/homebrew/share/"
+role = "package-content"
+note = "Homebrew package docs/data. NOT /opt/homebrew/etc (service configs) and NOT Cellar/, whose per-formula trees contain their own etc/."
+researched = "2026-07-30"
+[[region]]
+path = "/opt/homebrew/include/"
+role = "package-content"
+note = "Homebrew headers."
+researched = "2026-07-30"
+[[region]]
+path = "/opt/homebrew/lib/"
+role = "package-content"
+note = "Homebrew libraries and node_modules for globally-installed packages."
+researched = "2026-07-30"
+[[region]]
+path = "/Library/Developer/CommandLineTools/"
+role = "package-content"
+note = "Apple SDK headers and toolchain sources. Scoped to Developer/ so it cannot reach /Library/Keychains, which the admit-audit found leaking."
+researched = "2026-07-30"
+[[region]]
+path = "/nix/store/"
+role = "package-content"
+note = "Nix store paths are immutable, content-addressed and world-readable by design."
+researched = "2026-07-30"
+[[region]]
+path = "~/.cargo/registry/"
+role = "package-content"
+note = "Vendored crate sources fetched from a registry. Scoped to registry/ so it cannot reach ~/.cargo/credentials.toml."
+researched = "2026-07-30"
+[[region]]
+path = "~/.rustup/toolchains/"
+role = "package-content"
+note = "Installed Rust toolchains and their std sources."
+researched = "2026-07-30"
+[[region]]
+path = "~/go/pkg/mod/"
+role = "package-content"
+note = "Go module cache — downloaded dependency sources."
+researched = "2026-07-30"
+[[region]]
+path = "~/.nvm/versions/"
+role = "package-content"
+note = "nvm-installed node runtimes and their global node_modules."
+researched = "2026-07-30"
+[[region]]
+path = "~/.local/share/mise/installs/"
+role = "package-content"
+note = "mise-installed tool versions. Scoped to installs/ so it cannot reach mise's own config or state."
+researched = "2026-07-30"
 
 # ── Credential shield: SEGMENT matches, denied everywhere, and NOT widenable by a grant. The
 #    only "denylist" we keep, and only because a broad grant (`grant ~/`) would otherwise hand
