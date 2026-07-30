@@ -25,4 +25,5 @@ fuzz/corpus/explain_render/
 fuzz/corpus/suggest_roundtrip/
 fuzz/corpus/level_monotonic/
 fuzz/corpus/config_load/
+fuzz/corpus/setup_merge/
 fuzz/artifacts/

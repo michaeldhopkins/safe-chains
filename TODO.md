@@ -375,12 +375,20 @@ SIX property targets live now: equivalence, hook_envelope, explain_render, sugge
 level_monotonic, config_load. First runs, all clean except the two that found real bugs on day one:
 explain_render 395k, suggest_roundtrip 295k, level_monotonic 160k, config_load 505k.
 
-ONE LEFT — `setup_merge`: arbitrary existing settings JSON through each target's `install`.
-Generalizes `no_target_install_panics_or_clobbers_an_unreadable_config` from a table of shapes to a
-search. The class is proven live (a wrong-typed key panicked cursor's installer, and under
---auto-detect that left every later tool uninstalled), but it is the last and least of these: the
-install path runs once at setup rather than on every command, so a panic there is loud rather than
-silently fail-open.
+SEVEN targets now, and the list is COMPLETE for the layers that exist: parse (availability),
+equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load,
+setup_merge. Each asserts a property the others cannot see; none was added for coverage's own sake.
+
+setup_merge closes the last one: arbitrary bytes as an existing settings file, through each target's
+real `install`. On refusal the file must be byte-identical; on success it must still parse as JSON.
+Filesystem-driven, so it runs ~38k iterations where the pure targets run hundreds of thousands —
+worth it because the property is about `install`, not about a parser. It carries an explicit
+vacuity guard: discovery learns each target's config path by installing once into a clean tree, and
+if that found nothing the target asserts rather than looping over an empty list.
+
+DELIBERATELY NOT ADDED: docs.rs (no security property) and pathctx (already covered by proptests,
+which shrink better than libFuzzer for a pure function). A target is only worth its nightly runtime
+if it asserts something the others cannot.
 
 ## Fuzzing finds availability bugs only — two targets worth adding
 
