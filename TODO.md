@@ -324,6 +324,40 @@ in the clear), `ssm --with-decryption` (decrypts SecureString values), `s3api --
 (supplies caller-held key material). Every family also withholds `--endpoint-url`, `--profile`,
 `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
 
+## Fuzzing finds availability bugs only — two targets worth adding
+
+State (2026-07-30): healthy and quiet. Nightly green five nights running (~5h, sharded), replay
+green on every push, no crash/timeout/oom artifacts, corpus merged to 18,013 inputs.
+
+But `fuzz_targets/parse.rs` ends in `let _ = is_safe_command(&command);` — the verdict is
+DISCARDED by design, so the only contract under test is "does not panic or hang". Measured against
+that: every one of the ~30 defects found in the 2026-07-29/30 review session was invisible to it.
+The heredoc-body fail-open, the 24 executor-flag gaps and the env-twin bypasses are all
+CLASSIFICATION bugs — the fuzzer runs them and sees no panic. The hook blank-command approval, the
+`--setup` panic and the `--suggest` phishing vector live in `targets/*` and `suggest.rs`, which
+`is_safe_command` never calls.
+
+That is not a criticism of the target: it does its job, and the availability contract it guards is
+real (a panicking PreToolUse hook fails OPEN). It just means the fuzzing budget currently buys
+nothing against the bug class that actually dominates.
+
+1. **A METAMORPHIC target — the highest-value one.** Assert a property OF the verdict instead of
+   discarding it: a semantics-preserving respelling must not change the verdict. Every class found
+   this session was exactly a respelling gap — `--flag=V` vs `--flag V` vs `-fV`, an env twin vs its
+   flag, a heredoc body vs a herestring. Generate a command, apply a transform that provably does
+   not change what the shell does, assert the two verdicts are equal. Unlike the current target this
+   can find fail-opens, and it needs no oracle beyond self-consistency. Start from the transforms
+   already hand-written as guards (`FormCase` flag-form equivalence, the twin tag, the heredoc
+   herestring equivalence) — they are the seed set.
+
+2. **A hook-envelope target** for `targets/*` (already noted in AGENTS.md §Fuzzing). Feed arbitrary
+   bytes as an envelope to each target's `parse_input` + render path. The blank-command approval and
+   the wrong-typed-key panic were both found by hand there; a target would have found both and keeps
+   finding them as harnesses change. Note a subtlety: the interesting contract is not only
+   "no panic" but "never emits an ALLOW decision it was not asked for", which is checkable.
+
+Neither needs new machinery — `cargo fuzz` is already wired, sharded and merging corpora nightly.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
