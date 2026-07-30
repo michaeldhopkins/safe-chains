@@ -1599,11 +1599,62 @@ mod tests {
     }
 
     #[test]
-    fn cat_of_a_system_file_is_not_admitted() {
-        // the retreat: reading a system path is no longer admitted (it prompts, or the user grants).
-        for path in ["/etc/hosts", "/etc/os-release", "/usr/share/doc/x"] {
+    fn cat_of_machine_config_is_not_admitted() {
+        // The retreat still holds for machine CONFIG and STATE: these prompt, or the user grants.
+        // `/usr/share/doc/x` moved out of this list deliberately — see the test below.
+        for path in ["/etc/hosts", "/etc/os-release", "/usr/local/etc/nginx/nginx.conf", "/var/log/auth.log"] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
             assert!(!read_local().admits(&p), "cat {path} is no longer auto-approved");
+        }
+    }
+
+    /// Distributed package CONTENT is read-admitted; its WRITE face is not.
+    ///
+    /// The retreat refused whole roots because an audit found them leaking — the macOS keychain,
+    /// Homebrew service configs under `etc`, auth tokens under `/var/log`. Those all live in a
+    /// root's machine-local half. Cutting at the layer the FHS already separates keeps the leaks
+    /// out (`etc`/`var` are never admitted) while ending the friction of refusing a man page or a
+    /// vendored crate README, whose bytes are public by construction.
+    #[test]
+    fn package_content_is_readable_but_never_writable() {
+        for path in [
+            "/usr/share/doc/x",
+            "/usr/share/man/man1/git.1",
+            "/usr/local/share/doc/x/README",
+            "/opt/homebrew/lib/node_modules/npm/package.json",
+            "/Library/Developer/CommandLineTools/usr/include/stdio.h",
+            "/nix/store/abc/share/doc/README",
+            "~/.cargo/registry/src/idx/serde-1.0/README.md",
+            "~/.rustup/toolchains/stable/lib/rustlib/src/core/src/lib.rs",
+            "~/go/pkg/mod/github.com/x/y@v1/README.md",
+            "~/.local/share/mise/installs/node/22/README.md",
+        ] {
+            let read = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(read_local().admits(&read), "reading package content {path} should be admitted");
+            let write = resolve(&toks(&["rm", "-rf", path])).expect("rm");
+            assert!(
+                !read_local().admits(&write),
+                "package content {path} must NOT be writable — this widens disclosure only"
+            );
+        }
+    }
+
+    /// The credential shield outranks an admit prefix, whatever the specificity ordering says.
+    ///
+    /// Specificity ranks exact ≫ prefix ≫ segment, so every subtree admit outranked the shield's
+    /// segment match: `/usr/share/.ssh/id_rsa` was APPROVED the moment package content became
+    /// readable. A shield that a new admit node can widen is not a shield.
+    #[test]
+    fn an_admit_prefix_can_never_widen_the_credential_shield() {
+        for path in [
+            "/usr/share/.ssh/id_rsa",
+            "/usr/local/lib/.aws/credentials",
+            "/opt/homebrew/share/.gnupg/secring.gpg",
+            "~/.cargo/registry/.ssh/id_ed25519",
+            "/nix/store/x/.aws/credentials",
+        ] {
+            let p = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(!read_local().admits(&p), "an admit prefix widened the shield at {path}");
         }
     }
 

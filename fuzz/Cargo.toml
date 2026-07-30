@@ -76,3 +76,10 @@ path = "fuzz_targets/setup_merge.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "path_admit"
+path = "fuzz_targets/path_admit.rs"
+test = false
+doc = false
+bench = false

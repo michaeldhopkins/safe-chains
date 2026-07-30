@@ -495,6 +495,28 @@ fn base_region(path: &str) -> Role {
     // a case-sensitive macOS volume over-denies a genuinely-distinct `.GIT` (fail-safe). Matching the
     // OS is the honest proxy for the default case.
     let fold_shields = current_os() == "macos";
+
+    // A SECRET-BEARING region wins outright, before specificity is considered at all.
+    //
+    // Specificity ranks exact ≫ prefix ≫ segment, so ANY subtree admit outranks the shield's
+    // segment match however deep the shield sits. Adding read-admits for package content made that
+    // concrete: `/usr/share/.ssh/id_rsa` was approved, because `/usr/share/` is a prefix and
+    // `.ssh` is only a segment. The shield's whole purpose is to be un-widenable — `apply_grant`
+    // already refuses to let a grant reach through it, and an admit node must not either.
+    //
+    // This is the same failure that retired the previous admit map: a broad prefix quietly
+    // swallowing something sensitive underneath it.
+    if let Some(role) = r
+        .nodes
+        .iter()
+        .filter(|n| n.applies_here() && n.role.reads_secret)
+        .filter(|n| n.matcher.specificity(path, n.fold && fold_shields).is_some())
+        .map(|n| n.role)
+        .next()
+    {
+        return role;
+    }
+
     let mut best: Option<(usize, Role)> = None;
     for node in &r.nodes {
         if !node.applies_here() {
