@@ -434,26 +434,24 @@ one lies about what the tool accepts.
 Done under that rule: `cargo deny --version`, MEASURED against the installed cargo-deny 0.19.0
 (prints `cargo-deny 0.19.0`, exit 0) rather than assumed from the clap convention.
 
-## wasm-pack `build` is `candidate` — deliberate, but worth re-deciding
+## wasm-pack — CONVERTED to facets; one refinement left
 
-`commands/wasm/wasm-pack.toml` marks every meaningful sub `candidate = true`, on the stated
-grounds that "meaningful invocations execute Rust at build time" (build.rs, proc-macros). That is a
-considered call, not a gap, so it was left alone.
+Re-researched at 0.15.0 against the installed binary and converted from `candidate = true` to
+archetype profiles, so the verdict is DERIVED rather than asserted. `--explain` now names the facet
+that decides it: `persistence.level = installing (allowed: <= data)`.
 
-But it sits oddly beside `cargo build`, which IS allowed at SafeWrite and executes build.rs and
-proc-macros identically. If executing build.rs is acceptable for cargo it is hard to argue it is
-disqualifying for wasm-pack. Two additional facts from reading `wasm-pack build --help` at 0.15.0,
-which should inform whichever way it goes:
+  build, test, new  supply-chain-build   fetches an executable over the network and runs it
+  publish           remote-create        creates a published version on the npm registry
+  login             credential-mint      obtains a token and persists it — secret WRITING
+  pack              (unlisted)           local create, no network; no archetype applies
 
-  - `--mode` DEFAULTS to `normal`, which downloads and installs the wasm-bindgen and wasm-opt
-    binaries when missing. That is closer to `npm install` than to `cargo build`: it installs
-    executables, not just source. `--mode no-install` is the form that does not.
-  - `--panic-unwind` states outright that it installs a nightly toolchain, `rust-src` and the
-    wasm32 target via rustup — a toolchain install as a side effect of a build flag.
-
-So a defensible middle is to admit `build` only in its non-installing form, gating `--out-dir` as a
-write, and leave `--panic-unwind` off. That needs the flag-conditional mechanism the npm `ci` entry
-already uses (`when_absent`), not a plain sub listing.
+REMAINING: `wasm-pack build --mode no-install` genuinely does not fetch or install — it is a local
+build executing only workspace-authored code, exactly as `cargo build` does. Classifying that form
+separately is defensible and needs the flag-conditional mechanism npm's `ci` entry already uses
+(`when_absent` on a safety flag). It was NOT faked with a flat listing, because the default
+invocation is the one an unqualified `wasm-pack build` performs and that is what the profile has to
+describe. `--panic-unwind` stays off the flag list either way: it installs a nightly toolchain,
+`rust-src` and the wasm32 target through rustup as a side effect of a build flag.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 

@@ -1,8 +1,32 @@
 [[command]]
 name = "wasm-pack"
-description = "Builds, tests, and publishes Rust crates as WebAssembly. `build` compiles the crate via cargo + wasm-bindgen and writes pkg/ output (project-local SafeWrite + executes build.rs / proc-macros). `test` builds and runs tests in headless browsers (executes user code). `pack`, `publish` write or upload artifacts. `login` saves npm auth state. The carve-out covers diagnostic forms only — meaningful invocations execute Rust at build time."
 url = "https://rustwasm.github.io/wasm-pack/book/commands.html"
-researched_version = "wasm-pack 0.x"
+researched_version = "0.15.0"
+description = """
+Compiles a Rust crate to WebAssembly and wraps the artifact as an npm package. Re-researched at \
+0.15.0 against the installed binary (`wasm-pack --help`, `wasm-pack build --help`) and the command \
+book. Behaviour per subcommand, along the axes that decide where each lands:
+
+- `build` — create/execute on a LOCAL worktree path; the package is written to `--out-dir` \
+(default `pkg/`). Two behaviours dominate the profile and neither is the compile itself. `--mode` \
+defaults to `normal`, which FETCHES the wasm-bindgen and wasm-opt executables over the network when \
+they are absent and then RUNS them over the build artifact — network-sourced execution plus an \
+install that persists outside the worktree. `--panic-unwind` goes further, installing a nightly \
+toolchain, the `rust-src` component and the wasm32 target through rustup. The compile also executes \
+the crate's own `build.rs` and proc-macros, but that is workspace-authored code, a different origin \
+from a fetched binary.
+- `test` — builds, then downloads a browser webdriver and drives a headless browser to run the \
+compiled tests: an executable fetched from the network and then run.
+- `new` — scaffolds from a project template retrieved from a remote git repository; the network \
+supplies code the resulting project builds and runs.
+- `publish` — uploads the packed artifact to the npm registry: a create on a REMOTE locus, \
+authenticated with stored npm credentials, disclosing the package contents to a public audience.
+- `login` — obtains an npm registry token and persists it to the npm configuration. Secret-WRITING \
+rather than secret-reading.
+- `pack` — creates a tarball from an already-built `pkg/`. Local create, no network, no fetched \
+execution. Its flag surface has not been read, so it carries no listing: an entry that happens to \
+work asserts more than was measured.
+"""
 bare_flags = ["--help", "--version", "-h", "-V"]
 
 [[command.sub]]
@@ -11,24 +35,51 @@ allow_all = true
 
 [[command.sub]]
 name = "build"
-candidate = true
+profile = "supply-chain-build"
+fact = "`--mode` selects which steps run and defaults to `normal`; `no-install` is documented as the mode that does not install and `force` re-installs. In the default mode wasm-pack downloads the wasm-bindgen and wasm-opt binaries when missing, then runs them over the build artifact."
+source = "https://rustwasm.github.io/wasm-pack/book/commands/build.html — `--mode`; `wasm-pack build --help` (0.15.0)"
+judgment = "Classified on the DEFAULT invocation, since that is what an unqualified `wasm-pack build` does: fetch executables and run them — network-sourced execution with an install outliving the build. The crate's own build.rs and proc-macros also execute, but that is workspace-authored code and would not by itself lift this above a local build; cargo build runs the same code and stays local. `--mode no-install` genuinely removes the fetch-and-run, so a narrower profile for that form is defensible — expressing it needs the flag-conditional mechanism npm's `ci` uses, and is deliberately not faked with a flat listing."
+standalone = ["--debug", "--dev", "--help", "-h", "--no-opt", "--no-pack", "--no-typescript", "--profiling", "--reference-types", "--release", "--weak-refs"]
+valued = ["--mode", "-m", "--out-dir", "-d", "--out-name", "--profile", "--scope", "-s", "--target", "-t"]
 
 [[command.sub]]
 name = "test"
-candidate = true
-
-[[command.sub]]
-name = "pack"
-candidate = true
-
-[[command.sub]]
-name = "publish"
-candidate = true
-
-[[command.sub]]
-name = "login"
-candidate = true
+profile = "supply-chain-build"
+fact = "Builds the crate for testing and runs the tests in a headless browser, downloading the matching webdriver (chromedriver / geckodriver / safaridriver) when it is not already present."
+source = "https://rustwasm.github.io/wasm-pack/book/commands/test.html; `wasm-pack test --help` (0.15.0)"
+judgment = "Same origin story as `build` in its default mode — an executable is fetched from the network and then run — so it takes the same profile rather than a test-specific one."
+standalone = ["--chrome", "--firefox", "--headless", "--help", "-h", "--node", "--release", "-r", "--safari"]
+valued = ["--chromedriver", "--geckodriver", "--mode", "-m", "--safaridriver"]
 
 [[command.sub]]
 name = "new"
+profile = "supply-chain-build"
+fact = "Generates a new project from a template; `--template` names a git repository and the default template is fetched from a remote repository."
+source = "https://rustwasm.github.io/wasm-pack/book/commands/new.html — `--template`"
+judgment = "The fetched template is code the resulting project builds and runs, so the network is supplying execution rather than data."
+standalone = ["--help", "-h"]
+valued = ["--mode", "-m", "--template"]
+
+[[command.sub]]
+name = "publish"
+profile = "remote-create"
+fact = "Packs the package and uploads it to the npm registry, creating a published version; `--access` selects public or restricted visibility."
+source = "https://rustwasm.github.io/wasm-pack/book/commands/publish.html"
+judgment = "A create on a remote locus. Publication is also irreversible in practice, since npm restricts unpublishing, but the archetype turns on the remote create; disclosure of the package contents rides on the same operation."
+standalone = ["--help", "-h"]
+valued = ["--access", "-a", "--pkg-dir", "-d", "--tag", "--target", "-t"]
+
+[[command.sub]]
+name = "login"
+profile = "credential-mint"
+fact = "Runs `npm login` to authenticate against a registry and stores the resulting auth token in the npm configuration."
+source = "https://rustwasm.github.io/wasm-pack/book/commands/login.html"
+judgment = "Secret-WRITING rather than secret-reading: it obtains new credential material and persists it, which is the mint side rather than the read side."
+standalone = ["--help", "-h"]
+valued = ["--auth-type", "-t", "--registry", "-r", "--scope", "-s"]
+
+# `pack` is local create — no network, no fetched execution — so no archetype applies; it sits
+# inside the ordinary band. It stays unlisted rather than being given a flag surface nobody read.
+[[command.sub]]
+name = "pack"
 candidate = true
