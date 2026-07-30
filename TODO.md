@@ -353,6 +353,39 @@ a fourth (`:/:`). The guard's corpus is now thirteen values spanning colons, tra
 bare names, and `worst_path_element_splits_only_a_list_and_never_a_url` pins the rule directly,
 including that splitting can only ever be STRICTER than judging whole.
 
+## Fuzz suite — four property targets live, two more specified
+
+Live in the nightly `property-targets` matrix, each with its own corpus so they accumulate
+independently: `equivalence`, `hook_envelope`, `explain_render`, `suggest_roundtrip`. Plus the
+original `parse` (availability) on its own sharded pipeline.
+
+What each ASSERTS beyond "did not crash", which is the whole point — `parse` discards the verdict,
+so it can only ever find hangs and panics:
+
+  equivalence        a semantics-preserving respelling cannot change the verdict
+  hook_envelope      a target never emits a grant it was not asked for
+  explain_render     the explanation describes the verdict that was ENFORCED; a command cannot
+                     manufacture a marker line; no control character or bidi override survives
+  suggest_roundtrip  every config we generate parses back, and merging never drops what was there
+
+First runs: explain_render 395k clean, suggest_roundtrip 295k clean, equivalence 111k clean,
+hook_envelope 899k clean. The two added earlier each found a real bug on day one.
+
+STILL WORTH ADDING, in value order:
+
+1. `config_load` — arbitrary bytes as a repo `.safe-chains.toml` and as `~/.claude/settings.json`.
+   Two properties: no panic (a panic here is a hook crash, which fails OPEN — one was fixed by hand
+   this session), and the TRUST invariant, that an unpinned repo config can never change a verdict.
+   This is the highest-value one left, because it is the only fuzzed input an attacker can place in
+   a repository.
+2. `level_monotonic` — for any command, the verdict at a stricter level must never be MORE
+   permissive than at a looser one (paranoid <= reader <= editor <= developer <= upper band).
+   Soundness of the level algebra against real command strings rather than synthesized capabilities,
+   which is what `engine/testgen.rs` already covers.
+3. `setup_merge` — arbitrary existing settings JSON through each target's `install`. Generalizes
+   `no_target_install_panics_or_clobbers_an_unreadable_config` from a table of shapes to a search;
+   that test was written after a real panic, so the class is proven live.
+
 ## Fuzzing finds availability bugs only — two targets worth adding
 
 State (2026-07-30): healthy and quiet. Nightly green five nights running (~5h, sharded), replay
