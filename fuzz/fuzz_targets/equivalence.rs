@@ -74,22 +74,11 @@ fn is_transparent(v: &str) -> bool {
         })
 }
 
-/// Divergences already found, triaged and left open. Recorded rather than silently tolerated, and
-/// the list may only shrink.
-///
-/// `:/:` — the flag gate (`path_gate` role `exec`) approves it, the environment gate
-/// (`shape = "exec-path"`) refuses. Two implementations of the same locus rule that part on one
-/// value. The flag side is the correct one (`:/:` is a RELATIVE path, a directory named `:`), so
-/// the env side is over-denying and this is fail-closed, which is why it is parked rather than
-/// fixed in a hurry. Found by this target on its first clean run; the hand-written twin guard
-/// missed it because that one tries three values and this needed a fourth.
-const KNOWN_DIVERGENCES: &[&str] = &[":/:"];
-
 fuzz_target!(|data: &[u8]| {
     let Ok(value) = std::str::from_utf8(data) else {
         return;
     };
-    if !is_transparent(value) || KNOWN_DIVERGENCES.contains(&value) {
+    if !is_transparent(value) {
         return;
     }
     for (left, right) in EQUIVALENT {

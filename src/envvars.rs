@@ -118,6 +118,12 @@ struct Entry {
     /// Gating one spelling and not the other is not a partial fix: the ungated spelling is a
     /// complete bypass, and the gated one reads as closed while it is not. Every executor flag
     /// gated in the registry was bypassable through its env twin until these were paired.
+    /// This variable holds ONE value, not a colon-separated list — a command like `BORG_RSH`,
+    /// not a search path like `PYTHONPATH`. Splitting such a value makes the env gate disagree
+    /// with the flag gate that judges the very same string. Opt-OUT because the reverse mistake
+    /// (a real list judged whole) is a fail-open.
+    #[serde(default)]
+    single_value: bool,
     #[allow(dead_code)] // read by the twin-pairing guard (cfg(test))
     #[serde(default)]
     twin_flag: Option<String>,
@@ -151,6 +157,7 @@ struct Table {
 #[derive(Clone)]
 pub(crate) struct Rule {
     pub(crate) shape: Shape,
+    pub(crate) single_value: bool,
     allowed: Vec<String>,
     path_flags: Vec<PathFlagEntry>,
 }
@@ -173,10 +180,10 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
             Some((pre, suf)) => {
                 assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
                 globs.push((pre.to_string(), suf.to_string(),
-                            Rule { shape: entry.shape, allowed: entry.allowed, path_flags: entry.path_flags }));
+                            Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags }));
             }
             None => {
-                exact.insert(name, Rule { shape: entry.shape, allowed: entry.allowed, path_flags: entry.path_flags });
+                exact.insert(name, Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags });
             }
         }
     }
@@ -222,8 +229,8 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     }
     match rule.shape {
         Shape::Command => crate::command_verdict(value),
-        Shape::ExecPath => exec_path_verdict(value),
-        Shape::DataPath => data_path_verdict(value),
+        Shape::ExecPath => exec_path_verdict(value, !rule.single_value),
+        Shape::DataPath => data_path_verdict(value, !rule.single_value),
         Shape::Opaque => Verdict::Denied,
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
     }
@@ -313,10 +320,12 @@ fn path_flag_match<'a>(
 /// A path flag's value, judged by the same rules the standalone shapes use — so `-cp ./lib` and
 /// `CLASSPATH=./lib` cannot disagree.
 fn gate_path(role: PathRole, path: &str) -> Verdict {
+    // These are the values of flags INSIDE an option-string (`JDK_JAVA_OPTIONS='-cp …'`), and the
+    // ones that carry paths are classpath-shaped, so they split like the standalone list shapes.
     match role {
-        PathRole::Read => data_path_verdict(path),
+        PathRole::Read => data_path_verdict(path, true),
         PathRole::Write => crate::engine::resolve::write_target_verdict(path),
-        PathRole::Exec => exec_path_verdict(path),
+        PathRole::Exec => exec_path_verdict(path, true),
     }
 }
 
@@ -339,26 +348,24 @@ fn flag_matches(token: &str, entry: &str) -> bool {
 ///
 /// A colon-separated list is judged by its WORST element: one attacker-controlled entry is enough,
 /// because the loader searches all of them.
-fn exec_path_verdict(value: &str) -> Verdict {
+fn exec_path_verdict(value: &str, split_list: bool) -> Verdict {
     // `execute_file_verdict` IS the executor-locus rule — the same function pathgate's `exec` role
     // uses for `cargo --manifest-path`. Reused rather than re-derived: an earlier cut compared
     // `classify_locus(p) <= Worktree` and admitted `/tmp`, because the locus ladder orders by the
     // blast radius of a WRITE (`temp` sits below `worktree`) and not by trust for EXECUTION.
-    worst_element(value, crate::engine::resolve::execute_file_verdict)
+    worst_element(value, crate::engine::resolve::execute_file_verdict, split_list)
 }
 
 /// A path read or written as DATA — the ordinary read locus, which already refuses credential and
 /// system paths while allowing the worktree.
-fn data_path_verdict(value: &str) -> Verdict {
-    worst_element(value, crate::engine::resolve::read_content_verdict)
+fn data_path_verdict(value: &str, split_list: bool) -> Verdict {
+    worst_element(value, crate::engine::resolve::read_content_verdict, split_list)
 }
 
-fn worst_element(value: &str, judge: fn(&str) -> Verdict) -> Verdict {
-    value
-        .split(':')
-        .filter(|s| !s.is_empty())
-        .map(judge)
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+/// Delegates to the ONE shared rule so the environment gate and the flag gate cannot drift apart
+/// again — they had separate copies and disagreed on `x:/tmp/evil`.
+fn worst_element(value: &str, judge: fn(&str) -> Verdict, split_list: bool) -> Verdict {
+    crate::engine::resolve::worst_path_element(value, judge, split_list)
 }
 
 #[cfg(test)]
@@ -375,6 +382,65 @@ mod tests {
             "LUA_INIT", "JULIA_LOAD_PATH", "JULIA_DEPOT_PATH", "R_PROFILE_USER",
         ] {
             assert!(shape_of(name).is_some(), "envvars.toml is missing a measured vector: {name}");
+        }
+    }
+
+    /// The shared list rule: split only when asked, and never split a URL.
+    #[test]
+    fn worst_path_element_splits_only_a_list_and_never_a_url() {
+        use crate::engine::resolve::{execute_file_verdict, worst_path_element};
+
+        // As a LIST, an out-of-workspace element condemns the whole value.
+        assert!(!worst_path_element("./ok:/tmp/evil", execute_file_verdict, true).is_allowed());
+        assert!(!worst_path_element("/tmp/evil:./ok", execute_file_verdict, true).is_allowed());
+        assert!(worst_path_element("./a:./b", execute_file_verdict, true).is_allowed());
+
+        // As a SINGLE value the same string is one filename, judged whole. This is what lets the
+        // env spelling agree with the flag spelling, which judges it the same way.
+        assert!(worst_path_element("x:/tmp/evil", execute_file_verdict, false).is_allowed());
+        assert!(!worst_path_element("x:/tmp/evil", execute_file_verdict, true).is_allowed());
+
+        // A URL is never a path list. Splitting `https://example.com` into `https` and
+        // `//example.com` denied every curl invocation in the suite.
+        for url in ["https://example.com", "http://a.b/c", "ssh://host/path"] {
+            assert!(
+                worst_path_element(url, execute_file_verdict, true).is_allowed()
+                    == worst_path_element(url, execute_file_verdict, false).is_allowed(),
+                "splitting changed the verdict for a URL: {url}"
+            );
+        }
+
+        // Splitting can only ever be STRICTER, never looser — the property that makes it the safe
+        // default for anything not explicitly marked single-valued.
+        for v in ["./a", "/tmp/x", "a:b", ":/:", "./ok:/etc/shadow", "x", "/", ".."] {
+            let split = worst_path_element(v, execute_file_verdict, true).is_allowed();
+            let whole = worst_path_element(v, execute_file_verdict, false).is_allowed();
+            assert!(!split || whole, "splitting was LOOSER than judging whole for {v:?}");
+        }
+    }
+
+    /// A variable declared `single_value` must not be split, and one that is not must be.
+    ///
+    /// The direction matters and is not symmetric: a real LIST judged whole is a fail-open
+    /// (`PYTHONPATH=/tmp/evil:/ok` matches no locus rule as one string), while a single value
+    /// split is merely stricter. So splitting is the default and `single_value` is the exception.
+    #[test]
+    fn list_variables_still_split_and_single_value_ones_do_not() {
+        for listy in ["PYTHONPATH", "CLASSPATH", "PERL5LIB", "RUBYLIB", "NODE_PATH"] {
+            assert!(
+                !assignment_verdict(listy, "/tmp/evil:./ok").is_allowed(),
+                "{listy} stopped splitting; an out-of-workspace element now rides in behind a prefix"
+            );
+        }
+        for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH"] {
+            assert!(
+                !assignment_verdict(single, "/tmp/evil").is_allowed(),
+                "{single} must still refuse a foreign executor"
+            );
+            assert!(
+                assignment_verdict(single, "ssh").is_allowed(),
+                "{single} must still accept a bare name on $PATH"
+            );
         }
     }
 
@@ -397,7 +463,13 @@ mod tests {
         let mut failures = Vec::new();
         for (name, flag_tmpl, base) in &twins {
             let mut verdicts = Vec::new();
-            for value in ["/tmp/evil", "./bin/tool", "ssh"] {
+            // Widened after the metamorphic fuzz target found a disagreement on `:/:` that the
+            // original three values missed. Three values was never a proof; these span the shapes
+            // that actually distinguish the two gates - colons, traversal, roots, bare names.
+            for value in [
+                "/tmp/evil", "./bin/tool", "ssh", ":/:", "x:/tmp/evil", "a:b", "..", "/",
+                "./a:./b", "~/.ssh/id_rsa", ".", "/etc/shadow", "sub/dir/tool",
+            ] {
                 let flag_form = flag_tmpl.replace("{v}", value);
                 let env_form = format!("{name}={value} {base}");
                 let by_flag = crate::is_safe_command(&flag_form);

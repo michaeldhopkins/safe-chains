@@ -76,6 +76,35 @@ pub(crate) fn write_target_verdict(path: &str) -> crate::verdict::Verdict {
     crate::engine::bridge::project(&Profile::of(vec![cap]))
 }
 
+/// Judge a path value, taking the WORST element when it is a colon-separated LIST.
+///
+/// The one place the list rule lives, so the environment gate and the flag gate cannot drift apart.
+/// They HAD drifted: the env gate always split on `:` while the flag gate never did, so
+/// `BORG_RSH=x:/tmp/evil` denied and `borg --rsh x:/tmp/evil` — the same operation — was approved.
+///
+/// Splitting is opt-OUT rather than opt-in, because the two mistakes are not symmetric. Treating a
+/// real list as one string is a FAIL-OPEN: `PYTHONPATH=/tmp/evil:/ok` read whole matches no locus
+/// rule and sails through. Treating a single value as a list is merely stricter. So a value splits
+/// unless its entry says it is a single value, and the entries that say so are commands
+/// (`BORG_RSH`, `RSYNC_RSH`) rather than search paths.
+///
+/// A URL is never split: `https://example.com` is not `https` plus `//example.com`, and splitting
+/// it denied every `curl` invocation in the suite.
+pub(crate) fn worst_path_element(
+    value: &str,
+    judge: fn(&str) -> crate::verdict::Verdict,
+    split_list: bool,
+) -> crate::verdict::Verdict {
+    let mut worst = judge(value);
+    if split_list && value.contains(':') && !value.contains("://") {
+        for element in value.split(':').filter(|s| !s.is_empty()) {
+            worst = worst.combine(judge(element));
+        }
+    }
+    worst
+}
+
+
 /// The verdict for EXECUTING the code in file `path` — used to gate an interpreter/runner's
 /// script operand (`bash x.sh`, `python x.py`, `node x.js`, `go run pkg/`) by its EXECUTOR
 /// locus. A worktree-local script is the dev loop → admitted at `developer`; a foreign one

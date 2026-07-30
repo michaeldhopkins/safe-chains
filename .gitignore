@@ -15,3 +15,10 @@ docs/src/includes/command-count.md
 docs/src/version-footer.js
 docs/book/
 .pstyle_dump.txt
+
+# Locally-generated corpora for the property targets. The nightly accumulates these through the
+# actions cache, one entry per target, so committing a few hundred hash-named inputs from a laptop
+# run adds noise without adding coverage.
+fuzz/corpus/equivalence/
+fuzz/corpus/hook_envelope/
+fuzz/artifacts/
