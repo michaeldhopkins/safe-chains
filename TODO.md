@@ -324,6 +324,35 @@ in the clear), `ssm --with-decryption` (decrypts SecureString values), `s3api --
 (supplies caller-held key material). Every family also withholds `--endpoint-url`, `--profile`,
 `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
 
+## Two new fuzz targets — BOTH found real bugs immediately, neither is wired into nightly yet
+
+Added 2026-07-30: `fuzz/fuzz_targets/equivalence.rs` and `fuzz/fuzz_targets/hook_envelope.rs`. Both
+build and run under `cargo +nightly fuzz run <target>`. Neither is in `.github/workflows/fuzz.yml`
+yet, because both are RED against genuine findings and a nightly that starts red gets ignored.
+
+WHAT THEY FOUND, within a minute each:
+
+1. `equivalence` — a CLASS of disagreements between the two implementations of the executor locus
+   rule: `path_gate` role `exec` (flag form) and envvars `shape = "exec-path"` (env form). First
+   example `borg --rsh :/:` approves while `BORG_RSH=:/: borg` refuses. Every case seen so far is
+   fail-CLOSED (the env side over-denies; `:/:` is a relative path, so the flag side is right), but
+   it is a class, not an edge case — parking values one at a time would be whack-a-mole and would
+   hide the signal. THE FIX IS TO UNIFY THE TWO GATES on one implementation, then enable the target.
+   Note what this says about the hand-written twin guard: it tries three values and passed. Three
+   values is not a proof.
+
+2. `hook_envelope` — cursor emits `permission: "allow"` for a BLANK command at the FORMAT layer.
+   The shipped binary is safe: the blank check added earlier sits in `main.rs` and was verified
+   end-to-end. But the invariant lives in the wrong place — `render_response` owns the decision
+   contract and knows nothing about blankness, so a second caller reintroduces the bug, and the
+   integration guard passes only because it drives the binary. Move the check into the format layer
+   (or into a shared entry point both go through), then enable the target.
+
+TO WIRE THEM UP once green: `.github/workflows/fuzz.yml` hardcodes `parse` in the build step, the
+artifact paths, the shard matrix, the corpus/dict paths and the coverage job. Parameterise those
+over a target matrix (`parse`, `equivalence`, `hook_envelope`); each target keeps its own corpus
+directory, so they accumulate coverage independently and adding both at once costs nothing extra.
+
 ## Fuzzing finds availability bugs only — two targets worth adding
 
 State (2026-07-30): healthy and quiet. Nightly green five nights running (~5h, sharded), replay

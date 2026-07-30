@@ -24,3 +24,17 @@ path = "fuzz_targets/parse.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "equivalence"
+path = "fuzz_targets/equivalence.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "hook_envelope"
+path = "fuzz_targets/hook_envelope.rs"
+test = false
+doc = false
+bench = false
