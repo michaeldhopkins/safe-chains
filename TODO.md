@@ -69,6 +69,35 @@ baseline invocation:
 All gated with role `exec`; `rsync -e ssh` (a bare name on $PATH) still approves, which is the form
 that actually matters. The guard now walks all four locations.
 
+SIXTH PASS (2026-07-29) — measured the surface; NO new defects. Recorded so nobody re-runs it.
+
+Scale of the gate surface: 1,604 commands, 14,669 valued-flag slots. 126 commands (7.9%) declare a
+path_gate; 343 flag slots (2.34%) are gated. So 14,326 flag values are ungated — but that number is
+NOT the exposure, and reading it as such would send the campaign in the wrong direction.
+
+WHY it is not the exposure. An unresearched command is capped at SafeWrite: local, no execution, no
+remote. A tool that merely READS an arbitrary path stays inside that cap, whatever the path — which
+is why `detekt ~/.ssh/id_rsa` and `journalctl --file ~/.ssh/id_rsa` approve and are not bugs. Note
+this is NOT a flag-vs-positional gap: the positional spelling approves too. Those commands simply
+have no path model, and do not need one.
+
+The bugs found in passes 1-5 were all ESCAPES from that cap — a flag value that gets EXECUTED. That
+is the predicate worth sweeping, not "ungated path".
+
+Swept clean this pass, both negative results worth keeping:
+  - Reader flags. 134 flags named --input/--file/--cert/--identity/... that take an ungated path.
+    Triaged: almost all are format names (`numfmt --from`), booleans (`terraform --input`), device
+    specs (`findmnt --source`) or intended use (`age --identity` reading an SSH key IS its purpose).
+    Reading a file into a parser is not disclosure; only content flowing OUT is.
+  - Content-to-model disclosure. jq -f, xargs -a, base64, xxd, column, expand, fold, nl, rev, tac,
+    paste, pr against ~/.ssh/id_rsa — every one denies, as does the `cat` control.
+  - Exfil (local secret to a remote). curl -T / -d @ / -F / --upload-file, scp, rsync remote,
+    aws s3 cp, gh release upload, http POST @, wget --post-file — all eleven deny.
+
+So the remaining campaign is bounded: find flag values that reach an EXECUTION sink. The two tags
+(`twin_flag`/`twin_base`, `CONFIG_IS_CODE`) cover the members already known. What neither does is
+DISCOVER new members — that is still the open mechanism, and the highest-value one left.
+
 FIFTH PASS (2026-07-29) — a TAG for the config-is-code class, plus one more finding.
 
 `marp --config-file` / `-c` (marp.config.js is JavaScript Node executes) and `--engine` (a JS module
