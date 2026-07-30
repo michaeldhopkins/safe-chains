@@ -15937,7 +15937,12 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 ### `wasm-pack`
 <p class="cmd-url"><a href="https://rustwasm.github.io/wasm-pack/book/commands.html">https://rustwasm.github.io/wasm-pack/book/commands.html</a></p>
 
+- **build**
 - **help**: Positional args accepted
+- **login**
+- **new**
+- **publish**
+- **test**
 - Allowed standalone flags: --help, --version, -h, -V
 
 ### `wasm-strip`
