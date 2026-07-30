@@ -61,3 +61,10 @@ path = "fuzz_targets/level_monotonic.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "config_load"
+path = "fuzz_targets/config_load.rs"
+test = false
+doc = false
+bench = false

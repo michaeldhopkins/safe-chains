@@ -371,20 +371,16 @@ so it can only ever find hangs and panics:
 First runs: explain_render 395k clean, suggest_roundtrip 295k clean, equivalence 111k clean,
 hook_envelope 899k clean. The two added earlier each found a real bug on day one.
 
-STILL WORTH ADDING, in value order:
+SIX property targets live now: equivalence, hook_envelope, explain_render, suggest_roundtrip,
+level_monotonic, config_load. First runs, all clean except the two that found real bugs on day one:
+explain_render 395k, suggest_roundtrip 295k, level_monotonic 160k, config_load 505k.
 
-1. `config_load` — arbitrary bytes as a repo `.safe-chains.toml` and as `~/.claude/settings.json`.
-   Two properties: no panic (a panic here is a hook crash, which fails OPEN — one was fixed by hand
-   this session), and the TRUST invariant, that an unpinned repo config can never change a verdict.
-   This is the highest-value one left, because it is the only fuzzed input an attacker can place in
-   a repository.
-2. `level_monotonic` — for any command, the verdict at a stricter level must never be MORE
-   permissive than at a looser one (paranoid <= reader <= editor <= developer <= upper band).
-   Soundness of the level algebra against real command strings rather than synthesized capabilities,
-   which is what `engine/testgen.rs` already covers.
-3. `setup_merge` — arbitrary existing settings JSON through each target's `install`. Generalizes
-   `no_target_install_panics_or_clobbers_an_unreadable_config` from a table of shapes to a search;
-   that test was written after a real panic, so the class is proven live.
+ONE LEFT — `setup_merge`: arbitrary existing settings JSON through each target's `install`.
+Generalizes `no_target_install_panics_or_clobbers_an_unreadable_config` from a table of shapes to a
+search. The class is proven live (a wrong-typed key panicked cursor's installer, and under
+--auto-detect that left every later tool uninstalled), but it is the last and least of these: the
+install path runs once at setup rather than on every command, so a panic there is loud rather than
+silently fail-open.
 
 ## Fuzzing finds availability bugs only — two targets worth adding
 

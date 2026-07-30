@@ -115,6 +115,28 @@ fn repo_is_trusted(repo_file: &Path, bytes: &[u8], trusted: &[TrustedEntry]) -> 
 /// Skipping the file fails SAFE: the custom definitions do not load, so nothing is widened, and the
 /// built-in registry keeps deciding. The message goes to stderr rather than stdout so it cannot be
 /// mistaken for a hook decision.
+/// Fuzz/test seam onto [`load_custom_file`]: how many command definitions a config SOURCE yields,
+/// and whether a repo-scoped load stripped an output claim.
+///
+/// Exposed because a repo `.safe-chains.toml` is the one input an attacker can place in a
+/// repository, and this is the function that reads it. It has already aborted the process once —
+/// `load_toml` panicked on a wrong-typed key, and since the hook is a PreToolUse hook, an abort
+/// means the harness proceeds, so an ordinary typo silently disabled safe-chains altogether. The
+/// filesystem path cannot be fuzzed because `CUSTOM_REGISTRY` is a `LazyLock` read once per
+/// process, so the seam takes the source directly.
+#[doc(hidden)]
+pub fn fuzz_load_config(source: &str, repo_scope: bool) -> usize {
+    let path = Path::new("<fuzz>");
+    let category = if repo_scope { "custom-project" } else { "custom-user" };
+    let specs = load_custom_file(source, category, path);
+    if repo_scope {
+        // Mirrors what `apply_custom` does for a repo file: an output claim never survives from a
+        // config the agent can write.
+        return specs.into_iter().map(repo_scoped).filter(|s| s.output.is_none()).count();
+    }
+    specs.len()
+}
+
 fn load_custom_file(source: &str, category: &str, path: &Path) -> Vec<CommandSpec> {
     // Check SYNTAX first, so the common failure — a typo — is reported without a panic at all.
     // `toml::Value` accepts any well-formed document, so this only rejects what `load_toml` would
@@ -203,6 +225,40 @@ mod tests {
     /// fail-OPEN: one typo in `~/.config/safe-chains.toml` aborted every invocation with exit 101,
     /// the hook included, and a crashed PreToolUse hook lets the harness proceed. So an ordinary
     /// mistake silently disabled safe-chains entirely.
+    /// A config that does not parse must load NOTHING — never a partial read.
+    ///
+    /// The unit-level counterpart to the `config_load` fuzz target. Loading "some" of a broken
+    /// config is how a half-parsed definition would widen the allowlist, and this function has
+    /// already aborted the process once on a wrong-typed key: as a PreToolUse hook, an abort means
+    /// the harness proceeds, so a typo in a config file silently disabled safe-chains entirely.
+    #[test]
+    fn a_config_that_does_not_parse_loads_nothing() {
+        // Malformed in several different ways, including the wrong-typed key that caused the abort.
+        for broken in [
+            "this is not valid toml [[[",
+            "[[command]]\nname = 12345\n",
+            "[[command]]\nname = \"x\"\nlevel = \"not-a-level\"\n",
+            "[[command]]\nname = \"x\"\nbehavior = { hook = \"no-such-hook\" }\n",
+            "\u{0}\u{1}\u{2}",
+            "[[command]]",
+        ] {
+            for repo_scope in [false, true] {
+                assert_eq!(
+                    super::fuzz_load_config(broken, repo_scope),
+                    0,
+                    "a broken config loaded definitions (repo_scope={repo_scope}): {broken:?}"
+                );
+            }
+        }
+        // Non-vacuity: a WELL-FORMED config does load, so the zeros above are not simply what this
+        // function always returns.
+        let good = "[[command]]\nname = \"fuzzprobe\"\nmax_positional = 1\nlevel = \"SafeWrite\"\n";
+        assert!(
+            super::fuzz_load_config(good, false) > 0,
+            "a valid config must load; otherwise the fail-safe assertions prove nothing"
+        );
+    }
+
     #[test]
     fn an_invalid_custom_config_is_skipped_not_fatal() {
         let path = Path::new("/tmp/does-not-matter.toml");
