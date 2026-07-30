@@ -15,9 +15,9 @@ standalone = [
     "--profile", "--progress",
     "--target", "--version",
     "--watch", "--watch-options-stdin",
-    "-c", "-d", "-h", "-j", "-o", "-t", "-v", "-w",
+    "-d", "-h", "-j", "-o", "-t", "-v", "-w",
 ]
-valued = [
+valued = ["-c", 
     "--config", "--config-name", "--entry",
     "--merge", "--name", "--node-env",
     "--output-clean", "--output-filename",
@@ -26,4 +26,5 @@ valued = [
 ]
 
 [command.path_gate]
-flags = { "--output-path" = "write" }
+# A webpack config is JavaScript that webpack EVALUATES, so `--config`/`-c` select code.
+flags = { "--output-path" = "write", "--config" = "exec", "-c" = "exec" }

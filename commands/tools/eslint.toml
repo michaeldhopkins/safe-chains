@@ -22,4 +22,6 @@ valued = [
 ]
 
 [command.path_gate]
-flags = { "--output-file" = "write" }
+# An eslint config is JavaScript (eslint.config.js / .eslintrc.js), and `--format` accepts a path
+# to a custom formatter MODULE, so both select code. A bare name (`-f json`) stays trusted.
+flags = { "--output-file" = "write", "--config" = "exec", "-c" = "exec", "--format" = "exec", "-f" = "exec" }

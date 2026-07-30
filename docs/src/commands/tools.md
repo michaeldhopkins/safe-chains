@@ -1917,8 +1917,8 @@ Aliases: `python`
 ### `webpack`
 <p class="cmd-url"><a href="https://webpack.js.org/api/cli/">https://webpack.js.org/api/cli/</a></p>
 
-- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -c, -d, -h, -j, -o, -t, -v, -w
-- Allowed valued flags: --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
+- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -d, -h, -j, -o, -t, -v, -w
+- Allowed valued flags: -c, --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
 - Bare invocation allowed
 
 ### `workon`

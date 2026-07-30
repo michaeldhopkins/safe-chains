@@ -21,4 +21,6 @@ valued = [
 ]
 
 [command.path_gate]
-flags = { "--output-file" = "write" }
+# stylelint.config.js is JavaScript, and `--formatter` accepts a path to a custom formatter
+# module. A bare name (`-f string`) resolves on $PATH-like rules and stays trusted.
+flags = { "--output-file" = "write", "--config" = "exec", "--formatter" = "exec", "-f" = "exec" }
