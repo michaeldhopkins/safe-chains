@@ -168,7 +168,7 @@ name = "deny"
 level = "Inert"
 bare = false
 standalone = [
-    "--all-features", "--help", "--no-default-features",
+    "--all-features", "--help", "--version", "--no-default-features",
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [

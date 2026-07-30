@@ -424,6 +424,23 @@ nothing against the bug class that actually dominates.
 
 Neither needs new machinery — `cargo fuzz` is already wired, sharded and merging corpora nightly.
 
+## `--version` is missing from 2,394 subs — a DECISION, not a sweep to run blind
+
+Surfaced 2026-07-30 triaging real captured commands: `cargo deny --version` prompted because the
+`deny` sub lists `--help`/`-h` and not `--version`. Fixed there, because cargo-deny genuinely
+supports it. The pattern is registry-wide: 2,394 subs accept `--help` but not `--version`.
+
+NOT swept, deliberately. The standing rule is to research a flag FOR the command in question rather
+than rule it safe across a CLI's subs — an omitted flag merely prompts, a wrongly-asserted one
+lies. `--version` is inert wherever it EXISTS, and asserting it where it does not mostly yields a
+usage error rather than an unsafe action, so the risk of a blanket add is low but not zero: a tool
+that treats an unknown flag as a positional would change behaviour.
+
+The decision to make: either (a) accept the residual and add `--version` wherever `--help` is
+already listed, on the argument that both are the same class of inert self-description, or (b) keep
+per-command research and let these prompt. Worth deciding once rather than meeting it one prompt at
+a time.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
