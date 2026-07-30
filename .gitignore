@@ -23,4 +23,5 @@ fuzz/corpus/equivalence/
 fuzz/corpus/hook_envelope/
 fuzz/corpus/explain_render/
 fuzz/corpus/suggest_roundtrip/
+fuzz/corpus/level_monotonic/
 fuzz/artifacts/
