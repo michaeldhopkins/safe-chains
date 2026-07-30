@@ -54,3 +54,10 @@ path = "fuzz_targets/suggest_roundtrip.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "level_monotonic"
+path = "fuzz_targets/level_monotonic.rs"
+test = false
+doc = false
+bench = false

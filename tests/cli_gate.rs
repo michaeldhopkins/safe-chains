@@ -172,3 +172,45 @@ fn suggest_refuses_a_config_it_cannot_parse() {
     assert!(after.contains("existing"), "the user's own entry must survive:\n{after}");
     assert!(after.contains("frobnicate"), "the generated entry must be added:\n{after}");
 }
+
+/// The levels must genuinely DISCRIMINATE, or the `level_monotonic` fuzz target is theatre.
+///
+/// That target asserts tightening never loosens a verdict — a property trivially satisfied if every
+/// level returns the same answer. This pins the staircase it explores: each step admits strictly
+/// more than the one below. If levels ever collapse into each other the fuzz target would keep
+/// passing while guarding nothing, and this fails instead.
+#[test]
+fn levels_admit_strictly_more_as_they_loosen() {
+    // (level, cat a file, write a file, remove a file, push to a remote)
+    const STAIRCASE: &[(&str, [bool; 4])] = &[
+        ("paranoid", [false, false, false, false]),
+        ("reader", [true, false, false, false]),
+        ("editor", [true, true, false, false]),
+        ("developer", [true, true, true, false]),
+        ("network-admin", [true, true, true, true]),
+    ];
+    const COMMANDS: [&str; 4] =
+        ["cat ./a.txt", "echo hi > ./a.txt", "rm ./a.txt", "git push origin main"];
+
+    let cwd = std::env::current_dir().expect("cwd");
+    let root = cwd.display().to_string();
+    for (level, expected) in STAIRCASE {
+        for (command, want) in COMMANDS.iter().zip(expected) {
+            let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+                .args(["--cwd", &root, "--root", &root, "--level", level, command])
+                .stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status()
+                .expect("run")
+                .code()
+                .unwrap_or(-1);
+            let allowed = code == 0;
+            assert_eq!(
+                allowed, *want,
+                "level `{level}` on `{command}`: expected allowed={want}, got {allowed}"
+            );
+        }
+    }
+}
+

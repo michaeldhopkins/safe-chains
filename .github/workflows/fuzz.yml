@@ -353,7 +353,7 @@ jobs:
     strategy:
       fail-fast: false # one target finding a bug must not cancel the other
       matrix:
-        target: [equivalence, hook_envelope, explain_render, suggest_roundtrip]
+        target: [equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic]
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@nightly
