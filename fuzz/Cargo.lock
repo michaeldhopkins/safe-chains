@@ -308,6 +308,7 @@ version = "0.0.0"
 dependencies = [
  "libfuzzer-sys",
  "safe-chains",
+ "serde_json",
  "toml 0.9.12+spec-1.1.0",
 ]
 

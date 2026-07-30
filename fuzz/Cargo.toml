@@ -11,6 +11,7 @@ cargo-fuzz = true
 libfuzzer-sys = "0.4"
 # The suggest target judges its own output by parsing it back.
 toml = "0.9"
+serde_json = "1"
 
 [dependencies.safe-chains]
 path = ".."
@@ -65,6 +66,13 @@ bench = false
 [[bin]]
 name = "config_load"
 path = "fuzz_targets/config_load.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "setup_merge"
+path = "fuzz_targets/setup_merge.rs"
 test = false
 doc = false
 bench = false
