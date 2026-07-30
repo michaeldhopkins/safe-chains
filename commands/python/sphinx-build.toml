@@ -24,3 +24,7 @@ valued = [
     "--warning-file",
     "-A", "-D", "-c", "-d", "-j", "-t", "-w",
 ]
+
+# `-c`/`--conf-dir` names the directory holding conf.py, which sphinx EXECUTES as Python.
+[command.path_gate]
+flags = { "--conf-dir" = "exec", "-c" = "exec" }

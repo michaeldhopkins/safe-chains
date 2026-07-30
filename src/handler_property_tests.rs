@@ -1082,6 +1082,17 @@ const EXECUTOR_FLAGS: &[(&str, &str)] = &[
     ("pip-sync --python-executable {p}", "pip-sync invokes it to install"),
     ("kustomize build --helm-command {p} ./k", "the helm executable kustomize shells out to"),
     ("steep check --steep-command {p}", "the steep executable the subcommand re-invokes"),
+    // Config-is-code: the flag name says "config", but the file is a PROGRAM the tool runs.
+    // No name rule can find these; each came from knowing the tool.
+    ("webpack -c {p}", "webpack.config.js is JavaScript webpack evaluates"),
+    ("webpack --config {p}", "same, long spelling"),
+    ("eslint -c {p} ./src", "eslint.config.js is JavaScript"),
+    ("eslint --config {p} ./src", "same, long spelling"),
+    ("stylelint --config {p} ./s", "stylelint.config.js is JavaScript"),
+    ("nox -f {p}", "a noxfile is Python nox imports and runs"),
+    ("nox --noxfile {p}", "same, long spelling"),
+    ("sphinx-build -c {p} ./d ./o", "the directory holding conf.py, executed as Python"),
+    ("mkdocs build -f {p}", "mkdocs.yml can declare `hooks:` Python modules"),
 ];
 
 proptest! {

@@ -69,6 +69,32 @@ baseline invocation:
 All gated with role `exec`; `rsync -e ssh` (a bare name on $PATH) still approves, which is the form
 that actually matters. The guard now walks all four locations.
 
+THIRD PASS (2026-07-29) — the part names cannot find, partly closed. The predicate that works for
+this half is the TOOL, not the flag: a build/task runner whose config file is CODE. Eight more were
+live, all confirmed with a working baseline:
+
+    webpack -c /tmp/evil.js            webpack.config.js is JavaScript webpack evaluates
+    webpack --config /tmp/evil.js
+    eslint -c /tmp/evil.js ./src       eslint.config.js is JavaScript
+    eslint --config /tmp/evil.js ./src
+    stylelint --config /tmp/evil.js    stylelint.config.js is JavaScript
+    nox -f /tmp/evil.py                a noxfile is Python nox imports and runs
+    sphinx-build -c /tmp/evil ./d ./o  the directory holding conf.py, executed as Python
+    mkdocs build -f /tmp/evil.yml      mkdocs.yml can declare `hooks:` Python modules
+
+All gated `exec`; the in-workspace and bare-name spellings still approve (`eslint -f json`,
+`stylelint -f string`). jest, vitest and cmake were already gated. make/just/ninja/rake/rollup/
+prettier/cypress/storybook/invoke/fab are not auto-approved at all, so they carry no exposure today
+— but each becomes a live question the moment any invocation of it is allowed.
+
+DELIBERATELY NOT GATED, having checked: `swc --config-file` (.swcrc is JSON swc never executes),
+`esbuild --tsconfig` (JSON, not executed), `mysqldump --init-command` (SQL run by the server).
+
+A SEPARATE BUG CLASS surfaced here and is NOT swept: webpack's `-c` was listed in `standalone`
+though it takes a value, so `webpack -c /tmp/evil.js` parsed the path as a POSITIONAL and escaped
+flag gating entirely. A valued flag mismodelled as a boolean defeats every flag-level gate we have.
+Nothing enumerates that mismatch today; it needs a pass of its own.
+
 STILL OPEN — the part names cannot find. Every flag above advertised itself (`-rsh`, `-command`,
 `-executable`). A flag whose name hides what it does is invisible to the ratchet: `vite --config`
 evaluates JavaScript and `sandbox-exec -f` picks the sandbox profile, and both were found only

@@ -16,3 +16,7 @@ valued = [
     "--sessions", "--tags",
     "-e", "-f", "-p", "-s", "-t",
 ]
+
+# A noxfile is Python that nox IMPORTS and runs.
+[command.path_gate]
+flags = { "--noxfile" = "exec", "-f" = "exec" }

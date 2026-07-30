@@ -11,3 +11,4 @@ cc d1e95758c27a60ea480b4b7a4243bdd0cbed1caaef487d507c7d7c3e87980c82 # shrinks to
 cc ddaaa600524ed64aa3466df77a864e7b10baa7c7b843220dba2efca81744137c # shrinks to template = "cat $(pwd)/$(fd d {p})", target = "/etc/hosts"
 cc 9a750fa0bd491e66dee71bf967d11c3541b06f1fd5201792512cc8be71b6e63e # shrinks to template = "awk '{print}' {p}", target = "~"
 cc 884089c7377e5ab6e0e311bd028b3748c8961a79697c4dee682e8826b4df979c # shrinks to case = ("borg --rsh {p} check repo", "borg runs it to reach the repository")
+cc 03d9dd21e12d4a248e28cac46f386350a126cdbf8cb3d63ed92bfe725a7cd65d # shrinks to case = ("webpack -c {p}", "webpack.config.js is JavaScript webpack evaluates")

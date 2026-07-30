@@ -41,3 +41,8 @@ candidate = true
 [[command.sub]]
 name = "get-deps"
 candidate = true
+
+# mkdocs.yml can declare `hooks:` naming Python modules that mkdocs imports and runs, so the
+# config file selects code rather than only data.
+[command.path_gate]
+flags = { "--config-file" = "exec", "-f" = "exec" }
