@@ -24,4 +24,5 @@ fuzz/corpus/hook_envelope/
 fuzz/corpus/explain_render/
 fuzz/corpus/suggest_roundtrip/
 fuzz/corpus/level_monotonic/
+fuzz/corpus/config_load/
 fuzz/artifacts/

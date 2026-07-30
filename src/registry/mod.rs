@@ -1,5 +1,6 @@
 mod build;
 mod custom;
+pub use custom::fuzz_load_config;
 mod dispatch;
 mod docs;
 mod policy;
