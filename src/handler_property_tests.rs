@@ -171,7 +171,18 @@ fn classifier_terminates_on_adversarial_input() {
         let _ = crate::cst::explain(&plain).render();
         start.elapsed()
     };
-    let budget = std::cmp::max(std::time::Duration::from_millis(1500), baseline * 8);
+    // FLOOR of 10s, not 1.5s. Two things make a tight wall-clock bound unreliable here, and both
+    // were observed rather than guessed: the calibration reads ~432ms when this test runs alone
+    // (it pays the one-time registry load) but ~27ms inside the full suite (already warm), so the
+    // floor decides in practice; and `cargo test` runs this in PARALLEL with the rest of the
+    // suite, so any entry can lose the CPU for a while through no fault of its own.
+    //
+    // 10s still does the job. What this guard catches is hangs and super-linear blow-ups — the
+    // `a$(a<(a` case ran over THIRTY seconds and an infinite loop never returns at all. The
+    // tighter 1.2-5.8s regressions are caught by the fuzz-corpus guard below, which is what that
+    // one is for. A bound that fails on slow or busy hardware catches nothing: it gets diagnosed
+    // as flaky and ignored, which is exactly what happened to this test earlier today.
+    let budget = std::cmp::max(std::time::Duration::from_secs(10), baseline * 8);
     let corpus: Vec<String> = vec![
         "(".repeat(n), ")".repeat(n), "$(".repeat(n / 2), "`".repeat(n),
         "\"".repeat(n), "'".repeat(n), "{".repeat(n), "}".repeat(n), "[".repeat(n),
