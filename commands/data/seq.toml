@@ -7,3 +7,15 @@ level = "Inert"
 bare = false
 standalone = ["--equal-width", "--help", "--version", "-V", "-h", "-w"]
 valued = ["--format", "--separator", "-f", "-s", "-t"]
+
+# Every word of a plain `seq` is a number, so no word can contain `/` — that is the `atom` claim,
+# and it is what lets `> "$SCRATCH/dx_$i.txt"` stay confined to its literal prefix.
+#
+# Three flags break it and all three are listed, because each one puts caller text into stdout:
+# `-s`/`--separator` sets what goes BETWEEN the numbers (`seq -s / 1 4` → `1/2/3/4`), `-t` sets the
+# terminator, and `-f`/`--format` is a printf format wrapping each number (`seq -f ../%g 1 4` →
+# `../1`, which traverses with no separator of its own). `-w` only pads with zeros, so it keeps the
+# claim.
+[command.output]
+locus_from = "atom"
+invalidated_by = ["--format", "--separator", "-f", "-s", "-t"]
