@@ -453,6 +453,49 @@ invocation is the one an unqualified `wasm-pack build` performs and that is what
 describe. `--panic-unwind` stays off the flag list either way: it installs a nightly toolchain,
 `rust-src` and the wasm32 target through rustup as a side effect of a build flag.
 
+## Confining an unpinnable path LEAF under a pinned prefix — foundation landed, 3 layers left
+
+Reported from real use: `for i in $(seq 1 4); do … > "$SCRATCH/dx_$i.txt"; done` prompts. The
+scratchpad is NOT the cause — direct reads/writes there approve, and `--session-id` correctly adds
+execution. The cause is that any unpinnable component collapses the whole path to unpinnable, and
+that is not scratchpad-specific: `echo hi > ./out/dx_$UNSET.txt` denies inside the worktree too.
+
+Today's behaviour is CORRECT under abstraction soundness — `$i` can be `../../etc`, so the
+abstraction denotes `/etc/…` and must deny. Allowing the idiom means narrowing what the abstraction
+can denote, never relaxing that rule.
+
+Two things must BOTH hold for a leaf to be confined:
+  - SHAPE: the interpolation is flanked by literal text inside its component (`dx_$i.txt`), so it
+    cannot BE `.` or `..`. Flanking alone is insufficient — `$i = ../../x` still traverses.
+  - SOURCE: the substitution's words are separator-free, so the interpolation cannot introduce a
+    `/`. `seq` prints integers; plain `ls` qualifies (filenames cannot contain `/`) but `ls -R`
+    does not, which is what `invalidated_by` already exists for.
+
+LANDED (this pass): `OutputLocus::Atom` + `locus_from = "atom"` in the registry schema, wired
+fail-CLOSED — the resolver returns `None` for it, so a declaration cannot widen anything, and
+`every_output_claim_is_bounded_by_its_roots` PANICS if any command declares it before the rest is
+built. The variant exists; nothing uses it yet, deliberately.
+
+REMAINING, in order:
+  1. PATH REPRESENTATION. `pathctx::resolve` / `is_unpinnable` flatten a path to a single
+     "unpinnable" bit. The CST still has the `WordPart`s, so the information exists — it has to
+     survive as (literal prefix, interpolated segments with flanking metadata) far enough for the
+     locus classifier to see the prefix.
+  2. LOOP BINDING. `for i in $(seq …)` binds the loop variable to the substitution, so the atom
+     claim has to flow through the loop-variable representative (`loop_reprs`) to reach `$i` in the
+     path.
+  3. FACET + LEVEL. `locus.binding` is `RemoteBinding` (remote-only) and cannot carry this; it
+     wants its own axis, roughly `locus.anchoring ∈ {literal, anchored, opaque}`, so `--explain`
+     can say WHY an anchored path was admitted and levels can decide which anchorings they take.
+
+SCOPE when building it: prefix must resolve to temp/scratchpad/worktree only (never home or
+system), and only `seq`-class sources at first. Because this widens a fail-closed rule, the
+soundness proof IS the deliverable: a proptest over an adversarial value corpus (`..`, `../..`,
+`a/b`, `/etc/passwd`, `.`, empty) asserting that nothing classified `anchored` ever resolves
+outside its prefix, plus an extension to the `path_admit` fuzz target.
+
+WORKAROUND meanwhile: `for i in 1 2 3 4` (literal items) already approves.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
