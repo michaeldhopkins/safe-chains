@@ -1243,6 +1243,13 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     }
 
     match rule.locus_from {
+        // An ATOM names no locus, so there is nothing to return here — a separator-free word is
+        // not a path and cannot stand in for one. Declaring `atom` therefore leaves a substitution
+        // exactly as unpinnable as it is today; the claim only pays off in the PATH layer, where a
+        // literal prefix plus a flanked atom leaf is confinable. Wiring that is the next slice
+        // (see TODO.md); until then this arm must stay `None` so the declaration cannot widen
+        // anything on its own.
+        OutputLocus::Atom => None,
         // The cwd is the workspace root by construction (the harness passes it), so `$(pwd)` is a
         // worktree path. `pathctx` is what decides whether the cwd itself escaped the root.
         OutputLocus::Cwd => Some(StageOutput::Locus(read_locus("."))),
@@ -2186,6 +2193,17 @@ mod tests {
             let Some(spec) = crate::registry::command_output_locus(name) else { continue };
             probed += 1;
             match spec.locus_from {
+                // `atom` is declared but NOT yet honoured: the resolver returns `None` for it, so
+                // it cannot make a substitution pinnable. The payoff needs the path layer (a
+                // literal prefix plus a flanked atom leaf is confinable), and until that exists a
+                // declaration would be inert at best and misleading at worst — it would read as a
+                // claim that is doing something. So nothing may declare it yet, and this fails the
+                // moment something does, which is the reminder to finish the wiring.
+                OutputLocus::Atom => panic!(
+                    "command '{name}' declares `locus_from = \"atom\"`, but the confinement layer \
+                     that gives it meaning is not built yet (see TODO.md). Until then the \
+                     declaration does nothing — the resolver returns None for it."
+                ),
                 OutputLocus::Operands => {
                     // `~` is here as a named case, not just inside HOT_PATHS, because it is the
                     // spelling that actually got through: it carries neither `/` nor `.`, so the

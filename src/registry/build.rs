@@ -867,7 +867,8 @@ fn lower_output(name: &str, o: Option<&TomlOutput>) -> Option<OutputSpec> {
         "operands" => OutputLocus::Operands,
         "cwd" => OutputLocus::Cwd,
         "stdin" => OutputLocus::Stdin,
-        other => panic!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin)"),
+        "atom" => OutputLocus::Atom,
+        other => panic!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin, atom)"),
     };
     Some(OutputSpec {
         locus_from,

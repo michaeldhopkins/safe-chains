@@ -776,6 +776,20 @@ pub(crate) enum OutputLocus {
     /// pipeline stage's. Only when the command has no path operand: `head f.txt` prints the
     /// contents of a file rather than filtering a stream, and contents are not paths.
     Stdin,
+    /// The output words are ATOMS: they carry no path separator, so splicing one into a path
+    /// cannot move which directory the path names. `seq` prints integers; `basename` prints a
+    /// single component by definition.
+    ///
+    /// This is a different KIND of claim from the others, which all answer "which locus does this
+    /// output name". An atom names no locus at all — the point is that it cannot CHANGE one. That
+    /// is what makes `for i in $(seq 1 4); do … > "$SP/dx_$i.txt"; done` confinable: the prefix is
+    /// literal, and an atom spliced into the leaf cannot escape it.
+    ///
+    /// Separator-freedom alone is not sufficient — an atom that IS a whole component could be
+    /// `..`. Confinement additionally requires the interpolation to be flanked by literal text
+    /// within its component, which is a property of the PATH, not of this declaration. See
+    /// `docs/design/behavioral-taxonomy-*` and the plan recorded in TODO.md.
+    Atom,
 }
 
 /// A named thin resolver hook for irreducible token logic a declaration can't express — a
