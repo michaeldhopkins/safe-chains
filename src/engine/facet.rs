@@ -179,6 +179,23 @@ ordinal_term! {
 }
 
 ordinal_term! {
+    /// How firmly a LOCAL path is pinned to the place it names — the local counterpart to
+    /// `Provenance`, which grades the same question for remote targets.
+    ///
+    /// A path built by interpolation (`$i`, `$(…)`) denotes whatever the value turns out to be, so
+    /// the classifier cannot read a region off it. `Opaque` is that case and is the fail-closed
+    /// worst. `Anchored` is the narrower one: the interpolation sits beside literal text inside its
+    /// own component AND its source cannot emit a separator, so the component is a filename
+    /// whatever the value is and the literal prefix decides the locus (`out/dx_$i.txt`). See
+    /// `neutralize_atoms` — that function is the only thing that can grant `Anchored`.
+    Anchoring {
+        Literal => "literal",    // every component spelled out
+        Anchored => "anchored",  // interpolated, but confined by a literal prefix and flanking
+        Opaque => "opaque",      // interpolated and unconstrained — could denote anything
+    }
+}
+
+ordinal_term! {
     /// Breadth of effect (v1.4 §2.2). Modifies `destroy` *and* `disclosure` (R23).
     Scale {
         Single => "single",
@@ -680,6 +697,7 @@ mod tests {
         assert_term_strings_roundtrip::<RemoteReach>();
         assert_term_strings_roundtrip::<RemoteBinding>();
         assert_term_strings_roundtrip::<Provenance>();
+        assert_term_strings_roundtrip::<Anchoring>();
         assert_term_strings_roundtrip::<Scale>();
         assert_term_strings_roundtrip::<RetrievalGranularity>();
         assert_term_strings_roundtrip::<Authority>();
@@ -707,6 +725,7 @@ mod tests {
         assert_zero_is_minimum::<LocalLocus>();
         assert_zero_is_minimum::<RemoteReach>();
         assert_zero_is_minimum::<Provenance>();
+        assert_zero_is_minimum::<Anchoring>();
         assert_zero_is_minimum::<Scale>();
         assert_zero_is_minimum::<RetrievalGranularity>();
         assert_zero_is_minimum::<Authority>();
