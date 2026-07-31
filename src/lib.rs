@@ -399,7 +399,13 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         if !outside {
             return None;
         }
-        let reason = if engine::resolve::reads_secret(&resolved) {
+        // Asked on the LITERAL structure, so an interpolated component cannot strip the credential
+        // warning off a path that plainly names one. `cat ~/.ssh/$(id)` was reported as merely
+        // "built by an interpolation" — offering to flank it, which can never help, while dropping
+        // the one sentence that matters — and the CONFINED spelling fell through to
+        // "outside the working directory", whose remedy is to GRANT the path. That advised the
+        // user to grant `~/.ssh` to make the prompt stop.
+        let reason = if engine::resolve::names_credential_store(&resolved) {
             ReachReason::Credential
         } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
             // Ahead of OutsideWorkspace because it is the more specific diagnosis of the SAME

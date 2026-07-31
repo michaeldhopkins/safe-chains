@@ -25,8 +25,8 @@ use capability::{
 };
 use flags::{walk_positionals, walk_value};
 use locus::{classify_locus, read_locus, write_locus};
-pub(crate) use locus::anchoring_of;
-pub(crate) use locus::{is_substitution_value, is_unpinnable, reads_secret};
+pub(crate) use locus::{anchoring_of, names_credential_store};
+pub(crate) use locus::{is_substitution_value, is_unpinnable};
 
 /// For `for VAR in ITEMS; do …$VAR…`, the representatives to bind `$VAR` to in the body: the
 /// worst-READ item and the worst-WRITE item of the list (they can differ, so a read and a

@@ -212,14 +212,6 @@ pub(crate) fn classify_locus(path: &str) -> LocalLocus {
     write_locus(path)
 }
 
-/// Whether reading `path` extracts a secret (a known credential store). Consumed by the
-/// secret-facet enrichment (follow-on); also drives the overreach nudge's credential-store wording.
-pub(crate) fn reads_secret(path: &str) -> bool {
-    let expanded = crate::pathctx::expand_vars(path, false);
-    let resolved = crate::pathctx::resolve(&expanded);
-    !is_unpinnable(&resolved) && classify_region(&resolved).reads_secret
-}
-
 /// Fail-closed guard (§0): a `$VAR` expansion, a `..` escape, or a COMMAND-substitution result
 /// (`$(…)` / backticks, which the CST evaluates to the `__SAFE_CHAINS_CMDSUB__` placeholder)
 /// could name ANYTHING, so no positive region classification is sound — worst-case to `machine`.
@@ -343,7 +335,7 @@ mod atom_backstop {
     /// `neutralize_atoms` runs first in `classify_one` and rewrites every sentinel, so the locus
     /// path never consults this — which is exactly why it needs its own test. The callers that DO
     /// depend on it are the ones that ask `is_unpinnable` directly without neutralizing first
-    /// (`reads_secret`, and the pathgate's operand test); for them a sentinel that read as an
+    /// (the pathgate's operand test, and the operands output claim); for them a sentinel read as an
     /// ordinary filename would be classified as a real path under whatever region it sits in.
     #[test]
     fn an_atom_sentinel_is_unpinnable_without_neutralization() {
@@ -358,6 +350,24 @@ mod atom_backstop {
             "the NEUTRALIZED form must be pinnable, or confinement could never pay off"
         );
     }
+}
+
+/// Whether the path's LITERAL structure names a credential store, whatever else in it is unknown.
+///
+/// The shield is a segment match on literal names, and in `cat ~/.ssh/$(id)` the `.ssh` is right
+/// there in the command the user typed — interpolating a sibling component does not make it less of
+/// a credential store. So this deliberately does NOT consult `is_unpinnable`.
+///
+/// That distinction matters if a secret FACET is ever built on top of the same region bit: a facet
+/// makes a positive claim about what a command does, and claiming "reads a credential" for a value
+/// nobody knows would be an invention, so a facet consumer wants the pinned question and should not
+/// reuse this one. A pin-guarded variant existed for exactly that reason and was deleted here
+/// rather than carried: its only caller was this nudge, and speculative dead code is how a
+/// half-built rule rots.
+pub(crate) fn names_credential_store(path: &str) -> bool {
+    let expanded = crate::pathctx::expand_vars(path, false);
+    let neutralized = neutralize_atoms(&expanded);
+    classify_region(&crate::pathctx::resolve(&neutralized)).reads_secret
 }
 
 /// How firmly `path` is pinned — the `Anchoring` face of the same analysis the locus uses.
@@ -496,12 +506,17 @@ mod tests {
     }
 
     #[test]
-    fn credential_stores_read_secret() {
-        assert!(reads_secret("~/.ssh/id_rsa"));
-        assert!(reads_secret("~/.aws/credentials"));
-        assert!(reads_secret("~/.gnupg/secring.gpg"));
-        assert!(!reads_secret("/etc/hosts")); // denied, but not a credential store
-        assert!(!reads_secret("notes.md"));
+    fn credential_stores_are_named_as_such() {
+        assert!(names_credential_store("~/.ssh/id_rsa"));
+        assert!(names_credential_store("~/.aws/credentials"));
+        assert!(names_credential_store("~/.gnupg/secring.gpg"));
+        assert!(!names_credential_store("/etc/hosts")); // denied, but not a credential store
+        assert!(!names_credential_store("notes.md"));
+        // The reason this function exists rather than the pin-guarded one it replaced: a literal
+        // shielded segment survives an interpolated sibling, in every spelling.
+        assert!(names_credential_store("~/.ssh/__SAFE_CHAINS_CMDSUB__"));
+        assert!(names_credential_store(&format!("~/.ssh/dx_{}.txt", crate::cst::eval::ATOM_SENTINEL)));
+        assert!(!names_credential_store("~/projects/other/__SAFE_CHAINS_CMDSUB__"));
     }
 
     use proptest::prelude::*;
