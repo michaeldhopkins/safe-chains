@@ -476,11 +476,24 @@ fail-CLOSED — the resolver returns `None` for it, so a declaration cannot wide
 `every_output_claim_is_bounded_by_its_roots` PANICS if any command declares it before the rest is
 built. The variant exists; nothing uses it yet, deliberately.
 
+REVISED PLAN for layer 1 (found while starting it — do not build the original):
+  `tagged_substitution` (resolve/locus.rs) ALREADY does what layer 1 was specified to build. A
+  substitution can carry a bounded locus as a `TAGGED_PREFIX` sentinel; the classifier swaps the
+  sentinel for `SUB_STANDIN` — "an ordinary relative name, so it contributes nothing of its own" —
+  classifies the residue normally, and takes the worse of the two. It already handles the cases the
+  original plan did not name: SEVERAL sentinels in one word, descent reaching a different rung than
+  the tag, and `$(pwd)/../..` climbing out of the tag entirely.
+  So the work is to teach that sentinel an ATOM claim, not to replumb `pathctx::resolve`. An atom
+  sentinel differs from a tagged one in what it asserts: not "the value lives at rung R" but "the
+  value cannot traverse" — no `/`, and not `.`/`..`. That makes it a claim about the SHAPE of the
+  residue, so the flanking test belongs at the same place, and the existing "a second unpinnable
+  piece re-opens the hole" rule is inherited rather than rewritten.
+  Verify before building: that `expand_vars`/`is_unpinnable` see the sentinel rather than a bare `$`
+  for a LOOP variable (the tagged path is exercised by `$(…)` in operand position, and the loop
+  binding in layer 2 is what has to put the sentinel there).
+
 REMAINING, in order:
-  1. PATH REPRESENTATION. `pathctx::resolve` / `is_unpinnable` flatten a path to a single
-     "unpinnable" bit. The CST still has the `WordPart`s, so the information exists — it has to
-     survive as (literal prefix, interpolated segments with flanking metadata) far enough for the
-     locus classifier to see the prefix.
+  1. PATH REPRESENTATION — see REVISED PLAN above; likely much smaller than written here.
   2. LOOP BINDING. `for i in $(seq …)` binds the loop variable to the substitution, so the atom
      claim has to flow through the loop-variable representative (`loop_reprs`) to reach `$i` in the
      path.
