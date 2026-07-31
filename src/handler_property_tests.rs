@@ -1357,6 +1357,47 @@ fn no_internal_sentinel_ever_reaches_a_human() {
     }
 }
 
+/// A credential store stays a credential store when part of the path is interpolated.
+///
+/// The shield is a SEGMENT match on literal names, so `.ssh` in `cat ~/.ssh/$(id)` is as plain as
+/// in `cat ~/.ssh/id_rsa`. Reporting it as merely "built by an interpolation" dropped the one
+/// sentence that matters and offered flanking, which can never lift a shielded segment — and the
+/// CONFINED spelling fell through to "outside the working directory", whose remedy is to grant the
+/// path, i.e. advising the user to grant `~/.ssh` to stop the prompt.
+///
+/// The second half of the table is what keeps this honest: an interpolated path that is NOT a
+/// credential store must still report the interpolation, or the fix has simply relabelled
+/// everything as a credential.
+#[test]
+fn an_interpolated_credential_path_still_warns_as_one() {
+    let home = std::env::var("HOME").unwrap_or_default();
+    if !home.starts_with('/') {
+        return;
+    }
+    let ws = format!("{home}/projects/scproj");
+    let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+        cwd: Some(ws.clone()),
+        root: Some(ws),
+        ..Default::default()
+    });
+    let credential = [
+        "cat ~/.ssh/id_rsa",
+        "cat ~/.ssh/$(id)",
+        "cat ~/.aws/$(id)",
+        "cat ~/.ssh/dx_$(seq 1 1).txt",
+        "cat ~/.ssh/$UNKNOWN",
+    ];
+    for cmd in credential {
+        let (_, reason) = crate::workspace_overreach(cmd).unwrap_or_else(|| panic!("{cmd}: expected a reach"));
+        assert_eq!(reason, crate::ReachReason::Credential, "{cmd}");
+    }
+    // Non-credential interpolations must NOT be relabelled.
+    for cmd in ["cat ~/projects/other/$(id)", "cat /etc/$(id)"] {
+        let (_, reason) = crate::workspace_overreach(cmd).unwrap_or_else(|| panic!("{cmd}: expected a reach"));
+        assert_eq!(reason, crate::ReachReason::Unconfined, "{cmd}");
+    }
+}
+
 const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "-", "1", "0004", "a", "..\u{2024}"];
 
 // `~` is deliberately ABSENT. A tilde only expands at the START of a word, so an interpolated `~`
