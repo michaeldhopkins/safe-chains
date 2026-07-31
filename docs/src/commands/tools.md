@@ -717,7 +717,7 @@ Aliases: `g++`, `cc`, `c++`
 
 - **analyze**: Flags: --help, --json, -h, -j. Valued: --config, --format
 - **format**: Flags: --check, --color, --help, --no-color, --write, -h, -w. Valued: --config
-- **lint**: Flags: --color, --fail-fast, --fix, --help, --no-color, --quiet, --verbose, -h, -q, -v. Valued: --config, --exclude, --format, --include
+- **lint**: Flags: --disable-failing, --fix, --fix-unsafely, --force, --github, --help, -h, --ignore-disable-comments, --init, --json, --no-custom-rules, --no-github, --simple, --upgrade, --version, -v. Valued: --config-file, -c, --fail-level, --format, --jobs, -j, --theme
 - **parse**: Flags: --help, --json, --no-color, -h, -j
 - Allowed standalone flags: --help, --version, -h, -V
 
