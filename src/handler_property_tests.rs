@@ -1293,6 +1293,54 @@ fn an_unconfined_interpolation_is_explained_as_such() {
     );
 }
 
+/// No INTERNAL substitution marker ever reaches a human, through any nudge.
+///
+/// The hook's `additionalContext` goes into the MODEL's context on the Claude and Qwen targets, and
+/// it was reporting `~/p/out/__SAFE_CHAINS_CMDSUB_ATOM__` for a command whose author wrote
+/// `$(seq 1 1)`. Two costs: a nudge naming a path the user cannot find in their own command is one
+/// they have no reason to trust, and an internal magic string in front of a model is a string the
+/// model can learn to emit.
+///
+/// Checked at BOTH layers — the renderer directly, and end-to-end through every `ReachReason` — so
+/// it cannot regress by a message being built some other way. Every sentinel spelling is covered,
+/// including a tagged one with a path descending from it.
+#[test]
+fn no_internal_sentinel_ever_reaches_a_human() {
+    let atom = crate::cst::eval::ATOM_SENTINEL;
+    let tagged = format!("{}WORKTREE__", crate::cst::eval::TAGGED_PREFIX);
+    let spellings = [
+        "__SAFE_CHAINS_CMDSUB__".to_string(),
+        atom.to_string(),
+        tagged.clone(),
+        format!("~/p/out/{atom}"),
+        format!("{tagged}/lib/x.rs"),
+        format!("~/p/{atom}/a/{tagged}"),
+    ];
+    for raw in &spellings {
+        let shown = crate::sanitize_display(raw);
+        assert!(
+            !shown.contains("SAFE_CHAINS_CMDSUB"),
+            "an internal sentinel survived rendering: {shown}"
+        );
+        assert!(shown.contains("$(\u{2026})"), "the sentinel was dropped instead of rendered: {shown}");
+    }
+    // Surrounding literal text must survive, or the nudge stops naming a recognizable path.
+    assert!(crate::sanitize_display(&format!("{tagged}/lib/x.rs")).ends_with("/lib/x.rs"));
+
+    for reason in [
+        crate::ReachReason::Credential,
+        crate::ReachReason::Unconfined,
+        crate::ReachReason::OutsideWorkspace,
+        crate::ReachReason::ForeignTemp,
+    ] {
+        let msg = reason.message(&format!("~/p/out/{atom}"));
+        assert!(
+            !msg.contains("SAFE_CHAINS_CMDSUB"),
+            "{reason:?} leaked an internal sentinel: {msg}"
+        );
+    }
+}
+
 const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "-", "1", "0004", "a", "..\u{2024}"];
 
 // `~` is deliberately ABSENT. A tilde only expands at the START of a word, so an interpolated `~`
