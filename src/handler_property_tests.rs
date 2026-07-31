@@ -1218,48 +1218,83 @@ proptest! {
 /// Separator-free values an atom source could emit, including the ones that traverse when they
 /// stand ALONE. `.` and `..` are the whole point: the atom claim does not exclude them — flanking
 /// is what makes them harmless — so a corpus without them would prove nothing.
-const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "~", "-", "1", "0004", "a", "..\u{2024}"];
+/// The confinement actually PAYS OFF — the reported idiom approves.
+///
+/// Its own guard, because the soundness property above is an implication and would be satisfied by
+/// a classifier that denied every substituted path. That is the failure this feature exists to fix,
+/// so it is asserted directly rather than left to follow from a one-sided property.
+#[test]
+fn the_reported_loop_idiom_approves() {
+    let ws = "/tmp/sc-atom-ws";
+    let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+        cwd: Some(ws.to_string()),
+        root: Some(ws.to_string()),
+        ..Default::default()
+    });
+    assert!(
+        is_safe_command("for i in $(seq 1 4); do echo hi > ./out/dx_$i.txt; done"),
+        "the loop idiom this feature exists for is still refused"
+    );
+    assert!(
+        !is_safe_command("for i in $(seq -s / 1 4); do echo hi > ./out/dx_$i.txt; done"),
+        "a separator-injecting flag must void the atom claim"
+    );
+}
+
+const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "-", "1", "0004", "a", "..\u{2024}"];
+
+// `~` is deliberately ABSENT. A tilde only expands at the START of a word, so an interpolated `~`
+// mid-component is the ordinary filename `~`, not the home directory — but the classifier refuses
+// that spelling anyway, conservatively. Including it made the property fail on the classifier being
+// STRICT about a literal rather than on an atom escaping, which is the opposite of what this
+// guards. `.` and `..` are the values that genuinely traverse and they carry the test.
 
 proptest! {
-    /// SOUNDNESS of the atom confinement: substituting ANY separator-free value into a FLANKED
-    /// component may not change where the write lands.
+    /// SOUNDNESS of the atom confinement: if a flanked atom is ADMITTED, then every value it
+    /// could take must land somewhere already admitted.
     ///
-    /// This is the proof obligation the whole feature rests on, because it widens a fail-closed
-    /// rule. The claim being checked is not "seq prints numbers" — it is the weaker, structural one
-    /// that a value with no `/` in it, sitting beside literal text, is just a filename. If that
-    /// holds, the literal prefix decides the locus and the interpolation cannot move it.
+    /// This is the proof obligation the feature rests on, because it widens a fail-closed rule.
+    /// Quantifying over ALL values is the whole point and was learned the hard way: comparing the
+    /// sentinel against ONE representative literal (`dx_1.txt`) passes happily while a different
+    /// value escapes, which is exactly how `./out/.$(seq 1 1)` — `.` beside an atom worth `.`,
+    /// spelling `..` — got admitted. A one-sided check against a benign witness proves nothing.
     ///
-    /// Stated as an EQUIVALENCE to the ordinary literal write rather than as "approves", so it
-    /// cannot pass by everything being denied — if the prefix is refused, the substituted form must
-    /// be refused too, and the test still has teeth.
+    /// The flanking text is generated too. Holding it fixed at `dx_`/`.txt` is what hid the same
+    /// bug: dots are the one literal that does NOT make a component into a filename, and no
+    /// alphanumeric corpus can express that.
     #[test]
     fn a_flanked_atom_never_moves_where_the_write_lands(
-        value in proptest::sample::select(ATOM_VALUES.to_vec()),
-        prefix in proptest::sample::select(vec!["./out", "sub/dir", "/etc", "~/.ssh"]),
+        // `.` and `out` are load-bearing: they sit ONE level inside the root, so a single `..`
+        // leaves the workspace. Deeper prefixes cannot expose the escape at all — `./out/..` is
+        // the workspace root, which is legitimately admitted, so a corpus of deep prefixes reports
+        // clean while the hole is wide open.
+        prefix in proptest::sample::select(vec![".", "out", "./out", "sub/dir", "/etc", "~/.ssh"]),
+        lead in proptest::sample::select(vec!["", ".", "..", "dx_", "a"]),
+        trail in proptest::sample::select(vec!["", ".", "..", ".txt", "b"]),
     ) {
-        let ws = "/tmp/sc-atom-ws";
+        prop_assume!(!(lead.is_empty() && trail.is_empty()));
+        // The workspace sits directly under HOME, not under a temp root. That placement is what
+        // gives the test teeth: escaping one level from a `/tmp` workspace lands in the temp root,
+        // which is itself writable, so every escape looked admitted-and-fine and the property
+        // passed while the hole was open. One level up from here is HOME, where a write is refused.
+        let home = std::env::var("HOME").unwrap_or_default();
+        prop_assume!(home.starts_with('/'));
+        let ws = format!("{home}/scproj");
         let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
-            cwd: Some(ws.to_string()),
-            root: Some(ws.to_string()),
+            cwd: Some(ws.clone()),
+            root: Some(ws),
             ..Default::default()
         });
-        let literal = is_safe_command(&format!("echo hi > {prefix}/dx_1.txt"));
-        let substituted = is_safe_command(&format!("echo hi > {prefix}/dx_{value}.txt"));
-        prop_assert_eq!(
-            literal, substituted,
-            "a flanked atom changed the verdict at `{}`: literal={}, value={:?}",
-            prefix, literal, value
-        );
-        // The two assertions above are about VALUES and hold whatever the classifier does with
-        // sentinels, so on their own they would pass with the confinement removed. This one ties
-        // the structural claim to the implementation: the SENTINEL form has to land where the
-        // literal it stands for lands — no better, and no worse.
-        let sentinel = is_safe_command(&format!("echo hi > {prefix}/dx_$(seq 1 1).txt"));
-        prop_assert_eq!(
-            literal, sentinel,
-            "the atom sentinel did not track its literal at `{}`",
-            prefix
-        );
+        if !is_safe_command(&format!("echo hi > {prefix}/{lead}$(seq 1 1){trail}")) {
+            return Ok(()); // refusing is always sound; only an ADMIT carries an obligation.
+        }
+        for value in ATOM_VALUES {
+            prop_assert!(
+                is_safe_command(&format!("echo hi > {prefix}/{lead}{value}{trail}")),
+                "a flanked atom was admitted at `{}/{}…{}`, but the value {:?} lands outside it",
+                prefix, lead, trail, value
+            );
+        }
     }
 
     /// The other half: an atom that is NOT flanked must never be admitted, whatever the prefix.

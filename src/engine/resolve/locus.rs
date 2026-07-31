@@ -306,7 +306,15 @@ fn neutralize_atoms(path: &str) -> Cow<'_, str> {
                 return comp.to_string();
             }
             let residue = comp.replace(atom, "");
-            if residue.is_empty() || residue.contains(crate::cst::eval::TAGGED_PREFIX) {
+            // The flanking text must contain something that is not a DOT. Dots are the one
+            // literal that does not make a component into a filename: `.` beside an atom whose
+            // value is `.` spells `..`, and `..` beside an empty atom already IS `..`. Both
+            // traverse with no separator anywhere, which is exactly what this was supposed to
+            // rule out — `./out/.$(seq 1 1)` was admitted before this test existed.
+            if residue.is_empty()
+                || residue.chars().all(|c| c == '.')
+                || residue.contains(crate::cst::eval::TAGGED_PREFIX)
+            {
                 return UNPINNABLE_MARK.to_string();
             }
             comp.replace(atom, SUB_STANDIN)
