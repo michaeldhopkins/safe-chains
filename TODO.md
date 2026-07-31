@@ -516,15 +516,40 @@ work fixed the `$i` half; the `$SCRATCH` half still denies, so the user's litera
 does not approve. `echo hi > "$SCRATCH/plain.txt"` denies on its own — no loop, no atom — which
 locates the residue in the PREFIX, not in anything the atom work touched.
 
-This is correct, not a bug: an unbound `$SCRATCH` could name anywhere, so under abstraction
-soundness it must deny, and the harness cannot know that the agent's `$SCRATCH` is the scratchpad it
-reported. The forms that DO work are the literal and relative prefixes: `./out/dx_$i.txt`,
+This is correct, not a bug. `$SCRATCH` is NOT a harness convention — Claude Code does not set it
+(the shell has `CLAUDE_JOB_DIR`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_EFFORT`; the scratchpad path is
+deliberately not exposed at all). So it is a variable the user or the agent defined locally, naming
+anywhere, and under abstraction soundness it must deny. The forms that DO work are the literal and relative prefixes: `./out/dx_$i.txt`,
 `/tmp/dx_$i.txt`.
 
-Candidate follow-up, needs research not a guess: `$TMPDIR` is POSIX-standard and always names a
-temp directory, so it is a legitimate `envvars.toml` classification in a way `$SCRATCH` is not.
-That would fix `"$TMPDIR/dx_$i.txt"` without asserting anything about arbitrary variables. Check
-what an unset/hostile `TMPDIR` implies before doing it.
+### Resolving a `$VAR` path prefix is UNSOUND — closed, do not reopen
+
+Two candidates were considered and both are dead: `$CLAUDE_PROJECT_DIR` (the harness names the
+project root, so why not use it) and `$TMPDIR` (POSIX standardizes what it means). The argument
+kills any variable, so it is written once here.
+
+1. Classifying `$VAR/rest` requires knowing VAR's value IN THE SHELL THAT RUNS THE COMMAND, and
+   safe-chains cannot know it. Reading its own environment is not the same question: the hook's
+   environment is not the agent's. MEASURED — the agent's Bash shell has `CLAUDE_JOB_DIR`,
+   `CLAUDE_CODE_SESSION_ID`, `CLAUDE_EFFORT` and NOT `CLAUDE_PROJECT_DIR`, which the docs list as
+   available to hooks. The variable the idea rested on is absent from the shell that would expand it.
+2. The failure mode is severe and does not degrade gracefully. An unset variable does not make the
+   path land somewhere else in the workspace — it makes it land at the ROOT:
+   `"$CLAUDE_PROJECT_DIR/out/x"` expands to `/out/x` (measured, not reasoned). So a wrong guess
+   turns a worktree write into a write at `/`.
+3. `$TMPDIR` dies to the same argument. It is set on this machine, but "happens to be set here" is
+   not a guarantee, and POSIX pinning its MEANING says nothing about its PRESENCE.
+4. `envvars.toml` was never the mechanism anyway. It classifies `VAR=value cmd` ASSIGNMENTS, where
+   the value is literally in the command string (`assignment_verdict(name, value)`). It does not
+   resolve `$VAR` expansions and adding that would be a different feature with this problem.
+
+Current behaviour — deny — is correct, and there is no sound relaxation available: the worst case of
+`$VAR/out/x` is unbounded, and even its best-known case `/out/x` denies on its own.
+
+What works instead: spell the prefix literally (`/tmp/dx_$i.txt`, `./out/dx_$i.txt`). The harness
+exposing the scratchpad path would be the real fix and Claude Code declined it
+(anthropics/claude-code#45745, "not planned"), which is why the session-id + path-shape recognition
+in `pathctx` exists at all.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
