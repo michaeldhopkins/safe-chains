@@ -1251,6 +1251,22 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     let token = Token::from_raw(name.clone());
     let canonical = crate::registry::canonical_name(token.command_name());
     let rule = crate::registry::command_output_locus(canonical)?;
+    // `--help` and `--version` replace the command's DATA output with prose, and EVERY output
+    // claim is a statement about the data. GNU `seq --help` prints
+    // `<https://www.gnu.org/software/coreutils/>` — slash-bearing words under an `atom` claim that
+    // says no word can contain a separator. Handled here rather than in each command's
+    // `invalidated_by` so it holds for claims that do not exist yet: the danger is not seq (whose
+    // help leaks only URLs, which as paths are relative) but the next atom source whose help
+    // prints `/etc/foo.conf`, which would hand an ABSOLUTE path to a caller told it was confined.
+    //
+    // Long forms only. `-h` and `-V` are not reliably help/version — `sort -h` is human-numeric
+    // sort — so treating them as informational would void real claims. A command whose OWN grammar
+    // maps a short flag to help lists it in `invalidated_by` (see seq).
+    //
+    // Not caught by the local install: macOS ships BSD seq, whose help is terse and slash-free.
+    if args.iter().any(|a| a == "--help" || a == "--version") {
+        return None;
+    }
     // A flag that changes what stdout CONTAINS (`fd -x cat {}` prints file bodies, `fd -l` prints
     // `ls -l` rows) voids the claim — the output is no longer a path at all.
     if args.iter().any(|a| flag_present(a, &rule.invalidated_by)) {
@@ -2193,6 +2209,37 @@ mod tests {
             // point at" — correctly see nothing.
             SubClaim::Atom => None,
         }
+    }
+
+    /// No output claim survives `--help` / `--version`, for EVERY command that declares one.
+    ///
+    /// Enumerated over the registry rather than spot-checked on seq, because the failure is a
+    /// property of what those flags DO — replace the command's data output with prose — and so it
+    /// applies to every claim, including ones added later. The prose routinely carries paths and
+    /// URLs: GNU `seq --help` prints `<https://www.gnu.org/software/coreutils/>` under an `atom`
+    /// claim asserting no word holds a separator.
+    ///
+    /// Missed by hand-probing because macOS ships BSD seq, whose help is terse and slash-free —
+    /// the local install disagreed with the upstream the claim is written against.
+    #[test]
+    fn no_output_claim_survives_a_help_or_version_flag() {
+        let mut probed = 0usize;
+        for name in crate::registry::toml_command_names() {
+            if crate::registry::command_output_locus(name).is_none() {
+                continue;
+            }
+            for flag in ["--help", "--version"] {
+                let line = format!("{name} {flag}");
+                let Some(script) = crate::cst::parse(&line) else { continue };
+                probed += 1;
+                assert!(
+                    substitution_claim(&script).is_none(),
+                    "`{line}` still carries an output claim, but --help/--version print prose \
+                     rather than the command's data, so the claim does not describe it"
+                );
+            }
+        }
+        assert!(probed > 0, "no command declares [command.output]; this guard would be vacuous");
     }
 
     /// Fail-closed, enumerated over the REGISTRY: every `[command.output]` claim is probed on a HOT
