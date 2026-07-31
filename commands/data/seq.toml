@@ -18,4 +18,8 @@ valued = ["--format", "--separator", "-f", "-s", "-t"]
 # claim.
 [command.output]
 locus_from = "atom"
-invalidated_by = ["--format", "--separator", "-f", "-s", "-t"]
+# `-h`/`-V` are here because seq's own grammar maps them to help/version, and GNU seq's help
+# prints `<https://www.gnu.org/software/coreutils/>` — slash-bearing words under a claim that says
+# there are none. The long forms are voided engine-wide; short spellings are per-command because
+# `-h` means human-readable elsewhere.
+invalidated_by = ["--format", "--separator", "--version", "-V", "-f", "-h", "-s", "-t"]
