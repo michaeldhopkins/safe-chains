@@ -360,6 +360,24 @@ mod atom_backstop {
     }
 }
 
+/// How firmly `path` is pinned — the `Anchoring` face of the same analysis the locus uses.
+///
+/// Reported rather than acted on: the locus already worst-cases an opaque path, so nothing here
+/// decides a verdict. What it buys is an accurate REASON. An unconfined interpolation used to be
+/// explained as "outside the working directory", which is both wrong and unactionable — `./out/$i`
+/// is not outside anything, and the remedy is to flank the interpolation, not to grant a path.
+pub(crate) fn anchoring_of(path: &str) -> crate::engine::facet::Anchoring {
+    use crate::engine::facet::Anchoring;
+    let neutralized = neutralize_atoms(path);
+    if is_unpinnable(&neutralized) {
+        Anchoring::Opaque
+    } else if neutralized.as_ref() != path {
+        Anchoring::Anchored
+    } else {
+        Anchoring::Literal
+    }
+}
+
 fn is_parent_escape(path: &str) -> bool {
     path == ".." || path.starts_with("../") || path.contains("/../") || path.ends_with("/..")
 }

@@ -238,6 +238,10 @@ pub enum ReachReason {
     /// `adjacent`, but its dotfiles/dotdirs are shielded.
     /// Genuinely above/outside the working directory.
     OutsideWorkspace,
+    /// A path built by an interpolation that nothing confines (`./out/$i`, `> $(cmd)`). It is not
+    /// outside anything — it names WHATEVER the value turns out to be, which is why it cannot be
+    /// admitted — so the remedy is to constrain the spelling, not to grant a directory.
+    Unconfined,
     /// A temp path that is NOT this session's scratchpad. Reading and writing it is fine; RUNNING
     /// code from it is not, because anonymous `/tmp` is where downloaded/foreign code lands. This
     /// is the one reach whose remedy is usually "that IS my working directory" — so the nudge says
@@ -301,6 +305,14 @@ impl ReachReason {
                  ~/.config/safe-chains.toml; a scratchpad the harness reports for this session is \
                  recognized automatically and needs no grant"
             ),
+            ReachReason::Unconfined => format!(
+                "the path `{path}` is built by an interpolation, so what it names depends on a \
+                 value that is not visible in the command — it could be anywhere, which is why it \
+                 cannot be auto-approved. If the interpolated part cannot contain a `/`, putting \
+                 literal text beside it in the same path component is enough to confine it: \
+                 `out/dx_$i.txt` is approved where `out/$i` is not, because the first is a \
+                 filename whatever `$i` holds and the second could be `..`"
+            ),
             ReachReason::OutsideWorkspace => match pathctx::cwd().map(|c| sanitize_display(&c)) {
                 Some(cwd) => format!(
                     "it reaches `{path}`, outside the working directory `{cwd}`. If the agent is \
@@ -345,6 +357,12 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         }
         let reason = if engine::resolve::reads_secret(&resolved) {
             ReachReason::Credential
+        } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
+            // Ahead of OutsideWorkspace because it is the more specific diagnosis of the SAME
+            // refusal, and the generic wording actively misleads here: it names a working-directory
+            // problem the user does not have and a remedy (grant the path) that cannot work,
+            // since the path is not a fixed path at all.
+            ReachReason::Unconfined
         } else {
             ReachReason::OutsideWorkspace
         };

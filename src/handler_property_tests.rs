@@ -1241,6 +1241,58 @@ fn the_reported_loop_idiom_approves() {
     );
 }
 
+/// The nudge names the ACTUAL reason an unconfined interpolation was refused.
+///
+/// `./out/$i` is not outside the working directory, so the generic wording described a problem the
+/// user does not have and offered a remedy — grant the path — that cannot work, because there is no
+/// fixed path to grant. Anchoring is what distinguishes the two, and this pins that the confined
+/// spelling is NOT diagnosed the same way.
+#[test]
+fn an_unconfined_interpolation_is_explained_as_such() {
+    use crate::engine::facet::Anchoring;
+    let home = std::env::var("HOME").unwrap_or_default();
+    if !home.starts_with('/') {
+        return;
+    }
+    let ws = format!("{home}/scproj");
+    let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+        cwd: Some(ws.clone()),
+        root: Some(ws),
+        ..Default::default()
+    });
+
+    assert_eq!(crate::engine::resolve::anchoring_of("out/$i"), Anchoring::Opaque);
+    // `anchoring_of` reads an EVALUATED path, which is the only form that can be anchored: a raw
+    // `$(…)` still carries a `$` and so is opaque like any other interpolation. The sentinel is
+    // what a confined substitution looks like by the time a path is classified.
+    let confined = format!("out/dx_{}.txt", crate::cst::eval::ATOM_SENTINEL);
+    assert_eq!(crate::engine::resolve::anchoring_of(&confined), Anchoring::Anchored);
+    let bare = format!("out/{}", crate::cst::eval::ATOM_SENTINEL);
+    assert_eq!(
+        crate::engine::resolve::anchoring_of(&bare),
+        Anchoring::Opaque,
+        "an UNFLANKED atom is not anchored — it can still be `.` or `..`"
+    );
+    assert_eq!(crate::engine::resolve::anchoring_of("out/dx_1.txt"), Anchoring::Literal);
+
+    // Two things this spelling has to get right, both learned by watching it return None:
+    // it is an OPERAND (the function walks words, and a redirect target is not one), and the
+    // interpolation is a SUBSTITUTION rather than a bare `$i`. An unbound variable evaluates to
+    // the empty string, so `./out/$i` becomes `./out/` — a perfectly ordinary path with nothing
+    // to report. Only a substitution survives evaluation as a sentinel. And the path is spelled
+    // ABSOLUTELY: this function deliberately skips relative worktree paths, so a relative
+    // unconfined path never reaches the nudge at all.
+    let (_, reason) = crate::workspace_overreach("cat ~/scproj/out/$(id)")
+        .expect("an unconfined read is a reach worth nudging about");
+    assert_eq!(reason, crate::ReachReason::Unconfined);
+
+    // The confined spelling is approved outright, so there is nothing to nudge about at all.
+    assert!(
+        crate::workspace_overreach("for i in $(seq 1 4); do cat ./out/dx_$i.txt; done").is_none(),
+        "a CONFINED read should not be reported as a path reach at all"
+    );
+}
+
 const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "-", "1", "0004", "a", "..\u{2024}"];
 
 // `~` is deliberately ABSENT. A tilde only expands at the START of a word, so an interpolated `~`
