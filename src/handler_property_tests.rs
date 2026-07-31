@@ -1215,6 +1215,73 @@ proptest! {
 }
 
 /// Credential-shield names that are SEGMENT-matched, so they bite at any depth in any project.
+/// Separator-free values an atom source could emit, including the ones that traverse when they
+/// stand ALONE. `.` and `..` are the whole point: the atom claim does not exclude them — flanking
+/// is what makes them harmless — so a corpus without them would prove nothing.
+const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "~", "-", "1", "0004", "a", "..\u{2024}"];
+
+proptest! {
+    /// SOUNDNESS of the atom confinement: substituting ANY separator-free value into a FLANKED
+    /// component may not change where the write lands.
+    ///
+    /// This is the proof obligation the whole feature rests on, because it widens a fail-closed
+    /// rule. The claim being checked is not "seq prints numbers" — it is the weaker, structural one
+    /// that a value with no `/` in it, sitting beside literal text, is just a filename. If that
+    /// holds, the literal prefix decides the locus and the interpolation cannot move it.
+    ///
+    /// Stated as an EQUIVALENCE to the ordinary literal write rather than as "approves", so it
+    /// cannot pass by everything being denied — if the prefix is refused, the substituted form must
+    /// be refused too, and the test still has teeth.
+    #[test]
+    fn a_flanked_atom_never_moves_where_the_write_lands(
+        value in proptest::sample::select(ATOM_VALUES.to_vec()),
+        prefix in proptest::sample::select(vec!["./out", "sub/dir", "/etc", "~/.ssh"]),
+    ) {
+        let ws = "/tmp/sc-atom-ws";
+        let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some(ws.to_string()),
+            root: Some(ws.to_string()),
+            ..Default::default()
+        });
+        let literal = is_safe_command(&format!("echo hi > {prefix}/dx_1.txt"));
+        let substituted = is_safe_command(&format!("echo hi > {prefix}/dx_{value}.txt"));
+        prop_assert_eq!(
+            literal, substituted,
+            "a flanked atom changed the verdict at `{}`: literal={}, value={:?}",
+            prefix, literal, value
+        );
+        // The two assertions above are about VALUES and hold whatever the classifier does with
+        // sentinels, so on their own they would pass with the confinement removed. This one ties
+        // the structural claim to the implementation: the SENTINEL form has to land where the
+        // literal it stands for lands — no better, and no worse.
+        let sentinel = is_safe_command(&format!("echo hi > {prefix}/dx_$(seq 1 1).txt"));
+        prop_assert_eq!(
+            literal, sentinel,
+            "the atom sentinel did not track its literal at `{}`",
+            prefix
+        );
+    }
+
+    /// The other half: an atom that is NOT flanked must never be admitted, whatever the prefix.
+    /// A whole component that is the substitution can BE `..`, so confinement must not reach it.
+    #[test]
+    fn an_unflanked_atom_is_never_admitted(
+        prefix in proptest::sample::select(vec!["./out", "sub/dir", ".", "out/deep"]),
+    ) {
+        let ws = "/tmp/sc-atom-ws";
+        let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some(ws.to_string()),
+            root: Some(ws.to_string()),
+            ..Default::default()
+        });
+        prop_assert!(
+            !is_safe_command(&format!("echo hi > {prefix}/$(seq 1 1)")),
+            "an unflanked atom was admitted under `{}`",
+            prefix
+        );
+    }
+}
+
 const SHIELD_ANYWHERE: &[&str] = &[".ssh", ".aws", ".gnupg", ".kube", ".docker", ".netrc"];
 
 proptest! {

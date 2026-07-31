@@ -18,6 +18,11 @@ const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
 /// latter can never fire on a declared substitution, nor vice versa.
 pub(crate) const TAGGED_PREFIX: &str = "__SAFE_CHAINS_CMDSUB_";
 
+/// The sentinel for a substitution whose every output word is separator-free (`seq 1 4`). It
+/// asserts a SHAPE, not a rung, so it is deliberately not spelled like a locus tag: nothing can
+/// mistake it for one and admit it by parsing.
+pub(crate) const ATOM_SENTINEL: &str = "__SAFE_CHAINS_CMDSUB_ATOM__";
+
 /// Expand a word to the literal words bash would produce, chiefly via UNQUOTED brace expansion
 /// (`{/etc/shadow,x}` → two words). Quoted / escaped / substituted parts are fixed (bash does not
 /// brace-expand inside quotes), so only `Lit` parts expand. The classifier checks EVERY produced
@@ -143,11 +148,16 @@ fn split_top_commas(s: &str) -> Vec<String> {
 /// The placeholder a substitution's value evaluates to: the bounded, locus-tagged form when the
 /// inner command declared what its stdout can name, else the opaque worst-cased one.
 fn sub_sentinel(inner: &super::Script) -> String {
-    match crate::engine::resolve::substitution_locus(inner) {
-        Some(locus) => {
+    use crate::engine::resolve::SubClaim;
+    match crate::engine::resolve::substitution_claim(inner) {
+        Some(SubClaim::Locus(locus)) => {
             use crate::engine::facet::FacetTerm;
             format!("{TAGGED_PREFIX}{}__", locus.as_str().to_uppercase().replace('-', "_"))
         }
+        // Shares the tagged shape so every "is this a substitution value" test keeps seeing it,
+        // but `ATOM` is not a locus term — `tagged_substitution` intercepts it before the term
+        // parse, and anything that does not intercept it fails closed via `is_unpinnable`.
+        Some(SubClaim::Atom) => ATOM_SENTINEL.to_string(),
         None => UNPINNABLE.to_string(),
     }
 }

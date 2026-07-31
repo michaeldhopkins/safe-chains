@@ -1202,7 +1202,7 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
 /// a fail-open: `echo` is inert and `$(echo /etc/shadow)` still names a credential file. So a
 /// command only gets an answer here if it has declared one (`[command.output]`); everything else
 /// stays unpinnable, exactly as before. See docs/design/behavioral-taxonomy-substitution-locus.md.
-pub(crate) fn substitution_locus(script: &crate::cst::Script) -> Option<LocalLocus> {
+pub(crate) fn substitution_claim(script: &crate::cst::Script) -> Option<SubClaim> {
     // A pipeline's VALUE is its last stage's stdout; the earlier stages feed it and are verdicted
     // separately as usual. Pass-through filters (`… | head -1`) emit a SUBSET of what they were
     // given, so walking back over them reaches the stage that actually produced the paths.
@@ -1211,7 +1211,10 @@ pub(crate) fn substitution_locus(script: &crate::cst::Script) -> Option<LocalLoc
     let mut idx = cmds.len().checked_sub(1)?;
     loop {
         match stage_output_locus(cmds.get(idx)?)? {
-            StageOutput::Locus(l) => return Some(l),
+            StageOutput::Locus(l) => return Some(SubClaim::Locus(l)),
+            // A pass-through filter emits a SUBSET of its input words, so it cannot turn an atom
+            // into something with a separator — the claim survives the filter unchanged.
+            StageOutput::Atom => return Some(SubClaim::Atom),
             StageOutput::PassThrough => idx = idx.checked_sub(1)?,
         }
     }
@@ -1219,8 +1222,19 @@ pub(crate) fn substitution_locus(script: &crate::cst::Script) -> Option<LocalLoc
 
 enum StageOutput {
     Locus(LocalLocus),
+    /// Every word of this stage's stdout is separator-free, so no word can BE a path.
+    Atom,
     /// This stage only filters; ask the stage before it.
     PassThrough,
+}
+
+/// What a `$(…)` is known to yield. Two different kinds of claim, which is why this is not an
+/// `Option<LocalLocus>`: a locus says the value NAMES something at a rung, an atom says the value
+/// names nothing at all and cannot traverse. The second is the weaker claim and the more useful
+/// one — it is what lets a literal prefix survive around an interpolated leaf.
+pub(crate) enum SubClaim {
+    Locus(LocalLocus),
+    Atom,
 }
 
 fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
@@ -1243,13 +1257,12 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     }
 
     match rule.locus_from {
-        // An ATOM names no locus, so there is nothing to return here — a separator-free word is
-        // not a path and cannot stand in for one. Declaring `atom` therefore leaves a substitution
-        // exactly as unpinnable as it is today; the claim only pays off in the PATH layer, where a
-        // literal prefix plus a flanked atom leaf is confinable. Wiring that is the next slice
-        // (see TODO.md); until then this arm must stay `None` so the declaration cannot widen
-        // anything on its own.
-        OutputLocus::Atom => None,
+        // An ATOM names no locus — a separator-free word is not a path and cannot stand in for
+        // one. It pays off in the PATH layer instead: a literal prefix around a FLANKED atom leaf
+        // is confinable, because the atom cannot introduce a `/` and the flanking rules out the
+        // leaf being `.` or `..`. Both halves of that are enforced in `locus::neutralize_atoms`;
+        // on its own this claim widens nothing, since an atom sentinel is `is_unpinnable`.
+        OutputLocus::Atom => Some(StageOutput::Atom),
         // The cwd is the workspace root by construction (the harness passes it), so `$(pwd)` is a
         // worktree path. `pathctx` is what decides whether the cwd itself escaped the root.
         OutputLocus::Cwd => Some(StageOutput::Locus(read_locus("."))),
@@ -2173,7 +2186,12 @@ mod tests {
     #[cfg(test)]
     fn sub_locus(line: &str) -> Option<LocalLocus> {
         let script = crate::cst::parse(line).expect("parses");
-        substitution_locus(&script)
+        match substitution_claim(&script)? {
+            SubClaim::Locus(l) => Some(l),
+            // An atom names no locus, so these callers — which ask "which rung does this value
+            // point at" — correctly see nothing.
+            SubClaim::Atom => None,
+        }
     }
 
     /// Fail-closed, enumerated over the REGISTRY: every `[command.output]` claim is probed on a HOT
@@ -2193,17 +2211,42 @@ mod tests {
             let Some(spec) = crate::registry::command_output_locus(name) else { continue };
             probed += 1;
             match spec.locus_from {
-                // `atom` is declared but NOT yet honoured: the resolver returns `None` for it, so
-                // it cannot make a substitution pinnable. The payoff needs the path layer (a
-                // literal prefix plus a flanked atom leaf is confinable), and until that exists a
-                // declaration would be inert at best and misleading at worst — it would read as a
-                // claim that is doing something. So nothing may declare it yet, and this fails the
-                // moment something does, which is the reminder to finish the wiring.
-                OutputLocus::Atom => panic!(
-                    "command '{name}' declares `locus_from = \"atom\"`, but the confinement layer \
-                     that gives it meaning is not built yet (see TODO.md). Until then the \
-                     declaration does nothing — the resolver returns None for it."
-                ),
+                // An `atom` claim is that no output word can contain a separator, so the check is
+                // the claim: run the command's OWN examples and read what they would print. A
+                // command whose examples emit a `/` is mis-declared, and the consequence is not
+                // subtle — the confinement layer treats the value as unable to leave its
+                // component, so a separator would let it walk anywhere the prefix can reach.
+                //
+                // Enumerated over the registry rather than spot-checked, because the next command
+                // to declare `atom` gets this for free, which is the only way a data-driven claim
+                // stays honest as the data grows.
+                // An `atom` claim cannot be checked the way the others can. The rest are probed by
+                // asking the resolver where a HOT root lands, but "no output word contains a
+                // separator" is a fact about the TOOL, and the only mechanical way to confirm it
+                // would be to run the command — which a unit test must not do for arbitrary
+                // registry entries.
+                //
+                // So this is a REVIEW gate, not a proof: the claim has to be argued per command,
+                // and a new declaration fails here until someone does that and adds it. What makes
+                // it worth having is the failure mode it guards — an atom is treated as unable to
+                // leave its path component, so a tool that CAN emit a `/` would let the value walk
+                // anywhere its prefix reaches. `seq`'s argument is in its TOML: numbers only, with
+                // the three flags that inject caller text (`-s`, `-t`, `-f`) in `invalidated_by`.
+                //
+                // The soundness of the confinement ITSELF — that a separator-free value beside
+                // literal text cannot escape — is proved separately, by
+                // `a_flanked_atom_never_moves_where_the_write_lands`.
+                OutputLocus::Atom => {
+                    const ARGUED: &[&str] = &["seq"];
+                    assert!(
+                        ARGUED.contains(&name),
+                        "command '{name}' declares `locus_from = \"atom\"`, which asserts that no \
+                         word it prints can contain a separator. That cannot be checked here \
+                         without running the command, so it must be argued in the command's TOML \
+                         (what it prints, and which flags reshape it into `invalidated_by`) and \
+                         then listed in ARGUED."
+                    );
+                }
                 OutputLocus::Operands => {
                     // `~` is here as a named case, not just inside HOT_PATHS, because it is the
                     // spelling that actually got through: it carries neither `/` nor `.`, so the

@@ -105,6 +105,10 @@ fn classify_one(path: &str, want_write: bool) -> LocalLocus {
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
     let expanded = crate::pathctx::expand_vars(path, want_write);
 
+    // An atom sentinel is `is_unpinnable` by default, so this is the ONLY thing that can neutralize
+    // one — and it does so only where the atom is flanked by literal text in its own component.
+    let expanded = Cow::Owned(neutralize_atoms(&expanded).into_owned());
+
     // A declared substitution's locus rides in its sentinel, and the sentinel can enter the path at
     // TWO points. Both are checked, and the worst wins along with the ordinary classification of
     // whatever surrounds it — the tag bounds where the substitution's own VALUE points and says
@@ -223,7 +227,15 @@ pub(crate) fn reads_secret(path: &str) -> bool {
 /// and auto-approves `rm -rf /`. (Process substitution is a pipe whose inner command is checked
 /// separately, so its distinct placeholder is NOT worst-cased here.)
 pub(crate) fn is_unpinnable(path: &str) -> bool {
-    path.contains('$') || path.contains("__SAFE_CHAINS_CMDSUB__") || is_parent_escape(path)
+    path.contains('$')
+        || path.contains("__SAFE_CHAINS_CMDSUB__")
+        || path.contains(crate::cst::eval::ATOM_SENTINEL)
+        // An atom sentinel that reached here UNNEUTRALIZED is one `neutralize_atoms` did not
+        // confine, or a path that never went through it. Either way its value is unknown text, so
+        // it worst-cases exactly like an opaque substitution. This is what keeps the atom claim
+        // from widening anything by itself.
+        
+        || is_parent_escape(path)
 }
 
 /// The locus carried by a BOUNDED substitution sentinel, plus the path to classify in its place.
@@ -269,6 +281,41 @@ fn tagged_substitution(path: &str) -> Option<(LocalLocus, String)> {
 
 const UNPINNABLE_MARK: &str = "__SAFE_CHAINS_CMDSUB__";
 
+/// Turn a CONFINED atom sentinel into an ordinary path component, and worst-case every other one.
+///
+/// An atom claim is that the value is separator-free — so it cannot introduce a `/` and cannot
+/// reach out of the component it sits in. That alone is not enough: a whole component that IS the
+/// atom can still be `.` or `..`, which traverses without any separator of its own. Literal text
+/// beside it in the same component rules that out, since `..` plus any other character is just a
+/// filename. Both conditions are required, which is why this works per COMPONENT rather than over
+/// the whole path.
+///
+/// The flanking must be LITERAL. Another sentinel next door is not evidence — two adjacent atoms
+/// spell `..` between them (`$i$j` with `i=j="."`), and a locus tag says where its own value points,
+/// not that the surrounding component is safe. So a component holding an atom plus any other
+/// sentinel fails closed rather than counting the neighbour as flanking.
+fn neutralize_atoms(path: &str) -> Cow<'_, str> {
+    let atom = crate::cst::eval::ATOM_SENTINEL;
+    if !path.contains(atom) {
+        return Cow::Borrowed(path);
+    }
+    let out = path
+        .split('/')
+        .map(|comp| {
+            if !comp.contains(atom) {
+                return comp.to_string();
+            }
+            let residue = comp.replace(atom, "");
+            if residue.is_empty() || residue.contains(crate::cst::eval::TAGGED_PREFIX) {
+                return UNPINNABLE_MARK.to_string();
+            }
+            comp.replace(atom, SUB_STANDIN)
+        })
+        .collect::<Vec<_>>()
+        .join("/");
+    Cow::Owned(out)
+}
+
 /// Whether `path` carries a command-substitution sentinel of ANY kind — the opaque one
 /// `is_unpinnable` worst-cases, or a bounded tagged one. (`TAGGED_PREFIX` is a prefix of the opaque
 /// marker too, so one test covers both.)
@@ -279,6 +326,30 @@ const UNPINNABLE_MARK: &str = "__SAFE_CHAINS_CMDSUB__";
 /// pinnable — which let `asciidoctor -o $(fd a /etc)` ship its write ungated.
 pub(crate) fn is_substitution_value(path: &str) -> bool {
     path.contains(crate::cst::eval::TAGGED_PREFIX)
+}
+
+#[cfg(test)]
+mod atom_backstop {
+    /// The atom sentinel must be unpinnable ON ITS OWN.
+    ///
+    /// `neutralize_atoms` runs first in `classify_one` and rewrites every sentinel, so the locus
+    /// path never consults this — which is exactly why it needs its own test. The callers that DO
+    /// depend on it are the ones that ask `is_unpinnable` directly without neutralizing first
+    /// (`reads_secret`, and the pathgate's operand test); for them a sentinel that read as an
+    /// ordinary filename would be classified as a real path under whatever region it sits in.
+    #[test]
+    fn an_atom_sentinel_is_unpinnable_without_neutralization() {
+        let atom = crate::cst::eval::ATOM_SENTINEL;
+        assert!(super::is_unpinnable(atom), "a bare atom sentinel must fail closed");
+        assert!(
+            super::is_unpinnable(&format!("~/.ssh/dx_{atom}.txt")),
+            "an un-neutralized atom must fail closed wherever it appears"
+        );
+        assert!(
+            !super::is_unpinnable(&format!("~/.ssh/dx_{}.txt", super::SUB_STANDIN)),
+            "the NEUTRALIZED form must be pinnable, or confinement could never pay off"
+        );
+    }
 }
 
 fn is_parent_escape(path: &str) -> bool {
