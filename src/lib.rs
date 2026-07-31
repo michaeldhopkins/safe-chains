@@ -279,7 +279,10 @@ pub enum ReachReason {
 ///
 /// Covers every sentinel spelling at once — opaque, atom, and the locus-tagged forms — by keying
 /// on the shared prefix and consuming through the terminating `__`, so a sentinel added later is
-/// rendered without touching this. A malformed one drops its tail rather than echoing internals.
+/// rendered without touching this. Text that merely LOOKS like a sentinel keeps its tail — only
+/// the marker itself is replaced — because what follows a bare prefix is the user's path, not our
+/// internals, and dropping it handed a crafted filename control over how much of the path the
+/// reader saw.
 fn render_sentinels(s: &str) -> std::borrow::Cow<'_, str> {
     let prefix = cst::eval::TAGGED_PREFIX;
     if !s.contains(prefix) {
@@ -291,7 +294,18 @@ fn render_sentinels(s: &str) -> std::borrow::Cow<'_, str> {
         out.push_str(&rest[..at]);
         out.push_str("$(…)");
         let after = &rest[at + prefix.len()..];
-        rest = after.find("__").map_or("", |i| &after[i + 2..]);
+        rest = if let Some(tail) = after.strip_prefix('_') {
+            // The opaque marker is the prefix plus a single `_`.
+            tail
+        } else if let Some(i) = after.find("__") {
+            // Atom and locus-tagged markers are the prefix, a term, then `__`.
+            &after[i + 2..]
+        } else {
+            // Not one of ours. Keep the text: dropping it let a CRAFTED filename decide how much
+            // of the path a human was shown — `cat ~/__SAFE_CHAINS_CMDSUB_.ssh/id_rsa` reported
+            // reaching `~/$(…)`, hiding `.ssh/id_rsa` from the one message used to decide.
+            after
+        };
     }
     out.push_str(rest);
     std::borrow::Cow::Owned(out)

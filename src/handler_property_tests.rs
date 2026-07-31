@@ -1327,6 +1327,22 @@ fn no_internal_sentinel_ever_reaches_a_human() {
     // Surrounding literal text must survive, or the nudge stops naming a recognizable path.
     assert!(crate::sanitize_display(&format!("{tagged}/lib/x.rs")).ends_with("/lib/x.rs"));
 
+    // Text that only LOOKS like a sentinel must keep its tail. Dropping it let a crafted filename
+    // choose how much of the path a human was shown: `~/__SAFE_CHAINS_CMDSUB_.ssh/id_rsa` was
+    // reported as reaching `~/$(…)`, with `.ssh/id_rsa` silently removed from the nudge.
+    for (raw, must_keep) in [
+        ("~/__SAFE_CHAINS_CMDSUB_.ssh/id_rsa", ".ssh/id_rsa"),
+        ("/etc/__SAFE_CHAINS_CMDSUB_shadow", "shadow"),
+        ("__SAFE_CHAINS_CMDSUB__/etc/shadow", "/etc/shadow"),
+    ] {
+        let shown = crate::sanitize_display(raw);
+        assert!(
+            shown.ends_with(must_keep),
+            "a crafted sentinel-lookalike truncated the reported path: {raw} -> {shown}"
+        );
+        assert!(!shown.contains("SAFE_CHAINS_CMDSUB"), "leaked while preserving the tail: {shown}");
+    }
+
     for reason in [
         crate::ReachReason::Credential,
         crate::ReachReason::Unconfined,
