@@ -509,6 +509,23 @@ outside its prefix, plus an extension to the `path_admit` fuzz target.
 
 WORKAROUND meanwhile: `for i in 1 2 3 4` (literal items) already approves.
 
+## Atom confinement — the `$SCRATCH` half is NOT fixed (found in adversarial review)
+
+The reported command was `for i in $(seq 1 4); do … > "$SCRATCH/dx_$i.txt"; done`. The confinement
+work fixed the `$i` half; the `$SCRATCH` half still denies, so the user's literal command STILL
+does not approve. `echo hi > "$SCRATCH/plain.txt"` denies on its own — no loop, no atom — which
+locates the residue in the PREFIX, not in anything the atom work touched.
+
+This is correct, not a bug: an unbound `$SCRATCH` could name anywhere, so under abstraction
+soundness it must deny, and the harness cannot know that the agent's `$SCRATCH` is the scratchpad it
+reported. The forms that DO work are the literal and relative prefixes: `./out/dx_$i.txt`,
+`/tmp/dx_$i.txt`.
+
+Candidate follow-up, needs research not a guess: `$TMPDIR` is POSIX-standard and always names a
+temp directory, so it is a legitimate `envvars.toml` classification in a way `$SCRATCH` is not.
+That would fix `"$TMPDIR/dx_$i.txt"` without asserting anything about arbitrary variables. Check
+what an unset/hostile `TMPDIR` implies before doing it.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
