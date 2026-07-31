@@ -582,15 +582,20 @@ pub(crate) fn declared_region_paths() -> Vec<String> {
     file.region.into_iter().map(|r| r.path).collect()
 }
 
-pub(crate) fn is_hidden_peer(path: &str) -> bool {
-    matches!(peer_kind(path), PeerKind::Hidden)
-}
-
 enum PeerKind {
-    /// A peer project's ordinary file — earns `adjacent`.
+    /// A peer project's file — earns `adjacent`.
+    ///
+    /// Hidden components used to split off a `Hidden` variant here, shielding a peer's `.env`,
+    /// `.github` and so on. Removed after a fortnight of real use: it fired constantly on ordinary
+    /// committed content (`.github/workflows`, `.vscode`, `.cargo/config.toml`) while the things it
+    /// was reaching for — `.ssh`, `.aws`, `.netrc`, `~/.config/gh` — are named by the credential
+    /// shield, which is segment-matched and bites at any depth in any project. Hidden-ness was a
+    /// second, structural vote on secrecy layered over a shield that already names what is secret,
+    /// and it disagreed with the first vote far more often than it added to it.
+    ///
+    /// What this did give up: a peer's `.env`, `.npmrc` and `.git/config` are now readable — as the
+    /// SAME files already were in the workspace the agent is rooted at.
     Ordinary,
-    /// Under the common parent, would be `adjacent`, but a hidden component shields it.
-    Hidden,
     /// Not a co-located peer at all (fails a structural guard).
     NotPeer,
 }
@@ -632,10 +637,7 @@ fn peer_kind(path: &str) -> PeerKind {
     if path == root || path.strip_prefix(root).is_some_and(|r| r.starts_with('/')) {
         return PeerKind::NotPeer;
     }
-    // a peer project's hidden files (.env/.git/.aws/.npmrc) are secrets/config — shielded, not adjacent.
-    if has_hidden_component(under_parent.trim_start_matches('/')) {
-        return PeerKind::Hidden;
-    }
+    let _ = under_parent;
     PeerKind::Ordinary
 }
 
@@ -687,11 +689,14 @@ mod tests {
         assert_eq!(ws(WS, "~/projects/branchdiff/src/main.rs").write_locus, LocalLocus::Adjacent);
         assert_eq!(ws(WS, "~/projects/notes.txt").read_locus, LocalLocus::Adjacent, "a file peer to the workspace dir");
 
-        // A sibling's HIDDEN files (.env/.git/.aws/.npmrc) are peer secrets/config → NOT adjacent.
-        // (.git/.ssh are also caught by the segment shields; a bare .env has no shield node, so the
-        // hidden-component guard is what protects it — the key edge case.)
-        assert_ne!(ws(WS, "~/projects/branchdiff/.env").read_locus, LocalLocus::Adjacent, "peer .env stays denied");
-        assert_ne!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Adjacent, "peer .npmrc stays denied");
+        // A sibling's HIDDEN files are ordinary peer content now — the dot-shield is gone, and what
+        // stops a peer's secrets is the credential shield (segment-matched, any depth). `.env` and
+        // `.npmrc` are the two the shield does NOT name, so they read exactly as the same files in
+        // the workspace the agent is rooted at already did.
+        assert_eq!(ws(WS, "~/projects/branchdiff/.env").read_locus, LocalLocus::Adjacent, "peer .env reads as peer content");
+        assert_eq!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Adjacent, "peer .npmrc reads as peer content");
+        assert_eq!(ws(WS, "~/projects/branchdiff/.ssh/id_rsa").read_locus, LocalLocus::Machine, "the shield still bites in a peer");
+        // The .git WRITE freeze is a separate guard and is unaffected by dropping the dot-shield.
         assert_eq!(ws(WS, "~/projects/branchdiff/.git/hooks/pre-commit").write_locus, LocalLocus::WorktreeTrusted, "peer .git hook stays frozen");
 
         // THE danger case: a workspace at `~/work` (depth 1) must NOT make `~/.ssh` / `~/x` siblings.
@@ -714,29 +719,48 @@ mod tests {
         assert_ne!(classify_region("~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
     }
 
+    /// A peer project's HIDDEN files are ordinary peer content now, and the credential shield is
+    /// what still stops the secrets.
+    ///
+    /// The dot-shield used to freeze every hidden component under a peer. Two weeks of real use
+    /// said it fired overwhelmingly on committed project content — `.github/workflows`, `.vscode`,
+    /// `.cargo/config.toml` — while everything it was reaching for is NAMED by the credential
+    /// shield, which is segment-matched and bites at any depth in any project. It was a second,
+    /// structural vote on secrecy over a shield that already names what is secret.
     #[test]
-    fn hidden_peer_predicate_tracks_the_dot_shield() {
+    fn a_peers_hidden_files_are_adjacent_and_the_shield_still_holds() {
         use crate::pathctx::{enter, PathCtx};
-        let hp = |root: &str, path: &str| {
+        let at = |root: &str, path: &str| {
             let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
-            is_hidden_peer(path)
+            classify_region(path).read_locus
         };
         const WS: &str = "~/projects/safe-chains";
-        // A hidden file in a peer project — would be adjacent but for the dot-shield → HiddenPeer.
-        assert!(hp(WS, "~/projects/branchdiff/.env"));
-        assert!(hp(WS, "~/projects/branchdiff/.github/workflows/ci.yml"));
-        assert!(hp(WS, "~/projects/branchdiff/sub/.config/app.toml"), "hidden component anywhere in the remainder");
-        // Ordinary peer files ARE adjacent, so NOT hidden-peer — this is the pair that must never
-        // collapse (else the nudge would call readable peer source a shielded path, or vice-versa).
-        assert!(!hp(WS, "~/projects/branchdiff/src/main.rs"));
-        // The workspace's OWN hidden file is in-workspace, not a peer.
-        assert!(!hp(WS, "~/projects/safe-chains/.env"));
-        // A cousin (different parent) is not a peer at all — it's genuinely outside.
-        assert!(!hp(WS, "~/other/.env"));
-        // Depth-1 workspace has no peers → never hidden-peer (the ~/.ssh danger case).
-        assert!(!hp("~/work", "~/.ssh/id_rsa"));
-        // No workspace context → not a peer (fail-closed, mirrors adjacency).
-        assert!(!is_hidden_peer("~/projects/branchdiff/.env"));
+
+        // Hidden peer content is adjacent — the same rung its ordinary source has.
+        for p in [
+            "~/projects/branchdiff/.github/workflows/ci.yml",
+            "~/projects/branchdiff/.vscode/settings.json",
+            "~/projects/branchdiff/.cargo/config.toml",
+            "~/projects/branchdiff/.env",
+            "~/projects/branchdiff/sub/.config/app.toml",
+        ] {
+            assert_eq!(at(WS, p), LocalLocus::Adjacent, "hidden peer content should be adjacent: {p}");
+        }
+        // Ordinary peer source is unchanged.
+        assert_eq!(at(WS, "~/projects/branchdiff/src/main.rs"), LocalLocus::Adjacent);
+
+        // The SHIELD is what still refuses, at any depth, in a peer as anywhere else. This is the
+        // half that must never regress: removing the dot rule leaned the whole guarantee onto it.
+        for p in [
+            "~/projects/branchdiff/.ssh/id_rsa",
+            "~/projects/branchdiff/.aws/credentials",
+            "~/projects/branchdiff/a/b/c/.netrc",
+            "~/projects/branchdiff/deep/.gnupg/secring.gpg",
+        ] {
+            assert_eq!(at(WS, p), LocalLocus::Machine, "the credential shield must still bite: {p}");
+        }
+        // A cousin under a different parent is still not a peer at all.
+        assert_ne!(at(WS, "~/other/notes.txt"), LocalLocus::Adjacent);
     }
 
     #[test]

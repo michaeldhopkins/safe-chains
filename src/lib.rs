@@ -236,7 +236,6 @@ pub enum ReachReason {
     Credential,
     /// A HIDDEN file inside a co-located peer project — the peer's ordinary source is readable as
     /// `adjacent`, but its dotfiles/dotdirs are shielded.
-    HiddenPeer,
     /// Genuinely above/outside the working directory.
     OutsideWorkspace,
     /// A temp path that is NOT this session's scratchpad. Reading and writing it is fine; RUNNING
@@ -294,13 +293,6 @@ impl ReachReason {
                 "it reaches `{path}`, a credential store the agent should almost certainly not touch. \
                  If this was not intended, stop it"
             ),
-            ReachReason::HiddenPeer => format!(
-                "it reaches `{path}`, a HIDDEN file inside a co-located peer project. The peer's \
-                 ordinary source is readable, but its hidden files (`.env`, `.git`, `.aws`, …) are \
-                 shielded — this is a deliberate guard, not a path error. To reach it, grant that \
-                 path in ~/.config/safe-chains.toml, or run the agent from the peer's parent \
-                 directory so the peer counts as in-workspace"
-            ),
             ReachReason::ForeignTemp => format!(
                 "it runs code from `{path}`, a temporary directory that is not this session's \
                  scratchpad. Temp files can be read and written freely, but code there is treated \
@@ -353,8 +345,6 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         }
         let reason = if engine::resolve::reads_secret(&resolved) {
             ReachReason::Credential
-        } else if engine::resolve::hidden_peer_reach(&t) {
-            ReachReason::HiddenPeer
         } else {
             ReachReason::OutsideWorkspace
         };
