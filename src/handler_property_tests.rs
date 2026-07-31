@@ -1214,6 +1214,51 @@ proptest! {
     }
 }
 
+/// Credential-shield names that are SEGMENT-matched, so they bite at any depth in any project.
+const SHIELD_ANYWHERE: &[&str] = &[".ssh", ".aws", ".gnupg", ".kube", ".docker", ".netrc"];
+
+proptest! {
+    /// The credential shield still bites inside a PEER project, at any depth.
+    ///
+    /// The dot-shield used to freeze every hidden component under a co-located peer; it was removed
+    /// after a fortnight of use, because it fired overwhelmingly on committed content (`.github`,
+    /// `.vscode`, `.cargo/config.toml`) while everything it reached for is NAMED by the credential
+    /// shield. That removal leans the whole peer guarantee onto the shield, so the shield is now
+    /// the thing that must not regress — generated over name x depth rather than spot-checked,
+    /// because the property is about the segment match holding at ANY position.
+    #[test]
+    fn the_credential_shield_bites_in_a_peer_at_any_depth(
+        name in proptest::sample::select(SHIELD_ANYWHERE.to_vec()),
+        depth in 0usize..4,
+    ) {
+        let Ok(home) = std::env::var("HOME") else { return Ok(()) };
+        if !home.starts_with('/') {
+            return Ok(());
+        }
+        let ws = format!("{home}/projects/scproj");
+        let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some(ws.clone()),
+            root: Some(ws),
+            ..Default::default()
+        });
+        let mid = "sub/".repeat(depth);
+        let path = format!("{home}/projects/peer/{mid}{name}/secret");
+        prop_assert!(
+            !is_safe_command(&format!("cat {path}")),
+            "the credential shield failed to bite in a peer: `cat {}`",
+            path
+        );
+        // Non-vacuity: ordinary peer content at the SAME depth must read, or the assertion above
+        // would pass simply because peers are refused wholesale — which is what we just removed.
+        let ordinary = format!("{home}/projects/peer/{mid}src/main.rs");
+        prop_assert!(
+            is_safe_command(&format!("cat {ordinary}")),
+            "ordinary peer content should read: `cat {}`",
+            ordinary
+        );
+    }
+}
+
 /// Every read-admitted package-content root, and every credential-shield segment.
 const ADMIT_ROOTS: &[&str] = &[
     "/usr/share", "/usr/include", "/usr/lib", "/usr/local/share", "/usr/local/include",
