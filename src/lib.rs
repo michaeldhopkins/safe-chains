@@ -268,7 +268,37 @@ pub enum ReachReason {
 /// DISPLAYED without changing the bytes, which is the same forgery by other means.
 ///
 /// This neutralizes our own OUTPUT. It is not a check on the command and decides nothing.
+/// Render our INTERNAL substitution markers back as `$(…)` before any of them reach a human.
+///
+/// A path carrying a substitution is classified through a sentinel, and the operand the nudge
+/// reports is the expanded form — so the reader of `cat ~/p/out/$(seq 1 1)` was being shown
+/// `~/p/out/__SAFE_CHAINS_CMDSUB_ATOM__`, a path they never wrote. On the Claude and Qwen targets
+/// this text is injected into the MODEL's context, where an internal marker is worse than noise:
+/// it is a magic string the model can learn and start emitting, and a nudge that describes a path
+/// the user cannot find in their own command is one they have no reason to trust.
+///
+/// Covers every sentinel spelling at once — opaque, atom, and the locus-tagged forms — by keying
+/// on the shared prefix and consuming through the terminating `__`, so a sentinel added later is
+/// rendered without touching this. A malformed one drops its tail rather than echoing internals.
+fn render_sentinels(s: &str) -> std::borrow::Cow<'_, str> {
+    let prefix = cst::eval::TAGGED_PREFIX;
+    if !s.contains(prefix) {
+        return std::borrow::Cow::Borrowed(s);
+    }
+    let mut out = String::with_capacity(s.len());
+    let mut rest = s;
+    while let Some(at) = rest.find(prefix) {
+        out.push_str(&rest[..at]);
+        out.push_str("$(…)");
+        let after = &rest[at + prefix.len()..];
+        rest = after.find("__").map_or("", |i| &after[i + 2..]);
+    }
+    out.push_str(rest);
+    std::borrow::Cow::Owned(out)
+}
+
 pub fn sanitize_display(s: &str) -> String {
+    let s = &render_sentinels(s);
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
         match c {
