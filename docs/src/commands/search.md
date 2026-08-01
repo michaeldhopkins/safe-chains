@@ -45,6 +45,11 @@ Aliases: `whatis`
 
 - Read-only primaries (tests, operators, reporting actions); `-exec`/`-execdir` and `-delete` are decided by the traversal locus.
 
+- **Without a subcommand:**
+- Bare invocation allowed
+- Allowed standalone flags: --help, --version, -H, -L, -P, -a, -and, -d, -daystart, -depth, -empty, -executable, -false, -follow, -help, -ignore_readdir_race, -ls, -mount, -nogroup, -noignore_readdir_race, -noleaf, -not, -nouser, -nowarn, -o, -or, -print, -print0, -prune, -quit, -readable, -true, -version, -warn, -writable, -xdev
+- Allowed valued flags: -D, -amin, -anewer, -atime, -cmin, -cnewer, -context, -ctime, -fstype, -gid, -group, -ilname, -iname, -inum, -ipath, -iregex, -iwholename, -links, -lname, -maxdepth, -mindepth, -mmin, -mtime, -name, -path, -perm, -printf, -regex, -regextype, -samefile, -size, -type, -uid, -used, -user, -wholename, -xtype
+
 **Examples:**
 
 - `find . -name '*.rs'`

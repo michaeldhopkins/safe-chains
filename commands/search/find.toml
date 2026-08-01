@@ -57,3 +57,95 @@ invalidated_by = [
     "-printf",
     "-version",
 ]
+
+# find's primary vocabulary, held here as DATA. The handler walks the expression itself — a valued
+# primary consumes its value, `-newer*` is matched by prefix, `-exec`/`-execdir` and `-delete`
+# delegate against the traversal bases — but the two sets it consults are a flag list, and a flag
+# list belongs in TOML rather than as `WordSet` constants in `src/handlers/`.
+#
+# `standalone` and `valued` mean exactly what the walk does: `standalone` advances one token,
+# `valued` advances two because the primary consumes its argument. That is not an approximation of
+# find's grammar, it IS find's grammar for these primaries.
+#
+# Naming caveat: `[command.fallback]` normally means "the grammar used when no subcommand matched",
+# and find has no subcommands. It is used here purely as the place a handler-dispatched command can
+# keep its flag vocabulary; find never calls `try_fallback_grammar`, and nothing dispatches a
+# fallback implicitly.
+[command.fallback]
+standalone = [
+    "--help",
+    "--version",
+    "-H",
+    "-L",
+    "-P",
+    "-a",
+    "-and",
+    "-d",
+    "-daystart",
+    "-depth",
+    "-empty",
+    "-executable",
+    "-false",
+    "-follow",
+    "-help",
+    "-ignore_readdir_race",
+    "-ls",
+    "-mount",
+    "-nogroup",
+    "-noignore_readdir_race",
+    "-noleaf",
+    "-not",
+    "-nouser",
+    "-nowarn",
+    "-o",
+    "-or",
+    "-print",
+    "-print0",
+    "-prune",
+    "-quit",
+    "-readable",
+    "-true",
+    "-version",
+    "-warn",
+    "-writable",
+    "-xdev",
+]
+valued = [
+    "-D",
+    "-amin",
+    "-anewer",
+    "-atime",
+    "-cmin",
+    "-cnewer",
+    "-context",
+    "-ctime",
+    "-fstype",
+    "-gid",
+    "-group",
+    "-ilname",
+    "-iname",
+    "-inum",
+    "-ipath",
+    "-iregex",
+    "-iwholename",
+    "-links",
+    "-lname",
+    "-maxdepth",
+    "-mindepth",
+    "-mmin",
+    "-mtime",
+    "-name",
+    "-path",
+    "-perm",
+    "-printf",
+    "-regex",
+    "-regextype",
+    "-samefile",
+    "-size",
+    "-type",
+    "-uid",
+    "-used",
+    "-user",
+    "-wholename",
+    "-xtype",
+]

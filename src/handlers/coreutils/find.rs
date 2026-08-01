@@ -1,4 +1,5 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::Token;
+use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
 
 // find's expression is an ALLOWLIST of READ-ONLY primaries: tests (`-name`/`-type`/`-size`/…),
@@ -12,40 +13,6 @@ use crate::verdict::{SafetyLevel, Verdict};
 // value. SAFETY (as in mlr): a value-taking primary MUST be in VALUED, never STANDALONE, or the
 // walk would fail to skip its value — over-denying at best, or (if the value were an action)
 // swallowing it silently.
-
-/// Read-only find primaries that take NO value (tests, read-only actions, positional/global
-/// options, operators, and `--help`/`--version`).
-static FIND_SAFE_STANDALONE: WordSet = WordSet::new(&[
-    "--help", "--version",
-    "-H", "-L", "-P",
-    "-a", "-and", "-d", "-daystart", "-depth",
-    "-empty", "-executable", "-false", "-follow", "-help",
-    "-ignore_readdir_race", "-ls", "-mount",
-    "-nogroup", "-noignore_readdir_race", "-noleaf", "-not", "-nouser", "-nowarn",
-    "-o", "-or",
-    "-print", "-print0", "-prune", "-quit", "-readable", "-true", "-version",
-    "-warn", "-writable", "-xdev",
-]);
-
-/// Read-only find primaries that consume the NEXT token as a value. `-newer` / `-newerXY` are
-/// handled by prefix below. Every entry is read-only (no `-fprintf`, which writes a file).
-static FIND_SAFE_VALUED: WordSet = WordSet::new(&[
-    "-D",
-    "-amin", "-anewer", "-atime",
-    "-cmin", "-cnewer", "-context", "-ctime",
-    "-fstype",
-    "-gid", "-group",
-    "-ilname", "-iname", "-inum", "-ipath", "-iregex", "-iwholename",
-    "-links", "-lname",
-    "-maxdepth", "-mindepth", "-mmin", "-mtime",
-    "-name",
-    "-path", "-perm", "-printf",
-    "-regex", "-regextype",
-    "-samefile", "-size",
-    "-type",
-    "-uid", "-used", "-user",
-    "-wholename", "-xtype",
-]);
 
 pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict {
     // find's `{}` placeholder is substituted with each traversed path, which lives UNDER
@@ -78,6 +45,13 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             .map(Token::as_str)
             .collect();
         if leading.is_empty() { vec!["."] } else { leading }
+    };
+
+    // The primary vocabulary is DATA and lives in commands/search/find.toml. Absent it, nothing is
+    // recognised, so fail closed rather than fall through to the deny-by-omission arm and pretend
+    // every primary was simply unknown.
+    let Some((safe_standalone, safe_valued)) = crate::registry::fallback_flag_sets("find") else {
+        return Verdict::Denied;
     };
 
     let mut level = SafetyLevel::Inert;
@@ -141,11 +115,11 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             continue;
         }
         // A read-only VALUED primary consumes its value; `-newer`/`-newerXY` take a reference.
-        if FIND_SAFE_VALUED.contains(&tokens[i]) || s.starts_with("-newer") {
+        if safe_valued.contains_flag(s) || s.starts_with("-newer") {
             i += 2;
             continue;
         }
-        if FIND_SAFE_STANDALONE.contains(&tokens[i]) {
+        if safe_standalone.contains_flag(s) {
             i += 1;
             continue;
         }
