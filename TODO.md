@@ -551,6 +551,69 @@ exposing the scratchpad path would be the real fix and Claude Code declined it
 (anthropics/claude-code#45745, "not planned"), which is why the session-id + path-shape recognition
 in `pathctx` exists at all.
 
+## Three reported prompts — two pieces of work (analysis done, implementation not)
+
+### A. `$(( ))` containing a substitution — fix is KNOWN, blocked on a pre-existing hang
+
+Symptom: `echo "days left: $(( (X - $(date -u +%s)) / 86400 ))"` denies. Every other segment of that
+chain approves, including `date -u +%s` alone, plain `$(( ))`, and `$(date …)` in an ordinary string.
+
+Cause: `arith_sub` (cst/parse.rs) backtracks whenever the body holds `$(` or a backtick. That hands
+`$((` to `cmd_sub`, which reads it as `$(` plus a subshell — `--explain` renders `$( (1 + …))`, a
+command the user never wrote — and then refuses it because `(1` is not a command. Fail-CLOSED, so no
+security exposure; the cost is a false deny on an everyday idiom. The backtrack was deliberate and
+defensible: treating the body as opaque text would hide the inner command, which is a fail-OPEN.
+
+The fix that WORKS (built, full suite green, new guard passing):
+  `Arith(String)` -> `Arith(Word)`; parse the body; `part_sub_verdict` recurses into it exactly as it
+  already does for `DQuote`; `collect_part_subs` likewise; display renders the parts. Five sites.
+  Arithmetic stays inert, the inner `$( )` is verdicted normally — `$(( 1 + $(rm -rf /) ))` still
+  refuses. `$((cmd))` correctly becomes inert, which MATCHES bash: bash parses `$((` as arithmetic
+  and errors on a non-arithmetic body, it does not execute it. `$( (cmd) )` with a space is
+  untouched and still a real command substitution.
+
+WHY IT IS NOT LANDED — a pre-existing landmine underneath it, measured this session:
+  - Balanced nesting already hangs WITHOUT any change: `echo $((1+` x1000 `))` x1000 TIMEOUTs (>45s)
+    on released 0.220.0 AND on current HEAD. `echo $( ` x50000 balanced TIMEOUTs too. So nested
+    substitution blow-up is an EXISTING defect, not one the arithmetic fix introduces.
+  - With `Arith(Word)` and no depth guard, that same x1000 case became exit=0 in 0.43s — the fix
+    IMPROVED it — but `$((1+` x50000 then ABORTED (SIGABRT). Arithmetic recursion bypasses
+    `MAX_PARSE_DEPTH`, which is enforced at `script()`, "the funnel every other recursion source goes
+    through". An abort is the worst outcome: a hook crash fails OPEN and `catch_unwind` cannot
+    recover a stack overflow.
+  - Taking `DepthGuard::enter()` inside `arith_sub` fixed the abort and made x1000 take 68 SECONDS:
+    bailing backtracks into `cmd_sub`, which re-parses the whole nest.
+  - Parsing the body with a non-recursive part parser (no `arith_sub` inside) still timed out at
+    x1000.
+
+  So the order is: fix the balanced-nesting blow-up FIRST, then land `Arith(Word)` on top. Suspect
+  `MAX_PARSE_WORK_BASE + PER_BYTE * len` — for a 250 KB adversarial input that budget is enormous, so
+  it never trips; the depth cap does not fire because bailing re-enters a different parser rather
+  than failing the parse outright. A `cut`-style error (no alternative tried) at the depth bail is
+  the first thing to try.
+
+### B. A substitution's locus claim is LOST through a variable assignment
+
+Reported: in `jjpr`, `D=$(find ~/.cargo/registry/src -maxdepth 2 -name '…' -type d | head -1)` then
+`grep -rn 'divergent' "$D/src/"` prompts. Measured: the `cd`, the assignment and the `echo` all
+approve; grepping the LITERAL path approves (the package-content read admit works); only the
+`"$D/src/"` segment denies.
+
+This is NOT the `$SCRATCH` case and must not be filed with it. `$SCRATCH` is an unbound external
+variable with no claim to propagate, and denying it is correct forever. Here the value IS bounded —
+`find <root>` carries an output-locus claim that its stdout names paths under that root — and the
+claim is simply dropped when the value passes through a variable.
+
+The machinery already exists for the sibling case: `for i in $(seq 1 4)` propagates, because
+`loop_reprs` binds the loop variable to the list's representative. Plain assignment has no
+equivalent. So the work is to bind an assignment's RHS to the substitution's claim the same way, and
+then `"$D/src/"` is a DESCENT from a tagged sentinel, which `tagged_substitution` already handles
+(it is the `$(pwd)/.git/config` case).
+
+Scope carefully: only an assignment whose RHS is a claim-carrying substitution IN THE SAME COMMAND.
+An assignment from anything else stays unpinnable. This subsumes the third reported item ("handle D
+assigned from command substitution") — they are one piece of work, not two.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
