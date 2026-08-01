@@ -898,6 +898,31 @@ service backend and can carry secrets (`--secret` encrypts a value), so each wan
 analysis — locus remote vs local file backend, whether `get` on a secret value decrypts, and what
 `refresh` reads — before it goes back in.
 
+## There is a positional WRITER audit and no positional READER audit
+
+Found by sweeping, not by a bug. `positional_last_arg_writers_are_gated_or_acknowledged` plus
+`tests/fixtures/positional_writer_worklist.tsv` systematically ask "does this command WRITE its last
+positional". Nothing asks whether it READS one.
+
+The sweep: probe every sub declared `level = "Inert"` with `~/.ssh/id_rsa` and `/etc/shadow` as a
+positional. 692 of 764 accept. That is NOT 692 bugs — it is the model working as designed. Levels
+classify the OPERATION; path operands are gated by locus/pathgate, and a level says nothing about
+operands. Reporting it as a finding would be a false alarm, which is why it is written down here
+instead.
+
+What is genuinely open underneath it: some of those commands have no `[command.path_gate]` at all
+(measured: xccov, xcodegen, simctl declare none; xcresulttool does). If any of them treats a bare
+positional as a file it READS and prints, that is an exfil path — the same shape the writer audit
+was built for, in the other direction. `cat` and `grep` are gated because they are known readers;
+nothing systematically establishes which of the long tail are.
+
+Doing it properly mirrors the writer audit: probe `<cmd> <sensitive-path>`, and for each command
+that auto-approves, decide whether it (a) reads that positional — gate it `read` — or (b) ignores
+it / uses it as a non-path token — acknowledge it in a reader worklist. Blunt probing cannot tell
+those apart, which is why this needs per-command research rather than another sweep.
+
+Entirely pre-existing; verified identical on 0.220.0.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
