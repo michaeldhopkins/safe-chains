@@ -822,9 +822,23 @@ SEQUENCE, so each step is independently verifiable:
      re-route dispatch, which is the only real unknown here.
   2. Add the accessor, switch the handler's two `.contains(...)` calls to it, DELETE both WordSets.
      Run the suite. The examples in find.rs are what catch a mistranscribed primary.
-  3. Only then consider moving the ~30 inline examples to `examples_safe`/`examples_denied`. They
-     are the handler's unit tests and serve a different purpose from registry examples, so this is
-     a separate judgement, not part of the data move.
+  3. DECIDED — the ~30 inline examples STAY in find.rs. `safe!`/`denied!` expand to
+     `assert!(check(cmd))` where `check` is `is_safe_command`, which is exactly what
+     `toml_examples_match_dispatch` asserts, so moving them would buy no coverage and would trade
+     away one named `#[test]` per case. The names are the point: `find_size_negative`,
+     `find_name_looks_like_action` and friends document what the WALK must handle, and a walk is
+     what stayed in the handler.
+
+     The risk calculus is also different from the vocabulary, which is why the two get opposite
+     answers. Two copies of the VOCABULARY could diverge and silently change what find admits — so
+     that had to be deletion. Two sets of EXAMPLES cannot diverge harmfully: if they differ, each
+     still asserts something true, and the worst case is redundancy. find.toml therefore keeps a
+     small curated set that pins the LOCUS contract (`find . -delete` safe, `find /etc -delete` and
+     `find ~ -name '*.bak' -delete` not), which is what the docs should show, while the granular
+     grammar cases stay next to the grammar.
+
+     find's conversion is COMPLETE: -delete delegates, the registry entry exists, the output claim
+     is live, the positional-writer fixture is acknowledged, and both WordSets are gone.
 
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
