@@ -1431,6 +1431,15 @@ fn arithmetic_with_a_substitution_is_judged_by_its_inner_command() {
     assert!(is_safe_command("echo $(( 1 + 1 ))"));
     assert!(is_safe_command("echo $(( (2 + 3) * 4 ))"));
 
+    // NESTED arithmetic. `$((` inside an arithmetic body has to be recognised as arithmetic before
+    // `cmd_sub` reaches it, or it reads as `$(` plus a subshell and refuses on an inner "command"
+    // `(1+1)`. It must not be skipped as literal text either — that would hide a real substitution
+    // nested inside, which is why the last case here is the one that matters.
+    assert!(is_safe_command("echo $(( $((1+1)) ))"));
+    assert!(is_safe_command("echo $(( 1 + $((2)) ))"));
+    assert!(!is_safe_command("echo $(( $(( $(rm -rf /) )) ))"));
+    assert!(!is_safe_command("echo $(( $((`rm -rf /`)) ))"));
+
     // It must be PARSED as arithmetic. Backtracking made `$((` read as `$(` plus a subshell, which
     // is what produced both the refusal and a rendered command the user never wrote.
     let rendered = crate::cst::explain("echo $(( 1 + $(date -u +%s) ))").render();

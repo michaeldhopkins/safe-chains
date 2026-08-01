@@ -893,6 +893,11 @@ fn arith_body_part(input: &mut &str) -> ModalResult<WordPart> {
     }
     alt((
         dq_escape,
+        // Nested `$(( ))` must be recognised as ARITHMETIC before `cmd_sub` sees it, or `$((` is
+        // read as `$(` plus a subshell and `$(( $((1+1)) ))` refuses on an inner "command" `(1+1)`.
+        // It cannot be skipped as literal text either: `$(( $(( $(rm -rf /) )) ))` would then hide
+        // a real substitution, which is a fail-OPEN. So it recurses, bounded by the guard below.
+        arith_sub,
         cmd_sub,
         backtick_part,
         dollar_lit(is_heredoc_literal),
@@ -905,6 +910,15 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
     if !input.starts_with("$((") {
         return backtrack();
     }
+    // Parsing the body makes this a recursion source that does NOT funnel through `script()`, where
+    // MAX_PARSE_DEPTH is enforced — unguarded, `$((1+` x50000 overflowed the stack and ABORTED,
+    // which for a hook is a fail-open crash `catch_unwind` cannot recover. Taking the guard here
+    // was previously rejected because bailing backtracks into `cmd_sub`, which re-parsed the same
+    // nest for 68 seconds; that is affordable now only because the work budget gained a flat
+    // ceiling, which bounds the retry as well as the descent.
+    let Some(_depth) = DepthGuard::enter() else {
+        return backtrack();
+    };
     let body_start = 3;
     let bytes = input.as_bytes();
     let mut depth: i32 = 1;
@@ -1280,10 +1294,19 @@ mod tests {
              the margin that makes this constant safe is gone"
         );
 
-        // Flat input is free however long it is — this is why the ceiling can be flat too.
+        // Flat input stays LINEAR however long it is — that is why a flat ceiling is safe, and it
+        // is the property, not a particular number. Arithmetic began costing one unit each when
+        // `arith_sub` took the depth guard (it is a recursion source now), so 400 expansions cost
+        // ~400 rather than the ~1 they cost when arithmetic was outside the accounting. Still two
+        // orders of magnitude under the ceiling, which is what matters.
         let flat = format!("echo {}", "$((1)) ".repeat(400));
         let _ = super::parse(&flat);
-        assert!(super::PARSE_WORK.with(|w| w.get()) <= 4, "flat input should cost ~nothing");
+        let flat_work = super::PARSE_WORK.with(|w| w.get());
+        assert!(
+            flat_work < MAX_PARSE_WORK_CEILING / 10,
+            "flat input cost {flat_work}, close to the {MAX_PARSE_WORK_CEILING} ceiling — a long \
+             flat command is at risk of being refused"
+        );
 
         // A deep nest is stopped by the CEILING, not by a length-scaled allowance. The property
         // asserted is that the work stops GROWING with the input — doubling the nest must not
