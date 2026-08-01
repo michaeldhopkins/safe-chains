@@ -2477,6 +2477,7 @@ Aliases: `capacitor`
 - **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
 - **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --target, -Z
 - **fmt**: Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
+- **fuzz**: Flags: --help, --version, -V, -h
 - **geiger**: Flags: --all, --all-dependencies, --all-features, --all-targets, --build-dependencies, --dev-dependencies, --forbid-only, --frozen, --help, --include-tests, --invert, --locked, --no-default-features, --no-indent, --offline, --prefix-depth, --quiet, --verbose, --version, -V, -a, -f, -h, -i, -q, -v. Valued: --color, --features, --format, --manifest-path, --output-format, --package, --section-name, --target, -Z, -p
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **help**: Positional args accepted
@@ -2529,6 +2530,7 @@ Aliases: `capacitor`
 
 **Examples:**
 
+- `cargo fuzz --version`
 - `cargo sweep --time 5`
 - `cargo sweep -r --installed`
 - `cargo sweep --dry-run --maxsize 500`
