@@ -586,13 +586,60 @@ WHY IT IS NOT LANDED — a pre-existing landmine underneath it, measured this se
   - Parsing the body with a non-recursive part parser (no `arith_sub` inside) still timed out at
     x1000.
 
-  So the order is: fix the balanced-nesting blow-up FIRST, then land `Arith(Word)` on top. Suspect
+  MEASURED (release, profiling both halves separately — see numbers below); the guesswork in the
+  paragraph after this is superseded by them.
+
+  1. THE COST IS ENTIRELY IN PARSE. `parse` and full `is_safe_command` are equal to within noise
+     (1.55s vs 1.57s at depth 400), so classification contributes nothing and only the parser is in
+     question.
+  2. IT IS NESTING, NOT LENGTH. At the SAME byte count (~2805):
+         flat   `$((1)) ` x400  ->   56.6 us   (and linear: 17.8 / 31.0 / 56.6 us at 100/200/400)
+         nested `$((1+`   x400  ->    1.55 s
+     27000x apart on equal input. Real commands are flat, so a far tighter work budget would bite
+     the pathological shape without touching them — that is the headroom the fix lives in.
+  3. GROWTH is ~quadratic in DEPTH (~3.5x per doubling), not exponential.
+  4. THE PARSE FAILS AND IS SLOW ANYWAY — `parsed_ok=false` throughout; 1.55s is spent arriving at a
+     refusal. The expense starts exactly where the depth cap begins firing: `$( ` x25 parses in 17us,
+     x50 fails in 19ms.
+  5. WHY THE WORK BUDGET NEVER TRIPS: it counts `script()` ENTRIES and allows
+     `16384 + 512 * len`. For a 2806-byte input that is 1.45 MILLION entries, far above the work
+     actually done. `MAX_PARSE_WORK_PER_BYTE = 512` is the loose constant.
+  6. TRIED AND REJECTED: making the depth bail a `Cut` instead of a backtrack, on the theory that
+     `alt` was retrying other parsers over the same nest. It is principled and safe (the guard only
+     fires where the parse already fails) but bought only ~8% — 1.68s -> 1.55s — so alt-retry is NOT
+     the dominant cost. Reverted rather than left in the tree as an unvalidated change.
+
+  NEXT: the remaining suspect is per-position balanced SCANNING — `arith_sub` and `cmd_sub` each
+  scan forward for their closing delimiter before recursing, so at every nesting level the scan
+  spans the whole remaining tail. Instrument that directly (count bytes scanned) before changing
+  anything. If confirmed, the fix is to charge scan work to `PARSE_WORK` and lower PER_BYTE, which
+  finding 2 says is safe for real commands.
+
+  Superseded guesswork, kept only to show what was ruled out: suspect
   `MAX_PARSE_WORK_BASE + PER_BYTE * len` — for a 250 KB adversarial input that budget is enormous, so
   it never trips; the depth cap does not fire because bailing re-enters a different parser rather
   than failing the parse outright. A `cut`-style error (no alternative tried) at the depth bail is
   the first thing to try.
 
-### B. A substitution's locus claim is LOST through a variable assignment
+### B-CORRECTED. `find` has NO output claim — assignment propagation was never the problem
+
+The original diagnosis here was WRONG and is corrected in place. Assignment propagation already
+works: `D=$(pwd); cat "$D/README.md"` APPROVES, and `D=$(pwd); cat "$D/../../../etc/passwd"` denies,
+so a claim survives a variable AND its descent is judged. `pwd` works because it declares
+`[command.output] locus_from = "cwd"`.
+
+`find` declares no `[command.output]` at all, so EVERY `$(find …)` is unpinnable regardless of root
+— `cat "$(find ./sub -name x -type d)"` denies even inside the worktree. That is a missing
+declaration, not a soundness barrier, and `fd` already has the shape to copy
+(`locus_from = "operands"`, with `invalidated_by` for the flags that change what is printed —
+`-printf`, `-exec`, `-ls`, `-fprint` at minimum).
+
+The reported jjpr command STILL will not approve after that fix, and correctly: `"$D/src/"`
+DESCENDS from the substitution, and `find` can match nothing, so `D=""` makes the path `/src/`,
+which denies on its own. Adding the claim fixes non-descending uses; the descent-from-possibly-empty
+case stays refused for the same reason as the `$VAR` prefix closure above.
+
+### OLD (superseded) framing: a claim lost through assignment
 
 Reported: in `jjpr`, `D=$(find ~/.cargo/registry/src -maxdepth 2 -name '…' -type d | head -1)` then
 `grep -rn 'divergent' "$D/src/"` prompts. Measured: the `cd`, the assignment and the `echo` all
@@ -613,6 +660,16 @@ then `"$D/src/"` is a DESCENT from a tagged sentinel, which `tagged_substitution
 Scope carefully: only an assignment whose RHS is a claim-carrying substitution IN THE SAME COMMAND.
 An assignment from anything else stays unpinnable. This subsumes the third reported item ("handle D
 assigned from command substitution") — they are one piece of work, not two.
+
+
+### C. `cargo fuzz` is not an allowed cargo subcommand
+
+`cargo fuzz --version` denies; `which cargo-fuzz`, `rustup toolchain list | head -5` and
+`sed -n '/^\[dependencies\]/,/^\[/p' Cargo.toml | head -25` all approve, so it is the only blocker
+in that chain. cargo-fuzz is a third-party cargo subcommand and is simply absent from cargo's sub
+list. Research it as its own command surface — `init`, `add`, `build`, `run`, `fmt`, `cmin`, `tmin`,
+`coverage`, `list` — and note that `run`/`cmin`/`tmin` EXECUTE the fuzz target (workspace-authored
+code, but still execution) while `list`/`--version` only report.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
