@@ -4,6 +4,7 @@ description = "Rust package manager and build system with a very large subcomman
 url = "https://doc.rust-lang.org/cargo/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
+  "cargo fuzz --version",
   "cargo sweep --time 5",
   "cargo sweep -r --installed",
   "cargo sweep --dry-run --maxsize 500",
@@ -28,6 +29,9 @@ examples_safe = [
   "cargo swift package --features foo --all-features",
 ]
 examples_denied = [
+  # every real cargo-fuzz sub turns an operand into a path; only the informational forms are listed
+  "cargo fuzz cmin parse ~/.ssh",
+  "cargo fuzz add ../../../etc/x",
   # sweep takes no PATH positional: `-r` over a spelled-out root would delete build output for
   # every project beneath it, which is disk-wide scale at a locus well outside the worktree.
   "cargo sweep -r /",
@@ -54,6 +58,29 @@ examples_denied = [
 # `--fuzz-dir` sits beside `--manifest-path` for the same reason: it names the directory whose
 # Cargo.toml is compiled and whose targets are then EXECUTED, so it selects whose code runs.
 flags = { "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec", "--fuzz-dir" = "exec" }
+
+# cargo-fuzz: a third-party cargo subcommand driving libFuzzer over targets in `fuzz/`.
+# Researched against cargo-fuzz 0.13.2.
+#
+# ONLY the informational forms. `cargo fuzz --version` and `--help` print a string and touch
+# nothing: operation observe, process locus, no network, no execution, no secret — which is what
+# `Inert` projects. Every real subcommand is withheld, because each turns an operand into a path:
+# `cmin` MINIFIES the directory it is handed (rewriting and removing files), `run` writes new inputs
+# into it, `tmin`/`fmt`/`coverage` read an arbitrary input file, `add` interpolates its target NAME
+# into `fuzz/fuzz_targets/<name>.rs`, and `init --target` does the same through a flag — an upstream
+# footgun, since `init` documents `--target <TARGET>` as a target NAME while `build` documents
+# `--target <TRIPLE>` as a build triple. One spelling, two meanings, one tool.
+#
+# `max_positional = 0` is what makes the Inert classification HONEST rather than aspirational, and
+# is the whole reason this entry can exist safely. Without a bound, `max_positional` is unlimited,
+# so `cargo fuzz cmin parse ~/.ssh` parsed as three unremarkable positionals and was admitted under
+# an entry that claimed to describe `--version`. A classification is a claim about what the token
+# sequence can DO, so the entry has to be shaped so no other token sequence reaches it.
+[[command.sub]]
+name = "fuzz"
+level = "Inert"
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
 name = "audit"
