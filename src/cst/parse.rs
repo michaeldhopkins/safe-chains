@@ -886,6 +886,21 @@ fn proc_sub(input: &mut &str) -> ModalResult<WordPart> {
     sub_body(input, 2).map(WordPart::ProcSub)
 }
 
+/// The parts of an arithmetic BODY: literal text plus the substitutions that actually run.
+fn arith_body_part(input: &mut &str) -> ModalResult<WordPart> {
+    if input.is_empty() {
+        return backtrack();
+    }
+    alt((
+        dq_escape,
+        cmd_sub,
+        backtick_part,
+        dollar_lit(is_heredoc_literal),
+        lit(is_heredoc_literal),
+    ))
+    .parse_next(input)
+}
+
 fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
     if !input.starts_with("$((") {
         return backtrack();
@@ -899,12 +914,24 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
             b'(' => depth += 1,
             b')' => {
                 if depth == 1 && i + 1 < bytes.len() && bytes[i + 1] == b')' {
-                    let body = input[body_start..i].to_string();
-                    if body.contains("$(") || body.contains('`') {
+                    // The body is PARSED, not kept as text. It used to backtrack whenever it held
+                    // a substitution, which handed `$((` to `cmd_sub` and re-read it as `$(` plus a
+                    // subshell — `--explain` rendered `$( (1 + …))`, a command nobody wrote, and
+                    // refused it because `(1` is not a command. That cost a false deny on the
+                    // everyday `$(( now - $(date +%s) ))`.
+                    //
+                    // The old backtrack was the conservative choice: treating the body as opaque
+                    // text would hide the inner command, a fail-OPEN. Parsing keeps it visible and
+                    // stops the misparse. `arith_body_part` deliberately excludes `arith_sub`, so
+                    // arithmetic is not a recursion source — nested `$(( ))` is literal text here,
+                    // which costs nothing since arithmetic is inert either way.
+                    let mut body = &input[body_start..i];
+                    let parts: Vec<WordPart> = repeat(0.., arith_body_part).parse_next(&mut body)?;
+                    if !body.is_empty() {
                         return backtrack();
                     }
                     *input = &input[i + 2..];
-                    return Ok(WordPart::Arith(body));
+                    return Ok(WordPart::Arith(Word(parts)));
                 }
                 depth -= 1;
                 if depth < 0 {

@@ -236,7 +236,7 @@ impl fmt::Display for WordPart {
             }
             WordPart::ProcSub(s) => write!(f, "<({s})"),
             WordPart::Backtick(s) => write!(f, "`{s}`"),
-            WordPart::Arith(s) => write!(f, "$(({s}))"),
+            WordPart::Arith(w) => write!(f, "$(({w}))"),
         }
     }
 }

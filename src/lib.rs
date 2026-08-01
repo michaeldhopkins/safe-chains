@@ -457,11 +457,14 @@ fn collect_part_subs(part: &cst::WordPart, out: &mut Vec<String>) {
     match part {
         WordPart::CmdSub(script) | WordPart::ProcSub(script) => collect_script_words(script, out),
         WordPart::DQuote(inner) => collect_word(inner, out),
+        // Arithmetic contributes no operand of its own — its value is a number — but a `$( )`
+        // inside it runs, and that command's words are operands the verdict layer classifies.
+        WordPart::Arith(inner) => collect_word(inner, out),
         WordPart::Lit(_)
         | WordPart::Escape(_)
         | WordPart::SQuote(_)
         | WordPart::Backtick(_)
-        | WordPart::Arith(_) => {}
+        => {}
     }
 }
 

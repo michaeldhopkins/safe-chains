@@ -115,7 +115,11 @@ pub enum WordPart {
     CmdSub(Script),
     ProcSub(Script),
     Backtick(String),
-    Arith(String),
+    /// `$(( … ))`. Holds a `Word`, not raw text, because the body is not opaque: a `$( )` inside it
+    /// RUNS. The arithmetic itself is inert — it can only produce a number, and bash, zsh and dash
+    /// all evaluate `$((id))` to 0 rather than executing `id` — so the inner command is what
+    /// decides, and storing parts is what lets the ordinary substitution walkers reach it.
+    Arith(Word),
 }
 
 /// How an output redirect opens its target. All three land the same bytes somewhere, so they
