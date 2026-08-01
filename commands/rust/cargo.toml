@@ -51,7 +51,9 @@ examples_denied = [
 # `/tmp`/home/system deny) across every cargo sub that accepts it. See
 # docs/design/behavioral-taxonomy-execution-origin.md.
 [command.path_gate]
-flags = { "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec" }
+# `--fuzz-dir` sits beside `--manifest-path` for the same reason: it names the directory whose
+# Cargo.toml is compiled and whose targets are then EXECUTED, so it selects whose code runs.
+flags = { "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec", "--fuzz-dir" = "exec" }
 
 [[command.sub]]
 name = "audit"
@@ -964,3 +966,363 @@ candidate = true
 [[command.sub]]
 name = "release"
 candidate = true
+
+# cargo-fuzz: a third-party cargo subcommand that drives libFuzzer over targets in `fuzz/`.
+# Researched against cargo-fuzz 0.13.2 (`cargo fuzz <sub> --help`).
+#
+# The build options are one shared group across every sub that compiles, which is why the lists
+# repeat: `--sanitizer`, `--build-std`, `--careful` and the `--trace-*`/`--no-*` switches select how
+# the target is instrumented, not what it may reach. What separates the subs is whether they RUN the
+# target: `list` only reports, `add`/`init` only scaffold, and `run`/`fmt`/`cmin`/`tmin`/`coverage`
+# execute it. That execution is the crate's OWN code — the same origin `cargo test` executes — and
+# everything written lands under `fuzz/` or the target directory, both regenerable.
+#
+# `--fuzz-dir` names the directory whose Cargo.toml is compiled and whose targets are then run, so
+# it selects whose code executes — exactly what `--manifest-path` does for cargo proper. It is
+# therefore gated at the executor locus in the command-level `[command.path_gate]` above, and NOT
+# left as a plain valued flag: `cargo fuzz run t --fuzz-dir /etc` was admitted before that was
+# added, while the `--manifest-path` spelling of the same reach already denied.
+[[command.sub]]
+name = "fuzz"
+nested_bare = true
+standalone = ["--help", "--version", "-V", "-h"]
+
+# Reads fuzz/Cargo.toml and prints the target names. Observes; nothing is built or run.
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = [
+    "--fuzz-dir",
+    "--help",
+    "--version",
+    "-V",
+    "-h",
+]
+valued = [
+    "--fuzz-dir",
+]
+
+# Compiles the targets. Runs the crate's own build scripts and proc-macros — workspace-authored
+# code, the same execution `cargo build` already performs — and writes to the target directory.
+[[command.sub.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-s",
+]
+
+# Type-checks only, but still runs build scripts and proc-macros and writes target output.
+[[command.sub.sub]]
+name = "check"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-s",
+]
+
+# EXECUTES the fuzz target in a loop against generated input, and writes the corpus and any
+# crash artifacts under fuzz/. The code executed is the crate's own, like `cargo test`; what it is
+# fed is machine-generated, which is the point of the tool rather than a separate hazard.
+[[command.sub.sub]]
+name = "run"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--jobs",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-j",
+    "-s",
+]
+
+# Runs the target once on one input to print its Debug rendering — execution of workspace code,
+# bounded to a single input.
+[[command.sub.sub]]
+name = "fmt"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-s",
+]
+
+# Runs the target over the corpus and REWRITES that corpus to a minimal set. Executes workspace
+# code and mutates fuzz/corpus, which is regenerable by construction.
+[[command.sub.sub]]
+name = "cmin"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-s",
+]
+
+# Runs the target repeatedly on one input, shrinking it. Executes workspace code; writes the
+# minimised artifact.
+[[command.sub.sub]]
+name = "tmin"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--runs",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-s",
+]
+
+# Runs the target over the corpus to gather coverage, then writes profile data under fuzz/.
+[[command.sub.sub]]
+name = "coverage"
+level = "SafeWrite"
+standalone = [
+    "--all-features",
+    "--build-std",
+    "--careful",
+    "--debug-assertions",
+    "--dev",
+    "--disable-branch-folding",
+    "--help",
+    "--no-cfg-fuzzing",
+    "--no-default-features",
+    "--no-include-main-msvc",
+    "--no-trace-compares",
+    "--release",
+    "--strip-dead-code",
+    "--trace-div",
+    "--trace-gep",
+    "--verbose",
+    "--version",
+    "-D",
+    "-O",
+    "-V",
+    "-a",
+    "-c",
+    "-h",
+    "-v",
+]
+valued = [
+    "--codegen-units",
+    "--features",
+    "--fuzz-dir",
+    "--jobs",
+    "--llvm-path",
+    "--sanitizer",
+    "--target",
+    "--target-dir",
+    "-j",
+    "-s",
+]
+
+# Scaffolds a new target source file and registers it in fuzz/Cargo.toml. Local create.
+[[command.sub.sub]]
+name = "add"
+level = "SafeWrite"
+standalone = [
+    "--fuzz-dir",
+    "--help",
+    "--version",
+    "-V",
+    "-h",
+]
+valued = [
+    "--fuzz-dir",
+]
+
+# Creates the fuzz/ directory, its Cargo.toml and a first target. Local create.
+[[command.sub.sub]]
+name = "init"
+level = "SafeWrite"
+standalone = [
+    "--fuzz-dir",
+    "--help",
+    "--version",
+    "-V",
+    "-h",
+]
+valued = [
+    "--fuzz-dir",
+    "--fuzz-engine",
+    "--fuzzing-workspace",
+    "--target",
+]
