@@ -888,6 +888,16 @@ So this wants a pathgate handler keyed on cargo that inspects `tokens[1] == "fuz
 positional after the target name — `write` for `run`/`cmin`, `read` for `tmin`/`fmt`/`coverage` —
 the same shape `ar_archive` uses to gate by operation.
 
+## pulumi config: the write subs need research before any is listed
+
+`config` declared only `nested_bare = true`, which admitted `pulumi config set k v` and
+`pulumi config rm k` (see the guard `a_nested_bare_sub_refuses_an_unknown_nested_subcommand`).
+`get` is now declared so the rest deny by omission, but `set`, `rm`, `cp`, `refresh`, `set-all` and
+`rm-all` are simply unresearched, not judged unsafe. Stack configuration is remote state under the
+service backend and can carry secrets (`--secret` encrypts a value), so each wants its own facet
+analysis — locus remote vs local file backend, whether `get` on a secret value decrypts, and what
+`refresh` reads — before it goes back in.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
