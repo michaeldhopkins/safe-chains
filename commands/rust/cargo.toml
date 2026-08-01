@@ -1112,21 +1112,6 @@ valued = [
 # Runs the target once on one input to print its Debug rendering — execution of workspace code,
 # Runs the target over the corpus and REWRITES that corpus to a minimal set. Executes workspace
 # Runs the target repeatedly on one input, shrinking it. Executes workspace code; writes the
-# Scaffolds a new target source file and registers it in fuzz/Cargo.toml. Local create.
-[[command.sub.sub]]
-name = "add"
-level = "SafeWrite"
-standalone = [
-    "--fuzz-dir",
-    "--help",
-    "--version",
-    "-V",
-    "-h",
-]
-valued = [
-    "--fuzz-dir",
-]
-
 # Creates the fuzz/ directory, its Cargo.toml and a first target. Local create.
 [[command.sub.sub]]
 name = "init"
