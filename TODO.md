@@ -734,6 +734,36 @@ Do it as its own change with its own review — it is a permissiveness change to
 allowlist — and assert both directions: `find . -delete` approves, `find / -delete` and
 `find ~/.ssh -delete` refuse.
 
+### `-delete` is a DELEGATION, not a list entry
+
+Reading the handler settles how to add it. `is_safe_find` starts at `SafetyLevel::Inert` and is only
+raised by `-exec`, which binds `{}` to `<base>/f` for every traversal base and calls
+`command_verdict` on the result, deny-absorbing. That is the entire reason
+`find . -exec rm {} ;` approves while `find / -exec rm {} ;` denies — the locus comes from find's
+path operands, not from the primary.
+
+So `-delete` must NOT go into `FIND_SAFE_STANDALONE`. That set is documented as read-only primaries
+and membership costs nothing, so a destroy joining it would be admitted with no locus reasoning at
+all. Route it through the same delegation instead:
+
+    if s == "-delete" {
+        for base in &bases {
+            let bound = format!("{}/f", base.trim_end_matches('/'));
+            match crate::command_verdict(&format!("rm -r {bound}")) { … }   // deny-absorbing
+        }
+        i += 1; continue;
+    }
+
+Model it as `rm -r`, not `rm`: `-delete` implies `-depth` and removes directories bottom-up, so the
+recursive spelling is both the accurate analogue and the more conservative one. Consistency with
+`-exec rm` then holds STRUCTURALLY — both spellings resolve through one code path against the same
+bases — rather than being asserted by a test that could drift. `find / -delete` and
+`find ~/.ssh -delete` inherit their refusals for free.
+
+Assert both directions anyway, since the whole point is that the two spellings agree:
+`find . -delete` approves, `find / -delete` and `find ~/.ssh -delete` refuse, and each matches the
+`-exec rm` spelling of the same command.
+
 ### The conversion: what moves, what stays
 
 `src/handlers/coreutils/find.rs` is 221 lines and holds two `WordSet::new(&[...])` constants, which
@@ -758,6 +788,22 @@ Prerequisites, both already discovered:
      wants either `shape = "last_write"` or an entry in
      `tests/fixtures/positional_writer_worklist.tsv`. find ignores its last positional as a write
      target, so the fixture is the correct answer.
+
+The accessor the handler needs does not exist yet. Nothing in `registry/mod.rs` hands a handler its
+flag word-sets — `sub_archetypes`, `command_flag_archetypes` and `sub_output_path_token` are the
+nearest and none of them return one. Shape:
+
+    pub(crate) fn fallback_flag_sets(name: &str) -> Option<(&'static [String], &'static [String])>
+
+with the handler's `FIND_SAFE_VALUED.contains(&tokens[i])` becoming a lookup against the returned
+slices. Linear scan over ~35 entries is irrelevant next to the rest of a verdict, so the loss of
+`WordSet`'s binary search does not matter; what does matter is that `WordSet::new` enforces sorted
+order at COMPILE time and a TOML list does not, so the registry build must keep that check or the
+guarantee is silently dropped in the move.
+
+One semantic check that makes the move faithful rather than approximate: `valued` already means
+"consumes the next token", which is exactly find's walk rule (`i += 2`), and `standalone` means
+`i += 1`. The fields line up with the handler's two branches one-for-one.
 
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
