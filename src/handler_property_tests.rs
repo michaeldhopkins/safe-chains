@@ -1437,6 +1437,45 @@ fn arithmetic_with_a_substitution_is_judged_by_its_inner_command() {
     assert!(!rendered.contains("$( ("), "arithmetic was misparsed:\n{rendered}");
 }
 
+/// `-delete` and `-exec rm -r {}` are the same operation, so they must reach the same verdict at
+/// every traversal base.
+///
+/// Enumerated over bases rather than spot-checked, because the property is that the LOCUS decides
+/// both — which is only true while they share the delegation path. `-delete` was refused for years
+/// purely because it was absent from find's read-only primary list, while `-exec rm {}` was
+/// admitted by explicit argument; the engine admits unbounded worktree destroy in every other
+/// spelling (`rm -rf ./*`, `rm -r ./src`), so that refusal was an omission, not a safety stance.
+///
+/// The non-vacuity clause matters: if the bases all agreed by all DENYING, this would pass with
+/// `-delete` hard-wired to refuse, which is the state it is replacing.
+#[test]
+fn find_delete_matches_the_exec_rm_spelling_at_every_base() {
+    let home = std::env::var("HOME").unwrap_or_default();
+    if !home.starts_with('/') {
+        return;
+    }
+    let ws = format!("{home}/projects/scproj");
+    let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
+        cwd: Some(ws.clone()),
+        root: Some(ws),
+        ..Default::default()
+    });
+    let mut approved = 0;
+    let mut refused = 0;
+    for base in [".", "./src", "sub/dir", "/", "/etc", "~", "~/.ssh", "/tmp"] {
+        let by_delete = is_safe_command(&format!("find {base} -delete"));
+        let by_exec = is_safe_command(&format!("find {base} -exec rm -r {{}} ;"));
+        assert_eq!(
+            by_delete, by_exec,
+            "`find {base} -delete` and `find {base} -exec rm -r {{}} ;` are the same operation but \
+             disagree: -delete={by_delete}, -exec={by_exec}"
+        );
+        if by_delete { approved += 1 } else { refused += 1 }
+    }
+    assert!(approved > 0, "every base refused; agreement would hold trivially");
+    assert!(refused > 0, "every base approved; the locus gate is not being exercised");
+}
+
 const ATOM_VALUES: &[&str] = &["", ".", "..", "...", "-", "1", "0004", "a", "..\u{2024}"];
 
 // `~` is deliberately ABSENT. A tilde only expands at the START of a word, so an interpolated `~`

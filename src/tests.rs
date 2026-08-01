@@ -1393,10 +1393,10 @@ denied! {
     help_bypass_bunx: "bunx evil-package --help",
     help_bypass_docker: "docker run evil --help",
     help_bypass_cargo_run: "cargo run --manifest-path /tmp/x/Cargo.toml -- --help",
-    help_bypass_find: "find . -delete --help",
+    help_bypass_find: "find /etc -delete --help",
     help_bypass_unknown: "unknown-command subcommand --help",
     version_bypass_docker_run: "docker run evil --version",
-    version_bypass_find: "find . -delete --version",
+    version_bypass_find: "find /etc -delete --version",
 
     dry_run_rm: "rm -rf / --dry-run",
     dry_run_terraform: "terraform apply --dry-run",
@@ -1406,7 +1406,7 @@ denied! {
     recursive_timeout_version: "timeout 5 rm -rf / --version",
     recursive_nice_version: "nice rm -rf / --version",
 
-    pipeline_find_delete: "find . -name '*.py' -delete | wc -l",
+    pipeline_find_delete: "find /etc -name '*.py' -delete | wc -l",
 
     for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
     // legacy file commands gate their path operands by locus (audit fix): reading a secret or

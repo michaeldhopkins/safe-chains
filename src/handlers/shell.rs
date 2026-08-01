@@ -204,7 +204,7 @@ mod tests {
         xargs_piped_secret_cat: "echo /etc/shadow | xargs cat",
         xargs_npx_unsafe: "xargs npx cowsay",
         xargs_sed_inplace_denied: "xargs sed -i 's/foo/bar/'",
-        xargs_find_delete_denied: "xargs find . -delete",
+        xargs_find_delete_denied: "xargs find /etc -delete",
         xargs_sort_output_denied: "xargs sort -o out.txt",
         xargs_nested_bash_chain_denied: "xargs bash -c 'ls && rm -rf /'",
         xargs_unknown_flag_denied: "xargs --xyzzy cat",

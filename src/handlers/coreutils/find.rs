@@ -3,9 +3,10 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 // find's expression is an ALLOWLIST of READ-ONLY primaries: tests (`-name`/`-type`/`-size`/…),
 // read-only actions (`-print`/`-ls`/`-prune`/…), positional + global options, and operators. A
-// primary NOT listed — `-delete`, `-ok`/`-okdir`, `-fprint*`/`-fls`, or any new/BSD write primary —
+// primary NOT listed — `-ok`/`-okdir`, `-fprint*`/`-fls`, or any new/BSD write primary —
 // denies by OMISSION (fail closed), where the old denylist failed open on anything it hadn't
-// enumerated. `-exec`/`-execdir` are handled separately (delegate to the inner command). A VALUED
+// enumerated. `-exec`/`-execdir` and `-delete` are handled separately (they delegate, so the
+// traversal locus decides them). A VALUED
 // primary consumes its next token, so a `-`-prefixed VALUE (`-mtime -7`, `-perm -644`) is not
 // mistaken for a primary and a filename that looks like an action (`find . -name -delete`) stays a
 // value. SAFETY (as in mlr): a value-taking primary MUST be in VALUED, never STANDALONE, or the
@@ -108,6 +109,27 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             i = cmd_end + 1;
             continue;
         }
+        // `-delete` removes every match, so it is a DESTROY bound to the traversal bases exactly
+        // as `-exec rm {}` is. It deliberately does NOT live in the read-only standalone list:
+        // membership there costs nothing, so it would be admitted with no locus reasoning at all.
+        // Routing it through the same delegation is what makes the two spellings of one operation
+        // agree STRUCTURALLY — one code path, the same bases — instead of by a test that can
+        // drift, and `find / -delete` inherits its refusal the way `find / -exec rm {}` already
+        // has one. Modelled as `rm -r`, not `rm`: `-delete` implies `-depth` and removes
+        // directories bottom-up, so the recursive spelling is both the accurate analogue and the
+        // more conservative one.
+        if s == "-delete" {
+            for base in &bases {
+                let bound = format!("{}/f", base.trim_end_matches('/'));
+                let words = vec!["rm".to_string(), "-r".to_string(), bound];
+                match crate::command_verdict(&shell_words::join(&words)) {
+                    Verdict::Denied => return Verdict::Denied,
+                    Verdict::Allowed(l) => level = level.max(l),
+                }
+            }
+            i += 1;
+            continue;
+        }
         // A path operand, a primary's value, or an operator (`(` `)` `!` `,`).
         if !s.starts_with('-') {
             i += 1;
@@ -127,7 +149,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             i += 1;
             continue;
         }
-        // Anything else — `-delete`, `-ok*`, `-fprint*`/`-fls`, or an unknown/newer primary — denies.
+        // Anything else — `-ok*`, `-fprint*`/`-fls`, or an unknown/newer primary — denies.
         return Verdict::Denied;
     }
     Verdict::Allowed(level)
@@ -173,6 +195,11 @@ mod tests {
         // ({} binds to the find path, so these stay inside the worktree).
         find_exec_rm: "find . -exec rm {} \\;",
         find_exec_rm_rf: "find . -exec rm -rf {} +",
+        // `-delete` delegates like `-exec rm -r {}`, so a WORKTREE base is admitted for the same
+        // reason and an out-of-worktree base still refuses (see the denied list).
+        find_delete: "find . -name '*.tmp' -delete",
+        find_type_delete: "find . -type f -name '*.bak' -delete",
+        find_delete_after_valued: "find . -mtime -7 -delete",
         find_execdir_unsafe: "find . -execdir rm {} \\;",
         // Allowlist coverage: `-`-prefixed VALUES of valued primaries aren't mistaken for primaries.
         find_size_negative: "find . -size -1M",
@@ -198,7 +225,7 @@ mod tests {
     }
 
     denied! {
-        find_delete_denied: "find . -name '*.tmp' -delete",
+        find_delete_outside_denied: "find /etc -name '*.tmp' -delete",
         // a leading global option must not hide the real path: base is /etc, not the cwd.
         find_global_opt_L_system: "find -L /etc -exec rm -rf {} \\;",
         find_global_opt_P_system: "find -P / -exec rm {} \\;",
@@ -207,7 +234,7 @@ mod tests {
         find_ok_denied: "find . -ok rm {} \\;",
         find_okdir_denied: "find . -okdir rm {} \\;",
         find_exec_nested_bash_chain_denied: "find . -exec bash -c 'ls && rm -rf /' \\;",
-        find_type_delete_denied: "find . -type f -name '*.bak' -delete",
+        find_type_delete_home_denied: "find ~ -type f -name '*.bak' -delete",
         find_fprint_denied: "find . -fprint /tmp/list.txt",
         find_fprint0_denied: "find . -fprint0 /tmp/list.txt",
         find_fls_denied: "find . -fls /tmp/list.txt",
@@ -215,7 +242,7 @@ mod tests {
         // Allowlist fail-closed wins: an unknown/newer/BSD primary denies by OMISSION (the old
         // denylist would have allowed anything it hadn't enumerated).
         find_unknown_primary_denied: "find . -frobnicate",
-        find_delete_after_valued_denied: "find . -mtime -7 -delete",
+        find_delete_after_valued_outside_denied: "find /etc -mtime -7 -delete",
         find_unknown_action_after_test_denied: "find . -type f -flushcache",
     }
 }
