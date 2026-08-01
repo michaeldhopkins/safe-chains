@@ -120,6 +120,37 @@ pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
     if path.contains(['*', '?', '[']) {
         return crate::engine::bridge::project(&worst("glob executor — the code that would run is unknown (§6)"));
     }
+    // An executor slot names a PATH. A value carrying whitespace is a command LINE, and judging it
+    // as one path is how `BORG_RSH='sh -c evil'` and `rsync -e 'sh -c evil'` were auto-approved:
+    // the whole string read as one oddly-named executable, which satisfied the bare-name rule.
+    //
+    // Every whitespace-separated token must therefore look like a path. That keeps the documented
+    // space-separated forms working (`LD_PRELOAD='/a.so /b.so'` judges both), while a token that is
+    // not a path — an interpreter's `-c`, the inline code after it — means the value was never a
+    // path and cannot be judged as one. Stated as a requirement ON the value, not as a list of
+    // forbidden programs: `sh -c evil` fails because `-c` is not a path, not because it is `sh`.
+    //
+    // Fail-CLOSED and known to over-deny: `rsync -e 'ssh -p 2222'` is a legitimate idiom that now
+    // refuses, because vetting a transport's own flags is a question this layer cannot answer.
+    if path.split_whitespace().count() > 1 {
+        let mut worst_seen = None;
+        for token in path.split_whitespace() {
+            if token.starts_with('-') {
+                return crate::engine::bridge::project(&worst(
+                    "executor value is a command line, not a path — a non-path token means the \
+                     code that would run is unknown",
+                ));
+            }
+            let v = execute_file_verdict(token);
+            worst_seen = Some(match worst_seen {
+                None => v,
+                Some(prev) => crate::verdict::Verdict::combine(prev, v),
+            });
+        }
+        return worst_seen.unwrap_or_else(|| {
+            crate::engine::bridge::project(&worst("empty executor value"))
+        });
+    }
     let cap = executes(classify_locus(path), ExecutionTrust::CallerFile, "runs code from a named file");
     crate::engine::bridge::project(&Profile::of(vec![cap]))
 }

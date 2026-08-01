@@ -331,7 +331,14 @@ fn gate(role: Role, path: &str) -> bool {
     // undeclared one worst-cases to Denied; a declared one carries a real locus). Admit both here
     // so the gate sees every operand the verdict layer does (`shred $(…)`, `base64 $(…)`, and
     // `asciidoctor -o $(fd a /etc)` must gate, not auto-approve).
+    // A value carrying WHITESPACE is admitted for the same reason: it is a command line, and
+    // `looks_like_path` rejects one that happens to contain no `/`, `.` or `~`. That is how
+    // `borg --rsh 'sh -c evil'` and `restic --password-command 'sh -c evil'` reached the executor
+    // slot ungated — the flag WAS declared `exec`, but the gate never handed the value to it, so a
+    // correctly-configured gate read as a closed one. The env twins denied the same values, which
+    // is the shape of divergence the fuzz `equivalence` target exists to catch.
     (crate::policy::looks_like_path(path)
+        || path.split_whitespace().count() > 1
         || crate::engine::resolve::is_unpinnable(path)
         || crate::engine::resolve::is_substitution_value(path))
         && verdict(path) == Verdict::Denied
