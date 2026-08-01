@@ -10,7 +10,10 @@ pub fn parse(input: &str) -> Option<Script> {
     PARSE_DEPTH.with(|d| d.set(0));
     PARSE_WORK.with(|w| w.set(0));
     PARSE_WORK_LIMIT
-        .with(|l| l.set(MAX_PARSE_WORK_BASE + MAX_PARSE_WORK_PER_BYTE * input.len() as u64));
+        .with(|l| {
+            let budget = MAX_PARSE_WORK_BASE + MAX_PARSE_WORK_PER_BYTE * input.len() as u64;
+            l.set(budget.min(MAX_PARSE_WORK_CEILING));
+        });
     let result = script.parse(input).ok();
     reset_heredoc_queue();
     result
@@ -47,8 +50,16 @@ const MAX_PARSE_DEPTH: u32 = 48;
 /// depth cap misses because its nesting stays shallow). The balanced-scan in `cmd_sub`/`proc_sub`
 /// removes the known source; this is the belt-and-suspenders backstop that fails ANY future
 /// exponential closed rather than hanging the hook. Found by `classifier_terminates_on_adversarial_input`.
-const MAX_PARSE_WORK_BASE: u64 = 16_384;
-const MAX_PARSE_WORK_PER_BYTE: u64 = 512;
+/// Absolute ceiling on the per-parse work budget, whatever the input length.
+///
+/// Without it the allowance grows with the input, so a LARGER adversarial input buys itself more
+/// time — the opposite of what a bound is for. Measured across all 1338 registry examples the most
+/// any real command needs is 2 entries, so a flat ceiling four orders of magnitude above that
+/// cannot refuse anything real while capping the worst case at a fixed cost.
+const MAX_PARSE_WORK_CEILING: u64 = 20_000;
+
+const MAX_PARSE_WORK_BASE: u64 = 2_048;
+const MAX_PARSE_WORK_PER_BYTE: u64 = 8;
 
 /// RAII depth counter for the recursive descent — increments on `enter`, decrements on drop (winnow
 /// returns errors rather than panicking, so drops balance even on the bail path). `enter` also bumps
@@ -1208,6 +1219,68 @@ fn name(input: &mut &str) -> ModalResult<String> {
 
 #[cfg(test)]
 mod tests {
+    /// The parse work budget must bound NESTED input without refusing anything real.
+    ///
+    /// Both halves are measured, because the constant is only defensible as a ratio between them:
+    ///
+    ///   - Real commands are FLAT and cost 1-2 `script()` entries. Across every example the
+    ///     registry ships (1338 of them) the most any one needs is 2 — the worst being
+    ///     `eval "$(conda shell.bash hook)"`. Flat input is free regardless of size: 400
+    ///     side-by-side `$((1))` in 2805 bytes costs ONE entry.
+    ///   - Nested input is what blows up, and it blew up because the budget GREW with the input
+    ///     (`16384 + 512 * len`), so a bigger adversarial input bought itself more time. At depth
+    ///     400 that allowed 1_453_119 entries and took 1.55s in release purely to fail; depth 1000
+    ///     read as a hang.
+    ///
+    /// So the guard pins the ratio, not a timing: real examples must stay far under the ceiling,
+    /// and a deep nest must be stopped BY the ceiling rather than by exhausting a length-scaled
+    /// allowance. Timings are deliberately not asserted — they are machine-dependent — but for the
+    /// record the same depth-400 input now parses in 0.028s, below process startup.
+    #[test]
+    fn the_parse_work_budget_bounds_nesting_without_refusing_real_commands() {
+        let worst_real = crate::registry::corpus_examples()
+            .into_iter()
+            .flat_map(|(_, safe, denied)| safe.iter().chain(denied.iter()).cloned().collect::<Vec<_>>())
+            .map(|ex| {
+                let _ = super::parse(&ex);
+                super::PARSE_WORK.with(|w| w.get())
+            })
+            .max()
+            .expect("the registry ships examples");
+        assert!(
+            worst_real * 100 < MAX_PARSE_WORK_CEILING,
+            "a real example needs {worst_real} entries against a {MAX_PARSE_WORK_CEILING} ceiling; \
+             the margin that makes this constant safe is gone"
+        );
+
+        // Flat input is free however long it is — this is why the ceiling can be flat too.
+        let flat = format!("echo {}", "$((1)) ".repeat(400));
+        let _ = super::parse(&flat);
+        assert!(super::PARSE_WORK.with(|w| w.get()) <= 4, "flat input should cost ~nothing");
+
+        // A deep nest is stopped by the CEILING, not by a length-scaled allowance. The property
+        // asserted is that the work stops GROWING with the input — doubling the nest must not
+        // double the work — which is precisely what the old `BASE + PER_BYTE * len` budget failed
+        // to do. An exact cap is not asserted: `enter()` bumps the counter before it checks, so
+        // calls on the unwind path overshoot slightly (59 entries when this was written).
+        let work_at = |depth: usize| {
+            let deep = format!("echo {}1{}", "$((1+".repeat(depth), "))".repeat(depth));
+            let _ = super::parse(&deep);
+            super::PARSE_WORK.with(|w| w.get())
+        };
+        let (w2k, w4k) = (work_at(2000), work_at(4000));
+        assert!(w2k > 1000, "the nest should actually reach the bound, or this proves nothing");
+        assert!(
+            w4k <= w2k + w2k / 10,
+            "work still scales with input length: depth 2000 used {w2k}, depth 4000 used {w4k}"
+        );
+        assert!(
+            w4k < MAX_PARSE_WORK_CEILING + MAX_PARSE_WORK_CEILING / 10,
+            "work {w4k} ran far past the {MAX_PARSE_WORK_CEILING} ceiling"
+        );
+    }
+
+
     use super::*;
 
     fn p(input: &str) -> Script {
