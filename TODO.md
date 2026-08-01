@@ -843,6 +843,29 @@ SEQUENCE, so each step is independently verifiable:
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
 
+## cargo fuzz: run/cmin/tmin/coverage/fmt need a pathgate handler before they can be allowed
+
+Found in adversarial review of the batch, in a change made earlier in the same session:
+`cargo fuzz cmin parse ~/.ssh` was AUTO-APPROVED. `cmin` minifies a corpus by rewriting the
+directory it is handed — removing files — and that directory is a plain POSITIONAL. `run` writes
+new inputs into the same slot, and `tmin`/`fmt` read an arbitrary input FILE and print a derived
+result.
+
+Those five now deny by omission. The corpus-free subs (`list`, `build`, `check`, `add`, `init`) are
+allowed, which covers the reported `cargo fuzz --version` case.
+
+Why the obvious fixes do not work:
+  - A `positional = "write"` role in pathgates.toml keys on the COMMAND name, and cargo's
+    positionals are meaningful everywhere else (`cargo test <filter>`, `cargo run <args>`), so the
+    role cannot be scoped to `fuzz`.
+  - `max_positional` was tried and reverted. It cannot distinguish the target NAME from a corpus
+    DIRECTORY, and it refuses `cargo fuzz run t -- -max_total_time=60` — measured — because the
+    libFuzzer arguments after `--` count as positionals. That is the ordinary invocation.
+
+So this wants a pathgate handler keyed on cargo that inspects `tokens[1] == "fuzz"` and gates the
+positional after the target name — `write` for `run`/`cmin`, `read` for `tmin`/`fmt`/`coverage` —
+the same shape `ar_archive` uses to gate by operation.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No

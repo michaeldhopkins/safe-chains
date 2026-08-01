@@ -909,6 +909,30 @@ candidate = true
 name = "binstall"
 candidate = true
 
+
+# `max_positional` is a SAFETY bound here, not tidiness. `cmin` minifies a corpus by rewriting the
+# directory it is given, and `run` writes new inputs into it — both take that directory as a plain
+# POSITIONAL, so `cargo fuzz cmin parse ~/.ssh` was an auto-approved destroy of an arbitrary
+# directory. Path roles in pathgates.toml key on the command name only, and cargo's positionals are
+# meaningful everywhere else (`cargo test <filter>`, `cargo run <args>`), so a `positional = "write"`
+# role cannot be scoped to this subcommand. Bounding the count is what is expressible: the target
+# NAME is allowed, an extra path is not. `fmt`/`tmin`/`add` take two because their second argument
+# is an input file they read, or the new target's name.
+#
+# Cost, stated plainly: an explicit corpus directory (`cargo fuzz run t fuzz/corpus/t`) now needs
+# approval. The implicit default corpus is unaffected, which is the common invocation.
+
+# ONLY the subs that take no corpus path are listed. `run`, `cmin`, `tmin`, `coverage` and `fmt` all
+# accept a corpus directory or input file as a plain POSITIONAL, and `cmin` MINIFIES that directory
+# — it rewrites and removes files — so `cargo fuzz cmin parse ~/.ssh` would be an auto-approved
+# destroy of an arbitrary directory. `run` writes new inputs into the same positional.
+#
+# Gating it needs a pathgate handler: roles in pathgates.toml key on the COMMAND name, and cargo's
+# positionals are meaningful everywhere else (`cargo test <filter>`), so the role cannot be scoped
+# to this subcommand. `max_positional` was tried and rejected — it cannot tell a target NAME from a
+# corpus DIRECTORY, and it refuses `cargo fuzz run t -- -max_total_time=60`, which is the ordinary
+# invocation. So those five deny by omission until the handler exists (see TODO.md), which is the
+# fail-closed direction.
 [[command.sub]]
 name = "fuzz"
 candidate = true
@@ -1085,215 +1109,9 @@ valued = [
 
 # EXECUTES the fuzz target in a loop against generated input, and writes the corpus and any
 # crash artifacts under fuzz/. The code executed is the crate's own, like `cargo test`; what it is
-# fed is machine-generated, which is the point of the tool rather than a separate hazard.
-[[command.sub.sub]]
-name = "run"
-level = "SafeWrite"
-standalone = [
-    "--all-features",
-    "--build-std",
-    "--careful",
-    "--debug-assertions",
-    "--dev",
-    "--disable-branch-folding",
-    "--help",
-    "--no-cfg-fuzzing",
-    "--no-default-features",
-    "--no-include-main-msvc",
-    "--no-trace-compares",
-    "--release",
-    "--strip-dead-code",
-    "--trace-div",
-    "--trace-gep",
-    "--verbose",
-    "--version",
-    "-D",
-    "-O",
-    "-V",
-    "-a",
-    "-c",
-    "-h",
-    "-v",
-]
-valued = [
-    "--codegen-units",
-    "--features",
-    "--fuzz-dir",
-    "--jobs",
-    "--sanitizer",
-    "--target",
-    "--target-dir",
-    "-j",
-    "-s",
-]
-
 # Runs the target once on one input to print its Debug rendering — execution of workspace code,
-# bounded to a single input.
-[[command.sub.sub]]
-name = "fmt"
-level = "SafeWrite"
-standalone = [
-    "--all-features",
-    "--build-std",
-    "--careful",
-    "--debug-assertions",
-    "--dev",
-    "--disable-branch-folding",
-    "--help",
-    "--no-cfg-fuzzing",
-    "--no-default-features",
-    "--no-include-main-msvc",
-    "--no-trace-compares",
-    "--release",
-    "--strip-dead-code",
-    "--trace-div",
-    "--trace-gep",
-    "--verbose",
-    "--version",
-    "-D",
-    "-O",
-    "-V",
-    "-a",
-    "-c",
-    "-h",
-    "-v",
-]
-valued = [
-    "--codegen-units",
-    "--features",
-    "--fuzz-dir",
-    "--sanitizer",
-    "--target",
-    "--target-dir",
-    "-s",
-]
-
 # Runs the target over the corpus and REWRITES that corpus to a minimal set. Executes workspace
-# code and mutates fuzz/corpus, which is regenerable by construction.
-[[command.sub.sub]]
-name = "cmin"
-level = "SafeWrite"
-standalone = [
-    "--all-features",
-    "--build-std",
-    "--careful",
-    "--debug-assertions",
-    "--dev",
-    "--disable-branch-folding",
-    "--help",
-    "--no-cfg-fuzzing",
-    "--no-default-features",
-    "--no-include-main-msvc",
-    "--no-trace-compares",
-    "--release",
-    "--strip-dead-code",
-    "--trace-div",
-    "--trace-gep",
-    "--verbose",
-    "--version",
-    "-D",
-    "-O",
-    "-V",
-    "-a",
-    "-c",
-    "-h",
-    "-v",
-]
-valued = [
-    "--codegen-units",
-    "--features",
-    "--fuzz-dir",
-    "--sanitizer",
-    "--target",
-    "--target-dir",
-    "-s",
-]
-
 # Runs the target repeatedly on one input, shrinking it. Executes workspace code; writes the
-# minimised artifact.
-[[command.sub.sub]]
-name = "tmin"
-level = "SafeWrite"
-standalone = [
-    "--all-features",
-    "--build-std",
-    "--careful",
-    "--debug-assertions",
-    "--dev",
-    "--disable-branch-folding",
-    "--help",
-    "--no-cfg-fuzzing",
-    "--no-default-features",
-    "--no-include-main-msvc",
-    "--no-trace-compares",
-    "--release",
-    "--strip-dead-code",
-    "--trace-div",
-    "--trace-gep",
-    "--verbose",
-    "--version",
-    "-D",
-    "-O",
-    "-V",
-    "-a",
-    "-c",
-    "-h",
-    "-v",
-]
-valued = [
-    "--codegen-units",
-    "--features",
-    "--fuzz-dir",
-    "--runs",
-    "--sanitizer",
-    "--target",
-    "--target-dir",
-    "-s",
-]
-
-# Runs the target over the corpus to gather coverage, then writes profile data under fuzz/.
-[[command.sub.sub]]
-name = "coverage"
-level = "SafeWrite"
-standalone = [
-    "--all-features",
-    "--build-std",
-    "--careful",
-    "--debug-assertions",
-    "--dev",
-    "--disable-branch-folding",
-    "--help",
-    "--no-cfg-fuzzing",
-    "--no-default-features",
-    "--no-include-main-msvc",
-    "--no-trace-compares",
-    "--release",
-    "--strip-dead-code",
-    "--trace-div",
-    "--trace-gep",
-    "--verbose",
-    "--version",
-    "-D",
-    "-O",
-    "-V",
-    "-a",
-    "-c",
-    "-h",
-    "-v",
-]
-valued = [
-    "--codegen-units",
-    "--features",
-    "--fuzz-dir",
-    "--jobs",
-    "--llvm-path",
-    "--sanitizer",
-    "--target",
-    "--target-dir",
-    "-j",
-    "-s",
-]
-
 # Scaffolds a new target source file and registers it in fuzz/Cargo.toml. Local create.
 [[command.sub.sub]]
 name = "add"
