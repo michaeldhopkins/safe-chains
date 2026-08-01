@@ -2462,7 +2462,6 @@ Aliases: `capacitor`
 
 - **about generate**: Flags: --all-features, --fail, --frozen, --help, --locked, --no-default-features, --offline, --workspace, -V, -h. Valued: --color, --features, --format, --manifest-path, --name, --target, --threshold, -L, -c, -m, -n
 - **about**: Flags: --help, --version, -V, -h. Valued: --color, -L
-- **asm**: Flags: --all-features, --bin, --debug-info, --example, --features, --frozen, --full-name, --help, --lib, --locked, --no-color, --no-default-features, --offline, --release, --rust, --simplify, --source, --test, --verbose, --version, -V, -h. Valued: --asm-style, --bench, --build-type, --manifest-path, --package, --target, --target-cpu, --target-dir, --unstable, -p
 - **audit**: Flags: --deny, --help, --json, --no-fetch, --stale, -h, -n, --quiet, -q, -v. Valued: --color, --db, --file, --ignore, --target-arch, --target-os, -f
 - **bench**: Flags: --all, --workspace, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **bloat**: Flags: --crates, --filter, --help, --lib, --no-default-features, --release, --time, --wide, -h. Valued: --bin, --example, --features, --jobs, --manifest-path, --message-format, --package, --target, -j, -n, -p
@@ -2478,11 +2477,6 @@ Aliases: `capacitor`
 - **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
 - **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --target, -Z
 - **fmt**: Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
-- **fuzz build**: Flags: --all-features, --build-std, --careful, --debug-assertions, --dev, --disable-branch-folding, --help, --no-cfg-fuzzing, --no-default-features, --no-include-main-msvc, --no-trace-compares, --release, --strip-dead-code, --trace-div, --trace-gep, --verbose, --version, -D, -O, -V, -a, -c, -h, -v. Valued: --codegen-units, --features, --fuzz-dir, --sanitizer, --target, --target-dir, -s
-- **fuzz check**: Flags: --all-features, --build-std, --careful, --debug-assertions, --dev, --disable-branch-folding, --help, --no-cfg-fuzzing, --no-default-features, --no-include-main-msvc, --no-trace-compares, --release, --strip-dead-code, --trace-div, --trace-gep, --verbose, --version, -D, -O, -V, -a, -c, -h, -v. Valued: --codegen-units, --features, --fuzz-dir, --sanitizer, --target, --target-dir, -s
-- **fuzz init**: Flags: --fuzz-dir, --help, --version, -V, -h. Valued: --fuzz-dir, --fuzz-engine, --fuzzing-workspace, --target
-- **fuzz list**: Flags: --fuzz-dir, --help, --version, -V, -h. Valued: --fuzz-dir
-- **fuzz**: Flags: --help, --version, -V, -h
 - **geiger**: Flags: --all, --all-dependencies, --all-features, --all-targets, --build-dependencies, --dev-dependencies, --forbid-only, --frozen, --help, --include-tests, --invert, --locked, --no-default-features, --no-indent, --offline, --prefix-depth, --quiet, --verbose, --version, -V, -a, -f, -h, -i, -q, -v. Valued: --color, --features, --format, --manifest-path, --output-format, --package, --section-name, --target, -Z, -p
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **help**: Positional args accepted
@@ -2494,7 +2488,6 @@ Aliases: `capacitor`
 - **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **machete**: Flags: --help, --skip-target-dir, --with-metadata, -V, -h
 - **metadata**: Flags: --all-features, --frozen, --help, --locked, --no-default-features, --no-deps, --offline, -h, --quiet, -q, -v. Valued: --color, --features, --filter-platform, --format-version, --manifest-path
-- **modules**: Flags: --all-features, --cfg-test, --help, --no-default-features, --no-externs, --no-fns, --no-modules, --no-sysroot, --no-traits, --no-types, --no-uses, --orphans, --sort-by-name, --sort-by-visibility, --types, --uses, --verbose, -h. Valued: --bin, --example, --features, --lib, --manifest-path, --package, --target, -p
 - **msrv find**: Flags: --all-features, --bisect, --help, --ignore-lockfile, --include-all-patch-releases, --linear, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --target
 - **msrv list**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path, --variant
 - **msrv show**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
