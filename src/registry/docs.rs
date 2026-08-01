@@ -222,8 +222,10 @@ impl CommandSpec {
             self.describe_kind()
         };
         let mut doc = crate::docs::CommandDoc::handler(
-            Box::leak(self.name.clone().into_boxed_str()),
-            Box::leak(self.url.clone().into_boxed_str()),
+            // These were `Box::leak`ed to satisfy a `&'static str`. `CommandDoc` owns both now,
+            // so the clone is the whole cost — the leak bought nothing and paid per call.
+            self.name.clone(),
+            self.url.clone(),
             description,
             &self.category,
         );

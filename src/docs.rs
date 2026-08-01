@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 pub struct CommandDoc {
     pub name: String,
     pub kind: DocKind,
-    pub url: &'static str,
+    pub url: String,
     pub description: String,
     pub aliases: Vec<String>,
     pub category: String,
@@ -16,7 +16,7 @@ pub enum DocKind {
 }
 
 impl CommandDoc {
-    pub fn handler(name: &'static str, url: &'static str, description: impl Into<String>, category: &str) -> Self {
+    pub fn handler(name: impl Into<String>, url: impl Into<String>, description: impl Into<String>, category: &str) -> Self {
         let raw = description.into();
         let description = raw
             .lines()
@@ -32,7 +32,7 @@ impl CommandDoc {
             })
             .collect::<Vec<_>>()
             .join("\n");
-        Self { name: name.to_string(), kind: DocKind::Handler, url, description, aliases: Vec::new(), category: category.to_string(), examples: Vec::new() }
+        Self { name: name.into(), kind: DocKind::Handler, url: url.into(), description, aliases: Vec::new(), category: category.to_string(), examples: Vec::new() }
     }
 
     pub fn wordset(name: &'static str, url: &'static str, words: &WordSet, category: &str) -> Self {
