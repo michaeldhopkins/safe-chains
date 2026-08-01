@@ -16,6 +16,10 @@
 # KNOWN writers is the corpus test `positional_and_output_dir_writers_gate_sensitive_paths`.
 
 # ── Readers / stdout filters — read input (or the arg as text), write to stdout ────────────────
+# find: its last positional is a search ROOT (read) or a primary's value (`-name PATTERN`);
+# results go to stdout. The primaries that DO write (`-fprint*`, `-fls`) name their file after the
+# primary, not as a trailing positional, and are refused by the handler regardless.
+find
 avbdiagnose
 echo
 expr

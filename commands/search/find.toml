@@ -1,0 +1,59 @@
+[[command]]
+name = "find"
+description = """
+Walks a directory tree and reports the paths matching an expression. The expression is a grammar, \
+not a flag list: tests (`-name`, `-type`, `-size`, `-mtime`), operators (`-a`, `-o`, `-not`, \
+parentheses), and ACTIONS — and the action is what decides the risk, not the traversal. Most only \
+report (`-print`, `-print0`, `-ls`, `-prune`, `-quit`), but `-delete` removes every match, \
+`-exec` / `-execdir` run an arbitrary command per match (`-ok` / `-okdir` the same with a prompt), \
+and `-fprint` / `-fprintf` / `-fls` write their output to a named file. GNU adds `-printf`, which \
+emits an arbitrary caller-supplied format instead of paths. Whatever the action, its reach is \
+bounded by the path operands: the same `-delete` is a worktree cleanup under `.` and a system \
+wipe under `/`. Traversal itself is a read of every directory it descends, so a bare `find /` \
+enumerates the machine.
+"""
+url = "https://www.gnu.org/software/findutils/manual/html_mono/find.html"
+researched_version = "GNU findutils 4.10 / BSD find (macOS 15)"
+handler = "find"
+doc_body = "Read-only primaries (tests, operators, reporting actions); `-exec`/`-execdir` and `-delete` are decided by the traversal locus."
+examples_safe = [
+    "find . -name '*.rs'",
+    "find src -type f",
+    "find . -maxdepth 2 -type d",
+    "find . -delete",
+]
+examples_denied = [
+    "find /etc -delete",
+    "find ~ -name '*.bak' -delete",
+]
+
+# Every word find prints is a path BENEATH its path operands, so a `$(find …)` is bounded by the
+# worst read locus of those operands — the same claim `fd` carries, and what makes
+# `cat "$(find ./sub -name x)"` classifiable instead of unpinnable.
+#
+# The listed primaries each break that, so they void the claim:
+#   -ls / -fls           print `ls -dils` rows, not bare paths
+#   -printf / -fprintf   emit an arbitrary caller-supplied format — `-printf` IS an allowed
+#                        primary today (`find . -printf '%p\\n'` is a safe example), so this entry
+#                        is load-bearing rather than defensive
+#   -exec / -execdir     stdout becomes the INNER command's output, which can name anything
+#   -ok / -okdir         the same, with a prompt
+#   -fprint / -fprint0   send the paths to a file, so stdout is not the result
+#   -D                   interleaves diagnostics with results
+#   -help / -version     print prose; the `--` spellings are voided engine-wide, these are find's
+#                        own single-dash forms
+# Some of these the handler refuses anyway. They are listed regardless: `invalidated_by` states
+# what the claim depends on, and a claim that quietly relies on another layer to stay true breaks
+# the moment that layer moves.
+[command.output]
+locus_from = "operands"
+invalidated_by = [
+    "-D",
+    "-exec", "-execdir",
+    "-fls", "-fprint", "-fprint0", "-fprintf",
+    "-help",
+    "-ls",
+    "-ok", "-okdir",
+    "-printf",
+    "-version",
+]

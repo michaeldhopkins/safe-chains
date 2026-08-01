@@ -40,6 +40,18 @@ Aliases: `whatis`
 - `fd pattern -x wc -l {}`
 - `fd -X cat`
 
+### `find`
+<p class="cmd-url"><a href="https://www.gnu.org/software/findutils/manual/html_mono/find.html">https://www.gnu.org/software/findutils/manual/html_mono/find.html</a></p>
+
+- Read-only primaries (tests, operators, reporting actions); `-exec`/`-execdir` and `-delete` are decided by the traversal locus.
+
+**Examples:**
+
+- `find . -name '*.rs'`
+- `find src -type f`
+- `find . -maxdepth 2 -type d`
+- `find . -delete`
+
 ### `locate`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/locate.1.html">https://man7.org/linux/man-pages/man1/locate.1.html</a></p>
 

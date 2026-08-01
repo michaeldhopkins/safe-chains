@@ -4877,6 +4877,18 @@ Aliases: `gfalse`
 
 - Read-only predicates and actions allowed (tests like -name/-type/-size, -print/-ls/-prune, operators, positional and global options). -exec/-execdir allowed when the executed command is itself safe (each `{}` binds to the traversal path).
 
+### `find`
+<p class="cmd-url"><a href="https://www.gnu.org/software/findutils/manual/html_mono/find.html">https://www.gnu.org/software/findutils/manual/html_mono/find.html</a></p>
+
+- Read-only primaries (tests, operators, reporting actions); `-exec`/`-execdir` and `-delete` are decided by the traversal locus.
+
+**Examples:**
+
+- `find . -name '*.rs'`
+- `find src -type f`
+- `find . -maxdepth 2 -type d`
+- `find . -delete`
+
 ### `findmnt`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/findmnt.8.html">https://man7.org/linux/man-pages/man8/findmnt.8.html</a></p>
 
