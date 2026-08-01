@@ -469,9 +469,24 @@ mod tests {
             for value in [
                 "/tmp/evil", "./bin/tool", "ssh", ":/:", "x:/tmp/evil", "a:b", "..", "/",
                 "./a:./b", "~/.ssh/id_rsa", ".", "/etc/shadow", "sub/dir/tool",
+                // Command LINES. Every value above is a single token, so the corpus could not see
+                // the case where one gate treats the value as a path and the other as a command:
+                // `--rsh 'sh -c evil'` was auto-approved (the pathgate pre-filter skipped it as
+                // "not path-shaped") while `BORG_RSH='sh -c evil'` denied. The nightly fuzz found
+                // only a lookalike symptom (`fiLe:~`) because its transform excludes whitespace,
+                // so this shape has to be carried here.
+                "sh -c evil", "ssh -p 2222", "/bin/sh -c x",
             ] {
-                let flag_form = flag_tmpl.replace("{v}", value);
-                let env_form = format!("{name}={value} {base}");
+                // Multi-word values are quoted so both spellings still see ONE value; unquoted,
+                // the extra words would become separate arguments and the two forms would stop
+                // denoting the same operation.
+                let quoted = if value.contains(char::is_whitespace) {
+                    format!("'{value}'")
+                } else {
+                    value.to_string()
+                };
+                let flag_form = flag_tmpl.replace("{v}", &quoted);
+                let env_form = format!("{name}={quoted} {base}");
                 let by_flag = crate::is_safe_command(&flag_form);
                 let by_env = crate::is_safe_command(&env_form);
                 if by_flag != by_env {
