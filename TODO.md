@@ -843,7 +843,7 @@ SEQUENCE, so each step is independently verifiable:
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
 
-## cargo fuzz: run/cmin/tmin/coverage/fmt/add need a path gate before they can be allowed
+## cargo fuzz: REVERTED — needs a pathgate handler and a positional shape, not TOML whittling
 
 Found in adversarial review of the batch, in a change made earlier in the same session:
 `cargo fuzz cmin parse ~/.ssh` was AUTO-APPROVED. `cmin` minifies a corpus by rewriting the
@@ -860,7 +860,20 @@ path component — the first round fixed the corpus positional and missed its si
 `positional_shape` admitting only a separator-free name would be enough, and adding a shape is a
 one-line `PositionalShape` addition plus a match arm.
 
-Those six now deny by omission. The corpus-free subs (`list`, `build`, `check`, `add`, `init`) are
+REVERTED ENTIRELY. Three review rounds each found another operand that becomes a path, and the
+attempt to keep a minimal safe subset failed twice more: dropping `nested_bare` made the sub accept
+arbitrary positionals (`cargo fuzz cmin parse ~/.ssh` admitted again), and restoring it with no
+`[[command.sub.sub]]` declared did the same. The TOML shapes available cannot express "this sub
+exists but takes no operands".
+
+`init --target` is worth recording as an upstream footgun for whoever redoes this: `init` documents
+`-t, --target <TARGET>` as "name of the first fuzz target to create", while `build` documents
+`--target <TRIPLE>` as the target triple. One spelling, two meanings, one tool — so a flag list
+copied between subs is wrong in a way that reads as correct.
+
+Redo it with: a pathgate handler keyed on `tokens[1] == "fuzz"` gating the positional after the
+target name (write for run/cmin, read for tmin/fmt/coverage), and a `positional_shape` admitting
+only separator-free names for `add` and `init --target`. The corpus-free subs (`list`, `build`, `check`, `add`, `init`) are
 allowed, which covers the reported `cargo fuzz --version` case.
 
 Why the obvious fixes do not work:
