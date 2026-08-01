@@ -671,6 +671,44 @@ list. Research it as its own command surface — `init`, `add`, `build`, `run`, 
 `coverage`, `list` — and note that `run`/`cmin`/`tmin` EXECUTE the fuzz target (workspace-authored
 code, but still execution) while `list`/`--version` only report.
 
+## find: an output claim needs a TOML entry, and adding one exposed a scale gap
+
+Attempted `[command.output] locus_from = "operands"` for `find` (the fd shape) so
+`cat "$(find ./sub -name x)"` classifies against its search root instead of being unpinnable.
+Two blockers, both surfaced by existing registry guards, and the second is the important one.
+
+1. STRUCTURAL: `find` has NO TOML entry at all — it is registered purely as a Rust handler
+   (`src/handlers/coreutils/find.rs`). So the change is not "add a field", it is "give find a TOML
+   entry with `handler = "find"`", which `commands/search/fd.toml` shows is a supported shape.
+   Doing that also subjects find to guards it has never been held to, which is how #2 appeared:
+   `positional_last_arg_writers_are_gated_or_acknowledged` flags find and wants either
+   `shape = "last_write"` or an entry in `tests/fixtures/positional_writer_worklist.tsv` — find
+   ignores its last positional as a write target, so the fixture is the right answer.
+
+2. FAIL-OPEN, PRE-EXISTING: `toml_examples_match_dispatch` refused to accept
+   `find . -name '*.log' -exec rm {} ;` as a DENIED example, because it is APPROVED. Measured:
+
+       deny     find . -delete
+       APPROVE  find . -exec rm {} ;          <- same effect
+       APPROVE  rm {}
+       deny     find / -name '*.log' -exec rm {} ;   (root locus refuses)
+       deny     find . -exec sh -c 'rm -rf /' ;      (inner command refuses)
+
+   `-delete` is refused and `-exec rm {}` is not, though they destroy the same files. The cause is
+   that `-exec` DELEGATES to the inner command, which is classified on its own — `rm {}` is a
+   single worktree file — so find's multiplier is lost at the delegation boundary. Scale is the
+   facet that should carry it: the same operation at `scale = unbounded` is what `-delete`'s
+   refusal already encodes.
+
+   This is not caused by the TOML attempt; the attempt only made an existing guard able to see it.
+   The TOML was reverted rather than landed with a weakened example, because changing the example
+   to match the dispatcher would have buried the finding.
+
+   Fix direction: the `-exec`/`-execdir` delegation should raise the inner capability's scale
+   (single -> unbounded) before verdicting, so a per-match destroy is judged as the mass operation
+   it is. Check `-ok`/`-okdir` and fd's `-x`/`-X` for the same shape — fd's TOML already voids its
+   output claim on those flags, which is the adjacent concern, not this one.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
