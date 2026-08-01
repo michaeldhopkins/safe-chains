@@ -2413,6 +2413,79 @@ use super::*;
     /// flags any drift between the TOML and the runtime dispatcher.
     /// Use to lock in alias correctness, security boundaries, and
     /// representative agent invocations.
+    /// A `nested_bare` sub must not accept an UNKNOWN nested subcommand.
+    ///
+    /// `max_positional` defaults to UNLIMITED, so a sub declaring only `nested_bare = true` takes
+    /// every following token as an unremarkable positional. Unknown FLAGS deny while unknown
+    /// POSITIONALS pass, so such an entry reads as "this subcommand is gated" while admitting
+    /// anything after it. `pulumi config` was exactly that: `pulumi config set k v` and
+    /// `pulumi config rm k` were approved — mutations of stack configuration, which is remote state
+    /// under the service backend — and only `--secret` refused, because it happened to be an
+    /// unlisted flag.
+    ///
+    /// Read from the TOML SOURCE rather than the lowered registry, because `nested_bare` is folded
+    /// into a dispatch kind and the property being guarded is a property of what was AUTHORED.
+    /// Enumerated so a future `nested_bare` sub with no nested subs fails here the day it lands.
+    #[test]
+    fn a_nested_bare_sub_refuses_an_unknown_nested_subcommand() {
+        fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            let Ok(entries) = std::fs::read_dir(dir) else { return };
+            for e in entries.flatten() {
+                let p = e.path();
+                if p.is_dir() {
+                    tomls(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+        let mut files = Vec::new();
+        tomls(std::path::Path::new("commands"), &mut files);
+        assert!(!files.is_empty(), "no command TOMLs found; the guard would be vacuous");
+
+        let mut leaks = Vec::new();
+        let mut checked = 0usize;
+        for f in files {
+            let Ok(text) = std::fs::read_to_string(&f) else { continue };
+            let (mut command, mut sub, mut in_sub) = (String::new(), String::new(), false);
+            for line in text.lines() {
+                let t = line.trim();
+                if t == "[[command]]" {
+                    command.clear();
+                    in_sub = false;
+                } else if t == "[[command.sub]]" {
+                    sub.clear();
+                    in_sub = true;
+                } else if t.starts_with("[[") {
+                    in_sub = false;
+                } else if let Some(n) = t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"')) {
+                    if in_sub && sub.is_empty() {
+                        sub = n.to_string();
+                    } else if !in_sub && command.is_empty() {
+                        command = n.to_string();
+                    }
+                } else if t == "nested_bare = true" && in_sub && !command.is_empty() && !sub.is_empty() {
+                    checked += 1;
+                    for probe in [
+                        format!("{command} {sub} zzunknownsub"),
+                        format!("{command} {sub} zzunknownsub /etc/passwd"),
+                    ] {
+                        if crate::is_safe_command(&probe) {
+                            leaks.push(probe);
+                        }
+                    }
+                }
+            }
+        }
+        assert!(checked > 50, "only {checked} nested_bare subs seen; the walk is not finding them");
+        assert!(
+            leaks.is_empty(),
+            "a nested_bare sub admitted an unknown nested subcommand — unknown POSITIONALS pass \
+             where unknown flags deny, so the gate reads as closed while anything gets through:\n  {}",
+            leaks.join("\n  ")
+        );
+    }
+
     #[test]
     fn toml_examples_match_dispatch() {
         let mut failures = Vec::new();

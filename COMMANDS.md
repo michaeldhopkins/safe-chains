@@ -12011,7 +12011,7 @@ Aliases: `gptx`
 <p class="cmd-url"><a href="https://www.pulumi.com/docs/cli/">https://www.pulumi.com/docs/cli/</a></p>
 
 - **about**: Flags: --help, --json, --transitive, -h
-- **config**
+- **config get**: Flags: --help, -h, --json. Valued: --stack, -s
 - **console**: Flags: --help, -h
 - **gen-completion**: Flags: --help, -h
 - **logs**: Flags: --follow, --help, --json, -f, -h. Valued: --resource, --since, --stack, -r, -s
