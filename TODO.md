@@ -709,6 +709,59 @@ Two blockers, both surfaced by existing registry guards, and the second is the i
    it is. Check `-ok`/`-okdir` and fd's `-x`/`-X` for the same shape — fd's TOML already voids its
    output claim on those flags, which is the adjacent concern, not this one.
 
+## find: the handler->TOML conversion, and `-delete` is a FALSE DENY (derived, not opinion)
+
+### `-delete` should be admitted — the engine already says so
+
+Measured, so this needs no judgement call:
+
+    APPROVE  rm ./file.log      APPROVE  rm -rf ./*
+    APPROVE  rm -rf ./builddir  APPROVE  rm -r ./src
+    APPROVE  find . -exec rm {} ;
+    deny     find . -delete
+
+Unbounded destroy on a WORKTREE locus is admitted at `developer`, consistently, in every spelling
+except `-delete`. And the `-exec rm` admission is deliberate — `src/handlers/coreutils/find.rs`
+carries it as a safe example with the note "engine-authoritative: deleting WORKTREE files via -exec
+is admitted at developer ({} binds to the find path, so these stay inside the worktree)".
+
+So the two verdicts do not disagree about policy. `-exec rm` was argued; `-delete` was never listed,
+and find's allowlist denies unlisted primaries by omission. That is a false deny, not a safety
+stance, and adding `-delete` keeps the protection that matters: `find / -exec rm {} ;` already
+denies on the operand locus, so `find / -delete` will too.
+
+Do it as its own change with its own review — it is a permissiveness change to a security
+allowlist — and assert both directions: `find . -delete` approves, `find / -delete` and
+`find ~/.ssh -delete` refuse.
+
+### The conversion: what moves, what stays
+
+`src/handlers/coreutils/find.rs` is 221 lines and holds two `WordSet::new(&[...])` constants, which
+AGENTS.md names as the smell for data in the wrong place.
+
+MOVES to TOML (`[command.fallback]`, the shape `commands/tools/tilt.toml` uses, reached from the
+handler by `registry::try_fallback_grammar("find", tokens)`):
+  - `FIND_SAFE_STANDALONE` (~35 primaries) -> `standalone`
+  - `FIND_SAFE_VALUED` (~20 primaries)     -> `valued`; the field already MEANS "consumes the next
+    token", which is find's central walk rule, so this is not an approximation
+  - the ~30 inline examples               -> `examples_safe` / `examples_denied`
+
+STAYS as logic:
+  - the `-newer*` PREFIX family (`-newermt`, `-neweraa`, …) — a set cannot express a prefix
+  - `-exec` / `-execdir` delegation, including binding `{}` to the traversal base
+  - extraction of the path operands that precede the first primary
+
+Prerequisites, both already discovered:
+  1. find has NO `[[command]]` entry at all today, so it needs one with `handler = "find"`
+     (`commands/search/fd.toml` is the working example of that shape).
+  2. Adding it subjects find to `positional_last_arg_writers_are_gated_or_acknowledged`, which
+     wants either `shape = "last_write"` or an entry in
+     `tests/fixtures/positional_writer_worklist.tsv`. find ignores its last positional as a write
+     target, so the fixture is the correct answer.
+
+Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
+which is the original reason for touching it — see the entry above.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
