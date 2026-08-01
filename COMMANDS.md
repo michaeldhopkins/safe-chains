@@ -2478,7 +2478,6 @@ Aliases: `capacitor`
 - **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
 - **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --target, -Z
 - **fmt**: Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
-- **fuzz add**: Flags: --fuzz-dir, --help, --version, -V, -h. Valued: --fuzz-dir
 - **fuzz build**: Flags: --all-features, --build-std, --careful, --debug-assertions, --dev, --disable-branch-folding, --help, --no-cfg-fuzzing, --no-default-features, --no-include-main-msvc, --no-trace-compares, --release, --strip-dead-code, --trace-div, --trace-gep, --verbose, --version, -D, -O, -V, -a, -c, -h, -v. Valued: --codegen-units, --features, --fuzz-dir, --sanitizer, --target, --target-dir, -s
 - **fuzz check**: Flags: --all-features, --build-std, --careful, --debug-assertions, --dev, --disable-branch-folding, --help, --no-cfg-fuzzing, --no-default-features, --no-include-main-msvc, --no-trace-compares, --release, --strip-dead-code, --trace-div, --trace-gep, --verbose, --version, -D, -O, -V, -a, -c, -h, -v. Valued: --codegen-units, --features, --fuzz-dir, --sanitizer, --target, --target-dir, -s
 - **fuzz init**: Flags: --fuzz-dir, --help, --version, -V, -h. Valued: --fuzz-dir, --fuzz-engine, --fuzzing-workspace, --target

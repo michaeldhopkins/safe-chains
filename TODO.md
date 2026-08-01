@@ -843,7 +843,7 @@ SEQUENCE, so each step is independently verifiable:
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
 
-## cargo fuzz: run/cmin/tmin/coverage/fmt need a pathgate handler before they can be allowed
+## cargo fuzz: run/cmin/tmin/coverage/fmt/add need a path gate before they can be allowed
 
 Found in adversarial review of the batch, in a change made earlier in the same session:
 `cargo fuzz cmin parse ~/.ssh` was AUTO-APPROVED. `cmin` minifies a corpus by rewriting the
@@ -851,7 +851,16 @@ directory it is handed — removing files — and that directory is a plain POSI
 new inputs into the same slot, and `tmin`/`fmt` read an arbitrary input FILE and print a derived
 result.
 
-Those five now deny by omission. The corpus-free subs (`list`, `build`, `check`, `add`, `init`) are
+`add` joins them for a different reason found in the SECOND review round: its positional is a target
+NAME interpolated into `fuzz/fuzz_targets/<name>.rs`, so `cargo fuzz add ../../../etc/x` created a
+file outside the workspace. "Scaffolds a file locally" sounds bounded until you notice the name is a
+path component — the first round fixed the corpus positional and missed its sibling.
+
+`add` is also the one that does NOT need the handler: its argument should be a bare identifier, so a
+`positional_shape` admitting only a separator-free name would be enough, and adding a shape is a
+one-line `PositionalShape` addition plus a match arm.
+
+Those six now deny by omission. The corpus-free subs (`list`, `build`, `check`, `add`, `init`) are
 allowed, which covers the reported `cargo fuzz --version` case.
 
 Why the obvious fixes do not work:
