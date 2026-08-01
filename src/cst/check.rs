@@ -718,6 +718,8 @@ fn part_sub_verdict(part: &WordPart) -> Verdict {
         WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => script_verdict(inner),
         WordPart::Backtick(raw) => command_verdict(raw),
         WordPart::DQuote(inner) => word_sub_verdict(inner),
+        // Arithmetic is inert, but a `$( )` inside it runs — judged, not skipped.
+        WordPart::Arith(inner) => word_sub_verdict(inner),
         _ => Verdict::Allowed(SafetyLevel::Inert),
     }
 }
