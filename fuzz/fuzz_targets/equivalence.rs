@@ -54,6 +54,17 @@ const EQUIVALENT: &[(&str, &str)] = &[
 /// Anything the shell would treat as structure — whitespace, quotes, redirects, expansion — is
 /// rejected, because with it the two sides stop denoting the same command and a mismatch would say
 /// nothing. Keeping the filter strict is what keeps a failure meaningful.
+/// INTERIOR WHITESPACE IS ALLOWED, and that is the point of this filter's most recent widening. A
+/// value with a space is a command LINE, and the executor-slot gates read one as a path — which is
+/// how `borg --rsh 'sh -c evil'` and `restic --password-command 'sh -c evil'` were auto-approved on
+/// BOTH spellings. Excluding whitespace made that entire class unreachable: the run that caught the
+/// pair could only report a single-token lookalike (`fiLe:~`), and the real defect was found by hand
+/// afterwards. Multi-word values are spliced QUOTED so both sides still denote one value.
+///
+/// Leading/trailing whitespace is still rejected (`v.trim() == v`): it would be swallowed by the
+/// shell on one side and preserved inside quotes on the other, so the two forms would stop denoting
+/// the same operation and every run would report a mismatch that means nothing.
+///
 /// A leading `-` is excluded deliberately. Whether `--rsh -x` passes `-x` as the VALUE or starts a
 /// new flag is a getopt convention, not a shell one, and tools differ — real rsync takes it as the
 /// value while we read it as an unknown flag and refuse. That divergence is fail-CLOSED and worth
@@ -63,9 +74,9 @@ fn is_transparent(v: &str) -> bool {
     !v.is_empty()
         && !v.starts_with('-')
         && v.len() <= 200
+        && v.trim() == v
         && !v.chars().any(|c| {
-            c.is_whitespace()
-                || c.is_control()
+            c.is_control()
                 || matches!(
                     c,
                     '\'' | '"' | '`' | '\\' | '$' | '(' | ')' | ';' | '&' | '|' | '<' | '>' | '*'
@@ -81,9 +92,18 @@ fuzz_target!(|data: &[u8]| {
     if !is_transparent(value) {
         return;
     }
+    let multiword = value.chars().any(char::is_whitespace);
     for (left, right) in EQUIVALENT {
-        let a = left.replace("{v}", value);
-        let b = right.replace("{v}", value);
+        // The pairs that differ only by SHELL QUOTING (`cat {v}` vs `cat '{v}'`) are about quoting
+        // itself, so a value containing a space genuinely makes their two sides different commands —
+        // one word versus two. Skipping them for multi-word values keeps a real mismatch meaningful
+        // instead of reporting the filter's own artifact.
+        if multiword && [left, right].iter().any(|t| t.contains('\'') || t.contains('"')) {
+            continue;
+        }
+        let spliced = if multiword { format!("'{value}'") } else { value.to_string() };
+        let a = left.replace("{v}", &spliced);
+        let b = right.replace("{v}", &spliced);
         let va = safe_chains::is_safe_command(&a);
         let vb = safe_chains::is_safe_command(&b);
         assert_eq!(
