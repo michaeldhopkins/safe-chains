@@ -789,21 +789,42 @@ Prerequisites, both already discovered:
      `tests/fixtures/positional_writer_worklist.tsv`. find ignores its last positional as a write
      target, so the fixture is the correct answer.
 
-The accessor the handler needs does not exist yet. Nothing in `registry/mod.rs` hands a handler its
-flag word-sets — `sub_archetypes`, `command_flag_archetypes` and `sub_output_path_token` are the
-nearest and none of them return one. Shape:
+The accessor does not exist yet, but it is small, and two claims recorded here earlier were WRONG
+and are corrected:
 
-    pub(crate) fn fallback_flag_sets(name: &str) -> Option<(&'static [String], &'static [String])>
+  WRONG #1: "the Vecs do not survive lowering, so the accessor is the wrong shape". They do.
+  `OwnedPolicy` (registry/types.rs) keeps `standalone: Vec<String>` and `valued: Vec<String>` as
+  separate fields, so the accessor is exactly:
 
-with the handler's `FIND_SAFE_VALUED.contains(&tokens[i])` becoming a lookup against the returned
-slices. Linear scan over ~35 entries is irrelevant next to the rest of a verdict, so the loss of
-`WordSet`'s binary search does not matter; what does matter is that `WordSet::new` enforces sorted
-order at COMPILE time and a TOML list does not, so the registry build must keep that check or the
-guarantee is silently dropped in the move.
+      pub(crate) fn fallback_flag_sets(cmd_name: &str)
+          -> Option<(&'static [String], &'static [String])>
+      // handler_spec -> DispatchKind::Custom { fallback } -> (&f.policy.standalone, &f.policy.valued)
 
-One semantic check that makes the move faithful rather than approximate: `valued` already means
-"consumes the next token", which is exactly find's walk rule (`i += 2`), and `standalone` means
-`i += 1`. The fields line up with the handler's two branches one-for-one.
+  WRONG #2: "WordSet::new enforces sorted order at compile time and a TOML list does not, so the
+  build must keep that check". It must not, because there is nothing to keep. `WordSet` needs
+  sorting because it BINARY SEARCHES; `impl FlagSet for [String]` is `self.iter().any(...)`, a
+  linear scan. The requirement travels with the data STRUCTURE, not the data, so it disappears
+  along with the WordSet. ~35 entries scanned linearly is nothing beside the rest of a verdict.
+
+HOW DRIFT IS AVOIDED: by DELETION, not by synchronisation. The data moves to TOML and the two
+`WordSet` constants are deleted in the same change. Two copies cannot drift if only one exists —
+any design that keeps both and adds a test to compare them is strictly worse, because it makes
+divergence a thing that must be detected rather than a thing that cannot happen.
+
+ONE SEMANTIC CAVEAT: `[command.fallback]` means "the grammar used when no sub matches". find would
+use it as a data source read by its OWN walk and would never call `try_fallback_grammar`. Nothing
+auto-dispatches a fallback (tilt calls it explicitly), so this is safe today, but it is a stretch of
+what the block means and deserves a comment in the TOML saying so.
+
+SEQUENCE, so each step is independently verifiable:
+  1. Add `[command.fallback]` to find.toml with the data, change NOTHING else. Run the suite. Green
+     with no verdict movement proves the block is inert — that declaring it does not silently
+     re-route dispatch, which is the only real unknown here.
+  2. Add the accessor, switch the handler's two `.contains(...)` calls to it, DELETE both WordSets.
+     Run the suite. The examples in find.rs are what catch a mistranscribed primary.
+  3. Only then consider moving the ~30 inline examples to `examples_safe`/`examples_denied`. They
+     are the handler's unit tests and serve a different purpose from registry examples, so this is
+     a separate judgement, not part of the data move.
 
 Landing the TOML entry is also what unblocks `[command.output] locus_from = "operands"` for find,
 which is the original reason for touching it — see the entry above.
