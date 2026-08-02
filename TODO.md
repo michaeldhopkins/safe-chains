@@ -27,6 +27,12 @@ auto-approved before this was written:
     borg --rsh /tmp/evil check repo                   runs it to reach the repo        [FIXED]
     borg --remote-path /tmp/evil list repo            borg executable on the far side  [FIXED]
 
+RE-VERIFIED after v0.221.0 changed `execute_file_verdict` (it now requires every whitespace-separated
+token to look like a path, to stop a command LINE being judged as one path). All seven still refuse
+`/tmp/evil`, and the in-workspace spellings — `vite -c ./vite.config.js`, `borg --rsh ./bin/myssh`,
+`restic --password-command ./bin/pass` — still work. Worth re-running whenever that function is
+touched, since these seven are exactly its consumers.
+
 All seven now declare a `[command.path_gate]` with role `exec`, which withholds `/tmp` and home
 where `read`/`write` would admit them, while keeping the in-workspace spelling
 (`vite -c ./vite.config.js`, `borg --rsh ./bin/myssh`) working. The mechanism needed no extension —
@@ -453,7 +459,7 @@ invocation is the one an unqualified `wasm-pack build` performs and that is what
 describe. `--panic-unwind` stays off the flag list either way: it installs a nightly toolchain,
 `rust-src` and the wasm32 target through rustup as a side effect of a build flag.
 
-## Confining an unpinnable path LEAF under a pinned prefix — foundation landed, 3 layers left
+## Confining an unpinnable path LEAF under a pinned prefix — DONE (v0.220.0), all 3 layers
 
 Reported from real use: `for i in $(seq 1 4); do … > "$SCRATCH/dx_$i.txt"; done` prompts. The
 scratchpad is NOT the cause — direct reads/writes there approve, and `--session-id` correctly adds
@@ -700,7 +706,7 @@ deliberately admits — and would contradict the engine's own stance on worktree
 stance should change, the place to change it is the LEVEL model for `destroy` at
 `locus.local = worktree`, uniformly, not a special case at find's delegation boundary.
 
-## find: the handler->TOML conversion, and `-delete` is a FALSE DENY (derived, not opinion)
+## find: handler->TOML conversion and `-delete` — DONE (v0.221.0)
 
 ### `-delete` should be admitted — the engine already says so
 
