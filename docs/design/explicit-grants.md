@@ -283,6 +283,73 @@ by a grant that names them.
 The last line is the part worth keeping. It explains the one behaviour that would otherwise look
 arbitrary, and it does so in terms of a rule rather than an exception.
 
+## Documentation change (draft)
+
+The user-facing rule already exists in `docs/src/how-it-works.md`, for dotfiles:
+
+> Dot files are generally not part of allowlisted target directories. You'll need to grant access to
+> these directories explicitly. **Credential stores like `.ssh`/`.aws` stay protected regardless.**
+
+So the change is small. The rule is already taught; credential stores are the stated exception to
+it. After this change there is no exception, which makes the docs shorter rather than longer.
+
+### Replacing that paragraph
+
+> A grant covers the directory you name and everything under it. It does not reach into dot
+> directories below that, because those are usually config and credentials that a broad grant should
+> not sweep up. Name them to reach them.
+>
+> ```toml
+> # Covers ~/projects/app/src, but not ~/projects/app/.git or ~/projects/.ssh
+> [[grant]]
+> path = "~/projects/"
+> read = true
+> write = true
+>
+> # Covers ~/.ssh, because it names it
+> [[grant]]
+> path = "~/.ssh"
+> read = true
+> ```
+>
+> The same applies to credential stores. A grant on a parent directory never reaches `~/.ssh` or
+> `~/.aws`. A grant that names one does.
+>
+> Two things cannot be granted at all, however you name them. safe-chains will not auto-approve
+> writes to its own config at `~/.config/safe-chains.toml`, because an agent that could change that
+> file could change everything else. And it will not auto-approve writes to the files that decide who
+> may log in and what they may do: `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d` and the boot loader.
+> Ordinary files in `/etc` are not covered by that and can be granted normally.
+>
+> Grants are read only from `~/.config/safe-chains.toml`, never from a file inside a project. A
+> project you have checked out cannot grant itself anything.
+
+### One caveat that belongs in the docs
+
+> On macOS, `~/.ssh` and `~/.SSH` are the same directory, but a grant covers the spelling you write.
+> Write the spelling you use.
+
+It is a small thing and it will look like a bug to whoever hits it, which is why it should be
+written down rather than left to be discovered. The reason it works this way is in the design notes
+above: shields fold case so they catch more, grants do not fold so they never admit a directory that
+would be genuinely different on a case-sensitive disk.
+
+### A decision this draft surfaced
+
+`how-it-works.md` also documents that safe-chains borrows read approvals from
+`~/.claude/settings.json`, and says "the credential shields and dotfile rule above still apply, so a
+broad read rule can't reach `.ssh`".
+
+After this change, "broad" is doing real work in that sentence, and the question becomes whether a
+Claude rule that NAMES a credential store, `Read(~/.ssh/**)`, should count as naming it.
+
+Recommendation: no. Those grants are derived from a different file, written for a different tool,
+for a different purpose. A user allowing Claude to read `~/.ssh` has not necessarily decided that
+safe-chains should auto-approve every command that touches it. Borrowing them at all is a
+convenience, and the convenience should stop short of the case where being wrong is expensive. The
+explicit `[[grant]]` stays the only way to name a credential store, and the docs sentence stays true
+as written.
+
 ## Testing
 
 1. A grant of `~/.ssh` admits reads of `~/.ssh/id_rsa`. This is the user-facing point of the change.
