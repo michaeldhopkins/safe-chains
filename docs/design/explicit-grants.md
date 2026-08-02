@@ -217,6 +217,50 @@ Three rows of that table are deliberately asymmetric and should be written as su
 `system-integrity` have no widening direction at all, and `read_locus > worktree-trusted` has no
 refusing direction. If any of them ever grows its missing half, something has gone wrong.
 
+## Remaining decisions and checks
+
+Verified while writing this, and each is a thing an implementer would otherwise have to guess.
+
+**Widening the locus IS sufficient — settled.** `reads_secret` has no independent verdict gate. Its
+only consumers are `role_is_protective` (which drives case-folding), the secret-first pass in
+`base_region`, and the nudge helper. Path-based secret protection is expressed purely as
+`read_locus = machine`. So a grant that widens the read face is enough, and the implementation
+should NOT also try to clear `reads_secret`: it is structural, and clearing it would change
+case-folding behaviour as a side effect.
+
+**Grants do not case-fold, and should not start — settled, with a consequence to document.**
+`best_grant` calls `specificity(path, false)` while shields use `fold_shields = macos`. That
+asymmetry is deliberate: folding an ADMIT could admit a case-variant that is a different path on a
+case-sensitive volume, a fail-open, whereas folding a PROTECTION only ever denies more.
+
+The consequence is real and should be in the user-facing docs rather than discovered: on macOS a
+grant of `~/.ssh` covers `~/.ssh/id_rsa`, while `~/.SSH/id_rsa` still meets the folded shield and the
+unfolded grant does not reach it. Same directory on that filesystem, two spellings, two answers. A
+grant covers the spelling it names. Making grants fold to fix this would trade a small surprise for
+a fail-open on case-sensitive volumes, which is the wrong trade.
+
+**The shielded "node" is path-dependent for SEGMENT matchers — the main implementation subtlety.**
+`.ssh` is matched as a segment, so it fires at any depth: `~/.ssh/id_rsa` and
+`~/projects/app/.ssh/key` both hit it, but the node ROOT differs (`~/.ssh` versus
+`~/projects/app/.ssh`). The comparison in the new rule is against that per-path root, so it has to
+be computed from the match POSITION, not read off the matcher. An implementation that treats a
+segment matcher as having one fixed root will get the peer case wrong in a way that looks right for
+`~/.ssh`.
+
+**A grant can never name a relative shield.** The segment shield bites `myproj/.ssh/id_rsa` (there
+is a test). Grants are rooted at `~` or `/`, so no grant can name that occurrence, and a repo-local
+`.ssh` directory stays shielded regardless of grants. That is the desired behaviour and is worth an
+assertion so nobody "fixes" it later.
+
+**Still to check before implementing:**
+
+1. Does the peer/adjacent classification path need the same change? It applies `has_hidden_component`
+   separately, and after this a grant naming `../peer/.ssh` should behave exactly like one naming
+   `~/.ssh`. Read that path before assuming `apply_grant` is the only site.
+2. `read = true, write = false` on a node that is BOTH a secret store and a write freeze. The faces
+   are independent by construction, but no test covers a node carrying both, and the credential
+   stores are `machine`/`machine` rather than one of each. Construct the case.
+
 ## Copy, once this lands
 
 `refusal-copy.md` example 5 currently points at raising the level, because that is the only lever
