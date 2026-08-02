@@ -993,6 +993,38 @@ first declaration wins, that tightening NEVER TOOK EFFECT; those subs are live a
 at intent. Decide whether the restriction stands: if it does, it is a separate, deliberate
 tightening with its own review, not a duplicate cleanup.
 
+## Structural invariants: three probed clean, one REAL gap remains
+
+Asked after the duplicate-tree guard: what else is declared protection that can never fire? Probed
+three classes across the registry. All three are clean, and the reasons are worth keeping so nobody
+re-probes them:
+
+  - `invalidated_by` naming a flag the command never accepts — 0 found. That one would be nasty (a
+    claim-voiding flag that can never be presented, so the claim stands when it should not).
+  - `path_gate` on a flag no list declares — 0 real. The 2 apparent hits (`whisper --model_dir`,
+    `--output_dir`) were a bug in the PROBE: its flag regex excluded underscores, so it never matched
+    the declarations that do exist.
+  - A flag in BOTH `standalone` and `valued` of one block — 1548 found, and SAFE. It is a deliberate
+    idiom for optional-value flags (`--verbose` vs `--verbose=3`, `-color` vs `-color auto`), and
+    `policy::consumes_next_value` only consumes the next token when it is NOT flag-shaped. Verified:
+    `coqc -color --frobnicate` denies, so a dual-listed flag cannot swallow a following flag and hide
+    it from the allowlist.
+
+THE REAL GAP — reparenting WITHOUT duplication. `the_command_tree_has_no_duplicate_names` catches a
+duplicated span because duplication necessarily repeats a name. It does NOT catch a `[[command.sub.sub]]`
+that simply moved under the wrong parent: the pulumi corruption reparented `history`/`tag`/`graph`
+under `config` AND duplicated, and only the duplication was detectable. A pure move would still pass.
+
+Guarding it needs an expectation of which subs OWN nested subs, which the data does not currently
+state. Two ways in, neither yet built:
+  - Assert every `[[command.sub.sub]]`'s parent is a sub that actually dispatches nested (a sub with
+    nested subs but no nested dispatch is dead data, which is the same defect from the other side).
+  - Pin the tree SHAPE per command — a fixture of `command sub subsub` triples, regenerated
+    deliberately — so any move shows up as a diff rather than needing to be reasoned about.
+
+Adjacent and also unbuilt: `[command.output]` or `[command.fallback]` declared on a command whose
+dispatch never consults it — dead declarations that read as configuration.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
