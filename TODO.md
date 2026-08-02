@@ -936,12 +936,30 @@ What that leaves, and it is a better-shaped question:
   - `set`'s full flag surface is small and researched: `--path`, `--plaintext`, `--raw`, `--secret`,
     `--type`.
 
-ONE UNKNOWN REMAINS before listing `set`: whether a PLAINTEXT set contacts the backend at all to
-resolve the current stack. Under the service backend it plausibly requires being logged in, which
-would make even the plaintext form a remote READ. Settle it by running against a `pulumi login
---local` stack with the network unavailable and watching whether it succeeds — do NOT infer it from
-help text, which is silent on the point. That measurement is the whole remaining blocker, and it is
-cheap.
+RESOLVED — `set` cannot be auto-approved, and the reason is not where it writes.
+
+Measured: `pulumi whoami` on this machine returns a Pulumi SERVICE account, and `pulumi config` run
+outside a project errors with "no Pulumi.yaml project file found". So config operations are
+project-scoped, and the BACKEND is ambient — it comes from login state or `PULUMI_BACKEND_URL`, never
+from the command string. A bare `pulumi config set` therefore may consult the service to resolve the
+stack, and nothing in the command lets that be ruled out. SafeWrite is local-only, so the possibility
+alone disqualifies it. The write TARGET being a local file was never the deciding factor; what the
+command must consult to get there is.
+
+That also closes the "measure it with a local backend" plan recorded above: measuring the local case
+would prove only that ONE backend is local, which is not the question. The question is what the
+abstraction can denote, and it can denote the service.
+
+The one way this could change: if the backend were made visible in the command string — a
+`PULUMI_BACKEND_URL=file://…` prefix classified through envvars.toml would do it, since that is the
+existing mechanism for a value that changes what a command reaches. Then the file-backend spelling
+could be admitted while the bare form stays out. That is a real design option, not a workaround, and
+it is the same shape `GIT_DIR` and friends already use.
+
+Also found while researching: `-C` / `--cwd` ("run pulumi as if it had been started in another
+directory") is a GLOBAL flag, so it applies to every pulumi subcommand including the allowed bare
+`config`. It takes a path and currently denies by omission — verified. Any future listing must not
+add it without a path gate; it relocates the whole invocation.
 
 Unchanged and still out for their own reasons: `copy` (writes a second NAMED stack), `refresh`
 (remote read plus local write), `env` (a whole ESC surface), `remove`/`remove-all` (same shape as
