@@ -244,10 +244,6 @@ name = "git"
 candidate = true
 
 [[command.sub]]
-name = "license"
-candidate = true
-
-[[command.sub]]
 name = "providers"
 candidate = true
 

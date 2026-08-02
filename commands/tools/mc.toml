@@ -237,10 +237,6 @@ name = "lock"
 candidate = true
 
 [[command.sub]]
-name = "share"
-candidate = true
-
-[[command.sub]]
 name = "idp"
 candidate = true
 

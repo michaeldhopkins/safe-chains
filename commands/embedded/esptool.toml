@@ -93,10 +93,6 @@ name = "read_mem"
 candidate = true
 
 [[command.sub]]
-name = "flash_id"
-candidate = true
-
-[[command.sub]]
 name = "read_flash_status"
 candidate = true
 

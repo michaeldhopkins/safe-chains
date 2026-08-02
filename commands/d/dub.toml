@@ -127,6 +127,3 @@ candidate = true
 name = "dustmite"
 candidate = true
 
-[[command.sub]]
-name = "describe"
-candidate = true
