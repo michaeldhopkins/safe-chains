@@ -115,6 +115,44 @@ impl Matcher {
             Matcher::Segment(_) => path,
         }
     }
+
+    /// The root this matcher occupies IN `path` — the naming test's left-hand side.
+    ///
+    /// Computed from the match POSITION, not from the matcher's text, because a `Segment` has no
+    /// fixed root: `.aws` roots at `~/.aws` in one path and at `~/projects/app/.aws` in another,
+    /// and comparing against the bare text `".aws"` would rank every grant as being below it.
+    fn root_in(&self, path: &str, fold: bool) -> Option<String> {
+        self.specificity(path, fold)?;
+        Some(match self {
+            Matcher::Exact(s) => s.clone(),
+            Matcher::Prefix(s) => s.strip_suffix('/').unwrap_or(s).to_string(),
+            Matcher::StringPrefix(s) => s.clone(),
+            Matcher::Segment(seg) => {
+                let eq = |a: &str, b: &str| if fold { a.eq_ignore_ascii_case(b) } else { a == b };
+                let mut acc = String::new();
+                for comp in path.split('/') {
+                    if !acc.is_empty() {
+                        acc.push('/');
+                    }
+                    acc.push_str(comp);
+                    if eq(comp, seg) {
+                        break;
+                    }
+                }
+                acc
+            }
+        })
+    }
+}
+
+/// Whether `inner` sits at or below `outer` as a path, by whole components.
+///
+/// `~/.ssh` is at-or-below `~/.ssh` and `~/.ssh/known_hosts` is below it, but `~/.sshfoo` is not —
+/// hence the component boundary rather than a bare `starts_with`.
+fn at_or_below(inner: &str, outer: &str) -> bool {
+    let inner = inner.trim_end_matches('/');
+    let outer = outer.trim_end_matches('/');
+    inner == outer || inner.strip_prefix(outer).is_some_and(|rest| rest.starts_with('/'))
 }
 
 /// Whether `remainder` (a path below a grant root) contains a hidden component — a dotfile/
@@ -243,10 +281,21 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
 // could drop one to escalate), and NEVER override a secret carve-out (`~/.ssh/id_rsa` stays
 // denied even under a `~/` grant).
 
+/// Where a grant came from. Only a grant the user wrote FOR safe-chains may name a credential
+/// store: a `Read(~/.ssh/**)` rule in `~/.claude/settings.json` was written to answer Claude's
+/// permission prompt, and does not say the user wants every command touching `~/.ssh` auto-approved
+/// here. Borrowing those rules is a convenience, and it stops short of the expensive case.
+#[derive(Clone, Copy, PartialEq)]
+enum GrantSource {
+    UserConfig,
+    Derived,
+}
+
 struct Grant {
     matcher: Matcher,
     read: bool,
     write: bool,
+    source: GrantSource,
 }
 
 // Grants are read from the user config in the real binary; tests inject them via `with_grants`.
@@ -288,7 +337,7 @@ fn load_user_grants() -> Vec<Grant> {
                 .flat_map(|g| {
                     grant_matchers(&g.path)
                         .into_iter()
-                        .map(move |m| Grant { matcher: m, read: g.read, write: g.write })
+                        .map(move |m| Grant { matcher: m, read: g.read, write: g.write, source: GrantSource::UserConfig })
                 }),
         );
     }
@@ -363,7 +412,7 @@ fn claude_settings_read_grants(home: &std::path::Path) -> Vec<Grant> {
         .flat_map(|p| {
             grant_matchers(&p)
                 .into_iter()
-                .map(|m| Grant { matcher: m, read: true, write: false })
+                .map(|m| Grant { matcher: m, read: true, write: false, source: GrantSource::Derived })
         })
         .collect()
 }
@@ -404,12 +453,28 @@ thread_local! {
     static TEST_GRANTS: std::cell::RefCell<Vec<Grant>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
-/// Run `f` with the given grants active (tests only): `(path, read, write)`.
+/// Run `f` with the given grants active (tests only): `(path, read, write)`. These carry
+/// user-config semantics, so they may name a credential store; `with_derived_grants` is the
+/// borrowed-from-another-tool flavor that may not.
 #[cfg(test)]
 pub(crate) fn with_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOnce() -> T) -> T {
+    with_grants_of_kind(grants, GrantSource::UserConfig, f)
+}
+
+/// Run `f` with grants that came from another tool's config (tests only) — read-only in practice,
+/// and never able to name a credential store.
+#[cfg(test)]
+pub(crate) fn with_derived_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOnce() -> T) -> T {
+    with_grants_of_kind(grants, GrantSource::Derived, f)
+}
+
+#[cfg(test)]
+fn with_grants_of_kind<T>(grants: &[(&str, bool, bool)], source: GrantSource, f: impl FnOnce() -> T) -> T {
     let parsed = grants
         .iter()
-        .flat_map(|&(p, read, write)| grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write }))
+        .flat_map(|&(p, read, write)| {
+            grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source })
+        })
         .collect();
     TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
     let out = f();
@@ -418,12 +483,35 @@ pub(crate) fn with_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOnce() -> 
 }
 
 /// The most-specific grant matching `path`, as `(read, write)`.
-fn best_grant(path: &str) -> Option<(bool, bool)> {
+///
+/// `secret_root`, when set, is the root of the credential-store node covering `path`, and switches
+/// on the NAMING test: a grant reaches a secret only if it names it, meaning the grant's own root
+/// sits at or below that node's root. `~/.ssh` and `~/.ssh/known_hosts` name `~/.ssh`; `~/` does
+/// not. Someone who grants a path inside a store has decided about the store as surely as someone
+/// who grants the store itself.
+///
+/// The hidden-component rule below cannot stand in for this. It only covers stores that are
+/// dot-prefixed, and most are not — `/etc/shadow`, `/root`, `~/Library/Keychains`,
+/// `~/Library/Messages` and every browser profile under `Application Support` all have dot-free
+/// remainders, so without the naming test a `~/Library/` grant would silently unlock Keychains,
+/// Safari history and Messages.
+fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
     let pick = |grants: &[Grant]| {
         grants
             .iter()
             .filter_map(|g| {
                 let spec = g.matcher.specificity(path, false)?;
+                if let Some(root) = secret_root {
+                    if g.source != GrantSource::UserConfig {
+                        return None;
+                    }
+                    // Grants never fold case, so the root is computed unfolded here too; a grant
+                    // covers the spelling it names (see `role_is_protective`).
+                    let grant_root = g.matcher.root_in(path, false)?;
+                    if !at_or_below(&grant_root, root) {
+                        return None;
+                    }
+                }
                 // A grant never widens a hidden file/dir it happened to sweep up (`~/` grant vs
                 // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
                 (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
@@ -441,15 +529,37 @@ fn best_grant(path: &str) -> Option<(bool, bool)> {
     }
 }
 
-/// Widen `base` by a matching user grant. A grant never lowers a secret carve-out, and each
-/// face is admitted only if the grant grants it — `read`/`write` are independent.
+/// Widen `base` by a matching user grant. Each face is admitted only if the grant grants it —
+/// `read`/`write` are independent.
+///
+/// A grant covers what it NAMES. That is the whole rule, and a credential store is not an
+/// exception to it: a grant naming `~/.ssh` reaches `~/.ssh`, a grant on `~/` does not (the naming
+/// test lives in `best_grant`). Forcing a user to acknowledge that they meant it is not this
+/// program's job; declining to let a grant reach somewhere it never mentioned is.
+///
+/// Two WRITE faces are frozen regardless of naming, because granting them forfeits the ability to
+/// enforce anything afterwards:
+///   - `pinned` — safe-chains' own config. An agent that can write it can grant itself the rest.
+///   - `system-integrity` — `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader and boot. These
+///     decide who may log in and what they may do, so a write there is compromise-complete.
+///
+/// Both stay READABLE by a naming grant; it is only the write that cannot be handed over.
 fn apply_grant(path: &str, base: Role) -> Role {
-    if base.reads_secret || base.pinned {
-        return base; // a grant never widens a secret store or safe-chains' own config
-    }
-    let Some((read, write)) = best_grant(path) else {
+    let write_frozen = base.pinned || base.write_locus >= LocalLocus::SystemIntegrity;
+    // Fail closed: a secret role whose node we cannot locate gets no grant at all, rather than
+    // falling through to the un-named case.
+    let secret_root = if base.reads_secret {
+        match secret_node_root(path) {
+            Some(root) => Some(root),
+            None => return base,
+        }
+    } else {
+        None
+    };
+    let Some((read, write)) = best_grant(path, secret_root.as_deref()) else {
         return base;
     };
+    let write = write && !write_frozen;
     Role {
         read_locus: if read { base.read_locus.min(LocalLocus::WorktreeTrusted) } else { base.read_locus },
         write_locus: if write { base.write_locus.min(LocalLocus::Worktree) } else { base.write_locus },
@@ -496,6 +606,22 @@ fn scratchpad_role(path: &str) -> Option<Role> {
     })
 }
 
+/// The credential-store node covering `path`, if any. Shared by `base_region` (which wants the
+/// role) and `apply_grant` (which wants the root the naming test compares against) so the two can
+/// never disagree about which node is in play.
+fn secret_node(path: &str) -> Option<&'static Node> {
+    REGIONS
+        .nodes
+        .iter()
+        .filter(|n| n.applies_here() && n.role.reads_secret)
+        .find(|n| n.matcher.specificity(path, n.fold && current_os() == "macos").is_some())
+}
+
+fn secret_node_root(path: &str) -> Option<String> {
+    let node = secret_node(path)?;
+    node.matcher.root_in(path, node.fold && current_os() == "macos")
+}
+
 fn base_region(path: &str) -> Role {
     let r = &*REGIONS;
     // macOS's default filesystem (APFS) is case-insensitive, so `~/.AWS` and `.GIT/hooks` name the
@@ -517,15 +643,8 @@ fn base_region(path: &str) -> Role {
     //
     // This is the same failure that retired the previous admit map: a broad prefix quietly
     // swallowing something sensitive underneath it.
-    if let Some(role) = r
-        .nodes
-        .iter()
-        .filter(|n| n.applies_here() && n.role.reads_secret)
-        .filter(|n| n.matcher.specificity(path, n.fold && fold_shields).is_some())
-        .map(|n| n.role)
-        .next()
-    {
-        return role;
+    if let Some(node) = secret_node(path) {
+        return node.role;
     }
 
     let mut best: Option<(usize, Role)> = None;
@@ -894,6 +1013,159 @@ mod tests {
         assert!(claude_settings_read_grants(empty.path()).is_empty());
     }
 
+
+    /// A sample path inside `node`, the grant that NAMES it, and the grant on its PARENT.
+    ///
+    /// `StringPrefix` is skipped (returns `None`): a `/dev/sd*` style matcher has no component
+    /// boundary, so "the parent" is not well defined. No credential store uses one today, and the
+    /// caller asserts the set it covered is non-empty so this cannot silently empty the guard.
+    #[cfg(test)]
+    fn naming_probe(matcher: &Matcher) -> Option<(String, String, String)> {
+        let parent_of = |s: &str| {
+            let t = s.trim_end_matches('/');
+            match t.rfind('/') {
+                Some(0) => "/".to_string(),
+                Some(i) => format!("{}/", &t[..i]),
+                None => return None,
+            }
+            .into()
+        };
+        match matcher {
+            Matcher::Exact(s) => Some((s.clone(), s.clone(), parent_of(s)?)),
+            Matcher::Prefix(s) => {
+                Some((format!("{s}probe"), s.clone(), parent_of(s)?))
+            }
+            Matcher::Segment(seg) => Some((format!("~/{seg}/probe"), format!("~/{seg}"), "~/".to_string())),
+            Matcher::StringPrefix(_) => None,
+        }
+    }
+
+    /// Enumerated over the REAL region table, so a credential store added later is covered without
+    /// anyone remembering to extend this.
+    ///
+    /// The rule: a grant covers what it names. Naming a store reaches it; granting the parent does
+    /// not. The second half is the one with teeth, because most stores are NOT dot-prefixed
+    /// (`/etc/shadow`, `/root`, `~/Library/Keychains`, `~/Library/Messages`, the browser profiles
+    /// under `Application Support`) so the hidden-component rule never fires for them, and without
+    /// the naming test a `~/Library/` grant would silently unlock Keychains and Messages.
+    /// A grant written without a trailing slash covers the subtree, because that is what anyone
+    /// writing it means. Before this, `path = "~/projects"` matched only the directory entry and
+    /// nothing inside it, so a grant written the natural way was very nearly inert.
+    #[test]
+    fn a_grant_covers_the_subtree_however_the_path_is_spelled() {
+        for spelling in ["~/projects", "~/projects/"] {
+            with_grants(&[(spelling, true, true)], || {
+                assert_eq!(
+                    classify_region("~/projects/sibling/notes.txt").write_locus,
+                    LocalLocus::Worktree,
+                    "{spelling} must cover its contents"
+                );
+                assert_eq!(classify_region("~/projects").write_locus, LocalLocus::Worktree, "{spelling} covers the dir itself");
+            });
+        }
+        // The component boundary still holds: a neighbour sharing a name prefix is not covered.
+        with_grants(&[("~/projects", true, true)], || {
+            assert_eq!(classify_region("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
+        });
+    }
+
+    #[test]
+    fn a_grant_reaches_a_credential_store_only_when_it_names_it() {
+        for os in ["macos", "linux"] {
+            with_os(os, || {
+                let mut covered = 0;
+                for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.reads_secret) {
+                    let Some((path, naming, parent)) = naming_probe(&node.matcher) else {
+                        continue;
+                    };
+                    assert!(
+                        base_region(&path).reads_secret,
+                        "{os}: probe {path} does not reach the secret node it was built from"
+                    );
+                    with_grants(&[(naming.as_str(), true, true)], || {
+                        assert_eq!(
+                            classify_region(&path).read_locus,
+                            LocalLocus::WorktreeTrusted,
+                            "{os}: a grant naming {naming} must reach {path}"
+                        );
+                    });
+                    with_grants(&[(parent.as_str(), true, true)], || {
+                        assert_eq!(
+                            classify_region(&path).read_locus,
+                            LocalLocus::Machine,
+                            "{os}: a grant on the parent {parent} must NOT reach the secret at {path}"
+                        );
+                    });
+                    covered += 1;
+                }
+                assert!(covered > 10, "{os}: only {covered} credential stores probed - the guard has gone vacuous");
+            });
+        }
+    }
+
+    /// Grants borrowed from another tool's config never name a credential store, however specific
+    /// they are. A `Read(~/.ssh/**)` rule answers Claude's permission prompt; it does not say the
+    /// user wants every command touching `~/.ssh` auto-approved here.
+    #[test]
+    fn a_derived_grant_never_names_a_credential_store() {
+        for os in ["macos", "linux"] {
+            with_os(os, || {
+                let mut covered = 0;
+                for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.reads_secret) {
+                    let Some((path, naming, _)) = naming_probe(&node.matcher) else {
+                        continue;
+                    };
+                    with_derived_grants(&[(naming.as_str(), true, false)], || {
+                        assert_eq!(
+                            classify_region(&path).read_locus,
+                            LocalLocus::Machine,
+                            "{os}: a derived grant on {naming} must not reach {path}"
+                        );
+                    });
+                    // The same grant written by the user in safe-chains' own config DOES reach it,
+                    // so this guard is testing the source and not merely re-testing the naming test.
+                    with_grants(&[(naming.as_str(), true, false)], || {
+                        assert_eq!(classify_region(&path).read_locus, LocalLocus::WorktreeTrusted);
+                    });
+                    covered += 1;
+                }
+                assert!(covered > 10, "{os}: only {covered} stores probed - the guard has gone vacuous");
+            });
+        }
+    }
+
+    /// The two frozen WRITE faces, enumerated over the region table. Granting these away forfeits
+    /// the ability to enforce anything afterwards, so no grant opens them however it is spelled.
+    /// Reads are deliberately not frozen: `/etc/passwd` is world-readable, and safe-chains' own
+    /// config is readable already.
+    #[test]
+    fn no_grant_opens_a_frozen_write_face() {
+        for os in ["macos", "linux"] {
+            with_os(os, || {
+                let mut covered = 0;
+                for node in REGIONS.nodes.iter().filter(|n| n.applies_here()) {
+                    let role = node.role;
+                    if !(role.pinned || role.write_locus >= LocalLocus::SystemIntegrity) {
+                        continue;
+                    }
+                    let Some((path, naming, parent)) = naming_probe(&node.matcher) else {
+                        continue;
+                    };
+                    for grant in [naming.as_str(), parent.as_str(), "~/", "/"] {
+                        with_grants(&[(grant, true, true)], || {
+                            assert!(
+                                classify_region(&path).write_locus > LocalLocus::Worktree,
+                                "{os}: grant {grant} must not open the frozen write at {path}"
+                            );
+                        });
+                    }
+                    covered += 1;
+                }
+                assert!(covered > 5, "{os}: only {covered} frozen nodes probed - the guard has gone vacuous");
+            });
+        }
+    }
+
     #[test]
     fn shields_fold_case_on_macos_so_a_case_variant_cannot_evade_them() {
         // On APFS (case-insensitive) a case-variant names the SAME file, so every protection —
@@ -907,9 +1179,14 @@ mod tests {
             assert!(classify_region(".GIT/hooks/pre-commit").write_locus > LocalLocus::Worktree, ".GIT write frozen");
             assert!(classify_region(".Git/hooks/pre-commit").write_locus > LocalLocus::Worktree, "mixed-case .Git frozen");
             assert!(classify_region(".ENVRC").write_locus > LocalLocus::Worktree, ".ENVRC write frozen");
-            // and a case-variant credential store stays un-grantable even under an explicit grant
+            // A grant NAMING the folded spelling reaches it: on this filesystem `~/.AWS` is the
+            // very same directory as `~/.aws`, so someone who granted one granted the other.
             with_grants(&[("~/.AWS/", true, false)], || {
-                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine, "explicit grant cannot unlock a folded secret");
+                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::WorktreeTrusted, "a grant naming the folded secret reaches it");
+            });
+            // A grant that does NOT name it still cannot reach through the fold.
+            with_grants(&[("~/", true, false)], || {
+                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine, "a broad grant cannot reach a folded secret");
             });
         });
     }
@@ -984,33 +1261,11 @@ mod tests {
     }
 
     #[test]
-    fn grant_never_widens_a_secret_carveout() {
+    fn a_broad_grant_never_reaches_a_secret_carveout() {
         with_grants(&[("~/", true, true)], || {
             let r = classify_region("~/.ssh/id_rsa");
-            assert_eq!(r.read_locus, LocalLocus::Machine, "secret stays denied under a ~/ grant");
+            assert_eq!(r.read_locus, LocalLocus::Machine, "a ~/ grant does not name ~/.ssh, so it does not reach it");
             assert!(r.reads_secret);
-        });
-    }
-
-
-    /// A grant written without a trailing slash covers the subtree, because that is what anyone
-    /// writing it means. Before this, `path = "~/projects"` matched only the directory entry and
-    /// nothing inside it, so a grant written the natural way was very nearly inert.
-    #[test]
-    fn a_grant_covers_the_subtree_however_the_path_is_spelled() {
-        for spelling in ["~/projects", "~/projects/"] {
-            with_grants(&[(spelling, true, true)], || {
-                assert_eq!(
-                    classify_region("~/projects/sibling/notes.txt").write_locus,
-                    LocalLocus::Worktree,
-                    "{spelling} must cover its contents"
-                );
-                assert_eq!(classify_region("~/projects").write_locus, LocalLocus::Worktree, "{spelling} covers the dir itself");
-            });
-        }
-        // The component boundary still holds: a neighbour sharing a name prefix is not covered.
-        with_grants(&[("~/projects", true, true)], || {
-            assert_eq!(classify_region("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
         });
     }
 
