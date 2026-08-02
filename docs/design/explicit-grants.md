@@ -1,121 +1,142 @@
-# Explicit grants: letting a user's own statement cut through
+# A grant covers what it names
 
-## The defect
+## What a user expects
 
-A user who wants safe-chains to stop asking about `~/.ssh/config` does the obvious thing and grants
-the path in `~/.config/safe-chains.toml`. Nothing changes. There is no message saying why, and no
-hint that another lever exists.
-
-The lever that does work is raising the LEVEL to `local-admin` or `yolo`. That is machine-wide. So
-the narrow, precise instrument silently fails and the blunt one succeeds, and a user following the
-path of least resistance ends up with far more granted than they asked for. For a safety tool that
-is the wrong way round.
-
-Measured, at the default level:
-
-```
---level developer      deny     cat ~/.ssh/id_rsa
---level local-admin    APPROVE
---level network-admin  deny
---level yolo           APPROVE
-```
-
-## Why it happens: two axes, one vocabulary
-
-Both levers are described to users as "allowing a path". They are not the same motion.
-
-- A GRANT re-classifies a path. `~/projects/` granted moves from `machine` to `worktree`, separately
-  for read and write.
-- A LEVEL raises the ceiling: how far up the locus ladder is auto-approved.
-
-The grant moves the path down toward the ceiling. The level moves the ceiling up toward the path.
-Three carve-outs refuse to be moved by a grant at all: secret stores, hidden components under a
-broad grant, and safe-chains' own config write.
-
-So for `~/.ssh/id_rsa` the grant is a no-op not because the path sits too high for the level, but
-because the shield pins it at `machine` and will not move.
-
-## What the shield is actually protecting against
-
-Worth being precise, because it decides the fix. The shield exists so that a BROAD grant does not
-sweep up credentials by accident. `~/` granted should not silently hand over every key on the
-machine. That is an accident-prevention rule, and a good one.
-
-It is not an argument against a user naming `~/.ssh` and saying "yes, that one". Those are different
-acts, and the current design cannot tell them apart because a grant carries no statement of intent
-beyond its path.
-
-## Proposal: an acknowledged grant, not a new status
-
-A new locus rung (`user-approved-read`) is the wrong shape. Adding a rung to the ladder invites the
-question of where it sits relative to the others, and the answer would have to be "above everything,
-conditionally", which is not a rung. What is missing is not a classification. It is a record that the
-user knew what they were asking for.
+Someone tired of approving reads under `~/.ssh` writes this and expects to stop being asked:
 
 ```toml
 [[grant]]
 path = "~/.ssh"
 read = true
-write = false
-acknowledge = "credential-store"
+write = true
 ```
 
-`acknowledge` names the carve-out being overridden. Without it the grant behaves exactly as today.
-With it, and only for the named carve-out, the grant wins.
+Today nothing changes, and nothing says why. That is the defect. The user config is the trust root:
+it is user-only, a repo file can never carry a grant, and an agent cannot write it. A grant typed
+there IS the statement of intent. Asking for a second field to prove the user meant it is ceremony,
+not safety, and anyone willing to add the grant would add the ceremony too.
 
-Four properties this has that bare exactness would not:
+An earlier draft of this document proposed exactly that (`acknowledge = "credential-store"`). It was
+wrong. safe-chains is not in the business of making users attest that they know what they are doing.
 
-1. It cannot happen by accident. A copied-and-pasted path does not acquire an acknowledgement.
-2. It is self-documenting. Someone reading the config later sees that a credential store was opened
-   deliberately, not swept up.
-3. It is auditable. `acknowledge` values are enumerable, so "what has this machine opened" is a
-   grep, not an inference over path shapes.
-4. It states the real cost. Reading a credential is not only a locus question. `secret = reads` also
-   means the content enters the agent's context, where it can be logged or sent onward. The word
-   `acknowledge` is doing honest work: the user is accepting THAT, not just widening a directory.
+## The rule
 
-An alternative considered and rejected: infer intent from grant SPECIFICITY, so an exact grant of
-`~/.ssh` cuts through while a prefix grant of `~/` does not. It reuses the exact-beats-prefix rule
-the region matcher already has, and needs no new syntax. It was rejected because the strength of the
-statement would depend on how the path happened to be written, with no way to tell a deliberate
-exact grant from one that is exact by coincidence, and nothing in the file recording that a
-credential store was involved.
+**A grant covers the subtree it names. Carve-outs exist to stop a grant reaching into things it did
+not name.**
+
+That is not a new idea here. It is already the rule for hidden files:
+
+```rust
+/// The part of `path` below this matcher's root ... A `~/` grant matches `~/.ssh` and
+/// `~/projects`, but only the latter's remainder is dot-free.
+fn remainder<'a>(&self, path: &'a str) -> &'a str
+```
+
+```rust
+// A grant never widens a hidden file/dir it happened to sweep up (`~/` grant vs
+// `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
+(!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
+```
+
+`remainder` is the part of the path BELOW the grant root, so:
+
+- grant `~/`, path `~/.ssh/id_rsa` — remainder `.ssh/id_rsa`, hidden, not widened. Correct: the
+  grant named home, not the keys.
+- grant `~/.ssh`, path `~/.ssh/id_rsa` — remainder `id_rsa`, dot-free, widened. Correct: the grant
+  named the directory.
+
+The secret carve-out does not follow that rule. It bails unconditionally:
+
+```rust
+fn apply_grant(path: &str, base: Role) -> Role {
+    if base.reads_secret || base.pinned {
+        return base; // a grant never widens a secret store or safe-chains' own config
+    }
+```
+
+It never asks whether the grant named the store. Two carve-outs, one asks, one does not, and the one
+that does not is the one users hit.
+
+## The change
+
+Replace the blanket bail with the same question the hidden rule asks: **is the shielded node at or
+below the grant root, or is it strictly below it?**
+
+- Shield node strictly BELOW the grant root — the grant swept it up. Shield wins.
+- Grant root AT or INSIDE the shielded node — the grant named it. Grant wins.
+
+Worked through:
+
+| grant | path | shield node | outcome |
+|---|---|---|---|
+| `~/` | `~/.ssh/id_rsa` | `~/.ssh` | below grant root, shield wins |
+| `~/.ssh` | `~/.ssh/id_rsa` | `~/.ssh` | grant root is the node, grant wins |
+| `~/.ssh` | `~/.aws/credentials` | `~/.aws` | not under the grant at all, shield wins |
+| `~/projects` | `~/projects/app/.ssh/key` | `.ssh` segment | below grant root, shield wins |
+| `/etc` | `/etc/shadow` | `/etc/shadow` | below grant root, shield wins |
+| `/etc/shadow` | `/etc/shadow` | `/etc/shadow` | grant names it, grant wins |
+
+The fourth row is why this cannot be simplified to "remove the bail and let the hidden rule handle
+it". Most credential stores are dot-directories, so the hidden rule would cover them by accident.
+But `/etc/shadow`, `/root`, the macOS keychains and browser profiles are not dot-prefixed, and a
+broad `/etc` grant would sweep them up with the bail gone. The comparison has to be against the
+shielded node, not against dot-ness.
+
+## What this needs from the code
+
+`apply_grant` currently receives only the resolved `Role`, which has lost the information about
+WHICH node matched. The shielded node's root has to survive the region lookup so the comparison can
+be made. That is the whole implementation: thread the matched node's path out of `base_region`
+alongside the role, then compare it with the grant root the same way `remainder` already compares.
+
+No new config syntax. No new locus rung. No new field on `[[grant]]`.
 
 ## What must not change
 
-- User config only. A repo-level file can never carry a grant, acknowledged or not. An agent that
-  can write `.safe-chains.toml` must not be able to open a credential store.
-- safe-chains' own config write stays un-grantable regardless of acknowledgement. An agent must not
-  be able to grant itself write access to the file that governs it, and no user intent argument
-  changes that, because the risk is not to the user's data but to the mechanism itself.
-- The default stays refused. Absent `acknowledge`, behaviour is exactly as today.
-- Hidden-component sweeping stays off for broad grants. `acknowledge` is per-carve-out, not a
-  blanket override.
+- **`pinned` stays absolute.** safe-chains' own config write is un-grantable regardless of how
+  specifically it is named. The risk there is not to the user's data but to the mechanism: an agent
+  that can grant itself write access to the governing file has defeated everything else. That is a
+  different kind of rule from a credential shield and it keeps its blanket bail.
+- **User config only.** A repo-level `.safe-chains.toml` can never carry a grant. This is what makes
+  "the user typed it" a trustworthy signal at all.
+- **Broad grants still do not sweep.** `~/` does not reach `~/.ssh`, and that is the same rule, not
+  an exception to it.
+- **Read and write stay independent.** `read = true, write = false` on `~/.ssh` admits reads and
+  keeps writes refused.
 
-## Copy, once this exists
+## Copy, once this lands
 
-The refusal in `refusal-copy.md` example 5 currently points at the level, which is the only lever
-that works today. With acknowledged grants it should point at the narrow one first:
+`refusal-copy.md` example 5 currently points at raising the level, because that is the only lever
+that works today. After this it should point at the narrow one:
 
 ```
 safe-chains did not auto-approve this. It reads `~/.ssh/id_rsa`, which holds
-credentials. If that was not what you meant to do, stop and check the command.
-A plain path grant does not cover credential paths, so that a broad grant cannot
-hand over keys by accident. To allow this one, add acknowledge = "credential-store"
-to the grant for ~/.ssh in ~/.config/safe-chains.toml.
+credentials.
+If you want reads there approved, grant that directory in
+~/.config/safe-chains.toml:
+
+  [[grant]]
+  path = "~/.ssh"
+  read = true
+
+A grant on a parent directory will not cover it. Credential paths are only covered
+by a grant that names them.
 ```
+
+The last line is the part worth keeping. It explains the one behaviour that would otherwise look
+arbitrary, and it does so in terms of a rule rather than an exception.
 
 ## Testing
 
-1. A grant without `acknowledge` leaves a credential path refused. This is today's behaviour and
-   must not regress.
-2. A grant WITH `acknowledge = "credential-store"` admits the read, and only under the granted
-   subtree. `~/.ssh` acknowledged does not open `~/.aws`.
-3. `acknowledge` in a REPO-level config is ignored entirely, and the presence of one does not make
-   the file load differently otherwise.
-4. safe-chains' own config write stays refused under every acknowledgement value.
-5. The refusal message offers the acknowledged-grant remedy only when that remedy would actually
-   change the verdict, which is the guard already specified in `refusal-copy.md`.
+1. A grant of `~/.ssh` admits reads of `~/.ssh/id_rsa`. This is the user-facing point of the change.
+2. A grant of `~/` does NOT admit them. This is today's behaviour and the accident-prevention
+   property.
+3. A grant of `~/.ssh` does not admit `~/.aws/credentials`. Naming one store does not name another.
+4. A grant of `/etc` does not admit `/etc/shadow`; a grant of `/etc/shadow` does. This is the
+   non-dot case the hidden rule cannot cover, so it is the one most likely to be got wrong.
+5. `read = true, write = false` on `~/.ssh` admits the read and refuses the write.
+6. safe-chains' own config write stays refused under a grant naming it exactly.
+7. A grant in a REPO-level config is ignored, with and without a credential path.
 
-Every one needs a red demo. This is a mechanism whose entire purpose is to open something normally
-closed, so a test that passes for the wrong reason is worse here than anywhere else in the codebase.
+Each needs a red demo. This mechanism exists to open something normally closed, so a test passing
+for the wrong reason costs more here than anywhere else in the codebase.

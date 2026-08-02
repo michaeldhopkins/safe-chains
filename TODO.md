@@ -1064,32 +1064,39 @@ offers a grant if and only if a grant actually changes the verdict.
 Four guards specified, each needing a red demo — three of this session's findings were in this same
 message layer and every one looked correct until the demo showed the text had not moved.
 
-## Explicit ("acknowledged") grants — SPEC WRITTEN (docs/design/explicit-grants.md)
+## A grant should cover what it names — SPEC (docs/design/explicit-grants.md)
 
-The UX defect recorded above has a proposed fix. A user who grants `~/.ssh` sees nothing change,
-because grants and levels act on different axes: a grant RE-CLASSIFIES a path (machine -> worktree),
-a level raises the CEILING of which classifications are auto-approved, and three carve-outs refuse to
-be moved by a grant at all (secret stores, hidden components under a broad grant, safe-chains' own
-config write).
+A user tired of approving `~/.ssh` reads writes `[[grant]] path = "~/.ssh", read = true` and expects
+to stop being asked. Today nothing changes and nothing says why.
 
-The consequence is backwards for a safety tool: the narrow instrument fails silently and the blunt
-one (`--level local-admin`, machine-wide) works, so a user following the path of least resistance
-grants far more than they asked for.
+The rule that fixes it is already in the codebase, for hidden files: a grant covers the subtree it
+NAMES, and carve-outs exist to stop a grant reaching into things it did not name. `remainder()` is
+the path below the grant root, so a `~/` grant sees `.ssh/id_rsa` (hidden, refused) while a `~/.ssh`
+grant sees `id_rsa` (dot-free, admitted). The comment says it outright: "grant such a directory
+explicitly to reach inside it."
 
-Proposal: an `acknowledge = "credential-store"` field on a grant, naming the carve-out being
-overridden. Absent it, behaviour is exactly as today. NOT a new locus rung — the missing thing is not
-a classification but a record that the user knew what they were asking for, which also carries the
-real cost honestly (`secret = reads` means the content enters the agent's context).
+The secret carve-out does not follow that rule. `apply_grant` bails unconditionally on
+`base.reads_secret`, never asking whether the grant named the store. Two carve-outs, one asks, one
+does not, and the one that does not is the one users hit.
 
-Rejected alternative, recorded so it is not re-proposed: infer intent from grant SPECIFICITY (exact
-beats prefix, reusing the region matcher's rule). It needs no new syntax, but the strength of the
-statement would depend on how the path happened to be written, an exact-by-coincidence grant is
-indistinguishable from a deliberate one, and nothing in the file would record that a credential store
-was opened.
+Change: compare the SHIELDED NODE against the grant root. Node strictly below the root means the
+grant swept it up, so the shield wins. Root at or inside the node means the grant named it, so the
+grant wins. No new syntax, no new locus rung, no new field.
 
-Invariants that must survive: user config only (a repo file can never carry one), safe-chains' own
-config write stays un-grantable under any acknowledgement, the default stays refused, and
-`acknowledge` is per-carve-out rather than a blanket override.
+Implementation cost is one thing: `apply_grant` only receives the resolved `Role`, which has lost
+which node matched, so the shielded node's path has to survive `base_region` for the comparison.
+
+Cannot be simplified to "delete the bail and let the hidden rule cover it": most credential stores
+are dot-dirs so it would look right, but `/etc/shadow`, `/root`, macOS keychains and browser profiles
+are not dot-prefixed, and a broad `/etc` grant would sweep them up.
+
+`pinned` keeps its blanket bail. safe-chains' own config write stays un-grantable however
+specifically it is named, because the risk is to the mechanism rather than to the user's data.
+
+REJECTED (an earlier draft of this spec): an `acknowledge = "credential-store"` field. The user
+config is already the trust root — user-only, unwritable by agents — so a grant typed there IS the
+statement of intent, and demanding a second field to prove it is ceremony rather than safety.
+Anyone willing to add the grant would add the acknowledgement.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
