@@ -165,7 +165,7 @@ than to the user's data: an agent that can grant itself write access to the gove
 defeated everything else. Keeps its blanket bail, and that asymmetry is deliberate rather than an
 oversight to be tidied later.
 
-**4. `write_locus > worktree` (write freezes) — a naming grant WINS, with one open question.**
+**4. `write_locus > worktree` (write freezes) — a naming grant WINS, except `system-integrity`.**
 This is the kind most likely to be forgotten, because the bail never mentions it. It covers several
 different things:
 
@@ -176,12 +176,30 @@ different things:
    - `.envrc`, same shape.
    - `package-content` (`/usr/share`, `~/.cargo/registry`) at `write = machine`. Naming it grants
      it. Note the read face is already `adjacent`, so only the write is at stake here.
-   - `system-integrity` (`write = system-integrity`). This is the open question. Following the rule
-     uniformly is the simplest story and is arguably harmless, since the OS refuses these writes
-     anyway on a protected volume, so the grant would buy a failed syscall rather than a real
-     capability. Treating it like `pinned` is also defensible. DECIDE THIS EXPLICITLY rather than
-     letting the implementation pick, because whichever way it goes it should be a sentence in this
-     file, not an accident of where the condition was split.
+   - `system-integrity` (`write = system-integrity`) — DECIDED: absolute, like `pinned`. No grant,
+     however specifically it names the path.
+
+     An earlier draft left this open and argued it was "arguably harmless, since the OS refuses
+     these writes anyway". That was wrong, and wrong because of a mistaken picture of what the role
+     covers. It is not `/System`. It is `/etc/passwd`, `/etc/group`, `/etc/sudoers`,
+     `/etc/sudoers.d/*`, `/etc/pam.d/*` and the Linux loader/boot regions — the role's own words are
+     "the machine's identity/auth/boot/loader substrate ... a WRITE is compromise-complete". Those
+     are writable with privilege on both macOS and Linux, so a grant would buy a real capability,
+     not a failed syscall.
+
+     The `pinned` parallel then decides it. `pinned` is absolute because an agent that can write
+     safe-chains' own config defeats safe-chains. An agent that can write `/etc/sudoers` defeats the
+     machine's whole authorization substrate, safe-chains included, by whatever route it prefers.
+     Same category: the risk is to the mechanism that makes every other rule mean something, not to
+     the user's data.
+
+     Note also that `apply_grant` caps the write face at `min(Worktree)`, so a naming grant would
+     not move `system-integrity` down one rung. It would drop it to fully auto-approved.
+
+     The cost of being absolute is small, which is what makes this easy. Ordinary `/etc` stays
+     `machine` and remains grantable (there is a test asserting `/etc/nginx/nginx.conf` is
+     `machine`), so this pins only the identity/auth subset. A human editing their own sudoers
+     outside the agent is unaffected.
 
 ## The completeness check
 
@@ -195,9 +213,9 @@ failure modes the risks section lists: the peer-path divergence shows up as a na
 works for `~/.ssh` and not `../peer/.ssh`, and the case-folding gap shows up as one that works for
 `.ssh` and not `.SSH`. Neither is visible from a single-direction test.
 
-Two rows of that table are deliberately asymmetric and should be written as such: `pinned` has no
-widening direction at all, and `read_locus > worktree-trusted` has no refusing direction. If either
-ever grows its missing half, something has gone wrong.
+Three rows of that table are deliberately asymmetric and should be written as such: `pinned` and
+`system-integrity` have no widening direction at all, and `read_locus > worktree-trusted` has no
+refusing direction. If any of them ever grows its missing half, something has gone wrong.
 
 ## Copy, once this lands
 

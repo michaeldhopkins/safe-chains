@@ -1094,8 +1094,11 @@ FOUR carve-out kinds, not two (`role_is_protective`): `reads_secret`, `pinned`,
 `write_locus > worktree` (write freezes: `.git`, `.envrc`, package-content, system-integrity) and
 `read_locus > worktree-trusted`. That last one is NOT a carve-out — it is the `unknown` role that
 grants exist to widen, and "fixing" it would break ordinary grants. Write freezes are the kind most
-likely to be missed, because the bail never mentions them. One decision is left open on purpose:
-whether `system-integrity` follows the rule or is absolute like `pinned`.
+likely to be missed, because the bail never mentions them. `system-integrity` is DECIDED as absolute like `pinned`: it is `/etc/passwd`, `/etc/sudoers`,
+`/etc/pam.d/*` and the loader, not `/System`, so an earlier "the OS refuses it anyway" argument was
+false — those are writable with privilege. An agent that can write `/etc/sudoers` defeats the
+machine's authorization substrate including safe-chains, which is the same category of risk that
+makes `pinned` absolute. Ordinary `/etc` stays `machine` and grantable, so the cost is small.
 
 `pinned` keeps its blanket bail. safe-chains' own config write stays un-grantable however
 specifically it is named, because the risk is to the mechanism rather than to the user's data.
