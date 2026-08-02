@@ -1054,6 +1054,13 @@ a fallback that is vague about CONSEQUENCE but specific about CAUSE when the har
 a parse-surprise hint emitted only when the resolved name is an unknown bare word AND an
 env-assignment prefix is present.
 
+Review of the examples exposed a UX inconsistency worth fixing in the LOGIC: a credential path is
+refused at `developer`, APPROVED at `local-admin` and `yolo`, and refused again at `network-admin`
+(siblings, not a ladder). A path grant never opens it, by design. So the lever a user reaches for
+first does nothing and nothing tells them the other lever exists. The spec records three fixes, the
+cheapest being that a refusal should name the lever that WOULD work, plus a guard that a message
+offers a grant if and only if a grant actually changes the verdict.
+
 Four guards specified, each needing a red demo — three of this session's findings were in this same
 message layer and every one looked correct until the demo showed the text had not moved.
 
