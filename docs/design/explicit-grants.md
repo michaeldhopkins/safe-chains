@@ -350,6 +350,63 @@ convenience, and the convenience should stop short of the case where being wrong
 explicit `[[grant]]` stays the only way to name a credential store, and the docs sentence stays true
 as written.
 
+## Blocker found while checking the plan: the hidden rule does not carry the secret case
+
+The plan assumed the change was mostly deleting `reads_secret` from the bail in `apply_grant`,
+because the hidden-component rule in `best_grant` already implements "a grant covers what it names":
+a `~/` grant has remainder `.ssh/id_rsa`, which has a hidden component, so it never applies.
+
+That reasoning holds only for credential stores that are dot-prefixed. Most are not:
+
+    /etc/shadow          /etc/gshadow      /etc/master.passwd     /etc/ssl/private/
+    /root/               /var/root/
+    ~/Library/Keychains/ ~/Library/Cookies/ ~/Library/Safari/     ~/Library/Messages/
+    ~/Library/Application Support/{Firefox,Google/Chrome,Chromium,BraveSoftware,Microsoft Edge}/
+
+For these the remainder is dot-free, so the hidden rule does not fire. Deleting the bail on its own
+would mean a grant on `~/Library/` silently unlocks Keychains, Cookies, Safari history, Messages and
+every browser profile, and a grant on `/etc/` unlocks `/etc/shadow`. That is precisely the thing the
+rule says must not happen: a broad grant reaching something it did not name.
+
+So the change needs a real naming test, not the hidden rule standing in for one.
+
+### The test
+
+A grant reaches a secret node only when the grant root is **at or below** the node root.
+
+| grant | node | reaches? |
+|---|---|---|
+| `~/` | `~/.ssh` | no, shallower |
+| `~/.ssh` | `~/.ssh` | yes, equal |
+| `~/.ssh/known_hosts` | `~/.ssh` | yes, deeper |
+| `~/Library/` | `~/Library/Keychains/` | no, shallower |
+| `~/Library/Keychains/` | `~/Library/Keychains/` | yes, equal |
+
+Granting something *inside* a secret store counts as naming it. Someone who writes
+`~/.ssh/known_hosts` has decided about `~/.ssh` as surely as someone who writes `~/.ssh`.
+
+This subsumes the hidden rule for secrets rather than replacing it. The hidden rule still does its
+own job for non-secret dot directories such as `.git` and `.envrc`.
+
+### Path-dependence
+
+Node roots are not fixed strings. `.aws` and `.ssh` are segment matchers, so the node root has to be
+computed from where the matcher hit: for `~/projects/app/.aws/creds` the node root is
+`~/projects/app/.aws`, and a grant on `~/projects/` is shallower and must not reach it. Comparing
+against the literal matcher text instead of the match position would get this wrong.
+
+## Two earlier checks, now closed
+
+**A node that is both a secret store and a write freeze.** There is none. `reads_secret` is set by
+exactly one role (`credential-store`) and `pinned` by exactly one (`safe-chains-config`), and a node
+carries one role. No overlap to resolve.
+
+**Whether the peer/adjacent path needs the same change.** It does not, because it already behaves
+this way. `package-content` is `read = adjacent`, `write = machine`, and is neither secret nor
+pinned, so `apply_grant` already widens it today. The write freezes reached through dot directories
+(`.git`, `.envrc`) are already handled by the hidden rule: a broad grant misses them, a naming grant
+reaches them. Both match the decision recorded above, so neither needs code.
+
 ## Testing
 
 1. A grant of `~/.ssh` admits reads of `~/.ssh/id_rsa`. This is the user-facing point of the change.
