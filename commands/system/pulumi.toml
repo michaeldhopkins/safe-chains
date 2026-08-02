@@ -61,6 +61,49 @@ valued = ["--resource", "--since", "--stack", "-r", "-s"]
 # `config` declared only `nested_bare = true` — no nested subs, no flags, no positional bound — and
 # `max_positional` defaults to UNLIMITED, so every token after it was an unremarkable positional.
 # Unknown FLAGS denied while unknown POSITIONALS passed, which admitted `pulumi config set k v` and
+# `pulumi config rm k`: mutations of stack configuration, remote state under the service backend.
+#
+# Bounded to the BARE form. `pulumi config` with no arguments lists the stack's configuration with
+# secret values masked as `[secret]`; `--show-secrets` is not listed, so the unmasking spelling is an
+# unknown flag and refuses.
+#
+# Every sub-form stays out, and `get` is out for a reason worth recording rather than lumping in with
+# the mutators: `pulumi config get <key>` returns the PLAINTEXT of a secret value, where the bare
+# list masks it. Whether a given key holds a secret is not knowable from the command string, so the
+# honest classification is the `decrypt-read` archetype — "reveals plaintext secret material to the
+# caller", which sits at yolo — and not the SafeRead it was briefly given here. `set`, `rm`, `cp`,
+# `refresh`, `set-all` and `rm-all` change stack state. All of them want their own research
+# (see TODO.md); none is judged safe by omission.
+#
+# `max_positional = 0` is what makes the bound real: without it the entry accepts any number of
+# positionals, which is the exact defect this replaced.
+[[command.sub]]
+name = "config"
+nested_bare = true
+max_positional = 0
+standalone = ["--help", "-h", "--json"]
+valued = ["--stack", "-s"]
+[[command.sub.sub]]
+name = "history"
+standalone = ["--help", "--json", "--show-secrets", "-h"]
+valued = ["--page", "--page-size", "--stack", "-s"]
+[[command.sub.sub]]
+name = "tag"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "graph"
+standalone = ["--help", "-h"]
+valued = ["--dependency-edge-color", "--parent-edge-color", "--stack", "-s"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--follow", "--help", "--json", "-f", "-h"]
+valued = ["--resource", "--since", "--stack", "-r", "-s"]
+
+# `config` declared only `nested_bare = true` — no nested subs, no flags, no positional bound — and
+# `max_positional` defaults to UNLIMITED, so every token after it was an unremarkable positional.
+# Unknown FLAGS denied while unknown POSITIONALS passed, which admitted `pulumi config set k v` and
 # `pulumi config rm k`: mutations of stack configuration, which is remote state under the service
 # backend and can hold secrets. Only `--secret` refused, and only because it was an unlisted flag.
 #
