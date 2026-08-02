@@ -30,6 +30,16 @@ jobs:
       - name: cargo clippy
         run: cargo clippy --locked --all-targets -- -D warnings
 
+      # Also checked at release time. It belongs here too: release.yml only runs on a version bump,
+      # so a stale or truncated COMMANDS.md can otherwise ride along for many pushes unnoticed.
+      - name: Verify COMMANDS.md is up to date
+        run: |
+          cargo run --locked -- --list-commands > COMMANDS.md.check
+          diff -u COMMANDS.md COMMANDS.md.check || {
+            echo "::error::COMMANDS.md is out of date. Run ./generate-docs.sh and commit."
+            exit 1
+          }
+
       - uses: taiki-e/install-action@cargo-deny
 
       - name: cargo deny check licenses
