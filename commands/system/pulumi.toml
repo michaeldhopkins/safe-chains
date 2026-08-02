@@ -67,13 +67,21 @@ valued = ["--resource", "--since", "--stack", "-r", "-s"]
 # secret values masked as `[secret]`; `--show-secrets` is not listed, so the unmasking spelling is an
 # unknown flag and refuses.
 #
-# Every sub-form stays out, and `get` is out for a reason worth recording rather than lumping in with
-# the mutators: `pulumi config get <key>` returns the PLAINTEXT of a secret value, where the bare
-# list masks it. Whether a given key holds a secret is not knowable from the command string, so the
-# honest classification is the `decrypt-read` archetype — "reveals plaintext secret material to the
-# caller", which sits at yolo — and not the SafeRead it was briefly given here. `set`, `rm`, `cp`,
-# `refresh`, `set-all` and `rm-all` change stack state. All of them want their own research
-# (see TODO.md); none is judged safe by omission.
+# Measured against pulumi v3.255.0 (`pulumi config --help`, `pulumi config get --help`).
+#
+# Every sub-form stays out — the real names are `get`, `set`, `set-all`, `remove`, `remove-all`,
+# `copy`, `refresh` and `env` — and `get` is out for a reason worth recording rather than lumping in
+# with the mutators. `--show-secrets` exists ONLY on the listing form, documented as "show secret
+# values when listing config instead of displaying blinded values". Blinding is a property of
+# LISTING; `get` has no such flag and no blinding concept, so it returns the value directly, which
+# for a secret key is the plaintext. Whether a key holds a secret is not knowable from the command
+# string, so the honest classification is the `decrypt-read` archetype — "reveals plaintext secret
+# material to the caller", at yolo — not the SafeRead it was briefly given here.
+#
+# Two flags are deliberately absent from the lists below and each denies for a real reason, not by
+# oversight: `--show-secrets` unmasks the very values the bare listing blinds, and `--config-file`
+# takes a filesystem PATH (it would need a read gate before it could be listed). `--open`, which
+# defaults to true, resolves ESC environments and so reaches remote providers.
 #
 # `max_positional = 0` is what makes the bound real: without it the entry accepts any number of
 # positionals, which is the exact defect this replaced.

@@ -899,16 +899,31 @@ caller", `secret = { level = "reads" }`, which sits at yolo — the same treatme
 `age -d` and `ansible-vault view` already get. Listing it at SafeRead was a secret-disclosure hole,
 introduced and removed within this session.
 
-Still to research, each on its own facets (pulumi was NOT installed locally, so this was reasoned
-from documentation rather than measured — verify before listing anything):
-  - `get`      — `decrypt-read` if it decrypts unconditionally; check whether a non-secret key is
-                 distinguishable, and whether `--show-secrets` is even required for `get`.
-  - `set` / `set-all` / `rm` / `rm-all` — mutate stack configuration. Locus is the open question:
-                 the file backend writes `Pulumi.<stack>.yaml` locally, the service backend writes
-                 REMOTE state, and the command string does not say which. SafeWrite is local-only,
-                 so absent a way to tell them apart these stay out.
-  - `cp`       — copies config INTO another stack; a write to a second, named destination.
-  - `refresh`  — pulls config from the stack; a remote read plus a local write.
+MEASURED against pulumi v3.255.0 — an earlier pass recorded "pulumi is NOT installed locally" and
+reasoned from documentation. That was wrong: `command -v pulumi` came back empty in this shell while
+the binary sits at /opt/homebrew/bin/pulumi. A negative from one probe is not proof of absence, the
+same lesson as classifying `seq` from macOS's BSD build.
+
+What the real surface says:
+  - Subcommands are `get`, `set`, `set-all`, `remove`, `remove-all`, `copy`, `refresh`, `env`. The
+    doc-based guesses `rm` and `cp` were WRONG names, which only escaped notice because a wrong name
+    denies by omission.
+  - `get` CONFIRMED as `decrypt-read`, by structure rather than by running it: `--show-secrets`
+    exists only on the listing form and is documented as "show secret values when listing config
+    instead of displaying blinded values". Blinding belongs to LISTING; `get` has no such flag and
+    no blinding concept, so it returns the value directly — plaintext for a secret key.
+  - `--config-file` takes a filesystem PATH and would need a read gate before being listed.
+  - `--open` defaults to TRUE and resolves ESC environments, so even a read form reaches remote
+    providers unless it is disabled.
+
+Still open, and now sharper:
+  - `set`/`set-all`/`remove`/`remove-all` — the locus question stands and is the blocker: the file
+    backend writes `Pulumi.<stack>.yaml` locally, the service backend writes REMOTE state, and the
+    command string does not say which. SafeWrite is local-only, so they stay out until there is a
+    way to tell the backends apart (the presence of `--config-file`? a `[[trusted]]`-style pin?).
+  - `copy` — writes into a second, NAMED destination stack.
+  - `refresh` — remote read plus a local write.
+  - `env` — a whole ESC surface of its own; not researched at all.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
