@@ -879,40 +879,30 @@ So this wants a pathgate handler keyed on cargo that inspects `tokens[1] == "fuz
 positional after the target name — `write` for `run`/`cmin`, `read` for `tmin`/`fmt`/`coverage` —
 the same shape `ar_archive` uses to gate by operation.
 
-## pulumi config: the write subs need research before any is listed
+## pulumi config: bounded to the bare form; every sub-form still needs research
 
-`config` declared only `nested_bare = true`, which admitted `pulumi config set k v` and
-`pulumi config rm k` (see the guard `a_nested_bare_sub_refuses_an_unknown_nested_subcommand`).
-`get` is now declared so the rest deny by omission, but `set`, `rm`, `cp`, `refresh`, `set-all` and
-`rm-all` are simply unresearched, not judged unsafe. Stack configuration is remote state under the
-service backend and can carry secrets (`--secret` encrypts a value), so each wants its own facet
-analysis — locus remote vs local file backend, whether `get` on a secret value decrypts, and what
-`refresh` reads — before it goes back in.
+`config` is now `nested_bare = true` + `max_positional = 0`, so the bare listing works
+(secrets masked as `[secret]`; `--show-secrets` is an unknown flag and refuses) and every sub-form
+denies by omission.
 
-## There is a positional WRITER audit and no positional READER audit
+`get` was briefly listed at SafeRead in an earlier pass and has been REMOVED, which is the part
+worth keeping: `pulumi config get <key>` returns the PLAINTEXT of a secret value where the bare list
+masks it, and whether a key holds a secret is not knowable from the command string. The honest
+classification is the existing `decrypt-read` archetype — "reveals plaintext secret material to the
+caller", `secret = { level = "reads" }`, which sits at yolo — the same treatment `sops -d`,
+`age -d` and `ansible-vault view` already get. Listing it at SafeRead was a secret-disclosure hole,
+introduced and removed within this session.
 
-Found by sweeping, not by a bug. `positional_last_arg_writers_are_gated_or_acknowledged` plus
-`tests/fixtures/positional_writer_worklist.tsv` systematically ask "does this command WRITE its last
-positional". Nothing asks whether it READS one.
-
-The sweep: probe every sub declared `level = "Inert"` with `~/.ssh/id_rsa` and `/etc/shadow` as a
-positional. 692 of 764 accept. That is NOT 692 bugs — it is the model working as designed. Levels
-classify the OPERATION; path operands are gated by locus/pathgate, and a level says nothing about
-operands. Reporting it as a finding would be a false alarm, which is why it is written down here
-instead.
-
-What is genuinely open underneath it: some of those commands have no `[command.path_gate]` at all
-(measured: xccov, xcodegen, simctl declare none; xcresulttool does). If any of them treats a bare
-positional as a file it READS and prints, that is an exfil path — the same shape the writer audit
-was built for, in the other direction. `cat` and `grep` are gated because they are known readers;
-nothing systematically establishes which of the long tail are.
-
-Doing it properly mirrors the writer audit: probe `<cmd> <sensitive-path>`, and for each command
-that auto-approves, decide whether it (a) reads that positional — gate it `read` — or (b) ignores
-it / uses it as a non-path token — acknowledge it in a reader worklist. Blunt probing cannot tell
-those apart, which is why this needs per-command research rather than another sweep.
-
-Entirely pre-existing; verified identical on 0.220.0.
+Still to research, each on its own facets (pulumi was NOT installed locally, so this was reasoned
+from documentation rather than measured — verify before listing anything):
+  - `get`      — `decrypt-read` if it decrypts unconditionally; check whether a non-secret key is
+                 distinguishable, and whether `--show-secrets` is even required for `get`.
+  - `set` / `set-all` / `rm` / `rm-all` — mutate stack configuration. Locus is the open question:
+                 the file backend writes `Pulumi.<stack>.yaml` locally, the service backend writes
+                 REMOTE state, and the command string does not say which. SafeWrite is local-only,
+                 so absent a way to tell them apart these stay out.
+  - `cp`       — copies config INTO another stack; a write to a second, named destination.
+  - `refresh`  — pulls config from the stack; a remote read plus a local write.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 

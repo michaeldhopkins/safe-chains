@@ -12012,8 +12012,13 @@ Aliases: `gptx`
 
 - **about**: Flags: --help, --json, --transitive, -h
 - **config get**: Flags: --help, -h, --json. Valued: --stack, -s
+- **config graph**: Flags: --help, -h. Valued: --dependency-edge-color, --parent-edge-color, --stack, -s
+- **config history**: Flags: --help, --json, --show-secrets, -h. Valued: --page, --page-size, --stack, -s
+- **config tag**: Flags: --help, -h
+- **config**: Flags: --help, -h, --json. Valued: --stack, -s
 - **console**: Flags: --help, -h
 - **gen-completion**: Flags: --help, -h
+- **logs**: Flags: --follow, --help, --json, -f, -h. Valued: --resource, --since, --stack, -r, -s
 - **logs**: Flags: --follow, --help, --json, -f, -h. Valued: --resource, --since, --stack, -r, -s
 - **preview**: Flags: --diff, --help, --json, --non-interactive, --refresh, --show-config, --show-reads, --show-replacement-steps, --show-sames, --suppress-outputs, --suppress-permalink, -h, -j. Valued: --config, --config-file, --parallel, --stack, --target, -c, -p, -s, -t
 - **schema check**: Flags: --help, -h
