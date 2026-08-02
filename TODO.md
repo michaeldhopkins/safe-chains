@@ -965,28 +965,31 @@ Unchanged and still out for their own reasons: `copy` (writes a second NAMED sta
 (remote read plus local write), `env` (a whole ESC surface), `remove`/`remove-all` (same shape as
 `set`, so they resolve with it), and `get` (`decrypt-read`).
 
-## Command-tree duplicates — 35 acknowledged, each needs triage
+## Command-tree duplicates — 30 of 35 FIXED; 5 singles left, plus one intent question
 
-`the_command_tree_has_no_duplicate_names` was added after a corruption of `pulumi.toml` survived a
-fully green suite: a replacement region whose end index matched an EARLIER occurrence duplicated a
-span, giving 12 `[[command.sub]]` blocks where there should have been 10 and reparenting
-`history`/`tag`/`graph` under `config`. The file stayed SYNTACTICALLY VALID, so it parsed and built,
-and every existing structural guard checks flag lists or examples rather than the shape of the tree.
+`the_command_tree_has_no_duplicate_names` found 35 duplicates on its first run. Thirty are resolved,
+all behaviour-neutral (verified against the released binary), and the loader's rule was established
+first: the FIRST declaration wins — measured on `aws sts`, where the later block's `first_arg` globs
+and `tolerate_unknown_*` had no effect at all.
 
-Its first run found 35 pre-existing duplicates, listed in
-`tests/fixtures/command_tree_duplicates.tsv`. They are ACKNOWLEDGED, not approved: each is a second
-declaration of a name that already exists, so one of the two is dead weight and which one survives
-depends on lowering order.
+  - `aws sts`: an explicit block with a `get-caller-identity` nested sub, plus a later block from the
+    glob-sweep batch declaring `first_arg = ["describe-*", "get-*", "list-*"]`. The DEAD one was the
+    permissive one, so removing it changed nothing and removed a hazard — had lowering order ever
+    shifted, the glob block would have become live silently. Removing it also lowered the pinned
+    unresearched-glob-family count 237 -> 236, which is that guard working as designed.
+  - `gcloud artifacts`: the entire subtree declared twice, byte-identical (3034 bytes each), which
+    accounted for 23 of the 35 rows. Removing the second is neutral whichever one the loader keeps.
+  - `mise` (7 subs): the opposite shape, and the one worth a decision. The later blocks are a uniform
+    `bare = false` / `max_positional = 0` / `standalone = ["--help", "-h"]` — someone adding a
+    deliberate RESTRICTION. Because the first declaration wins, that tightening NEVER TOOK EFFECT:
+    `install`, `use`, `upgrade`, `prune`, `uninstall`, `unset` are live at their full `SafeWrite`
+    surfaces, and `self-update` is live as `candidate = true` (denied). The dead blocks were removed
+    to preserve current behaviour rather than guess at intent — but SOMEONE MEANT TO RESTRICT THESE.
+    Decide whether that intent stands; if it does, it is a separate, deliberate tightening.
 
-`aws sts` is the clearest and the place to start — one block declares an explicit
-`[[command.sub.sub]] get-caller-identity`, another declares `first_arg = ["describe-*", "get-*",
-"list-*"]` with `tolerate_unknown_short/long`. Those are very different surfaces and only one is
-live. The gcloud rows (`artifacts` and its nested `apt`/`attachments`/`docker`/`files`) look like
-the same shape.
-
-Triage each by determining which declaration the loader keeps, then delete the dead one — and
-remove its row, which the guard enforces: a row that no longer reproduces fails the test, so the
-fixture cannot drift into describing a past that no longer exists.
+REMAINING (5 singles, each still to triage the same way — determine which declaration is live, then
+delete the dead one): `dub describe`, `esptool flash_id`, `mc share`, `paket outdated`,
+`spack license`.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
