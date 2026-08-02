@@ -965,31 +965,33 @@ Unchanged and still out for their own reasons: `copy` (writes a second NAMED sta
 (remote read plus local write), `env` (a whole ESC surface), `remove`/`remove-all` (same shape as
 `set`, so they resolve with it), and `get` (`decrypt-read`).
 
-## Command-tree duplicates — 30 of 35 FIXED; 5 singles left, plus one intent question
+## Command-tree duplicates — ALL 35 FIXED. One intent question remains.
 
-`the_command_tree_has_no_duplicate_names` found 35 duplicates on its first run. Thirty are resolved,
-all behaviour-neutral (verified against the released binary), and the loader's rule was established
-first: the FIRST declaration wins — measured on `aws sts`, where the later block's `first_arg` globs
-and `tolerate_unknown_*` had no effect at all.
+`the_command_tree_has_no_duplicate_names` found 35 duplicates on its first run; all are resolved and
+the backlog fixture is empty, so the guard is now absolute. Every removal was behaviour-neutral,
+verified against the released binary, because the loader's rule was established by MEASUREMENT
+first: the FIRST declaration wins (proved on `aws sts`, where the later block's `first_arg` globs
+and `tolerate_unknown_*` had no effect at all).
 
-  - `aws sts`: an explicit block with a `get-caller-identity` nested sub, plus a later block from the
-    glob-sweep batch declaring `first_arg = ["describe-*", "get-*", "list-*"]`. The DEAD one was the
-    permissive one, so removing it changed nothing and removed a hazard — had lowering order ever
-    shifted, the glob block would have become live silently. Removing it also lowered the pinned
-    unresearched-glob-family count 237 -> 236, which is that guard working as designed.
-  - `gcloud artifacts`: the entire subtree declared twice, byte-identical (3034 bytes each), which
-    accounted for 23 of the 35 rows. Removing the second is neutral whichever one the loader keeps.
-  - `mise` (7 subs): the opposite shape, and the one worth a decision. The later blocks are a uniform
-    `bare = false` / `max_positional = 0` / `standalone = ["--help", "-h"]` — someone adding a
-    deliberate RESTRICTION. Because the first declaration wins, that tightening NEVER TOOK EFFECT:
-    `install`, `use`, `upgrade`, `prune`, `uninstall`, `unset` are live at their full `SafeWrite`
-    surfaces, and `self-update` is live as `candidate = true` (denied). The dead blocks were removed
-    to preserve current behaviour rather than guess at intent — but SOMEONE MEANT TO RESTRICT THESE.
-    Decide whether that intent stands; if it does, it is a separate, deliberate tightening.
+Three distinct origins, and the distinction is the useful part — a duplicate is not one kind of bug:
 
-REMAINING (5 singles, each still to triage the same way — determine which declaration is live, then
-delete the dead one): `dub describe`, `esptool flash_id`, `mc share`, `paket outdated`,
-`spack license`.
+  1. GLOB-SWEEP OVERLAP — `aws sts`. An explicit block already existed when the glob-sweep batch
+     appended a `first_arg` family. The dead block was the PERMISSIVE one, so nothing was
+     mis-classified, but it was a hazard: had lowering order ever shifted, the globs would have gone
+     live silently. Removing it lowered the pinned unresearched-glob-family count 237 -> 236.
+  2. STRAIGHT DUPLICATION — `gcloud artifacts`, byte-identical at 3034 bytes, which alone accounted
+     for 23 of the 35 rows; and `mc share`, two identical `candidate = true` markers.
+  3. BULK-PASS LEFTOVERS — `dub describe`, `esptool flash_id`, `paket outdated`, `spack license`.
+     A pass that marked unresearched subs `candidate = true` did not dedupe against entries research
+     had already landed, so each has a live substantive block and a dead marker behind it.
+
+STILL OPEN — a decision, not a defect: `mise` had a fourth shape. Its later blocks were a uniform
+`bare = false` / `max_positional = 0` / `standalone = ["--help", "-h"]` — someone adding a
+deliberate RESTRICTION to `install`, `use`, `upgrade`, `prune`, `uninstall`, `unset`. Because the
+first declaration wins, that tightening NEVER TOOK EFFECT; those subs are live at their full
+`SafeWrite` surfaces. The dead blocks were removed to preserve current behaviour rather than guess
+at intent. Decide whether the restriction stands: if it does, it is a separate, deliberate
+tightening with its own review, not a duplicate cleanup.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 

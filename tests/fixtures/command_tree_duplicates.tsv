@@ -1,20 +1,15 @@
-# Command-tree duplicates — ACKNOWLEDGED BACKLOG, not approved shapes.
+# Command-tree duplicates — ACKNOWLEDGED BACKLOG. Currently EMPTY.
 #
 # `the_command_tree_has_no_duplicate_names` asserts that no name repeats at any level of the command
 # tree. A duplicated or reparented block still parses as valid TOML and still builds, so nothing else
-# catches it — a real corruption of pulumi.toml (a replacement region whose end index matched an
-# earlier occurrence, duplicating a span) survived a fully green suite until it was noticed by eye.
+# catches it — a real corruption of pulumi.toml survived a fully green suite until it was noticed by
+# eye.
 #
-# The guard found these on its first run. They are PRE-EXISTING and UNREVIEWED: each is a second
-# declaration of a name that already exists, so one of the two is dead weight and which one wins
-# depends on lowering order. `aws sts` is the clearest example — one block declares an explicit
-# `get-caller-identity` nested sub, another declares `first_arg` globs, and only one survives.
+# The guard found 35 pre-existing duplicates on its first run; all 35 are now resolved, so this file
+# is empty and the guard is absolute. The loader's rule, established by measurement rather than
+# assumption, is that the FIRST declaration wins — so every duplicate was a dead second block, and
+# removing each was behaviour-neutral (verified against the released binary).
 #
-# Listing a row here says "known, not yet triaged". It does NOT say the shape is correct. Removing
-# rows as they are resolved is the point; the guard blocks anything NOT listed, which is what stops
-# a fresh corruption from slipping through the way the pulumi one did.
-dub: subcommand `describe` declared twice
-esptool: subcommand `flash_id` declared twice
-mc: subcommand `share` declared twice
-paket: subcommand `outdated` declared twice
-spack: subcommand `license` declared twice
+# Adding a row here says "known, not yet triaged". It does NOT say the shape is correct. The guard
+# fails on any problem not listed AND on any listed row that no longer reproduces, so this file
+# cannot drift into describing a past that no longer exists.

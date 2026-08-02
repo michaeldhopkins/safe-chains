@@ -88,10 +88,6 @@ name = "update"
 candidate = true
 
 [[command.sub]]
-name = "outdated"
-candidate = true
-
-[[command.sub]]
 name = "add"
 candidate = true
 
