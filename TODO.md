@@ -1029,6 +1029,34 @@ state. Two ways in, neither yet built:
 Adjacent and also unbuilt: `[command.output]` or `[command.fallback]` declared on a command whose
 dispatch never consults it — dead declarations that read as configuration.
 
+## Refusal copy — SPEC WRITTEN, not implemented (docs/design/refusal-copy.md)
+
+The message an agent meets when we do not auto-approve is jargon-laden and, worse, reads as a
+verdict: "this command is not on the allowlist" sounds like the command was assessed and REJECTED,
+whose natural response is to hunt for a spelling that passes. The true statement is nearly the
+opposite — safe-chains only grants approvals for researched commands, and says nothing about the
+rest.
+
+Prompted by `RUSTDOCFLAGS=-D warnings cargo doc …`, refused because the unquoted assignment makes
+`warnings` the COMMAND NAME. The message never said `warnings`, so the refusal looked arbitrary,
+while naming it would have been an instant bug report — and the bug was otherwise silent, since
+`bash: warnings: command not found` matches neither `^error` nor `^warning` and the user's own grep
+would have swallowed it.
+
+The spec's load-bearing rule: the copy is selected by the (capability, EMISSION) pair, not by harness
+name. A deny-harness we ABSTAIN on produces an ordinary prompt, not a block, so "blocked" would be a
+lie there. Deriving copy from emission is what stops it drifting when a harness's behaviour changes —
+as Cursor's did when `allow` turned out to be ignored. Any implementation that hardcodes wording per
+target reintroduces exactly the drift HARNESS-BEHAVIORS.md exists to prevent.
+
+Also specified: always name the resolved command; neutral vocabulary with an explicit avoid-list;
+a fallback that is vague about CONSEQUENCE but specific about CAUSE when the harness is unknown; and
+a parse-surprise hint emitted only when the resolved name is an unknown bare word AND an
+env-assignment prefix is present.
+
+Four guards specified, each needing a red demo — three of this session's findings were in this same
+message layer and every one looked correct until the demo showed the text had not moved.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
