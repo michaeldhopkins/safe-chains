@@ -335,6 +335,21 @@ envelope SHAPE (field names, decision values, exit codes) and leave wording to t
 **The avoid-list guard must cover every producer.** A string check that only scans `main.rs` will
 pass while `ReachReason` still says "blocked". Enumerate the producers, not the files you remember.
 
+## Remaining decisions
+
+1. **Does `--explain` share the copy verbatim?** It is a deliberate query rather than an
+   interruption, so it can afford more detail. Recommendation: same first sentence and same facts,
+   with the extra reasoning `--explain` already prints kept underneath. What must NOT differ is the
+   claim about consequence, or the two outputs disagree about what happened.
+2. **Length limits on `additionalContext`.** Unknown per harness. If any of them truncates, the most
+   important sentence has to come first, which argues for leading with the resolved command name
+   and the outcome rather than with the not-a-rating explanation. Worth measuring before finalising
+   sentence order.
+3. **Do the deny harnesses show our reason to the human, the model, or both?** `HARNESS-BEHAVIORS.md`
+   records that grok shows it to the UI *and* the model. If any harness shows it to only one, the
+   copy is addressing an audience that cannot act on it, and the wording should say who is expected
+   to do what.
+
 ## Testing
 
 The point of Rule 1 is that copy and behaviour cannot diverge, so the guard asserts the PAIRING:
