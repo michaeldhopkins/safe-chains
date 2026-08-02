@@ -1064,6 +1064,33 @@ offers a grant if and only if a grant actually changes the verdict.
 Four guards specified, each needing a red demo — three of this session's findings were in this same
 message layer and every one looked correct until the demo showed the text had not moved.
 
+## Explicit ("acknowledged") grants — SPEC WRITTEN (docs/design/explicit-grants.md)
+
+The UX defect recorded above has a proposed fix. A user who grants `~/.ssh` sees nothing change,
+because grants and levels act on different axes: a grant RE-CLASSIFIES a path (machine -> worktree),
+a level raises the CEILING of which classifications are auto-approved, and three carve-outs refuse to
+be moved by a grant at all (secret stores, hidden components under a broad grant, safe-chains' own
+config write).
+
+The consequence is backwards for a safety tool: the narrow instrument fails silently and the blunt
+one (`--level local-admin`, machine-wide) works, so a user following the path of least resistance
+grants far more than they asked for.
+
+Proposal: an `acknowledge = "credential-store"` field on a grant, naming the carve-out being
+overridden. Absent it, behaviour is exactly as today. NOT a new locus rung — the missing thing is not
+a classification but a record that the user knew what they were asking for, which also carries the
+real cost honestly (`secret = reads` means the content enters the agent's context).
+
+Rejected alternative, recorded so it is not re-proposed: infer intent from grant SPECIFICITY (exact
+beats prefix, reusing the region matcher's rule). It needs no new syntax, but the strength of the
+statement would depend on how the path happened to be written, an exact-by-coincidence grant is
+indistinguishable from a deliberate one, and nothing in the file would record that a credential store
+was opened.
+
+Invariants that must survive: user config only (a repo file can never carry one), safe-chains' own
+config write stays un-grantable under any acknowledgement, the default stays refused, and
+`acknowledge` is per-carve-out rather than a blanket override.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
