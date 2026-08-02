@@ -671,43 +671,34 @@ list. Research it as its own command surface — `init`, `add`, `build`, `run`, 
 `coverage`, `list` — and note that `run`/`cmin`/`tmin` EXECUTE the fuzz target (workspace-authored
 code, but still execution) while `list`/`--version` only report.
 
-## find: an output claim needs a TOML entry, and adding one exposed a scale gap
+## find: output claim + conversion — DONE (v0.221.0). The "scale gap" here was a MISREADING.
 
-Attempted `[command.output] locus_from = "operands"` for `find` (the fd shape) so
-`cat "$(find ./sub -name x)"` classifies against its search root instead of being unpinnable.
-Two blockers, both surfaced by existing registry guards, and the second is the important one.
+Everything this entry once tracked has shipped: find has a `[[command]]` entry with
+`handler = "find"`, an `[command.output] locus_from = "operands"` claim, an acknowledged row in
+`tests/fixtures/positional_writer_worklist.tsv`, and both `WordSet` constants moved into
+`[command.fallback]`.
 
-1. STRUCTURAL: `find` has NO TOML entry at all — it is registered purely as a Rust handler
-   (`src/handlers/coreutils/find.rs`). So the change is not "add a field", it is "give find a TOML
-   entry with `handler = "find"`", which `commands/search/fd.toml` shows is a supported shape.
-   Doing that also subjects find to guards it has never been held to, which is how #2 appeared:
-   `positional_last_arg_writers_are_gated_or_acknowledged` flags find and wants either
-   `shape = "last_write"` or an entry in `tests/fixtures/positional_writer_worklist.tsv` — find
-   ignores its last positional as a write target, so the fixture is the right answer.
+The part worth keeping is the CORRECTION, because the original diagnosis would be actively harmful
+to act on. This entry used to record a "FAIL-OPEN": `find . -exec rm {} ;` approved while
+`find . -delete` refused, blamed on `-exec` delegation losing find's per-match multiplier, with a
+fix direction of raising the inner capability's scale to `unbounded`.
 
-2. FAIL-OPEN, PRE-EXISTING: `toml_examples_match_dispatch` refused to accept
-   `find . -name '*.log' -exec rm {} ;` as a DENIED example, because it is APPROVED. Measured:
+That was wrong on both halves:
 
-       deny     find . -delete
-       APPROVE  find . -exec rm {} ;          <- same effect
-       APPROVE  rm {}
-       deny     find / -name '*.log' -exec rm {} ;   (root locus refuses)
-       deny     find . -exec sh -c 'rm -rf /' ;      (inner command refuses)
+  - `-exec rm` is DELIBERATE, argued in `src/handlers/coreutils/find.rs` itself: "engine-
+    authoritative: deleting WORKTREE files via -exec is admitted at developer ({} binds to the find
+    path, so these stay inside the worktree)". It is also consistent with everything else — measured,
+    `rm ./file`, `rm -rf ./builddir`, `rm ./*.log`, `rm -rf ./*` and `rm -r ./src` all approve.
+  - `-delete` refusing was the anomaly, not the safe half: find's allowlist denies unlisted
+    primaries by omission and `-delete` was simply never listed. It is now routed through the SAME
+    `-exec` delegation, so both spellings agree at every base and `find / -delete` refuses for the
+    locus.
 
-   `-delete` is refused and `-exec rm {}` is not, though they destroy the same files. The cause is
-   that `-exec` DELEGATES to the inner command, which is classified on its own — `rm {}` is a
-   single worktree file — so find's multiplier is lost at the delegation boundary. Scale is the
-   facet that should carry it: the same operation at `scale = unbounded` is what `-delete`'s
-   refusal already encodes.
-
-   This is not caused by the TOML attempt; the attempt only made an existing guard able to see it.
-   The TOML was reverted rather than landed with a weakened example, because changing the example
-   to match the dispatcher would have buried the finding.
-
-   Fix direction: the `-exec`/`-execdir` delegation should raise the inner capability's scale
-   (single -> unbounded) before verdicting, so a per-match destroy is judged as the mass operation
-   it is. Check `-ok`/`-okdir` and fd's `-x`/`-X` for the same shape — fd's TOML already voids its
-   output claim on those flags, which is the adjacent concern, not this one.
+So DO NOT implement the recorded fix direction. Raising the delegated capability's scale to
+`unbounded` would refuse `find . -delete` and `find . -exec rm {} ;` — the two things v0.221.0
+deliberately admits — and would contradict the engine's own stance on worktree destroy. If that
+stance should change, the place to change it is the LEVEL model for `destroy` at
+`locus.local = worktree`, uniformly, not a special case at find's delegation boundary.
 
 ## find: the handler->TOML conversion, and `-delete` is a FALSE DENY (derived, not opinion)
 
