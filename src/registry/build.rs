@@ -144,6 +144,22 @@ fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) {
 }
 
 fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
+    // Asserted HERE, not in `build_subs`, because that is the whole point: a candidate sub is
+    // dropped by this filter and never reaches `build_subs`, so a check placed there could never
+    // fire for the case it targets. (It was written there first, and the red demo caught it.)
+    //
+    // Any nested subs a candidate declares are dropped with it — silently, since the file still
+    // parses and builds. That is dead data wearing the shape of configuration: a reader sees the
+    // nested surface declared and reasonably concludes it is in force. Same family as the
+    // profiled-leaf assert in `build_subs`, where one field also makes another unreachable.
+    for s in &subs {
+        assert!(
+            !s.candidate.unwrap_or(false) || s.sub.is_empty(),
+            "sub `{}`: a `candidate` sub is filtered out, so its nested subs are dead — drop the \
+             nested subs, or drop `candidate` if the sub is meant to be live",
+            s.name,
+        );
+    }
     subs.into_iter().filter(|s| !s.candidate.unwrap_or(false))
 }
 

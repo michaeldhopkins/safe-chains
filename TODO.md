@@ -1017,8 +1017,12 @@ under `config` AND duplicated, and only the duplication was detectable. A pure m
 
 Guarding it needs an expectation of which subs OWN nested subs, which the data does not currently
 state. Two ways in, neither yet built:
-  - Assert every `[[command.sub.sub]]`'s parent is a sub that actually dispatches nested (a sub with
-    nested subs but no nested dispatch is dead data, which is the same defect from the other side).
+  - "Assert every `[[command.sub.sub]]`'s parent actually dispatches nested" was investigated and is
+    VACUOUS: `build_sub_kind` returns `DispatchKind::Branching` whenever `!toml.sub.is_empty()`, so
+    every parent with nested subs dispatches them by construction. There is no such thing as an
+    ignored nested sub. The nearest NON-vacuous variant — a `candidate` parent, whose nested subs
+    `filter_candidates` silently drops — found 0 instances but is now asserted in `filter_candidates`
+    so it cannot appear.
   - Pin the tree SHAPE per command — a fixture of `command sub subsub` triples, regenerated
     deliberately — so any move shows up as a diff rather than needing to be reasoned about.
 
