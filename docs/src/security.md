@@ -33,7 +33,7 @@ A project's `.safe-chains.toml` must be trusted before safe-chains honors it. Se
 
 **Don't run an agent from your home directory.** safe-chains treats your working directory as the project, and files under it are read/write. From `~`, a relative path like `cat Documents/finances.csv` is indistinguishable from a project file, so files throughout your home directory are exposed. Run agents from a project directory instead.
 
-**Grant narrowly.** A [trusted directory](how-it-works.md#trusted-directories) grant is a deliberate broad allow, the same broad access you get by running from a directory. Grant the specific directories you work in (`~/projects`), not all of `~`.
+**Grant narrowly.** A [trusted directory](how-it-works.md#trusted-directories) grant is a deliberate broad allow, the same broad access you get by running from a directory. Grant the specific directories you work in (`~/projects`), not all of `~`. A grant only covers what it names, so a broad one can't reach a credential store by accident — but a grant that names `~/.ssh` or `~/.aws` does reach it, and then reading a private key is approved like any other file. Grant those only if that is what you meant.
 
 **Deny the folders you never want touched.** On Claude Code, safe-chains only ever *approves*. It never denies, so a command it doesn't recognize just falls through to Claude's normal prompt. For a hard block on paths you never want touched, pair it with a second hook that denies them (Claude Code blocks the command if any hook denies it). A blunt backstop at `~/.claude/hooks/deny-paths.sh`:
 

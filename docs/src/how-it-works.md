@@ -24,7 +24,7 @@ safe-chains allows reaching into sibling directories of the current working dire
 
 ## Trusted directories
 
-If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`. The binary will pick up these preferences. safe-chains has a special block to not auto-allow writes to `~/.config/safe-chains.toml`. This is because currently, most harnesses don't have a protected way for third party hooks to store preferences.
+If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`. The binary will pick up these preferences. `read` and `write` are independent, so you can grant one without the other.
 
 ```toml
 # Work across every project under ~/projects, not just the current one
@@ -45,11 +45,34 @@ path = "~/.local/share/mise/"
 read = true
 ```
 
-Dot files are generally not part of allowlisted target directories. You'll need to grant access to these directories explicitly. Credential stores like `.ssh`/`.aws` stay protected regardless.
+### A grant covers what it names
+
+A grant covers the directory you name and everything under it. It does not reach into dot directories below that, because those are usually config and credentials that a broad grant should not sweep up. Name them to reach them.
+
+```toml
+# Covers ~/projects/app/src, but not ~/projects/app/.git or ~/projects/.ssh
+[[grant]]
+path = "~/projects"
+read = true
+write = true
+
+# Covers ~/.ssh, because it names it
+[[grant]]
+path = "~/.ssh"
+read = true
+```
+
+The same applies to credential stores. A grant on a parent directory never reaches `~/.ssh`, `~/.aws` or `~/Library/Keychains`. A grant that names one does, and so does a grant on a path inside one.
+
+Two things cannot be granted, however you name them. safe-chains will not auto-approve writes to its own config at `~/.config/safe-chains.toml`, because an agent that could change that file could grant itself everything else. And it will not auto-approve writes to the files that decide who may log in and what they may do: `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d` and the boot loader. Both stay readable. Ordinary files in `/etc` are not covered by this and can be granted normally.
+
+Grants are read only from `~/.config/safe-chains.toml`, never from a file inside a project. A project you have checked out cannot grant itself anything.
+
+On macOS, `~/.ssh` and `~/.SSH` are the same directory, but a grant covers the spelling you write. Write the spelling you use. Protected paths work the other way around and match either spelling, so a case variant can never be used to slip past one.
 
 ### Read approvals from `~/.claude/settings.json`
 
-If you use Claude Code, safe-chains also honors the file-**read** approvals already in your `~/.claude/settings.json`. A `permissions.allow` entry such as `Read(//Users/you/.local/share/mise/**)` or `Read(~/.gem/**)` becomes a read-only trusted directory — the same effect as a `[[grant]]` with `read = true`, so you don't have to declare a directory in two places. Only absolute (`//…`) and home (`~/…`) paths are honored; a bare "read anything" rule is not (grant that explicitly in `safe-chains.toml` if you really want it). `Edit(…)`/`Write(…)` rules are deliberately **not** turned into write grants — reads only — and the credential shields and dotfile rule above still apply, so a broad read rule can't reach `.ssh`. Only your user-level `~/.claude/settings.json` is read, never a project's `.claude/settings.json`.
+If you use Claude Code, safe-chains also honors the file-**read** approvals already in your `~/.claude/settings.json`. A `permissions.allow` entry such as `Read(//Users/you/.local/share/mise/**)` or `Read(~/.gem/**)` becomes a read-only trusted directory — the same effect as a `[[grant]]` with `read = true`, so you don't have to declare a directory in two places. Only absolute (`//…`) and home (`~/…`) paths are honored; a bare "read anything" rule is not (grant that explicitly in `safe-chains.toml` if you really want it). `Edit(…)`/`Write(…)` rules are deliberately **not** turned into write grants — reads only — and the dotfile rule above still applies. A rule borrowed from Claude never reaches a credential store, even one that names it: `Read(~/.ssh/**)` was written to answer Claude's permission prompt, and doesn't say you want every command touching `~/.ssh` auto-approved here. Grant it in `safe-chains.toml` if that's what you want. Only your user-level `~/.claude/settings.json` is read, never a project's `.claude/settings.json`.
 
 ## Parsing example
 
