@@ -123,9 +123,10 @@ them, not to paraphrase them.
 
 ```
 safe-chains has no entry for the command `warnings`, so it did not auto-approve this.
-That is not a rating of the command. safe-chains approves only commands it has
-researched, and says nothing about the rest. The normal approval prompt follows.
-Rewording the command to get it approved is not the fix.
+That is not a rating of the command. safe-chains approves commands it has researched
+and has no opinion about the rest. The normal approval prompt follows.
+If `warnings` is a real command that should be approved, please open an issue:
+https://github.com/michaeldhopkins/safe-chains/issues
 ```
 
 ### 2. Unknown command, we emit deny and the harness honours it (Codex, Cursor, Grok, agy)
@@ -133,19 +134,25 @@ Rewording the command to get it approved is not the fix.
 ```
 safe-chains did not approve this, and the command did not run.
 safe-chains has no entry for the command `warnings`. That is not a rating of the
-command. safe-chains approves only commands it has researched, and says nothing about
-the rest. Rewording the command to get it approved is not the fix.
+command. safe-chains approves commands it has researched and has no opinion about the
+rest.
+If `warnings` is a real command that should be approved, please open an issue:
+https://github.com/michaeldhopkins/safe-chains/issues
 ```
 
 ### 3. Unknown command, no harness detected (direct CLI, unrecognised target)
 
-Vague about what follows, exact about what was found.
+Vague about what follows, exact about what was found. Note the wording is "gives no answer" rather
+than "says nothing": on some tools a non-approval is enforced as a block, so claiming safe-chains
+stays out of it would be false there.
 
 ```
-safe-chains has no entry for the command `warnings`, so it did not auto-approve this.
-What happens next depends on the tool that ran safe-chains.
-That is not a rating of the command. safe-chains approves only commands it has
-researched, and says nothing about the rest.
+safe-chains has no entry for the command `warnings`, so it did not approve it.
+That is not a rating of the command. safe-chains approves commands it has researched.
+For anything else it gives no answer, and the tool that ran safe-chains decides what
+to do by its own default.
+If `warnings` is a real command that should be approved, please open an issue:
+https://github.com/michaeldhopkins/safe-chains/issues
 ```
 
 ### 4. Parse surprise: an env assignment swallowed the command name
@@ -162,43 +169,67 @@ The normal approval prompt follows.
 
 ### 5. A known command reaching a credential store
 
-The command is known, so do not say "no entry". Name the path and the reason.
+The command is known, so do not say "no entry". Name the path and the reason. Name the remedy that
+WORKS: measured, a path grant does not open a credential path, while `--level local-admin` and
+`--level yolo` both do. Offering the grant here would be the same defect as telling someone to grant
+a path that is not a path.
 
 ```
 safe-chains did not auto-approve this. It reads `~/.ssh/id_rsa`, which holds
 credentials. If that was not what you meant to do, stop and check the command.
-Granting this path in ~/.config/safe-chains.toml will not help. Credential paths are
-never auto-approved.
+Adding this path to the granted paths in ~/.config/safe-chains.toml will not change
+it. Credential paths are held back from path grants on purpose, so that widening a
+directory cannot widen the keys inside it.
+To allow reads like this, raise the level in ~/.config/safe-chains.toml to
+local-admin or yolo.
 ```
 
 ### 6. A path built by an interpolation
 
-Give the remedy that exists, and only if it exists.
+Many interpolations ARE computed, so do not imply none are. Say which kinds work, and name the one
+in this command that did not.
 
 ```
-safe-chains did not auto-approve this. The path `./out/$(id)` is built by an
-interpolation, so what it names depends on a value that is not in the command. It
-could be any path, which is why it cannot be approved in advance.
-If the interpolated part cannot contain a `/`, putting literal text next to it in the
-same path component is enough: `out/dx_$i.txt` is approved where `out/$i` is not,
-because the first is a filename whatever `$i` holds and the second could be `..`.
+safe-chains did not auto-approve this. The path `./out/$(id)` depends on the output of
+`id`, and safe-chains cannot tell where that points.
+It can work this out for commands whose output it knows. `$(pwd)` is the working
+directory. `$(find ./src -name x)` is a path under ./src. `$(seq 1 4)` is a number.
+`id` is not one of those, so the path could be anywhere.
+Two things help. Use a command safe-chains knows, or put literal text next to the
+interpolation in the same path component: `out/dx_$i.txt` is approved where `out/$i`
+is not, because the first is a filename whatever `$i` holds and the second could be
+`..`.
 ```
 
 ### 7. Code run from a temporary directory
 
-```
-safe-chains did not auto-approve this. It runs code from `/tmp/build.sh`. Temporary
-directories are where downloaded files land, so code there is treated as foreign even
-though reading and writing temp files is fine.
-If this is a directory you trust, grant it in ~/.config/safe-chains.toml. A scratchpad
-that the harness reports for this session is recognised already and needs no grant.
-```
-
-### 8. A path outside the working directory
+The read/write versus run distinction is the whole point, so state it as two facts rather than one
+sentence with "even though" in the middle. Do NOT mention the session scratchpad unless a session id
+was actually supplied. Claiming a scratchpad is recognised when none was reported sends the reader
+looking for something that is not there.
 
 ```
-safe-chains did not auto-approve this. It reads `~/other-project/notes.md`, which is
-outside the working directory `~/projects/app`.
+safe-chains did not auto-approve this. It runs code from `/tmp/build.sh`.
+Reading and writing files in a temporary directory is approved. Running code from one
+is not, because a temporary directory is where a downloaded file lands, and safe-chains
+cannot tell a script you wrote from one that arrived.
+If this is a directory you trust, grant it in ~/.config/safe-chains.toml.
+```
+
+### 8. A path that is not in an approved place
+
+"Outside the working directory" is WRONG and was measured so: at `developer`, `../peer/README.md`,
+`/tmp/x`, `/usr/share/man/man1/ls.1` and `~/.cargo/registry/...` are all outside the working
+directory and all approved, while `~/notes.txt`, `/etc/hosts`, `~/Documents/x.txt` and
+`/usr/local/bin/tool` are refused. Name the places that ARE approved, and say the path is not one of
+them. The list depends on the level, so it must be generated from the level in force rather than
+hardcoded.
+
+```
+safe-chains did not auto-approve this. It reads `~/notes.txt`.
+At the current level, reads are approved in the working directory, in projects next to
+it, in temporary directories, and in installed package files. `~/notes.txt` is not in
+any of those.
 If safe-chains is running from the wrong directory, restart it where you meant to be.
 To allow this path from here, grant it in ~/.config/safe-chains.toml.
 ```
@@ -234,6 +265,44 @@ safe-chains could not verify this command was safe — you may want to try a dif
 approach.
 ```
 An em dash, a hedge, and an invitation to go looking for a spelling that passes.
+
+## Open UX problem this review exposed: two levers, one discoverable
+
+Writing example 5 turned up an inconsistency worth fixing in the LOGIC, not just the copy.
+
+Measured, at the default level:
+
+```
+--level developer      deny     cat ~/.ssh/id_rsa
+--level local-admin    APPROVE
+--level network-admin  deny
+--level yolo           APPROVE
+```
+
+So a credential read IS reachable. Not through the lever a user would reach for first. A path grant
+in `~/.config/safe-chains.toml` does not open it, on purpose, so that widening a directory cannot
+widen the keys inside it. Raising the LEVEL does open it.
+
+That is defensible and undiscoverable. Someone who wants to read their own `~/.ssh/config` grants the
+path, sees no change, and has nothing telling them the other lever exists.
+
+`local-admin` allowing it while `network-admin` refuses is also coherent but surprising. They are
+siblings, not a ladder: `local-admin` flexes local machine access, `network-admin` flexes remote
+egress, and a credential read is local. Nothing in the output says so.
+
+Three things to fix, in order of how much they buy:
+
+1. When a path is refused and a grant would NOT change it, say which lever would. Example 5 does
+   this now. It is the cheapest fix and covers the common case.
+2. When a path is refused and a grant WOULD change it, say so specifically. Examples 7 and 8 do
+   this. The two messages must not be interchangeable, or the advice is noise.
+3. Generate the "approved places" list from the level in force rather than hardcoding it. Example 8
+   names four kinds of place, and all four are level-dependent. A hardcoded list is wrong the moment
+   someone changes level, and wrong in the direction that teaches distrust.
+
+A guard belongs with 1 and 2: for a refused path, the message must offer a grant if and only if a
+grant actually changes the verdict. That is checkable by running the verdict twice, once with the
+grant applied, and it fails the day the two drift.
 
 ## Sites to change
 
