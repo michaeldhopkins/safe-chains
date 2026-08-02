@@ -313,6 +313,28 @@ grant applied, and it fails the day the two drift.
 - `ReachReason::message`. Already follows this spirit (it names the path and gives a remedy that
   exists); it is the model for the rest, not a site needing change.
 
+## Partial-implementation risks
+
+**Three producers, not one.** The gated reason is built once in `main.rs` and handed to
+`render_deny`/`render_ask`, which every target wraps in its own envelope. That part is already
+centralised and is the easy half. But the abstain path produces its text through `ReachReason`, and
+`--explain` produces its own. Fixing one leaves the others, which is how "not on the allowlist"
+survives in some outputs and not others today. Any implementation should route all three through one
+builder, or the next reviewer finds the same inconsistency in a different place.
+
+**The emission has to reach the builder.** Rule 1 says copy follows the (capability, emission) pair.
+`main.rs` knows it, because it picks deny vs ask vs abstain from `gated_policy()`. The nudge path
+does not necessarily know it. If the builder cannot see the emission it will default to one wording,
+which is exactly the "blocked on a harness that only prompts" error.
+
+**Target tests hardcode the copy.** `codex.rs`, `grok.rs` and `cursor.rs` each assert on literal
+strings like `"blocked: not on the allowlist"`. Those keep passing while the real copy changes,
+which is worse than no test: they report green on the layer being changed. They should assert
+envelope SHAPE (field names, decision values, exit codes) and leave wording to the copy guards.
+
+**The avoid-list guard must cover every producer.** A string check that only scans `main.rs` will
+pass while `ReachReason` still says "blocked". Enumerate the producers, not the files you remember.
+
 ## Testing
 
 The point of Rule 1 is that copy and behaviour cannot diverge, so the guard asserts the PAIRING:

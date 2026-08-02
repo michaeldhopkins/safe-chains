@@ -104,6 +104,39 @@ No new config syntax. No new locus rung. No new field on `[[grant]]`.
 - **Read and write stay independent.** `read = true, write = false` on `~/.ssh` admits reads and
   keeps writes refused.
 
+## Partial-implementation risks
+
+The change is one line in spirit and five places in practice. Each of these is a way to ship
+something that looks done and is not.
+
+**1. The shielded node has to survive the region lookup.** `apply_grant` receives a resolved `Role`,
+which has already forgotten which node matched, so the comparison cannot be made without threading
+that out of `base_region`. This is not optional plumbing: without it the only implementable rule is
+the blanket bail we are replacing. If this gets hard, the temptation will be to approximate with
+dot-ness, which fails on `/etc/shadow` (see the table above).
+
+**2. `base_region` has its OWN secret-first pass.** It short-circuits on `reads_secret` before
+ordinary specificity so an admit node cannot outrank the shield. That shortcut and `apply_grant`
+must agree on which node they mean, or a grant naming a store gets past one and not the other. Two
+places deciding "which shield applies here" is the shape of the original bug.
+
+**3. The peer/adjacent path applies the same idea separately.** A peer project's `.env`/`.git`/`.aws`
+stays denied via `has_hidden_component` on a different code path. After this change, a grant naming
+`../peer/.ssh` should behave exactly like one naming `~/.ssh`. If only `apply_grant` learns the new
+rule, the two diverge and the difference is invisible until someone hits it.
+
+**4. Case folding.** On macOS the shield folds, so `~/.SSH/id_rsa` matches the `.ssh` store. If the
+GRANT matcher does not fold the same way, granting `~/.ssh` covers one spelling and not the other.
+That is worse than not implementing it, because the user believes the directory is granted.
+
+**5. `pinned` must not come along.** It shares the bail line with `reads_secret`. Deleting the
+condition wholesale makes safe-chains' own config write grantable, which is the one thing that must
+never be reachable by any user statement. The edit is to split the condition, not remove it.
+
+A useful completeness check, cheap to write: for every carve-out kind, assert both directions — a
+grant that NAMES it widens, a grant ABOVE it does not. If a carve-out has no such pair, it has not
+been considered.
+
 ## Copy, once this lands
 
 `refusal-copy.md` example 5 currently points at raising the level, because that is the only lever
