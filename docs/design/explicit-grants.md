@@ -137,6 +137,68 @@ A useful completeness check, cheap to write: for every carve-out kind, assert bo
 grant that NAMES it widens, a grant ABOVE it does not. If a carve-out has no such pair, it has not
 been considered.
 
+## Every carve-out kind, and what the rule says about each
+
+`role_is_protective` is the authoritative list of what makes a node stricter than an ordinary
+worktree. There are FOUR conditions, not the two the bail names, so "does a grant that names it
+win?" has to be answered for each or the change is only partly specified.
+
+```rust
+fn role_is_protective(role: &Role) -> bool {
+    role.reads_secret
+        || role.pinned
+        || role.write_locus > LocalLocus::Worktree
+        || role.read_locus > LocalLocus::WorktreeTrusted
+}
+```
+
+**1. `read_locus > worktree-trusted` is NOT a carve-out.** It is the ordinary case. The `unknown`
+role is `read = machine`, and widening exactly that is what grants are for. Listing it here is the
+point: it looks protective by the predicate above, but a grant naming a directory of your own files
+already widens it today and must keep doing so. Do not "fix" this one.
+
+**2. `reads_secret` — a naming grant WINS.** `credential-store`, the motivating case. `~/.ssh`
+granted covers `~/.ssh/id_rsa`; `~/` granted does not.
+
+**3. `pinned` — absolute, no grant ever.** `safe-chains-config`. The risk is to the mechanism rather
+than to the user's data: an agent that can grant itself write access to the governing file has
+defeated everything else. Keeps its blanket bail, and that asymmetry is deliberate rather than an
+oversight to be tidied later.
+
+**4. `write_locus > worktree` (write freezes) — a naming grant WINS, with one open question.**
+This is the kind most likely to be forgotten, because the bail never mentions it. It covers several
+different things:
+
+   - `.git` write freeze (`.git/config`, `.git/hooks/pre-commit`). A hook is an installed
+     executable, so this is execution persistence, not just a file write. The rule still applies:
+     a user naming `.git` in their own config has said what they mean. A grant on the REPO does not
+     reach it, which is the case that matters for an agent.
+   - `.envrc`, same shape.
+   - `package-content` (`/usr/share`, `~/.cargo/registry`) at `write = machine`. Naming it grants
+     it. Note the read face is already `adjacent`, so only the write is at stake here.
+   - `system-integrity` (`write = system-integrity`). This is the open question. Following the rule
+     uniformly is the simplest story and is arguably harmless, since the OS refuses these writes
+     anyway on a protected volume, so the grant would buy a failed syscall rather than a real
+     capability. Treating it like `pinned` is also defensible. DECIDE THIS EXPLICITLY rather than
+     letting the implementation pick, because whichever way it goes it should be a sentence in this
+     file, not an accident of where the condition was split.
+
+## The completeness check
+
+For every kind above, assert BOTH directions in the same test:
+
+- a grant that NAMES the node widens it, and
+- a grant ABOVE the node does not.
+
+A carve-out with only one of the two has not been considered. The pairing is what catches the
+failure modes the risks section lists: the peer-path divergence shows up as a naming grant that
+works for `~/.ssh` and not `../peer/.ssh`, and the case-folding gap shows up as one that works for
+`.ssh` and not `.SSH`. Neither is visible from a single-direction test.
+
+Two rows of that table are deliberately asymmetric and should be written as such: `pinned` has no
+widening direction at all, and `read_locus > worktree-trusted` has no refusing direction. If either
+ever grows its missing half, something has gone wrong.
+
 ## Copy, once this lands
 
 `refusal-copy.md` example 5 currently points at raising the level, because that is the only lever

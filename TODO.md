@@ -1090,6 +1090,13 @@ Cannot be simplified to "delete the bail and let the hidden rule cover it": most
 are dot-dirs so it would look right, but `/etc/shadow`, `/root`, macOS keychains and browser profiles
 are not dot-prefixed, and a broad `/etc` grant would sweep them up.
 
+FOUR carve-out kinds, not two (`role_is_protective`): `reads_secret`, `pinned`,
+`write_locus > worktree` (write freezes: `.git`, `.envrc`, package-content, system-integrity) and
+`read_locus > worktree-trusted`. That last one is NOT a carve-out — it is the `unknown` role that
+grants exist to widen, and "fixing" it would break ordinary grants. Write freezes are the kind most
+likely to be missed, because the bail never mentions them. One decision is left open on purpose:
+whether `system-integrity` follows the rule or is absolute like `pinned`.
+
 `pinned` keeps its blanket bail. safe-chains' own config write stays un-grantable however
 specifically it is named, because the risk is to the mechanism rather than to the user's data.
 
