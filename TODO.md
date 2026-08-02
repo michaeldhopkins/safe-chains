@@ -916,14 +916,36 @@ What the real surface says:
   - `--open` defaults to TRUE and resolves ESC environments, so even a read form reaches remote
     providers unless it is disabled.
 
-Still open, and now sharper:
-  - `set`/`set-all`/`remove`/`remove-all` — the locus question stands and is the blocker: the file
-    backend writes `Pulumi.<stack>.yaml` locally, the service backend writes REMOTE state, and the
-    command string does not say which. SafeWrite is local-only, so they stay out until there is a
-    way to tell the backends apart (the presence of `--config-file`? a `[[trusted]]`-style pin?).
-  - `copy` — writes into a second, NAMED destination stack.
-  - `refresh` — remote read plus a local write.
-  - `env` — a whole ESC surface of its own; not researched at all.
+RESOLVED PREMISE (v3.255.0): the blocker recorded here — "the file backend writes
+`Pulumi.<stack>.yaml` locally, the service backend writes REMOTE state, and the command string does
+not say which" — rested on a mistake of mine. Pulumi stores stack CONFIG and stack STATE separately.
+Config lives in a detected local file, which `--config-file` states outright: "use the configuration
+values in the specified file rather than detecting the file name". The backend holds the
+checkpoint/state, a different artifact. So `config set` does not write remote state under either
+backend, and the file-vs-service distinction is not what decides its locus.
+
+What that leaves, and it is a better-shaped question:
+
+  - WRITE TARGET is `Pulumi.<stack>.yaml` in the project directory — a worktree path when run from
+    the project, which is SafeWrite-shaped, and already locus-gated like any other file write.
+  - `--secret` is the flag that changes the profile, and it is VISIBLE in the command string:
+    "encrypt the value instead of storing it in plaintext". Encryption needs the stack's key — the
+    Pulumi service's under the service backend, `PULUMI_CONFIG_PASSPHRASE` under a local one. That is
+    exactly the `[[command.sub.flag]]` classifying-flag shape (`classifies = …`) this repo already
+    uses for `sops`/`age`/`ansible-vault`, rather than a reason to withhold the whole subcommand.
+  - `set`'s full flag surface is small and researched: `--path`, `--plaintext`, `--raw`, `--secret`,
+    `--type`.
+
+ONE UNKNOWN REMAINS before listing `set`: whether a PLAINTEXT set contacts the backend at all to
+resolve the current stack. Under the service backend it plausibly requires being logged in, which
+would make even the plaintext form a remote READ. Settle it by running against a `pulumi login
+--local` stack with the network unavailable and watching whether it succeeds — do NOT infer it from
+help text, which is silent on the point. That measurement is the whole remaining blocker, and it is
+cheap.
+
+Unchanged and still out for their own reasons: `copy` (writes a second NAMED stack), `refresh`
+(remote read plus local write), `env` (a whole ESC surface), `remove`/`remove-all` (same shape as
+`set`, so they resolve with it), and `get` (`decrypt-read`).
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
