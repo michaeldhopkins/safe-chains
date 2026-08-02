@@ -4,6 +4,19 @@ description = "Infrastructure-as-code platform that lets developers define cloud
 url = "https://www.pulumi.com/docs/cli/"
 bare_flags = ["--help", "-h"]
 
+# `-C` / `--cwd` ("run pulumi as if it had been started in another directory") is a GLOBAL flag: it
+# reaches every subcommand and relocates the whole invocation rather than naming an operand. Its
+# value IS the locus the command then acts on, so gating it is what keeps a subcommand's
+# classification true — `pulumi config -C /etc` would read a project there while the entry describes
+# reading the current one.
+#
+# Gated `read` because the only admitted subcommand is the bare `config` listing, which reads
+# `Pulumi.yaml` and `Pulumi.<stack>.yaml` in whatever directory it is pointed at. A future WRITE
+# subcommand needs this re-examined: the flag would then relocate a write and `read` would
+# under-gate it. Declared at COMMAND level, matching the flag's own global scope.
+[command.path_gate]
+flags = { "-C" = "read", "--cwd" = "read" }
+
 [[command.sub]]
 name = "version"
 
@@ -61,71 +74,34 @@ valued = ["--resource", "--since", "--stack", "-r", "-s"]
 # `config` declared only `nested_bare = true` — no nested subs, no flags, no positional bound — and
 # `max_positional` defaults to UNLIMITED, so every token after it was an unremarkable positional.
 # Unknown FLAGS denied while unknown POSITIONALS passed, which admitted `pulumi config set k v` and
-# `pulumi config rm k`: mutations of stack configuration, remote state under the service backend.
-#
-# Bounded to the BARE form. `pulumi config` with no arguments lists the stack's configuration with
-# secret values masked as `[secret]`; `--show-secrets` is not listed, so the unmasking spelling is an
-# unknown flag and refuses.
-#
-# Measured against pulumi v3.255.0 (`pulumi config --help`, `pulumi config get --help`).
-#
-# Every sub-form stays out — the real names are `get`, `set`, `set-all`, `remove`, `remove-all`,
-# `copy`, `refresh` and `env` — and `get` is out for a reason worth recording rather than lumping in
-# with the mutators. `--show-secrets` exists ONLY on the listing form, documented as "show secret
-# values when listing config instead of displaying blinded values". Blinding is a property of
-# LISTING; `get` has no such flag and no blinding concept, so it returns the value directly, which
-# for a secret key is the plaintext. Whether a key holds a secret is not knowable from the command
-# string, so the honest classification is the `decrypt-read` archetype — "reveals plaintext secret
-# material to the caller", at yolo — not the SafeRead it was briefly given here.
-#
-# Two flags are deliberately absent from the lists below and each denies for a real reason, not by
-# oversight: `--show-secrets` unmasks the very values the bare listing blinds, and `--config-file`
-# takes a filesystem PATH (it would need a read gate before it could be listed). `--open`, which
-# defaults to true, resolves ESC environments and so reaches remote providers.
-#
-# `max_positional = 0` is what makes the bound real: without it the entry accepts any number of
-# positionals, which is the exact defect this replaced.
-[[command.sub]]
-name = "config"
-nested_bare = true
-max_positional = 0
-standalone = ["--help", "-h", "--json"]
-valued = ["--stack", "-s"]
-[[command.sub.sub]]
-name = "history"
-standalone = ["--help", "--json", "--show-secrets", "-h"]
-valued = ["--page", "--page-size", "--stack", "-s"]
-[[command.sub.sub]]
-name = "tag"
-bare = false
-standalone = ["--help", "-h"]
-[[command.sub.sub]]
-name = "graph"
-standalone = ["--help", "-h"]
-valued = ["--dependency-edge-color", "--parent-edge-color", "--stack", "-s"]
-
-[[command.sub]]
-name = "logs"
-standalone = ["--follow", "--help", "--json", "-f", "-h"]
-valued = ["--resource", "--since", "--stack", "-r", "-s"]
-
-# `config` declared only `nested_bare = true` — no nested subs, no flags, no positional bound — and
-# `max_positional` defaults to UNLIMITED, so every token after it was an unremarkable positional.
-# Unknown FLAGS denied while unknown POSITIONALS passed, which admitted `pulumi config set k v` and
 # `pulumi config rm k`: mutations of stack configuration, which is remote state under the service
 # backend and can hold secrets. Only `--secret` refused, and only because it was an unlisted flag.
 #
 # Declaring the read sub makes the mutators deny by OMISSION, which is the direction this file wants.
 # `set`, `rm`, `cp`, `refresh`, `set-all` and `rm-all` all change stack state and need their own
 # research before any of them is listed (see TODO.md).
+# Bounded to the BARE listing. `pulumi config` with no arguments lists the stack's configuration
+# with secret values masked as `[secret]`; `--show-secrets` is not listed, so the unmasking spelling
+# is an unknown flag and refuses. Measured against pulumi v3.255.0.
+#
+# Every sub-form stays out — the real names are `get`, `set`, `set-all`, `remove`, `remove-all`,
+# `copy`, `refresh`, `env`. `get` is out for its own reason: `--show-secrets` exists ONLY on the
+# listing form ("show secret values when listing config instead of displaying blinded values"), so
+# blinding is a property of LISTING. `get` has no such flag and no blinding concept, so it returns
+# the value directly — plaintext for a secret key. That is the `decrypt-read` archetype, at yolo,
+# not the SafeRead it was briefly given. `set` and friends cannot be admitted either, and not
+# because of where they write: the write target is a local `Pulumi.<stack>.yaml` under any backend,
+# but the BACKEND itself is ambient (login state or `PULUMI_BACKEND_URL`), so a bare `set` may
+# consult the service and the command string cannot rule it out.
+#
+# `max_positional = 0` is what makes the bound real: without it the entry accepts any number of
+# positionals, which is how `pulumi config set k v` was admitted in the first place.
 [[command.sub]]
 name = "config"
 nested_bare = true
-[[command.sub.sub]]
-name = "get"
-level = "SafeRead"
+max_positional = 0
 standalone = ["--help", "-h", "--json"]
-valued = ["--stack", "-s"]
+valued = ["--cwd", "--stack", "-C", "-s"]
 
 [[command.sub]]
 name = "gen-completion"
