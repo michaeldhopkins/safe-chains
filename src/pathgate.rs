@@ -79,8 +79,11 @@ pub(crate) struct RoleSpec {
     /// Used when a positional's role depends on a mode selector — `ar`'s key-letter (`ar rcs a.a`
     /// WRITES the archive, `ar t a.a` READS it) or `textutil`'s `-convert` vs `-info`. Read and
     /// write both deny a sensitive locus, so this only changes the verdict at an in-workspace
-    /// protected-config path (`.git/config`: readable, write-denied). When set, it REPLACES the
-    /// positional/shape walk; `flags` are ignored (the handler parses them itself).
+    /// protected-config path (`.git/config`: readable, write-denied). When set, it replaces the
+    /// positional/shape walk — the handler decides roles per operation — but `flags` are still
+    /// honoured if declared, and a spec may carry both. That is deliberate: `flags` used to be
+    /// silently discarded whenever a handler was present, so adding a handler to a spec that
+    /// already gated flags would have removed those gates while appearing to add protection.
     #[serde(default)]
     handler: Option<String>,
 }
@@ -198,7 +201,19 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
 /// declarative walk, otherwise the positional/shape/flags walk runs.
 fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
     match &spec.handler {
-        Some(name) => handlers::dispatch(name, tokens),
+        // A handler used to REPLACE the walk, which silently discarded the spec's flag map. No spec
+        // declares both today, so nothing was mis-gated — but it is a trap laid for whoever needs
+        // one: adding `handler = …` to `[roles."cargo"]` would have dropped its `--target-dir` and
+        // `--out-dir` gates while appearing to add protection, the same silent-shadowing the
+        // `central || own` comment warns about one layer up.
+        //
+        // The walk runs only when the spec actually declares flags. That matters: with an EMPTY
+        // flag map, `walk` gates every path argument by `spec.positional`, so running it
+        // unconditionally would ADD denials to the handler-only specs (`ar`, `textutil`) that rely
+        // on their handler deciding roles per operation.
+        Some(name) => {
+            handlers::dispatch(name, tokens) || (!spec.flags.is_empty() && walk(spec, tokens))
+        }
         None => walk(spec, tokens),
     }
 }
@@ -447,6 +462,52 @@ mod handlers {
             }
         }
         false
+    }
+}
+
+#[cfg(test)]
+mod both_gates {
+    use super::{Role, RoleSpec, Shape, apply};
+    use crate::parse::Token;
+
+    fn toks(words: &[&str]) -> Vec<Token> {
+        words.iter().map(|w| Token::from_raw((*w).to_string())).collect()
+    }
+
+    /// A gate declaring BOTH a handler and flags must honour both.
+    ///
+    /// No spec in pathgates.toml declares both today, so this constructs the case rather than
+    /// finding one — which is the point. `apply` used to `match` on the handler and return early,
+    /// discarding the flag map, so the first spec to need both would have silently lost its flag
+    /// gates. The failure would have looked like added protection.
+    #[test]
+    fn a_gate_with_both_a_handler_and_flags_honours_both() {
+        let mut flags = std::collections::HashMap::new();
+        flags.insert("--out".to_string(), Role::Write);
+        let with_handler = RoleSpec {
+            positional: Role::Ignore,
+            shape: Shape::default(),
+            flags: flags.clone(),
+            handler: Some("ar_archive".to_string()),
+        };
+        let flags_only =
+            RoleSpec { positional: Role::Ignore, shape: Shape::default(), flags, handler: None };
+
+        // The FLAG half fires with a handler present, exactly as it does without one.
+        let sensitive = toks(&["ar", "t", "./lib.a", "--out", "/etc/x"]);
+        assert!(apply(&flags_only, &sensitive), "baseline: the flag gate fires without a handler");
+        assert!(
+            apply(&with_handler, &sensitive),
+            "a declared flag gate was dropped because a handler was also present"
+        );
+
+        // And the HANDLER half still fires on its own terms — `ar rcs` WRITES the archive.
+        let handler_case = toks(&["ar", "rcs", "/etc/lib.a", "./x.o"]);
+        assert!(apply(&with_handler, &handler_case), "the handler stopped deciding its own roles");
+
+        // Neither half fires on a benign invocation, or the assertions above prove nothing.
+        let benign = toks(&["ar", "t", "./lib.a", "--out", "./out.txt"]);
+        assert!(!apply(&with_handler, &benign), "both gates fired on a worktree-only invocation");
     }
 }
 
