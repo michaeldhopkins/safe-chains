@@ -2486,6 +2486,164 @@ use super::*;
         );
     }
 
+    /// The command TREE must be well-formed: no name repeats at any level.
+    ///
+    /// This exists because a real corruption went undetected. An edit to `pulumi.toml` computed a
+    /// replacement region's end with an index that matched an EARLIER occurrence than intended, so
+    /// the slice duplicated a span instead of removing it — 12 `[[command.sub]]` blocks where there
+    /// should have been 10, and `history`/`tag`/`graph` reparented under `config`. The file remained
+    /// SYNTACTICALLY VALID TOML, so it parsed, the registry built, and the entire suite stayed
+    /// green. Every existing structural guard checks flag lists or examples; none checked the shape
+    /// of the tree.
+    ///
+    /// Uniqueness is the invariant that catches it: duplicating any span necessarily repeats a
+    /// name. Read from the TOML SOURCE rather than the lowered registry, because a duplicate may be
+    /// silently collapsed during lowering — the authored file is what went wrong and what a human
+    /// edits.
+    /// Collect every command TOML under `commands/`, excluding the SAMPLE reference file.
+    fn command_toml_files() -> Vec<std::path::PathBuf> {
+        fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            let Ok(entries) = std::fs::read_dir(dir) else { return };
+            for e in entries.flatten() {
+                let p = e.path();
+                if p.is_dir() {
+                    tomls(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+        let mut files = Vec::new();
+        tomls(std::path::Path::new("commands"), &mut files);
+        files.retain(|f| !f.ends_with("SAMPLE.toml"));
+        files.sort();
+        files
+    }
+
+    #[test]
+    fn the_command_tree_has_no_duplicate_names() {
+        let files = command_toml_files();
+        assert!(files.len() > 100, "only {} command TOMLs found; the walk is wrong", files.len());
+
+        let mut problems = Vec::new();
+        let mut commands_seen: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
+        let mut checked = 0usize;
+
+        for f in &files {
+            let Ok(text) = std::fs::read_to_string(f) else { continue };
+            let file = f.display().to_string();
+            let (mut cmd, mut sub) = (String::new(), String::new());
+            let mut level = 0u8; // 1 = command, 2 = sub, 3 = sub.sub
+            let mut subs: Vec<String> = Vec::new();
+            let mut subsubs: Vec<(String, String)> = Vec::new();
+
+            let flush = |cmd: &str, subs: &mut Vec<String>, subsubs: &mut Vec<(String, String)>,
+                             problems: &mut Vec<String>| {
+                if cmd.is_empty() {
+                    return;
+                }
+                let mut seen = std::collections::HashSet::new();
+                for s in subs.iter() {
+                    if !seen.insert(s.clone()) {
+                        problems.push(format!("{cmd}: subcommand `{s}` declared twice"));
+                    }
+                }
+                let mut seen2 = std::collections::HashSet::new();
+                for pair in subsubs.iter() {
+                    if !seen2.insert(pair.clone()) {
+                        problems.push(format!(
+                            "{cmd} {}: nested subcommand `{}` declared twice",
+                            pair.0, pair.1
+                        ));
+                    }
+                }
+                subs.clear();
+                subsubs.clear();
+            };
+
+            for line in text.lines() {
+                let t = line.trim();
+                match t {
+                    "[[command]]" => {
+                        flush(&cmd, &mut subs, &mut subsubs, &mut problems);
+                        cmd.clear();
+                        sub.clear();
+                        level = 1;
+                    }
+                    "[[command.sub]]" => {
+                        sub.clear();
+                        level = 2;
+                    }
+                    "[[command.sub.sub]]" => level = 3,
+                    _ if t.starts_with("[[") => level = 0,
+                    _ => {
+                        if let Some(n) =
+                            t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"'))
+                        {
+                            match level {
+                                1 if cmd.is_empty() => {
+                                    cmd = n.to_string();
+                                    checked += 1;
+                                    if let Some(prev) = commands_seen.insert(cmd.clone(), file.clone())
+                                        && prev != file
+                                    {
+                                        problems.push(format!(
+                                            "command `{cmd}` declared in both {prev} and {file}"
+                                        ));
+                                    }
+                                }
+                                2 if sub.is_empty() => {
+                                    sub = n.to_string();
+                                    subs.push(sub.clone());
+                                }
+                                3 => subsubs.push((sub.clone(), n.to_string())),
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+            }
+            flush(&cmd, &mut subs, &mut subsubs, &mut problems);
+        }
+
+        assert!(checked > 100, "only {checked} commands scanned; the parse is wrong");
+
+        assert_tree_problems_are_known(&problems);
+    }
+
+    /// Compare the walk's findings against the acknowledged backlog, in both directions.
+    ///
+    /// Listing a row says "known, not yet triaged" — NOT that the shape is correct. The guard's job
+    /// is to block anything NOT listed, which is what a fresh corruption would be; and to fail when
+    /// a listed row stops reproducing, so the fixture cannot drift into describing a past that no
+    /// longer exists.
+    fn assert_tree_problems_are_known(problems: &[String]) {
+        let known: std::collections::HashSet<&str> =
+            include_str!("../../tests/fixtures/command_tree_duplicates.tsv")
+                .lines()
+                .map(str::trim)
+                .filter(|l| !l.is_empty() && !l.starts_with('#'))
+                .collect();
+        let fresh: Vec<&String> =
+            problems.iter().filter(|p| !known.contains(p.as_str())).collect();
+        assert!(
+            fresh.is_empty(),
+            "the command tree is malformed — a duplicated or reparented block still parses as \
+             valid TOML and builds cleanly, so nothing else catches this:\n  {}",
+            fresh.iter().map(|p| p.as_str()).collect::<Vec<_>>().join("\n  ")
+        );
+        // And the backlog must SHRINK, never silently grow stale: a row that no longer reproduces
+        // has been fixed and should be removed, or the fixture stops describing reality.
+        let stale: Vec<&str> =
+            known.iter().copied().filter(|k| !problems.iter().any(|p| p == k)).collect();
+        assert!(
+            stale.is_empty(),
+            "these rows in command_tree_duplicates.tsv no longer reproduce — delete them:\n  {}",
+            stale.join("\n  ")
+        );
+    }
+
     #[test]
     fn toml_examples_match_dispatch() {
         let mut failures = Vec::new();
