@@ -447,12 +447,6 @@ max_positional = 0
 standalone = ["--help", "-h"]
 
 [[command.sub]]
-name = "install"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
 name = "link"
 bare = false
 max_positional = 0
@@ -471,19 +465,7 @@ max_positional = 0
 standalone = ["--help", "-h"]
 
 [[command.sub]]
-name = "prune"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
 name = "run"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
-name = "self-update"
 bare = false
 max_positional = 0
 standalone = ["--help", "-h"]
@@ -501,31 +483,7 @@ max_positional = 0
 standalone = ["--help", "-h"]
 
 [[command.sub]]
-name = "uninstall"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
-name = "unset"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
 name = "unuse"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
-name = "upgrade"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
-
-[[command.sub]]
-name = "use"
 bare = false
 max_positional = 0
 standalone = ["--help", "-h"]

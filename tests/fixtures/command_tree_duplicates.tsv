@@ -13,38 +13,8 @@
 # Listing a row here says "known, not yet triaged". It does NOT say the shape is correct. Removing
 # rows as they are resolved is the point; the guard blocks anything NOT listed, which is what stops
 # a fresh corruption from slipping through the way the pulumi one did.
-aws: subcommand `sts` declared twice
 dub: subcommand `describe` declared twice
 esptool: subcommand `flash_id` declared twice
-gcloud artifacts: nested subcommand `apt` declared twice
-gcloud artifacts: nested subcommand `attachments` declared twice
-gcloud artifacts: nested subcommand `docker` declared twice
-gcloud artifacts: nested subcommand `files` declared twice
-gcloud artifacts: nested subcommand `generic` declared twice
-gcloud artifacts: nested subcommand `go` declared twice
-gcloud artifacts: nested subcommand `image-streaming-cache` declared twice
-gcloud artifacts: nested subcommand `locations` declared twice
-gcloud artifacts: nested subcommand `operations` declared twice
-gcloud artifacts: nested subcommand `packages` declared twice
-gcloud artifacts: nested subcommand `print-settings` declared twice
-gcloud artifacts: nested subcommand `projects` declared twice
-gcloud artifacts: nested subcommand `repositories` declared twice
-gcloud artifacts: nested subcommand `rules` declared twice
-gcloud artifacts: nested subcommand `sbom` declared twice
-gcloud artifacts: nested subcommand `settings` declared twice
-gcloud artifacts: nested subcommand `tags` declared twice
-gcloud artifacts: nested subcommand `versions` declared twice
-gcloud artifacts: nested subcommand `vpcsc-config` declared twice
-gcloud artifacts: nested subcommand `vulnerabilities` declared twice
-gcloud artifacts: nested subcommand `yum` declared twice
-gcloud: subcommand `artifacts` declared twice
 mc: subcommand `share` declared twice
-mise: subcommand `install` declared twice
-mise: subcommand `prune` declared twice
-mise: subcommand `self-update` declared twice
-mise: subcommand `uninstall` declared twice
-mise: subcommand `unset` declared twice
-mise: subcommand `upgrade` declared twice
-mise: subcommand `use` declared twice
 paket: subcommand `outdated` declared twice
 spack: subcommand `license` declared twice

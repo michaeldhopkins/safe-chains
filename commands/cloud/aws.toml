@@ -2579,12 +2579,6 @@ source = "https://docs.aws.amazon.com/cli/latest/reference/storagegateway/descri
 standalone = ["--debug", "--help", "--no-cli-pager", "--no-paginate"]
 valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color", "--max-items", "--output", "--page-size", "--query", "--region", "--starting-token"]
 [[command.sub]]
-name = "sts"
-first_arg = ["describe-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-
-[[command.sub]]
 name = "support"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
