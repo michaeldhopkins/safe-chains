@@ -965,6 +965,29 @@ Unchanged and still out for their own reasons: `copy` (writes a second NAMED sta
 (remote read plus local write), `env` (a whole ESC surface), `remove`/`remove-all` (same shape as
 `set`, so they resolve with it), and `get` (`decrypt-read`).
 
+## Command-tree duplicates — 35 acknowledged, each needs triage
+
+`the_command_tree_has_no_duplicate_names` was added after a corruption of `pulumi.toml` survived a
+fully green suite: a replacement region whose end index matched an EARLIER occurrence duplicated a
+span, giving 12 `[[command.sub]]` blocks where there should have been 10 and reparenting
+`history`/`tag`/`graph` under `config`. The file stayed SYNTACTICALLY VALID, so it parsed and built,
+and every existing structural guard checks flag lists or examples rather than the shape of the tree.
+
+Its first run found 35 pre-existing duplicates, listed in
+`tests/fixtures/command_tree_duplicates.tsv`. They are ACKNOWLEDGED, not approved: each is a second
+declaration of a name that already exists, so one of the two is dead weight and which one survives
+depends on lowering order.
+
+`aws sts` is the clearest and the place to start — one block declares an explicit
+`[[command.sub.sub]] get-caller-identity`, another declares `first_arg = ["describe-*", "get-*",
+"list-*"]` with `tolerate_unknown_short/long`. Those are very different surfaces and only one is
+live. The gcloud rows (`artifacts` and its nested `apt`/`attachments`/`docker`/`files`) look like
+the same shape.
+
+Triage each by determining which declaration the loader keeps, then delete the dead one — and
+remove its row, which the guard enforces: a row that no longer reproduces fails the test, so the
+fixture cannot drift into describing a past that no longer exists.
+
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
 Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
