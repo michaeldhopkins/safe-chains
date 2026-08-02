@@ -696,11 +696,6 @@ fn adjacent_role(path: &str) -> Option<Role> {
     })
 }
 
-/// Whether `path` is a peer path that would be `adjacent` EXCEPT that a hidden (dot) component
-/// shields it (`../peer/.github/…`, `../peer/sub/.env`). This is NOT a deny reason of its own — the
-/// shield already denies it — but it lets the overreach nudge say *why* a peer path is frozen
-/// (hidden-in-peer) instead of the misleading generic "outside the working directory". `path` is in
-/// the same `~`-form `adjacent_role` sees.
 /// Every region PATH the model declares, straight from `regions/default.toml`. Test-only, and it
 /// exists so the abstraction-soundness property draws its witnesses from the region table rather
 /// than from a hand-picked list: a newly-protected path becomes a witness the moment it is
