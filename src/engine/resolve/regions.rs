@@ -372,17 +372,28 @@ fn claude_settings_read_grants(home: &std::path::Path) -> Vec<Grant> {
 /// so a `~/` grant and a `/Users/you/` grant both cover a home file however the agent spells it.
 fn grant_matchers(path: &str) -> Vec<Matcher> {
     let home = || std::env::var_os("HOME").and_then(|h| h.into_string().ok());
-    let mut out = vec![Matcher::from_path(path)];
+    let mut out = vec![Matcher::from_path(&as_subtree(path))];
     if let Some(rest) = path.strip_prefix('~') {
         if let Some(h) = home() {
-            out.push(Matcher::from_path(&format!("{h}{rest}")));
+            out.push(Matcher::from_path(&as_subtree(&format!("{h}{rest}"))));
         }
     } else if let Some(h) = home()
         && let Some(rest) = path.strip_prefix(h.as_str())
     {
-        out.push(Matcher::from_path(&format!("~{rest}")));
+        out.push(Matcher::from_path(&as_subtree(&format!("~{rest}"))));
     }
     out
+}
+
+/// A grant path in subtree form: `~/.ssh` covers `~/.ssh/id_rsa`, not just the directory entry.
+///
+/// Without this a grant written the natural way is nearly inert. `Matcher::from_path` reads a path
+/// with no trailing slash as `Exact`, which matches the directory itself and nothing inside it, so
+/// `path = "~/projects"` would grant only `~/projects` while `path = "~/projects/"` granted the
+/// tree. Nobody means the first. A `Prefix` still matches the bare directory too, so the stricter
+/// reading is not lost, and a `*` path keeps its `StringPrefix` form.
+fn as_subtree(path: &str) -> String {
+    if path.ends_with('*') || path.ends_with('/') { path.to_string() } else { format!("{path}/") }
 }
 
 #[cfg(not(test))]
@@ -978,6 +989,28 @@ mod tests {
             let r = classify_region("~/.ssh/id_rsa");
             assert_eq!(r.read_locus, LocalLocus::Machine, "secret stays denied under a ~/ grant");
             assert!(r.reads_secret);
+        });
+    }
+
+
+    /// A grant written without a trailing slash covers the subtree, because that is what anyone
+    /// writing it means. Before this, `path = "~/projects"` matched only the directory entry and
+    /// nothing inside it, so a grant written the natural way was very nearly inert.
+    #[test]
+    fn a_grant_covers_the_subtree_however_the_path_is_spelled() {
+        for spelling in ["~/projects", "~/projects/"] {
+            with_grants(&[(spelling, true, true)], || {
+                assert_eq!(
+                    classify_region("~/projects/sibling/notes.txt").write_locus,
+                    LocalLocus::Worktree,
+                    "{spelling} must cover its contents"
+                );
+                assert_eq!(classify_region("~/projects").write_locus, LocalLocus::Worktree, "{spelling} covers the dir itself");
+            });
+        }
+        // The component boundary still holds: a neighbour sharing a name prefix is not covered.
+        with_grants(&[("~/projects", true, true)], || {
+            assert_eq!(classify_region("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
         });
     }
 
