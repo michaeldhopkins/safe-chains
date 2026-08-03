@@ -354,6 +354,21 @@ mod tests {
                 if crate::registry::sub_archetypes(&t).is_some() {
                     continue;
                 }
+                // The one deliberate refinement. An informational invocation (`rm --help`) prints
+                // usage and exits, so it is genuinely Inert, while the legacy path classified it at
+                // the command's declared WRITE level. That reads as "looser" to this ratchet
+                // because Inert is admitted by stricter user levels (a `paranoid` plan accepts it),
+                // but it is the engine being more accurate, not more permissive about effects.
+                //
+                // Deliberately narrow: long-form help/version ONLY, and no other token. The risk it
+                // would carry — an informational flag laundering a real operand — is what
+                // `an_informational_flag_is_not_a_write_but_never_launders_an_operand` exists to
+                // rule out, and it is asserted over the whole registry rather than here.
+                if t.len() >= 2
+                    && t[1..].iter().all(|x| matches!(x.as_str(), "--help" | "--version"))
+                {
+                    continue;
+                }
                 let engine = project(&profile);
                 let base = legacy(ex);
                 assert!(
