@@ -2377,6 +2377,61 @@ use super::*;
         assert!(failures.is_empty(), "{}", failures.join("\n"));
     }
 
+    /// STDIN is not a workspace file, for any executor.
+    ///
+    /// `python3 -`, `node -` and `ruby -` each read their PROGRAM from stdin, so the code being run
+    /// is neither in the worktree nor anywhere in the command string. The bare `-` was resolving as
+    /// an ordinary relative path, which classifies worktree-local, so `curl … | python3 -` was
+    /// auto-approved: remote code execution through the allowlist. `/dev/stdin` and `/dev/fd/0`
+    /// already denied as absolute foreign paths; only the short spelling slipped.
+    ///
+    /// Enumerated over the registry rather than over the three interpreters that happen to have it
+    /// today, so the next `executor = "file"` command cannot inherit the same hole.
+    #[test]
+    fn no_file_executor_accepts_stdin_as_its_program() {
+        use crate::registry::types::{ExecutorKind, SubSpec};
+        let is_file_exec =
+            |k: &DispatchKind| matches!(k, DispatchKind::Executor { kind: ExecutorKind::File, .. });
+        let sub_invocations = |name: &str, subs: &[SubSpec]| -> Vec<String> {
+            subs.iter()
+                .filter(|s| is_file_exec(&s.kind))
+                .map(|s| format!("{name} {} -", s.name))
+                .collect()
+        };
+
+        let mut failures = Vec::new();
+        let mut checked = 0usize;
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // alias entries share the canonical spec
+            }
+            let mut invocations = Vec::new();
+            if is_file_exec(&spec.kind) {
+                invocations.push(format!("{name} -"));
+            }
+            match &spec.kind {
+                DispatchKind::Branching { subs, .. } => {
+                    invocations.extend(sub_invocations(name, subs));
+                }
+                DispatchKind::Custom { fallback, subs, .. } => {
+                    if fallback.as_ref().is_some_and(|f| f.executor == Some(ExecutorKind::File)) {
+                        invocations.push(format!("{name} -"));
+                    }
+                    invocations.extend(sub_invocations(name, subs));
+                }
+                _ => {}
+            }
+            for inv in invocations {
+                checked += 1;
+                if crate::is_safe_command(&inv) {
+                    failures.push(format!("{inv}: stdin accepted as the program to run"));
+                }
+            }
+        }
+        assert!(checked >= 3, "only {checked} file-executor invocations probed — the walk is wrong");
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
