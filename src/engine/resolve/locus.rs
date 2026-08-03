@@ -235,6 +235,15 @@ fn is_network_url(path: &str) -> bool {
         && scheme.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'+' | b'-' | b'.'))
 }
 
+/// Whether `path` is a URL rather than a filesystem path: a `scheme://…` or a `file:` URL.
+///
+/// Admitting a URL is right for a network OPERAND, where the command's own handler gates the
+/// network. It is wrong for an EXECUTOR, which has to be a local file the project owns — see
+/// `execute_file_verdict`.
+pub(crate) fn is_url(path: &str) -> bool {
+    file_url_local(path).is_some() || is_network_url(path)
+}
+
 /// The default (write) face — kept as `classify_locus` so every existing write-side call site
 /// reads unchanged.
 pub(crate) fn classify_locus(path: &str) -> LocalLocus {
