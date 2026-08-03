@@ -2377,6 +2377,48 @@ use super::*;
         assert!(failures.is_empty(), "{}", failures.join("\n"));
     }
 
+    /// `--help` on a write command prints usage and exits. It is not a write with a hidden target.
+    ///
+    /// The engine worst-cases a write-role behavior with no operand, which is the right default for
+    /// `rm -f` (where an operand may have been consumed by a flag) but denied every informational
+    /// invocation of every write command: `rm --help`, `mkdir --help`, `rmdir --version`. Enumerated
+    /// over the registry so a command that declares write behavior later inherits the fix and the
+    /// three properties that bound it.
+    #[test]
+    fn an_informational_flag_is_not_a_write_but_never_launders_an_operand() {
+        use crate::registry::types::PositionalRole;
+        let mut checked = 0usize;
+        let mut failures = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // alias entries share the canonical spec
+            }
+            let Some(behavior) = spec.behavior.as_ref() else { continue };
+            if behavior.positionals != PositionalRole::Write {
+                continue;
+            }
+            checked += 1;
+            // Informational and operand-free: allowed.
+            for flag in ["--help", "--version"] {
+                let line = format!("{name} {flag}");
+                if !crate::is_safe_command(&line) {
+                    failures.push(format!("{line}: informational invocation denied"));
+                }
+            }
+            // Still a write with no operand: worst-cased, as before.
+            if crate::is_safe_command(name) {
+                failures.push(format!("{name}: bare write invocation must not auto-approve"));
+            }
+            // And the flag must not LAUNDER a real operand — the whole risk of the exemption.
+            let laundered = format!("{name} --help /etc/safe-chains-probe");
+            if crate::is_safe_command(&laundered) {
+                failures.push(format!("{laundered}: --help laundered an out-of-workspace operand"));
+            }
+        }
+        assert!(checked >= 3, "only {checked} write-behavior commands probed — the walk is wrong");
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
+    }
+
     /// STDIN is not a workspace file, for any executor.
     ///
     /// `python3 -`, `node -` and `ruby -` each read their PROGRAM from stdin, so the code being run

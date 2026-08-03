@@ -649,6 +649,20 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
         }
         PositionalRole::Write => {
             if operands.is_empty() {
+                // `rm --help` prints usage and exits. It is not a write whose target is hidden, so
+                // worst-casing it denied every informational invocation of every write command:
+                // `rm --help`, `mkdir --help`, `rmdir --version`. The flag already passed the
+                // command's own grammar to get here, and no operand survived the walk.
+                //
+                // LONG forms only, the same rule and the same reasoning the output-claim voider
+                // uses below: `-h`/`-V` are not reliably help/version (`sort -h` is human-numeric
+                // sort), so honoring the short spellings here would be guessing.
+                if tokens.iter().skip(1).any(|t| matches!(t.as_str(), "--help" | "--version")) {
+                    let mut c = Capability::new(Operation::Observe);
+                    c.disclosure.audience = DisclosureAudience::LocalProcess;
+                    c.because = "behavior: prints usage and exits; nothing is written".to_string();
+                    return Profile::of(vec![c]);
+                }
                 return worst("behavior: write operation with no operand — worst-cased (§0)");
             }
             let mut caps: Vec<Capability> = operands
