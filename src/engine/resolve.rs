@@ -146,6 +146,17 @@ pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
             "process-substitution executor — the code that would run is a command's output (§6)",
         ));
     }
+    // A URL executor (`borg --rsh http://evil/x`, `rsync -e file:~`) is not a workspace file. The
+    // locus layer admits a network URL at `worktree` on purpose — for a network OPERAND the
+    // command's own handler gates the network, and a URL's `..` is a path segment rather than a
+    // filesystem escape. In an EXECUTOR slot that reasoning inverts: the thing has to be a local
+    // file the project owns, and `http://…` is not one however harmless its `..` are. Third member
+    // of the same family as the glob and process-substitution rules above.
+    if crate::engine::resolve::locus::is_url(path) {
+        return crate::engine::bridge::project(&worst(
+            "URL executor — the code that would run is not a workspace file (§6)",
+        ));
+    }
     // An executor slot names a PATH. A value carrying whitespace is a command LINE, and judging it
     // as one path is how `BORG_RSH='sh -c evil'` and `rsync -e 'sh -c evil'` were auto-approved:
     // the whole string read as one oddly-named executable, which satisfied the bare-name rule.
