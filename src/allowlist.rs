@@ -15,7 +15,10 @@ impl Matcher {
     /// the harness applies its own project settings directly. See
     /// `docs/design/trusted-customization.md`.
     pub fn load() -> Self {
-        match std::env::var_os("HOME") {
+        // Claude's OWN permission file, so it counts only when Claude is the harness being served.
+        // Loaded unconditionally, it granted commands under Codex and every other target — see
+        // `crate::trust_claude_config`.
+        match std::env::var_os("HOME").filter(|_| crate::claude_config_trusted()) {
             Some(home) => Self::load_from_home(Path::new(&home)),
             None => Matcher {
                 exact: HashSet::new(),

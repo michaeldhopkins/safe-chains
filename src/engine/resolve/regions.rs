@@ -406,7 +406,12 @@ fn load_user_grants() -> Vec<Grant> {
     // ~/.claude/settings.json Read(...) rules — the harness's own read approvals, honored
     // read-only (an Edit()/Write() rule never becomes a write grant). The command-grant
     // analogue lives in `allowlist.rs`.
-    grants.extend(claude_settings_read_grants(&home));
+    // Same scoping as the command bridge: these are Claude's own `Read(...)` approvals, so they
+    // count only when Claude is the harness. Unconditionally, a Claude file was widening path
+    // grants under Codex and every other target (`crate::trust_claude_config`).
+    if crate::claude_config_trusted() {
+        grants.extend(claude_settings_read_grants(&home));
+    }
     grants
 }
 
