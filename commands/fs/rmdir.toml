@@ -6,8 +6,27 @@ url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invoca
 researched_version = "GNU coreutils 9.7 + BSD rmdir (macOS 14)"
 level = "SafeWrite"
 bare = false
+examples_safe = ["rmdir build/empty", "rmdir ./tmp", "rmdir --help"]
+examples_denied = ["rmdir /etc", "rmdir ~/.ssh", "rmdir -p a/b/c"]
+# Legacy `standalone` stays at the informational flags only, so the legacy fallback can never
+# fail-open on a destroy. The real grammar is `[command.behavior]` below, same split as rm.
+standalone = ["--help", "--version"]
+
+# Declarative facet behavior: rmdir DESTROYS each operand, gated per-operand by locus. It was
+# ungated entirely, so `rmdir /etc`, `rmdir ~/.ssh` and `rmdir /etc/pam.d` all auto-approved while
+# `rm -rf` on the very same paths denied. The directory must be empty for rmdir to succeed, which
+# bounds the damage but does not make it a worktree-local operation, and "it would probably fail"
+# is not a safety argument.
+#
+# `-p`/`--parents` is deliberately ABSENT, so it denies. It removes each component of the pathname
+# bottom-up, which reaches ABOVE the operand: `rmdir -p ~/.config/x` attempts `~/.config` and then
+# `~`. The locus gate judges the operand as written and has no way to say "and every ancestor of
+# it", so the flag that breaks that assumption is not on the list.
+[command.behavior]
+operation = "destroy"
+positionals = "write"
+scale = "breadth"
 standalone = [
-    "--help", "--ignore-fail-on-non-empty", "--parents",
-    "--verbose", "--version",
-    "-p", "-v",
+    "--help", "--ignore-fail-on-non-empty", "--verbose", "--version",
+    "-v",
 ]

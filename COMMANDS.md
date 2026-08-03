@@ -12736,7 +12736,14 @@ Aliases: `grm`
 
 Aliases: `grmdir`
 
-- Allowed standalone flags: --help, --ignore-fail-on-non-empty, --parents, --verbose, --version, -p, -v
+- Deletes its file operands within your workspace.
+- Allowed standalone flags: --help, --ignore-fail-on-non-empty, --verbose, --version, -v
+
+**Examples:**
+
+- `rmdir build/empty`
+- `rmdir ./tmp`
+- `rmdir --help`
 
 ### `roc`
 <p class="cmd-url"><a href="https://www.roc-lang.org/">https://www.roc-lang.org/</a></p>
