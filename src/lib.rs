@@ -345,44 +345,41 @@ impl ReachReason {
         let path = &sanitize_display(path);
         match self {
             ReachReason::Credential => format!(
-                "it reaches `{path}`, a credential store the agent should almost certainly not touch. \
-                 If this was not intended, stop it. If you do mean to allow it, name that path in \
-                 ~/.config/safe-chains.toml; a grant on a parent directory does not reach a \
+                "it reaches `{path}`, a credential store. The agent has no ordinary reason to touch \
+                 one. If that was not intended, stop it. If you do want to allow it, name that path \
+                 in ~/.config/safe-chains.toml. A grant on a parent directory does not reach a \
                  credential store"
             ),
             ReachReason::FrozenTrustFile => format!(
-                "it reaches `{path}`, a file safe-chains reads its own permissions from. A write \
-                 there is never auto-approved, and granting the path does not change that, because \
-                 an agent that can edit this file can decide what gets approved next. Edit it \
-                 yourself if you meant to change it"
+                "it reaches `{path}`. safe-chains reads its own permissions from that file, so a \
+                 write there is never auto-approved. Granting the path does not change that, \
+                 because an agent that can edit this file can decide what gets approved next. Edit \
+                 it yourself if you meant to change it"
             ),
             ReachReason::FrozenSystemIntegrity => format!(
-                "it reaches `{path}`, one of the files that decide who may log in and what they may \
-                 do. A write there is never auto-approved, and granting the path does not change \
-                 that. Edit it yourself if you meant to change it"
+                "it reaches `{path}`. That file decides who may log in and what they may do, so a \
+                 write there is never auto-approved. Granting the path does not change that. Edit \
+                 it yourself if you meant to change it"
             ),
             ReachReason::ForeignTemp => format!(
                 "it runs code from `{path}`, a temporary directory that is not this session's \
-                 scratchpad. Temp files can be read and written freely, but code there is treated \
-                 as FOREIGN (a downloaded script lands in the same place), so running it is not \
-                 auto-approved. If this is a working directory you trust, grant it in \
-                 ~/.config/safe-chains.toml; a scratchpad the harness reports for this session is \
-                 recognized automatically and needs no grant"
+                 scratchpad. Reading and writing temp files is fine. Running code from there is \
+                 not, because a downloaded script lands in the same place. If this is a working \
+                 directory you trust, grant it in ~/.config/safe-chains.toml. A scratchpad the \
+                 harness reports for this session is recognized on its own and needs no grant"
             ),
             ReachReason::Unconfined => format!(
                 "the path `{path}` is built by an interpolation, so what it names depends on a \
-                 value that is not visible in the command — it could be anywhere, which is why it \
-                 cannot be auto-approved. If the interpolated part cannot contain a `/`, putting \
-                 literal text beside it in the same path component is enough to confine it: \
-                 `out/dx_$i.txt` is approved where `out/$i` is not, because the first is a \
-                 filename whatever `$i` holds and the second could be `..`"
+                 value the command does not show. It could be anywhere, which is why it cannot be \
+                 auto-approved. If the interpolated part cannot contain a `/`, put literal text \
+                 beside it in the same path component. `out/dx_$i.txt` is approved where `out/$i` \
+                 is not: the first is a filename whatever `$i` holds, and the second could be `..`"
             ),
             ReachReason::OutsideWorkspace => match pathctx::cwd().map(|c| sanitize_display(&c)) {
                 Some(cwd) => format!(
                     "it reaches `{path}`, outside the working directory `{cwd}`. If the agent is \
-                     running from the wrong directory — an easy thing to forget — relaunch it where \
-                     you meant to be; to allow it from here, grant that path in \
-                     ~/.config/safe-chains.toml"
+                     running from the wrong directory, relaunch it where you meant to be. To allow \
+                     it from here, grant that path in ~/.config/safe-chains.toml"
                 ),
                 None => format!(
                     "it reaches `{path}`, outside the working directory. To allow it, grant that \

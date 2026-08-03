@@ -5682,7 +5682,7 @@ Aliases: `g++`, `cc`, `c++`
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
 - **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
 - **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
-- **status** — see `simple_list` below
+- **status**: see `simple_list` below
 
 - **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
@@ -5693,31 +5693,31 @@ Aliases: `g++`, `cc`, `c++`
   - **diff**: Flags: --name-only, --patch, --web, -w. Valued: --color, --repo, -R
   - **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, --web, -a, -w. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
   - **status**: Flags: --exit-status, --log, --log-failed, --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
-  - **verify** — see `simple_view` below
+  - **verify**: see `simple_view` below
   - **view**: Flags: --comments, --web, --yaml, -c, -w, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
-  - **watch** — see `simple_view` below
+  - **watch**: see `simple_view` below
 - **run** (Inert)
-  - **checks** — see `simple_view` below
-  - **diff** — see `simple_view` below
+  - **checks**: see `simple_view` below
+  - **diff**: see `simple_view` below
   - **list**: Valued: --branch, --commit, --created, --event, --jq, --json, --limit, --repo, --status, --template, --user, --workflow, -L, -R, -b, -q, -u, -w
-  - **status** — see `simple_view` below
-  - **verify** — see `simple_view` below
+  - **status**: see `simple_view` below
+  - **verify**: see `simple_view` below
   - **view**: Flags: --exit-status, --log, --log-failed, --verbose, --web, -v, -w. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
   - **watch**: Flags: --exit-status. Valued: --interval, --repo, -R, -i
 - **run** (SafeWrite)
   - **rerun**: Flags: --debug, --failed. Valued: --job, --repo, -R, -j
 - **release** (Inert)
-  - **checks** — see `simple_list` below
-  - **diff** — see `simple_list` below
+  - **checks**: see `simple_list` below
+  - **diff**: see `simple_list` below
   - **list**: Flags: --exclude-drafts, --exclude-pre-releases. Valued: --jq, --json, --limit, --order, --repo, --template, -L, -R, -q
-  - **status** — see `simple_list` below
-  - **verify** — see `simple_list` below
+  - **status**: see `simple_list` below
+  - **verify**: see `simple_list` below
   - **view**: Flags: --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
-  - **watch** — see `simple_list` below
+  - **watch**: see `simple_list` below
 - **release** (SafeWrite)
   - **download** (requires -O/--output): Flags: --clobber, --skip-existing. Valued: --archive, --dir, --output, --pattern, --repo, -A, -D, -O, -R, -p
 - **auth** (Inert)
-  - **status** — see `simple_list` below
+  - **status**: see `simple_list` below
 
 - **Shared flag sets:**
 - **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
@@ -5847,12 +5847,12 @@ Aliases: `g++`, `cc`, `c++`
 - **Subcommands by action verb:**
 - **ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable** (Inert)
   - **diff**: Flags: --help, --raw, -h. Valued: --color, --repo, -R
-  - **issues** — see `list` below
-  - **list** — see `list` below
-  - **status** — see `simple` below
+  - **issues**: see `list` below
+  - **list**: see `list` below
+  - **status**: see `simple` below
   - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, --web, -c, -h, -p, -s, -w. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
 - **auth** (Inert)
-  - **status** — see `simple` below
+  - **status**: see `simple` below
 
 - **Shared flag sets:**
 - **list**: Flags: --all, --closed, --draft, --help, --merged, -A, -M, -a, -c, -d, -g, -h, -q. Valued: --assignee, --author, --group, --label, --milestone, --not-label, --order, --output, --page, --per-page, --repo, --reviewer, --search, --sort, --source-branch, --state, --target-branch, -F, -P, -R, -S, -a, -g, -l, -m, -o, -p, -r, -s, -t

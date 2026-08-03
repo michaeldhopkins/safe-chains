@@ -40,13 +40,13 @@ fn run_suggest(command: &str) -> ! {
 
     match suggest::analyze(command) {
         Outcome::AlreadyAllowed => {
-            println!("safe-chains already auto-approves this command — nothing to add.");
+            println!("safe-chains already auto-approves this command. Nothing to add.");
             process::exit(0);
         }
         Outcome::Unparseable => {
             eprintln!(
-                "safe-chains couldn't parse this command, so a command definition can't help — \
-                 check the quoting."
+                "safe-chains couldn't parse this command, so a command definition can't help. \
+                 Check the quoting."
             );
             process::exit(1);
         }
@@ -129,7 +129,7 @@ fn emit_suggestion(
                  (which safe-chains never edits):\n\n{pin}"
             );
             println!(
-                "The level defaults to \"SafeWrite\" — edit it to \"SafeRead\" (runs code, no \
+                "The level defaults to \"SafeWrite\". Edit it to \"SafeRead\" (runs code, no \
                  artifacts) or \"Inert\" (read-only) if that fits the tool. Any later edit to \
                  {shown} changes its hash: recompute with `shasum -a 256 {shown}` and update the pin."
             );
@@ -309,10 +309,10 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         safe_chains::targets::GatedPolicy::Ask => {
             let reason = match &overreach_why {
                 Some(why) => format!(
-                    "safe-chains did not auto-approve this — please confirm: {why}. {DOCS_URL}"
+                    "safe-chains did not auto-approve this, so please confirm: {why}. {DOCS_URL}"
                 ),
-                None => "safe-chains did not auto-approve this command — please confirm. (Add it to \
-                     ~/.config/safe-chains.toml so safe-chains stops flagging it.)"
+                None => "safe-chains did not auto-approve this command, so please confirm. Add it \
+                     to ~/.config/safe-chains.toml so safe-chains stops flagging it."
                     .to_string(),
             };
             let response = format.render_ask(&reason);
@@ -380,7 +380,7 @@ fn main() {
                     Some(name) => {
                         if let Some((_, Some(current))) = SafetyLevel::resolve_threshold(name) {
                             eprintln!(
-                                "note: '--level {name}' is a legacy level name — mapping to \
+                                "note: '--level {name}' is a legacy level name, mapping to \
                                  '{current}'. Current levels: paranoid, reader, editor, \
                                  developer, local-admin, network-admin, yolo."
                             );

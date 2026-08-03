@@ -2203,7 +2203,7 @@ fn every_actionable_reach_reason_names_a_remedy() {
         let msg = reason.message("~/.config/safe-chains.toml");
         assert!(!msg.contains("grant that path"), "{reason:?} must not advise a grant: {msg}");
         assert!(
-            msg.contains("granting the path does not change that"),
+            msg.to_lowercase().contains("granting the path does not change that"),
             "{reason:?} must say granting will not help: {msg}"
         );
         assert!(msg.contains("yourself"), "{reason:?} must give the real remedy: {msg}");
@@ -2216,6 +2216,47 @@ fn every_actionable_reach_reason_names_a_remedy() {
     // Unconfined is deliberately excluded: its remedy is to flank the interpolation, and pointing
     // at a grant there is the misleading advice this arm exists to avoid.
     assert!(!Unconfined.message("./out/$i").contains("safe-chains.toml"));
+}
+
+/// Shipped copy is written in plain sentences, not dashes.
+///
+/// An em dash reads as machine-written and it is nearly always doing the job of a full stop. The
+/// copy drifted into using them as a general-purpose connective, and this is the copy an agent
+/// injects into its own context and a human reads while deciding whether to approve something, so
+/// it is worth holding to a standard. Enumerated over the reason variants and every guidance branch
+/// rather than grepping the source, so it covers the strings as they are actually RENDERED.
+#[test]
+fn shipped_copy_uses_sentences_not_dashes() {
+    use crate::ReachReason::*;
+    let mut rendered: Vec<String> = Vec::new();
+    for reason in [
+        Credential,
+        FrozenTrustFile,
+        FrozenSystemIntegrity,
+        ForeignTemp,
+        Unconfined,
+        OutsideWorkspace,
+    ] {
+        rendered.push(reason.message("~/.ssh/id_rsa"));
+    }
+    // Every guidance branch: single denied, all denied, stateful chain, independent chain.
+    for cmd in [
+        "cat /etc/shadow",
+        "cat /etc/shadow && cat /etc/shadow",
+        "cd /tmp && cat /etc/shadow",
+        "ls && cat /etc/shadow",
+    ] {
+        rendered.push(crate::cst::explain(cmd).render());
+    }
+    for text in &rendered {
+        assert!(!text.contains('—'), "em dash in shipped copy: {text}");
+        assert!(!text.contains('–'), "en dash in shipped copy: {text}");
+    }
+    assert!(rendered.len() >= 10, "only {} strings checked", rendered.len());
+    // Prove the guidance branches actually fired, rather than rendering an empty explanation and
+    // trivially containing no dash.
+    let guidance = rendered.iter().filter(|t| t.contains("This is not a block")).count();
+    assert!(guidance >= 3, "only {guidance} guidance branches rendered; the guard is near-vacuous");
 }
 
 /// A command that is safe to RUN is not a command whose output is safe to EXECUTE.

@@ -206,21 +206,21 @@ impl Explanation {
         // feedback for next time, never an instruction to re-run.
         if total == 1 {
             return Some(
-                "This is not a block — it just needs manual approval. Don't put a command that needs approval in the same call as auto-approving ones.",
+                "This is not a block. It just needs manual approval. Next time send a command that needs approval on its own, not in the same call as commands that auto-approve.",
             );
         }
         if denied == total {
             return Some(
-                "This is not a block — these just need manual approval; none auto-approve on their own.",
+                "This is not a block. These all need manual approval. None of them auto-approve on their own.",
             );
         }
         if self.stateful {
             return Some(
-                "This is not a block — the command has likely already run, so this is feedback, not a request to re-run. These segments share shell state (a cd, variable, or source), so they belong in one call; bundling was correct here — nothing to change.",
+                "This is not a block. The command has likely already run, so this is feedback and not a request to re-run it. These segments share shell state, such as a cd, a variable, or a source, so they belong in one call. Bundling them was correct. Nothing to change.",
             );
         }
         Some(
-            "This is not a block — the command has likely already run, so this is feedback, not a request to re-run. Next time send independent commands as separate tool calls instead of chaining them: the ✓ segments auto-approve on their own, so only a ✗ segment needs approval.",
+            "This is not a block. The command has likely already run, so this is feedback and not a request to re-run it. Next time send independent commands as separate tool calls instead of chaining them. The ✓ segments auto-approve on their own, so only a ✗ segment needs approval.",
         )
     }
 }
@@ -236,7 +236,7 @@ fn header(total: usize, denied: usize) -> String {
         return "safe-chains: this command is not on the allowlist, so it is not auto-approved:\n"
             .to_string();
     }
-    format!("safe-chains: not auto-approved — {denied} of {total} segments are not on the allowlist:\n")
+    format!("safe-chains: not auto-approved. {denied} of {total} segments are not on the allowlist:\n")
 }
 
 /// One `✓`/`✗` line. The echoed text is command-derived, so it is neutralized first: a raw newline
