@@ -409,12 +409,15 @@ pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
     let expanded = crate::pathctx::expand_vars(path, false);
     let neutralized = neutralize_atoms(&expanded);
     let role = classify_region(&crate::pathctx::resolve(&neutralized));
-    if role.frozen == super::regions::Frozen::Write {
-        Some(FrozenWrite::TrustFile)
-    } else if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity {
-        Some(FrozenWrite::SystemIntegrity)
-    } else {
-        None
+    match role.frozen {
+        super::regions::Frozen::Write => Some(FrozenWrite::TrustFile),
+        super::regions::Frozen::Rebind => Some(FrozenWrite::TrustRootDir),
+        super::regions::Frozen::Nothing
+            if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity =>
+        {
+            Some(FrozenWrite::SystemIntegrity)
+        }
+        super::regions::Frozen::Nothing => None,
     }
 }
 
@@ -424,6 +427,10 @@ pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
 pub(crate) enum FrozenWrite {
     /// safe-chains' own config, or a harness settings file it reads permissions out of.
     TrustFile,
+    /// The DIRECTORY such a file lives in. Only the rebind is frozen here: writing a file into it
+    /// stays perfectly ordinary, so the copy has to say which half is refused or it reads as a
+    /// blanket denial of a directory the user explicitly granted.
+    TrustRootDir,
     /// `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader and boot.
     SystemIntegrity,
 }

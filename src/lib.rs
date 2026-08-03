@@ -240,6 +240,11 @@ pub enum ReachReason {
     /// following the advice changes nothing. For safe-chains' own config it is also circular,
     /// telling the user to edit the file they are being stopped from editing.
     FrozenTrustFile,
+    /// The DIRECTORY a trust file lives in. Distinct from `FrozenTrustFile` because only HALF of
+    /// it is refused: writing a file into `~/.config` is ordinary and stays allowed, and only
+    /// removing or replacing the directory is not. Copy that said "this is refused" flatly would
+    /// misdescribe a directory the user explicitly granted.
+    FrozenTrustRoot,
     /// One of the files that decide who may log in (`/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`,
     /// the loader and boot). Same false-remedy problem as `FrozenTrustFile`.
     FrozenSystemIntegrity,
@@ -356,6 +361,13 @@ impl ReachReason {
                  because an agent that can edit this file can decide what gets approved next. Edit \
                  it yourself if you meant to change it"
             ),
+            ReachReason::FrozenTrustRoot => format!(
+                "it reaches `{path}`. safe-chains reads its own permissions from a file in that \
+                 directory, so removing or replacing the directory itself is never auto-approved: \
+                 doing that would point the trust root somewhere else. Writing files into it is \
+                 fine, and granting the path does not change either half. Move or delete it \
+                 yourself if you meant to"
+            ),
             ReachReason::FrozenSystemIntegrity => format!(
                 "it reaches `{path}`. That file decides who may log in and what they may do, so a \
                  write there is never auto-approved. Granting the path does not change that. Edit \
@@ -410,9 +422,14 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         if pathctx::under_temp_root(&resolved) && !pathctx::in_session_scratchpad(&resolved) {
             return Some((t, ReachReason::ForeignTemp));
         }
+        // The REBIND face is consulted too, or a granted trust-root directory denies in silence:
+        // the grant opens read and write, so `rm -rf ~/.config` looked ordinary here while the
+        // engine refused it. Only the trust-root directories can make this term true, since every
+        // other role's rebind face equals its write face.
         let outside = (resolved.starts_with('/') || resolved.starts_with('~'))
             && (!engine::resolve::read_content_verdict(&resolved).is_allowed()
-                || !engine::resolve::write_target_verdict(&resolved).is_allowed());
+                || !engine::resolve::write_target_verdict(&resolved).is_allowed()
+                || engine::resolve::rebind_is_stricter_than_write(&resolved));
         if !outside {
             return None;
         }
@@ -435,6 +452,7 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
             // merely vague, and for safe-chains' own config it is circular as well.
             match kind {
                 engine::resolve::FrozenWrite::TrustFile => ReachReason::FrozenTrustFile,
+                engine::resolve::FrozenWrite::TrustRootDir => ReachReason::FrozenTrustRoot,
                 engine::resolve::FrozenWrite::SystemIntegrity => ReachReason::FrozenSystemIntegrity,
             }
         } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
