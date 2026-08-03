@@ -27,6 +27,7 @@ fuzz/corpus/level_monotonic/
 fuzz/corpus/config_load/
 fuzz/corpus/setup_merge/
 fuzz/corpus/path_admit/
+fuzz/corpus/gate_prefilter/
 fuzz/artifacts/
 
 # Playwright MCP session artifacts: page snapshots, console logs, screenshots.

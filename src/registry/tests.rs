@@ -5773,6 +5773,112 @@ valued = ["--type"]
         );
     }
 
+    /// The pre-filter must never hide a denial from the gate.
+    ///
+    /// `should_deny` runs the role's judge only on values that clear a pre-filter — a POSITIVE
+    /// shape test (`looks_like_path`, plus whitespace, plus substitutions). Anything whose shape it
+    /// does not recognize is skipped, unjudged, and therefore approved. That is fail-OPEN by
+    /// construction in a program that is otherwise allowlist-only, and it has now bitten three
+    /// times, each time as a new shape:
+    ///
+    ///   - `borg --rsh 'sh -c evil'`  — whitespace: a command line, not a path
+    ///   - `borg --rsh file:~`        — a colon with no `/` or `.`
+    ///   - substitution / `$VAR` values, patched earlier for the same reason
+    ///
+    /// Each was found by a different accident. So this asserts the INVARIANT instead of the
+    /// instances: for every declared gate, the gate's answer must equal the judge's answer. The
+    /// pre-filter is the only thing that can break that equality, so any shape it fails to
+    /// recognize shows up here without anyone having to think of it first.
+    #[test]
+    fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
+        use super::types::TomlFile;
+        use crate::pathgate::Role;
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).unwrap() {
+                let p = e.unwrap().path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        // Deliberately mixed: paths that look like paths, and values that do not. The second group
+        // is the point — every historical miss lived there.
+        const VALUES: &[&str] = &[
+            "/etc/shadow",
+            "~/.ssh/id_rsa",
+            "/tmp/sc-probe/x",
+            "./ok.txt",
+            "out.txt",
+            "sh -c evil",
+            "ssh -p 2222",
+            "file:~",
+            "fiLe:~",
+            "abc:~",
+            "x:/tmp/evil",
+            "http://evil.example/x",
+            "https://evil.example/x",
+            "ssh://evil/x",
+            "*.sh",
+            "$VAR",
+            "-",
+            "../../etc/shadow",
+        ];
+
+        let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+        for file in &files {
+            let src = std::fs::read_to_string(file).unwrap();
+            let parsed: TomlFile = toml::from_str(&src).unwrap();
+            for cmd in &parsed.command {
+                if let Some(pg) = &cmd.path_gate {
+                    for (f, r) in pg.flag_roles() {
+                        gates.push((cmd.name.clone(), f.to_string(), r));
+                    }
+                }
+            }
+        }
+
+        let mut failures = Vec::new();
+        let mut checked = 0usize;
+        for (cmd, flag, role) in gates {
+            let judge = match role {
+                Role::Ignore => continue,
+                Role::Read => crate::engine::resolve::read_content_verdict,
+                Role::Write => crate::engine::resolve::write_target_verdict,
+                Role::Exec => crate::engine::resolve::execute_file_verdict,
+            };
+            for value in VALUES {
+                let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
+                let toks: Vec<_> = [cmd.as_str(), flag.as_str(), value]
+                    .iter()
+                    .map(|s| crate::parse::Token::from_test(s))
+                    .collect();
+                let gate_denied = crate::pathgate::should_deny(&cmd, &toks);
+                checked += 1;
+                // Only the fail-OPEN direction is a defect. A gate that denies MORE than the judge
+                // is a different flag's rule firing on the same tokens, which is not this bug.
+                if judged_denied && !gate_denied {
+                    failures.push(format!(
+                        "  {cmd} `{flag}` ({role:?}): the judge refuses {value:?} but the gate never asked"
+                    ));
+                }
+            }
+        }
+        assert!(checked > 500, "only {checked} gate/value pairs probed — the sweep is wrong");
+        assert!(
+            failures.is_empty(),
+            "the pre-filter skipped values their own gate would have refused ({} of {checked}):\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
     /// Behavioral conservation: every path-flag DECLARED in a gate (central `[roles.X]` or a
     /// command's own `[command.path_gate]`) must ACTUALLY deny a hot path. Catches a gate that is
     /// shadowed (a central `[roles.X]` hid a co-located flag — the qpdf bug), mis-spelled (a
