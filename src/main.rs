@@ -365,8 +365,13 @@ fn main() {
                 safe_chains::docs::render_book(&docs, std::path::Path::new("docs"));
             } else if let Some(command) = cli.command {
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
-                    cwd: cli.cwd,
-                    root: cli.root,
+                    // Default root to cwd, exactly as the hook arm above does. `pathctx::resolve`
+                    // joins a relative path only when BOTH are known, so `--cwd X` on its own was
+                    // silently inert: `cd /etc && cat master.passwd` came back approved from the
+                    // CLI and denied through the hook, for the same command. A debugging tool that
+                    // disagrees with the thing it debugs is worse than no tool.
+                    cwd: cli.cwd.clone(),
+                    root: cli.root.or_else(|| cli.cwd.clone()),
                     session_id: cli.session_id,
                 });
                 if cli.explain {
