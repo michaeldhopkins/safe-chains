@@ -2164,16 +2164,17 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["mv", ".git/config", "./x"])).expect("mv")), Verdict::Denied, "mv .git/config");
         assert_eq!(project(&resolve(&toks(&["cp", ".git/config", "./x"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp .git/config reads");
 
-        // The relocate source gates at its WRITE face, not its read face. safe-chains' own config
-        // READS at worktree-trusted but WRITES at machine (un-grantable): `mv`ing it REMOVES it,
-        // so the removal must gate at the write face (machine); a `cp` of it only READS
-        // (worktree-trusted). Both deny by verdict, so assert the source LOCUS to pin the face —
-        // this is the case a read-face relocate would fail open on.
+        // The relocate source gates at its REBIND face, not its read face. safe-chains' own config
+        // READS at worktree-trusted but rebinds at system-integrity (un-grantable, and above what
+        // any level below yolo admits): `mv`ing it REMOVES it, so the removal must gate at the
+        // rebind face; a `cp` of it only READS (worktree-trusted). Both deny by verdict, so assert
+        // the source LOCUS to pin the face — this is the case a read-face relocate would fail open
+        // on, and the value pins that the face is the strict one rather than plain `machine`.
         let cfg = "~/.config/safe-chains.toml";
         assert_eq!(
             resolve(&toks(&["mv", cfg, "./x"])).expect("mv").capabilities[0].locus.local,
-            LocalLocus::Machine,
-            "mv source removal gates at the WRITE face",
+            LocalLocus::SystemIntegrity,
+            "mv source removal gates at the REBIND face",
         );
         assert_eq!(
             resolve(&toks(&["cp", cfg, "./x"])).expect("cp").capabilities[0].locus.local,
