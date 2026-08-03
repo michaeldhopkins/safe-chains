@@ -23,6 +23,15 @@ pub(crate) const TAGGED_PREFIX: &str = "__SAFE_CHAINS_CMDSUB_";
 /// mistake it for one and admit it by parsing.
 pub(crate) const ATOM_SENTINEL: &str = "__SAFE_CHAINS_CMDSUB_ATOM__";
 
+/// Process substitution (`<(cmd)`). Deliberately NOT the unpinnable sentinel: as a data operand a
+/// `/dev/fd` pipe is exactly as safe as the inner command, which is checked separately, so
+/// `diff <(ls) <(ls)` should classify as an ordinary worktree operand.
+///
+/// As an EXECUTOR it is the opposite, which is why `execute_file_verdict` refuses it by name:
+/// running the pipe runs the inner command's OUTPUT, and a command that is safe to RUN is not the
+/// same as one whose output is safe to EXECUTE.
+pub(crate) const PROCSUB_SENTINEL: &str = "__SAFE_CHAINS_PROCSUB__";
+
 /// Expand a word to the literal words bash would produce, chiefly via UNQUOTED brace expansion
 /// (`{/etc/shadow,x}` → two words). Quoted / escaped / substituted parts are fixed (bash does not
 /// brace-expand inside quotes), so only `Lit` parts expand. The classifier checks EVERY produced
@@ -185,7 +194,7 @@ fn eval_part(part: &WordPart, out: &mut String) {
         // Process substitution: the operand is a /dev/fd pipe; its safety is the INNER command
         // (checked separately by word_sub_verdict), not an unknowable path — so a distinct
         // placeholder that classifies as an ordinary (worktree) operand.
-        WordPart::ProcSub(_) => out.push_str("__SAFE_CHAINS_PROCSUB__"),
+        WordPart::ProcSub(_) => out.push_str(PROCSUB_SENTINEL),
         WordPart::Arith(_) => out.push_str("__SAFE_CHAINS_ARITH__"),
     }
 }
