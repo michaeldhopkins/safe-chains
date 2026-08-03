@@ -346,7 +346,14 @@ Aliases: `grm`
 
 Aliases: `grmdir`
 
-- Allowed standalone flags: --help, --ignore-fail-on-non-empty, --parents, --verbose, --version, -p, -v
+- Deletes its file operands within your workspace.
+- Allowed standalone flags: --help, --ignore-fail-on-non-empty, --verbose, --version, -v
+
+**Examples:**
+
+- `rmdir build/empty`
+- `rmdir ./tmp`
+- `rmdir --help`
 
 ### `rs`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?rs">https://man.freebsd.org/cgi/man.cgi?rs</a></p>

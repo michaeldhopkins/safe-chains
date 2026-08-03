@@ -3052,8 +3052,8 @@ mod tests {
     /// none-role printer; `dd`/`tar`/`sed` are hook commands; `grep` is a hook + pattern-then-read;
     /// the other 10 are the plain positional coreutils.
     const EXPECTED_BEHAVIOR_COMMANDS: &[&str] = &[
-        "cat", "cp", "dd", "echo", "grep", "head", "ln", "mkdir", "mv", "perl", "rm", "sed",
-        "tail", "tar", "touch", "wc",
+        "cat", "cp", "dd", "echo", "grep", "head", "ln", "mkdir", "mv", "perl", "rm", "rmdir",
+        "sed", "tail", "tar", "touch", "wc",
     ];
 
     /// The behavior roster is exactly `EXPECTED_BEHAVIOR_COMMANDS` — no command silently lost its
