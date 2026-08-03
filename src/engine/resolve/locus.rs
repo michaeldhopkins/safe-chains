@@ -186,7 +186,7 @@ const SUB_STANDIN: &str = "sc_substitution_value";
 /// `/Users/me/.config/safe-chains.toml`, `~/.config/./safe-chains.toml`, and `~/.config//…`
 /// all reduce to the canonical `~/.config/safe-chains.toml`. `..` is left in place on purpose —
 /// `is_unpinnable` rejects it (a normalized `..` would silently defeat that guard).
-fn canonicalize(path: &str) -> Cow<'_, str> {
+pub(crate) fn canonicalize(path: &str) -> Cow<'_, str> {
     let home = std::env::var("HOME").ok();
     let home_abs = home
         .as_deref()

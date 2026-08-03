@@ -309,32 +309,22 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
         }
     };
 
-    // Both spellings of a `~/`-anchored node, for the same reason `grant_matchers` generates both:
-    // `pathctx::resolve` deliberately does NOT fold `/Users/you/x` into `~/x` (it leaves `~` to the
-    // classifiers), so a node written `~/Library/Keychains/` matched that spelling alone.
-    //
-    // Without a grant that failed safe — the absolute form fell through to `unknown`, which denies.
-    // WITH a grant it did not, because a grant DOES carry both spellings: the grant matched the
-    // absolute path, the shield did not, and the protection came off. Spelling `~/.config`
-    // absolutely was enough to make `rm -rf` of the trust root grantable again.
+    // ONE node per declaration. An earlier pass generated an absolute twin for every `~/` node so
+    // that `/Users/you/.config` would match `~/.config`. That was the right observation at the
+    // wrong layer: `canonicalize` already folds an absolute home path to `~`, and `classify_region`
+    // now calls it, so the twins did a job the choke point does — while doubling the table and
+    // pinning it to whatever `$HOME` happened to be when the `LazyLock` first ran.
     let nodes = file
         .region
         .iter()
-        .flat_map(|r| {
+        .map(|r| {
             let role = role_of(&r.role);
-            let node = |path: &str| Node {
-                matcher: Matcher::from_path(path),
+            Node {
+                matcher: Matcher::from_path(&r.path),
                 role,
                 os: r.os.clone(),
                 fold: role_is_protective(&role),
-            };
-            let mut out = vec![node(&r.path)];
-            if let Some(rest) = r.path.strip_prefix('~')
-                && let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok())
-            {
-                out.push(node(&format!("{home}{rest}")));
             }
-            out
         })
         .collect();
 
@@ -656,6 +646,12 @@ fn apply_grant(path: &str, base: Role) -> Role {
 /// `worktree`. Then a user trust grant may widen the result. `path` is expected already
 /// resolved and past the `$`/`..` guard.
 pub(crate) fn classify_region(path: &str) -> Role {
+    // Canonicalized HERE, at the choke point, rather than by each caller. `classify_pinned` did it
+    // and the other two callers did not, so `names_credential_store` and `frozen_write_kind` judged
+    // raw spellings: `/Users/you/.config` and `~/.config/` are the same directory, and only the
+    // enforcement path knew it. Enforcement was never wrong, but the NUDGE was, which is how a
+    // denial for one reason came out explained as another.
+    let path = &super::locus::canonicalize(path);
     if let Some(role) = scratchpad_role(path) {
         return role;
     }
