@@ -83,3 +83,10 @@ path = "fuzz_targets/path_admit.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "gate_prefilter"
+path = "fuzz_targets/gate_prefilter.rs"
+test = false
+doc = false
+bench = false

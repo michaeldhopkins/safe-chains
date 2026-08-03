@@ -113,6 +113,12 @@ impl RoleSpec {
     pub(crate) fn flag_roles(&self) -> impl Iterator<Item = (&str, Role)> + '_ {
         self.flags.iter().map(|(f, r)| (f.as_str(), *r))
     }
+
+    /// The role this gate declares for `flag`. Not test-gated: the `gate_prefilter` fuzz target is
+    /// a separate crate, so it cannot reach the `#[cfg(test)]` lookups above.
+    fn role_of(&self, flag: &str) -> Option<Role> {
+        self.flags.get(flag).copied()
+    }
 }
 
 /// Every `(command, flag, role)` declared in a central `pathgates.toml [roles.X]` block — the
@@ -226,7 +232,17 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     while i < tokens.len() {
         let t = tokens[i].as_str();
         if let Some((role, value, consumed)) = match_flag(spec, tokens, i) {
-            if gate(role, value) {
+            // A DECLARED flag's value skips the pre-filter and is always judged. The declaration
+            // already says this token is a path operand of this role, so asking "does it look like
+            // a path?" second-guesses it — and every miss in this gate has been a value the filter
+            // failed to recognize: a command line with spaces, a `file:~`, a `$VAR`, a glob like
+            // `evil*`. Each was patched by teaching the filter one more shape, and a fuzz target
+            // over arbitrary values then found the next one in ninety seconds. Judging outright
+            // ends the sequence instead of extending it.
+            //
+            // The pre-filter still guards POSITIONALS below, where it earns its place: there the
+            // question really is whether a bare token is an operand at all.
+            if judge(role, value) == Verdict::Denied {
                 return true;
             }
             i += consumed;
@@ -328,9 +344,39 @@ fn match_flag<'a>(spec: &RoleSpec, tokens: &'a [Token], i: usize) -> Option<(Rol
         })
 }
 
+/// What the ROLE's judge says about `value` for a declared `cmd`/`flag` gate, or `None` when that
+/// flag declares no gate.
+///
+/// Exposed for the `gate_prefilter` fuzz target, which asserts the one invariant the pre-filter can
+/// break: a value the judge refuses must not be skipped before the judge ever sees it. Deliberately
+/// returns the JUDGE's answer rather than the gate's, so the two can be compared.
+pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
+    let role = GATES
+        .roles
+        .get(cmd)
+        .and_then(|spec| spec.role_of(flag))
+        .or_else(|| crate::registry::command_path_gate(cmd)?.role_of(flag))?;
+    Some(match role {
+        Role::Ignore => return None,
+        Role::Read => crate::engine::resolve::read_content_verdict(value),
+        Role::Write => crate::engine::resolve::write_target_verdict(value),
+        Role::Exec => crate::engine::resolve::execute_file_verdict(value),
+    })
+}
+
 /// A `host:path` remote endpoint: a `:` appears before any `/`.
 fn is_remote(operand: &str) -> bool {
     operand.find(':').is_some_and(|c| !operand[..c].contains('/'))
+}
+
+/// The role's judge, with no pre-filter. `Ignore` has no judge, so it yields `Allowed`.
+fn judge(role: Role, path: &str) -> Verdict {
+    match role {
+        Role::Ignore => Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
+        Role::Read => crate::engine::resolve::read_content_verdict(path),
+        Role::Write => crate::engine::resolve::write_target_verdict(path),
+        Role::Exec => crate::engine::resolve::execute_file_verdict(path),
+    }
 }
 
 fn gate(role: Role, path: &str) -> bool {
