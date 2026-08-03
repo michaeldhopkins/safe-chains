@@ -668,7 +668,9 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
             let mut caps: Vec<Capability> = operands
                 .iter()
                 .map(|p| match spec.operation {
-                    Operation::Destroy => destroys(classify_locus(p), scale),
+                    // A destroy UNBINDS the name, so it reads the rebind face: `rm -rf ~/.config`
+                    // removes what the trust root points at, while `touch ~/.config/x` does not.
+                    Operation::Destroy => destroys(locus::rebind_locus(p), scale),
                     Operation::Create => creates(classify_locus(p), scale),
                     Operation::Mutate => mutates(classify_locus(p), scale, "behavior: in-place mutate"),
                     _ => Capability::worst("behavior: unsupported write operation — worst-cased (§0)"),
@@ -719,13 +721,22 @@ fn resolve_transfer(
     };
     let recursive = t.recursive_flags.iter().any(|f| behavior_flag_present(tokens, f));
     let transfer_scale = breadth_scale(&sources, recursive);
-    // A relocate REMOVES its source (a write), so gate the source at its write face.
-    let source_writes = matches!(t.source, TransferSource::Relocate);
+    // A relocate REMOVES its source, so the source name stops referring to anything: that is a
+    // REBIND, not merely a write, and it is what makes `mv ~/.config elsewhere` a relocation of the
+    // trust root rather than an edit of it.
+    let source_face = match t.source {
+        TransferSource::Relocate => locus::Face::Rebind,
+        TransferSource::Observe => locus::Face::Read,
+    };
+    // `ln` points the destination NAME at something else; `cp`/`mv` write bytes at or under it.
+    // Both are `create`/`transfer`, so only the command's own declaration separates them.
+    let dest_face = if t.rebinds_destination { locus::Face::Rebind } else { locus::Face::Write };
     let mut prof = transfer_profile(
         &sources,
         dest,
         transfer_scale,
-        source_writes,
+        source_face,
+        dest_face,
         |loc, sc| match t.source {
             TransferSource::Observe => observes(loc, sc, "transfer reads the source at its locus"),
             TransferSource::Relocate => relocates(loc, sc),

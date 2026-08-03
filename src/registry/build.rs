@@ -995,6 +995,7 @@ fn lower_transfer(name: &str, t: Option<&TomlTransfer>) -> Option<TransferSpec> 
     }
     Some(TransferSpec {
         source,
+        rebinds_destination: t.rebinds_destination,
         no_clobber_flags: t.no_clobber_flags.clone(),
         clobber_flags: t.clobber_flags.clone(),
         recursive_flags: t.recursive_flags.clone(),

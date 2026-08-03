@@ -3,7 +3,7 @@
 //! name the intent (`creates`/`overwrites`/`relocates`/`destroys`/`reads_*`/`worst`); the
 //! enum choices and `because` strings live here, in one place.
 
-use super::locus::{classify_locus, read_locus, write_locus};
+use super::locus::{read_locus, write_locus};
 use crate::engine::facet::*;
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
@@ -178,13 +178,20 @@ pub(super) fn transfer_profile(
     sources: &[&str],
     dest: &str,
     scale: Scale,
-    source_writes: bool,
+    source_face: super::locus::Face,
+    dest_face: super::locus::Face,
     per_source: impl Fn(LocalLocus, Scale) -> Capability,
     per_dest: impl Fn(LocalLocus, Scale) -> Capability,
 ) -> Profile {
-    let source_locus = if source_writes { write_locus } else { read_locus };
+    // Faces rather than a `source_writes` bool: `mv` REBINDS its source (the name stops referring
+    // to anything) and `ln` rebinds its destination, and neither is expressible as read-or-write.
+    let at = |p: &str, f: super::locus::Face| match f {
+        super::locus::Face::Read => read_locus(p),
+        super::locus::Face::Write => write_locus(p),
+        super::locus::Face::Rebind => super::locus::rebind_locus(p),
+    };
     let mut caps: Vec<Capability> =
-        sources.iter().map(|s| per_source(source_locus(s), scale)).collect();
-    caps.push(per_dest(classify_locus(dest), scale));
+        sources.iter().map(|s| per_source(at(s, source_face), scale)).collect();
+    caps.push(per_dest(at(dest, dest_face), scale));
     Profile::of(caps)
 }

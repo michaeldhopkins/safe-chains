@@ -14,16 +14,51 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 
-/// A role's projection: the locus a READ of such a path reaches, the locus a WRITE reaches,
-/// and whether reading it extracts a secret.
+/// Which faces a user grant may NOT widen.
+///
+/// Two distinct needs, and collapsing them was a real over-deny. safe-chains' own config must not
+/// be WRITTEN at all, because any write to it decides what gets approved next. Its parent directory
+/// is different: writing a file into `~/.config` is ordinary, and what must not happen is the
+/// directory being replaced by something pointing elsewhere.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum Frozen {
+    /// A grant widens every face. The default.
+    Nothing,
+    /// A grant may not widen REBIND. Writing into the node is still grantable.
+    Rebind,
+    /// A grant may not widen WRITE, and therefore not REBIND either.
+    Write,
+}
+
+/// A role's projection: the locus a READ reaches, the locus a WRITE reaches, the locus a REBIND
+/// reaches, and whether reading it extracts a secret.
+///
+/// REBIND is the third face, and it answers a question the other two cannot: may this operation
+/// change what the NAME refers to? `rm` removes the binding, `ln` points it somewhere else, `mv`
+/// takes it away — all rebinds. `cp`, `touch` and a redirect write THROUGH the name to the bytes
+/// underneath, which is an ordinary write. The distinction cannot be read off the operation alone:
+/// `cp x DIR` and `ln -s y DIR` are both `create`/`transfer` to the engine.
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct Role {
     pub read_locus: LocalLocus,
     pub write_locus: LocalLocus,
+    /// Defaults to `write_locus`; only a grant, or an explicit `rebind_locus`, separates them.
+    pub rebind_locus: LocalLocus,
     pub reads_secret: bool,
-    /// A user grant may NOT widen this role (like a secret store). Used for safe-chains' own
-    /// config: an agent must not be able to grant itself write access to the file that governs it.
-    pub pinned: bool,
+    pub frozen: Frozen,
+}
+
+impl Role {
+    /// Whether a grant may widen this role's WRITE face.
+    fn write_grantable(&self) -> bool {
+        self.frozen != Frozen::Write && self.write_locus < LocalLocus::SystemIntegrity
+    }
+
+    /// Whether a grant may widen this role's REBIND face. Strictly stronger: freezing the write
+    /// necessarily freezes the rebind, since a rebind is the more destructive of the two.
+    fn rebind_grantable(&self) -> bool {
+        self.frozen == Frozen::Nothing && self.write_locus < LocalLocus::SystemIntegrity
+    }
 }
 
 #[derive(Deserialize)]
@@ -38,10 +73,15 @@ struct RegionsFile {
 struct RoleDef {
     read_locus: String,
     write_locus: String,
+    /// Absent → the write locus. Only a role that must be writable-into but not replaceable states
+    /// it separately.
+    #[serde(default)]
+    rebind_locus: Option<String>,
     #[serde(default)]
     reads_secret: bool,
+    /// `"rebind"` or `"write"`; absent → nothing is frozen.
     #[serde(default)]
-    pinned: bool,
+    frozen: Option<String>,
     #[serde(default)]
     #[allow(dead_code)] // policy prose, not consumed by the classifier
     description: String,
@@ -183,7 +223,7 @@ fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
 /// case-sensitive volume (fail-open), whereas folding a protection only ever denies more.
 fn role_is_protective(role: &Role) -> bool {
     role.reads_secret
-        || role.pinned
+        || role.frozen != Frozen::Nothing
         || role.write_locus > LocalLocus::Worktree
         || role.read_locus > LocalLocus::WorktreeTrusted
 }
@@ -252,11 +292,20 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
             .role
             .get(name)
             .unwrap_or_else(|| panic!("regions: role `{name}` is not defined"));
+        let write_locus = parse_locus(&def.write_locus);
         Role {
             read_locus: parse_locus(&def.read_locus),
-            write_locus: parse_locus(&def.write_locus),
+            write_locus,
+            // Absent → the same rung as the write face. The two only diverge under a grant, or
+            // where a role states the rebind face explicitly.
+            rebind_locus: def.rebind_locus.as_deref().map(parse_locus).unwrap_or(write_locus),
             reads_secret: def.reads_secret,
-            pinned: def.pinned,
+            frozen: match def.frozen.as_deref() {
+                None => Frozen::Nothing,
+                Some("rebind") => Frozen::Rebind,
+                Some("write") => Frozen::Write,
+                Some(other) => panic!("regions: role `{name}` has unknown frozen face `{other}` (known: rebind, write)"),
+            },
         }
     };
 
@@ -545,15 +594,17 @@ fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
 /// test lives in `best_grant`). Forcing a user to acknowledge that they meant it is not this
 /// program's job; declining to let a grant reach somewhere it never mentioned is.
 ///
-/// Two WRITE faces are frozen regardless of naming, because granting them forfeits the ability to
+/// Faces that stay frozen regardless of naming, because granting them forfeits the ability to
 /// enforce anything afterwards:
-///   - `pinned` — safe-chains' own config. An agent that can write it can grant itself the rest.
+///   - `frozen = "write"` — safe-chains' own config and the harness settings file it reads
+///     permissions from. An agent that can write one can decide what gets approved next.
+///   - `frozen = "rebind"` — the directories those files live in. Writing a file INTO `~/.config`
+///     is ordinary; replacing `~/.config` itself points the trust root somewhere else.
 ///   - `system-integrity` — `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader and boot. These
 ///     decide who may log in and what they may do, so a write there is compromise-complete.
 ///
-/// Both stay READABLE by a naming grant; it is only the write that cannot be handed over.
+/// All stay READABLE by a naming grant; it is only the writing face that cannot be handed over.
 fn apply_grant(path: &str, base: Role) -> Role {
-    let write_frozen = base.pinned || base.write_locus >= LocalLocus::SystemIntegrity;
     // Fail closed: a secret role whose node we cannot locate gets no grant at all, rather than
     // falling through to the un-named case.
     let secret_root = if base.reads_secret {
@@ -567,12 +618,20 @@ fn apply_grant(path: &str, base: Role) -> Role {
     let Some((read, write)) = best_grant(path, secret_root.as_deref()) else {
         return base;
     };
-    let write = write && !write_frozen;
     Role {
         read_locus: if read { base.read_locus.min(LocalLocus::WorktreeTrusted) } else { base.read_locus },
-        write_locus: if write { base.write_locus.min(LocalLocus::Worktree) } else { base.write_locus },
+        write_locus: if write && base.write_grantable() {
+            base.write_locus.min(LocalLocus::Worktree)
+        } else {
+            base.write_locus
+        },
+        rebind_locus: if write && base.rebind_grantable() {
+            base.rebind_locus.min(LocalLocus::Worktree)
+        } else {
+            base.rebind_locus
+        },
         reads_secret: base.reads_secret,
-        pinned: base.pinned,
+        frozen: base.frozen,
     }
 }
 
@@ -609,8 +668,9 @@ fn scratchpad_role(path: &str) -> Option<Role> {
     crate::pathctx::in_session_scratchpad(path).then_some(Role {
         read_locus: LocalLocus::SandboxScope,
         write_locus: LocalLocus::SandboxScope,
+        rebind_locus: LocalLocus::SandboxScope,
         reads_secret: false,
-        pinned: false,
+        frozen: Frozen::Nothing,
     })
 }
 
@@ -712,8 +772,9 @@ fn adjacent_role(path: &str) -> Option<Role> {
     matches!(peer_kind(path), PeerKind::Ordinary).then_some(Role {
         read_locus: LocalLocus::Adjacent,
         write_locus: LocalLocus::Adjacent,
+        rebind_locus: LocalLocus::Adjacent,
         reads_secret: false,
-        pinned: false,
+        frozen: Frozen::Nothing,
     })
 }
 
@@ -1111,7 +1172,7 @@ mod tests {
     #[test]
     fn a_trust_files_directory_cannot_be_destroyed_or_replaced() {
         let mut checked = 0usize;
-        for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.pinned) {
+        for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.frozen == Frozen::Write) {
             let Matcher::Exact(path) = &node.matcher else { continue };
             let Some((parent, _)) = path.rsplit_once('/') else { continue };
             // `~` is DELIBERATELY not frozen (decided 2026-08-02), so it is skipped here rather
@@ -1140,6 +1201,32 @@ mod tests {
             checked += 1;
         }
         assert!(checked >= 2, "only {checked} trust files probed — the guard is vacuous");
+    }
+
+    /// The rebind split, end to end: writing INTO a trust-root directory works, replacing it does not.
+    ///
+    /// The first freeze of these directories used the write face, which stopped the relocation but
+    /// also denied `cp x ~/.config` — an ordinary thing to do in a directory you granted. Writing
+    /// through a name and changing what the name refers to are different acts, and the region model
+    /// now has a face for each. Both halves are asserted, because a fix that only tightened would
+    /// pass a one-sided guard while leaving the over-deny in place.
+    #[test]
+    fn a_trust_root_directory_is_writable_into_but_not_replaceable() {
+        for dir in ["~/.config", "~/.claude"] {
+            with_grants(&[(dir, true, true)], || {
+                for allowed in [format!("cp a.toml {dir}"), format!("mv a.toml {dir}"), format!("touch {dir}/x")] {
+                    assert!(crate::is_safe_command(&allowed), "{allowed} must stay allowed");
+                }
+                for refused in [
+                    format!("rm -rf {dir}"),
+                    format!("rmdir {dir}"),
+                    format!("ln -s /tmp/evil {dir}"),
+                    format!("mv {dir} {dir}.bak"),
+                ] {
+                    assert!(!crate::is_safe_command(&refused), "{refused} relocates the trust root");
+                }
+            });
+        }
     }
 
     /// A node claiming the whole filesystem could never be NAMED by anything.
@@ -1240,18 +1327,23 @@ mod tests {
         }
     }
 
-    /// The two frozen WRITE faces, enumerated over the region table. Granting these away forfeits
-    /// the ability to enforce anything afterwards, so no grant opens them however it is spelled.
-    /// Reads are deliberately not frozen: `/etc/passwd` is world-readable, and safe-chains' own
-    /// config is readable already.
+    /// Every frozen face, enumerated over the region table, each checked on the face it froze.
+    ///
+    /// Granting these away forfeits the ability to enforce anything afterwards, so no grant opens
+    /// them however it is spelled. Which FACE that means differs by role, and conflating the two
+    /// was the over-deny this split exists to fix: `frozen = "write"` (a trust file) must refuse
+    /// every write, while `frozen = "rebind"` (the directory it lives in) must still ACCEPT an
+    /// ordinary write and refuse only the replacement. Reads are never frozen: `/etc/passwd` is
+    /// world-readable and safe-chains' own config is readable already.
     #[test]
-    fn no_grant_opens_a_frozen_write_face() {
+    fn no_grant_opens_a_frozen_face() {
         for os in ["macos", "linux"] {
             with_os(os, || {
-                let mut covered = 0;
+                let (mut covered, mut rebind_only) = (0, 0);
                 for node in REGIONS.nodes.iter().filter(|n| n.applies_here()) {
                     let role = node.role;
-                    if !(role.pinned || role.write_locus >= LocalLocus::SystemIntegrity) {
+                    let system = role.write_locus >= LocalLocus::SystemIntegrity;
+                    if role.frozen == Frozen::Nothing && !system {
                         continue;
                     }
                     let Some((path, naming, parent)) = naming_probe(&node.matcher) else {
@@ -1259,15 +1351,38 @@ mod tests {
                     };
                     for grant in [naming.as_str(), parent.as_str(), "~/", "/"] {
                         with_grants(&[(grant, true, true)], || {
+                            let r = classify_region(&path);
+                            // The rebind face is frozen for BOTH kinds: a write freeze implies it.
                             assert!(
-                                classify_region(&path).write_locus > LocalLocus::Worktree,
-                                "{os}: grant {grant} must not open the frozen write at {path}"
+                                r.rebind_locus > LocalLocus::Worktree,
+                                "{os}: grant {grant} opens the frozen rebind at {path}"
+                            );
+                            if role.frozen == Frozen::Write || system {
+                                assert!(
+                                    r.write_locus > LocalLocus::Worktree,
+                                    "{os}: grant {grant} opens the frozen write at {path}"
+                                );
+                            }
+                        });
+                    }
+                    // The other half of the split, asserted only for the grant that actually
+                    // REACHES the node. A broad `~/` grant does not reach `~/.config` at all — the
+                    // dotfile rule stops it — so it proves nothing about the freeze either way.
+                    if role.frozen == Frozen::Rebind {
+                        with_grants(&[(naming.as_str(), true, true)], || {
+                            assert!(
+                                classify_region(&path).write_locus <= LocalLocus::Worktree,
+                                "{os}: a rebind-only freeze must still allow writing into {path}"
                             );
                         });
                     }
                     covered += 1;
+                    if role.frozen == Frozen::Rebind {
+                        rebind_only += 1;
+                    }
                 }
                 assert!(covered > 5, "{os}: only {covered} frozen nodes probed - the guard has gone vacuous");
+                assert!(rebind_only >= 2, "{os}: {rebind_only} rebind-only nodes - the split is untested");
             });
         }
     }

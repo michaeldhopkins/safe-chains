@@ -27,7 +27,23 @@
 #
 # PROVENANCE: every node keeps a `note` (why it earns its role) and a dated `researched`.
 
-# ── Roles: role → { read face, write face, secret } ────────────────────────────────────────
+# ── Roles: role → { read face, write face, rebind face, secret, frozen } ───────────────────
+#
+# THREE faces, not two. `read_locus` and `write_locus` are the obvious ones. `rebind_locus` is the
+# locus of an operation that changes what the NAME refers to rather than the bytes under it: `rm`
+# and `rmdir` unbind it, `ln` points it elsewhere, `mv` takes it away. It defaults to the write
+# face and only needs stating where the two must differ.
+#
+# `frozen` says which face a user GRANT may not widen:
+#   (absent)          a grant widens every face
+#   frozen = "rebind" a grant may write INTO the node but never replace it
+#   frozen = "write"  a grant may not write it at all, and therefore cannot rebind it either
+#
+# The distinction is load-bearing rather than decorative. Freezing the WRITE face of `~/.config` to
+# stop `ln -s /tmp/evil ~/.config` also denied `cp x ~/.config`, which is an ordinary thing to do in
+# a directory you granted. Freezing only the REBIND face keeps both answers right. It cannot be
+# derived from the operation, because `cp x DIR` and `ln -s y DIR` are both `create`/`transfer` to
+# the engine — `ln` declares `rebinds_destination` in its own TOML to separate them.
 [role.worktree]
 description = "The project tree (relative paths under the workspace). Read + write."
 read_locus = "worktree"
@@ -69,14 +85,21 @@ description = "safe-chains' own config. Read-OK, but write DENIED and un-grantab
 read_locus = "worktree-trusted"
 write_locus = "machine"
 reads_secret = false
-pinned = true
+frozen = "write"
 
 [role.trust-source]
 description = "A file safe-chains derives its own trust from: a harness settings file it reads allow-rules or read-approvals out of. Write DENIED and un-grantable — an agent that rewrites one of these decides what safe-chains approves next. Unlike safe-chains' own config the READ face stays machine, because a harness settings file can carry an `env` block with API keys."
 read_locus = "machine"
 write_locus = "machine"
 reads_secret = false
-pinned = true
+frozen = "write"
+
+[role.trust-root-dir]
+description = "The DIRECTORY a trust file lives in. Writing a file into it is ordinary and stays grantable; REBINDING it is not, because replacing the directory points the trust root at somewhere else entirely and every file pin beneath it becomes irrelevant. A grant on such a directory therefore permits `cp x ~/.config` and refuses `rm -rf ~/.config` and `ln -s /tmp/evil ~/.config`."
+read_locus = "machine"
+write_locus = "machine"
+reads_secret = false
+frozen = "rebind"
 
 [role.unknown]
 description = "Fail-closed default: any absolute/home path matching no region. Deny read & write (the harness then prompts)."
@@ -435,13 +458,13 @@ researched = "2026-08-02"
 #    `/etc` needs no equivalent: it already denies as `machine`.
 [[region]]
 path = "~/.config"
-role = "trust-source"
+role = "trust-root-dir"
 note = "Parent of safe-chains' own config. `rm -rf ~/.config` then `ln -s /tmp/evil ~/.config` relocated the whole trust root."
 researched = "2026-08-02"
 
 [[region]]
 path = "~/.claude"
-role = "trust-source"
+role = "trust-root-dir"
 note = "Parent of the harness settings file safe-chains reads allow-rules from. Same relocation."
 researched = "2026-08-02"
 
