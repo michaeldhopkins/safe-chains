@@ -120,6 +120,19 @@ pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
     if path.contains(['*', '?', '[']) {
         return crate::engine::bridge::project(&worst("glob executor — the code that would run is unknown (§6)"));
     }
+    // A PROCESS-SUBSTITUTION executor (`sh <(curl …)`) runs the OUTPUT of the inner command, not
+    // the inner command. The inner command is checked separately and is usually safe on its own —
+    // `curl` prints, `echo` prints — which is exactly how this hid: `sh <(curl …)` auto-approved
+    // while the identical `curl … | sh` denied. A command that is safe to RUN is not the same as a
+    // command whose output is safe to EXECUTE.
+    //
+    // Only in the executor slot. As a DATA operand the sentinel stays worktree-ordinary on purpose,
+    // because reading a `/dev/fd` pipe really is as safe as the inner command (`diff <(ls) <(ls)`).
+    if path.contains(crate::cst::eval::PROCSUB_SENTINEL) {
+        return crate::engine::bridge::project(&worst(
+            "process-substitution executor — the code that would run is a command's output (§6)",
+        ));
+    }
     // An executor slot names a PATH. A value carrying whitespace is a command LINE, and judging it
     // as one path is how `BORG_RSH='sh -c evil'` and `rsync -e 'sh -c evil'` were auto-approved:
     // the whole string read as one oddly-named executable, which satisfied the bare-name rule.
