@@ -81,23 +81,24 @@ write_locus = "machine"
 reads_secret = true
 
 [role.safe-chains-config]
-description = "safe-chains' own config. Read-OK, but write DENIED and un-grantable — an agent must not rewrite the file that governs what it may do."
+description = "safe-chains' own config. Read-OK, but write DENIED and un-grantable — an agent must not rewrite the file that governs what it may do. The write face sits at `system-integrity`, not `machine`: this file IS the classifier's trust substrate, and a level that admits ordinary machine administration must not thereby admit rewriting its own ceiling."
 read_locus = "worktree-trusted"
-write_locus = "machine"
+write_locus = "system-integrity"
 reads_secret = false
 frozen = "write"
 
 [role.trust-source]
-description = "A file safe-chains derives its own trust from: a harness settings file it reads allow-rules or read-approvals out of. Write DENIED and un-grantable — an agent that rewrites one of these decides what safe-chains approves next. Unlike safe-chains' own config the READ face stays machine, because a harness settings file can carry an `env` block with API keys."
+description = "A file safe-chains derives its own trust from: a harness settings file it reads allow-rules or read-approvals out of. Write DENIED and un-grantable — an agent that rewrites one of these decides what safe-chains approves next. Unlike safe-chains' own config the READ face stays machine, because a harness settings file can carry an `env` block with API keys. Its write face sits at `system-integrity` for the same reason safe-chains own config does: a level admitting ordinary machine administration must not thereby admit rewriting the file that decides what gets approved next."
 read_locus = "machine"
-write_locus = "machine"
+write_locus = "system-integrity"
 reads_secret = false
 frozen = "write"
 
 [role.trust-root-dir]
-description = "The DIRECTORY a trust file lives in. Writing a file into it is ordinary and stays grantable; REBINDING it is not, because replacing the directory points the trust root at somewhere else entirely and every file pin beneath it becomes irrelevant. A grant on such a directory therefore permits `cp x ~/.config` and refuses `rm -rf ~/.config` and `ln -s /tmp/evil ~/.config`."
+description = "The DIRECTORY a trust file lives in. Writing a file into it is ordinary and stays grantable; REBINDING it is not, because replacing the directory points the trust root at somewhere else entirely and every file pin beneath it becomes irrelevant. A grant on such a directory therefore permits `cp x ~/.config` and refuses `rm -rf ~/.config` and `ln -s /tmp/evil ~/.config`. The REBIND face sits at `system-integrity` so the freeze survives a raised level, while the write face stays at `machine` and remains grantable."
 read_locus = "machine"
 write_locus = "machine"
+rebind_locus = "system-integrity"
 reads_secret = false
 frozen = "rebind"
 

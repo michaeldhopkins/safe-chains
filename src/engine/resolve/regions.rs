@@ -1300,6 +1300,51 @@ mod tests {
         }
     }
 
+    /// A freeze must survive a RAISED LEVEL, not just a grant.
+    ///
+    /// The freeze lives in `apply_grant`, so it only ever answered the question "can a grant widen
+    /// this". The level gate is a separate question and never consulted it: `local-admin` admits
+    /// `locus.local <= machine` outright, and the trust files wrote at `machine`. So a user who
+    /// raised the level to `local-admin` — which still refuses `/etc/sudoers` — handed the agent a
+    /// write to the very file that SETS the level, and with it a one-step climb to `yolo` and
+    /// everything `local-admin` was refusing. Verified end to end before the fix.
+    ///
+    /// `yolo` is excluded deliberately, and it is not a gap: it admits everything already, so there
+    /// is no privilege left to escalate to. The levels that must hold are the ones that still gate.
+    #[test]
+    fn a_freeze_holds_at_every_level_that_still_gates() {
+        let attacks = [
+            "echo x > ~/.config/safe-chains.toml",
+            "echo x > ~/.claude/settings.json",
+            "cp a ~/.config/safe-chains.toml",
+            "rmdir ~/.config",
+            "ln -s /tmp/evil ~/.config",
+            "mv ~/.config ~/x",
+            "rm -rf ~/.claude",
+        ];
+        let mut checked = 0usize;
+        for name in ["local-admin", "network-admin"] {
+            let level = crate::upper_level_by_name(name).expect("level exists");
+            for attack in attacks {
+                assert!(
+                    !crate::command_verdict_at_level(attack, level).is_allowed(),
+                    "`{attack}` is auto-approved at `{name}`, which can then rewrite its own ceiling"
+                );
+                checked += 1;
+            }
+        }
+        assert!(checked >= 14, "only {checked} level/attack pairs probed — the guard is vacuous");
+        // And the gating level must still permit ordinary machine administration, or the fix has
+        // simply turned `local-admin` into `developer`.
+        let admin = crate::upper_level_by_name("local-admin").expect("level exists");
+        for ordinary in ["echo x > /etc/nginx/nginx.conf", "cat /etc/passwd", "cp a ~/.config/other.toml"] {
+            assert!(
+                crate::command_verdict_at_level(ordinary, admin).is_allowed(),
+                "`{ordinary}` should still be admin work at `local-admin`"
+            );
+        }
+    }
+
     /// A node claiming the whole filesystem could never be NAMED by anything.
     #[test]
     fn nothing_names_a_root_that_claims_everything() {
@@ -1511,10 +1556,14 @@ mod tests {
     fn safe_chains_config_is_read_ok_write_denied_and_ungrantable() {
         let cfg = "~/.config/safe-chains.toml";
         assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted, "read is fine");
-        assert_eq!(classify_region(cfg).write_locus, LocalLocus::Machine, "write denied");
+        // `system-integrity`, not `machine`, and the exact rung is the point rather than an
+        // implementation detail: `machine` is admitted outright by `local-admin`, so the file that
+        // SETS the level was writable at a level it was supposed to bound. The rung above is the
+        // one no level below yolo admits.
+        assert_eq!(classify_region(cfg).write_locus, LocalLocus::SystemIntegrity, "write denied");
         // even a broad ~/ grant cannot widen the write (the trust root is pinned)
         with_grants(&[("~/", true, true)], || {
-            assert_eq!(classify_region(cfg).write_locus, LocalLocus::Machine, "grant can't unlock the config write");
+            assert_eq!(classify_region(cfg).write_locus, LocalLocus::SystemIntegrity, "grant can't unlock the config write");
             assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted);
         });
     }
