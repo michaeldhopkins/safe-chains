@@ -198,14 +198,14 @@ pub(crate) fn append_hook_entry(
     let hooks = obj.entry(outer).or_insert_with(|| json!({}));
     let Some(hooks) = hooks.as_object_mut() else {
         return Err(format!(
-            "`{outer}` is {}, expected an object — leaving the file unchanged",
+            "`{outer}` is {}, expected an object. Leaving the file unchanged.",
             json_kind(&obj[outer])
         ));
     };
     let slot = hooks.entry(event).or_insert_with(|| json!([]));
     if !slot.is_array() {
         return Err(format!(
-            "`{outer}.{event}` is {}, expected an array — leaving the file unchanged",
+            "`{outer}.{event}` is {}, expected an array. Leaving the file unchanged.",
             json_kind(slot)
         ));
     }
@@ -254,7 +254,7 @@ impl InstallOutcome {
                 format!("{target_display}: already configured at {}", path.display())
             }
             InstallOutcome::Skipped { reason } => {
-                format!("{target_display}: skipped — {reason}")
+                format!("{target_display}: skipped, {reason}")
             }
         }
     }

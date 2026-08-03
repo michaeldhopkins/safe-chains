@@ -64,7 +64,7 @@ fn describe_matrices(
                 // Reference by name — the flag list shows up in
                 // **Shared flag sets** below.
                 lines.push(format!(
-                    "  - **{name}**{guard} — see `{}` below",
+                    "  - **{name}**{guard}: see `{}` below",
                     action.policy_key,
                 ));
             } else if let Some(policy) = handler_policies.get(&action.policy_key) {
@@ -166,7 +166,7 @@ fn describe_custom(
         if let Some(ref_name) = sub.policy_ref.as_deref()
             && shared_keys.contains(ref_name)
         {
-            sub_lines.push(format!("- **{}** — see `{ref_name}` below", sub.name));
+            sub_lines.push(format!("- **{}**: see `{ref_name}` below", sub.name));
         } else {
             sub.doc_line("", &mut sub_lines);
         }

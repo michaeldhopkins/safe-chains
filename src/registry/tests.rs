@@ -4365,7 +4365,7 @@ watch = "canonical"
 "#);
         let doc = spec.to_command_doc();
         assert!(
-            doc.description.contains("**alias-sub** — see `canonical` below"),
+            doc.description.contains("**alias-sub**: see `canonical` below"),
             "sub with shared policy_ref must render as reference: {}",
             doc.description,
         );
