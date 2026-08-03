@@ -461,6 +461,13 @@ pub(super) fn dispatch_executor(
 ) -> Verdict {
     match kind {
         ExecutorKind::File => match super::policy::first_positional(tokens, policy) {
+            // `-` is STDIN, not a file. Every interpreter reads its program from stdin when given
+            // it, so the code being run is not in the workspace and is not in the command string
+            // either — the classifier cannot see it at all. It was resolving as a bare relative
+            // path, which classifies worktree-local, so `curl … | python3 -` auto-approved: remote
+            // code execution straight through the allowlist. `/dev/stdin` and `/dev/fd/0` already
+            // denied as absolute foreign paths; only the short spelling slipped.
+            Some("-") => Verdict::Denied,
             // A declared shape the executor path must satisfy (`go run` → `go-package`):
             // a remote import path is not a worktree executor, so it denies here.
             Some(first) if shape.is_some_and(|s| !s.matches(first)) => Verdict::Denied,
