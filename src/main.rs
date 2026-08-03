@@ -217,14 +217,19 @@ fn run_hook_for(target_name: &str) -> ! {
         );
         process::exit(1);
     };
-    run_hook_format(format);
+    run_hook_format(format, target_name);
 }
 
 /// The "outside the working directory" clause, NAMING the cwd when the harness reported one — so a
 /// directory MISMATCH (the agent was launched from the wrong repo, a common and easy-to-forget
 /// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
 /// elsewhere" from "this command genuinely overreaches".
-fn run_hook_format(format: &dyn HookFormat) -> ! {
+fn run_hook_format(format: &dyn HookFormat, target_name: &str) -> ! {
+    // Claude's own permission files are trust ONLY when Claude is the harness being served.
+    // Every other target gets safe-chains' own classification and nothing borrowed.
+    if target_name == "claude" {
+        safe_chains::trust_claude_config();
+    }
     let mut buf = String::new();
     if io::stdin().read_to_string(&mut buf).is_err() {
         process::exit(0);
@@ -413,7 +418,9 @@ fn main() {
                 let format = claude
                     .hook_format()
                     .expect("claude target has a hook format");
-                run_hook_format(format);
+                // The no-argument stdin path IS the Claude hook (see the CLI docs), so it keeps
+                // Claude's permission files as a trust source.
+                run_hook_format(format, "claude");
             }
         }
         // A malformed CLI invocation — an unknown/typo'd flag (`--levle`), a bad value — must FAIL

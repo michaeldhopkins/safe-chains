@@ -199,6 +199,30 @@ pub fn command_verdict_ceilinged(
 /// engine level → the plain 3-band coverage (paranoid/reader/default). The caller still gates the
 /// result's `overall <= threshold`; running under the level closes the last path a lower plan's
 /// tighter rule could leak through.
+/// Whether Claude Code's OWN permission files may contribute trust to this run.
+///
+/// safe-chains reads two things out of `~/.claude/settings.json`: `permissions.allow` command
+/// patterns (the coverage bridge, `allowlist.rs`) and `Read(...)` path approvals (the grant bridge,
+/// `regions.rs`). Both were loaded unconditionally, on every harness — so a file that exists purely
+/// to configure Claude Code was silently granting permissions under Codex, Cursor, Grok and agy.
+///
+/// On Codex that is not academic. Codex has no interactive approval, which is why safe-chains
+/// DENIES a gated command there; with a `Bash(curl:*)` rule sitting in the Claude file,
+/// `curl … | sh` went from denied to abstain, and abstain on Codex means it simply runs.
+///
+/// Defaults to FALSE, so a harness safe-chains does not recognize never inherits another tool's
+/// grants. Only the Claude target turns it on.
+static CLAUDE_CONFIG_TRUSTED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Honor `~/.claude/settings.json` as a source of trust for the rest of this process.
+pub fn trust_claude_config() {
+    CLAUDE_CONFIG_TRUSTED.store(true, std::sync::atomic::Ordering::Relaxed);
+}
+
+pub(crate) fn claude_config_trusted() -> bool {
+    CLAUDE_CONFIG_TRUSTED.load(std::sync::atomic::Ordering::Relaxed)
+}
+
 pub fn explain_with_coverage_at_level(
     command: &str,
     engine_level: Option<&'static engine::level::Level>,

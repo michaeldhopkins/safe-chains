@@ -74,6 +74,8 @@ On macOS, `~/.ssh` and `~/.SSH` are the same directory, but a grant covers the s
 
 If you use Claude Code, safe-chains also honors the file-**read** approvals already in your `~/.claude/settings.json`. A `permissions.allow` entry such as `Read(//Users/you/.local/share/mise/**)` or `Read(~/.gem/**)` becomes a read-only trusted directory — the same effect as a `[[grant]]` with `read = true`, so you don't have to declare a directory in two places. Only absolute (`//…`) and home (`~/…`) paths are honored; a bare "read anything" rule is not (grant that explicitly in `safe-chains.toml` if you really want it). `Edit(…)`/`Write(…)` rules are deliberately **not** turned into write grants — reads only — and the dotfile rule above still applies. A rule borrowed from Claude never reaches a credential store, even one that names it: `Read(~/.ssh/**)` was written to answer Claude's permission prompt, and doesn't say you want every command touching `~/.ssh` auto-approved here. Grant it in `safe-chains.toml` if that's what you want. Only your user-level `~/.claude/settings.json` is read, never a project's `.claude/settings.json`.
 
+These rules count **only when the harness is Claude Code**. If you also run safe-chains under Codex, Cursor, Copilot or another tool, that tool gets safe-chains' own classification and nothing borrowed from your Claude settings. A permission you granted to one agent is not a permission you granted to every agent, and on a harness that has no approval prompt of its own the difference is whether a command is blocked or simply runs.
+
 ## Parsing example
 
 Take this command from the introduction:
