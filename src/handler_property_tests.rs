@@ -2178,3 +2178,30 @@ fn absolute_and_relative_in_root_paths_classify_identically() {
         );
     }
 }
+
+/// Every refusal a user can act on must say HOW to act on it.
+///
+/// The Credential arm had no remedy at all ("If this was not intended, stop it") because for a long
+/// time there was none: no grant could reach a credential store. That is no longer true, and the
+/// nudge is the one place a user meets the problem, so silence there is the whole feature being
+/// undiscoverable. Enumerated over the variants rather than spot-checked so a new one cannot ship
+/// without a remedy either.
+#[test]
+fn every_actionable_reach_reason_names_a_remedy() {
+    use crate::ReachReason::*;
+    for reason in [Credential, ForeignTemp, OutsideWorkspace] {
+        let msg = reason.message("~/.ssh/id_rsa");
+        assert!(
+            msg.contains("safe-chains.toml"),
+            "{reason:?} gives the user nothing to do: {msg}"
+        );
+    }
+    // The credential remedy must also say that the ordinary parent-directory grant is not it,
+    // since that is the form a user reaches for first and the one that will not work.
+    let cred = Credential.message("~/.ssh/id_rsa");
+    assert!(cred.contains("name that path"), "credential remedy must say to NAME the path: {cred}");
+    assert!(cred.contains("parent directory"), "credential remedy must rule out a parent grant: {cred}");
+    // Unconfined is deliberately excluded: its remedy is to flank the interpolation, and pointing
+    // at a grant there is the misleading advice this arm exists to avoid.
+    assert!(!Unconfined.message("./out/$i").contains("safe-chains.toml"));
+}
