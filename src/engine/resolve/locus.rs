@@ -370,6 +370,35 @@ pub(crate) fn names_credential_store(path: &str) -> bool {
     classify_region(&crate::pathctx::resolve(&neutralized)).reads_secret
 }
 
+/// Whether a WRITE to `path` is frozen — never auto-approved, and not openable by a grant — and if
+/// so which kind. Asked on the literal structure, like `names_credential_store`.
+///
+/// This exists for the NUDGE, not for a verdict: `apply_grant` already enforces the freeze. Without
+/// it the nudge falls through to "outside the working directory", whose remedy is "grant that
+/// path", which for these paths is not merely unhelpful but false.
+pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
+    let expanded = crate::pathctx::expand_vars(path, false);
+    let neutralized = neutralize_atoms(&expanded);
+    let role = classify_region(&crate::pathctx::resolve(&neutralized));
+    if role.pinned {
+        Some(FrozenWrite::TrustFile)
+    } else if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity {
+        Some(FrozenWrite::SystemIntegrity)
+    } else {
+        None
+    }
+}
+
+/// Which of the two ungrantable write faces a path carries. Mirrors the `write_frozen` test in
+/// `regions::apply_grant`; kept in step by `frozen_write_kind_matches_the_grant_freeze`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum FrozenWrite {
+    /// safe-chains' own config, or a harness settings file it reads permissions out of.
+    TrustFile,
+    /// `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader and boot.
+    SystemIntegrity,
+}
+
 /// How firmly `path` is pinned — the `Anchoring` face of the same analysis the locus uses.
 ///
 /// Reported rather than acted on: the locus already worst-cases an opaque path, so nothing here

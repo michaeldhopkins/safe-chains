@@ -234,8 +234,15 @@ pub fn command_verdict_in(command: &str, ctx: pathctx::PathCtx) -> Verdict {
 pub enum ReachReason {
     /// A known credential store (`.ssh`, `.aws`, keychain…).
     Credential,
-    /// A HIDDEN file inside a co-located peer project — the peer's ordinary source is readable as
-    /// `adjacent`, but its dotfiles/dotdirs are shielded.
+    /// A file safe-chains reads its OWN permissions from (`~/.config/safe-chains.toml`,
+    /// `~/.claude/settings.json`). Distinct from `OutsideWorkspace` because the generic remedy
+    /// there — grant the path — is not merely unhelpful but FALSE: the write face is frozen, so
+    /// following the advice changes nothing. For safe-chains' own config it is also circular,
+    /// telling the user to edit the file they are being stopped from editing.
+    FrozenTrustFile,
+    /// One of the files that decide who may log in (`/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`,
+    /// the loader and boot). Same false-remedy problem as `FrozenTrustFile`.
+    FrozenSystemIntegrity,
     /// Genuinely above/outside the working directory.
     OutsideWorkspace,
     /// A path built by an interpolation that nothing confines (`./out/$i`, `> $(cmd)`). It is not
@@ -343,6 +350,17 @@ impl ReachReason {
                  ~/.config/safe-chains.toml; a grant on a parent directory does not reach a \
                  credential store"
             ),
+            ReachReason::FrozenTrustFile => format!(
+                "it reaches `{path}`, a file safe-chains reads its own permissions from. A write \
+                 there is never auto-approved, and granting the path does not change that, because \
+                 an agent that can edit this file can decide what gets approved next. Edit it \
+                 yourself if you meant to change it"
+            ),
+            ReachReason::FrozenSystemIntegrity => format!(
+                "it reaches `{path}`, one of the files that decide who may log in and what they may \
+                 do. A write there is never auto-approved, and granting the path does not change \
+                 that. Edit it yourself if you meant to change it"
+            ),
             ReachReason::ForeignTemp => format!(
                 "it runs code from `{path}`, a temporary directory that is not this session's \
                  scratchpad. Temp files can be read and written freely, but code there is treated \
@@ -414,6 +432,14 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         // difference instead.
         let reason = if engine::resolve::names_credential_store(&resolved) {
             ReachReason::Credential
+        } else if let Some(kind) = engine::resolve::frozen_write_kind(&resolved) {
+            // Ahead of Unconfined and OutsideWorkspace for the same reason Credential is: both of
+            // those end in "grant that path", which for a frozen write face is FALSE rather than
+            // merely vague, and for safe-chains' own config it is circular as well.
+            match kind {
+                engine::resolve::FrozenWrite::TrustFile => ReachReason::FrozenTrustFile,
+                engine::resolve::FrozenWrite::SystemIntegrity => ReachReason::FrozenSystemIntegrity,
+            }
         } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
             // Ahead of OutsideWorkspace because it is the more specific diagnosis of the SAME
             // refusal, and the generic wording actively misleads here: it names a working-directory
