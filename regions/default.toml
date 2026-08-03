@@ -423,6 +423,28 @@ role = "trust-source"
 note = "safe-chains reads `permissions.allow` command patterns AND Read() path approvals out of this file (src/allowlist.rs, regions.rs::claude_settings_read_grants), and the hook gates on the coverage those patterns produce. Writing it is therefore a way to decide what safe-chains approves next, exactly like writing safe-chains' own config."
 researched = "2026-08-02"
 
+# ── Trust-root DIRECTORIES. Freezing the trust FILES is not enough on its own: a grant on the
+#    parent let an agent delete the directory and replace it with a symlink to one it controls,
+#    after which safe-chains read its grants (and its `level` ceiling) from the agent's own file.
+#    Every step of that was auto-approved. safe-chains classifies a path by its literal spelling and
+#    does not follow symlinks (AGENTS.md §0.2), which is right for classification but means the
+#    RELOCATION has to be stopped where it happens, at the point the directory is replaced.
+#
+#    EXACT matchers, so only the directory node itself is frozen. Files underneath are untouched and
+#    a `~/.config` grant still works normally for every other tool's config living there.
+#    `/etc` needs no equivalent: it already denies as `machine`.
+[[region]]
+path = "~/.config"
+role = "trust-source"
+note = "Parent of safe-chains' own config. `rm -rf ~/.config` then `ln -s /tmp/evil ~/.config` relocated the whole trust root."
+researched = "2026-08-02"
+
+[[region]]
+path = "~/.claude"
+role = "trust-source"
+note = "Parent of the harness settings file safe-chains reads allow-rules from. Same relocation."
+researched = "2026-08-02"
+
 # ── System-integrity substrate: the machine's own identity/auth/boot/loader files, where a WRITE is
 #    compromise-complete — add a UID-0 user, grant yourself sudo, rewrite the auth/login path, redirect
 #    the dynamic loader, or change the boot path. The READ face is ordinary machine config; the WRITE

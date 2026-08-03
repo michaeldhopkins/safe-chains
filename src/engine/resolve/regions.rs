@@ -1096,6 +1096,51 @@ mod tests {
         });
     }
 
+    /// Freezing a trust FILE is not enough if its DIRECTORY can be replaced.
+    ///
+    /// With a grant on `~/.config`, every step of this was auto-approved:
+    ///   rm -rf ~/.config  &&  ln -s /tmp/evil ~/.config
+    /// after which safe-chains read its grants, and its `level` ceiling, out of a directory the
+    /// agent controls. safe-chains classifies a path by its literal spelling and does not follow
+    /// symlinks (AGENTS.md §0.2), which is right for classification and is exactly why the
+    /// relocation has to be stopped at the point the directory is replaced.
+    ///
+    /// Derived from the trust files rather than from the directory nodes, so deleting those nodes
+    /// makes this FAIL. The frozen-face guard cannot do that job: it enumerates declared nodes, so
+    /// removing one leaves nothing to enumerate and it passes vacuously.
+    #[test]
+    fn a_trust_files_directory_cannot_be_destroyed_or_replaced() {
+        let mut checked = 0usize;
+        for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.pinned) {
+            let Matcher::Exact(path) = &node.matcher else { continue };
+            let Some((parent, _)) = path.rsplit_once('/') else { continue };
+            // KNOWN GAP, deliberately skipped rather than silently passing: `~` itself is not
+            // frozen, so a `~` grant still permits `rm -rf ~` and relocates the trust root one
+            // level higher. Freezing `~` would deny `cp x ~`, an ordinary operation, and the region
+            // model has one write face and cannot say "writable into, not destroyable". The docs
+            // already advise granting `~/projects` rather than all of `~`.
+            if parent == "~" {
+                continue;
+            }
+            with_grants(&[(parent, true, true)], || {
+                for line in [format!("rm -rf {parent}"), format!("ln -s /tmp/evil {parent}")] {
+                    assert!(
+                        !crate::is_safe_command(&line),
+                        "`{line}` relocates the trust root holding {path}"
+                    );
+                }
+                // The other half of the trade-off: freezing the directory must not freeze what is
+                // INSIDE it, or a `~/.config` grant would stop being useful for every other tool.
+                assert!(
+                    crate::is_safe_command(&format!("touch {parent}/ordinary.toml")),
+                    "{parent}: freezing the directory must not freeze its contents"
+                );
+            });
+            checked += 1;
+        }
+        assert!(checked >= 2, "only {checked} trust files probed — the guard is vacuous");
+    }
+
     /// A node claiming the whole filesystem could never be NAMED by anything.
     #[test]
     fn nothing_names_a_root_that_claims_everything() {
