@@ -2259,6 +2259,25 @@ fn shipped_copy_uses_sentences_not_dashes() {
     assert!(guidance >= 3, "only {guidance} guidance branches rendered; the guard is near-vacuous");
 }
 
+/// The flag spelling and the environment spelling of one executor value must agree.
+///
+/// `fuzz/equivalence` crashed on `file:~`: `borg --rsh file:~ check repo` was approved while
+/// `BORG_RSH=file:~ borg check repo` denied. The cause was not the judge but the pathgate
+/// PRE-FILTER — `looks_like_path` rejects `file:~` (no `/`, no `.`), so a correctly-declared `exec`
+/// flag never handed the value over, and a configured gate read as a closed one. The env twin has
+/// no such filter and judged it. Same shape as the whitespace case fixed before it, which is why
+/// the fix is the same: admit the value so the executor rule can decide.
+#[test]
+fn an_executor_value_classifies_the_same_as_a_flag_and_as_an_env_var() {
+    // Includes the literal libFuzzer input, so the crash cannot come back unnoticed.
+    let crash = "fiLe:~_______~________BBBBBBBBBBBBBB_BBBBBBBBBBBBBBB__~";
+    for value in [crash, "file:~", "fiLe:~", "abc:~", "x:/tmp/evil", "http://evil/x", "ssh", "./evil", "/tmp/evil"] {
+        let flag = crate::is_safe_command(&format!("borg --rsh {value} check repo"));
+        let env = crate::is_safe_command(&format!("BORG_RSH={value} borg check repo"));
+        assert_eq!(flag, env, "same operation, different verdict for executor value {value:?}");
+    }
+}
+
 /// A command that is safe to RUN is not a command whose output is safe to EXECUTE.
 ///
 /// `sh <(curl …)` auto-approved while the identical `curl … | sh` denied. Process substitution
