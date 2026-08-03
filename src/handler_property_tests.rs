@@ -2303,20 +2303,29 @@ fn the_frozen_write_nudge_matches_what_a_grant_actually_does() {
             continue;
         }
         let probe = path.trim_end_matches('/').to_string();
-        let says_frozen = crate::engine::resolve::frozen_write_kind(&probe).is_some();
-        // What a grant NAMING this exact path actually achieves for the write face.
-        let grant_opens_write = crate::engine::resolve::regions::with_grants(
+        let kind = crate::engine::resolve::frozen_write_kind(&probe);
+        // What a grant NAMING this exact path actually achieves, per face.
+        let (opens_write, opens_rebind) = crate::engine::resolve::regions::with_grants(
             &[(probe.as_str(), true, true)],
             || {
-                crate::engine::resolve::regions::classify_region(&probe).write_locus
-                    <= crate::engine::facet::LocalLocus::Worktree
+                let r = crate::engine::resolve::regions::classify_region(&probe);
+                let admitted = crate::engine::facet::LocalLocus::Worktree;
+                (r.write_locus <= admitted, r.rebind_locus <= admitted)
             },
         );
         checked += 1;
-        assert_ne!(
-            says_frozen, grant_opens_write,
-            "{probe}: nudge says frozen={says_frozen}, but a naming grant opens the write={grant_opens_write}"
-        );
+        // Each kind is checked on the face it actually claims, which is the whole point: the
+        // trust-root directory says "you may write in here but not replace it", and a guard that
+        // only looked at the write face read that as the nudge lying. It was not lying; the guard
+        // was asking the wrong question, and it passed while the nudge said nothing at all.
+        match kind {
+            Some(crate::engine::resolve::FrozenWrite::TrustRootDir) => {
+                assert!(!opens_rebind, "{probe}: says the rebind is frozen, but a naming grant opens it");
+                assert!(opens_write, "{probe}: says only the rebind is frozen, but the write is shut too");
+            }
+            Some(_) => assert!(!opens_write, "{probe}: says frozen, but a naming grant opens the write"),
+            None => assert!(opens_write, "{probe}: says nothing is frozen, but the write stays shut"),
+        }
     }
     assert!(checked > 20, "only {checked} region paths probed — the guard has gone vacuous");
 }

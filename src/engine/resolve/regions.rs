@@ -313,10 +313,10 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
     // `pathctx::resolve` deliberately does NOT fold `/Users/you/x` into `~/x` (it leaves `~` to the
     // classifiers), so a node written `~/Library/Keychains/` matched that spelling alone.
     //
-    // Without a grant that failed safe — the absolute form fell through to `unknown`, which denies,
-    // so nothing looked wrong. WITH a grant it did not, because a grant DOES carry both spellings:
-    // the grant matched the absolute path, the shield never claimed it, and the protection came
-    // off. Spelling `~/.config` absolutely was enough to make `rm -rf` of the trust root grantable.
+    // Without a grant that failed safe — the absolute form fell through to `unknown`, which denies.
+    // WITH a grant it did not, because a grant DOES carry both spellings: the grant matched the
+    // absolute path, the shield did not, and the protection came off. Spelling `~/.config`
+    // absolutely was enough to make `rm -rf` of the trust root grantable again.
     let nodes = file
         .region
         .iter()
@@ -1244,14 +1244,38 @@ mod tests {
         }
     }
 
+    /// A rebinding command still writes INTO a directory when the destination is a container.
+    ///
+    /// `rebinds_destination` describes the ENTRY `ln` creates, and `ln -t DIR a` or `ln a b DIR`
+    /// puts that entry inside DIR rather than replacing it. Reading the declaration unconditionally
+    /// denied `ln -t ~/.config a`, which is the same container-versus-object mistake the write face
+    /// made before the rebind face existed — repeated one layer up, which is why it is pinned here.
+    #[test]
+    fn a_rebinding_command_into_a_container_is_an_ordinary_write() {
+        with_grants(&[("~/.config", true, true)], || {
+            // Definitively a container: `-t`, its long spelling, and three-or-more operands.
+            for allowed in [
+                "ln -t ~/.config a",
+                "ln --target-directory=~/.config a",
+                "ln -s a b ~/.config",
+            ] {
+                assert!(crate::is_safe_command(allowed), "{allowed} links INTO the directory");
+            }
+            // Two operands stay ambiguous, and the conservative reading is the safe one: this is
+            // the spelling that actually relocates the trust root.
+            assert!(!crate::is_safe_command("ln -s /tmp/evil ~/.config"), "the 2-operand form rebinds");
+        });
+    }
+
     /// A `~/`-anchored node must protect the ABSOLUTE spelling of the same directory too.
     ///
-    /// `resolve` deliberately does not fold `/Users/you/x` to `~/x`, and grants cover both spellings
-    /// only because `grant_matchers` generates both. Region nodes had no such treatment, so every
-    /// `~/`-anchored node — the credential stores under `~/Library`, `~/.config/gh`, the trust files
-    /// and their directories — matched one spelling only. Without a grant that failed safe, since
-    /// the absolute form fell through to `unknown`, which is why it went unnoticed. WITH a grant it
-    /// did not: the grant's own absolute matcher applied to a path the shield never claimed.
+    /// `resolve` deliberately does not fold `/Users/you/x` to `~/x` (pathctx leaves `~` to the
+    /// classifiers), and grants cover both spellings only because `grant_matchers` generates both.
+    /// Region nodes had no such treatment, so every `~/`-anchored node — the credential stores under
+    /// `~/Library`, `~/.config/gh`, the trust files and their directories — matched one spelling
+    /// only. Without a grant that failed safe, since the absolute form fell through to `unknown`.
+    /// WITH a grant it did not: the grant's own absolute matcher applied to a path the shield never
+    /// claimed, and the protection came off.
     #[test]
     fn a_home_anchored_node_protects_the_absolute_spelling_too() {
         let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok()) else {
@@ -1267,7 +1291,7 @@ mod tests {
             let absolute = tilde.replacen('~', &home, 1);
             // The same directory, so the same classification, whichever way it is spelled — and
             // asserted BOTH with and without a grant, since the un-granted case failed safe on its
-            // own and hid the divergence until a grant was present.
+            // own (`unknown` denies) and hid the divergence until a grant was present.
             let compare = |when: &str| {
                 let t = classify_region(tilde);
                 let a = classify_region(&absolute);

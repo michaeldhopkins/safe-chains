@@ -77,6 +77,19 @@ pub(crate) fn write_target_verdict(path: &str) -> crate::verdict::Verdict {
     crate::engine::bridge::project(&Profile::of(vec![cap]))
 }
 
+/// Whether REBINDING `path` (removing it, or pointing the name elsewhere) is refused where an
+/// ordinary write is not. Only the trust-root directories answer true.
+///
+/// The nudge needs this, because its "does this reach outside" test reads the read and write faces
+/// only. A grant on `~/.config` opens both, so `rm -rf ~/.config` looked entirely unremarkable to
+/// the nudge while the engine refused it — a denial with no explanation at all, which is the worst
+/// of the outcomes available.
+pub(crate) fn rebind_is_stricter_than_write(path: &str) -> bool {
+    let rebind = overwrites(locus::rebind_locus(path), Scale::Single, false);
+    let refused = !crate::engine::bridge::project(&Profile::of(vec![rebind])).is_allowed();
+    refused && write_target_verdict(path).is_allowed()
+}
+
 /// Judge a path value, taking the WORST element when it is a colon-separated LIST.
 ///
 /// The one place the list rule lives, so the environment gate and the flag gate cannot drift apart.
@@ -702,14 +715,18 @@ fn resolve_transfer(
     let Some(t) = &spec.transfer else {
         return worst("behavior: transfer role without transfer spec — worst-cased (§0)");
     };
-    let (sources, dest) = if let Some(d) = walk_value(&spec.valued_short, tokens, b't', "--target-directory") {
+    // Whether the destination is DEFINITIVELY a container rather than the entry being created.
+    // `-t DIR` says so outright, and with two or more sources the last operand must be a directory
+    // for the command to make sense at all. Only the two-operand form is ambiguous, and there the
+    // conservative reading (the destination is the entry) is the safe one.
+    let (sources, dest, dest_is_container) = if let Some(d) = walk_value(&spec.valued_short, tokens, b't', "--target-directory") {
         if operands.is_empty() {
             return worst("behavior: transfer -t with no source operand — worst-cased (§0)");
         }
-        (operands, d)
+        (operands, d, true)
     } else {
         match operands.split_last() {
-            Some((last, rest)) if !rest.is_empty() => (rest.to_vec(), *last),
+            Some((last, rest)) if !rest.is_empty() => (rest.to_vec(), *last, rest.len() >= 2),
             _ => return worst("behavior: transfer needs a source and a destination — worst-cased (§0)"),
         }
     };
@@ -730,7 +747,16 @@ fn resolve_transfer(
     };
     // `ln` points the destination NAME at something else; `cp`/`mv` write bytes at or under it.
     // Both are `create`/`transfer`, so only the command's own declaration separates them.
-    let dest_face = if t.rebinds_destination { locus::Face::Rebind } else { locus::Face::Write };
+    //
+    // But the declaration is about the ENTRY the command creates, and `ln -t DIR a` or
+    // `ln a b DIR` puts that entry INSIDE the directory instead of replacing it. Treating those as
+    // rebinds denied `ln -t ~/.config a`, which is an ordinary link into a directory you granted —
+    // the same container-versus-object mistake the write face made before this face existed.
+    let dest_face = if t.rebinds_destination && !dest_is_container {
+        locus::Face::Rebind
+    } else {
+        locus::Face::Write
+    };
     let mut prof = transfer_profile(
         &sources,
         dest,
