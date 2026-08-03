@@ -1114,11 +1114,12 @@ mod tests {
         for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.pinned) {
             let Matcher::Exact(path) = &node.matcher else { continue };
             let Some((parent, _)) = path.rsplit_once('/') else { continue };
-            // KNOWN GAP, deliberately skipped rather than silently passing: `~` itself is not
-            // frozen, so a `~` grant still permits `rm -rf ~` and relocates the trust root one
-            // level higher. Freezing `~` would deny `cp x ~`, an ordinary operation, and the region
-            // model has one write face and cannot say "writable into, not destroyable". The docs
-            // already advise granting `~/projects` rather than all of `~`.
+            // `~` is DELIBERATELY not frozen (decided 2026-08-02), so it is skipped here rather
+            // than passing quietly. Granting all of `~` write access is an intentional act by the
+            // user, and one the docs already advise against; having done it, `rm -rf ~` is the
+            // access they asked for. safe-chains does not second-guess a grant that broad. The
+            // consequence to be aware of is that such a grant also permits relocating `~` itself,
+            // and with it the trust root beneath it.
             if parent == "~" {
                 continue;
             }
