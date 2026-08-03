@@ -339,7 +339,9 @@ impl ReachReason {
         match self {
             ReachReason::Credential => format!(
                 "it reaches `{path}`, a credential store the agent should almost certainly not touch. \
-                 If this was not intended, stop it"
+                 If this was not intended, stop it. If you do mean to allow it, name that path in \
+                 ~/.config/safe-chains.toml; a grant on a parent directory does not reach a \
+                 credential store"
             ),
             ReachReason::ForeignTemp => format!(
                 "it runs code from `{path}`, a temporary directory that is not this session's \
@@ -403,8 +405,13 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         // warning off a path that plainly names one. `cat ~/.ssh/$(id)` was reported as merely
         // "built by an interpolation" — offering to flank it, which can never help, while dropping
         // the one sentence that matters — and the CONFINED spelling fell through to
-        // "outside the working directory", whose remedy is to GRANT the path. That advised the
-        // user to grant `~/.ssh` to make the prompt stop.
+        // "outside the working directory", whose remedy is to GRANT the path.
+        //
+        // Granting a credential store IS possible now (a grant covers what it names), so the
+        // objection is no longer "that remedy cannot work". It is that the generic wording says
+        // "grant that path" while meaning the ordinary parent-directory grant, which is exactly
+        // the form a credential store does not accept. The Credential arm spells out the
+        // difference instead.
         let reason = if engine::resolve::names_credential_store(&resolved) {
             ReachReason::Credential
         } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
