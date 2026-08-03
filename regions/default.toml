@@ -71,6 +71,13 @@ write_locus = "machine"
 reads_secret = false
 pinned = true
 
+[role.trust-source]
+description = "A file safe-chains derives its own trust from: a harness settings file it reads allow-rules or read-approvals out of. Write DENIED and un-grantable — an agent that rewrites one of these decides what safe-chains approves next. Unlike safe-chains' own config the READ face stays machine, because a harness settings file can carry an `env` block with API keys."
+read_locus = "machine"
+write_locus = "machine"
+reads_secret = false
+pinned = true
+
 [role.unknown]
 description = "Fail-closed default: any absolute/home path matching no region. Deny read & write (the harness then prompts)."
 read_locus = "machine"
@@ -409,6 +416,12 @@ path = "~/.config/safe-chains.toml"
 role = "safe-chains-config"
 note = "safe-chains' user config (grants). Writing it would let an agent grant itself permissions."
 researched = "2026-07-12"
+
+[[region]]
+path = "~/.claude/settings.json"
+role = "trust-source"
+note = "safe-chains reads `permissions.allow` command patterns AND Read() path approvals out of this file (src/allowlist.rs, regions.rs::claude_settings_read_grants), and the hook gates on the coverage those patterns produce. Writing it is therefore a way to decide what safe-chains approves next, exactly like writing safe-chains' own config."
+researched = "2026-08-02"
 
 # ── System-integrity substrate: the machine's own identity/auth/boot/loader files, where a WRITE is
 #    compromise-complete — add a UID-0 user, grant yourself sudo, rewrite the auth/login path, redirect
