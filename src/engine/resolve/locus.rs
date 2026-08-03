@@ -16,18 +16,43 @@ use std::borrow::Cow;
 use super::regions::classify_region;
 use crate::engine::facet::LocalLocus;
 
+/// Which face of a region role a given operation reads.
+#[derive(Clone, Copy, PartialEq)]
+pub(crate) enum Face {
+    Read,
+    Write,
+    /// Changes what the NAME refers to, rather than the bytes underneath it: `rm` unbinds it, `ln`
+    /// points it elsewhere, `mv` takes it away. Identical to `Write` for almost every path; the two
+    /// diverge only where a role says a directory may be written INTO but not replaced.
+    Rebind,
+}
+
+impl Face {
+    /// Whether this face changes state, which is what `expand_vars` needs to pick a loop
+    /// variable's representative item. A rebind is a write for that purpose.
+    fn mutates(self) -> bool {
+        self != Face::Read
+    }
+}
+
 /// The locus a READ of `path` reaches (the read face of its region role).
 pub(crate) fn read_locus(path: &str) -> LocalLocus {
-    face(path, false)
+    face(path, Face::Read)
 }
 
 /// The locus a WRITE of `path` reaches (the write face of its region role). The conservative
 /// face — a system path stays at `machine` even where its read face is lower.
 pub(crate) fn write_locus(path: &str) -> LocalLocus {
-    face(path, true)
+    face(path, Face::Write)
 }
 
-fn face(path: &str, want_write: bool) -> LocalLocus {
+/// The locus a REBIND of `path` reaches: `rm`/`rmdir` on it, `mv` away from it, `ln` onto it.
+/// Equal to the write face unless a role separates them.
+pub(crate) fn rebind_locus(path: &str) -> LocalLocus {
+    face(path, Face::Rebind)
+}
+
+fn face(path: &str, want_write: Face) -> LocalLocus {
     // Scheme-aware: a URL is not an ordinary local path. `file:` names a LOCAL file, so classify
     // the path it points at (`file:///etc/shadow` denies like reading /etc/shadow). Any other
     // scheme (`http://`, `s3://`, `ssh://`, …) is a NETWORK endpoint — not a local filesystem
@@ -77,7 +102,7 @@ fn url_escapes_cwd(url: &str) -> bool {
 /// several words, so one operand in the CST becomes several arguments at run time.
 const IFS_WHITESPACE: [char; 3] = [' ', '\t', '\n'];
 
-fn classify_local(path: &str, want_write: bool) -> LocalLocus {
+fn classify_local(path: &str, want_write: Face) -> LocalLocus {
     let whole = classify_one(path, want_write);
 
     // WORD SPLITTING. A variable holding whitespace expands to several words, and the classifier
@@ -89,7 +114,7 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     // Combined with the unsplit answer rather than replacing it, so this can only ever tighten:
     // a value that happens to name a real file containing a space keeps whatever it classified as
     // before. Splitting terminates in one level — no piece contains whitespace.
-    let expanded = crate::pathctx::expand_vars(path, want_write);
+    let expanded = crate::pathctx::expand_vars(path, want_write.mutates());
     if !expanded.contains(IFS_WHITESPACE) {
         return whole;
     }
@@ -100,10 +125,10 @@ fn classify_local(path: &str, want_write: bool) -> LocalLocus {
         .fold(whole, LocalLocus::max)
 }
 
-fn classify_one(path: &str, want_write: bool) -> LocalLocus {
+fn classify_one(path: &str, want_write: Face) -> LocalLocus {
     // A bound `for`-loop variable expands to its list's representative item first (its read or
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
-    let expanded = crate::pathctx::expand_vars(path, want_write);
+    let expanded = crate::pathctx::expand_vars(path, want_write.mutates());
 
     // An atom sentinel is `is_unpinnable` by default, so this is the ONLY thing that can neutralize
     // one — and it does so only where the atom is flanked by literal text in its own component.
@@ -137,13 +162,17 @@ fn classify_one(path: &str, want_write: bool) -> LocalLocus {
 
 /// Classify an ALREADY-resolved path: canonicalize, fail closed on an unpinnable spelling, then
 /// read the region model's face.
-fn classify_pinned(resolved: &str, want_write: bool) -> LocalLocus {
+fn classify_pinned(resolved: &str, want_write: Face) -> LocalLocus {
     let canonical = canonicalize(resolved);
     if is_unpinnable(&canonical) {
         return LocalLocus::Machine;
     }
     let role = classify_region(&canonical);
-    if want_write { role.write_locus } else { role.read_locus }
+    match want_write {
+        Face::Read => role.read_locus,
+        Face::Write => role.write_locus,
+        Face::Rebind => role.rebind_locus,
+    }
 }
 
 /// A path component standing in for a substitution's value while the SURROUNDING text is
@@ -380,7 +409,7 @@ pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
     let expanded = crate::pathctx::expand_vars(path, false);
     let neutralized = neutralize_atoms(&expanded);
     let role = classify_region(&crate::pathctx::resolve(&neutralized));
-    if role.pinned {
+    if role.frozen == super::regions::Frozen::Write {
         Some(FrozenWrite::TrustFile)
     } else if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity {
         Some(FrozenWrite::SystemIntegrity)

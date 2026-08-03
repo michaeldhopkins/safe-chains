@@ -35,4 +35,10 @@ standalone = [
 valued = ["-S", "-t", "--suffix", "--target-directory"]
 [command.behavior.transfer]
 source = "observe"
+# ln makes the destination NAME refer to somewhere else, rather than writing bytes at or under it
+# the way cp and mv do. All three are `create`/`transfer`, so the operation cannot tell them apart
+# and the destination face has to be declared. It is what separates `ln -s /tmp/evil ~/.config`,
+# which points the trust root at an agent-controlled directory, from `cp x ~/.config`, which does
+# not — see the `frozen = "rebind"` roles in regions/default.toml.
+rebinds_destination = true
 clobber_flags = ["-f", "--force"]

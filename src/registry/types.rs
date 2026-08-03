@@ -255,6 +255,10 @@ pub(super) struct TomlTransfer {
     /// The source-operand operation: `observe` (cp/ln read the source into the dest/link) or
     /// `relocate` (mv removes the source from its old location).
     pub source: String,
+    /// True when the destination operand is REBOUND rather than written through: `ln` points the
+    /// destination name at something else. Defaults false (cp/mv write bytes at the destination).
+    #[serde(default)]
+    pub rebinds_destination: bool,
     /// Flags whose PRESENCE means the destination will not be overwritten (`cp`/`mv`: `-n`,
     /// `--no-clobber`). Mutually exclusive with `clobber_flags`.
     #[serde(default)]
@@ -722,6 +726,10 @@ pub(crate) enum PathRole {
 #[derive(Debug, Clone)]
 pub(crate) struct TransferSpec {
     pub source: TransferSource,
+    /// Whether the DESTINATION operand is a rebind rather than an ordinary write: `ln` makes the
+    /// destination name refer to somewhere else, while `cp` and `mv` put bytes at or under it.
+    /// Both are `create`/`transfer` to the engine, so the operation cannot tell them apart.
+    pub rebinds_destination: bool,
     pub no_clobber_flags: Vec<String>,
     pub clobber_flags: Vec<String>,
     pub recursive_flags: Vec<String>,
