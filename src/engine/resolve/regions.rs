@@ -309,17 +309,32 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
         }
     };
 
+    // Both spellings of a `~/`-anchored node, for the same reason `grant_matchers` generates both:
+    // `pathctx::resolve` deliberately does NOT fold `/Users/you/x` into `~/x` (it leaves `~` to the
+    // classifiers), so a node written `~/Library/Keychains/` matched that spelling alone.
+    //
+    // Without a grant that failed safe — the absolute form fell through to `unknown`, which denies,
+    // so nothing looked wrong. WITH a grant it did not, because a grant DOES carry both spellings:
+    // the grant matched the absolute path, the shield never claimed it, and the protection came
+    // off. Spelling `~/.config` absolutely was enough to make `rm -rf` of the trust root grantable.
     let nodes = file
         .region
         .iter()
-        .map(|r| {
+        .flat_map(|r| {
             let role = role_of(&r.role);
-            Node {
-                matcher: Matcher::from_path(&r.path),
+            let node = |path: &str| Node {
+                matcher: Matcher::from_path(path),
                 role,
                 os: r.os.clone(),
                 fold: role_is_protective(&role),
+            };
+            let mut out = vec![node(&r.path)];
+            if let Some(rest) = r.path.strip_prefix('~')
+                && let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok())
+            {
+                out.push(node(&format!("{home}{rest}")));
             }
+            out
         })
         .collect();
 
@@ -1226,6 +1241,42 @@ mod tests {
                     assert!(!crate::is_safe_command(&refused), "{refused} relocates the trust root");
                 }
             });
+        }
+    }
+
+    /// A `~/`-anchored node must protect the ABSOLUTE spelling of the same directory too.
+    ///
+    /// `resolve` deliberately does not fold `/Users/you/x` to `~/x`, and grants cover both spellings
+    /// only because `grant_matchers` generates both. Region nodes had no such treatment, so every
+    /// `~/`-anchored node — the credential stores under `~/Library`, `~/.config/gh`, the trust files
+    /// and their directories — matched one spelling only. Without a grant that failed safe, since
+    /// the absolute form fell through to `unknown`, which is why it went unnoticed. WITH a grant it
+    /// did not: the grant's own absolute matcher applied to a path the shield never claimed.
+    #[test]
+    fn a_home_anchored_node_protects_the_absolute_spelling_too() {
+        let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok()) else {
+            return;
+        };
+        let cases = [
+            ("~/.config", "the trust-root directory"),
+            ("~/.config/safe-chains.toml", "safe-chains' own config"),
+            ("~/.claude/settings.json", "the harness settings file"),
+            ("~/Library/Keychains/login.keychain", "a credential store"),
+        ];
+        for (tilde, what) in cases {
+            let absolute = tilde.replacen('~', &home, 1);
+            // The same directory, so the same classification, whichever way it is spelled — and
+            // asserted BOTH with and without a grant, since the un-granted case failed safe on its
+            // own and hid the divergence until a grant was present.
+            let compare = |when: &str| {
+                let t = classify_region(tilde);
+                let a = classify_region(&absolute);
+                assert_eq!(a.reads_secret, t.reads_secret, "{absolute} ({when}): {what} loses its secret bit");
+                assert_eq!(a.write_locus, t.write_locus, "{absolute} ({when}): {what} write face diverges");
+                assert_eq!(a.rebind_locus, t.rebind_locus, "{absolute} ({when}): {what} rebind face diverges");
+            };
+            compare("no grant");
+            with_grants(&[(tilde, true, true)], || compare("granted"));
         }
     }
 
