@@ -51,6 +51,24 @@ safe-chains is **allowlist-only**; what it EMITS for a given command depends on 
 So we *do* actively deny on some harnesses (Codex) — the flip from the old "never deny" is
 deliberate and capability-driven; see the design doc + the per-target table below.
 
+### What the hook cannot see, and why it needs re-checking
+
+Every row in this document is about the **shell tool**. safe-chains is a hook on that one tool: it
+receives the command string, classifies it, and answers. An agent's own file-editing tools — the
+ones that read and write files directly, without a shell — never reach the hook at all.
+
+That bounds every protection here. safe-chains refuses `echo x > ~/.config/safe-chains.toml` and
+`echo x > ~/.claude/settings.json` in the shell, and it cannot see either file being rewritten by a
+file-edit tool. The pins on those paths are defense against the shell surface, not a guarantee
+about the file. Harness file permissions are what cover the rest, and there is no way for a
+PreToolUse hook on the shell tool to substitute for them.
+
+**This needs re-checking, not just recording.** The scorecard above dates every claim because
+harnesses move, and the thing to watch for is not only a changed decision contract but a NEW TOOL
+that runs commands by another route. A harness that grows a "run script" or "execute" tool
+alongside its shell tool has grown a surface safe-chains does not cover until it is hooked too.
+When re-verifying a harness, list its tools, not just its hook fields.
+
 Two consequences that shape everything else:
 
 - **A hook firing does not pause the world.** PreToolUse runs before the tool,
