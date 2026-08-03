@@ -28,9 +28,16 @@ env:
 
 jobs:
   replay:
-    name: Replay corpus
+    name: Replay corpus (${{ matrix.target }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # EVERY target, kept in step with fuzz/Cargo.toml and the nightly matrix by
+        # `tests/fuzz_targets_wired.rs`. A target only in the nightly regresses silently until
+        # morning; one only here never explores. Both halves or neither.
+        target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter]
     steps:
       - uses: actions/checkout@v5
 
@@ -49,31 +56,31 @@ jobs:
           tool: cargo-fuzz
 
       - name: Build fuzz target
-        run: cargo +nightly fuzz build parse --target "$TRIPLE"
+        run: cargo +nightly fuzz build ${{ matrix.target }} --target "$TRIPLE"
 
       # Read the nightly's canonical corpus. Caches written on main are readable from PR branches.
       - name: Restore corpus
         uses: actions/cache/restore@v4
         with:
-          path: fuzz/corpus/parse
-          key: fuzz-corpus-parse-
-          restore-keys: fuzz-corpus-parse-
+          path: fuzz/corpus/${{ matrix.target }}
+          key: fuzz-corpus-${{ matrix.target }}-
+          restore-keys: fuzz-corpus-${{ matrix.target }}-
 
       # `-runs=0` executes each corpus input exactly once and exits — no mutation, no randomness.
       - name: Replay corpus
         run: |
           set -euo pipefail
-          BIN="fuzz/target/$TRIPLE/release/parse"
-          mkdir -p fuzz/corpus/parse fuzz/artifacts/parse
-          COUNT=$(find fuzz/corpus/parse -type f | wc -l)
+          BIN="fuzz/target/$TRIPLE/release/${{ matrix.target }}"
+          mkdir -p fuzz/corpus/${{ matrix.target }} fuzz/artifacts/${{ matrix.target }}
+          COUNT=$(find fuzz/corpus/${{ matrix.target }} -type f | wc -l)
           echo "Replaying $COUNT corpus inputs"
           if [ "$COUNT" -eq 0 ]; then
             echo "::notice::no corpus cached yet (the nightly populates it) — replay skipped"
             exit 0
           fi
           "$BIN" -runs=0 -timeout=25 -rss_limit_mb=4096 \
-            -artifact_prefix=fuzz/artifacts/parse/ \
-            fuzz/corpus/parse
+            -artifact_prefix=fuzz/artifacts/${{ matrix.target }}/ \
+            fuzz/corpus/${{ matrix.target }}
 
       # Opt-in only (manual dispatch), NOT on every push. Measured: a nominal 60s burst cost ~275s,
       # because in fork mode each child reloads the whole 12.6k corpus before it mutates and loading
@@ -84,18 +91,18 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           set -euo pipefail
-          BIN="fuzz/target/$TRIPLE/release/parse"
+          BIN="fuzz/target/$TRIPLE/release/${{ matrix.target }}"
           "$BIN" -fork=1 -ignore_crashes=1 \
             -max_total_time=${{ github.event.inputs.burst_seconds || '60' }} \
             -timeout=25 -rss_limit_mb=4096 \
-            -artifact_prefix=fuzz/artifacts/parse/ \
-            fuzz/corpus/parse
+            -artifact_prefix=fuzz/artifacts/${{ matrix.target }}/ \
+            fuzz/corpus/${{ matrix.target }}
 
       - name: Upload findings
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fuzz-replay-findings
+          name: fuzz-replay-findings-${{ matrix.target }}
           path: fuzz/artifacts/
           if-no-files-found: ignore
 
