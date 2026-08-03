@@ -127,19 +127,21 @@ impl Matcher {
             Matcher::Exact(s) => s.clone(),
             Matcher::Prefix(s) => s.strip_suffix('/').unwrap_or(s).to_string(),
             Matcher::StringPrefix(s) => s.clone(),
+            // SLICED from `path`, never rebuilt by joining components: an absolute path's leading
+            // `/` is an empty first component, so re-joining silently produced `root/.ssh` for
+            // `/root/.ssh/id_rsa` and the grant that named it then failed to match its own node.
             Matcher::Segment(seg) => {
                 let eq = |a: &str, b: &str| if fold { a.eq_ignore_ascii_case(b) } else { a == b };
-                let mut acc = String::new();
+                let mut offset = 0usize;
+                let mut end = None;
                 for comp in path.split('/') {
-                    if !acc.is_empty() {
-                        acc.push('/');
-                    }
-                    acc.push_str(comp);
                     if eq(comp, seg) {
+                        end = Some(offset + comp.len());
                         break;
                     }
+                    offset += comp.len() + 1;
                 }
-                acc
+                path[..end?].to_string()
             }
         })
     }
@@ -152,6 +154,12 @@ impl Matcher {
 fn at_or_below(inner: &str, outer: &str) -> bool {
     let inner = inner.trim_end_matches('/');
     let outer = outer.trim_end_matches('/');
+    // An empty `outer` would make every absolute path read as "below" it. No node roots at `/`
+    // today, so this is a fail-closed backstop rather than a live case: nothing NAMES a node that
+    // claims the whole filesystem.
+    if outer.is_empty() {
+        return false;
+    }
     inner == outer || inner.strip_prefix(outer).is_some_and(|rest| rest.starts_with('/'))
 }
 
@@ -617,9 +625,22 @@ fn secret_node(path: &str) -> Option<&'static Node> {
         .find(|n| n.matcher.specificity(path, n.fold && current_os() == "macos").is_some())
 }
 
+/// The root the naming test compares a grant against: the DEEPEST matching credential-store node.
+///
+/// Deepest, not first-declared. A path can match more than one secret node (`/root/.ssh/id_rsa`
+/// matches both the `/root/` prefix and the `.ssh` segment), and the deeper root is the safer
+/// choice because it demands a more specific grant to name it. Taking whichever node the table
+/// happened to declare first would let a shallower root govern a store nested inside it, which is
+/// the failure the naming test exists to prevent. Today the segment nodes are declared first and
+/// happen to give the deeper root; that is an accident of file order, not a property to rely on.
 fn secret_node_root(path: &str) -> Option<String> {
-    let node = secret_node(path)?;
-    node.matcher.root_in(path, node.fold && current_os() == "macos")
+    let fold_shields = current_os() == "macos";
+    REGIONS
+        .nodes
+        .iter()
+        .filter(|n| n.applies_here() && n.role.reads_secret)
+        .filter_map(|n| n.matcher.root_in(path, n.fold && fold_shields))
+        .max_by_key(|r| (r.split('/').count(), r.len()))
 }
 
 fn base_region(path: &str) -> Role {
@@ -1030,9 +1051,18 @@ mod tests {
             Matcher::Prefix(s) => {
                 Some((format!("{s}probe"), s.clone(), parent_of(s)?))
             }
+            // BOTH spellings. Probing a segment only as `~/.ssh/probe` left the absolute form
+            // unexercised, and that is precisely where the root was being computed wrongly.
             Matcher::Segment(seg) => Some((format!("~/{seg}/probe"), format!("~/{seg}"), "~/".to_string())),
             Matcher::StringPrefix(_) => None,
         }
+    }
+
+    /// The absolute-form probe for a `Segment` node, which `naming_probe` gives in `~/` form.
+    #[cfg(test)]
+    fn absolute_segment_probe(matcher: &Matcher) -> Option<(String, String, String)> {
+        let Matcher::Segment(seg) = matcher else { return None };
+        Some((format!("/opt/app/{seg}/probe"), format!("/opt/app/{seg}"), "/opt/app/".to_string()))
     }
 
     /// Enumerated over the REAL region table, so a credential store added later is covered without
@@ -1046,6 +1076,35 @@ mod tests {
     /// A grant written without a trailing slash covers the subtree, because that is what anyone
     /// writing it means. Before this, `path = "~/projects"` matched only the directory entry and
     /// nothing inside it, so a grant written the natural way was very nearly inert.
+    /// The naming test must compare against the DEEPEST matching secret node, not the first one
+    /// declared. `/root/.ssh/id_rsa` matches two: the `/root/` prefix (root `/root`) and the `.ssh`
+    /// segment (root `/root/.ssh`). If the shallow one governed, a grant on `/root` would name the
+    /// `.ssh` nested inside it. Today the segment nodes are declared first and this holds by
+    /// accident of file order, which is exactly why it is pinned here.
+    #[test]
+    fn the_naming_test_uses_the_deepest_matching_secret_node() {
+        with_os("linux", || {
+            assert_eq!(secret_node_root("/root/.ssh/id_rsa").as_deref(), Some("/root/.ssh"));
+            assert_eq!(secret_node_root("/root/notes.txt").as_deref(), Some("/root"));
+            with_grants(&[("/root", true, true)], || {
+                assert_eq!(
+                    classify_region("/root/.ssh/id_rsa").read_locus,
+                    LocalLocus::Machine,
+                    "a grant on /root must not name the .ssh nested inside it"
+                );
+            });
+        });
+    }
+
+    /// A node claiming the whole filesystem could never be NAMED by anything.
+    #[test]
+    fn nothing_names_a_root_that_claims_everything() {
+        assert!(!at_or_below("/etc/shadow", ""), "an empty node root must not admit an absolute grant");
+        assert!(!at_or_below("~/.ssh", ""));
+        assert!(at_or_below("~/.ssh/known_hosts", "~/.ssh"), "a path inside the store still names it");
+        assert!(!at_or_below("~/.sshfoo", "~/.ssh"), "a name-prefix neighbour does not name it");
+    }
+
     #[test]
     fn a_grant_covers_the_subtree_however_the_path_is_spelled() {
         for spelling in ["~/projects", "~/projects/"] {
@@ -1070,9 +1129,14 @@ mod tests {
             with_os(os, || {
                 let mut covered = 0;
                 for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.reads_secret) {
-                    let Some((path, naming, parent)) = naming_probe(&node.matcher) else {
+                    let probes: Vec<_> = [naming_probe(&node.matcher), absolute_segment_probe(&node.matcher)]
+                        .into_iter()
+                        .flatten()
+                        .collect();
+                    if probes.is_empty() {
                         continue;
-                    };
+                    }
+                    for (path, naming, parent) in probes {
                     assert!(
                         base_region(&path).reads_secret,
                         "{os}: probe {path} does not reach the secret node it was built from"
@@ -1092,6 +1156,7 @@ mod tests {
                         );
                     });
                     covered += 1;
+                    }
                 }
                 assert!(covered > 10, "{os}: only {covered} credential stores probed - the guard has gone vacuous");
             });
