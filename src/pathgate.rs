@@ -352,8 +352,15 @@ fn gate(role: Role, path: &str) -> bool {
     // slot ungated — the flag WAS declared `exec`, but the gate never handed the value to it, so a
     // correctly-configured gate read as a closed one. The env twins denied the same values, which
     // is the shape of divergence the fuzz `equivalence` target exists to catch.
+    // A value carrying a COLON is admitted for the same reason as whitespace, and the fuzz target
+    // caught the same shape a second time: `borg --rsh file:~ check repo` was approved while
+    // `BORG_RSH=file:~ borg check repo` denied. `looks_like_path` rejects `file:~` (no `/`, no `.`),
+    // so the declared `exec` flag never handed the value to the gate, while the env twin split it
+    // on `:` and refused the `~` element. Admitting it here lets the executor rule judge it, which
+    // is where the colon-list split now lives.
     (crate::policy::looks_like_path(path)
         || path.split_whitespace().count() > 1
+        || path.contains(':')
         || crate::engine::resolve::is_unpinnable(path)
         || crate::engine::resolve::is_substitution_value(path))
         && verdict(path) == Verdict::Denied
