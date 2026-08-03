@@ -160,11 +160,24 @@ fn load_custom_file(source: &str, category: &str, path: &Path) -> Vec<CommandSpe
 }
 
 fn skip(path: &Path, why: &str) -> Vec<CommandSpec> {
+    // Silent under `cargo fuzz`. The message is for a person who mistyped their config, and the
+    // `config_load` target feeds mostly-invalid TOML at thousands of inputs a second — two lines of
+    // stderr each, twice per input. There is no human reading stderr in there.
+    //
+    // Measured locally: 9,488 exec/s with the message, 14,167 without. That 1.5x alone does not
+    // explain the nightly failure, and the failure was not a crash — the job has
+    // `timeout-minutes: 75` around 3600s of fuzzing, ran 80 minutes, and was killed. Its siblings
+    // finished in ~61. Log ingestion on a runner is far slower than the local pipe this was
+    // measured through, so the gap is consistent with the flooding without being proven by it.
+    // Silencing removes the one difference between this target and the ones that finish.
+    #[cfg(not(fuzzing))]
     eprintln!(
         "safe-chains: ignoring {} — {why}\n  Built-in commands are unaffected; fix the file to \
          re-enable your custom ones.",
         path.display()
     );
+    #[cfg(fuzzing)]
+    let _ = (path, why);
     Vec::new()
 }
 

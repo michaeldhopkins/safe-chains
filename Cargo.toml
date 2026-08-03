@@ -42,6 +42,11 @@ expectrl = "0.8"
 proptest = "1.10.0"
 tempfile = "3"
 
+[lints.rust]
+# `cargo fuzz` sets `--cfg fuzzing`. Declared so the compiler checks the spelling instead of
+# warning about an unknown name — a typo'd `#[cfg(fuzzng)]` would silently never apply.
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
+
 [lints.clippy]
 struct-excessive-bools = "deny"
 fn-params-excessive-bools = "deny"
