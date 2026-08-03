@@ -33,6 +33,19 @@ const GATES: &[(&str, &str)] = &[
     ("rsync", "-e"),            // Exec
 ];
 
+/// Commands whose BARE POSITIONALS carry a declared role, with the leading words needed to reach
+/// that slot. The positional invariant is weaker than the flag one and deliberately so: for a
+/// declared flag the token IS an operand by declaration, while for a positional whether the token
+/// is an operand at all is a real question — which is why the pre-filter still guards this slot and
+/// legitimately skips flag-shaped tokens.
+const POSITIONALS: &[(&str, &[&str])] = &[
+    ("curl", &[]),          // Read
+    ("scp", &[]),           // Read
+    ("rsync", &[]),         // Read
+    ("karma", &["start"]),  // Exec
+    ("tilt", &["up"]),      // Exec
+];
+
 fuzz_target!(|data: &[u8]| {
     let Ok(value) = std::str::from_utf8(data) else {
         return;
@@ -57,6 +70,31 @@ fuzz_target!(|data: &[u8]| {
         assert!(
             safe_chains::pathgate::should_deny(cmd, &tokens),
             "the pre-filter skipped a value its own gate would refuse: {cmd} {flag} {value:?}",
+        );
+    }
+
+    // A FLAG-shaped token is not an operand, and the pre-filter is right to skip it — that is the
+    // job it still does for this slot. Judging it as a path would be the bug.
+    if value.starts_with('-') {
+        return;
+    }
+    for (cmd, lead) in POSITIONALS {
+        let Some(judged) = safe_chains::pathgate::judge_for_positional(cmd, value) else {
+            continue;
+        };
+        if judged != Verdict::Denied {
+            continue;
+        }
+        let mut words = vec![(*cmd).to_string()];
+        words.extend(lead.iter().map(|s| (*s).to_string()));
+        words.push(value.to_string());
+        let tokens: Vec<_> = words
+            .into_iter()
+            .map(safe_chains::parse::Token::from_raw)
+            .collect();
+        assert!(
+            safe_chains::pathgate::should_deny(cmd, &tokens),
+            "the pre-filter skipped a POSITIONAL its own gate would refuse: {cmd} {lead:?} {value:?}",
         );
     }
 });

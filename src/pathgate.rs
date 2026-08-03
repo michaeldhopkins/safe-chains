@@ -364,6 +364,26 @@ pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
     })
 }
 
+/// What the POSITIONAL role's judge says about `value` for `cmd`, or `None` when the command
+/// declares no positional role (or declares `ignore`).
+///
+/// The positional companion to [`judge_for_flag`], for the same fuzz target. The target still skips
+/// flag-shaped values here, because `walk` peels those off before a token is treated as a
+/// positional at all — feeding one in would test a path the real code never takes.
+pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
+    let role = GATES
+        .roles
+        .get(cmd)
+        .map(|spec| spec.positional)
+        .or_else(|| crate::registry::command_path_gate(cmd).map(|spec| spec.positional))?;
+    match role {
+        Role::Ignore => None,
+        Role::Read => Some(crate::engine::resolve::read_content_verdict(value)),
+        Role::Write => Some(crate::engine::resolve::write_target_verdict(value)),
+        Role::Exec => Some(crate::engine::resolve::execute_file_verdict(value)),
+    }
+}
+
 /// A `host:path` remote endpoint: a `:` appears before any `/`.
 fn is_remote(operand: &str) -> bool {
     operand.find(':').is_some_and(|c| !operand[..c].contains('/'))
@@ -386,30 +406,19 @@ fn gate(role: Role, path: &str) -> bool {
         Role::Write => crate::engine::resolve::write_target_verdict,
         Role::Exec => crate::engine::resolve::execute_file_verdict,
     };
-    // The pre-filter skips flags/bare keywords so verdict runs only on operands. A SUBSTITUTION
-    // token (`$(…)`/backtick) and a `$VAR` carry no `/` or `.`, so `looks_like_path` alone would
-    // short-circuit them — yet they are exactly the operands the verdict layer classifies (an
-    // undeclared one worst-cases to Denied; a declared one carries a real locus). Admit both here
-    // so the gate sees every operand the verdict layer does (`shred $(…)`, `base64 $(…)`, and
-    // `asciidoctor -o $(fd a /etc)` must gate, not auto-approve).
-    // A value carrying WHITESPACE is admitted for the same reason: it is a command line, and
-    // `looks_like_path` rejects one that happens to contain no `/`, `.` or `~`. That is how
-    // `borg --rsh 'sh -c evil'` and `restic --password-command 'sh -c evil'` reached the executor
-    // slot ungated — the flag WAS declared `exec`, but the gate never handed the value to it, so a
-    // correctly-configured gate read as a closed one. The env twins denied the same values, which
-    // is the shape of divergence the fuzz `equivalence` target exists to catch.
-    // A value carrying a COLON is admitted for the same reason as whitespace, and the fuzz target
-    // caught the same shape a second time: `borg --rsh file:~ check repo` was approved while
-    // `BORG_RSH=file:~ borg check repo` denied. `looks_like_path` rejects `file:~` (no `/`, no `.`),
-    // so the declared `exec` flag never handed the value to the gate, while the env twin split it
-    // on `:` and refused the `~` element. Admitting it here lets the executor rule judge it, which
-    // is where the colon-list split now lives.
-    (crate::policy::looks_like_path(path)
-        || path.split_whitespace().count() > 1
-        || path.contains(':')
-        || crate::engine::resolve::is_unpinnable(path)
-        || crate::engine::resolve::is_substitution_value(path))
-        && verdict(path) == Verdict::Denied
+    // No pre-filter. There used to be one — a positive shape test (`looks_like_path`, plus
+    // whitespace, plus a colon, plus substitutions) deciding which values were worth judging — and
+    // it was fail-OPEN by construction: a shape it did not recognize was skipped, unjudged, and so
+    // approved. It leaked four times, each as a shape nobody had listed: a command line with
+    // spaces, `file:~`, a `$VAR`, and a bare glob. Each was patched by teaching it one more shape.
+    //
+    // The filter's stated job was skipping flags and bare keywords so only operands got judged. Its
+    // CALLER already does that: `walk` peels flags off before pushing to `positionals`, so nothing
+    // flag-shaped reaches here. The filter was re-asking a question already answered, and answering
+    // it worse. A bare keyword judged anyway classifies worktree-relative and allows, so dropping
+    // it costs nothing — the whole registry corpus and the ordinary invocations of every
+    // positional-gated command are unchanged.
+    verdict(path) == Verdict::Denied
 }
 
 /// Operation-aware path gates: a command whose positional roles depend on a mode selector its own

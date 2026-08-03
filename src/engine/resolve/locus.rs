@@ -355,17 +355,6 @@ fn neutralize_atoms(path: &str) -> Cow<'_, str> {
 }
 
 /// Whether `path` carries a command-substitution sentinel of ANY kind — the opaque one
-/// `is_unpinnable` worst-cases, or a bounded tagged one. (`TAGGED_PREFIX` is a prefix of the opaque
-/// marker too, so one test covers both.)
-///
-/// Anything deciding "is this token an operand worth gating" must ask THIS, not a path-shape test
-/// and not `is_unpinnable`. A sentinel carries no `/` and no `.`, so `looks_like_path` skips it;
-/// keying on `is_unpinnable` used to cover that, but stopped once a declared substitution became
-/// pinnable — which let `asciidoctor -o $(fd a /etc)` ship its write ungated.
-pub(crate) fn is_substitution_value(path: &str) -> bool {
-    path.contains(crate::cst::eval::TAGGED_PREFIX)
-}
-
 #[cfg(test)]
 mod atom_backstop {
     /// The atom sentinel must be unpinnable ON ITS OWN.
