@@ -91,20 +91,49 @@ fn run_suggest(command: &str) -> ! {
 /// Locate the project `.safe-chains.toml` (nearest one walking up from the cwd), or the path where
 /// one would be created in the cwd if none exists yet.
 fn repo_config_path() -> std::path::PathBuf {
-    const REPO_FILENAME: &str = ".safe-chains.toml";
     let Ok(start) = std::env::current_dir() else {
         return std::path::PathBuf::from(REPO_FILENAME);
     };
-    let mut dir = start.clone();
+    repo_config_path_from(&start)
+}
+
+const REPO_FILENAME: &str = ".safe-chains.toml";
+
+/// The project `.safe-chains.toml` for a run starting at `start`: the nearest one at or above
+/// `start` but NEVER above the project root, else the path where one would be created at that root.
+///
+/// The confinement is the point. This used to walk to the filesystem root and write to the first
+/// `.safe-chains.toml` it met, so a `~/.safe-chains.toml` captured every `--suggest` run anywhere
+/// beneath `$HOME` — the same command writing a different file depending on where an ancestor config
+/// happened to sit, with nothing on the command line to say which. `--suggest`'s output asks for a
+/// trust decision, so the file it offers has to be one the reader can predict: the project whose
+/// commands were just analysed. With no project root there is no boundary to search within, so it
+/// does not search at all.
+fn repo_config_path_from(start: &std::path::Path) -> std::path::PathBuf {
+    let mut dir = start.to_path_buf();
+    let root = loop {
+        if dir.join(".git").exists() || dir.join(".jj").exists() {
+            break Some(dir);
+        }
+        if !dir.pop() {
+            break None;
+        }
+    };
+    let Some(root) = root else {
+        return start.join(REPO_FILENAME);
+    };
+
+    let mut dir = start.to_path_buf();
     loop {
         let candidate = dir.join(REPO_FILENAME);
         if candidate.is_file() {
             return candidate;
         }
-        if !dir.pop() {
-            return start.join(REPO_FILENAME);
+        if dir == root || !dir.pop() {
+            break;
         }
     }
+    root.join(REPO_FILENAME)
 }
 
 fn emit_suggestion(
