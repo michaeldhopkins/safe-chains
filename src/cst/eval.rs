@@ -115,10 +115,23 @@ fn brace_expand(s: &str) -> Vec<String> {
                 let prefix: String = chars[..i].iter().collect();
                 let content: String = chars[i + 1..j].iter().collect();
                 let suffix: String = chars[j + 1..].iter().collect();
+                // The suffix expansion does not depend on the alternative, so compute it ONCE.
+                // Recomputing it inside the loops repeated an identical expansion per alternative,
+                // multiplying the work by the alternative count at every nesting level.
+                let suffix_alts = brace_expand(&suffix);
                 let mut out = Vec::new();
                 for alt in split_top_commas(&content) {
                     for alt_x in brace_expand(&alt) {
-                        for suf_x in brace_expand(&suffix) {
+                        for suf_x in &suffix_alts {
+                            // Bound the WORDS PRODUCED, not the brace count. The `{` count above is
+                            // a proxy that does not track fan-out: six groups of eight alternatives
+                            // is only six braces but 8^6 = 262144 words, and eight groups is 16.7M —
+                            // seconds of wall clock inside a PreToolUse hook, from ~300 bytes. This
+                            // is the same ceiling the caller applies to `alts`, enforced here so the
+                            // product is never materialized before anyone checks its size.
+                            if out.len() >= BRACE_EXPANSION_CAP {
+                                return vec![UNPINNABLE.to_string()];
+                            }
                             out.push(format!("{prefix}{alt_x}{suf_x}"));
                         }
                     }
