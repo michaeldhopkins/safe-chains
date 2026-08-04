@@ -178,6 +178,31 @@ proptest! {
     }
 }
 
+/// Brace fan-out must stay BOUNDED as groups are added, not grow with their product.
+///
+/// `brace_expand` guarded only `s.matches('{').count() > 8` — a count of braces, which is not a
+/// count of words. Six groups of eight alternatives is six braces and 262144 words; eight groups is
+/// 16.7 MILLION, and the caller's `BRACE_EXPANSION_CAP` could not help because it inspected `alts`
+/// only AFTER the full product had been materialized. Measured on the release build before the fix:
+/// 38us at two groups, 107ms at six, ~7s at eight — from ~150 bytes, inside a PreToolUse hook that
+/// runs before every command. Found as an OOM by the `suggest_roundtrip` fuzz target.
+///
+/// The sweep matters more than any single size: the defect is that cost grows with GROUP COUNT, so
+/// a guard fixed at one count would sit at whatever margin that count happened to have. Each entry
+/// past the old brace guard's threshold is now flat, and the budget is generous precisely so this
+/// fails on a super-linear regression rather than on a slow or busy machine.
+#[test]
+fn brace_expansion_stays_bounded_as_groups_are_added() {
+    for groups in [2usize, 4, 6, 8, 10, 16] {
+        let line = format!("echo {}", "x{a,b,c,d,e,f,g,h}".repeat(groups));
+        assert!(
+            finishes_within(&line, std::time::Duration::from_secs(5)),
+            "brace fan-out blew up at {groups} groups ({} bytes): 8^{groups} words if unbounded",
+            line.len()
+        );
+    }
+}
+
 /// The same invariant, swept ACROSS THE BUDGET BOUNDARY, which is the only place it can break.
 ///
 /// The proptest above states the rule but cannot be relied on to reach it: a divergence needs a
