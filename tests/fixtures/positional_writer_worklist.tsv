@@ -146,3 +146,10 @@ h2xs
 
 # ── ar-family — output is the FIRST positional archive, not the last (see TODO first_write) ─────
 emar
+
+# ── safe-chains itself — the positional is a COMMAND STRING, never a path ───────────────────────
+# Matched once `--suggest` was documented as WRITING a `.safe-chains.toml`. It does write, but the
+# target is derived from the CWD (the project root), never from the positional: that argument is the
+# command line being classified and is parsed as shell text, not opened. `safe-chains X ~/.ssh/y`
+# classifies the string, it does not touch the file.
+safe-chains
