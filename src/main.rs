@@ -24,10 +24,11 @@ fn print_docs() {
 /// meant `safe-chains "<cmd>"` reported denied for a command the hook approved. Same footgun as
 /// `--cwd` without `--root`: this is the tool people run to ask what the hook decided.
 ///
-/// Worth knowing rather than discovering: a covered segment classifies `Inert`, and `Inert` clears
-/// every threshold. So a `Bash(rm:*)` rule in your own settings out-ranks even `--level paranoid`.
-/// That is what the hook already does; this makes the CLI say so instead of inventing a stricter
-/// answer that no harness would give.
+/// A covered segment classifies `SafeWrite` — the top of the auto-approve band, and the DEFAULT
+/// threshold — so a `permissions.allow` rule is honoured exactly as the hook honours it, while a
+/// stricter `--level` still clamps it: `paranoid` and `reader` refuse a covered command rather than
+/// being overridden by it. It used to classify `Inert`, the bottom of the ordering, which cleared
+/// every threshold and let a `Bash(rm:*)` rule out-rank `--level paranoid`.
 fn run_cli(
     command: &str,
     threshold: SafetyLevel,

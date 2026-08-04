@@ -156,3 +156,46 @@ fn no_other_target_inherits_claude_permissions() {
         }
     }
 }
+
+/// A `permissions.allow` rule GRANTS, but it may not exceed the ceiling `--level` states.
+///
+/// The coverage bridge used to classify a covered segment `Inert` — the BOTTOM of the ordering — so
+/// it cleared every threshold and a `Bash(rm:*)` rule out-ranked even `--level paranoid`. A ceiling
+/// a per-command rule can lift is not a ceiling. It now classifies `SafeWrite`, the top of the
+/// auto-approve band, so the rule is honoured wherever the band is while a stricter level clamps it.
+///
+/// Both directions are asserted deliberately. Only checking that `paranoid` refuses would also pass
+/// if coverage stopped working altogether, which would be a far worse regression than the one being
+/// guarded — the default and `developer` cases are what prove the grant still grants.
+#[test]
+fn a_covered_command_is_clamped_by_a_stricter_level() {
+    let home = home_with_claude_rules();
+    // Covered by this fixture's own `Bash(curl:*)`/`Bash(sh:*)` rules, and refused by the
+    // classifier on its own merits — piping a download into a shell.
+    const COVERED: &str = GATED_COMMAND;
+
+    let run = |level: Option<&str>| {
+        let mut args: Vec<&str> = vec!["--cwd", "/work", "--root", "/work"];
+        if let Some(l) = level {
+            args.push("--level");
+            args.push(l);
+        }
+        args.push(COVERED);
+        let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+            .args(&args)
+            .env("HOME", home.path())
+            .output()
+            .expect("run safe-chains");
+        // Exit 2 is clap refusing the ARGV, which would silently read as "denied" and make this
+        // test pass for the wrong reason.
+        assert_ne!(out.status.code(), Some(2), "malformed invocation for level {level:?}");
+        out.status.success()
+    };
+
+    for level in [None, Some("developer"), Some("editor")] {
+        assert!(run(level), "the user's own Bash(curl:*)/Bash(sh:*) rules should still grant at {level:?}");
+    }
+    for level in [Some("reader"), Some("paranoid")] {
+        assert!(!run(level), "a permissions.allow rule must not out-rank the stated ceiling {level:?}");
+    }
+}
