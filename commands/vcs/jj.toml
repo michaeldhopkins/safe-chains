@@ -4,9 +4,18 @@ description = "Git-compatible version control system with an opinionated, simple
 url = "https://jj-vcs.github.io/jj/latest/cli-reference/"
 researched_version = "jj 0.39.0 (config subcommand reviewed)"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = ["jj new", "jj -R ./sub new"]
+examples_denied = ["jj -R /etc new"]
 [command.wrapper]
 standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
 valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
+
+# `-R`/`--repository` picks the repo every sub acts on, so a write sub lands outside the workspace:
+# `jj -R /etc new` created a commit in a repo under /etc and auto-approved. Gated at the WRITE locus
+# rather than `exec` because jj mutates that repo's store — it does not run code out of it — so
+# `-R /tmp/scratch-repo` stays workable while system and home paths do not.
+[command.path_gate]
+flags = { "--repository" = "write", "-R" = "write" }
 
 [[command.sub]]
 name = "abandon"

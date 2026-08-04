@@ -4,10 +4,19 @@ description = "Modern Python project manager. Many subcommands. Read-side: `vers
 url = "https://hatch.pypa.io/"
 researched_version = "hatch 1.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = ["hatch build", "hatch --project ./pkg build", "hatch --data-dir ./.hatch build"]
+examples_denied = ["hatch --project /etc build", "hatch --data-dir /etc build"]
 
 [command.wrapper]
 standalone = ["--no-interactive", "-n", "--quiet", "-q", "--verbose", "-v"]
 valued = ["--cache-dir", "--config", "--data-dir", "--env", "--project", "-e", "-p"]
+
+# `--project`/`-p` selects WHICH project hatch builds, so it decides whose build hooks run, and
+# `--config` names a hatch config that can define environments and scripts — both `exec`, where
+# `write` would still admit `/tmp`. `--data-dir`/`--cache-dir` only relocate hatch's own storage,
+# so they are ordinary writes. (`-e`/`--env` names an environment, not a path.)
+[command.path_gate]
+flags = { "--project" = "exec", "-p" = "exec", "--config" = "exec", "--data-dir" = "write", "--cache-dir" = "write" }
 
 [[command.sub]]
 name = "status"

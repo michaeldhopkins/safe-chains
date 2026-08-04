@@ -4,10 +4,18 @@ description = "i18n key checker and YAML/JSON locale data manager for Rails proj
 url = "https://github.com/glebm/i18n-tasks"
 researched_version = "i18n-tasks 1.1.2 (December 2025)"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = ["i18n-tasks health", "i18n-tasks -c ./config/i18n-tasks.yml health"]
+examples_denied = ["i18n-tasks -c /etc/i.yml health"]
 
 [command.wrapper]
 standalone = ["--verbose"]
 valued = ["--config", "-c"]
+
+# `-c`/`--config` names an i18n-tasks config that is YAML run through ERB, so the file's contents
+# are evaluated as Ruby when it is loaded — the value selects code and takes `exec`, which withholds
+# `/tmp` where `write` would not.
+[command.path_gate]
+flags = { "--config" = "exec", "-c" = "exec" }
 
 [[command.sub]]
 name = "missing"

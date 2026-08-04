@@ -55,8 +55,12 @@ pub(crate) enum Shape {
     OptionString,
 }
 
-/// The role a path-flag's value plays, spelled as `registry::types::PathRole` spells it: read is
-/// gated by the read locus, write by the write locus.
+/// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
+/// gated by the read locus, write by the write locus, exec by the executor locus.
+///
+/// NOT `registry::types::PathRole`, which this comment used to name — that enum has only
+/// `Read`/`Write`, so the claim sent a reader looking for an `Exec` variant that is not there. The
+/// three-role enum `[command.path_gate]` deserializes into is `pathgate::Role`.
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) enum PathRole {

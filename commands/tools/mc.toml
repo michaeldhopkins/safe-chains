@@ -5,11 +5,13 @@ examples_safe = [
     "mc ls bucket",
     "mc find bucket --name foo",
     "mc version",
+    "mc --config-dir ./.mc ls x",
 ]
 examples_denied = [
     "mc find bucket --exec rm",
     "mc cp src dst",
     "mc rm bucket/file",
+    "mc --config-dir /etc ls x",
 ]
 url = "https://min.io/docs/minio/linux/reference/minio-mc.html"
 researched_version = "mc 2025.x"
@@ -18,6 +20,12 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 [command.wrapper]
 standalone = ["--debug", "--insecure", "--json", "--no-color", "--quiet"]
 valued = ["--config-dir", "--retries", "--timeout"]
+
+# `--config-dir` relocates the directory holding mc's aliases and their access keys, which mc both
+# reads and rewrites — `mc --config-dir /etc ls x` auto-approved. A write gate keeps a scratch or
+# in-workspace config usable while refusing system and home locations.
+[command.path_gate]
+flags = { "--config-dir" = "write" }
 
 [[command.sub]]
 name = "version"

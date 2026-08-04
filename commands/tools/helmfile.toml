@@ -4,11 +4,13 @@ description = "Wraps helm to manage releases declaratively. `lint`, `diff`, `tem
 url = "https://helmfile.readthedocs.io/"
 researched_version = "helmfile 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["helmfile list", "helmfile -f ./helmfile.yaml list"]
+examples_denied = ["helmfile -f /etc/h.yaml list"]
 
 [command.path_gate]
 # `--helm-binary` names the helm executable helmfile shells out to, so its value is the program
 # that runs — `exec` withholds `/tmp` and home, where `read`/`write` would admit them.
-flags = { "--output-dir" = "write", "--helm-binary" = "exec" }
+flags = { "--output-dir" = "write", "--helm-binary" = "exec", "--file" = "exec", "-f" = "exec", "--helmfile" = "exec" }
 
 [command.wrapper]
 standalone = ["--allow-no-matching-release", "--debug", "--disable-force-update", "--enable-live-output", "--no-color", "--quiet", "--strict-parsing"]
