@@ -51,7 +51,38 @@ refusal says nothing about whether `-f` is gated. Both halves of that sentence w
 nothing. Whether nix-env's `-f` needs a gate is still OPEN and becomes a real question the moment
 any nix-env invocation is allowed.
 
-### The RELOCATION sub-class — confirmed live 2026-08-03, NOT yet fixed
+### The RELOCATION sub-class — FIXED 2026-08-04 (all nine)
+
+All nine below now carry a `[command.path_gate]`, verified in BOTH directions: every foreign path
+denies and every bare + in-workspace spelling still auto-approves (`composer -d ./packages/api
+install`, `jj -R ./sub new`, `hatch --project ./pkg build`, `mc --config-dir ./.mc ls x`,
+`helmfile -f ./helmfile.yaml list`, `alembic -c ./alembic.ini current`,
+`i18n-tasks -c ./config/i18n-tasks.yml health`).
+
+ROLE CHOICE was the substantive decision, and `write` is NOT always enough. `pathgate::Role::Exec`
+denies a `/tmp` executor where `write` ADMITS it, so any flag whose value selects code takes `exec`:
+
+    composer -d/--working-dir     exec   picks whose composer.json scripts run (a `write` gate would
+                                        have left `-d /tmp/evil install` running a planted project)
+    hatch --project/-p, --config  exec   selects which project is built, i.e. whose build hooks run
+    alembic -c/--config           exec   the ini's script_location names the Python alembic imports
+    i18n-tasks -c/--config        exec   its YAML is run through ERB, so loading it evaluates Ruby
+    helmfile -f/--file/--helmfile exec   a helmfile can declare hooks that run
+    jj -R/--repository            write  jj MUTATES that repo's store; it does not run code from it
+    hatch --data-dir/--cache-dir  write  relocates hatch's own storage only
+    mc --config-dir               write  holds aliases and access keys; mc reads and rewrites it
+
+SCHEMA NOTE, because it cost time: this file previously said these gates use "role `exec`" and that
+`registry::types::PathRole` spells it — `registry::types::PathRole` has only `Read`/`Write`. The enum
+that `[command.path_gate]` actually deserializes into is `src/pathgate.rs::Role`, which has all three.
+`envvars.rs::PathRole` also has `Exec` and its doc comment still claims the registry enum spells it
+the same way; those two have diverged and the comment is wrong.
+
+All seven commands also gained `examples_safe`/`examples_denied` pinning both directions. Six of them
+had NO examples at all, so they were fuzz-coverage holes as well (AGENTS.md: un-exampled commands are
+never reached by the registry-derived seeds).
+
+### Original report — confirmed live 2026-08-03
 
 The seven above are *executor* values: the flag names a program to run. There is a second sub-class
 in the same `valued` lists that is still open. The value is not a program but a WORKING DIRECTORY,
@@ -248,6 +279,75 @@ Worth noting the two are separable: the coverage bridge could keep granting whil
 the result (`min(covered, threshold)` rather than `Inert`), which honours the rule without letting
 it exceed the stated ceiling. Not implemented; recording the option so the choice is informed.
 
+## Support OPTIONAL-VALUE flags by design (decided 2026-08-04)
+
+DECIDED: add optional-value flags to the schema as a first-class thing, rather than making the
+overlap a build error and forcing 234 scopes to drop a spelling. A flag that genuinely accepts both
+`--long` and `--long=27` is a real grammar, and every tool that has one is currently modelled by a
+contradiction (declared in `standalone` AND `valued`, where only one can be honoured) or by dropping
+a form — and a dropped form is a FALSE DENY, which costs a user a prompt for a command that is fine.
+
+Shape to design (not yet chosen):
+  - a per-flag `value = "optional"`, or a third list alongside `standalone`/`valued`;
+  - the parser must accept the glued/`=` form as carrying a value and the bare form as not, WITHOUT
+    letting the bare form swallow the next token as its value — that swallow is exactly how a valued
+    flag mismodelled as a boolean turns a path into a positional (see the section below);
+  - once it exists, the `standalone`+`valued` overlap becomes a build error, and the 234 scopes are
+    migrated to whichever of the three they actually are.
+
+Known callers waiting on it, so the migration has a first batch: `zstd --long`, `7z -r`, and the
+seven `cargo mutants` flags omitted for this reason (`--cap-lints`, `--jobserver`, `--copy-target`,
+`--copy-vcs`, `--gitignore`, `--skip-calls-defaults`, `--test-workspace`).
+
+Sequencing note: do this BEFORE the overlap audit below, not after. The audit's whole difficulty is
+that it cannot tell a typo from an optional-value flag; with the third state expressible, that
+distinction becomes mechanical.
+
+## The `standalone` + `valued` overlap audit (blocked on the above)
+
+Promoted 2026-08-04 out of the "FIFTH PASS" narrative above, where it was easy to miss.
+
+**234 scopes declare the same flag in BOTH lists.** SAMPLE.toml defines `standalone` as "flags that
+take no value", so the two declarations contradict each other and only one can be honoured. marp was
+one of them, and that mattered: a valued flag mismodelled as a boolean defeats flag-level gating (see
+the next section).
+
+But most of the 234 are not typos. They look like deliberate attempts to model an OPTIONAL value —
+`zstd --long` vs `--long=27`, `7z -r` vs `-r-` — which the schema has no way to express.
+
+RESOLVED IN PRINCIPLE: the direction is decided (support optional values by design — see the section
+above). What remains here is the MIGRATION: once the third state is expressible, walk the 234, sort
+each into standalone / valued / optional, and turn the remaining overlap into a build error.
+
+Do NOT write a guard against the current ambiguity before then: it would encode a convention nobody
+has chosen, and it cannot distinguish a typo from an optional-value flag.
+
+## A valued flag mismodelled as `standalone` defeats every flag gate — NOT swept
+
+Promoted 2026-08-04 out of "THIRD PASS", where it was a closing paragraph. This is a live bug CLASS
+with no enumeration, and it silently disables the gating mechanism the passes above spent themselves
+building.
+
+The shape: webpack's `-c` was listed in `standalone` though it TAKES a value, so
+`webpack -c /tmp/evil.js` parsed the path as a POSITIONAL — it never reached the flag policy at all,
+and the `exec` gate on `-c` could not fire because `-c` was never treated as a valued flag. Any
+flag-level gate can be defeated the same way, which makes this a meta-bug: it does not add one hole,
+it invalidates a defence everywhere it occurs.
+
+Why it is not just the section above: an overlap (`standalone` AND `valued`) is at least VISIBLE. A
+flag declared ONLY in `standalone` that actually takes a value looks completely normal, and nothing
+compares a declaration against the tool's real grammar.
+
+DONE when: something enumerates the mismatch. Two angles, neither tried —
+  - **Registry-internal differential**, which already found marp: a flag declared `standalone` in one
+    command while `valued` in many others is a strong smell. Cheap, no external data, and it ranks
+    candidates by how lopsided the split is.
+  - **Behavioural probe**: for each `standalone` flag on an auto-approving command, classify
+    `<cmd> <flag> /etc/x` and see whether the path landed as a positional. Directly tests the
+    property that matters rather than a proxy.
+
+Start with the differential; it needs nothing but the registry and would have caught webpack.
+
 ## `slow-unit-*` in the nightly artifacts — CHECKED AND CLEARED (2026-08-03)
 
 The nightly uploads `slow-unit-*` files for `level_monotonic` (2) and `suggest_roundtrip` (1) even
@@ -379,9 +479,21 @@ Current exposure: **2,328** `tolerate_unknown_short = true` and **1,630** `toler
 true`. Concentrated in the big cloud CLIs — az (700), gcloud (389), aws (247), oci (61) — plus jj
 (53), claude (37), notion (18), codex (17).
 
-Known live consequence: `systemctl status nginx -H remote.example.com` auto-approves. `-H` retargets
-systemctl to a REMOTE host over SSH, turning a local read into an operation on another system;
-`status` is a legacy sub whose author-declared `tolerate_unknown_short = true` lets `-H` through.
+Known live consequence — FIXED 2026-08-04. `systemctl status nginx -H remote.example.com` used to
+auto-approve: `-H` retargets systemctl at a REMOTE host over SSH (and `-M` at a container), turning a
+local read into an operation on another system, and `status` declared `tolerate_unknown_short = true`,
+which accepts ANY short flag whatever the sub enumerated.
+
+`tolerate_unknown_short` is gone from all six read subs (status, show, is-active, is-enabled,
+is-failed, cat). The fix is allowlist-shaped, not a denylist on `-H`: the subs now stand on their
+enumerated flags, so `-H`/`-M` fall to approval by omission along with anything else unresearched.
+Verified both ways — `-H`/`-M` deny on every read sub, while `systemctl status nginx`, `status -a -l`,
+`status -q`, `show -p Type`, `show --value -p Type`, `is-active`, `cat` and `list-units --type=service`
+all still auto-approve. `--quiet`/`-q` was added to status and `--value`/`-P` to show, checked against
+the systemd 257 man page rather than assumed, so removing the tolerance introduced no false denies.
+
+This closes the ONE confirmed live consequence of the tolerance pile; the remaining ~2,300 entries are
+still the deferred campaign below.
 
 Two distinct shapes, both bypassing per-sub enforcement:
 1. **A profiled sub that declares tolerance** — enumerates flags, then accepts anything anyway.
@@ -1792,9 +1904,13 @@ producing a file that will never load, and hands over a pin for it.
 Same shape as the `--setup` panic already fixed: don't write into a config whose existing content we
 could not read.
 
-DONE when: `--suggest` validates the existing file before merging, and on failure reports the parse
-error and writes nothing (the block can still be printed for the user to place by hand). A test
-should assert the malformed file is byte-unchanged, as
+CODE FIX LANDED, TEST DID NOT (verified 2026-08-04). `emit_suggestion` now validates the existing
+file first — `main.rs` refuses with "isn't valid TOML (…), so adding to it would leave a file
+safe-chains can't load", prints the block for hand-placement, and exits 1 without writing. What is
+still missing is the guard: nothing asserts the malformed file is byte-unchanged, so the behaviour
+rests on the code alone and a refactor could drop it silently.
+
+DONE when: a test asserts the malformed file is byte-unchanged, as
 `refuses_a_wrong_typed_outer_key_without_panicking` does for the install path.
 
 ## Re-tokenize split words instead of refusing them
@@ -1820,3 +1936,265 @@ before the face is known.
 DONE when: `Word::expand` splits unquoted variable expansions, `VAR="-rf ./sub"; rm $VAR` is allowed
 again while `VAR="--exec rm"; fd pat $VAR` still denies, and `smuggles_a_flag` is deleted rather
 than left as a second gate.
+
+## Nightly fuzz 2026-08-04: the classify budget does not cover its sibling entry points
+
+Two nightly failures on the released v0.222.0 (`explain_render` crash, `suggest_roundtrip` OOM), one
+root cause. `command_verdict` is budgeted — `ClassifyGuard::enter()` caps total work and fails
+closed. The two OTHER public entry points that also walk and brace-expand a command are not.
+
+Neither is a fail-open. Over-budget denies, so the leak can only over-deny. Verified there is no
+bypass: `{,}` is a way to spell `-e` without the literal bytes, and every brace-spelled payload is
+refused exactly like its plain form (`perl -{,}e system("id")` denies, as does `perl -e system("id")`).
+
+### 1. `explain_inner` had no work budget of its own — FIXED 2026-08-04
+
+`ClassifyGuard::enter()` resets `CLASSIFY_WORK` only on entry at depth 0 and NEVER clears it on exit.
+`explain_inner` enters no guard, so it starts with whatever the previous classification left and
+trips `MAX_CLASSIFY_WORK`. Same input, same thread, only the call order differs:
+
+    explain first    explain=true   is_safe_command=true    agree
+    enforce first    explain=FALSE  is_safe_command=true    DIVERGE
+
+Minimized from the 244-byte artifact to 37 printable chars (libFuzzer `tmin` stalled at 130; a
+delta-debugger in STRING space against the real predicate got the rest):
+
+    perl {,} -{,}e{,}{,}{,}\~{,}{,}{,}{,}
+
+Impact is transparency, and it is not cosmetic: the hook auto-approves the command while injecting
+context reading "this command is not on the allowlist, so it is not auto-approved". That explanation
+feeds both the human's approval decision and the model's context.
+
+FIXED, in two parts — the first was necessary but NOT sufficient, which is worth recording:
+
+  1. `ClassifyGuard::drop` now clears the counter when depth returns to 0, so a completed
+     classification leaves nothing behind for a caller that takes no guard.
+  2. That alone still left `explain` non-deterministic: it charges fan-out with no guard of its own
+     while the per-segment classifications inside it reset the counter whenever one bottomed out at
+     depth 0, so two consecutive `explain` calls on one dense input rendered DIFFERENT answers.
+     `explain_inner` now takes a top-level `ClassifyGuard`, giving the whole explanation one budget
+     and keeping every nested classification at depth >= 1 — the same shape `command_verdict` has.
+
+Part 2 was found only because the guard's generator was extended (below); the original fuzz artifact
+passed after part 1.
+
+GUARDS, both red-demoed:
+  - `explain_agrees_with_enforcement_whatever_the_call_order` — the invariant, over generated input.
+  - `explain_agrees_with_enforcement_across_the_classify_budget_boundary` — a CONSTRUCTED sweep of
+    both brace-group counts. The proptest alone is not enough and this was measured, not assumed:
+    with the fix disabled it passed 1500 generated cases while the sweep failed on the first
+    crossing. A divergence needs a command that is ALLOWED and within one call's residue of the cap,
+    and random fragments almost always deny outright.
+
+GENERATOR GAP CLOSED, and it was the real lesson: `arb_shell_fragment` emitted `{` and `}` as
+separate space-joined fragments, so it could never produce a contiguous `{,}`. Brace expansion — a
+real parser feature with a real cap and a real fan-out charge — was unreachable from the generator
+every guard in that file is built on. It now emits brace GROUPS, including one dense enough to
+approach the budget (8 groups = 256 alternatives); the space-joined form tops out at 224 against a
+cap of 512 and so could never reach the boundary where a budget's interesting behaviour lives.
+
+### 2. `is_safe_command` took 5.6 SECONDS on a 322-byte input — FIXED 2026-08-04 (brace fan-out)
+
+CORRECTED 2026-08-04 after profiling. The first reading here was "`suggest::analyze` is unbudgeted"
+(true — zero budget references in `src/suggest.rs`) and it was the WRONG diagnosis. Measured on the
+release binary against the `suggest_roundtrip` artifact:
+
+    cst::parse            8.3 us    parsed=true
+    is_safe_command        5.6 s    -> false
+    suggest::analyze       5.4 s    -> Generated(1 entries)
+
+Three things follow, and the first is the one that matters:
+
+  - The cost is in CLASSIFICATION, not parsing — parse is six orders of magnitude cheaper. That is
+    the OPPOSITE of the nested-`$((` blow-up in "Three reported prompts A", where the cost was
+    entirely in parse. Do not merge the two; they need different fixes.
+  - It is in the MAIN path. `is_safe_command` is what the PreToolUse hook runs before every command,
+    so a 322-byte line buying 5.6s is a hook-latency bug, not a `--suggest` one. `suggest` is a
+    victim: it calls `command_verdict` first, then walks again.
+  - `MAX_CLASSIFY_WORK` bounds the NUMBER of re-classifications (512) but not the COST of each. The
+    comment on `charge_classify_work` already anticipated this shape ("512 delegations x 256 words
+    is ~131k word checks — seconds of wall clock from a ~200-byte input") and charging fan-out was
+    supposed to bound it. This input shows that mitigation is INSUFFICIENT, which is new information
+    about a fix already believed complete.
+
+It fails CLOSED (returns `false`), so this is latency/availability, not a bypass — but a hook slow
+enough to look hung is its own failure.
+
+PROFILED, then fixed. The method that worked was delta-debugging on ELAPSED TIME (shrink while
+`is_safe_command` still takes >= 500ms), which cut 322 bytes to 165 and made the shape legible:
+repeated `{…,,,,,,,…}` groups. A synthetic sweep then gave the scaling law outright —
+
+    groups (8 alts each)   2: 38us   3: 179us   4: 1.38ms   5: 11.8ms   6: 107ms
+    alts (3 groups)        4: 52us   8: 188us  16: 1.18ms  32: 8.34ms
+
+— x8-9 per added group: time linear in words produced, words = alts^groups.
+
+ROOT CAUSE, two defects in `brace_expand` (src/cst/eval.rs):
+
+  1. The only guard was `s.matches('{').count() > 8` — a count of BRACES, not of words. Six groups of
+     eight alternatives is six braces and 262144 words; eight groups is 16.7M, which is the ~7s that
+     matched the artifact. `BRACE_EXPANSION_CAP` could not save it: the caller inspects `alts` only
+     AFTER `brace_expand` has materialized the entire product.
+  2. `brace_expand(&suffix)` was recomputed inside both loops although `suffix` is loop-invariant, so
+     an identical expansion was redone once per alternative at every nesting level.
+
+FIXED: the suffix expansion is hoisted, and the cap is enforced on WORDS PRODUCED inside the
+innermost loop, so the product is never materialized before its size is checked. Measured after: the
+whole series is FLAT at 30-63us out to 8 groups (was 38us -> 107ms), and `suggest::analyze` on the
+original artifact went 5.4s -> 6.7ms. Both nightly artifacts (`suggest_roundtrip` OOM,
+`explain_render` crash) now replay clean.
+
+GUARD: `brace_expansion_stays_bounded_as_groups_are_added` sweeps 2..16 groups through
+`finishes_within`. Red-demoed — with the cap disabled it fails at 8 groups from 149 bytes. The sweep
+rather than a single size is deliberate: the defect is that cost grows WITH GROUP COUNT, so a guard
+fixed at one count would sit at whatever margin that count happened to have.
+
+Correctness spot-checked, since this changes an expansion everything depends on: `echo {a,b}`,
+`cp file.{txt,bak}` and `mkdir -p ./src/{lib,bin}` still auto-approve, and `rm -{,}rf /` still denies.
+
+Both artifacts are in the nightly run's `fuzz-findings-*` uploads. `equivalence` and `config_load`,
+which had failed four nights running, both PASSED — those fixes held.
+
+## `--suggest` can write OUTSIDE the worktree (nearest-ancestor walk)
+
+Found 2026-08-04 researching why `safe-chains --suggest` prompts (it prompts correctly — see below).
+
+`repo_config_path()` walks UP from the cwd and writes to the first `.safe-chains.toml` it finds,
+falling back to creating one in the cwd only if none exists anywhere. So a `~/.safe-chains.toml`
+makes every `--suggest` run from anywhere under `$HOME` rewrite THAT file — an out-of-worktree,
+user-locus config write. Same command, different write target depending on where an ancestor config
+happens to sit, with nothing on the command line indicating which.
+
+Second consequence, quieter: if the repo config is already pinned and trusted, any `--suggest` run
+rewrites it, changes its hash, and breaks the pin — silently disabling the user's customizations
+until they re-pin. That direction is fail-CLOSED (`repo_is_trusted` requires the hash to match), so
+it is a self-inflicted DoS rather than an escalation.
+
+The escalation path is genuinely closed and was verified, not assumed: `registry::custom::
+repo_is_trusted` honours a repo config only when the canonicalized parent matches a pinned
+`[[trusted]] path` AND the SHA-256 matches; `user_config_level()` never consults the repo file, so a
+repo `.safe-chains.toml` cannot raise the ceiling.
+
+FIXED 2026-08-04. `repo_config_path_from(start)` now finds the project root (`.git`/`.jj`) first and
+confines the search to it: the nearest existing config at or below that root, else one created AT the
+root. With no project root there is no boundary to search within, so it does not search at all — it
+uses the cwd rather than climbing. Split out from `repo_config_path()` so it takes the start
+directory as a parameter and is testable without changing the process cwd.
+
+GUARD: `tests/suggest_write_scope.rs::suggest_never_writes_a_config_above_the_project_root`,
+red-demoed against the old walk (which wrote `…/.tmplYNqAT/.safe-chains.toml`, outside the project).
+
+### `--suggest` stays OFF the allowlist — decided, with the reason
+
+Our own `commands/tools/safe-chains.toml` is `level = "Inert"` and does not list `--suggest`, so it
+denies by omission. That is CORRECT and should stay:
+
+  - the write locus is not worktree-bounded (above), so it is not SafeWrite;
+  - it writes safe-chains' own policy config — the `reconfigure future commands` facet, which the
+    research rules separate from plain data persistence;
+  - auto-approving buys NOTHING. The next step of the workflow is a human trust decision (paste the
+    pin into `~/.config/safe-chains.toml`), so a prompt at the write costs the user nothing they
+    were not about to do anyway, and it is the one moment worth noticing WHICH file is written.
+
+### Our own description omits `--suggest`
+
+`commands/tools/safe-chains.toml`'s `description` documents `--setup`/`--auto-detect`/`--tool`
+("write the hook into another tool's config") and `--generate-book`, but never mentions the flag
+that writes safe-chains' OWN config — the most trust-relevant write it has. The description is
+meant to be the full behavioural profile.
+
+FIXED 2026-08-04 — the description now covers `--suggest`: what it writes, that the generated file is
+inert until the pin is added by hand, and that the write is confined to the project root.
+
+Side effect worth knowing: documenting the write tripped
+`positional_last_arg_writers_are_gated_or_acknowledged`, whose heuristic reads a writer-shaped
+description and then probes `<cmd> in.dat ~/.ssh/authorized_keys`. safe-chains is a false positive —
+its positional is the COMMAND STRING being classified, parsed as shell text and never opened, and
+`--suggest`'s target comes from the cwd — so it is acknowledged in
+`tests/fixtures/positional_writer_worklist.tsv` with that reasoning, which is what the guard's own
+comment prescribes for false positives.
+
+## `cargo mutants` — researched at 27.1.0, SHIPPED 2026-08-04
+
+Everything under `cargo mutants` currently denies (a clean gap, no misclassification). Full facet
+research done 2026-08-04; recorded here so it is not redone.
+
+`cargo mutants --list` is `observe` / worktree / **no network** / no execution / **no persistence**
+-> `SafeRead`, not `Inert` (it observes real worktree state). Two details that only the facet pass
+surfaced, both worth keeping:
+
+  - It DOES invoke cargo — `MetadataCommand::new().no_deps()` in `workspace.rs`. `.no_deps()` is the
+    single load-bearing call: without it, `--list` would resolve dependencies, hit the registry and
+    write `Cargo.lock`, silently becoming an outbound-fetch operation. Diff against this on the next
+    re-research.
+  - `--list`/`--list-files` return BEFORE `OutputDir::new()` (only the `else` branch creates it), so
+    no `mutants.out` and no writes.
+
+Flags that must stay OFF, each for a distinct reason:
+
+    -C/--cargo-arg              arbitrary args into every cargo invocation — same injection class the
+                                `cargo` description already refuses for `--config KEY=VALUE`
+    --cargo-test-arg/-args      passthrough to cargo test; the latter swallows everything after `--`
+    --error <EXPR>              injects a Rust expression as a mutant return value, then COMPILES AND
+                                RUNS it — code injection via a flag value
+    --in-place                  mutates the real source tree; upstream cautions an interrupted run
+                                leaves mutated code behind
+    -o/--output <DIR>           writes mutants.out into an arbitrary directory (output-flag-write
+                                class; needs output_path_flags, never a blanket allow)
+    -d/--dir, --manifest-path   retarget at a DIFFERENT crate, i.e. select whose code runs
+    --config <FILE>             reads an arbitrary config that can itself set options
+    -D/--in-diff, --Zmutate-file   take arbitrary read paths — still out-of-worktree READS even when
+                                paired with --list, which is why the safe tier is "flags taking no
+                                path", not "anything that pairs with --list"
+
+`--list` and `--check` are ONE facet apart: `--check` runs `cargo check` on every mutant, compiling
+and thus executing `build.rs` and proc macros from the whole dependency tree. Adjacent in the docs,
+entirely different execution facet — do not group them as a "preview surface".
+
+Recommended shape: `[[command.sub]] name = "mutants"`, `researched_version = "27.1.0"`,
+`max_positional = 0` (doing real work — `--cargo-test-args` consumes trailing args, and this is the
+exact lesson of the `cargo fuzz` comment in that file), escape-hatch flags simply omitted.
+
+DECIDED (user, 2026-08-04): the RUN tier is safe — auto-approve at `SafeRead`, as `cargo test` is.
+
+### Run tier facets (bare `cargo mutants`)
+
+    operation      execute + create — compiles and runs the test suite once per mutant
+    locus          local: scratch COPY of the tree in the system temp dir (one per -j job), plus
+                   `mutants.out` written in the source directory. `.git`/VCS and `target/` are
+                   excluded from the copy by default
+    network        none of its own; the builds it drives fetch dependencies exactly as `cargo
+                   build`/`cargo test` do
+    execution      workspace-own code — build.rs, proc macros and the test suite — but MUTATED.
+                   Upstream's Cautions: a mutated function can make otherwise-safe test code
+                   misbehave ("could potentially delete unintended directories")
+    persistence    data. `mutants.out` ROTATES rather than overwrites (previous -> `mutants.out.old`,
+                   older `.old` deleted). `--leak-dirs` keeps the scratch trees
+    reversibility  recoverable — scratch trees are temporary and the source tree is untouched unless
+                   `--in-place`
+
+Two things the run-tier pass turned up that the `--list` pass could not:
+
+  - ENV TWIN. `CARGO_MUTANTS_OUTPUT` relocates the output directory — the env spelling of the
+    `--output` flag deliberately omitted above. Omitting the flag without classifying the variable
+    is exactly the respelling bypass recorded in "FOURTH PASS" of the wrapper section. `envvars.toml`
+    must carry it as `shape = "data-path"` (the value is a path written as data, ordinary locus
+    rules) in the SAME change that allows the sub, or the omission is decorative.
+  - AMBIENT CONFIG. `.cargo/mutants.toml` can set `additional_cargo_args` and
+    `additional_cargo_test_args`, so the repo config injects arguments into every cargo invocation.
+    This is NOT a blocker and does not change the level: it is the same class as `.cargo/config.toml`
+    (`target.<cfg>.runner`, `build.rustc-wrapper`), which the house model already accepts as
+    workspace-own — it is why `cargo test` is allowed at all. It is why `--config <FILE>`, which
+    points OUTSIDE the worktree, stays off while `--no-config` is harmless.
+
+SHIPPED: `[[command.sub]] name = "mutants"` at `SafeRead` with `max_positional = 0`, the nine escape
+hatches omitted, and `examples_safe`/`examples_denied` pinning both directions. `CARGO_MUTANTS_OUTPUT`
+is classified `shape = "data-path"` in envvars.toml in the same change — without it the variable was
+ignored outright and omitting `--output` would have been decorative. Verified: the run and list tiers
+allow, every escape hatch denies, `CARGO_MUTANTS_OUTPUT=/etc` denies while `./target/m` allows.
+
+Seven optional-bool flags are omitted pending the schema decision — see "DECISION NEEDED: what
+`standalone` + `valued` on the SAME flag means".
+
+DOC BUG UPSTREAM: the book's `list.md` describes a `--diff` flag; there is NO such arg in 27.1.0
+(no `diff` bool in the clap `Args` — only `--in-diff`). Source wins over book prose.

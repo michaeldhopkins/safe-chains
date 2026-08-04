@@ -379,6 +379,11 @@ Aliases: `antigravity`
 - **show**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `alembic current`
+- `alembic -c ./alembic.ini current`
+
 ### `alias`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/alias.1p.html">https://man7.org/linux/man-pages/man1/alias.1p.html</a></p>
 
@@ -2493,6 +2498,7 @@ Aliases: `capacitor`
 - **msrv show**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
 - **msrv verify**: Flags: --all-features, --help, --ignore-lockfile, --include-all-patch-releases, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --rust-version, --target
 - **msrv**: Flags: --help, --no-log, --no-user-output, --version, -V, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
+- **mutants**: Flags: --all-features, --all-logs, --caught, --check, --help, --iterate, --json, --leak-dirs, --list, --list-files, --no-config, --no-default-features, --no-shuffle, --no-times, --shuffle, --unviable, --version, --workspace, -V, -h, -v. Valued: --annotations, --baseline, --build-timeout, --build-timeout-multiplier, --colors, --completions, --emit-schema, --exclude, --exclude-re, --features, --file, --jobs, --jobserver-tasks, --level, --line-col, --minimum-test-timeout, --package, --profile, --re, --shard, --skip-calls, --test-package, --timeout, --timeout-multiplier, -E, -F, -L, -e, -f, -j, -p, -t
 - **new**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --edition, --name, --registry, --vcs, -Z
 - **nextest archive**: Flags: --all-features, --help, --locked, --no-default-features, --release, -h. Valued: --archive-file, --archive-format, --cargo-profile, --features, --manifest-path, --package, --target, --target-dir, -p
 - **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
@@ -2530,6 +2536,11 @@ Aliases: `capacitor`
 **Examples:**
 
 - `cargo fuzz --version`
+- `cargo mutants`
+- `cargo mutants --list`
+- `cargo mutants --list --json`
+- `cargo mutants -j 4 --shard 1/4`
+- `cargo mutants -f src/lib.rs --check`
 - `cargo sweep --time 5`
 - `cargo sweep -r --installed`
 - `cargo sweep --dry-run --maxsize 500`
@@ -3070,6 +3081,11 @@ Aliases: `gcomm`
 - **why**: Flags: --help, --recursive, --tree, -h, -r, -t
 - **why-not**: Flags: --help, --recursive, --tree, -h, -r, -t
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `composer install`
+- `composer -d ./packages/api install`
 
 ### `compress`
 <p class="cmd-url"><a href="https://www.freebsd.org/cgi/man.cgi?compress">https://www.freebsd.org/cgi/man.cgi?compress</a></p>
@@ -6264,6 +6280,12 @@ Aliases: `ggroups`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `hatch build`
+- `hatch --project ./pkg build`
+- `hatch --data-dir ./.hatch build`
+
 ### `hcloud`
 <p class="cmd-url"><a href="https://github.com/hetznercloud/cli">https://github.com/hetznercloud/cli</a></p>
 
@@ -6430,6 +6452,11 @@ Aliases: `ghead`
 - **template**: Flags: --help, --include-crds, --include-needs, --include-transitive-needs, --no-hooks, --skip-cleanup, --skip-deps, --skip-needs, --skip-tests, --validate, -h. Valued: --args, --concurrency, --debug, --output-dir, --output-dir-template, --selector, --set, --show-only, --values, -l
 - **version**: Flags: --full, --help, --output, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `helmfile list`
+- `helmfile -f ./helmfile.yaml list`
 
 ### `herb`
 <p class="cmd-url"><a href="https://herb-tools.dev">https://herb-tools.dev</a></p>
@@ -6751,6 +6778,11 @@ Aliases: `hf`
 - **tree-subtract**: Flags: --help, --nostdin, -h. Valued: --data-format
 - **unused**: Flags: --help, --no-strict, --strict, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `i18n-tasks health`
+- `i18n-tasks -c ./config/i18n-tasks.yml health`
 
 ### `ibtool`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ibtool.1.html">https://keith.github.io/xcode-man-pages/ibtool.1.html</a></p>
@@ -7293,6 +7325,11 @@ Aliases: `iperf`
 - **workspace root**: Positional args accepted
 - **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `jj new`
+- `jj -R ./sub new`
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>
@@ -8813,6 +8850,7 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - `mc ls bucket`
 - `mc find bucket --name foo`
 - `mc version`
+- `mc --config-dir ./.mc ls x`
 
 ### `mcs`
 <p class="cmd-url"><a href="https://www.mono-project.com/docs/about-mono/languages/csharp/">https://www.mono-project.com/docs/about-mono/languages/csharp/</a></p>
@@ -14520,16 +14558,16 @@ Aliases: `gsync`
 ### `systemctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/systemctl.1.html">https://man7.org/linux/man-pages/man1/systemctl.1.html</a></p>
 
-- **cat**: Flags: --help, --no-pager, -h. Positional args accepted
+- **cat**: Flags: --help, --no-pager, -h
 - **condrestart**
 - **daemon-reexec**
 - **daemon-reload**
 - **disable**
 - **enable**
 - **force-reload**
-- **is-active**: Flags: --help, --quiet, -h, -q. Positional args accepted
-- **is-enabled**: Flags: --help, --quiet, -h, -q. Positional args accepted
-- **is-failed**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **is-active**: Flags: --help, --quiet, -h, -q
+- **is-enabled**: Flags: --help, --quiet, -h, -q
+- **is-failed**: Flags: --help, --quiet, -h, -q
 - **isolate**
 - **kill**
 - **list-dependencies**: Flags: --all, --help, --no-pager, --plain, --reverse, -a, -h
@@ -14546,9 +14584,9 @@ Aliases: `gsync`
 - **restart**
 - **set-default**
 - **set-property**
-- **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
+- **show**: Flags: --all, --help, --no-pager, --value, -a, -h. Valued: --property, -P, -p
 - **start**
-- **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
+- **status**: Flags: --all, --full, --help, --lines, --no-pager, --quiet, -a, -h, -l, -q. Valued: -n, --output, -o
 - **stop**
 - **try-restart**
 - **unmask**

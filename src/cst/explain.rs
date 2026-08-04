@@ -120,7 +120,19 @@ fn effective_verdict(pipeline: &Pipeline, covered: &impl Fn(&Cmd) -> bool) -> Ve
         return base;
     }
     if !pipeline.commands.is_empty() && pipeline.commands.iter().all(covered) {
-        return Verdict::Allowed(SafetyLevel::Inert);
+        // `SafeWrite`, the TOP of the auto-approve band — not `Inert`.
+        //
+        // A `permissions.allow` rule says the user accepts this command. It does NOT say the command
+        // is inert, and claiming so was a lie with teeth: `Inert` is the bottom of the ordering, so it
+        // cleared every threshold and a `Bash(rm:*)` rule out-ranked even `--level paranoid`. A
+        // ceiling a per-command rule can lift is not a ceiling.
+        //
+        // Granting at the band's top keeps the rule honoured wherever the band is (the default
+        // threshold IS `SafeWrite`, so ordinary use is unchanged) while letting a stricter level
+        // clamp it: `paranoid` and `reader` now refuse a covered command, which is what someone
+        // asking for a read-only plan meant. The grant widens what is allowed; it no longer escapes
+        // the ceiling the user stated.
+        return Verdict::Allowed(SafetyLevel::SafeWrite);
     }
     base
 }
