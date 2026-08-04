@@ -51,6 +51,41 @@ refusal says nothing about whether `-f` is gated. Both halves of that sentence w
 nothing. Whether nix-env's `-f` needs a gate is still OPEN and becomes a real question the moment
 any nix-env invocation is allowed.
 
+### The RELOCATION sub-class — confirmed live 2026-08-03, NOT yet fixed
+
+The seven above are *executor* values: the flag names a program to run. There is a second sub-class
+in the same `valued` lists that is still open. The value is not a program but a WORKING DIRECTORY,
+project root, repo, or config file — it does not run anything itself, it moves where everything else
+lands. Confirmed auto-approving, each with a control run so the result means something:
+
+    composer -d /etc install          writes vendor/ + runs post-install scripts, in /etc
+    composer -d ~/.ssh install        same, in a credential store
+    jj -R /etc new                    creates a commit in a repo outside the workspace
+    hatch --project /etc build        builds against a project outside the workspace
+    hatch --data-dir /etc build       relocates hatch's own data directory
+    mc --config-dir /etc ls x         relocates mc's config directory
+    helmfile -f /etc/h.yaml list      reads a helmfile from outside the workspace
+    i18n-tasks -c /etc/i.yml health   reads a config from outside the workspace
+    alembic -c /etc/a.ini current     alembic's ini names the migration script location (code)
+
+What makes these a GAP rather than a stance is that the same shape is handled elsewhere, three
+different ways — so the fix has templates rather than needing a design:
+
+    git -C /etc add .                 DENIES — fails closed on `-C` with any write sub. Cheapest
+                                      correct answer; does not model the directory, just refuses.
+    cargo run --manifest-path /etc/…  DENIES — modelled properly via the executor redirect flag.
+    vite --config /etc/v.js build     DENIES — the value is gated.
+
+Two cautions for whoever picks this up, both learned the hard way on this pass:
+
+  - RUN THE CONTROL. `env -C /etc cat master.passwd`, `xargs -a /etc/master.passwd echo`,
+    `watch … `, `sudo … ` and `script … ` all deny — by OMISSION, because those flags/commands are
+    not allowlisted at all. They are evidence of nothing, exactly as the CORRECTION above records
+    for `borg --rsh` and `nix-env -f`. Check the safe twin (`env -C /tmp ls`) before concluding.
+  - `git add /etc/x` is APPROVED (git's positionals are not locus-gated). Probably harmless — git
+    stages into its own index and refuses paths outside the repo — but it is unexamined, and it is
+    a different question from `-C`.
+
 **Shape of the work**, mirroring the env-prefix project: go through every `[command.wrapper]` (57 of
 them) and classify each entry in `valued` as inert, a path (with a role), or a command. Inert stays
 listed; a path gets a locus gate; a command recurses through `command_verdict`; anything unresearched
@@ -192,6 +227,40 @@ Each needs the per-flag research this section describes — the ~14,600 valued f
 by name alone.
 
 Found 2026-07-27 while reviewing the env-assignment work.
+
+## DECISION NEEDED: `permissions.allow` out-ranks every level, including `paranoid`
+
+Surfaced while unifying the CLI with the hook (2026-08-03). The coverage fallback marks a segment
+covered by the user's own `permissions.allow` as `Allowed(Inert)`, and `Inert` clears every
+threshold. So a `Bash(rm:*)` rule in `~/.claude/settings.json` auto-approves `rm -rf /` even at
+`--level paranoid`.
+
+This is long-standing hook behaviour, not new; what changed is that the CLI now reports it instead
+of computing a stricter answer no harness would give. Two defensible readings and no obvious winner:
+
+  - The rule is the user's own explicit statement, so it should win — the same principle as "a grant
+    covers what it names", and safe-chains does not second-guess a deliberate act.
+  - `level` is the ceiling, and a ceiling that a per-command rule can lift is not a ceiling. Someone
+    setting `paranoid` is asking for a read-only plan and probably does not mean "except for the 300
+    Bash() rules I accumulated for a different purpose."
+
+Worth noting the two are separable: the coverage bridge could keep granting while the LEVEL clamps
+the result (`min(covered, threshold)` rather than `Inert`), which honours the rule without letting
+it exceed the stated ceiling. Not implemented; recording the option so the choice is informed.
+
+## Verify the `config_load` nightly actually goes green
+
+The nightly failed four nights running on `config_load` — NOT a crash. The job carries
+`timeout-minutes: 75` around 3600s of fuzzing, ran 80 minutes, and was killed; its siblings finish
+in ~61. The one difference is that every malformed config printed two lines to stderr, the target
+feeds mostly-invalid TOML, and it calls the loader twice per input. That is now silent under
+`cfg(fuzzing)`.
+
+The honest caveat: measured locally, silencing took it from 9,488 to 14,167 exec/s — 1.5x, which
+does NOT by itself account for a twenty-minute overrun. Runner log ingestion is far slower than the
+local pipe the measurement went through, so the gap is consistent with the flooding without being
+proven by it. If the nightly still overruns after this ships, the cause is elsewhere and the next
+step is to instrument the job rather than assume.
 
 ## Follow-up: remaining JVM code-supplying flags (deliberately denied)
 
