@@ -83,6 +83,29 @@ fn a_claude_rule_still_counts_on_claude() {
     }
 }
 
+/// The CLI must answer as the Claude hook does, because it is the tool people run to ask what the
+/// hook decided.
+///
+/// Scoping the bridges to the Claude target broke this: the CLI sets no target, so it stopped
+/// honoring the `Read()` grants and started refusing paths the hook allowed. A debugging tool that
+/// disagrees with the thing it debugs is worse than no tool — the same lesson as defaulting `--root`
+/// to `--cwd`, on a different axis, and it went unnoticed for exactly one commit.
+#[test]
+fn the_cli_agrees_with_the_claude_hook_about_claude_grants() {
+    let home = home_with_claude_rules();
+    // A path only the borrowed `Read()` rule can admit.
+    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--cwd", "/work", "--root", "/work", GATED_READ])
+        .env("HOME", home.path())
+        .output()
+        .expect("run safe-chains");
+    assert!(
+        out.status.success(),
+        "the CLI refused `{GATED_READ}` while the Claude hook allows it: the bridges are \
+         target-scoped, and the CLI's target is Claude"
+    );
+}
+
 /// And no OTHER target may inherit them, whatever its capability model happens to be. Enumerated so
 /// a target added later cannot quietly start borrowing another tool's grants.
 #[test]

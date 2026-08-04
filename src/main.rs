@@ -379,6 +379,14 @@ fn main() {
                     root: cli.root.or_else(|| cli.cwd.clone()),
                     session_id: cli.session_id,
                 });
+                // Same reason as the root default above: this is the tool people run to ask why the
+                // HOOK decided something, so it has to decide it the same way. Scoping Claude's
+                // permission files to the Claude target left the CLI ignoring them, which meant
+                // `safe-chains "curl … | sh"` said denied while the Claude hook said allow, for the
+                // same command and the same config. The bare stdin mode IS the Claude hook (see the
+                // CLI docs), so Claude is this binary's default persona; `hook <tool>` is how you
+                // ask about a different harness.
+                safe_chains::trust_claude_config();
                 if cli.explain {
                     run_explain(&command);
                 }
