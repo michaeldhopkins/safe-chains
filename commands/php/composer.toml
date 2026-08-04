@@ -3,6 +3,12 @@ name = "composer"
 description = "PHP dependency manager. install and dump-autoload write to the vendor directory and can execute post-install scripts defined in composer.json (arbitrary PHP/shell). --no-scripts disables script execution. update rewrites composer.lock. require/remove modify composer.json. exec and run-script execute arbitrary vendored binaries or scripts. Read-only subcommands (show, audit, outdated, validate, depends, prohibits, search) inspect packages and metadata. config without --list modifies composer.json. browse/home opens a browser. Mature, stable project with releases a few times per year."
 url = "https://getcomposer.org/doc/03-cli.md"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = ["composer install", "composer -d ./packages/api install"]
+examples_denied = [
+    "composer -d /etc install",
+    "composer -d ~/.ssh install",
+    "composer -d /tmp/evil install",
+]
 [command.wrapper]
 standalone = [
     "--ansi", "--no-ansi", "--no-cache", "--no-interaction",
@@ -10,6 +16,14 @@ standalone = [
     "-n", "-q", "-v", "-vv", "-vvv",
 ]
 valued = ["--working-dir", "-d"]
+
+# `-d`/`--working-dir` moves the directory composer operates in, so it decides where `install`
+# writes `vendor/` AND whose `composer.json` scripts run — `composer -d ~/.ssh install` executed
+# post-install scripts inside a credential store and auto-approved. `exec` rather than `write`
+# because the value selects CODE: `write` admits `/tmp`, which would leave `-d /tmp/evil install`
+# running a planted project's scripts. An in-workspace relocation (`-d ./packages/api`) still works.
+[command.path_gate]
+flags = { "--working-dir" = "exec", "-d" = "exec" }
 
 [[command.sub]]
 name = "about"

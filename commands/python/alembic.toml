@@ -4,10 +4,19 @@ description = "SQLAlchemy database migration tool. `current`, `history`, `heads`
 url = "https://alembic.sqlalchemy.org/"
 researched_version = "alembic 1.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = ["alembic current", "alembic -c ./alembic.ini current"]
+examples_denied = ["alembic -c /etc/a.ini current"]
 
 [command.wrapper]
 standalone = ["--quiet", "--raiseerr", "-q"]
 valued = ["--config", "--name", "-c", "-n"]
+
+# `-c`/`--config` names an alembic.ini, and that ini's `script_location` points at the migration
+# package alembic IMPORTS and runs (env.py plus the revision modules). So the value selects code,
+# not just settings — `exec`, which withholds `/tmp` as well as system and home paths.
+# (`-n`/`--name` selects a section within that ini; it is not a path.)
+[command.path_gate]
+flags = { "--config" = "exec", "-c" = "exec" }
 
 [[command.sub]]
 name = "current"
