@@ -350,6 +350,10 @@ fn match_flag<'a>(spec: &RoleSpec, tokens: &'a [Token], i: usize) -> Option<(Rol
 /// Exposed for the `gate_prefilter` fuzz target, which asserts the one invariant the pre-filter can
 /// break: a value the judge refuses must not be skipped before the judge ever sees it. Deliberately
 /// returns the JUDGE's answer rather than the gate's, so the two can be compared.
+///
+/// `doc(hidden)` for the same reason as `registry::fuzz_load_config`: the fuzz target is a separate
+/// crate so this must be `pub`, but this crate publishes to crates.io and a test seam is not API.
+#[doc(hidden)]
 pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
     let role = GATES
         .roles
@@ -370,6 +374,7 @@ pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
 /// The positional companion to [`judge_for_flag`], for the same fuzz target. The target still skips
 /// flag-shaped values here, because `walk` peels those off before a token is treated as a
 /// positional at all — feeding one in would test a path the real code never takes.
+#[doc(hidden)]
 pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
     let role = GATES
         .roles
