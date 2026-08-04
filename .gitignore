@@ -34,3 +34,8 @@ fuzz/artifacts/
 .playwright-mcp/
 COMMANDS.md.tmp
 COMMANDS.md.check
+# `safe-chains --suggest` WRITES a repo config as a side effect, so testing that path inside this
+# repo leaves one behind. Under jj an untracked file is snapshotted by the next command, so it
+# lands in a commit with nobody running an `add` — which happened while reviewing this stack.
+# A real `.safe-chains.toml` for this project would need `git add -f`, deliberately.
+.safe-chains.toml
