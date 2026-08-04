@@ -92,6 +92,18 @@ fn arb_shell_fragment() -> impl Strategy<Value = String> {
         Just("bash".into()), Just("-c".into()), Just("perl".into()), Just("-e".into()),
         Just("sed".into()), Just("mlr".into()), Just("find".into()), Just("git".into()),
         Just("xargs".into()), Just("rm".into()), Just("cargo".into()), Just("go".into()),
+        // Brace-expansion GROUPS, spelled contiguously. The bare `{` and `}` above are joined with a
+        // space, so no combination of them ever produced `{,}` — the fan-out that charges the shared
+        // classify budget was unreachable from this generator, and every guard built on it was blind
+        // to the whole expansion path. `{,}` is the dense form: two empty alternatives, so it costs
+        // work without changing what the command means.
+        Just("{,}".into()), Just("{,}{,}{,}".into()), Just("{a,b}".into()),
+        // A word dense enough to approach the budget on its own (8 groups = 256 alternatives).
+        // Fan-out is charged per word and the cap is 512, so the space-joined fragments above can
+        // never get near it — 28 words of 8 is still only 224. Reaching the CAP is the whole point:
+        // the interesting behaviour of a budget lives at its boundary, and the order-dependence bug
+        // was only observable when one call left the counter close enough for the next to cross it.
+        Just("{,}{,}{,}{,}{,}{,}{,}{,}".into()),
         "[a-z]{1,4}", "-[a-z]{1,3}", "[/.~][a-z/.]{0,4}", "\\$[A-Za-z]{1,3}",
     ]
 }
@@ -121,6 +133,89 @@ proptest! {
         let e1 = crate::cst::explain(&line).render();
         let e2 = crate::cst::explain(&line).render();
         prop_assert_eq!(e1, e2, "nondeterministic explain for `{}`", line.escape_debug().to_string());
+    }
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(1500))]
+
+    /// The explanation must describe the verdict that was ENFORCED, and that agreement may not
+    /// depend on WHEN it is asked.
+    ///
+    /// Both halves are load-bearing, and the second is the one that caught a real bug. The classifier
+    /// carries a thread-local work budget that used to be cleared on the way IN but never on the way
+    /// OUT, so a caller that takes no guard — `explain` is one — began with whatever the previous
+    /// classification had spent and failed closed on work it had not done. The verdict therefore
+    /// depended on call ORDER: enforce-then-explain diverged where explain-then-enforce agreed.
+    ///
+    /// Order is exercised in-thread on purpose. Proptest reuses the thread across cases, so residue
+    /// from earlier cases is live here exactly as it is in a long-running process — spawning a clean
+    /// thread per case would hide the very state this guard exists to catch.
+    #[test]
+    fn explain_agrees_with_enforcement_whatever_the_call_order(
+        frags in proptest::collection::vec(arb_shell_fragment(), 0..28),
+    ) {
+        let line = frags.join(" ");
+        let shown = line.escape_debug().to_string();
+
+        let enforced = command_verdict(&line).is_allowed();
+        let explained_after = crate::cst::explain(&line).is_allowed();
+        prop_assert_eq!(
+            enforced, explained_after,
+            "explain disagreed with enforcement when asked SECOND for `{}`", shown
+        );
+
+        let explained_first = crate::cst::explain(&line).is_allowed();
+        let enforced_after = command_verdict(&line).is_allowed();
+        prop_assert_eq!(
+            explained_first, enforced_after,
+            "explain disagreed with enforcement when asked FIRST for `{}`", shown
+        );
+        prop_assert_eq!(
+            enforced, enforced_after,
+            "enforcement changed across repeated calls for `{}`", shown
+        );
+    }
+}
+
+/// The same invariant, swept ACROSS THE BUDGET BOUNDARY, which is the only place it can break.
+///
+/// The proptest above states the rule but cannot be relied on to reach it: a divergence needs a
+/// command that is ALLOWED and lands within one call's residue of `MAX_CLASSIFY_WORK`, and randomly
+/// assembled fragments almost always deny outright, so both paths agree trivially. Measured — with
+/// the fix disabled, the generator found nothing across 1500 cases while this sweep fails on the
+/// first crossing.
+///
+/// The corpus is CONSTRUCTED, not pasted. Sweeping both group counts covers the boundary wherever it
+/// sits, so a change to the cap or to the fan-out charge moves the failing member instead of
+/// silently emptying the test; `a = 3, b = 4` happens to be the input the `explain_render` fuzz
+/// target found, which is why the sweep is written to contain it rather than hard-coding it.
+#[test]
+fn explain_agrees_with_enforcement_across_the_classify_budget_boundary() {
+    const G: &str = "{,}";
+    let mut corpus: Vec<String> = Vec::new();
+    for a in 1..=8 {
+        for b in 1..=8 {
+            corpus.push(["perl ", G, " -", G, "e", &G.repeat(a), "\\~", &G.repeat(b)].concat());
+        }
+        corpus.push(["perl -e print", &G.repeat(a)].concat());
+        corpus.push(["ls ./a", &G.repeat(a)].concat());
+    }
+
+    for line in corpus {
+        let enforced = command_verdict(&line).is_allowed();
+        let explained_after = crate::cst::explain(&line).is_allowed();
+        assert_eq!(
+            enforced, explained_after,
+            "explain disagreed with enforcement when asked SECOND for `{line}`"
+        );
+
+        let explained_first = crate::cst::explain(&line).is_allowed();
+        let enforced_after = command_verdict(&line).is_allowed();
+        assert_eq!(
+            explained_first, enforced_after,
+            "explain disagreed with enforcement when asked FIRST for `{line}`"
+        );
     }
 }
 

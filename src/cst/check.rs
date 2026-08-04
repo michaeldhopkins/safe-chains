@@ -24,10 +24,10 @@ const MAX_CLASSIFY_WORK: u32 = 512;
 /// RAII budget guard for the classifier recursion. `enter` resets the budget at the OUTERMOST call
 /// and charges one unit per (re-)entry; `None` means the budget is spent and the caller must fail
 /// closed. Depth is bumped only on a successful enter, so it stays balanced with the `Drop`.
-struct ClassifyGuard;
+pub(super) struct ClassifyGuard;
 
 impl ClassifyGuard {
-    fn enter() -> Option<Self> {
+    pub(super) fn enter() -> Option<Self> {
         if CLASSIFY_DEPTH.with(|d| d.get()) == 0 {
             CLASSIFY_WORK.with(|w| w.set(0));
         }
@@ -46,7 +46,21 @@ impl ClassifyGuard {
 
 impl Drop for ClassifyGuard {
     fn drop(&mut self) {
-        CLASSIFY_DEPTH.with(|d| d.set(d.get().saturating_sub(1)));
+        let depth = CLASSIFY_DEPTH.with(|d| {
+            let n = d.get().saturating_sub(1);
+            d.set(n);
+            n
+        });
+        // Clearing on the way OUT, not only on the way in, is what makes the budget per-call for
+        // callers that never take a guard. `explain()` and `suggest::analyze()` walk and brace-expand
+        // a command without entering here, so they used to start with whatever the previous
+        // classification had spent and trip `MAX_CLASSIFY_WORK` on work they had not done. That made
+        // the verdict ORDER-DEPENDENT: `perl {,} -{,}e{,}{,}{,}\~{,}{,}{,}{,}` was allowed by
+        // `is_safe_command` and reported not-allowed by a following `explain` — the hook auto-approving
+        // while telling the reader it had not. Found by the `explain_render` fuzz target.
+        if depth == 0 {
+            CLASSIFY_WORK.with(|w| w.set(0));
+        }
     }
 }
 

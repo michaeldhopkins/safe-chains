@@ -46,6 +46,27 @@ pub fn explain_with_coverage(input: &str, patterns: &Matcher) -> Explanation {
 }
 
 fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
+    // ONE work budget for the whole explanation, taken the same way `command_verdict` takes it.
+    //
+    // Without this, explaining had no budget of its own: brace-expansion fan-out charged the shared
+    // counter while the per-segment classifications inside reset it whenever one bottomed out at
+    // depth 0. The result depended on how much the CALLER had already spent and on where the resets
+    // fell, so `explain` was neither order-independent (it disagreed with the verdict enforced just
+    // before it) nor deterministic (two consecutive calls on one dense input rendered different
+    // answers). Entering here resets once, at the top, and keeps every nested classification at
+    // depth >= 1, which is what makes explaining and enforcing spend from the same pool.
+    let Some(_guard) = super::check::ClassifyGuard::enter() else {
+        return Explanation {
+            overall: Verdict::Denied,
+            segments: vec![SegmentReport {
+                text: input.trim().to_string(),
+                verdict: Verdict::Denied,
+                culprit: None,
+            }],
+            parsed: false,
+            stateful: false,
+        };
+    };
     let Some(script) = parse(input) else {
         return Explanation {
             overall: Verdict::Denied,
