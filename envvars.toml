@@ -114,6 +114,9 @@ because = "as RUSTC_WRAPPER, for workspace members"
 [env.CARGO_BUILD_RUSTC_WRAPPER]
 shape = "command"
 because = "the CARGO_* config-mirror spelling of RUSTC_WRAPPER"
+[env.CARGO_MUTANTS_OUTPUT]
+shape = "data-path"
+because = "names the directory cargo-mutants creates mutants.out in — the environment spelling of its --output flag, which the cargo mutants entry deliberately omits. Left unlisted the assignment is simply ignored, so the write lands wherever it points"
 [env.RUSTC]
 shape = "command"
 because = "replaces the compiler cargo invokes"

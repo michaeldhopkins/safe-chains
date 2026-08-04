@@ -5,6 +5,11 @@ url = "https://doc.rust-lang.org/cargo/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
   "cargo fuzz --version",
+  "cargo mutants",
+  "cargo mutants --list",
+  "cargo mutants --list --json",
+  "cargo mutants -j 4 --shard 1/4",
+  "cargo mutants -f src/lib.rs --check",
   "cargo sweep --time 5",
   "cargo sweep -r --installed",
   "cargo sweep --dry-run --maxsize 500",
@@ -29,6 +34,15 @@ examples_safe = [
   "cargo swift package --features foo --all-features",
 ]
 examples_denied = [
+  # cargo-mutants: the escape hatches, one per mechanism. -C/--cargo-test-args feed arbitrary args
+  # to cargo, --error injects a Rust expression that gets compiled and run, --in-place mutates the
+  # real source tree, and -o/-d relocate the write or the project.
+  "cargo mutants -C --target-dir=/tmp/x",
+  "cargo mutants --cargo-test-args -- rm -rf /",
+  "cargo mutants --error unlink",
+  "cargo mutants --in-place",
+  "cargo mutants -o /etc",
+  "cargo mutants -d /etc",
   # every real cargo-fuzz sub turns an operand into a path; only the informational forms are listed
   "cargo fuzz cmin parse ~/.ssh",
   "cargo fuzz add ../../../etc/x",
@@ -417,6 +431,61 @@ name = "verify-project"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--manifest-path"]
+
+# cargo-mutants, researched at 27.1.0 (CalVer; released 2026-06-02).
+#
+# Copies the tree to a scratch dir in TMPDIR (one per `-j` job; `.git` and `target/` excluded by
+# default), applies one mutation, then builds and runs the test suite — once per mutant. So it
+# executes workspace-own code (build.rs, proc macros, tests) exactly as `cargo test` does, which is
+# why it sits at the same level, with one caveat upstream states plainly: the code it runs has been
+# deliberately corrupted, and a mutated function can make otherwise-safe test code misbehave.
+# `mutants.out` is written in the source dir and ROTATES (previous -> .out.old) rather than growing.
+# `--list`/`--list-files` return before any output dir is created, so they write nothing at all.
+#
+# `max_positional = 0` is load-bearing, and for the same reason it is on `fuzz` above: `--cargo-test-args`
+# consumes everything after `--`, so an unbounded entry would let a command line be parsed as
+# unremarkable positionals under an entry that claims to describe flags.
+#
+# OFF this list, each for its own reason rather than by oversight:
+#   -C/--cargo-arg, --cargo-test-arg, --cargo-test-args  arbitrary args into every cargo invocation —
+#       the same injection surface the top-level description refuses for `cargo --config KEY=VALUE`
+#   --error <EXPR>       a Rust expression injected as a mutant's return value, then compiled AND run
+#   --in-place           mutates the real source tree; an interrupted run leaves mutated code behind
+#   -o/--output <DIR>    writes mutants.out into any directory (see CARGO_MUTANTS_OUTPUT in
+#                        envvars.toml, which is the env spelling of the same thing)
+#   -d/--dir, --manifest-path   retarget a DIFFERENT project, i.e. select whose code runs
+#   --config <FILE>      reads a config from outside the worktree. `.cargo/mutants.toml` INSIDE the
+#                        tree can set additional_cargo_args, but that is workspace-own and the same
+#                        class as .cargo/config.toml; `--no-config` is strictly narrowing, so it stays
+#   -D/--in-diff, --Zmutate-file   open an arbitrary path, so they are reads that escape the worktree
+#
+# Optional-value flags (--cap-lints, --jobserver, --copy-target, --copy-vcs, --gitignore,
+# --skip-calls-defaults, --test-workspace) are omitted rather than guessed: the schema cannot express
+# "flag with an OPTIONAL value" today (see TODO.md, the standalone/valued overlap), and declaring one
+# in either list would assert a grammar the tool does not have.
+#
+# `-V` is `--unviable` here, NOT `--version`. It takes no value either way, but the entry must not
+# imply cargo-mutants accepts `-V` as a version flag — it does not.
+[[command.sub]]
+name = "mutants"
+level = "SafeRead"
+max_positional = 0
+standalone = [
+    "--all-features", "--all-logs", "--caught", "--check", "--help",
+    "--iterate", "--json", "--leak-dirs", "--list", "--list-files",
+    "--no-config", "--no-default-features", "--no-shuffle", "--no-times",
+    "--shuffle", "--unviable", "--version", "--workspace",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--annotations", "--baseline", "--build-timeout", "--build-timeout-multiplier",
+    "--colors", "--completions", "--emit-schema", "--exclude", "--exclude-re",
+    "--features", "--file", "--jobs", "--jobserver-tasks", "--level",
+    "--line-col", "--minimum-test-timeout", "--package", "--profile",
+    "--re", "--shard", "--skip-calls", "--test-package", "--timeout",
+    "--timeout-multiplier",
+    "-E", "-F", "-L", "-e", "-f", "-j", "-p", "-t",
+]
 
 [[command.sub]]
 name = "nextest"
