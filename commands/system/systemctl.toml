@@ -1,7 +1,7 @@
 [[command]]
 name = "systemctl"
 researched_version = "systemd 257 (2024)"
-description = "Primary management tool for systemd, Linux's init system and service manager. Its subcommands split cleanly by behavior. READ-ONLY inspection (status, show, is-active, is-enabled, is-failed, list-units, list-unit-files, list-sockets, list-timers, list-dependencies, cat) reports service states, unit configurations, dependency trees, and timer schedules without changing anything. SERVICE MANAGEMENT (start, stop, restart, reload, try-restart, reload-or-restart, condrestart, force-reload, enable, disable, reenable, preset, mask, unmask, daemon-reload, daemon-reexec, isolate, set-default, kill, reset-failed, set-property) changes running and boot-time system state and requires root for system units: privileged, machine-scoped, persistent (enable/disable/mask write unit symlinks under /etc/systemd/system), but recoverable -- the inverse subcommand restores the prior state, so none of it is irreversible destruction. POWER-STATE control (reboot, poweroff, halt, kexec, suspend, hibernate, hybrid-sleep, emergency, rescue) takes the whole machine down and is the most disruptive surface -- deliberately not auto-classified here. The `edit` subcommand launches an editor (arbitrary unit config). The interface is tied to systemd releases and is very stable."
+description = "Primary management tool for systemd, Linux's init system and service manager. Its subcommands split cleanly by behavior. READ-ONLY inspection (status, show, is-active, is-enabled, is-failed, list-units, list-unit-files, list-sockets, list-timers, list-dependencies, cat) reports service states, unit configurations, dependency trees, and timer schedules without changing anything. SERVICE MANAGEMENT (start, stop, restart, reload, try-restart, reload-or-restart, condrestart, force-reload, enable, disable, reenable, preset, mask, unmask, daemon-reload, daemon-reexec, isolate, set-default, kill, reset-failed, set-property) changes running and boot-time system state and requires root for system units: privileged, machine-scoped, persistent (enable/disable/mask write unit symlinks under /etc/systemd/system), but recoverable -- the inverse subcommand restores the prior state, so none of it is irreversible destruction. POWER-STATE control (reboot, poweroff, halt, kexec, suspend, hibernate, hybrid-sleep, emergency, rescue) takes the whole machine down and is the most disruptive surface -- deliberately not auto-classified here. The `edit` subcommand launches an editor (arbitrary unit config). Two global options change WHICH SYSTEM every one of these acts on: `-H`/`--host=` connects to a remote host over SSH, and `-M`/`--machine=` operates inside a local container. Either turns even a read like `status` into an operation on a system other than this one, so the locus is no longer local regardless of how harmless the subcommand looks. The interface is tied to systemd releases and is very stable."
 url = "https://man7.org/linux/man-pages/man1/systemctl.1.html"
 bare_flags = ["--help", "--version", "-h"]
 examples_safe = [
@@ -11,6 +11,13 @@ examples_safe = [
     "systemctl cat nginx",
 ]
 examples_denied = [
+    # -H/--host retargets systemctl at ANOTHER machine over SSH and -M/--machine at a container, so
+    # they turn every read here into an operation on a system that is not this one. They reached the
+    # read subs through `tolerate_unknown_short`, which accepted any short flag whatever the sub had
+    # enumerated; that tolerance is gone from the read subs and these pin it.
+    "systemctl status nginx -H remote.example.com",
+    "systemctl status nginx -M container",
+    "systemctl show nginx -H remote.example.com",
     "systemctl restart nginx",
     "systemctl enable nginx",
     "systemctl daemon-reload",
@@ -20,32 +27,27 @@ examples_denied = [
 
 [[command.sub]]
 name = "status"
-tolerate_unknown_short = true
-standalone = ["--all", "--full", "--help", "--lines", "--no-pager", "-a", "-h", "-l"]
+standalone = ["--all", "--full", "--help", "--lines", "--no-pager", "--quiet", "-a", "-h", "-l", "-q"]
 valued = ["-n", "--output", "-o"]
 
 [[command.sub]]
 name = "show"
-tolerate_unknown_short = true
-standalone = ["--all", "--help", "--no-pager", "-a", "-h"]
-valued = ["--property", "-p"]
+standalone = ["--all", "--help", "--no-pager", "--value", "-a", "-h"]
+valued = ["--property", "-P", "-p"]
 
 [[command.sub]]
 name = "is-active"
 bare = false
-tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "is-enabled"
 bare = false
-tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "is-failed"
 bare = false
-tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
@@ -81,7 +83,6 @@ standalone = ["--all", "--help", "--no-pager", "--plain", "--reverse", "-a", "-h
 [[command.sub]]
 name = "cat"
 bare = false
-tolerate_unknown_short = true
 standalone = ["--help", "--no-pager", "-h"]
 
 # ── Service LIFECYCLE control — `profile = "privileged-control"`: root machine ops that act on
