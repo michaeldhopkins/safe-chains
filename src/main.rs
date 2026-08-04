@@ -12,17 +12,40 @@ fn print_docs() {
     print!("{}", safe_chains::docs::render_markdown(&docs));
 }
 
+/// The CLI's verdict, computed exactly as the hook computes its own.
+///
+/// The hook decides in two steps: the ceilinged verdict, and if that denies, a coverage fallback
+/// that also honors the user's own `permissions.allow` patterns — then gates `overall <= threshold`.
+/// This collapses the two into one call, which is equivalent rather than merely similar:
+/// `effective_verdict` returns the base verdict untouched whenever the base is allowed, so coverage
+/// only ever widens, and with nothing covered `overall` IS the plain verdict.
+///
+/// It used to run `command_verdict_ceilinged` alone and so never saw the user's patterns, which
+/// meant `safe-chains "<cmd>"` reported denied for a command the hook approved. Same footgun as
+/// `--cwd` without `--root`: this is the tool people run to ask what the hook decided.
+///
+/// Worth knowing rather than discovering: a covered segment classifies `Inert`, and `Inert` clears
+/// every threshold. So a `Bash(rm:*)` rule in your own settings out-ranks even `--level paranoid`.
+/// That is what the hook already does; this makes the CLI say so instead of inventing a stricter
+/// answer that no harness would give.
 fn run_cli(
     command: &str,
     threshold: SafetyLevel,
     engine_level: Option<&'static safe_chains::engine::level::Level>,
 ) {
-    let verdict = safe_chains::command_verdict_ceilinged(command, threshold, engine_level);
-    process::exit(i32::from(!verdict.is_allowed()));
+    let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
+    let allowed = matches!(explanation.overall, Verdict::Allowed(level) if level <= threshold);
+    process::exit(i32::from(!allowed));
 }
 
-fn run_explain(command: &str) -> ! {
-    let explanation = safe_chains::cst::explain(command);
+fn run_explain(
+    command: &str,
+    engine_level: Option<&'static safe_chains::engine::level::Level>,
+) -> ! {
+    // Coverage here too, and for the same reason: the hook renders THIS explanation into the
+    // model's context, so an `--explain` that omitted the user's own patterns showed a `✗` beside a
+    // segment the agent had just watched be approved.
+    let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
     print!("{}", explanation.render());
     // The facet breakdown is CLI-only. `render()` also feeds the hook's injected context, where an
     // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
@@ -387,12 +410,10 @@ fn main() {
                 // CLI docs), so Claude is this binary's default persona; `hook <tool>` is how you
                 // ask about a different harness.
                 safe_chains::trust_claude_config();
-                if cli.explain {
-                    run_explain(&command);
-                }
-                if cli.suggest {
-                    run_suggest(&command);
-                }
+                // The level is resolved BEFORE `--explain`, which used to run first and so
+                // explained at the default band whatever `--level` said. The hook explains under
+                // its configured level; asking why something was refused under `reader` should
+                // answer about `reader`.
                 let (threshold, engine_level) = match cli.level.as_deref() {
                     None => (SafetyLevel::SafeWrite, None), // default: developer
                     Some(name) => {
@@ -416,6 +437,15 @@ fn main() {
                         }
                     }
                 };
+                // `--explain` still wins over `--suggest` when both are passed, as it did before the
+                // level resolution moved above them. Swapping that precedence would have been a
+                // silent side effect of an unrelated change.
+                if cli.explain {
+                    run_explain(&command, engine_level);
+                }
+                if cli.suggest {
+                    run_suggest(&command);
+                }
                 run_cli(&command, threshold, engine_level);
             } else if io::stdin().is_terminal() {
                 Cli::command().print_help().ok();
