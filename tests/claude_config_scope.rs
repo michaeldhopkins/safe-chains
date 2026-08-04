@@ -106,6 +106,36 @@ fn the_cli_agrees_with_the_claude_hook_about_claude_grants() {
     );
 }
 
+/// The CLI and the Claude hook must reach the same verdict for a command covered ONLY by the user's
+/// own `permissions.allow` rule.
+///
+/// This is the harder half of CLI/hook agreement. The read-grant bridge flows through the verdict
+/// path, so the CLI picked it up once the target was set; the COVERAGE bridge does not — it lives in
+/// `explain_with_coverage_at_level`, which was hook-only. So the CLI ran a different computation
+/// entirely and reported denied for commands the hook approved, for as long as both have existed.
+#[test]
+fn the_cli_and_the_claude_hook_agree_about_a_user_covered_command() {
+    let home = home_with_claude_rules();
+
+    let cli = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--cwd", "/work", "--root", "/work", GATED_COMMAND])
+        .env("HOME", home.path())
+        .output()
+        .expect("run safe-chains");
+    let hook = decision("claude", GATED_COMMAND, home.path());
+
+    let hook_allows = hook.contains(r#""permissionDecision":"allow""#);
+    assert_eq!(
+        cli.status.success(),
+        hook_allows,
+        "CLI says allowed={}, Claude hook says allowed={hook_allows} for `{GATED_COMMAND}` — the \
+         tool people run to ask what the hook decided must decide it the same way",
+        cli.status.success()
+    );
+    // Pin the direction too, so this cannot pass by both sides refusing for some unrelated reason.
+    assert!(hook_allows, "the user's own Bash(curl:*)/Bash(sh:*) rules should cover this");
+}
+
 /// And no OTHER target may inherit them, whatever its capability model happens to be. Enumerated so
 /// a target added later cannot quietly start borrowing another tool's grants.
 #[test]
