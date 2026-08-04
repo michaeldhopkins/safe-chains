@@ -248,6 +248,31 @@ Worth noting the two are separable: the coverage bridge could keep granting whil
 the result (`min(covered, threshold)` rather than `Inert`), which honours the rule without letting
 it exceed the stated ceiling. Not implemented; recording the option so the choice is informed.
 
+## `slow-unit-*` in the nightly artifacts — CHECKED AND CLEARED (2026-08-03)
+
+The nightly uploads `slow-unit-*` files for `level_monotonic` (2) and `suggest_roundtrip` (1) even
+on runs where those jobs PASS: libFuzzer saves a slow input, and the "Fail on crashes" step greps
+only `crash-*`/`timeout-*`/`oom-*`. They looked alarming — 7.6s, 8.9s and 8.8s for inputs of 221–387
+bytes, in a tool that runs as a PreToolUse hook before every command.
+
+They are instrumentation, not a hazard. Measured on the release binary: 2.5ms, 2.5ms and 44.5ms per
+run, against a 45ms baseline for `ls -la` that is essentially process startup. The fuzz figure is
+sanitizer coverage instrumentation plus, for `level_monotonic`, one classification PER LEVEL per
+input.
+
+Recorded mainly for HOW to measure it, because three attempts were wrong before one was right:
+
+  - `/usr/bin/time -p CMD >/dev/null 2>/dev/null` swallows time's OWN output. Put the redirects
+    inside `sh -c` so the timing line survives.
+  - The inputs are invalid UTF-8, and clap rejects an invalid-UTF-8 argv with exit 2 before
+    classifying anything. A "0.00s" there measures argument parsing. Sanitize with
+    `iconv -f UTF-8 -t UTF-8 -c` (approximating the target's `from_utf8_lossy`) and CHECK THE EXIT
+    CODE — 1 or 0 means it ran, 2 means it never started.
+  - `run_cli` is not what `suggest_roundtrip` exercises. Time `--suggest` for that target and
+    `--level` for `level_monotonic`, or the number is about a different code path.
+
+If the "Fail on crashes" step is ever extended to `slow-unit-*`, expect these three to trip it.
+
 ## Verify the `config_load` nightly actually goes green
 
 The nightly failed four nights running on `config_load` — NOT a crash. The job carries
