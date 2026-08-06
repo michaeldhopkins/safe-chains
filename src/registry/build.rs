@@ -5,6 +5,33 @@ use crate::verdict::SafetyLevel;
 
 use super::types::*;
 
+/// A command definition is invalid. Returns `Err` from the enclosing function instead of panicking.
+///
+/// These checks run on USER-supplied configs as well as the built-in `commands/*.toml`: a
+/// `~/.config/safe-chains.toml` or a repo `.safe-chains.toml` goes through exactly this code. An
+/// abort there takes a PreToolUse hook down, and a crashed hook means the harness PROCEEDS — so a
+/// typo in a config file used to disable safe-chains altogether. It was caught downstream by
+/// `catch_unwind`, but panicking across a library boundary as control flow left two marks: the
+/// default hook printed a panic and a backtrace to stderr on every invocation before anything could
+/// catch it, and under libFuzzer a caught panic is still an abort, which is how `config_load` kept
+/// failing.
+///
+/// The built-in definitions are compiled in and turn an `Err` back into a panic AT THE CALL SITE,
+/// where it belongs: a broken `commands/*.toml` is a bug in this repository, not something a user
+/// typed, and it should stop the process loudly.
+macro_rules! fail {
+    ($($arg:tt)*) => { return Err(format!($($arg)*)) };
+}
+
+/// `assert!` for the same checks: the condition must hold or the definition is rejected.
+macro_rules! ensure {
+    ($cond:expr, $($arg:tt)*) => {
+        if !($cond) {
+            return Err(format!($($arg)*));
+        }
+    };
+}
+
 pub(super) fn build_policy(
     standalone: Vec<String>,
     valued: Vec<String>,
@@ -87,7 +114,7 @@ fn build_verb_chain(toml: TomlVerbChain) -> VerbChainSpec {
     }
 }
 
-fn build_fallback(parent: &str, toml: TomlFallback) -> FallbackSpec {
+fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, String> {
     let policy = build_policy(
         toml.standalone,
         toml.valued,
@@ -98,25 +125,27 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> FallbackSpec {
         toml.numeric_dash,
     );
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
-    let positional_shape = toml.positional_shape.as_deref().map(|name| {
-        crate::policy::PositionalShape::from_name(name).unwrap_or_else(|| {
-            panic!(
-                "{}: unknown fallback positional_shape `{}` (known: path)",
-                parent, name
-            )
-        })
-    });
-    let executor = toml.executor.as_deref().map(|name| {
-        ExecutorKind::from_name(name)
-            .unwrap_or_else(|| panic!("{parent}: unknown fallback executor `{name}` (known: file, project)"))
-    });
-    FallbackSpec {
+    let positional_shape = match toml.positional_shape.as_deref() {
+        None => None,
+        Some(name) => match crate::policy::PositionalShape::from_name(name) {
+            Some(shape) => Some(shape),
+            None => fail!("{parent}: unknown fallback positional_shape `{name}` (known: path)"),
+        },
+    };
+    let executor = match toml.executor.as_deref() {
+        None => None,
+        Some(name) => match ExecutorKind::from_name(name) {
+            Some(kind) => Some(kind),
+            None => fail!("{parent}: unknown fallback executor `{name}` (known: file, project)"),
+        },
+    };
+    Ok(FallbackSpec {
         policy,
         level,
         positional_shape,
         executor,
         executor_redirect_flag: toml.executor_redirect_flag,
-    }
+    })
 }
 
 fn allow_all_policy() -> OwnedPolicy {
@@ -129,9 +158,9 @@ fn allow_all_policy() -> OwnedPolicy {
     }
 }
 
-fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) {
+fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) -> Result<(), String> {
     if ps.is_some() {
-        panic!(
+        fail!(
             "command '{name}': `positional_style` was removed. Use \
              `tolerate_unknown_short = true` for tools with single-dash \
              flags (pdftotext -help, sample -mayDie). Use \
@@ -141,9 +170,10 @@ fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) {
              on, which has caused safety bugs. Most tools need neither."
         );
     }
+    Ok(())
 }
 
-fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
+fn filter_candidates(subs: Vec<TomlSub>) -> Result<impl Iterator<Item = TomlSub>, String> {
     // Asserted HERE, not in `build_subs`, because that is the whole point: a candidate sub is
     // dropped by this filter and never reaches `build_subs`, so a check placed there could never
     // fire for the case it targets. (It was written there first, and the red demo caught it.)
@@ -153,14 +183,14 @@ fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
     // nested surface declared and reasonably concludes it is in force. Same family as the
     // profiled-leaf assert in `build_subs`, where one field also makes another unreachable.
     for s in &subs {
-        assert!(
+        ensure!(
             !s.candidate.unwrap_or(false) || s.sub.is_empty(),
             "sub `{}`: a `candidate` sub is filtered out, so its nested subs are dead — drop the \
              nested subs, or drop `candidate` if the sub is meant to be live",
             s.name,
         );
     }
-    subs.into_iter().filter(|s| !s.candidate.unwrap_or(false))
+    Ok(subs.into_iter().filter(|s| !s.candidate.unwrap_or(false)))
 }
 
 /// Whether `name` is matched by a `first_arg` pattern (`get-*` prefix glob, or an exact token).
@@ -177,13 +207,13 @@ fn first_arg_matches(name: &str, patterns: &[String]) -> bool {
 /// inverting the author's intent (a deny becomes an allow). This panics at load when it detects that
 /// shape, directing the author to a `profile`/explicit sub-sub instead. (The AWS blob-readers hit
 /// exactly this: a `candidate` under `get-*` would have auto-approved.)
-fn assert_no_candidate_shadowed_by_glob(parent: &str, subs: &[TomlSub], first_arg: &[String]) {
+fn assert_no_candidate_shadowed_by_glob(parent: &str, subs: &[TomlSub], first_arg: &[String]) -> Result<(), String> {
     if first_arg.is_empty() {
-        return;
+        return Ok(());
     }
     for s in subs {
         if s.candidate.unwrap_or(false) && first_arg_matches(&s.name, first_arg) {
-            panic!(
+            fail!(
                 "'{parent}' sub `{}` is `candidate = true` but its name is MATCHED by the sibling \
                  first_arg glob {first_arg:?} — it would fall through the filter and AUTO-APPROVE \
                  (a silent deny→allow inversion). Use `profile`/an explicit sub-sub to deny it, or \
@@ -192,6 +222,7 @@ fn assert_no_candidate_shadowed_by_glob(parent: &str, subs: &[TomlSub], first_ar
             );
         }
     }
+    Ok(())
 }
 
 /// Builds one SubSpec per alias (canonical name first, then each alias).
@@ -202,9 +233,9 @@ pub(super) fn build_subs(
     parent: &str,
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> Vec<SubSpec> {
+) -> Result<Vec<SubSpec>, String> {
     let aliases = toml.aliases.clone();
-    let canonical = build_sub(parent, toml, handler_policies);
+    let canonical = build_sub(parent, toml, handler_policies)?;
     let mut out = Vec::with_capacity(1 + aliases.len());
     for alias in aliases {
         out.push(SubSpec {
@@ -230,7 +261,7 @@ pub(super) fn build_subs(
         });
     }
     out.push(canonical);
-    out
+    Ok(out)
 }
 
 /// Enforce the research standard at build time (reading the TOML fields, so provenance is a
@@ -239,25 +270,25 @@ pub(super) fn build_subs(
 /// real archetype (or the `unclassified` fail-closed escape) and cite its own `fact` + `source`. A
 /// mis-authored classification fails CLOSED — the registry panics at load rather than silently
 /// under-recording why a subcommand sits above the auto-approve line.
-fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
+fn assert_sub_provenance(parent: &str, toml: &TomlSub) -> Result<(), String> {
     let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
     // A `judgment` is optional (the discretionary layer), but if given it must say something.
     let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
     if let Some(p) = &toml.profile {
-        assert!(
+        ensure!(
             crate::engine::archetype::archetype(p).is_some(),
             "{parent} sub `{}`: profile `{p}` is not a known archetype (archetypes.toml)",
             toml.name,
         );
-        assert!(cited(&toml.fact), "{parent} sub `{}`: `profile` requires a `fact`", toml.name);
-        assert!(cited(&toml.source), "{parent} sub `{}`: `profile` requires a `source`", toml.name);
-        assert!(judged(&toml.judgment), "{parent} sub `{}`: `judgment`, if given, must not be blank", toml.name);
+        ensure!(cited(&toml.fact), "{parent} sub `{}`: `profile` requires a `fact`", toml.name);
+        ensure!(cited(&toml.source), "{parent} sub `{}`: `profile` requires a `source`", toml.name);
+        ensure!(judged(&toml.judgment), "{parent} sub `{}`: `judgment`, if given, must not be blank", toml.name);
         // A profiled sub must say what flags it accepts. The engine classifies it from its archetype
         // without running the legacy flag walk, so an EMPTY list is not "nothing permitted" — before
         // this was enforced it meant "everything permitted", and `git rebase --exec 'rm -rf /'`
         // classified as an ordinary rebase. Declaring `tolerate_unknown_*` is the explicit way to say
         // a surface is genuinely unbounded; saying nothing at all is not an option.
-        assert!(
+        ensure!(
             !toml.standalone.is_empty()
                 || !toml.valued.is_empty()
                 || toml.tolerate_unknown_short == Some(true)
@@ -269,42 +300,43 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
         );
         // A profiled sub is a leaf: the engine classifies it by archetype, and its legacy kind is
         // forced to deny-all (below) — a nested Branching would sidestep that.
-        assert!(toml.sub.is_empty(), "{parent} sub `{}`: a profiled sub must be a leaf (no nested subs)", toml.name);
+        ensure!(toml.sub.is_empty(), "{parent} sub `{}`: a profiled sub must be a leaf (no nested subs)", toml.name);
     }
     // `network_destination` classifies the destination onto the archetype's `locus.provenance`, so
     // it only has meaning on a profiled sub.
-    assert!(
+    ensure!(
         toml.network_destination != Some(true) || toml.profile.is_some(),
         "{parent} sub `{}`: `network_destination` requires a `profile`",
         toml.name,
     );
-    assert!(
+    ensure!(
         toml.destination_flag.is_none() || toml.network_destination == Some(true),
         "{parent} sub `{}`: `destination_flag` requires `network_destination`",
         toml.name,
     );
     // An output-file path is only meaningful on a profiled (`data-export`) sub — the engine gates
     // that file's write onto the sub's derived profile.
-    assert!(
+    ensure!(
         toml.output_path_flags.is_empty() || toml.profile.is_some(),
         "{parent} sub `{}`: `output_path_flags` requires a `profile`",
         toml.name,
     );
     for f in &toml.flag {
-        assert!(
+        ensure!(
             f.classifies == "unclassified" || crate::engine::archetype::archetype(&f.classifies).is_some(),
             "{parent} sub `{}` flag `{}`: classifies `{}` is not a known archetype",
             toml.name, f.name, f.classifies,
         );
-        assert!(cited(&f.fact), "{parent} sub `{}` flag `{}`: requires a `fact`", toml.name, f.name);
-        assert!(cited(&f.source), "{parent} sub `{}` flag `{}`: requires a `source`", toml.name, f.name);
-        assert!(judged(&f.judgment), "{parent} sub `{}` flag `{}`: `judgment`, if given, must not be blank", toml.name, f.name);
-        assert!(
+        ensure!(cited(&f.fact), "{parent} sub `{}` flag `{}`: requires a `fact`", toml.name, f.name);
+        ensure!(cited(&f.source), "{parent} sub `{}` flag `{}`: requires a `source`", toml.name, f.name);
+        ensure!(judged(&f.judgment), "{parent} sub `{}` flag `{}`: `judgment`, if given, must not be blank", toml.name, f.name);
+        ensure!(
             !(f.when_absent == Some(true) && f.value_prefix.is_some()),
             "{parent} sub `{}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
             toml.name, f.name,
         );
     }
+    Ok(())
 }
 
 /// `loopback_localizes` says "pointed at this machine, clear the facets the destination decides".
@@ -316,20 +348,20 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
 ///   8000:dynamodb.<region>.amazonaws.com:443` makes `localhost:8000` production — and a wrong
 ///   guess costs a stray write for a mutate and the data for a delete. Refusing it here rather than
 ///   relying on the resolver's runtime skip means no future sub opts out by accident.
-fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSub) {
+fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSub) -> Result<(), String> {
     // Both the admission gate (`presents_unlisted_flag`) and the delta (`sub_loopback_localizes`)
     // are reached only through the PROFILED sub walk, so on an unprofiled sub the declaration is
     // inert — the flag would simply be missing from the legacy lists and deny, with nothing saying
     // why. Fails closed, but silently, which is its own kind of bug.
-    assert!(
+    ensure!(
         toml.loopback_valued.is_empty() || toml.profile.is_some(),
         "{parent} sub `{name}`: `loopback_valued` needs `profile` — the gate is only consulted on \
          a profiled sub, so here it would do nothing at all",
     );
     if !toml.loopback_localizes.unwrap_or(false) {
-        return;
+        return Ok(());
     }
-    assert!(
+    ensure!(
         !toml.loopback_valued.is_empty(),
         "{parent} sub `{name}`: `loopback_localizes` requires a `loopback_valued` flag — without \
          one nothing can establish that the destination is this machine",
@@ -340,25 +372,26 @@ fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSu
     // by name rather than behavior is the exact mistake this classifier exists to avoid.
     let profile = toml.profile.as_deref().unwrap_or_default();
     let operation = crate::engine::archetype::archetype(profile).map(|c| c.operation);
-    assert!(
+    ensure!(
         operation != Some(crate::engine::facet::Operation::Destroy),
         "{parent} sub `{name}`: `profile = \"{profile}\"` carries `operation = destroy` and may \
          not set `loopback_localizes` — a loopback endpoint cannot be verified (an SSH tunnel makes \
          localhost mean production), and that is only unrecoverable for destroy",
     );
+    Ok(())
 }
 
 pub(super) fn build_sub(
     parent: &str,
     mut toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> SubSpec {
-    check_no_legacy_positional_style(&toml.name, toml.positional_style);
+) -> Result<SubSpec, String> {
+    check_no_legacy_positional_style(&toml.name, toml.positional_style)?;
     let name = toml.name.clone();
     let policy_ref = toml.policy.clone();
     let profile = toml.profile.clone();
-    assert_sub_provenance(parent, &toml);
-    assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg);
+    assert_sub_provenance(parent, &toml)?;
+    assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg)?;
     let flags = std::mem::take(&mut toml.flag)
         .into_iter()
         .map(|f| crate::registry::types::FlagProvenance {
@@ -402,16 +435,16 @@ pub(super) fn build_sub(
     } else {
         LoopbackEffect::AdmitOnly
     };
-    assert_loopback_localizes_is_coherent(parent, &name, &toml);
+    assert_loopback_localizes_is_coherent(parent, &name, &toml)?;
     let valued_for_check = toml.valued.clone();
-    assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
-    assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values);
-    assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values);
-    assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags);
-    assert_sub_eval_safe_only_on_leaf(parent, &toml);
-    SubSpec {
+    assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags)?;
+    assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values)?;
+    assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values)?;
+    assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags)?;
+    assert_sub_eval_safe_only_on_leaf(parent, &toml)?;
+    Ok(SubSpec {
         name,
-        kind: build_sub_kind(parent, toml, handler_policies),
+        kind: build_sub_kind(parent, toml, handler_policies)?,
         policy_ref,
         profile,
         flags,
@@ -427,7 +460,7 @@ pub(super) fn build_sub(
         loopback_valued,
         loopback_effect,
         output_path_flags,
-    }
+    })
 }
 
 fn assert_eval_safe_flag_values_consistent(
@@ -435,10 +468,10 @@ fn assert_eval_safe_flag_values_consistent(
     name: &str,
     eval_safe_flags: &[String],
     eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
-) {
+) -> Result<(), String> {
     for (flag, values) in eval_safe_flag_values {
         if !eval_safe_flags.iter().any(|f| f == flag) {
-            panic!(
+            fail!(
                 "command '{parent}' sub `{name}` lists `{flag}` in \
                  `eval_safe_flag_values` but not in `eval_safe_flags`. \
                  A value allowlist only takes effect when the flag itself \
@@ -448,7 +481,7 @@ fn assert_eval_safe_flag_values_consistent(
         }
         for value in values {
             if value.is_empty() || !value.chars().all(is_bare_literal_char) {
-                panic!(
+                fail!(
                     "command '{parent}' sub `{name}` has eval_safe_flag_values \
                      for `{flag}` containing value `{value:?}` with characters \
                      outside `[a-zA-Z0-9_./=-]`. The allowed-value set must \
@@ -458,6 +491,7 @@ fn assert_eval_safe_flag_values_consistent(
             }
         }
     }
+    Ok(())
 }
 
 fn is_bare_literal_char(c: char) -> bool {
@@ -469,10 +503,10 @@ fn assert_eval_safe_required_flags_consistent(
     name: &str,
     eval_safe_flags: &[String],
     eval_safe_required_flags: &[String],
-) {
+) -> Result<(), String> {
     for flag in eval_safe_required_flags {
         if !eval_safe_flags.iter().any(|f| f == flag) {
-            panic!(
+            fail!(
                 "command '{parent}' sub `{name}` lists `{flag}` in \
                  `eval_safe_required_flags` but not in `eval_safe_flags`. \
                  A required-flag constraint must be a subset of the \
@@ -482,6 +516,7 @@ fn assert_eval_safe_required_flags_consistent(
             );
         }
     }
+    Ok(())
 }
 
 /// Every valued flag in `eval_safe_flags` must declare its value
@@ -497,13 +532,13 @@ fn assert_eval_safe_valued_flags_declared(
     eval_safe_flags: &[String],
     valued: &[String],
     eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
-) {
+) -> Result<(), String> {
     for flag in eval_safe_flags {
         if !valued.iter().any(|v| v == flag) {
             continue;
         }
         if !eval_safe_flag_values.contains_key(flag) {
-            panic!(
+            fail!(
                 "command '{parent}' sub `{name}` lists `{flag}` in \
                  `eval_safe_flags` AND in `valued`, but `{flag}` has no \
                  entry in `eval_safe_flag_values`. Every valued flag \
@@ -519,25 +554,27 @@ fn assert_eval_safe_valued_flags_declared(
             );
         }
     }
+    Ok(())
 }
 
-fn assert_eval_safe_flags_require_tag(parent: &str, name: &str, eval_safe: bool, flags: &[String]) {
+fn assert_eval_safe_flags_require_tag(parent: &str, name: &str, eval_safe: bool, flags: &[String]) -> Result<(), String> {
     if !flags.is_empty() && !eval_safe {
-        panic!(
+        fail!(
             "command '{parent}' sub `{name}` declares `eval_safe_flags` without \
              `eval_safe = true`. The flag allowlist only takes effect when the \
              sub is tagged eval-safe. Add `eval_safe = true` or drop \
              `eval_safe_flags`."
         );
     }
+    Ok(())
 }
 
-fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
+fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) -> Result<(), String> {
     if toml.eval_safe != Some(true) {
-        return;
+        return Ok(());
     }
     if !toml.sub.is_empty() {
-        panic!(
+        fail!(
             "command '{parent}' sub `{}` sets `eval_safe = true` AND has \
              nested [[command.sub.sub]] blocks. eval_safe must be tagged on \
              a leaf node — move the tag onto the specific sub-sub that emits \
@@ -547,7 +584,7 @@ fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
         );
     }
     if toml.handler.is_some() {
-        panic!(
+        fail!(
             "command '{parent}' sub `{}` sets `eval_safe = true` AND \
              `handler = \"...\"`. Handler-based subs run Rust dispatch logic \
              whose shape the eval walker cannot introspect — eval-safety \
@@ -556,7 +593,7 @@ fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
         );
     }
     if toml.delegate_after.is_some() || toml.delegate_skip.is_some() {
-        panic!(
+        fail!(
             "command '{parent}' sub `{}` sets `eval_safe = true` AND \
              delegates to an inner command (delegate_after / delegate_skip). \
              The inner command's output is unrelated to this sub's vetting \
@@ -564,16 +601,17 @@ fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
             toml.name,
         );
     }
+    Ok(())
 }
 
-fn assert_eval_safe_tagged_command_has_researched_version(toml: &TomlCommand) {
+fn assert_eval_safe_tagged_command_has_researched_version(toml: &TomlCommand) -> Result<(), String> {
     let command_tagged = toml.eval_safe == Some(true);
     let any_sub_tagged = toml_has_any_eval_safe_sub(&toml.sub);
     if !command_tagged && !any_sub_tagged {
-        return;
+        return Ok(());
     }
     if toml.researched_version.is_none() {
-        panic!(
+        fail!(
             "command '{}' has `eval_safe = true` (on the command or a sub) \
              but no `researched_version`. eval-safe tags pin a per-tag trust \
              claim against a specific upstream snapshot — add the version \
@@ -582,18 +620,19 @@ fn assert_eval_safe_tagged_command_has_researched_version(toml: &TomlCommand) {
             toml.name,
         );
     }
+    Ok(())
 }
 
 fn toml_has_any_eval_safe_sub(subs: &[TomlSub]) -> bool {
     subs.iter().any(|s| s.eval_safe == Some(true) || toml_has_any_eval_safe_sub(&s.sub))
 }
 
-fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
+fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) -> Result<(), String> {
     if toml.eval_safe != Some(true) {
-        return;
+        return Ok(());
     }
     if !toml.sub.is_empty() {
-        panic!(
+        fail!(
             "command '{}' sets `eval_safe = true` at the command level AND \
              has [[command.sub]] blocks. Move the tag onto the specific \
              sub that emits shell-init code (e.g. `mise activate`) — \
@@ -611,7 +650,7 @@ fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
     // `eval_safe_required_flags`). See fzf's TOML for the canonical
     // pattern.
     if toml.wrapper.is_some() {
-        panic!(
+        fail!(
             "command '{}' sets `eval_safe = true` AND `[command.wrapper]`. \
              Wrappers forward to an inner command — tagging the wrapper \
              would tag every wrapped invocation. Drop `eval_safe`.",
@@ -619,40 +658,41 @@ fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
         );
     }
     if toml.deny.unwrap_or(false) {
-        panic!(
+        fail!(
             "command '{}' sets both `deny = true` and `eval_safe = true`. \
              These are contradictory — deny silently dominates. Drop one.",
             toml.name,
         );
     }
+    Ok(())
 }
 
 fn build_sub_kind(
     parent: &str,
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> DispatchKind {
+) -> Result<DispatchKind, String> {
     if let Some(handler_name) = toml.handler {
-        return DispatchKind::Custom {
+        return Ok(DispatchKind::Custom {
             handler_name,
             doc_body: toml.doc_body,
             subs: Vec::new(),
             fallback: None,
             handler_policies: std::collections::HashMap::new(),
             matrices: Vec::new(),
-        };
+        });
     }
     if toml.allow_all.unwrap_or(false) {
-        return DispatchKind::Policy {
+        return Ok(DispatchKind::Policy {
             policy: allow_all_policy(),
             level: toml.level.unwrap_or(TomlLevel::Inert).into(),
-        };
+        });
     }
     if let Some(sep) = toml.delegate_after {
-        return DispatchKind::DelegateAfterSeparator { separator: sep };
+        return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
     }
     if let Some(skip) = toml.delegate_skip {
-        return DispatchKind::DelegateSkip { skip };
+        return Ok(DispatchKind::DelegateSkip { skip });
     }
     // A `credential_first_arg` gate forces the Branching path even with no sub-subs: only Branching
     // runs `skip_pre_flags`, so the credential check sees the real resource arg (`get -o yaml secret`),
@@ -665,9 +705,12 @@ fn build_sub_kind(
         // the command-level Branching, which already threads `first_arg` through; the sub level used
         // to hard-drop it (`Vec::new()`), which made "glob + carve-out" inexpressible.
         let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
-        return DispatchKind::Branching {
-            subs: filter_candidates(toml.sub)
-                .flat_map(|s| build_subs(parent, s, handler_policies))
+        return Ok(DispatchKind::Branching {
+            subs: filter_candidates(toml.sub)?
+                .map(|s| build_subs(parent, s, handler_policies))
+                .collect::<Result<Vec<_>, _>>()?
+                .into_iter()
+                .flatten()
                 .collect(),
             bare_flags: Vec::new(),
             bare_ok: toml.nested_bare.unwrap_or(false),
@@ -679,7 +722,7 @@ fn build_sub_kind(
             first_arg_valued: toml.first_arg_valued,
             first_arg_loopback_valued: toml.first_arg_loopback_valued,
             credential_first_arg: toml.credential_first_arg,
-        };
+        });
     }
     build_policy_sub_kind(parent, toml, handler_policies)
 }
@@ -688,10 +731,10 @@ fn build_policy_sub_kind(
     parent: &str,
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> DispatchKind {
+) -> Result<DispatchKind, String> {
     let policy = if let Some(key) = &toml.policy {
         if !toml.standalone.is_empty() || !toml.valued.is_empty() {
-            panic!(
+            fail!(
                 "command '{parent}' sub `{}` sets both `policy = \"{}\"` and \
                  inline standalone/valued — pick one. Either drop the inline \
                  lists (and rely on the referenced handler_policy) or drop \
@@ -699,14 +742,15 @@ fn build_policy_sub_kind(
                 toml.name, key,
             );
         }
-        handler_policies.get(key).cloned().unwrap_or_else(|| {
-            panic!(
+        match handler_policies.get(key).cloned() {
+            Some(p) => p,
+            None => fail!(
                 "command '{parent}' sub `{}` references handler_policy \
                  `{key}` which is not declared. Add a \
                  [command.handler_policy.{key}] block or fix the typo.",
                 toml.name,
-            )
-        })
+            ),
+        }
     } else {
         build_policy(
             toml.standalone,
@@ -720,58 +764,67 @@ fn build_policy_sub_kind(
     };
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     if let Some(name) = toml.executor.as_deref() {
-        let kind = ExecutorKind::from_name(name).unwrap_or_else(|| {
-            panic!("command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)", toml.name)
-        });
-        let shape = toml.positional_shape.as_deref().map(|s| {
-            crate::policy::PositionalShape::from_name(s)
-                .unwrap_or_else(|| panic!("command '{parent}' sub `{}`: unknown positional_shape `{s}`", toml.name))
-        });
-        return DispatchKind::Executor {
+        let Some(kind) = ExecutorKind::from_name(name) else {
+            fail!(
+                "command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)",
+                toml.name
+            )
+        };
+        let shape = match toml.positional_shape.as_deref() {
+            None => None,
+            Some(s) => match crate::policy::PositionalShape::from_name(s) {
+                Some(shape) => Some(shape),
+                None => fail!(
+                    "command '{parent}' sub `{}`: unknown positional_shape `{s}`",
+                    toml.name
+                ),
+            },
+        };
+        return Ok(DispatchKind::Executor {
             policy,
             level,
             kind,
             redirect_flag: toml.executor_redirect_flag,
             shape,
-        };
+        });
     }
     if !toml.write_flags.is_empty() {
-        return DispatchKind::WriteFlagged {
+        return Ok(DispatchKind::WriteFlagged {
             policy,
             base_level: level,
             write_flags: toml.write_flags,
-        };
+        });
     }
     if let Some(guard) = toml.guard {
         let mut require_any = vec![guard];
         if let Some(short) = toml.guard_short {
             require_any.push(short);
         }
-        return DispatchKind::RequireAny {
+        return Ok(DispatchKind::RequireAny {
             require_any,
             policy,
             level,
             accept_bare_help: true,
-        };
+        });
     }
     if !toml.first_arg.is_empty() {
-        return DispatchKind::FirstArg {
+        return Ok(DispatchKind::FirstArg {
             patterns: toml.first_arg,
             level,
             standalone: toml.first_arg_standalone,
             valued: toml.first_arg_valued,
             loopback_valued: toml.first_arg_loopback_valued,
-        };
+        });
     }
     if !toml.require_any.is_empty() {
-        return DispatchKind::RequireAny {
+        return Ok(DispatchKind::RequireAny {
             require_any: toml.require_any,
             policy,
             level,
             accept_bare_help: false,
-        };
+        });
     }
-    DispatchKind::Policy { policy, level }
+    Ok(DispatchKind::Policy { policy, level })
 }
 
 /// Diagnostic for a configuration class that silently breaks flag dispatch:
@@ -781,9 +834,9 @@ fn build_policy_sub_kind(
 /// dispatch routes through the Branching path. The fix is to either remove
 /// the subs (if the command is meant to be flat) or move global flags into
 /// a `[command.wrapper]` block.
-fn assert_flat_or_structured(toml: &TomlCommand) {
+fn assert_flat_or_structured(toml: &TomlCommand) -> Result<(), String> {
     if toml.sub.is_empty() {
-        return;
+        return Ok(());
     }
     let mut conflicts = Vec::new();
     if !toml.standalone.is_empty() {
@@ -805,7 +858,7 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
         conflicts.push("numeric_dash");
     }
     if !conflicts.is_empty() {
-        panic!(
+        fail!(
             "command '{}' mixes flat-style top-level fields ({}) with [[command.sub]] blocks. \
              When subs are present these fields are silently dropped. \
              Either drop the subs (if the command is flat) or move global \
@@ -814,11 +867,12 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
             conflicts.join(", "),
         );
     }
+    Ok(())
 }
 
-fn assert_matrix_policy_keys_exist(toml: &TomlCommand) {
+fn assert_matrix_policy_keys_exist(toml: &TomlCommand) -> Result<(), String> {
     if toml.matrix.is_empty() {
-        return;
+        return Ok(());
     }
     for matrix in &toml.matrix {
         for (action_name, action) in &matrix.actions {
@@ -827,7 +881,7 @@ fn assert_matrix_policy_keys_exist(toml: &TomlCommand) {
                 TomlMatrixAction::Detailed(d) => &d.policy,
             };
             if !toml.handler_policy.contains_key(policy_key) {
-                panic!(
+                fail!(
                     "command '{}' matrix action `{}` references \
                      handler_policy `{}` which is not declared. \
                      Add a [command.handler_policy.{}] block or fix the typo.",
@@ -836,11 +890,12 @@ fn assert_matrix_policy_keys_exist(toml: &TomlCommand) {
             }
         }
     }
+    Ok(())
 }
 
-fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) {
+fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) -> Result<(), String> {
     if toml.matrix.len() < 2 {
-        return;
+        return Ok(());
     }
     let mut seen: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
     for matrix in &toml.matrix {
@@ -848,7 +903,7 @@ fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) {
             for action in matrix.actions.keys() {
                 let key = (parent.clone(), action.clone());
                 if !seen.insert(key) {
-                    panic!(
+                    fail!(
                         "command '{}' matrix has duplicate (parent, action) pair \
                          (`{}`, `{}`). The first match would silently win — \
                          consolidate into one matrix block or remove the duplicate.",
@@ -858,11 +913,12 @@ fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) {
             }
         }
     }
+    Ok(())
 }
 
-fn assert_fallback_requires_handler(toml: &TomlCommand) {
+fn assert_fallback_requires_handler(toml: &TomlCommand) -> Result<(), String> {
     if toml.fallback.is_some() && toml.handler.is_none() {
-        panic!(
+        fail!(
             "command '{}' declares [command.fallback] without a handler. \
              Fallback grammars are only consulted via \
              registry::try_fallback_grammar() from a Rust handler — without \
@@ -871,45 +927,47 @@ fn assert_fallback_requires_handler(toml: &TomlCommand) {
             toml.name,
         );
     }
+    Ok(())
 }
 
 /// Lower a `[command.behavior]` block into a typed `BehaviorSpec`. Every facet string is
 /// resolved to its enum here (via `FacetTerm::from_term`); an unknown term PANICS naming the
 /// command, so a typo fails the build (the registry loads in a test) rather than silently
 /// mis-classifying. `None` when the command declares no behavior.
-fn lower_output(name: &str, o: Option<&TomlOutput>) -> Option<OutputSpec> {
-    let o = o?;
+fn lower_output(name: &str, o: Option<&TomlOutput>) -> Result<Option<OutputSpec>, String> {
+    let Some(o) = o else { return Ok(None) };
     let locus_from = match o.locus_from.as_str() {
         "operands" => OutputLocus::Operands,
         "cwd" => OutputLocus::Cwd,
         "stdin" => OutputLocus::Stdin,
         "atom" => OutputLocus::Atom,
-        other => panic!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin, atom)"),
+        other => fail!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin, atom)"),
     };
-    Some(OutputSpec {
+    Ok(Some(OutputSpec {
         locus_from,
         invalidated_by: o.invalidated_by.clone(),
         valued: o.valued.clone(),
-    })
+    }))
 }
 
-fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> {
+fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Result<Option<BehaviorSpec>, String> {
     use crate::engine::facet::{FacetTerm, Operation};
-    let b = b?;
-    let operation = Operation::from_term(&b.operation)
-        .unwrap_or_else(|| panic!("command '{name}': unknown behavior operation `{}`", b.operation));
+    let Some(b) = b else { return Ok(None) };
+    let Some(operation) = Operation::from_term(&b.operation) else {
+        fail!("command '{name}': unknown behavior operation `{}`", b.operation)
+    };
     let positionals = match b.positionals.as_str() {
         "none" => PositionalRole::None,
         "read" => PositionalRole::Read,
         "write" => PositionalRole::Write,
         "pattern-then-read" => PositionalRole::PatternThenRead,
         "transfer" => PositionalRole::Transfer,
-        other => panic!("command '{name}': unknown behavior positionals `{other}` (known: none, read, write, pattern-then-read, transfer)"),
+        other => fail!("command '{name}': unknown behavior positionals `{other}` (known: none, read, write, pattern-then-read, transfer)"),
     };
     let scale = match b.scale.as_deref() {
         None | Some("single") => ScaleModel::Single,
         Some("breadth") => ScaleModel::Breadth,
-        Some(other) => panic!("command '{name}': unknown behavior scale `{other}` (known: single, breadth)"),
+        Some(other) => fail!("command '{name}': unknown behavior scale `{other}` (known: single, breadth)"),
     };
     let hook = match b.hook.as_deref() {
         None => None,
@@ -918,7 +976,7 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> 
         Some("tar") => Some(BehaviorHook::Tar),
         Some("sed") => Some(BehaviorHook::Sed),
         Some("perl") => Some(BehaviorHook::Perl),
-        Some(other) => panic!("command '{name}': unknown behavior hook `{other}` (known: grep, dd, tar, sed, perl)"),
+        Some(other) => fail!("command '{name}': unknown behavior hook `{other}` (known: grep, dd, tar, sed, perl)"),
     };
     let (short, long) = split_flag_forms(&b.standalone);
     let (valued_short, valued_long) = split_flag_forms(&b.valued);
@@ -928,16 +986,16 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> 
         if delta.scale.as_deref() == Some("unbounded") {
             unbounded_flags.push(flag.clone());
         } else if let Some(other) = delta.scale.as_deref() {
-            panic!("command '{name}': behavior flag `{flag}` has unknown scale `{other}` (known: unbounded)");
+            fail!("command '{name}': behavior flag `{flag}` has unknown scale `{other}` (known: unbounded)");
         }
         if let Some(kind) = delta.kind.as_deref() {
             let role = match kind {
                 "read" => PathRole::Read,
                 "write" => PathRole::Write,
-                other => panic!("command '{name}': behavior flag `{flag}` has unknown kind `{other}` (known: read, write)"),
+                other => fail!("command '{name}': behavior flag `{flag}` has unknown kind `{other}` (known: read, write)"),
             };
             if !b.valued.contains(flag) {
-                panic!("command '{name}': behavior path-flag `{flag}` (kind = {kind}) must also be listed in `valued`");
+                fail!("command '{name}': behavior path-flag `{flag}` (kind = {kind}) must also be listed in `valued`");
             }
             let (short, long) = if let Some(rest) = flag.strip_prefix("--") {
                 (None, Some(format!("--{rest}")))
@@ -945,26 +1003,26 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> 
                 if rest.len() == 1 {
                     (Some(rest.as_bytes()[0]), None)
                 } else {
-                    panic!("command '{name}': behavior path-flag `{flag}` must be a single-char short or a `--long`");
+                    fail!("command '{name}': behavior path-flag `{flag}` must be a single-char short or a `--long`");
                 }
             } else {
-                panic!("command '{name}': behavior path-flag `{flag}` must start with `-`");
+                fail!("command '{name}': behavior path-flag `{flag}` must start with `-`");
             };
             path_flags.push(PathFlag { short, long, role });
         }
     }
-    let transfer = lower_transfer(name, b.transfer.as_ref());
+    let transfer = lower_transfer(name, b.transfer.as_ref())?;
     // A transfer role needs its knobs; anything else must not carry them.
     match (positionals, &transfer) {
         (PositionalRole::Transfer, None) => {
-            panic!("command '{name}': positionals = \"transfer\" requires a [command.behavior.transfer] block")
+            fail!("command '{name}': positionals = \"transfer\" requires a [command.behavior.transfer] block")
         }
         (role, Some(_)) if role != PositionalRole::Transfer => {
-            panic!("command '{name}': [command.behavior.transfer] is only valid with positionals = \"transfer\"")
+            fail!("command '{name}': [command.behavior.transfer] is only valid with positionals = \"transfer\"")
         }
         _ => {}
     }
-    Some(BehaviorSpec {
+    Ok(Some(BehaviorSpec {
         operation,
         positionals,
         scale,
@@ -977,29 +1035,29 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Option<BehaviorSpec> 
         path_flags,
         hook,
         transfer,
-    })
+    }))
 }
 
 /// Lower a `[command.behavior.transfer]` block, resolving the `source` term and enforcing that
 /// the two clobber-flag sets are mutually exclusive (a command declares whether the default is
 /// clobber or no-clobber, never both).
-fn lower_transfer(name: &str, t: Option<&TomlTransfer>) -> Option<TransferSpec> {
-    let t = t?;
+fn lower_transfer(name: &str, t: Option<&TomlTransfer>) -> Result<Option<TransferSpec>, String> {
+    let Some(t) = t else { return Ok(None) };
     let source = match t.source.as_str() {
         "observe" => TransferSource::Observe,
         "relocate" => TransferSource::Relocate,
-        other => panic!("command '{name}': unknown transfer source `{other}` (known: observe, relocate)"),
+        other => fail!("command '{name}': unknown transfer source `{other}` (known: observe, relocate)"),
     };
     if !t.no_clobber_flags.is_empty() && !t.clobber_flags.is_empty() {
-        panic!("command '{name}': transfer declares both no_clobber_flags and clobber_flags (mutually exclusive)");
+        fail!("command '{name}': transfer declares both no_clobber_flags and clobber_flags (mutually exclusive)");
     }
-    Some(TransferSpec {
+    Ok(Some(TransferSpec {
         source,
         rebinds_destination: t.rebinds_destination,
         no_clobber_flags: t.no_clobber_flags.clone(),
         clobber_flags: t.clobber_flags.clone(),
         recursive_flags: t.recursive_flags.clone(),
-    })
+    }))
 }
 
 /// Split a behavior flag list into (single-dash single-char shorts as bytes, `--long`
@@ -1029,46 +1087,46 @@ fn split_flag_forms(tokens: &[String]) -> (Vec<u8>, Vec<String>) {
 fn build_command_archetype_flags(
     cmd: &str,
     flags: Vec<TomlSubFlag>,
-) -> Vec<crate::registry::types::FlagProvenance> {
+) -> Result<Vec<crate::registry::types::FlagProvenance>, String> {
     let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
     let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
     flags
         .into_iter()
         .map(|f| {
-            assert!(
+            ensure!(
                 f.classifies == "unclassified"
                     || crate::engine::archetype::archetype(&f.classifies).is_some(),
                 "command `{cmd}` flag `{}`: classifies `{}` is not a known archetype",
                 f.name, f.classifies,
             );
-            assert!(cited(&f.fact), "command `{cmd}` flag `{}`: requires a `fact`", f.name);
-            assert!(cited(&f.source), "command `{cmd}` flag `{}`: requires a `source`", f.name);
-            assert!(judged(&f.judgment), "command `{cmd}` flag `{}`: `judgment`, if given, must not be blank", f.name);
-            assert!(
+            ensure!(cited(&f.fact), "command `{cmd}` flag `{}`: requires a `fact`", f.name);
+            ensure!(cited(&f.source), "command `{cmd}` flag `{}`: requires a `source`", f.name);
+            ensure!(judged(&f.judgment), "command `{cmd}` flag `{}`: `judgment`, if given, must not be blank", f.name);
+            ensure!(
                 !(f.when_absent == Some(true) && f.value_prefix.is_some()),
                 "command `{cmd}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
                 f.name,
             );
-            crate::registry::types::FlagProvenance {
+            Ok(crate::registry::types::FlagProvenance {
                 name: f.name,
                 classifies: f.classifies,
                 value_prefix: f.value_prefix,
                 when_absent: f.when_absent.unwrap_or(false),
-            }
+            })
         })
         .collect()
 }
 
 #[allow(clippy::too_many_lines)]
-pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
-    assert_flat_or_structured(&toml);
-    assert_fallback_requires_handler(&toml);
-    assert_matrix_policy_keys_exist(&toml);
-    assert_no_candidate_shadowed_by_glob(&toml.name, &toml.sub, &toml.first_arg);
-    assert_matrix_no_duplicate_parent_action(&toml);
-    assert_command_eval_safe_only_on_leaf(&toml);
-    assert_eval_safe_tagged_command_has_researched_version(&toml);
-    check_no_legacy_positional_style(&toml.name, toml.positional_style);
+pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<CommandSpec, String> {
+    assert_flat_or_structured(&toml)?;
+    assert_fallback_requires_handler(&toml)?;
+    assert_matrix_policy_keys_exist(&toml)?;
+    assert_no_candidate_shadowed_by_glob(&toml.name, &toml.sub, &toml.first_arg)?;
+    assert_matrix_no_duplicate_parent_action(&toml)?;
+    assert_command_eval_safe_only_on_leaf(&toml)?;
+    assert_eval_safe_tagged_command_has_researched_version(&toml)?;
+    check_no_legacy_positional_style(&toml.name, toml.positional_style)?;
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
     let researched_version = toml.researched_version;
@@ -1079,7 +1137,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let eval_safe_flag_values = toml.eval_safe_flag_values;
     let eval_safe_required_flags = toml.eval_safe_required_flags;
     if !eval_safe_flags.is_empty() && !eval_safe {
-        panic!(
+        fail!(
             "command '{}' declares `eval_safe_flags` without `eval_safe = true`. \
              The flag allowlist only takes effect when the command is tagged \
              eval-safe. Add `eval_safe = true` or drop `eval_safe_flags`.",
@@ -1091,26 +1149,26 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         "<command>",
         &eval_safe_flags,
         &eval_safe_flag_values,
-    );
+    )?;
     assert_eval_safe_valued_flags_declared(
         &toml.name,
         "<command>",
         &eval_safe_flags,
         &toml.valued,
         &eval_safe_flag_values,
-    );
+    )?;
     assert_eval_safe_required_flags_consistent(
         &toml.name,
         "<command>",
         &eval_safe_flags,
         &eval_safe_required_flags,
-    );
-    let behavior = lower_behavior(&toml.name, toml.behavior.as_ref());
-    let output = lower_output(&toml.name, toml.output.as_ref());
+    )?;
+    let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
+    let output = lower_output(&toml.name, toml.output.as_ref())?;
     let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
-    let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag);
+    let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag)?;
     if toml.deny.unwrap_or(false) {
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1138,10 +1196,10 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 },
                 level: SafetyLevel::Inert,
             },
-        };
+        });
     }
     if let Some(vc) = toml.verb_chain {
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1160,7 +1218,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             output,
             env_assignment_positionals,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
-        };
+        });
     }
 
     if let Some(handler_name) = toml.handler {
@@ -1172,16 +1230,19 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             .map(|(k, v)| (k, build_handler_policy(v)))
             .collect();
         let parent_name = toml.name.clone();
-        let subs: Vec<SubSpec> = filter_candidates(toml.sub)
-            .flat_map(|s| build_subs(&parent_name, s, &handler_policies))
+        let subs: Vec<SubSpec> = filter_candidates(toml.sub)?
+            .map(|s| build_subs(&parent_name, s, &handler_policies))
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .flatten()
             .collect();
-        let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));
+        let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f)).transpose()?;
         let matrices = toml
             .matrix
             .into_iter()
             .map(build_matrix)
             .collect();
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1207,14 +1268,14 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 handler_policies,
                 matrices,
             },
-        };
+        });
     }
 
     if let Some(w) = toml.wrapper {
         if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
             let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
             let parent_name = toml.name.clone();
-            return CommandSpec {
+            return Ok(CommandSpec {
                 name: toml.name,
                 description: desc,
                 aliases: toml.aliases,
@@ -1234,8 +1295,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 env_assignment_positionals,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
-                    subs: filter_candidates(toml.sub)
-                        .flat_map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                    subs: filter_candidates(toml.sub)?
+                        .map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                        .collect::<Result<Vec<_>, _>>()?
+                        .into_iter()
+                        .flatten()
                         .collect(),
                     pre_standalone: w.standalone,
                     pre_valued: w.valued,
@@ -1247,9 +1311,9 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                     first_arg_level,
                     credential_first_arg: toml.credential_first_arg,
                 },
-            };
+            });
         }
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1274,13 +1338,13 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 separator: w.separator,
                 bare_ok: w.bare_ok.unwrap_or(false),
             },
-        };
+        });
     }
 
     if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
         let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
         let parent_name = toml.name.clone();
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1300,8 +1364,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             env_assignment_positionals,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
-                subs: filter_candidates(toml.sub)
-                    .flat_map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                subs: filter_candidates(toml.sub)?
+                    .map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                    .collect::<Result<Vec<_>, _>>()?
+                    .into_iter()
+                    .flatten()
                     .collect(),
                 pre_standalone: Vec::new(),
                 pre_valued: Vec::new(),
@@ -1313,7 +1380,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 first_arg_loopback_valued: toml.first_arg_loopback_valued,
                 credential_first_arg: toml.credential_first_arg,
             },
-        };
+        });
     }
 
     let policy = build_policy(
@@ -1329,7 +1396,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
 
     if !toml.first_arg.is_empty() {
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1354,11 +1421,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 valued: toml.first_arg_valued,
                 loopback_valued: toml.first_arg_loopback_valued,
             },
-        };
+        });
     }
 
     if !toml.write_flags.is_empty() {
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1381,11 +1448,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 base_level: level,
                 write_flags: toml.write_flags,
             },
-        };
+        });
     }
 
     if !toml.require_any.is_empty() {
-        return CommandSpec {
+        return Ok(CommandSpec {
             name: toml.name,
             description: desc,
             aliases: toml.aliases,
@@ -1409,10 +1476,10 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 level,
                 accept_bare_help: false,
             },
-        };
+        });
     }
 
-    CommandSpec {
+    Ok(CommandSpec {
         env_assignment_positionals,
         name: toml.name,
         description: desc,
@@ -1434,15 +1501,20 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             policy,
             level,
         },
-    }
+    })
 }
 
-pub fn load_toml(source: &str, category: &str) -> Vec<CommandSpec> {
+/// Build every command definition in `source`, or the first reason one is invalid.
+///
+/// Returns `Err` rather than panicking because this reads USER files too — see the `fail!` macro at
+/// the top of this module. The built-in `commands/*.toml` are compiled in and unwrap the result at
+/// their call site, so a broken definition in this repository still stops the process loudly.
+pub fn load_toml(source: &str, category: &str) -> Result<Vec<CommandSpec>, String> {
     let file: TomlFile = match toml::from_str(source) {
         Ok(f) => f,
         Err(e) => {
             let preview: String = source.chars().take(80).collect();
-            panic!("invalid TOML command definition: {e}\n  source begins: {preview}");
+            fail!("invalid TOML command definition: {e}\n  source begins: {preview}");
         }
     };
     file.command.into_iter()
