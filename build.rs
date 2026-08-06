@@ -27,7 +27,10 @@ fn main() {
                     .expect("non-UTF-8 stem")
             });
         code.push_str(&format!(
-            "    all.extend(load_toml(include_str!(\"{path_str}\"), \"{category}\"));\n",
+            // `.expect` on purpose: these definitions are compiled in, so an invalid one is a bug in
+            // this repository and must stop the process loudly. User-supplied configs go through the
+            // same `load_toml` but handle the `Err` instead — see `registry::custom`.
+            "    all.extend(load_toml(include_str!(\"{path_str}\"), \"{category}\")\n        .unwrap_or_else(|e| panic!(\"built-in {category}: {{e}}\")));\n",
         ));
     }
     code.push_str("    build_registry(all)\n}");

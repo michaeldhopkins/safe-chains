@@ -138,24 +138,16 @@ pub fn fuzz_load_config(source: &str, repo_scope: bool) -> usize {
 }
 
 fn load_custom_file(source: &str, category: &str, path: &Path) -> Vec<CommandSpec> {
-    // Check SYNTAX first, so the common failure — a typo — is reported without a panic at all.
-    // `toml::Value` accepts any well-formed document, so this only rejects what `load_toml` would
-    // have aborted on, and its error carries the line and column.
-    if let Err(e) = toml::from_str::<toml::Value>(source) {
-        return skip(path, &e.to_string());
-    }
-    // Everything else `load_toml` refuses — an unknown behavior hook, a bad enum value, ~40
-    // assertions — still panics, so it is caught here and its message recovered for the report.
-    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| load_toml(source, category))) {
+    // One match, because `load_toml` now REPORTS every way a definition can be invalid instead of
+    // panicking on it. This used to be three layers: a syntax pre-check, a shape pre-check, and a
+    // `catch_unwind` around the ~40 content assertions — each added because the layer beneath it
+    // aborted the process. Panicking across a library boundary as control flow left marks the
+    // catching could not erase: the default hook printed a panic and a backtrace to stderr before
+    // anything could catch it, and under libFuzzer a caught panic is still an abort, which is what
+    // kept failing the `config_load` target.
+    match load_toml(source, category) {
         Ok(specs) => specs,
-        Err(payload) => {
-            let why = payload
-                .downcast_ref::<String>()
-                .map(String::as_str)
-                .or_else(|| payload.downcast_ref::<&str>().copied())
-                .unwrap_or("unrecognized command definition");
-            skip(path, why)
-        }
+        Err(why) => skip(path, &why),
     }
 }
 
@@ -310,7 +302,8 @@ bare = true
 [command.output]
 locus_from = "cwd"
 "#;
-        let user: Vec<_> = load_toml(source, "custom-user").into_iter().collect();
+        let user: Vec<_> =
+            load_toml(source, "custom-user").expect("valid test definition").into_iter().collect();
         assert!(
             user.iter().any(|s| s.output.is_some()),
             "the user config must still be able to declare an output locus, or this guard is \
@@ -319,8 +312,11 @@ locus_from = "cwd"
 
         // Calls the REAL rule `apply_custom` applies, not a copy of it — a copy would pass even
         // with the restriction deleted from the load path.
-        let stripped: Vec<_> =
-            load_toml(source, "custom-project").into_iter().map(repo_scoped).collect();
+        let stripped: Vec<_> = load_toml(source, "custom-project")
+            .expect("valid test definition")
+            .into_iter()
+            .map(repo_scoped)
+            .collect();
         assert!(
             stripped.iter().all(|s| s.output.is_none()),
             "a repo-level custom TOML must not be able to declare `[command.output]`",
@@ -381,12 +377,17 @@ locus_from = "cwd"
     fn load_toml_tolerates_trusted_sections() {
         // A user config holding only [[trusted]] must parse to zero commands,
         // not panic on a missing `command` field.
-        assert!(load_toml("[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n", "custom-user").is_empty());
+        assert!(
+            load_toml("[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n", "custom-user")
+                .expect("a trusted-only config is valid, just empty")
+                .is_empty()
+        );
         // command alongside trusted: command parsed, trusted ignored here.
         let specs = load_toml(
             "[[command]]\nname = \"myco\"\nbare = true\n\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n",
             "custom-user",
-        );
+        )
+        .expect("valid test definition");
         assert_eq!(specs.len(), 1);
     }
 

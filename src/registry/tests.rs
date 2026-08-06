@@ -10,8 +10,9 @@ use super::*;
     // Provenance + archetype validity are enforced at BUILD time (build::assert_sub_provenance),
     // reading the TOML — so the research is a validated part of the tree, and mis-authoring fails
     // CLOSED at registry load rather than silently under-recording. (This supersedes the earlier
-    // runtime sweeps; every real command's subs pass this at load. The `should_panic`s below prove
-    // each arm of the check fires; the positive case proves a well-formed profiled sub builds.)
+    // runtime sweeps; every real command's subs pass this at load. The `assert_rejected`s below
+    // prove each arm of the check fires; the positive case proves a well-formed profiled sub
+    // builds.)
 
     #[test]
     fn a_profiled_sub_with_full_provenance_builds() {
@@ -30,31 +31,31 @@ use super::*;
     }
 
     #[test]
-    #[should_panic(expected = "requires a `fact`")]
-    fn a_profiled_sub_without_a_fact_panics_at_build() {
-        load_one(
+    fn a_profiled_sub_without_a_fact_is_rejected() {
+        assert_rejected(
             "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
              profile = \"remote-destroy-recoverable\"\nsource = \"https://example/docs\"\n",
+            "requires a `fact`",
         );
     }
 
     #[test]
-    #[should_panic(expected = "is not a known archetype")]
-    fn a_sub_with_an_unknown_profile_panics_at_build() {
-        load_one(
+    fn a_sub_with_an_unknown_profile_is_rejected() {
+        assert_rejected(
             "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
              profile = \"remote-destroy-typo\"\nfact = \"x\"\nsource = \"y\"\n",
+            "is not a known archetype",
         );
     }
 
     #[test]
-    #[should_panic(expected = "AUTO-APPROVE")]
-    fn a_candidate_shadowed_by_a_sibling_glob_panics_at_build() {
+    fn a_candidate_shadowed_by_a_sibling_glob_is_rejected() {
         // `get-secret-value` is candidate=true (meant to DENY) but matches the `get-*` glob → it
         // would fall through the candidate filter and auto-approve. The #4 footgun; must fail closed.
-        load_one(
+        assert_rejected(
             "[[command]]\nname = \"tc\"\nfirst_arg = [\"get-*\", \"list-*\"]\n\
              [[command.sub]]\nname = \"get-secret-value\"\ncandidate = true\n",
+            "AUTO-APPROVE",
         );
     }
 
@@ -68,13 +69,13 @@ use super::*;
     }
 
     #[test]
-    #[should_panic(expected = "requires a `source`")]
-    fn an_escalating_flag_without_a_source_panics_at_build() {
-        load_one(
+    fn an_escalating_flag_without_a_source_is_rejected() {
+        assert_rejected(
             "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"push\"\n\
              profile = \"vcs-sync\"\nfact = \"x\"\nsource = \"y\"\n\
              [[command.sub.flag]]\nname = \"--force\"\n\
              classifies = \"remote-destroy-irreversible\"\nfact = \"z\"\n",
+            "requires a `source`",
         );
     }
 
@@ -170,9 +171,33 @@ use super::*;
     }
 
     fn load_one(toml_str: &str) -> CommandSpec {
-        let mut specs = load_toml(toml_str, "test");
+        let mut specs = load_toml(toml_str, "test").expect("valid test definition");
         assert_eq!(specs.len(), 1);
         specs.remove(0)
+    }
+
+    /// Assert a definition is REJECTED, and that the stated reason is why.
+    ///
+    /// These were `#[should_panic(expected = …)]` until `load_toml` started returning the reason
+    /// instead of panicking it. That worked, but only indirectly: the panic came from `load_one`'s
+    /// `.expect()`, whose message embeds the `Err` via `{:?}`, so each `expected =` fragment was
+    /// being matched against a DEBUG-ESCAPED string. Any fragment containing a quote or a newline
+    /// would have silently stopped matching, and the test names claimed a panic that no longer
+    /// happens. Reading the error directly removes both problems and lets the assertion say which
+    /// of the two failures occurred — accepted when it should not have been, or rejected for an
+    /// unrelated reason.
+    #[track_caller]
+    fn assert_rejected(toml_str: &str, expected: &str) {
+        match load_toml(toml_str, "test") {
+            Ok(specs) => panic!(
+                "definition was ACCEPTED ({} spec(s)); expected rejection naming {expected:?}",
+                specs.len()
+            ),
+            Err(why) => assert!(
+                why.contains(expected),
+                "rejected, but not for the stated reason — wanted {expected:?}, got:\n{why}"
+            ),
+        }
     }
 
     // ---------------------------------------------------------------
@@ -356,7 +381,7 @@ use super::*;
     }
 
     #[test]
-    fn legacy_positional_style_panics() {
+    fn legacy_positional_style_is_rejected() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
                 [[command]]
@@ -1442,7 +1467,7 @@ use super::*;
             aliases = ["egrep"]
             bare = false
             standalone = ["-r"]
-        "#, "test");
+        "#, "test").expect("valid test definition");
         let registry = build_registry(specs);
         let spec = registry.get("egrep").expect("alias registered");
         assert_eq!(
@@ -1823,7 +1848,7 @@ use super::*;
             name = "head"
             bare = false
             valued = ["-n"]
-        "#, "test");
+        "#, "test").expect("valid test definition");
         assert_eq!(specs.len(), 2);
         assert_eq!(specs[0].name, "cat");
         assert_eq!(specs[1].name, "head");
@@ -3409,7 +3434,7 @@ level = "Inert"
     }
 
     #[test]
-    fn sub_policy_ref_unknown_key_panics() {
+    fn sub_policy_ref_unknown_key_is_rejected() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
 [[command]]
@@ -3431,7 +3456,7 @@ policy = "rael"
     }
 
     #[test]
-    fn sub_policy_ref_with_inline_lists_panics() {
+    fn sub_policy_ref_with_inline_lists_is_rejected() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
 [[command]]
@@ -3455,7 +3480,7 @@ standalone = ["--extra"]
     }
 
     #[test]
-    fn matrix_referencing_unknown_policy_panics() {
+    fn matrix_referencing_unknown_policy_is_rejected() {
         // Silent-deny would otherwise hide typos: a matrix entry whose
         // policy_key doesn't match any [command.handler_policy.*] would
         // dispatch to "policy not found → Denied," masking the typo.
@@ -3483,7 +3508,7 @@ list = "rael"
     }
 
     #[test]
-    fn matrix_with_duplicate_parent_action_panics() {
+    fn matrix_with_duplicate_parent_action_is_rejected() {
         // Latent ordering footgun: if two matrices both contain the
         // same (parent, action), only the first match wins. Panicking
         // at build forces the author to consolidate.
@@ -3518,7 +3543,7 @@ list = "b"
     }
 
     #[test]
-    fn fallback_without_handler_panics() {
+    fn fallback_without_handler_is_rejected() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
 [[command]]
@@ -3539,7 +3564,7 @@ bare = true
     }
 
     #[test]
-    fn unknown_positional_shape_panics() {
+    fn unknown_positional_shape_is_rejected() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
 [[command]]
@@ -3583,7 +3608,7 @@ handler = "demo"
 name = "demo-deny"
 deny = true
 "#;
-        let specs = load_toml(source, "test");
+        let specs = load_toml(source, "test").expect("valid test definition");
         let map = build_registry(specs);
         let spec = map.get("demo-deny").expect("demo-deny in registry");
         for case in ["demo-deny", "demo-deny --help", "demo-deny foo bar", "demo-deny -x"] {
@@ -3605,7 +3630,7 @@ aliases = ["o", "orig"]
 url = "x"
 description = "first"
 bare_flags = ["--help"]
-"#, "test");
+"#, "test").expect("valid test definition");
         let mut map = build_registry(original);
         assert!(map.contains_key("o"));
         assert!(map.contains_key("orig"));
@@ -3614,7 +3639,7 @@ bare_flags = ["--help"]
 [[command]]
 name = "original-tool"
 deny = true
-"#, "test").into_iter().next().unwrap();
+"#, "test").expect("valid test definition").into_iter().next().unwrap();
         super::build::insert_spec(&mut map, override_spec);
 
         assert!(!map.contains_key("o"), "stale alias 'o' must be removed");
@@ -4613,39 +4638,36 @@ valued = ["--type"]
     // -------------------------------------------------------------------
 
     #[test]
-    #[should_panic(expected = "eval_safe_flags` without `eval_safe = true")]
-    fn eval_safe_flags_without_tag_panics_command() {
-        load_one(r#"
+    fn eval_safe_flags_without_tag_is_rejected_at_command_level() {
+        assert_rejected(r#"
             [[command]]
             name = "ssh-agent"
             bare = true
             eval_safe_flags = ["-s"]
-        "#);
+        "#, "eval_safe_flags` without `eval_safe = true");
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe_flags` without `eval_safe = true")]
-    fn eval_safe_flags_without_tag_panics_sub() {
-        load_one(r#"
+    fn eval_safe_flags_without_tag_is_rejected_on_a_sub() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             [[command.sub]]
             name = "init"
             eval_safe_flags = ["--shims"]
-        "#);
+        "#, "eval_safe_flags` without `eval_safe = true");
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe = true` at the command level AND")]
-    fn eval_safe_command_with_subs_panics() {
-        load_one(r#"
+    fn eval_safe_command_with_subs_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             eval_safe = true
             [[command.sub]]
             name = "init"
-        "#);
+        "#, "eval_safe = true` at the command level AND");
     }
 
     /// Command-level `eval_safe = true` IS allowed alongside
@@ -4674,34 +4696,31 @@ valued = ["--type"]
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe = true` AND `[command.wrapper]")]
-    fn eval_safe_wrapper_command_panics() {
-        load_one(r#"
+    fn eval_safe_wrapper_command_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             eval_safe = true
             [command.wrapper]
             positional_skip = 1
-        "#);
+        "#, "eval_safe = true` AND `[command.wrapper]");
     }
 
     #[test]
-    #[should_panic(expected = "deny = true` and `eval_safe = true")]
-    fn eval_safe_with_deny_panics() {
-        load_one(r#"
+    fn eval_safe_with_deny_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             deny = true
             eval_safe = true
-        "#);
+        "#, "deny = true` and `eval_safe = true");
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe = true` AND has nested")]
-    fn eval_safe_sub_with_nested_subs_panics() {
-        load_one(r#"
+    fn eval_safe_sub_with_nested_subs_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -4710,13 +4729,12 @@ valued = ["--type"]
             eval_safe = true
             [[command.sub.sub]]
             name = "get"
-        "#);
+        "#, "eval_safe = true` AND has nested");
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe = true` AND `handler")]
-    fn eval_safe_handler_sub_panics() {
-        load_one(r#"
+    fn eval_safe_handler_sub_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -4724,13 +4742,12 @@ valued = ["--type"]
             name = "init"
             handler = "php"
             eval_safe = true
-        "#);
+        "#, "eval_safe = true` AND `handler");
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe = true` AND delegates")]
-    fn eval_safe_delegate_sub_panics() {
-        load_one(r#"
+    fn eval_safe_delegate_sub_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -4738,7 +4755,7 @@ valued = ["--type"]
             name = "exec"
             delegate_after = "--"
             eval_safe = true
-        "#);
+        "#, "eval_safe = true` AND delegates");
     }
 
     #[test]
@@ -4755,20 +4772,18 @@ valued = ["--type"]
     }
 
     #[test]
-    #[should_panic(expected = "but no `researched_version")]
-    fn eval_safe_command_without_researched_version_panics() {
-        load_one(r#"
+    fn eval_safe_command_without_researched_version_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "ssh-agent"
             bare = true
             eval_safe = true
-        "#);
+        "#, "but no `researched_version");
     }
 
     #[test]
-    #[should_panic(expected = "but no `researched_version")]
-    fn eval_safe_sub_without_command_researched_version_panics() {
-        load_one(r#"
+    fn eval_safe_sub_without_command_researched_version_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             [[command.sub]]
@@ -4776,7 +4791,7 @@ valued = ["--type"]
             bare = false
             max_positional = 1
             eval_safe = true
-        "#);
+        "#, "but no `researched_version");
     }
 
     #[test]
@@ -5064,9 +5079,8 @@ valued = ["--type"]
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe_flag_values` but not in `eval_safe_flags")]
-    fn flag_value_without_flag_in_allowlist_panics() {
-        load_one(r#"
+    fn flag_value_without_flag_in_allowlist_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5079,13 +5093,12 @@ valued = ["--type"]
             eval_safe_flags = ["--profile"]
             [command.sub.eval_safe_flag_values]
             --format = ["env"]
-        "#);
+        "#, "eval_safe_flag_values` but not in `eval_safe_flags");
     }
 
     #[test]
-    #[should_panic(expected = "characters outside `[a-zA-Z0-9_./=-]")]
-    fn flag_value_with_expansion_trigger_panics() {
-        load_one(r#"
+    fn flag_value_with_expansion_trigger_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5098,7 +5111,7 @@ valued = ["--type"]
             eval_safe_flags = ["--format"]
             [command.sub.eval_safe_flag_values]
             --format = ["$EVIL"]
-        "#);
+        "#, "characters outside `[a-zA-Z0-9_./=-]");
     }
 
     proptest::proptest! {
@@ -5223,9 +5236,8 @@ valued = ["--type"]
     }
 
     #[test]
-    #[should_panic(expected = "eval_safe_required_flags` but not in `eval_safe_flags")]
-    fn required_flag_not_in_allowlist_panics() {
-        load_one(r#"
+    fn required_flag_not_in_allowlist_is_rejected() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5235,7 +5247,7 @@ valued = ["--type"]
             eval_safe = true
             eval_safe_flags = ["--bash"]
             eval_safe_required_flags = ["--bash", "--zsh"]
-        "#);
+        "#, "eval_safe_required_flags` but not in `eval_safe_flags");
     }
 
     proptest::proptest! {
@@ -5278,9 +5290,8 @@ valued = ["--type"]
     /// aws v0.196.0 near-miss pattern where `--format` defaulting to
     /// `process` (JSON) would substitute JSON into eval.
     #[test]
-    #[should_panic(expected = "Every valued flag tagged eval-safe must declare its value posture")]
-    fn valued_flag_without_value_posture_panics_sub() {
-        load_one(r#"
+    fn valued_flag_without_value_posture_is_rejected_on_a_sub() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5291,14 +5302,13 @@ valued = ["--type"]
             valued = ["--format"]
             eval_safe = true
             eval_safe_flags = ["--format"]
-        "#);
+        "#, "Every valued flag tagged eval-safe must declare its value posture");
     }
 
     /// Same check applied at command level for flat commands.
     #[test]
-    #[should_panic(expected = "Every valued flag tagged eval-safe must declare its value posture")]
-    fn valued_flag_without_value_posture_panics_command() {
-        load_one(r#"
+    fn valued_flag_without_value_posture_is_rejected_at_command_level() {
+        assert_rejected(r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5306,7 +5316,7 @@ valued = ["--type"]
             valued = ["--format"]
             eval_safe = true
             eval_safe_flags = ["--format"]
-        "#);
+        "#, "Every valued flag tagged eval-safe must declare its value posture");
     }
 
     /// Explicit-unrestricted form (`= []`) is the documented opt-out

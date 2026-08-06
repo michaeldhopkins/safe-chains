@@ -71,7 +71,7 @@ proptest! {
         prop_assert_eq!(&entries[0].name, &name);
 
         let toml = render_toml(&entries);
-        let specs = load_toml(&toml, "suggest-test");
+        let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
         prop_assert_eq!(specs.len(), 1, "generated toml did not load to one spec:\n{}", toml);
         prop_assert!(
             dispatch_spec(&tokens(&argv), &specs[0]).is_allowed(),
@@ -92,7 +92,7 @@ proptest! {
         prop_assert!(!entry.standalone.iter().any(|f| f == UNOBSERVED_FLAG));
 
         let toml = render_toml(std::slice::from_ref(&entry));
-        let specs = load_toml(&toml, "suggest-test");
+        let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
         let probe = tokens(&[name.clone(), UNOBSERVED_FLAG.to_string()]);
         prop_assert!(
             !dispatch_spec(&probe, &specs[0]).is_allowed(),
@@ -111,7 +111,7 @@ proptest! {
         prop_assert_eq!(entry.max_positional, positionals.len());
 
         let toml = render_toml(std::slice::from_ref(&entry));
-        let specs = load_toml(&toml, "suggest-test");
+        let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
         let mut argv = vec![name.clone()];
         argv.extend(std::iter::repeat_n("x".to_string(), entry.max_positional + 1));
         prop_assert!(
@@ -138,7 +138,7 @@ proptest! {
             level: "SafeWrite".to_string(),
         };
         let toml = render_toml(std::slice::from_ref(&entry));
-        let specs = load_toml(&toml, "suggest-test");
+        let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
         prop_assert_eq!(specs.len(), 1, "toml failed to load:\n{}", toml);
         prop_assert_eq!(&specs[0].name, &name);
     }
@@ -187,7 +187,7 @@ fn pin_hash_is_over_the_merged_file() {
     assert!(with_existing.starts_with("[[command]]\nname = \"other\"\n"));
     assert!(with_existing.contains("name = \"mytool\""));
     // The merged file still parses as a whole (existing + appended), to BOTH commands.
-    let specs = load_toml(&with_existing, "suggest-test");
+    let specs = load_toml(&with_existing, "suggest-test").expect("valid test definition");
     let names: BTreeSet<&str> = specs.iter().map(|s| s.name.as_str()).collect();
     assert!(names.contains("other") && names.contains("mytool"), "merged file lost a command: {names:?}");
 }
