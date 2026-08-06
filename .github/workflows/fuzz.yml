@@ -10,7 +10,7 @@ name: Fuzz
 # restored). A final coverage job measures which parts of the classifier the corpus actually reaches.
 on:
   schedule:
-    - cron: "0 7 * * *" # ~07:00 UTC nightly
+    - cron: "0 5 * * *" # ~05:00 UTC nightly
   workflow_dispatch:
     inputs:
       max_total_time:
