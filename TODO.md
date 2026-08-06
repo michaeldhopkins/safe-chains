@@ -373,7 +373,141 @@ Recorded mainly for HOW to measure it, because three attempts were wrong before 
 
 If the "Fail on crashes" step is ever extended to `slow-unit-*`, expect these three to trip it.
 
-## Verify the `config_load` nightly actually goes green
+## `config_load` nightly — VERIFIED GREEN, then found a real bug (2026-08-06)
+
+The timeout question below is CLOSED: the nightly of 2026-08-05 passed `config_load` on
+87cc89eb, so silencing the stderr flood under `cfg(fuzzing)` was sufficient and the twenty-minute
+overrun is not lurking elsewhere.
+
+The 2026-08-06 nightly then failed the same target on the SAME SHA — which is the signal worth
+reading, not a flake: the corpus accumulates through the actions cache, so a later run explores
+further. It was a `crash-` artifact (496 bytes) and the job finished in 38 minutes, well inside the
+75-minute cap, so it was a finding rather than the old timeout.
+
+FOUND: a user config that is well-formed TOML but is not a command definition — `[[command]]` with
+no `name` — hit `load_toml`'s deserialization `panic!` (build.rs). `load_custom_file` pre-checks
+SYNTAX (`toml::from_str::<toml::Value>`) and catches the ~40 CONTENT assertions, but this class falls
+between the two: `toml::Value` accepts the document, and the failure is in deserializing it into
+`TomlFile`.
+
+Not a fail-open, and the classifier was never wrong: `catch_unwind` caught it, the file was skipped,
+built-ins kept deciding and `rm -rf /` still denied. The damage was that the default panic hook had
+already printed `thread 'main' panicked at src/registry/build.rs:1445` plus a backtrace note to
+stderr on EVERY invocation, naming an internal file and line — an ordinary typo in a config reading
+as a crash. Under the fuzzer it is fatal outright, because libFuzzer's hook aborts on a panic even
+one that would be caught.
+
+FIXED: `load_custom_file` now also pre-checks the SHAPE (`toml::from_str::<TomlFile>`) before the
+panic path, so this class is reported the same way a syntax error is. Guarded by
+`tests/custom_config_shape.rs`, red-demoed. The guard asserts stderr carries no `panicked at` AND no
+`source begins:` — the latter is `load_toml`'s panic preview, so its absence proves the pre-check ran
+FIRST rather than the panic being caught after the fact, which is the only observable difference
+between fixed and unfixed.
+
+THEN DONE PROPERLY (same day): `load_toml` returns `Result` and `src/registry/build.rs` contains
+ZERO `panic!`. Panic is no longer control flow across the library boundary.
+
+  - All 63 sites (40 `panic!`, 23 `assert!`) became `fail!`/`ensure!` macros expanding to
+    `return Err(...)`, and ~26 functions now return `Result`. Three `unwrap_or_else(|| panic!(..))`
+    closures were restructured by hand — `return` there exits the CLOSURE, not the function, so a
+    blind macro swap would have silently changed meaning.
+  - The BUILT-IN definitions keep failing loudly, which is right: they are compiled in, so a broken
+    one is a bug in this repo. `build.rs` now generates `load_toml(...).unwrap_or_else(|e| panic!())`
+    at each of the 1257 include sites.
+  - `load_custom_file` collapsed from three layers (syntax pre-check + shape pre-check +
+    `catch_unwind`) to a single `match`. Each layer had existed only because the one beneath it
+    aborted the process; with errors returned, all three are redundant. The pre-checks added earlier
+    the same day are gone with them.
+
+VERIFIED beyond the original artifact, which is the point: a bad `operation` term and an unknown
+`profile` archetype are CONTENT assertions the pre-checks could never have caught, and both now
+report cleanly with no panic. Full suite green (10 suites), clippy clean, artifact replays clean.
+
+## The registry validators are largely UNTESTED — found by adversarial review
+
+Mutation-testing during review of the refactor above: disabling `filter_candidates`'s check outright
+left ALL 4504 TESTS PASSING. Its own comment records that the case was red-demoed when it was
+written, but the demo was never left behind as a test.
+
+This is NOT caused by the Result refactor — the check was equally untested as an `assert!`. What the
+refactor changes is the stakes. Every test runs against VALID data (every built-in `commands/*.toml`
+is well-formed), so no validator fires on the happy path, and a validator that stopped working would
+be invisible to a green suite. 63 checks were just rewritten under exactly that blind spot.
+
+Covered so far: 20 `should_panic` tests, plus `a_candidate_sub_may_not_declare_nested_subs` added
+during this review (red-demoed). That leaves most of the 63 with no test asserting they reject
+anything.
+
+Those 20 are now FIXED (2026-08-07). They had become `should_panic` tests matching a Debug-ESCAPED
+string, because `load_one` reached the validator through `.expect()`, whose panic message embeds the
+`Err` via `{:?}` — so any `expected =` fragment containing a quote or newline would have silently
+stopped matching, and the names claimed a panic that no longer happens.
+
+All 20 now call `assert_rejected(toml, expected)`, which reads the `Err` directly. Three gains, in
+order of importance:
+
+  - it distinguishes ACCEPTED-when-it-should-not-be from REJECTED-FOR-THE-WRONG-REASON, which
+    `should_panic` could not — red-demoed, and the failure now reads "rejected, but not for the
+    stated reason — wanted X, got: <actual>" instead of a bare "did not panic as expected";
+  - no Debug escaping, so the fragments mean what they say;
+  - the names say `_is_rejected` rather than `_panics_at_build`.
+
+### Pilot run DONE 2026-08-07 — `cargo mutants` over `registry/build.rs`
+
+    133 mutants in 18m: 107 caught, 7 missed, 19 unviable, 0 timeouts
+    mutation score 107/114 = 93.9%   (unviable excluded from the denominator)
+    baseline: 18s build + 28s TEST  -> test-bound, so restricting the suite is the lever here
+    per mutant: ~5s build + ~40s test    cargo-mutants 27.1.0, -j2, --no-shuffle
+
+CALIBRATION, and the reason to trust the rest: `filter_candidates` is NOT in the missed list. It was
+provably untested when this section was written, and is now caught by the test added during the
+review. The tool independently reproduced the hand-mutation result and confirmed the fix.
+
+THE 7 MISSES. Two are whole validators that can be replaced with `Ok(())` undetected — exactly the
+class this section predicted:
+
+    356   assert_loopback_localizes_is_coherent -> Ok(())      entire validator disabled
+    838   assert_flat_or_structured -> Ok(())                  entire validator disabled
+    200   first_arg_matches: == becomes !=                     see below
+    897   assert_matrix_no_duplicate_parent_action: < becomes >
+    1017  lower_behavior: delete arm (Transfer, None)          "transfer needs its block"
+    1020  lower_behavior: match guard -> false                 "transfer block only with transfer"
+    1092  build_command_archetype_flags: delete !              when_absent/value_prefix exclusivity
+
+`first_arg_matches` is the one to fix first. It is build-time only (its sole caller is
+`assert_no_candidate_shadowed_by_glob`), so inverting it is not a runtime bypass — but that guard is
+the fail-closed detector for the candidate-under-glob footgun, whose own comment records that "the
+AWS blob-readers hit exactly this: a `candidate` under `get-*` would have auto-approved". Inverting
+`==` disables the detector for EXACT-token patterns, which suggests the existing coverage exercises
+only the `get-*` glob arm.
+
+ALL 7 KILLED, re-run verified: `133 mutants in 12m: 1 missed, 113 caught, 19 unviable` after the
+first six tests, then the last one hand-verified red→green. `registry/build.rs` is at 114/114.
+
+Two lessons from killing them, both portable:
+
+  - **The obvious test for a boundary mutant can pass against the mutant.** `matrix.len() < 2`
+    became `> 2`, and at exactly TWO matrices those are indistinguishable — both fall through to
+    the duplicate check. Only a THIRD separates them. A test written to satisfy the report rather
+    than to kill the specific mutant would have looked like a fix.
+  - **Read the mutant's column, not just its line.** The last survivor was reported at `1092:67`
+    and I tested the mutual-exclusion check at 1106, because both are `!` in the same function. The
+    real target was the `!` inside the `judged` CLOSURE, whose inversion refuses a legitimate
+    `judgment` and accepts a blank one. Nothing caught it because every other flag test omits
+    `judgment` entirely, so `is_none_or` short-circuits on `None` and the predicate never runs —
+    an optional field is unexercised in BOTH directions unless a test supplies it.
+
+Also confirmed the skill's warning the hard way: two hand-applied mutations silently did not apply
+(wrong line, then a pattern that occurs TWICE in the file), and each time the test "passed" against
+unmutated code. Only printing an applied-count caught it. Never read a SURVIVED without proving the
+edit landed.
+
+NEXT: the same pilot over `engine/` and `pathgate.rs`, which carry the runtime decisions —
+`registry/build.rs` only validates authored data, so its mutants are about our own data hygiene, not
+about what gets auto-approved. Do NOT extrapolate the 12-18m/133-mutant rate: the skill's measured
+lesson is that it transfers between neither scopes nor cold/warm build dirs. `--list` first; free.
+
+## Original note: verify the `config_load` nightly actually goes green
 
 The nightly failed four nights running on `config_load` — NOT a crash. The job carries
 `timeout-minutes: 75` around 3600s of fuzzing, ran 80 minutes, and was killed; its siblings finish
