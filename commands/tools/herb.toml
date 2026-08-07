@@ -4,6 +4,13 @@ description = "HTML+ERB language tooling from herb-tools (Marco Roth) — a pars
 url = "https://herb-tools.dev"
 researched_version = "0.10.2 (herb gem v0.10.2, libherb v0.10.2; `herb lint --help` read on the installed binary)"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "herb parse app/views/layouts/application.html.erb",
+    "herb lint app/views",
+    "herb lint --fix app/views/home/index.html.erb",
+    "herb format --check app/views",
+    "herb format --write app/views/home/index.html.erb",
+]
 
 [[command.sub]]
 name = "parse"
@@ -49,6 +56,11 @@ valued = ["--config", "--format"]
 # `--config-file`/`-c` names a `.herb.yml` that herb READS. It is data, not code: custom rules load
 # from a fixed `.herb/rules/**/*.{mjs,js}` path that the config does not relocate, so this is an
 # ordinary read at whatever locus the value points to rather than an executor.
+#
+# `lint --fix`/`--fix-unsafely` and `format --write`/`-w` REWRITE the templates named as positionals,
+# so those operands are writes only in the fixing modes. Inspecting modes (`parse`, bare `lint`,
+# `format --check`) leave the positionals ungated, so linting a template outside the workspace works.
 [command.path_gate]
+write_when = ["--fix", "--fix-unsafely", "--write", "-w"]
 flags = { "--config-file" = "read", "-c" = "read" }
 

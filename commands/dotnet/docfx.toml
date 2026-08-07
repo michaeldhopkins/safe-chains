@@ -4,6 +4,10 @@ description = "DocFX — documentation generator for .NET projects. `metadata` e
 url = "https://dotnet.github.io/docfx/reference/docfx-cli-reference/docfx.html"
 researched_version = "docfx 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["docfx build --output ./_site", "docfx metadata -o ./api"]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "metadata"

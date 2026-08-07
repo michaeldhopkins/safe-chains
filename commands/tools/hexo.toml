@@ -10,11 +10,17 @@ examples_safe = [
     "hexo config",
     "hexo generate",
     "hexo g",
+    "hexo render source/_posts/hello.md -o ./rendered.html",
 ]
 examples_denied = [
     "hexo deploy",
     "hexo server",
 ]
+
+# `render -o/--output` names the destination FILE the rendered output is written to (the sub already
+# declares it a write flag; this binds the locus that write may land in).
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

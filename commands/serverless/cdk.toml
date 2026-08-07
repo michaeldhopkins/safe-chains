@@ -7,6 +7,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 examples_safe = [
     "cdk version",
     "cdk synth",
+    "cdk synth --output ./cdk.out",
     "cdk synthesize",
     "cdk list",
     "cdk ls",
@@ -18,6 +19,9 @@ examples_denied = [
     "cdk destroy",
     "cdk bootstrap",
 ]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

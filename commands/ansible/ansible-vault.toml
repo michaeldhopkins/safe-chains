@@ -4,6 +4,10 @@ description = "Manages encrypted Ansible vault files. Subcommands: `view` / `dec
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
 researched_version = "Ansible 9.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml"]
+
+[command.path_gate]
+flags = { "--output" = "write" }
 
 [[command.sub]]
 name = "view"

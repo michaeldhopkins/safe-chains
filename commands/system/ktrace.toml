@@ -3,6 +3,16 @@ name = "ktrace"
 description = "Records, dumps, and configures kernel trace events on macOS. info shows current config (read-only). trace prints events live. dump writes a kernel trace file to a local path. The mutation subs (init, setopt, enable, disable, remove, reset, emit) reconfigure persistent kernel tracing state and are excluded here. macOS ship; surface stable."
 url = "https://keith.github.io/xcode-man-pages/ktrace.1.html"
 researched_version = "macOS 14 (surface stable)"
+examples_safe = [
+    "ktrace info",
+    "ktrace trace --json",
+    "ktrace artrace",
+    "ktrace artrace -o ./trace.atrc",
+]
+
+# `artrace -o` is documented as "specify the name of the file to be created" — the trace destination.
+[command.path_gate]
+flags = { "-o" = "write" }
 
 [[command.sub]]
 name = "info"

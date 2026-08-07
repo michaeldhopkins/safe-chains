@@ -5,6 +5,10 @@ description = "Patch-level vulnerability scanner for Ruby projects. Reads Gemfil
 url = "https://github.com/rubysec/bundler-audit"
 researched_version = "bundler-audit 0.9.3 (Nov 2025)"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = ["bundler-audit check --format json --output ./audit.json"]
+
+[command.path_gate]
+flags = { "--output" = "write" }
 
 [[command.sub]]
 name = "check"

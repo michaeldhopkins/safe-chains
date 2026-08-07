@@ -11,12 +11,19 @@ examples_safe = [
     "nomad alloc-status abc123",
     "nomad agent-info",
     "nomad version",
+    "nomad fmt --check ./jobs",
+    "nomad fmt -w ./jobs/web.nomad.hcl",
 ]
 examples_denied = [
     "nomad alloc-status",
     "nomad job run example.nomad",
     "nomad node-drain -enable web",
 ]
+
+# `fmt -w/--write` rewrites the HCL files named as positionals in place. Without it the run only
+# reports (`--check`/`--list`), so the operands are writes in the fixing mode alone.
+[command.path_gate]
+write_when = ["--write", "-w"]
 
 [[command.sub]]
 name = "version"

@@ -4,6 +4,10 @@ description = "Docker Compose standalone CLI (separate from `docker compose`). S
 url = "https://docs.docker.com/compose/reference/"
 researched_version = "Docker Compose 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["docker-compose config --output ./resolved-compose.yaml"]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

@@ -18,12 +18,19 @@ examples_safe = [
     "hg bm",
     "hg config",
     "hg showconfig",
+    "hg cat -o ./extracted-%s foo.py",
 ]
 examples_denied = [
     "hg push",
     "hg commit",
     "hg pull",
 ]
+
+# `hg cat -o/--output FORMAT` is not a format in the display sense — FORMAT is a filename template
+# (`%s`, `%d`, `%p`, `%H` expand per file/revision), and Mercurial WRITES each extracted revision to
+# the expanded name instead of stdout.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

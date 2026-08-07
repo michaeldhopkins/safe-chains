@@ -86,11 +86,30 @@ pub(crate) struct RoleSpec {
     /// already gated flags would have removed those gates while appearing to add protection.
     #[serde(default)]
     handler: Option<String>,
+    /// Flags that promote the positionals from `positional` to WRITE for this invocation.
+    ///
+    /// The declarative form of the commonest operation-aware shape: a tool that INSPECTS its
+    /// operands by default and REWRITES them under a mode flag — `ansible-lint --fix`,
+    /// `markdownlint --fix`, `clang-tidy --fix`. Without it each such command needs its own Rust
+    /// handler, and six were written by hand before the pattern was obvious enough to name; the
+    /// autofix linters alone would have needed eight more.
+    ///
+    /// Only expresses "flag present ⇒ positionals are writes". A tool whose MODE also moves the
+    /// path (mtree's `-p`, ncu's `--packageFile`) or that needs to disarm on another flag (rdfind's
+    /// `-dryrun`) still needs a handler — this is the common case, not the general one.
+    #[serde(default)]
+    write_when: Vec<String>,
 }
 
 impl RoleSpec {
     fn simple(positional: Role, shape: Shape) -> Self {
-        RoleSpec { positional, shape, flags: HashMap::new(), handler: None }
+        RoleSpec {
+            positional,
+            shape,
+            flags: HashMap::new(),
+            handler: None,
+            write_when: Vec::new(),
+        }
     }
 
     /// The operation-aware handler name this gate delegates to, if any.
@@ -227,6 +246,27 @@ fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
 /// Walk the arguments once: gate each mapped flag's value by its role, then assign roles to the
 /// bare positionals via the positional policy. Any gated path at a sensitive locus → deny.
 fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
+    // `write_when`: a mode flag promotes this invocation's positionals from their declared role to
+    // WRITE. Computed once over the whole token list, because the flag may appear after the paths
+    // (`ansible-lint site.yml --fix`) as readily as before them.
+    // Matches `--fix` AND `--fix=all`. An exact comparison would silently stop firing the moment a
+    // tool's fix flag grew a value — `ansible-lint --fix=all` is a real spelling — and the gate
+    // would vanish with nothing to show for it. Prefix-matching on `=` fails in the safe direction:
+    // a longer flag that merely starts the same (`--fixture`) does not match, because the next
+    // character must be `=` or the token must end.
+    let positional_role = if !spec.write_when.is_empty()
+        && tokens[1..].iter().any(|t| {
+            let t = t.as_str();
+            spec.write_when.iter().any(|w| {
+                t == w.as_str()
+                    || t.strip_prefix(w.as_str()).is_some_and(|r| r.starts_with('='))
+            })
+        })
+    {
+        Role::Write
+    } else {
+        spec.positional
+    };
     let mut positionals: Vec<&str> = Vec::new();
     let mut i = 1;
     while i < tokens.len() {
@@ -276,7 +316,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
                 };
                 if let Some(v) = value
                     && !v.trim_matches('/').is_empty()
-                    && gate(spec.positional, v)
+                    && gate(positional_role, v)
                 {
                     return true;
                 }
@@ -306,7 +346,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
         let role = if last_write && idx == last {
             Role::Write
         } else {
-            spec.positional
+            positional_role
         };
         gate(role, p)
     })
@@ -437,12 +477,29 @@ mod handlers {
 
     /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
     #[cfg(test)]
-    pub(super) const NAMES: &[&str] = &["ar_archive", "textutil_mode"];
+    pub(super) const NAMES: &[&str] = &[
+        "ar_archive",
+        "dart_mode",
+        "exiftool_mode",
+        "jupytext_mode",
+        "mtree_mode",
+        "ncu_mode",
+        "rdfind_mode",
+        "textutil_mode",
+        "xattr_mode",
+    ];
 
     pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         match name {
             "ar_archive" => ar_archive(tokens),
+            "dart_mode" => dart_mode(tokens),
+            "exiftool_mode" => exiftool_mode(tokens),
+            "jupytext_mode" => jupytext_mode(tokens),
+            "mtree_mode" => mtree_mode(tokens),
+            "ncu_mode" => ncu_mode(tokens),
+            "rdfind_mode" => rdfind_mode(tokens),
             "textutil_mode" => textutil_mode(tokens),
+            "xattr_mode" => xattr_mode(tokens),
             // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
             // misconfigured name so a typo can never silently ungate a command.
             _ => true,
@@ -491,6 +548,278 @@ mod handlers {
         // r/q archive real files given as members — a sensitive member is a disclosing read.
         matches!(op, Some(b'r' | b'q'))
             && positionals.iter().skip(archive_idx + 1).any(|m| gate(Role::Read, m))
+    }
+
+    /// `xattr [-lrsvx] [-p NAME | -w NAME VALUE | -d NAME | -c] file…` — the extended-attribute
+    /// operation sets the files' role: `-w`/`-d`/`-c` MUTATE each file's attributes (write),
+    /// everything else (a bare listing, or `-p NAME`) reads them.
+    ///
+    /// Operation-aware rather than a blanket `positional = "write"` because the read form is the
+    /// common one — checking `com.apple.quarantine` on a download — and write-gating it would
+    /// over-deny every inspection of a file outside the workspace. The write form is the one that
+    /// matters: `xattr -w com.apple.quarantine … ~/.ssh/id_rsa` auto-approved before this.
+    ///
+    /// A BARE listing is not gated at all, which follows this file's standing policy rather than
+    /// inventing one: metadata-only commands (`ls`, `stat`, `file`, `du`) are deliberately excluded
+    /// because they reveal names and sizes, not content. `xattr FILE` prints attribute NAMES and is
+    /// exactly that shape; `-p NAME` and `-l` print attribute VALUES, which is content, so those
+    /// read-gate like `cat` does.
+    ///
+    /// The valued flags consume their operands so a NAME or VALUE is never mistaken for a file:
+    /// `-w` takes two, `-p`/`-d` take one.
+    fn xattr_mode(tokens: &[Token]) -> bool {
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let writes = args.iter().any(|a| matches!(*a, "-w" | "-d" | "-c"));
+        let reads_values = args.iter().any(|a| matches!(*a, "-p" | "-l"));
+        if !writes && !reads_values {
+            return false; // name-only listing: metadata, not content
+        }
+        let role = if writes { Role::Write } else { Role::Read };
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "-w" {
+                it.next();
+                it.next();
+                continue;
+            }
+            if t == "-p" || t == "-d" {
+                it.next();
+                continue;
+            }
+            if t.starts_with('-') {
+                continue;
+            }
+            if gate(role, t) {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// `exiftool [-TAG=VALUE …] files…` — a tag ASSIGNMENT rewrites the file's metadata in place.
+    ///
+    /// Write-only on purpose. This file's standing note defers the question of read-gating the
+    /// disclosure inspectors (`pdfinfo`, `ffprobe`, `mediainfo`, `exiftool`) because doing so
+    /// over-denies ordinary home-file inspection — that deferral is about READS, and nothing here
+    /// changes it: a bare `exiftool ~/photo.jpg` is untouched. What was never deferred is the write
+    /// form, and `exiftool -Author=x ~/.ssh/id_rsa` auto-approved.
+    ///
+    /// Detecting the write is the whole difficulty, because exiftool's writing syntax IS its flag
+    /// syntax: `-TAG=VALUE` assigns, and `-all=` DELETES every tag. So any dash-led token carrying
+    /// `=` is treated as a write. That over-matches rather than under-matches (a read-only run with
+    /// an `=` in some option would merely gate its paths more strictly), which is the safe
+    /// direction for a detector whose miss is an ungated write.
+    fn exiftool_mode(tokens: &[Token]) -> bool {
+        const VALUED: &[&str] = &["-o", "-tagsfromfile", "-api", "-charset", "-lang", "-@"];
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let assigns = args.iter().any(|a| {
+            a.starts_with('-')
+                && a.contains('=')
+                && !VALUED.contains(a)
+        });
+        let overwrites = args.iter().any(|a| {
+            matches!(*a, "-overwrite_original" | "-overwrite_original_in_place" | "-delete_original")
+        });
+        if !assigns && !overwrites {
+            return false; // a read: metadata inspection, deliberately not gated here
+        }
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "-o" {
+                if let Some(v) = it.next()
+                    && gate(Role::Write, v)
+                {
+                    return true;
+                }
+                continue;
+            }
+            if VALUED.contains(&t) {
+                it.next(); // a non-path option value
+                continue;
+            }
+            if t.starts_with('-') {
+                continue;
+            }
+            if gate(Role::Write, t) {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// `rdfind [-action true] dir…` — the action flags decide whether the scanned trees are read or
+    /// destroyed. Per its own description: by default it reports duplicates and writes `results.txt`
+    /// in the CWD; `-makesymlinks`/`-makehardlinks`/`-deleteduplicates` replace or REMOVE duplicates
+    /// in the trees given as positionals; `-dryrun` previews without acting.
+    ///
+    /// So the positionals are a write-target only when an action is actually enabled — the flags
+    /// take an explicit `true`/`false`, and `-dryrun true` disarms all of them. A plain scan of
+    /// `~/Pictures` stays allowed; `rdfind -deleteduplicates true ~/.ssh` does not.
+    fn rdfind_mode(tokens: &[Token]) -> bool {
+        const ACTIONS: &[&str] = &["-makesymlinks", "-makehardlinks", "-deleteduplicates"];
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let enabled = |flag: &str| {
+            args.windows(2).any(|w| w[0] == flag && w[1] == "true")
+        };
+        let acting = ACTIONS.iter().any(|f| enabled(f));
+        if !acting || enabled("-dryrun") {
+            return false; // scan-and-report, or explicitly disarmed
+        }
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t.starts_with('-') {
+                it.next(); // every rdfind option takes an explicit true/false or numeric value
+                continue;
+            }
+            if gate(Role::Write, t) {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// `mtree [-uUr] -p PATH` — verifies a file hierarchy against a spec, and can CHANGE it to match.
+    ///
+    /// The dangerous flag is `-r`: it REMOVES every file in the tree that the spec does not mention,
+    /// so `mtree -r -p ~/.ssh` is mass deletion of a credential directory, and it auto-approved.
+    /// `-u`/`-U` modify the hierarchy (permissions, ownership, missing entries) to match.
+    ///
+    /// The tree is a FLAG value (`-p`), never a positional, which is why every positional-shaped
+    /// sweep missed this one. `-f SPEC` and `-X EXCLUDE` are reads whatever the mode.
+    fn mtree_mode(tokens: &[Token]) -> bool {
+        // ONLY genuinely valued flags. `-P` (do not follow symlinks) and `-L` (follow them) are
+        // BOOLEAN, and listing them here was a live bypass: the walk consumed the following `-p` as
+        // their value, so `mtree -P -p ~/.ssh -r` left the tree ungated while `mtree -r -p ~/.ssh`
+        // denied — the same destructive operation, reordered. Asserting an arity without checking it
+        // is the same defect this gate exists to catch.
+        const VALUED: &[&str] = &["-f", "-K", "-k", "-p", "-s", "-N", "-X", "-R"];
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let writes = args.iter().any(|a| matches!(*a, "-u" | "-U" | "-r"));
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "-p" {
+                let role = if writes { Role::Write } else { Role::Read };
+                if let Some(v) = it.next()
+                    && gate(role, v)
+                {
+                    return true;
+                }
+                continue;
+            }
+            if t == "-f" || t == "-X" {
+                if let Some(v) = it.next()
+                    && gate(Role::Read, v)
+                {
+                    return true;
+                }
+                continue;
+            }
+            if VALUED.contains(&t) {
+                it.next();
+            }
+        }
+        false
+    }
+
+    /// `ncu [--upgrade] [--packageFile FILE]` — npm-check-updates REPORTS available updates by
+    /// default and only rewrites the manifest with `--upgrade`/`-u`, so the manifest's role follows
+    /// the mode. Without this, `ncu --upgrade --packageFile /etc/package.json` wrote outside the
+    /// workspace.
+    fn ncu_mode(tokens: &[Token]) -> bool {
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let writes = args.iter().any(|a| matches!(*a, "--upgrade" | "-u"));
+        let role = if writes { Role::Write } else { Role::Read };
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "--packageFile"
+                && let Some(v) = it.next()
+                && gate(role, v)
+            {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// `jupytext [--sync|--set-formats|--update-metadata|--to FMT] notebooks…` — the operation
+    /// decides whether the notebooks are read or REWRITTEN. `--sync` and `--set-formats` mutate the
+    /// notebook and its paired file in place; `--to` writes a converted sibling; a plain invocation
+    /// only inspects. `jupytext --sync ~/.ssh/config` auto-approved before this.
+    fn jupytext_mode(tokens: &[Token]) -> bool {
+        const VALUED: &[&str] = &["--to", "--from", "--set-formats", "--output", "-o", "--pipe"];
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let writes = args.iter().any(|a| {
+            matches!(*a, "--sync" | "--set-formats" | "--update-metadata" | "--to" | "-o" | "--output")
+        });
+        let role = if writes { Role::Write } else { Role::Read };
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "--output" || t == "-o" {
+                if let Some(v) = it.next()
+                    && gate(Role::Write, v)
+                {
+                    return true;
+                }
+                continue;
+            }
+            if VALUED.contains(&t) {
+                it.next(); // a format name, not a path
+                continue;
+            }
+            if t.starts_with('-') {
+                continue;
+            }
+            if gate(role, t) {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// `dart format [-o MODE] paths…` — formats its positionals IN PLACE unless told otherwise.
+    ///
+    /// Two things make this need a handler rather than `write_when`. First the default: with no
+    /// flag at all `dart format` REWRITES every path it is given, so the dangerous case carries no
+    /// distinguishing token — `dart format ~/.ssh/authorized_keys` auto-approved. Second the
+    /// selector: `-o`/`--output` takes a VALUE (`write` rewrites, `show`/`json`/`none` print to
+    /// stdout), and `write_when` sees only flag PRESENCE. This is the flag-with-value predicate
+    /// recorded as an open question in docs/design/command-modes.md, with a live hole attached.
+    ///
+    /// Scoped to the `format` subcommand: `dart analyze`, `dart run`, `dart test` and friends do
+    /// not write their operands, so a blanket positional role on `dart` would over-deny them.
+    fn dart_mode(tokens: &[Token]) -> bool {
+        const VALUED: &[&str] = &["-o", "--output", "-l", "--line-length", "--indent", "--summary"];
+        if tokens.get(1).map(Token::as_str) != Some("format") {
+            return false;
+        }
+        let args: Vec<&str> = tokens[2..].iter().map(Token::as_str).collect();
+        // Default is `write`; only an explicit non-write output mode makes this a read.
+        let mut mode = "write";
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "-o" || t == "--output" {
+                if let Some(v) = it.next() {
+                    mode = v;
+                }
+            } else if let Some(v) = t.strip_prefix("--output=") {
+                mode = v;
+            }
+        }
+        let role = if mode == "write" { Role::Write } else { Role::Read };
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if VALUED.contains(&t) {
+                it.next();
+                continue;
+            }
+            if t.starts_with('-') {
+                continue;
+            }
+            if gate(role, t) {
+                return true;
+            }
+        }
+        false
     }
 
     /// `textutil -MODE [opts] files…` — `-convert`/`-strip` WRITE (to `-output`/`-outputdir`, else a
@@ -556,9 +885,15 @@ mod both_gates {
             shape: Shape::default(),
             flags: flags.clone(),
             handler: Some("ar_archive".to_string()),
+            write_when: Vec::new(),
         };
-        let flags_only =
-            RoleSpec { positional: Role::Ignore, shape: Shape::default(), flags, handler: None };
+        let flags_only = RoleSpec {
+            positional: Role::Ignore,
+            shape: Shape::default(),
+            flags,
+            handler: None,
+            write_when: Vec::new(),
+        };
 
         // The FLAG half fires with a handler present, exactly as it does without one.
         let sensitive = toks(&["ar", "t", "./lib.a", "--out", "/etc/x"]);
@@ -585,6 +920,189 @@ mod tests {
 
     fn toks(parts: &[&str]) -> Vec<Token> {
         parts.iter().map(|p| Token::from_test(p)).collect()
+    }
+
+    /// GLOBAL INVARIANT: no gate declares something the walker would silently ignore.
+    ///
+    /// This is the guard for a whole defect class, not one combination. A `RoleSpec` field that
+    /// cannot take effect in the shape it was declared in is worse than a missing one: the entry
+    /// READS as though the path is handled, review sees a declaration, and nothing fires. That is
+    /// the same failure the `handler` doc comment already records — `flags` used to be discarded
+    /// whenever a handler was present, so adding a handler to a spec that already gated flags
+    /// silently removed those gates while appearing to add protection.
+    ///
+    /// A `handler` REPLACES the positional/shape walk (it decides roles per invocation), so
+    /// `positional`, `shape` and `write_when` are all inert beside one; `flags` are honoured and are
+    /// deliberately allowed. Rather than enumerate legal pairs, this asserts the rule directly, so a
+    /// field added to `RoleSpec` later is covered the moment someone declares it next to a handler —
+    /// as long as this list is extended with it, which the message says outright.
+    #[test]
+    fn no_gate_declares_a_field_the_walker_would_ignore() {
+        /// Fields a `handler` makes inert. `flags` is deliberately absent — it IS honoured.
+        const INERT_BESIDE_HANDLER: &[&str] = &["positional", "shape", "write_when"];
+
+        let mut bad: Vec<String> = Vec::new();
+        for (cmd, spec) in &GATES.roles {
+            let Some(h) = spec.handler.as_deref() else { continue };
+            let mut inert: Vec<&str> = Vec::new();
+            if spec.positional != Role::default() {
+                inert.push("positional");
+            }
+            if spec.shape != Shape::default() {
+                inert.push("shape");
+            }
+            if !spec.write_when.is_empty() {
+                inert.push("write_when");
+            }
+            if !inert.is_empty() {
+                bad.push(format!("  [roles.\"{cmd}\"] handler = \"{h}\" — {} ignored", inert.join(", ")));
+            }
+        }
+
+        // BOTH declaration sites, or the invariant is not global. A gate may be declared centrally
+        // in pathgates.toml OR co-located as `[command.path_gate]` in the command's own TOML — and
+        // the latter is the PREFERRED site (104 commands use it), so covering only the central map
+        // would leave the majority unchecked while the failure message claimed otherwise.
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read command toml");
+            let Ok(doc) = toml::from_str::<toml::Value>(&src) else { continue };
+            let Some(cmds) = doc.get("command").and_then(toml::Value::as_array) else { continue };
+            for cmd in cmds {
+                let Some(gate) = cmd.get("path_gate").and_then(toml::Value::as_table) else {
+                    continue;
+                };
+                let Some(h) = gate.get("handler").and_then(toml::Value::as_str) else { continue };
+                let inert: Vec<&str> =
+                    INERT_BESIDE_HANDLER.iter().copied().filter(|k| gate.contains_key(*k)).collect();
+                if !inert.is_empty() {
+                    let name = cmd.get("name").and_then(toml::Value::as_str).unwrap_or("?");
+                    bad.push(format!(
+                        "  {name} [command.path_gate] handler = \"{h}\" — {} ignored",
+                        inert.join(", ")
+                    ));
+                }
+            }
+        }
+        bad.sort();
+        assert!(
+            bad.is_empty(),
+            "these gates declare fields the walker discards, so they protect nothing while looking \
+             like they do. A `handler` replaces the positional/shape walk, so move the intent INTO \
+             the handler (or drop the field). `flags` are the one thing honoured alongside a \
+             handler. If you added a new RoleSpec field, add it to this check too:\n{}",
+            bad.join("\n"),
+        );
+    }
+
+    /// `write_when` promotes positionals to WRITE only when one of its flags is present, and
+    /// recognises the `--flag=value` spelling as well as the bare one.
+    ///
+    /// A schema field with no test of its own semantics is how a gate silently stops firing: the
+    /// integration probes all use the bare form, so an exact-match regression would keep them green
+    /// while `--fix=all` sailed through. The over-match direction is checked too — `--fixture` must
+    /// NOT count as `--fix`, or the promotion would fire on unrelated flags and manufacture false
+    /// denies that look like policy.
+    #[test]
+    fn write_when_promotes_only_on_its_own_flags() {
+        let spec = RoleSpec {
+            positional: Role::Read,
+            shape: Shape::default(),
+            flags: HashMap::new(),
+            handler: None,
+            write_when: vec!["--fix".to_string()],
+        };
+        // `read` and `write` both deny a sensitive locus, so the observable difference lives at an
+        // in-workspace protected path: readable, write-denied.
+        let protected = ".git/config";
+        assert!(
+            !walk(&spec, &toks(&["lint", protected])),
+            "no fix flag: the operand is a READ and a protected path is readable"
+        );
+        assert!(
+            walk(&spec, &toks(&["lint", "--fix", protected])),
+            "--fix must promote the operand to a WRITE"
+        );
+        assert!(
+            walk(&spec, &toks(&["lint", "--fix=all", protected])),
+            "--fix=all is the same flag carrying a value and must promote too"
+        );
+        assert!(
+            walk(&spec, &toks(&["lint", protected, "--fix"])),
+            "the flag may follow the paths — promotion is decided over the whole token list"
+        );
+        assert!(
+            !walk(&spec, &toks(&["lint", "--fixture", protected])),
+            "--fixture merely starts with --fix and must NOT promote"
+        );
+    }
+
+    /// `pathgates.toml` parses. Named separately so the failure SAYS SO.
+    ///
+    /// The file is read through a `LazyLock` that panics on a parse error, so a broken one already
+    /// fails the suite — but it fails inside whichever unrelated test touches the registry first,
+    /// as a panic buried among dozens of others. This test states the actual problem in its own
+    /// name and message.
+    ///
+    /// The recurring cause is a DUPLICATE `[roles."x"]` header. TOML rejects a repeated table key,
+    /// so adding a second block for a command that already has one — easy, because the file is long
+    /// and grouped by theme rather than sorted — takes the whole gate down. It has happened three
+    /// times; the fix is always to MERGE into the existing block.
+    #[test]
+    fn pathgates_toml_parses() {
+        let src = include_str!("../pathgates.toml");
+        if let Err(e) = toml::from_str::<toml::Value>(src) {
+            panic!(
+                "pathgates.toml is not valid TOML: {e}\n\
+                 A duplicate `[roles.\"<cmd>\"]` header is the usual cause — merge into the \
+                 existing block instead of adding a second one."
+            );
+        }
+    }
+
+    /// CANARY: commands that must never stop being auto-approved.
+    ///
+    /// This is the guard that would have caught all three duplicate-key incidents IMMEDIATELY, and
+    /// it catches far more than that. When a config the loader depends on fails to parse, the
+    /// loader panics and EVERY command denies — which from the outside is indistinguishable from a
+    /// perfectly working gate. Checking only that `/etc/hosts` is refused would have passed while
+    /// the classifier was entirely broken.
+    ///
+    /// So the assertion is the opposite one: a handful of unmistakably safe commands still pass. A
+    /// failure here means something catastrophic (unparseable config, a gate that over-matches,
+    /// a registry that did not load) rather than a subtle policy question — which is why the list
+    /// is deliberately boring and should stay that way.
+    #[test]
+    fn known_safe_commands_are_still_auto_approved() {
+        const CANARY: &[&str] = &[
+            "ls",
+            "true",
+            "pwd",
+            "echo hi",
+            "git status",
+            "cargo build",
+            "grep -rn foo ./src",
+        ];
+        for cmd in CANARY {
+            assert!(
+                crate::is_safe_command(cmd),
+                "CANARY FAILED: `{cmd}` is no longer auto-approved. Something is broken globally — \
+                 check that pathgates.toml and the command TOMLs still parse (a duplicate table key \
+                 panics the loader, and a panicking loader denies EVERYTHING)."
+            );
+        }
     }
 
     /// THE invariant the glued-flag handling kept breaking: for a whole-command file gate

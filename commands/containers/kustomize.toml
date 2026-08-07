@@ -3,6 +3,12 @@ name = "kustomize"
 description = "Template-free customization tool for Kubernetes YAML configurations. The build subcommand is the core operation: it reads a kustomization.yaml and emits rendered manifests to stdout -- purely local file processing with no cluster or network interaction, unless Helm inflation or remote bases are enabled via flags. edit subcommands modify the kustomization.yaml file. The project targets biweekly-to-monthly releases, with kustomize v5.8.1 shipping in February 2026. New transformer types and field options are added periodically."
 url = "https://kubectl.docs.kubernetes.io/references/kustomize/"
 bare_flags = ["--help", "-h"]
+examples_safe = [
+    "kustomize version",
+    "kustomize build",
+    "kustomize build ./overlays/dev",
+    "kustomize build -o ./rendered.yaml",
+]
 
 [[command.sub]]
 name = "build"
@@ -14,5 +20,7 @@ name = "version"
 standalone = ["--help", "--short", "-h"]
 
 # `--helm-command` names the helm executable kustomize shells out to when inflating a chart.
+# `build -o/--output` is a PATH, not a format: kustomize writes the rendered manifests to that file
+# (or, if it names a directory, one file per resource inside it).
 [command.path_gate]
-flags = { "--helm-command" = "exec" }
+flags = { "--helm-command" = "exec", "--output" = "write", "-o" = "write" }

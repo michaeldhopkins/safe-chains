@@ -27,3 +27,14 @@ valued = [
     "-transform",
 ]
 write_flags = ["--w", "-w"]
+examples_safe = [
+    "gomodifytags -file ./main.go -struct Server -add-tags json",
+    "gomodifytags -w -file ./main.go -struct Server -add-tags json",
+    "gomodifytags --file ./main.go --all --remove-tags xml",
+]
+
+# `-file`/`--file` names the source gomodifytags operates on, and `-w` rewrites that same file in
+# place — so the flag VALUE is the write target. `-w` itself is boolean and carries no path, which is
+# why the output-flag sweep saw nothing to gate here.
+[command.path_gate]
+flags = { "-file" = "write", "--file" = "write" }

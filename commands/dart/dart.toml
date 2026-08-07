@@ -4,6 +4,18 @@ description = "Dart SDK CLI. `analyze` and `format` (without --fix) are static a
 url = "https://dart.dev/tools/dart-tool"
 researched_version = "Dart 3.x"
 bare_flags = ["--help", "--version", "-h"]
+# Safe twins for the `dart_mode` gate: `dart format` rewrites its positionals IN PLACE by default,
+# so the gate must still leave in-workspace formatting and the non-`format` subcommands alone.
+examples_safe = [
+    "dart format ./lib",
+    "dart format -o write ./lib",
+    "dart format -o show ./lib",
+    "dart analyze",
+]
+examples_denied = [
+    "dart format ~/.ssh/authorized_keys",
+    "dart format -o write /etc/hosts",
+]
 
 [[command.sub]]
 name = "analyze"

@@ -4,6 +4,28 @@ description = "HTTP load tester (Go). Subcommands: `attack`, `report`, `dump`, `
 url = "https://github.com/tsenart/vegeta"
 researched_version = "vegeta 12.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+# The safe twin for the `--output` gate below: an in-workspace report, and the bare form that
+# defaults to stdout, must both keep working. Without these the gate has nothing proving it does
+# not swallow ordinary usage.
+examples_safe = [
+    "vegeta report",
+    "vegeta report --output",
+    "vegeta report --output ./results.txt",
+]
+examples_denied = [
+    "vegeta report --output /etc/cron.d/x",
+    "vegeta report --output ~/.ssh/authorized_keys",
+]
+
+# `--output` names the FILE the analysis is written to, on every sub that has it, and it was
+# ungated: `vegeta report --output ~/.ssh/authorized_keys` auto-approved, writing report content
+# into a credential file. `write` because vegeta emits a report there; it does not run it.
+#
+# Note `--output` sits in BOTH `standalone` and `valued` on these subs. That is not a contradiction
+# — it is how this schema spells an OPTIONAL value, and it is load-bearing here: vegeta's `--output`
+# defaults to stdout when bare. The gate applies to the form that carries a value.
+[command.path_gate]
+flags = { "--output" = "write" }
 
 [[command.sub]]
 name = "report"

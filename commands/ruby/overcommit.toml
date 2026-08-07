@@ -18,3 +18,16 @@ standalone = [
     "-f", "-h", "-i", "-l", "-t", "-u", "-v",
 ]
 write_flags = ["--install", "--sign", "--uninstall", "-i", "-u"]
+examples_safe = [
+    "overcommit --list-hooks",
+    "overcommit --template-dir",
+    "overcommit --install",
+    "overcommit --install .",
+    "overcommit --uninstall ./vendor/checkout",
+]
+
+# The optional trailing operand is the REPOSITORY overcommit acts on, and in the installing modes
+# that means writing hook scripts into its `.git/hooks/`. Bare/diagnostic runs (`--list-hooks`,
+# `--template-dir`) only read, so the operand is a write in the installing modes alone.
+[command.path_gate]
+write_when = ["--install", "--sign", "--uninstall", "-i", "-u"]

@@ -4,6 +4,18 @@ description = "Grafana k6 — JavaScript load testing tool. `run` executes a JS 
 url = "https://grafana.com/docs/k6/latest/using-k6/k6-cli/"
 researched_version = "k6 0.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "k6 version",
+    "k6 inspect script.js",
+    "k6 archive script.js",
+    "k6 archive -O ./archive.tar script.js",
+    "k6 convert --output ./script.js recording.har",
+]
+
+# `archive`'s `-O/--archive-out` (and the `-o/--out` spelling the docs also show) names the tar file
+# k6 writes; `convert`'s `--output` names the generated script file. Every one is a destination path.
+[command.path_gate]
+flags = { "--archive-out" = "write", "-O" = "write", "--out" = "write", "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

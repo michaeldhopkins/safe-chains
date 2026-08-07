@@ -4,6 +4,18 @@ description = "Release automation for Go projects. `check` validates `.gorelease
 url = "https://goreleaser.com/"
 researched_version = "goreleaser 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "goreleaser check",
+    "goreleaser healthcheck",
+    "goreleaser schema",
+    "goreleaser schema -o ./goreleaser.schema.json",
+    "goreleaser jsonschema --output ./schema.json",
+]
+
+# `schema`/`jsonschema -o/--output` is the FILE the generated JSON schema is written to (`-` means
+# stdout); nothing here selects a format.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "check"

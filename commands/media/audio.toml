@@ -23,6 +23,7 @@ valued = [
     "--sample-rate", "--src-complexity",
     "--strategy", "--useragent", "--verbose",
 ]
+examples_safe = ["afconvert -f AIFF -d BEI16 ./input.wav ./output.aiff"]
 
 [command.path_gate]
 flags = { "--output-dir" = "write" }
@@ -36,6 +37,10 @@ level = "Inert"
 bare = false
 standalone = ["-c", "-h", "-x", "-w"]
 write_flags = ["-w"]
+examples_safe = ["afhash -x ./track.aiff", "afhash -w ./track.aiff"]
+
+[command.path_gate]
+write_when = ["-w"]
 
 [[command]]
 name = "afida"
@@ -45,6 +50,7 @@ researched_version = "macOS 14; CoreAudio surface frozen"
 level = "Inert"
 bare = false
 standalone = ["-h"]
+examples_safe = ["afida ./track.aiff"]
 
 [[command]]
 name = "afinfo"
@@ -54,6 +60,7 @@ researched_version = "macOS 14; CoreAudio surface frozen"
 level = "Inert"
 bare = false
 standalone = ["--help", "-h", "-b", "-i", "-r", "-x", "--brief", "--info-only", "--no-fileformat", "--warnings"]
+examples_safe = ["afinfo ./track.aiff", "afinfo --brief ./track.aiff"]
 
 [[command]]
 name = "afplay"
@@ -64,6 +71,7 @@ level = "SafeRead"
 bare = false
 standalone = ["--help", "-h", "-d", "--debug"]
 valued = ["-t", "--time", "-r", "--rate", "-v", "--volume", "-q", "--quality"]
+examples_safe = ["afplay ./track.aiff", "afplay -v 0.5 ./track.aiff"]
 
 [[command]]
 name = "auval"
@@ -78,6 +86,7 @@ standalone = [
     "-strict", "-w", "-veryverbose",
 ]
 valued = ["-v", "-vt", "-de", "-f"]
+examples_safe = ["auval -a", "auval -v aufx dely appl"]
 
 [[command]]
 name = "say"
@@ -105,6 +114,7 @@ valued = [
     "--audio-device",
 ]
 write_flags = ["-o", "--output-file"]
+examples_safe = ["say hello world", "say --output-file ./greeting.aiff hello world"]
 
 [command.path_gate]
 flags = { "--output-file" = "write", "--input-file" = "read" }
@@ -157,3 +167,4 @@ valued = [
     "--genre-list",
     "-p",
 ]
+examples_safe = ["lame ./input.wav ./output.mp3", "lame -b 192 ./input.wav ./output.mp3"]

@@ -24,3 +24,4 @@ valued = [
     "-f",
 ]
 write_flags = ["--fix", "--out"]
+examples_safe = ["ameba", "ameba src", "ameba --fix src/parser.cr", "ameba --out ./ameba.json"]

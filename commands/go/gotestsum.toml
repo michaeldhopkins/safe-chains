@@ -9,6 +9,7 @@ standalone = [
     "--debug", "--dry-run", "--force-cache",
     "--format-hide-empty-pkg",
     "--help", "--ignore-non-json-output-lines",
+    "--junitfile-hide-empty-pkg",
     "--no-color", "--rerun-fails-only-root-cases",
     "--watch", "--watch-chdir",
     "-h",
@@ -16,7 +17,7 @@ standalone = [
 valued = [
     "--format", "--format-hivis",
     "--format-icons", "--hide-summary",
-    "--junitfile", "--junitfile-hide-empty-pkg",
+    "--junitfile",
     "--junitfile-project-name", "--junitfile-testcase-classname",
     "--junitfile-testsuite-name",
     "--max-fails", "--packages",
@@ -26,11 +27,22 @@ valued = [
     "--rerun-fails-run-root-test", "--watch-skip-tests",
 ]
 write_flags = [
-    "--junitfile", "--junitfile-hide-empty-pkg",
+    "--junitfile",
     "--rerun-fails-report",
+]
+examples_safe = [
+    "gotestsum",
+    "gotestsum --format testname",
+    "gotestsum --junitfile ./junit.xml",
+    "gotestsum --junitfile ./junit.xml --junitfile-hide-empty-pkg",
+    "gotestsum --rerun-fails --rerun-fails-report ./rerun.txt",
 ]
 
 # `--raw-command` REPLACES the test command with the given program and `--post-run-command` runs
 # one afterwards, so both values are programs rather than data.
+#
+# `--junitfile` and `--rerun-fails-report` each name the FILE the report is written to.
+# `--junitfile-hide-empty-pkg` only shapes what goes INTO that report — it is boolean upstream and
+# causes no write of its own, so it is neither valued nor a write flag.
 [command.path_gate]
-flags = { "--raw-command" = "exec", "--post-run-command" = "exec" }
+flags = { "--raw-command" = "exec", "--post-run-command" = "exec", "--junitfile" = "write", "--rerun-fails-report" = "write" }

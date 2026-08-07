@@ -4,6 +4,10 @@ description = "Artillery — load testing toolkit (Node). `run` executes a YAML 
 url = "https://www.artillery.io/docs/reference/cli"
 researched_version = "artillery 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["artillery report --output ./report.html ./results.json"]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

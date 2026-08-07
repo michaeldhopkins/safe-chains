@@ -8,6 +8,7 @@ examples_safe = [
     "flutter logs",
     "flutter logs -d ABC123",
     "flutter doctor",
+    "flutter analyze --write ./analysis.txt",
 ]
 examples_denied = [
     "flutter logs --clear",
@@ -15,6 +16,9 @@ examples_denied = [
     "flutter run",
     "flutter build apk",
 ]
+
+[command.path_gate]
+flags = { "--write" = "write" }
 
 [[command.sub]]
 name = "doctor"

@@ -4,6 +4,10 @@ description = "dotnet-trace — trace .NET process events via EventPipe. `ps` li
 url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace"
 researched_version = "dotnet-trace 8.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = ["dotnet-trace convert ./trace.nettrace --format speedscope --output ./trace.speedscope.json"]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "ps"

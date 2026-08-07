@@ -26,3 +26,7 @@ valued = [
     "-T", "-X", "-d", "-f", "-x",
 ]
 write_flags = ["--output-to", "-f", "--init"]
+examples_safe = ["depcruise --output-to ./deps.json src", "depcruise -f ./deps.dot -T dot src"]
+
+[command.path_gate]
+flags = { "--output-to" = "write", "-f" = "write" }

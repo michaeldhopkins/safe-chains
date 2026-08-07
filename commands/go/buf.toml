@@ -4,6 +4,15 @@ description = "Buf — modern protobuf tooling. Read subcommands: `lint`, `forma
 url = "https://buf.build/docs/"
 researched_version = "buf 1.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "buf build -o ./image.bin",
+    "buf format --write ./proto",
+    "buf generate --output ./gen",
+]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
+write_when = ["--write", "-w"]
 
 [command.wrapper]
 standalone = ["--debug"]

@@ -4,6 +4,10 @@ description = "Older Ruby web-app security scanner (predecessor of Brakeman in s
 url = "https://github.com/thesp0nge/dawnscanner"
 researched_version = "dawnscanner 2.2.0 (April 2023; project dormant)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["dawn scan --output ./dawn-report.json ."]
+
+[command.path_gate]
+flags = { "--output" = "write", "-O" = "write" }
 
 [[command.sub]]
 name = "scan"

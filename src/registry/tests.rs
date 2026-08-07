@@ -2897,6 +2897,69 @@ use super::*;
         );
     }
 
+    /// A gated command must prove its SAFE form still works, by carrying an `examples_safe`.
+    ///
+    /// The ratchet next door (`ambiguous_output_flags_do_not_write_sensitive_paths`) only looks for
+    /// MISSING gates. It is blind to the opposite mistake, which is the one a burn-down actually
+    /// makes: gating too broadly. `--output` is a path on `ytt` and a FORMAT on `bazel query`, so a
+    /// well-meaning gate on the latter denies ordinary usage — and no test notices, because nothing
+    /// asserts ordinary usage still passes.
+    ///
+    /// `examples_safe` is the safe-twin control made permanent. Every gate added by hand this
+    /// session was verified with one by hand (`clang-format -i ./src/x.c` still allows); this makes
+    /// that verification a build artifact instead of a thing someone typed once, because
+    /// `toml_examples_match_dispatch` re-runs those examples on every build.
+    ///
+    /// Seeded with the 313 gated commands that predate the rule, so it ratchets: a newly gated
+    /// command must bring its example. Both directions fail, so the list cannot rot.
+    #[test]
+    fn a_gated_command_proves_its_safe_form_still_works() {
+        let seeded: std::collections::HashSet<&str> =
+            include_str!("../../tests/fixtures/gated_without_examples.tsv")
+                .lines()
+                .map(str::trim)
+                .filter(|l| !l.is_empty() && !l.starts_with('#'))
+                .collect();
+
+        let mut gated_missing: Vec<&str> = Vec::new();
+        let mut now_has: Vec<&str> = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // aliases carry no examples of their own
+            }
+            // Either declaration site counts: a central `[roles."x"]` (or the flat read/write
+            // lists) in pathgates.toml, or a co-located `[command.path_gate]` on the command.
+            let gated = crate::pathgate::central_role_exists(name) || spec.path_gate.is_some();
+            if !gated {
+                continue;
+            }
+            let has_example = !spec.examples_safe.is_empty();
+            match (has_example, seeded.contains(name.as_str())) {
+                (false, false) => gated_missing.push(name),
+                (true, true) => now_has.push(name),
+                _ => {}
+            }
+        }
+        gated_missing.sort();
+        now_has.sort();
+
+        assert!(
+            gated_missing.is_empty(),
+            "these commands declare a path gate but no `examples_safe`, so nothing proves the gate \
+             leaves ordinary usage working ({}). Add an example of the SAFE form — the in-workspace \
+             invocation the gate must still allow:\n  {}",
+            gated_missing.len(),
+            gated_missing.join("\n  "),
+        );
+        assert!(
+            now_has.is_empty(),
+            "these are listed in tests/fixtures/gated_without_examples.tsv but now HAVE examples — \
+             remove them from the fixture so the backlog keeps shrinking ({}):\n  {}",
+            now_has.len(),
+            now_has.join("\n  "),
+        );
+    }
+
     #[test]
     fn toml_examples_match_dispatch() {
         let mut failures = Vec::new();
@@ -6140,11 +6203,44 @@ valued = ["--type"]
             let src = std::fs::read_to_string(file).unwrap();
             let parsed: TomlFile = toml::from_str(&src).unwrap();
             for cmd in &parsed.command {
-                for flag in &cmd.valued {
-                    if OUTPUT_FLAGS.contains(&flag.as_str())
-                        && crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name))
-                    {
+                // Two sources, and the second is the one that matters. OUTPUT_FLAGS is a NAME
+                // heuristic, so it only ever finds flags someone thought to list: it misses `-i`,
+                // `-w`, `--in-place`, `--fix` — the in-place formatters and autofixers, which are
+                // the largest writer family in the tree. `write_flags` is not a heuristic at all,
+                // it is the entry's OWN declaration that this flag makes the run write, so deriving
+                // the obligation from it cannot drift from what the author claimed.
+                //
+                // Measured before this was added: 33 commands (74 flag/path pairs) declared
+                // `write_flags` and still auto-approved a system path — `clang-format -i /etc/hosts`,
+                // `gofmt -w /etc/hosts`, `yapf --in-place ~/.ssh/config`, `xattr -w … ~/.ssh/id_rsa`.
+                // `write_flags` raises the LEVEL to SafeWrite; it never gated the LOCUS, and nothing
+                // connected the two.
+                let declared: Vec<&String> = cmd
+                    .valued
+                    .iter()
+                    .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
+                    .chain(cmd.write_flags.iter())
+                    .collect();
+                for flag in declared {
+                    if crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name)) {
                         holes.insert((cmd.name.clone(), flag.clone()));
+                    }
+                }
+                // Subs too. Restricting the walk to top-level `parsed.command` is why
+                // `vegeta report --output ~/.ssh/authorized_keys` was missed: the flag is declared
+                // on the sub, so the guard never saw it.
+                for sub in &cmd.sub {
+                    let declared: Vec<&String> = sub
+                        .valued
+                        .iter()
+                        .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
+                        .chain(sub.write_flags.iter())
+                        .collect();
+                    for flag in declared {
+                        let probe = format!("{} {} {flag} {SENSITIVE} in", cmd.name, sub.name);
+                        if crate::is_safe_command(&probe) {
+                            holes.insert((format!("{} {}", cmd.name, sub.name), flag.clone()));
+                        }
                     }
                 }
             }

@@ -185,10 +185,15 @@ flags = { "-f" = "write", "--prefix" = "write" }
 flags = { "--output" = "write" }
 
 [roles."afconvert"]
+# `afconvert [opts] INPUT [OUTPUT]` — the output is the LAST POSITIONAL, not only the `-o` flag, so
+# the flag gate alone left `afconvert -f AIFF ./in.wav ~/.ssh/authorized_keys` auto-approving.
+# Merged into the existing block; a second `[roles."afconvert"]` would make the file unparseable.
+shape = "last_write"
 flags = { "-o" = "write" }
 
 [roles."ameba"]
 flags = { "--out" = "write" }
+write_when = ["--fix"]
 
 [roles."applesingle"]
 flags = { "--directory" = "write", "--rename" = "write", "-C" = "write", "-o" = "write" }
@@ -366,6 +371,10 @@ flags = { "-o" = "read" }
 flags = { "--output" = "write" }
 
 [roles."jupytext"]
+# `--sync`/`--set-formats`/`--update-metadata` REWRITE the notebooks given as positionals, so the
+# operation decides their role. Merged into the existing block rather than declared as a second
+# `[roles."jupytext"]` — a duplicate table key makes the whole file unparseable.
+handler = "jupytext_mode"
 flags = { "--output" = "write", "-o" = "write" }
 
 [roles."layerutil"]
@@ -393,6 +402,12 @@ flags = { "-o" = "write" }
 flags = { "--directory" = "write", "--rename" = "write", "-C" = "write", "-o" = "write" }
 
 [roles."markdownlint"]
+# `--fix` rewrites the linted files in place, so the operands become writes. Merged here rather than
+# declared as a second `[roles."markdownlint"]` — a duplicate table key makes the file unparseable,
+# which panics the loader and denies EVERYTHING. That failure looks exactly like a working gate
+# until you check the in-workspace control.
+positional = "ignore"
+write_when = ["--fix", "-f"]
 flags = { "--output" = "write", "-o" = "write" }
 
 [roles."marp"]
@@ -444,6 +459,10 @@ flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "
 flags = { "-o" = "write" }
 
 [roles."ocamlformat"]
+# `--inplace`/`-i` rewrites the POSITIONAL, so the file operand is a write-target as well as the
+# `-o` output. Merged here rather than added as a second `[roles."ocamlformat"]` block — a duplicate
+# table key makes the whole file unparseable, which panics the loader and denies everything.
+positional = "write"
 flags = { "--output" = "write", "-o" = "write" }
 
 [roles."opj_compress"]
@@ -772,6 +791,32 @@ shape = "last_write"
 positional = "write"
 [roles."afscexpand"]
 positional = "write"
+# In-place FORMATTERS, same shape: the `-i`/`-w`/`--in-place` flag carries no value, so the file
+# being rewritten is a POSITIONAL — which is why the flag-name-based output guard never saw them.
+# All four auto-approved a rewrite of a system or credential file (`clang-format -i /etc/hosts`,
+# `gofmt -w /etc/hosts`, `yapf --in-place ~/.ssh/config`) before this.
+[roles."clang-format"]
+positional = "write"
+[roles."gofmt"]
+positional = "write"
+[roles."gofumpt"]
+positional = "write"
+[roles."yapf"]
+positional = "write"
+# Same family, each confirmed against its OWN description rather than pattern-matched from the flag
+# name: all seven say they rewrite the file in place.
+[roles."autoflake"]
+positional = "write"
+[roles."autopep8"]
+positional = "write"
+[roles."cmake-format"]
+positional = "write"
+[roles."fourmolu"]
+positional = "write"
+[roles."ormolu"]
+positional = "write"
+[roles."goimports"]
+positional = "write"
 
 # ── Operation-aware gates (the archive/mode selector decides read vs write; see pathgate::handlers).
 #    r/q/d/m/s write the .a, t/p/x read it — matters at an in-workspace protected path (.git/config:
@@ -785,6 +830,60 @@ handler = "ar_archive"
 # textutil -convert/-strip write (a sibling of each input, or -output/-outputdir); -info/-cat read.
 [roles."textutil"]
 handler = "textutil_mode"
+# xattr -w/-d/-c mutate a file's extended attributes; a bare listing or -p reads them. Operation-aware
+# because the read form is the common one and a blanket write gate would over-deny it.
+[roles."xattr"]
+handler = "xattr_mode"
+# exiftool: a `-TAG=VALUE` assignment rewrites the file's metadata in place. WRITE-only — the
+# read-gating deferral recorded above (disclosure inspectors over-deny home inspection) is untouched.
+[roles."exiftool"]
+handler = "exiftool_mode"
+# rdfind: -makesymlinks/-makehardlinks/-deleteduplicates destroy duplicates in the scanned trees;
+# a bare scan only reports (and writes results.txt into the cwd). -dryrun disarms them.
+[roles."rdfind"]
+handler = "rdfind_mode"
+# mtree -u/-U modify the hierarchy to match the spec and -r REMOVES everything the spec omits, so
+# `mtree -r -p ~/.ssh` was mass deletion of a credential directory. The tree is a `-p` FLAG value,
+# never a positional, which is why the positional-shaped sweeps never saw it.
+[roles."mtree"]
+handler = "mtree_mode"
+# ncu only rewrites the manifest with --upgrade/-u; without it the run reports.
+[roles."ncu"]
+handler = "ncu_mode"
+# `dart format` rewrites its positionals IN PLACE by default — the dangerous form carries no
+# distinguishing flag at all — and `-o write|show|json|none` selects the mode by VALUE, which
+# write_when cannot express. Scoped to the `format` sub inside the handler.
+[roles."dart"]
+handler = "dart_mode"
+
+# ── Autofix LINTERS: inspect their operands by default, REWRITE them under a fix flag. Declared
+#    with `write_when` rather than eight more Rust handlers — this is the shape that mechanism
+#    exists for. Reads stay ungated, so linting a file outside the workspace still works; only the
+#    fixing form is locus-checked.
+[roles."ansible-lint"]
+positional = "ignore"
+write_when = ["--fix", "--write", "-w"]
+[roles."erb_lint"]
+positional = "ignore"
+write_when = ["--autocorrect", "-a"]
+[roles."haml-lint"]
+positional = "ignore"
+write_when = ["--auto-correct", "--auto-correct-all", "-a", "-A"]
+[roles."markdownlint-cli2"]
+positional = "ignore"
+write_when = ["--fix"]
+[roles."tflint"]
+positional = "ignore"
+write_when = ["--fix"]
+[roles."clang-tidy"]
+positional = "ignore"
+write_when = ["--fix", "--fix-errors", "--fix-notes"]
+# `--export-fixes FILE` writes a YAML fixes file — a flag VALUE, so `write_when` (which promotes
+# positionals) does not cover it and it needs its own role.
+flags = { "--export-fixes" = "write" }
+[roles."jsonlint"]
+positional = "ignore"
+write_when = ["--in-place", "-i"]
 
 # ── Derived-output writers: the output is a SIBLING of the input (same directory), so write-gating
 #    the input path is locus-equivalent to gating the sibling. No read mode, so a plain write gate.

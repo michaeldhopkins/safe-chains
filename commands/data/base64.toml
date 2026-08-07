@@ -1,7 +1,7 @@
 [[command]]
 name = "base64"
 aliases = ["gbase64"]
-description = "Encodes or decodes data in Base64 representation, reading from stdin or files and writing to stdout. Pure data transformation with no filesystem writes, no network access, and no ability to execute the decoded output. Ships with GNU coreutils and macOS."
+description = "Encodes or decodes data in Base64 representation. No network access and no ability to execute the decoded output. The two implementations differ in a way that matters and that a single flag list cannot express. GNU coreutils reads stdin or a file operand and always writes stdout; its `-i` is `--ignore-garbage`, a boolean that only affects decoding. The macOS/BSD build instead takes `-i INPUT` and `-o OUTPUT` as VALUED flags, so on that platform base64 does write to the filesystem, at whatever path `-o` names — and `-i` is valued rather than boolean, the opposite of GNU. Because the same spelling is a boolean on one platform and takes a value on the other, either modelling is wrong somewhere: read as GNU (as here), a BSD `-i FILE` leaves FILE parsed as a positional, which is still a content read and gated as one. Ships with GNU coreutils and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation"
 level = "Inert"
 bare = true

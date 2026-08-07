@@ -6,6 +6,7 @@ researched_version = "dvc 3.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
 examples_safe = [
     "dvc add data.csv",
+    "dvc add --out ./data/train.csv data.csv",
     "dvc status",
     "dvc version",
 ]
@@ -14,6 +15,9 @@ examples_denied = [
     "dvc push",
     "dvc repro",
 ]
+
+[command.path_gate]
+flags = { "--out" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

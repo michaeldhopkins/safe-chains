@@ -8,7 +8,6 @@
 @shopify/theme-check	--output
 @shopify/theme-check	-o
 ack	--output
-ansible-lint	--write
 avbdiagnose	--output
 avbdiagnose	-o
 bombardier	-o
@@ -17,7 +16,6 @@ df	--output
 duf	--output
 findmnt	--output
 findmnt	-o
-fourmolu	-o
 h2xs	-o
 hunspell	-o
 journalctl	--output
@@ -35,7 +33,6 @@ mongostat	-o
 mythril	-o
 nroff	-o
 oid2name	-o
-ormolu	-o
 parallel_test	-o
 pax	-o
 pcre2grep	--output
@@ -67,3 +64,316 @@ wrjpgcom	-o
 ytt	--output
 ytt	-o
 ziptool	-o
+
+# ── TRIAGED 2026-08-08 (a–f slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
+#
+# Each row below was checked against the tool's own reference for the researched version. The value
+# the flag takes is an ENUM, an identifier, or a JSON blob — never a filesystem path — so a path
+# there is a nonsense value and no write occurs. Recorded per command:
+#
+#   argocd version --output          `wide|json|yaml|name` — the Argo CD global output format.
+#   bazel {a,c,}query --output       `label|label_kind|build|proto|jsonproto|graph|xml|…` — the
+#                                    query result NOTATION. (`--output_base`/`--output_user_root`
+#                                    are the path flags, and they are not in the allowlist.)
+#   cargo udeps --output             `human|json`.
+#   clever … -o                      `-o` is the short form of `--org` on every clever sub — an
+#                                    organisation id/name routed to the API, not a local path.
+#                                    (`clever`'s own path flags are on other subs.)
+#   code --add-mcp                   a JSON server definition passed inline, e.g. `{"name":…}`.
+#   code --enable-proposed-api       an extension identifier (`publisher.name`).
+#   code --uninstall-extension       an extension identifier.
+#   code --install-extension         an extension identifier, or a `.vsix` to READ. Either way it
+#                                    is an input, never a write target; the write lands in the
+#                                    extensions dir, which is what put it in `write_flags`.
+#   cosign verify{,-attestation} -o/--output
+#                                    `json|text` — the format the signature payload is printed in.
+#                                    (`--output-file` is cosign's path flag; not in the allowlist.)
+#   dapr … -o/--output               `table|json|yaml` on components/configurations/list/status/
+#                                    version.
+#   dart format -o/--output          `write|show|json|none` — WHERE formatted output goes, as an
+#                                    enum. See the note in the untriaged block: dart format's
+#                                    positional rewrite is a separate, still-open question.
+#   dbt {list,ls} --output           `name|path|selector|json` — the shape of the node listing.
+#   flux version -o/--output         `yaml|json`.
+argocd version	--output
+bazel aquery	--output
+bazel cquery	--output
+bazel query	--output
+cargo udeps	--output
+clever activity	-o
+clever console	-o
+clever diag	-o
+clever link	-o
+clever login	-o
+clever logout	-o
+clever status	-o
+clever unlink	-o
+clever version	-o
+code	--add-mcp
+code	--enable-proposed-api
+code	--install-extension
+code	--uninstall-extension
+cosign verify	--output
+cosign verify	-o
+cosign verify-attestation	--output
+cosign verify-attestation	-o
+dapr components	--output
+dapr components	-o
+dapr configurations	--output
+dapr configurations	-o
+dapr list	--output
+dapr list	-o
+dapr status	--output
+dapr status	-o
+dapr version	--output
+dapr version	-o
+dart format	--output
+dart format	-o
+dbt list	--output
+dbt ls	--output
+flux version	--output
+flux version	-o
+
+# ── SEEDED 2026-08-07, UNTRIAGED — these are NOT verified format-only ────────────────────────────
+#
+# Everything above this line was triaged: a human checked the flag takes a FORMAT, not a path.
+# Everything below was seeded wholesale when the guard was widened, and carries no such claim.
+#
+# The guard used to derive its flag list from a hardcoded NAME list over `cmd.valued`, on top-level
+# commands only. Three blind spots followed: `-i`/`-w`/`--in-place`/`--fix` were not on the name list
+# (the in-place formatters — the largest writer family in the tree), `write_flags` was never read at
+# all, and SUBS were never walked (which is why `vegeta report --output ~/.ssh/authorized_keys` was
+# missed). Widening it on all three axes took the reported set from 62 to 424.
+#
+# These 362 are seeded so the ratchet HOLDS THE LINE at today's exposure — nothing new can ship
+# ungated — rather than leaving the guard red and therefore ignored. They are a BURN-DOWN LIST, not
+# an acknowledgement. Expect roughly three populations:
+#
+#   - genuine holes: `clang-format -i`, `gofmt -w`, `yapf --in-place`, `xattr -w` all auto-approve a
+#     write to /etc/hosts or ~/.ssh — CONFIRMED by hand. These need a `[command.path_gate]`.
+#   - format flags: `bazel query --output`, `argocd version --output` take `json`/`proto`, so a path
+#     is a nonsense value and no write occurs. These belong above the line, with the check recorded.
+#   - not-a-path-at-all: `borg check --repair`, `borg config --delete` swallowed the probe path as a
+#     positional. A different question, and not this guard's.
+#
+# Triage order: the credential-touching ones first (`~/.ssh` reachable), then /etc, then the rest.
+#
+# a–f slice triaged 2026-08-08. The genuine writers are GATED and gone from this file (afhash -w,
+# ameba --fix, ansible-vault encrypt --output, artillery report -o/--output, buf build/convert/
+# format/generate -o/--output + format -w/--write, bun build --outdir, bundler-audit check --output,
+# cdk synth -o/--output, coverage json -o, crystal build -o + docs --output, dawn scan -O/--output,
+# depcruise -f/--output-to, docfx -o/--output, docker-compose config -o/--output, dotnet -o/--output,
+# dotnet-trace convert -o/--output, dvc add -o/--out, flutter analyze --write). The format-only ones
+# moved above the line. What remains here from a–f are the three PROBE ARTIFACTS below: the flag is a
+# BOOLEAN, so the probe's path never reaches it — it lands on a positional whose role is a different
+# question than this guard asks, and gating it here would gate the wrong thing.
+#
+#   borg check --repair    boolean. `borg check [options] REPOSITORY_OR_ARCHIVE` — the probe path is
+#                          swallowed as the repository spec, which --repair rebuilds in place. Not a
+#                          path the flag names.
+#   borg config --delete   boolean. `borg config REPOSITORY NAME` — the probe path is the repository
+#                          positional and `in` the config KEY.
+#   depcruise --init       boolean (optional `oneshot` word). It writes `.dependency-cruiser.js` into
+#                          the CWD; the probe path is swallowed as a source directory to SCAN.
+borg check	--repair
+borg config	--delete
+depcruise	--init
+git fetch	-o
+git ls-remote	-o
+git pull	-o
+gomodifytags	--w
+gomodifytags	-w
+helm history	--output
+helm history	-o
+helm list	--output
+helm list	-o
+helm status	--output
+helm status	-o
+helmfile list	--output
+helmfile version	--output
+helmfile version	-o
+istioctl analyze	--output
+istioctl analyze	-o
+istioctl proxy-status	--output
+istioctl proxy-status	-o
+istioctl validate	--output
+istioctl validate	-o
+istioctl version	--output
+istioctl version	-o
+jupytext	--set-formats
+koyeb login	--output
+koyeb login	-o
+koyeb version	--output
+koyeb version	-o
+koyeb whoami	--output
+koyeb whoami	-o
+kubectl api-resources	--output
+kubectl api-resources	-o
+kubectl events	--output
+kubectl events	-o
+kubectl get	--output
+kubectl get	-o
+kubectl version	--output
+kubectl version	-o
+linkerd check	--output
+linkerd check	-o
+mtree	-U
+mtree	-r
+mtree	-u
+ncu	--upgrade
+ncu	-u
+neon me	--output
+neon me	-o
+northflank get	--output
+northflank get	-o
+northflank list	--output
+northflank list	-o
+northflank logs	--output
+northflank logs	-o
+northflank metrics	--output
+northflank metrics	-o
+oc events	--output
+oc events	-o
+oc explain	--output
+oc explain	-o
+oc get	--output
+oc get	-o
+oc status	--output
+oc status	-o
+oc version	--output
+oc version	-o
+packer validate	-o
+platform organization:billing:address	-o
+platform organization:billing:profile	-o
+platform organization:info	-o
+platform organization:subscription:list	-o
+platform organization:user:get	-o
+platform organization:user:list	-o
+platform organization:user:projects	-o
+platform pro	-o
+platform project:list	-o
+platform projects	-o
+platform team:get	-o
+platform team:list	-o
+platform team:project:list	-o
+platform team:user:list	-o
+platform teams	-o
+qemu-img check	--output
+qemu-img info	--output
+qemu-img map	--output
+qemu-img measure	--output
+qemu-img measure	-o
+qlmanage	-t
+rbs prototype	--out-dir
+rdfind	-deleteduplicates
+rdfind	-makehardlinks
+rdfind	-makesymlinks
+render environments	--output
+render environments	-o
+render logs	--output
+render logs	-o
+render projects	--output
+render projects	-o
+render whoami	--output
+render whoami	-o
+render workspaces	--output
+render workspaces	-o
+roc build	--output
+roc docs	--output
+rubocop	--auto-correct
+rubocop	--auto-correct-all
+rubocop	--autocorrect
+rubocop	--autocorrect-all
+rubocop	--fix-layout
+rubocop	--safe-auto-correct
+rubocop	--safe-autocorrect
+rubocop	-A
+rubocop	-a
+rubocop	-x
+safety check	--output
+safety check	--save-html
+safety check	--save-json
+safety check	-o
+safety scan	--output
+semgrep ci	--output
+semgrep ci	-o
+semgrep scan	--output
+semgrep scan	-o
+skaffold diagnose	--output
+skaffold diagnose	-o
+skaffold find-configs	--output
+skaffold find-configs	-o
+skaffold inspect	--output
+skaffold inspect	-o
+skaffold version	--output
+skaffold version	-o
+slither	--checklist
+slither	--json
+slither	--sarif
+srb tc	--autocorrect
+srb tc	--suggest-typed
+srb tc	--suggest-unsafe
+srb tc	-a
+standardrb	--auto-correct
+standardrb	--auto-correct-all
+standardrb	--autocorrect
+standardrb	--autocorrect-all
+standardrb	--fix
+standardrb	--fix-layout
+standardrb	--safe-auto-correct
+standardrb	--safe-autocorrect
+standardrb	-A
+standardrb	-a
+starship preset	--output
+starship preset	-o
+steep binstub	--output
+steep binstub	-o
+steep check	--save-expectations
+supabase inspect	--output
+supabase inspect	-o
+supabase services	--output
+supabase services	-o
+systemctl status	--output
+systemctl status	-o
+tilt describe	--output
+tilt describe	-o
+tilt get	--output
+tilt get	-o
+trace trim	--output
+trivy config	--output
+trivy config	-o
+trivy fs	--output
+trivy fs	-o
+trivy image	--output
+trivy image	-o
+trivy sbom	--output
+trivy sbom	-o
+tuist build	--destination
+tuist generate	--destination
+tuist test	--destination
+turbo prune	--out-dir
+velero get	--output
+velero get	-o
+vitepress build	--out-dir
+wasm-tools demangle	--output
+wasm-tools demangle	-o
+wasm-tools parse	--output
+wasm-tools parse	-o
+wasm-tools print	--output
+wasm-tools print	-o
+wasm-tools strip	--output
+wasm-tools strip	-o
+wasmer wasm2wat	--output
+wasmer wat2wasm	--output
+wasmtime compile	--output
+wasmtime compile	-o
+wasmtime explore	--output
+wasmtime explore	-o
+west manifest	--out
+west manifest	-o
+# xattr -d/-w are PROBE ARTIFACTS, not holes. The guard probes `<cmd> <flag> ~/.ssh/… in`,
+# and for these the sensitive path is consumed as the attribute NAME, so no file operand is
+# left to gate and the probe auto-approves. Real invocations ARE gated by xattr_mode:
+# `xattr -w k v ~/.ssh/id_rsa` and `xattr -d k /etc/hosts` both deny. Do not re-chase these.
+xattr	-d
+xattr	-w

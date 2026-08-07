@@ -4,9 +4,19 @@ description = "ORAS — OCI registry artifact tool. Subcommands: `attach`, `blob
 url = "https://oras.land/docs/category/cli-reference"
 researched_version = "ORAS 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "oras version",
+    "oras discover -o json localhost:5000/hello:v1",
+    "oras discover --output tree localhost:5000/hello:v1",
+    "oras manifest fetch -o ./manifest.json localhost:5000/hello:v1",
+]
 
+# `-o/--output` is overloaded across the tree and both readings are path-safe under a write gate:
+# on `discover` it selects a display format (`tree`/`json`/`table`, superseded by `--format`), which
+# gates as an ordinary worktree-relative name and stays allowed; on `manifest fetch` / `blob fetch`
+# it is the file the fetched bytes are written to, which is the write this binds.
 [command.path_gate]
-flags = { "--cert-file" = "read", "--key-file" = "read", "--ca-file" = "read" }
+flags = { "--cert-file" = "read", "--key-file" = "read", "--ca-file" = "read", "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

@@ -4,6 +4,10 @@ description = "Crystal language launcher. Subcommands include `build` (compile t
 url = "https://crystal-lang.org/reference/"
 researched_version = "crystal 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = ["crystal build -o ./bin/app src/app.cr", "crystal docs --output ./docs"]
+
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"
