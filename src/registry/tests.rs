@@ -30,6 +30,137 @@ use super::*;
         );
     }
 
+    // ── Killing the mutants `cargo mutants` found surviving in build.rs (2026-08-07) ────────────
+    // Each of these was reachable, load-bearing validation that no test noticed being switched off.
+
+    /// `loopback_valued` is only consulted on a PROFILED sub, so declaring it without a `profile`
+    /// silently does nothing. The whole validator could be replaced with `Ok(())` undetected.
+    #[test]
+    fn loopback_valued_without_a_profile_is_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"ls\"\n\
+             loopback_valued = [\"--endpoint-url\"]\n",
+            "needs `profile`",
+        );
+    }
+
+    /// A structured command's top-level flat fields are DROPPED by the Branching dispatch path, so
+    /// mixing them is silently ineffective config. The whole validator could be replaced with
+    /// `Ok(())` undetected.
+    #[test]
+    fn flat_fields_mixed_with_subs_are_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nstandalone = [\"--all\"]\n\
+             [[command.sub]]\nname = \"ls\"\n",
+            "mixes flat-style top-level fields",
+        );
+    }
+
+    /// THREE matrices, not two, and that is the whole point: the surviving mutant turned
+    /// `matrix.len() < 2` into `> 2`, which is indistinguishable from the original at exactly two —
+    /// both fall through to the duplicate check. Only a third matrix separates them, because the
+    /// mutant then returns early and never looks for the duplicate.
+    #[test]
+    fn a_duplicate_parent_action_across_three_matrices_is_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\n\
+             [command.handler_policy.p]\nstandalone = []\n\
+             [[command.matrix]]\nparents = [\"alpha\"]\nlevel = \"Inert\"\n\
+             [command.matrix.actions]\nlist = \"p\"\n\
+             [[command.matrix]]\nparents = [\"beta\"]\nlevel = \"Inert\"\n\
+             [command.matrix.actions]\nshow = \"p\"\n\
+             [[command.matrix]]\nparents = [\"alpha\"]\nlevel = \"Inert\"\n\
+             [command.matrix.actions]\nlist = \"p\"\n",
+            "duplicate (parent, action) pair",
+        );
+    }
+
+    /// `positionals = "transfer"` without the block that carries the transfer knobs.
+    #[test]
+    fn a_transfer_positional_without_its_block_is_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nbare = true\n\
+             [command.behavior]\noperation = \"create\"\npositionals = \"transfer\"\n",
+            "requires a [command.behavior.transfer] block",
+        );
+    }
+
+    /// And the converse arm: the transfer block carried by a non-transfer positional role.
+    #[test]
+    fn a_transfer_block_without_the_transfer_positional_is_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nbare = true\n\
+             [command.behavior]\noperation = \"create\"\npositionals = \"read\"\n\
+             [command.behavior.transfer]\nsource = \"relocate\"\n",
+            "only valid with positionals",
+        );
+    }
+
+    /// `when_absent` classifies on the flag's ABSENCE and `value_prefix` on its value, so a flag
+    /// cannot carry both. The surviving mutant deleted the `!`, inverting the check.
+    #[test]
+    fn a_classifying_flag_with_both_when_absent_and_value_prefix_is_rejected() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nbare = true\n\
+             [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
+             fact = \"x\"\nsource = \"y\"\nwhen_absent = true\nvalue_prefix = \"v\"\n",
+            "mutually exclusive",
+        );
+    }
+
+    /// A blank `judgment` on a classifying flag is rejected, and a real one still BUILDS.
+    ///
+    /// Both halves are needed and neither existed: every other flag test omits `judgment`, so the
+    /// `Option` is `None` and `is_none_or` short-circuits before reaching the predicate at all. The
+    /// surviving mutant deleted the `!` inside it, which inverts the rule — a legitimate judgment
+    /// would be refused and a blank one accepted — and nothing noticed, because nothing supplied a
+    /// judgment in either state.
+    #[test]
+    fn a_classifying_flag_judgment_must_be_non_blank_when_present() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nbare = true\n\
+             [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
+             fact = \"x\"\nsource = \"y\"\njudgment = \"   \"\n",
+            "must not be blank",
+        );
+        let spec = load_one(
+            "[[command]]\nname = \"tc\"\nbare = true\n\
+             [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
+             fact = \"x\"\nsource = \"y\"\njudgment = \"deliberate: reading it is the point\"\n",
+        );
+        assert_eq!(spec.name, "tc");
+    }
+
+    /// The candidate-under-glob detector must fire for an EXACT first_arg token, not only a glob.
+    ///
+    /// `first_arg_matches` treats a pattern without a trailing `*` as an exact token, and mutation
+    /// testing showed `==` could become `!=` there undetected — the existing coverage exercised only
+    /// the `get-*` arm. That inversion silently disables the detector, and what the detector prevents
+    /// is a deny→allow inversion: a `candidate` sub is REMOVED from the registry, so if a sibling
+    /// pattern still matches its name the token falls through and AUTO-APPROVES.
+    #[test]
+    fn the_candidate_under_glob_guard_fires_for_an_exact_first_arg_token() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\nfirst_arg = [\"getsecret\"]\n\
+             [[command.sub]]\nname = \"getsecret\"\ncandidate = true\n",
+            "AUTO-APPROVE",
+        );
+    }
+
+    /// A `candidate` sub is dropped by `filter_candidates`, and its NESTED subs go with it — dead
+    /// data wearing the shape of configuration. `filter_candidates` rejects that, and until now
+    /// nothing held it to it: disabling the check outright left all 4504 tests passing, found by
+    /// mutation-testing the validator during adversarial review. Its own comment records that the
+    /// case was red-demoed when written, but the demo was never left behind as a test.
+    #[test]
+    fn a_candidate_sub_may_not_declare_nested_subs() {
+        assert_rejected(
+            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"grp\"\ncandidate = true\n\
+             [[command.sub.sub]]\nname = \"inner\"\n",
+            "nested subs are dead",
+        );
+    }
+
     #[test]
     fn a_profiled_sub_without_a_fact_is_rejected() {
         assert_rejected(
