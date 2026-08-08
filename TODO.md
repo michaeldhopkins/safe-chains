@@ -303,6 +303,37 @@ Sequencing note: do this BEFORE the overlap audit below, not after. The audit's 
 that it cannot tell a typo from an optional-value flag; with the third state expressible, that
 distinction becomes mechanical.
 
+## Command MODES — design written, not built (docs/design/command-modes.md)
+
+The schema describes ONE behaviour per command, and behaviour often depends on which FLAGS are
+present. Four mechanisms already select behaviour by flag, each expressing a sliver:
+`[[command.sub]]` (positional axis, full payload), `[[command.flag]] classifies` (archetype only),
+`output.invalidated_by` ("claim off"), and a proposed `output.requires` ("claim on") — the last two
+being the same idea pointing opposite ways, which is what prompted a design instead of a fifth field.
+
+FOUR MEASURED CUSTOMERS, each hit while doing other work:
+
+    git diff --name-only   emits paths; bare `git diff` emits a PATCH. An unconditional output claim
+                           would assert patch text denotes paths at the cwd locus — a FAIL-OPEN,
+                           since an absolute path in a diff body would then be read for real.
+    php -l file.php        lint mode: reads and parses, executes nothing (SafeRead) — but takes an
+                           operand, and the shared fallback is max_positional = 0.
+    ruby -S CMD ARGS       delegation mode, structurally `mise exec --`: recurse into CMD with an
+                           exec-locus gate on the value (bare name via PATH trusted, /tmp/evil not).
+    base64 -i/-o           GNU `-i` is a BOOLEAN; BSD `-i INPUT` is VALUED and `-o` WRITES. Two
+                           grammars in one entry — the standalone/valued overlap at its sharpest.
+
+DO NOT add `output.requires` meanwhile: it needs an unwritten precedence rule against
+`invalidated_by`, and `git diff` would need BOTH anyway, so the very first customer exercises the
+confusing interaction.
+
+FREE MEANWHILE, needing no new mechanism: `git ls-files` and `jj file list` ALWAYS emit paths and can
+take an ordinary `[command.output]` claim today, closing part of the command-substitution class.
+
+The overlap audit below and the glob-family migration are the same problem wearing different clothes
+— "this entry is really several commands" — and should migrate INTO modes rather than run as separate
+campaigns.
+
 ## The `standalone` + `valued` overlap audit (blocked on the above)
 
 Promoted 2026-08-04 out of the "FIFTH PASS" narrative above, where it was easy to miss.
@@ -2332,3 +2363,179 @@ Seven optional-bool flags are omitted pending the schema decision — see "DECIS
 
 DOC BUG UPSTREAM: the book's `list.md` describes a `--diff` flag; there is NO such arg in 27.1.0
 (no `diff` bool in the clap `Args` — only `--in-diff`). Source wins over book prose.
+
+## `write_flags` declares a write but does NOT gate it — the sweep, and what it found
+
+FOUND 2026-08-07 while measuring the denominator for the mode design. `write_flags` raises a
+command's LEVEL to SafeWrite when the flag appears; it never constrains WHERE the write may land,
+and nothing connected the two. So an author who correctly declares `write_flags` gets no protection
+AND no warning — worse than not declaring it, because the entry reads as though the write is handled.
+
+The tell is in the data: of the commands that WERE gated, almost none declares a `path_gate`
+(`ameba`, `brakeman`, `fmt`, `gosec`, `http` — all zero). They were protected incidentally, by the
+global `pathgates.toml` lists, not by anything they declared.
+
+### The guard was widened, 62 -> 424 reported
+
+`ambiguous_output_flags_do_not_write_sensitive_paths` already existed and missed all of this, for
+three independent reasons — each worth knowing because each is a different kind of blind spot:
+
+  - it matched a HARDCODED flag-name list (`-o`, `--output`, `--outdir`…), so `-i`, `-w`,
+    `--in-place`, `--fix` were invisible — the in-place formatters and autofixers, which are the
+    largest writer family in the tree;
+  - it read `cmd.valued` only, never `write_flags` — i.e. never the entry's OWN declaration;
+  - it walked top-level commands only, NOT subs. That is why `vegeta report --output
+    ~/.ssh/authorized_keys` was missed, and it is the biggest multiplier: many holes are
+    `<cmd> <sub> --output`.
+
+It now derives the obligation from `write_flags` as well. A name list only finds flags someone
+thought to write down; `write_flags` cannot drift from what the author claimed.
+
+### The worklist is SEEDED, not acknowledged
+
+424 reported, 362 seeded wholesale into `tests/fixtures/output_flag_worklist.tsv` under an
+UNTRIAGED header. That was deliberate: it holds the line at today's exposure (nothing new can ship
+ungated) instead of leaving the guard red and therefore ignored. Everything above that header was
+triaged by a human; everything below carries no such claim and is a BURN-DOWN LIST.
+
+Expect three populations in it: genuine holes; FORMAT flags where a path is a nonsense value
+(`bazel query --output json`); and probe artifacts where the guard's fixed probe shape is not a
+valid invocation for that command (`xattr -w` consumes the path as an attribute NAME). The last
+group cannot be fixed and should be annotated in place, as `xattr` now is.
+
+### Burned down so far: 424 -> 377 -> 295 (agents, 2026-08-08)
+
+Two agents took the `a–f` and `g–p` slices; a third and fourth are on `q–s` and `t–z`. Combined they
+closed 82 rows. The split of outcomes is the useful number, because it says what the residue IS:
+roughly a third were genuine holes to gate, and most of the rest were FORMAT flags where a path is a
+nonsense value — which is what the seeding note predicted, so the seeded-not-acknowledged call holds
+up.
+
+Three live holes were found that the guard could NOT have flagged, all escalated by the agents
+rather than guessed:
+
+    dart format        rewrites its positionals IN PLACE by DEFAULT, so the dangerous form carries
+                       no flag at all, and `-o write|show|json|none` selects the mode BY VALUE.
+                       Needed a handler; see the mode doc — it is the acceptance test there.
+    afconvert          the output is the LAST POSITIONAL, not a flag. `shape = "last_write"`.
+    gomodifytags       `-file X` is a read without `-w` and a write with it. Gated write
+                       UNCONDITIONALLY as the fail-closed choice, which buys a narrow over-deny:
+                       a read-only `gomodifytags -file ~/other/x.go -add-tags json` now denies.
+                       Folded into docs/design/command-modes.md as customer 5.
+
+`gomodifytags` is a DIFFERENT shape from every other customer and is why the mode doc grew a
+requirement: modes must be able to re-role a FLAG's value, not only positionals. `write_when` cannot
+express it — that field promotes positionals only.
+
+### The guard caught its author, which is the point
+
+`a_gated_command_proves_its_safe_form_still_works` went red on `dart` — a gate I added myself,
+missing its `examples_safe`. Not an agent's mistake. A guard that only ever catches other people's
+work has not been tested.
+
+### Burned down in the first pass: 424 -> 377
+
+    11 in-place formatters   positional = "write"    clang-format, gofmt, gofumpt, yapf, autoflake,
+                                                     autopep8, cmake-format, fourmolu, ocamlformat,
+                                                     ormolu, goimports
+    xattr                    handler                 -w/-d/-c write, -p/-l read, bare listing is
+                                                     METADATA and stays ungated (matching this
+                                                     file's standing policy for ls/stat/file)
+    exiftool                 handler                 write-only; the READ-gating deferral for
+                                                     disclosure inspectors is untouched
+    rdfind                   handler                 -deleteduplicates/-makesymlinks destroy;
+                                                     -dryrun disarms
+    mtree                    handler                 -r REMOVES everything the spec omits, and the
+                                                     tree is a `-p` FLAG value, never a positional —
+                                                     which is why every positional sweep missed it
+    ncu, jupytext            handler                 --upgrade / --sync decide the role
+    8 autofix linters        write_when              declarative; see below
+    clang-tidy               flags                   --export-fixes writes a FLAG VALUE, so
+                                                     write_when does not cover it
+
+### NEW MECHANISM: `write_when` on a pathgates role
+
+Six hand-written handlers in, the shape was obvious enough to name: a tool that INSPECTS its
+operands by default and REWRITES them under a mode flag. `write_when = ["--fix", …]` promotes the
+positionals to writes when any listed flag is present, anywhere in the token list (the flag may
+follow the paths). Eight linters closed with data instead of Rust.
+
+Deliberately NOT general: it expresses only "flag present => positionals are writes". A tool whose
+mode also MOVES the path (`mtree -p`, `ncu --packageFile`) or that needs disarming on another flag
+(`rdfind -dryrun`) still needs a handler.
+
+### This is the mode design's best evidence
+
+SIX of the eight pathgate handlers were written in one sitting, every one because read-vs-write
+depends on a flag and the TOML cannot say so. `mtree` is the sharpest: same binary, same operand,
+and `-r` turns inspection into deletion. The metric to watch for docs/design/command-modes.md is
+therefore the HANDLER COUNT, not the worklist count — each new handler is a mode the schema could
+not express. `write_when` is the first narrow slice of that concept landing declaratively, and it
+removed eight commands' worth of bespoke code on its first use.
+
+### Two guards added, both red-demoed
+
+`pathgates_toml_parses` and `known_safe_commands_are_still_auto_approved` (a canary: `ls`, `true`,
+`pwd`, `echo hi`, `git status`, `cargo build`, `grep -rn foo ./src`).
+
+The canary is the important one, and the lesson generalises: A SECURITY TEST THAT ONLY ASSERTS
+DENIALS CANNOT DISTINGUISH "correctly gated" FROM "catastrophically broken". A duplicate
+`[roles."x"]` table key makes pathgates.toml unparseable, the loader panics, and EVERY command
+denies — which from outside looks like a flawless gate. That happened THREE times this session and
+was caught each time only because the in-workspace control also denied. The canary makes that
+instinct permanent.
+
+### Differential regression check — clean, and the harness was proven first
+
+1391 registry-example invocations (every `examples_safe`/`examples_denied` in the tree) run through
+the pre-change binary and the current one: ZERO changed verdicts. Before believing that, the harness
+was shown to detect BOTH directions — `A->D` on `clang-format -i /etc/hosts`, and `D->A` on the same
+command with the binaries swapped — because a differential that cannot see a change reports a clean
+run for a broken build.
+
+What it does NOT prove: the corpus is the registry's own examples, which are in-workspace forms, so
+it shows no FALSE DENIES on documented usage. It does not exercise the gates firing; that is what
+the per-command safe-twin controls did.
+
+RE-RUN 2026-08-08 after the adversarial review, because the first result predated the `mtree_mode`
+fix and the `write_when` hardening — a differential is only evidence about the tree that produced
+it. Same outcome: 1391 invocations, 0 changed verdicts, 0 in each direction. The harness was proved
+again first, and this time the positive control included the bypass the review found
+(`mtree -P -p ~/.ssh -r`, A->D), so the proof covers the change actually under test rather than an
+older one.
+
+### Adversarial review of the gate batch (2026-08-08) — one live bypass, one inconsistency
+
+**BYPASS in my own handler, fixed.** `mtree_mode` listed `-P` and `-L` as VALUED. They are BOOLEAN
+(do-not-follow / follow symlinks), so the walk consumed the following `-p` as their value and never
+gated the tree:
+
+    mtree -r -p ~/.ssh        denied
+    mtree -P -p ~/.ssh -r     ALLOWED   <- same destructive -r, reordered
+
+Exactly the defect class this gate exists to catch — an arity asserted without checking it —
+committed while building the gate. VALUED is now only genuinely valued flags, verified in every
+ordering with in-workspace controls.
+
+**`write_when` hardened.** It matched exactly, so `--fix=all` (a real ansible-lint spelling) would
+not have promoted. It now also matches `<flag>=`, and `--fixture` still does not match `--fix`. Unit
+test added and red-demoed; the integration probes all use the bare form, so an exact-match regression
+would have kept them green.
+
+**OPEN — the formatter/linter split is inconsistent.** The 11 in-place formatters use
+`positional = "write"` (their READS are write-gated); the 8 autofix linters use `write_when` with
+`positional = "ignore"` (reads ungated). Same family, two policies. It shows at an in-workspace
+PROTECTED path, where read and write differ:
+
+    gofmt .git/config          DENIES   (read-only invocation: a false deny)
+    ansible-lint .git/config   allows
+
+The principled fix is `positional = "read"` + `write_when` on the formatters too. NOT done here,
+because `fourmolu`/`ormolu` also accept `--mode inplace` — a VALUED mode selector `write_when`
+cannot express — so converting them would trade a narrow false deny for a real hole. Needs the
+per-command research, and is another customer for the mode design.
+
+**Also latent:** a spec carrying BOTH `handler` and `write_when` silently drops the `write_when`,
+because a handler replaces the positional walk. That is the same trap the `handler` doc comment
+already records for `flags` (which was fixed by honouring them alongside). No spec does this today;
+it should either be honoured or made a build error before one does.
