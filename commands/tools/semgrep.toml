@@ -3,6 +3,17 @@ name = "semgrep"
 description = "Static analysis tool that finds bugs and security vulnerabilities using pattern-matching rules across 30+ languages. scan and ci subcommands parse source files and report findings without modifying them (--autofix is opt-in and not exposed here). The ci subcommand may send results to the Semgrep platform if configured. Actively maintained with monthly releases."
 url = "https://semgrep.dev/docs/cli-reference/"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "semgrep scan --config auto",
+    "semgrep scan --config auto --json -o ./findings.json",
+    "semgrep scan --config auto --sarif --output=./findings.sarif",
+    "semgrep ci --config auto",
+    "semgrep ci -o ./ci-findings.json",
+]
+examples_denied = [
+    "semgrep scan --config auto -o ~/.ssh/authorized_keys",
+    "semgrep ci --output=/etc/hosts",
+]
 
 [[command.sub]]
 name = "scan"
@@ -30,3 +41,9 @@ standalone = [
     "-h", "-q",
 ]
 valued = ["--config", "--exclude", "--include", "--metrics", "--output", "-c", "-o"]
+
+# `-o`/`--output` is "save search results to a file or post to URL" — a write target on both `scan`
+# and `ci`. The result FORMAT is selected separately by `--json`/`--sarif`/`--text`/…, so a format
+# name never appears here. A URL value is not path-shaped and stays unaffected.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }

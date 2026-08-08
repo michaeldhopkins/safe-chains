@@ -4,6 +4,27 @@ description = "Bytecode Alliance multi-tool for the WebAssembly binary format. S
 url = "https://github.com/bytecodealliance/wasm-tools"
 researched_version = "wasm-tools 1.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "wasm-tools --version",
+    "wasm-tools validate ./mod.wasm",
+    "wasm-tools print ./mod.wasm",
+    "wasm-tools print ./mod.wasm -o ./mod.wat",
+    "wasm-tools parse ./mod.wat --output ./mod.wasm",
+    "wasm-tools strip ./mod.wasm -o ./stripped.wasm",
+    "wasm-tools demangle ./mod.wasm --output ./demangled.wasm",
+]
+examples_denied = [
+    "wasm-tools parse ./mod.wat --output ~/.ssh/authorized_keys",
+    "wasm-tools print ./mod.wasm -o /etc/hosts",
+    "wasm-tools strip ./mod.wasm -o ~/.ssh/authorized_keys",
+    "wasm-tools mutate ./mod.wasm",
+]
+
+# Every sub flattens the shared `OutputArg`, whose `-o/--output` is a `PathBuf` — "where to place
+# output", defaulting to stdout. So one command-level gate covers parse / print / strip / demangle
+# at once. `strip`'s `-d/--delete` names a custom SECTION, not a path, and is left ungated.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

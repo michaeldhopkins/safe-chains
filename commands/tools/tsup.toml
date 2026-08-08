@@ -17,14 +17,14 @@ standalone = [
     "--source-map", "--splitting",
     "--sourcemap", "--terser",
     "--treeshake", "--version", "--watch",
-    "-d", "-h", "-w",
+    "-h", "-w",
 ]
 valued = [
     "--cjs-interop", "--config", "--define",
     "--entry", "--env", "--external",
     "--format", "--inject",
     "--name", "--no-external",
-    "--out-dir", "--platform",
+    "--out-dir", "--platform", "-d",
     "--public-dir", "--target",
     "--tsconfig",
 ]

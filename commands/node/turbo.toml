@@ -2,7 +2,26 @@
 name = "turbo"
 description = "Monorepo build system and task runner by Vercel. turbo run executes tasks defined in turbo.json (build, test, lint, etc.), which run arbitrary shell commands in each package; safety depends entirely on the task definitions. turbo ls and turbo query are read-only workspace introspection commands. turbo prune generates a subset of the monorepo for a given package, writing files to an output directory. daemon status is a read-only process status query. Actively developed with frequent releases."
 url = "https://turbo.build/repo/docs/reference/command-line-reference"
+researched_version = "turbo 2.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "turbo --version",
+    "turbo ls",
+    "turbo run build --dry-run",
+    "turbo prune web",
+    "turbo prune web --out-dir ./out",
+    "turbo prune web --docker --out-dir ./out",
+]
+examples_denied = [
+    "turbo prune web --out-dir ~/.ssh",
+    "turbo prune web --out-dir ~/.ssh/authorized_keys",
+]
+
+# `turbo prune --out-dir DIR` is the "directory the pruned output is generated in" (default
+# `./out`) — a directory turbo populates, not a mode. `--out-dir` is the only spelling clap
+# declares (`#[clap(long = "out-dir")]`).
+[command.path_gate]
+flags = { "--out-dir" = "write" }
 
 [[command.sub]]
 name = "run"

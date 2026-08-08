@@ -47,6 +47,10 @@
 - **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml`
+
 ### `molecule`
 <p class="cmd-url"><a href="https://ansible.readthedocs.io/projects/molecule/usage/">https://ansible.readthedocs.io/projects/molecule/usage/</a></p>
 

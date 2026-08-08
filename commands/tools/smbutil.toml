@@ -5,9 +5,18 @@ url = "https://keith.github.io/xcode-man-pages/smbutil.1.html"
 researched_version = "macOS 14 smbutil(1)"
 bare_flags = ["-h", "--help", "-v"]
 
-# -f is the mounted-share path that statshares/multichannel/snapshot/smbstat inspect.
-[command.path_gate]
-flags = { "-f" = "read" }
+# `-f` is the mounted-share path that statshares/multichannel/snapshot/smbstat inspect — but it is
+# a BOOLEAN on `view`, which takes no path at all. A command-wide gate cannot express that: it made
+# `smbutil view -f //server` deny, because the gate consumed `//server` as `-f`'s value. The gate is
+# therefore declared per-sub in pathgates.toml (`[roles."smbutil statshares"]` and siblings).
+examples_safe = [
+    "smbutil view -f //server",
+    "smbutil view //server",
+    "smbutil statshares -a",
+]
+examples_denied = [
+    "smbutil statshares -f ~/.ssh",
+]
 
 [[command.sub]]
 name = "help"

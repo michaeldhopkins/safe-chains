@@ -519,8 +519,16 @@ flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-
 [roles."rspec"]
 flags = { "--deprecation-out" = "write", "--out" = "write", "-o" = "write" }
 
+# `--out`/`-o` names the report file. The autocorrect family (-a/-A/-x and the deprecated
+# --auto-correct* / --safe-auto-correct spellings) REWRITES every inspected file in place, so under
+# any of them the positionals are write-targets; a bare run only reports.
 [roles."rubocop"]
 flags = { "--out" = "write", "-o" = "write" }
+write_when = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
+    "--fix-layout", "--safe-auto-correct", "--safe-autocorrect",
+    "-A", "-a", "-x",
+]
 
 [roles."say"]
 flags = { "-o" = "write" }
@@ -540,8 +548,15 @@ flags = { "-i" = "read", "-microstackshots_datastore" = "write", "-microstacksho
 [roles."stackprof"]
 flags = { "--out" = "write" }
 
+# Inherits RuboCop's flag surface, so the same autocorrect family rewrites the inspected files in
+# place; `--fix` is Standard's own spelling of it. `--no-fix` is the read-only counterpart.
 [roles."standardrb"]
 flags = { "--out" = "write", "-o" = "write" }
+write_when = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
+    "--fix", "--fix-layout", "--safe-auto-correct", "--safe-autocorrect",
+    "-A", "-a",
+]
 
 [roles."strip"]
 flags = { "-o" = "write" }
@@ -646,8 +661,41 @@ flags = { "-o" = "write", "--output" = "write" }
 [roles."vyper"]
 flags = { "-o" = "write" }
 
+# SUB-SCOPED gates. The key is `"<command> <sub>"`, and it is consulted with the sub name in the
+# command slot, so it reads exactly like a command-scoped role. Needed when a flag's ROLE or ARITY
+# differs per sub: `smbutil -f` names a mounted share on these four subs and is a boolean on `view`,
+# so the command-wide gate that used to live in smbutil.toml made `smbutil view -f //server` deny.
+[roles."smbutil statshares"]
+flags = { "-f" = "read" }
+
+[roles."smbutil multichannel"]
+flags = { "-f" = "read" }
+
+[roles."smbutil snapshot"]
+flags = { "-f" = "read" }
+
+[roles."smbutil smbstat"]
+flags = { "-f" = "read" }
+
+# `rbs annotate` UPDATES each RBS file it is given (upstream calls `annotate_file(path)` per
+# positional); its siblings — `validate`, `prototype`, `list` — only read. There is no flag to key
+# on here: the SUBCOMMAND is the mode, so before sub-scoped keys the only expressible choices were
+# to gate every sub (breaking `rbs prototype ./lib`) or none (leaving
+# `rbs annotate ~/.ssh/authorized_keys` auto-approved, which it was).
+[roles."rbs annotate"]
+positional = "write"
+
+# `-w`/`--write` do NOT take a value — they rewrite every file OPERAND in place. Gating them as
+# path-valued flags looked right on a one-operand probe (`shfmt -w ~/.ssh/config` denied, because
+# the gate ate the path as `-w`'s value) and left the real shape wide open:
+# `shfmt -w ./a.sh ~/.ssh/config` auto-approved, overwriting a credential file with formatted shell.
+#
+# `write_when`, not `positional = "write"`: without `-w` shfmt prints to stdout and `-d`/`-l` only
+# report, so the operands are reads and gating them unconditionally would deny ordinary inspection.
 [roles."shfmt"]
-flags = { "-w" = "write", "--write" = "write" }
+positional = "ignore"
+write_when = ["-w", "--write"]
+
 [roles."weasyprint"]
 shape = "last_write"
 

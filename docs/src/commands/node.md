@@ -28,6 +28,11 @@
 - **x**
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `bun build ./src/index.ts --outdir ./dist`
+- `bun build ./src/index.ts --outfile ./dist/bundle.js`
+
 ### `bunx`
 <p class="cmd-url"><a href="https://bun.sh/docs/cli/bunx">https://bun.sh/docs/cli/bunx</a></p>
 
@@ -208,6 +213,15 @@
 - **query**: Flags: --help, -h
 - **run**: Flags: --affected, --cache-dir, --continue, --dry-run, --env-mode, --force, --framework-inference, --graph, --help, --no-cache, --no-daemon, --output-logs, --parallel, --summarize, --verbose, -h. Valued: --cache-workers, --color, --concurrency, --env-mode, --filter, --global-deps, --graph, --log-order, --log-prefix, --output-logs, --profile, --remote-only, --scope, --team, --token, -F. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `turbo --version`
+- `turbo ls`
+- `turbo run build --dry-run`
+- `turbo prune web`
+- `turbo prune web --out-dir ./out`
+- `turbo prune web --docker --out-dir ./out`
 
 ### `vitest`
 <p class="cmd-url"><a href="https://vitest.dev/guide/cli.html">https://vitest.dev/guide/cli.html</a></p>

@@ -20,6 +20,11 @@
 - **template list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `docfx build --output ./_site`
+- `docfx metadata -o ./api`
+
 ### `dotnet`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/tools/">https://learn.microsoft.com/en-us/dotnet/core/tools/</a></p>
 
@@ -45,6 +50,11 @@
 - **workload list**: Flags: --help, -h. Valued: --verbosity, -v
 - **workload**: Flags: --help, -h
 - Allowed standalone flags: --help, --info, --list-runtimes, --list-sdks, --version, -V, -h
+
+**Examples:**
+
+- `dotnet build --output ./bin/out`
+- `dotnet publish -o ./publish`
 
 ### `dotnet-counters`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters</a></p>
@@ -122,6 +132,10 @@
 - **report**: Flags: --help, -h. Valued: --max-depth. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `dotnet-trace convert ./trace.nettrace --format speedscope --output ./trace.speedscope.json`
 
 ### `fantomas`
 <p class="cmd-url"><a href="https://github.com/fsprojects/fantomas">https://github.com/fsprojects/fantomas</a></p>

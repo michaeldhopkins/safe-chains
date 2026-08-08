@@ -2,7 +2,33 @@
 name = "trivy"
 description = "Comprehensive security scanner from Aqua Security that finds vulnerabilities, misconfigurations, and secrets in container images, filesystems, code repos, and IaC files. Scanning subcommands (fs, image, config, sbom) analyze targets and report findings without modifying them. Downloads and caches a vulnerability database on first run (network access). Very actively maintained with frequent releases. Note: Trivy experienced supply-chain security incidents in early 2026 affecting its GitHub Actions and binary releases."
 url = "https://aquasecurity.github.io/trivy/"
+researched_version = "trivy 0.67"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "trivy --version",
+    "trivy version",
+    "trivy fs .",
+    "trivy fs --format json .",
+    "trivy fs --output ./trivy-report.json .",
+    "trivy fs -o ./report.json .",
+    "trivy image alpine:3.20",
+    "trivy config ./terraform",
+    "trivy sbom ./sbom.json",
+]
+examples_denied = [
+    "trivy fs --output ~/.ssh/authorized_keys .",
+    "trivy fs -o /etc/hosts .",
+    "trivy image -o ~/.ssh/authorized_keys alpine:3.20",
+    "trivy config --output ~/.ssh/authorized_keys ./terraform",
+    "trivy sbom -o ~/.ssh/authorized_keys ./sbom.json",
+]
+
+# `-o, --output` is trivy's "output file name" on every scanning sub (fs / image / config / sbom
+# share one report-flag group), so the scan report is written wherever it points. `-f, --format`
+# is the enum that picks the report's shape — the two are separate flags, and only `--output`
+# names a path.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "fs"

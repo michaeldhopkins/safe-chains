@@ -1,0 +1,43 @@
+# Probe artifacts for `a_boolean_write_flag_gates_its_operands` — VERIFIED non-holes.
+#
+# That guard probes `<cmd> <boolean-write-flag> ./probe.txt <sensitive>`, the shape that exposed
+# `shfmt -w ./a.sh ~/.ssh/config` (a real hole: shfmt rewrites EVERY operand in place). The probe
+# assumes the operands are file targets. For the entries below they are not, so the invocation is
+# nonsense rather than dangerous and there is nothing to gate.
+#
+# This list only shrinks, and it fails in BOTH directions: a NEW auto-approving probe that is not
+# listed fails closed, and a listed entry that stops auto-approving fails as stale.
+#
+# Format: <scope>\t<flag>. Each row's reason, checked against the tool's own reference:
+#
+#   borg check --repair       the positional is REPOSITORY_OR_ARCHIVE — a repo spec, not a file the
+#                             command rewrites. (Whether `--repair` belongs above the line at all is
+#                             a LEVEL question, not a path question — see TODO.md.)
+#   borg config --delete      operands are REPOSITORY and a config KEY, not paths.
+#   depcruise --init          writes `.dependency-cruiser.cjs` in the cwd from an interactive
+#                             prompt; the operands are not written.
+#   gomodifytags -w / --w     flag-driven only — the file comes from `-file`, which IS gated write.
+#                             Bare positionals are not read as paths. (Go's flag package accepts
+#                             both `-w` and `--w`, hence two rows.)
+#   mtree -U / -r / -u        the tree is a `-p` FLAG value and the spec arrives on stdin or via
+#                             `-f`; mtree takes no file positionals. The `mtree_mode` handler gates
+#                             the real target.
+#   ncu -u / --upgrade        positionals are package-name FILTERS, not paths; the manifest comes
+#                             from `--packageFile`, which the `ncu_mode` handler gates.
+#   qlmanage -t               the operands are files to PREVIEW (a read) and the output goes to
+#                             `-o`. Recorded for the read/disclosure sweep instead — see TODO.md.
+#   xattr -w                  `-w NAME VALUE FILE`: the probe's tokens land as the attribute NAME
+#                             and VALUE, so no file is touched. Same artifact already noted for
+#                             xattr on the output-flag worklist.
+borg check	--repair
+borg config	--delete
+depcruise	--init
+gomodifytags	--w
+gomodifytags	-w
+mtree	-U
+mtree	-r
+mtree	-u
+ncu	--upgrade
+ncu	-u
+qlmanage	-t
+xattr	-w

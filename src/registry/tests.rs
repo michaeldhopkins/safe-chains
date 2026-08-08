@@ -2910,6 +2910,244 @@ use super::*;
     /// that verification a build artifact instead of a thing someone typed once, because
     /// `toml_examples_match_dispatch` re-runs those examples on every build.
     ///
+    /// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so the operands are the
+    /// write targets and must be gated as such.
+    ///
+    /// This exists because the sweep that was supposed to find these could not see them. Every
+    /// output-flag probe has the shape `<cmd> <flag> <sensitive>` — ONE operand — which cannot
+    /// distinguish a working gate from a mis-typed one that ate the path as the flag's value.
+    /// `shfmt -w` was gated as if it took a path; the one-operand probe therefore DENIED and the
+    /// gate looked correct, while `shfmt -w ./a.sh ~/.ssh/config` auto-approved and overwrote a
+    /// credential file with formatted shell.
+    ///
+    /// So the probe here puts a plausible first operand ahead of the sensitive one. The population
+    /// is derived, not guessed: a flag the entry ITSELF declares in `write_flags` (the author's
+    /// claim that this flag makes the run write) that is also declared `standalone` and NOT
+    /// `valued` (so it takes no value, and the operands are what gets written).
+    #[test]
+    fn a_boolean_write_flag_gates_its_operands() {
+        use super::types::TomlFile;
+        const SENSITIVE: &str = "~/.ssh/authorized_keys";
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        // VERIFIED artifacts: the probe's operands are not file targets for these, so there is
+        // nothing to gate. Fails in both directions, so the list cannot rot.
+        let artifacts: std::collections::HashSet<(String, String)> =
+            include_str!("../../tests/fixtures/operand_write_probe_artifacts.tsv")
+                .lines()
+                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+                .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
+                .collect();
+
+        let mut holes: Vec<String> = Vec::new();
+        let mut seen: std::collections::HashSet<(String, String)> = Default::default();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                struct Scope<'a> {
+                    label: String,
+                    write_flags: &'a [String],
+                    standalone: &'a [String],
+                    valued: &'a [String],
+                }
+                let mut scopes = vec![Scope {
+                    label: cmd.name.clone(),
+                    write_flags: &cmd.write_flags,
+                    standalone: &cmd.standalone,
+                    valued: &cmd.valued,
+                }];
+                for sub in &cmd.sub {
+                    scopes.push(Scope {
+                        label: format!("{} {}", cmd.name, sub.name),
+                        write_flags: &sub.write_flags,
+                        standalone: &sub.standalone,
+                        valued: &sub.valued,
+                    });
+                }
+                for Scope { label, write_flags, standalone, valued } in scopes {
+                    for flag in write_flags {
+                        let boolean = standalone.contains(flag) && !valued.contains(flag);
+                        if !boolean {
+                            continue;
+                        }
+                        let probe = format!("{label} {flag} ./probe.txt {SENSITIVE}");
+                        if crate::is_safe_command(&probe) {
+                            let key = (label.clone(), flag.clone());
+                            seen.insert(key.clone());
+                            if !artifacts.contains(&key) {
+                                holes.push(format!("  {probe}"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        holes.sort();
+        holes.dedup();
+        assert!(
+            holes.is_empty(),
+            "boolean write-mode flags whose OPERANDS are ungated ({}) — the command rewrites each \
+             operand in place, so gate the positionals (`write_when` on the flag, or \
+             `positional = \"write\"` if it always writes). If the operands are NOT file targets \
+             for this command, add it to tests/fixtures/operand_write_probe_artifacts.tsv with the \
+             verified reason:\n{}",
+            holes.len(),
+            holes.join("\n"),
+        );
+
+        let mut stale: Vec<_> = artifacts.difference(&seen).collect();
+        stale.sort();
+        assert!(
+            stale.is_empty(),
+            "artifact rows that no longer auto-approve ({}) — they were gated or the entry changed, \
+             so remove them from tests/fixtures/operand_write_probe_artifacts.tsv:\n{}",
+            stale.len(),
+            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+    }
+
+    /// A gated flag CONSUMES a value, so declaring it `standalone`-only is a contradiction — and a
+    /// silent one. The gate reads as protection; the flag grammar says the flag takes nothing, so
+    /// the walker never consumes the following token and the path lands where no role applies.
+    ///
+    /// `safety --save-html ~/.ssh/authorized_keys` auto-approved for exactly this reason: upstream
+    /// the flag takes a path, our entry declared it boolean, and the probe fell through to a
+    /// positional. That was found by hand, one command at a time. It is checkable for the whole
+    /// registry with no research at all, because both halves are already written down.
+    ///
+    /// A flag in BOTH lists is fine and deliberate — that is how this schema spells an OPTIONAL
+    /// value (`vegeta report --output` defaults to stdout). The contradiction is `standalone`
+    /// WITHOUT `valued`.
+    ///
+    /// Covers both declaration sites (co-located `[command.path_gate]` and the central
+    /// `pathgates.toml` map) and recurses into nested subs, since a flag's arity is declared per
+    /// scope while a command-level gate applies across all of them.
+    ///
+    /// A flag the command declares `valued` in ANY scope is EXEMPT, even where another scope
+    /// declares it standalone-only. That is a real defect too, but a DIFFERENT one: the gate has a
+    /// legitimate customer and the mismatch is that path gates are not sub-scoped (`smbutil -f` is
+    /// a mounted-share path on `statshares` and a boolean on `view`; `bundle --path` is valued on
+    /// `install` and boolean on `info`). Folding the two together would make this guard un-fixable
+    /// without the schema change, so it targets only the contradiction with no such excuse: a gate
+    /// for a flag the command treats as value-less EVERYWHERE. See TODO.md for the sub-scoping gap.
+    #[test]
+    fn a_gated_flag_is_never_declared_value_less() {
+        use super::types::{TomlCommand, TomlFile, TomlSub};
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        fn check(
+            label: &str,
+            standalone: &[String],
+            valued: &[String],
+            gated: &std::collections::BTreeSet<String>,
+            bad: &mut Vec<String>,
+        ) {
+            for flag in gated {
+                if standalone.iter().any(|s| s == flag) && !valued.iter().any(|v| v == flag) {
+                    bad.push(format!(
+                        "  {label} `{flag}` — gated as path-valued but declared standalone-only"
+                    ));
+                }
+            }
+        }
+
+        fn walk_sub(
+            prefix: &str,
+            sub: &TomlSub,
+            gated: &std::collections::BTreeSet<String>,
+            bad: &mut Vec<String>,
+        ) {
+            let label = format!("{prefix} {}", sub.name);
+            check(&label, &sub.standalone, &sub.valued, gated, bad);
+            for nested in &sub.sub {
+                walk_sub(&label, nested, gated, bad);
+            }
+        }
+
+        let mut central: std::collections::HashMap<String, Vec<String>> =
+            std::collections::HashMap::new();
+        for (cmd, flag, _role) in crate::pathgate::central_flag_gates() {
+            central.entry(cmd).or_default().push(flag);
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut bad: Vec<String> = Vec::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                let cmd: &TomlCommand = cmd;
+                let mut gated: std::collections::BTreeSet<String> = Default::default();
+                if let Some(gate) = &cmd.path_gate {
+                    gated.extend(gate.flag_roles().map(|(f, _)| f.to_string()));
+                }
+                if let Some(flags) = central.get(&cmd.name) {
+                    gated.extend(flags.iter().cloned());
+                }
+                if gated.is_empty() {
+                    continue;
+                }
+                let mut valued_anywhere: std::collections::BTreeSet<&str> = Default::default();
+                fn collect_valued<'a>(
+                    subs: &'a [TomlSub],
+                    out: &mut std::collections::BTreeSet<&'a str>,
+                ) {
+                    for sub in subs {
+                        out.extend(sub.valued.iter().map(String::as_str));
+                        collect_valued(&sub.sub, out);
+                    }
+                }
+                valued_anywhere.extend(cmd.valued.iter().map(String::as_str));
+                collect_valued(&cmd.sub, &mut valued_anywhere);
+                gated.retain(|f| !valued_anywhere.contains(f.as_str()));
+
+                check(&cmd.name, &cmd.standalone, &cmd.valued, &gated, &mut bad);
+                for sub in &cmd.sub {
+                    walk_sub(&cmd.name, sub, &gated, &mut bad);
+                }
+            }
+        }
+
+        bad.sort();
+        assert!(
+            bad.is_empty(),
+            "gated flags declared value-less ({}) — the gate cannot apply, so the path is \
+             UNGATED. Move the flag into `valued` (keep it in `standalone` too if its value is \
+             genuinely optional):\n{}",
+            bad.len(),
+            bad.join("\n"),
+        );
+    }
+
     /// Seeded with the 313 gated commands that predate the rule, so it ratchets: a newly gated
     /// command must bring its example. Both directions fail, so the list cannot rot.
     #[test]

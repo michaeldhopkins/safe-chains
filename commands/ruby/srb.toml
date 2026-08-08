@@ -4,6 +4,18 @@ description = "Stripe's gradual type checker for Ruby. Bare `srb` defaults to th
 url = "https://sorbet.org/docs/cli"
 researched_version = "sorbet 0.6.13169 (April 2026); flag surface evolves frequently"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "srb tc",
+    "srb tc lib/foo.rb",
+    "srb tc --dir lib",
+    "srb tc -a lib/foo.rb",
+    "srb tc --autocorrect lib",
+]
+examples_denied = [
+    "srb tc -a ~/.ssh/authorized_keys",
+    "srb tc --autocorrect /etc",
+    "srb init",
+]
 
 [[command.sub]]
 name = "tc"
@@ -53,3 +65,10 @@ candidate = true
 [[command.sub]]
 name = "help"
 allow_all = true
+
+# `srb tc` reports by default; `-a`/`--autocorrect` "auto-correct source files with suggested
+# fixes", rewriting the files it was pointed at in place. `--suggest-typed` and `--suggest-unsafe`
+# only ever produce autocorrects, so they are treated the same way — the entry's own `write_flags`
+# already claims all four make the run write.
+[command.path_gate]
+write_when = ["--autocorrect", "--suggest-typed", "--suggest-unsafe", "-a"]

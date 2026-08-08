@@ -4,6 +4,27 @@ description = "Wasmtime — runtime for WebAssembly modules / components. Subcom
 url = "https://docs.wasmtime.dev/cli.html"
 researched_version = "Wasmtime 25.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "wasmtime --version",
+    "wasmtime compile ./mod.wasm",
+    "wasmtime compile ./mod.wasm -o ./mod.cwasm",
+    "wasmtime compile ./mod.wasm --output ./mod.cwasm",
+    "wasmtime explore ./mod.wasm -o ./explore.html",
+    "wasmtime objdump ./mod.cwasm",
+    "wasmtime settings list",
+]
+examples_denied = [
+    "wasmtime compile ./mod.wasm -o ~/.ssh/authorized_keys",
+    "wasmtime compile ./mod.wasm --output /etc/hosts",
+    "wasmtime explore ./mod.wasm --output ~/.ssh/authorized_keys",
+    "wasmtime run ./mod.wasm",
+]
+
+# `compile` declares `output: Option<PathBuf>` ("the path of the output compiled module") and
+# writes it with `fs::write`; `explore` declares the same field and `File::create`s it for the
+# HTML report. `-O` is `--optimize` and is a different token, so it is untouched.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

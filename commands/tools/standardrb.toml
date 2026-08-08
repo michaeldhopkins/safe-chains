@@ -5,6 +5,21 @@ url = "https://github.com/standardrb/standard"
 researched_version = "standard gem ~1.x line; flag surface tracks RuboCop"
 level = "SafeRead"
 bare = true
+examples_safe = [
+    "standardrb",
+    "standardrb lib",
+    "standardrb --format json",
+    "standardrb --fix",
+    "standardrb --fix lib",
+    "standardrb -a app/models/user.rb",
+    "standardrb --no-fix lib",
+    "standardrb -o ./standard-report.txt",
+]
+examples_denied = [
+    "standardrb --fix ~/.ssh",
+    "standardrb -A /etc",
+    "standardrb -o ~/.ssh/authorized_keys",
+]
 standalone = [
     "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
     "--color", "--debug", "--display-cop-names",

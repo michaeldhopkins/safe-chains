@@ -14,6 +14,12 @@
 - **ls-files**: Flags: --help, --include-imports, --include-import-paths, -h. Valued: --config, --format. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `buf build -o ./image.bin`
+- `buf format --write ./proto`
+- `buf generate --output ./gen`
+
 ### `dlv`
 <p class="cmd-url"><a href="https://github.com/go-delve/delve">https://github.com/go-delve/delve</a></p>
 
@@ -125,6 +131,12 @@
 - Allowed standalone flags: --add-options, --all, --clear-tags, --clear-options, --format, --help, --quiet, --remove-tags, --remove-options, --skip-unexported, --sort, --transform, --w, -h, -w
 - Allowed valued flags: --add-tags, --field, --file, --line, --modified, --offset, --override, --remove-options, --remove-tags, --struct, --template, --transform, -add-tags, -clear-tags, -field, -file, -line, -modified, -offset, -override, -remove-options, -remove-tags, -struct, -template, -transform
 
+**Examples:**
+
+- `gomodifytags -file ./main.go -struct Server -add-tags json`
+- `gomodifytags -w -file ./main.go -struct Server -add-tags json`
+- `gomodifytags --file ./main.go --all --remove-tags xml`
+
 ### `goreleaser`
 <p class="cmd-url"><a href="https://goreleaser.com/">https://goreleaser.com/</a></p>
 
@@ -138,6 +150,14 @@
 - **verify**: Flags: --help, -h, --debug. Valued: -f, --config, --checksum-file. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `goreleaser check`
+- `goreleaser healthcheck`
+- `goreleaser schema`
+- `goreleaser schema -o ./goreleaser.schema.json`
+- `goreleaser jsonschema --output ./schema.json`
+
 ### `gosec`
 <p class="cmd-url"><a href="https://github.com/securego/gosec">https://github.com/securego/gosec</a></p>
 
@@ -147,9 +167,17 @@
 ### `gotestsum`
 <p class="cmd-url"><a href="https://github.com/gotestyourself/gotestsum">https://github.com/gotestyourself/gotestsum</a></p>
 
-- Allowed standalone flags: --debug, --dry-run, --force-cache, --format-hide-empty-pkg, --help, --ignore-non-json-output-lines, --no-color, --rerun-fails-only-root-cases, --watch, --watch-chdir, -h
-- Allowed valued flags: --format, --format-hivis, --format-icons, --hide-summary, --junitfile, --junitfile-hide-empty-pkg, --junitfile-project-name, --junitfile-testcase-classname, --junitfile-testsuite-name, --max-fails, --packages, --post-run-command, --raw-command, --rerun-fails, --rerun-fails-max-failures, --rerun-fails-report, --rerun-fails-run-root-test, --watch-skip-tests
+- Allowed standalone flags: --debug, --dry-run, --force-cache, --format-hide-empty-pkg, --help, --ignore-non-json-output-lines, --junitfile-hide-empty-pkg, --no-color, --rerun-fails-only-root-cases, --watch, --watch-chdir, -h
+- Allowed valued flags: --format, --format-hivis, --format-icons, --hide-summary, --junitfile, --junitfile-project-name, --junitfile-testcase-classname, --junitfile-testsuite-name, --max-fails, --packages, --post-run-command, --raw-command, --rerun-fails, --rerun-fails-max-failures, --rerun-fails-report, --rerun-fails-run-root-test, --watch-skip-tests
 - Bare invocation allowed
+
+**Examples:**
+
+- `gotestsum`
+- `gotestsum --format testname`
+- `gotestsum --junitfile ./junit.xml`
+- `gotestsum --junitfile ./junit.xml --junitfile-hide-empty-pkg`
+- `gotestsum --rerun-fails --rerun-fails-report ./rerun.txt`
 
 ### `govulncheck`
 <p class="cmd-url"><a href="https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck">https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck</a></p>

@@ -134,6 +134,120 @@ dbt ls	--output
 flux version	--output
 flux version	-o
 
+# ── TRIAGED 2026-08-08 (q–s slice of the 2026-08-07 seeding) — verified NON-PATH values ──────────
+#
+# Same rule as the block above: each row was checked against the tool's own reference at the
+# version in its `researched_version`, and the flag's value turned out to be an enum, a template, a
+# boolean, or a `true`/`false` word — never a filesystem path.
+#
+#   qemu-img {check,info,map,measure} --output
+#                                    `human|json` — the report NOTATION. Every write subcommand
+#                                    (create/convert/resize/…) names its target as a positional.
+#   qemu-img measure -o              format-specific IMAGE CREATION options, a comma-separated
+#                                    `key=value` list (`-o cluster_size=64k`) describing the image
+#                                    being measured. `measure` writes nothing at all.
+#   qlmanage -t                      boolean ("display the Quick Look thumbnails for the specified
+#                                    files"). The probe path lands on the file-to-preview
+#                                    positional, which is an INPUT; the thumbnail's destination is
+#                                    `-o`, and that is gated.
+#   rdfind -make{sym,hard}links      every rdfind option takes an explicit `true`/`false` word, so
+#   rdfind -deleteduplicates         the probe path is a malformed VALUE, not a target. The
+#                                    directories these act on are positionals, and the
+#                                    `rdfind_mode` handler already write-gates them once an action
+#                                    is armed with `true` (and disarms on `-dryrun true`).
+#   render … -o/--output             `interactive|json|yaml|text` — the CLI-wide output format,
+#                                    auto-switching to text off a TTY. Same on every sub in
+#                                    coverage (whoami, workspaces, projects, environments, logs).
+#   slither --checklist              boolean ("generate a markdown page with the detector results").
+#                                    The probe path is swallowed as the contract/project to
+#                                    ANALYZE. Its file-writing siblings `--json`/`--sarif` are
+#                                    gated.
+#   supabase {inspect,services} -o/--output
+#                                    `env|pretty|json|toml|yaml` — the CLI-wide output format.
+#   systemctl status -o/--output     the journal output MODE — `short`, `short-precise`,
+#                                    `short-iso`, `verbose`, `cat`, `json`, … — the same enum
+#                                    `journalctl -o` takes, which is grandfathered above.
+#
+# The q–s writers found in the same pass are GATED and gone from this file: rbs prototype
+# --out-dir, roc build/docs --output, rubocop's autocorrect family (write_when), safety check
+# --save-html/--save-json, semgrep scan/ci -o/--output, skaffold diagnose -o/--output, slither
+# --json/--sarif/--triage-database, srb tc's autocorrect family (write_when), standardrb's
+# autocorrect family (write_when), starship preset -o/--output, steep binstub -o/--output and
+# steep check --save-expectations.
+#
+# `safety check -o/--output` and `safety scan --output` ARE enums (`screen|text|json|bare|html`;
+# the ScanOutput enum) and would have belonged in the list above — they are absent because safety's
+# gate also declares `positional = "write"`, so a path-shaped value in that slot denies anyway.
+# That declaration is there for `scan --save-as <FORMAT> <PATH>`, whose write target is the flag's
+# SECOND value and which no flag→role map can reach; neither safety sub takes a path positional
+# (every input is a flag: `-r`, `--target`), so it costs no ordinary usage.
+qemu-img check	--output
+qemu-img info	--output
+qemu-img map	--output
+qemu-img measure	--output
+qemu-img measure	-o
+qlmanage	-t
+rdfind	-deleteduplicates
+rdfind	-makehardlinks
+rdfind	-makesymlinks
+render environments	--output
+render environments	-o
+render logs	--output
+render logs	-o
+render projects	--output
+render projects	-o
+render whoami	--output
+render whoami	-o
+render workspaces	--output
+render workspaces	-o
+slither	--checklist
+supabase inspect	--output
+supabase inspect	-o
+supabase services	--output
+supabase services	-o
+systemctl status	--output
+systemctl status	-o
+
+# ── TRIAGED 2026-08-08 (t–z slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
+#
+# Same bar as the a–f block: each row was checked against the tool's own reference at the version in
+# its `researched_version`. The genuine writers are GATED and gone from this file (trace trim
+# --output/-o, trivy config/fs/image/sbom -o/--output, turbo prune --out-dir, vitepress build
+# --outDir/--out-dir, wasm-tools demangle/parse/print/strip -o/--output, wasmtime compile/explore
+# -o/--output, west manifest --out/-o). What is left below takes no path:
+#
+#   tilt get -o/--output       kubectl-style format enum — `json|yaml|kyaml|name|wide|go-template|
+#                              jsonpath|custom-columns|…`. The `*-file` members of that enum do name
+#                              a template file, but it is supplied via `--template`, never via `-o`.
+#   tilt describe -o/--output  NOT A FLAG. `tilt describe` takes `-f/--filename`, `-k/--kustomize`,
+#                              `-R/--recursive`, `-l/--selector`, `--host`, `--port` — there is no
+#                              output flag on it at all, so tilt's own parser rejects the spelling.
+#   tuist {build,generate,test} --destination
+#                              NOT A FLAG. Tuist assembles the xcodebuild destination string itself
+#                              from `--device`/`--platform`/`--os`; in the 4.x option tables the word
+#                              `destination` appears only inside the `--rosetta` help text. The one
+#                              real `-destination` is single-dash passthrough on `tuist xcodebuild`,
+#                              which is not allowlisted. Already recorded as `--destination =
+#                              "ignore"` in tuist.toml's `[command.path_gate]`.
+#   velero get -o/--output     `table|json|yaml` — the display format, default `table`.
+#   wasmer {wasm2wat,wat2wasm} --output
+#                              NOT A SUBCOMMAND. Neither exists in Wasmer 5.x or on main (wasm2wat /
+#                              wat2wasm are wabt binaries); these allowlist entries are historical.
+#                              Wasmer's unknown-subcommand fallback re-parses argv as `wasmer run`,
+#                              which has no `--output` either, so the parse fails and nothing is
+#                              written.
+tilt describe	--output
+tilt describe	-o
+tilt get	--output
+tilt get	-o
+tuist build	--destination
+tuist generate	--destination
+tuist test	--destination
+velero get	--output
+velero get	-o
+wasmer wasm2wat	--output
+wasmer wat2wasm	--output
+
 # ── SEEDED 2026-08-07, UNTRIAGED — these are NOT verified format-only ────────────────────────────
 #
 # Everything above this line was triaged: a human checked the flag takes a FORMAT, not a path.
@@ -258,119 +372,6 @@ platform team:list	-o
 platform team:project:list	-o
 platform team:user:list	-o
 platform teams	-o
-qemu-img check	--output
-qemu-img info	--output
-qemu-img map	--output
-qemu-img measure	--output
-qemu-img measure	-o
-qlmanage	-t
-rbs prototype	--out-dir
-rdfind	-deleteduplicates
-rdfind	-makehardlinks
-rdfind	-makesymlinks
-render environments	--output
-render environments	-o
-render logs	--output
-render logs	-o
-render projects	--output
-render projects	-o
-render whoami	--output
-render whoami	-o
-render workspaces	--output
-render workspaces	-o
-roc build	--output
-roc docs	--output
-rubocop	--auto-correct
-rubocop	--auto-correct-all
-rubocop	--autocorrect
-rubocop	--autocorrect-all
-rubocop	--fix-layout
-rubocop	--safe-auto-correct
-rubocop	--safe-autocorrect
-rubocop	-A
-rubocop	-a
-rubocop	-x
-safety check	--output
-safety check	--save-html
-safety check	--save-json
-safety check	-o
-safety scan	--output
-semgrep ci	--output
-semgrep ci	-o
-semgrep scan	--output
-semgrep scan	-o
-skaffold diagnose	--output
-skaffold diagnose	-o
-skaffold find-configs	--output
-skaffold find-configs	-o
-skaffold inspect	--output
-skaffold inspect	-o
-skaffold version	--output
-skaffold version	-o
-slither	--checklist
-slither	--json
-slither	--sarif
-srb tc	--autocorrect
-srb tc	--suggest-typed
-srb tc	--suggest-unsafe
-srb tc	-a
-standardrb	--auto-correct
-standardrb	--auto-correct-all
-standardrb	--autocorrect
-standardrb	--autocorrect-all
-standardrb	--fix
-standardrb	--fix-layout
-standardrb	--safe-auto-correct
-standardrb	--safe-autocorrect
-standardrb	-A
-standardrb	-a
-starship preset	--output
-starship preset	-o
-steep binstub	--output
-steep binstub	-o
-steep check	--save-expectations
-supabase inspect	--output
-supabase inspect	-o
-supabase services	--output
-supabase services	-o
-systemctl status	--output
-systemctl status	-o
-tilt describe	--output
-tilt describe	-o
-tilt get	--output
-tilt get	-o
-trace trim	--output
-trivy config	--output
-trivy config	-o
-trivy fs	--output
-trivy fs	-o
-trivy image	--output
-trivy image	-o
-trivy sbom	--output
-trivy sbom	-o
-tuist build	--destination
-tuist generate	--destination
-tuist test	--destination
-turbo prune	--out-dir
-velero get	--output
-velero get	-o
-vitepress build	--out-dir
-wasm-tools demangle	--output
-wasm-tools demangle	-o
-wasm-tools parse	--output
-wasm-tools parse	-o
-wasm-tools print	--output
-wasm-tools print	-o
-wasm-tools strip	--output
-wasm-tools strip	-o
-wasmer wasm2wat	--output
-wasmer wat2wasm	--output
-wasmtime compile	--output
-wasmtime compile	-o
-wasmtime explore	--output
-wasmtime explore	-o
-west manifest	--out
-west manifest	-o
 # xattr -d/-w are PROBE ARTIFACTS, not holes. The guard probes `<cmd> <flag> ~/.ssh/… in`,
 # and for these the sensitive path is consumed as the attribute NAME, so no file operand is
 # left to gate and the probe auto-approves. Real invocations ARE gated by xattr_mode:

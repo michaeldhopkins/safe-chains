@@ -680,6 +680,13 @@ Aliases: `fly`
 - **symbolicate**: Flags: --help, -h
 - **trace**: Flags: --continuous, --csv, --disable-coprocessors, --json, --json-64, --ndjson, --no-default-codes-files, --only-named-events, -A, -C, -E, -N, -S, -h, -n, -r, -s, -t, -u. Valued: -R, -T, -b, -f, -p, -x. Positional args accepted
 
+**Examples:**
+
+- `ktrace info`
+- `ktrace trace --json`
+- `ktrace artrace`
+- `ktrace artrace -o ./trace.atrc`
+
 ### `latency`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/latency.1.html">https://keith.github.io/xcode-man-pages/latency.1.html</a></p>
 
@@ -1669,16 +1676,16 @@ Aliases: `upsun`
 ### `systemctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/systemctl.1.html">https://man7.org/linux/man-pages/man1/systemctl.1.html</a></p>
 
-- **cat**: Flags: --help, --no-pager, -h. Positional args accepted
+- **cat**: Flags: --help, --no-pager, -h
 - **condrestart**
 - **daemon-reexec**
 - **daemon-reload**
 - **disable**
 - **enable**
 - **force-reload**
-- **is-active**: Flags: --help, --quiet, -h, -q. Positional args accepted
-- **is-enabled**: Flags: --help, --quiet, -h, -q. Positional args accepted
-- **is-failed**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **is-active**: Flags: --help, --quiet, -h, -q
+- **is-enabled**: Flags: --help, --quiet, -h, -q
+- **is-failed**: Flags: --help, --quiet, -h, -q
 - **isolate**
 - **kill**
 - **list-dependencies**: Flags: --all, --help, --no-pager, --plain, --reverse, -a, -h
@@ -1695,9 +1702,9 @@ Aliases: `upsun`
 - **restart**
 - **set-default**
 - **set-property**
-- **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
+- **show**: Flags: --all, --help, --no-pager, --value, -a, -h. Valued: --property, -P, -p
 - **start**
-- **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
+- **status**: Flags: --all, --full, --help, --lines, --no-pager, --quiet, -a, -h, -l, -q. Valued: -n, --output, -o
 - **stop**
 - **try-restart**
 - **unmask**
@@ -1884,7 +1891,15 @@ Aliases: `upsun`
 - **plans**: Flags: --help, -h
 - **providers**: Flags: --help, -h
 - **record**: Flags: --compress, --experimental, --help, --overwrite, --unsafe, -h. Valued: --add, --end-after-duration, --end-after-kdebug-events-size, --end-on-kdebug-event, --end-on-notification, --notify-after-end, --notify-after-start, --omit, --plan. Positional args accepted
-- **trim**: Flags: --help, -h. Valued: --end-time, --output, --start-time
+- **trim**: Flags: --help, -h. Valued: --end-time, --output, --start-time, -o
+
+**Examples:**
+
+- `trace plans`
+- `trace providers`
+- `trace trim ./in.atrc --output ./out.atrc`
+- `trace trim ./in.atrc -o ./out.atrc`
+- `trace trim ./in.atrc --start-time 0 --end-time 5 --output ./out.atrc`
 
 ### `vagrant`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vagrant/docs/cli">https://developer.hashicorp.com/vagrant/docs/cli</a></p>

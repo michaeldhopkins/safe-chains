@@ -304,6 +304,10 @@ Aliases: `bundle-audit`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `bundler-audit check --format json --output ./audit.json`
+
 ### `bw`
 <p class="cmd-url"><a href="https://bitwarden.com/help/cli/">https://bitwarden.com/help/cli/</a></p>
 
@@ -413,6 +417,10 @@ Aliases: `@cucumber/cucumber`
 - **scan**: Flags: --count, --debug, --dependencies, --exit-on-warn, --gemfile, --help, --verbose, -C, -G, -d, -h, -z. Valued: --config-file, --output, --report-format, --skip, -F, -O, -S, -c. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `dawn scan --output ./dawn-report.json .`
+
 ### `depcheck`
 <p class="cmd-url"><a href="https://github.com/depcheck/depcheck">https://github.com/depcheck/depcheck</a></p>
 
@@ -427,6 +435,11 @@ Aliases: `dependency-cruise`
 
 - Allowed standalone flags: --cache, --config, --detect-jsc-paths, --help, --ignore-known, --init, --metrics, --no-cache, --no-config, --no-progress, --preserve-symlinks, --validate, --verbose, --version, -V, -h, -v
 - Allowed valued flags: --baseline, --exclude, --focus, --focus-depth, --ignore-known, --include-only, --max-depth, --module-systems, --output-to, --output-type, --prefix, --reaches, --ts-config, --ts-pre-compilation-deps, --validate, --webpack-config, -T, -X, -d, -f, -x
+
+**Examples:**
+
+- `depcruise --output-to ./deps.json src`
+- `depcruise -f ./deps.dot -T dot src`
 
 ### `DeRez`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/DeRez.1.html">https://keith.github.io/xcode-man-pages/DeRez.1.html</a></p>
@@ -712,6 +725,11 @@ Aliases: `g++`, `cc`, `c++`
 - **version**: Flags: --full, --help, --output, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `helmfile list`
+- `helmfile -f ./helmfile.yaml list`
+
 ### `herb`
 <p class="cmd-url"><a href="https://herb-tools.dev">https://herb-tools.dev</a></p>
 
@@ -720,6 +738,14 @@ Aliases: `g++`, `cc`, `c++`
 - **lint**: Flags: --disable-failing, --fix, --fix-unsafely, --force, --github, --help, -h, --ignore-disable-comments, --init, --json, --no-custom-rules, --no-github, --simple, --upgrade, --version, -v. Valued: --config-file, -c, --fail-level, --format, --jobs, -j, --theme
 - **parse**: Flags: --help, --json, --no-color, -h, -j
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `herb parse app/views/layouts/application.html.erb`
+- `herb lint app/views`
+- `herb lint --fix app/views/home/index.html.erb`
+- `herb format --check app/views`
+- `herb format --write app/views/home/index.html.erb`
 
 ### `hexo`
 <p class="cmd-url"><a href="https://hexo.io/docs/commands">https://hexo.io/docs/commands</a></p>
@@ -744,6 +770,7 @@ Aliases: `g++`, `cc`, `c++`
 - `hexo config`
 - `hexo generate`
 - `hexo g`
+- `hexo render source/_posts/hello.md -o ./rendered.html`
 
 ### `hiutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hiutil.1.html">https://keith.github.io/xcode-man-pages/hiutil.1.html</a></p>
@@ -958,6 +985,7 @@ Aliases: `g++`, `cc`, `c++`
 - `mc ls bucket`
 - `mc find bucket --name foo`
 - `mc version`
+- `mc --config-dir ./.mc ls x`
 
 ### `mdbook`
 <p class="cmd-url"><a href="https://rust-lang.github.io/mdBook/">https://rust-lang.github.io/mdBook/</a></p>
@@ -1035,6 +1063,8 @@ Aliases: `g++`, `cc`, `c++`
 - `nomad alloc-status abc123`
 - `nomad agent-info`
 - `nomad version`
+- `nomad fmt --check ./jobs`
+- `nomad fmt -w ./jobs/web.nomad.hcl`
 
 ### `notifyutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/notifyutil.1.html">https://keith.github.io/xcode-man-pages/notifyutil.1.html</a></p>
@@ -1219,6 +1249,14 @@ Aliases: `run-p`, `run-s`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `prisma version`
+- `prisma validate`
+- `prisma format`
+- `prisma generate`
+- `prisma init --output ./src/generated/prisma`
+
 ### `productutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/productutil.1.html">https://keith.github.io/xcode-man-pages/productutil.1.html</a></p>
 
@@ -1395,6 +1433,17 @@ Aliases: `python`
 - Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
 - Bare invocation allowed
 
+**Examples:**
+
+- `rubocop`
+- `rubocop app/models`
+- `rubocop --format json`
+- `rubocop -a`
+- `rubocop -a app/models/user.rb`
+- `rubocop --autocorrect-all lib`
+- `rubocop -x app`
+- `rubocop -o ./rubocop-report.txt`
+
 ### `ruby-audit`
 <p class="cmd-url"><a href="https://github.com/civisanalytics/ruby_audit">https://github.com/civisanalytics/ruby_audit</a></p>
 
@@ -1514,6 +1563,14 @@ Aliases: `python`
 - **scan**: Flags: --debug, --dryrun, --emacs, --error, --help, --json, --junit-xml, --no-autofix, --no-git-ignore, --no-rewrite-rule-ids, --quiet, --sarif, --strict, --text, --time, --verbose, --vim, -e, -h, -q, -v. Valued: --config, --exclude, --include, --lang, --max-target-bytes, --metrics, --output, --pattern, --timeout, -c, -f, -l, -o
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `semgrep scan --config auto`
+- `semgrep scan --config auto --json -o ./findings.json`
+- `semgrep scan --config auto --sarif --output=./findings.sarif`
+- `semgrep ci --config auto`
+- `semgrep ci -o ./ci-findings.json`
+
 ### `sequelize`
 <p class="cmd-url"><a href="https://github.com/sequelize/cli">https://github.com/sequelize/cli</a></p>
 
@@ -1551,9 +1608,16 @@ Aliases: `python`
 ### `shfmt`
 <p class="cmd-url"><a href="https://github.com/mvdan/sh">https://github.com/mvdan/sh</a></p>
 
-- Allowed standalone flags: --help, -V, -bn, -ci, -d, -fn, -h, -i, -kp, -l, -ln, -mn, -p, -s, -sr, -tojson, -version, -w
-- Allowed valued flags: --apply-ignore, --check, --filename, --from-json, --lang, --list, --write, -filename, -from-json, -i, -lang, -ln
+- Allowed standalone flags: --help, -V, -bn, -ci, -d, -fn, -h, -i, -kp, -l, -ln, -mn, -p, -s, -sr, -tojson, -version, -w, --write
+- Allowed valued flags: --apply-ignore, --check, --filename, --from-json, --lang, --list, -filename, -from-json, -i, -lang, -ln
 - Bare invocation allowed
+
+**Examples:**
+
+- `shfmt -w ./script.sh`
+- `shfmt -w ./a.sh ./b.sh`
+- `shfmt -l .`
+- `shfmt -d ./script.sh`
 
 ### `size-limit`
 <p class="cmd-url"><a href="https://github.com/ai/size-limit">https://github.com/ai/size-limit</a></p>
@@ -1572,6 +1636,16 @@ Aliases: `python`
 - **inspect**: Flags: --help, -h. Valued: -f, --filename, -o, --output, --module, -m. Positional args accepted
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `skaffold version`
+- `skaffold version -o {{.Version}}`
+- `skaffold diagnose`
+- `skaffold diagnose --yaml-only`
+- `skaffold diagnose -o ./diagnose.yaml`
+- `skaffold find-configs -o json`
+- `skaffold inspect build-env list -o json`
 
 ### `slim-lint`
 <p class="cmd-url"><a href="https://github.com/sds/slim-lint">https://github.com/sds/slim-lint</a></p>
@@ -1594,6 +1668,12 @@ Aliases: `python`
 - **status**: Flags: -a, -e, -h, --help
 - **view**: Flags: -A, -N, -G, -g, -a, -f, -h, --help
 - Allowed standalone flags: -h, --help, -v
+
+**Examples:**
+
+- `smbutil view -f //server`
+- `smbutil view //server`
+- `smbutil statshares -a`
 
 ### `snyk`
 <p class="cmd-url"><a href="https://docs.snyk.io/snyk-cli">https://docs.snyk.io/snyk-cli</a></p>
@@ -1641,6 +1721,17 @@ Aliases: `python`
 - Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --fail-fast, --fix, --fix-layout, --help, --lint, --list-target-files, --no-color, --no-fix, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --version, -A, -V, -a, -d, -h, -l
 - Allowed valued flags: --cache-root, --config, --except, --fail-level, --format, --only, --out, --require, --stdin, -c, -f, -o, -r
 - Bare invocation allowed
+
+**Examples:**
+
+- `standardrb`
+- `standardrb lib`
+- `standardrb --format json`
+- `standardrb --fix`
+- `standardrb --fix lib`
+- `standardrb -a app/models/user.rb`
+- `standardrb --no-fix lib`
+- `standardrb -o ./standard-report.txt`
 
 ### `stylelint`
 <p class="cmd-url"><a href="https://stylelint.io/user-guide/cli/">https://stylelint.io/user-guide/cli/</a></p>
@@ -1794,6 +1885,18 @@ Aliases: `python`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `trivy --version`
+- `trivy version`
+- `trivy fs .`
+- `trivy fs --format json .`
+- `trivy fs --output ./trivy-report.json .`
+- `trivy fs -o ./report.json .`
+- `trivy image alpine:3.20`
+- `trivy config ./terraform`
+- `trivy sbom ./sbom.json`
+
 ### `ts`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
 
@@ -1815,8 +1918,8 @@ Aliases: `python`
 ### `tsup`
 <p class="cmd-url"><a href="https://tsup.egoist.dev/">https://tsup.egoist.dev/</a></p>
 
-- Allowed standalone flags: --bundle, --clean, --cjs, --dts, --dts-only, --dts-resolve, --esm, --external, --global-name, --help, --keep-names, --legacy-output, --metafile, --minify, --no-clean, --no-config, --shims, --silent, --skip-node-modules-bundle, --source-map, --splitting, --sourcemap, --terser, --treeshake, --version, --watch, -d, -h, -w
-- Allowed valued flags: --cjs-interop, --config, --define, --entry, --env, --external, --format, --inject, --name, --no-external, --out-dir, --platform, --public-dir, --target, --tsconfig
+- Allowed standalone flags: --bundle, --clean, --cjs, --dts, --dts-only, --dts-resolve, --esm, --external, --global-name, --help, --keep-names, --legacy-output, --metafile, --minify, --no-clean, --no-config, --shims, --silent, --skip-node-modules-bundle, --source-map, --splitting, --sourcemap, --terser, --treeshake, --version, --watch, -h, -w
+- Allowed valued flags: --cjs-interop, --config, --define, --entry, --env, --external, --format, --inject, --name, --no-external, --out-dir, --platform, -d, --public-dir, --target, --tsconfig
 - Bare invocation allowed
 
 ### `tsx`
@@ -1898,10 +2001,20 @@ Aliases: `python`
 ### `vitepress`
 <p class="cmd-url"><a href="https://vitepress.dev/reference/cli">https://vitepress.dev/reference/cli</a></p>
 
-- **build**: Flags: --help, --mpa, -h. Valued: --base, --cache-dir, --out-dir. Positional args accepted
+- **build**: Flags: --help, --mpa, -h. Valued: --base, --cache-dir, --out-dir, --outDir. Positional args accepted
 - **help**: Positional args accepted
 - **init**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `vitepress --version`
+- `vitepress init`
+- `vitepress build`
+- `vitepress build docs`
+- `vitepress build docs --outDir ./dist`
+- `vitepress build docs --out-dir ./dist`
+- `vitepress build docs --base /docs/`
 
 ### `watchexec`
 <p class="cmd-url"><a href="https://watchexec.github.io/">https://watchexec.github.io/</a></p>
@@ -1917,8 +2030,8 @@ Aliases: `python`
 ### `webpack`
 <p class="cmd-url"><a href="https://webpack.js.org/api/cli/">https://webpack.js.org/api/cli/</a></p>
 
-- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -d, -h, -j, -o, -t, -v, -w
-- Allowed valued flags: -c, --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
+- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -d, -h, -j, -t, -v, -w
+- Allowed valued flags: -c, -o, --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
 - Bare invocation allowed
 
 ### `workon`

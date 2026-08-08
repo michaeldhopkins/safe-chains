@@ -4,6 +4,21 @@ description = "Continuous development for Kubernetes apps. `dev`, `run`, `debug`
 url = "https://skaffold.dev/docs/references/cli/"
 researched_version = "skaffold 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "skaffold version",
+    "skaffold version -o {{.Version}}",
+    "skaffold diagnose",
+    "skaffold diagnose --yaml-only",
+    "skaffold diagnose -o ./diagnose.yaml",
+    "skaffold find-configs -o json",
+    "skaffold inspect build-env list -o json",
+]
+examples_denied = [
+    "skaffold diagnose -o ~/.ssh/authorized_keys",
+    "skaffold diagnose --output=/etc/hosts",
+    "skaffold dev",
+    "skaffold deploy",
+]
 
 [[command.sub]]
 name = "version"
@@ -118,3 +133,11 @@ candidate = true
 [[command.sub]]
 name = "filter"
 candidate = true
+
+# `diagnose -o/--output` is "file to write diagnose result" — a write target. The gate is
+# command-wide because a path gate is declared per command, not per sub; on the other subs in
+# coverage the same spelling carries a non-path value (`find-configs -o json|table`, `inspect -o`
+# is the shorthand for `--format json`, `version -o` a go-template), which the locus check leaves
+# untouched.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }

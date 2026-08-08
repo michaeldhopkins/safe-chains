@@ -10,13 +10,29 @@ standalone = [
     "-ci", "-d", "-fn", "-h",
     "-i", "-kp", "-l", "-ln",
     "-mn", "-p", "-s", "-sr", "-tojson",
-    "-version", "-w",
+    "-version", "-w", "--write",
 ]
+# `-w`/`--write` are BOOLEAN — "write result to file instead of stdout", rewriting every file
+# operand in place. `--write` was listed `valued`, which made the gate on it consume the following
+# token as its value; the real operands after it were then ungated.
 valued = [
     "--apply-ignore", "--check",
     "--filename", "--from-json", "--lang",
-    "--list", "--write",
+    "--list",
     "-filename", "-from-json", "-i",
     "-lang", "-ln",
+]
+# The safe twin for the `write_when` gate: in-workspace formatting, and the read-only modes that
+# must keep working even when pointed at a path outside the worktree.
+examples_safe = [
+    "shfmt -w ./script.sh",
+    "shfmt -w ./a.sh ./b.sh",
+    "shfmt -l .",
+    "shfmt -d ./script.sh",
+]
+examples_denied = [
+    "shfmt -w ~/.ssh/config",
+    "shfmt -w ./a.sh ~/.ssh/config",
+    "shfmt --write ./a.sh /etc/hosts",
 ]
 write_flags = ["-w", "--write"]

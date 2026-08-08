@@ -69,6 +69,7 @@
 - **msrv show**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
 - **msrv verify**: Flags: --all-features, --help, --ignore-lockfile, --include-all-patch-releases, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --rust-version, --target
 - **msrv**: Flags: --help, --no-log, --no-user-output, --version, -V, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
+- **mutants**: Flags: --all-features, --all-logs, --caught, --check, --help, --iterate, --json, --leak-dirs, --list, --list-files, --no-config, --no-default-features, --no-shuffle, --no-times, --shuffle, --unviable, --version, --workspace, -V, -h, -v. Valued: --annotations, --baseline, --build-timeout, --build-timeout-multiplier, --colors, --completions, --emit-schema, --exclude, --exclude-re, --features, --file, --jobs, --jobserver-tasks, --level, --line-col, --minimum-test-timeout, --package, --profile, --re, --shard, --skip-calls, --test-package, --timeout, --timeout-multiplier, -E, -F, -L, -e, -f, -j, -p, -t
 - **new**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --edition, --name, --registry, --vcs, -Z
 - **nextest archive**: Flags: --all-features, --help, --locked, --no-default-features, --release, -h. Valued: --archive-file, --archive-format, --cargo-profile, --features, --manifest-path, --package, --target, --target-dir, -p
 - **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
@@ -106,6 +107,11 @@
 **Examples:**
 
 - `cargo fuzz --version`
+- `cargo mutants`
+- `cargo mutants --list`
+- `cargo mutants --list --json`
+- `cargo mutants -j 4 --shard 1/4`
+- `cargo mutants -f src/lib.rs --check`
 - `cargo sweep --time 5`
 - `cargo sweep -r --installed`
 - `cargo sweep --dry-run --maxsize 500`
@@ -201,4 +207,7 @@
 - `eval "$(starship init bash)"`
 - `eval "$(starship init zsh)"`
 - `eval "$(starship init fish --print-full-init)"`
+- `starship preset --list`
+- `starship preset nerd-font-symbols`
+- `starship preset nerd-font-symbols -o ./starship-preset.toml`
 

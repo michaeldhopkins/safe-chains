@@ -4,6 +4,27 @@ description = "Vue-flavoured static site generator built on Vite. `build` writes
 url = "https://vitepress.dev/reference/cli"
 researched_version = "vitepress 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "vitepress --version",
+    "vitepress init",
+    "vitepress build",
+    "vitepress build docs",
+    "vitepress build docs --outDir ./dist",
+    "vitepress build docs --out-dir ./dist",
+    "vitepress build docs --base /docs/",
+]
+examples_denied = [
+    "vitepress build docs --outDir ~/.ssh",
+    "vitepress build docs --out-dir ~/.ssh/authorized_keys",
+    "vitepress dev",
+]
+
+# `vitepress build --outDir DIR` is the rendered site's destination. The CLI parses argv with
+# minimist, which does NO kebab/camel normalization, so only the camelCase spelling actually
+# reaches the builder — but both are gated, because the kebab spelling is the one people type and
+# a switch to a normalizing parser (cac/yargs) would make it live without anyone noticing here.
+[command.path_gate]
+flags = { "--outDir" = "write", "--out-dir" = "write" }
 
 [[command.sub]]
 name = "init"
@@ -17,7 +38,7 @@ level = "SafeWrite"
 bare = true
 tolerate_unknown_short = true
 standalone = ["--help", "--mpa", "-h"]
-valued = ["--base", "--cache-dir", "--out-dir"]
+valued = ["--base", "--cache-dir", "--out-dir", "--outDir"]
 
 [[command.sub]]
 name = "help"

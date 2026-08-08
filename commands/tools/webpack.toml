@@ -15,9 +15,10 @@ standalone = [
     "--profile", "--progress",
     "--target", "--version",
     "--watch", "--watch-options-stdin",
-    "-d", "-h", "-j", "-o", "-t", "-v", "-w",
+    "-d", "-h", "-j", "-t", "-v", "-w",
 ]
-valued = ["-c", 
+# `-o` is the short form of `--output-path` and takes a MANDATORY directory (`-o ./dist`).
+valued = ["-c", "-o",
     "--config", "--config-name", "--entry",
     "--merge", "--name", "--node-env",
     "--output-clean", "--output-filename",

@@ -4,6 +4,22 @@ description = "Ruby's standard-library tool for working with RBS type signatures
 url = "https://github.com/ruby/rbs"
 researched_version = "rbs 4.0.2 (March 2026)"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "rbs list",
+    "rbs validate",
+    "rbs prototype rb lib/foo.rb",
+    "rbs prototype rb --out-dir=sig lib/foo.rb",
+    "rbs prototype rbi --out-dir sig/models --base-dir app/models app/models",
+    "rbs annotate ./sig",
+    "rbs annotate sig/foo.rbs",
+]
+examples_denied = [
+    "rbs prototype rb --out-dir ~/.ssh lib/foo.rb",
+    "rbs prototype rb --out-dir=/etc lib/foo.rb",
+    "rbs test -- ruby app.rb",
+    "rbs annotate ~/.ssh/authorized_keys",
+    "rbs annotate /etc",
+]
 
 [[command.sub]]
 name = "ast"
@@ -166,3 +182,8 @@ allow_all = true
 [[command.sub]]
 name = "test"
 candidate = true
+
+# `rbs prototype --out-dir=DIR` is the batch mode: it SAVES a generated .rbs file per input under
+# DIR (creating it), so the value is a write target, not a format.
+[command.path_gate]
+flags = { "--out-dir" = "write" }

@@ -3,6 +3,23 @@ name = "trace"
 description = "Records and modifies .atrc Darwin trace files — packages of kdebug events, Unified Logging records, and machine-config metadata used by Instruments System Trace, spindump(1), and ktrace(1). Subcommands: record (sample the live system into a new .atrc file), amend (add a provider to an existing trace), trim (extract a range), plans (list trace plans), providers (list available trace providers). macOS ship; surface relatively new and evolving with newer Instruments features."
 url = "https://keith.github.io/xcode-man-pages/trace.1.html"
 researched_version = "macOS 14"
+examples_safe = [
+    "trace plans",
+    "trace providers",
+    "trace trim ./in.atrc --output ./out.atrc",
+    "trace trim ./in.atrc -o ./out.atrc",
+    "trace trim ./in.atrc --start-time 0 --end-time 5 --output ./out.atrc",
+]
+examples_denied = [
+    "trace trim ./in.atrc --output ~/.ssh/authorized_keys",
+    "trace trim ./in.atrc -o /etc/hosts",
+]
+
+# `trace trim FILE --output|-o PATH` writes the trimmed .atrc wherever PATH points ("write the
+# trimmed file to the specified path"). Both spellings are gated; the man page documents them as
+# one option.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "record"
@@ -29,7 +46,7 @@ name = "trim"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
-valued = ["--end-time", "--output", "--start-time"]
+valued = ["--end-time", "--output", "--start-time", "-o"]
 
 [[command.sub]]
 name = "plans"

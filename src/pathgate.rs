@@ -219,7 +219,23 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
         false
     };
     let own = crate::registry::command_path_gate(cmd).is_some_and(|spec| apply(spec, tokens));
-    central || own
+    // SUB-SCOPED gate, spelled `[roles."smbutil statshares"]`. A flag's role AND ARITY can differ
+    // per subcommand, and a command-wide gate cannot say so: `smbutil -f` is a mounted-share path
+    // on `statshares` but a BOOLEAN on `view`, so gating it command-wide made
+    // `smbutil view -f //server` deny — the gate ate the operand as `-f`'s value. The same shape is
+    // why `rbs annotate` (rewrites its operands; siblings only read) had no expressible gate, and
+    // why `dart format` needed a Rust handler.
+    //
+    // Applied to `tokens[1..]`, so the sub name lands where the walk expects the command name and
+    // is skipped exactly as `tokens[0]` is for a command-scoped gate.
+    let sub = tokens.get(1).map(Token::as_str).is_some_and(|word| {
+        !word.starts_with('-')
+            && gates
+                .roles
+                .get(&format!("{cmd} {word}"))
+                .is_some_and(|spec| apply(spec, &tokens[1..]))
+    });
+    central || own || sub
 }
 
 /// Gate `tokens` against `spec`: an operation-aware `handler` (if declared) replaces the
@@ -1005,6 +1021,23 @@ mod tests {
              handler. If you added a new RoleSpec field, add it to this check too:\n{}",
             bad.join("\n"),
         );
+    }
+
+    /// A sub-scoped gate (`[roles."<cmd> <sub>"]`) fires on ITS sub and leaves the siblings alone.
+    ///
+    /// Both directions matter and the second is the reason the mechanism exists. A command-wide
+    /// gate for `smbutil -f` denied `smbutil view -f //server`, because `-f` is a mounted-share
+    /// PATH on `statshares` and a BOOLEAN on `view`, so the gate consumed the operand as its value.
+    /// Testing only the deny direction would call that gate working.
+    #[test]
+    fn a_sub_scoped_gate_fires_only_on_its_own_sub() {
+        // The gated sub: `-f` names a path, and a sensitive one is refused.
+        assert!(!crate::is_safe_command("smbutil statshares -f ~/.ssh"));
+        assert!(!crate::is_safe_command("smbutil smbstat -f ~/.ssh"));
+        // The sibling that spells `-f` as a boolean is untouched — the regression this fixed.
+        assert!(crate::is_safe_command("smbutil view -f //server"));
+        // And the gate does not swallow ordinary usage on its own sub.
+        assert!(crate::is_safe_command("smbutil statshares -a"));
     }
 
     /// `write_when` promotes positionals to WRITE only when one of its flags is present, and

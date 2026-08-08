@@ -317,7 +317,6 @@ rgb2ycbcr
 rollup
 rspec
 rsync
-rubocop
 sandbox-exec
 scp
 sdiff
@@ -331,7 +330,6 @@ sha384sum
 sha512sum
 shasum
 shazam
-shfmt
 shred
 shuf
 smbutil
@@ -343,8 +341,6 @@ spindump
 sponge
 ssh-keygen
 stackprof
-standardrb
-steep
 strings
 strip
 stylelint

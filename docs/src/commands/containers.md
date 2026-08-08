@@ -159,6 +159,10 @@
 - **version**: Flags: --format, --help, --short, -f, -h. Valued: --format
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `docker-compose config --output ./resolved-compose.yaml`
+
 ### `flux`
 <p class="cmd-url"><a href="https://fluxcd.io/flux/cmd/flux/">https://fluxcd.io/flux/cmd/flux/</a></p>
 
@@ -319,6 +323,13 @@
 - **version**: Flags: --help, --short, -h
 - Allowed standalone flags: --help, -h
 
+**Examples:**
+
+- `kustomize version`
+- `kustomize build`
+- `kustomize build ./overlays/dev`
+- `kustomize build -o ./rendered.yaml`
+
 ### `linkerd`
 <p class="cmd-url"><a href="https://linkerd.io/2/reference/cli/">https://linkerd.io/2/reference/cli/</a></p>
 
@@ -379,6 +390,13 @@
 - **repo tags**: Flags: --help, -h. Valued: --last
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `oras version`
+- `oras discover -o json localhost:5000/hello:v1`
+- `oras discover --output tree localhost:5000/hello:v1`
+- `oras manifest fetch -o ./manifest.json localhost:5000/hello:v1`
 
 ### `orb`
 <p class="cmd-url"><a href="https://docs.orbstack.dev/cli">https://docs.orbstack.dev/cli</a></p>

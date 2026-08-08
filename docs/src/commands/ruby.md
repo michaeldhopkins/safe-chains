@@ -128,6 +128,11 @@
 - **unused**: Flags: --help, --no-strict, --strict, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `i18n-tasks health`
+- `i18n-tasks -c ./config/i18n-tasks.yml health`
+
 ### `importmap`
 <p class="cmd-url"><a href="https://github.com/rails/importmap-rails">https://github.com/rails/importmap-rails</a></p>
 
@@ -182,6 +187,14 @@
 
 - Allowed standalone flags: --force, --help, --install, --list-hooks, --sign, --template-dir, --uninstall, --version, -f, -h, -i, -l, -t, -u, -v
 
+**Examples:**
+
+- `overcommit --list-hooks`
+- `overcommit --template-dir`
+- `overcommit --install`
+- `overcommit --install .`
+- `overcommit --uninstall ./vendor/checkout`
+
 ### `packwerk`
 <p class="cmd-url"><a href="https://github.com/Shopify/packwerk">https://github.com/Shopify/packwerk</a></p>
 
@@ -210,8 +223,8 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 ### `racc`
 <p class="cmd-url"><a href="https://github.com/ruby/racc">https://github.com/ruby/racc</a></p>
 
-- Allowed standalone flags: --check-only, --debug, --embedded, --frozen, --help, --line-convert-all, --no-extensions, --no-line-convert, --no-omit-actions, --output-status-table, --profile, --superclass, --verbose, --version, -C, -E, -F, -N, -O, -S, -V, -a, -c, -g, -h, -l, -t, -v
-- Allowed valued flags: --executable, --log-file, --output-file, --runtime, --template, -e, -o
+- Allowed standalone flags: --check-only, --debug, --embedded, --frozen, --help, --line-convert-all, --no-extensions, --no-line-convert, --no-omit-actions, --output-status-table, --profile, --superclass, --verbose, --version, -C, -E, -F, -N, -S, -V, -a, -c, -g, -h, -l, -t, -v
+- Allowed valued flags: --executable, --log-file, --output-file, --runtime, --template, -O, -e, -o
 - Hyphen-prefixed positional arguments accepted
 
 ### `railroady`
@@ -382,6 +395,16 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **vendor**: Flags: --clean, --help, --no-clean, -h. Valued: --vendor-dir, -I, --collection, --repo, --log-level, -r
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `rbs list`
+- `rbs validate`
+- `rbs prototype rb lib/foo.rb`
+- `rbs prototype rb --out-dir=sig lib/foo.rb`
+- `rbs prototype rbi --out-dir sig/models --base-dir app/models app/models`
+- `rbs annotate ./sig`
+- `rbs annotate sig/foo.rbs`
+
 ### `rex`
 <p class="cmd-url"><a href="https://github.com/tenderlove/rexical">https://github.com/tenderlove/rexical</a></p>
 
@@ -488,6 +511,14 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **tc**: Flags: --autocorrect, --check-out-of-order-constant-references, --color, --did-you-mean, --enable-experimental-rbs-assertions, --enable-experimental-rbs-comments, --enable-experimental-rbs-signatures, --enable-experimental-requires-ancestor, --enable-experimental-rspec, --experimental-ruby3-keyword-args, --force-hashing, --help, --license, --no-config, --no-did-you-mean, --no-error-count, --no-error-sections, --no-stdlib, --progress, --quiet, --silence-dev-message, --simulate-crash, --stdout-hup-hack, --suggest-typed, --suggest-unsafe, --suppress-non-critical, --track-untyped, --typed-super, --uniquely-defined-behavior, --verbose, --version, -P, -a, -h, -q, -v. Valued: --allowed-extension, --censor-for-snapshot-tests, --dir, --error-url-base, --file, --forcibly-silence-lsp-multiple-dir-error, --ignore, --isolate-error-code, --max-cache-size-bytes, --max-threads, --metrics-prefix, --minimize-to-rbi, --parser, --print, --remove-path-prefix, --stop-after, --suppress-error-code, --suppress-payload-superclass-redefinition-for, --typed, --typed-override, -e, -p
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `srb tc`
+- `srb tc lib/foo.rb`
+- `srb tc --dir lib`
+- `srb tc -a lib/foo.rb`
+- `srb tc --autocorrect lib`
+
 ### `stackprof`
 <p class="cmd-url"><a href="https://github.com/tmm1/stackprof">https://github.com/tmm1/stackprof</a></p>
 
@@ -515,6 +546,17 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **vendor**: Flags: --clean, --help, --no-clean, -h. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `steep check`
+- `steep stats`
+- `steep validate`
+- `steep check --save-expectations`
+- `steep check --save-expectations=./steep_expectations.yml`
+- `steep binstub`
+- `steep binstub -o ./bin/steep`
+- `steep binstub --output ./bin/steep`
 
 ### `stree`
 <p class="cmd-url"><a href="https://github.com/ruby-syntax-tree/syntax_tree">https://github.com/ruby-syntax-tree/syntax_tree</a></p>

@@ -13,13 +13,16 @@ standalone = [
     "--no-line-convert", "--no-omit-actions",
     "--output-status-table", "--profile",
     "--superclass", "--verbose", "--version",
-    "-C", "-E", "-F", "-N", "-O", "-S", "-V", "-a",
+    "-C", "-E", "-F", "-N", "-S", "-V", "-a",
     "-c", "-g", "-h", "-l", "-t", "-v",
 ]
+# `-O` is the short form of `--log-file` and takes a MANDATORY filename (`-O file`). It was listed
+# `standalone`, so the gate on it could never apply — the walker consumed no value and the path
+# landed as a positional.
 valued = [
     "--executable", "--log-file", "--output-file",
     "--runtime", "--template",
-    "-e", "-o",
+    "-O", "-e", "-o",
 ]
 
 [command.path_gate]

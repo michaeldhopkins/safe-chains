@@ -4,6 +4,21 @@ description = "Vulnerability scanner for Python dependencies. `check` and `scan`
 url = "https://docs.safetycli.com/"
 researched_version = "safety 3.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "safety check",
+    "safety check -r requirements.txt",
+    "safety check --output json",
+    "safety check --save-json ./safety-report.json",
+    "safety check --save-html ./reports",
+    "safety scan --output screen",
+    "safety scan --save-as json ./scan.json",
+]
+examples_denied = [
+    "safety check --save-json ~/.ssh/authorized_keys",
+    "safety check --save-html /etc/hosts",
+    "safety scan --save-as json ~/.ssh/authorized_keys",
+    "safety auth",
+]
 
 [[command.sub]]
 name = "check"
@@ -15,7 +30,6 @@ standalone = [
     "--help", "--ignore-unpinned-requirements",
     "--json", "--no-cache",
     "--policy-file", "--proxy-required",
-    "--save-html", "--save-json",
     "--short-report",
     "-h",
 ]
@@ -24,7 +38,7 @@ valued = [
     "--db", "--exclude", "--file",
     "--ignore", "--key",
     "--output", "--proxy-host", "--proxy-port",
-    "--proxy-protocol",
+    "--proxy-protocol", "--save-html", "--save-json",
     "-i", "-o", "-r",
 ]
 write_flags = ["--save-html", "--save-json", "--output", "-o"]
@@ -68,3 +82,13 @@ candidate = true
 [[command.sub]]
 name = "configure"
 candidate = true
+
+# `--save-json`/`--save-html` are "path to where the output file will be placed" (a directory gets a
+# safety-report.{json,html} inside it) — write targets, unlike `--output`, which is a
+# screen|text|json|bare|html enum. Neither `check` nor `scan` takes a path POSITIONAL — every input
+# is a flag (`-r`, `--target`) — so gating bare positionals as writes costs no ordinary usage and
+# covers the one shape a flag map cannot: `scan --save-as <FORMAT> <PATH>`, whose write target is
+# the SECOND value.
+[command.path_gate]
+positional = "write"
+flags = { "--save-html" = "write", "--save-json" = "write" }

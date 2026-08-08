@@ -4,6 +4,22 @@ description = "Static type checker for Ruby using RBS signatures. The `check` su
 url = "https://github.com/soutaro/steep"
 researched_version = "steep 1.10.0 (March 2025)"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "steep check",
+    "steep stats",
+    "steep validate",
+    "steep check --save-expectations",
+    "steep check --save-expectations=./steep_expectations.yml",
+    "steep binstub",
+    "steep binstub -o ./bin/steep",
+    "steep binstub --output ./bin/steep",
+]
+examples_denied = [
+    "steep check --save-expectations=~/.ssh/authorized_keys",
+    "steep binstub -o ~/.ssh/authorized_keys",
+    "steep binstub --output /etc/hosts",
+    "steep langserver",
+]
 
 [[command.sub]]
 name = "check"
@@ -161,6 +177,9 @@ candidate = true
 name = "prototype"
 candidate = true
 
-# `--steep-command` names the steep executable the subcommand re-invokes.
+# `--steep-command` names the steep executable the subcommand re-invokes. `binstub -o/--output` is
+# "the path of the executable file" it generates — it mkpath's the parent directory — and
+# `check --save-expectations[=PATH]` writes the type-check expectations YAML there (defaulting to
+# steep_expectations.yml when the value is omitted).
 [command.path_gate]
-flags = { "--steep-command" = "exec" }
+flags = { "--output" = "write", "--save-expectations" = "write", "--steep-command" = "exec", "-o" = "write" }

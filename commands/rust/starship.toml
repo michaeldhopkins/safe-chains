@@ -8,11 +8,16 @@ examples_safe = [
     "eval \"$(starship init bash)\"",
     "eval \"$(starship init zsh)\"",
     "eval \"$(starship init fish --print-full-init)\"",
+    "starship preset --list",
+    "starship preset nerd-font-symbols",
+    "starship preset nerd-font-symbols -o ./starship-preset.toml",
 ]
 examples_denied = [
     "eval \"$(starship init --help)\"",
     "eval \"$(starship init bash --print-full-init=$VAR)\"",
     "eval \"$(starship prompt)\"",
+    "starship preset nerd-font-symbols -o ~/.ssh/authorized_keys",
+    "starship preset nerd-font-symbols --output=/etc/hosts",
 ]
 
 [[command.sub]]
@@ -99,3 +104,8 @@ candidate = true
 [[command.sub]]
 name = "time"
 candidate = true
+
+# `starship preset -o/--output PATH` writes the preset config to a file instead of stdout (and
+# `--force` overwrites an existing one), so the value is a write target.
+[command.path_gate]
+flags = { "--output" = "write", "-o" = "write" }

@@ -4,6 +4,27 @@ description = "Zephyr RTOS multi-repo / build tool. Many subcommands. Read-side:
 url = "https://docs.zephyrproject.org/latest/develop/west/index.html"
 researched_version = "west 1.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "west --version",
+    "west list",
+    "west topdir",
+    "west status",
+    "west manifest --resolve",
+    "west manifest --resolve --out ./resolved.yml",
+    "west manifest --freeze -o ./frozen.yml",
+]
+examples_denied = [
+    "west manifest --resolve --out ~/.ssh/authorized_keys",
+    "west manifest --freeze -o /etc/hosts",
+    "west update",
+]
+
+# `west manifest -o/--out` is declared as "output file, default is standard output" — the resolved
+# or frozen manifest is written there. `-o` means something else on `init` (--clone-opt) and
+# `update` (--fetch-opt), but both are candidate-only, so `manifest` is the only sub where a `-o`
+# reaches this gate.
+[command.path_gate]
+flags = { "--out" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "version"

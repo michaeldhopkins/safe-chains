@@ -32,3 +32,24 @@ valued = [
     "--triage-database",
 ]
 write_flags = ["--json", "--sarif", "--checklist"]
+examples_safe = [
+    "slither .",
+    "slither contracts/Token.sol",
+    "slither . --json ./slither.json",
+    "slither . --json -",
+    "slither . --sarif=./slither.sarif",
+    "slither . --checklist",
+    "slither . --triage-database ./slither.db.json",
+]
+examples_denied = [
+    "slither . --json ~/.ssh/authorized_keys",
+    "slither . --sarif=/etc/hosts",
+    "slither . --triage-database ~/.ssh/authorized_keys",
+]
+
+# `--json`/`--sarif` EXPORT the results to the named file (`-` means stdout), and
+# `--triage-database` is the "file path to the triage database" slither rewrites in triage mode —
+# all three are write targets. `--checklist` is a boolean (markdown rendering of the same results),
+# so it names no path.
+[command.path_gate]
+flags = { "--json" = "write", "--sarif" = "write", "--triage-database" = "write" }

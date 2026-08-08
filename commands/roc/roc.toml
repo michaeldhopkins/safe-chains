@@ -4,6 +4,19 @@ description = "Roc — fast, friendly, functional language. `build` compiles a b
 url = "https://www.roc-lang.org/"
 researched_version = "roc 0.x; pre-1.0"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "roc check main.roc",
+    "roc format",
+    "roc build main.roc",
+    "roc build --output ./bin/app main.roc",
+    "roc build --output=./bin/app main.roc",
+    "roc docs --output ./generated-docs main.roc",
+]
+examples_denied = [
+    "roc build --output ~/.ssh/authorized_keys main.roc",
+    "roc docs --output=/etc main.roc",
+    "roc run main.roc",
+]
 
 [[command.sub]]
 name = "version"
@@ -75,3 +88,9 @@ candidate = true
 [[command.sub]]
 name = "preprocess-host"
 candidate = true
+
+# `build --output=<path>` is "the full path to the output binary, including filename" and
+# `docs --output=<dir>` is the directory the generated documentation is written into — both are
+# write targets. Roc spells them long-only; there is no `-o`.
+[command.path_gate]
+flags = { "--output" = "write" }

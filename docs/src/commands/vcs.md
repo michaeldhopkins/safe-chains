@@ -154,6 +154,7 @@
 - `hg bm`
 - `hg config`
 - `hg showconfig`
+- `hg cat -o ./extracted-%s foo.py`
 
 ### `jj`
 <p class="cmd-url"><a href="https://jj-vcs.github.io/jj/latest/cli-reference/">https://jj-vcs.github.io/jj/latest/cli-reference/</a></p>
@@ -212,6 +213,11 @@
 - **workspace root**: Positional args accepted
 - **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `jj new`
+- `jj -R ./sub new`
 
 ### `lore`
 <p class="cmd-url"><a href="https://epicgames.github.io/lore/">https://epicgames.github.io/lore/</a></p>

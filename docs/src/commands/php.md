@@ -52,6 +52,11 @@
 - **why-not**: Flags: --help, --recursive, --tree, -h, -r, -t
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `composer install`
+- `composer -d ./packages/api install`
+
 ### `craft`
 <p class="cmd-url"><a href="https://craftcms.com/docs/5.x/reference/cli.html">https://craftcms.com/docs/5.x/reference/cli.html</a></p>
 

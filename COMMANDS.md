@@ -263,26 +263,49 @@ Aliases: `7zz`, `7za`
 - Allowed valued flags: -b, -c, -d, -e, -f, -l, -o, -q, -r, -s, -t, --bitdepth, --channellayout, --channels, --data-format, --file-format, --mix, --output-dir, --quality, --sample-rate, --src-complexity, --strategy, --useragent, --verbose
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `afconvert -f AIFF -d BEI16 ./input.wav ./output.aiff`
+
 ### `afhash`
 <p class="cmd-url"><a href="https://ss64.com/mac/afhash.html">https://ss64.com/mac/afhash.html</a></p>
 
 - Allowed standalone flags: -c, -h, -x, -w
+
+**Examples:**
+
+- `afhash -x ./track.aiff`
+- `afhash -w ./track.aiff`
 
 ### `afida`
 <p class="cmd-url"><a href="https://ss64.com/mac/afida.html">https://ss64.com/mac/afida.html</a></p>
 
 - Allowed standalone flags: -h
 
+**Examples:**
+
+- `afida ./track.aiff`
+
 ### `afinfo`
 <p class="cmd-url"><a href="https://ss64.com/mac/afinfo.html">https://ss64.com/mac/afinfo.html</a></p>
 
 - Allowed standalone flags: --help, -h, -b, -i, -r, -x, --brief, --info-only, --no-fileformat, --warnings
+
+**Examples:**
+
+- `afinfo ./track.aiff`
+- `afinfo --brief ./track.aiff`
 
 ### `afplay`
 <p class="cmd-url"><a href="https://ss64.com/mac/afplay.html">https://ss64.com/mac/afplay.html</a></p>
 
 - Allowed standalone flags: --help, -h, -d, --debug
 - Allowed valued flags: -t, --time, -r, --rate, -v, --volume, -q, --quality
+
+**Examples:**
+
+- `afplay ./track.aiff`
+- `afplay -v 0.5 ./track.aiff`
 
 ### `afscexpand`
 <p class="cmd-url"><a href="https://ss64.com/mac/afscexpand.html">https://ss64.com/mac/afscexpand.html</a></p>
@@ -430,6 +453,13 @@ Aliases: `muse`
 - Allowed valued flags: --config, --exclude, --fail-level, --filter, --format, --globs, --ignored, --out, --reporter, --rule, -f
 - Bare invocation allowed
 
+**Examples:**
+
+- `ameba`
+- `ameba src`
+- `ameba --fix src/parser.cr`
+- `ameba --out ./ameba.json`
+
 ### `amplify`
 <p class="cmd-url"><a href="https://docs.amplify.aws/gen1/javascript/tools/cli/usage/">https://docs.amplify.aws/gen1/javascript/tools/cli/usage/</a></p>
 
@@ -532,6 +562,10 @@ Aliases: `muse`
 - **help**: Positional args accepted
 - **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml`
 
 ### `anvil`
 <p class="cmd-url"><a href="https://book.getfoundry.sh/reference/anvil/">https://book.getfoundry.sh/reference/anvil/</a></p>
@@ -674,6 +708,10 @@ Aliases: `whatis`
 - **report**: Flags: --help, -h. Valued: --output, -o. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `artillery report --output ./report.html ./results.json`
 
 ### `artisan`
 <p class="cmd-url"><a href="https://laravel.com/docs/12.x/artisan">https://laravel.com/docs/12.x/artisan</a></p>
@@ -955,6 +993,11 @@ Aliases: `gas`
 - Allowed standalone flags: -a, -A, -h, --help, -bl, -l, -q, -r, -s, -strict, -w, -veryverbose
 - Allowed valued flags: -v, -vt, -de, -f
 - Bare invocation allowed
+
+**Examples:**
+
+- `auval -a`
+- `auval -v aufx dely appl`
 
 ### `ava`
 <p class="cmd-url"><a href="https://github.com/avajs/ava">https://github.com/avajs/ava</a></p>
@@ -2241,6 +2284,12 @@ Aliases: `@biomejs/biome`
 - **ls-files**: Flags: --help, --include-imports, --include-import-paths, -h. Valued: --config, --format. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `buf build -o ./image.bin`
+- `buf format --write ./proto`
+- `buf generate --output ./gen`
+
 ### `buildah`
 <p class="cmd-url"><a href="https://github.com/containers/buildah/tree/main/docs">https://github.com/containers/buildah/tree/main/docs</a></p>
 
@@ -2276,6 +2325,11 @@ Aliases: `@biomejs/biome`
 - **x**
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `bun build ./src/index.ts --outdir ./dist`
+- `bun build ./src/index.ts --outfile ./dist/bundle.js`
+
 ### `bundle`
 <p class="cmd-url"><a href="https://bundler.io/man/bundle.1.html">https://bundler.io/man/bundle.1.html</a></p>
 
@@ -2298,6 +2352,10 @@ Aliases: `bundle-audit`
 - **update**: Flags: --help, --quiet, -h, -q
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `bundler-audit check --format json --output ./audit.json`
 
 ### `bundletool`
 <p class="cmd-url"><a href="https://developer.android.com/tools/bundletool">https://developer.android.com/tools/bundletool</a></p>
@@ -2670,6 +2728,7 @@ Aliases: `gcat`
 
 - `cdk version`
 - `cdk synth`
+- `cdk synth --output ./cdk.out`
 - `cdk synthesize`
 - `cdk list`
 - `cdk ls`
@@ -3231,6 +3290,12 @@ Aliases: `uncompress`
 - **run**: Flags: --append, --branch, --concurrency, --help, --parallel, --source, --timid, -a, -h, -p. Valued: --context, --data-file, --include, --omit, --rcfile, --source. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `coverage report`
+- `coverage json -o ./coverage.json`
+- `coverage html -d ./htmlcov`
+
 ### `cp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation</a></p>
 
@@ -3370,6 +3435,11 @@ Aliases: `gcp`
 - **tool unreachable**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `crystal build -o ./bin/app src/app.cr`
+- `crystal docs --output ./docs`
 
 ### `csi`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/visualstudio/scripting/scripting-with-the-csi-utility">https://learn.microsoft.com/en-us/visualstudio/scripting/scripting-with-the-csi-utility</a></p>
@@ -3531,6 +3601,13 @@ Aliases: `gcut`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `dart format ./lib`
+- `dart format -o write ./lib`
+- `dart format -o show ./lib`
+- `dart analyze`
+
 ### `dasel`
 <p class="cmd-url"><a href="https://daseldocs.tomwright.me/">https://daseldocs.tomwright.me/</a></p>
 
@@ -3565,6 +3642,10 @@ Aliases: `gdate`
 - **kb status**: Flags: --debug, --help, --verbose, -h
 - **scan**: Flags: --count, --debug, --dependencies, --exit-on-warn, --gemfile, --help, --verbose, -C, -G, -d, -h, -z. Valued: --config-file, --output, --report-format, --skip, -F, -O, -S, -c. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `dawn scan --output ./dawn-report.json .`
 
 ### `dbmate`
 <p class="cmd-url"><a href="https://github.com/amacneil/dbmate">https://github.com/amacneil/dbmate</a></p>
@@ -3735,6 +3816,11 @@ Aliases: `dependency-cruise`
 
 - Allowed standalone flags: --cache, --config, --detect-jsc-paths, --help, --ignore-known, --init, --metrics, --no-cache, --no-config, --no-progress, --preserve-symlinks, --validate, --verbose, --version, -V, -h, -v
 - Allowed valued flags: --baseline, --exclude, --focus, --focus-depth, --ignore-known, --include-only, --max-depth, --module-systems, --output-to, --output-type, --prefix, --reaches, --ts-config, --ts-pre-compilation-deps, --validate, --webpack-config, -T, -X, -d, -f, -x
+
+**Examples:**
+
+- `depcruise --output-to ./deps.json src`
+- `depcruise -f ./deps.dot -T dot src`
 
 ### `deptry`
 <p class="cmd-url"><a href="https://deptry.com/">https://deptry.com/</a></p>
@@ -3958,6 +4044,11 @@ Aliases: `gdirname`
 - **template list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `docfx build --output ./_site`
+- `docfx metadata -o ./api`
+
 ### `docker`
 <p class="cmd-url"><a href="https://docs.docker.com/reference/cli/docker/">https://docs.docker.com/reference/cli/docker/</a></p>
 
@@ -4035,6 +4126,10 @@ Aliases: `gdirname`
 - **top**: Flags: --help, -h. Positional args accepted
 - **version**: Flags: --format, --help, --short, -f, -h. Valued: --format
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `docker-compose config --output ./resolved-compose.yaml`
 
 ### `doctl`
 <p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
@@ -4167,6 +4262,11 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 - **workload**: Flags: --help, -h
 - Allowed standalone flags: --help, --info, --list-runtimes, --list-sdks, --version, -V, -h
 
+**Examples:**
+
+- `dotnet build --output ./bin/out`
+- `dotnet publish -o ./publish`
+
 ### `dotnet-counters`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters</a></p>
 
@@ -4243,6 +4343,10 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 - **report**: Flags: --help, -h. Valued: --max-depth. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `dotnet-trace convert ./trace.nettrace --format speedscope --output ./trace.speedscope.json`
 
 ### `doxygen`
 <p class="cmd-url"><a href="https://www.doxygen.nl/">https://www.doxygen.nl/</a></p>
@@ -4395,6 +4499,7 @@ Aliases: `gdu`
 **Examples:**
 
 - `dvc add data.csv`
+- `dvc add --out ./data/train.csv data.csv`
 - `dvc status`
 - `dvc version`
 
@@ -4981,6 +5086,7 @@ Aliases: `flang-new`
 - `flutter logs`
 - `flutter logs -d ABC123`
 - `flutter doctor`
+- `flutter analyze --write ./analysis.txt`
 
 ### `flux`
 <p class="cmd-url"><a href="https://fluxcd.io/flux/cmd/flux/">https://fluxcd.io/flux/cmd/flux/</a></p>
@@ -6023,6 +6129,12 @@ Aliases: `godot4`
 - Allowed standalone flags: --add-options, --all, --clear-tags, --clear-options, --format, --help, --quiet, --remove-tags, --remove-options, --skip-unexported, --sort, --transform, --w, -h, -w
 - Allowed valued flags: --add-tags, --field, --file, --line, --modified, --offset, --override, --remove-options, --remove-tags, --struct, --template, --transform, -add-tags, -clear-tags, -field, -file, -line, -modified, -offset, -override, -remove-options, -remove-tags, -struct, -template, -transform
 
+**Examples:**
+
+- `gomodifytags -file ./main.go -struct Server -add-tags json`
+- `gomodifytags -w -file ./main.go -struct Server -add-tags json`
+- `gomodifytags --file ./main.go --all --remove-tags xml`
+
 ### `goose`
 <p class="cmd-url"><a href="https://github.com/pressly/goose">https://github.com/pressly/goose</a></p>
 
@@ -6046,6 +6158,14 @@ Aliases: `godot4`
 - **verify**: Flags: --help, -h, --debug. Valued: -f, --config, --checksum-file. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `goreleaser check`
+- `goreleaser healthcheck`
+- `goreleaser schema`
+- `goreleaser schema -o ./goreleaser.schema.json`
+- `goreleaser jsonschema --output ./schema.json`
+
 ### `gosec`
 <p class="cmd-url"><a href="https://github.com/securego/gosec">https://github.com/securego/gosec</a></p>
 
@@ -6055,9 +6175,17 @@ Aliases: `godot4`
 ### `gotestsum`
 <p class="cmd-url"><a href="https://github.com/gotestyourself/gotestsum">https://github.com/gotestyourself/gotestsum</a></p>
 
-- Allowed standalone flags: --debug, --dry-run, --force-cache, --format-hide-empty-pkg, --help, --ignore-non-json-output-lines, --no-color, --rerun-fails-only-root-cases, --watch, --watch-chdir, -h
-- Allowed valued flags: --format, --format-hivis, --format-icons, --hide-summary, --junitfile, --junitfile-hide-empty-pkg, --junitfile-project-name, --junitfile-testcase-classname, --junitfile-testsuite-name, --max-fails, --packages, --post-run-command, --raw-command, --rerun-fails, --rerun-fails-max-failures, --rerun-fails-report, --rerun-fails-run-root-test, --watch-skip-tests
+- Allowed standalone flags: --debug, --dry-run, --force-cache, --format-hide-empty-pkg, --help, --ignore-non-json-output-lines, --junitfile-hide-empty-pkg, --no-color, --rerun-fails-only-root-cases, --watch, --watch-chdir, -h
+- Allowed valued flags: --format, --format-hivis, --format-icons, --hide-summary, --junitfile, --junitfile-project-name, --junitfile-testcase-classname, --junitfile-testsuite-name, --max-fails, --packages, --post-run-command, --raw-command, --rerun-fails, --rerun-fails-max-failures, --rerun-fails-report, --rerun-fails-run-root-test, --watch-skip-tests
 - Bare invocation allowed
+
+**Examples:**
+
+- `gotestsum`
+- `gotestsum --format testname`
+- `gotestsum --junitfile ./junit.xml`
+- `gotestsum --junitfile ./junit.xml --junitfile-hide-empty-pkg`
+- `gotestsum --rerun-fails --rerun-fails-report ./rerun.txt`
 
 ### `govulncheck`
 <p class="cmd-url"><a href="https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck">https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck</a></p>
@@ -6467,6 +6595,14 @@ Aliases: `ghead`
 - **parse**: Flags: --help, --json, --no-color, -h, -j
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `herb parse app/views/layouts/application.html.erb`
+- `herb lint app/views`
+- `herb lint --fix app/views/home/index.html.erb`
+- `herb format --check app/views`
+- `herb format --write app/views/home/index.html.erb`
+
 ### `heroku`
 <p class="cmd-url"><a href="https://devcenter.heroku.com/articles/heroku-cli-commands">https://devcenter.heroku.com/articles/heroku-cli-commands</a></p>
 
@@ -6512,6 +6648,7 @@ Aliases: `ghead`
 - `hexo config`
 - `hexo generate`
 - `hexo g`
+- `hexo render source/_posts/hello.md -o ./rendered.html`
 
 ### `hey`
 <p class="cmd-url"><a href="https://github.com/basecamp/hey-cli">https://github.com/basecamp/hey-cli</a></p>
@@ -6582,6 +6719,7 @@ Aliases: `ghead`
 - `hg bm`
 - `hg config`
 - `hg showconfig`
+- `hg cat -o ./extracted-%s foo.py`
 
 ### `hiutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hiutil.1.html">https://keith.github.io/xcode-man-pages/hiutil.1.html</a></p>
@@ -7478,6 +7616,14 @@ Aliases: `nbconvert`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `k6 version`
+- `k6 inspect script.js`
+- `k6 archive script.js`
+- `k6 archive -O ./archive.tar script.js`
+- `k6 convert --output ./script.js recording.har`
+
 ### `kafka-console-consumer`
 <p class="cmd-url"><a href="https://kafka.apache.org/documentation/#basic_ops_consumer">https://kafka.apache.org/documentation/#basic_ops_consumer</a></p>
 
@@ -7894,6 +8040,13 @@ Aliases: `nbconvert`
 - **symbolicate**: Flags: --help, -h
 - **trace**: Flags: --continuous, --csv, --disable-coprocessors, --json, --json-64, --ndjson, --no-default-codes-files, --only-named-events, -A, -C, -E, -N, -S, -h, -n, -r, -s, -t, -u. Valued: -R, -T, -b, -f, -p, -x. Positional args accepted
 
+**Examples:**
+
+- `ktrace info`
+- `ktrace trace --json`
+- `ktrace artrace`
+- `ktrace artrace -o ./trace.atrc`
+
 ### `kubectl`
 <p class="cmd-url"><a href="https://kubernetes.io/docs/reference/kubectl/">https://kubernetes.io/docs/reference/kubectl/</a></p>
 
@@ -7935,6 +8088,13 @@ Aliases: `nbconvert`
 - **version**: Flags: --help, --short, -h
 - Allowed standalone flags: --help, -h
 
+**Examples:**
+
+- `kustomize version`
+- `kustomize build`
+- `kustomize build ./overlays/dev`
+- `kustomize build -o ./rendered.yaml`
+
 ### `lake`
 <p class="cmd-url"><a href="https://lean-lang.org/lean4/doc/quickstart.html">https://lean-lang.org/lean4/doc/quickstart.html</a></p>
 
@@ -7958,6 +8118,11 @@ Aliases: `nbconvert`
 - Allowed standalone flags: --help, --longhelp, --help-id3, --license, --version, --silent, --brief, --verbose, --decode, --decode-mp3delay, --mp3input, --ogginput, --nogap, --nogapout, --scale, --scale-l, --scale-r, --replaygain-fast, --replaygain-accurate, --noreplaygain, --clipdetect, --freeformat, --strictly-enforce-ISO, --abr, --cbr, --allshort, --noshort, --athonly, --noath, --athaa-sensitivity, --cwlimit, --notemp, --nspsytune, --nssafejoint, --nsmsfix, --preset, --alt-preset, --add-id3v2, --pad-id3v2, --ignore-tag-errors, --id3v1-only, --id3v2-only, --id3v2-utf16, --id3v2-latin1, --space-id3v1, -h, -?, -v, -V, -S, -a, -d, -x, -r, -s, -m, -q
 - Allowed valued flags: -b, -B, -F, -Q, -t, -T, --bitwidth, --signed, --unsigned, --little-endian, --big-endian, --vbr-old, --vbr-new, --vbr, --resample, --lowpass, --lowpass-width, --highpass, --highpass-width, --athlower, --athtype, --athaa-type, --athaa-loudapprox, --tt, --ta, --tl, --ty, --tc, --tn, --tg, --tv, --ti, --pad-id3v2-size, --genre-list, -p
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `lame ./input.wav ./output.mp3`
+- `lame -b 192 ./input.wav ./output.mp3`
 
 ### `last`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/last.1.html">https://man7.org/linux/man-pages/man1/last.1.html</a></p>
@@ -9993,6 +10158,8 @@ Aliases: `gnohup`
 - `nomad alloc-status abc123`
 - `nomad agent-info`
 - `nomad version`
+- `nomad fmt --check ./jobs`
+- `nomad fmt -w ./jobs/web.nomad.hcl`
 
 ### `northflank`
 <p class="cmd-url"><a href="https://northflank.com/docs/v1/api/use-the-cli">https://northflank.com/docs/v1/api/use-the-cli</a></p>
@@ -10508,6 +10675,13 @@ Aliases: `god`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `oras version`
+- `oras discover -o json localhost:5000/hello:v1`
+- `oras discover --output tree localhost:5000/hello:v1`
+- `oras manifest fetch -o ./manifest.json localhost:5000/hello:v1`
+
 ### `orb`
 <p class="cmd-url"><a href="https://docs.orbstack.dev/cli">https://docs.orbstack.dev/cli</a></p>
 
@@ -10587,6 +10761,14 @@ Aliases: `god`
 <p class="cmd-url"><a href="https://github.com/sds/overcommit">https://github.com/sds/overcommit</a></p>
 
 - Allowed standalone flags: --force, --help, --install, --list-hooks, --sign, --template-dir, --uninstall, --version, -f, -h, -i, -l, -t, -u, -v
+
+**Examples:**
+
+- `overcommit --list-hooks`
+- `overcommit --template-dir`
+- `overcommit --install`
+- `overcommit --install .`
+- `overcommit --uninstall ./vendor/checkout`
 
 ### `overmind`
 <p class="cmd-url"><a href="https://github.com/DarthSim/overmind">https://github.com/DarthSim/overmind</a></p>
@@ -11843,6 +12025,14 @@ Aliases: `gprintf`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `prisma version`
+- `prisma validate`
+- `prisma format`
+- `prisma generate`
+- `prisma init --output ./src/generated/prisma`
+
 ### `procs`
 <p class="cmd-url"><a href="https://github.com/dalance/procs#readme">https://github.com/dalance/procs#readme</a></p>
 
@@ -12236,8 +12426,8 @@ Aliases: `python`
 ### `racc`
 <p class="cmd-url"><a href="https://github.com/ruby/racc">https://github.com/ruby/racc</a></p>
 
-- Allowed standalone flags: --check-only, --debug, --embedded, --frozen, --help, --line-convert-all, --no-extensions, --no-line-convert, --no-omit-actions, --output-status-table, --profile, --superclass, --verbose, --version, -C, -E, -F, -N, -O, -S, -V, -a, -c, -g, -h, -l, -t, -v
-- Allowed valued flags: --executable, --log-file, --output-file, --runtime, --template, -e, -o
+- Allowed standalone flags: --check-only, --debug, --embedded, --frozen, --help, --line-convert-all, --no-extensions, --no-line-convert, --no-omit-actions, --output-status-table, --profile, --superclass, --verbose, --version, -C, -E, -F, -N, -S, -V, -a, -c, -g, -h, -l, -t, -v
+- Allowed valued flags: --executable, --log-file, --output-file, --runtime, --template, -O, -e, -o
 - Hyphen-prefixed positional arguments accepted
 
 ### `raco`
@@ -12489,6 +12679,16 @@ Aliases: `python`
 - **validate**: Flags: --help, --silent, -h. Valued: -I, --collection, --repo, --log-level, -r
 - **vendor**: Flags: --clean, --help, --no-clean, -h. Valued: --vendor-dir, -I, --collection, --repo, --log-level, -r
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `rbs list`
+- `rbs validate`
+- `rbs prototype rb lib/foo.rb`
+- `rbs prototype rb --out-dir=sig lib/foo.rb`
+- `rbs prototype rbi --out-dir sig/models --base-dir app/models app/models`
+- `rbs annotate ./sig`
+- `rbs annotate sig/foo.rbs`
 
 ### `rclone`
 <p class="cmd-url"><a href="https://rclone.org/commands/">https://rclone.org/commands/</a></p>
@@ -12794,6 +12994,15 @@ Aliases: `grmdir`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `roc check main.roc`
+- `roc format`
+- `roc build main.roc`
+- `roc build --output ./bin/app main.roc`
+- `roc build --output=./bin/app main.roc`
+- `roc docs --output ./generated-docs main.roc`
+
 ### `rollup`
 <p class="cmd-url"><a href="https://rollupjs.org/">https://rollupjs.org/</a></p>
 
@@ -12847,6 +13056,17 @@ Aliases: `grmdir`
 - Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --fail-fast, --fix-layout, --help, --lint, --list-target-files, --no-color, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --show-docs-url, --version, -A, -L, -V, -a, -d, -h, -l, -x
 - Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
 - Bare invocation allowed
+
+**Examples:**
+
+- `rubocop`
+- `rubocop app/models`
+- `rubocop --format json`
+- `rubocop -a`
+- `rubocop -a app/models/user.rb`
+- `rubocop --autocorrect-all lib`
+- `rubocop -x app`
+- `rubocop -o ./rubocop-report.txt`
 
 ### `ruby`
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
@@ -13004,11 +13224,21 @@ Aliases: `psed`
 ### `safety`
 <p class="cmd-url"><a href="https://docs.safetycli.com/">https://docs.safetycli.com/</a></p>
 
-- **check**: Flags: --bare, --continue-on-error, --exit-code, --full-report, --help, --ignore-unpinned-requirements, --json, --no-cache, --policy-file, --proxy-required, --save-html, --save-json, --short-report, -h. Valued: --api, --cache, --db, --exclude, --file, --ignore, --key, --output, --proxy-host, --proxy-port, --proxy-protocol, -i, -o, -r
+- **check**: Flags: --bare, --continue-on-error, --exit-code, --full-report, --help, --ignore-unpinned-requirements, --json, --no-cache, --policy-file, --proxy-required, --short-report, -h. Valued: --api, --cache, --db, --exclude, --file, --ignore, --key, --output, --proxy-host, --proxy-port, --proxy-protocol, --save-html, --save-json, -i, -o, -r
 - **help**: Positional args accepted
 - **scan**: Flags: --apply-remediations, --detailed-output, --disable-optional-telemetry, --help, --no-fix-suggestion, -h. Valued: --auth-type, --key, --output, --policy-file, --save-as, --target
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `safety check`
+- `safety check -r requirements.txt`
+- `safety check --output json`
+- `safety check --save-json ./safety-report.json`
+- `safety check --save-html ./reports`
+- `safety scan --output screen`
+- `safety scan --save-as json ./scan.json`
 
 ### `salt`
 <p class="cmd-url"><a href="https://docs.saltproject.io/en/latest/ref/cli/index.html">https://docs.saltproject.io/en/latest/ref/cli/index.html</a></p>
@@ -13047,6 +13277,11 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - Allowed standalone flags: --help, -h, --interactive, -i, --progress, --quality
 - Allowed valued flags: -v, --voice, -r, --rate, -f, --input-file, -o, --output-file, --data-format, --file-format, --channels, --bit-rate, --network-send, --audio-device
 - Bare invocation allowed
+
+**Examples:**
+
+- `say hello world`
+- `say --output-file ./greeting.aiff hello world`
 
 ### `sbcl`
 <p class="cmd-url"><a href="https://www.sbcl.org/">https://www.sbcl.org/</a></p>
@@ -13354,6 +13589,14 @@ Aliases: `gsed`
 - **scan**: Flags: --debug, --dryrun, --emacs, --error, --help, --json, --junit-xml, --no-autofix, --no-git-ignore, --no-rewrite-rule-ids, --quiet, --sarif, --strict, --text, --time, --verbose, --vim, -e, -h, -q, -v. Valued: --config, --exclude, --include, --lang, --max-target-bytes, --metrics, --output, --pattern, --timeout, -c, -f, -l, -o
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `semgrep scan --config auto`
+- `semgrep scan --config auto --json -o ./findings.json`
+- `semgrep scan --config auto --sarif --output=./findings.sarif`
+- `semgrep ci --config auto`
+- `semgrep ci -o ./ci-findings.json`
+
 ### `sentry-cli`
 <p class="cmd-url"><a href="https://docs.sentry.io/cli/">https://docs.sentry.io/cli/</a></p>
 
@@ -13551,9 +13794,16 @@ Aliases: `gsha512sum`
 ### `shfmt`
 <p class="cmd-url"><a href="https://github.com/mvdan/sh">https://github.com/mvdan/sh</a></p>
 
-- Allowed standalone flags: --help, -V, -bn, -ci, -d, -fn, -h, -i, -kp, -l, -ln, -mn, -p, -s, -sr, -tojson, -version, -w
-- Allowed valued flags: --apply-ignore, --check, --filename, --from-json, --lang, --list, --write, -filename, -from-json, -i, -lang, -ln
+- Allowed standalone flags: --help, -V, -bn, -ci, -d, -fn, -h, -i, -kp, -l, -ln, -mn, -p, -s, -sr, -tojson, -version, -w, --write
+- Allowed valued flags: --apply-ignore, --check, --filename, --from-json, --lang, --list, -filename, -from-json, -i, -lang, -ln
 - Bare invocation allowed
+
+**Examples:**
+
+- `shfmt -w ./script.sh`
+- `shfmt -w ./a.sh ./b.sh`
+- `shfmt -l .`
+- `shfmt -d ./script.sh`
 
 ### `shopt`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin">https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin</a></p>
@@ -13681,6 +13931,16 @@ Aliases: `gshuf`
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `skaffold version`
+- `skaffold version -o {{.Version}}`
+- `skaffold diagnose`
+- `skaffold diagnose --yaml-only`
+- `skaffold diagnose -o ./diagnose.yaml`
+- `skaffold find-configs -o json`
+- `skaffold inspect build-env list -o json`
+
 ### `skopeo`
 <p class="cmd-url"><a href="https://github.com/containers/skopeo">https://github.com/containers/skopeo</a></p>
 
@@ -13714,6 +13974,16 @@ Aliases: `gsleep`
 - Allowed standalone flags: --checklist, --checklist-with-summary, --debug, --detect, --exclude, --exclude-dependencies, --exclude-high, --exclude-informational, --exclude-low, --exclude-medium, --exclude-optimization, --filter-paths, --fail-high, --fail-low, --fail-medium, --fail-pedantic, --generate-patches, --help, --ignore-compile, --include-paths, --list-detectors, --list-detectors-json, --list-printers, --markdown-root, --no-fail-pedantic, --printers-to-run, --show-ignored-findings, --triage-database, --version
 - Allowed valued flags: --checklist, --config-file, --detect, --exclude, --exclude-dependencies, --filter-paths, --include-paths, --json, --json-types, --markdown-root, --printers-to-run, --sarif, --solc-args, --solc-disable-warnings, --solc-remaps, --solc-working-dir, --triage-database
 
+**Examples:**
+
+- `slither .`
+- `slither contracts/Token.sol`
+- `slither . --json ./slither.json`
+- `slither . --json -`
+- `slither . --sarif=./slither.sarif`
+- `slither . --checklist`
+- `slither . --triage-database ./slither.db.json`
+
 ### `sls`
 <p class="cmd-url"><a href="https://www.serverless.com/framework/docs/providers/aws/cli-reference">https://www.serverless.com/framework/docs/providers/aws/cli-reference</a></p>
 
@@ -13741,6 +14011,12 @@ Aliases: `serverless`
 - **status**: Flags: -a, -e, -h, --help
 - **view**: Flags: -A, -N, -G, -g, -a, -f, -h, --help
 - Allowed standalone flags: -h, --help, -v
+
+**Examples:**
+
+- `smbutil view -f //server`
+- `smbutil view //server`
+- `smbutil statshares -a`
 
 ### `snmpbulkget`
 <p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html">https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html</a></p>
@@ -14058,6 +14334,14 @@ Aliases: `gsort`
 - **tc**: Flags: --autocorrect, --check-out-of-order-constant-references, --color, --did-you-mean, --enable-experimental-rbs-assertions, --enable-experimental-rbs-comments, --enable-experimental-rbs-signatures, --enable-experimental-requires-ancestor, --enable-experimental-rspec, --experimental-ruby3-keyword-args, --force-hashing, --help, --license, --no-config, --no-did-you-mean, --no-error-count, --no-error-sections, --no-stdlib, --progress, --quiet, --silence-dev-message, --simulate-crash, --stdout-hup-hack, --suggest-typed, --suggest-unsafe, --suppress-non-critical, --track-untyped, --typed-super, --uniquely-defined-behavior, --verbose, --version, -P, -a, -h, -q, -v. Valued: --allowed-extension, --censor-for-snapshot-tests, --dir, --error-url-base, --file, --forcibly-silence-lsp-multiple-dir-error, --ignore, --isolate-error-code, --max-cache-size-bytes, --max-threads, --metrics-prefix, --minimize-to-rbi, --parser, --print, --remove-path-prefix, --stop-after, --suppress-error-code, --suppress-payload-superclass-redefinition-for, --typed, --typed-override, -e, -p
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `srb tc`
+- `srb tc lib/foo.rb`
+- `srb tc --dir lib`
+- `srb tc -a lib/foo.rb`
+- `srb tc --autocorrect lib`
+
 ### `ss`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ss.8.html">https://man7.org/linux/man-pages/man8/ss.8.html</a></p>
 
@@ -14157,6 +14441,17 @@ Aliases: `gsort`
 - Allowed valued flags: --cache-root, --config, --except, --fail-level, --format, --only, --out, --require, --stdin, -c, -f, -o, -r
 - Bare invocation allowed
 
+**Examples:**
+
+- `standardrb`
+- `standardrb lib`
+- `standardrb --format json`
+- `standardrb --fix`
+- `standardrb --fix lib`
+- `standardrb -a app/models/user.rb`
+- `standardrb --no-fix lib`
+- `standardrb -o ./standard-report.txt`
+
 ### `stapler`
 <p class="cmd-url"><a href="https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow">https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow</a></p>
 
@@ -14184,6 +14479,9 @@ Aliases: `gsort`
 - `eval "$(starship init bash)"`
 - `eval "$(starship init zsh)"`
 - `eval "$(starship init fish --print-full-init)"`
+- `starship preset --list`
+- `starship preset nerd-font-symbols`
+- `starship preset nerd-font-symbols -o ./starship-preset.toml`
 
 ### `stat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation</a></p>
@@ -14224,6 +14522,17 @@ Aliases: `gstat`
 - **vendor**: Flags: --clean, --help, --no-clean, -h. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `steep check`
+- `steep stats`
+- `steep validate`
+- `steep check --save-expectations`
+- `steep check --save-expectations=./steep_expectations.yml`
+- `steep binstub`
+- `steep binstub -o ./bin/steep`
+- `steep binstub --output ./bin/steep`
 
 ### `stern`
 <p class="cmd-url"><a href="https://github.com/stern/stern">https://github.com/stern/stern</a></p>
@@ -14932,8 +15241,8 @@ Aliases: `[`
 ### `tiff2ps`
 <p class="cmd-url"><a href="https://libtiff.gitlab.io/libtiff/tools/tiff2ps.html">https://libtiff.gitlab.io/libtiff/tools/tiff2ps.html</a></p>
 
-- Allowed standalone flags: -?, -1, -2, -3, -a, -A, -c, -d, -D, -e, -E, -i, -m, -O, -p, -r, -s, -T, -u, -U, -v, -z
-- Allowed valued flags: -b, -f, -H, -h, -L, -M, -o, -P, -S, -t, -w, -W, -x, -y
+- Allowed standalone flags: -?, -1, -2, -3, -a, -A, -c, -d, -D, -e, -E, -i, -m, -p, -r, -s, -T, -u, -U, -v, -z
+- Allowed valued flags: -b, -f, -H, -h, -L, -M, -O, -o, -P, -S, -t, -w, -W, -x, -y
 
 ### `tiff2rgba`
 <p class="cmd-url"><a href="https://libtiff.gitlab.io/libtiff/tools/tiff2rgba.html">https://libtiff.gitlab.io/libtiff/tools/tiff2rgba.html</a></p>
@@ -15296,7 +15605,15 @@ Aliases: `gtr`
 - **plans**: Flags: --help, -h
 - **providers**: Flags: --help, -h
 - **record**: Flags: --compress, --experimental, --help, --overwrite, --unsafe, -h. Valued: --add, --end-after-duration, --end-after-kdebug-events-size, --end-on-kdebug-event, --end-on-notification, --notify-after-end, --notify-after-start, --omit, --plan. Positional args accepted
-- **trim**: Flags: --help, -h. Valued: --end-time, --output, --start-time
+- **trim**: Flags: --help, -h. Valued: --end-time, --output, --start-time, -o
+
+**Examples:**
+
+- `trace plans`
+- `trace providers`
+- `trace trim ./in.atrc --output ./out.atrc`
+- `trace trim ./in.atrc -o ./out.atrc`
+- `trace trim ./in.atrc --start-time 0 --end-time 5 --output ./out.atrc`
 
 ### `traceroute`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/traceroute.8.html">https://man7.org/linux/man-pages/man8/traceroute.8.html</a></p>
@@ -15344,6 +15661,18 @@ Aliases: `traceroute6`
 - **sbom**: Flags: --help, --json, --quiet, -h, -q. Valued: --artifact-type, --cache-dir, --format, --output, -f, -o. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `trivy --version`
+- `trivy version`
+- `trivy fs .`
+- `trivy fs --format json .`
+- `trivy fs --output ./trivy-report.json .`
+- `trivy fs -o ./report.json .`
+- `trivy image alpine:3.20`
+- `trivy config ./terraform`
+- `trivy sbom ./sbom.json`
 
 ### `true`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation</a></p>
@@ -15403,8 +15732,8 @@ Aliases: `gtsort`
 ### `tsup`
 <p class="cmd-url"><a href="https://tsup.egoist.dev/">https://tsup.egoist.dev/</a></p>
 
-- Allowed standalone flags: --bundle, --clean, --cjs, --dts, --dts-only, --dts-resolve, --esm, --external, --global-name, --help, --keep-names, --legacy-output, --metafile, --minify, --no-clean, --no-config, --shims, --silent, --skip-node-modules-bundle, --source-map, --splitting, --sourcemap, --terser, --treeshake, --version, --watch, -d, -h, -w
-- Allowed valued flags: --cjs-interop, --config, --define, --entry, --env, --external, --format, --inject, --name, --no-external, --out-dir, --platform, --public-dir, --target, --tsconfig
+- Allowed standalone flags: --bundle, --clean, --cjs, --dts, --dts-only, --dts-resolve, --esm, --external, --global-name, --help, --keep-names, --legacy-output, --metafile, --minify, --no-clean, --no-config, --shims, --silent, --skip-node-modules-bundle, --source-map, --splitting, --sourcemap, --terser, --treeshake, --version, --watch, -h, -w
+- Allowed valued flags: --cjs-interop, --config, --define, --entry, --env, --external, --format, --inject, --name, --no-external, --out-dir, --platform, -d, --public-dir, --target, --tsconfig
 - Bare invocation allowed
 
 ### `tsx`
@@ -15476,6 +15805,15 @@ Aliases: `gtty`
 - **query**: Flags: --help, -h
 - **run**: Flags: --affected, --cache-dir, --continue, --dry-run, --env-mode, --force, --framework-inference, --graph, --help, --no-cache, --no-daemon, --output-logs, --parallel, --summarize, --verbose, -h. Valued: --cache-workers, --color, --concurrency, --env-mode, --filter, --global-deps, --graph, --log-order, --log-prefix, --output-logs, --profile, --remote-only, --scope, --team, --token, -F. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `turbo --version`
+- `turbo ls`
+- `turbo run build --dry-run`
+- `turbo prune web`
+- `turbo prune web --out-dir ./out`
+- `turbo prune web --docker --out-dir ./out`
 
 ### `twine`
 <p class="cmd-url"><a href="https://twine.readthedocs.io/">https://twine.readthedocs.io/</a></p>
@@ -15788,6 +16126,12 @@ Aliases: `gusers`
 - **report**: Flags: --every, --help, --type, --output, -h. Valued: --every, --output, --type
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `vegeta report`
+- `vegeta report --output`
+- `vegeta report --output ./results.txt`
+
 ### `velero`
 <p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>
 
@@ -15857,10 +16201,20 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 ### `vitepress`
 <p class="cmd-url"><a href="https://vitepress.dev/reference/cli">https://vitepress.dev/reference/cli</a></p>
 
-- **build**: Flags: --help, --mpa, -h. Valued: --base, --cache-dir, --out-dir. Positional args accepted
+- **build**: Flags: --help, --mpa, -h. Valued: --base, --cache-dir, --out-dir, --outDir. Positional args accepted
 - **help**: Positional args accepted
 - **init**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `vitepress --version`
+- `vitepress init`
+- `vitepress build`
+- `vitepress build docs`
+- `vitepress build docs --outDir ./dist`
+- `vitepress build docs --out-dir ./dist`
+- `vitepress build docs --base /docs/`
 
 ### `vitest`
 <p class="cmd-url"><a href="https://vitest.dev/guide/cli.html">https://vitest.dev/guide/cli.html</a></p>
@@ -16002,6 +16356,16 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `wasm-tools --version`
+- `wasm-tools validate ./mod.wasm`
+- `wasm-tools print ./mod.wasm`
+- `wasm-tools print ./mod.wasm -o ./mod.wat`
+- `wasm-tools parse ./mod.wat --output ./mod.wasm`
+- `wasm-tools strip ./mod.wasm -o ./stripped.wasm`
+- `wasm-tools demangle ./mod.wasm --output ./demangled.wasm`
+
 ### `wasm-validate`
 <p class="cmd-url"><a href="https://github.com/WebAssembly/wabt">https://github.com/WebAssembly/wabt</a></p>
 
@@ -16043,6 +16407,16 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 - **version**: Flags: --help, -h
 - **wast**: Flags: --debug, --help, -D, -W, -h. Valued: --config, --cranelift, --profile, --wasm. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `wasmtime --version`
+- `wasmtime compile ./mod.wasm`
+- `wasmtime compile ./mod.wasm -o ./mod.cwasm`
+- `wasmtime compile ./mod.wasm --output ./mod.cwasm`
+- `wasmtime explore ./mod.wasm -o ./explore.html`
+- `wasmtime objdump ./mod.cwasm`
+- `wasmtime settings list`
 
 ### `wat2wasm`
 <p class="cmd-url"><a href="https://github.com/WebAssembly/wabt">https://github.com/WebAssembly/wabt</a></p>
@@ -16092,8 +16466,8 @@ Aliases: `gwc`
 ### `webpack`
 <p class="cmd-url"><a href="https://webpack.js.org/api/cli/">https://webpack.js.org/api/cli/</a></p>
 
-- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -d, -h, -j, -o, -t, -v, -w
-- Allowed valued flags: -c, --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
+- Allowed standalone flags: --analyze, --bail, --cache, --color, --devtool, --disable-interpret, --env, --extends, --fail-on-warnings, --help, --hot, --json, --mode, --no-cache, --no-color, --no-stats, --no-watch, --no-watch-options-stdin, --profile, --progress, --target, --version, --watch, --watch-options-stdin, -d, -h, -j, -t, -v, -w
+- Allowed valued flags: -c, -o, --config, --config-name, --entry, --merge, --name, --node-env, --output-clean, --output-filename, --output-path, --output-public-path, --source-map, --stats
 - Bare invocation allowed
 
 ### `webpinfo`
@@ -16122,6 +16496,16 @@ Aliases: `gwc`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `west --version`
+- `west list`
+- `west topdir`
+- `west status`
+- `west manifest --resolve`
+- `west manifest --resolve --out ./resolved.yml`
+- `west manifest --freeze -o ./frozen.yml`
+
 ### `wg`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/wg.8.html">https://man7.org/linux/man-pages/man8/wg.8.html</a></p>
 
@@ -16149,8 +16533,8 @@ Aliases: `gwc`
 ### `wget`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>
 
-- Allowed standalone flags: --ask-password, --auth-no-challenge, --background, --backup-converted, --backups, --cache, --certificate-type, --check-certificate, --config, --connect-timeout, --content-disposition, --continue, --convert-file-only, --convert-links, --cookies, --cut-dirs, --debug, --delete-after, --directory-prefix, --dns-cache, --dns-timeout, --dont-remove-listing, --egd-file, --exclude-directories, --exclude-domains, --execute, --follow-ftp, --follow-tags, --force-directories, --force-html, --ftp-password, --ftp-stmlf, --ftp-user, --header, --help, --hsts, --hsts-file, --html-extension, --http-keep-alive, --http-password, --http-user, --ignore-case, --ignore-length, --ignore-tags, --include-directories, --inet4-only, --inet6-only, --input-file, --input-metalink, --keep-badhash, --keep-session-cookies, --level, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --metalink-over-http, --mirror, --no-check-certificate, --no-clobber, --no-config, --no-cookies, --no-directories, --no-dns-cache, --no-glob, --no-host-directories, --no-hsts, --no-http-keep-alive, --no-iri, --no-parent, --no-passive-ftp, --no-proxy, --no-remove-listing, --no-use-server-timestamps, --no-verbose, --no-warc-compression, --no-warc-digests, --no-warc-keep-log, --output-document, --output-file, --page-requisites, --passive-ftp, --password, --post-data, --post-file, --prefer-family, --preserve-permissions, --private-key-type, --progress, --protocol-directories, --proxy, --proxy-password, --proxy-user, --quiet, --quota, --random-file, --random-wait, --read-timeout, --recursive, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --relative, --remote-encoding, --report-speed, --restrict-file-names, --retr-symlinks, --retry-connrefused, --retry-on-http-error, --save-cookies, --save-headers, --server-response, --show-progress, --span-hosts, --spider, --start-pos, --strict-comments, --timeout, --timestamping, --tries, --unlink, --use-askpass, --use-server-timestamps, --user, --user-agent, --verbose, --version, --wait, --waitretry, --warc-cdx, --warc-dedup, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, --xattr, -4, -6, -A, -B, -D, -E, -F, -H, -I, -K, -L, -N, -O, -P, -Q, -R, -S, -T, -U, -V, -X, -Y, -a, -b, -c, -d, -e, -h, -i, -k, -l, -m, -nc, -nd, -nh, -nv, -o, -p, -q, -r, -s, -t, -v, -w, -x, -Z
-- Allowed valued flags: --certificate, --certificate-type, --ciphers, --config, --connect-timeout, --cookies, --crl-file, --cut-dirs, --dns-servers, --dns-timeout, --domains, --exclude-directories, --exclude-domains, --execute, --follow-tags, --ftp-password, --ftp-user, --header, --http-password, --http-user, --ignore-tags, --include-directories, --input-file, --input-metalink, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --output-document, --output-file, --password, --post-data, --post-file, --prefer-family, --preferred-location, --private-key, --progress, --proxy-password, --proxy-user, --quota, --random-file, --read-timeout, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --remote-encoding, --restrict-file-names, --retry-on-http-error, --save-cookies, --secure-protocol, --start-pos, --timeout, --tries, --user, --user-agent, --wait, --waitretry, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, -A, -B, -D, -I, -O, -P, -Q, -R, -T, -U, -X, -a, -e, -i, -l, -o, -t, -w
+- Allowed standalone flags: --ask-password, --auth-no-challenge, --background, --backup-converted, --backups, --cache, --certificate-type, --check-certificate, --config, --connect-timeout, --content-disposition, --continue, --convert-file-only, --convert-links, --cookies, --cut-dirs, --debug, --delete-after, --dns-cache, --dns-timeout, --dont-remove-listing, --egd-file, --exclude-directories, --exclude-domains, --execute, --follow-ftp, --follow-tags, --force-directories, --force-html, --ftp-password, --ftp-stmlf, --ftp-user, --header, --help, --hsts, --hsts-file, --html-extension, --http-keep-alive, --http-password, --http-user, --ignore-case, --ignore-length, --ignore-tags, --include-directories, --inet4-only, --inet6-only, --input-file, --input-metalink, --keep-badhash, --keep-session-cookies, --level, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --metalink-over-http, --mirror, --no-check-certificate, --no-clobber, --no-config, --no-cookies, --no-directories, --no-dns-cache, --no-glob, --no-host-directories, --no-hsts, --no-http-keep-alive, --no-iri, --no-parent, --no-passive-ftp, --no-proxy, --no-remove-listing, --no-use-server-timestamps, --no-verbose, --no-warc-compression, --no-warc-digests, --no-warc-keep-log, --output-document, --output-file, --page-requisites, --passive-ftp, --password, --post-data, --post-file, --prefer-family, --preserve-permissions, --private-key-type, --progress, --protocol-directories, --proxy, --proxy-password, --proxy-user, --quiet, --quota, --random-file, --random-wait, --read-timeout, --recursive, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --relative, --remote-encoding, --report-speed, --restrict-file-names, --retr-symlinks, --retry-connrefused, --retry-on-http-error, --save-cookies, --save-headers, --server-response, --show-progress, --span-hosts, --spider, --start-pos, --strict-comments, --timeout, --timestamping, --tries, --unlink, --use-askpass, --use-server-timestamps, --user, --user-agent, --verbose, --version, --wait, --waitretry, --warc-cdx, --warc-dedup, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, --xattr, -4, -6, -A, -B, -D, -E, -F, -H, -I, -K, -L, -N, -O, -P, -Q, -R, -S, -T, -U, -V, -X, -Y, -a, -b, -c, -d, -e, -h, -i, -k, -l, -m, -nc, -nd, -nh, -nv, -o, -p, -q, -r, -s, -t, -v, -w, -x, -Z
+- Allowed valued flags: --certificate, --certificate-type, --ciphers, --config, --connect-timeout, --cookies, --crl-file, --cut-dirs, --directory-prefix, --dns-servers, --dns-timeout, --domains, --exclude-directories, --exclude-domains, --execute, --follow-tags, --ftp-password, --ftp-user, --header, --http-password, --http-user, --ignore-tags, --include-directories, --input-file, --input-metalink, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --output-document, --output-file, --password, --post-data, --post-file, --prefer-family, --preferred-location, --private-key, --progress, --proxy-password, --proxy-user, --quota, --random-file, --read-timeout, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --remote-encoding, --restrict-file-names, --retry-on-http-error, --save-cookies, --secure-protocol, --start-pos, --timeout, --tries, --user, --user-agent, --wait, --waitretry, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, -A, -B, -D, -I, -O, -P, -Q, -R, -T, -U, -X, -a, -e, -i, -l, -o, -t, -w
 - Hyphen-prefixed positional arguments accepted
 
 ### `what`

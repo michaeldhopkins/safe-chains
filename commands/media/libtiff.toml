@@ -117,13 +117,14 @@ standalone = [
     "-?", "-1", "-2", "-3",
     "-a", "-A", "-c", "-d", "-D",
     "-e", "-E", "-i", "-m",
-    "-O", "-p", "-r", "-s",
+    "-p", "-r", "-s",
     "-T", "-u", "-U", "-v",
     "-z",
 ]
+# `-O file` writes the PostScript to that file instead of stdout — a MANDATORY value.
 valued = [
     "-b", "-f", "-H", "-h", "-L",
-    "-M", "-o",
+    "-M", "-O", "-o",
     "-P", "-S", "-t", "-w",
     "-W", "-x", "-y",
 ]

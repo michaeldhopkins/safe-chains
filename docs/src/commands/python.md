@@ -15,6 +15,11 @@
 - **show**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `alembic current`
+- `alembic -c ./alembic.ini current`
+
 ### `autoflake`
 <p class="cmd-url"><a href="https://github.com/PyCQA/autoflake">https://github.com/PyCQA/autoflake</a></p>
 
@@ -75,6 +80,12 @@
 - **run**: Flags: --append, --branch, --concurrency, --help, --parallel, --source, --timid, -a, -h, -p. Valued: --context, --data-file, --include, --omit, --rcfile, --source. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `coverage report`
+- `coverage json -o ./coverage.json`
+- `coverage html -d ./htmlcov`
+
 ### `dbt`
 <p class="cmd-url"><a href="https://docs.getdbt.com/reference/dbt-commands">https://docs.getdbt.com/reference/dbt-commands</a></p>
 
@@ -117,6 +128,7 @@
 **Examples:**
 
 - `dvc add data.csv`
+- `dvc add --out ./data/train.csv data.csv`
 - `dvc status`
 - `dvc version`
 
@@ -139,6 +151,12 @@
 - **status**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `hatch build`
+- `hatch --project ./pkg build`
+- `hatch --data-dir ./.hatch build`
 
 ### `http`
 <p class="cmd-url"><a href="https://httpie.io/docs/cli">https://httpie.io/docs/cli</a></p>
@@ -413,11 +431,21 @@ Aliases: `pip3`
 ### `safety`
 <p class="cmd-url"><a href="https://docs.safetycli.com/">https://docs.safetycli.com/</a></p>
 
-- **check**: Flags: --bare, --continue-on-error, --exit-code, --full-report, --help, --ignore-unpinned-requirements, --json, --no-cache, --policy-file, --proxy-required, --save-html, --save-json, --short-report, -h. Valued: --api, --cache, --db, --exclude, --file, --ignore, --key, --output, --proxy-host, --proxy-port, --proxy-protocol, -i, -o, -r
+- **check**: Flags: --bare, --continue-on-error, --exit-code, --full-report, --help, --ignore-unpinned-requirements, --json, --no-cache, --policy-file, --proxy-required, --short-report, -h. Valued: --api, --cache, --db, --exclude, --file, --ignore, --key, --output, --proxy-host, --proxy-port, --proxy-protocol, --save-html, --save-json, -i, -o, -r
 - **help**: Positional args accepted
 - **scan**: Flags: --apply-remediations, --detailed-output, --disable-optional-telemetry, --help, --no-fix-suggestion, -h. Valued: --auth-type, --key, --output, --policy-file, --save-as, --target
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `safety check`
+- `safety check -r requirements.txt`
+- `safety check --output json`
+- `safety check --save-json ./safety-report.json`
+- `safety check --save-html ./reports`
+- `safety scan --output screen`
+- `safety scan --save-as json ./scan.json`
 
 ### `scalene`
 <p class="cmd-url"><a href="https://github.com/plasma-umass/scalene">https://github.com/plasma-umass/scalene</a></p>

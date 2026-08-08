@@ -5,6 +5,21 @@ url = "https://docs.rubocop.org/rubocop/usage/basic_usage.html"
 researched_version = "RuboCop ~1.x line; flag surface stable across recent releases as of 2026-05"
 level = "SafeRead"
 bare = true
+examples_safe = [
+    "rubocop",
+    "rubocop app/models",
+    "rubocop --format json",
+    "rubocop -a",
+    "rubocop -a app/models/user.rb",
+    "rubocop --autocorrect-all lib",
+    "rubocop -x app",
+    "rubocop -o ./rubocop-report.txt",
+]
+examples_denied = [
+    "rubocop -a ~/.ssh",
+    "rubocop --autocorrect-all /etc",
+    "rubocop -o ~/.ssh/authorized_keys",
+]
 standalone = [
     "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
     "--color", "--debug", "--display-cop-names",
