@@ -1007,15 +1007,23 @@ fn is_bare_literal_char(c: char) -> bool {
     c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | '/' | '=')
 }
 
+/// Whether a command's redirects are acceptable on the USER-ALLOWLIST path — the one taken when the
+/// user's own `Bash(...)` rule names a command safe-chains does not otherwise know.
+///
+/// Delegates to [`redirect_verdict`], the same location model every other redirect goes through.
+/// It used to carry its own rule — a write was accepted only to `/dev/null`, a read always — and
+/// that second copy was wrong in BOTH directions:
+///
+/// - Too strict on writes. A granted runner script could not redirect anywhere, not even into the
+///   session scratchpad: `~/runner-scripts/x.sh > $SCRATCH/out.txt` fell through to a prompt while
+///   the byte-identical `cat f > $SCRATCH/out.txt` auto-approved through the engine path.
+/// - Too lax on reads. `Redir::Read` was unconditionally true, so `~/runner-scripts/x.sh <
+///   /etc/shadow` fed a credential to a granted command without ever consulting the read locus.
+///
+/// One model, one answer. A grant covers the command; the redirect is still gated by where it
+/// lands, so `> ~/.ssh/authorized_keys` stays denied whatever rule named the command.
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
-    redirs.iter().all(|r| match r {
-        // `<>` opens for writing too, so it faces the same `/dev/null`-only bar as `>`.
-        Redir::Write { target, .. } | Redir::ReadWrite { target, .. } => target.eval() == "/dev/null",
-        Redir::Read { .. }
-        | Redir::HereStr(_)
-        | Redir::HereDoc { .. }
-        | Redir::DupFd { .. } => true,
-    })
+    redirect_verdict(redirs).is_allowed()
 }
 
 /// Whether a redirect *write* target is one we can auto-approve. Delegates to the SAME location

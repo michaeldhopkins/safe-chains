@@ -376,14 +376,41 @@ proptest! {
         );
     }
 
+    /// The user-allowlist redirect gate and the engine's redirect model must never disagree.
+    ///
+    /// They are two callers of one question — "may this command open these targets?" — and while
+    /// each kept its own answer they drifted apart in both directions: the allowlist path refused
+    /// every write but `/dev/null` (so a granted script could not write to its own worktree) and
+    /// waved through every read (so `< /etc/shadow` reached a granted command ungated). Pinning
+    /// agreement rather than a literal expectation is what keeps a second copy from growing back.
     #[test]
-    fn redirect_safety(redirs in prop::collection::vec(arb_redir(), 1..4)) {
-        let result = check::check_redirects(&redirs);
-        let expected = redirs.iter().all(|r| match r {
-            Redir::Write { target, .. } => target.eval() == "/dev/null",
-            _ => true,
-        });
-        prop_assert_eq!(result, expected);
+    fn allowlist_redirect_gate_agrees_with_engine(redirs in prop::collection::vec(arb_redir(), 1..4)) {
+        prop_assert_eq!(
+            check::check_redirects(&redirs),
+            check::redirect_verdict(&redirs).is_allowed(),
+        );
+    }
+
+    /// The direction that matters on its own: a grant names the COMMAND, never the target. A
+    /// redirect into a credential store, an auto-executed file, or outside the tree stays refused
+    /// on the allowlist path no matter which rule matched the command.
+    #[test]
+    fn allowlist_redirect_gate_refuses_sensitive_targets(
+        target in prop_oneof![
+            arb_env_name().prop_map(|n| format!("$HOME/.ssh/{n}")),
+            arb_env_name().prop_map(|n| format!("/etc/{n}")),
+            arb_env_name().prop_map(|n| format!("../{n}")),
+            Just(".git/hooks/pre-commit".to_string()),
+            Just(".envrc".to_string()),
+        ],
+        mode in arb_write_mode(),
+    ) {
+        let redirs = vec![Redir::Write {
+            fd: 1,
+            target: Word(vec![WordPart::Lit(target)]),
+            mode,
+        }];
+        prop_assert!(!check::check_redirects(&redirs));
     }
 
     #[test]
@@ -563,11 +590,13 @@ proptest! {
                 mode,
             }],
         };
-        prop_assert!(!check::check_redirects(&cmd.redirs));
         prop_assert_eq!(
             check::redirect_verdict(&cmd.redirs),
             crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite),
         );
+        // The user-allowlist gate reaches the same answer. It used to accept `/dev/null` and
+        // nothing else, so a granted command could not redirect into its own worktree.
+        prop_assert!(check::check_redirects(&cmd.redirs));
     }
 
     #[test]

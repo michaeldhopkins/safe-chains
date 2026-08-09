@@ -6,6 +6,37 @@ use crate::cst::{Cmd, check};
 pub struct Matcher {
     exact: HashSet<String>,
     globs: Vec<Vec<String>>,
+    /// `$HOME`, used to canonicalize `~/` on BOTH sides of a match. Empty disables it.
+    home: String,
+}
+
+/// Rewrite a leading `~/` in every word to the absolute home path, so the two spellings of one
+/// file compare equal.
+///
+/// A grant names a FILE. `Bash(~/runner-scripts/x.sh:*)` and `/Users/me/runner-scripts/x.sh` are
+/// the same script, and matching raw strings made the second fall through to a prompt while the
+/// first auto-approved — the calling-convention rule ("apply safety to the operation, not the
+/// syntax") applied to the user's own allowlist. Both sides go through this, so a rule written
+/// either way covers a command written either way.
+///
+/// Only a LEADING `~/`, and only in the home-relative sense:
+/// - `~user/…` is a DIFFERENT user's home and is left alone.
+/// - `$HOME/…` is left alone too. It is a variable, not a spelling of `~`, and this matcher's
+///   whole posture toward values it cannot pin is to match nothing rather than guess. A preceding
+///   `HOME=…` assignment already makes a command unmatchable via `normalize_for_matching`.
+fn canonicalize_home(text: &str, home: &str) -> String {
+    if home.is_empty() || home == "/" {
+        return text.to_string();
+    }
+    let home = home.strip_suffix('/').unwrap_or(home);
+    text.split(' ')
+        .map(|word| match word.strip_prefix("~/") {
+            Some(rest) => format!("{home}/{rest}"),
+            None if word == "~" => home.to_string(),
+            None => word.to_string(),
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 impl Matcher {
@@ -23,6 +54,7 @@ impl Matcher {
             None => Matcher {
                 exact: HashSet::new(),
                 globs: Vec::new(),
+                home: String::new(),
             },
         }
     }
@@ -31,6 +63,7 @@ impl Matcher {
         let mut patterns = Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
+            home: home.to_string_lossy().into_owned(),
         };
         patterns.load_file(&home.join(".claude/settings.json"));
         patterns
@@ -73,6 +106,7 @@ impl Matcher {
         } else {
             inner.to_string()
         };
+        let normalized = canonicalize_home(&normalized, &self.home);
         if normalized.contains('*') {
             self.globs
                 .push(normalized.split('*').map(String::from).collect());
@@ -90,7 +124,8 @@ impl Matcher {
         let Some(normalized) = check::normalize_for_matching(simple) else {
             return false;
         };
-        let normalized = normalized.trim();
+        let normalized = canonicalize_home(normalized.trim(), &self.home);
+        let normalized = normalized.as_str();
         if normalized.is_empty() {
             return false;
         }
@@ -111,6 +146,7 @@ impl Matcher {
         let mut m = Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
+            home: TEST_HOME.to_string(),
         };
         for p in patterns {
             m.add_pattern(&format!("Bash({p})"));
@@ -118,6 +154,10 @@ impl Matcher {
         m
     }
 }
+
+/// A fixed home for tests, so `~` canonicalization is exercised rather than skipped.
+#[cfg(test)]
+const TEST_HOME: &str = "/home/tester";
 
 pub fn is_cmd_covered(cmd: &Cmd, patterns: &Matcher) -> bool {
     match cmd {
@@ -169,6 +209,7 @@ mod tests {
         Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
+            home: TEST_HOME.to_string(),
         }
     }
 
@@ -615,6 +656,52 @@ mod env_prefix_matching_tests {
         let m = matcher(&["~/runner-scripts/x.sh:*"]);
         assert!(m.matches_cmd(&cmd("~/runner-scripts/x.sh")));
         assert!(m.matches_cmd(&cmd("~/runner-scripts/x.sh --dry-run")));
+    }
+
+    /// A grant names a FILE, so the two spellings of that file are one grant. Matching raw strings
+    /// meant `~/runner-scripts/x.sh` auto-approved while the byte-identical script spelled
+    /// absolutely fell through to a prompt.
+    #[test]
+    fn a_home_grant_covers_both_spellings_of_the_same_file() {
+        for rule in ["~/runner-scripts/x.sh:*", "/home/tester/runner-scripts/x.sh:*"] {
+            let m = matcher(&[rule]);
+            for c in [
+                "~/runner-scripts/x.sh",
+                "/home/tester/runner-scripts/x.sh",
+                "~/runner-scripts/x.sh --dry-run",
+                "/home/tester/runner-scripts/x.sh --dry-run",
+            ] {
+                assert!(m.matches_cmd(&cmd(c)), "rule `{rule}` missed: {c}");
+            }
+        }
+    }
+
+    /// Canonicalization applies to EVERY word, not just the command name — the granted script is an
+    /// argument in the interpreter forms (`osascript -l JavaScript ~/runner-scripts/x.js`).
+    #[test]
+    fn a_home_grant_covers_both_spellings_in_an_argument() {
+        let m = matcher(&["osascript -l JavaScript ~/runner-scripts/x.js:*"]);
+        assert!(m.matches_cmd(&cmd("osascript -l JavaScript ~/runner-scripts/x.js --p safe-chains")));
+        assert!(m.matches_cmd(&cmd(
+            "osascript -l JavaScript /home/tester/runner-scripts/x.js --p safe-chains"
+        )));
+    }
+
+    /// `~user/` is somebody ELSE's home. Expanding it would let a rule for the agent's own file
+    /// cover a path it never named.
+    #[test]
+    fn another_users_home_is_not_expanded() {
+        let m = matcher(&["~/runner-scripts/x.sh:*"]);
+        assert!(!m.matches_cmd(&cmd("~root/runner-scripts/x.sh")));
+        assert!(!m.matches_cmd(&cmd("~other/runner-scripts/x.sh")));
+    }
+
+    /// `$HOME/` is a variable, not a spelling of `~`. The matcher's posture toward a value it
+    /// cannot pin is to match nothing rather than assume.
+    #[test]
+    fn a_home_variable_is_not_expanded() {
+        let m = matcher(&["~/runner-scripts/x.sh:*"]);
+        assert!(!m.matches_cmd(&cmd("$HOME/runner-scripts/x.sh")));
     }
 
     #[test]
