@@ -685,6 +685,17 @@ flags = { "-f" = "read" }
 [roles."rbs annotate"]
 positional = "write"
 
+# `swiftlint fix` rewrites its files IN PLACE (the entry's own description has said so all along);
+# `lint`/`analyze`/`rules` only read. BOTH spellings need a key — a sub-scoped gate matches the
+# literal token, so gating only the canonical name leaves the alias wide open. That is not a
+# hypothetical: `swiftlint autocorrect ~/.ssh/authorized_keys` auto-approved while
+# `swiftlint fix …` denied. `a_sub_scoped_gate_covers_every_spelling_of_its_sub` now enforces it.
+[roles."swiftlint fix"]
+positional = "write"
+
+[roles."swiftlint autocorrect"]
+positional = "write"
+
 # `-w`/`--write` do NOT take a value — they rewrite every file OPERAND in place. Gating them as
 # path-valued flags looked right on a one-operand probe (`shfmt -w ~/.ssh/config` denied, because
 # the gate ate the path as `-w`'s value) and left the real shape wide open:

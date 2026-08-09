@@ -248,47 +248,133 @@ velero get	-o
 wasmer wasm2wat	--output
 wasmer wat2wasm	--output
 
-# ── SEEDED 2026-08-07, UNTRIAGED — these are NOT verified format-only ────────────────────────────
+# ── TRIAGED 2026-08-08 (o–x slice of the 2026-08-07 seeding) — verified NON-PATH values ──────────
 #
-# Everything above this line was triaged: a human checked the flag takes a FORMAT, not a path.
-# Everything below was seeded wholesale when the guard was widened, and carries no such claim.
+# Same bar as the blocks above: each row checked against the tool's own source/reference at the
+# version in its `researched_version`. Nothing in this slice turned out to be a write path — the
+# `oc`/`packer` rows take an enum or are not flags at all, and the `xattr` rows are probe artifacts
+# whose real write target is already gated.
 #
-# The guard used to derive its flag list from a hardcoded NAME list over `cmd.valued`, on top-level
-# commands only. Three blind spots followed: `-i`/`-w`/`--in-place`/`--fix` were not on the name list
-# (the in-place formatters — the largest writer family in the tree), `write_flags` was never read at
-# all, and SUBS were never walked (which is why `vegeta report --output ~/.ssh/authorized_keys` was
-# missed). Widening it on all three axes took the reported set from 62 to 424.
+#   oc status -o/--output      `dot` and nothing else. openshift/oc registers it as
+#                              `"Output format. One of: dot."` and REJECTS any other value
+#                              (`invalid output format provided: %s`), so a path cannot even parse.
+#   oc version -o/--output     `yaml|json` — `StringVarP(&o.Output, "output", "o", …, "One of
+#                              'yaml' or 'json'.")`.
+#   oc explain -o/--output     `plaintext|plaintext-openapiv2` — the schema RENDERER, inherited
+#                              from kubectl.
+#   oc get -o/--output         the kubectl format enum: `json|yaml|kyaml|name|wide|go-template|
+#   oc events -o/--output      go-template-file|template|templatefile|jsonpath|jsonpath-as-json|
+#                              jsonpath-file|custom-columns|custom-columns-file`. A NOTATION, never
+#                              a write target — every `oc` write names its object on the command
+#                              line or via `-f`. NOTE for whoever revisits this: unlike `tilt get`
+#                              (recorded in the t–z block), kubectl DOES accept the template file
+#                              inline on this flag, as `-o go-template-file=PATH` (and likewise
+#                              `jsonpath-file=` / `custom-columns-file=`), and today
+#                              `oc get pods -o go-template-file=~/.ssh/id_rsa` auto-approves,
+#                              printing the file through the template engine. That is a disclosing
+#                              READ, not a write, so it is outside what this guard asks and the row
+#                              stays here; it is also not expressible as a flag→role map, which
+#                              gates a flag's value WHOLESALE and would have to judge `json` and
+#                              `custom-columns=NAME:.metadata.name` too. Closing it needs a
+#                              value-prefix-aware gate that does not exist yet — raised as an open
+#                              follow-up rather than bodged in.
+#   platform … -o              `-o` is the short form of `--org`, exactly as on `clever` in the a–f
+#                              block. Two registrations, both an organization NAME OR ID sent to
+#                              the API: the shared `Selector` adds `new InputOption('org', 'o',
+#                              VALUE_REQUIRED, 'The organization name (or ID)')`, which is what the
+#                              `organization:*` and `team:*` subs pick up, and `ProjectListCommand`
+#                              adds its own `->addOption('org', 'o', VALUE_REQUIRED, 'Filter by
+#                              organization name or ID')`, inherited by the `projects` and `pro`
+#                              aliases. Every sub in this slice already carries `--org` in its
+#                              `valued` list next to the `-o` — the pair is the tell. The CLI's
+#                              actual output-format flag is `--format` (`table|csv|tsv|plain`), and
+#                              the path-bearing subs are elsewhere (`db:dump`, `mount:download`,
+#                              `environment:scp`).
+#   packer validate -o         NOT A FLAG. Packer's `ValidateArgs` flagset registers only
+#                              `-syntax-only`, `-no-warn-undeclared-var`, `-evaluate-datasources`,
+#                              `-ignore-prerelease-plugins`, `-use-sequential-evaluation` plus
+#                              `MetaArgs`' `-only`/`-except`/`-var`/`-var-file`. Go's `flag`
+#                              package does no abbreviation matching, so `-o` (and the `-e` next to
+#                              it in the allowlist) are historical guesses at short forms that
+#                              upstream never had; `packer validate` writes nothing at all.
+#   xattr -w / xattr -d        PROBE ARTIFACTS. Both are valued, and the value is an ATTRIBUTE
+#                              NAME, not a path: `-w` consumes NAME and VALUE, `-d` consumes NAME.
+#                              The guard's probe (`xattr -w <path> in`) therefore lands the path in
+#                              the name slot and leaves no file operand at all. The real write
+#                              target is the FILE positional, and it is already gated — the
+#                              `xattr_mode` handler in pathgates.toml write-gates the operands of
+#                              `-w`/`-d`/`-c` (verified: `xattr -w com.apple.quarantine 0
+#                              ~/.ssh/authorized_keys` and `xattr -d com.apple.quarantine
+#                              ~/.ssh/authorized_keys` both deny, while the `./a.txt` forms allow).
+oc events	--output
+oc events	-o
+oc explain	--output
+oc explain	-o
+oc get	--output
+oc get	-o
+oc status	--output
+oc status	-o
+oc version	--output
+oc version	-o
+packer validate	-o
+platform organization:billing:address	-o
+platform organization:billing:profile	-o
+platform organization:info	-o
+platform organization:subscription:list	-o
+platform organization:user:get	-o
+platform organization:user:list	-o
+platform organization:user:projects	-o
+platform pro	-o
+platform project:list	-o
+platform projects	-o
+platform team:get	-o
+platform team:list	-o
+platform team:project:list	-o
+platform team:user:list	-o
+platform teams	-o
+xattr	-d
+xattr	-w
+
+# ── TRIAGED 2026-08-08 (k–n slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
 #
-# These 362 are seeded so the ratchet HOLDS THE LINE at today's exposure — nothing new can ship
-# ungated — rather than leaving the guard red and therefore ignored. They are a BURN-DOWN LIST, not
-# an acknowledgement. Expect roughly three populations:
+# Same bar as the blocks around it: every row checked against the tool's own reference at the
+# version in its `researched_version`. This slice turned up NO writers — each row is either a
+# CLI-wide output-FORMAT enum or a BOOLEAN whose operands are not file targets — so nothing was
+# gated out of it and the file only gained annotations.
 #
-#   - genuine holes: `clang-format -i`, `gofmt -w`, `yapf --in-place`, `xattr -w` all auto-approve a
-#     write to /etc/hosts or ~/.ssh — CONFIRMED by hand. These need a `[command.path_gate]`.
-#   - format flags: `bazel query --output`, `argocd version --output` take `json`/`proto`, so a path
-#     is a nonsense value and no write occurs. These belong above the line, with the check recorded.
-#   - not-a-path-at-all: `borg check --repair`, `borg config --delete` swallowed the probe path as a
-#     positional. A different question, and not this guard's.
-#
-# Triage order: the credential-touching ones first (`~/.ssh` reachable), then /etc, then the rest.
-#
-# a–f slice triaged 2026-08-08. The genuine writers are GATED and gone from this file (afhash -w,
-# ameba --fix, ansible-vault encrypt --output, artillery report -o/--output, buf build/convert/
-# format/generate -o/--output + format -w/--write, bun build --outdir, bundler-audit check --output,
-# cdk synth -o/--output, coverage json -o, crystal build -o + docs --output, dawn scan -O/--output,
-# depcruise -f/--output-to, docfx -o/--output, docker-compose config -o/--output, dotnet -o/--output,
-# dotnet-trace convert -o/--output, dvc add -o/--out, flutter analyze --write). The format-only ones
-# moved above the line. What remains here from a–f are the three PROBE ARTIFACTS below: the flag is a
-# BOOLEAN, so the probe's path never reaches it — it lands on a positional whose role is a different
-# question than this guard asks, and gating it here would gate the wrong thing.
-#
-#   borg check --repair    boolean. `borg check [options] REPOSITORY_OR_ARCHIVE` — the probe path is
-#                          swallowed as the repository spec, which --repair rebuilds in place. Not a
-#                          path the flag names.
-#   borg config --delete   boolean. `borg config REPOSITORY NAME` — the probe path is the repository
-#                          positional and `in` the config KEY.
-#   depcruise --init       boolean (optional `oneshot` word). It writes `.dependency-cruiser.js` into
-#                          the CWD; the probe path is swallowed as a source directory to SCAN.
+#   koyeb {login,version,whoami} -o/--output
+#                              `yaml|json|table` — koyeb's CLI-WIDE output format. It is a
+#                              persistent (global) flag, which is why it appears on subs that
+#                              declare no options of their own beyond `-h`. koyeb's real path flag
+#                              is `--config`/`-c` — the YAML token store `koyeb login` writes — and
+#                              that one already gates (`koyeb login -c ~/.ssh/authorized_keys`
+#                              denies).
+#   kubectl {api-resources,events,get,version} -o/--output
+#                              the kubectl format enum, and narrower per sub than the family
+#                              suggests: `json|yaml|kyaml|name|wide` on api-resources, `yaml|json`
+#                              on version, and the full `…|go-template|jsonpath|custom-columns|…`
+#                              set on get and events. A bare path is a member of none of them.
+#                              The `*-file` members DO carry a path, but inside the value
+#                              (`-o go-template-file=/etc/shadow`) and as a READ — a disclosure
+#                              question, not this write guard's, and tracked with the
+#                              read/disclosure sweep rather than here.
+#   linkerd check -o/--output  `table|json|short` — the format of the check report.
+#   mtree -U / -r / -u         boolean, and mtree takes NO file positionals at all: the tree is the
+#                              `-p` FLAG value and the spec arrives on stdin or via `-f`. The
+#                              `mtree_mode` handler gates `-p` — write once `-u`/`-U`/`-r` is
+#                              present, read otherwise — so `mtree -r -p ~/.ssh` denies while
+#                              `mtree -u -p ./sub` still allows. Also in
+#                              operand_write_probe_artifacts.tsv.
+#   ncu -u / --upgrade         boolean. ncu's positionals are package-name FILTERS, not paths; the
+#                              manifest comes from `--packageFile`, which the `ncu_mode` handler
+#                              gates as a write exactly when `-u`/`--upgrade` is present. Also in
+#                              operand_write_probe_artifacts.tsv.
+#   neon me -o/--output        `json|yaml|table` — the Neon CLI-wide output format (default
+#                              `table`, which the docs note omits fields).
+#   northflank {get,list,logs,metrics} -o/--output
+#                              `format|json|yaml` — the CLI-wide output format, `format` being the
+#                              human-readable default.
+
 borg check	--repair
 borg config	--delete
 depcruise	--init
@@ -331,9 +417,9 @@ kubectl version	--output
 kubectl version	-o
 linkerd check	--output
 linkerd check	-o
-mtree	-U
 mtree	-r
 mtree	-u
+mtree	-U
 ncu	--upgrade
 ncu	-u
 neon me	--output
@@ -346,35 +432,92 @@ northflank logs	--output
 northflank logs	-o
 northflank metrics	--output
 northflank metrics	-o
-oc events	--output
-oc events	-o
-oc explain	--output
-oc explain	-o
-oc get	--output
-oc get	-o
-oc status	--output
-oc status	-o
-oc version	--output
-oc version	-o
-packer validate	-o
-platform organization:billing:address	-o
-platform organization:billing:profile	-o
-platform organization:info	-o
-platform organization:subscription:list	-o
-platform organization:user:get	-o
-platform organization:user:list	-o
-platform organization:user:projects	-o
-platform pro	-o
-platform project:list	-o
-platform projects	-o
-platform team:get	-o
-platform team:list	-o
-platform team:project:list	-o
-platform team:user:list	-o
-platform teams	-o
+
+# ── SEEDED 2026-08-07 — DRAINED 2026-08-08. Nothing below this line. ─────────────────────────────
+#
+# The seeded backlog is EMPTY: every row of it has been triaged and moved above, and every row that
+# turned out to be a genuine writer was gated and deleted from this file. What remains in this file
+# is entirely VERIFIED format-only / probe-artifact rows. A new row appearing below this header
+# means the guard found something nobody has looked at yet.
+#
+# The history is kept because it explains what the counts mean and why the file is shaped this way.
+#
+# The guard used to derive its flag list from a hardcoded NAME list over `cmd.valued`, on top-level
+# commands only. Three blind spots followed: `-i`/`-w`/`--in-place`/`--fix` were not on the name list
+# (the in-place formatters — the largest writer family in the tree), `write_flags` was never read at
+# all, and SUBS were never walked (which is why `vegeta report --output ~/.ssh/authorized_keys` was
+# missed). Widening it on all three axes took the reported set from 62 to 424.
+#
+# These 362 are seeded so the ratchet HOLDS THE LINE at today's exposure — nothing new can ship
+# ungated — rather than leaving the guard red and therefore ignored. They are a BURN-DOWN LIST, not
+# an acknowledgement. Expect roughly three populations:
+#
+#   - genuine holes: `clang-format -i`, `gofmt -w`, `yapf --in-place`, `xattr -w` all auto-approve a
+#     write to /etc/hosts or ~/.ssh — CONFIRMED by hand. These need a `[command.path_gate]`.
+#   - format flags: `bazel query --output`, `argocd version --output` take `json`/`proto`, so a path
+#     is a nonsense value and no write occurs. These belong above the line, with the check recorded.
+#   - not-a-path-at-all: `borg check --repair`, `borg config --delete` swallowed the probe path as a
+#     positional. A different question, and not this guard's.
+#
+# Triage order: the credential-touching ones first (`~/.ssh` reachable), then /etc, then the rest.
+#
+# a–f slice triaged 2026-08-08. The genuine writers are GATED and gone from this file (afhash -w,
+# ameba --fix, ansible-vault encrypt --output, artillery report -o/--output, buf build/convert/
+# format/generate -o/--output + format -w/--write, bun build --outdir, bundler-audit check --output,
+# cdk synth -o/--output, coverage json -o, crystal build -o + docs --output, dawn scan -O/--output,
+# depcruise -f/--output-to, docfx -o/--output, docker-compose config -o/--output, dotnet -o/--output,
+# dotnet-trace convert -o/--output, dvc add -o/--out, flutter analyze --write). The format-only ones
+# moved above the line. What remains here from a–f are the three PROBE ARTIFACTS below: the flag is a
+# BOOLEAN, so the probe's path never reaches it — it lands on a positional whose role is a different
+# question than this guard asks, and gating it here would gate the wrong thing.
+#
+#   borg check --repair    boolean. `borg check [options] REPOSITORY_OR_ARCHIVE` — the probe path is
+#                          swallowed as the repository spec, which --repair rebuilds in place. Not a
+#                          path the flag names.
+#   borg config --delete   boolean. `borg config REPOSITORY NAME` — the probe path is the repository
+#                          positional and `in` the config KEY.
+#   depcruise --init       boolean (optional `oneshot` word). It writes `.dependency-cruiser.js` into
+#                          the CWD; the probe path is swallowed as a source directory to SCAN.
+# ── TRIAGED 2026-08-08 (g–j slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
+#
+# Same bar as the a–f block: each row was checked against the tool's own reference at the version in
+# its `researched_version`. Every row of this slice came out format-only or a probe artifact, so
+# nothing here was gated. (The slice's b/d rows are the borg/depcruise probe artifacts above.)
+#
+#   git {fetch,ls-remote,pull} -o
+#                              short form of `--server-option=<option>` — an opaque string handed to
+#                              the REMOTE under wire protocol v2, never interpreted locally. (`-o` is
+#                              `--origin` on `git clone`; that is a different command and not a row
+#                              here.)
+#   gomodifytags -w / --w      boolean. The file it rewrites in place comes from `-file`/`--file`,
+#                              which the entry's own `[command.path_gate]` already gates as a write;
+#                              bare positionals are not read as paths. (Go's flag package accepts
+#                              both `-w` and `--w`, hence two rows.) Same artifact already recorded
+#                              in operand_write_probe_artifacts.tsv.
+#   helm {history,list,status} -o/--output
+#                              `table|json|yaml`, default `table` — "prints the output in the
+#                              specified format".
+#   helmfile list --output     compared against the literal `json` in `App.ListReleases`; any other
+#                              value prints the table. This sub has no `-o` short form.
+#   helmfile version -o/--output
+#                              the sub comes from `go.szostok.io/version`'s cobra extension:
+#                              `pretty|json|yaml|short`.
+#   istioctl analyze -o/--output       `log|json|yaml`.
+#   istioctl proxy-status -o/--output  `json|yaml|table`, default `table`.
+#   istioctl version -o/--output       `yaml` or `json`; istioctl errors on anything else before it
+#                                      does any work.
+#   istioctl validate -o/--output      NOT A FLAG. `istioctl validate` registers only `-f/--filename`
+#                              and the hidden `-x/--referential`, and declares `cobra.NoArgs`, so the
+#                              spelling is an unknown-flag parse error. A historical allowlist entry.
+#   jupytext --set-formats     a comma-separated FORMAT SPEC, `[[path/][prefix]/][suffix.]ext[:name]`,
+#                              whose `ext` must be a notebook extension — a bare path raises
+#                              JupytextFormatError. The optional path prefix is not a free path
+#                              either: `paired_paths.base_path` validates every prefix component
+#                              against the NOTEBOOK's own directory and drops the prefix when it does
+#                              not match, so a paired file only ever lands relative to the notebook.
+#                              The notebook is the positional, and the `jupytext_mode` gate already
+#                              promotes it to a write whenever `--set-formats` is present.
 # xattr -d/-w are PROBE ARTIFACTS, not holes. The guard probes `<cmd> <flag> ~/.ssh/… in`,
 # and for these the sensitive path is consumed as the attribute NAME, so no file operand is
 # left to gate and the probe auto-approves. Real invocations ARE gated by xattr_mode:
 # `xattr -w k v ~/.ssh/id_rsa` and `xattr -d k /etc/hosts` both deny. Do not re-chase these.
-xattr	-d
-xattr	-w

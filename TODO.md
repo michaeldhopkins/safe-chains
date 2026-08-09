@@ -2469,6 +2469,97 @@ every sweep: they inflate the worklist, they make coverage look worse than it is
 a researcher a full lookup to disprove. Worth a dedicated guard — a flag we allow that upstream does
 not define is exactly the kind of drift `researched_version` exists to catch.
 
+### Path-named flags: a RATCHET on the re-research campaign, not a second campaign
+
+`--cache-dir` and friends are ungated capabilities at the `user` rung (`trivy fs --cache-dir ~/.ssh`
+auto-approves). The sweep missed them because its population is an output-flag NAME list plus
+author-declared `write_flags`, and a flag named for its PURPOSE rather than its direction is in
+neither.
+
+`a_path_named_flag_records_its_facet_profile` + `tests/fixtures/path_named_flag_facets.tsv` hold the
+line: a path-named flag that auto-approves a sensitive path must be recorded, with `operation` /
+`locus` / `persistence` validated against `src/engine/facet.rs` so an invented or unfilled term is a
+build error. Red-demoed four ways: unlisted candidate, stale row, invented facet term, missing
+evidence note.
+
+**Do NOT schedule a campaign against the 928 rows.** Measured: they span 297 commands, 225 of which
+already carry a `researched_version` — so 714 of 928 sit on commands that were already researched
+under the PRE-FACET standard. Redoing those under facets IS the re-research campaign; a second
+worklist would duplicate it and compete for the same attention. Rows leave this file as a side
+effect of that campaign (gate the flag → row stops auto-approving → stale check forces deletion).
+Its standalone value is only that the backlog cannot GROW, plus an ordering signal: a command with
+rows here has evidence of an ungated path capability and is worth re-researching sooner.
+
+The facet framing is what makes the rows worth recording at all, because it splits them into three
+capabilities a write/not-write question flattens into one:
+
+    --cache-dir, --build-path     create · user · data
+    --config-file, --conf-path    CONFIGURE · reconfiguring — changes what LATER commands do, and
+                                  `pathgate::Role` cannot express it. Gating these as "write" would
+                                  record the wrong capability and call it closed.
+    --vault-password-file         SECRET READ on the disclosure axis; already denies elsewhere.
+
+### Adversarial review of the sub-scoped gate — TWO fail-opens in code written the same day
+
+Both were in the mechanism added hours earlier, both invisible to the tests that "proved" it worked,
+and both reachable.
+
+**1. A flag before the sub walked past the gate.** The lookup checked `tokens[1]` only. Measured with
+a temporary gate on `helm list`:
+
+    helm list ~/.ssh/authorized_keys                  DENY
+    helm --namespace foo list ~/.ssh/authorized_keys  ALLOW   <- bypass
+
+Fixed by trying EVERY bare token as a candidate sub, applying the gate from that offset. Scanning for
+"the first bare token" would NOT have worked — a valued pre-flag's value is itself bare (`foo`
+above), so it would have found the wrong token. Trying all of them needs no flag-arity knowledge at
+this layer and fails closed; the cost is that a positional whose text equals a sub name engages that
+sub's gate, which can only add a denial.
+
+Why the original tests missed it: `rbs` and `smbutil` both REJECT pre-sub flags at dispatch, so the
+gap could not show up on either of the two commands that use the mechanism. The regression test
+therefore drives the token walk directly instead of relying on a real command to expose it.
+
+**2. A sub ALIAS evaded the gate — and that one was hiding a live hole.** A key matches the literal
+token, so gating the canonical spelling leaves every alias open:
+
+    swiftlint fix ~/.ssh/authorized_keys          DENY
+    swiftlint autocorrect ~/.ssh/authorized_keys  ALLOW   <- same code path, alias spelling
+
+`swiftlint fix` rewrites files IN PLACE, so it was an ungated in-place rewriter before this — the
+alias probe is what surfaced it. Both spellings are now gated, with examples. 35 subs in the registry
+declare aliases, so this was a trap laid for the next author, not a one-off.
+
+`a_sub_scoped_gate_covers_every_spelling_of_its_sub` now fails the build when a gate names some
+spellings of a sub but not all. That is a GUARD, not the deeper fix: `should_deny` still cannot
+resolve a sub alias to its canonical name (the pathgate layer has no sub-name canonicalizer). The
+guard makes the gap impossible to spring silently, which is the property that matters until then.
+
+**And `swiftlint`'s own description already said "aliased autocorrect … rewrites files in place"** —
+the third entry this session whose text recorded the capability while no gate existed (`rbs annotate`,
+`dart format`, now this). That pattern is the argument for deriving gates FROM the description's
+facts rather than trusting a separate hand-written gate to agree with them.
+
+### Known limitations of the new guards — recorded, not fixed
+
+- **`operand_write_probe_artifacts.tsv` masks future change.** A row says "these operands are not
+  file targets". If the command later starts writing its operands, the row keeps suppressing the
+  finding, and the stale check cannot see it (that only fires when a row STOPS auto-approving).
+- **`a_path_named_flag_records_its_facet_profile` under-selects.** It probes `<scope> <flag>
+  <sensitive>`; a flag needing further operands may deny for the WRONG reason (missing positional),
+  so the candidate never enters the population. Fail-open in selection, documented in the fixture.
+- **The guard shipped not compiling, and that hid 142 rows.** `src/registry/tests.rs` referenced
+  `TomlSub` without importing it, so `cargo test --lib` failed to BUILD — which reads as a broken
+  tree, not as a failing guard, and `cargo build` stayed green throughout. With the import added the
+  nested-sub walk ran for the first time and the population went 786 → 928. The lesson is the one
+  `--all-targets` already teaches for clippy: a guard is only as good as the last time it actually
+  executed, and "the suite didn't compile" is the failure mode that looks least like one.
+- **`shfmt --write=true ./a.sh` is a NEW false deny** introduced by moving `--write` from `valued` to
+  `standalone`. The move is correct — with `--write` valued, `shfmt --write ~/.ssh/config` has the
+  flag swallow the path and leaves no positional for `write_when`, which is the original hole. The
+  real gap is that the parser rejects `=value` on a boolean flag, which Go's flag package accepts;
+  `-w=true` already denied before this change, so the class predates it.
+
 ### Still-open holes the name heuristic cannot reach (from t–z)
 
     trivy fs|image|sbom --cache-dir DIR    a directory trivy WRITES its vulnerability DB into

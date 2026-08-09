@@ -1,0 +1,995 @@
+# Path-named flags that auto-approve a sensitive path, with their FACET PROFILE.
+#
+# Guard: registry::tests::a_path_named_flag_records_its_facet_profile.
+#
+# WHY THIS EXISTS SEPARATELY FROM output_flag_worklist.tsv
+#
+# That list asks "does this flag write?", which is the legacy band's question. It cannot record WHY
+# a row is safe, so its verdicts collapse three different capabilities into one row type — and the
+# collapse mis-triages the middle one:
+#
+#   --cache-dir, --build-path      create · user · persists as DATA
+#   --config-file, --conf-path     CONFIGURE · persists by RECONFIGURING future commands. Strictly
+#                                  worse than dropping data, and `pathgate::Role` (read/write/exec)
+#                                  cannot express it — gating these as "write" would record the
+#                                  wrong capability and call it closed.
+#   --vault-password-file          a SECRET READ on the disclosure axis. Not a write at all; these
+#                                  already deny, via a different mechanism.
+#
+# So a row here declares what the capability IS. The vocabulary is validated against the engine's
+# own enums (src/engine/facet.rs), so an invented or unfilled term is a build error rather than a
+# vague "verified format-only" nobody can re-check.
+#
+# COLUMNS
+#   scope        `<command>` or `<command> <sub>`
+#   flag         the flag as spelled in the entry's `valued` list
+#   disposition  untriaged | not-a-path | in-workspace | pending-gate
+#   operation    observe | create | mutate | destroy | execute | communicate | configure |
+#                authorize | control        (`-` only when untriaged)
+#   locus        process | temp | sandbox-scope | worktree | adjacent | worktree-trusted | user |
+#                machine | system-integrity | device | kernel        (`-` only when untriaged)
+#   persistence  transient | data | reconfiguring | installing       (`-` only when untriaged)
+#   note         the evidence. Required for every triaged row.
+#
+# THIS IS A RATCHET, NOT A WORK QUEUE. Do not schedule a campaign against it.
+#
+# Measured 2026-08-08: the 787 rows span 285 commands, and 224 of those already carry a
+# `researched_version` — i.e. 639 of the rows sit on commands that were ALREADY researched, just
+# under the pre-facet standard. Re-researching those commands under the facet taxonomy is the
+# existing campaign (see TODO.md), and it is the same work. A second list would compete with that
+# campaign for attention while duplicating it.
+#
+# So rows leave this file as a SIDE EFFECT of re-research: when a command is redone under facets and
+# its path-bearing flags are gated, the row stops auto-approving and the stale check requires its
+# deletion. What this file does on its own is FAIL CLOSED on a path-named flag that is not recorded
+# — which stops the backlog GROWING while the campaign drains it.
+#
+# Its second use is ORDERING, not tracking: a command with rows here has concrete evidence of an
+# ungated path capability, which is a reason to re-research it sooner than one that does not.
+#
+# DISPOSITIONS
+#   untriaged     seeded 2026-08-08 to hold the line. NOT a safety claim — nobody has looked.
+#   not-a-path    the value is not a filesystem location (`--profile` is an AWS/named profile;
+#                 `--filename` on some tools is a display label). No capability to profile, so the
+#                 facet columns stay `-`, but the note must say what the value IS. Stays forever.
+#   in-workspace  the value is a path, but the command binds it inside the workspace by
+#                 construction, so it cannot reach a higher rung. Stays, with the binding recorded.
+#   pending-gate  a real capability at a rung above worktree, profile recorded, gate NOT yet
+#                 applied — normally because the gate needs a mechanism that does not exist yet.
+#
+# The population selector is a NAME heuristic (`dir`/`path`/`file`/`folder`), which is deliberately
+# dumb. Under-selecting only leaves a flag unswept — never a claim that it is safe — so the selector
+# is not a safety boundary and must not be read as one.
+#
+# The guard fails in BOTH directions: a candidate missing from this file fails closed, and a row
+# that no longer auto-approves fails as stale (it was gated — delete the row).
+#
+# scope	flag	disposition	operation	locus	persistence	note
+@arethetypeswrong/cli	--config-path	untriaged	-	-	-	
+@axe-core/cli	--chromedriver-path	untriaged	-	-	-	
+@axe-core/cli	--dir	untriaged	-	-	-	
+@herb-tools/linter	--config-file	untriaged	-	-	-	
+@htmlhint/htmlhint	--rulesdir	untriaged	-	-	-	
+@ls-lint/ls-lint	--workdir	untriaged	-	-	-	
+@microsoft/api-extractor run	--typescript-compiler-folder	untriaged	-	-	-	
+@shopify/theme-check	--path	untriaged	-	-	-	
+@stoplight/spectral-cli lint	--stdin-filepath	untriaged	-	-	-	
+aapt2 dump badging	--file	untriaged	-	-	-	
+aapt2 dump configurations	--file	untriaged	-	-	-	
+aapt2 dump permissions	--file	untriaged	-	-	-	
+aapt2 dump resources	--file	untriaged	-	-	-	
+aapt2 dump strings	--file	untriaged	-	-	-	
+aapt2 dump styleparents	--file	untriaged	-	-	-	
+aapt2 dump xmlstrings	--file	untriaged	-	-	-	
+aapt2 dump xmltree	--file	untriaged	-	-	-	
+ack	--ignore-dir	untriaged	-	-	-	
+ack	--noignore-dir	untriaged	-	-	-	
+aclocal	--aclocal-path	untriaged	-	-	-	
+aclocal	--automake-acdir	untriaged	-	-	-	
+aclocal	--system-acdir	untriaged	-	-	-	
+actool	--sticker-pack-strings-file	untriaged	-	-	-	
+ag	--file-search-regex	untriaged	-	-	-	
+ag	--path-to-ignore	untriaged	-	-	-	
+age	--recipients-file	untriaged	-	-	-	
+alembic revision	--version-path	untriaged	-	-	-	
+amplify status	--profile	untriaged	-	-	-	
+amtool config routes test	--config.file	untriaged	-	-	-	
+anchor idl parse	--file	untriaged	-	-	-	
+ansible-doc	--module-path	untriaged	-	-	-	
+ansible-lint	--config-file	untriaged	-	-	-	
+ansible-lint	--ignore-file	untriaged	-	-	-	
+ansible-lint	--profile	untriaged	-	-	-	
+ansible-lint	--project-dir	untriaged	-	-	-	
+ansible-lint	--rulesdir	untriaged	-	-	-	
+ansible-lint	--show-relpath	untriaged	-	-	-	
+ansible-vault encrypt	--vault-password-file	untriaged	-	-	-	
+ansible-vault encrypt_string	--vault-password-file	untriaged	-	-	-	
+apkanalyzer dex packages	--files	untriaged	-	-	-	
+apkanalyzer dex packages	--proguard-folder	untriaged	-	-	-	
+arduino-cli compile	--build-cache-path	untriaged	-	-	-	
+arduino-cli compile	--build-path	untriaged	-	-	-	
+arduino-cli compile	--config-file	untriaged	-	-	-	
+arduino-cli compile	--export-dir	untriaged	-	-	-	
+arduino-cli compile	--input-dir	untriaged	-	-	-	
+arduino-cli compile	--log-file	untriaged	-	-	-	
+arduino-cli compile	--profile	untriaged	-	-	-	
+argocd version	--grpc-web-root-path	untriaged	-	-	-	
+artisan migrate:status	--path	untriaged	-	-	-	
+artisan route:list	--except-path	untriaged	-	-	-	
+artisan route:list	--path	untriaged	-	-	-	
+asciidoctor	--base-dir	untriaged	-	-	-	
+asciidoctor	--source-dir	untriaged	-	-	-	
+atlas migrate diff	--dir	untriaged	-	-	-	
+atlas migrate hash	--dir	untriaged	-	-	-	
+atlas migrate lint	--dir	untriaged	-	-	-	
+atlas migrate lint	--git-dir	untriaged	-	-	-	
+atlas migrate status	--dir	untriaged	-	-	-	
+atlas migrate test	--dir	untriaged	-	-	-	
+atlas migrate validate	--dir	untriaged	-	-	-	
+automake	--libdir	untriaged	-	-	-	
+aws secretsmanager describe-secret	--profile	untriaged	-	-	-	
+aws secretsmanager list-secret-version-ids	--profile	untriaged	-	-	-	
+aws secretsmanager list-secrets	--profile	untriaged	-	-	-	
+bandit	--configfile	untriaged	-	-	-	
+bandit	--profile	untriaged	-	-	-	
+bc	--file	untriaged	-	-	-	
+biber	--input-directory	untriaged	-	-	-	
+biber	--logfile	untriaged	-	-	-	
+biber	--output-directory	untriaged	-	-	-	
+biome check	--config-path	untriaged	-	-	-	
+biome check	--stdin-file-path	untriaged	-	-	-	
+biome ci	--config-path	untriaged	-	-	-	
+biome format	--config-path	untriaged	-	-	-	
+biome format	--stdin-file-path	untriaged	-	-	-	
+biome lint	--config-path	untriaged	-	-	-	
+biome lint	--stdin-file-path	untriaged	-	-	-	
+bombardier	--body-file	untriaged	-	-	-	
+brakeman	--add-checks-path	untriaged	-	-	-	
+brakeman	--app-path	untriaged	-	-	-	
+brakeman	--config-file	untriaged	-	-	-	
+brakeman	--only-files	untriaged	-	-	-	
+brakeman	--path	untriaged	-	-	-	
+brakeman	--skip-files	untriaged	-	-	-	
+brew bundle check	--file	untriaged	-	-	-	
+brew bundle list	--file	untriaged	-	-	-	
+buck2 targets	--config-file	untriaged	-	-	-	
+buf breaking	--exclude-path	untriaged	-	-	-	
+buf breaking	--path	untriaged	-	-	-	
+buf build	--exclude-path	untriaged	-	-	-	
+buf build	--path	untriaged	-	-	-	
+buf format	--exclude-path	untriaged	-	-	-	
+buf format	--path	untriaged	-	-	-	
+buf generate	--exclude-path	untriaged	-	-	-	
+buf generate	--path	untriaged	-	-	-	
+buf lint	--exclude-path	untriaged	-	-	-	
+buf lint	--path	untriaged	-	-	-	
+bun build	--public-path	untriaged	-	-	-	
+bundle check	--gemfile	untriaged	-	-	-	
+bundle install	--gemfile	untriaged	-	-	-	
+bundler-audit check	--gemfile-lock	untriaged	-	-	-	
+bundletool dump config	--xpath	untriaged	-	-	-	
+bundletool dump manifest	--xpath	untriaged	-	-	-	
+bundletool dump resources	--xpath	untriaged	-	-	-	
+c8 check-coverage	--per-file	untriaged	-	-	-	
+c8 report	--reports-dir	untriaged	-	-	-	
+c8 report	--temp-directory	untriaged	-	-	-	
+caddy manpage	--directory	untriaged	-	-	-	
+cargo audit	--file	untriaged	-	-	-	
+cargo bench	--profile	untriaged	-	-	-	
+cargo build	--profile	untriaged	-	-	-	
+cargo check	--profile	untriaged	-	-	-	
+cargo clean	--lockfile-path	untriaged	-	-	-	
+cargo clean	--profile	untriaged	-	-	-	
+cargo clippy	--profile	untriaged	-	-	-	
+cargo criterion	--criterion-manifest-path	untriaged	-	-	-	
+cargo cyclonedx	--override-filename	untriaged	-	-	-	
+cargo doc	--profile	untriaged	-	-	-	
+cargo fetch	--lockfile-path	untriaged	-	-	-	
+cargo install	--path	untriaged	-	-	-	
+cargo install	--profile	untriaged	-	-	-	
+cargo llvm-cov	--ignore-filename-regex	untriaged	-	-	-	
+cargo llvm-cov	--profile	untriaged	-	-	-	
+cargo msrv find	--path	untriaged	-	-	-	
+cargo msrv list	--path	untriaged	-	-	-	
+cargo msrv show	--path	untriaged	-	-	-	
+cargo msrv verify	--path	untriaged	-	-	-	
+cargo mutants	--file	untriaged	-	-	-	
+cargo mutants	--profile	untriaged	-	-	-	
+cargo nextest archive	--archive-file	untriaged	-	-	-	
+cargo nextest archive	--cargo-profile	untriaged	-	-	-	
+cargo nextest list	--profile	untriaged	-	-	-	
+cargo nextest run	--cargo-profile	untriaged	-	-	-	
+cargo nextest run	--profile	untriaged	-	-	-	
+cargo run	--profile	untriaged	-	-	-	
+cargo semver-checks check-release	--config-path	untriaged	-	-	-	
+cargo test	--profile	untriaged	-	-	-	
+cargo udeps	--profile	untriaged	-	-	-	
+cargo vendor	--lockfile-path	untriaged	-	-	-	
+cdk diff	--profile	untriaged	-	-	-	
+cdk list	--profile	untriaged	-	-	-	
+cdk ls	--profile	untriaged	-	-	-	
+cdk synth	--profile	untriaged	-	-	-	
+certbot certificates	--config-dir	untriaged	-	-	-	
+certbot certificates	--logs-dir	untriaged	-	-	-	
+certbot plugins	--config-dir	untriaged	-	-	-	
+chalice logs	--profile	untriaged	-	-	-	
+chalice url	--profile	untriaged	-	-	-	
+clang-tidy	--config-file	untriaged	-	-	-	
+clang-tidy	--store-check-profile	untriaged	-	-	-	
+cloc	--exclude-dir	untriaged	-	-	-	
+cloc	--exclude-list-file	untriaged	-	-	-	
+cloc	--fullpath	untriaged	-	-	-	
+cloc	--list-file	untriaged	-	-	-	
+cloc	--read-binary-files	untriaged	-	-	-	
+code	--extensions-dir	untriaged	-	-	-	
+code	--profile	untriaged	-	-	-	
+code	--user-data-dir	untriaged	-	-	-	
+consul info	-token-file	untriaged	-	-	-	
+consul members	-token-file	untriaged	-	-	-	
+copilot app ls	--profile	untriaged	-	-	-	
+copilot app show	--profile	untriaged	-	-	-	
+coqc	-native-output-dir	untriaged	-	-	-	
+coqc	-time-file	untriaged	-	-	-	
+coverage combine	--data-file	untriaged	-	-	-	
+coverage html	--data-file	untriaged	-	-	-	
+coverage json	--data-file	untriaged	-	-	-	
+coverage report	--data-file	untriaged	-	-	-	
+coverage run	--data-file	untriaged	-	-	-	
+coverage run	--rcfile	untriaged	-	-	-	
+cppcheck	--cppcheck-build-dir	untriaged	-	-	-	
+cppcheck	--includes-file	untriaged	-	-	-	
+cppcheck	--rule-file	untriaged	-	-	-	
+credo	--config-file	untriaged	-	-	-	
+cucumber	--profile	untriaged	-	-	-	
+cucumber-js	--paths	untriaged	-	-	-	
+dart analyze	--directory	untriaged	-	-	-	
+dawn scan	--config-file	untriaged	-	-	-	
+dbmate status	--config-file	untriaged	-	-	-	
+dbmate status	--migrations-dir	untriaged	-	-	-	
+dbmate status	--schema-file	untriaged	-	-	-	
+dbt clean	--profile	untriaged	-	-	-	
+dbt clean	--profiles-dir	untriaged	-	-	-	
+dbt clean	--project-dir	untriaged	-	-	-	
+dbt compile	--profile	untriaged	-	-	-	
+dbt compile	--profiles-dir	untriaged	-	-	-	
+dbt compile	--project-dir	untriaged	-	-	-	
+dbt compile	--target-path	untriaged	-	-	-	
+dbt debug	--profile	untriaged	-	-	-	
+dbt debug	--profiles-dir	untriaged	-	-	-	
+dbt debug	--project-dir	untriaged	-	-	-	
+dbt deps	--profile	untriaged	-	-	-	
+dbt deps	--profiles-dir	untriaged	-	-	-	
+dbt deps	--project-dir	untriaged	-	-	-	
+dbt list	--profile	untriaged	-	-	-	
+dbt list	--profiles-dir	untriaged	-	-	-	
+dbt list	--project-dir	untriaged	-	-	-	
+dbt ls	--profile	untriaged	-	-	-	
+dbt ls	--profiles-dir	untriaged	-	-	-	
+dbt ls	--project-dir	untriaged	-	-	-	
+dbt parse	--profile	untriaged	-	-	-	
+dbt parse	--profiles-dir	untriaged	-	-	-	
+dbt parse	--project-dir	untriaged	-	-	-	
+dbt parse	--target-path	untriaged	-	-	-	
+dc	--file	untriaged	-	-	-	
+depcheck	--ignore-dirs	untriaged	-	-	-	
+depcheck	--ignore-path	untriaged	-	-	-	
+deptry	--requirements-files	untriaged	-	-	-	
+deptry	--requirements-files-dev	untriaged	-	-	-	
+detekt	--classpath	untriaged	-	-	-	
+diesel migration generate	--migrations-dir	untriaged	-	-	-	
+diesel migration list	--migrations-dir	untriaged	-	-	-	
+diesel migration pending	--migrations-dir	untriaged	-	-	-	
+diesel print-schema	--patch-file	untriaged	-	-	-	
+docfx build	--changesFile	untriaged	-	-	-	
+docfx build	--fileMetadata	untriaged	-	-	-	
+docfx build	--fileMetadataFiles	untriaged	-	-	-	
+docfx build	--globalMetadataFiles	untriaged	-	-	-	
+docfx build	--logFile	untriaged	-	-	-	
+docfx build	--templateFolder	untriaged	-	-	-	
+docfx metadata	--logFile	untriaged	-	-	-	
+docker-compose config	--profile	untriaged	-	-	-	
+dotnet build	--artifacts-path	untriaged	-	-	-	
+dotnet clean	--artifacts-path	untriaged	-	-	-	
+dotnet nuget verify	--configfile	untriaged	-	-	-	
+dotnet pack	--artifacts-path	untriaged	-	-	-	
+dotnet publish	--artifacts-path	untriaged	-	-	-	
+dotnet restore	--artifacts-path	untriaged	-	-	-	
+dotnet restore	--configfile	untriaged	-	-	-	
+dotnet restore	--lock-file-path	untriaged	-	-	-	
+dotnet sln add	--solution-folder	untriaged	-	-	-	
+dotnet test	--artifacts-path	untriaged	-	-	-	
+dotnet test	--results-directory	untriaged	-	-	-	
+dotnet test	--test-adapter-path	untriaged	-	-	-	
+dotnet tool list	--tool-path	untriaged	-	-	-	
+dotnet-ef migrations list	--msbuildprojectextensionspath	untriaged	-	-	-	
+dotnet-symbol	--authenticated-server-path	untriaged	-	-	-	
+dotnet-symbol	--cache-directory	untriaged	-	-	-	
+dotnet-symbol	--server-path	untriaged	-	-	-	
+dsymutil	--oso-prepend-path	untriaged	-	-	-	
+dsymutil	--remarks-prepend-path	untriaged	-	-	-	
+du	--files0-from	untriaged	-	-	-	
+dvc add	--file	untriaged	-	-	-	
+dyld_info	-all_dir	untriaged	-	-	-	
+eb events	--profile	untriaged	-	-	-	
+eb health	--profile	untriaged	-	-	-	
+eb list	--profile	untriaged	-	-	-	
+eb logs	--profile	untriaged	-	-	-	
+eb printenv	--profile	untriaged	-	-	-	
+eb status	--profile	untriaged	-	-	-	
+eleventy	--pathprefix	untriaged	-	-	-	
+erb_lint	--custom-rule-files	untriaged	-	-	-	
+eslint	--ignore-path	untriaged	-	-	-	
+eslint	--rulesdir	untriaged	-	-	-	
+espeak-ng	--path	untriaged	-	-	-	
+exiftool	-fileOrder	untriaged	-	-	-	
+exiftool	-srcfile	untriaged	-	-	-	
+eza	--group-directories-first-dirs	untriaged	-	-	-	
+file	--files-from	untriaged	-	-	-	
+file	--magic-file	untriaged	-	-	-	
+findmnt	--direction	untriaged	-	-	-	
+findmnt	--tab-file	untriaged	-	-	-	
+flake8	--filename	untriaged	-	-	-	
+flake8	--per-file-ignores	untriaged	-	-	-	
+flutter config	--android-studio-dir	untriaged	-	-	-	
+flutter config	--build-dir	untriaged	-	-	-	
+flutter config	--jdk-dir	untriaged	-	-	-	
+flutter config	--no-android-studio-dir	untriaged	-	-	-	
+flutter config	--no-build-dir	untriaged	-	-	-	
+foreman check	--procfile	untriaged	-	-	-	
+forge lint	--config-path	untriaged	-	-	-	
+fossil diff	--exec-abs-paths	untriaged	-	-	-	
+fossil diff	--exec-rel-paths	untriaged	-	-	-	
+fpm	--chdir	untriaged	-	-	-	
+fpm	--config-files	untriaged	-	-	-	
+fpm	--directories	untriaged	-	-	-	
+fpm	--exclude-file	untriaged	-	-	-	
+fpm	--fpm-options-file	untriaged	-	-	-	
+fpm	--workdir	untriaged	-	-	-	
+geth dump	--datadir	untriaged	-	-	-	
+gettextize	--po-dir	untriaged	-	-	-	
+git add	--pathspec-from-file	untriaged	-	-	-	
+git blame	--ignore-revs-file	untriaged	-	-	-	
+git cat-file	--path	untriaged	-	-	-	
+git commit	--file	untriaged	-	-	-	
+git describe	--dirty	untriaged	-	-	-	
+git diff	--dirstat	untriaged	-	-	-	
+git grep	--open-files-in-pager	untriaged	-	-	-	
+git ls-files	--exclude-per-directory	untriaged	-	-	-	
+git rev-parse	--resolve-git-dir	untriaged	-	-	-	
+git status	--untracked-files	untriaged	-	-	-	
+git-lfs locks	--path	untriaged	-	-	-	
+gitleaks detect	--baseline-path	untriaged	-	-	-	
+gitleaks detect	--gitleaks-ignore-path	untriaged	-	-	-	
+gitleaks detect	--report-path	untriaged	-	-	-	
+gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-	
+gitleaks protect	--report-path	untriaged	-	-	-	
+go build	-modfile	untriaged	-	-	-	
+go build	-pkgdir	untriaged	-	-	-	
+go list	-modfile	untriaged	-	-	-	
+go list	-pkgdir	untriaged	-	-	-	
+go run	-modfile	untriaged	-	-	-	
+go run	-pkgdir	untriaged	-	-	-	
+go test	-blockprofile	untriaged	-	-	-	
+go test	-blockprofilerate	untriaged	-	-	-	
+go test	-coverprofile	untriaged	-	-	-	
+go test	-cpuprofile	untriaged	-	-	-	
+go test	-memprofile	untriaged	-	-	-	
+go test	-memprofilerate	untriaged	-	-	-	
+go test	-modfile	untriaged	-	-	-	
+go test	-mutexprofile	untriaged	-	-	-	
+go test	-mutexprofilefraction	untriaged	-	-	-	
+go test	-outputdir	untriaged	-	-	-	
+go test	-pkgdir	untriaged	-	-	-	
+go vet	-modfile	untriaged	-	-	-	
+go vet	-pkgdir	untriaged	-	-	-	
+golangci-lint run	--path-prefix	untriaged	-	-	-	
+golangci-lint run	--skip-dirs	untriaged	-	-	-	
+golangci-lint run	--skip-files	untriaged	-	-	-	
+goreleaser check	--load-env-files	untriaged	-	-	-	
+goreleaser verify	--checksum-file	untriaged	-	-	-	
+gosec	--exclude-dir	untriaged	-	-	-	
+gosec	-exclude-dir	untriaged	-	-	-	
+gotestsum	--junitfile-project-name	untriaged	-	-	-	
+gotestsum	--junitfile-testcase-classname	untriaged	-	-	-	
+gotestsum	--junitfile-testsuite-name	untriaged	-	-	-	
+grpcurl	-import-path	untriaged	-	-	-	
+haml-lint	--file	untriaged	-	-	-	
+helm lint	--set-file	untriaged	-	-	-	
+helm show values	--jsonpath	untriaged	-	-	-	
+helm template	--set-file	untriaged	-	-	-	
+helmfile diff	--retain-values-files	untriaged	-	-	-	
+helmfile template	--output-dir-template	untriaged	-	-	-	
+hexo new	--path	untriaged	-	-	-	
+hlint	--cpp-file	untriaged	-	-	-	
+hlint	--data-dir	untriaged	-	-	-	
+hlint	--path	untriaged	-	-	-	
+huggingface-cli scan-cache	--dir	untriaged	-	-	-	
+hugo build	--cacheDir	untriaged	-	-	-	
+hugo build	--contentDir	untriaged	-	-	-	
+hugo build	--layoutDir	untriaged	-	-	-	
+hugo build	--logFile	untriaged	-	-	-	
+hugo build	--themesDir	untriaged	-	-	-	
+hugo gen autocomplete	--completionfile	untriaged	-	-	-	
+hugo gen docs	--dir	untriaged	-	-	-	
+hugo gen man	--dir	untriaged	-	-	-	
+hurl	--file-root	untriaged	-	-	-	
+hurl	--max-filesize	untriaged	-	-	-	
+hurl	--max-redirs	untriaged	-	-	-	
+hurl	--netrc-file	untriaged	-	-	-	
+hurl	--secrets-file	untriaged	-	-	-	
+hurl	--variables-file	untriaged	-	-	-	
+ibtool	--companion-strings-file	untriaged	-	-	-	
+ibtool	--export-strings-file	untriaged	-	-	-	
+ibtool	--import-strings-file	untriaged	-	-	-	
+ibtool	--incremental-file	untriaged	-	-	-	
+ibtool	--previous-file	untriaged	-	-	-	
+idn	--profile	untriaged	-	-	-	
+influxd print-config	--bolt-path	untriaged	-	-	-	
+influxd print-config	--engine-path	untriaged	-	-	-	
+inso generate config	--working-dir	untriaged	-	-	-	
+inso lint spec	--working-dir	untriaged	-	-	-	
+iperf3	--bidir	untriaged	-	-	-	
+iperf3	--file	untriaged	-	-	-	
+iperf3	--logfile	untriaged	-	-	-	
+iperf3	--pidfile	untriaged	-	-	-	
+ippfind	--path	untriaged	-	-	-	
+istioctl analyze	--meshConfigFile	untriaged	-	-	-	
+istioctl proxy-status	--file	untriaged	-	-	-	
+istioctl validate	--filename	untriaged	-	-	-	
+istioctl version	--filename	untriaged	-	-	-	
+javap	-bootclasspath	untriaged	-	-	-	
+javap	-classpath	untriaged	-	-	-	
+jdeps	--class-path	untriaged	-	-	-	
+jdeps	--module-path	untriaged	-	-	-	
+jdeps	--upgrade-module-path	untriaged	-	-	-	
+jdeps	-classpath	untriaged	-	-	-	
+jest	--testPathPattern	untriaged	-	-	-	
+journalctl	--directory	untriaged	-	-	-	
+journalctl	--file	untriaged	-	-	-	
+jupyter-nbconvert	--template-file	untriaged	-	-	-	
+keytool -printcert	-file	untriaged	-	-	-	
+keytool -printcert	-jarfile	untriaged	-	-	-	
+knex migrate:currentVersion	--knexfile	untriaged	-	-	-	
+knex migrate:currentVersion	--knexpath	untriaged	-	-	-	
+knex migrate:list	--knexfile	untriaged	-	-	-	
+knex migrate:list	--knexpath	untriaged	-	-	-	
+knex migrate:make	--knexfile	untriaged	-	-	-	
+knex migrate:make	--knexpath	untriaged	-	-	-	
+knex migrate:status	--knexfile	untriaged	-	-	-	
+knex migrate:status	--knexpath	untriaged	-	-	-	
+knex seed:make	--knexfile	untriaged	-	-	-	
+knex seed:make	--knexpath	untriaged	-	-	-	
+knex seed:make	--timestamp-filename-date	untriaged	-	-	-	
+kotlinc	-classpath	untriaged	-	-	-	
+kotlinc	-Xfriend-paths	untriaged	-	-	-	
+kramdown	--config-file	untriaged	-	-	-	
+kubectl diff	--filename	untriaged	-	-	-	
+latexmk	--output-directory	untriaged	-	-	-	
+latexmk	-aux-directory	untriaged	-	-	-	
+latexmk	-output-directory	untriaged	-	-	-	
+license-checker	--clarificationsFile	untriaged	-	-	-	
+license-checker	--customPath	untriaged	-	-	-	
+llvm-otool	--object-tool-path	untriaged	-	-	-	
+llvm-otool	-object-tool-path	untriaged	-	-	-	
+localedef	--inputfile	untriaged	-	-	-	
+madge	--basedir	untriaged	-	-	-	
+madge	--rankdir	untriaged	-	-	-	
+man	--config-file	untriaged	-	-	-	
+man	--manpath	untriaged	-	-	-	
+markdownlint	--ignore-path	untriaged	-	-	-	
+markdownlint-cli2	--directories	untriaged	-	-	-	
+marp	--allow-local-files	untriaged	-	-	-	
+marp	--browser-path	untriaged	-	-	-	
+marp	--input-dir	untriaged	-	-	-	
+masscan	--excludefile	untriaged	-	-	-	
+masscan	--includefile	untriaged	-	-	-	
+masscan	--output-filename	untriaged	-	-	-	
+masscan	--rotate-dir	untriaged	-	-	-	
+mc find	--path	untriaged	-	-	-	
+mcs	/keyfile	untriaged	-	-	-	
+mdbook test	--library-path	untriaged	-	-	-	
+mediainfo	--LogFile	untriaged	-	-	-	
+minikube addons list	--profile	untriaged	-	-	-	
+minikube ip	--profile	untriaged	-	-	-	
+minikube service list	--profile	untriaged	-	-	-	
+minikube status	--profile	untriaged	-	-	-	
+mkcert	--p12-file	untriaged	-	-	-	
+mkcert	-p12-file	untriaged	-	-	-	
+mktemp	--tmpdir	untriaged	-	-	-	
+mongodump	--queryFile	untriaged	-	-	-	
+mongodump	--sslCAFile	untriaged	-	-	-	
+mongodump	--sslCRLFile	untriaged	-	-	-	
+mongodump	--sslPEMKeyFile	untriaged	-	-	-	
+mongodump	--tlsCAFile	untriaged	-	-	-	
+mongodump	--tlsCertificateKeyFile	untriaged	-	-	-	
+mongoexport	--fieldFile	untriaged	-	-	-	
+mongoexport	--queryFile	untriaged	-	-	-	
+mongoexport	--sslCAFile	untriaged	-	-	-	
+mongoexport	--sslCRLFile	untriaged	-	-	-	
+mongoexport	--sslPEMKeyFile	untriaged	-	-	-	
+mongoexport	--tlsCAFile	untriaged	-	-	-	
+mongoexport	--tlsCertificateKeyFile	untriaged	-	-	-	
+mongoimport	--fieldFile	untriaged	-	-	-	
+mongoimport	--file	untriaged	-	-	-	
+mongoimport	--sslCAFile	untriaged	-	-	-	
+mongoimport	--sslCRLFile	untriaged	-	-	-	
+mongoimport	--sslPEMKeyFile	untriaged	-	-	-	
+mongoimport	--tlsCAFile	untriaged	-	-	-	
+mongoimport	--tlsCertificateKeyFile	untriaged	-	-	-	
+mongorestore	--sslCAFile	untriaged	-	-	-	
+mongorestore	--sslCRLFile	untriaged	-	-	-	
+mongorestore	--sslPEMKeyFile	untriaged	-	-	-	
+mongorestore	--tlsCAFile	untriaged	-	-	-	
+mongorestore	--tlsCertificateKeyFile	untriaged	-	-	-	
+mongostat	--sslCAFile	untriaged	-	-	-	
+mongostat	--sslCRLFile	untriaged	-	-	-	
+mongostat	--sslPEMKeyFile	untriaged	-	-	-	
+mongostat	--tlsCAFile	untriaged	-	-	-	
+mongostat	--tlsCertificateKeyFile	untriaged	-	-	-	
+mongotop	--sslCAFile	untriaged	-	-	-	
+mongotop	--sslCRLFile	untriaged	-	-	-	
+mongotop	--sslPEMKeyFile	untriaged	-	-	-	
+mongotop	--tlsCAFile	untriaged	-	-	-	
+mongotop	--tlsCertificateKeyFile	untriaged	-	-	-	
+msbuild	-distributedFileLogger	untriaged	-	-	-	
+msbuild	-fileLogger	untriaged	-	-	-	
+msbuild	-fileLoggerParameters	untriaged	-	-	-	
+msbuild	-profileEvaluation	untriaged	-	-	-	
+msbuild	/distributedFileLogger	untriaged	-	-	-	
+msbuild	/fileLogger	untriaged	-	-	-	
+msbuild	/fileLoggerParameters	untriaged	-	-	-	
+msbuild	/profileEvaluation	untriaged	-	-	-	
+msgcat	--files-from	untriaged	-	-	-	
+msgfmt	--directory	untriaged	-	-	-	
+mypy	--cache-dir	untriaged	-	-	-	
+mypy	--config-file	untriaged	-	-	-	
+mysqladmin	--character-sets-dir	untriaged	-	-	-	
+mysqladmin	--login-path	untriaged	-	-	-	
+mysqladmin	--ssl-capath	untriaged	-	-	-	
+mysqlcheck	--login-path	untriaged	-	-	-	
+mysqlcheck	--ssl-capath	untriaged	-	-	-	
+mysqldump	--character-sets-dir	untriaged	-	-	-	
+mysqldump	--login-path	untriaged	-	-	-	
+mysqldump	--pid-file	untriaged	-	-	-	
+mysqldump	--plugin-dir	untriaged	-	-	-	
+mysqldump	--result-file	untriaged	-	-	-	
+mysqldump	--server-public-key-path	untriaged	-	-	-	
+mysqldump	--ssl-capath	untriaged	-	-	-	
+ncu	--configFileName	untriaged	-	-	-	
+ncu	--configFilePath	untriaged	-	-	-	
+neon branches get	--context-file	untriaged	-	-	-	
+neon branches list	--context-file	untriaged	-	-	-	
+neon branches schema-diff	--context-file	untriaged	-	-	-	
+neon databases list	--context-file	untriaged	-	-	-	
+neon ip-allow list	--context-file	untriaged	-	-	-	
+neon me	--context-file	untriaged	-	-	-	
+neon operations list	--context-file	untriaged	-	-	-	
+neon orgs list	--context-file	untriaged	-	-	-	
+neon projects get	--context-file	untriaged	-	-	-	
+neon projects list	--context-file	untriaged	-	-	-	
+neon roles list	--context-file	untriaged	-	-	-	
+neon set-context	--context-file	untriaged	-	-	-	
+newman run	--folder	untriaged	-	-	-	
+newman run	--working-dir	untriaged	-	-	-	
+nix eval	--file	untriaged	-	-	-	
+nix profile diff-closures	--profile	untriaged	-	-	-	
+nix profile history	--profile	untriaged	-	-	-	
+nix profile list	--profile	untriaged	-	-	-	
+nix-collect-garbage	--profile	untriaged	-	-	-	
+nixos-rebuild list-generations	--profile-name	untriaged	-	-	-	
+nomad alloc-status	-token-file	untriaged	-	-	-	
+nomad monitor	-token-file	untriaged	-	-	-	
+nomad node-status	-token-file	untriaged	-	-	-	
+nomad status	-token-file	untriaged	-	-	-	
+nox	--envdir	untriaged	-	-	-	
+nuget config	-ConfigFile	untriaged	-	-	-	
+nuget list	-ConfigFile	untriaged	-	-	-	
+nuget search	-ConfigFile	untriaged	-	-	-	
+nuget sources	-ConfigFile	untriaged	-	-	-	
+nuget spec	-AssemblyPath	untriaged	-	-	-	
+nuget verify	-ConfigFile	untriaged	-	-	-	
+nx graph	--file	untriaged	-	-	-	
+nx graph	--groupByFolder	untriaged	-	-	-	
+nx print-affected	--files	untriaged	-	-	-	
+nyc report	--report-dir	untriaged	-	-	-	
+nyc report	--temp-directory	untriaged	-	-	-	
+oc describe	--filename	untriaged	-	-	-	
+oc diff	--filename	untriaged	-	-	-	
+oha	--max-redirects	untriaged	-	-	-	
+oha	--redirect	untriaged	-	-	-	
+oha	--redirect-uri	untriaged	-	-	-	
+oid2name	--filenode	untriaged	-	-	-	
+opj_compress	-ImgDir	untriaged	-	-	-	
+opj_decompress	-ImgDir	untriaged	-	-	-	
+opj_dump	-ImgDir	untriaged	-	-	-	
+overmind start	--procfile	untriaged	-	-	-	
+packer validate	--var-file	untriaged	-	-	-	
+parcel build	--cache-dir	untriaged	-	-	-	
+parcel build	--dist-dir	untriaged	-	-	-	
+parcel watch	--cache-dir	untriaged	-	-	-	
+parcel watch	--dist-dir	untriaged	-	-	-	
+pcre2grep	--binary-files	untriaged	-	-	-	
+pcre2grep	--directories	untriaged	-	-	-	
+pcre2grep	--exclude-dir	untriaged	-	-	-	
+pcre2grep	--file	untriaged	-	-	-	
+pcre2grep	--file-list	untriaged	-	-	-	
+pcre2grep	--include-dir	untriaged	-	-	-	
+pdfgrep	--file	untriaged	-	-	-	
+pdflatex	--output-directory	untriaged	-	-	-	
+pdflatex	--translate-file	untriaged	-	-	-	
+periphery scan	--index-store-path	untriaged	-	-	-	
+periphery scan	--json-package-manifest-path	untriaged	-	-	-	
+periphery scan	--retain-files	untriaged	-	-	-	
+pest	--cache-directory	untriaged	-	-	-	
+pest	--include-path	untriaged	-	-	-	
+pest	--test-directory	untriaged	-	-	-	
+pg_basebackup	--waldir	untriaged	-	-	-	
+pg_checksums	--filenode	untriaged	-	-	-	
+pg_receivewal	--directory	untriaged	-	-	-	
+pg_recvlogical	--file	untriaged	-	-	-	
+pg_rewind	--config-file	untriaged	-	-	-	
+pg_test_fsync	--filename	untriaged	-	-	-	
+pg_upgrade	--new-bindir	untriaged	-	-	-	
+pg_upgrade	--new-datadir	untriaged	-	-	-	
+pg_upgrade	--old-bindir	untriaged	-	-	-	
+pg_upgrade	--old-datadir	untriaged	-	-	-	
+pg_upgrade	--socketdir	untriaged	-	-	-	
+pg_verifybackup	--manifest-path	untriaged	-	-	-	
+pg_verifybackup	--wal-directory	untriaged	-	-	-	
+pg_waldump	--path	untriaged	-	-	-	
+pgbench	--file	untriaged	-	-	-	
+pgrep	--pidfile	untriaged	-	-	-	
+phpstan analyse	--autoload-file	untriaged	-	-	-	
+phpstan analyse	--tmp-file	untriaged	-	-	-	
+phpstan clear-result-cache	--autoload-file	untriaged	-	-	-	
+phpstan diagnose	--autoload-file	untriaged	-	-	-	
+phpunit	--cache-directory	untriaged	-	-	-	
+phpunit	--include-path	untriaged	-	-	-	
+pijul ls	--repo-path	untriaged	-	-	-	
+pio check	--project-dir	untriaged	-	-	-	
+pio pkg list	--storage-dir	untriaged	-	-	-	
+pio pkg outdated	--storage-dir	untriaged	-	-	-	
+pio pkg show	--storage-dir	untriaged	-	-	-	
+pip freeze	--path	untriaged	-	-	-	
+pip list	--path	untriaged	-	-	-	
+pip-audit	--cache-dir	untriaged	-	-	-	
+pip-audit	--path	untriaged	-	-	-	
+pip-sync	--cache-dir	untriaged	-	-	-	
+please auth:migration	--path	untriaged	-	-	-	
+please nocache:migration	--path	untriaged	-	-	-	
+pod install	--project-directory	untriaged	-	-	-	
+pod update	--project-directory	untriaged	-	-	-	
+pp	--addfile	untriaged	-	-	-	
+promtool check healthy	--http.config.file	untriaged	-	-	-	
+promtool check ready	--http.config.file	untriaged	-	-	-	
+promtool query instant	--http.config.file	untriaged	-	-	-	
+promtool query labels	--http.config.file	untriaged	-	-	-	
+promtool query range	--http.config.file	untriaged	-	-	-	
+promtool query series	--http.config.file	untriaged	-	-	-	
+prove	--statefile	untriaged	-	-	-	
+pulumi preview	--config-file	untriaged	-	-	-	
+pycodestyle	--filename	untriaged	-	-	-	
+pydocstyle	--match-dir	untriaged	-	-	-	
+pylint	--ignore-paths	untriaged	-	-	-	
+pylint	--rcfile	untriaged	-	-	-	
+pyright	--pythonpath	untriaged	-	-	-	
+pyright	--typeshedpath	untriaged	-	-	-	
+pytest	--confcutdir	untriaged	-	-	-	
+pytest	--rootdir	untriaged	-	-	-	
+railway logs	--path	untriaged	-	-	-	
+railway metrics	--path	untriaged	-	-	-	
+rbs prototype	--base-dir	untriaged	-	-	-	
+rbs vendor	--vendor-dir	untriaged	-	-	-	
+rclone check	--checkfile	untriaged	-	-	-	
+rclone hashsum	--checkfile	untriaged	-	-	-	
+rclone md5sum	--checkfile	untriaged	-	-	-	
+rclone sha1sum	--checkfile	untriaged	-	-	-	
+rdfind	-makeresultsfile	untriaged	-	-	-	
+rdoc	--copy-files	untriaged	-	-	-	
+rdoc	--locale-data-dir	untriaged	-	-	-	
+rdoc	--page-dir	untriaged	-	-	-	
+redis-benchmark	--cacertdir	untriaged	-	-	-	
+reek	--exclude-paths	untriaged	-	-	-	
+render logs	--direction	untriaged	-	-	-	
+render logs	--path	untriaged	-	-	-	
+restic dump	--path	untriaged	-	-	-	
+restic find	--path	untriaged	-	-	-	
+restic ls	--path	untriaged	-	-	-	
+restic snapshots	--path	untriaged	-	-	-	
+restic stats	--path	untriaged	-	-	-	
+revive	--max_open_files	untriaged	-	-	-	
+revive	-max_open_files	untriaged	-	-	-	
+rg	--file	untriaged	-	-	-	
+rg	--ignore-file	untriaged	-	-	-	
+rg	--max-filesize	untriaged	-	-	-	
+rg	--path-separator	untriaged	-	-	-	
+rollup	--amd.basePath	untriaged	-	-	-	
+rollup	--assetFileNames	untriaged	-	-	-	
+rollup	--chunkFileNames	untriaged	-	-	-	
+rollup	--entryFileNames	untriaged	-	-	-	
+rspec	--default-path	untriaged	-	-	-	
+rspec	--profile	untriaged	-	-	-	
+rufo	--filename	untriaged	-	-	-	
+rvm install	--with-openssl-dir	untriaged	-	-	-	
+rvm install	--with-readline-dir	untriaged	-	-	-	
+sam list endpoints	--config-file	untriaged	-	-	-	
+sam list endpoints	--profile	untriaged	-	-	-	
+sam list resources	--config-file	untriaged	-	-	-	
+sam list resources	--profile	untriaged	-	-	-	
+sam list resources	--template-file	untriaged	-	-	-	
+sam list stack-outputs	--config-file	untriaged	-	-	-	
+sam list stack-outputs	--profile	untriaged	-	-	-	
+sam list testable-resources	--config-file	untriaged	-	-	-	
+sam list testable-resources	--profile	untriaged	-	-	-	
+sam list testable-resources	--template-file	untriaged	-	-	-	
+sam validate	--config-file	untriaged	-	-	-	
+sam validate	--profile	untriaged	-	-	-	
+sam validate	--template-file	untriaged	-	-	-	
+say	--file-format	untriaged	-	-	-	
+scalac	-bootclasspath	untriaged	-	-	-	
+scalac	-classpath	untriaged	-	-	-	
+scalac	-extdirs	untriaged	-	-	-	
+scalac	-javabootclasspath	untriaged	-	-	-	
+scalac	-sourcepath	untriaged	-	-	-	
+scalafix	--auto-classpath-roots	untriaged	-	-	-	
+scalafix	--classpath	untriaged	-	-	-	
+scalafix	--files	untriaged	-	-	-	
+scalafix	--tool-classpath	untriaged	-	-	-	
+sem diff	--file-exts	untriaged	-	-	-	
+sem impact	--file	untriaged	-	-	-	
+sequelize init	--config-path	untriaged	-	-	-	
+sequelize init	--migrations-path	untriaged	-	-	-	
+sequelize init	--models-path	untriaged	-	-	-	
+sequelize init	--seeders-path	untriaged	-	-	-	
+shellcheck	--rcfile	untriaged	-	-	-	
+shellcheck	--source-path	untriaged	-	-	-	
+shfmt	--filename	untriaged	-	-	-	
+shfmt	-filename	untriaged	-	-	-	
+siege	--file	untriaged	-	-	-	
+skaffold diagnose	--filename	untriaged	-	-	-	
+skaffold find-configs	--directory	untriaged	-	-	-	
+skaffold inspect	--filename	untriaged	-	-	-	
+skopeo inspect	--authfile	untriaged	-	-	-	
+skopeo inspect	--cert-dir	untriaged	-	-	-	
+skopeo list-tags	--authfile	untriaged	-	-	-	
+skopeo list-tags	--cert-dir	untriaged	-	-	-	
+slim-lint	--stdin-file-path	untriaged	-	-	-	
+slither	--config-file	untriaged	-	-	-	
+slither	--filter-paths	untriaged	-	-	-	
+slither	--include-paths	untriaged	-	-	-	
+slither	--solc-working-dir	untriaged	-	-	-	
+sls print	--path	untriaged	-	-	-	
+sntp	--keyfile	untriaged	-	-	-	
+snyk container test	--file	untriaged	-	-	-	
+snyk test	--file	untriaged	-	-	-	
+snyk test	--packages-folder	untriaged	-	-	-	
+solc	--allow-paths	untriaged	-	-	-	
+solc	--base-path	untriaged	-	-	-	
+solc	--include-path	untriaged	-	-	-	
+specdiff	--base-dir	untriaged	-	-	-	
+specdiff	--head-dir	untriaged	-	-	-	
+sphinx-apidoc	--templatedir	untriaged	-	-	-	
+sphinx-apidoc	--tocfile-name	untriaged	-	-	-	
+sphinx-quickstart	--templatedir	untriaged	-	-	-	
+srb tc	--dir	untriaged	-	-	-	
+srb tc	--file	untriaged	-	-	-	
+srb tc	--forcibly-silence-lsp-multiple-dir-error	untriaged	-	-	-	
+srb tc	--remove-path-prefix	untriaged	-	-	-	
+stackprof	--file	untriaged	-	-	-	
+stackprof	--reject-files	untriaged	-	-	-	
+stackprof	--select-files	untriaged	-	-	-	
+starship prompt	--logical-path	untriaged	-	-	-	
+starship prompt	--path	untriaged	-	-	-	
+starship prompt	--profile	untriaged	-	-	-	
+steep ancestors	--steepfile	untriaged	-	-	-	
+steep annotations	--steepfile	untriaged	-	-	-	
+steep check	--steepfile	untriaged	-	-	-	
+steep checkfile	--steepfile	untriaged	-	-	-	
+steep init	--steepfile	untriaged	-	-	-	
+steep list	--steepfile	untriaged	-	-	-	
+steep method	--steepfile	untriaged	-	-	-	
+steep methods	--steepfile	untriaged	-	-	-	
+steep paths	--steepfile	untriaged	-	-	-	
+steep project	--steepfile	untriaged	-	-	-	
+steep stats	--steepfile	untriaged	-	-	-	
+steep validate	--steepfile	untriaged	-	-	-	
+streamzip	-zipfile	untriaged	-	-	-	
+stylelint	--config-basedir	untriaged	-	-	-	
+stylelint	--ignore-path	untriaged	-	-	-	
+stz extract	--hashes-file	untriaged	-	-	-	
+supabase branches get	--workdir	untriaged	-	-	-	
+supabase branches list	--workdir	untriaged	-	-	-	
+supabase db diff	--file	untriaged	-	-	-	
+supabase db diff	--workdir	untriaged	-	-	-	
+supabase db dump	--workdir	untriaged	-	-	-	
+supabase db lint	--workdir	untriaged	-	-	-	
+supabase db pull	--workdir	untriaged	-	-	-	
+supabase domains get	--workdir	untriaged	-	-	-	
+supabase functions download	--workdir	untriaged	-	-	-	
+supabase functions list	--workdir	untriaged	-	-	-	
+supabase gen types	--workdir	untriaged	-	-	-	
+supabase inspect	--workdir	untriaged	-	-	-	
+supabase migration fetch	--workdir	untriaged	-	-	-	
+supabase migration list	--workdir	untriaged	-	-	-	
+supabase network-bans get	--workdir	untriaged	-	-	-	
+supabase network-restrictions get	--workdir	untriaged	-	-	-	
+supabase orgs list	--workdir	untriaged	-	-	-	
+supabase postgres-config get	--workdir	untriaged	-	-	-	
+supabase projects list	--workdir	untriaged	-	-	-	
+supabase secrets list	--workdir	untriaged	-	-	-	
+supabase services	--workdir	untriaged	-	-	-	
+supabase snippets download	--workdir	untriaged	-	-	-	
+supabase snippets list	--workdir	untriaged	-	-	-	
+supabase ssl-enforcement get	--workdir	untriaged	-	-	-	
+supabase sso info	--workdir	untriaged	-	-	-	
+supabase sso list	--workdir	untriaged	-	-	-	
+supabase sso show	--workdir	untriaged	-	-	-	
+supabase storage ls	--workdir	untriaged	-	-	-	
+supabase vanity-subdomains check-availability	--workdir	untriaged	-	-	-	
+supabase vanity-subdomains get	--workdir	untriaged	-	-	-	
+svn blame	--config-dir	untriaged	-	-	-	
+svn cat	--config-dir	untriaged	-	-	-	
+svn diff	--config-dir	untriaged	-	-	-	
+svn info	--config-dir	untriaged	-	-	-	
+svn list	--config-dir	untriaged	-	-	-	
+svn log	--config-dir	untriaged	-	-	-	
+svn log	--xml-file	untriaged	-	-	-	
+svn mergeinfo	--config-dir	untriaged	-	-	-	
+svn propget	--config-dir	untriaged	-	-	-	
+svn proplist	--config-dir	untriaged	-	-	-	
+svn status	--config-dir	untriaged	-	-	-	
+swc	--config-file	untriaged	-	-	-	
+swc	--filename	untriaged	-	-	-	
+swc	--out-file	untriaged	-	-	-	
+swc	--source-file-name	untriaged	-	-	-	
+swift build	--build-path	untriaged	-	-	-	
+swift build	--package-path	untriaged	-	-	-	
+swift package describe	--package-path	untriaged	-	-	-	
+swift package dump-package	--package-path	untriaged	-	-	-	
+swift package show-dependencies	--package-path	untriaged	-	-	-	
+swift test	--build-path	untriaged	-	-	-	
+swift test	--package-path	untriaged	-	-	-	
+swiftlint analyze	--compiler-log-path	untriaged	-	-	-	
+swiftlint analyze	--path	untriaged	-	-	-	
+swiftlint lint	--path	untriaged	-	-	-	
+syft	--file	untriaged	-	-	-	
+task	--dir	untriaged	-	-	-	
+task	--taskfile	untriaged	-	-	-	
+terraform-docs	--lockfile	untriaged	-	-	-	
+terraform-docs	--recursive-path	untriaged	-	-	-	
+tflint	--var-file	untriaged	-	-	-	
+tfsec	--config-file	untriaged	-	-	-	
+tfsec	--custom-check-dir	untriaged	-	-	-	
+tfsec	--exclude-paths	untriaged	-	-	-	
+tfsec	--rego-policy-dir	untriaged	-	-	-	
+tfsec	--tfvars-file	untriaged	-	-	-	
+tfsec	--var-file	untriaged	-	-	-	
+tofu graph	--var-file	untriaged	-	-	-	
+tofu graph	-var-file	untriaged	-	-	-	
+tofu init	--lockfile	untriaged	-	-	-	
+tofu init	--plugin-dir	untriaged	-	-	-	
+tofu init	--test-directory	untriaged	-	-	-	
+tofu init	--var-file	untriaged	-	-	-	
+tofu init	-lockfile	untriaged	-	-	-	
+tofu init	-plugin-dir	untriaged	-	-	-	
+tofu init	-test-directory	untriaged	-	-	-	
+tofu init	-var-file	untriaged	-	-	-	
+tofu output	--var-file	untriaged	-	-	-	
+tofu output	-var-file	untriaged	-	-	-	
+tofu providers	--var-file	untriaged	-	-	-	
+tofu providers	-var-file	untriaged	-	-	-	
+tofu providers lock	--var-file	untriaged	-	-	-	
+tofu providers lock	-var-file	untriaged	-	-	-	
+tofu providers mirror	--lock-file	untriaged	-	-	-	
+tofu providers mirror	--var-file	untriaged	-	-	-	
+tofu providers mirror	-lock-file	untriaged	-	-	-	
+tofu providers mirror	-var-file	untriaged	-	-	-	
+tofu providers schema	--var-file	untriaged	-	-	-	
+tofu providers schema	-var-file	untriaged	-	-	-	
+tofu show	--var-file	untriaged	-	-	-	
+tofu show	-var-file	untriaged	-	-	-	
+tofu state list	--var-file	untriaged	-	-	-	
+tofu state list	-var-file	untriaged	-	-	-	
+tofu state show	--var-file	untriaged	-	-	-	
+tofu state show	-var-file	untriaged	-	-	-	
+tofu validate	--var-file	untriaged	-	-	-	
+tofu validate	-var-file	untriaged	-	-	-	
+tree	--filelimit	untriaged	-	-	-	
+tree	--filesfrom	untriaged	-	-	-	
+trivy config	--ignorefile	untriaged	-	-	-	
+trivy config	--skip-dirs	untriaged	-	-	-	
+trivy config	--skip-files	untriaged	-	-	-	
+trivy fs	--cache-dir	untriaged	-	-	-	
+trivy fs	--ignorefile	untriaged	-	-	-	
+trivy fs	--skip-dirs	untriaged	-	-	-	
+trivy fs	--skip-files	untriaged	-	-	-	
+trivy image	--cache-dir	untriaged	-	-	-	
+trivy image	--ignorefile	untriaged	-	-	-	
+trivy image	--skip-dirs	untriaged	-	-	-	
+trivy image	--skip-files	untriaged	-	-	-	
+trivy sbom	--cache-dir	untriaged	-	-	-	
+tsup	--public-dir	untriaged	-	-	-	
+tuist build	--derived-data-path	untriaged	-	-	-	
+tuist build	--path	untriaged	-	-	-	
+tuist clean	--path	untriaged	-	-	-	
+tuist dump	--path	untriaged	-	-	-	
+tuist edit	--path	untriaged	-	-	-	
+tuist fetch	--path	untriaged	-	-	-	
+tuist generate	--path	untriaged	-	-	-	
+tuist graph	--path	untriaged	-	-	-	
+tuist hash cache	--path	untriaged	-	-	-	
+tuist hash selective-testing	--path	untriaged	-	-	-	
+tuist inspect build	--path	untriaged	-	-	-	
+tuist inspect bundle	--path	untriaged	-	-	-	
+tuist inspect dependencies	--path	untriaged	-	-	-	
+tuist inspect implicit-imports	--path	untriaged	-	-	-	
+tuist inspect redundant-imports	--path	untriaged	-	-	-	
+tuist inspect test	--path	untriaged	-	-	-	
+tuist install	--path	untriaged	-	-	-	
+tuist migration check-empty-settings	--path	untriaged	-	-	-	
+tuist migration list-targets	--path	untriaged	-	-	-	
+tuist scaffold list	--path	untriaged	-	-	-	
+tuist test	--derived-data-path	untriaged	-	-	-	
+tuist test	--path	untriaged	-	-	-	
+tuist test	--result-bundle-path	untriaged	-	-	-	
+turbo run	--profile	untriaged	-	-	-	
+typedoc	--basePath	untriaged	-	-	-	
+units	--file	untriaged	-	-	-	
+velero logs	--caCertFile	untriaged	-	-	-	
+vite build	--assetsDir	untriaged	-	-	-	
+vitepress build	--cache-dir	untriaged	-	-	-	
+vitest	--dir	untriaged	-	-	-	
+vyper	--root-folder	untriaged	-	-	-	
+wasmtime compile	--profile	untriaged	-	-	-	
+wasmtime wast	--profile	untriaged	-	-	-	
+webpack	--output-filename	untriaged	-	-	-	
+webpack	--output-public-path	untriaged	-	-	-	
+wget	--crl-file	untriaged	-	-	-	
+wget	--cut-dirs	untriaged	-	-	-	
+wget	--exclude-directories	untriaged	-	-	-	
+wget	--include-directories	untriaged	-	-	-	
+wget	--max-redirect	untriaged	-	-	-	
+wget	--random-file	untriaged	-	-	-	
+wget	--restrict-file-names	untriaged	-	-	-	
+wrjpgcom	-cfile	untriaged	-	-	-	
+xar	--file-cksum	untriaged	-	-	-	
+xccov diff	--path-equivalence	untriaged	-	-	-	
+xccov view	--file	untriaged	-	-	-	
+xccov view	--files-for-target	untriaged	-	-	-	
+xccov view	--functions-for-file	untriaged	-	-	-	
+xcodebuild	-importPath	untriaged	-	-	-	
+xcodebuild	-localizationPath	untriaged	-	-	-	
+xcodebuild	-packageCachePath	untriaged	-	-	-	
+xcodebuild	-resultStreamPath	untriaged	-	-	-	
+xcodebuild	-test-enumeration-output-path	untriaged	-	-	-	
+xcodebuild	-testProductsPath	untriaged	-	-	-	
+xcodegen generate	--cache-path	untriaged	-	-	-	
+xcresulttool compare	--baseline-path	untriaged	-	-	-	
+xcresulttool export	--path	untriaged	-	-	-	
+xcresulttool get	--path	untriaged	-	-	-	
+xcresulttool graph	--path	untriaged	-	-	-	
+xcresulttool metadata get	--path	untriaged	-	-	-	
+xctrace export	--xpath	untriaged	-	-	-	
+xgettext	--directory	untriaged	-	-	-	
+xgettext	--files-from	untriaged	-	-	-	
+xgettext.pl	--directory	untriaged	-	-	-	
+xgettext.pl	--files-from	untriaged	-	-	-	
+xsel	--logfile	untriaged	-	-	-	
+yamllint	--config-file	untriaged	-	-	-	
+yard doc	--template-path	untriaged	-	-	-	
+yard graph	--file	untriaged	-	-	-	
+yardoc	--template-path	untriaged	-	-	-	
+yt-dlp	--batch-file	untriaged	-	-	-	
+yt-dlp	--cache-dir	untriaged	-	-	-	
+yt-dlp	--file-access-retries	untriaged	-	-	-	
+yt-dlp	--max-filesize	untriaged	-	-	-	
+yt-dlp	--min-filesize	untriaged	-	-	-	
+yt-dlp	--paths	untriaged	-	-	-	
+yt-dlp	--rm-cache-dir	untriaged	-	-	-	
+yt-dlp	--trim-filenames	untriaged	-	-	-	
+ytt	--data-value-file	untriaged	-	-	-	
+ytt	--data-values-file	untriaged	-	-	-	
+ytt	--file-mark	untriaged	-	-	-	
+ytt	--ignored-paths	untriaged	-	-	-	
+zgrep	--file	untriaged	-	-	-	
+zipcloak	--temp-path	untriaged	-	-	-	

@@ -14,7 +14,9 @@ examples_safe = [
     "swiftlint analyze --compiler-log-path xcodebuild.log",
     "swiftlint fix",
     "swiftlint fix --format",
+    "swiftlint fix ./Sources",
     "swiftlint autocorrect",
+    "swiftlint autocorrect ./Sources",
     "swiftlint rules",
     "swiftlint reporters",
     "swiftlint version",
@@ -23,6 +25,8 @@ examples_safe = [
 ]
 examples_denied = [
     "swiftlint evil-sub",
+    "swiftlint fix ~/.ssh/authorized_keys",
+    "swiftlint autocorrect ~/.ssh/authorized_keys",
 ]
 
 [[command.sub]]

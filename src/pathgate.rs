@@ -151,11 +151,23 @@ pub(crate) fn central_flag_gates() -> Vec<(String, String, Role)> {
         .collect()
 }
 
+/// Every sub-scoped role key (`"<cmd> <sub>"`), for the guard that requires a gate to name all of
+/// its sub's spellings.
+#[cfg(test)]
+pub(crate) fn sub_scoped_keys() -> Vec<String> {
+    GATES.roles.keys().filter(|k| k.contains(' ')).cloned().collect()
+}
+
 /// Whether `pathgates.toml` declares ANY central gate for `cmd` — the flat lists included. Used by
 /// the capped-File-executor guard, where a gate declared centrally is as good as a co-located one.
 #[cfg(test)]
 pub(crate) fn central_role_exists(cmd: &str) -> bool {
     GATES.roles.contains_key(cmd)
+        // A SUB-scoped key (`[roles."smbutil statshares"]`) is a central gate on that command too.
+        // Omitting it let a sub-scoped-only gate escape `a_gated_command_proves_its_safe_form_still_works`
+        // — the requirement that a gated command carry the ordinary invocation its gate must not
+        // break. Measured: stripping `smbutil`'s examples left that guard GREEN.
+        || SUB_SCOPED.contains(cmd)
         || GATES.read.contains(cmd)
         || GATES.read_after_first.contains(cmd)
         || GATES.write.contains(cmd)
@@ -198,6 +210,16 @@ static GATES: LazyLock<Gates> = LazyLock::new(|| {
     toml::from_str(src).expect("pathgates.toml is invalid TOML")
 });
 
+/// Commands owning at least one sub-scoped role (`[roles."<cmd> <sub>"]`).
+///
+/// Exists so the sub lookup in `should_deny` costs one set probe for the ~1600 commands that have
+/// no sub-scoped gate, instead of a `format!` allocation per bare token on every invocation. The
+/// hook runs on every command the agent issues, and a previous regression here was a multi-second
+/// stall, so this path stays allocation-free unless a gate actually exists.
+static SUB_SCOPED: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    GATES.roles.keys().filter_map(|k| k.split_once(' ').map(|(cmd, _)| cmd)).collect()
+});
+
 /// Whether `cmd`'s already-allowed verdict must be overridden to `Denied` because one of its
 /// path arguments reads/writes a sensitive locus. Returns `false` for commands in no gate.
 pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
@@ -226,15 +248,27 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
     // why `rbs annotate` (rewrites its operands; siblings only read) had no expressible gate, and
     // why `dart format` needed a Rust handler.
     //
-    // Applied to `tokens[1..]`, so the sub name lands where the walk expects the command name and
-    // is skipped exactly as `tokens[0]` is for a command-scoped gate.
-    let sub = tokens.get(1).map(Token::as_str).is_some_and(|word| {
-        !word.starts_with('-')
-            && gates
-                .roles
-                .get(&format!("{cmd} {word}"))
-                .is_some_and(|spec| apply(spec, &tokens[1..]))
-    });
+    // Applied from the sub's own token onward, so the sub name lands where the walk expects the
+    // command name and is skipped exactly as `tokens[0]` is for a command-scoped gate.
+    //
+    // EVERY bare token is tried, not just `tokens[1]`. Checking only the second token was a
+    // FAIL-OPEN: a flag before the sub walks straight past the gate, and plenty of commands accept
+    // one — with a gate on `helm list`, `helm list ~/.ssh/authorized_keys` denied while
+    // `helm --namespace foo list ~/.ssh/authorized_keys` was allowed. Scanning for "the first bare
+    // token" does not fix it either, because a valued pre-flag's VALUE is itself bare (`foo` above).
+    //
+    // Trying all of them needs no flag-arity knowledge at this layer and fails CLOSED: the cost is
+    // that a positional whose text happens to equal a sub name engages that sub's gate, which can
+    // only ever add a denial.
+    let sub = SUB_SCOPED.contains(cmd)
+        && tokens.iter().enumerate().skip(1).any(|(i, t)| {
+            let word = t.as_str();
+            !word.starts_with('-')
+                && gates
+                    .roles
+                    .get(&format!("{cmd} {word}"))
+                    .is_some_and(|spec| apply(spec, &tokens[i..]))
+        });
     central || own || sub
 }
 
@@ -1021,6 +1055,63 @@ mod tests {
              handler. If you added a new RoleSpec field, add it to this check too:\n{}",
             bad.join("\n"),
         );
+    }
+
+    /// Every sub-scoped key must be reachable by the lookup, which builds `"<cmd> <word>"` — one
+    /// space, exactly two parts.
+    ///
+    /// A deeper key (`[roles."swift package describe"]`, for a NESTED sub) parses fine, looks like
+    /// a gate, and silently gates NOTHING: the lookup never constructs a three-part string.
+    /// Verified against a control — the probe denied identically with and without the key, which is
+    /// precisely how such a key would pass a careless review. 2421 nested sub blocks exist in the
+    /// registry, so writing one is a plausible mistake rather than a contrived one.
+    ///
+    /// Failing the build is the fail-closed choice while the lookup is two-part. If nested gating is
+    /// ever needed, this test is the thing to change alongside it.
+    #[test]
+    fn a_sub_scoped_key_is_reachable_by_the_lookup() {
+        let unreachable: Vec<&String> =
+            GATES.roles.keys().filter(|k| k.split(' ').count() > 2).collect();
+        assert!(
+            unreachable.is_empty(),
+            "sub-scoped keys the lookup can never build ({}) — it constructs `\"<cmd> <word>\"`, so \
+             a key with more than two parts gates NOTHING while looking like a gate:\n{}",
+            unreachable.len(),
+            unreachable.iter().map(|k| format!("  [roles.\"{k}\"]")).collect::<Vec<_>>().join("\n"),
+        );
+    }
+
+    /// A sub-scoped gate fires wherever the sub name appears, not only as `tokens[1]`.
+    ///
+    /// The first implementation checked `tokens[1]` alone, which was a FAIL-OPEN: a flag before the
+    /// sub walked straight past the gate. Found by review, with a gate temporarily placed on
+    /// `helm list` — `helm list ~/.ssh/authorized_keys` denied while
+    /// `helm --namespace foo list ~/.ssh/authorized_keys` was ALLOWED. Many commands accept a flag
+    /// before the sub (`git -C . status`, `helm --namespace foo list`), so the gap was reachable.
+    ///
+    /// `rbs` is the standing case: it rejects pre-sub flags at dispatch, so a regression here would
+    /// NOT show up on it — which is exactly why this test drives the token walk directly instead of
+    /// relying on a real command to expose it.
+    #[test]
+    fn a_sub_scoped_gate_is_not_bypassed_by_a_flag_before_the_sub() {
+        let spec = RoleSpec {
+            positional: Role::Write,
+            shape: Shape::default(),
+            flags: HashMap::new(),
+            handler: None,
+            write_when: Vec::new(),
+        };
+        // The sub as the second token — the shape the first implementation handled.
+        assert!(apply(&spec, &toks(&["list", "~/.ssh/authorized_keys"])));
+        // …and the same invocation reached from a LATER offset, which is what the fixed walk does
+        // when a flag (and its value) precede the sub.
+        let with_flag = toks(&["helm", "--namespace", "foo", "list", "~/.ssh/authorized_keys"]);
+        let sub_at = with_flag.iter().position(|t| t.as_str() == "list").expect("sub present");
+        assert!(apply(&spec, &with_flag[sub_at..]), "gate must fire from the sub's own offset");
+        // An in-workspace path at the same offset must still pass, or the fix is just a blanket deny.
+        let safe = toks(&["helm", "--namespace", "foo", "list", "./chart"]);
+        let safe_at = safe.iter().position(|t| t.as_str() == "list").expect("sub present");
+        assert!(!apply(&spec, &safe[safe_at..]));
     }
 
     /// A sub-scoped gate (`[roles."<cmd> <sub>"]`) fires on ITS sub and leaves the siblings alone.

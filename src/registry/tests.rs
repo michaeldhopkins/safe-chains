@@ -1,5 +1,6 @@
 use super::*;
     use super::types::DispatchKind;
+    use super::types::TomlSub;
     use crate::parse::Token;
     use crate::verdict::{SafetyLevel, Verdict};
 
@@ -2910,6 +2911,268 @@ use super::*;
     /// that verification a build artifact instead of a thing someone typed once, because
     /// `toml_examples_match_dispatch` re-runs those examples on every build.
     ///
+    /// A sub-scoped gate (`[roles."<cmd> <sub>"]`) must name EVERY spelling of that sub.
+    ///
+    /// The key is matched against the literal token, so gating only the canonical name leaves each
+    /// alias ungated — and the failure is invisible, because the canonical spelling denies exactly
+    /// as intended. Measured with a gate on `swiftlint fix`:
+    /// `swiftlint fix ~/.ssh/authorized_keys` denied while `swiftlint autocorrect …` was ALLOWED.
+    /// 35 subs in the registry declare aliases, so this is a trap laid for the next author, not a
+    /// one-off.
+    ///
+    /// Resolving aliases inside `should_deny` would be the deeper fix; it needs a sub-name
+    /// canonicalizer the pathgate layer does not have. Until then this fails the build rather than
+    /// letting a half-covered gate look complete.
+    #[test]
+    fn a_sub_scoped_gate_covers_every_spelling_of_its_sub() {
+        use super::types::TomlFile;
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let keys: std::collections::HashSet<String> =
+            crate::pathgate::sub_scoped_keys().into_iter().collect();
+        if keys.is_empty() {
+            panic!("no sub-scoped gates found — this guard would be vacuous");
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut missing: Vec<String> = Vec::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                for sub in &cmd.sub {
+                    let spellings: Vec<&String> =
+                        std::iter::once(&sub.name).chain(sub.aliases.iter()).collect();
+                    let gated: Vec<&&String> = spellings
+                        .iter()
+                        .filter(|s| keys.contains(&format!("{} {}", cmd.name, s)))
+                        .collect();
+                    if gated.is_empty() || gated.len() == spellings.len() {
+                        continue;
+                    }
+                    let absent: Vec<&str> = spellings
+                        .iter()
+                        .filter(|s| !keys.contains(&format!("{} {}", cmd.name, s)))
+                        .map(|s| s.as_str())
+                        .collect();
+                    missing.push(format!(
+                        "  [roles.\"{} {}\"] is gated but these spellings of the same sub are NOT: {}",
+                        cmd.name,
+                        gated.first().expect("non-empty"),
+                        absent.join(", "),
+                    ));
+                }
+            }
+        }
+
+        missing.sort();
+        assert!(
+            missing.is_empty(),
+            "sub-scoped gates that cover only some spellings of their sub ({}) — an alias reaches \
+             the same code, so add a `[roles.\"<cmd> <alias>\"]` for each:\n{}",
+            missing.len(),
+            missing.join("\n"),
+        );
+    }
+
+    /// Parse `path_named_flag_facets.tsv`, returning the recorded keys and any authoring errors.
+    ///
+    /// The facet vocabularies are checked against the engine's OWN terms (src/engine/facet.rs), so
+    /// a profile cannot drift from the model it claims to be written in: an invented term is a
+    /// build error rather than a plausible-looking string nobody re-checks.
+    #[allow(clippy::type_complexity)]
+    fn parse_facet_fixture() -> (std::collections::HashSet<(String, String)>, Vec<String>) {
+        const DISPOSITIONS: &[&str] = &["untriaged", "not-a-path", "in-workspace", "pending-gate"];
+        const OPERATIONS: &[&str] = &[
+            "observe", "create", "mutate", "destroy", "execute", "communicate", "configure",
+            "authorize", "control",
+        ];
+        const LOCI: &[&str] = &[
+            "process", "temp", "sandbox-scope", "worktree", "adjacent", "worktree-trusted", "user",
+            "machine", "system-integrity", "device", "kernel",
+        ];
+        const PERSISTENCE: &[&str] = &["transient", "data", "reconfiguring", "installing"];
+
+        let raw = include_str!("../../tests/fixtures/path_named_flag_facets.tsv");
+        let mut listed: std::collections::HashSet<(String, String)> = Default::default();
+        let mut bad: Vec<String> = Vec::new();
+        for line in raw.lines() {
+            if line.trim().is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let f: Vec<&str> = line.split('\t').collect();
+            if f.len() < 6 {
+                bad.push(format!("  {line} — expected 7 tab-separated columns"));
+                continue;
+            }
+            let (scope, flag, disp, op, locus, persist) = (f[0], f[1], f[2], f[3], f[4], f[5]);
+            let note = f.get(6).copied().unwrap_or("").trim();
+            listed.insert((scope.to_string(), flag.to_string()));
+            if !DISPOSITIONS.contains(&disp) {
+                bad.push(format!("  {scope} `{flag}` — unknown disposition `{disp}`"));
+                continue;
+            }
+            // `untriaged` has no claim to make; `not-a-path` says the value is not a filesystem
+            // location, so there is no capability to profile and demanding facet terms for one
+            // would invite invented ones. Both leave the columns as `-`; only `not-a-path` owes an
+            // explanation.
+            if disp == "untriaged" || disp == "not-a-path" {
+                if op != "-" || locus != "-" || persist != "-" {
+                    bad.push(format!(
+                        "  {scope} `{flag}` — `{disp}` rows describe no capability, so the facet \
+                         columns must stay `-`"
+                    ));
+                }
+                if disp == "not-a-path" && note.is_empty() {
+                    bad.push(format!(
+                        "  {scope} `{flag}` — a not-a-path row must say what the value IS"
+                    ));
+                }
+                continue;
+            }
+            for (label, value, vocab) in [
+                ("operation", op, OPERATIONS),
+                ("locus", locus, LOCI),
+                ("persistence", persist, PERSISTENCE),
+            ] {
+                if !vocab.contains(&value) {
+                    bad.push(format!(
+                        "  {scope} `{flag}` — `{value}` is not a valid {label} (see src/engine/facet.rs)"
+                    ));
+                }
+            }
+            if note.is_empty() {
+                bad.push(format!(
+                    "  {scope} `{flag}` — a triaged row must record the evidence in the note column"
+                ));
+            }
+        }
+        (listed, bad)
+    }
+
+    /// A flag whose NAME says it carries a path must have its capability RECORDED — operation,
+    /// locus rung and persistence — not merely be judged write-or-not.
+    ///
+    /// The output-flag sweep asks "does this flag write?", which is the legacy band's question and
+    /// cannot record WHY something is safe. That flattens three different capabilities into one
+    /// row type, and the flattening mis-triages:
+    ///
+    ///   --cache-dir / --build-path      create · user · persists as DATA
+    ///   --conf-path / --config-file     CONFIGURE · persists by RECONFIGURING future commands —
+    ///                                   a strictly worse capability, and one `Role` cannot express
+    ///   --vault-password-file           a SECRET READ on the disclosure axis, not a write at all
+    ///
+    /// So every candidate must declare its facet profile, and the vocabulary is validated against
+    /// the engine's own enums — an unfilled or invented term is a build error rather than a vague
+    /// "verified format-only" that nobody can re-check.
+    #[test]
+    fn a_path_named_flag_records_its_facet_profile() {
+        use super::types::TomlFile;
+        const SENSITIVE: &str = "~/.ssh/authorized_keys";
+        // Population selector, NOT a safety judgement: a name saying "this value is a filesystem
+        // location". Under-selecting only leaves a flag unswept (it is never a claim of safety), so
+        // the list is deliberately plain rather than clever.
+        const PATH_NAMED: &[&str] =
+            &["dir", "Dir", "path", "Path", "file", "File", "folder", "Folder"];
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut candidates: Vec<(String, String)> = Vec::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                // Recurses into NESTED subs. Walking only one level left 32 path-named spellings
+                // (across 2421 nested sub blocks) unswept — a guard that claims coverage has to
+                // cover, or its green is a statement about its own reach rather than the tree's.
+                fn collect<'a>(
+                    prefix: &str,
+                    subs: &'a [TomlSub],
+                    out: &mut Vec<(String, &'a Vec<String>)>,
+                ) {
+                    for sub in subs {
+                        let label = format!("{prefix} {}", sub.name);
+                        out.push((label.clone(), &sub.valued));
+                        collect(&label, &sub.sub, out);
+                    }
+                }
+                let mut scopes: Vec<(String, &Vec<String>)> =
+                    vec![(cmd.name.clone(), &cmd.valued)];
+                collect(&cmd.name, &cmd.sub, &mut scopes);
+                for (label, valued) in scopes {
+                    for flag in valued {
+                        if !PATH_NAMED.iter().any(|s| flag.contains(s)) {
+                            continue;
+                        }
+                        if crate::is_safe_command(&format!("{label} {flag} {SENSITIVE}")) {
+                            candidates.push((label.clone(), flag.clone()));
+                        }
+                    }
+                }
+            }
+        }
+        candidates.sort();
+        candidates.dedup();
+
+        let (listed, mut malformed) = parse_facet_fixture();
+        malformed.sort();
+        assert!(
+            malformed.is_empty(),
+            "malformed rows in tests/fixtures/path_named_flag_facets.tsv ({}):\n{}",
+            malformed.len(),
+            malformed.join("\n"),
+        );
+
+        let found: std::collections::HashSet<(String, String)> =
+            candidates.iter().cloned().collect();
+        let mut unlisted: Vec<_> = found.difference(&listed).collect();
+        unlisted.sort();
+        assert!(
+            unlisted.is_empty(),
+            "path-named flags that auto-approve a sensitive path and are NOT recorded ({}) — add \
+             each to tests/fixtures/path_named_flag_facets.tsv with its facet profile, or gate \
+             it:\n{}",
+            unlisted.len(),
+            unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+
+        let mut stale: Vec<_> = listed.difference(&found).collect();
+        stale.sort();
+        assert!(
+            stale.is_empty(),
+            "recorded rows that no longer auto-approve ({}) — they were gated, so delete them from \
+             tests/fixtures/path_named_flag_facets.tsv:\n{}",
+            stale.len(),
+            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+    }
+
     /// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so the operands are the
     /// write targets and must be gated as such.
     ///
@@ -2965,20 +3228,25 @@ use super::*;
                     standalone: &'a [String],
                     valued: &'a [String],
                 }
+                fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<Scope<'a>>) {
+                    for sub in subs {
+                        let label = format!("{prefix} {}", sub.name);
+                        out.push(Scope {
+                            label: label.clone(),
+                            write_flags: &sub.write_flags,
+                            standalone: &sub.standalone,
+                            valued: &sub.valued,
+                        });
+                        collect(&label, &sub.sub, out);
+                    }
+                }
                 let mut scopes = vec![Scope {
                     label: cmd.name.clone(),
                     write_flags: &cmd.write_flags,
                     standalone: &cmd.standalone,
                     valued: &cmd.valued,
                 }];
-                for sub in &cmd.sub {
-                    scopes.push(Scope {
-                        label: format!("{} {}", cmd.name, sub.name),
-                        write_flags: &sub.write_flags,
-                        standalone: &sub.standalone,
-                        valued: &sub.valued,
-                    });
-                }
+                collect(&cmd.name, &cmd.sub, &mut scopes);
                 for Scope { label, write_flags, standalone, valued } in scopes {
                     for flag in write_flags {
                         let boolean = standalone.contains(flag) && !valued.contains(flag);

@@ -284,7 +284,9 @@
 - `swiftlint analyze --compiler-log-path xcodebuild.log`
 - `swiftlint fix`
 - `swiftlint fix --format`
+- `swiftlint fix ./Sources`
 - `swiftlint autocorrect`
+- `swiftlint autocorrect ./Sources`
 - `swiftlint rules`
 - `swiftlint reporters`
 - `swiftlint version`
