@@ -1358,7 +1358,7 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     let canonical = crate::registry::canonical_name(token.command_name());
     // A SUB's claim wins over the command's, and narrows `args` to what follows the sub path so the
     // sub name is not counted as a path operand (`git ls-files src/` must see `src/`, not `ls-files`).
-    let (rule, args) = match crate::registry::sub_output_locus(&words) {
+    let (rule, args) = match crate::registry::sub_output_locus(canonical, args) {
         Some((rule, rest)) => (rule, rest),
         None => (crate::registry::command_output_locus(canonical)?, args),
     };
@@ -2361,6 +2361,35 @@ mod tests {
             }
         }
         assert!(probed > 0, "nothing declares an output claim; this guard would be vacuous");
+    }
+
+    /// A sub-scoped claim must survive every TRUSTED spelling of its command, and no other.
+    ///
+    /// The walker keys on the registry name, so it has to be handed the CANONICALIZED one — the
+    /// same key the command-level lookup gets. Given the raw first word instead, `/usr/bin/git diff
+    /// --name-only` silently lost the claim that bare `git` kept: one operation, two spellings, two
+    /// answers, which is the false-deny class the flag-form guards exist to kill.
+    ///
+    /// The other half is that this must NOT extend trust: `./git` is a worktree binary that may not
+    /// be git at all, and `trusted_command_path` is what keeps it claimless.
+    #[test]
+    fn a_sub_claim_follows_every_trusted_spelling_of_its_command() {
+        let bare = sub_locus("git diff --name-only");
+        assert!(bare.is_some(), "precondition: bare `git diff --name-only` should carry a claim");
+        for spelling in ["/usr/bin/git", "/opt/homebrew/bin/git"] {
+            assert_eq!(
+                sub_locus(&format!("{spelling} diff --name-only")),
+                bare,
+                "`{spelling} diff --name-only` disagrees with the bare spelling",
+            );
+        }
+        for untrusted in ["./git", "/tmp/git", "../git"] {
+            assert_eq!(
+                sub_locus(&format!("{untrusted} diff --name-only")),
+                None,
+                "`{untrusted}` is not a trusted path to git and must earn no output claim",
+            );
+        }
     }
 
     /// A claim gated on `requires` must be DEAD without its flag. `git diff` prints a patch and

@@ -104,15 +104,21 @@ pub(crate) fn command_output_locus(cmd: &str) -> Option<&'static crate::registry
 /// Descends nested subs to the deepest declaring node, the same walk `is_eval_safe_invocation`
 /// does, so a claim can sit on `<resource> <action>`. `None` when no sub on the path declares one,
 /// which leaves the caller to fall back to the command-level claim (and then to unpinnable).
-pub(crate) fn sub_output_locus(
-    words: &[String],
-) -> Option<(&'static crate::registry::types::OutputSpec, &[String])> {
-    let (name, mut rest) = words.split_first()?;
+/// `canonical` must be the CANONICALIZED command name (`registry::canonical_name` of the token's
+/// command name), the same key `command_output_locus` is given. Keying on the raw first word
+/// instead silently dropped the claim for a path-spelled or aliased command: `/usr/bin/git diff
+/// --name-only` is a trusted spelling of a trusted tool, and it lost the claim while bare `git` kept
+/// it — one operation, two spellings, two answers.
+pub(crate) fn sub_output_locus<'a>(
+    canonical: &str,
+    args: &'a [String],
+) -> Option<(&'static crate::registry::types::OutputSpec, &'a [String])> {
+    let mut rest = args;
     let spec = CUSTOM_REGISTRY
-        .get(name.as_str())
-        .or_else(|| TOML_REGISTRY.get(name.as_str()))?;
+        .get(canonical)
+        .or_else(|| TOML_REGISTRY.get(canonical))?;
     let mut kind = &spec.kind;
-    let mut found: Option<(&'static crate::registry::types::OutputSpec, &[String])> = None;
+    let mut found: Option<(&'static crate::registry::types::OutputSpec, &'a [String])> = None;
     loop {
         let subs = match kind {
             DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
@@ -123,11 +129,11 @@ pub(crate) fn sub_output_locus(
             return found;
         };
         rest = tail;
-        // Deepest declaration wins, but a shallower one is kept while descending: a sub that
-        // declares and whose child does not still describes what the child prints.
-        if let Some(o) = sub.output.as_ref() {
-            found = Some((o, rest));
-        }
+        // Deepest declaration wins. A shallower one is NOT inherited by a child that declares
+        // nothing: the claim is researched per node, and letting `<parent>`'s answer stand in for
+        // an unresearched `<parent> <child>` would be asserting something nobody checked. Reset so
+        // descending past a declaring node into a silent one falls back to unpinnable.
+        found = sub.output.as_ref().map(|o| (o, rest));
         kind = &sub.kind;
     }
 }
