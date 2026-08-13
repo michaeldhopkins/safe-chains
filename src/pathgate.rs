@@ -158,6 +158,23 @@ pub(crate) fn sub_scoped_keys() -> Vec<String> {
     GATES.roles.keys().filter(|k| k.contains(' ')).cloned().collect()
 }
 
+/// Every `[roles.X]` block whose POSITIONALS are gated, with the flags it declares a role for.
+///
+/// A positional gate is not confined to positionals: the walk gates each valued flag's value too,
+/// so a valued flag with no declared role is treated as a path. That is fail-CLOSED but shows up as
+/// a false deny that is hard to attribute — `git diff -S /etc/passwd` searches the diff for a
+/// path-shaped literal and reads nothing, and it denied until every non-path valued flag on
+/// `git diff` was marked `ignore`. Feeds the completeness guard in `registry::tests`.
+#[cfg(test)]
+pub(crate) fn central_positional_gates() -> Vec<(String, Vec<String>)> {
+    GATES
+        .roles
+        .iter()
+        .filter(|(_, spec)| spec.positional != Role::Ignore)
+        .map(|(cmd, spec)| (cmd.clone(), spec.flags.keys().cloned().collect()))
+        .collect()
+}
+
 /// Whether `pathgates.toml` declares ANY central gate for `cmd` — the flat lists included. Used by
 /// the capped-File-executor guard, where a gate declared centrally is as good as a co-located one.
 #[cfg(test)]

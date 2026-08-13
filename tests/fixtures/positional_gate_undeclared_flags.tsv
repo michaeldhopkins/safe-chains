@@ -1,0 +1,185 @@
+# Valued flags on a POSITIONAL-gated command that have no declared role — the known backlog.
+#
+# Guard: registry::tests::a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope.
+#
+# WHY THESE ROWS EXIST
+#
+# A `positional` path gate is not confined to positionals. The walk gates each valued flag's VALUE
+# too, so a valued flag with no declared role has its value treated as a path. That is fail-CLOSED
+# — nothing is admitted that shouldn't be — but it produces a FALSE DENY whenever the value happens
+# to look like a path, and one that is hard to attribute:
+#
+#     git diff -S /etc/passwd            searches the diff for a path-shaped literal, reads nothing
+#     clang-format --style /etc/passwd   `--style` names a style, not a file
+#
+# Measured when the gate on `git diff` was added: the flags there needed twenty-six roles by hand.
+# Every row below is the same shape, latent until someone passes a path-shaped value.
+#
+# THIS IS A CAP, NOT A WORKLIST
+#
+# Rows are latent, not live: `--max-line-length 100` is not path-shaped, so the gate never fires.
+# Classifying all 157 is a research campaign of the same kind as path_named_flag_facets.tsv, and it
+# competes for the same attention — do NOT schedule one. What this file buys is that the backlog
+# cannot GROW: a NEW positional gate must declare roles for its scope's valued flags, the way
+# `git diff` now does. A row leaves by being given a role in pathgates.toml (`ignore` for a count,
+# mode, enum, regex or search string; `read`/`write` when the value really is a path), and the
+# guard's stale check then forces its deletion.
+#
+# Format: <scope>\t<flag>
+autoflake	--exclude
+autoflake	--ignore-init-module-imports
+autoflake	--imports
+autoflake	--jobs
+autoflake	--stdin-display-name
+autoflake	-j
+autopep8	--exclude
+autopep8	--global-config
+autopep8	--ignore
+autopep8	--indent-size
+autopep8	--jobs
+autopep8	--line-range
+autopep8	--max-line-length
+autopep8	--select
+autopep8	-j
+autopep8	-l
+cap_mkdb	-f
+clang-format	--assume-filename
+clang-format	--cursor
+clang-format	--fallback-style
+clang-format	--length
+clang-format	--lines
+clang-format	--offset
+clang-format	--output-replacements-xml
+clang-format	--style
+cmake-format	--bullet-char
+cmake-format	--command-case
+cmake-format	--enum-char
+cmake-format	--keyword-case
+cmake-format	--line-ending
+cmake-format	--line-width
+cmake-format	--max-pargs-hwrap
+cmake-format	--max-prefix-chars
+cmake-format	--max-rows-cmdline
+cmake-format	--max-subgroups-hwrap
+cmake-format	--min-prefix-chars
+cmake-format	--output-encoding
+cmake-format	--separate-ctrl-name-with-space
+cmake-format	--separate-fn-name-with-space
+cmake-format	--tab-size
+create-next-app	--example
+create-next-app	--example-path
+create-react-app	--scripts-version
+create-react-app	--template
+create-react-app	--typescript
+create-vite	--template
+create-vite	-t
+csplit	--digits
+csplit	--suffix-format
+csplit	-b
+csplit	-n
+fourmolu	--config
+fourmolu	--end-column
+fourmolu	--end-line
+fourmolu	--ghc-opt
+fourmolu	--mode
+fourmolu	--package-name
+fourmolu	--start-column
+fourmolu	--start-line
+fourmolu	-o
+gofmt	--r
+gofmt	-r
+gofumpt	--lang
+gofumpt	--modpath
+goimports	--local
+goimports	--srcdir
+goimports	-local
+goimports	-srcdir
+nbstripout	--attributes
+nbstripout	--extra-keys
+nbstripout	--keep-metadata-keys
+nbstripout	--max-size
+ocamlformat	--config
+ocamlformat	--doc-comments
+ocamlformat	--doc-comments-padding
+ocamlformat	--enable-outside-detected-project
+ocamlformat	--exclude
+ocamlformat	--impl
+ocamlformat	--include
+ocamlformat	--intf
+ocamlformat	--margin
+ocamlformat	--max-iters
+ocamlformat	--name
+ocamlformat	--ocaml-version
+ocamlformat	--profile
+ocamlformat	--use-file
+ormolu	--cabal-default-extensions
+ormolu	--cabal-extension
+ormolu	--end-column
+ormolu	--end-line
+ormolu	--ghc-opt
+ormolu	--mode
+ormolu	--package-name
+ormolu	--start-column
+ormolu	--start-line
+ormolu	-o
+rbs annotate	--collection
+rbs annotate	--dir
+rbs annotate	--log-level
+rbs annotate	--repo
+rbs annotate	-d
+rbs annotate	-I
+rbs annotate	-r
+rsync	--address
+rsync	--bwlimit
+rsync	--checksum-choice
+rsync	--chmod
+rsync	--chown
+rsync	--compress-level
+rsync	--contimeout
+rsync	--copy-as
+rsync	--debug
+rsync	--exclude
+rsync	--exclude-from
+rsync	--files-from
+rsync	--filter
+rsync	--info
+rsync	--log-file
+rsync	--log-file-format
+rsync	--max-alloc
+rsync	--max-delete
+rsync	--max-size
+rsync	--min-size
+rsync	--modify-window
+rsync	--out-format
+rsync	--partial-dir
+rsync	--password-file
+rsync	--port
+rsync	--protocol
+rsync	--read-batch
+rsync	--remote-option
+rsync	--rsync-path
+rsync	--secret-file
+rsync	--skip-compress
+rsync	--sockopts
+rsync	--stop-after
+rsync	--stop-at
+rsync	--stop-fmt
+rsync	--suffix
+rsync	--temp-dir
+rsync	--timeout
+rsync	--write-batch
+rsync	-f
+rsync	-T
+scp	-c
+scp	-D
+scp	-l
+scp	-P
+scp	-s
+swiftlint fix	--config
+swiftlint fix	--path
+swiftlint fix	--reporter
+yapf	--exclude
+yapf	--lines
+yapf	--style
+yapf	-e
+yapf	-l

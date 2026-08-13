@@ -1,5 +1,30 @@
 # TODO
 
+## `--suggest` writes the file its name implies it only proposes — refine the CLI
+
+`safe-chains --suggest "<cmd>"` analyses the command, generates a `.safe-chains.toml` entry, and
+WRITES it to the project root (`std::fs::write`, src/main.rs). It then prints a `[[trusted]]` pin for
+the user to paste into `~/.config/safe-chains.toml`. The name says "suggest"; the success message
+says "Added this to …". Those disagree, and the flag name is the one people read.
+
+The write itself cannot escalate trust — the pin is `path + sha256 OF THE FILE CONTENTS`
+(`registry::custom::repo_is_trusted`), so an unpinned file is ignored and any later edit to a pinned
+one breaks the hash and drops the whole file back to ignored. A second `--suggest` therefore cannot
+silently widen an already-pinned project; it invalidates the pin.
+
+So the open question is CLI design, not a hole:
+
+- Should the default be dry-run — print the block and the pin, write nothing, with `--write`
+  (or `--apply`) to commit it? That matches the name and matches the runner-script convention.
+- If it keeps writing by default, does the flag want renaming?
+- `safe_chains_knows_its_own_cli_flags` lists `suggest` and `generate-book` in `NOT_AUTO_APPROVED`.
+  Once the write behaviour is settled, revisit whether a dry-run `--suggest` should auto-approve
+  (it would be a pure read) and whether `--generate-book`, a plain worktree docs write, belongs in
+  that list at all. `--setup`/`--tool`/`--auto-detect` stay out regardless: they write ANOTHER
+  tool's config outside the worktree and reconfigure how it behaves afterwards.
+
+Raised 2026-08-13 while reviewing the OmniFocus inbox item "This is safe safe-chains --suggest …".
+
 ## Env prefixes — SHIPPED
 
 `VAR=value cmd` classification is built (`envvars.toml` + `src/envvars.rs`); the original fail-opens
@@ -2539,6 +2564,30 @@ guard makes the gap impossible to spring silently, which is the property that ma
 the third entry this session whose text recorded the capability while no gate existed (`rbs annotate`,
 `dart format`, now this). That pattern is the argument for deriving gates FROM the description's
 facts rather than trusting a separate hand-written gate to agree with them.
+
+### A `positional` gate is not free — it gates the VALUED flags too, and that cuts both ways
+
+Gating `git diff`'s positionals to close the `--no-index` credential read also gated every valued
+flag's value, which was right for `-O <orderfile>` (a file git reads — `git diff -O /etc/shadow`
+denies, and the flag's NAME would never have flagged it to the path-named heuristic) and WRONG for
+`-S`/`-G`, whose values are a search string and a regex. `git diff -S /etc/passwd` — looking for a
+path-shaped literal in the diff, reading nothing — started denying.
+
+So a `positional` role on a flag-rich command owes an explicit `flags` map covering every valued
+flag: the path-bearing ones by role, the rest as `ignore`. An unlisted valued flag is treated as a
+path, which is fail-CLOSED but shows up as a false deny that is hard to attribute.
+
+`a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope` +
+`tests/fixtures/positional_gate_undeclared_flags.tsv` now enforce it. Writing the guard showed the
+problem was never about `git diff`: **157 valued flags across the already-gated commands have no
+role**, so the hand-fix was one instance of a systemic gap.
+
+They are LATENT, not live — the gate only fires on a path-shaped value, and `--max-line-length 100`
+is not one. Classifying all 157 is a research campaign of the same kind as the path-named rows and
+competes for the same attention, so **do not schedule one**. The fixture is a CAP: a new positional
+gate must declare its scope's valued flags the way `git diff` now does, and a row leaves by being
+given a role (the stale check then forces its deletion). Red-demoed both directions — removing a
+declared role fails, and a row that gains one fails until deleted.
 
 ### Known limitations of the new guards — recorded, not fixed
 

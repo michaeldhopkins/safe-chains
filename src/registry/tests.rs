@@ -3063,6 +3063,110 @@ use super::*;
         (listed, bad)
     }
 
+    /// A `positional` path gate must declare a role for EVERY valued flag its scope declares.
+    ///
+    /// A positional gate is not confined to positionals. The walk gates each valued flag's VALUE
+    /// too, so an undeclared valued flag has its value treated as a path. That is fail-closed, and
+    /// it is still a bug: `git diff -S /etc/passwd` searches the diff for a path-shaped literal and
+    /// reads nothing, yet it denied the moment `git diff`'s positionals were gated to close the
+    /// `--no-index` credential read. Twenty-six roles were then added by hand, which is exactly the
+    /// kind of enumeration that rots — git adds a valued flag, or the next author gates a different
+    /// flag-rich sub, and the false deny comes back silently.
+    ///
+    /// So the completeness is mechanical: the scope's `valued` list is the population, and each
+    /// entry must appear in the gate's `flags` map with SOME role. `ignore` is the honest answer for
+    /// a count, a mode name or a search string, and saying so is cheap; leaving it out is what
+    /// cannot be told apart from an oversight.
+    #[test]
+    fn a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope() {
+        use super::types::TomlFile;
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        fn collect(prefix: &str, subs: &[TomlSub], out: &mut Vec<(String, Vec<String>)>) {
+            for sub in subs {
+                let label = format!("{prefix} {}", sub.name);
+                out.push((label.clone(), sub.valued.clone()));
+                collect(&label, &sub.sub, out);
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut valued_by_scope: std::collections::HashMap<String, Vec<String>> = Default::default();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                let mut scopes = vec![(cmd.name.clone(), cmd.valued.clone())];
+                collect(&cmd.name, &cmd.sub, &mut scopes);
+                for (label, valued) in scopes {
+                    valued_by_scope.entry(label).or_default().extend(valued);
+                }
+            }
+        }
+
+        // The 157 that predate the guard are latent, not live — `--max-line-length 100` is not
+        // path-shaped, so the gate never fires on it — and classifying them all is a research
+        // campaign of the same kind as path_named_flag_facets.tsv. So the fixture CAPS the backlog
+        // rather than listing work: a new gate must declare its scope's valued flags, and a row
+        // leaves by being given a role.
+        let known: std::collections::HashSet<(String, String)> =
+            include_str!("../../tests/fixtures/positional_gate_undeclared_flags.tsv")
+                .lines()
+                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+                .filter_map(|l| l.split_once('\t'))
+                .map(|(s, f)| (s.to_string(), f.to_string()))
+                .collect();
+
+        let mut found: std::collections::HashSet<(String, String)> = Default::default();
+        let mut checked = 0usize;
+        for (scope, declared) in crate::pathgate::central_positional_gates() {
+            // Only scopes whose grammar we can read. A gate on a command defined by a Rust handler
+            // has no TOML `valued` list to compare against, so it is skipped rather than guessed at.
+            let Some(valued) = valued_by_scope.get(&scope) else { continue };
+            checked += 1;
+            for flag in valued {
+                if !declared.contains(flag) {
+                    found.insert((scope.clone(), flag.clone()));
+                }
+            }
+        }
+
+        let mut new: Vec<_> = found.difference(&known).collect();
+        new.sort();
+        assert!(
+            new.is_empty(),
+            "a `positional` path gate gates its valued flags' VALUES too, so each needs a declared \
+             role — `read`/`write` if the value is a path, `ignore` if it is a count, mode, enum, \
+             regex or search string. NEW undeclared ({}):\n{}",
+            new.len(),
+            new.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+
+        let mut stale: Vec<_> = known.difference(&found).collect();
+        stale.sort();
+        assert!(
+            stale.is_empty(),
+            "recorded rows that now DO have a role — delete them from \
+             tests/fixtures/positional_gate_undeclared_flags.tsv ({}):\n{}",
+            stale.len(),
+            stale.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+        assert!(checked > 0, "no positional gate matched a TOML scope — the guard is vacuous");
+    }
+
     /// A flag whose NAME says it carries a path must have its capability RECORDED — operation,
     /// locus rung and persistence — not merely be judged write-or-not.
     ///
