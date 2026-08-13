@@ -2594,6 +2594,10 @@ Aliases: `capacitor`
 **Examples:**
 
 - `cargo fuzz --version`
+- `cargo +nightly build`
+- `cargo +nightly test`
+- `cargo +1.90.0 check`
+- `cargo +nightly-2026-01-01 build`
 - `cargo mutants`
 - `cargo mutants --list`
 - `cargo mutants --list --json`
