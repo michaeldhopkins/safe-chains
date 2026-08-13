@@ -1356,7 +1356,18 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     }
     let token = Token::from_raw(name.clone());
     let canonical = crate::registry::canonical_name(token.command_name());
-    let rule = crate::registry::command_output_locus(canonical)?;
+    // A SUB's claim wins over the command's, and narrows `args` to what follows the sub path so the
+    // sub name is not counted as a path operand (`git ls-files src/` must see `src/`, not `ls-files`).
+    let (rule, args) = match crate::registry::sub_output_locus(&words) {
+        Some((rule, rest)) => (rule, rest),
+        None => (crate::registry::command_output_locus(canonical)?, args),
+    };
+    // At least one required flag must be present, or the command prints something other than paths
+    // entirely — `git diff` without `--name-only` prints a patch. Checked before `invalidated_by`
+    // because it is the stronger condition: absent, there is no claim to invalidate.
+    if !rule.requires.is_empty() && !rule.requires.iter().any(|r| args.iter().any(|a| flag_present(a, std::slice::from_ref(r)))) {
+        return None;
+    }
     // `--help` and `--version` replace the command's DATA output with prose, and EVERY output
     // claim is a statement about the data. GNU `seq --help` prints
     // `<https://www.gnu.org/software/coreutils/>` — slash-bearing words under an `atom` claim that
@@ -2331,12 +2342,15 @@ mod tests {
     #[test]
     fn no_output_claim_survives_a_help_or_version_flag() {
         let mut probed = 0usize;
-        for name in crate::registry::toml_command_names() {
-            if crate::registry::command_output_locus(name).is_none() {
-                continue;
-            }
+        for (scope, spec) in crate::registry::output_claims() {
+            // A claim gated on a required flag is only ever live WITH it, so the probe has to carry
+            // it — otherwise the assertion holds for the boring reason and guards nothing.
+            let scope = match spec.requires.first() {
+                Some(required) => format!("{scope} {required}"),
+                None => scope,
+            };
             for flag in ["--help", "--version"] {
-                let line = format!("{name} {flag}");
+                let line = format!("{scope} {flag}");
                 let Some(script) = crate::cst::parse(&line) else { continue };
                 probed += 1;
                 assert!(
@@ -2346,7 +2360,41 @@ mod tests {
                 );
             }
         }
-        assert!(probed > 0, "no command declares [command.output]; this guard would be vacuous");
+        assert!(probed > 0, "nothing declares an output claim; this guard would be vacuous");
+    }
+
+    /// A claim gated on `requires` must be DEAD without its flag. `git diff` prints a patch and
+    /// `jj diff` a diff; only `--name-only` turns either into a list of paths, so the ungated
+    /// invocation must stay unpinnable. Without this, `requires` could be silently ignored and the
+    /// claim would widen every invocation of the sub.
+    #[test]
+    fn a_required_flag_is_necessary_for_its_claim() {
+        let mut probed = 0usize;
+        for (scope, spec) in crate::registry::output_claims() {
+            if spec.requires.is_empty() {
+                continue;
+            }
+            probed += 1;
+            let Some(script) = crate::cst::parse(&scope) else { continue };
+            assert_eq!(
+                substitution_claim(&script).map(|_| ()),
+                None,
+                "`{scope}` carries an output claim without any of {:?}, which the declaration says \
+                 are required for the output to be paths at all",
+                spec.requires,
+            );
+            // ...and LIVE with it, or the declaration describes nothing.
+            for required in &spec.requires {
+                let line = format!("{scope} {required}");
+                let Some(script) = crate::cst::parse(&line) else { continue };
+                assert!(
+                    substitution_claim(&script).is_some(),
+                    "`{line}` carries no output claim, but `{required}` is declared as one of the \
+                     flags that makes the claim hold"
+                );
+            }
+        }
+        assert!(probed > 0, "nothing declares `requires`; this guard would be vacuous");
     }
 
     /// Fail-closed, enumerated over the REGISTRY: every `[command.output]` claim is probed on a HOT
@@ -2362,9 +2410,15 @@ mod tests {
         use crate::registry::types::OutputLocus;
 
         let mut probed = 0usize;
-        for name in crate::registry::toml_command_names() {
-            let Some(spec) = crate::registry::command_output_locus(name) else { continue };
+        for (scope, spec) in crate::registry::output_claims() {
             probed += 1;
+            // A `requires`-gated claim is only live with its flag, so every probe below carries it.
+            // `name` is therefore the invocation PREFIX, not just a command name.
+            let name = match spec.requires.first() {
+                Some(required) => format!("{scope} {required}"),
+                None => scope.clone(),
+            };
+            let name = name.as_str();
             match spec.locus_from {
                 // An `atom` claim is that no output word can contain a separator, so the check is
                 // the claim: run the command's OWN examples and read what they would print. A
@@ -2453,6 +2507,14 @@ mod tests {
             }
         }
         assert!(probed > 0, "no command declares [command.output] — the guard is vacuous");
+        // The enumeration must reach SUB-scoped claims, not just command-scoped ones. Without this
+        // the extension is silently self-defeating: a walker that stopped at the top level would
+        // make every `[command.sub.output]` skip the probes above and the guard would still be
+        // green, reporting coverage it does not have.
+        assert!(
+            crate::registry::output_claims().iter().any(|(scope, _)| scope.contains(' ')),
+            "no sub-scoped output claim was enumerated, so `[command.sub.output]` is unprobed",
+        );
     }
 
     /// Enumerated over the REGISTRY: a flag declared `valued` on `[command.output]` means "this
@@ -2463,8 +2525,13 @@ mod tests {
     fn output_valued_flags_agree_across_spellings() {
         use crate::registry::types::OutputLocus;
         let mut checked = 0usize;
-        for name in crate::registry::toml_command_names() {
-            let Some(spec) = crate::registry::command_output_locus(name) else { continue };
+        for (scope, spec) in crate::registry::output_claims() {
+            // As above: a `requires`-gated claim is only live with its flag, so the probe carries it.
+            let name = match spec.requires.first() {
+                Some(required) => format!("{scope} {required}"),
+                None => scope.clone(),
+            };
+            let name = name.as_str();
             for flag in &spec.valued {
                 // An invalidating flag voids the claim by design, so it is not a spelling case.
                 if spec.invalidated_by.contains(flag) {

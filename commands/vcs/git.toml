@@ -198,6 +198,47 @@ valued = [
     "--unified", "--word-diff", "--word-diff-regex",
     "-G", "-O", "-S", "-U",
 ]
+# `$(git diff --name-only)` is the standard way an agent asks "which files changed", and without a
+# claim here the value is unpinnable, so `grep -rn pat $(git diff --name-only)` denies.
+#
+# Only with `--name-only`: the default output is a PATCH, and --stat/--numstat/--raw/--name-status
+# are alternative formats rather than modifiers of it. In-repo, git emits repository-relative paths
+# that can be neither absolute nor contain `..`, so the value is worktree-bound.
+#
+# `--no-index` is the escape hatch and MUST void the claim: it compares two filesystem paths and
+# prints them AS GIVEN, so `git diff --no-index --name-only /etc/passwd /tmp/x` yields an absolute
+# path from outside any repository. (`locus_from = "operands"` would also worst-case that to
+# `system` via the operand itself; the flag is listed so the claim does not depend on it.)
+# Verified against git-scm.com/docs/git-diff (git 2.53).
+[command.sub.output]
+locus_from = "operands"
+requires = ["--name-only"]
+invalidated_by = [
+    "--check",
+    "--compact-summary", "--cumulative",
+    "--dirstat", "--dirstat-by-file",
+    "--line-prefix",
+    "--name-status",
+    "--no-index",
+    "--numstat",
+    "--patch", "--patch-with-raw", "--patch-with-stat",
+    "--raw",
+    "--shortstat", "--stat", "--summary",
+    "-p", "-u", "-z",
+]
+valued = [
+    "--abbrev", "--color", "--color-moved",
+    "--diff-algorithm", "--diff-filter",
+    "--diff-merges", "--dirstat", "--dst-prefix",
+    "--inter-hunk-context",
+    "--line-prefix",
+    "--output-indicator-new", "--output-indicator-old",
+    "--relative", "--src-prefix",
+    "--stat-count", "--stat-graph-width", "--stat-name-width", "--stat-width",
+    "--submodule",
+    "--unified", "--word-diff", "--word-diff-regex",
+    "-G", "-O", "-S", "-U",
+]
 
 [[command.sub]]
 name = "diff-tree"

@@ -93,6 +93,45 @@ pub(crate) fn command_output_locus(cmd: &str) -> Option<&'static crate::registry
         .and_then(|spec| spec.output.as_ref())
 }
 
+/// What the SUBCOMMAND in `words` prints, when that sub has declared it
+/// (`[command.sub.output]`), plus the arguments left after the sub path.
+///
+/// Separate from `command_output_locus` because for a multi-command tool the claim belongs to the
+/// sub, not the program: `git diff --name-only` prints worktree paths while `git log` prints prose.
+/// Expressing that command-level would mean an `invalidated_by` naming every OTHER subcommand — a
+/// denylist, which fails open the next time git grows one.
+///
+/// Descends nested subs to the deepest declaring node, the same walk `is_eval_safe_invocation`
+/// does, so a claim can sit on `<resource> <action>`. `None` when no sub on the path declares one,
+/// which leaves the caller to fall back to the command-level claim (and then to unpinnable).
+pub(crate) fn sub_output_locus(
+    words: &[String],
+) -> Option<(&'static crate::registry::types::OutputSpec, &[String])> {
+    let (name, mut rest) = words.split_first()?;
+    let spec = CUSTOM_REGISTRY
+        .get(name.as_str())
+        .or_else(|| TOML_REGISTRY.get(name.as_str()))?;
+    let mut kind = &spec.kind;
+    let mut found: Option<(&'static crate::registry::types::OutputSpec, &[String])> = None;
+    loop {
+        let subs = match kind {
+            DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+            _ => return found,
+        };
+        let Some((arg, tail)) = rest.split_first() else { return found };
+        let Some(sub) = subs.iter().find(|s| s.name == *arg) else {
+            return found;
+        };
+        rest = tail;
+        // Deepest declaration wins, but a shallower one is kept while descending: a sub that
+        // declares and whose child does not still describes what the child prints.
+        if let Some(o) = sub.output.as_ref() {
+            found = Some((o, rest));
+        }
+        kind = &sub.kind;
+    }
+}
+
 /// The facet archetypes (`archetypes.toml`) the subcommand `tokens` resolve to — the Phase-1
 /// `profile = …` classification plus a capability for every present escalating `[[command.sub.flag]]`
 /// (`git push` → `[vcs-sync]`; `git push --force` → `[vcs-sync, remote-destroy-irreversible]`). The
@@ -473,6 +512,43 @@ pub fn toml_command_names() -> Vec<&'static str> {
         .keys()
         .map(|k| k.as_str())
         .collect()
+}
+
+/// EVERY declared stdout claim in the registry, command-level and sub-level alike, each paired with
+/// the invocation scope that carries it (`"fd"`, `"git diff"`).
+///
+/// The structural guards over `[command.output]` enumerate this rather than `toml_command_names`,
+/// so a sub-scoped claim is held to the same bar as a command-scoped one. Enumerating only commands
+/// would have let every `[command.sub.output]` ship unprobed — the claim is transitive (it widens
+/// whatever consumes the substitution), so an unguarded one is the worst kind to add.
+#[cfg(test)]
+pub(crate) fn output_claims() -> Vec<(String, &'static crate::registry::types::OutputSpec)> {
+    fn walk(
+        prefix: &str,
+        kind: &'static DispatchKind,
+        out: &mut Vec<(String, &'static crate::registry::types::OutputSpec)>,
+    ) {
+        let subs = match kind {
+            DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+            _ => return,
+        };
+        for sub in subs {
+            let scope = format!("{prefix} {}", sub.name);
+            if let Some(o) = sub.output.as_ref() {
+                out.push((scope.clone(), o));
+            }
+            walk(&scope, &sub.kind, out);
+        }
+    }
+
+    let mut out = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if let Some(o) = spec.output.as_ref() {
+            out.push((name.clone(), o));
+        }
+        walk(name, &spec.kind, &mut out);
+    }
+    out
 }
 
 /// Every command's canonical name with its declared `examples_safe` / `examples_denied`

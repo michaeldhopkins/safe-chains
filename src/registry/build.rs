@@ -253,6 +253,10 @@ pub(super) fn build_subs(
             eval_safe_flags: canonical.eval_safe_flags.clone(),
             eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
             eval_safe_required_flags: canonical.eval_safe_required_flags.clone(),
+            // As with the flag allowlist: an alias spelling must carry the canonical sub's stdout
+            // claim, or `$(git diff --name-only)` would be bounded while an aliased spelling of the
+            // same sub fell back to unpinnable — the mirror of the sub-alias gate hole.
+            output: canonical.output.clone(),
             network_destination: canonical.network_destination,
             destination_flag: canonical.destination_flag.clone(),
         loopback_valued: canonical.loopback_valued.clone(),
@@ -442,8 +446,10 @@ pub(super) fn build_sub(
     assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values)?;
     assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags)?;
     assert_sub_eval_safe_only_on_leaf(parent, &toml)?;
+    let output = lower_output(&format!("{parent} {name}"), toml.output.as_ref())?;
     Ok(SubSpec {
         name,
+        output,
         kind: build_sub_kind(parent, toml, handler_policies)?,
         policy_ref,
         profile,
@@ -947,6 +953,7 @@ fn lower_output(name: &str, o: Option<&TomlOutput>) -> Result<Option<OutputSpec>
         locus_from,
         invalidated_by: o.invalidated_by.clone(),
         valued: o.valued.clone(),
+        requires: o.requires.clone(),
     }))
 }
 

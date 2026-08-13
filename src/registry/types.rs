@@ -198,6 +198,12 @@ pub(super) struct TomlOutput {
     /// silently-shared list would let an unrelated edit change what counts as a root.
     #[serde(default)]
     pub valued: Vec<String>,
+    /// Flags of which at least ONE must be present, or the claim does not hold. The inverse of
+    /// `invalidated_by`, and needed by any command whose default output is not paths at all:
+    /// `git diff` prints a PATCH, and only `--name-only` turns it into a list of paths. Empty
+    /// (the normal case) means the claim holds for the bare invocation.
+    #[serde(default)]
+    pub requires: Vec<String>,
 }
 
 /// A command's declarative facet behavior (`[command.behavior]`). Field values that name a
@@ -606,6 +612,17 @@ pub(super) struct TomlSub {
     /// command-level field).
     #[serde(default)]
     pub eval_safe_required_flags: Vec<String>,
+    /// `[command.sub.output]` — what THIS SUB's stdout can name (same shape and
+    /// semantics as the command-level `[command.output]`).
+    ///
+    /// Sub-scoped because the claim rarely holds for a whole multi-command tool:
+    /// `git diff --name-only` prints worktree paths, while `git log` prints prose
+    /// and `git config --get` prints whatever was configured. A command-level
+    /// claim would have to be voided by an `invalidated_by` list naming every
+    /// other subcommand, which is a denylist and fails open on the next one git
+    /// adds.
+    #[serde(default)]
+    pub output: Option<TomlOutput>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -771,6 +788,8 @@ pub(crate) struct OutputSpec {
     pub invalidated_by: Vec<String>,
     /// Value-taking flags (see `TomlOutput::valued`).
     pub valued: Vec<String>,
+    /// Flags of which at least one must be present (see `TomlOutput::requires`).
+    pub requires: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -869,6 +888,9 @@ pub(super) struct SubSpec {
     /// Per-valued-flag value allowlist (same semantics as on
     /// `CommandSpec`).
     pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Lowered `[command.sub.output]` — this sub's own stdout claim, consulted by
+    /// `registry::sub_output_locus` before the command-level one.
+    pub output: Option<OutputSpec>,
     /// Flags where at least one must appear in the substituted
     /// invocation (same semantics as on `CommandSpec`).
     pub eval_safe_required_flags: Vec<String>,

@@ -57,6 +57,34 @@ tolerate_unknown_long = true
 name = "diff"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+# `jj diff --name-only` prints workspace-relative paths, one per line — jj's own help recommends it
+# for exactly this ("useful for shell commands like: jj diff -r @- --name-only | xargs ..."), so
+# leaving the value unpinnable denied the idiom the tool documents.
+#
+# jj enforces the exclusivity itself, which is what makes this claim safe under
+# `tolerate_unknown_long`: --template/--summary/--stat/--types are declared conflicting with
+# --name-only and jj exits with an error rather than combining them. A future format flag would
+# almost certainly join that conflict set; the ones known today are listed regardless, because a
+# claim that leans on another layer breaks the moment that layer moves.
+#
+# `-R`/`--repository` is deliberately absent from `valued`: it points jj at ANOTHER repo, so its
+# value SHOULD count as a root and worst-case the locus (`--repository /etc` → system → denied)
+# rather than be skipped and let the claim keep reporting worktree.
+# Verified against jj 0.39.0 (`jj diff --help`).
+[command.sub.output]
+locus_from = "operands"
+requires = ["--name-only"]
+invalidated_by = [
+    "--color",
+    "--config", "--config-file",
+    "--debug",
+    "--git", "--color-words",
+    "--stat", "--summary", "--types",
+    "--template", "-T",
+    "--tool",
+    "-s",
+]
+valued = ["--context", "--from", "--revisions", "--to", "-f", "-r", "-t"]
 
 [[command.sub]]
 name = "duplicate"

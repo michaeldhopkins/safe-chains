@@ -805,7 +805,16 @@
 # valued: this command's value-taking flags, so a VALUE is not counted
 #   as an operand (`head -n 5` takes no file). Needed by "stdin", whose
 #   whole test is "does it have a file operand"; harmless to omit under
-#   "operands", where an over-counted root only ever denies.
+#   "operands", where an over-counted root only ever denies. The corollary
+#   is a TOOL: leave a flag OUT on purpose when its value should widen the
+#   locus — `jj diff -R <path>` points at another repo, so letting the
+#   path count as a root worst-cases it instead of reporting worktree.
+#
+# requires: flags of which at least ONE must be present, or there is no
+#   claim. The inverse of `invalidated_by`, for a command whose DEFAULT
+#   output is not paths at all: `git diff` prints a patch, and only
+#   `--name-only` turns it into a list of paths. Omit (the normal case)
+#   when the claim holds for the bare invocation.
 #
 # Every remaining argument counts as a root — deliberately, including
 # ones that carry no `/` or `.`. Do NOT reintroduce a path-shape test
@@ -821,6 +830,20 @@
 # `.safe-chains.toml` cannot carry it. Unlike every other per-command field, this one is
 # TRANSITIVE: it widens whatever CONSUMES the output, so declaring it on `echo` is really a
 # statement that `cat $(echo /etc/shadow)` may run.
+#
+# SUB-SCOPED form (`[command.sub.output]`): identical shape and semantics, attached to a
+# subcommand instead of the program. Prefer it for any multi-command tool — the claim almost
+# never holds program-wide. `git diff --name-only` prints worktree paths while `git log` prints
+# prose, and expressing that at command level would need an `invalidated_by` naming every OTHER
+# subcommand, which is a denylist and fails open on the next one git adds. Nested subs are walked
+# to the deepest declaring node, and a sub ALIAS inherits the canonical sub's claim.
+#
+# [[command.sub]]
+# name = "diff"
+# [command.sub.output]
+# locus_from = "operands"
+# requires = ["--name-only"]
+# invalidated_by = ["--stat", "--numstat", "--no-index", "-z"]
 #
 # See docs/design/behavioral-taxonomy-substitution-locus.md.
 
