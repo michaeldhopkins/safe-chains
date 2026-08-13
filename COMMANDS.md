@@ -5930,6 +5930,18 @@ Aliases: `g++`, `cc`, `c++`
 - **worktree list**: Flags: --porcelain, --verbose, -v, -z
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `git diff src/x.rs`
+- `git diff main`
+- `git diff main..feature`
+- `git diff HEAD~3 -- src/`
+- `git diff --name-only`
+- `git -c diff.mnemonicPrefix=false -c diff.noprefix=false diff main -- src/x.rs`
+- `git diff -S /etc/passwd`
+- `git diff -G /etc/passwd`
+- `git diff -O orderfile`
+
 ### `git-cliff`
 <p class="cmd-url"><a href="https://git-cliff.org/">https://git-cliff.org/</a></p>
 

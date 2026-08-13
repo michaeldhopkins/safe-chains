@@ -352,7 +352,7 @@ git blame	--ignore-revs-file	untriaged	-	-	-
 git cat-file	--path	untriaged	-	-	-	
 git commit	--file	untriaged	-	-	-	
 git describe	--dirty	untriaged	-	-	-	
-git diff	--dirstat	untriaged	-	-	-	
+git diff	--dirstat	not-a-path	-	-	-	Takes dirstat PARAMETERS (changes,lines,files,cumulative,<limit>), not a path — a false positive of the "dir" name test. The positional gate on `git diff` marks it `ignore` for the same reason.
 git grep	--open-files-in-pager	untriaged	-	-	-	
 git ls-files	--exclude-per-directory	untriaged	-	-	-	
 git rev-parse	--resolve-git-dir	untriaged	-	-	-	

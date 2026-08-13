@@ -696,6 +696,28 @@ positional = "write"
 [roles."swiftlint autocorrect"]
 positional = "write"
 
+# `git diff` prints the CONTENT of the files it is given, and with two paths outside the worktree it
+# stops being a VCS command at all: `git diff --no-index /etc/shadow /dev/null` renders a credential
+# file into the caller's context as a unified diff. git engages that mode implicitly too — its own
+# docs say `--no-index` may be omitted "when at least one of the paths points outside the working
+# tree" — so keying the gate on the flag would miss the shorter spelling. Gating the POSITIONALS
+# covers both, and costs nothing in normal use: an in-repo pathspec (`git diff src/x.rs`) and a
+# revision (`main`, `HEAD~3`, `main..feature`) are relative and read as worktree, while only a path
+# that leaves the tree — which as a pathspec git would reject anyway — denies.
+#
+# `diff-tree`/`diff-files`/`diff-index` take tree-ish arguments rather than filesystem paths and
+# have no --no-index mode, so they are not gated here.
+#
+# The valued flags need roles too, and in both directions. `-O <orderfile>` names a file git READS,
+# so it is gated (`git diff -O /etc/shadow`). But `-S`/`-G` take a SEARCH STRING and a regex, and
+# gating a bare `positional = "read"` without saying so denied `git diff -S /etc/passwd` — looking
+# for a path-shaped literal in the diff, which reads nothing. Every remaining valued flag takes a
+# count, a mode name, an enum or a display prefix, so each is `ignore`: an unlisted one would be
+# gated as a path and repeat that false deny.
+[roles."git diff"]
+positional = "read"
+flags = { "-O" = "read", "--relative" = "read", "-S" = "ignore", "-G" = "ignore", "-U" = "ignore", "--unified" = "ignore", "--abbrev" = "ignore", "--color" = "ignore", "--color-moved" = "ignore", "--diff-algorithm" = "ignore", "--diff-filter" = "ignore", "--diff-merges" = "ignore", "--dirstat" = "ignore", "--src-prefix" = "ignore", "--dst-prefix" = "ignore", "--inter-hunk-context" = "ignore", "--line-prefix" = "ignore", "--output-indicator-new" = "ignore", "--output-indicator-old" = "ignore", "--stat-count" = "ignore", "--stat-graph-width" = "ignore", "--stat-name-width" = "ignore", "--stat-width" = "ignore", "--submodule" = "ignore", "--word-diff" = "ignore", "--word-diff-regex" = "ignore" }
+
 # `-w`/`--write` do NOT take a value — they rewrite every file OPERAND in place. Gating them as
 # path-valued flags looked right on a one-operand probe (`shfmt -w ~/.ssh/config` denied, because
 # the gate ate the path as `-w`'s value) and left the real shape wide open:

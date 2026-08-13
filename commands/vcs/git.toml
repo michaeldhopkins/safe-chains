@@ -3,6 +3,33 @@ name = "git"
 description = "Distributed version control system. git has a huge surface area — hundreds of subcommands and flags, with new ones added regularly. Read-only operations (log, diff, status, blame, show, branch listing) are safe. Write operations (push, commit, merge, rebase, reset, checkout) modify the repo or communicate with remotes. fetch contacts the network but only downloads; it does not modify the working tree. diff and show have 50+ display flags that are all safe but easy to miss. git releases roughly every 2-3 months (e.g. 2.48 through 2.53 shipped between Jan 2025 and Feb 2026), with git 3.0 expected late 2026; flag coverage needs periodic review."
 url = "https://git-scm.com/docs"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "git diff src/x.rs",
+    "git diff main",
+    "git diff main..feature",
+    "git diff HEAD~3 -- src/",
+    "git diff --name-only",
+    "git -c diff.mnemonicPrefix=false -c diff.noprefix=false diff main -- src/x.rs",
+    # The pickaxe flags take a SEARCH STRING and a regex, not paths — a path-shaped literal reads
+    # nothing, and gating the positionals without saying so denied these.
+    "git diff -S /etc/passwd",
+    "git diff -G /etc/passwd",
+    "git diff -O orderfile",
+]
+examples_denied = [
+    # `git diff` renders file CONTENT. Given paths outside the tree it is a file reader rather than
+    # a VCS command, so its positionals are locus-gated — and in the IMPLICIT --no-index form too,
+    # which git engages on its own when a path points outside the working tree.
+    "git diff --no-index /etc/shadow /dev/null",
+    "git diff --no-index ~/.ssh/id_rsa /dev/null",
+    "git diff /etc/shadow",
+    # Vetting the `-c` display keys must not launder the subcommand, nor admit an unvetted key.
+    "git -c diff.noprefix=false push",
+    "git -c diff.external=/tmp/evil.sh diff",
+    "git -c diff.orderFile=/etc/shadow diff",
+    # `-O` names a file git READS; its flag name would never have caught the path-named heuristic.
+    "git diff -O /etc/shadow",
+]
 [command.wrapper]
 valued = ["-C"]
 
