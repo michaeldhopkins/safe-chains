@@ -91,13 +91,39 @@ fn dispatch_require_any(
     }
 }
 
+/// Whether `s` is a rustup toolchain selector (`+nightly`, `+1.90.0`, `+nightly-2026-01-01`).
+///
+/// A POSITIVE shape test, so an unrecognized spelling is simply not a selector and dispatch
+/// proceeds without stripping it (which then denies on the unknown token). The selector names an
+/// ALREADY-INSTALLED toolchain — rustup resolves `+name` through its own toolchain list and cannot
+/// be pointed at an arbitrary directory — so the shape is restricted to what a toolchain name can
+/// be. `/`, `~`, `$`, `.` and `..` are excluded by construction rather than by exclusion: only
+/// alphanumerics and `._-` are admitted, and a name must start alphanumeric so `+..` cannot form.
+fn is_toolchain_selector(s: &str) -> bool {
+    let Some(name) = s.strip_prefix('+') else { return false };
+    !name.is_empty()
+        && name.starts_with(|c: char| c.is_ascii_alphanumeric())
+        && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
+}
+
 fn skip_pre_flags(
     tokens: &[Token],
     pre_standalone: &[String],
     pre_valued: &[String],
+    toolchain_selector: bool,
     start: usize,
 ) -> usize {
     let mut i = start;
+    // At most ONE, and only in front. `cargo +nightly build` selects which toolchain runs `build`;
+    // it does not change what `build` does, which is why the sub dispatch below is reached
+    // unchanged. Bounded to a single leading token so a `+`-prefixed OPERAND deeper in the line is
+    // never silently eaten.
+    if toolchain_selector
+        && let Some(t) = tokens.get(i)
+        && is_toolchain_selector(t.as_str())
+    {
+        i += 1;
+    }
     while i < tokens.len() {
         let t = &tokens[i];
         let s = t.as_str();
@@ -151,10 +177,11 @@ fn dispatch_branching(
     bare_flags: &[String],
     bare_ok: bool,
     pre_flags: (&[String], &[String]),
+    toolchain_selector: bool,
     glob: &GlobArm<'_>,
 ) -> Verdict {
     let (pre_standalone, pre_valued) = pre_flags;
-    let start = skip_pre_flags(tokens, pre_standalone, pre_valued, 1);
+    let start = skip_pre_flags(tokens, pre_standalone, pre_valued, toolchain_selector, 1);
     if start >= tokens.len() {
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
@@ -162,7 +189,7 @@ fn dispatch_branching(
     let is_bare_flag = bare_flags.iter().any(|f| f == arg)
         || (bare_flags.is_empty() && matches!(arg, "--help" | "-h"));
     if is_bare_flag {
-        let after = skip_pre_flags(tokens, pre_standalone, pre_valued, start + 1);
+        let after = skip_pre_flags(tokens, pre_standalone, pre_valued, toolchain_selector, start + 1);
         if after >= tokens.len() {
             return Verdict::Allowed(SafetyLevel::Inert);
         }
@@ -277,10 +304,11 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
         DispatchKind::Branching {
             subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
             first_arg_standalone, first_arg_valued, first_arg_loopback_valued,
-            credential_first_arg,
+            credential_first_arg, toolchain_selector,
         } => {
             dispatch_branching(
                 tokens, subs, bare_flags, *bare_ok, (pre_standalone, pre_valued),
+                *toolchain_selector,
                 &GlobArm {
                     patterns: first_arg,
                     level: *first_arg_level,
@@ -532,4 +560,63 @@ pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdic
         return Verdict::Denied;
     }
     Verdict::Allowed(spec.level)
+}
+
+#[cfg(test)]
+mod toolchain_selector_tests {
+    use crate::is_safe_command;
+
+    /// The selector is OPT-IN, and must stay that way. Stripping a leading `+token` for every
+    /// structured command would silently swallow a first positional on tools that have no such
+    /// convention — `+nightly` is a rustup spelling, not a shell one.
+    ///
+    /// Enumerated over commands that dispatch subs but do NOT declare it: the bare sub allows, and
+    /// the same sub behind a `+toolchain` must NOT, because for these tools that token is an
+    /// unknown operand rather than a selector.
+    #[test]
+    fn a_toolchain_selector_is_not_stripped_unless_declared() {
+        for (bare, with_selector) in [
+            ("git log", "git +nightly log"),
+            ("jj log", "jj +nightly log"),
+            ("docker compose logs", "docker +nightly compose logs"),
+            ("go version", "go +nightly version"),
+        ] {
+            assert!(is_safe_command(bare), "precondition: `{bare}` should allow");
+            assert!(
+                !is_safe_command(with_selector),
+                "`{with_selector}`: a toolchain selector was stripped for a command that does not \
+                 declare `toolchain_selector`, so a leading operand is being silently discarded"
+            );
+        }
+    }
+
+    /// ...and IS stripped where declared, for every spelling a toolchain name takes.
+    #[test]
+    fn a_declared_toolchain_selector_is_accepted() {
+        for line in [
+            "cargo +nightly build",
+            "cargo +stable test",
+            "cargo +1.90.0 check",
+            "cargo +nightly-2026-01-01 build",
+            "cargo +nightly-x86_64-apple-darwin build",
+        ] {
+            assert!(is_safe_command(line), "`{line}` should classify as its bare subcommand does");
+        }
+    }
+
+    /// The selector does not launder the SUBCOMMAND: what `cargo publish` is stays what
+    /// `cargo +nightly publish` is. This is the fail-open the strip would cause if it were applied
+    /// before, rather than instead of, the sub's own classification.
+    #[test]
+    fn a_toolchain_selector_does_not_change_its_subcommand() {
+        for sub in ["publish", "install ripgrep", "login"] {
+            let bare = format!("cargo {sub}");
+            let selected = format!("cargo +nightly {sub}");
+            assert_eq!(
+                is_safe_command(&bare),
+                is_safe_command(&selected),
+                "`{selected}` disagrees with `{bare}` — the selector changed the verdict",
+            );
+        }
+    }
 }

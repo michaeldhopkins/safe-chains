@@ -5,6 +5,10 @@ url = "https://doc.rust-lang.org/cargo/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
   "cargo fuzz --version",
+  "cargo +nightly build",
+  "cargo +nightly test",
+  "cargo +1.90.0 check",
+  "cargo +nightly-2026-01-01 build",
   "cargo mutants",
   "cargo mutants --list",
   "cargo mutants --list --json",
@@ -34,6 +38,19 @@ examples_safe = [
   "cargo swift package --features foo --all-features",
 ]
 examples_denied = [
+  # A toolchain selector selects a toolchain; it must not launder the SUBCOMMAND past its own
+  # classification, nor admit a token that is not a toolchain name.
+  "cargo +nightly publish",
+  "cargo +nightly install ripgrep",
+  "cargo +../evil build",
+  "cargo +/tmp/evil build",
+  "cargo ++nightly build",
+  # The leading-character rule, which the `/`-bearing cases above do not reach: a name must start
+  # alphanumeric, so a relative-path-shaped or flag-shaped token is not a selector.
+  "cargo +.. build",
+  "cargo +. build",
+  "cargo +-evil build",
+  "cargo +nightly +stable build",
   # cargo-mutants: the escape hatches, one per mechanism. -C/--cargo-test-args feed arbitrary args
   # to cargo, --error injects a Rust expression that gets compiled and run, --in-place mutates the
   # real source tree, and -o/-d relocate the write or the project.
@@ -63,6 +80,16 @@ examples_denied = [
   "cargo build --config build.rustc-wrapper=/tmp/evil",
   "cargo swift package --platforms ios macos",
 ]
+
+# `cargo +nightly test` picks WHICH rustup toolchain runs `test`; it does not change what `test`
+# does, so the selector is stripped and the subcommand classifies exactly as it does without it.
+# Without this, every `+toolchain` spelling denied while the bare one auto-approved — the same
+# operation, two spellings, two answers. rustup resolves `+name` against its own installed
+# toolchains and cannot be aimed at a directory, and the accepted shape is a positive one
+# (alphanumeric-leading, `[A-Za-z0-9._-]`), so `+../x` and `+$X` are not selectors and still deny.
+# Only ONE, and only leading, so a `+`-prefixed operand deeper in the line is never eaten.
+[command.wrapper]
+toolchain_selector = true
 
 # `--manifest-path DIR/Cargo.toml` selects WHICH project cargo builds/tests/runs — a foreign one
 # runs foreign build.rs/tests/binary, so its value is gated by EXECUTOR locus (worktree allows,

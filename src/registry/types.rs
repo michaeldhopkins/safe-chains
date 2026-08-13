@@ -417,6 +417,11 @@ pub(super) struct TomlWrapper {
     pub separator: Option<String>,
     #[serde(default)]
     pub bare_ok: Option<bool>,
+    /// Accept one leading rustup toolchain selector (`cargo +nightly build`). A `+name` token is
+    /// not a flag, so `standalone` cannot express it, and the name is variable, so it cannot be
+    /// enumerated. Only meaningful on a structured (sub-dispatching) command.
+    #[serde(default)]
+    pub toolchain_selector: Option<bool>,
 }
 
 /// One `[[command.sub.flag]]`: a flag that escalates its sub's classification when present.
@@ -959,6 +964,9 @@ pub(super) enum DispatchKind {
         /// First-positional globs that classify the invocation as a credential-read (deny), checked
         /// after explicit subs and before the allow-glob. Empty for almost every command.
         credential_first_arg: Vec<String>,
+        /// Accept one leading rustup toolchain selector (`cargo +nightly build`), stripped before
+        /// sub dispatch. From `[command.wrapper] toolchain_selector = true`.
+        toolchain_selector: bool,
     },
     WriteFlagged {
         policy: OwnedPolicy,

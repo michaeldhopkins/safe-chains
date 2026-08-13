@@ -546,6 +546,16 @@
 #   separator   — stop scanning flags at this token (e.g., "--")
 #   bare_ok     — if true, running the wrapper with no inner command
 #                 is allowed (e.g., "env" alone lists variables)
+#   toolchain_selector — accept ONE leading rustup toolchain selector
+#                 (`cargo +nightly build`), stripped before sub dispatch.
+#                 A `+name` token is not a flag, so `standalone` cannot
+#                 express it, and the name varies, so it cannot be
+#                 enumerated. OPT-IN: `+nightly` is a rustup spelling, and
+#                 stripping it everywhere would swallow a first positional
+#                 on tools with no such convention. The selector chooses
+#                 WHICH toolchain runs the subcommand and never changes
+#                 what the subcommand does, so `cargo +nightly publish`
+#                 stays exactly as classified as `cargo publish`.
 
 # [[command]]
 # name = "timeout"

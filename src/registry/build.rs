@@ -728,6 +728,8 @@ fn build_sub_kind(
             first_arg_valued: toml.first_arg_valued,
             first_arg_loopback_valued: toml.first_arg_loopback_valued,
             credential_first_arg: toml.credential_first_arg,
+            // A nested sub level; the selector is only ever leading, so it belongs to the command.
+            toolchain_selector: false,
         });
     }
     build_policy_sub_kind(parent, toml, handler_policies)
@@ -1317,6 +1319,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                     first_arg_loopback_valued: toml.first_arg_loopback_valued,
                     first_arg_level,
                     credential_first_arg: toml.credential_first_arg,
+                    toolchain_selector: w.toolchain_selector.unwrap_or(false),
                 },
             });
         }
@@ -1386,6 +1389,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 first_arg_valued: toml.first_arg_valued,
                 first_arg_loopback_valued: toml.first_arg_loopback_valued,
                 credential_first_arg: toml.credential_first_arg,
+                // Declared on `[command.wrapper]`, which this arm is the no-wrapper case of.
+                toolchain_selector: false,
             },
         });
     }
