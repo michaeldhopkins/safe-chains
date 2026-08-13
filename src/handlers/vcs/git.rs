@@ -30,9 +30,44 @@ static GIT_C_ALLOWED_KV: WordSet = WordSet::new(&[
     "init.defaultBranch=trunk",
 ]);
 
+/// Settings safe for ANY value, matched on the KEY alone — display and formatting knobs that only
+/// change how a diff is rendered.
+///
+/// Enumerated as exact keys rather than a `diff.` prefix, because that namespace is NOT uniformly
+/// safe: `diff.external` and `diff.textconv` run a program of the caller's choosing, `diff.tool`
+/// and `diff.guitool` name one for difftool, and `diff.orderFile` reads an arbitrary file. A prefix
+/// rule would hand over all five. Three-part driver keys (`diff.<driver>.command`,
+/// `diff.<driver>.textconv`) also execute, and an exact two-part match excludes them by shape.
+///
+/// Keys are lowercased before lookup: git treats the section and variable names case-insensitively,
+/// so `diff.noPrefix` and `diff.noprefix` are one setting. A subsection (the middle component of a
+/// three-part name) IS case-sensitive, which costs nothing here — no three-part key is listed.
+///
+/// Verified against git-scm.com/docs/git-config (git 2.53) — none of these executes a program,
+/// reads a file, or reaches the network.
+static GIT_C_ALLOWED_KEYS: WordSet = WordSet::new(&[
+    "diff.algorithm",
+    "diff.colormoved",
+    "diff.colormovedws",
+    "diff.context",
+    "diff.dstprefix",
+    "diff.indentheuristic",
+    "diff.interhunkcontext",
+    "diff.mnemonicprefix",
+    "diff.noprefix",
+    "diff.relative",
+    "diff.renames",
+    "diff.srcprefix",
+    "diff.statgraphwidth",
+    "diff.submodule",
+    "diff.wordregex",
+    "diff.wserrorhighlight",
+]);
+
 /// Whether a `-c key=value` is on the allowlist. Positive by construction: an exact setting above,
-/// or one of three namespaces safe for any value — `color.*` (output styling), `advice.*` (hint
-/// toggles), `safe.directory` (ownership exceptions). Anything else is not on the list.
+/// a key safe for any value, or one of three namespaces safe for any value — `color.*` (output
+/// styling), `advice.*` (hint toggles), `safe.directory` (ownership exceptions). Anything else is
+/// not on the list.
 fn is_allowed_git_c(kv: &str) -> bool {
     if GIT_C_ALLOWED_KV.contains(kv) {
         return true;
@@ -41,7 +76,10 @@ fn is_allowed_git_c(kv: &str) -> bool {
         return false;
     };
     let key = key.to_ascii_lowercase();
-    key == "safe.directory" || key.starts_with("advice.") || key.starts_with("color.")
+    GIT_C_ALLOWED_KEYS.contains(key.as_str())
+        || key == "safe.directory"
+        || key.starts_with("advice.")
+        || key.starts_with("color.")
 }
 
 pub fn is_safe_git(tokens: &[Token]) -> Verdict {
@@ -149,6 +187,20 @@ mod tests {
         git_config_init_default_branch: "git -c init.defaultBranch=main ls-remote origin",
         git_config_multiple_c: "git -c core.askPass=false -c credential.helper= ls-remote origin",
         git_config_lower_c_with_upper_c: "git -C /repo -c core.askPass=false log",
+        git_c_diff_mnemonic_prefix: "git -c diff.mnemonicPrefix=false diff main -- src/x.rs",
+        git_c_diff_noprefix: "git -c diff.noprefix=false diff main",
+        git_c_diff_both_prefixes: "git -c diff.mnemonicPrefix=false -c diff.noprefix=false diff main -- src/x.rs",
+        git_c_diff_key_case_insensitive: "git -c DIFF.NOPREFIX=true diff",
+        git_c_diff_algorithm: "git -c diff.algorithm=histogram diff",
+        git_c_diff_context: "git -c diff.context=10 diff",
+        git_c_diff_color_moved: "git -c diff.colorMoved=zebra diff",
+        git_c_diff_src_prefix: "git -c diff.srcPrefix=old/ -c diff.dstPrefix=new/ diff",
+        git_c_diff_relative: "git -c diff.relative=true diff",
+        git_c_diff_renames: "git -c diff.renames=copies diff",
+        git_c_diff_indent_heuristic: "git -c diff.indentHeuristic=true diff",
+        git_c_diff_word_regex: "git -c diff.wordRegex=. diff --word-diff",
+        git_c_diff_submodule: "git -c diff.submodule=log diff",
+        git_c_diff_ws_error_highlight: "git -c diff.wsErrorHighlight=all diff",
         git_remote_bare: "git remote",
         git_remote_v: "git remote -v",
         git_remote_get_url: "git remote get-url origin",
@@ -190,6 +242,22 @@ mod tests {
     }
 
     denied! {
+        // The `diff.` namespace is NOT uniformly safe, which is why the display keys are listed
+        // exactly rather than by prefix. Each of these runs a program or reads a file, and each
+        // would be reachable the moment `diff.*` became a prefix rule.
+        git_c_diff_external_denied: "git -c diff.external=/tmp/evil.sh diff",
+        git_c_diff_textconv_denied: "git -c diff.textconv=/tmp/evil.sh diff",
+        git_c_diff_tool_denied: "git -c diff.tool=evil difftool",
+        git_c_diff_guitool_denied: "git -c diff.guitool=evil difftool",
+        git_c_diff_order_file_denied: "git -c diff.orderFile=/etc/shadow diff",
+        // A three-part driver key executes too, and must not be reached by the two-part match.
+        git_c_diff_driver_command_denied: "git -c diff.mydriver.command=/tmp/evil.sh diff",
+        git_c_diff_driver_textconv_denied: "git -c diff.myDriver.textconv=/tmp/evil.sh diff",
+        // Vetting display keys must not have widened `-c` generally.
+        git_c_core_ssh_command_denied: "git -c core.sshCommand=/tmp/evil.sh diff",
+        git_c_alias_shell_denied: "git -c alias.x=!/tmp/evil.sh diff",
+        git_c_core_editor_denied: "git -c core.editor=/tmp/evil.sh diff",
+        git_c_unvetted_diff_key_denied: "git -c diff.notARealKey=1 diff",
         // (`git rebase --help` moved to the safe set when rebase gained a facet profile — it is a
         // supported sub now, so its help form is an ordinary read.)
         git_push_help_denied: "git push --help",
