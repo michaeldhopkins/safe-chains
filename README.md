@@ -52,6 +52,10 @@ The legacy names `inert` / `safe-read` / `safe-write` still work. They map to
 
 Drop a `.safe-chains.toml` in your repo (or `~/.config/safe-chains.toml` for all projects) to add tools safe-chains doesn't know about, or to lock down a built-in command. See the [Custom Commands docs](https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html).
 
+## Development
+
+Add `--log` to the hook command to record what safe-chains didn't approve, and why, as JSON Lines in `~/.local/state/safe-chains/log.jsonl`. `--log-everything` records approvals too. Off by default; the file holds commands verbatim, credentials included. See the [Logging docs](https://www.michaeldhopkins.com/docs/safe-chains/logging.html).
+
 ## Contributing
 
 Found a safe command safe-chains should support? [Submit an issue.](https://github.com/michaeldhopkins/safe-chains/issues/new?template=command-request.yml)

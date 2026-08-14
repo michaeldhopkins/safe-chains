@@ -55,3 +55,4 @@
 # Contributing
 
 - [Adding Commands](contributing.md)
+- [Logging](logging.md)
