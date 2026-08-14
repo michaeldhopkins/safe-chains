@@ -1,0 +1,123 @@
+# Path policy corpus — the read/write surface, stated as cases rather than discovered per bug.
+#
+# Guard: tests/path_policy.rs::the_path_policy_corpus_holds
+#
+# WHY A CORPUS AND NOT SPOT TESTS
+#
+# The path model is the part of safe-chains users actually feel: every false deny is a prompt, and
+# every false allow is the whole product failing. It had been changed by accretion — a region node
+# added whenever someone hit a deny — which is how `~/.cargo/registry` came to read as `adjacent`
+# and `/usr/lib` as a sibling workspace. A corpus makes the surface a THING YOU CAN READ, so a
+# change to it is a diff in this file rather than a discovery six weeks later.
+#
+# THE POLICY, IN ONE PARAGRAPH
+#
+# Reads are broad: anything that is not a credential store may be read. Writes are narrow: the
+# workspace and its descendants, sibling workspaces, and scratch (/tmp). Home is readable and not
+# writable. The credential shield denies on the SECRET axis (`reads_secret`), not on locus, which is
+# what lets reads open up without the shield dissolving — and a user grant can never widen it.
+#
+# Format: <expected>\t<category>\t<command>
+#   expected  allow | deny
+#   category  grouping for the report; a whole category flipping is the signal that matters
+
+# ── Reads: the workspace and below ─────────────────────────────────────────────────────────
+allow	read-workspace	cat README.md
+allow	read-workspace	cat ./src/lib.rs
+allow	read-workspace	cat sub/dir/deep/file.txt
+allow	read-workspace	grep -rn pattern .
+
+# ── Reads: sibling workspaces (a peer checkout) ────────────────────────────────────────────
+allow	read-sibling	cat ../branchdiff/README.md
+allow	read-sibling	cat ../branchdiff/src/main.rs
+
+# ── Reads: scratch ─────────────────────────────────────────────────────────────────────────
+allow	read-temp	cat /tmp/notes.txt
+allow	read-temp	cat /private/tmp/claude-501/session/scratchpad/probe.tsv
+allow	read-temp	cat /var/tmp/x
+
+# ── Reads: home. The change — ordinary files under ~ were denied, and there is nothing
+# secret about ~/notes.txt. ────────────────────────────────────────────────────────────────
+allow	read-home	cat ~/notes.txt
+allow	read-home	cat ~/Downloads/statement.pdf
+allow	read-home	cat ~/.grok/config.toml
+allow	read-home	cat ~/.local/state/safe-chains/log.jsonl
+allow	read-home	cat ~/Library/LaunchAgents/com.example.plist
+allow	read-home	cat ~/.claude/CLAUDE.md
+allow	read-home	cat ~/.zshrc
+
+# ── Reads: toolchain and package content. These used to need hand-placed region nodes; they
+# should now fall out of the general rule. ─────────────────────────────────────────────────
+allow	read-packages	cat ~/.cargo/registry/src/idx/foo-0.1.0/src/lib.rs
+allow	read-packages	cat ~/.local/share/mise/installs/ruby/4.0.5/lib/x.rb
+allow	read-packages	cat ~/go/pkg/mod/example.com/x/y.go
+allow	read-packages	cat /usr/share/dict/words
+allow	read-packages	cat /usr/lib/libSystem.dylib
+allow	read-packages	cat /opt/homebrew/lib/x.dylib
+allow	read-packages	cat /nix/store/abc-pkg/bin/tool
+
+# ── Reads: the rest of the machine ─────────────────────────────────────────────────────────
+allow	read-machine	cat /etc/hosts
+allow	read-machine	cat /etc/passwd
+allow	read-machine	cat /usr/bin/env
+allow	read-machine	cat /var/log/system.log
+
+# ── Reads: THE SHIELD. Denies on the secret axis, so opening reads must not touch these. ───
+deny	read-shield	cat ~/.ssh/id_rsa
+deny	read-shield	cat ~/.ssh/authorized_keys
+deny	read-shield	cat .ssh/id_rsa
+deny	read-shield	cat ~/.aws/credentials
+deny	read-shield	cat ~/.gnupg/secring.gpg
+deny	read-shield	cat ~/.kube/config
+deny	read-shield	cat ~/.docker/config.json
+deny	read-shield	cat ~/.netrc
+deny	read-shield	cat /etc/shadow
+deny	read-shield	cat /etc/master.passwd
+deny	read-shield	cat ~/.config/gh/hosts.yml
+deny	read-shield	cat ~/.config/gcloud/credentials.db
+deny	read-shield	cat ~/Library/Keychains/login.keychain-db
+deny	read-shield	cat ~/Library/Cookies/Cookies.binarycookies
+deny	read-shield	cat /root/.bashrc
+deny	read-shield	cat /var/root/x
+
+# ── Writes: the workspace and below ────────────────────────────────────────────────────────
+allow	write-workspace	touch out.txt
+allow	write-workspace	touch ./build/artifact.o
+allow	write-workspace	cp a.txt sub/b.txt
+allow	write-workspace	rm ./build/artifact.o
+
+# ── Writes: sibling workspaces. Create and mutate yes; DESTROY is deliberately withheld and
+# is the one open question — see TODO.md. ──────────────────────────────────────────────────
+allow	write-sibling	touch ../branchdiff/x
+allow	write-sibling	cp a.txt ../branchdiff/x
+deny	write-sibling-destroy	rm ../branchdiff/x
+
+# ── Writes: scratch ────────────────────────────────────────────────────────────────────────
+allow	write-temp	touch /tmp/x
+allow	write-temp	echo hi > /tmp/x
+allow	write-temp	echo hi > /private/tmp/claude-501/session/scratchpad/o.txt
+allow	write-temp	rm /tmp/x
+
+# ── Writes: home is NOT writable. Reads outpace writes; this is the asymmetry. ─────────────
+deny	write-home	touch ~/x
+deny	write-home	cp a.txt ~/notes.txt
+deny	write-home	echo hi > ~/.zshrc
+deny	write-home	rm ~/notes.txt
+
+# ── Writes: the shield and the machine stay closed ─────────────────────────────────────────
+deny	write-shield	echo x > ~/.ssh/authorized_keys
+deny	write-shield	cp k ~/.aws/credentials
+deny	write-machine	touch /usr/lib/x
+deny	write-machine	echo x > /etc/hosts
+
+# ── Writes: things that RUN later. Frozen regardless of how permissive reads get. ──────────
+deny	write-autoexec	echo x > .git/hooks/pre-commit
+deny	write-autoexec	echo x > .envrc
+deny	write-autoexec	echo x > ~/.config/safe-chains.toml
+deny	write-autoexec	echo x > /etc/sudoers
+deny	write-autoexec	echo x > /etc/ld.so.preload
+
+# ── Reads of in-project trust files stay fine; it is the WRITE that is frozen. ─────────────
+allow	read-autoexec	cat .git/config
+allow	read-autoexec	cat .envrc
+allow	read-autoexec	cat ~/.config/safe-chains.toml

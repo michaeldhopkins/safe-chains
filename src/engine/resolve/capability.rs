@@ -3,8 +3,49 @@
 //! name the intent (`creates`/`overwrites`/`relocates`/`destroys`/`reads_*`/`worst`); the
 //! enum choices and `because` strings live here, in one place.
 
-use super::locus::{read_locus, write_locus};
+use super::locus::{names_credential_store, read_is_unshieldable, read_locus, write_locus};
 use crate::engine::facet::*;
+
+/// A read capability for `path`: its read locus AND, when the path cannot be cleared by the
+/// credential shield, the `secret · reads` claim.
+///
+/// **Use this rather than `reads_content(read_locus(p), …)` anywhere a PATH becomes a read.**
+///
+/// The shield has never actually reached the level algebra. `reads_secret` sits on the region nodes,
+/// but it is consumed only by `apply_grant` (stopping a grant widening a store) and the case-folding
+/// test — no capability ever carried it, so `cat ~/.ssh/id_rsa` denied purely because `.ssh`
+/// classifies `machine` and the reader level caps local reads at `worktree-trusted`. That made the
+/// reader level's own comment — `secret <= uses-ambient` "excludes credential EXTRACTION" — true
+/// only of commands that DECLARE a secret read (`security find-generic-password`), never of `cat` on
+/// a secret path.
+///
+/// So the verdict is unchanged today and the REASON is now correct, which is what makes the locus
+/// cap safe to relax later. Both halves matter: a path that names a store, and a path that cannot be
+/// checked at all.
+pub(super) fn reads_path(path: &str, scale: Scale, because: &str) -> Capability {
+    let mut c = reads_content(read_locus(path), scale, because);
+    if unshieldable(path) {
+        c.secret.level = SecretLevel::Reads;
+    }
+    c
+}
+
+/// As [`reads_path`], for the metadata-only observers (`find`, a `-f` script file, a tar member)
+/// that place a path without pulling its content into the model.
+pub(super) fn observes_path(path: &str, scale: Scale, because: &str) -> Capability {
+    let mut c = observes(read_locus(path), scale, because);
+    if unshieldable(path) {
+        c.secret.level = SecretLevel::Reads;
+    }
+    c
+}
+
+/// A read of `path` must be treated as a credential read when it either NAMES a known store or
+/// cannot be checked against the shield at all. See [`read_is_unshieldable`] for why the second half
+/// is not redundant with the locus.
+fn unshieldable(path: &str) -> bool {
+    names_credential_store(path) || read_is_unshieldable(path)
+}
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
 /// `-` operand is stdin (process-scoped); every other path is placed by `classify_locus`.
@@ -18,7 +59,7 @@ pub(super) fn reads_to_model(paths: &[&str], scale: Scale) -> Vec<Capability> {
             if *p == "-" {
                 reads_content(LocalLocus::Process, scale, "reads stdin (-)")
             } else {
-                reads_content(read_locus(p), scale, "reads file content to the model")
+                reads_path(p, scale, "reads file content to the model")
             }
         })
         .collect()

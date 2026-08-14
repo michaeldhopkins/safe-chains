@@ -20,8 +20,9 @@ pub(crate) mod regions;
 mod scenarios;
 
 use capability::{
-    breadth_scale, creates, destroys, executes, mutates, observes, overwrites, reads_content,
-    reads_to_model, relocates, transfer_profile, worst, writes_export_file,
+    breadth_scale, creates, destroys, executes, mutates, observes, observes_path, overwrites,
+    reads_content, reads_path, reads_to_model, relocates, transfer_profile, worst,
+    writes_export_file,
 };
 use flags::{walk_positionals, walk_value};
 use locus::{classify_locus, read_locus, write_locus};
@@ -66,7 +67,7 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
 /// (`cmd < path`) by its read locus, exactly as an operand read is gated, so `cat < /etc/shadow`
 /// denies like `cat /etc/shadow`. `-` / stdin never reaches here (redirects always name a file).
 pub(crate) fn read_content_verdict(path: &str) -> crate::verdict::Verdict {
-    let cap = reads_content(read_locus(path), Scale::Single, "reads a redirect source");
+    let cap = reads_path(path, Scale::Single, "reads a redirect source");
     crate::engine::bridge::project(&Profile::of(vec![cap]))
 }
 
@@ -628,7 +629,7 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
                 let mut caps: Vec<Capability> = g
                     .pattern_files
                     .iter()
-                    .map(|f| reads_content(read_locus(f), Scale::Single, "reads a grep -f pattern file"))
+                    .map(|f| reads_path(f, Scale::Single, "reads a grep -f pattern file"))
                     .collect();
                 caps.extend(reads_to_model(&g.files, g.scale));
                 Profile::of(caps)
@@ -795,7 +796,7 @@ fn path_flag_caps(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token])
         let long = pf.long.as_deref().unwrap_or("");
         if let Some(v) = walk_value(&spec.valued_short, tokens, short, long) {
             caps.push(match pf.role {
-                PathRole::Read => observes(read_locus(v), Scale::Single, "behavior: a flag value is a read path"),
+                PathRole::Read => observes_path(v, Scale::Single, "behavior: a flag value is a read path"),
                 PathRole::Write => mutates(write_locus(v), Scale::Single, "behavior: a flag value is a write path"),
             });
         }
@@ -1198,7 +1199,7 @@ impl<'a> TarParse<'a> {
             b'c' | b'r' | b'u' => {
                 let mut caps: Vec<Capability> = members
                     .iter()
-                    .map(|(dir, m)| observes(read_locus(&tar_bound(dir.as_deref(), m)), Scale::Bounded, "tar reads a member into the archive"))
+                    .map(|(dir, m)| observes_path(&tar_bound(dir.as_deref(), m), Scale::Bounded, "tar reads a member into the archive"))
                     .collect();
                 if let Some((dir, a)) = archive_file {
                     caps.push(overwrites(classify_locus(&tar_bound(dir, a)), Scale::Single, false));
@@ -1290,11 +1291,11 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     // home path denies whatever the scale).
     let scale = breadth_scale(&files, false);
     let mut caps: Vec<Capability> =
-        script_files.iter().map(|f| observes(read_locus(f), Scale::Single, "sed reads an -f script file")).collect();
+        script_files.iter().map(|f| observes_path(f, Scale::Single, "sed reads an -f script file")).collect();
     // Script-embedded file commands (`w`/`W` write, `r`/`R` read, `s///w` write) — gate each target
     // by its locus, just like an operand file.
     caps.extend(script.writes.iter().map(|f| mutates(classify_locus(f), Scale::Single, "sed w/W writes a file")));
-    caps.extend(script.reads.iter().map(|f| observes(read_locus(f), Scale::Single, "sed r/R reads a file")));
+    caps.extend(script.reads.iter().map(|f| observes_path(f, Scale::Single, "sed r/R reads a file")));
     if in_place {
         caps.extend(files.iter().map(|f| mutates(classify_locus(f), scale, "sed -i edits the file in place")));
     } else {
@@ -1989,6 +1990,73 @@ mod tests {
         c
     }
 
+    /// A read the credential shield cannot clear must SAY so, on the secret axis.
+    ///
+    /// Enumerated over the shield's own region nodes plus the unpinnable spellings, because the
+    /// claim has to survive a new store being declared and a new reader being written. Two halves,
+    /// and the second is the one that is easy to lose:
+    ///
+    ///  - a path that NAMES a store (`~/.ssh/id_rsa`) — the shield can check it and it fails;
+    ///  - a path the shield cannot check AT ALL (`$VAR`, an undeclared `$(…)`, an xargs item) —
+    ///    unknowable, so possibly a credential, so refused.
+    ///
+    /// Today both also deny by locus, which is exactly why this guard is worth having: the locus
+    /// cap makes the secret claim invisible in the verdict, so nothing else would notice it going
+    /// missing — and it is the only thing that keeps `find / | xargs -I{} cat {}` refused once
+    /// local reads open up (TODO.md).
+    #[test]
+    fn a_read_the_shield_cannot_clear_claims_secret() {
+        let secret_of = |cmd: &str| {
+            let toks: Vec<Token> = shell_words::split(cmd)
+                .expect("splits")
+                .into_iter()
+                .map(Token::from_raw)
+                .collect();
+            resolve(&toks).map(|p| {
+                p.capabilities.iter().any(|c| c.secret.level == crate::engine::facet::SecretLevel::Reads)
+            })
+        };
+
+        // Every declared credential store, read by the plainest reader there is.
+        let mut checked = 0usize;
+        for path in crate::engine::resolve::regions::declared_region_paths() {
+            if !crate::engine::resolve::names_credential_store(&path) {
+                continue;
+            }
+            // A node is a SUBTREE (`~/.ssh/`), a SEGMENT (`.ssh`) or an EXACT file
+            // (`/etc/master.passwd`). Only the first two have anything beneath them; appending to
+            // the exact form names a path that is not the node and is not shielded.
+            // QUOTED, because several stores have a space in them (`~/Library/Application
+            // Support/Firefox/`) and an unquoted probe splits into two tokens, neither of which is
+            // the node — the guard would pass by never testing them.
+            let probe = if path.ends_with('/') || !path.contains('/') {
+                format!("cat '{}/probe'", path.trim_end_matches('/'))
+            } else {
+                format!("cat '{path}'")
+            };
+            if let Some(claims) = secret_of(&probe) {
+                checked += 1;
+                assert!(claims, "`{probe}` reads a declared credential store without claiming secret");
+            }
+        }
+        assert!(checked > 0, "no credential store was probed — the guard is vacuous");
+
+        // Paths the shield cannot be consulted about at all.
+        for cmd in ["cat $SOMEVAR", "cat $(hostname)", "head -c 20 ${HOME}x/$Y"] {
+            assert_eq!(
+                secret_of(cmd),
+                Some(true),
+                "`{cmd}` names a path the shield cannot check, so it must claim secret"
+            );
+        }
+
+        // ...and an ordinary, checkable read does NOT — the claim has to discriminate, or it is
+        // just a second way of spelling "deny everything".
+        for cmd in ["cat ./README.md", "cat src/lib.rs"] {
+            assert_eq!(secret_of(cmd), Some(false), "`{cmd}` must not claim a secret read");
+        }
+    }
+
     /// Golden profiles: assert **every** facet of the resolved capability for
     /// representative invocations. This is the "all facets covered" check (§0) — struct
     /// equality means a facet the resolver forgot (left at a wrong default) or set wrong
@@ -2013,9 +2081,14 @@ mod tests {
         cat_home.locus.local = LocalLocus::Machine;
         assert_eq!(one_cap(&["cat", "~/notes.txt"]), cat_home, "cat ~/notes.txt");
 
-        // cat of a home CREDENTIAL store rises further, to machine (HP-20 credential role).
+        // cat of a home CREDENTIAL store: machine locus AND — the part that was missing until
+        // 2026-08-14 — a `secret · reads` claim. The region carried `reads_secret = true` all along,
+        // but nothing put it on the capability, so this golden recorded "reading an SSH private key
+        // claims no secret" and the denial rested entirely on the locus cap. Both facets now, which
+        // is what lets the locus cap be relaxed without handing over the key.
         let mut cat_cred = cat.clone();
         cat_cred.locus.local = LocalLocus::Machine;
+        cat_cred.secret.level = SecretLevel::Reads;
         assert_eq!(one_cap(&["cat", "~/.ssh/id_rsa"]), cat_cred, "cat ~/.ssh/id_rsa");
 
         // grep of a worktree file — like cat, bounded to the single searched file.

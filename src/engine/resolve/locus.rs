@@ -160,6 +160,53 @@ fn classify_one(path: &str, want_write: Face) -> LocalLocus {
     [operand_tag, cwd_tag].into_iter().flatten().fold(plain, LocalLocus::max)
 }
 
+/// Whether a READ of `path` lands somewhere the credential shield cannot be consulted about: the
+/// final spelling is STILL unpinnable once variables, substitutions and the cwd are resolved.
+///
+/// The shield can only fire on a path safe-chains can see. `$VAR`, an undeclared `$(…)` value and an
+/// xargs stdin item are precisely the targets it cannot check, so a read of one has to be treated as
+/// possibly-a-credential rather than merely far away.
+///
+/// Today this changes no verdict — an unpinnable path already classifies `machine`, and every
+/// auto-approving level caps local reads well below it, so these deny by locus. It is stated on the
+/// secret axis anyway because that is the true objection, and because the locus cap is not load-
+/// bearing forever: the moment local reads open up (TODO.md), locus stops denying and this is the
+/// only thing standing between `find / | xargs -I{} cat {}` and every key on the machine.
+///
+/// Runs the SAME pipeline `classify_one` does rather than testing the raw argument, and the
+/// difference is not academic: `for f in ./src/*; do cat $f; done` binds `$f` to a worktree
+/// representative, so the raw text carries a `$` while the resolved path is perfectly pinnable.
+/// Testing the raw form treats every bound loop variable as a credential.
+pub(crate) fn read_is_unshieldable(path: &str) -> bool {
+    // Mirror `face`'s scheme handling before the local pipeline, or a URL is judged as though it
+    // were a filename: `curl https://x.com/a/../b` is a network endpoint whose `..` is a path
+    // segment, and running it through canonicalization made it look unpinnable and denied a plain
+    // GET. A `file:` URL names a real local file, so its local part is tested; any other scheme is
+    // the handler's business, not the shield's.
+    if let Some(local) = file_url_local(path) {
+        return unpinnable_after_resolution(local);
+    }
+    if is_network_url(path) {
+        return false;
+    }
+    unpinnable_after_resolution(path)
+}
+
+fn unpinnable_after_resolution(path: &str) -> bool {
+    let expanded = crate::pathctx::expand_vars(path, false);
+    let expanded = neutralize_atoms(&expanded).into_owned();
+    let base = match tagged_substitution(&expanded) {
+        Some((_, rewritten)) => rewritten,
+        None => expanded,
+    };
+    let resolved = crate::pathctx::resolve(&base).into_owned();
+    let base = match tagged_substitution(&resolved) {
+        Some((_, rewritten)) => rewritten,
+        None => resolved,
+    };
+    is_unpinnable(&canonicalize(&base))
+}
+
 /// Classify an ALREADY-resolved path: canonicalize, fail closed on an unpinnable spelling, then
 /// read the region model's face.
 fn classify_pinned(resolved: &str, want_write: Face) -> LocalLocus {
