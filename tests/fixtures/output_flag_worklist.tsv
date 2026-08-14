@@ -5,66 +5,13 @@
 # never writes). Guard: registry::tests::ambiguous_output_flags_do_not_write_sensitive_paths --
 # every output-flag hole must be listed here (a NEW one fails closed => a real writer to gate), and
 # a listed entry that stops auto-approving fails as stale. The list only shrinks. Format: <cmd>\t<flag>
-@shopify/theme-check	--output
-@shopify/theme-check	-o
-ack	--output
-avbdiagnose	--output
-avbdiagnose	-o
-bombardier	-o
-cjpeg	-o
-df	--output
-duf	--output
-findmnt	--output
-findmnt	-o
-h2xs	-o
-hunspell	-o
-journalctl	--output
-journalctl	-o
-jpegtran	-o
-kramdown	--output
-kramdown	-o
-lp	-o
-lpoptions	-o
-lpr	-o
-lsblk	--output
-lsblk	-o
-lsof	-o
-mongostat	-o
-mythril	-o
-nroff	-o
-oid2name	-o
-parallel_test	-o
-pax	-o
-pcre2grep	--output
-pcre2grep	-o
-pg_recvlogical	-o
-pg_upgrade	-o
-ps	-o
-pytest	-o
-scp	-o
-shellcheck	-o
-sntp	-o
-ssh-copy-id	-o
-ssh-keygen	-o
-stern	--output
-stern	-o
-svelte-check	--output
-tiff2ps	-o
-tiffcp	-o
-tiffdump	-o
-tiffinfo	-o
-tokei	--output
-tokei	-o
-top	-o
-tshark	-o
-tsql	-o
-units	-o
-weasyprint	-o
-wrjpgcom	-o
-ytt	--output
-ytt	-o
-ziptool	-o
-
+#
+# One row is non-path for a different reason than the rest, so it is called out here rather than
+# left to look like an oversight: `safe-chains --log` / `--log-everything` are BOOLEANS, not valued
+# flags. The token after them is safe-chains' positional -- the command string to classify -- so the
+# probe's `~/.ssh/authorized_keys` is parsed as a command, never opened. The write these flags do
+# cause goes to a compiled-in constant (~/.local/state/safe-chains/log.jsonl) that no flag can
+# redirect, which is why there is no path value to gate. See docs/design/decision-log.md.
 # ── TRIAGED 2026-08-08 (a–f slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
 #
 # Each row below was checked against the tool's own reference for the researched version. The value
@@ -95,45 +42,6 @@ ziptool	-o
 #                                    positional rewrite is a separate, still-open question.
 #   dbt {list,ls} --output           `name|path|selector|json` — the shape of the node listing.
 #   flux version -o/--output         `yaml|json`.
-argocd version	--output
-bazel aquery	--output
-bazel cquery	--output
-bazel query	--output
-cargo udeps	--output
-clever activity	-o
-clever console	-o
-clever diag	-o
-clever link	-o
-clever login	-o
-clever logout	-o
-clever status	-o
-clever unlink	-o
-clever version	-o
-code	--add-mcp
-code	--enable-proposed-api
-code	--install-extension
-code	--uninstall-extension
-cosign verify	--output
-cosign verify	-o
-cosign verify-attestation	--output
-cosign verify-attestation	-o
-dapr components	--output
-dapr components	-o
-dapr configurations	--output
-dapr configurations	-o
-dapr list	--output
-dapr list	-o
-dapr status	--output
-dapr status	-o
-dapr version	--output
-dapr version	-o
-dart format	--output
-dart format	-o
-dbt list	--output
-dbt ls	--output
-flux version	--output
-flux version	-o
-
 # ── TRIAGED 2026-08-08 (q–s slice of the 2026-08-07 seeding) — verified NON-PATH values ──────────
 #
 # Same rule as the block above: each row was checked against the tool's own reference at the
@@ -181,33 +89,6 @@ flux version	-o
 # That declaration is there for `scan --save-as <FORMAT> <PATH>`, whose write target is the flag's
 # SECOND value and which no flag→role map can reach; neither safety sub takes a path positional
 # (every input is a flag: `-r`, `--target`), so it costs no ordinary usage.
-qemu-img check	--output
-qemu-img info	--output
-qemu-img map	--output
-qemu-img measure	--output
-qemu-img measure	-o
-qlmanage	-t
-rdfind	-deleteduplicates
-rdfind	-makehardlinks
-rdfind	-makesymlinks
-render environments	--output
-render environments	-o
-render logs	--output
-render logs	-o
-render projects	--output
-render projects	-o
-render whoami	--output
-render whoami	-o
-render workspaces	--output
-render workspaces	-o
-slither	--checklist
-supabase inspect	--output
-supabase inspect	-o
-supabase services	--output
-supabase services	-o
-systemctl status	--output
-systemctl status	-o
-
 # ── TRIAGED 2026-08-08 (t–z slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
 #
 # Same bar as the a–f block: each row was checked against the tool's own reference at the version in
@@ -236,18 +117,6 @@ systemctl status	-o
 #                              Wasmer's unknown-subcommand fallback re-parses argv as `wasmer run`,
 #                              which has no `--output` either, so the parse fails and nothing is
 #                              written.
-tilt describe	--output
-tilt describe	-o
-tilt get	--output
-tilt get	-o
-tuist build	--destination
-tuist generate	--destination
-tuist test	--destination
-velero get	--output
-velero get	-o
-wasmer wasm2wat	--output
-wasmer wat2wasm	--output
-
 # ── TRIAGED 2026-08-08 (o–x slice of the 2026-08-07 seeding) — verified NON-PATH values ──────────
 #
 # Same bar as the blocks above: each row checked against the tool's own source/reference at the
@@ -306,35 +175,6 @@ wasmer wat2wasm	--output
 #                              `-w`/`-d`/`-c` (verified: `xattr -w com.apple.quarantine 0
 #                              ~/.ssh/authorized_keys` and `xattr -d com.apple.quarantine
 #                              ~/.ssh/authorized_keys` both deny, while the `./a.txt` forms allow).
-oc events	--output
-oc events	-o
-oc explain	--output
-oc explain	-o
-oc get	--output
-oc get	-o
-oc status	--output
-oc status	-o
-oc version	--output
-oc version	-o
-packer validate	-o
-platform organization:billing:address	-o
-platform organization:billing:profile	-o
-platform organization:info	-o
-platform organization:subscription:list	-o
-platform organization:user:get	-o
-platform organization:user:list	-o
-platform organization:user:projects	-o
-platform pro	-o
-platform project:list	-o
-platform projects	-o
-platform team:get	-o
-platform team:list	-o
-platform team:project:list	-o
-platform team:user:list	-o
-platform teams	-o
-xattr	-d
-xattr	-w
-
 # ── TRIAGED 2026-08-08 (k–n slice of the 2026-08-07 seeding) — verified NON-PATH values ─────────
 #
 # Same bar as the blocks around it: every row checked against the tool's own reference at the
@@ -374,65 +214,6 @@ xattr	-w
 #   northflank {get,list,logs,metrics} -o/--output
 #                              `format|json|yaml` — the CLI-wide output format, `format` being the
 #                              human-readable default.
-
-borg check	--repair
-borg config	--delete
-depcruise	--init
-git fetch	-o
-git ls-remote	-o
-git pull	-o
-gomodifytags	--w
-gomodifytags	-w
-helm history	--output
-helm history	-o
-helm list	--output
-helm list	-o
-helm status	--output
-helm status	-o
-helmfile list	--output
-helmfile version	--output
-helmfile version	-o
-istioctl analyze	--output
-istioctl analyze	-o
-istioctl proxy-status	--output
-istioctl proxy-status	-o
-istioctl validate	--output
-istioctl validate	-o
-istioctl version	--output
-istioctl version	-o
-jupytext	--set-formats
-koyeb login	--output
-koyeb login	-o
-koyeb version	--output
-koyeb version	-o
-koyeb whoami	--output
-koyeb whoami	-o
-kubectl api-resources	--output
-kubectl api-resources	-o
-kubectl events	--output
-kubectl events	-o
-kubectl get	--output
-kubectl get	-o
-kubectl version	--output
-kubectl version	-o
-linkerd check	--output
-linkerd check	-o
-mtree	-r
-mtree	-u
-mtree	-U
-ncu	--upgrade
-ncu	-u
-neon me	--output
-neon me	-o
-northflank get	--output
-northflank get	-o
-northflank list	--output
-northflank list	-o
-northflank logs	--output
-northflank logs	-o
-northflank metrics	--output
-northflank metrics	-o
-
 # ── SEEDED 2026-08-07 — DRAINED 2026-08-08. Nothing below this line. ─────────────────────────────
 #
 # The seeded backlog is EMPTY: every row of it has been triaged and moved above, and every row that
@@ -521,3 +302,224 @@ northflank metrics	-o
 # and for these the sensitive path is consumed as the attribute NAME, so no file operand is
 # left to gate and the probe auto-approves. Real invocations ARE gated by xattr_mode:
 # `xattr -w k v ~/.ssh/id_rsa` and `xattr -d k /etc/hosts` both deny. Do not re-chase these.
+@shopify/theme-check	--output
+@shopify/theme-check	-o
+ack	--output
+argocd version	--output
+avbdiagnose	--output
+avbdiagnose	-o
+bazel aquery	--output
+bazel cquery	--output
+bazel query	--output
+bombardier	-o
+borg check	--repair
+borg config	--delete
+cargo udeps	--output
+cjpeg	-o
+clever activity	-o
+clever console	-o
+clever diag	-o
+clever link	-o
+clever login	-o
+clever logout	-o
+clever status	-o
+clever unlink	-o
+clever version	-o
+code	--add-mcp
+code	--enable-proposed-api
+code	--install-extension
+code	--uninstall-extension
+cosign verify	--output
+cosign verify	-o
+cosign verify-attestation	--output
+cosign verify-attestation	-o
+dapr components	--output
+dapr components	-o
+dapr configurations	--output
+dapr configurations	-o
+dapr list	--output
+dapr list	-o
+dapr status	--output
+dapr status	-o
+dapr version	--output
+dapr version	-o
+dart format	--output
+dart format	-o
+dbt list	--output
+dbt ls	--output
+depcruise	--init
+df	--output
+duf	--output
+findmnt	--output
+findmnt	-o
+flux version	--output
+flux version	-o
+git fetch	-o
+git ls-remote	-o
+git pull	-o
+gomodifytags	--w
+gomodifytags	-w
+h2xs	-o
+helm history	--output
+helm history	-o
+helm list	--output
+helm list	-o
+helm status	--output
+helm status	-o
+helmfile list	--output
+helmfile version	--output
+helmfile version	-o
+hunspell	-o
+istioctl analyze	--output
+istioctl analyze	-o
+istioctl proxy-status	--output
+istioctl proxy-status	-o
+istioctl validate	--output
+istioctl validate	-o
+istioctl version	--output
+istioctl version	-o
+journalctl	--output
+journalctl	-o
+jpegtran	-o
+jupytext	--set-formats
+koyeb login	--output
+koyeb login	-o
+koyeb version	--output
+koyeb version	-o
+koyeb whoami	--output
+koyeb whoami	-o
+kramdown	--output
+kramdown	-o
+kubectl api-resources	--output
+kubectl api-resources	-o
+kubectl events	--output
+kubectl events	-o
+kubectl get	--output
+kubectl get	-o
+kubectl version	--output
+kubectl version	-o
+linkerd check	--output
+linkerd check	-o
+lp	-o
+lpoptions	-o
+lpr	-o
+lsblk	--output
+lsblk	-o
+lsof	-o
+mongostat	-o
+mtree	-r
+mtree	-u
+mtree	-U
+mythril	-o
+ncu	--upgrade
+ncu	-u
+neon me	--output
+neon me	-o
+northflank get	--output
+northflank get	-o
+northflank list	--output
+northflank list	-o
+northflank logs	--output
+northflank logs	-o
+northflank metrics	--output
+northflank metrics	-o
+nroff	-o
+oc events	--output
+oc events	-o
+oc explain	--output
+oc explain	-o
+oc get	--output
+oc get	-o
+oc status	--output
+oc status	-o
+oc version	--output
+oc version	-o
+oid2name	-o
+packer validate	-o
+parallel_test	-o
+pax	-o
+pcre2grep	--output
+pcre2grep	-o
+pg_recvlogical	-o
+pg_upgrade	-o
+platform organization:billing:address	-o
+platform organization:billing:profile	-o
+platform organization:info	-o
+platform organization:subscription:list	-o
+platform organization:user:get	-o
+platform organization:user:list	-o
+platform organization:user:projects	-o
+platform pro	-o
+platform project:list	-o
+platform projects	-o
+platform team:get	-o
+platform team:list	-o
+platform team:project:list	-o
+platform team:user:list	-o
+platform teams	-o
+ps	-o
+pytest	-o
+qemu-img check	--output
+qemu-img info	--output
+qemu-img map	--output
+qemu-img measure	--output
+qemu-img measure	-o
+qlmanage	-t
+rdfind	-deleteduplicates
+rdfind	-makehardlinks
+rdfind	-makesymlinks
+render environments	--output
+render environments	-o
+render logs	--output
+render logs	-o
+render projects	--output
+render projects	-o
+render whoami	--output
+render whoami	-o
+render workspaces	--output
+render workspaces	-o
+safe-chains	--log
+safe-chains	--log-everything
+scp	-o
+shellcheck	-o
+slither	--checklist
+sntp	-o
+ssh-copy-id	-o
+ssh-keygen	-o
+stern	--output
+stern	-o
+supabase inspect	--output
+supabase inspect	-o
+supabase services	--output
+supabase services	-o
+svelte-check	--output
+systemctl status	--output
+systemctl status	-o
+tiff2ps	-o
+tiffcp	-o
+tiffdump	-o
+tiffinfo	-o
+tilt describe	--output
+tilt describe	-o
+tilt get	--output
+tilt get	-o
+tokei	--output
+tokei	-o
+top	-o
+tshark	-o
+tsql	-o
+tuist build	--destination
+tuist generate	--destination
+tuist test	--destination
+units	-o
+velero get	--output
+velero get	-o
+wasmer wasm2wat	--output
+wasmer wat2wasm	--output
+weasyprint	-o
+wrjpgcom	-o
+xattr	-d
+xattr	-w
+ytt	--output
+ytt	-o
+ziptool	-o

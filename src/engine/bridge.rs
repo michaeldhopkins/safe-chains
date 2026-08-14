@@ -83,6 +83,22 @@ pub fn project(profile: &Profile) -> Verdict {
     Verdict::Denied
 }
 
+/// The most permissive level in the default auto-approve band.
+fn default_band_top_level() -> Option<&'static Level> {
+    default_levels().iter().rfind(|l| to_legacy(&l.name).is_some())
+}
+
+/// The NAME of that level — what a refusal is reported against when the user has set no ceiling of
+/// their own (`developer`, today).
+///
+/// Exposed so `--explain`'s "refused by `X`" and the decision log's `level` field come from one
+/// definition. They were briefly two: the log took `SafetyLevel::to_string()` and recorded the
+/// LEGACY band name (`safe-write`) for the same run `--explain` called `developer`, which is the
+/// kind of disagreement that makes a diagnostic worse than no diagnostic.
+pub fn default_band_top_name() -> &'static str {
+    default_band_top_level().map_or("developer", |l| l.name.as_str())
+}
+
 fn to_legacy(level_name: &str) -> Option<SafetyLevel> {
     match level_name {
         "paranoid" => Some(SafetyLevel::Inert),
@@ -119,9 +135,7 @@ pub fn explain_profile(tokens: &[Token]) -> Option<ProfileExplanation> {
     // Report against the MOST PERMISSIVE level in the auto-approve band. If the top of the band
     // refuses a capability, every level below it does too, so its complaint is the binding one —
     // a lower level's would just be the first of several walls.
-    let blocked_by = default_levels()
-        .iter()
-        .rfind(|l| to_legacy(&l.name).is_some())
+    let blocked_by = default_band_top_level()
         .and_then(|top| {
             profile
                 .capabilities

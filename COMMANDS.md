@@ -13212,7 +13212,7 @@ Aliases: `psed`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h, -v
+- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --log, --log-everything, --version, -V, -h, -v
 - Allowed valued flags: --cwd, --level, --root, --session-id
 
 **Examples:**
@@ -13236,6 +13236,9 @@ Aliases: `psed`
 - `safe-chains hook opencode`
 - `safe-chains help`
 - `safe-chains help hook`
+- `safe-chains --log hook claude`
+- `safe-chains --log-everything hook claude`
+- `safe-chains --log 'cat foo'`
 
 ### `safety`
 <p class="cmd-url"><a href="https://docs.safetycli.com/">https://docs.safetycli.com/</a></p>

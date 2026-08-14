@@ -26,6 +26,12 @@
 #                             from `--packageFile`, which the `ncu_mode` handler gates.
 #   qlmanage -t               the operands are files to PREVIEW (a read) and the output goes to
 #                             `-o`. Recorded for the read/disclosure sweep instead — see TODO.md.
+#   safe-chains --log         the positional is the COMMAND STRING to classify, never a path, and
+#   safe-chains               the write destination is a compiled-in constant
+#     --log-everything        (~/.local/state/safe-chains/log.jsonl) with no flag to redirect it.
+#                             The flags are `write_flags` because the invocation does write — but
+#                             it writes THERE, not to anything named on the command line, so there
+#                             is no operand to gate. See docs/design/decision-log.md.
 #   xattr -w                  `-w NAME VALUE FILE`: the probe's tokens land as the attribute NAME
 #                             and VALUE, so no file is touched. Same artifact already noted for
 #                             xattr on the output-flag worklist.
@@ -34,10 +40,12 @@ borg config	--delete
 depcruise	--init
 gomodifytags	--w
 gomodifytags	-w
-mtree	-U
 mtree	-r
 mtree	-u
+mtree	-U
 ncu	--upgrade
 ncu	-u
 qlmanage	-t
+safe-chains	--log
+safe-chains	--log-everything
 xattr	-w

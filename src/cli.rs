@@ -67,6 +67,16 @@ pub struct Cli {
     #[arg(long)]
     pub suggest: bool,
 
+    /// Record every command that did NOT auto-approve — with the directory it ran in and why it was
+    /// refused — as JSON Lines in ~/.local/state/safe-chains/log.jsonl. Off unless given. The file
+    /// holds commands verbatim, credentials included, and is created owner-only.
+    #[arg(long)]
+    pub log: bool,
+
+    /// Like --log, but records approvals too. Writes an entry per command rather than per refusal.
+    #[arg(long)]
+    pub log_everything: bool,
+
     /// List all supported commands in Markdown format
     #[arg(long)]
     pub list_commands: bool,

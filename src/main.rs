@@ -33,9 +33,40 @@ fn run_cli(
     command: &str,
     threshold: SafetyLevel,
     engine_level: Option<&'static safe_chains::engine::level::Level>,
+    log_mode: safe_chains::decisionlog::Mode,
+    cwd: Option<&str>,
+    root: Option<&str>,
 ) {
     let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
     let allowed = matches!(explanation.overall, Verdict::Allowed(level) if level <= threshold);
+    // The CLI logs too. `--log` used to be accepted here and silently do nothing, which is the
+    // worst behaviour available for a flag: `safe-chains --log "cmd"` reported the right verdict and
+    // wrote no entry, so the first thing anyone would try to convince themselves logging worked
+    // quietly proved the opposite. `harness: "cli"` distinguishes these from real hook traffic.
+    let level_name = engine_level.map_or_else(
+        || safe_chains::engine::bridge::default_band_top_name().to_string(),
+        |l| l.name.clone(),
+    );
+    let outcome = if allowed {
+        safe_chains::decisionlog::Outcome::Allowed
+    } else if explanation.parsed {
+        safe_chains::decisionlog::Outcome::Denied
+    } else {
+        safe_chains::decisionlog::Outcome::Unparseable
+    };
+    safe_chains::decisionlog::record(
+        log_mode,
+        outcome,
+        &safe_chains::decisionlog::Context {
+            command,
+            cwd,
+            root,
+            session_id: None,
+            harness: "cli",
+            level: &level_name,
+        },
+        Some(&explanation),
+    );
     process::exit(i32::from(!allowed));
 }
 
@@ -258,7 +289,7 @@ fn run_list_tools() -> ! {
     process::exit(0);
 }
 
-fn run_hook_for(target_name: &str) -> ! {
+fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     let Some(target) = targets::find(target_name) else {
         eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
         process::exit(1);
@@ -270,14 +301,18 @@ fn run_hook_for(target_name: &str) -> ! {
         );
         process::exit(1);
     };
-    run_hook_format(format, target_name);
+    run_hook_format(format, target_name, log_mode);
 }
 
 /// The "outside the working directory" clause, NAMING the cwd when the harness reported one — so a
 /// directory MISMATCH (the agent was launched from the wrong repo, a common and easy-to-forget
 /// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
 /// elsewhere" from "this command genuinely overreaches".
-fn run_hook_format(format: &dyn HookFormat, target_name: &str) -> ! {
+fn run_hook_format(
+    format: &dyn HookFormat,
+    target_name: &str,
+    log_mode: safe_chains::decisionlog::Mode,
+) -> ! {
     // Claude's own permission files are trust ONLY when Claude is the harness being served.
     // Every other target gets safe-chains' own classification and nothing borrowed.
     if target_name == "claude" {
@@ -309,15 +344,42 @@ fn run_hook_format(format: &dyn HookFormat, target_name: &str) -> ! {
     // `<= threshold` gate as the CLI's `--level`. The pathctx (cwd/root) is already installed above.
     let (threshold, engine_level) = safe_chains::configured_hook_ceiling();
     let verdict = safe_chains::command_verdict_ceilinged(&input.command, threshold, engine_level);
+
+    // The decision log (`--log` / `--log-everything`, off otherwise). Recorded at each point an
+    // outcome becomes FINAL, never before: the coverage fallback below can still turn a denial into
+    // an approval, so a single call up here would mislabel every command the user's own grants
+    // cover. `record` checks the mode before building anything, so under `--log` the two approval
+    // sites cost a comparison.
+    // The level in force, in the SAME vocabulary `--explain` uses. Taking `threshold.to_string()`
+    // here recorded the legacy band name (`safe-write`) for a run `--explain` called `developer`.
+    let log_level = engine_level.map_or_else(
+        || safe_chains::engine::bridge::default_band_top_name().to_string(),
+        |l| l.name.clone(),
+    );
+    let log_ctx = safe_chains::decisionlog::Context {
+        command: &input.command,
+        cwd: input.cwd.as_deref(),
+        root: input.root.as_deref(),
+        session_id: input.session_id.as_deref(),
+        harness: target_name,
+        level: &log_level,
+    };
+    use safe_chains::decisionlog::{Outcome as LogOutcome, record as log_decision};
+
     // `respond` owns the grant rule, including that a BLANK command grants nothing: it classifies
     // as inert, but inert-about-nothing is not something to approve. Routed through the shared seam
     // so the rule cannot be bypassed by reaching for `render_response` directly.
     if let Some(response) = targets::respond(format, &input.command, verdict) {
+        log_decision(log_mode, LogOutcome::Allowed, &log_ctx, None);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }
     if verdict.is_allowed() {
-        process::exit(0); // safe, but not grantable (blank) — abstain silently
+        // Allowed but not GRANTABLE (a blank command): safe-chains says nothing and the harness
+        // decides. Recorded as an abstain rather than an approval, because that is what it is —
+        // `may_grant` exists precisely because approving nothing is not an approval.
+        log_decision(log_mode, LogOutcome::Abstained, &log_ctx, None);
+        process::exit(0);
     }
 
     // Coverage fallback: the built-in/pattern classifier (also honoring the user's own
@@ -331,10 +393,20 @@ fn run_hook_format(format: &dyn HookFormat, target_name: &str) -> ! {
     if let Verdict::Allowed(level) = explanation.overall
         && level <= threshold
     {
+        log_decision(log_mode, LogOutcome::Allowed, &log_ctx, Some(&explanation));
         let response = format.render_response(Verdict::Allowed(level));
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }
+
+    // Past this point every exit is a non-approval — Deny, Ask, a surfaced explanation, the
+    // overreach nudge, or a silent fall-through to the harness's own prompt. They differ in what
+    // the HARNESS is told, not in what safe-chains decided, so the log records once here rather
+    // than at each of the five. A parse failure is kept distinct: it is a correct refusal, but a
+    // RISE in them is how a parser regression shows up in the field, and nothing else surfaces it.
+    let outcome =
+        if explanation.parsed { LogOutcome::Denied } else { LogOutcome::Unparseable };
+    log_decision(log_mode, outcome, &log_ctx, Some(&explanation));
 
     // GATED command. What the hook emits depends on the harness's capabilities
     // (docs/design/harness-capability-model.md):
@@ -407,8 +479,10 @@ fn main() {
 
     match cli {
         Ok(cli) => {
+            let log_mode =
+                safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
             if let Some(Subcommand::Hook { tool }) = cli.subcommand {
-                run_hook_for(&tool);
+                run_hook_for(&tool, log_mode);
             }
             if cli.list_tools {
                 run_list_tools();
@@ -422,6 +496,9 @@ fn main() {
                 let docs = safe_chains::docs::all_command_docs();
                 safe_chains::docs::render_book(&docs, std::path::Path::new("docs"));
             } else if let Some(command) = cli.command {
+                // Captured before the PathCtx consumes them, so a logged entry records the same
+                // directory context the classification ran under.
+                let (log_cwd, log_root) = (cli.cwd.clone(), cli.root.clone());
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
                     // Default root to cwd, exactly as the hook arm above does. `pathctx::resolve`
                     // joins a relative path only when BOTH are known, so `--cwd X` on its own was
@@ -476,7 +553,14 @@ fn main() {
                 if cli.suggest {
                     run_suggest(&command);
                 }
-                run_cli(&command, threshold, engine_level);
+                run_cli(
+                    &command,
+                    threshold,
+                    engine_level,
+                    log_mode,
+                    log_cwd.as_deref(),
+                    log_root.as_deref(),
+                );
             } else if io::stdin().is_terminal() {
                 Cli::command().print_help().ok();
                 println!();
@@ -488,7 +572,7 @@ fn main() {
                     .expect("claude target has a hook format");
                 // The no-argument stdin path IS the Claude hook (see the CLI docs), so it keeps
                 // Claude's permission files as a trust source.
-                run_hook_format(format, "claude");
+                run_hook_format(format, "claude", log_mode);
             }
         }
         // A malformed CLI invocation — an unknown/typo'd flag (`--levle`), a bad value — must FAIL

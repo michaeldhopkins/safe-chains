@@ -56,6 +56,7 @@ macro_rules! safe_write {
 }
 
 pub mod cli;
+pub mod decisionlog;
 #[cfg(test)]
 mod composition;
 pub mod cst;
