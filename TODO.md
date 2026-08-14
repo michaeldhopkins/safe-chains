@@ -1,5 +1,121 @@
 # TODO
 
+## The `user` locus rung is constructed ONLY in tests — the resolver never emits it
+
+The precise defect, which is sharper than "the rung is unusable": `LocalLocus::User` has **zero
+production construction sites**. Every reference outside the enum itself is a test
+(`authoring.rs`, `bridge.rs`, `level.rs`) building the value by hand, or a bound comparing against
+it. Nothing in the path→locus resolver ever produces it.
+
+Meanwhile the rung is fully SPECIFIED. `facet.rs` defines it as `User => "user", // ~, keychain`,
+and the level-authoring tests assert real behaviour against it:
+
+    authoring.rs:407  assert!(!read_local.admits(&observe_at(LocalLocus::User)), "cat ~/.ssh/id_rsa");
+    authoring.rs:500  assert!(!developer.admits(&destroy_at(LocalLocus::User)), "rm -rf ~");
+    authoring.rs:552  assert!(!developer.admits(&exec_at(LocalLocus::User)), "~/x.sh waits for a higher level");
+
+So the ladder was authored against `~` being `user`, those assertions pass, and **none of them
+describes what happens to a real `~` path** — which resolves to `machine`, on reads and writes
+alike. Green tests documenting a rung production never reaches.
+
+## Reading anywhere in `~` should be separable from writing anywhere in `~`
+
+Measured 2026-08-14 (0.225.0), reading with cwd/root at a project:
+
+    ~/notes.txt                          locus.local = machine
+    ~/Downloads/x.pdf                    locus.local = machine
+    ~/.grok/config.toml                  locus.local = machine
+    ~/.local/state/safe-chains/log.jsonl locus.local = machine
+    ~/.claude/CLAUDE.md                  locus.local = worktree-trusted
+    ~/.cargo/registry/src/x/lib.rs       locus.local = adjacent
+    /etc/hosts                           locus.local = machine
+    /usr/lib/x.so                        locus.local = adjacent
+
+**Nothing lands on `user`.** An ordinary file in the user's own home gets the SAME rung as
+`/etc/hosts` — the rung that is supposed to mean machine-wide. The ladder has a rung between
+`worktree-trusted` and `machine` whose entire population is "things under `$HOME`", and that
+population resolves past it.
+
+Three consequences, and the third is why this is not cosmetic:
+
+1. **`machine` is not true.** `~/notes.txt` is not machine-wide state. A facet term that says
+   something false is worse than a coarse one, because levels are authored against the term.
+2. **A level cannot express "your own files, yes; the rest of the machine, no."** Admitting `user`
+   admits nothing (dead rung); admitting `machine` also admits `/etc` and `/usr`. The distinction
+   the ladder was drawn to make is unavailable.
+3. **So the admit map is doing the level's job.** `~/.claude` → worktree-trusted and
+   `~/.cargo/registry` → adjacent are hand-placed exceptions, each one a person noticing a false
+   deny and hardcoding a rung. That is the leak `project_path_retreat` already decided to walk back,
+   seen from the other end: the map exists BECAUSE the rung below it is unusable.
+
+Note `/usr/lib` → `adjacent` too, which is the same defect pointing the permissive way: a system
+library directory reading as "sibling workspace" is how `/usr/local/lib/foo.rb` ends up auto-approved
+while `/usr/bin/env` denies.
+
+**Make the rung reachable, then say the policy in facet terms.** Reading anywhere under `~` while
+writing nowhere under `~` is a reasonable stance and is EXACTLY what the ladder was drawn to express.
+The facets already carry the two axes separately — `operation` (observe vs create/mutate/destroy)
+against `locus.local` — so the asymmetry needs no new vocabulary, only a resolver that emits `user`:
+
+    observe · user                  admitted   (cat ~/notes.txt, cat ~/.local/state/…/log.jsonl)
+    create/mutate/destroy · user    refused    (touch ~/x, rm -rf ~)
+    anything · machine              refused    (/etc, /usr, another user's home)
+
+Today both lines collapse into `machine`, so the read cannot be allowed without also allowing the
+write, and neither without also allowing `/etc`. That collapse — not the policy — is the bug. Note
+the credential shield is orthogonal and stays: `~/.ssh` denies on the secret axis, not the locus one,
+which is why "read all of `~`" does not mean "read your keys".
+
+Doing this should also let the admit map shrink toward the credential shield, which is what
+`project_path_retreat` wanted: `~/.claude` → worktree-trusted and `~/.cargo/registry` → adjacent are
+hand-placed rungs that exist because the rung beneath them never fires.
+
+Watch `/usr/lib` → `adjacent` while fixing this; it is the same collapse pointing the permissive way.
+
+## A denied compound construct records no reason at all
+
+The decision log leaves `culprit: null` and `facets: null` for a `for`/`while`/`case` construct —
+`explain` sees one segment, and the engine will not resolve a command whose first word is `for`, so
+the entry says "denied" and stops. Measured on real entries; roughly a third of the denials in the
+author's own log read "no reason recorded".
+
+That is the same hole the per-segment facets closed for `&&`/`;` chains, one level further in: the
+interesting command is INSIDE the loop body and never gets classified on its own for reporting. The
+fix is presumably to walk the construct's body the way `explain` walks a chain, and attach a reason
+per inner command.
+
+## `sed -i ''` on macOS: the empty suffix is eaten as the script, and a `$` then denies
+
+Found 2026-08-14 by the decision log, on the first real chain it recorded from another session —
+which is the feature working as intended, so it is worth saying that is how this arrived.
+
+    cwd = <project>/web
+    sed -i '' '1257,$d' app/x.css      DENIED    locus.local = machine
+    sed -i '' '1257,900d' app/x.css    allowed   (worktree)
+    sed -n  '1257,$p'    app/x.css     allowed   (worktree)
+    sed -i.bak '1,$d'    app/x.css     allowed   (worktree)
+
+So it is the COMBINATION of `-i ''` and a `$` in the script, and the mechanism follows from the two
+sed dialects. GNU takes the in-place suffix ATTACHED (`-i.bak`) and never as a separate word; BSD
+(macOS) requires it SEPARATE, and empty for "no backup". Modelled the GNU way, `-i` consumes
+nothing, so `''` lands in the first positional — which for sed is the SCRIPT. Everything shifts one:
+the real script `1257,$d` becomes a FILE operand, its `$` reads as an unpinnable variable, and the
+operand list worst-cases to `machine`.
+
+Fail-CLOSED, so not a hole — but `sed -i ''` is the standard macOS spelling and `$` is everywhere in
+sed (`$d`, `$p`, `1,$s/…`), so the false-deny is common on this platform. Two things to get right in
+the fix, neither obvious from the symptom:
+
+- The dialects genuinely conflict on the same flag, exactly as `base64 -i` does (see
+  `commands/data/base64.toml`, which documents the same GNU/BSD split and concludes either modelling
+  is wrong somewhere). Whatever is decided here should probably decide that too.
+- Accepting a separate `-i ''` must not accept a separate `-i /etc/passwd`: under BSD the word after
+  `-i` is a SUFFIX, not a path, so admitting it as a value has to be narrow (empty string only) or
+  the flag starts swallowing operands.
+
+Guard shape: a `$`-bearing single-quoted sed script must classify the same with `-i ''`, `-i.bak`
+and `-n` — one operation, three spellings, one answer.
+
 ## `--suggest` writes the file its name implies it only proposes — refine the CLI
 
 `safe-chains --suggest "<cmd>"` analyses the command, generates a `.safe-chains.toml` entry, and
