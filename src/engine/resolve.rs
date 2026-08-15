@@ -1048,19 +1048,28 @@ fn resolve_dd(tokens: &[Token]) -> Profile {
     // dd touches exactly one input and one output — a `single` blast radius, whatever the
     // data VOLUME. The disk-wipe danger of `of=/dev/rdisk0` is carried by its device locus,
     // not by scale.
-    let input_locus = input.map_or(LocalLocus::Process, read_locus);
+    // Built from the PATH, not just its locus: the locus says which rung `if=` reaches, and the
+    // shield is what says whether the file on that rung is a credential store. Reading the rung
+    // alone let `dd if=/etc/shadow of=./safe` copy a file `cat /etc/shadow` refuses, then read the
+    // copy out of the worktree — the shield was never asked.
     match output {
         // of= names a sink: read the input into it (no model disclosure) + write the sink.
         Some(of) => Profile::of(vec![
-            observes(input_locus, Scale::Single, "dd reads its input (if=) into the output"),
+            match input {
+                Some(i) => observes_path(i, Scale::Single, "dd reads its input (if=) into the output"),
+                None => observes(LocalLocus::Process, Scale::Single, "dd reads stdin into the output"),
+            },
             overwrites(classify_locus(of), Scale::Single, false),
         ]),
         // no of= → output is stdout, so the input content reaches the model (like `cat`).
-        None => Profile::of(vec![reads_content(
-            input_locus,
-            Scale::Single,
-            "dd copies its input to stdout (→ the model)",
-        )]),
+        None => Profile::of(vec![match input {
+            Some(i) => reads_path(i, Scale::Single, "dd copies its input to stdout (→ the model)"),
+            None => reads_content(
+                LocalLocus::Process,
+                Scale::Single,
+                "dd copies stdin to stdout (→ the model)",
+            ),
+        }]),
     }
 }
 
