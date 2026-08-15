@@ -184,12 +184,39 @@ pub(crate) fn read_is_unshieldable(path: &str) -> bool {
     // GET. A `file:` URL names a real local file, so its local part is tested; any other scheme is
     // the handler's business, not the shield's.
     if let Some(local) = file_url_local(path) {
-        return unpinnable_after_resolution(local);
+        return unshieldable_word(local);
     }
     if is_network_url(path) {
         return false;
     }
-    unpinnable_after_resolution(path)
+    // WORD SPLITTING, for the same reason `classify_local` does it: an unquoted expansion whose
+    // value holds whitespace becomes SEVERAL arguments at run time, and the classifier is looking at
+    // one. The locus half of this has been split-aware for a while; the shield half was not, so
+    // `VAR="x /etc/shadow"; cat $VAR` reached the shield as the single word `$VAR`, matched no store,
+    // expanded to something with no `$` left in it, and came back clearable.
+    //
+    // Any piece being unshieldable makes the whole thing unshieldable — the command reads all of
+    // them. Caught by `an_unquoted_expansion_is_split_into_words`.
+    // Checked as a WHOLE first and then per piece, exactly as `classify_local` folds the unsplit
+    // answer in alongside the split ones. Splitting alone is wrong in the other direction: a
+    // credential store can have a space in its NAME, and
+    // `~/Library/Application Support/Firefox/` split into `~/Library/Application` and
+    // `Support/Firefox/` names nothing at all. Caught by
+    // `a_read_the_shield_cannot_clear_claims_secret`, which enumerates the shield's own nodes.
+    if unshieldable_word(path) {
+        return true;
+    }
+    let expanded = crate::pathctx::expand_vars(path, false);
+    expanded.contains(IFS_WHITESPACE)
+        && expanded
+            .split(IFS_WHITESPACE)
+            .filter(|piece| !piece.is_empty())
+            .any(unshieldable_word)
+}
+
+/// One already-split word: it names a credential store, or it cannot be pinned down at all.
+fn unshieldable_word(word: &str) -> bool {
+    names_credential_store(word) || unpinnable_after_resolution(word)
 }
 
 fn unpinnable_after_resolution(path: &str) -> bool {

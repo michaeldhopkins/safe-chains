@@ -3,7 +3,7 @@
 //! name the intent (`creates`/`overwrites`/`relocates`/`destroys`/`reads_*`/`worst`); the
 //! enum choices and `because` strings live here, in one place.
 
-use super::locus::{names_credential_store, read_is_unshieldable, read_locus, write_locus};
+use super::locus::{read_is_unshieldable, read_locus, write_locus};
 use crate::engine::facet::*;
 
 /// A read capability for `path`: its read locus AND, when the path cannot be cleared by the
@@ -44,7 +44,11 @@ pub(super) fn observes_path(path: &str, scale: Scale, because: &str) -> Capabili
 /// cannot be checked against the shield at all. See [`read_is_unshieldable`] for why the second half
 /// is not redundant with the locus.
 fn unshieldable(path: &str) -> bool {
-    names_credential_store(path) || read_is_unshieldable(path)
+    // Delegates entirely: `read_is_unshieldable` owns both halves (names-a-store, cannot-be-pinned)
+    // AND the IFS word split they must each run under. Keeping a separate named-store test here ran
+    // it on the whole operand, so `VAR="x /etc/shadow"; cat $VAR` reached it as one word that names
+    // nothing. Kept as a named seam because the call sites read better for it.
+    read_is_unshieldable(path)
 }
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
@@ -231,8 +235,25 @@ pub(super) fn transfer_profile(
         super::locus::Face::Write => write_locus(p),
         super::locus::Face::Rebind => super::locus::rebind_locus(p),
     };
-    let mut caps: Vec<Capability> =
-        sources.iter().map(|s| per_source(at(s, source_face), scale)).collect();
+    // A SOURCE the shield cannot clear carries the same `secret · reads` claim a plain reader gets.
+    // `per_source` takes only a locus, so it could never make this claim itself, and every transfer
+    // command routes through here — `cp`, `mv`, `ln`, `scp`, `rsync`. Without it `cp ~/.ssh/id_rsa
+    // ./stolen` rested entirely on the locus cap, and `xargs -I{} cp {} /tmp/dest` (whose source is
+    // an unknowable stdin item) claimed nothing at all.
+    //
+    // Sources only. An unshieldable DESTINATION is a write-placement question, answered by the write
+    // face — `secret` is about what is READ, and stamping it on a dest would deny `cp ./a $OUT` for
+    // the wrong reason.
+    let mut caps: Vec<Capability> = sources
+        .iter()
+        .map(|s| {
+            let mut c = per_source(at(s, source_face), scale);
+            if unshieldable(s) {
+                c.secret.level = SecretLevel::Reads;
+            }
+            c
+        })
+        .collect();
     caps.push(per_dest(at(dest, dest_face), scale));
     Profile::of(caps)
 }

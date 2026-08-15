@@ -894,7 +894,13 @@ fn an_unquoted_expansion_is_split_into_words() {
         "VAR=\"PAYLOAD\"; cat $VAR",
     ];
     // Each is one word plus a hot path: harmless read as a single token, dangerous once split.
-    let payloads: Vec<String> = OUT_OF_WORKSPACE
+    //
+    // The canary comes from UNREADABLE, not OUT_OF_WORKSPACE. The property under test is WORD
+    // SPLITTING, and the hot path is only the tell — so it has to be one that stays hot. Drawing
+    // from OUT_OF_WORKSPACE made the test depend on `/etc/hosts` being refused, which is a read
+    // POLICY that changed; every UNREADABLE entry is a credential store or another user's home, so
+    // it is refused to both readers and writers under any policy and the tell keeps telling.
+    let payloads: Vec<String> = UNREADABLE
         .iter()
         .flat_map(|hot| [format!("x {hot}"), format!("-rf {hot}"), format!("{hot} x")])
         .collect();

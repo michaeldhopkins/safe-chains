@@ -1414,6 +1414,22 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
             let roots = candidate_roots(args, &rule.valued);
             // No path operand means the command searches `.` (`fd pattern`), which is the cwd.
             let worst = roots.iter().map(|r| read_locus(r)).max().unwrap_or_else(|| read_locus("."));
+            // A bounded claim is only meaningful BELOW `user`. At worktree/adjacent/temp nothing
+            // under the root can be a credential store, so the rung is the whole truth about the
+            // value. At `user` or above it is not: the claim carries a LOCUS and says nothing about
+            // WHICH file, and which file is exactly what the shield needs to see.
+            //
+            // `cat $(fd pat ~/.ssh)` was allowed while `cat ~/.ssh/id_rsa` denied — the tag reported
+            // `machine`, the shield was never consulted because there was no path to consult it
+            // about, and a substitution ended up more permissive than a path it could produce.
+            // Caught by no_abstraction_is_more_permissive_than_a_path_it_could_denote.
+            //
+            // Same rule, and the same reasoning, as the synthetic pipe representative in
+            // `cst::check::stage_output_repr`. Dropping the claim leaves the ordinary unpinnable
+            // sentinel, which `reads_path` then treats as unshieldable.
+            if worst >= LocalLocus::User {
+                return None;
+            }
             Some(StageOutput::Locus(worst))
         }
         // Only a filter when it is filtering: given a file operand it prints that file's CONTENTS,
