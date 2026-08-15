@@ -1841,8 +1841,8 @@ denied! {
     csplit_writes_pieces_to_system: "csplit -f /etc/out ./book.txt 5",
     // scheme-URL escape: a generic reader treats `scheme://../../x` as a local path and the OS
     // walks the `..` out of the workspace.
-    cat_scheme_escape: "cat s3://../../secret.txt",
-    grep_scheme_escape: "grep x s3://../../etc/passwd",
+    cat_scheme_escape: "cat s3://../../.ssh/id_rsa",
+    grep_scheme_escape: "grep x s3://../../etc/shadow",
     redirect_scheme_escape: "echo pwned > s3://../../etc/evil",
 }
 
@@ -1953,17 +1953,27 @@ fn test_runner_code_load_flags_gate_foreign_executors() {
 /// expansion not modeled" fail-open (`cat {/etc/shadow,readme}` read the secret).
 #[test]
 fn brace_expansion_checks_every_alternative() {
-    const HOT: &[&str] = &["/etc/shadow", "/etc/cron.d/job", "~/.ssh/id_rsa"];
+    // Split by FACE. `/etc/cron.d/job` reads like any other machine file now — what must never
+    // happen is a write to it — so keeping it in one list would have asserted a read denial that
+    // is no longer the policy, and dropping it would have lost the write case that still is.
+    const HOT_READ: &[&str] = &["/etc/shadow", "~/.ssh/id_rsa"];
+    const HOT_WRITE: &[&str] = &["/etc/shadow", "/etc/cron.d/job", "~/.ssh/id_rsa"];
     const DECOY: &str = "readme.txt";
     let mut failures = Vec::new();
-    for p in HOT {
+    for p in HOT_READ {
         for form in [
             format!("cat {{{p},{DECOY}}}"),
             format!("cat {{{DECOY},{p}}}"),
             format!("cat {{,{p}}}"),
-            format!("tee {{{p},{DECOY}}}"),
             format!("head {{{p},{DECOY}}}"),
         ] {
+            if check(&form) {
+                failures.push(form);
+            }
+        }
+    }
+    for p in HOT_WRITE {
+        for form in [format!("tee {{{p},{DECOY}}}"), format!("tee {{{DECOY},{p}}}")] {
             if check(&form) {
                 failures.push(form);
             }

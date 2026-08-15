@@ -27,10 +27,20 @@ fn hook_stdout(payload: &str) -> String {
 /// launched the agent from can spot the mismatch (and the reached path, so they know what it hit).
 #[test]
 fn overreach_nudge_names_the_working_directory() {
-    let payload = r#"{"tool_input":{"command":"cat /other/repo/x.rs"},"cwd":"/work/here"}"#;
-    let out = hook_stdout(payload);
-    assert!(out.contains("/work/here"), "nudge must NAME the working directory (mismatch cue): {out}");
-    assert!(out.contains("/other/repo/x.rs"), "nudge must name the reached path: {out}");
+    // A WRITE and a SWEEP. `cat /other/repo/x.rs` used to stand here and no longer overreaches at
+    // all — reading a named file outside the workspace is ordinary now, so there is nothing to
+    // nudge about. The nudge fires where reaching out is still refused, and both remaining shapes
+    // must name the cwd (the mismatch cue) and the path they reached.
+    for (command, reached) in [
+        (r"echo x > /other/repo/x.rs", "/other/repo/x.rs"),
+        (r"grep -r x /other/repo", "/other/repo"),
+    ] {
+        let payload =
+            format!(r#"{{"tool_input":{{"command":"{command}"}},"cwd":"/work/here"}}"#);
+        let out = hook_stdout(&payload);
+        assert!(out.contains("/work/here"), "nudge must NAME the working directory: {out}");
+        assert!(out.contains(reached), "nudge must name the reached path: {out}");
+    }
 }
 
 fn exit_code(args: &[&str]) -> i32 {

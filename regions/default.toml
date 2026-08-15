@@ -15,10 +15,22 @@
 #   • scratch (`/tmp`) and standard streams (`/dev/null`, fd pseudo-files) are read/write.
 #   • a small CREDENTIAL SHIELD (`.ssh`, `.aws`, …) is denied and — crucially — a user grant can
 #     NEVER widen it (see `apply_grant`), so `grant ~/` still can't hand over an SSH key.
-#   • EVERYTHING ELSE (any absolute or `~` path matching nothing) → `unknown` → deny/abstain.
-#     Reading `/etc/hosts` or `/usr/bin/python3` now prompts instead of auto-approving; a user
-#     who wants those adds a read grant to ~/.config/safe-chains.toml. This is the retreat: we
-#     stop guessing the filesystem and let the user's grants encode their own machine's truth.
+#   • WRITES stop at the workspace, its siblings and scratch. Everything else is `unknown`, whose
+#     write face is `machine` — above where writes reach — so it denies and the harness prompts.
+#
+# READS are the asymmetry, and it is deliberate. They run to the machine rung: `/etc/hosts`,
+# `~/.zshrc`, `/usr/bin/python3`, a sibling checkout and a vendored crate source all read without
+# a prompt, because confining reads to the worktree cost a prompt on nearly every legitimate thing
+# an agent does and bought protection only for files that mostly are not secret. What bounds a
+# read is therefore this file's shield — a test on the NAME — plus three rungs that sit ABOVE
+# machine because they are not ordinary files at all: `device` (raw disks and memory),
+# `system-integrity` (the trust substrate) and `kernel`.
+#
+# The shield being a name test is what forces the rest of the model. A name test can only answer
+# about a path someone actually wrote down, so anything that reads files it never names has to be
+# refused wholesale above the workspace: an unbounded sweep (`grep -r foo ~`), a glob (`/etc/*`), a
+# traversal's placeholder (`find ~ -exec cat {}`) and an unpinnable path (`$SECRET`, a `..` with no
+# cwd to resolve against). Those are not special cases bolted on; they are the same rule.
 #
 # Matching (header rules unchanged): a `path` ending `/` = SUBTREE prefix; ending `*` = STRING
 # prefix; no `/` = SEGMENT (matches any path component == it, at any depth); else EXACT. Most
@@ -66,12 +78,6 @@ reads_secret = false
 description = "Standard streams / fd pseudo-files — no real filesystem is touched."
 read_locus = "process"
 write_locus = "process"
-reads_secret = false
-
-[role.package-content]
-description = "Distributed package CONTENT — docs, headers, libraries, vendored module sources. Read-admitted; writes stay denied."
-read_locus = "adjacent"
-write_locus = "machine"
 reads_secret = false
 
 [role.raw-device]
@@ -247,96 +253,6 @@ researched = "2026-08-12"
 # under `~/.cargo/registry` is published on crates.io; a man page ships in the OS. Refusing the
 # local copy while the same bytes are a network fetch away is friction without a matching risk.
 # WRITES stay denied — this widens disclosure only, not the ability to alter what runs.
-[[region]]
-path = "/usr/share/"
-role = "package-content"
-note = "OS-distributed docs, man pages, locale data. Sibling `/usr/etc` does not exist; config lives in /etc, which is NOT admitted."
-researched = "2026-07-30"
-[[region]]
-path = "/usr/include/"
-role = "package-content"
-note = "System C headers — compiler input, no machine state."
-researched = "2026-07-30"
-[[region]]
-path = "/usr/lib/"
-role = "package-content"
-note = "OS-distributed libraries."
-researched = "2026-07-30"
-[[region]]
-path = "/usr/local/share/"
-role = "package-content"
-note = "Locally-installed package docs/data. Deliberately NOT /usr/local/etc, which the admit-audit found holding Homebrew service secrets."
-researched = "2026-07-30"
-[[region]]
-path = "/usr/local/include/"
-role = "package-content"
-note = "Locally-installed headers."
-researched = "2026-07-30"
-[[region]]
-path = "/usr/local/lib/"
-role = "package-content"
-note = "Locally-installed libraries."
-researched = "2026-07-30"
-[[region]]
-path = "/opt/homebrew/share/"
-role = "package-content"
-note = "Homebrew package docs/data. NOT /opt/homebrew/etc (service configs) and NOT Cellar/, whose per-formula trees contain their own etc/."
-researched = "2026-07-30"
-[[region]]
-path = "/opt/homebrew/include/"
-role = "package-content"
-note = "Homebrew headers."
-researched = "2026-07-30"
-[[region]]
-path = "/opt/homebrew/lib/"
-role = "package-content"
-note = "Homebrew libraries and node_modules for globally-installed packages."
-researched = "2026-07-30"
-[[region]]
-path = "/Library/Developer/CommandLineTools/"
-role = "package-content"
-note = "Apple SDK headers and toolchain sources. Scoped to Developer/ so it cannot reach /Library/Keychains, which the admit-audit found leaking."
-researched = "2026-07-30"
-[[region]]
-path = "/nix/store/"
-role = "package-content"
-note = "Nix store paths are immutable, content-addressed and world-readable by design."
-researched = "2026-07-30"
-[[region]]
-path = "~/.cargo/registry/"
-role = "package-content"
-note = "Vendored crate sources fetched from a registry. Scoped to registry/ so it cannot reach ~/.cargo/credentials.toml."
-researched = "2026-07-30"
-[[region]]
-path = "~/.rustup/toolchains/"
-role = "package-content"
-note = "Installed Rust toolchains and their std sources."
-researched = "2026-07-30"
-[[region]]
-path = "~/go/pkg/mod/"
-role = "package-content"
-note = "Go module cache — downloaded dependency sources."
-researched = "2026-07-30"
-[[region]]
-path = "~/.nvm/versions/"
-role = "package-content"
-note = "nvm-installed node runtimes and their global node_modules."
-researched = "2026-07-30"
-[[region]]
-path = "~/.local/bin/"
-role = "package-content"
-note = "Installed user-level executables (mise/pipx/cargo-install shims). Reading one — `strings`, `cat` on a wrapper script — discloses an installed tool, not machine state. Writes stay denied: this is where a planted binary would go."
-researched = "2026-07-30"
-[[region]]
-path = "~/.local/share/mise/installs/"
-role = "package-content"
-note = "mise-installed tool versions. Scoped to installs/ so it cannot reach mise's own config or state."
-researched = "2026-07-30"
-
-# ── Credential shield: SEGMENT matches, denied everywhere, and NOT widenable by a grant. The
-#    only "denylist" we keep, and only because a broad grant (`grant ~/`) would otherwise hand
-#    over these. A project that literally contains one of these dirs is denied too — rare and
-#    acceptable. Everything else in home is already deny-by-default; these just can't be granted. ─
 [[region]]
 path = ".ssh"
 role = "credential-store"

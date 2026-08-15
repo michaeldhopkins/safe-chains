@@ -402,9 +402,12 @@ mod tests {
         assert!(read_local.admits(&observe_at(LocalLocus::Worktree)), "cat ./notes");
         assert!(read_local.admits(&observe_at(LocalLocus::WorktreeTrusted)), "git status reads .git");
 
-        // home content read — denied by LOCUS, not by any secret detection
-        // (cat ~/.ssh/id_rsa: locus=user, secret=none — cat extracts no credential)
-        assert!(!read_local.admits(&observe_at(LocalLocus::User)), "cat ~/.ssh/id_rsa");
+        // Home content READS, and this is the assertion that used to say otherwise. The old
+        // comment here read "cat ~/.ssh/id_rsa: locus=user, secret=none" — which is exactly the
+        // bug: the refusal came from the rung, so it took `~/notes.txt` down with the key and
+        // would have evaporated the moment the rung opened. The rung is open now, and what
+        // refuses the key is the secret claim `reads_path` attaches to it (asserted below).
+        assert!(read_local.admits(&observe_at(LocalLocus::User)), "cat ~/notes.txt");
 
         // a credential-extraction command — denied by the positive secret claim
         // (security find-generic-password -w: secret=reads, regardless of locus)

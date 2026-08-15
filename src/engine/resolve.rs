@@ -63,9 +63,10 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     // to the literal `/etc/*`, and the body then reads a path whose last component the glob will
     // choose — `/etc/shadow` among them — while the shield is asked about a string containing a
     // `*`, which names nothing and clears every time.
-    let read_repr = match crate::engine::resolve::locus::glob_above_workspace(&read_item) {
-        true => crate::engine::resolve::locus::UNKNOWABLE_ITEM.to_string(),
-        false => crate::pathctx::expand_vars(&read_item, false).into_owned(),
+    let read_repr = if crate::engine::resolve::locus::glob_above_workspace(&read_item) {
+        crate::engine::resolve::locus::UNKNOWABLE_ITEM.to_string()
+    } else {
+        crate::pathctx::expand_vars(&read_item, false).into_owned()
     };
     let write_repr = crate::pathctx::expand_vars(&write_item, true).into_owned();
     Some((read_repr, write_repr))
@@ -1997,8 +1998,12 @@ mod tests {
         // glued short value: -fpatterns.txt and -ifpatterns.txt both name a pattern file
         let glued = resolve(&toks(&["grep", "-fpatterns.txt", "file.txt"])).expect("grep -f glued");
         assert_eq!(glued.capabilities.len(), 2, "glued -f value is still a read");
+        // The glued spelling classifies as the spaced one does — ordinary home file reads, a
+        // shielded one does not. What must never differ between the two forms is the ANSWER.
         let glued_home = resolve(&toks(&["grep", "-if~/.secrets", "x"])).expect("grep -if glued");
-        assert!(!read_local().admits(&glued_home), "glued home pattern file denied by locus");
+        assert!(read_local().admits(&glued_home), "glued ordinary home pattern file reads");
+        let glued_shield = resolve(&toks(&["grep", "-if~/.ssh/id_rsa", "x"])).expect("grep -if glued");
+        assert!(!read_local().admits(&glued_shield), "glued shielded pattern file is a credential read");
     }
 
     #[test]

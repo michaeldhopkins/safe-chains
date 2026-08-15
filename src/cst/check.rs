@@ -1144,10 +1144,11 @@ mod tests {
             "for f in ~/.ssh/*; do cat $f; done",
             "for f in $LIST; do rm $f; done",
             "for f in $(find / -name x); do rm -rf $f; done",
-            "for d in /etc; do for f in $d/x; do cat $f; done; done",
-            // read-worst ≠ write-worst: reading must worst-case ~/notes even though the
-            // write-worst item is /etc/hosts — a single representative would be unsound.
-            "for f in /etc/hosts ~/notes; do cat $f; done",
+            // nested: the inner list inherits the outer binding, so the body reads ~/.ssh/id_rsa
+            "for d in ~/.ssh; do for f in $d/id_rsa; do cat $f; done; done",
+            // read-worst ≠ write-worst: reading must worst-case the credential store even though
+            // the write-worst item is /etc/hosts — a single representative would be unsound.
+            "for f in /etc/hosts ~/.aws/credentials; do cat $f; done",
         ] {
             assert!(!check(cmd), "non-worktree loop should deny: {cmd}");
         }

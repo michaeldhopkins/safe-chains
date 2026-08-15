@@ -174,14 +174,25 @@ mod tests {
         }]);
         assert_eq!(project(&read), Verdict::Allowed(SafetyLevel::SafeRead));
 
-        // cat ~/.ssh/id_rsa — above the authored ladder → Denied
+        // cat ~/notes.txt — observe·user·no-secret is inside the reader band now
         let home = Profile::of(vec![{
             let mut c = Capability::new(Operation::Observe);
             c.locus.local = LocalLocus::User;
             c.disclosure.audience = DisclosureAudience::LocalProcess;
             c
         }]);
-        assert_eq!(project(&home), Verdict::Denied);
+        assert_eq!(project(&home), Verdict::Allowed(SafetyLevel::SafeRead));
+
+        // cat ~/.ssh/id_rsa — the SAME rung, refused on the secret claim rather than the locus.
+        // The pair is the point: one facet apart, and it is the facet that names the harm.
+        let secret = Profile::of(vec![{
+            let mut c = Capability::new(Operation::Observe);
+            c.locus.local = LocalLocus::User;
+            c.disclosure.audience = DisclosureAudience::LocalProcess;
+            c.secret.level = SecretLevel::Reads;
+            c
+        }]);
+        assert_eq!(project(&secret), Verdict::Denied);
 
         // touch build/out — create·worktree·data → write-local → SafeWrite (the
         // to_legacy `_ => SafeWrite` arm; no resolver emits this yet)

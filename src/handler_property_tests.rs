@@ -559,7 +559,10 @@ const DECLARED_SUB_CASES: &[&str] = &[
 // must all deny even though `$(pwd)` itself is worktree.
 const TAGGED_RESIDUE_CASES: &[&str] = &[
     "cat $(pwd)/../../../etc/shadow",
-    "cat $(pwd)/../../..",
+    // Climbing out to a bare root used to be harmful on its own, because everything up there was
+    // refused. It is not any more, so the case has to land on something that still is: a glob at
+    // the top of the climb reads files the escape gets to choose and the shield never sees.
+    "cat $(pwd)/../../../*",
     "cat $(pwd)/$SECRET",
     "cat $(pwd)/$(hostname)",
     "echo hi > $(pwd)/../../../etc/hosts",
@@ -1821,24 +1824,32 @@ proptest! {
         }
     }
 
-    /// The machine-local half of an admitted root stays refused.
+    /// A sweep of one of those roots stays refused even though a named file under it reads.
     ///
-    /// This is the cut the design rests on. The previous admit map was retired because it took
-    /// whole roots, and an audit found Homebrew service configs under `etc` and auth tokens under
-    /// `var`. Admitting `share`/`lib`/`include` while refusing `etc`/`var` is what keeps those
-    /// findings out, so it is asserted rather than assumed.
+    /// Replaces `the_machine_local_half_of_an_admitted_root_stays_refused`, whose premise was the
+    /// admit map: it asserted that `share`/`lib`/`include` read while `etc`/`var` did not, which
+    /// was the cut that map drew. There is no map any more — everything under these roots reads
+    /// by name — so the question it was really guarding moved. The audit that retired the map
+    /// found leaks (Homebrew service configs, auth tokens) by walking roots wholesale, and THAT
+    /// is what must still be impossible: naming a file is fine, harvesting the tree is not.
     #[test]
-    fn the_machine_local_half_of_an_admitted_root_stays_refused(
+    fn a_sweep_of_a_package_root_stays_refused(
         root in proptest::sample::select(
             ["/usr", "/usr/local", "/opt/homebrew"].to_vec()
         ),
         local in proptest::sample::select(MACHINE_LOCAL.to_vec()),
     ) {
-        let path = format!("{root}/{local}/service/secrets.conf");
+        let dir = format!("{root}/{local}");
         prop_assert!(
-            !is_safe_command(&format!("cat {path}")),
-            "machine-local config under an admitted root was approved: `cat {}`", path
+            is_safe_command(&format!("cat {dir}/service/secrets.conf")),
+            "a NAMED file under {dir} is an ordinary read"
         );
+        for sweep in [format!("grep -r token {dir}"), format!("cat {dir}/*"), format!("tar -cf ./x.tar {dir}")] {
+            prop_assert!(
+                !is_safe_command(&sweep),
+                "a sweep of {dir} reads files it never names: `{sweep}`"
+            );
+        }
     }
 }
 
@@ -2328,8 +2339,10 @@ fn absolute_and_relative_in_root_paths_classify_identically() {
         assert_eq!(rv, av, "abs vs rel spelling DISAGREE for in-root `{rel}` vs `{abs}`");
         assert!(rv, "an in-root path must allow (both spellings): {rel}");
     }
-    // out-of-root absolutes still deny (no syntax loophole)
-    for bad in ["/etc/hosts", "/Users/someone/other/x", "/work/../sibling/secret", "/root/.ssh/id_rsa"] {
+    // Out-of-root absolutes the shield cannot clear still deny — no syntax loophole. (Ordinary
+    // out-of-root files like /etc/hosts read now; the equivalence being tested is spelling, and
+    // it is tested above by the in-root pairs, which allow.)
+    for bad in ["/etc/shadow", "/Users/someone/other/x", "/work/../sibling/.ssh/id_rsa", "/root/.ssh/id_rsa"] {
         assert!(
             !command_verdict_in(&format!("cat {bad}"), workspace()).is_allowed(),
             "out-of-root absolute must deny: {bad}",

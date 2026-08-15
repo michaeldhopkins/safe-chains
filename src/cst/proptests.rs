@@ -721,7 +721,11 @@ mod resolution {
     fn var_assignment_substitutes_by_locus() {
         let _w = workspace();
         assert!(allowed("GEM=./data; cat $GEM/notes.txt"), "in-workspace resolves + allows");
-        assert!(!allowed("GEM=/etc; cat $GEM/hosts"), "system path resolves + denies");
+        // Resolution is proven by the ALLOW: an UNRESOLVED `$GEM/hosts` is unpinnable and denies,
+        // so this can only pass if the assignment was actually substituted. That is a stronger
+        // witness than the deny it replaces, which the unresolved form would also have produced.
+        assert!(allowed("GEM=/etc; cat $GEM/hosts"), "system path resolves, and an ordinary one reads");
+        assert!(!allowed("GEM=~/.ssh; cat $GEM/id_rsa"), "resolving a path does not launder the shield");
         assert!(allowed("A=./d; B=$A/sub; cat $B/x"), "chained certain assignments resolve");
     }
 
@@ -732,8 +736,10 @@ mod resolution {
         assert!(!allowed("cat $UNDEFINED/x"), "unbound var → untouched → deny");
         // reassignment to uncertain must not leave the earlier certain value live.
         assert!(!allowed("GEM=./safe; GEM=$(x); cat $GEM/f"), "stale certain value must not survive");
-        // last CERTAIN assignment wins — here to a system path.
-        assert!(!allowed("GEM=./safe; GEM=/etc; cat $GEM/f"), "last assignment (/etc) wins → deny");
+        // Last CERTAIN assignment wins. The canary has to be a path the SECOND value makes unsafe
+        // and the first does not, or the assertion passes without discriminating: were the stale
+        // `./safe` still live this would read `./safe/id_rsa` and allow.
+        assert!(!allowed("GEM=./safe; GEM=~/.ssh; cat $GEM/id_rsa"), "last assignment wins → deny");
     }
 
     #[test]

@@ -146,7 +146,7 @@ fn claude_default_invocation_denies_unsafe_command() {
 
 #[test]
 fn claude_nudges_when_a_command_reaches_outside_the_workspace() {
-    let payload = r#"{"tool_input": {"command": "cat /etc/hosts"}, "cwd": "/Users/me/proj"}"#;
+    let payload = r#"{"tool_input": {"command": "grep -r x /etc"}, "cwd": "/Users/me/proj"}"#;
     let (stdout, _stderr, code) = run_hook(&[], payload);
     assert_eq!(code, 0);
     // reaches outside → an additionalContext nudge, but NO permission decision (Claude still decides)
@@ -238,7 +238,7 @@ fn codex_hook_gated_overreach_reason_names_the_path() {
     // A gated command that reaches OUTSIDE the workspace: the deny reason must name the path and say
     // it's outside the working directory (not the generic "not on the allowlist" text). A Deny
     // harness exits the gated match early, so this is the only place that specific reason reaches it.
-    let payload = r#"{"tool_input": {"command": "cat /etc/hosts"}, "cwd": "/tmp/proj"}"#;
+    let payload = r#"{"tool_input": {"command": "grep -r x /etc"}, "cwd": "/tmp/proj"}"#;
     let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
@@ -246,7 +246,7 @@ fn codex_hook_gated_overreach_reason_names_the_path() {
         .pointer("/hookSpecificOutput/permissionDecisionReason")
         .and_then(|d| d.as_str())
         .unwrap_or_default();
-    assert!(reason.contains("/etc/hosts"), "reason should name the path: {reason}");
+    assert!(reason.contains("/etc"), "reason should name the path: {reason}");
     assert!(reason.contains("outside the working directory"), "reason: {reason}");
 }
 
@@ -292,13 +292,13 @@ fn antigravity_hook_gated_command_force_asks() {
 
 #[test]
 fn antigravity_hook_gated_overreach_force_asks_with_path() {
-    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"cat /etc/hosts"}},"workspacePaths":["/tmp/proj"]}"#;
+    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"grep -r x /etc"}},"workspacePaths":["/tmp/proj"]}"#;
     let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
     assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("force_ask"));
     let reason = v.get("reason").and_then(|d| d.as_str()).unwrap_or_default();
-    assert!(reason.contains("/etc/hosts"), "reason should name the path: {reason}");
+    assert!(reason.contains("/etc"), "reason should name the path: {reason}");
     assert!(reason.contains("outside the working directory"), "reason: {reason}");
 }
 

@@ -51,21 +51,35 @@ cost = "none"
 # network. The read/write LOCUS distinction that DOES matter is on the WRITE side (editor/developer
 # stay local; remote writes are network-admin) — reads don't earn that friction.
 #
-# Bounds still hold, fail-closed: local content is bounded by LOCUS (home/absolute `cat ~/.ssh` is
-# above this level, denied by locus); `secret <= uses-ambient` excludes credential EXTRACTION;
-# `payload <= fetches` allows a GET but NOT `sends-host-data` — an exfil request (`curl -d @secret`)
-# carries host data OUT and is denied, and a fetch whose URL splices in a secret dies on the inner
-# secret read. So the network read is a pure fetch, never an egress.
+# Bounds still hold, fail-closed, and they are the SECRET and NETWORK bounds rather than a locus
+# one: `secret <= uses-ambient` excludes credential reads; `payload <= fetches` allows a GET but NOT
+# `sends-host-data` — an exfil request (`curl -d @secret`) carries host data OUT and is denied, and a
+# fetch whose URL splices in a secret dies on the inner secret read. So the network read is a pure
+# fetch, never an egress.
 extends = "paranoid"
 [[level.reader.allow]]
 operation = ["observe"]
-# `<= worktree-trusted` already admits a SIBLING project read: `adjacent` sits just BELOW
-# worktree-trusted in the ladder, so `cat ../branchdiff/x` (a peer repo under the same parent) reads
-# here without widening the cap. A sibling's own hidden files (.env/.git/.aws) never classify
-# `adjacent` (region shield + hidden-component guard), so only ordinary peer source is read. `user`
-# (~, keychain) and above stay denied. Sibling-ness is a structural resolver test, NOT a named
-# directory list — so it doesn't reintroduce a region admit-map.
-locus = { local = "<= worktree-trusted", remote = "<= arbitrary" }
+# READS ARE BROAD: anything the credential shield can clear may be read — the workspace, a sibling
+# checkout, /tmp, ordinary files under ~, /usr, /etc/hosts.
+#
+# This stopped at `<= worktree-trusted` until 2026-08-15, and the comment defending it argued that
+# `cat ~/.ssh/id_rsa` had to be caught by LOCUS because "secret=none — cat extracts no credential".
+# True when written; false once the shield landed, and it stayed in the file long after. A read of a
+# store now carries `secret · reads` (capability::reads_path), as does a read of a path the shield
+# cannot CHECK at all — `$VAR`, an undeclared `$(…)`, an xargs item — so `find / | xargs -I{} cat {}`
+# refuses without the locus doing any of the work.
+#
+# Keeping the cap as well was not defence in depth: it was one real control plus a great deal of
+# collateral, and the collateral was the whole cost. Every read of a downloaded PDF, a vendored crate
+# source or the agent's own log was a prompt, and relieving that pressure is what grew the region
+# admit-map (`~/.cargo/registry` → adjacent, `/usr/lib` → adjacent) one hand-placed node at a time.
+# Both are gone.
+#
+# WRITES ARE NOT AFFECTED. This is the OBSERVE clause; editor/developer keep `<= worktree` and
+# `<= adjacent` write clauses, so home stays unwritable and reads outpace writes by design. Still
+# refusing a read: the shield, another user's home, home DOTFILES (not yet enumerated — see
+# TODO.md), `disclosure.audience <= local-process`, and `retrieval <= record` for bulk remote bodies.
+locus = { local = "<= machine", remote = "<= arbitrary" }
 reversibility = "none"
 persistence = { level = "transient" }
 disclosure = { audience = "<= local-process" }
