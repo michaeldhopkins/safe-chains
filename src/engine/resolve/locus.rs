@@ -46,6 +46,33 @@ pub(crate) fn write_locus(path: &str) -> LocalLocus {
     face(path, Face::Write)
 }
 
+/// The path a traversal (`find`/`fd`) rooted at `base` is treated as producing.
+///
+/// Callers need SOME path to hand the inner command, and none of them know the real one. Below
+/// `user` a plausible literal is a faithful stand-in: nothing under a worktree, temp or adjacent
+/// root can be a credential store, so the rung is the whole truth about the item.
+///
+/// At `user` and above that stops holding, because up there the NAME is what decides — `~/.ssh/
+/// id_rsa` and `~/notes.txt` sit on the same rung and only one of them is a secret. A literal is
+/// then a lie the shield believes: it is asked about `~/f`, finds no credential store, and admits
+/// the read of whatever the traversal actually turned up. So worst-case to the unknowable sentinel,
+/// which says the true thing — we know the rung, not the file, and here the file is what matters.
+///
+/// Keyed on the READ face alone. The write face runs ahead of it on paths that read fine and must
+/// not be written (`.git`), and sentinelling those would deny `find app/.git -exec cat {}` for a
+/// reason that belongs to a write. A write at `machine` is refused by its own locus regardless.
+pub(crate) fn traversal_item(base: &str) -> String {
+    let repr = format!("{}/f", base.trim_end_matches('/'));
+    if read_locus(&repr) >= LocalLocus::User {
+        return UNKNOWABLE_ITEM.to_string();
+    }
+    repr
+}
+
+/// Stands for a path we cannot name. Unpinnable by construction, so every shield check over it
+/// fails closed instead of clearing a filename nobody has seen.
+pub(crate) const UNKNOWABLE_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
+
 /// The locus a REBIND of `path` reaches: `rm`/`rmdir` on it, `mv` away from it, `ln` onto it.
 /// Equal to the write face unless a role separates them.
 pub(crate) fn rebind_locus(path: &str) -> LocalLocus {

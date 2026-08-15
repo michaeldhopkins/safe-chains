@@ -46,7 +46,7 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
         tokens[cmd_start..cmd_end].iter().any(|t| t.as_str().contains('{'));
     let mut level = SafetyLevel::Inert;
     for base in &bases {
-        let bound = format!("{}/f", base.trim_end_matches('/'));
+        let bound = crate::engine::resolve::locus::traversal_item(base);
         let mut words: Vec<String> = tokens[cmd_start..cmd_end]
             .iter()
             .map(|t| bind_placeholders(t.as_str(), &bound))

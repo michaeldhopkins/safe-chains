@@ -468,26 +468,14 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
                 })
                 .copied()
                 .unwrap_or(".");
-            // A SYNTHETIC representative: `sc_item` stands in for a filename nobody has seen. That
-            // is fine while the root is worktree/adjacent/temp — nothing under those can be a
-            // credential store, so the locus bound is the whole truth about the item.
+            // Same stand-in the `-exec` handlers bind `{}` to — one rule, one definition. It was two
+            // copies before, and the copy that got the shield fix was this one, so `find / | xargs
+            // cat` refused while `find / -exec cat {} \;` read the same files.
             //
-            // At `user` or above it stops being true. `find / | xargs -I{} cat {}` bound the item to
-            // `/sc_item`, which is PINNABLE, so the shield was consulted about a name that is not
-            // the real file, `names_credential_store` said no, and the composition read whatever the
-            // find turned up — `~/.ssh/id_rsa` included. Worst-case to the unknowable sentinel
-            // instead, which is honest: we know the rung and not the file, and at this rung the file
-            // is the part that matters.
-            //
-            // Deliberately narrow to this arm. `echo /etc/passwd | xargs cat` keeps its literal
-            // representative because the shield genuinely CAN check that one; the distinction is
-            // whether we hold the actual path or a placeholder for it.
-            let repr = format!("{}/sc_item", base.trim_end_matches('/'));
-            if crate::engine::resolve::locus::read_locus(&repr) >= crate::engine::facet::LocalLocus::User
-            {
-                return UNKNOWN_ITEM.to_string();
-            }
-            repr
+            // Deliberately not applied to the arms below. `echo /etc/passwd | xargs cat` keeps its
+            // literal representative because the shield genuinely CAN check that one; the
+            // distinction is whether we hold the actual path or a placeholder for it.
+            crate::engine::resolve::locus::traversal_item(base)
         }
         // ls emits cwd-relative BASENAMES (worktree) unless `-d` echoes its (possibly absolute) args.
         "ls" => {
