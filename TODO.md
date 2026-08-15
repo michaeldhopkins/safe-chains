@@ -39,29 +39,44 @@ was not: with the bound lifted experimentally the restated guards stayed green, 
 `no_abstraction_is_more_permissive_than_a_path_it_could_denote` and
 `substitution_is_never_more_permissive_than_a_path_it_could_produce`.
 
-**4. The actual blocker is xargs, and it is a composition-layer hole the path layer cannot reach.**
-With the bound lifted, `xargs_never_launders_stdin_items` reports 19 laundered compositions:
+**4. xargs — 19 laundered compositions down to 9, two distinct causes left.**
 
-    xargs -I{} cat {}            = safe-read   >  bare `cat`          = inert
-    find / | xargs -I{} cat {}   = safe-read   >  bare `cat`          = inert
-    xargs -I{} cp {} /tmp/dest   = safe-write  >  bare `cp /tmp/dest` = denied
+The first cause is FIXED and shipped (see `unpinnable_after_resolution`): the unshieldable test ran
+`tagged_substitution` before checking, and that function replaces a substitution sentinel with a
+benign residue, handing the locus back separately. So the check saw the residue and reported
+"pinnable" for the very sentinel that means unknowable — and `xargs cat`, whose items resolve to
+exactly that sentinel, slipped the shield. Checking before the rewrite closed 10 of the 19.
 
-`{}` is NOT unpinnable — it is a literal relative name — so `reads_path`'s unshieldable test does not
-fire, and the items are not in the argument list at all: they arrive on stdin. The path layer has
-nothing to classify. `find / | xargs -I{} cat {}` therefore reads whatever the find turned up, keys
-included, and it is admitted the moment local reads open.
+The nine that remain, measured with the bound lifted:
 
-Fix belongs where the composition is modelled: an `xargs`-fed reader consumes UNKNOWABLE operands, so
-it should resolve as a read of an unshieldable path (`secret · reads`) rather than as a read of the
-literal `{}`. That is the same claim `reads_path` makes for `$VAR`, applied one layer up. Until it
-lands the bound stays where it is — the corpus reaches 70/70 with it lifted, so this is the only
-thing between here and done.
+**4a. Transfer sources (4 cases).** `xargs -I{} cp {} /tmp/dest`, same for `ln -sf`. `cp`'s source
+capability comes from `transfer_profile`/`per_source`, not `reads_to_model`, so it never reaches
+`reads_path` and never claims secret. The fix is the same conversion already done for the readers —
+route the transfer SOURCE through the path-aware builder. Note the guard's comparison is partly an
+artifact here (bare `cp /tmp/dest` denies for having one operand, not for a locus), but the
+underlying read of an unknowable source is real.
 
-Measured with the bound lifted: 67 test failures, of which this is the ONLY fail-open. The rest are
-policy snapshots naming the old behaviour (`macos_system_and_home_are_not_auto_read`,
-`reads_the_workspace_denies_everything_outside`, `linux_system_introspection_is_no_longer_auto_read`)
-plus the `loop_over_*_sub` and `resolution::*` locus assertions. The bound-lift diff is preserved at
-`scratchpad/bound-lift.patch`.
+**4b. Locus-bound stdin representatives (5 cases).** `find / | xargs -I{} cat {}`. The pipeline
+walker binds the item to a representative carrying the SOURCE's output locus, so `find /` yields a
+synthetic path at `machine` rather than the unpinnable sentinel. It is therefore "pinnable", the
+shield is consulted on a name that is not the real file, `names_credential_store` says no, and with
+machine reads admitted the whole thing auto-approves — including `~/.ssh/id_rsa` if the find turned
+it up.
+
+This is the deeper one, and the rule that fixes it is: **an item representative is shield-clearable
+only when its locus is strictly below `user`.** At worktree/adjacent/temp the item cannot be a
+credential store, so the bound is meaningful and `find ./src | xargs cat` should keep working; at
+`user` or above the item could be anything and the shield was never really consulted. Cleanest
+implementation is at the source — have the walker emit the UNPINNABLE sentinel instead of a
+locus-bound repr when the source locus is `>= user`, so everything downstream treats it as unknowable
+without needing to know about provenance.
+
+Until 4a and 4b land the bound stays where it is. The corpus reaches 70/70 with it lifted, so these
+are the only things between here and done; the bound-lift diff is preserved at
+`scratchpad/bound-lift.patch`. The other ~58 failures under the lift are policy snapshots naming the
+old behaviour (`macos_system_and_home_are_not_auto_read`,
+`reads_the_workspace_denies_everything_outside`) plus `loop_over_*_sub` and `resolution::*` locus
+assertions — mechanical, but they should be re-derived rather than bulk-edited.
 
 `tests/fixtures/path_policy_corpus.tsv` is the acceptance test — 60/70 today, with all ten
 mismatches in `read-home` and `read-machine`.

@@ -193,18 +193,26 @@ pub(crate) fn read_is_unshieldable(path: &str) -> bool {
 }
 
 fn unpinnable_after_resolution(path: &str) -> bool {
+    // Expand first: a bound loop variable resolves to its representative, so `for f in ./src/*; do
+    // cat $f; done` is pinnable even though the raw text carries a `$`.
     let expanded = crate::pathctx::expand_vars(path, false);
     let expanded = neutralize_atoms(&expanded).into_owned();
-    let base = match tagged_substitution(&expanded) {
-        Some((_, rewritten)) => rewritten,
-        None => expanded,
-    };
-    let resolved = crate::pathctx::resolve(&base).into_owned();
-    let base = match tagged_substitution(&resolved) {
-        Some((_, rewritten)) => rewritten,
-        None => resolved,
-    };
-    is_unpinnable(&canonicalize(&base))
+
+    // Tested BEFORE `tagged_substitution`, which is the whole subtlety. That function replaces a
+    // substitution sentinel with a benign residue and hands the LOCUS back separately, so
+    // `classify_one` recovers the unpinnable-ness from the tag. This function has no tag to consult
+    // — running the residue through `is_unpinnable` reported `false` for the very sentinel that
+    // means "unknowable", which is how `xargs cat` (whose items resolve to exactly that sentinel)
+    // slipped the shield.
+    //
+    // A DECLARED substitution is unaffected: its tag spells `__SAFE_CHAINS_<LOCUS>__`, deliberately
+    // not a prefix-match of the unpinnable `__SAFE_CHAINS_CMDSUB__`, so `$(git diff --name-only)`
+    // stays checkable and keeps its bounded locus.
+    if is_unpinnable(&expanded) {
+        return true;
+    }
+    let resolved = crate::pathctx::resolve(&expanded).into_owned();
+    is_unpinnable(&canonicalize(&resolved))
 }
 
 /// Classify an ALREADY-resolved path: canonicalize, fail closed on an unpinnable spelling, then
