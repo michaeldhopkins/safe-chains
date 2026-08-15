@@ -471,6 +471,8 @@ const READ_MODE_CASES: &[&str] = &[
 // what any surviving path-SHAPE test fails to see. It briefly lived in a separate list because
 // adding it here failed the `rg`/`awk`/`mlr` guards — those were not corpus noise but a real
 // over-approval in `looks_like_path`, now fixed, so the lists are one again.
+/// Targets outside the workspace, for the WRITE guards. Writes stay narrow — the workspace, a
+/// sibling, `/tmp` — so every entry here must refuse a write regardless of how reads evolve.
 const OUT_OF_WORKSPACE: &[&str] = &[
     "/etc/hosts",
     "/etc/passwd",
@@ -482,6 +484,30 @@ const OUT_OF_WORKSPACE: &[&str] = &[
     "~root",
     "../outside.txt",
     "../../escape.txt",
+];
+
+/// Targets that must never be READ, whatever the read policy is.
+///
+/// Deliberately a SUBSET of `OUT_OF_WORKSPACE`, and the split is the point. That list conflates two
+/// populations — credential stores and other users' homes, which must always refuse; and ordinary
+/// files like `/etc/hosts`, `~/.bashrc` and `../outside.txt`, which the read policy deliberately
+/// ADMITS (see tests/fixtures/path_policy_corpus.tsv). While local reads were capped at
+/// `worktree-trusted` both groups denied for the same reason, so one list served both guards and
+/// the conflation was invisible.
+///
+/// The invariant the read guards actually mean is "a read the shield cannot CLEAR denies", not "a
+/// read outside the workspace denies". Stated that way it holds under the current policy and under
+/// the permissive one, which is what makes it a property rather than a snapshot. The complementary
+/// half — that the ordinary paths are READABLE — belongs in the corpus, not here.
+const UNREADABLE: &[&str] = &[
+    "~/.ssh/id_rsa",
+    "~/.aws/credentials",
+    "~/.gnupg/secring.gpg",
+    "/etc/shadow",
+    "/etc/master.passwd",
+    "/root/.bashrc",
+    "~root",
+    "~root/.bashrc",
 ];
 
 // A substitution whose inner command DECLARED its output locus (`[command.output]`) evaluates to a
@@ -1092,11 +1118,11 @@ proptest! {
     #[test]
     fn declared_substitutions_deny_out_of_workspace_roots(
         template in proptest::sample::select(DECLARED_SUB_CASES.to_vec()),
-        target in proptest::sample::select(OUT_OF_WORKSPACE.to_vec()),
+        target in proptest::sample::select(UNREADABLE.to_vec()),
     ) {
         let line = template.replace("{p}", target);
         let allowed = command_verdict_in(&line, workspace()).is_allowed();
-        prop_assert!(!allowed, "substitution over an out-of-workspace root was allowed: `{}`", line);
+        prop_assert!(!allowed, "substitution over a shielded root was allowed: `{}`", line);
     }
 
     /// A write-enabling flag or script command must never allow a write outside the workspace.
@@ -1131,15 +1157,21 @@ proptest! {
         prop_assert!(!allowed, "trusted-rung write laundered through a substitution: `{}`", line);
     }
 
-    /// A read command naming a file inside an argument must not disclose an out-of-workspace file.
+    /// A read command naming a file inside an argument must not disclose a target the credential
+    /// shield cannot clear — a known store, or another user's home.
+    ///
+    /// Was `read_commands_deny_out_of_workspace_targets`, drawing from `OUT_OF_WORKSPACE`. That
+    /// asserted the wrong invariant: it held only because local reads were capped below `user`, so
+    /// it would have to be deleted the moment the cap lifted rather than surviving it. Reading
+    /// `/etc/hosts` is not the hazard; reading a key is.
     #[test]
-    fn read_commands_deny_out_of_workspace_targets(
+    fn read_commands_deny_targets_the_shield_cannot_clear(
         template in proptest::sample::select(READ_MODE_CASES.to_vec()),
-        target in proptest::sample::select(OUT_OF_WORKSPACE.to_vec()),
+        target in proptest::sample::select(UNREADABLE.to_vec()),
     ) {
         let line = template.replace("{p}", target);
         let allowed = command_verdict_in(&line, workspace()).is_allowed();
-        prop_assert!(!allowed, "out-of-workspace read was allowed: `{}`", line);
+        prop_assert!(!allowed, "a shielded read was allowed: `{}`", line);
     }
 }
 

@@ -33,16 +33,35 @@ way round.
 **2. Lift the reader level's observe bound** from `<= worktree-trusted` to `<= machine`, and delete
 the seventeen `package-content` nodes it exists to compensate for.
 
-**3. Restate the property guards.** They are the real blocker, not the bound. `OUT_OF_WORKSPACE` in
-`handler_property_tests.rs` conflates two populations: genuine secrets (`~/.ssh/id_rsa`,
-`/root/.bashrc`, `~root`) and ordinary files the new policy should ADMIT (`/etc/hosts`,
-`~/.bashrc`, `/usr/local/bin/x`, `../outside.txt`). Splitting that list is most of the work;
-`no_abstraction_is_more_permissive_than_a_path_it_could_denote`,
-`substitution_is_never_more_permissive_than_a_path_it_could_produce` and
-`read_commands_deny_out_of_workspace_targets` all draw from it, and their invariant should be
-restated as "a read the shield cannot clear denies" rather than "an out-of-workspace read denies".
-Do that restatement FIRST and confirm it passes against current behaviour; then (2) is a two-line
-diff and the corpus goes 70/70.
+**3. ~~Restate the property guards.~~ DONE** — `UNREADABLE` split out of `OUT_OF_WORKSPACE`, the
+read guards draw from it, and they pass under BOTH policies. That was expected to be the blocker and
+was not: with the bound lifted experimentally the restated guards stayed green, and so did
+`no_abstraction_is_more_permissive_than_a_path_it_could_denote` and
+`substitution_is_never_more_permissive_than_a_path_it_could_produce`.
+
+**4. The actual blocker is xargs, and it is a composition-layer hole the path layer cannot reach.**
+With the bound lifted, `xargs_never_launders_stdin_items` reports 19 laundered compositions:
+
+    xargs -I{} cat {}            = safe-read   >  bare `cat`          = inert
+    find / | xargs -I{} cat {}   = safe-read   >  bare `cat`          = inert
+    xargs -I{} cp {} /tmp/dest   = safe-write  >  bare `cp /tmp/dest` = denied
+
+`{}` is NOT unpinnable — it is a literal relative name — so `reads_path`'s unshieldable test does not
+fire, and the items are not in the argument list at all: they arrive on stdin. The path layer has
+nothing to classify. `find / | xargs -I{} cat {}` therefore reads whatever the find turned up, keys
+included, and it is admitted the moment local reads open.
+
+Fix belongs where the composition is modelled: an `xargs`-fed reader consumes UNKNOWABLE operands, so
+it should resolve as a read of an unshieldable path (`secret · reads`) rather than as a read of the
+literal `{}`. That is the same claim `reads_path` makes for `$VAR`, applied one layer up. Until it
+lands the bound stays where it is — the corpus reaches 70/70 with it lifted, so this is the only
+thing between here and done.
+
+Measured with the bound lifted: 67 test failures, of which this is the ONLY fail-open. The rest are
+policy snapshots naming the old behaviour (`macos_system_and_home_are_not_auto_read`,
+`reads_the_workspace_denies_everything_outside`, `linux_system_introspection_is_no_longer_auto_read`)
+plus the `loop_over_*_sub` and `resolution::*` locus assertions. The bound-lift diff is preserved at
+`scratchpad/bound-lift.patch`.
 
 `tests/fixtures/path_policy_corpus.tsv` is the acceptance test — 60/70 today, with all ten
 mismatches in `read-home` and `read-machine`.
