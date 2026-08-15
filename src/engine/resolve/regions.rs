@@ -281,7 +281,7 @@ pub(crate) fn with_os<T>(os: &'static str, f: impl FnOnce() -> T) -> T {
     f()
 }
 
-fn current_os() -> &'static str {
+pub(super) fn current_os() -> &'static str {
     #[cfg(test)]
     if let Some(o) = OS_OVERRIDE.with(std::cell::Cell::get) {
         return o;
@@ -1460,6 +1460,38 @@ mod tests {
         with_grants(&[("~/projects", true, true)], || {
             assert_eq!(classify_region("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
         });
+    }
+
+    /// `/etc/x` and `/private/etc/x` are one file on macOS, so they must be one classification.
+    /// They were not: `/etc/shadow` was shielded and `/private/etc/shadow` read out clean, which
+    /// is a bypass anyone can type. Enumerated over the real node list rather than spot-checked,
+    /// so a node added under any firmlinked root is covered the day it lands.
+    #[test]
+    fn the_private_spelling_of_a_firmlinked_node_classifies_identically() {
+        // macOS only: that is where the firmlink makes the two spellings one file. On Linux they
+        // are unrelated paths and `/private/…` is correctly unknown — `os_scope_is_load_bearing`
+        // holds that end, and folding there would hand `/private/tmp` the permissive temp rung.
+        let os = "macos";
+        {
+            with_os(os, || {
+                let mut covered = 0;
+                for node in REGIONS.nodes.iter().filter(|n| n.applies_here()) {
+                    let Some((path, _, _)) = naming_probe(&node.matcher) else { continue };
+                    if !["/etc/", "/var/", "/tmp/"].iter().any(|r| path.starts_with(r)) {
+                        continue;
+                    }
+                    covered += 1;
+                    let private = format!("/private{path}");
+                    let (plain, firm) = (classify_region(&path), classify_region(&private));
+                    assert_eq!(
+                        (plain.read_locus, plain.write_locus, plain.reads_secret),
+                        (firm.read_locus, firm.write_locus, firm.reads_secret),
+                        "{os}: {path} and {private} name one file but classify differently"
+                    );
+                }
+                assert!(covered >= 3, "{os}: guard covered only {covered} firmlinked nodes — vacuous");
+            });
+        }
     }
 
     #[test]

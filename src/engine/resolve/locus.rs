@@ -294,6 +294,33 @@ const SUB_STANDIN: &str = "sc_substitution_value";
 /// all reduce to the canonical `~/.config/safe-chains.toml`. `..` is left in place on purpose —
 /// `is_unpinnable` rejects it (a normalized `..` would silently defeat that guard).
 pub(crate) fn canonicalize(path: &str) -> Cow<'_, str> {
+    match firmlink_fold(path) {
+        Some(folded) => Cow::Owned(fold_spellings(&folded).into_owned()),
+        None => fold_spellings(path),
+    }
+}
+
+/// macOS serves `/etc`, `/var` and `/tmp` as firmlinks to `/private/…`, so both spellings name the
+/// SAME file. Only one of them can be written in a region node, and the other was walking straight
+/// past it: `/etc/shadow` was shielded while `/private/etc/shadow` read out clean.
+///
+/// macOS only, where the firmlinks are. Folding everywhere is tempting — one answer per string —
+/// but it is not uniformly stricter, which is the only thing that would justify it: `/private/etc/
+/// shadow` folds toward a shield, and `/private/tmp/x` folds toward the permissive temp rung. On
+/// Linux those are ordinary unknown paths that already deny, so leaving them unfolded is both
+/// correct and safe. Region nodes are `os`-scoped for the same reason.
+fn firmlink_fold(path: &str) -> Option<String> {
+    const FIRMLINKS: &[&str] = &["/private/etc", "/private/var", "/private/tmp"];
+    if super::regions::current_os() != "macos" {
+        return None;
+    }
+    FIRMLINKS
+        .iter()
+        .find(|p| path.strip_prefix(**p).is_some_and(|rest| rest.is_empty() || rest.starts_with('/')))
+        .map(|_| path["/private".len()..].to_string())
+}
+
+fn fold_spellings(path: &str) -> Cow<'_, str> {
     let home = std::env::var("HOME").ok();
     let home_abs = home
         .as_deref()
