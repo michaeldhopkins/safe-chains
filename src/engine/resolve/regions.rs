@@ -239,6 +239,22 @@ struct Node {
 
 impl Node {
     fn applies_here(&self) -> bool {
+        // A SHIELD applies on every platform, whatever its `os` list says. Over-denying a path that
+        // does not exist on this OS costs nothing — nobody reads `/etc/shadow` on macOS — whereas
+        // under-denying it is a credential leak.
+        //
+        // Harmless while an unmatched path fell through to `unknown`/`machine` and denied anyway:
+        // the os-gated shields were belt on top of braces. They stop being harmless the moment local
+        // reads open up, because that removes the braces. Measured on the experimental read-opening:
+        // `perl -pe 's/a/b/' /etc/shadow` — a MUST-DENY composition invariant — auto-approved on
+        // macOS, because the node carrying `/etc/shadow` is `os = ["linux"]`.
+        //
+        // An `os` list is a statement about where a path is MEANINGFUL. That is a reasonable thing
+        // to record for an admit (a case-variant of `/tmp` really is a different directory on a
+        // case-sensitive volume); for a shield it is a reason to deny more, never less.
+        if self.role.reads_secret {
+            return true;
+        }
         match &self.os {
             None => true,
             Some(list) => list.iter().any(|o| o == current_os()),
@@ -767,10 +783,69 @@ fn base_region(path: &str) -> Role {
         // A specific region (credential shield, .git freeze) already won above; only a path matching
         // NOTHING reaches here. If it is a SIBLING of the workspace, it earns `adjacent` (a peer
         // project) rather than the `unknown`/machine deny — the co-located-repo pattern.
-        adjacent_role(path).unwrap_or(r.unknown)
+        //
+        // Order is load-bearing. Home comes AFTER adjacency: expressed instead as a `~/` node in the
+        // region table it matched by subtree specificity up in the loop above and SHADOWED the
+        // sibling test, so every peer project (which lives under `$HOME` too) stopped being
+        // `adjacent` and `touch ../branchdiff/x` began denying. Sibling-ness is structural; home is
+        // the fallback for whatever under `$HOME` is neither.
+        adjacent_role(path)
+            .or_else(|| other_user_home_role(path))
+            .or_else(|| home_role(path))
+            .unwrap_or(r.unknown)
     } else {
         r.worktree
     }
+}
+
+/// ANOTHER user's home (`~root`, `~alice`): shielded, exactly like a credential store.
+///
+/// Checked before `home_role` and stated as a secret rather than left to the locus, because the
+/// locus is what opens up: with local reads admitted to `<= machine`, `~root/.bashrc` would
+/// otherwise become an ordinary readable file. `/root/` is already a declared shield and this is the
+/// same claim by a different spelling — a home that is not ours is private data whatever its rung.
+fn other_user_home_role(path: &str) -> Option<Role> {
+    let rest = path.strip_prefix('~')?;
+    // `~` and `~/…` are OUR home; `~name` / `~name/…` is someone else's.
+    (!rest.is_empty() && !rest.starts_with('/')).then_some(Role {
+        read_locus: LocalLocus::Machine,
+        write_locus: LocalLocus::Machine,
+        rebind_locus: LocalLocus::Machine,
+        reads_secret: true,
+        frozen: Frozen::Nothing,
+    })
+}
+
+/// Anything under `$HOME` that matched no node and is not a sibling: readable, not writable.
+///
+/// This is the first production construction site `LocalLocus::User` has ever had. The rung was
+/// defined (`User => "user", // ~, keychain`) and the level ladder was authored against it, but no
+/// path ever resolved to it — every `~` path fell through to `unknown` and so to `machine`, the same
+/// rung as `/etc/hosts`. Three authoring assertions passed while describing behaviour production
+/// could not reach, and "read all of `~`, write none of it" was inexpressible because both halves
+/// were the same term.
+/// HIDDEN components are excluded, mirroring `adjacent_role`'s rule for a peer project's
+/// `.env`/`.git`/`.aws`, and for a sharper reason here: home dotfiles are simultaneously the most
+/// ordinary read (`.zshrc`, `.gitconfig`, a tool's config) and the most credential-dense thing on
+/// the disk. `~/.git-credentials` holds plaintext passwords and is NOT in the shield today; nor are
+/// `.npmrc`, `.pypirc`, `.pgpass`, `.boto`. Admitting all of `~` including dotfiles before the
+/// shield names those would hand them over. So dotted paths keep falling through to
+/// `unknown`/`machine` and deny exactly as they do now, and opening them is a separate, researched
+/// step — see TODO.md.
+fn home_role(path: &str) -> Option<Role> {
+    if path != "~" && !path.starts_with("~/") {
+        return None;
+    }
+    if path.split('/').any(|seg| seg.starts_with('.') && seg != "." && seg != "..") {
+        return None;
+    }
+    Some(Role {
+        read_locus: LocalLocus::User,
+        write_locus: LocalLocus::Machine,
+        rebind_locus: LocalLocus::Machine,
+        reads_secret: false,
+        frozen: Frozen::Nothing,
+    })
 }
 
 /// Classify `path` as a direct SIBLING of the workspace — a peer project under the same parent
@@ -993,8 +1068,11 @@ mod tests {
         assert_eq!(ssh.read_locus, LocalLocus::Machine);
         assert!(ssh.reads_secret);
         assert!(classify_region("myproj/.ssh/id_rsa").reads_secret, "segment bites a relative spelling too");
-        // ~/notes has no node → unknown → denied (home is not admitted)
-        assert_eq!(classify_region("~/notes.txt").read_locus, LocalLocus::Machine);
+        // ~/notes matches no node → the home fallback → `user`, and NOT writable.
+        assert_eq!(classify_region("~/notes.txt").read_locus, LocalLocus::User);
+        assert_eq!(classify_region("~/notes.txt").write_locus, LocalLocus::Machine);
+        // ...while another user's home is shielded rather than merely far away.
+        assert!(classify_region("~root/.bashrc").reads_secret, "another user's home is private");
     }
 
     #[test]

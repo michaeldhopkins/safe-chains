@@ -2076,10 +2076,20 @@ mod tests {
         cat.disclosure.audience = DisclosureAudience::LocalProcess;
         assert_eq!(one_cap(&["cat", "./notes.md"]), cat, "cat ./notes.md");
 
-        // cat of a plain home file — home is no longer admitted, so locus rises to machine (deny).
+        // cat of a plain home file resolves to `user` — the rung the ladder defines for `~` and
+        // that, until 2026-08-15, no production path ever reached (everything under home fell
+        // through to `unknown`/`machine`, the same rung as /etc/hosts). Still denies: `user` sits
+        // above the reader level's cap. The rung is now HONEST, which is the prerequisite for a
+        // level admitting a home read without also admitting the whole machine.
         let mut cat_home = cat.clone();
-        cat_home.locus.local = LocalLocus::Machine;
+        cat_home.locus.local = LocalLocus::User;
         assert_eq!(one_cap(&["cat", "~/notes.txt"]), cat_home, "cat ~/notes.txt");
+
+        // A home DOTFILE stays at machine. Home dotfiles are the most credential-dense thing on the
+        // disk (`~/.git-credentials`, `.npmrc`, `.pypirc`), and the shield does not name them yet.
+        let mut cat_dot = cat.clone();
+        cat_dot.locus.local = LocalLocus::Machine;
+        assert_eq!(one_cap(&["cat", "~/.git-credentials"]), cat_dot, "cat ~/.git-credentials");
 
         // cat of a home CREDENTIAL store: machine locus AND — the part that was missing until
         // 2026-08-14 — a `secret · reads` claim. The region carried `reads_secret = true` all along,

@@ -1,5 +1,52 @@
 # TODO
 
+## Permissive reads: what is left, and the one finding that changes its shape
+
+Landed so far (all zero-behavioural-delta, so they are safe on their own):
+
+- the credential shield reaches the level algebra at all (`secret · reads`), instead of resting
+  entirely on the locus cap that is about to be lifted;
+- a read the shield cannot CHECK (`$VAR`, an undeclared `$(…)`, an xargs item) claims secret too;
+- shields are no longer OS-gated — `/etc/shadow` and `/root/` bite on macOS;
+- another user's home (`~root`, `~alice`) is shielded rather than merely far away;
+- `LocalLocus::User` is reachable: `~/notes.txt` resolves to `user`, siblings still to `adjacent`.
+
+Remaining, in order:
+
+**1. Home DOTFILES are the hard part, and were not in the plan.** `home_role` deliberately excludes
+any hidden component, so `~/.zshrc` and `~/.cargo/registry/…` still resolve to `machine`. Lifting
+that is not a one-line follow-on, because home dotfiles are simultaneously the most ordinary read on
+the disk and the most credential-dense. The shield does NOT currently name:
+
+    ~/.git-credentials     plaintext usernames and passwords
+    ~/.npmrc               `_authToken=` registry credentials
+    ~/.pypirc              PyPI upload passwords
+    ~/.pgpass              Postgres passwords
+    ~/.boto                AWS credentials (legacy)
+    ~/.dockercfg           the pre-`.docker/` registry auth file
+
+`a_grant_does_not_widen_hidden_files_or_system_secrets` caught this: with dotfiles admitted,
+`~/.git-credentials` classified `user` and would have been readable. So the sequence is: research
+and declare the credential dotfiles FIRST, then drop the hidden-component exclusion — not the other
+way round.
+
+**2. Lift the reader level's observe bound** from `<= worktree-trusted` to `<= machine`, and delete
+the seventeen `package-content` nodes it exists to compensate for.
+
+**3. Restate the property guards.** They are the real blocker, not the bound. `OUT_OF_WORKSPACE` in
+`handler_property_tests.rs` conflates two populations: genuine secrets (`~/.ssh/id_rsa`,
+`/root/.bashrc`, `~root`) and ordinary files the new policy should ADMIT (`/etc/hosts`,
+`~/.bashrc`, `/usr/local/bin/x`, `../outside.txt`). Splitting that list is most of the work;
+`no_abstraction_is_more_permissive_than_a_path_it_could_denote`,
+`substitution_is_never_more_permissive_than_a_path_it_could_produce` and
+`read_commands_deny_out_of_workspace_targets` all draw from it, and their invariant should be
+restated as "a read the shield cannot clear denies" rather than "an out-of-workspace read denies".
+Do that restatement FIRST and confirm it passes against current behaviour; then (2) is a two-line
+diff and the corpus goes 70/70.
+
+`tests/fixtures/path_policy_corpus.tsv` is the acceptance test — 60/70 today, with all ten
+mismatches in `read-home` and `read-machine`.
+
 ## The `user` locus rung is constructed ONLY in tests — the resolver never emits it
 
 The precise defect, which is sharper than "the rung is unusable": `LocalLocus::User` has **zero

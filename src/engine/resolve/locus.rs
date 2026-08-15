@@ -543,7 +543,14 @@ mod tests {
         assert_eq!(read_locus("/usr/bin/python3"), LocalLocus::Machine);
         assert_eq!(read_locus("/etc/shadow"), LocalLocus::Machine);
         assert_eq!(read_locus("~/.ssh/id_rsa"), LocalLocus::Machine);
-        assert_eq!(read_locus("~/notes"), LocalLocus::Machine);
+        // An ordinary home file resolves to `user` — the rung that exists for it, and that until
+        // 2026-08-15 nothing in production ever produced. Still ABOVE the reader level's cap, so
+        // the verdict is unchanged; what changed is that the rung no longer claims a file in your
+        // own home is machine-wide state, which is what lets a level admit the read without also
+        // admitting `/etc`.
+        assert_eq!(read_locus("~/notes"), LocalLocus::User);
+        // Another user's home is not ours: shielded, not `user`.
+        assert_eq!(read_locus("~root/.bashrc"), LocalLocus::Machine);
         assert_eq!(read_locus("/some/unmapped/thing"), LocalLocus::Machine);
         // only the workspace and /tmp read
         assert_eq!(read_locus("notes.md"), LocalLocus::Worktree);
