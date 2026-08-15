@@ -2085,10 +2085,15 @@ mod tests {
         cat_home.locus.local = LocalLocus::User;
         assert_eq!(one_cap(&["cat", "~/notes.txt"]), cat_home, "cat ~/notes.txt");
 
-        // A home DOTFILE stays at machine. Home dotfiles are the most credential-dense thing on the
-        // disk (`~/.git-credentials`, `.npmrc`, `.pypirc`), and the shield does not name them yet.
+        // An ordinary home DOTFILE is ordinary: `.zshrc` is `user`, like any other file in home.
+        assert_eq!(one_cap(&["cat", "~/.zshrc"]), cat_home, "cat ~/.zshrc");
+
+        // A CREDENTIAL dotfile is not, and it is the shield that says so rather than the rung.
+        // Excluding dotfiles from the `user` rung protected nothing — an excluded path fell through
+        // to machine, which the read policy admits — so the shield names them instead.
         let mut cat_dot = cat.clone();
         cat_dot.locus.local = LocalLocus::Machine;
+        cat_dot.secret.level = SecretLevel::Reads;
         assert_eq!(one_cap(&["cat", "~/.git-credentials"]), cat_dot, "cat ~/.git-credentials");
 
         // cat of a home CREDENTIAL store: machine locus AND — the part that was missing until

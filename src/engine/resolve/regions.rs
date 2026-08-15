@@ -824,26 +824,22 @@ fn other_user_home_role(path: &str) -> Option<Role> {
 /// rung as `/etc/hosts`. Three authoring assertions passed while describing behaviour production
 /// could not reach, and "read all of `~`, write none of it" was inexpressible because both halves
 /// were the same term.
-/// HIDDEN components are excluded, mirroring `adjacent_role`'s rule for a peer project's
-/// `.env`/`.git`/`.aws`. Home dotfiles are simultaneously the most ordinary read (`.zshrc`,
-/// `.gitconfig`, a tool's config) and the most credential-dense thing on the disk —
-/// `~/.git-credentials` holds plaintext passwords and is NOT in the shield, nor are `.npmrc`,
-/// `.pypirc`, `.pgpass`, `.boto`.
+/// DOTFILES are included. `~/.zshrc`, `~/.gitconfig` and a tool's config under `~/.config` are
+/// ordinary reads, and excluding them was never what protected the credential-bearing ones: an
+/// excluded path falls through to `unknown` → `machine`, and `machine` reads are exactly what the
+/// read policy admits. Measured before the shield was extended: `cat ~/.git-credentials` ALLOWED,
+/// indistinguishable from `~/.zshrc`.
 ///
-/// **This exclusion is NOT what protects those files, and must not be mistaken for it.** An excluded
-/// path falls through to `unknown` → `machine`, which denies today only because the reader level
-/// caps local reads below it. Measured with the cap experimentally lifted: `cat ~/.git-credentials`
-/// ALLOWS, exactly like `~/.zshrc` and `~/notes.txt`. So the exclusion buys nothing at the moment it
-/// would matter; the only real protection is the shield NAMING those files, and that research is a
-/// prerequisite for lifting the cap rather than a follow-up to it (TODO.md).
+/// What protects those files is the shield NAMING them — `.git-credentials`, `.npmrc`, `.pypirc`,
+/// `.pgpass`, `.my.cnf`, `.dockercfg`, the cargo/gem/maven/gradle/composer token files — and the
+/// shield wins outright in `base_region`, before specificity is considered at all. That is why the
+/// dotfile research had to land first and this exclusion could then go.
 ///
-/// What it does buy, and why it stays: the rung it hands out is honest. `user` means "an ordinary
-/// file in this user's home", and a credential dotfile is not that.
+/// The residual risk is stated rather than hidden: the shield is an enumeration, so a tool that
+/// invents a new credential dotfile is readable until someone declares it. That is the accepted
+/// shape of the one denylist this project keeps.
 fn home_role(path: &str) -> Option<Role> {
     if path != "~" && !path.starts_with("~/") {
-        return None;
-    }
-    if path.split('/').any(|seg| seg.starts_with('.') && seg != "." && seg != "..") {
         return None;
     }
     Some(Role {
@@ -995,11 +991,15 @@ mod tests {
         assert_eq!(ws(WS, "~/projects/notes.txt").read_locus, LocalLocus::Adjacent, "a file peer to the workspace dir");
 
         // A sibling's HIDDEN files are ordinary peer content now — the dot-shield is gone, and what
-        // stops a peer's secrets is the credential shield (segment-matched, any depth). `.env` and
-        // `.npmrc` are the two the shield does NOT name, so they read exactly as the same files in
-        // the workspace the agent is rooted at already did.
+        // stops a peer's secrets is the credential shield (segment-matched, any depth). `.env` is
+        // one the shield does NOT name, so it reads exactly as the same file in the workspace the
+        // agent is rooted at already does.
         assert_eq!(ws(WS, "~/projects/branchdiff/.env").read_locus, LocalLocus::Adjacent, "peer .env reads as peer content");
-        assert_eq!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Adjacent, "peer .npmrc reads as peer content");
+        // `.npmrc` WAS in that category and is not any more: it was added to the shield on
+        // 2026-08-15 because it carries `_authToken`, and a project-local copy carries the same one
+        // as the home copy. Segment-matched, so the peer's is shielded too — the deliberate
+        // over-denial the shield header describes.
+        assert_eq!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Machine, "peer .npmrc is a token file, not peer content");
         assert_eq!(ws(WS, "~/projects/branchdiff/.ssh/id_rsa").read_locus, LocalLocus::Machine, "the shield still bites in a peer");
         // The .git WRITE freeze is a separate guard and is unaffected by dropping the dot-shield.
         assert_eq!(ws(WS, "~/projects/branchdiff/.git/hooks/pre-commit").write_locus, LocalLocus::WorktreeTrusted, "peer .git hook stays frozen");

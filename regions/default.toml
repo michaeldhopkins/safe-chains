@@ -307,6 +307,89 @@ role = "credential-store"
 note = "Plaintext machine login credentials for ftp/curl/git."
 researched = "2026-07-12"
 
+# ── Credential DOTFILES. A prerequisite for admitting home dotfiles at all, not a follow-up. ──
+#
+# Home dotfiles are simultaneously the most ordinary read on the disk (`.zshrc`, `.gitconfig`) and
+# the densest concentration of plaintext credentials on it. `home_role` currently excludes any hidden
+# component for that reason — but measured, that exclusion protects nothing once local reads open:
+# an excluded dotfile falls through to `unknown` → `machine`, and `machine` reads are exactly what
+# the read policy admits. `cat ~/.git-credentials` ALLOWS with the cap lifted. These nodes are the
+# only thing that will actually stand in front of them.
+#
+# SEGMENT matches for the bare filenames, so a project-local copy is shielded too — a repo `.npmrc`
+# carries the same `_authToken` as the home one. Over-denying an innocent one is the accepted trade
+# the shield header already states.
+[[region]]
+path = ".git-credentials"
+role = "credential-store"
+note = "git-credential-store's default file: one plaintext `https://user:pass@host` per line. Its XDG twin `~/.config/git/credentials` is already covered by the `~/.config/git/` node. Verified: git-scm.com/docs/git-credential-store."
+researched = "2026-08-15"
+[[region]]
+path = ".npmrc"
+role = "credential-store"
+note = "npm config; holds `//registry.example/:_authToken=…` registry tokens. Segment-matched so a project-local .npmrc is shielded too — it carries the same token."
+researched = "2026-08-15"
+[[region]]
+path = ".pypirc"
+role = "credential-store"
+note = "PyPI upload credentials — `username`/`password` or an API token per repository section."
+researched = "2026-08-15"
+[[region]]
+path = ".pgpass"
+role = "credential-store"
+note = "libpq password file, `host:port:db:user:password` per line. Postgres refuses it unless mode 0600, which is the tell."
+researched = "2026-08-15"
+[[region]]
+path = ".my.cnf"
+role = "credential-store"
+note = "MySQL client config; `[client] password=` is the documented way to avoid typing it."
+researched = "2026-08-15"
+[[region]]
+path = ".dockercfg"
+role = "credential-store"
+note = "The pre-1.7 Docker registry auth file (base64 user:pass). Superseded by ~/.docker/config.json, which the `.docker` segment already shields, but still read by older tooling."
+researched = "2026-08-15"
+[[region]]
+path = ".terraform.d"
+role = "credential-store"
+note = "Holds credentials.tfrc.json — the Terraform Cloud/Enterprise API token. A SEGMENT, like `.ssh`/`.aws`: written with a trailing slash it became a subtree PREFIX anchored at the start of the path, which matched nothing real and let `$(fd pat /work)/.terraform.d` out-permit the literal `/work/.terraform.d` — caught by substitution_is_never_more_permissive_than_a_path_it_could_produce."
+researched = "2026-08-15"
+[[region]]
+path = "~/.azure/"
+role = "credential-store"
+note = "Azure CLI token cache (msal_token_cache.json / accessTokens.json) and the active subscription profile."
+researched = "2026-08-15"
+[[region]]
+path = "~/.cargo/credentials"
+role = "credential-store"
+note = "crates.io registry token. Cargo writes `credentials.toml` since 1.68 but still reads and prefers the extensionless name when both exist, so BOTH are shielded. Deliberately exact paths, not a `.cargo` segment: the sibling `~/.cargo/registry/` is published crate source and stays readable. Verified: doc.rust-lang.org/cargo/reference/config.html."
+researched = "2026-08-15"
+[[region]]
+path = "~/.cargo/credentials.toml"
+role = "credential-store"
+note = "As above — the current default spelling of the crates.io token file."
+researched = "2026-08-15"
+[[region]]
+path = "~/.gem/credentials"
+role = "credential-store"
+note = "RubyGems `:rubygems_api_key:` — the push token."
+researched = "2026-08-15"
+[[region]]
+path = "~/.m2/settings.xml"
+role = "credential-store"
+note = "Maven `<server><password>` entries for deploy repositories."
+researched = "2026-08-15"
+[[region]]
+path = "~/.gradle/gradle.properties"
+role = "credential-store"
+note = "Conventional home for signing keys and repository credentials (`signing.password`, `*.apiKey`)."
+researched = "2026-08-15"
+[[region]]
+path = "~/.composer/auth.json"
+role = "credential-store"
+note = "Composer HTTP-basic and OAuth tokens for private PHP package repositories."
+researched = "2026-08-15"
+
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
 #    covers hidden entries; these are not dotfiles). ──────────────────────────────────────────
