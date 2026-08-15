@@ -25,10 +25,17 @@ the disk and the most credential-dense. The shield does NOT currently name:
     ~/.boto                AWS credentials (legacy)
     ~/.dockercfg           the pre-`.docker/` registry auth file
 
-`a_grant_does_not_widen_hidden_files_or_system_secrets` caught this: with dotfiles admitted,
-`~/.git-credentials` classified `user` and would have been readable. So the sequence is: research
-and declare the credential dotfiles FIRST, then drop the hidden-component exclusion — not the other
-way round.
+`a_grant_does_not_widen_hidden_files_or_system_secrets` caught the first version of this, where
+dotfiles were admitted and `~/.git-credentials` classified `user`.
+
+**But excluding them does not protect them, and the first draft of this note claimed it did.**
+Adversarial review measured it: an excluded dotfile falls through to `unknown` → `machine`, and
+`machine` reads are exactly what the bound lift admits. With the bound lifted,
+`cat ~/.git-credentials` ALLOWS — indistinguishable from `~/.zshrc`. The exclusion only bites while
+the cap is down, which is precisely when nothing needed protecting.
+
+So declaring the credential dotfiles in the shield is a HARD PREREQUISITE for lifting the bound, not
+a follow-up to it. Nothing else is standing in front of those files.
 
 **2. Lift the reader level's observe bound** from `<= worktree-trusted` to `<= machine`, and delete
 the seventeen `package-content` nodes it exists to compensate for.

@@ -198,19 +198,17 @@ fn unpinnable_after_resolution(path: &str) -> bool {
     let expanded = crate::pathctx::expand_vars(path, false);
     let expanded = neutralize_atoms(&expanded).into_owned();
 
-    // Tested BEFORE `tagged_substitution`, which is the whole subtlety. That function replaces a
-    // substitution sentinel with a benign residue and hands the LOCUS back separately, so
-    // `classify_one` recovers the unpinnable-ness from the tag. This function has no tag to consult
-    // — running the residue through `is_unpinnable` reported `false` for the very sentinel that
-    // means "unknowable", which is how `xargs cat` (whose items resolve to exactly that sentinel)
-    // slipped the shield.
+    // NOTE what is deliberately absent: `classify_one` runs `tagged_substitution` at this point and
+    // this does not. That function replaces a substitution sentinel with a benign residue and hands
+    // the LOCUS back separately — `classify_one` recovers the unpinnable-ness from the tag it was
+    // given, and there is no tag here to recover it from. Calling it would report "pinnable" for the
+    // very sentinel that means unknowable, which is how `xargs cat` — whose stdin items resolve to
+    // exactly that sentinel — read an unknown path while claiming no secret.
     //
-    // A DECLARED substitution is unaffected: its tag spells `__SAFE_CHAINS_<LOCUS>__`, deliberately
-    // not a prefix-match of the unpinnable `__SAFE_CHAINS_CMDSUB__`, so `$(git diff --name-only)`
-    // stays checkable and keeps its bounded locus.
-    if is_unpinnable(&expanded) {
-        return true;
-    }
+    // A DECLARED substitution is unaffected either way: its tag spells `__SAFE_CHAINS_<LOCUS>__`,
+    // deliberately not a prefix-match of the unpinnable `__SAFE_CHAINS_CMDSUB__`, so
+    // `$(git diff --name-only)` is not unpinnable here and keeps its bounded locus over in
+    // `classify_one`.
     let resolved = crate::pathctx::resolve(&expanded).into_owned();
     is_unpinnable(&canonicalize(&resolved))
 }
@@ -541,6 +539,33 @@ mod tests {
         assert_eq!(write_locus("/usr/local/bin/x"), LocalLocus::Machine);
         assert_eq!(write_locus("/dev/rdisk0"), LocalLocus::Machine);
         assert_eq!(write_locus("~bob/.ssh/id_rsa"), LocalLocus::Machine, "another user's home");
+    }
+
+    /// The SUBSTITUTION SENTINEL is unshieldable, and the check must happen before it is rewritten.
+    ///
+    /// White-box on purpose. The natural black-box probe (`resolve` over `shell_words::split`) can
+    /// never reach this: the sentinel is produced by CST EVALUATION of a substitution, so a token
+    /// list built by splitting a string carries `$(…)` — which trips `is_unpinnable` on the raw text
+    /// and passes whether or not the ordering is right. `a_read_the_shield_cannot_clear_claims_secret`
+    /// stayed green with the fix deleted for exactly that reason.
+    ///
+    /// The ordering: `tagged_substitution` replaces a sentinel with a benign residue and returns the
+    /// locus separately, so testing the residue reported "pinnable" for the one value that means
+    /// unknowable. That is how `xargs cat` — whose stdin items resolve to this sentinel — read an
+    /// unknown path while claiming no secret.
+    #[test]
+    fn the_substitution_sentinel_cannot_be_cleared_by_the_shield() {
+        let sentinel = format!("/{}", "__SAFE_CHAINS_CMDSUB__");
+        assert!(is_unpinnable(&sentinel), "precondition: the sentinel is unpinnable");
+        assert!(
+            read_is_unshieldable(&sentinel),
+            "the substitution sentinel must be unshieldable — it is what an xargs stdin item and an \
+             undeclared $(…) resolve to, and the shield cannot be consulted about it"
+        );
+        // A DECLARED substitution keeps its bounded locus and stays checkable: its tag spells
+        // `__SAFE_CHAINS_<LOCUS>__`, deliberately not a prefix-match of the unpinnable sentinel.
+        assert!(!read_is_unshieldable("./src/main.rs"), "an ordinary path must stay clearable");
+        assert!(!read_is_unshieldable("~/notes.txt"), "an ordinary home path must stay clearable");
     }
 
     #[test]

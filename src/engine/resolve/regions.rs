@@ -825,13 +825,20 @@ fn other_user_home_role(path: &str) -> Option<Role> {
 /// could not reach, and "read all of `~`, write none of it" was inexpressible because both halves
 /// were the same term.
 /// HIDDEN components are excluded, mirroring `adjacent_role`'s rule for a peer project's
-/// `.env`/`.git`/`.aws`, and for a sharper reason here: home dotfiles are simultaneously the most
-/// ordinary read (`.zshrc`, `.gitconfig`, a tool's config) and the most credential-dense thing on
-/// the disk. `~/.git-credentials` holds plaintext passwords and is NOT in the shield today; nor are
-/// `.npmrc`, `.pypirc`, `.pgpass`, `.boto`. Admitting all of `~` including dotfiles before the
-/// shield names those would hand them over. So dotted paths keep falling through to
-/// `unknown`/`machine` and deny exactly as they do now, and opening them is a separate, researched
-/// step — see TODO.md.
+/// `.env`/`.git`/`.aws`. Home dotfiles are simultaneously the most ordinary read (`.zshrc`,
+/// `.gitconfig`, a tool's config) and the most credential-dense thing on the disk —
+/// `~/.git-credentials` holds plaintext passwords and is NOT in the shield, nor are `.npmrc`,
+/// `.pypirc`, `.pgpass`, `.boto`.
+///
+/// **This exclusion is NOT what protects those files, and must not be mistaken for it.** An excluded
+/// path falls through to `unknown` → `machine`, which denies today only because the reader level
+/// caps local reads below it. Measured with the cap experimentally lifted: `cat ~/.git-credentials`
+/// ALLOWS, exactly like `~/.zshrc` and `~/notes.txt`. So the exclusion buys nothing at the moment it
+/// would matter; the only real protection is the shield NAMING those files, and that research is a
+/// prerequisite for lifting the cap rather than a follow-up to it (TODO.md).
+///
+/// What it does buy, and why it stays: the rung it hands out is honest. `user` means "an ordinary
+/// file in this user's home", and a credential dotfile is not that.
 fn home_role(path: &str) -> Option<Role> {
     if path != "~" && !path.starts_with("~/") {
         return None;
