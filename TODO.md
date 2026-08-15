@@ -1,5 +1,23 @@
 # TODO
 
+## A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace
+
+`rg`, `ag`, `ack`, `ugrep`, `sift` and `pt` are gated `read_tree_after_first`: their path operand
+is the root of a recursive search, and a root cannot be cleared by a shield that tests names —
+`rg foo ~` names `~`, which is not a credential store, then reads `~/.ssh/id_rsa` out of it.
+
+The cost is that `rg foo ~/notes.txt` also refuses, because nothing static distinguishes a file
+operand from a directory operand. Two ways out, neither taken yet:
+
+- Read the flags that bound the search (`--max-depth 0`, `-g`, `--files-with-matches` on a single
+  named file) and downgrade to a single read when the search provably cannot descend. Real, but it
+  is per-tool grammar work and each tool spells it differently.
+- Model these tools in the engine the way `grep` is modelled, where recursion is known rather than
+  assumed. Bigger, and the right end state.
+
+Not urgent: this is exactly what these tools did before local reads opened up, so it is unchanged
+behaviour rather than a regression, and `grep` reads the same file fine.
+
 ## DECISION NEEDED: enumerating credential dotfiles is losing, and the evidence is one probe deep
 
 Admitting all of `~` rests on the shield naming every credential-bearing dotfile. Two rounds in, that

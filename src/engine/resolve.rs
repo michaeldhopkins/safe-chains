@@ -71,6 +71,13 @@ pub(crate) fn read_content_verdict(path: &str) -> crate::verdict::Verdict {
     crate::engine::bridge::project(&Profile::of(vec![cap]))
 }
 
+/// The verdict for reading everything UNDER `path` — a recursive searcher or an archiver's source
+/// tree, where the operand is the root of a sweep and not the file that gets read.
+pub(crate) fn read_tree_verdict(path: &str) -> crate::verdict::Verdict {
+    let cap = reads_path(path, Scale::Unbounded, "reads a tree of files");
+    crate::engine::bridge::project(&Profile::of(vec![cap]))
+}
+
 /// The verdict for WRITING/overwriting `path` — used to gate a legacy writer command's file
 /// operand (`tee`/`shred`/`bzip2`) by its write locus, so `shred /etc/hosts` denies.
 pub(crate) fn write_target_verdict(path: &str) -> crate::verdict::Verdict {
@@ -1208,7 +1215,11 @@ impl<'a> TarParse<'a> {
             b'c' | b'r' | b'u' => {
                 let mut caps: Vec<Capability> = members
                     .iter()
-                    .map(|(dir, m)| observes_path(&tar_bound(dir.as_deref(), m), Scale::Bounded, "tar reads a member into the archive"))
+                    // UNBOUNDED, not bounded: a member that is a directory is archived with
+                    // everything under it, so `tar -cf x.tar ~` packs every key in home into a
+                    // worktree file that is then ordinary to read. The member names the root of a
+                    // sweep, not a file, and the shield cannot clear a root.
+                    .map(|(dir, m)| observes_path(&tar_bound(dir.as_deref(), m), Scale::Unbounded, "tar reads a member into the archive"))
                     .collect();
                 if let Some((dir, a)) = archive_file {
                     caps.push(overwrites(classify_locus(&tar_bound(dir, a)), Scale::Single, false));
@@ -1770,11 +1781,25 @@ mod tests {
     }
 
     #[test]
-    fn cat_beyond_the_worktree_is_denied_by_locus() {
-        // Secrets, private home, unpinnable, and unrecognized system paths stay denied…
-        for path in ["~/.ssh/id_rsa", "~/notes", "/etc/shadow", "$SECRET", "../outside", "/var/lib/mysql/data"] {
+    fn cat_of_a_path_the_shield_cannot_clear_is_denied() {
+        // What bounds a read is the shield, not the rung: a credential store, another user's
+        // home, a raw device, or a path we cannot resolve well enough to ASK about.
+        for path in [
+            "~/.ssh/id_rsa",
+            "/etc/shadow",
+            "$SECRET",
+            "/var/lib/mysql/data",
+            "/dev/mem",
+            "/root/.bashrc",
+        ] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
-            assert!(!read_local().admits(&p), "cat {path} is above read-local by locus");
+            assert!(!read_local().admits(&p), "cat {path} must not be admitted as a local read");
+        }
+        // …while ordinary files on those same rungs now read, which is the whole point of the
+        // shield being a NAME test rather than a rung test.
+        for path in ["~/notes", "../outside", "/etc/hosts", "/usr/bin/python3"] {
+            let p = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(read_local().admits(&p), "cat {path} is an ordinary read");
         }
     }
 

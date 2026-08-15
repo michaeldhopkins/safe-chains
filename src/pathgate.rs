@@ -5,7 +5,7 @@
 //! an `-i` identity, a converter's transcode input) — and a single walker here gates each path
 //! by the matching locus face. Roles come from a positional policy (with `skip_first` /
 //! `last_write` / `remote_aware` modifiers) plus a per-flag map; the three flat lists
-//! (`read` / `read_after_first` / `write`) are shorthand for the common positional policies.
+//! (`read` / `read_tree_after_first` / `write`) are shorthand for the common positional policies.
 //! `awk` is gated in its own handler instead (its regex programs contain `/` and `$`).
 //!
 //! Role assignment is authored knowledge, not inferred from spelling: the same `~/.ssh/id_rsa`
@@ -27,6 +27,15 @@ use crate::verdict::Verdict;
 pub(crate) enum Role {
     /// Gate by read locus — a disclosing read (`od FILE`, `scp` source, `wget --post-file`).
     Read,
+    /// Gate by read locus, as a SWEEP — the command descends the path rather than reading it as
+    /// one file (`rg PATTERN DIR`, `ag`, an archiver's source tree).
+    ///
+    /// The distinction matters only above the workspace, and it is the shield that makes it
+    /// matter: `rg foo ~` names `~`, which is not a credential store, and then reads
+    /// `~/.ssh/id_rsa` out of it. A name test can only clear a name someone wrote, so a root that
+    /// stands for everything beneath it cannot be cleared at all. `read` stays correct for the
+    /// commands that open exactly the file they are given.
+    ReadTree,
     /// Gate by write locus — a write-target (`tee FILE`, `curl -o`, a converter's output).
     Write,
     /// Gate by EXECUTOR locus — a flag whose value selects code to run (`cargo --manifest-path
@@ -186,7 +195,7 @@ pub(crate) fn central_role_exists(cmd: &str) -> bool {
         // break. Measured: stripping `smbutil`'s examples left that guard GREEN.
         || SUB_SCOPED.contains(cmd)
         || GATES.read.contains(cmd)
-        || GATES.read_after_first.contains(cmd)
+        || GATES.read_tree_after_first.contains(cmd)
         || GATES.write.contains(cmd)
 }
 
@@ -215,7 +224,7 @@ struct Gates {
     #[serde(default)]
     read: HashSet<String>,
     #[serde(default)]
-    read_after_first: HashSet<String>,
+    read_tree_after_first: HashSet<String>,
     #[serde(default)]
     write: HashSet<String>,
     #[serde(default)]
@@ -250,8 +259,8 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
         apply(spec, tokens)
     } else if gates.read.contains(cmd) {
         walk(&RoleSpec::simple(Role::Read, Shape::Plain), tokens)
-    } else if gates.read_after_first.contains(cmd) {
-        walk(&RoleSpec::simple(Role::Read, Shape::SkipFirst), tokens)
+    } else if gates.read_tree_after_first.contains(cmd) {
+        walk(&RoleSpec::simple(Role::ReadTree, Shape::SkipFirst), tokens)
     } else if gates.write.contains(cmd) {
         walk(&RoleSpec::simple(Role::Write, Shape::Plain), tokens)
     } else {
@@ -470,6 +479,7 @@ pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
     Some(match role {
         Role::Ignore => return None,
         Role::Read => crate::engine::resolve::read_content_verdict(value),
+        Role::ReadTree => crate::engine::resolve::read_tree_verdict(value),
         Role::Write => crate::engine::resolve::write_target_verdict(value),
         Role::Exec => crate::engine::resolve::execute_file_verdict(value),
     })
@@ -491,6 +501,7 @@ pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
     match role {
         Role::Ignore => None,
         Role::Read => Some(crate::engine::resolve::read_content_verdict(value)),
+        Role::ReadTree => Some(crate::engine::resolve::read_tree_verdict(value)),
         Role::Write => Some(crate::engine::resolve::write_target_verdict(value)),
         Role::Exec => Some(crate::engine::resolve::execute_file_verdict(value)),
     }
@@ -506,6 +517,7 @@ fn judge(role: Role, path: &str) -> Verdict {
     match role {
         Role::Ignore => Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
         Role::Read => crate::engine::resolve::read_content_verdict(path),
+        Role::ReadTree => crate::engine::resolve::read_tree_verdict(path),
         Role::Write => crate::engine::resolve::write_target_verdict(path),
         Role::Exec => crate::engine::resolve::execute_file_verdict(path),
     }
@@ -515,6 +527,7 @@ fn gate(role: Role, path: &str) -> bool {
     let verdict: fn(&str) -> Verdict = match role {
         Role::Ignore => return false,
         Role::Read => crate::engine::resolve::read_content_verdict,
+        Role::ReadTree => crate::engine::resolve::read_tree_verdict,
         Role::Write => crate::engine::resolve::write_target_verdict,
         Role::Exec => crate::engine::resolve::execute_file_verdict,
     };

@@ -24,17 +24,31 @@ use crate::engine::facet::*;
 /// checked at all.
 pub(super) fn reads_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = reads_content(read_locus(path), scale, because);
-    if unshieldable(path) {
+    if unshieldable(path) || sweeps_unnameable(path, scale) {
         c.secret.level = SecretLevel::Reads;
     }
     c
+}
+
+/// An UNBOUNDED read rooted at `user` or above cannot be cleared, whatever its root is named.
+///
+/// The shield is a test on a name, so it can only answer about a path someone actually wrote.
+/// `grep -r foo ~` writes one path, `~`, which is not a credential store — and then reads
+/// `~/.ssh/id_rsa`, `~/.aws/credentials` and everything else underneath it. Same laundering as
+/// `find ~ -exec cat {}`, arriving through scale instead of through a placeholder.
+///
+/// Bounded reads on those rungs are untouched: `cat /etc/hosts` names the one file it reads, and
+/// the shield genuinely can clear it. Below `user` the sweep is bounded by the workspace, where
+/// there is nothing for the shield to protect.
+fn sweeps_unnameable(path: &str, scale: Scale) -> bool {
+    scale == Scale::Unbounded && read_locus(path) >= crate::engine::facet::LocalLocus::User
 }
 
 /// As [`reads_path`], for the metadata-only observers (`find`, a `-f` script file, a tar member)
 /// that place a path without pulling its content into the model.
 pub(super) fn observes_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = observes(read_locus(path), scale, because);
-    if unshieldable(path) {
+    if unshieldable(path) || sweeps_unnameable(path, scale) {
         c.secret.level = SecretLevel::Reads;
     }
     c

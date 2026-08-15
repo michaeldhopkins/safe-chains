@@ -50,7 +50,14 @@ read = [
 # ── grep-like tools: `CMD [flags] PATTERN [flags] files…` — gate the FILE operands, skipping
 #    the first positional (the PATTERN, which may itself be a `/regex/`). Same shape as `awk`,
 #    which is gated in its own handler. (Plain `grep`/`sed` are the engine's job.)
-read_after_first = ["rg", "ag", "ack", "ugrep", "sift", "pt"]
+#
+#    `read_tree`, not `read`: every one of these searches a DIRECTORY recursively by default, so
+#    the operand is the root of a sweep. `rg foo ~` names `~` — not a credential store — and then
+#    reads `~/.ssh/id_rsa` out of it. Since a directory cannot be told from a file without
+#    touching the filesystem, this also refuses `rg foo ~/notes.txt`, which is a false deny; it
+#    matches what these tools did before local reads opened up, and `grep` (engine-modelled, so
+#    its recursion is actually known) reads that file fine. See TODO.md.
+read_tree_after_first = ["rg", "ag", "ack", "ugrep", "sift", "pt"]
 
 # ── Commands that WRITE / modify / destroy their file operands → gated by write locus ──────
 # (Every positional is a write-target. Tools whose args play mixed roles — an output flag, a

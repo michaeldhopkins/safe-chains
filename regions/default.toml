@@ -212,6 +212,18 @@ os = ["linux"]
 note = "Authentication log — sudo/su/ssh events, and passwords typed into a username prompt land here verbatim."
 researched = "2026-08-12"
 [[region]]
+path = "/var/lib/mysql/"
+role = "credential-store"
+os = ["linux"]
+note = "MySQL/MariaDB data directory. The `mysql.user` table lives here as a file, so the password hashes for every database account are readable straight off disk."
+researched = "2026-08-12"
+[[region]]
+path = "/var/lib/postgresql/"
+role = "credential-store"
+os = ["linux"]
+note = "PostgreSQL data directory — `pg_authid` carries the role password hashes, and pgpass/certs are commonly kept alongside."
+researched = "2026-08-12"
+[[region]]
 path = "/var/log/secure"
 role = "credential-store"
 os = ["linux"]
