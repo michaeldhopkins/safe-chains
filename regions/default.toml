@@ -467,6 +467,16 @@ os = ["macos"]
 note = "macOS password hash store."
 researched = "2026-07-12"
 [[region]]
+path = "/etc/ssh/"
+role = "credential-store"
+note = """
+Host private keys (`ssh_host_*_key`) — impersonating the host is exactly what they enable. The
+whole directory, not the key files: node matching has no globs, and the readable half (sshd_config,
+known_hosts) is worth little enough that shielding it costs nothing next to naming five key
+patterns and missing the sixth.
+"""
+researched = "2026-08-12"
+[[region]]
 path = "/etc/ssl/private/"
 role = "credential-store"
 note = "TLS/service private keys."
