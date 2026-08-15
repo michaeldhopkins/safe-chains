@@ -111,12 +111,20 @@ enum Matcher {
     StringPrefix(String),
     /// `.git`, `.envrc` — any path component equal to it, at any depth.
     Segment(String),
+    /// `/proc/*/environ` — `*` stands for exactly one path component; every other component is
+    /// literal. For the entries that are per-PROCESS rather than per-host: `/proc/1234/environ`
+    /// holds that process's environment, which is where an agent's API tokens live, and there is
+    /// no way to name the pid ahead of time. A subtree node would have to swallow `/proc/cpuinfo`
+    /// with it.
+    Glob(Vec<String>),
 }
 
 impl Matcher {
     fn from_path(path: &str) -> Matcher {
         if let Some(p) = path.strip_suffix('*') {
             Matcher::StringPrefix(p.to_string())
+        } else if path.contains('*') {
+            Matcher::Glob(path.split('/').map(str::to_string).collect())
         } else if path.ends_with('/') {
             Matcher::Prefix(path.to_string())
         } else if path.starts_with('/') || path.starts_with('~') {
@@ -142,6 +150,14 @@ impl Matcher {
             }
             Matcher::StringPrefix(s) => starts(path, s.as_str()).then_some(1_000 + s.len()),
             Matcher::Segment(seg) => path.split('/').any(|c| eq(c, seg)).then_some(seg.len()),
+            // Between Prefix and Exact: it pins every component but one, so it must outrank a
+            // subtree node while still yielding to a node that spells the path out in full.
+            Matcher::Glob(pat) => {
+                let comps: Vec<&str> = path.split('/').collect();
+                (comps.len() == pat.len()
+                    && pat.iter().zip(&comps).all(|(p, c)| p == "*" || eq(c, p)))
+                .then_some(10_000 + path.len())
+            }
         }
     }
 
@@ -152,6 +168,9 @@ impl Matcher {
         match self {
             Matcher::Prefix(s) | Matcher::StringPrefix(s) => path.strip_prefix(s.as_str()).unwrap_or(""),
             Matcher::Exact(_) => "",
+            // A Glob pins every component, so like an Exact it matches the whole path: nothing
+            // hangs below it to widen.
+            Matcher::Glob(_) => "",
             Matcher::Segment(_) => path,
         }
     }
@@ -167,6 +186,7 @@ impl Matcher {
             Matcher::Exact(s) => s.clone(),
             Matcher::Prefix(s) => s.strip_suffix('/').unwrap_or(s).to_string(),
             Matcher::StringPrefix(s) => s.clone(),
+            Matcher::Glob(_) => path.to_string(),
             // SLICED from `path`, never rebuilt by joining components: an absolute path's leading
             // `/` is an empty first component, so re-joining silently produced `root/.ssh` for
             // `/root/.ssh/id_rsa` and the grant that named it then failed to match its own node.
@@ -1217,6 +1237,16 @@ mod tests {
             // unexercised, and that is precisely where the root was being computed wrongly.
             Matcher::Segment(seg) => Some((format!("~/{seg}/probe"), format!("~/{seg}"), "~/".to_string())),
             Matcher::StringPrefix(_) => None,
+            // Fill each wildcard with a concrete component, so a Glob node is probed by the
+            // grant/shield guards exactly like a spelled-out one.
+            Matcher::Glob(pat) => {
+                let concrete = pat
+                    .iter()
+                    .map(|c| if c == "*" { "probe" } else { c.as_str() })
+                    .collect::<Vec<_>>()
+                    .join("/");
+                Some((concrete.clone(), concrete.clone(), parent_of(&concrete)?))
+            }
         }
     }
 

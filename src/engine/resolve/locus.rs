@@ -618,7 +618,12 @@ mod tests {
         assert_eq!(write_locus("~/notes"), LocalLocus::Machine);
         assert_eq!(write_locus("/etc/hosts"), LocalLocus::Machine);
         assert_eq!(write_locus("/usr/local/bin/x"), LocalLocus::Machine);
-        assert_eq!(write_locus("/dev/rdisk0"), LocalLocus::Machine);
+        // A raw device is its own rung, ABOVE machine: writing /dev/rdisk0 is not administering
+        // this host, it is overwriting the disk under it. Both faces say so, which is what keeps
+        // it refused once ordinary machine-rung reads open up.
+        assert_eq!(write_locus("/dev/rdisk0"), LocalLocus::Device);
+        assert_eq!(read_locus("/dev/rdisk0"), LocalLocus::Device);
+        assert_eq!(write_locus("/dev/null"), LocalLocus::Process, "the streams outrank the subtree");
         assert_eq!(write_locus("~bob/.ssh/id_rsa"), LocalLocus::Machine, "another user's home");
     }
 

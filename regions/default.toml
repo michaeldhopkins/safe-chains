@@ -74,6 +74,12 @@ read_locus = "adjacent"
 write_locus = "machine"
 reads_secret = false
 
+[role.raw-device]
+description = "Raw block/char devices. Reading one is not reading a file — `/dev/rdisk0` is the whole disk and `/dev/mem` is physical memory, so both hand over every secret on the host in one operand. Sits at the `device` rung on both faces, which is ABOVE the machine rung ordinary local reads reach, so it stays refused when reads open up without needing to be enumerated as a secret."
+read_locus = "device"
+write_locus = "device"
+reads_secret = false
+
 [role.credential-store]
 description = "Known credential/secret stores. Denied, and a user grant may NOT widen them (the shield)."
 read_locus = "machine"
@@ -168,6 +174,49 @@ path = "/dev/fd/"
 role = "standard-stream"
 note = "Per-process file-descriptor pseudo-files (process substitution). Process-local."
 researched = "2026-07-12"
+[[region]]
+path = "/dev/"
+role = "raw-device"
+note = """
+Everything else under /dev is a raw device until shown otherwise. The standard streams above are
+Exact nodes and outrank this subtree, so they keep reading and writing normally.
+
+Positive classification rather than a list of dangerous device names: `/dev/mem`, `/dev/kmem`,
+`/dev/rdisk0`, `/dev/sda`, `/dev/nvme0n1` and every future spelling land here by default, and a
+device that turns out to be ordinary can be given its own node. Enumerating the dangerous ones
+would have to be complete to be worth anything.
+"""
+researched = "2026-08-12"
+[[region]]
+path = "/proc/*/environ"
+role = "credential-store"
+os = ["linux"]
+note = "A process's environment block — where an agent's own API tokens and cloud keys live. Per-pid, so the component is a wildcard; /proc/self/environ matches it too."
+researched = "2026-08-12"
+[[region]]
+path = "/proc/*/mem"
+role = "credential-store"
+os = ["linux"]
+note = "A process's address space: every secret it has decrypted or been handed, readable as a file."
+researched = "2026-08-12"
+[[region]]
+path = "/proc/*/cmdline"
+role = "credential-store"
+os = ["linux"]
+note = "A process's argv, which routinely carries tokens passed as flags (`--password`, `--token`)."
+researched = "2026-08-12"
+[[region]]
+path = "/var/log/auth.log"
+role = "credential-store"
+os = ["linux"]
+note = "Authentication log — sudo/su/ssh events, and passwords typed into a username prompt land here verbatim."
+researched = "2026-08-12"
+[[region]]
+path = "/var/log/secure"
+role = "credential-store"
+os = ["linux"]
+note = "The RHEL/Fedora spelling of auth.log."
+researched = "2026-08-12"
 
 # ── Package CONTENT: read-admitted, writes still denied. ───────────────────────────────────────
 #
