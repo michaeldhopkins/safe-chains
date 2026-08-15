@@ -1,5 +1,37 @@
 # TODO
 
+## DECISION NEEDED: enumerating credential dotfiles is losing, and the evidence is one probe deep
+
+Admitting all of `~` rests on the shield naming every credential-bearing dotfile. Two rounds in, that
+is not looking like a race the enumeration wins.
+
+Round one declared thirteen from research. An adversarial probe immediately found **ten more
+readable** — `.boto`, `.vault-token`, `.databrickscfg`, `.authinfo`, `.hgrc`, `~/.pip/pip.conf`,
+`~/.kaggle/`, `~/.subversion/auth/`, `~/.oci/`, `~/.snowflake/`. `.boto` had been WRITTEN DOWN in
+this file as missing and then not added, which is the failure mode in miniature: even the person
+holding the list drops entries from it.
+
+All twenty-three are now declared and `~/.zshrc` still reads. But the structural point stands: a home
+dotfile is config, config for anything that authenticates holds a credential, and the set of things
+that authenticate is unbounded and grows. `~/.vault-token` is a bare live token in a file named after
+itself; nobody would have guessed `.authinfo` without knowing Emacs. Each new tool ships a new one.
+
+Three ways out, and this wants a decision rather than another pass:
+
+1. **Keep enumerating.** Honest about what it is — a denylist, permanently trailing. Cheap per entry,
+   never finished, and every gap is a plaintext credential in the model's context.
+2. **Invert for dotfiles only.** Non-dotfile home content reads freely; a home DOTFILE reads only if
+   allowlisted (`.zshrc`, `.gitconfig`, `.vimrc`, `.tmux.conf`, …) or covered by a user grant. This
+   is allowlist-shaped, matches the project's stated posture, and fails closed on the next tool's
+   invention. Cost: a curated list, and a prompt the first time someone reads an unlisted dotfile.
+   Note this is NOT the region admit-map that was deleted — that map admitted whole system roots to
+   get reads working at all; this is one narrow list at one rung.
+3. **Gate dotfiles behind the grant mechanism.** `[[grant]] path = "~/.config/foo"` already exists and
+   is the user's own trust statement. Zero curation, more friction.
+
+Nothing blocks the bound lift on this — it is a policy choice about how much of `~` opens — but it
+should be made deliberately rather than settled by which files someone happened to think of.
+
 ## Permissive reads: what is left, and the one finding that changes its shape
 
 Landed so far (all zero-behavioural-delta, so they are safe on their own):

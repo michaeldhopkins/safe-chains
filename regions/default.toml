@@ -389,6 +389,61 @@ path = "~/.composer/auth.json"
 role = "credential-store"
 note = "Composer HTTP-basic and OAuth tokens for private PHP package repositories."
 researched = "2026-08-15"
+# ── Second pass. The first list was assembled from memory and an adversarial probe found ten more
+#    readable in one go — including `.boto`, which the accompanying TODO note had already WRITTEN
+#    DOWN as missing. Recorded because it is the measurement that matters about this approach: the
+#    shield is an enumeration, and an enumeration of "config files that hold credentials" trails the
+#    ecosystem permanently. See TODO.md for the structural question that raises.
+[[region]]
+path = ".boto"
+role = "credential-store"
+note = "Legacy boto/gsutil config; holds aws_access_key_id / aws_secret_access_key and gs_oauth2_refresh_token."
+researched = "2026-08-15"
+[[region]]
+path = ".vault-token"
+role = "credential-store"
+note = "HashiCorp Vault CLI token, written bare into the file by `vault login`. A live credential to everything the token can reach."
+researched = "2026-08-15"
+[[region]]
+path = ".databrickscfg"
+role = "credential-store"
+note = "Databricks CLI profiles; `token = dapi…` personal access tokens."
+researched = "2026-08-15"
+[[region]]
+path = ".authinfo"
+role = "credential-store"
+note = "Emacs/GNU auth-source netrc-format store — the `.netrc` of the Emacs world, same plaintext shape. (`.authinfo.gpg` is encrypted but shielded by the same segment.)"
+researched = "2026-08-15"
+[[region]]
+path = "~/.pip/pip.conf"
+role = "credential-store"
+note = "pip config; `index-url = https://user:pass@host/simple` is the documented way to reach a private index."
+researched = "2026-08-15"
+[[region]]
+path = "~/.kaggle/"
+role = "credential-store"
+note = "kaggle.json — username plus API key."
+researched = "2026-08-15"
+[[region]]
+path = "~/.subversion/auth/"
+role = "credential-store"
+note = "Subversion's cached credentials; the simple/ provider stores passwords in cleartext."
+researched = "2026-08-15"
+[[region]]
+path = "~/.oci/"
+role = "credential-store"
+note = "Oracle Cloud CLI config plus the API signing private key it points at."
+researched = "2026-08-15"
+[[region]]
+path = "~/.snowflake/"
+role = "credential-store"
+note = "Snowflake CLI connections.toml — account passwords and private-key paths."
+researched = "2026-08-15"
+[[region]]
+path = ".hgrc"
+role = "credential-store"
+note = "Mercurial config; the `[auth]` section holds per-prefix usernames and passwords in cleartext."
+researched = "2026-08-15"
 
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
