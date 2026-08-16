@@ -24,10 +24,21 @@ use crate::engine::facet::*;
 /// checked at all.
 pub(super) fn reads_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = reads_content(read_locus(path), scale, because);
-    if unshieldable(path) || sweeps_unnameable(path, scale) {
+    if unclearable_read(path, scale) {
         c.secret.level = SecretLevel::Reads;
     }
     c
+}
+
+/// The ONE test for "this read cannot be cleared by the shield" — either the path names a store,
+/// or it does not name the files it reads at all.
+///
+/// One function because the previous two copies fell out of step the moment the second condition
+/// was added: `reads_path` learned about sweeps and `transfer_profile` did not, so `tar -cf x.tar ~`
+/// was refused while `cp -r ~ ./stolen` copied the same keys into the worktree, where reading them
+/// is ordinary. Every read-shaped capability has to ask the same question.
+pub(super) fn unclearable_read(path: &str, scale: Scale) -> bool {
+    unshieldable(path) || sweeps_unnameable(path, scale)
 }
 
 /// An UNBOUNDED read rooted at `user` or above cannot be cleared, whatever its root is named.
@@ -56,7 +67,7 @@ fn names_many(path: &str) -> bool {
 /// that place a path without pulling its content into the model.
 pub(super) fn observes_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = observes(read_locus(path), scale, because);
-    if unshieldable(path) || sweeps_unnameable(path, scale) {
+    if unclearable_read(path, scale) {
         c.secret.level = SecretLevel::Reads;
     }
     c
@@ -270,7 +281,7 @@ pub(super) fn transfer_profile(
         .iter()
         .map(|s| {
             let mut c = per_source(at(s, source_face), scale);
-            if unshieldable(s) {
+            if unclearable_read(s, scale) {
                 c.secret.level = SecretLevel::Reads;
             }
             c

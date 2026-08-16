@@ -3442,6 +3442,44 @@ mod tests {
         }
     }
 
+    /// Every RECURSIVE transfer refuses a source above the workspace.
+    ///
+    /// The shield tests a name; a recursive source is a root standing for files nobody named, so
+    /// it cannot be cleared. `cp ~/.ssh/id_rsa ./x` was refused all along and `cp -r ~ ./x` was
+    /// not — same theft, one flag apart — because the claim that makes a read unclearable was
+    /// written twice and only one copy learned about sweeps.
+    ///
+    /// Enumerated from the registry rather than listed, so a transfer command that declares
+    /// `recursive_flags` later is covered the day it lands and does not need anyone to remember
+    /// this test exists.
+    #[test]
+    fn every_recursive_transfer_refuses_a_source_above_the_workspace() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+
+        let mut covered = 0usize;
+        for name in crate::registry::toml_command_names() {
+            let Some(b) = crate::registry::command_behavior(name) else { continue };
+            let Some(t) = b.transfer.as_ref() else { continue };
+            for flag in &t.recursive_flags {
+                covered += 1;
+                let hot = vec![name.to_string(), flag.clone(), "~".to_string(), "./dest".to_string()];
+                let refs: Vec<&str> = hot.iter().map(String::as_str).collect();
+                if let Some(p) = resolve(&toks(&refs)) {
+                    assert_eq!(project(&p), Verdict::Denied, "{hot:?}: a recursive read of home is unclearable");
+                }
+                // Non-vacuity: the same command and flag over the WORKTREE must still work, or
+                // this would pass on a build that simply refused every recursive copy.
+                let ok = vec![name.to_string(), flag.clone(), "./src".to_string(), "./dest".to_string()];
+                let refs: Vec<&str> = ok.iter().map(String::as_str).collect();
+                if let Some(p) = resolve(&toks(&refs)) {
+                    assert_ne!(project(&p), Verdict::Denied, "{ok:?}: a worktree recursive copy must still allow");
+                }
+            }
+        }
+        assert!(covered >= 3, "only {covered} recursive transfer flags swept — the registry lookup is wrong");
+    }
+
     /// Fail-closed, enumerated over the REGISTRY: every `[command.behavior]` command denies an
     /// operand on a hot path (a secret, home, system, or unpinnable locus), AND a write-role
     /// command denies a write into the worktree-trusted rung (`.git/config`). Restores and
