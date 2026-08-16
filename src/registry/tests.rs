@@ -6664,6 +6664,7 @@ valued = ["--type"]
             let judge = match role {
                 Role::Ignore => continue,
                 Role::Read => crate::engine::resolve::read_content_verdict,
+                Role::ReadTree => crate::engine::resolve::read_tree_verdict,
                 Role::Write => crate::engine::resolve::write_target_verdict,
                 Role::Exec => crate::engine::resolve::execute_file_verdict,
             };
@@ -6735,6 +6736,7 @@ valued = ["--type"]
             let hot = match role {
                 Role::Write => "/etc/sc-probe-target",
                 Role::Read => "~/.ssh/id_rsa",
+                Role::ReadTree => "~/.ssh/id_rsa",
                 // A /tmp executor is the discriminating hot path: `write` would ALLOW it
                 // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
                 Role::Exec => "/tmp/sc-probe/Cargo.toml",

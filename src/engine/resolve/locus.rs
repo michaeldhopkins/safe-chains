@@ -69,6 +69,12 @@ pub(crate) fn traversal_item(base: &str) -> String {
     repr
 }
 
+/// A glob standing for files above the workspace: it names many paths and spells out none of
+/// them, so there is nothing for the shield to be asked about.
+pub(crate) fn glob_above_workspace(path: &str) -> bool {
+    path.contains(['*', '?', '[']) && read_locus(path) >= LocalLocus::User
+}
+
 /// Stands for a path we cannot name. Unpinnable by construction, so every shield check over it
 /// fails closed instead of clearing a filename nobody has seen.
 pub(crate) const UNKNOWABLE_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";

@@ -73,7 +73,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
                 let bound = crate::engine::resolve::locus::traversal_item(base);
                 let exec_words: Vec<String> = tokens[cmd_start..cmd_end]
                     .iter()
-                    .map(|t| t.as_str().replace("{}", &bound))
+                    .map(|t| crate::handlers::fd::synthetic_operand(&t.as_str().replace("{}", &bound), t.as_str()))
                     .collect();
                 match crate::command_verdict(&shell_words::join(&exec_words)) {
                     Verdict::Denied => return Verdict::Denied,

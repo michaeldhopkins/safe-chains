@@ -41,7 +41,15 @@ pub(super) fn reads_path(path: &str, scale: Scale, because: &str) -> Capability 
 /// the shield genuinely can clear it. Below `user` the sweep is bounded by the workspace, where
 /// there is nothing for the shield to protect.
 fn sweeps_unnameable(path: &str, scale: Scale) -> bool {
-    scale == Scale::Unbounded && read_locus(path) >= crate::engine::facet::LocalLocus::User
+    let sweeps = scale == Scale::Unbounded || names_many(path);
+    sweeps && read_locus(path) >= crate::engine::facet::LocalLocus::User
+}
+
+/// A glob stands for every file it expands to, none of which is written down. `for f in /etc/*;
+/// do cat $f; done` reads `/etc/shadow` while the only string the shield ever sees is `/etc/*`,
+/// so the scale is unbounded no matter what the caller declared it to be.
+fn names_many(path: &str) -> bool {
+    path.contains(['*', '?', '['])
 }
 
 /// As [`reads_path`], for the metadata-only observers (`find`, a `-f` script file, a tar member)

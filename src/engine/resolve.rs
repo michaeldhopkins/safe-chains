@@ -58,7 +58,15 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     let write_item = faced.iter().max_by_key(|(_, _, w)| *w).map(|(s, _, _)| s.clone())?;
     // Freeze against the CURRENT (outer) loop bindings, so an inner representative like `$d/x`
     // doesn't carry a stale outer variable into the body — nested loops compose.
-    let read_repr = crate::pathctx::expand_vars(&read_item, false).into_owned();
+    //
+    // A GLOB item above the workspace gets no representative at all. `for f in /etc/*` binds `$f`
+    // to the literal `/etc/*`, and the body then reads a path whose last component the glob will
+    // choose — `/etc/shadow` among them — while the shield is asked about a string containing a
+    // `*`, which names nothing and clears every time.
+    let read_repr = match crate::engine::resolve::locus::glob_above_workspace(&read_item) {
+        true => crate::engine::resolve::locus::UNKNOWABLE_ITEM.to_string(),
+        false => crate::pathctx::expand_vars(&read_item, false).into_owned(),
+    };
     let write_repr = crate::pathctx::expand_vars(&write_item, true).into_owned();
     Some((read_repr, write_repr))
 }
@@ -1230,8 +1238,21 @@ impl<'a> TarParse<'a> {
                 Profile::of(caps)
             }
             b't' => {
-                let loc = archive_file.map_or(LocalLocus::Process, |(dir, a)| classify_locus(&tar_bound(dir, a)));
-                Profile::of(vec![reads_content(loc, Scale::Single, "tar lists the archive's members (names → the model)")])
+                // Gated on the archive's PATH, not just its rung: `tar tf /etc/shadow` opens the
+                // credential store and reports what it found there, which is a read of it however
+                // poorly it parses as an archive.
+                Profile::of(vec![match archive_file {
+                    Some((dir, a)) => reads_path(
+                        &tar_bound(dir, a),
+                        Scale::Single,
+                        "tar lists the archive's members (names → the model)",
+                    ),
+                    None => reads_content(
+                        LocalLocus::Process,
+                        Scale::Single,
+                        "tar lists stdin's members (names → the model)",
+                    ),
+                }])
             }
             // x (extract) and A/d: archive-controlled, ..-escapable writes → worst-case.
             _ => worst("tar extract writes an archive-controlled, ..-escapable path set — worst-cased (§0)"),
@@ -1791,25 +1812,33 @@ mod tests {
             "/var/lib/mysql/data",
             "/dev/mem",
             "/root/.bashrc",
+            // `resolve` alone has no cwd binding, so a `..` cannot be pinned to the directory it
+            // would land in and the unpinnable guard takes it. With a cwd (the CLI, the hook) the
+            // same path resolves and reads — `path_policy_corpus.tsv` covers that end.
+            "../outside",
         ] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
             assert!(!read_local().admits(&p), "cat {path} must not be admitted as a local read");
         }
         // …while ordinary files on those same rungs now read, which is the whole point of the
         // shield being a NAME test rather than a rung test.
-        for path in ["~/notes", "../outside", "/etc/hosts", "/usr/bin/python3"] {
+        for path in ["~/notes", "/etc/hosts", "/usr/bin/python3"] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
             assert!(read_local().admits(&p), "cat {path} is an ordinary read");
         }
     }
 
     #[test]
-    fn cat_of_machine_config_is_not_admitted() {
-        // The retreat still holds for machine CONFIG and STATE: these prompt, or the user grants.
-        // `/usr/share/doc/x` moved out of this list deliberately — see the test below.
-        for path in ["/etc/hosts", "/etc/os-release", "/usr/local/etc/nginx/nginx.conf", "/var/log/auth.log"] {
+    fn machine_config_reads_but_its_credential_bearing_files_do_not() {
+        for path in ["/etc/hosts", "/etc/os-release", "/usr/local/etc/nginx/nginx.conf"] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
-            assert!(!read_local().admits(&p), "cat {path} is no longer auto-approved");
+            assert!(read_local().admits(&p), "cat {path} is ordinary machine config");
+        }
+        // Same rung, different answer, and the rung is not what decided it: an auth log records
+        // credentials outright, so it is a store however public the directory around it looks.
+        for path in ["/var/log/auth.log", "/etc/shadow"] {
+            let p = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(!read_local().admits(&p), "cat {path} reads credentials");
         }
     }
 
@@ -1958,8 +1987,12 @@ mod tests {
         assert_eq!(f.capabilities.len(), 2, "patterns.txt + file.txt");
         assert!(read_local().admits(&f));
 
+        // The `-f` value is gated as a read like any other operand: an ordinary home file is
+        // readable now, a credential store is not — and the flag is what makes it a read at all.
         let home = resolve(&toks(&["grep", "-f", "~/.secret-patterns", "file.txt"])).expect("grep -f");
-        assert!(!read_local().admits(&home), "a home pattern file is denied by locus");
+        assert!(read_local().admits(&home), "an ordinary home pattern file reads");
+        let shielded = resolve(&toks(&["grep", "-f", "~/.ssh/id_rsa", "file.txt"])).expect("grep -f");
+        assert!(!read_local().admits(&shielded), "a shielded pattern file is still a credential read");
 
         // glued short value: -fpatterns.txt and -ifpatterns.txt both name a pattern file
         let glued = resolve(&toks(&["grep", "-fpatterns.txt", "file.txt"])).expect("grep -f glued");
@@ -2364,8 +2397,10 @@ mod tests {
         // locus, exactly as `cp` of it would (a link would otherwise alias the secret in).
         assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home credential");
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/shadow", "./x"])).expect("ln")), Verdict::Denied, "symlink to secret");
-        // the retreat: linking to a NON-workspace target denies on the target locus (as cp would).
-        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Denied, "symlink to system path");
+        // An ORDINARY out-of-workspace target links fine, for the same reason `cat /etc/hosts`
+        // reads: the link aliases whatever the target could disclose, no more. What the two
+        // asserts above pin is that the alias cannot launder a target the shield refuses.
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Allowed(SafetyLevel::SafeWrite), "symlink to ordinary system path");
         // writing the LINK outside the worktree denies on the link locus.
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "./a", "~/evil"])).expect("ln")), Verdict::Denied, "link into home");
         // -t DIR, lone operand, unknown flag.
@@ -2762,12 +2797,12 @@ mod tests {
         let glued = resolve(&toks(&["perl", "-i.bak", "-pe", "s/x/y/", "./foo"])).expect("perl");
         assert_eq!(glued.capabilities[0].operation, Operation::Mutate, "-i.bak is still in-place");
 
-        // THE REGRESSION: an inert one-liner does not license the operand. Reads above the
-        // worktree deny, exactly as `cat` and `sed` already did.
+        // THE REGRESSION: an inert one-liner does not license the operand. It is gated exactly as
+        // `cat` and `sed` gate theirs — so a credential store or an unpinnable path denies, while
+        // an ordinary machine file (asserted below) reads.
         for cmd in [
             vec!["perl", "-pe", "s/a/b/", "/etc/shadow"],
             vec!["perl", "-ne", "print", "~/.ssh/id_rsa"],
-            vec!["perl", "-pe", "s/a/b/", "/etc/passwd"],
             vec!["perl", "-pe", "s/a/b/", "$CONFIG"], // unpinnable
             vec!["perl", "-pi", "-e", "s/a/b/", "/etc/hosts"],
             vec!["perl", "-pi", "-e", "s/a/b/", "~/.bashrc"],
@@ -2775,6 +2810,12 @@ mod tests {
         ] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("perl")), Verdict::Denied, "{cmd:?} must deny");
         }
+        // The WRITE half stays put: reading /etc/passwd is fine, rewriting it in place is not.
+        assert_eq!(
+            project(&resolve(&toks(&["perl", "-pe", "s/a/b/", "/etc/passwd"])).expect("perl")),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+            "an inert one-liner over an ordinary machine file is a read"
+        );
 
         // Opaque code is refused whatever the operand: no `-e` means the first operand is a script
         // file we cannot read, and a failed identifier gate means the one-liner left the vocabulary.
@@ -2906,7 +2947,9 @@ mod tests {
         let p = resolve(&toks(&["touch", "-r", "ref.txt", "./out"])).expect("touch");
         assert_eq!(p.capabilities.len(), 2, "./out create + ref.txt read");
         assert!(p.capabilities.iter().any(|c| c.operation == Operation::Observe), "the -r reference is a read");
-        assert_eq!(project(&resolve(&toks(&["touch", "-r", "~/.bashrc", "./out"])).expect("touch")), Verdict::Denied, "home reference");
+        // An ordinary home reference is an ordinary read of its mtime; a credential store's is
+        // not, and neither is a path the shield cannot be asked about.
+        assert_eq!(project(&resolve(&toks(&["touch", "-r", "~/.bashrc", "./out"])).expect("touch")), Verdict::Allowed(SafetyLevel::SafeWrite), "ordinary home reference");
         assert_eq!(project(&resolve(&toks(&["touch", "-r", "/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "system reference");
         assert_eq!(project(&resolve(&toks(&["touch", "--reference=/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "long glued reference");
         assert_eq!(project(&resolve(&toks(&["touch", "--reference", "/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "long spaced reference");

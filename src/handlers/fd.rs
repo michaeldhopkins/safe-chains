@@ -49,7 +49,7 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
         let bound = crate::engine::resolve::locus::traversal_item(base);
         let mut words: Vec<String> = tokens[cmd_start..cmd_end]
             .iter()
-            .map(|t| bind_placeholders(t.as_str(), &bound))
+            .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), &bound), t.as_str()))
             .collect();
         if !has_placeholder {
             words.push(bound.clone());
@@ -60,6 +60,21 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
         }
     }
     Verdict::Allowed(level)
+}
+
+/// A word built by GLUING a match onto a literal prefix is as unknowable as the bare match.
+///
+/// `fd -x cat /etc/{}` binds `{}` under the worktree, so the operand reads `/etc/<some worktree
+/// filename>` — a path at the machine rung whose last component nobody chose. The shield was
+/// asked about the stand-in and cleared it, and a checkout containing a file called `shadow` then
+/// read `/etc/shadow`. Only words that actually carried a placeholder are affected; a literal the
+/// caller wrote stays literal, so the shield can still be asked about it properly.
+pub(crate) fn synthetic_operand(bound_word: &str, original: &str) -> String {
+    use crate::engine::resolve::locus::{UNKNOWABLE_ITEM, read_locus};
+    if bound_word != original && read_locus(bound_word) >= crate::engine::facet::LocalLocus::User {
+        return UNKNOWABLE_ITEM.to_string();
+    }
+    bound_word.to_string()
 }
 
 /// fd's placeholders (`{}` full path, `{.}` no-ext, `{/}` basename, `{//}` parent, `{/.}` basename
