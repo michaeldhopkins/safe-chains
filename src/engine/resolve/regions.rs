@@ -1788,10 +1788,28 @@ mod tests {
     fn a_grant_does_not_widen_hidden_files_or_system_secrets() {
         with_grants(&[("~/", true, true)], || {
             assert_eq!(classify_region("~/projects/foo/main.rs").write_locus, LocalLocus::Worktree);
-            // hidden dotfiles/dirs (where credentials live) are NOT swept up by a broad grant
-            for p in ["~/.git-credentials", "~/.npmrc", "~/.config/gh/hosts.yml", "~/.pgpass", "~/.SSH/id_rsa"] {
-                assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "hidden not widened: {p}");
+            // Credential dotfiles are NOT swept up by a broad grant. They are held by the shield
+            // NAMING them, not by being hidden: this release made ordinary home dotfiles readable
+            // (`~/.zshrc`, `~/.gitconfig`), so "hidden" stopped being the test and the list below
+            // is exactly the set the shield declares.
+            for p in ["~/.git-credentials", "~/.npmrc", "~/.config/gh/hosts.yml", "~/.pgpass"] {
+                assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "shielded, not widened: {p}");
             }
+            // `.SSH` is the CASE variant, so it depends on the filesystem and must be asserted per
+            // OS rather than once. macOS folds shields (the default volume is case-insensitive, so
+            // it is the same directory); Linux does not, where `~/.SSH` is a genuinely different
+            // directory and reads as the ordinary dotfile it is. Asserting the macOS answer
+            // everywhere is what broke on CI.
+            assert_eq!(
+                with_os("macos", || classify_region("~/.SSH/id_rsa").read_locus),
+                LocalLocus::Machine,
+                "macos: the case variant is the same directory, so the shield must fold onto it"
+            );
+            assert_eq!(
+                with_os("linux", || classify_region("~/.SSH/id_rsa").read_locus),
+                LocalLocus::User,
+                "linux: ~/.SSH is not ~/.ssh, and an unlisted dotfile is an ordinary home read"
+            );
         });
         // a `/` grant cannot reach a system credential store (un-grantable shield)
         with_grants(&[("/", true, true)], || {

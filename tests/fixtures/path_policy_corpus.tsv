@@ -20,6 +20,16 @@
 # Format: <expected>\t<category>\t<command>
 #   expected  allow | deny
 #   category  grouping for the report; a whole category flipping is the signal that matters
+#
+# EVERY ROW MUST CLASSIFY THE SAME ON macOS AND LINUX. The guard drives the real binary, so it
+# reads the host's actual OS — locally that is macOS, in CI it is ubuntu, and a row that depends on
+# the platform passes here and fails there. `/private/tmp/...` did exactly that: scratch on macOS
+# via the firmlink fold, an unknown path on Linux, so the WRITE row went green locally and red in
+# CI. Write `/tmp/...`, which is scratch on both. Platform-specific behaviour belongs in the
+# `with_os` tests (`os_scope_is_load_bearing`, the firmlink guard), not here.
+#
+# os-INDEPENDENT does not mean os-agnostic paths: `/etc/master.passwd` and `~/Library/Keychains`
+# are fine, because a credential shield applies on every platform whatever its `os` list says.
 
 # ── Reads: the workspace and below ─────────────────────────────────────────────────────────
 allow	read-workspace	cat README.md
@@ -33,7 +43,7 @@ allow	read-sibling	cat ../branchdiff/src/main.rs
 
 # ── Reads: scratch ─────────────────────────────────────────────────────────────────────────
 allow	read-temp	cat /tmp/notes.txt
-allow	read-temp	cat /private/tmp/claude-501/session/scratchpad/probe.tsv
+allow	read-temp	cat /tmp/claude-501/session/scratchpad/probe.tsv
 allow	read-temp	cat /var/tmp/x
 
 # ── Reads: home. The change — ordinary files under ~ were denied, and there is nothing
@@ -101,7 +111,7 @@ deny	write-sibling-destroy	rm -rf ../branchdiff
 # ── Writes: scratch ────────────────────────────────────────────────────────────────────────
 allow	write-temp	touch /tmp/x
 allow	write-temp	echo hi > /tmp/x
-allow	write-temp	echo hi > /private/tmp/claude-501/session/scratchpad/o.txt
+allow	write-temp	echo hi > /tmp/claude-501/session/scratchpad/o.txt
 allow	write-temp	rm /tmp/x
 
 # ── Writes: home is NOT writable. Reads outpace writes; this is the asymmetry. ─────────────
