@@ -1,5 +1,23 @@
 # TODO
 
+## `cpio -o` archives a file list it reads from stdin, and the list is unknowable
+
+`cpio -o < ./list` reads pathnames from stdin and writes those files to stdout as an archive. The
+list is data, so nothing in the command line names what gets read:
+
+    printf '%s\n' ~/.ssh/id_rsa > list && cpio -o < list > out
+
+`cpio` is in the `write` pathgate group, which gates its operands — but here there are none. The
+same shape as `xargs`, and unlike xargs the stdin side is not modelled: there is no pipe whose
+left-hand side can be classified, because the list arrives from a file redirect.
+
+Pre-existing — open in 0.226.0, not introduced by the read-policy change. Not fixed because the
+honest fix is to model the stdin-list commands (`cpio -o`, `tar -T`, `xargs -a`, `rsync
+--files-from`) as a class, binding their item to the same unknowable sentinel a traversal gets,
+and that wants doing once rather than per-tool.
+
+Found by the review probe alongside `pax -w ~` and `ditto ~/.ssh ./s`, which ARE fixed.
+
 ## A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace
 
 `rg`, `ag`, `ack`, `ugrep`, `sift` and `pt` are gated `read_tree_after_first`: their path operand

@@ -35,6 +35,7 @@ pub(crate) enum Role {
     /// `~/.ssh/id_rsa` out of it. A name test can only clear a name someone wrote, so a root that
     /// stands for everything beneath it cannot be cleared at all. `read` stays correct for the
     /// commands that open exactly the file they are given.
+    #[serde(rename = "read_tree")]
     ReadTree,
     /// Gate by write locus — a write-target (`tee FILE`, `curl -o`, a converter's output).
     Write,

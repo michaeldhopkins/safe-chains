@@ -17,3 +17,19 @@ valued = [
     "-B", "-E", "-G", "-T", "-U",
     "-b", "-f", "-o", "-p", "-s", "-x",
 ]
+examples_safe = ["pax -w ./src -f ./out.tar", "pax -f ./archive.tar"]
+
+# pax had no path gate: `pax -w ~` archived every key in home to stdout, and a shell redirect put
+# it in the worktree. Predates the read-policy change — it was open in 0.226.0 too.
+#
+# `read_tree` on the operands because `-w` takes source hierarchies, which are sweep roots the
+# credential shield cannot clear. In list/extract mode the operands are match patterns instead;
+# gating those as reads is harmless, since a pattern classifies worktree-relative.
+#
+# `-f` is gated as a WRITE although its role actually flips with the mode (`-w` writes the
+# archive, `-r` and list read it). Gating the strictest of the two is the fail-closed choice and
+# keeps this declarative — the cost is that reading an archive from outside the workspace prompts.
+# Same treatment 7z, cpio and unzip already get.
+[command.path_gate]
+positional = "read_tree"
+flags = { "-f" = "write", "-B" = "ignore", "-E" = "ignore", "-G" = "ignore", "-T" = "ignore", "-U" = "ignore", "-b" = "ignore", "-o" = "ignore", "-p" = "ignore", "-s" = "ignore", "-x" = "ignore" }

@@ -115,7 +115,10 @@ shape = "remote"
 flags = { "-i" = "ignore", "-F" = "ignore", "-o" = "ignore", "-J" = "ignore", "-S" = "ignore", "-b" = "read" }
 
 [roles.rsync]
-positional = "read"
+# `read_tree`: rsync exists to copy TREES, so its source operand is the root of a sweep and not
+# the file it opens. `rsync -a ~/ ./x` names `~`, clears the shield, and lands every key in the
+# worktree.
+positional = "read_tree"
 shape = "remote"
 flags = { "-e" = "ignore", "--rsh" = "ignore" }
 
