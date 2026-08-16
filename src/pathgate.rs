@@ -386,7 +386,19 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
                 } else if !t.starts_with("--") {
                     let tail = &t[1..];
                     let vstart = tail.find(|c: char| !c.is_ascii_alphabetic()).unwrap_or(tail.len());
-                    Some(&tail[vstart..])
+                    let rest = &tail[vstart..];
+                    // `-o/etc/x` skips ONE letter and the value is literally what follows.
+                    // `-odata/file.txt` skips four, and what follows — `/file.txt` — is a path we
+                    // invented: the real operand is `data/file.txt`, or `-o -d -a -t -a` and a
+                    // cluster, and a static classifier cannot tell. Handing the invention to the
+                    // shield asks about a name nobody wrote, so hand it the sentinel instead.
+                    // Until local reads opened, the invented absolute denied on its rung and this
+                    // was invisible.
+                    if vstart > 1 && rest.starts_with('/') {
+                        Some(crate::engine::resolve::locus::UNKNOWABLE_ITEM)
+                    } else {
+                        Some(rest)
+                    }
                 } else {
                     None
                 };
@@ -1293,8 +1305,12 @@ mod tests {
             // expansion), not just clean absolute/home paths — a regression once slipped through a
             // `..`/`$VAR`-blind short-glued filter precisely because the corpus omitted them.
             for path in [
-                "/etc/cron.d/job", "/etc/ssl/private/x.key", "~/.ssh/id_rsa", "/root/.ssh/id_ed25519",
-                "../../../../etc/cron.d/job", "$HOME/.ssh/authorized_keys", "../../../../etc/passwd",
+                // Every entry must be sensitive on BOTH faces, since the loop runs each role over
+                // it. `/etc/cron.d/job` and `/etc/passwd` qualified only while all machine reads
+                // were refused; now they read, so the read-face role would fail on them. Replaced
+                // with paths the shield refuses whichever face asks.
+                "/etc/shadow", "/etc/ssl/private/x.key", "~/.ssh/id_rsa", "/root/.ssh/id_ed25519",
+                "../../../../etc/shadow", "$HOME/.ssh/authorized_keys", "~/.aws/credentials",
             ] {
                 for s in spellings(path) {
                     assert!(deny(&spec, &s), "SENSITIVE must deny [{role:?}]: {s:?}");
@@ -1315,7 +1331,8 @@ mod tests {
     fn reader_gate_denies_outside_the_workspace_allows_worktree() {
         assert!(should_deny("od", &toks(&["od", "/etc/shadow"])));
         assert!(should_deny("base64", &toks(&["base64", "~/.ssh/id_rsa"])));
-        assert!(should_deny("diff", &toks(&["diff", "/etc/hosts", "./x"])), "system reads deny now (retreat)");
+        assert!(!should_deny("diff", &toks(&["diff", "/etc/hosts", "./x"])), "an ordinary system file diffs");
+        assert!(should_deny("diff", &toks(&["diff", "/etc/shadow", "./x"])), "a credential store does not");
         assert!(!should_deny("od", &toks(&["od", "./notes.txt"])));
         assert!(!should_deny("cut", &toks(&["cut", "-d:", "-f1", "file.txt"])));
         assert!(!should_deny("ls", &toks(&["ls", "/etc/shadow"])));
