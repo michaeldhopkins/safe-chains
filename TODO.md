@@ -1,5 +1,49 @@
 # TODO
 
+## DECISION NEEDED: three sources disagree about what a grant NAMING a credential store does
+
+Measured, with `[[grant]] path = "~/.ssh"  read = true  write = true`:
+
+    touch ~/.ssh/x            ALLOW    the grant widened the WRITE face
+    cat ~/.ssh/known_hosts    DENY     the READ face did not move
+    cat ~/.ssh/id_rsa         DENY
+
+Identical in 0.226.0 — pre-existing, not introduced by the read-policy release. Three places in
+the tree describe this differently and they cannot all be right:
+
+1. `regions/default.toml` header — "a user grant can NEVER widen it (see `apply_grant`), so
+   `grant ~/` still can't hand over an SSH key." Reads as absolute.
+2. `docs/src/how-it-works.md` — "A grant on a parent directory never reaches `~/.ssh` … A grant
+   that names one does, and so does a grant on a path inside one." Promises naming works.
+3. The `ReachReason::Credential` nudge — "If you do want to allow it, name that path in
+   ~/.config/safe-chains.toml." Tells the user to do the thing that does not work for a read.
+4. `a_grant_reaches_a_credential_store_only_when_it_names_it` asserts naming DOES reach it — but
+   at the region layer (`classify_region(path).read_locus`), which is not where the read is
+   finally decided.
+
+The mechanism: a grant lowers the region role's locus, and the write face is decided from that.
+The read runs additionally through `reads_path` → `unclearable_read` → `names_credential_store`,
+which is a test on the path alone and never consults grants. So the write face honours the grant
+and the read face cannot see it.
+
+Which way to resolve is a real policy choice, not a bug fix:
+
+- **Make the shield absolute for reads.** Fix (1) as the truth; correct the doc and the nudge, and
+  the nudge needs a different remedy (there is none — that is the point). Simple, and the current
+  behaviour already matches.
+- **Make naming work for reads.** Fix (3) as the truth; `names_credential_store` becomes
+  grant-aware. This is the intent the region-layer guard encodes, and it makes the documented
+  remedy real — but it puts grant logic inside the shield, which is the one component whose value
+  is that it cannot be widened.
+
+Worth noting the asymmetry is currently backwards from the release's own philosophy: writes to a
+named store are permitted and reads are not, when reads are the direction this release opened.
+
+NOT fixed in 0.227.0 deliberately: it is pre-existing, it fails CLOSED (over-denying), and either
+resolution touches the credential shield, which wants its own change and its own review. The docs
+were left as they are rather than edited to match the current behaviour, because editing them
+would presuppose the first option.
+
 ## `cpio -o` archives a file list it reads from stdin, and the list is unknowable
 
 `cpio -o < ./list` reads pathnames from stdin and writes those files to stdout as an archive. The

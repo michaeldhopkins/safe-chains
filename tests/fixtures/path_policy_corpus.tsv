@@ -41,7 +41,10 @@ allow	read-temp	cat /var/tmp/x
 allow	read-home	cat ~/notes.txt
 allow	read-home	cat ~/Downloads/statement.pdf
 allow	read-home	cat ~/.grok/config.toml
-allow	read-home	cat ~/.local/state/safe-chains/log.jsonl
+# Moved from read-home/allow: the decision log records every classified command verbatim, by an
+# explicit design decision not to redact, so it accumulates whatever secrets reached a command
+# line. It is the one credential store whose contents safe-chains creates itself.
+deny	read-shield	cat ~/.local/state/safe-chains/log.jsonl
 allow	read-home	cat ~/Library/LaunchAgents/com.example.plist
 allow	read-home	cat ~/.claude/CLAUDE.md
 allow	read-home	cat ~/.zshrc
@@ -86,11 +89,14 @@ allow	write-workspace	touch ./build/artifact.o
 allow	write-workspace	cp a.txt sub/b.txt
 allow	write-workspace	rm ./build/artifact.o
 
-# ── Writes: sibling workspaces. Create and mutate yes; DESTROY is deliberately withheld and
-# is the one open question — see TODO.md. ──────────────────────────────────────────────────
+# ── Writes: sibling workspaces. Create and mutate yes; DESTROY is deliberately withheld —
+# DECIDED 2026-08-16, marked for revisit on feel. See TODO.md. ─────────────────────────────
 allow	write-sibling	touch ../branchdiff/x
 allow	write-sibling	cp a.txt ../branchdiff/x
 deny	write-sibling-destroy	rm ../branchdiff/x
+# The -rf form is the one the decision is actually about: a typo away from the whole checkout.
+deny	write-sibling-destroy	rm -rf ../branchdiff/build
+deny	write-sibling-destroy	rm -rf ../branchdiff
 
 # ── Writes: scratch ────────────────────────────────────────────────────────────────────────
 allow	write-temp	touch /tmp/x

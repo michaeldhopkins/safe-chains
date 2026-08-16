@@ -34,7 +34,7 @@ safe-chains "rm -rf /"            # exit 1 = unsafe
 ```
 
 Use `--level` to set a threshold; only commands at or below it auto-approve. The levels, from
-most locked down to most open, are `paranoid` (barely reads), `reader` (reads your project),
+most locked down to most open, are `paranoid` (barely reads), `reader` (reads, but never a credential),
 `editor` (edits it, no delete/run/network), `developer` (the everyday dev default, runs your
 project, deletes your own files), the two admin flavors `local-admin` (runs this machine) and
 `network-admin` (operates your remotes), and `yolo` (no limits except `rm -rf /`). Default:

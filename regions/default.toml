@@ -212,6 +212,20 @@ os = ["linux"]
 note = "A process's argv, which routinely carries tokens passed as flags (`--password`, `--token`)."
 researched = "2026-08-12"
 [[region]]
+path = "~/.local/state/safe-chains/"
+role = "credential-store"
+note = """
+safe-chains' own decision log. It records every command it classified, verbatim and by design —
+`--log-everything` was specified as logging the whole line without redaction, on the grounds that
+it is opt-in — so it accumulates whatever secrets appeared on a command line: tokens passed as
+flags, env prefixes, here-doc bodies.
+
+That makes it a credential store we KNOW the contents of rather than one we guess at, and the one
+file the classifier is directly responsible for creating. It surfaced as readable in the diff
+against 0.226.0, alongside the ordinary home reads this release intends.
+"""
+researched = "2026-08-12"
+[[region]]
 path = "/var/log/auth.log"
 role = "credential-store"
 os = ["linux"]

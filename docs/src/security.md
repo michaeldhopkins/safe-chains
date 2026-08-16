@@ -6,7 +6,11 @@ safe-chains is an allowlist-only command checker. It auto-approves bash commands
 
 Auto-approval of destructive, write, or state-changing commands. An agentic tool cannot use safe-chains to bypass permission prompts for `rm`, `git push`, `sed -i`, `curl -X POST`, or any command/flag combination not in the allowlist.
 
-Auto-approval of reads and writes outside your project. File commands are checked by location, so `cat ~/.ssh/id_rsa`, `cp secret /etc/x`, and writes to system paths are not approved. See [Files by location](how-it-works.md#files-by-location).
+Auto-approval of **credential reads**. `cat ~/.ssh/id_rsa`, `~/.aws/credentials`, `~/.npmrc`, `/etc/shadow`, another user's home, a raw device — refused, and a directory grant never widens to reach one. Also refused: any command that reads files it never names, since there is nothing to check the shield against — a recursive search, glob, traversal or recursive copy rooted above your project (`grep -r secret ~`, `cp -r ~ ./backup`).
+
+Note the shape of this: ordinary reads outside your project **are** auto-approved (`cat /etc/hosts`, `cat ~/.zshrc`). The protection is about which file, not where it sits.
+
+Auto-approval of **writes outside your project**. `cp secret /etc/x` and writes to system paths are not approved; writes stay within your project, its siblings and `/tmp`. See [Files by location](how-it-works.md#files-by-location).
 
 Auto-approval of writes to safe-chains' own config. See [Trusted directories](how-it-works.md#trusted-directories).
 

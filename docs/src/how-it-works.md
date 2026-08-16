@@ -6,7 +6,11 @@ safe-chains knows {{#include includes/command-count.md}} commands. For each one 
 
 ## Files by location
 
-When you run a bash command, in addition to checking the safety of the actual command, safe-chains checks the directory the command wants to affect. Generally, commands are approved when they operate within the _current working directory_ (from where you are running the agent, like `~/projects/abc`). It also approves some read and write locations outside of that, like `/tmp`.
+When you run a bash command, in addition to checking the safety of the actual command, safe-chains checks the files the command wants to touch. **Reads and writes are treated differently**, and the difference is deliberate.
+
+**Reading** is broad. Ordinary files read without a prompt wherever they live — your dotfiles, a sibling checkout, `/etc/hosts`, a vendored dependency's source. Confining reads to the project cost a prompt on nearly everything an agent legitimately does, and protected a set of files that mostly are not secret. What stops a read instead is the file being a **credential store** — `~/.ssh`, `~/.aws`, `~/.npmrc`, `/etc/shadow` and the rest — or being something that is not an ordinary file at all, like a raw disk or another process's memory.
+
+**Writing** stays close to home: your project, its sibling projects, and scratch (`/tmp`). Everything else prompts.
 
 If you run an agent from a high-level directory like `~/`, you give it a lot of power. This is the case whether or not you run safe-chains. Careful!
 
@@ -15,16 +19,22 @@ cat ./src/main.rs         # approved: inside your working directory
 echo hi > ./out.txt       # approved: writing inside the project
 grep -r TODO ./src        # approved
 cat /tmp/scratch.txt      # approved: /tmp is scratch
-cat /etc/hosts            # not approved: outside the project; you're prompted
+cat /etc/hosts            # approved: an ordinary file, read
+cat ~/.zshrc              # approved: your own config, read
 cat ~/.ssh/id_rsa         # not approved: a credential
+cat /dev/mem              # not approved: raw memory, not a file
 cp notes.txt /etc/x       # not approved: writing outside the project
 ```
+
+Because the protection is now about **which file**, and not about where it sits, a command that reads files it never names is refused above your project — there is no name to check. That covers a recursive search (`grep -r secret ~`), a glob (`cat /etc/*`), a traversal (`find ~ -exec cat {} \;`) and a recursive copy (`cp -r ~ ./backup`). The same commands are fine inside your project, where the sweep is bounded by the directory you invited the agent into.
 
 safe-chains allows reaching into sibling directories of the current working directory. E.g., when working in `~/projects/webapp`, otherwise safe commands in `~/projects/mobileapp` would be auto-approved, except deleting a sibling's files. "Nephew" directories (e.g. `~/projects/mobileapp/android/config`) are also approved. This does not apply when you're working in children of user folders, root, etc.
 
 ## Trusted directories
 
 If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`. The binary will pick up these preferences. `read` and `write` are independent, so you can grant one without the other.
+
+Most of the time you want `write = true`: ordinary reads already work everywhere. A `read = true` grant is still worth setting on a directory you want to **search or copy wholesale** — that is the case safe-chains otherwise refuses, because a sweep names no files, and granting the tree is exactly the statement that clears it.
 
 ```toml
 # Work across every project under ~/projects, not just the current one

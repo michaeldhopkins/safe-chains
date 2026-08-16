@@ -4005,6 +4005,11 @@ Aliases: `gdirname`
 - Allowed valued flags: --arch, --bom, --keepBinariesList, --keepBinariesPattern, --lang, --option, --outBom, --zlibCompressionLevel
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `ditto ./src ./dst`
+- `ditto -c -k ./src ./out.zip`
+
 ### `dive`
 <p class="cmd-url"><a href="https://github.com/wagoodman/dive">https://github.com/wagoodman/dive</a></p>
 
@@ -10974,6 +10979,11 @@ Aliases: `gpathchk`
 - Allowed valued flags: -B, -E, -G, -T, -U, -b, -f, -o, -p, -s, -x
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `pax -w ./src -f ./out.tar`
+- `pax -f ./archive.tar`
 
 ### `pbcopy`
 <p class="cmd-url"><a href="https://ss64.com/mac/pbcopy.html">https://ss64.com/mac/pbcopy.html</a></p>

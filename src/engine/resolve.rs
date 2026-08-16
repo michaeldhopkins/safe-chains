@@ -1845,11 +1845,16 @@ mod tests {
 
     /// Distributed package CONTENT is read-admitted; its WRITE face is not.
     ///
-    /// The retreat refused whole roots because an audit found them leaking — the macOS keychain,
-    /// Homebrew service configs under `etc`, auth tokens under `/var/log`. Those all live in a
-    /// root's machine-local half. Cutting at the layer the FHS already separates keeps the leaks
-    /// out (`etc`/`var` are never admitted) while ending the friction of refusing a man page or a
-    /// vendored crate README, whose bytes are public by construction.
+    /// A man page, a vendored crate README, a toolchain source file: read yes, WRITE no.
+    ///
+    /// These used to be readable via a `package-content` region role that admitted the roots
+    /// explicitly. That role is gone — it existed to get reads working while the bound was low,
+    /// and it cut `/usr` into halves (`share` readable, `etc` not) that nothing justified as a
+    /// boundary. Reads reach these paths on the general policy now.
+    ///
+    /// The assertion that still earns its keep is the WRITE half. Opening reads must not have
+    /// widened what the agent can alter, and these are the paths where a write would be an
+    /// install rather than an edit.
     #[test]
     fn package_content_is_readable_but_never_writable() {
         for path in [
