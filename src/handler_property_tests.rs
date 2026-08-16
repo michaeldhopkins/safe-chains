@@ -1766,7 +1766,10 @@ proptest! {
     }
 }
 
-/// Every read-admitted package-content root, and every credential-shield segment.
+/// Roots that carry distributed package CONTENT — docs, headers, libraries, vendored module
+/// sources — paired with the credential-shield segments below. Named ADMIT_ROOTS from when a
+/// region role admitted them explicitly; that role is gone and they read on the general policy,
+/// but they remain the right corpus for "a shield segment under here still bites".
 const ADMIT_ROOTS: &[&str] = &[
     "/usr/share", "/usr/include", "/usr/lib", "/usr/local/share", "/usr/local/include",
     "/usr/local/lib", "/opt/homebrew/share", "/opt/homebrew/include", "/opt/homebrew/lib",
@@ -1802,9 +1805,10 @@ proptest! {
 
     /// Reading package content is admitted; WRITING it is not.
     ///
-    /// The whole justification for admitting these is that the content is public by construction —
-    /// a man page, a vendored crate README. That argument covers disclosure and nothing else, so
-    /// the write face must stay shut or the change has quietly widened what the agent can alter.
+    /// These read on the general policy now rather than via the deleted `package-content` role.
+    /// The half that still needs asserting is the write face: the argument for reading a man page
+    /// or a vendored README covers DISCLOSURE and nothing else, so a write here must stay shut or
+    /// opening reads has quietly widened what the agent can alter.
     #[test]
     fn package_content_reads_admit_but_writes_do_not(
         root in proptest::sample::select(ADMIT_ROOTS.to_vec()),
@@ -2359,26 +2363,73 @@ fn absolute_and_relative_in_root_paths_classify_identically() {
 /// without a remedy either.
 #[test]
 fn every_actionable_reach_reason_names_a_remedy() {
-    use crate::ReachReason::*;
-    for reason in [Credential, ForeignTemp, OutsideWorkspace] {
+    use crate::ReachReason::{self, *};
+
+    /// The shape of remedy a reason owes the user.
+    #[derive(PartialEq)]
+    enum Remedy {
+        /// A grant in safe-chains.toml is the answer.
+        Grant,
+        /// There is no automated answer, and saying "grant it" would be false.
+        Manual,
+        /// Nothing to grant — the path is not a fixed path. Respell it.
+        Respell,
+    }
+
+    /// Exhaustive BY CONSTRUCTION: adding a `ReachReason` fails to compile here.
+    ///
+    /// The doc above always claimed the guard was enumerated over the variants, and it was not —
+    /// it was a hand-written list covering five of eight, so `RawDevice` shipped through it with
+    /// no check at all, and `FrozenTrustRoot`/`Unconfined` had never been covered. A match is the
+    /// cheapest thing that makes the claim true.
+    fn owed(r: ReachReason) -> Remedy {
+        match r {
+            Credential | ForeignTemp | OutsideWorkspace | RawDevice => Remedy::Grant,
+            FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity => Remedy::Manual,
+            Unconfined => Remedy::Respell,
+        }
+    }
+
+    let all = [
+        Credential,
+        ForeignTemp,
+        OutsideWorkspace,
+        RawDevice,
+        FrozenTrustFile,
+        FrozenTrustRoot,
+        FrozenSystemIntegrity,
+        Unconfined,
+    ];
+    for reason in all {
         let msg = reason.message("~/.ssh/id_rsa");
-        assert!(
-            msg.contains("safe-chains.toml"),
-            "{reason:?} gives the user nothing to do: {msg}"
-        );
+        match owed(reason) {
+            Remedy::Grant => assert!(
+                msg.contains("safe-chains.toml"),
+                "{reason:?} gives the user nothing to do: {msg}"
+            ),
+            // The frozen faces must do the OPPOSITE: never point at a grant, because for them
+            // that advice is false rather than vague, and for safe-chains' own config it is
+            // circular as well. Their remedy is that there is no automated one.
+            Remedy::Manual => {
+                assert!(!msg.contains("grant that path"), "{reason:?} must not advise a grant: {msg}");
+                assert!(
+                    msg.to_lowercase().contains("granting the path does not change"),
+                    "{reason:?} must say granting will not help: {msg}"
+                );
+                assert!(msg.contains("yourself"), "{reason:?} must give the real remedy: {msg}");
+            }
+            Remedy::Respell => assert!(
+                msg.contains("literal text"),
+                "{reason:?} must say how to respell the path: {msg}"
+            ),
+        }
     }
-    // The frozen faces must do the OPPOSITE: never point at a grant, because for them that advice
-    // is false rather than vague, and for safe-chains' own config it is circular as well. Their
-    // remedy is that there is no automated one.
-    for reason in [FrozenTrustFile, FrozenSystemIntegrity] {
-        let msg = reason.message("~/.config/safe-chains.toml");
-        assert!(!msg.contains("grant that path"), "{reason:?} must not advise a grant: {msg}");
-        assert!(
-            msg.to_lowercase().contains("granting the path does not change that"),
-            "{reason:?} must say granting will not help: {msg}"
-        );
-        assert!(msg.contains("yourself"), "{reason:?} must give the real remedy: {msg}");
-    }
+    // A raw device must not borrow the login-policy copy. `/dev/mem` sits ABOVE system-integrity
+    // on the ladder, so it fell into that arm and was explained as a file that decides who may
+    // log in — false, and unhelpful about what actually makes a device dangerous.
+    let dev = RawDevice.message("/dev/mem");
+    assert!(dev.contains("raw device"), "a device must be named as one: {dev}");
+    assert!(!dev.contains("who may log in"), "a device must not borrow the login-policy copy: {dev}");
     // The credential remedy must also say that the ordinary parent-directory grant is not it,
     // since that is the form a user reaches for first and the one that will not work.
     let cred = Credential.message("~/.ssh/id_rsa");

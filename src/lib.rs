@@ -273,6 +273,11 @@ pub enum ReachReason {
     /// One of the files that decide who may log in (`/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`,
     /// the loader and boot). Same false-remedy problem as `FrozenTrustFile`.
     FrozenSystemIntegrity,
+    /// A raw block or character device (`/dev/mem`, `/dev/rdisk0`, `/dev/sda`). Distinct from
+    /// `FrozenSystemIntegrity` because the `device` rung outranks `system-integrity`, so without
+    /// its own arm every device was explained as a file that "decides who may log in" — which is
+    /// both false and unhelpful about the thing that actually makes a device dangerous.
+    RawDevice,
     /// Genuinely above/outside the working directory.
     OutsideWorkspace,
     /// A path built by an interpolation that nothing confines (`./out/$i`, `> $(cmd)`). It is not
@@ -380,6 +385,12 @@ impl ReachReason {
                  in ~/.config/safe-chains.toml. A grant on a parent directory does not reach a \
                  credential store"
             ),
+            ReachReason::RawDevice => format!(
+                "it reaches `{path}`, a raw device. Reading one is not reading a file — a disk \
+                 device hands over every file on it and memory hands over every secret in it — and \
+                 writing one goes underneath the filesystem entirely. If you do want the read, \
+                 name that path in ~/.config/safe-chains.toml; the write stays refused"
+            ),
             ReachReason::FrozenTrustFile => format!(
                 "it reaches `{path}`. safe-chains reads its own permissions from that file, so a \
                  write there is never auto-approved. Granting the path does not change that, \
@@ -479,6 +490,7 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
                 engine::resolve::FrozenWrite::TrustFile => ReachReason::FrozenTrustFile,
                 engine::resolve::FrozenWrite::TrustRootDir => ReachReason::FrozenTrustRoot,
                 engine::resolve::FrozenWrite::SystemIntegrity => ReachReason::FrozenSystemIntegrity,
+                engine::resolve::FrozenWrite::RawDevice => ReachReason::RawDevice,
             }
         } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
             // Ahead of OutsideWorkspace because it is the more specific diagnosis of the SAME
