@@ -371,8 +371,21 @@ fn is_network_url(path: &str) -> bool {
         return false;
     };
     let scheme = &path[..idx];
-    scheme.starts_with(|c: char| c.is_ascii_alphabetic())
-        && scheme.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'+' | b'-' | b'.'))
+    let well_formed_scheme = scheme.starts_with(|c: char| c.is_ascii_alphabetic())
+        && scheme.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'+' | b'-' | b'.'));
+    well_formed_scheme && has_host(&path[idx + 3..])
+}
+
+/// A URL needs a HOST. `s3://../../.ssh/id_rsa` has none, so it is not a URL at all — it is a
+/// local path wearing a scheme, and a generic reader hands it straight to the OS, which walks the
+/// `..` and opens the key. Treating it as a URL meant skipping the local-path checks entirely,
+/// which was harmless only while every path it could climb to was refused anyway.
+///
+/// Deliberately narrow. A real `https://example.com/.ssh/id_rsa` still classifies as a URL and is
+/// the network handler's business, not the shield's.
+fn has_host(after_scheme: &str) -> bool {
+    let authority = after_scheme.split('/').next().unwrap_or("");
+    !authority.is_empty() && authority != "." && authority != ".."
 }
 
 /// Whether `path` is a URL rather than a filesystem path: a `scheme://…` or a `file:` URL.

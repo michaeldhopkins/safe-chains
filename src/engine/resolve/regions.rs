@@ -825,14 +825,33 @@ fn base_region(path: &str) -> Role {
 /// otherwise become an ordinary readable file. `/root/` is already a declared shield and this is the
 /// same claim by a different spelling — a home that is not ours is private data whatever its rung.
 fn other_user_home_role(path: &str) -> Option<Role> {
-    let rest = path.strip_prefix('~')?;
     // `~` and `~/…` are OUR home; `~name` / `~name/…` is someone else's.
-    (!rest.is_empty() && !rest.starts_with('/')).then_some(Role {
+    let tilde_named = path.strip_prefix('~').is_some_and(|r| !r.is_empty() && !r.starts_with('/'));
+    (tilde_named || absolute_other_home(path)).then_some(Role {
         read_locus: LocalLocus::Machine,
         write_locus: LocalLocus::Machine,
         rebind_locus: LocalLocus::Machine,
         reads_secret: true,
         frozen: Frozen::Nothing,
+    })
+}
+
+/// `/Users/someone/…`, `/home/someone/…` — another user's home written out in full.
+///
+/// Only the `~name` spelling was recognised, and while every machine-rung path was refused that
+/// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
+/// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
+/// `canonicalize` has already folded it to `~/…`.
+fn absolute_other_home(path: &str) -> bool {
+    let home = std::env::var("HOME").unwrap_or_default();
+    let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
+    // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
+    // path handed to a macOS run must not come back with a different answer.
+    ["/Users", "/home"].iter().any(|parent| {
+        path.strip_prefix(parent)
+            .and_then(|r| r.strip_prefix('/'))
+            .and_then(|r| r.split('/').next())
+            .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
     })
 }
 
