@@ -316,14 +316,37 @@ pub(crate) fn canonicalize(path: &str) -> Cow<'_, str> {
 /// Linux those are ordinary unknown paths that already deny, so leaving them unfolded is both
 /// correct and safe. Region nodes are `os`-scoped for the same reason.
 fn firmlink_fold(path: &str) -> Option<String> {
+    firmlink_fold_impl(path, false)
+}
+
+/// The same fold, matching the `/private` prefix case-INSENSITIVELY — offered to the credential
+/// shield and to nothing else.
+///
+/// The ordinary fold above is case-sensitive on purpose, because it feeds admits as well as
+/// shields and folding an admit is not safe: on a case-SENSITIVE macOS volume `/PRIVATE/tmp` is a
+/// genuinely different directory, and handing it the scratch rung would be the case-variant
+/// widening that `base_region` refuses to allow for any other node.
+///
+/// Shields have the opposite requirement — they must fire on the variant — which is why
+/// `base_region` folds protective roles and only those. This fold was doing neither: it matched
+/// `/private` exactly, so `/PRIVATE/etc/shadow` skipped the fold, never became `/etc/shadow`, and
+/// read out clean while `/etc/SHADOW` was correctly refused.
+pub(crate) fn firmlink_fold_case_insensitive(path: &str) -> Option<String> {
+    firmlink_fold_impl(path, true)
+}
+
+fn firmlink_fold_impl(path: &str, fold_case: bool) -> Option<String> {
     const FIRMLINKS: &[&str] = &["/private/etc", "/private/var", "/private/tmp"];
     if super::regions::current_os() != "macos" {
         return None;
     }
-    FIRMLINKS
-        .iter()
-        .find(|p| path.strip_prefix(**p).is_some_and(|rest| rest.is_empty() || rest.starts_with('/')))
-        .map(|_| path["/private".len()..].to_string())
+    let matched = FIRMLINKS.iter().any(|p| {
+        let Some(head) = path.get(..p.len()) else { return false };
+        let same = if fold_case { head.eq_ignore_ascii_case(p) } else { head == *p };
+        // `get` keeps this UTF-8-safe; the boundary check stops `/private/etcetera` matching.
+        same && matches!(path[p.len()..].chars().next(), None | Some('/'))
+    });
+    matched.then(|| path["/private".len()..].to_string())
 }
 
 fn fold_spellings(path: &str) -> Cow<'_, str> {
@@ -563,6 +586,13 @@ pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
     match role.frozen {
         super::regions::Frozen::Write => Some(FrozenWrite::TrustFile),
         super::regions::Frozen::Rebind => Some(FrozenWrite::TrustRootDir),
+        // Device BEFORE SystemIntegrity: `device` outranks it on the ladder, so the broader
+        // test would swallow every raw device and mislabel it.
+        super::regions::Frozen::Nothing
+            if role.write_locus >= crate::engine::facet::LocalLocus::Device =>
+        {
+            Some(FrozenWrite::RawDevice)
+        }
         super::regions::Frozen::Nothing
             if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity =>
         {
@@ -584,6 +614,10 @@ pub(crate) enum FrozenWrite {
     TrustRootDir,
     /// `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader and boot.
     SystemIntegrity,
+    /// A raw block or character device. Sits ABOVE system-integrity on the ladder, so without its
+    /// own arm it fell into that one and `/dev/mem` was explained as "decides who may log in" —
+    /// true of `/etc/sudoers`, false and confusing here.
+    RawDevice,
 }
 
 /// How firmly `path` is pinned — the `Anchoring` face of the same analysis the locus uses.

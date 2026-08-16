@@ -730,11 +730,33 @@ fn scratchpad_role(path: &str) -> Option<Role> {
 /// role) and `apply_grant` (which wants the root the naming test compares against) so the two can
 /// never disagree about which node is in play.
 fn secret_node(path: &str) -> Option<&'static Node> {
-    REGIONS
-        .nodes
-        .iter()
-        .filter(|n| n.applies_here() && n.role.reads_secret)
-        .find(|n| n.matcher.specificity(path, n.fold && current_os() == "macos").is_some())
+    shield_spellings(path).into_iter().find_map(|p| {
+        REGIONS
+            .nodes
+            .iter()
+            .filter(|n| n.applies_here() && n.role.reads_secret)
+            .find(|n| n.matcher.specificity(&p, n.fold && current_os() == "macos").is_some())
+    })
+}
+
+/// Every spelling a SHIELD must be asked about: the path itself, plus its macOS firmlink form
+/// when the `/private` prefix only matches under case folding.
+///
+/// `canonicalize` already folds `/private/etc/x` → `/etc/x`, but case-sensitively, because that
+/// fold also feeds admits and folding an admit would hand `/PRIVATE/tmp` the scratch rung. So the
+/// case variant of a firmlink never reached the shield: `/etc/SHADOW` was refused (nodes fold) and
+/// `/PRIVATE/etc/shadow` was not, though on the default macOS volume they are one file.
+///
+/// Extra spellings are offered to the shield ONLY. Everything else classifies the path as written,
+/// which is what keeps a case variant from reaching a permissive node.
+fn shield_spellings(path: &str) -> Vec<String> {
+    let mut out = vec![path.to_string()];
+    if let Some(folded) = super::locus::firmlink_fold_case_insensitive(path)
+        && folded != path
+    {
+        out.push(folded);
+    }
+    out
 }
 
 /// The root the naming test compares a grant against: the DEEPEST matching credential-store node.
@@ -747,11 +769,15 @@ fn secret_node(path: &str) -> Option<&'static Node> {
 /// happen to give the deeper root; that is an accident of file order, not a property to rely on.
 fn secret_node_root(path: &str) -> Option<String> {
     let fold_shields = current_os() == "macos";
-    REGIONS
-        .nodes
+    shield_spellings(path)
         .iter()
-        .filter(|n| n.applies_here() && n.role.reads_secret)
-        .filter_map(|n| n.matcher.root_in(path, n.fold && fold_shields))
+        .flat_map(|p| {
+            REGIONS
+                .nodes
+                .iter()
+                .filter(|n| n.applies_here() && n.role.reads_secret)
+                .filter_map(move |n| n.matcher.root_in(p, n.fold && fold_shields))
+        })
         .max_by_key(|r| (r.split('/').count(), r.len()))
 }
 
@@ -1537,6 +1563,25 @@ mod tests {
                         (firm.read_locus, firm.write_locus, firm.reads_secret),
                         "{os}: {path} and {private} name one file but classify differently"
                     );
+
+                    // A SHIELD must also fire on the case variant of the firmlink prefix, because
+                    // the default macOS volume is case-insensitive and `/PRIVATE/etc/shadow` is
+                    // the same file. The plain fold is case-SENSITIVE on purpose (it feeds admits
+                    // too), so this half is served by the shield's own extra spelling — and it was
+                    // missing: `/etc/SHADOW` refused while `/PRIVATE/etc/shadow` read out.
+                    //
+                    // Asserted for shields ONLY. An admit deliberately does not fold: on a
+                    // case-sensitive volume `/PRIVATE/tmp` is a different directory and must not
+                    // inherit the scratch rung.
+                    if plain.reads_secret {
+                        for variant in ["/PRIVATE", "/Private"] {
+                            let cased = format!("{variant}{path}");
+                            assert!(
+                                classify_region(&cased).reads_secret,
+                                "{os}: {cased} is {path} on a case-insensitive volume, but the shield missed it"
+                            );
+                        }
+                    }
                 }
                 assert!(covered >= 3, "{os}: guard covered only {covered} firmlinked nodes — vacuous");
             });
