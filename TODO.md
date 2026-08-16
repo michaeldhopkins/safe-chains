@@ -36,7 +36,26 @@ operand from a directory operand. Two ways out, neither taken yet:
 Not urgent: this is exactly what these tools did before local reads opened up, so it is unchanged
 behaviour rather than a regression, and `grep` reads the same file fine.
 
-## DECISION NEEDED: enumerating credential dotfiles is losing, and the evidence is one probe deep
+## DECIDED (2026-08-16): dotfiles are allowed; the shield keeps naming the credential ones
+
+**Option 1 below — keep enumerating.** `~/.zshrc`, `~/.gitconfig`, `~/.config/nvim/init.lua` and
+every other home dotfile read without a prompt; the shield names the credential-bearing ones and
+those refuse. No allowlist for dotfiles, no grant requirement.
+
+This accepts the trailing-denylist risk stated below with eyes open: the next tool that invents a
+credential dotfile is readable until someone adds it. That is the cost of the thing being useful,
+and the alternative — a curated allowlist of readable dotfiles — buys less than it costs, because
+the common case is an agent reading ordinary config and the uncommon case is the one we can name.
+
+What to do about it, instead of inverting: **treat a new credential store as a bug to fix, not a
+gap to tolerate.** When one is found, declare it. The enumeration is at 24 (23 dotfiles plus
+safe-chains' own decision log, which is a store we KNOW the contents of). The two probe rounds that
+found the last ten are worth repeating whenever this area is touched.
+
+The analysis that led here is kept below, because it is the argument for revisiting if the
+enumeration starts losing visibly rather than theoretically.
+
+---
 
 Admitting all of `~` rests on the shield naming every credential-bearing dotfile. Two rounds in, that
 is not looking like a race the enumeration wins.
@@ -67,6 +86,49 @@ Three ways out, and this wants a decision rather than another pass:
 
 Nothing blocks the bound lift on this — it is a policy choice about how much of `~` opens — but it
 should be made deliberately rather than settled by which files someone happened to think of.
+
+## DECIDED (2026-08-16): sibling DELETE stays refused at developer — revisit on feel
+
+A sibling checkout (`../branchdiff`, the `adjacent` rung) is readable and writable at developer, but
+not deletable:
+
+    cat ../branchdiff/x            allow
+    touch ../branchdiff/x          allow
+    cp ./a ../branchdiff/b         allow
+    mv ../branchdiff/a ./b         allow
+    rm ../branchdiff/x             DENY
+    rm -rf ../branchdiff/build     DENY
+
+The asymmetry is deliberate, not an oversight. Reaching into a peer project to read it, or to write
+a file into it, is the thing agents legitimately do across a multi-repo checkout. Deleting out of
+one is a different proposition: the blast radius is a project the user did not point the agent at,
+and `rm -rf ../<sibling>/build` is one typo away from `rm -rf ../<sibling>`. The reversibility spine
+already treats destroy as the operation that earns the most caution, and `adjacent` is the rung
+where "the agent was invited here" stops being true.
+
+**Marked for revisit based on how it feels in use.** If cleaning a sibling's build output turns out
+to be a routine prompt, the answer is probably a `destroy` clause scoped to `adjacent` at developer
+rather than a blanket lift — the sibling equivalent of how worktree destroy is already admitted.
+Until then it stays refused, and a user who wants it can grant the path.
+
+Covered by the `write-sibling-destroy` rows in `tests/fixtures/path_policy_corpus.tsv`, so a change
+here shows up as a corpus diff rather than a surprise.
+
+**One edge this decision does not settle**, flagged rather than decided quietly: `mv
+../branchdiff/a ./b` is ALLOWED, and it does make `a` disappear from the sibling.
+
+It is NOT a hole in the rule, and reading it as one is the trap — that argues from consequence (the
+peer project is missing a directory) to classification (so call it a destroy). `mv` is a relocate:
+the bytes are intact and the act reverses. What it exposes is a vocabulary gap — the model cannot
+currently say "these bytes moved from one locus to another", so the sibling rule had to attach to
+`destroy`, which `mv` correctly does not carry.
+
+Diagnosis and the proposed fix (an `Operation::Relocate` term, plus an `origin` on `Locus`) are in
+**`docs/design/behavioral-taxonomy-relocation.md`**. Deferred out of 0.227.0 on purpose: it is a
+schema change to the level files and wants its own release.
+
+Note the design note does not presuppose the verdict changes. Once the crossing is expressible,
+allowing `mv` out of a sibling may well be the right answer.
 
 ## Permissive reads: what is left, and the one finding that changes its shape
 
