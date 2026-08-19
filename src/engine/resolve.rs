@@ -1306,9 +1306,9 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
         } else {
             match sed_cluster(&t[1..], next, BOOL) {
                 SedShort::Bad => return worst("sed: unrecognized flag — worst-cased (§0)"),
-                SedShort::InPlace => {
+                SedShort::InPlace { consumes_next } => {
                     in_place = true;
-                    i += 1;
+                    i += usize::from(consumes_next) + 1;
                 }
                 SedShort::Standalone => i += 1,
                 SedShort::Script { consumes_next } => {
@@ -1595,7 +1595,7 @@ fn resolve_perl(tokens: &[Token]) -> Profile {
 enum SedShort<'a> {
     Bad,
     Standalone,
-    InPlace,                                                    // -i (rest is the optional suffix)
+    InPlace { consumes_next: bool },                          // -i[SUFFIX], or BSD's separate `-i ''`
     Script { consumes_next: bool },                            // -e SCRIPT
     ScriptFile { file: Option<&'a str>, consumes_next: bool }, // -f FILE
     SkipValue { consumes_next: bool },                         // -l N
@@ -1613,7 +1613,18 @@ fn sed_cluster<'a>(cluster: &'a str, next: Option<&'a str>, boolset: &[u8]) -> S
         let glued = &cluster[k + 1..]; // safe: bytes[k] is ASCII → k+1 is a char boundary
         let has = !glued.is_empty();
         match bytes[k] {
-            b'i' => return SedShort::InPlace, // -i[SUFFIX]: the rest of the cluster is the suffix
+            // `-i[SUFFIX]` glued is the GNU spelling. BSD (macOS) requires the suffix as a SEPARATE
+            // word, empty for "no backup", so `sed -i '' 's/a/b/' f` is the standard macOS form.
+            //
+            // Modelled GNU-only, `-i` consumed nothing, so `''` landed in the first positional —
+            // which for sed is the SCRIPT. Everything shifted one: the real script became a FILE
+            // operand, and since operands are word-split, any absolute-looking token inside it
+            // decided the locus. A JS comment did it in practice — the `//` in
+            // `s|…|// TEMP: no-op|` read as the filesystem root and the edit denied at `machine`.
+            //
+            // ONLY an empty next word is consumed. Under BSD the word after `-i` is a suffix, not a
+            // path, so accepting a non-empty one would let `-i /etc/passwd` swallow a real operand.
+            b'i' => return SedShort::InPlace { consumes_next: !has && next == Some("") },
             b'e' => return SedShort::Script { consumes_next: !has },
             b'f' => {
                 let file = if has { Some(glued) } else { next };
@@ -2937,6 +2948,45 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "*"])).expect("sed")), Verdict::Denied, "cwd=/etc: sed -i * denied");
         assert_eq!(project(&resolve(&toks(&["dd", "if=./x", "of=passwd"])).expect("dd")), Verdict::Denied, "cwd=/etc: dd of=passwd denied");
         assert_eq!(project(&resolve(&toks(&["cp", "./payload", "config"])).expect("cp")), Verdict::Denied, "cwd=/etc: cp denied");
+    }
+
+    /// One operation, three spellings of in-place, one answer.
+    ///
+    /// BSD (macOS) spells the empty in-place suffix as a SEPARATE word — `sed -i '' SCRIPT FILE` —
+    /// and modelled GNU-only, `-i` consumed nothing, so `''` landed in the first positional, which
+    /// for sed is the SCRIPT. Everything shifted one: the real script became a FILE operand, got
+    /// word-split, and any absolute-looking token inside it picked the locus. That is not a
+    /// contrived input — the decision log caught it on `s|…|// TEMP: no-op|`, where the `//` of a
+    /// JavaScript comment read as the filesystem root and a worktree edit denied at `machine`.
+    ///
+    /// Enumerated over scripts that contain the tokens which make the shift visible (`$`, `//`, a
+    /// leading `/`), because the bug is invisible on a script that happens to hold none of them.
+    #[test]
+    fn sed_in_place_classifies_the_same_in_every_spelling() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        for script in ["1257,$d", "s|x|// TEMP|", "s|a|/b|", "1,$s/x/y/"] {
+            let bsd = resolve(&toks(&["sed", "-i", "", script, "./app.css"])).expect("sed");
+            let gnu = resolve(&toks(&["sed", "-i.bak", script, "./app.css"])).expect("sed");
+            let read = resolve(&toks(&["sed", "-n", script, "./app.css"])).expect("sed");
+            assert_eq!(
+                project(&bsd),
+                Verdict::Allowed(SafetyLevel::SafeWrite),
+                "`sed -i '' {script} ./app.css` is a worktree edit"
+            );
+            assert_eq!(project(&bsd), project(&gnu), "{script}: -i '' and -i.bak must agree");
+            assert!(matches!(project(&read), Verdict::Allowed(_)), "{script}: -n is a plain read");
+        }
+
+        // The separate word is consumed ONLY when empty. Under BSD the token after `-i` is a
+        // SUFFIX, so accepting a non-empty one would let `-i` swallow a real operand — and the
+        // operand it swallowed would be the one carrying the locus.
+        assert_eq!(
+            project(&resolve(&toks(&["sed", "-i", "", "s/a/b/", "/etc/passwd"])).expect("sed")),
+            Verdict::Denied,
+            "the FILE after a consumed `-i ''` is still gated"
+        );
     }
 
     #[test]
