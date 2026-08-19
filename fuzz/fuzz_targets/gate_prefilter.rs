@@ -38,12 +38,24 @@ const GATES: &[(&str, &str)] = &[
 /// declared flag the token IS an operand by declaration, while for a positional whether the token
 /// is an operand at all is a real question — which is why the pre-filter still guards this slot and
 /// legitimately skips flag-shaped tokens.
+/// Only commands whose positional role is FIXED. `judge_for_positional` answers with the declared
+/// role, so the value must land in a slot where that role is what the walk actually applies.
+///
+/// That rules out `shape = "remote"` (scp, rsync), where the role of a positional depends on two
+/// things this table cannot express: its POSITION — the last operand is the destination, so it is
+/// gated as a Write, not the declared Read — and its FORM, since a `host:path` endpoint is a
+/// network transfer the walk deliberately leaves to the command's own handler. Both were listed
+/// here, and with one operand the fuzzed value was always the last, so every scp/rsync case
+/// compared the declared Read against a Write the walk had performed. It only surfaced once a
+/// value existed whose read and write faces disagree.
+///
+/// Dropping them costs little: the axis under test is the VALUE and the pre-filter that might skip
+/// it, and the three that remain cover all three roles. Re-adding them needs the target to model
+/// `Shape`, which is the walk's job, not the oracle's.
 const POSITIONALS: &[(&str, &[&str])] = &[
-    ("curl", &[]),          // Read
-    ("scp", &[]),           // Read
-    ("rsync", &[]),         // Read
-    ("karma", &["start"]),  // Exec
-    ("tilt", &["up"]),      // Exec
+    ("curl", &[]),          // Read   — Plain shape
+    ("karma", &["start"]),  // Exec   — Plain shape
+    ("tilt", &["up"]),      // Exec   — Plain shape
 ];
 
 fuzz_target!(|data: &[u8]| {
