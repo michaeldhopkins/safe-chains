@@ -1,5 +1,193 @@
 # TODO
 
+## PARTLY DONE: Rails 8 multi-database task variants — `db:migrate:<db>` is the one still denied
+
+Found while researching `db:verify`. Two separate answers, and the second is the real one.
+
+**`db:verify` does not exist.** Enumerated against a live Rails 8.1.3.1 app (`bin/rails -T`): zero
+matches. Nothing to research or add.
+
+**`dev:verify` is APP-DEFINED and must stay denied.** In the app it was seen in, `dev:` holds three
+locally-written tasks — `dev:verify`, `dev:states`, and `dev:reset`, the last of which DROPS THE DEV
+DATABASE. Rails does ship a `dev:` namespace (`dev:cache`), so the namespace is shared and a name
+cannot tell a built-in from an app's own. Adding `dev:verify` to the built-in allowlist would let
+ANY checkout define a `dev:verify` that does anything at all, which is precisely the shape
+safe-chains refuses. Custom tasks belong in the project's `.safe-chains.toml`, hash-pinned — that
+mechanism exists for exactly this.
+
+**The real gap: per-database task variants.** Rails 8 ships solid_cache, solid_queue and solid_cable
+by default, so a NEW Rails 8 app has four databases and rake generates a variant per database:
+
+    db:create        db:drop         db:migrate       db:migrate:down
+    db:migrate:redo  db:migrate:reset  db:migrate:status  db:migrate:up
+    db:reset         db:rollback     db:schema:dump   db:schema:load
+    db:setup         db:version
+
+14 base tasks x 4 databases = **56 tasks, every one denied today** (`db:migrate:primary`,
+`db:create:cache`, `db:drop:queue`, `db:migrate:down:cable`, …) while the bare `db:migrate` allows.
+Also missing regardless of multi-db: `db:environment:set`, `db:migrate:up`, `db:migrate:down`, and
+the genuine built-in `dev:cache`.
+
+Enumeration cannot close this. The trailing segment is a database NAME out of `config/database.yml`,
+so `primary/cache/queue/cable` are only this app's; another app has `db:migrate:analytics`. The
+honest rule is behavioural: **`db:<task>:<dbname>` does to one configured database exactly what
+`db:<task>` does to all of them, so it inherits the base task's classification** — which means a
+suffix-pattern primitive in the TOML rather than 56 more lines.
+
+BUILT: `per_database = true` on a `[[command.sub]]` makes it also match one trailing plain
+identifier, inheriting the base classification. Eleven db: tasks carry it, so `db:create:cache`,
+`db:schema:dump:queue`, `db:version:primary` and the rest now answer as their base does, while
+`db:drop:cache` and `db:rollback:primary` stay denied with theirs.
+
+STILL DENIED, and this is the interesting part: **`db:migrate:<db>`**, the most common variant of
+all. `db:migrate` prefixes three other declared tasks — `db:migrate:redo`, `:reset`, `:status` —
+and `db:migrate:primary` (a database) is the same SHAPE as `db:migrate:redo` (a task). Nothing in
+the string distinguishes them, so marking `db:migrate` read `redo` as a database name and admitted
+a destructive task that is deliberately `candidate`. The repo caught it: `examples_denied` already
+held `rails db:migrate:redo VERSION=1`.
+
+`filter_candidates` now refuses the marking on any sub that prefixes another declared task, so it
+cannot be re-added by hand. `db:migrate`s four variants are instead ENUMERATED — primary, cache,
+queue, cable, which is exactly a default Rails 8 app.
+
+RESIDUE: a CUSTOM database name under db:migrate (`db:migrate:analytics`) still prompts, because
+enumeration cannot cover it and the rule cannot be used here. Closing that needs a way to say
+"these suffixes are subtasks, anything else is a database" — an exclusion list on the marking.
+Small, and worth doing only if a real app hits it.
+
+Net: 28 of the 56 variants newly allowed. The other 28 belong to db:drop / db:rollback / db:reset
+and correctly stay denied with their bases.
+
+## DONE: `editor` was the only lower-band level using `admits`, so the ladder was not monotone
+
+The nightly `level_monotonic` target failed 2026-08-19: a command approved at the STRICTER `reader`
+and refused at the looser `editor`. **Pre-existing** — v0.226.0 crashes on the same input, so the
+read-policy release did not cause it; the fuzzer simply took until that night to synthesize the
+input. Reproducer is in the run's artifacts (`crash-fe4672a119d047035da9bb6a1ec3ef2e45e7b685`,
+`tilt\tse{d,` plus NUL and `\x1d` bytes).
+
+Measured on that input:
+
+    paranoid    ceiling only        Allowed(Inert)
+    reader      ceiling only        Allowed(Inert)
+    editor      engine `admits`     DENIED        <-- the break
+    developer   ceiling only        Allowed(Inert)
+
+The cause is structural, not input-specific. `level_ceiling` gives an engine level to `editor` and
+to the upper band, and to nothing else in the lower band: paranoid, reader and developer are PURE
+CEILINGS gated by `<= threshold`, while editor additionally classifies through `Level::admits`.
+Two different mechanisms sit adjacent in one ordered ladder, so nothing makes them agree — a
+profile that projects to `Inert` clears every ceiling and can still fail editor's `admits`.
+
+Direction matters for triage: editor denies MORE, so this is fail-CLOSED and not a hole. It is a
+broken lattice property, and the target is right to assert it.
+
+Not fixed here, because both repairs are design work rather than a patch:
+
+- **Give the whole lower band engine levels.** `paranoid`, `reader` and `developer` are already
+  DEFINED in levels/default.toml — `level_ceiling` just declines to return them. And the levels are
+  fully `extends`-chained (paranoid → reader → editor → developer → admin → yolo), so if every
+  level classified through `admits`, monotonicity would hold BY CONSTRUCTION rather than by
+  assertion. That makes it look like a four-word change to one match arm.
+
+  MEASURED, and it is not. Flipping that arm and diffing 1707 commands per level:
+
+        --level paranoid    49 newly denied,   0 newly allowed
+        --level reader     157 newly denied,   0 newly allowed
+        --level developer    0 changes
+
+  Direction is uniformly tightening, never loosening, and `developer` is untouched — which fits,
+  since the legacy projection is calibrated to the default band. But sampling the reader denials:
+
+        cat ./notes.txt              <-- denied at --level reader
+        cat ../branchdiff/README.md
+        aws secretsmanager list-secrets
+
+  Reading a file in your own worktree is what `reader` IS. First reading of that: the engine's
+  `paranoid`/`reader` definitions must not admit their own band, and repairing them is the real
+  job. **That was wrong.** `--explain` shows the profile (`observe` / `worktree` /
+  `local-process`) and reports it ADMITTED — the level definitions are fine.
+
+  The defect is one expression in `engine::bridge::project`:
+
+        return if level.admits(profile) {
+            Verdict::Allowed(SafetyLevel::SafeWrite)   // <-- always SafeWrite
+        } else { Verdict::Denied };
+
+  When an eval level is set, a pass is stamped `SafeWrite` regardless of what the profile earns.
+  Its own comment says why — "the legacy ceiling every upper level shares" — and that holds for
+  every level this path was built to serve: local-admin, network-admin, yolo and `editor` all
+  carry a SafeWrite ceiling. It silently breaks any level whose ceiling is LOWER. At `reader`
+  (SafeRead) and `paranoid` (Inert) the `<= threshold` gate then refuses the very profile the
+  level just admitted, which is the whole 49/157.
+
+  So the fix is `to_legacy(&level.name).unwrap_or(SafeWrite)` instead of the constant, plus the
+  match arm. Tried: the ladder comes out
+  paranoid(nothing) → reader(read) → editor(+create/mutate) → developer(+destroy), the
+  `level_monotonic` crash input passes, and the only test that fails is
+  `level_ceiling_maps_names_to_ceiling_and_engine_level`, which asserts the old arm and wants
+  re-deriving.
+
+  FIXED. `project` returns `to_legacy(&level.name).unwrap_or(SafeWrite)`, and `level_ceiling`
+  hands an engine level to every named level. Measured after:
+
+        default (no --level)   0 changes      <-- the path everyone actually uses
+        --level editor         0 changes
+        --level developer      0 changes
+        --level yolo           0 changes
+        --level paranoid      41 newly denied, 0 newly allowed
+        --level reader        74 newly denied, 0 newly allowed
+
+  and the reader tightenings are the level finally doing its job — every one sampled is a WRITE or
+  an EXEC that a read-only level should never have admitted:
+
+        buf build -o ./image.bin        dart format ./lib
+        docker-compose config --output  karma start
+
+  `level_monotonic` passes the recorded crash input and 306,493 fresh runs with no violation.
+
+- **Enforce monotonicity in `command_verdict_ceilinged`** — a level never denies what a strictly
+  stricter level admitted. Cheap, and it would green the target, but it papers over the
+  disagreement instead of resolving it and would hide the next instance. It also inverts the
+  intent: the ladder would be monotone because the wrapper forces it, not because the levels agree.
+
+Recommendation: the first, once `reader`/`paranoid` are made to admit their own band. Until then
+the nightly is correct to be red.
+
+Do NOT silence the target. It found a real property violation on its first opportunity, and the
+nightly staying red is the accurate signal until the band is reconciled.
+
+## RESEARCHED, not doing: binding `$(which X)` / `$(command -v X)` as a path
+
+`head -1 $(which bundle)` denies — the substitution is unpinnable. Reported by the decision log
+2026-08-18. The obvious fix is a `[command.output]` claim on `which`, on the reasoning that it
+prints an executable path on `$PATH` and `$PATH` resolution is already safe-chains' trust model for
+bare command names (AGENTS.md §0.2). Measured, that reasoning does not survive:
+
+    which bundle        →  /Users/michaelhopkins/.local/share/mise/installs/ruby/3.4.2/bin/bundle
+    which -a python3    →  three paths, the first also under ~/.local/share/mise
+    command -v cd       →  cd                      (a bare word, not a path)
+    command -v f        →  f                       (a shell function)
+    command -v ll       →  alias ll='ls -l'        (arbitrary text with quotes and spaces)
+
+Two separate problems:
+
+1. **`command -v` does not print paths.** For a builtin, function or alias it prints a word or a
+   whole alias definition. Declaring an output locus on it would be a straight fail-open of exactly
+   the kind SAMPLE.toml warns about — the field is TRANSITIVE, so it widens every consumer.
+2. **`which` prints a real path, but not to a predictable place.** A version manager (mise, asdf,
+   rbenv, nvm) puts the binary under `~`, so "a standard bin directory" is false on the first
+   machine tested. There is no existing `OutputLocus` variant that fits, and the honest bound for
+   "wherever PATH happens to point" is `machine` — which is what an unpinnable path already gets.
+
+So the only version worth building is a new variant meaning "a PATH-resolved executable, locus
+machine", declared on `which` alone and never on `command -v`. Under the read policy that would be
+enough to make `head -1 $(which bundle)` allow while `rm $(which bundle)` still denies.
+
+Deferred rather than done because it is a schema addition with a transitive fail-open surface, for
+one convenience form, and the `command -v` half must be excluded on evidence rather than by
+omission. If it is built, the guard is: `$(command -v <alias>)` must NOT become a bounded path.
+
 ## DECISION NEEDED: three sources disagree about what a grant NAMING a credential store does
 
 Measured, with `[[grant]] path = "~/.ssh"  read = true  write = true`:

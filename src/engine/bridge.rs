@@ -14,11 +14,16 @@ use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 thread_local! {
-    /// The level a `--level` threshold selected, when it is one of the UPPER band
-    /// (`local-admin`/`network-admin`/`yolo`) that has no 3-value legacy equivalent. When set,
-    /// `project` decides via `Level::admits` against THIS level instead of the lower-band
-    /// projection — the only way a profile that only an upper level admits (`git push`, `sudo`)
-    /// can be approved. `None` (the default) keeps the byte-for-byte lower-band behavior, so
+    /// The level a `--level` threshold selected. When set, `project` decides via `Level::admits`
+    /// against THIS level instead of walking the band for the lowest level that admits — which is
+    /// the only way a profile that just one level admits (`git push`, `sudo`) can be approved, and
+    /// the only way a level whose rule the 3-value projection cannot express (`editor`: no
+    /// destroy, no sibling write) can be enforced.
+    ///
+    /// Every named level sets it now. It was upper-band-only while `project` stamped a pass as
+    /// `SafeWrite`, which a lower ceiling then refused; see the note there.
+    ///
+    /// `None` (the default — no `--level` given) keeps the byte-for-byte default-band behavior, so
     /// `command_verdict` / `is_safe_command` and every existing test are unaffected.
     static EVAL_LEVEL: Cell<Option<&'static Level>> = const { Cell::new(None) };
 }
@@ -58,14 +63,28 @@ pub fn project(profile: &Profile) -> Verdict {
         return Verdict::Denied;
     }
     if let Some(level) = EVAL_LEVEL.with(Cell::get) {
-        // An upper-band `--level` is authoritative via `admits`. Pass projects to `SafeWrite`
-        // — the legacy ceiling every upper level shares — so `run_cli`'s existing `<= ceiling`
-        // gate accepts it; a profile the level does not admit is `Denied`, dominating the chain.
-        return if level.admits(profile) {
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        } else {
-            Verdict::Denied
-        };
+        // A selected `--level` is authoritative via `admits`: a profile it does not admit is
+        // `Denied`, dominating the chain.
+        if !level.admits(profile) {
+            return Verdict::Denied;
+        }
+        // A pass projects to the band the PROFILE earns — not a fixed `SafeWrite`.
+        //
+        // It was fixed, and correctly so for every level this path originally served: the upper
+        // band and `editor` all carry a `SafeWrite` ceiling, so `run_cli`'s `<= ceiling` gate
+        // accepted the stamp. It silently breaks any level whose ceiling is LOWER. At `reader`
+        // (SafeRead) or `paranoid` (Inert) the gate then refused the very profile the level had
+        // just admitted — `cat ./notes.txt` denied at `--level reader`.
+        //
+        // That is why `level_ceiling` handed an engine level to `editor` and the upper band only:
+        // giving one to reader/paranoid would have denied their whole band. The workaround became
+        // the cause of the `level_monotonic` failure — `editor` classified by `admits` while its
+        // neighbours classified by projection, so two mechanisms sat adjacent in one ordered
+        // ladder with nothing making them agree.
+        //
+        // `unwrap_or(SafeWrite)` keeps the upper band byte-identical: those levels have no legacy
+        // equivalent, so `to_legacy` yields `None` for them and they keep the shared ceiling.
+        return Verdict::Allowed(to_legacy(&level.name).unwrap_or(SafetyLevel::SafeWrite));
     }
     for level in default_levels() {
         // Only the auto-approvable band (paranoid..developer) has a 3-value legacy

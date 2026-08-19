@@ -130,12 +130,13 @@ pub fn command_verdict(command: &str) -> Verdict {
     cst::command_verdict(command)
 }
 
-/// Classify `command` against an UPPER-band level (`local-admin`/`network-admin`/`yolo`), which
-/// has no 3-value legacy ceiling. Every engine-resolved leaf is decided by `Level::admits`
-/// against `level` instead of the lower-band projection; a `Denied` on any segment dominates.
-/// Legacy (unresolved) leaves keep their local-safe `SafeWrite`-or-below verdict, which every
-/// upper level admits. The result is `Allowed(SafeWrite)` (accepted by the shared upper ceiling)
-/// or `Denied`.
+/// Classify `command` against a named level. Every engine-resolved leaf is decided by
+/// `Level::admits` against `level` rather than by walking the band; a `Denied` on any segment
+/// dominates. Legacy (unresolved) leaves keep their local-safe `SafeWrite`-or-below verdict.
+///
+/// A pass returns the band the PROFILE earns (`to_legacy`), so the caller's `<= ceiling` gate
+/// still tightens — that is what lets `reader` (SafeRead) and `paranoid` (Inert) use this path at
+/// all. Upper-band levels have no legacy equivalent and keep the shared `SafeWrite`.
 pub fn command_verdict_at_level(command: &str, level: &'static engine::level::Level) -> Verdict {
     let _guard = engine::bridge::enter_eval_level(level);
     cst::command_verdict(command)
@@ -160,13 +161,23 @@ pub fn upper_level_by_name(name: &str) -> Option<&'static engine::level::Level> 
 pub fn level_ceiling(name: &str) -> Option<(SafetyLevel, Option<&'static engine::level::Level>)> {
     let (ceiling, legacy_of) = verdict::SafetyLevel::resolve_threshold(name)?;
     let canonical = legacy_of.unwrap_or(name);
-    // Levels whose rule the 3-band projection can't express classify per-level via `admits`:
-    // `editor` (no destroy, no sibling write — distinct from developer) and the UPPER band (git push,
-    // bulk-object-read, sudo — above the band). `paranoid`/`reader` are pure ceilings (their
-    // inert/read bands need no `admits`; the `<= threshold` gate tightens), and `developer` IS the
-    // default band — those carry no engine level.
+    // EVERY named level classifies through `admits`. The levels are `extends`-chained
+    // (paranoid ⊂ reader ⊂ editor ⊂ developer ⊂ admin ⊂ yolo), so one mechanism across the whole
+    // ladder makes it monotone BY CONSTRUCTION: whatever a level admits, every looser level
+    // inherits.
+    //
+    // Only `editor` and the upper band used to, for a reason that turned out to be a bug rather
+    // than a design: `project` stamped every pass `SafeWrite`, which the `<= threshold` gate then
+    // refused at any lower ceiling, so handing `reader` an engine level denied its entire band
+    // (measured: 157 commands, `cat ./notes.txt` among them). With `project` returning the band
+    // the profile actually earns, that is gone.
+    //
+    // The mixture was itself the `level_monotonic` fuzz failure — `editor` decided by `admits`
+    // while `reader` and `developer` decided by projection, and nothing made two mechanisms
+    // adjacent in one ordered ladder agree.
     let engine_level = match canonical {
-        "editor" | "local-admin" | "network-admin" | "yolo" => {
+        "paranoid" | "reader" | "editor" | "developer" | "local-admin" | "network-admin"
+        | "yolo" => {
             engine::authoring::default_levels().iter().find(|l| l.name == canonical)
         }
         _ => None,

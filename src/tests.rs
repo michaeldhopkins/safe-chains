@@ -2038,18 +2038,28 @@ fn operand_injection_propagates_source_locus() {
 fn level_ceiling_maps_names_to_ceiling_and_engine_level() {
     use crate::verdict::SafetyLevel;
     let ceiling = |n: &str| level_ceiling(n).map(|(c, l)| (c, l.is_some()));
-    // pure-ceiling lower band: no engine level, the `<= threshold` gate does the tightening.
-    assert_eq!(ceiling("paranoid"), Some((SafetyLevel::Inert, false)));
-    assert_eq!(ceiling("reader"), Some((SafetyLevel::SafeRead, false)));
-    // editor classifies via `admits` (no destroy / no sibling write — distinct from developer), so it
-    // carries an engine level; developer IS the default band (no engine level).
-    assert_eq!(ceiling("editor"), Some((SafetyLevel::SafeWrite, true)));
-    assert_eq!(ceiling("developer"), Some((SafetyLevel::SafeWrite, false)));
-    // the UPPER band classifies via `admits` — carries an engine level, shared SafeWrite ceiling.
-    assert_eq!(ceiling("network-admin"), Some((SafetyLevel::SafeWrite, true)));
-    assert_eq!(ceiling("yolo"), Some((SafetyLevel::SafeWrite, true)));
-    // legacy alias canonicalizes.
-    assert_eq!(ceiling("safe-read"), Some((SafetyLevel::SafeRead, false)));
+    // EVERY named level carries an engine level, so the whole ladder classifies through one
+    // mechanism. That is the property, not an implementation detail: the levels are
+    // `extends`-chained, so a single mechanism across all of them makes the ladder monotone by
+    // construction. It used to be a mixture — editor and the upper band by `admits`, the rest by
+    // projection — and the mixture WAS the `level_monotonic` failure.
+    for (name, band) in [
+        ("paranoid", SafetyLevel::Inert),
+        ("reader", SafetyLevel::SafeRead),
+        ("editor", SafetyLevel::SafeWrite),
+        ("developer", SafetyLevel::SafeWrite),
+        ("local-admin", SafetyLevel::SafeWrite),
+        ("network-admin", SafetyLevel::SafeWrite),
+        ("yolo", SafetyLevel::SafeWrite),
+    ] {
+        assert_eq!(ceiling(name), Some((band, true)), "{name} must carry a ceiling AND an engine level");
+    }
+    // The ceiling still tightens on top of `admits`: it is what separates paranoid from reader
+    // from the SafeWrite levels, which is why the two are kept as a pair rather than collapsed.
+    // legacy alias canonicalizes — to the ceiling AND the engine level of its modern name.
+    assert_eq!(ceiling("safe-read"), ceiling("reader"));
+    assert_eq!(ceiling("inert"), ceiling("paranoid"));
+    assert_eq!(ceiling("safe-write"), ceiling("developer"));
     // unknown → None (the caller fails safe to the default band).
     assert_eq!(ceiling("banana"), None);
 }
