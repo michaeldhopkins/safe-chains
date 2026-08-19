@@ -190,6 +190,31 @@ fn filter_candidates(subs: Vec<TomlSub>) -> Result<impl Iterator<Item = TomlSub>
             s.name,
         );
     }
+    // A `per_database` sub must not be a PREFIX of another declared task, or the two are
+    // indistinguishable by shape and the suffix rule swallows the sibling.
+    //
+    // Rails makes this concrete: `db:migrate:primary` names a database and `db:migrate:redo` names
+    // a different task, and nothing in the string says which. Marking `db:migrate` therefore read
+    // `redo` as a database name and admitted a destructive task that is deliberately `candidate`.
+    // The existing `examples_denied` entry caught it, which is why the check belongs here rather
+    // than in a test.
+    //
+    // Checked in THIS function for the same reason the assert above is: candidates are filtered
+    // out below, so a check placed after the filter could not see the very siblings that create
+    // the ambiguity — `db:migrate:redo` and `db:migrate:reset` are both candidates.
+    for s in &subs {
+        if !s.per_database {
+            continue;
+        }
+        let clash = subs.iter().find(|o| o.name.starts_with(&format!("{}:", s.name)));
+        ensure!(
+            clash.is_none(),
+            "sub `{}`: `per_database` is unsound on a task that prefixes another (`{}`) — a \
+             suffix cannot be told from a subtask name. Enumerate the variants, or drop the flag",
+            s.name,
+            clash.map(|c| c.name.as_str()).unwrap_or(""),
+        );
+    }
     Ok(subs.into_iter().filter(|s| !s.candidate.unwrap_or(false)))
 }
 
@@ -241,6 +266,7 @@ pub(super) fn build_subs(
         out.push(SubSpec {
             name: alias,
             kind: canonical.kind.clone(),
+            name_match: canonical.name_match,
             policy_ref: canonical.policy_ref.clone(),
             profile: canonical.profile.clone(),
             flags: canonical.flags.clone(),
@@ -450,6 +476,7 @@ pub(super) fn build_sub(
     Ok(SubSpec {
         name,
         output,
+        name_match: if toml.per_database { NameMatch::WithDatabaseSuffix } else { NameMatch::Exact },
         kind: build_sub_kind(parent, toml, handler_policies)?,
         policy_ref,
         profile,

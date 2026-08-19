@@ -12483,6 +12483,10 @@ Aliases: `python`
 - **db:create**: Flags: --help, -h
 - **db:fixtures:load**: Flags: --help, -h
 - **db:migrate**: Flags: --help, --trace, -h
+- **db:migrate:cable**: Flags: --help, --trace, -h
+- **db:migrate:cache**: Flags: --help, --trace, -h
+- **db:migrate:primary**: Flags: --help, --trace, -h
+- **db:migrate:queue**: Flags: --help, --trace, -h
 - **db:migrate:status**: Flags: --help, -h
 - **db:prepare**: Flags: --help, -h
 - **db:schema:dump**: Flags: --help, -h

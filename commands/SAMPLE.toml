@@ -143,6 +143,36 @@
 # valued = ["--jobs", "--target", "-j"]
 
 # ─────────────────────────────────────────────────────────────────────
+# per_database — one arbitrary trailing `:segment`, inheriting this sub
+# ─────────────────────────────────────────────────────────────────────
+#
+# `per_database = true` makes a sub ALSO match `name:<segment>` for one plain identifier
+# ([A-Za-z0-9_-]+), classified exactly as the bare sub is.
+#
+# It exists for Rails' per-database rake tasks. A Rails 8 app has four databases out of the box
+# (solid_cache, solid_queue, solid_cable), and rake generates a variant of each schema task per
+# database — `db:create:cache`, `db:schema:dump:queue`. The trailing segment is a key out of the
+# app's own config/database.yml, so it cannot be enumerated: another app has `db:migrate:analytics`.
+#
+# ONLY set this where the variant is strictly NARROWER than the base, which is what makes
+# inheriting the classification safe rather than a widening: `db:drop:cache` drops one of the
+# databases `db:drop` drops all of, so it lands at `db:drop`'s level and stays denied.
+#
+# It is NOT a general "ignore the tail". Two limits, both enforced rather than documented:
+#   • the segment must be a single plain identifier, and must not be an opaque value — a
+#     substitution arrives already rewritten to the CMDSUB sentinel, which is otherwise
+#     identifier-shaped, so `db:migrate:$(x)` would ride in as a "database name".
+#   • the sub must not PREFIX another declared task. `db:migrate` prefixes `db:migrate:redo`, and a
+#     database name is indistinguishable from a subtask name, so marking it would have admitted a
+#     destructive `candidate` task. The registry build REFUSES the marking in that case; enumerate
+#     the variants instead (see `db:migrate:primary` … in commands/ruby/rails.toml).
+#
+# [[command.sub]]
+# name = "db:create"
+# per_database = true
+# level = "SafeWrite"
+
+# ─────────────────────────────────────────────────────────────────────
 # ARCHETYPE-CLASSIFIED SUBCOMMAND — profile + research provenance
 # ─────────────────────────────────────────────────────────────────────
 #

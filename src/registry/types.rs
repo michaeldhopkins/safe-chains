@@ -454,6 +454,24 @@ pub(super) struct TomlSubFlag {
 #[derive(Debug, Deserialize)]
 pub(super) struct TomlSub {
     pub name: String,
+    /// This sub also matches with ONE arbitrary trailing `:segment`, which inherits this sub's
+    /// classification unchanged.
+    ///
+    /// For Rails' per-database rake tasks. A Rails 8 app has four databases out of the box
+    /// (solid_cache, solid_queue, solid_cable), and rake generates a variant of each schema task
+    /// per database: `db:migrate:primary`, `db:create:cache`, `db:drop:queue`. Fourteen base tasks
+    /// times four databases is 56 names, and enumerating them does not even work — the segment is
+    /// a key out of the app's own `config/database.yml`, so another app has `db:migrate:analytics`.
+    ///
+    /// Sound because the variant is strictly NARROWER than the base: `db:migrate:primary` migrates
+    /// one of the databases `db:migrate` migrates all of. Inheriting the base's classification is
+    /// therefore never a widening — `db:drop:cache` lands wherever `db:drop` already sits.
+    ///
+    /// Set it only where that containment argument holds. It is not a general "ignore the tail":
+    /// the suffix must be a single plain identifier, and a sub that means something DIFFERENT with
+    /// a suffix must keep declaring it separately.
+    #[serde(default)]
+    pub per_database: bool,
     #[serde(default)]
     pub candidate: Option<bool>,
     /// A facet archetype name (`archetypes.toml`) — the Phase-1 successor to `candidate = true`:
@@ -853,10 +871,24 @@ pub(super) struct FlagProvenance {
     pub when_absent: bool,
 }
 
+/// How a sub's declared name is matched. An enum rather than a bool because the two are genuinely
+/// different matching MODES, and because a third boolean on `SubSpec` is the point at which the
+/// struct stops being readable — `name_match: WithDatabaseSuffix` says what `per_database: true`
+/// only implied.
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
+pub(super) enum NameMatch {
+    #[default]
+    Exact,
+    /// Also matches `name:<dbname>` for one plain identifier — see `TomlSub::per_database`.
+    WithDatabaseSuffix,
+}
+
 #[derive(Debug, Clone)]
 pub(super) struct SubSpec {
     pub name: String,
     pub kind: DispatchKind,
+    /// How this sub's name is matched against an argument.
+    pub name_match: NameMatch,
     /// The facet archetype this sub is classified as (`archetypes.toml`), if declared via
     /// `profile = …`. The engine resolves the sub to this archetype's static capability profile
     /// (`registry::sub_archetype`), deriving the verdict rather than taking a hand-marked level.

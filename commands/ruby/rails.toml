@@ -70,19 +70,53 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:version"
+per_database = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:migrate:status"
+per_database = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:create"
+per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:migrate"
+level = "SafeWrite"
+standalone = ["--help", "--trace", "-h"]
+
+# The per-database variants of db:migrate, ENUMERATED rather than declared with `per_database`.
+#
+# `db:migrate` is the one task in the family where the suffix rule is unsound: it prefixes three
+# other tasks (`db:migrate:redo`, `:reset`, `:status`), and `db:migrate:primary` is the same shape
+# as `db:migrate:redo` — a database name and a subtask name are indistinguishable. Marking it read
+# `redo` as a database and admitted a destructive `candidate` task. `filter_candidates` now refuses
+# the marking outright, so these four are written out.
+#
+# Four because a default Rails 8 app has exactly these databases: `primary` plus solid_cache,
+# solid_queue and solid_cable. An app with a custom database name (`db:migrate:analytics`) still
+# prompts — the honest limit of enumeration, and the reason the other eleven tasks use the rule.
+[[command.sub]]
+name = "db:migrate:primary"
+level = "SafeWrite"
+standalone = ["--help", "--trace", "-h"]
+
+[[command.sub]]
+name = "db:migrate:cache"
+level = "SafeWrite"
+standalone = ["--help", "--trace", "-h"]
+
+[[command.sub]]
+name = "db:migrate:queue"
+level = "SafeWrite"
+standalone = ["--help", "--trace", "-h"]
+
+[[command.sub]]
+name = "db:migrate:cable"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
@@ -98,6 +132,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:setup"
+per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
@@ -118,11 +153,13 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:schema:load"
+per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:schema:dump"
+per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
@@ -275,14 +312,17 @@ candidate = true
 
 [[command.sub]]
 name = "db:drop"
+per_database = true
 candidate = true
 
 [[command.sub]]
 name = "db:reset"
+per_database = true
 candidate = true
 
 [[command.sub]]
 name = "db:rollback"
+per_database = true
 candidate = true
 
 [[command.sub]]
@@ -291,8 +331,10 @@ candidate = true
 
 [[command.sub]]
 name = "db:migrate:redo"
+per_database = true
 candidate = true
 
 [[command.sub]]
 name = "db:migrate:reset"
+per_database = true
 candidate = true

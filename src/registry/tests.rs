@@ -2182,6 +2182,104 @@ use super::*;
         );
     }
 
+    /// Every `per_database` sub answers the same for its variants as for itself, and the suffix
+    /// is not a hole.
+    ///
+    /// Rails 8 defaults to four databases (solid_cache, solid_queue, solid_cable), so rake emits a
+    /// per-database variant of each schema task — `db:migrate:primary`, `db:create:cache`,
+    /// `db:drop:queue`. All 56 were denied while the bare task allowed. The suffix is a key from
+    /// the app's own `config/database.yml`, so it cannot be enumerated; the rule is that the
+    /// variant is strictly narrower than the base and inherits its classification.
+    ///
+    /// Enumerated over the registry rather than over a list of Rails tasks, so a sub that opts in
+    /// later is held to the same contract without anyone remembering this test.
+    #[test]
+    fn a_per_database_variant_matches_its_base_and_nothing_else() {
+        fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+            let subs: &[super::types::SubSpec] = match kind {
+                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+                _ => return,
+            };
+            for sub in subs {
+                if sub.name_match == super::types::NameMatch::WithDatabaseSuffix {
+                    out.push((cmd.to_string(), sub.name.clone()));
+                }
+                collect(cmd, &sub.kind, out);
+            }
+        }
+        let mut opted_in = Vec::new();
+        for (cmd, spec) in TOML_REGISTRY.iter() {
+            collect(cmd, &spec.kind, &mut opted_in);
+        }
+        // Eleven subs carry `per_database`; six reach the runtime registry. The other five are
+        // `candidate = true` (db:drop, db:rollback, db:reset, db:migrate:redo, db:migrate:reset),
+        // which is a compile-time marker for "above the line" and never becomes a runtime sub — so
+        // the flag is inert on them and their variants deny as unknown subs, which is the answer
+        // we want anyway. They keep the marking because the variants DO exist upstream, and if a
+        // base is ever reclassified its variants should follow without a second edit.
+        //
+        // `db:migrate` is deliberately NOT among them, which is why `db:migrate:primary` — the
+        // most common variant of all — still denies. It prefixes `db:migrate:redo`/`:reset`/
+        // `:status`, so a suffix cannot be told from a subtask name; `filter_candidates` refuses
+        // the marking outright. See TODO.md.
+        assert!(
+            opted_in.len() >= 6,
+            "only {} per_database subs found — the registry walk is wrong",
+            opted_in.len()
+        );
+        // `db:migrate`'s four variants are ENUMERATED rather than rule-matched, because that one
+        // task prefixes three others. Asserted here so the two mechanisms are held to the same
+        // outcome, and so deleting the enumeration is caught.
+        for db in ["primary", "cache", "queue", "cable"] {
+            assert!(
+                crate::command_verdict(&format!("rails db:migrate:{db}")).is_allowed(),
+                "`rails db:migrate:{db}` is a per-database migrate and must classify as db:migrate"
+            );
+        }
+        // …and the sibling TASKS that make the rule unsound for db:migrate must stay denied. If
+        // someone ever gets `per_database` onto db:migrate past the build check, this fails.
+        for task in ["db:migrate:redo", "db:migrate:reset"] {
+            assert_eq!(
+                crate::command_verdict(&format!("rails {task}")),
+                crate::verdict::Verdict::Denied,
+                "`rails {task}` is a destructive subtask, not a database name"
+            );
+        }
+
+        // The candidate half, asserted directly since the walk cannot see it.
+        for denied in ["db:drop:cache", "db:rollback:primary", "db:reset:queue"] {
+            assert_eq!(
+                crate::command_verdict(&format!("rails {denied}")),
+                crate::verdict::Verdict::Denied,
+                "`rails {denied}` must stay denied with its base"
+            );
+        }
+
+        for (cmd, base) in &opted_in {
+            let bare = crate::command_verdict(&format!("{cmd} {base}"));
+            // A real database name inherits the base's answer, whatever that answer is: an
+            // allowed base stays allowed and a denied one (db:drop, db:rollback) stays denied.
+            for db in ["primary", "cache", "queue", "cable", "analytics", "reporting_2"] {
+                assert_eq!(
+                    crate::command_verdict(&format!("{cmd} {base}:{db}")),
+                    bare,
+                    "`{cmd} {base}:{db}` must classify as `{cmd} {base}`"
+                );
+            }
+            // …and the suffix is ONE plain identifier, not "anything after a colon". A
+            // substitution reaches dispatch already rewritten to the CMDSUB sentinel, which is
+            // alphanumeric-and-underscore and passed the character test on its own — so an opaque
+            // value must be rejected explicitly or `db:migrate:$(x)` rides in as a variant.
+            for hostile in ["$(id)", "`id`", "$DB", "../etc", "a/b", "nope:extra", ""] {
+                assert_eq!(
+                    crate::command_verdict(&format!("{cmd} {base}:{hostile}")),
+                    crate::verdict::Verdict::Denied,
+                    "`{cmd} {base}:{hostile}` is not a database name and must not inherit the base"
+                );
+            }
+        }
+    }
+
     /// Credential-EXPOSURE corpus ratchet — the ARGUMENT-layer complement to
     /// `credential_smelling_subs_are_classified_or_grandfathered` (which guards sub NAMES). A
     /// secret-store read whose credential signal lives in the ARGUMENT (`vault kv get secret/x`) or in

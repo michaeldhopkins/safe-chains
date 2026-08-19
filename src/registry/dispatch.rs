@@ -8,6 +8,26 @@ use super::{CMD_HANDLERS, SUB_HANDLERS};
 
 type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 
+/// The `per_database` sub that `arg` is a variant of: `arg` is `<sub.name>:<dbname>`.
+///
+/// The suffix must be ONE plain identifier — the shape of a key in `config/database.yml`. That is
+/// what keeps this from degenerating into "ignore anything after a colon": a further `:` would
+/// name a different task, and a suffix carrying a `/`, a space or a substitution is not a database
+/// name and must not inherit a schema task's classification.
+fn per_database_variant<'a>(subs: &'a [SubSpec], arg: &str) -> Option<&'a SubSpec> {
+    let (base, dbname) = arg.rsplit_once(':')?;
+    let plain = !dbname.is_empty()
+        && dbname.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    // The character test alone is not enough, and failing to say so was a fail-open in the first
+    // cut of this: a substitution reaches dispatch already rewritten to `__SAFE_CHAINS_CMDSUB__`,
+    // which is alphanumeric-and-underscore and sailed straight through as a "plain identifier".
+    // `db:migrate:$(anything)` was admitted as a per-database variant.
+    if !plain || crate::cst::check::is_opaque_value(dbname) {
+        return None;
+    }
+    subs.iter().find(|s| s.name_match == NameMatch::WithDatabaseSuffix && s.name == base)
+}
+
 fn short_flag_char(s: &str) -> Option<char> {
     let bytes = s.as_bytes();
     if bytes.len() == 2 && bytes[0] == b'-' && bytes[1] != b'-' {
@@ -198,6 +218,13 @@ fn dispatch_branching(
         }
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
+        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
+    }
+    // A per-database variant: `db:migrate:primary` is `db:migrate` aimed at one of the databases
+    // it would otherwise migrate all of. Only subs that OPT IN (`per_database`) match this way,
+    // and only for a single trailing plain identifier — see `TomlSub::per_database` for why the
+    // set cannot be enumerated and why inheriting the base's classification cannot widen it.
+    if let Some(sub) = per_database_variant(subs, arg) {
         return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
     }
     let glob_match = |p: &str| match p.strip_suffix('*') {
