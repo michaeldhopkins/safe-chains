@@ -211,20 +211,18 @@ role = "credential-store"
 os = ["linux"]
 note = "A process's argv, which routinely carries tokens passed as flags (`--password`, `--token`)."
 researched = "2026-08-12"
-[[region]]
-path = "~/.local/state/safe-chains/"
-role = "credential-store"
-note = """
-safe-chains' own decision log. It records every command it classified, verbatim and by design —
-`--log-everything` was specified as logging the whole line without redaction, on the grounds that
-it is opt-in — so it accumulates whatever secrets appeared on a command line: tokens passed as
-flags, env prefixes, here-doc bodies.
+# NOT shielded: safe-chains' own decision log at `~/.local/state/safe-chains/`.
+#
+# It was, for one release. The reasoning — it records command lines verbatim, so it accumulates
+# whatever secrets appeared on one — is true and was the wrong call anyway. Logging is entirely
+# opt-in. Someone who turns it on has already weighed that trade and did it in order to READ the
+# result, so shielding the file removes the only reason it exists. Every question asked of it ("why
+# was this denied", "what is prompting most") needs a manual approval, which is the feature
+# defeating itself.
+#
+# The general rule stands and covers this: an ordinary file under `~` reads, a credential store
+# does not. The log is not a credential store — it is a log the user asked for.
 
-That makes it a credential store we KNOW the contents of rather than one we guess at, and the one
-file the classifier is directly responsible for creating. It surfaced as readable in the diff
-against 0.226.0, alongside the ordinary home reads this release intends.
-"""
-researched = "2026-08-12"
 [[region]]
 path = "/var/log/auth.log"
 role = "credential-store"

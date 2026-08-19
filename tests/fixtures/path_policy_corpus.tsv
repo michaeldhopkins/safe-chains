@@ -51,10 +51,10 @@ allow	read-temp	cat /var/tmp/x
 allow	read-home	cat ~/notes.txt
 allow	read-home	cat ~/Downloads/statement.pdf
 allow	read-home	cat ~/.grok/config.toml
-# Moved from read-home/allow: the decision log records every classified command verbatim, by an
-# explicit design decision not to redact, so it accumulates whatever secrets reached a command
-# line. It is the one credential store whose contents safe-chains creates itself.
-deny	read-shield	cat ~/.local/state/safe-chains/log.jsonl
+# The decision log reads. It holds whatever secrets reached a command line, and logging is opt-in:
+# someone who enabled it did so to READ the result, and shielding it made every question asked of
+# the log need a manual approval.
+allow	read-home	cat ~/.local/state/safe-chains/log.jsonl
 allow	read-home	cat ~/Library/LaunchAgents/com.example.plist
 allow	read-home	cat ~/.claude/CLAUDE.md
 allow	read-home	cat ~/.zshrc
