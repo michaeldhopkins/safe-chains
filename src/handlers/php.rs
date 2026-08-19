@@ -59,6 +59,45 @@ pub fn is_safe_php(tokens: &[Token]) -> Verdict {
     };
     let arg_str = arg.as_str();
 
+    // `-l` / `--syntax-check` PARSES each operand and reports syntax errors. It does NOT run the
+    // file — verified against php 8: a script whose body echoes prints only "No syntax errors
+    // detected". So this is a READ of each operand, gated by locus like any other reader, and not
+    // the code-execution surface a bare script path is.
+    //
+    // Found by the decision log: `php -l <file>` was denied while `ruby -c` and `node --check` —
+    // the same operation in two other languages — were both allowed. The TOML fallback covers the
+    // no-operand diagnostics (`--version`, `-i`, `-m`) at `max_positional = 0`, so a lint with a
+    // file could not be expressed there.
+    //
+    // At least one operand required. Bare `php -l` lints STDIN, which is harmless but is also a
+    // form nobody types deliberately; refusing it keeps this narrow.
+    if matches!(arg_str, "-l" | "--syntax-check") {
+        let files = &tokens[i + 1..];
+        if files.is_empty() {
+            return Verdict::Denied;
+        }
+        // Every remaining token must be a plain FILE. Treating them all as path operands and
+        // gating them as reads was a fail-open: `php -l -S localhost:8080` gated `-S` and
+        // `localhost:8080` as two worktree-relative reads and approved — while php really does
+        // start the built-in HTTP server, verified listening on the port. `-S` is out of coverage
+        // and has its own denied! case; the lint branch was walking around it.
+        //
+        // Rejecting every dash-led token rather than the known-dangerous ones, because that is the
+        // allowlist-shaped rule: `-l` takes files. It costs `php -l -f x.php`, which does lint
+        // (checked) but is a form nobody needs when `php -l x.php` is right there.
+        if files.iter().any(|f| f.as_str().starts_with('-')) {
+            return Verdict::Denied;
+        }
+        let mut level = SafetyLevel::Inert;
+        for f in files {
+            match crate::engine::resolve::read_content_verdict(f.as_str()) {
+                Verdict::Denied => return Verdict::Denied,
+                Verdict::Allowed(l) => level = level.max(l),
+            }
+        }
+        return Verdict::Allowed(level);
+    }
+
     // Bare diagnostic flag as the final token: probe the [command.fallback]
     // grammar with a synthetic two-token slice so `php -d X=1 --version`
     // is validated the same way as `php --version`.
@@ -201,6 +240,14 @@ mod tests {
         php_artisan_cache_clear_with_tags: "php artisan cache:clear --tags=foo --store=file",
         php_artisan_cache_clear_tags_only: "php artisan cache:clear --tags=foo",
         php_artisan_cache_clear_tags_space: "php artisan cache:clear --tags foo",
+        // `-l` parses and reports syntax errors WITHOUT running the file (verified on php 8: a
+        // script whose body echoes prints only "No syntax errors detected"). It is the same
+        // operation as `ruby -c` and `node --check`, both of which were already allowed — the
+        // decision log caught php being the odd one out.
+        php_lint: "php -l pages/team.php",
+        php_lint_long: "php --syntax-check pages/team.php",
+        php_lint_after_ini: "php -d memory_limit=512M -l pages/team.php",
+        php_lint_several: "php -l a.php b.php",
     }
 
     denied! {
@@ -215,6 +262,16 @@ mod tests {
         php_d_no_equals: "php -d memory_limit artisan view:clear",
         php_d_attached_unsafe: "php -dauto_prepend_file=/tmp/x artisan view:clear",
         php_d_consumes_artisan: "php -d artisan view:clear",
+        // A lint still READS its operand, so the operand is gated like any other read.
+        // And a FLAG after `-l` is not a file: `php -l -S localhost:8080` really does start the
+        // built-in server (verified listening on the port) — the first cut of the lint branch
+        // gated `-S` and the host:port as two worktree reads and approved it.
+        php_lint_then_server: "php -l -S localhost:8080",
+        php_lint_then_run_code: "php -l -r 'system(id);'",
+        php_lint_then_f: "php -l -f evil.php",
+        php_lint_shielded_file: "php -l ~/.ssh/id_rsa",
+        php_lint_system_secret: "php -l /etc/shadow",
+        php_lint_no_operand: "php -l",
         php_built_in_server: "php -S localhost:8000",
         php_built_in_server_with_t: "php -S localhost:8000 -t public",
         php_help_then_extra: "php --help artisan",
