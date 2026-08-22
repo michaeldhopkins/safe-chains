@@ -566,7 +566,7 @@ mod tests {
         assert!(check(&toks(&["echo", "--foo=bar"]), &BOTH_TOLERANCES_POLICY));
     }
 
-    // ============ Narrow tolerance: short-only ============
+    // Narrow tolerance: short-only
     // tolerate_unknown_short = true accepts unknown single-dash tokens
     // (-X, -mayDie, -help) as positional, while leaving double-dash unknowns
     // strict. This is the safer setting because most modern destructive
@@ -608,7 +608,7 @@ mod tests {
         assert!(check(&toks(&["sample", "--help"]), &SHORT_ONLY_POLICY));
     }
 
-    // ============ Narrow tolerance: long-only ============
+    // Narrow tolerance: long-only
     // tolerate_unknown_long = true accepts unknown double-dash tokens as
     // positional. This is the dangerous form; reserved for tools like AWS
     // CLI whose long-flag surface is genuinely unbounded.
@@ -639,7 +639,7 @@ mod tests {
         assert!(!check(&toks(&["aws", "-x"]), &LONG_ONLY_POLICY));
     }
 
-    // ============ Both tolerances false: strict ============
+    // Both tolerances false: strict
 
     static STRICT_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&["--help"]),

@@ -1,7 +1,7 @@
 # Delegation & supply-chain provenance — deep-dive (spec v1.1)
 
 Status: draft (2026-07-01). Deepens R1 (delegation) and refines F6 (execution
-provenance) from the Stage-2 pilot. Feeds back into `behavioral-taxonomy-v1.md`.
+provenance) from the Stage-2 pilot. Feeds back into `behavioral-taxonomy-v1.4.md`.
 
 Two subjects, one theme: a command's real behavior often lives in code it *runs
 on your behalf* — a nested command, a remote shell, a downloaded package. Both

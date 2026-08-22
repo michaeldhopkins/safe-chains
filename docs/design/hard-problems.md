@@ -1,7 +1,7 @@
 # Hard Problems & Open Interactions — a running log
 
 **Living document.** Problems the behavioral capability model
-(`behavioral-taxonomy-v1.1.md`) does not yet capture — cross-command
+(`behavioral-taxonomy-v1.4.md`) does not yet capture — cross-command
 interactions, runtime-dependent facts, and modeling gaps we've noticed but not
 resolved. This is a *notebook*, not a spec: entries are here to be remembered and
 returned to, not because we have answers. Add freely; promote to a spec section

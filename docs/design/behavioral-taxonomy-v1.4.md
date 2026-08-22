@@ -1,6 +1,6 @@
 # Behavioral Capability Model — spec v1.4 (canonical)
 
-Status: canonical draft (2026-07-07). Supersedes `behavioral-taxonomy-v1.3.md`.
+Status: canonical (2026-07-07). Consolidates the v1–v1.3 line, now removed.
 Consolidates the level work done since v1.3 — the full default level set, the
 level-authoring rule, containment resolved to a modifier, and the golden-set as the
 concrete answer key — into one clean canon. Carries the whole v1.3 model (three

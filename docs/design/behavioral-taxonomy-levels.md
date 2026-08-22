@@ -1,7 +1,7 @@
 # Safety Levels — Stage 3 design
 
 Status: draft (2026-07-03; level set revised 2026-07-07). Stage 3 of the behavioral
-capability model (`behavioral-taxonomy-v1.1.md`, §4). Designs the concrete default
+capability model (`behavioral-taxonomy-v1.4.md`, §4). Designs the concrete default
 levels as predicates over the 12 facets and measures them against today's behavior as
 an impact baseline (not a spec to reproduce). The default ladder is now authored in
 `levels/default.toml` and enforced by the engine — see §0 for the finalized names and shape.

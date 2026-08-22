@@ -1,7 +1,7 @@
 # Information flow & taint — how the model handles data flow
 
 Status: draft (2026-07-01). Adds a flow layer over the per-command profile model.
-Feeds `behavioral-taxonomy-v1.md`. References collected in `reading-list.md`.
+Feeds `behavioral-taxonomy-v1.4.md`. References collected in `reading-list.md`.
 
 ## 1. Safety is often a property of *flows*, not commands
 
