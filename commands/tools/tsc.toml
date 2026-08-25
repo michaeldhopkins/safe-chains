@@ -15,8 +15,17 @@ standalone = [
     "--version",
     "-h", "-v",
 ]
+# Short spellings sit beside their long forms. `tsc --help` gives them as pairs — `--project, -p`,
+# `--target, -t`, `--module, -m` — and they are the same flag, so allowing one spelling and not the
+# other refuses the operation on syntax rather than on behaviour. `npx tsc -p tsconfig.test.json
+# --noEmit` prompted for exactly that reason while `--project` did not.
+#
+# Not added: `-w`/`--watch`, `-b`/`--build`, `-d`/`--declaration`. Those are absent in BOTH
+# spellings and deliberately so — watch is long-running, and build and declaration emit files,
+# which `require_any = --noEmit` exists to prevent.
 valued = [
     "--baseUrl", "--jsx", "--lib", "--module",
     "--moduleResolution", "--project",
     "--rootDir", "--target",
+    "-m", "-p", "-t",
 ]

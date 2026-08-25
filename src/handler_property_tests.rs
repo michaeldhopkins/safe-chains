@@ -2008,6 +2008,17 @@ const FORM_CASES: &[FormCase] = &[
         tail: "file.txt",
         values: &["foo", "^bar$", "a.*b"],
     },
+    // `--project` was declared and `-p` was not, so `npx tsc -p tsconfig.test.json --noEmit`
+    // prompted while the identical `--project` spelling did not. Reported from real use. The two
+    // are one flag — `tsc --help` prints them as a pair — so refusing one is refusing the
+    // operation on syntax rather than behaviour.
+    FormCase {
+        cmd: "tsc",
+        short: "-p",
+        long: "--project",
+        tail: "--noEmit",
+        values: &["tsconfig.json", "tsconfig.test.json"],
+    },
 ];
 
 fn form_combos() -> Vec<(String, String, String, String, String)> {
