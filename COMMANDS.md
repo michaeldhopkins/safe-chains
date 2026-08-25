@@ -8703,10 +8703,18 @@ Aliases: `mlocate`, `plocate`
 <p class="cmd-url"><a href="https://ss64.com/mac/log.html">https://ss64.com/mac/log.html</a></p>
 
 - **help**: Flags: --help, -h
-- **show**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --no-pager, --signpost, -h. Valued: --color, --end, --last, --predicate, --process, --source, --start, --style, --type
-- **stats**: Flags: --help, -h
-- **stream**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --signpost, -h. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
+- **show**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --no-backtrace, --no-debug, --no-info, --no-loss, --no-pager, --no-signpost, --pager, --realtime, --signpost, --source, --unreliable, -h. Valued: --color, --directory, --end, --last, --predicate, --process, --start, --style, --timezone, --type
+- **stats**: Flags: --help, --no-pager, --overview, --pager, --per-book, --per-file, -h. Valued: --archive, --count, --end, --last, --predicate, --process, --sender, --sort, --start, --style
+- **stream**: Flags: --backtrace, --debug, --help, --ignore-dropped, --info, --loss, --mach-continuous-time, --no-backtrace, --signpost, --source, --unreliable, -h. Valued: --color, --level, --predicate, --process, --style, --timeout, --type, --user
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `log stats --process chronod`
+- `log stats --per-book --count all --sort bytes`
+- `log show --last 5m --style json`
+- `log show --source --last 5m`
+- `log stream --level info --timeout 5s`
 
 ### `logger`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/logger.1.html">https://keith.github.io/xcode-man-pages/logger.1.html</a></p>
@@ -15741,7 +15749,7 @@ Aliases: `gtrue`
 <p class="cmd-url"><a href="https://www.typescriptlang.org/docs/handbook/compiler-options.html">https://www.typescriptlang.org/docs/handbook/compiler-options.html</a></p>
 
 - Requires --help, --noEmit, --version, -h, -v. - Allowed standalone flags: --allowJs, --checkJs, --esModuleInterop, --forceConsistentCasingInFileNames, --help, --incremental, --isolatedModules, --noEmit, --noFallthroughCasesInSwitch, --noImplicitAny, --noImplicitReturns, --noUnusedLocals, --noUnusedParameters, --pretty, --resolveJsonModule, --skipLibCheck, --strict, --strictNullChecks, --version, -h, -v
-- Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target
+- Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target, -m, -p, -t
 
 ### `tshark`
 <p class="cmd-url"><a href="https://www.wireshark.org/docs/man-pages/tshark.html">https://www.wireshark.org/docs/man-pages/tshark.html</a></p>

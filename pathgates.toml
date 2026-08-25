@@ -999,3 +999,23 @@ shape = "last_write"
 
 [roles."djxl"]
 shape = "last_write"
+
+# `log show` reads a .logarchive — as a positional (`log show ./x.logarchive`), or named by
+# `--directory`; `log stats` names one with `--archive`.
+#
+# `read`, NOT `read_tree`, even though the value is a directory. read_tree is for a root the
+# command descends and renders whatever it finds (`rg foo ~`), and log does not: pointed at an
+# ordinary directory it exits with "did not refer to a valid log archive" and emits nothing.
+# Measured — a canary file in the target directory does not appear in the output. Gating it as a
+# sweep would have denied `log show --directory ~/Desktop/sys.logarchive`, an ordinary read, while
+# buying no disclosure protection. `read` still puts the named path under the credential shield.
+#
+# Only `show` needs a positional gate, which is why its non-path valued flags are spelled out as
+# `ignore` — under a positional gate the walk treats an undeclared valued flag's value as a path,
+# and `--predicate` carries a filter expression, not a filename.
+[roles."log show"]
+positional = "read"
+flags = { "--directory" = "read", "--color" = "ignore", "--end" = "ignore", "--last" = "ignore", "--predicate" = "ignore", "--process" = "ignore", "--start" = "ignore", "--style" = "ignore", "--timezone" = "ignore", "--type" = "ignore" }
+
+[roles."log stats"]
+flags = { "--archive" = "read" }

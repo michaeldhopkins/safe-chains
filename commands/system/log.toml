@@ -1,35 +1,69 @@
 [[command]]
 name = "log"
-description = "macOS unified logging system CLI (/usr/bin/log) for querying Apple's binary log store, which aggregates messages from the kernel, system services, and applications across all Apple platforms. The show subcommand queries historical logs with predicate-based filtering; stream provides real-time log output; stats reports log store statistics. All three are read-only operations against the local log archive. The uncovered collect subcommand can write .logarchive files to disk, and config can adjust logging levels. Logs may contain sensitive system data but are read from existing stores, not generated. Privacy-sensitive fields are redacted by default (shown as <private>). The interface ships with macOS and evolves with OS releases."
+description = "macOS unified logging system CLI (/usr/bin/log) for querying Apple's binary log store, which aggregates messages from the kernel, system services, and applications across all Apple platforms. show queries historical logs with predicate-based filtering; stream follows them in real time; stats reports log-store size and event counts. All three observe an existing store rather than generating one, and none of them writes. Three of the subcommands name a filesystem path to read: show takes an optional positional .logarchive, show --directory names an archive directory, and stats --archive names one; each reads the whole tree beneath what it is given, so the path is the operation's real subject. Logs carry system-wide data from every process on the machine, but privacy-sensitive interpolated fields are redacted by the emitter and render as <private> unless a configuration profile has enabled them. The uncovered subcommands are meaningfully different: collect writes a .logarchive to disk, config reconfigures logging levels persistently for future boots, erase destroys the store irreversibly, repack rewrites archives, diagnose collects and can transmit a system report, and emit injects records into the store. The interface ships with macOS and evolves with OS releases; the flag surface has been stable across recent ones."
 url = "https://ss64.com/mac/log.html"
+researched_version = "/usr/bin/log on macOS (Darwin 25.5.0), flags probed against the live binary 2026-08-24"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "log stats --process chronod",
+    "log stats --per-book --count all --sort bytes",
+    "log show --last 5m --style json",
+    "log show --source --last 5m",
+    "log stream --level info --timeout 5s",
+]
+examples_denied = [
+    "log collect --output /tmp/x.logarchive",
+    "log config --mode level:debug",
+    "log erase --all",
+    "log show --directory ~/.ssh",
+]
 
+# `--source`, `--realtime` and `--unreliable` are annotation switches, NOT valued flags, however
+# much they read like they name a thing. This entry declared `--source` as valued, which makes it
+# swallow the following token: `log show --source --last 5m` consumed `--last` and left `5m` as a
+# bare positional. The gate is not what saves that — `positional = "read"` catches the orphaned
+# value either way (measured) — so the arity is worth getting right on its own account, not as a
+# security fix.
 [[command.sub]]
 name = "show"
 standalone = [
-    "--backtrace", "--debug", "--help", "--info", "--loss", "--mach-continuous-time",
-    "--no-pager", "--signpost", "-h",
+    "--backtrace", "--debug", "--help", "--info", "--loss",
+    "--mach-continuous-time", "--no-backtrace", "--no-debug", "--no-info",
+    "--no-loss", "--no-pager", "--no-signpost", "--pager", "--realtime",
+    "--signpost", "--source", "--unreliable", "-h",
 ]
 valued = [
-    "--color", "--end", "--last", "--predicate",
-    "--process", "--source", "--start", "--style", "--type",
+    "--color", "--directory", "--end", "--last", "--predicate",
+    "--process", "--start", "--style", "--timezone", "--type",
 ]
 
 [[command.sub]]
 name = "stream"
 standalone = [
-    "--backtrace", "--debug", "--help", "--info", "--loss",
-    "--mach-continuous-time", "--signpost", "-h",
+    "--backtrace", "--debug", "--help", "--ignore-dropped", "--info",
+    "--loss", "--mach-continuous-time", "--no-backtrace", "--signpost",
+    "--source", "--unreliable", "-h",
 ]
 valued = [
     "--color", "--level", "--predicate", "--process",
-    "--source", "--style", "--timeout", "--type",
+    "--style", "--timeout", "--type", "--user",
 ]
 
 [[command.sub]]
 name = "help"
 standalone = ["--help", "-h"]
 
+# `stats` carried only `--help`, so every real invocation of it denied — `log stats --process
+# chronod` is what surfaced this. Its modes (`--overview`/`--per-book`/`--per-file`) are switches;
+# `--sender`/`--process`/`--predicate` are filters that take a value despite `log stats --help`
+# printing them under "modes" rather than "options".
 [[command.sub]]
 name = "stats"
-standalone = ["--help", "-h"]
+standalone = [
+    "--help", "--no-pager", "--overview", "--pager",
+    "--per-book", "--per-file", "-h",
+]
+valued = [
+    "--archive", "--count", "--end", "--last", "--predicate",
+    "--process", "--sender", "--sort", "--start", "--style",
+]
