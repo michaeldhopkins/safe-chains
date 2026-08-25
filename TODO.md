@@ -643,8 +643,64 @@ Swept clean this pass, both negative results worth keeping:
     Reading a file into a parser is not disclosure; only content flowing OUT is.
   - Content-to-model disclosure. jq -f, xargs -a, base64, xxd, column, expand, fold, nl, rev, tac,
     paste, pr against ~/.ssh/id_rsa — every one denies, as does the `cat` control.
+    **Superseded in part — see "Parsers that echo on error" below. That probe population was all
+    DUMPERS, every one of which is modelled and gated. It never asked what a PARSER prints when it
+    fails, and that is a different population with a different answer.**
   - Exfil (local secret to a remote). curl -T / -d @ / -F / --upload-file, scp, rsync remote,
     aws s3 cp, gh release upload, http POST @, wget --post-file — all eleven deny.
+
+### Parsers that echo on error — a SECOND disclosure predicate (found 2026-08-24)
+
+The claim above that the only predicate worth sweeping is "reaches an EXECUTION sink" is too narrow.
+There is a second one, and `tsc` was a live instance of it in shipped 0.228.0:
+
+```
+tsc --project ~/.aws/credentials --noEmit --pretty
+```
+
+`--noEmit` stops tsc WRITING; it does not stop it READING, and a parser reports errors by quoting
+the line it choked on. In pretty mode (the default when stdout is a terminal) that quoting prints
+the file's content. Measured with a canary AWS key: it came back seven times. Now gated —
+`commands/tools/tsc.toml` carries a `path_gate` on `--project`/`-p` and its positionals.
+
+So the predicate is: **an ungated path argument on a tool whose DIAGNOSTICS quote source text.**
+It is not covered by the dumper probe above, because the population is different — linters,
+compilers and formatters, whose job is reading files someone else wrote and which therefore mostly
+have no path model at all.
+
+Unverified candidates, all of which currently auto-approve against `~/.ssh/id_rsa` and all of which
+are believed to print the offending line: `shellcheck`, `ruff check`, `eslint`, `mypy`, `yamllint`,
+`swiftlint lint`, `stylelint`. NONE of these was confirmed — none is installed on the machine where
+this was found, so the echo behaviour is an assumption in every case and the list is a place to
+start, not a finding. `jq`, `rustc`, `gcc -fsyntax-only` and `prettier` already deny.
+
+The sweep wants the same shape as the output-flag one: enumerate commands whose positionals or path
+flags are ungated, keep those documented to render source context in diagnostics (`--pretty`,
+`--show-source`, caret output), gate them `read`, and put the verified non-echoers on a worklist
+fixture so the guard stays green for a stated reason rather than by omission.
+
+#### And a THIRD predicate underneath it: a prefix the TOOL strips
+
+`tsc @FILE` is a response file — tsc opens FILE and splices its contents in as arguments, naming
+each token it cannot resolve. The gate judged the literal token `@/path`, but the path the tool
+opens is `/path`, so the two disagreed and every shield anchored to a LOCATION was slipped. Shields
+matched by NAME segment (`.ssh`, `.npmrc`) bit straight through the prefix — which is exactly what
+made this hard to see, because the paths anyone would reach for first still denied. Measured at
+**40** region paths once a guard enumerated them, against 7 found by hand.
+
+Fixed for tsc (`tsc_response_file` in `src/pathgate.rs`), and the guard
+`a_response_file_argument_is_gated_as_the_path_it_names` now holds `@X` and `X` to the same answer
+for every path in `regions/default.toml`.
+
+The general problem is bigger than `@`, and is NOT swept: any argument whose literal spelling is not
+the path the tool opens. The obvious siblings were checked and are NOT exposed — `clang`, `gcc` and
+`ld` share the `@file` convention but already refuse the form for other reasons, and `javac` is not
+in the corpus. So tsc was the live one, not the first of many.
+
+What remains open is the shape, not a backlog: any tool taking a `prefix:path` or `sigil+path` form
+the resolver does not decompose. The invariant to sweep for is the one the new guard states: **the
+string the gate judges must be the string the tool opens.** Where a command's grammar rewrites its
+argument, that rewriting has to happen before the gate, not after.
 
 So the remaining campaign is bounded: find flag values that reach an EXECUTION sink. The two tags
 (`twin_flag`/`twin_base`, `CONFIG_IS_CODE`) cover the members already known. What neither does is

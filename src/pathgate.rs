@@ -579,6 +579,7 @@ mod handlers {
         "ncu_mode",
         "rdfind_mode",
         "textutil_mode",
+        "tsc_response_file",
         "xattr_mode",
     ];
 
@@ -592,6 +593,7 @@ mod handlers {
             "ncu_mode" => ncu_mode(tokens),
             "rdfind_mode" => rdfind_mode(tokens),
             "textutil_mode" => textutil_mode(tokens),
+            "tsc_response_file" => tsc_response_file(tokens),
             "xattr_mode" => xattr_mode(tokens),
             // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
             // misconfigured name so a typo can never silently ungate a command.
@@ -641,6 +643,30 @@ mod handlers {
         // r/q archive real files given as members — a sensitive member is a disclosing read.
         matches!(op, Some(b'r' | b'q'))
             && positionals.iter().skip(archive_idx + 1).any(|m| gate(Role::Read, m))
+    }
+
+    /// `tsc @FILE` — a RESPONSE FILE: tsc opens FILE and splices its contents in as arguments.
+    ///
+    /// The declarative gate cannot see this, because the token it judges is `@/path`, and `@/path`
+    /// is not the path — the tool strips the `@`. The shields that match on a NAME segment
+    /// (`.ssh`, `.npmrc`) still fired through the prefix, which is what made the gap easy to miss;
+    /// the ones anchored to a location (`~/.cargo/credentials`, `~/.m2/settings.xml`,
+    /// `~/.gradle/gradle.properties`, `~/.composer/auth.json`, `~/.gem/credentials`, `~/.azure/`)
+    /// did not, and all six admitted `tsc @<that file>`.
+    ///
+    /// It discloses: tsc reports each token it cannot resolve as `error TS6231: Could not resolve
+    /// the path 'X'`, so the file comes back a word at a time. Unlike the `--pretty` quoting this
+    /// command's other gate covers, this needs no flag at all. Measured with a canary.
+    ///
+    /// Gates every `@`-prefixed argument, not only positionals: tsc accepts one anywhere on the
+    /// line. Composes with tsc's co-located `[command.path_gate]` rather than replacing it —
+    /// `should_deny` ORs the central and co-located gates, so the flag/positional roles stay
+    /// declared as data in `commands/tools/tsc.toml`.
+    fn tsc_response_file(tokens: &[Token]) -> bool {
+        tokens[1..]
+            .iter()
+            .filter_map(|t| t.as_str().strip_prefix('@'))
+            .any(|path| gate(Role::Read, path))
     }
 
     /// `xattr [-lrsvx] [-p NAME | -w NAME VALUE | -d NAME | -c] file…` — the extended-attribute
@@ -1121,6 +1147,52 @@ mod tests {
              a key with more than two parts gates NOTHING while looking like a gate:\n{}",
             unreachable.len(),
             unreachable.iter().map(|k| format!("  [roles.\"{k}\"]")).collect::<Vec<_>>().join("\n"),
+        );
+    }
+
+    /// A response-file argument must be gated exactly as the same path written bare.
+    ///
+    /// `tsc @FILE` splices FILE's contents in as arguments and names each token it cannot resolve
+    /// in an error, so the file comes back a word at a time. The `@` makes the token the gate
+    /// judges (`@/path`) differ from the path the tool opens (`/path`), and that slipped every
+    /// shield anchored to a LOCATION — `~/.cargo/credentials`, `~/.m2/settings.xml`,
+    /// `~/.gradle/gradle.properties`, `~/.composer/auth.json`, `~/.gem/credentials`, `~/.azure/`
+    /// all admitted the `@` form while refusing the bare one. Segment-matched shields (`.ssh`,
+    /// `.npmrc`) matched through the prefix, which is what made the gap easy to miss: the paths
+    /// anyone would reach for first were still covered.
+    ///
+    /// Witnesses come from `declared_region_paths()` rather than a hand-picked list, so a newly
+    /// declared shield is checked the moment it exists. The property is AGREEMENT, not denial:
+    /// asserting "`@X` denies" would pass vacuously if the gate ever started denying everything,
+    /// and would have to be edited every time a region's role changed.
+    #[test]
+    fn a_response_file_argument_is_gated_as_the_path_it_names() {
+        let witnesses = crate::engine::resolve::regions::declared_region_paths();
+        let mut checked = 0usize;
+        let mut disagreements = Vec::new();
+        for raw in &witnesses {
+            // Region paths are shapes, not files: a bare segment (`.ssh`) needs a home to sit in,
+            // and a trailing-slash prefix needs a leaf under it.
+            let path = match raw {
+                p if p.starts_with('~') || p.starts_with('/') => {
+                    format!("{}{}", p.trim_end_matches('/'), if p.ends_with('/') { "/x" } else { "" })
+                }
+                p => format!("~/{p}/x"),
+            };
+            let bare = should_deny("tsc", &toks(&["tsc", &path, "--noEmit"]));
+            let at = should_deny("tsc", &toks(&["tsc", &format!("@{path}"), "--noEmit"]));
+            checked += 1;
+            if bare != at {
+                disagreements.push(format!("  {path}: bare={bare} @={at}"));
+            }
+        }
+        assert!(checked > 30, "only {checked} region witnesses probed — the sweep is wrong");
+        assert!(
+            disagreements.is_empty(),
+            "`tsc @PATH` must be gated exactly as `tsc PATH`; the `@` is a prefix the TOOL strips, \
+             not part of the path ({} disagree):\n{}",
+            disagreements.len(),
+            disagreements.join("\n"),
         );
     }
 

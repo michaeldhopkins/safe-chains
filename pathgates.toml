@@ -1020,6 +1020,13 @@ flags = { "--directory" = "read", "--color" = "ignore", "--end" = "ignore", "--l
 [roles."log stats"]
 flags = { "--archive" = "read" }
 
+# `tsc @FILE` splices FILE's contents in as arguments and reports each unresolvable token back, so
+# the file is disclosed a word at a time. The `@` prefix means the declarative gate judges `@/path`
+# instead of `/path`, which slips every shield anchored to a LOCATION rather than a name. The
+# handler gates the stripped form; tsc's flag and positional roles stay declarative in its own TOML.
+[roles.tsc]
+handler = "tsc_response_file"
+
 # `ghostty +validate-config --config-file=X` parses X and reports its errors. It reads exactly the
 # file it is named, so `read` — and reading it is the whole operation, which is why it is gated at
 # all rather than ignored.

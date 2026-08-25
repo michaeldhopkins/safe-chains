@@ -669,6 +669,7 @@ Aliases: `g++`, `cc`, `c++`
 - **+show-face**: Flags: --help. Valued: --cp, --string
 - **+validate-config**: Flags: --help. Valued: --config-file
 - **+version**: Flags: --help
+- Allowed standalone flags: --help, --version
 
 **Examples:**
 
@@ -1940,6 +1941,14 @@ Aliases: `python`
 
 - Requires --help, --noEmit, --version, -h, -v. - Allowed standalone flags: --allowJs, --checkJs, --esModuleInterop, --forceConsistentCasingInFileNames, --help, --incremental, --isolatedModules, --noEmit, --noFallthroughCasesInSwitch, --noImplicitAny, --noImplicitReturns, --noUnusedLocals, --noUnusedParameters, --pretty, --resolveJsonModule, --skipLibCheck, --strict, --strictNullChecks, --version, -h, -v
 - Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target, -m, -p, -t
+
+**Examples:**
+
+- `tsc --noEmit`
+- `tsc -p tsconfig.test.json --noEmit`
+- `tsc --project ./sub/tsconfig.json --noEmit`
+- `tsc src/index.ts --noEmit --pretty`
+- `tsc -t es2020 -m esnext --noEmit`
 
 ### `tsup`
 <p class="cmd-url"><a href="https://tsup.egoist.dev/">https://tsup.egoist.dev/</a></p>

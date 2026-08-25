@@ -5,6 +5,19 @@ url = "https://www.typescriptlang.org/docs/handbook/compiler-options.html"
 level = "Inert"
 bare = false
 require_any = ["--help", "--noEmit", "--version", "-h", "-v"]
+examples_safe = [
+    "tsc --noEmit",
+    "tsc -p tsconfig.test.json --noEmit",
+    "tsc --project ./sub/tsconfig.json --noEmit",
+    "tsc src/index.ts --noEmit --pretty",
+    "tsc -t es2020 -m esnext --noEmit",
+]
+examples_denied = [
+    "tsc -p ~/.aws/credentials --noEmit --pretty",
+    "tsc ~/.ssh/id_rsa --noEmit",
+    "tsc -p tsconfig.json",
+    "tsc -w --noEmit",
+]
 standalone = [
     "--allowJs", "--checkJs", "--esModuleInterop",
     "--forceConsistentCasingInFileNames", "--help", "--incremental",
@@ -29,3 +42,16 @@ valued = [
     "--rootDir", "--target",
     "-m", "-p", "-t",
 ]
+
+# --noEmit stops tsc writing files; it does NOT stop it reading them, and tsc reports errors by
+# quoting the offending source line. With --pretty (allowed above, and the default when stdout is a
+# terminal) that quoting renders the file's CONTENT: `tsc -p ~/.aws/credentials --noEmit --pretty`
+# parses the INI as JSON and prints every line it chokes on, key material included. Measured with a
+# canary — it came back seven times.
+#
+# So the paths tsc is pointed at are the operation's real subject and are gated as `read`. The
+# enum-valued flags are spelled out as `ignore` because a positional gate treats an undeclared
+# valued flag's value as a path, and `--target es2020` names a language level, not a file.
+[command.path_gate]
+positional = "read"
+flags = { "--project" = "read", "-p" = "read", "--baseUrl" = "read", "--rootDir" = "read", "--jsx" = "ignore", "--lib" = "ignore", "--module" = "ignore", "--moduleResolution" = "ignore", "--target" = "ignore", "-m" = "ignore", "-t" = "ignore" }
