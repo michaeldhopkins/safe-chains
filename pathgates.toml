@@ -1019,3 +1019,9 @@ flags = { "--directory" = "read", "--color" = "ignore", "--end" = "ignore", "--l
 
 [roles."log stats"]
 flags = { "--archive" = "read" }
+
+# `ghostty +validate-config --config-file=X` parses X and reports its errors. It reads exactly the
+# file it is named, so `read` — and reading it is the whole operation, which is why it is gated at
+# all rather than ignored.
+[roles."ghostty +validate-config"]
+flags = { "--config-file" = "read" }

@@ -5859,6 +5859,29 @@ Aliases: `g++`, `cc`, `c++`
 
 - Allowed standalone flags: --help, --info, --numeric-version, --print-global-package-db, --print-libdir, --print-project-version, --supported-extensions, --supported-languages, --version, -?
 
+### `ghostty`
+<p class="cmd-url"><a href="https://ghostty.org/docs/help/cli">https://ghostty.org/docs/help/cli</a></p>
+
+- **+crash-report**: Flags: --help
+- **+help**: Flags: --help
+- **+list-actions**: Flags: --docs, --help
+- **+list-colors**: Flags: --help, --plain
+- **+list-fonts**: Flags: --bold, --help, --italic. Valued: --bold, --family, --italic, --style
+- **+list-keybinds**: Flags: --default, --docs, --help, --plain
+- **+list-themes**: Flags: --help, --path, --plain. Valued: --color
+- **+show-config**: Flags: --changes-only, --default, --docs, --help
+- **+show-face**: Flags: --help. Valued: --cp, --string
+- **+validate-config**: Flags: --help. Valued: --config-file
+- **+version**: Flags: --help
+
+**Examples:**
+
+- `ghostty +list-actions`
+- `ghostty +list-keybinds --default --plain`
+- `ghostty +list-fonts --family=Menlo`
+- `ghostty +show-config --changes-only`
+- `ghostty +validate-config --config-file=./ghostty.conf`
+
 ### `gif2webp`
 <p class="cmd-url"><a href="https://developers.google.com/speed/webp/docs/gif2webp">https://developers.google.com/speed/webp/docs/gif2webp</a></p>
 

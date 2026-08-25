@@ -1,0 +1,114 @@
+[[command]]
+name = "ghostty"
+description = "Ghostty terminal emulator. Invoked bare it launches the emulator, and `ghostty -e <command>` runs an arbitrary command inside the new terminal — that is a general execution surface, so no bare or `-e` form is covered here. Only the `+action` helpers are, and they divide sharply. The listing actions (+list-actions, +list-fonts, +list-themes, +list-colors, +list-keybinds, +show-face) enumerate what the binary and the host font stack already know and touch nothing; +show-config and +validate-config read the user's configuration, the latter reading whatever file --config-file names; +crash-report lists crash reports found on disk. All observe local state and none writes. The uncovered actions are genuinely different: +edit-config spawns $EDITOR, which executes a program of the environment's choosing; +new-window drives an already-running instance (and reports itself unsupported on macOS); +ssh-cache maintains the cache of remote hosts Ghostty has uploaded its terminfo to, where --add/--remove/--clear mutate that record and its own help warns that combining them is unsafe; and +boo, an easter-egg animation, is simply unresearched. Note that a top-level flag ghostty does not recognize is not an error: `-v` is not a version flag and starting the emulator from the CLI is unsupported on macOS, so such an invocation hangs rather than exiting. Note that +crash-report documents sending reports as unimplemented but planned, so a future version could transmit crash data over the network — reached only through a flag that would have to be added here first."
+url = "https://ghostty.org/docs/help/cli"
+researched_version = "Ghostty 1.3.1 (stable); +action flag surfaces probed against the live binary 2026-08-24, top-level flags taken from ghostty(1) rather than by running them — see the note below"
+bare = false
+# `--version` and `--help` print and exit (both confirmed, and ghostty(1) documents the version flag
+# as "recognized as either +version or --version"). `-v` and `-h` are NOT their short forms and are
+# deliberately absent: ghostty(1) documents no `-v` at all, and running it did not print a version —
+# it HUNG, apparently trying to start the terminal itself, which on macOS is unsupported from the
+# CLI and had to be cleaned up by hand. That is also the argument for `bare = false`: a top-level
+# flag this binary does not recognize does not error, it launches something.
+bare_flags = ["--help", "--version"]
+examples_safe = [
+    "ghostty +list-actions",
+    "ghostty +list-keybinds --default --plain",
+    "ghostty +list-fonts --family=Menlo",
+    "ghostty +show-config --changes-only",
+    "ghostty +validate-config --config-file=./ghostty.conf",
+]
+examples_denied = [
+    "ghostty -e top",
+    "ghostty +edit-config",
+    "ghostty +ssh-cache --clear",
+    "ghostty +validate-config --config-file=~/.ssh/id_rsa",
+]
+
+[[command.sub]]
+name = "+version"
+level = "Inert"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "+help"
+level = "Inert"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "+list-actions"
+level = "SafeRead"
+standalone = ["--docs", "--help"]
+
+[[command.sub]]
+name = "+list-keybinds"
+level = "SafeRead"
+standalone = ["--default", "--docs", "--help", "--plain"]
+
+[[command.sub]]
+name = "+list-colors"
+level = "SafeRead"
+standalone = ["--help", "--plain"]
+
+[[command.sub]]
+name = "+list-themes"
+level = "SafeRead"
+standalone = ["--help", "--path", "--plain"]
+valued = ["--color"]
+
+# --bold and --italic are BOOLEANS that also accept an explicit `=true`/`=false`, so they are listed
+# in both lists: standalone for the bare spelling, valued for the glued one. Declaring them valued
+# alone would make the bare form consume the following token; declaring them standalone alone would
+# refuse `--bold=true`, which ghostty accepts. Both spellings were measured against the binary.
+#
+# --family and --style genuinely take a value, and only glued — ghostty silently ignores
+# `--family Menlo` written with a space, which is why the space form is not worth modelling here.
+[[command.sub]]
+name = "+list-fonts"
+level = "SafeRead"
+standalone = ["--bold", "--help", "--italic"]
+valued = ["--bold", "--family", "--italic", "--style"]
+
+[[command.sub]]
+name = "+show-face"
+level = "SafeRead"
+standalone = ["--help"]
+valued = ["--cp", "--string"]
+
+[[command.sub]]
+name = "+show-config"
+level = "SafeRead"
+standalone = ["--changes-only", "--default", "--docs", "--help"]
+
+# `--config-file` names a file to parse, so it is gated in pathgates.toml. Validating a config
+# parses it and reports errors; it does not act on any `command =` key the file may contain.
+[[command.sub]]
+name = "+validate-config"
+level = "SafeRead"
+standalone = ["--help"]
+valued = ["--config-file"]
+
+[[command.sub]]
+name = "+crash-report"
+level = "SafeRead"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "+edit-config"
+candidate = true
+description = "Opens the configuration in $EDITOR, executing whatever program the environment names."
+
+[[command.sub]]
+name = "+new-window"
+candidate = true
+description = "Drives an already-running Ghostty instance to open a window; reports itself unsupported on macOS."
+
+[[command.sub]]
+name = "+ssh-cache"
+candidate = true
+description = "Maintains the record of remote hosts Ghostty has uploaded its terminfo to; --add/--remove/--clear mutate it, and upstream warns that combining them is unsafe."
+
+[[command.sub]]
+name = "+boo"
+candidate = true
+description = "Displays the Ghostty website's animation in the terminal. Left uncovered because its termination and output behaviour were never established, not because an animation is itself a hazard — this project allows plenty of commands that run until interrupted (tail -f, top, log stream)."
