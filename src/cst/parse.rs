@@ -238,8 +238,53 @@ fn pipeline(input: &mut &str) -> ModalResult<Pipeline> {
         return backtrack();
     }
     let bang = opt(terminated('!', ws)).parse_next(input)?.is_some();
+    opt_time_keyword_before_compound(input);
     let commands: Vec<Cmd> = separated(1.., command, pipe_sep).parse_next(input)?;
     Ok(Pipeline { bang, commands })
+}
+
+/// Consume a leading `time` / `time -p` when it prefixes a COMPOUND command.
+///
+/// `time` is a shell reserved word, not just `/usr/bin/time`: bash lets it prefix a whole pipeline
+/// or compound, so `time (cmd)` and `time { cmd; }` are ordinary shell. The parser only ever
+/// offered `time` to `simple_cmd`, which wants a command NAME, so those forms did not parse at all
+/// and fell to "could not parse this command" — fail-closed, but a prompt for valid shell that was
+/// reported from real use.
+///
+/// NOT handled, deliberately: `time ! (cmd)`. bash accepts the keyword and the `!` in either order
+/// (`bash -n` validates all four spellings), and the caller parses the bang first, so a bang
+/// BETWEEN `time` and the compound leaves nothing this can commit on. `time ! ls` — the simple
+/// form — does work, through the wrapper entry, so the two spellings genuinely disagree. It stays
+/// unfixed because the fix is not local: the helper would have to consume the bang itself and hand
+/// it back for `Pipeline.bang`, which means editing the shared `pipeline()` path that every command
+/// in the corpus goes through. That is a poor trade against a form nobody writes, and the failure
+/// is a prompt, not a hole — `time ! (rm -rf /)` denies, as does every other spelling of it.
+///
+/// Deliberately narrow: it commits ONLY when a `(` or `{` follows. `time ls` keeps going through
+/// the existing `[command.wrapper]` entry in `commands/wrappers/time.toml`, which already handles
+/// the simple-command form and its `-p` flag, so nothing that parses today changes shape. Widening
+/// this to consume `time` unconditionally would work too, but it would silently retire that wrapper
+/// entry for the bare spelling, and a maintenance fix should not move a path that already works.
+fn opt_time_keyword_before_compound(input: &mut &str) -> bool {
+    let mut probe = *input;
+    if eat_keyword(&mut probe, "time").is_err() || !probe.starts_with([' ', '\t', '\n']) {
+        return false;
+    }
+    if ws.parse_next(&mut probe).is_err() {
+        return false;
+    }
+    // `time -p (…)` — the POSIX output flag, the only one the keyword form takes.
+    if probe.starts_with("-p") {
+        let mut with_flag = &probe[2..];
+        if with_flag.starts_with([' ', '\t', '\n']) && ws.parse_next(&mut with_flag).is_ok() {
+            probe = with_flag;
+        }
+    }
+    if !probe.starts_with(['(', '{']) {
+        return false;
+    }
+    *input = probe;
+    true
 }
 
 // === Command ===
@@ -1421,6 +1466,47 @@ mod tests {
             assert_eq!(body.0.len(), 2);
         } else { panic!("expected BraceGroup"); }
     }
+    /// `time` is a reserved word, so it may prefix a COMPOUND command — and those forms did not
+    /// parse at all, falling to "could not parse this command" on valid shell.
+    ///
+    /// The compound must survive as itself: if `time` were swallowed into a simple command the
+    /// subshell would vanish, and with it whatever the inner command is. That is what makes the
+    /// classification still follow the inner command rather than the wrapper.
+    #[test]
+    fn time_keyword_prefixes_a_compound() {
+        for (src, want_subshell) in
+            [("time (ls)", true), ("time -p (ls)", true), ("time { ls; }", false)]
+        {
+            let pl = &p(src).0[0].pipeline;
+            assert_eq!(pl.commands.len(), 1, "{src}: one compound command");
+            if want_subshell {
+                assert!(matches!(&pl.commands[0], Cmd::Subshell { .. }), "{src}: kept the subshell");
+            } else {
+                assert!(matches!(&pl.commands[0], Cmd::BraceGroup { .. }), "{src}: kept the group");
+            }
+        }
+        // A pipeline inside the subshell survives too.
+        let pl = &p("time (ls | head -5)").0[0].pipeline;
+        assert!(matches!(&pl.commands[0], Cmd::Subshell { .. }));
+
+        // NOT consumed for a simple command: `time ls` keeps going through the wrapper entry in
+        // commands/wrappers/time.toml, so this fix cannot move a path that already worked.
+        let pl = &p("time ls").0[0].pipeline;
+        assert!(matches!(&pl.commands[0], Cmd::Simple(_)), "time ls stays a simple command");
+
+        // And a command genuinely NAMED time-something is not mistaken for the keyword.
+        let pl = &p("timeout 5 ls").0[0].pipeline;
+        assert!(matches!(&pl.commands[0], Cmd::Simple(_)), "timeout is not the time keyword");
+
+        // `! time (cmd)` parses — the bang is read first, then the keyword. The reverse spelling
+        // `time ! (cmd)` does NOT, and is a known accepted false deny (see the fn's doc comment).
+        // Pinned so that if anyone ever moves the bang handling, the change is deliberate: this
+        // assertion flipping is the signal that the ordering was touched.
+        let pl = &p("! time (ls)").0[0].pipeline;
+        assert!(pl.bang, "the bang survives the time keyword");
+        assert!(matches!(&pl.commands[0], Cmd::Subshell { .. }), "and the compound survives too");
+    }
+
     #[test]
     fn brace_group_in_pipeline() {
         let pl = &p("{ echo a; echo b; } | grep a").0[0].pipeline;
