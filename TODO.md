@@ -1043,9 +1043,65 @@ confusing interaction.
 FREE MEANWHILE, needing no new mechanism: `git ls-files` and `jj file list` ALWAYS emit paths and can
 take an ordinary `[command.output]` claim today, closing part of the command-substitution class.
 
+**`git ls-files` DONE 2026-08-30.** `cat $(git ls-files)` and `grep -n foo $(git ls-files)` were
+denied and now allow. `invalidated_by` is every flag that stops a line being a bare relative path,
+confirmed against git-scm.com: `-t`/`-v`/`-f`, `-s`/`--stage`, `-u`/`--unmerged`, `--debug`,
+`--eol`, `--resolve-undo`, `--format`, `--abbrev`, `-z`, and `--full-name`. The claim is safe under
+`git -C DIR ls-files` even though the wrapper flag is stripped before the rule sees the arguments,
+because every path git prints is RELATIVE and the CONSUMER resolves it against its own cwd —
+redirecting git's directory changes which names appear, not where they land. `git ls-files ../` is
+the form that can escape, and it escapes through an operand, which is what `locus_from = "operands"`
+bounds. `every_output_claim_is_bounded_by_its_roots` picked the new claim up automatically.
+
+**`jj file list` NOT done, and it is not the same "free".** It declares
+`tolerate_unknown_short = true` and `tolerate_unknown_long = true`, so its flag surface is
+deliberately unbounded — any flag nobody has enumerated is accepted as a positional. An output claim
+asserts a property of the OUTPUT that any unlisted flag could break (`-T`/`--template` alone would),
+and `invalidated_by` can only name spellings someone has thought of. So the prerequisite is
+enumerating that entry's flags, which is a fact about jj rather than about the mechanism. Nested-sub
+claims themselves work: `sub_output_locus` descends `[[command.sub.sub]]`, so there is no
+mechanism blocker here, only an unenumerated grammar.
+
 The overlap audit below and the glob-family migration are the same problem wearing different clothes
 — "this entry is really several commands" — and should migrate INTO modes rather than run as separate
 campaigns.
+
+### The design contradicts itself on scope, and that has to be settled before building
+
+Read 2026-08-30 with the intent to implement. The document decides two things that cannot both hold:
+
+- §"What can a predicate say?" settles v1 as **flag PRESENCE only** — "Values (`--format=%f`) are not
+  expressible and stay that way in v1 — under-reaching fails closed."
+- §"Six customers" names **`dart format` the acceptance test** — "the smallest invocation in the tree
+  that defeats every declarative mechanism currently proposed, so it is the right acceptance test for
+  any mode v1 — if the design cannot express `dart format`, it has not cleared the bar the existing
+  handlers already clear."
+
+`dart format` selects its mode by a flag's VALUE (`-o write|show|json|none`) and the selected mode
+re-roles the POSITIONALS. A presence-only v1 cannot express either half, so building v1 as specified
+fails its own stated acceptance test on day one. Customers 4 (`fourmolu --mode inplace`) and 5
+(`gomodifytags -w -file`) are the same shape: 4 needs the PREDICATE to read a value, 5 needs the
+PAYLOAD to re-role a flag's value, and the document itself notes "a v1 that covers one is not close
+to covering both".
+
+This is a decision, not a defect — but it is the user's, because the two answers are very different
+amounts of work:
+
+  **(a) Lower the bar.** Ship presence-only. It serves customers 1, 2, 3 and 6 (`git diff`, `php -l`,
+  `ruby -S`, `base64`), which is four of six and includes the whole `output.requires` question. Drop
+  `dart format` as the acceptance test and say plainly that value-selected modes stay handlers.
+
+  **(b) Raise the mechanism.** Value predicates plus flag-role payloads in v1. Covers all six and the
+  in-place formatter family, at materially more design and a bigger blast radius, since the payload
+  half touches path-role resolution rather than just flag lists.
+
+Recommendation: **(a)**, and amend the design to match. The four customers it serves are the ones
+that recur, `write_when` already demonstrates that shipping the narrow version buys real coverage,
+and the document's own argument against narrowness — that `write_when` "closed eight commands cheaply
+and then could not close the two beside them" — is an argument for choosing the boundary
+deliberately, not for making v1 large. Whichever is chosen, the acceptance test in the document must
+be changed to match the scope, or the first implementation will be measured against a bar it was
+never designed to clear.
 
 ## The `standalone` + `valued` overlap audit (blocked on the above)
 

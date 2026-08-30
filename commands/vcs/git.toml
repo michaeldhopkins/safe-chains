@@ -458,6 +458,35 @@ valued = [
     "-X", "-x",
 ]
 
+# `git ls-files` prints one pathname per line, and unlike `git diff` it does so unconditionally —
+# there is no mode where the default output stops being paths. That is what makes it declarable
+# today, while `git diff --name-only` still cannot be (see docs/design/command-modes.md).
+#
+# Every path it prints is RELATIVE, so the caller resolves it against the caller's own cwd. That is
+# what makes the claim safe under `git -C DIR ls-files`: the wrapper flag is stripped before this
+# rule sees the arguments, but redirecting git's directory only changes which names are printed, not
+# where the consumer resolves them. `git ls-files ../` is the case that CAN escape the cwd, and it
+# escapes through an operand — which is exactly what `operands` bounds.
+#
+# `invalidated_by` is every flag that stops a line being a bare relative path, confirmed against
+# git-scm.com/docs/git-ls-files: -t/-v/-f prefix a status tag, -s/--stage and -u/--unmerged prefix
+# mode+object+stage, --debug and --resolve-undo append record data, --eol prefixes three attribute
+# columns, --format is arbitrary, --abbrev alters the hash inside the -s form, and -z terminates
+# with NUL so a `$( )` splice yields one concatenated word rather than paths. `--full-name` is
+# listed too: it prints root-relative rather than cwd-relative names, which does not escape but
+# does mean the words no longer denote what this claim says they denote.
+[command.sub.output]
+locus_from = "operands"
+valued = [
+    "--abbrev", "--exclude", "--exclude-from", "--exclude-per-directory",
+    "--format", "--with-tree", "-X", "-x",
+]
+invalidated_by = [
+    "--abbrev", "--debug", "--eol", "--format", "--full-name",
+    "--resolve-undo", "--stage", "--unmerged",
+    "-f", "-s", "-t", "-u", "-v", "-z",
+]
+
 [[command.sub]]
 name = "ls-remote"
 standalone = [
