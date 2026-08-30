@@ -2996,6 +2996,55 @@ use super::*;
     /// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
     /// still exist and are not all errors; sorting them is the migration this field unblocks, and
     /// a guard written before that would encode a convention nobody has chosen (TODO.md).
+    /// Every `[command.output]` variant must have confronted the rule that a locus-only claim
+    /// cannot clear a NAME-based shield.
+    ///
+    /// `resolve.rs` drops an `Operands` claim once the worst root is `>= user`, because at that
+    /// point the claim carries a LOCATION and the credential shield needs a FILENAME — the two
+    /// stop being the same question. `cat $(fd pat ~/.ssh)` was allowed while `cat ~/.ssh/id_rsa`
+    /// denied, until that check was added.
+    ///
+    /// The risk this guard exists for is a FUTURE variant that quietly skips it. TODO.md carried a
+    /// proposal for exactly one — "a PATH-resolved executable, locus machine", to make
+    /// `$(which bundle)` pinnable — which is `>= user` by construction and would have reintroduced
+    /// the same fail-open. `no_abstraction_is_more_permissive_than_a_path_it_could_denote` would
+    /// catch it, but only for the shapes its ABSTRACTION_SITES actually build, and that list is
+    /// hardcoded to `fd`; a claim added to `which` would not be exercised by it at all.
+    ///
+    /// So this matches exhaustively rather than testing behaviour: adding a variant fails to
+    /// compile here, and the author has to say which side of the `user` line it falls on.
+    #[test]
+    fn every_output_locus_variant_states_whether_it_can_exceed_the_user_rung() {
+        use super::types::OutputLocus;
+
+        for variant in [
+            OutputLocus::Operands,
+            OutputLocus::Cwd,
+            OutputLocus::Stdin,
+            OutputLocus::Atom,
+        ] {
+            let bounded_below_user = match variant {
+                // Bounded by its own operands' worst read locus, and explicitly dropped at
+                // `>= user` in `resolve_output_claim`.
+                OutputLocus::Operands => true,
+                // The cwd is the workspace root by construction, so worktree.
+                OutputLocus::Cwd => true,
+                // Carries the previous pipeline stage's locus, which is bounded by the same rules.
+                OutputLocus::Stdin => true,
+                // Names no locus at all — a separator-free word cannot move which directory a
+                // path denotes, so there is nothing here to exceed.
+                OutputLocus::Atom => true,
+            };
+            assert!(
+                bounded_below_user,
+                "{variant:?} can denote a path at or above `user`. A claim that carries only a \
+                 LOCATION cannot clear the credential shield, which matches on the NAME — so this \
+                 variant must either be dropped at `>= user` the way `Operands` is, or not exist. \
+                 See TODO.md, \"That variant CANNOT be built\"."
+            );
+        }
+    }
+
     /// A long flag declared `standalone` here while declared `valued` in many other scopes.
     ///
     /// The bug this hunts does not look like a bug. A flag in the wrong list reads as completely

@@ -30,7 +30,7 @@ the schema that carries it.
 | 2 | A valued flag mismodelled as `standalone`. **Enumerated** for long flags (118 rows, ratcheted); the short-flag half is not enumerable this way | "A valued flag mismodelled as `standalone`…" |
 | 3 | The `standalone`+`valued` overlap audit — unblocked by #1. **Measured: 233 scopes, 1527 (scope,flag) pairs, 869 distinct flags** — and the bulk is short flags. Sort them, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
 | 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
-| 5 | `[command.output]` offers only `operands`/`cwd`/`stdin`, so a command that prints a path to somewhere else cannot be described at all | "RESEARCHED, not doing: binding `$(which X)`…" and "B-CORRECTED" |
+| ~~5~~ | ~~`[command.output]` cannot describe a command that prints a path to somewhere else~~ — **CLOSED as not buildable.** A locus-only claim can never clear a NAME-based shield, so both candidate forms (`which`/`bundle show`, `git rev-parse --show-toplevel`) are fail-opens. Needs a which-FILES claim or harness ground truth, neither of which is a `locus_from` variant | "RESEARCHED, not doing: binding `$(which X)`…" |
 
 #3 is next, and #2 wants doing alongside it: the audit visits exactly the scopes
 where a mismodelled arity would live, so the two sweeps read the same data. Do #3
@@ -204,6 +204,42 @@ enough to make `head -1 $(which bundle)` allow while `rm $(which bundle)` still 
 Deferred rather than done because it is a schema addition with a transitive fail-open surface, for
 one convenience form, and the `command -v` half must be excluded on evidence rather than by
 omission. If it is built, the guard is: `$(command -v <alias>)` must NOT become a bounded path.
+
+### That variant CANNOT be built — checked 2026-08-29, and the reason generalises
+
+The paragraph above is wrong, and the engine already contains the refutation. `resolve.rs`, in the
+`OutputLocus::Operands` arm:
+
+    // A bounded claim is only meaningful BELOW `user`. […] At `user` or above it is not: the
+    // claim carries a LOCUS and says nothing about WHICH file, and which file is exactly what
+    // the shield needs to see.
+    if worst >= LocalLocus::User { return None; }
+
+A "locus machine" variant is `>= user` by construction, so it is precisely the shape that rule
+exists to reject. The bug it was added for — `cat $(fd pat ~/.ssh)` allowed while
+`cat ~/.ssh/id_rsa` denied — is the same bug this variant would reintroduce, and
+`no_abstraction_is_more_permissive_than_a_path_it_could_denote` would catch it as a property
+violation rather than as one example.
+
+The generalisation is worth stating plainly, because it applies to every future proposal of this
+kind: **the credential shield is NAME-based, so a claim that carries only a LOCATION can never
+clear it.** Below `user` that does not matter — nothing under the worktree is a credential store,
+so the rung is the whole truth about the value. At `user` and above the two are independent, and no
+amount of precision about WHERE substitutes for knowing WHICH.
+
+`git rev-parse --show-toplevel` looked like the sound sub-case and is not, for a second reason
+worth keeping separate: it would claim the locus of `.`, but it NAMES an ancestor of `.`. Where the
+workspace root is itself a subdirectory of a larger repository — a monorepo subdirectory opened as
+the project — the toplevel is ABOVE the workspace, so the claim would report `worktree` for a path
+that is `adjacent` or `user`. That is an under-report, which is the fail-open direction, and it is
+unreachable statically because the toplevel is exactly what we do not know.
+
+So this is not "a schema addition nobody got to". Both candidate forms are refused by the same
+structural fact, and a variant that ignored it would be a fail-open with a guard already written to
+catch it. What would actually be needed is a claim that bounds WHICH FILES rather than which
+location, or ground truth from the harness about where the substitution resolved — neither of which
+is a `locus_from` variant. Until one of those exists, `$( )` in a path stays unpinnable, and the
+cost is a prompt on `sed -n … $(bundle show doorkeeper)/…`, which is the correct trade.
 
 ## DECISION NEEDED: three sources disagree about what a grant NAMING a credential store does
 
