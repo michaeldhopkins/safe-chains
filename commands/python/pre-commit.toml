@@ -10,36 +10,35 @@ name = "install"
 level = "SafeWrite"
 bare = true
 standalone = [
-    "--allow-missing-config", "--config",
+    "--allow-missing-config",
     "--help", "--install-hooks", "--overwrite",
-    "-c", "-f", "-h",
+    "-f", "-h",
 ]
-valued = ["--hook-type", "-t"]
+valued = ["--config", "--hook-type", "-c", "-t"]
 
 [[command.sub]]
 name = "uninstall"
 level = "SafeWrite"
 bare = true
-standalone = ["--config", "--help", "-c", "-h"]
-valued = ["--hook-type", "-t"]
+standalone = ["--help", "-h"]
+valued = ["--config", "--hook-type", "-c", "-t"]
 
 [[command.sub]]
 name = "install-hooks"
 level = "SafeWrite"
 bare = true
-standalone = ["--config", "--help", "-c", "-h"]
+standalone = ["--help", "-h"]
+valued = ["--config", "-c"]
 
 [[command.sub]]
 name = "autoupdate"
 level = "SafeWrite"
 bare = true
 standalone = [
-    "--bleeding-edge", "--config",
-    "--dry-run", "--freeze",
-    "--help", "--jobs",
-    "-c", "-h", "-j",
+    "--bleeding-edge", "--dry-run",
+    "--freeze", "--help", "-h",
 ]
-valued = ["--repo"]
+valued = ["--config", "--jobs", "--repo", "-c", "-j"]
 
 [[command.sub]]
 name = "validate-config"

@@ -1,0 +1,147 @@
+# Long flags declared `standalone` in this scope while declared `valued` in many others.
+#
+# WHY THIS EXISTS. A valued flag mismodelled as `standalone` does not merely mis-describe the
+# tool: the value it should have consumed falls through as a POSITIONAL. Where the flag carries a
+# path gate that gate never fires, which is how `webpack -c /tmp/evil.js` auto-approved. The gated
+# subset is covered by `a_gated_flag_is_never_declared_value_less`; this worklist is the UNGATED
+# remainder, where nothing else would ever surface the mistake.
+#
+# HOW THE CANDIDATES ARE PICKED. Purely from the corpus, no external data: a `--name` means roughly
+# the same thing across tools, so "valued in >= 5 scopes, standalone in at most a sixth of that"
+# is evidence the odd one out is wrong. SHORT flags are deliberately excluded — `-o` is an output
+# path in one tool and a boolean in the next, so the same comparison there is noise, and they are
+# the bulk of the raw overlap (`-r` alone overlaps in 34 scopes).
+#
+# IT IS A HEURISTIC, NOT A VERDICT. Some rows will be correct as written — a tool really can have a
+# boolean `--filter` when everyone else's takes a value. Resolving a row means checking that ONE
+# tool's grammar and then either moving the flag to `valued` / `optional_valued`, or deleting the
+# row because the declaration was right.
+#
+# SHRINKS ONLY. `a_long_flag_is_not_standalone_where_it_is_valued_elsewhere` fails if a scope
+# appears that is not listed here, so a new mismodelling cannot land quietly. It also fails on a
+# row that is no longer a candidate, so fixing a command means deleting its row in the same change
+# and the file cannot rot into a list of things that were true once.
+#
+# Seeded 2026-08-29 with 118 rows. Found and fixed while seeding it: pre-commit's `-c`/`--config`
+# on install / uninstall / install-hooks / autoupdate (a config PATH, and `install` writes git
+# hooks) and `-j`/`--jobs` on autoupdate (a thread count) — both confirmed against pre-commit.com.
+#
+# FORMAT: <scope>\t<flag>   where scope is "<command>" or "<command> <sub>".
+ag	--filename
+alembic init	--package
+ansible-lint	--format
+app-sso	--state
+brew desc	--name
+buildctl du	--filter
+cargo bloat	--filter
+cargo sweep	--file
+coverage run	--concurrency
+cppcheck	--addon
+create-next-app	--app
+credo	--ignore
+dart analyze	--format
+dbt debug	--config-dir
+dbt init	--profiles-dir
+depcruise	--config
+doggo	--cookie
+earthly ls	--args
+erb_lint	--fail-level
+errcheck	--exclude
+eza	--context
+file	--extension
+fossil diff	--context
+fossil diff	--exclude
+fossil finfo	--offset
+fossil status	--limit
+fping	--name
+git ls-files	--stage
+golangci-lint version	--format
+gomodifytags	--format
+helm version	--template
+helmfile diff	--context
+hg annotate	--date
+hg annotate	--file
+hg id	--id
+hg tip	--style
+hg tip	--template
+http	--style
+hugo build	--config
+id	--context
+id	--name
+jasmine	--filter
+jupytext	--out
+kafka-consumer-groups --describe	--state
+kextfind	--plugin
+kextstat	--arch
+lean	--features
+libtool	--config
+libtool	--features
+ls	--author
+ls	--context
+marp	--template
+mc find	--ignore
+minikube status	--format
+minikube status	--output
+minikube version	--output
+mise set	--file
+mise trust	--ignore
+mise unset	--file
+ncu	--target
+ncu	--timeout
+next lint	--dir
+nx print-affected	--select
+ollama show	--template
+opam list	--columns
+opam list	--separator
+pdm config	--project
+pdm show	--name
+pigz	--name
+pijul log	--state
+pip-compile	--cache-dir
+pip-compile	--config
+pip-compile	--index-url
+pip-sync	--config
+railway metrics	--network
+rbs annotate	--filename
+rbs parse	--type
+rdoc	--exclude
+rebar3 path	--app
+rollup	--config
+rollup	--context
+ruff rule	--output-format
+ruff version	--output-format
+say	--quality
+skopeo inspect	--config
+swiftlint fix	--format
+systemctl status	--lines
+tac	--before
+task	--concurrency
+task	--interval
+terraform-docs	--indent
+terraform-docs	--type
+tofu show	--config
+tofu show	--state
+turbo run	--cache-dir
+typedoc	--exclude
+typedoc	--name
+uptime	--since
+velero describe	--features
+vipe	--suffix
+vite build	--app
+vitest	--reporter
+w	--from
+wc	--lines
+webpack	--mode
+webpack	--target
+wkhtmltopdf	--log-level
+wkhtmltopdf	--title
+xmllint	--format
+xsel	--input
+xsel	--output
+xsltproc	--encoding
+yard doc	--exclude
+yard list	--exclude
+yard list	--method
+yardoc	--exclude
+zip	--exclude
+zoxide query	--exclude

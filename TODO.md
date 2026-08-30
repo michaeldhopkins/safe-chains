@@ -27,8 +27,8 @@ the schema that carries it.
 | # | item | section |
 |---|---|---|
 | ~~1~~ | ~~Optional-value flags have no representation~~ — **DONE**, `optional_valued` | "Support OPTIONAL-VALUE flags by design" |
-| 2 | A valued flag mismodelled as `standalone` silently disables every flag gate on that command. No enumeration exists | "A valued flag mismodelled as `standalone`…" |
-| 3 | The `standalone`+`valued` overlap audit — **now unblocked**: walk the 234 scopes, sort each into one of the three, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
+| 2 | A valued flag mismodelled as `standalone`. **Enumerated** for long flags (118 rows, ratcheted); the short-flag half is not enumerable this way | "A valued flag mismodelled as `standalone`…" |
+| 3 | The `standalone`+`valued` overlap audit — unblocked by #1. **Measured: 233 scopes, 1527 (scope,flag) pairs, 869 distinct flags** — and the bulk is short flags. Sort them, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
 | 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
 | 5 | `[command.output]` offers only `operands`/`cwd`/`stdin`, so a command that prints a path to somewhere else cannot be described at all | "RESEARCHED, not doing: binding `$(which X)`…" and "B-CORRECTED" |
 
@@ -1024,8 +1024,15 @@ But most of the 234 are not typos. They look like deliberate attempts to model a
 `zstd --long` vs `--long=27`, `7z -r` vs `-r-` — which the schema has no way to express.
 
 UNBLOCKED 2026-08-29: `optional_valued` exists, so the third state is expressible. What remains is
-the MIGRATION — walk the 234, sort each into standalone / valued / optional_valued, and turn the
-remaining raw overlap into a build error.
+the MIGRATION — sort each scope into standalone / valued / optional_valued, and turn the remaining
+raw overlap into a build error.
+
+MEASURED while building the differential, because "234 scopes" understates the job: it is **233
+scopes but 1527 (scope, flag) pairs across 869 distinct flags**. The count that matters for
+planning is the pairs. It is also dominated by SHORT flags — `-r` overlaps in 34 scopes, `-c` 26,
+`-d` 23, `-p` 23, `-h` 22 — and those are the ones no cross-tool comparison can adjudicate, so this
+migration is per-tool work almost all the way down. The long-flag overlaps are comparatively few
+and are where `optional_valued` will do most of its work.
 
 Note while doing it: an overlap is NOT currently broken. It behaves as an optional-value flag
 already (see the corrected section above), so this migration is about making intent legible and
@@ -1051,15 +1058,31 @@ Why it is not just the section above: an overlap (`standalone` AND `valued`) is 
 flag declared ONLY in `standalone` that actually takes a value looks completely normal, and nothing
 compares a declaration against the tool's real grammar.
 
-DONE when: something enumerates the mismatch. Two angles, neither tried —
-  - **Registry-internal differential**, which already found marp: a flag declared `standalone` in one
-    command while `valued` in many others is a strong smell. Cheap, no external data, and it ranks
-    candidates by how lopsided the split is.
+ENUMERATED 2026-08-29 for LONG flags, via the registry-internal differential below. The guard is
+`a_long_flag_is_not_standalone_where_it_is_valued_elsewhere`, ratcheting
+`tests/fixtures/flag_arity_worklist.tsv` (118 rows, 61 distinct flags). It fails on a candidate
+that is not listed AND on a listed row that is no longer a candidate, so a new mismodelling cannot
+land quietly and the file cannot rot.
+
+The differential works: it independently re-flagged webpack (`--target`, `--mode`) — the command
+whose `-c` produced this section — and seeding it turned up pre-commit's `-c`/`--config` on
+install / uninstall / install-hooks / autoupdate (a config PATH, on subs that WRITE git hooks) and
+`-j`/`--jobs` on autoupdate (a thread count). Both confirmed against pre-commit.com and fixed.
+
+**The short-flag half is NOT enumerable this way, and that is a finding rather than a gap in the
+implementation.** `-o` is an output path in one tool and a boolean in the next, so the cross-tool
+comparison carries no information — and short flags are most of the population (`-r` overlaps in 34
+scopes, `-c` in 26, `-d` and `-p` in 23). Whatever catches those has to come from the tools, not
+from comparing them to each other. The remaining angle is the second one below.
+
+DONE when: the short-flag half also has an enumeration. Two angles, one now built —
+  - ~~**Registry-internal differential**~~ — BUILT, long flags only, for the reason above.
   - **Behavioural probe**: for each `standalone` flag on an auto-approving command, classify
     `<cmd> <flag> /etc/x` and see whether the path landed as a positional. Directly tests the
-    property that matters rather than a proxy.
-
-Start with the differential; it needs nothing but the registry and would have caught webpack.
+    property that matters rather than a proxy, and is the only one of the two that can speak to
+    short flags. Note the probe needs care about what it concludes: a path landing as a positional
+    is only a DEFECT where something would have gated it, which is why the gated subset already has
+    its own guard (`a_gated_flag_is_never_declared_value_less`) and is not this population.
 
 ## The registry validators are largely UNTESTED — found by adversarial review
 

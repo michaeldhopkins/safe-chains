@@ -12034,14 +12034,14 @@ Aliases: `gpr`
 ### `pre-commit`
 <p class="cmd-url"><a href="https://pre-commit.com/">https://pre-commit.com/</a></p>
 
-- **autoupdate**: Flags: --bleeding-edge, --config, --dry-run, --freeze, --help, --jobs, -c, -h, -j. Valued: --repo
+- **autoupdate**: Flags: --bleeding-edge, --dry-run, --freeze, --help, -h. Valued: --config, --jobs, --repo, -c, -j
 - **clean**: Flags: --help, -h
 - **gc**: Flags: --help, -h
 - **help**: Positional args accepted
-- **install**: Flags: --allow-missing-config, --config, --help, --install-hooks, --overwrite, -c, -f, -h. Valued: --hook-type, -t
-- **install-hooks**: Flags: --config, --help, -c, -h
+- **install**: Flags: --allow-missing-config, --help, --install-hooks, --overwrite, -f, -h. Valued: --config, --hook-type, -c, -t
+- **install-hooks**: Flags: --help, -h. Valued: --config, -c
 - **sample-config**: Flags: --help, -h
-- **uninstall**: Flags: --config, --help, -c, -h. Valued: --hook-type, -t
+- **uninstall**: Flags: --help, -h. Valued: --config, --hook-type, -c, -t
 - **validate-config**: Flags: --help, -h. Positional args accepted
 - **validate-manifest**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h

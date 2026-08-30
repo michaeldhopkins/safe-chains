@@ -2996,6 +2996,131 @@ use super::*;
     /// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
     /// still exist and are not all errors; sorting them is the migration this field unblocks, and
     /// a guard written before that would encode a convention nobody has chosen (TODO.md).
+    /// A long flag declared `standalone` here while declared `valued` in many other scopes.
+    ///
+    /// The bug this hunts does not look like a bug. A flag in the wrong list reads as completely
+    /// normal, and nothing compares a declaration against the tool's real grammar — but the value
+    /// it should have consumed falls through as a POSITIONAL, and any gate on that flag then never
+    /// fires. `webpack -c /tmp/evil.js` auto-approved for exactly this reason. That makes it a
+    /// meta-bug: it does not add one hole, it disables a defence wherever it occurs.
+    ///
+    /// `a_gated_flag_is_never_declared_value_less` already covers the flags that carry a gate.
+    /// This is the UNGATED remainder, where the mistake is otherwise invisible, and it is answered
+    /// from the corpus alone: a `--name` means roughly the same thing across tools, so a flag
+    /// valued in many scopes and standalone in one or two is evidence about the one or two.
+    ///
+    /// SHORT flags are excluded deliberately. `-o` is an output path in one tool and a boolean in
+    /// the next, so the cross-tool comparison carries no information there — and they are most of
+    /// the raw overlap (`-r` in 34 scopes, `-c` in 26), so including them would bury the signal in
+    /// noise rather than adding to it.
+    ///
+    /// The threshold is evidence, not proof, so the fixture is a WORKLIST rather than a deny-list:
+    /// a row means "check this one tool", and some rows will turn out correct as written.
+    #[test]
+    fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
+        use super::types::TomlFile;
+        use std::collections::{HashMap, HashSet};
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        // flag -> (scopes declaring it standalone, count of scopes declaring it valued)
+        let mut standalone_scopes: HashMap<String, Vec<String>> = HashMap::new();
+        let mut valued_count: HashMap<String, usize> = HashMap::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                let mut scopes: Vec<(String, &Vec<String>, &Vec<String>)> =
+                    vec![(cmd.name.clone(), &cmd.standalone, &cmd.valued)];
+                for sub in &cmd.sub {
+                    scopes
+                        .push((format!("{} {}", cmd.name, sub.name), &sub.standalone, &sub.valued));
+                }
+                for (scope, st, va) in scopes {
+                    for f in st {
+                        // A flag in BOTH lists is an optional-value declaration, not a
+                        // standalone one — it is the `optional_valued` shape spelled the old way,
+                        // and counting it here would report every such scope as a mismodelling.
+                        if f.starts_with("--") && !va.contains(f) {
+                            standalone_scopes.entry(f.clone()).or_default().push(scope.clone());
+                        }
+                    }
+                    for f in va {
+                        if f.starts_with("--") && !st.contains(f) {
+                            *valued_count.entry(f.clone()).or_default() += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut candidates: HashSet<(String, String)> = HashSet::new();
+        for (flag, scopes) in &standalone_scopes {
+            let valued = valued_count.get(flag).copied().unwrap_or(0);
+            if valued >= 5 && scopes.len() * 6 <= valued {
+                for scope in scopes {
+                    candidates.insert((scope.clone(), flag.clone()));
+                }
+            }
+        }
+
+        let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/flag_arity_worklist.tsv");
+        let raw = std::fs::read_to_string(&fixture).expect("read flag_arity_worklist.tsv");
+        let listed: HashSet<(String, String)> = raw
+            .lines()
+            .filter(|l| !l.starts_with('#') && !l.trim().is_empty())
+            .filter_map(|l| l.split_once('\t'))
+            .map(|(scope, flag)| (scope.trim().to_string(), flag.trim().to_string()))
+            .collect();
+
+        let mut unlisted: Vec<String> = candidates
+            .difference(&listed)
+            .map(|(s, f)| format!("  {s}\t{f}"))
+            .collect();
+        let mut stale: Vec<String> = listed
+            .difference(&candidates)
+            .map(|(s, f)| format!("  {s}\t{f}"))
+            .collect();
+        unlisted.sort();
+        stale.sort();
+
+        assert!(
+            !listed.is_empty(),
+            "flag_arity_worklist.tsv has no rows — the guard would be vacuous"
+        );
+        assert!(
+            unlisted.is_empty(),
+            "these scopes declare a long flag `standalone` that is `valued` in many other \
+             commands, and are not on the worklist ({}). Check the tool's grammar: move the flag \
+             to `valued` (or `optional_valued`), or add the row with a note saying the \
+             declaration is right:\n{}",
+            unlisted.len(),
+            unlisted.join("\n"),
+        );
+        assert!(
+            stale.is_empty(),
+            "these worklist rows are no longer candidates ({}) — the declaration was fixed, so \
+             delete the row in the same change and keep the file from rotting into a list of \
+             things that used to be true:\n{}",
+            stale.len(),
+            stale.join("\n"),
+        );
+    }
+
     #[test]
     fn optional_valued_is_not_also_declared_standalone_or_valued() {
         use super::types::TomlFile;
