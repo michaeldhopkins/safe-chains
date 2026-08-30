@@ -1,5 +1,116 @@
 # TODO
 
+safe-chains is the IMPLEMENTER of a behavioural-facet model: a bash command line
+in, a verdict out, with no execution and no filesystem probing. Everything tracked
+here is MECHANISM — the parser, the TOML schema, the facet engine, the region and
+level models, the path gates, the guard suite, and the harness envelopes.
+
+**What is not tracked here.** Findings about a particular command — what a flag
+does, whether a subcommand reaches the network, which upstream version was read —
+are not tasks. They belong in that command's `description` and its TOML fields,
+authored per AGENTS.md → "Researching a new command". Likewise a row on one of the
+worklist fixtures is DATA, not a todo: the guard that keeps the fixture honest is
+the mechanism, and the guard is what this file owns.
+
+The distinction is load-bearing, because the two fail differently. A wrong finding
+about one command is one wrong answer. A gap in the mechanism is every command that
+would have used it — which is why the backlog below is ordered by how much of the
+model a gap makes inexpressible, not by how many commands are waiting on it.
+
+## The open mechanism backlog, in order
+
+**Tier 1 — the schema cannot express what the model already knows.** These come
+first because each one forces a correct finding to be recorded as a falsehood, a
+contradiction, or a dropped spelling. Nothing downstream can be trusted more than
+the schema that carries it.
+
+| # | item | section |
+|---|---|---|
+| 1 | Optional-value flags (`--long` AND `--long=27`) have no representation. 234 scopes currently declare a contradiction or drop a form; a dropped form is a false deny | "Support OPTIONAL-VALUE flags by design" |
+| 2 | A valued flag mismodelled as `standalone` silently disables every flag gate on that command. No enumeration exists | "A valued flag mismodelled as `standalone`…" |
+| 3 | The `standalone`+`valued` overlap audit — explicitly blocked on #1 | "The `standalone` + `valued` overlap audit" |
+| 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
+| 5 | `[command.output]` offers only `operands`/`cwd`/`stdin`, so a command that prints a path to somewhere else cannot be described at all | "RESEARCHED, not doing: binding `$(which X)`…" and "B-CORRECTED" |
+
+#1 → #2 → #3 is one sequence: #1 makes the third state expressible, which turns
+#3 from a judgement call into a mechanical migration, and gives #2 somewhere to
+put what it finds.
+
+**Tier 2 — the engine resolves less than the model declares.**
+
+| item | section |
+|---|---|
+| Eleven facet axes carry a declared `hazard` that no authored level constrains. Part is deliberate (the supply-chain group); the rest is unverified, and a mis-declaration there is invisible | "Eleven facet axes have no authored level constraint" |
+| The `user` locus rung is constructed only in tests — the resolver never emits it | "The `user` locus rung is constructed ONLY in tests" |
+| Reading anywhere in `~` should be separable from writing anywhere in `~` | "Reading anywhere in `~` should be separable…" |
+| Loopback destinations — remaining work | "Loopback destinations" |
+| Atom confinement: the `$SCRATCH` half | "Atom confinement" |
+| `$(( ))` containing a substitution — fix known, blocked on a pre-existing hang | "Three reported prompts", A |
+| A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace (accepted false deny; revisit if the shape generalises) | "A recursive searcher cannot tell…" |
+| `cpio -o` reads its file list from stdin, and the list is unknowable | "`cpio -o` archives a file list…" |
+
+**Tier 3 — dispatch and gate correctness.**
+
+| item | section |
+|---|---|
+| `dispatch_executor` skips the flag policy when a positional is present | "`dispatch_executor` skips the flag policy…" |
+| `cargo fuzz` needs a pathgate handler and a positional shape | "cargo fuzz: REVERTED" |
+| Retire blanket flag tolerance (`tolerate_unknown_short/long`); glob-family migration in progress | "Retire blanket flag tolerance", "Glob-family flag migration" |
+| One real structural-invariant gap remains | "Structural invariants: three probed clean" |
+| Command-tree duplicates: one intent question | "Command-tree duplicates" |
+| Known limitations of the gate guards — recorded, not fixed | "Known limitations of the new guards" |
+
+**Tier 4 — surface: CLI, harness targets, refusal copy.**
+
+| item | section |
+|---|---|
+| `--suggest` writes the file its name implies it only proposes; appends to a config it cannot parse; nearest-ancestor walk | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
+| A denied compound construct records no reason at all | "A denied compound construct records no reason" |
+| Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
+| A grant should cover what it names — spec written | "A grant should cover what it names" |
+| `--setup` silently rewrites a wrong-typed key on three targets | "`--setup` silently rewrites…" |
+| Two targets cannot self-filter on the tool — verify their envelopes | "Two targets cannot self-filter" |
+| Re-tokenize split words instead of refusing them | "Re-tokenize split words" |
+
+**Tier 5 — guards and fuzzing.**
+
+| item | section |
+|---|---|
+| The registry validators are largely untested | "The registry validators are largely UNTESTED" |
+| Two more fuzz targets specified but not built; the parse target finds availability bugs only | "Fuzz suite", "Fuzzing finds availability bugs only" |
+| Verify the `config_load` nightly actually goes green | "Original note: verify the `config_load` nightly" |
+
+**Decisions needed before the work can be done.**
+
+| question | section |
+|---|---|
+| Three sources disagree about what a grant NAMING a credential store does (currently fails closed) | "DECISION NEEDED: three sources disagree…" |
+| `permissions.allow` out-ranks every level, including `paranoid` | "DECISION NEEDED: `permissions.allow` out-ranks…" |
+
+**Known and accepted, not scheduled.** `time ! (cmd)` does not parse while
+`time ! cmd` does; the fix means editing the shared `pipeline()` path for a form
+nobody writes, and the failure is a prompt. Recorded in the doc comment on
+`opt_time_keyword_before_compound`, with a test pinning the ordering so a change
+there is deliberate.
+
+## When the engine needs a facet term that does not exist
+
+Every term added in August 2026 was discovered by implementing and hitting a gap,
+not by a survey: the `device` locus rung, the `raw-device` region role, the
+`RawDevice` refusal reason, the `read_tree` path role, `per_database`. So:
+
+1. Implement what is needed to fix the bug — do not wait on anything.
+2. Record the term, and the finding that produced it, in the section below.
+3. Expect it to be renamed or generalised later, and follow if it is.
+
+The facet model implemented here is **v1.4** (`docs/design/behavioral-taxonomy-v1.4.md`).
+
+---
+
+Everything below is the detailed record: the reasoning behind each item above,
+plus the history of what was already closed and why. Sections are kept after they
+are done when the reasoning still explains a decision.
+
 ## PARTLY DONE: Rails 8 multi-database task variants — `db:migrate:<db>` is the one still denied
 
 Found while researching `db:verify`. Two separate answers, and the second is the real one.
@@ -1692,14 +1803,17 @@ config is already the trust root — user-only, unwritable by agents — so a gr
 statement of intent, and demanding a second field to prove it is ceremony rather than safety.
 Anyone willing to add the grant would add the acknowledgement.
 
-## THE campaign — re-research every command (see RESEARCH-PLAN.md)
+## Why the corpus is authored under the facet model, not under levels
 
-Decision (2026-07-16): re-research and upgrade the TOML of EVERY command under the facet model. No
-shortcuts — the level-based tail hid real credential exposures (`vault read`, `security
-find-internet-password`, `aws secretsmanager get-secret-value`). Batched, highest-risk-first, with a
-targeted adversarial review after each batch and a general facet-vocab assessment every ~2–3 batches.
-Full plan, standard, batch order, and cadence in **RESEARCH-PLAN.md**. Next: **Batch 0 (credential
-slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's grandfather worklist.
+Decision (2026-07-16), kept here because it explains the shape of every TOML in
+`commands/`: a command is characterised along the behavioural axes and the level falls out of that
+profile, rather than a level being assigned directly. The level-based tail hid real credential
+exposures — `vault read`, `security find-internet-password`,
+`aws secretsmanager get-secret-value` — because "read-only" flattens the axes that decide safety.
+
+The mechanism consequence, which IS this repo's job: every axis a description asserts must have
+somewhere in the schema to live and something in the engine that reads it. Where it does not, that
+is a Tier 1 or Tier 2 item above, not a per-command matter.
 
 ## Pre-1.0 hardening
 

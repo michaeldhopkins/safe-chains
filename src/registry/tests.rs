@@ -4911,7 +4911,7 @@ deny = true
     /// policy — verified against the botocore output shape). A NEW credential-returning action that
     /// auto-approves is neither → the test fails and forces triage. This flushed `ssm get-access-token`
     /// and `lakeformation get-temporary-data-location-credentials` that the LLM sweep missed. GRANDFATHER
-    /// shrinks only. Refresh the fixture when re-researching AWS (see RESEARCH-PLAN.md).
+    /// shrinks only. Refresh the fixture whenever AWS is re-characterised.
     #[test]
     fn aws_credential_smell_actions_deny_or_are_grandfathered() {
         // (service, action, why-benign) — each verified to return NO usable secret value.

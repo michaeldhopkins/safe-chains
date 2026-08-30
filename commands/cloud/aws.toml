@@ -592,8 +592,8 @@ source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameters-by
 # one). Only metadata reads (describe/list) auto-approve now — fail-closed. Batch 1 (aws) restructures
 # this into explicit sub-subs (get-secret-value -> credential-read, get-resource-policy -> remote-read).
 name = "secretsmanager"
-# Restructured from `first_arg = ["describe-*", "list-*"]` into explicit sub-subs (RESEARCH-PLAN
-# Batch 1). The glob was safe about WHICH operations it admitted, but it admitted them without
+# Restructured from `first_arg = ["describe-*", "list-*"]` into explicit sub-subs. The glob was safe
+# about WHICH operations it admitted, but it admitted them without
 # consulting any flag list, and it would auto-admit any FUTURE describe-*/list-* API that AWS adds to
 # this service — for a service whose entire purpose is storing secrets, that is the wrong default.
 # Verified before the change: `list-secrets --frobnicate` and
