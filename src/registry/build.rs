@@ -32,15 +32,38 @@ macro_rules! ensure {
     };
 }
 
+/// `optional_valued` compiles down to membership in BOTH other lists, and that is the whole
+/// mechanism — the walk needs no third state.
+///
+/// Measured before choosing this (`policy::tests::a_flag_declared_in_both_lists_…`): `check_flags`
+/// consults `standalone` first, so the BARE spelling matches there and cannot swallow the next
+/// token; its `=` branch consults `valued`, so the GLUED spelling matches too. Both are honoured,
+/// for different spellings, which is exactly what an optional-value flag means — and it matches
+/// getopt, where an optional argument must be glued (`--flag=x`, never `--flag x`).
+///
+/// So this field buys INTENT, not behaviour. That distinction is the point: the same pair of
+/// memberships previously meant either "a deliberate optional-value flag" or "somebody made a
+/// mistake", and nothing could tell those apart — which is why the overlap audit was blocked on
+/// this. Declaring it here says which one it is, and leaves a raw `standalone`+`valued` overlap
+/// free to become a build error once the existing scopes are sorted.
+///
+/// NOT covered: the short glued form (`-r0`). That reaches the cluster loop, which walks byte by
+/// byte and has no notion of "the rest of this token is my value". Recorded in TODO.md.
 pub(super) fn build_policy(
     standalone: Vec<String>,
     valued: Vec<String>,
+    optional_valued: Vec<String>,
     bare: Option<bool>,
     max_positional: Option<usize>,
     tolerate_unknown_short: Option<bool>,
     tolerate_unknown_long: Option<bool>,
     numeric_dash: Option<bool>,
 ) -> OwnedPolicy {
+    let (mut standalone, mut valued) = (standalone, valued);
+    for flag in optional_valued {
+        standalone.push(flag.clone());
+        valued.push(flag);
+    }
     let unknown = match (
         tolerate_unknown_short.unwrap_or(false),
         tolerate_unknown_long.unwrap_or(false),
@@ -95,6 +118,7 @@ fn build_handler_policy(toml: TomlHandlerPolicy) -> OwnedPolicy {
     build_policy(
         toml.standalone,
         toml.valued,
+        toml.optional_valued,
         toml.bare,
         toml.max_positional,
         toml.tolerate_unknown_short,
@@ -118,6 +142,7 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, Stri
     let policy = build_policy(
         toml.standalone,
         toml.valued,
+        toml.optional_valued,
         toml.bare,
         toml.max_positional,
         toml.tolerate_unknown_short,
@@ -790,6 +815,7 @@ fn build_policy_sub_kind(
         build_policy(
             toml.standalone,
             toml.valued,
+            toml.optional_valued,
             toml.bare,
             toml.max_positional,
             toml.tolerate_unknown_short,
@@ -1425,6 +1451,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let policy = build_policy(
         toml.standalone,
         toml.valued,
+        toml.optional_valued,
         toml.bare,
         toml.max_positional,
         toml.tolerate_unknown_short,

@@ -26,15 +26,20 @@ the schema that carries it.
 
 | # | item | section |
 |---|---|---|
-| 1 | Optional-value flags (`--long` AND `--long=27`) have no representation. 234 scopes currently declare a contradiction or drop a form; a dropped form is a false deny | "Support OPTIONAL-VALUE flags by design" |
+| ~~1~~ | ~~Optional-value flags have no representation~~ — **DONE**, `optional_valued` | "Support OPTIONAL-VALUE flags by design" |
 | 2 | A valued flag mismodelled as `standalone` silently disables every flag gate on that command. No enumeration exists | "A valued flag mismodelled as `standalone`…" |
-| 3 | The `standalone`+`valued` overlap audit — explicitly blocked on #1 | "The `standalone` + `valued` overlap audit" |
+| 3 | The `standalone`+`valued` overlap audit — **now unblocked**: walk the 234 scopes, sort each into one of the three, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
 | 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
 | 5 | `[command.output]` offers only `operands`/`cwd`/`stdin`, so a command that prints a path to somewhere else cannot be described at all | "RESEARCHED, not doing: binding `$(which X)`…" and "B-CORRECTED" |
 
-#1 → #2 → #3 is one sequence: #1 makes the third state expressible, which turns
-#3 from a judgement call into a mechanical migration, and gives #2 somewhere to
-put what it finds.
+#3 is next, and #2 wants doing alongside it: the audit visits exactly the scopes
+where a mismodelled arity would live, so the two sweeps read the same data. Do #3
+first — it removes the population #2 would otherwise have to filter.
+
+**The short glued form (`-r0`) is still not expressible** and was left that way
+deliberately: the closed value sets that need it are better enumerated
+(7z declares `-r`, `-r-`, `-r0`, which is exact where a mechanism would be
+approximate). Revisit only if a tool turns up with an open-ended short-glued value.
 
 **Tier 2 — the engine resolves less than the model declares.**
 
@@ -926,7 +931,32 @@ Worth noting the two are separable: the coverage bridge could keep granting whil
 the result (`min(covered, threshold)` rather than `Inert`), which honours the rule without letting
 it exceed the stated ceiling. Not implemented; recording the option so the choice is informed.
 
-## Support OPTIONAL-VALUE flags by design (decided 2026-08-04)
+## Support OPTIONAL-VALUE flags by design — BUILT 2026-08-29 (`optional_valued`)
+
+DONE. Declaring a flag in `optional_valued` admits `--gitignore` and `--gitignore=false` and
+nothing else; a guard fails the build if the same flag is repeated in `standalone` or `valued`.
+Migrated: the seven `cargo mutants` flags that were omitted waiting on this, and ghostty's
+`+list-fonts --bold`/`--italic`. Documented in SAMPLE.toml.
+
+**One premise below was wrong, and it is the interesting part of this entry.** The original text
+said a flag in both lists is "a contradiction… where only one can be honoured". It is not. Measured
+(`policy::tests::a_flag_declared_in_both_lists_already_takes_an_optional_value`): `check_flags`
+consults `standalone` first, so the BARE spelling matches there and cannot swallow the next token,
+and its `=` branch consults `valued`, so the GLUED spelling matches too. Both are honoured, for
+different spellings — which is already optional-value semantics, and already matches getopt, where
+an optional argument must be glued.
+
+So the behaviour existed and the schema simply had no word for it. That changed what got built:
+`optional_valued` compiles down to membership in both lists and the walk was not touched at all.
+The field buys INTENT, and intent was the whole blocker — the same pair of memberships meant either
+"deliberate" or "mistake", nothing could tell them apart, and that ambiguity is what the overlap
+audit was stuck behind.
+
+Worth generalising from: the fix for an inexpressible grammar is not always new machinery. Check
+what the walk already does before designing a third state for it — here the measurement removed the
+engine change entirely, and with it the risk of touching a path every command goes through.
+
+### Original entry, kept for the reasoning
 
 DECIDED: add optional-value flags to the schema as a first-class thing, rather than making the
 overlap a build error and forcing 234 scopes to drop a spelling. A flag that genuinely accepts both
@@ -993,12 +1023,17 @@ the next section).
 But most of the 234 are not typos. They look like deliberate attempts to model an OPTIONAL value —
 `zstd --long` vs `--long=27`, `7z -r` vs `-r-` — which the schema has no way to express.
 
-RESOLVED IN PRINCIPLE: the direction is decided (support optional values by design — see the section
-above). What remains here is the MIGRATION: once the third state is expressible, walk the 234, sort
-each into standalone / valued / optional, and turn the remaining overlap into a build error.
+UNBLOCKED 2026-08-29: `optional_valued` exists, so the third state is expressible. What remains is
+the MIGRATION — walk the 234, sort each into standalone / valued / optional_valued, and turn the
+remaining raw overlap into a build error.
 
-Do NOT write a guard against the current ambiguity before then: it would encode a convention nobody
-has chosen, and it cannot distinguish a typo from an optional-value flag.
+Note while doing it: an overlap is NOT currently broken. It behaves as an optional-value flag
+already (see the corrected section above), so this migration is about making intent legible and
+letting the build reject the real typos — not about fixing live wrong answers. The exception is the
+opposite error, a valued flag declared ONLY in `standalone`, which IS live and is the next section.
+
+Still do NOT write a guard against the raw ambiguity until the sort is done: before then it cannot
+distinguish a typo from an optional-value flag, which is exactly what the sort decides.
 
 ## A valued flag mismodelled as `standalone` defeats every flag gate — NOT swept
 

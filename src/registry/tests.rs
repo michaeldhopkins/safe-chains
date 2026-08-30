@@ -2985,6 +2985,109 @@ use super::*;
     /// Resolving aliases inside `should_deny` would be the deeper fix; it needs a sub-name
     /// canonicalizer the pathgate layer does not have. Until then this fails the build rather than
     /// letting a half-covered gate look complete.
+    /// `optional_valued` must be the ONLY place a flag is declared.
+    ///
+    /// The field compiles down to membership in both other lists, so listing a flag in
+    /// `optional_valued` AND in `standalone` or `valued` produces exactly the state that was
+    /// indistinguishable before — and re-creates the ambiguity the field exists to remove. The
+    /// duplicate is silent otherwise: the built policy is identical either way, so nothing would
+    /// ever surface it.
+    ///
+    /// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
+    /// still exist and are not all errors; sorting them is the migration this field unblocks, and
+    /// a guard written before that would encode a convention nobody has chosen (TODO.md).
+    #[test]
+    fn optional_valued_is_not_also_declared_standalone_or_valued() {
+        use super::types::TomlFile;
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).expect("read commands dir") {
+                let p = e.expect("dir entry").path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut declared = 0usize;
+        let mut dupes: Vec<String> = Vec::new();
+        let mut check = |scope: String, opt: &[String], standalone: &[String], valued: &[String]| {
+            declared += opt.len();
+            for flag in opt {
+                if standalone.contains(flag) {
+                    dupes.push(format!("  {scope}: `{flag}` in optional_valued AND standalone"));
+                }
+                if valued.contains(flag) {
+                    dupes.push(format!("  {scope}: `{flag}` in optional_valued AND valued"));
+                }
+            }
+        };
+
+        for file in &files {
+            let src = std::fs::read_to_string(file).expect("read toml");
+            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+            for cmd in &parsed.command {
+                check(cmd.name.clone(), &cmd.optional_valued, &cmd.standalone, &cmd.valued);
+                for sub in &cmd.sub {
+                    check(
+                        format!("{} {}", cmd.name, sub.name),
+                        &sub.optional_valued,
+                        &sub.standalone,
+                        &sub.valued,
+                    );
+                }
+                if let Some(fb) = &cmd.fallback {
+                    check(
+                        format!("{} [fallback]", cmd.name),
+                        &fb.optional_valued,
+                        &fb.standalone,
+                        &fb.valued,
+                    );
+                }
+            }
+        }
+
+        assert!(
+            declared > 0,
+            "no scope declares `optional_valued` — this guard is vacuous, and the field it \
+             protects is unused"
+        );
+        assert!(
+            dupes.is_empty(),
+            "`optional_valued` already implies both other lists, so declaring the flag again \
+             restores the ambiguity the field removes ({}):\n{}",
+            dupes.len(),
+            dupes.join("\n"),
+        );
+    }
+
+    /// The four spellings of an `optional_valued` flag, end to end through a real command rather
+    /// than a synthetic policy — so the field is proven where it is actually consumed.
+    #[test]
+    fn optional_valued_admits_the_bare_and_glued_spellings() {
+        // `cargo mutants` carries `max_positional = 0`, which is what makes the fourth case below
+        // meaningful: with no positional allowed, a token the bare flag wrongly swallowed would
+        // vanish from the count and the invocation would pass. On a command that tolerates a
+        // positional the same probe proves nothing — it passes either way.
+        assert!(crate::is_safe_command("cargo mutants --gitignore"), "bare spelling");
+        assert!(crate::is_safe_command("cargo mutants --gitignore=false"), "glued spelling");
+        assert!(crate::is_safe_command("cargo mutants --cap-lints=warn"), "glued, non-boolean value");
+        assert!(
+            !crate::is_safe_command("cargo mutants --gitignore somefile"),
+            "the bare form must not consume the next token as its value"
+        );
+
+        // And the same grammar reached through a sub rather than a command.
+        assert!(crate::is_safe_command("ghostty +list-fonts --bold"), "bare, on a sub");
+        assert!(crate::is_safe_command("ghostty +list-fonts --bold=true"), "glued, on a sub");
+    }
+
     #[test]
     fn a_sub_scoped_gate_covers_every_spelling_of_its_sub() {
         use super::types::TomlFile;

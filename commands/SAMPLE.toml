@@ -116,6 +116,29 @@
 #     "--after-context", "--max-count",   # also accepts --max-count=5 syntax
 #     "-A", "-m",
 # ]
+# optional_valued = [                    # flags whose value is OPTIONAL: both
+#     "--gitignore", "--cap-lints",       #   `--gitignore` and `--gitignore=false`
+# ]
+#
+# Use `optional_valued` when BOTH spellings are real. Declare the flag ONLY
+# there — it implies membership in the other two, and a guard fails the build
+# if it is repeated in `standalone` or `valued`.
+#
+# The glued form is the only valued spelling this admits, which matches getopt:
+# an optional argument must be attached (`--gitignore=false`), never separated
+# (`--gitignore false`). If the tool really requires a value, it belongs in
+# `valued`; if it never takes one, `standalone`.
+#
+# Getting this wrong is not cosmetic in either direction. A valued flag put in
+# `standalone` lets its value fall through as a POSITIONAL, which silently
+# defeats every flag-level gate on that command. A boolean put in `valued`
+# swallows whatever follows it. `optional_valued` is how a flag that is
+# genuinely both says so, instead of picking a side and being wrong half the
+# time.
+#
+# NOT covered: the short glued form (`-r0`, `-r-`). Enumerate those spellings
+# in `standalone` instead — the value set is nearly always closed (7z's `-r`
+# is `-r`, `-r-`, `-r0`), so listing them is exact rather than approximate.
 
 # ─────────────────────────────────────────────────────────────────────
 # STRUCTURED COMMAND — has subcommands

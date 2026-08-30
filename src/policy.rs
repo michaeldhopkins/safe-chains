@@ -348,6 +348,42 @@ mod tests {
         assert!(check(&toks(&["uname"]), &policy));
     }
 
+    /// What a flag declared in BOTH lists actually does — measured, because the answer decides
+    /// whether an optional-value flag needs new machinery or only a name.
+    ///
+    /// TODO.md recorded that the two declarations "contradict each other and only one can be
+    /// honoured". That is not what the walk does. `standalone` is consulted first, so the BARE
+    /// spelling matches there and cannot swallow the next token; the `=` branch below it consults
+    /// `valued`, so the GLUED spelling matches too. Both are honoured, for different spellings —
+    /// which is exactly optional-value semantics, and matches getopt, where an optional argument
+    /// must be glued (`--flag=x`, never `--flag x`).
+    ///
+    /// The gap is the SHORT glued form: `-r0` reaches the cluster loop, which walks byte by byte
+    /// and has no notion of "the rest of this token is my value", so it fails on `0`.
+    #[test]
+    fn a_flag_declared_in_both_lists_already_takes_an_optional_value() {
+        static BOTH: FlagPolicy = FlagPolicy {
+            standalone: WordSet::flags(&["--long", "-r"]),
+            valued: WordSet::flags(&["--long", "-r"]),
+            bare: true,
+            max_positional: Some(0),
+            tolerance: FlagTolerance::strict(),
+        };
+        assert!(check(&toks(&["zstd", "--long"]), &BOTH), "bare long form");
+        assert!(check(&toks(&["zstd", "--long=27"]), &BOTH), "glued long form");
+        assert!(check(&toks(&["zstd", "-r"]), &BOTH), "bare short form");
+
+        // The bare form must NOT eat the next token — that swallow is how a path becomes a
+        // positional and slips the flag gate.
+        assert!(
+            !check(&toks(&["zstd", "--long", "somefile"]), &BOTH),
+            "the bare form must not consume the following token as its value"
+        );
+
+        // The short glued form is the one shape this does not cover.
+        assert!(!check(&toks(&["7z", "-r0"]), &BOTH), "short-glued is NOT handled today");
+    }
+
     #[test]
     fn standalone_long_flag() {
         assert!(check(&toks(&["grep", "--recursive", "pattern", "."]), &TEST_POLICY));

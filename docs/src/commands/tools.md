@@ -662,7 +662,7 @@ Aliases: `g++`, `cc`, `c++`
 - **+help**: Flags: --help
 - **+list-actions**: Flags: --docs, --help
 - **+list-colors**: Flags: --help, --plain
-- **+list-fonts**: Flags: --bold, --help, --italic. Valued: --bold, --family, --italic, --style
+- **+list-fonts**: Flags: --help, --bold, --italic. Valued: --family, --style, --bold, --italic
 - **+list-keybinds**: Flags: --default, --docs, --help, --plain
 - **+list-themes**: Flags: --help, --path, --plain. Valued: --color
 - **+show-config**: Flags: --changes-only, --default, --docs, --help

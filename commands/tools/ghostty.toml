@@ -56,18 +56,18 @@ level = "SafeRead"
 standalone = ["--help", "--path", "--plain"]
 valued = ["--color"]
 
-# --bold and --italic are BOOLEANS that also accept an explicit `=true`/`=false`, so they are listed
-# in both lists: standalone for the bare spelling, valued for the glued one. Declaring them valued
-# alone would make the bare form consume the following token; declaring them standalone alone would
-# refuse `--bold=true`, which ghostty accepts. Both spellings were measured against the binary.
+# --bold and --italic are BOOLEANS that also accept an explicit `=true`/`=false`. Both spellings were
+# measured against the binary, and `optional_valued` is exactly that grammar: the bare form does not
+# consume the following token, the glued form carries a value.
 #
-# --family and --style genuinely take a value, and only glued — ghostty silently ignores
+# --family and --style genuinely require a value, and only glued — ghostty silently ignores
 # `--family Menlo` written with a space, which is why the space form is not worth modelling here.
 [[command.sub]]
 name = "+list-fonts"
 level = "SafeRead"
-standalone = ["--bold", "--help", "--italic"]
-valued = ["--bold", "--family", "--italic", "--style"]
+standalone = ["--help"]
+valued = ["--family", "--style"]
+optional_valued = ["--bold", "--italic"]
 
 [[command.sub]]
 name = "+show-face"

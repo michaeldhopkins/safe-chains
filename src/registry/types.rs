@@ -49,6 +49,11 @@ pub(super) struct TomlCommand {
     pub standalone: Vec<String>,
     #[serde(default)]
     pub valued: Vec<String>,
+    /// Flags that take a value OPTIONALLY: `--long` and `--long=27` are both real spellings.
+    /// See `build_policy` for why this compiles down to the other two lists rather than adding
+    /// a state to the walk.
+    #[serde(default)]
+    pub optional_valued: Vec<String>,
     #[serde(default)]
     pub bare_flags: Vec<String>,
     #[serde(default)]
@@ -359,6 +364,8 @@ pub(super) struct TomlHandlerPolicy {
     #[serde(default)]
     pub valued: Vec<String>,
     #[serde(default)]
+    pub optional_valued: Vec<String>,
+    #[serde(default)]
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
@@ -382,6 +389,8 @@ pub(super) struct TomlFallback {
     pub standalone: Vec<String>,
     #[serde(default)]
     pub valued: Vec<String>,
+    #[serde(default)]
+    pub optional_valued: Vec<String>,
     #[serde(default)]
     pub tolerate_unknown_short: Option<bool>,
     #[serde(default)]
@@ -513,6 +522,8 @@ pub(super) struct TomlSub {
     pub standalone: Vec<String>,
     #[serde(default)]
     pub valued: Vec<String>,
+    #[serde(default)]
+    pub optional_valued: Vec<String>,
     #[serde(default)]
     pub guard: Option<String>,
     #[serde(default)]

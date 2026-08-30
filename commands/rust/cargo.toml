@@ -486,10 +486,11 @@ valued = ["--color", "--manifest-path"]
 #                        class as .cargo/config.toml; `--no-config` is strictly narrowing, so it stays
 #   -D/--in-diff, --Zmutate-file   open an arbitrary path, so they are reads that escape the worktree
 #
-# Optional-value flags (--cap-lints, --jobserver, --copy-target, --copy-vcs, --gitignore,
-# --skip-calls-defaults, --test-workspace) are omitted rather than guessed: the schema cannot express
-# "flag with an OPTIONAL value" today (see TODO.md, the standalone/valued overlap), and declaring one
-# in either list would assert a grammar the tool does not have.
+# --cap-lints, --jobserver, --copy-target, --copy-vcs, --gitignore, --skip-calls-defaults and
+# --test-workspace take an OPTIONAL value (`--gitignore` and `--gitignore=false` are both real).
+# They were omitted while the schema had no way to say so; `optional_valued` says it, so they are
+# declared now. None of them names a path or selects code — they are booleans with an explicit
+# spelling — so admitting the glued form widens nothing that the bare form did not already admit.
 #
 # `-V` is `--unviable` here, NOT `--version`. It takes no value either way, but the entry must not
 # imply cargo-mutants accepts `-V` as a version flag — it does not.
@@ -512,6 +513,10 @@ valued = [
     "--re", "--shard", "--skip-calls", "--test-package", "--timeout",
     "--timeout-multiplier",
     "-E", "-F", "-L", "-e", "-f", "-j", "-p", "-t",
+]
+optional_valued = [
+    "--cap-lints", "--copy-target", "--copy-vcs", "--gitignore",
+    "--jobserver", "--skip-calls-defaults", "--test-workspace",
 ]
 
 [[command.sub]]
