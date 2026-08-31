@@ -50,6 +50,24 @@ pub(crate) enum Role {
     Ignore,
 }
 
+impl Role {
+    /// How much this role withholds, for picking between clauses that both hold.
+    ///
+    /// Written out rather than derived from declaration order so that reordering the enum — which
+    /// looks cosmetic — cannot quietly change which role a self-overlapping gate selects. `Exec`
+    /// outranks `Write` because it withholds strictly more: it refuses `/tmp` and home, where a
+    /// write target is allowed to land.
+    pub(crate) fn restrictiveness(self) -> u8 {
+        match self {
+            Role::Ignore => 0,
+            Role::Read => 1,
+            Role::ReadTree => 2,
+            Role::Write => 3,
+            Role::Exec => 4,
+        }
+    }
+}
+
 /// How bare positionals map to roles, beyond the flat `positional` default.
 #[derive(Deserialize, Clone, Copy, PartialEq, Default, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -109,6 +127,37 @@ pub(crate) struct RoleSpec {
     /// `-dryrun`) still needs a handler — this is the common case, not the general one.
     #[serde(default)]
     write_when: Vec<String>,
+    /// Value-aware mode selection: each clause names flag spellings and, optionally, the VALUES
+    /// they must carry, and declares the positional role while it holds.
+    ///
+    /// `write_when` above reads flag PRESENCE and can only promote to `write`. That covers the
+    /// autofix linters and nothing else. Two shapes it cannot reach, both measured:
+    /// `dart format -o write|show|json|none` and `fourmolu --mode inplace` select the mode by a
+    /// flag's VALUE, and `dart`'s default (no flag at all) is the WRITING one, so the clause has
+    /// to make the invocation LESS restrictive rather than more.
+    ///
+    /// A matching clause REPLACES the declared positional role rather than promoting it, which is
+    /// what lets `dart format` default to `write` and step down to `read` under `-o show`. Where
+    /// several clauses match, the most restrictive of them wins, so an entry that overlaps itself
+    /// fails safe instead of depending on declaration order.
+    #[serde(default)]
+    when: Vec<WhenClause>,
+}
+
+/// One value-aware mode clause on a `[roles.X]` gate. See `RoleSpec::when`.
+#[derive(Deserialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct WhenClause {
+    /// Flag spellings that select this clause — every spelling of one flag, since a tool that
+    /// accepts `-o` and `--output` must not behave differently by which the caller typed.
+    #[serde(default)]
+    flag: Vec<String>,
+    /// Values the flag must carry for the clause to hold. Empty means PRESENCE alone selects it,
+    /// which is `write_when`'s semantics expressed in the general form.
+    #[serde(default)]
+    value: Vec<String>,
+    /// The positional role while this clause holds.
+    positional: Role,
 }
 
 impl RoleSpec {
@@ -119,6 +168,7 @@ impl RoleSpec {
             flags: HashMap::new(),
             handler: None,
             write_when: Vec::new(),
+            when: Vec::new(),
         }
     }
 
@@ -320,6 +370,43 @@ fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
     }
 }
 
+/// Whether `clause` holds over these tokens: one of its flag spellings is present, and — when the
+/// clause names values — that flag carries one of them.
+///
+/// Reads the LAST occurrence, because that is what the tools do: `dart format -o write -o show`
+/// formats to stdout. Taking the first would let a trailing flag silently move the invocation into
+/// the writing mode while the gate still judged it a read.
+///
+/// An UNRECOGNIZED value does not hold the clause. That is the fail-closed direction here and it
+/// matters: `dart format -o something-new` keeps the declared default (`write`) rather than
+/// stepping down to `read`, so a value this entry has never heard of cannot talk the gate into
+/// treating a rewrite as a read.
+fn clause_holds(clause: &WhenClause, tokens: &[Token]) -> bool {
+    let mut found = None;
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if let Some(spelling) = clause.flag.iter().find(|f| t == f.as_str()) {
+            let _ = spelling;
+            found = Some(tokens.get(i + 1).map(Token::as_str));
+            i += 2;
+            continue;
+        }
+        if let Some((head, glued)) = t.split_once('=')
+            && clause.flag.iter().any(|f| head == f.as_str())
+        {
+            found = Some(Some(glued));
+        }
+        i += 1;
+    }
+    match found {
+        None => false,
+        // Presence alone selects the clause — `write_when`'s semantics in the general form.
+        Some(_) if clause.value.is_empty() => true,
+        Some(value) => value.is_some_and(|v| clause.value.iter().any(|w| w == v)),
+    }
+}
+
 /// Walk the arguments once: gate each mapped flag's value by its role, then assign roles to the
 /// bare positionals via the positional policy. Any gated path at a sensitive locus → deny.
 fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
@@ -344,6 +431,17 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     } else {
         spec.positional
     };
+    // A value-aware clause REPLACES that role rather than promoting it — `dart format` defaults to
+    // rewriting its operands and steps DOWN to `read` under `-o show`, which no promote-only
+    // mechanism can express. Where several clauses match, the most restrictive wins, so an entry
+    // that overlaps itself fails safe rather than depending on the order it was written in.
+    let positional_role = spec
+        .when
+        .iter()
+        .filter(|clause| clause_holds(clause, tokens))
+        .map(|clause| clause.positional)
+        .max_by_key(|role| role.restrictiveness())
+        .unwrap_or(positional_role);
     let mut positionals: Vec<&str> = Vec::new();
     let mut i = 1;
     while i < tokens.len() {
@@ -572,7 +670,6 @@ mod handlers {
     #[cfg(test)]
     pub(super) const NAMES: &[&str] = &[
         "ar_archive",
-        "dart_mode",
         "exiftool_mode",
         "jupytext_mode",
         "mtree_mode",
@@ -586,7 +683,6 @@ mod handlers {
     pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         match name {
             "ar_archive" => ar_archive(tokens),
-            "dart_mode" => dart_mode(tokens),
             "exiftool_mode" => exiftool_mode(tokens),
             "jupytext_mode" => jupytext_mode(tokens),
             "mtree_mode" => mtree_mode(tokens),
@@ -895,52 +991,6 @@ mod handlers {
         false
     }
 
-    /// `dart format [-o MODE] paths…` — formats its positionals IN PLACE unless told otherwise.
-    ///
-    /// Two things make this need a handler rather than `write_when`. First the default: with no
-    /// flag at all `dart format` REWRITES every path it is given, so the dangerous case carries no
-    /// distinguishing token — `dart format ~/.ssh/authorized_keys` auto-approved. Second the
-    /// selector: `-o`/`--output` takes a VALUE (`write` rewrites, `show`/`json`/`none` print to
-    /// stdout), and `write_when` sees only flag PRESENCE. This is the flag-with-value predicate
-    /// recorded as an open question in docs/design/command-modes.md, with a live hole attached.
-    ///
-    /// Scoped to the `format` subcommand: `dart analyze`, `dart run`, `dart test` and friends do
-    /// not write their operands, so a blanket positional role on `dart` would over-deny them.
-    fn dart_mode(tokens: &[Token]) -> bool {
-        const VALUED: &[&str] = &["-o", "--output", "-l", "--line-length", "--indent", "--summary"];
-        if tokens.get(1).map(Token::as_str) != Some("format") {
-            return false;
-        }
-        let args: Vec<&str> = tokens[2..].iter().map(Token::as_str).collect();
-        // Default is `write`; only an explicit non-write output mode makes this a read.
-        let mut mode = "write";
-        let mut it = args.iter().copied();
-        while let Some(t) = it.next() {
-            if t == "-o" || t == "--output" {
-                if let Some(v) = it.next() {
-                    mode = v;
-                }
-            } else if let Some(v) = t.strip_prefix("--output=") {
-                mode = v;
-            }
-        }
-        let role = if mode == "write" { Role::Write } else { Role::Read };
-        let mut it = args.iter().copied();
-        while let Some(t) = it.next() {
-            if VALUED.contains(&t) {
-                it.next();
-                continue;
-            }
-            if t.starts_with('-') {
-                continue;
-            }
-            if gate(role, t) {
-                return true;
-            }
-        }
-        false
-    }
-
     /// `textutil -MODE [opts] files…` — `-convert`/`-strip` WRITE (to `-output`/`-outputdir`, else a
     /// sibling of each input, so the input's directory is written); `-info`/`-cat` READ the inputs.
     /// `-output`/`-outputdir` are always write targets.
@@ -1005,6 +1055,7 @@ mod both_gates {
             flags: flags.clone(),
             handler: Some("ar_archive".to_string()),
             write_when: Vec::new(),
+            when: Vec::new(),
         };
         let flags_only = RoleSpec {
             positional: Role::Ignore,
@@ -1012,6 +1063,7 @@ mod both_gates {
             flags,
             handler: None,
             write_when: Vec::new(),
+            when: Vec::new(),
         };
 
         // The FLAG half fires with a handler present, exactly as it does without one.
@@ -1207,6 +1259,50 @@ mod tests {
     /// `rbs` is the standing case: it rejects pre-sub flags at dispatch, so a regression here would
     /// NOT show up on it — which is exactly why this test drives the token walk directly instead of
     /// relying on a real command to expose it.
+    /// A value-aware `when` clause selects the positional role, and fails closed on anything it
+    /// does not recognise.
+    ///
+    /// `dart format` is the case this mechanism was built for and the one the modes design names
+    /// as its acceptance test: the mode is chosen by a flag's VALUE, and the chosen mode decides
+    /// whether the positionals are read or written. Both halves defeated every declarative
+    /// mechanism that existed, so it was a Rust handler until this.
+    ///
+    /// The witness has to be a path that READS fine and must not be WRITTEN. A credential store
+    /// denies both ways and would pass this test no matter which role was selected — that is how a
+    /// first draft of it proved nothing.
+    #[test]
+    fn a_when_clause_selects_the_positional_role_by_flag_value() {
+        let home = std::env::var("HOME").expect("HOME");
+        let witness = format!("{home}/notes.txt");
+        let toks = |words: &[&str]| -> Vec<Token> {
+            words.iter().map(|s| Token::from_test(s)).collect()
+        };
+
+        // Sanity: the witness discriminates. Without this the rest is vacuous.
+        assert!(
+            !should_deny("cat", &toks(&["cat", &witness])),
+            "witness must be readable, or this test cannot tell the roles apart"
+        );
+
+        let deny = |words: &[&str]| should_deny("dart", &toks(words));
+
+        // Default mode: `dart format` rewrites its operands in place.
+        assert!(deny(&["dart", "format", &witness]), "the bare form writes");
+        // A non-write output mode steps the positionals DOWN to read — the direction no
+        // promote-only mechanism can express.
+        assert!(!deny(&["dart", "format", "-o", "show", &witness]), "-o show reads");
+        assert!(!deny(&["dart", "format", "--output=json", &witness]), "glued spelling reads");
+        // Explicitly asking for the writing mode is still a write.
+        assert!(deny(&["dart", "format", "-o", "write", &witness]), "-o write writes");
+        // An unrecognised value keeps the declared default rather than stepping down, so a
+        // spelling this entry has never seen cannot argue its way into being treated as a read.
+        assert!(deny(&["dart", "format", "-o", "bogus", &witness]), "unknown value fails closed");
+        // The LAST occurrence decides, as the tool itself does.
+        assert!(deny(&["dart", "format", "-o", "show", "-o", "write", &witness]), "last wins");
+        // A sibling sub is untouched — the gate is scoped to `format`.
+        assert!(!deny(&["dart", "analyze", &witness]), "analyze does not write its operands");
+    }
+
     #[test]
     fn a_sub_scoped_gate_is_not_bypassed_by_a_flag_before_the_sub() {
         let spec = RoleSpec {
@@ -1215,6 +1311,7 @@ mod tests {
             flags: HashMap::new(),
             handler: None,
             write_when: Vec::new(),
+            when: Vec::new(),
         };
         // The sub as the second token — the shape the first implementation handled.
         assert!(apply(&spec, &toks(&["list", "~/.ssh/authorized_keys"])));
@@ -1262,6 +1359,7 @@ mod tests {
             flags: HashMap::new(),
             handler: None,
             write_when: vec!["--fix".to_string()],
+            when: Vec::new(),
         };
         // `read` and `write` both deny a sensitive locus, so the observable difference lives at an
         // in-workspace protected path: readable, write-denied.

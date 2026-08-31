@@ -88,6 +88,24 @@ write = [
 #    (read | write | ignore); `flags` maps a path-bearing flag to its value's role; `shape`
 #    (plain | skip_first | last_write | remote) adjusts the positional policy. The walker in
 #    pathgate.rs interprets these. Role assignment is authored per the tool's real semantics. ──
+#
+#    MODE SELECTION, in increasing order of what it can say:
+#      write_when = ["--fix"]        flag PRESENT ⇒ positionals are writes. Promote-only, and
+#                                    blind to the flag's value. Covers the autofix linters.
+#      [[roles.X.when]]              flag present AND (optionally) carrying one of these VALUES
+#        flag = ["-o", "--output"]   ⇒ positionals take THIS role. Unlike write_when it REPLACES
+#        value = ["show", "none"]    the declared role rather than promoting, so a tool whose
+#        positional = "read"         default is the writing mode can step DOWN under a flag.
+#
+#    Use `when` when the mode is chosen by a flag's VALUE, or when the DEFAULT is the dangerous
+#    mode. `dart format` is both: a bare `dart format .` rewrites in place, and
+#    `-o write|show|json|none` picks the mode by value. Omitting `value` makes a clause
+#    presence-only, i.e. write_when's semantics in the general form.
+#
+#    A clause that does not match leaves the declared role alone, and an unrecognised VALUE does
+#    not match — so a spelling the entry has never seen keeps the default rather than talking the
+#    gate into a weaker role. Where several clauses match, the most restrictive wins, so an entry
+#    that overlaps itself fails safe rather than depending on the order it was written in.
 
 # HTTP downloaders: the URL operand is gated by read locus, but the locus layer is scheme-aware
 # — a network URL admits (so `curl https://x/a/../b` does NOT false-deny on the `..`) and a
@@ -942,10 +960,27 @@ handler = "mtree_mode"
 [roles."ncu"]
 handler = "ncu_mode"
 # `dart format` rewrites its positionals IN PLACE by default — the dangerous form carries no
-# distinguishing flag at all — and `-o write|show|json|none` selects the mode by VALUE, which
-# write_when cannot express. Scoped to the `format` sub inside the handler.
-[roles."dart"]
-handler = "dart_mode"
+# distinguishing flag at all — and `-o write|show|json|none` selects the mode by VALUE.
+#
+# This was a Rust handler (`dart_mode`) until value-aware `when` clauses existed, and it is the
+# reason they do: it is the smallest invocation in the tree that needs a predicate over a flag's
+# VALUE *and* a payload that re-roles the positionals. Declaring it is now the acceptance test for
+# that mechanism, so if this entry cannot be expressed here the mechanism has not earned its place.
+#
+# The default is `write` because that is what a bare `dart format .` does. An unrecognized `-o`
+# value keeps the default rather than stepping down, so a spelling this entry has never seen cannot
+# argue its way into being treated as a read.
+#
+# The valued flags are spelled out as `ignore` because a positional gate treats an undeclared
+# valued flag's value as a path, and `--line-length 80` names a column count.
+[roles."dart format"]
+positional = "write"
+flags = { "--language-version" = "ignore", "--line-length" = "ignore", "--output" = "ignore", "--page-width" = "ignore", "--selection" = "ignore", "--style" = "ignore", "-l" = "ignore", "-o" = "ignore" }
+
+[[roles."dart format".when]]
+flag = ["-o", "--output"]
+value = ["show", "json", "none"]
+positional = "read"
 
 # ── Autofix LINTERS: inspect their operands by default, REWRITE them under a fix flag. Declared
 #    with `write_when` rather than eight more Rust handlers — this is the shape that mechanism

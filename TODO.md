@@ -1103,6 +1103,36 @@ deliberately, not for making v1 large. Whichever is chosen, the acceptance test 
 be changed to match the scope, or the first implementation will be measured against a bar it was
 never designed to clear.
 
+### DECIDED: (b). Stage 1 built 2026-08-31 — the value predicate and the path-role payload
+
+`[[roles.X.when]]` in `pathgates.toml`: a clause names flag spellings and, optionally, the VALUES
+they must carry, and declares the positional role while it holds. It REPLACES the declared role
+rather than promoting it, which is what `write_when` could not do and what `dart format` needs — a
+bare `dart format .` rewrites in place, so the clause has to make the invocation LESS restrictive.
+
+**The acceptance test passes.** `dart format` is now declared, not coded: `dart_mode` is deleted,
+and the entry expresses both halves the design said defeated every declarative mechanism — a
+predicate over a flag's VALUE, and a payload that re-roles the positionals.
+
+One deliberate behaviour change while converting: the old handler treated ANY non-`write` value as a
+read, so `dart format -o bogus ~/x` was a read. The clause matches only values it names, so an
+unrecognised one keeps the default (`write`) and denies. A value the entry has never seen can no
+longer argue its way into a weaker role.
+
+REMAINING for (b), in the order they should be taken:
+
+  - **Flag-role payloads.** A clause can re-role POSITIONALS; it cannot yet re-role another flag's
+    VALUE. That is customer 5 — `gomodifytags -w -file X`, where `-file`'s value is a write with
+    `-w` and a read without, currently authored `write` unconditionally as the fail-closed choice
+    and costing a narrow over-deny. The clause needs a `flags = { … }` payload beside `positional`.
+  - **The formatter family.** `fourmolu`/`ormolu --mode inplace` can now be expressed; converting
+    them plus moving the eight `write_when` linters onto `positional = "read"` + a presence clause
+    removes the split that made `gofmt .git/config` deny while `ansible-lint .git/config` allowed.
+  - **Modes proper** — the LEVEL and FLAG-LIST payload, which is what customers 1, 2, 3 and 6
+    (`git diff --name-only`, `php -l`, `ruby -S`, `base64`) need and which this stage does not
+    touch. It is the larger half: it has to live in the registry beside `[[command.sub]]` rather
+    than in the path gate, and the no-inheritance rule means each mode repeats its grammar.
+
 ## The `standalone` + `valued` overlap audit (blocked on the above)
 
 Promoted 2026-08-04 out of the "FIFTH PASS" narrative above, where it was easy to miss.
