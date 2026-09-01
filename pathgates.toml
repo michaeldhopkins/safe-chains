@@ -97,6 +97,12 @@ write = [
 #        value = ["show", "none"]    the declared role rather than promoting, so a tool whose
 #        positional = "read"         default is the writing mode can step DOWN under a flag.
 #
+#    A clause may also carry `flags = { "-file" = "write" }`, which re-roles another FLAG's value
+#    while it holds. That is the other half of mode selection: `gomodifytags -file X` prints to
+#    stdout and `-w` makes it rewrite X, so `-file`'s role depends on a DIFFERENT flag and no map
+#    keyed on `-file` alone can say so. `positional` and `flags` are independent — a clause may set
+#    either, or both.
+#
 #    Use `when` when the mode is chosen by a flag's VALUE, or when the DEFAULT is the dangerous
 #    mode. `dart format` is both: a bare `dart format .` rewrites in place, and
 #    `-o write|show|json|none` picks the mode by value. Omitting `value` makes a clause

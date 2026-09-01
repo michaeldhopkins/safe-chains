@@ -156,8 +156,19 @@ pub(crate) struct WhenClause {
     /// which is `write_when`'s semantics expressed in the general form.
     #[serde(default)]
     value: Vec<String>,
-    /// The positional role while this clause holds.
-    positional: Role,
+    /// The positional role while this clause holds. Omitted when the clause only re-roles flags.
+    #[serde(default)]
+    positional: Option<Role>,
+    /// Flag roles while this clause holds, overriding the gate's own `flags` map.
+    ///
+    /// The positional payload above covers a tool whose OPERANDS change role with the mode. This
+    /// covers the other half: a tool where one flag's VALUE changes role because of another flag.
+    /// `gomodifytags -file X` prints the modified source to stdout, and `-w` makes it rewrite X in
+    /// place — so `-file` is a read or a write depending on `-w`, which no map keyed on the flag
+    /// alone can say. It was authored `write` unconditionally as the fail-closed choice, at the
+    /// cost of denying every read-only run.
+    #[serde(default)]
+    flags: HashMap<String, Role>,
 }
 
 impl RoleSpec {
@@ -435,18 +446,43 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     // rewriting its operands and steps DOWN to `read` under `-o show`, which no promote-only
     // mechanism can express. Where several clauses match, the most restrictive wins, so an entry
     // that overlaps itself fails safe rather than depending on the order it was written in.
-    let positional_role = spec
-        .when
+    let holding: Vec<&WhenClause> =
+        spec.when.iter().filter(|clause| clause_holds(clause, tokens)).collect();
+    let positional_role = holding
         .iter()
-        .filter(|clause| clause_holds(clause, tokens))
-        .map(|clause| clause.positional)
+        .filter_map(|clause| clause.positional)
         .max_by_key(|role| role.restrictiveness())
         .unwrap_or(positional_role);
+    // A holding clause may also re-role FLAGS. Built as an overlay rather than mutating the spec,
+    // and resolved most-restrictive-first for the same reason the positional role is: two clauses
+    // that disagree about one flag must not depend on the order they were declared in.
+    // The overlay is resolved among the CLAUSES first, then REPLACES the spec's entry — it does not
+    // max against it. Maxing against the spec would make a clause unable to lower a flag's role,
+    // which is the direction that matters: `gomodifytags -file` is declared `write` so the
+    // undecidable case fails closed, and the clause's job is to say when it is only a read.
+    let mut overlay: HashMap<String, Role> = HashMap::new();
+    for clause in &holding {
+        for (flag, &role) in &clause.flags {
+            overlay
+                .entry(flag.clone())
+                .and_modify(|held| {
+                    if role.restrictiveness() > held.restrictiveness() {
+                        *held = role;
+                    }
+                })
+                .or_insert(role);
+        }
+    }
+    let mut flags = spec.flags.clone();
+    flags.extend(overlay);
+    // Only pay for the overlay when a clause actually re-roles something; every other gate walks
+    // the spec's own map, which is the overwhelmingly common case.
+    let flags = if holding.iter().any(|c| !c.flags.is_empty()) { &flags } else { &spec.flags };
     let mut positionals: Vec<&str> = Vec::new();
     let mut i = 1;
     while i < tokens.len() {
         let t = tokens[i].as_str();
-        if let Some((role, value, consumed)) = match_flag(spec, tokens, i) {
+        if let Some((role, value, consumed)) = match_flag(flags, tokens, i) {
             // A DECLARED flag's value skips the pre-filter and is always judged. The declaration
             // already says this token is a path operand of this role, so asking "does it look like
             // a path?" second-guesses it — and every miss in this gate has been a value the filter
@@ -541,9 +577,9 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
 
 /// If `tokens[i]` is one of `spec`'s mapped flags in any form — `-o V`, `--output=V`, glued
 /// `-oV`, or clustered `-qO/etc/x` — return its (role, value, tokens-consumed).
-fn match_flag<'a>(spec: &RoleSpec, tokens: &'a [Token], i: usize) -> Option<(Role, &'a str, usize)> {
+fn match_flag<'a>(flags: &HashMap<String, Role>, tokens: &'a [Token], i: usize) -> Option<(Role, &'a str, usize)> {
     let t = tokens[i].as_str();
-    for (flag, &role) in &spec.flags {
+    for (flag, &role) in flags {
         if t == flag {
             return Some((role, tokens.get(i + 1).map_or("", Token::as_str), 2));
         }
@@ -560,7 +596,7 @@ fn match_flag<'a>(spec: &RoleSpec, tokens: &'a [Token], i: usize) -> Option<(Rol
     // write. Its value is the rest of the token, or the NEXT token when the letter is last
     // (`-qO /etc/x`); `-qO-` reads `-` (stdout).
     let cluster = t.strip_prefix('-').filter(|c| !c.starts_with('-') && !c.is_empty())?;
-    spec.flags
+    flags
         .iter()
         .filter(|(flag, _)| flag.len() == 2 && flag.starts_with('-'))
         .filter_map(|(flag, &role)| cluster.find(&flag[1..]).map(|p| (p, role)))
@@ -1259,6 +1295,45 @@ mod tests {
     /// `rbs` is the standing case: it rejects pre-sub flags at dispatch, so a regression here would
     /// NOT show up on it — which is exactly why this test drives the token walk directly instead of
     /// relying on a real command to expose it.
+    /// A `when` clause can re-role a FLAG's value, not only the positionals.
+    ///
+    /// `gomodifytags -file X` prints the modified source to stdout; `-w` makes it rewrite X in
+    /// place. So `-file`'s value is a read or a write depending on ANOTHER flag, which a map keyed
+    /// on the flag alone cannot say. It was declared `write` unconditionally — the fail-closed
+    /// choice, at the cost of denying every read-only run against a file outside the workspace.
+    ///
+    /// The clause is an ESCALATION here (read by default, write under `-w`), so a clause that
+    /// stopped matching would fall back to `read`. That is only safe because a run without `-w`
+    /// genuinely does not write, which is the fact this test pins: if `-w` ever stops selecting the
+    /// write role, the third case below fails rather than quietly admitting a rewrite.
+    #[test]
+    fn a_when_clause_can_re_role_a_flags_value() {
+        let toks = |words: &[&str]| -> Vec<Token> {
+            words.iter().map(|s| Token::from_test(s)).collect()
+        };
+        let deny = |words: &[&str]| should_deny("gomodifytags", &toks(words));
+
+        // `.git/config` is readable and write-denied, so it tells the two roles apart.
+        assert!(
+            !deny(&["gomodifytags", "-file", ".git/config", "-add-tags", "json"]),
+            "without -w the source goes to stdout, so -file is only read"
+        );
+        assert!(
+            !deny(&["gomodifytags", "--file", ".git/config", "--all"]),
+            "the long spelling reads too"
+        );
+        assert!(
+            deny(&["gomodifytags", "-w", "-file", ".git/config", "-add-tags", "json"]),
+            "-w rewrites the file -file names"
+        );
+        // The clause is computed over the whole token list, so the order cannot hide the write.
+        assert!(
+            deny(&["gomodifytags", "-file", ".git/config", "-w"]),
+            "-w after the path still selects the write role"
+        );
+        assert!(deny(&["gomodifytags", "--w", "--file", ".git/config"]), "the --w alias too");
+    }
+
     /// The in-place formatters answer the same question the same way: printing is a read, and only
     /// the tool's own write flag makes it a write.
     ///

@@ -36,5 +36,19 @@ examples_safe = [
 # `-file`/`--file` names the source gomodifytags operates on, and `-w` rewrites that same file in
 # place — so the flag VALUE is the write target. `-w` itself is boolean and carries no path, which is
 # why the output-flag sweep saw nothing to gate here.
+#
+# The role depends on ANOTHER flag: without `-w` the modified source goes to stdout, so `-file` is
+# only read. It was declared `write` unconditionally because a map keyed on the flag alone cannot
+# say "read unless `-w`", and that was the fail-closed choice — at the cost of denying every
+# read-only run against a file outside the workspace. The `when` clause says it properly now.
+#
+# Declared read-by-default and escalated by the clause, rather than the reverse. If the clause ever
+# stops matching, the flag falls back to READ, so it is worth being explicit that this is safe here:
+# a gomodifytags run with no `-w` genuinely does not write, and `--w` (the alias in `write_flags`)
+# is covered alongside it.
 [command.path_gate]
+flags = { "-file" = "read", "--file" = "read" }
+
+[[command.path_gate.when]]
+flag = ["-w", "--w"]
 flags = { "-file" = "write", "--file" = "write" }

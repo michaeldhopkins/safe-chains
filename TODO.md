@@ -1121,10 +1121,19 @@ longer argue its way into a weaker role.
 
 REMAINING for (b), in the order they should be taken:
 
-  - **Flag-role payloads.** A clause can re-role POSITIONALS; it cannot yet re-role another flag's
-    VALUE. That is customer 5 — `gomodifytags -w -file X`, where `-file`'s value is a write with
-    `-w` and a read without, currently authored `write` unconditionally as the fail-closed choice
-    and costing a narrow over-deny. The clause needs a `flags = { … }` payload beside `positional`.
+  - ~~**Flag-role payloads.**~~ DONE 2026-08-31. A clause now carries `flags = { … }` beside
+    `positional`, re-roling another flag's VALUE while it holds. `gomodifytags` is converted:
+    `-file` is declared `read` and escalated to `write` by a clause on `-w`/`--w`, so the read-only
+    run against a file outside the workspace stops denying.
+
+    Note the direction. Here the clause ESCALATES (read by default), where `dart format`'s steps
+    DOWN — so a clause that stopped matching would fall back to `read` and admit a rewrite. That is
+    only sound because a gomodifytags run without `-w` genuinely does not write, and the guard pins
+    it: red-demoed by deleting the clause, which makes the `-w` case fail OPEN and the test fail.
+
+    The overlay resolves among clauses and then REPLACES the spec's entry rather than maxing
+    against it — maxing would make a clause unable to lower a role, which is the direction
+    `dart format` needs.
   - ~~**The formatter family.**~~ DONE 2026-08-31 for six: `gofmt`, `gofumpt`, `goimports`,
     `clang-format`, `fourmolu`, `ormolu` moved from a blanket `positional = "write"` to
     `positional = "read"` plus a write clause. `gofmt .git/config` allowed a read again while every
