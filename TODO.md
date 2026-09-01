@@ -1149,10 +1149,21 @@ REMAINING for (b), in the order they should be taken:
     `autopep8` keep the blanket gate until their write-flag surface is enumerated the same way, and
     `cmake-format` additionally has `-o`/`--outfile-path`, which writes somewhere the positional
     gate does not look — so it needs the flag-role payload below, not just a clause.
-  - **Modes proper** — the LEVEL and FLAG-LIST payload, which is what customers 1, 2, 3 and 6
-    (`git diff --name-only`, `php -l`, `ruby -S`, `base64`) need and which this stage does not
-    touch. It is the larger half: it has to live in the registry beside `[[command.sub]]` rather
-    than in the path gate, and the no-inheritance rule means each mode repeats its grammar.
+  - **Modes proper** — the LEVEL and FLAG-LIST payload. **Re-measured 2026-09-01 before building,
+    and the customer list had gone stale: four of the six are served.** `git diff --name-only` by
+    `output.requires` (built after the design was written, and the design argues against adding it);
+    `php -l` by the `interpreter` handler; `fourmolu` and `gomodifytags` by the two clause stages
+    above. `base64` is served by deliberate degradation — the entry models GNU and says so, and
+    BSD's `-o`, the only spelling that writes, is not allowlisted at all.
+
+    That leaves `ruby -S CMD`, which denies. It is an OVER-DENY, not a hole, and what it needs is a
+    DELEGATION payload — open question 3 in the design — rather than the level-and-flag-lists the
+    document mostly describes.
+
+    So the remaining case is one over-deny on one command, against a mechanism whose no-inheritance
+    rule makes every mode repeat its grammar. Not obviously worth it; deliberately NOT built on that
+    basis rather than left unfinished by accident. The design doc now carries the measured table, so
+    the next person re-derives the list instead of trusting it.
 
 ## The `standalone` + `valued` overlap audit (blocked on the above)
 

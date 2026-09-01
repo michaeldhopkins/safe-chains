@@ -150,6 +150,29 @@ permissive fallback under a flag-selected model is a fail-open generator.
 Ambiguous mode selection is an author mistake of exactly that kind, and "first match wins" would make
 mode ORDER load-bearing and invisible.
 
+## STATUS 2026-09-01 — measured, and the six-customer list is now stale
+
+Four of the six are served, and two of the four were served by mechanisms built AFTER this document
+was written. Measured against the binary, not read off the entries:
+
+| # | customer | status |
+|---|---|---|
+| 1 | `git diff --name-only` | **SERVED.** `output.requires` was built and `git diff` carries it (verified against git 2.53). `grep -rn x $(git diff --name-only)` allows; `$(git diff)` denies. The document argues for modes partly on the grounds that `requires` should not be added — it was, and it works. |
+| 2 | `php -l file.php` | **SERVED** by the `interpreter` handler. `php -l ./index.php` allows, `php ./index.php` denies, `php --version` allows. |
+| 3 | `ruby -S CMD` | **NOT served.** Denies, along with `-e`/`-r`/`-x`, by omission from the allowlist. This is an OVER-DENY, not a hole. |
+| 4 | `fourmolu --mode inplace` | **SERVED** by value-aware `when` clauses (2026-08-31). |
+| 5 | `gomodifytags -w -file` | **SERVED** by the clause flag-role payload (2026-08-31). |
+| 6 | `base64 -i/-o` | **SERVED by degradation, deliberately.** The entry models GNU and says so; a BSD `-i FILE` leaves FILE as a positional, still gated as a content read. BSD's `-o`, the only spelling that WRITES, is not in the allowlist at all, so it denies. Fail-closed and documented. |
+
+So the case for modes proper is now one over-deny on one command, where the payload needed is
+DELEGATION (open question 3 below) rather than the level-and-flag-lists this document mostly
+describes. That is a materially weaker case than "six customers, all measured", and the no-inheritance
+rule — which requires every mode to repeat its grammar — is a real cost to weigh against it.
+
+This does not retract the design. It records that the pressure behind it has been absorbed
+piecemeal, and that anyone picking it up should re-derive the customer list before building, because
+four entries in the one above changed without this file being touched.
+
 ## What is actually open
 
 These are the ones with real content, and they are about ENFORCEMENT rather than shape:
