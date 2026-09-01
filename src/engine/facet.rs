@@ -26,23 +26,66 @@ pub trait FacetTerm: Copy + Eq + Sized + 'static {
     fn from_term(s: &str) -> Option<Self>;
     /// The term a level is LEAST likely to admit — the one `Capability::worst` carries on this axis.
     ///
-    /// Not derivable from the term list, which is why it is declared. Most ordinals run
-    /// least-severe to most, so the ladder top is the hazard; but `Isolation` and `Pinning` are
-    /// TRUST ladders where higher is safer and a level FLOORS them (`>= namespace`, `>= version`),
-    /// so their hazard is the BOTTOM. And a categorical has no order at all: `TriggerKind::None`
-    /// means "not recurring", the benign case, while `Clock`/`Event` are what persist.
+    /// For an ORDINAL it is derived, never written: the ladder top for a severity ladder, and the
+    /// bottom for one marked `inverted;` (`Isolation`, `Pinning` — trust ladders where higher is
+    /// safer and a level FLOORS them, `>= namespace`, `>= version`). Only the DIRECTION is
+    /// declared, because direction has an objectively right answer while the hazard is a
+    /// consequence of it, and declaring a consequence lets the two disagree.
     ///
-    /// Hand-writing this per axis inside `worst()` is what let it drift — it carried
+    /// A CATEGORICAL still declares it, and must: there is no order to derive from.
+    /// `TriggerKind::None` means "not recurring", the benign case, while `Clock`/`Event` are what
+    /// persist — nothing about the term list says which.
+    ///
+    /// Hand-writing this per axis inside `worst()` is what let it drift once already: it carried
     /// `TriggerKind::None`, so a clause allowing only non-recurring triggers admitted the
-    /// fail-closed sentinel on that axis.
+    /// fail-closed sentinel on that axis. The ordinal half of that exposure is now gone by
+    /// construction; the categorical half is guarded by
+    /// `a_declared_hazard_is_the_term_authored_levels_reject`, which can only speak for the axes
+    /// some level constrains (TODO.md, "Eleven facet axes have no authored level constraint").
     fn hazard() -> Self;
 }
 
 macro_rules! ordinal_term {
+    // A SEVERITY ladder — least-severe first, so the hazard is the top. The overwhelming majority.
     (
         $(#[$meta:meta])*
         $name:ident { $first:ident => $fs:literal $(, $rest:ident => $rs:literal)* $(,)? }
-        $(hazard = $hz:ident;)?
+    ) => {
+        ordinal_term! { @build
+            $(#[$meta])*
+            $name { $first => $fs $(, $rest => $rs)* }
+            hazard = *Self::all().last().expect("a facet has at least one term");
+        }
+    };
+    // A TRUST ladder — higher is SAFER (`Isolation`, `Pinning`), and a level FLOORS it
+    // (`>= namespace`, `>= version`), so the hazard is the BOTTOM.
+    //
+    // The DIRECTION is declared, and the hazard derived from it. It used to be the other way round:
+    // each trust ladder hand-wrote `hazard = Floating`, which is a value someone has to get right
+    // twice — once when adding the axis and again whenever the term list is reordered. That is the
+    // shape the trait's own doc blames for the one bug this has already caused (`worst()` carried
+    // `TriggerKind::None`, the benign term, so a clause admitting only non-recurring triggers
+    // admitted the fail-closed sentinel).
+    //
+    // Direction is a property of the ladder with an objectively right answer; the hazard is a
+    // consequence of it. Declaring the consequence let the two disagree, and no test could catch it
+    // on an axis no level constrains — which is both of these. See TODO.md, "Eleven facet axes have
+    // no authored level constraint".
+    (
+        $(#[$meta:meta])*
+        $name:ident { $first:ident => $fs:literal $(, $rest:ident => $rs:literal)* $(,)? }
+        inverted;
+    ) => {
+        ordinal_term! { @build
+            $(#[$meta])*
+            $name { $first => $fs $(, $rest => $rs)* }
+            hazard = Self::$first;
+        }
+    };
+    (@build
+        $(#[$meta:meta])*
+        $name:ident { $first:ident => $fs:literal $(, $rest:ident => $rs:literal)* $(,)? }
+        hazard = $hazard:expr;
     ) => {
         $(#[$meta])*
         #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -59,14 +102,7 @@ macro_rules! ordinal_term {
             fn from_term(s: &str) -> Option<Self> {
                 match s { $fs => Some(Self::$first), $($rs => Some(Self::$rest),)* _ => None }
             }
-            fn hazard() -> Self {
-                // An explicit `hazard =` short-circuits; otherwise the ladder top is the hazard,
-                // which is right for every severity ladder and wrong for the two trust ladders
-                // (they declare it).
-                $( return Self::$hz; )?
-                #[allow(unreachable_code)]
-                { *Self::all().last().expect("a facet has at least one term") }
-            }
+            fn hazard() -> Self { $hazard }
         }
     };
 }
@@ -242,7 +278,7 @@ ordinal_term! {
         Vm => "vm",
         Ocap => "ocap",
     }
-    hazard = None;
+    inverted;
 }
 
 // ── 2.3 Durability ─────────────────────────────────────────────────────────────
@@ -410,7 +446,7 @@ ordinal_term! {
         HashVerified => "hash-verified",
         Digest => "digest",
     }
-    hazard = Floating;
+    inverted;
 }
 
 categorical_term! {
@@ -718,6 +754,36 @@ mod tests {
         assert_term_strings_roundtrip::<Pinning>();
         assert_term_strings_roundtrip::<ExecSurface>();
         assert_term_strings_roundtrip::<Cost>();
+    }
+
+    /// The trust ladders take their hazard from the BOTTOM of the ladder.
+    ///
+    /// `Isolation` and `Pinning` run safe-ward: more isolation and tighter pinning are higher, and
+    /// a level FLOORS them (`>= namespace`, `>= version`). So the term a level is least likely to
+    /// admit is the bottom — no isolation, no pinning — and not the top the severity ladders use.
+    ///
+    /// This is pinned by NAME rather than derived, because there is nothing left to derive it from:
+    /// the ladder direction is exactly what the `inverted;` marker declares, and a guard that read
+    /// the marker would be asserting the marker against itself. What it catches is the marker going
+    /// MISSING, which is silent otherwise — measured, and the reason this test exists: with
+    /// `inverted;` removed from `Pinning`, `hazard()` becomes `Digest`, the SAFEST term on the axis,
+    /// and the entire suite still passed. 4601 tests, zero failures, while `Capability::worst()`
+    /// claimed the most-pinned supply chain was the worst case.
+    ///
+    /// It stays silent because no authored level constrains either axis — the supply-chain group
+    /// deliberately so (TODO.md, "Eleven facet axes have no authored level constraint"), which
+    /// means `a_declared_hazard_is_the_term_authored_levels_reject` cannot speak for them and
+    /// nothing else was looking.
+    #[test]
+    fn the_trust_ladders_take_their_hazard_from_the_bottom() {
+        assert_eq!(Isolation::hazard(), Isolation::None, "no isolation is the hazard, not `ocap`");
+        assert_eq!(Pinning::hazard(), Pinning::Floating, "unpinned is the hazard, not `digest`");
+        // And each really is the ladder's bottom, so the claim above is about the ladder and not
+        // about which variant happens to be spelled first.
+        assert_eq!(Isolation::hazard(), Isolation::all()[0]);
+        assert_eq!(Pinning::hazard(), Pinning::all()[0]);
+        assert!(Isolation::None < Isolation::Ocap, "Isolation runs safe-ward");
+        assert!(Pinning::Floating < Pinning::Digest, "Pinning runs safe-ward");
     }
 
     #[test]

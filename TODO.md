@@ -46,11 +46,11 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | item | section |
 |---|---|
 | Eleven facet axes carry a declared `hazard` that no authored level constrains. Part is deliberate (the supply-chain group); the rest is unverified, and a mis-declaration there is invisible | "Eleven facet axes have no authored level constraint" |
-| The `user` locus rung is constructed only in tests — the resolver never emits it | "The `user` locus rung is constructed ONLY in tests" |
-| Reading anywhere in `~` should be separable from writing anywhere in `~` | "Reading anywhere in `~` should be separable…" |
+| ~~The `user` locus rung is never emitted~~ — **DONE**, `regions::home_role`; verified 2026-09-01 | "The `user` locus rung is constructed ONLY in tests" |
+| ~~Reading anywhere in `~` separable from writing~~ — **DONE**; the op×locus matrix now behaves as that section specifies | "Reading anywhere in `~` should be separable…" |
 | Loopback destinations — remaining work | "Loopback destinations" |
 | Atom confinement: the `$SCRATCH` half | "Atom confinement" |
-| `$(( ))` containing a substitution — fix known, blocked on a pre-existing hang | "Three reported prompts", A |
+| ~~`$(( ))` containing a substitution~~ — **DONE and guarded**; no hang, sub-second, `arithmetic_with_a_substitution_is_judged_by_its_inner_command` | "Three reported prompts", A |
 | A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace (accepted false deny; revisit if the shape generalises) | "A recursive searcher cannot tell…" |
 | `cpio -o` reads its file list from stdin, and the list is unknowable | "`cpio -o` archives a file list…" |
 
@@ -502,6 +502,39 @@ assertions — mechanical, but they should be re-derived rather than bulk-edited
 
 `tests/fixtures/path_policy_corpus.tsv` is the acceptance test — 60/70 today, with all ten
 mismatches in `read-home` and `read-machine`.
+
+## DONE 2026-09-01 — the `user` rung, and the read/write split that depended on it
+
+Both sections below are resolved, and were resolved before this check: `regions::home_role` is the
+production construction site the first one says does not exist, and its doc comment narrates the
+same defect. Re-measured rather than assumed, with cwd/root at a project:
+
+    ~/notes.txt            user        (was machine)
+    ~/Downloads/x.pdf      user        (was machine)
+    ~/.grok/config.toml    user        (was machine)
+    ~/.cargo/registry/…    user        (was adjacent — a hand-placed rung)
+    /etc/hosts             machine
+    /usr/lib/x.so          machine     (was adjacent — the same collapse pointing permissive)
+
+And the operation × locus matrix the second section asks for:
+
+    observe · user      ALLOW    cat ~/notes.txt
+    create · user       DENY     touch ~/x
+    mutate · user       DENY     tee ~/x
+    destroy · user      DENY     rm -rf ~
+    mutate · machine    DENY     tee /etc/hosts
+    secret axis         DENY     cat ~/.ssh/id_rsa   (orthogonal, as specified)
+
+One deliberate difference from what that section proposed: it wanted `anything · machine` refused,
+but `observe · machine` ALLOWS (`cat /etc/hosts`). That is the permissive read policy as decided —
+everything readable except the credential shields — not a regression against this design.
+
+Guarded end to end, so the "green tests documenting a rung production never reaches" problem is
+closed too: `locus.rs` asserts `read_locus("~/notes") == User` and `regions.rs` asserts
+`classify_region("~/notes.txt").read_locus == User`, both against real path strings rather than
+hand-built enum values.
+
+**Kept below for the reasoning, which is still the clearest statement of why the rung matters.**
 
 ## The `user` locus rung is constructed ONLY in tests — the resolver never emits it
 
@@ -1375,6 +1408,21 @@ and per the next paragraph none is expected to. Mis-declaring `Pinning::hazard =
 term on that ladder) would go unnoticed by that test — verified by red demo; only
 `the_sentinel_is_denied_even_with_any_one_axis_relaxed` would still hold, and only because the other
 axes carry the denial.
+
+**ADDRESSED 2026-09-01, for the ordinal half.** Re-confirmed the exposure first, and it was worse
+than "would go unnoticed by that test": with `Pinning`'s hazard set to `Digest`, the whole suite
+passed — 4601 tests, zero failures — while `Capability::worst()` claimed the most-pinned supply
+chain was the worst case. Nothing anywhere was looking.
+
+Two changes. `ordinal_term!` no longer accepts a hand-written `hazard =`; a trust ladder is marked
+`inverted;` and the hazard is DERIVED (bottom when inverted, top otherwise). Direction has an
+objectively right answer and the hazard is a consequence of it, so declaring the consequence was
+what let the two disagree — the same shape the trait doc already blamed for the `TriggerKind::None`
+drift. And `the_trust_ladders_take_their_hazard_from_the_bottom` pins both axes by name, which is
+what catches the marker going MISSING; red-demoed, since that was the failure mode with no witness.
+
+Categoricals still declare their hazard and must — there is no order to derive from. That half stays
+resting on its doc comment for any axis no level constrains, which is the paragraph below.
 
 **The whole supply-chain group is unconstrained BY DESIGN, and will likely stay that way.** The
 developer install clause (`levels/default.toml`, the `npm ci --ignore-scripts` shape) has landed, and
