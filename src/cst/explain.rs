@@ -102,7 +102,15 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
 
 fn segment_report(stmt: &Stmt, covered: &impl Fn(&Cmd) -> bool) -> SegmentReport {
     let verdict = effective_verdict(&stmt.pipeline, covered);
-    let culprit = if verdict.is_allowed() || stmt.pipeline.commands.len() <= 1 {
+    // A culprit is suppressed when it would only repeat the segment's own name: for a lone SIMPLE
+    // command the segment text already IS `cat ~/.ssh/id_rsa`, so labelling it `cat` says nothing.
+    //
+    // That used to be spelled `commands.len() <= 1`, which caught compounds as well — and there the
+    // label is the only actionable information there is. The segment text of a denied `for` loop is
+    // the whole loop; what the caller has to change is the command inside it, and suppressing that
+    // is how a third of the author's decision-log denials came to read "no reason recorded".
+    let redundant_with_segment_text = matches!(stmt.pipeline.commands.as_slice(), [Cmd::Simple(_)]);
+    let culprit = if verdict.is_allowed() || redundant_with_segment_text {
         None
     } else {
         first_denied_label(&stmt.pipeline, covered)
@@ -145,11 +153,110 @@ fn first_denied_label(pipeline: &Pipeline, covered: &impl Fn(&Cmd) -> bool) -> O
         .and_then(command_label)
 }
 
+/// The name to report as the culprit for a denied command.
+///
+/// A compound is not itself a command anyone can act on: the thing the caller has to change lives
+/// INSIDE it. So this descends into the body and names the first inner command that is denied on
+/// its own — `(cat ~/.ssh/id_rsa)` reports `cat`, not nothing.
+///
+/// It used to return `None` for everything but `Simple`, which is why a denied `for`/`while`/`case`
+/// left `culprit: null` and `facets: null` in the decision log — roughly a third of the denials in
+/// the author's own log read "no reason recorded". `--explain` had the same hole, and it is the
+/// worse place for it: the hook renders that text back to the agent, so a refusal with no reason is
+/// one the agent cannot act on except by guessing.
+///
+/// Every body is descended, not just the one that will run. Which `if` branch or `case` arm
+/// executes is a runtime value, so the classifier already treats such a command as only as safe as
+/// its worst body; reporting has to look in the same places or it would name nothing for exactly
+/// the constructs that were denied because of what is buried in them.
 fn command_label(cmd: &Cmd) -> Option<String> {
     match cmd {
         Cmd::Simple(s) => simple_cmd_name(s),
-        _ => None,
+        // A function DEFINITION is inert — its body only matters when called, and naming the body's
+        // commands here would report a culprit for a command that did nothing.
+        Cmd::FunctionDef { .. } => None,
+        Cmd::Subshell { body, .. } | Cmd::BraceGroup { body, .. } => denied_label_in(body),
+        Cmd::For { body, .. } => denied_label_in(body),
+        Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
+            denied_label_in(cond).or_else(|| denied_label_in(body))
+        }
+        Cmd::If { branches, else_body, .. } => branches
+            .iter()
+            .find_map(|b| denied_label_in(&b.cond).or_else(|| denied_label_in(&b.body)))
+            .or_else(|| else_body.as_ref().and_then(denied_label_in)),
+        Cmd::Case { arms, .. } => arms.iter().find_map(|arm| denied_label_in(&arm.body)),
+        // `[[ … ]]` is a test expression, not a command that could be the culprit.
+        Cmd::DoubleBracket { .. } => None,
     }
+}
+
+/// The WORDS of the first denied command inside a compound, for the facet breakdown.
+///
+/// `--explain`'s profile section tokenises the raw string flatly, which cannot see into a compound:
+/// `(cat ~/.ssh/id_rsa)` splits to `["(cat", "~/.ssh/id_rsa)"]`, no resolver recognises `(cat`, and
+/// the refusal renders with no reason at all. Roughly a third of the denials in the author's
+/// decision log read "no reason recorded" for this shape.
+///
+/// Returns `None` for a plain simple command, so the caller keeps its existing path and this is
+/// only consulted where that path has nothing to say.
+pub(crate) fn denied_inner_words(input: &str) -> Option<Vec<String>> {
+    let _guard = super::check::ClassifyGuard::enter()?;
+    let script = parse(input)?;
+    let [stmt] = &script.0[..] else { return None };
+    let [cmd] = &stmt.pipeline.commands[..] else { return None };
+    // A simple command is already handled by the flat path, and going through the CST for it would
+    // change what that path reports on inputs it handles correctly today.
+    if matches!(cmd, Cmd::Simple(_)) {
+        return None;
+    }
+    first_denied_simple(cmd)
+}
+
+/// The first simple command at or below `cmd` that is denied on its own.
+fn first_denied_simple(cmd: &Cmd) -> Option<Vec<String>> {
+    match cmd {
+        Cmd::Simple(s) => Some(s.words.iter().map(Word::eval).collect()),
+        Cmd::FunctionDef { .. } | Cmd::DoubleBracket { .. } => None,
+        Cmd::Subshell { body, .. } | Cmd::BraceGroup { body, .. } | Cmd::For { body, .. } => {
+            first_denied_simple_in(body)
+        }
+        Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
+            first_denied_simple_in(cond).or_else(|| first_denied_simple_in(body))
+        }
+        Cmd::If { branches, else_body, .. } => branches
+            .iter()
+            .find_map(|b| {
+                first_denied_simple_in(&b.cond).or_else(|| first_denied_simple_in(&b.body))
+            })
+            .or_else(|| else_body.as_ref().and_then(first_denied_simple_in)),
+        Cmd::Case { arms, .. } => arms.iter().find_map(|arm| first_denied_simple_in(&arm.body)),
+    }
+}
+
+fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
+    script.0.iter().find_map(|stmt| {
+        stmt.pipeline
+            .commands
+            .iter()
+            .find(|c| !cmd_verdict(c).is_allowed())
+            .and_then(first_denied_simple)
+    })
+}
+
+/// The first command inside `script` that is denied on its own, by name.
+///
+/// Recurses through `command_label`, so a culprit nested several constructs deep is still found.
+/// Termination rests on the CST being finite and acyclic — a body is always a strictly smaller
+/// subtree than the command containing it — which is the same property the classifier's own walk
+/// relies on.
+fn denied_label_in(script: &Script) -> Option<String> {
+    script.0.iter().find_map(|stmt| {
+        stmt.pipeline
+            .commands
+            .iter()
+            .find(|c| !cmd_verdict(c).is_allowed())
+            .and_then(command_label)
+    })
 }
 
 fn simple_cmd_name(s: &SimpleCmd) -> Option<String> {
@@ -334,6 +441,48 @@ mod tests {
     fn semicolons_and_or_split_into_segments() {
         assert_eq!(explain("ls; pwd; whoami").segments.len(), 3);
         assert_eq!(explain("ls || rm -rf /").segments.len(), 2);
+    }
+
+    /// A denied COMPOUND names the command inside it, rather than nothing.
+    ///
+    /// `command_label` returned `None` for every non-simple command, so a denied `for`/`while`/
+    /// `case`/subshell left `culprit: null` in the decision log and no reason in `--explain`.
+    /// Roughly a third of the denials in the author's own log read "no reason recorded".
+    ///
+    /// The construct itself is never the actionable answer — the caller cannot change "a subshell",
+    /// only the command in it — so every body is descended, including the branches and arms that
+    /// may not run. The classifier already treats such a command as only as safe as its worst body;
+    /// reporting looks in the same places, or it names nothing for precisely the constructs whose
+    /// denial came from something buried in them.
+    #[test]
+    fn a_denied_compound_names_the_command_inside_it() {
+        for src in [
+            "(cat ~/.ssh/id_rsa)",
+            "{ cat ~/.ssh/id_rsa; }",
+            "if true; then cat ~/.ssh/id_rsa; fi",
+            "for f in a b; do cat ~/.ssh/id_rsa; done",
+            "while true; do cat ~/.ssh/id_rsa; done",
+            "case $x in a) cat ~/.ssh/id_rsa ;; esac",
+        ] {
+            let ex = explain(src);
+            assert_eq!(ex.segments.len(), 1, "{src}: one segment");
+            assert!(!ex.is_allowed(), "{src}: denied");
+            assert_eq!(
+                ex.segments[0].culprit.as_deref(),
+                Some("cat"),
+                "{src}: must name the command inside the construct"
+            );
+        }
+
+        // And the words reach the facet breakdown, which is what puts a REASON on the refusal.
+        assert_eq!(
+            denied_inner_words("(cat ~/.ssh/id_rsa)"),
+            Some(vec!["cat".to_string(), "~/.ssh/id_rsa".to_string()]),
+        );
+        // A plain simple command keeps the existing path — this is only for what it cannot see.
+        assert_eq!(denied_inner_words("cat ~/.ssh/id_rsa"), None);
+        // A construct whose body is fine has no culprit to name.
+        assert_eq!(denied_inner_words("(ls)"), None);
     }
 
     #[test]

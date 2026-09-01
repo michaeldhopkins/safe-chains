@@ -70,7 +70,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | item | section |
 |---|---|
 | `--suggest` writes the file its name implies it only proposes; appends to a config it cannot parse; nearest-ancestor walk | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
-| A denied compound construct records no reason at all | "A denied compound construct records no reason" |
+| ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
 | Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — spec written | "A grant should cover what it names" |
 | `--setup` silently rewrites a wrong-typed key on three targets | "`--setup` silently rewrites…" |
@@ -619,6 +619,28 @@ That is the same hole the per-segment facets closed for `&&`/`;` chains, one lev
 interesting command is INSIDE the loop body and never gets classified on its own for reporting. The
 fix is presumably to walk the construct's body the way `explain` walks a chain, and attach a reason
 per inner command.
+
+DONE 2026-09-01. Confirmed first on `(…)`, `{…}`, `if`, `for`, `while` and `case`: every one denied
+with no profile and no refusal line. Two separate causes, which is why the first change alone did
+nothing visible:
+
+1. `command_label` returned `None` for every non-`Simple` command, so no culprit was found. It now
+   descends the body — including branches and arms that may not run, since the classifier already
+   treats such a command as only as safe as its worst body, and reporting has to look in the same
+   places.
+2. The culprit was then suppressed anyway by `commands.len() <= 1`. That rule is right for a lone
+   SIMPLE command, where the segment text already IS the command and labelling it says nothing —
+   but a compound is one command too, and there the inner name is the only actionable information
+   there is. Narrowed to `[Cmd::Simple(_)]`.
+
+And a third for the facet block specifically: `facet_breakdown` tokenises the raw string with
+`shell_words`, which cannot see into a construct — `(cat ~/.ssh/id_rsa)` splits to `["(cat",
+"~/.ssh/id_rsa)"]` and no resolver claims `(cat`. It now asks the CST for the inner denied command's
+words and labels the output with which command it is describing.
+
+A construct whose inner command is LEGACY-classified still shows no facets (`case … tee /etc/hosts`),
+which is the documented behaviour of that block — no resolver claims it, so there is nothing to
+render. That is a property of the inner command, not of the construct.
 
 ## `sed -i ''` on macOS: the empty suffix is eaten as the script, and a `$` then denies
 

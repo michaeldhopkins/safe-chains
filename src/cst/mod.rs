@@ -178,6 +178,7 @@ pub enum Redir {
 
 pub use check::{command_verdict, is_safe_command, is_safe_pipeline};
 pub use explain::{Explanation, SegmentReport, explain, explain_with_coverage};
+pub(crate) use explain::denied_inner_words;
 pub use parse::parse;
 
 impl Word {

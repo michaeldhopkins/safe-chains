@@ -94,8 +94,17 @@ pub fn facet_breakdown(command: &str) -> String {
         return "\n  (facet breakdown covers one command at a time; run --explain on a single segment)\n"
             .to_string();
     }
-    let Ok(words) = shell_words::split(command) else {
-        return String::new();
+    // A COMPOUND is one segment, so it reaches here — but the flat split cannot see into it.
+    // `(cat ~/.ssh/id_rsa)` tokenises to `["(cat", "~/.ssh/id_rsa)"]`, no resolver recognises
+    // `(cat`, and the refusal rendered with no reason at all. The command the caller has to change
+    // is INSIDE the construct, so describe that one and say so.
+    let inner = cst::denied_inner_words(command);
+    let words = match inner {
+        Some(ref w) => w.clone(),
+        None => match shell_words::split(command) {
+            Ok(w) => w,
+            Err(_) => return String::new(),
+        },
     };
     if words.is_empty() {
         return String::new();
@@ -105,6 +114,9 @@ pub fn facet_breakdown(command: &str) -> String {
         return String::new();
     };
     let mut out = String::from("\n  resolved profile:\n");
+    if let Some(w) = &inner {
+        out.push_str(&format!("    (the refused command inside it: `{}`)\n", w.join(" ")));
+    }
     for (because, facets) in &ex.capabilities {
         out.push_str(&format!("    · {because}\n"));
         for (name, term) in facets {
