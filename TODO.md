@@ -1125,9 +1125,21 @@ REMAINING for (b), in the order they should be taken:
     VALUE. That is customer 5 — `gomodifytags -w -file X`, where `-file`'s value is a write with
     `-w` and a read without, currently authored `write` unconditionally as the fail-closed choice
     and costing a narrow over-deny. The clause needs a `flags = { … }` payload beside `positional`.
-  - **The formatter family.** `fourmolu`/`ormolu --mode inplace` can now be expressed; converting
-    them plus moving the eight `write_when` linters onto `positional = "read"` + a presence clause
-    removes the split that made `gofmt .git/config` deny while `ansible-lint .git/config` allowed.
+  - ~~**The formatter family.**~~ DONE 2026-08-31 for six: `gofmt`, `gofumpt`, `goimports`,
+    `clang-format`, `fourmolu`, `ormolu` moved from a blanket `positional = "write"` to
+    `positional = "read"` plus a write clause. `gofmt .git/config` allowed a read again while every
+    write spelling still denies, closing the split against `ansible-lint`.
+
+    Each write flag was enumerated from the tool's own documentation, because this direction is a
+    LOOSENING and a missed spelling reads a real rewrite as a read. That caution paid: fourmolu's
+    published docs give `--mode inplace`, but its option parser (`app/Main.hs`) also declares
+    `short 'm'`, so `-m inplace` is real — declaring only the long form would have been exactly the
+    hole the design predicted converting them would cause.
+
+    NOT converted, each for a stated reason rather than by omission: `yapf`, `autoflake`,
+    `autopep8` keep the blanket gate until their write-flag surface is enumerated the same way, and
+    `cmake-format` additionally has `-o`/`--outfile-path`, which writes somewhere the positional
+    gate does not look — so it needs the flag-role payload below, not just a clause.
   - **Modes proper** — the LEVEL and FLAG-LIST payload, which is what customers 1, 2, 3 and 6
     (`git diff --name-only`, `php -l`, `ruby -S`, `base64`) need and which this stage does not
     touch. It is the larger half: it has to live in the registry beside `[[command.sub]]` rather

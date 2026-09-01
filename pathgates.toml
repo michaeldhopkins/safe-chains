@@ -904,12 +904,39 @@ positional = "write"
 # being rewritten is a POSITIONAL — which is why the flag-name-based output guard never saw them.
 # All four auto-approved a rewrite of a system or credential file (`clang-format -i /etc/hosts`,
 # `gofmt -w /etc/hosts`, `yapf --in-place ~/.ssh/config`) before this.
+#
+# The ones below now gate the WRITE FLAG rather than the whole family, which is what the autofix
+# linters already did. Gating every positional as a write was correct about the dangerous form and
+# wrong about the ordinary one: these tools print to stdout by default, so `gofmt .git/config`
+# — a read — denied while `ansible-lint .git/config` allowed. One family, two answers, decided by
+# which mechanism happened to exist when each was added.
+#
+# Each write flag is enumerated from the tool's own documentation, not pattern-matched from the
+# name, because this direction is a LOOSENING: a spelling missed here reads a real rewrite as a
+# read. gofmt/gofumpt/goimports write only under `-w` (pkg.go.dev/cmd/gofmt: "-w is the only flag
+# that modifies files in place"); clang-format only under `-i`.
 [roles."clang-format"]
+positional = "read"
+[[roles."clang-format".when]]
+flag = ["-i"]
 positional = "write"
+
 [roles."gofmt"]
+positional = "read"
+[[roles."gofmt".when]]
+flag = ["-w"]
 positional = "write"
+
 [roles."gofumpt"]
+positional = "read"
+[[roles."gofumpt".when]]
+flag = ["-w"]
 positional = "write"
+
+# Not converted, and each for its own reason rather than by omission: yapf, autoflake, autopep8 and
+# cmake-format keep the blanket write gate until their write-flag surface is enumerated the way the
+# ones above were. cmake-format additionally has `-o`/`--outfile-path`, which writes somewhere the
+# positional gate does not look, so converting it needs a flag role as well as a clause.
 [roles."yapf"]
 positional = "write"
 # Same family, each confirmed against its OWN description rather than pattern-matched from the flag
@@ -920,11 +947,41 @@ positional = "write"
 positional = "write"
 [roles."cmake-format"]
 positional = "write"
+# fourmolu and ormolu are the pair the modes design named as blocked: the mode is selected by a
+# flag's VALUE, which `write_when` cannot see, so converting them would have traded a narrow false
+# deny for a real hole. Read from fourmolu's own option parser (app/Main.hs) rather than its docs,
+# because the short spellings are what matter here and the docs omit them:
+#
+#     -i                 a shortcut for --mode inplace   (a switch, no value)
+#     -m / --mode MODE   'stdout' (default), 'inplace', 'check'
+#
+# `-m inplace` is the reason this had to be checked at the source. Declaring only `--mode` would
+# have left the short spelling reading a rewrite as a read — the exact fail-open the design warned
+# converting them would cause. `stdout` and `check` both read, and are covered by the default role.
 [roles."fourmolu"]
+positional = "read"
+[[roles."fourmolu".when]]
+flag = ["-i"]
 positional = "write"
+[[roles."fourmolu".when]]
+flag = ["-m", "--mode"]
+value = ["inplace"]
+positional = "write"
+
 [roles."ormolu"]
+positional = "read"
+[[roles."ormolu".when]]
+flag = ["-i"]
 positional = "write"
+[[roles."ormolu".when]]
+flag = ["-m", "--mode"]
+value = ["inplace"]
+positional = "write"
+
 [roles."goimports"]
+positional = "read"
+[[roles."goimports".when]]
+flag = ["-w"]
 positional = "write"
 
 # ── Operation-aware gates (the archive/mode selector decides read vs write; see pathgate::handlers).

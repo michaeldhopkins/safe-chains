@@ -1259,6 +1259,88 @@ mod tests {
     /// `rbs` is the standing case: it rejects pre-sub flags at dispatch, so a regression here would
     /// NOT show up on it — which is exactly why this test drives the token walk directly instead of
     /// relying on a real command to expose it.
+    /// The in-place formatters answer the same question the same way: printing is a read, and only
+    /// the tool's own write flag makes it a write.
+    ///
+    /// They did not, and the split was not a judgement call — it was which mechanism existed when
+    /// each entry was written. The formatters got `positional = "write"` (blanket, before clauses),
+    /// the autofix linters got `write_when` (flag-gated), so `gofmt .git/config` denied a read
+    /// while `ansible-lint .git/config` allowed one. Converting the formatters was blocked on
+    /// fourmolu and ormolu, which select the mode by a flag's VALUE.
+    ///
+    /// A table so adding a formatter is one row, and so the direction that matters is asserted
+    /// explicitly: the write spellings are enumerated from each tool's own documentation, and a
+    /// spelling missed there reads a real rewrite as a read.
+    #[test]
+    fn the_in_place_formatters_agree_on_read_versus_write() {
+        /// One formatter: its name, the spellings that REWRITE the operand, and the spellings
+        /// that print it. Named rather than left as a bare tuple so the two flag lists cannot be
+        /// swapped at a call site without the compiler noticing the field names.
+        struct Formatter {
+            cmd: &'static str,
+            writes: &'static [&'static [&'static str]],
+            reads: &'static [&'static [&'static str]],
+        }
+
+        const fn f(
+            cmd: &'static str,
+            writes: &'static [&'static [&'static str]],
+            reads: &'static [&'static [&'static str]],
+        ) -> Formatter {
+            Formatter { cmd, writes, reads }
+        }
+
+        const FAMILY: &[Formatter] = &[
+            f("gofmt", &[&["-w"]], &[&[], &["-l"], &["-d"]]),
+            f("gofumpt", &[&["-w"]], &[&[], &["-l"]]),
+            f("goimports", &[&["-w"]], &[&[], &["-l"]]),
+            f("clang-format", &[&["-i"]], &[&[]]),
+            // The pair the design named as blocked. `-m inplace` is the spelling that would have
+            // been the hole: fourmolu's parser gives `--mode` a short form, and the published docs
+            // do not mention it.
+            f(
+                "fourmolu",
+                &[&["-i"], &["-m", "inplace"], &["--mode", "inplace"], &["--mode=inplace"]],
+                &[&[], &["--mode", "check"], &["-m", "stdout"]],
+            ),
+            f(
+                "ormolu",
+                &[&["-i"], &["-m", "inplace"], &["--mode", "inplace"]],
+                &[&[], &["--mode", "check"]],
+            ),
+        ];
+
+        // An in-workspace path that is READABLE and write-denied. A path outside the workspace
+        // would deny under both roles and make every row below vacuous.
+        const WITNESS: &str = ".git/config";
+        let toks = |cmd: &str, flags: &[&str]| -> Vec<Token> {
+            std::iter::once(cmd)
+                .chain(flags.iter().copied())
+                .chain(std::iter::once(WITNESS))
+                .map(Token::from_test)
+                .collect()
+        };
+
+        let mut checked = 0usize;
+        for Formatter { cmd, writes, reads } in FAMILY {
+            for flags in *reads {
+                checked += 1;
+                assert!(
+                    !should_deny(cmd, &toks(cmd, flags)),
+                    "{cmd} {flags:?} prints rather than rewriting, so {WITNESS} is a read"
+                );
+            }
+            for flags in *writes {
+                checked += 1;
+                assert!(
+                    should_deny(cmd, &toks(cmd, flags)),
+                    "{cmd} {flags:?} REWRITES its operand — this spelling is not gated"
+                );
+            }
+        }
+        assert!(checked > 20, "only {checked} spellings probed — the table shrank");
+    }
+
     /// A value-aware `when` clause selects the positional role, and fails closed on anything it
     /// does not recognise.
     ///
