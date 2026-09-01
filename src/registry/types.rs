@@ -412,6 +412,10 @@ pub(super) struct TomlFallback {
     pub executor: Option<String>,
     #[serde(default)]
     pub executor_redirect_flag: Option<String>,
+    /// Tokens after the executor path are the SCRIPT's argv, not this command's arguments.
+    /// Defaults to false, which is the enforcing answer — see `TomlSub::passes_argv`.
+    #[serde(default)]
+    pub passes_argv: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -620,6 +624,17 @@ pub(super) struct TomlSub {
     /// Predicate the executor path must satisfy (`"go-package"`), else deny. `File` only.
     #[serde(default)]
     pub positional_shape: Option<String>,
+    /// Tokens after the executor path are the SCRIPT's argv, not this command's own arguments.
+    ///
+    /// An interpreter passes them through (`python3 ./task.py --flag arg`) and its flag grammar
+    /// cannot describe them, so only the prefix up to the script is checked. A tool that merely
+    /// TAKES a path does not: a second positional on `karma start` is a second config file it
+    /// loads and executes, and it must be counted by `max_positional`.
+    ///
+    /// Defaults to false, the enforcing answer, so a new File executor is governed by its own
+    /// declared grammar unless someone states otherwise.
+    #[serde(default)]
+    pub passes_argv: Option<bool>,
     #[serde(default)]
     pub handler: Option<String>,
     #[serde(default)]
@@ -1048,6 +1063,13 @@ pub(super) enum DispatchKind {
         /// `go run` uses `go-package` so a remote import path (`rsc.io/x@latest`) is not
         /// treated as a worktree executor.
         shape: Option<crate::policy::PositionalShape>,
+        /// Whether the tokens AFTER the executor path are the SCRIPT's argv rather than this
+        /// command's own arguments. `python3 ./task.py --flag arg` passes them; `karma start
+        /// ./a.conf.js` does not, and a second path there is a second CONFIG it will load.
+        ///
+        /// Decides how much of the invocation the flag policy governs, so it defaults to FALSE —
+        /// the enforcing answer. See `dispatch::dispatch_executor`.
+        passes_argv: bool,
     },
     Custom {
         #[allow(dead_code)]
@@ -1134,4 +1156,7 @@ pub(super) struct FallbackSpec {
     pub executor: Option<ExecutorKind>,
     /// See `DispatchKind::Executor::redirect_flag`. Unused for `File` fallbacks.
     pub executor_redirect_flag: Option<String>,
+    /// See `DispatchKind::Executor::passes_argv`. This is where the interpreters set it: their
+    /// trailing tokens are the script's argv, which their own grammar cannot describe.
+    pub passes_argv: bool,
 }

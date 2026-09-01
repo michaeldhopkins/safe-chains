@@ -384,8 +384,16 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             dispatch_wrapper(tokens, standalone, valued, *positional_skip, separator.as_deref(), *bare_ok)
         }
         DispatchKind::VerbChain(spec) => dispatch_verb_chain(tokens, spec),
-        DispatchKind::Executor { policy, level, kind, redirect_flag, shape } => {
-            dispatch_executor(tokens, policy, *kind, *level, redirect_flag.as_deref(), *shape)
+        DispatchKind::Executor { policy, level, kind, redirect_flag, shape, passes_argv } => {
+            dispatch_executor(
+                tokens,
+                policy,
+                *kind,
+                *level,
+                redirect_flag.as_deref(),
+                *shape,
+                *passes_argv,
+            )
         }
         DispatchKind::Custom { handler_name, .. } => {
             handlers
@@ -513,9 +521,31 @@ pub(super) fn dispatch_executor(
     level: SafetyLevel,
     redirect_flag: Option<&str>,
     shape: Option<crate::policy::PositionalShape>,
+    passes_argv: bool,
 ) -> Verdict {
     match kind {
-        ExecutorKind::File => match super::policy::first_positional(tokens, policy) {
+        ExecutorKind::File => match super::policy::first_positional_at(tokens, policy)
+            .and_then(|(at, first)| {
+                // How much of the invocation the command's own grammar governs.
+                //
+                // This used to check NOTHING once a first positional resolved, so `max_positional`
+                // went unenforced and a command that OPENS its extra positionals was handed them:
+                // `karma start ./ok.conf.js /etc/evil.conf.js` was admitted, the second path being
+                // a second config karma loads and runs. `karma` and `tilt` each grew a `path_gate`
+                // to compensate, which worked but left the next such command to inherit the hole.
+                //
+                // Checking only the PREFIX up to the executor — TODO's first suggestion — does not
+                // fix it, which was measured rather than reasoned: the prefix contains exactly one
+                // positional by construction, so `max_positional = 1` always passes and the second
+                // config is still never counted. That approach is a no-op for the case it targets.
+                //
+                // So the command DECLARES whether trailing tokens are its own. An interpreter
+                // passes them to the script (`python3 ./task.py --flag arg`) and its grammar
+                // genuinely cannot describe them, so only the prefix is checked. Everything else is
+                // governed in full, which is the enforcing default a new entry gets for free.
+                let governed = if passes_argv { &tokens[..=at] } else { tokens };
+                check_owned(governed, policy).then_some(first)
+            }) {
             // `-` is STDIN, not a file. Every interpreter reads its program from stdin when given
             // it, so the code being run is not in the workspace and is not in the command string
             // either — the classifier cannot see it at all. It was resolving as a bare relative
@@ -574,7 +604,7 @@ pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdic
     if let Some(kind) = spec.executor {
         return dispatch_executor(
             tokens, &spec.policy, kind, spec.level,
-            spec.executor_redirect_flag.as_deref(), spec.positional_shape,
+            spec.executor_redirect_flag.as_deref(), spec.positional_shape, spec.passes_argv,
         );
     }
     if let Some(shape) = spec.positional_shape

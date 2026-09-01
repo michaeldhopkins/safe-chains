@@ -89,6 +89,8 @@ standalone = ["--help", "--m", "--vendor", "-h"]
 [[command.sub]]
 name = "run"
 executor = "file"
+# Tokens after the script are the SCRIPT's argv, which this grammar cannot describe.
+passes_argv = true
 positional_shape = "go-package"
 bare = false
 standalone = [

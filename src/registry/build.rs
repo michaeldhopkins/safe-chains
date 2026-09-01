@@ -170,6 +170,7 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, Stri
         positional_shape,
         executor,
         executor_redirect_flag: toml.executor_redirect_flag,
+        passes_argv: toml.passes_argv.unwrap_or(false),
     })
 }
 
@@ -847,6 +848,7 @@ fn build_policy_sub_kind(
             kind,
             redirect_flag: toml.executor_redirect_flag,
             shape,
+            passes_argv: toml.passes_argv.unwrap_or(false),
         });
     }
     if !toml.write_flags.is_empty() {

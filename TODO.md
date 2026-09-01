@@ -48,8 +48,8 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | Eleven facet axes carry a declared `hazard` that no authored level constrains. Part is deliberate (the supply-chain group); the rest is unverified, and a mis-declaration there is invisible | "Eleven facet axes have no authored level constraint" |
 | ~~The `user` locus rung is never emitted~~ — **DONE**, `regions::home_role`; verified 2026-09-01 | "The `user` locus rung is constructed ONLY in tests" |
 | ~~Reading anywhere in `~` separable from writing~~ — **DONE**; the op×locus matrix now behaves as that section specifies | "Reading anywhere in `~` should be separable…" |
-| Loopback destinations — remaining work | "Loopback destinations" |
-| Atom confinement: the `$SCRATCH` half | "Atom confinement" |
+| ~~Loopback destinations~~ — the MECHANISM is shipped and generic (`is_loopback`, `loopback_valued`, `loopback_localizes`). What remains is per-service write-surface research, not engine work | "Loopback destinations" |
+| ~~Atom confinement: the `$SCRATCH` half~~ — closed as CORRECT, not a bug: `$SCRATCH` is not a harness convention, so it names anywhere and must deny. The section's own sub-heading says do not reopen | "Atom confinement" |
 | ~~`$(( ))` containing a substitution~~ — **DONE and guarded**; no hang, sub-second, `arithmetic_with_a_substitution_is_judged_by_its_inner_command` | "Three reported prompts", A |
 | A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace (accepted false deny; revisit if the shape generalises) | "A recursive searcher cannot tell…" |
 | `cpio -o` reads its file list from stdin, and the list is unknowable | "`cpio -o` archives a file list…" |
@@ -58,7 +58,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 
 | item | section |
 |---|---|
-| `dispatch_executor` skips the flag policy when a positional is present | "`dispatch_executor` skips the flag policy…" |
+| ~~`dispatch_executor` skips the flag policy when a positional is present~~ — **DONE** via `passes_argv` (default false); karma's compensating gate removed | "`dispatch_executor` skips the flag policy…" |
 | `cargo fuzz` needs a pathgate handler and a positional shape | "cargo fuzz: REVERTED" |
 | Retire blanket flag tolerance (`tolerate_unknown_short/long`); glob-family migration in progress | "Retire blanket flag tolerance", "Glob-family flag migration" |
 | One real structural-invariant gap remains | "Structural invariants: three probed clean" |
@@ -2293,9 +2293,32 @@ The structural half is now guarded: `capped_file_executors_declare_a_path_gate` 
 fails if any command declares a File executor WITH `max_positional` but no `path_gate`, so the next
 one cannot inherit the hole silently.
 
-DONE when: `dispatch_executor` enforces the policy over the pre-script prefix, and
-`tilt a.erb b.erb` still denies with tilt's `path_gate` removed. Until then the guard is the
-backstop, not the fix.
+DONE 2026-09-01 — but NOT by the fix this section proposed, and the difference is the useful part.
+
+**"Enforce the policy over the pre-script prefix" does not work.** It was implemented and measured:
+the prefix contains exactly one positional by construction, so `max_positional = 1` always passes
+and the second config is still never counted. With karma's `path_gate` commented out,
+`karma start ./ok.conf.js /etc/evil.conf.js` was still ADMITTED under that change. It is a no-op for
+the case it targets.
+
+What works is the section's other option — declare which commands pass trailing args through.
+`passes_argv` on a File executor says the tokens after the script are the SCRIPT's argv, so only the
+prefix is checked; **it defaults to false**, so the whole invocation is governed and `max_positional`
+counts every operand. Declared on `python3`, `node`, `ruby` and `go run`; absent everywhere else,
+which is where the enforcement comes from.
+
+The payoff is that the compensating gates can go. `karma`'s `positional = "exec"` existed only
+because of this gap — with the grammar enforced, at most one positional is possible and the executor
+already locus-gates it — so it is removed and the two-config form still denies. Its FLAG roles stay:
+`--format-error` names a JS module karma requires, and nothing else gates that.
+
+Note `tilt` is not the witness this section assumed. It never used `fallback.executor` at all — it
+deliberately chose a `path_gate` instead, for this very reason — so it does not exercise the dispatch
+path and is unchanged. `karma start` (a File executor WITH `max_positional`) is the real case.
+
+Guarded by `a_file_executor_enforces_its_grammar_unless_it_passes_argv`, red-demoed by setting
+`passes_argv` on karma, which is only load-bearing because the compensating gate was removed first —
+with it in place the guard passed either way and proved nothing.
 
 ## Two targets cannot self-filter on the tool — verify their envelopes
 

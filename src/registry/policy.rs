@@ -24,6 +24,23 @@ pub(super) fn first_positional<'a>(
     tokens: &'a [Token],
     policy: &OwnedPolicy,
 ) -> Option<&'a str> {
+    first_positional_at(tokens, policy).map(|(_, s)| s)
+}
+
+/// [`first_positional`], plus WHERE it was found.
+///
+/// The index is what lets a caller split an invocation at the executor: everything up to and
+/// including that token is the command's own grammar and can be checked against its flag policy,
+/// while everything after it is the SCRIPT's argv and cannot. `dispatch_executor` needs exactly
+/// that split — see the comment there.
+///
+/// Expressed as one walk with `first_positional` delegating to it, rather than two functions that
+/// scan independently: the value and its index must never disagree about which token is the
+/// executor, and two copies of this loop is how they would.
+pub(super) fn first_positional_at<'a>(
+    tokens: &'a [Token],
+    policy: &OwnedPolicy,
+) -> Option<(usize, &'a str)> {
     let standalone = policy.standalone.as_slice();
     let valued = policy.valued.as_slice();
     let mut i = 1;
@@ -31,10 +48,10 @@ pub(super) fn first_positional<'a>(
         let t = &tokens[i];
         let s = t.as_str();
         if s == "--" {
-            return tokens.get(i + 1).map(Token::as_str);
+            return tokens.get(i + 1).map(|t| (i + 1, t.as_str()));
         }
         if s == "-" || !s.starts_with('-') {
-            return Some(s);
+            return Some((i, s));
         }
         if standalone.contains_flag(s) {
             i += 1;

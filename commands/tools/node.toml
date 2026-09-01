@@ -26,6 +26,8 @@ examples_denied = [
 # absent from the allowlist, so it denies.
 [command.fallback]
 executor = "file"
+# Tokens after the script are the SCRIPT's argv, which this grammar cannot describe.
+passes_argv = true
 level = "Inert"
 bare = false
 standalone = ["--help", "--version", "-h", "-v"]

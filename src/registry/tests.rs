@@ -2996,6 +2996,39 @@ use super::*;
     /// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
     /// still exist and are not all errors; sorting them is the migration this field unblocks, and
     /// a guard written before that would encode a convention nobody has chosen (TODO.md).
+    /// A File executor is governed by its own flag grammar unless it declares `passes_argv`.
+    ///
+    /// `dispatch_executor` used to return the locus verdict INSTEAD of checking the policy, so
+    /// `max_positional` went unenforced the moment a first positional resolved. A command that
+    /// OPENS its extra positionals was then handed them: `karma start ./ok.conf.js
+    /// /etc/evil.conf.js` was admitted, the second path being a second config karma loads and
+    /// runs. Both it and `tilt` grew a `path_gate` to compensate, which worked, and left the
+    /// grammar itself unenforced for whatever declared an executor next.
+    ///
+    /// The distinction cannot be inferred, which is why it is declared: an interpreter's trailing
+    /// tokens are the SCRIPT's argv and no flag list here can describe them, while a tool that
+    /// merely takes a config path has no argv to pass. Defaulting to false makes the enforcing
+    /// answer the one a new entry gets without thinking about it.
+    #[test]
+    fn a_file_executor_enforces_its_grammar_unless_it_passes_argv() {
+        // Declares `passes_argv`: trailing tokens belong to the script, so they are not counted.
+        assert!(crate::is_safe_command("python3 ./task.py --flag arg"), "argv passes through");
+        assert!(crate::is_safe_command("python3 ./task.py a b c"), "several argv words");
+        assert!(crate::is_safe_command("ruby ./rakefile.rb x y"));
+        assert!(crate::is_safe_command("go run ./cmd/app a b"));
+        // The executor itself is still locus-gated — passing argv is not passing anything else.
+        assert!(!crate::is_safe_command("python3 /tmp/evil.py"), "a foreign script still denies");
+
+        // Does NOT declare it: `max_positional = 1` governs, so a second config is refused. karma
+        // also carries a path_gate today; this holds without one, which is the point — measured by
+        // commenting the gate out, where the deny survives.
+        assert!(
+            !crate::is_safe_command("karma start ./ok.conf.js /etc/evil.conf.js"),
+            "a second config file is a second thing karma executes"
+        );
+        assert!(crate::is_safe_command("karma start ./ok.conf.js"), "one config is the ordinary use");
+    }
+
     /// Every `[command.output]` variant must have confronted the rule that a locus-only claim
     /// cannot clear a NAME-based shield.
     ///

@@ -30,6 +30,8 @@ examples_denied = [
 # take its own arguments (`python3 ./x.py a b`), which are data, not gated.
 [command.fallback]
 executor = "file"
+# Tokens after the script are the SCRIPT's argv, which this grammar cannot describe.
+passes_argv = true
 level = "Inert"
 bare = false
 standalone = ["--help", "--version", "-V", "-h"]

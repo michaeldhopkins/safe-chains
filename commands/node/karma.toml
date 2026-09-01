@@ -17,13 +17,20 @@ examples_denied = [
     "karma start --format-error /etc/evil.js",
 ]
 
-# The config file is loaded and EXECUTED, so every positional takes the executor locus gate.
-# `sub.executor` already gates the FIRST one, but it returns the locus verdict instead of the flag
-# policy, so `max_positional = 1` goes unenforced and a second config path is neither counted nor
-# gated (`karma start ./ok.conf.js /etc/evil.conf.js`). This gate composes with the grammar rather
-# than replacing it and covers every positional. See TODO.md for the underlying dispatch gap.
+# The config file is loaded and EXECUTED. `positional = "exec"` used to be declared here as well,
+# because `dispatch_executor` returned the locus verdict INSTEAD of checking the flag policy — so
+# `max_positional = 1` went unenforced and a second config path was neither counted nor gated
+# (`karma start ./ok.conf.js /etc/evil.conf.js` was admitted). The gate was compensation for that.
+#
+# It is redundant now that the dispatch enforces the grammar: `max_positional = 1` allows at most
+# one positional, and that one is the executor, which `executor = "file"` already locus-gates.
+# Removed rather than left in place, so this entry says what karma is instead of also carrying a
+# repair to something else. Verified by measurement, not inference — the two-config form still
+# denies with no positional gate at all.
+#
+# The FLAG roles below are not redundant and stay: `--format-error` names a JS module karma
+# requires and runs, and nothing else would gate it.
 [command.path_gate]
-positional = "exec"
 
 # Valued flags authored explicitly, so a value is never walked as a positional and exec-gated by
 # accident. `--format-error` names a JS module karma requires and runs; the rest are names, hosts

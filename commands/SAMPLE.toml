@@ -711,10 +711,22 @@
 #                                       # glob) denies. Two forms:
 #                                       #  "file"    — the first positional is the
 #                                       #              executor path (python3 ./s.py,
-#                                       #              go run ./cmd). Tokens after it are
-#                                       #              the script's own args (not
-#                                       #              validated). No positional → the
+#                                       #              go run ./cmd). No positional → the
 #                                       #              flat `level` (python3 --version).
+# passes_argv = true                    # ONLY with executor = "file". Tokens after the
+#                                       # executor path are the SCRIPT's argv, so the flag
+#                                       # policy is checked over the prefix up to the script
+#                                       # and no further — `python3 ./task.py --flag arg`
+#                                       # cannot be described by python3's own grammar.
+#                                       #
+#                                       # Defaults to FALSE, which is the enforcing answer:
+#                                       # the whole invocation is governed, so `max_positional`
+#                                       # counts every operand. Set it only for a genuine
+#                                       # interpreter. A tool that merely TAKES a path has no
+#                                       # argv to pass, and a second positional there is a
+#                                       # second file it opens: `karma start ./ok.conf.js
+#                                       # /etc/evil.conf.js` loads BOTH configs and executes
+#                                       # them, and was admitted while this was unconditional.
 #                                       #  "project" — the current project is the
 #                                       #              executor, no path operand
 #                                       #              (cargo run). Also valid on a
