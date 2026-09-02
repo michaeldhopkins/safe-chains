@@ -262,7 +262,11 @@ fn codex_hook_gated_non_overreach_uses_generic_reason() {
         .pointer("/hookSpecificOutput/permissionDecisionReason")
         .and_then(|d| d.as_str())
         .unwrap_or_default();
-    assert!(reason.contains("not on the allowlist"), "reason: {reason}");
+    // Asserts the FACTS the reason has to carry, not its sentences. Codex is a deny harness, so the
+    // outcome wording is "did not run"; the exact phrasing belongs to `refusal::tests`, and pinning
+    // it here would keep this test green while the copy it claims to check moved underneath.
+    assert!(reason.contains("frobnicate"), "the reason must name the command: {reason}");
+    assert!(reason.contains("did not run"), "codex honours deny, so say so: {reason}");
     assert!(!reason.contains("outside the working directory"), "reason: {reason}");
 }
 
@@ -287,7 +291,11 @@ fn antigravity_hook_gated_command_force_asks() {
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
     assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("force_ask"));
     let reason = v.get("reason").and_then(|d| d.as_str()).unwrap_or_default();
-    assert!(reason.contains("stops flagging it"), "reason: {reason}");
+    // agy ASKS rather than denying, so the reason must not claim the command was stopped. That
+    // pairing — emission against wording — is the whole point of routing copy through one builder.
+    assert!(reason.contains("frobnicate"), "the reason must name the command: {reason}");
+    assert!(reason.contains("approval prompt"), "agy prompts a human: {reason}");
+    assert!(!reason.contains("did not run"), "nothing was stopped: {reason}");
 }
 
 #[test]

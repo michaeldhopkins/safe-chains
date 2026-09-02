@@ -372,11 +372,17 @@ fn header(total: usize, denied: usize) -> String {
         }
         return format!("safe-chains: all {total} segments auto-approve.\n");
     }
+    // The THIRD producer of refusal copy, and the one that kept "not on the allowlist" alive after
+    // it was removed from the others. It routes through the same builder now, with
+    // `Outcome::Unknown`: `--explain` is run against no harness, so what follows is not ours to
+    // claim. See docs/design/refusal-copy.md.
     if total == 1 {
-        return "safe-chains: this command is not on the allowlist, so it is not auto-approved:\n"
-            .to_string();
+        return format!("safe-chains: {}\n", crate::refusal::EXPLAIN_SINGLE);
     }
-    format!("safe-chains: not auto-approved. {denied} of {total} segments are not on the allowlist:\n")
+    format!(
+        "safe-chains: did not auto-approve {denied} of {total} segments. {}\n",
+        crate::refusal::EXPLAIN_MANY
+    )
 }
 
 /// One `✓`/`✗` line. The echoed text is command-derived, so it is neutralized first: a raw newline
@@ -605,7 +611,12 @@ mod tests {
     #[test]
     fn render_single_denied_keeps_it_alone() {
         let out = explain("cargo publish").render();
-        assert!(out.contains("not auto-approved"));
+        // The header moved to the shared builder (`refusal::EXPLAIN_SINGLE`), so this asserts the
+        // FACTS it has to carry rather than the exact sentence — the spec's own note that target
+        // tests pinning literal copy "keep passing while the real copy changes, which is worse than
+        // no test". Wording is the copy guards' job (`refusal::tests`).
+        assert!(out.contains("did not auto-approve"), "says what happened: {out}");
+        assert!(out.contains("has researched"), "says why, without rating the command: {out}");
         assert!(out.contains("not a block"));
         assert!(out.contains("needs manual approval"));
     }

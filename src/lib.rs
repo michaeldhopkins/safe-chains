@@ -71,6 +71,7 @@ pub mod parse;
 pub mod pathctx;
 pub mod pathgate;
 pub mod policy;
+pub mod refusal;
 pub mod registry;
 pub mod suggest;
 pub mod allowlist;

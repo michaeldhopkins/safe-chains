@@ -428,29 +428,38 @@ fn run_hook_format(
     let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
     match format.gated_policy() {
         safe_chains::targets::GatedPolicy::Deny => {
-            let reason = match &overreach_why {
-                Some(why) => format!(
-                    "safe-chains blocked this: {why}. This harness has no interactive approval. {DOCS_URL}"
-                ),
-                None => format!(
-                    "safe-chains blocked this: it is not on the allowlist and this harness has no \
-                     interactive approval. To allow it, add a custom command or a grant to \
-                     ~/.config/safe-chains.toml. {DOCS_URL}"
-                ),
-            };
+            // The copy follows what we EMIT, not which harness this is: here we emit deny and the
+            // harness honours it, so "the command did not run" is accurate. On the Ask arm below
+            // the same refusal must not say that. See docs/design/refusal-copy.md rule 1.
+            // No `DOCS_URL` appended. The builder already closes with the issues link for an
+            // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
+            // The reach cause carries its own remedy in `ReachReason::message`.
+            let reason = safe_chains::refusal::Refusal {
+                    outcome: safe_chains::refusal::Outcome::DidNotRun,
+                    cause: match &overreach_why {
+                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
+                        None => safe_chains::refusal::Cause::no_entry(&input.command),
+                    },
+                }
+            .render();
             let response = format.render_deny(&reason);
             let _ = io::stdout().write_all(response.stdout.as_bytes());
             process::exit(response.exit_code);
         }
         safe_chains::targets::GatedPolicy::Ask => {
-            let reason = match &overreach_why {
-                Some(why) => format!(
-                    "safe-chains did not auto-approve this, so please confirm: {why}. {DOCS_URL}"
-                ),
-                None => "safe-chains did not auto-approve this command, so please confirm. Add it \
-                     to ~/.config/safe-chains.toml so safe-chains stops flagging it."
-                    .to_string(),
-            };
+            // Same refusal, different EMISSION: the harness will run its own approval flow, so
+            // this must not claim the command was stopped.
+            // No `DOCS_URL` appended. The builder already closes with the issues link for an
+            // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
+            // The reach cause carries its own remedy in `ReachReason::message`.
+            let reason = safe_chains::refusal::Refusal {
+                    outcome: safe_chains::refusal::Outcome::GoesToHuman,
+                    cause: match &overreach_why {
+                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
+                        None => safe_chains::refusal::Cause::no_entry(&input.command),
+                    },
+                }
+            .render();
             let response = format.render_ask(&reason);
             let _ = io::stdout().write_all(response.stdout.as_bytes());
             process::exit(response.exit_code);

@@ -71,7 +71,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 |---|---|
 | ~~`--suggest` writes the file its name implies it only proposes~~ — **DONE**: informational, writes nothing, and out of NOT_AUTO_APPROVED. All three suggest items closed | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
 | ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
-| Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
+| Refusal copy — rules 1-6 and the four guards **DONE**; the "two levers" UX item remains | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — READ half **DONE**; write half and the four carve-out kinds remain | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
@@ -2023,6 +2023,39 @@ state. Two ways in, neither yet built:
 
 Adjacent and also unbuilt: `[command.output]` or `[command.fallback]` declared on a command whose
 dispatch never consults it — dead declarations that read as configuration.
+
+## DONE 2026-09-02 — refusal copy, rules 1-6 and the four guards
+
+`src/refusal.rs` is the one builder. All three producers route through it: the gated reason in
+`main.rs` (both the Deny and Ask arms), the `--explain` header, and the reach nudge — which is the
+partial-implementation risk the spec names, since fixing one at a time is how "not on the allowlist"
+survived in some outputs after being removed from others.
+
+The copy is keyed on `Outcome` (`DidNotRun` / `GoesToHuman` / `Unknown`), never on a harness name,
+so the same refusal reads "the command did not run" on a deny harness and "the normal approval
+prompt follows" where we abstain. `main.rs` picks the outcome from `gated_policy()`, which is the
+same value that decides the emission, so the two cannot disagree.
+
+The reported case now reads:
+
+    safe-chains did not approve this, and the command did not run. safe-chains has no entry for
+    the command `warnings`. That is not a rating of the command. […] The command name here is
+    `warnings`. It comes after the `RUSTDOCFLAGS=-D` assignment, so the shell reads it as the
+    program to run. If you meant `-D warnings` as one value, it needs quotes.
+
+Four guards, each red-demoed: the wording follows the outcome; the resolved name always appears; no
+message uses an avoid-list word (checked across EVERY producer through its public entry point, not
+by grepping the files I remembered); the parse-surprise sentence fires only when an assignment
+prefix is present.
+
+Two existing tests pinned the old literal copy and were rewritten to assert SHAPE — the spec's own
+note that such tests "keep passing while the real copy changes, which is worse than no test".
+
+NOT done, and it is the section's own "Open UX problem" rather than part of rules 1-6: a refusal
+does not yet name the LEVER that would work. A credential path is refused at `developer`, approved
+at `local-admin` and `yolo`, and a path grant never opens it — so the first lever a user reaches for
+does nothing and nothing says the other exists. That needs the guard the spec specifies alongside
+it: a message offers a grant if and only if a grant actually changes the verdict.
 
 ## Refusal copy — SPEC WRITTEN, not implemented (docs/design/refusal-copy.md)
 
