@@ -163,24 +163,61 @@ fn suggest_refuses_a_config_it_cannot_parse() {
         "refusing must leave the file untouched"
     );
 
+    // The VALID case, so the refusal above cannot be satisfied by declining everything: it still
+    // succeeds and still produces the entry — on STDOUT. `--suggest` writes nothing at all now, so
+    // what distinguishes the two cases is the exit code and where the block appears, not whether a
+    // file changed.
     let good = tmp.path().join("good");
     std::fs::create_dir(&good).expect("mkdir");
     let cfg = good.join(".safe-chains.toml");
-    std::fs::write(&cfg, "[[command]]\nname = \"existing\"\nmax_positional = 1\n").expect("write");
-    let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let original = "[[command]]\nname = \"existing\"\nmax_positional = 1\n";
+    std::fs::write(&cfg, original).expect("write");
+    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
         .args(["--suggest", "frobnicate build"])
         .current_dir(&good)
         .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .expect("run")
-        .code()
-        .unwrap_or(-1);
-    assert_eq!(code, 0, "a VALID config must still be appended to");
-    let after = std::fs::read_to_string(&cfg).expect("read");
-    assert!(after.contains("existing"), "the user's own entry must survive:\n{after}");
-    assert!(after.contains("frobnicate"), "the generated entry must be added:\n{after}");
+        .output()
+        .expect("run");
+    assert_eq!(out.status.code().unwrap_or(-1), 0, "a VALID config must still produce an entry");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(text.contains("frobnicate"), "the generated entry must be printed:\n{text}");
+    assert!(text.contains("[[trusted]]"), "the pin must be printed:\n{text}");
+    assert_eq!(
+        std::fs::read_to_string(&cfg).expect("read"),
+        original,
+        "--suggest must not modify the project config"
+    );
+}
+
+/// `--suggest` writes NOTHING — not even to a project that has no config yet.
+///
+/// It used to write the file and report "Added this to …", which is not what a flag called
+/// `--suggest` says it does. The name is the part people read, and the obvious way to find out what
+/// it says was to run it — which changed the project.
+///
+/// The fresh-project case is the one that would regress most quietly: with no existing file there
+/// is nothing to preserve, so a write here breaks no assertion about surviving content. It has to
+/// be checked by absence.
+#[test]
+fn suggest_creates_no_file_in_a_fresh_project() {
+    let tmp = tempfile::tempdir().expect("tempdir");
+    let proj = tmp.path().join("proj");
+    std::fs::create_dir_all(proj.join(".git")).expect("mkdir .git");
+
+    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["--suggest", "frobnicate build"])
+        .current_dir(&proj)
+        .stdin(Stdio::null())
+        .output()
+        .expect("run");
+
+    assert_eq!(out.status.code().unwrap_or(-1), 0, "suggesting is not a failure");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(text.contains("frobnicate"), "the entry must still be printed:\n{text}");
+    assert!(
+        !proj.join(".safe-chains.toml").exists(),
+        "--suggest created a config file; it is informational and must write nothing"
+    );
 }
 
 /// The levels must genuinely DISCRIMINATE, or the `level_monotonic` fuzz target is theatre.

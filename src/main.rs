@@ -168,6 +168,22 @@ fn repo_config_path_from(start: &std::path::Path) -> std::path::PathBuf {
     root.join(REPO_FILENAME)
 }
 
+/// Print the entry a command would need, where it goes, and the pin that activates it. Writes
+/// NOTHING.
+///
+/// It used to write the file and report "Added this to …", which is not what a flag called
+/// `--suggest` says it does. The name is the part people read, and a tool that edits a repo file
+/// when its name promises advice is a misnomer with consequences: the obvious way to find out what
+/// `--suggest` says was to run it, and running it changed the project.
+///
+/// The write bought little even when it worked. The generated file does nothing until the user
+/// pastes a `[[trusted]]` pin into `~/.config/safe-chains.toml` by hand — so the flow was never
+/// hands-off, and the one step it automated was the one the user could see and check. Printing the
+/// block leaves the same two steps, both explicit.
+///
+/// The hash in the pin is of the target file with exactly this block added, so it is correct for a
+/// verbatim paste; the message says to recompute it otherwise, which is the same instruction that
+/// already applied to any later edit.
 fn emit_suggestion(
     entries: &[safe_chains::suggest::GeneratedEntry],
     also_recognized: &[String],
@@ -205,36 +221,26 @@ fn emit_suggestion(
         process::exit(1);
     }
 
-    match std::fs::write(&target, &merged) {
-        Ok(()) => {
-            println!("Added this to {shown}:\n\n{block}");
-            println!(
-                "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
-                 (which safe-chains never edits):\n\n{pin}"
-            );
-            println!(
-                "The level defaults to \"SafeWrite\". Edit it to \"SafeRead\" (runs code, no \
-                 artifacts) or \"Inert\" (read-only) if that fits the tool. Any later edit to \
-                 {shown} changes its hash: recompute with `shasum -a 256 {shown}` and update the pin."
-            );
-            if !also_recognized.is_empty() {
-                println!(
-                    "\nHeads up: this command also uses commands safe-chains already recognizes \
-                     ({}). The entry above only covers the unrecognized one(s), so if the whole \
-                     command still isn't approved, one of those is why.",
-                    also_recognized.join(", ")
-                );
-            }
-            process::exit(0);
-        }
-        Err(e) => {
-            eprintln!(
-                "Couldn't write {shown} ({e}). Add this block to a `.safe-chains.toml` yourself:\n\n{block}\n\
-                 then pin it in ~/.config/safe-chains.toml:\n\n{pin}"
-            );
-            process::exit(1);
-        }
+    println!("Add this to {shown}:\n\n{block}");
+    println!(
+        "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
+         (which safe-chains never edits):\n\n{pin}"
+    );
+    println!(
+        "The level defaults to \"SafeWrite\". Edit it to \"SafeRead\" (runs code, no \
+         artifacts) or \"Inert\" (read-only) if that fits the tool. The hash above is of {shown} \
+         with exactly the block above added; if you change either, recompute it with \
+         `shasum -a 256 {shown}` and update the pin."
+    );
+    if !also_recognized.is_empty() {
+        println!(
+            "\nHeads up: this command also uses commands safe-chains already recognizes \
+             ({}). The entry above only covers the unrecognized one(s), so if the whole \
+             command still isn't approved, one of those is why.",
+            also_recognized.join(", ")
+        );
     }
+    process::exit(0);
 }
 
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {

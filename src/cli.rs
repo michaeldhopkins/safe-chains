@@ -60,10 +60,10 @@ pub struct Cli {
     #[arg(long)]
     pub explain: bool,
 
-    /// Offer to support a command safe-chains doesn't recognize yet. Pass the command as the
-    /// argument: `safe-chains --suggest "<command>"`. It writes (or upgrades) the project's local
-    /// `.safe-chains.toml` with a definition for the unrecognized command, then prints the
-    /// `[[trusted]]` pin for you to add to ~/.config/safe-chains.toml so that file takes effect.
+    /// Show how to support a command safe-chains doesn't recognize yet. Pass the command as the
+    /// argument: `safe-chains --suggest "<command>"`. It prints the `.safe-chains.toml` entry for
+    /// the unrecognized command, the path that file belongs at, and the `[[trusted]]` pin to add to
+    /// ~/.config/safe-chains.toml so it takes effect. Writes nothing — copy the parts you want.
     #[arg(long)]
     pub suggest: bool,
 

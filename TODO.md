@@ -69,7 +69,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 
 | item | section |
 |---|---|
-| `--suggest` writes the file its name implies it only proposes — **a CLI-design decision, see below**. The other two (unparseable config, ancestor walk) are DONE and guarded | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
+| ~~`--suggest` writes the file its name implies it only proposes~~ — **DONE**: informational, writes nothing, and out of NOT_AUTO_APPROVED. All three suggest items closed | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
 | ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
 | Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — spec written | "A grant should cover what it names" |
@@ -685,6 +685,24 @@ The write itself cannot escalate trust — the pin is `path + sha256 OF THE FILE
 (`registry::custom::repo_is_trusted`), so an unpinned file is ignored and any later edit to a pinned
 one breaks the hash and drops the whole file back to ignored. A second `--suggest` therefore cannot
 silently widen an already-pinned project; it invalidates the pin.
+
+DECIDED 2026-09-01: informational. `--suggest` prints the entry, the path it belongs at, and the
+pin, and writes NOTHING — not a dry-run with a `--write` twin, because the writing was the mistake
+rather than the default. "We made a big mistake when we agreed to make it try to generate toml with
+*suggest*; it's a simple misnomer."
+
+The write bought little even when it worked: the generated file is inert until the user pastes a
+`[[trusted]]` pin into `~/.config/safe-chains.toml` by hand, so the flow was never hands-off, and
+the one step it automated was the one the user could see and check. What it cost was that the
+obvious way to find out what `--suggest` says — running it — changed the project.
+
+Follow-on taken with it, as this section anticipated: `--suggest` is out of `NOT_AUTO_APPROVED`. It
+was listed for writing "the very file that grants trust"; it no longer writes, so it classifies as
+the read-only meta operation it now is. The part worth barring is unchanged and still barred — the
+pin lives outside the worktree and nothing here can author it. `--generate-book` stays listed: it
+does write.
+
+### The original framing, kept for the reasoning
 
 So the open question is CLI design, not a hole:
 

@@ -13258,7 +13258,7 @@ Aliases: `psed`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --log, --log-everything, --version, -V, -h, -v
+- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --log, --log-everything, --suggest, --version, -V, -h, -v
 - Allowed valued flags: --cwd, --level, --root, --session-id
 
 **Examples:**

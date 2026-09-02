@@ -53,11 +53,22 @@ fn suggest_never_writes_a_config_above_the_project_root() {
         String::from_utf8_lossy(&out.stdout),
         String::from_utf8_lossy(&out.stderr)
     );
+    // `--suggest` is informational and creates nothing, so what has to be checked is the path it
+    // OFFERS: the project root, never the ancestor. That is the property this test was always
+    // about — the write was just how it used to be observable.
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let offered = proj.join(".safe-chains.toml");
     assert!(
-        proj.join(".safe-chains.toml").is_file(),
-        "expected the config to be created at the project root; stdout={} stderr={}",
-        String::from_utf8_lossy(&out.stdout),
-        String::from_utf8_lossy(&out.stderr)
+        stdout.contains(&offered.to_string_lossy().to_string()),
+        "expected the project-root path to be offered; stdout={stdout}"
+    );
+    assert!(
+        !stdout.contains(&ancestor_cfg.to_string_lossy().to_string()),
+        "--suggest offered a config ABOVE the project root; stdout={stdout}"
+    );
+    assert!(
+        !offered.exists(),
+        "--suggest created a file; it is informational and must write nothing"
     );
 }
 

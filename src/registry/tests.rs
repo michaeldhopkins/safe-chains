@@ -4052,12 +4052,15 @@ use super::*;
         use clap::CommandFactory;
 
         // Flags whose effect is deliberately NOT auto-approved: they write another tool's config
-        // (`--setup`/`--tool`/`--auto-detect`), generate files (`--generate-book`), or write the
-        // very file that grants trust (`--suggest` creates/extends `.safe-chains.toml`, which an
-        // agent must never be able to author unprompted). Listing them here records the intent, so
-        // a flag is never merely *forgotten*.
-        const NOT_AUTO_APPROVED: &[&str] =
-            &["setup", "tool", "auto-detect", "generate-book", "suggest"];
+        // (`--setup`/`--tool`/`--auto-detect`) or generate files (`--generate-book`). Listing them
+        // here records the intent, so a flag is never merely *forgotten*.
+        //
+        // `--suggest` was here too, for writing "the very file that grants trust". It no longer
+        // writes anything — it prints the entry, the path it belongs at, and the pin — so that
+        // reason is gone and it classifies as the read-only meta operation it now is. What made the
+        // old behaviour worth barring is unchanged and still barred: the pin lives in
+        // `~/.config/safe-chains.toml`, outside the worktree, and nothing here can author it.
+        const NOT_AUTO_APPROVED: &[&str] = &["setup", "tool", "auto-detect", "generate-book"];
 
         let cmd = crate::cli::Cli::command();
         let mut failures = Vec::new();

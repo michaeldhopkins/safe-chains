@@ -57,17 +57,21 @@ This allows `myco --help`, `myco deploy --dry-run staging`, `myco status --env p
 
 The schema mirrors the built-in TOMLs. Every field documented in [`commands/SAMPLE.toml`](https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml) works in custom files.
 
-## Let safe-chains write it: `--suggest`
+## Let safe-chains draft it: `--suggest`
 
-For a command safe-chains doesn't recognize, `--suggest` writes (or upgrades) your local `.safe-chains.toml` for you. Pass the command you want to support as the argument:
+For a command safe-chains doesn't recognize, `--suggest` shows you the entry it would take. Pass the command you want to support as the argument:
 
 ```sh
 safe-chains --suggest "acmedeploy --env prod ./service"
 ```
 
-It writes a scoped `[[command]]` to `.safe-chains.toml` — allowing exactly the flags and positional count you ran, nothing more — and prints the `[[trusted]]` pin to paste into `~/.config/safe-chains.toml`. safe-chains never edits your user config, so the command stays inert until you add that pin by hand.
+It prints three things: a scoped `[[command]]` block — allowing exactly the flags and positional count you ran, nothing more — the path the `.safe-chains.toml` belongs at, and the `[[trusted]]` pin to paste into `~/.config/safe-chains.toml`.
 
-The generated `level` defaults to `"SafeWrite"`; change it to `"SafeRead"` or `"Inert"` if the tool is lighter, then re-hash. `--suggest` only helps with commands safe-chains doesn't know — for a recognized command that's denied by a flag, subcommand, or path, it says so rather than generating a bypass.
+**It writes nothing.** Copy the block into the file yourself, then add the pin. safe-chains never edits either file, so nothing takes effect until you have done both by hand.
+
+The hash in the pin is for that file with exactly the printed block added. If you change either, recompute it with `shasum -a 256 .safe-chains.toml`.
+
+The generated `level` defaults to `"SafeWrite"`; change it to `"SafeRead"` or `"Inert"` if the tool is lighter. `--suggest` only helps with commands safe-chains doesn't know — for a recognized command that's denied by a flag, subcommand, or path, it says so rather than drafting a bypass.
 
 ## A shell script
 
