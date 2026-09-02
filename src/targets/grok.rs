@@ -17,6 +17,19 @@ impl Target for GrokTarget {
         "Grok CLI (xAI)"
     }
 
+    fn shell_tool_name(&self) -> &'static str {
+        GrokHookFormat::SHELL_TOOL
+    }
+
+    /// grok's envelope DOES name the tool, so it can be held to
+    /// `no_target_decides_on_a_foreign_tool` rather than exempted from it.
+    #[cfg(test)]
+    fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
+        Some(format!(
+            r#"{{"toolName":"{tool}","toolInput":{{"command":"{command}"}},"workspaceRoot":"/w"}}"#
+        ))
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".grok")]
     }
@@ -59,6 +72,12 @@ impl Target for GrokTarget {
 
 struct GrokHookFormat;
 
+impl GrokHookFormat {
+    /// grok's real shell tool. The hook is CONFIGURED with `matcher: "Bash"` for Claude
+    /// compatibility, but the payload names the tool itself — see HARNESS-BEHAVIORS.md.
+    const SHELL_TOOL: &'static str = "run_terminal_command";
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct GrokToolInput {
@@ -69,6 +88,14 @@ struct GrokToolInput {
 #[serde(rename_all = "camelCase")]
 struct GrokHookEnvelope {
     tool_input: GrokToolInput,
+    /// `toolName` — grok's shell tool is `run_terminal_command`.
+    ///
+    /// TODO.md listed grok as unable to self-filter, on the reading that its envelope carries no
+    /// tool identifier. It does: the field is in HARNESS-BEHAVIORS.md's recorded payload and in this
+    /// module's own `GROK_DOCS_SAMPLE`. It simply was not deserialized — the identical oversight
+    /// that had antigravity on the same list.
+    #[serde(default)]
+    tool_name: Option<String>,
     #[serde(default)]
     cwd: Option<String>,
     #[serde(default)]
@@ -82,6 +109,14 @@ impl HookFormat for GrokHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
         let envelope: GrokHookEnvelope =
             serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        // Self-filter on the tool, the same way antigravity does. An ABSENT name still passes: the
+        // hook is configured with a matcher, and refusing an envelope that simply omits the field
+        // would break every harness version that does not send it.
+        if let Some(name) = envelope.tool_name.as_deref()
+            && name != Self::SHELL_TOOL
+        {
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
+        }
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,

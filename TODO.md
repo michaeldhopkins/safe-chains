@@ -74,7 +74,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — spec written | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
-| Two targets cannot self-filter on the tool — verify their envelopes | "Two targets cannot self-filter" |
+| ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
 | Re-tokenize split words instead of refusing them | "Re-tokenize split words" |
 
 **Tier 5 — guards and fuzzing.**
@@ -2381,6 +2381,28 @@ over-deny, never a grant.
 `run_command`, documented AND live-verified in HARNESS-BEHAVIORS.md — we simply were not
 deserializing it. Now filtered. The lesson for the two below: check the doc before assuming the
 field is absent.)
+
+DONE 2026-09-01 — and the lesson above applied to BOTH of them. Neither exemption survived actually
+checking, and in each case the evidence was already in this repository:
+
+- **grok DOES name the tool.** `toolName: "run_terminal_command"` is in HARNESS-BEHAVIORS.md's
+  recorded envelope and in `grok.rs`'s own `GROK_DOCS_SAMPLE`, which this module's tests parse. It
+  was simply not in the deserialized struct — the identical oversight to antigravity's. grok now
+  filters, declares `shell_tool_name = "run_terminal_command"` (the config matcher says `Bash` for
+  Claude compatibility; the payload does not), and implements `sample_envelope`, so it is held to
+  `no_target_decides_on_a_foreign_tool` rather than exempt from it.
+- **cursor names no tool, but it names the EVENT.** `hook_event_name: "beforeShellExecution"` is in
+  the documented payload and in `CURSOR_DOCS_SAMPLE`. cursor has other hook events —
+  `beforeReadFile`, `afterFileEdit`, `beforeSubmitPrompt`, `stop` — and an envelope from one of
+  those is not a shell command to classify. It filters on that instead, guarded by its own test
+  since the tool-based guard cannot express it.
+
+Both treat an ABSENT field as passing: the hook is configured with a matcher and under one event, so
+refusing a payload that merely omits the field would break any harness version that does not send
+it. Both red-demoed.
+
+The zero-exemption count is the point. Every target now either filters or has a test saying why it
+cannot, and no target is exempt on an unchecked assumption.
 
 DONE when: each harness's PreToolUse envelope is checked for a tool-identifying field (drive the
 TUI, dump a real envelope for a non-shell tool). Either add the field and the filter — the guard

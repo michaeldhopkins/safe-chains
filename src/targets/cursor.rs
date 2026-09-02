@@ -67,9 +67,23 @@ impl Target for CursorTarget {
 
 struct CursorHookFormat;
 
+impl CursorHookFormat {
+    /// The only cursor hook event that carries a shell command to classify.
+    const SHELL_EVENT: &'static str = "beforeShellExecution";
+}
+
 #[derive(Deserialize)]
 struct CursorHookEnvelope {
     command: String,
+    /// `hook_event_name` — cursor's shell event is `beforeShellExecution`.
+    ///
+    /// cursor names no TOOL, which is why TODO.md listed it as unable to self-filter. It does name
+    /// the EVENT, which serves the same purpose here: cursor has other hook events
+    /// (`beforeReadFile`, `afterFileEdit`, `beforeSubmitPrompt`, `stop`), and an envelope from one
+    /// of those is not a shell command to classify. The field is in the documented payload and in
+    /// this module's own `CURSOR_DOCS_SAMPLE`; it was simply not deserialized.
+    #[serde(default)]
+    hook_event_name: Option<String>,
     #[serde(default)]
     cwd: Option<String>,
     #[serde(default)]
@@ -80,6 +94,14 @@ impl HookFormat for CursorHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
         let mut envelope: CursorHookEnvelope =
             serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        // Self-filter on the EVENT, since cursor's payload names no tool. An absent name still
+        // passes: the hook is configured under a specific event, and refusing an envelope that
+        // omits the field would break any version that does not send it.
+        if let Some(event) = envelope.hook_event_name.as_deref()
+            && event != Self::SHELL_EVENT
+        {
+            return Err(ParseError { message: format!("not a shell event: {event}") });
+        }
         Ok(HookInput {
             command: envelope.command,
             cwd: envelope.cwd,
@@ -260,6 +282,38 @@ mod tests {
         "cwd": "/Users/me/project",
         "sandbox": false
     }"#;
+
+    /// cursor abstains on an envelope from one of its OTHER hook events.
+    ///
+    /// `no_target_decides_on_a_foreign_tool` cannot cover this: cursor's payload names no TOOL,
+    /// which is why it was exempted from that guard. It names the EVENT, and cursor has several
+    /// (`beforeReadFile`, `afterFileEdit`, `beforeSubmitPrompt`, `stop`) — an envelope from one of
+    /// those is not a shell command, and classifying whatever `command` field it happens to carry
+    /// would be deciding about something never analysed.
+    ///
+    /// The field was in the documented payload and in `CURSOR_DOCS_SAMPLE` all along; it simply was
+    /// not deserialized, the same oversight that had antigravity listed as unfilterable.
+    #[test]
+    fn parse_input_abstains_on_a_foreign_hook_event() {
+        for event in ["beforeReadFile", "afterFileEdit", "beforeSubmitPrompt", "stop"] {
+            let envelope = format!(
+                r#"{{"hook_event_name":"{event}","command":"rm -rf /","workspace_roots":["/w"]}}"#
+            );
+            assert!(
+                CursorHookFormat.parse_input(&envelope).is_err(),
+                "decided on a {event} envelope"
+            );
+        }
+
+        // The shell event still parses, or "reject everything" would satisfy the above.
+        let shell = r#"{"hook_event_name":"beforeShellExecution","command":"ls","workspace_roots":["/w"]}"#;
+        assert_eq!(CursorHookFormat.parse_input(shell).unwrap().command, "ls");
+
+        // An ABSENT event still parses: the hook is configured under one event, and refusing a
+        // payload that omits the field would break any version that does not send it.
+        let no_event = r#"{"command":"ls","workspace_roots":["/w"]}"#;
+        assert_eq!(CursorHookFormat.parse_input(no_event).unwrap().command, "ls");
+    }
 
     #[test]
     fn parse_input_extracts_top_level_command() {
