@@ -75,7 +75,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | A grant should cover what it names — READ half **DONE**; write half and the four carve-out kinds remain | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
-| Re-tokenize split words instead of refusing them | "Re-tokenize split words" |
+| Re-tokenize split words — **investigated, not built**: the `loop_reprs` two-face blocker is real; a scoped fix covers assignments only and fails the "delete the gate" criterion. Needs a scoping decision | "Re-tokenize split words" |
 
 **Tier 5 — guards and fuzzing.**
 
@@ -2515,6 +2515,35 @@ before the face is known.
 DONE when: `Word::expand` splits unquoted variable expansions, `VAR="-rf ./sub"; rm $VAR` is allowed
 again while `VAR="--exec rm"; fd pat $VAR` still denies, and `smuggles_a_flag` is deleted rather
 than left as a second gate.
+
+### Investigated 2026-09-01, deliberately NOT built. Read this before starting.
+
+The blocker is REAL and it is confined. `loop_reprs` returns a PAIR — the worst read item and the
+worst write item, which are different strings — so a loop variable has no single value to tokenize
+and `expand` cannot pick a face it does not know. A plain assignment has no such problem: one
+binding, one value.
+
+So the tractable version is scoped to assignments, and measured, that is only half the symptom:
+
+    VAR="-rf ./sub"; rm $VAR                  DENY   ← fixable by scoping
+    for f in "-rf ./sub"; do rm $f; done      DENY   ← NOT fixable; two faces
+    VAR="./sub"; rm -rf $VAR                  ALLOW  ← the gate only fires on a flag in the VALUE
+    for f in "--exec rm"; do fd pat $f; done  DENY   ← must stay denied
+
+A scoped fix therefore meets two of the three DONE criteria and fails the third: `smuggles_a_flag`
+would remain for the loop shape, as a second gate, which is exactly what that criterion forbids.
+Whether an explicit partial is wanted here is a decision, not an implementation detail.
+
+**The reason to be slow about this specifically**, beyond the blocker: it makes the SHARED expansion
+path more permissive, and its failure mode is a flag reaching a command whose grammar would have
+rejected it — `fd --exec rm`, `find -exec rm {} \;`. That is the capability escape this gate exists
+to prevent, so a mistake here is a fail-open in the layer every command passes through, traded for
+one over-deny on a form the section itself calls "a rare way to write a command". The evidence bar
+should be higher than the payoff justifies rushing.
+
+If it is built: the property to prove is that a re-tokenized piece flows through the SAME grammar
+checks as a literal token — for handler dispatch, registry dispatch AND the engine resolvers, not
+just one of the three — since the gate being replaced covered all of them at once.
 
 ## Nightly fuzz 2026-08-04: the classify budget does not cover its sibling entry points
 
