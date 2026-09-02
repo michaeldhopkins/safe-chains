@@ -397,6 +397,16 @@ fn clause_holds(clause: &WhenClause, tokens: &[Token]) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         let t = tokens[i].as_str();
+        // `--` ends flag scanning, as it does for the shell and for `check_flags`/`first_positional`.
+        //
+        // Without this the clause read `dart format -- -o show ~/notes.txt` as selecting the
+        // printing mode, while the tool takes `-o` and `show` as OPERANDS and rewrites them in
+        // place. The gate then judged a write as a read. It is a hole only where a clause LOWERS
+        // the role, which is exactly the case this mechanism was built for; where a clause raises
+        // it (`gofmt -- -w x`) the same mistake over-denies instead.
+        if t == "--" {
+            break;
+        }
         if let Some(spelling) = clause.flag.iter().find(|f| t == f.as_str()) {
             let _ = spelling;
             found = Some(tokens.get(i + 1).map(Token::as_str));
@@ -1458,6 +1468,15 @@ mod tests {
         assert!(deny(&["dart", "format", "-o", "show", "-o", "write", &witness]), "last wins");
         // A sibling sub is untouched — the gate is scoped to `format`.
         assert!(!deny(&["dart", "analyze", &witness]), "analyze does not write its operands");
+
+        // `--` ends flag scanning. After it, `-o` and `show` are OPERANDS that dart rewrites in
+        // place, so reading them as a mode selector judged a write as a read. Found in review; it
+        // is a hole only where a clause LOWERS the role, which is precisely this mechanism's
+        // reason to exist.
+        assert!(
+            deny(&["dart", "format", "--", "-o", "show", &witness]),
+            "after `--` these are operands, not a mode selector"
+        );
     }
 
     #[test]

@@ -3233,3 +3233,24 @@ because a handler replaces the positional walk. That is the same trap the `handl
 already records for `flags` (which was fixed by honouring them alongside). No spec does this today;
 it should either be honoured or made a build error before one does.
 
+## Residuals from the pre-push review (2026-09-02)
+
+Two things the whole-diff review surfaced that are recorded rather than fixed, both currently
+harmless and both the kind that drift.
+
+**The positional-gate completeness guard does not see `optional_valued`.**
+`a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope` reads `cmd.valued` and
+`sub.valued` from the raw TOML, and `optional_valued` compiles into `valued` only at build time. So
+a scope with a positional gate and an optional-value flag is not required to declare a role for it.
+The direction is safe — an undeclared flag's value is walked as a path, which over-denies — and no
+scope is affected today: `ghostty` has no positional gate, and `cargo mutants`' space form
+(`--gitignore false`) correctly denies anyway because clap's optional-value args need `=` and the
+stray word hits `max_positional = 0`. Fix is one line in the guard whenever it next matters.
+
+**A fourth site writes refusal copy outside the builder.** The retreat nudge in `main.rs` composes
+"safe-chains did not auto-approve this: {reach message}" itself. Its wording is right, and routing
+it through `Refusal` would make it WORSE: the nearest outcome, `GoesToHuman`, ends "so please
+confirm", and this path prompts nobody — it injects context and lets the harness decide. So the
+builder's `Outcome` set is what is incomplete, missing "we abstained and are explaining, no prompt
+of ours follows". Worth adding when someone next touches that path; not worth churning a
+cross-harness output to fix a sentence that is already correct.
