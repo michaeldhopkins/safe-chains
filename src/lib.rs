@@ -400,6 +400,34 @@ pub fn sanitize_display(s: &str) -> String {
 impl ReachReason {
     /// The self-contained nudge body ("it reaches `X`, …") including the reason-appropriate remedy.
     /// Callers add their own framing (block / please-confirm) and the docs link.
+    /// Whether naming this path in `~/.config/safe-chains.toml` actually changes the verdict.
+    ///
+    /// The refusal copy offers a grant, or explains that granting will not help, and the two must
+    /// not diverge: advice that does nothing costs more than silence, because the reader follows
+    /// it, sees no change, and stops believing the rest. `a_refusal_offers_a_grant_only_when_one_
+    /// would_work` runs the verdict twice — once with the grant applied — and holds this to it.
+    ///
+    /// `Credential` is `true` as of 2026-09-01 and was `false` before it. A grant naming a store
+    /// used to move the locus and leave `reads_secret` set, so the message's "name that path"
+    /// advice was FALSE while reading exactly right. That is the failure this pairing exists to
+    /// catch, and it went unnoticed because nothing compared the sentence to the behaviour.
+    pub fn grant_helps(self) -> bool {
+        match self {
+            // A grant that NAMES the store clears the shield for reading it.
+            ReachReason::Credential | ReachReason::RawDevice => true,
+            // "That IS my working directory" is the usual answer here.
+            ReachReason::ForeignTemp | ReachReason::OutsideWorkspace => true,
+            // Frozen faces stay frozen however specifically they are named: an agent that can edit
+            // the trust file decides what is approved next, and one that can write `/etc/sudoers`
+            // owns the machine's authorization substrate.
+            ReachReason::FrozenTrustFile
+            | ReachReason::FrozenTrustRoot
+            | ReachReason::FrozenSystemIntegrity => false,
+            // There is no path to grant. The remedy is to constrain the spelling.
+            ReachReason::Unconfined => false,
+        }
+    }
+
     pub fn message(self, path: &str) -> String {
         let path = &sanitize_display(path);
         match self {

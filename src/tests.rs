@@ -2074,3 +2074,66 @@ fn command_verdict_ceilinged_gates_by_threshold() {
     assert_eq!(command_verdict_ceilinged("touch newfile", SafetyLevel::SafeRead, None), Verdict::Denied);
     assert!(matches!(command_verdict_ceilinged("touch newfile", SafetyLevel::SafeWrite, None), Verdict::Allowed(_)));
 }
+
+/// A refusal offers a grant if and only if a grant would actually change the verdict.
+///
+/// The spec that asked for this (docs/design/refusal-copy.md, "two levers, one discoverable") was
+/// written when the two HAD diverged: the `Credential` message said "name that path in
+/// ~/.config/safe-chains.toml" while a naming grant moved the locus and left `reads_secret` set, so
+/// following the advice changed nothing. Reading the message and reading the code each looked
+/// right; only running both told the truth.
+///
+/// So this runs the verdict TWICE — once with the grant applied — and compares the outcome to what
+/// `grant_helps` claims. It fails the day either side moves without the other, which is the
+/// property the spec asked for and the one prose alone cannot hold.
+#[test]
+fn a_refusal_offers_a_grant_only_when_one_would_work() {
+    use crate::engine::resolve::regions::with_grants;
+
+    // (command, the path to grant). Each triggers a different ReachReason.
+    let home = std::env::var("HOME").expect("HOME");
+    let cases: Vec<(String, String)> = vec![
+        (format!("cat {home}/.ssh/id_rsa"), format!("{home}/.ssh")),
+        (format!("tee {home}/.config/safe-chains.toml"), format!("{home}/.config/safe-chains.toml")),
+        ("tee /etc/sudoers".to_string(), "/etc/sudoers".to_string()),
+        ("cat /dev/mem".to_string(), "/dev/mem".to_string()),
+    ];
+
+    let mut checked = 0usize;
+    for (command, grant_path) in &cases {
+        let Some((path, reason)) = workspace_overreach(command) else {
+            continue; // not a reach refusal on this build; nothing to compare
+        };
+        let _ = path;
+        checked += 1;
+
+        let without = is_safe_command(command);
+        assert!(!without, "{command} must be refused for this comparison to mean anything");
+
+        let with = with_grants(&[(grant_path.as_str(), true, true)], || is_safe_command(command));
+
+        assert_eq!(
+            with,
+            reason.grant_helps(),
+            "{reason:?}: the message {} a grant, but granting `{grant_path}` {} the verdict.\n{}",
+            if reason.grant_helps() { "offers" } else { "declines to offer" },
+            if with { "DOES change" } else { "does NOT change" },
+            reason.message(command),
+        );
+
+        // And the prose has to agree with the flag, or the guard only checks half the pairing.
+        let text = reason.message(command).to_lowercase();
+        if reason.grant_helps() {
+            assert!(
+                text.contains("safe-chains.toml"),
+                "{reason:?} helps, so the message must say where to name it: {text}"
+            );
+        } else {
+            assert!(
+                text.contains("does not change") || text.contains("not to grant"),
+                "{reason:?} does not help, so the message must say so: {text}"
+            );
+        }
+    }
+    assert!(checked >= 3, "only {checked} reach reasons probed — the sweep shrank");
+}

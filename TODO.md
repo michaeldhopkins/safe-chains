@@ -71,7 +71,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 |---|---|
 | ~~`--suggest` writes the file its name implies it only proposes~~ — **DONE**: informational, writes nothing, and out of NOT_AUTO_APPROVED. All three suggest items closed | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
 | ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
-| Refusal copy — rules 1-6 and the four guards **DONE**; the "two levers" UX item remains | "Refusal copy — SPEC WRITTEN" |
+| ~~Refusal copy~~ — **DONE**: rules 1-6, the four guards, and the grant-pairing guard. Only "generate the approved-places list from the level" remains | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — READ half **DONE**; write half and the four carve-out kinds remain | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
@@ -2051,11 +2051,34 @@ prefix is present.
 Two existing tests pinned the old literal copy and were rewritten to assert SHAPE — the spec's own
 note that such tests "keep passing while the real copy changes, which is worse than no test".
 
-NOT done, and it is the section's own "Open UX problem" rather than part of rules 1-6: a refusal
-does not yet name the LEVER that would work. A credential path is refused at `developer`, approved
-at `local-admin` and `yolo`, and a path grant never opens it — so the first lever a user reaches for
-does nothing and nothing says the other exists. That needs the guard the spec specifies alongside
-it: a message offers a grant if and only if a grant actually changes the verdict.
+### The "two levers" problem, resolved 2026-09-02 — mostly by the grants fix
+
+Re-measured before building, and the spec's table had gone stale in BOTH directions:
+
+    --level developer      deny     (unchanged)
+    --level local-admin    deny     (the spec recorded APPROVE)
+    --level network-admin  deny     (unchanged)
+    --level yolo           APPROVE  (unchanged)
+
+So the surprising sibling behaviour — `local-admin` approving what `network-admin` refuses — is
+gone. And the premise that "a path grant does not open it, on purpose" stopped being true earlier
+the same day: a grant NAMING a credential store now opens it for reading. The lever a user reaches
+for first is the one that works, which is the whole problem this section described.
+
+Items 1 and 2 were therefore already in the copy — every `ReachReason` message either says where to
+name the path or says that granting will not change it.
+
+What was missing is the pairing, and it is now `ReachReason::grant_helps()` plus
+`a_refusal_offers_a_grant_only_when_one_would_work`. The guard runs the verdict TWICE, once with the
+grant applied, and compares the outcome to what the message claims — the check the spec asked for,
+because prose and behaviour had already diverged once here without anyone noticing.
+
+Red-demoed both ways, and demo B is the point: reverting the grants fix makes the guard report
+"the message offers a grant, but granting `~/.ssh` does NOT change the verdict" — the exact bug the
+spec was written about, now caught automatically.
+
+Item 3 (generate the "approved places" list from the level in force rather than hardcoding it) is
+untouched and still open.
 
 ## Refusal copy — SPEC WRITTEN, not implemented (docs/design/refusal-copy.md)
 
@@ -3209,3 +3232,4 @@ per-command research, and is another customer for the mode design.
 because a handler replaces the positional walk. That is the same trap the `handler` doc comment
 already records for `flags` (which was fixed by honouring them alongside). No spec does this today;
 it should either be honoured or made a build error before one does.
+
