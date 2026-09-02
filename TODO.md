@@ -72,7 +72,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | ~~`--suggest` writes the file its name implies it only proposes~~ — **DONE**: informational, writes nothing, and out of NOT_AUTO_APPROVED. All three suggest items closed | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
 | ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
 | Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
-| A grant should cover what it names — spec written | "A grant should cover what it names" |
+| A grant should cover what it names — READ half **DONE**; write half and the four carve-out kinds remain | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
 | Re-tokenize split words instead of refusing them | "Re-tokenize split words" |
@@ -2058,6 +2058,28 @@ offers a grant if and only if a grant actually changes the verdict.
 
 Four guards specified, each needing a red demo — three of this session's findings were in this same
 message layer and every one looked correct until the demo showed the text had not moved.
+
+## DONE 2026-09-01 — a naming grant now opens the store it names
+
+The read half is fixed and the diagnosis below was half right. `best_grant` ALREADY implemented the
+rule this section asks for — `at_or_below(grant_root, secret_node_root)`, so a `~/` grant is refused
+and a `~/.ssh` grant matches. That part had landed since this was written.
+
+What had not: `apply_grant` then returned `reads_secret: base.reads_secret` regardless. So a NAMING
+grant lowered the locus (measured: `machine` → `worktree-trusted`) and changed nothing else — and
+since no level below yolo admits `secret · reads`, the read still refused. The lever moved a dial
+nobody was reading.
+
+`reads_secret: base.reads_secret && !read`. Reaching that line already proves the grant named the
+store rather than sweeping it up, because `best_grant` returns `None` otherwise, so the check is
+exactly the spec's "root at or inside the node means the grant named it".
+
+Verified end to end against a temp HOME, not just in unit tests: `[[grant]] path = "~/.ssh",
+read = true` makes `cat ~/.ssh/id_rsa` allow, a `~` grant does not, and no grant does not.
+
+Only the READ face — `read = true` is not a statement about writing, and the write faces stay behind
+`write_grantable`, where `pinned` keeps its blanket refusal. The write half of this section, and the
+four carve-out kinds, are untouched.
 
 ## A grant should cover what it names — SPEC (docs/design/explicit-grants.md)
 

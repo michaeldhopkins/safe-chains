@@ -676,7 +676,27 @@ fn apply_grant(path: &str, base: Role) -> Role {
         } else {
             base.rebind_locus
         },
-        reads_secret: base.reads_secret,
+        // A READ grant that NAMED the store clears the shield for it. Without this the grant moved
+        // the locus and nothing else, so `[[grant]] path = "~/.ssh", read = true` still refused —
+        // `secret · reads` is admitted by no level below yolo, so the flag alone decided it. The
+        // user's first lever did nothing and nothing said why, which is the symptom this fixes.
+        //
+        // Reaching here already proves the grant named the store rather than sweeping it up:
+        // `best_grant` returns None unless the grant root is `at_or_below` the shielded node AND
+        // the remainder carries no hidden component, so a `~/` grant cannot clear `~/.ssh` — it is
+        // ABOVE the node, not at or inside it. That is the rule the hidden-file carve-out already
+        // states in its own comment: "grant such a directory explicitly to reach inside it."
+        //
+        // Only the READ face. A grant that says `read = true` says nothing about writing, and the
+        // write faces stay behind `write_grantable`/`rebind_grantable`, which is where `pinned`
+        // keeps its blanket refusal — safe-chains' own config stays un-grantable however
+        // specifically it is named, because that risk is to the mechanism rather than to the
+        // user's data.
+        //
+        // The user config is the trust root: user-owned and unwritable by an agent. A grant typed
+        // there IS the statement of intent, which is why an extra `acknowledge` field was rejected
+        // as ceremony rather than safety.
+        reads_secret: base.reads_secret && !read,
         frozen: base.frozen,
     }
 }
@@ -1841,6 +1861,43 @@ mod tests {
             let r = classify_region("~/.ssh/id_rsa");
             assert_eq!(r.read_locus, LocalLocus::Machine, "a ~/ grant does not name ~/.ssh, so it does not reach it");
             assert!(r.reads_secret);
+        });
+    }
+
+    /// A read grant that NAMES a credential store clears the shield for it — the other half of the
+    /// rule the test above pins.
+    ///
+    /// `best_grant` already refused to let a broad grant reach a store, but `apply_grant` then kept
+    /// `reads_secret` regardless, so a NAMING grant moved the locus and nothing else. Since no level
+    /// below yolo admits `secret · reads`, the read still refused: the first lever a user reaches
+    /// for did nothing, and nothing said why. Measured before the fix —
+    /// `[[grant]] path = "~/.ssh", read = true` left `cat ~/.ssh/id_rsa` denied.
+    ///
+    /// Only the READ face. `read = true` says nothing about writing, and the write faces stay behind
+    /// `write_grantable`, where `pinned` keeps its blanket refusal.
+    #[test]
+    fn a_grant_that_names_a_secret_store_opens_it_for_reading() {
+        with_grants(&[("~/.ssh", true, false)], || {
+            let r = classify_region("~/.ssh/id_rsa");
+            assert!(!r.reads_secret, "the grant named ~/.ssh, so the shield yields to it");
+            assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "and the locus is granted too");
+        });
+
+        // A grant one level INSIDE the store also names it — the rule is at-or-below, so granting
+        // `~/.ssh/config` must not accidentally clear `~/.ssh/id_rsa` beside it.
+        with_grants(&[("~/.ssh/config", true, false)], || {
+            assert!(!classify_region("~/.ssh/config").reads_secret, "the named file opens");
+            assert!(
+                classify_region("~/.ssh/id_rsa").reads_secret,
+                "a sibling the grant did not name stays shielded"
+            );
+        });
+
+        // A WRITE grant does not clear the read shield, and does not open the write face of a
+        // store either.
+        with_grants(&[("~/.ssh", false, true)], || {
+            let r = classify_region("~/.ssh/id_rsa");
+            assert!(r.reads_secret, "write = true is not a statement about reading");
         });
     }
 
