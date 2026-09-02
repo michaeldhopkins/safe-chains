@@ -69,11 +69,11 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 
 | item | section |
 |---|---|
-| `--suggest` writes the file its name implies it only proposes; appends to a config it cannot parse; nearest-ancestor walk | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
+| `--suggest` writes the file its name implies it only proposes — **a CLI-design decision, see below**. The other two (unparseable config, ancestor walk) are DONE and guarded | "`--suggest` writes the file…", "…appends to a `.safe-chains.toml`…", "…can write OUTSIDE the worktree" |
 | ~~A denied compound construct records no reason at all~~ — **DONE**: culprit and facets now come from the command INSIDE the construct | "A denied compound construct records no reason" |
 | Refusal copy — spec written, not implemented | "Refusal copy — SPEC WRITTEN" |
 | A grant should cover what it names — spec written | "A grant should cover what it names" |
-| `--setup` silently rewrites a wrong-typed key on three targets | "`--setup` silently rewrites…" |
+| ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | Two targets cannot self-filter on the tool — verify their envelopes | "Two targets cannot self-filter" |
 | Re-tokenize split words instead of refusing them | "Re-tokenize split words" |
 
@@ -2387,6 +2387,24 @@ them nest differently (antigravity puts `PreToolUse` at the top level, with no o
 DONE when: all seven refuse rather than overwrite — either by generalizing `append_hook_entry` to
 an optional outer key, or by each guarding in place — and a test asserts the pre-existing value
 survives, the way `refuses_a_wrong_typed_outer_key_without_panicking` does for the shared helper.
+
+DONE 2026-09-01, and two of the three were already fixed. codex and cursor had both been converted
+to `append_hook_entry` since this was written, so their wrong-typed INNER keys were already refused
+— codex even carries a doc comment describing that fix. Only antigravity still replaced, and it
+genuinely cannot use the helper: its hook entry is a top-level key, so there is no outer key to
+protect. It guards in place instead, which is the section's second option.
+
+What re-reading found that this section did not name: the same silent replacement existed for a
+non-object ROOT in `append_hook_entry` itself, so ALL SEVEN discarded a settings file that parsed to
+`[1,2,3]` or `"a string"`. A test asserted that as intended — "a file whose ROOT is not an object
+carries nothing to preserve" — which is the argument this very section rejects one level in. A root
+we cannot read is not more disposable than a key we cannot read; it is less, being the whole file.
+That test now asserts refusal instead.
+
+Refusing is safe for a first-time `--setup`: every caller turns a MISSING file into an empty object
+before the helper sees it, so the refusal only fires on a file that exists and parses to a
+non-object. Guarded end to end through `AntigravityTarget::install` (the file survives byte-for-byte)
+and over four non-object roots for the shared helper; red-demoed by restoring the replacement.
 
 ## `--suggest` appends to a `.safe-chains.toml` it cannot parse
 

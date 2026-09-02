@@ -72,7 +72,7 @@ impl Target for AntigravityTarget {
         if has_safe_chains_hook(&settings) {
             return Ok(InstallOutcome::AlreadyConfigured { path });
         }
-        add_hook(&mut settings, binary);
+        add_hook(&mut settings, binary)?;
         let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
         std::fs::write(&path, format!("{output}\n"))
             .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
@@ -194,14 +194,22 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         })
 }
 
-fn add_hook(settings: &mut Value, binary: &str) {
-    if !settings.is_object() {
-        *settings = json!({});
-    }
-    settings
-        .as_object_mut()
-        .expect("settings is an object")
-        .insert("safe-chains".to_string(), hook_entry(binary));
+/// Antigravity nests differently from the others — its hook entry is a TOP-LEVEL key, with no outer
+/// `hooks` object — so it cannot use `append_hook_entry`, which exists to protect an outer key.
+/// What it CAN share is the refusal: a settings file that parses to something other than an object
+/// used to be replaced with `{}`, silently discarding whatever the user had.
+///
+/// Only reachable for a file that exists and parses to a non-object (`[1,2,3]`, `"a string"`); the
+/// caller turns a missing file into an empty object first, so refusing cannot break a fresh setup.
+fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
+    let Some(obj) = settings.as_object_mut() else {
+        return Err(format!(
+            "the settings file is {}, expected an object. Leaving the file unchanged.",
+            super::json_kind(settings)
+        ));
+    };
+    obj.insert("safe-chains".to_string(), hook_entry(binary));
+    Ok(())
 }
 
 #[cfg(test)]
@@ -213,6 +221,31 @@ mod tests {
     fn install_skips_when_no_config_dir() {
         let dir = tempfile::tempdir().unwrap();
         assert!(matches!(AntigravityTarget.install(dir.path()).unwrap(), InstallOutcome::Skipped { .. }));
+    }
+
+    /// A settings file whose root is not an object survives `--setup` untouched.
+    ///
+    /// Antigravity inserts a TOP-LEVEL key, so it cannot use `append_hook_entry` and had its own
+    /// `if !settings.is_object() { *settings = json!({}) }` — a silent destructive edit to a file
+    /// we did not write. It is now refused, like the wrong-typed inner keys the other targets
+    /// already refuse.
+    #[test]
+    fn install_refuses_a_non_object_settings_root() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".gemini/config")).unwrap();
+        let path = dir.path().join(".gemini/config/hooks.json");
+        const ORIGINAL: &str = "[1, 2, 3]\n";
+        std::fs::write(&path, ORIGINAL).unwrap();
+
+        match AntigravityTarget.install(dir.path()) {
+            Err(err) => assert!(err.contains("expected an object"), "unhelpful error: {err}"),
+            Ok(_) => panic!("a non-object settings root must be refused"),
+        }
+        assert_eq!(
+            std::fs::read_to_string(&path).unwrap(),
+            ORIGINAL,
+            "--setup rewrote a settings file it could not read"
+        );
     }
 
     #[test]

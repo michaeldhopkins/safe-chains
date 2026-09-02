@@ -163,9 +163,10 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
 fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
     // cursor's file carries a schema `version` next to the hooks, so it is seeded before the shared
     // helper runs (the helper only ever creates the hook path itself).
-    if !settings.is_object() {
-        *settings = json!({"version": 1});
-    }
+    //
+    // A non-object root is NOT seeded — it used to be replaced with `{"version": 1}`, discarding
+    // whatever was there. The shared helper refuses it below; this only adds the version key to a
+    // file that is already an object.
     if let Some(obj) = settings.as_object_mut()
         && !obj.contains_key("version")
     {

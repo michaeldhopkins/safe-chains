@@ -189,11 +189,21 @@ pub(crate) fn append_hook_entry(
     entry: serde_json::Value,
 ) -> Result<(), String> {
     use serde_json::json;
+    // Refuse a non-object ROOT rather than replace it, for the same reason a wrong-typed inner key
+    // is refused below: an unreadable value is usually a hand-edit or a schema we do not know, and
+    // rewriting config we did not understand is not ours to do.
+    //
+    // This only ever fires on a file that EXISTS and parses to something that is not an object
+    // (`[1,2,3]`, `"a string"`, `42`). Every caller turns a MISSING file into an empty object
+    // before reaching here, so refusing cannot break a first-time `--setup`.
     if !settings.is_object() {
-        *settings = json!({});
+        return Err(format!(
+            "the settings file is {}, expected an object. Leaving the file unchanged.",
+            json_kind(settings)
+        ));
     }
     let Some(obj) = settings.as_object_mut() else {
-        unreachable!("settings was just set to an object");
+        unreachable!("just checked it is an object");
     };
     let hooks = obj.entry(outer).or_insert_with(|| json!({}));
     let Some(hooks) = hooks.as_object_mut() else {
@@ -342,12 +352,32 @@ mod append_hook_entry_tests {
         assert_eq!(s, before, "the user's value must be left alone, not replaced");
     }
 
+    /// A non-object ROOT is refused, not replaced.
+    ///
+    /// This test previously asserted the opposite, on the reasoning that "a file whose ROOT is not
+    /// an object carries nothing to preserve". That is the same argument this module already
+    /// rejected one level in, where a wrong-typed `hooks` value is refused because an unreadable
+    /// value usually means a hand-edit or a schema we do not know. A root we cannot read is not
+    /// more disposable than a key we cannot read — it is less, since it is the whole file.
+    ///
+    /// Refusing is safe for a first-time `--setup`: every caller turns a MISSING file into an empty
+    /// object before reaching here, so this fires only for a file that exists and parses to a
+    /// non-object.
     #[test]
-    fn replaces_a_non_object_root() {
-        // A file whose ROOT is not an object carries nothing to preserve.
-        let mut s = json!("garbage");
+    fn refuses_a_non_object_root_without_replacing_it() {
+        for root in [json!("garbage"), json!([1, 2, 3]), json!(42), json!(null)] {
+            let mut s = root.clone();
+            let err = append_hook_entry(&mut s, "hooks", "PreToolUse", json!({"matcher": "Bash"}))
+                .expect_err("a non-object root must be refused");
+            assert!(err.contains("expected an object"), "unhelpful error: {err}");
+            assert_eq!(s, root, "the user's file must be left alone, not replaced");
+        }
+
+        // An object root is still the ordinary path.
+        let mut s = json!({"unrelated": true});
         append_hook_entry(&mut s, "hooks", "PreToolUse", json!({"matcher": "Bash"})).unwrap();
         assert_eq!(s["hooks"]["PreToolUse"][0]["matcher"], "Bash");
+        assert_eq!(s["unrelated"], true, "unrelated keys survive");
     }
 }
 
