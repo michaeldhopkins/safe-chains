@@ -17,11 +17,13 @@ if command -v mdbook &> /dev/null; then
     mdbook build docs/
     echo "Built book in docs/book/"
 
-    # CI overrides SITE_DIR to point at a checkout of michaeldhopkins.com.
-    SITE_DIR="${SITE_DIR:-$HOME/projects/michaeldhopkins.com/public/docs/safe-chains}"
-    mkdir -p "$SITE_DIR"
-    rsync -a --delete docs/book/ "$SITE_DIR/"
-    echo "Deployed to $SITE_DIR"
+    # Only the release workflow sets SITE_DIR; each release publishes the
+    # book to michaeldhopkins.com, so local runs never touch the site.
+    if [[ -n "${SITE_DIR:-}" ]]; then
+        mkdir -p "$SITE_DIR"
+        rsync -a --delete docs/book/ "$SITE_DIR/"
+        echo "Deployed to $SITE_DIR"
+    fi
 else
     echo "mdbook not found — skipping book build (install: cargo install mdbook)"
 fi
