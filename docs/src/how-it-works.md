@@ -45,7 +45,7 @@ write = true
 
 # A scripts directory the agent both runs and edits
 [[grant]]
-path = "~/.runner-scripts/"
+path = "~/runner-scripts/"
 read = true
 write = true
 
