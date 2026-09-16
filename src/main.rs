@@ -165,17 +165,38 @@ fn main() {
                 let docs = safe_chains::docs::all_command_docs();
                 safe_chains::docs::render_book(&docs, std::path::Path::new("docs"));
             } else if let Some(command) = cli.command {
+                // Default the cwd to the directory the CLI was RUN from, then the root to that cwd
+                // exactly as the hook arm above does. Both defaults exist for one reason: a
+                // debugging tool that disagrees with the thing it debugs is worse than no tool.
+                //
+                // The root default alone was not enough. `pathctx::resolve` joins a relative path
+                // only when BOTH are known, so with no `--cwd` there was no workspace boundary at
+                // all — a `cd` out of the project was invisible and every relative path behind it
+                // classified worktree-local. `safe-chains 'cd ~/Library/… && unzip -l x.zip'`
+                // answered ALLOW while the hook, which always receives a cwd, abstained on the same
+                // command in the same directory. Nobody passes `--cwd` by hand; the `--help`
+                // examples don't either, so the lenient path was the one everyone measured with.
+                //
+                // `current_dir()` and NOT `$PWD`, deliberately. `$PWD` is what a shell would use and
+                // is the only thing that preserves a symlinked spelling, but it is an ordinary
+                // environment variable — an agent that can set it could name any directory as the
+                // workspace. `current_dir()` asks the kernel. The cost is that a cwd reached
+                // through a symlink resolves to its physical path here while a harness may report
+                // the logical one; both are then classified consistently, just not identically.
+                //
+                // A process cwd is always available in practice; if it somehow isn't, fall back to
+                // the old boundary-less behaviour rather than inventing a root.
+                let effective_cwd = cli.cwd.clone().or_else(|| {
+                    std::env::current_dir().ok().map(|p| p.to_string_lossy().into_owned())
+                });
                 // Captured before the PathCtx consumes them, so a logged entry records the same
-                // directory context the classification ran under.
-                let (log_cwd, log_root) = (cli.cwd.clone(), cli.root.clone());
+                // directory context the classification ran under — the EFFECTIVE cwd, not the flag,
+                // or the log would disagree with the verdict beside it.
+                let (log_cwd, log_root) =
+                    (effective_cwd.clone(), cli.root.clone().or_else(|| effective_cwd.clone()));
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
-                    // Default root to cwd, exactly as the hook arm above does. `pathctx::resolve`
-                    // joins a relative path only when BOTH are known, so `--cwd X` on its own was
-                    // silently inert: `cd /etc && cat master.passwd` came back approved from the
-                    // CLI and denied through the hook, for the same command. A debugging tool that
-                    // disagrees with the thing it debugs is worse than no tool.
-                    cwd: cli.cwd.clone(),
-                    root: cli.root.or_else(|| cli.cwd.clone()),
+                    cwd: effective_cwd.clone(),
+                    root: cli.root.or(effective_cwd),
                     session_id: cli.session_id,
                 });
                 // Same reason as the root default above: this is the tool people run to ask why the
