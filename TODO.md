@@ -84,6 +84,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | The registry validators are largely untested | "The registry validators are largely UNTESTED" |
 | Two more fuzz targets specified but not built; the parse target finds availability bugs only | "Fuzz suite", "Fuzzing finds availability bugs only" |
 | Verify the `config_load` nightly actually goes green | "Original note: verify the `config_load` nightly" |
+| The lib tests read the developer's own `~/.config/safe-chains.toml` | "The suite is not hermetic against the developer's own config" |
 
 **Decisions needed before the work can be done.**
 
@@ -3247,10 +3248,32 @@ scope is affected today: `ghostty` has no positional gate, and `cargo mutants`' 
 (`--gitignore false`) correctly denies anyway because clap's optional-value args need `=` and the
 stray word hits `max_positional = 0`. Fix is one line in the guard whenever it next matters.
 
-**A fourth site writes refusal copy outside the builder.** The retreat nudge in `main.rs` composes
-"safe-chains did not auto-approve this: {reach message}" itself. Its wording is right, and routing
-it through `Refusal` would make it WORSE: the nearest outcome, `GoesToHuman`, ends "so please
-confirm", and this path prompts nobody — it injects context and lets the harness decide. So the
-builder's `Outcome` set is what is incomplete, missing "we abstained and are explaining, no prompt
-of ours follows". Worth adding when someone next touches that path; not worth churning a
-cross-harness output to fix a sentence that is already correct.
+**Three sites write refusal copy outside the builder**, all composing the reach message themselves:
+the retreat nudge in `hook_cli.rs`, and — since the surfaces were brought into line — `--explain` in
+`main.rs` and the path arm of `--suggest` in `suggest_cli.rs`. Their wording is right, and routing
+them through `Refusal` would make it WORSE: the nearest outcome, `GoesToHuman`, ends "so please
+confirm", and none of these prompts anybody — they explain and let the reader (or the harness)
+decide. So the builder's `Outcome` set is what is incomplete, missing "we abstained and are
+explaining, no prompt of ours follows". Worth adding when someone next touches that path; not worth
+churning a cross-harness output to fix sentences that are already correct. The shared
+`HOW_IT_WORKS_URL` const and `every_why_surface_names_the_path_and_the_remedy` hold the three
+together in the meantime.
+
+## The suite is not hermetic against the developer's own config
+
+`cargo test` on a machine with a populated `~/.config/safe-chains.toml` fails around sixty lib tests
+and `probe::heredoc_safe`, because a user's `[[command]]` override SHADOWS the built-in of the same
+name: `CUSTOM_REGISTRY` is consulted before `TOML_REGISTRY`, so a personal entry for `cat`, `sed`,
+`grep`, `head`, `tail`, `node` or `sqlite3` replaces the researched one — and with it the
+`[command.behavior]` block, so `engine::resolve::resolve` returns `None` and every test asserting
+`cat`'s facets fails. Shadowing is the feature working; reading the developer's config from the
+TEST suite is not.
+
+It goes green in CI, where HOME is bare, which is exactly what makes it corrosive: the suite is red
+locally for reasons unrelated to the change in hand, and that trains people to stop reading it.
+
+Four instances of the same class were fixed when the file-length ratchet went in (the hook overreach
+guards now pin their own HOME). The rest is the lib, where the fix is either a hermetic default for
+the whole test binary or a deliberate `SAFE_CHAINS_NO_LOCAL` in the harness — note that the flag
+cannot simply be set globally, because `claude_config_scope`, `custom_config_shape` and the
+`configured_level_*` hook tests exist to exercise the config loading it disables.
