@@ -1,11 +1,14 @@
-use std::io::{self, IsTerminal, Read, Write};
+use std::io::{self, IsTerminal};
 use std::process;
 
 use clap::{CommandFactory, Parser};
 
 use safe_chains::cli::{Cli, Subcommand};
-use safe_chains::targets::{self, HookFormat};
+use safe_chains::targets;
 use safe_chains::verdict::{SafetyLevel, Verdict};
+
+mod hook_cli;
+mod suggest_cli;
 
 fn print_docs() {
     let docs = safe_chains::docs::all_command_docs();
@@ -86,162 +89,6 @@ fn run_explain(
     process::exit(i32::from(!explanation.is_allowed()));
 }
 
-/// `--suggest`: help a user support a command safe-chains doesn't recognize. OPT-IN — reached only
-/// by the explicit flag, never mentioned in any deny/hook output. Writes/updates a project
-/// `.safe-chains.toml` and prints the `[[trusted]]` pin the user hand-adds to ~/ to approve it.
-fn run_suggest(command: &str) -> ! {
-    use safe_chains::suggest::{self, Outcome};
-    const DOCS: &str = "https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html";
-
-    match suggest::analyze(command) {
-        Outcome::AlreadyAllowed => {
-            println!("safe-chains already auto-approves this command. Nothing to add.");
-            process::exit(0);
-        }
-        Outcome::Unparseable => {
-            eprintln!(
-                "safe-chains couldn't parse this command, so a command definition can't help. \
-                 Check the quoting."
-            );
-            process::exit(1);
-        }
-        Outcome::RecognizedButDenied { names } => {
-            eprintln!(
-                "Every command here is one safe-chains already recognizes ({}). It isn't \
-                 auto-approving because of HOW it's used — a flag, subcommand, or path — not because \
-                 the command is unknown, so --suggest won't generate an override. See {DOCS}.",
-                names.join(", ")
-            );
-            process::exit(1);
-        }
-        Outcome::Generated { entries, also_recognized } => {
-            emit_suggestion(&entries, &also_recognized);
-        }
-    }
-}
-
-/// Locate the project `.safe-chains.toml` (nearest one walking up from the cwd), or the path where
-/// one would be created in the cwd if none exists yet.
-fn repo_config_path() -> std::path::PathBuf {
-    let Ok(start) = std::env::current_dir() else {
-        return std::path::PathBuf::from(REPO_FILENAME);
-    };
-    repo_config_path_from(&start)
-}
-
-const REPO_FILENAME: &str = ".safe-chains.toml";
-
-/// The project `.safe-chains.toml` for a run starting at `start`: the nearest one at or above
-/// `start` but NEVER above the project root, else the path where one would be created at that root.
-///
-/// The confinement is the point. This used to walk to the filesystem root and write to the first
-/// `.safe-chains.toml` it met, so a `~/.safe-chains.toml` captured every `--suggest` run anywhere
-/// beneath `$HOME` — the same command writing a different file depending on where an ancestor config
-/// happened to sit, with nothing on the command line to say which. `--suggest`'s output asks for a
-/// trust decision, so the file it offers has to be one the reader can predict: the project whose
-/// commands were just analysed. With no project root there is no boundary to search within, so it
-/// does not search at all.
-fn repo_config_path_from(start: &std::path::Path) -> std::path::PathBuf {
-    let mut dir = start.to_path_buf();
-    let root = loop {
-        if dir.join(".git").exists() || dir.join(".jj").exists() {
-            break Some(dir);
-        }
-        if !dir.pop() {
-            break None;
-        }
-    };
-    let Some(root) = root else {
-        return start.join(REPO_FILENAME);
-    };
-
-    let mut dir = start.to_path_buf();
-    loop {
-        let candidate = dir.join(REPO_FILENAME);
-        if candidate.is_file() {
-            return candidate;
-        }
-        if dir == root || !dir.pop() {
-            break;
-        }
-    }
-    root.join(REPO_FILENAME)
-}
-
-/// Print the entry a command would need, where it goes, and the pin that activates it. Writes
-/// NOTHING.
-///
-/// It used to write the file and report "Added this to …", which is not what a flag called
-/// `--suggest` says it does. The name is the part people read, and a tool that edits a repo file
-/// when its name promises advice is a misnomer with consequences: the obvious way to find out what
-/// `--suggest` says was to run it, and running it changed the project.
-///
-/// The write bought little even when it worked. The generated file does nothing until the user
-/// pastes a `[[trusted]]` pin into `~/.config/safe-chains.toml` by hand — so the flow was never
-/// hands-off, and the one step it automated was the one the user could see and check. Printing the
-/// block leaves the same two steps, both explicit.
-///
-/// The hash in the pin is of the target file with exactly this block added, so it is correct for a
-/// verbatim paste; the message says to recompute it otherwise, which is the same instruction that
-/// already applied to any later edit.
-fn emit_suggestion(
-    entries: &[safe_chains::suggest::GeneratedEntry],
-    also_recognized: &[String],
-) -> ! {
-    use safe_chains::suggest;
-
-    let target = repo_config_path();
-    let existing = std::fs::read_to_string(&target).unwrap_or_default();
-    let merged = suggest::merged_content(&existing, entries);
-    let hash = suggest::config_hash(merged.as_bytes());
-    let block = suggest::render_toml(entries);
-
-    let dir = target.parent().unwrap_or_else(|| std::path::Path::new("."));
-    let canonical = std::fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
-    let pin = suggest::pin_block(&canonical.to_string_lossy(), &hash);
-
-    // This path comes from the CWD, so a directory name chosen by whoever wrote the project picks
-    // the bytes. `--suggest` is exactly what someone runs inside an unfamiliar checkout, and its
-    // output ASKS FOR A TRUST DECISION — "add this to ~/.config/safe-chains.toml". Interpolated raw,
-    // a directory named with newlines printed a second, forged `[[trusted]] path = "/"` block above
-    // the real one, in our voice. `pin_block` escapes its own TOML; the prose around it did not.
-    let shown = safe_chains::sanitize_display(&target.display().to_string());
-
-    // Appending to a file that is not valid TOML produces a file that is still not valid TOML —
-    // and safe-chains cannot load one, so the block would never take effect. Reporting "Added
-    // this to …" and handing over a pin for it sends the reader off to approve something that
-    // cannot work, and the hash pins the broken content. Refuse and say what is wrong instead.
-    if !existing.trim().is_empty()
-        && let Err(e) = toml::from_str::<toml::Value>(&existing)
-    {
-        eprintln!(
-            "{shown} isn't valid TOML ({e}), so adding to it would leave a file safe-chains can't \
-             load. Fix or move that file, then re-run. The block to add is:\n\n{block}"
-        );
-        process::exit(1);
-    }
-
-    println!("Add this to {shown}:\n\n{block}");
-    println!(
-        "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
-         (which safe-chains never edits):\n\n{pin}"
-    );
-    println!(
-        "The level defaults to \"SafeWrite\". Edit it to \"SafeRead\" (runs code, no \
-         artifacts) or \"Inert\" (read-only) if that fits the tool. The hash above is of {shown} \
-         with exactly the block above added; if you change either, recompute it with \
-         `shasum -a 256 {shown}` and update the pin."
-    );
-    if !also_recognized.is_empty() {
-        println!(
-            "\nHeads up: this command also uses commands safe-chains already recognizes \
-             ({}). The entry above only covers the unrecognized one(s), so if the whole \
-             command still isn't approved, one of those is why.",
-            also_recognized.join(", ")
-        );
-    }
-    process::exit(0);
-}
 
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
     let Some(home) = std::env::var_os("HOME") else {
@@ -295,199 +142,6 @@ fn run_list_tools() -> ! {
     process::exit(0);
 }
 
-fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
-    let Some(target) = targets::find(target_name) else {
-        eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
-        process::exit(1);
-    };
-    let Some(format) = target.hook_format() else {
-        eprintln!(
-            "{}: this target does not use a runtime hook (config-only integration).",
-            target.display_name()
-        );
-        process::exit(1);
-    };
-    run_hook_format(format, target_name, log_mode);
-}
-
-/// The "outside the working directory" clause, NAMING the cwd when the harness reported one — so a
-/// directory MISMATCH (the agent was launched from the wrong repo, a common and easy-to-forget
-/// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
-/// elsewhere" from "this command genuinely overreaches".
-fn run_hook_format(
-    format: &dyn HookFormat,
-    target_name: &str,
-    log_mode: safe_chains::decisionlog::Mode,
-) -> ! {
-    // Claude's own permission files are trust ONLY when Claude is the harness being served.
-    // Every other target gets safe-chains' own classification and nothing borrowed.
-    if target_name == "claude" {
-        safe_chains::trust_claude_config();
-    }
-    let mut buf = String::new();
-    if io::stdin().read_to_string(&mut buf).is_err() {
-        process::exit(0);
-    }
-
-    let Ok(input) = format.parse_input(&buf) else {
-        process::exit(0);
-    };
-
-
-    // HP-19: install the harness cwd/root so relative paths resolve against the real
-    // directory for the whole evaluation (verdict and explainer). Most harnesses send `cwd`
-    // but no distinct project `root`; default root to cwd so the workspace boundary (and the
-    // "reaches above your workspace" nudge) engages with the one directory we do know.
-    let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
-        cwd: input.cwd.clone(),
-        root: input.root.clone().or_else(|| input.cwd.clone()),
-        session_id: input.session_id.clone(),
-    });
-    // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
-    // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —
-    // git push / bulk-object-read become reachable; a LOWER level (reader/editor) TIGHTENS it — a read-
-    // only or no-destroy plan, gating writes the default would allow. Both funnel through the same
-    // `<= threshold` gate as the CLI's `--level`. The pathctx (cwd/root) is already installed above.
-    let (threshold, engine_level) = safe_chains::configured_hook_ceiling();
-    let verdict = safe_chains::command_verdict_ceilinged(&input.command, threshold, engine_level);
-
-    // The decision log (`--log` / `--log-everything`, off otherwise). Recorded at each point an
-    // outcome becomes FINAL, never before: the coverage fallback below can still turn a denial into
-    // an approval, so a single call up here would mislabel every command the user's own grants
-    // cover. `record` checks the mode before building anything, so under `--log` the two approval
-    // sites cost a comparison.
-    // The level in force, in the SAME vocabulary `--explain` uses. Taking `threshold.to_string()`
-    // here recorded the legacy band name (`safe-write`) for a run `--explain` called `developer`.
-    let log_level = engine_level.map_or_else(
-        || safe_chains::engine::bridge::default_band_top_name().to_string(),
-        |l| l.name.clone(),
-    );
-    let log_ctx = safe_chains::decisionlog::Context {
-        command: &input.command,
-        cwd: input.cwd.as_deref(),
-        root: input.root.as_deref(),
-        session_id: input.session_id.as_deref(),
-        harness: target_name,
-        level: &log_level,
-    };
-    use safe_chains::decisionlog::{Outcome as LogOutcome, record as log_decision};
-
-    // `respond` owns the grant rule, including that a BLANK command grants nothing: it classifies
-    // as inert, but inert-about-nothing is not something to approve. Routed through the shared seam
-    // so the rule cannot be bypassed by reaching for `render_response` directly.
-    if let Some(response) = targets::respond(format, &input.command, verdict) {
-        log_decision(log_mode, LogOutcome::Allowed, &log_ctx, None);
-        let _ = io::stdout().write_all(response.stdout.as_bytes());
-        process::exit(response.exit_code);
-    }
-    if verdict.is_allowed() {
-        // Allowed but not GRANTABLE (a blank command): safe-chains says nothing and the harness
-        // decides. Recorded as an abstain rather than an approval, because that is what it is —
-        // `may_grant` exists precisely because approving nothing is not an approval.
-        log_decision(log_mode, LogOutcome::Abstained, &log_ctx, None);
-        process::exit(0);
-    }
-
-    // Coverage fallback: the built-in/pattern classifier (also honoring the user's own
-    // `~/.claude/settings.json` `permissions.allow` grants), computed UNDER the configured engine level
-    // so a covered command respects that level's rule (an `editor` plan's forbidden worktree destroy
-    // classifies denied here too). Its REAL level in `overall` is then held under the SAME `<=
-    // threshold` ceiling — so a lower `level` (reader) can't have the write it just gated re-admitted.
-    // At the default band both are no-ops (no engine level, coverage `<= SafeWrite`).
-    let explanation = safe_chains::explain_with_coverage_at_level(&input.command, engine_level);
-
-    if let Verdict::Allowed(level) = explanation.overall
-        && level <= threshold
-    {
-        log_decision(log_mode, LogOutcome::Allowed, &log_ctx, Some(&explanation));
-        let response = format.render_response(Verdict::Allowed(level));
-        let _ = io::stdout().write_all(response.stdout.as_bytes());
-        process::exit(response.exit_code);
-    }
-
-    // Past this point every exit is a non-approval — Deny, Ask, a surfaced explanation, the
-    // overreach nudge, or a silent fall-through to the harness's own prompt. They differ in what
-    // the HARNESS is told, not in what safe-chains decided, so the log records once here rather
-    // than at each of the five. A parse failure is kept distinct: it is a correct refusal, but a
-    // RISE in them is how a parser regression shows up in the field, and nothing else surfaces it.
-    let outcome =
-        if explanation.parsed { LogOutcome::Denied } else { LogOutcome::Unparseable };
-    log_decision(log_mode, outcome, &log_ctx, Some(&explanation));
-
-    // GATED command. What the hook emits depends on the harness's capabilities
-    // (docs/design/harness-capability-model.md):
-    //  - Deny (e.g. Codex): no interactive approval, so VETO it (silence would just run it — its
-    //    sandbox even permits broad reads). Escape valve is a config-level exception.
-    //  - Ask  (e.g. Antigravity): escalate to an in-the-moment human prompt.
-    //  - Defer (e.g. Claude): fall through to context/nudge/silent so the harness's own prompt decides.
-    // When the command was gated because it reaches OUTSIDE the workspace, fold that specific reason
-    // into the Deny/Ask message so the human/model sees *why* — Defer surfaces it via render_context
-    // below, but Deny/Ask exit here, so without this they'd get only the generic reason.
-    const DOCS_URL: &str = "https://www.michaeldhopkins.com/docs/safe-chains/how-it-works.html";
-    let overreach = safe_chains::workspace_overreach(&input.command);
-    let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
-    match format.gated_policy() {
-        safe_chains::targets::GatedPolicy::Deny => {
-            // The copy follows what we EMIT, not which harness this is: here we emit deny and the
-            // harness honours it, so "the command did not run" is accurate. On the Ask arm below
-            // the same refusal must not say that. See docs/design/refusal-copy.md rule 1.
-            // No `DOCS_URL` appended. The builder already closes with the issues link for an
-            // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
-            // The reach cause carries its own remedy in `ReachReason::message`.
-            let reason = safe_chains::refusal::Refusal {
-                    outcome: safe_chains::refusal::Outcome::DidNotRun,
-                    cause: match &overreach_why {
-                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
-                        None => safe_chains::refusal::Cause::no_entry(&input.command),
-                    },
-                }
-            .render();
-            let response = format.render_deny(&reason);
-            let _ = io::stdout().write_all(response.stdout.as_bytes());
-            process::exit(response.exit_code);
-        }
-        safe_chains::targets::GatedPolicy::Ask => {
-            // Same refusal, different EMISSION: the harness will run its own approval flow, so
-            // this must not claim the command was stopped.
-            // No `DOCS_URL` appended. The builder already closes with the issues link for an
-            // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
-            // The reach cause carries its own remedy in `ReachReason::message`.
-            let reason = safe_chains::refusal::Refusal {
-                    outcome: safe_chains::refusal::Outcome::GoesToHuman,
-                    cause: match &overreach_why {
-                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
-                        None => safe_chains::refusal::Cause::no_entry(&input.command),
-                    },
-                }
-            .render();
-            let response = format.render_ask(&reason);
-            let _ = io::stdout().write_all(response.stdout.as_bytes());
-            process::exit(response.exit_code);
-        }
-        safe_chains::targets::GatedPolicy::Defer => {}
-    }
-
-    if explanation.should_surface() {
-        let response = format.render_context(&explanation.render());
-        let _ = io::stdout().write_all(response.stdout.as_bytes());
-        process::exit(response.exit_code);
-    }
-
-    // The retreat's nudge: if the command wasn't auto-approved because it reaches outside the
-    // workspace, say so (and how to allow it) instead of a silent prompt. Degrades to a plain
-    // prompt on harnesses without additionalContext.
-    if let Some((path, reason)) = overreach {
-        let nudge = format!(
-            "safe-chains did not auto-approve this: {}. {DOCS_URL}",
-            reason.message(&path)
-        );
-        let response = format.render_context(&nudge);
-        let _ = io::stdout().write_all(response.stdout.as_bytes());
-        process::exit(response.exit_code);
-    }
-
-    process::exit(0);
-}
 
 fn main() {
     let cli = Cli::try_parse();
@@ -497,7 +151,7 @@ fn main() {
             let log_mode =
                 safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
             if let Some(Subcommand::Hook { tool }) = cli.subcommand {
-                run_hook_for(&tool, log_mode);
+                hook_cli::run_hook_for(&tool, log_mode);
             }
             if cli.list_tools {
                 run_list_tools();
@@ -566,7 +220,7 @@ fn main() {
                     run_explain(&command, engine_level);
                 }
                 if cli.suggest {
-                    run_suggest(&command);
+                    suggest_cli::run_suggest(&command);
                 }
                 run_cli(
                     &command,
@@ -587,7 +241,7 @@ fn main() {
                     .expect("claude target has a hook format");
                 // The no-argument stdin path IS the Claude hook (see the CLI docs), so it keeps
                 // Claude's permission files as a trust source.
-                run_hook_format(format, "claude", log_mode);
+                hook_cli::run_hook_format(format, "claude", log_mode);
             }
         }
         // A malformed CLI invocation — an unknown/typo'd flag (`--levle`), a bad value — must FAIL

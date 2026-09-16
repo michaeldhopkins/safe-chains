@@ -7,7 +7,7 @@
 // it does, its number comes down here in the same change. An entry disappears when its file gets
 // under the limit. Nothing is ever ADDED here: a file that outgrows its limit after this point is
 // split, and new code goes in a new module rather than into a file on this list.
-const PINS: [(&str, usize); 22] = [
+const PINS: [(&str, usize); 21] = [
     ("src/cst/check.rs", 1103),
     ("src/cst/parse.rs", 1304),
     ("src/cst/proptests.rs", 801),
@@ -19,7 +19,6 @@ const PINS: [(&str, usize); 22] = [
     ("src/handler_property_tests.rs", 2616),
     ("src/handlers/perl.rs", 476),
     ("src/lib.rs", 645),
-    ("src/main.rs", 601),
     ("src/pathctx.rs", 430),
     ("src/pathgate.rs", 969),
     ("src/registry/build.rs", 1638),
