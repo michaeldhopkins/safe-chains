@@ -40,6 +40,12 @@ clap_complete = "4"
 clap_mangen = "0.2"
 expectrl = "0.8"
 proptest = "1.10.0"
+# syn + proc-macro2: tests/file_length.rs parses this crate's own source rather than scanning its
+# text. Every text rule the gate has been written with was fooled by ordinary code — a `}` in
+# column 0 inside a fixture string ends a module, `#[cfg(test)]` inside a string or comment starts
+# one — and this crate is full of both. `span-locations` gives exact line spans.
+syn = { version = "2", features = ["full", "visit"] }
+proc-macro2 = { version = "1", features = ["span-locations"] }
 tempfile = "3"
 
 [lints.rust]
