@@ -275,3 +275,105 @@ fn levels_admit_strictly_more_as_they_loosen() {
         }
     }
 }
+
+/// The CLI and the hook must reach the SAME verdict for the same command in the same directory.
+///
+/// `safe-chains "<cmd>"` is the tool people run to ask what the hook decided — the `--help`
+/// examples say exactly that, and none of them pass `--cwd`. So the bare form is the one everyone
+/// measures with, and for a long time it was the lenient one: with no `--cwd` the `PathCtx` had
+/// neither a cwd nor a root, `pathctx::resolve` joins a relative path only when BOTH are known, and
+/// so the workspace boundary simply did not exist. A `cd` out of the project was invisible and
+/// every relative path behind it classified worktree-local. `cd ~/Library/… && unzip -l x.zip`
+/// came back ALLOW from the CLI and abstain from the hook, for the same command in the same
+/// directory — and a reader who trusted the CLI concluded safe-chains had no opinion about paths
+/// at all.
+///
+/// The guard is a PARITY property rather than a fixed expectation per command: it asserts the two
+/// entry points agree, never that a particular command is allowed, so it keeps holding as
+/// classifications change. The `cd`-prefixed rows are the discriminating ones (they are what the
+/// boundary decides); the bare rows hold the other direction, that installing a cwd did not make
+/// the CLI stricter than the hook on ordinary in-workspace work.
+#[test]
+fn the_cli_and_the_hook_agree_in_the_same_directory() {
+    // Somewhere real to stand that is NOT a temp dir (temp has its own admit rules, which would
+    // mask the boundary this is about).
+    let workspace = env!("CARGO_MANIFEST_DIR");
+    // A HOME of our own, for the same reason `claude_config_scope.rs` builds one: both entry points
+    // read `~/.claude/settings.json` and `~/.config/safe-chains.toml`, so on the developer's own
+    // machine this would be measuring their personal rules. The settings file is not empty on
+    // purpose — the coverage and `Read()` bridges are themselves a thing the two entry points have
+    // disagreed about before, so parity has to be asserted with them in play.
+    let home = tempfile::tempdir().expect("tempdir");
+    std::fs::create_dir_all(home.path().join(".claude")).expect("mkdir .claude");
+    std::fs::create_dir_all(home.path().join(".config")).expect("mkdir .config");
+    std::fs::write(
+        home.path().join(".claude/settings.json"),
+        r#"{"permissions":{"allow":["Bash(cat:*)","Read(//opt/vendor/**)"]}}"#,
+    )
+    .expect("write settings.json");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), "").expect("write config");
+
+    const OUTSIDE: &[&str] = &[
+        "/etc",
+        "/usr/share/vendor",
+        "~/Library/Preferences/calibre",
+        "/Users/someone/other-project",
+    ];
+    // A spread across the roles the boundary treats differently: a named read, an archive listing,
+    // an unbounded sweep, a redirect write, a destroy, an in-place edit.
+    const BODIES: &[&str] = &[
+        "cat notes.txt",
+        "unzip -l archive.zip",
+        "tar -tf bundle.tar",
+        "grep -r TODO .",
+        "echo x > out.txt",
+        "rm -rf build",
+        "sed -i s/a/b/ notes.txt",
+    ];
+
+    let mut cases: Vec<String> = BODIES.iter().map(|b| (*b).to_string()).collect();
+    for dir in OUTSIDE {
+        for body in BODIES {
+            cases.push(format!("cd {dir} && {body}"));
+        }
+    }
+
+    let (mut allowed_seen, mut refused_seen) = (false, false);
+    for command in &cases {
+        let cli_allowed = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+            .arg(command)
+            .current_dir(workspace)
+            .env("HOME", home.path())
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .expect("run safe-chains")
+            .code()
+            .unwrap_or(-1)
+            == 0;
+
+        let payload = serde_json::json!({
+            "tool_name": "Bash",
+            "tool_input": {"command": command},
+            "cwd": workspace,
+        })
+        .to_string();
+        let hook_allowed = hook_stdout(&payload, workspace, home.path())
+            .contains(r#""permissionDecision":"allow""#);
+
+        assert_eq!(
+            cli_allowed, hook_allowed,
+            "`{command}` in {workspace}: CLI says allowed={cli_allowed}, hook says \
+             allowed={hook_allowed}. The CLI is how people ask what the hook decided; it has to \
+             decide it the same way."
+        );
+        allowed_seen |= cli_allowed;
+        refused_seen |= !cli_allowed;
+    }
+
+    // Non-vacuity: a corpus that is uniformly allowed (or uniformly refused) would agree trivially
+    // and prove nothing about the boundary.
+    assert!(allowed_seen, "corpus must contain a command both entry points ALLOW");
+    assert!(refused_seen, "corpus must contain a command both entry points REFUSE");
+}
