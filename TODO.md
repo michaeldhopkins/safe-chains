@@ -3261,10 +3261,10 @@ together in the meantime.
 
 ## The suite is not hermetic against the developer's own config
 
-`cargo test` on a machine with a populated `~/.config/safe-chains.toml` fails around sixty lib tests
-and `probe::heredoc_safe`, because a user's `[[command]]` override SHADOWS the built-in of the same
-name: `CUSTOM_REGISTRY` is consulted before `TOML_REGISTRY`, so a personal entry for `cat`, `sed`,
-`grep`, `head`, `tail`, `node` or `sqlite3` replaces the researched one — and with it the
+`cargo test` on a machine with a populated `~/.config/safe-chains.toml` can fail around sixty lib
+tests and `probe::heredoc_safe`, because a user's `[[command]]` override SHADOWS the built-in of the
+same name: `CUSTOM_REGISTRY` is consulted before `TOML_REGISTRY`, so a personal entry for `cat`,
+`sed`, `grep`, `head`, `tail`, `node` or `sqlite3` replaces the researched one — and with it the
 `[command.behavior]` block, so `engine::resolve::resolve` returns `None` and every test asserting
 `cat`'s facets fails. Shadowing is the feature working; reading the developer's config from the
 TEST suite is not.
@@ -3277,3 +3277,9 @@ guards now pin their own HOME). The rest is the lib, where the fix is either a h
 the whole test binary or a deliberate `SAFE_CHAINS_NO_LOCAL` in the harness — note that the flag
 cannot simply be set globally, because `claude_config_scope`, `custom_config_shape` and the
 `configured_level_*` hook tests exist to exercise the config loading it disables.
+
+**The suite is green again as of 2026-09-16, but nothing was fixed here** — the overrides that were
+shadowing `cat`/`sed`/`grep`/`head`/`tail`/`node`/`sqlite3` were deleted from the config that had
+them, for a separate and more serious reason (they had disarmed the credential shield, and the
+`sqlite3` one auto-approved `.shell`, i.e. arbitrary command execution). The mechanism is untouched:
+the next override of a built-in name reddens the suite again, on whichever machine has it.
