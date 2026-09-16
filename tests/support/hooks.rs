@@ -1,7 +1,7 @@
 //! Spawning the binary in hook mode, shared by the hook integration tests.
 //!
-//! Pulled out of `integration_hooks.rs` for the file-length gate: that file is pinned, so new code
-//! goes elsewhere — and the spawn plumbing was never what that file is about.
+//! Pulled out of `integration_hooks.rs` when the file-length gate went in: that file is pinned, so
+//! new code goes elsewhere — and the spawn plumbing was never what that file is about.
 //!
 //! In `tests/support/` rather than `tests/`, because cargo builds every top-level `tests/*.rs` as
 //! its own test binary and a helper module is not a test.
@@ -13,10 +13,24 @@ pub fn binary() -> &'static str {
     env!("CARGO_BIN_EXE_safe-chains")
 }
 
+/// A bare `$HOME` shared by every `run_hook` test: no `~/.claude/settings.json`, no
+/// `~/.config/safe-chains.toml`.
+///
+/// Without it these tests inherited the ambient home and so measured the config of whoever ran the
+/// suite. A single `permissions.allow` entry covering `grep` turned three overreach guards into
+/// approvals — `grep -r x /etc` came back "allow" instead of the nudge — so they passed in CI,
+/// where HOME is bare, and failed on a developer machine.
+pub fn bare_home() -> &'static std::path::Path {
+    use std::sync::OnceLock;
+    static HOME: OnceLock<tempfile::TempDir> = OnceLock::new();
+    HOME.get_or_init(|| tempfile::tempdir().expect("tempdir")).path()
+}
+
 /// Run the binary with `args`, piping `stdin_payload` in. Returns (stdout, stderr, exit code).
 pub fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
     let mut child = Command::new(binary())
         .args(args)
+        .env("HOME", bare_home())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
