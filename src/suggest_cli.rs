@@ -4,11 +4,13 @@
 //! analyses the command and generates the entry; this decides what the person reads and which exit
 //! code they get, which is why it may call `process::exit` and the library may not.
 //!
-//! Split out of `main.rs` for the file-length gate: `main.rs` was over its limit, and `--suggest`
-//! is a self-contained surface that had no reason to share a file with the hook dispatch and the
-//! gate-mode verdict.
+//! Split out of `main.rs` when the file-length gate went in: `main.rs` was over its limit, and
+//! `--suggest` is a self-contained surface that had no reason to be in the same file as the hook
+//! dispatch and the gate-mode verdict.
 
 use std::process;
+
+use crate::HOW_IT_WORKS_URL;
 
 /// `--suggest`: help a user support a command safe-chains doesn't recognize. OPT-IN — reached only
 /// by the explicit flag, never mentioned in any deny/hook output. Writes/updates a project
@@ -30,12 +32,30 @@ pub fn run_suggest(command: &str) -> ! {
             process::exit(1);
         }
         Outcome::RecognizedButDenied { names } => {
-            eprintln!(
-                "Every command here is one safe-chains already recognizes ({}). It isn't \
-                 auto-approving because of HOW it's used — a flag, subcommand, or path — not because \
-                 the command is unknown, so --suggest won't generate an override. See {DOCS}.",
-                names.join(", ")
-            );
+            // A recognized command can be held back by its own grammar (a flag, a subcommand) or by
+            // a PATH it reaches, and those have different remedies on different pages. Saying "a
+            // flag, subcommand, or path" and then linking custom-commands.html sent every path case
+            // to the one page that says nothing about paths: a reader looking for a way to declare
+            // an extra readable directory found none there and concluded safe-chains had none,
+            // while `[[grant]]` was documented on how-it-works.html the whole time.
+            //
+            // So when the reach check can name the path, say which one and where the remedy lives.
+            // `--suggest` still generates nothing either way — the command is already known.
+            match safe_chains::workspace_overreach(command) {
+                Some((path, reason)) => eprintln!(
+                    "Every command here is one safe-chains already recognizes ({}). It isn't \
+                     auto-approving because of the PATH it reaches, not because the command is \
+                     unknown, so --suggest won't generate an override: {}. {HOW_IT_WORKS_URL}",
+                    names.join(", "),
+                    reason.message(&path)
+                ),
+                None => eprintln!(
+                    "Every command here is one safe-chains already recognizes ({}). It isn't \
+                     auto-approving because of HOW it's used — a flag or subcommand — not because \
+                     the command is unknown, so --suggest won't generate an override. See {DOCS}.",
+                    names.join(", ")
+                ),
+            }
             process::exit(1);
         }
         Outcome::Generated { entries, also_recognized } => {

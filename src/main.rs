@@ -10,6 +10,12 @@ use safe_chains::verdict::{SafetyLevel, Verdict};
 mod hook_cli;
 mod suggest_cli;
 
+/// The page that documents the path model and, with it, the `[[grant]]` that widens it. Every
+/// output whose remedy is "grant that path" links HERE — the hook nudge, `--explain` and
+/// `--suggest` — because sending a reader to a page that does not mention grants is how they
+/// conclude the feature does not exist.
+const HOW_IT_WORKS_URL: &str = "https://www.michaeldhopkins.com/docs/safe-chains/how-it-works.html";
+
 fn print_docs() {
     let docs = safe_chains::docs::all_command_docs();
     print!("{}", safe_chains::docs::render_markdown(&docs));
@@ -86,9 +92,29 @@ fn run_explain(
     // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
     // cannot act on. Someone who typed `--explain` is asking why, so they get why.
     print!("{}", safe_chains::facet_breakdown(command));
+    // …and the reach clause, which is the rest of "why" for anything refused over a PATH.
+    //
+    // The hook has always emitted this; `--explain` did not, so the two disagreed about the reason
+    // as well as (until now) the verdict. What `--explain` said instead was actively wrong: the
+    // header reads "safe-chains approves commands it has researched and has no opinion about the
+    // rest", which is a claim about an UNKNOWN command, and the advice under it is about splitting
+    // chains. For `unzip -l ~/Library/…/x.zip` the command is researched, the opinion is specific,
+    // and neither line points at the path — so a reader doing exactly what --help tells them to do
+    // ("--explain … names the facet that refused it") concluded safe-chains had no path model and
+    // no way to widen it, while the hook was naming both the path and the remedy the whole time.
+    //
+    // The facet breakdown covers the engine's own commands; this covers the legacy surface, where
+    // the breakdown is empty and there is otherwise nothing to read.
+    if !explanation.is_allowed()
+        && let Some((path, reason)) = safe_chains::workspace_overreach(command)
+    {
+        // "Why:" rather than the hook's "safe-chains did not auto-approve this:" lead-in, which the
+        // header three lines up has already said. `message` opens mid-sentence ("it reaches …"), so
+        // it needs something in front of it or it reads as an orphan.
+        println!("\nWhy: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
+    }
     process::exit(i32::from(!explanation.is_allowed()));
 }
-
 
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
     let Some(home) = std::env::var_os("HOME") else {
@@ -141,8 +167,6 @@ fn run_list_tools() -> ! {
     }
     process::exit(0);
 }
-
-
 fn main() {
     let cli = Cli::try_parse();
 

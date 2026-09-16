@@ -4,14 +4,17 @@
 //! this drives one request through it — install the directory context, classify, log, and emit the
 //! allow / deny / ask / context the harness understands.
 //!
-//! Split out of `main.rs` for the file-length gate: `main.rs` was over its limit, and the hook is a
-//! self-contained surface that shares nothing with argument parsing but `process::exit`.
+//! Split out of `main.rs` when the file-length gate went in: `main.rs` was over the limit, and the
+//! hook is a self-contained surface that shares nothing with argument parsing but `process::exit`.
 
 use std::io::{self, Read, Write};
 use std::process;
 
 use safe_chains::targets::{self, HookFormat};
 use safe_chains::verdict::Verdict;
+
+use crate::HOW_IT_WORKS_URL;
+
 
 pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     let Some(target) = targets::find(target_name) else {
@@ -141,7 +144,6 @@ pub fn run_hook_format(
     // When the command was gated because it reaches OUTSIDE the workspace, fold that specific reason
     // into the Deny/Ask message so the human/model sees *why* — Defer surfaces it via render_context
     // below, but Deny/Ask exit here, so without this they'd get only the generic reason.
-    const DOCS_URL: &str = "https://www.michaeldhopkins.com/docs/safe-chains/how-it-works.html";
     let overreach = safe_chains::workspace_overreach(&input.command);
     let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
     match format.gated_policy() {
@@ -149,7 +151,7 @@ pub fn run_hook_format(
             // The copy follows what we EMIT, not which harness this is: here we emit deny and the
             // harness honours it, so "the command did not run" is accurate. On the Ask arm below
             // the same refusal must not say that. See docs/design/refusal-copy.md rule 1.
-            // No `DOCS_URL` appended. The builder already closes with the issues link for an
+            // No `HOW_IT_WORKS_URL` appended. The builder already closes with the issues link for an
             // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
             // The reach cause carries its own remedy in `ReachReason::message`.
             let reason = safe_chains::refusal::Refusal {
@@ -167,7 +169,7 @@ pub fn run_hook_format(
         safe_chains::targets::GatedPolicy::Ask => {
             // Same refusal, different EMISSION: the harness will run its own approval flow, so
             // this must not claim the command was stopped.
-            // No `DOCS_URL` appended. The builder already closes with the issues link for an
+            // No `HOW_IT_WORKS_URL` appended. The builder already closes with the issues link for an
             // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
             // The reach cause carries its own remedy in `ReachReason::message`.
             let reason = safe_chains::refusal::Refusal {
@@ -196,7 +198,7 @@ pub fn run_hook_format(
     // prompt on harnesses without additionalContext.
     if let Some((path, reason)) = overreach {
         let nudge = format!(
-            "safe-chains did not auto-approve this: {}. {DOCS_URL}",
+            "safe-chains did not auto-approve this: {}. {HOW_IT_WORKS_URL}",
             reason.message(&path)
         );
         let response = format.render_context(&nudge);
@@ -206,3 +208,4 @@ pub fn run_hook_format(
 
     process::exit(0);
 }
+
