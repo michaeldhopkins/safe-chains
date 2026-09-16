@@ -10,3 +10,13 @@ standalone = [
     "-c", "-h", "-l", "-m", "-p", "-q", "-s", "-t", "-v", "-z",
     "--help", "--version", "-V",
 ]
+examples_safe = [
+    "unzip -l ./archive.zip",
+    "unzip -Z1 ./archive.zip",
+    "unzip -t ./archive.zip",
+    "unzip -p ./archive.zip notes.txt",
+]
+examples_denied = [
+    "unzip ./archive.zip",
+    "unzip -p ~/.ssh/id_rsa",
+]
