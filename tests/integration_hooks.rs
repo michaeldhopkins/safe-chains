@@ -11,34 +11,11 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-fn binary() -> &'static str {
-    env!("CARGO_BIN_EXE_safe-chains")
-}
-
-fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
-    let mut child = Command::new(binary())
-        .args(args)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .expect("spawn safe-chains");
-    match child.stdin.as_mut().unwrap().write_all(stdin_payload.as_bytes()) {
-        Ok(()) => {}
-        // Short-circuit error paths (e.g. unknown subcommand) exit before
-        // reading stdin, which races with our write and surfaces as
-        // BrokenPipe. The test is asserting on stdout/exit code, not on
-        // a successful stdin handshake — tolerate the race.
-        Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => {}
-        Err(e) => panic!("write to safe-chains stdin failed: {e}"),
-    }
-    let out = child.wait_with_output().expect("wait");
-    (
-        String::from_utf8_lossy(&out.stdout).into_owned(),
-        String::from_utf8_lossy(&out.stderr).into_owned(),
-        out.status.code().unwrap_or(-1),
-    )
-}
+// The spawn plumbing lives in `support/`, not here: this file is pinned by the file-length gate,
+// and it is about what the hooks DECIDE rather than how the process gets started.
+#[path = "support/hooks.rs"]
+mod hooks;
+use hooks::{binary, run_hook};
 
 /// Run the claude hook with a temp `$HOME` carrying `level = "<level>"` in the user config, and
 /// `cwd` set to that home so a relative `./f` classifies as a worktree path. Returns (stdout, exit).
