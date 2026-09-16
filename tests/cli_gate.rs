@@ -6,8 +6,16 @@ use std::io::Write;
 use std::process::{Command, Stdio};
 
 /// Run the binary in claude-hook mode (bare, JSON on stdin) and return its stdout.
-fn hook_stdout(payload: &str) -> String {
+///
+/// `home` is required rather than inherited: the hook reads `~/.claude/settings.json` and
+/// `~/.config/safe-chains.toml`, so a guard that let this default would be measuring whatever
+/// config the person running the suite happens to have.
+/// `cwd` is likewise explicit, so a guard comparing the hook against the CLI can stand both in the
+/// same directory.
+fn hook_stdout(payload: &str, cwd: &str, home: &std::path::Path) -> String {
     let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .current_dir(cwd)
+        .env("HOME", home)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
@@ -25,8 +33,15 @@ fn hook_stdout(payload: &str) -> String {
 
 /// The overreach nudge must NAME the working directory, so a user who forgot which directory they
 /// launched the agent from can spot the mismatch (and the reached path, so they know what it hit).
+///
+/// Pinned to a HOME of its own. Without that it read whatever `~/.claude/settings.json` and
+/// `~/.config/safe-chains.toml` the person running it happens to have, and a single `permissions.allow`
+/// entry covering one of these commands turns the nudge into an approval — so the guard passed in
+/// CI, where HOME is bare, and failed on the machine of anyone who had approved `grep` once. A test
+/// that reads the developer's personal config is not testing safe-chains.
 #[test]
 fn overreach_nudge_names_the_working_directory() {
+    let home = tempfile::tempdir().expect("tempdir");
     // A WRITE and a SWEEP. `cat /other/repo/x.rs` used to stand here and no longer overreaches at
     // all — reading a named file outside the workspace is ordinary now, so there is nothing to
     // nudge about. The nudge fires where reaching out is still refused, and both remaining shapes
@@ -37,7 +52,7 @@ fn overreach_nudge_names_the_working_directory() {
     ] {
         let payload =
             format!(r#"{{"tool_input":{{"command":"{command}"}},"cwd":"/work/here"}}"#);
-        let out = hook_stdout(&payload);
+        let out = hook_stdout(&payload, env!("CARGO_MANIFEST_DIR"), home.path());
         assert!(out.contains("/work/here"), "nudge must NAME the working directory: {out}");
         assert!(out.contains(reached), "nudge must name the reached path: {out}");
     }
@@ -260,4 +275,3 @@ fn levels_admit_strictly_more_as_they_loosen() {
         }
     }
 }
-
