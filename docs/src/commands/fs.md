@@ -404,6 +404,13 @@ Aliases: `gtouch`
 
 - Requires -c, -l, -p, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
 
+**Examples:**
+
+- `unzip -l ./archive.zip`
+- `unzip -Z1 ./archive.zip`
+- `unzip -t ./archive.zip`
+- `unzip -p ./archive.zip notes.txt`
+
 ### `vis`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?vis">https://man.freebsd.org/cgi/man.cgi?vis</a></p>
 

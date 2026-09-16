@@ -268,6 +268,51 @@ pub(crate) fn central_role_declares_flag(cmd: &str, flag: &str) -> bool {
     GATES.roles.get(cmd).is_some_and(|r| r.flags.contains_key(flag))
 }
 
+/// How `cmd`'s POSITIONALS are gated as writes, across every source: the flat `write` list, a
+/// central `[roles.X]`, and its own `[command.path_gate]`.
+///
+/// The distinction is the whole point. An UNCONDITIONAL gate says every operand is a write target
+/// in every invocation. A CONDITIONAL one (`write_when`, or a `when` clause that promotes) says a
+/// specific mode writes and the default does not — which is a statement about the tool's grammar,
+/// not a blanket claim, and is the correct shape for a mode-selecting tool. Feeds
+/// `no_inert_command_is_gated_as_a_writer`, which holds them to different rules.
+#[cfg(test)]
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) enum PositionalWriteGate {
+    None,
+    Conditional,
+    Unconditional,
+}
+
+#[cfg(test)]
+pub(crate) fn positional_write_gate(cmd: &str) -> PositionalWriteGate {
+    // SUB-scoped gates (`[roles."dart format"]`) count. `should_deny` consults them, so a gate
+    // declared only against a subcommand gates the command just as much — leaving them out would
+    // have made the guard quietly under-report: `rbs annotate`, `swiftlint fix`,
+    // `swiftlint autocorrect` and `dart format` all declare `positional = "write"` that way, and
+    // none of them would have been seen.
+    let sub_scoped = GATES
+        .roles
+        .iter()
+        .filter(move |(k, _)| k.split_once(' ').is_some_and(|(c, _)| c == cmd))
+        .map(|(_, spec)| spec);
+    let specs: Vec<&RoleSpec> = GATES
+        .roles
+        .get(cmd)
+        .into_iter()
+        .chain(crate::registry::command_path_gate(cmd))
+        .chain(sub_scoped)
+        .collect();
+
+    if GATES.write.contains(cmd) || specs.iter().any(|s| s.positional == Role::Write) {
+        return PositionalWriteGate::Unconditional;
+    }
+    let conditional = specs.iter().any(|s| {
+        !s.write_when.is_empty() || s.when.iter().any(|w| w.positional == Some(Role::Write))
+    });
+    if conditional { PositionalWriteGate::Conditional } else { PositionalWriteGate::None }
+}
+
 /// Whether `cmd` declares any WRITE-role FLAG (centrally or co-located) — i.e. its output is a
 /// named flag, so its positionals are inputs. The positional-writer ratchet uses this to exclude
 /// flag-output writers structurally: probing `-o <path>` cannot tell a gated output flag from an

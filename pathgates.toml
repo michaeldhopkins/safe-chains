@@ -75,9 +75,11 @@ write = [
   # can't find the output — gate every positional as a write. Cost: a home INPUT prompts (grant
   # its dir to allow); effect args (`reverb`, `0.5`) aren't paths, so they're harmless.
   "sox",
-  # archivers / sync that write extracted files by path (`7z a /etc/x.7z`, `cpio -F /etc/x`,
-  # `unzip -p ~/.ssh/id_rsa`). A remote spec (`host:/path`) classifies worktree.
-  "7z", "7za", "7zr", "cpio", "unzip",
+  # archivers / sync that write extracted files by path (`7z a /etc/x.7z`, `cpio -F /etc/x`).
+  # A remote spec (`host:/path`) classifies worktree.
+  # (`unzip` was here for `unzip -p ~/.ssh/id_rsa`. That is a READ, and it is gated as one in
+  #  [roles.unzip] below — see the note there for why the write gate was the wrong instrument.)
+  "7z", "7za", "7zr", "cpio",
   # other HTTP downloaders (curl/wget have richer grammars in [roles.*]). The blanket write
   # gate catches a `-o`/`-d`/`-P` path into a sensitive locus; a URL classifies worktree.
   "aria2c", "http", "https", "xh", "httpie",
@@ -112,6 +114,24 @@ write = [
 #    not match — so a spelling the entry has never seen keeps the default rather than talking the
 #    gate into a weaker role. Where several clauses match, the most restrictive wins, so an entry
 #    that overlaps itself fails safe rather than depending on the order it was written in.
+
+# unzip: its operands are READS, in every form safe-chains can approve.
+#
+# It sat in the flat `write` list above, on the reasoning that unzip extracts files. It does — but
+# not in any invocation that gets this far. `commands/fs/unzip.toml` carries
+# `require_any = ["-c", "-l", "-p", "-t", "-Z"]`, so an approvable unzip is always one of the
+# read-only modes (list, test, zipinfo, or stream a member to stdout), and `-d`, which chooses an
+# extraction directory, is not in its flag set at all. The archive positional is the file it opens.
+#
+# The cost of the blanket gate was a false deny with no way to read it. `unzip -l` on a file outside
+# the workspace was measured against WRITE locus and refused, while `cat`, `less`, `od` and
+# `tar -tf` read the same file without a prompt — and `zipinfo -1`, which is the same program unzip
+# runs for `-Z`, was approved on it too. Two spellings of one operation, opposite answers.
+#
+# The read gate keeps what the write gate was actually there for: `unzip -p ~/.ssh/id_rsa` streams
+# a credential to stdout, and a read gate denies a credential read.
+[roles.unzip]
+positional = "read"
 
 # HTTP downloaders: the URL operand is gated by read locus, but the locus layer is scheme-aware
 # — a network URL admits (so `curl https://x/a/../b` does NOT false-deny on the `..`) and a
