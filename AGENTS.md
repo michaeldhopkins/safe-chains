@@ -91,9 +91,17 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   takes a larger `max_total_time` and also renders the `parse` coverage report): one job per target
   running `fuzz/burst.sh`: 180s of single-process mutation timed from when the corpus has loaded
   (libFuzzer's `-max_total_time` counts the load, which on a runner can exceed the whole budget),
-  then `-merge=1` into the corpus, saved as `fuzz-corpus-<target>-<run>`,
-  which is the prefix the replay restores. `tests/fuzz_targets_wired.rs` keeps both matrices equal
-  to `fuzz/Cargo.toml`, holds the cache prefix in step, and refuses a `schedule:` trigger.
+  then `-merge=1` into the corpus, saved as `fuzz-corpus-<target>-<run>` only when the merge
+  completed, which is the prefix the replay restores. The burst's check fails on a crash-,
+  timeout- or oom- artifact, or on a burst step that failed without one. `tests/fuzz_targets_wired.rs`
+  keeps both matrices equal to `fuzz/Cargo.toml`, holds the cache prefix and those two conditions
+  in step, and refuses a `schedule:` trigger. Both fuzz workflows skip docs-only pushes
+  (`**.md`, `docs/**`): nothing fuzzed reads either.
+- **`fuzz/burst.sh` runs the same locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
+  repo root). Finds go to `fuzz/new/<target>`, so bursting targets one after another never merges
+  one target's finds into the next; the committed `seed-*` inputs keep their names through the
+  merge; `fuzz/dict/<target>.dict` is used when present. `tests/fuzz_burst.rs` holds those against
+  a stand-in libFuzzer binary.
 - **No nightly (retired 2026-09-26).** It ran 05:00 UTC: three 5h shards on `parse` plus 1h on each
   property target. Every real find came in a target's first days; after the first week of August it
   ran seven weeks without another, and its later red nights were job timeouts (`config_load`
