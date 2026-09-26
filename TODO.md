@@ -83,7 +83,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 |---|---|
 | The registry validators are largely untested | "The registry validators are largely UNTESTED" |
 | Two more fuzz targets specified but not built; the parse target finds availability bugs only | "Fuzz suite", "Fuzzing finds availability bugs only" |
-| Verify the `config_load` nightly actually goes green | "Original note: verify the `config_load` nightly" |
+| ~~Verify the `config_load` nightly actually goes green~~ — **MOOT**: the nightly was retired 2026-09-26; `config_load` now bursts 180s per push to main, far inside its job timeout | "Nightly fuzz retired", "Original note: verify the `config_load` nightly" |
 | The lib tests read the developer's own `~/.config/safe-chains.toml` | "The suite is not hermetic against the developer's own config" |
 
 **Decisions needed before the work can be done.**
@@ -1398,6 +1398,10 @@ lesson is that it transfers between neither scopes nor cold/warm build dirs. `--
 
 ## Original note: verify the `config_load` nightly actually goes green
 
+**Superseded 2026-09-26:** the nightly is gone (see "Nightly fuzz retired"). The overrun can no longer
+happen at a 180s budget; if a `workflow_dispatch` deep run of `config_load` overruns, this note is the
+starting point.
+
 The nightly failed four nights running on `config_load` — NOT a crash. The job carries
 `timeout-minutes: 75` around 3600s of fuzzing, ran 80 minutes, and was killed; its siblings finish
 in ~61. The one difference is that every malformed config printed two lines to stderr, the target
@@ -1574,9 +1578,25 @@ in the clear), `ssm --with-decryption` (decrypts SecureString values), `s3api --
 (supplies caller-held key material). Every family also withholds `--endpoint-url`, `--profile`,
 `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
 
+## Nightly fuzz retired (2026-09-26)
+
+The nightly `fuzz.yml` (05:00 UTC: three 5h shards on `parse`, 1h on each property target) is
+replaced by a burst on each push to `main`: one job per target, 180s single-process mutation, merged
+and saved as the corpus `fuzz-replay.yml` gates on. `workflow_dispatch` takes a larger
+`max_total_time` for a deeper run and renders the `parse` coverage report, which the nightly used to
+render every night.
+
+Why: every real find came in a target's first days, most on the first local run. After the first
+week of August the nightly ran seven weeks without another, and its later red nights were job
+timeouts (`config_load` overrunning `timeout-minutes`), not findings. A burst fuzzes new code the day
+it lands, which is when fuzzing finds things, and keeps each corpus cache fresh.
+
+Watch: whether corpus growth per burst stays non-zero on the property targets, and whether the
+replay gate's wall clock grows with the corpus (the skill's escape hatch is replaying a subset).
+
 ## Fuzz suite — four property targets live, two more specified
 
-Live in the nightly `property-targets` matrix, each with its own corpus so they accumulate
+Live in the burst matrix (was the nightly `property-targets` matrix), each with its own corpus so they accumulate
 independently: `equivalence`, `hook_envelope`, `explain_render`, `suggest_roundtrip`. Plus the
 original `parse` (availability) on its own sharded pipeline.
 
