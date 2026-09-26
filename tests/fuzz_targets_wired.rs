@@ -133,3 +133,31 @@ fn every_fuzz_target_is_wired_into_the_per_push_replay() {
          the replay exists."
     );
 }
+
+#[test]
+fn the_burst_saves_only_a_merged_corpus_and_fails_on_a_broken_burst() {
+    let src = workflow("fuzz.yml");
+    assert!(
+        src.contains("steps.fuzz.outputs.merged == 'true'"),
+        "fuzz.yml must save the corpus only when fuzz/burst.sh reports `merged=true`; a save after a \
+         failed merge makes a half-merged corpus canonical for every later replay"
+    );
+    assert!(
+        src.contains("FUZZ_OUTCOME: ${{ steps.fuzz.outcome }}") && src.contains(r#"[ "$FUZZ_OUTCOME" != success ]"#),
+        "fuzz.yml's crash check must also fail on a non-success burst outcome: the burst step is \
+         continue-on-error, so a burst that broke without writing an artifact would otherwise be green"
+    );
+    let call = src
+        .lines()
+        .map(str::trim)
+        .find_map(|l| l.strip_prefix("run: bash fuzz/burst.sh "))
+        .map(str::to_string)
+        .expect("fuzz.yml does not run `bash fuzz/burst.sh`");
+    assert_eq!(
+        // Each argument is double-quoted (`${{ matrix.target }}` has spaces inside it), so count
+        // the quoted spans; anything outside them is an unquoted extra argument.
+        call.split('"').skip(1).step_by(2).count() + call.split('"').step_by(2).filter(|s| !s.trim().is_empty()).count(),
+        3,
+        "fuzz/burst.sh takes <binary> <target> <budget> and refuses anything else: `{call}`"
+    );
+}
