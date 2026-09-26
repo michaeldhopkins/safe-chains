@@ -361,7 +361,7 @@ fn classifier_terminates_on_adversarial_input() {
 }
 
 /// The same termination contract, enforced over the COMMITTED fuzz corpus (`fuzz/corpus/parse/seed-*`)
-/// rather than a hand-written list. The nightly fuzzer finds real pathological inputs that nobody
+/// rather than a hand-written list. The fuzzer finds real pathological inputs that nobody
 /// would think to write down — the `seed-slow-*` entries took 1.2s, 1.5s and 5.8s before brace-
 /// expansion fan-out was charged to the shared classification budget (it multiplied with the
 /// delegation cap instead of adding). Enumerating the directory means every input a future nightly

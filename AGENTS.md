@@ -63,18 +63,49 @@ adding a new one — extend a corpus/table where one already fits rather than st
 ### Fuzzing (project specifics)
 
 General fuzzing method — the two budgets, the seeding ladder, coverage, CI shape, the gotchas — is
-in the `rust-project` skill. This section is only what is specific to safe-chains.
+in the `rust-fuzzing` skill. This section is only what is specific to safe-chains.
 
-- **Target:** `fuzz/fuzz_targets/parse.rs` runs `is_safe_command(&String::from_utf8_lossy(data))` —
-  the never-panics/never-hangs contract on the whole classifier (parse → CST → engine → handlers).
-  It **discards the verdict**, so it finds availability bugs only; a wrong *classification* (a
-  fail-open) is out of scope for this target and would need an invariant target instead.
+- **Targets** (`fuzz/fuzz_targets/`; each file's header states its properties in full):
+  - `parse` — `is_safe_command` on arbitrary bytes: never panics, never hangs, across parse → CST →
+    engine → handlers. It **discards the verdict**, so it finds availability bugs only.
+  - `equivalence` — a semantics-preserving respelling (flag forms, env-var forms) cannot change the
+    verdict.
+  - `hook_envelope` — the `targets/*` hook I/O never panics and never emits a grant it was not
+    asked for.
+  - `explain_render` — the explanation describes the verdict that was enforced, and a command
+    cannot forge a marker line or smuggle a control/bidi character into it.
+  - `suggest_roundtrip` — every config `--suggest` generates parses back, and merging never drops
+    what was there.
+  - `level_monotonic` — a stricter level never approves what a looser one refused.
+  - `config_load` — a repo `.safe-chains.toml` (the one attacker-placed input) never aborts the
+    loader, loads NOTHING when it is not valid TOML, and loads deterministically.
+  - `setup_merge` — `--setup` into an arbitrary existing settings file: on refusal the file is
+    byte-identical, on success it still parses.
+  - `path_admit` — the credential shield outranks every package-content read admit, and those
+    admits never grant a write.
+  - `gate_prefilter` — a declared path gate never skips a value its own judge would refuse.
+- **Not fuzzed:** `docs.rs` (no security property) and `pathctx` (proptests cover it and shrink
+  better for a pure function).
+- **CI:** `fuzz-replay.yml` replays every target's cached corpus (`-runs=0`) on every push and PR —
+  the gate. `fuzz.yml` is a non-gating burst on each push to `main` (and `workflow_dispatch`, which
+  takes a larger `max_total_time` and also renders the `parse` coverage report): one job per target
+  running `fuzz/burst.sh`: 180s of single-process mutation timed from when the corpus has loaded
+  (libFuzzer's `-max_total_time` counts the load, which on a runner can exceed the whole budget),
+  then `-merge=1` into the corpus, saved as `fuzz-corpus-<target>-<run>`,
+  which is the prefix the replay restores. `tests/fuzz_targets_wired.rs` keeps both matrices equal
+  to `fuzz/Cargo.toml`, holds the cache prefix in step, and refuses a `schedule:` trigger.
+- **No nightly (retired 2026-09-26).** It ran 05:00 UTC: three 5h shards on `parse` plus 1h on each
+  property target. Every real find came in a target's first days; after the first week of August it
+  ran seven weeks without another, and its later red nights were job timeouts (`config_load`
+  overrunning `timeout-minutes`), not findings. The burst fuzzes new code the day it lands, which is
+  when finds happen. For a deeper run after a large change, dispatch `fuzz.yml` with a bigger budget.
 - **Seeding is registry-derived.** `src/bin/gen_fuzz_corpus.rs` (feature `fuzz-gen`,
   `cargo run --bin gen-fuzz-corpus --features fuzz-gen`) reads `commands/**/*.toml` and emits the
   `examples_safe`/`examples_denied` invocations as seeds and the command/subcommand/flag vocabulary
-  as a `-dict`. New commands are covered automatically — **no hand-maintained fuzz corpus.** The
-  nightly (`.github/workflows/fuzz.yml`) regenerates and merges them in; the per-push replay is
-  `fuzz-replay.yml`. Generated `gen-*` seeds and `fuzz/dict/` are git-ignored.
+  as a `-dict` for `parse`. New commands are covered automatically — **no hand-maintained fuzz
+  corpus.** The burst's build job regenerates them each run and the `parse` burst merges them in.
+  Generated `gen-*` seeds and `fuzz/dict/` are git-ignored. The property targets take other input
+  domains (a flag value, an envelope, a config file), so the registry seeds do not apply to them.
 - **Measured coverage** (region, authored source): mutation corpus alone ~26%, registry seeds alone
   ~37%, **combined ~61%**. The two are complementary — seeds unlock the per-command grammars,
   mutation covers parser byte-paths.
