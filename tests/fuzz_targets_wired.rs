@@ -1,14 +1,17 @@
 //! Every fuzz target runs in BOTH halves of the fuzzing program, and nothing drifts.
 //!
-//! The program has two halves and a target needs both. The nightly EXPLORES — hours of mutation
-//! discovering new paths. The per-push replay is the REGRESSION gate — it re-runs the corpus the
-//! nightly accumulated, deterministically, in minutes. A target wired only into the nightly still
-//! finds bugs, but a regression in it stays invisible until the next morning; a target wired only
-//! into the replay never explores, so its corpus never grows and the replay has nothing to say.
+//! The program has two halves and a target needs both. The burst on each push to `main`
+//! (`fuzz.yml`) EXPLORES — a few minutes of mutation per target, merged into that target's saved
+//! corpus. The per-push replay (`fuzz-replay.yml`) is the REGRESSION gate — it re-runs that
+//! corpus, deterministically, in minutes. A target wired only into the burst still finds bugs, but
+//! nothing gates a regression in it; a target wired only into the replay never explores, so its
+//! corpus never grows and the replay has nothing to say.
 //!
 //! Drift here is silent in both directions, which is why this is a test rather than a convention.
-//! `gate_prefilter` was added to `fuzz/Cargo.toml` and the nightly matrix and NOT to the replay,
-//! and nothing complained — the workflows are YAML that no compiler reads.
+//! `gate_prefilter` was added to `fuzz/Cargo.toml` and the exploring matrix and NOT to the replay,
+//! and nothing complained — the workflows are YAML that no compiler reads. The same is true of the
+//! cache key that joins them: if the burst saved under a prefix the replay does not restore, every
+//! replay would find an empty corpus and pass green, gating nothing.
 //!
 //! The authority is `fuzz/Cargo.toml`: a target exists when it has a `[[bin]]`. Both workflows must
 //! list exactly that set.
@@ -43,17 +46,14 @@ fn declared_targets() -> Vec<String> {
 
 /// The `target: [a, b, c]` matrix list from a workflow. Takes the first one, which is the only one
 /// either workflow has.
-fn matrix_targets(workflow: &str) -> Vec<String> {
-    let src = std::fs::read_to_string(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows").join(workflow),
-    )
-    .unwrap_or_else(|e| panic!("read {workflow}: {e}"));
+fn matrix_targets(name: &str) -> Vec<String> {
+    let src = workflow(name);
 
     let line = src
         .lines()
         .map(str::trim)
         .find(|l| l.starts_with("target: ["))
-        .unwrap_or_else(|| panic!("{workflow} declares no `target: [...]` matrix"));
+        .unwrap_or_else(|| panic!("{name} declares no `target: [...]` matrix"));
 
     let inner = line
         .trim_start_matches("target: [")
@@ -64,26 +64,62 @@ fn matrix_targets(workflow: &str) -> Vec<String> {
     out
 }
 
-/// The nightly runs `parse` in its own sharded job rather than the matrix, because it is the one
-/// target big enough to need sharding. It is still a target and still must be replayed, so the
-/// comparison adds it back rather than exempting it.
-fn nightly_targets() -> Vec<String> {
-    let mut out = matrix_targets("fuzz.yml");
-    out.push("parse".to_string());
-    out.sort();
-    out
+fn workflow(name: &str) -> String {
+    std::fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows").join(name),
+    )
+    .unwrap_or_else(|e| panic!("read {name}: {e}"))
 }
 
+/// Every `key:` / `restore-keys:` value in a workflow that names a corpus cache.
+fn corpus_cache_keys(src: &str) -> Vec<String> {
+    src.lines()
+        .map(str::trim)
+        .filter_map(|l| l.strip_prefix("key: ").or_else(|| l.strip_prefix("restore-keys: ")))
+        .filter(|v| v.starts_with("fuzz-corpus-"))
+        .map(str::to_string)
+        .collect()
+}
+
+const MATRIX_CORPUS_PREFIX: &str = "fuzz-corpus-${{ matrix.target }}-";
+
 #[test]
-fn every_fuzz_target_is_wired_into_the_nightly() {
+fn every_fuzz_target_is_wired_into_the_burst() {
     let declared = declared_targets();
     assert!(declared.len() >= 8, "only {} targets found — the Cargo.toml parse is wrong", declared.len());
     assert_eq!(
         declared,
-        nightly_targets(),
-        "fuzz/Cargo.toml and the nightly disagree. A target missing from the nightly never explores, \
+        matrix_targets("fuzz.yml"),
+        "fuzz/Cargo.toml and the burst disagree. A target missing from the burst never explores, \
          so its corpus never grows and the per-push replay has nothing to replay."
     );
+}
+
+#[test]
+fn the_replay_restores_the_corpus_the_burst_saves() {
+    let burst = corpus_cache_keys(&workflow("fuzz.yml"));
+    let replay = corpus_cache_keys(&workflow("fuzz-replay.yml"));
+
+    let saved: Vec<&String> =
+        burst.iter().filter(|k| k.starts_with(MATRIX_CORPUS_PREFIX) && k.len() > MATRIX_CORPUS_PREFIX.len()).collect();
+    assert!(!saved.is_empty(), "fuzz.yml saves no per-target corpus under `{MATRIX_CORPUS_PREFIX}<unique>`: {burst:?}");
+    assert!(
+        replay.iter().any(|k| k == MATRIX_CORPUS_PREFIX),
+        "fuzz-replay.yml does not restore by the prefix `{MATRIX_CORPUS_PREFIX}` the burst saves under \
+         ({saved:?}). Every replay would then find an empty corpus and pass green, gating nothing. Found: {replay:?}"
+    );
+}
+
+#[test]
+fn fuzzing_runs_on_no_schedule() {
+    for name in ["fuzz.yml", "fuzz-replay.yml"] {
+        assert!(
+            !workflow(name).lines().any(|l| l.trim() == "schedule:"),
+            "{name} has a `schedule:` trigger. The nightly was retired on 2026-09-26: its finds all came \
+             in each target's first days, and its later red runs were job timeouts. Exploration runs \
+             as the burst on each push to main; a deeper run is a workflow_dispatch."
+        );
+    }
 }
 
 #[test]
@@ -93,7 +129,7 @@ fn every_fuzz_target_is_wired_into_the_per_push_replay() {
         declared,
         matrix_targets("fuzz-replay.yml"),
         "fuzz/Cargo.toml and the per-push replay disagree. A target missing from the replay still \
-         finds bugs overnight, but a regression in it stays invisible until the next morning — \
-         which is the whole reason the replay exists."
+         finds bugs in the burst, but nothing gates a regression in it — which is the whole reason \
+         the replay exists."
     );
 }
