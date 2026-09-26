@@ -143,19 +143,17 @@ jobs:
       # fuzz/burst.sh: one process, not fork mode (fork mode reloads the whole corpus in every child;
       # a nominal 60s fork-mode burst measured ~275s against a 12.6k corpus). The budget clock starts
       # once the corpus has loaded, since libFuzzer's -max_total_time counts the load and a large
-      # corpus on a runner can take longer to load than the whole budget. New units go to fuzz/new,
-      # then `-merge=1` folds [restored corpus + seeds, new] into a minimized union. The merge runs
-      # after a crash too; a successful one sets `merged=true`.
+      # corpus on a runner can take longer to load than the whole budget. New units go to
+      # fuzz/new/<target>, then `-merge=1` folds [restored corpus + seeds, new] into a minimized
+      # union. The merge runs after a crash too; a successful one sets `merged=true`. The script
+      # picks up fuzz/dict/<target>.dict itself, so `parse` gets the dictionary downloaded above.
       #
       # `continue-on-error` so the save and upload still run after a find; "Fail on crashes" turns
       # the job red.
       - name: Fuzz and merge
         id: fuzz
         continue-on-error: true
-        run: |
-          DICT=""
-          if [ "${{ matrix.target }}" = parse ]; then DICT=fuzz/dict/parse.dict; fi
-          bash fuzz/burst.sh "./bin/${{ matrix.target }}" "${{ matrix.target }}" "$BUDGET" $DICT
+        run: bash fuzz/burst.sh "./bin/${{ matrix.target }}" "${{ matrix.target }}" "$BUDGET"
 
       # Unique (always-miss) key, so the next restore's prefix match pulls the newest. Only a
       # completed merge is saved, so a half-merged corpus never becomes canonical.

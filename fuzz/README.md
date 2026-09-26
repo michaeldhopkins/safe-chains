@@ -28,6 +28,7 @@ toolchain file inside `fuzz/` is NOT picked up. The `+nightly` override propagat
 cargo +nightly fuzz build parse                      # smoke-test: compiles + links?
 cargo +nightly fuzz run parse                        # runs until a crash or Ctrl-C
 cargo +nightly fuzz run parse -- -max_total_time=28800   # a long local run
+fuzz/burst.sh fuzz/target/aarch64-apple-darwin/release/parse parse 60   # what CI's burst runs
 ```
 
 The corpus lives in `fuzz/corpus/parse/`; the `seed-*` files are committed starting inputs, and
