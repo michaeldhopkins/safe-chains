@@ -14,9 +14,13 @@ name: Fuzz replay
 # also keep the cache inside GitHub's 7-day eviction window. On a cache miss (a fork, or a target
 # the burst has not run yet) the replay is a no-op, so this degrades gracefully rather than failing.
 on:
+  # Nothing fuzzed reads Markdown or the mdbook sources (no include_str! of either, no .md corpus
+  # inputs), so a docs-only change cannot change a replay's result.
   push:
     branches: [main]
+    paths-ignore: ["**.md", "docs/**"]
   pull_request:
+    paths-ignore: ["**.md", "docs/**"]
   workflow_dispatch:
 
 env:

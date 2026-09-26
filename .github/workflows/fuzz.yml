@@ -16,6 +16,9 @@ name: Fuzz burst
 on:
   push:
     branches: [main]
+    # Nothing fuzzed reads Markdown or the mdbook sources (no include_str! of either, no .md
+    # corpus inputs), so a docs-only push has no new code to explore.
+    paths-ignore: ["**.md", "docs/**"]
   workflow_dispatch:
     inputs:
       max_total_time:
