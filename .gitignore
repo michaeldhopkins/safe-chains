@@ -1,6 +1,8 @@
 /target
 /fuzz/target
 /fuzz/artifacts
+# fuzz/burst.sh's per-target finds, emptied by its merge; left behind only by an interrupted run.
+/fuzz/new
 # `cargo fuzz coverage` output: multi-MB .profraw/.profdata build artifacts.
 /fuzz/coverage
 # Keep a hand-curated committed seed corpus (seed-*); ignore libFuzzer's hash-named generated
