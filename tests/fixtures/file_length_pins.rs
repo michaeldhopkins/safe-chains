@@ -9,7 +9,7 @@
 // split, and new code goes in a new module rather than into a file on this list.
 const PINS: [(&str, usize); 21] = [
     ("src/cst/check.rs", 1103),
-    ("src/cst/parse.rs", 1300),
+    ("src/cst/parse.rs", 1292),
     ("src/cst/proptests.rs", 801),
     ("src/engine/facet.rs", 697),
     ("src/engine/resolve.rs", 1661),
