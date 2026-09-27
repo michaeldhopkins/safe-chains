@@ -145,10 +145,48 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
     panic is a crash — which for a PreToolUse hook fails OPEN. Extending a corpus beat building a
     target; check that before reaching for new machinery on the layers above.
 
+### Mutation testing (project specifics)
+
+General method is in the `rust-mutation-testing` skill. This is what is specific to safe-chains.
+
+- **Per change** (`.github/workflows/mutants.yml`, not gating): `--in-diff` on every PR and push to
+  `main`, skipped with a warning above 30 selected mutants; and on each push to `main` one
+  **rotating slice**, `--shard (run_number % 256)/256`. PR runs advance the same counter, so
+  coverage is roughly one pass per 256 runs rather than exactly one per 256 pushes. There is no whole-tree sweep: ~5,300 mutants at ~19s of wall clock each is ~28 hours.
+- **N = 256, measured 2026-09-27** on slice 128/256 (21 mutants in `engine/resolve.rs`): 6m45s
+  locally at `-j2` on a loaded M3 (baseline 21s build + 45s test). The runner is slower; if slices
+  approach the 20-minute job timeout, raise N rather than the timeout. The 30-mutant in-diff cap is
+  from the same local rate and wants recalibrating from the first runner timings.
+- **Test-bound, and the profile is the lever.** A mutant's rebuild is 2-5s; its test run is the full
+  suite. The integration tests spawn the debug binary a few hundred times, and unoptimized each
+  spawn spent ~0.4s parsing the registry TOML inside the dependencies. `.cargo/mutants.toml` selects
+  the `mutants` profile (Cargo.toml), which optimizes dependencies only: suite 124s to 45s, rebuild
+  cost unchanged. Restricting the test command was not an option: `cli_gate`, `path_policy` and the
+  hook tests drive the real binary (`CARGO_BIN_EXE_safe-chains`), which is built from the mutated
+  tree, so they catch mutants the lib tests do not.
+- **The `fuzz-gen` feature is on** for mutation runs, or `gen-fuzz-corpus` is never built and all of
+  its mutants read as MISSED. CI's test job runs its tests the same way.
+- **Exclusion:** `gen-fuzz-corpus`'s `main` (binds the checkout path and prints counts; `generate`
+  holds the logic and is tested). Reason in `.cargo/mutants.toml`.
+- **Equivalent, not excluded:** `delete !` in `sed_cluster`'s `-f` arm (`consumes_next: !has`).
+  `scan_sed` flags every `-f` spelling and `resolve_sed` worst-cases before the cluster parser runs,
+  so the `ScriptFile` arm's word count is never observed. A slice that lands on it reports it.
+- **Findings of the first slices (2026-09-27):** slice 128/256 had 5 MISSED of 20 viable (75%): no
+  test pinned which word `sed -e`/`-l` consume, that a trailing `-l` fails closed, or that an unknown
+  byte in a short cluster fails closed when the script itself is harmless (`sed -Q ./foo` was caught
+  only because `./foo` is an unknown sed command). Four now have
+  `sed_short_flags_consume_exactly_their_own_value`; the fifth is the equivalent one above.
+  `gen-fuzz-corpus` was never built by `cargo test` and had no tests; it now has four, and a run
+  over the file caught 27 of 28 viable (the 28th is the excluded `main`).
+- **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
+  `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
+  its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
+  `~/projects/safe-chains` and a peer under a HOME of its own.
+
 ## Linting
 
 ```bash
-cargo clippy --all-targets -- -D warnings
+cargo clippy --all-targets --all-features -- -D warnings
 cargo deny check licenses
 ```
 
