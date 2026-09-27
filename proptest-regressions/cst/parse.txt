@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 82f73cb68040286759b496dc0e8e59dd78a17f7abb32af93362b763eb4b0f9d4 # shrinks to nest = ["function f {\n", "{\n", "{\n", "{\n", "{\n", "{\n", "{\n", "{\n", "{\n"], tail = []
+cc a129915833b0ef9a9c234d17d272dc62b411a1c0bc79caa6cd698f6cee25bc11 # shrinks to opener = "$(", depth = 4, mixed = ["$("], tail = ["$(", "}", "\"", "\""], closes = 6
+cc 353a3eb0b80fc99aa72d02e7699237c0514156408b7f160eec44164cdc3d9811 # shrinks to opener = "function f {\n", depth = 6, mixed = ["{\n"], tail = ["}"], closes = 0
