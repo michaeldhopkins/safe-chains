@@ -1454,6 +1454,31 @@ mod tests {
         }
     }
 
+    /// The explain_render timeout's own input, with its brace nest regrown to 10..40: parse work
+    /// and steps must grow linearly in the braces, never double.
+    ///
+    /// The seed is the minimized fuzzer find. Its backtick body is an unclosed `{` nest in front of
+    /// a `"$([[ … <<` tail, and classifying it re-parses that body several times, so before the
+    /// fix it took 4s. Keeping the seed's actual tail here, rather than a hand-written look-alike,
+    /// is what makes this the regression it claims to be.
+    #[test]
+    fn the_explain_render_timeout_seed_scales_linearly_in_its_braces() {
+        let seed = include_bytes!("../../fuzz/corpus/explain_render/seed-unclosed-brace-nest");
+        let seed = String::from_utf8_lossy(seed);
+        let body = seed.split('`').nth(1).expect("the seed carries a backtick body");
+        let deep = body.find("$([[").expect("the seed's tail opens a `$([[`");
+        let tail = &body[body[..deep].rfind("\n{").expect("the nest ends before the tail") + 2..];
+        let cost = |k: usize| {
+            let _ = parse(&format!("{}{tail}", "{\n".repeat(k)));
+            assert!(!budget::spent(), "{k} braces spent the budget; the nest is not linear");
+            (budget::work(), budget::steps())
+        };
+        let [(w10, s10), (w20, s20), (w40, s40)] = [cost(10), cost(20), cost(40)];
+        assert!(w40 - w20 <= 2 * (w20 - w10) + 4, "entries {w10}/{w20}/{w40} for 10/20/40 braces");
+        assert!(s40 - s20 <= 2 * (s20 - s10) + 16, "steps {s10}/{s20}/{s40} for 10/20/40 braces");
+        assert!(!crate::is_safe_command(&seed));
+    }
+
     /// The step budget refuses nothing real: no registry example spends it, and long real shapes
     /// (a big heredoc commit message, a long flat script) stay far inside their allowance.
     #[test]
