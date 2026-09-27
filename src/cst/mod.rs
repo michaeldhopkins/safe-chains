@@ -2,6 +2,7 @@ pub(crate) mod check;
 mod display;
 pub(crate) mod eval;
 mod explain;
+mod budget;
 mod parse;
 mod reserved;
 #[cfg(test)]

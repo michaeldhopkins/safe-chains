@@ -1,4 +1,5 @@
 use super::*;
+use super::budget::{self, DepthGuard};
 use winnow::ModalResult;
 use winnow::combinator::{alt, delimited, not, opt, preceded, repeat, separated, terminated};
 use winnow::error::{ContextError, ErrMode};
@@ -7,14 +8,8 @@ use winnow::token::{any, take_while};
 
 pub fn parse(input: &str) -> Option<Script> {
     reset_heredoc_queue();
-    PARSE_DEPTH.with(|d| d.set(0));
-    PARSE_WORK.with(|w| w.set(0));
-    PARSE_WORK_LIMIT
-        .with(|l| {
-            let budget = MAX_PARSE_WORK_BASE + MAX_PARSE_WORK_PER_BYTE * input.len() as u64;
-            l.set(budget.min(MAX_PARSE_WORK_CEILING));
-        });
-    let result = script.parse(input).ok();
+    budget::reset(input.len());
+    let result = script.parse(input).ok().filter(|_| !budget::spent());
     reset_heredoc_queue();
     result
 }
@@ -23,74 +18,25 @@ fn backtrack<T>() -> ModalResult<T> {
     Err(ErrMode::Backtrack(ContextError::new()))
 }
 
-thread_local! {
-    static PARSE_DEPTH: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
-    /// MONOTONIC work counter for one `parse()` call — every `script()` entry bumps it and it is
-    /// never decremented (unlike `PARSE_DEPTH`), so it counts total recursive-descent work, not
-    /// concurrent depth. Reset per parse; compared against `PARSE_WORK_LIMIT`.
-    static PARSE_WORK: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
-    static PARSE_WORK_LIMIT: std::cell::Cell<u64> = const { std::cell::Cell::new(u64::MAX) };
+/// Charge one parsing attempt; over budget it fails, and `parse` then refuses.
+fn step() -> ModalResult<()> {
+    if budget::charge(1, 0) { Ok(()) } else { backtrack() }
 }
 
-/// Nesting depth beyond which the parser bails instead of recursing further. EVERY recursion source
-/// — subshells `( )`, brace groups `{ }`, command/process substitutions `$( )`/`<( )`, and
-/// double-quote-nested subs — funnels through `script()`, so bounding it there caps stack depth. A
-/// deeply-nested adversarial input (`"$("` × 100 000) would otherwise overflow the stack and ABORT
-/// the process — a fail-open CRASH of the hook that `catch_unwind` cannot recover (a stack overflow
-/// is not an unwindable panic). 200 is far beyond any real command; past it the parse fails and the
-/// command is denied (fail closed). Found by `classifier_terminates_on_adversarial_input`. Kept
-/// LOW (winnow's combinator frames are fat — ~200 levels alone overflowed a 2 MB stack), yet still
-/// far beyond any real command, which nests a handful of levels at most.
-const MAX_PARSE_DEPTH: u32 = 48;
-
-/// Cumulative `script()` entries allowed per parse, as `BASE + PER_BYTE * input.len()`. A correct
-/// recursive-descent parse is linear in input length, so this bound is loose for every real command
-/// yet trips fast on combinator BACKTRACKING blow-up — inputs where nested constructs make winnow
-/// re-parse overlapping tails super-linearly (the `a$(a<(a` × N interleaved-substitution class the
-/// depth cap misses because its nesting stays shallow). The balanced-scan in `cmd_sub`/`proc_sub`
-/// removes the known source; this is the belt-and-suspenders backstop that fails ANY future
-/// exponential closed rather than hanging the hook. Found by `classifier_terminates_on_adversarial_input`.
-/// Absolute ceiling on the per-parse work budget, whatever the input length.
-///
-/// Without it the allowance grows with the input, so a LARGER adversarial input buys itself more
-/// time — the opposite of what a bound is for. Measured across all 1338 registry examples the most
-/// any real command needs is 2 entries, so a flat ceiling four orders of magnitude above that
-/// cannot refuse anything real while capping the worst case at a fixed cost.
-const MAX_PARSE_WORK_CEILING: u64 = 20_000;
-
-const MAX_PARSE_WORK_BASE: u64 = 2_048;
-const MAX_PARSE_WORK_PER_BYTE: u64 = 8;
-
-/// RAII depth counter for the recursive descent — increments on `enter`, decrements on drop (winnow
-/// returns errors rather than panicking, so drops balance even on the bail path). `enter` also bumps
-/// the monotonic work counter and bails (→ fail closed) once it exceeds the per-parse work budget.
-struct DepthGuard;
-
-impl DepthGuard {
-    fn enter() -> Option<Self> {
-        let over_budget = PARSE_WORK.with(|w| {
-            let n = w.get().saturating_add(1);
-            w.set(n);
-            n > PARSE_WORK_LIMIT.with(|l| l.get())
-        });
-        if over_budget {
-            return None;
-        }
-        PARSE_DEPTH.with(|d| {
-            if d.get() >= MAX_PARSE_DEPTH {
-                None
-            } else {
-                d.set(d.get() + 1);
-                Some(DepthGuard)
-            }
-        })
-    }
+/// Charge `bytes` consumed or looked ahead at, outside any counted attempt.
+fn scan(bytes: usize) -> ModalResult<()> {
+    if budget::charge(0, bytes) { Ok(()) } else { backtrack() }
 }
 
-impl Drop for DepthGuard {
-    fn drop(&mut self) {
-        PARSE_DEPTH.with(|d| d.set(d.get().saturating_sub(1)));
-    }
+/// Run a parser, charging the step budget for what it consumed.
+fn consumed<'a, O>(
+    input: &mut &'a str,
+    p: impl FnOnce(&mut &'a str) -> ModalResult<O>,
+) -> ModalResult<O> {
+    let before = input.len();
+    let out = p(input);
+    scan(before - input.len())?;
+    out
 }
 
 fn comment(input: &mut &str) -> ModalResult<()> {
@@ -105,6 +51,10 @@ fn comment(input: &mut &str) -> ModalResult<()> {
 }
 
 fn ws(input: &mut &str) -> ModalResult<()> {
+    consumed(input, ws_raw)
+}
+
+fn ws_raw(input: &mut &str) -> ModalResult<()> {
     loop {
         take_while(0.., [' ', '\t']).void().parse_next(input)?;
         if input.starts_with('#') {
@@ -117,6 +67,10 @@ fn ws(input: &mut &str) -> ModalResult<()> {
 }
 
 fn sep(input: &mut &str) -> ModalResult<()> {
+    consumed(input, sep_raw)
+}
+
+fn sep_raw(input: &mut &str) -> ModalResult<()> {
     loop {
         // Consume separators one at a time so a `;;` stays intact: it terminates a case arm, and
         // eating its first `;` here would let the arm's body run on into the next arm's pattern.
@@ -186,7 +140,7 @@ fn is_dq_literal(c: char) -> bool {
 
 fn script(input: &mut &str) -> ModalResult<Script> {
     // Bound recursion depth: every nested `(`/`{`/`$(`/`<(`/`` ` `` funnels back through `script`,
-    // so this one guard caps stack depth against deeply-nested adversarial input (see MAX_PARSE_DEPTH).
+    // so this one guard caps stack depth against deeply-nested adversarial input (see `budget`).
     let Some(_depth) = DepthGuard::enter() else {
         return backtrack();
     };
@@ -290,6 +244,7 @@ fn opt_time_keyword_before_compound(input: &mut &str) -> bool {
 // === Command ===
 
 fn command(input: &mut &str) -> ModalResult<Cmd> {
+    step()?;
     ws.parse_next(input)?;
     if at_script_stop(input) {
         return backtrack();
@@ -317,7 +272,7 @@ fn function_def(input: &mut &str) -> ModalResult<Cmd> {
         return backtrack();
     }
     // The body may sit on the next line (`foo()\n{ … }`); consume ws/newlines but not `;`.
-    take_while(0.., [' ', '\t', '\n']).void().parse_next(input)?;
+    blank(input)?;
     let body = function_body(input)?;
     Ok(Cmd::FunctionDef { name, body })
 }
@@ -352,9 +307,12 @@ fn opt_paren_pair(input: &mut &str) -> bool {
 }
 
 fn function_name(input: &mut &str) -> ModalResult<String> {
-    take_while(1.., |c: char| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':' | '+'))
-        .map(|s: &str| s.to_string())
-        .parse_next(input)
+    run(input, |c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':' | '+')).map(String::from)
+}
+
+/// A non-empty run of `pred` characters, charged to the step budget.
+fn run<'a>(input: &mut &'a str, pred: fn(char) -> bool) -> ModalResult<&'a str> {
+    consumed(input, |i| take_while(1.., pred).parse_next(i))
 }
 
 /// The compound body of a function — `{ …; }` or `( … )`. Redirects attached to the definition
@@ -460,8 +418,7 @@ fn at_cmd_end(input: &str) -> bool {
 }
 
 fn assignment(input: &mut &str) -> ModalResult<(String, Word)> {
-    let n: &str = take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_')
-        .parse_next(input)?;
+    let n = run(input, |c| c.is_ascii_alphanumeric() || c == '_')?;
     '='.parse_next(input)?;
     let value = opt(word)
         .parse_next(input)?
@@ -536,7 +493,10 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
     "<<".parse_next(input)?;
     let strip_tabs = opt('-').parse_next(input)?.is_some();
     ws.parse_next(input)?;
-    let (delimiter, expands) = heredoc_delimiter.parse_next(input)?;
+    let before = input.len();
+    let delimiter = heredoc_delimiter.parse_next(input);
+    scan(if delimiter.is_ok() { before - input.len() } else { before })?;
+    let (delimiter, expands) = delimiter?;
     // With a BARE delimiter the shell expands the body, so `cat <<EOF` with `$(rm -rf /)` in it
     // runs that command. The body is looked up now (it is already present in `input`, after this
     // line) rather than at drain time, so the expansions land on the redirect that owns them.
@@ -570,19 +530,23 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
 /// `unexpected EOF while looking for matching backquote` and runs nothing.
 fn heredoc_body_word(input: &str, delimiter: &str, strip_tabs: bool) -> ModalResult<Word> {
     let Some(nl) = input.find('\n') else {
+        scan(input.len())?;
         return Ok(Word(Vec::new())); // no body yet; the drain will fail the parse
     };
     let mut rest = &input[nl + 1..];
     let priors: Vec<PendingHeredoc> = PENDING_HEREDOCS.with(|q| q.borrow().clone());
     for prior in &priors {
         let Some((_, after)) = split_heredoc_body(rest, &prior.delimiter, prior.strip_tabs) else {
+            scan(input.len())?;
             return Ok(Word(Vec::new()));
         };
         rest = after;
     }
-    let Some((body, _)) = split_heredoc_body(rest, delimiter, strip_tabs) else {
+    let Some((body, after)) = split_heredoc_body(rest, delimiter, strip_tabs) else {
+        scan(input.len())?;
         return Ok(Word(Vec::new()));
     };
+    scan(input.len() - after.len())?;
     let mut text = body;
     let parts: Vec<WordPart> = repeat(0.., heredoc_part).parse_next(&mut text)?;
     if !text.is_empty() {
@@ -599,6 +563,7 @@ fn is_heredoc_literal(c: char) -> bool {
 }
 
 fn heredoc_part(input: &mut &str) -> ModalResult<WordPart> {
+    step()?;
     if input.is_empty() {
         return backtrack();
     }
@@ -642,7 +607,9 @@ fn drain_pending_heredocs(input: &mut &str) {
 }
 
 fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> bool {
-    match split_heredoc_body(input, delimiter, strip_tabs) {
+    let split = split_heredoc_body(input, delimiter, strip_tabs);
+    let _ = scan(split.map_or(input.len(), |(_, rest)| input.len() - rest.len()));
+    match split {
         Some((_, rest)) => {
             *input = rest;
             true
@@ -767,6 +734,7 @@ fn word(input: &mut &str) -> ModalResult<Word> {
 }
 
 fn word_part(input: &mut &str) -> ModalResult<WordPart> {
+    step()?;
     if input.is_empty() {
         return backtrack();
     }
@@ -781,9 +749,11 @@ fn word_part(input: &mut &str) -> ModalResult<WordPart> {
 }
 
 fn single_quoted(input: &mut &str) -> ModalResult<WordPart> {
-    delimited('\'', take_while(0.., |c| c != '\''), '\'')
-        .map(|s: &str| WordPart::SQuote(s.to_string()))
-        .parse_next(input)
+    delimited_scan(input, '\'', |i| {
+        delimited('\'', take_while(0.., |c| c != '\''), '\'')
+            .map(|s: &str| WordPart::SQuote(s.to_string()))
+            .parse_next(i)
+    })
 }
 
 fn double_quoted(input: &mut &str) -> ModalResult<WordPart> {
@@ -868,7 +838,9 @@ fn find_sub_close(body: &str) -> Option<usize> {
 /// fallback — which drains the body correctly — rather than failing the whole parse.
 fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     let body = &input[open_len..];
-    let Some(rel) = find_sub_close(body) else {
+    let close = find_sub_close(body);
+    scan(close.map_or(2 * body.len(), |rel| 3 * rel))?;
+    let Some(rel) = close else {
         return if body.contains("<<") {
             sub_body_via_grammar(input, body)
         } else {
@@ -900,7 +872,7 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
 }
 
 /// The EXACT old grammar over the full body: it drains heredocs and tracks `case` arms, so it finds
-/// a close that `find_sub_close`'s byte scan places wrongly or misses. Bounded by `MAX_PARSE_WORK_*`.
+/// a close that `find_sub_close`'s byte scan places wrongly or misses. Bounded by `budget`.
 fn sub_body_via_grammar<'a>(input: &mut &'a str, body: &'a str) -> ModalResult<Script> {
     let mut rest: &str = body;
     ws.parse_next(&mut rest)?;
@@ -929,6 +901,7 @@ fn proc_sub(input: &mut &str) -> ModalResult<WordPart> {
 
 /// The parts of an arithmetic BODY: literal text plus the substitutions that actually run.
 fn arith_body_part(input: &mut &str) -> ModalResult<WordPart> {
+    step()?;
     if input.is_empty() {
         return backtrack();
     }
@@ -952,11 +925,11 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
         return backtrack();
     }
     // Parsing the body makes this a recursion source that does NOT funnel through `script()`, where
-    // MAX_PARSE_DEPTH is enforced — unguarded, `$((1+` x50000 overflowed the stack and ABORTED,
+    // the depth cap is enforced — unguarded, `$((1+` x50000 overflowed the stack and ABORTED,
     // which for a hook is a fail-open crash `catch_unwind` cannot recover. Taking the guard here
     // was previously rejected because bailing backtracks into `cmd_sub`, which re-parsed the same
-    // nest for 68 seconds; that is affordable now only because the work budget gained a flat
-    // ceiling, which bounds the retry as well as the descent.
+    // nest for 68 seconds; that is affordable now only because `budget` charges what each retry
+    // reads, which bounds the retry as well as the descent.
     let Some(_depth) = DepthGuard::enter() else {
         return backtrack();
     };
@@ -980,6 +953,7 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
                     // stops the misparse. `arith_body_part` deliberately excludes `arith_sub`, so
                     // arithmetic is not a recursion source — nested `$(( ))` is literal text here,
                     // which costs nothing since arithmetic is inert either way.
+                    scan(i)?;
                     let mut body = &input[body_start..i];
                     let parts: Vec<WordPart> = repeat(0.., arith_body_part).parse_next(&mut body)?;
                     if !body.is_empty() {
@@ -990,6 +964,7 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
                 }
                 depth -= 1;
                 if depth < 0 {
+                    scan(i)?;
                     return backtrack();
                 }
             }
@@ -997,13 +972,30 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
         }
         i += 1;
     }
+    scan(i)?;
     backtrack()
 }
 
 fn backtick_part(input: &mut &str) -> ModalResult<WordPart> {
-    delimited('`', backtick_inner, '`')
-        .map(WordPart::Backtick)
-        .parse_next(input)
+    delimited_scan(input, '`', |i| {
+        delimited('`', backtick_inner, '`').map(WordPart::Backtick).parse_next(i)
+    })
+}
+
+/// A quoted span scans to its close, or to the end of the input when there is none, so an unclosed
+/// one is charged for everything it read even though it consumes nothing.
+fn delimited_scan<O>(
+    input: &mut &str,
+    open: char,
+    p: impl FnOnce(&mut &str) -> ModalResult<O>,
+) -> ModalResult<O> {
+    if !input.starts_with(open) {
+        return backtrack();
+    }
+    let before = input.len();
+    let out = p(input);
+    scan(if out.is_ok() { before - input.len() } else { before })?;
+    out
 }
 
 fn escaped(input: &mut &str) -> ModalResult<WordPart> {
@@ -1012,16 +1004,15 @@ fn escaped(input: &mut &str) -> ModalResult<WordPart> {
 
 fn lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<WordPart> {
     move |input: &mut &str| {
-        take_while(1.., pred)
-            .map(|s: &str| WordPart::Lit(s.to_string()))
-            .parse_next(input)
+        let s: &str = consumed(input, |i| take_while(1.., pred).parse_next(i))?;
+        Ok(WordPart::Lit(s.to_string()))
     }
 }
 
 fn dollar_lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<WordPart> {
     move |input: &mut &str| {
         ('$', not('(')).void().parse_next(input)?;
-        let rest: &str = take_while(0.., pred).parse_next(input)?;
+        let rest: &str = consumed(input, |i| take_while(0.., pred).parse_next(i))?;
         Ok(WordPart::Lit(format!("${rest}")))
     }
 }
@@ -1029,6 +1020,7 @@ fn dollar_lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<Wo
 // === Double-quoted parts ===
 
 fn dq_part(input: &mut &str) -> ModalResult<WordPart> {
+    step()?;
     if input.is_empty() || input.starts_with('"') {
         return backtrack();
     }
@@ -1197,7 +1189,7 @@ fn case_arm(input: &mut &str) -> ModalResult<CaseArm> {
 
 /// Whitespace including newlines, but NOT `;` — used where a `;;` must stay visible to the caller.
 fn blank(input: &mut &str) -> ModalResult<()> {
-    take_while(0.., [' ', '\t', '\n']).void().parse_next(input)
+    consumed(input, |i| take_while(0.., [' ', '\t', '\n']).void().parse_next(i))
 }
 
 fn double_bracket_cmd(input: &mut &str) -> ModalResult<Cmd> {
@@ -1242,6 +1234,7 @@ fn bracket_word(input: &mut &str) -> ModalResult<Word> {
 }
 
 fn bracket_word_part(input: &mut &str) -> ModalResult<WordPart> {
+    step()?;
     if input.is_empty() {
         return backtrack();
     }
@@ -1285,6 +1278,7 @@ fn bracket_lit(input: &mut &str) -> ModalResult<WordPart> {
         }
         end += 1;
     }
+    scan(end)?;
     if end == 0 {
         return backtrack();
     }
@@ -1294,13 +1288,12 @@ fn bracket_lit(input: &mut &str) -> ModalResult<WordPart> {
 }
 
 fn name(input: &mut &str) -> ModalResult<String> {
-    take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_')
-        .map(|s: &str| s.to_string())
-        .parse_next(input)
+    run(input, |c| c.is_ascii_alphanumeric() || c == '_').map(String::from)
 }
 
 #[cfg(test)]
 mod tests {
+    use super::budget::MAX_PARSE_WORK_CEILING;
     /// The parse work budget must bound NESTED input without refusing anything real.
     ///
     /// Both halves are measured, because the constant is only defensible as a ratio between them:
@@ -1325,7 +1318,7 @@ mod tests {
             .flat_map(|(_, safe, denied)| safe.iter().chain(denied.iter()).cloned().collect::<Vec<_>>())
             .map(|ex| {
                 let _ = super::parse(&ex);
-                super::PARSE_WORK.with(|w| w.get())
+                budget::work()
             })
             .max()
             .expect("the registry ships examples");
@@ -1342,7 +1335,7 @@ mod tests {
         // orders of magnitude under the ceiling, which is what matters.
         let flat = format!("echo {}", "$((1)) ".repeat(400));
         let _ = super::parse(&flat);
-        let flat_work = super::PARSE_WORK.with(|w| w.get());
+        let flat_work = budget::work();
         assert!(
             flat_work < MAX_PARSE_WORK_CEILING / 10,
             "flat input cost {flat_work}, close to the {MAX_PARSE_WORK_CEILING} ceiling — a long \
@@ -1357,10 +1350,10 @@ mod tests {
         let work_at = |depth: usize| {
             let deep = format!("echo {}1{}", "$((1+".repeat(depth), "))".repeat(depth));
             let _ = super::parse(&deep);
-            super::PARSE_WORK.with(|w| w.get())
+            assert!(budget::spent(), "the nest should actually reach a bound, or this proves nothing");
+            budget::work()
         };
         let (w2k, w4k) = (work_at(2000), work_at(4000));
-        assert!(w2k > 1000, "the nest should actually reach the bound, or this proves nothing");
         assert!(
             w4k <= w2k + w2k / 10,
             "work still scales with input length: depth 2000 used {w2k}, depth 4000 used {w4k}"
@@ -1405,7 +1398,7 @@ mod tests {
                 for depth in [10u64, 20, 40] {
                     let text = format!("{}{tail}", prefix.repeat(depth as usize));
                     let _ = parse(&text);
-                    let work = PARSE_WORK.with(|w| w.get());
+                    let work = budget::work();
                     assert!(
                         work <= 4 * depth + 64,
                         "{depth} nested unclosed {prefix:?} cost {work} parse entries, more than \
@@ -1431,7 +1424,7 @@ mod tests {
                     let n = depth as usize;
                     let text = format!("echo {}x{}", format!("{open}{refused} ").repeat(n), close.repeat(n));
                     let _ = parse(&text);
-                    let work = PARSE_WORK.with(|w| w.get());
+                    let work = budget::work();
                     assert!(
                         work <= 4 * depth + 64,
                         "{depth} nested {open}{refused} cost {work} parse entries, more than linear: \
@@ -1439,6 +1432,49 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    /// A nest that still backtracks is stopped by how much it READS, not by how often it enters.
+    ///
+    /// `$((` is read as arithmetic first and as `$(` plus a subshell when that fails, as bash does,
+    /// so a failing nest of them still doubles per level. The entry ceiling caps the count at
+    /// 20,000, but each entry here re-reads a 100 KB tail, and before the step budget that took 15s
+    /// to refuse. Stopping it after a few hundred entries is the step budget doing its job; hitting
+    /// the entry ceiling instead means some scan is not being charged.
+    #[test]
+    fn a_backtracking_nest_over_a_long_tail_is_stopped_by_what_it_reads() {
+        let tail = "a ".repeat(50_000);
+        for (open, close) in [("$(( $({ ", ") ))"), ("\"$(( $( [[ ", ") ))\"")] {
+            let text = format!("echo {}x {tail}{}", open.repeat(20), close.repeat(20));
+            assert!(parse(&text).is_none(), "{open:?} nest parsed");
+            assert!(budget::spent(), "{open:?} nest was refused, but not by the budget");
+            let work = budget::work();
+            assert!(work < 1_000, "{open:?} nest ran {work} entries before the step budget stopped it");
+        }
+    }
+
+    /// The step budget refuses nothing real: no registry example spends it, and long real shapes
+    /// (a big heredoc commit message, a long flat script) stay far inside their allowance.
+    #[test]
+    fn the_step_budget_refuses_nothing_real() {
+        for (_, safe, denied) in crate::registry::corpus_examples() {
+            for example in safe.iter().chain(denied.iter()) {
+                let _ = parse(example);
+                assert!(!budget::spent(), "a registry example spent the step budget: {example}");
+            }
+        }
+        let message = "it's a line of prose (with parens) and $vars\n".repeat(5_000);
+        for text in [
+            format!("git commit -m \"$(cat <<'EOF'\n{message}EOF\n)\""),
+            "ls -la foo/bar; ".repeat(20_000),
+        ] {
+            assert!(parse(&text).is_some(), "a long real command no longer parses");
+            let (steps, len) = (budget::steps(), text.len() as u64);
+            assert!(
+                steps * 4 < budget::STEPS_PER_BYTE * len,
+                "{len} bytes of ordinary input spent {steps} steps, within 4x of the allowance"
+            );
         }
     }
 
