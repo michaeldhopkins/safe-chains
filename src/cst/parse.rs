@@ -294,17 +294,13 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
     if at_script_stop(input) {
         return backtrack();
     }
+    let committed = super::reserved::opens_compound(input);
     alt((
-        subshell,
-        brace_group,
-        for_cmd,
-        while_cmd,
-        until_cmd,
-        if_cmd,
-        case_cmd,
-        double_bracket_cmd,
+        subshell, brace_group, for_cmd, while_cmd, until_cmd, if_cmd, case_cmd, double_bracket_cmd,
         function_def,
-        simple_cmd.map(Cmd::Simple),
+        move |i: &mut &str| {
+            if committed { backtrack() } else { simple_cmd.map(Cmd::Simple).parse_next(i) }
+        },
     ))
     .parse_next(input)
 }
@@ -1377,6 +1373,48 @@ mod tests {
 
 
     use super::*;
+
+    /// An unclosed compound, nested, must cost parse work LINEAR in its depth.
+    ///
+    /// Found by the `explain_render` fuzzer as a timeout: `{\n` repeated in front of a
+    /// `"$([[ … <<` tail. Every level was parsed as a brace group, failed at the far end, and was
+    /// parsed again as a simple command named `{`, so the work doubled per brace until the entry
+    /// budget stopped it, 0.35s per parse and several parses per classification. The rule is not
+    /// about braces: any reserved word that opens a compound had the same second reading. So this
+    /// walks every opener `reserved` knows, and a new one without an unclosed form here fails.
+    #[test]
+    fn unclosed_compound_nesting_costs_linear_work() {
+        let unclosed = |opener: &str| match opener {
+            "{" => "{\n",
+            "[[" => "[[ a\n",
+            "if" => "if a; then\n",
+            "for" => "for x in a; do\n",
+            "while" => "while a; do\n",
+            "until" => "until a; do\n",
+            "case" => "case x in a)\n",
+            "function" => "function f {\n",
+            other => panic!("no unclosed form for the reserved word {other:?}; add one here"),
+        };
+        let tail = "\"$([[ <<\"\"<\"$( [[ x ]] ) $(ls <<EOF\n)\nEOF\n)\" ls";
+        let openers = super::super::reserved::BLANK_OPENERS
+            .iter()
+            .chain(super::super::reserved::KEYWORD_OPENERS.iter());
+        for opener in openers {
+            let unit = unclosed(opener);
+            for prefix in [unit.to_string(), format!("{unit}{{\n")] {
+                for depth in [10u64, 20, 40] {
+                    let text = format!("{}{tail}", prefix.repeat(depth as usize));
+                    let _ = parse(&text);
+                    let work = PARSE_WORK.with(|w| w.get());
+                    assert!(
+                        work <= 4 * depth + 64,
+                        "{depth} nested unclosed {prefix:?} cost {work} parse entries, more than \
+                         linear in the nesting: a failed compound is being re-read another way"
+                    );
+                }
+            }
+        }
+    }
 
     fn p(input: &str) -> Script {
         parse(input).unwrap_or_else(|| panic!("failed to parse: {input}"))

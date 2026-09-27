@@ -3,6 +3,7 @@ mod display;
 pub(crate) mod eval;
 mod explain;
 mod parse;
+mod reserved;
 #[cfg(test)]
 mod proptests;
 
