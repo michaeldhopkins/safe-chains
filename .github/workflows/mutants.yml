@@ -1,0 +1,258 @@
+name: Mutants
+
+# Mutation testing, in two brief jobs and never a long one. `cargo mutants` injects plausible bugs
+# and reports the ones the suite fails to notice. The whole tree is ~5,300 mutants and each one
+# reruns the full suite (~45s locally), so a sweep would be hours; instead:
+#
+#   in-diff  mutants overlapping the changed code, on PRs and pushes to main
+#   slice    one rotating 1/256th of the whole tree, on pushes to main only
+#
+# Neither gates. Method: the `rust-mutation-testing` skill. This crate's numbers, N and why, and
+# what the slices have found: AGENTS.md, "Mutation testing". `.cargo/mutants.toml` selects the
+# `mutants` profile (optimized dependencies) and the `fuzz-gen` feature for both jobs.
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  in-diff:
+    name: Mutants in changed code
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Need history to diff against the base ref (PR) or the previous commit (push).
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Prebuilt binary; `cargo install` would rebuild it on every run.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants
+
+      # A PR diffs against its base; a push diffs against the commit it replaced.
+      # `github.event.before` is all-zeros for a newly created branch, in which case fall back to
+      # the first parent.
+      - name: Compute diff
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="origin/${{ github.base_ref }}"
+          else
+            before="${{ github.event.before }}"
+            if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
+              base="HEAD~1"
+            else
+              base="$before"
+            fi
+          fi
+          echo "Diffing against $base"
+          # Force standard a/ b/ prefixes. `diff.mnemonicPrefix` emits `i/` and `w/` instead, which
+          # cargo-mutants does not recognise: it matches no files, logs "No mutants to filter" and
+          # EXITS 0, a silent pass.
+          git -c diff.mnemonicPrefix=false -c diff.noprefix=false \
+              diff "$base".. > mutants.diff
+          wc -l mutants.diff
+          if [ -s mutants.diff ] && ! grep -q '^diff --git a/' mutants.diff; then
+            echo "::error::diff lacks a/ b/ prefixes — cargo-mutants would silently match nothing"
+            head -3 mutants.diff
+            exit 1
+          fi
+
+      # A diff touching only tests, docs or command TOML yields no mutants: cargo-mutants matches
+      # the diff against Rust source under test, not test code. The early exits exist for the
+      # MESSAGE; without them the job is a silent green and nobody can tell whether it ran.
+      - name: Mutants
+        id: mutants
+        run: |
+          set -euo pipefail
+          # Every exit path records WHY, so Summarise can tell "tested nothing" from "tested
+          # everything and found nothing".
+          echo "ran" > mutants-status.txt
+
+          if [ ! -s mutants.diff ]; then
+            echo "empty" > mutants-status.txt
+            echo "::notice::empty diff — nothing to mutate"
+            exit 0
+          fi
+          selected=$(cargo mutants --list --in-diff mutants.diff | wc -l)
+          echo "$selected" > mutants-selected.txt
+          echo "Selected $selected mutants in changed regions"
+          if [ "$selected" -eq 0 ]; then
+            echo "none" > mutants-status.txt
+            echo "::notice::no mutants overlap the changed regions (test-, doc- or TOML-only change)"
+            exit 0
+          fi
+
+          # A broad diff (a reformat, a mass refactor) is a sweep, not a changed-code check, and
+          # would overrun the job. Measured locally: ~19s of wall clock per mutant at -j2 (21 in
+          # 6m45s); 30 fits the timeout with room for the cold build. Recalibrate from the first
+          # runner timings. Skip loudly rather than sample: a partial run reads as a pass.
+          MAX_SELECTED=30
+          if [ "$selected" -gt "$MAX_SELECTED" ]; then
+            echo "skipped" > mutants-status.txt
+            echo "::warning::Mutants skipped: $selected selected, over the limit of $MAX_SELECTED. A diff this broad is a sweep rather than a changed-code check and would exceed the job timeout. Nothing was mutation-tested for this push."
+            exit 0
+          fi
+          # Exit codes: 2 a mutant was MISSED (the finding); 3 a mutant TIMED OUT (usually an
+          # injected infinite loop, or a guard that bounds work — a real result); 4 the baseline
+          # failed; 5 the diff does not match the tree and 6 it is malformed, both harness bugs in
+          # "Compute diff" above rather than findings about safe-chains.
+          #
+          # No --timeout: cargo-mutants derives one from the measured baseline, so it adapts to
+          # the runner.
+          cargo mutants --no-shuffle -vV -j2 --in-diff mutants.diff
+
+      - name: Summarise
+        if: always()
+        run: |
+          set -euo pipefail
+          status="$(cat mutants-status.txt 2>/dev/null || echo unknown)"
+          selected="$(cat mutants-selected.txt 2>/dev/null || echo '?')"
+          {
+            echo '## Mutants in changed code'
+            echo
+            echo "_step outcome: ${{ steps.mutants.outcome }}_"
+            echo
+            case "$status" in
+              empty)
+                echo 'No diff to analyse. Nothing was mutation-tested.'
+                ;;
+              none)
+                echo 'No mutants overlap the changed regions — a test-, docs- or TOML-only'
+                echo 'change. Nothing was mutation-tested, and that is expected.'
+                ;;
+              skipped)
+                echo "**Skipped: $selected mutants selected, over the limit.**"
+                echo
+                echo 'The diff touches many functions, so `--in-diff` selects a large share of'
+                echo 'the tree. **Nothing was mutation-tested for this push.** To cover it'
+                echo 'deliberately, shard a manual run: `cargo mutants --in-diff <diff> --shard 0/4`'
+                ;;
+              unknown)
+                echo 'The mutants step did not run — an earlier step failed (see "Compute diff").'
+                echo '**Nothing was mutation-tested.**'
+                ;;
+              *)
+                if [ ! -d mutants.out ]; then
+                  echo 'cargo-mutants started but produced no results directory — it failed'
+                  echo 'before reporting (exit 4, 5 or 6; see the step log).'
+                  echo '**Treat this as no coverage, not as a pass.**'
+                  exit 0
+                fi
+                for kind in missed caught unviable timeout; do
+                  f="mutants.out/$kind.txt"
+                  n=0
+                  [ -f "$f" ] && n=$(wc -l < "$f" | tr -d ' ')
+                  echo "- **$kind**: $n"
+                done
+                if [ -s mutants.out/missed.txt ]; then
+                  echo
+                  echo '### Missed — a bug was inserted here and no test noticed'
+                  echo
+                  echo '```'
+                  cat mutants.out/missed.txt
+                  echo '```'
+                  echo
+                  echo 'Three legitimate responses: write a test that fails on it; judge it an'
+                  echo '*equivalent* mutant that cannot change behaviour (record why in AGENTS.md);'
+                  echo 'or exclude the code in `.cargo/mutants.toml` with a comment saying why.'
+                fi
+                ;;
+            esac
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive mutants.out
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutants-in-diff
+          path: mutants.out
+          if-no-files-found: ignore
+
+  # Old code nobody touches is never selected by --in-diff, so each push to main also runs one
+  # rotating slice of the whole tree: shard k of N, k advancing with the run number. Every N
+  # pushes the tree has been looked at once and no job runs long. The tree changes between
+  # slices, so coverage is approximate, which is fine. N is in AGENTS.md with how it was chosen.
+  slice:
+    name: Mutants, rotating slice
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SLICES: 256
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants
+
+      - name: Mutants
+        run: |
+          set -euo pipefail
+          k=$(( ${{ github.run_number }} % SLICES ))
+          echo "$k" > mutants-slice.txt
+          echo "Slice $k of $SLICES"
+          cargo mutants --no-shuffle -vV -j2 --shard "$k/$SLICES"
+
+      - name: Summarise
+        if: always()
+        run: |
+          set -euo pipefail
+          k="$(cat mutants-slice.txt 2>/dev/null || echo '?')"
+          {
+            echo "## Mutants, slice $k of $SLICES"
+            echo
+            if [ ! -d mutants.out ]; then
+              echo 'No results directory: the run failed before reporting.'
+              echo '**Treat this as no coverage, not as a pass.**'
+              exit 0
+            fi
+            for kind in missed caught unviable timeout; do
+              f="mutants.out/$kind.txt"
+              n=0
+              [ -f "$f" ] && n=$(wc -l < "$f" | tr -d ' ')
+              echo "- **$kind**: $n"
+            done
+            if [ -s mutants.out/missed.txt ]; then
+              echo
+              echo '### Missed in this slice'
+              echo
+              echo '```'
+              cat mutants.out/missed.txt
+              echo '```'
+              echo
+              echo 'Old code, not this push: give each a test or an exclusion with its reason,'
+              echo 'as for any other miss.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive mutants.out
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutants-slice
+          path: mutants.out
+          if-no-files-found: ignore
