@@ -27,8 +27,12 @@ jobs:
       - name: cargo test
         run: cargo test --locked
 
+      # The fuzz-corpus generator is feature-gated, so the plain run above never builds it.
+      - name: cargo test (gen-fuzz-corpus)
+        run: cargo test --locked --features fuzz-gen --bin gen-fuzz-corpus
+
       - name: cargo clippy
-        run: cargo clippy --locked --all-targets -- -D warnings
+        run: cargo clippy --locked --all-targets --all-features -- -D warnings
 
       # Also checked at release time. It belongs here too: release.yml only runs on a version bump,
       # so a stale or truncated COMMANDS.md can otherwise ride along for many pushes unnoticed.
