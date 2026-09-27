@@ -855,14 +855,14 @@ fn find_sub_close(body: &str) -> Option<usize> {
 /// nested substitutions stay linear instead of the old `delimited(script, ')')` shape that recursed
 /// into the tail before knowing a close existed (the `a$(a<(a` × N exponential).
 ///
-/// FALLBACK: a few grammar constructs move the real close PAST that first balanced `)` — chiefly a
-/// heredoc body, whose text (including any `)`) is consumed out-of-band by `drain_pending_heredocs`
-/// and which `find_sub_close` does not model. When the bounded interior does not parse cleanly we
-/// re-run the EXACT old grammar over the full body, preserving classification for those inputs. The
-/// fallback is the recursive shape, but the per-parse work budget (`MAX_PARSE_WORK_*`) bounds it, so
-/// it cannot reintroduce the hang. A `None` from `find_sub_close` normally means no unquoted `)`
-/// exists at all — the grammar could not close the sub either — so we fail fast. The exception is a
-/// heredoc: its body is data the scanner reads as code, so a lone apostrophe in prose (`the shell's
+/// FALLBACK: a heredoc or a `case` moves the real close PAST that first balanced `)` (a heredoc body
+/// is drained out-of-band; an arm's pattern ends in a bare `)`), so an interior holding either goes
+/// to the EXACT old grammar over the full body instead. Otherwise the fast path is the ONLY reading:
+/// a refused interior refuses the substitution. Re-running the grammar there doubled the work per
+/// nested `$(`, since each level parsed its interior once bounded and once more in full.
+///
+/// A `None` from `find_sub_close` normally means no unquoted `)` exists at all, so the grammar
+/// could not close the sub either and we fail fast. The exception is a heredoc: its body is data the scanner reads as code, so a lone apostrophe in prose (`the shell's
 /// grammar`) opens a quote that never closes and swallows the real `)`. `git commit -m "$(cat <<EOF`
 /// with any contraction in the message lands here, so `None` + a heredoc operator takes the grammar
 /// fallback — which drains the body correctly — rather than failing the whole parse.
@@ -888,13 +888,13 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     // test is deliberately the bare substring: a literal word `case` merely costs a slower path.
     if !interior.contains("<<") && !interior.contains("case") {
         let mut fast: &str = interior;
-        if let Ok(parsed) = script.parse_next(&mut fast) {
-            ws.parse_next(&mut fast)?;
-            if fast.is_empty() {
-                *input = &body[rel + 1..];
-                return Ok(parsed);
-            }
+        let parsed = script.parse_next(&mut fast)?;
+        ws.parse_next(&mut fast)?;
+        if !fast.is_empty() {
+            return backtrack();
         }
+        *input = &body[rel + 1..];
+        return Ok(parsed);
     }
     sub_body_via_grammar(input, body)
 }
@@ -1410,6 +1410,32 @@ mod tests {
                         work <= 4 * depth + 64,
                         "{depth} nested unclosed {prefix:?} cost {work} parse entries, more than \
                          linear in the nesting: a failed compound is being re-read another way"
+                    );
+                }
+            }
+        }
+    }
+
+    /// A refused substitution interior, nested, must also cost work linear in the nesting.
+    ///
+    /// `sub_body` used to follow a refused bounded interior with a full-grammar re-parse of the
+    /// same text, so every `$(` level read its interior twice and depth 10 cost 2047 entries. The
+    /// interiors here are refused for different reasons (an unclosed `[[`, an unclosed brace group,
+    /// an `if` without `then`, a stray `}`), in plain and double-quoted substitutions, because the
+    /// doubling did not depend on why the interior failed.
+    #[test]
+    fn refused_substitution_nesting_costs_linear_work() {
+        for refused in ["[[ a", "{ a", "if a", "a; }"] {
+            for (open, close) in [("$(", ")"), ("\"$(", ")\""), ("<(", ")")] {
+                for depth in [10u64, 20, 40] {
+                    let n = depth as usize;
+                    let text = format!("echo {}x{}", format!("{open}{refused} ").repeat(n), close.repeat(n));
+                    let _ = parse(&text);
+                    let work = PARSE_WORK.with(|w| w.get());
+                    assert!(
+                        work <= 4 * depth + 64,
+                        "{depth} nested {open}{refused} cost {work} parse entries, more than linear: \
+                         a refused interior is being parsed a second time"
                     );
                 }
             }
