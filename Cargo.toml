@@ -65,3 +65,13 @@ too_many_arguments = "deny"
 needless_range_loop = "deny"
 extend_with_drain = "deny"
 unwrap_used = "deny"
+
+# For cargo-mutants only (`.cargo/mutants.toml` selects it). Every mutant reruns the whole suite, and
+# the integration tests spawn the debug binary a few hundred times; unoptimized, each spawn spends
+# ~0.4s parsing the registry TOML inside the dependencies. Optimizing the dependencies alone took the
+# suite from 124s to 45s while this crate stays at opt-level 0, so a mutant's rebuild costs no more.
+[profile.mutants]
+inherits = "test"
+
+[profile.mutants.package."*"]
+opt-level = 3
