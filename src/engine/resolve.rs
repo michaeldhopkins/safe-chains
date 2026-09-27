@@ -2989,6 +2989,32 @@ mod tests {
         );
     }
 
+    /// Which word a short flag consumes decides which word is the FILE, and the file carries the
+    /// locus. Each pair below differs only in what the flag swallowed, and a wrong count moves a
+    /// system path into or out of the operand list.
+    #[test]
+    fn sed_short_flags_consume_exactly_their_own_value() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+        let verdict = |cmd: &[&str]| project(&resolve(&toks(cmd)).expect("sed"));
+
+        // `-e SCRIPT` takes the next word; `-eSCRIPT` takes nothing more.
+        assert_eq!(verdict(&["sed", "-i", "-e", "/x/d", "./foo"]), Verdict::Allowed(SafetyLevel::SafeWrite), "-e consumed /x/d");
+        assert_eq!(verdict(&["sed", "-i", "-e/x/d", "/etc/hosts"]), Verdict::Denied, "-eS leaves the file an operand");
+
+        // `-l N` (line length) takes its value, glued or separate.
+        for cmd in [["sed", "-l", "5", "s/a/b/", "./foo"].as_slice(), &["sed", "-l5", "s/a/b/", "./foo"]] {
+            assert_eq!(verdict(cmd), Verdict::Allowed(SafetyLevel::SafeRead), "{cmd:?}");
+        }
+        // A trailing `-l` with no value is malformed, and malformed fails closed.
+        assert_eq!(verdict(&["sed", "-e", "p", "./foo", "-l"]), Verdict::Denied, "-l without a value");
+
+        // An unknown byte in a cluster fails closed even when the script is harmless.
+        for cmd in [["sed", "-Q", "s/a/b/", "./foo"], ["sed", "-nQ", "s/a/b/", "./foo"]] {
+            assert_eq!(verdict(&cmd), Verdict::Denied, "{cmd:?}");
+        }
+    }
+
     #[test]
     fn touch_creates_in_the_worktree_and_gates_the_reference_path() {
         use crate::engine::bridge::project;
