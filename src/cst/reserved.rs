@@ -11,8 +11,8 @@ pub(super) const KEYWORD_OPENERS: [&str; 6] = ["if", "for", "while", "until", "c
 /// parser failed, and that second reading is what made unclosed nesting exponential. Each
 /// `{` level was parsed once as a brace group that failed at the far end of the input and once
 /// more as a simple command named `{`, which re-entered the next level twice again. Twenty
-/// unclosed braces in front of a ~1.4 KB tail ran the parse into its work budget, and one
-/// classification that re-parsed the same text per brace-expanded word took 39s.
+/// unclosed braces in front of a ~1.4 KB tail ran each parse into its work budget, and a
+/// classification that re-parsed the backtick body several times took 4s.
 ///
 /// The fallback never changed a verdict. A command named `{`, `if` or `[[` resolves to nothing and
 /// is refused, so committing turns "parsed, refused" into "did not parse, refused".

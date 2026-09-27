@@ -1479,6 +1479,80 @@ mod tests {
         assert!(!crate::is_safe_command(&seed));
     }
 
+    proptest::proptest! {
+        #![proptest_config(proptest::prelude::ProptestConfig::with_cases(300))]
+
+        /// A random nest of unclosed compounds and substitutions, then random material, parses in
+        /// work linear in its size, and never by running out of budget.
+        ///
+        /// The two tests above pin the shapes that were found; this is the class. An unclosed
+        /// compound used to be re-read as a simple command, and a refused substitution interior
+        /// was re-parsed by the grammar, and either alone doubled the work per level of nesting.
+        /// The nest is generated as one opener repeated on purpose: a random walk, and even a random
+        /// mix of openers, almost never stacks ten failing levels, and both stayed green with the
+        /// fixes reverted. Counting entries rather
+        /// than timing makes the check exact on any machine. `$((` is left out because it still
+        /// legitimately tries two readings, which the step budget bounds (see
+        /// `a_backtracking_nest_over_a_long_tail_is_stopped_by_what_it_reads`).
+        #[test]
+        fn a_random_unclosed_nest_parses_in_linear_work(
+            opener in proptest::sample::select(OPENERS.to_vec()),
+            depth in 0..24usize,
+            mixed in proptest::collection::vec(proptest::sample::select(OPENERS.to_vec()), 0..8),
+            tail in proptest::collection::vec(proptest::sample::select(vec![
+                "}", " ]]", "fi", "done", ";;", "esac", ")", "\"", "<<", "<<E\n", "\n", ";", "a ",
+                "$(", "[[ ", "`",
+            ]), 0..24),
+            closes in 0..24usize,
+        ) {
+            let input = format!(
+                "{}{}{}{}", opener.repeat(depth), mixed.concat(), tail.concat(), ")".repeat(closes)
+            );
+            let _ = parse(&input);
+            let work = budget::work();
+            let tokens = (depth + mixed.len() + tail.len() + closes) as u64;
+            proptest::prop_assert!(!budget::spent(), "spent the budget on {input:?}");
+            proptest::prop_assert!(work <= 4 * tokens + 16, "{work} entries for {tokens} tokens: {input:?}");
+        }
+    }
+
+    const OPENERS: [&str; 14] = [
+        "{\n", "{ ", "[[ a\n", "if a; then\n", "for x in a; do\n", "while a; do\n", "case x in a)\n",
+        "function f {\n", "(\n", "$(", "\"$(", "<(", "$([[ ", "$({ ",
+    ];
+
+    /// Every committed seed of the two command-string fuzz targets parses without spending the
+    /// budget, and in work linear in its length.
+    ///
+    /// `classifier_terminates_on_the_committed_fuzz_corpus` times the `parse` seeds against a
+    /// clock; this counts work instead, and also walks `explain_render`, whose seed is the
+    /// unclosed-brace-nest timeout. Enumerating the directories means a seed committed later is
+    /// covered without editing this list.
+    #[test]
+    fn committed_command_seeds_parse_in_linear_work() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/corpus");
+        let mut checked = 0;
+        for target in ["parse", "explain_render"] {
+            let dir = std::fs::read_dir(root.join(target)).expect("the fuzz corpus is committed");
+            for path in dir.flatten().map(|e| e.path()) {
+                if !path.file_name().and_then(|n| n.to_str()).is_some_and(|n| n.starts_with("seed-")) {
+                    continue;
+                }
+                let text = String::from_utf8_lossy(&std::fs::read(&path).expect("readable seed")).into_owned();
+                // A backtick body stays raw text in the tree and is parsed when classified, which
+                // is where the brace-nest seed does its work, so each body is parsed here too.
+                for piece in std::iter::once(text.as_str()).chain(text.split('`').skip(1).step_by(2)) {
+                    let _ = parse(piece);
+                    let (work, len) = (budget::work(), piece.len() as u64);
+                    assert!(!budget::spent(), "{} spent the parse budget", path.display());
+                    assert!(work <= len + 16, "{} cost {work} entries for {len} bytes", path.display());
+                }
+                checked += 1;
+            }
+        }
+        assert!(checked >= 16, "only {checked} seeds found; the corpus has moved");
+    }
+
     /// The step budget refuses nothing real: no registry example spends it, and long real shapes
     /// (a big heredoc commit message, a long flat script) stay far inside their allowance.
     #[test]
