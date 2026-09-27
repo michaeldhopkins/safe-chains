@@ -39,16 +39,41 @@ fn rows() -> Vec<Row<'static>> {
         .collect()
 }
 
-/// The workspace the corpus is written against. A real directory (this checkout) so that the
-/// sibling and parent cases have something to resolve against.
-fn workspace() -> String {
-    env!("CARGO_MANIFEST_DIR").to_string()
+/// The corpus is written against a checkout at `~/projects/safe-chains` with peers beside it, so
+/// build exactly that under a HOME of our own. It used to be this checkout under the real HOME,
+/// which made the verdict depend on where the tree was: a sibling is `adjacent` only under `$HOME`,
+/// so a copy under `$TMPDIR` (where cargo-mutants builds) denied `touch ../branchdiff/x` and failed
+/// the baseline; and the developer's own `~/.claude/settings.json` fed the verdicts too.
+struct Layout {
+    _home: tempfile::TempDir,
+    home: String,
+    workspace: String,
+}
+
+fn layout() -> &'static Layout {
+    static LAYOUT: std::sync::OnceLock<Layout> = std::sync::OnceLock::new();
+    LAYOUT.get_or_init(|| {
+        let dir = tempfile::tempdir().expect("tempdir");
+        // Not canonicalized: on macOS that turns `/var/folders/…` into `/private/var/folders/…`,
+        // which the classifier folds back to `/var/…`, so HOME would no longer prefix the paths.
+        let home = dir.path().to_path_buf();
+        let workspace = home.join("projects/safe-chains");
+        std::fs::create_dir_all(&workspace).expect("workspace");
+        std::fs::create_dir_all(home.join("projects/branchdiff")).expect("peer");
+        Layout {
+            home: home.to_string_lossy().into_owned(),
+            workspace: workspace.to_string_lossy().into_owned(),
+            _home: dir,
+        }
+    })
 }
 
 fn allows(command: &str) -> bool {
-    let w = workspace();
+    let l = layout();
+    let w = &l.workspace;
     Command::new(env!("CARGO_BIN_EXE_safe-chains"))
-        .args(["--cwd", &w, "--root", &w, command])
+        .env("HOME", &l.home)
+        .args(["--cwd", w, "--root", w, command])
         .output()
         .expect("run safe-chains")
         .status
