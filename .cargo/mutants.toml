@@ -8,3 +8,8 @@ profile = "mutants"
 # `gen-fuzz-corpus` is a feature-gated bin. Without the feature `cargo test` never builds it, so
 # every mutant in it would pass untested and read as MISSED.
 features = ["fuzz-gen"]
+
+# The corpus generator's `main` only binds this checkout's path and prints two counts; everything it
+# does is `generate`, which the bin's tests run against a scratch tree. Testing `main` itself would
+# mean running it, and it writes into this checkout's `fuzz/`.
+exclude_re = ['gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$']
