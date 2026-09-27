@@ -1,0 +1,10 @@
+# cargo-mutants configuration. Method: the `rust-mutation-testing` skill; this crate's numbers and
+# decisions: AGENTS.md, "Mutation testing".
+
+# Dependencies optimized, this crate not (see the profile's comment in Cargo.toml): the suite is
+# test-bound, and most of the test time was the debug binary parsing its registry on every spawn.
+profile = "mutants"
+
+# `gen-fuzz-corpus` is a feature-gated bin. Without the feature `cargo test` never builds it, so
+# every mutant in it would pass untested and read as MISSED.
+features = ["fuzz-gen"]
