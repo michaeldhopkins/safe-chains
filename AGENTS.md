@@ -150,13 +150,16 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
 General method is in the `rust-mutation-testing` skill. This is what is specific to safe-chains.
 
 - **Per change** (`.github/workflows/mutants.yml`, not gating): `--in-diff` on every PR and push to
-  `main`, skipped with a warning above 30 selected mutants; and on each push to `main` one
-  **rotating slice**, `--shard (run_number % 256)/256`. PR runs advance the same counter, so
-  coverage is roughly one pass per 256 runs rather than exactly one per 256 pushes. There is no whole-tree sweep: ~5,300 mutants at ~19s of wall clock each is ~28 hours.
-- **N = 256, measured 2026-09-27** on slice 128/256 (21 mutants in `engine/resolve.rs`): 6m45s
-  locally at `-j2` on a loaded M3 (baseline 21s build + 45s test). The runner is slower; if slices
-  approach the 20-minute job timeout, raise N rather than the timeout. The 30-mutant in-diff cap is
-  from the same local rate and wants recalibrating from the first runner timings.
+  `main`, skipped with a warning above 20 selected mutants; and on each push to `main` one
+  **rotating slice**, `--shard (run_number % 512)/512`. PR runs advance the same counter, so
+  coverage is roughly one pass per 512 runs rather than exactly one per 512 pushes. There is no
+  whole-tree sweep: ~5,300 mutants at ~39s of runner wall clock each is ~58 hours.
+- **N = 512, from the runner.** The first CI slice (run 36363446362, slice 1/256, 21 mutants) took
+  16.7 minutes: baseline 105s build + 98s test, then ~39s of wall clock per mutant at `-j2`, against
+  a 20-minute job timeout. The `mutants` profile did apply (`--profile=mutants` in its baseline
+  log); the runner is just slower than the laptop, where slice 128/256 took 6m45s (21s build + 45s
+  test). At 512 a slice is ~10 mutants, ~10 minutes. If slices approach the timeout again, raise N
+  rather than the timeout. The in-diff cap of 20 is from the same runner rate.
 - **Test-bound, and the profile is the lever.** A mutant's rebuild is 2-5s; its test run is the full
   suite. The integration tests spawn the debug binary a few hundred times, and unoptimized each
   spawn spent ~0.4s parsing the registry TOML inside the dependencies. `.cargo/mutants.toml` selects
@@ -178,6 +181,12 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   `sed_short_flags_consume_exactly_their_own_value`; the fifth is the equivalent one above.
   `gen-fuzz-corpus` was never built by `cargo test` and had no tests; it now has four, and a run
   over the file caught 27 of 28 viable (the 28th is the excluded `main`).
+- **CI slice 1/256 (run 36363446362):** 1 MISSED of 17 viable: `!=` to `==` in `facet_breakdown`'s
+  one-segment guard. Nothing called the function directly. Now killed by
+  `facet_breakdown_profiles_a_single_command_and_declines_a_chain` in `tests/facet_breakdown.rs`. Writing it
+  showed that a PIPELINE is one segment to `cst::explain`, so `facet_breakdown("cat x | rm -rf /")`
+  still gets the flat split the guard exists to prevent (a diagnostic only, not a verdict; see
+  TODO.md).
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
