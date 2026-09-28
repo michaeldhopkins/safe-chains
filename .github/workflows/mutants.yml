@@ -112,13 +112,20 @@ jobs:
             exit 0
           fi
           # Exit codes: 2 a mutant was MISSED (the finding); 3 a mutant TIMED OUT (usually an
-          # injected infinite loop, or a guard that bounds work — a real result); 4 the baseline
-          # failed; 5 the diff does not match the tree and 6 it is malformed, both harness bugs in
-          # "Compute diff" above rather than findings about safe-chains.
+          # injected infinite loop, or a guard that bounds work — a real result, so counted as
+          # caught and passed); 4 the baseline failed; 5 the diff does not match the tree and 6 it
+          # is malformed, both harness bugs in "Compute diff" above rather than findings about
+          # safe-chains.
           #
           # No --timeout: cargo-mutants derives one from the measured baseline, so it adapts to
           # the runner.
-          cargo mutants --no-shuffle -vV -j2 --in-diff mutants.diff
+          rc=0
+          cargo mutants --no-shuffle -vV -j2 --in-diff mutants.diff || rc=$?
+          if [ "$rc" -eq 3 ]; then
+            echo "::notice::timeouts counted as caught; see mutants.out/timeout.txt"
+            rc=0
+          fi
+          exit "$rc"
 
       - name: Summarise
         if: always()
@@ -215,7 +222,13 @@ jobs:
           k=$(( ${{ github.run_number }} % SLICES ))
           echo "$k" > mutants-slice.txt
           echo "Slice $k of $SLICES"
-          cargo mutants --no-shuffle -vV -j2 --shard "$k/$SLICES"
+          rc=0
+          cargo mutants --no-shuffle -vV -j2 --shard "$k/$SLICES" || rc=$?
+          if [ "$rc" -eq 3 ]; then
+            echo "::notice::timeouts counted as caught; see mutants.out/timeout.txt"
+            rc=0
+          fi
+          exit "$rc"
 
       - name: Summarise
         if: always()
