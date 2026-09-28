@@ -75,6 +75,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | A grant should cover what it names — READ half **DONE**; write half and the four carve-out kinds remain | "A grant should cover what it names" |
 | ~~`--setup` silently rewrites a wrong-typed key on three targets~~ — **DONE**; two were already fixed, antigravity guards in place, and the shared helper no longer discards a non-object ROOT | "`--setup` silently rewrites…" |
 | ~~Two targets cannot self-filter on the tool~~ — **DONE**: both DID carry a filterable field (grok `toolName`, cursor `hook_event_name`); no target is exempt on an unchecked assumption now | "Two targets cannot self-filter" |
+| `--explain`'s facet breakdown flat-splits a pipeline | "The facet breakdown flat-splits a pipeline" |
 | Re-tokenize split words — **investigated, not built**: the `loop_reprs` two-face blocker is real; a scoped fix covers assignments only and fails the "delete the gate" criterion. Needs a scoping decision | "Re-tokenize split words" |
 
 **Tier 5 — guards and fuzzing.**
@@ -3303,3 +3304,14 @@ shadowing `cat`/`sed`/`grep`/`head`/`tail`/`node`/`sqlite3` were deleted from th
 them, for a separate and more serious reason (they had disarmed the credential shield, and the
 `sqlite3` one auto-approved `.shell`, i.e. arbitrary command execution). The mechanism is untouched:
 the next override of a built-in name reddens the suite again, on whichever machine has it.
+
+## The facet breakdown flat-splits a pipeline
+
+`facet_breakdown` (the "resolved profile" part of `--explain`) declines a chain because
+`shell_words::split` knows nothing of `&&` and would read the second command's words as the first's
+flags. Its guard is `cst::explain(command).segments.len() != 1`, and a PIPELINE is one segment
+there, so `safe-chains --explain 'cat x | rm -rf /'` still flat-splits `cat x | rm -rf /` into one
+word list and prints a worst-cased `unrecognized flag` profile belonging to neither stage. Found
+2026-09-27 while writing the test for a mutant in that guard. Diagnostic output only: the verdict
+comes from the CST and is unaffected. The fix is to decline (or describe per stage) when the one
+segment is a multi-command pipeline.
