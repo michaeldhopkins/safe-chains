@@ -5,7 +5,7 @@ name: Mutants
 # reruns the full suite (~45s locally), so a sweep would be hours; instead:
 #
 #   in-diff  mutants overlapping the changed code, on PRs and pushes to main
-#   slice    one rotating 1/256th of the whole tree, on pushes to main only
+#   slice    one rotating 1/512th of the whole tree, on pushes to main only
 #
 # Neither gates. Method: the `rust-mutation-testing` skill. This crate's numbers, N and why, and
 # what the slices have found: AGENTS.md, "Mutation testing". `.cargo/mutants.toml` selects the
@@ -102,10 +102,10 @@ jobs:
           fi
 
           # A broad diff (a reformat, a mass refactor) is a sweep, not a changed-code check, and
-          # would overrun the job. Measured locally: ~19s of wall clock per mutant at -j2 (21 in
-          # 6m45s); 30 fits the timeout with room for the cold build. Recalibrate from the first
-          # runner timings. Skip loudly rather than sample: a partial run reads as a pass.
-          MAX_SELECTED=30
+          # would overrun the job. Measured on the runner (run 36363446362): ~3.5 min of baseline,
+          # then ~39s of wall clock per mutant at -j2, so 20 is ~16.5 min against the 20-minute
+          # timeout. Skip loudly rather than sample: a partial run reads as a pass.
+          MAX_SELECTED=20
           if [ "$selected" -gt "$MAX_SELECTED" ]; then
             echo "skipped" > mutants-status.txt
             echo "::warning::Mutants skipped: $selected selected, over the limit of $MAX_SELECTED. A diff this broad is a sweep rather than a changed-code check and would exceed the job timeout. Nothing was mutation-tested for this push."
@@ -197,7 +197,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SLICES: 256
+      SLICES: 512
     steps:
       - uses: actions/checkout@v5
 
