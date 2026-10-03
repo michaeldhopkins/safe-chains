@@ -13,6 +13,7 @@ use std::sync::LazyLock;
 use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
+mod grant_faces;
 
 /// Which faces a user grant may NOT widen.
 ///
@@ -641,17 +642,7 @@ fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
                 // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
                 (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
             })
-            .fold(None, |best: Option<(_, bool, bool)>, (s, r, w)| match best {
-                // Grants only widen, so equally specific grants for the same path add their faces
-                // together. Picking one of them instead let a read-only grant borrowed from
-                // `~/.claude/settings.json` (`Read(~/scripts/**)`, appended after the user's
-                // own) shadow the user's `write = true` grant for the same directory: the tie went
-                // to whichever came last, and writes there kept asking.
-                Some((bs, br, bw)) if bs == s => Some((s, br || r, bw || w)),
-                Some((bs, ..)) if bs > s => best,
-                _ => Some((s, r, w)),
-            })
-            .map(|(_, r, w)| (r, w))
+            .fold(None, grant_faces::merge).map(|(_, r, w)| (r, w))
     };
     #[cfg(test)]
     {
