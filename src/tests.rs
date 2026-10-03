@@ -2137,3 +2137,37 @@ fn a_refusal_offers_a_grant_only_when_one_would_work() {
     }
     assert!(checked >= 3, "only {checked} reach reasons probed — the sweep shrank");
 }
+
+/// A grant borrowed from `~/.claude/settings.json` only ever widens reads; it must never take a
+/// write away from a grant the user wrote here for the same directory. It did: the two tied on
+/// specificity, the borrowed one came last, and the tie went to it, so `[[grant]] path =
+/// "~/scripts/", write = true` was inert for anyone whose Claude settings also held
+/// `Read(~/scripts/**)` (every edit there asked).
+#[test]
+fn a_borrowed_read_grant_never_shadows_a_write_grant_for_the_same_directory() {
+    use crate::engine::resolve::regions::with_user_and_derived_grants;
+    use crate::pathctx::{enter, PathCtx};
+    let Ok(home) = std::env::var("HOME") else { return };
+    let ws = format!("{home}/projects/scproj");
+    let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });
+    let write = "touch ~/scripts/x";
+
+    assert!(
+        with_user_and_derived_grants(&[("~/scripts", true, true)], &[("~/scripts", true, false)], || {
+            check(write)
+        }),
+        "the user's write grant must hold beside a borrowed read grant for the same directory"
+    );
+    assert!(
+        !with_user_and_derived_grants(&[], &[("~/scripts", true, false)], || check(write)),
+        "a borrowed read grant alone must still write nothing"
+    );
+    assert!(
+        !with_user_and_derived_grants(
+            &[("~/scripts", true, true), ("~/scripts/keep", true, false)],
+            &[],
+            || check("touch ~/scripts/keep/x"),
+        ),
+        "a more specific read-only grant still decides for what it names"
+    );
+}

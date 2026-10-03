@@ -571,6 +571,28 @@ pub(crate) fn with_derived_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOn
     with_grants_of_kind(grants, GrantSource::Derived, f)
 }
 
+/// Run `f` with the user's own grants and borrowed ones active together (tests only), as the real
+/// binary has them: the user's first, the borrowed appended after.
+#[cfg(test)]
+pub(crate) fn with_user_and_derived_grants<T>(
+    user: &[(&str, bool, bool)],
+    derived: &[(&str, bool, bool)],
+    f: impl FnOnce() -> T,
+) -> T {
+    let parsed = [(user, GrantSource::UserConfig), (derived, GrantSource::Derived)]
+        .into_iter()
+        .flat_map(|(grants, source)| {
+            grants.iter().flat_map(move |&(p, read, write)| {
+                grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source })
+            })
+        })
+        .collect();
+    TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
+    let out = f();
+    TEST_GRANTS.with(|g| g.borrow_mut().clear());
+    out
+}
+
 #[cfg(test)]
 fn with_grants_of_kind<T>(grants: &[(&str, bool, bool)], source: GrantSource, f: impl FnOnce() -> T) -> T {
     let parsed = grants
@@ -619,7 +641,16 @@ fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
                 // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
                 (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
             })
-            .max_by_key(|&(s, ..)| s)
+            .fold(None, |best: Option<(_, bool, bool)>, (s, r, w)| match best {
+                // Grants only widen, so equally specific grants for the same path add their faces
+                // together. Picking one of them instead let a read-only grant borrowed from
+                // `~/.claude/settings.json` (`Read(~/scripts/**)`, appended after the user's
+                // own) shadow the user's `write = true` grant for the same directory: the tie went
+                // to whichever came last, and writes there kept asking.
+                Some((bs, br, bw)) if bs == s => Some((s, br || r, bw || w)),
+                Some((bs, ..)) if bs > s => best,
+                _ => Some((s, r, w)),
+            })
             .map(|(_, r, w)| (r, w))
     };
     #[cfg(test)]
