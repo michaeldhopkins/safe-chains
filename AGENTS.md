@@ -197,6 +197,7 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
 ## Linting
 
 ```bash
+cargo fmt --all --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo deny check licenses
 ```
