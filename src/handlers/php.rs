@@ -210,7 +210,7 @@ mod tests {
         php_d_then_please: "php -d memory_limit=512M please stache:clear",
         php_d_then_path_please: "php -d memory_limit=512M /Users/me/projects/site/please stache:clear",
         php_path_artisan: "php /var/www/app/artisan view:clear",
-        php_path_please: "php /Users/me/projects/clce.org/please stache:clear",
+        php_path_please: "php /Users/me/projects/blog/please stache:clear",
         php_two_d_flags: "php -d memory_limit=512M -d max_execution_time=300 artisan view:clear",
         php_d_diagnostic_then_version: "php -d display_errors=1 --version",
         php_d_timezone: "php -d date.timezone=UTC artisan view:clear",
