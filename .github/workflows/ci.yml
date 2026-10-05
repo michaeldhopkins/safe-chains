@@ -72,3 +72,7 @@ jobs:
 
       - name: cargo machete
         run: cargo machete
+
+      # Every tracked shell script, so a new one is checked the day it lands.
+      - name: shellcheck
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck

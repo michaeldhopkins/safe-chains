@@ -24,13 +24,13 @@ print_table() {
     ncols=${#first[@]}
 
     local -a widths
-    for ((c=0; c<ncols; c++)); do widths[$c]=0; done
+    for ((c=0; c<ncols; c++)); do widths[c]=0; done
 
     for row in "${rows[@]}"; do
         IFS='|' read -ra cols <<< "$row"
         for ((c=0; c<ncols; c++)); do
             local len=${#cols[$c]}
-            if (( len > widths[$c] )); then widths[$c]=$len; fi
+            if (( len > widths[c] )); then widths[c]=$len; fi
         done
     done
 
@@ -56,14 +56,14 @@ rs_file_count=$(find "$SRC_DIR" -name "*.rs" | wc -l | tr -d ' ')
 rs_total_lines=$(find "$SRC_DIR" -name "*.rs" -exec cat {} + | wc -l | tr -d ' ')
 
 test_lines=0
-for file in $(find "$SRC_DIR" -name "*.rs"); do
+while IFS= read -r file; do
     test_start=$(grep -n "#\[cfg(test)\]" "$file" 2>/dev/null | head -1 | cut -d: -f1)
     if [ -n "$test_start" ]; then
         file_total=$(wc -l < "$file" | tr -d ' ')
         file_test_lines=$((file_total - test_start + 1))
         test_lines=$((test_lines + file_test_lines))
     fi
-done
+done < <(find "$SRC_DIR" -name "*.rs")
 app_lines=$((rs_total_lines - test_lines))
 
 test_funcs=$(grep -r "#\[test\]" "$SRC_DIR" --include="*.rs" 2>/dev/null | wc -l | tr -d ' ')
@@ -74,7 +74,7 @@ toml_total_lines=$(find "$CMD_DIR" -name "*.toml" ! -name "SAMPLE.toml" -exec ca
 command_count=$(grep -c "^### \`" "$REPO_ROOT/COMMANDS.md" 2>/dev/null || echo "0")
 
 types=$(grep -r "^pub struct\|^struct\|^pub enum\|^enum" "$SRC_DIR" --include="*.rs" 2>/dev/null | wc -l | tr -d ' ')
-deps=$(grep -A 100 "^\[dependencies\]" "$REPO_ROOT/Cargo.toml" | grep -B 100 "^\[" | grep -v "^\[" | grep -v "^#" | grep -v "^$" | grep "=" | wc -l | tr -d ' ')
+deps=$(grep -A 100 "^\[dependencies\]" "$REPO_ROOT/Cargo.toml" | grep -B 100 "^\[" | grep -v "^\[" | grep -v "^#" | grep -v "^$" | grep -c "=" || true)
 
 if [ "$rs_total_lines" -gt 0 ]; then
     app_pct=$((app_lines * 100 / rs_total_lines))
@@ -95,13 +95,13 @@ summary_rows=(
     "**Supported commands**|$command_count"
     " | "
     "**Rust source files**|$rs_file_count"
-    "**Rust total lines**|$(format_num $rs_total_lines)"
+    "**Rust total lines**|$(format_num "$rs_total_lines")"
     "**Rust application lines**|~$(format_num $app_lines) (${app_pct}%)"
     "**Rust test lines**|~$(format_num $test_lines) (${test_pct}%)"
     "**Test functions**|$test_funcs"
     " | "
     "**TOML command files**|$toml_file_count"
-    "**TOML total lines**|$(format_num $toml_total_lines)"
+    "**TOML total lines**|$(format_num "$toml_total_lines")"
     " | "
     "**Combined lines (Rust+TOML)**|$(format_num $combined_lines)"
     "**Structs/Enums**|$types"
@@ -132,7 +132,7 @@ printf "└── (%d files in root)\n" "$root_count"
 echo ""
 echo "commands/"
 toml_dir_count=$(find "$CMD_DIR" -mindepth 1 -type d | wc -l | tr -d ' ')
-printf "└── (%d directories, %d files, %s lines)\n" "$toml_dir_count" "$toml_file_count" "$(format_num $toml_total_lines)"
+printf "└── (%d directories, %d files, %s lines)\n" "$toml_dir_count" "$toml_file_count" "$(format_num "$toml_total_lines")"
 echo "\`\`\`"
 echo ""
 
@@ -140,7 +140,7 @@ echo "### Largest Rust Files"
 rs_rows=("File|Lines|Test Lines|App Lines")
 while read -r lines file; do
     if [ -n "$file" ] && [ -f "$file" ]; then
-        relpath="${file#$SRC_DIR/}"
+        relpath="${file#"$SRC_DIR"/}"
         test_start=$(grep -n "#\[cfg(test)\]" "$file" 2>/dev/null | head -1 | cut -d: -f1)
         if [ -n "$test_start" ]; then
             file_test=$((lines - test_start + 1))
@@ -159,7 +159,7 @@ echo "### Largest TOML Files"
 toml_rows=("File|Lines")
 while read -r lines file; do
     if [ -n "$file" ] && [ -f "$file" ]; then
-        relpath="${file#$REPO_ROOT/}"
+        relpath="${file#"$REPO_ROOT"/}"
         toml_rows+=("\`$relpath\`|$lines")
     fi
 done < <(find "$CMD_DIR" -name "*.toml" ! -name "SAMPLE.toml" -exec wc -l {} + | sort -rn | head -11 | tail -10)

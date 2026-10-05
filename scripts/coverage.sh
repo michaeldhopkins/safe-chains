@@ -13,7 +13,7 @@ commands=$(echo "$output" | grep -c '^### ')
 
 subcommands=$(echo "$output" | grep -c '^- \*\*')
 
-read standalone valued sub_standalone sub_valued <<< "$(echo "$output" | awk '
+read -r standalone valued sub_standalone sub_valued <<< "$(echo "$output" | awk '
 /^- Allowed standalone flags:/ {
     s = $0; sub(/^- Allowed standalone flags: /, "", s)
     n = split(s, arr, ", "); standalone += n
@@ -52,9 +52,9 @@ echo "## Safe-chains Coverage"
 echo ""
 printf "| %-26s | %10s |\n" "Metric" "Count"
 printf "| %-26s | %10s |\n" "--------------------------" "----------"
-printf "| %-26s | %10s |\n" "Commands"                   "$(format_num $commands)"
-printf "| %-26s | %10s |\n" "Subcommands"                "$(format_num $subcommands)"
-printf "| %-26s | %10s |\n" "Standalone flag entries"    "$(format_num $total_standalone)"
-printf "| %-26s | %10s |\n" "Valued flag entries"        "$(format_num $total_valued)"
-printf "| %-26s | %10s |\n" "**Total flag entries**"     "$(format_num $total_flags)"
-printf "| %-26s | %10s |\n" "Unique flag names"          "$(format_num $unique_flags)"
+printf "| %-26s | %10s |\n" "Commands"                   "$(format_num "$commands")"
+printf "| %-26s | %10s |\n" "Subcommands"                "$(format_num "$subcommands")"
+printf "| %-26s | %10s |\n" "Standalone flag entries"    "$(format_num "$total_standalone")"
+printf "| %-26s | %10s |\n" "Valued flag entries"        "$(format_num "$total_valued")"
+printf "| %-26s | %10s |\n" "**Total flag entries**"     "$(format_num "$total_flags")"
+printf "| %-26s | %10s |\n" "Unique flag names"          "$(format_num "$unique_flags")"

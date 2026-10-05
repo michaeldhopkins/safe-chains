@@ -123,3 +123,13 @@ fn ci_refuses_unused_dependencies() {
     let ci = &all.iter().find(|(n, _)| n == "ci.yml").expect("ci.yml").1;
     assert!(ci.lines().any(|l| l.trim() == "run: cargo machete"), "ci.yml does not run `cargo machete`");
 }
+
+#[test]
+fn ci_shellchecks_every_tracked_script() {
+    let all = workflows();
+    let ci = &all.iter().find(|(n, _)| n == "ci.yml").expect("ci.yml").1;
+    assert!(
+        ci.lines().any(|l| l.trim() == "run: git ls-files -z '*.sh' | xargs -0 shellcheck"),
+        "ci.yml does not shellcheck every tracked .sh file"
+    );
+}
