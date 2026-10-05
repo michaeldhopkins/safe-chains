@@ -1,0 +1,3456 @@
+lake	denied
+lake --help	inert
+lake --help --version	denied
+lake --help x	denied
+lake --version	inert
+lake -V	inert
+lake -h	inert
+lake add	denied
+lake add x	denied
+lake build	denied
+lake build x	denied
+lake check-build	denied
+lake check-build x	denied
+lake check-test	denied
+lake check-test x	denied
+lake clean	denied
+lake clean x	denied
+lake env	inert
+lake env --help	inert
+lake env --help -h	inert
+lake env --help x	inert
+lake env -h	inert
+lake env x	inert
+lake exe	denied
+lake exe x	denied
+lake exec	denied
+lake exec x	denied
+lake gather	denied
+lake gather x	denied
+lake help	inert
+lake help x	inert
+lake init	denied
+lake init x	denied
+lake lean	denied
+lake lean x	denied
+lake lean-runtime	safe-read
+lake lean-runtime --help	safe-read
+lake lean-runtime --help -h	safe-read
+lake lean-runtime --help x	safe-read
+lake lean-runtime -h	safe-read
+lake lean-runtime x	safe-read
+lake lint	denied
+lake lint x	denied
+lake manifest	safe-read
+lake manifest --help	safe-read
+lake manifest --help --manifest x	safe-read
+lake manifest --help -h	safe-read
+lake manifest --help x	safe-read
+lake manifest --manifest x	safe-read
+lake manifest -h	safe-read
+lake manifest x	safe-read
+lake new	denied
+lake new x	denied
+lake pack	denied
+lake pack x	denied
+lake post-update	denied
+lake post-update x	denied
+lake print-paths	safe-read
+lake print-paths --help	safe-read
+lake print-paths --help -h	safe-read
+lake print-paths --help x	safe-read
+lake print-paths -h	safe-read
+lake print-paths x	safe-read
+lake query	denied
+lake query --help	safe-read
+lake query --help -h	safe-read
+lake query --help x	safe-read
+lake query -h	safe-read
+lake query x	safe-read
+lake remove	denied
+lake remove x	denied
+lake resolve	denied
+lake resolve x	denied
+lake script	denied
+lake script x	denied
+lake scripts	denied
+lake scripts x	denied
+lake self-check	denied
+lake self-check x	denied
+lake serve	denied
+lake serve x	denied
+lake setup-file	denied
+lake setup-file x	denied
+lake test	denied
+lake test x	denied
+lake translate-config	denied
+lake translate-config x	denied
+lake unpack	denied
+lake unpack x	denied
+lake update	denied
+lake update x	denied
+lake upgrade	denied
+lake upgrade x	denied
+lake uplift	denied
+lake uplift x	denied
+lake version	inert
+lake version --help	inert
+lake version --help -h	inert
+lake version --help x	inert
+lake version -h	inert
+lake version x	inert
+lake x	denied
+lam	denied
+lam --help	denied
+lam --version	denied
+lam x	inert
+lame	denied
+lame --abr	safe-write
+lame --abr --add-id3v2	safe-write
+lame --abr --athaa-loudapprox x	safe-write
+lame --abr x	safe-write
+lame --add-id3v2	safe-write
+lame --allshort	safe-write
+lame --alt-preset	safe-write
+lame --athaa-loudapprox x	safe-write
+lame --athaa-sensitivity	safe-write
+lame --athaa-type x	safe-write
+lame --athlower x	safe-write
+lame --athonly	safe-write
+lame --athtype x	safe-write
+lame --big-endian x	safe-write
+lame --bitwidth x	safe-write
+lame --brief	safe-write
+lame --cbr	safe-write
+lame --clipdetect	safe-write
+lame --cwlimit	safe-write
+lame --decode	safe-write
+lame --decode-mp3delay	safe-write
+lame --freeformat	safe-write
+lame --genre-list x	safe-write
+lame --help	safe-write
+lame --help-id3	safe-write
+lame --highpass x	safe-write
+lame --highpass-width x	safe-write
+lame --id3v1-only	safe-write
+lame --id3v2-latin1	safe-write
+lame --id3v2-only	safe-write
+lame --id3v2-utf16	safe-write
+lame --ignore-tag-errors	safe-write
+lame --license	safe-write
+lame --little-endian x	safe-write
+lame --longhelp	safe-write
+lame --lowpass x	safe-write
+lame --lowpass-width x	safe-write
+lame --mp3input	safe-write
+lame --noath	safe-write
+lame --nogap	safe-write
+lame --nogapout	safe-write
+lame --noreplaygain	safe-write
+lame --noshort	safe-write
+lame --notemp	safe-write
+lame --nsmsfix	safe-write
+lame --nspsytune	safe-write
+lame --nssafejoint	safe-write
+lame --ogginput	safe-write
+lame --pad-id3v2	safe-write
+lame --pad-id3v2-size x	safe-write
+lame --preset	safe-write
+lame --replaygain-accurate	safe-write
+lame --replaygain-fast	safe-write
+lame --resample x	safe-write
+lame --scale	safe-write
+lame --scale-l	safe-write
+lame --scale-r	safe-write
+lame --signed x	safe-write
+lame --silent	safe-write
+lame --space-id3v1	safe-write
+lame --strictly-enforce-ISO	safe-write
+lame --ta x	safe-write
+lame --tc x	safe-write
+lame --tg x	safe-write
+lame --ti x	safe-write
+lame --tl x	safe-write
+lame --tn x	safe-write
+lame --tt x	safe-write
+lame --tv x	safe-write
+lame --ty x	safe-write
+lame --unsigned x	safe-write
+lame --vbr x	safe-write
+lame --vbr-new x	safe-write
+lame --vbr-old x	safe-write
+lame --verbose	safe-write
+lame --version	safe-write
+lame -?	safe-write
+lame -B x	safe-write
+lame -F x	safe-write
+lame -Q x	safe-write
+lame -S	safe-write
+lame -T x	safe-write
+lame -V	safe-write
+lame -a	safe-write
+lame -b 192 ./input.wav ./output.mp3	safe-write
+lame -b x	safe-write
+lame -d	safe-write
+lame -h	safe-write
+lame -m	safe-write
+lame -p x	safe-write
+lame -q	safe-write
+lame -r	safe-write
+lame -s	safe-write
+lame -t x	safe-write
+lame -v	safe-write
+lame -x	safe-write
+lame ./input.wav ./output.mp3	safe-write
+lame x	safe-write
+last	inert
+last --dns	inert
+last --dns --fullnames	inert
+last --dns --limit x	inert
+last --dns x	inert
+last --fullnames	inert
+last --fulltimes	inert
+last --help	inert
+last --hostlast	inert
+last --ip	inert
+last --limit x	inert
+last --nohostname	inert
+last --present x	inert
+last --since x	inert
+last --system	inert
+last --time-format	inert
+last --time-format x	inert
+last --until x	inert
+last --version	inert
+last -0	inert
+last -1	inert
+last -2	inert
+last -3	inert
+last -4	inert
+last -5	inert
+last -6	inert
+last -7	inert
+last -8	inert
+last -9	inert
+last -F	inert
+last -R	inert
+last -V	inert
+last -a	inert
+last -d	inert
+last -f x	inert
+last -h	inert
+last -i	inert
+last -n x	inert
+last -p x	inert
+last -s x	inert
+last -t x	inert
+last -w	inert
+last -x	inert
+last x	inert
+lastcomm	inert
+lastcomm --help	denied
+lastcomm --version	denied
+lastcomm -f x	inert
+lastcomm -w	inert
+lastcomm -w -f x	inert
+lastcomm -w x	inert
+lastcomm someuser	inert
+lastcomm x	inert
+lastlog	inert
+lastlog --before x	inert
+lastlog --help	inert
+lastlog --help --before x	inert
+lastlog --help --version	inert
+lastlog --help x	denied
+lastlog --time x	inert
+lastlog --user x	inert
+lastlog --version	inert
+lastlog -V	inert
+lastlog -b x	inert
+lastlog -h	inert
+lastlog -t x	inert
+lastlog -u x	inert
+lastlog x	denied
+latency	denied
+latency --help	denied
+latency --version	denied
+latency -R x	inert
+latency -c x	inert
+latency -h	inert
+latency -h -R x	inert
+latency -h -m	inert
+latency -h x	inert
+latency -it x	inert
+latency -l x	inert
+latency -m	inert
+latency -n x	inert
+latency -p x	inert
+latency -st x	inert
+latency x	inert
+latex	denied
+latex --cnf-line	safe-write
+latex --cnf-line --cnf-line x	safe-write
+latex --cnf-line --draftmode	safe-write
+latex --cnf-line x	safe-write
+latex --draftmode	safe-write
+latex --enc	safe-write
+latex --enc x	safe-write
+latex --etex	safe-write
+latex --file-line-error	safe-write
+latex --file-line-error-style	safe-write
+latex --fmt	safe-write
+latex --fmt x	safe-write
+latex --halt-on-error	safe-write
+latex --halt-on-error x	safe-write
+latex --help	safe-write
+latex --ini	safe-write
+latex --initialize	safe-write
+latex --interaction	safe-write
+latex --interaction x	safe-write
+latex --ipc	safe-write
+latex --ipc-start	safe-write
+latex --jobname x	safe-write
+latex --kanji x	safe-write
+latex --kanji-internal x	safe-write
+latex --mktex	safe-write
+latex --mktex x	safe-write
+latex --mltex x	safe-write
+latex --no-cnf	safe-write
+latex --no-file-line-error	safe-write
+latex --no-mktex	safe-write
+latex --no-mktex x	safe-write
+latex --no-parse-first-line	safe-write
+latex --no-shell-escape	safe-write
+latex --no-shell-escape x	safe-write
+latex --output-comment x	safe-write
+latex --output-directory x	safe-write
+latex --output-format x	safe-write
+latex --parse-first-line	safe-write
+latex --progname	safe-write
+latex --progname x	safe-write
+latex --recorder	safe-write
+latex --recorder x	safe-write
+latex --restricted-shell-escape	safe-write
+latex --shell-escape x	safe-write
+latex --shell-restricted	safe-write
+latex --shell-restricted x	safe-write
+latex --show-version	safe-write
+latex --src-specials	safe-write
+latex --src-specials x	safe-write
+latex --synctex	safe-write
+latex --synctex x	safe-write
+latex --translate-file	safe-write
+latex --translate-file x	safe-write
+latex --version	safe-write
+latex -help	safe-write
+latex -version	safe-write
+latex x	safe-write
+latexmk	safe-write
+latexmk --	safe-write
+latexmk -- --help	safe-write
+latexmk -- --output-directory x	safe-write
+latexmk -- x	safe-write
+latexmk --help	safe-write
+latexmk --output-directory x	safe-write
+latexmk --version	safe-write
+latexmk -C	safe-write
+latexmk -CA	safe-write
+latexmk -MF	safe-write
+latexmk -MP	safe-write
+latexmk -MT	safe-write
+latexmk -Werror	safe-write
+latexmk -aux-directory x	safe-write
+latexmk -c	safe-write
+latexmk -cd	safe-write
+latexmk -cd-	safe-write
+latexmk -commands	safe-write
+latexmk -dependents	safe-write
+latexmk -deps	safe-write
+latexmk -deps-	safe-write
+latexmk -deps-out x	safe-write
+latexmk -deps-out=	safe-write
+latexmk -dvi	safe-write
+latexmk -dvi-	safe-write
+latexmk -dvilua	safe-write
+latexmk -dvilua-	safe-write
+latexmk -emulate-aux-dir	safe-write
+latexmk -f	safe-write
+latexmk -f-	safe-write
+latexmk -failure-cmd	safe-write
+latexmk -fdb-ext x	safe-write
+latexmk -g	safe-write
+latexmk -gg	safe-write
+latexmk -h	safe-write
+latexmk -help	safe-write
+latexmk -jobname x	safe-write
+latexmk -jobname=	safe-write
+latexmk -l	safe-write
+latexmk -l-	safe-write
+latexmk -latex	safe-write
+latexmk -latex=	safe-write
+latexmk -latexoption=	safe-write
+latexmk -list	safe-write
+latexmk -logfilewarninglist	safe-write
+latexmk -lualatex	safe-write
+latexmk -lualatex-	safe-write
+latexmk -make	safe-write
+latexmk -makeindexfudge	safe-write
+latexmk -makeindexfudge-	safe-write
+latexmk -new-viewer	safe-write
+latexmk -new-viewer-	safe-write
+latexmk -no-shell-escape x	safe-write
+latexmk -nodependents	safe-write
+latexmk -nodeps	safe-write
+latexmk -nodeps-	safe-write
+latexmk -nofileline-error	safe-write
+latexmk -nofileline-error-	safe-write
+latexmk -nopdf-	safe-write
+latexmk -norc	safe-write
+latexmk -output-directory x	safe-write
+latexmk -output-format= x	safe-write
+latexmk -pdf	safe-write
+latexmk -pdf-	safe-write
+latexmk -pdfdvi	safe-write
+latexmk -pdflua	safe-write
+latexmk -pdfps	safe-write
+latexmk -pdfxe	safe-write
+latexmk -pretex x	safe-write
+latexmk -pretex=	safe-write
+latexmk -print=	safe-write
+latexmk -ps	safe-write
+latexmk -ps-	safe-write
+latexmk -pv	safe-write
+latexmk -pv-	safe-write
+latexmk -pvc	safe-write
+latexmk -pvc-	safe-write
+latexmk -pvctimeout	safe-write
+latexmk -quiet	safe-write
+latexmk -quote x	safe-write
+latexmk -r	safe-write
+latexmk -recorder	safe-write
+latexmk -recorder-	safe-write
+latexmk -rules	safe-write
+latexmk -rules-	safe-write
+latexmk -shell-escape x	safe-write
+latexmk -showextraoptions	safe-write
+latexmk -silent	safe-write
+latexmk -stdtexinputs	safe-write
+latexmk -time	safe-write
+latexmk -time x	safe-write
+latexmk -use-make	safe-write
+latexmk -use-make-	safe-write
+latexmk -v	safe-write
+latexmk -verbose	safe-write
+latexmk -version	safe-write
+latexmk -view=	safe-write
+latexmk -x	safe-write
+latexmk -xelatex	safe-write
+latexmk -xelatex-	safe-write
+latexmk x	safe-write
+launchctl	denied
+launchctl --help	inert
+launchctl --help --version	denied
+launchctl --help x	denied
+launchctl --version	inert
+launchctl -V	inert
+launchctl -h	inert
+launchctl blame	inert
+launchctl blame --help	inert
+launchctl blame --help -h	inert
+launchctl blame --help x	inert
+launchctl blame -h	inert
+launchctl blame x	inert
+launchctl dumpstate	inert
+launchctl dumpstate --help	inert
+launchctl dumpstate --help -h	inert
+launchctl dumpstate --help x	inert
+launchctl dumpstate -h	inert
+launchctl dumpstate x	inert
+launchctl error	inert
+launchctl error --help	inert
+launchctl error --help -h	inert
+launchctl error --help x	inert
+launchctl error -h	inert
+launchctl error x	inert
+launchctl examine	inert
+launchctl examine --help	inert
+launchctl examine --help -h	inert
+launchctl examine --help x	inert
+launchctl examine -h	inert
+launchctl examine x	inert
+launchctl help	inert
+launchctl help --help	inert
+launchctl help --help -h	inert
+launchctl help --help x	inert
+launchctl help -h	inert
+launchctl help x	inert
+launchctl hostinfo	inert
+launchctl hostinfo --help	inert
+launchctl hostinfo --help -h	inert
+launchctl hostinfo --help x	inert
+launchctl hostinfo -h	inert
+launchctl hostinfo x	inert
+launchctl list	inert
+launchctl list --help	inert
+launchctl list --help -h	inert
+launchctl list --help x	inert
+launchctl list -h	inert
+launchctl list x	inert
+launchctl print	inert
+launchctl print --help	inert
+launchctl print --help -h	inert
+launchctl print --help x	inert
+launchctl print -h	inert
+launchctl print x	inert
+launchctl print-cache	inert
+launchctl print-cache --help	inert
+launchctl print-cache --help -h	inert
+launchctl print-cache --help x	inert
+launchctl print-cache -h	inert
+launchctl print-cache x	inert
+launchctl print-disabled	inert
+launchctl print-disabled --help	inert
+launchctl print-disabled --help -h	inert
+launchctl print-disabled --help x	inert
+launchctl print-disabled -h	inert
+launchctl print-disabled x	inert
+launchctl resolveport	inert
+launchctl resolveport --help	inert
+launchctl resolveport --help -h	inert
+launchctl resolveport --help x	inert
+launchctl resolveport -h	inert
+launchctl resolveport x	inert
+launchctl version	inert
+launchctl version --help	inert
+launchctl version --help -h	inert
+launchctl version --help x	inert
+launchctl version -h	inert
+launchctl version x	inert
+launchctl x	denied
+layerutil	denied
+layerutil --display-gamut x	safe-write
+layerutil --flattened-image x	safe-write
+layerutil --gpu-compression x	safe-write
+layerutil --help	safe-write
+layerutil --help --display-gamut x	safe-write
+layerutil --help --palette-image	safe-write
+layerutil --help x	safe-write
+layerutil --lossy-compression x	safe-write
+layerutil --output x	safe-write
+layerutil --palette-image	safe-write
+layerutil --scale x	safe-write
+layerutil --version	safe-write
+layerutil -V	safe-write
+layerutil -c	safe-write
+layerutil -c -o out.lcr Image.psd	safe-write
+layerutil -f x	safe-write
+layerutil -g x	safe-write
+layerutil -h	safe-write
+layerutil -l x	safe-write
+layerutil -o x	safe-write
+layerutil -p x	safe-write
+layerutil -s x	safe-write
+layerutil x	safe-write
+ld	denied
+ld --help	safe-write
+ld --help --version	safe-write
+ld --help -o x	safe-write
+ld --help x	safe-write
+ld --version	safe-write
+ld -o x	safe-write
+ld x	safe-write
+ld.lld	denied
+ld.lld --help	safe-write
+ld.lld --help --version	safe-write
+ld.lld --help x	safe-write
+ld.lld --version	safe-write
+ld.lld -?	safe-write
+ld.lld -h	safe-write
+ld.lld -v	safe-write
+ld.lld x	safe-write
+ld64.lld	denied
+ld64.lld --help	safe-write
+ld64.lld --help --version	safe-write
+ld64.lld --help x	safe-write
+ld64.lld --version	safe-write
+ld64.lld -?	safe-write
+ld64.lld -h	safe-write
+ld64.lld -v	safe-write
+ld64.lld x	safe-write
+ldapcompare	denied
+ldapcompare --help	denied
+ldapcompare --version	denied
+ldapcompare -D x	inert
+ldapcompare -E x	inert
+ldapcompare -H x	inert
+ldapcompare -I	inert
+ldapcompare -I -D x	inert
+ldapcompare -I -M	inert
+ldapcompare -I x	inert
+ldapcompare -M	inert
+ldapcompare -MM	inert
+ldapcompare -O x	inert
+ldapcompare -P x	inert
+ldapcompare -Q	inert
+ldapcompare -R x	inert
+ldapcompare -U x	inert
+ldapcompare -W	inert
+ldapcompare -X x	inert
+ldapcompare -Y x	inert
+ldapcompare -Z	inert
+ldapcompare -ZZ	inert
+ldapcompare -d x	inert
+ldapcompare -e x	inert
+ldapcompare -h x	inert
+ldapcompare -n	inert
+ldapcompare -p x	inert
+ldapcompare -v	inert
+ldapcompare -w x	inert
+ldapcompare -x	inert
+ldapcompare -x ldap.example.com 'cn=joe,dc=example,dc=com' 'uid:joe'	inert
+ldapcompare -y x	inert
+ldapcompare -z	inert
+ldapcompare x	inert
+ldapsearch	inert
+ldapsearch --help	denied
+ldapsearch --version	denied
+ldapsearch -A	inert
+ldapsearch -A -D x	inert
+ldapsearch -A -I	inert
+ldapsearch -A x	inert
+ldapsearch -D x	inert
+ldapsearch -E x	inert
+ldapsearch -H x	inert
+ldapsearch -I	inert
+ldapsearch -L	inert
+ldapsearch -LL	inert
+ldapsearch -LLL	inert
+ldapsearch -M	inert
+ldapsearch -MM	inert
+ldapsearch -O x	inert
+ldapsearch -P x	inert
+ldapsearch -Q	inert
+ldapsearch -R x	inert
+ldapsearch -S x	inert
+ldapsearch -U x	inert
+ldapsearch -W	inert
+ldapsearch -X x	inert
+ldapsearch -Y x	inert
+ldapsearch -Z	inert
+ldapsearch -ZZ	inert
+ldapsearch -a x	inert
+ldapsearch -b x	inert
+ldapsearch -c	inert
+ldapsearch -d x	inert
+ldapsearch -e x	inert
+ldapsearch -f x	inert
+ldapsearch -h x	inert
+ldapsearch -l x	inert
+ldapsearch -n	inert
+ldapsearch -p x	inert
+ldapsearch -s x	inert
+ldapsearch -u	inert
+ldapsearch -v	inert
+ldapsearch -w x	inert
+ldapsearch -x	inert
+ldapsearch -x -LLL -b dc=example,dc=com '(uid=joe)'	inert
+ldapsearch -x -h ldap.example.com -b dc=example,dc=com	inert
+ldapsearch -y x	inert
+ldapsearch -z x	inert
+ldapsearch x	inert
+ldapurl	inert
+ldapurl --help	denied
+ldapurl --version	denied
+ldapurl -E x	inert
+ldapurl -H ldaps://ldap.example.com	inert
+ldapurl -H x	inert
+ldapurl -S x	inert
+ldapurl -a x	inert
+ldapurl -b x	inert
+ldapurl -e x	inert
+ldapurl -f x	inert
+ldapurl -h x	inert
+ldapurl -p x	inert
+ldapurl -s x	inert
+ldapurl x	inert
+ldapwhoami	inert
+ldapwhoami --help	denied
+ldapwhoami --version	denied
+ldapwhoami -D x	inert
+ldapwhoami -E x	inert
+ldapwhoami -H x	inert
+ldapwhoami -I	inert
+ldapwhoami -I -D x	inert
+ldapwhoami -I -Q	inert
+ldapwhoami -I x	inert
+ldapwhoami -O x	inert
+ldapwhoami -Q	inert
+ldapwhoami -R x	inert
+ldapwhoami -U x	inert
+ldapwhoami -W	inert
+ldapwhoami -X x	inert
+ldapwhoami -Y x	inert
+ldapwhoami -Z	inert
+ldapwhoami -ZZ	inert
+ldapwhoami -d x	inert
+ldapwhoami -e x	inert
+ldapwhoami -h x	inert
+ldapwhoami -n	inert
+ldapwhoami -p x	inert
+ldapwhoami -v	inert
+ldapwhoami -w x	inert
+ldapwhoami -x	inert
+ldapwhoami -x -h ldap.example.com	inert
+ldapwhoami -y x	inert
+ldapwhoami -z	inert
+ldapwhoami x	inert
+ldd	denied
+ldd --help	inert
+ldd --help --version	inert
+ldd --help x	inert
+ldd --version	inert
+ldd -d	inert
+ldd -r	inert
+ldd -u	inert
+ldd -v	inert
+ldd x	inert
+leaks	denied
+leaks --help	inert
+leaks --help -autoreleasePools	inert
+leaks --help -debug x	inert
+leaks --help x	inert
+leaks --version	inert
+leaks -autoreleasePools	inert
+leaks -conservative	inert
+leaks -debug x	inert
+leaks -diffFrom x	inert
+leaks -exclude x	inert
+leaks -fullContent	inert
+leaks -fullStackHistory	inert
+leaks -groupByType	inert
+leaks -list	inert
+leaks -noContent	inert
+leaks -nosources	inert
+leaks -nostacks	inert
+leaks -quiet	inert
+leaks -readonlyContent	inert
+leaks -referenceTree	inert
+leaks -traceTree x	inert
+leaks x	inert
+lean	denied
+lean --features	inert
+lean --features --githash	inert
+lean --features x	denied
+lean --githash	inert
+lean --help	inert
+lean --print-paths	inert
+lean --version	inert
+lean -h	inert
+lean -v	inert
+lean x	denied
+lein	denied
+lein --help	inert
+lein --help --version	denied
+lein --help x	denied
+lein --version	inert
+lein -h	inert
+lein -v	inert
+lein clean	denied
+lein clean x	denied
+lein compile	denied
+lein compile x	denied
+lein deploy	denied
+lein deploy x	denied
+lein deps	denied
+lein deps x	denied
+lein do	denied
+lein do x	denied
+lein help	inert
+lein help x	inert
+lein install	denied
+lein install x	denied
+lein jar	denied
+lein jar x	denied
+lein new	denied
+lein new x	denied
+lein release	denied
+lein release x	denied
+lein repl	denied
+lein repl x	denied
+lein run	denied
+lein run x	denied
+lein show-profiles	denied
+lein show-profiles x	denied
+lein test	denied
+lein test x	denied
+lein trampoline	denied
+lein trampoline x	denied
+lein uberjar	denied
+lein uberjar x	denied
+lein update-in	denied
+lein update-in x	denied
+lein version	inert
+lein version --help	inert
+lein version --help -h	inert
+lein version --help x	inert
+lein version -h	inert
+lein version x	inert
+lein with-profile	denied
+lein with-profile x	denied
+lein x	denied
+less	inert
+less --LINE-NUMBERS x	inert
+less --LONG-PROMPT x	inert
+less --QUIT-AT-EOF	inert
+less --QUIT-AT-EOF --LINE-NUMBERS x	inert
+less --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
+less --QUIT-AT-EOF x	inert
+less --RAW-CONTROL-CHARS	inert
+less --chop-long-lines	inert
+less --help	inert
+less --ignore-case	inert
+less --no-init	inert
+less --pattern x	inert
+less --prompt x	inert
+less --quiet	inert
+less --quit-at-eof	inert
+less --quit-if-one-screen	inert
+less --raw-control-chars	inert
+less --shift x	inert
+less --silent	inert
+less --squeeze-blank-lines	inert
+less --tabs x	inert
+less --tag x	inert
+less --version	inert
+less --window x	inert
+less -E	inert
+less -F	inert
+less -G	inert
+less -I	inert
+less -J	inert
+less -K	inert
+less -L	inert
+less -M	inert
+less -N	inert
+less -P x	inert
+less -Q	inert
+less -R	inert
+less -S	inert
+less -V	inert
+less -W	inert
+less -X	inert
+less -a	inert
+less -b x	inert
+less -c	inert
+less -e	inert
+less -f	inert
+less -g	inert
+less -h x	inert
+less -i	inert
+less -j x	inert
+less -m	inert
+less -n	inert
+less -p x	inert
+less -q	inert
+less -r	inert
+less -s	inert
+less -t x	inert
+less -w	inert
+less -x x	inert
+less -y x	inert
+less -z x	inert
+less x	inert
+lessecho	inert
+lessecho --help	denied
+lessecho --version	denied
+lessecho x	inert
+lesskey	safe-write
+lesskey --help	safe-write
+lesskey --help --output x	safe-write
+lesskey --help --version	safe-write
+lesskey --help x	safe-write
+lesskey --output x	safe-write
+lesskey --version	safe-write
+lesskey -V	safe-write
+lesskey -o x	safe-write
+lesskey x	safe-write
+libnetcfg	safe-write
+libnetcfg --help	denied
+libnetcfg --version	denied
+libnetcfg -c	safe-write
+libnetcfg -c -d	safe-write
+libnetcfg -c -i x	safe-write
+libnetcfg -c x	safe-write
+libnetcfg -d	safe-write
+libnetcfg -h	safe-write
+libnetcfg -i x	safe-write
+libnetcfg -o x	safe-write
+libnetcfg x	safe-write
+libtool	safe-write
+libtool --config	safe-write
+libtool --config --debug	safe-write
+libtool --config --mode x	safe-write
+libtool --config x	safe-write
+libtool --debug	safe-write
+libtool --dry-run	safe-write
+libtool --dynamic	safe-write
+libtool --features	safe-write
+libtool --finish	safe-write
+libtool --help	safe-write
+libtool --help-all	safe-write
+libtool --mode x	safe-write
+libtool --no-quiet	safe-write
+libtool --no-silent	safe-write
+libtool --no-verbose	safe-write
+libtool --no-warnings	safe-write
+libtool --noall_load	safe-write
+libtool --preserve-dup-deps x	safe-write
+libtool --quiet	safe-write
+libtool --silent	safe-write
+libtool --static	safe-write
+libtool --tag x	safe-write
+libtool --verbose	safe-write
+libtool --version	safe-write
+libtool --warnings x	safe-write
+libtool -V	safe-write
+libtool -W x	safe-write
+libtool -arch_only x	safe-write
+libtool -c	safe-write
+libtool -compatibility_version x	safe-write
+libtool -current_version x	safe-write
+libtool -filelist x	safe-write
+libtool -h	safe-write
+libtool -install_name x	safe-write
+libtool -n	safe-write
+libtool -o x	safe-write
+libtool -q	safe-write
+libtool -s	safe-write
+libtool -v	safe-write
+libtool x	safe-write
+libtoolize	safe-write
+libtoolize --copy	safe-write
+libtoolize --copy --debug	safe-write
+libtoolize --copy --ltdl x	safe-write
+libtoolize --copy x	safe-write
+libtoolize --debug	safe-write
+libtoolize --dry-run	safe-write
+libtoolize --force	safe-write
+libtoolize --help	safe-write
+libtoolize --install	safe-write
+libtoolize --install --force	safe-write
+libtoolize --ltdl x	safe-write
+libtoolize --no-warnings	safe-write
+libtoolize --nonrecursive	safe-write
+libtoolize --quiet	safe-write
+libtoolize --recursive	safe-write
+libtoolize --subproject	safe-write
+libtoolize --verbose	safe-write
+libtoolize --version	safe-write
+libtoolize --warnings x	safe-write
+libtoolize -W x	safe-write
+libtoolize -c	safe-write
+libtoolize -f	safe-write
+libtoolize -h	safe-write
+libtoolize -i	safe-write
+libtoolize -n	safe-write
+libtoolize -q	safe-write
+libtoolize -v	safe-write
+libtoolize x	safe-write
+license-checker	inert
+license-checker --clarificationsFile x	inert
+license-checker --color	inert
+license-checker --color --clarificationsFile x	inert
+license-checker --color --csv	inert
+license-checker --color x	inert
+license-checker --csv	inert
+license-checker --customFormat	inert
+license-checker --customPath x	inert
+license-checker --development	inert
+license-checker --direct	inert
+license-checker --excludeLicenses x	inert
+license-checker --excludePackages x	inert
+license-checker --excludePackagesStartingWith x	inert
+license-checker --excludePrivatePackages x	inert
+license-checker --failOn x	inert
+license-checker --files x	inert
+license-checker --from x	inert
+license-checker --help	inert
+license-checker --json	inert
+license-checker --long	inert
+license-checker --markdown	inert
+license-checker --no-color	inert
+license-checker --onlyAllow x	inert
+license-checker --onlyunknown x	inert
+license-checker --out x	inert
+license-checker --production	inert
+license-checker --relativeLicensePath	inert
+license-checker --start	inert
+license-checker --summary	inert
+license-checker --unknown	inert
+license-checker --version	inert
+license-checker x	inert
+license_finder	denied
+license_finder --help	inert
+license_finder --help --version	denied
+license_finder --help x	denied
+license_finder --version	inert
+license_finder -h	inert
+license_finder -v	inert
+license_finder action_items	denied
+license_finder action_items x	denied
+license_finder approvals	denied
+license_finder approvals x	denied
+license_finder dependencies	denied
+license_finder dependencies x	denied
+license_finder help	inert
+license_finder help x	inert
+license_finder ignored_dependencies	denied
+license_finder ignored_dependencies x	denied
+license_finder ignored_groups	denied
+license_finder ignored_groups x	denied
+license_finder inherited_decisions	denied
+license_finder inherited_decisions x	denied
+license_finder licenses	denied
+license_finder licenses x	denied
+license_finder permitted_licenses	denied
+license_finder permitted_licenses x	denied
+license_finder project_name	denied
+license_finder project_name x	denied
+license_finder project_roots	denied
+license_finder project_roots x	denied
+license_finder report	denied
+license_finder report x	denied
+license_finder restricted_licenses	denied
+license_finder restricted_licenses x	denied
+license_finder version	inert
+license_finder version --help	inert
+license_finder version --help -h	inert
+license_finder version --help x	inert
+license_finder version -h	inert
+license_finder version x	inert
+license_finder x	denied
+linear	denied
+linear --help	inert
+linear --help --version	denied
+linear --help x	denied
+linear --version	inert
+linear -h	inert
+linear completions	inert
+linear completions x	inert
+linear issue	inert
+linear issue comment	inert
+linear issue comment list	inert
+linear issue comment list x	inert
+linear issue comment x	denied
+linear issue id	inert
+linear issue id x	inert
+linear issue list	inert
+linear issue list x	inert
+linear issue query	inert
+linear issue query x	inert
+linear issue title	inert
+linear issue title x	inert
+linear issue url	inert
+linear issue url x	inert
+linear issue view	inert
+linear issue view x	inert
+linear issue x	denied
+linear milestone	inert
+linear milestone list	inert
+linear milestone list x	inert
+linear milestone view	inert
+linear milestone view x	inert
+linear milestone x	denied
+linear project	inert
+linear project list	inert
+linear project list x	inert
+linear project view	inert
+linear project view x	inert
+linear project x	denied
+linear team	inert
+linear team id	inert
+linear team id x	inert
+linear team list	inert
+linear team list x	inert
+linear team members	inert
+linear team members x	inert
+linear team x	denied
+linear x	denied
+link	denied
+link --backup	denied
+link --backup --backup x	denied
+link --backup --directory	denied
+link --backup x	denied
+link --directory	denied
+link --force	denied
+link --help	denied
+link --interactive	denied
+link --logical	denied
+link --no-dereference	denied
+link --no-target-directory	denied
+link --physical	denied
+link --relative	denied
+link --suffix x	denied
+link --symbolic	denied
+link --target-directory x	denied
+link --verbose	denied
+link --version	denied
+link -F	denied
+link -L	denied
+link -P	denied
+link -S x	denied
+link -T	denied
+link -d	denied
+link -f	denied
+link -h	denied
+link -i	denied
+link -n	denied
+link -r	denied
+link -s	denied
+link -t x	denied
+link -v	denied
+link -w	denied
+link x	denied
+linkerd	denied
+linkerd --help	inert
+linkerd --help --version	denied
+linkerd --help x	denied
+linkerd --version	inert
+linkerd -h	inert
+linkerd -v	inert
+linkerd alpha	denied
+linkerd alpha x	denied
+linkerd buoyant	denied
+linkerd buoyant x	denied
+linkerd check	safe-read
+linkerd check --allow-mismatched-policy-controller	safe-read
+linkerd check --allow-mismatched-policy-controller --cli-version-override	safe-read
+linkerd check --allow-mismatched-policy-controller --cni-namespace x	safe-read
+linkerd check --allow-mismatched-policy-controller x	safe-read
+linkerd check --cli-version-override	safe-read
+linkerd check --cni-namespace	safe-read
+linkerd check --cni-namespace x	safe-read
+linkerd check --config	safe-read
+linkerd check --config x	safe-read
+linkerd check --crds	safe-read
+linkerd check --deletion-pending	safe-read
+linkerd check --enable-pprof	safe-read
+linkerd check --expected-version	safe-read
+linkerd check --expected-version x	safe-read
+linkerd check --help	safe-read
+linkerd check --ipv6	safe-read
+linkerd check --linkerd-cni-enabled	safe-read
+linkerd check --multicluster	safe-read
+linkerd check --namespace x	safe-read
+linkerd check --no-policy	safe-read
+linkerd check --no-tls-policy	safe-read
+linkerd check --output	safe-read
+linkerd check --output x	safe-read
+linkerd check --pre	safe-read
+linkerd check --proxy	safe-read
+linkerd check --retry-deadline	safe-read
+linkerd check --retry-deadline x	safe-read
+linkerd check --short	safe-read
+linkerd check --wait	safe-read
+linkerd check --wait x	safe-read
+linkerd check -h	safe-read
+linkerd check -n x	safe-read
+linkerd check -o	safe-read
+linkerd check -o x	safe-read
+linkerd check x	safe-read
+linkerd completion	denied
+linkerd completion --help	inert
+linkerd completion --help -h	inert
+linkerd completion --help x	inert
+linkerd completion -h	inert
+linkerd completion x	inert
+linkerd diagnostics	safe-read
+linkerd diagnostics --api-addr x	safe-read
+linkerd diagnostics --context x	safe-read
+linkerd diagnostics --help	safe-read
+linkerd diagnostics --help --api-addr x	safe-read
+linkerd diagnostics --help -h	safe-read
+linkerd diagnostics --help x	safe-read
+linkerd diagnostics --kubeconfig x	safe-read
+linkerd diagnostics --linkerd-namespace x	safe-read
+linkerd diagnostics -L x	safe-read
+linkerd diagnostics -h	safe-read
+linkerd diagnostics x	safe-read
+linkerd endpoints	denied
+linkerd endpoints x	denied
+linkerd help	inert
+linkerd help x	inert
+linkerd identity	denied
+linkerd identity x	denied
+linkerd inject	denied
+linkerd inject x	denied
+linkerd install	denied
+linkerd install x	denied
+linkerd install-cni	denied
+linkerd install-cni x	denied
+linkerd jaeger	denied
+linkerd jaeger x	denied
+linkerd metrics	denied
+linkerd metrics --context x	safe-read
+linkerd metrics --help	safe-read
+linkerd metrics --help --context x	safe-read
+linkerd metrics --help -h	safe-read
+linkerd metrics --help x	safe-read
+linkerd metrics --kubeconfig x	safe-read
+linkerd metrics --linkerd-namespace x	safe-read
+linkerd metrics --namespace x	safe-read
+linkerd metrics -L x	safe-read
+linkerd metrics -h	safe-read
+linkerd metrics -n x	safe-read
+linkerd metrics x	safe-read
+linkerd multicluster	denied
+linkerd multicluster x	denied
+linkerd policy	denied
+linkerd policy x	denied
+linkerd profile	denied
+linkerd profile x	denied
+linkerd prune	denied
+linkerd prune x	denied
+linkerd purge	denied
+linkerd purge x	denied
+linkerd uninject	denied
+linkerd uninject x	denied
+linkerd uninstall	denied
+linkerd uninstall x	denied
+linkerd uninstall-cni	denied
+linkerd uninstall-cni x	denied
+linkerd upgrade	denied
+linkerd upgrade x	denied
+linkerd version	inert
+linkerd version --client	inert
+linkerd version --client --help	inert
+linkerd version --client --namespace x	inert
+linkerd version --client x	inert
+linkerd version --help	inert
+linkerd version --namespace x	inert
+linkerd version --proxy	inert
+linkerd version --short	inert
+linkerd version -h	inert
+linkerd version x	inert
+linkerd viz	denied
+linkerd viz x	denied
+linkerd x	denied
+linkicc	denied
+linkicc --help	safe-write
+linkicc --help -8	safe-write
+linkicc --help -D x	safe-write
+linkicc --help x	safe-write
+linkicc --version	denied
+linkicc -8	safe-write
+linkicc -D x	safe-write
+linkicc -V	safe-write
+linkicc -c x	safe-write
+linkicc -d x	safe-write
+linkicc -h	safe-write
+linkicc -k x	safe-write
+linkicc -o x	safe-write
+linkicc -t x	safe-write
+linkicc -v	safe-write
+linkicc x	safe-write
+linode-cli	denied
+linode-cli --delimiter x	denied
+linode-cli --help	inert
+linode-cli --help --delimiter x	inert
+linode-cli --help --json	inert
+linode-cli --help x	denied
+linode-cli --json	denied
+linode-cli --markdown	denied
+linode-cli --no-headers	denied
+linode-cli --pretty	denied
+linode-cli --suppress-warnings	denied
+linode-cli --text	denied
+linode-cli --version	inert
+linode-cli account	denied
+linode-cli account events-list	inert
+linode-cli account events-list --help	inert
+linode-cli account events-list --help x	inert
+linode-cli account events-list x	inert
+linode-cli account invoice-view	denied
+linode-cli account invoice-view --help	inert
+linode-cli account invoice-view --help x	inert
+linode-cli account invoice-view x	inert
+linode-cli account invoices-list	inert
+linode-cli account invoices-list --help	inert
+linode-cli account invoices-list --help x	inert
+linode-cli account invoices-list x	inert
+linode-cli account notifications-list	inert
+linode-cli account notifications-list --help	inert
+linode-cli account notifications-list --help x	inert
+linode-cli account notifications-list x	inert
+linode-cli account transfer	inert
+linode-cli account transfer --help	inert
+linode-cli account transfer --help x	inert
+linode-cli account transfer x	inert
+linode-cli account view	inert
+linode-cli account view --help	inert
+linode-cli account view --help x	inert
+linode-cli account view x	inert
+linode-cli account x	denied
+linode-cli configure	denied
+linode-cli databases	denied
+linode-cli databases list	inert
+linode-cli databases list --help	inert
+linode-cli databases list --help x	inert
+linode-cli databases list x	inert
+linode-cli databases x	denied
+linode-cli domains	denied
+linode-cli domains list	inert
+linode-cli domains list --help	inert
+linode-cli domains list --help x	inert
+linode-cli domains list x	inert
+linode-cli domains view	denied
+linode-cli domains view --help	inert
+linode-cli domains view --help x	inert
+linode-cli domains view x	inert
+linode-cli domains x	denied
+linode-cli firewalls	denied
+linode-cli firewalls list	inert
+linode-cli firewalls list --help	inert
+linode-cli firewalls list --help x	inert
+linode-cli firewalls list x	inert
+linode-cli firewalls view	denied
+linode-cli firewalls view --help	inert
+linode-cli firewalls view --help x	inert
+linode-cli firewalls view x	inert
+linode-cli firewalls x	denied
+linode-cli images	denied
+linode-cli images list	inert
+linode-cli images list --help	inert
+linode-cli images list --help x	inert
+linode-cli images list x	inert
+linode-cli images view	denied
+linode-cli images view --help	inert
+linode-cli images view --help x	inert
+linode-cli images view x	inert
+linode-cli images x	denied
+linode-cli linodes	denied
+linode-cli linodes create --type g6-nanode-1 --region us-east --image linode/debian12	denied
+linode-cli linodes delete 123	denied
+linode-cli linodes kernels	inert
+linode-cli linodes kernels --help	inert
+linode-cli linodes kernels --help x	inert
+linode-cli linodes kernels x	inert
+linode-cli linodes list	inert
+linode-cli linodes list --help	inert
+linode-cli linodes list --help x	inert
+linode-cli linodes list x	inert
+linode-cli linodes reboot 123	denied
+linode-cli linodes types	inert
+linode-cli linodes types --help	inert
+linode-cli linodes types --help x	inert
+linode-cli linodes types x	inert
+linode-cli linodes view	denied
+linode-cli linodes view --help	inert
+linode-cli linodes view --help x	inert
+linode-cli linodes view 123	inert
+linode-cli linodes view x	inert
+linode-cli linodes x	denied
+linode-cli lke	denied
+linode-cli lke cluster-view	denied
+linode-cli lke cluster-view --help	inert
+linode-cli lke cluster-view --help x	inert
+linode-cli lke cluster-view x	inert
+linode-cli lke clusters-list	inert
+linode-cli lke clusters-list --help	inert
+linode-cli lke clusters-list --help x	inert
+linode-cli lke clusters-list x	inert
+linode-cli lke x	denied
+linode-cli networking	denied
+linode-cli networking ip-view	denied
+linode-cli networking ip-view --help	inert
+linode-cli networking ip-view --help x	inert
+linode-cli networking ip-view x	inert
+linode-cli networking ips-list	inert
+linode-cli networking ips-list --help	inert
+linode-cli networking ips-list --help x	inert
+linode-cli networking ips-list x	inert
+linode-cli networking x	denied
+linode-cli nodebalancers	denied
+linode-cli nodebalancers list	inert
+linode-cli nodebalancers list --help	inert
+linode-cli nodebalancers list --help x	inert
+linode-cli nodebalancers list x	inert
+linode-cli nodebalancers view	denied
+linode-cli nodebalancers view --help	inert
+linode-cli nodebalancers view --help x	inert
+linode-cli nodebalancers view x	inert
+linode-cli nodebalancers x	denied
+linode-cli obj get my-bucket file	denied
+linode-cli obj ls	denied
+linode-cli profile	denied
+linode-cli profile view	inert
+linode-cli profile view --help	inert
+linode-cli profile view --help x	inert
+linode-cli profile view x	inert
+linode-cli profile x	denied
+linode-cli regions	denied
+linode-cli regions list	inert
+linode-cli regions list --help	inert
+linode-cli regions list --help x	inert
+linode-cli regions list x	inert
+linode-cli regions view	denied
+linode-cli regions view --help	inert
+linode-cli regions view --help x	inert
+linode-cli regions view x	inert
+linode-cli regions x	denied
+linode-cli ssh root@123	denied
+linode-cli stackscripts	denied
+linode-cli stackscripts list	inert
+linode-cli stackscripts list --help	inert
+linode-cli stackscripts list --help x	inert
+linode-cli stackscripts list x	inert
+linode-cli stackscripts view	denied
+linode-cli stackscripts view --help	inert
+linode-cli stackscripts view --help x	inert
+linode-cli stackscripts view x	inert
+linode-cli stackscripts x	denied
+linode-cli tags	denied
+linode-cli tags list	inert
+linode-cli tags list --help	inert
+linode-cli tags list --help x	inert
+linode-cli tags list x	inert
+linode-cli tags x	denied
+linode-cli tickets	denied
+linode-cli tickets list	inert
+linode-cli tickets list --help	inert
+linode-cli tickets list --help x	inert
+linode-cli tickets list x	inert
+linode-cli tickets view	denied
+linode-cli tickets view --help	inert
+linode-cli tickets view --help x	inert
+linode-cli tickets view x	inert
+linode-cli tickets x	denied
+linode-cli volumes	denied
+linode-cli volumes list	inert
+linode-cli volumes list --help	inert
+linode-cli volumes list --help x	inert
+linode-cli volumes list x	inert
+linode-cli volumes view	denied
+linode-cli volumes view --help	inert
+linode-cli volumes view --help x	inert
+linode-cli volumes view x	inert
+linode-cli volumes x	denied
+linode-cli vpcs	denied
+linode-cli vpcs list	inert
+linode-cli vpcs list --help	inert
+linode-cli vpcs list --help x	inert
+linode-cli vpcs list x	inert
+linode-cli vpcs view	denied
+linode-cli vpcs view --help	inert
+linode-cli vpcs view --help x	inert
+linode-cli vpcs view x	inert
+linode-cli vpcs x	denied
+linode-cli x	denied
+lint	inert
+lint --check x	inert
+lint --config x	inert
+lint --disable x	inert
+lint --enable x	inert
+lint --help	inert
+lint --help --check x	inert
+lint --help --list	inert
+lint --help x	inert
+lint --list	inert
+lint --quiet	inert
+lint --show	inert
+lint --version	inert
+lint -V	inert
+lint -h	inert
+lint x	inert
+lint-staged	denied
+lint-staged --allow-empty x	inert
+lint-staged --concurrent x	inert
+lint-staged --config x	inert
+lint-staged --cwd x	inert
+lint-staged --debug	inert
+lint-staged --debug --allow-empty x	inert
+lint-staged --debug --diff	inert
+lint-staged --debug x	inert
+lint-staged --diff	inert
+lint-staged --diff-filter x	inert
+lint-staged --help	inert
+lint-staged --max-arg-length x	inert
+lint-staged --no-stash	inert
+lint-staged --print-config	inert
+lint-staged --quiet	inert
+lint-staged --relative	inert
+lint-staged --shell	inert
+lint-staged --verbose	inert
+lint-staged --version	inert
+lint-staged -V	inert
+lint-staged -c x	inert
+lint-staged -d	inert
+lint-staged -h	inert
+lint-staged -p	inert
+lint-staged -q	inert
+lint-staged -r x	inert
+lint-staged -v	inert
+lint-staged x	inert
+lipo	denied
+lipo --help	inert
+lipo --help -arch x	denied
+lipo --help -archs	safe-write
+lipo --help x	denied
+lipo --version	denied
+lipo -arch x	denied
+lipo -archs	safe-write
+lipo -archs --help	safe-write
+lipo -archs -arch x	safe-write
+lipo -archs -archs	safe-write
+lipo -archs -create	safe-write
+lipo -archs -detailed_info	safe-write
+lipo -archs -extract x	safe-write
+lipo -archs -extract_family x	safe-write
+lipo -archs -h	safe-write
+lipo -archs -info	safe-write
+lipo -archs -output x	safe-write
+lipo -archs -remove x	safe-write
+lipo -archs -replace x	safe-write
+lipo -archs -segalign x	safe-write
+lipo -archs -thin x	safe-write
+lipo -archs -verify_arch	safe-write
+lipo -archs MyBinary	safe-write
+lipo -create	safe-write
+lipo -create x86_64.o arm64.o -output universal.o	safe-write
+lipo -detailed_info	safe-write
+lipo -detailed_info MyBinary	safe-write
+lipo -extract	safe-write
+lipo -extract x	safe-write
+lipo -extract_family	safe-write
+lipo -extract_family x	safe-write
+lipo -h	inert
+lipo -info	safe-write
+lipo -info MyBinary	safe-write
+lipo -output x	denied
+lipo -remove	safe-write
+lipo -remove x	safe-write
+lipo -replace	safe-write
+lipo -replace x	safe-write
+lipo -segalign x	denied
+lipo -thin	safe-write
+lipo -thin x	safe-write
+lipo -verify_arch	safe-write
+lipo -verify_arch arm64 x86_64 MyBinary	safe-write
+lipo MyBinary	denied
+lipo MyBinary -extract arm64 -output arm64.o	safe-write
+lipo MyBinary -remove arm64 -output without-arm64.o	safe-write
+lipo MyBinary -thin arm64 -output arm64-only	safe-write
+lipo x	denied
+liquibase	denied
+liquibase --help	inert
+liquibase --help --version	denied
+liquibase --help x	denied
+liquibase --version	inert
+liquibase -h	inert
+liquibase calculate-checksum	denied
+liquibase calculate-checksum x	denied
+liquibase changelog-sync	denied
+liquibase changelog-sync x	denied
+liquibase clear-checksums	denied
+liquibase clear-checksums x	denied
+liquibase db-doc	safe-write
+liquibase db-doc x	safe-write
+liquibase diff	safe-read
+liquibase diff x	safe-read
+liquibase diff-changelog	safe-write
+liquibase diff-changelog x	safe-write
+liquibase drop-all	denied
+liquibase drop-all x	denied
+liquibase execute-sql	denied
+liquibase execute-sql x	denied
+liquibase future-rollback-count-sql	denied
+liquibase future-rollback-count-sql x	denied
+liquibase future-rollback-from-tag-sql	denied
+liquibase future-rollback-from-tag-sql x	denied
+liquibase future-rollback-sql	denied
+liquibase future-rollback-sql x	denied
+liquibase generate-changelog	safe-write
+liquibase generate-changelog x	safe-write
+liquibase help	inert
+liquibase help x	inert
+liquibase history	safe-read
+liquibase history x	safe-read
+liquibase init	safe-write
+liquibase init x	safe-write
+liquibase mark-next-changeset-ran	denied
+liquibase mark-next-changeset-ran x	denied
+liquibase release-locks	denied
+liquibase release-locks x	denied
+liquibase rollback	denied
+liquibase rollback x	denied
+liquibase rollback-count	denied
+liquibase rollback-count x	denied
+liquibase rollback-sql	denied
+liquibase rollback-sql x	denied
+liquibase rollback-to-date	denied
+liquibase rollback-to-date x	denied
+liquibase snapshot	denied
+liquibase snapshot x	denied
+liquibase status	safe-read
+liquibase status x	safe-read
+liquibase tag	denied
+liquibase tag x	denied
+liquibase tag-exists	safe-read
+liquibase tag-exists x	safe-read
+liquibase update	denied
+liquibase update x	denied
+liquibase update-count	denied
+liquibase update-count x	denied
+liquibase update-sql	denied
+liquibase update-sql x	denied
+liquibase update-testing-rollback	denied
+liquibase update-testing-rollback x	denied
+liquibase update-to-tag	denied
+liquibase update-to-tag x	denied
+liquibase validate	safe-read
+liquibase validate x	safe-read
+liquibase version	inert
+liquibase version x	inert
+liquibase x	denied
+litecli	denied
+litecli --help	inert
+litecli --help --version	inert
+litecli --help x	denied
+litecli --version	inert
+litecli -V	inert
+litecli -h	inert
+litecli x	denied
+llc	denied
+llc --help	safe-write
+llc --help --version	safe-write
+llc --help x	safe-write
+llc --version	safe-write
+llc -?	safe-write
+llc -h	safe-write
+llc -v	safe-write
+llc x	safe-write
+lld	denied
+lld --help	safe-write
+lld --help --version	safe-write
+lld --help x	safe-write
+lld --version	safe-write
+lld -?	safe-write
+lld -h	safe-write
+lld -v	safe-write
+lld x	safe-write
+lld-link	denied
+lld-link --help	safe-write
+lld-link --help --version	safe-write
+lld-link --help x	safe-write
+lld-link --version	safe-write
+lld-link -?	safe-write
+lld-link -h	safe-write
+lld-link -v	safe-write
+lld-link x	safe-write
+lldb	denied
+lldb --attach-pid 1234	denied
+lldb --help	inert
+lldb --help --print-script-interpreter-info	inert
+lldb --help x	denied
+lldb --print-script-interpreter-info	inert
+lldb --python-path	inert
+lldb --version	inert
+lldb -P	inert
+lldb -h	inert
+lldb -v	inert
+lldb /usr/bin/echo	denied
+lldb x	denied
+lli	denied
+lli --help	inert
+lli --help --version	inert
+lli --help x	denied
+lli --version	inert
+lli -?	inert
+lli -h	inert
+lli -v	inert
+lli x	denied
+llm	denied
+llm --help	inert
+llm --help --version	denied
+llm --help x	denied
+llm --version	inert
+llm -V	inert
+llm -h	inert
+llm aliases	inert
+llm aliases --help	inert
+llm aliases --help --json	inert
+llm aliases --help x	inert
+llm aliases --json	inert
+llm aliases -h	inert
+llm aliases x	inert
+llm collections	inert
+llm collections --help	inert
+llm collections --help --json	inert
+llm collections --help x	inert
+llm collections --json	inert
+llm collections -h	inert
+llm collections x	inert
+llm logs	inert
+llm logs --cid x	inert
+llm logs --conversation	inert
+llm logs --conversation --cid x	inert
+llm logs --conversation --help	inert
+llm logs --conversation x	inert
+llm logs --count x	inert
+llm logs --help	inert
+llm logs --id x	inert
+llm logs --json	inert
+llm logs --model x	inert
+llm logs --no-truncate	inert
+llm logs --response	inert
+llm logs --search x	inert
+llm logs --truncate	inert
+llm logs -c x	inert
+llm logs -h	inert
+llm logs -m x	inert
+llm logs -n x	inert
+llm logs x	inert
+llm models	inert
+llm models --help	inert
+llm models --help --json	inert
+llm models --help x	inert
+llm models --json	inert
+llm models --options	inert
+llm models -h	inert
+llm models x	inert
+llm plugins	inert
+llm plugins --all	inert
+llm plugins --all --help	inert
+llm plugins --all x	inert
+llm plugins --help	inert
+llm plugins --json	inert
+llm plugins -h	inert
+llm plugins x	inert
+llm templates	inert
+llm templates --help	inert
+llm templates --help --json	inert
+llm templates --help x	inert
+llm templates --json	inert
+llm templates -h	inert
+llm templates x	inert
+llm x	denied
+llvm-ar	denied
+llvm-ar --help	safe-write
+llvm-ar --help --version	safe-write
+llvm-ar --help x	safe-write
+llvm-ar --version	safe-write
+llvm-ar -?	safe-write
+llvm-ar -h	safe-write
+llvm-ar x	safe-write
+llvm-as	denied
+llvm-as --help	safe-write
+llvm-as --help --version	safe-write
+llvm-as --help x	safe-write
+llvm-as --version	safe-write
+llvm-as -?	safe-write
+llvm-as -h	safe-write
+llvm-as x	safe-write
+llvm-config	safe-read
+llvm-config --help	safe-read
+llvm-config --help --version	safe-read
+llvm-config --help x	safe-read
+llvm-config --version	safe-read
+llvm-config -?	safe-read
+llvm-config -h	safe-read
+llvm-config x	safe-read
+llvm-cov	denied
+llvm-cov --help	safe-write
+llvm-cov --help --version	safe-write
+llvm-cov --help x	safe-write
+llvm-cov --version	safe-write
+llvm-cov -?	safe-write
+llvm-cov -h	safe-write
+llvm-cov x	safe-write
+llvm-cxxfilt	safe-read
+llvm-cxxfilt --help	safe-read
+llvm-cxxfilt --help --version	safe-read
+llvm-cxxfilt --help x	safe-read
+llvm-cxxfilt --version	safe-read
+llvm-cxxfilt -?	safe-read
+llvm-cxxfilt -h	safe-read
+llvm-cxxfilt x	safe-read
+llvm-dis	denied
+llvm-dis --help	safe-write
+llvm-dis --help --version	safe-write
+llvm-dis --help x	safe-write
+llvm-dis --version	safe-write
+llvm-dis -?	safe-write
+llvm-dis -h	safe-write
+llvm-dis x	safe-write
+llvm-dwp	denied
+llvm-dwp --help	safe-write
+llvm-dwp --help --version	safe-write
+llvm-dwp --help x	safe-write
+llvm-dwp --version	safe-write
+llvm-dwp -?	safe-write
+llvm-dwp -h	safe-write
+llvm-dwp x	safe-write
+llvm-libtool-darwin	denied
+llvm-libtool-darwin --help	safe-write
+llvm-libtool-darwin --help --version	safe-write
+llvm-libtool-darwin --help x	safe-write
+llvm-libtool-darwin --version	safe-write
+llvm-libtool-darwin -?	safe-write
+llvm-libtool-darwin -h	safe-write
+llvm-libtool-darwin x	safe-write
+llvm-link	denied
+llvm-link --help	safe-write
+llvm-link --help --version	safe-write
+llvm-link --help x	safe-write
+llvm-link --version	safe-write
+llvm-link -?	safe-write
+llvm-link -h	safe-write
+llvm-link x	safe-write
+llvm-mc	denied
+llvm-mc --help	safe-write
+llvm-mc --help --version	safe-write
+llvm-mc --help x	safe-write
+llvm-mc --version	safe-write
+llvm-mc -?	safe-write
+llvm-mc -h	safe-write
+llvm-mc x	safe-write
+llvm-nm	denied
+llvm-nm --help	safe-read
+llvm-nm --help --version	safe-read
+llvm-nm --help x	safe-read
+llvm-nm --version	safe-read
+llvm-nm -?	safe-read
+llvm-nm -h	safe-read
+llvm-nm x	safe-read
+llvm-objcopy	denied
+llvm-objcopy --help	safe-write
+llvm-objcopy --help --version	safe-write
+llvm-objcopy --help x	safe-write
+llvm-objcopy --version	safe-write
+llvm-objcopy -?	safe-write
+llvm-objcopy -h	safe-write
+llvm-objcopy x	safe-write
+llvm-objdump	denied
+llvm-objdump --help	safe-read
+llvm-objdump --help --version	safe-read
+llvm-objdump --help x	safe-read
+llvm-objdump --version	safe-read
+llvm-objdump -?	safe-read
+llvm-objdump -h	safe-read
+llvm-objdump x	safe-read
+llvm-otool	denied
+llvm-otool --help	inert
+llvm-otool --help --object-tool-path x	inert
+llvm-otool --help -h	inert
+llvm-otool --help x	inert
+llvm-otool --object-tool-path x	inert
+llvm-otool --version	denied
+llvm-otool -h	inert
+llvm-otool -objdump	inert
+llvm-otool -object-tool-path x	inert
+llvm-otool -show-objdump-command	inert
+llvm-otool x	inert
+llvm-pdbutil	denied
+llvm-pdbutil --help	safe-read
+llvm-pdbutil --help --version	safe-read
+llvm-pdbutil --help x	safe-read
+llvm-pdbutil --version	safe-read
+llvm-pdbutil -?	safe-read
+llvm-pdbutil -h	safe-read
+llvm-pdbutil x	safe-read
+llvm-profdata	denied
+llvm-profdata --help	safe-write
+llvm-profdata --help --version	safe-write
+llvm-profdata --help x	safe-write
+llvm-profdata --version	safe-write
+llvm-profdata -?	safe-write
+llvm-profdata -h	safe-write
+llvm-profdata x	safe-write
+llvm-ranlib	denied
+llvm-ranlib --help	safe-write
+llvm-ranlib --help --version	safe-write
+llvm-ranlib --help x	safe-write
+llvm-ranlib --version	safe-write
+llvm-ranlib -?	safe-write
+llvm-ranlib -h	safe-write
+llvm-ranlib x	safe-write
+llvm-readelf	denied
+llvm-readelf --help	safe-read
+llvm-readelf --help --version	safe-read
+llvm-readelf --help x	safe-read
+llvm-readelf --version	safe-read
+llvm-readelf -?	safe-read
+llvm-readelf -h	safe-read
+llvm-readelf x	safe-read
+llvm-readobj	denied
+llvm-readobj --help	safe-read
+llvm-readobj --help --version	safe-read
+llvm-readobj --help x	safe-read
+llvm-readobj --version	safe-read
+llvm-readobj -?	safe-read
+llvm-readobj -h	safe-read
+llvm-readobj x	safe-read
+llvm-size	denied
+llvm-size --help	safe-read
+llvm-size --help --version	safe-read
+llvm-size --help x	safe-read
+llvm-size --version	safe-read
+llvm-size -?	safe-read
+llvm-size -h	safe-read
+llvm-size x	safe-read
+llvm-strip	denied
+llvm-strip --help	safe-write
+llvm-strip --help --version	safe-write
+llvm-strip --help x	safe-write
+llvm-strip --version	safe-write
+llvm-strip -?	safe-write
+llvm-strip -h	safe-write
+llvm-strip x	safe-write
+llvm-symbolizer	safe-read
+llvm-symbolizer --help	safe-read
+llvm-symbolizer --help --version	safe-read
+llvm-symbolizer --help x	safe-read
+llvm-symbolizer --version	safe-read
+llvm-symbolizer -?	safe-read
+llvm-symbolizer -h	safe-read
+llvm-symbolizer x	safe-read
+llvm-undname	safe-read
+llvm-undname --help	safe-read
+llvm-undname --help --version	safe-read
+llvm-undname --help x	safe-read
+llvm-undname --version	safe-read
+llvm-undname -?	safe-read
+llvm-undname -h	safe-read
+llvm-undname x	safe-read
+llvm-xray	denied
+llvm-xray --help	safe-read
+llvm-xray --help --version	safe-read
+llvm-xray --help x	safe-read
+llvm-xray --version	safe-read
+llvm-xray -?	safe-read
+llvm-xray -h	safe-read
+llvm-xray x	safe-read
+ln	denied
+ln --backup	denied
+ln --backup --backup x	denied
+ln --backup --directory	denied
+ln --backup x	denied
+ln --directory	denied
+ln --force	denied
+ln --help	denied
+ln --interactive	denied
+ln --logical	denied
+ln --no-dereference	denied
+ln --no-target-directory	denied
+ln --physical	denied
+ln --relative	denied
+ln --suffix x	denied
+ln --symbolic	denied
+ln --target-directory x	denied
+ln --verbose	denied
+ln --version	denied
+ln -F	denied
+ln -L	denied
+ln -P	denied
+ln -S x	denied
+ln -T	denied
+ln -d	denied
+ln -f	denied
+ln -h	denied
+ln -i	denied
+ln -n	denied
+ln -r	denied
+ln -s	denied
+ln -s ./target ./link	safe-write
+ln -s ./target hosts	safe-write
+ln -t x	denied
+ln -v	denied
+ln -w	denied
+ln ./a ./b	safe-write
+ln x	denied
+lnav	denied
+lnav --help	inert
+lnav --help --version	inert
+lnav --help x	denied
+lnav --version	inert
+lnav -V	inert
+lnav -h	inert
+lnav x	denied
+lncli	denied
+lncli --help	inert
+lncli --help --version	inert
+lncli --help x	denied
+lncli --version	inert
+lncli -h	inert
+lncli -v	inert
+lncli x	denied
+locale	inert
+locale --all-locales	inert
+locale --all-locales --category-name	inert
+locale --all-locales x	inert
+locale --category-name	inert
+locale --charmaps	inert
+locale --help	inert
+locale --keyword-name	inert
+locale --verbose	inert
+locale --version	inert
+locale -V	inert
+locale -a	inert
+locale -c	inert
+locale -h	inert
+locale -k	inert
+locale -m	inert
+locale -v	inert
+locale x	inert
+localedef	denied
+localedef --alias-file	safe-write
+localedef --alias-file --charmap x	safe-write
+localedef --alias-file --force	safe-write
+localedef --alias-file x	safe-write
+localedef --charmap x	safe-write
+localedef --force	safe-write
+localedef --help	safe-write
+localedef --inputfile x	safe-write
+localedef --list-archive	safe-write
+localedef --no-archive	safe-write
+localedef --no-hard-links	safe-write
+localedef --no-warnings	safe-write
+localedef --posix	safe-write
+localedef --prefix x	safe-write
+localedef --quiet	safe-write
+localedef --repertoire-map x	safe-write
+localedef --replace	safe-write
+localedef --verbose	safe-write
+localedef --version	safe-write
+localedef --warnings	safe-write
+localedef -A	safe-write
+localedef -c	safe-write
+localedef -f	safe-write
+localedef -i	safe-write
+localedef -u	safe-write
+localedef -v	safe-write
+localedef x	safe-write
+locate	denied
+locate --all	inert
+locate --all --basename	inert
+locate --all --database x	inert
+locate --all x	inert
+locate --basename	inert
+locate --count	inert
+locate --database x	inert
+locate --existing	inert
+locate --follow	inert
+locate --help	inert
+locate --ignore-case	inert
+locate --limit x	inert
+locate --null	inert
+locate --quiet	inert
+locate --statistics	inert
+locate --version	inert
+locate --wholename	inert
+locate -0	inert
+locate -A	inert
+locate -S	inert
+locate -V	inert
+locate -b	inert
+locate -c	inert
+locate -d x	inert
+locate -e	inert
+locate -h	inert
+locate -i	inert
+locate -l x	inert
+locate -n x	inert
+locate -q	inert
+locate -w	inert
+locate x	inert
+lockf	denied
+lockf --help	denied
+lockf --version	denied
+lockf -k	denied
+lockf -k -n	denied
+lockf -k -t x	denied
+lockf -k x	denied
+lockf -n	denied
+lockf -s	denied
+lockf -t x	denied
+lockf -w	denied
+lockf x	denied
+lockstat	inert
+lockstat --help	denied
+lockstat --version	denied
+lockstat -A	inert
+lockstat -A -C	inert
+lockstat -A -D x	inert
+lockstat -A x	inert
+lockstat -C	inert
+lockstat -D x	inert
+lockstat -E	inert
+lockstat -H	inert
+lockstat -I	inert
+lockstat -S	inert
+lockstat -T	inert
+lockstat -V	inert
+lockstat -W	inert
+lockstat -b x	inert
+lockstat -c	inert
+lockstat -d x	inert
+lockstat -e x	inert
+lockstat -f x	inert
+lockstat -g	inert
+lockstat -h x	inert
+lockstat -i x	inert
+lockstat -k	inert
+lockstat -l x	inert
+lockstat -n x	inert
+lockstat -o x	inert
+lockstat -p	inert
+lockstat -s x	inert
+lockstat -t x	inert
+lockstat -w	inert
+lockstat -x x	inert
+lockstat x	inert
+locust	denied
+locust --help	inert
+locust --help --version	inert
+locust --help x	denied
+locust --version	inert
+locust -V	inert
+locust -h	inert
+locust x	denied
+log	denied
+log --help	inert
+log --help --version	denied
+log --help x	denied
+log --version	inert
+log -V	inert
+log -h	inert
+log collect --output /tmp/x.logarchive	denied
+log config --mode level:debug	denied
+log erase --all	denied
+log help	inert
+log help --help	inert
+log help --help -h	inert
+log help --help x	inert
+log help -h	inert
+log help x	inert
+log show	inert
+log show --backtrace	inert
+log show --backtrace --color x	inert
+log show --backtrace --debug	inert
+log show --backtrace x	inert
+log show --color x	inert
+log show --debug	inert
+log show --directory x	inert
+log show --directory ~/.ssh	denied
+log show --end x	inert
+log show --help	inert
+log show --info	inert
+log show --last 5m --style json	inert
+log show --last x	inert
+log show --loss	inert
+log show --mach-continuous-time	inert
+log show --no-backtrace	inert
+log show --no-debug	inert
+log show --no-info	inert
+log show --no-loss	inert
+log show --no-pager	inert
+log show --no-signpost	inert
+log show --pager	inert
+log show --predicate x	inert
+log show --process x	inert
+log show --realtime	inert
+log show --signpost	inert
+log show --source	inert
+log show --source --last 5m	inert
+log show --start x	inert
+log show --style x	inert
+log show --timezone x	inert
+log show --type x	inert
+log show --unreliable	inert
+log show -h	inert
+log show x	inert
+log stats	inert
+log stats --archive x	inert
+log stats --count x	inert
+log stats --end x	inert
+log stats --help	inert
+log stats --help --archive x	inert
+log stats --help --no-pager	inert
+log stats --help x	inert
+log stats --last x	inert
+log stats --no-pager	inert
+log stats --overview	inert
+log stats --pager	inert
+log stats --per-book	inert
+log stats --per-book --count all --sort bytes	inert
+log stats --per-file	inert
+log stats --predicate x	inert
+log stats --process chronod	inert
+log stats --process x	inert
+log stats --sender x	inert
+log stats --sort x	inert
+log stats --start x	inert
+log stats --style x	inert
+log stats -h	inert
+log stats x	inert
+log stream	inert
+log stream --backtrace	inert
+log stream --backtrace --color x	inert
+log stream --backtrace --debug	inert
+log stream --backtrace x	inert
+log stream --color x	inert
+log stream --debug	inert
+log stream --help	inert
+log stream --ignore-dropped	inert
+log stream --info	inert
+log stream --level info --timeout 5s	inert
+log stream --level x	inert
+log stream --loss	inert
+log stream --mach-continuous-time	inert
+log stream --no-backtrace	inert
+log stream --predicate x	inert
+log stream --process x	inert
+log stream --signpost	inert
+log stream --source	inert
+log stream --style x	inert
+log stream --timeout x	inert
+log stream --type x	inert
+log stream --unreliable	inert
+log stream --user x	inert
+log stream -h	inert
+log stream x	inert
+log x	denied
+logger	safe-write
+logger 'test message'	safe-write
+logger --help	denied
+logger --version	denied
+logger -f x	safe-write
+logger -i	safe-write
+logger -i -f x	safe-write
+logger -i -s	safe-write
+logger -i x	safe-write
+logger -p x	safe-write
+logger -s	safe-write
+logger -t x	safe-write
+logger x	safe-write
+logname	inert
+logname --help	inert
+logname --help --version	inert
+logname --help x	denied
+logname --version	inert
+logname x	denied
+look	denied
+look --alphanum	inert
+look --alphanum --ignore-case	inert
+look --alphanum --terminate x	inert
+look --alphanum x	inert
+look --help	denied
+look --ignore-case	inert
+look --terminate x	inert
+look --version	denied
+look -d	inert
+look -f	inert
+look -f Hello	inert
+look -t : foo:	inert
+look -t x	inert
+look hello	inert
+look hello /usr/share/dict/words	inert
+look hello words.txt extra	denied
+look x	inert
+lorder	denied
+lorder --help	denied
+lorder --version	denied
+lorder a.o b.o c.o	inert
+lorder x	inert
+lore	denied
+lore --help	inert
+lore --help --version	denied
+lore --help x	denied
+lore --version	inert
+lore -V	inert
+lore -h	inert
+lore auth	denied
+lore auth x	denied
+lore branch	denied
+lore branch x	denied
+lore clone	denied
+lore clone x	denied
+lore commit -m wip	denied
+lore completions	denied
+lore completions --help	inert
+lore completions --help -h	inert
+lore completions --help x	inert
+lore completions -h	inert
+lore completions bash	inert
+lore completions fish	inert
+lore completions x	inert
+lore completions zsh	inert
+lore file	denied
+lore file x	denied
+lore history	denied
+lore history x	denied
+lore layer	denied
+lore layer x	denied
+lore link	denied
+lore link x	denied
+lore lock	denied
+lore lock x	denied
+lore login	denied
+lore login x	denied
+lore push	denied
+lore repository	denied
+lore repository x	denied
+lore revision	denied
+lore revision x	denied
+lore stage	denied
+lore stage x	denied
+lore status	denied
+lore sync	denied
+lore sync x	denied
+lore x	denied
+lp	denied
+lp --evil doc.pdf	denied
+lp --help	safe-write
+lp --help --version	safe-write
+lp --help -H x	safe-write
+lp --help x	safe-write
+lp --version	safe-write
+lp -E	safe-write
+lp -H x	safe-write
+lp -P x	safe-write
+lp -U x	safe-write
+lp -c	safe-write
+lp -d HP_LaserJet -n 2 doc.pdf	safe-write
+lp -d x	safe-write
+lp -h x	safe-write
+lp -i x	safe-write
+lp -m	safe-write
+lp -n x	safe-write
+lp -o x	safe-write
+lp -q x	safe-write
+lp -s	safe-write
+lp -t x	safe-write
+lp doc.pdf	safe-write
+lp x	safe-write
+lpoptions	safe-write
+lpoptions --help	safe-write
+lpoptions --help --version	safe-write
+lpoptions --help -U x	safe-write
+lpoptions --help x	safe-write
+lpoptions --version	safe-write
+lpoptions -E	safe-write
+lpoptions -U x	safe-write
+lpoptions -d HP_LaserJet	safe-write
+lpoptions -d x	safe-write
+lpoptions -h x	safe-write
+lpoptions -l	safe-write
+lpoptions -o media=Letter	safe-write
+lpoptions -o x	safe-write
+lpoptions -p x	safe-write
+lpoptions -r x	safe-write
+lpoptions -x x	safe-write
+lpoptions x	safe-write
+lpq	inert
+lpq --help	inert
+lpq --help --version	inert
+lpq --help -P x	inert
+lpq --help x	inert
+lpq --version	inert
+lpq -E	inert
+lpq -P HP_LaserJet	inert
+lpq -P x	inert
+lpq -U x	inert
+lpq -a	inert
+lpq -h x	inert
+lpq -l	inert
+lpq x	inert
+lpr	denied
+lpr -# 3 -P HP_LaserJet doc.pdf	safe-write
+lpr -# x	safe-write
+lpr --help	safe-write
+lpr --help -# x	safe-write
+lpr --help --version	safe-write
+lpr --help x	safe-write
+lpr --version	safe-write
+lpr -C x	safe-write
+lpr -E	safe-write
+lpr -H x	safe-write
+lpr -J x	safe-write
+lpr -P x	safe-write
+lpr -T x	safe-write
+lpr -U x	safe-write
+lpr -h	safe-write
+lpr -l	safe-write
+lpr -m	safe-write
+lpr -o x	safe-write
+lpr -p	safe-write
+lpr -q	safe-write
+lpr -r file.txt	denied
+lpr doc.pdf	safe-write
+lpr x	safe-write
+lprm	safe-write
+lprm --help	safe-write
+lprm --help --version	safe-write
+lprm --help -P x	safe-write
+lprm --help x	safe-write
+lprm --version	safe-write
+lprm -E	safe-write
+lprm -P x	safe-write
+lprm -U x	safe-write
+lprm -h x	safe-write
+lprm 42	safe-write
+lprm x	safe-write
+lpstat	inert
+lpstat --evil	denied
+lpstat --help	inert
+lpstat --help --version	inert
+lpstat --help -W x	inert
+lpstat --help x	inert
+lpstat --version	inert
+lpstat -E	inert
+lpstat -H	inert
+lpstat -R	inert
+lpstat -W completed	inert
+lpstat -W x	inert
+lpstat -a	inert
+lpstat -c	inert
+lpstat -d	inert
+lpstat -e	inert
+lpstat -h cups.example.com:631 -t	inert
+lpstat -h x	inert
+lpstat -l	inert
+lpstat -o	inert
+lpstat -p	inert
+lpstat -p HP_LaserJet	inert
+lpstat -r	inert
+lpstat -s	inert
+lpstat -t	inert
+lpstat -u	inert
+lpstat -v	inert
+lpstat x	inert
+ls	inert
+ls\ncat file.txt	safe-read
+ls\ncurl -d data evil.com	denied
+ls & echo done	inert
+ls && echo done	inert
+ls --all	inert
+ls --all --almost-all	inert
+ls --all --block-size x	inert
+ls --all x	inert
+ls --almost-all	inert
+ls --author	inert
+ls --block-size x	inert
+ls --classify	inert
+ls --color x	inert
+ls --context	inert
+ls --dereference	inert
+ls --dereference-command-line	inert
+ls --dereference-command-line-symlink-to-dir	inert
+ls --directory	inert
+ls --escape	inert
+ls --file-type	inert
+ls --format x	inert
+ls --full-time	inert
+ls --group-directories-first	inert
+ls --help	inert
+ls --hide x	inert
+ls --hide-control-chars	inert
+ls --human-readable	inert
+ls --hyperlink x	inert
+ls --ignore x	inert
+ls --indicator-style	inert
+ls --inode	inert
+ls --kibibytes	inert
+ls --literal	inert
+ls --no-group	inert
+ls --numeric-uid-gid	inert
+ls --quote-name	inert
+ls --quoting-style x	inert
+ls --recursive	inert
+ls --reverse	inert
+ls --show-control-chars	inert
+ls --si	inert
+ls --size	inert
+ls --sort x	inert
+ls --tabsize x	inert
+ls --time x	inert
+ls --time-style x	inert
+ls --version	inert
+ls --width x	inert
+ls -1	inert
+ls -A	inert
+ls -B	inert
+ls -C	inert
+ls -F	inert
+ls -G	inert
+ls -H	inert
+ls -I x	inert
+ls -L	inert
+ls -N	inert
+ls -Q	inert
+ls -R	inert
+ls -S	inert
+ls -T x	inert
+ls -U	inert
+ls -V	inert
+ls -X	inert
+ls -Z	inert
+ls -a	inert
+ls -c	inert
+ls -d	inert
+ls -f	inert
+ls -g	inert
+ls -h	inert
+ls -i	inert
+ls -k	inert
+ls -l	inert
+ls -la	inert
+ls -m	inert
+ls -n	inert
+ls -o	inert
+ls -p	inert
+ls -q	inert
+ls -r	inert
+ls -s	inert
+ls -t	inert
+ls -u	inert
+ls -v	inert
+ls -w x	inert
+ls -x	inert
+ls 1>| out.txt	safe-write
+ls 2> errors.txt	safe-write
+ls 2>&1	inert
+ls <> /dev/null	inert
+ls <> /etc/hosts	denied
+ls <> f.txt	safe-write
+ls <> ~/.ssh/id_rsa	denied
+ls >| /etc/hosts	denied
+ls >| out.txt	safe-write
+ls >| ~/.ssh/authorized_keys	denied
+ls `pwd`	inert
+ls x	inert
+ls | xargs wc -l	safe-read
+ls; echo done	inert
+lsappinfo	denied
+lsappinfo --help	inert
+lsappinfo --version	denied
+lsappinfo createFile	denied
+lsappinfo createFile x	denied
+lsappinfo find	inert
+lsappinfo find x	inert
+lsappinfo front	inert
+lsappinfo front x	inert
+lsappinfo info	inert
+lsappinfo info x	inert
+lsappinfo kill	denied
+lsappinfo kill x	denied
+lsappinfo launch	denied
+lsappinfo launch x	denied
+lsappinfo list	inert
+lsappinfo list x	inert
+lsappinfo metainfo	inert
+lsappinfo metainfo x	inert
+lsappinfo processList	inert
+lsappinfo processList x	inert
+lsappinfo removeFile	denied
+lsappinfo removeFile x	denied
+lsappinfo restart	denied
+lsappinfo restart x	denied
+lsappinfo sharedMemory	inert
+lsappinfo sharedMemory x	inert
+lsappinfo visibleProcessList	inert
+lsappinfo visibleProcessList x	inert
+lsappinfo x	denied
+lsblk	inert
+lsblk --all	inert
+lsblk --all --ascii	inert
+lsblk --all --exclude x	inert
+lsblk --all x	inert
+lsblk --ascii	inert
+lsblk --bytes	inert
+lsblk --dedup	inert
+lsblk --discard	inert
+lsblk --exclude x	inert
+lsblk --fs	inert
+lsblk --help	inert
+lsblk --include x	inert
+lsblk --inverse	inert
+lsblk --json	inert
+lsblk --list	inert
+lsblk --merge	inert
+lsblk --nodeps	inert
+lsblk --noheadings	inert
+lsblk --output x	inert
+lsblk --output-all	inert
+lsblk --pairs	inert
+lsblk --paths	inert
+lsblk --perms	inert
+lsblk --raw	inert
+lsblk --scsi	inert
+lsblk --sort x	inert
+lsblk --topology	inert
+lsblk --tree	inert
+lsblk --version	inert
+lsblk --width x	inert
+lsblk --zoned	inert
+lsblk -A	inert
+lsblk -E x	inert
+lsblk -I x	inert
+lsblk -J	inert
+lsblk -O	inert
+lsblk -P	inert
+lsblk -S	inert
+lsblk -T	inert
+lsblk -V	inert
+lsblk -a	inert
+lsblk -b	inert
+lsblk -d	inert
+lsblk -e x	inert
+lsblk -f	inert
+lsblk -h	inert
+lsblk -i	inert
+lsblk -l	inert
+lsblk -m	inert
+lsblk -n	inert
+lsblk -o x	inert
+lsblk -p	inert
+lsblk -r	inert
+lsblk -s	inert
+lsblk -t	inert
+lsblk -w x	inert
+lsblk -x x	inert
+lsblk -z	inert
+lsblk x	inert
+lsbom	denied
+lsbom --arch x	inert
+lsbom --help	inert
+lsbom --help --arch x	inert
+lsbom --help -b	inert
+lsbom --help x	inert
+lsbom --version	denied
+lsbom -b	inert
+lsbom -c	inert
+lsbom -d	inert
+lsbom -f	inert
+lsbom -h	inert
+lsbom -l	inert
+lsbom -m	inert
+lsbom -p x	inert
+lsbom -s	inert
+lsbom -x	inert
+lsbom Receipt.bom	inert
+lsbom x	inert
+lskq	inert
+lskq --help	denied
+lskq --version	denied
+lskq -a	inert
+lskq -a -e	inert
+lskq -a -p x	inert
+lskq -a x	inert
+lskq -e	inert
+lskq -h	inert
+lskq -p x	inert
+lskq -r	inert
+lskq -v	inert
+lskq x	inert
+lsm	inert
+lsm --help	inert
+lsm --help --verbose	inert
+lsm --help x	inert
+lsm --verbose	inert
+lsm --version	denied
+lsm -h	inert
+lsm -v	inert
+lsm x	inert
+lsmp	denied
+lsmp --help	denied
+lsmp --version	denied
+lsmp -a	inert
+lsmp -a -h	inert
+lsmp -a -j x	inert
+lsmp -a x	inert
+lsmp -h	inert
+lsmp -j x	inert
+lsmp -p x	inert
+lsmp -v	inert
+lsmp x	inert
+lsof	inert
+lsof --help	inert
+lsof --help --version	inert
+lsof --help -F x	inert
+lsof --help x	inert
+lsof --version	inert
+lsof -C	inert
+lsof -F x	inert
+lsof -G	inert
+lsof -M	inert
+lsof -N	inert
+lsof -O	inert
+lsof -P	inert
+lsof -R	inert
+lsof -S x	inert
+lsof -T x	inert
+lsof -U	inert
+lsof -V	inert
+lsof -X	inert
+lsof -a x	inert
+lsof -b	inert
+lsof -c x	inert
+lsof -d x	inert
+lsof -g x	inert
+lsof -h	inert
+lsof -i x	inert
+lsof -k x	inert
+lsof -l	inert
+lsof -n	inert
+lsof -o x	inert
+lsof -p x	inert
+lsof -r x	inert
+lsof -s x	inert
+lsof -t	inert
+lsof -u x	inert
+lsof -w	inert
+lsof -x	inert
+lsof x	inert
+lsvfs	inert
+lsvfs --help	denied
+lsvfs --version	denied
+lsvfs x	inert
+lua	denied
+lua --help	inert
+lua --help --version	inert
+lua --help x	denied
+lua --version	inert
+lua -v	inert
+lua x	denied
+lualatex	denied
+lualatex --cnf-line	safe-write
+lualatex --cnf-line --cnf-line x	safe-write
+lualatex --cnf-line --draftmode	safe-write
+lualatex --cnf-line x	safe-write
+lualatex --draftmode	safe-write
+lualatex --enc	safe-write
+lualatex --enc x	safe-write
+lualatex --etex	safe-write
+lualatex --file-line-error	safe-write
+lualatex --file-line-error-style	safe-write
+lualatex --fmt	safe-write
+lualatex --fmt x	safe-write
+lualatex --halt-on-error	safe-write
+lualatex --halt-on-error x	safe-write
+lualatex --help	safe-write
+lualatex --ini	safe-write
+lualatex --initialize	safe-write
+lualatex --interaction	safe-write
+lualatex --interaction x	safe-write
+lualatex --ipc	safe-write
+lualatex --ipc-start	safe-write
+lualatex --jobname x	safe-write
+lualatex --kanji x	safe-write
+lualatex --kanji-internal x	safe-write
+lualatex --mktex	safe-write
+lualatex --mktex x	safe-write
+lualatex --mltex x	safe-write
+lualatex --no-cnf	safe-write
+lualatex --no-file-line-error	safe-write
+lualatex --no-mktex	safe-write
+lualatex --no-mktex x	safe-write
+lualatex --no-parse-first-line	safe-write
+lualatex --no-shell-escape	safe-write
+lualatex --no-shell-escape x	safe-write
+lualatex --output-comment x	safe-write
+lualatex --output-directory x	safe-write
+lualatex --output-format x	safe-write
+lualatex --parse-first-line	safe-write
+lualatex --progname	safe-write
+lualatex --progname x	safe-write
+lualatex --recorder	safe-write
+lualatex --recorder x	safe-write
+lualatex --restricted-shell-escape	safe-write
+lualatex --shell-escape x	safe-write
+lualatex --shell-restricted	safe-write
+lualatex --shell-restricted x	safe-write
+lualatex --show-version	safe-write
+lualatex --src-specials	safe-write
+lualatex --src-specials x	safe-write
+lualatex --synctex	safe-write
+lualatex --synctex x	safe-write
+lualatex --translate-file	safe-write
+lualatex --translate-file x	safe-write
+lualatex --version	safe-write
+lualatex -help	safe-write
+lualatex -version	safe-write
+lualatex x	safe-write
+luarocks	denied
+luarocks --help	inert
+luarocks --help --version	denied
+luarocks --help x	denied
+luarocks --version	inert
+luarocks -h	inert
+luarocks build	denied
+luarocks build x	denied
+luarocks config	safe-read
+luarocks config --help	safe-read
+luarocks config --help --lua-incdir	safe-read
+luarocks config --help x	safe-read
+luarocks config --lua-incdir	safe-read
+luarocks config --lua-libdir	safe-read
+luarocks config --lua-ver	safe-read
+luarocks config --rock-trees	safe-read
+luarocks config --system-config	safe-read
+luarocks config --user-config	safe-read
+luarocks config -h	safe-read
+luarocks config x	safe-read
+luarocks doc	denied
+luarocks doc x	denied
+luarocks download	denied
+luarocks download x	denied
+luarocks help	inert
+luarocks help x	inert
+luarocks init	denied
+luarocks init x	denied
+luarocks install	denied
+luarocks install x	denied
+luarocks lint	denied
+luarocks lint --help	safe-read
+luarocks lint --help -h	safe-read
+luarocks lint --help x	safe-read
+luarocks lint -h	safe-read
+luarocks lint x	safe-read
+luarocks list	safe-read
+luarocks list --help	safe-read
+luarocks list --help --no-tree-of	safe-read
+luarocks list --help --tree x	safe-read
+luarocks list --help x	safe-read
+luarocks list --no-tree-of	safe-read
+luarocks list --outdated	safe-read
+luarocks list --porcelain	safe-read
+luarocks list --tree x	safe-read
+luarocks list -h	safe-read
+luarocks list x	safe-read
+luarocks make	denied
+luarocks make x	denied
+luarocks new_version	denied
+luarocks new_version x	denied
+luarocks pack	denied
+luarocks pack x	denied
+luarocks path	safe-read
+luarocks path --bin	safe-read
+luarocks path --bin --full	safe-read
+luarocks path --bin x	safe-read
+luarocks path --full	safe-read
+luarocks path --help	safe-read
+luarocks path --lr-bin	safe-read
+luarocks path --lr-cpath	safe-read
+luarocks path --lr-path	safe-read
+luarocks path --lua-cpath	safe-read
+luarocks path --lua-path	safe-read
+luarocks path -h	safe-read
+luarocks path x	safe-read
+luarocks purge	denied
+luarocks purge x	denied
+luarocks remove	denied
+luarocks remove x	denied
+luarocks search	denied
+luarocks search --all	safe-read
+luarocks search --all --binary	safe-read
+luarocks search --all x	safe-read
+luarocks search --binary	safe-read
+luarocks search --help	safe-read
+luarocks search --porcelain	safe-read
+luarocks search --source	safe-read
+luarocks search -h	safe-read
+luarocks search x	safe-read
+luarocks show	denied
+luarocks show --help	safe-read
+luarocks show --help --home	safe-read
+luarocks show --help x	safe-read
+luarocks show --home	safe-read
+luarocks show --issues	safe-read
+luarocks show --list	safe-read
+luarocks show --mversion	safe-read
+luarocks show --rock-licenses	safe-read
+luarocks show --rock-tree	safe-read
+luarocks show --rockspec	safe-read
+luarocks show -h	safe-read
+luarocks show x	safe-read
+luarocks test	denied
+luarocks test x	denied
+luarocks upload	denied
+luarocks upload x	denied
+luarocks version	inert
+luarocks version --help	inert
+luarocks version --help -h	inert
+luarocks version --help x	inert
+luarocks version -h	inert
+luarocks version x	inert
+luarocks which	denied
+luarocks which --help	safe-read
+luarocks which --help -h	safe-read
+luarocks which --help x	safe-read
+luarocks which -h	safe-read
+luarocks which x	safe-read
+luarocks write_rockspec	denied
+luarocks write_rockspec x	denied
+luarocks x	denied
+lunzip	safe-write
+lunzip --check-lib	safe-write
+lunzip --check-lib --compress	safe-write
+lunzip --check-lib --match-length x	safe-write
+lunzip --check-lib x	safe-write
+lunzip --compress	safe-write
+lunzip --decompress	safe-write
+lunzip --empty	safe-write
+lunzip --fast	safe-write
+lunzip --force	safe-write
+lunzip --help	safe-write
+lunzip --ignore-trailing	safe-write
+lunzip --keep	safe-write
+lunzip --list	safe-write
+lunzip --loose-trailing	safe-write
+lunzip --match-length x	safe-write
+lunzip --member-size x	safe-write
+lunzip --quiet	safe-write
+lunzip --stdout	safe-write
+lunzip --test	safe-write
+lunzip --threads	safe-write
+lunzip --verbose	safe-write
+lunzip --version	safe-write
+lunzip --volume	safe-write
+lunzip --volume-size x	safe-write
+lunzip -0	safe-write
+lunzip -1	safe-write
+lunzip -2	safe-write
+lunzip -3	safe-write
+lunzip -4	safe-write
+lunzip -5	safe-write
+lunzip -6	safe-write
+lunzip -7	safe-write
+lunzip -8	safe-write
+lunzip -9	safe-write
+lunzip -A	safe-write
+lunzip -D	safe-write
+lunzip -F	safe-write
+lunzip -S	safe-write
+lunzip -V	safe-write
+lunzip -a	safe-write
+lunzip -c	safe-write
+lunzip -d	safe-write
+lunzip -f	safe-write
+lunzip -h	safe-write
+lunzip -k	safe-write
+lunzip -l	safe-write
+lunzip -m x	safe-write
+lunzip -n	safe-write
+lunzip -n x	safe-write
+lunzip -q	safe-write
+lunzip -s	safe-write
+lunzip -s x	safe-write
+lunzip -t	safe-write
+lunzip -v	safe-write
+lunzip -z	safe-write
+lunzip x	safe-write
+lz4	safe-write
+lz4 --best	safe-write
+lz4 --best --block-size x	safe-write
+lz4 --best --compress	safe-write
+lz4 --best x	safe-write
+lz4 --block-size x	safe-write
+lz4 --compress	safe-write
+lz4 --content-size x	safe-write
+lz4 --decompress	safe-write
+lz4 --fast	safe-write
+lz4 --favor-decSpeed	safe-write
+lz4 --favor-decSpeed x	safe-write
+lz4 --force	safe-write
+lz4 --frame-block-size x	safe-write
+lz4 --help	safe-write
+lz4 --keep	safe-write
+lz4 --list	safe-write
+lz4 --long-help	safe-write
+lz4 --multiple	safe-write
+lz4 --no-frame-crc	safe-write
+lz4 --no-progress	safe-write
+lz4 --no-sparse	safe-write
+lz4 --no-test	safe-write
+lz4 --quiet	safe-write
+lz4 --rm	safe-write
+lz4 --sparse	safe-write
+lz4 --stdout	safe-write
+lz4 --test	safe-write
+lz4 --uncompress	safe-write
+lz4 --verbose	safe-write
+lz4 --version	safe-write
+lz4 -1	safe-write
+lz4 -2	safe-write
+lz4 -3	safe-write
+lz4 -4	safe-write
+lz4 -5	safe-write
+lz4 -6	safe-write
+lz4 -7	safe-write
+lz4 -8	safe-write
+lz4 -9	safe-write
+lz4 -A	safe-write
+lz4 -B	safe-write
+lz4 -B x	safe-write
+lz4 -BD	safe-write
+lz4 -BI	safe-write
+lz4 -BX	safe-write
+lz4 -D x	safe-write
+lz4 -S x	safe-write
+lz4 -V	safe-write
+lz4 -c	safe-write
+lz4 -d	safe-write
+lz4 -f	safe-write
+lz4 -h	safe-write
+lz4 -k	safe-write
+lz4 -l	safe-write
+lz4 -m	safe-write
+lz4 -q	safe-write
+lz4 -r	safe-write
+lz4 -t	safe-write
+lz4 -v	safe-write
+lz4 -z	safe-write
+lz4 x	safe-write
+lz4c	safe-write
+lz4c --best	safe-write
+lz4c --best --block-size x	safe-write
+lz4c --best --compress	safe-write
+lz4c --best x	safe-write
+lz4c --block-size x	safe-write
+lz4c --compress	safe-write
+lz4c --content-size x	safe-write
+lz4c --decompress	safe-write
+lz4c --fast	safe-write
+lz4c --favor-decSpeed	safe-write
+lz4c --favor-decSpeed x	safe-write
+lz4c --force	safe-write
+lz4c --frame-block-size x	safe-write
+lz4c --help	safe-write
+lz4c --keep	safe-write
+lz4c --list	safe-write
+lz4c --long-help	safe-write
+lz4c --multiple	safe-write
+lz4c --no-frame-crc	safe-write
+lz4c --no-progress	safe-write
+lz4c --no-sparse	safe-write
+lz4c --no-test	safe-write
+lz4c --quiet	safe-write
+lz4c --rm	safe-write
+lz4c --sparse	safe-write
+lz4c --stdout	safe-write
+lz4c --test	safe-write
+lz4c --uncompress	safe-write
+lz4c --verbose	safe-write
+lz4c --version	safe-write
+lz4c -1	safe-write
+lz4c -2	safe-write
+lz4c -3	safe-write
+lz4c -4	safe-write
+lz4c -5	safe-write
+lz4c -6	safe-write
+lz4c -7	safe-write
+lz4c -8	safe-write
+lz4c -9	safe-write
+lz4c -A	safe-write
+lz4c -B	safe-write
+lz4c -B x	safe-write
+lz4c -BD	safe-write
+lz4c -BI	safe-write
+lz4c -BX	safe-write
+lz4c -D x	safe-write
+lz4c -S x	safe-write
+lz4c -V	safe-write
+lz4c -c	safe-write
+lz4c -d	safe-write
+lz4c -f	safe-write
+lz4c -h	safe-write
+lz4c -k	safe-write
+lz4c -l	safe-write
+lz4c -m	safe-write
+lz4c -q	safe-write
+lz4c -r	safe-write
+lz4c -t	safe-write
+lz4c -v	safe-write
+lz4c -z	safe-write
+lz4c x	safe-write
+lz4cat	safe-write
+lz4cat --best	safe-write
+lz4cat --best --block-size x	safe-write
+lz4cat --best --compress	safe-write
+lz4cat --best x	safe-write
+lz4cat --block-size x	safe-write
+lz4cat --compress	safe-write
+lz4cat --content-size x	safe-write
+lz4cat --decompress	safe-write
+lz4cat --fast	safe-write
+lz4cat --favor-decSpeed	safe-write
+lz4cat --favor-decSpeed x	safe-write
+lz4cat --force	safe-write
+lz4cat --frame-block-size x	safe-write
+lz4cat --help	safe-write
+lz4cat --keep	safe-write
+lz4cat --list	safe-write
+lz4cat --long-help	safe-write
+lz4cat --multiple	safe-write
+lz4cat --no-frame-crc	safe-write
+lz4cat --no-progress	safe-write
+lz4cat --no-sparse	safe-write
+lz4cat --no-test	safe-write
+lz4cat --quiet	safe-write
+lz4cat --rm	safe-write
+lz4cat --sparse	safe-write
+lz4cat --stdout	safe-write
+lz4cat --test	safe-write
+lz4cat --uncompress	safe-write
+lz4cat --verbose	safe-write
+lz4cat --version	safe-write
+lz4cat -1	safe-write
+lz4cat -2	safe-write
+lz4cat -3	safe-write
+lz4cat -4	safe-write
+lz4cat -5	safe-write
+lz4cat -6	safe-write
+lz4cat -7	safe-write
+lz4cat -8	safe-write
+lz4cat -9	safe-write
+lz4cat -A	safe-write
+lz4cat -B	safe-write
+lz4cat -B x	safe-write
+lz4cat -BD	safe-write
+lz4cat -BI	safe-write
+lz4cat -BX	safe-write
+lz4cat -D x	safe-write
+lz4cat -S x	safe-write
+lz4cat -V	safe-write
+lz4cat -c	safe-write
+lz4cat -d	safe-write
+lz4cat -f	safe-write
+lz4cat -h	safe-write
+lz4cat -k	safe-write
+lz4cat -l	safe-write
+lz4cat -m	safe-write
+lz4cat -q	safe-write
+lz4cat -r	safe-write
+lz4cat -t	safe-write
+lz4cat -v	safe-write
+lz4cat -z	safe-write
+lz4cat x	safe-write
+lzcat	safe-write
+lzcat --block-size x	safe-write
+lzcat --check	safe-write
+lzcat --check --block-size x	safe-write
+lzcat --check --compress	safe-write
+lzcat --check x	safe-write
+lzcat --check-lib	denied
+lzcat --check-lib --compress	denied
+lzcat --check-lib --match-length x	denied
+lzcat --check-lib x	denied
+lzcat --compress	safe-write
+lzcat --decompress	safe-write
+lzcat --delta x	safe-write
+lzcat --empty	denied
+lzcat --extreme	safe-write
+lzcat --fast	safe-write
+lzcat --files	safe-write
+lzcat --files x	safe-write
+lzcat --files0	safe-write
+lzcat --files0 x	safe-write
+lzcat --filters x	safe-write
+lzcat --filters1 x	safe-write
+lzcat --filters2 x	safe-write
+lzcat --filters3 x	safe-write
+lzcat --filters4 x	safe-write
+lzcat --flush-timeout x	safe-write
+lzcat --force	safe-write
+lzcat --format	safe-write
+lzcat --format x	safe-write
+lzcat --help	safe-write
+lzcat --ignore-check	safe-write
+lzcat --ignore-trailing	denied
+lzcat --info-alloc	safe-write
+lzcat --keep	safe-write
+lzcat --list	safe-write
+lzcat --loose-trailing	denied
+lzcat --lzma1	safe-write
+lzcat --lzma1 x	safe-write
+lzcat --lzma2	safe-write
+lzcat --lzma2 x	safe-write
+lzcat --match-length x	denied
+lzcat --member-size x	denied
+lzcat --memlimit	safe-write
+lzcat --memlimit-compress	safe-write
+lzcat --memlimit-compress x	safe-write
+lzcat --memlimit-decompress	safe-write
+lzcat --memlimit-decompress x	safe-write
+lzcat --memlimit-mt-decompress	safe-write
+lzcat --memlimit-mt-decompress x	safe-write
+lzcat --memory x	safe-write
+lzcat --no-adjust	safe-write
+lzcat --no-sparse	safe-write
+lzcat --no-warn	safe-write
+lzcat --presets x	safe-write
+lzcat --quiet	safe-write
+lzcat --robot	safe-write
+lzcat --single-stream	safe-write
+lzcat --stdout	safe-write
+lzcat --suffix	safe-write
+lzcat --suffix x	safe-write
+lzcat --test	denied
+lzcat --threads	safe-write
+lzcat --threads x	safe-write
+lzcat --to-stdout	safe-write
+lzcat --uncompress	safe-write
+lzcat --verbose	safe-write
+lzcat --version	safe-write
+lzcat --volume	denied
+lzcat --volume-size x	denied
+lzcat --x86 x	safe-write
+lzcat -0	safe-write
+lzcat -1	safe-write
+lzcat -2	safe-write
+lzcat -3	safe-write
+lzcat -4	safe-write
+lzcat -5	safe-write
+lzcat -6	safe-write
+lzcat -7	safe-write
+lzcat -8	safe-write
+lzcat -9	safe-write
+lzcat -A	denied
+lzcat -C	safe-write
+lzcat -C x	safe-write
+lzcat -D	denied
+lzcat -F	safe-write
+lzcat -F x	safe-write
+lzcat -H	safe-write
+lzcat -M x	safe-write
+lzcat -Q	safe-write
+lzcat -S	safe-write
+lzcat -S x	safe-write
+lzcat -T	safe-write
+lzcat -T x	safe-write
+lzcat -V	safe-write
+lzcat -a	denied
+lzcat -c	safe-write
+lzcat -d	safe-write
+lzcat -e	safe-write
+lzcat -f	safe-write
+lzcat -h	safe-write
+lzcat -k	safe-write
+lzcat -l	safe-write
+lzcat -m x	denied
+lzcat -n	denied
+lzcat -n x	denied
+lzcat -q	safe-write
+lzcat -s	denied
+lzcat -s x	denied
+lzcat -t	safe-write
+lzcat -v	safe-write
+lzcat -z	safe-write
+lzcat x	safe-write
+lzcmp	denied
+lzcmp --help	inert
+lzcmp --help --version	inert
+lzcmp --help x	inert
+lzcmp --version	inert
+lzcmp x	inert
+lzdiff	denied
+lzdiff --help	inert
+lzdiff --help --version	inert
+lzdiff --help x	inert
+lzdiff --version	inert
+lzdiff x	inert
+lzegrep	denied
+lzegrep --help	denied
+lzegrep --version	denied
+lzegrep x	inert
+lzfgrep	denied
+lzfgrep --help	denied
+lzfgrep --version	denied
+lzfgrep x	inert
+lzgrep	denied
+lzgrep --help	denied
+lzgrep --version	denied
+lzgrep x	inert
+lzip	safe-write
+lzip --check-lib	safe-write
+lzip --check-lib --compress	safe-write
+lzip --check-lib --match-length x	safe-write
+lzip --check-lib x	safe-write
+lzip --compress	safe-write
+lzip --decompress	safe-write
+lzip --empty	safe-write
+lzip --fast	safe-write
+lzip --force	safe-write
+lzip --help	safe-write
+lzip --ignore-trailing	safe-write
+lzip --keep	safe-write
+lzip --list	safe-write
+lzip --loose-trailing	safe-write
+lzip --match-length x	safe-write
+lzip --member-size x	safe-write
+lzip --quiet	safe-write
+lzip --stdout	safe-write
+lzip --test	safe-write
+lzip --threads	safe-write
+lzip --verbose	safe-write
+lzip --version	safe-write
+lzip --volume	safe-write
+lzip --volume-size x	safe-write
+lzip -0	safe-write
+lzip -1	safe-write
+lzip -2	safe-write
+lzip -3	safe-write
+lzip -4	safe-write
+lzip -5	safe-write
+lzip -6	safe-write
+lzip -7	safe-write
+lzip -8	safe-write
+lzip -9	safe-write
+lzip -A	safe-write
+lzip -D	safe-write
+lzip -F	safe-write
+lzip -S	safe-write
+lzip -V	safe-write
+lzip -a	safe-write
+lzip -c	safe-write
+lzip -d	safe-write
+lzip -f	safe-write
+lzip -h	safe-write
+lzip -k	safe-write
+lzip -l	safe-write
+lzip -m x	safe-write
+lzip -n	safe-write
+lzip -n x	safe-write
+lzip -q	safe-write
+lzip -s	safe-write
+lzip -s x	safe-write
+lzip -t	safe-write
+lzip -v	safe-write
+lzip -z	safe-write
+lzip x	safe-write
+lzless	inert
+lzless --help	denied
+lzless --version	denied
+lzless x	inert
+lzma	safe-write
+lzma --block-size x	safe-write
+lzma --check	safe-write
+lzma --check --block-size x	safe-write
+lzma --check --compress	safe-write
+lzma --check x	safe-write
+lzma --compress	safe-write
+lzma --decompress	safe-write
+lzma --delta x	safe-write
+lzma --extreme	safe-write
+lzma --fast	safe-write
+lzma --files	safe-write
+lzma --files x	safe-write
+lzma --files0	safe-write
+lzma --files0 x	safe-write
+lzma --filters x	safe-write
+lzma --filters1 x	safe-write
+lzma --filters2 x	safe-write
+lzma --filters3 x	safe-write
+lzma --filters4 x	safe-write
+lzma --flush-timeout x	safe-write
+lzma --force	safe-write
+lzma --format	safe-write
+lzma --format x	safe-write
+lzma --help	safe-write
+lzma --ignore-check	safe-write
+lzma --info-alloc	safe-write
+lzma --keep	safe-write
+lzma --list	safe-write
+lzma --lzma1	safe-write
+lzma --lzma1 x	safe-write
+lzma --lzma2	safe-write
+lzma --lzma2 x	safe-write
+lzma --memlimit	safe-write
+lzma --memlimit-compress	safe-write
+lzma --memlimit-compress x	safe-write
+lzma --memlimit-decompress	safe-write
+lzma --memlimit-decompress x	safe-write
+lzma --memlimit-mt-decompress	safe-write
+lzma --memlimit-mt-decompress x	safe-write
+lzma --memory x	safe-write
+lzma --no-adjust	safe-write
+lzma --no-sparse	safe-write
+lzma --no-warn	safe-write
+lzma --presets x	safe-write
+lzma --quiet	safe-write
+lzma --robot	safe-write
+lzma --single-stream	safe-write
+lzma --stdout	safe-write
+lzma --suffix	safe-write
+lzma --suffix x	safe-write
+lzma --threads	safe-write
+lzma --threads x	safe-write
+lzma --to-stdout	safe-write
+lzma --uncompress	safe-write
+lzma --verbose	safe-write
+lzma --version	safe-write
+lzma --x86 x	safe-write
+lzma -0	safe-write
+lzma -1	safe-write
+lzma -2	safe-write
+lzma -3	safe-write
+lzma -4	safe-write
+lzma -5	safe-write
+lzma -6	safe-write
+lzma -7	safe-write
+lzma -8	safe-write
+lzma -9	safe-write
+lzma -C	safe-write
+lzma -C x	safe-write
+lzma -F	safe-write
+lzma -F x	safe-write
+lzma -H	safe-write
+lzma -M x	safe-write
+lzma -Q	safe-write
+lzma -S x	safe-write
+lzma -T	safe-write
+lzma -T x	safe-write
+lzma -V	safe-write
+lzma -c	safe-write
+lzma -d	safe-write
+lzma -e	safe-write
+lzma -f	safe-write
+lzma -h	safe-write
+lzma -k	safe-write
+lzma -l	safe-write
+lzma -q	safe-write
+lzma -t	safe-write
+lzma -v	safe-write
+lzma -z	safe-write
+lzma x	safe-write
+lzmadec	inert
+lzmadec --decompress	inert
+lzmadec --decompress --help	inert
+lzmadec --decompress x	inert
+lzmadec --help	inert
+lzmadec --keep	inert
+lzmadec --no-warn	inert
+lzmadec --quiet	inert
+lzmadec --stdout	inert
+lzmadec --to-stdout	inert
+lzmadec --uncompress	inert
+lzmadec --version	inert
+lzmadec -Q	inert
+lzmadec -V	inert
+lzmadec -c	inert
+lzmadec -d	inert
+lzmadec -h	inert
+lzmadec -k	inert
+lzmadec -q	inert
+lzmadec x	inert
+lzmainfo	inert
+lzmainfo --help	inert
+lzmainfo --help --version	inert
+lzmainfo --help x	inert
+lzmainfo --version	inert
+lzmainfo x	inert
+lzmore	inert
+lzmore --help	denied
+lzmore --version	denied
+lzmore x	inert

@@ -1,0 +1,4269 @@
+M4	denied
+M4 --help	denied
+M4 --version	denied
+M4 x	denied
+m	denied
+m --help	inert
+m --help --version	inert
+m --help x	denied
+m --version	inert
+m -h	inert
+m -v	inert
+m x	denied
+m4	denied
+m4 --help	denied
+m4 --version	denied
+m4 -DCMD=syscmd file.m4	denied
+m4 file.m4	denied
+m4 x	denied
+macbinary	denied
+macbinary --directory x	safe-write
+macbinary --force	safe-write
+macbinary --force --directory x	safe-write
+macbinary --force --help	safe-write
+macbinary --force x	safe-write
+macbinary --help	safe-write
+macbinary --pipe	safe-write
+macbinary --rename x	safe-write
+macbinary --suffix x	safe-write
+macbinary --type x	safe-write
+macbinary --verbose	safe-write
+macbinary --version	safe-write
+macbinary -C x	safe-write
+macbinary -V	safe-write
+macbinary -c	safe-write
+macbinary -f	safe-write
+macbinary -h	safe-write
+macbinary -o x	safe-write
+macbinary -s x	safe-write
+macbinary -t x	safe-write
+macbinary -v	safe-write
+macbinary x	safe-write
+machine	inert
+machine --help	denied
+machine --version	denied
+machine x	denied
+madge	denied
+madge --basedir x	safe-read
+madge --circular	safe-read
+madge --circular --basedir x	safe-read
+madge --circular --debug	safe-read
+madge --circular x	safe-read
+madge --debug	safe-read
+madge --dot	safe-read
+madge --exclude x	safe-read
+madge --extensions x	safe-read
+madge --help	safe-read
+madge --include-npm	safe-read
+madge --json	safe-read
+madge --layout x	safe-read
+madge --leaves	safe-read
+madge --no-color	safe-read
+madge --no-count	safe-read
+madge --no-spinner	safe-read
+madge --orphans	safe-read
+madge --rankdir x	safe-read
+madge --require-config x	safe-read
+madge --stdin	safe-read
+madge --summary	safe-read
+madge --ts-config x	safe-read
+madge --version	safe-read
+madge --warning	safe-read
+madge --webpack-config x	safe-read
+madge x	safe-read
+mage	denied
+mage --help	safe-read
+mage --help --list	safe-read
+mage --help x	safe-read
+mage --list	safe-read
+mage --version	safe-read
+mage -V	safe-read
+mage -h	safe-read
+mage -l	safe-read
+mage x	safe-read
+magick	denied
+magick --help	inert
+magick --help --version	inert
+magick --help x	safe-write
+magick --version	inert
+magick -V	inert
+magick -h	inert
+magick -list color	safe-write
+magick -list font	safe-write
+magick -quality 85 in.jpg out.jpg	safe-write
+magick -resize 1200x in.png out.png	safe-write
+magick -script attack.msl	denied
+magick /Users/me/Downloads/x.avif -resize 1200x /tmp/out.png	safe-write
+magick animate animation.gif	denied
+magick combine	safe-write
+magick combine a.png b.png combined.png	safe-write
+magick combine x	safe-write
+magick compare	safe-write
+magick compare a.png b.png diff.png	safe-write
+magick compare x	safe-write
+magick composite	safe-write
+magick composite x	safe-write
+magick conjure script.msl	denied
+magick convert	denied
+magick convert -script attack.msl	denied
+magick convert in.png -resize 1200x out.png	safe-write
+magick convert in.png out.png	safe-write
+magick convert x	safe-write
+magick display photo.jpg	denied
+magick identify	denied
+magick identify photo.jpg	inert
+magick identify x	inert
+magick import screen.png	denied
+magick in.jpg -quality 85 out.jpg	safe-write
+magick in.png -resize 1200x out.png	safe-write
+magick in.png -script attack.msl out.png	denied
+magick in.png /etc/evil.png	denied
+magick in.png out.png	safe-write
+magick mogrify	safe-write
+magick mogrify -resize 50% photo.jpg	safe-write
+magick mogrify x	safe-write
+magick montage	safe-write
+magick montage *.png montage.png	safe-write
+magick montage x	safe-write
+magick stream	safe-write
+magick stream image.png pixels.gray	safe-write
+magick stream x	safe-write
+magick x	denied
+magick ~/Downloads/x.avif /tmp/out.png	safe-write
+make	denied
+make --directory x	denied
+make --dry-run	inert
+make --dry-run --directory x	inert
+make --dry-run --help	inert
+make --dry-run x	inert
+make --file x	denied
+make --help	inert
+make --jobs x	denied
+make --just-print	inert
+make --makefile x	denied
+make --print-data-base	inert
+make --question	denied
+make --recon	inert
+make --version	denied
+make -C x	denied
+make -V	denied
+make -f x	denied
+make -h	inert
+make -j x	denied
+make -n	inert
+make -n --directory x	inert
+make -n --dry-run	inert
+make -n --file x	inert
+make -n --help	inert
+make -n --jobs x	inert
+make -n --just-print	inert
+make -n --makefile x	inert
+make -n --print-data-base	inert
+make -n --question	inert
+make -n --recon	inert
+make -n --version	inert
+make -n -C x	inert
+make -n -V	inert
+make -n -f x	inert
+make -n -h	inert
+make -n -j x	inert
+make -n -n	inert
+make -n -p	inert
+make -n -q	inert
+make -p	inert
+make -q	denied
+make x	denied
+malloc_history	denied
+malloc_history --help	inert
+malloc_history --help -allByCount	inert
+malloc_history --help x	inert
+malloc_history --version	inert
+malloc_history -allByCount	inert
+malloc_history -allBySize	inert
+malloc_history -allEvents	inert
+malloc_history -callTree	inert
+malloc_history -chargeSystemLibraries	inert
+malloc_history -collapseRecursion	inert
+malloc_history -highWaterMark	inert
+malloc_history -ignoreThreads	inert
+malloc_history -invert	inert
+malloc_history -showContent	inert
+malloc_history -virtual	inert
+malloc_history x	inert
+mamba	denied
+mamba --help	inert
+mamba --help --version	denied
+mamba --help x	denied
+mamba --version	inert
+mamba -V	inert
+mamba -h	inert
+mamba info	inert
+mamba info --help	inert
+mamba info --help --json	inert
+mamba info --help x	inert
+mamba info --json	inert
+mamba info -h	inert
+mamba info x	inert
+mamba list	inert
+mamba list --help	inert
+mamba list --help --json	inert
+mamba list --help --name x	inert
+mamba list --help x	inert
+mamba list --json	inert
+mamba list --name x	inert
+mamba list --prefix x	inert
+mamba list -h	inert
+mamba list -n x	inert
+mamba list -p x	inert
+mamba list x	inert
+mamba shell	denied
+mamba shell hook	inert
+mamba shell hook --help	inert
+mamba shell hook --help --shell x	inert
+mamba shell hook --help -h	inert
+mamba shell hook --help x	denied
+mamba shell hook --shell x	inert
+mamba shell hook -h	inert
+mamba shell hook -s x	inert
+mamba shell hook x	denied
+mamba shell x	denied
+mamba x	denied
+man	denied
+man --all	inert
+man --all --apropos	inert
+man --all --config-file x	inert
+man --all x	inert
+man --apropos	inert
+man --config-file x	inert
+man --default	inert
+man --encoding x	inert
+man --extension x	inert
+man --help	inert
+man --local-file	inert
+man --locale x	inert
+man --manpath x	inert
+man --regex	inert
+man --sections x	inert
+man --systems x	inert
+man --update	inert
+man --version	inert
+man --whatis	inert
+man --where	inert
+man --where-cat	inert
+man --wildcard	inert
+man -C x	inert
+man -E x	inert
+man -L x	inert
+man -M x	inert
+man -S x	inert
+man -V	inert
+man -a	inert
+man -e x	inert
+man -f	inert
+man -h	inert
+man -k	inert
+man -l	inert
+man -m x	inert
+man -u	inert
+man -w	inert
+man x	inert
+mandoc	inert
+mandoc --evil file	denied
+mandoc --help	denied
+mandoc --version	denied
+mandoc -I x	inert
+mandoc -K x	inert
+mandoc -O indent=4 -T utf8 manpage.1	inert
+mandoc -O x	inert
+mandoc -T html /usr/share/man/man1/ls.1	inert
+mandoc -T x	inert
+mandoc -W warning manpage.1	inert
+mandoc -W x	inert
+mandoc -a	inert
+mandoc -a -I x	inert
+mandoc -a -c	inert
+mandoc -a x	inert
+mandoc -c	inert
+mandoc -man	inert
+mandoc -man manpage.1	inert
+mandoc -mdoc	inert
+mandoc -mdoc /usr/share/man/man1/ls.1	inert
+mandoc /usr/share/man/man1/ls.1	inert
+mandoc x	inert
+manpath	inert
+manpath --help	denied
+manpath --version	denied
+manpath -L	inert
+manpath -L -d	inert
+manpath -L x	denied
+manpath -d	inert
+manpath -q	inert
+manpath foo	denied
+manpath x	denied
+mariadb	denied
+mariadb --help	inert
+mariadb --help --version	inert
+mariadb --help x	denied
+mariadb --version	inert
+mariadb -?	inert
+mariadb -V	inert
+mariadb x	denied
+markdownlint	safe-read
+markdownlint --config x	safe-read
+markdownlint --dot	safe-read
+markdownlint --dot --config x	safe-read
+markdownlint --dot --fix	safe-write
+markdownlint --dot x	safe-read
+markdownlint --fix	safe-write
+markdownlint --help	safe-read
+markdownlint --ignore x	safe-read
+markdownlint --ignore-path x	safe-read
+markdownlint --output	safe-write
+markdownlint --output x	safe-write
+markdownlint --quiet	safe-read
+markdownlint --rules x	safe-read
+markdownlint --stdin	safe-read
+markdownlint --version	safe-read
+markdownlint -V	safe-read
+markdownlint -c x	safe-read
+markdownlint -d	safe-read
+markdownlint -f	safe-write
+markdownlint -h	safe-read
+markdownlint -i x	safe-read
+markdownlint -o	safe-write
+markdownlint -o x	safe-write
+markdownlint -q	safe-read
+markdownlint -r x	safe-read
+markdownlint -s	safe-read
+markdownlint x	safe-read
+markdownlint-cli2	safe-read
+markdownlint-cli2 --config x	safe-read
+markdownlint-cli2 --directories x	safe-read
+markdownlint-cli2 --fix	safe-write
+markdownlint-cli2 --fix --config x	safe-write
+markdownlint-cli2 --fix --help	safe-write
+markdownlint-cli2 --fix x	safe-write
+markdownlint-cli2 --help	safe-read
+markdownlint-cli2 --no-globs	safe-read
+markdownlint-cli2 --no-globs x	safe-read
+markdownlint-cli2 --no-inline-config	safe-read
+markdownlint-cli2 --quiet	safe-read
+markdownlint-cli2 --version	denied
+markdownlint-cli2 x	safe-read
+marp	denied
+marp --allow-local-files x	safe-write
+marp --bespoke.osc	safe-write
+marp --bespoke.osc --allow-local-files x	safe-write
+marp --bespoke.osc --bespoke.progress	safe-write
+marp --bespoke.osc x	safe-write
+marp --bespoke.progress	safe-write
+marp --bespoke.transition	safe-write
+marp --browser x	safe-write
+marp --browser-path x	safe-write
+marp --browser-protocol	safe-write
+marp --browser-protocol x	safe-write
+marp --browser-timeout x	safe-write
+marp --config-file	safe-write
+marp --config-file x	safe-write
+marp --description	safe-write
+marp --description x	safe-write
+marp --engine	safe-write
+marp --engine x	safe-write
+marp --help	safe-write
+marp --html	safe-write
+marp --image	safe-write
+marp --images	safe-write
+marp --input-dir	safe-write
+marp --input-dir x	safe-write
+marp --no-config-file	safe-write
+marp --no-stdin	safe-write
+marp --ogImage	safe-write
+marp --ogImage x	safe-write
+marp --output	safe-write
+marp --output x	safe-write
+marp --parallel x	safe-write
+marp --pdf	safe-write
+marp --pdf-notes	safe-write
+marp --pdf-notes x	safe-write
+marp --pdf-outlines	safe-write
+marp --pdf-outlines.headings	safe-write
+marp --pdf-outlines.pages	safe-write
+marp --pptx	safe-write
+marp --pptx-editable	safe-write
+marp --preview	safe-write
+marp --quiet	safe-write
+marp --server	safe-write
+marp --stdin	safe-write
+marp --template	safe-write
+marp --theme	safe-write
+marp --theme x	safe-write
+marp --themeSet	safe-write
+marp --themeSet x	safe-write
+marp --title	safe-write
+marp --title x	safe-write
+marp --toc	safe-write
+marp --url	safe-write
+marp --url x	safe-write
+marp --version	safe-write
+marp --watch	safe-write
+marp -I x	safe-write
+marp -c	safe-write
+marp -c x	safe-write
+marp -h	safe-write
+marp -o	safe-write
+marp -o x	safe-write
+marp -p	safe-write
+marp -q	safe-write
+marp -s	safe-write
+marp -t	safe-write
+marp -v	safe-write
+marp -w	safe-write
+marp x	safe-write
+masscan	denied
+masscan --banners x	safe-write
+masscan --config x	safe-write
+masscan --echo	safe-write
+masscan --echo --banners x	safe-write
+masscan --echo --echo-cidr	safe-write
+masscan --echo x	safe-write
+masscan --echo-cidr	safe-write
+masscan --exclude	safe-write
+masscan --exclude x	safe-write
+masscan --excludefile	safe-write
+masscan --excludefile x	safe-write
+masscan --help	safe-write
+masscan --http-user-agent	safe-write
+masscan --http-user-agent x	safe-write
+masscan --includefile	safe-write
+masscan --includefile x	safe-write
+masscan --output-filename x	safe-write
+masscan --output-format x	safe-write
+masscan --ping	safe-write
+masscan --randomize-hosts	safe-write
+masscan --rate	safe-write
+masscan --rate x	safe-write
+masscan --readscan x	safe-write
+masscan --reason	safe-write
+masscan --retries	safe-write
+masscan --retries x	safe-write
+masscan --rotate x	safe-write
+masscan --rotate-dir x	safe-write
+masscan --source-ip	safe-write
+masscan --source-ip x	safe-write
+masscan --source-port	safe-write
+masscan --source-port x	safe-write
+masscan --ttl	safe-write
+masscan --ttl x	safe-write
+masscan --user-agent	safe-write
+masscan --version	safe-write
+masscan --wait	safe-write
+masscan --wait x	safe-write
+masscan -?	safe-write
+masscan -c	safe-write
+masscan -c x	safe-write
+masscan -d	safe-write
+masscan -h	safe-write
+masscan -iL	safe-write
+masscan -iL x	safe-write
+masscan -iR	safe-write
+masscan -iR x	safe-write
+masscan -oG	safe-write
+masscan -oG x	safe-write
+masscan -oJ	safe-write
+masscan -oJ x	safe-write
+masscan -oL	safe-write
+masscan -oL x	safe-write
+masscan -oU	safe-write
+masscan -oU x	safe-write
+masscan -oX	safe-write
+masscan -oX x	safe-write
+masscan -p	safe-write
+masscan -p x	safe-write
+masscan -r x	safe-write
+masscan -v	safe-write
+masscan -w x	safe-write
+masscan x	safe-write
+mc	denied
+mc --config-dir ./.mc ls x	safe-read
+mc --config-dir /etc ls x	denied
+mc --config-dir x	denied
+mc --debug	denied
+mc --debug --config-dir x	denied
+mc --debug --help	inert
+mc --debug x	denied
+mc --help	inert
+mc --insecure	denied
+mc --json	denied
+mc --no-color	denied
+mc --quiet	denied
+mc --retries x	denied
+mc --timeout x	denied
+mc --version	inert
+mc -h	inert
+mc -v	inert
+mc admin	denied
+mc admin x	denied
+mc alias	inert
+mc alias export	denied
+mc alias export x	denied
+mc alias import	denied
+mc alias import x	denied
+mc alias list	inert
+mc alias list --help	inert
+mc alias list --help -h	inert
+mc alias list --help x	inert
+mc alias list -h	inert
+mc alias list x	inert
+mc alias remove	denied
+mc alias remove x	denied
+mc alias set	denied
+mc alias set x	denied
+mc alias x	denied
+mc anonymous	denied
+mc anonymous x	denied
+mc batch	denied
+mc batch x	denied
+mc cat	denied
+mc cat --encrypt-key	safe-read
+mc cat --encrypt-key --encrypt-key x	safe-read
+mc cat --encrypt-key --help	safe-read
+mc cat --encrypt-key x	safe-read
+mc cat --help	safe-read
+mc cat --rewind	safe-read
+mc cat --rewind x	safe-read
+mc cat --version-id x	safe-read
+mc cat -h	safe-read
+mc cat x	safe-read
+mc completion	denied
+mc completion --help	inert
+mc completion --help -h	inert
+mc completion --help x	inert
+mc completion -h	inert
+mc completion x	inert
+mc config	denied
+mc config x	denied
+mc cp	denied
+mc cp src dst	denied
+mc cp x	denied
+mc diff	denied
+mc diff x	denied
+mc du	denied
+mc du --depth	safe-read
+mc du --depth --depth x	safe-read
+mc du --depth --help	safe-read
+mc du --depth x	safe-read
+mc du --help	safe-read
+mc du --recursive	safe-read
+mc du --rewind	safe-read
+mc du --rewind x	safe-read
+mc du --versions	safe-read
+mc du -d	safe-read
+mc du -h	safe-read
+mc du -r	safe-read
+mc du x	safe-read
+mc encrypt	denied
+mc encrypt x	denied
+mc event	denied
+mc event x	denied
+mc find	denied
+mc find --help	safe-read
+mc find --help --ignore	safe-read
+mc find --help --maxdepth x	safe-read
+mc find --help x	safe-read
+mc find --ignore	safe-read
+mc find --maxdepth x	safe-read
+mc find --metadata	safe-read
+mc find --mindepth x	safe-read
+mc find --name	safe-read
+mc find --name x	safe-read
+mc find --newer-than	safe-read
+mc find --newer-than x	safe-read
+mc find --older-than	safe-read
+mc find --older-than x	safe-read
+mc find --path	safe-read
+mc find --path x	safe-read
+mc find --print	safe-read
+mc find --print x	safe-read
+mc find --recursive	safe-read
+mc find --regex	safe-read
+mc find --regex x	safe-read
+mc find --rewind	safe-read
+mc find --versions	safe-read
+mc find --watch	safe-read
+mc find -h	safe-read
+mc find -r	safe-read
+mc find bucket --exec rm	denied
+mc find bucket --name foo	safe-read
+mc find x	safe-read
+mc head	denied
+mc head --encrypt-key	safe-read
+mc head --encrypt-key --encrypt-key x	safe-read
+mc head --encrypt-key --help	safe-read
+mc head --encrypt-key x	safe-read
+mc head --help	safe-read
+mc head --lines x	safe-read
+mc head --rewind	safe-read
+mc head --rewind x	safe-read
+mc head --version-id x	safe-read
+mc head -h	safe-read
+mc head -n x	safe-read
+mc head x	safe-read
+mc help	inert
+mc help x	inert
+mc idp	denied
+mc idp x	denied
+mc ilm	denied
+mc ilm x	denied
+mc legalhold	denied
+mc legalhold x	denied
+mc license	denied
+mc license x	denied
+mc license-update	denied
+mc license-update x	denied
+mc lock	denied
+mc lock x	denied
+mc ls	denied
+mc ls --help	safe-read
+mc ls --help --incomplete	safe-read
+mc ls --help x	safe-read
+mc ls --incomplete	safe-read
+mc ls --metadata	safe-read
+mc ls --no-color	safe-read
+mc ls --recursive	safe-read
+mc ls --rewind	safe-read
+mc ls --summarize	safe-read
+mc ls --versions	safe-read
+mc ls -I	safe-read
+mc ls -S	safe-read
+mc ls -h	safe-read
+mc ls -r	safe-read
+mc ls bucket	safe-read
+mc ls x	safe-read
+mc mb	denied
+mc mb x	denied
+mc mirror	denied
+mc mirror x	denied
+mc mv	denied
+mc mv x	denied
+mc od	denied
+mc od x	denied
+mc ping	denied
+mc ping x	denied
+mc pipe	denied
+mc pipe x	denied
+mc policy	denied
+mc policy x	denied
+mc quota	denied
+mc quota x	denied
+mc rb	denied
+mc rb x	denied
+mc ready	denied
+mc ready x	denied
+mc replicate	denied
+mc replicate x	denied
+mc retention	denied
+mc retention x	denied
+mc rm	denied
+mc rm bucket/file	denied
+mc rm x	denied
+mc share	denied
+mc share x	denied
+mc stat	denied
+mc stat --encrypt-key	safe-read
+mc stat --encrypt-key --encrypt-key x	safe-read
+mc stat --encrypt-key --help	safe-read
+mc stat --encrypt-key x	safe-read
+mc stat --help	safe-read
+mc stat --no-list	safe-read
+mc stat --recursive	safe-read
+mc stat --rewind	safe-read
+mc stat --rewind x	safe-read
+mc stat --version-id x	safe-read
+mc stat --versions	safe-read
+mc stat -h	safe-read
+mc stat -r	safe-read
+mc stat x	safe-read
+mc support	denied
+mc support x	denied
+mc sync	denied
+mc sync x	denied
+mc tag	denied
+mc tag x	denied
+mc tree	denied
+mc tree --depth	safe-read
+mc tree --depth --depth x	safe-read
+mc tree --depth --files	safe-read
+mc tree --depth x	safe-read
+mc tree --files	safe-read
+mc tree --help	safe-read
+mc tree --no-color	safe-read
+mc tree -d	safe-read
+mc tree -f	safe-read
+mc tree -h	safe-read
+mc tree x	safe-read
+mc update	denied
+mc update x	denied
+mc version	inert
+mc version --help	inert
+mc version --help -h	inert
+mc version --help x	inert
+mc version -h	inert
+mc version x	inert
+mc watch	denied
+mc watch x	denied
+mc x	denied
+mcs	denied
+mcs --help	safe-write
+mcs --help --version	safe-write
+mcs --help /d x	safe-write
+mcs --help x	safe-write
+mcs --version	safe-write
+mcs -?	safe-write
+mcs -help	safe-write
+mcs -langversion	safe-write
+mcs /checked	safe-write
+mcs /checked-	safe-write
+mcs /codepage:auto	safe-write
+mcs /d x	safe-write
+mcs /debug	safe-write
+mcs /debug+	safe-write
+mcs /debug-	safe-write
+mcs /define x	safe-write
+mcs /doc x	safe-write
+mcs /help	safe-write
+mcs /keycontainer x	safe-write
+mcs /keyfile x	safe-write
+mcs /l x	safe-write
+mcs /lib x	safe-write
+mcs /main x	safe-write
+mcs /noconfig	safe-write
+mcs /nologo	safe-write
+mcs /nostdlib	safe-write
+mcs /nowarn	safe-write
+mcs /optimize	safe-write
+mcs /optimize+	safe-write
+mcs /optimize-	safe-write
+mcs /out x	safe-write
+mcs /pkg x	safe-write
+mcs /r x	safe-write
+mcs /recurse	safe-write
+mcs /recurse x	safe-write
+mcs /reference x	safe-write
+mcs /target x	safe-write
+mcs /target:exe	safe-write
+mcs /target:library	safe-write
+mcs /target:module	safe-write
+mcs /target:winexe	safe-write
+mcs /unsafe	safe-write
+mcs /unsafe+	safe-write
+mcs /unsafe-	safe-write
+mcs /v	safe-write
+mcs /warn x	safe-write
+mcs /warnaserror	safe-write
+mcs /warnaserror x	safe-write
+mcs /warnaserror+	safe-write
+mcs /warnaserror-	safe-write
+mcs /win32icon x	safe-write
+mcs /win32res x	safe-write
+mcs x	safe-write
+md5	inert
+md5 --help	inert
+md5 --help --version	inert
+md5 --help -s x	inert
+md5 --help x	inert
+md5 --version	inert
+md5 -V	inert
+md5 -h	inert
+md5 -n	inert
+md5 -p	inert
+md5 -q	inert
+md5 -r	inert
+md5 -s x	inert
+md5 -t	inert
+md5 file.txt	inert
+md5 x	inert
+md5sum	inert
+md5sum --binary	inert
+md5sum --binary --check	inert
+md5sum --binary x	inert
+md5sum --check	inert
+md5sum --help	inert
+md5sum --ignore-missing	inert
+md5sum --quiet	inert
+md5sum --status	inert
+md5sum --strict	inert
+md5sum --tag	inert
+md5sum --text	inert
+md5sum --version	inert
+md5sum --warn	inert
+md5sum --zero	inert
+md5sum -V	inert
+md5sum -b	inert
+md5sum -c	inert
+md5sum -h	inert
+md5sum -t	inert
+md5sum -w	inert
+md5sum -z	inert
+md5sum file.txt	inert
+md5sum x	inert
+mdbook	denied
+mdbook --dest-dir x	denied
+mdbook --help	inert
+mdbook --help --dest-dir x	denied
+mdbook --help --version	denied
+mdbook --help x	denied
+mdbook --version	inert
+mdbook -V	inert
+mdbook -d x	denied
+mdbook -h	inert
+mdbook build	safe-write
+mdbook build --dest-dir x	safe-write
+mdbook build --help	safe-write
+mdbook build --help --dest-dir x	safe-write
+mdbook build --help --open	safe-write
+mdbook build --help x	safe-write
+mdbook build --open	safe-write
+mdbook build -d x	safe-write
+mdbook build -h	safe-write
+mdbook build -o	safe-write
+mdbook build x	safe-write
+mdbook clean	safe-write
+mdbook clean --dest-dir x	safe-write
+mdbook clean --help	safe-write
+mdbook clean --help --dest-dir x	safe-write
+mdbook clean --help -h	safe-write
+mdbook clean --help x	safe-write
+mdbook clean -d x	safe-write
+mdbook clean -h	safe-write
+mdbook clean x	safe-write
+mdbook test	safe-read
+mdbook test --dest-dir x	safe-read
+mdbook test --help	safe-read
+mdbook test --help --dest-dir x	safe-read
+mdbook test --help -h	safe-read
+mdbook test --help x	safe-read
+mdbook test --library-path x	safe-read
+mdbook test -L x	safe-read
+mdbook test -d x	safe-read
+mdbook test -h	safe-read
+mdbook test x	safe-read
+mdbook x	denied
+mdfind	denied
+mdfind 'kMDItemKind == Application'	inert
+mdfind --help	inert
+mdfind --help --version	inert
+mdfind --help -attr x	inert
+mdfind --help x	inert
+mdfind --version	inert
+mdfind -0	inert
+mdfind -V	inert
+mdfind -attr x	inert
+mdfind -count	inert
+mdfind -h	inert
+mdfind -interpret	inert
+mdfind -literal	inert
+mdfind -live	inert
+mdfind -name x	inert
+mdfind -onlyin x	inert
+mdfind -s x	inert
+mdfind x	inert
+mdls	denied
+mdls --help	inert
+mdls --help --name x	inert
+mdls --help --raw	inert
+mdls --help x	inert
+mdls --name x	inert
+mdls --nullMarker x	inert
+mdls --raw	inert
+mdls --version	inert
+mdls -V	inert
+mdls -h	inert
+mdls -n x	inert
+mdls -r	inert
+mdls file.txt	inert
+mdls x	inert
+mediainfo	denied
+mediainfo --BlockMethod x	safe-read
+mediainfo --Help	safe-read
+mediainfo --Help --BlockMethod x	safe-read
+mediainfo --Help --Help-Outputs	safe-read
+mediainfo --Help x	safe-read
+mediainfo --Help-Outputs	safe-read
+mediainfo --Info-Capacities	safe-read
+mediainfo --Info-OutputFormats	safe-read
+mediainfo --Info-Parameters	safe-read
+mediainfo --Info-Parameters_CSV	safe-read
+mediainfo --Info-Version	safe-read
+mediainfo --Inform x	safe-read
+mediainfo --LogFile	safe-read
+mediainfo --LogFile x	safe-read
+mediainfo --Output	safe-read
+mediainfo --Output x	safe-read
+mediainfo --ParseSpeed x	safe-read
+mediainfo --ReadByHuman x	safe-read
+mediainfo --Trace_Format x	safe-read
+mediainfo --Trace_Level x	safe-read
+mediainfo --Version	safe-read
+mediainfo --help	denied
+mediainfo --version	denied
+mediainfo -f	safe-read
+mediainfo -h	safe-read
+mediainfo -i x	safe-read
+mediainfo x	safe-read
+mesg	inert
+mesg --help	denied
+mesg --version	denied
+mesg n	inert
+mesg x	inert
+mesg y	inert
+meson	denied
+meson --help	inert
+meson --help --version	denied
+meson --help x	denied
+meson --version	inert
+meson -V	inert
+meson -h	inert
+meson configure	inert
+meson configure --help	inert
+meson configure --help -h	inert
+meson configure --help x	inert
+meson configure -h	inert
+meson configure x	inert
+meson info	inert
+meson info --help	inert
+meson info --help -h	inert
+meson info --help x	inert
+meson info -h	inert
+meson info x	inert
+meson introspect	inert
+meson introspect --all	inert
+meson introspect --all --backend x	inert
+meson introspect --all --benchmarks	inert
+meson introspect --all x	inert
+meson introspect --backend x	inert
+meson introspect --benchmarks	inert
+meson introspect --buildoptions	inert
+meson introspect --buildsystem-files	inert
+meson introspect --dependencies	inert
+meson introspect --help	inert
+meson introspect --indent x	inert
+meson introspect --installed	inert
+meson introspect --projectinfo	inert
+meson introspect --targets	inert
+meson introspect --tests	inert
+meson introspect -a	inert
+meson introspect -h	inert
+meson introspect x	inert
+meson x	denied
+micro	inert
+micro --help	inert
+micro --help -debug	inert
+micro --help x	inert
+micro --version	denied
+micro -debug	inert
+micro -options	inert
+micro -version	inert
+micro x	inert
+middleman	denied
+middleman --help	inert
+middleman --help --version	denied
+middleman --help x	denied
+middleman --version	inert
+middleman -h	inert
+middleman -v	inert
+middleman build	denied
+middleman build x	denied
+middleman console	denied
+middleman console x	denied
+middleman extension	denied
+middleman extension x	denied
+middleman help	inert
+middleman help x	inert
+middleman init	denied
+middleman init x	denied
+middleman new	denied
+middleman new x	denied
+middleman server	denied
+middleman server x	denied
+middleman version	inert
+middleman version --help	inert
+middleman version --help -h	inert
+middleman version --help x	inert
+middleman version -h	inert
+middleman version x	inert
+middleman x	denied
+mig	denied
+mig --help	denied
+mig --version	denied
+mig -B	safe-write
+mig -B -K	safe-write
+mig -B -arch x	safe-write
+mig -B x	safe-write
+mig -K	safe-write
+mig -L	safe-write
+mig -MD	safe-write
+mig -Q	safe-write
+mig -S	safe-write
+mig -V	safe-write
+mig -arch x	safe-write
+mig -b	safe-write
+mig -cc x	safe-write
+mig -cpp	safe-write
+mig -dheader x	safe-write
+mig -header x	safe-write
+mig -i x	safe-write
+mig -iheader x	safe-write
+mig -isysroot x	safe-write
+mig -k	safe-write
+mig -l	safe-write
+mig -maxonstack x	safe-write
+mig -migcom x	safe-write
+mig -q	safe-write
+mig -s	safe-write
+mig -server x	safe-write
+mig -sheader x	safe-write
+mig -split	safe-write
+mig -user user.c -server server.c -header user.h spec.defs	safe-write
+mig -user x	safe-write
+mig -v	safe-write
+mig x	safe-write
+migcom	denied
+migcom --help	denied
+migcom --version	denied
+migcom -B	safe-write
+migcom -B -K	safe-write
+migcom -B -dheader x	safe-write
+migcom -B x	safe-write
+migcom -K	safe-write
+migcom -L	safe-write
+migcom -Q	safe-write
+migcom -S	safe-write
+migcom -V	safe-write
+migcom -b	safe-write
+migcom -dheader x	safe-write
+migcom -header x	safe-write
+migcom -i x	safe-write
+migcom -iheader x	safe-write
+migcom -k	safe-write
+migcom -l	safe-write
+migcom -maxonstack x	safe-write
+migcom -q	safe-write
+migcom -s	safe-write
+migcom -server x	safe-write
+migcom -sheader x	safe-write
+migcom -split	safe-write
+migcom -user x	safe-write
+migcom -v	safe-write
+migcom x	safe-write
+migrate	denied
+migrate --help	inert
+migrate --help --version	denied
+migrate --help x	denied
+migrate --version	inert
+migrate -h	inert
+migrate create	denied
+migrate create x	denied
+migrate down	denied
+migrate down x	denied
+migrate drop	denied
+migrate drop x	denied
+migrate force	denied
+migrate force x	denied
+migrate goto	denied
+migrate goto x	denied
+migrate help	inert
+migrate help x	inert
+migrate up	denied
+migrate up x	denied
+migrate version	inert
+migrate version x	inert
+migrate x	denied
+mill	denied
+mill --bell	inert
+mill --bell --debug	inert
+mill --bell x	denied
+mill --debug	inert
+mill --disable-callgraph	inert
+mill --disable-prompt	inert
+mill --enable-prompt	inert
+mill --help	inert
+mill --interactive	inert
+mill --no-server	inert
+mill --silent	inert
+mill --ticker	inert
+mill --version	inert
+mill --watch	inert
+mill -V	inert
+mill -b	inert
+mill -d	inert
+mill -h	inert
+mill -i	inert
+mill -s	inert
+mill -w	inert
+mill x	denied
+minikube	denied
+minikube --help	inert
+minikube --help --version	denied
+minikube --help x	denied
+minikube --version	inert
+minikube -h	inert
+minikube addons	denied
+minikube addons list	inert
+minikube addons list --help	inert
+minikube addons list --help --output	inert
+minikube addons list --help --profile x	inert
+minikube addons list --help x	inert
+minikube addons list --output	inert
+minikube addons list --profile x	inert
+minikube addons list -h	inert
+minikube addons list -o	inert
+minikube addons list -p x	inert
+minikube addons list x	inert
+minikube addons x	denied
+minikube ip	inert
+minikube ip --help	inert
+minikube ip --help --node x	inert
+minikube ip --help -h	inert
+minikube ip --help x	inert
+minikube ip --node x	inert
+minikube ip --profile x	inert
+minikube ip -h	inert
+minikube ip -n x	inert
+minikube ip -p x	inert
+minikube ip x	inert
+minikube profile	denied
+minikube profile list	inert
+minikube profile list --help	inert
+minikube profile list --help --light	inert
+minikube profile list --help x	inert
+minikube profile list --light	inert
+minikube profile list --output	inert
+minikube profile list -h	inert
+minikube profile list -l	inert
+minikube profile list -o	inert
+minikube profile list x	inert
+minikube profile x	denied
+minikube service	denied
+minikube service list	inert
+minikube service list --help	inert
+minikube service list --help --namespace	inert
+minikube service list --help --profile x	inert
+minikube service list --help x	inert
+minikube service list --namespace	inert
+minikube service list --profile x	inert
+minikube service list -h	inert
+minikube service list -p x	inert
+minikube service list x	inert
+minikube service x	denied
+minikube status	inert
+minikube status --format	inert
+minikube status --format --help	inert
+minikube status --format --node x	inert
+minikube status --format x	inert
+minikube status --help	inert
+minikube status --node x	inert
+minikube status --output	inert
+minikube status --profile x	inert
+minikube status -h	inert
+minikube status -n x	inert
+minikube status -o	inert
+minikube status -p x	inert
+minikube status x	inert
+minikube version	inert
+minikube version --components	inert
+minikube version --components --help	inert
+minikube version --components x	inert
+minikube version --help	inert
+minikube version --output	inert
+minikube version --short	inert
+minikube version -h	inert
+minikube version -o	inert
+minikube version x	inert
+minikube x	denied
+mise	denied
+mise --help	inert
+mise --help --version	denied
+mise --help x	denied
+mise --version	inert
+mise -V	inert
+mise -h	inert
+mise activate	inert
+mise activate --help	inert
+mise activate --help --no-hook-env	inert
+mise activate --help x	inert
+mise activate --no-hook-env	inert
+mise activate --quiet	inert
+mise activate --shims	inert
+mise activate -h	inert
+mise activate bash	inert
+mise activate bash --shims	inert
+mise activate x	inert
+mise activate zsh	inert
+mise backends	inert
+mise backends list	inert
+mise backends list --help	inert
+mise backends list --help -h	inert
+mise backends list --help x	inert
+mise backends list -h	inert
+mise backends list -q	inert
+mise backends list -v	inert
+mise backends list x	inert
+mise backends ls	inert
+mise backends ls --help	inert
+mise backends ls --help -h	inert
+mise backends ls --help x	inert
+mise backends ls -h	inert
+mise backends ls -q	inert
+mise backends ls -v	inert
+mise backends ls x	inert
+mise backends x	denied
+mise bin-paths	inert
+mise bin-paths --help	inert
+mise bin-paths --help -h	inert
+mise bin-paths --help x	inert
+mise bin-paths -h	inert
+mise bin-paths -q	inert
+mise bin-paths -v	inert
+mise bin-paths x	inert
+mise cache	inert
+mise cache clear	denied
+mise cache clear --help	inert
+mise cache clear --help -h	inert
+mise cache clear --help x	denied
+mise cache clear -h	inert
+mise cache clear x	denied
+mise cache path	inert
+mise cache path --help	inert
+mise cache path --help -h	inert
+mise cache path --help x	inert
+mise cache path -h	inert
+mise cache path -q	inert
+mise cache path -v	inert
+mise cache path x	inert
+mise cache prune	denied
+mise cache prune --help	inert
+mise cache prune --help -h	inert
+mise cache prune --help x	denied
+mise cache prune -h	inert
+mise cache prune x	denied
+mise cache x	denied
+mise completion	inert
+mise completion --help	inert
+mise completion --help -h	inert
+mise completion --help x	inert
+mise completion -h	inert
+mise completion -q	inert
+mise completion -v	inert
+mise completion x	inert
+mise config	inert
+mise config generate	denied
+mise config generate --help	inert
+mise config generate --help -h	inert
+mise config generate --help x	denied
+mise config generate -h	inert
+mise config generate x	denied
+mise config get	inert
+mise config get --help	inert
+mise config get --help -h	inert
+mise config get --help x	inert
+mise config get -h	inert
+mise config get -q	inert
+mise config get -v	inert
+mise config get x	inert
+mise config list	inert
+mise config list --help	inert
+mise config list --help -h	inert
+mise config list --help x	inert
+mise config list -h	inert
+mise config list -q	inert
+mise config list -v	inert
+mise config list x	inert
+mise config ls	inert
+mise config ls --help	inert
+mise config ls --help -h	inert
+mise config ls --help x	inert
+mise config ls -h	inert
+mise config ls -q	inert
+mise config ls -v	inert
+mise config ls x	inert
+mise config set	denied
+mise config set --help	inert
+mise config set --help -h	inert
+mise config set --help x	denied
+mise config set -h	inert
+mise config set x	denied
+mise config x	denied
+mise current	inert
+mise current --help	inert
+mise current --help -h	inert
+mise current --help x	inert
+mise current -h	inert
+mise current -q	inert
+mise current -v	inert
+mise current x	inert
+mise deactivate	denied
+mise deactivate --help	inert
+mise deactivate --help -h	inert
+mise deactivate --help x	denied
+mise deactivate -h	inert
+mise deactivate x	denied
+mise doctor	inert
+mise doctor --help	inert
+mise doctor --help -h	inert
+mise doctor --help x	inert
+mise doctor -h	inert
+mise doctor -q	inert
+mise doctor -v	inert
+mise doctor x	inert
+mise edit	denied
+mise edit --help	inert
+mise edit --help -h	inert
+mise edit --help x	denied
+mise edit -h	inert
+mise edit x	denied
+mise en	denied
+mise en --help	inert
+mise en --help -h	inert
+mise en --help x	denied
+mise en -h	inert
+mise en x	denied
+mise env	inert
+mise env --help	inert
+mise env --help --json	inert
+mise env --help --shell x	inert
+mise env --help x	inert
+mise env --json	inert
+mise env --shell x	inert
+mise env -J	inert
+mise env -h	inert
+mise env -s x	inert
+mise env x	inert
+mise exec	denied
+mise exec -- bin/rails db:create	safe-write
+mise exec x	denied
+mise fmt	denied
+mise fmt --check	inert
+mise fmt --check --help	inert
+mise fmt --check x	denied
+mise fmt --help	inert
+mise fmt -h	inert
+mise fmt x	denied
+mise generate	denied
+mise generate --help	inert
+mise generate --help -h	inert
+mise generate --help x	denied
+mise generate -h	inert
+mise generate x	denied
+mise i	safe-write
+mise i --force	safe-write
+mise i --force --help	safe-write
+mise i --force --jobs x	safe-write
+mise i --force x	safe-write
+mise i --help	safe-write
+mise i --jobs x	safe-write
+mise i --quiet	safe-write
+mise i --verbose	safe-write
+mise i -f	safe-write
+mise i -h	safe-write
+mise i -j x	safe-write
+mise i -q	safe-write
+mise i -v	safe-write
+mise i ruby@4	safe-write
+mise i x	safe-write
+mise implode	denied
+mise implode --help	inert
+mise implode --help -h	inert
+mise implode --help x	denied
+mise implode -h	inert
+mise implode x	denied
+mise install	safe-write
+mise install --force	safe-write
+mise install --force --help	safe-write
+mise install --force --jobs x	safe-write
+mise install --force x	safe-write
+mise install --help	safe-write
+mise install --jobs x	safe-write
+mise install --quiet	safe-write
+mise install --verbose	safe-write
+mise install -f	safe-write
+mise install -h	safe-write
+mise install -j x	safe-write
+mise install -q	safe-write
+mise install -v	safe-write
+mise install ruby@4	safe-write
+mise install x	safe-write
+mise latest	inert
+mise latest --help	inert
+mise latest --help -h	inert
+mise latest --help x	inert
+mise latest -h	inert
+mise latest -q	inert
+mise latest -v	inert
+mise latest x	inert
+mise link	denied
+mise link --help	inert
+mise link --help -h	inert
+mise link --help x	denied
+mise link -h	inert
+mise link x	denied
+mise list	inert
+mise list --current	inert
+mise list --current --help	inert
+mise list --current x	inert
+mise list --help	inert
+mise list --installed	inert
+mise list --json	inert
+mise list --missing	inert
+mise list --no-header	inert
+mise list --prefix	inert
+mise list -J	inert
+mise list -c	inert
+mise list -h	inert
+mise list -i	inert
+mise list -m	inert
+mise list x	inert
+mise lock	denied
+mise lock --help	inert
+mise lock --help -h	inert
+mise lock --help x	denied
+mise lock -h	inert
+mise lock x	denied
+mise ls	inert
+mise ls --current	inert
+mise ls --current --help	inert
+mise ls --current x	inert
+mise ls --help	inert
+mise ls --installed	inert
+mise ls --json	inert
+mise ls --missing	inert
+mise ls --no-header	inert
+mise ls --prefix	inert
+mise ls -J	inert
+mise ls -c	inert
+mise ls -h	inert
+mise ls -i	inert
+mise ls -m	inert
+mise ls x	inert
+mise ls-remote	denied
+mise ls-remote --all	inert
+mise ls-remote --all --help	inert
+mise ls-remote --all x	inert
+mise ls-remote --help	inert
+mise ls-remote -h	inert
+mise ls-remote x	inert
+mise outdated	inert
+mise outdated --help	inert
+mise outdated --help --json	inert
+mise outdated --help x	inert
+mise outdated --json	inert
+mise outdated --no-header	inert
+mise outdated -J	inert
+mise outdated -h	inert
+mise outdated x	inert
+mise plugins	inert
+mise plugins install	denied
+mise plugins install --help	inert
+mise plugins install --help -h	inert
+mise plugins install --help x	denied
+mise plugins install -h	inert
+mise plugins install x	denied
+mise plugins link	denied
+mise plugins link --help	inert
+mise plugins link --help -h	inert
+mise plugins link --help x	denied
+mise plugins link -h	inert
+mise plugins link x	denied
+mise plugins list	inert
+mise plugins list --help	inert
+mise plugins list --help -h	inert
+mise plugins list --help x	inert
+mise plugins list -h	inert
+mise plugins list -q	inert
+mise plugins list -v	inert
+mise plugins list x	inert
+mise plugins ls	inert
+mise plugins ls --help	inert
+mise plugins ls --help -h	inert
+mise plugins ls --help x	inert
+mise plugins ls -h	inert
+mise plugins ls -q	inert
+mise plugins ls -v	inert
+mise plugins ls x	inert
+mise plugins ls-remote	inert
+mise plugins ls-remote --help	inert
+mise plugins ls-remote --help -h	inert
+mise plugins ls-remote --help x	inert
+mise plugins ls-remote -h	inert
+mise plugins ls-remote -q	inert
+mise plugins ls-remote -v	inert
+mise plugins ls-remote x	inert
+mise plugins uninstall	denied
+mise plugins uninstall --help	inert
+mise plugins uninstall --help -h	inert
+mise plugins uninstall --help x	denied
+mise plugins uninstall -h	inert
+mise plugins uninstall x	denied
+mise plugins update	denied
+mise plugins update --help	inert
+mise plugins update --help -h	inert
+mise plugins update --help x	denied
+mise plugins update -h	inert
+mise plugins update x	denied
+mise plugins x	denied
+mise prepare	denied
+mise prepare --help	inert
+mise prepare --help -h	inert
+mise prepare --help x	denied
+mise prepare -h	inert
+mise prepare x	denied
+mise prune	safe-write
+mise prune --dry-run	safe-write
+mise prune --dry-run --help	safe-write
+mise prune --dry-run x	safe-write
+mise prune --help	safe-write
+mise prune --plugins	safe-write
+mise prune --tools	safe-write
+mise prune -h	safe-write
+mise prune -n	safe-write
+mise prune x	safe-write
+mise registry	inert
+mise registry --backend x	inert
+mise registry --help	inert
+mise registry --help --backend x	inert
+mise registry --help -h	inert
+mise registry --help x	inert
+mise registry -b x	inert
+mise registry -h	inert
+mise registry x	inert
+mise remove	denied
+mise remove --all	safe-write
+mise remove --all --dry-run	safe-write
+mise remove --all x	safe-write
+mise remove --dry-run	safe-write
+mise remove --help	safe-write
+mise remove -a	safe-write
+mise remove -h	safe-write
+mise remove -n	safe-write
+mise remove ruby@4	safe-write
+mise remove x	safe-write
+mise reshim	safe-write
+mise reshim --force	safe-write
+mise reshim --force --help	safe-write
+mise reshim --force x	safe-write
+mise reshim --help	safe-write
+mise reshim -h	safe-write
+mise reshim x	safe-write
+mise rm	denied
+mise rm --all	safe-write
+mise rm --all --dry-run	safe-write
+mise rm --all x	safe-write
+mise rm --dry-run	safe-write
+mise rm --help	safe-write
+mise rm -a	safe-write
+mise rm -h	safe-write
+mise rm -n	safe-write
+mise rm ruby@4	safe-write
+mise rm x	safe-write
+mise run	denied
+mise run --help	inert
+mise run --help -h	inert
+mise run --help x	denied
+mise run -h	inert
+mise run x	denied
+mise search	denied
+mise search --help	inert
+mise search --help -h	inert
+mise search --help x	inert
+mise search -h	inert
+mise search x	inert
+mise self-update	denied
+mise self-update x	denied
+mise set	safe-write
+mise set --file	safe-write
+mise set --file --global	safe-write
+mise set --file x	safe-write
+mise set --global	safe-write
+mise set --help	safe-write
+mise set --remove	safe-write
+mise set -f	safe-write
+mise set -g	safe-write
+mise set -h	safe-write
+mise set x	safe-write
+mise settings	inert
+mise settings add	denied
+mise settings add --help	inert
+mise settings add --help -h	inert
+mise settings add --help x	denied
+mise settings add -h	inert
+mise settings add x	denied
+mise settings get	inert
+mise settings get --help	inert
+mise settings get --help -h	inert
+mise settings get --help x	inert
+mise settings get -h	inert
+mise settings get -q	inert
+mise settings get -v	inert
+mise settings get x	inert
+mise settings list	inert
+mise settings list --help	inert
+mise settings list --help -h	inert
+mise settings list --help x	inert
+mise settings list -h	inert
+mise settings list -q	inert
+mise settings list -v	inert
+mise settings list x	inert
+mise settings ls	inert
+mise settings ls --help	inert
+mise settings ls --help -h	inert
+mise settings ls --help x	inert
+mise settings ls -h	inert
+mise settings ls -q	inert
+mise settings ls -v	inert
+mise settings ls x	inert
+mise settings set	denied
+mise settings set --help	inert
+mise settings set --help -h	inert
+mise settings set --help x	denied
+mise settings set -h	inert
+mise settings set x	denied
+mise settings unset	denied
+mise settings unset --help	inert
+mise settings unset --help -h	inert
+mise settings unset --help x	denied
+mise settings unset -h	inert
+mise settings unset x	denied
+mise settings x	denied
+mise shell	denied
+mise shell --help	inert
+mise shell --help -h	inert
+mise shell --help x	denied
+mise shell -h	inert
+mise shell x	denied
+mise shell-alias	inert
+mise shell-alias get	inert
+mise shell-alias get --help	inert
+mise shell-alias get --help -h	inert
+mise shell-alias get --help x	inert
+mise shell-alias get -h	inert
+mise shell-alias get -q	inert
+mise shell-alias get -v	inert
+mise shell-alias get x	inert
+mise shell-alias list	inert
+mise shell-alias list --help	inert
+mise shell-alias list --help -h	inert
+mise shell-alias list --help x	inert
+mise shell-alias list -h	inert
+mise shell-alias list -q	inert
+mise shell-alias list -v	inert
+mise shell-alias list x	inert
+mise shell-alias ls	inert
+mise shell-alias ls --help	inert
+mise shell-alias ls --help -h	inert
+mise shell-alias ls --help x	inert
+mise shell-alias ls -h	inert
+mise shell-alias ls -q	inert
+mise shell-alias ls -v	inert
+mise shell-alias ls x	inert
+mise shell-alias set	denied
+mise shell-alias set --help	inert
+mise shell-alias set --help -h	inert
+mise shell-alias set --help x	denied
+mise shell-alias set -h	inert
+mise shell-alias set x	denied
+mise shell-alias unset	denied
+mise shell-alias unset --help	inert
+mise shell-alias unset --help -h	inert
+mise shell-alias unset --help x	denied
+mise shell-alias unset -h	inert
+mise shell-alias unset x	denied
+mise shell-alias x	denied
+mise sync	denied
+mise sync --help	inert
+mise sync --help -h	inert
+mise sync --help x	denied
+mise sync -h	inert
+mise sync x	denied
+mise tasks	inert
+mise tasks add	denied
+mise tasks add --help	inert
+mise tasks add --help -h	inert
+mise tasks add --help x	denied
+mise tasks add -h	inert
+mise tasks add x	denied
+mise tasks deps	inert
+mise tasks deps --help	inert
+mise tasks deps --help -h	inert
+mise tasks deps --help x	inert
+mise tasks deps -h	inert
+mise tasks deps -q	inert
+mise tasks deps -v	inert
+mise tasks deps x	inert
+mise tasks edit	denied
+mise tasks edit --help	inert
+mise tasks edit --help -h	inert
+mise tasks edit --help x	denied
+mise tasks edit -h	inert
+mise tasks edit x	denied
+mise tasks info	inert
+mise tasks info --help	inert
+mise tasks info --help -h	inert
+mise tasks info --help x	inert
+mise tasks info -h	inert
+mise tasks info -q	inert
+mise tasks info -v	inert
+mise tasks info x	inert
+mise tasks list	inert
+mise tasks list --help	inert
+mise tasks list --help -h	inert
+mise tasks list --help x	inert
+mise tasks list -h	inert
+mise tasks list -q	inert
+mise tasks list -v	inert
+mise tasks list x	inert
+mise tasks ls	inert
+mise tasks ls --help	inert
+mise tasks ls --help -h	inert
+mise tasks ls --help x	inert
+mise tasks ls -h	inert
+mise tasks ls -q	inert
+mise tasks ls -v	inert
+mise tasks ls x	inert
+mise tasks run	denied
+mise tasks run --help	inert
+mise tasks run --help -h	inert
+mise tasks run --help x	denied
+mise tasks run -h	inert
+mise tasks run my-task	denied
+mise tasks run x	denied
+mise tasks x	denied
+mise tool	inert
+mise tool --help	inert
+mise tool --help -h	inert
+mise tool --help x	inert
+mise tool -h	inert
+mise tool -q	inert
+mise tool -v	inert
+mise tool x	inert
+mise tool-alias	inert
+mise tool-alias get	inert
+mise tool-alias get --help	inert
+mise tool-alias get --help -h	inert
+mise tool-alias get --help x	inert
+mise tool-alias get -h	inert
+mise tool-alias get -q	inert
+mise tool-alias get -v	inert
+mise tool-alias get x	inert
+mise tool-alias list	inert
+mise tool-alias list --help	inert
+mise tool-alias list --help -h	inert
+mise tool-alias list --help x	inert
+mise tool-alias list -h	inert
+mise tool-alias list -q	inert
+mise tool-alias list -v	inert
+mise tool-alias list x	inert
+mise tool-alias ls	inert
+mise tool-alias ls --help	inert
+mise tool-alias ls --help -h	inert
+mise tool-alias ls --help x	inert
+mise tool-alias ls -h	inert
+mise tool-alias ls -q	inert
+mise tool-alias ls -v	inert
+mise tool-alias ls x	inert
+mise tool-alias set	denied
+mise tool-alias set --help	inert
+mise tool-alias set --help -h	inert
+mise tool-alias set --help x	denied
+mise tool-alias set -h	inert
+mise tool-alias set x	denied
+mise tool-alias unset	denied
+mise tool-alias unset --help	inert
+mise tool-alias unset --help -h	inert
+mise tool-alias unset --help x	denied
+mise tool-alias unset -h	inert
+mise tool-alias unset x	denied
+mise tool-alias x	denied
+mise trust	safe-write
+mise trust --all	safe-write
+mise trust --all --help	safe-write
+mise trust --all x	safe-write
+mise trust --help	safe-write
+mise trust --ignore	safe-write
+mise trust --quiet	safe-write
+mise trust --show	safe-write
+mise trust -a	safe-write
+mise trust -h	safe-write
+mise trust -q	safe-write
+mise trust x	safe-write
+mise u	denied
+mise u --cd x	safe-write
+mise u --env	safe-write
+mise u --env --cd x	safe-write
+mise u --env --force	safe-write
+mise u --env x	safe-write
+mise u --force	safe-write
+mise u --fuzzy	safe-write
+mise u --global	safe-write
+mise u --help	safe-write
+mise u --path	safe-write
+mise u --pin	safe-write
+mise u --quiet	safe-write
+mise u --remove	safe-write
+mise u --verbose	safe-write
+mise u -E	safe-write
+mise u -f	safe-write
+mise u -g	safe-write
+mise u -h	safe-write
+mise u -p	safe-write
+mise u -q	safe-write
+mise u -v	safe-write
+mise u ruby@4.0.3	safe-write
+mise u x	safe-write
+mise uninstall	denied
+mise uninstall --all	safe-write
+mise uninstall --all --dry-run	safe-write
+mise uninstall --all x	safe-write
+mise uninstall --dry-run	safe-write
+mise uninstall --help	safe-write
+mise uninstall -a	safe-write
+mise uninstall -h	safe-write
+mise uninstall -n	safe-write
+mise uninstall ruby@4	safe-write
+mise uninstall x	safe-write
+mise unset	safe-write
+mise unset --file	safe-write
+mise unset --file --global	safe-write
+mise unset --file x	safe-write
+mise unset --global	safe-write
+mise unset --help	safe-write
+mise unset -f	safe-write
+mise unset -g	safe-write
+mise unset -h	safe-write
+mise unset x	safe-write
+mise untrust	safe-write
+mise untrust --all	safe-write
+mise untrust --all --help	safe-write
+mise untrust --all x	safe-write
+mise untrust --help	safe-write
+mise untrust -a	safe-write
+mise untrust -h	safe-write
+mise untrust x	safe-write
+mise unuse	denied
+mise unuse --help	inert
+mise unuse --help -h	inert
+mise unuse --help x	denied
+mise unuse -h	inert
+mise unuse x	denied
+mise up	safe-write
+mise up --dry-run	safe-write
+mise up --dry-run --help	safe-write
+mise up --dry-run --jobs x	safe-write
+mise up --dry-run x	safe-write
+mise up --help	safe-write
+mise up --interactive	safe-write
+mise up --jobs x	safe-write
+mise up -h	safe-write
+mise up -i	safe-write
+mise up -j x	safe-write
+mise up -n	safe-write
+mise up x	safe-write
+mise upgrade	safe-write
+mise upgrade --dry-run	safe-write
+mise upgrade --dry-run --help	safe-write
+mise upgrade --dry-run --jobs x	safe-write
+mise upgrade --dry-run x	safe-write
+mise upgrade --help	safe-write
+mise upgrade --interactive	safe-write
+mise upgrade --jobs x	safe-write
+mise upgrade -h	safe-write
+mise upgrade -i	safe-write
+mise upgrade -j x	safe-write
+mise upgrade -n	safe-write
+mise upgrade x	safe-write
+mise use	denied
+mise use --cd x	safe-write
+mise use --env	safe-write
+mise use --env --cd x	safe-write
+mise use --env --force	safe-write
+mise use --env x	safe-write
+mise use --force	safe-write
+mise use --fuzzy	safe-write
+mise use --global	safe-write
+mise use --help	safe-write
+mise use --path	safe-write
+mise use --pin	safe-write
+mise use --quiet	safe-write
+mise use --remove	safe-write
+mise use --verbose	safe-write
+mise use -E	safe-write
+mise use -f	safe-write
+mise use -g	safe-write
+mise use -h	safe-write
+mise use -p	safe-write
+mise use -q	safe-write
+mise use -v	safe-write
+mise use ruby@4.0.3	safe-write
+mise use x	safe-write
+mise watch	denied
+mise watch --help	inert
+mise watch --help -h	inert
+mise watch --help x	denied
+mise watch -h	inert
+mise watch x	denied
+mise where	inert
+mise where --help	inert
+mise where --help -h	inert
+mise where --help x	inert
+mise where -h	inert
+mise where -q	inert
+mise where -v	inert
+mise where x	inert
+mise which	inert
+mise which --help	inert
+mise which --help -h	inert
+mise which --help x	inert
+mise which -h	inert
+mise which -q	inert
+mise which -v	inert
+mise which x	inert
+mise x	denied
+mix	denied
+mix --help	inert
+mix --help --version	inert
+mix --help x	denied
+mix --version	inert
+mix -h	inert
+mix -v	inert
+mix x	denied
+mkbom	denied
+mkbom --help	safe-write
+mkbom --help -h	safe-write
+mkbom --help -i x	safe-write
+mkbom --help x	safe-write
+mkbom --version	denied
+mkbom -h	safe-write
+mkbom -i x	safe-write
+mkbom -s	safe-write
+mkbom x	safe-write
+mkcert	safe-write
+mkcert --CAROOT	safe-write
+mkcert --CAROOT --cert-file	safe-write
+mkcert --CAROOT --cert-file x	safe-write
+mkcert --CAROOT x	safe-write
+mkcert --cert-file	safe-write
+mkcert --cert-file x	safe-write
+mkcert --client x	safe-write
+mkcert --csr	safe-write
+mkcert --csr x	safe-write
+mkcert --ecdsa	safe-write
+mkcert --help	safe-write
+mkcert --install	safe-write
+mkcert --key-file	safe-write
+mkcert --key-file x	safe-write
+mkcert --p12-file	safe-write
+mkcert --p12-file x	safe-write
+mkcert --pkcs12	safe-write
+mkcert --uninstall	safe-write
+mkcert --version	safe-write
+mkcert -CAROOT	safe-write
+mkcert -cert-file	safe-write
+mkcert -cert-file x	safe-write
+mkcert -client x	safe-write
+mkcert -csr	safe-write
+mkcert -csr x	safe-write
+mkcert -ecdsa	safe-write
+mkcert -help	safe-write
+mkcert -install	safe-write
+mkcert -key-file	safe-write
+mkcert -key-file x	safe-write
+mkcert -p12-file	safe-write
+mkcert -p12-file x	safe-write
+mkcert -pkcs12	safe-write
+mkcert -uninstall	safe-write
+mkcert -version	safe-write
+mkcert x	safe-write
+mkdir	denied
+mkdir --context x	denied
+mkdir --help	inert
+mkdir --help --context x	inert
+mkdir --help --parents	inert
+mkdir --help x	safe-write
+mkdir --mode x	denied
+mkdir --parents	denied
+mkdir --verbose	denied
+mkdir --version	inert
+mkdir -Z	denied
+mkdir -m x	denied
+mkdir -p	denied
+mkdir -v	denied
+mkdir x	safe-write
+mkdocs	denied
+mkdocs --config-file x	denied
+mkdocs --help	inert
+mkdocs --help --config-file x	denied
+mkdocs --help --version	denied
+mkdocs --help x	denied
+mkdocs --version	inert
+mkdocs -V	inert
+mkdocs -f x	denied
+mkdocs -h	inert
+mkdocs build	safe-write
+mkdocs build --clean	safe-write
+mkdocs build --clean --config-file x	safe-write
+mkdocs build --clean --dirty	safe-write
+mkdocs build --clean x	safe-write
+mkdocs build --config-file x	safe-write
+mkdocs build --dirty	safe-write
+mkdocs build --help	safe-write
+mkdocs build --no-strict	safe-write
+mkdocs build --quiet	safe-write
+mkdocs build --site-dir x	safe-write
+mkdocs build --strict	safe-write
+mkdocs build --theme x	safe-write
+mkdocs build --verbose	safe-write
+mkdocs build -c	safe-write
+mkdocs build -d x	safe-write
+mkdocs build -f x	safe-write
+mkdocs build -h	safe-write
+mkdocs build -q	safe-write
+mkdocs build -s	safe-write
+mkdocs build -t x	safe-write
+mkdocs build -v	safe-write
+mkdocs build x	safe-write
+mkdocs get-deps	denied
+mkdocs get-deps x	denied
+mkdocs gh-deploy	denied
+mkdocs gh-deploy x	denied
+mkdocs help	inert
+mkdocs help x	inert
+mkdocs new	denied
+mkdocs new --help	safe-write
+mkdocs new --help --quiet	safe-write
+mkdocs new --help x	safe-write
+mkdocs new --quiet	safe-write
+mkdocs new --verbose	safe-write
+mkdocs new -h	safe-write
+mkdocs new -q	safe-write
+mkdocs new -v	safe-write
+mkdocs new x	safe-write
+mkdocs serve	denied
+mkdocs serve x	denied
+mkdocs x	denied
+mkfifo	denied
+mkfifo --context x	safe-write
+mkfifo --help	safe-write
+mkfifo --help --context x	safe-write
+mkfifo --help --version	safe-write
+mkfifo --help x	safe-write
+mkfifo --mode x	safe-write
+mkfifo --version	safe-write
+mkfifo -Z	safe-write
+mkfifo -m x	safe-write
+mkfifo /tmp/myfifo	safe-write
+mkfifo x	safe-write
+mkfile	denied
+mkfile --help	denied
+mkfile --version	denied
+mkfile -n	safe-write
+mkfile -n -v	safe-write
+mkfile -n x	safe-write
+mkfile -v	safe-write
+mkfile x	safe-write
+mktemp	safe-write
+mktemp --directory	safe-write
+mktemp --directory --dry-run	safe-write
+mktemp --directory --suffix x	safe-write
+mktemp --directory x	safe-write
+mktemp --dry-run	safe-write
+mktemp --help	safe-write
+mktemp --quiet	safe-write
+mktemp --suffix x	safe-write
+mktemp --tmpdir	safe-write
+mktemp --tmpdir x	safe-write
+mktemp --version	safe-write
+mktemp -d	safe-write
+mktemp -p x	safe-write
+mktemp -q	safe-write
+mktemp -t	safe-write
+mktemp -t x	safe-write
+mktemp -u	safe-write
+mktemp x	safe-write
+mlflow	denied
+mlflow --help	inert
+mlflow --help --version	denied
+mlflow --help x	denied
+mlflow --version	inert
+mlflow -h	inert
+mlflow artifacts	denied
+mlflow artifacts x	denied
+mlflow auth	denied
+mlflow auth x	denied
+mlflow azureml	denied
+mlflow azureml x	denied
+mlflow completion	denied
+mlflow completion --help	inert
+mlflow completion --help -h	inert
+mlflow completion --help x	inert
+mlflow completion -h	inert
+mlflow completion x	inert
+mlflow db	denied
+mlflow db x	denied
+mlflow deployments	denied
+mlflow deployments x	denied
+mlflow doctor	inert
+mlflow doctor --help	inert
+mlflow doctor --help --mask-envs x	inert
+mlflow doctor --help -h	inert
+mlflow doctor --help x	inert
+mlflow doctor --mask-envs x	inert
+mlflow doctor -h	inert
+mlflow doctor x	inert
+mlflow experiments	denied
+mlflow experiments x	denied
+mlflow gateway	denied
+mlflow gateway x	denied
+mlflow gc	denied
+mlflow gc x	denied
+mlflow help	inert
+mlflow help x	inert
+mlflow models	denied
+mlflow models x	denied
+mlflow recipes	denied
+mlflow recipes x	denied
+mlflow run	denied
+mlflow run x	denied
+mlflow runs	denied
+mlflow runs x	denied
+mlflow sagemaker	denied
+mlflow sagemaker x	denied
+mlflow server	denied
+mlflow server x	denied
+mlflow ui	denied
+mlflow ui x	denied
+mlflow version	inert
+mlflow version --help	inert
+mlflow version --help -h	inert
+mlflow version --help x	inert
+mlflow version -h	inert
+mlflow version x	inert
+mlflow x	denied
+mlocate	denied
+mlocate --all	inert
+mlocate --all --basename	inert
+mlocate --all --database x	inert
+mlocate --all x	inert
+mlocate --basename	inert
+mlocate --count	inert
+mlocate --database x	inert
+mlocate --existing	inert
+mlocate --follow	inert
+mlocate --help	inert
+mlocate --ignore-case	inert
+mlocate --limit x	inert
+mlocate --null	inert
+mlocate --quiet	inert
+mlocate --statistics	inert
+mlocate --version	inert
+mlocate --wholename	inert
+mlocate -0	inert
+mlocate -A	inert
+mlocate -S	inert
+mlocate -V	inert
+mlocate -b	inert
+mlocate -c	inert
+mlocate -d x	inert
+mlocate -e	inert
+mlocate -h	inert
+mlocate -i	inert
+mlocate -l x	inert
+mlocate -n x	inert
+mlocate -q	inert
+mlocate -w	inert
+mlocate x	inert
+mlr	denied
+mlr --allow-ragged-csv-input	inert
+mlr --allow-ragged-csv-input --barred	inert
+mlr --allow-ragged-csv-input --files x	inert
+mlr --allow-ragged-csv-input x	denied
+mlr --barred	inert
+mlr --csv	inert
+mlr --csv cat then put '$y=2' data.csv	denied
+mlr --csv cat then sort -f x then head -n 5 data.csv	inert
+mlr --csv frobnicate data.csv	denied
+mlr --csv head -n 10 data.csv	inert
+mlr --csv sort -nr value data.csv	inert
+mlr --csv split -n 100 data.csv	denied
+mlr --csv step -a delta,shift -f x data.csv	inert
+mlr --csv tee out.csv then cat data.csv	denied
+mlr --csvlite	inert
+mlr --dkvp	inert
+mlr --files x	inert
+mlr --fixed x	inert
+mlr --flatsep x	inert
+mlr --frobnicate cat data.csv	denied
+mlr --from data.csv -I cat	denied
+mlr --from data.csv cat	inert
+mlr --from x	inert
+mlr --fs x	inert
+mlr --fw x	inert
+mlr --headerless-csv-output	inert
+mlr --help	inert
+mlr --hi	inert
+mlr --ho	inert
+mlr --icsv	inert
+mlr --icsv --ojson cat data.csv	inert
+mlr --icsvlite	inert
+mlr --idkvp	inert
+mlr --ifs , cat data.dkvp	inert
+mlr --ifs -I cat data.csv	denied
+mlr --ifs x	inert
+mlr --ifs-regex x	inert
+mlr --ifs=, cat data.dkvp	inert
+mlr --ijson	inert
+mlr --ijsonl	inert
+mlr --imarkdown	inert
+mlr --implicit-csv-header	inert
+mlr --in-place --csv head -n 10 data.csv	denied
+mlr --inidx	inert
+mlr --ipprint	inert
+mlr --ips x	inert
+mlr --ips-regex x	inert
+mlr --irs x	inert
+mlr --itsv	inert
+mlr --ixtab	inert
+mlr --json	inert
+mlr --jsonl	inert
+mlr --markdown	inert
+mlr --mfrom a.csv -- put '$x=1'	denied
+mlr --mfrom a.csv b.csv -- cat	inert
+mlr --nidx	inert
+mlr --no-auto-flatten	inert
+mlr --no-auto-unflatten	inert
+mlr --nr-progress-mod x	inert
+mlr --ocsv	inert
+mlr --ocsvlite	inert
+mlr --odkvp	inert
+mlr --ofmt x	inert
+mlr --ofmte x	inert
+mlr --ofmtf x	inert
+mlr --ofmtg x	inert
+mlr --ofs x	inert
+mlr --ojson	inert
+mlr --ojsonl	inert
+mlr --omarkdown	inert
+mlr --onidx	inert
+mlr --opprint	inert
+mlr --ops x	inert
+mlr --ors x	inert
+mlr --otsv	inert
+mlr --oxtab	inert
+mlr --pass-comments	inert
+mlr --pprint	inert
+mlr --ps x	inert
+mlr --ragged	inert
+mlr --records-per-batch x	inert
+mlr --right	inert
+mlr --rs x	inert
+mlr --seed x	inert
+mlr --skip-comments	inert
+mlr --tsv	inert
+mlr --tsv cut -f name,age data.tsv	inert
+mlr --tz x	inert
+mlr --version	inert
+mlr --xtab	inert
+mlr -A	inert
+mlr -C	inert
+mlr -I --csv head -n 10 data.csv	denied
+mlr -M	inert
+mlr -N	inert
+mlr -O	inert
+mlr -S	inert
+mlr -h	inert
+mlr -n	inert
+mlr -x	inert
+mlr altkv	inert
+mlr bar	inert
+mlr bootstrap	inert
+mlr case	inert
+mlr cat	inert
+mlr cat then filter 'true' data.csv	denied
+mlr check	inert
+mlr clean-whitespace	inert
+mlr count	inert
+mlr count-distinct	inert
+mlr count-similar	inert
+mlr cut	inert
+mlr decimate	inert
+mlr describe	inert
+mlr fill-down	inert
+mlr fill-empty	inert
+mlr filter '$x>3' data.csv	denied
+mlr flatten	inert
+mlr format-values	inert
+mlr fraction	inert
+mlr gap	inert
+mlr grep	inert
+mlr group-by	inert
+mlr group-like	inert
+mlr gsub	inert
+mlr having-fields	inert
+mlr head	inert
+mlr histogram	inert
+mlr join	inert
+mlr json-parse	inert
+mlr json-stringify	inert
+mlr label	inert
+mlr latin1-to-utf8	inert
+mlr least-frequent	inert
+mlr merge-fields	inert
+mlr most-frequent	inert
+mlr nest	inert
+mlr nothing	inert
+mlr put '$x=1' data.csv	denied
+mlr regularize	inert
+mlr remove-empty-columns	inert
+mlr rename	inert
+mlr reorder	inert
+mlr repeat	inert
+mlr reshape	inert
+mlr sample	inert
+mlr sec2gmt	inert
+mlr sec2gmtdate	inert
+mlr seqgen	inert
+mlr shuffle	inert
+mlr skip-trivial-records	inert
+mlr sort	inert
+mlr sort-within-records	inert
+mlr sparsify	inert
+mlr ssub	inert
+mlr stats1	inert
+mlr stats2	inert
+mlr step	inert
+mlr sub	inert
+mlr summary	inert
+mlr surv	inert
+mlr tac	inert
+mlr tail	inert
+mlr template	inert
+mlr top	inert
+mlr unflatten	inert
+mlr uniq	inert
+mlr unspace	inert
+mlr unsparsify	inert
+mlr utf8-to-latin1	inert
+mlr x	denied
+mocha	safe-read
+mocha --bail	safe-read
+mocha --bail --check-leaks	safe-read
+mocha --bail --config x	safe-read
+mocha --bail x	safe-read
+mocha --check-leaks	safe-read
+mocha --color	safe-read
+mocha --config x	safe-read
+mocha --delay x	safe-read
+mocha --diff	safe-read
+mocha --dry-run	safe-read
+mocha --exit	safe-read
+mocha --extension x	safe-read
+mocha --fgrep x	safe-read
+mocha --file x	safe-read
+mocha --forbid-only	safe-read
+mocha --forbid-pending	safe-read
+mocha --full-trace	safe-read
+mocha --grep x	safe-read
+mocha --help	safe-read
+mocha --ignore x	safe-read
+mocha --inline-diffs	safe-read
+mocha --invert	safe-read
+mocha --jobs x	safe-read
+mocha --list-files	safe-read
+mocha --list-reporters	safe-read
+mocha --no-color	safe-read
+mocha --no-diff	safe-read
+mocha --no-timeouts	safe-read
+mocha --node-option x	safe-read
+mocha --package x	safe-read
+mocha --parallel	safe-read
+mocha --quiet	safe-read
+mocha --recursive	safe-read
+mocha --reporter x	safe-read
+mocha --reporter-option x	safe-read
+mocha --require x	safe-read
+mocha --retries x	safe-read
+mocha --slow x	safe-read
+mocha --sort	safe-read
+mocha --spec x	safe-read
+mocha --timeout x	safe-read
+mocha --ui x	safe-read
+mocha --version	safe-read
+mocha -A	safe-read
+mocha -R	safe-read
+mocha -V	safe-read
+mocha -b	safe-read
+mocha -c	safe-read
+mocha -f x	safe-read
+mocha -g x	safe-read
+mocha -h	safe-read
+mocha -j x	safe-read
+mocha -n x	safe-read
+mocha -r x	safe-read
+mocha -s x	safe-read
+mocha -t x	safe-read
+mocha -u x	safe-read
+mocha x	safe-read
+molecule	denied
+molecule --help	inert
+molecule --help --version	denied
+molecule --help x	denied
+molecule --version	inert
+molecule -V	inert
+molecule -h	inert
+molecule check	denied
+molecule check x	denied
+molecule cleanup	denied
+molecule cleanup x	denied
+molecule completion	denied
+molecule completion --help	inert
+molecule completion --help -h	inert
+molecule completion --help x	inert
+molecule completion -h	inert
+molecule completion x	inert
+molecule converge	denied
+molecule converge x	denied
+molecule create	denied
+molecule create x	denied
+molecule dependency	denied
+molecule dependency x	denied
+molecule destroy	denied
+molecule destroy x	denied
+molecule drivers	safe-read
+molecule drivers --format x	safe-read
+molecule drivers --help	safe-read
+molecule drivers --help --format x	safe-read
+molecule drivers --help -h	safe-read
+molecule drivers --help x	safe-read
+molecule drivers -h	safe-read
+molecule drivers x	safe-read
+molecule help	inert
+molecule help x	inert
+molecule idempotence	denied
+molecule idempotence x	denied
+molecule init	denied
+molecule init x	denied
+molecule lint	denied
+molecule lint x	denied
+molecule list	safe-read
+molecule list --format x	safe-read
+molecule list --help	safe-read
+molecule list --help --format x	safe-read
+molecule list --help -h	safe-read
+molecule list --help x	safe-read
+molecule list --scenario-name x	safe-read
+molecule list -h	safe-read
+molecule list -s x	safe-read
+molecule list x	safe-read
+molecule login	denied
+molecule login x	denied
+molecule matrix	denied
+molecule matrix --help	safe-read
+molecule matrix --help --scenario-name x	safe-read
+molecule matrix --help -h	safe-read
+molecule matrix --help x	safe-read
+molecule matrix --scenario-name x	safe-read
+molecule matrix -h	safe-read
+molecule matrix -s x	safe-read
+molecule matrix x	safe-read
+molecule prepare	denied
+molecule prepare x	denied
+molecule reset	denied
+molecule reset x	denied
+molecule side-effect	denied
+molecule side-effect x	denied
+molecule syntax	denied
+molecule syntax x	denied
+molecule test	denied
+molecule test x	denied
+molecule verify	denied
+molecule verify x	denied
+molecule x	denied
+mongodump	denied
+mongodump --allowPartialResults	safe-write
+mongodump --allowPartialResults --archive	safe-write
+mongodump --allowPartialResults --archive x	safe-write
+mongodump --allowPartialResults x	safe-write
+mongodump --archive	safe-write
+mongodump --archive x	safe-write
+mongodump --assertExists	safe-write
+mongodump --authenticationDatabase	safe-write
+mongodump --authenticationDatabase x	safe-write
+mongodump --authenticationMechanism	safe-write
+mongodump --authenticationMechanism x	safe-write
+mongodump --collection	safe-write
+mongodump --collection x	safe-write
+mongodump --config x	safe-write
+mongodump --db	safe-write
+mongodump --db x	safe-write
+mongodump --dryRun	safe-write
+mongodump --dumpDbUsersAndRoles	safe-write
+mongodump --excludeCollection	safe-write
+mongodump --excludeCollection x	safe-write
+mongodump --excludeCollectionsWithPrefix	safe-write
+mongodump --excludeCollectionsWithPrefix x	safe-write
+mongodump --forceTableScan	safe-write
+mongodump --gssapiHostName x	safe-write
+mongodump --gssapiServiceName x	safe-write
+mongodump --gzip	safe-write
+mongodump --help	safe-write
+mongodump --host x	safe-write
+mongodump --ipv6	safe-write
+mongodump --noIndexRestore	safe-write
+mongodump --numParallelCollections	safe-write
+mongodump --numParallelCollections x	safe-write
+mongodump --objcheck	safe-write
+mongodump --oplog	safe-write
+mongodump --out	safe-write
+mongodump --out x	safe-write
+mongodump --password	safe-write
+mongodump --password x	safe-write
+mongodump --port	safe-write
+mongodump --port x	safe-write
+mongodump --query x	safe-write
+mongodump --queryFile x	safe-write
+mongodump --quiet	safe-write
+mongodump --readPreference	safe-write
+mongodump --readPreference x	safe-write
+mongodump --ssl	safe-write
+mongodump --sslAllowInvalidCertificates	safe-write
+mongodump --sslAllowInvalidHostnames	safe-write
+mongodump --sslCAFile	safe-write
+mongodump --sslCAFile x	safe-write
+mongodump --sslCRLFile x	safe-write
+mongodump --sslPEMKeyFile	safe-write
+mongodump --sslPEMKeyFile x	safe-write
+mongodump --sslPEMKeyPassword	safe-write
+mongodump --sslPEMKeyPassword x	safe-write
+mongodump --tlsCAFile x	safe-write
+mongodump --tlsCertificateKeyFile x	safe-write
+mongodump --tlsInsecure	safe-write
+mongodump --uri x	safe-write
+mongodump --username	safe-write
+mongodump --username x	safe-write
+mongodump --verbose	safe-write
+mongodump --version	safe-write
+mongodump --writeConcern	safe-write
+mongodump --writeConcern x	safe-write
+mongodump -c	safe-write
+mongodump -c x	safe-write
+mongodump -d	safe-write
+mongodump -d x	safe-write
+mongodump -h	safe-write
+mongodump -h x	safe-write
+mongodump -j	safe-write
+mongodump -j x	safe-write
+mongodump -o	safe-write
+mongodump -o x	safe-write
+mongodump -p	safe-write
+mongodump -p x	safe-write
+mongodump -u	safe-write
+mongodump -u x	safe-write
+mongodump -v	safe-write
+mongodump x	safe-write
+mongoexport	denied
+mongoexport --assertExists	safe-read
+mongoexport --assertExists --authenticationDatabase	safe-read
+mongoexport --assertExists --authenticationDatabase x	safe-read
+mongoexport --assertExists x	safe-read
+mongoexport --authenticationDatabase	safe-read
+mongoexport --authenticationDatabase x	safe-read
+mongoexport --authenticationMechanism	safe-read
+mongoexport --authenticationMechanism x	safe-read
+mongoexport --collection	safe-read
+mongoexport --collection x	safe-read
+mongoexport --config x	safe-read
+mongoexport --db	safe-read
+mongoexport --db x	safe-read
+mongoexport --fieldFile x	safe-read
+mongoexport --fields x	safe-read
+mongoexport --forceTableScan	safe-read
+mongoexport --help	safe-read
+mongoexport --host x	safe-read
+mongoexport --ipv6	safe-read
+mongoexport --jsonArray	safe-read
+mongoexport --jsonFormat x	safe-read
+mongoexport --limit x	safe-read
+mongoexport --noHeaderLine	safe-read
+mongoexport --objcheck	safe-read
+mongoexport --out x	safe-read
+mongoexport --password	safe-read
+mongoexport --password x	safe-read
+mongoexport --port	safe-read
+mongoexport --port x	safe-read
+mongoexport --query x	safe-read
+mongoexport --queryFile x	safe-read
+mongoexport --quiet	safe-read
+mongoexport --readPreference	safe-read
+mongoexport --readPreference x	safe-read
+mongoexport --skip x	safe-read
+mongoexport --sort x	safe-read
+mongoexport --ssl	safe-read
+mongoexport --sslAllowInvalidCertificates	safe-read
+mongoexport --sslAllowInvalidHostnames	safe-read
+mongoexport --sslCAFile x	safe-read
+mongoexport --sslCRLFile x	safe-read
+mongoexport --sslPEMKeyFile x	safe-read
+mongoexport --sslPEMKeyPassword x	safe-read
+mongoexport --tlsCAFile x	safe-read
+mongoexport --tlsCertificateKeyFile x	safe-read
+mongoexport --type	safe-read
+mongoexport --type x	safe-read
+mongoexport --uri x	safe-read
+mongoexport --useArrayIndexFields	safe-read
+mongoexport --username	safe-read
+mongoexport --username x	safe-read
+mongoexport --verbose	safe-read
+mongoexport --version	safe-read
+mongoexport -c	safe-read
+mongoexport -c x	safe-read
+mongoexport -d	safe-read
+mongoexport -d x	safe-read
+mongoexport -f	safe-read
+mongoexport -f x	safe-read
+mongoexport -h	safe-read
+mongoexport -h x	safe-read
+mongoexport -o	safe-read
+mongoexport -o x	safe-read
+mongoexport -p	safe-read
+mongoexport -p x	safe-read
+mongoexport -q	safe-read
+mongoexport -q x	safe-read
+mongoexport -u	safe-read
+mongoexport -u x	safe-read
+mongoexport -v	safe-read
+mongoexport x	safe-read
+mongoimport	denied
+mongoimport --authenticationDatabase	safe-write
+mongoimport --authenticationDatabase --authenticationDatabase x	safe-write
+mongoimport --authenticationDatabase --authenticationMechanism	safe-write
+mongoimport --authenticationDatabase x	safe-write
+mongoimport --authenticationMechanism	safe-write
+mongoimport --authenticationMechanism x	safe-write
+mongoimport --bypassDocumentValidation	safe-write
+mongoimport --collection	safe-write
+mongoimport --collection x	safe-write
+mongoimport --columnsHaveTypes	safe-write
+mongoimport --columnsHaveTypes x	safe-write
+mongoimport --config x	safe-write
+mongoimport --db	safe-write
+mongoimport --db x	safe-write
+mongoimport --drop	safe-write
+mongoimport --fieldFile x	safe-write
+mongoimport --fields x	safe-write
+mongoimport --file	safe-write
+mongoimport --file x	safe-write
+mongoimport --gssapiHostName x	safe-write
+mongoimport --gssapiServiceName x	safe-write
+mongoimport --headerline	safe-write
+mongoimport --help	safe-write
+mongoimport --host x	safe-write
+mongoimport --ignoreBlanks	safe-write
+mongoimport --ipv6	safe-write
+mongoimport --jsonArray	safe-write
+mongoimport --legacy	safe-write
+mongoimport --maintainInsertionOrder	safe-write
+mongoimport --mode	safe-write
+mongoimport --mode x	safe-write
+mongoimport --numInsertionWorkers	safe-write
+mongoimport --numInsertionWorkers x	safe-write
+mongoimport --objcheck	safe-write
+mongoimport --parseGrace x	safe-write
+mongoimport --password	safe-write
+mongoimport --password x	safe-write
+mongoimport --port	safe-write
+mongoimport --port x	safe-write
+mongoimport --query x	safe-write
+mongoimport --quiet	safe-write
+mongoimport --readPreference	safe-write
+mongoimport --readPreference x	safe-write
+mongoimport --ssl	safe-write
+mongoimport --sslAllowInvalidCertificates	safe-write
+mongoimport --sslAllowInvalidHostnames	safe-write
+mongoimport --sslCAFile x	safe-write
+mongoimport --sslCRLFile x	safe-write
+mongoimport --sslPEMKeyFile x	safe-write
+mongoimport --sslPEMKeyPassword x	safe-write
+mongoimport --stopOnError	safe-write
+mongoimport --tlsCAFile x	safe-write
+mongoimport --tlsCertificateKeyFile x	safe-write
+mongoimport --type	safe-write
+mongoimport --type x	safe-write
+mongoimport --upsert	safe-write
+mongoimport --upsertFields	safe-write
+mongoimport --upsertFields x	safe-write
+mongoimport --uri x	safe-write
+mongoimport --username	safe-write
+mongoimport --username x	safe-write
+mongoimport --verbose	safe-write
+mongoimport --version	safe-write
+mongoimport --writeConcern	safe-write
+mongoimport --writeConcern x	safe-write
+mongoimport -c	safe-write
+mongoimport -c x	safe-write
+mongoimport -d	safe-write
+mongoimport -d x	safe-write
+mongoimport -f	safe-write
+mongoimport -f x	safe-write
+mongoimport -h	safe-write
+mongoimport -h x	safe-write
+mongoimport -j	safe-write
+mongoimport -j x	safe-write
+mongoimport -p	safe-write
+mongoimport -p x	safe-write
+mongoimport -u	safe-write
+mongoimport -u x	safe-write
+mongoimport -v	safe-write
+mongoimport x	safe-write
+mongorestore	denied
+mongorestore --archive	safe-write
+mongorestore --archive --archive x	safe-write
+mongorestore --archive --authenticationDatabase	safe-write
+mongorestore --archive x	safe-write
+mongorestore --authenticationDatabase	safe-write
+mongorestore --authenticationDatabase x	safe-write
+mongorestore --authenticationMechanism	safe-write
+mongorestore --authenticationMechanism x	safe-write
+mongorestore --bypassDocumentValidation	safe-write
+mongorestore --collection	safe-write
+mongorestore --collection x	safe-write
+mongorestore --config x	safe-write
+mongorestore --convertLegacyIndexes	safe-write
+mongorestore --db	safe-write
+mongorestore --db x	safe-write
+mongorestore --drop	safe-write
+mongorestore --dryRun	safe-write
+mongorestore --gzip	safe-write
+mongorestore --gzip x	safe-write
+mongorestore --help	safe-write
+mongorestore --host x	safe-write
+mongorestore --ipv6	safe-write
+mongorestore --keepIndexVersion	safe-write
+mongorestore --maintainInsertionOrder	safe-write
+mongorestore --noIndexRestore	safe-write
+mongorestore --noOptionsRestore	safe-write
+mongorestore --nsExclude	safe-write
+mongorestore --nsExclude x	safe-write
+mongorestore --nsFrom	safe-write
+mongorestore --nsFrom x	safe-write
+mongorestore --nsInclude	safe-write
+mongorestore --nsInclude x	safe-write
+mongorestore --nsTo	safe-write
+mongorestore --nsTo x	safe-write
+mongorestore --numInsertionWorkers x	safe-write
+mongorestore --numInsertionWorkersPerCollection	safe-write
+mongorestore --numInsertionWorkersPerCollection x	safe-write
+mongorestore --numParallelCollections	safe-write
+mongorestore --numParallelCollections x	safe-write
+mongorestore --objcheck	safe-write
+mongorestore --objcheck x	safe-write
+mongorestore --oplogFile	safe-write
+mongorestore --oplogLimit	safe-write
+mongorestore --oplogLimit x	safe-write
+mongorestore --oplogReplay	safe-write
+mongorestore --password	safe-write
+mongorestore --password x	safe-write
+mongorestore --port	safe-write
+mongorestore --port x	safe-write
+mongorestore --preserveUUID	safe-write
+mongorestore --quiet	safe-write
+mongorestore --readPreference	safe-write
+mongorestore --readPreference x	safe-write
+mongorestore --restoreDbUsersAndRoles	safe-write
+mongorestore --ssl	safe-write
+mongorestore --sslAllowInvalidCertificates	safe-write
+mongorestore --sslAllowInvalidHostnames	safe-write
+mongorestore --sslCAFile	safe-write
+mongorestore --sslCAFile x	safe-write
+mongorestore --sslCRLFile x	safe-write
+mongorestore --sslPEMKeyFile	safe-write
+mongorestore --sslPEMKeyFile x	safe-write
+mongorestore --sslPEMKeyPassword	safe-write
+mongorestore --sslPEMKeyPassword x	safe-write
+mongorestore --stopOnError	safe-write
+mongorestore --temp-dbpath	safe-write
+mongorestore --temp-port	safe-write
+mongorestore --tlsCAFile x	safe-write
+mongorestore --tlsCertificateKeyFile x	safe-write
+mongorestore --tlsInsecure	safe-write
+mongorestore --uri x	safe-write
+mongorestore --useArrayIndexFields	safe-write
+mongorestore --username	safe-write
+mongorestore --username x	safe-write
+mongorestore --verbose	safe-write
+mongorestore --version	safe-write
+mongorestore --writeConcern	safe-write
+mongorestore --writeConcern x	safe-write
+mongorestore -c	safe-write
+mongorestore -c x	safe-write
+mongorestore -d	safe-write
+mongorestore -d x	safe-write
+mongorestore -h	safe-write
+mongorestore -h x	safe-write
+mongorestore -j	safe-write
+mongorestore -j x	safe-write
+mongorestore -p	safe-write
+mongorestore -p x	safe-write
+mongorestore -u	safe-write
+mongorestore -u x	safe-write
+mongorestore -v	safe-write
+mongorestore x	safe-write
+mongosh	denied
+mongosh --help	inert
+mongosh --help --version	inert
+mongosh --help x	denied
+mongosh --version	inert
+mongosh -h	inert
+mongosh x	denied
+mongostat	safe-read
+mongostat --all	safe-read
+mongostat --all --authenticationDatabase	safe-read
+mongostat --all --authenticationDatabase x	safe-read
+mongostat --all x	safe-read
+mongostat --authenticationDatabase	safe-read
+mongostat --authenticationDatabase x	safe-read
+mongostat --authenticationMechanism	safe-read
+mongostat --authenticationMechanism x	safe-read
+mongostat --config x	safe-read
+mongostat --discover	safe-read
+mongostat --help	safe-read
+mongostat --host x	safe-read
+mongostat --http	safe-read
+mongostat --humanReadable	safe-read
+mongostat --ipv6	safe-read
+mongostat --json	safe-read
+mongostat --password	safe-read
+mongostat --password x	safe-read
+mongostat --port	safe-read
+mongostat --port x	safe-read
+mongostat --quiet	safe-read
+mongostat --rowcount x	safe-read
+mongostat --ssl	safe-read
+mongostat --sslAllowInvalidCertificates	safe-read
+mongostat --sslAllowInvalidHostnames	safe-read
+mongostat --sslCAFile x	safe-read
+mongostat --sslCRLFile x	safe-read
+mongostat --sslPEMKeyFile x	safe-read
+mongostat --sslPEMKeyPassword x	safe-read
+mongostat --tlsCAFile x	safe-read
+mongostat --tlsCertificateKeyFile x	safe-read
+mongostat --uri x	safe-read
+mongostat --username	safe-read
+mongostat --username x	safe-read
+mongostat --verbose	safe-read
+mongostat --version	safe-read
+mongostat -?	safe-read
+mongostat -h	safe-read
+mongostat -h x	safe-read
+mongostat -n	safe-read
+mongostat -n x	safe-read
+mongostat -o	safe-read
+mongostat -o x	safe-read
+mongostat -p	safe-read
+mongostat -p x	safe-read
+mongostat -u	safe-read
+mongostat -u x	safe-read
+mongostat -v	safe-read
+mongostat x	safe-read
+mongotop	safe-read
+mongotop --authenticationDatabase	safe-read
+mongotop --authenticationDatabase --authenticationDatabase x	safe-read
+mongotop --authenticationDatabase --authenticationMechanism	safe-read
+mongotop --authenticationDatabase x	safe-read
+mongotop --authenticationMechanism	safe-read
+mongotop --authenticationMechanism x	safe-read
+mongotop --config x	safe-read
+mongotop --help	safe-read
+mongotop --host x	safe-read
+mongotop --ipv6	safe-read
+mongotop --json	safe-read
+mongotop --locks	safe-read
+mongotop --password	safe-read
+mongotop --password x	safe-read
+mongotop --port	safe-read
+mongotop --port x	safe-read
+mongotop --quiet	safe-read
+mongotop --rowcount x	safe-read
+mongotop --ssl	safe-read
+mongotop --sslAllowInvalidCertificates	safe-read
+mongotop --sslAllowInvalidHostnames	safe-read
+mongotop --sslCAFile x	safe-read
+mongotop --sslCRLFile x	safe-read
+mongotop --sslPEMKeyFile x	safe-read
+mongotop --sslPEMKeyPassword x	safe-read
+mongotop --tlsCAFile x	safe-read
+mongotop --tlsCertificateKeyFile x	safe-read
+mongotop --uri x	safe-read
+mongotop --username	safe-read
+mongotop --username x	safe-read
+mongotop --verbose	safe-read
+mongotop --version	safe-read
+mongotop -?	safe-read
+mongotop -h	safe-read
+mongotop -h x	safe-read
+mongotop -n x	safe-read
+mongotop -p	safe-read
+mongotop -p x	safe-read
+mongotop -u	safe-read
+mongotop -u x	safe-read
+mongotop -v	safe-read
+mongotop x	safe-read
+mono	denied
+mono --help	inert
+mono --help --info	inert
+mono --help x	denied
+mono --info	inert
+mono --version	inert
+mono -V	inert
+mono -h	inert
+mono x	denied
+monolith	denied
+monolith --base-url x	inert
+monolith --blacklist-domains x	inert
+monolith --cookies x	inert
+monolith --domain x	inert
+monolith --encoding x	inert
+monolith --help	inert
+monolith --help --base-url x	inert
+monolith --help --insecure	inert
+monolith --help x	inert
+monolith --insecure	inert
+monolith --isolate	inert
+monolith --no-audio	inert
+monolith --no-css	inert
+monolith --no-fonts	inert
+monolith --no-frames	inert
+monolith --no-images	inert
+monolith --no-js	inert
+monolith --no-metadata	inert
+monolith --no-video	inert
+monolith --silent	inert
+monolith --timeout x	inert
+monolith --unwrap-noscript	inert
+monolith --user-agent x	inert
+monolith --version	inert
+monolith -B x	inert
+monolith -C x	inert
+monolith -E x	inert
+monolith -F	inert
+monolith -I	inert
+monolith -M	inert
+monolith -V	inert
+monolith -a	inert
+monolith -b x	inert
+monolith -c	inert
+monolith -d x	inert
+monolith -e	inert
+monolith -f	inert
+monolith -h	inert
+monolith -i	inert
+monolith -j	inert
+monolith -k	inert
+monolith -m	inert
+monolith -n	inert
+monolith -q	inert
+monolith -t x	inert
+monolith -u x	inert
+monolith -v	inert
+monolith x	inert
+more	inert
+more --help	inert
+more --help --lines x	inert
+more --help --version	inert
+more --help x	inert
+more --lines x	inert
+more --version	inert
+more -V	inert
+more -c	inert
+more -d	inert
+more -f	inert
+more -h	inert
+more -l	inert
+more -n x	inert
+more -p	inert
+more -s	inert
+more -u	inert
+more x	inert
+mosh	denied
+mosh --help	inert
+mosh --help --version	inert
+mosh --help x	denied
+mosh --version	inert
+mosh -h	inert
+mosh x	denied
+mount	inert
+mount --bind /a /b	denied
+mount --help	inert
+mount --help --show-labels	inert
+mount --help --test-opts x	inert
+mount --help x	denied
+mount --show-labels	inert
+mount --test-opts x	inert
+mount --types tmpfs	inert
+mount --types x	inert
+mount --verbose	inert
+mount --version	inert
+mount -O x	inert
+mount -V	inert
+mount -a	denied
+mount -h	inert
+mount -l	inert
+mount -o remount /tmp	denied
+mount -t tmpfs	inert
+mount -t x	inert
+mount -v	inert
+mount /dev/sda1 /mnt	denied
+mount x	denied
+mount | grep tmpfs	inert
+mountpoint	denied
+mountpoint --devno	inert
+mountpoint --devno --fs-devno	inert
+mountpoint --devno x	inert
+mountpoint --fs-devno	inert
+mountpoint --help	inert
+mountpoint --nofollow	inert
+mountpoint --quiet	inert
+mountpoint --show	inert
+mountpoint --show /tmp	inert
+mountpoint --version	inert
+mountpoint -V	inert
+mountpoint -d	inert
+mountpoint -h	inert
+mountpoint -q	inert
+mountpoint -q /tmp	inert
+mountpoint -x	inert
+mountpoint /tmp	inert
+mountpoint /tmp /var	denied
+mountpoint x	inert
+mprof	denied
+mprof --help	inert
+mprof --help --version	denied
+mprof --help x	denied
+mprof --version	inert
+mprof -h	inert
+mprof attach	denied
+mprof attach x	denied
+mprof clean	safe-write
+mprof clean --help	safe-write
+mprof clean --help -h	safe-write
+mprof clean --help x	safe-write
+mprof clean -h	safe-write
+mprof clean x	safe-write
+mprof help	inert
+mprof help x	inert
+mprof list	safe-read
+mprof list --help	safe-read
+mprof list --help -h	safe-read
+mprof list --help x	safe-read
+mprof list -h	safe-read
+mprof list x	safe-read
+mprof peak	denied
+mprof peak x	denied
+mprof plot	denied
+mprof plot x	denied
+mprof rm	denied
+mprof rm --help	safe-write
+mprof rm --help -h	safe-write
+mprof rm --help x	safe-write
+mprof rm -h	safe-write
+mprof rm x	safe-write
+mprof run	denied
+mprof run x	denied
+mprof x	denied
+msbuild	safe-write
+msbuild --help	safe-write
+msbuild --help -binaryLogger	safe-write
+msbuild --help -binaryLogger x	safe-write
+msbuild --help x	safe-write
+msbuild --version	denied
+msbuild -binaryLogger	safe-write
+msbuild -binaryLogger x	safe-write
+msbuild -check	safe-write
+msbuild -clp	safe-write
+msbuild -clp x	safe-write
+msbuild -consoleLoggerParameters	safe-write
+msbuild -consoleLoggerParameters x	safe-write
+msbuild -debug	safe-write
+msbuild -detailedSummary	safe-write
+msbuild -distributedFileLogger	safe-write
+msbuild -distributedFileLogger x	safe-write
+msbuild -distributedlogger	safe-write
+msbuild -distributedlogger x	safe-write
+msbuild -dl	safe-write
+msbuild -ds	safe-write
+msbuild -fileLogger	safe-write
+msbuild -fileLogger x	safe-write
+msbuild -fileLoggerParameters x	safe-write
+msbuild -fl	safe-write
+msbuild -flp x	safe-write
+msbuild -getItem	safe-write
+msbuild -getItem x	safe-write
+msbuild -getProperty	safe-write
+msbuild -getProperty x	safe-write
+msbuild -getTargetResult	safe-write
+msbuild -getTargetResult x	safe-write
+msbuild -graphBuild	safe-write
+msbuild -help	safe-write
+msbuild -ignoreProjectExtensions	safe-write
+msbuild -inputResultsCaches x	safe-write
+msbuild -interactive	safe-write
+msbuild -isolateProjects	safe-write
+msbuild -logger x	safe-write
+msbuild -lowPriority	safe-write
+msbuild -m	safe-write
+msbuild -maxcpucount	safe-write
+msbuild -maxcpucount x	safe-write
+msbuild -multiProc	safe-write
+msbuild -noAutoResponse	safe-write
+msbuild -noConsoleLogger	safe-write
+msbuild -noLogo	safe-write
+msbuild -nodeReuse	safe-write
+msbuild -nodeReuse x	safe-write
+msbuild -nologo	safe-write
+msbuild -nor	safe-write
+msbuild -outputResultsCache x	safe-write
+msbuild -p x	safe-write
+msbuild -preprocess	safe-write
+msbuild -preprocess x	safe-write
+msbuild -profileEvaluation	safe-write
+msbuild -profileEvaluation x	safe-write
+msbuild -property x	safe-write
+msbuild -q	safe-write
+msbuild -quiet	safe-write
+msbuild -r	safe-write
+msbuild -restore	safe-write
+msbuild -restore x	safe-write
+msbuild -restoreProperty	safe-write
+msbuild -t	safe-write
+msbuild -target	safe-write
+msbuild -target x	safe-write
+msbuild -terminalLogger	safe-write
+msbuild -terminalLogger x	safe-write
+msbuild -tl	safe-write
+msbuild -toolsVersion	safe-write
+msbuild -toolsVersion x	safe-write
+msbuild -tv	safe-write
+msbuild -tv x	safe-write
+msbuild -v	safe-write
+msbuild -validate	safe-write
+msbuild -ver	safe-write
+msbuild -verbosity	safe-write
+msbuild -verbosity x	safe-write
+msbuild -version	safe-write
+msbuild -warnAsError	safe-write
+msbuild -warnAsError x	safe-write
+msbuild -warnAsMessage	safe-write
+msbuild -warnAsMessage x	safe-write
+msbuild -warnNotAsError	safe-write
+msbuild -warnNotAsError x	safe-write
+msbuild /?	safe-write
+msbuild /binaryLogger	safe-write
+msbuild /binaryLogger x	safe-write
+msbuild /check	safe-write
+msbuild /clp	safe-write
+msbuild /clp x	safe-write
+msbuild /consoleLoggerParameters	safe-write
+msbuild /consoleLoggerParameters x	safe-write
+msbuild /debug	safe-write
+msbuild /detailedSummary	safe-write
+msbuild /distributedFileLogger	safe-write
+msbuild /distributedFileLogger x	safe-write
+msbuild /distributedlogger	safe-write
+msbuild /distributedlogger x	safe-write
+msbuild /dl	safe-write
+msbuild /ds	safe-write
+msbuild /fileLogger	safe-write
+msbuild /fileLogger x	safe-write
+msbuild /fileLoggerParameters x	safe-write
+msbuild /fl	safe-write
+msbuild /flp x	safe-write
+msbuild /getItem	safe-write
+msbuild /getItem x	safe-write
+msbuild /getProperty	safe-write
+msbuild /getProperty x	safe-write
+msbuild /getTargetResult	safe-write
+msbuild /getTargetResult x	safe-write
+msbuild /graphBuild	safe-write
+msbuild /help	safe-write
+msbuild /ignoreProjectExtensions	safe-write
+msbuild /inputResultsCaches	safe-write
+msbuild /inputResultsCaches x	safe-write
+msbuild /interactive	safe-write
+msbuild /isolateProjects	safe-write
+msbuild /logger x	safe-write
+msbuild /lowPriority	safe-write
+msbuild /m	safe-write
+msbuild /maxcpucount	safe-write
+msbuild /maxcpucount x	safe-write
+msbuild /multiProc	safe-write
+msbuild /noAutoResponse	safe-write
+msbuild /noConsoleLogger	safe-write
+msbuild /noLogo	safe-write
+msbuild /nodeReuse	safe-write
+msbuild /nodeReuse x	safe-write
+msbuild /nologo	safe-write
+msbuild /nor	safe-write
+msbuild /outputResultsCache x	safe-write
+msbuild /p x	safe-write
+msbuild /p:RestoreNoCache=true	safe-write
+msbuild /preprocess	safe-write
+msbuild /preprocess x	safe-write
+msbuild /profileEvaluation	safe-write
+msbuild /profileEvaluation x	safe-write
+msbuild /property x	safe-write
+msbuild /q	safe-write
+msbuild /quiet	safe-write
+msbuild /r	safe-write
+msbuild /restore	safe-write
+msbuild /restore x	safe-write
+msbuild /restoreProperty	safe-write
+msbuild /t	safe-write
+msbuild /target	safe-write
+msbuild /target x	safe-write
+msbuild /terminalLogger	safe-write
+msbuild /terminalLogger x	safe-write
+msbuild /tl	safe-write
+msbuild /toolsVersion	safe-write
+msbuild /toolsVersion x	safe-write
+msbuild /tv	safe-write
+msbuild /tv x	safe-write
+msbuild /v	safe-write
+msbuild /validate	safe-write
+msbuild /ver	safe-write
+msbuild /verbosity	safe-write
+msbuild /verbosity x	safe-write
+msbuild /version	safe-write
+msbuild /warnAsError	safe-write
+msbuild /warnAsError x	safe-write
+msbuild /warnAsMessage	safe-write
+msbuild /warnAsMessage x	safe-write
+msbuild /warnNotAsError	safe-write
+msbuild /warnNotAsError x	safe-write
+msbuild x	safe-write
+msgattrib	denied
+msgattrib --help	inert
+msgattrib --help --output-file x	inert
+msgattrib --help --version	inert
+msgattrib --help x	inert
+msgattrib --output-file x	inert
+msgattrib --version	inert
+msgattrib -o x	inert
+msgattrib x	inert
+msgcat	inert
+msgcat --files-from x	inert
+msgcat --help	inert
+msgcat --help --files-from x	inert
+msgcat --help --version	inert
+msgcat --help x	inert
+msgcat --output-file x	inert
+msgcat --version	inert
+msgcat -D x	inert
+msgcat -V	inert
+msgcat -f x	inert
+msgcat -h	inert
+msgcat -o x	inert
+msgcat x	inert
+msgcmp	denied
+msgcmp --help	inert
+msgcmp --help --version	inert
+msgcmp --help x	inert
+msgcmp --version	inert
+msgcmp -V	inert
+msgcmp -h	inert
+msgcmp x	inert
+msgcomm	denied
+msgcomm --help	inert
+msgcomm --help --output-file x	inert
+msgcomm --help --version	inert
+msgcomm --help x	inert
+msgcomm --output-file x	inert
+msgcomm --version	inert
+msgcomm -D x	inert
+msgcomm -o x	inert
+msgcomm x	inert
+msgconv	denied
+msgconv --help	inert
+msgconv --help --output-file x	inert
+msgconv --help --version	inert
+msgconv --help x	inert
+msgconv --output-file x	inert
+msgconv --to-code x	inert
+msgconv --version	inert
+msgconv -o x	inert
+msgconv -t x	inert
+msgconv x	inert
+msgen	denied
+msgen --help	inert
+msgen --help --output-file x	inert
+msgen --help --version	inert
+msgen --help x	inert
+msgen --output-file x	inert
+msgen --version	inert
+msgen -o x	inert
+msgen x	inert
+msgexec	denied
+msgexec --help	denied
+msgexec --help --input x	denied
+msgexec --help --version	denied
+msgexec --help x	denied
+msgexec --input x	denied
+msgexec --newline x	denied
+msgexec --version	denied
+msgexec -i x	denied
+msgexec x	denied
+msgfilter	denied
+msgfilter --help	denied
+msgfilter --help --input x	denied
+msgfilter --help --keep-header	denied
+msgfilter --help x	denied
+msgfilter --input x	denied
+msgfilter --keep-header	denied
+msgfilter --output-file x	denied
+msgfilter --version	denied
+msgfilter -i x	denied
+msgfilter -o x	denied
+msgfilter x	denied
+msgfmt	denied
+msgfmt --check	safe-write
+msgfmt --check --directory x	safe-write
+msgfmt --check --help	safe-write
+msgfmt --check x	safe-write
+msgfmt --directory x	safe-write
+msgfmt --help	safe-write
+msgfmt --output-file x	safe-write
+msgfmt --statistics	safe-write
+msgfmt --verbose	safe-write
+msgfmt --version	safe-write
+msgfmt -D x	safe-write
+msgfmt -c	safe-write
+msgfmt -d x	safe-write
+msgfmt -l x	safe-write
+msgfmt -o x	safe-write
+msgfmt -v	safe-write
+msgfmt x	safe-write
+msggrep	denied
+msggrep --help	inert
+msggrep --help --output-file x	inert
+msggrep --help --version	inert
+msggrep --help x	inert
+msggrep --output-file x	inert
+msggrep --regexp x	inert
+msggrep --version	inert
+msggrep -C	inert
+msggrep -E x	inert
+msggrep -J	inert
+msggrep -K	inert
+msggrep -N	inert
+msggrep -T	inert
+msggrep -e	inert
+msggrep -o x	inert
+msggrep x	inert
+msginit	safe-write
+msginit --help	safe-write
+msginit --help --input x	safe-write
+msginit --help --no-translator	safe-write
+msginit --help x	safe-write
+msginit --input x	safe-write
+msginit --locale x	safe-write
+msginit --no-translator	safe-write
+msginit --output-file x	safe-write
+msginit --version	safe-write
+msginit -i x	safe-write
+msginit -l x	safe-write
+msginit -o x	safe-write
+msginit x	safe-write
+msgmerge	denied
+msgmerge --backup	safe-write
+msgmerge --backup --help	safe-write
+msgmerge --backup --output-file x	safe-write
+msgmerge --backup x	safe-write
+msgmerge --help	safe-write
+msgmerge --output-file x	safe-write
+msgmerge --update	safe-write
+msgmerge --version	safe-write
+msgmerge -D x	safe-write
+msgmerge -N	safe-write
+msgmerge -U	safe-write
+msgmerge -o x	safe-write
+msgmerge x	safe-write
+msgunfmt	denied
+msgunfmt --help	safe-write
+msgunfmt --help --output-file x	safe-write
+msgunfmt --help --version	safe-write
+msgunfmt --help x	safe-write
+msgunfmt --output-file x	safe-write
+msgunfmt --version	safe-write
+msgunfmt -o x	safe-write
+msgunfmt x	safe-write
+msguniq	denied
+msguniq --help	inert
+msguniq --help --output-file x	inert
+msguniq --help --repeated	inert
+msguniq --help x	inert
+msguniq --output-file x	inert
+msguniq --repeated	inert
+msguniq --unique	inert
+msguniq --version	inert
+msguniq -o x	inert
+msguniq x	inert
+mtr	denied
+mtr --address x	inert
+mtr --count x	inert
+mtr --help	inert
+mtr --help --address x	inert
+mtr --help --no-dns	inert
+mtr --help x	inert
+mtr --interval x	inert
+mtr --max-ttl x	inert
+mtr --no-dns	inert
+mtr --psize x	inert
+mtr --report	inert
+mtr --report-cycles x	inert
+mtr --report-wide	inert
+mtr --show-ips	inert
+mtr --type x	inert
+mtr --version	inert
+mtr -4	inert
+mtr -6	inert
+mtr -I x	inert
+mtr -V	inert
+mtr -a x	inert
+mtr -b	inert
+mtr -c x	inert
+mtr -h	inert
+mtr -i x	inert
+mtr -m x	inert
+mtr -n	inert
+mtr -r	inert
+mtr -s x	inert
+mtr -w	inert
+mtr x	inert
+mtree	inert
+mtree --help	denied
+mtree --version	denied
+mtree -D	inert
+mtree -D -K x	inert
+mtree -D -L	inert
+mtree -D x	inert
+mtree -K x	inert
+mtree -L	inert
+mtree -P	inert
+mtree -S	inert
+mtree -U	safe-write
+mtree -X x	inert
+mtree -c	inert
+mtree -d	inert
+mtree -e	inert
+mtree -f x	inert
+mtree -i	inert
+mtree -k x	inert
+mtree -n	inert
+mtree -p /tmp	inert
+mtree -p x	inert
+mtree -q	inert
+mtree -r	safe-write
+mtree -s x	inert
+mtree -u	safe-write
+mtree -w	inert
+mtree -x	inert
+mtree x	inert
+muse	denied
+muse --help	inert
+muse --help --version	denied
+muse --help x	denied
+muse --version	inert
+muse -V	inert
+muse -h	inert
+muse board-content	denied
+muse board-content --help	safe-read
+muse board-content --help -h	safe-read
+muse board-content --help x	safe-read
+muse board-content -h	safe-read
+muse board-content x	safe-read
+muse board-create	denied
+muse board-create --help	safe-write
+muse board-create --help --workspace x	safe-write
+muse board-create --help -h	safe-write
+muse board-create --help x	safe-write
+muse board-create --workspace x	safe-write
+muse board-create -h	safe-write
+muse board-create x	safe-write
+muse card-content	denied
+muse card-content --help	safe-read
+muse card-content --help -h	safe-read
+muse card-content --help x	safe-read
+muse card-content -h	safe-read
+muse card-content x	safe-read
+muse card-move	denied
+muse card-move --help	safe-write
+muse card-move --help -h	safe-write
+muse card-move --help x	safe-write
+muse card-move -h	safe-write
+muse card-move x	safe-write
+muse cli	denied
+muse cli x	denied
+muse delete	denied
+muse delete --help	safe-write
+muse delete --help -h	safe-write
+muse delete --help x	safe-write
+muse delete -h	safe-write
+muse delete x	safe-write
+muse list-workspaces	safe-read
+muse list-workspaces --help	safe-read
+muse list-workspaces --help -h	safe-read
+muse list-workspaces --help x	safe-read
+muse list-workspaces -h	safe-read
+muse list-workspaces x	safe-read
+muse note-create	denied
+muse note-create --board x	safe-write
+muse note-create --help	safe-write
+muse note-create --help --board x	safe-write
+muse note-create --help -h	safe-write
+muse note-create --help x	safe-write
+muse note-create --workspace x	safe-write
+muse note-create -h	safe-write
+muse note-create x	safe-write
+muse open	denied
+muse open --help	safe-read
+muse open --help -h	safe-read
+muse open --help x	safe-read
+muse open -h	safe-read
+muse open x	safe-read
+muse search	denied
+muse search --help	safe-read
+muse search --help --type x	safe-read
+muse search --help -h	safe-read
+muse search --help x	safe-read
+muse search --type x	safe-read
+muse search --workspace x	safe-read
+muse search -h	safe-read
+muse search x	safe-read
+muse url-create	denied
+muse url-create --board x	safe-write
+muse url-create --help	safe-write
+muse url-create --help --board x	safe-write
+muse url-create --help -h	safe-write
+muse url-create --help x	safe-write
+muse url-create --workspace x	safe-write
+muse url-create -h	safe-write
+muse url-create x	safe-write
+muse x	denied
+mutant	denied
+mutant --help	inert
+mutant --help --version	denied
+mutant --help x	denied
+mutant --version	inert
+mutant -h	inert
+mutant -v	inert
+mutant environment	denied
+mutant environment x	denied
+mutant help	inert
+mutant help x	inert
+mutant run	denied
+mutant run x	denied
+mutant subscription	denied
+mutant subscription x	denied
+mutant util	denied
+mutant util x	denied
+mutant x	denied
+mutool	denied
+mutool --help	inert
+mutool --help --version	denied
+mutool --help x	denied
+mutool --version	inert
+mutool -V	inert
+mutool -h	inert
+mutool audit	denied
+mutool audit --help	safe-read
+mutool audit --help -?	safe-read
+mutool audit --help x	safe-read
+mutool audit -?	safe-read
+mutool audit -h	safe-read
+mutool audit x	safe-read
+mutool bake	denied
+mutool bake --help	safe-write
+mutool bake --help -?	safe-write
+mutool bake --help x	safe-write
+mutool bake -?	safe-write
+mutool bake -h	safe-write
+mutool bake x	safe-write
+mutool barcode	denied
+mutool barcode --help	safe-write
+mutool barcode --help -?	safe-write
+mutool barcode --help x	safe-write
+mutool barcode -?	safe-write
+mutool barcode -h	safe-write
+mutool barcode x	safe-write
+mutool clean	denied
+mutool clean --help	safe-write
+mutool clean --help -?	safe-write
+mutool clean --help x	safe-write
+mutool clean -?	safe-write
+mutool clean -h	safe-write
+mutool clean x	safe-write
+mutool convert	denied
+mutool convert --help	safe-write
+mutool convert --help -?	safe-write
+mutool convert --help x	safe-write
+mutool convert -?	safe-write
+mutool convert -h	safe-write
+mutool convert x	safe-write
+mutool create	denied
+mutool create --help	safe-write
+mutool create --help -?	safe-write
+mutool create --help x	safe-write
+mutool create -?	safe-write
+mutool create -h	safe-write
+mutool create x	safe-write
+mutool draw	denied
+mutool draw --help	safe-write
+mutool draw --help -?	safe-write
+mutool draw --help x	safe-write
+mutool draw -?	safe-write
+mutool draw -h	safe-write
+mutool draw x	safe-write
+mutool extract	denied
+mutool extract --help	safe-write
+mutool extract --help -?	safe-write
+mutool extract --help x	safe-write
+mutool extract -?	safe-write
+mutool extract -h	safe-write
+mutool extract x	safe-write
+mutool grep	denied
+mutool grep --help	safe-read
+mutool grep --help -?	safe-read
+mutool grep --help x	safe-read
+mutool grep -?	safe-read
+mutool grep -h	safe-read
+mutool grep x	safe-read
+mutool info	denied
+mutool info --help	safe-read
+mutool info --help -?	safe-read
+mutool info --help x	safe-read
+mutool info -?	safe-read
+mutool info -h	safe-read
+mutool info x	safe-read
+mutool merge	denied
+mutool merge --help	safe-write
+mutool merge --help -?	safe-write
+mutool merge --help x	safe-write
+mutool merge -?	safe-write
+mutool merge -h	safe-write
+mutool merge x	safe-write
+mutool pages	denied
+mutool pages --help	safe-write
+mutool pages --help -?	safe-write
+mutool pages --help x	safe-write
+mutool pages -?	safe-write
+mutool pages -h	safe-write
+mutool pages x	safe-write
+mutool poster	denied
+mutool poster --help	safe-write
+mutool poster --help -?	safe-write
+mutool poster --help x	safe-write
+mutool poster -?	safe-write
+mutool poster -h	safe-write
+mutool poster x	safe-write
+mutool recolor	denied
+mutool recolor --help	safe-write
+mutool recolor --help -?	safe-write
+mutool recolor --help x	safe-write
+mutool recolor -?	safe-write
+mutool recolor -h	safe-write
+mutool recolor x	safe-write
+mutool run	denied
+mutool run x	denied
+mutool show	denied
+mutool show --help	safe-read
+mutool show --help -?	safe-read
+mutool show --help x	safe-read
+mutool show -?	safe-read
+mutool show -h	safe-read
+mutool show x	safe-read
+mutool sign	denied
+mutool sign --help	safe-write
+mutool sign --help -?	safe-write
+mutool sign --help x	safe-write
+mutool sign -?	safe-write
+mutool sign -h	safe-write
+mutool sign x	safe-write
+mutool trace	denied
+mutool trace --help	safe-read
+mutool trace --help -?	safe-read
+mutool trace --help x	safe-read
+mutool trace -?	safe-read
+mutool trace -h	safe-read
+mutool trace x	safe-read
+mutool trim	denied
+mutool trim --help	safe-write
+mutool trim --help -?	safe-write
+mutool trim --help x	safe-write
+mutool trim -?	safe-write
+mutool trim -h	safe-write
+mutool trim x	safe-write
+mutool x	denied
+mv	denied
+mv --backup	denied
+mv --backup --backup x	denied
+mv --backup --force	denied
+mv --backup x	denied
+mv --force	denied
+mv --help	denied
+mv --interactive	denied
+mv --no-clobber	denied
+mv --no-target-directory	denied
+mv --strip-trailing-slashes	denied
+mv --suffix x	denied
+mv --target-directory x	denied
+mv --update	denied
+mv --verbose	denied
+mv --version	denied
+mv -S x	denied
+mv -T	denied
+mv -f	denied
+mv -h	denied
+mv -i	denied
+mv -n	denied
+mv -t x	denied
+mv -u	denied
+mv -v	denied
+mv old.txt new.txt	safe-write
+mv x	denied
+mvn	denied
+mvn --version	inert
+mvn -v	inert
+mvn / mvnw	denied
+mvn / mvnw --help	denied
+mvn / mvnw --version	denied
+mvn / mvnw x	denied
+mvn clean	denied
+mvn compile	safe-write
+mvn dependency:list	inert
+mvn dependency:tree	inert
+mvn dependency:tree --offline	inert
+mvn deploy	denied
+mvn help:describe -Dplugin=compiler	inert
+mvn install	denied
+mvn test	safe-read
+mvn test --batch-mode	safe-read
+mvn test -Dtest=MyTest	safe-read
+mvn test-compile	safe-write
+mvn validate	safe-read
+mvn verify	safe-read
+mvnw --version	inert
+mvnw test	safe-read
+mycli	denied
+mycli --help	inert
+mycli --help --version	inert
+mycli --help x	denied
+mycli --version	inert
+mycli -V	inert
+mycli -h	inert
+mycli x	denied
+mypy	denied
+mypy --cache-dir x	safe-read
+mypy --config-file x	safe-read
+mypy --exclude x	safe-read
+mypy --follow-imports x	safe-read
+mypy --help	safe-read
+mypy --help --cache-dir x	safe-read
+mypy --help --no-error-summary	safe-read
+mypy --help x	safe-read
+mypy --ignore-missing-imports x	safe-read
+mypy --module x	safe-read
+mypy --namespace-packages x	safe-read
+mypy --no-error-summary	safe-read
+mypy --no-incremental	safe-read
+mypy --package x	safe-read
+mypy --pretty	safe-read
+mypy --python-executable x	safe-read
+mypy --python-version x	safe-read
+mypy --show-column-numbers	safe-read
+mypy --show-error-codes	safe-read
+mypy --show-error-context	safe-read
+mypy --strict	safe-read
+mypy --verbose	safe-read
+mypy --version	safe-read
+mypy --warn-redundant-casts	safe-read
+mypy --warn-return-any	safe-read
+mypy --warn-unreachable	safe-read
+mypy --warn-unused-ignores	safe-read
+mypy -V	safe-read
+mypy -h	safe-read
+mypy -m x	safe-read
+mypy -p x	safe-read
+mypy -v	safe-read
+mypy x	safe-read
+mysql	denied
+mysql --help	inert
+mysql --help --version	inert
+mysql --help x	denied
+mysql --version	inert
+mysql -?	inert
+mysql -V	inert
+mysql x	denied
+mysqladmin	denied
+mysqladmin --character-sets-dir x	safe-read
+mysqladmin --connect-timeout	safe-read
+mysqladmin --connect-timeout --character-sets-dir x	safe-read
+mysqladmin --connect-timeout --count	safe-read
+mysqladmin --connect-timeout x	safe-read
+mysqladmin --count	safe-read
+mysqladmin --count x	safe-read
+mysqladmin --debug	safe-read
+mysqladmin --debug-check	safe-read
+mysqladmin --debug-info	safe-read
+mysqladmin --default-auth	safe-read
+mysqladmin --default-auth x	safe-read
+mysqladmin --default-character-set	safe-read
+mysqladmin --default-character-set x	safe-read
+mysqladmin --enable-cleartext-plugin	safe-read
+mysqladmin --force	safe-read
+mysqladmin --help	safe-read
+mysqladmin --host	safe-read
+mysqladmin --host x	safe-read
+mysqladmin --login-path	safe-read
+mysqladmin --login-path x	safe-read
+mysqladmin --login-timeout	safe-read
+mysqladmin --login-timeout x	safe-read
+mysqladmin --no-beep	safe-read
+mysqladmin --no-defaults	safe-read
+mysqladmin --password	safe-read
+mysqladmin --password x	safe-read
+mysqladmin --pipe	safe-read
+mysqladmin --port	safe-read
+mysqladmin --port x	safe-read
+mysqladmin --print-defaults	safe-read
+mysqladmin --protocol	safe-read
+mysqladmin --protocol x	safe-read
+mysqladmin --relative	safe-read
+mysqladmin --shutdown-timeout	safe-read
+mysqladmin --shutdown-timeout x	safe-read
+mysqladmin --silent	safe-read
+mysqladmin --sleep	safe-read
+mysqladmin --sleep x	safe-read
+mysqladmin --socket	safe-read
+mysqladmin --socket x	safe-read
+mysqladmin --ssl	safe-read
+mysqladmin --ssl-ca x	safe-read
+mysqladmin --ssl-capath x	safe-read
+mysqladmin --ssl-cert x	safe-read
+mysqladmin --ssl-cipher x	safe-read
+mysqladmin --ssl-fips-mode	safe-read
+mysqladmin --ssl-key x	safe-read
+mysqladmin --ssl-mode	safe-read
+mysqladmin --ssl-mode x	safe-read
+mysqladmin --user	safe-read
+mysqladmin --user x	safe-read
+mysqladmin --verbose	safe-read
+mysqladmin --version	safe-read
+mysqladmin --vertical	safe-read
+mysqladmin --wait	safe-read
+mysqladmin -?	safe-read
+mysqladmin -B	safe-read
+mysqladmin -C	safe-read
+mysqladmin -E	safe-read
+mysqladmin -F	safe-read
+mysqladmin -G	safe-read
+mysqladmin -K	safe-read
+mysqladmin -N	safe-read
+mysqladmin -O	safe-read
+mysqladmin -P x	safe-read
+mysqladmin -S	safe-read
+mysqladmin -S x	safe-read
+mysqladmin -T	safe-read
+mysqladmin -V	safe-read
+mysqladmin -c	safe-read
+mysqladmin -c x	safe-read
+mysqladmin -d	safe-read
+mysqladmin -e	safe-read
+mysqladmin -f	safe-read
+mysqladmin -h	safe-read
+mysqladmin -h x	safe-read
+mysqladmin -i	safe-read
+mysqladmin -i x	safe-read
+mysqladmin -p	safe-read
+mysqladmin -p x	safe-read
+mysqladmin -r	safe-read
+mysqladmin -s	safe-read
+mysqladmin -t	safe-read
+mysqladmin -u	safe-read
+mysqladmin -u x	safe-read
+mysqladmin -v	safe-read
+mysqladmin -w	safe-read
+mysqladmin x	safe-read
+mysqlcheck	denied
+mysqlcheck --all-databases	safe-write
+mysqlcheck --all-databases --all-in-1	safe-write
+mysqlcheck --all-databases --databases x	safe-write
+mysqlcheck --all-databases x	safe-write
+mysqlcheck --all-in-1	safe-write
+mysqlcheck --analyze	safe-write
+mysqlcheck --auto-repair	safe-write
+mysqlcheck --character-sets-dir	safe-write
+mysqlcheck --check	safe-write
+mysqlcheck --check-only-changed	safe-write
+mysqlcheck --check-upgrade	safe-write
+mysqlcheck --databases	safe-write
+mysqlcheck --databases x	safe-write
+mysqlcheck --debug	safe-write
+mysqlcheck --debug-check	safe-write
+mysqlcheck --debug-info	safe-write
+mysqlcheck --default-auth	safe-write
+mysqlcheck --default-auth x	safe-write
+mysqlcheck --default-character-set	safe-write
+mysqlcheck --default-character-set x	safe-write
+mysqlcheck --enable-cleartext-plugin	safe-write
+mysqlcheck --extended	safe-write
+mysqlcheck --fast	safe-write
+mysqlcheck --fix-db-names	safe-write
+mysqlcheck --fix-table-names	safe-write
+mysqlcheck --force	safe-write
+mysqlcheck --help	safe-write
+mysqlcheck --host	safe-write
+mysqlcheck --host x	safe-write
+mysqlcheck --login-path	safe-write
+mysqlcheck --login-path x	safe-write
+mysqlcheck --medium-check	safe-write
+mysqlcheck --optimize	safe-write
+mysqlcheck --password	safe-write
+mysqlcheck --password x	safe-write
+mysqlcheck --pipe	safe-write
+mysqlcheck --port	safe-write
+mysqlcheck --port x	safe-write
+mysqlcheck --print-defaults	safe-write
+mysqlcheck --protocol	safe-write
+mysqlcheck --protocol x	safe-write
+mysqlcheck --quick	safe-write
+mysqlcheck --repair	safe-write
+mysqlcheck --silent	safe-write
+mysqlcheck --skip-database	safe-write
+mysqlcheck --socket	safe-write
+mysqlcheck --socket x	safe-write
+mysqlcheck --ssl	safe-write
+mysqlcheck --ssl-ca x	safe-write
+mysqlcheck --ssl-capath x	safe-write
+mysqlcheck --ssl-cert x	safe-write
+mysqlcheck --ssl-cipher x	safe-write
+mysqlcheck --ssl-fips-mode	safe-write
+mysqlcheck --ssl-key x	safe-write
+mysqlcheck --ssl-mode	safe-write
+mysqlcheck --ssl-mode x	safe-write
+mysqlcheck --tables	safe-write
+mysqlcheck --use-frm	safe-write
+mysqlcheck --user	safe-write
+mysqlcheck --user x	safe-write
+mysqlcheck --verbose	safe-write
+mysqlcheck --version	safe-write
+mysqlcheck --write-binlog	safe-write
+mysqlcheck -?	safe-write
+mysqlcheck -A	safe-write
+mysqlcheck -B	safe-write
+mysqlcheck -C	safe-write
+mysqlcheck -F	safe-write
+mysqlcheck -N	safe-write
+mysqlcheck -O	safe-write
+mysqlcheck -P x	safe-write
+mysqlcheck -S	safe-write
+mysqlcheck -S x	safe-write
+mysqlcheck -T	safe-write
+mysqlcheck -V	safe-write
+mysqlcheck -W	safe-write
+mysqlcheck -a	safe-write
+mysqlcheck -c	safe-write
+mysqlcheck -e	safe-write
+mysqlcheck -f	safe-write
+mysqlcheck -h	safe-write
+mysqlcheck -h x	safe-write
+mysqlcheck -m	safe-write
+mysqlcheck -o	safe-write
+mysqlcheck -p	safe-write
+mysqlcheck -p x	safe-write
+mysqlcheck -q	safe-write
+mysqlcheck -r	safe-write
+mysqlcheck -s	safe-write
+mysqlcheck -u	safe-write
+mysqlcheck -u x	safe-write
+mysqlcheck -v	safe-write
+mysqlcheck x	safe-write
+mysqldump	denied
+mysqldump --add-drop-database	safe-read
+mysqldump --add-drop-database --add-drop-table	safe-read
+mysqldump --add-drop-database --character-sets-dir x	safe-read
+mysqldump --add-drop-database x	safe-read
+mysqldump --add-drop-table	safe-read
+mysqldump --add-drop-trigger	safe-read
+mysqldump --add-locks	safe-read
+mysqldump --all-databases	safe-read
+mysqldump --allow-keywords	safe-read
+mysqldump --apply-replica-statements	safe-read
+mysqldump --apply-slave-statements	safe-read
+mysqldump --character-sets-dir x	safe-read
+mysqldump --compact	safe-read
+mysqldump --compatible	safe-read
+mysqldump --compatible x	safe-read
+mysqldump --complete-insert	safe-read
+mysqldump --compress	safe-read
+mysqldump --create-options	safe-read
+mysqldump --databases	safe-read
+mysqldump --databases x	safe-read
+mysqldump --debug	safe-read
+mysqldump --debug-check	safe-read
+mysqldump --debug-info	safe-read
+mysqldump --default-auth x	safe-read
+mysqldump --default-character-set	safe-read
+mysqldump --default-character-set x	safe-read
+mysqldump --delayed-insert	safe-read
+mysqldump --delete-master-logs	safe-read
+mysqldump --disable-keys	safe-read
+mysqldump --dump-date	safe-read
+mysqldump --dump-replica	safe-read
+mysqldump --dump-slave	safe-read
+mysqldump --enable-cleartext-plugin x	safe-read
+mysqldump --events	safe-read
+mysqldump --exclude-gtids x	safe-read
+mysqldump --extended-insert	safe-read
+mysqldump --fields-enclosed-by	safe-read
+mysqldump --fields-enclosed-by x	safe-read
+mysqldump --fields-escaped-by	safe-read
+mysqldump --fields-escaped-by x	safe-read
+mysqldump --fields-optionally-enclosed-by	safe-read
+mysqldump --fields-optionally-enclosed-by x	safe-read
+mysqldump --fields-terminated-by	safe-read
+mysqldump --fields-terminated-by x	safe-read
+mysqldump --flush-logs	safe-read
+mysqldump --flush-privileges	safe-read
+mysqldump --flushlog x	safe-read
+mysqldump --force	safe-read
+mysqldump --gtid-purged x	safe-read
+mysqldump --help	safe-read
+mysqldump --hex-blob	safe-read
+mysqldump --host	safe-read
+mysqldump --host x	safe-read
+mysqldump --ignore-error	safe-read
+mysqldump --ignore-error x	safe-read
+mysqldump --ignore-table	safe-read
+mysqldump --ignore-table x	safe-read
+mysqldump --include-master-host-port	safe-read
+mysqldump --init-command x	safe-read
+mysqldump --insert-ignore	safe-read
+mysqldump --lines-terminated-by	safe-read
+mysqldump --lines-terminated-by x	safe-read
+mysqldump --lock-all-tables	safe-read
+mysqldump --lock-tables	safe-read
+mysqldump --log-error	safe-read
+mysqldump --login-path	safe-read
+mysqldump --login-path x	safe-read
+mysqldump --master-data	safe-read
+mysqldump --max-allowed-packet	safe-read
+mysqldump --max-allowed-packet x	safe-read
+mysqldump --mysqld-long-query-time	safe-read
+mysqldump --mysqld-long-query-time x	safe-read
+mysqldump --net-buffer-length	safe-read
+mysqldump --net-buffer-length x	safe-read
+mysqldump --no-autocommit	safe-read
+mysqldump --no-create-db	safe-read
+mysqldump --no-create-info	safe-read
+mysqldump --no-data	safe-read
+mysqldump --no-set-names	safe-read
+mysqldump --no-tablespaces	safe-read
+mysqldump --opt	safe-read
+mysqldump --order-by-primary	safe-read
+mysqldump --password	safe-read
+mysqldump --password x	safe-read
+mysqldump --pid-file x	safe-read
+mysqldump --pipe	safe-read
+mysqldump --plugin-dir x	safe-read
+mysqldump --port	safe-read
+mysqldump --port x	safe-read
+mysqldump --protocol	safe-read
+mysqldump --protocol x	safe-read
+mysqldump --quick	safe-read
+mysqldump --quote-names	safe-read
+mysqldump --replace	safe-read
+mysqldump --result-file x	safe-read
+mysqldump --routines	safe-read
+mysqldump --secure-auth x	safe-read
+mysqldump --server-public-key-path x	safe-read
+mysqldump --set-charset	safe-read
+mysqldump --set-gtid-purged	safe-read
+mysqldump --set-gtid-purged x	safe-read
+mysqldump --show-create-skip-secondary-engine	safe-read
+mysqldump --single-transaction	safe-read
+mysqldump --skip-add-drop-table	safe-read
+mysqldump --skip-add-locks	safe-read
+mysqldump --skip-comments	safe-read
+mysqldump --skip-compact	safe-read
+mysqldump --skip-disable-keys	safe-read
+mysqldump --skip-extended-insert	safe-read
+mysqldump --skip-lock-tables	safe-read
+mysqldump --skip-opt	safe-read
+mysqldump --skip-quick	safe-read
+mysqldump --skip-quote-names	safe-read
+mysqldump --skip-set-charset	safe-read
+mysqldump --skip-triggers	safe-read
+mysqldump --skip-tz-utc	safe-read
+mysqldump --socket	safe-read
+mysqldump --socket x	safe-read
+mysqldump --ssl	safe-read
+mysqldump --ssl-ca x	safe-read
+mysqldump --ssl-capath x	safe-read
+mysqldump --ssl-cert x	safe-read
+mysqldump --ssl-cipher x	safe-read
+mysqldump --ssl-fips-mode x	safe-read
+mysqldump --ssl-key x	safe-read
+mysqldump --ssl-mode x	safe-read
+mysqldump --tab	safe-read
+mysqldump --tab x	safe-read
+mysqldump --triggers	safe-read
+mysqldump --tz-utc	safe-read
+mysqldump --user	safe-read
+mysqldump --user x	safe-read
+mysqldump --verbose	safe-read
+mysqldump --version	safe-read
+mysqldump --where	safe-read
+mysqldump --where x	safe-read
+mysqldump --xml	safe-read
+mysqldump -?	safe-read
+mysqldump -A	safe-read
+mysqldump -B	safe-read
+mysqldump -C	safe-read
+mysqldump -D	safe-read
+mysqldump -E	safe-read
+mysqldump -F	safe-read
+mysqldump -K	safe-read
+mysqldump -N	safe-read
+mysqldump -O	safe-read
+mysqldump -P x	safe-read
+mysqldump -Q	safe-read
+mysqldump -R	safe-read
+mysqldump -S x	safe-read
+mysqldump -T	safe-read
+mysqldump -V	safe-read
+mysqldump -X	safe-read
+mysqldump -c	safe-read
+mysqldump -d	safe-read
+mysqldump -e	safe-read
+mysqldump -f	safe-read
+mysqldump -h	safe-read
+mysqldump -h x	safe-read
+mysqldump -l	safe-read
+mysqldump -n	safe-read
+mysqldump -p x	safe-read
+mysqldump -q	safe-read
+mysqldump -r	safe-read
+mysqldump -r x	safe-read
+mysqldump -t	safe-read
+mysqldump -u	safe-read
+mysqldump -u x	safe-read
+mysqldump -v	safe-read
+mysqldump -w	safe-read
+mysqldump -w x	safe-read
+mysqldump -x	safe-read
+mysqldump x	safe-read
+myth	denied
+myth --bin-runtime x	safe-read
+myth --call-depth-limit x	safe-read
+myth --code x	safe-read
+myth --codesize-limit x	safe-read
+myth --create-timeout x	safe-read
+myth --debug	safe-read
+myth --debug --bin-runtime x	safe-read
+myth --debug --help	safe-read
+myth --debug x	safe-read
+myth --enable-iprof x	safe-read
+myth --execution-timeout x	safe-read
+myth --help	safe-read
+myth --max-depth x	safe-read
+myth --no-color	safe-read
+myth --outform x	safe-read
+myth --quick	safe-read
+myth --quick x	safe-read
+myth --rpc x	safe-read
+myth --rpc-tls x	safe-read
+myth --solv x	safe-read
+myth --solver-timeout x	safe-read
+myth --storage x	safe-read
+myth --strategy	safe-read
+myth --strategy x	safe-read
+myth --transaction-count x	safe-read
+myth --verbose	safe-read
+myth --version	safe-read
+myth -?	safe-read
+myth -c	safe-read
+myth -c x	safe-read
+myth -d	safe-read
+myth -f	safe-read
+myth -g	safe-read
+myth -h	safe-read
+myth -l	safe-read
+myth -l x	safe-read
+myth -o	safe-read
+myth -o x	safe-read
+myth -q	safe-read
+myth -r	safe-read
+myth -r x	safe-read
+myth -s	safe-read
+myth -s x	safe-read
+myth -t	safe-read
+myth -t x	safe-read
+myth -v	safe-read
+myth -x	safe-read
+myth -x x	safe-read
+myth x	safe-read
+mythril	denied
+mythril --bin-runtime x	safe-read
+mythril --call-depth-limit x	safe-read
+mythril --code x	safe-read
+mythril --codesize-limit x	safe-read
+mythril --create-timeout x	safe-read
+mythril --debug	safe-read
+mythril --debug --bin-runtime x	safe-read
+mythril --debug --help	safe-read
+mythril --debug x	safe-read
+mythril --enable-iprof x	safe-read
+mythril --execution-timeout x	safe-read
+mythril --help	safe-read
+mythril --max-depth x	safe-read
+mythril --no-color	safe-read
+mythril --outform x	safe-read
+mythril --quick	safe-read
+mythril --quick x	safe-read
+mythril --rpc x	safe-read
+mythril --rpc-tls x	safe-read
+mythril --solv x	safe-read
+mythril --solver-timeout x	safe-read
+mythril --storage x	safe-read
+mythril --strategy	safe-read
+mythril --strategy x	safe-read
+mythril --transaction-count x	safe-read
+mythril --verbose	safe-read
+mythril --version	safe-read
+mythril -?	safe-read
+mythril -c	safe-read
+mythril -c x	safe-read
+mythril -d	safe-read
+mythril -f	safe-read
+mythril -g	safe-read
+mythril -h	safe-read
+mythril -l	safe-read
+mythril -l x	safe-read
+mythril -o	safe-read
+mythril -o x	safe-read
+mythril -q	safe-read
+mythril -r	safe-read
+mythril -r x	safe-read
+mythril -s	safe-read
+mythril -s x	safe-read
+mythril -t	safe-read
+mythril -t x	safe-read
+mythril -v	safe-read
+mythril -x	safe-read
+mythril -x x	safe-read
+mythril x	safe-read

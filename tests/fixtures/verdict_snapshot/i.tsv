@@ -1,0 +1,2011 @@
+i18n-tasks	denied
+i18n-tasks --config x	denied
+i18n-tasks --help	inert
+i18n-tasks --help --config x	inert
+i18n-tasks --help --verbose	inert
+i18n-tasks --help x	denied
+i18n-tasks --verbose	denied
+i18n-tasks --version	inert
+i18n-tasks -c ./config/i18n-tasks.yml health	safe-read
+i18n-tasks -c /etc/i.yml health	denied
+i18n-tasks -c x	denied
+i18n-tasks -h	inert
+i18n-tasks add-missing	safe-write
+i18n-tasks add-missing --help	safe-write
+i18n-tasks add-missing --help --nil-value	safe-write
+i18n-tasks add-missing --help --pattern x	safe-write
+i18n-tasks add-missing --help x	safe-write
+i18n-tasks add-missing --nil-value	safe-write
+i18n-tasks add-missing --pattern x	safe-write
+i18n-tasks add-missing --value x	safe-write
+i18n-tasks add-missing -h	safe-write
+i18n-tasks add-missing -v x	safe-write
+i18n-tasks add-missing x	safe-write
+i18n-tasks check-consistent-interpolations	safe-read
+i18n-tasks check-consistent-interpolations --help	safe-read
+i18n-tasks check-consistent-interpolations --help --out-format x	safe-read
+i18n-tasks check-consistent-interpolations --help -h	safe-read
+i18n-tasks check-consistent-interpolations --help x	safe-read
+i18n-tasks check-consistent-interpolations --out-format x	safe-read
+i18n-tasks check-consistent-interpolations -h	safe-read
+i18n-tasks check-consistent-interpolations x	safe-read
+i18n-tasks check-normalized	safe-read
+i18n-tasks check-normalized --help	safe-read
+i18n-tasks check-normalized --help -h	safe-read
+i18n-tasks check-normalized --help x	safe-read
+i18n-tasks check-normalized -h	safe-read
+i18n-tasks check-normalized x	safe-read
+i18n-tasks check-prism	safe-write
+i18n-tasks check-prism --help	safe-write
+i18n-tasks check-prism --help --prism-mode x	safe-write
+i18n-tasks check-prism --help -h	safe-write
+i18n-tasks check-prism --help x	safe-write
+i18n-tasks check-prism --prism-mode x	safe-write
+i18n-tasks check-prism -h	safe-write
+i18n-tasks check-prism x	safe-write
+i18n-tasks check-reserved-interpolations	safe-read
+i18n-tasks check-reserved-interpolations --help	safe-read
+i18n-tasks check-reserved-interpolations --help --out-format x	safe-read
+i18n-tasks check-reserved-interpolations --help -h	safe-read
+i18n-tasks check-reserved-interpolations --help x	safe-read
+i18n-tasks check-reserved-interpolations --out-format x	safe-read
+i18n-tasks check-reserved-interpolations -h	safe-read
+i18n-tasks check-reserved-interpolations x	safe-read
+i18n-tasks config	safe-read
+i18n-tasks config --help	safe-read
+i18n-tasks config --help -h	safe-read
+i18n-tasks config --help x	safe-read
+i18n-tasks config -h	safe-read
+i18n-tasks config x	safe-read
+i18n-tasks cp	denied
+i18n-tasks cp --help	safe-write
+i18n-tasks cp --help -h	safe-write
+i18n-tasks cp --help x	safe-write
+i18n-tasks cp -h	safe-write
+i18n-tasks cp x	safe-write
+i18n-tasks data	safe-read
+i18n-tasks data --data-format x	safe-read
+i18n-tasks data --help	safe-read
+i18n-tasks data --help --data-format x	safe-read
+i18n-tasks data --help --nostdin	safe-read
+i18n-tasks data --help x	safe-read
+i18n-tasks data --nostdin	safe-read
+i18n-tasks data -h	safe-read
+i18n-tasks data x	safe-read
+i18n-tasks data-merge	safe-write
+i18n-tasks data-merge --data-format x	safe-write
+i18n-tasks data-merge --help	safe-write
+i18n-tasks data-merge --help --data-format x	safe-write
+i18n-tasks data-merge --help --nostdin	safe-write
+i18n-tasks data-merge --help x	safe-write
+i18n-tasks data-merge --nostdin	safe-write
+i18n-tasks data-merge -h	safe-write
+i18n-tasks data-merge x	safe-write
+i18n-tasks data-remove	safe-write
+i18n-tasks data-remove --data-format x	safe-write
+i18n-tasks data-remove --help	safe-write
+i18n-tasks data-remove --help --data-format x	safe-write
+i18n-tasks data-remove --help --nostdin	safe-write
+i18n-tasks data-remove --help x	safe-write
+i18n-tasks data-remove --nostdin	safe-write
+i18n-tasks data-remove -h	safe-write
+i18n-tasks data-remove x	safe-write
+i18n-tasks data-write	safe-write
+i18n-tasks data-write --data-format x	safe-write
+i18n-tasks data-write --help	safe-write
+i18n-tasks data-write --help --data-format x	safe-write
+i18n-tasks data-write --help --nostdin	safe-write
+i18n-tasks data-write --help x	safe-write
+i18n-tasks data-write --nostdin	safe-write
+i18n-tasks data-write -h	safe-write
+i18n-tasks data-write x	safe-write
+i18n-tasks eq-base	safe-read
+i18n-tasks eq-base --help	safe-read
+i18n-tasks eq-base --help --out-format x	safe-read
+i18n-tasks eq-base --help -h	safe-read
+i18n-tasks eq-base --help x	safe-read
+i18n-tasks eq-base --out-format x	safe-read
+i18n-tasks eq-base -h	safe-read
+i18n-tasks eq-base x	safe-read
+i18n-tasks find	safe-read
+i18n-tasks find --help	safe-read
+i18n-tasks find --help --no-strict	safe-read
+i18n-tasks find --help x	safe-read
+i18n-tasks find --no-strict	safe-read
+i18n-tasks find --strict	safe-read
+i18n-tasks find -h	safe-read
+i18n-tasks find x	safe-read
+i18n-tasks gem-path	safe-read
+i18n-tasks gem-path --help	safe-read
+i18n-tasks gem-path --help -h	safe-read
+i18n-tasks gem-path --help x	safe-read
+i18n-tasks gem-path -h	safe-read
+i18n-tasks gem-path x	safe-read
+i18n-tasks health	safe-read
+i18n-tasks health --help	safe-read
+i18n-tasks health --help --out-format x	safe-read
+i18n-tasks health --help -h	safe-read
+i18n-tasks health --help x	safe-read
+i18n-tasks health --out-format x	safe-read
+i18n-tasks health -h	safe-read
+i18n-tasks health x	safe-read
+i18n-tasks irb	denied
+i18n-tasks irb x	denied
+i18n-tasks missing	safe-read
+i18n-tasks missing --help	safe-read
+i18n-tasks missing --help --pattern x	safe-read
+i18n-tasks missing --help -h	safe-read
+i18n-tasks missing --help x	safe-read
+i18n-tasks missing --pattern x	safe-read
+i18n-tasks missing --types x	safe-read
+i18n-tasks missing -h	safe-read
+i18n-tasks missing -t x	safe-read
+i18n-tasks missing x	safe-read
+i18n-tasks mv	denied
+i18n-tasks mv --help	safe-write
+i18n-tasks mv --help -h	safe-write
+i18n-tasks mv --help x	safe-write
+i18n-tasks mv -h	safe-write
+i18n-tasks mv x	safe-write
+i18n-tasks normalize	safe-write
+i18n-tasks normalize --help	safe-write
+i18n-tasks normalize --help --pattern-router	safe-write
+i18n-tasks normalize --help x	safe-write
+i18n-tasks normalize --pattern-router	safe-write
+i18n-tasks normalize -h	safe-write
+i18n-tasks normalize -p	safe-write
+i18n-tasks normalize x	safe-write
+i18n-tasks prune	safe-write
+i18n-tasks prune --confirm	safe-write
+i18n-tasks prune --confirm --help	safe-write
+i18n-tasks prune --confirm x	safe-write
+i18n-tasks prune --help	safe-write
+i18n-tasks prune --keep-order	safe-write
+i18n-tasks prune -h	safe-write
+i18n-tasks prune -k	safe-write
+i18n-tasks prune x	safe-write
+i18n-tasks remove-unused	safe-write
+i18n-tasks remove-unused --confirm	safe-write
+i18n-tasks remove-unused --confirm --help	safe-write
+i18n-tasks remove-unused --confirm --pattern x	safe-write
+i18n-tasks remove-unused --confirm x	safe-write
+i18n-tasks remove-unused --help	safe-write
+i18n-tasks remove-unused --keep-order	safe-write
+i18n-tasks remove-unused --no-strict	safe-write
+i18n-tasks remove-unused --pattern x	safe-write
+i18n-tasks remove-unused --strict	safe-write
+i18n-tasks remove-unused -h	safe-write
+i18n-tasks remove-unused -k	safe-write
+i18n-tasks remove-unused x	safe-write
+i18n-tasks rm	denied
+i18n-tasks rm --help	safe-write
+i18n-tasks rm --help -h	safe-write
+i18n-tasks rm --help x	safe-write
+i18n-tasks rm -h	safe-write
+i18n-tasks rm x	safe-write
+i18n-tasks translate-missing	denied
+i18n-tasks translate-missing x	denied
+i18n-tasks tree-convert	safe-read
+i18n-tasks tree-convert --data-format x	safe-read
+i18n-tasks tree-convert --from x	safe-read
+i18n-tasks tree-convert --help	safe-read
+i18n-tasks tree-convert --help --data-format x	safe-read
+i18n-tasks tree-convert --help -h	safe-read
+i18n-tasks tree-convert --help x	safe-read
+i18n-tasks tree-convert --to x	safe-read
+i18n-tasks tree-convert -f x	safe-read
+i18n-tasks tree-convert -h	safe-read
+i18n-tasks tree-convert -t x	safe-read
+i18n-tasks tree-convert x	safe-read
+i18n-tasks tree-filter	safe-read
+i18n-tasks tree-filter --data-format x	safe-read
+i18n-tasks tree-filter --help	safe-read
+i18n-tasks tree-filter --help --data-format x	safe-read
+i18n-tasks tree-filter --help -h	safe-read
+i18n-tasks tree-filter --help x	safe-read
+i18n-tasks tree-filter --pattern x	safe-read
+i18n-tasks tree-filter -h	safe-read
+i18n-tasks tree-filter x	safe-read
+i18n-tasks tree-merge	safe-read
+i18n-tasks tree-merge --data-format x	safe-read
+i18n-tasks tree-merge --help	safe-read
+i18n-tasks tree-merge --help --data-format x	safe-read
+i18n-tasks tree-merge --help --nostdin	safe-read
+i18n-tasks tree-merge --help x	safe-read
+i18n-tasks tree-merge --nostdin	safe-read
+i18n-tasks tree-merge -h	safe-read
+i18n-tasks tree-merge x	safe-read
+i18n-tasks tree-mv	denied
+i18n-tasks tree-mv --all-locales	safe-read
+i18n-tasks tree-mv --all-locales --data-format x	safe-read
+i18n-tasks tree-mv --all-locales --help	safe-read
+i18n-tasks tree-mv --all-locales x	safe-read
+i18n-tasks tree-mv --data-format x	safe-read
+i18n-tasks tree-mv --help	safe-read
+i18n-tasks tree-mv -h	safe-read
+i18n-tasks tree-mv x	safe-read
+i18n-tasks tree-set-value	denied
+i18n-tasks tree-set-value --data-format x	safe-read
+i18n-tasks tree-set-value --help	safe-read
+i18n-tasks tree-set-value --help --data-format x	safe-read
+i18n-tasks tree-set-value --help --nostdin	safe-read
+i18n-tasks tree-set-value --help x	safe-read
+i18n-tasks tree-set-value --nostdin	safe-read
+i18n-tasks tree-set-value --pattern x	safe-read
+i18n-tasks tree-set-value --value x	safe-read
+i18n-tasks tree-set-value -h	safe-read
+i18n-tasks tree-set-value -v x	safe-read
+i18n-tasks tree-set-value x	safe-read
+i18n-tasks tree-subtract	safe-read
+i18n-tasks tree-subtract --data-format x	safe-read
+i18n-tasks tree-subtract --help	safe-read
+i18n-tasks tree-subtract --help --data-format x	safe-read
+i18n-tasks tree-subtract --help --nostdin	safe-read
+i18n-tasks tree-subtract --help x	safe-read
+i18n-tasks tree-subtract --nostdin	safe-read
+i18n-tasks tree-subtract -h	safe-read
+i18n-tasks tree-subtract x	safe-read
+i18n-tasks tree-translate	denied
+i18n-tasks tree-translate x	denied
+i18n-tasks unused	safe-read
+i18n-tasks unused --help	safe-read
+i18n-tasks unused --help --no-strict	safe-read
+i18n-tasks unused --help x	safe-read
+i18n-tasks unused --no-strict	safe-read
+i18n-tasks unused --strict	safe-read
+i18n-tasks unused -h	safe-read
+i18n-tasks unused x	safe-read
+i18n-tasks x	denied
+ibtool	denied
+ibtool --all	safe-write
+ibtool --all --bundle x	safe-write
+ibtool --all --classes	safe-write
+ibtool --all x	safe-write
+ibtool --bundle x	safe-write
+ibtool --classes	safe-write
+ibtool --companion-strings-file x	safe-write
+ibtool --compile out.nib Main.storyboard	safe-write
+ibtool --compile x	safe-write
+ibtool --connections	safe-write
+ibtool --convert x	safe-write
+ibtool --enable-auto-layout	safe-write
+ibtool --errors	safe-write
+ibtool --export x	safe-write
+ibtool --export-strings-file x	safe-write
+ibtool --export-xliff x	safe-write
+ibtool --flatten x	safe-write
+ibtool --help	safe-write
+ibtool --hierarchy	safe-write
+ibtool --import x	safe-write
+ibtool --import-strings-file x	safe-write
+ibtool --import-xliff x	safe-write
+ibtool --incremental-file x	safe-write
+ibtool --localizable-all	safe-write
+ibtool --localizable-geometry	safe-write
+ibtool --localizable-other	safe-write
+ibtool --localizable-stringarrays	safe-write
+ibtool --localizable-strings	safe-write
+ibtool --localizable-to-many-relationships	safe-write
+ibtool --localize-incremental	safe-write
+ibtool --module x	safe-write
+ibtool --notices	safe-write
+ibtool --objects	safe-write
+ibtool --output-format x	safe-write
+ibtool --previous-file x	safe-write
+ibtool --reference-external-strings-file	safe-write
+ibtool --remove-plugin-dependencies	safe-write
+ibtool --source-language x	safe-write
+ibtool --strip x	safe-write
+ibtool --target-language x	safe-write
+ibtool --update-constraints	safe-write
+ibtool --update-frames	safe-write
+ibtool --upgrade	safe-write
+ibtool --version	safe-write
+ibtool --version-history	safe-write
+ibtool --warnings	safe-write
+ibtool --write x	safe-write
+ibtool -h	safe-write
+ibtool x	safe-write
+iconutil	denied
+iconutil --convert icns MyIcon.iconset	safe-write
+iconutil --convert iconset -o My.iconset MyIcon.icns	safe-write
+iconutil --convert x	safe-write
+iconutil --help	safe-write
+iconutil --help --convert x	safe-write
+iconutil --help -h	safe-write
+iconutil --help x	safe-write
+iconutil --output x	safe-write
+iconutil --version	denied
+iconutil -c icns -o /etc/cron.d/job x.iconset	denied
+iconutil -c iconset -o ./out ~/.ssh/id_rsa	denied
+iconutil -c iconset -o ./out.iconset app.icns	safe-write
+iconutil -c x	safe-write
+iconutil -h	safe-write
+iconutil -o x	safe-write
+iconutil x	safe-write
+iconv	denied
+iconv --from-code x	inert
+iconv --help	inert
+iconv --help --from-code x	inert
+iconv --help --list	inert
+iconv --help x	inert
+iconv --list	inert
+iconv --silent	inert
+iconv --to-code x	inert
+iconv --version	inert
+iconv -V	inert
+iconv -c	inert
+iconv -f UTF-8 -t ASCII file.txt	inert
+iconv -f x	inert
+iconv -h	inert
+iconv -l	inert
+iconv -s	inert
+iconv -t x	inert
+iconv x	inert
+id	inert
+id --context	inert
+id --context --group	inert
+id --context x	inert
+id --group	inert
+id --groups	inert
+id --help	inert
+id --name	inert
+id --real	inert
+id --user	inert
+id --version	inert
+id --zero	inert
+id -G	inert
+id -V	inert
+id -Z	inert
+id -g	inert
+id -h	inert
+id -n	inert
+id -p	inert
+id -r	inert
+id -u	inert
+id -z	inert
+id x	inert
+identify	denied
+identify --help	inert
+identify --help --verbose	inert
+identify --help -channel x	inert
+identify --help x	inert
+identify --verbose	inert
+identify --version	inert
+identify -V	inert
+identify -channel x	inert
+identify -define x	inert
+identify -density x	inert
+identify -depth x	inert
+identify -features x	inert
+identify -format x	inert
+identify -fuzz x	inert
+identify -h	inert
+identify -interlace x	inert
+identify -limit x	inert
+identify -list x	inert
+identify -log x	inert
+identify -moments x	inert
+identify -monitor x	inert
+identify -ping	inert
+identify -precision x	inert
+identify -quiet	inert
+identify -regard-warnings	inert
+identify -seed x	inert
+identify -set x	inert
+identify -size x	inert
+identify -strip x	inert
+identify -unique x	inert
+identify -verbose	inert
+identify -verbose photo.jpg	inert
+identify -virtual-pixel x	inert
+identify image.png	inert
+identify x	inert
+idf.py	denied
+idf.py --help	inert
+idf.py --help --version	denied
+idf.py --help x	denied
+idf.py --version	inert
+idf.py -h	inert
+idf.py -v	inert
+idf.py app	denied
+idf.py app x	denied
+idf.py bootloader	denied
+idf.py bootloader x	denied
+idf.py build	denied
+idf.py build x	denied
+idf.py clean	denied
+idf.py clean x	denied
+idf.py confserver	denied
+idf.py confserver x	denied
+idf.py coredump-debug	denied
+idf.py coredump-debug x	denied
+idf.py coredump-info	denied
+idf.py coredump-info x	denied
+idf.py create-component	denied
+idf.py create-component x	denied
+idf.py create-project	denied
+idf.py create-project x	denied
+idf.py dependencies	safe-read
+idf.py dependencies --help	safe-read
+idf.py dependencies --help -h	safe-read
+idf.py dependencies --help x	safe-read
+idf.py dependencies -h	safe-read
+idf.py dependencies x	safe-read
+idf.py docs	denied
+idf.py docs x	denied
+idf.py efuse-summary	safe-read
+idf.py efuse-summary --help	safe-read
+idf.py efuse-summary --help -h	safe-read
+idf.py efuse-summary --help x	safe-read
+idf.py efuse-summary -h	safe-read
+idf.py efuse-summary x	safe-read
+idf.py encrypted-flash	denied
+idf.py encrypted-flash x	denied
+idf.py erase-flash	denied
+idf.py erase-flash x	denied
+idf.py flash	denied
+idf.py flash x	denied
+idf.py fullclean	denied
+idf.py fullclean x	denied
+idf.py fullinstall	denied
+idf.py fullinstall x	denied
+idf.py gdb	denied
+idf.py gdb x	denied
+idf.py gdbgui	denied
+idf.py gdbgui x	denied
+idf.py gdbtui	denied
+idf.py gdbtui x	denied
+idf.py gen_compile_commands	denied
+idf.py gen_compile_commands x	denied
+idf.py help	inert
+idf.py help x	inert
+idf.py menuconfig	denied
+idf.py menuconfig x	denied
+idf.py merge-bin	denied
+idf.py merge-bin x	denied
+idf.py monitor	denied
+idf.py monitor x	denied
+idf.py openocd	denied
+idf.py openocd x	denied
+idf.py partition-table	safe-read
+idf.py partition-table --help	safe-read
+idf.py partition-table --help -h	safe-read
+idf.py partition-table --help x	safe-read
+idf.py partition-table -h	safe-read
+idf.py partition-table x	safe-read
+idf.py post-debug	denied
+idf.py post-debug x	denied
+idf.py python-clean	denied
+idf.py python-clean x	denied
+idf.py qemu	denied
+idf.py qemu x	denied
+idf.py reconfigure	denied
+idf.py reconfigure x	denied
+idf.py save-defconfig	denied
+idf.py save-defconfig x	denied
+idf.py set-target	denied
+idf.py set-target x	denied
+idf.py size	safe-read
+idf.py size --help	safe-read
+idf.py size --help -h	safe-read
+idf.py size --help x	safe-read
+idf.py size -h	safe-read
+idf.py size x	safe-read
+idf.py size-components	safe-read
+idf.py size-components --help	safe-read
+idf.py size-components --help -h	safe-read
+idf.py size-components --help x	safe-read
+idf.py size-components -h	safe-read
+idf.py size-components x	safe-read
+idf.py size-files	safe-read
+idf.py size-files --help	safe-read
+idf.py size-files --help -h	safe-read
+idf.py size-files --help x	safe-read
+idf.py size-files -h	safe-read
+idf.py size-files x	safe-read
+idf.py tools	denied
+idf.py tools x	denied
+idf.py uf2	denied
+idf.py uf2 x	denied
+idf.py uninstall	denied
+idf.py uninstall x	denied
+idf.py version	inert
+idf.py version --help	inert
+idf.py version --help -h	inert
+idf.py version --help x	inert
+idf.py version -h	inert
+idf.py version x	inert
+idf.py x	denied
+idn	inert
+idn --allow-unassigned	inert
+idn --allow-unassigned --debug	inert
+idn --allow-unassigned --profile x	inert
+idn --allow-unassigned x	inert
+idn --debug	inert
+idn --help	inert
+idn --idna-to-ascii	inert
+idn --idna-to-ascii example.com	inert
+idn --idna-to-unicode	inert
+idn --nfkc	inert
+idn --no-tld	inert
+idn --profile x	inert
+idn --punycode-decode	inert
+idn --punycode-decode xn--mnchen-3ya	inert
+idn --punycode-encode	inert
+idn --quiet	inert
+idn --stringprep	inert
+idn --usestd3asciirules	inert
+idn --version	inert
+idn -V	inert
+idn -a	inert
+idn -d	inert
+idn -e	inert
+idn -h	inert
+idn -n	inert
+idn -p x	inert
+idn -s	inert
+idn -u	inert
+idn x	inert
+idn2	inert
+idn2 --debug	inert
+idn2 --debug --decode	inert
+idn2 --debug x	inert
+idn2 --decode	inert
+idn2 --help	inert
+idn2 --lookup	inert
+idn2 --lookup example.com	inert
+idn2 --no-alabelroundtrip	inert
+idn2 --no-tr46	inert
+idn2 --quiet	inert
+idn2 --register	inert
+idn2 --tr46nt	inert
+idn2 --tr46t	inert
+idn2 --usestd3asciirules	inert
+idn2 --version	inert
+idn2 -N	inert
+idn2 -T	inert
+idn2 -V	inert
+idn2 -d	inert
+idn2 -h	inert
+idn2 -l	inert
+idn2 -r	inert
+idn2 x	inert
+idris2	denied
+idris2 --help	inert
+idris2 --help --version	inert
+idris2 --help x	denied
+idris2 --version	inert
+idris2 -h	inert
+idris2 -v	inert
+idris2 x	denied
+iex	denied
+iex --help	inert
+iex --help --version	inert
+iex --help x	denied
+iex --version	inert
+iex -h	inert
+iex -v	inert
+iex x	denied
+if [[ "a" == "a" ]]; then echo yes; fi	inert
+if false; then echo yes; else :; fi	inert
+if ruby /tmp/evil.rb; then echo done; fi	denied
+if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi	inert
+if test -f foo; then echo exists; fi	inert
+if test -f foo; then echo yes; else echo no; fi	inert
+if test -f foo; then rc=$?; fi	inert
+if true; then :; fi	inert
+if true; then case x in a) ls;; esac; fi	inert
+if true; then echo hello	denied
+if true; then echo x; fi 2>&1	inert
+if true; then for x in 1 2; do echo $x; done; fi	inert
+if true; then rm -rf /; fi	denied
+ifconfig	inert
+ifconfig --help	inert
+ifconfig --help --version	inert
+ifconfig --help x	inert
+ifconfig --version	inert
+ifconfig -L	inert
+ifconfig -V	inert
+ifconfig -a	inert
+ifconfig -h	inert
+ifconfig -l	inert
+ifconfig -s	inert
+ifconfig -v	inert
+ifconfig x	inert
+ifne	denied
+ifne --help	inert
+ifne --help -n	inert
+ifne --help x	denied
+ifne --version	denied
+ifne -n	inert
+ifne x	denied
+ignite	denied
+ignite --help	inert
+ignite --help --version	denied
+ignite --help x	denied
+ignite --version	inert
+ignite -h	inert
+ignite -v	inert
+ignite account	denied
+ignite account x	denied
+ignite app	denied
+ignite app x	denied
+ignite chain	denied
+ignite chain x	denied
+ignite completion	denied
+ignite completion --help	inert
+ignite completion --help -h	inert
+ignite completion --help x	inert
+ignite completion -h	inert
+ignite completion x	inert
+ignite docs	denied
+ignite docs x	denied
+ignite doctor	safe-read
+ignite doctor --help	safe-read
+ignite doctor --help -h	safe-read
+ignite doctor --help x	safe-read
+ignite doctor -h	safe-read
+ignite doctor x	safe-read
+ignite generate	denied
+ignite generate x	denied
+ignite help	inert
+ignite help x	inert
+ignite network	denied
+ignite network x	denied
+ignite node	denied
+ignite node x	denied
+ignite plugin	denied
+ignite plugin x	denied
+ignite relayer	denied
+ignite relayer x	denied
+ignite scaffold	denied
+ignite scaffold x	denied
+ignite testnet	denied
+ignite testnet x	denied
+ignite tools	denied
+ignite tools x	denied
+ignite version	inert
+ignite version --help	inert
+ignite version --help -h	inert
+ignite version --help x	inert
+ignite version -h	inert
+ignite version x	inert
+ignite x	denied
+img2webp	denied
+img2webp --help	denied
+img2webp --version	denied
+img2webp -H	safe-write
+img2webp -H -d x	safe-write
+img2webp -H -h	safe-write
+img2webp -H x	safe-write
+img2webp -d x	safe-write
+img2webp -h	safe-write
+img2webp -help	safe-write
+img2webp -kmax x	safe-write
+img2webp -kmin x	safe-write
+img2webp -longhelp	safe-write
+img2webp -loop x	safe-write
+img2webp -lossless	safe-write
+img2webp -lossy	safe-write
+img2webp -m x	safe-write
+img2webp -metadata x	safe-write
+img2webp -min_size x	safe-write
+img2webp -mixed	safe-write
+img2webp -mt	safe-write
+img2webp -near_lossless x	safe-write
+img2webp -o x	safe-write
+img2webp -q x	safe-write
+img2webp -v	safe-write
+img2webp -version	safe-write
+img2webp x	safe-write
+imgcmp	denied
+imgcmp --help	inert
+imgcmp --help --threshold x	inert
+imgcmp --help --verbose	inert
+imgcmp --help x	inert
+imgcmp --threshold x	inert
+imgcmp --verbose	inert
+imgcmp --version	denied
+imgcmp -h	inert
+imgcmp -t x	inert
+imgcmp -v	inert
+imgcmp x	inert
+imginfo	denied
+imginfo --format-only	inert
+imginfo --format-only --help	inert
+imginfo --format-only x	inert
+imginfo --help	inert
+imginfo --verbose	inert
+imginfo --version	denied
+imginfo -f	inert
+imginfo -h	inert
+imginfo -v	inert
+imginfo x	inert
+importmap	denied
+importmap --help	inert
+importmap --help -h	denied
+importmap --help x	denied
+importmap --version	denied
+importmap -h	inert
+importmap audit	inert
+importmap audit --help	inert
+importmap audit --help -h	inert
+importmap audit --help x	denied
+importmap audit -h	inert
+importmap audit x	denied
+importmap json	inert
+importmap json --help	inert
+importmap json --help -h	inert
+importmap json --help x	denied
+importmap json -h	inert
+importmap json x	denied
+importmap outdated	inert
+importmap outdated --help	inert
+importmap outdated --help -h	inert
+importmap outdated --help x	denied
+importmap outdated -h	inert
+importmap outdated x	denied
+importmap packages	inert
+importmap packages --help	inert
+importmap packages --help -h	inert
+importmap packages --help x	denied
+importmap packages -h	inert
+importmap packages x	denied
+importmap x	denied
+imptrace	inert
+imptrace --help	denied
+imptrace --version	denied
+imptrace -d	inert
+imptrace -d -i	inert
+imptrace -d -p x	inert
+imptrace -d x	inert
+imptrace -i	inert
+imptrace -p x	inert
+imptrace -s	inert
+imptrace x	inert
+indent	denied
+indent --help	denied
+indent --version	safe-write
+indent --version -npro	safe-write
+indent --version x	safe-write
+indent -npro	safe-write
+indent -st	safe-write
+indent file.c	safe-write
+indent x	safe-write
+influx	denied
+influx --help	inert
+influx --help --version	denied
+influx --help x	denied
+influx --version	inert
+influx -h	inert
+influx apply	denied
+influx apply x	denied
+influx auth	denied
+influx auth x	denied
+influx backup	denied
+influx backup x	denied
+influx bucket	denied
+influx bucket x	denied
+influx completion	denied
+influx completion --help	inert
+influx completion --help -h	inert
+influx completion --help x	inert
+influx completion -h	inert
+influx completion x	inert
+influx config	denied
+influx config x	denied
+influx dashboards	denied
+influx dashboards x	denied
+influx delete	denied
+influx delete x	denied
+influx export	denied
+influx export x	denied
+influx external	denied
+influx external x	denied
+influx help	inert
+influx help x	inert
+influx org	denied
+influx org x	denied
+influx ping	safe-read
+influx ping --help	safe-read
+influx ping --help --host x	safe-read
+influx ping --help -h	safe-read
+influx ping --help x	safe-read
+influx ping --host x	safe-read
+influx ping --http-debug x	safe-read
+influx ping --skip-verify x	safe-read
+influx ping -h	safe-read
+influx ping x	safe-read
+influx query	denied
+influx query x	denied
+influx remote	denied
+influx remote x	denied
+influx replication	denied
+influx replication x	denied
+influx restore	denied
+influx restore x	denied
+influx scripts	denied
+influx scripts x	denied
+influx secret	denied
+influx secret x	denied
+influx setup	denied
+influx setup x	denied
+influx stacks	denied
+influx stacks x	denied
+influx task	denied
+influx task x	denied
+influx telegrafs	denied
+influx telegrafs x	denied
+influx templates	denied
+influx templates x	denied
+influx transpile	denied
+influx transpile --help	safe-read
+influx transpile --help -h	safe-read
+influx transpile --help x	safe-read
+influx transpile -h	safe-read
+influx transpile x	safe-read
+influx user	denied
+influx user x	denied
+influx v1	denied
+influx v1 x	denied
+influx version	inert
+influx version --help	inert
+influx version --help -h	inert
+influx version --help x	inert
+influx version -h	inert
+influx version x	inert
+influx write	denied
+influx write x	denied
+influx x	denied
+influxd	denied
+influxd --help	inert
+influxd --help --version	denied
+influxd --help x	denied
+influxd --version	inert
+influxd -h	inert
+influxd completion	denied
+influxd completion --help	inert
+influxd completion --help -h	inert
+influxd completion --help x	inert
+influxd completion -h	inert
+influxd completion x	inert
+influxd downgrade	denied
+influxd downgrade x	denied
+influxd help	inert
+influxd help x	inert
+influxd inspect	denied
+influxd inspect x	denied
+influxd print-config	safe-read
+influxd print-config --bolt-path x	safe-read
+influxd print-config --engine-path x	safe-read
+influxd print-config --help	safe-read
+influxd print-config --help --bolt-path x	safe-read
+influxd print-config --help -h	safe-read
+influxd print-config --help x	safe-read
+influxd print-config --http-bind-address x	safe-read
+influxd print-config --log-level x	safe-read
+influxd print-config --secret-store x	safe-read
+influxd print-config -h	safe-read
+influxd print-config x	safe-read
+influxd recovery	denied
+influxd recovery x	denied
+influxd run	denied
+influxd run x	denied
+influxd upgrade	denied
+influxd upgrade x	denied
+influxd version	inert
+influxd version --help	inert
+influxd version --help -h	inert
+influxd version --help x	inert
+influxd version -h	inert
+influxd version x	inert
+influxd x	denied
+initdb	denied
+initdb --allow-group-access	safe-write
+initdb --allow-group-access --auth x	safe-write
+initdb --allow-group-access --data-checksums	safe-write
+initdb --allow-group-access x	safe-write
+initdb --auth x	safe-write
+initdb --auth-host x	safe-write
+initdb --auth-local x	safe-write
+initdb --builtin-locale x	safe-write
+initdb --data-checksums	safe-write
+initdb --debug	safe-write
+initdb --discard-caches	safe-write
+initdb --encoding x	safe-write
+initdb --help	safe-write
+initdb --icu-locale x	safe-write
+initdb --icu-rules x	safe-write
+initdb --lc-collate x	safe-write
+initdb --lc-ctype x	safe-write
+initdb --lc-messages x	safe-write
+initdb --lc-monetary x	safe-write
+initdb --lc-numeric x	safe-write
+initdb --lc-time x	safe-write
+initdb --locale x	safe-write
+initdb --locale-provider x	safe-write
+initdb --no-clean	safe-write
+initdb --no-data-checksums	safe-write
+initdb --no-instructions	safe-write
+initdb --no-locale	safe-write
+initdb --no-sync	safe-write
+initdb --no-sync-data-files	safe-write
+initdb --pgdata x	safe-write
+initdb --pwfile x	safe-write
+initdb --pwprompt	safe-write
+initdb --set x	safe-write
+initdb --show	safe-write
+initdb --sync-method x	safe-write
+initdb --sync-only	safe-write
+initdb --text-search-config x	safe-write
+initdb --username x	safe-write
+initdb --version	safe-write
+initdb --wal-segsize x	safe-write
+initdb --waldir x	safe-write
+initdb -?	safe-write
+initdb -A	safe-write
+initdb -D x	safe-write
+initdb -E x	safe-write
+initdb -L x	safe-write
+initdb -N	safe-write
+initdb -S	safe-write
+initdb -T x	safe-write
+initdb -U x	safe-write
+initdb -V	safe-write
+initdb -W	safe-write
+initdb -X x	safe-write
+initdb -c x	safe-write
+initdb -d	safe-write
+initdb -g	safe-write
+initdb -k	safe-write
+initdb -n	safe-write
+initdb -s	safe-write
+initdb x	safe-write
+inso	denied
+inso --help	inert
+inso --help --version	denied
+inso --help x	denied
+inso --version	inert
+inso -h	inert
+inso -v	inert
+inso completion	denied
+inso completion --help	inert
+inso completion --help -h	inert
+inso completion --help x	inert
+inso completion -h	inert
+inso completion x	inert
+inso export	denied
+inso export x	denied
+inso generate	denied
+inso generate config	inert
+inso generate config --help	inert
+inso generate config --help --output x	inert
+inso generate config --help -h	inert
+inso generate config --help x	inert
+inso generate config --output x	inert
+inso generate config --src x	inert
+inso generate config --type x	inert
+inso generate config --working-dir x	inert
+inso generate config -h	inert
+inso generate config -o x	inert
+inso generate config -t x	inert
+inso generate config -w x	inert
+inso generate config x	inert
+inso generate x	denied
+inso help	inert
+inso help x	inert
+inso lint	denied
+inso lint spec	inert
+inso lint spec --help	inert
+inso lint spec --help --src x	inert
+inso lint spec --help -h	inert
+inso lint spec --help x	inert
+inso lint spec --src x	inert
+inso lint spec --working-dir x	inert
+inso lint spec -h	inert
+inso lint spec -w x	inert
+inso lint spec x	inert
+inso lint x	denied
+inso run	denied
+inso run x	denied
+inso script	denied
+inso script x	denied
+inso version	inert
+inso version --help	inert
+inso version --help -h	inert
+inso version --help x	inert
+inso version -h	inert
+inso version x	inert
+inso x	denied
+install_name_tool	denied
+install_name_tool --help	denied
+install_name_tool --version	denied
+install_name_tool -add_rpath x	safe-write
+install_name_tool -change x	safe-write
+install_name_tool -delete_rpath x	safe-write
+install_name_tool -id x	safe-write
+install_name_tool -rpath x	safe-write
+install_name_tool x	safe-write
+instmodsh	safe-read
+instmodsh --help	denied
+instmodsh --version	denied
+instmodsh x	denied
+ionic	denied
+ionic --help	inert
+ionic --help --version	denied
+ionic --help x	denied
+ionic --version	inert
+ionic -h	inert
+ionic -v	inert
+ionic build	denied
+ionic build x	denied
+ionic cap	denied
+ionic cap x	denied
+ionic capacitor	denied
+ionic capacitor x	denied
+ionic completion	denied
+ionic completion --help	inert
+ionic completion --help -h	inert
+ionic completion --help x	inert
+ionic completion -h	inert
+ionic completion x	inert
+ionic config	denied
+ionic config get	inert
+ionic config get --global	inert
+ionic config get --global --help	inert
+ionic config get --global x	inert
+ionic config get --help	inert
+ionic config get --json	inert
+ionic config get -g	inert
+ionic config get -h	inert
+ionic config get x	inert
+ionic config print	inert
+ionic config print --global	inert
+ionic config print --global --help	inert
+ionic config print --global x	inert
+ionic config print --help	inert
+ionic config print --json	inert
+ionic config print -g	inert
+ionic config print -h	inert
+ionic config print x	inert
+ionic config set	denied
+ionic config set x	denied
+ionic config unset	denied
+ionic config unset x	denied
+ionic config x	denied
+ionic cordova	denied
+ionic cordova x	denied
+ionic doctor	inert
+ionic doctor check	inert
+ionic doctor check --help	inert
+ionic doctor check --help -h	inert
+ionic doctor check --help x	inert
+ionic doctor check -h	inert
+ionic doctor check x	inert
+ionic doctor ignore	denied
+ionic doctor ignore x	denied
+ionic doctor list	inert
+ionic doctor list --help	inert
+ionic doctor list --help -h	inert
+ionic doctor list --help x	inert
+ionic doctor list -h	inert
+ionic doctor list x	inert
+ionic doctor treat	denied
+ionic doctor treat x	denied
+ionic doctor x	denied
+ionic enterprise	denied
+ionic enterprise x	denied
+ionic generate	denied
+ionic generate x	denied
+ionic help	inert
+ionic help x	inert
+ionic info	safe-read
+ionic info --help	safe-read
+ionic info --help --json	safe-read
+ionic info --help x	safe-read
+ionic info --json	safe-read
+ionic info -h	safe-read
+ionic info x	safe-read
+ionic init	denied
+ionic init x	denied
+ionic lab	denied
+ionic lab x	denied
+ionic link	denied
+ionic link x	denied
+ionic login	denied
+ionic login x	denied
+ionic logout	denied
+ionic logout x	denied
+ionic monitoring	denied
+ionic monitoring x	denied
+ionic repair	denied
+ionic repair x	denied
+ionic serve	denied
+ionic serve x	denied
+ionic signup	denied
+ionic signup x	denied
+ionic ssl	denied
+ionic ssl x	denied
+ionic start	denied
+ionic start x	denied
+ionic whoami	safe-read
+ionic whoami --help	safe-read
+ionic whoami --help -h	safe-read
+ionic whoami --help x	safe-read
+ionic whoami -h	safe-read
+ionic whoami x	safe-read
+ionic x	denied
+ionice	denied
+ionice --adjustment x	denied
+ionice --help	denied
+ionice --version	denied
+ionice -n x	denied
+ionice git log	inert
+ionice rm -rf /	denied
+ionice x	denied
+ioreg	inert
+ioreg --help	inert
+ioreg --help --version	inert
+ioreg --help -c x	inert
+ioreg --help x	denied
+ioreg --version	inert
+ioreg -S	inert
+ioreg -V	inert
+ioreg -a	inert
+ioreg -b	inert
+ioreg -c x	inert
+ioreg -d x	inert
+ioreg -f	inert
+ioreg -h	inert
+ioreg -i	inert
+ioreg -k x	inert
+ioreg -l	inert
+ioreg -l -w 0	inert
+ioreg -n x	inert
+ioreg -p x	inert
+ioreg -r	inert
+ioreg -t	inert
+ioreg -w x	inert
+ioreg -x	inert
+ioreg x	denied
+iostat	inert
+iostat --help	denied
+iostat --version	denied
+iostat -?	inert
+iostat -? -C	inert
+iostat -? -c x	inert
+iostat -? x	inert
+iostat -C	inert
+iostat -I	inert
+iostat -K	inert
+iostat -T	inert
+iostat -U	inert
+iostat -c x	inert
+iostat -d	inert
+iostat -n x	inert
+iostat -o	inert
+iostat -w x	inert
+iostat x	inert
+iotop	inert
+iotop --accumulated	inert
+iotop --accumulated --batch	inert
+iotop --accumulated --delay x	inert
+iotop --accumulated x	denied
+iotop --batch	inert
+iotop --delay x	inert
+iotop --help	inert
+iotop --iter x	inert
+iotop --kilobytes	inert
+iotop --only	inert
+iotop --pid x	inert
+iotop --processes	inert
+iotop --quiet	inert
+iotop --user x	inert
+iotop --version	inert
+iotop -P	inert
+iotop -V	inert
+iotop -a	inert
+iotop -b	inert
+iotop -d x	inert
+iotop -h	inert
+iotop -k	inert
+iotop -n x	inert
+iotop -o	inert
+iotop -p x	inert
+iotop -q	inert
+iotop -t	inert
+iotop -u x	inert
+iotop x	denied
+ip2cc	inert
+ip2cc --help	denied
+ip2cc --version	denied
+ip2cc 8.8.8.8	inert
+ip2cc x	inert
+ipcalc	denied
+ipcalc --class	inert
+ipcalc --class --deaggregate	inert
+ipcalc --class x	inert
+ipcalc --deaggregate	inert
+ipcalc --deaggregate 192.168.0.0-192.168.5.255	inert
+ipcalc --help	inert
+ipcalc --html	inert
+ipcalc --html 192.168.1.0/24	inert
+ipcalc --nobinary	inert
+ipcalc --nocolor	inert
+ipcalc --output /tmp/out 192.168.1.0/24	denied
+ipcalc --split	inert
+ipcalc --split 192.168.1.0/24 64 64 64	inert
+ipcalc --version	inert
+ipcalc -b	inert
+ipcalc -c	inert
+ipcalc -d	inert
+ipcalc -h	inert
+ipcalc -n	inert
+ipcalc -s	inert
+ipcalc -v	inert
+ipcalc 10.0.0.0 255.0.0.0	inert
+ipcalc 192.168.1.0/24	inert
+ipcalc x	inert
+ipconfig	denied
+ipconfig --help	inert
+ipconfig --version	denied
+ipconfig getdhcpduid	inert
+ipconfig getdhcpduid x	denied
+ipconfig getdhcpiaid	denied
+ipconfig getdhcpiaid x	inert
+ipconfig getifaddr	denied
+ipconfig getifaddr en0	inert
+ipconfig getifaddr x	inert
+ipconfig getiflist	inert
+ipconfig getiflist x	denied
+ipconfig getoption	denied
+ipconfig getoption x	inert
+ipconfig getpacket	denied
+ipconfig getpacket x	inert
+ipconfig getra	denied
+ipconfig getra x	inert
+ipconfig getsummary	denied
+ipconfig getsummary en0	inert
+ipconfig getsummary x	inert
+ipconfig getv6packet	denied
+ipconfig getv6packet x	inert
+ipconfig ifcount	inert
+ipconfig ifcount x	denied
+ipconfig set	denied
+ipconfig set en0 DHCP	denied
+ipconfig set x	denied
+ipconfig setverbose	denied
+ipconfig setverbose 1	denied
+ipconfig setverbose x	denied
+ipconfig waitall	safe-read
+ipconfig waitall x	denied
+ipconfig x	denied
+ipcrm	denied
+ipcrm --help	denied
+ipcrm --version	denied
+ipcrm -M x	safe-write
+ipcrm -Q x	safe-write
+ipcrm -S x	safe-write
+ipcrm -m x	safe-write
+ipcrm -q x	safe-write
+ipcrm -s x	safe-write
+ipcrm x	safe-write
+ipcs	inert
+ipcs --help	denied
+ipcs --version	denied
+ipcs -M	inert
+ipcs -M -Q	inert
+ipcs -M -u x	inert
+ipcs -M x	inert
+ipcs -Q	inert
+ipcs -S	inert
+ipcs -T	inert
+ipcs -a	inert
+ipcs -b	inert
+ipcs -c	inert
+ipcs -m	inert
+ipcs -o	inert
+ipcs -p	inert
+ipcs -q	inert
+ipcs -s	inert
+ipcs -t	inert
+ipcs -u x	inert
+ipcs x	inert
+iperf	denied
+iperf --bandwidth x	safe-read
+iperf --bidir x	safe-read
+iperf --bind x	safe-read
+iperf --client x	safe-read
+iperf --congestion x	safe-read
+iperf --connect-timeout x	safe-read
+iperf --cport x	safe-read
+iperf --debug x	safe-read
+iperf --dscp x	safe-read
+iperf --extra-data x	safe-read
+iperf --fec x	safe-read
+iperf --file x	safe-read
+iperf --flowlabel x	safe-read
+iperf --format x	safe-read
+iperf --get-server-output x	safe-read
+iperf --help	safe-read
+iperf --help --bandwidth x	safe-read
+iperf --help --version	safe-read
+iperf --help x	safe-read
+iperf --idle-timeout x	safe-read
+iperf --interval x	safe-read
+iperf --length x	safe-read
+iperf --listen-port x	safe-read
+iperf --logfile x	safe-read
+iperf --mss x	safe-read
+iperf --no-delay x	safe-read
+iperf --omit x	safe-read
+iperf --parallel x	safe-read
+iperf --pidfile x	safe-read
+iperf --port x	safe-read
+iperf --reverse x	safe-read
+iperf --sctp x	safe-read
+iperf --server x	safe-read
+iperf --server-only x	safe-read
+iperf --set-mss x	safe-read
+iperf --time x	safe-read
+iperf --title x	safe-read
+iperf --tos x	safe-read
+iperf --udp x	safe-read
+iperf --version	safe-read
+iperf --window x	safe-read
+iperf --zerocopy x	safe-read
+iperf -1	safe-read
+iperf -A x	safe-read
+iperf -B x	safe-read
+iperf -C x	safe-read
+iperf -D	safe-read
+iperf -F x	safe-read
+iperf -J	safe-read
+iperf -K x	safe-read
+iperf -L x	safe-read
+iperf -M x	safe-read
+iperf -O x	safe-read
+iperf -P x	safe-read
+iperf -R	safe-read
+iperf -S x	safe-read
+iperf -T x	safe-read
+iperf -V	safe-read
+iperf -X x	safe-read
+iperf -Z	safe-read
+iperf -b x	safe-read
+iperf -c x	safe-read
+iperf -d	safe-read
+iperf -f x	safe-read
+iperf -h	safe-read
+iperf -i x	safe-read
+iperf -k	safe-read
+iperf -l x	safe-read
+iperf -n	safe-read
+iperf -o x	safe-read
+iperf -p x	safe-read
+iperf -r	safe-read
+iperf -s	safe-read
+iperf -t	safe-read
+iperf -u	safe-read
+iperf -v	safe-read
+iperf -w	safe-read
+iperf -x	safe-read
+iperf x	safe-read
+iperf3	denied
+iperf3 --bandwidth x	safe-read
+iperf3 --bidir x	safe-read
+iperf3 --bind x	safe-read
+iperf3 --client x	safe-read
+iperf3 --congestion x	safe-read
+iperf3 --connect-timeout x	safe-read
+iperf3 --cport x	safe-read
+iperf3 --debug x	safe-read
+iperf3 --dscp x	safe-read
+iperf3 --extra-data x	safe-read
+iperf3 --fec x	safe-read
+iperf3 --file x	safe-read
+iperf3 --flowlabel x	safe-read
+iperf3 --format x	safe-read
+iperf3 --get-server-output x	safe-read
+iperf3 --help	safe-read
+iperf3 --help --bandwidth x	safe-read
+iperf3 --help --version	safe-read
+iperf3 --help x	safe-read
+iperf3 --idle-timeout x	safe-read
+iperf3 --interval x	safe-read
+iperf3 --length x	safe-read
+iperf3 --listen-port x	safe-read
+iperf3 --logfile x	safe-read
+iperf3 --mss x	safe-read
+iperf3 --no-delay x	safe-read
+iperf3 --omit x	safe-read
+iperf3 --parallel x	safe-read
+iperf3 --pidfile x	safe-read
+iperf3 --port x	safe-read
+iperf3 --reverse x	safe-read
+iperf3 --sctp x	safe-read
+iperf3 --server x	safe-read
+iperf3 --server-only x	safe-read
+iperf3 --set-mss x	safe-read
+iperf3 --time x	safe-read
+iperf3 --title x	safe-read
+iperf3 --tos x	safe-read
+iperf3 --udp x	safe-read
+iperf3 --version	safe-read
+iperf3 --window x	safe-read
+iperf3 --zerocopy x	safe-read
+iperf3 -1	safe-read
+iperf3 -A x	safe-read
+iperf3 -B x	safe-read
+iperf3 -C x	safe-read
+iperf3 -D	safe-read
+iperf3 -F x	safe-read
+iperf3 -J	safe-read
+iperf3 -K x	safe-read
+iperf3 -L x	safe-read
+iperf3 -M x	safe-read
+iperf3 -O x	safe-read
+iperf3 -P x	safe-read
+iperf3 -R	safe-read
+iperf3 -S x	safe-read
+iperf3 -T x	safe-read
+iperf3 -V	safe-read
+iperf3 -X x	safe-read
+iperf3 -Z	safe-read
+iperf3 -b x	safe-read
+iperf3 -c x	safe-read
+iperf3 -d	safe-read
+iperf3 -f x	safe-read
+iperf3 -h	safe-read
+iperf3 -i x	safe-read
+iperf3 -k	safe-read
+iperf3 -l x	safe-read
+iperf3 -n	safe-read
+iperf3 -o x	safe-read
+iperf3 -p x	safe-read
+iperf3 -r	safe-read
+iperf3 -s	safe-read
+iperf3 -t	safe-read
+iperf3 -u	safe-read
+iperf3 -v	safe-read
+iperf3 -w	safe-read
+iperf3 -x	safe-read
+iperf3 x	safe-read
+ipfs	denied
+ipfs --help	inert
+ipfs --help --version	denied
+ipfs --help x	denied
+ipfs --version	inert
+ipfs -h	inert
+ipfs -v	inert
+ipfs add	denied
+ipfs add x	denied
+ipfs block	inert
+ipfs block get	inert
+ipfs block get x	inert
+ipfs block put	denied
+ipfs block put x	denied
+ipfs block rm	denied
+ipfs block rm x	denied
+ipfs block stat	inert
+ipfs block stat x	inert
+ipfs block x	denied
+ipfs bootstrap	inert
+ipfs bootstrap add	denied
+ipfs bootstrap add x	denied
+ipfs bootstrap list	inert
+ipfs bootstrap list x	inert
+ipfs bootstrap rm	denied
+ipfs bootstrap rm x	denied
+ipfs bootstrap x	denied
+ipfs cat	safe-read
+ipfs cat x	safe-read
+ipfs cid	safe-read
+ipfs cid x	safe-read
+ipfs commands	denied
+ipfs commands x	denied
+ipfs completion	denied
+ipfs completion --help	inert
+ipfs completion --help -h	inert
+ipfs completion --help x	inert
+ipfs completion -h	inert
+ipfs completion x	inert
+ipfs config	denied
+ipfs config x	denied
+ipfs daemon	denied
+ipfs daemon x	denied
+ipfs dag	inert
+ipfs dag export	denied
+ipfs dag export x	denied
+ipfs dag get	inert
+ipfs dag get x	inert
+ipfs dag import	denied
+ipfs dag import x	denied
+ipfs dag put	denied
+ipfs dag put x	denied
+ipfs dag resolve	inert
+ipfs dag resolve x	inert
+ipfs dag stat	inert
+ipfs dag stat x	inert
+ipfs dag x	denied
+ipfs dht	denied
+ipfs dht findpeer	safe-read
+ipfs dht findpeer x	safe-read
+ipfs dht findprovs	safe-read
+ipfs dht findprovs x	safe-read
+ipfs dht get	safe-read
+ipfs dht get x	safe-read
+ipfs dht provide	denied
+ipfs dht provide x	denied
+ipfs dht put	denied
+ipfs dht put x	denied
+ipfs dht query	safe-read
+ipfs dht query x	safe-read
+ipfs dht x	denied
+ipfs diag	denied
+ipfs diag x	denied
+ipfs files	denied
+ipfs files x	denied
+ipfs filestore	denied
+ipfs filestore x	denied
+ipfs get	denied
+ipfs get x	denied
+ipfs help	inert
+ipfs help x	inert
+ipfs id	safe-read
+ipfs id x	safe-read
+ipfs init	denied
+ipfs init x	denied
+ipfs key	inert
+ipfs key export	denied
+ipfs key export x	denied
+ipfs key gen	denied
+ipfs key gen x	denied
+ipfs key import	denied
+ipfs key import x	denied
+ipfs key list	inert
+ipfs key list x	inert
+ipfs key rename	denied
+ipfs key rename x	denied
+ipfs key rm	denied
+ipfs key rm x	denied
+ipfs key x	denied
+ipfs log	denied
+ipfs log x	denied
+ipfs ls	safe-read
+ipfs ls x	safe-read
+ipfs mount	denied
+ipfs mount x	denied
+ipfs multibase	denied
+ipfs multibase x	denied
+ipfs name	inert
+ipfs name publish	denied
+ipfs name publish x	denied
+ipfs name pubsub	denied
+ipfs name pubsub x	denied
+ipfs name resolve	inert
+ipfs name resolve x	inert
+ipfs name x	denied
+ipfs object	denied
+ipfs object x	denied
+ipfs p2p	denied
+ipfs p2p x	denied
+ipfs pin	inert
+ipfs pin add	denied
+ipfs pin add x	denied
+ipfs pin ls	inert
+ipfs pin ls x	inert
+ipfs pin remote	denied
+ipfs pin remote x	denied
+ipfs pin rm	denied
+ipfs pin rm x	denied
+ipfs pin update	denied
+ipfs pin update x	denied
+ipfs pin verify	inert
+ipfs pin verify x	inert
+ipfs pin x	denied
+ipfs ping	denied
+ipfs ping x	denied
+ipfs pubsub	denied
+ipfs pubsub x	denied
+ipfs refs	safe-read
+ipfs refs x	safe-read
+ipfs repo	denied
+ipfs repo ds	denied
+ipfs repo ds x	denied
+ipfs repo fsck	denied
+ipfs repo fsck x	denied
+ipfs repo gc	denied
+ipfs repo gc x	denied
+ipfs repo migrate	denied
+ipfs repo migrate x	denied
+ipfs repo stat	safe-read
+ipfs repo stat x	safe-read
+ipfs repo verify	inert
+ipfs repo verify x	inert
+ipfs repo version	inert
+ipfs repo version x	inert
+ipfs repo x	denied
+ipfs resolve	denied
+ipfs resolve x	denied
+ipfs routing	denied
+ipfs routing x	denied
+ipfs shutdown	denied
+ipfs shutdown x	denied
+ipfs stats	denied
+ipfs stats x	denied
+ipfs swarm	inert
+ipfs swarm addrs	inert
+ipfs swarm addrs x	inert
+ipfs swarm connect	denied
+ipfs swarm connect x	denied
+ipfs swarm disconnect	denied
+ipfs swarm disconnect x	denied
+ipfs swarm filters	denied
+ipfs swarm filters x	denied
+ipfs swarm limit	denied
+ipfs swarm limit x	denied
+ipfs swarm peers	inert
+ipfs swarm peers x	inert
+ipfs swarm stats	denied
+ipfs swarm stats x	denied
+ipfs swarm x	denied
+ipfs tar	denied
+ipfs tar x	denied
+ipfs unixfs	denied
+ipfs unixfs x	denied
+ipfs update	denied
+ipfs update x	denied
+ipfs urlstore	denied
+ipfs urlstore x	denied
+ipfs version	inert
+ipfs version x	inert
+ipfs x	denied
+ippfind	inert
+ippfind --and	inert
+ippfind --and --domain x	inert
+ippfind --and --false	inert
+ippfind --and x	inert
+ippfind --domain x	inert
+ippfind --exec /bin/echo {} ;	denied
+ippfind --false	inert
+ippfind --help	inert
+ippfind --host x	inert
+ippfind --literal-name x	inert
+ippfind --local	inert
+ippfind --local --print	inert
+ippfind --ls	inert
+ippfind --name x	inert
+ippfind --not	inert
+ippfind --or	inert
+ippfind --path x	inert
+ippfind --port x	inert
+ippfind --print	inert
+ippfind --print-name	inert
+ippfind --quiet	inert
+ippfind --remote	inert
+ippfind --true	inert
+ippfind --txt x	inert
+ippfind --uri x	inert
+ippfind --version	inert
+ippfind -4	inert
+ippfind -6	inert
+ippfind -N x	inert
+ippfind -P x	inert
+ippfind -T x	inert
+ippfind -V x	inert
+ippfind -d x	inert
+ippfind -h x	inert
+ippfind -l	inert
+ippfind -n x	inert
+ippfind -p	inert
+ippfind -q	inert
+ippfind -r	inert
+ippfind -s	inert
+ippfind -t x	inert
+ippfind -u x	inert
+ippfind x	inert
+ipptool	denied
+ipptool --help	safe-read
+ipptool --help --stop-after-include-error	safe-read
+ipptool --help -T x	safe-read
+ipptool --help x	safe-read
+ipptool --stop-after-include-error	safe-read
+ipptool --version	safe-read
+ipptool -4	safe-read
+ipptool -6	safe-read
+ipptool -C	safe-read
+ipptool -E	safe-read
+ipptool -I	safe-read
+ipptool -L	safe-read
+ipptool -P out.plist -tv ipp://x/ test.test	denied
+ipptool -S	safe-read
+ipptool -T x	safe-read
+ipptool -V x	safe-read
+ipptool -X	safe-read
+ipptool -c	safe-read
+ipptool -d x	safe-read
+ipptool -f x	safe-read
+ipptool -h	safe-read
+ipptool -i x	safe-read
+ipptool -l	safe-read
+ipptool -n x	safe-read
+ipptool -q	safe-read
+ipptool -t	safe-read
+ipptool -tv ipp://printer.local/ test.test	safe-read
+ipptool -v	safe-read
+ipptool x	safe-read
+ipython	denied
+ipython --help	inert
+ipython --help --version	inert
+ipython --help x	denied
+ipython --version	inert
+ipython -h	inert
+ipython x	denied
+iredis	denied
+iredis --help	inert
+iredis --help --version	inert
+iredis --help x	denied
+iredis --version	inert
+iredis -V	inert
+iredis -h	inert
+iredis x	denied
+isort	denied
+isort --check-only	inert
+isort --check-only --check-only	inert
+isort --check-only --diff	inert
+isort --check-only --filter-files x	inert
+isort --check-only --help	inert
+isort --check-only --line-length x	inert
+isort --check-only --multi-line x	inert
+isort --check-only --profile x	inert
+isort --check-only --project x	inert
+isort --check-only --quiet	inert
+isort --check-only --settings-file x	inert
+isort --check-only --show-config	inert
+isort --check-only --skip x	inert
+isort --check-only --skip-glob x	inert
+isort --check-only --src x	inert
+isort --check-only --verbose	inert
+isort --check-only --version	inert
+isort --check-only -V	inert
+isort --check-only -c	inert
+isort --check-only -h	inert
+isort --check-only -l x	inert
+isort --check-only -m x	inert
+isort --check-only -q	inert
+isort --check-only -v	inert
+isort --check-only x	inert
+isort --diff	inert
+isort --filter-files x	denied
+isort --help	inert
+isort --line-length x	denied
+isort --multi-line x	denied
+isort --profile x	denied
+isort --project x	denied
+isort --quiet	denied
+isort --settings-file x	denied
+isort --show-config	denied
+isort --skip x	denied
+isort --skip-glob x	denied
+isort --src x	denied
+isort --verbose	denied
+isort --version	denied
+isort -V	denied
+isort -c	inert
+isort -h	inert
+isort -l x	denied
+isort -m x	denied
+isort -q	denied
+isort -v	denied
+isort x	denied
+ispell	denied
+ispell --help	inert
+ispell --help --version	inert
+ispell --help -T x	inert
+ispell --help x	inert
+ispell --version	inert
+ispell -A	inert
+ispell -T x	inert
+ispell -V	inert
+ispell -a	inert
+ispell -d x	inert
+ispell -l	inert
+ispell -p x	inert
+ispell -v	inert
+ispell -w x	inert
+ispell x	inert
+istioctl	denied
+istioctl --help	inert
+istioctl --help --version	denied
+istioctl --help x	denied
+istioctl --version	inert
+istioctl -h	inert
+istioctl -v	inert
+istioctl ambient	denied
+istioctl ambient x	denied
+istioctl analyze	safe-read
+istioctl analyze --all-namespaces	safe-read
+istioctl analyze --all-namespaces --color	safe-read
+istioctl analyze --all-namespaces --failure-threshold x	safe-read
+istioctl analyze --all-namespaces x	safe-read
+istioctl analyze --color	safe-read
+istioctl analyze --failure-threshold	safe-read
+istioctl analyze --failure-threshold x	safe-read
+istioctl analyze --help	safe-read
+istioctl analyze --ignore-unknown	safe-read
+istioctl analyze --list-analyzers	safe-read
+istioctl analyze --meshConfigFile	safe-read
+istioctl analyze --meshConfigFile x	safe-read
+istioctl analyze --namespace x	safe-read
+istioctl analyze --no-color	safe-read
+istioctl analyze --output	safe-read
+istioctl analyze --output x	safe-read
+istioctl analyze --output-threshold	safe-read
+istioctl analyze --output-threshold x	safe-read
+istioctl analyze --recursive	safe-read
+istioctl analyze --remote-contexts x	safe-read
+istioctl analyze --revision	safe-read
+istioctl analyze --revision x	safe-read
+istioctl analyze --suppress	safe-read
+istioctl analyze --suppress x	safe-read
+istioctl analyze --timeout	safe-read
+istioctl analyze --timeout x	safe-read
+istioctl analyze --use-kube	safe-read
+istioctl analyze --use-kube x	safe-read
+istioctl analyze --verbose	safe-read
+istioctl analyze --verbose x	safe-read
+istioctl analyze -A	safe-read
+istioctl analyze -L	safe-read
+istioctl analyze -R	safe-read
+istioctl analyze -S	safe-read
+istioctl analyze -S x	safe-read
+istioctl analyze -h	safe-read
+istioctl analyze -n x	safe-read
+istioctl analyze -o	safe-read
+istioctl analyze -o x	safe-read
+istioctl analyze x	safe-read
+istioctl bug-report	denied
+istioctl bug-report x	denied
+istioctl checkinject	denied
+istioctl checkinject x	denied
+istioctl completion	denied
+istioctl completion --help	inert
+istioctl completion --help -h	inert
+istioctl completion --help x	inert
+istioctl completion -h	inert
+istioctl completion x	inert
+istioctl create-remote-secret	denied
+istioctl create-remote-secret x	denied
+istioctl experimental	denied
+istioctl experimental x	denied
+istioctl help	inert
+istioctl help x	inert
+istioctl install	denied
+istioctl install x	denied
+istioctl kube-inject	denied
+istioctl kube-inject x	denied
+istioctl manifest	denied
+istioctl manifest x	denied
+istioctl operator	denied
+istioctl operator x	denied
+istioctl proxy-config	denied
+istioctl proxy-config all	inert
+istioctl proxy-config all --help	inert
+istioctl proxy-config all --help -h	inert
+istioctl proxy-config all --help x	inert
+istioctl proxy-config all -h	inert
+istioctl proxy-config all x	inert
+istioctl proxy-config bootstrap	inert
+istioctl proxy-config bootstrap --help	inert
+istioctl proxy-config bootstrap --help -h	inert
+istioctl proxy-config bootstrap --help x	inert
+istioctl proxy-config bootstrap -h	inert
+istioctl proxy-config bootstrap x	inert
+istioctl proxy-config cluster	inert
+istioctl proxy-config cluster --help	inert
+istioctl proxy-config cluster --help -h	inert
+istioctl proxy-config cluster --help x	inert
+istioctl proxy-config cluster -h	inert
+istioctl proxy-config cluster x	inert
+istioctl proxy-config endpoint	inert
+istioctl proxy-config endpoint --help	inert
+istioctl proxy-config endpoint --help -h	inert
+istioctl proxy-config endpoint --help x	inert
+istioctl proxy-config endpoint -h	inert
+istioctl proxy-config endpoint x	inert
+istioctl proxy-config listener	inert
+istioctl proxy-config listener --help	inert
+istioctl proxy-config listener --help -h	inert
+istioctl proxy-config listener --help x	inert
+istioctl proxy-config listener -h	inert
+istioctl proxy-config listener x	inert
+istioctl proxy-config log	denied
+istioctl proxy-config log x	denied
+istioctl proxy-config route	inert
+istioctl proxy-config route --help	inert
+istioctl proxy-config route --help -h	inert
+istioctl proxy-config route --help x	inert
+istioctl proxy-config route -h	inert
+istioctl proxy-config route x	inert
+istioctl proxy-config secret	denied
+istioctl proxy-config secret --help	denied
+istioctl proxy-config secret --help -h	denied
+istioctl proxy-config secret --help x	denied
+istioctl proxy-config secret -h	denied
+istioctl proxy-config secret x	denied
+istioctl proxy-config x	denied
+istioctl proxy-status	safe-read
+istioctl proxy-status --file	safe-read
+istioctl proxy-status --file --file x	safe-read
+istioctl proxy-status --file --help	safe-read
+istioctl proxy-status --file x	safe-read
+istioctl proxy-status --help	safe-read
+istioctl proxy-status --multi-xds	safe-read
+istioctl proxy-status --multi-xds x	safe-read
+istioctl proxy-status --output x	safe-read
+istioctl proxy-status --revision x	safe-read
+istioctl proxy-status --xds-via-agents	safe-read
+istioctl proxy-status -f	safe-read
+istioctl proxy-status -f x	safe-read
+istioctl proxy-status -h	safe-read
+istioctl proxy-status -o x	safe-read
+istioctl proxy-status x	safe-read
+istioctl uninstall	denied
+istioctl uninstall x	denied
+istioctl upgrade	denied
+istioctl upgrade x	denied
+istioctl validate	safe-read
+istioctl validate --filename x	safe-read
+istioctl validate --help	safe-read
+istioctl validate --help --filename x	safe-read
+istioctl validate --help --no-validate	safe-read
+istioctl validate --help x	safe-read
+istioctl validate --no-validate	safe-read
+istioctl validate --output	safe-read
+istioctl validate --output x	safe-read
+istioctl validate --quiet	safe-read
+istioctl validate --referential	safe-read
+istioctl validate -f	safe-read
+istioctl validate -f x	safe-read
+istioctl validate -h	safe-read
+istioctl validate -o	safe-read
+istioctl validate -o x	safe-read
+istioctl validate -q	safe-read
+istioctl validate x	safe-read
+istioctl version	inert
+istioctl version --filename x	inert
+istioctl version --help	inert
+istioctl version --help --filename x	inert
+istioctl version --help --remote	inert
+istioctl version --help x	inert
+istioctl version --output x	inert
+istioctl version --remote	inert
+istioctl version --revision	inert
+istioctl version --revision x	inert
+istioctl version --short	inert
+istioctl version -f x	inert
+istioctl version -h	inert
+istioctl version -o x	inert
+istioctl version -s	inert
+istioctl version x	inert
+istioctl wait	denied
+istioctl wait x	denied
+istioctl x	denied
+istioctl x x	denied
+istioctl ztunnel-config	denied
+istioctl ztunnel-config x	denied
+isutf8	denied
+isutf8 --help	safe-read
+isutf8 --help --invert	safe-read
+isutf8 --help x	safe-read
+isutf8 --invert	safe-read
+isutf8 --list	safe-read
+isutf8 --quiet	safe-read
+isutf8 --version	denied
+isutf8 -h	safe-read
+isutf8 -i	safe-read
+isutf8 -l	safe-read
+isutf8 -q	safe-read
+isutf8 x	safe-read

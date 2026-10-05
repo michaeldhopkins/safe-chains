@@ -1,0 +1,1018 @@
+zcat	inert
+zcat --force	inert
+zcat --force --help	inert
+zcat --force x	inert
+zcat --help	inert
+zcat --quiet	inert
+zcat --verbose	inert
+zcat --version	inert
+zcat -V	inert
+zcat -f	inert
+zcat -h	inert
+zcat -q	inert
+zcat -v	inert
+zcat x	inert
+zcmp	denied
+zcmp --help	denied
+zcmp --version	denied
+zcmp x	inert
+zdiff	denied
+zdiff --help	denied
+zdiff --version	denied
+zdiff x	inert
+zed	inert
+zed --add	inert
+zed --add --classic	inert
+zed --add x	inert
+zed --classic	inert
+zed --diff	inert
+zed --existing	inert
+zed --foreground	inert
+zed --help	inert
+zed --new	inert
+zed --reuse	inert
+zed --system-specs	inert
+zed --version	inert
+zed --wait	inert
+zed -a	inert
+zed -e	inert
+zed -h	inert
+zed -n	inert
+zed -r	inert
+zed -v	inert
+zed -w	inert
+zed x	inert
+zegrep	denied
+zegrep --after-context x	inert
+zegrep --before-context x	inert
+zegrep --context x	inert
+zegrep --count	inert
+zegrep --count --after-context x	inert
+zegrep --count --extended-regexp	inert
+zegrep --count x	inert
+zegrep --extended-regexp	inert
+zegrep --file x	inert
+zegrep --files-with-matches	inert
+zegrep --files-without-match	inert
+zegrep --fixed-strings	inert
+zegrep --help	inert
+zegrep --ignore-case	inert
+zegrep --invert-match	inert
+zegrep --line-number	inert
+zegrep --max-count x	inert
+zegrep --no-filename	inert
+zegrep --only-matching	inert
+zegrep --quiet	inert
+zegrep --regexp x	inert
+zegrep --silent	inert
+zegrep --version	inert
+zegrep --with-filename	inert
+zegrep --word-regexp	inert
+zegrep -A x	inert
+zegrep -B x	inert
+zegrep -C x	inert
+zegrep -E	inert
+zegrep -F	inert
+zegrep -G	inert
+zegrep -H	inert
+zegrep -L	inert
+zegrep -V	inert
+zegrep -Z	inert
+zegrep -c	inert
+zegrep -e x	inert
+zegrep -f x	inert
+zegrep -h	inert
+zegrep -i	inert
+zegrep -l	inert
+zegrep -m x	inert
+zegrep -n	inert
+zegrep -o	inert
+zegrep -q	inert
+zegrep -s	inert
+zegrep -v	inert
+zegrep -w	inert
+zegrep -x	inert
+zegrep x	inert
+zellij	denied
+zellij --help	inert
+zellij --help --version	denied
+zellij --help x	denied
+zellij --version	inert
+zellij -V	inert
+zellij -h	inert
+zellij action	denied
+zellij action x	denied
+zellij attach	denied
+zellij attach x	denied
+zellij convert-config	denied
+zellij convert-config --help	inert
+zellij convert-config --help -h	inert
+zellij convert-config --help x	inert
+zellij convert-config -h	inert
+zellij convert-config x	inert
+zellij convert-layout	denied
+zellij convert-layout --help	inert
+zellij convert-layout --help -h	inert
+zellij convert-layout --help x	inert
+zellij convert-layout -h	inert
+zellij convert-layout x	inert
+zellij convert-theme	denied
+zellij convert-theme --help	inert
+zellij convert-theme --help -h	inert
+zellij convert-theme --help x	inert
+zellij convert-theme -h	inert
+zellij convert-theme x	inert
+zellij delete-all-sessions	denied
+zellij delete-all-sessions x	denied
+zellij delete-session	denied
+zellij delete-session x	denied
+zellij edit	denied
+zellij edit x	denied
+zellij kill-all-sessions	denied
+zellij kill-all-sessions x	denied
+zellij kill-session	denied
+zellij kill-session x	denied
+zellij la	inert
+zellij la --help	inert
+zellij la --help -h	inert
+zellij la --help x	inert
+zellij la -h	inert
+zellij la x	inert
+zellij list-aliases	inert
+zellij list-aliases --help	inert
+zellij list-aliases --help -h	inert
+zellij list-aliases --help x	inert
+zellij list-aliases -h	inert
+zellij list-aliases x	inert
+zellij list-sessions	inert
+zellij list-sessions --help	inert
+zellij list-sessions --help --no-formatting	inert
+zellij list-sessions --help x	inert
+zellij list-sessions --no-formatting	inert
+zellij list-sessions --reverse	inert
+zellij list-sessions --short	inert
+zellij list-sessions -h	inert
+zellij list-sessions -n	inert
+zellij list-sessions -r	inert
+zellij list-sessions -s	inert
+zellij list-sessions x	inert
+zellij ls	inert
+zellij ls --help	inert
+zellij ls --help --no-formatting	inert
+zellij ls --help x	inert
+zellij ls --no-formatting	inert
+zellij ls --reverse	inert
+zellij ls --short	inert
+zellij ls -h	inert
+zellij ls -n	inert
+zellij ls -r	inert
+zellij ls -s	inert
+zellij ls x	inert
+zellij options	denied
+zellij options x	denied
+zellij pipe	denied
+zellij pipe x	denied
+zellij plugin	denied
+zellij plugin x	denied
+zellij run	denied
+zellij run x	denied
+zellij setup	inert
+zellij setup --check	inert
+zellij setup --check --clean	inert
+zellij setup --check --dump-config x	inert
+zellij setup --check x	inert
+zellij setup --clean	inert
+zellij setup --dump-config x	inert
+zellij setup --dump-layout x	inert
+zellij setup --dump-plugins x	inert
+zellij setup --dump-swap-layout x	inert
+zellij setup --generate-auto-start x	inert
+zellij setup --generate-completion x	inert
+zellij setup --help	inert
+zellij setup -h	inert
+zellij setup x	inert
+zellij subscribe	denied
+zellij subscribe --ansi	inert
+zellij subscribe --ansi --format x	inert
+zellij subscribe --ansi --help	inert
+zellij subscribe --ansi x	inert
+zellij subscribe --format x	inert
+zellij subscribe --help	inert
+zellij subscribe --pane-id x	inert
+zellij subscribe --scrollback x	inert
+zellij subscribe -f x	inert
+zellij subscribe -h	inert
+zellij subscribe -p x	inert
+zellij subscribe -s x	inert
+zellij subscribe x	inert
+zellij w	inert
+zellij w --help	inert
+zellij w --help -h	inert
+zellij w --help x	inert
+zellij w -h	inert
+zellij w x	inert
+zellij watch	inert
+zellij watch --help	inert
+zellij watch --help -h	inert
+zellij watch --help x	inert
+zellij watch -h	inert
+zellij watch x	inert
+zellij web	denied
+zellij web x	denied
+zellij x	denied
+zf	inert
+zf --delimiter x	inert
+zf --filter x	inert
+zf --height x	inert
+zf --help	inert
+zf --help --delimiter x	inert
+zf --help --keep-order	inert
+zf --help x	inert
+zf --keep-order	inert
+zf --lines x	inert
+zf --plain	inert
+zf --preview-width x	inert
+zf --version	inert
+zf -0	inert
+zf -d x	inert
+zf -f x	inert
+zf -h	inert
+zf -k	inert
+zf -l x	inert
+zf -p	inert
+zf -v	inert
+zf x	inert
+zfgrep	denied
+zfgrep --after-context x	inert
+zfgrep --before-context x	inert
+zfgrep --context x	inert
+zfgrep --count	inert
+zfgrep --count --after-context x	inert
+zfgrep --count --extended-regexp	inert
+zfgrep --count x	inert
+zfgrep --extended-regexp	inert
+zfgrep --file x	inert
+zfgrep --files-with-matches	inert
+zfgrep --files-without-match	inert
+zfgrep --fixed-strings	inert
+zfgrep --help	inert
+zfgrep --ignore-case	inert
+zfgrep --invert-match	inert
+zfgrep --line-number	inert
+zfgrep --max-count x	inert
+zfgrep --no-filename	inert
+zfgrep --only-matching	inert
+zfgrep --quiet	inert
+zfgrep --regexp x	inert
+zfgrep --silent	inert
+zfgrep --version	inert
+zfgrep --with-filename	inert
+zfgrep --word-regexp	inert
+zfgrep -A x	inert
+zfgrep -B x	inert
+zfgrep -C x	inert
+zfgrep -E	inert
+zfgrep -F	inert
+zfgrep -G	inert
+zfgrep -H	inert
+zfgrep -L	inert
+zfgrep -V	inert
+zfgrep -Z	inert
+zfgrep -c	inert
+zfgrep -e x	inert
+zfgrep -f x	inert
+zfgrep -h	inert
+zfgrep -i	inert
+zfgrep -l	inert
+zfgrep -m x	inert
+zfgrep -n	inert
+zfgrep -o	inert
+zfgrep -q	inert
+zfgrep -s	inert
+zfgrep -v	inert
+zfgrep -w	inert
+zfgrep -x	inert
+zfgrep x	inert
+zforce	denied
+zforce --help	denied
+zforce --version	denied
+zforce x	safe-write
+zgrep	denied
+zgrep --after-context x	inert
+zgrep --before-context x	inert
+zgrep --context x	inert
+zgrep --count	inert
+zgrep --count --after-context x	inert
+zgrep --count --extended-regexp	inert
+zgrep --count x	inert
+zgrep --extended-regexp	inert
+zgrep --file x	inert
+zgrep --files-with-matches	inert
+zgrep --files-without-match	inert
+zgrep --fixed-strings	inert
+zgrep --help	inert
+zgrep --ignore-case	inert
+zgrep --invert-match	inert
+zgrep --line-number	inert
+zgrep --max-count x	inert
+zgrep --no-filename	inert
+zgrep --only-matching	inert
+zgrep --quiet	inert
+zgrep --regexp x	inert
+zgrep --silent	inert
+zgrep --version	inert
+zgrep --with-filename	inert
+zgrep --word-regexp	inert
+zgrep -A x	inert
+zgrep -B x	inert
+zgrep -C x	inert
+zgrep -E	inert
+zgrep -F	inert
+zgrep -G	inert
+zgrep -H	inert
+zgrep -L	inert
+zgrep -V	inert
+zgrep -Z	inert
+zgrep -c	inert
+zgrep -e x	inert
+zgrep -f x	inert
+zgrep -h	inert
+zgrep -i	inert
+zgrep -l	inert
+zgrep -m x	inert
+zgrep -n	inert
+zgrep -o	inert
+zgrep -q	inert
+zgrep -s	inert
+zgrep -v	inert
+zgrep -w	inert
+zgrep -x	inert
+zgrep x	inert
+zig	denied
+zig --help	inert
+zig --help --version	inert
+zig --help x	denied
+zig --version	inert
+zig x	denied
+zip	denied
+zip --absolute-path	safe-write
+zip --absolute-path --compression-method x	safe-write
+zip --absolute-path --delete	safe-write
+zip --absolute-path x	safe-write
+zip --compression-method x	safe-write
+zip --delete	safe-write
+zip --encrypt	safe-write
+zip --exclude	safe-write
+zip --filesync	safe-write
+zip --fix	safe-write
+zip --fixfix	safe-write
+zip --freshen	safe-write
+zip --help	safe-write
+zip --include	safe-write
+zip --junk-paths	safe-write
+zip --license	safe-write
+zip --move	safe-write
+zip --password x	safe-write
+zip --paths	safe-write
+zip --quiet	safe-write
+zip --recurse-paths	safe-write
+zip --symlinks	safe-write
+zip --temp-path x	safe-write
+zip --test	safe-write
+zip --update	safe-write
+zip --verbose	safe-write
+zip --version	denied
+zip -0	safe-write
+zip -1	safe-write
+zip -9	safe-write
+zip -?	safe-write
+zip -@	safe-write
+zip -A	safe-write
+zip -C	safe-write
+zip -D	safe-write
+zip -DF	safe-write
+zip -E	safe-write
+zip -F	safe-write
+zip -FF	safe-write
+zip -FS	safe-write
+zip -J	safe-write
+zip -L	safe-write
+zip -M	safe-write
+zip -O	safe-write
+zip -O x	safe-write
+zip -P	safe-write
+zip -P x	safe-write
+zip -Q	safe-write
+zip -R	safe-write
+zip -S	safe-write
+zip -T	safe-write
+zip -U	safe-write
+zip -V	safe-write
+zip -X	safe-write
+zip -Z	safe-write
+zip -Z x	safe-write
+zip -a	safe-write
+zip -b x	safe-write
+zip -c	safe-write
+zip -d	safe-write
+zip -e	safe-write
+zip -f	safe-write
+zip -g	safe-write
+zip -h	safe-write
+zip -i	safe-write
+zip -j	safe-write
+zip -k	safe-write
+zip -l	safe-write
+zip -m	safe-write
+zip -n	safe-write
+zip -n x	safe-write
+zip -o	safe-write
+zip -p	safe-write
+zip -q	safe-write
+zip -r	safe-write
+zip -s	safe-write
+zip -s x	safe-write
+zip -t	safe-write
+zip -t x	safe-write
+zip -tt x	safe-write
+zip -u	safe-write
+zip -v	safe-write
+zip -w	safe-write
+zip -x	safe-write
+zip -y	safe-write
+zip -z	safe-write
+zip archive.zip file.txt	safe-write
+zip x	safe-write
+zipalign	denied
+zipalign --help	inert
+zipalign --help --version	denied
+zipalign --help x	denied
+zipalign --version	denied
+zipalign -V	denied
+zipalign -c	inert
+zipalign -c --help	inert
+zipalign -c --version	inert
+zipalign -c -V	inert
+zipalign -c -c	inert
+zipalign -c -h	inert
+zipalign -c -p	inert
+zipalign -c -v	inert
+zipalign -h	inert
+zipalign -p	denied
+zipalign -v	denied
+zipalign x	denied
+zipcloak	denied
+zipcloak --decrypt	safe-write
+zipcloak --decrypt --help	safe-write
+zipcloak --decrypt --output-file x	safe-write
+zipcloak --decrypt x	safe-write
+zipcloak --help	safe-write
+zipcloak --license	safe-write
+zipcloak --output-file x	safe-write
+zipcloak --quiet	safe-write
+zipcloak --temp-path x	safe-write
+zipcloak --version	safe-write
+zipcloak -L	safe-write
+zipcloak -O x	safe-write
+zipcloak -b	safe-write
+zipcloak -d	safe-write
+zipcloak -h	safe-write
+zipcloak -q	safe-write
+zipcloak -v	safe-write
+zipcloak x	safe-write
+zipcmp	denied
+zipcmp --help	denied
+zipcmp --version	denied
+zipcmp -C	inert
+zipcmp -C -T	inert
+zipcmp -C x	inert
+zipcmp -T	inert
+zipcmp -V	inert
+zipcmp -h	inert
+zipcmp -i	inert
+zipcmp -p	inert
+zipcmp -q	inert
+zipcmp -s	inert
+zipcmp -t	inert
+zipcmp -v	inert
+zipcmp x	inert
+zipdetails	denied
+zipdetails --help	denied
+zipdetails --scan	inert
+zipdetails --scan --version	inert
+zipdetails --scan x	inert
+zipdetails --version	inert
+zipdetails -h	inert
+zipdetails -v	inert
+zipdetails x	inert
+zipgrep	denied
+zipgrep --help	denied
+zipgrep --version	denied
+zipgrep pattern archive.zip	inert
+zipgrep x	inert
+zipinfo	denied
+zipinfo --help	inert
+zipinfo --help --version	inert
+zipinfo --help x	inert
+zipinfo --version	inert
+zipinfo -1	inert
+zipinfo -2	inert
+zipinfo -C	inert
+zipinfo -M	inert
+zipinfo -T	inert
+zipinfo -V	inert
+zipinfo -Z	inert
+zipinfo -h	inert
+zipinfo -l	inert
+zipinfo -m	inert
+zipinfo -s	inert
+zipinfo -t	inert
+zipinfo -v	inert
+zipinfo -z	inert
+zipinfo x	inert
+zipmerge	denied
+zipmerge --help	denied
+zipmerge --version	denied
+zipmerge -D	safe-write
+zipmerge -D -I	safe-write
+zipmerge -D x	safe-write
+zipmerge -I	safe-write
+zipmerge -S	safe-write
+zipmerge -V	safe-write
+zipmerge -h	safe-write
+zipmerge -i	safe-write
+zipmerge -k	safe-write
+zipmerge -s	safe-write
+zipmerge x	safe-write
+zipnote	denied
+zipnote --help	safe-write
+zipnote --help --license	safe-write
+zipnote --help x	safe-write
+zipnote --license	safe-write
+zipnote --version	safe-write
+zipnote -L	safe-write
+zipnote -b	safe-write
+zipnote -h	safe-write
+zipnote -v	safe-write
+zipnote -w	safe-write
+zipnote x	safe-write
+zipsplit	denied
+zipsplit --help	safe-write
+zipsplit --help --license	safe-write
+zipsplit --help -b x	safe-write
+zipsplit --help x	safe-write
+zipsplit --license	safe-write
+zipsplit --version	safe-write
+zipsplit -L	safe-write
+zipsplit -b x	safe-write
+zipsplit -h	safe-write
+zipsplit -i	safe-write
+zipsplit -n x	safe-write
+zipsplit -p	safe-write
+zipsplit -r x	safe-write
+zipsplit -s	safe-write
+zipsplit -t	safe-write
+zipsplit -v	safe-write
+zipsplit x	safe-write
+ziptool	denied
+ziptool --help	denied
+ziptool --version	denied
+ziptool -c	safe-write
+ziptool -c -e	safe-write
+ziptool -c -l x	safe-write
+ziptool -c x	safe-write
+ziptool -e	safe-write
+ziptool -g	safe-write
+ziptool -h	safe-write
+ziptool -l x	safe-write
+ziptool -n	safe-write
+ziptool -o x	safe-write
+ziptool -r	safe-write
+ziptool -s	safe-write
+ziptool -t	safe-write
+ziptool x	safe-write
+zless	inert
+zless --help	denied
+zless --version	denied
+zless file.gz	inert
+zless x	inert
+zlib-flate	inert
+zlib-flate --help	denied
+zlib-flate --version	denied
+zlib-flate -compress	inert
+zlib-flate -compress -level x	inert
+zlib-flate -compress -uncompress	inert
+zlib-flate -compress x	inert
+zlib-flate -level x	inert
+zlib-flate -uncompress	inert
+zlib-flate x	inert
+zmore	inert
+zmore --help	denied
+zmore --version	denied
+zmore x	inert
+znew	denied
+znew --help	denied
+znew --version	denied
+znew -9	safe-write
+znew -9 -K	safe-write
+znew -9 x	safe-write
+znew -K	safe-write
+znew -f	safe-write
+znew -t	safe-write
+znew -v	safe-write
+znew x	safe-write
+znew ~/.ssh/x.Z	denied
+zola	denied
+zola --config x	denied
+zola --help	inert
+zola --help --config x	denied
+zola --help --version	denied
+zola --help x	denied
+zola --output-dir x	denied
+zola --root x	denied
+zola --version	inert
+zola -V	inert
+zola -c x	denied
+zola -h	inert
+zola -o x	denied
+zola -r x	denied
+zola build	safe-write
+zola build --base-url x	safe-write
+zola build --config x	safe-write
+zola build --drafts	safe-write
+zola build --drafts --base-url x	safe-write
+zola build --drafts --force	safe-write
+zola build --drafts x	safe-write
+zola build --force	safe-write
+zola build --help	safe-write
+zola build --minify	safe-write
+zola build --output-dir x	safe-write
+zola build --root x	safe-write
+zola build -c x	safe-write
+zola build -h	safe-write
+zola build -o x	safe-write
+zola build -r x	safe-write
+zola build -u x	safe-write
+zola build x	safe-write
+zola check	safe-read
+zola check --config x	safe-read
+zola check --drafts	safe-read
+zola check --drafts --config x	safe-read
+zola check --drafts --help	safe-read
+zola check --drafts x	safe-read
+zola check --help	safe-read
+zola check --root x	safe-read
+zola check --skip-external-links	safe-read
+zola check -h	safe-read
+zola check x	safe-read
+zola completion	denied
+zola completion --help	inert
+zola completion --help -h	inert
+zola completion --help x	inert
+zola completion -h	inert
+zola completion x	inert
+zola help	inert
+zola help x	inert
+zola init	safe-write
+zola init --force	safe-write
+zola init --force --help	safe-write
+zola init --force x	safe-write
+zola init --help	safe-write
+zola init -f	safe-write
+zola init -h	safe-write
+zola init x	safe-write
+zola serve	denied
+zola serve x	denied
+zola x	denied
+zoxide	denied
+zoxide --help	inert
+zoxide --help --version	denied
+zoxide --help x	denied
+zoxide --version	inert
+zoxide -V	inert
+zoxide -h	inert
+zoxide init	denied
+zoxide init --help	inert
+zoxide init --help --no-aliases	inert
+zoxide init --help x	inert
+zoxide init --no-aliases	inert
+zoxide init --no-cmd	inert
+zoxide init -h	inert
+zoxide init x	inert
+zoxide query	inert
+zoxide query --all	inert
+zoxide query --all --exclude	inert
+zoxide query --all x	inert
+zoxide query --exclude	inert
+zoxide query --help	inert
+zoxide query --interactive	inert
+zoxide query --list	inert
+zoxide query --score	inert
+zoxide query -a	inert
+zoxide query -h	inert
+zoxide query -i	inert
+zoxide query -l	inert
+zoxide query -s	inert
+zoxide query x	inert
+zoxide x	denied
+zsh	denied
+zsh --help	inert
+zsh --help --version	inert
+zsh --help -n x	inert
+zsh --help x	denied
+zsh --version	inert
+zsh -c 'evil'	denied
+zsh -n x	inert
+zsh -n ~/.zshrc	inert
+zsh script.zsh	denied
+zsh x	denied
+zstd	safe-write
+zstd --adapt	safe-write
+zstd --adapt --adapt x	safe-write
+zstd --adapt --check	safe-write
+zstd --adapt x	safe-write
+zstd --block-size x	safe-write
+zstd --check	safe-write
+zstd --compress	safe-write
+zstd --content-size	safe-write
+zstd --decompress	safe-write
+zstd --dictionary x	safe-write
+zstd --exclude x	safe-write
+zstd --exclude-compressed	safe-write
+zstd --fast	safe-write
+zstd --filelist	safe-write
+zstd --filelist x	safe-write
+zstd --force	safe-write
+zstd --format	safe-write
+zstd --format x	safe-write
+zstd --from-stdin	safe-write
+zstd --help	safe-write
+zstd --keep	safe-write
+zstd --list	safe-write
+zstd --long	safe-write
+zstd --long x	safe-write
+zstd --max	safe-write
+zstd --maxdict x	safe-write
+zstd --maxmem x	safe-write
+zstd --memory	safe-write
+zstd --memory x	safe-write
+zstd --no-check	safe-write
+zstd --no-content-size	safe-write
+zstd --no-dictID	safe-write
+zstd --no-progress	safe-write
+zstd --no-row-match-finder	safe-write
+zstd --no-sparse	safe-write
+zstd --num-threads	safe-write
+zstd --num-threads x	safe-write
+zstd --output x	safe-write
+zstd --output-dir-flat x	safe-write
+zstd --output-dir-mirror x	safe-write
+zstd --patch-from	safe-write
+zstd --patch-from x	safe-write
+zstd --progress	safe-write
+zstd --quiet	safe-write
+zstd --rm	safe-write
+zstd --row-match-finder	safe-write
+zstd --rsyncable	safe-write
+zstd --sparse	safe-write
+zstd --stdout	safe-write
+zstd --summary	safe-write
+zstd --test	safe-write
+zstd --threads	safe-write
+zstd --threads x	safe-write
+zstd --train	safe-write
+zstd --train x	safe-write
+zstd --train-cover	safe-write
+zstd --train-cover x	safe-write
+zstd --train-fastcover	safe-write
+zstd --train-fastcover x	safe-write
+zstd --ultra	safe-write
+zstd --verbose	safe-write
+zstd --version	safe-write
+zstd --with-progress	safe-write
+zstd --write-data-blocks x	safe-write
+zstd -1	safe-write
+zstd -2	safe-write
+zstd -3	safe-write
+zstd -4	safe-write
+zstd -5	safe-write
+zstd -6	safe-write
+zstd -7	safe-write
+zstd -8	safe-write
+zstd -9	safe-write
+zstd -D	safe-write
+zstd -D x	safe-write
+zstd -K	safe-write
+zstd -M	safe-write
+zstd -T	safe-write
+zstd -T x	safe-write
+zstd -V	safe-write
+zstd -c	safe-write
+zstd -d	safe-write
+zstd -f	safe-write
+zstd -h	safe-write
+zstd -k	safe-write
+zstd -l	safe-write
+zstd -o x	safe-write
+zstd -q	safe-write
+zstd -r	safe-write
+zstd -t	safe-write
+zstd -v	safe-write
+zstd -z	safe-write
+zstd x	safe-write
+zstdcat	safe-write
+zstdcat --adapt	safe-write
+zstdcat --adapt --adapt x	safe-write
+zstdcat --adapt --check	safe-write
+zstdcat --adapt x	safe-write
+zstdcat --block-size x	safe-write
+zstdcat --check	safe-write
+zstdcat --compress	safe-write
+zstdcat --content-size	safe-write
+zstdcat --decompress	safe-write
+zstdcat --dictionary x	safe-write
+zstdcat --exclude x	safe-write
+zstdcat --exclude-compressed	safe-write
+zstdcat --fast	safe-write
+zstdcat --filelist	safe-write
+zstdcat --filelist x	safe-write
+zstdcat --force	safe-write
+zstdcat --format	safe-write
+zstdcat --format x	safe-write
+zstdcat --from-stdin	safe-write
+zstdcat --help	safe-write
+zstdcat --keep	safe-write
+zstdcat --list	safe-write
+zstdcat --long	safe-write
+zstdcat --long x	safe-write
+zstdcat --max	safe-write
+zstdcat --maxdict x	safe-write
+zstdcat --maxmem x	safe-write
+zstdcat --memory	safe-write
+zstdcat --memory x	safe-write
+zstdcat --no-check	safe-write
+zstdcat --no-content-size	safe-write
+zstdcat --no-dictID	safe-write
+zstdcat --no-progress	safe-write
+zstdcat --no-row-match-finder	safe-write
+zstdcat --no-sparse	safe-write
+zstdcat --num-threads	safe-write
+zstdcat --num-threads x	safe-write
+zstdcat --output x	safe-write
+zstdcat --output-dir-flat x	safe-write
+zstdcat --output-dir-mirror x	safe-write
+zstdcat --patch-from	safe-write
+zstdcat --patch-from x	safe-write
+zstdcat --progress	safe-write
+zstdcat --quiet	safe-write
+zstdcat --rm	safe-write
+zstdcat --row-match-finder	safe-write
+zstdcat --rsyncable	safe-write
+zstdcat --sparse	safe-write
+zstdcat --stdout	safe-write
+zstdcat --summary	safe-write
+zstdcat --test	safe-write
+zstdcat --threads	safe-write
+zstdcat --threads x	safe-write
+zstdcat --train	safe-write
+zstdcat --train x	safe-write
+zstdcat --train-cover	safe-write
+zstdcat --train-cover x	safe-write
+zstdcat --train-fastcover	safe-write
+zstdcat --train-fastcover x	safe-write
+zstdcat --ultra	safe-write
+zstdcat --verbose	safe-write
+zstdcat --version	safe-write
+zstdcat --with-progress	safe-write
+zstdcat --write-data-blocks x	safe-write
+zstdcat -1	safe-write
+zstdcat -2	safe-write
+zstdcat -3	safe-write
+zstdcat -4	safe-write
+zstdcat -5	safe-write
+zstdcat -6	safe-write
+zstdcat -7	safe-write
+zstdcat -8	safe-write
+zstdcat -9	safe-write
+zstdcat -D	safe-write
+zstdcat -D x	safe-write
+zstdcat -K	safe-write
+zstdcat -M	safe-write
+zstdcat -T	safe-write
+zstdcat -T x	safe-write
+zstdcat -V	safe-write
+zstdcat -c	safe-write
+zstdcat -d	safe-write
+zstdcat -f	safe-write
+zstdcat -h	safe-write
+zstdcat -k	safe-write
+zstdcat -l	safe-write
+zstdcat -o x	safe-write
+zstdcat -q	safe-write
+zstdcat -r	safe-write
+zstdcat -t	safe-write
+zstdcat -v	safe-write
+zstdcat -z	safe-write
+zstdcat x	safe-write
+zstdgrep	denied
+zstdgrep --help	denied
+zstdgrep --version	denied
+zstdgrep x	inert
+zstdless	inert
+zstdless --help	denied
+zstdless --version	denied
+zstdless x	inert
+zstdmt	safe-write
+zstdmt --adapt	safe-write
+zstdmt --adapt --adapt x	safe-write
+zstdmt --adapt --check	safe-write
+zstdmt --adapt x	safe-write
+zstdmt --block-size x	safe-write
+zstdmt --check	safe-write
+zstdmt --compress	safe-write
+zstdmt --content-size	safe-write
+zstdmt --decompress	safe-write
+zstdmt --dictionary x	safe-write
+zstdmt --exclude x	safe-write
+zstdmt --exclude-compressed	safe-write
+zstdmt --fast	safe-write
+zstdmt --filelist	safe-write
+zstdmt --filelist x	safe-write
+zstdmt --force	safe-write
+zstdmt --format	safe-write
+zstdmt --format x	safe-write
+zstdmt --from-stdin	safe-write
+zstdmt --help	safe-write
+zstdmt --keep	safe-write
+zstdmt --list	safe-write
+zstdmt --long	safe-write
+zstdmt --long x	safe-write
+zstdmt --max	safe-write
+zstdmt --maxdict x	safe-write
+zstdmt --maxmem x	safe-write
+zstdmt --memory	safe-write
+zstdmt --memory x	safe-write
+zstdmt --no-check	safe-write
+zstdmt --no-content-size	safe-write
+zstdmt --no-dictID	safe-write
+zstdmt --no-progress	safe-write
+zstdmt --no-row-match-finder	safe-write
+zstdmt --no-sparse	safe-write
+zstdmt --num-threads	safe-write
+zstdmt --num-threads x	safe-write
+zstdmt --output x	safe-write
+zstdmt --output-dir-flat x	safe-write
+zstdmt --output-dir-mirror x	safe-write
+zstdmt --patch-from	safe-write
+zstdmt --patch-from x	safe-write
+zstdmt --progress	safe-write
+zstdmt --quiet	safe-write
+zstdmt --rm	safe-write
+zstdmt --row-match-finder	safe-write
+zstdmt --rsyncable	safe-write
+zstdmt --sparse	safe-write
+zstdmt --stdout	safe-write
+zstdmt --summary	safe-write
+zstdmt --test	safe-write
+zstdmt --threads	safe-write
+zstdmt --threads x	safe-write
+zstdmt --train	safe-write
+zstdmt --train x	safe-write
+zstdmt --train-cover	safe-write
+zstdmt --train-cover x	safe-write
+zstdmt --train-fastcover	safe-write
+zstdmt --train-fastcover x	safe-write
+zstdmt --ultra	safe-write
+zstdmt --verbose	safe-write
+zstdmt --version	safe-write
+zstdmt --with-progress	safe-write
+zstdmt --write-data-blocks x	safe-write
+zstdmt -1	safe-write
+zstdmt -2	safe-write
+zstdmt -3	safe-write
+zstdmt -4	safe-write
+zstdmt -5	safe-write
+zstdmt -6	safe-write
+zstdmt -7	safe-write
+zstdmt -8	safe-write
+zstdmt -9	safe-write
+zstdmt -D	safe-write
+zstdmt -D x	safe-write
+zstdmt -K	safe-write
+zstdmt -M	safe-write
+zstdmt -T	safe-write
+zstdmt -T x	safe-write
+zstdmt -V	safe-write
+zstdmt -c	safe-write
+zstdmt -d	safe-write
+zstdmt -f	safe-write
+zstdmt -h	safe-write
+zstdmt -k	safe-write
+zstdmt -l	safe-write
+zstdmt -o x	safe-write
+zstdmt -q	safe-write
+zstdmt -r	safe-write
+zstdmt -t	safe-write
+zstdmt -v	safe-write
+zstdmt -z	safe-write
+zstdmt x	safe-write

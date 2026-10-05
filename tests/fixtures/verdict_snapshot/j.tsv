@@ -1,0 +1,1363 @@
+jai	denied
+jai --bare	denied
+jai --bare --casual	denied
+jai --bare x	denied
+jai --casual	denied
+jai --help	denied
+jai --strict	denied
+jai --version	denied
+jai x	denied
+jaq	inert
+jaq --arg x	inert
+jaq --argjson x	inert
+jaq --compact-output	inert
+jaq --compact-output --arg x	inert
+jaq --compact-output --exit-status	inert
+jaq --compact-output x	inert
+jaq --exit-status	inert
+jaq --from-file x	inert
+jaq --help	inert
+jaq --indent x	inert
+jaq --join-output	inert
+jaq --null-input	inert
+jaq --raw-input	inert
+jaq --raw-output	inert
+jaq --rawfile x	inert
+jaq --slurp	inert
+jaq --slurpfile x	inert
+jaq --sort-keys	inert
+jaq --tab	inert
+jaq --version	inert
+jaq -C	inert
+jaq -M	inert
+jaq -R	inert
+jaq -S	inert
+jaq -V	inert
+jaq -c	inert
+jaq -e	inert
+jaq -f x	inert
+jaq -h	inert
+jaq -j	inert
+jaq -n	inert
+jaq -r	inert
+jaq -s	inert
+jaq x	inert
+jar	denied
+jar --help	inert
+jar --list	inert
+jar --unknown	denied
+jar --version	inert
+jar -ctf app.jar	denied
+jar -tf app.jar	inert
+jar -tvf app.jar	inert
+jar cf app.jar .	denied
+jar tf app.jar	inert
+jar tvf app.jar	inert
+jar uf app.jar file.class	denied
+jar x	denied
+jar xf app.jar	denied
+jarsigner	denied
+jarsigner --help	inert
+jarsigner --version	denied
+jarsigner -certs	denied
+jarsigner -certs -h	denied
+jarsigner -certs x	denied
+jarsigner -h	inert
+jarsigner -help	denied
+jarsigner -strict	denied
+jarsigner -verbose	denied
+jarsigner -verify	inert
+jarsigner -verify -certs	inert
+jarsigner -verify -h	inert
+jarsigner -verify -help	inert
+jarsigner -verify -strict	inert
+jarsigner -verify -verbose	inert
+jarsigner -verify -verify	inert
+jarsigner x	denied
+jasmine	safe-read
+jasmine --color	safe-read
+jasmine --color --config x	safe-read
+jasmine --color --filter	safe-read
+jasmine --color x	safe-read
+jasmine --config x	safe-read
+jasmine --filter	safe-read
+jasmine --help	safe-read
+jasmine --no-color	safe-read
+jasmine --random	safe-read
+jasmine --reporter x	safe-read
+jasmine --require x	safe-read
+jasmine --seed	safe-read
+jasmine --stop-on-failure	safe-read
+jasmine --version	safe-read
+jasmine -h	safe-read
+jasmine x	safe-read
+jasper	denied
+jasper --cmpt x	safe-write
+jasper --debug-level x	safe-write
+jasper --force-srgb	safe-write
+jasper --force-srgb --cmpt x	safe-write
+jasper --force-srgb --help	safe-write
+jasper --force-srgb x	safe-write
+jasper --help	safe-write
+jasper --input x	safe-write
+jasper --input-format x	safe-write
+jasper --output x	safe-write
+jasper --output-format x	safe-write
+jasper --output-option x	safe-write
+jasper --verbose	safe-write
+jasper --version	safe-write
+jasper -F x	safe-write
+jasper -O x	safe-write
+jasper -T x	safe-write
+jasper -V	safe-write
+jasper -f x	safe-write
+jasper -h	safe-write
+jasper -t x	safe-write
+jasper -x x	safe-write
+jasper x	safe-write
+java	denied
+java --help	inert
+java --help --version	inert
+java --help x	denied
+java --version	inert
+java -h	inert
+java -version	inert
+java x	denied
+javap	denied
+javap --help	inert
+javap --help --module x	inert
+javap --help --version	inert
+javap --help x	inert
+javap --module x	inert
+javap --version	inert
+javap -V	inert
+javap -bootclasspath x	inert
+javap -c	inert
+javap -classpath x	inert
+javap -constants	inert
+javap -cp x	inert
+javap -h	inert
+javap -l	inert
+javap -m x	inert
+javap -p	inert
+javap -private	inert
+javap -protected	inert
+javap -public	inert
+javap -s	inert
+javap -sysinfo	inert
+javap -v	inert
+javap -verbose	inert
+javap x	inert
+jbig2dec	denied
+jbig2dec --embedded	safe-write
+jbig2dec --embedded --hash	safe-write
+jbig2dec --embedded --output x	safe-write
+jbig2dec --embedded x	safe-write
+jbig2dec --hash	safe-write
+jbig2dec --help	safe-write
+jbig2dec --no-render	safe-write
+jbig2dec --output x	safe-write
+jbig2dec --pdf	safe-write
+jbig2dec --quiet	safe-write
+jbig2dec --report-threshold x	safe-write
+jbig2dec --verbose	safe-write
+jbig2dec --version	safe-write
+jbig2dec -T x	safe-write
+jbig2dec -V	safe-write
+jbig2dec -e	safe-write
+jbig2dec -h	safe-write
+jbig2dec -o x	safe-write
+jbig2dec -p	safe-write
+jbig2dec -q	safe-write
+jbig2dec -t	safe-write
+jbig2dec -v	safe-write
+jbig2dec x	safe-write
+jc	denied
+jc --about	inert
+jc --about --bash-comp	inert
+jc --about x	inert
+jc --bash-comp	inert
+jc --force-color	inert
+jc --help	inert
+jc --meta-out	inert
+jc --monochrome	inert
+jc --pretty	inert
+jc --quiet	inert
+jc --raw	inert
+jc --unbuffer	inert
+jc --version	inert
+jc --yaml-out	inert
+jc --zsh-comp	inert
+jc -C	inert
+jc -M	inert
+jc -a	inert
+jc -h	inert
+jc -m	inert
+jc -p	inert
+jc -q	inert
+jc -r	inert
+jc -u	inert
+jc -y	inert
+jc x	inert
+jcmd	safe-read
+jcmd --help	safe-read
+jcmd --help -h	safe-read
+jcmd --help x	denied
+jcmd --version	denied
+jcmd -h	safe-read
+jcmd -help	safe-read
+jcmd -l	safe-read
+jcmd x	denied
+jdeps	denied
+jdeps --add-modules x	safe-read
+jdeps --api-only	safe-read
+jdeps --api-only --add-modules x	safe-read
+jdeps --api-only --check	safe-read
+jdeps --api-only x	safe-read
+jdeps --check	safe-read
+jdeps --class-path x	safe-read
+jdeps --dot-output x	safe-read
+jdeps --filter x	safe-read
+jdeps --help	denied
+jdeps --ignore-missing-deps	safe-read
+jdeps --ignore-missing-deps x	safe-read
+jdeps --include x	safe-read
+jdeps --inverse	safe-read
+jdeps --jdk-internals	safe-read
+jdeps --list-deps	safe-read
+jdeps --list-reduced-deps	safe-read
+jdeps --missing-deps	safe-read
+jdeps --module x	safe-read
+jdeps --module-path x	safe-read
+jdeps --multi-release x	safe-read
+jdeps --print-module-deps	safe-read
+jdeps --print-module-deps x	safe-read
+jdeps --regex	safe-read
+jdeps --regex x	safe-read
+jdeps --require x	safe-read
+jdeps --upgrade-module-path x	safe-read
+jdeps --version	denied
+jdeps -R	safe-read
+jdeps -V	safe-read
+jdeps -apionly	safe-read
+jdeps -c	safe-read
+jdeps -classpath x	safe-read
+jdeps -cp	safe-read
+jdeps -cp x	safe-read
+jdeps -dotoutput	safe-read
+jdeps -e	safe-read
+jdeps -f	safe-read
+jdeps -filter	safe-read
+jdeps -h	safe-read
+jdeps -help	safe-read
+jdeps -include	safe-read
+jdeps -jdkinternals	safe-read
+jdeps -m	safe-read
+jdeps -module	safe-read
+jdeps -multi-release	safe-read
+jdeps -p	safe-read
+jdeps -package	safe-read
+jdeps -q	safe-read
+jdeps -quiet	safe-read
+jdeps -recursive	safe-read
+jdeps -regex	safe-read
+jdeps -s	safe-read
+jdeps -summary	safe-read
+jdeps -v	safe-read
+jdeps -verbose	safe-read
+jdeps -version	safe-read
+jdeps x	safe-read
+jekyll	denied
+jekyll --help	inert
+jekyll --help --version	denied
+jekyll --help x	denied
+jekyll --version	inert
+jekyll -h	inert
+jekyll -v	inert
+jekyll b	denied
+jekyll b x	denied
+jekyll build	denied
+jekyll build x	denied
+jekyll clean	denied
+jekyll clean x	denied
+jekyll compose	denied
+jekyll compose x	denied
+jekyll docs	denied
+jekyll docs x	denied
+jekyll doctor	safe-read
+jekyll doctor --config x	safe-read
+jekyll doctor --help	safe-read
+jekyll doctor --help --config x	safe-read
+jekyll doctor --help --trace	safe-read
+jekyll doctor --help x	safe-read
+jekyll doctor --source x	safe-read
+jekyll doctor --trace	safe-read
+jekyll doctor -h	safe-read
+jekyll doctor -t	safe-read
+jekyll doctor x	safe-read
+jekyll help	inert
+jekyll help x	inert
+jekyll hyde	safe-read
+jekyll hyde --config x	safe-read
+jekyll hyde --help	safe-read
+jekyll hyde --help --config x	safe-read
+jekyll hyde --help --trace	safe-read
+jekyll hyde --help x	safe-read
+jekyll hyde --source x	safe-read
+jekyll hyde --trace	safe-read
+jekyll hyde -h	safe-read
+jekyll hyde -t	safe-read
+jekyll hyde x	safe-read
+jekyll import	denied
+jekyll import x	denied
+jekyll new	denied
+jekyll new x	denied
+jekyll new-theme	denied
+jekyll new-theme x	denied
+jekyll s	denied
+jekyll s x	denied
+jekyll serve	denied
+jekyll serve x	denied
+jekyll server	denied
+jekyll server x	denied
+jekyll x	denied
+jenv	denied
+jenv --help	inert
+jenv --help --version	denied
+jenv --help x	denied
+jenv --version	inert
+jenv -h	inert
+jenv add	denied
+jenv add --help	safe-write
+jenv add --help --skip-existing	safe-write
+jenv add --help x	safe-write
+jenv add --skip-existing	safe-write
+jenv add -h	safe-write
+jenv add x	safe-write
+jenv commands	inert
+jenv commands --help	inert
+jenv commands --help --no-sh	inert
+jenv commands --help x	inert
+jenv commands --no-sh	inert
+jenv commands --sh	inert
+jenv commands -h	inert
+jenv commands x	inert
+jenv disable-plugin	denied
+jenv disable-plugin --help	safe-write
+jenv disable-plugin --help -h	safe-write
+jenv disable-plugin --help x	safe-write
+jenv disable-plugin -h	safe-write
+jenv disable-plugin x	safe-write
+jenv doctor	inert
+jenv doctor --help	inert
+jenv doctor --help -h	inert
+jenv doctor --help x	inert
+jenv doctor -h	inert
+jenv doctor x	inert
+jenv enable-plugin	denied
+jenv enable-plugin --help	safe-write
+jenv enable-plugin --help -h	safe-write
+jenv enable-plugin --help x	safe-write
+jenv enable-plugin -h	safe-write
+jenv enable-plugin x	safe-write
+jenv global	safe-write
+jenv global --help	safe-write
+jenv global --help --unset	safe-write
+jenv global --help x	safe-write
+jenv global --unset	safe-write
+jenv global -h	safe-write
+jenv global x	safe-write
+jenv help	inert
+jenv help x	inert
+jenv hooks	inert
+jenv hooks --help	inert
+jenv hooks --help -h	inert
+jenv hooks --help x	inert
+jenv hooks -h	inert
+jenv hooks x	inert
+jenv init	denied
+jenv init -	inert
+jenv init - -	inert
+jenv init - --help	inert
+jenv init - -h	inert
+jenv init - x	inert
+jenv init --help	inert
+jenv init -h	inert
+jenv init x	denied
+jenv javahome	inert
+jenv javahome --help	inert
+jenv javahome --help -h	inert
+jenv javahome --help x	inert
+jenv javahome -h	inert
+jenv javahome x	inert
+jenv local	safe-write
+jenv local --help	safe-write
+jenv local --help --unset	safe-write
+jenv local --help x	safe-write
+jenv local --unset	safe-write
+jenv local -h	safe-write
+jenv local x	safe-write
+jenv macos-javahome	denied
+jenv macos-javahome x	denied
+jenv plugin	inert
+jenv plugin list	inert
+jenv plugin list --help	inert
+jenv plugin list --help -h	inert
+jenv plugin list --help x	inert
+jenv plugin list -h	inert
+jenv plugin list x	inert
+jenv plugin ls	inert
+jenv plugin ls --help	inert
+jenv plugin ls --help -h	inert
+jenv plugin ls --help x	inert
+jenv plugin ls -h	inert
+jenv plugin ls x	inert
+jenv plugin x	denied
+jenv plugins	inert
+jenv plugins --help	inert
+jenv plugins --help -h	inert
+jenv plugins --help x	inert
+jenv plugins -h	inert
+jenv plugins x	inert
+jenv prefix	inert
+jenv prefix --help	inert
+jenv prefix --help -h	inert
+jenv prefix --help x	inert
+jenv prefix -h	inert
+jenv prefix x	inert
+jenv rehash	safe-write
+jenv rehash --help	safe-write
+jenv rehash --help -h	safe-write
+jenv rehash --help x	safe-write
+jenv rehash -h	safe-write
+jenv rehash x	safe-write
+jenv remove	denied
+jenv remove --help	safe-write
+jenv remove --help -h	safe-write
+jenv remove --help x	safe-write
+jenv remove -h	safe-write
+jenv remove x	safe-write
+jenv root	inert
+jenv root --help	inert
+jenv root --help -h	inert
+jenv root --help x	inert
+jenv root -h	inert
+jenv root x	inert
+jenv shell	safe-write
+jenv shell --help	safe-write
+jenv shell --help --unset	safe-write
+jenv shell --help x	safe-write
+jenv shell --unset	safe-write
+jenv shell -h	safe-write
+jenv shell x	safe-write
+jenv shims	inert
+jenv shims --help	inert
+jenv shims --help --short	inert
+jenv shims --help x	inert
+jenv shims --short	inert
+jenv shims -h	inert
+jenv shims x	inert
+jenv version	inert
+jenv version --help	inert
+jenv version --help -h	inert
+jenv version --help x	inert
+jenv version -h	inert
+jenv version x	inert
+jenv version-file	inert
+jenv version-file --help	inert
+jenv version-file --help -h	inert
+jenv version-file --help x	inert
+jenv version-file -h	inert
+jenv version-file x	inert
+jenv version-file-read	inert
+jenv version-file-read --help	inert
+jenv version-file-read --help -h	inert
+jenv version-file-read --help x	inert
+jenv version-file-read -h	inert
+jenv version-file-read x	inert
+jenv version-name	inert
+jenv version-name --help	inert
+jenv version-name --help -h	inert
+jenv version-name --help x	inert
+jenv version-name -h	inert
+jenv version-name x	inert
+jenv version-origin	inert
+jenv version-origin --help	inert
+jenv version-origin --help -h	inert
+jenv version-origin --help x	inert
+jenv version-origin -h	inert
+jenv version-origin x	inert
+jenv versions	inert
+jenv versions --bare	inert
+jenv versions --bare --help	inert
+jenv versions --bare x	inert
+jenv versions --help	inert
+jenv versions -h	inert
+jenv versions x	inert
+jenv whence	denied
+jenv whence --help	inert
+jenv whence --help --path	inert
+jenv whence --help x	inert
+jenv whence --path	inert
+jenv whence -h	inert
+jenv whence x	inert
+jenv which	denied
+jenv which --help	inert
+jenv which --help -h	inert
+jenv which --help x	inert
+jenv which -h	inert
+jenv which x	inert
+jenv with	denied
+jenv with x	denied
+jenv x	denied
+jest	safe-read
+jest --all	safe-read
+jest --all --bail	safe-read
+jest --all --changedSince x	safe-read
+jest --all x	safe-read
+jest --bail	safe-read
+jest --changedFilesWithAncestor	safe-read
+jest --changedSince x	safe-read
+jest --ci	safe-read
+jest --clearCache	safe-read
+jest --clearMocks	safe-read
+jest --collectCoverage	safe-read
+jest --collectCoverageFrom x	safe-read
+jest --colors	safe-read
+jest --config x	safe-read
+jest --coverage	safe-read
+jest --coverageDirectory x	safe-read
+jest --coverageProvider x	safe-read
+jest --debug	safe-read
+jest --detectOpenHandles	safe-read
+jest --errorOnDeprecated	safe-read
+jest --expand	safe-read
+jest --filter x	safe-read
+jest --forceExit	safe-read
+jest --help	safe-read
+jest --json	safe-read
+jest --lastCommit	safe-read
+jest --listTests	safe-read
+jest --logHeapUsage	safe-read
+jest --maxConcurrency x	safe-read
+jest --maxWorkers x	safe-read
+jest --noCache	safe-read
+jest --noStackTrace	safe-read
+jest --onlyChanged	safe-read
+jest --outputFile x	safe-read
+jest --passWithNoTests	safe-read
+jest --projects x	safe-read
+jest --reporters x	safe-read
+jest --roots x	safe-read
+jest --runInBand	safe-read
+jest --shard x	safe-read
+jest --showConfig	safe-read
+jest --silent	safe-read
+jest --testMatch x	safe-read
+jest --testNamePattern x	safe-read
+jest --testPathPattern x	safe-read
+jest --testRunner x	safe-read
+jest --testTimeout x	safe-read
+jest --verbose	safe-read
+jest --version	safe-read
+jest -b	safe-read
+jest -c x	safe-read
+jest -e	safe-read
+jest -h	safe-read
+jest -i	safe-read
+jest -o	safe-read
+jest -t x	safe-read
+jest -u	safe-read
+jest -w	safe-read
+jest x	safe-read
+jira	denied
+jira --help	inert
+jira --help --version	denied
+jira --help x	denied
+jira --version	inert
+jira -h	inert
+jira -v	inert
+jira completion	inert
+jira completion x	inert
+jira init	safe-write
+jira init x	safe-write
+jira issue	inert
+jira issue list	inert
+jira issue list x	inert
+jira issue view	inert
+jira issue view x	inert
+jira issue x	denied
+jira me	inert
+jira me x	inert
+jira sprint	inert
+jira sprint list	inert
+jira sprint list x	inert
+jira sprint x	denied
+jira x	denied
+jj	denied
+jj --at-op x	denied
+jj --at-operation x	denied
+jj --color x	denied
+jj --debug	denied
+jj --debug --at-op x	denied
+jj --debug --help	inert
+jj --debug x	denied
+jj --help	inert
+jj --ignore-immutable	denied
+jj --ignore-working-copy	denied
+jj --no-pager	denied
+jj --quiet	denied
+jj --repository x	denied
+jj --verbose	denied
+jj --version	inert
+jj -R ./sub new	safe-write
+jj -R /etc new	denied
+jj -R x	denied
+jj -h	inert
+jj abandon	safe-write
+jj abandon @-	safe-write
+jj abandon x	safe-write
+jj absorb	safe-write
+jj absorb x	safe-write
+jj backout	safe-write
+jj backout -r @-	safe-write
+jj backout x	safe-write
+jj bookmark	inert
+jj bookmark create	safe-write
+jj bookmark create feature	safe-write
+jj bookmark create x	safe-write
+jj bookmark delete	safe-write
+jj bookmark delete feature	safe-write
+jj bookmark delete x	safe-write
+jj bookmark forget	safe-write
+jj bookmark forget x	safe-write
+jj bookmark list	inert
+jj bookmark list x	inert
+jj bookmark move	safe-write
+jj bookmark move feature --to @	safe-write
+jj bookmark move x	safe-write
+jj bookmark rename	safe-write
+jj bookmark rename x	safe-write
+jj bookmark set	safe-write
+jj bookmark set feature	safe-write
+jj bookmark set x	safe-write
+jj bookmark track	safe-write
+jj bookmark track feature@origin	safe-write
+jj bookmark track x	safe-write
+jj bookmark untrack	safe-write
+jj bookmark untrack x	safe-write
+jj bookmark x	denied
+jj cat	denied
+jj cat x	inert
+jj commit	safe-write
+jj commit -m 'msg'	safe-write
+jj commit x	safe-write
+jj config	inert
+jj config edit --user	denied
+jj config get	inert
+jj config get user.name	inert
+jj config get x	inert
+jj config list	inert
+jj config list x	inert
+jj config path	inert
+jj config path x	inert
+jj config set --user git.executable-path /tmp/evil	denied
+jj config set --user user.name t	denied
+jj config unset --user user.name	denied
+jj config x	denied
+jj describe	safe-write
+jj describe -m 'hello'	safe-write
+jj describe x	safe-write
+jj diff	inert
+jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt	safe-write
+jj diff x	inert
+jj duplicate	safe-write
+jj duplicate @-	safe-write
+jj duplicate x	safe-write
+jj edit	safe-write
+jj edit @-	safe-write
+jj edit x	safe-write
+jj file	inert
+jj file list	inert
+jj file list x	inert
+jj file show	inert
+jj file show x	inert
+jj file x	denied
+jj fix	safe-write
+jj fix x	safe-write
+jj git	inert
+jj git fetch	inert
+jj git fetch x	inert
+jj git import	inert
+jj git import x	inert
+jj git init	safe-write
+jj git init --colocate	safe-write
+jj git init x	safe-write
+jj git push	denied
+jj git push --bookmark main	denied
+jj git remote	inert
+jj git remote list	inert
+jj git remote list x	inert
+jj git remote x	denied
+jj git x	denied
+jj help	inert
+jj help x	inert
+jj log	inert
+jj log --oneline	inert
+jj log x	inert
+jj new	safe-write
+jj new main -m 'start feature'	safe-write
+jj new x	safe-write
+jj op	inert
+jj op log	inert
+jj op log x	inert
+jj op x	denied
+jj parallelize	safe-write
+jj parallelize @::@-	safe-write
+jj parallelize x	safe-write
+jj rebase	safe-write
+jj rebase -d main	safe-write
+jj rebase x	safe-write
+jj resolve	safe-write
+jj resolve --list	safe-write
+jj resolve x	safe-write
+jj restore	safe-write
+jj restore --from @-	safe-write
+jj restore x	safe-write
+jj root	inert
+jj root x	inert
+jj show	inert
+jj show @-	inert
+jj show x	inert
+jj simplify-parents	safe-write
+jj simplify-parents x	safe-write
+jj split	safe-write
+jj split --help	safe-write
+jj split x	safe-write
+jj squash	safe-write
+jj squash --help	safe-write
+jj squash x	safe-write
+jj st	inert
+jj st x	inert
+jj status	inert
+jj status x	inert
+jj tag	inert
+jj tag list	inert
+jj tag list x	inert
+jj tag x	denied
+jj undo	safe-write
+jj undo x	safe-write
+jj unsquash	safe-write
+jj unsquash x	safe-write
+jj version	inert
+jj version x	inert
+jj workspace	inert
+jj workspace add	safe-write
+jj workspace add ../ws2	safe-write
+jj workspace add x	safe-write
+jj workspace forget	safe-write
+jj workspace forget default	safe-write
+jj workspace forget x	safe-write
+jj workspace list	inert
+jj workspace list x	inert
+jj workspace rename	safe-write
+jj workspace rename new-name	safe-write
+jj workspace rename x	safe-write
+jj workspace root	inert
+jj workspace root x	inert
+jj workspace update-stale	inert
+jj workspace update-stale x	inert
+jj workspace x	denied
+jj x	denied
+jjpr	inert
+jjpr --help	inert
+jjpr --help --version	denied
+jjpr --help x	denied
+jjpr --version	inert
+jjpr -V	inert
+jjpr -h	inert
+jjpr auth	denied
+jjpr auth help	inert
+jjpr auth help x	inert
+jjpr auth setup	inert
+jjpr auth setup --help	inert
+jjpr auth setup --help -h	inert
+jjpr auth setup --help x	inert
+jjpr auth setup -h	inert
+jjpr auth setup x	inert
+jjpr auth test	inert
+jjpr auth test --help	inert
+jjpr auth test --help -h	inert
+jjpr auth test --help x	inert
+jjpr auth test -h	inert
+jjpr auth test x	inert
+jjpr auth x	denied
+jjpr config	denied
+jjpr config help	inert
+jjpr config help x	inert
+jjpr config x	denied
+jjpr help	inert
+jjpr help x	inert
+jjpr merge	denied
+jjpr merge --base x	denied
+jjpr merge --dry-run	inert
+jjpr merge --dry-run --base x	inert
+jjpr merge --dry-run --help	inert
+jjpr merge --dry-run x	inert
+jjpr merge --help	inert
+jjpr merge --merge-method x	denied
+jjpr merge --no-ci-check	denied
+jjpr merge --no-fetch	denied
+jjpr merge --reconcile-strategy x	denied
+jjpr merge --remote x	denied
+jjpr merge --required-approvals x	denied
+jjpr merge --watch	denied
+jjpr merge -h	inert
+jjpr merge x	denied
+jjpr status	inert
+jjpr status --dry-run	inert
+jjpr status --dry-run --help	inert
+jjpr status --dry-run x	inert
+jjpr status --help	inert
+jjpr status --no-fetch	inert
+jjpr status -h	inert
+jjpr status x	inert
+jjpr submit	denied
+jjpr submit --base x	denied
+jjpr submit --draft	denied
+jjpr submit --draft --base x	denied
+jjpr submit --draft --dry-run	inert
+jjpr submit --draft x	denied
+jjpr submit --dry-run	inert
+jjpr submit --help	inert
+jjpr submit --no-fetch	denied
+jjpr submit --ready	denied
+jjpr submit --remote x	denied
+jjpr submit --reviewer x	denied
+jjpr submit -h	inert
+jjpr submit x	denied
+jjpr watch	denied
+jjpr watch --help	inert
+jjpr watch --help -h	inert
+jjpr watch --help x	denied
+jjpr watch -h	inert
+jjpr watch auth	denied
+jjpr watch x	denied
+jjpr x	denied
+jless	denied
+jless --help	inert
+jless --help --json	inert
+jless --help --mode x	inert
+jless --help x	inert
+jless --json	inert
+jless --mode x	inert
+jless --scrolloff x	inert
+jless --version	inert
+jless --yaml	inert
+jless -N	inert
+jless -V	inert
+jless -h	inert
+jless -n	inert
+jless x	inert
+join	denied
+join --check-order	inert
+join --check-order --empty x	inert
+join --check-order --header	inert
+join --check-order x	inert
+join --empty x	inert
+join --header	inert
+join --help	inert
+join --ignore-case	inert
+join --nocheck-order	inert
+join --output-delimiter x	inert
+join --version	inert
+join --zero-terminated	inert
+join -1 x	inert
+join -2 x	inert
+join -V	inert
+join -a x	inert
+join -e x	inert
+join -h	inert
+join -i	inert
+join -j x	inert
+join -o x	inert
+join -t x	inert
+join -v x	inert
+join -z	inert
+join x	inert
+jot	inert
+jot --help	denied
+jot --version	denied
+jot x	inert
+journalctl	inert
+journalctl --after-cursor x	inert
+journalctl --all	inert
+journalctl --all --after-cursor x	inert
+journalctl --all --catalog	inert
+journalctl --all x	inert
+journalctl --boot x	inert
+journalctl --catalog	inert
+journalctl --cursor x	inert
+journalctl --directory x	inert
+journalctl --disk-usage	inert
+journalctl --dmesg	inert
+journalctl --facility x	inert
+journalctl --field x	inert
+journalctl --file x	inert
+journalctl --full	inert
+journalctl --header	inert
+journalctl --help	inert
+journalctl --identifier x	inert
+journalctl --json	inert
+journalctl --lines x	inert
+journalctl --list-boots	inert
+journalctl --list-catalog	inert
+journalctl --list-fields	inert
+journalctl --machine x	inert
+journalctl --merge	inert
+journalctl --no-full	inert
+journalctl --no-hostname	inert
+journalctl --no-pager	inert
+journalctl --no-tail	inert
+journalctl --output x	inert
+journalctl --priority x	inert
+journalctl --quiet	inert
+journalctl --reverse	inert
+journalctl --since x	inert
+journalctl --system	inert
+journalctl --this-boot	inert
+journalctl --unit x	inert
+journalctl --until x	inert
+journalctl --user	inert
+journalctl --user-unit x	inert
+journalctl --utc	inert
+journalctl --verify	inert
+journalctl --version	inert
+journalctl -D x	inert
+journalctl -F x	inert
+journalctl -M x	inert
+journalctl -S x	inert
+journalctl -U x	inert
+journalctl -a	inert
+journalctl -b	inert
+journalctl -f	inert
+journalctl -g x	inert
+journalctl -h	inert
+journalctl -k	inert
+journalctl -l	inert
+journalctl -m	inert
+journalctl -n x	inert
+journalctl -o x	inert
+journalctl -p x	inert
+journalctl -q	inert
+journalctl -r	inert
+journalctl -t x	inert
+journalctl -u x	inert
+journalctl -x	inert
+journalctl x	inert
+jpegoptim	denied
+jpegoptim --all-normal	safe-write
+jpegoptim --all-normal --all-progressive	safe-write
+jpegoptim --all-normal --dest x	safe-write
+jpegoptim --all-normal x	safe-write
+jpegoptim --all-progressive	safe-write
+jpegoptim --csv	safe-write
+jpegoptim --dest x	safe-write
+jpegoptim --force	safe-write
+jpegoptim --help	safe-write
+jpegoptim --keep-original	safe-write
+jpegoptim --max x	safe-write
+jpegoptim --noaction	safe-write
+jpegoptim --overwrite	safe-write
+jpegoptim --preserve-perms	safe-write
+jpegoptim --preserve-time	safe-write
+jpegoptim --quiet	safe-write
+jpegoptim --size x	safe-write
+jpegoptim --standard	safe-write
+jpegoptim --stdin x	safe-write
+jpegoptim --stdout x	safe-write
+jpegoptim --strip-all	safe-write
+jpegoptim --strip-com	safe-write
+jpegoptim --strip-exif	safe-write
+jpegoptim --strip-icc	safe-write
+jpegoptim --strip-iptc	safe-write
+jpegoptim --strip-none	safe-write
+jpegoptim --strip-xmp	safe-write
+jpegoptim --test	safe-write
+jpegoptim --threshold	safe-write
+jpegoptim --threshold x	safe-write
+jpegoptim --totals	safe-write
+jpegoptim --verbose	safe-write
+jpegoptim --version	safe-write
+jpegoptim -S x	safe-write
+jpegoptim -T x	safe-write
+jpegoptim -d x	safe-write
+jpegoptim -f	safe-write
+jpegoptim -h	safe-write
+jpegoptim -m x	safe-write
+jpegoptim -n	safe-write
+jpegoptim -q	safe-write
+jpegoptim -t	safe-write
+jpegoptim -v	safe-write
+jpegoptim x	safe-write
+jpegtran	denied
+jpegtran --help	denied
+jpegtran --version	denied
+jpegtran -?	safe-write
+jpegtran -? -arithmetic	safe-write
+jpegtran -? -copy x	safe-write
+jpegtran -? x	safe-write
+jpegtran -arithmetic	safe-write
+jpegtran -copy x	safe-write
+jpegtran -crop x	safe-write
+jpegtran -debug	safe-write
+jpegtran -drop x	safe-write
+jpegtran -flip x	safe-write
+jpegtran -grayscale	safe-write
+jpegtran -greyscale	safe-write
+jpegtran -h	safe-write
+jpegtran -help	safe-write
+jpegtran -icc	safe-write
+jpegtran -maxmemory x	safe-write
+jpegtran -o x	safe-write
+jpegtran -optimise	safe-write
+jpegtran -optimize	safe-write
+jpegtran -outfile x	safe-write
+jpegtran -perfect	safe-write
+jpegtran -progressive	safe-write
+jpegtran -restart x	safe-write
+jpegtran -rotate	safe-write
+jpegtran -scale x	safe-write
+jpegtran -scans x	safe-write
+jpegtran -strict	safe-write
+jpegtran -transpose	safe-write
+jpegtran -transverse	safe-write
+jpegtran -trim	safe-write
+jpegtran -verbose	safe-write
+jpegtran -version	safe-write
+jpegtran -wipe x	safe-write
+jpegtran x	safe-write
+jpgicc	denied
+jpgicc --help	safe-write
+jpgicc --help -V	safe-write
+jpgicc --help -c x	safe-write
+jpgicc --help x	safe-write
+jpgicc --version	denied
+jpgicc -V	safe-write
+jpgicc -b	safe-write
+jpgicc -c x	safe-write
+jpgicc -d	safe-write
+jpgicc -e	safe-write
+jpgicc -h	safe-write
+jpgicc -i x	safe-write
+jpgicc -l	safe-write
+jpgicc -n	safe-write
+jpgicc -o x	safe-write
+jpgicc -p	safe-write
+jpgicc -q x	safe-write
+jpgicc -s	safe-write
+jpgicc -t x	safe-write
+jpgicc -v	safe-write
+jpgicc -w x	safe-write
+jpgicc -x	safe-write
+jpgicc x	safe-write
+jq	inert
+jq '.key' file.json	inert
+jq --arg x	inert
+jq --argjson x	inert
+jq --args x	inert
+jq --ascii-output	inert
+jq --ascii-output --arg x	inert
+jq --ascii-output --color-output	inert
+jq --ascii-output x	inert
+jq --color-output	inert
+jq --compact-output	inert
+jq --exit-status	inert
+jq --from-file x	inert
+jq --help	inert
+jq --indent x	inert
+jq --join-output	inert
+jq --jsonargs x	inert
+jq --monochrome-output	inert
+jq --null-input	inert
+jq --raw-input	inert
+jq --raw-output	inert
+jq --raw-output0	inert
+jq --rawfile x	inert
+jq --seq	inert
+jq --slurp	inert
+jq --slurpfile x	inert
+jq --sort-keys	inert
+jq --tab	inert
+jq --version	inert
+jq -C	inert
+jq -M	inert
+jq -R	inert
+jq -S	inert
+jq -V	inert
+jq -c	inert
+jq -e	inert
+jq -f x	inert
+jq -g	inert
+jq -h	inert
+jq -j	inert
+jq -n	inert
+jq -r	inert
+jq -s	inert
+jq x	inert
+json_pp	inert
+json_pp --help	denied
+json_pp --version	denied
+json_pp -V	inert
+json_pp -V -f x	inert
+json_pp -V -v	inert
+json_pp -V x	inert
+json_pp -f x	inert
+json_pp -json_opt indent	inert
+json_pp -json_opt x	inert
+json_pp -t x	inert
+json_pp -v	inert
+json_pp x	inert
+json_xs	inert
+json_xs --help	denied
+json_xs --version	denied
+json_xs -e 'die'	denied
+json_xs -f x	inert
+json_xs -t x	inert
+json_xs -v	inert
+json_xs -v -f x	inert
+json_xs -v x	inert
+json_xs x	inert
+jsonlint	safe-read
+jsonlint --compact	safe-read
+jsonlint --compact --help	safe-read
+jsonlint --compact --indent x	safe-read
+jsonlint --compact x	safe-read
+jsonlint --help	safe-read
+jsonlint --in-place	safe-write
+jsonlint --indent x	safe-read
+jsonlint --insert-final-newline	safe-read
+jsonlint --mode x	safe-read
+jsonlint --prettify	safe-read
+jsonlint --quiet	safe-read
+jsonlint --sort-keys	safe-read
+jsonlint --version	safe-read
+jsonlint -V	safe-read
+jsonlint -c	safe-read
+jsonlint -h	safe-read
+jsonlint -i	safe-read
+jsonlint -m x	safe-read
+jsonlint -p	safe-read
+jsonlint -q	safe-read
+jsonlint -s	safe-read
+jsonlint -t x	safe-read
+jsonlint -v	safe-read
+jsonlint file.json	safe-read
+jsonlint x	safe-read
+jstack	denied
+jstack --help	inert
+jstack --help --version	inert
+jstack --help x	denied
+jstack --version	inert
+jstack -h	inert
+jstack -help	inert
+jstack -version	inert
+jstack x	denied
+julia	denied
+julia --help	inert
+julia --help --help-hidden	inert
+julia --help x	denied
+julia --help-hidden	inert
+julia --version	inert
+julia -h	inert
+julia -v	inert
+julia x	denied
+jupyter	denied
+jupyter --config-dir	denied
+jupyter --config-dir x	denied
+jupyter --data-dir	denied
+jupyter --data-dir x	denied
+jupyter --help	inert
+jupyter --help --version	denied
+jupyter --help x	denied
+jupyter --paths	denied
+jupyter --paths x	denied
+jupyter --runtime-dir	denied
+jupyter --runtime-dir x	denied
+jupyter --version	inert
+jupyter -h	inert
+jupyter bundlerextension	denied
+jupyter bundlerextension x	denied
+jupyter console	denied
+jupyter console x	denied
+jupyter events	denied
+jupyter events x	denied
+jupyter execute	denied
+jupyter execute x	denied
+jupyter fileid	denied
+jupyter fileid x	denied
+jupyter help	inert
+jupyter help x	inert
+jupyter kernel	denied
+jupyter kernel x	denied
+jupyter kernelspec	denied
+jupyter kernelspec x	denied
+jupyter lab	denied
+jupyter lab x	denied
+jupyter labextension	denied
+jupyter labextension x	denied
+jupyter labhub	denied
+jupyter labhub x	denied
+jupyter migrate	denied
+jupyter migrate x	denied
+jupyter nbclassic	denied
+jupyter nbclassic x	denied
+jupyter nbconvert	denied
+jupyter nbconvert x	denied
+jupyter nbextension	denied
+jupyter nbextension x	denied
+jupyter notebook	denied
+jupyter notebook x	denied
+jupyter qtconsole	denied
+jupyter qtconsole x	denied
+jupyter run	denied
+jupyter run x	denied
+jupyter server	denied
+jupyter server x	denied
+jupyter serverextension	denied
+jupyter serverextension x	denied
+jupyter shutdown	denied
+jupyter shutdown x	denied
+jupyter troubleshoot	safe-read
+jupyter troubleshoot --help	safe-read
+jupyter troubleshoot --help -h	safe-read
+jupyter troubleshoot --help x	safe-read
+jupyter troubleshoot -h	safe-read
+jupyter troubleshoot x	safe-read
+jupyter trust	denied
+jupyter trust x	denied
+jupyter x	denied
+jupyter-nbconvert	denied
+jupyter-nbconvert --ExecutePreprocessor.kernel-name x	safe-write
+jupyter-nbconvert --ExecutePreprocessor.kernel_name x	safe-write
+jupyter-nbconvert --ExecutePreprocessor.timeout x	safe-write
+jupyter-nbconvert --allow-chromium-download	safe-write
+jupyter-nbconvert --allow-chromium-download --ExecutePreprocessor.kernel-name x	safe-write
+jupyter-nbconvert --allow-chromium-download --allow-errors	safe-write
+jupyter-nbconvert --allow-chromium-download x	safe-write
+jupyter-nbconvert --allow-errors	safe-write
+jupyter-nbconvert --clear-output	safe-write
+jupyter-nbconvert --config x	safe-write
+jupyter-nbconvert --debug	safe-write
+jupyter-nbconvert --disable-chromium-sandbox	safe-write
+jupyter-nbconvert --embed-images	safe-write
+jupyter-nbconvert --exec	safe-write
+jupyter-nbconvert --execute	safe-write
+jupyter-nbconvert --from	safe-write
+jupyter-nbconvert --from x	safe-write
+jupyter-nbconvert --generate-config	safe-write
+jupyter-nbconvert --help	safe-write
+jupyter-nbconvert --inplace	safe-write
+jupyter-nbconvert --log-level	safe-write
+jupyter-nbconvert --log-level x	safe-write
+jupyter-nbconvert --nbformat x	safe-write
+jupyter-nbconvert --no-input	safe-write
+jupyter-nbconvert --no-prompt	safe-write
+jupyter-nbconvert --no-stdin	safe-write
+jupyter-nbconvert --output x	safe-write
+jupyter-nbconvert --output-dir x	safe-write
+jupyter-nbconvert --post x	safe-write
+jupyter-nbconvert --reveal-prefix x	safe-write
+jupyter-nbconvert --show-config	safe-write
+jupyter-nbconvert --show-config-json	safe-write
+jupyter-nbconvert --stdin	safe-write
+jupyter-nbconvert --stdout	safe-write
+jupyter-nbconvert --template x	safe-write
+jupyter-nbconvert --template-file x	safe-write
+jupyter-nbconvert --to x	safe-write
+jupyter-nbconvert --use-frontmatter x	safe-write
+jupyter-nbconvert --version	safe-write
+jupyter-nbconvert --writer	safe-write
+jupyter-nbconvert --writer x	safe-write
+jupyter-nbconvert -c x	safe-write
+jupyter-nbconvert -h	safe-write
+jupyter-nbconvert -y	safe-write
+jupyter-nbconvert -y x	safe-write
+jupyter-nbconvert x	safe-write
+jupytext	safe-read
+jupytext --check-paired	safe-read
+jupytext --check-paired --diff	safe-read
+jupytext --check-paired --from x	safe-read
+jupytext --check-paired x	safe-read
+jupytext --diff	safe-read
+jupytext --from x	safe-read
+jupytext --help	safe-read
+jupytext --input-format x	safe-read
+jupytext --opt x	safe-read
+jupytext --out	safe-read
+jupytext --output	safe-write
+jupytext --output x	safe-write
+jupytext --output-format x	safe-read
+jupytext --paired-paths x	safe-read
+jupytext --pipe x	safe-read
+jupytext --pipe-fmt x	safe-read
+jupytext --pre-commit-mode x	safe-read
+jupytext --quiet	safe-read
+jupytext --set-formats	safe-write
+jupytext --set-formats x	safe-write
+jupytext --set-kernel x	safe-read
+jupytext --show-changes	safe-read
+jupytext --sync	safe-write
+jupytext --test	safe-read
+jupytext --test-strict	safe-read
+jupytext --to x	safe-read
+jupytext --update-metadata	safe-write
+jupytext --use-source-timestamp	safe-read
+jupytext --version	safe-read
+jupytext --warn-only	safe-read
+jupytext --warn-only x	safe-read
+jupytext -K x	safe-read
+jupytext -h	safe-read
+jupytext -i x	safe-read
+jupytext -k x	safe-read
+jupytext -o	safe-write
+jupytext -o x	safe-write
+jupytext -q	safe-read
+jupytext x	safe-read
+just	denied
+just --color x	denied
+just --dump	inert
+just --dump --color x	inert
+just --dump --dump	inert
+just --dump --dump-format x	inert
+just --dump --evaluate	inert
+just --dump --help	inert
+just --dump --justfile x	inert
+just --dump --list	inert
+just --dump --list-heading x	inert
+just --dump --list-prefix x	inert
+just --dump --list-submodules x	inert
+just --dump --summary	inert
+just --dump --unsorted	inert
+just --dump --variables	inert
+just --dump --version	inert
+just --dump -f x	inert
+just --dump -l	inert
+just --dump -u	inert
+just --dump x	inert
+just --dump-format x	denied
+just --evaluate	inert
+just --help	inert
+just --justfile x	denied
+just --list	inert
+just --list-heading x	denied
+just --list-prefix x	denied
+just --list-submodules x	denied
+just --summary	inert
+just --unsorted	denied
+just --variables	inert
+just --version	denied
+just -f x	denied
+just -l	inert
+just -u	denied
+just x	denied

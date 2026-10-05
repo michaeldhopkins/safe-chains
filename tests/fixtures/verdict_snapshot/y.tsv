@@ -1,0 +1,1091 @@
+yacc	denied
+yacc --help	safe-write
+yacc --help --version	safe-write
+yacc --help -H x	safe-write
+yacc --help x	safe-write
+yacc --version	safe-write
+yacc -B	safe-write
+yacc -H x	safe-write
+yacc -L	safe-write
+yacc -P	safe-write
+yacc -V	safe-write
+yacc -b x	safe-write
+yacc -d	safe-write
+yacc -g	safe-write
+yacc -h	safe-write
+yacc -i	safe-write
+yacc -l	safe-write
+yacc -o x	safe-write
+yacc -p x	safe-write
+yacc -r	safe-write
+yacc -s	safe-write
+yacc -t	safe-write
+yacc -v	safe-write
+yacc -y	safe-write
+yacc grammar.y	safe-write
+yacc x	safe-write
+yamllint	safe-read
+yamllint --config-data x	safe-read
+yamllint --config-file x	safe-read
+yamllint --format x	safe-read
+yamllint --help	safe-read
+yamllint --help --config-data x	safe-read
+yamllint --help --list-files	safe-read
+yamllint --help x	safe-read
+yamllint --list-files	safe-read
+yamllint --no-warnings	safe-read
+yamllint --strict	safe-read
+yamllint --version	safe-read
+yamllint -c x	safe-read
+yamllint -d x	safe-read
+yamllint -f x	safe-read
+yamllint -h	safe-read
+yamllint -s	safe-read
+yamllint -v	safe-read
+yamllint x	safe-read
+yapf	safe-read
+yapf --diff	safe-read
+yapf --diff --exclude x	safe-read
+yapf --diff --help	safe-read
+yapf --diff x	safe-read
+yapf --exclude x	safe-read
+yapf --help	safe-read
+yapf --in-place	safe-write
+yapf --lines x	safe-read
+yapf --no-local-style	safe-read
+yapf --parallel	safe-read
+yapf --print-modified	safe-read
+yapf --quiet	safe-read
+yapf --recursive	safe-read
+yapf --style x	safe-read
+yapf --verify	safe-read
+yapf --version	safe-read
+yapf -d	safe-read
+yapf -e x	safe-read
+yapf -h	safe-read
+yapf -i	safe-write
+yapf -l x	safe-read
+yapf -m	safe-read
+yapf -p	safe-read
+yapf -q	safe-read
+yapf -r	safe-read
+yapf -vv	safe-read
+yapf x	safe-read
+yapp	denied
+yapp --help	denied
+yapp --version	denied
+yapp -V	safe-write
+yapp -V -b x	safe-write
+yapp -V -h	safe-write
+yapp -V x	safe-write
+yapp -b x	safe-write
+yapp -h	safe-write
+yapp -m x	safe-write
+yapp -n	safe-write
+yapp -o x	safe-write
+yapp -s	safe-write
+yapp -t x	safe-write
+yapp -v	safe-write
+yapp grammar.yp	safe-write
+yapp x	safe-write
+yard	denied
+yard --help	inert
+yard --help --output-dir x	denied
+yard --help --version	denied
+yard --help x	denied
+yard --output-dir x	denied
+yard --version	inert
+yard -h	inert
+yard -v	inert
+yard config	safe-read
+yard config --debug	safe-read
+yard config --debug --help	safe-read
+yard config --debug x	safe-read
+yard config --help	safe-read
+yard config --list	safe-read
+yard config --quiet	safe-read
+yard config --verbose	safe-read
+yard config -a	safe-read
+yard config -h	safe-read
+yard config -l	safe-read
+yard config -q	safe-read
+yard config x	safe-read
+yard diff	denied
+yard diff --added	safe-read
+yard diff --added --all	safe-read
+yard diff --added x	safe-read
+yard diff --all	safe-read
+yard diff --compact	safe-read
+yard diff --debug	safe-read
+yard diff --help	safe-read
+yard diff --modified	safe-read
+yard diff --no-progress	safe-read
+yard diff --query	safe-read
+yard diff --quiet	safe-read
+yard diff --removed	safe-read
+yard diff --verbose	safe-read
+yard diff --visibility	safe-read
+yard diff -a	safe-read
+yard diff -h	safe-read
+yard diff -q	safe-read
+yard diff x	safe-read
+yard doc	safe-write
+yard doc --api	safe-write
+yard doc --api --asset	safe-write
+yard doc --api --db x	safe-write
+yard doc --api x	safe-write
+yard doc --asset	safe-write
+yard doc --charset	safe-write
+yard doc --db x	safe-write
+yard doc --debug	safe-write
+yard doc --default-return	safe-write
+yard doc --default-tag x	safe-write
+yard doc --embed-mixins	safe-write
+yard doc --exclude	safe-write
+yard doc --exclude-tag	safe-write
+yard doc --fail-on-warning	safe-write
+yard doc --files	safe-write
+yard doc --format x	safe-write
+yard doc --has-tag	safe-write
+yard doc --help	safe-write
+yard doc --hide-api	safe-write
+yard doc --hide-tag	safe-write
+yard doc --hide-void-return	safe-write
+yard doc --list-undoc	safe-write
+yard doc --load-plugin x	safe-write
+yard doc --locale x	safe-write
+yard doc --macro x	safe-write
+yard doc --main	safe-write
+yard doc --markup x	safe-write
+yard doc --markup-provider	safe-write
+yard doc --no-api	safe-write
+yard doc --no-cache	safe-write
+yard doc --no-output	safe-write
+yard doc --no-private	safe-write
+yard doc --no-progress	safe-write
+yard doc --no-protected x	safe-write
+yard doc --no-public	safe-write
+yard doc --no-public x	safe-write
+yard doc --no-save	safe-write
+yard doc --no-stats	safe-write
+yard doc --one-file	safe-write
+yard doc --output-dir x	safe-write
+yard doc --plugin	safe-write
+yard doc --plugin x	safe-write
+yard doc --private	safe-write
+yard doc --protected	safe-write
+yard doc --query	safe-write
+yard doc --query-tag x	safe-write
+yard doc --quiet	safe-write
+yard doc --readme	safe-write
+yard doc --single	safe-write
+yard doc --tag x	safe-write
+yard doc --template x	safe-write
+yard doc --template-path x	safe-write
+yard doc --title x	safe-write
+yard doc --transitive-tag x	safe-write
+yard doc --type-tag x	safe-write
+yard doc --use-cache	safe-write
+yard doc --verbose	safe-write
+yard doc --visibility	safe-write
+yard doc --with-name-tag x	safe-write
+yard doc --with-tag x	safe-write
+yard doc --with-title-tag x	safe-write
+yard doc --with-types-tag x	safe-write
+yard doc -D	safe-write
+yard doc -M	safe-write
+yard doc -T	safe-write
+yard doc -b	safe-write
+yard doc -c	safe-write
+yard doc -e	safe-write
+yard doc -h	safe-write
+yard doc -m	safe-write
+yard doc -n	safe-write
+yard doc -o	safe-write
+yard doc -p	safe-write
+yard doc -q	safe-write
+yard doc -r	safe-write
+yard doc -t	safe-write
+yard doc x	safe-write
+yard gems	denied
+yard gems x	denied
+yard graph	safe-write
+yard graph --all	safe-write
+yard graph --all --db x	safe-write
+yard graph --all --debug	safe-write
+yard graph --all x	safe-write
+yard graph --db x	safe-write
+yard graph --debug	safe-write
+yard graph --dependencies	safe-write
+yard graph --file x	safe-write
+yard graph --format x	safe-write
+yard graph --full	safe-write
+yard graph --help	safe-write
+yard graph --no-color	safe-write
+yard graph --no-private	safe-write
+yard graph --no-protected	safe-write
+yard graph --no-public	safe-write
+yard graph --private	safe-write
+yard graph --protected	safe-write
+yard graph --quiet	safe-write
+yard graph --verbose	safe-write
+yard graph -F x	safe-write
+yard graph -d	safe-write
+yard graph -f	safe-write
+yard graph -h	safe-write
+yard graph -q	safe-write
+yard graph x	safe-write
+yard help	inert
+yard help x	inert
+yard i18n	denied
+yard i18n x	denied
+yard list	safe-read
+yard list --all	safe-read
+yard list --all --api	safe-read
+yard list --all --db x	safe-read
+yard list --all x	safe-read
+yard list --api	safe-read
+yard list --attr	safe-read
+yard list --class	safe-read
+yard list --constant	safe-read
+yard list --db x	safe-read
+yard list --debug	safe-read
+yard list --exception	safe-read
+yard list --exclude	safe-read
+yard list --exclude-tag x	safe-read
+yard list --extra	safe-read
+yard list --full	safe-read
+yard list --has-tag	safe-read
+yard list --help	safe-read
+yard list --inherit	safe-read
+yard list --inherited	safe-read
+yard list --kind	safe-read
+yard list --macro	safe-read
+yard list --method	safe-read
+yard list --module	safe-read
+yard list --module-function	safe-read
+yard list --no-api x	safe-read
+yard list --no-color	safe-read
+yard list --no-private	safe-read
+yard list --no-protected	safe-read
+yard list --no-public	safe-read
+yard list --protected	safe-read
+yard list --query	safe-read
+yard list --quiet	safe-read
+yard list --single	safe-read
+yard list --tag x	safe-read
+yard list --verbose	safe-read
+yard list --visibility	safe-read
+yard list -a	safe-read
+yard list -c	safe-read
+yard list -h	safe-read
+yard list -q	safe-read
+yard list x	safe-read
+yard ri	denied
+yard ri --help	safe-read
+yard ri --help -h	safe-read
+yard ri --help x	safe-read
+yard ri -h	safe-read
+yard ri x	safe-read
+yard server	safe-read
+yard server --bind x	safe-read
+yard server --debug	safe-read
+yard server --debug --bind x	safe-read
+yard server --debug --docroot	safe-read
+yard server --debug x	safe-read
+yard server --docroot	safe-read
+yard server --gems	safe-read
+yard server --help	safe-read
+yard server --lib-version x	safe-read
+yard server --no-cache	safe-read
+yard server --no-protected	safe-read
+yard server --no-public	safe-read
+yard server --port x	safe-read
+yard server --protected	safe-read
+yard server --quiet	safe-read
+yard server --reload	safe-read
+yard server --server x	safe-read
+yard server --single-library	safe-read
+yard server --use-cache	safe-read
+yard server -B	safe-read
+yard server -c	safe-read
+yard server -d	safe-read
+yard server -g	safe-read
+yard server -h	safe-read
+yard server -p x	safe-read
+yard server -q	safe-read
+yard server -r	safe-read
+yard server x	safe-read
+yard stats	safe-read
+yard stats --all	safe-read
+yard stats --all --compact	safe-read
+yard stats --all --db x	safe-read
+yard stats --all x	safe-read
+yard stats --compact	safe-read
+yard stats --db x	safe-read
+yard stats --debug	safe-read
+yard stats --exclude x	safe-read
+yard stats --help	safe-read
+yard stats --list-incomplete	safe-read
+yard stats --list-undoc	safe-read
+yard stats --no-cache	safe-read
+yard stats --query x	safe-read
+yard stats --quiet	safe-read
+yard stats --use-cache	safe-read
+yard stats --verbose	safe-read
+yard stats -a	safe-read
+yard stats -c	safe-read
+yard stats -h	safe-read
+yard stats -q	safe-read
+yard stats x	safe-read
+yard x	denied
+yardoc	safe-write
+yardoc --api	safe-write
+yardoc --api --asset	safe-write
+yardoc --api --db x	safe-write
+yardoc --api x	safe-write
+yardoc --asset	safe-write
+yardoc --charset	safe-write
+yardoc --db x	safe-write
+yardoc --debug	safe-write
+yardoc --default-return	safe-write
+yardoc --default-tag x	safe-write
+yardoc --embed-mixins	safe-write
+yardoc --exclude	safe-write
+yardoc --exclude-tag	safe-write
+yardoc --fail-on-warning	safe-write
+yardoc --files	safe-write
+yardoc --format x	safe-write
+yardoc --has-tag	safe-write
+yardoc --help	safe-write
+yardoc --hide-api	safe-write
+yardoc --hide-tag	safe-write
+yardoc --hide-void-return	safe-write
+yardoc --list-undoc	safe-write
+yardoc --load-plugin x	safe-write
+yardoc --locale x	safe-write
+yardoc --macro x	safe-write
+yardoc --main	safe-write
+yardoc --markup x	safe-write
+yardoc --markup-provider	safe-write
+yardoc --no-api	safe-write
+yardoc --no-cache	safe-write
+yardoc --no-output	safe-write
+yardoc --no-private	safe-write
+yardoc --no-progress	safe-write
+yardoc --no-public	safe-write
+yardoc --no-save	safe-write
+yardoc --no-stats	safe-write
+yardoc --one-file	safe-write
+yardoc --output-dir x	safe-write
+yardoc --plugin	safe-write
+yardoc --plugin x	safe-write
+yardoc --private	safe-write
+yardoc --protected	safe-write
+yardoc --query	safe-write
+yardoc --query-tag x	safe-write
+yardoc --quiet	safe-write
+yardoc --readme	safe-write
+yardoc --single	safe-write
+yardoc --tag x	safe-write
+yardoc --template x	safe-write
+yardoc --template-path x	safe-write
+yardoc --title x	safe-write
+yardoc --transitive-tag x	safe-write
+yardoc --type-tag x	safe-write
+yardoc --use-cache	safe-write
+yardoc --verbose	safe-write
+yardoc --version	safe-write
+yardoc --visibility	safe-write
+yardoc --with-name-tag x	safe-write
+yardoc --with-tag x	safe-write
+yardoc --with-title-tag x	safe-write
+yardoc --with-types-tag x	safe-write
+yardoc -D	safe-write
+yardoc -M	safe-write
+yardoc -T	safe-write
+yardoc -b	safe-write
+yardoc -c	safe-write
+yardoc -e	safe-write
+yardoc -h	safe-write
+yardoc -m	safe-write
+yardoc -n	safe-write
+yardoc -o	safe-write
+yardoc -p	safe-write
+yardoc -q	safe-write
+yardoc -r	safe-write
+yardoc -t	safe-write
+yardoc x	safe-write
+yarn	denied
+yarn --help	inert
+yarn --help --version	denied
+yarn --help x	denied
+yarn --version	inert
+yarn -V	inert
+yarn -h	inert
+yarn add left-pad	denied
+yarn dlx cowsay	denied
+yarn info	inert
+yarn info --help	inert
+yarn info --help --json	inert
+yarn info --help x	inert
+yarn info --json	inert
+yarn info -h	inert
+yarn info x	inert
+yarn jest	safe-read
+yarn jest --outputFile /etc/cron.d/x	denied
+yarn jest spec/date_range_filter_controller.test.js	safe-read
+yarn jest x	safe-read
+yarn karma	denied
+yarn karma start --single-run	safe-read
+yarn karma x	denied
+yarn list	inert
+yarn list --depth x	inert
+yarn list --help	inert
+yarn list --help --depth x	inert
+yarn list --help --json	inert
+yarn list --help x	inert
+yarn list --json	inert
+yarn list --long	inert
+yarn list --pattern x	inert
+yarn list --production	inert
+yarn list -h	inert
+yarn list x	inert
+yarn ls	inert
+yarn ls --depth x	inert
+yarn ls --help	inert
+yarn ls --help --depth x	inert
+yarn ls --help --json	inert
+yarn ls --help x	inert
+yarn ls --json	inert
+yarn ls --long	inert
+yarn ls --pattern x	inert
+yarn ls --production	inert
+yarn ls -h	inert
+yarn ls x	inert
+yarn mocha	safe-read
+yarn mocha x	safe-read
+yarn publish	denied
+yarn test	safe-read
+yarn test --help	safe-read
+yarn test:x	safe-read
+yarn test:x --help	safe-read
+yarn vitest	safe-read
+yarn vitest run	safe-read
+yarn vitest x	safe-read
+yarn why	inert
+yarn why --help	inert
+yarn why --help --json	inert
+yarn why --help x	inert
+yarn why --json	inert
+yarn why -h	inert
+yarn why x	inert
+yarn x	denied
+yasm	denied
+yasm --help	safe-write
+yasm --help --version	safe-write
+yasm --help x	safe-write
+yasm --version	safe-write
+yasm -?	safe-write
+yasm -h	safe-write
+yasm x	safe-write
+yes	inert
+yes --help	inert
+yes --help --version	inert
+yes --help x	inert
+yes --version	inert
+yes x	inert
+yo	denied
+yo --generators	inert
+yo --generators --help	inert
+yo --generators x	denied
+yo --help	inert
+yo --version	inert
+yo -h	inert
+yo -v	inert
+yo x	denied
+youtube-dl	denied
+youtube-dl --abort-on-error	safe-write
+youtube-dl --abort-on-error --abort-on-unavailable-fragment	safe-write
+youtube-dl --abort-on-error --add-headers x	safe-write
+youtube-dl --abort-on-error x	safe-write
+youtube-dl --abort-on-unavailable-fragment	safe-write
+youtube-dl --add-headers x	safe-write
+youtube-dl --add-metadata	safe-write
+youtube-dl --allow-playlist-files	safe-write
+youtube-dl --audio-format x	safe-write
+youtube-dl --audio-multistreams	safe-write
+youtube-dl --audio-quality x	safe-write
+youtube-dl --batch-file x	safe-write
+youtube-dl --bidi-workaround x	safe-write
+youtube-dl --break-match-filter x	safe-write
+youtube-dl --break-on-existing x	safe-write
+youtube-dl --break-per-input x	safe-write
+youtube-dl --buffer-size x	safe-write
+youtube-dl --cache-dir x	safe-write
+youtube-dl --check-all-formats	safe-write
+youtube-dl --check-formats	safe-write
+youtube-dl --clean-info-json	safe-write
+youtube-dl --client-certificate x	safe-write
+youtube-dl --client-certificate-key x	safe-write
+youtube-dl --client-certificate-password x	safe-write
+youtube-dl --compat-options x	safe-write
+youtube-dl --concurrent-fragments x	safe-write
+youtube-dl --continue	safe-write
+youtube-dl --convert-subs x	safe-write
+youtube-dl --convert-thumbnails x	safe-write
+youtube-dl --cookies x	safe-write
+youtube-dl --cookies-from-browser x	safe-write
+youtube-dl --cookies-from-firefox x	safe-write
+youtube-dl --credentials x	safe-write
+youtube-dl --dateafter x	safe-write
+youtube-dl --datebefore x	safe-write
+youtube-dl --default-search	safe-write
+youtube-dl --download-archive x	safe-write
+youtube-dl --download-sections x	safe-write
+youtube-dl --dump-pages	safe-write
+youtube-dl --dump-single-json	safe-write
+youtube-dl --embed-chapters	safe-write
+youtube-dl --embed-info-json	safe-write
+youtube-dl --embed-metadata	safe-write
+youtube-dl --embed-subs	safe-write
+youtube-dl --embed-thumbnail	safe-write
+youtube-dl --encoding x	safe-write
+youtube-dl --extract-audio	safe-write
+youtube-dl --extractor-args x	safe-write
+youtube-dl --extractor-retries x	safe-write
+youtube-dl --ffmpeg-location x	safe-write
+youtube-dl --file-access-retries x	safe-write
+youtube-dl --fixup x	safe-write
+youtube-dl --flat-playlist	safe-write
+youtube-dl --force-generic-extractor	safe-write
+youtube-dl --force-ipv4	safe-write
+youtube-dl --force-ipv6	safe-write
+youtube-dl --force-overwrites x	safe-write
+youtube-dl --force-write-archive	safe-write
+youtube-dl --format x	safe-write
+youtube-dl --format-sort x	safe-write
+youtube-dl --format-sort-force x	safe-write
+youtube-dl --fragment-retries x	safe-write
+youtube-dl --geo-bypass x	safe-write
+youtube-dl --geo-bypass-country x	safe-write
+youtube-dl --geo-bypass-ip-block x	safe-write
+youtube-dl --get-comments	safe-write
+youtube-dl --get-description	safe-write
+youtube-dl --get-duration	safe-write
+youtube-dl --get-filename	safe-write
+youtube-dl --get-format	safe-write
+youtube-dl --get-id	safe-write
+youtube-dl --get-thumbnail	safe-write
+youtube-dl --get-title	safe-write
+youtube-dl --get-url	safe-write
+youtube-dl --help	denied
+youtube-dl --hls-prefer-ffmpeg	safe-write
+youtube-dl --hls-prefer-native	safe-write
+youtube-dl --hls-use-mpegts	safe-write
+youtube-dl --http-chunk-size x	safe-write
+youtube-dl --id x	safe-write
+youtube-dl --ignore-config	safe-write
+youtube-dl --ignore-errors	safe-write
+youtube-dl --ignore-no-formats-error	safe-write
+youtube-dl --impersonate x	safe-write
+youtube-dl --keep-fragments	safe-write
+youtube-dl --keep-video	safe-write
+youtube-dl --legacy-server-connect	safe-write
+youtube-dl --limit-rate x	safe-write
+youtube-dl --list-formats	safe-write
+youtube-dl --list-subs	safe-write
+youtube-dl --list-thumbnails	safe-write
+youtube-dl --load-info-json x	safe-write
+youtube-dl --mark-watched	safe-write
+youtube-dl --match-filter x	safe-write
+youtube-dl --match-title x	safe-write
+youtube-dl --max-downloads x	safe-write
+youtube-dl --max-filesize x	safe-write
+youtube-dl --max-sleep-interval x	safe-write
+youtube-dl --merge-output-format x	safe-write
+youtube-dl --min-filesize x	safe-write
+youtube-dl --min-sleep-interval x	safe-write
+youtube-dl --mtime	safe-write
+youtube-dl --netrc-location x	safe-write
+youtube-dl --newline	safe-write
+youtube-dl --no-abort-on-error	safe-write
+youtube-dl --no-add-metadata	safe-write
+youtube-dl --no-allow-unplayable-formats x	safe-write
+youtube-dl --no-call-home	safe-write
+youtube-dl --no-check-certificate	safe-write
+youtube-dl --no-clean-info-json	safe-write
+youtube-dl --no-color	safe-write
+youtube-dl --no-colors	safe-write
+youtube-dl --no-config	safe-write
+youtube-dl --no-continue	safe-write
+youtube-dl --no-cookies	safe-write
+youtube-dl --no-embed-chapters	safe-write
+youtube-dl --no-embed-info-json	safe-write
+youtube-dl --no-embed-metadata	safe-write
+youtube-dl --no-embed-subs	safe-write
+youtube-dl --no-embed-thumbnail	safe-write
+youtube-dl --no-fixup-comments	safe-write
+youtube-dl --no-format-sort-force	safe-write
+youtube-dl --no-get-comments	safe-write
+youtube-dl --no-keep-fragments	safe-write
+youtube-dl --no-keep-video	safe-write
+youtube-dl --no-mark-watched	safe-write
+youtube-dl --no-mtime	safe-write
+youtube-dl --no-overwrites	safe-write
+youtube-dl --no-part	safe-write
+youtube-dl --no-playlist	safe-write
+youtube-dl --no-playlist-reverse	safe-write
+youtube-dl --no-post-overwrites	safe-write
+youtube-dl --no-progress	safe-write
+youtube-dl --no-quiet	safe-write
+youtube-dl --no-resize-buffer	safe-write
+youtube-dl --no-restrict-filenames	safe-write
+youtube-dl --no-simulate	safe-write
+youtube-dl --no-skip-unavailable-fragments	safe-write
+youtube-dl --no-split-chapters	safe-write
+youtube-dl --no-update	safe-write
+youtube-dl --no-warnings	safe-write
+youtube-dl --no-write-annotations	safe-write
+youtube-dl --no-write-archive	safe-write
+youtube-dl --no-write-auto-subs	safe-write
+youtube-dl --no-write-comments	safe-write
+youtube-dl --no-write-description	safe-write
+youtube-dl --no-write-info-json	safe-write
+youtube-dl --no-write-link	safe-write
+youtube-dl --no-write-playlist-metafiles	safe-write
+youtube-dl --no-write-subs	safe-write
+youtube-dl --no-write-thumbnail	safe-write
+youtube-dl --no-write-url-link	safe-write
+youtube-dl --output x	safe-write
+youtube-dl --output-na-placeholder x	safe-write
+youtube-dl --overwrites	safe-write
+youtube-dl --password x	safe-write
+youtube-dl --paths x	safe-write
+youtube-dl --paths-only	safe-write
+youtube-dl --playlist-end x	safe-write
+youtube-dl --playlist-items x	safe-write
+youtube-dl --playlist-random	safe-write
+youtube-dl --playlist-reverse	safe-write
+youtube-dl --playlist-start x	safe-write
+youtube-dl --port x	safe-write
+youtube-dl --prefer-free-formats	safe-write
+youtube-dl --print x	safe-write
+youtube-dl --print-json	safe-write
+youtube-dl --print-to-file	safe-write
+youtube-dl --print-traffic	safe-write
+youtube-dl --progress	safe-write
+youtube-dl --proxy x	safe-write
+youtube-dl --quiet	safe-write
+youtube-dl --recode-video x	safe-write
+youtube-dl --referer x	safe-write
+youtube-dl --reject-title x	safe-write
+youtube-dl --remux-video x	safe-write
+youtube-dl --rendezvous x	safe-write
+youtube-dl --resize-buffer	safe-write
+youtube-dl --restrict-filenames	safe-write
+youtube-dl --retries x	safe-write
+youtube-dl --retry-sleep x	safe-write
+youtube-dl --reverse-playlist	safe-write
+youtube-dl --rm-cache-dir x	safe-write
+youtube-dl --simulate	safe-write
+youtube-dl --skip-download	safe-write
+youtube-dl --skip-unavailable-fragments	safe-write
+youtube-dl --socket-timeout x	safe-write
+youtube-dl --source-address x	safe-write
+youtube-dl --split-chapters	safe-write
+youtube-dl --sponsorblock-api x	safe-write
+youtube-dl --sponsorblock-chapter-title x	safe-write
+youtube-dl --sponsorblock-mark x	safe-write
+youtube-dl --sponsorblock-remove x	safe-write
+youtube-dl --sub-format x	safe-write
+youtube-dl --sub-format-fallback x	safe-write
+youtube-dl --sub-langs x	safe-write
+youtube-dl --throttled-rate x	safe-write
+youtube-dl --trim-filenames x	safe-write
+youtube-dl --twofactor x	safe-write
+youtube-dl --user-agent x	safe-write
+youtube-dl --username x	safe-write
+youtube-dl --verbose	safe-write
+youtube-dl --version	safe-write
+youtube-dl --video-multistreams x	safe-write
+youtube-dl --video-password x	safe-write
+youtube-dl --wait-for-video x	safe-write
+youtube-dl --write-annotations	safe-write
+youtube-dl --write-auto-subs	safe-write
+youtube-dl --write-comments	safe-write
+youtube-dl --write-description	safe-write
+youtube-dl --write-info-json	safe-write
+youtube-dl --write-link	safe-write
+youtube-dl --write-pages x	safe-write
+youtube-dl --write-playlist-metafiles	safe-write
+youtube-dl --write-subs	safe-write
+youtube-dl --write-thumbnail	safe-write
+youtube-dl --write-url-link	safe-write
+youtube-dl --xattrs	safe-write
+youtube-dl --xff x	safe-write
+youtube-dl -4	safe-write
+youtube-dl -6	safe-write
+youtube-dl -F	safe-write
+youtube-dl -J	safe-write
+youtube-dl -N x	safe-write
+youtube-dl -P x	safe-write
+youtube-dl -R x	safe-write
+youtube-dl -S x	safe-write
+youtube-dl -T x	safe-write
+youtube-dl -a x	safe-write
+youtube-dl -c	safe-write
+youtube-dl -f x	safe-write
+youtube-dl -h	safe-write
+youtube-dl -i	safe-write
+youtube-dl -j	safe-write
+youtube-dl -k	safe-write
+youtube-dl -o x	safe-write
+youtube-dl -p x	safe-write
+youtube-dl -q	safe-write
+youtube-dl -r x	safe-write
+youtube-dl -s	safe-write
+youtube-dl -t x	safe-write
+youtube-dl -u x	safe-write
+youtube-dl -v	safe-write
+youtube-dl -w	safe-write
+youtube-dl -x	safe-write
+youtube-dl https://example.com/v	safe-write
+youtube-dl x	safe-write
+yq	denied
+yq --arg x	inert
+yq --argjson x	inert
+yq --colors	inert
+yq --colors --arg x	inert
+yq --colors --exit-status	inert
+yq --colors x	inert
+yq --exit-status	inert
+yq --expression x	inert
+yq --front-matter x	inert
+yq --help	inert
+yq --indent x	inert
+yq --input-format x	inert
+yq --no-colors	inert
+yq --no-doc	inert
+yq --null-input	inert
+yq --output-format x	inert
+yq --prettyPrint	inert
+yq --version	inert
+yq -C	inert
+yq -I x	inert
+yq -M	inert
+yq -N	inert
+yq -P	inert
+yq -V	inert
+yq -e	inert
+yq -h	inert
+yq -p x	inert
+yq -r	inert
+yq x	inert
+yt-dlp	denied
+yt-dlp --abort-on-error	safe-write
+yt-dlp --abort-on-error --abort-on-unavailable-fragment	safe-write
+yt-dlp --abort-on-error --add-headers x	safe-write
+yt-dlp --abort-on-error x	safe-write
+yt-dlp --abort-on-unavailable-fragment	safe-write
+yt-dlp --add-headers x	safe-write
+yt-dlp --add-metadata	safe-write
+yt-dlp --alias foo bar https://example.com/v	denied
+yt-dlp --allow-playlist-files	safe-write
+yt-dlp --audio-format x	safe-write
+yt-dlp --audio-multistreams	safe-write
+yt-dlp --audio-quality x	safe-write
+yt-dlp --batch-file x	safe-write
+yt-dlp --bidi-workaround x	safe-write
+yt-dlp --break-match-filter x	safe-write
+yt-dlp --break-on-existing x	safe-write
+yt-dlp --break-per-input x	safe-write
+yt-dlp --buffer-size x	safe-write
+yt-dlp --cache-dir x	safe-write
+yt-dlp --check-all-formats	safe-write
+yt-dlp --check-formats	safe-write
+yt-dlp --clean-info-json	safe-write
+yt-dlp --client-certificate x	safe-write
+yt-dlp --client-certificate-key x	safe-write
+yt-dlp --client-certificate-password x	safe-write
+yt-dlp --compat-options x	safe-write
+yt-dlp --concurrent-fragments x	safe-write
+yt-dlp --config-location /tmp/evil https://example.com/v	denied
+yt-dlp --continue	safe-write
+yt-dlp --convert-subs x	safe-write
+yt-dlp --convert-thumbnails x	safe-write
+yt-dlp --cookies x	safe-write
+yt-dlp --cookies-from-browser x	safe-write
+yt-dlp --cookies-from-firefox x	safe-write
+yt-dlp --credentials x	safe-write
+yt-dlp --dateafter x	safe-write
+yt-dlp --datebefore x	safe-write
+yt-dlp --default-search	safe-write
+yt-dlp --download-archive done.txt https://example.com/p	safe-write
+yt-dlp --download-archive x	safe-write
+yt-dlp --download-sections x	safe-write
+yt-dlp --downloader curl https://example.com/v	denied
+yt-dlp --dump-pages	safe-write
+yt-dlp --dump-single-json	safe-write
+yt-dlp --embed-chapters	safe-write
+yt-dlp --embed-info-json	safe-write
+yt-dlp --embed-metadata	safe-write
+yt-dlp --embed-subs	safe-write
+yt-dlp --embed-thumbnail	safe-write
+yt-dlp --encoding x	safe-write
+yt-dlp --exec 'rm -rf /' https://example.com/v	denied
+yt-dlp --extract-audio	safe-write
+yt-dlp --extractor-args x	safe-write
+yt-dlp --extractor-retries x	safe-write
+yt-dlp --ffmpeg-location x	safe-write
+yt-dlp --file-access-retries x	safe-write
+yt-dlp --fixup x	safe-write
+yt-dlp --flat-playlist	safe-write
+yt-dlp --force-generic-extractor	safe-write
+yt-dlp --force-ipv4	safe-write
+yt-dlp --force-ipv6	safe-write
+yt-dlp --force-overwrites x	safe-write
+yt-dlp --force-write-archive	safe-write
+yt-dlp --format x	safe-write
+yt-dlp --format-sort x	safe-write
+yt-dlp --format-sort-force x	safe-write
+yt-dlp --fragment-retries x	safe-write
+yt-dlp --geo-bypass x	safe-write
+yt-dlp --geo-bypass-country x	safe-write
+yt-dlp --geo-bypass-ip-block x	safe-write
+yt-dlp --get-comments	safe-write
+yt-dlp --get-description	safe-write
+yt-dlp --get-duration	safe-write
+yt-dlp --get-filename	safe-write
+yt-dlp --get-format	safe-write
+yt-dlp --get-id	safe-write
+yt-dlp --get-thumbnail	safe-write
+yt-dlp --get-title	safe-write
+yt-dlp --get-url	safe-write
+yt-dlp --help	denied
+yt-dlp --hls-prefer-ffmpeg	safe-write
+yt-dlp --hls-prefer-native	safe-write
+yt-dlp --hls-use-mpegts	safe-write
+yt-dlp --http-chunk-size x	safe-write
+yt-dlp --id x	safe-write
+yt-dlp --ignore-config	safe-write
+yt-dlp --ignore-errors	safe-write
+yt-dlp --ignore-no-formats-error	safe-write
+yt-dlp --impersonate x	safe-write
+yt-dlp --keep-fragments	safe-write
+yt-dlp --keep-video	safe-write
+yt-dlp --legacy-server-connect	safe-write
+yt-dlp --limit-rate x	safe-write
+yt-dlp --list-formats	safe-write
+yt-dlp --list-subs	safe-write
+yt-dlp --list-thumbnails	safe-write
+yt-dlp --load-info-json x	safe-write
+yt-dlp --mark-watched	safe-write
+yt-dlp --match-filter x	safe-write
+yt-dlp --match-title x	safe-write
+yt-dlp --max-downloads x	safe-write
+yt-dlp --max-filesize x	safe-write
+yt-dlp --max-sleep-interval x	safe-write
+yt-dlp --merge-output-format x	safe-write
+yt-dlp --min-filesize x	safe-write
+yt-dlp --min-sleep-interval x	safe-write
+yt-dlp --mtime	safe-write
+yt-dlp --netrc-cmd id https://example.com/v	denied
+yt-dlp --netrc-location x	safe-write
+yt-dlp --newline	safe-write
+yt-dlp --no-abort-on-error	safe-write
+yt-dlp --no-add-metadata	safe-write
+yt-dlp --no-allow-unplayable-formats x	safe-write
+yt-dlp --no-call-home	safe-write
+yt-dlp --no-check-certificate	safe-write
+yt-dlp --no-clean-info-json	safe-write
+yt-dlp --no-color	safe-write
+yt-dlp --no-colors	safe-write
+yt-dlp --no-config	safe-write
+yt-dlp --no-continue	safe-write
+yt-dlp --no-cookies	safe-write
+yt-dlp --no-embed-chapters	safe-write
+yt-dlp --no-embed-info-json	safe-write
+yt-dlp --no-embed-metadata	safe-write
+yt-dlp --no-embed-subs	safe-write
+yt-dlp --no-embed-thumbnail	safe-write
+yt-dlp --no-fixup-comments	safe-write
+yt-dlp --no-format-sort-force	safe-write
+yt-dlp --no-get-comments	safe-write
+yt-dlp --no-keep-fragments	safe-write
+yt-dlp --no-keep-video	safe-write
+yt-dlp --no-mark-watched	safe-write
+yt-dlp --no-mtime	safe-write
+yt-dlp --no-overwrites	safe-write
+yt-dlp --no-part	safe-write
+yt-dlp --no-playlist	safe-write
+yt-dlp --no-playlist-reverse	safe-write
+yt-dlp --no-post-overwrites	safe-write
+yt-dlp --no-progress	safe-write
+yt-dlp --no-quiet	safe-write
+yt-dlp --no-resize-buffer	safe-write
+yt-dlp --no-restrict-filenames	safe-write
+yt-dlp --no-simulate	safe-write
+yt-dlp --no-skip-unavailable-fragments	safe-write
+yt-dlp --no-split-chapters	safe-write
+yt-dlp --no-update	safe-write
+yt-dlp --no-warnings	safe-write
+yt-dlp --no-write-annotations	safe-write
+yt-dlp --no-write-archive	safe-write
+yt-dlp --no-write-auto-subs	safe-write
+yt-dlp --no-write-comments	safe-write
+yt-dlp --no-write-description	safe-write
+yt-dlp --no-write-info-json	safe-write
+yt-dlp --no-write-link	safe-write
+yt-dlp --no-write-playlist-metafiles	safe-write
+yt-dlp --no-write-subs	safe-write
+yt-dlp --no-write-thumbnail	safe-write
+yt-dlp --no-write-url-link	safe-write
+yt-dlp --output x	safe-write
+yt-dlp --output-na-placeholder x	safe-write
+yt-dlp --overwrites	safe-write
+yt-dlp --password x	safe-write
+yt-dlp --paths x	safe-write
+yt-dlp --paths-only	safe-write
+yt-dlp --playlist-end x	safe-write
+yt-dlp --playlist-items x	safe-write
+yt-dlp --playlist-random	safe-write
+yt-dlp --playlist-reverse	safe-write
+yt-dlp --playlist-start x	safe-write
+yt-dlp --plugin-dirs /tmp/p https://example.com/v	denied
+yt-dlp --port x	safe-write
+yt-dlp --postprocessor-args evil https://example.com/v	denied
+yt-dlp --prefer-free-formats	safe-write
+yt-dlp --print x	safe-write
+yt-dlp --print-json	safe-write
+yt-dlp --print-to-file	safe-write
+yt-dlp --print-traffic	safe-write
+yt-dlp --progress	safe-write
+yt-dlp --proxy http://proxy:8080 https://example.com/v	safe-write
+yt-dlp --proxy x	safe-write
+yt-dlp --quiet	safe-write
+yt-dlp --recode-video x	safe-write
+yt-dlp --referer x	safe-write
+yt-dlp --reject-title x	safe-write
+yt-dlp --remux-video x	safe-write
+yt-dlp --rendezvous x	safe-write
+yt-dlp --resize-buffer	safe-write
+yt-dlp --restrict-filenames	safe-write
+yt-dlp --retries x	safe-write
+yt-dlp --retry-sleep x	safe-write
+yt-dlp --reverse-playlist	safe-write
+yt-dlp --rm-cache-dir x	safe-write
+yt-dlp --simulate	safe-write
+yt-dlp --skip-download	safe-write
+yt-dlp --skip-unavailable-fragments	safe-write
+yt-dlp --socket-timeout x	safe-write
+yt-dlp --source-address x	safe-write
+yt-dlp --split-chapters	safe-write
+yt-dlp --sponsorblock-api x	safe-write
+yt-dlp --sponsorblock-chapter-title x	safe-write
+yt-dlp --sponsorblock-mark x	safe-write
+yt-dlp --sponsorblock-remove x	safe-write
+yt-dlp --sub-format x	safe-write
+yt-dlp --sub-format-fallback x	safe-write
+yt-dlp --sub-langs x	safe-write
+yt-dlp --throttled-rate x	safe-write
+yt-dlp --trim-filenames x	safe-write
+yt-dlp --twofactor x	safe-write
+yt-dlp --update	denied
+yt-dlp --update-to nightly@latest https://example.com/v	denied
+yt-dlp --user-agent x	safe-write
+yt-dlp --username x	safe-write
+yt-dlp --verbose	safe-write
+yt-dlp --version	safe-write
+yt-dlp --video-multistreams x	safe-write
+yt-dlp --video-password x	safe-write
+yt-dlp --wait-for-video x	safe-write
+yt-dlp --write-annotations	safe-write
+yt-dlp --write-auto-subs	safe-write
+yt-dlp --write-comments	safe-write
+yt-dlp --write-description	safe-write
+yt-dlp --write-info-json	safe-write
+yt-dlp --write-link	safe-write
+yt-dlp --write-pages x	safe-write
+yt-dlp --write-playlist-metafiles	safe-write
+yt-dlp --write-subs	safe-write
+yt-dlp --write-subs --sub-langs en https://example.com/v	safe-write
+yt-dlp --write-thumbnail	safe-write
+yt-dlp --write-url-link	safe-write
+yt-dlp --xattrs	safe-write
+yt-dlp --xff x	safe-write
+yt-dlp -4	safe-write
+yt-dlp -6	safe-write
+yt-dlp -F	safe-write
+yt-dlp -F https://example.com/v	safe-write
+yt-dlp -J	safe-write
+yt-dlp -N x	safe-write
+yt-dlp -P x	safe-write
+yt-dlp -R x	safe-write
+yt-dlp -S x	safe-write
+yt-dlp -T x	safe-write
+yt-dlp -a x	safe-write
+yt-dlp -c	safe-write
+yt-dlp -f best https://example.com/v	safe-write
+yt-dlp -f x	safe-write
+yt-dlp -h	safe-write
+yt-dlp -i	safe-write
+yt-dlp -j	safe-write
+yt-dlp -k	safe-write
+yt-dlp -o 'out.%(ext)s' https://example.com/v	safe-write
+yt-dlp -o x	safe-write
+yt-dlp -p x	safe-write
+yt-dlp -q	safe-write
+yt-dlp -r x	safe-write
+yt-dlp -s	safe-write
+yt-dlp -t x	safe-write
+yt-dlp -u x	safe-write
+yt-dlp -v	safe-write
+yt-dlp -w	safe-write
+yt-dlp -x	safe-write
+yt-dlp -x --audio-format mp3 https://example.com/v	safe-write
+yt-dlp https://example.com/v	safe-write
+yt-dlp x	safe-write
+ytt	safe-read
+ytt --dangerous-allow-all-symlink-destinations	safe-read
+ytt --dangerous-allow-all-symlink-destinations --data-value x	safe-read
+ytt --dangerous-allow-all-symlink-destinations --data-values-inspect	safe-read
+ytt --dangerous-allow-all-symlink-destinations x	safe-read
+ytt --data-value x	safe-read
+ytt --data-value-file x	safe-read
+ytt --data-value-yaml x	safe-read
+ytt --data-values-env x	safe-read
+ytt --data-values-env-yaml x	safe-read
+ytt --data-values-file x	safe-read
+ytt --data-values-inspect	safe-read
+ytt --data-values-schema-inspect	safe-read
+ytt --debug	safe-read
+ytt --debug-output x	safe-read
+ytt --debug-skip-default-files	safe-read
+ytt --file-mark x	safe-read
+ytt --filter x	safe-read
+ytt --help	safe-read
+ytt --ignore-unknown-comments	safe-read
+ytt --ignored-paths x	safe-read
+ytt --implied-template-files	safe-read
+ytt --output	safe-write
+ytt --output x	safe-write
+ytt --output-directory	safe-write
+ytt --output-directory x	safe-write
+ytt --output-files	safe-write
+ytt --output-files x	safe-write
+ytt --output-multi-files x	safe-read
+ytt --quiet	safe-read
+ytt --strict	safe-read
+ytt --symlink-allow	safe-read
+ytt --symlink-allow x	safe-read
+ytt --symlink-allow-all	safe-read
+ytt --type-strict	safe-read
+ytt --version	safe-read
+ytt -f x	safe-read
+ytt -h	safe-read
+ytt -o	safe-write
+ytt -o x	safe-write
+ytt -q	safe-read
+ytt -v	safe-read
+ytt x	safe-read

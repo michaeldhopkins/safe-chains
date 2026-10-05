@@ -1,0 +1,5043 @@
+tab2space	denied
+tab2space --help	denied
+tab2space --version	denied
+tab2space x	safe-write
+tabs	inert
+tabs --evil	denied
+tabs --help	denied
+tabs --version	denied
+tabs -8	inert
+tabs -T x	inert
+tabs -T xterm	inert
+tabs -a	inert
+tabs -a -T x	inert
+tabs -a -a2	inert
+tabs -a x	inert
+tabs -a2	inert
+tabs -c	inert
+tabs -c2	inert
+tabs -c3	inert
+tabs -f	inert
+tabs -p	inert
+tabs -s	inert
+tabs -u	inert
+tabs 1,5 9,13	denied
+tabs 1,5,9,13	inert
+tabs x	inert
+tac	inert
+tac --before	inert
+tac --before --help	inert
+tac --before --separator x	inert
+tac --before x	inert
+tac --help	inert
+tac --regex	inert
+tac --separator x	inert
+tac --version	inert
+tac -V	inert
+tac -b	inert
+tac -h	inert
+tac -r	inert
+tac -s x	inert
+tac file.txt	inert
+tac x	inert
+tail	inert
+tail --bytes x	inert
+tail --follow	inert
+tail --follow --bytes x	inert
+tail --follow --help	inert
+tail --follow x	safe-read
+tail --help	inert
+tail --lines x	inert
+tail --max-unchanged-stats x	inert
+tail --pid x	inert
+tail --quiet	inert
+tail --retry	inert
+tail --silent	inert
+tail --sleep-interval x	inert
+tail --verbose	inert
+tail --version	inert
+tail --zero-terminated	inert
+tail -100 log.txt	safe-read
+tail -F	inert
+tail -V	inert
+tail -b x	inert
+tail -c x	inert
+tail -f	inert
+tail -f ./app.log	safe-read
+tail -h	inert
+tail -n 50 src/main.rs	safe-read
+tail -n x	inert
+tail -q	inert
+tail -r	inert
+tail -v	inert
+tail -z	inert
+tail x	safe-read
+tailscale	denied
+tailscale --help	inert
+tailscale --help --version	denied
+tailscale --help x	denied
+tailscale --version	inert
+tailscale -h	inert
+tailscale bugreport	inert
+tailscale bugreport --help	inert
+tailscale bugreport --help -h	inert
+tailscale bugreport --help x	denied
+tailscale bugreport -h	inert
+tailscale bugreport x	denied
+tailscale dns	denied
+tailscale dns query	inert
+tailscale dns query --help	inert
+tailscale dns query --help -h	inert
+tailscale dns query --help x	inert
+tailscale dns query -h	inert
+tailscale dns query x	inert
+tailscale dns status	inert
+tailscale dns status --help	inert
+tailscale dns status --help -h	inert
+tailscale dns status --help x	denied
+tailscale dns status -h	inert
+tailscale dns status x	denied
+tailscale dns x	denied
+tailscale down	safe-write
+tailscale down --help	safe-write
+tailscale down --help -h	safe-write
+tailscale down --help x	denied
+tailscale down -h	safe-write
+tailscale down x	denied
+tailscale exit-node	denied
+tailscale exit-node list	inert
+tailscale exit-node list --filter x	inert
+tailscale exit-node list --help	inert
+tailscale exit-node list --help --filter x	inert
+tailscale exit-node list --help --json	inert
+tailscale exit-node list --help x	denied
+tailscale exit-node list --json	inert
+tailscale exit-node list -h	inert
+tailscale exit-node list x	denied
+tailscale exit-node suggest	inert
+tailscale exit-node suggest --help	inert
+tailscale exit-node suggest --help -h	inert
+tailscale exit-node suggest --help x	denied
+tailscale exit-node suggest -h	inert
+tailscale exit-node suggest x	denied
+tailscale exit-node x	denied
+tailscale ip	inert
+tailscale ip --1	inert
+tailscale ip --1 --4	inert
+tailscale ip --1 x	inert
+tailscale ip --4	inert
+tailscale ip --6	inert
+tailscale ip --help	inert
+tailscale ip -h	inert
+tailscale ip x	inert
+tailscale licenses	inert
+tailscale licenses --help	inert
+tailscale licenses --help -h	inert
+tailscale licenses --help x	denied
+tailscale licenses -h	inert
+tailscale licenses x	denied
+tailscale login	safe-write
+tailscale login --accept-dns	safe-write
+tailscale login --accept-dns --accept-routes	safe-write
+tailscale login --accept-dns --advertise-exit-node x	safe-write
+tailscale login --accept-dns x	denied
+tailscale login --accept-routes	safe-write
+tailscale login --advertise-exit-node x	safe-write
+tailscale login --advertise-routes x	safe-write
+tailscale login --advertise-tags x	safe-write
+tailscale login --authkey x	safe-write
+tailscale login --exit-node x	safe-write
+tailscale login --help	safe-write
+tailscale login --hostname x	safe-write
+tailscale login --login-server x	safe-write
+tailscale login --operator x	safe-write
+tailscale login --shields-up	safe-write
+tailscale login --timeout x	safe-write
+tailscale login -h	safe-write
+tailscale login x	denied
+tailscale logout	safe-write
+tailscale logout --help	safe-write
+tailscale logout --help -h	safe-write
+tailscale logout --help x	denied
+tailscale logout -h	safe-write
+tailscale logout x	denied
+tailscale netcheck	inert
+tailscale netcheck --help	inert
+tailscale netcheck --help -h	inert
+tailscale netcheck --help x	denied
+tailscale netcheck -h	inert
+tailscale netcheck x	denied
+tailscale ping	denied
+tailscale ping --c2c	inert
+tailscale ping --c2c --help	inert
+tailscale ping --c2c --size x	inert
+tailscale ping --c2c x	inert
+tailscale ping --help	inert
+tailscale ping --icmp	inert
+tailscale ping --peerapi	inert
+tailscale ping --size x	inert
+tailscale ping --timeout x	inert
+tailscale ping --tsmp	inert
+tailscale ping --until-direct	inert
+tailscale ping --verbose	inert
+tailscale ping -h	inert
+tailscale ping x	inert
+tailscale status	inert
+tailscale status --active	inert
+tailscale status --active --browser	inert
+tailscale status --active x	denied
+tailscale status --browser	inert
+tailscale status --help	inert
+tailscale status --json	inert
+tailscale status --peers	inert
+tailscale status --self	inert
+tailscale status --web	inert
+tailscale status -h	inert
+tailscale status x	denied
+tailscale switch	denied
+tailscale switch --help	safe-write
+tailscale switch --help --list	safe-write
+tailscale switch --help x	safe-write
+tailscale switch --list	safe-write
+tailscale switch -h	safe-write
+tailscale switch x	safe-write
+tailscale up	safe-write
+tailscale up --accept-dns	safe-write
+tailscale up --accept-dns --accept-routes	safe-write
+tailscale up --accept-dns --advertise-exit-node x	safe-write
+tailscale up --accept-dns x	denied
+tailscale up --accept-routes	safe-write
+tailscale up --advertise-exit-node x	safe-write
+tailscale up --advertise-routes x	safe-write
+tailscale up --advertise-tags x	safe-write
+tailscale up --authkey x	safe-write
+tailscale up --exit-node x	safe-write
+tailscale up --exit-node-allow-lan-access x	safe-write
+tailscale up --help	safe-write
+tailscale up --hostname x	safe-write
+tailscale up --login-server x	safe-write
+tailscale up --operator x	safe-write
+tailscale up --reset	safe-write
+tailscale up --shields-up	safe-write
+tailscale up --timeout x	safe-write
+tailscale up -h	safe-write
+tailscale up x	denied
+tailscale version	inert
+tailscale version --help	inert
+tailscale version --help -h	inert
+tailscale version --help x	inert
+tailscale version -h	inert
+tailscale version x	inert
+tailscale whois	denied
+tailscale whois --help	inert
+tailscale whois --help --json	inert
+tailscale whois --help x	inert
+tailscale whois --json	inert
+tailscale whois -h	inert
+tailscale whois x	inert
+tailscale x	denied
+tap	denied
+tap --help	inert
+tap --help --version	denied
+tap --help x	denied
+tap --version	inert
+tap -V	inert
+tap -h	inert
+tap build	denied
+tap build x	denied
+tap dump-config	inert
+tap dump-config --help	inert
+tap dump-config --help -h	inert
+tap dump-config --help x	inert
+tap dump-config -h	inert
+tap dump-config x	inert
+tap help	inert
+tap help x	inert
+tap init	denied
+tap init x	denied
+tap mocharc	denied
+tap mocharc x	denied
+tap plugin	denied
+tap plugin x	denied
+tap repl	denied
+tap repl x	denied
+tap report	safe-read
+tap report --coverage-reporter x	safe-read
+tap report --help	safe-read
+tap report --help --coverage-reporter x	safe-read
+tap report --help -h	safe-read
+tap report --help x	safe-read
+tap report -h	safe-read
+tap report x	safe-read
+tap run	denied
+tap run x	denied
+tap versions	inert
+tap versions --help	inert
+tap versions --help -h	inert
+tap versions --help x	inert
+tap versions -h	inert
+tap versions x	inert
+tap x	denied
+tar	denied
+tar --help	denied
+tar --list --file archive.tar	safe-read
+tar --version	denied
+tar -cf archive.tar files/	safe-write
+tar -cf out.tar --directory=./build a.o	safe-write
+tar -cf out.tar -C ./src main.rs lib.rs	safe-write
+tar -cf out.tar -C /etc shadow	denied
+tar -cf out.tar -C /tmp /etc/shadow	denied
+tar -cf out.tar -C ~/.ssh id_rsa	denied
+tar -cf out.tar -C./src main.rs	safe-write
+tar -cf out.tar -T /etc/shadow	denied
+tar -f archive.tar	denied
+tar -rf archive.tar newfile	safe-write
+tar -t -f archive.tar	safe-read
+tar -t -v -f archive.tar	safe-read
+tar -tJf archive.tar.xz	safe-read
+tar -tcf archive.tar	safe-write
+tar -tf archive.tar	safe-read
+tar -tjf archive.tar.bz2	safe-read
+tar -tvf archive.tar	safe-read
+tar -txf archive.tar	denied
+tar -tzf archive.tar.gz	safe-read
+tar -uf archive.tar newfile	safe-write
+tar -xf archive.tar	denied
+tar cf - -C / -C etc shadow	denied
+tar cf ./out.tar ./src	safe-write
+tar cf ./out.tar ~/.ssh	denied
+tar cf /etc/evil.tar ./src	denied
+tar cf archive.tar files/	safe-write
+tar cf out.tar -C / -C etc shadow	denied
+tar cf out.tar -C / -C root -C .ssh id_rsa	denied
+tar cf out.tar -C /home -C victim .ssh/id_rsa	denied
+tar tf ./archive.tar	safe-read
+tar tf archive.tar	safe-read
+tar tjf archive.tar.bz2	safe-read
+tar tvf archive.tar	safe-read
+tar tz	inert
+tar tzf archive.tar.gz	safe-read
+tar x	denied
+tar xf archive.tar	denied
+task	denied
+task --color	safe-read
+task --color --concurrency	safe-read
+task --color --dir x	safe-read
+task --color x	denied
+task --concurrency	safe-read
+task --dir x	safe-read
+task --dry	safe-read
+task --dry --list	safe-read
+task --exit-code	safe-read
+task --force	safe-read
+task --global	safe-read
+task --help	safe-read
+task --init	safe-read
+task --insecure	safe-read
+task --interval	safe-read
+task --json	safe-read
+task --list	safe-read
+task --list-all	safe-read
+task --no-color	safe-read
+task --offline	safe-read
+task --output x	safe-read
+task --parallel	safe-read
+task --silent	safe-read
+task --status	safe-read
+task --summary	safe-read
+task --taskfile x	safe-read
+task --verbose	safe-read
+task --version	safe-read
+task --watch	safe-read
+task -C	safe-read
+task -a	safe-read
+task -d	safe-read
+task -d x	denied
+task -f	safe-read
+task -g	safe-read
+task -h	safe-read
+task -i	safe-read
+task -j	safe-read
+task -l	safe-read
+task -n	safe-read
+task -o x	safe-read
+task -p	safe-read
+task -s	safe-read
+task -t	safe-read
+task -t x	denied
+task -v	safe-read
+task -w	safe-read
+task FOO=bar	denied
+task build	denied
+task default	denied
+task deploy	denied
+task x	denied
+taskinfo	inert
+taskinfo --boosts	inert
+taskinfo --boosts --dq	inert
+taskinfo --boosts x	inert
+taskinfo --dq	inert
+taskinfo --help	denied
+taskinfo --threads	inert
+taskinfo --version	denied
+taskinfo x	inert
+taskpolicy	denied
+taskpolicy --help	denied
+taskpolicy --version	denied
+taskpolicy -B	denied
+taskpolicy -B -P x	denied
+taskpolicy -B -a	denied
+taskpolicy -B x	denied
+taskpolicy -P x	denied
+taskpolicy -S x	denied
+taskpolicy -a	denied
+taskpolicy -b	denied
+taskpolicy -c x	denied
+taskpolicy -d x	denied
+taskpolicy -g x	denied
+taskpolicy -j x	denied
+taskpolicy -l x	denied
+taskpolicy -m x	denied
+taskpolicy -p x	denied
+taskpolicy -s	denied
+taskpolicy -t x	denied
+taskpolicy x	denied
+tbtdiagnose	inert
+tbtdiagnose --help	denied
+tbtdiagnose --version	denied
+tbtdiagnose x	denied
+tcc	denied
+tcc --help	inert
+tcc --help --version	inert
+tcc --help x	denied
+tcc --version	inert
+tcc -?	inert
+tcc -h	inert
+tcc -v	inert
+tcc x	denied
+tclsh	denied
+tclsh --help	inert
+tclsh --help --version	inert
+tclsh --help x	denied
+tclsh --version	inert
+tclsh -h	inert
+tclsh x	denied
+tcpdump	denied
+tcpdump --help	safe-read
+tcpdump --help --immediate-mode x	safe-read
+tcpdump --help --version	safe-read
+tcpdump --help x	safe-read
+tcpdump --immediate-mode x	safe-read
+tcpdump --snapshot-length x	safe-read
+tcpdump --time-stamp-precision x	safe-read
+tcpdump --time-stamp-type x	safe-read
+tcpdump --version	safe-read
+tcpdump -?	safe-read
+tcpdump -A	safe-read
+tcpdump -B	safe-read
+tcpdump -B x	safe-read
+tcpdump -C	safe-read
+tcpdump -C x	safe-read
+tcpdump -D	safe-read
+tcpdump -E x	safe-read
+tcpdump -F x	safe-read
+tcpdump -G	safe-read
+tcpdump -G x	safe-read
+tcpdump -K	safe-read
+tcpdump -L	safe-read
+tcpdump -M	safe-read
+tcpdump -M x	safe-read
+tcpdump -N	safe-read
+tcpdump -O	safe-read
+tcpdump -P	safe-read
+tcpdump -Q	safe-read
+tcpdump -Q x	safe-read
+tcpdump -S	safe-read
+tcpdump -T x	safe-read
+tcpdump -U	safe-read
+tcpdump -W	safe-read
+tcpdump -W x	safe-read
+tcpdump -X	safe-read
+tcpdump -Z	safe-read
+tcpdump -Z x	safe-read
+tcpdump -c	safe-read
+tcpdump -c x	safe-read
+tcpdump -d	safe-read
+tcpdump -e	safe-read
+tcpdump -f	safe-read
+tcpdump -h	safe-read
+tcpdump -i	safe-read
+tcpdump -i x	safe-read
+tcpdump -j	safe-read
+tcpdump -j x	safe-read
+tcpdump -l	safe-read
+tcpdump -n	safe-read
+tcpdump -p	safe-read
+tcpdump -q	safe-read
+tcpdump -r	safe-read
+tcpdump -r x	safe-read
+tcpdump -s	safe-read
+tcpdump -s x	safe-read
+tcpdump -t	safe-read
+tcpdump -u	safe-read
+tcpdump -v	safe-read
+tcpdump -w	safe-read
+tcpdump -w x	safe-read
+tcpdump -x	safe-read
+tcpdump -y	safe-read
+tcpdump -y x	safe-read
+tcpdump -z x	safe-read
+tcpdump x	safe-read
+td	denied
+td --help	inert
+td --help --version	denied
+td --help x	denied
+td --version	inert
+td -h	inert
+td auth	inert
+td auth status	inert
+td auth status x	inert
+td auth x	denied
+td inbox	inert
+td inbox x	inert
+td project	inert
+td project list	inert
+td project list x	inert
+td project x	denied
+td skill	inert
+td skill list	inert
+td skill list x	inert
+td skill x	denied
+td task	inert
+td task list	inert
+td task list x	inert
+td task view	inert
+td task view x	inert
+td task x	denied
+td today	inert
+td today x	inert
+td x	denied
+tea	denied
+tea --help	denied
+tea --version	inert
+tea --version -v	denied
+tea --version x	denied
+tea -v	inert
+tea b	inert
+tea b list	inert
+tea b list --fields x	inert
+tea b list --help	inert
+tea b list --help --fields x	inert
+tea b list --help -h	inert
+tea b list --help x	inert
+tea b list --limit x	inert
+tea b list --login x	inert
+tea b list --output x	inert
+tea b list --page x	inert
+tea b list --repo x	inert
+tea b list --state x	inert
+tea b list -L x	inert
+tea b list -R x	inert
+tea b list -f x	inert
+tea b list -h	inert
+tea b list -l x	inert
+tea b list -o x	inert
+tea b list -p x	inert
+tea b list -s x	inert
+tea b list x	inert
+tea b view	denied
+tea b view --comments	inert
+tea b view --comments --help	inert
+tea b view --comments --login x	inert
+tea b view --comments x	inert
+tea b view --help	inert
+tea b view --login x	inert
+tea b view --output x	inert
+tea b view --repo x	inert
+tea b view -R x	inert
+tea b view -c	inert
+tea b view -h	inert
+tea b view -l x	inert
+tea b view -o x	inert
+tea b view x	inert
+tea b x	denied
+tea branch	inert
+tea branch list	inert
+tea branch list --fields x	inert
+tea branch list --help	inert
+tea branch list --help --fields x	inert
+tea branch list --help -h	inert
+tea branch list --help x	inert
+tea branch list --limit x	inert
+tea branch list --login x	inert
+tea branch list --output x	inert
+tea branch list --page x	inert
+tea branch list --repo x	inert
+tea branch list --state x	inert
+tea branch list -L x	inert
+tea branch list -R x	inert
+tea branch list -f x	inert
+tea branch list -h	inert
+tea branch list -l x	inert
+tea branch list -o x	inert
+tea branch list -p x	inert
+tea branch list -s x	inert
+tea branch list x	inert
+tea branch view	denied
+tea branch view --comments	inert
+tea branch view --comments --help	inert
+tea branch view --comments --login x	inert
+tea branch view --comments x	inert
+tea branch view --help	inert
+tea branch view --login x	inert
+tea branch view --output x	inert
+tea branch view --repo x	inert
+tea branch view -R x	inert
+tea branch view -c	inert
+tea branch view -h	inert
+tea branch view -l x	inert
+tea branch view -o x	inert
+tea branch view x	inert
+tea branch x	denied
+tea branches	inert
+tea branches list	inert
+tea branches list --fields x	inert
+tea branches list --help	inert
+tea branches list --help --fields x	inert
+tea branches list --help -h	inert
+tea branches list --help x	inert
+tea branches list --limit x	inert
+tea branches list --login x	inert
+tea branches list --output x	inert
+tea branches list --page x	inert
+tea branches list --repo x	inert
+tea branches list --state x	inert
+tea branches list -L x	inert
+tea branches list -R x	inert
+tea branches list -f x	inert
+tea branches list -h	inert
+tea branches list -l x	inert
+tea branches list -o x	inert
+tea branches list -p x	inert
+tea branches list -s x	inert
+tea branches list x	inert
+tea branches view	denied
+tea branches view --comments	inert
+tea branches view --comments --help	inert
+tea branches view --comments --login x	inert
+tea branches view --comments x	inert
+tea branches view --help	inert
+tea branches view --login x	inert
+tea branches view --output x	inert
+tea branches view --repo x	inert
+tea branches view -R x	inert
+tea branches view -c	inert
+tea branches view -h	inert
+tea branches view -l x	inert
+tea branches view -o x	inert
+tea branches view x	inert
+tea branches x	denied
+tea i	inert
+tea i list	inert
+tea i list --fields x	inert
+tea i list --help	inert
+tea i list --help --fields x	inert
+tea i list --help -h	inert
+tea i list --help x	inert
+tea i list --limit x	inert
+tea i list --login x	inert
+tea i list --output x	inert
+tea i list --page x	inert
+tea i list --repo x	inert
+tea i list --state x	inert
+tea i list -L x	inert
+tea i list -R x	inert
+tea i list -f x	inert
+tea i list -h	inert
+tea i list -l x	inert
+tea i list -o x	inert
+tea i list -p x	inert
+tea i list -s x	inert
+tea i list x	inert
+tea i view	denied
+tea i view --comments	inert
+tea i view --comments --help	inert
+tea i view --comments --login x	inert
+tea i view --comments x	inert
+tea i view --help	inert
+tea i view --login x	inert
+tea i view --output x	inert
+tea i view --repo x	inert
+tea i view -R x	inert
+tea i view -c	inert
+tea i view -h	inert
+tea i view -l x	inert
+tea i view -o x	inert
+tea i view x	inert
+tea i x	denied
+tea issue	inert
+tea issue list	inert
+tea issue list --fields x	inert
+tea issue list --help	inert
+tea issue list --help --fields x	inert
+tea issue list --help -h	inert
+tea issue list --help x	inert
+tea issue list --limit x	inert
+tea issue list --login x	inert
+tea issue list --output x	inert
+tea issue list --page x	inert
+tea issue list --repo x	inert
+tea issue list --state x	inert
+tea issue list -L x	inert
+tea issue list -R x	inert
+tea issue list -f x	inert
+tea issue list -h	inert
+tea issue list -l x	inert
+tea issue list -o x	inert
+tea issue list -p x	inert
+tea issue list -s x	inert
+tea issue list x	inert
+tea issue view	denied
+tea issue view --comments	inert
+tea issue view --comments --help	inert
+tea issue view --comments --login x	inert
+tea issue view --comments x	inert
+tea issue view --help	inert
+tea issue view --login x	inert
+tea issue view --output x	inert
+tea issue view --repo x	inert
+tea issue view -R x	inert
+tea issue view -c	inert
+tea issue view -h	inert
+tea issue view -l x	inert
+tea issue view -o x	inert
+tea issue view x	inert
+tea issue x	denied
+tea issues	inert
+tea issues list	inert
+tea issues list --fields x	inert
+tea issues list --help	inert
+tea issues list --help --fields x	inert
+tea issues list --help -h	inert
+tea issues list --help x	inert
+tea issues list --limit x	inert
+tea issues list --login x	inert
+tea issues list --output x	inert
+tea issues list --page x	inert
+tea issues list --repo x	inert
+tea issues list --state x	inert
+tea issues list -L x	inert
+tea issues list -R x	inert
+tea issues list -f x	inert
+tea issues list -h	inert
+tea issues list -l x	inert
+tea issues list -o x	inert
+tea issues list -p x	inert
+tea issues list -s x	inert
+tea issues list x	inert
+tea issues view	denied
+tea issues view --comments	inert
+tea issues view --comments --help	inert
+tea issues view --comments --login x	inert
+tea issues view --comments x	inert
+tea issues view --help	inert
+tea issues view --login x	inert
+tea issues view --output x	inert
+tea issues view --repo x	inert
+tea issues view -R x	inert
+tea issues view -c	inert
+tea issues view -h	inert
+tea issues view -l x	inert
+tea issues view -o x	inert
+tea issues view x	inert
+tea issues x	denied
+tea label	inert
+tea label list	inert
+tea label list --fields x	inert
+tea label list --help	inert
+tea label list --help --fields x	inert
+tea label list --help -h	inert
+tea label list --help x	inert
+tea label list --limit x	inert
+tea label list --login x	inert
+tea label list --output x	inert
+tea label list --page x	inert
+tea label list --repo x	inert
+tea label list --state x	inert
+tea label list -L x	inert
+tea label list -R x	inert
+tea label list -f x	inert
+tea label list -h	inert
+tea label list -l x	inert
+tea label list -o x	inert
+tea label list -p x	inert
+tea label list -s x	inert
+tea label list x	inert
+tea label view	denied
+tea label view --comments	inert
+tea label view --comments --help	inert
+tea label view --comments --login x	inert
+tea label view --comments x	inert
+tea label view --help	inert
+tea label view --login x	inert
+tea label view --output x	inert
+tea label view --repo x	inert
+tea label view -R x	inert
+tea label view -c	inert
+tea label view -h	inert
+tea label view -l x	inert
+tea label view -o x	inert
+tea label view x	inert
+tea label x	denied
+tea labels	inert
+tea labels list	inert
+tea labels list --fields x	inert
+tea labels list --help	inert
+tea labels list --help --fields x	inert
+tea labels list --help -h	inert
+tea labels list --help x	inert
+tea labels list --limit x	inert
+tea labels list --login x	inert
+tea labels list --output x	inert
+tea labels list --page x	inert
+tea labels list --repo x	inert
+tea labels list --state x	inert
+tea labels list -L x	inert
+tea labels list -R x	inert
+tea labels list -f x	inert
+tea labels list -h	inert
+tea labels list -l x	inert
+tea labels list -o x	inert
+tea labels list -p x	inert
+tea labels list -s x	inert
+tea labels list x	inert
+tea labels view	denied
+tea labels view --comments	inert
+tea labels view --comments --help	inert
+tea labels view --comments --login x	inert
+tea labels view --comments x	inert
+tea labels view --help	inert
+tea labels view --login x	inert
+tea labels view --output x	inert
+tea labels view --repo x	inert
+tea labels view -R x	inert
+tea labels view -c	inert
+tea labels view -h	inert
+tea labels view -l x	inert
+tea labels view -o x	inert
+tea labels view x	inert
+tea labels x	denied
+tea login	denied
+tea login list	inert
+tea login list --fields x	inert
+tea login list --help	inert
+tea login list --help --fields x	inert
+tea login list --help -h	inert
+tea login list --help x	inert
+tea login list --limit x	inert
+tea login list --login x	inert
+tea login list --output x	inert
+tea login list --page x	inert
+tea login list --repo x	inert
+tea login list --state x	inert
+tea login list -L x	inert
+tea login list -R x	inert
+tea login list -f x	inert
+tea login list -h	inert
+tea login list -l x	inert
+tea login list -o x	inert
+tea login list -p x	inert
+tea login list -s x	inert
+tea login list x	inert
+tea login x	denied
+tea logins	denied
+tea logins list	inert
+tea logins list --fields x	inert
+tea logins list --help	inert
+tea logins list --help --fields x	inert
+tea logins list --help -h	inert
+tea logins list --help x	inert
+tea logins list --limit x	inert
+tea logins list --login x	inert
+tea logins list --output x	inert
+tea logins list --page x	inert
+tea logins list --repo x	inert
+tea logins list --state x	inert
+tea logins list -L x	inert
+tea logins list -R x	inert
+tea logins list -f x	inert
+tea logins list -h	inert
+tea logins list -l x	inert
+tea logins list -o x	inert
+tea logins list -p x	inert
+tea logins list -s x	inert
+tea logins list x	inert
+tea logins x	denied
+tea milestone	inert
+tea milestone list	inert
+tea milestone list --fields x	inert
+tea milestone list --help	inert
+tea milestone list --help --fields x	inert
+tea milestone list --help -h	inert
+tea milestone list --help x	inert
+tea milestone list --limit x	inert
+tea milestone list --login x	inert
+tea milestone list --output x	inert
+tea milestone list --page x	inert
+tea milestone list --repo x	inert
+tea milestone list --state x	inert
+tea milestone list -L x	inert
+tea milestone list -R x	inert
+tea milestone list -f x	inert
+tea milestone list -h	inert
+tea milestone list -l x	inert
+tea milestone list -o x	inert
+tea milestone list -p x	inert
+tea milestone list -s x	inert
+tea milestone list x	inert
+tea milestone view	denied
+tea milestone view --comments	inert
+tea milestone view --comments --help	inert
+tea milestone view --comments --login x	inert
+tea milestone view --comments x	inert
+tea milestone view --help	inert
+tea milestone view --login x	inert
+tea milestone view --output x	inert
+tea milestone view --repo x	inert
+tea milestone view -R x	inert
+tea milestone view -c	inert
+tea milestone view -h	inert
+tea milestone view -l x	inert
+tea milestone view -o x	inert
+tea milestone view x	inert
+tea milestone x	denied
+tea milestones	inert
+tea milestones list	inert
+tea milestones list --fields x	inert
+tea milestones list --help	inert
+tea milestones list --help --fields x	inert
+tea milestones list --help -h	inert
+tea milestones list --help x	inert
+tea milestones list --limit x	inert
+tea milestones list --login x	inert
+tea milestones list --output x	inert
+tea milestones list --page x	inert
+tea milestones list --repo x	inert
+tea milestones list --state x	inert
+tea milestones list -L x	inert
+tea milestones list -R x	inert
+tea milestones list -f x	inert
+tea milestones list -h	inert
+tea milestones list -l x	inert
+tea milestones list -o x	inert
+tea milestones list -p x	inert
+tea milestones list -s x	inert
+tea milestones list x	inert
+tea milestones view	denied
+tea milestones view --comments	inert
+tea milestones view --comments --help	inert
+tea milestones view --comments --login x	inert
+tea milestones view --comments x	inert
+tea milestones view --help	inert
+tea milestones view --login x	inert
+tea milestones view --output x	inert
+tea milestones view --repo x	inert
+tea milestones view -R x	inert
+tea milestones view -c	inert
+tea milestones view -h	inert
+tea milestones view -l x	inert
+tea milestones view -o x	inert
+tea milestones view x	inert
+tea milestones x	denied
+tea ms	inert
+tea ms list	inert
+tea ms list --fields x	inert
+tea ms list --help	inert
+tea ms list --help --fields x	inert
+tea ms list --help -h	inert
+tea ms list --help x	inert
+tea ms list --limit x	inert
+tea ms list --login x	inert
+tea ms list --output x	inert
+tea ms list --page x	inert
+tea ms list --repo x	inert
+tea ms list --state x	inert
+tea ms list -L x	inert
+tea ms list -R x	inert
+tea ms list -f x	inert
+tea ms list -h	inert
+tea ms list -l x	inert
+tea ms list -o x	inert
+tea ms list -p x	inert
+tea ms list -s x	inert
+tea ms list x	inert
+tea ms view	denied
+tea ms view --comments	inert
+tea ms view --comments --help	inert
+tea ms view --comments --login x	inert
+tea ms view --comments x	inert
+tea ms view --help	inert
+tea ms view --login x	inert
+tea ms view --output x	inert
+tea ms view --repo x	inert
+tea ms view -R x	inert
+tea ms view -c	inert
+tea ms view -h	inert
+tea ms view -l x	inert
+tea ms view -o x	inert
+tea ms view x	inert
+tea ms x	denied
+tea n	inert
+tea n list	inert
+tea n list --fields x	inert
+tea n list --help	inert
+tea n list --help --fields x	inert
+tea n list --help -h	inert
+tea n list --help x	inert
+tea n list --limit x	inert
+tea n list --login x	inert
+tea n list --output x	inert
+tea n list --page x	inert
+tea n list --repo x	inert
+tea n list --state x	inert
+tea n list -L x	inert
+tea n list -R x	inert
+tea n list -f x	inert
+tea n list -h	inert
+tea n list -l x	inert
+tea n list -o x	inert
+tea n list -p x	inert
+tea n list -s x	inert
+tea n list x	inert
+tea n view	denied
+tea n view --comments	inert
+tea n view --comments --help	inert
+tea n view --comments --login x	inert
+tea n view --comments x	inert
+tea n view --help	inert
+tea n view --login x	inert
+tea n view --output x	inert
+tea n view --repo x	inert
+tea n view -R x	inert
+tea n view -c	inert
+tea n view -h	inert
+tea n view -l x	inert
+tea n view -o x	inert
+tea n view x	inert
+tea n x	denied
+tea notification	inert
+tea notification list	inert
+tea notification list --fields x	inert
+tea notification list --help	inert
+tea notification list --help --fields x	inert
+tea notification list --help -h	inert
+tea notification list --help x	inert
+tea notification list --limit x	inert
+tea notification list --login x	inert
+tea notification list --output x	inert
+tea notification list --page x	inert
+tea notification list --repo x	inert
+tea notification list --state x	inert
+tea notification list -L x	inert
+tea notification list -R x	inert
+tea notification list -f x	inert
+tea notification list -h	inert
+tea notification list -l x	inert
+tea notification list -o x	inert
+tea notification list -p x	inert
+tea notification list -s x	inert
+tea notification list x	inert
+tea notification view	denied
+tea notification view --comments	inert
+tea notification view --comments --help	inert
+tea notification view --comments --login x	inert
+tea notification view --comments x	inert
+tea notification view --help	inert
+tea notification view --login x	inert
+tea notification view --output x	inert
+tea notification view --repo x	inert
+tea notification view -R x	inert
+tea notification view -c	inert
+tea notification view -h	inert
+tea notification view -l x	inert
+tea notification view -o x	inert
+tea notification view x	inert
+tea notification x	denied
+tea notifications	inert
+tea notifications list	inert
+tea notifications list --fields x	inert
+tea notifications list --help	inert
+tea notifications list --help --fields x	inert
+tea notifications list --help -h	inert
+tea notifications list --help x	inert
+tea notifications list --limit x	inert
+tea notifications list --login x	inert
+tea notifications list --output x	inert
+tea notifications list --page x	inert
+tea notifications list --repo x	inert
+tea notifications list --state x	inert
+tea notifications list -L x	inert
+tea notifications list -R x	inert
+tea notifications list -f x	inert
+tea notifications list -h	inert
+tea notifications list -l x	inert
+tea notifications list -o x	inert
+tea notifications list -p x	inert
+tea notifications list -s x	inert
+tea notifications list x	inert
+tea notifications view	denied
+tea notifications view --comments	inert
+tea notifications view --comments --help	inert
+tea notifications view --comments --login x	inert
+tea notifications view --comments x	inert
+tea notifications view --help	inert
+tea notifications view --login x	inert
+tea notifications view --output x	inert
+tea notifications view --repo x	inert
+tea notifications view -R x	inert
+tea notifications view -c	inert
+tea notifications view -h	inert
+tea notifications view -l x	inert
+tea notifications view -o x	inert
+tea notifications view x	inert
+tea notifications x	denied
+tea org	inert
+tea org list	inert
+tea org list --fields x	inert
+tea org list --help	inert
+tea org list --help --fields x	inert
+tea org list --help -h	inert
+tea org list --help x	inert
+tea org list --limit x	inert
+tea org list --login x	inert
+tea org list --output x	inert
+tea org list --page x	inert
+tea org list --repo x	inert
+tea org list --state x	inert
+tea org list -L x	inert
+tea org list -R x	inert
+tea org list -f x	inert
+tea org list -h	inert
+tea org list -l x	inert
+tea org list -o x	inert
+tea org list -p x	inert
+tea org list -s x	inert
+tea org list x	inert
+tea org view	denied
+tea org view --comments	inert
+tea org view --comments --help	inert
+tea org view --comments --login x	inert
+tea org view --comments x	inert
+tea org view --help	inert
+tea org view --login x	inert
+tea org view --output x	inert
+tea org view --repo x	inert
+tea org view -R x	inert
+tea org view -c	inert
+tea org view -h	inert
+tea org view -l x	inert
+tea org view -o x	inert
+tea org view x	inert
+tea org x	denied
+tea organization	inert
+tea organization list	inert
+tea organization list --fields x	inert
+tea organization list --help	inert
+tea organization list --help --fields x	inert
+tea organization list --help -h	inert
+tea organization list --help x	inert
+tea organization list --limit x	inert
+tea organization list --login x	inert
+tea organization list --output x	inert
+tea organization list --page x	inert
+tea organization list --repo x	inert
+tea organization list --state x	inert
+tea organization list -L x	inert
+tea organization list -R x	inert
+tea organization list -f x	inert
+tea organization list -h	inert
+tea organization list -l x	inert
+tea organization list -o x	inert
+tea organization list -p x	inert
+tea organization list -s x	inert
+tea organization list x	inert
+tea organization view	denied
+tea organization view --comments	inert
+tea organization view --comments --help	inert
+tea organization view --comments --login x	inert
+tea organization view --comments x	inert
+tea organization view --help	inert
+tea organization view --login x	inert
+tea organization view --output x	inert
+tea organization view --repo x	inert
+tea organization view -R x	inert
+tea organization view -c	inert
+tea organization view -h	inert
+tea organization view -l x	inert
+tea organization view -o x	inert
+tea organization view x	inert
+tea organization x	denied
+tea organizations	inert
+tea organizations list	inert
+tea organizations list --fields x	inert
+tea organizations list --help	inert
+tea organizations list --help --fields x	inert
+tea organizations list --help -h	inert
+tea organizations list --help x	inert
+tea organizations list --limit x	inert
+tea organizations list --login x	inert
+tea organizations list --output x	inert
+tea organizations list --page x	inert
+tea organizations list --repo x	inert
+tea organizations list --state x	inert
+tea organizations list -L x	inert
+tea organizations list -R x	inert
+tea organizations list -f x	inert
+tea organizations list -h	inert
+tea organizations list -l x	inert
+tea organizations list -o x	inert
+tea organizations list -p x	inert
+tea organizations list -s x	inert
+tea organizations list x	inert
+tea organizations view	denied
+tea organizations view --comments	inert
+tea organizations view --comments --help	inert
+tea organizations view --comments --login x	inert
+tea organizations view --comments x	inert
+tea organizations view --help	inert
+tea organizations view --login x	inert
+tea organizations view --output x	inert
+tea organizations view --repo x	inert
+tea organizations view -R x	inert
+tea organizations view -c	inert
+tea organizations view -h	inert
+tea organizations view -l x	inert
+tea organizations view -o x	inert
+tea organizations view x	inert
+tea organizations x	denied
+tea pr	inert
+tea pr list	inert
+tea pr list --fields x	inert
+tea pr list --help	inert
+tea pr list --help --fields x	inert
+tea pr list --help -h	inert
+tea pr list --help x	inert
+tea pr list --limit x	inert
+tea pr list --login x	inert
+tea pr list --output x	inert
+tea pr list --page x	inert
+tea pr list --repo x	inert
+tea pr list --state x	inert
+tea pr list -L x	inert
+tea pr list -R x	inert
+tea pr list -f x	inert
+tea pr list -h	inert
+tea pr list -l x	inert
+tea pr list -o x	inert
+tea pr list -p x	inert
+tea pr list -s x	inert
+tea pr list x	inert
+tea pr view	denied
+tea pr view --comments	inert
+tea pr view --comments --help	inert
+tea pr view --comments --login x	inert
+tea pr view --comments x	inert
+tea pr view --help	inert
+tea pr view --login x	inert
+tea pr view --output x	inert
+tea pr view --repo x	inert
+tea pr view -R x	inert
+tea pr view -c	inert
+tea pr view -h	inert
+tea pr view -l x	inert
+tea pr view -o x	inert
+tea pr view x	inert
+tea pr x	denied
+tea pull	inert
+tea pull list	inert
+tea pull list --fields x	inert
+tea pull list --help	inert
+tea pull list --help --fields x	inert
+tea pull list --help -h	inert
+tea pull list --help x	inert
+tea pull list --limit x	inert
+tea pull list --login x	inert
+tea pull list --output x	inert
+tea pull list --page x	inert
+tea pull list --repo x	inert
+tea pull list --state x	inert
+tea pull list -L x	inert
+tea pull list -R x	inert
+tea pull list -f x	inert
+tea pull list -h	inert
+tea pull list -l x	inert
+tea pull list -o x	inert
+tea pull list -p x	inert
+tea pull list -s x	inert
+tea pull list x	inert
+tea pull view	denied
+tea pull view --comments	inert
+tea pull view --comments --help	inert
+tea pull view --comments --login x	inert
+tea pull view --comments x	inert
+tea pull view --help	inert
+tea pull view --login x	inert
+tea pull view --output x	inert
+tea pull view --repo x	inert
+tea pull view -R x	inert
+tea pull view -c	inert
+tea pull view -h	inert
+tea pull view -l x	inert
+tea pull view -o x	inert
+tea pull view x	inert
+tea pull x	denied
+tea pulls	inert
+tea pulls list	inert
+tea pulls list --fields x	inert
+tea pulls list --help	inert
+tea pulls list --help --fields x	inert
+tea pulls list --help -h	inert
+tea pulls list --help x	inert
+tea pulls list --limit x	inert
+tea pulls list --login x	inert
+tea pulls list --output x	inert
+tea pulls list --page x	inert
+tea pulls list --repo x	inert
+tea pulls list --state x	inert
+tea pulls list -L x	inert
+tea pulls list -R x	inert
+tea pulls list -f x	inert
+tea pulls list -h	inert
+tea pulls list -l x	inert
+tea pulls list -o x	inert
+tea pulls list -p x	inert
+tea pulls list -s x	inert
+tea pulls list x	inert
+tea pulls view	denied
+tea pulls view --comments	inert
+tea pulls view --comments --help	inert
+tea pulls view --comments --login x	inert
+tea pulls view --comments x	inert
+tea pulls view --help	inert
+tea pulls view --login x	inert
+tea pulls view --output x	inert
+tea pulls view --repo x	inert
+tea pulls view -R x	inert
+tea pulls view -c	inert
+tea pulls view -h	inert
+tea pulls view -l x	inert
+tea pulls view -o x	inert
+tea pulls view x	inert
+tea pulls x	denied
+tea r	inert
+tea r list	inert
+tea r list --fields x	inert
+tea r list --help	inert
+tea r list --help --fields x	inert
+tea r list --help -h	inert
+tea r list --help x	inert
+tea r list --limit x	inert
+tea r list --login x	inert
+tea r list --output x	inert
+tea r list --page x	inert
+tea r list --repo x	inert
+tea r list --state x	inert
+tea r list -L x	inert
+tea r list -R x	inert
+tea r list -f x	inert
+tea r list -h	inert
+tea r list -l x	inert
+tea r list -o x	inert
+tea r list -p x	inert
+tea r list -s x	inert
+tea r list x	inert
+tea r view	denied
+tea r view --comments	inert
+tea r view --comments --help	inert
+tea r view --comments --login x	inert
+tea r view --comments x	inert
+tea r view --help	inert
+tea r view --login x	inert
+tea r view --output x	inert
+tea r view --repo x	inert
+tea r view -R x	inert
+tea r view -c	inert
+tea r view -h	inert
+tea r view -l x	inert
+tea r view -o x	inert
+tea r view x	inert
+tea r x	denied
+tea release	inert
+tea release list	inert
+tea release list --fields x	inert
+tea release list --help	inert
+tea release list --help --fields x	inert
+tea release list --help -h	inert
+tea release list --help x	inert
+tea release list --limit x	inert
+tea release list --login x	inert
+tea release list --output x	inert
+tea release list --page x	inert
+tea release list --repo x	inert
+tea release list --state x	inert
+tea release list -L x	inert
+tea release list -R x	inert
+tea release list -f x	inert
+tea release list -h	inert
+tea release list -l x	inert
+tea release list -o x	inert
+tea release list -p x	inert
+tea release list -s x	inert
+tea release list x	inert
+tea release view	denied
+tea release view --comments	inert
+tea release view --comments --help	inert
+tea release view --comments --login x	inert
+tea release view --comments x	inert
+tea release view --help	inert
+tea release view --login x	inert
+tea release view --output x	inert
+tea release view --repo x	inert
+tea release view -R x	inert
+tea release view -c	inert
+tea release view -h	inert
+tea release view -l x	inert
+tea release view -o x	inert
+tea release view x	inert
+tea release x	denied
+tea releases	inert
+tea releases list	inert
+tea releases list --fields x	inert
+tea releases list --help	inert
+tea releases list --help --fields x	inert
+tea releases list --help -h	inert
+tea releases list --help x	inert
+tea releases list --limit x	inert
+tea releases list --login x	inert
+tea releases list --output x	inert
+tea releases list --page x	inert
+tea releases list --repo x	inert
+tea releases list --state x	inert
+tea releases list -L x	inert
+tea releases list -R x	inert
+tea releases list -f x	inert
+tea releases list -h	inert
+tea releases list -l x	inert
+tea releases list -o x	inert
+tea releases list -p x	inert
+tea releases list -s x	inert
+tea releases list x	inert
+tea releases view	denied
+tea releases view --comments	inert
+tea releases view --comments --help	inert
+tea releases view --comments --login x	inert
+tea releases view --comments x	inert
+tea releases view --help	inert
+tea releases view --login x	inert
+tea releases view --output x	inert
+tea releases view --repo x	inert
+tea releases view -R x	inert
+tea releases view -c	inert
+tea releases view -h	inert
+tea releases view -l x	inert
+tea releases view -o x	inert
+tea releases view x	inert
+tea releases x	denied
+tea repo	inert
+tea repo list	inert
+tea repo list --fields x	inert
+tea repo list --help	inert
+tea repo list --help --fields x	inert
+tea repo list --help -h	inert
+tea repo list --help x	inert
+tea repo list --limit x	inert
+tea repo list --login x	inert
+tea repo list --output x	inert
+tea repo list --page x	inert
+tea repo list --repo x	inert
+tea repo list --state x	inert
+tea repo list -L x	inert
+tea repo list -R x	inert
+tea repo list -f x	inert
+tea repo list -h	inert
+tea repo list -l x	inert
+tea repo list -o x	inert
+tea repo list -p x	inert
+tea repo list -s x	inert
+tea repo list x	inert
+tea repo view	denied
+tea repo view --comments	inert
+tea repo view --comments --help	inert
+tea repo view --comments --login x	inert
+tea repo view --comments x	inert
+tea repo view --help	inert
+tea repo view --login x	inert
+tea repo view --output x	inert
+tea repo view --repo x	inert
+tea repo view -R x	inert
+tea repo view -c	inert
+tea repo view -h	inert
+tea repo view -l x	inert
+tea repo view -o x	inert
+tea repo view x	inert
+tea repo x	denied
+tea repos	inert
+tea repos list	inert
+tea repos list --fields x	inert
+tea repos list --help	inert
+tea repos list --help --fields x	inert
+tea repos list --help -h	inert
+tea repos list --help x	inert
+tea repos list --limit x	inert
+tea repos list --login x	inert
+tea repos list --output x	inert
+tea repos list --page x	inert
+tea repos list --repo x	inert
+tea repos list --state x	inert
+tea repos list -L x	inert
+tea repos list -R x	inert
+tea repos list -f x	inert
+tea repos list -h	inert
+tea repos list -l x	inert
+tea repos list -o x	inert
+tea repos list -p x	inert
+tea repos list -s x	inert
+tea repos list x	inert
+tea repos view	denied
+tea repos view --comments	inert
+tea repos view --comments --help	inert
+tea repos view --comments --login x	inert
+tea repos view --comments x	inert
+tea repos view --help	inert
+tea repos view --login x	inert
+tea repos view --output x	inert
+tea repos view --repo x	inert
+tea repos view -R x	inert
+tea repos view -c	inert
+tea repos view -h	inert
+tea repos view -l x	inert
+tea repos view -o x	inert
+tea repos view x	inert
+tea repos x	denied
+tea t	inert
+tea t list	inert
+tea t list --fields x	inert
+tea t list --help	inert
+tea t list --help --fields x	inert
+tea t list --help -h	inert
+tea t list --help x	inert
+tea t list --limit x	inert
+tea t list --login x	inert
+tea t list --output x	inert
+tea t list --page x	inert
+tea t list --repo x	inert
+tea t list --state x	inert
+tea t list -L x	inert
+tea t list -R x	inert
+tea t list -f x	inert
+tea t list -h	inert
+tea t list -l x	inert
+tea t list -o x	inert
+tea t list -p x	inert
+tea t list -s x	inert
+tea t list x	inert
+tea t view	denied
+tea t view --comments	inert
+tea t view --comments --help	inert
+tea t view --comments --login x	inert
+tea t view --comments x	inert
+tea t view --help	inert
+tea t view --login x	inert
+tea t view --output x	inert
+tea t view --repo x	inert
+tea t view -R x	inert
+tea t view -c	inert
+tea t view -h	inert
+tea t view -l x	inert
+tea t view -o x	inert
+tea t view x	inert
+tea t x	denied
+tea time	inert
+tea time list	inert
+tea time list --fields x	inert
+tea time list --help	inert
+tea time list --help --fields x	inert
+tea time list --help -h	inert
+tea time list --help x	inert
+tea time list --limit x	inert
+tea time list --login x	inert
+tea time list --output x	inert
+tea time list --page x	inert
+tea time list --repo x	inert
+tea time list --state x	inert
+tea time list -L x	inert
+tea time list -R x	inert
+tea time list -f x	inert
+tea time list -h	inert
+tea time list -l x	inert
+tea time list -o x	inert
+tea time list -p x	inert
+tea time list -s x	inert
+tea time list x	inert
+tea time view	denied
+tea time view --comments	inert
+tea time view --comments --help	inert
+tea time view --comments --login x	inert
+tea time view --comments x	inert
+tea time view --help	inert
+tea time view --login x	inert
+tea time view --output x	inert
+tea time view --repo x	inert
+tea time view -R x	inert
+tea time view -c	inert
+tea time view -h	inert
+tea time view -l x	inert
+tea time view -o x	inert
+tea time view x	inert
+tea time x	denied
+tea times	inert
+tea times list	inert
+tea times list --fields x	inert
+tea times list --help	inert
+tea times list --help --fields x	inert
+tea times list --help -h	inert
+tea times list --help x	inert
+tea times list --limit x	inert
+tea times list --login x	inert
+tea times list --output x	inert
+tea times list --page x	inert
+tea times list --repo x	inert
+tea times list --state x	inert
+tea times list -L x	inert
+tea times list -R x	inert
+tea times list -f x	inert
+tea times list -h	inert
+tea times list -l x	inert
+tea times list -o x	inert
+tea times list -p x	inert
+tea times list -s x	inert
+tea times list x	inert
+tea times view	denied
+tea times view --comments	inert
+tea times view --comments --help	inert
+tea times view --comments --login x	inert
+tea times view --comments x	inert
+tea times view --help	inert
+tea times view --login x	inert
+tea times view --output x	inert
+tea times view --repo x	inert
+tea times view -R x	inert
+tea times view -c	inert
+tea times view -h	inert
+tea times view -l x	inert
+tea times view -o x	inert
+tea times view x	inert
+tea times x	denied
+tea whoami	inert
+tea whoami x	denied
+tea x	denied
+tee	safe-write
+tee --append	safe-write
+tee --append --help	safe-write
+tee --append x	safe-write
+tee --help	safe-write
+tee --ignore-interrupts	safe-write
+tee --output-error	safe-write
+tee --version	safe-write
+tee -a	safe-write
+tee -i	safe-write
+tee -p	safe-write
+tee /etc/hosts	denied
+tee x	safe-write
+terraform	denied
+terraform --generate-config-out x	denied
+terraform --help	inert
+terraform --help --generate-config-out x	denied
+terraform --help --version	denied
+terraform --help x	denied
+terraform --out x	denied
+terraform --state x	denied
+terraform --state-out x	denied
+terraform --var-file x	denied
+terraform --version	inert
+terraform -V	inert
+terraform -generate-config-out x	denied
+terraform -h	inert
+terraform -out x	denied
+terraform -state x	denied
+terraform -state-out x	denied
+terraform -var-file x	denied
+terraform apply	denied
+terraform apply --dry-run	denied
+terraform apply -auto-approve	denied
+terraform apply x	denied
+terraform console	denied
+terraform console x	denied
+terraform destroy	denied
+terraform destroy x	denied
+terraform fmt	safe-write
+terraform fmt --check	safe-write
+terraform fmt --check --diff	safe-write
+terraform fmt --check --list x	safe-write
+terraform fmt --check x	denied
+terraform fmt --diff	safe-write
+terraform fmt --help	safe-write
+terraform fmt --list x	safe-write
+terraform fmt --no-color	safe-write
+terraform fmt --recursive	safe-write
+terraform fmt --write x	safe-write
+terraform fmt -check	safe-write
+terraform fmt -check -diff	safe-write
+terraform fmt -diff	safe-write
+terraform fmt -h	safe-write
+terraform fmt -help	safe-write
+terraform fmt -list x	safe-write
+terraform fmt -no-color	safe-write
+terraform fmt -recursive	safe-write
+terraform fmt -write x	safe-write
+terraform fmt x	denied
+terraform force-unlock	denied
+terraform force-unlock x	denied
+terraform get	denied
+terraform get x	denied
+terraform graph	safe-read
+terraform graph --draw-cycles	safe-read
+terraform graph --draw-cycles --help	safe-read
+terraform graph --draw-cycles --module-depth x	safe-read
+terraform graph --draw-cycles x	safe-read
+terraform graph --help	safe-read
+terraform graph --module-depth x	safe-read
+terraform graph --no-color	safe-read
+terraform graph --plan x	safe-read
+terraform graph --type x	safe-read
+terraform graph -draw-cycles	safe-read
+terraform graph -h	safe-read
+terraform graph -help	safe-read
+terraform graph -module-depth x	safe-read
+terraform graph -no-color	safe-read
+terraform graph -plan x	safe-read
+terraform graph -type x	safe-read
+terraform graph x	safe-read
+terraform import	denied
+terraform import aws_instance.x i-123	denied
+terraform import x	denied
+terraform init	denied
+terraform init x	denied
+terraform login	denied
+terraform login x	denied
+terraform logout	denied
+terraform logout x	denied
+terraform output	safe-read
+terraform output --help	safe-read
+terraform output --help --json	safe-read
+terraform output --help --state x	safe-read
+terraform output --help x	safe-read
+terraform output --json	safe-read
+terraform output --no-color	safe-read
+terraform output --raw	safe-read
+terraform output --state x	safe-read
+terraform output -h	safe-read
+terraform output -help	safe-read
+terraform output -json	safe-read
+terraform output -no-color	safe-read
+terraform output -raw	safe-read
+terraform output -state x	safe-read
+terraform output x	safe-read
+terraform plan	safe-read
+terraform plan --compact-warnings	safe-read
+terraform plan --compact-warnings --concise	safe-read
+terraform plan --compact-warnings --generate-config-out x	safe-read
+terraform plan --compact-warnings x	safe-read
+terraform plan --concise	safe-read
+terraform plan --destroy	safe-read
+terraform plan --detailed-exitcode	safe-read
+terraform plan --generate-config-out x	safe-read
+terraform plan --help	safe-read
+terraform plan --input x	safe-read
+terraform plan --json	safe-read
+terraform plan --lock x	safe-read
+terraform plan --lock-timeout x	safe-read
+terraform plan --no-color	safe-read
+terraform plan --out x	safe-read
+terraform plan --parallelism x	safe-read
+terraform plan --refresh x	safe-read
+terraform plan --refresh-only	safe-read
+terraform plan --replace x	safe-read
+terraform plan --state x	safe-read
+terraform plan --target x	safe-read
+terraform plan --var x	safe-read
+terraform plan --var-file x	safe-read
+terraform plan -compact-warnings	safe-read
+terraform plan -concise	safe-read
+terraform plan -destroy	safe-read
+terraform plan -detailed-exitcode	safe-read
+terraform plan -generate-config-out x	safe-read
+terraform plan -h	safe-read
+terraform plan -help	safe-read
+terraform plan -input x	safe-read
+terraform plan -json	safe-read
+terraform plan -lock x	safe-read
+terraform plan -lock-timeout x	safe-read
+terraform plan -no-color	safe-read
+terraform plan -out x	safe-read
+terraform plan -out=/etc/evil	denied
+terraform plan -out=plan.tfout	safe-read
+terraform plan -parallelism x	safe-read
+terraform plan -refresh x	safe-read
+terraform plan -refresh-only	safe-read
+terraform plan -replace x	safe-read
+terraform plan -state x	safe-read
+terraform plan -target x	safe-read
+terraform plan -var x	safe-read
+terraform plan -var-file x	safe-read
+terraform plan x	safe-read
+terraform providers	denied
+terraform providers --help	denied
+terraform providers --help --no-color	denied
+terraform providers --help x	denied
+terraform providers --no-color	denied
+terraform providers -h	denied
+terraform providers -help	denied
+terraform providers -no-color	denied
+terraform providers schema	safe-read
+terraform providers schema --help	safe-read
+terraform providers schema --help --json	safe-read
+terraform providers schema --help x	safe-read
+terraform providers schema --json	safe-read
+terraform providers schema --no-color	safe-read
+terraform providers schema -h	safe-read
+terraform providers schema -help	safe-read
+terraform providers schema -json	safe-read
+terraform providers schema -no-color	safe-read
+terraform providers schema x	safe-read
+terraform providers x	denied
+terraform refresh	denied
+terraform refresh x	denied
+terraform show	safe-read
+terraform show --help	safe-read
+terraform show --help --json	safe-read
+terraform show --help x	safe-read
+terraform show --json	safe-read
+terraform show --no-color	safe-read
+terraform show -h	safe-read
+terraform show -help	safe-read
+terraform show -json	safe-read
+terraform show -no-color	safe-read
+terraform show x	safe-read
+terraform state	denied
+terraform state list	safe-read
+terraform state list --help	safe-read
+terraform state list --help --id x	safe-read
+terraform state list --help --no-color	safe-read
+terraform state list --help x	safe-read
+terraform state list --id x	safe-read
+terraform state list --no-color	safe-read
+terraform state list --state x	safe-read
+terraform state list -h	safe-read
+terraform state list -help	safe-read
+terraform state list -id x	safe-read
+terraform state list -no-color	safe-read
+terraform state list -state x	safe-read
+terraform state list x	safe-read
+terraform state mv	denied
+terraform state mv x	denied
+terraform state pull	denied
+terraform state pull x	denied
+terraform state push	denied
+terraform state push x	denied
+terraform state replace-provider	denied
+terraform state replace-provider x	denied
+terraform state rm	denied
+terraform state rm aws_instance.x	denied
+terraform state rm x	denied
+terraform state show	safe-read
+terraform state show --help	safe-read
+terraform state show --help --no-color	safe-read
+terraform state show --help --state x	safe-read
+terraform state show --help x	safe-read
+terraform state show --no-color	safe-read
+terraform state show --state x	safe-read
+terraform state show -h	safe-read
+terraform state show -help	safe-read
+terraform state show -no-color	safe-read
+terraform state show -state x	safe-read
+terraform state show x	safe-read
+terraform state x	denied
+terraform taint	denied
+terraform taint x	denied
+terraform test	denied
+terraform test x	denied
+terraform untaint	denied
+terraform untaint x	denied
+terraform validate	safe-read
+terraform validate --help	safe-read
+terraform validate --help --json	safe-read
+terraform validate --help x	safe-read
+terraform validate --json	safe-read
+terraform validate --no-color	safe-read
+terraform validate -h	safe-read
+terraform validate -help	safe-read
+terraform validate -json	safe-read
+terraform validate -no-color	safe-read
+terraform validate x	safe-read
+terraform version	inert
+terraform version --help	inert
+terraform version --help --json	inert
+terraform version --help x	inert
+terraform version --json	inert
+terraform version -h	inert
+terraform version -help	inert
+terraform version -json	inert
+terraform version x	inert
+terraform workspace	denied
+terraform workspace delete	denied
+terraform workspace delete x	denied
+terraform workspace list	safe-read
+terraform workspace list --help	safe-read
+terraform workspace list --help --no-color	safe-read
+terraform workspace list --help x	safe-read
+terraform workspace list --no-color	safe-read
+terraform workspace list -h	safe-read
+terraform workspace list -help	safe-read
+terraform workspace list -no-color	safe-read
+terraform workspace list x	safe-read
+terraform workspace new	denied
+terraform workspace new prod	denied
+terraform workspace new x	denied
+terraform workspace select	denied
+terraform workspace select x	denied
+terraform workspace show	safe-read
+terraform workspace show --help	safe-read
+terraform workspace show --help --no-color	safe-read
+terraform workspace show --help x	safe-read
+terraform workspace show --no-color	safe-read
+terraform workspace show -h	safe-read
+terraform workspace show -help	safe-read
+terraform workspace show -no-color	safe-read
+terraform workspace show x	safe-read
+terraform workspace x	denied
+terraform x	denied
+terraform-docs	safe-read
+terraform-docs --anchor	safe-read
+terraform-docs --anchor --config x	safe-read
+terraform-docs --anchor --default	safe-read
+terraform-docs --anchor x	safe-read
+terraform-docs --config x	safe-read
+terraform-docs --default	safe-read
+terraform-docs --escape	safe-read
+terraform-docs --footer-from	safe-read
+terraform-docs --footer-from x	safe-read
+terraform-docs --header-from	safe-read
+terraform-docs --header-from x	safe-read
+terraform-docs --help	safe-read
+terraform-docs --hide	safe-read
+terraform-docs --hide-all	safe-read
+terraform-docs --html	safe-read
+terraform-docs --indent	safe-read
+terraform-docs --lockfile	safe-read
+terraform-docs --lockfile x	safe-read
+terraform-docs --mode x	safe-read
+terraform-docs --no-anchor	safe-read
+terraform-docs --no-color	safe-read
+terraform-docs --no-default	safe-read
+terraform-docs --no-escape	safe-read
+terraform-docs --no-footer-from	safe-read
+terraform-docs --no-header-from	safe-read
+terraform-docs --no-html	safe-read
+terraform-docs --no-required	safe-read
+terraform-docs --no-sensitive	safe-read
+terraform-docs --no-type	safe-read
+terraform-docs --output	safe-write
+terraform-docs --output x	safe-write
+terraform-docs --output-file	safe-write
+terraform-docs --output-file x	safe-write
+terraform-docs --output-mode x	safe-read
+terraform-docs --output-template x	safe-read
+terraform-docs --output-values x	safe-read
+terraform-docs --output-values-from x	safe-read
+terraform-docs --read-comments	safe-read
+terraform-docs --recursive	safe-read
+terraform-docs --recursive-path x	safe-read
+terraform-docs --required	safe-read
+terraform-docs --sensitive	safe-read
+terraform-docs --show	safe-read
+terraform-docs --show-all	safe-read
+terraform-docs --sort	safe-read
+terraform-docs --sort-by	safe-read
+terraform-docs --sort-by x	safe-read
+terraform-docs --type	safe-read
+terraform-docs --version	safe-read
+terraform-docs -O x	safe-read
+terraform-docs -c	safe-read
+terraform-docs -c x	safe-read
+terraform-docs -h	safe-read
+terraform-docs -l x	safe-read
+terraform-docs x	safe-read
+terragrunt	denied
+terragrunt --help	inert
+terragrunt --help --out x	denied
+terragrunt --help --version	denied
+terragrunt --help x	denied
+terragrunt --out x	denied
+terragrunt --version	inert
+terragrunt -h	inert
+terragrunt apply	denied
+terragrunt apply x	denied
+terragrunt aws-providers-to-tags	denied
+terragrunt aws-providers-to-tags x	denied
+terragrunt catalog	denied
+terragrunt catalog x	denied
+terragrunt console	denied
+terragrunt console x	denied
+terragrunt destroy	denied
+terragrunt destroy x	denied
+terragrunt force-unlock	denied
+terragrunt force-unlock x	denied
+terragrunt graph	denied
+terragrunt graph x	denied
+terragrunt graph-dependencies	safe-read
+terragrunt graph-dependencies --help	safe-read
+terragrunt graph-dependencies --help -h	safe-read
+terragrunt graph-dependencies --help x	safe-read
+terragrunt graph-dependencies -h	safe-read
+terragrunt graph-dependencies x	safe-read
+terragrunt hclfmt	denied
+terragrunt hclfmt x	denied
+terragrunt help	inert
+terragrunt help x	inert
+terragrunt import	denied
+terragrunt import x	denied
+terragrunt init	denied
+terragrunt init x	denied
+terragrunt output	denied
+terragrunt output x	denied
+terragrunt plan	denied
+terragrunt plan x	denied
+terragrunt render-json	safe-read
+terragrunt render-json --help	safe-read
+terragrunt render-json --help --out	safe-write
+terragrunt render-json --help --out x	safe-write
+terragrunt render-json --help x	safe-read
+terragrunt render-json --out	safe-write
+terragrunt render-json --out x	safe-write
+terragrunt render-json --with-metadata	safe-read
+terragrunt render-json -h	safe-read
+terragrunt render-json x	safe-read
+terragrunt run	denied
+terragrunt run x	denied
+terragrunt run-all	denied
+terragrunt run-all x	denied
+terragrunt scaffold	denied
+terragrunt scaffold x	denied
+terragrunt show	denied
+terragrunt show x	denied
+terragrunt state	denied
+terragrunt state x	denied
+terragrunt terragrunt-info	safe-read
+terragrunt terragrunt-info --help	safe-read
+terragrunt terragrunt-info --help -h	safe-read
+terragrunt terragrunt-info --help x	safe-read
+terragrunt terragrunt-info -h	safe-read
+terragrunt terragrunt-info x	safe-read
+terragrunt validate	denied
+terragrunt validate x	denied
+terragrunt validate-inputs	safe-read
+terragrunt validate-inputs --help	safe-read
+terragrunt validate-inputs --help --strict	safe-read
+terragrunt validate-inputs --help x	safe-read
+terragrunt validate-inputs --strict	safe-read
+terragrunt validate-inputs -h	safe-read
+terragrunt validate-inputs x	safe-read
+terragrunt version	inert
+terragrunt version --help	inert
+terragrunt version --help -h	inert
+terragrunt version --help x	inert
+terragrunt version -h	inert
+terragrunt version x	inert
+terragrunt x	denied
+test	inert
+test --help	inert
+test --version	inert
+test -f file.txt	inert
+test x	inert
+textutil	denied
+textutil --help	denied
+textutil --version	denied
+textutil -cat	safe-write
+textutil -cat -convert	safe-write
+textutil -cat -encoding x	safe-write
+textutil -cat x	safe-write
+textutil -convert	safe-write
+textutil -convert html ./.git/config	denied
+textutil -convert html ./doc.txt	safe-write
+textutil -convert html /etc/x.txt	denied
+textutil -convert html a.txt -output /etc/x.html	denied
+textutil -convert html ~/.ssh/x.txt	denied
+textutil -encoding x	safe-write
+textutil -extension x	safe-write
+textutil -fontname x	safe-write
+textutil -fontsize x	safe-write
+textutil -format x	safe-write
+textutil -help	safe-write
+textutil -info	safe-write
+textutil -info ./.git/config	safe-write
+textutil -info ./doc.txt	safe-write
+textutil -inputencoding x	safe-write
+textutil -noload	safe-write
+textutil -output x	safe-write
+textutil -outputdir x	safe-write
+textutil -stdin	safe-write
+textutil -stdout	safe-write
+textutil -strip	safe-write
+textutil x	safe-write
+tflint	safe-read
+tflint --act-as-bundled-plugin x	safe-read
+tflint --call-module-type	safe-read
+tflint --call-module-type --act-as-bundled-plugin x	safe-read
+tflint --call-module-type --chdir	safe-read
+tflint --call-module-type x	safe-read
+tflint --chdir	safe-read
+tflint --color	safe-read
+tflint --config	safe-read
+tflint --config x	safe-read
+tflint --disable-plugins	safe-read
+tflint --disable-rule	safe-read
+tflint --enable-plugin	safe-read
+tflint --enable-rule	safe-read
+tflint --filter	safe-read
+tflint --filter x	safe-read
+tflint --fix	safe-write
+tflint --force	safe-read
+tflint --format	safe-read
+tflint --format x	safe-read
+tflint --help	safe-read
+tflint --ignore-module	safe-read
+tflint --ignore-module x	safe-read
+tflint --init	safe-read
+tflint --minimum-failure-severity	safe-read
+tflint --module	safe-read
+tflint --module x	safe-read
+tflint --no-color	safe-read
+tflint --no-module	safe-read
+tflint --only	safe-read
+tflint --quiet	safe-read
+tflint --recursive	safe-read
+tflint --var x	safe-read
+tflint --var-file	safe-read
+tflint --var-file x	safe-read
+tflint --version	safe-read
+tflint -c	safe-read
+tflint -f	safe-read
+tflint -h	safe-read
+tflint -q	safe-read
+tflint -v	safe-read
+tflint -v x	safe-read
+tflint x	safe-read
+tfsec	safe-read
+tfsec --allow-checks-to-panic	safe-read
+tfsec --allow-checks-to-panic --color	safe-read
+tfsec --allow-checks-to-panic --config-file x	safe-read
+tfsec --allow-checks-to-panic x	safe-read
+tfsec --color	safe-read
+tfsec --concise-output	safe-read
+tfsec --config-file	safe-read
+tfsec --config-file x	safe-read
+tfsec --custom-check-dir	safe-read
+tfsec --custom-check-dir x	safe-read
+tfsec --custom-check-url	safe-read
+tfsec --custom-check-url x	safe-read
+tfsec --debug	safe-read
+tfsec --exclude-downloaded-modules	safe-read
+tfsec --exclude-paths	safe-read
+tfsec --exclude-paths x	safe-read
+tfsec --filter-results	safe-read
+tfsec --force-all-dirs	safe-read
+tfsec --format	safe-read
+tfsec --format x	safe-read
+tfsec --gif	safe-read
+tfsec --help	safe-read
+tfsec --ignore-warnings	safe-read
+tfsec --include-ignored	safe-read
+tfsec --include-passed	safe-read
+tfsec --minimum-severity	safe-read
+tfsec --minimum-severity x	safe-read
+tfsec --no-code	safe-read
+tfsec --no-color	safe-read
+tfsec --no-colour	safe-read
+tfsec --no-ignores	safe-read
+tfsec --no-module-downloads	safe-read
+tfsec --out	safe-write
+tfsec --out x	safe-write
+tfsec --rego-policy-dir	safe-read
+tfsec --rego-policy-dir x	safe-read
+tfsec --run-statistics	safe-read
+tfsec --single-thread	safe-read
+tfsec --soft-fail	safe-read
+tfsec --tfvars-file	safe-read
+tfsec --tfvars-file x	safe-read
+tfsec --update	safe-read
+tfsec --var-file	safe-read
+tfsec --var-file x	safe-read
+tfsec --verbose	safe-read
+tfsec --version	safe-read
+tfsec --workspace	safe-read
+tfsec --workspace x	safe-read
+tfsec -h	safe-read
+tfsec x	safe-read
+thor	denied
+thor --help	inert
+thor --help --version	denied
+thor --help x	denied
+thor --version	inert
+thor -h	inert
+thor -v	inert
+thor help	inert
+thor help x	inert
+thor install	denied
+thor install x	denied
+thor installed	inert
+thor installed --help	inert
+thor installed --help -h	inert
+thor installed --help x	inert
+thor installed -h	inert
+thor installed x	inert
+thor list	denied
+thor list x	denied
+thor uninstall	denied
+thor uninstall x	denied
+thor update	denied
+thor update x	denied
+thor version	inert
+thor version --help	inert
+thor version --help -h	inert
+thor version --help x	inert
+thor version -h	inert
+thor version x	inert
+thor x	denied
+thumbnail	denied
+thumbnail --help	denied
+thumbnail --version	denied
+thumbnail -?	safe-write
+thumbnail -? -N x	safe-write
+thumbnail -? x	safe-write
+thumbnail -N x	safe-write
+thumbnail -c x	safe-write
+thumbnail -f x	safe-write
+thumbnail -h x	safe-write
+thumbnail -s x	safe-write
+thumbnail -w x	safe-write
+thumbnail x	safe-write
+tidy	safe-write
+tidy --help	safe-write
+tidy --help --version	safe-write
+tidy --help -access x	safe-write
+tidy --help x	safe-write
+tidy --version	safe-write
+tidy -access x	safe-write
+tidy -ashtml	safe-write
+tidy -asxhtml	safe-write
+tidy -asxml	safe-write
+tidy -clean	safe-write
+tidy -config	safe-write
+tidy -encoding x	safe-write
+tidy -errors x	safe-write
+tidy -file x	safe-write
+tidy -h	safe-write
+tidy -help	safe-write
+tidy -help-config	safe-write
+tidy -help-option	safe-write
+tidy -i	safe-write
+tidy -indent	safe-write
+tidy -language	safe-write
+tidy -m	safe-write
+tidy -modify	safe-write
+tidy -n	safe-write
+tidy -numeric	safe-write
+tidy -o x	safe-write
+tidy -omit	safe-write
+tidy -output x	safe-write
+tidy -q	safe-write
+tidy -quiet	safe-write
+tidy -show-body-only	safe-write
+tidy -show-config	safe-write
+tidy -show-errors x	safe-write
+tidy -upper	safe-write
+tidy -utf8	safe-write
+tidy -v	safe-write
+tidy -version	safe-write
+tidy -w	safe-write
+tidy -wrap x	safe-write
+tidy -xml	safe-write
+tidy x	safe-write
+tiff2bw	denied
+tiff2bw --help	denied
+tiff2bw --version	denied
+tiff2bw -?	safe-write
+tiff2bw -? -B x	safe-write
+tiff2bw -? -h	safe-write
+tiff2bw -? x	safe-write
+tiff2bw -B x	safe-write
+tiff2bw -G x	safe-write
+tiff2bw -R x	safe-write
+tiff2bw -c x	safe-write
+tiff2bw -h	safe-write
+tiff2bw -r x	safe-write
+tiff2bw x	safe-write
+tiff2icns	denied
+tiff2icns --help	denied
+tiff2icns --version	denied
+tiff2icns -?	safe-write
+tiff2icns -? -h	safe-write
+tiff2icns -? x	safe-write
+tiff2icns -h	safe-write
+tiff2icns -noLarge	safe-write
+tiff2icns x	safe-write
+tiff2pdf	denied
+tiff2pdf --help	denied
+tiff2pdf --version	denied
+tiff2pdf -?	safe-write
+tiff2pdf -? -A x	safe-write
+tiff2pdf -? -P	safe-write
+tiff2pdf -? x	safe-write
+tiff2pdf -A x	safe-write
+tiff2pdf -F x	safe-write
+tiff2pdf -L x	safe-write
+tiff2pdf -M x	safe-write
+tiff2pdf -P	safe-write
+tiff2pdf -S x	safe-write
+tiff2pdf -T x	safe-write
+tiff2pdf -U x	safe-write
+tiff2pdf -a x	safe-write
+tiff2pdf -b x	safe-write
+tiff2pdf -c x	safe-write
+tiff2pdf -d	safe-write
+tiff2pdf -e x	safe-write
+tiff2pdf -f x	safe-write
+tiff2pdf -h	safe-write
+tiff2pdf -i	safe-write
+tiff2pdf -j x	safe-write
+tiff2pdf -k x	safe-write
+tiff2pdf -l x	safe-write
+tiff2pdf -m x	safe-write
+tiff2pdf -n	safe-write
+tiff2pdf -o x	safe-write
+tiff2pdf -p x	safe-write
+tiff2pdf -q	safe-write
+tiff2pdf -r x	safe-write
+tiff2pdf -s x	safe-write
+tiff2pdf -t x	safe-write
+tiff2pdf -u x	safe-write
+tiff2pdf -w x	safe-write
+tiff2pdf -x x	safe-write
+tiff2pdf -y x	safe-write
+tiff2pdf -z x	safe-write
+tiff2pdf x	safe-write
+tiff2ps	denied
+tiff2ps --help	denied
+tiff2ps --version	denied
+tiff2ps -1	safe-write
+tiff2ps -1 -2	safe-write
+tiff2ps -1 -H x	safe-write
+tiff2ps -1 x	safe-write
+tiff2ps -2	safe-write
+tiff2ps -3	safe-write
+tiff2ps -?	safe-write
+tiff2ps -A	safe-write
+tiff2ps -D	safe-write
+tiff2ps -E	safe-write
+tiff2ps -H x	safe-write
+tiff2ps -L x	safe-write
+tiff2ps -M x	safe-write
+tiff2ps -O x	safe-write
+tiff2ps -P x	safe-write
+tiff2ps -S x	safe-write
+tiff2ps -T	safe-write
+tiff2ps -U	safe-write
+tiff2ps -W x	safe-write
+tiff2ps -a	safe-write
+tiff2ps -b x	safe-write
+tiff2ps -c	safe-write
+tiff2ps -d	safe-write
+tiff2ps -e	safe-write
+tiff2ps -f x	safe-write
+tiff2ps -h x	safe-write
+tiff2ps -i	safe-write
+tiff2ps -m	safe-write
+tiff2ps -o x	safe-write
+tiff2ps -p	safe-write
+tiff2ps -r	safe-write
+tiff2ps -s	safe-write
+tiff2ps -t x	safe-write
+tiff2ps -u	safe-write
+tiff2ps -v	safe-write
+tiff2ps -w x	safe-write
+tiff2ps -x x	safe-write
+tiff2ps -y x	safe-write
+tiff2ps -z	safe-write
+tiff2ps x	safe-write
+tiff2rgba	denied
+tiff2rgba --help	denied
+tiff2rgba --version	denied
+tiff2rgba -?	safe-write
+tiff2rgba -? -b x	safe-write
+tiff2rgba -? -h	safe-write
+tiff2rgba -? x	safe-write
+tiff2rgba -b x	safe-write
+tiff2rgba -c x	safe-write
+tiff2rgba -h	safe-write
+tiff2rgba -n	safe-write
+tiff2rgba -r x	safe-write
+tiff2rgba x	safe-write
+tiffcmp	denied
+tiffcmp --help	denied
+tiffcmp --version	denied
+tiffcmp -?	inert
+tiffcmp -? -h	inert
+tiffcmp -? -t x	inert
+tiffcmp -? x	inert
+tiffcmp -h	inert
+tiffcmp -l	inert
+tiffcmp -t x	inert
+tiffcmp -z	inert
+tiffcmp x	inert
+tiffcp	denied
+tiffcp --help	denied
+tiffcp --version	denied
+tiffcp -8	safe-write
+tiffcp -8 -?	safe-write
+tiffcp -8 -B x	safe-write
+tiffcp -8 x	safe-write
+tiffcp -?	safe-write
+tiffcp -B x	safe-write
+tiffcp -S	safe-write
+tiffcp -a	safe-write
+tiffcp -b x	safe-write
+tiffcp -c x	safe-write
+tiffcp -f x	safe-write
+tiffcp -h	safe-write
+tiffcp -i	safe-write
+tiffcp -l x	safe-write
+tiffcp -o x	safe-write
+tiffcp -p x	safe-write
+tiffcp -r x	safe-write
+tiffcp -s	safe-write
+tiffcp -t	safe-write
+tiffcp -w x	safe-write
+tiffcp -x x	safe-write
+tiffcp -z x	safe-write
+tiffcp x	safe-write
+tiffcrop	denied
+tiffcrop --help	denied
+tiffcrop --version	denied
+tiffcrop -?	safe-write
+tiffcrop -? -A x	safe-write
+tiffcrop -? -D	safe-write
+tiffcrop -? x	safe-write
+tiffcrop -A x	safe-write
+tiffcrop -B x	safe-write
+tiffcrop -C x	safe-write
+tiffcrop -D	safe-write
+tiffcrop -E	safe-write
+tiffcrop -F	safe-write
+tiffcrop -H	safe-write
+tiffcrop -I	safe-write
+tiffcrop -J x	safe-write
+tiffcrop -K x	safe-write
+tiffcrop -L x	safe-write
+tiffcrop -M x	safe-write
+tiffcrop -N	safe-write
+tiffcrop -O	safe-write
+tiffcrop -P x	safe-write
+tiffcrop -R	safe-write
+tiffcrop -S	safe-write
+tiffcrop -U	safe-write
+tiffcrop -X x	safe-write
+tiffcrop -Y x	safe-write
+tiffcrop -Z	safe-write
+tiffcrop -a x	safe-write
+tiffcrop -b x	safe-write
+tiffcrop -c x	safe-write
+tiffcrop -f x	safe-write
+tiffcrop -h	safe-write
+tiffcrop -l x	safe-write
+tiffcrop -m x	safe-write
+tiffcrop -p x	safe-write
+tiffcrop x	safe-write
+tiffdither	denied
+tiffdither --help	denied
+tiffdither --version	denied
+tiffdither -?	safe-write
+tiffdither -? -c x	safe-write
+tiffdither -? -h	safe-write
+tiffdither -? x	safe-write
+tiffdither -c x	safe-write
+tiffdither -f x	safe-write
+tiffdither -h	safe-write
+tiffdither -r x	safe-write
+tiffdither -t x	safe-write
+tiffdither x	safe-write
+tiffdump	denied
+tiffdump --help	denied
+tiffdump --version	denied
+tiffdump -?	inert
+tiffdump -? -h	inert
+tiffdump -? -m x	inert
+tiffdump -? x	inert
+tiffdump -h	inert
+tiffdump -m x	inert
+tiffdump -o x	inert
+tiffdump -v	inert
+tiffdump x	inert
+tiffinfo	denied
+tiffinfo --help	denied
+tiffinfo --version	denied
+tiffinfo -?	inert
+tiffinfo -? -D	inert
+tiffinfo -? -f x	inert
+tiffinfo -? x	inert
+tiffinfo -D	inert
+tiffinfo -c	inert
+tiffinfo -d	inert
+tiffinfo -f x	inert
+tiffinfo -h	inert
+tiffinfo -i	inert
+tiffinfo -j	inert
+tiffinfo -o x	inert
+tiffinfo -r	inert
+tiffinfo -s	inert
+tiffinfo -w	inert
+tiffinfo -z	inert
+tiffinfo x	inert
+tiffmedian	denied
+tiffmedian --help	denied
+tiffmedian --version	denied
+tiffmedian -?	safe-write
+tiffmedian -? -C x	safe-write
+tiffmedian -? -d	safe-write
+tiffmedian -? x	safe-write
+tiffmedian -C x	safe-write
+tiffmedian -c x	safe-write
+tiffmedian -d	safe-write
+tiffmedian -f	safe-write
+tiffmedian -h	safe-write
+tiffmedian -r x	safe-write
+tiffmedian x	safe-write
+tiffset	denied
+tiffset --help	denied
+tiffset --version	denied
+tiffset -?	safe-write
+tiffset -? -S	safe-write
+tiffset -? -d x	safe-write
+tiffset -? x	safe-write
+tiffset -S	safe-write
+tiffset -d x	safe-write
+tiffset -h	safe-write
+tiffset -s x	safe-write
+tiffset -sf x	safe-write
+tiffset -u x	safe-write
+tiffset x	safe-write
+tiffsplit	denied
+tiffsplit --help	denied
+tiffsplit --version	denied
+tiffsplit -?	safe-write
+tiffsplit -? -h	safe-write
+tiffsplit -? x	safe-write
+tiffsplit -h	safe-write
+tiffsplit x	safe-write
+tiffutil	denied
+tiffutil --help	denied
+tiffutil --version	denied
+tiffutil -?	safe-write
+tiffutil -? -cat	safe-write
+tiffutil -? -out x	safe-write
+tiffutil -? x	safe-write
+tiffutil -cat	safe-write
+tiffutil -cathidpi	safe-write
+tiffutil -cathidpicheck	safe-write
+tiffutil -extract	safe-write
+tiffutil -extractAll	safe-write
+tiffutil -extractScale	safe-write
+tiffutil -extractScaleFactor	safe-write
+tiffutil -h	safe-write
+tiffutil -keepCompression	safe-write
+tiffutil -noEmbeddedThumbs	safe-write
+tiffutil -noStripThumbs	safe-write
+tiffutil -out x	safe-write
+tiffutil -print	safe-write
+tiffutil -show	safe-write
+tiffutil -stripThumbs	safe-write
+tiffutil -summary	safe-write
+tiffutil -verbose	safe-write
+tiffutil -version	safe-write
+tiffutil x	safe-write
+tificc	denied
+tificc --help	safe-write
+tificc --help -V	safe-write
+tificc --help -c x	safe-write
+tificc --help x	safe-write
+tificc --version	denied
+tificc -V	safe-write
+tificc -b	safe-write
+tificc -c x	safe-write
+tificc -d	safe-write
+tificc -e	safe-write
+tificc -h	safe-write
+tificc -i x	safe-write
+tificc -k	safe-write
+tificc -l	safe-write
+tificc -n	safe-write
+tificc -o x	safe-write
+tificc -p	safe-write
+tificc -s	safe-write
+tificc -t x	safe-write
+tificc -v	safe-write
+tificc -w x	safe-write
+tificc -x	safe-write
+tificc x	safe-write
+tig	inert
+tig --all	inert
+tig --all --date-order	inert
+tig --all -n x	inert
+tig --all x	inert
+tig --date-order	inert
+tig --help	inert
+tig --reverse	inert
+tig --version	inert
+tig -C	inert
+tig -h	inert
+tig -n x	inert
+tig -v	inert
+tig x	inert
+tiged	denied
+tiged --cache	safe-write
+tiged --cache --force	safe-write
+tiged --cache --mode x	safe-write
+tiged --cache x	safe-write
+tiged --force	safe-write
+tiged --help	safe-write
+tiged --mode	safe-write
+tiged --mode x	safe-write
+tiged --verbose	safe-write
+tiged --version	safe-write
+tiged -D	safe-write
+tiged -c	safe-write
+tiged -f	safe-write
+tiged -h	safe-write
+tiged -m x	safe-write
+tiged -v	safe-write
+tiged x	safe-write
+tilt	inert
+tilt -	inert
+tilt --context x	denied
+tilt --evil	denied
+tilt --field-selector x	denied
+tilt --help	inert
+tilt --help --context x	denied
+tilt --help --list	inert
+tilt --help x	denied
+tilt --kubeconfig x	denied
+tilt --layout /etc/evil.erb page.erb	denied
+tilt --layout layout.erb page.erb	inert
+tilt --layout x	inert
+tilt --list	inert
+tilt --namespace x	denied
+tilt --output x	denied
+tilt --selector x	denied
+tilt --type erb template.erb	inert
+tilt --type x	inert
+tilt --type=erb template.erb	inert
+tilt --version	inert
+tilt -V	inert
+tilt -X	denied
+tilt -h	inert
+tilt -l	inert
+tilt -l x	denied
+tilt -n x	denied
+tilt -o x	denied
+tilt -t erb template.erb	inert
+tilt -t x	inert
+tilt -v	inert
+tilt -y layout.erb page.erb	inert
+tilt -y x	inert
+tilt ../outside/page.erb	denied
+tilt ./ok.erb /etc/evil.erb	denied
+tilt /etc/page.erb	denied
+tilt /tmp/page.md	denied
+tilt a.erb b.erb	denied
+tilt apply -f manifest	denied
+tilt ci	denied
+tilt completion	inert
+tilt completion --help	inert
+tilt completion --help -h	inert
+tilt completion --help x	inert
+tilt completion -h	inert
+tilt completion bash	inert
+tilt completion x	inert
+tilt delete resource	denied
+tilt describe	safe-read
+tilt describe --context x	safe-read
+tilt describe --field-selector x	safe-read
+tilt describe --help	safe-read
+tilt describe --help --context x	safe-read
+tilt describe --help --no-headers	safe-read
+tilt describe --help x	safe-read
+tilt describe --kubeconfig x	safe-read
+tilt describe --namespace x	safe-read
+tilt describe --no-headers	safe-read
+tilt describe --output x	safe-read
+tilt describe --selector x	safe-read
+tilt describe --show-labels	safe-read
+tilt describe --watch	safe-read
+tilt describe -A	safe-read
+tilt describe -h	safe-read
+tilt describe -l x	safe-read
+tilt describe -n x	safe-read
+tilt describe -o x	safe-read
+tilt describe -w	safe-read
+tilt describe pod my-pod	safe-read
+tilt describe pod my-pod -n prod	safe-read
+tilt describe x	safe-read
+tilt doctor	inert
+tilt doctor --evil	denied
+tilt doctor --help	inert
+tilt doctor --help -h	inert
+tilt doctor --help x	denied
+tilt doctor -h	inert
+tilt doctor x	denied
+tilt down	denied
+tilt dump engine	denied
+tilt foo	denied
+tilt get	safe-read
+tilt get --context x	safe-read
+tilt get --field-selector x	safe-read
+tilt get --help	safe-read
+tilt get --help --context x	safe-read
+tilt get --help --no-headers	safe-read
+tilt get --help x	safe-read
+tilt get --kubeconfig x	safe-read
+tilt get --namespace x	safe-read
+tilt get --no-headers	safe-read
+tilt get --output x	safe-read
+tilt get --selector x	safe-read
+tilt get --show-labels	safe-read
+tilt get --watch	safe-read
+tilt get -A	safe-read
+tilt get -h	safe-read
+tilt get -l x	safe-read
+tilt get -n x	safe-read
+tilt get -o x	safe-read
+tilt get -w	safe-read
+tilt get pod	safe-read
+tilt get pod --kubeconfig ./kube.yaml	safe-read
+tilt get pod --namespace=default	safe-read
+tilt get pod -A	safe-read
+tilt get pod -n default	safe-read
+tilt get pod my-pod	safe-read
+tilt get x	safe-read
+tilt help	inert
+tilt help --help	inert
+tilt help --help -h	inert
+tilt help --help x	inert
+tilt help -h	inert
+tilt help up	inert
+tilt help x	inert
+tilt logs	denied
+tilt page.erb -t erb	inert
+tilt template	denied
+tilt template.erb	inert
+tilt trigger build	denied
+tilt up	denied
+tilt verify-install	inert
+tilt verify-install --help	inert
+tilt verify-install --help -h	inert
+tilt verify-install --help x	denied
+tilt verify-install -h	inert
+tilt verify-install x	denied
+tilt version	inert
+tilt version --help	inert
+tilt version --help -h	inert
+tilt version --help x	denied
+tilt version -h	inert
+tilt version foo	denied
+tilt version x	denied
+tilt views/index.haml	inert
+tilt x	denied
+tilt ~	denied
+tilt ~/page.erb	denied
+time	denied
+time --help	denied
+time --version	denied
+time -p	denied
+time -p x	denied
+time bash -c 'ls && rm -rf /'	denied
+time bundle exec rspec	safe-read
+time bundle exec rspec | tail -5	safe-read
+time git log --oneline -5	inert
+time git push	denied
+time rm file	safe-write
+time x	denied
+timeout	denied
+timeout --help	denied
+timeout --kill-after x	denied
+timeout --preserve-status	denied
+timeout --preserve-status --kill-after x	denied
+timeout --preserve-status 120 git status	inert
+timeout --preserve-status x	denied
+timeout --signal x	denied
+timeout --version	denied
+timeout --xyzzy 60 cat /tmp/x	denied
+timeout -k x	denied
+timeout -s KILL 60 bundle exec rspec	safe-read
+timeout -s x	denied
+timeout 120 bash -c 'git log | head -5'	inert
+timeout 120 bash -c 'ls && rm -rf /'	denied
+timeout 120 bash -c 'ls; rm -rf /'	denied
+timeout 120 bundle exec rspec	safe-read
+timeout 120 bundle exec rspec && git status	safe-read
+timeout 120 cargo test	safe-read
+timeout 120 env nice bash -c 'ls && rm -rf /'	denied
+timeout 120 git push origin main	denied
+timeout 30 git log --oneline	inert
+timeout 5 ls -la	inert
+timeout 5 rm -rf / --version	denied
+timeout 60 rm -rf /	denied
+timeout 60 rm -rf / --version	denied
+timeout x	denied
+timerfires	denied
+timerfires --help	denied
+timerfires --version	denied
+timerfires -a	inert
+timerfires -a -g	inert
+timerfires -a -n x	inert
+timerfires -a x	inert
+timerfires -g	inert
+timerfires -n x	inert
+timerfires -p x	inert
+timerfires -s	inert
+timerfires -t x	inert
+timerfires -v	inert
+timerfires x	inert
+tkn	denied
+tkn --help	inert
+tkn --help --version	denied
+tkn --help x	denied
+tkn --version	inert
+tkn -h	inert
+tkn -v	inert
+tkn bundle	denied
+tkn bundle x	denied
+tkn chains	denied
+tkn chains x	denied
+tkn clustertask	denied
+tkn clustertask x	denied
+tkn clustertriggerbinding	denied
+tkn clustertriggerbinding x	denied
+tkn completion	denied
+tkn completion --help	inert
+tkn completion --help -h	inert
+tkn completion --help x	inert
+tkn completion -h	inert
+tkn completion x	inert
+tkn ct	denied
+tkn ct x	denied
+tkn customrun	denied
+tkn customrun x	denied
+tkn eventlistener	denied
+tkn eventlistener x	denied
+tkn help	inert
+tkn help x	inert
+tkn hub	denied
+tkn hub x	denied
+tkn options	denied
+tkn options x	denied
+tkn pipeline	inert
+tkn pipeline create	denied
+tkn pipeline create x	denied
+tkn pipeline delete	denied
+tkn pipeline delete x	denied
+tkn pipeline describe	inert
+tkn pipeline describe --help	inert
+tkn pipeline describe --help --last	inert
+tkn pipeline describe --help --namespace x	inert
+tkn pipeline describe --help x	inert
+tkn pipeline describe --last	inert
+tkn pipeline describe --namespace x	inert
+tkn pipeline describe --output x	inert
+tkn pipeline describe -L	inert
+tkn pipeline describe -h	inert
+tkn pipeline describe -n x	inert
+tkn pipeline describe -o x	inert
+tkn pipeline describe x	inert
+tkn pipeline export	denied
+tkn pipeline export x	denied
+tkn pipeline list	inert
+tkn pipeline list --all-namespaces	inert
+tkn pipeline list --all-namespaces --help	inert
+tkn pipeline list --all-namespaces --namespace x	inert
+tkn pipeline list --all-namespaces x	inert
+tkn pipeline list --help	inert
+tkn pipeline list --namespace x	inert
+tkn pipeline list --no-headers	inert
+tkn pipeline list --output x	inert
+tkn pipeline list -A	inert
+tkn pipeline list -h	inert
+tkn pipeline list -n x	inert
+tkn pipeline list -o x	inert
+tkn pipeline list x	inert
+tkn pipeline logs	inert
+tkn pipeline logs --all	inert
+tkn pipeline logs --all --follow	inert
+tkn pipeline logs --all --limit x	inert
+tkn pipeline logs --all x	inert
+tkn pipeline logs --follow	inert
+tkn pipeline logs --help	inert
+tkn pipeline logs --last	inert
+tkn pipeline logs --limit x	inert
+tkn pipeline logs --namespace x	inert
+tkn pipeline logs --prefix	inert
+tkn pipeline logs --step	inert
+tkn pipeline logs --task	inert
+tkn pipeline logs --timestamps	inert
+tkn pipeline logs -a	inert
+tkn pipeline logs -f	inert
+tkn pipeline logs -h	inert
+tkn pipeline logs -n x	inert
+tkn pipeline logs x	inert
+tkn pipeline start	denied
+tkn pipeline start x	denied
+tkn pipeline x	denied
+tkn pipelineresource	denied
+tkn pipelineresource x	denied
+tkn pipelinerun	denied
+tkn pipelinerun x	denied
+tkn pr	denied
+tkn pr x	denied
+tkn task	denied
+tkn task x	denied
+tkn taskrun	denied
+tkn taskrun x	denied
+tkn tr	denied
+tkn tr x	denied
+tkn triggerbinding	denied
+tkn triggerbinding x	denied
+tkn triggertemplate	denied
+tkn triggertemplate x	denied
+tkn version	inert
+tkn version --client	inert
+tkn version --client --component	inert
+tkn version --client x	inert
+tkn version --component	inert
+tkn version --help	inert
+tkn version -h	inert
+tkn version x	inert
+tkn x	denied
+tldr	denied
+tldr --help	inert
+tldr --help --language x	inert
+tldr --help --list	inert
+tldr --help x	inert
+tldr --language x	inert
+tldr --list	inert
+tldr --platform x	inert
+tldr --version	inert
+tldr -L x	inert
+tldr -h	inert
+tldr -l	inert
+tldr -p x	inert
+tldr -v	inert
+tldr x	inert
+tmutil	denied
+tmutil --help	inert
+tmutil --version	denied
+tmutil calculatedrift	safe-read
+tmutil calculatedrift --help	safe-read
+tmutil calculatedrift --help -h	safe-read
+tmutil calculatedrift --help x	safe-read
+tmutil calculatedrift -h	safe-read
+tmutil calculatedrift x	safe-read
+tmutil delete -d /Volumes/Backup -t 2026-01-01-000000	denied
+tmutil deletelocalsnapshots /	denied
+tmutil destinationinfo	safe-read
+tmutil destinationinfo --help	safe-read
+tmutil destinationinfo --help -X	safe-read
+tmutil destinationinfo --help x	safe-read
+tmutil destinationinfo -X	safe-read
+tmutil destinationinfo -h	safe-read
+tmutil destinationinfo x	safe-read
+tmutil isexcluded	safe-read
+tmutil isexcluded --help	safe-read
+tmutil isexcluded --help -X	safe-read
+tmutil isexcluded --help x	safe-read
+tmutil isexcluded -X	safe-read
+tmutil isexcluded -h	safe-read
+tmutil isexcluded -p	safe-read
+tmutil isexcluded -v	safe-read
+tmutil isexcluded x	safe-read
+tmutil latestbackup	safe-read
+tmutil latestbackup --help	safe-read
+tmutil latestbackup --help -d x	safe-read
+tmutil latestbackup --help -h	safe-read
+tmutil latestbackup --help x	safe-read
+tmutil latestbackup -d x	safe-read
+tmutil latestbackup -h	safe-read
+tmutil latestbackup -m	safe-read
+tmutil latestbackup -t	safe-read
+tmutil latestbackup x	safe-read
+tmutil listbackups	safe-read
+tmutil listbackups --help	safe-read
+tmutil listbackups --help -d x	safe-read
+tmutil listbackups --help -h	safe-read
+tmutil listbackups --help x	safe-read
+tmutil listbackups -d x	safe-read
+tmutil listbackups -h	safe-read
+tmutil listbackups -m	safe-read
+tmutil listbackups -t	safe-read
+tmutil listbackups x	safe-read
+tmutil listlocalsnapshotdates	safe-read
+tmutil listlocalsnapshotdates --help	safe-read
+tmutil listlocalsnapshotdates --help -h	safe-read
+tmutil listlocalsnapshotdates --help x	safe-read
+tmutil listlocalsnapshotdates -h	safe-read
+tmutil listlocalsnapshotdates x	safe-read
+tmutil listlocalsnapshots	safe-read
+tmutil listlocalsnapshots --help	safe-read
+tmutil listlocalsnapshots --help -h	safe-read
+tmutil listlocalsnapshots --help x	safe-read
+tmutil listlocalsnapshots -h	safe-read
+tmutil listlocalsnapshots /	safe-read
+tmutil listlocalsnapshots x	safe-read
+tmutil machinedirectory	safe-read
+tmutil machinedirectory --help	safe-read
+tmutil machinedirectory --help -h	safe-read
+tmutil machinedirectory --help x	safe-read
+tmutil machinedirectory -h	safe-read
+tmutil machinedirectory x	safe-read
+tmutil restore /backup/file /file	denied
+tmutil startbackup	denied
+tmutil x	denied
+tmux	denied
+tmux --help	inert
+tmux --version	inert
+tmux -L test ls	inert
+tmux -S /tmp/sock ls	inert
+tmux a	safe-write
+tmux attach	safe-write
+tmux attach-session	safe-write
+tmux confirm-before 'ls'	inert
+tmux confirm-before 'rm -rf /'	denied
+tmux detach-client	safe-write
+tmux display	inert
+tmux display-message	inert
+tmux has	inert
+tmux has-session	inert
+tmux if-shell 'true' 'ls'	inert
+tmux if-shell 'true' 'rm -rf /'	denied
+tmux if-shell -F '#{cond}' 'rm -rf /'	denied
+tmux if-shell -F '#{pane_in_mode}' 'ls'	inert
+tmux info	inert
+tmux kill-pane	safe-write
+tmux kill-server	safe-write
+tmux kill-session	safe-write
+tmux kill-window	safe-write
+tmux list-buffers	inert
+tmux list-clients	inert
+tmux list-commands	inert
+tmux list-keys	inert
+tmux list-panes	inert
+tmux list-sessions	inert
+tmux list-windows	inert
+tmux load-buffer foo	denied
+tmux ls	inert
+tmux lsp	inert
+tmux lsw	inert
+tmux new	safe-write
+tmux new-session	safe-write
+tmux new-window	safe-write
+tmux pipe-pane 'cat'	inert
+tmux pipe-pane 'rm -rf /'	denied
+tmux pipe-pane -o /tmp/log 'cat'	inert
+tmux pipe-pane -o /tmp/log 'rm -rf /'	denied
+tmux rename-session	safe-write
+tmux rename-window	safe-write
+tmux resize-pane	safe-write
+tmux resize-window	safe-write
+tmux respawn-pane	safe-write
+tmux respawn-window	safe-write
+tmux run 'ls -la'	inert
+tmux run-shell	denied
+tmux run-shell 'git status'	inert
+tmux run-shell 'rm -rf /'	denied
+tmux run-shell -b 'git status'	inert
+tmux run-shell -d 5 'ls'	inert
+tmux select-pane	safe-write
+tmux select-window	safe-write
+tmux send	safe-write
+tmux send-keys	safe-write
+tmux set-environment	safe-write
+tmux set-option	safe-write
+tmux show	inert
+tmux show-environment	inert
+tmux show-options	inert
+tmux showenv	inert
+tmux source-file ~/.tmux.conf	denied
+tmux split-window	safe-write
+tmux start-server	inert
+tmux swap-pane	safe-write
+tmux swap-window	safe-write
+tmux switch-client	safe-write
+tmux x	denied
+tns	denied
+tns --help	inert
+tns --help --version	denied
+tns --help x	denied
+tns --version	inert
+tns -h	inert
+tns build	denied
+tns build x	denied
+tns clean	denied
+tns clean x	denied
+tns config	denied
+tns config x	denied
+tns create	denied
+tns create x	denied
+tns debug	denied
+tns debug x	denied
+tns deploy	denied
+tns deploy x	denied
+tns device	denied
+tns device x	denied
+tns doctor	safe-read
+tns doctor --help	safe-read
+tns doctor --help -h	safe-read
+tns doctor --help x	safe-read
+tns doctor -h	safe-read
+tns doctor x	safe-read
+tns extension	denied
+tns extension x	denied
+tns help	inert
+tns help x	inert
+tns info	safe-read
+tns info --help	safe-read
+tns info --help -h	safe-read
+tns info --help x	safe-read
+tns info -h	safe-read
+tns info x	safe-read
+tns migrate	denied
+tns migrate x	denied
+tns package-manager	denied
+tns package-manager x	denied
+tns prepare	denied
+tns prepare x	denied
+tns proxy	denied
+tns proxy x	denied
+tns run	denied
+tns run x	denied
+tns setup	denied
+tns setup x	denied
+tns test	denied
+tns test x	denied
+tns update	denied
+tns update x	denied
+tns usage-reports	denied
+tns usage-reports x	denied
+tns x	denied
+todoist	denied
+todoist --help	inert
+todoist --help --version	denied
+todoist --help x	denied
+todoist --version	inert
+todoist -h	inert
+todoist auth	inert
+todoist auth status	inert
+todoist auth status x	inert
+todoist auth x	denied
+todoist inbox	inert
+todoist inbox x	inert
+todoist project	inert
+todoist project list	inert
+todoist project list x	inert
+todoist project x	denied
+todoist skill	inert
+todoist skill list	inert
+todoist skill list x	inert
+todoist skill x	denied
+todoist task	inert
+todoist task list	inert
+todoist task list x	inert
+todoist task view	inert
+todoist task view x	inert
+todoist task x	denied
+todoist today	inert
+todoist today x	inert
+todoist x	denied
+tofu	denied
+tofu --help	inert
+tofu --help --version	denied
+tofu --help x	denied
+tofu --version	inert
+tofu -V	inert
+tofu -h	inert
+tofu -help	inert
+tofu -version	inert
+tofu apply	denied
+tofu apply --auto-approve	denied
+tofu console	denied
+tofu destroy	denied
+tofu destroy --auto-approve	denied
+tofu fmt	safe-write
+tofu fmt --check	safe-write
+tofu fmt --check --diff	safe-write
+tofu fmt --check --recursive	safe-write
+tofu fmt --check x	safe-write
+tofu fmt --diff	safe-write
+tofu fmt --help	safe-write
+tofu fmt --no-color	safe-write
+tofu fmt --recursive	safe-write
+tofu fmt -check	safe-write
+tofu fmt -diff	safe-write
+tofu fmt -h	safe-write
+tofu fmt -help	safe-write
+tofu fmt -no-color	safe-write
+tofu fmt -recursive	safe-write
+tofu fmt x	safe-write
+tofu force-unlock LOCKID	denied
+tofu get	safe-write
+tofu get --help	safe-write
+tofu get --help --no-color	safe-write
+tofu get --help x	safe-write
+tofu get --no-color	safe-write
+tofu get --update	safe-write
+tofu get -h	safe-write
+tofu get -help	safe-write
+tofu get -no-color	safe-write
+tofu get -update	safe-write
+tofu get x	safe-write
+tofu graph	inert
+tofu graph --draw-cycles	inert
+tofu graph --draw-cycles --help	inert
+tofu graph --draw-cycles --plan x	inert
+tofu graph --draw-cycles x	inert
+tofu graph --help	inert
+tofu graph --plan x	inert
+tofu graph --type x	inert
+tofu graph --type=plan	inert
+tofu graph --var x	inert
+tofu graph --var-file x	inert
+tofu graph -draw-cycles	inert
+tofu graph -h	inert
+tofu graph -help	inert
+tofu graph -plan x	inert
+tofu graph -type x	inert
+tofu graph -type=apply	inert
+tofu graph -var x	inert
+tofu graph -var-file x	inert
+tofu graph x	inert
+tofu import aws_instance.foo i-12345	denied
+tofu init	safe-write
+tofu init --backend	safe-write
+tofu init --backend --backend x	safe-write
+tofu init --backend --get	safe-write
+tofu init --backend x	safe-write
+tofu init --backend-config x	safe-write
+tofu init --backend-config=bucket=mybucket	safe-write
+tofu init --force-copy	denied
+tofu init --from-module x	safe-write
+tofu init --get	safe-write
+tofu init --get x	safe-write
+tofu init --help	safe-write
+tofu init --input	safe-write
+tofu init --input x	safe-write
+tofu init --json	safe-write
+tofu init --lock	safe-write
+tofu init --lock x	safe-write
+tofu init --lock-timeout x	safe-write
+tofu init --lockfile x	safe-write
+tofu init --migrate-state	denied
+tofu init --no-color	safe-write
+tofu init --plugin-dir x	safe-write
+tofu init --reconfigure	safe-write
+tofu init --target x	safe-write
+tofu init --test-directory x	safe-write
+tofu init --upgrade	safe-write
+tofu init --var x	safe-write
+tofu init --var-file x	safe-write
+tofu init -backend	safe-write
+tofu init -backend x	safe-write
+tofu init -backend-config x	safe-write
+tofu init -from-module x	safe-write
+tofu init -get	safe-write
+tofu init -get x	safe-write
+tofu init -h	safe-write
+tofu init -help	safe-write
+tofu init -input	safe-write
+tofu init -input x	safe-write
+tofu init -input=false	safe-write
+tofu init -input=false -lock=false -upgrade	safe-write
+tofu init -json	safe-write
+tofu init -lock	safe-write
+tofu init -lock x	safe-write
+tofu init -lock-timeout x	safe-write
+tofu init -lock=false	safe-write
+tofu init -lockfile x	safe-write
+tofu init -lockfile=readonly	safe-write
+tofu init -no-color	safe-write
+tofu init -plugin-dir x	safe-write
+tofu init -reconfigure	safe-write
+tofu init -target x	safe-write
+tofu init -test-directory x	safe-write
+tofu init -upgrade	safe-write
+tofu init -var x	safe-write
+tofu init -var-file x	safe-write
+tofu init x	safe-write
+tofu login	denied
+tofu login x	denied
+tofu logout	safe-write
+tofu logout --help	safe-write
+tofu logout --help -h	safe-write
+tofu logout --help x	safe-write
+tofu logout -h	safe-write
+tofu logout -help	safe-write
+tofu logout app.terraform.io	safe-write
+tofu logout x	safe-write
+tofu output	inert
+tofu output --help	inert
+tofu output --help --json	inert
+tofu output --help --state x	inert
+tofu output --help x	inert
+tofu output --json	inert
+tofu output --no-color	inert
+tofu output --raw	inert
+tofu output --raw myvar	inert
+tofu output --show-sensitive	inert
+tofu output --state x	inert
+tofu output --var x	inert
+tofu output --var-file x	inert
+tofu output -h	inert
+tofu output -help	inert
+tofu output -json	inert
+tofu output -no-color	inert
+tofu output -raw	inert
+tofu output -show-sensitive	inert
+tofu output -state x	inert
+tofu output -var x	inert
+tofu output -var-file x	inert
+tofu output myvar	inert
+tofu output x	inert
+tofu plan	denied
+tofu plan x	denied
+tofu providers	inert
+tofu providers --help	inert
+tofu providers --help --var x	inert
+tofu providers --help -h	inert
+tofu providers --help x	denied
+tofu providers --var x	inert
+tofu providers --var-file x	inert
+tofu providers -h	inert
+tofu providers -help	inert
+tofu providers -var x	inert
+tofu providers -var-file x	inert
+tofu providers lock	safe-write
+tofu providers lock --fs-mirror x	safe-write
+tofu providers lock --help	safe-write
+tofu providers lock --help --fs-mirror x	safe-write
+tofu providers lock --help --no-color	safe-write
+tofu providers lock --help x	safe-write
+tofu providers lock --net-mirror x	safe-write
+tofu providers lock --no-color	safe-write
+tofu providers lock --platform x	safe-write
+tofu providers lock --platform=linux_amd64	safe-write
+tofu providers lock --var x	safe-write
+tofu providers lock --var-file x	safe-write
+tofu providers lock -fs-mirror x	safe-write
+tofu providers lock -h	safe-write
+tofu providers lock -help	safe-write
+tofu providers lock -net-mirror x	safe-write
+tofu providers lock -no-color	safe-write
+tofu providers lock -platform x	safe-write
+tofu providers lock -var x	safe-write
+tofu providers lock -var-file x	safe-write
+tofu providers lock x	safe-write
+tofu providers mirror	safe-write
+tofu providers mirror --help	safe-write
+tofu providers mirror --help --lock-file x	safe-write
+tofu providers mirror --help -h	safe-write
+tofu providers mirror --help x	safe-write
+tofu providers mirror --lock-file x	safe-write
+tofu providers mirror --platform x	safe-write
+tofu providers mirror --var x	safe-write
+tofu providers mirror --var-file x	safe-write
+tofu providers mirror -h	safe-write
+tofu providers mirror -help	safe-write
+tofu providers mirror -lock-file x	safe-write
+tofu providers mirror -platform x	safe-write
+tofu providers mirror -var x	safe-write
+tofu providers mirror -var-file x	safe-write
+tofu providers mirror /tmp/mirror	safe-write
+tofu providers mirror x	safe-write
+tofu providers schema	inert
+tofu providers schema --help	inert
+tofu providers schema --help --json	inert
+tofu providers schema --help --var x	inert
+tofu providers schema --help x	inert
+tofu providers schema --json	inert
+tofu providers schema --no-color	inert
+tofu providers schema --var x	inert
+tofu providers schema --var-file x	inert
+tofu providers schema -h	inert
+tofu providers schema -help	inert
+tofu providers schema -json	inert
+tofu providers schema -no-color	inert
+tofu providers schema -var x	inert
+tofu providers schema -var-file x	inert
+tofu providers schema x	inert
+tofu providers x	denied
+tofu refresh	denied
+tofu refresh x	denied
+tofu show	inert
+tofu show --config	inert
+tofu show --config --help	inert
+tofu show --config --module x	inert
+tofu show --config x	inert
+tofu show --evil-flag	denied
+tofu show --help	inert
+tofu show --json	inert
+tofu show --module x	inert
+tofu show --no-color	inert
+tofu show --plan x	inert
+tofu show --show-sensitive	inert
+tofu show --state	inert
+tofu show --var x	inert
+tofu show --var-file x	inert
+tofu show -config	inert
+tofu show -h	inert
+tofu show -help	inert
+tofu show -json	inert
+tofu show -module x	inert
+tofu show -no-color	inert
+tofu show -plan x	inert
+tofu show -show-sensitive	inert
+tofu show -state	inert
+tofu show -var x	inert
+tofu show -var-file x	inert
+tofu show x	inert
+tofu state	denied
+tofu state list	inert
+tofu state list --help	inert
+tofu state list --help --id x	inert
+tofu state list --help -h	inert
+tofu state list --help x	inert
+tofu state list --id x	inert
+tofu state list --state x	inert
+tofu state list --var x	inert
+tofu state list --var-file x	inert
+tofu state list -h	inert
+tofu state list -help	inert
+tofu state list -id x	inert
+tofu state list -state x	inert
+tofu state list -var x	inert
+tofu state list -var-file x	inert
+tofu state list x	inert
+tofu state mv aws_instance.foo aws_instance.bar	denied
+tofu state push terraform.tfstate	denied
+tofu state replace-provider hashicorp/aws opentofu/aws	denied
+tofu state rm aws_instance.foo	denied
+tofu state show	denied
+tofu state show --help	inert
+tofu state show --help --state x	inert
+tofu state show --help -h	inert
+tofu state show --help x	inert
+tofu state show --state x	inert
+tofu state show --var x	inert
+tofu state show --var-file x	inert
+tofu state show -h	inert
+tofu state show -help	inert
+tofu state show -state x	inert
+tofu state show -var x	inert
+tofu state show -var-file x	inert
+tofu state show aws_instance.foo	inert
+tofu state show x	inert
+tofu state x	denied
+tofu taint aws_instance.foo	denied
+tofu test	denied
+tofu unknown-subcommand	denied
+tofu untaint aws_instance.foo	denied
+tofu validate	inert
+tofu validate --help	inert
+tofu validate --help --json	inert
+tofu validate --help --var x	inert
+tofu validate --help x	inert
+tofu validate --json	inert
+tofu validate --no-color	inert
+tofu validate --var foo=bar	inert
+tofu validate --var x	inert
+tofu validate --var-file x	inert
+tofu validate -h	inert
+tofu validate -help	inert
+tofu validate -json	inert
+tofu validate -no-color	inert
+tofu validate -var x	inert
+tofu validate -var-file x	inert
+tofu validate x	inert
+tofu version	inert
+tofu version --help	inert
+tofu version --help --json	inert
+tofu version --help x	inert
+tofu version --json	inert
+tofu version -h	inert
+tofu version -help	inert
+tofu version -json	inert
+tofu version x	inert
+tofu x	denied
+tokei	inert
+tokei --columns x	inert
+tokei --compact	inert
+tokei --compact --columns x	inert
+tokei --compact --files	inert
+tokei --compact x	inert
+tokei --exclude x	inert
+tokei --files	inert
+tokei --help	inert
+tokei --hidden	inert
+tokei --input x	inert
+tokei --languages x	inert
+tokei --no-ignore	inert
+tokei --no-ignore-dot	inert
+tokei --no-ignore-parent	inert
+tokei --no-ignore-vcs	inert
+tokei --num-format x	inert
+tokei --output x	inert
+tokei --sort x	inert
+tokei --type x	inert
+tokei --verbose	inert
+tokei --version	inert
+tokei -C	inert
+tokei -V	inert
+tokei -c x	inert
+tokei -e x	inert
+tokei -f	inert
+tokei -h	inert
+tokei -i x	inert
+tokei -l x	inert
+tokei -o x	inert
+tokei -s x	inert
+tokei -t x	inert
+tokei x	inert
+tomlq	denied
+tomlq --arg x	inert
+tomlq --argjson x	inert
+tomlq --compact-output	inert
+tomlq --compact-output --arg x	inert
+tomlq --compact-output --exit-status	inert
+tomlq --compact-output x	inert
+tomlq --exit-status	inert
+tomlq --help	inert
+tomlq --indent x	inert
+tomlq --null-input	inert
+tomlq --raw-input	inert
+tomlq --raw-output	inert
+tomlq --slurp	inert
+tomlq --sort-keys	inert
+tomlq --tab	inert
+tomlq --toml-output	inert
+tomlq --version	inert
+tomlq -C	inert
+tomlq -M	inert
+tomlq -R	inert
+tomlq -S	inert
+tomlq -V	inert
+tomlq -c	inert
+tomlq -e	inert
+tomlq -f x	inert
+tomlq -h	inert
+tomlq -n	inert
+tomlq -r	inert
+tomlq -s	inert
+tomlq -t	inert
+tomlq x	inert
+toolbox	denied
+toolbox --help	inert
+toolbox --help --log-level x	inert
+toolbox --help --log-podman	inert
+toolbox --help x	denied
+toolbox --log-level x	denied
+toolbox --log-podman	denied
+toolbox --verbose	denied
+toolbox --version	denied
+toolbox -h	inert
+toolbox -v	denied
+toolbox create	denied
+toolbox create x	denied
+toolbox enter	denied
+toolbox enter x	denied
+toolbox help	inert
+toolbox help x	inert
+toolbox init-container	denied
+toolbox init-container x	denied
+toolbox list	inert
+toolbox list --containers	inert
+toolbox list --containers --help	inert
+toolbox list --containers x	inert
+toolbox list --help	inert
+toolbox list --images	inert
+toolbox list -c	inert
+toolbox list -h	inert
+toolbox list -i	inert
+toolbox list x	inert
+toolbox ls	inert
+toolbox ls --containers	inert
+toolbox ls --containers --help	inert
+toolbox ls --containers x	inert
+toolbox ls --help	inert
+toolbox ls --images	inert
+toolbox ls -c	inert
+toolbox ls -h	inert
+toolbox ls -i	inert
+toolbox ls x	inert
+toolbox rm	denied
+toolbox rm x	denied
+toolbox rmi	denied
+toolbox rmi x	denied
+toolbox run	denied
+toolbox run x	denied
+toolbox x	denied
+toolbx	denied
+toolbx --help	inert
+toolbx --help --log-level x	inert
+toolbx --help --log-podman	inert
+toolbx --help x	denied
+toolbx --log-level x	denied
+toolbx --log-podman	denied
+toolbx --verbose	denied
+toolbx --version	denied
+toolbx -h	inert
+toolbx -v	denied
+toolbx create	denied
+toolbx create x	denied
+toolbx enter	denied
+toolbx enter x	denied
+toolbx help	inert
+toolbx help x	inert
+toolbx init-container	denied
+toolbx init-container x	denied
+toolbx list	inert
+toolbx list --containers	inert
+toolbx list --containers --help	inert
+toolbx list --containers x	inert
+toolbx list --help	inert
+toolbx list --images	inert
+toolbx list -c	inert
+toolbx list -h	inert
+toolbx list -i	inert
+toolbx list x	inert
+toolbx ls	inert
+toolbx ls --containers	inert
+toolbx ls --containers --help	inert
+toolbx ls --containers x	inert
+toolbx ls --help	inert
+toolbx ls --images	inert
+toolbx ls -c	inert
+toolbx ls -h	inert
+toolbx ls -i	inert
+toolbx ls x	inert
+toolbx rm	denied
+toolbx rm x	denied
+toolbx rmi	denied
+toolbx rmi x	denied
+toolbx run	denied
+toolbx run x	denied
+toolbx x	denied
+top	inert
+top --help	inert
+top --help --version	inert
+top --help -F x	inert
+top --help x	inert
+top --version	inert
+top -1	inert
+top -B	inert
+top -E	inert
+top -F x	inert
+top -H	inert
+top -O x	inert
+top -S	inert
+top -U x	inert
+top -V	inert
+top -b	inert
+top -c	inert
+top -d x	inert
+top -e	inert
+top -f x	inert
+top -h	inert
+top -i	inert
+top -l 1 -n 10	inert
+top -l x	inert
+top -n x	inert
+top -o x	inert
+top -p x	inert
+top -s x	inert
+top -u x	inert
+top -w x	inert
+top x	inert
+touch	denied
+touch --date x	denied
+touch --help	inert
+touch --help --date x	inert
+touch --help --no-create	inert
+touch --help x	safe-write
+touch --no-create	denied
+touch --no-dereference	denied
+touch --reference x	denied
+touch --time x	denied
+touch --version	inert
+touch -A	denied
+touch -a	denied
+touch -c	denied
+touch -d x	denied
+touch -h	denied
+touch -m	denied
+touch -r x	denied
+touch -t x	denied
+touch file.txt	safe-write
+touch x	safe-write
+tox	denied
+tox --help	inert
+tox --help --version	denied
+tox --help x	denied
+tox --version	inert
+tox -h	inert
+tox config	inert
+tox config --core	inert
+tox config --core --help	inert
+tox config --core x	inert
+tox config --help	inert
+tox config -h	inert
+tox config x	inert
+tox list	inert
+tox list --help	inert
+tox list --help --no-desc	inert
+tox list --help x	inert
+tox list --no-desc	inert
+tox list -d	inert
+tox list -h	inert
+tox list x	inert
+tox run	safe-read
+tox run --help	safe-read
+tox run --help --no-recreate-pkg	safe-read
+tox run --help --override x	safe-read
+tox run --help x	safe-read
+tox run --no-recreate-pkg	safe-read
+tox run --override x	safe-read
+tox run --result-json x	safe-read
+tox run --skip-missing-interpreters	safe-read
+tox run -e x	safe-read
+tox run -f x	safe-read
+tox run -h	safe-read
+tox run x	safe-read
+tox x	denied
+tpmtool	denied
+tpmtool -!	inert
+tpmtool -! --debug x	inert
+tpmtool -! --help	inert
+tpmtool -! x	inert
+tpmtool --debug x	inert
+tpmtool --generate-rsa --outfile key	denied
+tpmtool --help	inert
+tpmtool --infile x	inert
+tpmtool --list	inert
+tpmtool --more-help	inert
+tpmtool --outfile x	inert
+tpmtool --pubkey x	inert
+tpmtool --srk-well-known	inert
+tpmtool --test-sign x	inert
+tpmtool --verbose	inert
+tpmtool --version	inert
+tpmtool --version x	inert
+tpmtool -V	inert
+tpmtool -d x	inert
+tpmtool -h	inert
+tpmtool -v x	inert
+tpmtool x	inert
+tput	denied
+tput --help	denied
+tput --version	denied
+tput -S	inert
+tput -S -T x	inert
+tput -S -V	inert
+tput -S x	inert
+tput -T x	inert
+tput -V	inert
+tput x	inert
+tr	denied
+tr --complement	inert
+tr --complement --delete	inert
+tr --complement x	inert
+tr --delete	inert
+tr --help	inert
+tr --squeeze-repeats	inert
+tr --truncate-set1	inert
+tr --version	inert
+tr -C	inert
+tr -V	inert
+tr -c	inert
+tr -d	inert
+tr -h	inert
+tr -s	inert
+tr x	inert
+trace	denied
+trace --help	inert
+trace --output x	denied
+trace --version	denied
+trace -o x	denied
+trace amend	denied
+trace amend --add x	safe-write
+trace amend --experimental	safe-write
+trace amend --experimental --add x	safe-write
+trace amend --experimental --help	safe-write
+trace amend --experimental x	safe-write
+trace amend --help	safe-write
+trace amend --unsafe	safe-write
+trace amend -h	safe-write
+trace amend x	safe-write
+trace plans	inert
+trace plans --help	inert
+trace plans --help -h	inert
+trace plans --help x	inert
+trace plans -h	inert
+trace plans x	inert
+trace providers	inert
+trace providers --help	inert
+trace providers --help -h	inert
+trace providers --help x	inert
+trace providers -h	inert
+trace providers x	inert
+trace record	denied
+trace record --add x	safe-write
+trace record --compress	safe-write
+trace record --compress --add x	safe-write
+trace record --compress --experimental	safe-write
+trace record --compress x	safe-write
+trace record --end-after-duration x	safe-write
+trace record --end-after-kdebug-events-size x	safe-write
+trace record --end-on-kdebug-event x	safe-write
+trace record --end-on-notification x	safe-write
+trace record --experimental	safe-write
+trace record --help	safe-write
+trace record --notify-after-end x	safe-write
+trace record --notify-after-start x	safe-write
+trace record --omit x	safe-write
+trace record --overwrite	safe-write
+trace record --plan x	safe-write
+trace record --unsafe	safe-write
+trace record -h	safe-write
+trace record x	safe-write
+trace trim	denied
+trace trim --end-time x	safe-write
+trace trim --help	safe-write
+trace trim --help --end-time x	safe-write
+trace trim --help -h	safe-write
+trace trim --help x	safe-write
+trace trim --output x	safe-write
+trace trim --start-time x	safe-write
+trace trim -h	safe-write
+trace trim -o x	safe-write
+trace trim ./in.atrc --output ./out.atrc	safe-write
+trace trim ./in.atrc --output ~/.ssh/authorized_keys	denied
+trace trim ./in.atrc --start-time 0 --end-time 5 --output ./out.atrc	safe-write
+trace trim ./in.atrc -o ./out.atrc	safe-write
+trace trim ./in.atrc -o /etc/hosts	denied
+trace trim x	safe-write
+trace x	denied
+traceroute	denied
+traceroute --help	inert
+traceroute --help --port x	inert
+traceroute --help --version	inert
+traceroute --help x	inert
+traceroute --port x	inert
+traceroute --queries x	inert
+traceroute --sendwait x	inert
+traceroute --version	inert
+traceroute --wait x	inert
+traceroute -4	inert
+traceroute -6	inert
+traceroute -F	inert
+traceroute -I	inert
+traceroute -N x	inert
+traceroute -T	inert
+traceroute -U	inert
+traceroute -V	inert
+traceroute -d	inert
+traceroute -e	inert
+traceroute -f x	inert
+traceroute -h	inert
+traceroute -i x	inert
+traceroute -m x	inert
+traceroute -n	inert
+traceroute -p x	inert
+traceroute -q x	inert
+traceroute -r	inert
+traceroute -s x	inert
+traceroute -t x	inert
+traceroute -v	inert
+traceroute -w x	inert
+traceroute -z x	inert
+traceroute x	inert
+traceroute6	denied
+traceroute6 --help	inert
+traceroute6 --help --port x	inert
+traceroute6 --help --version	inert
+traceroute6 --help x	inert
+traceroute6 --port x	inert
+traceroute6 --queries x	inert
+traceroute6 --sendwait x	inert
+traceroute6 --version	inert
+traceroute6 --wait x	inert
+traceroute6 -4	inert
+traceroute6 -6	inert
+traceroute6 -F	inert
+traceroute6 -I	inert
+traceroute6 -N x	inert
+traceroute6 -T	inert
+traceroute6 -U	inert
+traceroute6 -V	inert
+traceroute6 -d	inert
+traceroute6 -e	inert
+traceroute6 -f x	inert
+traceroute6 -h	inert
+traceroute6 -i x	inert
+traceroute6 -m x	inert
+traceroute6 -n	inert
+traceroute6 -p x	inert
+traceroute6 -q x	inert
+traceroute6 -r	inert
+traceroute6 -s x	inert
+traceroute6 -t x	inert
+traceroute6 -v	inert
+traceroute6 -w x	inert
+traceroute6 -z x	inert
+traceroute6 x	inert
+traefik	denied
+traefik --help	inert
+traefik --help --version	denied
+traefik --help x	denied
+traefik --version	inert
+traefik -h	inert
+traefik -v	inert
+traefik healthcheck	safe-read
+traefik healthcheck --api.dashboard x	safe-read
+traefik healthcheck --api.entryPoint x	safe-read
+traefik healthcheck --api.insecure x	safe-read
+traefik healthcheck --help	safe-read
+traefik healthcheck --help --api.dashboard x	safe-read
+traefik healthcheck --help -h	safe-read
+traefik healthcheck --help x	safe-read
+traefik healthcheck --ping.entryPoint x	safe-read
+traefik healthcheck -h	safe-read
+traefik healthcheck x	safe-read
+traefik help	inert
+traefik help x	inert
+traefik version	inert
+traefik version --help	inert
+traefik version --help -h	inert
+traefik version --help x	inert
+traefik version -h	inert
+traefik version x	inert
+traefik x	denied
+transicc	denied
+transicc --help	safe-read
+transicc --help -V	safe-read
+transicc --help -i x	safe-read
+transicc --help x	safe-read
+transicc --version	denied
+transicc -V	safe-read
+transicc -c	safe-read
+transicc -h	safe-read
+transicc -i x	safe-read
+transicc -l x	safe-read
+transicc -n	safe-read
+transicc -o x	safe-read
+transicc -p x	safe-read
+transicc -t x	safe-read
+transicc -v	safe-read
+transicc -w	safe-read
+transicc -x	safe-read
+transicc x	safe-read
+tree	inert
+tree --charset x	inert
+tree --dirsfirst	inert
+tree --dirsfirst --charset x	inert
+tree --dirsfirst --du	inert
+tree --dirsfirst x	inert
+tree --du	inert
+tree --filelimit x	inert
+tree --filesfrom x	inert
+tree --fromfile	inert
+tree --gitignore	inert
+tree --help	inert
+tree --inodes	inert
+tree --matchdirs	inert
+tree --noreport	inert
+tree --prune	inert
+tree --si	inert
+tree --sort x	inert
+tree --timefmt x	inert
+tree --version	inert
+tree -A	inert
+tree -C	inert
+tree -D	inert
+tree -F	inert
+tree -H x	inert
+tree -I x	inert
+tree -J	inert
+tree -L x	inert
+tree -N	inert
+tree -P x	inert
+tree -Q	inert
+tree -S	inert
+tree -T x	inert
+tree -V	inert
+tree -X	inert
+tree -a	inert
+tree -d	inert
+tree -f	inert
+tree -g	inert
+tree -h	inert
+tree -i	inert
+tree -l	inert
+tree -n	inert
+tree -p	inert
+tree -q	inert
+tree -r	inert
+tree -s	inert
+tree -t	inert
+tree -u	inert
+tree -v	inert
+tree -x	inert
+tree x	inert
+trello	denied
+trello --help	inert
+trello --help --version	denied
+trello --help x	denied
+trello --version	inert
+trello -h	inert
+trello board	inert
+trello board list	inert
+trello board list x	inert
+trello board x	denied
+trello card	inert
+trello card list	inert
+trello card list x	inert
+trello card x	denied
+trello list	inert
+trello list list	inert
+trello list list x	inert
+trello list x	denied
+trello x	denied
+trivy	denied
+trivy --help	inert
+trivy --help --output x	denied
+trivy --help --version	denied
+trivy --help x	denied
+trivy --output x	denied
+trivy --version	inert
+trivy -h	inert
+trivy -o x	denied
+trivy config	denied
+trivy config --exit-code x	safe-read
+trivy config --format x	safe-read
+trivy config --help	safe-read
+trivy config --help --exit-code x	safe-read
+trivy config --help --json	safe-read
+trivy config --help x	safe-read
+trivy config --ignorefile x	safe-read
+trivy config --json	safe-read
+trivy config --output x	safe-read
+trivy config --output ~/.ssh/authorized_keys ./terraform	denied
+trivy config --quiet	safe-read
+trivy config --severity x	safe-read
+trivy config --skip-dirs x	safe-read
+trivy config --skip-files x	safe-read
+trivy config --template x	safe-read
+trivy config -f x	safe-read
+trivy config -h	safe-read
+trivy config -o x	safe-read
+trivy config -q	safe-read
+trivy config -s x	safe-read
+trivy config ./terraform	safe-read
+trivy config x	safe-read
+trivy fs	denied
+trivy fs --cache-dir x	safe-read
+trivy fs --config x	safe-read
+trivy fs --exit-code x	safe-read
+trivy fs --format json .	safe-read
+trivy fs --format x	safe-read
+trivy fs --help	safe-read
+trivy fs --help --cache-dir x	safe-read
+trivy fs --help --ignore-unfixed	safe-read
+trivy fs --help x	safe-read
+trivy fs --ignore-unfixed	safe-read
+trivy fs --ignorefile x	safe-read
+trivy fs --json	safe-read
+trivy fs --output ./trivy-report.json .	safe-read
+trivy fs --output x	safe-read
+trivy fs --output ~/.ssh/authorized_keys .	denied
+trivy fs --quiet	safe-read
+trivy fs --scanners x	safe-read
+trivy fs --severity	safe-read
+trivy fs --severity x	safe-read
+trivy fs --skip-dirs x	safe-read
+trivy fs --skip-files x	safe-read
+trivy fs --template x	safe-read
+trivy fs --timeout x	safe-read
+trivy fs -f x	safe-read
+trivy fs -h	safe-read
+trivy fs -o ./report.json .	safe-read
+trivy fs -o /etc/hosts .	denied
+trivy fs -o x	safe-read
+trivy fs -q	safe-read
+trivy fs -s x	safe-read
+trivy fs .	safe-read
+trivy fs x	safe-read
+trivy image	denied
+trivy image --cache-dir x	safe-read
+trivy image --config x	safe-read
+trivy image --exit-code x	safe-read
+trivy image --format x	safe-read
+trivy image --help	safe-read
+trivy image --help --cache-dir x	safe-read
+trivy image --help --ignore-unfixed	safe-read
+trivy image --help x	safe-read
+trivy image --ignore-unfixed	safe-read
+trivy image --ignorefile x	safe-read
+trivy image --json	safe-read
+trivy image --output x	safe-read
+trivy image --quiet	safe-read
+trivy image --scanners x	safe-read
+trivy image --severity x	safe-read
+trivy image --skip-dirs x	safe-read
+trivy image --skip-files x	safe-read
+trivy image --template x	safe-read
+trivy image --timeout x	safe-read
+trivy image -f x	safe-read
+trivy image -h	safe-read
+trivy image -o x	safe-read
+trivy image -o ~/.ssh/authorized_keys alpine:3.20	denied
+trivy image -q	safe-read
+trivy image -s x	safe-read
+trivy image alpine:3.20	safe-read
+trivy image x	safe-read
+trivy sbom	denied
+trivy sbom --artifact-type x	safe-read
+trivy sbom --cache-dir x	safe-read
+trivy sbom --format x	safe-read
+trivy sbom --help	safe-read
+trivy sbom --help --artifact-type x	safe-read
+trivy sbom --help --json	safe-read
+trivy sbom --help x	safe-read
+trivy sbom --json	safe-read
+trivy sbom --output x	safe-read
+trivy sbom --quiet	safe-read
+trivy sbom -f x	safe-read
+trivy sbom -h	safe-read
+trivy sbom -o x	safe-read
+trivy sbom -o ~/.ssh/authorized_keys ./sbom.json	denied
+trivy sbom -q	safe-read
+trivy sbom ./sbom.json	safe-read
+trivy sbom x	safe-read
+trivy version	inert
+trivy version --help	inert
+trivy version --help -h	inert
+trivy version --help x	inert
+trivy version -h	inert
+trivy version x	inert
+trivy x	denied
+true	inert
+true && [[ "a" == "a" ]]	inert
+true --help	inert
+true --help --version	inert
+true --help x	denied
+true --version	inert
+true -V	inert
+true -h	inert
+true x	denied
+truffle	denied
+truffle --help	inert
+truffle --help --version	denied
+truffle --help x	denied
+truffle --version	inert
+truffle -h	inert
+truffle -v	inert
+truffle compile	denied
+truffle compile x	denied
+truffle console	denied
+truffle console x	denied
+truffle dashboard	denied
+truffle dashboard x	denied
+truffle db	denied
+truffle db x	denied
+truffle debug	denied
+truffle debug x	denied
+truffle deploy	denied
+truffle deploy x	denied
+truffle develop	denied
+truffle develop x	denied
+truffle exec	denied
+truffle exec x	denied
+truffle help	inert
+truffle help x	inert
+truffle init	denied
+truffle init x	denied
+truffle migrate	denied
+truffle migrate x	denied
+truffle networks	safe-read
+truffle networks --clean	safe-read
+truffle networks --clean --help	safe-read
+truffle networks --clean x	safe-read
+truffle networks --help	safe-read
+truffle networks -h	safe-read
+truffle networks x	safe-read
+truffle obtain	denied
+truffle obtain x	denied
+truffle opcode	denied
+truffle opcode x	denied
+truffle preserve	denied
+truffle preserve x	denied
+truffle publish	denied
+truffle publish x	denied
+truffle run	denied
+truffle run x	denied
+truffle test	denied
+truffle test x	denied
+truffle unbox	denied
+truffle unbox x	denied
+truffle version	inert
+truffle version --help	inert
+truffle version --help -h	inert
+truffle version --help x	inert
+truffle version -h	inert
+truffle version x	inert
+truffle watch	denied
+truffle watch x	denied
+truffle x	denied
+ts	safe-read
+ts --help	safe-read
+ts --help -i	safe-read
+ts --help x	safe-read
+ts --version	denied
+ts -i	safe-read
+ts -m	safe-read
+ts -r	safe-read
+ts -s	safe-read
+ts x	safe-read
+ts-node	denied
+ts-node --help	inert
+ts-node --help --version	inert
+ts-node --help x	denied
+ts-node --version	inert
+ts-node -h	inert
+ts-node -v	inert
+ts-node x	denied
+tsc	denied
+tsc --allowJs	denied
+tsc --allowJs --baseUrl x	denied
+tsc --allowJs --checkJs	denied
+tsc --allowJs x	denied
+tsc --baseUrl x	denied
+tsc --checkJs	denied
+tsc --esModuleInterop	denied
+tsc --forceConsistentCasingInFileNames	denied
+tsc --help	inert
+tsc --help --allowJs	inert
+tsc --help --baseUrl x	inert
+tsc --help --checkJs	inert
+tsc --help --esModuleInterop	inert
+tsc --help --forceConsistentCasingInFileNames	inert
+tsc --help --help	inert
+tsc --help --incremental	inert
+tsc --help --isolatedModules	inert
+tsc --help --jsx x	inert
+tsc --help --lib x	inert
+tsc --help --module x	inert
+tsc --help --moduleResolution x	inert
+tsc --help --noEmit	inert
+tsc --help --noFallthroughCasesInSwitch	inert
+tsc --help --noImplicitAny	inert
+tsc --help --noImplicitReturns	inert
+tsc --help --noUnusedLocals	inert
+tsc --help --noUnusedParameters	inert
+tsc --help --pretty	inert
+tsc --help --project x	inert
+tsc --help --resolveJsonModule	inert
+tsc --help --rootDir x	inert
+tsc --help --skipLibCheck	inert
+tsc --help --strict	inert
+tsc --help --strictNullChecks	inert
+tsc --help --target x	inert
+tsc --help --version	inert
+tsc --help -h	inert
+tsc --help -m x	inert
+tsc --help -p x	inert
+tsc --help -t x	inert
+tsc --help -v	inert
+tsc --incremental	denied
+tsc --isolatedModules	denied
+tsc --jsx x	denied
+tsc --lib x	denied
+tsc --module x	denied
+tsc --moduleResolution x	denied
+tsc --noEmit	inert
+tsc --noFallthroughCasesInSwitch	denied
+tsc --noImplicitAny	denied
+tsc --noImplicitReturns	denied
+tsc --noUnusedLocals	denied
+tsc --noUnusedParameters	denied
+tsc --pretty	denied
+tsc --project ./sub/tsconfig.json --noEmit	inert
+tsc --project x	denied
+tsc --resolveJsonModule	denied
+tsc --rootDir x	denied
+tsc --skipLibCheck	denied
+tsc --strict	denied
+tsc --strictNullChecks	denied
+tsc --target x	denied
+tsc --version	inert
+tsc -h	inert
+tsc -m x	denied
+tsc -p tsconfig.json	denied
+tsc -p tsconfig.test.json --noEmit	inert
+tsc -p x	denied
+tsc -p ~/.aws/credentials --noEmit --pretty	denied
+tsc -t es2020 -m esnext --noEmit	inert
+tsc -t x	denied
+tsc -v	inert
+tsc -w --noEmit	denied
+tsc src/index.ts --noEmit --pretty	inert
+tsc x	denied
+tsc ~/.ssh/id_rsa --noEmit	denied
+tshark	denied
+tshark --help	safe-read
+tshark --help --list-time-stamp-types	safe-read
+tshark --help -A x	safe-read
+tshark --help x	safe-read
+tshark --list-time-stamp-types	safe-read
+tshark --version	safe-read
+tshark -2	safe-read
+tshark -?	safe-read
+tshark -A	safe-read
+tshark -A x	safe-read
+tshark -B	safe-read
+tshark -B x	safe-read
+tshark -C	safe-read
+tshark -C x	safe-read
+tshark -D	safe-read
+tshark -D x	safe-read
+tshark -E	safe-read
+tshark -E x	safe-read
+tshark -F	safe-read
+tshark -F x	safe-read
+tshark -G x	safe-read
+tshark -K	safe-read
+tshark -L	safe-read
+tshark -M	safe-read
+tshark -N	safe-read
+tshark -N x	safe-read
+tshark -O	safe-read
+tshark -O x	safe-read
+tshark -P	safe-read
+tshark -P x	safe-read
+tshark -Q	safe-read
+tshark -S	safe-read
+tshark -S x	safe-read
+tshark -T	safe-read
+tshark -T x	safe-read
+tshark -U	safe-read
+tshark -V	safe-read
+tshark -W	safe-read
+tshark -W x	safe-read
+tshark -X	safe-read
+tshark -X x	safe-read
+tshark -Y	safe-read
+tshark -Y x	safe-read
+tshark -Z	safe-read
+tshark -Z x	safe-read
+tshark -a	safe-read
+tshark -b	safe-read
+tshark -b x	safe-read
+tshark -c	safe-read
+tshark -c x	safe-read
+tshark -d	safe-read
+tshark -d x	safe-read
+tshark -e	safe-read
+tshark -e x	safe-read
+tshark -f	safe-read
+tshark -f x	safe-read
+tshark -h	safe-read
+tshark -i	safe-read
+tshark -i x	safe-read
+tshark -j	safe-read
+tshark -j x	safe-read
+tshark -l	safe-read
+tshark -l x	safe-read
+tshark -n	safe-read
+tshark -n x	safe-read
+tshark -o	safe-read
+tshark -o x	safe-read
+tshark -p	safe-read
+tshark -p x	safe-read
+tshark -q	safe-read
+tshark -r	safe-read
+tshark -r x	safe-read
+tshark -s	safe-read
+tshark -s x	safe-read
+tshark -t	safe-read
+tshark -t x	safe-read
+tshark -u	safe-read
+tshark -v	safe-read
+tshark -w	safe-read
+tshark -w x	safe-read
+tshark -x	safe-read
+tshark -y	safe-read
+tshark -y x	safe-read
+tshark -z	safe-read
+tshark -z x	safe-read
+tshark x	safe-read
+tsort	inert
+tsort --help	inert
+tsort --help --version	inert
+tsort --help x	inert
+tsort --version	inert
+tsort x	inert
+tsql	denied
+tsql --help	denied
+tsql --version	denied
+tsql -C	safe-read
+tsql -C -D x	safe-read
+tsql -C -L	safe-read
+tsql -C x	safe-read
+tsql -D x	safe-read
+tsql -H x	safe-read
+tsql -I x	safe-read
+tsql -J x	safe-read
+tsql -L	safe-read
+tsql -P x	safe-read
+tsql -S x	safe-read
+tsql -U x	safe-read
+tsql -a x	safe-read
+tsql -o x	safe-read
+tsql -p x	safe-read
+tsql -r x	safe-read
+tsql -t x	safe-read
+tsql -v	safe-read
+tsql x	safe-read
+tsup	safe-write
+tsup --bundle	safe-write
+tsup --bundle --cjs	safe-write
+tsup --bundle --cjs-interop x	safe-write
+tsup --bundle x	safe-write
+tsup --cjs	safe-write
+tsup --cjs-interop x	safe-write
+tsup --clean	safe-write
+tsup --config x	safe-write
+tsup --define x	safe-write
+tsup --dts	safe-write
+tsup --dts-only	safe-write
+tsup --dts-resolve	safe-write
+tsup --entry x	safe-write
+tsup --env x	safe-write
+tsup --esm	safe-write
+tsup --external	safe-write
+tsup --external x	safe-write
+tsup --format x	safe-write
+tsup --global-name	safe-write
+tsup --help	safe-write
+tsup --inject x	safe-write
+tsup --keep-names	safe-write
+tsup --legacy-output	safe-write
+tsup --metafile	safe-write
+tsup --minify	safe-write
+tsup --name x	safe-write
+tsup --no-clean	safe-write
+tsup --no-config	safe-write
+tsup --no-external x	safe-write
+tsup --out-dir x	safe-write
+tsup --platform x	safe-write
+tsup --public-dir x	safe-write
+tsup --shims	safe-write
+tsup --silent	safe-write
+tsup --skip-node-modules-bundle	safe-write
+tsup --source-map	safe-write
+tsup --sourcemap	safe-write
+tsup --splitting	safe-write
+tsup --target x	safe-write
+tsup --terser	safe-write
+tsup --treeshake	safe-write
+tsup --tsconfig x	safe-write
+tsup --version	safe-write
+tsup --watch	safe-write
+tsup -d x	safe-write
+tsup -h	safe-write
+tsup -w	safe-write
+tsup x	safe-write
+tsx	denied
+tsx --help	inert
+tsx --help --version	inert
+tsx --help x	denied
+tsx --version	inert
+tsx -h	inert
+tsx -v	inert
+tsx x	denied
+tty	inert
+tty --help	inert
+tty --help --quiet	inert
+tty --help x	denied
+tty --quiet	inert
+tty --silent	inert
+tty --version	inert
+tty -V	inert
+tty -h	inert
+tty -s	inert
+tty x	denied
+tuist	denied
+tuist --destination x	denied
+tuist --help	inert
+tuist --help --destination x	denied
+tuist --help --version	denied
+tuist --help x	denied
+tuist --version	inert
+tuist -V	inert
+tuist -h	inert
+tuist build	safe-write
+tuist build --build-output-path	safe-write
+tuist build --build-output-path --clean	safe-write
+tuist build --build-output-path --configuration x	safe-write
+tuist build --build-output-path x	safe-write
+tuist build --clean	safe-write
+tuist build --configuration x	safe-write
+tuist build --derived-data-path x	safe-write
+tuist build --destination x	safe-write
+tuist build --device x	safe-write
+tuist build --generate	safe-write
+tuist build --help	safe-write
+tuist build --no-binary-cache	safe-write
+tuist build --no-clean	safe-write
+tuist build --os x	safe-write
+tuist build --passthrough-xcodebuild-arguments x	safe-write
+tuist build --path x	safe-write
+tuist build --platform x	safe-write
+tuist build --rosetta	safe-write
+tuist build --scheme x	safe-write
+tuist build --skip-signing	safe-write
+tuist build --verbose	safe-write
+tuist build -c x	safe-write
+tuist build -h	safe-write
+tuist build -p x	safe-write
+tuist build MyTarget --configuration Release	safe-write
+tuist build x	safe-write
+tuist cache	denied
+tuist cache warm	denied
+tuist cache x	denied
+tuist clean	safe-write
+tuist clean --help	safe-write
+tuist clean --help --path x	safe-write
+tuist clean --help --verbose	safe-write
+tuist clean --help x	safe-write
+tuist clean --path x	safe-write
+tuist clean --verbose	safe-write
+tuist clean -h	safe-write
+tuist clean -p x	safe-write
+tuist clean dependencies manifests	safe-write
+tuist clean x	safe-write
+tuist deploy	denied
+tuist deploy x	denied
+tuist dump	inert
+tuist dump --help	inert
+tuist dump --help --json	inert
+tuist dump --help --path x	inert
+tuist dump --help x	inert
+tuist dump --json	inert
+tuist dump --path x	inert
+tuist dump --verbose	inert
+tuist dump -h	inert
+tuist dump -p x	inert
+tuist dump x	inert
+tuist edit	safe-write
+tuist edit --help	safe-write
+tuist edit --help --path x	safe-write
+tuist edit --help --permanent	safe-write
+tuist edit --help x	safe-write
+tuist edit --path x	safe-write
+tuist edit --permanent	safe-write
+tuist edit --verbose	safe-write
+tuist edit -P	safe-write
+tuist edit -h	safe-write
+tuist edit -p x	safe-write
+tuist edit x	safe-write
+tuist fetch	safe-write
+tuist fetch --help	safe-write
+tuist fetch --help --path x	safe-write
+tuist fetch --help --update	safe-write
+tuist fetch --help x	safe-write
+tuist fetch --path x	safe-write
+tuist fetch --update	safe-write
+tuist fetch --verbose	safe-write
+tuist fetch -h	safe-write
+tuist fetch -p x	safe-write
+tuist fetch x	safe-write
+tuist generate	safe-write
+tuist generate --binary-cache	safe-write
+tuist generate --binary-cache --configuration x	safe-write
+tuist generate --binary-cache --help	safe-write
+tuist generate --binary-cache x	safe-write
+tuist generate --configuration x	safe-write
+tuist generate --destination x	safe-write
+tuist generate --device x	safe-write
+tuist generate --help	safe-write
+tuist generate --json	safe-write
+tuist generate --no-binary-cache	safe-write
+tuist generate --no-open	safe-write
+tuist generate --no-open -p .	safe-write
+tuist generate --open	safe-write
+tuist generate --os x	safe-write
+tuist generate --path x	safe-write
+tuist generate --platform x	safe-write
+tuist generate --rosetta x	safe-write
+tuist generate --verbose	safe-write
+tuist generate -c x	safe-write
+tuist generate -h	safe-write
+tuist generate -p x	safe-write
+tuist generate App Watch	safe-write
+tuist generate x	safe-write
+tuist graph	inert
+tuist graph --format json	inert
+tuist graph --format x	inert
+tuist graph --help	inert
+tuist graph --help --format x	inert
+tuist graph --help --json	inert
+tuist graph --help x	inert
+tuist graph --json	inert
+tuist graph --path x	inert
+tuist graph --verbose	inert
+tuist graph -f x	inert
+tuist graph -h	inert
+tuist graph -p x	inert
+tuist graph x	inert
+tuist hash	denied
+tuist hash cache	inert
+tuist hash cache --help	inert
+tuist hash cache --help --json	inert
+tuist hash cache --help --path x	inert
+tuist hash cache --help x	inert
+tuist hash cache --json	inert
+tuist hash cache --path x	inert
+tuist hash cache --verbose	inert
+tuist hash cache -h	inert
+tuist hash cache -p x	inert
+tuist hash cache x	inert
+tuist hash selective-testing	inert
+tuist hash selective-testing --help	inert
+tuist hash selective-testing --help --json	inert
+tuist hash selective-testing --help --path x	inert
+tuist hash selective-testing --help x	inert
+tuist hash selective-testing --json	inert
+tuist hash selective-testing --path x	inert
+tuist hash selective-testing --verbose	inert
+tuist hash selective-testing -h	inert
+tuist hash selective-testing -p x	inert
+tuist hash selective-testing x	inert
+tuist hash x	denied
+tuist inspect	denied
+tuist inspect build	inert
+tuist inspect build --help	inert
+tuist inspect build --help --json	inert
+tuist inspect build --help --path x	inert
+tuist inspect build --help x	inert
+tuist inspect build --json	inert
+tuist inspect build --path x	inert
+tuist inspect build --verbose	inert
+tuist inspect build -h	inert
+tuist inspect build -p x	inert
+tuist inspect build x	inert
+tuist inspect bundle	inert
+tuist inspect bundle --help	inert
+tuist inspect bundle --help --json	inert
+tuist inspect bundle --help --path x	inert
+tuist inspect bundle --help x	inert
+tuist inspect bundle --json	inert
+tuist inspect bundle --path x	inert
+tuist inspect bundle --verbose	inert
+tuist inspect bundle -h	inert
+tuist inspect bundle -p x	inert
+tuist inspect bundle x	inert
+tuist inspect dependencies	inert
+tuist inspect dependencies --help	inert
+tuist inspect dependencies --help --json	inert
+tuist inspect dependencies --help --path x	inert
+tuist inspect dependencies --help x	inert
+tuist inspect dependencies --json	inert
+tuist inspect dependencies --path x	inert
+tuist inspect dependencies --verbose	inert
+tuist inspect dependencies -h	inert
+tuist inspect dependencies -p x	inert
+tuist inspect dependencies x	inert
+tuist inspect implicit-imports	inert
+tuist inspect implicit-imports --help	inert
+tuist inspect implicit-imports --help --json	inert
+tuist inspect implicit-imports --help --path x	inert
+tuist inspect implicit-imports --help x	inert
+tuist inspect implicit-imports --json	inert
+tuist inspect implicit-imports --path x	inert
+tuist inspect implicit-imports --verbose	inert
+tuist inspect implicit-imports -h	inert
+tuist inspect implicit-imports -p x	inert
+tuist inspect implicit-imports x	inert
+tuist inspect redundant-imports	inert
+tuist inspect redundant-imports --help	inert
+tuist inspect redundant-imports --help --json	inert
+tuist inspect redundant-imports --help --path x	inert
+tuist inspect redundant-imports --help x	inert
+tuist inspect redundant-imports --json	inert
+tuist inspect redundant-imports --path x	inert
+tuist inspect redundant-imports --verbose	inert
+tuist inspect redundant-imports -h	inert
+tuist inspect redundant-imports -p x	inert
+tuist inspect redundant-imports x	inert
+tuist inspect test	inert
+tuist inspect test --help	inert
+tuist inspect test --help --json	inert
+tuist inspect test --help --path x	inert
+tuist inspect test --help x	inert
+tuist inspect test --json	inert
+tuist inspect test --path x	inert
+tuist inspect test --verbose	inert
+tuist inspect test -h	inert
+tuist inspect test -p x	inert
+tuist inspect test x	inert
+tuist inspect x	denied
+tuist install	safe-write
+tuist install --help	safe-write
+tuist install --help --path x	safe-write
+tuist install --help --update	safe-write
+tuist install --help x	safe-write
+tuist install --path x	safe-write
+tuist install --update	safe-write
+tuist install --verbose	safe-write
+tuist install -h	safe-write
+tuist install -p x	safe-write
+tuist install x	safe-write
+tuist migration	denied
+tuist migration check-empty-settings	inert
+tuist migration check-empty-settings --help	inert
+tuist migration check-empty-settings --help --path x	inert
+tuist migration check-empty-settings --help -h	inert
+tuist migration check-empty-settings --help x	inert
+tuist migration check-empty-settings --path x	inert
+tuist migration check-empty-settings -h	inert
+tuist migration check-empty-settings -p x	inert
+tuist migration check-empty-settings x	inert
+tuist migration list-targets	inert
+tuist migration list-targets --help	inert
+tuist migration list-targets --help --path x	inert
+tuist migration list-targets --help -h	inert
+tuist migration list-targets --help x	inert
+tuist migration list-targets --path x	inert
+tuist migration list-targets -h	inert
+tuist migration list-targets -p x	inert
+tuist migration list-targets x	inert
+tuist migration x	denied
+tuist run	denied
+tuist run MyApp	denied
+tuist run x	denied
+tuist scaffold	denied
+tuist scaffold list	inert
+tuist scaffold list --help	inert
+tuist scaffold list --help --json	inert
+tuist scaffold list --help --path x	inert
+tuist scaffold list --help x	inert
+tuist scaffold list --json	inert
+tuist scaffold list --path x	inert
+tuist scaffold list -h	inert
+tuist scaffold list -p x	inert
+tuist scaffold list x	inert
+tuist scaffold x	denied
+tuist test	safe-write
+tuist test --clean	safe-write
+tuist test --clean --configuration x	safe-write
+tuist test --clean --generate	safe-write
+tuist test --clean x	safe-write
+tuist test --configuration x	safe-write
+tuist test --derived-data-path x	safe-write
+tuist test --destination x	safe-write
+tuist test --device x	safe-write
+tuist test --generate	safe-write
+tuist test --help	safe-write
+tuist test --ignore-binary-cache	safe-write
+tuist test --no-binary-cache	safe-write
+tuist test --no-clean	safe-write
+tuist test --no-selective-testing	safe-write
+tuist test --no-upload-results	safe-write
+tuist test --os x	safe-write
+tuist test --passthrough-xcodebuild-arguments x	safe-write
+tuist test --path x	safe-write
+tuist test --platform x	safe-write
+tuist test --result-bundle-path x	safe-write
+tuist test --retry-count x	safe-write
+tuist test --rosetta	safe-write
+tuist test --scheme x	safe-write
+tuist test --skip-signing	safe-write
+tuist test --skip-test-targets x	safe-write
+tuist test --skip-ui-tests	safe-write
+tuist test --test-plan x	safe-write
+tuist test --test-targets x	safe-write
+tuist test --verbose	safe-write
+tuist test --without-selective-testing	safe-write
+tuist test -c x	safe-write
+tuist test -h	safe-write
+tuist test -p x	safe-write
+tuist test x	safe-write
+tuist version	inert
+tuist version --help	inert
+tuist version --help -h	inert
+tuist version --help x	inert
+tuist version -h	inert
+tuist version x	inert
+tuist x	denied
+turbo	denied
+turbo --help	inert
+turbo --help --out-dir x	denied
+turbo --help --version	denied
+turbo --help x	denied
+turbo --out-dir x	denied
+turbo --version	inert
+turbo -h	inert
+turbo daemon	denied
+turbo daemon status	inert
+turbo daemon status --help	inert
+turbo daemon status --help -h	inert
+turbo daemon status --help x	inert
+turbo daemon status -h	inert
+turbo daemon status x	inert
+turbo daemon x	denied
+turbo ls	inert
+turbo ls --affected	inert
+turbo ls --affected --filter x	inert
+turbo ls --affected --help	inert
+turbo ls --affected x	inert
+turbo ls --filter x	inert
+turbo ls --help	inert
+turbo ls -F x	inert
+turbo ls -h	inert
+turbo ls x	inert
+turbo prune	denied
+turbo prune --docker	inert
+turbo prune --docker --help	inert
+turbo prune --docker --out-dir x	inert
+turbo prune --docker x	inert
+turbo prune --help	inert
+turbo prune --out-dir x	inert
+turbo prune --scope x	inert
+turbo prune -h	inert
+turbo prune web	inert
+turbo prune web --docker --out-dir ./out	inert
+turbo prune web --out-dir ./out	inert
+turbo prune web --out-dir ~/.ssh	denied
+turbo prune web --out-dir ~/.ssh/authorized_keys	denied
+turbo prune x	inert
+turbo query	inert
+turbo query --help	inert
+turbo query --help -h	inert
+turbo query --help x	inert
+turbo query -h	inert
+turbo query x	inert
+turbo run	safe-read
+turbo run --affected	safe-read
+turbo run --affected --cache-dir	safe-read
+turbo run --affected --cache-workers x	safe-read
+turbo run --affected x	safe-read
+turbo run --cache-dir	safe-read
+turbo run --cache-workers x	safe-read
+turbo run --color x	safe-read
+turbo run --concurrency x	safe-read
+turbo run --continue	safe-read
+turbo run --dry-run	safe-read
+turbo run --env-mode	safe-read
+turbo run --env-mode x	safe-read
+turbo run --filter x	safe-read
+turbo run --force	safe-read
+turbo run --framework-inference	safe-read
+turbo run --global-deps x	safe-read
+turbo run --graph	safe-read
+turbo run --graph x	safe-read
+turbo run --help	safe-read
+turbo run --log-order x	safe-read
+turbo run --log-prefix x	safe-read
+turbo run --no-cache	safe-read
+turbo run --no-daemon	safe-read
+turbo run --output-logs	safe-read
+turbo run --output-logs x	safe-read
+turbo run --parallel	safe-read
+turbo run --profile x	safe-read
+turbo run --remote-only x	safe-read
+turbo run --scope x	safe-read
+turbo run --summarize	safe-read
+turbo run --team x	safe-read
+turbo run --token x	safe-read
+turbo run --verbose	safe-read
+turbo run -F x	safe-read
+turbo run -h	safe-read
+turbo run build --dry-run	safe-read
+turbo run x	safe-read
+turbo x	denied
+twine	denied
+twine --help	inert
+twine --help --version	denied
+twine --help x	denied
+twine --version	inert
+twine -h	inert
+twine check	denied
+twine check --help	safe-read
+twine check --help --strict	safe-read
+twine check --help x	safe-read
+twine check --strict	safe-read
+twine check -h	safe-read
+twine check x	safe-read
+twine help	inert
+twine help x	inert
+twine register	denied
+twine register x	denied
+twine upload	denied
+twine upload x	denied
+twine x	denied
+twopi	denied
+twopi --help	safe-write
+twopi --help -?	safe-write
+twopi --help -A x	safe-write
+twopi --help x	safe-write
+twopi --version	denied
+twopi -?	safe-write
+twopi -A x	safe-write
+twopi -E x	safe-write
+twopi -G x	safe-write
+twopi -K x	safe-write
+twopi -N x	safe-write
+twopi -O	safe-write
+twopi -P	safe-write
+twopi -T x	safe-write
+twopi -V	safe-write
+twopi -n x	safe-write
+twopi -o x	safe-write
+twopi -q	safe-write
+twopi -s x	safe-write
+twopi -v	safe-write
+twopi -x	safe-write
+twopi -y	safe-write
+twopi x	safe-write
+type	denied
+type --help	inert
+type --help --version	inert
+type --help x	inert
+type --version	inert
+type -P	inert
+type -V	inert
+type -a	inert
+type -f	inert
+type -h	inert
+type -p	inert
+type -t	inert
+type x	inert
+typedoc	denied
+typedoc --basePath x	safe-write
+typedoc --cleanOutputDir	safe-write
+typedoc --cleanOutputDir --basePath x	safe-write
+typedoc --cleanOutputDir --disableSources	safe-write
+typedoc --cleanOutputDir x	safe-write
+typedoc --cname x	safe-write
+typedoc --customCss x	safe-write
+typedoc --darkHighlightTheme x	safe-write
+typedoc --disableSources	safe-write
+typedoc --emit	safe-write
+typedoc --entryPointStrategy x	safe-write
+typedoc --entryPoints x	safe-write
+typedoc --exclude	safe-write
+typedoc --excludeExternals	safe-write
+typedoc --excludeInternal	safe-write
+typedoc --excludeNotDocumented x	safe-write
+typedoc --excludePrivate	safe-write
+typedoc --excludeProtected	safe-write
+typedoc --excludeReferences	safe-write
+typedoc --excludeTags x	safe-write
+typedoc --externalSymbolLinkMappings x	safe-write
+typedoc --gitRemote x	safe-write
+typedoc --gitRevision	safe-write
+typedoc --githubPages x	safe-write
+typedoc --help	safe-write
+typedoc --hideGenerator x	safe-write
+typedoc --htmlLang x	safe-write
+typedoc --includeVersion	safe-write
+typedoc --json	safe-write
+typedoc --lightHighlightTheme x	safe-write
+typedoc --logLevel	safe-write
+typedoc --logfile	safe-write
+typedoc --media x	safe-write
+typedoc --name	safe-write
+typedoc --options x	safe-write
+typedoc --out x	safe-write
+typedoc --plugin x	safe-write
+typedoc --readme	safe-write
+typedoc --requiredToBeDocumented x	safe-write
+typedoc --searchInComments x	safe-write
+typedoc --showConfig	safe-write
+typedoc --skipErrorChecking	safe-write
+typedoc --sort	safe-write
+typedoc --theme x	safe-write
+typedoc --titleLink x	safe-write
+typedoc --treatWarningsAsErrors	safe-write
+typedoc --tsconfig x	safe-write
+typedoc --validation	safe-write
+typedoc --version	safe-write
+typedoc --visibilityFilters x	safe-write
+typedoc --watch	safe-write
+typedoc x	safe-write
+typeprof	denied
+typeprof --collection x	safe-read
+typeprof --exclude x	safe-read
+typeprof --help	safe-read
+typeprof --help --collection x	safe-read
+typeprof --help --no-collection	safe-read
+typeprof --help x	safe-read
+typeprof --no-collection	safe-read
+typeprof --no-show-errors	safe-read
+typeprof --no-show-parameter-names	safe-read
+typeprof --no-show-source-locations	safe-read
+typeprof --no-show-stats	safe-read
+typeprof --no-show-typeprof-version	safe-read
+typeprof --quiet	safe-read
+typeprof --show-errors	safe-read
+typeprof --show-parameter-names	safe-read
+typeprof --show-source-locations	safe-read
+typeprof --show-stats	safe-read
+typeprof --show-typeprof-version	safe-read
+typeprof --verbose	safe-read
+typeprof --version	safe-read
+typeprof -h	safe-read
+typeprof -o	safe-write
+typeprof -o x	safe-write
+typeprof -q	safe-read
+typeprof -v	safe-read
+typeprof x	safe-read
+typeset	inert
+typeset --help	denied
+typeset --version	denied
+typeset -A	inert
+typeset -A -F	inert
+typeset -A x	inert
+typeset -F	inert
+typeset -a	inert
+typeset -f	inert
+typeset -g	inert
+typeset -i	inert
+typeset -l	inert
+typeset -n	inert
+typeset -p	inert
+typeset -r	inert
+typeset -t	inert
+typeset -u	inert
+typeset -x	inert
+typeset x	inert

@@ -1,0 +1,1410 @@
+vacuumdb	safe-write
+vacuumdb --all	safe-write
+vacuumdb --all --analyze	safe-write
+vacuumdb --all --buffer-usage-limit x	safe-write
+vacuumdb --all x	safe-write
+vacuumdb --analyze	safe-write
+vacuumdb --analyze-in-stages	safe-write
+vacuumdb --analyze-only	safe-write
+vacuumdb --buffer-usage-limit	safe-write
+vacuumdb --buffer-usage-limit x	safe-write
+vacuumdb --dbname x	safe-write
+vacuumdb --disable-page-skipping	safe-write
+vacuumdb --echo	safe-write
+vacuumdb --exclude-schema	safe-write
+vacuumdb --exclude-schema x	safe-write
+vacuumdb --force-index-cleanup	safe-write
+vacuumdb --full	safe-write
+vacuumdb --help	safe-write
+vacuumdb --host x	safe-write
+vacuumdb --index-cleanup	safe-write
+vacuumdb --jobs	safe-write
+vacuumdb --jobs x	safe-write
+vacuumdb --maintenance-db	safe-write
+vacuumdb --maintenance-db x	safe-write
+vacuumdb --min-mxid-age	safe-write
+vacuumdb --min-mxid-age x	safe-write
+vacuumdb --min-xid-age	safe-write
+vacuumdb --min-xid-age x	safe-write
+vacuumdb --missing-stats-only	safe-write
+vacuumdb --no-index-cleanup	safe-write
+vacuumdb --no-password	safe-write
+vacuumdb --no-process-main	safe-write
+vacuumdb --no-process-toast	safe-write
+vacuumdb --no-truncate	safe-write
+vacuumdb --password	safe-write
+vacuumdb --port x	safe-write
+vacuumdb --quiet	safe-write
+vacuumdb --schema	safe-write
+vacuumdb --schema x	safe-write
+vacuumdb --skip-locked	safe-write
+vacuumdb --table	safe-write
+vacuumdb --table x	safe-write
+vacuumdb --truncate	safe-write
+vacuumdb --username x	safe-write
+vacuumdb --verbose	safe-write
+vacuumdb --version	safe-write
+vacuumdb -?	safe-write
+vacuumdb -F	safe-write
+vacuumdb -N	safe-write
+vacuumdb -P	safe-write
+vacuumdb -Q	safe-write
+vacuumdb -U	safe-write
+vacuumdb -U x	safe-write
+vacuumdb -V	safe-write
+vacuumdb -W	safe-write
+vacuumdb -Z	safe-write
+vacuumdb -a	safe-write
+vacuumdb -d	safe-write
+vacuumdb -d x	safe-write
+vacuumdb -e	safe-write
+vacuumdb -f	safe-write
+vacuumdb -h	safe-write
+vacuumdb -h x	safe-write
+vacuumdb -j	safe-write
+vacuumdb -j x	safe-write
+vacuumdb -n	safe-write
+vacuumdb -n x	safe-write
+vacuumdb -p	safe-write
+vacuumdb -p x	safe-write
+vacuumdb -q	safe-write
+vacuumdb -t	safe-write
+vacuumdb -t x	safe-write
+vacuumdb -v	safe-write
+vacuumdb -w	safe-write
+vacuumdb -z	safe-write
+vacuumdb x	safe-write
+vagrant	denied
+vagrant --help	inert
+vagrant --help --version	denied
+vagrant --help x	denied
+vagrant --version	inert
+vagrant -h	inert
+vagrant -v	inert
+vagrant box	denied
+vagrant box list	inert
+vagrant box list --box-info	inert
+vagrant box list --box-info --help	inert
+vagrant box list --box-info x	inert
+vagrant box list --help	inert
+vagrant box list -h	inert
+vagrant box list -i	inert
+vagrant box list x	inert
+vagrant box outdated	inert
+vagrant box outdated --global	inert
+vagrant box outdated --global --help	inert
+vagrant box outdated --global x	inert
+vagrant box outdated --help	inert
+vagrant box outdated -h	inert
+vagrant box outdated x	inert
+vagrant box x	denied
+vagrant global-status	inert
+vagrant global-status --help	inert
+vagrant global-status --help --machine-readable	inert
+vagrant global-status --help x	inert
+vagrant global-status --machine-readable	inert
+vagrant global-status --prune	inert
+vagrant global-status -h	inert
+vagrant global-status x	inert
+vagrant plugin	denied
+vagrant plugin list	inert
+vagrant plugin list --help	inert
+vagrant plugin list --help -h	inert
+vagrant plugin list --help x	inert
+vagrant plugin list -h	inert
+vagrant plugin list x	inert
+vagrant plugin x	denied
+vagrant port	inert
+vagrant port --guest	inert
+vagrant port --guest --help	inert
+vagrant port --guest x	inert
+vagrant port --help	inert
+vagrant port -h	inert
+vagrant port x	inert
+vagrant ssh-config	inert
+vagrant ssh-config --help	inert
+vagrant ssh-config --help --host x	inert
+vagrant ssh-config --help -h	inert
+vagrant ssh-config --help x	inert
+vagrant ssh-config --host x	inert
+vagrant ssh-config -h	inert
+vagrant ssh-config x	inert
+vagrant status	inert
+vagrant status --help	inert
+vagrant status --help --machine-readable	inert
+vagrant status --help x	inert
+vagrant status --machine-readable	inert
+vagrant status -h	inert
+vagrant status x	inert
+vagrant validate	inert
+vagrant validate --help	inert
+vagrant validate --help -h	inert
+vagrant validate --help x	inert
+vagrant validate -h	inert
+vagrant validate x	inert
+vagrant version	inert
+vagrant version --help	inert
+vagrant version --help -h	inert
+vagrant version --help x	inert
+vagrant version -h	inert
+vagrant version x	inert
+vagrant x	denied
+valet	denied
+valet --help	inert
+valet --help --version	denied
+valet --help x	denied
+valet --version	inert
+valet -V	inert
+valet -h	inert
+valet diagnose	inert
+valet diagnose --help	inert
+valet diagnose --help --ignore-output	inert
+valet diagnose --help x	inert
+valet diagnose --ignore-output	inert
+valet diagnose --plain	inert
+valet diagnose -h	inert
+valet diagnose x	inert
+valet forget	denied
+valet forget x	denied
+valet help	inert
+valet help status	inert
+valet help x	inert
+valet install	denied
+valet install x	denied
+valet isolate	denied
+valet isolate x	denied
+valet isolated	inert
+valet isolated --help	inert
+valet isolated --help -h	inert
+valet isolated --help x	inert
+valet isolated -h	inert
+valet isolated x	inert
+valet link	denied
+valet link x	denied
+valet links	inert
+valet links --help	inert
+valet links --help -h	inert
+valet links --help x	inert
+valet links -h	inert
+valet links x	inert
+valet list	inert
+valet list --format x	inert
+valet list --help	inert
+valet list --help --format x	inert
+valet list --help --raw	inert
+valet list --help x	inert
+valet list --raw	inert
+valet list -h	inert
+valet list x	inert
+valet log	inert
+valet log --help	inert
+valet log --help -f	inert
+valet log --help x	inert
+valet log -f	inert
+valet log -h	inert
+valet log nginx	inert
+valet log x	inert
+valet loopback	denied
+valet loopback x	denied
+valet on-latest-version	inert
+valet on-latest-version --help	inert
+valet on-latest-version --help -h	inert
+valet on-latest-version --help x	inert
+valet on-latest-version -h	inert
+valet on-latest-version x	inert
+valet park	denied
+valet park x	denied
+valet parked	inert
+valet parked --help	inert
+valet parked --help -h	inert
+valet parked --help x	inert
+valet parked -h	inert
+valet parked x	inert
+valet paths	inert
+valet paths --help	inert
+valet paths --help -h	inert
+valet paths --help x	inert
+valet paths -h	inert
+valet paths x	inert
+valet php-versions	inert
+valet php-versions --help	inert
+valet php-versions --help -h	inert
+valet php-versions --help x	inert
+valet php-versions -h	inert
+valet php-versions x	inert
+valet renew	denied
+valet renew x	denied
+valet restart	safe-write
+valet restart --help	safe-write
+valet restart --help -h	safe-write
+valet restart --help x	safe-write
+valet restart -h	safe-write
+valet restart nginx	safe-write
+valet restart x	safe-write
+valet secure	denied
+valet secure x	denied
+valet share	denied
+valet share x	denied
+valet start	safe-write
+valet start --help	safe-write
+valet start --help -h	safe-write
+valet start --help x	safe-write
+valet start -h	safe-write
+valet start x	safe-write
+valet status	inert
+valet status --help	inert
+valet status --help -h	inert
+valet status --help x	inert
+valet status -h	inert
+valet status x	inert
+valet stop	safe-write
+valet stop --help	safe-write
+valet stop --help -h	safe-write
+valet stop --help x	safe-write
+valet stop -h	safe-write
+valet stop x	safe-write
+valet tld	denied
+valet tld x	denied
+valet trust	denied
+valet trust x	denied
+valet uninstall	denied
+valet uninstall x	denied
+valet unisolate	denied
+valet unisolate x	denied
+valet unlink	denied
+valet unlink x	denied
+valet unsecure	denied
+valet unsecure x	denied
+valet use	denied
+valet use x	denied
+valet which	inert
+valet which --help	inert
+valet which --help -h	inert
+valet which --help x	inert
+valet which -h	inert
+valet which x	inert
+valet x	denied
+vault	denied
+vault --help	inert
+vault --help --version	denied
+vault --help x	denied
+vault --version	inert
+vault -h	inert
+vault -v	inert
+vault agent	denied
+vault agent x	denied
+vault audit	denied
+vault audit x	denied
+vault auth	denied
+vault auth x	denied
+vault debug	denied
+vault debug x	denied
+vault delete	denied
+vault delete x	denied
+vault events	denied
+vault events x	denied
+vault help	inert
+vault help x	inert
+vault kv	denied
+vault kv delete	denied
+vault kv delete x	denied
+vault kv destroy	denied
+vault kv destroy x	denied
+vault kv enable-versioning	denied
+vault kv enable-versioning x	denied
+vault kv get	denied
+vault kv get --address x	denied
+vault kv get --field	denied
+vault kv get --field --address x	denied
+vault kv get --field --help	denied
+vault kv get --field x	denied
+vault kv get --format x	denied
+vault kv get --help	denied
+vault kv get --mount	denied
+vault kv get --namespace x	denied
+vault kv get --version x	denied
+vault kv get -h	denied
+vault kv get x	denied
+vault kv list	inert
+vault kv list --address x	inert
+vault kv list --format x	inert
+vault kv list --help	inert
+vault kv list --help --address x	inert
+vault kv list --help --mount	inert
+vault kv list --help x	inert
+vault kv list --mount	inert
+vault kv list --namespace x	inert
+vault kv list -h	inert
+vault kv list x	inert
+vault kv metadata	inert
+vault kv metadata x	inert
+vault kv patch	denied
+vault kv patch x	denied
+vault kv put	denied
+vault kv put x	denied
+vault kv rollback	denied
+vault kv rollback x	denied
+vault kv undelete	denied
+vault kv undelete x	denied
+vault kv x	denied
+vault lease	denied
+vault lease x	denied
+vault list	denied
+vault list --address x	safe-read
+vault list --detailed	safe-read
+vault list --detailed --address x	safe-read
+vault list --detailed --help	safe-read
+vault list --detailed x	safe-read
+vault list --format x	safe-read
+vault list --help	safe-read
+vault list --mount	safe-read
+vault list --namespace x	safe-read
+vault list -h	safe-read
+vault list x	safe-read
+vault login	denied
+vault login x	denied
+vault logout	denied
+vault logout x	denied
+vault monitor	denied
+vault monitor x	denied
+vault namespace	denied
+vault namespace x	denied
+vault operator	denied
+vault operator x	denied
+vault patch	denied
+vault patch x	denied
+vault path-help	denied
+vault path-help x	denied
+vault pki	denied
+vault pki x	denied
+vault plugin	denied
+vault plugin x	denied
+vault policy	denied
+vault policy x	denied
+vault print	denied
+vault print x	denied
+vault proxy	denied
+vault proxy x	denied
+vault read	denied
+vault read --help	denied
+vault read --help -h	denied
+vault read --help x	denied
+vault read -h	denied
+vault read x	denied
+vault secrets	denied
+vault secrets x	denied
+vault server	denied
+vault server x	denied
+vault ssh	denied
+vault ssh x	denied
+vault status	safe-read
+vault status --address x	safe-read
+vault status --format	safe-read
+vault status --format --address x	safe-read
+vault status --format --help	safe-read
+vault status --format x	safe-read
+vault status --help	safe-read
+vault status -h	safe-read
+vault status x	safe-read
+vault token	denied
+vault token x	denied
+vault transit	denied
+vault transit x	denied
+vault unwrap	denied
+vault unwrap x	denied
+vault version	inert
+vault version --help	inert
+vault version --help -h	inert
+vault version --help x	inert
+vault version -h	inert
+vault version x	inert
+vault wrap	denied
+vault wrap x	denied
+vault write	denied
+vault write x	denied
+vault x	denied
+vcpkg	denied
+vcpkg --help	inert
+vcpkg --help --version	denied
+vcpkg --help x	denied
+vcpkg --version	inert
+vcpkg -h	inert
+vcpkg add	denied
+vcpkg add x	denied
+vcpkg bootstrap	denied
+vcpkg bootstrap x	denied
+vcpkg cache	denied
+vcpkg cache x	denied
+vcpkg ci	denied
+vcpkg ci x	denied
+vcpkg ci-clean	denied
+vcpkg ci-clean x	denied
+vcpkg contact	denied
+vcpkg contact x	denied
+vcpkg create	denied
+vcpkg create x	denied
+vcpkg depend-info	safe-read
+vcpkg depend-info x	safe-read
+vcpkg edit	denied
+vcpkg edit x	denied
+vcpkg env	safe-read
+vcpkg env x	safe-read
+vcpkg export	denied
+vcpkg export x	denied
+vcpkg fetch	denied
+vcpkg fetch x	denied
+vcpkg find	safe-read
+vcpkg find x	safe-read
+vcpkg format-manifest	denied
+vcpkg format-manifest x	denied
+vcpkg hash	safe-read
+vcpkg hash x	safe-read
+vcpkg help	inert
+vcpkg help x	inert
+vcpkg install	denied
+vcpkg install x	denied
+vcpkg integrate	denied
+vcpkg integrate x	denied
+vcpkg list	safe-read
+vcpkg list x	safe-read
+vcpkg new	denied
+vcpkg new x	denied
+vcpkg owns	safe-read
+vcpkg owns x	safe-read
+vcpkg portsdiff	safe-read
+vcpkg portsdiff x	safe-read
+vcpkg remove	denied
+vcpkg remove x	denied
+vcpkg search	safe-read
+vcpkg search x	safe-read
+vcpkg set-installed	denied
+vcpkg set-installed x	denied
+vcpkg update	denied
+vcpkg update x	denied
+vcpkg upgrade	denied
+vcpkg upgrade x	denied
+vcpkg use	denied
+vcpkg use x	denied
+vcpkg version	inert
+vcpkg version x	inert
+vcpkg x	denied
+vcpkg x-history	denied
+vcpkg x-history x	denied
+vcpkg x-set-installed	denied
+vcpkg x-set-installed x	denied
+vcpkg x-update-baseline	denied
+vcpkg x-update-baseline x	denied
+vdir	inert
+vdir --all	inert
+vdir --all --almost-all	inert
+vdir --all --block-size x	inert
+vdir --all x	inert
+vdir --almost-all	inert
+vdir --author	inert
+vdir --block-size x	inert
+vdir --classify	inert
+vdir --color x	inert
+vdir --context	inert
+vdir --dereference	inert
+vdir --dereference-command-line	inert
+vdir --dereference-command-line-symlink-to-dir	inert
+vdir --directory	inert
+vdir --escape	inert
+vdir --file-type	inert
+vdir --format x	inert
+vdir --full-time	inert
+vdir --group-directories-first	inert
+vdir --help	inert
+vdir --hide x	inert
+vdir --hide-control-chars	inert
+vdir --human-readable	inert
+vdir --hyperlink x	inert
+vdir --ignore x	inert
+vdir --indicator-style	inert
+vdir --inode	inert
+vdir --kibibytes	inert
+vdir --literal	inert
+vdir --no-group	inert
+vdir --numeric-uid-gid	inert
+vdir --quote-name	inert
+vdir --quoting-style x	inert
+vdir --recursive	inert
+vdir --reverse	inert
+vdir --show-control-chars	inert
+vdir --si	inert
+vdir --size	inert
+vdir --sort x	inert
+vdir --tabsize x	inert
+vdir --time x	inert
+vdir --time-style x	inert
+vdir --version	inert
+vdir --width x	inert
+vdir -1	inert
+vdir -A	inert
+vdir -B	inert
+vdir -C	inert
+vdir -F	inert
+vdir -G	inert
+vdir -H	inert
+vdir -I x	inert
+vdir -L	inert
+vdir -N	inert
+vdir -Q	inert
+vdir -R	inert
+vdir -S	inert
+vdir -T x	inert
+vdir -U	inert
+vdir -V	inert
+vdir -X	inert
+vdir -Z	inert
+vdir -a	inert
+vdir -c	inert
+vdir -d	inert
+vdir -f	inert
+vdir -g	inert
+vdir -h	inert
+vdir -i	inert
+vdir -k	inert
+vdir -l	inert
+vdir -m	inert
+vdir -n	inert
+vdir -o	inert
+vdir -p	inert
+vdir -q	inert
+vdir -r	inert
+vdir -s	inert
+vdir -t	inert
+vdir -u	inert
+vdir -v	inert
+vdir -w x	inert
+vdir -x	inert
+vdir x	inert
+vegeta	denied
+vegeta --help	inert
+vegeta --help --output x	denied
+vegeta --help --version	denied
+vegeta --help x	denied
+vegeta --output x	denied
+vegeta --version	inert
+vegeta -h	inert
+vegeta -v	inert
+vegeta attack	denied
+vegeta attack x	denied
+vegeta dump	safe-read
+vegeta dump --dumper	safe-read
+vegeta dump --dumper --dumper x	safe-read
+vegeta dump --dumper --help	safe-read
+vegeta dump --dumper x	safe-read
+vegeta dump --help	safe-read
+vegeta dump --output	safe-read
+vegeta dump --output x	safe-read
+vegeta dump -h	safe-read
+vegeta dump x	safe-read
+vegeta encode	safe-read
+vegeta encode --help	safe-read
+vegeta encode --help --output	safe-read
+vegeta encode --help --output x	safe-read
+vegeta encode --help x	safe-read
+vegeta encode --output	safe-read
+vegeta encode --output x	safe-read
+vegeta encode --to	safe-read
+vegeta encode --to x	safe-read
+vegeta encode -h	safe-read
+vegeta encode x	safe-read
+vegeta help	inert
+vegeta help x	inert
+vegeta plot	safe-read
+vegeta plot --help	safe-read
+vegeta plot --help --output	safe-read
+vegeta plot --help --output x	safe-read
+vegeta plot --help x	safe-read
+vegeta plot --output	safe-read
+vegeta plot --output x	safe-read
+vegeta plot --threshold	safe-read
+vegeta plot --threshold x	safe-read
+vegeta plot --title	safe-read
+vegeta plot --title x	safe-read
+vegeta plot -h	safe-read
+vegeta plot x	safe-read
+vegeta report	safe-read
+vegeta report --every	safe-read
+vegeta report --every --every x	safe-read
+vegeta report --every --help	safe-read
+vegeta report --every x	safe-read
+vegeta report --help	safe-read
+vegeta report --output	safe-read
+vegeta report --output ./results.txt	safe-read
+vegeta report --output /etc/cron.d/x	denied
+vegeta report --output x	safe-read
+vegeta report --output ~/.ssh/authorized_keys	denied
+vegeta report --type	safe-read
+vegeta report --type x	safe-read
+vegeta report -h	safe-read
+vegeta report x	safe-read
+vegeta x	denied
+velero	denied
+velero --help	inert
+velero --help --version	denied
+velero --help x	denied
+velero --version	inert
+velero -h	inert
+velero -v	inert
+velero backup	denied
+velero backup x	denied
+velero backup-location	denied
+velero backup-location x	denied
+velero bug	denied
+velero bug x	denied
+velero client	denied
+velero client x	denied
+velero completion	denied
+velero completion --help	inert
+velero completion --help -h	inert
+velero completion --help x	inert
+velero completion -h	inert
+velero completion x	inert
+velero create	denied
+velero create x	denied
+velero debug	denied
+velero debug x	denied
+velero delete	denied
+velero delete x	denied
+velero describe	denied
+velero describe --details	safe-read
+velero describe --details --features	safe-read
+velero describe --details --kubeconfig x	safe-read
+velero describe --details x	safe-read
+velero describe --features	safe-read
+velero describe --help	safe-read
+velero describe --insecure-skip-tls-verify	safe-read
+velero describe --kubeconfig x	safe-read
+velero describe --kubecontext x	safe-read
+velero describe --namespace x	safe-read
+velero describe --selector x	safe-read
+velero describe --volume-details	safe-read
+velero describe -h	safe-read
+velero describe -l x	safe-read
+velero describe -n x	safe-read
+velero describe x	safe-read
+velero get	safe-read
+velero get --help	safe-read
+velero get --help --kubeconfig x	safe-read
+velero get --help --output	safe-read
+velero get --help x	safe-read
+velero get --kubeconfig x	safe-read
+velero get --kubecontext x	safe-read
+velero get --namespace x	safe-read
+velero get --output	safe-read
+velero get --output x	safe-read
+velero get --selector x	safe-read
+velero get -h	safe-read
+velero get -l x	safe-read
+velero get -n x	safe-read
+velero get -o	safe-read
+velero get -o x	safe-read
+velero get x	safe-read
+velero help	inert
+velero help x	inert
+velero install	denied
+velero install x	denied
+velero logs	denied
+velero logs --caCertFile x	safe-read
+velero logs --help	safe-read
+velero logs --help --caCertFile x	safe-read
+velero logs --help --insecure-skip-tls-verify	safe-read
+velero logs --help x	safe-read
+velero logs --insecure-skip-tls-verify	safe-read
+velero logs --kubeconfig x	safe-read
+velero logs --kubecontext x	safe-read
+velero logs --namespace x	safe-read
+velero logs --timeout x	safe-read
+velero logs -h	safe-read
+velero logs -n x	safe-read
+velero logs x	safe-read
+velero node-agent	denied
+velero node-agent x	denied
+velero plugin	denied
+velero plugin x	denied
+velero repo	denied
+velero repo x	denied
+velero restore	denied
+velero restore x	denied
+velero schedule	denied
+velero schedule x	denied
+velero server	denied
+velero server x	denied
+velero snapshot-location	denied
+velero snapshot-location x	denied
+velero uninstall	denied
+velero uninstall x	denied
+velero version	inert
+velero version --client-only	inert
+velero version --client-only --help	inert
+velero version --client-only --namespace x	inert
+velero version --client-only x	inert
+velero version --help	inert
+velero version --namespace x	inert
+velero version --timeout	inert
+velero version --timeout x	inert
+velero version -h	inert
+velero version -n x	inert
+velero version x	inert
+velero x	denied
+vercel	denied
+vercel --help	inert
+vercel --help --version	denied
+vercel --help x	denied
+vercel --version	inert
+vercel -V	inert
+vercel -h	inert
+vercel inspect	denied
+vercel inspect --help	inert
+vercel inspect --help --json	inert
+vercel inspect --help --scope x	inert
+vercel inspect --help x	inert
+vercel inspect --json	inert
+vercel inspect --scope x	inert
+vercel inspect --timeout x	inert
+vercel inspect -S x	inert
+vercel inspect -T x	inert
+vercel inspect -h	inert
+vercel inspect -j	inert
+vercel inspect x	inert
+vercel list	inert
+vercel list --help	inert
+vercel list --help --json	inert
+vercel list --help --meta x	inert
+vercel list --help x	inert
+vercel list --json	inert
+vercel list --meta x	inert
+vercel list --next x	inert
+vercel list --scope x	inert
+vercel list -S x	inert
+vercel list -h	inert
+vercel list -j	inert
+vercel list -m x	inert
+vercel list x	inert
+vercel project	denied
+vercel project ls	inert
+vercel project ls --help	inert
+vercel project ls --help --json	inert
+vercel project ls --help --scope x	inert
+vercel project ls --help x	inert
+vercel project ls --json	inert
+vercel project ls --scope x	inert
+vercel project ls -S x	inert
+vercel project ls -h	inert
+vercel project ls -j	inert
+vercel project ls x	inert
+vercel project x	denied
+vercel whoami	inert
+vercel whoami --help	inert
+vercel whoami --help -h	inert
+vercel whoami --help x	inert
+vercel whoami -h	inert
+vercel whoami x	inert
+vercel x	denied
+vi	inert
+vi --clean	inert
+vi --clean --help	inert
+vi --clean -T x	inert
+vi --clean x	inert
+vi --help	inert
+vi --log	inert
+vi --noplugin	inert
+vi --not-a-term	inert
+vi --startuptime	inert
+vi --ttyfail	inert
+vi --version	inert
+vi -C	inert
+vi -D	inert
+vi -L	inert
+vi -M	inert
+vi -N	inert
+vi -R	inert
+vi -T x	inert
+vi -Z	inert
+vi -b	inert
+vi -d	inert
+vi -h	inert
+vi -i x	inert
+vi -l	inert
+vi -m	inert
+vi -n	inert
+vi -q x	inert
+vi -r	inert
+vi -t x	inert
+vi -v	inert
+vi -x	inert
+vi -y	inert
+vi x	inert
+vibe	denied
+vibe --help	inert
+vibe --help --version	inert
+vibe --help x	denied
+vibe --version	inert
+vibe -V	inert
+vibe -h	inert
+vibe x	denied
+vidir	denied
+vidir --help	inert
+vidir --help --verbose	inert
+vidir --help x	denied
+vidir --verbose	inert
+vidir --version	denied
+vidir x	denied
+view	inert
+view --clean	inert
+view --clean --help	inert
+view --clean -T x	inert
+view --clean x	inert
+view --help	inert
+view --log	inert
+view --noplugin	inert
+view --not-a-term	inert
+view --startuptime	inert
+view --ttyfail	inert
+view --version	inert
+view -C	inert
+view -D	inert
+view -L	inert
+view -M	inert
+view -N	inert
+view -R	inert
+view -T x	inert
+view -Z	inert
+view -b	inert
+view -d	inert
+view -h	inert
+view -i x	inert
+view -l	inert
+view -m	inert
+view -n	inert
+view -q x	inert
+view -r	inert
+view -t x	inert
+view -v	inert
+view -x	inert
+view -y	inert
+view x	inert
+viewdiagnostic	denied
+viewdiagnostic --help	denied
+viewdiagnostic --version	denied
+viewdiagnostic /tmp/crash.ips	inert
+viewdiagnostic x	inert
+vim	inert
+vim --clean	inert
+vim --clean --help	inert
+vim --clean -T x	inert
+vim --clean x	inert
+vim --help	inert
+vim --log	inert
+vim --noplugin	inert
+vim --not-a-term	inert
+vim --startuptime	inert
+vim --ttyfail	inert
+vim --version	inert
+vim -C	inert
+vim -D	inert
+vim -L	inert
+vim -M	inert
+vim -N	inert
+vim -R	inert
+vim -T x	inert
+vim -Z	inert
+vim -b	inert
+vim -d	inert
+vim -h	inert
+vim -i x	inert
+vim -l	inert
+vim -m	inert
+vim -n	inert
+vim -q x	inert
+vim -r	inert
+vim -t x	inert
+vim -v	inert
+vim -x	inert
+vim -y	inert
+vim x	inert
+vimdiff	inert
+vimdiff --clean	inert
+vimdiff --clean --help	inert
+vimdiff --clean -T x	inert
+vimdiff --clean x	inert
+vimdiff --help	inert
+vimdiff --log	inert
+vimdiff --noplugin	inert
+vimdiff --not-a-term	inert
+vimdiff --startuptime	inert
+vimdiff --ttyfail	inert
+vimdiff --version	inert
+vimdiff -C	inert
+vimdiff -D	inert
+vimdiff -L	inert
+vimdiff -M	inert
+vimdiff -N	inert
+vimdiff -R	inert
+vimdiff -T x	inert
+vimdiff -Z	inert
+vimdiff -b	inert
+vimdiff -d	inert
+vimdiff -h	inert
+vimdiff -i x	inert
+vimdiff -l	inert
+vimdiff -m	inert
+vimdiff -n	inert
+vimdiff -q x	inert
+vimdiff -r	inert
+vimdiff -t x	inert
+vimdiff -v	inert
+vimdiff -x	inert
+vimdiff -y	inert
+vimdiff x	inert
+vipe	denied
+vipe --help	inert
+vipe --help --suffix	inert
+vipe --help x	denied
+vipe --suffix	inert
+vipe --version	denied
+vipe x	denied
+vis	inert
+vis --help	denied
+vis --version	denied
+vis -F x	inert
+vis -M	inert
+vis -M -F x	inert
+vis -M -N	inert
+vis -M x	inert
+vis -N	inert
+vis -S	inert
+vis -b	inert
+vis -c	inert
+vis -e x	inert
+vis -f	inert
+vis -h	inert
+vis -l	inert
+vis -m	inert
+vis -n	inert
+vis -o	inert
+vis -s	inert
+vis -t	inert
+vis -w	inert
+vis x	inert
+vite	denied
+vite --base x	denied
+vite --clearScreen	denied
+vite --clearScreen --base x	denied
+vite --clearScreen --debug	denied
+vite --clearScreen x	denied
+vite --config x	denied
+vite --debug	denied
+vite --filter	denied
+vite --force	denied
+vite --help	inert
+vite --logLevel x	denied
+vite --mode x	denied
+vite --profile	denied
+vite --version	inert
+vite -c x	denied
+vite -d	denied
+vite -f	denied
+vite -h	inert
+vite -l x	denied
+vite -m x	denied
+vite -v	inert
+vite build	safe-write
+vite build --app	safe-write
+vite build --app --assetsDir x	safe-write
+vite build --app --emptyOutDir	safe-write
+vite build --app x	safe-write
+vite build --assetsDir x	safe-write
+vite build --assetsInlineLimit x	safe-write
+vite build --emptyOutDir	safe-write
+vite build --help	safe-write
+vite build --manifest	safe-write
+vite build --minify	safe-write
+vite build --no-watch	safe-write
+vite build --outDir x	safe-write
+vite build --sourcemap	safe-write
+vite build --ssr	safe-write
+vite build --ssrManifest	safe-write
+vite build --target x	safe-write
+vite build --watch	safe-write
+vite build --write	safe-write
+vite build -h	safe-write
+vite build -w	safe-write
+vite build x	safe-write
+vite dev	denied
+vite dev x	denied
+vite help	inert
+vite help x	inert
+vite optimize	safe-write
+vite optimize --force	safe-write
+vite optimize --force --help	safe-write
+vite optimize --force x	safe-write
+vite optimize --help	safe-write
+vite optimize -h	safe-write
+vite optimize x	safe-write
+vite preview	safe-read
+vite preview --cors	safe-read
+vite preview --cors --help	safe-read
+vite preview --cors --host x	safe-read
+vite preview --cors x	safe-read
+vite preview --help	safe-read
+vite preview --host x	safe-read
+vite preview --https	safe-read
+vite preview --open	safe-read
+vite preview --port x	safe-read
+vite preview --strictPort	safe-read
+vite preview -h	safe-read
+vite preview x	safe-read
+vite serve	denied
+vite serve x	denied
+vite x	denied
+vitepress	denied
+vitepress --help	inert
+vitepress --help --out-dir x	denied
+vitepress --help --version	denied
+vitepress --help x	denied
+vitepress --out-dir x	denied
+vitepress --outDir x	denied
+vitepress --version	inert
+vitepress -h	inert
+vitepress -v	inert
+vitepress build	safe-write
+vitepress build --base x	safe-write
+vitepress build --cache-dir x	safe-write
+vitepress build --help	safe-write
+vitepress build --help --base x	safe-write
+vitepress build --help --mpa	safe-write
+vitepress build --help x	safe-write
+vitepress build --mpa	safe-write
+vitepress build --out-dir x	safe-write
+vitepress build --outDir x	safe-write
+vitepress build -h	safe-write
+vitepress build docs	safe-write
+vitepress build docs --base /docs/	safe-write
+vitepress build docs --out-dir ./dist	safe-write
+vitepress build docs --out-dir ~/.ssh/authorized_keys	denied
+vitepress build docs --outDir ./dist	safe-write
+vitepress build docs --outDir ~/.ssh	denied
+vitepress build x	safe-write
+vitepress dev	denied
+vitepress dev x	denied
+vitepress help	inert
+vitepress help x	inert
+vitepress init	safe-write
+vitepress init --help	safe-write
+vitepress init --help -h	safe-write
+vitepress init --help x	safe-write
+vitepress init -h	safe-write
+vitepress init x	safe-write
+vitepress preview	denied
+vitepress preview x	denied
+vitepress serve	denied
+vitepress serve x	denied
+vitepress x	denied
+vitest	safe-read
+vitest --bail	safe-read
+vitest --bail --changed	safe-read
+vitest --bail --color x	safe-read
+vitest --bail x	safe-read
+vitest --changed	safe-read
+vitest --color x	safe-read
+vitest --config x	safe-read
+vitest --coverage	safe-read
+vitest --dir x	safe-read
+vitest --dom	safe-read
+vitest --environment x	safe-read
+vitest --exclude x	safe-read
+vitest --globals	safe-read
+vitest --help	safe-read
+vitest --hideSkippedTests	safe-read
+vitest --include x	safe-read
+vitest --maxConcurrency x	safe-read
+vitest --mode x	safe-read
+vitest --no-color	safe-read
+vitest --no-isolate	safe-read
+vitest --passWithNoTests	safe-read
+vitest --project x	safe-read
+vitest --reporter	safe-read
+vitest --root x	safe-read
+vitest --run	safe-read
+vitest --silent	safe-read
+vitest --testTimeout x	safe-read
+vitest --ui	safe-read
+vitest --update	safe-read
+vitest --version	safe-read
+vitest --watch	safe-read
+vitest -c x	safe-read
+vitest -h	safe-read
+vitest -r x	safe-read
+vitest -t x	safe-read
+vitest -v	safe-read
+vitest x	safe-read
+vm_stat	inert
+vm_stat --help	inert
+vm_stat --help --version	inert
+vm_stat --help -c x	inert
+vm_stat --help x	inert
+vm_stat --version	inert
+vm_stat -V	inert
+vm_stat -c x	inert
+vm_stat -h	inert
+vm_stat x	inert
+vmmap	denied
+vmmap --allSplitLibs	inert
+vmmap --allSplitLibs --attributes	inert
+vmmap --allSplitLibs x	inert
+vmmap --attributes	inert
+vmmap --help	denied
+vmmap --interleaved	inert
+vmmap --noCoalesce	inert
+vmmap --pages	inert
+vmmap --sortBySize	inert
+vmmap --submap	inert
+vmmap --summary	inert
+vmmap --verbose	inert
+vmmap --version	denied
+vmmap --wide	inert
+vmmap -h	inert
+vmmap -s	inert
+vmmap -v	inert
+vmmap -w	inert
+vmmap x	inert
+volta	denied
+volta --help	inert
+volta --help --version	denied
+volta --help x	denied
+volta --version	inert
+volta -V	inert
+volta -h	inert
+volta list	inert
+volta list --current	inert
+volta list --current --default	inert
+volta list --current --format x	inert
+volta list --current x	inert
+volta list --default	inert
+volta list --format x	inert
+volta list --help	inert
+volta list -c	inert
+volta list -d	inert
+volta list -h	inert
+volta list x	inert
+volta which	inert
+volta which --current	inert
+volta which --current --default	inert
+volta which --current --format x	inert
+volta which --current x	inert
+volta which --default	inert
+volta which --format x	inert
+volta which --help	inert
+volta which -c	inert
+volta which -d	inert
+volta which -h	inert
+volta which x	inert
+volta x	denied
+vultr-cli	denied
+vultr-cli --config x	denied
+vultr-cli --help	inert
+vultr-cli --help --config x	inert
+vultr-cli --help --version	denied
+vultr-cli --help x	denied
+vultr-cli --version	inert
+vultr-cli -h	inert
+vultr-cli -v	inert
+vultr-cli account	inert
+vultr-cli account x	inert
+vultr-cli bare-metal	denied
+vultr-cli bare-metal get	denied
+vultr-cli bare-metal get --help	inert
+vultr-cli bare-metal get --help -h	inert
+vultr-cli bare-metal get --help x	inert
+vultr-cli bare-metal get -h	inert
+vultr-cli bare-metal get x	inert
+vultr-cli bare-metal list	inert
+vultr-cli bare-metal list --help	inert
+vultr-cli bare-metal list --help -h	inert
+vultr-cli bare-metal list --help x	inert
+vultr-cli bare-metal list -h	inert
+vultr-cli bare-metal list x	inert
+vultr-cli bare-metal x	denied
+vultr-cli block-storage	denied
+vultr-cli block-storage get	denied
+vultr-cli block-storage get --help	inert
+vultr-cli block-storage get --help -h	inert
+vultr-cli block-storage get --help x	inert
+vultr-cli block-storage get -h	inert
+vultr-cli block-storage get x	inert
+vultr-cli block-storage list	inert
+vultr-cli block-storage list --help	inert
+vultr-cli block-storage list --help -h	inert
+vultr-cli block-storage list --help x	inert
+vultr-cli block-storage list -h	inert
+vultr-cli block-storage list x	inert
+vultr-cli block-storage x	denied
+vultr-cli database	denied
+vultr-cli database get	denied
+vultr-cli database get --help	inert
+vultr-cli database get --help -h	inert
+vultr-cli database get --help x	inert
+vultr-cli database get -h	inert
+vultr-cli database get x	inert
+vultr-cli database list	inert
+vultr-cli database list --help	inert
+vultr-cli database list --help -h	inert
+vultr-cli database list --help x	inert
+vultr-cli database list -h	inert
+vultr-cli database list x	inert
+vultr-cli database x	denied
+vultr-cli dns	denied
+vultr-cli dns domain	denied
+vultr-cli dns domain --help	inert
+vultr-cli dns domain --help -h	denied
+vultr-cli dns domain --help x	denied
+vultr-cli dns domain -h	inert
+vultr-cli dns domain list	inert
+vultr-cli dns domain list --help	inert
+vultr-cli dns domain x	denied
+vultr-cli dns record	denied
+vultr-cli dns record --help	inert
+vultr-cli dns record --help -h	denied
+vultr-cli dns record --help x	denied
+vultr-cli dns record -h	inert
+vultr-cli dns record list	inert
+vultr-cli dns record list --help	inert
+vultr-cli dns record x	denied
+vultr-cli dns x	denied
+vultr-cli firewall	denied
+vultr-cli firewall group	denied
+vultr-cli firewall group --help	inert
+vultr-cli firewall group --help -h	denied
+vultr-cli firewall group --help x	denied
+vultr-cli firewall group -h	inert
+vultr-cli firewall group list	inert
+vultr-cli firewall group list --help	inert
+vultr-cli firewall group x	denied
+vultr-cli firewall rule	denied
+vultr-cli firewall rule --help	inert
+vultr-cli firewall rule --help -h	denied
+vultr-cli firewall rule --help x	denied
+vultr-cli firewall rule -h	inert
+vultr-cli firewall rule list	inert
+vultr-cli firewall rule list --help	inert
+vultr-cli firewall rule x	denied
+vultr-cli firewall x	denied
+vultr-cli instance	denied
+vultr-cli instance get	denied
+vultr-cli instance get --help	inert
+vultr-cli instance get --help -h	inert
+vultr-cli instance get --help x	inert
+vultr-cli instance get -h	inert
+vultr-cli instance get x	inert
+vultr-cli instance list	inert
+vultr-cli instance list --help	inert
+vultr-cli instance list --help -h	inert
+vultr-cli instance list --help x	inert
+vultr-cli instance list -h	inert
+vultr-cli instance list x	inert
+vultr-cli instance x	denied
+vultr-cli kubernetes	denied
+vultr-cli kubernetes get	denied
+vultr-cli kubernetes get --help	inert
+vultr-cli kubernetes get --help -h	inert
+vultr-cli kubernetes get --help x	inert
+vultr-cli kubernetes get -h	inert
+vultr-cli kubernetes get x	inert
+vultr-cli kubernetes list	inert
+vultr-cli kubernetes list --help	inert
+vultr-cli kubernetes list --help -h	inert
+vultr-cli kubernetes list --help x	inert
+vultr-cli kubernetes list -h	inert
+vultr-cli kubernetes list x	inert
+vultr-cli kubernetes x	denied
+vultr-cli os	denied
+vultr-cli os list	inert
+vultr-cli os list --help	inert
+vultr-cli os list --help -h	inert
+vultr-cli os list --help x	inert
+vultr-cli os list -h	inert
+vultr-cli os list x	inert
+vultr-cli os x	denied
+vultr-cli plans	denied
+vultr-cli plans list	inert
+vultr-cli plans list --help	inert
+vultr-cli plans list --help -h	inert
+vultr-cli plans list --help x	inert
+vultr-cli plans list -h	inert
+vultr-cli plans list x	inert
+vultr-cli plans x	denied
+vultr-cli regions	denied
+vultr-cli regions list	inert
+vultr-cli regions list --help	inert
+vultr-cli regions list --help -h	inert
+vultr-cli regions list --help x	inert
+vultr-cli regions list -h	inert
+vultr-cli regions list x	inert
+vultr-cli regions x	denied
+vultr-cli version	inert
+vultr-cli version x	inert
+vultr-cli x	denied
+vulture	denied
+vulture --config x	safe-read
+vulture --exclude x	safe-read
+vulture --help	safe-read
+vulture --help --config x	safe-read
+vulture --help --ignore-decorators	safe-read
+vulture --help x	safe-read
+vulture --ignore-decorators	safe-read
+vulture --ignore-names	safe-read
+vulture --make-whitelist	safe-read
+vulture --min-confidence x	safe-read
+vulture --sort-by-size	safe-read
+vulture --verbose	safe-read
+vulture --version	safe-read
+vulture -h	safe-read
+vulture -v	safe-read
+vulture x	safe-read
+vyper	denied
+vyper --abi	safe-write
+vyper --abi --abi-python	safe-write
+vyper --abi --evm-version x	safe-write
+vyper --abi x	safe-write
+vyper --abi-python	safe-write
+vyper --asm	safe-write
+vyper --ast	safe-write
+vyper --bin-runtime	safe-write
+vyper --bytecode	safe-write
+vyper --bytecode-runtime	safe-write
+vyper --combined-json	safe-write
+vyper --debug	safe-write
+vyper --devdoc	safe-write
+vyper --evm-version x	safe-write
+vyper --external-interface	safe-write
+vyper --help	safe-write
+vyper --hex-ir	safe-write
+vyper --interface	safe-write
+vyper --ir	safe-write
+vyper --metadata	safe-write
+vyper --no-bytecode-metadata	safe-write
+vyper --no-optimize x	safe-write
+vyper --opcodes	safe-write
+vyper --opcodes-runtime	safe-write
+vyper --optimize x	safe-write
+vyper --output-dir x	safe-write
+vyper --output-format x	safe-write
+vyper --root-folder x	safe-write
+vyper --source-map	safe-write
+vyper --standard-json	safe-write
+vyper --storage-layout	safe-write
+vyper --storage-layout x	safe-write
+vyper --traceback	safe-write
+vyper --userdoc	safe-write
+vyper --version	safe-write
+vyper -O x	safe-write
+vyper -f	safe-write
+vyper -f x	safe-write
+vyper -h	safe-write
+vyper -o x	safe-write
+vyper -p x	safe-write
+vyper x	safe-write

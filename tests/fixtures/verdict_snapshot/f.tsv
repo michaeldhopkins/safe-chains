@@ -1,0 +1,2918 @@
+FOO="bar baz" ls -la	inert
+FOO='bar baz' ls -la	inert
+FOO='bar baz' rm -rf /	denied
+factor	inert
+factor --exponents	inert
+factor --exponents --help	inert
+factor --exponents x	inert
+factor --help	inert
+factor --version	inert
+factor -V	inert
+factor -h	inert
+factor 42	inert
+factor x	inert
+false	inert
+false --help	inert
+false --help --version	inert
+false --help x	denied
+false --version	inert
+false -V	inert
+false -h	inert
+false x	denied
+fantomas	denied
+fantomas --check	safe-write
+fantomas --check --config x	safe-write
+fantomas --check --daemon	safe-write
+fantomas --check x	safe-write
+fantomas --config x	safe-write
+fantomas --daemon	safe-write
+fantomas --exclude x	safe-write
+fantomas --force	safe-write
+fantomas --help	safe-write
+fantomas --include x	safe-write
+fantomas --out	safe-write
+fantomas --out x	safe-write
+fantomas --parallel x	safe-write
+fantomas --profile	safe-write
+fantomas --quiet	safe-write
+fantomas --recurse	safe-write
+fantomas --standalone	safe-write
+fantomas --strict	safe-write
+fantomas --verbose	safe-write
+fantomas --version	safe-write
+fantomas -h	safe-write
+fantomas -r	safe-write
+fantomas x	safe-write
+fasterer	safe-read
+fasterer --help	safe-read
+fasterer --help --version	safe-read
+fasterer --help x	safe-read
+fasterer --version	safe-read
+fasterer -h	safe-read
+fasterer -v	safe-read
+fasterer x	safe-read
+fastlane	denied
+fastlane --help	inert
+fastlane --help --version	denied
+fastlane --help x	denied
+fastlane --version	inert
+fastlane -V	inert
+fastlane -h	inert
+fastlane action	denied
+fastlane action --help	inert
+fastlane action --help -h	inert
+fastlane action --help x	inert
+fastlane action -h	inert
+fastlane action x	inert
+fastlane actions	inert
+fastlane actions --help	inert
+fastlane actions --help -h	inert
+fastlane actions --help x	denied
+fastlane actions -h	inert
+fastlane actions x	denied
+fastlane env	inert
+fastlane env --help	inert
+fastlane env --help -h	inert
+fastlane env --help x	denied
+fastlane env -h	inert
+fastlane env x	denied
+fastlane lanes	inert
+fastlane lanes --help	inert
+fastlane lanes --help -h	inert
+fastlane lanes --help x	denied
+fastlane lanes -h	inert
+fastlane lanes x	denied
+fastlane x	denied
+fax2ps	denied
+fax2ps --help	denied
+fax2ps --version	denied
+fax2ps -?	safe-write
+fax2ps -? -H x	safe-write
+fax2ps -? -S	safe-write
+fax2ps -? x	safe-write
+fax2ps -H x	safe-write
+fax2ps -S	safe-write
+fax2ps -W x	safe-write
+fax2ps -h	safe-write
+fax2ps -l	safe-write
+fax2ps -m x	safe-write
+fax2ps -o x	safe-write
+fax2ps -p	safe-write
+fax2ps -r	safe-write
+fax2ps -s x	safe-write
+fax2ps -x x	safe-write
+fax2ps -y x	safe-write
+fax2ps x	safe-write
+fax2tiff	denied
+fax2tiff --help	denied
+fax2tiff --version	denied
+fax2tiff -1	safe-write
+fax2tiff -1 -2	safe-write
+fax2tiff -1 -X x	safe-write
+fax2tiff -1 x	safe-write
+fax2tiff -2	safe-write
+fax2tiff -3	safe-write
+fax2tiff -4	safe-write
+fax2tiff -?	safe-write
+fax2tiff -A	safe-write
+fax2tiff -B	safe-write
+fax2tiff -L	safe-write
+fax2tiff -M	safe-write
+fax2tiff -P	safe-write
+fax2tiff -R	safe-write
+fax2tiff -U	safe-write
+fax2tiff -X x	safe-write
+fax2tiff -c	safe-write
+fax2tiff -f	safe-write
+fax2tiff -h	safe-write
+fax2tiff -l	safe-write
+fax2tiff -m	safe-write
+fax2tiff -o x	safe-write
+fax2tiff -p	safe-write
+fax2tiff -r x	safe-write
+fax2tiff -s	safe-write
+fax2tiff -u	safe-write
+fax2tiff -v	safe-write
+fax2tiff -z	safe-write
+fax2tiff x	safe-write
+fd	inert
+fd --absolute-path	inert
+fd --absolute-path --and x	inert
+fd --absolute-path --case-sensitive	inert
+fd --absolute-path x	inert
+fd --and x	inert
+fd --base-directory x	inert
+fd --batch-size x	inert
+fd --case-sensitive	inert
+fd --change-newer-than x	inert
+fd --change-older-than x	inert
+fd --changed-after x	inert
+fd --changed-before x	inert
+fd --changed-within x	inert
+fd --color x	inert
+fd --evil	denied
+fd --evil -x echo {}	denied
+fd --exact-depth x	inert
+fd --exclude x	inert
+fd --extension x	inert
+fd --fixed-strings	inert
+fd --follow	inert
+fd --format x	inert
+fd --full-path	inert
+fd --glob	inert
+fd --has-results	inert
+fd --help	inert
+fd --hidden	inert
+fd --hyperlink x	inert
+fd --ignore	inert
+fd --ignore-case	inert
+fd --ignore-file x	inert
+fd --ignore-vcs	inert
+fd --list-details	inert
+fd --max-depth x	inert
+fd --max-results x	inert
+fd --min-depth x	inert
+fd --newer x	inert
+fd --no-follow	inert
+fd --no-hidden	inert
+fd --no-ignore	inert
+fd --no-ignore-parent	inert
+fd --no-ignore-vcs	inert
+fd --no-require-git	inert
+fd --older x	inert
+fd --one-file-system	inert
+fd --owner x	inert
+fd --path-separator x	inert
+fd --print0	inert
+fd --prune	inert
+fd --quiet	inert
+fd --regex	inert
+fd --relative-path	inert
+fd --require-git	inert
+fd --search-path /etc -X cat	denied
+fd --search-path x	inert
+fd --show-errors	inert
+fd --size x	inert
+fd --strip-cwd-prefix x	inert
+fd --threads x	inert
+fd --type f --hidden pattern	inert
+fd --type x	inert
+fd --unrestricted	inert
+fd --version	inert
+fd -0	inert
+fd -1	inert
+fd -E x	inert
+fd -F	inert
+fd -H	inert
+fd -I	inert
+fd -L	inert
+fd -S x	inert
+fd -V	inert
+fd -X cat	safe-read
+fd -a	inert
+fd -c x	inert
+fd -d x	inert
+fd -e rs	inert
+fd -e x	inert
+fd -g	inert
+fd -h	inert
+fd -i	inert
+fd -j x	inert
+fd -l	inert
+fd -o x	inert
+fd -p	inert
+fd -q	inert
+fd -s	inert
+fd -t x	inert
+fd -u	inert
+fd -x	denied
+fd -x cat {//}/{/}	safe-read
+fd -x echo {}	inert
+fd -x rm /etc/{}	denied
+fd -x rm {}	safe-write
+fd /etc -X cat	denied
+fd /etc -x cat {}	denied
+fd pattern	inert
+fd pattern -x wc -l {}	safe-read
+fd pattern src	inert
+fd x	inert
+fdp	denied
+fdp --help	safe-write
+fdp --help -?	safe-write
+fdp --help -A x	safe-write
+fdp --help x	safe-write
+fdp --version	denied
+fdp -?	safe-write
+fdp -A x	safe-write
+fdp -E x	safe-write
+fdp -G x	safe-write
+fdp -K x	safe-write
+fdp -N x	safe-write
+fdp -O	safe-write
+fdp -P	safe-write
+fdp -T x	safe-write
+fdp -V	safe-write
+fdp -n x	safe-write
+fdp -o x	safe-write
+fdp -q	safe-write
+fdp -s x	safe-write
+fdp -v	safe-write
+fdp -x	safe-write
+fdp -y	safe-write
+fdp x	safe-write
+ffmpeg	denied
+ffmpeg --help	safe-write
+ffmpeg --help -acodec x	safe-write
+ffmpeg --help -an	safe-write
+ffmpeg --help x	safe-write
+ffmpeg --version	denied
+ffmpeg -acodec x	safe-write
+ffmpeg -af x	safe-write
+ffmpeg -aframes x	safe-write
+ffmpeg -an	safe-write
+ffmpeg -an x	safe-write
+ffmpeg -ar x	safe-write
+ffmpeg -aspect x	safe-write
+ffmpeg -async x	safe-write
+ffmpeg -atag x	safe-write
+ffmpeg -autorotate	safe-write
+ffmpeg -b x	safe-write
+ffmpeg -b:a x	safe-write
+ffmpeg -b:v x	safe-write
+ffmpeg -benchmark	safe-write
+ffmpeg -benchmark_all	safe-write
+ffmpeg -bf x	safe-write
+ffmpeg -bitexact x	safe-write
+ffmpeg -bsf x	safe-write
+ffmpeg -c x	safe-write
+ffmpeg -c:a x	safe-write
+ffmpeg -c:v x	safe-write
+ffmpeg -channel_layout x	safe-write
+ffmpeg -codec x	safe-write
+ffmpeg -copyinkf	safe-write
+ffmpeg -copytb	safe-write
+ffmpeg -copyts	safe-write
+ffmpeg -crf x	safe-write
+ffmpeg -crop x	safe-write
+ffmpeg -debug	safe-write
+ffmpeg -deinterlace x	safe-write
+ffmpeg -disposition x	safe-write
+ffmpeg -dn	safe-write
+ffmpeg -ec x	safe-write
+ffmpeg -err_detect	safe-write
+ffmpeg -f x	safe-write
+ffmpeg -fflags	safe-write
+ffmpeg -filter x	safe-write
+ffmpeg -filter_complex x	safe-write
+ffmpeg -filter_threads x	safe-write
+ffmpeg -fix_sub_duration	safe-write
+ffmpeg -flags x	safe-write
+ffmpeg -fpre x	safe-write
+ffmpeg -frames x	safe-write
+ffmpeg -g x	safe-write
+ffmpeg -glx x	safe-write
+ffmpeg -h	safe-write
+ffmpeg -hide_banner	safe-write
+ffmpeg -i in.mp4 /etc/evil	denied
+ffmpeg -i x	safe-write
+ffmpeg -i ~/Movies/x.mp4 out.mp4	safe-write
+ffmpeg -init_hw_device x	safe-write
+ffmpeg -itsoffset x	safe-write
+ffmpeg -keyint_min x	safe-write
+ffmpeg -language x	safe-write
+ffmpeg -loglevel	safe-write
+ffmpeg -loglevel x	safe-write
+ffmpeg -loop x	safe-write
+ffmpeg -map x	safe-write
+ffmpeg -maxrate x	safe-write
+ffmpeg -metadata x	safe-write
+ffmpeg -minrate x	safe-write
+ffmpeg -mode x	safe-write
+ffmpeg -movflags x	safe-write
+ffmpeg -muxdelay x	safe-write
+ffmpeg -muxpreload x	safe-write
+ffmpeg -n	safe-write
+ffmpeg -newaudio x	safe-write
+ffmpeg -newsubtitle x	safe-write
+ffmpeg -newvideo x	safe-write
+ffmpeg -noaccurate_seek	safe-write
+ffmpeg -noautorotate	safe-write
+ffmpeg -nostats	safe-write
+ffmpeg -nostdin	safe-write
+ffmpeg -output_ts_offset x	safe-write
+ffmpeg -pass	safe-write
+ffmpeg -passlogfile x	safe-write
+ffmpeg -pre x	safe-write
+ffmpeg -preset x	safe-write
+ffmpeg -profile x	safe-write
+ffmpeg -progress	safe-write
+ffmpeg -q:a x	safe-write
+ffmpeg -q:v x	safe-write
+ffmpeg -qp x	safe-write
+ffmpeg -r x	safe-write
+ffmpeg -rc-lookahead x	safe-write
+ffmpeg -re	safe-write
+ffmpeg -readrate x	safe-write
+ffmpeg -report	safe-write
+ffmpeg -s x	safe-write
+ffmpeg -sameq x	safe-write
+ffmpeg -seek_timestamp x	safe-write
+ffmpeg -segment_format x	safe-write
+ffmpeg -segment_list x	safe-write
+ffmpeg -segment_time x	safe-write
+ffmpeg -shortest	safe-write
+ffmpeg -shortest_buf_duration x	safe-write
+ffmpeg -sleeve x	safe-write
+ffmpeg -sn	safe-write
+ffmpeg -ss x	safe-write
+ffmpeg -stats	safe-write
+ffmpeg -stats_period x	safe-write
+ffmpeg -stream_loop x	safe-write
+ffmpeg -strftime x	safe-write
+ffmpeg -strict	safe-write
+ffmpeg -sync x	safe-write
+ffmpeg -t x	safe-write
+ffmpeg -target x	safe-write
+ffmpeg -threads x	safe-write
+ffmpeg -time_base x	safe-write
+ffmpeg -timecode x	safe-write
+ffmpeg -timestamp x	safe-write
+ffmpeg -to x	safe-write
+ffmpeg -tune x	safe-write
+ffmpeg -vbr x	safe-write
+ffmpeg -vcodec x	safe-write
+ffmpeg -version	safe-write
+ffmpeg -vf x	safe-write
+ffmpeg -vframes x	safe-write
+ffmpeg -vn	safe-write
+ffmpeg -vol x	safe-write
+ffmpeg -vstats	safe-write
+ffmpeg -x264-params x	safe-write
+ffmpeg -x264opts x	safe-write
+ffmpeg -y	safe-write
+ffmpeg x	safe-write
+ffprobe	denied
+ffprobe --help	safe-read
+ffprobe --help -bitexact	safe-read
+ffprobe --help -count_frames x	safe-read
+ffprobe --help x	safe-read
+ffprobe --version	denied
+ffprobe -bitexact	safe-read
+ffprobe -byte_binary_prefix	safe-read
+ffprobe -count_frames x	safe-read
+ffprobe -count_packets x	safe-read
+ffprobe -fflags x	safe-read
+ffprobe -find_stream_info	safe-read
+ffprobe -h	safe-read
+ffprobe -hide_banner	safe-read
+ffprobe -i x	safe-read
+ffprobe -loglevel	safe-read
+ffprobe -loglevel x	safe-read
+ffprobe -no_unit	safe-read
+ffprobe -of	safe-read
+ffprobe -of x	safe-read
+ffprobe -output_format	safe-read
+ffprobe -output_format x	safe-read
+ffprobe -pretty	safe-read
+ffprobe -print_format	safe-read
+ffprobe -print_format x	safe-read
+ffprobe -probesize x	safe-read
+ffprobe -read_intervals x	safe-read
+ffprobe -select_streams x	safe-read
+ffprobe -sexagesimal	safe-read
+ffprobe -show_chapters	safe-read
+ffprobe -show_data	safe-read
+ffprobe -show_data_hash	safe-read
+ffprobe -show_entries	safe-read
+ffprobe -show_entries x	safe-read
+ffprobe -show_error	safe-read
+ffprobe -show_format	safe-read
+ffprobe -show_format_entry	safe-read
+ffprobe -show_format_entry x	safe-read
+ffprobe -show_frames	safe-read
+ffprobe -show_log	safe-read
+ffprobe -show_packets	safe-read
+ffprobe -show_pixel_formats	safe-read
+ffprobe -show_private_data	safe-read
+ffprobe -show_program_version	safe-read
+ffprobe -show_programs	safe-read
+ffprobe -show_streams	safe-read
+ffprobe -show_streams_info x	safe-read
+ffprobe -show_versions	safe-read
+ffprobe -stream_specifier x	safe-read
+ffprobe -unit	safe-read
+ffprobe -v	safe-read
+ffprobe -version	safe-read
+ffprobe x	safe-read
+fgrep	denied
+fgrep 'literal string' file.txt	safe-read
+fgrep --help	denied
+fgrep --version	denied
+fgrep x	inert
+fi	denied
+fido2-assert	denied
+fido2-assert --help	denied
+fido2-assert --version	denied
+fido2-assert -G	safe-write
+fido2-assert -G -V	safe-write
+fido2-assert -G -i x	safe-write
+fido2-assert -G x	safe-write
+fido2-assert -V	safe-write
+fido2-assert -b	safe-write
+fido2-assert -d	safe-write
+fido2-assert -h	safe-write
+fido2-assert -i x	safe-write
+fido2-assert -o x	safe-write
+fido2-assert -p	safe-write
+fido2-assert -r	safe-write
+fido2-assert -t x	safe-write
+fido2-assert -u	safe-write
+fido2-assert -v	safe-write
+fido2-assert -w	safe-write
+fido2-assert x	safe-write
+fido2-cred	denied
+fido2-cred --help	denied
+fido2-cred --version	denied
+fido2-cred -M	safe-write
+fido2-cred -M -V	safe-write
+fido2-cred -M -a x	safe-write
+fido2-cred -M x	safe-write
+fido2-cred -V	safe-write
+fido2-cred -a x	safe-write
+fido2-cred -b	safe-write
+fido2-cred -c x	safe-write
+fido2-cred -d	safe-write
+fido2-cred -h	safe-write
+fido2-cred -i x	safe-write
+fido2-cred -o x	safe-write
+fido2-cred -q	safe-write
+fido2-cred -r	safe-write
+fido2-cred -t x	safe-write
+fido2-cred -u	safe-write
+fido2-cred -v	safe-write
+fido2-cred -w	safe-write
+fido2-cred x	safe-write
+fido2-token	denied
+fido2-token --help	denied
+fido2-token --version	denied
+fido2-token -I	safe-read
+fido2-token -I -L	safe-read
+fido2-token -I -k x	safe-read
+fido2-token -I x	safe-read
+fido2-token -L	safe-read
+fido2-token -R /dev/hidraw0	denied
+fido2-token -V	safe-read
+fido2-token -b	safe-read
+fido2-token -c	safe-read
+fido2-token -d	safe-read
+fido2-token -e	safe-read
+fido2-token -k x	safe-read
+fido2-token -r	safe-read
+fido2-token x	safe-read
+file	denied
+file --brief	inert
+file --brief --debug	inert
+file --brief --exclude x	inert
+file --brief x	inert
+file --debug	inert
+file --dereference	inert
+file --exclude x	inert
+file --exclude-quiet x	inert
+file --extension	inert
+file --files-from x	inert
+file --help	inert
+file --keep-going	inert
+file --list	inert
+file --magic-file x	inert
+file --mime	inert
+file --mime-encoding	inert
+file --mime-type	inert
+file --no-buffer	inert
+file --no-dereference	inert
+file --no-pad	inert
+file --no-sandbox	inert
+file --parameter x	inert
+file --preserve-date	inert
+file --print0	inert
+file --raw	inert
+file --separator x	inert
+file --special-files	inert
+file --uncompress	inert
+file --uncompress-noreport	inert
+file --version	inert
+file -0	inert
+file -D	inert
+file -F x	inert
+file -I	inert
+file -L	inert
+file -N	inert
+file -P x	inert
+file -S	inert
+file -V	inert
+file -Z	inert
+file -b	inert
+file -d	inert
+file -e x	inert
+file -f x	inert
+file -h	inert
+file -i	inert
+file -k	inert
+file -l	inert
+file -m x	inert
+file -n	inert
+file -p	inert
+file -r	inert
+file -s	inert
+file -z	inert
+file x	inert
+fileproviderctl	denied
+fileproviderctl --help	inert
+fileproviderctl --help -h	denied
+fileproviderctl --help x	denied
+fileproviderctl --version	denied
+fileproviderctl -h	inert
+fileproviderctl dump	inert
+fileproviderctl dump --help	inert
+fileproviderctl dump --help -h	inert
+fileproviderctl dump --help x	inert
+fileproviderctl dump -h	inert
+fileproviderctl dump x	inert
+fileproviderctl enumerate	denied
+fileproviderctl enumerate --help	inert
+fileproviderctl enumerate --help -h	inert
+fileproviderctl enumerate --help x	inert
+fileproviderctl enumerate -h	inert
+fileproviderctl enumerate x	inert
+fileproviderctl ls	denied
+fileproviderctl ls --help	inert
+fileproviderctl ls --help -h	inert
+fileproviderctl ls --help x	inert
+fileproviderctl ls -h	inert
+fileproviderctl ls x	inert
+fileproviderctl materialize	denied
+fileproviderctl materialize x	denied
+fileproviderctl validate	denied
+fileproviderctl validate --help	inert
+fileproviderctl validate --help -h	inert
+fileproviderctl validate --help x	inert
+fileproviderctl validate -h	inert
+fileproviderctl validate x	inert
+fileproviderctl x	denied
+fileurltool	denied
+fileurltool --help	inert
+fileurltool --help -h	denied
+fileurltool --help x	denied
+fileurltool --version	denied
+fileurltool -h	inert
+fileurltool check	denied
+fileurltool check --by-path	inert
+fileurltool check --by-path --by-ref	inert
+fileurltool check --by-path x	inert
+fileurltool check --by-ref	inert
+fileurltool check --help	inert
+fileurltool check -h	inert
+fileurltool check x	inert
+fileurltool get	denied
+fileurltool get --by-path	inert
+fileurltool get --by-path --by-ref	inert
+fileurltool get --by-path x	inert
+fileurltool get --by-ref	inert
+fileurltool get --cf1	inert
+fileurltool get --cfm	inert
+fileurltool get --help	inert
+fileurltool get --leaks	inert
+fileurltool get --ns1	inert
+fileurltool get --nsm	inert
+fileurltool get --print-cache	inert
+fileurltool get --print-type	inert
+fileurltool get -h	inert
+fileurltool get x	inert
+fileurltool getflags	denied
+fileurltool getflags --by-path	inert
+fileurltool getflags --by-path --by-ref	inert
+fileurltool getflags --by-path x	inert
+fileurltool getflags --by-ref	inert
+fileurltool getflags --help	inert
+fileurltool getflags -h	inert
+fileurltool getflags x	inert
+fileurltool getvolflags	denied
+fileurltool getvolflags --by-path	inert
+fileurltool getvolflags --by-path --by-ref	inert
+fileurltool getvolflags --by-path x	inert
+fileurltool getvolflags --by-ref	inert
+fileurltool getvolflags --help	inert
+fileurltool getvolflags -h	inert
+fileurltool getvolflags x	inert
+fileurltool keys	inert
+fileurltool keys --help	inert
+fileurltool keys --help -h	inert
+fileurltool keys --help x	inert
+fileurltool keys -h	inert
+fileurltool keys x	inert
+fileurltool set	denied
+fileurltool set x	denied
+fileurltool x	denied
+find	inert
+find --help	inert
+find --help --version	inert
+find --help -D x	inert
+find --help x	inert
+find --version	inert
+find -D	inert
+find -D tree /etc -exec rm {} \\;	denied
+find -D x	inert
+find -H	inert
+find -H -P -D	inert
+find -L	inert
+find -L -D	inert
+find -L /etc -exec rm -rf {} \\;	denied
+find -O3 /etc -exec rm {} \\;	denied
+find -P	inert
+find -P / -exec rm {} \\;	denied
+find -a	inert
+find -amin x	inert
+find -and	inert
+find -anewer x	inert
+find -atime x	inert
+find -cmin x	inert
+find -cnewer x	inert
+find -context x	inert
+find -ctime x	inert
+find -d	inert
+find -daystart	inert
+find -depth	inert
+find -empty	inert
+find -executable	inert
+find -false	inert
+find -follow	inert
+find -fstype x	inert
+find -gid x	inert
+find -group x	inert
+find -help	inert
+find -ignore_readdir_race	inert
+find -ilname x	inert
+find -iname x	inert
+find -inum x	inert
+find -ipath x	inert
+find -iregex x	inert
+find -iwholename x	inert
+find -links x	inert
+find -lname x	inert
+find -ls	inert
+find -maxdepth x	inert
+find -mindepth x	inert
+find -mmin x	inert
+find -mount	inert
+find -mtime x	inert
+find -name x	inert
+find -nogroup	inert
+find -noignore_readdir_race	inert
+find -noleaf	inert
+find -not	inert
+find -nouser	inert
+find -nowarn	inert
+find -o	inert
+find -or	inert
+find -path x	inert
+find -perm x	inert
+find -print	inert
+find -print0	inert
+find -printf x	inert
+find -prune	inert
+find -quit	inert
+find -readable	inert
+find -regex x	inert
+find -regextype x	inert
+find -samefile x	inert
+find -size x	inert
+find -true	inert
+find -type x	inert
+find -uid x	inert
+find -used x	inert
+find -user x	inert
+find -version	inert
+find -warn	inert
+find -wholename x	inert
+find -writable	inert
+find -xdev	inert
+find -xtype x	inert
+find . -delete	safe-write
+find . -empty	inert
+find . -exec bash -c 'git status' \\;	inert
+find . -exec bash -c 'ls && rm -rf /' \\;	denied
+find . -exec cat {} \\;	safe-read
+find . -exec rm -rf {} +	safe-write
+find . -exec rm {} \\;	safe-write
+find . -execdir cat {} \\;	safe-read
+find . -execdir grep pattern {} \\;	safe-read
+find . -execdir rm {} \\;	safe-write
+find . -fls /tmp/list.txt	denied
+find . -fprint /tmp/list.txt	denied
+find . -fprint0 /tmp/list.txt	denied
+find . -fprintf /tmp/list.txt '%p'	denied
+find . -frobnicate	denied
+find . -maxdepth 2 -type d	inert
+find . -mindepth 1 -maxdepth 3 -type d	inert
+find . -mtime -7 -delete	safe-write
+find . -mtime -7 -type f	inert
+find . -name '*.log' -print	inert
+find . -name '*.log' -print0	inert
+find . -name '*.log' | xargs cat	safe-read
+find . -name '*.py' -exec grep pattern {} +	safe-read
+find . -name '*.py' > listing.txt	safe-write
+find . -name '*.py' | sort | head -10	inert
+find . -name '*.py' | wc -l	inert
+find . -name '*.py' | xargs grep pattern	safe-read
+find . -name '*.rb'	inert
+find . -name '*.rb' -exec grep -l pattern {} +	safe-read
+find . -name '*.rb' -exec grep -l pattern {} \\;	safe-read
+find . -name '*.rb' -o -name '*.py'	inert
+find . -name '*.rb' | wc -l	inert
+find . -name '*.rs'	inert
+find . -name '*.tmp' -delete	safe-write
+find . -name -delete	inert
+find . -newer ref.txt	inert
+find . -newermt 2024-01-01	inert
+find . -not -name '*.tmp'	inert
+find . -ok rm {} \\;	denied
+find . -okdir rm {} \\;	denied
+find . -perm -644	inert
+find . -printf '%p\\n'	inert
+find . -size -1M	inert
+find . -type f -flushcache	denied
+find . -type f -name '*.bak' -delete	safe-write
+find . -type f -name '*.py'	inert
+find /etc -delete	denied
+find /etc -delete --help	denied
+find /etc -delete --version	denied
+find /etc -mtime -7 -delete	denied
+find /etc -name '*.py' -delete | wc -l	denied
+find /etc -name '*.tmp' -delete	denied
+find /tmp -maxdepth 2	inert
+find src -type f	inert
+find x	inert
+find ~ -name '*.bak' -delete	denied
+find ~ -type f -name '*.bak' -delete	denied
+findmnt	inert
+findmnt --all	inert
+findmnt --all --ascii	inert
+findmnt --all --direction x	inert
+findmnt --all x	inert
+findmnt --ascii	inert
+findmnt --bytes	inert
+findmnt --canonicalize	inert
+findmnt --df	inert
+findmnt --direction x	inert
+findmnt --evaluate	inert
+findmnt --evil	denied
+findmnt --first-only	inert
+findmnt --fstab	inert
+findmnt --help	inert
+findmnt --invert	inert
+findmnt --json	inert
+findmnt --json -t tmpfs	inert
+findmnt --kernel	inert
+findmnt --list	inert
+findmnt --mountpoint x	inert
+findmnt --mtab	inert
+findmnt --no-canonicalize	inert
+findmnt --nofsroot	inert
+findmnt --noheadings	inert
+findmnt --notruncate	inert
+findmnt --options x	inert
+findmnt --output x	inert
+findmnt --pairs	inert
+findmnt --poll	inert
+findmnt --raw	inert
+findmnt --shell	inert
+findmnt --source x	inert
+findmnt --submounts	inert
+findmnt --tab-file x	inert
+findmnt --target x	inert
+findmnt --task x	inert
+findmnt --timeout x	inert
+findmnt --types tmpfs	inert
+findmnt --types x	inert
+findmnt --verbose	inert
+findmnt --verify	inert
+findmnt --version	inert
+findmnt -A	inert
+findmnt -C	inert
+findmnt -D	inert
+findmnt -F x	inert
+findmnt -J	inert
+findmnt -M x	inert
+findmnt -N x	inert
+findmnt -O x	inert
+findmnt -P	inert
+findmnt -R	inert
+findmnt -S /dev/disk1s1	inert
+findmnt -S x	inert
+findmnt -T x	inert
+findmnt -V	inert
+findmnt -a	inert
+findmnt -b	inert
+findmnt -c	inert
+findmnt -d x	inert
+findmnt -e	inert
+findmnt -f	inert
+findmnt -h	inert
+findmnt -i	inert
+findmnt -k	inert
+findmnt -l	inert
+findmnt -m	inert
+findmnt -n	inert
+findmnt -o x	inert
+findmnt -p	inert
+findmnt -r	inert
+findmnt -s	inert
+findmnt -t tmpfs	inert
+findmnt -t x	inert
+findmnt -u	inert
+findmnt -v	inert
+findmnt -w x	inert
+findmnt -x	inert
+findmnt -y	inert
+findmnt /tmp	inert
+findmnt x	inert
+findrule	inert
+findrule --help	inert
+findrule --help -h	inert
+findrule --help x	inert
+findrule --version	denied
+findrule -h	inert
+findrule . -name '*.pm'	inert
+findrule x	inert
+firebase	denied
+firebase --help	inert
+firebase --help --version	denied
+firebase --help x	denied
+firebase --version	inert
+firebase -V	inert
+firebase -h	inert
+firebase apps:list	inert
+firebase apps:list --help	inert
+firebase apps:list --help -h	inert
+firebase apps:list --help x	denied
+firebase apps:list -h	inert
+firebase apps:list x	denied
+firebase functions:log	inert
+firebase functions:log --help	inert
+firebase functions:log --help --only x	inert
+firebase functions:log --help -h	inert
+firebase functions:log --help x	inert
+firebase functions:log --only x	inert
+firebase functions:log -h	inert
+firebase functions:log x	inert
+firebase login:list	inert
+firebase login:list --help	inert
+firebase login:list --help -h	inert
+firebase login:list --help x	denied
+firebase login:list -h	inert
+firebase login:list x	denied
+firebase projects:list	inert
+firebase projects:list --help	inert
+firebase projects:list --help -h	inert
+firebase projects:list --help x	denied
+firebase projects:list -h	inert
+firebase projects:list x	denied
+firebase x	denied
+fix-qdf	safe-write
+fix-qdf --help	denied
+fix-qdf --version	denied
+fix-qdf < broken.pdf > fixed.pdf	safe-write
+fix-qdf x	safe-write
+flake8	safe-read
+flake8 --benchmark	safe-read
+flake8 --benchmark --config x	safe-read
+flake8 --benchmark --count	safe-read
+flake8 --benchmark x	safe-read
+flake8 --config x	safe-read
+flake8 --count	safe-read
+flake8 --exclude x	safe-read
+flake8 --extend-exclude x	safe-read
+flake8 --extend-ignore x	safe-read
+flake8 --filename x	safe-read
+flake8 --format x	safe-read
+flake8 --help	safe-read
+flake8 --ignore x	safe-read
+flake8 --max-complexity x	safe-read
+flake8 --max-line-length x	safe-read
+flake8 --output-file x	safe-read
+flake8 --per-file-ignores x	safe-read
+flake8 --quiet	safe-read
+flake8 --select x	safe-read
+flake8 --show-pep8	safe-read
+flake8 --show-source	safe-read
+flake8 --statistics	safe-read
+flake8 --verbose	safe-read
+flake8 --version	safe-read
+flake8 -V	safe-read
+flake8 -h	safe-read
+flake8 -q	safe-read
+flake8 -v	safe-read
+flake8 x	safe-read
+flang	denied
+flang --help	safe-write
+flang --help --version	safe-write
+flang --help x	safe-write
+flang --version	safe-write
+flang -h	safe-write
+flang -v	safe-write
+flang x	safe-write
+flang-new	denied
+flang-new --help	safe-write
+flang-new --help --version	safe-write
+flang-new --help x	safe-write
+flang-new --version	safe-write
+flang-new -h	safe-write
+flang-new -v	safe-write
+flang-new x	safe-write
+flay	denied
+flay -# x	safe-read
+flay --diff	safe-read
+flay --diff -# x	safe-read
+flay --diff --help	safe-read
+flay --diff x	safe-read
+flay --fuzzy x	safe-read
+flay --help	safe-read
+flay --liberal	safe-read
+flay --mass x	safe-read
+flay --summary	safe-read
+flay --timeout x	safe-read
+flay --verbose	safe-read
+flay --version	safe-read
+flay -d	safe-read
+flay -f x	safe-read
+flay -h	safe-read
+flay -l	safe-read
+flay -m x	safe-read
+flay -s	safe-read
+flay -t x	safe-read
+flay -v	safe-read
+flay x	safe-read
+flex	denied
+flex -+	safe-write
+flex -+ --7bit	safe-write
+flex -+ --header-file x	safe-write
+flex -+ x	safe-write
+flex --7bit	safe-write
+flex --8bit	safe-write
+flex --align	safe-write
+flex --backup	safe-write
+flex --batch	safe-write
+flex --bison-bridge	safe-write
+flex --bison-locations	safe-write
+flex --c++	safe-write
+flex --case-insensitive	safe-write
+flex --debug	safe-write
+flex --ecs	safe-write
+flex --fast	safe-write
+flex --full	safe-write
+flex --header-file x	safe-write
+flex --help	safe-write
+flex --hex	safe-write
+flex --interactive	safe-write
+flex --lex-compat	safe-write
+flex --meta-ecs	safe-write
+flex --nodefault	safe-write
+flex --noline	safe-write
+flex --nounistd	safe-write
+flex --nowarn	safe-write
+flex --outfile x	safe-write
+flex --perf-report	safe-write
+flex --posix-compat	safe-write
+flex --prefix x	safe-write
+flex --reentrant	safe-write
+flex --skel x	safe-write
+flex --stdinit	safe-write
+flex --stdout	safe-write
+flex --tables-file x	safe-write
+flex --trace	safe-write
+flex --verbose	safe-write
+flex --version	safe-write
+flex --yyclass x	safe-write
+flex --yylineno	safe-write
+flex -7	safe-write
+flex -8	safe-write
+flex -?	safe-write
+flex -B	safe-write
+flex -CF	safe-write
+flex -Ca	safe-write
+flex -Ce	safe-write
+flex -Cem	safe-write
+flex -Cf	safe-write
+flex -Cm	safe-write
+flex -Cr	safe-write
+flex -D x	safe-write
+flex -F	safe-write
+flex -I	safe-write
+flex -L	safe-write
+flex -P x	safe-write
+flex -R	safe-write
+flex -S x	safe-write
+flex -T	safe-write
+flex -V	safe-write
+flex -X	safe-write
+flex -b	safe-write
+flex -c	safe-write
+flex -d	safe-write
+flex -f	safe-write
+flex -h	safe-write
+flex -i	safe-write
+flex -l	safe-write
+flex -n	safe-write
+flex -o scanner.c scanner.l	safe-write
+flex -o x	safe-write
+flex -p	safe-write
+flex -s	safe-write
+flex -t	safe-write
+flex -v	safe-write
+flex -w	safe-write
+flex scan.l	safe-write
+flex scanner.l	safe-write
+flex x	safe-write
+flog	denied
+flog --18	safe-read
+flog --18 --19	safe-read
+flog --18 --extra-options x	safe-read
+flog --18 x	safe-read
+flog --19	safe-read
+flog --all	safe-read
+flog --blame	safe-read
+flog --continue	safe-read
+flog --details	safe-read
+flog --extra-options x	safe-read
+flog --group	safe-read
+flog --help	safe-read
+flog --include x	safe-read
+flog --methods-only	safe-read
+flog --quiet	safe-read
+flog --require x	safe-read
+flog --score	safe-read
+flog --verbose	safe-read
+flog --version	safe-read
+flog -I x	safe-read
+flog -a	safe-read
+flog -b	safe-read
+flog -c	safe-read
+flog -d	safe-read
+flog -e x	safe-read
+flog -g	safe-read
+flog -h	safe-read
+flog -m	safe-read
+flog -q	safe-read
+flog -r x	safe-read
+flog -s	safe-read
+flog -v	safe-read
+flog x	safe-read
+flutter	denied
+flutter --help	inert
+flutter --help --version	denied
+flutter --help --write x	denied
+flutter --help x	denied
+flutter --version	inert
+flutter --write x	denied
+flutter -h	inert
+flutter -v	inert
+flutter analyze	safe-read
+flutter analyze --cache x	safe-read
+flutter analyze --congratulate	safe-read
+flutter analyze --congratulate --cache x	safe-read
+flutter analyze --congratulate --current-package	safe-read
+flutter analyze --congratulate x	safe-read
+flutter analyze --current-package	safe-read
+flutter analyze --exit-code x	safe-read
+flutter analyze --fatal-infos	safe-read
+flutter analyze --fatal-warnings	safe-read
+flutter analyze --help	safe-read
+flutter analyze --machine	safe-read
+flutter analyze --no-fatal-infos	safe-read
+flutter analyze --no-fatal-warnings	safe-read
+flutter analyze --no-pub	safe-read
+flutter analyze --preamble	safe-read
+flutter analyze --watch	safe-read
+flutter analyze --write	safe-write
+flutter analyze --write ./analysis.txt	safe-write
+flutter analyze --write x	safe-write
+flutter analyze -h	safe-read
+flutter analyze x	safe-read
+flutter attach	denied
+flutter attach x	denied
+flutter build	denied
+flutter build apk	denied
+flutter build x	denied
+flutter channel	inert
+flutter channel --help	inert
+flutter channel --help -h	inert
+flutter channel --help x	inert
+flutter channel -h	inert
+flutter channel x	inert
+flutter clean	denied
+flutter clean x	denied
+flutter config	inert
+flutter config --analytics	inert
+flutter config --analytics --android-sdk x	inert
+flutter config --analytics --clear-features	inert
+flutter config --analytics x	inert
+flutter config --android-sdk x	inert
+flutter config --android-studio-dir x	inert
+flutter config --build-dir x	inert
+flutter config --clear-features	inert
+flutter config --clear-ios-signing-cert	inert
+flutter config --enable-analytics	inert
+flutter config --enable-android	inert
+flutter config --enable-fuchsia	inert
+flutter config --enable-ios	inert
+flutter config --enable-linux-desktop	inert
+flutter config --enable-macos-desktop	inert
+flutter config --enable-native-assets	inert
+flutter config --enable-web	inert
+flutter config --enable-windows-desktop	inert
+flutter config --help	inert
+flutter config --jdk-dir x	inert
+flutter config --list	inert
+flutter config --no-analytics	inert
+flutter config --no-android-sdk x	inert
+flutter config --no-android-studio-dir x	inert
+flutter config --no-build-dir x	inert
+flutter config --no-enable-android	inert
+flutter config --no-enable-fuchsia	inert
+flutter config --no-enable-ios	inert
+flutter config --no-enable-linux-desktop	inert
+flutter config --no-enable-macos-desktop	inert
+flutter config --no-enable-web	inert
+flutter config --no-enable-windows-desktop	inert
+flutter config --no-jdk-dir	inert
+flutter config -h	inert
+flutter config x	inert
+flutter create	denied
+flutter create x	denied
+flutter devices	inert
+flutter devices --device-discovery-timeout x	inert
+flutter devices --device-id x	inert
+flutter devices --device-timeout x	inert
+flutter devices --help	inert
+flutter devices --help --device-discovery-timeout x	inert
+flutter devices --help --machine	inert
+flutter devices --help x	inert
+flutter devices --machine	inert
+flutter devices -d x	inert
+flutter devices -h	inert
+flutter devices x	inert
+flutter doctor	inert
+flutter doctor --android-licenses	inert
+flutter doctor --android-licenses --check-for-remote-artifacts	inert
+flutter doctor --android-licenses x	inert
+flutter doctor --check-for-remote-artifacts	inert
+flutter doctor --help	inert
+flutter doctor --verbose	inert
+flutter doctor -h	inert
+flutter doctor -v	inert
+flutter doctor x	inert
+flutter downgrade	denied
+flutter downgrade x	denied
+flutter drive	denied
+flutter drive x	denied
+flutter emulators	inert
+flutter emulators --help	inert
+flutter emulators --help --launch x	inert
+flutter emulators --help -h	inert
+flutter emulators --help x	inert
+flutter emulators --launch x	inert
+flutter emulators --name x	inert
+flutter emulators -h	inert
+flutter emulators x	inert
+flutter format	denied
+flutter format x	denied
+flutter gen-l10n	denied
+flutter gen-l10n x	denied
+flutter help	inert
+flutter help x	inert
+flutter ide-config	denied
+flutter ide-config x	denied
+flutter install	denied
+flutter install x	denied
+flutter logs	safe-read
+flutter logs --clear	denied
+flutter logs --device-id x	safe-read
+flutter logs --evil-flag	denied
+flutter logs --help	safe-read
+flutter logs --help --device-id x	safe-read
+flutter logs --help -h	safe-read
+flutter logs --help x	safe-read
+flutter logs -d ABC123	safe-read
+flutter logs -d x	safe-read
+flutter logs -h	safe-read
+flutter logs x	safe-read
+flutter make-host-app-editable	denied
+flutter make-host-app-editable x	denied
+flutter precache	denied
+flutter precache x	denied
+flutter pub	denied
+flutter pub x	denied
+flutter run	denied
+flutter run x	denied
+flutter screenshot	denied
+flutter screenshot x	denied
+flutter symbolize	denied
+flutter symbolize x	denied
+flutter test	denied
+flutter test x	denied
+flutter upgrade	denied
+flutter upgrade x	denied
+flutter version	inert
+flutter version --help	inert
+flutter version --help -h	inert
+flutter version --help x	inert
+flutter version -h	inert
+flutter version x	inert
+flutter x	denied
+flux	denied
+flux --as x	denied
+flux --as-group x	denied
+flux --as-uid x	denied
+flux --cache-dir x	denied
+flux --certificate-authority x	denied
+flux --client-certificate x	denied
+flux --client-key x	denied
+flux --cluster x	denied
+flux --context x	denied
+flux --disable-compression x	denied
+flux --help	inert
+flux --help --as x	inert
+flux --help --insecure-skip-tls-verify	inert
+flux --help x	denied
+flux --insecure-skip-tls-verify	denied
+flux --kube-api-burst x	denied
+flux --kube-api-qps x	denied
+flux --kubeconfig x	denied
+flux --namespace x	denied
+flux --password x	denied
+flux --request-timeout x	denied
+flux --server x	denied
+flux --server-side	denied
+flux --timeout x	denied
+flux --tls-server-name x	denied
+flux --token x	denied
+flux --user x	denied
+flux --username x	denied
+flux --version	inert
+flux -h	inert
+flux -n x	denied
+flux -v	inert
+flux apply	denied
+flux apply x	denied
+flux approve	denied
+flux approve x	denied
+flux bootstrap	denied
+flux bootstrap x	denied
+flux build	denied
+flux build x	denied
+flux check	safe-read
+flux check --components x	safe-read
+flux check --components-extra x	safe-read
+flux check --help	safe-read
+flux check --help --components x	safe-read
+flux check --help --pre	safe-read
+flux check --help x	safe-read
+flux check --kustomization x	safe-read
+flux check --pre	safe-read
+flux check --source x	safe-read
+flux check -h	safe-read
+flux check x	safe-read
+flux completion	denied
+flux completion --help	inert
+flux completion --help -h	inert
+flux completion --help x	inert
+flux completion -h	inert
+flux completion x	inert
+flux create	denied
+flux create x	denied
+flux delete	denied
+flux delete x	denied
+flux diff	denied
+flux diff artifact	denied
+flux diff artifact x	denied
+flux diff kustomization	denied
+flux diff kustomization x	denied
+flux diff x	denied
+flux edit	denied
+flux edit x	denied
+flux envsubst	denied
+flux envsubst x	denied
+flux events	denied
+flux events x	denied
+flux get	safe-read
+flux get --all-namespaces	safe-read
+flux get --all-namespaces --context x	safe-read
+flux get --all-namespaces --help	safe-read
+flux get --all-namespaces x	safe-read
+flux get --context x	safe-read
+flux get --help	safe-read
+flux get --kubeconfig x	safe-read
+flux get --label-selector x	safe-read
+flux get --namespace x	safe-read
+flux get --no-header	safe-read
+flux get --status-selector x	safe-read
+flux get --timeout x	safe-read
+flux get --watch-errors	safe-read
+flux get -A	safe-read
+flux get -h	safe-read
+flux get -n x	safe-read
+flux get x	safe-read
+flux help	inert
+flux help x	inert
+flux import	denied
+flux import x	denied
+flux install	denied
+flux install x	denied
+flux list	denied
+flux list x	denied
+flux logs	safe-read
+flux logs --all-namespaces	safe-read
+flux logs --all-namespaces --context x	safe-read
+flux logs --all-namespaces --follow	safe-read
+flux logs --all-namespaces x	safe-read
+flux logs --context x	safe-read
+flux logs --follow	safe-read
+flux logs --help	safe-read
+flux logs --kind x	safe-read
+flux logs --kubeconfig x	safe-read
+flux logs --level x	safe-read
+flux logs --name x	safe-read
+flux logs --namespace x	safe-read
+flux logs --since x	safe-read
+flux logs --tail x	safe-read
+flux logs -A	safe-read
+flux logs -f	safe-read
+flux logs -h	safe-read
+flux logs -n x	safe-read
+flux logs x	safe-read
+flux logs-controllers	denied
+flux logs-controllers x	denied
+flux patch	denied
+flux patch x	denied
+flux pull	denied
+flux pull x	denied
+flux push	denied
+flux push x	denied
+flux reconcile	denied
+flux reconcile x	denied
+flux resume	denied
+flux resume x	denied
+flux set-context	denied
+flux set-context x	denied
+flux set-orgs	denied
+flux set-orgs x	denied
+flux stats	safe-read
+flux stats --all-namespaces	safe-read
+flux stats --all-namespaces --context x	safe-read
+flux stats --all-namespaces --help	safe-read
+flux stats --all-namespaces x	safe-read
+flux stats --context x	safe-read
+flux stats --help	safe-read
+flux stats --kubeconfig x	safe-read
+flux stats --namespace x	safe-read
+flux stats -A	safe-read
+flux stats -h	safe-read
+flux stats -n x	safe-read
+flux stats x	safe-read
+flux suspend	denied
+flux suspend x	denied
+flux trace	denied
+flux trace --api-version x	safe-read
+flux trace --context x	safe-read
+flux trace --help	safe-read
+flux trace --help --api-version x	safe-read
+flux trace --help -h	safe-read
+flux trace --help x	safe-read
+flux trace --kind x	safe-read
+flux trace --kubeconfig x	safe-read
+flux trace --namespace x	safe-read
+flux trace -h	safe-read
+flux trace -n x	safe-read
+flux trace x	safe-read
+flux tree	denied
+flux tree --compact	safe-read
+flux tree --compact --context x	safe-read
+flux tree --compact --help	safe-read
+flux tree --compact x	safe-read
+flux tree --context x	safe-read
+flux tree --help	safe-read
+flux tree --kubeconfig x	safe-read
+flux tree --namespace x	safe-read
+flux tree -h	safe-read
+flux tree -n x	safe-read
+flux tree x	safe-read
+flux uninstall	denied
+flux uninstall x	denied
+flux uninstall-cli	denied
+flux uninstall-cli x	denied
+flux version	inert
+flux version --client	inert
+flux version --client --help	inert
+flux version --client --output x	inert
+flux version --client x	inert
+flux version --help	inert
+flux version --output x	inert
+flux version -h	inert
+flux version -o x	inert
+flux version x	inert
+flux watch	denied
+flux watch x	denied
+flux x	denied
+fly	denied
+fly --help	inert
+fly --help --version	denied
+fly --help x	denied
+fly --version	inert
+fly -V	inert
+fly -h	inert
+fly apps	denied
+fly apps list	inert
+fly apps list --help	inert
+fly apps list --help -h	inert
+fly apps list --help x	inert
+fly apps list -h	inert
+fly apps list x	inert
+fly apps x	denied
+fly config	denied
+fly config show	inert
+fly config show --app x	inert
+fly config show --help	inert
+fly config show --help --app x	inert
+fly config show --help --json	inert
+fly config show --help x	inert
+fly config show --json	inert
+fly config show -a x	inert
+fly config show -h	inert
+fly config show -j	inert
+fly config show x	inert
+fly config x	denied
+fly ips	denied
+fly ips list	inert
+fly ips list --app x	inert
+fly ips list --help	inert
+fly ips list --help --app x	inert
+fly ips list --help --json	inert
+fly ips list --help x	inert
+fly ips list --json	inert
+fly ips list -a x	inert
+fly ips list -h	inert
+fly ips list -j	inert
+fly ips list x	inert
+fly ips x	denied
+fly logs	inert
+fly logs --app x	inert
+fly logs --help	inert
+fly logs --help --app x	inert
+fly logs --help -h	inert
+fly logs --help x	inert
+fly logs --instance x	inert
+fly logs --region x	inert
+fly logs -a x	inert
+fly logs -h	inert
+fly logs -i x	inert
+fly logs -r x	inert
+fly logs x	inert
+fly platform	denied
+fly platform regions	inert
+fly platform regions --help	inert
+fly platform regions --help -h	inert
+fly platform regions --help x	inert
+fly platform regions -h	inert
+fly platform regions x	inert
+fly platform x	denied
+fly regions	denied
+fly regions list	inert
+fly regions list --app x	inert
+fly regions list --help	inert
+fly regions list --help --app x	inert
+fly regions list --help --json	inert
+fly regions list --help x	inert
+fly regions list --json	inert
+fly regions list -a x	inert
+fly regions list -h	inert
+fly regions list -j	inert
+fly regions list x	inert
+fly regions x	denied
+fly releases	inert
+fly releases --app x	inert
+fly releases --help	inert
+fly releases --help --app x	inert
+fly releases --help --json	inert
+fly releases --help x	inert
+fly releases --json	inert
+fly releases -a x	inert
+fly releases -h	inert
+fly releases -j	inert
+fly releases x	inert
+fly services	denied
+fly services list	inert
+fly services list --app x	inert
+fly services list --help	inert
+fly services list --help --app x	inert
+fly services list --help --json	inert
+fly services list --help x	inert
+fly services list --json	inert
+fly services list -a x	inert
+fly services list -h	inert
+fly services list -j	inert
+fly services list x	inert
+fly services x	denied
+fly status	inert
+fly status --app x	inert
+fly status --help	inert
+fly status --help --app x	inert
+fly status --help --json	inert
+fly status --help x	inert
+fly status --json	inert
+fly status -a x	inert
+fly status -h	inert
+fly status -j	inert
+fly status x	inert
+fly version	inert
+fly version --help	inert
+fly version --help -h	inert
+fly version --help x	inert
+fly version -h	inert
+fly version x	inert
+fly x	denied
+flyctl	denied
+flyctl --help	inert
+flyctl --help --version	denied
+flyctl --help x	denied
+flyctl --version	inert
+flyctl -V	inert
+flyctl -h	inert
+flyctl apps	denied
+flyctl apps list	inert
+flyctl apps list --help	inert
+flyctl apps list --help -h	inert
+flyctl apps list --help x	inert
+flyctl apps list -h	inert
+flyctl apps list x	inert
+flyctl apps x	denied
+flyctl config	denied
+flyctl config show	inert
+flyctl config show --app x	inert
+flyctl config show --help	inert
+flyctl config show --help --app x	inert
+flyctl config show --help --json	inert
+flyctl config show --help x	inert
+flyctl config show --json	inert
+flyctl config show -a x	inert
+flyctl config show -h	inert
+flyctl config show -j	inert
+flyctl config show x	inert
+flyctl config x	denied
+flyctl ips	denied
+flyctl ips list	inert
+flyctl ips list --app x	inert
+flyctl ips list --help	inert
+flyctl ips list --help --app x	inert
+flyctl ips list --help --json	inert
+flyctl ips list --help x	inert
+flyctl ips list --json	inert
+flyctl ips list -a x	inert
+flyctl ips list -h	inert
+flyctl ips list -j	inert
+flyctl ips list x	inert
+flyctl ips x	denied
+flyctl logs	inert
+flyctl logs --app x	inert
+flyctl logs --help	inert
+flyctl logs --help --app x	inert
+flyctl logs --help -h	inert
+flyctl logs --help x	inert
+flyctl logs --instance x	inert
+flyctl logs --region x	inert
+flyctl logs -a x	inert
+flyctl logs -h	inert
+flyctl logs -i x	inert
+flyctl logs -r x	inert
+flyctl logs x	inert
+flyctl platform	denied
+flyctl platform regions	inert
+flyctl platform regions --help	inert
+flyctl platform regions --help -h	inert
+flyctl platform regions --help x	inert
+flyctl platform regions -h	inert
+flyctl platform regions x	inert
+flyctl platform x	denied
+flyctl regions	denied
+flyctl regions list	inert
+flyctl regions list --app x	inert
+flyctl regions list --help	inert
+flyctl regions list --help --app x	inert
+flyctl regions list --help --json	inert
+flyctl regions list --help x	inert
+flyctl regions list --json	inert
+flyctl regions list -a x	inert
+flyctl regions list -h	inert
+flyctl regions list -j	inert
+flyctl regions list x	inert
+flyctl regions x	denied
+flyctl releases	inert
+flyctl releases --app x	inert
+flyctl releases --help	inert
+flyctl releases --help --app x	inert
+flyctl releases --help --json	inert
+flyctl releases --help x	inert
+flyctl releases --json	inert
+flyctl releases -a x	inert
+flyctl releases -h	inert
+flyctl releases -j	inert
+flyctl releases x	inert
+flyctl services	denied
+flyctl services list	inert
+flyctl services list --app x	inert
+flyctl services list --help	inert
+flyctl services list --help --app x	inert
+flyctl services list --help --json	inert
+flyctl services list --help x	inert
+flyctl services list --json	inert
+flyctl services list -a x	inert
+flyctl services list -h	inert
+flyctl services list -j	inert
+flyctl services list x	inert
+flyctl services x	denied
+flyctl status	inert
+flyctl status --app x	inert
+flyctl status --help	inert
+flyctl status --help --app x	inert
+flyctl status --help --json	inert
+flyctl status --help x	inert
+flyctl status --json	inert
+flyctl status -a x	inert
+flyctl status -h	inert
+flyctl status -j	inert
+flyctl status x	inert
+flyctl version	inert
+flyctl version --help	inert
+flyctl version --help -h	inert
+flyctl version --help x	inert
+flyctl version -h	inert
+flyctl version x	inert
+flyctl x	denied
+flyway	denied
+flyway --help	inert
+flyway --help --version	denied
+flyway --help x	denied
+flyway --version	inert
+flyway -h	inert
+flyway -v	inert
+flyway auth	denied
+flyway auth x	denied
+flyway baseline	denied
+flyway baseline x	denied
+flyway check	safe-read
+flyway check x	safe-read
+flyway clean	denied
+flyway clean x	denied
+flyway help	inert
+flyway help x	inert
+flyway history	safe-read
+flyway history x	safe-read
+flyway info	safe-read
+flyway info x	safe-read
+flyway migrate	denied
+flyway migrate x	denied
+flyway prepare	denied
+flyway prepare x	denied
+flyway repair	denied
+flyway repair x	denied
+flyway snapshot	denied
+flyway snapshot x	denied
+flyway undo	denied
+flyway undo x	denied
+flyway validate	safe-read
+flyway validate x	safe-read
+flyway version	inert
+flyway version x	inert
+flyway x	denied
+fm	denied
+fm --help	inert
+fm --help --version	denied
+fm --help x	denied
+fm --version	inert
+fm -V	inert
+fm -h	inert
+fm available	denied
+fm available x	denied
+fm chat	denied
+fm chat x	denied
+fm quota-usage	denied
+fm quota-usage x	denied
+fm respond	denied
+fm respond 'hi'	denied
+fm respond x	denied
+fm schema	denied
+fm schema x	denied
+fm serve	denied
+fm serve x	denied
+fm token-count	denied
+fm token-count x	denied
+fm x	denied
+fmt	inert
+fmt --crown-margin	inert
+fmt --crown-margin --goal x	inert
+fmt --crown-margin --help	inert
+fmt --crown-margin x	inert
+fmt --goal x	inert
+fmt --help	inert
+fmt --prefix x	inert
+fmt --split-only	inert
+fmt --tagged-paragraph	inert
+fmt --uniform-spacing	inert
+fmt --version	inert
+fmt --width x	inert
+fmt -V	inert
+fmt -c	inert
+fmt -d x	inert
+fmt -g x	inert
+fmt -h	inert
+fmt -l x	inert
+fmt -m	inert
+fmt -n	inert
+fmt -p x	inert
+fmt -s	inert
+fmt -t x	inert
+fmt -u	inert
+fmt -w 72 file.txt	inert
+fmt -w x	inert
+fmt x	inert
+fnm	denied
+fnm --help	inert
+fnm --help --version	denied
+fnm --help x	denied
+fnm --version	inert
+fnm -V	inert
+fnm -h	inert
+fnm current	inert
+fnm current --help	inert
+fnm current --help -h	inert
+fnm current --help x	inert
+fnm current -h	inert
+fnm current x	inert
+fnm default	inert
+fnm default --help	inert
+fnm default --help -h	inert
+fnm default --help x	inert
+fnm default -h	inert
+fnm default x	inert
+fnm env	inert
+fnm env --help	inert
+fnm env --help --multi	inert
+fnm env --help --shell x	inert
+fnm env --help x	denied
+fnm env --multi	inert
+fnm env --shell x	inert
+fnm env --use-on-cd	inert
+fnm env -h	inert
+fnm env x	denied
+fnm list	inert
+fnm list --help	inert
+fnm list --help -h	inert
+fnm list --help x	inert
+fnm list -h	inert
+fnm list x	inert
+fnm ls-remote	inert
+fnm ls-remote --help	inert
+fnm ls-remote --help -h	inert
+fnm ls-remote --help x	inert
+fnm ls-remote -h	inert
+fnm ls-remote x	inert
+fnm x	denied
+fold	inert
+fold --bytes	inert
+fold --bytes --help	inert
+fold --bytes --width x	inert
+fold --bytes x	inert
+fold --help	inert
+fold --spaces	inert
+fold --version	inert
+fold --width x	inert
+fold -V	inert
+fold -b	inert
+fold -h	inert
+fold -s	inert
+fold -w 80 file.txt	inert
+fold -w x	inert
+fold x	inert
+foo=bar	inert
+footprint	denied
+footprint --all	inert
+footprint --all --exclude x	inert
+footprint --all --forkCorpse	inert
+footprint --all x	inert
+footprint --exclude x	inert
+footprint --forkCorpse	inert
+footprint --format x	inert
+footprint --help	inert
+footprint --json	inert
+footprint --minFootprint x	inert
+footprint --pid x	inert
+footprint --proc	inert
+footprint --sample x	inert
+footprint --skip	inert
+footprint --sort x	inert
+footprint --swapped	inert
+footprint --sysFootprint	inert
+footprint --targetChildren	inert
+footprint --version	inert
+footprint --vmObjectDirty	inert
+footprint --wide	inert
+footprint --wired	inert
+footprint -a	inert
+footprint -f x	inert
+footprint -h	inert
+footprint -j x	inert
+footprint -p x	inert
+footprint -s	inert
+footprint -t	inert
+footprint -v	inert
+footprint -w	inert
+footprint -x x	inert
+footprint -y	inert
+footprint x	inert
+for c in a b c; do out=$(jj diff -r $c --summary); if [ -n "$out" ]; then echo "$c: $out"; fi; done	inert
+for c in a b; do result=$(jj diff -r $c --git | grep -c pattern || echo 0); if [ "$result" -gt 0 ]; then desc=$(jj log --no-graph -r $c -T template); echo "$c: $desc"; fi; done	inert
+for f in $(fd a /etc); do cat $f; done	denied
+for f in $(fd a app/ | head -3); do cat $f; done	safe-read
+for f in $(fd a app/); do cat "$f"; done	safe-read
+for f in $(fd a app/); do cat $f; done	safe-read
+for f in $(fd a app/); do echo hi > $f; done	safe-write
+for f in $(fd a ~); do cat $f; done	denied
+for f in $(hostname); do cat $f; done	denied
+for f in $(pwd); do cat $f/../../etc/shadow; done	denied
+for f in $(pwd); do cat $f; done	safe-read
+for f in *.txt; do cat $f | grep pattern; done	safe-read
+for f in *.txt; do { echo $f; cat $f; } > combined.txt; done	safe-write
+for f in a b; do echo $f; done 2>/dev/null	inert
+for f in a b; do echo $f; done > $(evil)	denied
+for f in a b; do echo $f; done > out.txt	safe-write
+for f in a b; do rm -rf $f; done 2>/dev/null	safe-write
+for f in a.rs b.rs; do echo "== $f =="; gh api repos/o/r/contents/$f --jq .content | base64 -d; done 2>&1 | head -260	inert
+for f in src/a src/b; do echo $f; done 2>&1 | head -5	inert
+for i in 1 2; do cat < /tmp/x; done	inert
+for i in 1 2; do echo $((i * 10)); done	inert
+for i in 1 2; do echo $i; rc=$?; done	inert
+for i in 1 2; do x=1; done	inert
+for x in $(rm -rf /); do echo $x; done	denied
+for x in $(seq 1 5); do echo $x; done	inert
+for x in 1 2 3; do echo $x	denied
+for x in 1 2 3; do echo $x; done	inert
+for x in 1 2 3; do rm $x; done	safe-write
+for x in 1 2 3; do; done	inert
+for x in 1 2 3; echo $x; done	denied
+for x in 1 2; do :; done	inert
+for x in 1 2; do echo $x; done && echo finished	inert
+for x in 1 2; do echo $x; done; for y in a b; do echo $y; done	inert
+for x in 1 2; do for y in a b; do echo $x $y; done; done	inert
+for x in 1 2; do if test $x = 1; then echo one; fi; done	inert
+foreman	denied
+foreman --help	inert
+foreman --help --version	denied
+foreman --help x	denied
+foreman --version	inert
+foreman -h	inert
+foreman -v	inert
+foreman check	safe-read
+foreman check --help	safe-read
+foreman check --help --procfile x	safe-read
+foreman check --help -h	safe-read
+foreman check --help x	safe-read
+foreman check --procfile x	safe-read
+foreman check -f x	safe-read
+foreman check -h	safe-read
+foreman check x	safe-read
+foreman export	denied
+foreman export x	denied
+foreman help	inert
+foreman help x	inert
+foreman run	denied
+foreman run x	denied
+foreman start	denied
+foreman start x	denied
+foreman version	inert
+foreman version --help	inert
+foreman version --help -h	inert
+foreman version --help x	inert
+foreman version -h	inert
+foreman version x	inert
+foreman x	denied
+forge	denied
+forge --help	inert
+forge --help --version	denied
+forge --help x	denied
+forge --version	inert
+forge -h	inert
+forge -v	inert
+forge bind	denied
+forge bind x	denied
+forge bind-json	denied
+forge bind-json x	denied
+forge build	denied
+forge build x	denied
+forge cache	denied
+forge cache x	denied
+forge clean	denied
+forge clean x	denied
+forge compile	denied
+forge compile x	denied
+forge completions	denied
+forge completions --help	inert
+forge completions --help -h	inert
+forge completions --help x	inert
+forge completions -h	inert
+forge completions x	inert
+forge config	safe-read
+forge config x	safe-read
+forge coverage	denied
+forge coverage x	denied
+forge create	denied
+forge create x	denied
+forge debug	denied
+forge debug x	denied
+forge doc	denied
+forge doc x	denied
+forge eip712	denied
+forge eip712 x	denied
+forge flatten	safe-read
+forge flatten x	safe-read
+forge fmt	denied
+forge fmt x	denied
+forge geiger	safe-read
+forge geiger x	safe-read
+forge generate	denied
+forge generate x	denied
+forge help	inert
+forge help x	inert
+forge init	denied
+forge init x	denied
+forge inspect	safe-read
+forge inspect x	safe-read
+forge install	denied
+forge install x	denied
+forge lint	safe-read
+forge lint --config-path x	safe-read
+forge lint --help	safe-read
+forge lint --help --config-path x	safe-read
+forge lint --help --json	safe-read
+forge lint --help x	safe-read
+forge lint --json	safe-read
+forge lint --root x	safe-read
+forge lint --severity x	safe-read
+forge lint -h	safe-read
+forge lint x	safe-read
+forge remappings	safe-read
+forge remappings x	safe-read
+forge remove	denied
+forge remove x	denied
+forge script	denied
+forge script x	denied
+forge selectors	safe-read
+forge selectors x	safe-read
+forge selectors-	denied
+forge selectors- x	denied
+forge snapshot	denied
+forge snapshot x	denied
+forge soldeer	denied
+forge soldeer x	denied
+forge test	denied
+forge test x	denied
+forge tree	safe-read
+forge tree x	safe-read
+forge update	denied
+forge update x	denied
+forge verify-bytecode	safe-read
+forge verify-bytecode x	safe-read
+forge verify-check	safe-read
+forge verify-check x	safe-read
+forge verify-contract	denied
+forge verify-contract x	denied
+forge version	inert
+forge version x	inert
+forge x	denied
+fossil	denied
+fossil --help	inert
+fossil --help --version	denied
+fossil --help x	denied
+fossil --version	inert
+fossil -h	inert
+fossil -v	inert
+fossil add	denied
+fossil add x	denied
+fossil addremove	denied
+fossil addremove x	denied
+fossil alerts	denied
+fossil alerts x	denied
+fossil all	denied
+fossil all x	denied
+fossil amend	denied
+fossil amend x	denied
+fossil annotate	denied
+fossil annotate x	denied
+fossil blame	denied
+fossil blame x	denied
+fossil branch	inert
+fossil branch close	denied
+fossil branch close x	denied
+fossil branch current	inert
+fossil branch current --help	inert
+fossil branch current --help -h	inert
+fossil branch current --help x	inert
+fossil branch current -h	inert
+fossil branch current x	inert
+fossil branch info	inert
+fossil branch info --help	inert
+fossil branch info --help --repository	inert
+fossil branch info --help --repository x	inert
+fossil branch info --help x	inert
+fossil branch info --repository	inert
+fossil branch info --repository x	inert
+fossil branch info -R	inert
+fossil branch info -R x	inert
+fossil branch info -h	inert
+fossil branch info x	inert
+fossil branch list	inert
+fossil branch list --all	inert
+fossil branch list --all --closed	inert
+fossil branch list --all --repository x	inert
+fossil branch list --all x	inert
+fossil branch list --closed	inert
+fossil branch list --help	inert
+fossil branch list --repository	inert
+fossil branch list --repository x	inert
+fossil branch list --verbose	inert
+fossil branch list -R x	inert
+fossil branch list -a	inert
+fossil branch list -c	inert
+fossil branch list -h	inert
+fossil branch list -r	inert
+fossil branch list -v	inert
+fossil branch list x	inert
+fossil branch new	denied
+fossil branch new x	denied
+fossil branch reopen	denied
+fossil branch reopen x	denied
+fossil branch x	denied
+fossil cat	denied
+fossil cat --help	safe-read
+fossil cat --help --repository	safe-read
+fossil cat --help --repository x	safe-read
+fossil cat --help x	safe-read
+fossil cat --repository	safe-read
+fossil cat --repository x	safe-read
+fossil cat -R	safe-read
+fossil cat -R x	safe-read
+fossil cat -h	safe-read
+fossil cat -r	safe-read
+fossil cat -r x	safe-read
+fossil cat x	safe-read
+fossil cgi	denied
+fossil cgi x	denied
+fossil checkout	denied
+fossil checkout x	denied
+fossil ci	denied
+fossil ci x	denied
+fossil clone	denied
+fossil clone x	denied
+fossil close	denied
+fossil close x	denied
+fossil co	denied
+fossil co x	denied
+fossil commit	denied
+fossil commit x	denied
+fossil config	denied
+fossil config x	denied
+fossil configuration	denied
+fossil configuration x	denied
+fossil cp	denied
+fossil cp x	denied
+fossil deconstruct	denied
+fossil deconstruct x	denied
+fossil diff	safe-read
+fossil diff --against x	safe-read
+fossil diff --brief	safe-read
+fossil diff --brief --against x	safe-read
+fossil diff --brief --checkin	safe-read
+fossil diff --brief x	safe-read
+fossil diff --checkin	safe-read
+fossil diff --context	safe-read
+fossil diff --diff-binary	safe-read
+fossil diff --diff-binary x	safe-read
+fossil diff --exclude	safe-read
+fossil diff --exec-abs-paths x	safe-read
+fossil diff --exec-rel-paths x	safe-read
+fossil diff --from	safe-read
+fossil diff --from x	safe-read
+fossil diff --help	safe-read
+fossil diff --ignore-all-space	safe-read
+fossil diff --ignore-blank-lines	safe-read
+fossil diff --ignore-case	safe-read
+fossil diff --ignore-eol-ws	safe-read
+fossil diff --ignore-space-at-eol	safe-read
+fossil diff --ignore-trailing-cr	safe-read
+fossil diff --include	safe-read
+fossil diff --internal	safe-read
+fossil diff --internal x	safe-read
+fossil diff --invert	safe-read
+fossil diff --no-dir-prefix	safe-read
+fossil diff --numstat	safe-read
+fossil diff --quiet	safe-read
+fossil diff --repository	safe-read
+fossil diff --repository x	safe-read
+fossil diff --show-summary	safe-read
+fossil diff --side-by-side	safe-read
+fossil diff --strip-trailing-cr	safe-read
+fossil diff --strip-trailing-lf	safe-read
+fossil diff --strip-trailing-spaces	safe-read
+fossil diff --strip-trailing-spaces x	safe-read
+fossil diff --strip-trailing-whitespace	safe-read
+fossil diff --strip-trailing-whitespace x	safe-read
+fossil diff --tk	safe-read
+fossil diff --to	safe-read
+fossil diff --to x	safe-read
+fossil diff --unified	safe-read
+fossil diff --unified x	safe-read
+fossil diff --verbose	safe-read
+fossil diff --versions	safe-read
+fossil diff --web	safe-read
+fossil diff -N	safe-read
+fossil diff -N x	safe-read
+fossil diff -R	safe-read
+fossil diff -R x	safe-read
+fossil diff -W	safe-read
+fossil diff -W x	safe-read
+fossil diff -Z	safe-read
+fossil diff -b	safe-read
+fossil diff -c	safe-read
+fossil diff -c x	safe-read
+fossil diff -h	safe-read
+fossil diff -i	safe-read
+fossil diff -q	safe-read
+fossil diff -r	safe-read
+fossil diff -r x	safe-read
+fossil diff -u	safe-read
+fossil diff -v	safe-read
+fossil diff -w	safe-read
+fossil diff -y	safe-read
+fossil diff -y x	safe-read
+fossil diff -z	safe-read
+fossil diff x	safe-read
+fossil extras	safe-read
+fossil extras --abs-paths	safe-read
+fossil extras --abs-paths --case-sensitive	safe-read
+fossil extras --abs-paths --ignore x	safe-read
+fossil extras --abs-paths x	safe-read
+fossil extras --case-sensitive	safe-read
+fossil extras --dotfiles	safe-read
+fossil extras --header	safe-read
+fossil extras --help	safe-read
+fossil extras --ignore	safe-read
+fossil extras --ignore x	safe-read
+fossil extras --rel-paths	safe-read
+fossil extras --repository	safe-read
+fossil extras --repository x	safe-read
+fossil extras -R	safe-read
+fossil extras -R x	safe-read
+fossil extras -h	safe-read
+fossil extras x	safe-read
+fossil finfo	denied
+fossil finfo --branch x	safe-read
+fossil finfo --help	safe-read
+fossil finfo --help --branch x	safe-read
+fossil finfo --help --limit	safe-read
+fossil finfo --help x	safe-read
+fossil finfo --limit	safe-read
+fossil finfo --limit x	safe-read
+fossil finfo --no-graph	safe-read
+fossil finfo --offset	safe-read
+fossil finfo --print	safe-read
+fossil finfo --repository	safe-read
+fossil finfo --repository x	safe-read
+fossil finfo --show-id	safe-read
+fossil finfo --showid	safe-read
+fossil finfo --status	safe-read
+fossil finfo --type	safe-read
+fossil finfo --type x	safe-read
+fossil finfo --width	safe-read
+fossil finfo --width x	safe-read
+fossil finfo -R	safe-read
+fossil finfo -R x	safe-read
+fossil finfo -h	safe-read
+fossil finfo -l	safe-read
+fossil finfo -l x	safe-read
+fossil finfo -p	safe-read
+fossil finfo -w	safe-read
+fossil finfo -w x	safe-read
+fossil finfo x	safe-read
+fossil forum	denied
+fossil forum x	denied
+fossil fts-config	denied
+fossil fts-config x	denied
+fossil help	inert
+fossil help x	inert
+fossil info	safe-read
+fossil info --comment-format	safe-read
+fossil info --comment-format --help	safe-read
+fossil info --comment-format --repository x	safe-read
+fossil info --comment-format x	safe-read
+fossil info --help	safe-read
+fossil info --repository	safe-read
+fossil info --repository x	safe-read
+fossil info --verbose	safe-read
+fossil info -R	safe-read
+fossil info -R x	safe-read
+fossil info -h	safe-read
+fossil info -v	safe-read
+fossil info x	safe-read
+fossil init	denied
+fossil init x	denied
+fossil ls	safe-read
+fossil ls --age	safe-read
+fossil ls --age --help	safe-read
+fossil ls --age --repository x	safe-read
+fossil ls --age x	safe-read
+fossil ls --help	safe-read
+fossil ls --repository	safe-read
+fossil ls --repository x	safe-read
+fossil ls --type	safe-read
+fossil ls --type x	safe-read
+fossil ls --verbose	safe-read
+fossil ls -R	safe-read
+fossil ls -R x	safe-read
+fossil ls -h	safe-read
+fossil ls -l	safe-read
+fossil ls -r	safe-read
+fossil ls -r x	safe-read
+fossil ls -v	safe-read
+fossil ls x	safe-read
+fossil merge	denied
+fossil merge x	denied
+fossil mv	denied
+fossil mv x	denied
+fossil new	denied
+fossil new x	denied
+fossil open	denied
+fossil open x	denied
+fossil praise	denied
+fossil praise x	denied
+fossil pull	denied
+fossil pull x	denied
+fossil purge	denied
+fossil purge x	denied
+fossil push	denied
+fossil push x	denied
+fossil rebase	denied
+fossil rebase x	denied
+fossil rebuild	denied
+fossil rebuild x	denied
+fossil reconstruct	denied
+fossil reconstruct x	denied
+fossil rename	denied
+fossil rename x	denied
+fossil revert	denied
+fossil revert x	denied
+fossil rm	denied
+fossil rm x	denied
+fossil scrub	denied
+fossil scrub x	denied
+fossil search	denied
+fossil search --all	safe-read
+fossil search --all --checkin	safe-read
+fossil search --all --limit x	safe-read
+fossil search --all x	safe-read
+fossil search --checkin	safe-read
+fossil search --documentation	safe-read
+fossil search --forum	safe-read
+fossil search --help	safe-read
+fossil search --limit x	safe-read
+fossil search --ticket	safe-read
+fossil search --unindexed	safe-read
+fossil search --wiki	safe-read
+fossil search -h	safe-read
+fossil search -n x	safe-read
+fossil search x	safe-read
+fossil server	denied
+fossil server x	denied
+fossil settings	denied
+fossil settings x	denied
+fossil stash	denied
+fossil stash x	denied
+fossil stash-list	denied
+fossil stash-list x	denied
+fossil status	safe-read
+fossil status --all	safe-read
+fossil status --all --changed	safe-read
+fossil status --all --repository x	safe-read
+fossil status --all x	safe-read
+fossil status --changed	safe-read
+fossil status --differ	safe-read
+fossil status --dotfiles	safe-read
+fossil status --header	safe-read
+fossil status --help	safe-read
+fossil status --ifchanged	safe-read
+fossil status --limit	safe-read
+fossil status --repository	safe-read
+fossil status --repository x	safe-read
+fossil status --verbose	safe-read
+fossil status -R	safe-read
+fossil status -R x	safe-read
+fossil status -a	safe-read
+fossil status -c	safe-read
+fossil status -d	safe-read
+fossil status -h	safe-read
+fossil status -v	safe-read
+fossil status x	safe-read
+fossil sync	denied
+fossil sync x	denied
+fossil tag	inert
+fossil tag add	denied
+fossil tag add x	denied
+fossil tag cancel	denied
+fossil tag cancel x	denied
+fossil tag find	inert
+fossil tag find --help	inert
+fossil tag find --help --repository x	inert
+fossil tag find --help -h	inert
+fossil tag find --help x	inert
+fossil tag find --repository x	inert
+fossil tag find --type x	inert
+fossil tag find -R x	inert
+fossil tag find -h	inert
+fossil tag find x	inert
+fossil tag list	inert
+fossil tag list --all	inert
+fossil tag list --all --help	inert
+fossil tag list --all --limit x	inert
+fossil tag list --all x	inert
+fossil tag list --help	inert
+fossil tag list --inverse	inert
+fossil tag list --limit x	inert
+fossil tag list --prefix x	inert
+fossil tag list --raw	inert
+fossil tag list --repository	inert
+fossil tag list --repository x	inert
+fossil tag list -R	inert
+fossil tag list -R x	inert
+fossil tag list -a	inert
+fossil tag list -h	inert
+fossil tag list -i	inert
+fossil tag list x	inert
+fossil tag x	denied
+fossil test-attach	denied
+fossil test-attach x	denied
+fossil test-content-deltify	denied
+fossil test-content-deltify x	denied
+fossil test-detach	denied
+fossil test-detach x	denied
+fossil ticket	denied
+fossil ticket x	denied
+fossil timeline	safe-read
+fossil timeline --after x	safe-read
+fossil timeline --before x	safe-read
+fossil timeline --brief	safe-read
+fossil timeline --brief --after x	safe-read
+fossil timeline --brief --full	safe-read
+fossil timeline --brief x	safe-read
+fossil timeline --children x	safe-read
+fossil timeline --full	safe-read
+fossil timeline --help	safe-read
+fossil timeline --limit	safe-read
+fossil timeline --limit x	safe-read
+fossil timeline --no-graph	safe-read
+fossil timeline --repository	safe-read
+fossil timeline --repository x	safe-read
+fossil timeline --showfiles	safe-read
+fossil timeline --type x	safe-read
+fossil timeline --verbose	safe-read
+fossil timeline --width x	safe-read
+fossil timeline -R	safe-read
+fossil timeline -R x	safe-read
+fossil timeline -W	safe-read
+fossil timeline -W x	safe-read
+fossil timeline -b	safe-read
+fossil timeline -c x	safe-read
+fossil timeline -h	safe-read
+fossil timeline -l	safe-read
+fossil timeline -l x	safe-read
+fossil timeline -n	safe-read
+fossil timeline -n x	safe-read
+fossil timeline -t x	safe-read
+fossil timeline -v	safe-read
+fossil timeline -w	safe-read
+fossil timeline -w x	safe-read
+fossil timeline x	safe-read
+fossil ui	denied
+fossil ui x	denied
+fossil update	denied
+fossil update x	denied
+fossil user	denied
+fossil user x	denied
+fossil version	inert
+fossil version --help	inert
+fossil version --help --verbose	inert
+fossil version --help x	inert
+fossil version --verbose	inert
+fossil version -h	inert
+fossil version -v	inert
+fossil version x	inert
+fossil whatis	denied
+fossil whatis --help	safe-read
+fossil whatis --help --repository	safe-read
+fossil whatis --help --repository x	safe-read
+fossil whatis --help x	safe-read
+fossil whatis --repository	safe-read
+fossil whatis --repository x	safe-read
+fossil whatis --type	safe-read
+fossil whatis --type x	safe-read
+fossil whatis --verbose	safe-read
+fossil whatis -R	safe-read
+fossil whatis -R x	safe-read
+fossil whatis -h	safe-read
+fossil whatis -v	safe-read
+fossil whatis x	safe-read
+fossil wiki	denied
+fossil wiki x	denied
+fossil x	denied
+foundryup	denied
+foundryup --help	inert
+foundryup --help --version	inert
+foundryup --help x	denied
+foundryup --version	inert
+foundryup -h	inert
+foundryup -v	inert
+foundryup x	denied
+fourmolu	safe-read
+fourmolu --check-idempotence	safe-read
+fourmolu --check-idempotence --color	safe-read
+fourmolu --check-idempotence --config x	safe-read
+fourmolu --check-idempotence x	safe-read
+fourmolu --color	safe-read
+fourmolu --config x	safe-read
+fourmolu --end-column x	safe-read
+fourmolu --end-line x	safe-read
+fourmolu --ghc-opt x	safe-read
+fourmolu --help	safe-read
+fourmolu --inplace	safe-write
+fourmolu --mode x	safe-read
+fourmolu --no-cabal	safe-read
+fourmolu --package-name x	safe-read
+fourmolu --start-column x	safe-read
+fourmolu --start-line x	safe-read
+fourmolu --version	denied
+fourmolu -c	safe-read
+fourmolu -h	safe-read
+fourmolu -i	safe-write
+fourmolu -o x	safe-read
+fourmolu x	safe-read
+fping	denied
+fping --addr	denied
+fping --addr --alive	denied
+fping --addr --backoff x	denied
+fping --addr x	denied
+fping --alive	denied
+fping --all	denied
+fping --backoff x	denied
+fping --count	inert
+fping --count x	inert
+fping --dontfrag	denied
+fping --elapsed	denied
+fping --fast-reachable	inert
+fping --fast-reachable x	inert
+fping --file x	denied
+fping --generate x	denied
+fping --help	inert
+fping --iface x	denied
+fping --interval x	denied
+fping --ipv4	denied
+fping --ipv6	denied
+fping --loop	denied
+fping --name	denied
+fping --netdata	denied
+fping --outage	denied
+fping --period x	denied
+fping --quiet	denied
+fping --random	denied
+fping --rdns	denied
+fping --reachable	inert
+fping --reachable x	inert
+fping --retry x	denied
+fping --size x	denied
+fping --squiet x	denied
+fping --src x	denied
+fping --stats	denied
+fping --timeout x	denied
+fping --timestamp	denied
+fping --tos x	denied
+fping --ttl x	denied
+fping --unreach	denied
+fping --vcount	inert
+fping --vcount x	inert
+fping --version	denied
+fping -4	denied
+fping -6	denied
+fping -A	denied
+fping -B x	denied
+fping -C	inert
+fping -C x	inert
+fping -D	denied
+fping -H x	denied
+fping -I x	denied
+fping -M	denied
+fping -N	denied
+fping -O x	denied
+fping -Q x	denied
+fping -R	denied
+fping -S x	denied
+fping -T x	denied
+fping -X	inert
+fping -X x	inert
+fping -a	denied
+fping -a -x 1 example.com	inert
+fping -b x	denied
+fping -c	inert
+fping -c --addr	inert
+fping -c --alive	inert
+fping -c --all	inert
+fping -c --backoff x	inert
+fping -c --count x	inert
+fping -c --dontfrag	inert
+fping -c --elapsed	inert
+fping -c --fast-reachable x	inert
+fping -c --file x	inert
+fping -c --generate x	inert
+fping -c --help	inert
+fping -c --iface x	inert
+fping -c --interval x	inert
+fping -c --ipv4	inert
+fping -c --ipv6	inert
+fping -c --loop	inert
+fping -c --name	inert
+fping -c --netdata	inert
+fping -c --outage	inert
+fping -c --period x	inert
+fping -c --quiet	inert
+fping -c --random	inert
+fping -c --rdns	inert
+fping -c --reachable x	inert
+fping -c --retry x	inert
+fping -c --size x	inert
+fping -c --squiet x	inert
+fping -c --src x	inert
+fping -c --stats	inert
+fping -c --timeout x	inert
+fping -c --timestamp	inert
+fping -c --tos x	inert
+fping -c --ttl x	inert
+fping -c --unreach	inert
+fping -c --vcount x	inert
+fping -c --version	inert
+fping -c -4	inert
+fping -c -6	inert
+fping -c -A	inert
+fping -c -B x	inert
+fping -c -C x	inert
+fping -c -D	inert
+fping -c -H x	inert
+fping -c -I x	inert
+fping -c -M	inert
+fping -c -N	inert
+fping -c -O x	inert
+fping -c -Q x	inert
+fping -c -R	inert
+fping -c -S x	inert
+fping -c -T x	inert
+fping -c -X x	inert
+fping -c -a	inert
+fping -c -b x	inert
+fping -c -c x	inert
+fping -c -d	inert
+fping -c -e	inert
+fping -c -f x	inert
+fping -c -g x	inert
+fping -c -h	inert
+fping -c -i x	inert
+fping -c -l	inert
+fping -c -m	inert
+fping -c -n	inert
+fping -c -o	inert
+fping -c -p x	inert
+fping -c -q	inert
+fping -c -r x	inert
+fping -c -s	inert
+fping -c -t x	inert
+fping -c -u	inert
+fping -c -v	inert
+fping -c -x x	inert
+fping -c 5 example.com	inert
+fping -c x	inert
+fping -d	denied
+fping -e	denied
+fping -f x	denied
+fping -g x	denied
+fping -h	inert
+fping -i x	denied
+fping -l	denied
+fping -m	denied
+fping -n	denied
+fping -o	denied
+fping -p x	denied
+fping -q	denied
+fping -r x	denied
+fping -s	denied
+fping -t x	denied
+fping -u	denied
+fping -v	denied
+fping -x	inert
+fping -x x	inert
+fping example.com	denied
+fping x	denied
+fpm	denied
+fpm --after-install x	safe-write
+fpm --after-remove x	safe-write
+fpm --after-upgrade x	safe-write
+fpm --architecture x	safe-write
+fpm --before-install x	safe-write
+fpm --before-remove x	safe-write
+fpm --before-upgrade x	safe-write
+fpm --category x	safe-write
+fpm --chdir x	safe-write
+fpm --config-files x	safe-write
+fpm --conflicts x	safe-write
+fpm --debug	safe-write
+fpm --debug --after-install x	safe-write
+fpm --debug --debug-workspace	safe-write
+fpm --debug x	safe-write
+fpm --debug-workspace	safe-write
+fpm --depends x	safe-write
+fpm --description x	safe-write
+fpm --directories x	safe-write
+fpm --epoch x	safe-write
+fpm --exclude x	safe-write
+fpm --exclude-file x	safe-write
+fpm --force	safe-write
+fpm --fpm-options-file x	safe-write
+fpm --help	safe-write
+fpm --input-type x	safe-write
+fpm --inputs x	safe-write
+fpm --iteration x	safe-write
+fpm --license x	safe-write
+fpm --log x	safe-write
+fpm --maintainer x	safe-write
+fpm --name x	safe-write
+fpm --no-auto-depends	safe-write
+fpm --no-depends	safe-write
+fpm --output-type x	safe-write
+fpm --package x	safe-write
+fpm --package-name-suffix x	safe-write
+fpm --prefix x	safe-write
+fpm --provides x	safe-write
+fpm --replaces x	safe-write
+fpm --source-date-epoch-default x	safe-write
+fpm --source-date-epoch-from-changelog	safe-write
+fpm --template-scripts	safe-write
+fpm --template-value x	safe-write
+fpm --url x	safe-write
+fpm --vendor x	safe-write
+fpm --verbose	safe-write
+fpm --version	safe-write
+fpm --version x	safe-write
+fpm --workdir x	safe-write
+fpm -C x	safe-write
+fpm -S x	safe-write
+fpm -a x	safe-write
+fpm -d x	safe-write
+fpm -f	safe-write
+fpm -h	safe-write
+fpm -m x	safe-write
+fpm -n x	safe-write
+fpm -p x	safe-write
+fpm -s x	safe-write
+fpm -t x	safe-write
+fpm -v x	safe-write
+fpm -x x	safe-write
+fpm x	safe-write
+frames	denied
+frames --assets x	safe-write
+frames --batch x	safe-write
+frames --color x	safe-write
+frames --copy	safe-write
+frames --copy --assets x	safe-write
+frames --copy --help	safe-write
+frames --copy x	safe-write
+frames --device x	safe-write
+frames --help	safe-write
+frames --json	safe-write
+frames --merge	safe-write
+frames --no-scale	safe-write
+frames --no-subfolder	safe-write
+frames --output x	safe-write
+frames --spacing x	safe-write
+frames --subfolder x	safe-write
+frames --version	safe-write
+frames -V	safe-write
+frames -b x	safe-write
+frames -c x	safe-write
+frames -d x	safe-write
+frames -f	safe-write
+frames -h	safe-write
+frames -m	safe-write
+frames -o x	safe-write
+frames -s x	safe-write
+frames x	safe-write
+free	inert
+free --bytes	inert
+free --bytes --count x	inert
+free --bytes --gibi	inert
+free --bytes x	denied
+free --count x	inert
+free --gibi	inert
+free --giga	inert
+free --help	inert
+free --human	inert
+free --kibi	inert
+free --kilo	inert
+free --lohi	inert
+free --mebi	inert
+free --mega	inert
+free --seconds x	inert
+free --si	inert
+free --tebi	inert
+free --tera	inert
+free --total	inert
+free --version	inert
+free --wide	inert
+free -V	inert
+free -b	inert
+free -c x	inert
+free -g	inert
+free -h	inert
+free -k	inert
+free -l	inert
+free -m	inert
+free -s x	inert
+free -t	inert
+free -v	inert
+free -w	inert
+free x	denied
+fs_usage	inert
+fs_usage --help	denied
+fs_usage --version	denied
+fs_usage -E x	inert
+fs_usage -F	inert
+fs_usage -F -E x	inert
+fs_usage -F -b	inert
+fs_usage -F x	inert
+fs_usage -R x	inert
+fs_usage -S x	inert
+fs_usage -b	inert
+fs_usage -e	inert
+fs_usage -f x	inert
+fs_usage -t x	inert
+fs_usage -w	inert
+fs_usage x	inert
+fsi	denied
+fsi --help	inert
+fsi --help --version	inert
+fsi --help x	denied
+fsi --version	inert
+fsi -?	inert
+fsi -h	inert
+fsi x	denied
+funzip	inert
+funzip --help	denied
+funzip --version	denied
+funzip archive.zip	inert
+funzip x	inert
+fuser	denied
+fuser --help	denied
+fuser --version	denied
+fuser -c	inert
+fuser -c -f	inert
+fuser -c x	inert
+fuser -f	inert
+fuser -u	inert
+fuser x	inert
+fx	inert
+fx --help	inert
+fx --help --raw	inert
+fx --help x	inert
+fx --raw	inert
+fx --slurp	inert
+fx --themes	inert
+fx --version	inert
+fx -h	inert
+fx -r	inert
+fx -s	inert
+fx x	inert
+fzf	inert
+fzf --ansi	inert
+fzf --bind 'ctrl-a:select-all+accept,ctrl-j:toggle'	inert
+fzf --bind 'ctrl-j:down,ctrl-k:up'	inert
+fzf --bind 'ctrl-o:execute(vim {})'	denied
+fzf --bind 'ctrl-p:preview(cat {})'	denied
+fzf --bind 'ctrl-r:reload(find .)'	denied
+fzf --bind 'ctrl-t:transform(echo toggle)'	denied
+fzf --bind 'ctrl-y:execute-silent(echo {} | pbcopy)'	denied
+fzf --bind 'enter:become(vim {})'	denied
+fzf --bind ctrl-c:abort	inert
+fzf --bind ctrl-j:accept	inert
+fzf --bind=ctrl-j:accept	inert
+fzf --bind=ctrl-o:execute(vim {})	denied
+fzf --border	inert
+fzf --color=dark	inert
+fzf --exact	inert
+fzf --header 'Pick a file'	inert
+fzf --height 40%	inert
+fzf --height 40% --layout=reverse --border --ansi --multi	inert
+fzf --help	inert
+fzf --history /tmp/fzf-history	denied
+fzf --info-command 'echo info'	denied
+fzf --layout=reverse	inert
+fzf --listen 6266	denied
+fzf --listen-unsafe 6266	denied
+fzf --multi --cycle --highlight-line	inert
+fzf --preview 'cat {}'	denied
+fzf --preview-window=right:50%	inert
+fzf --preview='cat {}'	denied
+fzf --prompt '> '	inert
+fzf --read0 --print0	inert
+fzf --scheme=path	inert
+fzf --select-1 --exit-0	inert
+fzf --tac --no-sort	inert
+fzf --tmux 80%	inert
+fzf --version	inert
+fzf --walker file,hidden	inert
+fzf --with-shell '/bin/bash -c'	denied
+fzf -d : -n 2	inert
+fzf -f pattern	inert
+fzf -m	inert
+fzf -q pattern	inert
+fzf x	inert
+fzy	inert
+fzy --help	inert
+fzy --help --lines x	inert
+fzy --help --show-info	inert
+fzy --help x	inert
+fzy --lines x	inert
+fzy --prompt x	inert
+fzy --query x	inert
+fzy --show-info	inert
+fzy --show-matches x	inert
+fzy --show-scores	inert
+fzy --tty x	inert
+fzy --version	inert
+fzy -e x	inert
+fzy -h	inert
+fzy -i	inert
+fzy -l x	inert
+fzy -p x	inert
+fzy -q x	inert
+fzy -t x	inert
+fzy -v	inert
+fzy x	inert

@@ -1,0 +1,2863 @@
+b2sum	inert
+b2sum --binary	inert
+b2sum --binary --check	inert
+b2sum --binary --length x	inert
+b2sum --binary x	inert
+b2sum --check	inert
+b2sum --help	inert
+b2sum --ignore-missing	inert
+b2sum --length x	inert
+b2sum --quiet	inert
+b2sum --status	inert
+b2sum --strict	inert
+b2sum --tag	inert
+b2sum --text	inert
+b2sum --version	inert
+b2sum --warn	inert
+b2sum --zero	inert
+b2sum -V	inert
+b2sum -b	inert
+b2sum -c	inert
+b2sum -h	inert
+b2sum -l x	inert
+b2sum -t	inert
+b2sum -w	inert
+b2sum -z	inert
+b2sum x	inert
+b64decode	denied
+b64decode --help	denied
+b64decode --version	denied
+b64decode -c	safe-write
+b64decode -c -i	safe-write
+b64decode -c -o x	safe-write
+b64decode -c x	safe-write
+b64decode -i	safe-write
+b64decode -m	safe-write
+b64decode -o out.bin in.b64	safe-write
+b64decode -o x	safe-write
+b64decode -p	safe-write
+b64decode -r	safe-write
+b64decode -s	safe-write
+b64decode x	safe-write
+b64encode	denied
+b64encode --help	denied
+b64encode --version	denied
+b64encode -o out.b64 raw.bin raw.bin	safe-write
+b64encode -o x	safe-write
+b64encode -r	safe-write
+b64encode -r -o x	safe-write
+b64encode -r x	safe-write
+b64encode -w x	safe-write
+b64encode x	safe-write
+bacon	safe-read
+bacon --help	safe-read
+bacon --help --prefs	safe-read
+bacon --help x	denied
+bacon --prefs	safe-read
+bacon --version	safe-read
+bacon -h	safe-read
+bacon -v	safe-read
+bacon x	denied
+bandit	denied
+bandit --aggregate x	safe-read
+bandit --baseline x	safe-read
+bandit --config x	safe-read
+bandit --configfile x	safe-read
+bandit --exclude x	safe-read
+bandit --format x	safe-read
+bandit --help	safe-read
+bandit --help --aggregate x	safe-read
+bandit --help --ignore-nosec	safe-read
+bandit --help x	safe-read
+bandit --ignore-nosec	safe-read
+bandit --number	safe-read
+bandit --one-line	safe-read
+bandit --output x	safe-read
+bandit --profile x	safe-read
+bandit --quiet	safe-read
+bandit --recursive	safe-read
+bandit --severity-level x	safe-read
+bandit --skip x	safe-read
+bandit --tests x	safe-read
+bandit --verbose	safe-read
+bandit --version	safe-read
+bandit -b x	safe-read
+bandit -c x	safe-read
+bandit -f x	safe-read
+bandit -h	safe-read
+bandit -i	safe-read
+bandit -l x	safe-read
+bandit -n	safe-read
+bandit -o x	safe-read
+bandit -p x	safe-read
+bandit -q	safe-read
+bandit -r	safe-read
+bandit -s x	safe-read
+bandit -t x	safe-read
+bandit -v	safe-read
+bandit x	safe-read
+base32	inert
+base32 --decode	inert
+base32 --decode --help	inert
+base32 --decode --wrap x	inert
+base32 --decode x	inert
+base32 --help	inert
+base32 --ignore-garbage	inert
+base32 --version	inert
+base32 --wrap x	inert
+base32 -d	inert
+base32 -h	inert
+base32 -i	inert
+base32 -w x	inert
+base32 x	inert
+base64	inert
+base64 --decode	inert
+base64 --decode --help	inert
+base64 --decode --wrap x	inert
+base64 --decode x	inert
+base64 --help	inert
+base64 --ignore-garbage	inert
+base64 --version	inert
+base64 --wrap x	inert
+base64 -D	inert
+base64 -V	inert
+base64 -b x	inert
+base64 -d	inert
+base64 -h	inert
+base64 -i	inert
+base64 -w x	inert
+base64 -w0 f	inert
+base64 x	inert
+base64 ~/.ssh/id_rsa	denied
+basecamp	denied
+basecamp --agent	denied
+basecamp --agent --help	inert
+basecamp --agent x	denied
+basecamp --help	inert
+basecamp --json	denied
+basecamp --quiet	denied
+basecamp --version	inert
+basecamp -h	inert
+basecamp auth	inert
+basecamp auth login	denied
+basecamp auth token	denied
+basecamp auth token --help	denied
+basecamp auth token --help -h	denied
+basecamp auth token --help x	denied
+basecamp auth token -h	denied
+basecamp auth token x	denied
+basecamp auth x	denied
+basecamp cards	inert
+basecamp cards list	inert
+basecamp cards list x	inert
+basecamp cards x	denied
+basecamp chat post 'hello' --in 123	denied
+basecamp commands	inert
+basecamp commands --json	inert
+basecamp commands x	inert
+basecamp comment 123 'looks good'	denied
+basecamp doctor	inert
+basecamp doctor x	inert
+basecamp done 123	denied
+basecamp files	inert
+basecamp files list	inert
+basecamp files list --in 12345	inert
+basecamp files list x	inert
+basecamp files x	denied
+basecamp help	inert
+basecamp help x	inert
+basecamp projects	inert
+basecamp projects list	inert
+basecamp projects list x	inert
+basecamp projects show	inert
+basecamp projects show x	inert
+basecamp projects x	denied
+basecamp search	inert
+basecamp search query	inert
+basecamp search x	inert
+basecamp todo 'Buy milk'	denied
+basecamp todos	inert
+basecamp todos list	inert
+basecamp todos list --in 12345	inert
+basecamp todos list x	inert
+basecamp todos x	denied
+basecamp x	denied
+basename	inert
+basename --help	inert
+basename --help --multiple	inert
+basename --help --suffix x	inert
+basename --help x	inert
+basename --multiple	inert
+basename --suffix x	inert
+basename --version	inert
+basename --zero	inert
+basename -V	inert
+basename -a	inert
+basename -h	inert
+basename -s x	inert
+basename -z	inert
+basename x	inert
+basenc	inert
+basenc --base16	inert
+basenc --base16 --base2lsbf	inert
+basenc --base16 --wrap x	inert
+basenc --base16 x	inert
+basenc --base2lsbf	inert
+basenc --base2msbf	inert
+basenc --base32	inert
+basenc --base32hex	inert
+basenc --base64	inert
+basenc --base64url	inert
+basenc --decode	inert
+basenc --help	inert
+basenc --ignore-garbage	inert
+basenc --version	inert
+basenc --wrap x	inert
+basenc --z85	inert
+basenc -d	inert
+basenc -h	inert
+basenc -i	inert
+basenc -w x	inert
+basenc x	inert
+bash	denied
+bash -- ./run.sh	safe-write
+bash --help	inert
+bash --version	inert
+bash -c "cat file | head -5"	safe-read
+bash -c "grep foo file"	safe-read
+bash -c "rm file"	safe-write
+bash -c 'for x in 1 2 3; do echo $x; done'	inert
+bash -c 'for x in do done; do echo $x; done'	inert
+bash -c 'if test -f foo; then echo yes; fi'	inert
+bash -c 'rm -rf /'	denied
+bash -c 'rm -rf /' --help	denied
+bash -c 'rm -rf /' --version	denied
+bash -c 'while test -f /tmp/foo; do sleep 1; done'	inert
+bash -i	denied
+bash -n /etc/profile	inert
+bash -n script.sh	inert
+bash -o pipefail run.sh	denied
+bash ../x.sh	denied
+bash ./run.sh	safe-write
+bash / sh	denied
+bash / sh --help	denied
+bash / sh --version	denied
+bash / sh x	denied
+bash /tmp/evil.sh	denied
+bash /tmp/script.sh	denied
+bash /usr/local/bin/x	denied
+bash script.sh	safe-write
+bash scripts/deploy.sh	safe-write
+bash ~/Downloads/x.sh	denied
+bat	inert
+bat --color x	inert
+bat --decorations x	inert
+bat --diff	inert
+bat --diff --color x	inert
+bat --diff --help	inert
+bat --diff x	inert
+bat --diff-context x	inert
+bat --file-name x	inert
+bat --help	inert
+bat --highlight-line x	inert
+bat --italic-text x	inert
+bat --language x	inert
+bat --line-range x	inert
+bat --list-languages	inert
+bat --list-themes	inert
+bat --map-syntax x	inert
+bat --no-config	inert
+bat --number	inert
+bat --paging x	inert
+bat --plain	inert
+bat --show-all	inert
+bat --style x	inert
+bat --tabs x	inert
+bat --terminal-width x	inert
+bat --theme x	inert
+bat --version	inert
+bat --wrap x	inert
+bat -A	inert
+bat -H x	inert
+bat -P	inert
+bat -V	inert
+bat -d	inert
+bat -h	inert
+bat -l x	inert
+bat -m x	inert
+bat -n	inert
+bat -p	inert
+bat -r x	inert
+bat -u	inert
+bat x	inert
+batch	safe-write
+batch --help	safe-write
+batch --help -V	safe-write
+batch --help -f x	safe-write
+batch --help x	safe-write
+batch --version	denied
+batch -V	safe-write
+batch -f x	safe-write
+batch -m	safe-write
+batch -q x	safe-write
+batch -v	safe-write
+batch x	safe-write
+bazel	denied
+bazel --help	inert
+bazel --help --version	denied
+bazel --help x	denied
+bazel --version	inert
+bazel -V	inert
+bazel -h	inert
+bazel aquery	denied
+bazel aquery --help	inert
+bazel aquery --help --keep_going	inert
+bazel aquery --help --output x	inert
+bazel aquery --help x	inert
+bazel aquery --keep_going	inert
+bazel aquery --output x	inert
+bazel aquery --universe_scope x	inert
+bazel aquery -h	inert
+bazel aquery -k	inert
+bazel aquery x	inert
+bazel cquery	denied
+bazel cquery --help	inert
+bazel cquery --help --keep_going	inert
+bazel cquery --help --output x	inert
+bazel cquery --help x	inert
+bazel cquery --keep_going	inert
+bazel cquery --output x	inert
+bazel cquery --universe_scope x	inert
+bazel cquery -h	inert
+bazel cquery -k	inert
+bazel cquery x	inert
+bazel info	inert
+bazel info --help	inert
+bazel info --help -h	inert
+bazel info --help x	inert
+bazel info -h	inert
+bazel info x	inert
+bazel query	denied
+bazel query --help	inert
+bazel query --help --keep_going	inert
+bazel query --help --output x	inert
+bazel query --help x	inert
+bazel query --keep_going	inert
+bazel query --nohost_deps	inert
+bazel query --noimplicit_deps	inert
+bazel query --order_output	inert
+bazel query --output x	inert
+bazel query --universe_scope x	inert
+bazel query -h	inert
+bazel query -k	inert
+bazel query x	inert
+bazel version	inert
+bazel version --help	inert
+bazel version --help -h	inert
+bazel version --help x	inert
+bazel version -h	inert
+bazel version x	inert
+bazel x	denied
+bc	inert
+bc --digit-clamp	inert
+bc --digit-clamp --expression x	inert
+bc --digit-clamp --global-stacks	inert
+bc --digit-clamp x	inert
+bc --expression x	inert
+bc --file x	inert
+bc --global-stacks	inert
+bc --help	inert
+bc --ibase x	inert
+bc --interactive	inert
+bc --mathlib	inert
+bc --no-digit-clamp	inert
+bc --no-line-length	inert
+bc --no-prompt	inert
+bc --no-read-prompt	inert
+bc --obase x	inert
+bc --quiet	inert
+bc --redefine x	inert
+bc --scale x	inert
+bc --seed x	inert
+bc --standard	inert
+bc --version	inert
+bc --warn	inert
+bc -C	inert
+bc -E x	inert
+bc -I x	inert
+bc -O x	inert
+bc -P	inert
+bc -R	inert
+bc -S x	inert
+bc -V	inert
+bc -c	inert
+bc -e x	inert
+bc -f x	inert
+bc -g	inert
+bc -h	inert
+bc -i	inert
+bc -l	inert
+bc -q	inert
+bc -r x	inert
+bc -s	inert
+bc -w	inert
+bc x	inert
+biber	denied
+biber --cache	safe-write
+biber --cache --cache x	safe-write
+biber --cache --clrmacros	safe-write
+biber --cache x	safe-write
+biber --clrmacros	safe-write
+biber --collate-options	safe-write
+biber --convert-control	safe-write
+biber --debug	safe-write
+biber --decodecharsset	safe-write
+biber --decodecharsset x	safe-write
+biber --dot-include	safe-write
+biber --fastsort	safe-write
+biber --help	safe-write
+biber --input-directory x	safe-write
+biber --input-encoding x	safe-write
+biber --input-format	safe-write
+biber --input-format x	safe-write
+biber --listsep	safe-write
+biber --logfile	safe-write
+biber --logfile x	safe-write
+biber --macros x	safe-write
+biber --mincrossrefs	safe-write
+biber --mincrossrefs x	safe-write
+biber --minxrefs	safe-write
+biber --mssplit	safe-write
+biber --mssplit x	safe-write
+biber --namesep x	safe-write
+biber --no-bblencoding	safe-write
+biber --no-bblsafechars	safe-write
+biber --no-bibwarn	safe-write
+biber --noconf	safe-write
+biber --nodieonerror	safe-write
+biber --noinit	safe-write
+biber --nolog	safe-write
+biber --nostdmacros	safe-write
+biber --onlylog	safe-write
+biber --output-directory x	safe-write
+biber --output-encoding	safe-write
+biber --output-encoding x	safe-write
+biber --output-fieldcase x	safe-write
+biber --output-file x	safe-write
+biber --output-format	safe-write
+biber --output-format x	safe-write
+biber --output-indent	safe-write
+biber --output-indent x	safe-write
+biber --output-legacy-dates x	safe-write
+biber --output-resolve	safe-write
+biber --output-resolve x	safe-write
+biber --output-safechars	safe-write
+biber --output-safecharsset	safe-write
+biber --output-safecharsset x	safe-write
+biber --quiet	safe-write
+biber --recodedata	safe-write
+biber --recodedata x	safe-write
+biber --sortdebug	safe-write
+biber --ssl-host-name x	safe-write
+biber --strict	safe-write
+biber --tool	safe-write
+biber --tool-config x	safe-write
+biber --trace	safe-write
+biber --validate-config	safe-write
+biber --validate-control	safe-write
+biber --validate-datamodel	safe-write
+biber --version	safe-write
+biber --vsval x	safe-write
+biber --wraplines	safe-write
+biber --xnamesep x	safe-write
+biber --xsuffix x	safe-write
+biber -h	safe-write
+biber -q	safe-write
+biber -v	safe-write
+biber x	safe-write
+bin/rails db:create	safe-write
+bin/rails db:test:prepare	safe-write
+binhex	denied
+binhex --directory x	safe-write
+binhex --force	safe-write
+binhex --force --directory x	safe-write
+binhex --force --help	safe-write
+binhex --force x	safe-write
+binhex --help	safe-write
+binhex --no-runlength-encoding	safe-write
+binhex --pipe	safe-write
+binhex --rename x	safe-write
+binhex --suffix x	safe-write
+binhex --verbose	safe-write
+binhex --version	safe-write
+binhex -C x	safe-write
+binhex -R	safe-write
+binhex -V	safe-write
+binhex -c	safe-write
+binhex -f	safe-write
+binhex -h	safe-write
+binhex -o x	safe-write
+binhex -s x	safe-write
+binhex -v	safe-write
+binhex x	safe-write
+binhex.pl	denied
+binhex.pl --help	denied
+binhex.pl --version	denied
+binhex.pl -o x	safe-write
+binhex.pl -v	safe-write
+binhex.pl -v -o x	safe-write
+binhex.pl -v x	safe-write
+binhex.pl x	safe-write
+bintrans	denied
+bintrans --help	denied
+bintrans --version	denied
+bintrans -b x	safe-write
+bintrans -c	safe-write
+bintrans -c -b x	safe-write
+bintrans -c -d	safe-write
+bintrans -c x	safe-write
+bintrans -d	safe-write
+bintrans -i	safe-write
+bintrans -m	safe-write
+bintrans -o x	safe-write
+bintrans -p	safe-write
+bintrans -r	safe-write
+bintrans -s	safe-write
+bintrans -u	safe-write
+bintrans -w x	safe-write
+bintrans x	safe-write
+biome	denied
+biome --help	inert
+biome --help --version	denied
+biome --help x	denied
+biome --version	inert
+biome -V	inert
+biome -h	inert
+biome check	safe-read
+biome check --colors	safe-read
+biome check --colors --config-path x	safe-read
+biome check --colors --help	safe-read
+biome check --colors x	safe-read
+biome check --config-path x	safe-read
+biome check --help	safe-read
+biome check --json-formatter	safe-read
+biome check --max-diagnostics x	safe-read
+biome check --no-errors-on-unmatched	safe-read
+biome check --quiet	safe-read
+biome check --stdin-file-path x	safe-read
+biome check --vcs-root x	safe-read
+biome check --verbose	safe-read
+biome check -h	safe-read
+biome check x	safe-read
+biome ci	safe-read
+biome ci --colors	safe-read
+biome ci --colors --config-path x	safe-read
+biome ci --colors --help	safe-read
+biome ci --colors x	safe-read
+biome ci --config-path x	safe-read
+biome ci --help	safe-read
+biome ci --json-formatter	safe-read
+biome ci --max-diagnostics x	safe-read
+biome ci --no-errors-on-unmatched	safe-read
+biome ci --quiet	safe-read
+biome ci --verbose	safe-read
+biome ci -h	safe-read
+biome ci x	safe-read
+biome format	inert
+biome format --colors	inert
+biome format --colors --config-path x	inert
+biome format --colors --help	inert
+biome format --colors x	inert
+biome format --config-path x	inert
+biome format --help	inert
+biome format --indent-style x	inert
+biome format --indent-width x	inert
+biome format --json-formatter	inert
+biome format --line-width x	inert
+biome format --no-errors-on-unmatched	inert
+biome format --quiet	inert
+biome format --stdin-file-path x	inert
+biome format --verbose	inert
+biome format -h	inert
+biome format x	inert
+biome lint	safe-read
+biome lint --colors	safe-read
+biome lint --colors --config-path x	safe-read
+biome lint --colors --help	safe-read
+biome lint --colors x	safe-read
+biome lint --config-path x	safe-read
+biome lint --help	safe-read
+biome lint --json-formatter	safe-read
+biome lint --max-diagnostics x	safe-read
+biome lint --no-errors-on-unmatched	safe-read
+biome lint --quiet	safe-read
+biome lint --stdin-file-path x	safe-read
+biome lint --vcs-root x	safe-read
+biome lint --verbose	safe-read
+biome lint -h	safe-read
+biome lint x	safe-read
+biome x	denied
+bison	denied
+bison --debug	safe-write
+bison --debug --defines	safe-write
+bison --debug --file-prefix x	safe-write
+bison --debug x	safe-write
+bison --defines	safe-write
+bison --file-prefix x	safe-write
+bison --fixed-output-files	safe-write
+bison --graph	safe-write
+bison --help	safe-write
+bison --name-prefix x	safe-write
+bison --no-lines	safe-write
+bison --no-parser	safe-write
+bison --output x	safe-write
+bison --output-file x	safe-write
+bison --token-table	safe-write
+bison --verbose	safe-write
+bison --version	safe-write
+bison --yacc	safe-write
+bison -V	safe-write
+bison -b x	safe-write
+bison -d	safe-write
+bison -d -o parser.c grammar.y	safe-write
+bison -d grammar.y	safe-write
+bison -g	safe-write
+bison -h	safe-write
+bison -k	safe-write
+bison -l	safe-write
+bison -n	safe-write
+bison -o x	safe-write
+bison -p x	safe-write
+bison -t	safe-write
+bison -v	safe-write
+bison -y	safe-write
+bison grammar.y	safe-write
+bison x	safe-write
+bitcode_strip	denied
+bitcode_strip --help	denied
+bitcode_strip --version	denied
+bitcode_strip -keep_cs	safe-write
+bitcode_strip -keep_cs -l	safe-write
+bitcode_strip -keep_cs -o x	safe-write
+bitcode_strip -keep_cs x	safe-write
+bitcode_strip -l	safe-write
+bitcode_strip -m	safe-write
+bitcode_strip -o x	safe-write
+bitcode_strip -r	safe-write
+bitcode_strip -v	safe-write
+bitcode_strip x	safe-write
+bitcoin-cli	denied
+bitcoin-cli --help	inert
+bitcoin-cli --help --version	inert
+bitcoin-cli --help x	denied
+bitcoin-cli --version	inert
+bitcoin-cli -?	inert
+bitcoin-cli -h	inert
+bitcoin-cli x	denied
+black	denied
+black --check	inert
+black --check --check	inert
+black --check --color	inert
+black --check --config x	inert
+black --check --diff	inert
+black --check --exclude x	inert
+black --check --extend-exclude x	inert
+black --check --fast	inert
+black --check --help	inert
+black --check --include x	inert
+black --check --line-length x	inert
+black --check --no-color	inert
+black --check --quiet	inert
+black --check --target-version x	inert
+black --check --verbose	inert
+black --check --version	inert
+black --check -l x	inert
+black --check -t x	inert
+black --check x	inert
+black --color	denied
+black --config x	denied
+black --diff	inert
+black --exclude x	denied
+black --extend-exclude x	denied
+black --fast	denied
+black --help	inert
+black --include x	denied
+black --line-length x	denied
+black --no-color	denied
+black --quiet	denied
+black --target-version x	denied
+black --verbose	denied
+black --version	denied
+black -l x	denied
+black -t x	denied
+black x	denied
+bombardier	denied
+bombardier --body x	safe-read
+bombardier --body-file x	safe-read
+bombardier --cert x	safe-read
+bombardier --connections x	safe-read
+bombardier --duration x	safe-read
+bombardier --fasthttp x	safe-read
+bombardier --format x	safe-read
+bombardier --header x	safe-read
+bombardier --help	safe-read
+bombardier --help --body x	safe-read
+bombardier --help --version	safe-read
+bombardier --help x	safe-read
+bombardier --http x	safe-read
+bombardier --insecure x	safe-read
+bombardier --key x	safe-read
+bombardier --latencies x	safe-read
+bombardier --method x	safe-read
+bombardier --no-print x	safe-read
+bombardier --print x	safe-read
+bombardier --rate x	safe-read
+bombardier --requests x	safe-read
+bombardier --timeout x	safe-read
+bombardier --version	safe-read
+bombardier -H x	safe-read
+bombardier -T x	safe-read
+bombardier -c x	safe-read
+bombardier -d x	safe-read
+bombardier -f x	safe-read
+bombardier -h	safe-read
+bombardier -i x	safe-read
+bombardier -k x	safe-read
+bombardier -l x	safe-read
+bombardier -m x	safe-read
+bombardier -n x	safe-read
+bombardier -o x	safe-read
+bombardier -p x	safe-read
+bombardier -q x	safe-read
+bombardier -r x	safe-read
+bombardier -t x	safe-read
+bombardier -v	safe-read
+bombardier x	safe-read
+borg	denied
+borg --bypass-lock	denied
+borg --bypass-lock --bypass-lock x	denied
+borg --bypass-lock --consider-checkpoints	denied
+borg --bypass-lock x	denied
+borg --consider-checkpoints	denied
+borg --debug	denied
+borg --debug-topic x	denied
+borg --help	inert
+borg --info	denied
+borg --lock-wait	denied
+borg --lock-wait x	denied
+borg --no-cache-sync	denied
+borg --progress	denied
+borg --remote-path x	denied
+borg --remote-ratelimit x	denied
+borg --rsh x	denied
+borg --show-rc	denied
+borg --show-version	denied
+borg --umask x	denied
+borg --verbose	denied
+borg --version	inert
+borg --warning	denied
+borg -V	inert
+borg -h	inert
+borg benchmark	denied
+borg benchmark x	denied
+borg break-lock	denied
+borg break-lock x	denied
+borg check	denied
+borg check --archives-only	safe-read
+borg check --archives-only --archives-only x	safe-read
+borg check --archives-only --first	safe-read
+borg check --archives-only x	safe-read
+borg check --first	safe-read
+borg check --first x	safe-read
+borg check --help	safe-read
+borg check --last	safe-read
+borg check --last x	safe-read
+borg check --match-archives x	safe-read
+borg check --max-duration x	safe-read
+borg check --prefix x	safe-read
+borg check --repair	safe-write
+borg check --repository-only	safe-read
+borg check --save-space	safe-read
+borg check --sort-by	safe-read
+borg check --sort-by x	safe-read
+borg check --verify-data	safe-read
+borg check -a x	safe-read
+borg check -h	safe-read
+borg check repo	safe-read
+borg check x	safe-read
+borg compact	denied
+borg compact x	denied
+borg config	denied
+borg config --cache	safe-read
+borg config --cache --delete	safe-write
+borg config --cache x	safe-read
+borg config --delete	safe-write
+borg config --help	safe-read
+borg config --list	safe-read
+borg config -c	safe-read
+borg config -h	safe-read
+borg config repo	safe-read
+borg config x	safe-read
+borg create	denied
+borg create x	denied
+borg debug	denied
+borg debug x	denied
+borg delete	denied
+borg delete x	denied
+borg diff	denied
+borg diff --exclude x	safe-read
+borg diff --exclude-caches x	safe-read
+borg diff --exclude-from x	safe-read
+borg diff --exclude-if-present x	safe-read
+borg diff --help	safe-read
+borg diff --help --exclude x	safe-read
+borg diff --help --json-lines	safe-read
+borg diff --help x	safe-read
+borg diff --json-lines	safe-read
+borg diff --numeric-ids	safe-read
+borg diff --patterns-from x	safe-read
+borg diff --sort	safe-read
+borg diff -h	safe-read
+borg diff x	safe-read
+borg export-tar	denied
+borg export-tar x	denied
+borg extract	denied
+borg extract x	denied
+borg help	inert
+borg help x	inert
+borg import-tar	denied
+borg import-tar x	denied
+borg info	denied
+borg info --exclude x	safe-read
+borg info --exclude-from x	safe-read
+borg info --first	safe-read
+borg info --first --exclude x	safe-read
+borg info --first --help	safe-read
+borg info --first x	safe-read
+borg info --help	safe-read
+borg info --json	safe-read
+borg info --last	safe-read
+borg info --last x	safe-read
+borg info --match-archives x	safe-read
+borg info --patterns-from x	safe-read
+borg info --sort-by	safe-read
+borg info --sort-by x	safe-read
+borg info -a x	safe-read
+borg info -e x	safe-read
+borg info -h	safe-read
+borg info repo	safe-read
+borg info x	safe-read
+borg init	denied
+borg init x	denied
+borg key	denied
+borg key x	denied
+borg list	denied
+borg list --exclude x	safe-read
+borg list --exclude-from x	safe-read
+borg list --first	safe-read
+borg list --first --exclude x	safe-read
+borg list --first --format	safe-read
+borg list --first x	safe-read
+borg list --format	safe-read
+borg list --format x	safe-read
+borg list --help	safe-read
+borg list --json	safe-read
+borg list --json-lines	safe-read
+borg list --last	safe-read
+borg list --last x	safe-read
+borg list --match-archives x	safe-read
+borg list --patterns-from x	safe-read
+borg list --short	safe-read
+borg list --sort-by	safe-read
+borg list --sort-by x	safe-read
+borg list -a x	safe-read
+borg list -e x	safe-read
+borg list -h	safe-read
+borg list repo	safe-read
+borg list x	safe-read
+borg mount	denied
+borg mount x	denied
+borg prune	denied
+borg prune x	denied
+borg recreate	denied
+borg recreate x	denied
+borg rename	denied
+borg rename x	denied
+borg serve	denied
+borg serve x	denied
+borg umount	denied
+borg umount x	denied
+borg upgrade	denied
+borg upgrade x	denied
+borg version	inert
+borg version --help	inert
+borg version --help -h	inert
+borg version --help x	inert
+borg version -h	inert
+borg version x	inert
+borg with-lock	denied
+borg with-lock x	denied
+borg x	denied
+brakeman	safe-read
+brakeman --add-checks-path x	safe-read
+brakeman --allow-check x	safe-read
+brakeman --app-path x	safe-read
+brakeman --branch-limit x	safe-read
+brakeman --check-arguments x	safe-read
+brakeman --checks x	safe-read
+brakeman --color	safe-read
+brakeman --color --add-checks-path x	safe-read
+brakeman --color --compare	safe-read
+brakeman --color x	safe-read
+brakeman --compare	safe-read
+brakeman --confidence-level	safe-read
+brakeman --config-file x	safe-read
+brakeman --debug	safe-read
+brakeman --ensure-ignore-notes	safe-read
+brakeman --ensure-latest	safe-read
+brakeman --except x	safe-read
+brakeman --exit-on-error	safe-read
+brakeman --exit-on-warn	safe-read
+brakeman --faster x	safe-read
+brakeman --force-scan	safe-read
+brakeman --format x	safe-read
+brakeman --help	safe-read
+brakeman --ignore-config x	safe-read
+brakeman --ignore-config-empty	safe-read
+brakeman --ignore-protected x	safe-read
+brakeman --interactive-ignore	safe-read
+brakeman --list-checks	safe-read
+brakeman --list-optional-checks	safe-read
+brakeman --message-limit x	safe-read
+brakeman --min-confidence x	safe-read
+brakeman --no-assume-routes	safe-read
+brakeman --no-branching x	safe-read
+brakeman --no-color	safe-read
+brakeman --no-exit-on-error	safe-read
+brakeman --no-exit-on-warn	safe-read
+brakeman --no-highlights	safe-read
+brakeman --no-pager	safe-read
+brakeman --no-progress	safe-read
+brakeman --no-summary	safe-read
+brakeman --no-threads	safe-read
+brakeman --only-files x	safe-read
+brakeman --output	safe-write
+brakeman --output x	safe-write
+brakeman --pager	safe-read
+brakeman --parser-timeout x	safe-read
+brakeman --path x	safe-read
+brakeman --progress	safe-read
+brakeman --quiet	safe-read
+brakeman --rails3 x	safe-read
+brakeman --rails4 x	safe-read
+brakeman --rails5 x	safe-read
+brakeman --rails6 x	safe-read
+brakeman --rails7 x	safe-read
+brakeman --rails8 x	safe-read
+brakeman --rake	safe-read
+brakeman --report-direct	safe-read
+brakeman --routes x	safe-read
+brakeman --run-all-checks	safe-read
+brakeman --safe-methods x	safe-read
+brakeman --separate-models	safe-read
+brakeman --show-ignored	safe-read
+brakeman --skip-checks x	safe-read
+brakeman --skip-files x	safe-read
+brakeman --skip-libs x	safe-read
+brakeman --summary	safe-read
+brakeman --table-width	safe-read
+brakeman --threads	safe-read
+brakeman --version	safe-read
+brakeman -A	safe-read
+brakeman -c x	safe-read
+brakeman -d	safe-read
+brakeman -f x	safe-read
+brakeman -h	safe-read
+brakeman -o	safe-write
+brakeman -o x	safe-write
+brakeman -p x	safe-read
+brakeman -q	safe-read
+brakeman -w x	safe-read
+brakeman x	safe-read
+branchdiff	inert
+branchdiff --diff	inert
+branchdiff --diff --help	inert
+branchdiff --diff x	inert
+branchdiff --help	inert
+branchdiff --no-auto-fetch	inert
+branchdiff --print	inert
+branchdiff --version	inert
+branchdiff -V	inert
+branchdiff -d	inert
+branchdiff -h	inert
+branchdiff -p	inert
+branchdiff x	inert
+break	inert
+break --help	denied
+break -1	denied
+break / continue	denied
+break / continue --help	denied
+break / continue --version	denied
+break / continue x	denied
+break 1 2	denied
+break 2	inert
+break evil	denied
+brew	denied
+brew --help	inert
+brew --help --version	denied
+brew --help x	denied
+brew --prefix	inert
+brew --prefix --help	inert
+brew --prefix --help -h	inert
+brew --prefix --help x	inert
+brew --prefix -h	inert
+brew --prefix -q	inert
+brew --prefix -v	inert
+brew --prefix x	inert
+brew --repository	inert
+brew --repository --help	inert
+brew --repository --help -h	inert
+brew --repository --help x	inert
+brew --repository -h	inert
+brew --repository -q	inert
+brew --repository -v	inert
+brew --repository x	inert
+brew --version	inert
+brew -V	inert
+brew -h	inert
+brew abv	inert
+brew abv --analytics	inert
+brew abv --analytics --cask	inert
+brew abv --analytics --days x	inert
+brew abv --analytics x	inert
+brew abv --cask	inert
+brew abv --days x	inert
+brew abv --formula	inert
+brew abv --help	inert
+brew abv --installed	inert
+brew abv --json	inert
+brew abv -h	inert
+brew abv -v	inert
+brew abv x	inert
+brew bundle	denied
+brew bundle check	inert
+brew bundle check --all	inert
+brew bundle check --all --file x	inert
+brew bundle check --all --help	inert
+brew bundle check --all x	inert
+brew bundle check --file x	inert
+brew bundle check --global x	inert
+brew bundle check --help	inert
+brew bundle check --no-upgrade	inert
+brew bundle check --verbose	inert
+brew bundle check -h	inert
+brew bundle check -v	inert
+brew bundle check x	inert
+brew bundle list	inert
+brew bundle list --all	inert
+brew bundle list --all --brews	inert
+brew bundle list --all --file x	inert
+brew bundle list --all x	inert
+brew bundle list --brews	inert
+brew bundle list --casks	inert
+brew bundle list --file x	inert
+brew bundle list --formula	inert
+brew bundle list --global x	inert
+brew bundle list --help	inert
+brew bundle list --taps	inert
+brew bundle list --verbose	inert
+brew bundle list --vscode	inert
+brew bundle list -h	inert
+brew bundle list -v	inert
+brew bundle list x	inert
+brew bundle x	denied
+brew casks	inert
+brew casks --help	inert
+brew casks --help -h	inert
+brew casks --help x	inert
+brew casks -h	inert
+brew casks -q	inert
+brew casks -v	inert
+brew casks x	inert
+brew cat	inert
+brew cat --help	inert
+brew cat --help -h	inert
+brew cat --help x	inert
+brew cat -h	inert
+brew cat -q	inert
+brew cat -v	inert
+brew cat x	inert
+brew cleanup	denied
+brew cleanup --dry-run	inert
+brew cleanup --dry-run --help	inert
+brew cleanup --dry-run --prune-prefix x	inert
+brew cleanup --dry-run x	inert
+brew cleanup --help	inert
+brew cleanup --prune	denied
+brew cleanup --prune-prefix x	denied
+brew cleanup --quiet	denied
+brew cleanup --verbose	denied
+brew cleanup -d	denied
+brew cleanup -h	inert
+brew cleanup -n	denied
+brew cleanup -q	denied
+brew cleanup -s	denied
+brew cleanup -v	denied
+brew cleanup x	denied
+brew config	inert
+brew config --help	inert
+brew config --help -h	inert
+brew config --help x	inert
+brew config -h	inert
+brew config -q	inert
+brew config -v	inert
+brew config x	inert
+brew deps	inert
+brew deps --1	inert
+brew deps --1 --annotate	inert
+brew deps --1 x	inert
+brew deps --annotate	inert
+brew deps --cask	inert
+brew deps --direct	inert
+brew deps --for-each	inert
+brew deps --formula	inert
+brew deps --full-name	inert
+brew deps --graph	inert
+brew deps --help	inert
+brew deps --include-build	inert
+brew deps --include-optional	inert
+brew deps --include-test	inert
+brew deps --installed	inert
+brew deps --missing	inert
+brew deps --skip-recommended	inert
+brew deps --tree	inert
+brew deps --union	inert
+brew deps -h	inert
+brew deps -n	inert
+brew deps x	inert
+brew desc	denied
+brew desc --cask	inert
+brew desc --cask --description	inert
+brew desc --cask x	inert
+brew desc --description	inert
+brew desc --eval-all	inert
+brew desc --formula	inert
+brew desc --help	inert
+brew desc --name	inert
+brew desc --search	inert
+brew desc -d	inert
+brew desc -h	inert
+brew desc -n	inert
+brew desc -s	inert
+brew desc x	inert
+brew doctor	inert
+brew doctor --help	inert
+brew doctor --help -h	inert
+brew doctor --help x	inert
+brew doctor -h	inert
+brew doctor -q	inert
+brew doctor -v	inert
+brew doctor x	inert
+brew formulae	inert
+brew formulae --help	inert
+brew formulae --help -h	inert
+brew formulae --help x	inert
+brew formulae -h	inert
+brew formulae -q	inert
+brew formulae -v	inert
+brew formulae x	inert
+brew home	inert
+brew home --help	inert
+brew home --help -h	inert
+brew home --help x	inert
+brew home -h	inert
+brew home -q	inert
+brew home -v	inert
+brew home x	inert
+brew info	inert
+brew info --analytics	inert
+brew info --analytics --cask	inert
+brew info --analytics --days x	inert
+brew info --analytics x	inert
+brew info --cask	inert
+brew info --days x	inert
+brew info --formula	inert
+brew info --help	inert
+brew info --installed	inert
+brew info --json	inert
+brew info -h	inert
+brew info -v	inert
+brew info x	inert
+brew install --help	denied
+brew leaves	inert
+brew leaves --help	inert
+brew leaves --help -h	inert
+brew leaves --help x	inert
+brew leaves -h	inert
+brew leaves -q	inert
+brew leaves -v	inert
+brew leaves x	inert
+brew list	inert
+brew list --cask	inert
+brew list --cask --formula	inert
+brew list --cask x	inert
+brew list --formula	inert
+brew list --full-name	inert
+brew list --help	inert
+brew list --multiple	inert
+brew list --pinned	inert
+brew list --versions	inert
+brew list -1	inert
+brew list -h	inert
+brew list -l	inert
+brew list -r	inert
+brew list -t	inert
+brew list x	inert
+brew log	denied
+brew log --cask	inert
+brew log --cask --formula	inert
+brew log --cask --max-count x	inert
+brew log --cask x	inert
+brew log --formula	inert
+brew log --help	inert
+brew log --max-count x	inert
+brew log --oneline	inert
+brew log -1	inert
+brew log -h	inert
+brew log -n x	inert
+brew log x	inert
+brew ls	inert
+brew ls --cask	inert
+brew ls --cask --formula	inert
+brew ls --cask x	inert
+brew ls --formula	inert
+brew ls --full-name	inert
+brew ls --help	inert
+brew ls --multiple	inert
+brew ls --pinned	inert
+brew ls --versions	inert
+brew ls -1	inert
+brew ls -h	inert
+brew ls -l	inert
+brew ls -r	inert
+brew ls -t	inert
+brew ls x	inert
+brew outdated	inert
+brew outdated --cask	inert
+brew outdated --cask --fetch-HEAD	inert
+brew outdated --cask x	inert
+brew outdated --fetch-HEAD	inert
+brew outdated --formula	inert
+brew outdated --greedy	inert
+brew outdated --greedy-auto-updates	inert
+brew outdated --greedy-latest	inert
+brew outdated --help	inert
+brew outdated --json	inert
+brew outdated -d	inert
+brew outdated -h	inert
+brew outdated -q	inert
+brew outdated -v	inert
+brew outdated x	inert
+brew search	denied
+brew search --cask	inert
+brew search --cask --closed	inert
+brew search --cask x	inert
+brew search --closed	inert
+brew search --debian	inert
+brew search --desc	inert
+brew search --fedora	inert
+brew search --fink	inert
+brew search --formula	inert
+brew search --help	inert
+brew search --macports	inert
+brew search --open	inert
+brew search --opensuse	inert
+brew search --pull-request	inert
+brew search --repology	inert
+brew search --ubuntu	inert
+brew search -h	inert
+brew search x	inert
+brew services	denied
+brew services info	denied
+brew services info --all	inert
+brew services info --all --help	inert
+brew services info --all x	inert
+brew services info --help	inert
+brew services info --json	inert
+brew services info -h	inert
+brew services info x	inert
+brew services list	inert
+brew services list --help	inert
+brew services list --help --json	inert
+brew services list --help x	inert
+brew services list --json	inert
+brew services list -h	inert
+brew services list x	inert
+brew services x	denied
+brew shellenv	inert
+brew shellenv --help	inert
+brew shellenv --help -h	inert
+brew shellenv --help x	inert
+brew shellenv -h	inert
+brew shellenv -q	inert
+brew shellenv -v	inert
+brew shellenv x	inert
+brew tap	inert
+brew tap --help	inert
+brew tap --help -h	inert
+brew tap --help x	inert
+brew tap -h	inert
+brew tap -q	inert
+brew tap -v	inert
+brew tap x	inert
+brew tap-info	inert
+brew tap-info --help	inert
+brew tap-info --help -h	inert
+brew tap-info --help x	inert
+brew tap-info -h	inert
+brew tap-info -q	inert
+brew tap-info -v	inert
+brew tap-info x	inert
+brew upgrade	denied
+brew upgrade --cask	denied
+brew upgrade --cask --debug	denied
+brew upgrade --cask x	denied
+brew upgrade --debug	denied
+brew upgrade --dry-run	inert
+brew upgrade --fetch-HEAD	denied
+brew upgrade --formula	denied
+brew upgrade --greedy	denied
+brew upgrade --greedy-auto-updates	denied
+brew upgrade --greedy-latest	denied
+brew upgrade --help	inert
+brew upgrade --quiet	denied
+brew upgrade --verbose	denied
+brew upgrade -d	denied
+brew upgrade -h	inert
+brew upgrade -n	denied
+brew upgrade -q	denied
+brew upgrade -v	denied
+brew upgrade x	denied
+brew uses	denied
+brew uses --cask	inert
+brew uses --cask --formula	inert
+brew uses --cask x	inert
+brew uses --formula	inert
+brew uses --help	inert
+brew uses --include-build	inert
+brew uses --include-optional	inert
+brew uses --include-test	inert
+brew uses --installed	inert
+brew uses --missing	inert
+brew uses --recursive	inert
+brew uses --skip-recommended	inert
+brew uses -h	inert
+brew uses x	inert
+brew x	denied
+bridgetown	denied
+bridgetown --help	inert
+bridgetown --help --version	denied
+bridgetown --help x	denied
+bridgetown --version	inert
+bridgetown -h	inert
+bridgetown -v	inert
+bridgetown build	denied
+bridgetown build x	denied
+bridgetown clean	denied
+bridgetown clean x	denied
+bridgetown configure	denied
+bridgetown configure x	denied
+bridgetown console	denied
+bridgetown console x	denied
+bridgetown deploy	denied
+bridgetown deploy x	denied
+bridgetown doctor	safe-read
+bridgetown doctor --config x	safe-read
+bridgetown doctor --help	safe-read
+bridgetown doctor --help --config x	safe-read
+bridgetown doctor --help --trace	safe-read
+bridgetown doctor --help x	safe-read
+bridgetown doctor --trace	safe-read
+bridgetown doctor -h	safe-read
+bridgetown doctor -t	safe-read
+bridgetown doctor x	safe-read
+bridgetown help	inert
+bridgetown help x	inert
+bridgetown new	denied
+bridgetown new x	denied
+bridgetown serve	denied
+bridgetown serve x	denied
+bridgetown start	denied
+bridgetown start x	denied
+bridgetown version	inert
+bridgetown version --help	inert
+bridgetown version --help -h	inert
+bridgetown version --help x	inert
+bridgetown version -h	inert
+bridgetown version x	inert
+bridgetown x	denied
+brotli	safe-write
+brotli --best	safe-write
+brotli --best --compress	safe-write
+brotli --best --input x	safe-write
+brotli --best x	safe-write
+brotli --compress	safe-write
+brotli --decompress	safe-write
+brotli --fast	safe-write
+brotli --force	safe-write
+brotli --gapless	safe-write
+brotli --help	safe-write
+brotli --input x	safe-write
+brotli --keep	safe-write
+brotli --no-copy-stat	safe-write
+brotli --output x	safe-write
+brotli --quality	safe-write
+brotli --quality x	safe-write
+brotli --quiet	safe-write
+brotli --repeat x	safe-write
+brotli --stdout	safe-write
+brotli --suffix	safe-write
+brotli --suffix x	safe-write
+brotli --test	safe-write
+brotli --verbose	safe-write
+brotli --version	safe-write
+brotli --window	safe-write
+brotli --window x	safe-write
+brotli -S x	safe-write
+brotli -Z	safe-write
+brotli -c	safe-write
+brotli -d	safe-write
+brotli -f	safe-write
+brotli -h	safe-write
+brotli -i x	safe-write
+brotli -j	safe-write
+brotli -k	safe-write
+brotli -n	safe-write
+brotli -o x	safe-write
+brotli -q	safe-write
+brotli -q x	safe-write
+brotli -t	safe-write
+brotli -v	safe-write
+brotli -w	safe-write
+brotli -w x	safe-write
+brotli -z	safe-write
+brotli x	safe-write
+bru	denied
+bru --help	inert
+bru --help --version	inert
+bru --help x	denied
+bru --version	inert
+bru -h	inert
+bru -v	inert
+bru x	denied
+bsqldb	safe-read
+bsqldb --help	denied
+bsqldb --version	denied
+bsqldb -D x	safe-read
+bsqldb -H x	safe-read
+bsqldb -P x	safe-read
+bsqldb -R x	safe-read
+bsqldb -S x	safe-read
+bsqldb -U x	safe-read
+bsqldb -e x	safe-read
+bsqldb -h	safe-read
+bsqldb -h -D x	safe-read
+bsqldb -h -q	safe-read
+bsqldb -h x	safe-read
+bsqldb -i x	safe-read
+bsqldb -o x	safe-read
+bsqldb -q	safe-read
+bsqldb -t x	safe-read
+bsqldb -v	safe-read
+bsqldb x	safe-read
+bsqlodbc	safe-read
+bsqlodbc --help	denied
+bsqlodbc --version	denied
+bsqlodbc -D x	safe-read
+bsqlodbc -P x	safe-read
+bsqlodbc -S x	safe-read
+bsqlodbc -U x	safe-read
+bsqlodbc -V x	safe-read
+bsqlodbc -e x	safe-read
+bsqlodbc -h	safe-read
+bsqlodbc -h -D x	safe-read
+bsqlodbc -h -q	safe-read
+bsqlodbc -h x	safe-read
+bsqlodbc -i x	safe-read
+bsqlodbc -o x	safe-read
+bsqlodbc -q	safe-read
+bsqlodbc -t x	safe-read
+bsqlodbc -v	safe-read
+bsqlodbc x	safe-read
+btop	denied
+btop --help	inert
+btop --help --version	inert
+btop --help x	denied
+btop --version	inert
+btop -h	inert
+btop -v	inert
+btop x	denied
+buck2	denied
+buck2 --help	inert
+buck2 --help --version	denied
+buck2 --help x	denied
+buck2 --version	inert
+buck2 -V	inert
+buck2 -h	inert
+buck2 aquery	denied
+buck2 aquery --help	safe-read
+buck2 aquery --help --json	safe-read
+buck2 aquery --help x	safe-read
+buck2 aquery --json	safe-read
+buck2 aquery -h	safe-read
+buck2 aquery x	safe-read
+buck2 audit	safe-read
+buck2 audit x	safe-read
+buck2 build	denied
+buck2 build x	denied
+buck2 bxl	denied
+buck2 bxl x	denied
+buck2 clean	denied
+buck2 clean x	denied
+buck2 completion	denied
+buck2 completion --help	inert
+buck2 completion --help -h	inert
+buck2 completion --help x	inert
+buck2 completion -h	inert
+buck2 completion x	inert
+buck2 cquery	denied
+buck2 cquery --help	safe-read
+buck2 cquery --help --json	safe-read
+buck2 cquery --help x	safe-read
+buck2 cquery --json	safe-read
+buck2 cquery -h	safe-read
+buck2 cquery x	safe-read
+buck2 expand-external-cells	denied
+buck2 expand-external-cells x	denied
+buck2 help	inert
+buck2 help x	inert
+buck2 init	denied
+buck2 init x	denied
+buck2 install	denied
+buck2 install x	denied
+buck2 kill	denied
+buck2 kill x	denied
+buck2 killall	denied
+buck2 killall x	denied
+buck2 log	denied
+buck2 log x	denied
+buck2 materialize	denied
+buck2 materialize x	denied
+buck2 profile	denied
+buck2 profile x	denied
+buck2 query	denied
+buck2 query --help	safe-read
+buck2 query --help --json	safe-read
+buck2 query --help x	safe-read
+buck2 query --json	safe-read
+buck2 query --output-attributes	safe-read
+buck2 query -h	safe-read
+buck2 query x	safe-read
+buck2 rage	denied
+buck2 rage x	denied
+buck2 root	denied
+buck2 root x	denied
+buck2 run	denied
+buck2 run x	denied
+buck2 server	denied
+buck2 server x	denied
+buck2 starlark	denied
+buck2 starlark x	denied
+buck2 status	denied
+buck2 status x	denied
+buck2 subscribe	denied
+buck2 subscribe x	denied
+buck2 targets	denied
+buck2 targets --config x	safe-read
+buck2 targets --config-file x	safe-read
+buck2 targets --help	safe-read
+buck2 targets --help --config x	safe-read
+buck2 targets --help --json	safe-read
+buck2 targets --help x	safe-read
+buck2 targets --json	safe-read
+buck2 targets --show-output	safe-read
+buck2 targets --show-target-hash	safe-read
+buck2 targets --target-platforms x	safe-read
+buck2 targets -c x	safe-read
+buck2 targets -h	safe-read
+buck2 targets x	safe-read
+buck2 test	denied
+buck2 test x	denied
+buck2 uquery	denied
+buck2 uquery --help	safe-read
+buck2 uquery --help --json	safe-read
+buck2 uquery --help x	safe-read
+buck2 uquery --json	safe-read
+buck2 uquery -h	safe-read
+buck2 uquery x	safe-read
+buck2 validate	denied
+buck2 validate x	denied
+buck2 version	inert
+buck2 version --help	inert
+buck2 version --help -h	inert
+buck2 version --help x	inert
+buck2 version -h	inert
+buck2 version x	inert
+buck2 x	denied
+buf	denied
+buf --config x	denied
+buf --debug	denied
+buf --debug --config x	denied
+buf --debug --help	inert
+buf --debug x	denied
+buf --disable-symlinks x	denied
+buf --exclude-imports x	denied
+buf --help	inert
+buf --log-format x	denied
+buf --output x	denied
+buf --timeout x	denied
+buf --verbose x	denied
+buf --version	inert
+buf -h	inert
+buf -o x	denied
+buf breaking	safe-read
+buf breaking --against x	safe-read
+buf breaking --against-config x	safe-read
+buf breaking --config x	safe-read
+buf breaking --error-format x	safe-read
+buf breaking --exclude-imports	safe-read
+buf breaking --exclude-imports --against x	safe-read
+buf breaking --exclude-imports --help	safe-read
+buf breaking --exclude-imports x	safe-read
+buf breaking --exclude-path x	safe-read
+buf breaking --help	safe-read
+buf breaking --limit-to-input-files	safe-read
+buf breaking --path x	safe-read
+buf breaking -h	safe-read
+buf breaking x	safe-read
+buf build	safe-read
+buf build --as-file-descriptor-set	safe-read
+buf build --as-file-descriptor-set --config x	safe-read
+buf build --as-file-descriptor-set --disable-symlinks	safe-read
+buf build --as-file-descriptor-set x	safe-read
+buf build --config x	safe-read
+buf build --disable-symlinks	safe-read
+buf build --exclude-imports	safe-read
+buf build --exclude-path x	safe-read
+buf build --exclude-source-info	safe-read
+buf build --help	safe-read
+buf build --output x	safe-read
+buf build --path x	safe-read
+buf build -h	safe-read
+buf build -o ./image.bin	safe-read
+buf build -o x	safe-read
+buf build x	safe-read
+buf completion	denied
+buf completion --help	inert
+buf completion --help -h	inert
+buf completion --help x	inert
+buf completion -h	inert
+buf completion x	inert
+buf config	denied
+buf config x	denied
+buf convert	safe-read
+buf convert --from x	safe-read
+buf convert --from-format	safe-read
+buf convert --from-format --from x	safe-read
+buf convert --from-format --help	safe-read
+buf convert --from-format x	safe-read
+buf convert --help	safe-read
+buf convert --output x	safe-read
+buf convert --to x	safe-read
+buf convert --to-format	safe-read
+buf convert --type x	safe-read
+buf convert -h	safe-read
+buf convert -o x	safe-read
+buf convert x	safe-read
+buf dep	denied
+buf dep x	denied
+buf format	safe-read
+buf format --config x	safe-read
+buf format --diff	safe-read
+buf format --diff --config x	safe-read
+buf format --diff --exit-code	safe-read
+buf format --diff x	safe-read
+buf format --exclude-path x	safe-read
+buf format --exit-code	safe-read
+buf format --help	safe-read
+buf format --output x	safe-read
+buf format --path x	safe-read
+buf format --write	safe-write
+buf format --write ./proto	safe-write
+buf format -d	safe-read
+buf format -h	safe-read
+buf format -o x	safe-read
+buf format -w	safe-write
+buf format x	safe-read
+buf generate	safe-write
+buf generate --clean	safe-write
+buf generate --clean --config x	safe-write
+buf generate --clean --debug	safe-write
+buf generate --clean x	safe-write
+buf generate --config x	safe-write
+buf generate --debug	safe-write
+buf generate --exclude-path x	safe-write
+buf generate --help	safe-write
+buf generate --include-imports	safe-write
+buf generate --include-types	safe-write
+buf generate --include-types x	safe-write
+buf generate --include-wkt	safe-write
+buf generate --output ./gen	safe-write
+buf generate --output x	safe-write
+buf generate --path x	safe-write
+buf generate --template x	safe-write
+buf generate --type x	safe-write
+buf generate -h	safe-write
+buf generate -o x	safe-write
+buf generate x	safe-write
+buf help	inert
+buf help x	inert
+buf lint	safe-read
+buf lint --config x	safe-read
+buf lint --error-format x	safe-read
+buf lint --exclude-imports	safe-read
+buf lint --exclude-imports --config x	safe-read
+buf lint --exclude-imports --help	safe-read
+buf lint --exclude-imports x	safe-read
+buf lint --exclude-path x	safe-read
+buf lint --help	safe-read
+buf lint --path x	safe-read
+buf lint -h	safe-read
+buf lint x	safe-read
+buf ls-files	safe-read
+buf ls-files --config x	safe-read
+buf ls-files --format x	safe-read
+buf ls-files --help	safe-read
+buf ls-files --help --config x	safe-read
+buf ls-files --help --include-import-paths	safe-read
+buf ls-files --help x	safe-read
+buf ls-files --include-import-paths	safe-read
+buf ls-files --include-imports	safe-read
+buf ls-files -h	safe-read
+buf ls-files x	safe-read
+buf mod	denied
+buf mod x	denied
+buf push	denied
+buf push x	denied
+buf registry	denied
+buf registry x	denied
+buf studio	denied
+buf studio x	denied
+buf x	denied
+buildah	denied
+buildah --help	inert
+buildah --help --version	denied
+buildah --help x	denied
+buildah --version	inert
+buildah -h	inert
+buildah -v	inert
+buildah add	denied
+buildah add x	denied
+buildah bud	denied
+buildah bud x	denied
+buildah build	denied
+buildah build x	denied
+buildah build-using-dockerfile	denied
+buildah build-using-dockerfile x	denied
+buildah commit	denied
+buildah commit x	denied
+buildah config	denied
+buildah config x	denied
+buildah containers	safe-read
+buildah containers --all	safe-read
+buildah containers --all --filter x	safe-read
+buildah containers --all --help	safe-read
+buildah containers --all x	safe-read
+buildah containers --filter x	safe-read
+buildah containers --format x	safe-read
+buildah containers --help	safe-read
+buildah containers --json	safe-read
+buildah containers --no-trunc	safe-read
+buildah containers --noheading	safe-read
+buildah containers --notruncate	safe-read
+buildah containers --quiet	safe-read
+buildah containers -a	safe-read
+buildah containers -f x	safe-read
+buildah containers -h	safe-read
+buildah containers -q	safe-read
+buildah containers x	safe-read
+buildah copy	denied
+buildah copy x	denied
+buildah from	denied
+buildah from x	denied
+buildah help	inert
+buildah help x	inert
+buildah images	safe-read
+buildah images --all	safe-read
+buildah images --all --digests	safe-read
+buildah images --all --filter x	safe-read
+buildah images --all x	safe-read
+buildah images --digests	safe-read
+buildah images --filter x	safe-read
+buildah images --format x	safe-read
+buildah images --help	safe-read
+buildah images --history	safe-read
+buildah images --json	safe-read
+buildah images --no-trunc	safe-read
+buildah images --noheading	safe-read
+buildah images --quiet	safe-read
+buildah images -a	safe-read
+buildah images -f x	safe-read
+buildah images -h	safe-read
+buildah images -n	safe-read
+buildah images -q	safe-read
+buildah images x	safe-read
+buildah info	inert
+buildah info --debug	inert
+buildah info --debug --format x	inert
+buildah info --debug --help	inert
+buildah info --debug x	inert
+buildah info --format x	inert
+buildah info --help	inert
+buildah info -h	inert
+buildah info x	inert
+buildah inspect	denied
+buildah inspect --format x	safe-read
+buildah inspect --help	safe-read
+buildah inspect --help --format x	safe-read
+buildah inspect --help -h	safe-read
+buildah inspect --help x	safe-read
+buildah inspect --type x	safe-read
+buildah inspect -f x	safe-read
+buildah inspect -h	safe-read
+buildah inspect -t x	safe-read
+buildah inspect x	safe-read
+buildah login	denied
+buildah login x	denied
+buildah logout	denied
+buildah logout x	denied
+buildah manifest	denied
+buildah manifest x	denied
+buildah mount	denied
+buildah mount x	denied
+buildah pull	denied
+buildah pull x	denied
+buildah push	denied
+buildah push x	denied
+buildah rename	denied
+buildah rename x	denied
+buildah rm	denied
+buildah rm x	denied
+buildah rmi	denied
+buildah rmi x	denied
+buildah run	denied
+buildah run x	denied
+buildah tag	denied
+buildah tag x	denied
+buildah umount	denied
+buildah umount x	denied
+buildah unmount	denied
+buildah unmount x	denied
+buildah untag	denied
+buildah untag x	denied
+buildah version	inert
+buildah version --format x	inert
+buildah version --help	inert
+buildah version --help --format x	inert
+buildah version --help -h	inert
+buildah version --help x	inert
+buildah version --json x	inert
+buildah version -h	inert
+buildah version x	inert
+buildah x	denied
+buildctl	denied
+buildctl --help	inert
+buildctl --help --version	denied
+buildctl --help x	denied
+buildctl --version	inert
+buildctl -h	inert
+buildctl -v	inert
+buildctl build	denied
+buildctl build x	denied
+buildctl completion	denied
+buildctl completion --help	inert
+buildctl completion --help -h	inert
+buildctl completion --help x	inert
+buildctl completion -h	inert
+buildctl completion x	inert
+buildctl debug	inert
+buildctl debug dump-llb	denied
+buildctl debug dump-llb x	denied
+buildctl debug get-policy	denied
+buildctl debug get-policy x	denied
+buildctl debug histories	inert
+buildctl debug histories --help	inert
+buildctl debug histories --help -h	inert
+buildctl debug histories --help x	inert
+buildctl debug histories -h	inert
+buildctl debug histories x	inert
+buildctl debug info	inert
+buildctl debug info --help	inert
+buildctl debug info --help -h	inert
+buildctl debug info --help x	inert
+buildctl debug info -h	inert
+buildctl debug info x	inert
+buildctl debug logs	denied
+buildctl debug logs x	denied
+buildctl debug monitor	denied
+buildctl debug monitor x	denied
+buildctl debug validate-policy	denied
+buildctl debug validate-policy x	denied
+buildctl debug workers	inert
+buildctl debug workers --filter	inert
+buildctl debug workers --filter --help	inert
+buildctl debug workers --filter x	inert
+buildctl debug workers --help	inert
+buildctl debug workers --verbose	inert
+buildctl debug workers -h	inert
+buildctl debug workers -v	inert
+buildctl debug workers x	inert
+buildctl debug x	denied
+buildctl dial-stdio	denied
+buildctl dial-stdio x	denied
+buildctl du	safe-read
+buildctl du --filter	safe-read
+buildctl du --filter --help	safe-read
+buildctl du --filter x	safe-read
+buildctl du --help	safe-read
+buildctl du --verbose	safe-read
+buildctl du -h	safe-read
+buildctl du -v	safe-read
+buildctl du x	safe-read
+buildctl help	inert
+buildctl help x	inert
+buildctl prune	denied
+buildctl prune x	denied
+buildctl x	denied
+bun	denied
+bun --help	inert
+bun --help --outdir x	denied
+bun --help --version	denied
+bun --help x	denied
+bun --outdir x	denied
+bun --outfile x	denied
+bun --version	inert
+bun -V	inert
+bun -h	inert
+bun build	denied
+bun build --asset-naming x	safe-write
+bun build --banner x	safe-write
+bun build --bytecode	safe-write
+bun build --bytecode --asset-naming x	safe-write
+bun build --bytecode --compile	safe-write
+bun build --bytecode x	safe-write
+bun build --chunk-naming x	safe-write
+bun build --compile	safe-write
+bun build --compile --outfile=my-app ./cli.ts	safe-write
+bun build --conditions x	safe-write
+bun build --css-chunking	safe-write
+bun build --emit-dce-annotations	safe-write
+bun build --entry-naming x	safe-write
+bun build --env x	safe-write
+bun build --external react --outdir=dist ./src/index.ts	safe-write
+bun build --external x	safe-write
+bun build --footer x	safe-write
+bun build --format x	safe-write
+bun build --format=cjs --outdir=dist ./src/index.ts	safe-write
+bun build --help	safe-write
+bun build --minify	safe-write
+bun build --minify --splitting --outdir=out ./index.jsx	safe-write
+bun build --minify-identifiers	safe-write
+bun build --minify-syntax	safe-write
+bun build --minify-whitespace	safe-write
+bun build --no-bundle	safe-write
+bun build --no-bundle ./src/index.ts	safe-write
+bun build --no-clear-screen	safe-write
+bun build --outdir x	safe-write
+bun build --outdir=dist ./src/index.ts	safe-write
+bun build --outfile x	safe-write
+bun build --outfile=bundle.js ./src/index.ts	safe-write
+bun build --packages x	safe-write
+bun build --production	safe-write
+bun build --production --outdir=dist ./src/index.ts	safe-write
+bun build --public-path x	safe-write
+bun build --react-fast-refresh	safe-write
+bun build --root x	safe-write
+bun build --some-unknown ./src/index.ts	denied
+bun build --sourcemap x	safe-write
+bun build --sourcemap=linked --outdir=dist ./src/index.ts	safe-write
+bun build --splitting	safe-write
+bun build --target x	safe-write
+bun build --target=bun --outfile=server.js ./server.ts	safe-write
+bun build --watch	safe-write
+bun build --watch --outdir=dist ./src/index.ts	safe-write
+bun build --windows-hide-console	safe-write
+bun build --windows-icon x	safe-write
+bun build -e x	safe-write
+bun build -h	safe-write
+bun build ./src/index.ts	safe-write
+bun build ./src/index.ts --outdir ./dist	safe-write
+bun build ./src/index.ts --outfile ./dist/bundle.js	safe-write
+bun build src/index.ts	safe-write
+bun build x	safe-write
+bun outdated	inert
+bun outdated --help	inert
+bun outdated --help -h	inert
+bun outdated --help x	inert
+bun outdated -h	inert
+bun outdated x	inert
+bun pm	denied
+bun pm bin	inert
+bun pm bin --help	inert
+bun pm bin --help -h	inert
+bun pm bin --help x	inert
+bun pm bin -h	inert
+bun pm bin x	inert
+bun pm cache	inert
+bun pm cache --help	inert
+bun pm cache --help -h	inert
+bun pm cache --help x	inert
+bun pm cache -h	inert
+bun pm cache x	inert
+bun pm hash	inert
+bun pm hash --help	inert
+bun pm hash --help -h	inert
+bun pm hash --help x	inert
+bun pm hash -h	inert
+bun pm hash x	inert
+bun pm ls	inert
+bun pm ls --help	inert
+bun pm ls --help -h	inert
+bun pm ls --help x	inert
+bun pm ls -h	inert
+bun pm ls x	inert
+bun pm x	denied
+bun test	safe-read
+bun test --bail	safe-read
+bun test --bail --help	safe-read
+bun test --bail --preload x	safe-read
+bun test --bail x	safe-read
+bun test --help	safe-read
+bun test --only	safe-read
+bun test --preload x	safe-read
+bun test --rerun-each	safe-read
+bun test --timeout 5000	safe-read
+bun test --timeout x	safe-read
+bun test --todo	safe-read
+bun test -h	safe-read
+bun test -t x	safe-read
+bun test x	safe-read
+bun x	denied
+bun x cowsay hello	denied
+bun x eslint src/	safe-read
+bun x tsc	denied
+bun x tsc --noEmit	inert
+bun x x	denied
+bundle	denied
+bundle --help	inert
+bundle --help --path x	denied
+bundle --help --version	denied
+bundle --help x	denied
+bundle --path x	denied
+bundle --version	inert
+bundle -V	inert
+bundle -h	inert
+bundle -v	inert
+bundle check	inert
+bundle check --dry-run	inert
+bundle check --dry-run --gemfile x	inert
+bundle check --dry-run --help	inert
+bundle check --dry-run x	inert
+bundle check --gemfile x	inert
+bundle check --help	inert
+bundle check --path x	inert
+bundle check -h	inert
+bundle check x	inert
+bundle config	inert
+bundle config --help	inert
+bundle config get path	inert
+bundle config list	inert
+bundle config path	inert
+bundle config path vendor/bundle	denied
+bundle config set --help	inert
+bundle config set path vendor/bundle	denied
+bundle config unset path	denied
+bundle config x	inert
+bundle exec	denied
+bundle exec annotaterb models	denied
+bundle exec appraisal	denied
+bundle exec appraisal --help	inert
+bundle exec appraisal list	inert
+bundle exec appraisal list --unknown	denied
+bundle exec appraisal list foo	denied
+bundle exec appraisal rails-7-1	denied
+bundle exec appraisal rails-7-1 cucumber	safe-read
+bundle exec appraisal rails-7-1 rm -rf /	denied
+bundle exec appraisal rails-7-1 rspec --tag focus spec/	safe-read
+bundle exec appraisal rails-7-1 rspec spec/models/foo_spec.rb	safe-read
+bundle exec asciidoctor README.adoc	safe-write
+bundle exec brakeman	safe-read
+bundle exec bundle-audit check	safe-read
+bundle exec bundler-audit check	safe-read
+bundle exec byebug --version	inert
+bundle exec byebug script.rb	denied
+bundle exec cucumber	safe-read
+bundle exec danger pr	denied
+bundle exec dawn scan app/	safe-write
+bundle exec debride lib/	safe-read
+bundle exec erb_lint app/views/foo.html.erb	safe-read
+bundle exec fasterer	safe-read
+bundle exec flay lib/	safe-read
+bundle exec flog -s lib/	safe-read
+bundle exec foreman start	denied
+bundle exec fpm -s dir -t deb -n mypkg lib/	safe-write
+bundle exec gem	denied
+bundle exec gem --help	inert
+bundle exec gem --version	inert
+bundle exec gem contents rails	inert
+bundle exec gem dependency rails	inert
+bundle exec gem environment	inert
+bundle exec gem info rails	inert
+bundle exec gem install rails	denied
+bundle exec gem list	inert
+bundle exec gem list --local	inert
+bundle exec gem outdated	inert
+bundle exec gem search rails	inert
+bundle exec gem uninstall rails	denied
+bundle exec gem update	denied
+bundle exec gem which bundler	inert
+bundle exec guard start	denied
+bundle exec haml-lint --auto-correct app/views/	safe-write
+bundle exec haml-lint --xyzzy	denied
+bundle exec haml-lint app/views/	safe-read
+bundle exec herb format --check app/views/foo.html.erb	safe-read
+bundle exec herb lint app/views/foo.html.erb	safe-read
+bundle exec i18n-tasks health	safe-read
+bundle exec i18n-tasks irb	denied
+bundle exec i18n-tasks missing	safe-read
+bundle exec i18n-tasks normalize	safe-write
+bundle exec i18n-tasks remove-unused	safe-write
+bundle exec jekyll build	denied
+bundle exec jekyll serve	denied
+bundle exec kamal deploy	denied
+bundle exec kramdown README.md	safe-read
+bundle exec mutant run -- Foo	denied
+bundle exec packwerk check	safe-read
+bundle exec packwerk update-todo	safe-write
+bundle exec pry --version	inert
+bundle exec pry script.rb	denied
+bundle exec rails	denied
+bundle exec rails --help	inert
+bundle exec rails about	inert
+bundle exec rails assets:reveal	inert
+bundle exec rails assets:reveal:full	inert
+bundle exec rails console	denied
+bundle exec rails credentials:edit	denied
+bundle exec rails db:create	safe-write
+bundle exec rails db:drop	denied
+bundle exec rails db:migrate	safe-write
+bundle exec rails db:migrate:status	inert
+bundle exec rails db:reset	denied
+bundle exec rails db:rollback	denied
+bundle exec rails db:schema:load	safe-write
+bundle exec rails db:seed	safe-write
+bundle exec rails db:setup	safe-write
+bundle exec rails db:version	inert
+bundle exec rails dbconsole	denied
+bundle exec rails destroy model User	denied
+bundle exec rails generate model User name:string	safe-write
+bundle exec rails initializers	inert
+bundle exec rails middleware	inert
+bundle exec rails notes	inert
+bundle exec rails notes --annotations FIXME RELEASE	inert
+bundle exec rails routes	inert
+bundle exec rails routes --controller users	inert
+bundle exec rails routes --expanded	inert
+bundle exec rails routes --grep dun_and_bradstreet	inert
+bundle exec rails runner script.rb	denied
+bundle exec rails secret	inert
+bundle exec rails server	denied
+bundle exec rails stats	inert
+bundle exec rails test	safe-read
+bundle exec rails test --fail-fast	safe-read
+bundle exec rails test --seed 1234	safe-read
+bundle exec rails test -e test	safe-read
+bundle exec rails test -n /user/	safe-read
+bundle exec rails test -v	safe-read
+bundle exec rails test test/models/user_test.rb	safe-read
+bundle exec rails test:system	safe-read
+bundle exec rails time:zones:all	inert
+bundle exec rails time:zones:local	inert
+bundle exec rails version	inert
+bundle exec rake --help	inert
+bundle exec rake about	inert
+bundle exec rake assets:precompile	safe-write
+bundle exec rake cache:clear	safe-write
+bundle exec rake db:create	safe-write
+bundle exec rake db:drop	denied
+bundle exec rake db:migrate	safe-write
+bundle exec rake db:migrate --trace	safe-write
+bundle exec rake db:migrate:redo	denied
+bundle exec rake db:migrate:status	inert
+bundle exec rake db:migrate:status RAILS_ENV=test	inert
+bundle exec rake db:prepare	safe-write
+bundle exec rake db:purge	denied
+bundle exec rake db:reset	denied
+bundle exec rake db:rollback	denied
+bundle exec rake db:schema:dump	safe-write
+bundle exec rake db:schema:load	safe-write
+bundle exec rake db:seed	safe-write
+bundle exec rake db:setup	safe-write
+bundle exec rake db:version	inert
+bundle exec rake foo:bar:baz	denied
+bundle exec rake log:clear	safe-write
+bundle exec rake my_custom_task	denied
+bundle exec rake routes	inert
+bundle exec rake stats	inert
+bundle exec rake test	safe-read
+bundle exec rake test:system	safe-read
+bundle exec rake time:zones:local	inert
+bundle exec rake tmp:clear	safe-write
+bundle exec rbs collection install	inert
+bundle exec rbs list --class	safe-read
+bundle exec rbs test	denied
+bundle exec rbs validate	safe-read
+bundle exec rdoc lib	safe-write
+bundle exec reek lib/	safe-read
+bundle exec rspec	safe-read
+bundle exec rspec spec/models/foo_spec.rb	safe-read
+bundle exec ruby ./task.rb	safe-write
+bundle exec ruby /tmp/script.rb	denied
+bundle exec ruby-audit check	safe-read
+bundle exec rubycritic	denied
+bundle exec rubycritic --no-browser	safe-write
+bundle exec rufo --check lib/	safe-write
+bundle exec rufo lib/	safe-write
+bundle exec slim-lint app/views/	safe-read
+bundle exec srb init	denied
+bundle exec srb rbi gems	denied
+bundle exec srb tc	safe-read
+bundle exec srb tc -a	safe-write
+bundle exec stackprof tmp/profile.dump	safe-read
+bundle exec standardrb --fix app/models/foo.rb	safe-write
+bundle exec standardrb app/models/foo.rb	safe-read
+bundle exec steep check	safe-read
+bundle exec steep langserver	denied
+bundle exec steep stats	safe-read
+bundle exec steep watch	denied
+bundle exec stree check lib/	safe-read
+bundle exec stree format lib/foo.rb	safe-read
+bundle exec stree lsp	denied
+bundle exec stree write lib/foo.rb	safe-write
+bundle exec thor list	denied
+bundle exec typeprof -o sig/app.rbs app.rb	safe-write
+bundle exec typeprof app.rb	safe-read
+bundle exec x	denied
+bundle exec yard list	safe-read
+bundle exec yard stats	safe-read
+bundle exec yardoc	safe-write
+bundle info	inert
+bundle info --help	inert
+bundle info --help --path	inert
+bundle info --help x	inert
+bundle info --path	inert
+bundle info -h	inert
+bundle info rails	inert
+bundle info rails --path	inert
+bundle info x	inert
+bundle install	safe-write
+bundle install --clean	safe-write
+bundle install --clean --deployment	safe-write
+bundle install --clean --gemfile x	safe-write
+bundle install --clean --quiet	safe-write
+bundle install --clean x	safe-write
+bundle install --deployment	safe-write
+bundle install --deployment --without development test	safe-write
+bundle install --frozen	safe-write
+bundle install --full-index	safe-write
+bundle install --gemfile gemfiles/rails_7.gemfile	safe-write
+bundle install --gemfile x	safe-write
+bundle install --help	safe-write
+bundle install --jobs 4	safe-write
+bundle install --jobs x	safe-write
+bundle install --jobs=4	safe-write
+bundle install --local	safe-write
+bundle install --no-cache	safe-write
+bundle install --no-prune-sources	safe-write
+bundle install --path vendor/bundle	safe-write
+bundle install --path x	safe-write
+bundle install --prefer-local	safe-write
+bundle install --quiet	safe-write
+bundle install --quiet --jobs 4 --retry 3	safe-write
+bundle install --redownload	safe-write
+bundle install --retry 3	safe-write
+bundle install --retry x	safe-write
+bundle install --standalone x	safe-write
+bundle install --system	safe-write
+bundle install --trust-policy x	safe-write
+bundle install --with development	safe-write
+bundle install --with x	safe-write
+bundle install --without x	safe-write
+bundle install -h	safe-write
+bundle install -j 4	safe-write
+bundle install -j x	safe-write
+bundle install x	safe-write
+bundle list	inert
+bundle list --help	inert
+bundle list --help --name-only	inert
+bundle list --help x	inert
+bundle list --name-only	inert
+bundle list --paths	inert
+bundle list -h	inert
+bundle list x	inert
+bundle show	inert
+bundle show --help	inert
+bundle show --help --paths	inert
+bundle show --help x	inert
+bundle show --paths	inert
+bundle show -h	inert
+bundle show actionpack	inert
+bundle show x	inert
+bundle x	denied
+bundle-audit	denied
+bundle-audit --help	inert
+bundle-audit --help --output x	denied
+bundle-audit --help --version	denied
+bundle-audit --help x	denied
+bundle-audit --output x	denied
+bundle-audit --version	inert
+bundle-audit -V	inert
+bundle-audit -h	inert
+bundle-audit check	safe-read
+bundle-audit check --config x	safe-read
+bundle-audit check --format x	safe-read
+bundle-audit check --gemfile-lock x	safe-read
+bundle-audit check --help	safe-read
+bundle-audit check --help --config x	safe-read
+bundle-audit check --help --no-update	safe-read
+bundle-audit check --help x	safe-read
+bundle-audit check --ignore x	safe-read
+bundle-audit check --no-update	safe-read
+bundle-audit check --output	safe-write
+bundle-audit check --output x	safe-write
+bundle-audit check --quiet	safe-read
+bundle-audit check --update	safe-read
+bundle-audit check --verbose	safe-read
+bundle-audit check -h	safe-read
+bundle-audit check -q	safe-read
+bundle-audit check -v	safe-read
+bundle-audit check x	safe-read
+bundle-audit stats	inert
+bundle-audit stats --help	inert
+bundle-audit stats --help -h	inert
+bundle-audit stats --help x	inert
+bundle-audit stats -h	inert
+bundle-audit stats x	inert
+bundle-audit update	safe-write
+bundle-audit update --help	safe-write
+bundle-audit update --help --quiet	safe-write
+bundle-audit update --help x	safe-write
+bundle-audit update --quiet	safe-write
+bundle-audit update -h	safe-write
+bundle-audit update -q	safe-write
+bundle-audit update x	safe-write
+bundle-audit version	inert
+bundle-audit version --help	inert
+bundle-audit version --help -h	inert
+bundle-audit version --help x	inert
+bundle-audit version -h	inert
+bundle-audit version x	inert
+bundle-audit x	denied
+bundler-audit	denied
+bundler-audit --help	inert
+bundler-audit --help --output x	denied
+bundler-audit --help --version	denied
+bundler-audit --help x	denied
+bundler-audit --output x	denied
+bundler-audit --version	inert
+bundler-audit -V	inert
+bundler-audit -h	inert
+bundler-audit check	safe-read
+bundler-audit check --config x	safe-read
+bundler-audit check --format json --output ./audit.json	safe-write
+bundler-audit check --format x	safe-read
+bundler-audit check --gemfile-lock x	safe-read
+bundler-audit check --help	safe-read
+bundler-audit check --help --config x	safe-read
+bundler-audit check --help --no-update	safe-read
+bundler-audit check --help x	safe-read
+bundler-audit check --ignore x	safe-read
+bundler-audit check --no-update	safe-read
+bundler-audit check --output	safe-write
+bundler-audit check --output x	safe-write
+bundler-audit check --quiet	safe-read
+bundler-audit check --update	safe-read
+bundler-audit check --verbose	safe-read
+bundler-audit check -h	safe-read
+bundler-audit check -q	safe-read
+bundler-audit check -v	safe-read
+bundler-audit check x	safe-read
+bundler-audit stats	inert
+bundler-audit stats --help	inert
+bundler-audit stats --help -h	inert
+bundler-audit stats --help x	inert
+bundler-audit stats -h	inert
+bundler-audit stats x	inert
+bundler-audit update	safe-write
+bundler-audit update --help	safe-write
+bundler-audit update --help --quiet	safe-write
+bundler-audit update --help x	safe-write
+bundler-audit update --quiet	safe-write
+bundler-audit update -h	safe-write
+bundler-audit update -q	safe-write
+bundler-audit update x	safe-write
+bundler-audit version	inert
+bundler-audit version --help	inert
+bundler-audit version --help -h	inert
+bundler-audit version --help x	inert
+bundler-audit version -h	inert
+bundler-audit version x	inert
+bundler-audit x	denied
+bundletool	denied
+bundletool --help	inert
+bundletool --help --version	denied
+bundletool --help x	denied
+bundletool --version	inert
+bundletool -V	inert
+bundletool -h	inert
+bundletool dump	denied
+bundletool dump config	denied
+bundletool dump config --bundle x	inert
+bundletool dump config --help	inert
+bundletool dump config --help --bundle x	inert
+bundletool dump config --help -h	inert
+bundletool dump config --help x	inert
+bundletool dump config --module x	inert
+bundletool dump config --xpath x	inert
+bundletool dump config -h	inert
+bundletool dump config x	inert
+bundletool dump manifest	denied
+bundletool dump manifest --bundle x	inert
+bundletool dump manifest --help	inert
+bundletool dump manifest --help --bundle x	inert
+bundletool dump manifest --help -h	inert
+bundletool dump manifest --help x	inert
+bundletool dump manifest --module x	inert
+bundletool dump manifest --xpath x	inert
+bundletool dump manifest -h	inert
+bundletool dump manifest x	inert
+bundletool dump resources	denied
+bundletool dump resources --bundle x	inert
+bundletool dump resources --help	inert
+bundletool dump resources --help --bundle x	inert
+bundletool dump resources --help -h	inert
+bundletool dump resources --help x	inert
+bundletool dump resources --module x	inert
+bundletool dump resources --xpath x	inert
+bundletool dump resources -h	inert
+bundletool dump resources x	inert
+bundletool dump x	denied
+bundletool get-size	denied
+bundletool get-size total	denied
+bundletool get-size total --apks x	inert
+bundletool get-size total --device-spec x	inert
+bundletool get-size total --dimensions x	inert
+bundletool get-size total --help	inert
+bundletool get-size total --help --apks x	inert
+bundletool get-size total --help -h	inert
+bundletool get-size total --help x	inert
+bundletool get-size total --modules x	inert
+bundletool get-size total -h	inert
+bundletool get-size total x	inert
+bundletool get-size x	denied
+bundletool validate	denied
+bundletool validate --bundle x	inert
+bundletool validate --help	inert
+bundletool validate --help --bundle x	inert
+bundletool validate --help -h	inert
+bundletool validate --help x	inert
+bundletool validate -h	inert
+bundletool validate x	inert
+bundletool version	inert
+bundletool version --help	inert
+bundletool version --help -h	inert
+bundletool version --help x	denied
+bundletool version -h	inert
+bundletool version x	denied
+bundletool x	denied
+bunx	denied
+bunx -- eslint src/	safe-read
+bunx --bun eslint src/	safe-read
+bunx --help	denied
+bunx --no-install eslint .	safe-read
+bunx --package eslint eslint src/	safe-read
+bunx --version	inert
+bunx biome check src/	safe-read
+bunx cowsay hello	denied
+bunx eslint src/	safe-read
+bunx evil-package --help	denied
+bunx prettier --check src/	inert
+bunx tsc	denied
+bunx tsc --noEmit	inert
+bunx tsc --pretty	denied
+bunx tsc --project tsconfig.json --noEmit	inert
+bunx x	denied
+bunzip2	safe-write
+bunzip2 --compress	safe-write
+bunzip2 --compress --decompress	safe-write
+bunzip2 --compress x	safe-write
+bunzip2 --decompress	safe-write
+bunzip2 --exponential	safe-write
+bunzip2 --fast	safe-write
+bunzip2 --force	safe-write
+bunzip2 --help	safe-write
+bunzip2 --keep	safe-write
+bunzip2 --license	safe-write
+bunzip2 --quiet	safe-write
+bunzip2 --repetitive-best	safe-write
+bunzip2 --repetitive-fast	safe-write
+bunzip2 --small	safe-write
+bunzip2 --stdout	safe-write
+bunzip2 --test	safe-write
+bunzip2 --verbose	safe-write
+bunzip2 --version	safe-write
+bunzip2 -1	safe-write
+bunzip2 -2	safe-write
+bunzip2 -3	safe-write
+bunzip2 -4	safe-write
+bunzip2 -5	safe-write
+bunzip2 -6	safe-write
+bunzip2 -7	safe-write
+bunzip2 -8	safe-write
+bunzip2 -9	safe-write
+bunzip2 -L	safe-write
+bunzip2 -V	safe-write
+bunzip2 -c	safe-write
+bunzip2 -d	safe-write
+bunzip2 -f	safe-write
+bunzip2 -h	safe-write
+bunzip2 -k	safe-write
+bunzip2 -q	safe-write
+bunzip2 -s	safe-write
+bunzip2 -t	safe-write
+bunzip2 -v	safe-write
+bunzip2 -z	safe-write
+bunzip2 x	safe-write
+bw	denied
+bw --help	inert
+bw --help --version	denied
+bw --help x	denied
+bw --version	inert
+bw -h	inert
+bw -v	inert
+bw completion	inert
+bw completion --help	inert
+bw completion --help --shell x	inert
+bw completion --help -h	inert
+bw completion --help x	inert
+bw completion --shell x	inert
+bw completion -h	inert
+bw completion x	inert
+bw config	denied
+bw config x	denied
+bw confirm	denied
+bw confirm x	denied
+bw create	denied
+bw create x	denied
+bw delete	denied
+bw delete x	denied
+bw device-approval	denied
+bw device-approval x	denied
+bw edit	denied
+bw edit x	denied
+bw encode	safe-read
+bw encode --help	safe-read
+bw encode --help -h	safe-read
+bw encode --help x	safe-read
+bw encode -h	safe-read
+bw encode x	safe-read
+bw export	denied
+bw export x	denied
+bw fingerprint	denied
+bw fingerprint --help	safe-read
+bw fingerprint --help -h	safe-read
+bw fingerprint --help x	safe-read
+bw fingerprint -h	safe-read
+bw fingerprint x	safe-read
+bw generate	denied
+bw generate x	denied
+bw get	denied
+bw get --help	denied
+bw get --help --itemid x	denied
+bw get --help --output	denied
+bw get --help x	denied
+bw get --itemid x	denied
+bw get --organizationid x	denied
+bw get --output	denied
+bw get --output x	denied
+bw get --pretty	denied
+bw get --raw	denied
+bw get --response	denied
+bw get --session x	denied
+bw get -h	denied
+bw get x	denied
+bw help	inert
+bw help x	inert
+bw import	denied
+bw import x	denied
+bw list	denied
+bw list --collectionid x	denied
+bw list --folderid x	denied
+bw list --help	denied
+bw list --help --collectionid x	denied
+bw list --help --organizationid	denied
+bw list --help x	denied
+bw list --nointeraction x	denied
+bw list --organizationid	denied
+bw list --organizationid x	denied
+bw list --pretty	denied
+bw list --quiet	denied
+bw list --raw	denied
+bw list --response	denied
+bw list --search x	denied
+bw list --session	denied
+bw list --session x	denied
+bw list --trash	denied
+bw list -h	denied
+bw list x	denied
+bw lock	denied
+bw lock x	denied
+bw login	denied
+bw login x	denied
+bw logout	denied
+bw logout x	denied
+bw move	denied
+bw move x	denied
+bw pending	denied
+bw pending --help	safe-read
+bw pending --help -h	safe-read
+bw pending --help x	safe-read
+bw pending -h	safe-read
+bw pending x	safe-read
+bw receive	denied
+bw receive x	denied
+bw restore	denied
+bw restore x	denied
+bw send	denied
+bw send x	denied
+bw serve	denied
+bw serve x	denied
+bw share	denied
+bw share x	denied
+bw status	safe-read
+bw status --help	safe-read
+bw status --help -h	safe-read
+bw status --help x	safe-read
+bw status -h	safe-read
+bw status x	safe-read
+bw sync	denied
+bw sync x	denied
+bw template	denied
+bw template --help	safe-read
+bw template --help --pretty	safe-read
+bw template --help x	safe-read
+bw template --pretty	safe-read
+bw template -h	safe-read
+bw template x	safe-read
+bw unlock	denied
+bw unlock x	denied
+bw update	denied
+bw update x	denied
+bw version	inert
+bw version --help	inert
+bw version --help -h	inert
+bw version --help x	inert
+bw version -h	inert
+bw version x	inert
+bw x	denied
+byacc	denied
+byacc --help	safe-write
+byacc --help --version	safe-write
+byacc --help -H x	safe-write
+byacc --help x	safe-write
+byacc --version	safe-write
+byacc -B	safe-write
+byacc -H x	safe-write
+byacc -L	safe-write
+byacc -P	safe-write
+byacc -V	safe-write
+byacc -b x	safe-write
+byacc -d	safe-write
+byacc -d grammar.y	safe-write
+byacc -g	safe-write
+byacc -h	safe-write
+byacc -i	safe-write
+byacc -l	safe-write
+byacc -o x	safe-write
+byacc -p x	safe-write
+byacc -r	safe-write
+byacc -s	safe-write
+byacc -t	safe-write
+byacc -v	safe-write
+byacc -y	safe-write
+byacc x	safe-write
+byebug	denied
+byebug --help	inert
+byebug --help --version	inert
+byebug --help x	denied
+byebug --version	inert
+byebug -h	inert
+byebug -v	inert
+byebug x	denied
+bzcat	safe-write
+bzcat --compress	safe-write
+bzcat --compress --decompress	safe-write
+bzcat --compress x	safe-write
+bzcat --decompress	safe-write
+bzcat --exponential	safe-write
+bzcat --fast	safe-write
+bzcat --force	safe-write
+bzcat --help	safe-write
+bzcat --keep	safe-write
+bzcat --license	safe-write
+bzcat --quiet	safe-write
+bzcat --repetitive-best	safe-write
+bzcat --repetitive-fast	safe-write
+bzcat --small	safe-write
+bzcat --stdout	safe-write
+bzcat --test	safe-write
+bzcat --verbose	safe-write
+bzcat --version	safe-write
+bzcat -1	safe-write
+bzcat -2	safe-write
+bzcat -3	safe-write
+bzcat -4	safe-write
+bzcat -5	safe-write
+bzcat -6	safe-write
+bzcat -7	safe-write
+bzcat -8	safe-write
+bzcat -9	safe-write
+bzcat -L	safe-write
+bzcat -V	safe-write
+bzcat -c	safe-write
+bzcat -d	safe-write
+bzcat -f	safe-write
+bzcat -h	safe-write
+bzcat -k	safe-write
+bzcat -q	safe-write
+bzcat -s	safe-write
+bzcat -t	safe-write
+bzcat -v	safe-write
+bzcat -z	safe-write
+bzcat x	safe-write
+bzcmp	denied
+bzcmp --help	denied
+bzcmp --version	denied
+bzcmp a.bz2 b.bz2	inert
+bzcmp x	inert
+bzdiff	denied
+bzdiff --help	denied
+bzdiff --version	denied
+bzdiff x	inert
+bzegrep	denied
+bzegrep --help	denied
+bzegrep --version	denied
+bzegrep x	inert
+bzfgrep	denied
+bzfgrep --help	denied
+bzfgrep --version	denied
+bzfgrep x	inert
+bzgrep	denied
+bzgrep --help	denied
+bzgrep --version	denied
+bzgrep x	inert
+bzip2	safe-write
+bzip2 --compress	safe-write
+bzip2 --compress --decompress	safe-write
+bzip2 --compress x	safe-write
+bzip2 --decompress	safe-write
+bzip2 --exponential	safe-write
+bzip2 --fast	safe-write
+bzip2 --force	safe-write
+bzip2 --help	safe-write
+bzip2 --keep	safe-write
+bzip2 --license	safe-write
+bzip2 --quiet	safe-write
+bzip2 --repetitive-best	safe-write
+bzip2 --repetitive-fast	safe-write
+bzip2 --small	safe-write
+bzip2 --stdout	safe-write
+bzip2 --test	safe-write
+bzip2 --verbose	safe-write
+bzip2 --version	safe-write
+bzip2 -1	safe-write
+bzip2 -2	safe-write
+bzip2 -3	safe-write
+bzip2 -4	safe-write
+bzip2 -5	safe-write
+bzip2 -6	safe-write
+bzip2 -7	safe-write
+bzip2 -8	safe-write
+bzip2 -9	safe-write
+bzip2 -L	safe-write
+bzip2 -V	safe-write
+bzip2 -c	safe-write
+bzip2 -d	safe-write
+bzip2 -f	safe-write
+bzip2 -h	safe-write
+bzip2 -k	safe-write
+bzip2 -q	safe-write
+bzip2 -s	safe-write
+bzip2 -t	safe-write
+bzip2 -v	safe-write
+bzip2 -z	safe-write
+bzip2 x	safe-write
+bzip2recover	safe-write
+bzip2recover --compress	safe-write
+bzip2recover --compress --decompress	safe-write
+bzip2recover --compress x	safe-write
+bzip2recover --decompress	safe-write
+bzip2recover --exponential	safe-write
+bzip2recover --fast	safe-write
+bzip2recover --force	safe-write
+bzip2recover --help	safe-write
+bzip2recover --keep	safe-write
+bzip2recover --license	safe-write
+bzip2recover --quiet	safe-write
+bzip2recover --repetitive-best	safe-write
+bzip2recover --repetitive-fast	safe-write
+bzip2recover --small	safe-write
+bzip2recover --stdout	safe-write
+bzip2recover --test	safe-write
+bzip2recover --verbose	safe-write
+bzip2recover --version	safe-write
+bzip2recover -1	safe-write
+bzip2recover -2	safe-write
+bzip2recover -3	safe-write
+bzip2recover -4	safe-write
+bzip2recover -5	safe-write
+bzip2recover -6	safe-write
+bzip2recover -7	safe-write
+bzip2recover -8	safe-write
+bzip2recover -9	safe-write
+bzip2recover -L	safe-write
+bzip2recover -V	safe-write
+bzip2recover -c	safe-write
+bzip2recover -d	safe-write
+bzip2recover -f	safe-write
+bzip2recover -h	safe-write
+bzip2recover -k	safe-write
+bzip2recover -q	safe-write
+bzip2recover -s	safe-write
+bzip2recover -t	safe-write
+bzip2recover -v	safe-write
+bzip2recover -z	safe-write
+bzip2recover x	safe-write
+bzless	inert
+bzless --help	denied
+bzless --version	denied
+bzless x	inert
+bzmore	inert
+bzmore --help	denied
+bzmore --version	denied
+bzmore x	inert

@@ -1,0 +1,5582 @@
+nano	inert
+nano -!	inert
+nano -! --help	inert
+nano -! -C x	inert
+nano -! x	inert
+nano --help	inert
+nano --version	inert
+nano -/	inert
+nano -0	inert
+nano -@	inert
+nano -A	inert
+nano -B	inert
+nano -C x	inert
+nano -D	inert
+nano -E	inert
+nano -F	inert
+nano -G	inert
+nano -H	inert
+nano -I	inert
+nano -J x	inert
+nano -K	inert
+nano -L	inert
+nano -M	inert
+nano -N	inert
+nano -O	inert
+nano -P	inert
+nano -Q x	inert
+nano -R	inert
+nano -S	inert
+nano -T x	inert
+nano -U	inert
+nano -V	inert
+nano -W	inert
+nano -X x	inert
+nano -Y x	inert
+nano -Z	inert
+nano -_	inert
+nano -a	inert
+nano -b	inert
+nano -c	inert
+nano -d	inert
+nano -e	inert
+nano -g	inert
+nano -h	inert
+nano -i	inert
+nano -j	inert
+nano -k	inert
+nano -l	inert
+nano -m	inert
+nano -n	inert
+nano -o x	inert
+nano -p	inert
+nano -q	inert
+nano -r x	inert
+nano -t	inert
+nano -u	inert
+nano -v	inert
+nano -w	inert
+nano -x	inert
+nano -y	inert
+nano -z	inert
+nano x	inert
+nasm	denied
+nasm --help	safe-write
+nasm --help --version	safe-write
+nasm --help x	safe-write
+nasm --version	safe-write
+nasm -?	safe-write
+nasm -h	safe-write
+nasm -v	safe-write
+nasm x	safe-write
+nativescript	denied
+nativescript --help	inert
+nativescript --help --version	denied
+nativescript --help x	denied
+nativescript --version	inert
+nativescript -h	inert
+nativescript build	denied
+nativescript build x	denied
+nativescript clean	denied
+nativescript clean x	denied
+nativescript config	denied
+nativescript config x	denied
+nativescript create	denied
+nativescript create x	denied
+nativescript debug	denied
+nativescript debug x	denied
+nativescript deploy	denied
+nativescript deploy x	denied
+nativescript device	denied
+nativescript device x	denied
+nativescript doctor	safe-read
+nativescript doctor --help	safe-read
+nativescript doctor --help -h	safe-read
+nativescript doctor --help x	safe-read
+nativescript doctor -h	safe-read
+nativescript doctor x	safe-read
+nativescript extension	denied
+nativescript extension x	denied
+nativescript help	inert
+nativescript help x	inert
+nativescript info	safe-read
+nativescript info --help	safe-read
+nativescript info --help -h	safe-read
+nativescript info --help x	safe-read
+nativescript info -h	safe-read
+nativescript info x	safe-read
+nativescript migrate	denied
+nativescript migrate x	denied
+nativescript package-manager	denied
+nativescript package-manager x	denied
+nativescript prepare	denied
+nativescript prepare x	denied
+nativescript proxy	denied
+nativescript proxy x	denied
+nativescript run	denied
+nativescript run x	denied
+nativescript setup	denied
+nativescript setup x	denied
+nativescript test	denied
+nativescript test x	denied
+nativescript update	denied
+nativescript update x	denied
+nativescript usage-reports	denied
+nativescript usage-reports x	denied
+nativescript x	denied
+nbconvert	denied
+nbconvert --ExecutePreprocessor.kernel-name x	safe-write
+nbconvert --ExecutePreprocessor.kernel_name x	safe-write
+nbconvert --ExecutePreprocessor.timeout x	safe-write
+nbconvert --allow-chromium-download	safe-write
+nbconvert --allow-chromium-download --ExecutePreprocessor.kernel-name x	safe-write
+nbconvert --allow-chromium-download --allow-errors	safe-write
+nbconvert --allow-chromium-download x	safe-write
+nbconvert --allow-errors	safe-write
+nbconvert --clear-output	safe-write
+nbconvert --config x	safe-write
+nbconvert --debug	safe-write
+nbconvert --disable-chromium-sandbox	safe-write
+nbconvert --embed-images	safe-write
+nbconvert --exec	safe-write
+nbconvert --execute	safe-write
+nbconvert --from	safe-write
+nbconvert --from x	safe-write
+nbconvert --generate-config	safe-write
+nbconvert --help	safe-write
+nbconvert --inplace	safe-write
+nbconvert --log-level	safe-write
+nbconvert --log-level x	safe-write
+nbconvert --nbformat x	safe-write
+nbconvert --no-input	safe-write
+nbconvert --no-prompt	safe-write
+nbconvert --no-stdin	safe-write
+nbconvert --output x	safe-write
+nbconvert --output-dir x	safe-write
+nbconvert --post x	safe-write
+nbconvert --reveal-prefix x	safe-write
+nbconvert --show-config	safe-write
+nbconvert --show-config-json	safe-write
+nbconvert --stdin	safe-write
+nbconvert --stdout	safe-write
+nbconvert --template x	safe-write
+nbconvert --template-file x	safe-write
+nbconvert --to x	safe-write
+nbconvert --use-frontmatter x	safe-write
+nbconvert --version	safe-write
+nbconvert --writer	safe-write
+nbconvert --writer x	safe-write
+nbconvert -c x	safe-write
+nbconvert -h	safe-write
+nbconvert -y	safe-write
+nbconvert -y x	safe-write
+nbconvert x	safe-write
+nbqa	denied
+nbqa --help	inert
+nbqa --help --nbqa-help	inert
+nbqa --help x	denied
+nbqa --nbqa-help	inert
+nbqa --nbqa-version	inert
+nbqa --version	inert
+nbqa -V	inert
+nbqa -h	inert
+nbqa x	denied
+nbstripout	safe-write
+nbstripout --attributes	safe-write
+nbstripout --attributes --attributes x	safe-write
+nbstripout --attributes --drop-empty-cells	safe-write
+nbstripout --attributes x	safe-write
+nbstripout --drop-empty-cells	safe-write
+nbstripout --dry-run	safe-write
+nbstripout --extra-keys	safe-write
+nbstripout --extra-keys x	safe-write
+nbstripout --force	safe-write
+nbstripout --global	safe-write
+nbstripout --help	safe-write
+nbstripout --include-files-from-stdin	safe-write
+nbstripout --install	safe-write
+nbstripout --is-installed	safe-write
+nbstripout --keep-count	safe-write
+nbstripout --keep-id	safe-write
+nbstripout --keep-metadata-keys	safe-write
+nbstripout --keep-metadata-keys x	safe-write
+nbstripout --keep-output	safe-write
+nbstripout --max-size	safe-write
+nbstripout --max-size x	safe-write
+nbstripout --max-size-bytes	safe-write
+nbstripout --no-empty-cells	safe-write
+nbstripout --no-strip-init-cells	safe-write
+nbstripout --status	safe-write
+nbstripout --strip-empty-cells	safe-write
+nbstripout --strip-init-cells	safe-write
+nbstripout --system	safe-write
+nbstripout --textconv	safe-write
+nbstripout --uninstall	safe-write
+nbstripout --verify	safe-write
+nbstripout --version	safe-write
+nbstripout -f	safe-write
+nbstripout -h	safe-write
+nbstripout -t	safe-write
+nbstripout x	safe-write
+nc	denied
+nc --help	inert
+nc --help -4	denied
+nc --help -w x	denied
+nc --help x	denied
+nc --version	denied
+nc -4	denied
+nc -6	denied
+nc -h	inert
+nc -n	denied
+nc -u	denied
+nc -v	denied
+nc -w x	denied
+nc -z	inert
+nc -z --help	inert
+nc -z -4	inert
+nc -z -6	inert
+nc -z -h	inert
+nc -z -n	inert
+nc -z -u	inert
+nc -z -v	inert
+nc -z -w x	inert
+nc -z -z	inert
+nc x	denied
+ncal	inert
+ncal --help	denied
+ncal --version	denied
+ncal x	inert
+ncat	denied
+ncat --help	inert
+ncat --help --version	denied
+ncat --help --wait x	denied
+ncat --help x	denied
+ncat --version	denied
+ncat --wait x	denied
+ncat -4	denied
+ncat -6	denied
+ncat -h	inert
+ncat -n	denied
+ncat -u	denied
+ncat -v	denied
+ncat -w x	denied
+ncat -z	inert
+ncat -z --help	inert
+ncat -z --version	inert
+ncat -z --wait x	inert
+ncat -z -4	inert
+ncat -z -6	inert
+ncat -z -h	inert
+ncat -z -n	inert
+ncat -z -u	inert
+ncat -z -v	inert
+ncat -z -w x	inert
+ncat -z -z	inert
+ncat x	denied
+ncu	safe-read
+ncu --color x	safe-read
+ncu --concurrency x	safe-read
+ncu --configFileName x	safe-read
+ncu --configFilePath x	safe-read
+ncu --cwd	safe-read
+ncu --cwd --color x	safe-read
+ncu --cwd --deep	safe-read
+ncu --cwd x	safe-read
+ncu --deep	safe-read
+ncu --dep	safe-read
+ncu --deprecated	safe-read
+ncu --doctor	denied
+ncu --enginesNode	safe-read
+ncu --errorLevel	safe-read
+ncu --filter x	safe-read
+ncu --filterResults x	safe-read
+ncu --filterVersion x	safe-read
+ncu --format x	safe-read
+ncu --global	safe-read
+ncu --groupFunction	safe-read
+ncu --help	safe-read
+ncu --install	safe-read
+ncu --interactive	safe-read
+ncu --jsonAll	safe-read
+ncu --jsonDeps	safe-read
+ncu --jsonUpgraded	safe-read
+ncu --loglevel	safe-read
+ncu --mergeConfig	safe-read
+ncu --minimal	safe-read
+ncu --no-color	safe-read
+ncu --packageData x	safe-read
+ncu --packageFile x	safe-read
+ncu --packageManager	safe-read
+ncu --peer	safe-read
+ncu --pre	safe-read
+ncu --prefix	safe-read
+ncu --registry x	safe-read
+ncu --registryType x	safe-read
+ncu --reject x	safe-read
+ncu --rejectVersion x	safe-read
+ncu --root	safe-read
+ncu --silent	safe-read
+ncu --stdin	safe-read
+ncu --target	safe-read
+ncu --timeout	safe-read
+ncu --upgrade	safe-write
+ncu --verbose	safe-read
+ncu --version	safe-read
+ncu --workspace x	safe-read
+ncu -c	safe-read
+ncu -d	safe-read
+ncu -e	safe-read
+ncu -f x	safe-read
+ncu -g	safe-read
+ncu -h	safe-read
+ncu -i	safe-read
+ncu -j	safe-read
+ncu -l	safe-read
+ncu -m	safe-read
+ncu -p	safe-read
+ncu -r	safe-read
+ncu -s	safe-read
+ncu -t	safe-read
+ncu -u	safe-write
+ncu -v	safe-read
+ncu -w	safe-read
+ncu -x x	safe-read
+ncu x	safe-read
+near	denied
+near --help	inert
+near --help --version	denied
+near --help x	denied
+near --version	inert
+near -V	inert
+near -h	inert
+near account	denied
+near account x	denied
+near config	safe-read
+near config x	safe-read
+near contract	denied
+near contract x	denied
+near dev-tool	denied
+near dev-tool x	denied
+near extensions	safe-read
+near extensions x	safe-read
+near help	inert
+near help x	inert
+near node	denied
+near node x	denied
+near rpc	denied
+near rpc x	denied
+near staking	denied
+near staking x	denied
+near tokens	denied
+near tokens x	denied
+near transaction	denied
+near transaction x	denied
+near version	inert
+near version x	inert
+near x	denied
+near-cli	denied
+near-cli --help	inert
+near-cli --help --version	denied
+near-cli --help x	denied
+near-cli --version	inert
+near-cli -V	inert
+near-cli -h	inert
+near-cli account	denied
+near-cli account x	denied
+near-cli config	safe-read
+near-cli config x	safe-read
+near-cli contract	denied
+near-cli contract x	denied
+near-cli dev-tool	denied
+near-cli dev-tool x	denied
+near-cli extensions	safe-read
+near-cli extensions x	safe-read
+near-cli help	inert
+near-cli help x	inert
+near-cli node	denied
+near-cli node x	denied
+near-cli rpc	denied
+near-cli rpc x	denied
+near-cli staking	denied
+near-cli staking x	denied
+near-cli tokens	denied
+near-cli tokens x	denied
+near-cli transaction	denied
+near-cli transaction x	denied
+near-cli version	inert
+near-cli version x	inert
+near-cli x	denied
+neato	denied
+neato --help	safe-write
+neato --help -?	safe-write
+neato --help -A x	safe-write
+neato --help x	safe-write
+neato --version	denied
+neato -?	safe-write
+neato -A x	safe-write
+neato -E x	safe-write
+neato -G x	safe-write
+neato -K x	safe-write
+neato -N x	safe-write
+neato -O	safe-write
+neato -P	safe-write
+neato -T x	safe-write
+neato -Tpdf graph.dot -o out.pdf	safe-write
+neato -V	safe-write
+neato -n x	safe-write
+neato -o x	safe-write
+neato -q	safe-write
+neato -s x	safe-write
+neato -v	safe-write
+neato -x	safe-write
+neato -y	safe-write
+neato x	safe-write
+neon	denied
+neon --help	inert
+neon --help --version	denied
+neon --help x	denied
+neon --version	inert
+neon -h	inert
+neon -v	inert
+neon auth	denied
+neon auth x	denied
+neon branch	inert
+neon branch add-compute	denied
+neon branch add-compute --context-file x	denied
+neon branch add-compute --help	denied
+neon branch add-compute --help --context-file x	denied
+neon branch add-compute --help --no-color	denied
+neon branch add-compute --help x	denied
+neon branch add-compute --no-color	denied
+neon branch add-compute --org-id x	denied
+neon branch add-compute --output x	denied
+neon branch add-compute --project-id x	denied
+neon branch add-compute --yes	denied
+neon branch add-compute -h	denied
+neon branch add-compute -o x	denied
+neon branch add-compute -y	denied
+neon branch add-compute x	denied
+neon branch create	denied
+neon branch create --context-file x	denied
+neon branch create --help	denied
+neon branch create --help --context-file x	denied
+neon branch create --help --no-color	denied
+neon branch create --help x	denied
+neon branch create --no-color	denied
+neon branch create --org-id x	denied
+neon branch create --output x	denied
+neon branch create --project-id x	denied
+neon branch create --yes	denied
+neon branch create -h	denied
+neon branch create -o x	denied
+neon branch create -y	denied
+neon branch create x	denied
+neon branch delete	denied
+neon branch delete --context-file x	denied
+neon branch delete --help	denied
+neon branch delete --help --context-file x	denied
+neon branch delete --help --no-color	denied
+neon branch delete --help x	denied
+neon branch delete --no-color	denied
+neon branch delete --org-id x	denied
+neon branch delete --output x	denied
+neon branch delete --project-id x	denied
+neon branch delete --yes	denied
+neon branch delete -h	denied
+neon branch delete -o x	denied
+neon branch delete -y	denied
+neon branch delete x	denied
+neon branch get	safe-read
+neon branch get --context-file x	safe-read
+neon branch get --help	safe-read
+neon branch get --help --context-file x	safe-read
+neon branch get --help --no-color	safe-read
+neon branch get --help x	safe-read
+neon branch get --no-color	safe-read
+neon branch get --org-id x	safe-read
+neon branch get --output x	safe-read
+neon branch get --project-id x	safe-read
+neon branch get --yes	safe-read
+neon branch get -h	safe-read
+neon branch get -o x	safe-read
+neon branch get -y	safe-read
+neon branch get x	safe-read
+neon branch list	safe-read
+neon branch list --context-file x	safe-read
+neon branch list --help	safe-read
+neon branch list --help --context-file x	safe-read
+neon branch list --help --no-color	safe-read
+neon branch list --help x	safe-read
+neon branch list --no-color	safe-read
+neon branch list --org-id x	safe-read
+neon branch list --output x	safe-read
+neon branch list --project-id x	safe-read
+neon branch list --yes	safe-read
+neon branch list -h	safe-read
+neon branch list -o x	safe-read
+neon branch list -y	safe-read
+neon branch list x	safe-read
+neon branch rename	denied
+neon branch rename --context-file x	denied
+neon branch rename --help	denied
+neon branch rename --help --context-file x	denied
+neon branch rename --help --no-color	denied
+neon branch rename --help x	denied
+neon branch rename --no-color	denied
+neon branch rename --org-id x	denied
+neon branch rename --output x	denied
+neon branch rename --project-id x	denied
+neon branch rename --yes	denied
+neon branch rename -h	denied
+neon branch rename -o x	denied
+neon branch rename -y	denied
+neon branch rename x	denied
+neon branch reset	denied
+neon branch reset --context-file x	denied
+neon branch reset --help	denied
+neon branch reset --help --context-file x	denied
+neon branch reset --help --no-color	denied
+neon branch reset --help x	denied
+neon branch reset --no-color	denied
+neon branch reset --org-id x	denied
+neon branch reset --output x	denied
+neon branch reset --project-id x	denied
+neon branch reset --yes	denied
+neon branch reset -h	denied
+neon branch reset -o x	denied
+neon branch reset -y	denied
+neon branch reset x	denied
+neon branch restore	denied
+neon branch restore --context-file x	denied
+neon branch restore --help	denied
+neon branch restore --help --context-file x	denied
+neon branch restore --help --no-color	denied
+neon branch restore --help x	denied
+neon branch restore --no-color	denied
+neon branch restore --org-id x	denied
+neon branch restore --output x	denied
+neon branch restore --project-id x	denied
+neon branch restore --yes	denied
+neon branch restore -h	denied
+neon branch restore -o x	denied
+neon branch restore -y	denied
+neon branch restore x	denied
+neon branch schema-diff	safe-read
+neon branch schema-diff --context-file x	safe-read
+neon branch schema-diff --help	safe-read
+neon branch schema-diff --help --context-file x	safe-read
+neon branch schema-diff --help --no-color	safe-read
+neon branch schema-diff --help x	safe-read
+neon branch schema-diff --no-color	safe-read
+neon branch schema-diff --org-id x	safe-read
+neon branch schema-diff --output x	safe-read
+neon branch schema-diff --project-id x	safe-read
+neon branch schema-diff --yes	safe-read
+neon branch schema-diff -h	safe-read
+neon branch schema-diff -o x	safe-read
+neon branch schema-diff -y	safe-read
+neon branch schema-diff x	safe-read
+neon branch set-default	denied
+neon branch set-default --context-file x	denied
+neon branch set-default --help	denied
+neon branch set-default --help --context-file x	denied
+neon branch set-default --help --no-color	denied
+neon branch set-default --help x	denied
+neon branch set-default --no-color	denied
+neon branch set-default --org-id x	denied
+neon branch set-default --output x	denied
+neon branch set-default --project-id x	denied
+neon branch set-default --yes	denied
+neon branch set-default -h	denied
+neon branch set-default -o x	denied
+neon branch set-default -y	denied
+neon branch set-default x	denied
+neon branch set-expiration	denied
+neon branch set-expiration --context-file x	denied
+neon branch set-expiration --help	denied
+neon branch set-expiration --help --context-file x	denied
+neon branch set-expiration --help --no-color	denied
+neon branch set-expiration --help x	denied
+neon branch set-expiration --no-color	denied
+neon branch set-expiration --org-id x	denied
+neon branch set-expiration --output x	denied
+neon branch set-expiration --project-id x	denied
+neon branch set-expiration --yes	denied
+neon branch set-expiration -h	denied
+neon branch set-expiration -o x	denied
+neon branch set-expiration -y	denied
+neon branch set-expiration x	denied
+neon branch x	denied
+neon branches	inert
+neon branches add-compute	denied
+neon branches add-compute --context-file x	denied
+neon branches add-compute --help	denied
+neon branches add-compute --help --context-file x	denied
+neon branches add-compute --help --no-color	denied
+neon branches add-compute --help x	denied
+neon branches add-compute --no-color	denied
+neon branches add-compute --org-id x	denied
+neon branches add-compute --output x	denied
+neon branches add-compute --project-id x	denied
+neon branches add-compute --yes	denied
+neon branches add-compute -h	denied
+neon branches add-compute -o x	denied
+neon branches add-compute -y	denied
+neon branches add-compute x	denied
+neon branches create	denied
+neon branches create --context-file x	denied
+neon branches create --help	denied
+neon branches create --help --context-file x	denied
+neon branches create --help --no-color	denied
+neon branches create --help x	denied
+neon branches create --no-color	denied
+neon branches create --org-id x	denied
+neon branches create --output x	denied
+neon branches create --project-id x	denied
+neon branches create --yes	denied
+neon branches create -h	denied
+neon branches create -o x	denied
+neon branches create -y	denied
+neon branches create x	denied
+neon branches delete	denied
+neon branches delete --context-file x	denied
+neon branches delete --help	denied
+neon branches delete --help --context-file x	denied
+neon branches delete --help --no-color	denied
+neon branches delete --help x	denied
+neon branches delete --no-color	denied
+neon branches delete --org-id x	denied
+neon branches delete --output x	denied
+neon branches delete --project-id x	denied
+neon branches delete --yes	denied
+neon branches delete -h	denied
+neon branches delete -o x	denied
+neon branches delete -y	denied
+neon branches delete mybranch	denied
+neon branches delete x	denied
+neon branches get	safe-read
+neon branches get --context-file x	safe-read
+neon branches get --help	safe-read
+neon branches get --help --context-file x	safe-read
+neon branches get --help --no-color	safe-read
+neon branches get --help x	safe-read
+neon branches get --no-color	safe-read
+neon branches get --org-id x	safe-read
+neon branches get --output x	safe-read
+neon branches get --project-id x	safe-read
+neon branches get --yes	safe-read
+neon branches get -h	safe-read
+neon branches get -o x	safe-read
+neon branches get -y	safe-read
+neon branches get x	safe-read
+neon branches list	safe-read
+neon branches list --context-file x	safe-read
+neon branches list --help	safe-read
+neon branches list --help --context-file x	safe-read
+neon branches list --help --no-color	safe-read
+neon branches list --help x	safe-read
+neon branches list --no-color	safe-read
+neon branches list --org-id x	safe-read
+neon branches list --output x	safe-read
+neon branches list --project-id x	safe-read
+neon branches list --yes	safe-read
+neon branches list -h	safe-read
+neon branches list -o x	safe-read
+neon branches list -y	safe-read
+neon branches list x	safe-read
+neon branches rename	denied
+neon branches rename --context-file x	denied
+neon branches rename --help	denied
+neon branches rename --help --context-file x	denied
+neon branches rename --help --no-color	denied
+neon branches rename --help x	denied
+neon branches rename --no-color	denied
+neon branches rename --org-id x	denied
+neon branches rename --output x	denied
+neon branches rename --project-id x	denied
+neon branches rename --yes	denied
+neon branches rename -h	denied
+neon branches rename -o x	denied
+neon branches rename -y	denied
+neon branches rename x	denied
+neon branches reset	denied
+neon branches reset --context-file x	denied
+neon branches reset --help	denied
+neon branches reset --help --context-file x	denied
+neon branches reset --help --no-color	denied
+neon branches reset --help x	denied
+neon branches reset --no-color	denied
+neon branches reset --org-id x	denied
+neon branches reset --output x	denied
+neon branches reset --project-id x	denied
+neon branches reset --yes	denied
+neon branches reset -h	denied
+neon branches reset -o x	denied
+neon branches reset -y	denied
+neon branches reset mybranch	denied
+neon branches reset x	denied
+neon branches restore	denied
+neon branches restore --context-file x	denied
+neon branches restore --help	denied
+neon branches restore --help --context-file x	denied
+neon branches restore --help --no-color	denied
+neon branches restore --help x	denied
+neon branches restore --no-color	denied
+neon branches restore --org-id x	denied
+neon branches restore --output x	denied
+neon branches restore --project-id x	denied
+neon branches restore --yes	denied
+neon branches restore -h	denied
+neon branches restore -o x	denied
+neon branches restore -y	denied
+neon branches restore x	denied
+neon branches schema-diff	safe-read
+neon branches schema-diff --context-file x	safe-read
+neon branches schema-diff --help	safe-read
+neon branches schema-diff --help --context-file x	safe-read
+neon branches schema-diff --help --no-color	safe-read
+neon branches schema-diff --help x	safe-read
+neon branches schema-diff --no-color	safe-read
+neon branches schema-diff --org-id x	safe-read
+neon branches schema-diff --output x	safe-read
+neon branches schema-diff --project-id x	safe-read
+neon branches schema-diff --yes	safe-read
+neon branches schema-diff -h	safe-read
+neon branches schema-diff -o x	safe-read
+neon branches schema-diff -y	safe-read
+neon branches schema-diff x	safe-read
+neon branches set-default	denied
+neon branches set-default --context-file x	denied
+neon branches set-default --help	denied
+neon branches set-default --help --context-file x	denied
+neon branches set-default --help --no-color	denied
+neon branches set-default --help x	denied
+neon branches set-default --no-color	denied
+neon branches set-default --org-id x	denied
+neon branches set-default --output x	denied
+neon branches set-default --project-id x	denied
+neon branches set-default --yes	denied
+neon branches set-default -h	denied
+neon branches set-default -o x	denied
+neon branches set-default -y	denied
+neon branches set-default x	denied
+neon branches set-expiration	denied
+neon branches set-expiration --context-file x	denied
+neon branches set-expiration --help	denied
+neon branches set-expiration --help --context-file x	denied
+neon branches set-expiration --help --no-color	denied
+neon branches set-expiration --help x	denied
+neon branches set-expiration --no-color	denied
+neon branches set-expiration --org-id x	denied
+neon branches set-expiration --output x	denied
+neon branches set-expiration --project-id x	denied
+neon branches set-expiration --yes	denied
+neon branches set-expiration -h	denied
+neon branches set-expiration -o x	denied
+neon branches set-expiration -y	denied
+neon branches set-expiration x	denied
+neon branches x	denied
+neon completion	denied
+neon completion --help	inert
+neon completion --help -h	inert
+neon completion --help x	inert
+neon completion -h	inert
+neon completion x	inert
+neon connection-string	denied
+neon connection-string --context-file x	denied
+neon connection-string --help	denied
+neon connection-string --help --context-file x	denied
+neon connection-string --help --no-color	denied
+neon connection-string --help x	denied
+neon connection-string --no-color	denied
+neon connection-string --org-id x	denied
+neon connection-string --output x	denied
+neon connection-string --project-id x	denied
+neon connection-string --yes	denied
+neon connection-string -h	denied
+neon connection-string -o x	denied
+neon connection-string -y	denied
+neon connection-string x	denied
+neon create-app	denied
+neon create-app x	denied
+neon cs	denied
+neon cs --context-file x	denied
+neon cs --help	denied
+neon cs --help --context-file x	denied
+neon cs --help --no-color	denied
+neon cs --help x	denied
+neon cs --no-color	denied
+neon cs --org-id x	denied
+neon cs --output x	denied
+neon cs --project-id x	denied
+neon cs --yes	denied
+neon cs -h	denied
+neon cs -o x	denied
+neon cs -y	denied
+neon cs mybranch	denied
+neon cs x	denied
+neon database	inert
+neon database create	denied
+neon database create --context-file x	denied
+neon database create --help	denied
+neon database create --help --context-file x	denied
+neon database create --help --no-color	denied
+neon database create --help x	denied
+neon database create --no-color	denied
+neon database create --org-id x	denied
+neon database create --output x	denied
+neon database create --project-id x	denied
+neon database create --yes	denied
+neon database create -h	denied
+neon database create -o x	denied
+neon database create -y	denied
+neon database create x	denied
+neon database delete	denied
+neon database delete --context-file x	denied
+neon database delete --help	denied
+neon database delete --help --context-file x	denied
+neon database delete --help --no-color	denied
+neon database delete --help x	denied
+neon database delete --no-color	denied
+neon database delete --org-id x	denied
+neon database delete --output x	denied
+neon database delete --project-id x	denied
+neon database delete --yes	denied
+neon database delete -h	denied
+neon database delete -o x	denied
+neon database delete -y	denied
+neon database delete x	denied
+neon database list	safe-read
+neon database list --context-file x	safe-read
+neon database list --help	safe-read
+neon database list --help --context-file x	safe-read
+neon database list --help --no-color	safe-read
+neon database list --help x	safe-read
+neon database list --no-color	safe-read
+neon database list --org-id x	safe-read
+neon database list --output x	safe-read
+neon database list --project-id x	safe-read
+neon database list --yes	safe-read
+neon database list -h	safe-read
+neon database list -o x	safe-read
+neon database list -y	safe-read
+neon database list x	safe-read
+neon database x	denied
+neon databases	inert
+neon databases create	denied
+neon databases create --context-file x	denied
+neon databases create --help	denied
+neon databases create --help --context-file x	denied
+neon databases create --help --no-color	denied
+neon databases create --help x	denied
+neon databases create --no-color	denied
+neon databases create --org-id x	denied
+neon databases create --output x	denied
+neon databases create --project-id x	denied
+neon databases create --yes	denied
+neon databases create -h	denied
+neon databases create -o x	denied
+neon databases create -y	denied
+neon databases create x	denied
+neon databases delete	denied
+neon databases delete --context-file x	denied
+neon databases delete --help	denied
+neon databases delete --help --context-file x	denied
+neon databases delete --help --no-color	denied
+neon databases delete --help x	denied
+neon databases delete --no-color	denied
+neon databases delete --org-id x	denied
+neon databases delete --output x	denied
+neon databases delete --project-id x	denied
+neon databases delete --yes	denied
+neon databases delete -h	denied
+neon databases delete -o x	denied
+neon databases delete -y	denied
+neon databases delete mydb	denied
+neon databases delete x	denied
+neon databases list	safe-read
+neon databases list --context-file x	safe-read
+neon databases list --help	safe-read
+neon databases list --help --context-file x	safe-read
+neon databases list --help --no-color	safe-read
+neon databases list --help x	safe-read
+neon databases list --no-color	safe-read
+neon databases list --org-id x	safe-read
+neon databases list --output x	safe-read
+neon databases list --project-id x	safe-read
+neon databases list --yes	safe-read
+neon databases list -h	safe-read
+neon databases list -o x	safe-read
+neon databases list -y	safe-read
+neon databases list x	safe-read
+neon databases x	denied
+neon db	inert
+neon db create	denied
+neon db create --context-file x	denied
+neon db create --help	denied
+neon db create --help --context-file x	denied
+neon db create --help --no-color	denied
+neon db create --help x	denied
+neon db create --no-color	denied
+neon db create --org-id x	denied
+neon db create --output x	denied
+neon db create --project-id x	denied
+neon db create --yes	denied
+neon db create -h	denied
+neon db create -o x	denied
+neon db create -y	denied
+neon db create x	denied
+neon db delete	denied
+neon db delete --context-file x	denied
+neon db delete --help	denied
+neon db delete --help --context-file x	denied
+neon db delete --help --no-color	denied
+neon db delete --help x	denied
+neon db delete --no-color	denied
+neon db delete --org-id x	denied
+neon db delete --output x	denied
+neon db delete --project-id x	denied
+neon db delete --yes	denied
+neon db delete -h	denied
+neon db delete -o x	denied
+neon db delete -y	denied
+neon db delete x	denied
+neon db list	safe-read
+neon db list --context-file x	safe-read
+neon db list --help	safe-read
+neon db list --help --context-file x	safe-read
+neon db list --help --no-color	safe-read
+neon db list --help x	safe-read
+neon db list --no-color	safe-read
+neon db list --org-id x	safe-read
+neon db list --output x	safe-read
+neon db list --project-id x	safe-read
+neon db list --yes	safe-read
+neon db list -h	safe-read
+neon db list -o x	safe-read
+neon db list -y	safe-read
+neon db list x	safe-read
+neon db x	denied
+neon endpoints	denied
+neon endpoints x	denied
+neon help	inert
+neon help x	inert
+neon ip-allow	inert
+neon ip-allow add	denied
+neon ip-allow add --context-file x	denied
+neon ip-allow add --help	denied
+neon ip-allow add --help --context-file x	denied
+neon ip-allow add --help --no-color	denied
+neon ip-allow add --help x	denied
+neon ip-allow add --no-color	denied
+neon ip-allow add --org-id x	denied
+neon ip-allow add --output x	denied
+neon ip-allow add --project-id x	denied
+neon ip-allow add --yes	denied
+neon ip-allow add -h	denied
+neon ip-allow add -o x	denied
+neon ip-allow add -y	denied
+neon ip-allow add 1.2.3.4	denied
+neon ip-allow add x	denied
+neon ip-allow list	safe-read
+neon ip-allow list --context-file x	safe-read
+neon ip-allow list --help	safe-read
+neon ip-allow list --help --context-file x	safe-read
+neon ip-allow list --help --no-color	safe-read
+neon ip-allow list --help x	safe-read
+neon ip-allow list --no-color	safe-read
+neon ip-allow list --org-id x	safe-read
+neon ip-allow list --output x	safe-read
+neon ip-allow list --project-id x	safe-read
+neon ip-allow list --yes	safe-read
+neon ip-allow list -h	safe-read
+neon ip-allow list -o x	safe-read
+neon ip-allow list -y	safe-read
+neon ip-allow list x	safe-read
+neon ip-allow remove	denied
+neon ip-allow remove --context-file x	denied
+neon ip-allow remove --help	denied
+neon ip-allow remove --help --context-file x	denied
+neon ip-allow remove --help --no-color	denied
+neon ip-allow remove --help x	denied
+neon ip-allow remove --no-color	denied
+neon ip-allow remove --org-id x	denied
+neon ip-allow remove --output x	denied
+neon ip-allow remove --project-id x	denied
+neon ip-allow remove --yes	denied
+neon ip-allow remove -h	denied
+neon ip-allow remove -o x	denied
+neon ip-allow remove -y	denied
+neon ip-allow remove x	denied
+neon ip-allow reset	denied
+neon ip-allow reset --context-file x	denied
+neon ip-allow reset --help	denied
+neon ip-allow reset --help --context-file x	denied
+neon ip-allow reset --help --no-color	denied
+neon ip-allow reset --help x	denied
+neon ip-allow reset --no-color	denied
+neon ip-allow reset --org-id x	denied
+neon ip-allow reset --output x	denied
+neon ip-allow reset --project-id x	denied
+neon ip-allow reset --yes	denied
+neon ip-allow reset -h	denied
+neon ip-allow reset -o x	denied
+neon ip-allow reset -y	denied
+neon ip-allow reset x	denied
+neon ip-allow x	denied
+neon me	safe-read
+neon me --context-file x	safe-read
+neon me --help	safe-read
+neon me --help --context-file x	safe-read
+neon me --help --no-color	safe-read
+neon me --help x	safe-read
+neon me --no-color	safe-read
+neon me --org-id x	safe-read
+neon me --output x	safe-read
+neon me --project-id x	safe-read
+neon me --yes	safe-read
+neon me -h	safe-read
+neon me -o x	safe-read
+neon me -y	safe-read
+neon me x	safe-read
+neon operation	inert
+neon operation list	safe-read
+neon operation list --context-file x	safe-read
+neon operation list --help	safe-read
+neon operation list --help --context-file x	safe-read
+neon operation list --help --no-color	safe-read
+neon operation list --help x	safe-read
+neon operation list --no-color	safe-read
+neon operation list --org-id x	safe-read
+neon operation list --output x	safe-read
+neon operation list --project-id x	safe-read
+neon operation list --yes	safe-read
+neon operation list -h	safe-read
+neon operation list -o x	safe-read
+neon operation list -y	safe-read
+neon operation list x	safe-read
+neon operation x	denied
+neon operations	inert
+neon operations list	safe-read
+neon operations list --context-file x	safe-read
+neon operations list --help	safe-read
+neon operations list --help --context-file x	safe-read
+neon operations list --help --no-color	safe-read
+neon operations list --help x	safe-read
+neon operations list --no-color	safe-read
+neon operations list --org-id x	safe-read
+neon operations list --output x	safe-read
+neon operations list --project-id x	safe-read
+neon operations list --yes	safe-read
+neon operations list -h	safe-read
+neon operations list -o x	safe-read
+neon operations list -y	safe-read
+neon operations list x	safe-read
+neon operations x	denied
+neon org	inert
+neon org list	safe-read
+neon org list --context-file x	safe-read
+neon org list --help	safe-read
+neon org list --help --context-file x	safe-read
+neon org list --help --no-color	safe-read
+neon org list --help x	safe-read
+neon org list --no-color	safe-read
+neon org list --org-id x	safe-read
+neon org list --output x	safe-read
+neon org list --project-id x	safe-read
+neon org list --yes	safe-read
+neon org list -h	safe-read
+neon org list -o x	safe-read
+neon org list -y	safe-read
+neon org list x	safe-read
+neon org x	denied
+neon orgs	inert
+neon orgs list	safe-read
+neon orgs list --context-file x	safe-read
+neon orgs list --help	safe-read
+neon orgs list --help --context-file x	safe-read
+neon orgs list --help --no-color	safe-read
+neon orgs list --help x	safe-read
+neon orgs list --no-color	safe-read
+neon orgs list --org-id x	safe-read
+neon orgs list --output x	safe-read
+neon orgs list --project-id x	safe-read
+neon orgs list --yes	safe-read
+neon orgs list -h	safe-read
+neon orgs list -o x	safe-read
+neon orgs list -y	safe-read
+neon orgs list x	safe-read
+neon orgs x	denied
+neon project	inert
+neon project create	denied
+neon project create --context-file x	denied
+neon project create --help	denied
+neon project create --help --context-file x	denied
+neon project create --help --no-color	denied
+neon project create --help x	denied
+neon project create --no-color	denied
+neon project create --org-id x	denied
+neon project create --output x	denied
+neon project create --project-id x	denied
+neon project create --yes	denied
+neon project create -h	denied
+neon project create -o x	denied
+neon project create -y	denied
+neon project create x	denied
+neon project delete	denied
+neon project delete --context-file x	denied
+neon project delete --help	denied
+neon project delete --help --context-file x	denied
+neon project delete --help --no-color	denied
+neon project delete --help x	denied
+neon project delete --no-color	denied
+neon project delete --org-id x	denied
+neon project delete --output x	denied
+neon project delete --project-id x	denied
+neon project delete --yes	denied
+neon project delete -h	denied
+neon project delete -o x	denied
+neon project delete -y	denied
+neon project delete x	denied
+neon project get	safe-read
+neon project get --context-file x	safe-read
+neon project get --help	safe-read
+neon project get --help --context-file x	safe-read
+neon project get --help -h	safe-read
+neon project get --help x	safe-read
+neon project get --output x	safe-read
+neon project get --project-id x	safe-read
+neon project get -h	safe-read
+neon project get -o x	safe-read
+neon project get x	safe-read
+neon project list	safe-read
+neon project list --context-file x	safe-read
+neon project list --help	safe-read
+neon project list --help --context-file x	safe-read
+neon project list --help --no-color	safe-read
+neon project list --help x	safe-read
+neon project list --no-color	safe-read
+neon project list --org-id x	safe-read
+neon project list --output x	safe-read
+neon project list --project-id x	safe-read
+neon project list --yes	safe-read
+neon project list -h	safe-read
+neon project list -o x	safe-read
+neon project list -y	safe-read
+neon project list x	safe-read
+neon project recover	denied
+neon project recover --context-file x	denied
+neon project recover --help	denied
+neon project recover --help --context-file x	denied
+neon project recover --help --no-color	denied
+neon project recover --help x	denied
+neon project recover --no-color	denied
+neon project recover --org-id x	denied
+neon project recover --output x	denied
+neon project recover --project-id x	denied
+neon project recover --yes	denied
+neon project recover -h	denied
+neon project recover -o x	denied
+neon project recover -y	denied
+neon project recover x	denied
+neon project update	denied
+neon project update --context-file x	denied
+neon project update --help	denied
+neon project update --help --context-file x	denied
+neon project update --help --no-color	denied
+neon project update --help x	denied
+neon project update --no-color	denied
+neon project update --org-id x	denied
+neon project update --output x	denied
+neon project update --project-id x	denied
+neon project update --yes	denied
+neon project update -h	denied
+neon project update -o x	denied
+neon project update -y	denied
+neon project update x	denied
+neon project x	denied
+neon projects	inert
+neon projects create	denied
+neon projects create --context-file x	denied
+neon projects create --help	denied
+neon projects create --help --context-file x	denied
+neon projects create --help --no-color	denied
+neon projects create --help x	denied
+neon projects create --no-color	denied
+neon projects create --org-id x	denied
+neon projects create --output x	denied
+neon projects create --project-id x	denied
+neon projects create --yes	denied
+neon projects create -h	denied
+neon projects create -o x	denied
+neon projects create -y	denied
+neon projects create x	denied
+neon projects delete	denied
+neon projects delete --context-file x	denied
+neon projects delete --help	denied
+neon projects delete --help --context-file x	denied
+neon projects delete --help --no-color	denied
+neon projects delete --help x	denied
+neon projects delete --no-color	denied
+neon projects delete --org-id x	denied
+neon projects delete --output x	denied
+neon projects delete --project-id x	denied
+neon projects delete --yes	denied
+neon projects delete -h	denied
+neon projects delete -o x	denied
+neon projects delete -y	denied
+neon projects delete foo	denied
+neon projects delete x	denied
+neon projects get	safe-read
+neon projects get --context-file x	safe-read
+neon projects get --help	safe-read
+neon projects get --help --context-file x	safe-read
+neon projects get --help -h	safe-read
+neon projects get --help x	safe-read
+neon projects get --output x	safe-read
+neon projects get --project-id foo	safe-read
+neon projects get --project-id x	safe-read
+neon projects get -h	safe-read
+neon projects get -o x	safe-read
+neon projects get x	safe-read
+neon projects list	safe-read
+neon projects list --context-file x	safe-read
+neon projects list --help	safe-read
+neon projects list --help --context-file x	safe-read
+neon projects list --help --no-color	safe-read
+neon projects list --help x	safe-read
+neon projects list --no-color	safe-read
+neon projects list --org-id x	safe-read
+neon projects list --output x	safe-read
+neon projects list --project-id x	safe-read
+neon projects list --yes	safe-read
+neon projects list -h	safe-read
+neon projects list -o x	safe-read
+neon projects list -y	safe-read
+neon projects list x	safe-read
+neon projects recover	denied
+neon projects recover --context-file x	denied
+neon projects recover --help	denied
+neon projects recover --help --context-file x	denied
+neon projects recover --help --no-color	denied
+neon projects recover --help x	denied
+neon projects recover --no-color	denied
+neon projects recover --org-id x	denied
+neon projects recover --output x	denied
+neon projects recover --project-id x	denied
+neon projects recover --yes	denied
+neon projects recover -h	denied
+neon projects recover -o x	denied
+neon projects recover -y	denied
+neon projects recover x	denied
+neon projects update	denied
+neon projects update --context-file x	denied
+neon projects update --help	denied
+neon projects update --help --context-file x	denied
+neon projects update --help --no-color	denied
+neon projects update --help x	denied
+neon projects update --no-color	denied
+neon projects update --org-id x	denied
+neon projects update --output x	denied
+neon projects update --project-id x	denied
+neon projects update --yes	denied
+neon projects update -h	denied
+neon projects update -o x	denied
+neon projects update -y	denied
+neon projects update x	denied
+neon projects x	denied
+neon role	inert
+neon role create	denied
+neon role create --context-file x	denied
+neon role create --help	denied
+neon role create --help --context-file x	denied
+neon role create --help --no-color	denied
+neon role create --help x	denied
+neon role create --no-color	denied
+neon role create --org-id x	denied
+neon role create --output x	denied
+neon role create --project-id x	denied
+neon role create --yes	denied
+neon role create -h	denied
+neon role create -o x	denied
+neon role create -y	denied
+neon role create x	denied
+neon role delete	denied
+neon role delete --context-file x	denied
+neon role delete --help	denied
+neon role delete --help --context-file x	denied
+neon role delete --help --no-color	denied
+neon role delete --help x	denied
+neon role delete --no-color	denied
+neon role delete --org-id x	denied
+neon role delete --output x	denied
+neon role delete --project-id x	denied
+neon role delete --yes	denied
+neon role delete -h	denied
+neon role delete -o x	denied
+neon role delete -y	denied
+neon role delete x	denied
+neon role list	safe-read
+neon role list --context-file x	safe-read
+neon role list --help	safe-read
+neon role list --help --context-file x	safe-read
+neon role list --help --no-color	safe-read
+neon role list --help x	safe-read
+neon role list --no-color	safe-read
+neon role list --org-id x	safe-read
+neon role list --output x	safe-read
+neon role list --project-id x	safe-read
+neon role list --yes	safe-read
+neon role list -h	safe-read
+neon role list -o x	safe-read
+neon role list -y	safe-read
+neon role list x	safe-read
+neon role x	denied
+neon roles	inert
+neon roles create	denied
+neon roles create --context-file x	denied
+neon roles create --help	denied
+neon roles create --help --context-file x	denied
+neon roles create --help --no-color	denied
+neon roles create --help x	denied
+neon roles create --name admin	denied
+neon roles create --no-color	denied
+neon roles create --org-id x	denied
+neon roles create --output x	denied
+neon roles create --project-id x	denied
+neon roles create --yes	denied
+neon roles create -h	denied
+neon roles create -o x	denied
+neon roles create -y	denied
+neon roles create x	denied
+neon roles delete	denied
+neon roles delete --context-file x	denied
+neon roles delete --help	denied
+neon roles delete --help --context-file x	denied
+neon roles delete --help --no-color	denied
+neon roles delete --help x	denied
+neon roles delete --no-color	denied
+neon roles delete --org-id x	denied
+neon roles delete --output x	denied
+neon roles delete --project-id x	denied
+neon roles delete --yes	denied
+neon roles delete -h	denied
+neon roles delete -o x	denied
+neon roles delete -y	denied
+neon roles delete x	denied
+neon roles list	safe-read
+neon roles list --context-file x	safe-read
+neon roles list --help	safe-read
+neon roles list --help --context-file x	safe-read
+neon roles list --help --no-color	safe-read
+neon roles list --help x	safe-read
+neon roles list --no-color	safe-read
+neon roles list --org-id x	safe-read
+neon roles list --output x	safe-read
+neon roles list --project-id x	safe-read
+neon roles list --yes	safe-read
+neon roles list -h	safe-read
+neon roles list -o x	safe-read
+neon roles list -y	safe-read
+neon roles list x	safe-read
+neon roles x	denied
+neon set-context	safe-write
+neon set-context --api-host x	safe-write
+neon set-context --api-key x	safe-write
+neon set-context --branch x	safe-write
+neon set-context --context-file x	safe-write
+neon set-context --help	safe-write
+neon set-context --help --api-host x	safe-write
+neon set-context --help -h	safe-write
+neon set-context --help x	safe-write
+neon set-context --org-id x	safe-write
+neon set-context --project-id foo	safe-write
+neon set-context --project-id x	safe-write
+neon set-context -h	safe-write
+neon set-context x	safe-write
+neon version	inert
+neon version --help	inert
+neon version --help -h	inert
+neon version --help x	inert
+neon version -h	inert
+neon version x	inert
+neon x	denied
+neonctl	denied
+neonctl --help	inert
+neonctl --help --version	denied
+neonctl --help x	denied
+neonctl --version	inert
+neonctl -h	inert
+neonctl -v	inert
+neonctl auth	denied
+neonctl auth x	denied
+neonctl branch	inert
+neonctl branch add-compute	denied
+neonctl branch add-compute --context-file x	denied
+neonctl branch add-compute --help	denied
+neonctl branch add-compute --help --context-file x	denied
+neonctl branch add-compute --help --no-color	denied
+neonctl branch add-compute --help x	denied
+neonctl branch add-compute --no-color	denied
+neonctl branch add-compute --org-id x	denied
+neonctl branch add-compute --output x	denied
+neonctl branch add-compute --project-id x	denied
+neonctl branch add-compute --yes	denied
+neonctl branch add-compute -h	denied
+neonctl branch add-compute -o x	denied
+neonctl branch add-compute -y	denied
+neonctl branch add-compute x	denied
+neonctl branch create	denied
+neonctl branch create --context-file x	denied
+neonctl branch create --help	denied
+neonctl branch create --help --context-file x	denied
+neonctl branch create --help --no-color	denied
+neonctl branch create --help x	denied
+neonctl branch create --no-color	denied
+neonctl branch create --org-id x	denied
+neonctl branch create --output x	denied
+neonctl branch create --project-id x	denied
+neonctl branch create --yes	denied
+neonctl branch create -h	denied
+neonctl branch create -o x	denied
+neonctl branch create -y	denied
+neonctl branch create x	denied
+neonctl branch delete	denied
+neonctl branch delete --context-file x	denied
+neonctl branch delete --help	denied
+neonctl branch delete --help --context-file x	denied
+neonctl branch delete --help --no-color	denied
+neonctl branch delete --help x	denied
+neonctl branch delete --no-color	denied
+neonctl branch delete --org-id x	denied
+neonctl branch delete --output x	denied
+neonctl branch delete --project-id x	denied
+neonctl branch delete --yes	denied
+neonctl branch delete -h	denied
+neonctl branch delete -o x	denied
+neonctl branch delete -y	denied
+neonctl branch delete x	denied
+neonctl branch get	safe-read
+neonctl branch get --context-file x	safe-read
+neonctl branch get --help	safe-read
+neonctl branch get --help --context-file x	safe-read
+neonctl branch get --help --no-color	safe-read
+neonctl branch get --help x	safe-read
+neonctl branch get --no-color	safe-read
+neonctl branch get --org-id x	safe-read
+neonctl branch get --output x	safe-read
+neonctl branch get --project-id x	safe-read
+neonctl branch get --yes	safe-read
+neonctl branch get -h	safe-read
+neonctl branch get -o x	safe-read
+neonctl branch get -y	safe-read
+neonctl branch get x	safe-read
+neonctl branch list	safe-read
+neonctl branch list --context-file x	safe-read
+neonctl branch list --help	safe-read
+neonctl branch list --help --context-file x	safe-read
+neonctl branch list --help --no-color	safe-read
+neonctl branch list --help x	safe-read
+neonctl branch list --no-color	safe-read
+neonctl branch list --org-id x	safe-read
+neonctl branch list --output x	safe-read
+neonctl branch list --project-id x	safe-read
+neonctl branch list --yes	safe-read
+neonctl branch list -h	safe-read
+neonctl branch list -o x	safe-read
+neonctl branch list -y	safe-read
+neonctl branch list x	safe-read
+neonctl branch rename	denied
+neonctl branch rename --context-file x	denied
+neonctl branch rename --help	denied
+neonctl branch rename --help --context-file x	denied
+neonctl branch rename --help --no-color	denied
+neonctl branch rename --help x	denied
+neonctl branch rename --no-color	denied
+neonctl branch rename --org-id x	denied
+neonctl branch rename --output x	denied
+neonctl branch rename --project-id x	denied
+neonctl branch rename --yes	denied
+neonctl branch rename -h	denied
+neonctl branch rename -o x	denied
+neonctl branch rename -y	denied
+neonctl branch rename x	denied
+neonctl branch reset	denied
+neonctl branch reset --context-file x	denied
+neonctl branch reset --help	denied
+neonctl branch reset --help --context-file x	denied
+neonctl branch reset --help --no-color	denied
+neonctl branch reset --help x	denied
+neonctl branch reset --no-color	denied
+neonctl branch reset --org-id x	denied
+neonctl branch reset --output x	denied
+neonctl branch reset --project-id x	denied
+neonctl branch reset --yes	denied
+neonctl branch reset -h	denied
+neonctl branch reset -o x	denied
+neonctl branch reset -y	denied
+neonctl branch reset x	denied
+neonctl branch restore	denied
+neonctl branch restore --context-file x	denied
+neonctl branch restore --help	denied
+neonctl branch restore --help --context-file x	denied
+neonctl branch restore --help --no-color	denied
+neonctl branch restore --help x	denied
+neonctl branch restore --no-color	denied
+neonctl branch restore --org-id x	denied
+neonctl branch restore --output x	denied
+neonctl branch restore --project-id x	denied
+neonctl branch restore --yes	denied
+neonctl branch restore -h	denied
+neonctl branch restore -o x	denied
+neonctl branch restore -y	denied
+neonctl branch restore x	denied
+neonctl branch schema-diff	safe-read
+neonctl branch schema-diff --context-file x	safe-read
+neonctl branch schema-diff --help	safe-read
+neonctl branch schema-diff --help --context-file x	safe-read
+neonctl branch schema-diff --help --no-color	safe-read
+neonctl branch schema-diff --help x	safe-read
+neonctl branch schema-diff --no-color	safe-read
+neonctl branch schema-diff --org-id x	safe-read
+neonctl branch schema-diff --output x	safe-read
+neonctl branch schema-diff --project-id x	safe-read
+neonctl branch schema-diff --yes	safe-read
+neonctl branch schema-diff -h	safe-read
+neonctl branch schema-diff -o x	safe-read
+neonctl branch schema-diff -y	safe-read
+neonctl branch schema-diff x	safe-read
+neonctl branch set-default	denied
+neonctl branch set-default --context-file x	denied
+neonctl branch set-default --help	denied
+neonctl branch set-default --help --context-file x	denied
+neonctl branch set-default --help --no-color	denied
+neonctl branch set-default --help x	denied
+neonctl branch set-default --no-color	denied
+neonctl branch set-default --org-id x	denied
+neonctl branch set-default --output x	denied
+neonctl branch set-default --project-id x	denied
+neonctl branch set-default --yes	denied
+neonctl branch set-default -h	denied
+neonctl branch set-default -o x	denied
+neonctl branch set-default -y	denied
+neonctl branch set-default x	denied
+neonctl branch set-expiration	denied
+neonctl branch set-expiration --context-file x	denied
+neonctl branch set-expiration --help	denied
+neonctl branch set-expiration --help --context-file x	denied
+neonctl branch set-expiration --help --no-color	denied
+neonctl branch set-expiration --help x	denied
+neonctl branch set-expiration --no-color	denied
+neonctl branch set-expiration --org-id x	denied
+neonctl branch set-expiration --output x	denied
+neonctl branch set-expiration --project-id x	denied
+neonctl branch set-expiration --yes	denied
+neonctl branch set-expiration -h	denied
+neonctl branch set-expiration -o x	denied
+neonctl branch set-expiration -y	denied
+neonctl branch set-expiration x	denied
+neonctl branch x	denied
+neonctl branches	inert
+neonctl branches add-compute	denied
+neonctl branches add-compute --context-file x	denied
+neonctl branches add-compute --help	denied
+neonctl branches add-compute --help --context-file x	denied
+neonctl branches add-compute --help --no-color	denied
+neonctl branches add-compute --help x	denied
+neonctl branches add-compute --no-color	denied
+neonctl branches add-compute --org-id x	denied
+neonctl branches add-compute --output x	denied
+neonctl branches add-compute --project-id x	denied
+neonctl branches add-compute --yes	denied
+neonctl branches add-compute -h	denied
+neonctl branches add-compute -o x	denied
+neonctl branches add-compute -y	denied
+neonctl branches add-compute x	denied
+neonctl branches create	denied
+neonctl branches create --context-file x	denied
+neonctl branches create --help	denied
+neonctl branches create --help --context-file x	denied
+neonctl branches create --help --no-color	denied
+neonctl branches create --help x	denied
+neonctl branches create --no-color	denied
+neonctl branches create --org-id x	denied
+neonctl branches create --output x	denied
+neonctl branches create --project-id x	denied
+neonctl branches create --yes	denied
+neonctl branches create -h	denied
+neonctl branches create -o x	denied
+neonctl branches create -y	denied
+neonctl branches create x	denied
+neonctl branches delete	denied
+neonctl branches delete --context-file x	denied
+neonctl branches delete --help	denied
+neonctl branches delete --help --context-file x	denied
+neonctl branches delete --help --no-color	denied
+neonctl branches delete --help x	denied
+neonctl branches delete --no-color	denied
+neonctl branches delete --org-id x	denied
+neonctl branches delete --output x	denied
+neonctl branches delete --project-id x	denied
+neonctl branches delete --yes	denied
+neonctl branches delete -h	denied
+neonctl branches delete -o x	denied
+neonctl branches delete -y	denied
+neonctl branches delete x	denied
+neonctl branches get	safe-read
+neonctl branches get --context-file x	safe-read
+neonctl branches get --help	safe-read
+neonctl branches get --help --context-file x	safe-read
+neonctl branches get --help --no-color	safe-read
+neonctl branches get --help x	safe-read
+neonctl branches get --no-color	safe-read
+neonctl branches get --org-id x	safe-read
+neonctl branches get --output x	safe-read
+neonctl branches get --project-id x	safe-read
+neonctl branches get --yes	safe-read
+neonctl branches get -h	safe-read
+neonctl branches get -o x	safe-read
+neonctl branches get -y	safe-read
+neonctl branches get x	safe-read
+neonctl branches list	safe-read
+neonctl branches list --context-file x	safe-read
+neonctl branches list --help	safe-read
+neonctl branches list --help --context-file x	safe-read
+neonctl branches list --help --no-color	safe-read
+neonctl branches list --help x	safe-read
+neonctl branches list --no-color	safe-read
+neonctl branches list --org-id x	safe-read
+neonctl branches list --output x	safe-read
+neonctl branches list --project-id x	safe-read
+neonctl branches list --yes	safe-read
+neonctl branches list -h	safe-read
+neonctl branches list -o x	safe-read
+neonctl branches list -y	safe-read
+neonctl branches list x	safe-read
+neonctl branches rename	denied
+neonctl branches rename --context-file x	denied
+neonctl branches rename --help	denied
+neonctl branches rename --help --context-file x	denied
+neonctl branches rename --help --no-color	denied
+neonctl branches rename --help x	denied
+neonctl branches rename --no-color	denied
+neonctl branches rename --org-id x	denied
+neonctl branches rename --output x	denied
+neonctl branches rename --project-id x	denied
+neonctl branches rename --yes	denied
+neonctl branches rename -h	denied
+neonctl branches rename -o x	denied
+neonctl branches rename -y	denied
+neonctl branches rename x	denied
+neonctl branches reset	denied
+neonctl branches reset --context-file x	denied
+neonctl branches reset --help	denied
+neonctl branches reset --help --context-file x	denied
+neonctl branches reset --help --no-color	denied
+neonctl branches reset --help x	denied
+neonctl branches reset --no-color	denied
+neonctl branches reset --org-id x	denied
+neonctl branches reset --output x	denied
+neonctl branches reset --project-id x	denied
+neonctl branches reset --yes	denied
+neonctl branches reset -h	denied
+neonctl branches reset -o x	denied
+neonctl branches reset -y	denied
+neonctl branches reset x	denied
+neonctl branches restore	denied
+neonctl branches restore --context-file x	denied
+neonctl branches restore --help	denied
+neonctl branches restore --help --context-file x	denied
+neonctl branches restore --help --no-color	denied
+neonctl branches restore --help x	denied
+neonctl branches restore --no-color	denied
+neonctl branches restore --org-id x	denied
+neonctl branches restore --output x	denied
+neonctl branches restore --project-id x	denied
+neonctl branches restore --yes	denied
+neonctl branches restore -h	denied
+neonctl branches restore -o x	denied
+neonctl branches restore -y	denied
+neonctl branches restore x	denied
+neonctl branches schema-diff	safe-read
+neonctl branches schema-diff --context-file x	safe-read
+neonctl branches schema-diff --help	safe-read
+neonctl branches schema-diff --help --context-file x	safe-read
+neonctl branches schema-diff --help --no-color	safe-read
+neonctl branches schema-diff --help x	safe-read
+neonctl branches schema-diff --no-color	safe-read
+neonctl branches schema-diff --org-id x	safe-read
+neonctl branches schema-diff --output x	safe-read
+neonctl branches schema-diff --project-id x	safe-read
+neonctl branches schema-diff --yes	safe-read
+neonctl branches schema-diff -h	safe-read
+neonctl branches schema-diff -o x	safe-read
+neonctl branches schema-diff -y	safe-read
+neonctl branches schema-diff x	safe-read
+neonctl branches set-default	denied
+neonctl branches set-default --context-file x	denied
+neonctl branches set-default --help	denied
+neonctl branches set-default --help --context-file x	denied
+neonctl branches set-default --help --no-color	denied
+neonctl branches set-default --help x	denied
+neonctl branches set-default --no-color	denied
+neonctl branches set-default --org-id x	denied
+neonctl branches set-default --output x	denied
+neonctl branches set-default --project-id x	denied
+neonctl branches set-default --yes	denied
+neonctl branches set-default -h	denied
+neonctl branches set-default -o x	denied
+neonctl branches set-default -y	denied
+neonctl branches set-default x	denied
+neonctl branches set-expiration	denied
+neonctl branches set-expiration --context-file x	denied
+neonctl branches set-expiration --help	denied
+neonctl branches set-expiration --help --context-file x	denied
+neonctl branches set-expiration --help --no-color	denied
+neonctl branches set-expiration --help x	denied
+neonctl branches set-expiration --no-color	denied
+neonctl branches set-expiration --org-id x	denied
+neonctl branches set-expiration --output x	denied
+neonctl branches set-expiration --project-id x	denied
+neonctl branches set-expiration --yes	denied
+neonctl branches set-expiration -h	denied
+neonctl branches set-expiration -o x	denied
+neonctl branches set-expiration -y	denied
+neonctl branches set-expiration x	denied
+neonctl branches x	denied
+neonctl completion	denied
+neonctl completion --help	inert
+neonctl completion --help -h	inert
+neonctl completion --help x	inert
+neonctl completion -h	inert
+neonctl completion x	inert
+neonctl connection-string	denied
+neonctl connection-string --context-file x	denied
+neonctl connection-string --help	denied
+neonctl connection-string --help --context-file x	denied
+neonctl connection-string --help --no-color	denied
+neonctl connection-string --help x	denied
+neonctl connection-string --no-color	denied
+neonctl connection-string --org-id x	denied
+neonctl connection-string --output x	denied
+neonctl connection-string --project-id x	denied
+neonctl connection-string --yes	denied
+neonctl connection-string -h	denied
+neonctl connection-string -o x	denied
+neonctl connection-string -y	denied
+neonctl connection-string x	denied
+neonctl create-app	denied
+neonctl create-app x	denied
+neonctl cs	denied
+neonctl cs --context-file x	denied
+neonctl cs --help	denied
+neonctl cs --help --context-file x	denied
+neonctl cs --help --no-color	denied
+neonctl cs --help x	denied
+neonctl cs --no-color	denied
+neonctl cs --org-id x	denied
+neonctl cs --output x	denied
+neonctl cs --project-id x	denied
+neonctl cs --yes	denied
+neonctl cs -h	denied
+neonctl cs -o x	denied
+neonctl cs -y	denied
+neonctl cs x	denied
+neonctl database	inert
+neonctl database create	denied
+neonctl database create --context-file x	denied
+neonctl database create --help	denied
+neonctl database create --help --context-file x	denied
+neonctl database create --help --no-color	denied
+neonctl database create --help x	denied
+neonctl database create --no-color	denied
+neonctl database create --org-id x	denied
+neonctl database create --output x	denied
+neonctl database create --project-id x	denied
+neonctl database create --yes	denied
+neonctl database create -h	denied
+neonctl database create -o x	denied
+neonctl database create -y	denied
+neonctl database create x	denied
+neonctl database delete	denied
+neonctl database delete --context-file x	denied
+neonctl database delete --help	denied
+neonctl database delete --help --context-file x	denied
+neonctl database delete --help --no-color	denied
+neonctl database delete --help x	denied
+neonctl database delete --no-color	denied
+neonctl database delete --org-id x	denied
+neonctl database delete --output x	denied
+neonctl database delete --project-id x	denied
+neonctl database delete --yes	denied
+neonctl database delete -h	denied
+neonctl database delete -o x	denied
+neonctl database delete -y	denied
+neonctl database delete x	denied
+neonctl database list	safe-read
+neonctl database list --context-file x	safe-read
+neonctl database list --help	safe-read
+neonctl database list --help --context-file x	safe-read
+neonctl database list --help --no-color	safe-read
+neonctl database list --help x	safe-read
+neonctl database list --no-color	safe-read
+neonctl database list --org-id x	safe-read
+neonctl database list --output x	safe-read
+neonctl database list --project-id x	safe-read
+neonctl database list --yes	safe-read
+neonctl database list -h	safe-read
+neonctl database list -o x	safe-read
+neonctl database list -y	safe-read
+neonctl database list x	safe-read
+neonctl database x	denied
+neonctl databases	inert
+neonctl databases create	denied
+neonctl databases create --context-file x	denied
+neonctl databases create --help	denied
+neonctl databases create --help --context-file x	denied
+neonctl databases create --help --no-color	denied
+neonctl databases create --help x	denied
+neonctl databases create --no-color	denied
+neonctl databases create --org-id x	denied
+neonctl databases create --output x	denied
+neonctl databases create --project-id x	denied
+neonctl databases create --yes	denied
+neonctl databases create -h	denied
+neonctl databases create -o x	denied
+neonctl databases create -y	denied
+neonctl databases create x	denied
+neonctl databases delete	denied
+neonctl databases delete --context-file x	denied
+neonctl databases delete --help	denied
+neonctl databases delete --help --context-file x	denied
+neonctl databases delete --help --no-color	denied
+neonctl databases delete --help x	denied
+neonctl databases delete --no-color	denied
+neonctl databases delete --org-id x	denied
+neonctl databases delete --output x	denied
+neonctl databases delete --project-id x	denied
+neonctl databases delete --yes	denied
+neonctl databases delete -h	denied
+neonctl databases delete -o x	denied
+neonctl databases delete -y	denied
+neonctl databases delete x	denied
+neonctl databases list	safe-read
+neonctl databases list --context-file x	safe-read
+neonctl databases list --help	safe-read
+neonctl databases list --help --context-file x	safe-read
+neonctl databases list --help --no-color	safe-read
+neonctl databases list --help x	safe-read
+neonctl databases list --no-color	safe-read
+neonctl databases list --org-id x	safe-read
+neonctl databases list --output x	safe-read
+neonctl databases list --project-id x	safe-read
+neonctl databases list --yes	safe-read
+neonctl databases list -h	safe-read
+neonctl databases list -o x	safe-read
+neonctl databases list -y	safe-read
+neonctl databases list x	safe-read
+neonctl databases x	denied
+neonctl db	inert
+neonctl db create	denied
+neonctl db create --context-file x	denied
+neonctl db create --help	denied
+neonctl db create --help --context-file x	denied
+neonctl db create --help --no-color	denied
+neonctl db create --help x	denied
+neonctl db create --no-color	denied
+neonctl db create --org-id x	denied
+neonctl db create --output x	denied
+neonctl db create --project-id x	denied
+neonctl db create --yes	denied
+neonctl db create -h	denied
+neonctl db create -o x	denied
+neonctl db create -y	denied
+neonctl db create x	denied
+neonctl db delete	denied
+neonctl db delete --context-file x	denied
+neonctl db delete --help	denied
+neonctl db delete --help --context-file x	denied
+neonctl db delete --help --no-color	denied
+neonctl db delete --help x	denied
+neonctl db delete --no-color	denied
+neonctl db delete --org-id x	denied
+neonctl db delete --output x	denied
+neonctl db delete --project-id x	denied
+neonctl db delete --yes	denied
+neonctl db delete -h	denied
+neonctl db delete -o x	denied
+neonctl db delete -y	denied
+neonctl db delete x	denied
+neonctl db list	safe-read
+neonctl db list --context-file x	safe-read
+neonctl db list --help	safe-read
+neonctl db list --help --context-file x	safe-read
+neonctl db list --help --no-color	safe-read
+neonctl db list --help x	safe-read
+neonctl db list --no-color	safe-read
+neonctl db list --org-id x	safe-read
+neonctl db list --output x	safe-read
+neonctl db list --project-id x	safe-read
+neonctl db list --yes	safe-read
+neonctl db list -h	safe-read
+neonctl db list -o x	safe-read
+neonctl db list -y	safe-read
+neonctl db list x	safe-read
+neonctl db x	denied
+neonctl endpoints	denied
+neonctl endpoints x	denied
+neonctl help	inert
+neonctl help x	inert
+neonctl ip-allow	inert
+neonctl ip-allow add	denied
+neonctl ip-allow add --context-file x	denied
+neonctl ip-allow add --help	denied
+neonctl ip-allow add --help --context-file x	denied
+neonctl ip-allow add --help --no-color	denied
+neonctl ip-allow add --help x	denied
+neonctl ip-allow add --no-color	denied
+neonctl ip-allow add --org-id x	denied
+neonctl ip-allow add --output x	denied
+neonctl ip-allow add --project-id x	denied
+neonctl ip-allow add --yes	denied
+neonctl ip-allow add -h	denied
+neonctl ip-allow add -o x	denied
+neonctl ip-allow add -y	denied
+neonctl ip-allow add x	denied
+neonctl ip-allow list	safe-read
+neonctl ip-allow list --context-file x	safe-read
+neonctl ip-allow list --help	safe-read
+neonctl ip-allow list --help --context-file x	safe-read
+neonctl ip-allow list --help --no-color	safe-read
+neonctl ip-allow list --help x	safe-read
+neonctl ip-allow list --no-color	safe-read
+neonctl ip-allow list --org-id x	safe-read
+neonctl ip-allow list --output x	safe-read
+neonctl ip-allow list --project-id x	safe-read
+neonctl ip-allow list --yes	safe-read
+neonctl ip-allow list -h	safe-read
+neonctl ip-allow list -o x	safe-read
+neonctl ip-allow list -y	safe-read
+neonctl ip-allow list x	safe-read
+neonctl ip-allow remove	denied
+neonctl ip-allow remove --context-file x	denied
+neonctl ip-allow remove --help	denied
+neonctl ip-allow remove --help --context-file x	denied
+neonctl ip-allow remove --help --no-color	denied
+neonctl ip-allow remove --help x	denied
+neonctl ip-allow remove --no-color	denied
+neonctl ip-allow remove --org-id x	denied
+neonctl ip-allow remove --output x	denied
+neonctl ip-allow remove --project-id x	denied
+neonctl ip-allow remove --yes	denied
+neonctl ip-allow remove -h	denied
+neonctl ip-allow remove -o x	denied
+neonctl ip-allow remove -y	denied
+neonctl ip-allow remove x	denied
+neonctl ip-allow reset	denied
+neonctl ip-allow reset --context-file x	denied
+neonctl ip-allow reset --help	denied
+neonctl ip-allow reset --help --context-file x	denied
+neonctl ip-allow reset --help --no-color	denied
+neonctl ip-allow reset --help x	denied
+neonctl ip-allow reset --no-color	denied
+neonctl ip-allow reset --org-id x	denied
+neonctl ip-allow reset --output x	denied
+neonctl ip-allow reset --project-id x	denied
+neonctl ip-allow reset --yes	denied
+neonctl ip-allow reset -h	denied
+neonctl ip-allow reset -o x	denied
+neonctl ip-allow reset -y	denied
+neonctl ip-allow reset x	denied
+neonctl ip-allow x	denied
+neonctl me	safe-read
+neonctl me --context-file x	safe-read
+neonctl me --help	safe-read
+neonctl me --help --context-file x	safe-read
+neonctl me --help --no-color	safe-read
+neonctl me --help x	safe-read
+neonctl me --no-color	safe-read
+neonctl me --org-id x	safe-read
+neonctl me --output x	safe-read
+neonctl me --project-id x	safe-read
+neonctl me --yes	safe-read
+neonctl me -h	safe-read
+neonctl me -o x	safe-read
+neonctl me -y	safe-read
+neonctl me x	safe-read
+neonctl operation	inert
+neonctl operation list	safe-read
+neonctl operation list --context-file x	safe-read
+neonctl operation list --help	safe-read
+neonctl operation list --help --context-file x	safe-read
+neonctl operation list --help --no-color	safe-read
+neonctl operation list --help x	safe-read
+neonctl operation list --no-color	safe-read
+neonctl operation list --org-id x	safe-read
+neonctl operation list --output x	safe-read
+neonctl operation list --project-id x	safe-read
+neonctl operation list --yes	safe-read
+neonctl operation list -h	safe-read
+neonctl operation list -o x	safe-read
+neonctl operation list -y	safe-read
+neonctl operation list x	safe-read
+neonctl operation x	denied
+neonctl operations	inert
+neonctl operations list	safe-read
+neonctl operations list --context-file x	safe-read
+neonctl operations list --help	safe-read
+neonctl operations list --help --context-file x	safe-read
+neonctl operations list --help --no-color	safe-read
+neonctl operations list --help x	safe-read
+neonctl operations list --no-color	safe-read
+neonctl operations list --org-id x	safe-read
+neonctl operations list --output x	safe-read
+neonctl operations list --project-id x	safe-read
+neonctl operations list --yes	safe-read
+neonctl operations list -h	safe-read
+neonctl operations list -o x	safe-read
+neonctl operations list -y	safe-read
+neonctl operations list x	safe-read
+neonctl operations x	denied
+neonctl org	inert
+neonctl org list	safe-read
+neonctl org list --context-file x	safe-read
+neonctl org list --help	safe-read
+neonctl org list --help --context-file x	safe-read
+neonctl org list --help --no-color	safe-read
+neonctl org list --help x	safe-read
+neonctl org list --no-color	safe-read
+neonctl org list --org-id x	safe-read
+neonctl org list --output x	safe-read
+neonctl org list --project-id x	safe-read
+neonctl org list --yes	safe-read
+neonctl org list -h	safe-read
+neonctl org list -o x	safe-read
+neonctl org list -y	safe-read
+neonctl org list x	safe-read
+neonctl org x	denied
+neonctl orgs	inert
+neonctl orgs list	safe-read
+neonctl orgs list --context-file x	safe-read
+neonctl orgs list --help	safe-read
+neonctl orgs list --help --context-file x	safe-read
+neonctl orgs list --help --no-color	safe-read
+neonctl orgs list --help x	safe-read
+neonctl orgs list --no-color	safe-read
+neonctl orgs list --org-id x	safe-read
+neonctl orgs list --output x	safe-read
+neonctl orgs list --project-id x	safe-read
+neonctl orgs list --yes	safe-read
+neonctl orgs list -h	safe-read
+neonctl orgs list -o x	safe-read
+neonctl orgs list -y	safe-read
+neonctl orgs list x	safe-read
+neonctl orgs x	denied
+neonctl project	inert
+neonctl project create	denied
+neonctl project create --context-file x	denied
+neonctl project create --help	denied
+neonctl project create --help --context-file x	denied
+neonctl project create --help --no-color	denied
+neonctl project create --help x	denied
+neonctl project create --no-color	denied
+neonctl project create --org-id x	denied
+neonctl project create --output x	denied
+neonctl project create --project-id x	denied
+neonctl project create --yes	denied
+neonctl project create -h	denied
+neonctl project create -o x	denied
+neonctl project create -y	denied
+neonctl project create x	denied
+neonctl project delete	denied
+neonctl project delete --context-file x	denied
+neonctl project delete --help	denied
+neonctl project delete --help --context-file x	denied
+neonctl project delete --help --no-color	denied
+neonctl project delete --help x	denied
+neonctl project delete --no-color	denied
+neonctl project delete --org-id x	denied
+neonctl project delete --output x	denied
+neonctl project delete --project-id x	denied
+neonctl project delete --yes	denied
+neonctl project delete -h	denied
+neonctl project delete -o x	denied
+neonctl project delete -y	denied
+neonctl project delete x	denied
+neonctl project get	safe-read
+neonctl project get --context-file x	safe-read
+neonctl project get --help	safe-read
+neonctl project get --help --context-file x	safe-read
+neonctl project get --help -h	safe-read
+neonctl project get --help x	safe-read
+neonctl project get --output x	safe-read
+neonctl project get --project-id x	safe-read
+neonctl project get -h	safe-read
+neonctl project get -o x	safe-read
+neonctl project get x	safe-read
+neonctl project list	safe-read
+neonctl project list --context-file x	safe-read
+neonctl project list --help	safe-read
+neonctl project list --help --context-file x	safe-read
+neonctl project list --help --no-color	safe-read
+neonctl project list --help x	safe-read
+neonctl project list --no-color	safe-read
+neonctl project list --org-id x	safe-read
+neonctl project list --output x	safe-read
+neonctl project list --project-id x	safe-read
+neonctl project list --yes	safe-read
+neonctl project list -h	safe-read
+neonctl project list -o x	safe-read
+neonctl project list -y	safe-read
+neonctl project list x	safe-read
+neonctl project recover	denied
+neonctl project recover --context-file x	denied
+neonctl project recover --help	denied
+neonctl project recover --help --context-file x	denied
+neonctl project recover --help --no-color	denied
+neonctl project recover --help x	denied
+neonctl project recover --no-color	denied
+neonctl project recover --org-id x	denied
+neonctl project recover --output x	denied
+neonctl project recover --project-id x	denied
+neonctl project recover --yes	denied
+neonctl project recover -h	denied
+neonctl project recover -o x	denied
+neonctl project recover -y	denied
+neonctl project recover x	denied
+neonctl project update	denied
+neonctl project update --context-file x	denied
+neonctl project update --help	denied
+neonctl project update --help --context-file x	denied
+neonctl project update --help --no-color	denied
+neonctl project update --help x	denied
+neonctl project update --no-color	denied
+neonctl project update --org-id x	denied
+neonctl project update --output x	denied
+neonctl project update --project-id x	denied
+neonctl project update --yes	denied
+neonctl project update -h	denied
+neonctl project update -o x	denied
+neonctl project update -y	denied
+neonctl project update x	denied
+neonctl project x	denied
+neonctl projects	inert
+neonctl projects create	denied
+neonctl projects create --context-file x	denied
+neonctl projects create --help	denied
+neonctl projects create --help --context-file x	denied
+neonctl projects create --help --no-color	denied
+neonctl projects create --help x	denied
+neonctl projects create --no-color	denied
+neonctl projects create --org-id x	denied
+neonctl projects create --output x	denied
+neonctl projects create --project-id x	denied
+neonctl projects create --yes	denied
+neonctl projects create -h	denied
+neonctl projects create -o x	denied
+neonctl projects create -y	denied
+neonctl projects create x	denied
+neonctl projects delete	denied
+neonctl projects delete --context-file x	denied
+neonctl projects delete --help	denied
+neonctl projects delete --help --context-file x	denied
+neonctl projects delete --help --no-color	denied
+neonctl projects delete --help x	denied
+neonctl projects delete --no-color	denied
+neonctl projects delete --org-id x	denied
+neonctl projects delete --output x	denied
+neonctl projects delete --project-id x	denied
+neonctl projects delete --yes	denied
+neonctl projects delete -h	denied
+neonctl projects delete -o x	denied
+neonctl projects delete -y	denied
+neonctl projects delete x	denied
+neonctl projects get	safe-read
+neonctl projects get --context-file x	safe-read
+neonctl projects get --help	safe-read
+neonctl projects get --help --context-file x	safe-read
+neonctl projects get --help -h	safe-read
+neonctl projects get --help x	safe-read
+neonctl projects get --output x	safe-read
+neonctl projects get --project-id x	safe-read
+neonctl projects get -h	safe-read
+neonctl projects get -o x	safe-read
+neonctl projects get x	safe-read
+neonctl projects list	safe-read
+neonctl projects list --context-file x	safe-read
+neonctl projects list --help	safe-read
+neonctl projects list --help --context-file x	safe-read
+neonctl projects list --help --no-color	safe-read
+neonctl projects list --help x	safe-read
+neonctl projects list --no-color	safe-read
+neonctl projects list --org-id x	safe-read
+neonctl projects list --output x	safe-read
+neonctl projects list --project-id x	safe-read
+neonctl projects list --yes	safe-read
+neonctl projects list -h	safe-read
+neonctl projects list -o x	safe-read
+neonctl projects list -y	safe-read
+neonctl projects list x	safe-read
+neonctl projects recover	denied
+neonctl projects recover --context-file x	denied
+neonctl projects recover --help	denied
+neonctl projects recover --help --context-file x	denied
+neonctl projects recover --help --no-color	denied
+neonctl projects recover --help x	denied
+neonctl projects recover --no-color	denied
+neonctl projects recover --org-id x	denied
+neonctl projects recover --output x	denied
+neonctl projects recover --project-id x	denied
+neonctl projects recover --yes	denied
+neonctl projects recover -h	denied
+neonctl projects recover -o x	denied
+neonctl projects recover -y	denied
+neonctl projects recover x	denied
+neonctl projects update	denied
+neonctl projects update --context-file x	denied
+neonctl projects update --help	denied
+neonctl projects update --help --context-file x	denied
+neonctl projects update --help --no-color	denied
+neonctl projects update --help x	denied
+neonctl projects update --no-color	denied
+neonctl projects update --org-id x	denied
+neonctl projects update --output x	denied
+neonctl projects update --project-id x	denied
+neonctl projects update --yes	denied
+neonctl projects update -h	denied
+neonctl projects update -o x	denied
+neonctl projects update -y	denied
+neonctl projects update x	denied
+neonctl projects x	denied
+neonctl role	inert
+neonctl role create	denied
+neonctl role create --context-file x	denied
+neonctl role create --help	denied
+neonctl role create --help --context-file x	denied
+neonctl role create --help --no-color	denied
+neonctl role create --help x	denied
+neonctl role create --no-color	denied
+neonctl role create --org-id x	denied
+neonctl role create --output x	denied
+neonctl role create --project-id x	denied
+neonctl role create --yes	denied
+neonctl role create -h	denied
+neonctl role create -o x	denied
+neonctl role create -y	denied
+neonctl role create x	denied
+neonctl role delete	denied
+neonctl role delete --context-file x	denied
+neonctl role delete --help	denied
+neonctl role delete --help --context-file x	denied
+neonctl role delete --help --no-color	denied
+neonctl role delete --help x	denied
+neonctl role delete --no-color	denied
+neonctl role delete --org-id x	denied
+neonctl role delete --output x	denied
+neonctl role delete --project-id x	denied
+neonctl role delete --yes	denied
+neonctl role delete -h	denied
+neonctl role delete -o x	denied
+neonctl role delete -y	denied
+neonctl role delete x	denied
+neonctl role list	safe-read
+neonctl role list --context-file x	safe-read
+neonctl role list --help	safe-read
+neonctl role list --help --context-file x	safe-read
+neonctl role list --help --no-color	safe-read
+neonctl role list --help x	safe-read
+neonctl role list --no-color	safe-read
+neonctl role list --org-id x	safe-read
+neonctl role list --output x	safe-read
+neonctl role list --project-id x	safe-read
+neonctl role list --yes	safe-read
+neonctl role list -h	safe-read
+neonctl role list -o x	safe-read
+neonctl role list -y	safe-read
+neonctl role list x	safe-read
+neonctl role x	denied
+neonctl roles	inert
+neonctl roles create	denied
+neonctl roles create --context-file x	denied
+neonctl roles create --help	denied
+neonctl roles create --help --context-file x	denied
+neonctl roles create --help --no-color	denied
+neonctl roles create --help x	denied
+neonctl roles create --no-color	denied
+neonctl roles create --org-id x	denied
+neonctl roles create --output x	denied
+neonctl roles create --project-id x	denied
+neonctl roles create --yes	denied
+neonctl roles create -h	denied
+neonctl roles create -o x	denied
+neonctl roles create -y	denied
+neonctl roles create x	denied
+neonctl roles delete	denied
+neonctl roles delete --context-file x	denied
+neonctl roles delete --help	denied
+neonctl roles delete --help --context-file x	denied
+neonctl roles delete --help --no-color	denied
+neonctl roles delete --help x	denied
+neonctl roles delete --no-color	denied
+neonctl roles delete --org-id x	denied
+neonctl roles delete --output x	denied
+neonctl roles delete --project-id x	denied
+neonctl roles delete --yes	denied
+neonctl roles delete -h	denied
+neonctl roles delete -o x	denied
+neonctl roles delete -y	denied
+neonctl roles delete x	denied
+neonctl roles list	safe-read
+neonctl roles list --context-file x	safe-read
+neonctl roles list --help	safe-read
+neonctl roles list --help --context-file x	safe-read
+neonctl roles list --help --no-color	safe-read
+neonctl roles list --help x	safe-read
+neonctl roles list --no-color	safe-read
+neonctl roles list --org-id x	safe-read
+neonctl roles list --output x	safe-read
+neonctl roles list --project-id x	safe-read
+neonctl roles list --yes	safe-read
+neonctl roles list -h	safe-read
+neonctl roles list -o x	safe-read
+neonctl roles list -y	safe-read
+neonctl roles list x	safe-read
+neonctl roles x	denied
+neonctl set-context	safe-write
+neonctl set-context --api-host x	safe-write
+neonctl set-context --api-key x	safe-write
+neonctl set-context --branch x	safe-write
+neonctl set-context --context-file x	safe-write
+neonctl set-context --help	safe-write
+neonctl set-context --help --api-host x	safe-write
+neonctl set-context --help -h	safe-write
+neonctl set-context --help x	safe-write
+neonctl set-context --org-id x	safe-write
+neonctl set-context --project-id x	safe-write
+neonctl set-context -h	safe-write
+neonctl set-context x	safe-write
+neonctl version	inert
+neonctl version --help	inert
+neonctl version --help -h	inert
+neonctl version --help x	inert
+neonctl version -h	inert
+neonctl version x	inert
+neonctl x	denied
+nerdctl	denied
+nerdctl --help	inert
+nerdctl --help --version	denied
+nerdctl --help x	denied
+nerdctl --version	inert
+nerdctl -h	inert
+nerdctl -v	inert
+nerdctl apparmor	denied
+nerdctl apparmor x	denied
+nerdctl build	denied
+nerdctl build x	denied
+nerdctl builder	denied
+nerdctl builder x	denied
+nerdctl commit	denied
+nerdctl commit x	denied
+nerdctl completion	denied
+nerdctl completion --help	inert
+nerdctl completion --help -h	inert
+nerdctl completion --help x	inert
+nerdctl completion -h	inert
+nerdctl completion x	inert
+nerdctl compose	denied
+nerdctl compose x	denied
+nerdctl container	denied
+nerdctl container x	denied
+nerdctl cp	denied
+nerdctl cp x	denied
+nerdctl create	denied
+nerdctl create x	denied
+nerdctl events	inert
+nerdctl events --filter x	inert
+nerdctl events --format x	inert
+nerdctl events --help	inert
+nerdctl events --help --filter x	inert
+nerdctl events --help -h	inert
+nerdctl events --help x	inert
+nerdctl events --since x	inert
+nerdctl events --until x	inert
+nerdctl events -f x	inert
+nerdctl events -h	inert
+nerdctl events x	inert
+nerdctl exec	denied
+nerdctl exec x	denied
+nerdctl export	denied
+nerdctl export x	denied
+nerdctl help	inert
+nerdctl help x	inert
+nerdctl image	inert
+nerdctl image build	denied
+nerdctl image build x	denied
+nerdctl image history	inert
+nerdctl image history --format x	inert
+nerdctl image history --help	inert
+nerdctl image history --help --format x	inert
+nerdctl image history --help --human	inert
+nerdctl image history --help x	inert
+nerdctl image history --human	inert
+nerdctl image history --no-trunc	inert
+nerdctl image history --quiet	inert
+nerdctl image history -H	inert
+nerdctl image history -h	inert
+nerdctl image history -q	inert
+nerdctl image history x	inert
+nerdctl image inspect	inert
+nerdctl image inspect --format x	inert
+nerdctl image inspect --help	inert
+nerdctl image inspect --help --format x	inert
+nerdctl image inspect --help --mode	inert
+nerdctl image inspect --help x	inert
+nerdctl image inspect --mode	inert
+nerdctl image inspect --mode x	inert
+nerdctl image inspect -f x	inert
+nerdctl image inspect -h	inert
+nerdctl image inspect x	inert
+nerdctl image load	denied
+nerdctl image load x	denied
+nerdctl image ls	inert
+nerdctl image ls --all	inert
+nerdctl image ls --all --digests	inert
+nerdctl image ls --all --filter x	inert
+nerdctl image ls --all x	inert
+nerdctl image ls --digests	inert
+nerdctl image ls --filter x	inert
+nerdctl image ls --format x	inert
+nerdctl image ls --help	inert
+nerdctl image ls --names	inert
+nerdctl image ls --no-trunc	inert
+nerdctl image ls --quiet	inert
+nerdctl image ls -a	inert
+nerdctl image ls -f x	inert
+nerdctl image ls -h	inert
+nerdctl image ls -q	inert
+nerdctl image ls x	inert
+nerdctl image prune	denied
+nerdctl image prune x	denied
+nerdctl image pull	denied
+nerdctl image pull x	denied
+nerdctl image push	denied
+nerdctl image push x	denied
+nerdctl image rm	denied
+nerdctl image rm x	denied
+nerdctl image save	denied
+nerdctl image save x	denied
+nerdctl image tag	denied
+nerdctl image tag x	denied
+nerdctl image x	denied
+nerdctl images	inert
+nerdctl images --all	inert
+nerdctl images --all --digests	inert
+nerdctl images --all --filter x	inert
+nerdctl images --all x	inert
+nerdctl images --digests	inert
+nerdctl images --filter x	inert
+nerdctl images --format x	inert
+nerdctl images --help	inert
+nerdctl images --names	inert
+nerdctl images --no-trunc	inert
+nerdctl images --quiet	inert
+nerdctl images -a	inert
+nerdctl images -f x	inert
+nerdctl images -h	inert
+nerdctl images -q	inert
+nerdctl images x	inert
+nerdctl import	denied
+nerdctl import x	denied
+nerdctl info	inert
+nerdctl info --debug	inert
+nerdctl info --debug --format x	inert
+nerdctl info --debug --help	inert
+nerdctl info --debug x	inert
+nerdctl info --format x	inert
+nerdctl info --help	inert
+nerdctl info --mode	inert
+nerdctl info --mode x	inert
+nerdctl info -f x	inert
+nerdctl info -h	inert
+nerdctl info x	inert
+nerdctl inspect	denied
+nerdctl inspect --format x	inert
+nerdctl inspect --help	inert
+nerdctl inspect --help --format x	inert
+nerdctl inspect --help --mode	inert
+nerdctl inspect --help x	inert
+nerdctl inspect --mode	inert
+nerdctl inspect --mode x	inert
+nerdctl inspect --size	inert
+nerdctl inspect --type x	inert
+nerdctl inspect -f x	inert
+nerdctl inspect -h	inert
+nerdctl inspect -s	inert
+nerdctl inspect x	inert
+nerdctl ipfs	denied
+nerdctl ipfs x	denied
+nerdctl kill	denied
+nerdctl kill x	denied
+nerdctl load	denied
+nerdctl load x	denied
+nerdctl login	denied
+nerdctl login x	denied
+nerdctl logout	denied
+nerdctl logout x	denied
+nerdctl logs	denied
+nerdctl logs --details	inert
+nerdctl logs --details --follow	inert
+nerdctl logs --details --since x	inert
+nerdctl logs --details x	inert
+nerdctl logs --follow	inert
+nerdctl logs --help	inert
+nerdctl logs --since x	inert
+nerdctl logs --tail x	inert
+nerdctl logs --timestamps	inert
+nerdctl logs --until x	inert
+nerdctl logs -f	inert
+nerdctl logs -h	inert
+nerdctl logs -n x	inert
+nerdctl logs -t	inert
+nerdctl logs x	inert
+nerdctl namespace	denied
+nerdctl namespace x	denied
+nerdctl network	inert
+nerdctl network create	denied
+nerdctl network create x	denied
+nerdctl network inspect	inert
+nerdctl network inspect --format x	inert
+nerdctl network inspect --help	inert
+nerdctl network inspect --help --format x	inert
+nerdctl network inspect --help -h	inert
+nerdctl network inspect --help x	inert
+nerdctl network inspect --mode x	inert
+nerdctl network inspect -f x	inert
+nerdctl network inspect -h	inert
+nerdctl network inspect x	inert
+nerdctl network ls	inert
+nerdctl network ls --filter x	inert
+nerdctl network ls --format x	inert
+nerdctl network ls --help	inert
+nerdctl network ls --help --filter x	inert
+nerdctl network ls --help --no-trunc	inert
+nerdctl network ls --help x	inert
+nerdctl network ls --no-trunc	inert
+nerdctl network ls --quiet	inert
+nerdctl network ls -f x	inert
+nerdctl network ls -h	inert
+nerdctl network ls -q	inert
+nerdctl network ls x	inert
+nerdctl network prune	denied
+nerdctl network prune x	denied
+nerdctl network rm	denied
+nerdctl network rm x	denied
+nerdctl network x	denied
+nerdctl pause	denied
+nerdctl pause x	denied
+nerdctl port	denied
+nerdctl port --help	inert
+nerdctl port --help -h	inert
+nerdctl port --help x	inert
+nerdctl port -h	inert
+nerdctl port x	inert
+nerdctl ps	inert
+nerdctl ps --all	inert
+nerdctl ps --all --filter x	inert
+nerdctl ps --all --help	inert
+nerdctl ps --all x	inert
+nerdctl ps --filter x	inert
+nerdctl ps --format x	inert
+nerdctl ps --help	inert
+nerdctl ps --last x	inert
+nerdctl ps --latest	inert
+nerdctl ps --no-trunc	inert
+nerdctl ps --quiet	inert
+nerdctl ps --size	inert
+nerdctl ps -a	inert
+nerdctl ps -f x	inert
+nerdctl ps -h	inert
+nerdctl ps -l	inert
+nerdctl ps -n	inert
+nerdctl ps -q	inert
+nerdctl ps -s	inert
+nerdctl ps x	inert
+nerdctl pull	denied
+nerdctl pull x	denied
+nerdctl push	denied
+nerdctl push x	denied
+nerdctl rename	denied
+nerdctl rename x	denied
+nerdctl restart	denied
+nerdctl restart x	denied
+nerdctl rm	denied
+nerdctl rm x	denied
+nerdctl rmi	denied
+nerdctl rmi x	denied
+nerdctl run	denied
+nerdctl run x	denied
+nerdctl save	denied
+nerdctl save x	denied
+nerdctl start	denied
+nerdctl start x	denied
+nerdctl stats	inert
+nerdctl stats --all	inert
+nerdctl stats --all --format x	inert
+nerdctl stats --all --help	inert
+nerdctl stats --all x	inert
+nerdctl stats --format x	inert
+nerdctl stats --help	inert
+nerdctl stats --no-stream	inert
+nerdctl stats --no-trunc	inert
+nerdctl stats -a	inert
+nerdctl stats -h	inert
+nerdctl stats x	inert
+nerdctl stop	denied
+nerdctl stop x	denied
+nerdctl system	inert
+nerdctl system df	denied
+nerdctl system df x	denied
+nerdctl system events	denied
+nerdctl system events x	denied
+nerdctl system info	inert
+nerdctl system info --format x	inert
+nerdctl system info --help	inert
+nerdctl system info --help --format x	inert
+nerdctl system info --help -h	inert
+nerdctl system info --help x	inert
+nerdctl system info --mode x	inert
+nerdctl system info -f x	inert
+nerdctl system info -h	inert
+nerdctl system info x	inert
+nerdctl system prune	denied
+nerdctl system prune x	denied
+nerdctl system x	denied
+nerdctl tag	denied
+nerdctl tag x	denied
+nerdctl top	denied
+nerdctl top --help	inert
+nerdctl top --help -h	inert
+nerdctl top --help x	inert
+nerdctl top -h	inert
+nerdctl top x	inert
+nerdctl unpause	denied
+nerdctl unpause x	denied
+nerdctl update	denied
+nerdctl update x	denied
+nerdctl version	inert
+nerdctl version --format	inert
+nerdctl version --format --format x	inert
+nerdctl version --format --help	inert
+nerdctl version --format x	inert
+nerdctl version --help	inert
+nerdctl version -f	inert
+nerdctl version -f x	inert
+nerdctl version -h	inert
+nerdctl version x	inert
+nerdctl volume	inert
+nerdctl volume create	denied
+nerdctl volume create x	denied
+nerdctl volume inspect	inert
+nerdctl volume inspect --format x	inert
+nerdctl volume inspect --help	inert
+nerdctl volume inspect --help --format x	inert
+nerdctl volume inspect --help -h	inert
+nerdctl volume inspect --help x	inert
+nerdctl volume inspect -f x	inert
+nerdctl volume inspect -h	inert
+nerdctl volume inspect x	inert
+nerdctl volume ls	inert
+nerdctl volume ls --filter x	inert
+nerdctl volume ls --format x	inert
+nerdctl volume ls --help	inert
+nerdctl volume ls --help --filter x	inert
+nerdctl volume ls --help --quiet	inert
+nerdctl volume ls --help x	inert
+nerdctl volume ls --quiet	inert
+nerdctl volume ls --size	inert
+nerdctl volume ls -f x	inert
+nerdctl volume ls -h	inert
+nerdctl volume ls -q	inert
+nerdctl volume ls x	inert
+nerdctl volume prune	denied
+nerdctl volume prune x	denied
+nerdctl volume rm	denied
+nerdctl volume rm x	denied
+nerdctl volume x	denied
+nerdctl wait	denied
+nerdctl wait x	denied
+nerdctl x	denied
+netlify	denied
+netlify --help	inert
+netlify --help -h	denied
+netlify --help x	denied
+netlify --version	denied
+netlify -h	inert
+netlify completion	inert
+netlify completion --help	inert
+netlify completion --help -h	inert
+netlify completion --help x	inert
+netlify completion -h	inert
+netlify completion x	inert
+netlify env:list	inert
+netlify env:list --context x	inert
+netlify env:list --help	inert
+netlify env:list --help --context x	inert
+netlify env:list --help --json	inert
+netlify env:list --help x	inert
+netlify env:list --json	inert
+netlify env:list --plain	inert
+netlify env:list --scope x	inert
+netlify env:list -h	inert
+netlify env:list x	inert
+netlify functions:list	inert
+netlify functions:list --help	inert
+netlify functions:list --help --json	inert
+netlify functions:list --help x	inert
+netlify functions:list --json	inert
+netlify functions:list -h	inert
+netlify functions:list x	inert
+netlify logs	inert
+netlify logs --help	inert
+netlify logs --help --level x	inert
+netlify logs --help -h	inert
+netlify logs --help x	inert
+netlify logs --level x	inert
+netlify logs --type x	inert
+netlify logs -h	inert
+netlify logs x	inert
+netlify sites:list	inert
+netlify sites:list --help	inert
+netlify sites:list --help --json	inert
+netlify sites:list --help x	inert
+netlify sites:list --json	inert
+netlify sites:list -h	inert
+netlify sites:list x	inert
+netlify status	inert
+netlify status --help	inert
+netlify status --help --verbose	inert
+netlify status --help x	inert
+netlify status --verbose	inert
+netlify status -h	inert
+netlify status x	inert
+netlify teams:list	inert
+netlify teams:list --help	inert
+netlify teams:list --help --json	inert
+netlify teams:list --help x	inert
+netlify teams:list --json	inert
+netlify teams:list -h	inert
+netlify teams:list x	inert
+netlify x	denied
+netlog	inert
+netlog --help	denied
+netlog --version	denied
+netlog -I x	inert
+netlog -N	inert
+netlog -N -I x	inert
+netlog -N -Z	inert
+netlog -N x	inert
+netlog -Z	inert
+netlog -c	inert
+netlog -h	inert
+netlog -i x	inert
+netlog -m x	inert
+netlog -p x	inert
+netlog -t x	inert
+netlog -v	inert
+netlog x	inert
+netstat	inert
+netstat --all	inert
+netstat --all --continuous	inert
+netstat --all -I x	inert
+netstat --all x	inert
+netstat --continuous	inert
+netstat --extend	inert
+netstat --groups	inert
+netstat --help	inert
+netstat --interfaces	inert
+netstat --listening	inert
+netstat --masquerade	inert
+netstat --numeric	inert
+netstat --numeric-hosts	inert
+netstat --numeric-ports	inert
+netstat --numeric-users	inert
+netstat --program	inert
+netstat --route	inert
+netstat --statistics	inert
+netstat --symbolic	inert
+netstat --tcp	inert
+netstat --timers	inert
+netstat --udp	inert
+netstat --unix	inert
+netstat --verbose	inert
+netstat --version	inert
+netstat --wide	inert
+netstat -A	inert
+netstat -C	inert
+netstat -I x	inert
+netstat -L	inert
+netstat -M	inert
+netstat -N	inert
+netstat -R	inert
+netstat -S	inert
+netstat -V	inert
+netstat -W	inert
+netstat -Z	inert
+netstat -a	inert
+netstat -b	inert
+netstat -c	inert
+netstat -d	inert
+netstat -e	inert
+netstat -f	inert
+netstat -g	inert
+netstat -h	inert
+netstat -i	inert
+netstat -l	inert
+netstat -m	inert
+netstat -n	inert
+netstat -o	inert
+netstat -p	inert
+netstat -q	inert
+netstat -r	inert
+netstat -s	inert
+netstat -t	inert
+netstat -u	inert
+netstat -v	inert
+netstat -w	inert
+netstat -x	inert
+netstat x	inert
+nettop	inert
+nettop --help	denied
+nettop --version	denied
+nettop -J x	inert
+nettop -L x	inert
+nettop -P	inert
+nettop -P -J x	inert
+nettop -P -c	inert
+nettop -P x	inert
+nettop -c	inert
+nettop -d	inert
+nettop -h	inert
+nettop -j x	inert
+nettop -k x	inert
+nettop -l x	inert
+nettop -m x	inert
+nettop -n	inert
+nettop -p x	inert
+nettop -s x	inert
+nettop -t x	inert
+nettop -x	inert
+nettop x	inert
+netusage	denied
+netusage --all-traffic x	inert
+netusage --app-traffic x	inert
+netusage --compact	inert
+netusage --compact --all-traffic x	inert
+netusage --compact --help	inert
+netusage --compact x	inert
+netusage --help	inert
+netusage --interactive	inert
+netusage --interval x	inert
+netusage --lookup-name x	inert
+netusage --lookup-uuid x	inert
+netusage --process-traffic x	inert
+netusage --unitize	inert
+netusage --version	inert
+netusage -d x	inert
+netusage -e x	inert
+netusage -h	inert
+netusage -n x	inert
+netusage -p	inert
+netusage -r	inert
+netusage -s x	inert
+netusage x	inert
+networksetup	denied
+networksetup --help	inert
+networksetup --version	inert
+networksetup -V	inert
+networksetup -getdnsservers Wi-Fi	inert
+networksetup -getinfo Wi-Fi	inert
+networksetup -getx	inert
+networksetup -h	inert
+networksetup -help	inert
+networksetup -listallhardwareports	inert
+networksetup -listallnetworkservices	inert
+networksetup -listx	inert
+networksetup -printx	inert
+networksetup -setairportpower en0 on	denied
+networksetup -setdnsservers Wi-Fi 8.8.8.8	denied
+networksetup -showx	inert
+networksetup -version	inert
+networksetup x	denied
+newman	denied
+newman --help	inert
+newman --help --version	denied
+newman --help x	denied
+newman --version	inert
+newman -h	inert
+newman -v	inert
+newman help	inert
+newman help x	inert
+newman run	denied
+newman run --bail	safe-read
+newman run --bail --color	safe-read
+newman run --bail --cookie-jar x	safe-read
+newman run --bail x	safe-read
+newman run --color	safe-read
+newman run --cookie-jar x	safe-read
+newman run --delay-request	safe-read
+newman run --delay-request x	safe-read
+newman run --disable-unicode	safe-read
+newman run --environment x	safe-read
+newman run --export-collection x	safe-read
+newman run --export-cookie-jar	safe-read
+newman run --export-cookie-jar x	safe-read
+newman run --export-environment	safe-read
+newman run --export-environment x	safe-read
+newman run --export-globals	safe-read
+newman run --export-globals x	safe-read
+newman run --folder x	safe-read
+newman run --global-var x	safe-read
+newman run --globals x	safe-read
+newman run --ignore-redirects	safe-read
+newman run --insecure	safe-read
+newman run --insecure-file-read	safe-read
+newman run --iteration-count x	safe-read
+newman run --iteration-data x	safe-read
+newman run --no-color	safe-read
+newman run --no-summary	safe-read
+newman run --reporter	safe-read
+newman run --reporter x	safe-read
+newman run --reporters	safe-read
+newman run --reporters x	safe-read
+newman run --ssl-client-cert x	safe-read
+newman run --ssl-client-cert-list x	safe-read
+newman run --ssl-client-key x	safe-read
+newman run --ssl-client-passphrase x	safe-read
+newman run --ssl-extra-ca-certs	safe-read
+newman run --ssl-extra-ca-certs x	safe-read
+newman run --suppress-exit-code	safe-read
+newman run --timeout	safe-read
+newman run --timeout x	safe-read
+newman run --timeout-request	safe-read
+newman run --timeout-request x	safe-read
+newman run --timeout-script	safe-read
+newman run --timeout-script x	safe-read
+newman run --verbose	safe-read
+newman run --working-dir	safe-read
+newman run --working-dir x	safe-read
+newman run -d x	safe-read
+newman run -e x	safe-read
+newman run -g x	safe-read
+newman run -h	safe-read
+newman run -k x	safe-read
+newman run -n x	safe-read
+newman run -r x	safe-read
+newman run -v	safe-read
+newman run x	safe-read
+newman version	inert
+newman version --help	inert
+newman version --help -h	inert
+newman version --help x	inert
+newman version -h	inert
+newman version x	inert
+newman x	denied
+newrelic	denied
+newrelic --debug	denied
+newrelic --debug --format x	denied
+newrelic --debug --help	inert
+newrelic --debug x	denied
+newrelic --format x	denied
+newrelic --help	inert
+newrelic --plain x	denied
+newrelic --trace	denied
+newrelic --version	inert
+newrelic -h	inert
+newrelic apm	denied
+newrelic apm application	denied
+newrelic apm application --accountId x	inert
+newrelic apm application --guid x	inert
+newrelic apm application --help	inert
+newrelic apm application --help --accountId x	inert
+newrelic apm application --help -h	inert
+newrelic apm application --help x	inert
+newrelic apm application --name x	inert
+newrelic apm application -a x	inert
+newrelic apm application -h	inert
+newrelic apm application x	inert
+newrelic apm x	denied
+newrelic entity	denied
+newrelic entity search	denied
+newrelic entity search --fields-filter x	inert
+newrelic entity search --help	inert
+newrelic entity search --help --fields-filter x	inert
+newrelic entity search --help -h	inert
+newrelic entity search --help x	inert
+newrelic entity search --type x	inert
+newrelic entity search -h	inert
+newrelic entity search x	inert
+newrelic entity tags	denied
+newrelic entity tags --help	inert
+newrelic entity tags --help -h	inert
+newrelic entity tags --help x	inert
+newrelic entity tags -h	inert
+newrelic entity tags x	inert
+newrelic entity x	denied
+newrelic nrql	denied
+newrelic nrql query	denied
+newrelic nrql query --accountId x	inert
+newrelic nrql query --help	inert
+newrelic nrql query --help --accountId x	inert
+newrelic nrql query --help -h	inert
+newrelic nrql query --help x	inert
+newrelic nrql query --query x	inert
+newrelic nrql query -a x	inert
+newrelic nrql query -h	inert
+newrelic nrql query -q x	inert
+newrelic nrql query x	inert
+newrelic nrql x	denied
+newrelic profile	denied
+newrelic profile list	inert
+newrelic profile list --help	inert
+newrelic profile list --help -h	inert
+newrelic profile list --help x	inert
+newrelic profile list -h	inert
+newrelic profile list x	inert
+newrelic profile x	denied
+newrelic version	inert
+newrelic version x	inert
+newrelic workload	denied
+newrelic workload get	denied
+newrelic workload get --accountId x	inert
+newrelic workload get --guid x	inert
+newrelic workload get --help	inert
+newrelic workload get --help --accountId x	inert
+newrelic workload get --help -h	inert
+newrelic workload get --help x	inert
+newrelic workload get -a x	inert
+newrelic workload get -h	inert
+newrelic workload get x	inert
+newrelic workload list	inert
+newrelic workload list --accountId x	inert
+newrelic workload list --help	inert
+newrelic workload list --help --accountId x	inert
+newrelic workload list --help -h	inert
+newrelic workload list --help x	inert
+newrelic workload list -a x	inert
+newrelic workload list -h	inert
+newrelic workload list x	inert
+newrelic workload x	denied
+newrelic x	denied
+next	denied
+next --help	inert
+next --help --output-file x	denied
+next --help --version	denied
+next --help x	denied
+next --output-file x	denied
+next --version	inert
+next -h	inert
+next build	safe-write
+next build --debug	safe-write
+next build --debug --help	safe-write
+next build --debug x	safe-write
+next build --help	safe-write
+next build --lint	safe-write
+next build --no-lint	safe-write
+next build --profile	safe-write
+next build -d	safe-write
+next build -h	safe-write
+next build x	safe-write
+next info	inert
+next info --help	inert
+next info --help -h	inert
+next info --help x	inert
+next info -h	inert
+next info x	inert
+next lint	safe-read
+next lint --cache-location x	safe-read
+next lint --dir	safe-read
+next lint --dir --cache-location x	safe-read
+next lint --dir --help	safe-read
+next lint --dir x	safe-read
+next lint --ext x	safe-read
+next lint --help	safe-read
+next lint --max-warnings x	safe-read
+next lint --output-file x	safe-read
+next lint --quiet	safe-read
+next lint --resolve-plugins-relative-to x	safe-read
+next lint --strict	safe-read
+next lint -c x	safe-read
+next lint -d	safe-read
+next lint -h	safe-read
+next lint x	safe-read
+next x	denied
+nfsstat	inert
+nfsstat --help	denied
+nfsstat --version	denied
+nfsstat -3	inert
+nfsstat -3 -4	inert
+nfsstat -3 -f x	inert
+nfsstat -3 x	inert
+nfsstat -4	inert
+nfsstat -E	inert
+nfsstat -c	inert
+nfsstat -e	inert
+nfsstat -f x	inert
+nfsstat -m x	inert
+nfsstat -n x	inert
+nfsstat -s	inert
+nfsstat -u	inert
+nfsstat -v	inert
+nfsstat -w x	inert
+nfsstat -z	denied
+nfsstat x	inert
+ngettext	denied
+ngettext --domain x	inert
+ngettext --env x	inert
+ngettext --help	inert
+ngettext --help --domain x	inert
+ngettext --help --version	inert
+ngettext --help x	inert
+ngettext --version	inert
+ngettext -E	inert
+ngettext -V	inert
+ngettext -d x	inert
+ngettext -e x	inert
+ngettext -h	inert
+ngettext x	inert
+nginx	denied
+nginx --help	safe-read
+nginx --help -?	safe-read
+nginx --help -c x	safe-read
+nginx --help x	safe-read
+nginx --version	denied
+nginx -?	safe-read
+nginx -T	safe-read
+nginx -V	safe-read
+nginx -c x	safe-read
+nginx -e x	safe-read
+nginx -g x	safe-read
+nginx -h	safe-read
+nginx -p x	safe-read
+nginx -q	safe-read
+nginx -s x	safe-read
+nginx -t	safe-read
+nginx -v	safe-read
+nginx x	safe-read
+ngrok	denied
+ngrok --help	inert
+ngrok --help --version	denied
+ngrok --help x	denied
+ngrok --version	inert
+ngrok -h	inert
+ngrok completion	inert
+ngrok completion x	inert
+ngrok config	inert
+ngrok config check	inert
+ngrok config check x	inert
+ngrok config x	denied
+ngrok credits	inert
+ngrok credits x	inert
+ngrok diagnose	inert
+ngrok diagnose x	inert
+ngrok version	inert
+ngrok version x	inert
+ngrok x	denied
+nice	denied
+nice --adjustment x	denied
+nice --help	denied
+nice --version	denied
+nice --xyzzy cat /tmp/x	denied
+nice -n 10 cargo test	safe-read
+nice -n 10 rm -rf /	denied
+nice -n x	denied
+nice bash -c 'ls && rm -rf /'	denied
+nice git log	inert
+nice rm -rf /	denied
+nice rm -rf / --version	denied
+nice x	denied
+nim	denied
+nim --help	inert
+nim --help --version	inert
+nim --help x	denied
+nim --version	inert
+nim -h	inert
+nim -v	inert
+nim x	denied
+nimble	denied
+nimble --help	inert
+nimble --help --version	denied
+nimble --help x	denied
+nimble --version	inert
+nimble -h	inert
+nimble -v	inert
+nimble build	denied
+nimble build x	denied
+nimble c	denied
+nimble c x	denied
+nimble cc	denied
+nimble cc x	denied
+nimble check	safe-read
+nimble check --help	safe-read
+nimble check --help -h	safe-read
+nimble check --help x	safe-read
+nimble check -h	safe-read
+nimble check x	safe-read
+nimble develop	denied
+nimble develop x	denied
+nimble dump	safe-read
+nimble dump --help	safe-read
+nimble dump --help --ini	safe-read
+nimble dump --help x	safe-read
+nimble dump --ini	safe-read
+nimble dump --json	safe-read
+nimble dump -h	safe-read
+nimble dump x	safe-read
+nimble help	inert
+nimble help x	inert
+nimble init	denied
+nimble init x	denied
+nimble install	denied
+nimble install x	denied
+nimble list	safe-read
+nimble list --help	safe-read
+nimble list --help --installed	safe-read
+nimble list --help x	safe-read
+nimble list --installed	safe-read
+nimble list --ver	safe-read
+nimble list -h	safe-read
+nimble list -i	safe-read
+nimble list x	safe-read
+nimble lock	denied
+nimble lock x	denied
+nimble manifest	safe-read
+nimble manifest --help	safe-read
+nimble manifest --help -h	safe-read
+nimble manifest --help x	safe-read
+nimble manifest -h	safe-read
+nimble manifest x	safe-read
+nimble path	denied
+nimble path --help	safe-read
+nimble path --help -h	safe-read
+nimble path --help x	safe-read
+nimble path -h	safe-read
+nimble path x	safe-read
+nimble publish	denied
+nimble publish x	denied
+nimble refresh	denied
+nimble refresh x	denied
+nimble run	denied
+nimble run x	denied
+nimble search	denied
+nimble search --help	safe-read
+nimble search --help --ver	safe-read
+nimble search --help x	safe-read
+nimble search --ver	safe-read
+nimble search -h	safe-read
+nimble search x	safe-read
+nimble setup	denied
+nimble setup x	denied
+nimble sync	denied
+nimble sync x	denied
+nimble tasks	safe-read
+nimble tasks --help	safe-read
+nimble tasks --help -h	safe-read
+nimble tasks --help x	safe-read
+nimble tasks -h	safe-read
+nimble tasks x	safe-read
+nimble test	denied
+nimble test x	denied
+nimble uninstall	denied
+nimble uninstall x	denied
+nimble version	inert
+nimble version --help	inert
+nimble version --help -h	inert
+nimble version --help x	inert
+nimble version -h	inert
+nimble version x	inert
+nimble x	denied
+ninja	denied
+ninja --help	inert
+ninja --help --version	denied
+ninja --help -C x	denied
+ninja --help x	denied
+ninja --version	denied
+ninja -C x	denied
+ninja -V	denied
+ninja -f x	denied
+ninja -h	inert
+ninja -j x	denied
+ninja -k x	denied
+ninja -l x	denied
+ninja -n	inert
+ninja -t	inert
+ninja -t --help	inert
+ninja -t --version	inert
+ninja -t -C x	inert
+ninja -t -V	inert
+ninja -t -f x	inert
+ninja -t -h	inert
+ninja -t -j x	inert
+ninja -t -k x	inert
+ninja -t -l x	inert
+ninja -t -n	inert
+ninja -t -t x	inert
+ninja -t -v	inert
+ninja -t x	inert
+ninja -v	denied
+ninja x	denied
+nix	denied
+nix --help	inert
+nix --help --version	denied
+nix --help x	denied
+nix --version	inert
+nix -h	inert
+nix -v	inert
+nix build	denied
+nix build x	denied
+nix bundle	denied
+nix bundle x	denied
+nix channel	denied
+nix channel x	denied
+nix completion	denied
+nix completion --help	inert
+nix completion --help -h	inert
+nix completion --help x	inert
+nix completion -h	inert
+nix completion x	inert
+nix config	inert
+nix config check	inert
+nix config check --help	inert
+nix config check --help -h	inert
+nix config check --help x	inert
+nix config check -h	inert
+nix config check x	inert
+nix config show	inert
+nix config show --help	inert
+nix config show --help --json	inert
+nix config show --help x	inert
+nix config show --json	inert
+nix config show -h	inert
+nix config show x	inert
+nix config x	denied
+nix copy	denied
+nix copy x	denied
+nix daemon	denied
+nix daemon x	denied
+nix derivation	denied
+nix derivation show	inert
+nix derivation show --debug	inert
+nix derivation show --debug --help	inert
+nix derivation show --debug --store x	inert
+nix derivation show --debug x	inert
+nix derivation show --help	inert
+nix derivation show --store x	inert
+nix derivation show -h	inert
+nix derivation show x	inert
+nix derivation x	denied
+nix describe-stores	safe-read
+nix describe-stores --help	safe-read
+nix describe-stores --help --json	safe-read
+nix describe-stores --help x	safe-read
+nix describe-stores --json	safe-read
+nix describe-stores -h	safe-read
+nix describe-stores x	safe-read
+nix develop	denied
+nix develop x	denied
+nix doctor	inert
+nix doctor --help	inert
+nix doctor --help -h	inert
+nix doctor --help x	inert
+nix doctor -h	inert
+nix doctor x	inert
+nix doctor-check	denied
+nix doctor-check --help	safe-read
+nix doctor-check --help -h	safe-read
+nix doctor-check --help x	safe-read
+nix doctor-check -h	safe-read
+nix doctor-check x	safe-read
+nix edit	denied
+nix edit x	denied
+nix eval	denied
+nix eval --apply	safe-read
+nix eval --apply --arg x	safe-read
+nix eval --apply --debug	safe-read
+nix eval --apply x	safe-read
+nix eval --arg x	safe-read
+nix eval --argstr x	safe-read
+nix eval --debug	safe-read
+nix eval --debugger	safe-read
+nix eval --expr	safe-read
+nix eval --expr x	safe-read
+nix eval --file	safe-read
+nix eval --file x	safe-read
+nix eval --help	safe-read
+nix eval --ignore-try	safe-read
+nix eval --impure	safe-read
+nix eval --include x	safe-read
+nix eval --json	safe-read
+nix eval --no-net	safe-read
+nix eval --option x	safe-read
+nix eval --print-build-logs	safe-read
+nix eval --quiet	safe-read
+nix eval --raw	safe-read
+nix eval --read-only	safe-read
+nix eval --refresh	safe-read
+nix eval --store	safe-read
+nix eval --store x	safe-read
+nix eval --strict	safe-read
+nix eval --write-lock-file	safe-read
+nix eval -I x	safe-read
+nix eval -L	safe-read
+nix eval -f	safe-read
+nix eval -f x	safe-read
+nix eval -h	safe-read
+nix eval -q	safe-read
+nix eval x	safe-read
+nix flake	inert
+nix flake archive	denied
+nix flake archive x	denied
+nix flake check	inert
+nix flake check --all-systems	inert
+nix flake check --all-systems --debug	inert
+nix flake check --all-systems x	inert
+nix flake check --debug	inert
+nix flake check --help	inert
+nix flake check --no-build	inert
+nix flake check --no-update-lock-file	inert
+nix flake check --quiet	inert
+nix flake check -h	inert
+nix flake check -q	inert
+nix flake check x	inert
+nix flake clone	denied
+nix flake clone x	denied
+nix flake info	inert
+nix flake info --debug	inert
+nix flake info --debug --help	inert
+nix flake info --debug x	inert
+nix flake info --help	inert
+nix flake info --json	inert
+nix flake info -h	inert
+nix flake info x	inert
+nix flake init	denied
+nix flake init x	denied
+nix flake lock	denied
+nix flake lock x	denied
+nix flake metadata	inert
+nix flake metadata --debug	inert
+nix flake metadata --debug --help	inert
+nix flake metadata --debug x	inert
+nix flake metadata --help	inert
+nix flake metadata --json	inert
+nix flake metadata --no-update-lock-file	inert
+nix flake metadata --no-write-lock-file	inert
+nix flake metadata --quiet	inert
+nix flake metadata -h	inert
+nix flake metadata -q	inert
+nix flake metadata x	inert
+nix flake new	denied
+nix flake new x	denied
+nix flake prefetch	denied
+nix flake prefetch x	denied
+nix flake show	inert
+nix flake show --all-systems	inert
+nix flake show --all-systems --debug	inert
+nix flake show --all-systems x	inert
+nix flake show --debug	inert
+nix flake show --help	inert
+nix flake show --json	inert
+nix flake show --legacy	inert
+nix flake show --no-update-lock-file	inert
+nix flake show --quiet	inert
+nix flake show -h	inert
+nix flake show -q	inert
+nix flake show x	inert
+nix flake update	denied
+nix flake update x	denied
+nix flake x	denied
+nix fmt	denied
+nix fmt x	denied
+nix hash	denied
+nix hash x	denied
+nix help	inert
+nix help x	inert
+nix key	denied
+nix key x	denied
+nix log	denied
+nix log --help	safe-read
+nix log --help -h	safe-read
+nix log --help x	safe-read
+nix log -h	safe-read
+nix log x	safe-read
+nix ls-remote	denied
+nix ls-remote x	denied
+nix nar	denied
+nix nar x	denied
+nix path-info	denied
+nix path-info --all	safe-read
+nix path-info --all --closure-size	safe-read
+nix path-info --all --from x	safe-read
+nix path-info --all x	safe-read
+nix path-info --closure-size	safe-read
+nix path-info --debug	safe-read
+nix path-info --from x	safe-read
+nix path-info --help	safe-read
+nix path-info --human-readable	safe-read
+nix path-info --json	safe-read
+nix path-info --quiet	safe-read
+nix path-info --recursive	safe-read
+nix path-info --sigs	safe-read
+nix path-info --size	safe-read
+nix path-info --store x	safe-read
+nix path-info -S	safe-read
+nix path-info -c	safe-read
+nix path-info -h	safe-read
+nix path-info -q	safe-read
+nix path-info -r	safe-read
+nix path-info -s	safe-read
+nix path-info x	safe-read
+nix profile	inert
+nix profile diff-closures	inert
+nix profile diff-closures --help	inert
+nix profile diff-closures --help --profile x	inert
+nix profile diff-closures --help -h	inert
+nix profile diff-closures --help x	inert
+nix profile diff-closures --profile x	inert
+nix profile diff-closures -h	inert
+nix profile diff-closures x	inert
+nix profile history	inert
+nix profile history --debug	inert
+nix profile history --debug --help	inert
+nix profile history --debug --profile x	inert
+nix profile history --debug x	inert
+nix profile history --help	inert
+nix profile history --profile x	inert
+nix profile history -h	inert
+nix profile history x	inert
+nix profile install	denied
+nix profile install x	denied
+nix profile list	inert
+nix profile list --debug	inert
+nix profile list --debug --help	inert
+nix profile list --debug --profile x	inert
+nix profile list --debug x	inert
+nix profile list --help	inert
+nix profile list --json	inert
+nix profile list --profile x	inert
+nix profile list -h	inert
+nix profile list x	inert
+nix profile remove	denied
+nix profile remove x	denied
+nix profile rollback	denied
+nix profile rollback x	denied
+nix profile upgrade	denied
+nix profile upgrade x	denied
+nix profile wipe-history	denied
+nix profile wipe-history x	denied
+nix profile x	denied
+nix registry	inert
+nix registry add	denied
+nix registry add x	denied
+nix registry list	inert
+nix registry list --help	inert
+nix registry list --help -h	inert
+nix registry list --help x	inert
+nix registry list -h	inert
+nix registry list x	inert
+nix registry pin	denied
+nix registry pin x	denied
+nix registry remove	denied
+nix registry remove x	denied
+nix registry x	denied
+nix repl	denied
+nix repl x	denied
+nix run	denied
+nix run x	denied
+nix search	safe-read
+nix search --debug	safe-read
+nix search --debug --exclude	safe-read
+nix search --debug --exclude x	safe-read
+nix search --debug x	safe-read
+nix search --exclude	safe-read
+nix search --exclude x	safe-read
+nix search --help	safe-read
+nix search --inputs-from	safe-read
+nix search --inputs-from x	safe-read
+nix search --json	safe-read
+nix search --no-update-lock-file	safe-read
+nix search --no-write-lock-file	safe-read
+nix search --option x	safe-read
+nix search --override-flake x	safe-read
+nix search --override-input x	safe-read
+nix search --print-build-logs	safe-read
+nix search --quiet	safe-read
+nix search --refresh	safe-read
+nix search --store x	safe-read
+nix search -L	safe-read
+nix search -e x	safe-read
+nix search -h	safe-read
+nix search -q	safe-read
+nix search x	safe-read
+nix shell	denied
+nix shell x	denied
+nix show-derivation	denied
+nix show-derivation --debug	safe-read
+nix show-derivation --debug --help	safe-read
+nix show-derivation --debug x	safe-read
+nix show-derivation --help	safe-read
+nix show-derivation --json	safe-read
+nix show-derivation --no-net	safe-read
+nix show-derivation --quiet	safe-read
+nix show-derivation --recursive	safe-read
+nix show-derivation -h	safe-read
+nix show-derivation -q	safe-read
+nix show-derivation -r	safe-read
+nix show-derivation x	safe-read
+nix store	inert
+nix store add-file	denied
+nix store add-file x	denied
+nix store add-path	denied
+nix store add-path x	denied
+nix store cat	inert
+nix store cat --help	inert
+nix store cat --help --store x	inert
+nix store cat --help -h	inert
+nix store cat --help x	inert
+nix store cat --store x	inert
+nix store cat -h	inert
+nix store cat x	inert
+nix store copy-log	denied
+nix store copy-log x	denied
+nix store copy-sigs	denied
+nix store copy-sigs x	denied
+nix store delete	denied
+nix store delete x	denied
+nix store diff-closures	inert
+nix store diff-closures --help	inert
+nix store diff-closures --help -h	inert
+nix store diff-closures --help x	inert
+nix store diff-closures -h	inert
+nix store diff-closures x	inert
+nix store dump-path	inert
+nix store dump-path --help	inert
+nix store dump-path --help --store x	inert
+nix store dump-path --help -h	inert
+nix store dump-path --help x	inert
+nix store dump-path --store x	inert
+nix store dump-path -h	inert
+nix store dump-path x	inert
+nix store gc	denied
+nix store gc x	denied
+nix store info	inert
+nix store info --help	inert
+nix store info --help --store x	inert
+nix store info --help -h	inert
+nix store info --help x	inert
+nix store info --store x	inert
+nix store info -h	inert
+nix store info x	inert
+nix store ls	inert
+nix store ls --debug	inert
+nix store ls --debug --help	inert
+nix store ls --debug --store x	inert
+nix store ls --debug x	inert
+nix store ls --help	inert
+nix store ls --human-readable	inert
+nix store ls --json	inert
+nix store ls --long	inert
+nix store ls --quiet	inert
+nix store ls --recursive	inert
+nix store ls --store x	inert
+nix store ls -d	inert
+nix store ls -h	inert
+nix store ls -l	inert
+nix store ls -q	inert
+nix store ls -r	inert
+nix store ls x	inert
+nix store make-content-addressed	denied
+nix store make-content-addressed x	denied
+nix store optimise	denied
+nix store optimise x	denied
+nix store ping	inert
+nix store ping --help	inert
+nix store ping --help --store x	inert
+nix store ping --help -h	inert
+nix store ping --help x	inert
+nix store ping --store x	inert
+nix store ping -h	inert
+nix store ping x	inert
+nix store prefetch-file	denied
+nix store prefetch-file x	denied
+nix store repair-path	denied
+nix store repair-path x	denied
+nix store sign-paths	denied
+nix store sign-paths x	denied
+nix store verify	inert
+nix store verify --all	inert
+nix store verify --all --help	inert
+nix store verify --all --store x	inert
+nix store verify --all x	inert
+nix store verify --help	inert
+nix store verify --store x	inert
+nix store verify -a	inert
+nix store verify -h	inert
+nix store verify x	inert
+nix store x	denied
+nix upgrade-nix	denied
+nix upgrade-nix x	denied
+nix version	inert
+nix version --help	inert
+nix version --help -h	inert
+nix version --help x	inert
+nix version -h	inert
+nix version x	inert
+nix why-depends	denied
+nix why-depends --all	safe-read
+nix why-depends --all --derivation x	safe-read
+nix why-depends --all --help	safe-read
+nix why-depends --all x	safe-read
+nix why-depends --derivation x	safe-read
+nix why-depends --help	safe-read
+nix why-depends --precise	safe-read
+nix why-depends --store x	safe-read
+nix why-depends -a	safe-read
+nix why-depends -h	safe-read
+nix why-depends x	safe-read
+nix x	denied
+nix-build	denied
+nix-build --dry-run	inert
+nix-build --dry-run --help	inert
+nix-build --dry-run x	denied
+nix-build --help	inert
+nix-build --version	inert
+nix-build -h	inert
+nix-build x	denied
+nix-channel	denied
+nix-channel --add	denied
+nix-channel --add x	denied
+nix-channel --help	inert
+nix-channel --help --version	denied
+nix-channel --help x	denied
+nix-channel --list	denied
+nix-channel --list x	denied
+nix-channel --list-generations	denied
+nix-channel --list-generations x	denied
+nix-channel --remove	denied
+nix-channel --remove x	denied
+nix-channel --rollback	denied
+nix-channel --rollback x	denied
+nix-channel --update	denied
+nix-channel --update x	denied
+nix-channel --version	inert
+nix-channel -h	inert
+nix-channel x	denied
+nix-collect-garbage	safe-write
+nix-collect-garbage --debug	safe-write
+nix-collect-garbage --debug --delete-old	safe-write
+nix-collect-garbage --debug --delete-older-than x	safe-write
+nix-collect-garbage --debug x	safe-write
+nix-collect-garbage --delete-old	safe-write
+nix-collect-garbage --delete-older-than	safe-write
+nix-collect-garbage --delete-older-than x	safe-write
+nix-collect-garbage --dry-run	safe-write
+nix-collect-garbage --help	safe-write
+nix-collect-garbage --max-freed	safe-write
+nix-collect-garbage --max-freed x	safe-write
+nix-collect-garbage --option x	safe-write
+nix-collect-garbage --print-dead	safe-write
+nix-collect-garbage --print-live	safe-write
+nix-collect-garbage --print-roots	safe-write
+nix-collect-garbage --profile x	safe-write
+nix-collect-garbage --quiet	safe-write
+nix-collect-garbage --version	safe-write
+nix-collect-garbage -d	safe-write
+nix-collect-garbage -h	safe-write
+nix-collect-garbage -q	safe-write
+nix-collect-garbage x	safe-write
+nix-env	denied
+nix-env --arg x	denied
+nix-env --argstr x	denied
+nix-env --delete-generations	denied
+nix-env --delete-generations x	denied
+nix-env --help	inert
+nix-env --help --arg x	inert
+nix-env --help --keep-failed	inert
+nix-env --help x	denied
+nix-env --install	denied
+nix-env --install x	denied
+nix-env --keep-failed	denied
+nix-env --list-generations	denied
+nix-env --list-generations x	denied
+nix-env --option x	denied
+nix-env --profile x	denied
+nix-env --query	denied
+nix-env --query x	denied
+nix-env --quiet	denied
+nix-env --rollback	denied
+nix-env --rollback x	denied
+nix-env --set	denied
+nix-env --set x	denied
+nix-env --set-flag	denied
+nix-env --set-flag x	denied
+nix-env --store x	denied
+nix-env --switch-generation	denied
+nix-env --switch-generation x	denied
+nix-env --uninstall	denied
+nix-env --uninstall x	denied
+nix-env --upgrade	denied
+nix-env --upgrade x	denied
+nix-env --version	inert
+nix-env -A x	denied
+nix-env -G	denied
+nix-env -G x	denied
+nix-env -K	denied
+nix-env -Q	denied
+nix-env -e	denied
+nix-env -e x	denied
+nix-env -f x	denied
+nix-env -h	inert
+nix-env -i	denied
+nix-env -i x	denied
+nix-env -q	denied
+nix-env -q x	denied
+nix-env -r x	denied
+nix-env -u	denied
+nix-env -u x	denied
+nix-env x	denied
+nix-instantiate	denied
+nix-instantiate --help	inert
+nix-instantiate --help --version	inert
+nix-instantiate --help x	denied
+nix-instantiate --version	inert
+nix-instantiate -h	inert
+nix-instantiate x	denied
+nix-prefetch-url	denied
+nix-prefetch-url --debug	safe-write
+nix-prefetch-url --debug --help	safe-write
+nix-prefetch-url --debug --name x	safe-write
+nix-prefetch-url --debug x	safe-write
+nix-prefetch-url --help	safe-write
+nix-prefetch-url --name	safe-write
+nix-prefetch-url --name x	safe-write
+nix-prefetch-url --print-path	safe-write
+nix-prefetch-url --quiet	safe-write
+nix-prefetch-url --type	safe-write
+nix-prefetch-url --type x	safe-write
+nix-prefetch-url --unpack	safe-write
+nix-prefetch-url --version	safe-write
+nix-prefetch-url -h	safe-write
+nix-prefetch-url x	safe-write
+nix-shell	denied
+nix-shell --help	inert
+nix-shell --help --version	inert
+nix-shell --help x	denied
+nix-shell --version	inert
+nix-shell -h	inert
+nix-shell x	denied
+nix-store	denied
+nix-store --add	denied
+nix-store --add x	denied
+nix-store --add-fixed	denied
+nix-store --add-fixed x	denied
+nix-store --delete	denied
+nix-store --delete x	denied
+nix-store --dump	denied
+nix-store --dump x	denied
+nix-store --export	denied
+nix-store --export x	denied
+nix-store --gc	denied
+nix-store --gc x	denied
+nix-store --help	inert
+nix-store --help --option x	inert
+nix-store --help --quiet	inert
+nix-store --help x	denied
+nix-store --import	denied
+nix-store --import x	denied
+nix-store --optimise	denied
+nix-store --optimise x	denied
+nix-store --option x	denied
+nix-store --query	denied
+nix-store --query x	denied
+nix-store --quiet	denied
+nix-store --read-log	denied
+nix-store --read-log x	denied
+nix-store --realise	denied
+nix-store --realise x	denied
+nix-store --repair-path	denied
+nix-store --repair-path x	denied
+nix-store --restore	denied
+nix-store --restore x	denied
+nix-store --serve	denied
+nix-store --serve x	denied
+nix-store --store x	denied
+nix-store --verify	denied
+nix-store --verify x	denied
+nix-store --verify-path	denied
+nix-store --verify-path x	denied
+nix-store --version	inert
+nix-store -h	inert
+nix-store -l	denied
+nix-store -l x	denied
+nix-store -q	denied
+nix-store -q x	denied
+nix-store -r	denied
+nix-store -r x	denied
+nix-store x	denied
+nixos-rebuild	denied
+nixos-rebuild --help	inert
+nixos-rebuild --help --version	denied
+nixos-rebuild --help x	denied
+nixos-rebuild --version	inert
+nixos-rebuild -h	inert
+nixos-rebuild boot	denied
+nixos-rebuild boot x	denied
+nixos-rebuild build	denied
+nixos-rebuild build x	denied
+nixos-rebuild build-image	denied
+nixos-rebuild build-image x	denied
+nixos-rebuild build-vm	denied
+nixos-rebuild build-vm x	denied
+nixos-rebuild build-vm-with-bootloader	denied
+nixos-rebuild build-vm-with-bootloader x	denied
+nixos-rebuild dry-activate	safe-read
+nixos-rebuild dry-activate --flake x	safe-read
+nixos-rebuild dry-activate --help	safe-read
+nixos-rebuild dry-activate --help --flake x	safe-read
+nixos-rebuild dry-activate --help -h	safe-read
+nixos-rebuild dry-activate --help x	safe-read
+nixos-rebuild dry-activate -h	safe-read
+nixos-rebuild dry-activate x	safe-read
+nixos-rebuild dry-build	safe-read
+nixos-rebuild dry-build --flake x	safe-read
+nixos-rebuild dry-build --help	safe-read
+nixos-rebuild dry-build --help --flake x	safe-read
+nixos-rebuild dry-build --help -h	safe-read
+nixos-rebuild dry-build --help x	safe-read
+nixos-rebuild dry-build -h	safe-read
+nixos-rebuild dry-build x	safe-read
+nixos-rebuild edit	denied
+nixos-rebuild edit x	denied
+nixos-rebuild list-generations	safe-read
+nixos-rebuild list-generations --help	safe-read
+nixos-rebuild list-generations --help --json	safe-read
+nixos-rebuild list-generations --help --profile-name x	safe-read
+nixos-rebuild list-generations --help x	safe-read
+nixos-rebuild list-generations --json	safe-read
+nixos-rebuild list-generations --profile-name x	safe-read
+nixos-rebuild list-generations -h	safe-read
+nixos-rebuild list-generations -p x	safe-read
+nixos-rebuild list-generations x	safe-read
+nixos-rebuild repl	denied
+nixos-rebuild repl x	denied
+nixos-rebuild switch	denied
+nixos-rebuild switch x	denied
+nixos-rebuild switch-and-update	denied
+nixos-rebuild switch-and-update x	denied
+nixos-rebuild test	denied
+nixos-rebuild test x	denied
+nixos-rebuild x	denied
+nl	inert
+nl --body-numbering x	inert
+nl --footer-numbering x	inert
+nl --header-numbering x	inert
+nl --help	inert
+nl --help --body-numbering x	inert
+nl --help --no-renumber	inert
+nl --help x	inert
+nl --join-blank-lines x	inert
+nl --line-increment x	inert
+nl --no-renumber	inert
+nl --number-format x	inert
+nl --number-separator x	inert
+nl --number-width x	inert
+nl --section-delimiter x	inert
+nl --starting-line-number x	inert
+nl --version	inert
+nl -V	inert
+nl -b x	inert
+nl -d x	inert
+nl -f x	inert
+nl -h x	inert
+nl -i x	inert
+nl -l x	inert
+nl -n x	inert
+nl -p	inert
+nl -s x	inert
+nl -v x	inert
+nl -w x	inert
+nl file.txt	inert
+nl x	inert
+nm	denied
+nm --debug-syms	inert
+nm --debug-syms --defined-only	inert
+nm --debug-syms --format x	inert
+nm --debug-syms x	inert
+nm --defined-only	inert
+nm --demangle	inert
+nm --dynamic	inert
+nm --extern-only	inert
+nm --format x	inert
+nm --help	inert
+nm --line-numbers	inert
+nm --no-demangle	inert
+nm --no-llvm-bc	inert
+nm --no-sort	inert
+nm --numeric-sort	inert
+nm --portability	inert
+nm --print-armap	inert
+nm --print-file-name	inert
+nm --print-size	inert
+nm --radix x	inert
+nm --reverse-sort	inert
+nm --size-sort x	inert
+nm --special-syms	inert
+nm --target x	inert
+nm --undefined-only	inert
+nm --version	inert
+nm -A	inert
+nm -B	inert
+nm -C	inert
+nm -D	inert
+nm -P	inert
+nm -S	inert
+nm -V	inert
+nm -a	inert
+nm -f x	inert
+nm -g	inert
+nm -h	inert
+nm -j	inert
+nm -l	inert
+nm -m	inert
+nm -n	inert
+nm -o	inert
+nm -p	inert
+nm -r	inert
+nm -s	inert
+nm -t x	inert
+nm -u	inert
+nm -v	inert
+nm -x	inert
+nm a.out	inert
+nm x	inert
+nmap	denied
+nmap --dns-servers x	inert
+nmap --exclude x	inert
+nmap --exclude-ports x	inert
+nmap --help	inert
+nmap --help --dns-servers x	inert
+nmap --help --no-stylesheet	inert
+nmap --help x	inert
+nmap --host-timeout x	inert
+nmap --initial-rtt-timeout x	inert
+nmap --max-hostgroup x	inert
+nmap --max-parallelism x	inert
+nmap --max-rate x	inert
+nmap --max-retries x	inert
+nmap --max-rtt-timeout x	inert
+nmap --max-scan-delay x	inert
+nmap --min-hostgroup x	inert
+nmap --min-parallelism x	inert
+nmap --min-rate x	inert
+nmap --min-rtt-timeout x	inert
+nmap --no-stylesheet	inert
+nmap --open	inert
+nmap --packet-trace	inert
+nmap --port-ratio x	inert
+nmap --reason	inert
+nmap --scan-delay x	inert
+nmap --source-port x	inert
+nmap --system-dns	inert
+nmap --top-ports x	inert
+nmap --traceroute	inert
+nmap --ttl x	inert
+nmap --version	inert
+nmap --version-all	inert
+nmap --version-intensity x	inert
+nmap --version-light	inert
+nmap -4	inert
+nmap -6	inert
+nmap -F	inert
+nmap -PE	inert
+nmap -PM	inert
+nmap -PP	inert
+nmap -Pn	inert
+nmap -R	inert
+nmap -T0	inert
+nmap -T1	inert
+nmap -T2	inert
+nmap -T3	inert
+nmap -T4	inert
+nmap -T5	inert
+nmap -V	inert
+nmap -d	inert
+nmap -d1	inert
+nmap -d2	inert
+nmap -d3	inert
+nmap -d4	inert
+nmap -d5	inert
+nmap -d6	inert
+nmap -d7	inert
+nmap -d8	inert
+nmap -d9	inert
+nmap -e x	inert
+nmap -g x	inert
+nmap -h	inert
+nmap -n	inert
+nmap -p x	inert
+nmap -sL	inert
+nmap -sP	inert
+nmap -sT	inert
+nmap -sV	inert
+nmap -sn	inert
+nmap -v	inert
+nmap -vv	inert
+nmap -vvv	inert
+nmap x	inert
+nmedit	denied
+nmedit --help	denied
+nmedit --version	denied
+nmedit -A	safe-write
+nmedit -A -D	safe-write
+nmedit -A -R x	safe-write
+nmedit -A x	safe-write
+nmedit -D	safe-write
+nmedit -R x	safe-write
+nmedit -arch x	safe-write
+nmedit -o x	safe-write
+nmedit -p	safe-write
+nmedit -s x	safe-write
+nmedit x	safe-write
+node	denied
+node *.js	denied
+node --check --eval=x	denied
+node --check --import=./evil.js	denied
+node --check --require=./evil.js	denied
+node --check /tmp/foo.js	inert
+node --check app.js	inert
+node --check file.js /tmp/extra.js	denied
+node --check x	inert
+node --eval 'process.exit()'	denied
+node --help	inert
+node --help --check x	inert
+node --help --extra	denied
+node --help --version	inert
+node --help x	safe-write
+node --version	inert
+node --version --extra	denied
+node -c -r./evil.js	denied
+node -c app.js	inert
+node -c x	inert
+node -capp.js	inert
+node -e 'process.exit()'	denied
+node -e 'x()'	denied
+node -h	inert
+node -r foo --check app.js	denied
+node -v	inert
+node ./src/main.js	safe-write
+node /tmp/app.js	denied
+node /tmp/evil.js	denied
+node /usr/local/lib/x.js	denied
+node server.js	safe-write
+node x	safe-write
+node ~/Downloads/x.js	denied
+nodemon	denied
+nodemon --dump	inert
+nodemon --dump --help	inert
+nodemon --dump x	denied
+nodemon --help	inert
+nodemon --quiet	inert
+nodemon --version	inert
+nodemon -h	inert
+nodemon -q	inert
+nodemon -v	inert
+nodemon x	denied
+nodenv	denied
+nodenv --help	inert
+nodenv --help --version	denied
+nodenv --help x	denied
+nodenv --version	inert
+nodenv -V	inert
+nodenv -h	inert
+nodenv completions	denied
+nodenv completions --help	inert
+nodenv completions --help -h	inert
+nodenv completions --help x	inert
+nodenv completions -h	inert
+nodenv completions x	inert
+nodenv help	inert
+nodenv help --help	inert
+nodenv help --help -h	inert
+nodenv help --help x	inert
+nodenv help -h	inert
+nodenv help x	inert
+nodenv hooks	denied
+nodenv hooks --help	inert
+nodenv hooks --help -h	inert
+nodenv hooks --help x	inert
+nodenv hooks -h	inert
+nodenv hooks x	inert
+nodenv init	denied
+nodenv init -	inert
+nodenv init - -	inert
+nodenv init - --help	inert
+nodenv init - --no-rehash	inert
+nodenv init - -h	inert
+nodenv init - x	inert
+nodenv init --help	inert
+nodenv init --no-rehash	denied
+nodenv init -h	inert
+nodenv init bash	denied
+nodenv init x	denied
+nodenv prefix	inert
+nodenv prefix --help	inert
+nodenv prefix --help -h	inert
+nodenv prefix --help x	inert
+nodenv prefix -h	inert
+nodenv prefix x	inert
+nodenv root	inert
+nodenv root --help	inert
+nodenv root --help -h	inert
+nodenv root --help x	inert
+nodenv root -h	inert
+nodenv root x	inert
+nodenv shims	inert
+nodenv shims --help	inert
+nodenv shims --help -h	inert
+nodenv shims --help x	inert
+nodenv shims -h	inert
+nodenv shims x	inert
+nodenv version	inert
+nodenv version --help	inert
+nodenv version --help -h	inert
+nodenv version --help x	inert
+nodenv version -h	inert
+nodenv version x	inert
+nodenv version-file	inert
+nodenv version-file --help	inert
+nodenv version-file --help -h	inert
+nodenv version-file --help x	inert
+nodenv version-file -h	inert
+nodenv version-file x	inert
+nodenv version-name	inert
+nodenv version-name --help	inert
+nodenv version-name --help -h	inert
+nodenv version-name --help x	inert
+nodenv version-name -h	inert
+nodenv version-name x	inert
+nodenv version-origin	inert
+nodenv version-origin --help	inert
+nodenv version-origin --help -h	inert
+nodenv version-origin --help x	inert
+nodenv version-origin -h	inert
+nodenv version-origin x	inert
+nodenv versions	inert
+nodenv versions --bare	inert
+nodenv versions --bare --help	inert
+nodenv versions --bare x	inert
+nodenv versions --help	inert
+nodenv versions -h	inert
+nodenv versions x	inert
+nodenv whence	denied
+nodenv whence --help	inert
+nodenv whence --help -h	inert
+nodenv whence --help x	inert
+nodenv whence -h	inert
+nodenv whence x	inert
+nodenv which	denied
+nodenv which --help	inert
+nodenv which --help -h	inert
+nodenv which --help x	inert
+nodenv which -h	inert
+nodenv which node	inert
+nodenv which x	inert
+nodenv x	denied
+nodetool	denied
+nodetool --help	inert
+nodetool --help --version	denied
+nodetool --help x	denied
+nodetool --version	inert
+nodetool -h	inert
+nodetool bootstrap	denied
+nodetool bootstrap x	denied
+nodetool cfhistograms	safe-read
+nodetool cfhistograms x	safe-read
+nodetool cfstats	safe-read
+nodetool cfstats x	safe-read
+nodetool cleanup	denied
+nodetool cleanup x	denied
+nodetool clearsnapshot	denied
+nodetool clearsnapshot x	denied
+nodetool compact	denied
+nodetool compact x	denied
+nodetool compactionhistory	safe-read
+nodetool compactionhistory x	safe-read
+nodetool compactionstats	safe-read
+nodetool compactionstats x	safe-read
+nodetool decommission	denied
+nodetool decommission x	denied
+nodetool describecluster	safe-read
+nodetool describecluster x	safe-read
+nodetool drain	denied
+nodetool drain x	denied
+nodetool flush	denied
+nodetool flush x	denied
+nodetool garbagecollect	denied
+nodetool garbagecollect x	denied
+nodetool getendpoints	safe-read
+nodetool getendpoints x	safe-read
+nodetool getlogginglevels	safe-read
+nodetool getlogginglevels x	safe-read
+nodetool getseeds	safe-read
+nodetool getseeds x	safe-read
+nodetool getsstables	safe-read
+nodetool getsstables x	safe-read
+nodetool gettraceprobability	safe-read
+nodetool gettraceprobability x	safe-read
+nodetool gossipinfo	safe-read
+nodetool gossipinfo x	safe-read
+nodetool help	inert
+nodetool help x	inert
+nodetool info	safe-read
+nodetool info x	safe-read
+nodetool move	denied
+nodetool move x	denied
+nodetool rebuild	denied
+nodetool rebuild x	denied
+nodetool rebuild_index	denied
+nodetool rebuild_index x	denied
+nodetool refresh	denied
+nodetool refresh x	denied
+nodetool reload	denied
+nodetool reload x	denied
+nodetool removenode	denied
+nodetool removenode x	denied
+nodetool repair	denied
+nodetool repair x	denied
+nodetool ring	safe-read
+nodetool ring x	safe-read
+nodetool scrub	denied
+nodetool scrub x	denied
+nodetool setlogginglevel	denied
+nodetool setlogginglevel x	denied
+nodetool settraceprobability	denied
+nodetool settraceprobability x	denied
+nodetool snapshot	denied
+nodetool snapshot x	denied
+nodetool status	safe-read
+nodetool status x	safe-read
+nodetool stopdaemon	denied
+nodetool stopdaemon x	denied
+nodetool tablehistograms	safe-read
+nodetool tablehistograms x	safe-read
+nodetool tablestats	safe-read
+nodetool tablestats x	safe-read
+nodetool tpstats	safe-read
+nodetool tpstats x	safe-read
+nodetool upgradesstables	denied
+nodetool upgradesstables x	denied
+nodetool verify	denied
+nodetool verify x	denied
+nodetool version	inert
+nodetool version x	inert
+nodetool x	denied
+nohup	denied
+nohup --help	denied
+nohup --help --version	denied
+nohup --help x	denied
+nohup --version	denied
+nohup x	denied
+nomad	denied
+nomad --help	inert
+nomad --help --version	denied
+nomad --help x	denied
+nomad --version	inert
+nomad -h	inert
+nomad -v	inert
+nomad agent	denied
+nomad agent x	denied
+nomad agent-info	safe-read
+nomad agent-info --help	safe-read
+nomad agent-info --help -address x	safe-read
+nomad agent-info --help -h	safe-read
+nomad agent-info --help x	safe-read
+nomad agent-info -address x	safe-read
+nomad agent-info -h	safe-read
+nomad agent-info x	safe-read
+nomad alloc	denied
+nomad alloc x	denied
+nomad alloc-status	denied
+nomad alloc-status --help	safe-read
+nomad alloc-status --help -address x	safe-read
+nomad alloc-status --help -h	safe-read
+nomad alloc-status --help x	safe-read
+nomad alloc-status -address x	safe-read
+nomad alloc-status -h	safe-read
+nomad alloc-status -json	safe-read
+nomad alloc-status -namespace x	safe-read
+nomad alloc-status -region x	safe-read
+nomad alloc-status -short	safe-read
+nomad alloc-status -stats	safe-read
+nomad alloc-status -t x	safe-read
+nomad alloc-status -token x	safe-read
+nomad alloc-status -token-file x	safe-read
+nomad alloc-status -verbose	safe-read
+nomad alloc-status abc123	safe-read
+nomad alloc-status x	safe-read
+nomad client-config	denied
+nomad client-config x	denied
+nomad deployment	denied
+nomad deployment x	denied
+nomad eval	denied
+nomad eval x	denied
+nomad exec	denied
+nomad exec x	denied
+nomad fmt	denied
+nomad fmt --check	safe-write
+nomad fmt --check --help	safe-write
+nomad fmt --check ./jobs	safe-write
+nomad fmt --check x	safe-write
+nomad fmt --help	safe-write
+nomad fmt --list	safe-write
+nomad fmt --recursive	safe-write
+nomad fmt --write	safe-write
+nomad fmt -c	safe-write
+nomad fmt -h	safe-write
+nomad fmt -l	safe-write
+nomad fmt -recursive	safe-write
+nomad fmt -w	safe-write
+nomad fmt -w ./jobs/web.nomad.hcl	safe-write
+nomad fmt x	safe-write
+nomad help	inert
+nomad help x	inert
+nomad job	denied
+nomad job run example.nomad	denied
+nomad job x	denied
+nomad license	denied
+nomad license x	denied
+nomad login	denied
+nomad login x	denied
+nomad logs	denied
+nomad logs x	denied
+nomad monitor	safe-read
+nomad monitor --help	safe-read
+nomad monitor --help -address x	safe-read
+nomad monitor --help -h	safe-read
+nomad monitor --help x	safe-read
+nomad monitor -address x	safe-read
+nomad monitor -h	safe-read
+nomad monitor -json	safe-read
+nomad monitor -log-level x	safe-read
+nomad monitor -namespace x	safe-read
+nomad monitor -no-color	safe-read
+nomad monitor -node-id x	safe-read
+nomad monitor -region x	safe-read
+nomad monitor -server-id x	safe-read
+nomad monitor -token x	safe-read
+nomad monitor -token-file x	safe-read
+nomad monitor x	safe-read
+nomad namespace	denied
+nomad namespace x	denied
+nomad node	denied
+nomad node x	denied
+nomad node-drain	denied
+nomad node-drain -enable web	denied
+nomad node-drain x	denied
+nomad node-status	safe-read
+nomad node-status --help	safe-read
+nomad node-status --help -address x	safe-read
+nomad node-status --help -allocs	safe-read
+nomad node-status --help x	safe-read
+nomad node-status -address x	safe-read
+nomad node-status -allocs	safe-read
+nomad node-status -class x	safe-read
+nomad node-status -h	safe-read
+nomad node-status -json	safe-read
+nomad node-status -namespace x	safe-read
+nomad node-status -pool x	safe-read
+nomad node-status -region x	safe-read
+nomad node-status -self	safe-read
+nomad node-status -short	safe-read
+nomad node-status -stats	safe-read
+nomad node-status -t x	safe-read
+nomad node-status -token x	safe-read
+nomad node-status -token-file x	safe-read
+nomad node-status -verbose	safe-read
+nomad node-status x	safe-read
+nomad operator	denied
+nomad operator x	denied
+nomad plan	denied
+nomad plan x	denied
+nomad quota	denied
+nomad quota x	denied
+nomad recommendation	denied
+nomad recommendation x	denied
+nomad run	denied
+nomad run x	denied
+nomad scaling	denied
+nomad scaling x	denied
+nomad sentinel	denied
+nomad sentinel x	denied
+nomad server	denied
+nomad server x	denied
+nomad service	denied
+nomad service x	denied
+nomad status	safe-read
+nomad status --help	safe-read
+nomad status --help -address x	safe-read
+nomad status --help -h	safe-read
+nomad status --help x	safe-read
+nomad status -address x	safe-read
+nomad status -h	safe-read
+nomad status -namespace x	safe-read
+nomad status -region x	safe-read
+nomad status -token x	safe-read
+nomad status -token-file x	safe-read
+nomad status x	safe-read
+nomad stop	denied
+nomad stop x	denied
+nomad system	denied
+nomad system x	denied
+nomad tls	denied
+nomad tls x	denied
+nomad ui	denied
+nomad ui x	denied
+nomad validate	denied
+nomad validate --help	safe-read
+nomad validate --help -h	safe-read
+nomad validate --help -vault-namespace x	safe-read
+nomad validate --help x	safe-read
+nomad validate -h	safe-read
+nomad validate -vault-namespace x	safe-read
+nomad validate -vault-token x	safe-read
+nomad validate x	safe-read
+nomad var	denied
+nomad var x	denied
+nomad version	inert
+nomad version --help	inert
+nomad version --help -h	inert
+nomad version --help x	inert
+nomad version -h	inert
+nomad version x	inert
+nomad volume	denied
+nomad volume x	denied
+nomad x	denied
+nop	denied
+nop --help	safe-write
+nop --help -?	safe-write
+nop --help -A x	safe-write
+nop --help x	safe-write
+nop --version	denied
+nop -?	safe-write
+nop -A x	safe-write
+nop -E x	safe-write
+nop -G x	safe-write
+nop -K x	safe-write
+nop -N x	safe-write
+nop -O	safe-write
+nop -P	safe-write
+nop -T x	safe-write
+nop -V	safe-write
+nop -n x	safe-write
+nop -o x	safe-write
+nop -q	safe-write
+nop -s x	safe-write
+nop -v	safe-write
+nop -x	safe-write
+nop -y	safe-write
+nop x	safe-write
+northflank	denied
+northflank --help	inert
+northflank --help --version	denied
+northflank --help x	denied
+northflank --version	inert
+northflank -h	inert
+northflank -v	inert
+northflank command-overview	inert
+northflank command-overview --help	inert
+northflank command-overview --help -h	inert
+northflank command-overview --help x	inert
+northflank command-overview -h	inert
+northflank command-overview x	inert
+northflank context	denied
+northflank context list	inert
+northflank context list --help	inert
+northflank context list --help -h	inert
+northflank context list --help x	inert
+northflank context list -h	inert
+northflank context list x	inert
+northflank context ls	inert
+northflank context ls --help	inert
+northflank context ls --help -h	inert
+northflank context ls --help x	inert
+northflank context ls -h	inert
+northflank context ls x	inert
+northflank context use	safe-write
+northflank context use --help	safe-write
+northflank context use --help -h	safe-write
+northflank context use --help x	safe-write
+northflank context use -h	safe-write
+northflank context use x	safe-write
+northflank context x	denied
+northflank create	denied
+northflank create service --project p --service s	denied
+northflank create x	denied
+northflank delete	denied
+northflank delete service --project p --service s	denied
+northflank delete x	denied
+northflank exec	denied
+northflank exec --project p --service s	denied
+northflank exec x	denied
+northflank execute-command	denied
+northflank execute-command x	denied
+northflank get	denied
+northflank get --addon x	inert
+northflank get --domain x	inert
+northflank get --help	inert
+northflank get --help --addon x	inert
+northflank get --help -h	inert
+northflank get --help x	inert
+northflank get --job x	inert
+northflank get --output x	inert
+northflank get --project x	inert
+northflank get --service x	inert
+northflank get --volume x	inert
+northflank get --workflow x	inert
+northflank get -h	inert
+northflank get -o x	inert
+northflank get service --project myproj --service web	inert
+northflank get x	inert
+northflank list	denied
+northflank list --help	inert
+northflank list --help --output x	inert
+northflank list --help -h	inert
+northflank list --help x	inert
+northflank list --output x	inert
+northflank list --project x	inert
+northflank list -h	inert
+northflank list -o x	inert
+northflank list projects	inert
+northflank list x	inert
+northflank login	safe-write
+northflank login --help	safe-write
+northflank login --help --name x	safe-write
+northflank login --help -h	safe-write
+northflank login --help x	safe-write
+northflank login --name x	safe-write
+northflank login --token abc	safe-write
+northflank login --token x	safe-write
+northflank login -h	safe-write
+northflank login -n x	safe-write
+northflank login -t x	safe-write
+northflank login x	safe-write
+northflank logout	safe-write
+northflank logout --help	safe-write
+northflank logout --help -h	safe-write
+northflank logout --help x	safe-write
+northflank logout -h	safe-write
+northflank logout x	safe-write
+northflank logs	inert
+northflank logs --container x	inert
+northflank logs --follow	inert
+northflank logs --follow --container x	inert
+northflank logs --follow --help	inert
+northflank logs --follow x	inert
+northflank logs --help	inert
+northflank logs --job x	inert
+northflank logs --limit x	inert
+northflank logs --output x	inert
+northflank logs --project myproj --service web --follow	inert
+northflank logs --project x	inert
+northflank logs --service x	inert
+northflank logs --since x	inert
+northflank logs --until x	inert
+northflank logs -f	inert
+northflank logs -h	inert
+northflank logs -o x	inert
+northflank logs x	inert
+northflank metrics	inert
+northflank metrics --help	inert
+northflank metrics --help --job x	inert
+northflank metrics --help -h	inert
+northflank metrics --help x	inert
+northflank metrics --job x	inert
+northflank metrics --output x	inert
+northflank metrics --project myproj --service web	inert
+northflank metrics --project x	inert
+northflank metrics --service x	inert
+northflank metrics -h	inert
+northflank metrics -o x	inert
+northflank metrics x	inert
+northflank patch	denied
+northflank patch x	denied
+northflank update	denied
+northflank update x	denied
+northflank x	denied
+notifyutil	safe-write
+notifyutil --help	denied
+notifyutil --version	denied
+notifyutil -M	safe-write
+notifyutil -M -R	safe-write
+notifyutil -M -g x	safe-write
+notifyutil -M x	safe-write
+notifyutil -R	safe-write
+notifyutil -check	safe-write
+notifyutil -dispatch	safe-write
+notifyutil -file	safe-write
+notifyutil -g x	safe-write
+notifyutil -p x	safe-write
+notifyutil -port	safe-write
+notifyutil -q	safe-write
+notifyutil -s x	safe-write
+notifyutil -signal x	safe-write
+notifyutil -v	safe-write
+notifyutil -w x	safe-write
+notifyutil -z x	safe-write
+notifyutil x	safe-write
+notion	denied
+notion --help	inert
+notion --help --version	denied
+notion --help x	denied
+notion --version	inert
+notion -h	inert
+notion block	inert
+notion block get	inert
+notion block get x	inert
+notion block list	inert
+notion block list x	inert
+notion block x	denied
+notion comment	inert
+notion comment get	inert
+notion comment get x	inert
+notion comment list	inert
+notion comment list x	inert
+notion comment x	denied
+notion db	inert
+notion db list	inert
+notion db list x	inert
+notion db open	inert
+notion db open x	inert
+notion db query	inert
+notion db query x	inert
+notion db view	inert
+notion db view x	inert
+notion db x	denied
+notion doctor	inert
+notion doctor x	inert
+notion file	inert
+notion file list	inert
+notion file list x	inert
+notion file x	denied
+notion page	inert
+notion page list	inert
+notion page list x	inert
+notion page open	inert
+notion page open x	inert
+notion page view	inert
+notion page view x	inert
+notion page x	denied
+notion search	inert
+notion search x	inert
+notion status	inert
+notion status x	inert
+notion user	inert
+notion user get	inert
+notion user get x	inert
+notion user list	inert
+notion user list x	inert
+notion user me	inert
+notion user me x	inert
+notion user x	denied
+notion x	denied
+nox	safe-read
+nox --default-venv-backend x	safe-read
+nox --envdir x	safe-read
+nox --error-on-external-run	safe-read
+nox --error-on-external-run --default-venv-backend x	safe-read
+nox --error-on-external-run --error-on-missing-interpreters	safe-read
+nox --error-on-external-run x	safe-read
+nox --error-on-missing-interpreters	safe-read
+nox --extra-pythons x	safe-read
+nox --force-pythons x	safe-read
+nox --help	safe-read
+nox --list	safe-read
+nox --no-color	safe-read
+nox --no-error-on-external-run	safe-read
+nox --no-error-on-missing-interpreters	safe-read
+nox --no-install	safe-read
+nox --no-venv	safe-read
+nox --noxfile x	safe-read
+nox --pythons x	safe-read
+nox --reuse-existing-virtualenvs	safe-read
+nox --sessions x	safe-read
+nox --stop-on-first-error	safe-read
+nox --tags x	safe-read
+nox --version	safe-read
+nox -R	safe-read
+nox -e x	safe-read
+nox -f x	safe-read
+nox -h	safe-read
+nox -l	safe-read
+nox -p x	safe-read
+nox -r	safe-read
+nox -s x	safe-read
+nox -t x	safe-read
+nox -x	safe-read
+nox x	safe-read
+npm	denied
+npm --help	inert
+npm --help --version	denied
+npm --help x	denied
+npm --version	inert
+npm -V	inert
+npm -h	inert
+npm add	denied
+npm add --help	denied
+npm add --help --json	denied
+npm add --help --prefix x	denied
+npm add --help x	denied
+npm add --json	denied
+npm add --prefix x	denied
+npm add --registry x	denied
+npm add --silent	denied
+npm add --workspace x	denied
+npm add -h	denied
+npm add -w x	denied
+npm add x	denied
+npm audit	inert
+npm audit --audit-level x	inert
+npm audit --help	inert
+npm audit --help --audit-level x	inert
+npm audit --help --json	inert
+npm audit --help x	inert
+npm audit --json	inert
+npm audit --omit	inert
+npm audit --production	inert
+npm audit -h	inert
+npm audit x	inert
+npm ci	denied
+npm ci --help	denied
+npm ci --help --json	denied
+npm ci --help --prefix x	denied
+npm ci --help x	denied
+npm ci --ignore-scripts	safe-write
+npm ci --json	denied
+npm ci --prefix x	denied
+npm ci --registry x	denied
+npm ci --silent	denied
+npm ci --workspace x	denied
+npm ci -h	denied
+npm ci -w x	denied
+npm ci x	denied
+npm config	denied
+npm config get	inert
+npm config get --help	inert
+npm config get --help --json	inert
+npm config get --help x	inert
+npm config get --json	inert
+npm config get --long	inert
+npm config get -h	inert
+npm config get -l	inert
+npm config get x	inert
+npm config list	inert
+npm config list --help	inert
+npm config list --help --json	inert
+npm config list --help x	inert
+npm config list --json	inert
+npm config list --long	inert
+npm config list -h	inert
+npm config list -l	inert
+npm config list x	inert
+npm config x	denied
+npm doctor	inert
+npm doctor --help	inert
+npm doctor --help --json	inert
+npm doctor --help x	inert
+npm doctor --json	inert
+npm doctor -h	inert
+npm doctor x	inert
+npm explain	inert
+npm explain --help	inert
+npm explain --help --json	inert
+npm explain --help x	inert
+npm explain --json	inert
+npm explain -h	inert
+npm explain x	inert
+npm fund	inert
+npm fund --help	inert
+npm fund --help --json	inert
+npm fund --help x	inert
+npm fund --json	inert
+npm fund -h	inert
+npm fund x	inert
+npm i	denied
+npm i --help	denied
+npm i --help --json	denied
+npm i --help --prefix x	denied
+npm i --help x	denied
+npm i --json	denied
+npm i --prefix x	denied
+npm i --registry x	denied
+npm i --silent	denied
+npm i --workspace x	denied
+npm i -h	denied
+npm i -w x	denied
+npm i react	denied
+npm i x	denied
+npm info	inert
+npm info --help	inert
+npm info --help --json	inert
+npm info --help x	inert
+npm info --json	inert
+npm info -h	inert
+npm info x	inert
+npm install	denied
+npm install --help	denied
+npm install --help --json	denied
+npm install --help --prefix x	denied
+npm install --help x	denied
+npm install --json	denied
+npm install --prefix x	denied
+npm install --registry x	denied
+npm install --silent	denied
+npm install --workspace x	denied
+npm install -h	denied
+npm install -w x	denied
+npm install left-pad	denied
+npm install x	denied
+npm isntall	denied
+npm isntall --help	denied
+npm isntall --help --json	denied
+npm isntall --help --prefix x	denied
+npm isntall --help x	denied
+npm isntall --json	denied
+npm isntall --prefix x	denied
+npm isntall --registry x	denied
+npm isntall --silent	denied
+npm isntall --workspace x	denied
+npm isntall -h	denied
+npm isntall -w x	denied
+npm isntall x	denied
+npm list	inert
+npm list --all	inert
+npm list --all --depth x	inert
+npm list --all --help	inert
+npm list --all x	inert
+npm list --depth x	inert
+npm list --help	inert
+npm list --json	inert
+npm list --link	inert
+npm list --long	inert
+npm list --omit	inert
+npm list --parseable	inert
+npm list --prefix x	inert
+npm list --production	inert
+npm list --unicode	inert
+npm list -a	inert
+npm list -h	inert
+npm list -l	inert
+npm list x	inert
+npm list | grep react	inert
+npm ls	inert
+npm ls --all	inert
+npm ls --all --depth x	inert
+npm ls --all --help	inert
+npm ls --all x	inert
+npm ls --depth x	inert
+npm ls --help	inert
+npm ls --json	inert
+npm ls --link	inert
+npm ls --long	inert
+npm ls --omit	inert
+npm ls --parseable	inert
+npm ls --prefix x	inert
+npm ls --production	inert
+npm ls --unicode	inert
+npm ls -a	inert
+npm ls -h	inert
+npm ls -l	inert
+npm ls x	inert
+npm outdated	inert
+npm outdated --help	inert
+npm outdated --help --json	inert
+npm outdated --help x	inert
+npm outdated --json	inert
+npm outdated -h	inert
+npm outdated x	inert
+npm prefix	inert
+npm prefix --help	inert
+npm prefix --help --json	inert
+npm prefix --help x	inert
+npm prefix --json	inert
+npm prefix -h	inert
+npm prefix x	inert
+npm root	inert
+npm root --help	inert
+npm root --help --json	inert
+npm root --help x	inert
+npm root --json	inert
+npm root -h	inert
+npm root x	inert
+npm run	denied
+npm run test	safe-read
+npm run test:x	safe-read
+npm run x	denied
+npm run-script	denied
+npm run-script test	safe-read
+npm run-script test:x	safe-read
+npm run-script x	denied
+npm test	safe-read
+npm test --help	safe-read
+npm test --help -h	safe-read
+npm test --help x	safe-read
+npm test -h	safe-read
+npm test x	safe-read
+npm view	inert
+npm view --help	inert
+npm view --help --json	inert
+npm view --help x	inert
+npm view --json	inert
+npm view -h	inert
+npm view react	inert
+npm view x	inert
+npm why	inert
+npm why --help	inert
+npm why --help --json	inert
+npm why --help x	inert
+npm why --json	inert
+npm why -h	inert
+npm why x	inert
+npm x	denied
+npm-run-all	denied
+npm-run-all --help	inert
+npm-run-all --help --version	inert
+npm-run-all --help x	denied
+npm-run-all --version	inert
+npm-run-all -h	inert
+npm-run-all -v	inert
+npm-run-all x	denied
+nproc	inert
+nproc --all	inert
+nproc --all --help	inert
+nproc --all --ignore x	inert
+nproc --all x	denied
+nproc --help	inert
+nproc --ignore x	inert
+nproc --version	inert
+nproc -V	inert
+nproc -h	inert
+nproc x	denied
+npx	denied
+npx -- eslint src/	safe-read
+npx --help	denied
+npx --package eslint eslint src/	safe-read
+npx --version	inert
+npx --yes	denied
+npx --yes eslint src/	safe-read
+npx -y eslint src/	safe-read
+npx @herb-tools/linter --fail-level warning file.erb	safe-read
+npx @herb-tools/linter@0.9.5 --fail-level warning file.erb	safe-read
+npx biome check src/	safe-read
+npx circuschief	safe-write
+npx circuschief -p 8080	safe-write
+npx cowsay hello	denied
+npx eslint src/	safe-read
+npx eslint src/ --max-warnings 0	safe-read
+npx eslint@8 src/	safe-read
+npx evil-package --help	denied
+npx evil-package --version	denied
+npx prettier --check src/	inert
+npx rm -rf /	denied
+npx shellcheck script.sh	inert
+npx stylelint 'src/**/*.css'	safe-read
+npx tsc --noEmit	inert
+npx unknown-package-xyz	denied
+npx x	denied
+nroff	denied
+nroff --help	inert
+nroff --help --version	inert
+nroff --help -M x	inert
+nroff --help x	inert
+nroff --version	inert
+nroff -M x	inert
+nroff -P x	inert
+nroff -S	inert
+nroff -T x	inert
+nroff -V	inert
+nroff -c	inert
+nroff -d x	inert
+nroff -h	inert
+nroff -i	inert
+nroff -k	inert
+nroff -m x	inert
+nroff -n x	inert
+nroff -o x	inert
+nroff -p	inert
+nroff -q	inert
+nroff -r x	inert
+nroff -t	inert
+nroff -w x	inert
+nroff x	inert
+ns	denied
+ns --help	inert
+ns --help --version	denied
+ns --help x	denied
+ns --version	inert
+ns -h	inert
+ns build	denied
+ns build x	denied
+ns clean	denied
+ns clean x	denied
+ns config	denied
+ns config x	denied
+ns create	denied
+ns create x	denied
+ns debug	denied
+ns debug x	denied
+ns deploy	denied
+ns deploy x	denied
+ns device	denied
+ns device x	denied
+ns doctor	safe-read
+ns doctor --help	safe-read
+ns doctor --help -h	safe-read
+ns doctor --help x	safe-read
+ns doctor -h	safe-read
+ns doctor x	safe-read
+ns extension	denied
+ns extension x	denied
+ns help	inert
+ns help x	inert
+ns info	safe-read
+ns info --help	safe-read
+ns info --help -h	safe-read
+ns info --help x	safe-read
+ns info -h	safe-read
+ns info x	safe-read
+ns migrate	denied
+ns migrate x	denied
+ns package-manager	denied
+ns package-manager x	denied
+ns prepare	denied
+ns prepare x	denied
+ns proxy	denied
+ns proxy x	denied
+ns run	denied
+ns run x	denied
+ns setup	denied
+ns setup x	denied
+ns test	denied
+ns test x	denied
+ns update	denied
+ns update x	denied
+ns usage-reports	denied
+ns usage-reports x	denied
+ns x	denied
+nslookup	inert
+nslookup --help	inert
+nslookup --version	inert
+nslookup -type=MX example.com	inert
+nslookup example.com	inert
+nslookup example.com 8.8.8.8	inert
+nslookup x	inert
+nu	denied
+nu --help	inert
+nu --help --version	inert
+nu --help x	denied
+nu --version	inert
+nu -h	inert
+nu x	denied
+nuget	denied
+nuget --help	inert
+nuget --help -?	denied
+nuget --help x	denied
+nuget --version	denied
+nuget -?	inert
+nuget -h	inert
+nuget -help	inert
+nuget add	denied
+nuget add x	denied
+nuget client-certs	denied
+nuget client-certs x	denied
+nuget config	denied
+nuget config --help	safe-read
+nuget config --help -?	safe-read
+nuget config --help -ConfigFile x	safe-read
+nuget config --help x	safe-read
+nuget config -?	safe-read
+nuget config -AsPath	safe-read
+nuget config -ConfigFile x	safe-read
+nuget config -help	safe-read
+nuget config x	safe-read
+nuget delete	denied
+nuget delete x	denied
+nuget help	inert
+nuget help x	inert
+nuget init	denied
+nuget init x	denied
+nuget install	denied
+nuget install x	denied
+nuget list	safe-read
+nuget list --help	safe-read
+nuget list --help -?	safe-read
+nuget list --help -ConfigFile x	safe-read
+nuget list --help x	safe-read
+nuget list -?	safe-read
+nuget list -AllVersions	safe-read
+nuget list -ConfigFile x	safe-read
+nuget list -IncludeDelisted	safe-read
+nuget list -NonInteractive	safe-read
+nuget list -PreRelease	safe-read
+nuget list -Source x	safe-read
+nuget list -Verbosity x	safe-read
+nuget list -help	safe-read
+nuget list x	safe-read
+nuget locals	denied
+nuget locals --help	safe-read
+nuget locals --help -?	safe-read
+nuget locals --help -Verbosity x	safe-read
+nuget locals --help x	safe-read
+nuget locals -?	safe-read
+nuget locals -Verbosity x	safe-read
+nuget locals -clear	safe-read
+nuget locals -help	safe-read
+nuget locals -list	safe-read
+nuget locals x	safe-read
+nuget mirror	denied
+nuget mirror x	denied
+nuget pack	denied
+nuget pack x	denied
+nuget push	denied
+nuget push x	denied
+nuget restore	denied
+nuget restore x	denied
+nuget search	denied
+nuget search --help	safe-read
+nuget search --help -?	safe-read
+nuget search --help -ConfigFile x	safe-read
+nuget search --help x	safe-read
+nuget search -?	safe-read
+nuget search -ConfigFile x	safe-read
+nuget search -PreRelease	safe-read
+nuget search -Source x	safe-read
+nuget search -Take x	safe-read
+nuget search -Verbosity x	safe-read
+nuget search -help	safe-read
+nuget search x	safe-read
+nuget setapikey	denied
+nuget setapikey x	denied
+nuget sign	denied
+nuget sign x	denied
+nuget sources	safe-read
+nuget sources --help	safe-read
+nuget sources --help -?	safe-read
+nuget sources --help -ConfigFile x	safe-read
+nuget sources --help x	safe-read
+nuget sources -?	safe-read
+nuget sources -ConfigFile x	safe-read
+nuget sources -Format	safe-read
+nuget sources -Format x	safe-read
+nuget sources -Name x	safe-read
+nuget sources -Password x	safe-read
+nuget sources -ProtocolVersion x	safe-read
+nuget sources -Source x	safe-read
+nuget sources -StorePasswordInClearText x	safe-read
+nuget sources -Username x	safe-read
+nuget sources -Verbosity x	safe-read
+nuget sources -help	safe-read
+nuget sources x	safe-read
+nuget spec	denied
+nuget spec --help	safe-write
+nuget spec --help -?	safe-write
+nuget spec --help -AssemblyPath x	safe-write
+nuget spec --help x	safe-write
+nuget spec -?	safe-write
+nuget spec -AssemblyPath x	safe-write
+nuget spec -Force	safe-write
+nuget spec -help	safe-write
+nuget spec x	safe-write
+nuget trusted-signers	denied
+nuget trusted-signers x	denied
+nuget update	denied
+nuget update x	denied
+nuget verify	denied
+nuget verify --help	safe-read
+nuget verify --help -?	safe-read
+nuget verify --help -CertificateFingerprint x	safe-read
+nuget verify --help x	safe-read
+nuget verify -?	safe-read
+nuget verify -All	safe-read
+nuget verify -CertificateFingerprint x	safe-read
+nuget verify -ConfigFile x	safe-read
+nuget verify -Signatures	safe-read
+nuget verify -Verbosity x	safe-read
+nuget verify -help	safe-read
+nuget verify x	safe-read
+nuget x	denied
+nuke	denied
+nuke --?	inert
+nuke --? --help	inert
+nuke --? x	denied
+nuke --help	inert
+nuke --version	inert
+nuke -?	inert
+nuke -h	inert
+nuke x	denied
+numfmt	inert
+numfmt --debug	inert
+numfmt --debug --delimiter x	inert
+numfmt --debug --grouping	inert
+numfmt --debug x	inert
+numfmt --delimiter x	inert
+numfmt --evil 1024	denied
+numfmt --field 2 --to=iec	inert
+numfmt --field x	inert
+numfmt --format x	inert
+numfmt --from x	inert
+numfmt --from-unit x	inert
+numfmt --from=auto --to=si 1500000	inert
+numfmt --grouping	inert
+numfmt --grouping 1000000	inert
+numfmt --header	inert
+numfmt --header --to=iec	inert
+numfmt --help	inert
+numfmt --invalid x	inert
+numfmt --padding x	inert
+numfmt --round x	inert
+numfmt --suffix x	inert
+numfmt --to x	inert
+numfmt --to-unit x	inert
+numfmt --to=iec 1024	inert
+numfmt --version	inert
+numfmt --zero-terminated	inert
+numfmt -d x	inert
+numfmt -z	inert
+numfmt -z --to=iec	inert
+numfmt x	inert
+nvim	inert
+nvim --clean	inert
+nvim --clean --help	inert
+nvim --clean --startuptime x	inert
+nvim --clean x	inert
+nvim --help	inert
+nvim --noplugin	inert
+nvim --startuptime x	inert
+nvim --version	inert
+nvim -?	inert
+nvim -A	inert
+nvim -D	inert
+nvim -H	inert
+nvim -L	inert
+nvim -M	inert
+nvim -R	inert
+nvim -T x	inert
+nvim -b	inert
+nvim -d	inert
+nvim -h	inert
+nvim -i x	inert
+nvim -m	inert
+nvim -n	inert
+nvim -q x	inert
+nvim -r	inert
+nvim -t x	inert
+nvim -v	inert
+nvim x	inert
+nvm	denied
+nvm --help	inert
+nvm --help --version	denied
+nvm --help x	denied
+nvm --version	inert
+nvm -V	inert
+nvm -h	inert
+nvm current	inert
+nvm current --help	inert
+nvm current --help --lts	inert
+nvm current --help x	inert
+nvm current --lts	inert
+nvm current --no-colors	inert
+nvm current -h	inert
+nvm current x	inert
+nvm list	inert
+nvm list --help	inert
+nvm list --help --lts	inert
+nvm list --help x	inert
+nvm list --lts	inert
+nvm list --no-colors	inert
+nvm list -h	inert
+nvm list x	inert
+nvm ls	inert
+nvm ls --help	inert
+nvm ls --help --lts	inert
+nvm ls --help x	inert
+nvm ls --lts	inert
+nvm ls --no-colors	inert
+nvm ls -h	inert
+nvm ls x	inert
+nvm ls-remote	inert
+nvm ls-remote --help	inert
+nvm ls-remote --help --lts	inert
+nvm ls-remote --help x	inert
+nvm ls-remote --lts	inert
+nvm ls-remote --no-colors	inert
+nvm ls-remote -h	inert
+nvm ls-remote x	inert
+nvm version	inert
+nvm version --help	inert
+nvm version --help --lts	inert
+nvm version --help x	inert
+nvm version --lts	inert
+nvm version --no-colors	inert
+nvm version -h	inert
+nvm version x	inert
+nvm which	inert
+nvm which --help	inert
+nvm which --help --lts	inert
+nvm which --help x	inert
+nvm which --lts	inert
+nvm which --no-colors	inert
+nvm which -h	inert
+nvm which x	inert
+nvm x	denied
+nvtop	denied
+nvtop --help	inert
+nvtop --help --version	inert
+nvtop --help x	denied
+nvtop --version	inert
+nvtop -V	inert
+nvtop -h	inert
+nvtop x	denied
+nx	denied
+nx --help	inert
+nx --help --version	denied
+nx --help x	denied
+nx --version	inert
+nx -h	inert
+nx format	denied
+nx format --all	denied
+nx format --all --base	denied
+nx format --all --exclude x	denied
+nx format --all x	denied
+nx format --base	denied
+nx format --check	inert
+nx format --exclude x	denied
+nx format --files x	denied
+nx format --head	denied
+nx format --help	inert
+nx format --projects x	denied
+nx format --uncommitted	denied
+nx format --untracked	denied
+nx format -h	inert
+nx format x	denied
+nx graph	inert
+nx graph --affected	inert
+nx graph --affected --file x	inert
+nx graph --affected --help	inert
+nx graph --affected x	inert
+nx graph --file x	inert
+nx graph --focus x	inert
+nx graph --groupByFolder x	inert
+nx graph --help	inert
+nx graph --host x	inert
+nx graph --open	inert
+nx graph --port x	inert
+nx graph --targets x	inert
+nx graph --view x	inert
+nx graph --watch	inert
+nx graph -h	inert
+nx graph x	inert
+nx list	inert
+nx list --help	inert
+nx list --help --plugin x	inert
+nx list --help -h	inert
+nx list --help x	inert
+nx list --plugin x	inert
+nx list -h	inert
+nx list x	inert
+nx print-affected	inert
+nx print-affected --all	inert
+nx print-affected --all --base	inert
+nx print-affected --all --exclude x	inert
+nx print-affected --all x	inert
+nx print-affected --base	inert
+nx print-affected --exclude x	inert
+nx print-affected --files x	inert
+nx print-affected --head	inert
+nx print-affected --help	inert
+nx print-affected --select	inert
+nx print-affected --type x	inert
+nx print-affected --uncommitted	inert
+nx print-affected --untracked	inert
+nx print-affected -h	inert
+nx print-affected x	inert
+nx report	inert
+nx report --help	inert
+nx report --help -h	inert
+nx report --help x	inert
+nx report -h	inert
+nx report x	inert
+nx show	denied
+nx show --help	inert
+nx show --help --json	inert
+nx show --help --projects x	inert
+nx show --help x	inert
+nx show --json	inert
+nx show --projects x	inert
+nx show --type x	inert
+nx show --web x	inert
+nx show -h	inert
+nx show x	inert
+nx x	denied
+nyc	denied
+nyc --help	inert
+nyc --help --version	denied
+nyc --help x	denied
+nyc --version	inert
+nyc -h	inert
+nyc -v	inert
+nyc check-coverage	safe-read
+nyc check-coverage --branches x	safe-read
+nyc check-coverage --functions x	safe-read
+nyc check-coverage --help	safe-read
+nyc check-coverage --help --branches x	safe-read
+nyc check-coverage --help --per-file	safe-read
+nyc check-coverage --help x	safe-read
+nyc check-coverage --lines x	safe-read
+nyc check-coverage --per-file	safe-read
+nyc check-coverage --statements x	safe-read
+nyc check-coverage -h	safe-read
+nyc check-coverage x	safe-read
+nyc help	inert
+nyc help x	inert
+nyc instrument	denied
+nyc instrument --complete-copy	safe-write
+nyc instrument --complete-copy --delete	safe-write
+nyc instrument --complete-copy --exclude x	safe-write
+nyc instrument --complete-copy x	safe-write
+nyc instrument --delete	safe-write
+nyc instrument --exclude x	safe-write
+nyc instrument --help	safe-write
+nyc instrument --in-place	safe-write
+nyc instrument --include x	safe-write
+nyc instrument --require x	safe-write
+nyc instrument --source-map x	safe-write
+nyc instrument -h	safe-write
+nyc instrument x	safe-write
+nyc merge	denied
+nyc merge --help	safe-write
+nyc merge --help -h	safe-write
+nyc merge --help x	safe-write
+nyc merge -h	safe-write
+nyc merge x	safe-write
+nyc report	safe-read
+nyc report --all	safe-read
+nyc report --all --clean	safe-read
+nyc report --all --report-dir x	safe-read
+nyc report --all x	safe-read
+nyc report --clean	safe-read
+nyc report --help	safe-read
+nyc report --report-dir x	safe-read
+nyc report --reporter x	safe-read
+nyc report --temp-directory x	safe-read
+nyc report -h	safe-read
+nyc report -r x	safe-read
+nyc report x	safe-read
+nyc x	denied

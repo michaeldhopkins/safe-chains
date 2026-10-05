@@ -1,0 +1,3816 @@
+k6	denied
+k6 --archive-out x	denied
+k6 --help	inert
+k6 --help --archive-out x	denied
+k6 --help --version	denied
+k6 --help x	denied
+k6 --out x	denied
+k6 --output x	denied
+k6 --version	inert
+k6 -O x	denied
+k6 -h	inert
+k6 -o x	denied
+k6 -v	inert
+k6 archive	denied
+k6 archive --archive-out x	safe-write
+k6 archive --config x	safe-write
+k6 archive --exclude-env-vars	safe-write
+k6 archive --exclude-env-vars --archive-out x	safe-write
+k6 archive --exclude-env-vars --help	safe-write
+k6 archive --exclude-env-vars x	safe-write
+k6 archive --help	safe-write
+k6 archive --include-system-env-vars x	safe-write
+k6 archive --out x	safe-write
+k6 archive -O ./archive.tar script.js	safe-write
+k6 archive -O x	safe-write
+k6 archive -c x	safe-write
+k6 archive -h	safe-write
+k6 archive -o x	safe-write
+k6 archive script.js	safe-write
+k6 archive x	safe-write
+k6 cloud	denied
+k6 cloud x	denied
+k6 completion	denied
+k6 completion --help	inert
+k6 completion --help -h	inert
+k6 completion --help x	inert
+k6 completion -h	inert
+k6 completion x	inert
+k6 convert	denied
+k6 convert --correlate	safe-read
+k6 convert --correlate --enable-status-code-checks x	safe-read
+k6 convert --correlate --help	safe-read
+k6 convert --correlate x	safe-read
+k6 convert --enable-status-code-checks x	safe-read
+k6 convert --help	safe-read
+k6 convert --no-batch x	safe-read
+k6 convert --only x	safe-read
+k6 convert --output ./script.js recording.har	safe-read
+k6 convert --output x	safe-read
+k6 convert --return-on-failed-check x	safe-read
+k6 convert --skip x	safe-read
+k6 convert -h	safe-read
+k6 convert -o x	safe-read
+k6 convert x	safe-read
+k6 help	inert
+k6 help x	inert
+k6 inspect	denied
+k6 inspect --execution-requirements	safe-read
+k6 inspect --execution-requirements --help	safe-read
+k6 inspect --execution-requirements x	safe-read
+k6 inspect --help	safe-read
+k6 inspect -h	safe-read
+k6 inspect script.js	safe-read
+k6 inspect x	safe-read
+k6 login	denied
+k6 login x	denied
+k6 new	denied
+k6 new x	denied
+k6 pause	denied
+k6 pause x	denied
+k6 resume	denied
+k6 resume x	denied
+k6 run	denied
+k6 run x	denied
+k6 scale	denied
+k6 scale x	denied
+k6 stats	denied
+k6 stats x	denied
+k6 status	denied
+k6 status x	denied
+k6 version	inert
+k6 version --help	inert
+k6 version --help -h	inert
+k6 version --help x	inert
+k6 version -h	inert
+k6 version x	inert
+k6 x	denied
+kafka-console-consumer	denied
+kafka-console-consumer --bootstrap-server x	safe-read
+kafka-console-consumer --consumer-config x	safe-read
+kafka-console-consumer --consumer-property x	safe-read
+kafka-console-consumer --consumer.config x	safe-read
+kafka-console-consumer --enable-systest-events	safe-read
+kafka-console-consumer --enable-systest-events --bootstrap-server x	safe-read
+kafka-console-consumer --enable-systest-events --from-beginning	safe-read
+kafka-console-consumer --enable-systest-events x	safe-read
+kafka-console-consumer --formatter x	safe-read
+kafka-console-consumer --formatter-config x	safe-read
+kafka-console-consumer --from-beginning	safe-read
+kafka-console-consumer --group x	safe-read
+kafka-console-consumer --help	safe-read
+kafka-console-consumer --include x	safe-read
+kafka-console-consumer --isolation-level x	safe-read
+kafka-console-consumer --key-deserializer x	safe-read
+kafka-console-consumer --max-messages x	safe-read
+kafka-console-consumer --offset x	safe-read
+kafka-console-consumer --partition x	safe-read
+kafka-console-consumer --property x	safe-read
+kafka-console-consumer --skip-message-on-error	safe-read
+kafka-console-consumer --timeout-ms x	safe-read
+kafka-console-consumer --topic x	safe-read
+kafka-console-consumer --value-deserializer x	safe-read
+kafka-console-consumer --version	safe-read
+kafka-console-consumer --whitelist x	safe-read
+kafka-console-consumer -h	safe-read
+kafka-console-consumer x	safe-read
+kafka-consumer-groups	denied
+kafka-consumer-groups --all-groups	denied
+kafka-consumer-groups --all-groups --bootstrap-server x	denied
+kafka-consumer-groups --all-groups --help	inert
+kafka-consumer-groups --all-groups x	denied
+kafka-consumer-groups --bootstrap-server x	denied
+kafka-consumer-groups --command-config x	denied
+kafka-consumer-groups --describe	inert
+kafka-consumer-groups --describe --all-groups	inert
+kafka-consumer-groups --describe --all-groups --bootstrap-server x	inert
+kafka-consumer-groups --describe --all-groups --help	inert
+kafka-consumer-groups --describe --all-groups x	inert
+kafka-consumer-groups --describe --bootstrap-server x	inert
+kafka-consumer-groups --describe --command-config x	inert
+kafka-consumer-groups --describe --group x	inert
+kafka-consumer-groups --describe --help	inert
+kafka-consumer-groups --describe --members	inert
+kafka-consumer-groups --describe --offsets	inert
+kafka-consumer-groups --describe --state	inert
+kafka-consumer-groups --describe --timeout x	inert
+kafka-consumer-groups --describe --verbose	inert
+kafka-consumer-groups --describe -h	inert
+kafka-consumer-groups --describe x	inert
+kafka-consumer-groups --group x	denied
+kafka-consumer-groups --help	inert
+kafka-consumer-groups --list	inert
+kafka-consumer-groups --list --bootstrap-server x	inert
+kafka-consumer-groups --list --command-config x	inert
+kafka-consumer-groups --list --help	inert
+kafka-consumer-groups --list --help --bootstrap-server x	inert
+kafka-consumer-groups --list --help -h	inert
+kafka-consumer-groups --list --help x	inert
+kafka-consumer-groups --list --state x	inert
+kafka-consumer-groups --list -h	inert
+kafka-consumer-groups --list x	inert
+kafka-consumer-groups --members	denied
+kafka-consumer-groups --offsets	denied
+kafka-consumer-groups --state	denied
+kafka-consumer-groups --timeout x	denied
+kafka-consumer-groups --verbose	denied
+kafka-consumer-groups --version	inert
+kafka-consumer-groups -h	inert
+kafka-consumer-groups x	denied
+kafka-topics	denied
+kafka-topics --bootstrap-server x	denied
+kafka-topics --command-config x	denied
+kafka-topics --describe	inert
+kafka-topics --describe --at-min-isr-partitions	inert
+kafka-topics --describe --at-min-isr-partitions --bootstrap-server x	inert
+kafka-topics --describe --at-min-isr-partitions --exclude-internal	inert
+kafka-topics --describe --at-min-isr-partitions x	inert
+kafka-topics --describe --bootstrap-server x	inert
+kafka-topics --describe --command-config x	inert
+kafka-topics --describe --exclude-internal	inert
+kafka-topics --describe --exclude-topic x	inert
+kafka-topics --describe --help	inert
+kafka-topics --describe --partition x	inert
+kafka-topics --describe --topic x	inert
+kafka-topics --describe --topic-id x	inert
+kafka-topics --describe --topic-id-type x	inert
+kafka-topics --describe --unavailable-partitions	inert
+kafka-topics --describe --under-min-isr-partitions	inert
+kafka-topics --describe --under-replicated-partitions	inert
+kafka-topics --describe -h	inert
+kafka-topics --describe x	inert
+kafka-topics --exclude-internal	denied
+kafka-topics --exclude-internal --bootstrap-server x	denied
+kafka-topics --exclude-internal --help	inert
+kafka-topics --exclude-internal x	denied
+kafka-topics --exclude-topic x	denied
+kafka-topics --help	inert
+kafka-topics --list	inert
+kafka-topics --list --bootstrap-server x	inert
+kafka-topics --list --command-config x	inert
+kafka-topics --list --exclude-internal	inert
+kafka-topics --list --exclude-internal --bootstrap-server x	inert
+kafka-topics --list --exclude-internal --help	inert
+kafka-topics --list --exclude-internal x	inert
+kafka-topics --list --exclude-topic x	inert
+kafka-topics --list --help	inert
+kafka-topics --list --topic x	inert
+kafka-topics --list --topic-id x	inert
+kafka-topics --list --topic-id-type x	inert
+kafka-topics --list -h	inert
+kafka-topics --list x	inert
+kafka-topics --topic x	denied
+kafka-topics --topic-id x	denied
+kafka-topics --topic-id-type x	denied
+kafka-topics --version	inert
+kafka-topics -h	inert
+kafka-topics x	denied
+kamal	denied
+kamal --help	inert
+kamal --help --version	denied
+kamal --help x	denied
+kamal --version	inert
+kamal -h	inert
+kamal -v	inert
+kamal accessory	denied
+kamal accessory x	denied
+kamal app	denied
+kamal app x	denied
+kamal audit	denied
+kamal audit x	denied
+kamal build	denied
+kamal build x	denied
+kamal config	denied
+kamal config x	denied
+kamal deploy	denied
+kamal deploy x	denied
+kamal details	denied
+kamal details x	denied
+kamal envify	denied
+kamal envify x	denied
+kamal help	inert
+kamal help x	inert
+kamal init	denied
+kamal init x	denied
+kamal lock	denied
+kamal lock x	denied
+kamal proxy	denied
+kamal proxy x	denied
+kamal prune	denied
+kamal prune x	denied
+kamal redeploy	denied
+kamal redeploy x	denied
+kamal registry	denied
+kamal registry x	denied
+kamal remove	denied
+kamal remove x	denied
+kamal rollback	denied
+kamal rollback x	denied
+kamal secrets	denied
+kamal secrets x	denied
+kamal server	denied
+kamal server x	denied
+kamal setup	denied
+kamal setup x	denied
+kamal traefik	denied
+kamal traefik x	denied
+kamal upgrade	denied
+kamal upgrade x	denied
+kamal version	inert
+kamal version --help	inert
+kamal version --help -h	inert
+kamal version --help x	inert
+kamal version -h	inert
+kamal version x	inert
+kamal x	denied
+kapp	denied
+kapp --help	inert
+kapp --help --version	denied
+kapp --help x	denied
+kapp --version	inert
+kapp -h	inert
+kapp -v	inert
+kapp app-change	denied
+kapp app-change x	denied
+kapp cancel	denied
+kapp cancel x	denied
+kapp completion	denied
+kapp completion --help	inert
+kapp completion --help -h	inert
+kapp completion --help x	inert
+kapp completion -h	inert
+kapp completion x	inert
+kapp config	denied
+kapp config x	denied
+kapp delete	denied
+kapp delete x	denied
+kapp deploy	denied
+kapp deploy x	denied
+kapp help	inert
+kapp help x	inert
+kapp inspect	denied
+kapp inspect --app x	safe-read
+kapp inspect --filter x	safe-read
+kapp inspect --help	safe-read
+kapp inspect --help --app x	safe-read
+kapp inspect --help --raw	safe-read
+kapp inspect --help x	safe-read
+kapp inspect --kubeconfig x	safe-read
+kapp inspect --kubeconfig-context x	safe-read
+kapp inspect --namespace x	safe-read
+kapp inspect --raw	safe-read
+kapp inspect --tree	safe-read
+kapp inspect -a x	safe-read
+kapp inspect -h	safe-read
+kapp inspect -n x	safe-read
+kapp inspect -t	safe-read
+kapp inspect x	safe-read
+kapp label-change	denied
+kapp label-change x	denied
+kapp list	safe-read
+kapp list --all-namespaces	safe-read
+kapp list --all-namespaces --help	safe-read
+kapp list --all-namespaces --namespace x	safe-read
+kapp list --all-namespaces x	safe-read
+kapp list --help	safe-read
+kapp list --namespace	safe-read
+kapp list --namespace x	safe-read
+kapp list -A	safe-read
+kapp list -h	safe-read
+kapp list -n	safe-read
+kapp list -n x	safe-read
+kapp list x	safe-read
+kapp logs	denied
+kapp logs x	denied
+kapp pause	denied
+kapp pause x	denied
+kapp rename	denied
+kapp rename x	denied
+kapp set	denied
+kapp set x	denied
+kapp tools	denied
+kapp tools x	denied
+kapp version	inert
+kapp version --help	inert
+kapp version --help -h	inert
+kapp version --help x	inert
+kapp version -h	inert
+kapp version x	inert
+kapp x	denied
+karma	denied
+karma --browsers x	denied
+karma --format-error x	denied
+karma --help	inert
+karma --help --browsers x	denied
+karma --help --version	denied
+karma --help x	denied
+karma --hostname x	denied
+karma --log-level x	denied
+karma --port x	denied
+karma --protocol x	denied
+karma --report-slower-than x	denied
+karma --reporters x	denied
+karma --version	inert
+karma -h	inert
+karma completion	inert
+karma completion --help	inert
+karma completion --help -h	inert
+karma completion --help x	denied
+karma completion -h	inert
+karma completion x	denied
+karma init	denied
+karma run	safe-read
+karma run --fail-on-empty-test-suite	safe-read
+karma run --fail-on-empty-test-suite --help	safe-read
+karma run --fail-on-empty-test-suite --port x	safe-read
+karma run --fail-on-empty-test-suite x	denied
+karma run --help	safe-read
+karma run --no-refresh	safe-read
+karma run --port x	safe-read
+karma run -h	safe-read
+karma run x	denied
+karma start	safe-read
+karma start --auto-watch	safe-read
+karma start --auto-watch --browsers x	safe-read
+karma start --auto-watch --colors	safe-read
+karma start --auto-watch x	safe-write
+karma start --browsers x	safe-read
+karma start --colors	safe-read
+karma start --detached	safe-read
+karma start --fail-on-empty-test-suite	safe-read
+karma start --fail-on-failing-test-suite	safe-read
+karma start --format-error /etc/evil.js	denied
+karma start --format-error x	safe-read
+karma start --help	safe-read
+karma start --hostname x	safe-read
+karma start --log-level x	safe-read
+karma start --no-auto-watch	safe-read
+karma start --no-colors	safe-read
+karma start --no-fail-on-empty-test-suite	safe-read
+karma start --no-fail-on-failing-test-suite	safe-read
+karma start --no-single-run	safe-read
+karma start --port x	safe-read
+karma start --protocol x	safe-read
+karma start --report-slower-than x	safe-read
+karma start --reporters x	safe-read
+karma start --single-run	safe-read
+karma start -h	safe-read
+karma start ./ok.conf.js /etc/evil.conf.js	denied
+karma start /etc/evil.conf.js	denied
+karma start karma.conf.js --single-run --browsers ChromeHeadless	safe-write
+karma start x	safe-write
+karma start ~/evil.conf.js	denied
+karma stop	safe-read
+karma stop --help	safe-read
+karma stop --help --port x	safe-read
+karma stop --help -h	safe-read
+karma stop --help x	denied
+karma stop --port x	safe-read
+karma stop -h	safe-read
+karma stop x	denied
+karma x	denied
+kcc	inert
+kcc --help	inert
+kcc --help --version	inert
+kcc --help x	denied
+kcc --version	inert
+kcc x	denied
+kdestroy	safe-write
+kdestroy --all	safe-write
+kdestroy --all --cache x	safe-write
+kdestroy --all --help	safe-write
+kdestroy --all x	safe-write
+kdestroy --cache x	safe-write
+kdestroy --credential x	safe-write
+kdestroy --help	safe-write
+kdestroy --no-delete-v4	safe-write
+kdestroy --no-unlog	safe-write
+kdestroy --principal x	safe-write
+kdestroy --version	safe-write
+kdestroy -A	safe-write
+kdestroy -a	safe-write
+kdestroy -c x	safe-write
+kdestroy -p x	safe-write
+kdestroy x	safe-write
+kernprof	denied
+kernprof --help	inert
+kernprof --help --version	inert
+kernprof --help x	denied
+kernprof --version	inert
+kernprof -V	inert
+kernprof -h	inert
+kernprof x	denied
+kextfind	inert
+kextfind --and	inert
+kextfind --and --arch x	inert
+kextfind --and --authentic	inert
+kextfind --and x	inert
+kextfind --arch x	inert
+kextfind --arch-exact x	inert
+kextfind --authentic	inert
+kextfind --bundle-id x	inert
+kextfind --bundle-name x	inert
+kextfind --case-insensitive	inert
+kextfind --defines-symbol x	inert
+kextfind --dependencies-met	inert
+kextfind --dependencies-missing	inert
+kextfind --echo	inert
+kextfind --executable	inert
+kextfind --has-plugins	inert
+kextfind --help	inert
+kextfind --inauthentic	inert
+kextfind --invalid	inert
+kextfind --kernel-resource	inert
+kextfind --library	inert
+kextfind --loadable	inert
+kextfind --loaded	inert
+kextfind --match-property x	inert
+kextfind --match-property-exists x	inert
+kextfind --no-executable	inert
+kextfind --no-paths	inert
+kextfind --nonloadable	inert
+kextfind --not	inert
+kextfind --null	inert
+kextfind --or	inert
+kextfind --plugin	inert
+kextfind --print	inert
+kextfind --print0	inert
+kextfind --property x	inert
+kextfind --property-exists x	inert
+kextfind --references-symbol x	inert
+kextfind --relative-paths	inert
+kextfind --report x	inert
+kextfind --search-item x	inert
+kextfind --set-arch x	inert
+kextfind --substring	inert
+kextfind --subtree-immediate	inert
+kextfind --system-extensions	inert
+kextfind --valid	inert
+kextfind --version	inert
+kextfind --warnings	inert
+kextfind -0	inert
+kextfind -B x	inert
+kextfind -arch x	inert
+kextfind -ax x	inert
+kextfind -b x	inert
+kextfind -d	inert
+kextfind -dsym x	inert
+kextfind -e	inert
+kextfind -f x	inert
+kextfind -h	inert
+kextfind -i	inert
+kextfind -l	inert
+kextfind -m x	inert
+kextfind -me x	inert
+kextfind -nd	inert
+kextfind -nl	inert
+kextfind -nv	inert
+kextfind -nx	inert
+kextfind -p x	inert
+kextfind -pe x	inert
+kextfind -rsym x	inert
+kextfind -s	inert
+kextfind -v	inert
+kextfind -w	inert
+kextfind -x	inert
+kextfind x	inert
+kextlibs	denied
+kextlibs --all-symbols	inert
+kextlibs --all-symbols --arch x	inert
+kextlibs --all-symbols --compatible-versions	inert
+kextlibs --all-symbols x	inert
+kextlibs --arch x	inert
+kextlibs --compatible-versions	inert
+kextlibs --help	inert
+kextlibs --multdef-symbols	inert
+kextlibs --non-kpi	inert
+kextlibs --onedef-symbols	inert
+kextlibs --repository x	inert
+kextlibs --undef-symbols	inert
+kextlibs --version	denied
+kextlibs --xml	inert
+kextlibs -a x	inert
+kextlibs -c	inert
+kextlibs -h	inert
+kextlibs -r x	inert
+kextlibs x	inert
+kextstat	inert
+kextstat --arch	inert
+kextstat --arch --bundle-id x	inert
+kextstat --arch --help	inert
+kextstat --arch x	inert
+kextstat --bundle-id x	inert
+kextstat --help	inert
+kextstat --list-only	inert
+kextstat --no-kernel	inert
+kextstat --sort	inert
+kextstat --version	denied
+kextstat -a	inert
+kextstat -b x	inert
+kextstat -h	inert
+kextstat -k	inert
+kextstat -l	inert
+kextstat -s	inert
+kextstat x	inert
+keytool	denied
+keytool --help	inert
+keytool --help --version	denied
+keytool --help x	denied
+keytool --version	inert
+keytool -V	inert
+keytool -h	inert
+keytool -list	inert
+keytool -list --help	inert
+keytool -list --help -alias x	inert
+keytool -list --help -h	inert
+keytool -list --help x	denied
+keytool -list -alias x	inert
+keytool -list -h	inert
+keytool -list -keystore x	inert
+keytool -list -rfc	inert
+keytool -list -storepass x	inert
+keytool -list -storetype x	inert
+keytool -list -v	inert
+keytool -list x	denied
+keytool -printcert	inert
+keytool -printcert --help	inert
+keytool -printcert --help -file x	inert
+keytool -printcert --help -h	inert
+keytool -printcert --help x	denied
+keytool -printcert -file x	inert
+keytool -printcert -h	inert
+keytool -printcert -jarfile x	inert
+keytool -printcert -rfc	inert
+keytool -printcert -v	inert
+keytool -printcert x	denied
+keytool x	denied
+kgetcred	denied
+kgetcred --cache x	safe-write
+kgetcred --canonicalize	safe-write
+kgetcred --canonicalize --cache x	safe-write
+kgetcred --canonicalize --help	safe-write
+kgetcred --canonicalize x	safe-write
+kgetcred --enctype x	safe-write
+kgetcred --help	safe-write
+kgetcred --no-transit-check	safe-write
+kgetcred --version	safe-write
+kgetcred -c x	safe-write
+kgetcred -e x	safe-write
+kgetcred x	safe-write
+kill	denied
+kill --help	inert
+kill --help -0	inert
+kill --help x	denied
+kill --version	denied
+kill -0	inert
+kill -0 --help	inert
+kill -0 -0	inert
+kill -0 -L	inert
+kill -0 -h	inert
+kill -0 -l	inert
+kill -L	inert
+kill -h	inert
+kill -l	inert
+kill x	denied
+killall	denied
+killall --help	safe-write
+killall --help -I	safe-write
+killall --help -SIGNAL x	safe-write
+killall --help x	safe-write
+killall --version	denied
+killall -I	safe-write
+killall -SIGNAL x	safe-write
+killall -c x	safe-write
+killall -d	safe-write
+killall -e	safe-write
+killall -l	safe-write
+killall -m	safe-write
+killall -q	safe-write
+killall -s	safe-write
+killall -t x	safe-write
+killall -u x	safe-write
+killall -v	safe-write
+killall -z	safe-write
+killall x	safe-write
+kind	denied
+kind --help	inert
+kind --help --version	denied
+kind --help x	denied
+kind --version	inert
+kind -h	inert
+kind get	denied
+kind get clusters	inert
+kind get clusters --help	inert
+kind get clusters --help -h	inert
+kind get clusters --help x	inert
+kind get clusters -h	inert
+kind get clusters x	inert
+kind get kubeconfig	denied
+kind get kubeconfig --help	inert
+kind get kubeconfig --help --internal	inert
+kind get kubeconfig --help --name x	inert
+kind get kubeconfig --help x	inert
+kind get kubeconfig --internal	inert
+kind get kubeconfig --name x	inert
+kind get kubeconfig -h	inert
+kind get kubeconfig x	inert
+kind get nodes	denied
+kind get nodes --help	inert
+kind get nodes --help --name x	inert
+kind get nodes --help -h	inert
+kind get nodes --help x	inert
+kind get nodes --name x	inert
+kind get nodes -h	inert
+kind get nodes x	inert
+kind get x	denied
+kind version	inert
+kind version --help	inert
+kind version --help -h	inert
+kind version --help x	inert
+kind version -h	inert
+kind version x	inert
+kind x	denied
+kinit	safe-write
+kinit --afslog	safe-write
+kinit --afslog --anonymous	safe-write
+kinit --afslog --cache x	safe-write
+kinit --afslog x	safe-write
+kinit --anonymous	safe-write
+kinit --cache x	safe-write
+kinit --canonicalize	safe-write
+kinit --enctypes x	safe-write
+kinit --enterprise	safe-write
+kinit --extra-addresses x	safe-write
+kinit --fcache-version x	safe-write
+kinit --forwardable	safe-write
+kinit --help	safe-write
+kinit --keytab x	safe-write
+kinit --lifetime x	safe-write
+kinit --no-addresses	safe-write
+kinit --no-forwardable	safe-write
+kinit --password-file x	safe-write
+kinit --proxiable	safe-write
+kinit --renew	safe-write
+kinit --renewable	safe-write
+kinit --renewable-life x	safe-write
+kinit --server x	safe-write
+kinit --start-time x	safe-write
+kinit --use-keytab	safe-write
+kinit --validate	safe-write
+kinit --verbose	safe-write
+kinit --version	safe-write
+kinit -A	safe-write
+kinit -R	safe-write
+kinit -S x	safe-write
+kinit -V	safe-write
+kinit -a x	safe-write
+kinit -c x	safe-write
+kinit -e x	safe-write
+kinit -f	safe-write
+kinit -k	safe-write
+kinit -l x	safe-write
+kinit -p	safe-write
+kinit -r x	safe-write
+kinit -s x	safe-write
+kinit -t x	safe-write
+kinit -v	safe-write
+kinit x	safe-write
+klist	inert
+klist --cache x	inert
+klist --help	inert
+klist --help --cache x	inert
+klist --help --list-caches	inert
+klist --help x	inert
+klist --list-caches	inert
+klist --test	inert
+klist --tokens	inert
+klist --v5	inert
+klist --verbose	inert
+klist --version	inert
+klist -5	inert
+klist -T	inert
+klist -c x	inert
+klist -f	inert
+klist -h	inert
+klist -l	inert
+klist -s	inert
+klist -t	inert
+klist -v	inert
+klist x	inert
+klist_cdhashes	inert
+klist_cdhashes --help	denied
+klist_cdhashes --version	denied
+klist_cdhashes x	denied
+kn	denied
+kn --help	inert
+kn --help --version	denied
+kn --help x	denied
+kn --version	inert
+kn -h	inert
+kn -v	inert
+kn broker	denied
+kn broker x	denied
+kn channel	denied
+kn channel x	denied
+kn completion	denied
+kn completion --help	inert
+kn completion --help -h	inert
+kn completion --help x	inert
+kn completion -h	inert
+kn completion x	inert
+kn container	denied
+kn container x	denied
+kn domain	denied
+kn domain x	denied
+kn eventtype	denied
+kn eventtype x	denied
+kn func	denied
+kn func x	denied
+kn help	inert
+kn help x	inert
+kn options	denied
+kn options x	denied
+kn plugin	denied
+kn plugin x	denied
+kn revision	inert
+kn revision delete	denied
+kn revision delete x	denied
+kn revision describe	inert
+kn revision describe --help	inert
+kn revision describe --help -h	inert
+kn revision describe --help x	inert
+kn revision describe -h	inert
+kn revision describe x	inert
+kn revision list	inert
+kn revision list --help	inert
+kn revision list --help -h	inert
+kn revision list --help x	inert
+kn revision list -h	inert
+kn revision list x	inert
+kn revision x	denied
+kn route	denied
+kn route x	denied
+kn service	inert
+kn service apply	denied
+kn service apply x	denied
+kn service create	denied
+kn service create x	denied
+kn service delete	denied
+kn service delete x	denied
+kn service describe	inert
+kn service describe --help	inert
+kn service describe --help --namespace x	inert
+kn service describe --help --no-headers	inert
+kn service describe --help x	inert
+kn service describe --namespace x	inert
+kn service describe --no-headers	inert
+kn service describe --output x	inert
+kn service describe --print-details	inert
+kn service describe --verbose	inert
+kn service describe -h	inert
+kn service describe -n x	inert
+kn service describe -o x	inert
+kn service describe -v	inert
+kn service describe x	inert
+kn service export	denied
+kn service export x	denied
+kn service import	denied
+kn service import x	denied
+kn service list	inert
+kn service list --all-namespaces	inert
+kn service list --all-namespaces --help	inert
+kn service list --all-namespaces --namespace x	inert
+kn service list --all-namespaces x	inert
+kn service list --help	inert
+kn service list --namespace x	inert
+kn service list --no-headers	inert
+kn service list --output x	inert
+kn service list -A	inert
+kn service list -h	inert
+kn service list -n x	inert
+kn service list -o x	inert
+kn service list x	inert
+kn service update	denied
+kn service update x	denied
+kn service x	denied
+kn source	denied
+kn source x	denied
+kn subscription	denied
+kn subscription x	denied
+kn trigger	denied
+kn trigger x	denied
+kn version	inert
+kn version --help	inert
+kn version --help --version	inert
+kn version --help x	inert
+kn version --version	inert
+kn version -h	inert
+kn version x	inert
+kn x	denied
+knex	denied
+knex --help	inert
+knex --help --version	denied
+knex --help x	denied
+knex --version	inert
+knex -V	inert
+knex -h	inert
+knex help	inert
+knex help x	inert
+knex init	safe-write
+knex init --cjs	safe-write
+knex init --cjs --client x	safe-write
+knex init --cjs --esm	safe-write
+knex init --cjs x	safe-write
+knex init --client x	safe-write
+knex init --esm	safe-write
+knex init --help	safe-write
+knex init -h	safe-write
+knex init -x	safe-write
+knex init x	safe-write
+knex migrate:currentVersion	safe-read
+knex migrate:currentVersion --env x	safe-read
+knex migrate:currentVersion --help	safe-read
+knex migrate:currentVersion --help --env x	safe-read
+knex migrate:currentVersion --help -h	safe-read
+knex migrate:currentVersion --help x	safe-read
+knex migrate:currentVersion --knexfile x	safe-read
+knex migrate:currentVersion --knexpath x	safe-read
+knex migrate:currentVersion -h	safe-read
+knex migrate:currentVersion x	safe-read
+knex migrate:down	denied
+knex migrate:down x	denied
+knex migrate:latest	denied
+knex migrate:latest x	denied
+knex migrate:list	safe-read
+knex migrate:list --env x	safe-read
+knex migrate:list --help	safe-read
+knex migrate:list --help --env x	safe-read
+knex migrate:list --help -h	safe-read
+knex migrate:list --help x	safe-read
+knex migrate:list --knexfile x	safe-read
+knex migrate:list --knexpath x	safe-read
+knex migrate:list -h	safe-read
+knex migrate:list x	safe-read
+knex migrate:make	denied
+knex migrate:make --cjs	safe-write
+knex migrate:make --cjs --esm	safe-write
+knex migrate:make --cjs --knexfile x	safe-write
+knex migrate:make --cjs x	safe-write
+knex migrate:make --esm	safe-write
+knex migrate:make --help	safe-write
+knex migrate:make --knexfile x	safe-write
+knex migrate:make --knexpath x	safe-write
+knex migrate:make --specific x	safe-write
+knex migrate:make --stub	safe-write
+knex migrate:make --timestamp-filename-date	safe-write
+knex migrate:make -h	safe-write
+knex migrate:make x	safe-write
+knex migrate:rollback	denied
+knex migrate:rollback x	denied
+knex migrate:status	safe-read
+knex migrate:status --env x	safe-read
+knex migrate:status --help	safe-read
+knex migrate:status --help --env x	safe-read
+knex migrate:status --help -h	safe-read
+knex migrate:status --help x	safe-read
+knex migrate:status --knexfile x	safe-read
+knex migrate:status --knexpath x	safe-read
+knex migrate:status -h	safe-read
+knex migrate:status x	safe-read
+knex migrate:unlock	denied
+knex migrate:unlock x	denied
+knex migrate:up	denied
+knex migrate:up x	denied
+knex seed:make	denied
+knex seed:make --cjs	safe-write
+knex seed:make --cjs --esm	safe-write
+knex seed:make --cjs --knexfile x	safe-write
+knex seed:make --cjs x	safe-write
+knex seed:make --esm	safe-write
+knex seed:make --help	safe-write
+knex seed:make --knexfile x	safe-write
+knex seed:make --knexpath x	safe-write
+knex seed:make --stub x	safe-write
+knex seed:make --timestamp-filename-date x	safe-write
+knex seed:make -h	safe-write
+knex seed:make x	safe-write
+knex seed:run	denied
+knex seed:run x	denied
+knex x	denied
+knife	denied
+knife --help	inert
+knife --help --version	inert
+knife --help x	denied
+knife --version	inert
+knife -h	inert
+knife -v	inert
+knife x	denied
+knip	safe-read
+knip --cache-location x	safe-read
+knip --config x	safe-read
+knip --debug	safe-read
+knip --debug --cache-location x	safe-read
+knip --debug --dependencies	safe-read
+knip --debug x	safe-read
+knip --dependencies	safe-read
+knip --exclude x	safe-read
+knip --exports	safe-read
+knip --files	safe-read
+knip --help	safe-read
+knip --include x	safe-read
+knip --include-entry-exports	safe-read
+knip --include-libs	safe-read
+knip --isolate-workspaces	safe-read
+knip --max-issues x	safe-read
+knip --no-config-hints	safe-read
+knip --no-exit-code	safe-read
+knip --no-gitignore	safe-read
+knip --no-progress	safe-read
+knip --performance	safe-read
+knip --production	safe-read
+knip --reporter x	safe-read
+knip --strict	safe-read
+knip --tags x	safe-read
+knip --tsConfig x	safe-read
+knip --version	safe-read
+knip --workspace x	safe-read
+knip -V	safe-read
+knip -W x	safe-read
+knip -c x	safe-read
+knip -h	safe-read
+knip -t x	safe-read
+knip x	safe-read
+kotlinc	denied
+kotlinc --help	safe-write
+kotlinc --help --release x	safe-write
+kotlinc --help -Werror	safe-write
+kotlinc --help x	safe-write
+kotlinc --release x	safe-write
+kotlinc --version	denied
+kotlinc -Werror	safe-write
+kotlinc -X	safe-write
+kotlinc -Xfriend-paths x	safe-write
+kotlinc -Xjava-source-roots	safe-write
+kotlinc -Xjvm-default	safe-write
+kotlinc -Xnew-inference	safe-write
+kotlinc -Xno-call-assertions	safe-write
+kotlinc -Xno-receiver-assertions	safe-write
+kotlinc -Xplugin x	safe-write
+kotlinc -api-version x	safe-write
+kotlinc -classpath x	safe-write
+kotlinc -cp x	safe-write
+kotlinc -d x	safe-write
+kotlinc -expression x	safe-write
+kotlinc -h	safe-write
+kotlinc -help	safe-write
+kotlinc -include-runtime	safe-write
+kotlinc -java-parameters	safe-write
+kotlinc -jdk-home x	safe-write
+kotlinc -jvm-target	safe-write
+kotlinc -kotlin-home x	safe-write
+kotlinc -language-version	safe-write
+kotlinc -language-version x	safe-write
+kotlinc -module-name x	safe-write
+kotlinc -no-jdk	safe-write
+kotlinc -no-reflect	safe-write
+kotlinc -no-stdlib	safe-write
+kotlinc -nowarn	safe-write
+kotlinc -opt-in x	safe-write
+kotlinc -progressive	safe-write
+kotlinc -script	safe-write
+kotlinc -script-templates x	safe-write
+kotlinc -verbose	safe-write
+kotlinc -version	safe-write
+kotlinc x	safe-write
+koyeb	denied
+koyeb --config x	denied
+koyeb --debug	denied
+koyeb --debug --config x	denied
+koyeb --debug --debug-full	denied
+koyeb --debug x	denied
+koyeb --debug-full	denied
+koyeb --force-ascii	denied
+koyeb --full	denied
+koyeb --help	inert
+koyeb --organization x	denied
+koyeb --output x	denied
+koyeb --token x	denied
+koyeb --url x	denied
+koyeb --version	inert
+koyeb -c x	denied
+koyeb -d	denied
+koyeb -h	inert
+koyeb -o x	denied
+koyeb -v	inert
+koyeb a	inert
+koyeb a create	denied
+koyeb a create --help	denied
+koyeb a create --help --organization x	denied
+koyeb a create --help -h	denied
+koyeb a create --help x	denied
+koyeb a create --organization x	denied
+koyeb a create --output x	denied
+koyeb a create -h	denied
+koyeb a create -o x	denied
+koyeb a create x	denied
+koyeb a delete	denied
+koyeb a delete --help	denied
+koyeb a delete --help --organization x	denied
+koyeb a delete --help -h	denied
+koyeb a delete --help x	denied
+koyeb a delete --organization x	denied
+koyeb a delete --output x	denied
+koyeb a delete -h	denied
+koyeb a delete -o x	denied
+koyeb a delete x	denied
+koyeb a describe	denied
+koyeb a describe --help	inert
+koyeb a describe --help --organization x	inert
+koyeb a describe --help -h	inert
+koyeb a describe --help x	inert
+koyeb a describe --organization x	inert
+koyeb a describe --output x	inert
+koyeb a describe --token x	inert
+koyeb a describe --url x	inert
+koyeb a describe -h	inert
+koyeb a describe -o x	inert
+koyeb a describe x	inert
+koyeb a get	denied
+koyeb a get --help	inert
+koyeb a get --help --organization x	inert
+koyeb a get --help -h	inert
+koyeb a get --help x	inert
+koyeb a get --organization x	inert
+koyeb a get --output x	inert
+koyeb a get --token x	inert
+koyeb a get --url x	inert
+koyeb a get -h	inert
+koyeb a get -o x	inert
+koyeb a get x	inert
+koyeb a init	denied
+koyeb a init --help	denied
+koyeb a init --help --organization x	denied
+koyeb a init --help -h	denied
+koyeb a init --help x	denied
+koyeb a init --organization x	denied
+koyeb a init --output x	denied
+koyeb a init -h	denied
+koyeb a init -o x	denied
+koyeb a init x	denied
+koyeb a list	inert
+koyeb a list --help	inert
+koyeb a list --help --organization x	inert
+koyeb a list --help -h	inert
+koyeb a list --help x	inert
+koyeb a list --organization x	inert
+koyeb a list --output x	inert
+koyeb a list --token x	inert
+koyeb a list --url x	inert
+koyeb a list -h	inert
+koyeb a list -o x	inert
+koyeb a list x	inert
+koyeb a pause	denied
+koyeb a pause --help	denied
+koyeb a pause --help --organization x	denied
+koyeb a pause --help -h	denied
+koyeb a pause --help x	denied
+koyeb a pause --organization x	denied
+koyeb a pause --output x	denied
+koyeb a pause -h	denied
+koyeb a pause -o x	denied
+koyeb a pause x	denied
+koyeb a resume	denied
+koyeb a resume --help	denied
+koyeb a resume --help --organization x	denied
+koyeb a resume --help -h	denied
+koyeb a resume --help x	denied
+koyeb a resume --organization x	denied
+koyeb a resume --output x	denied
+koyeb a resume -h	denied
+koyeb a resume -o x	denied
+koyeb a resume x	denied
+koyeb a update	denied
+koyeb a update --help	denied
+koyeb a update --help --organization x	denied
+koyeb a update --help -h	denied
+koyeb a update --help x	denied
+koyeb a update --organization x	denied
+koyeb a update --output x	denied
+koyeb a update -h	denied
+koyeb a update -o x	denied
+koyeb a update x	denied
+koyeb a x	denied
+koyeb app	inert
+koyeb app create	denied
+koyeb app create --help	denied
+koyeb app create --help --organization x	denied
+koyeb app create --help -h	denied
+koyeb app create --help x	denied
+koyeb app create --organization x	denied
+koyeb app create --output x	denied
+koyeb app create -h	denied
+koyeb app create -o x	denied
+koyeb app create x	denied
+koyeb app delete	denied
+koyeb app delete --help	denied
+koyeb app delete --help --organization x	denied
+koyeb app delete --help -h	denied
+koyeb app delete --help x	denied
+koyeb app delete --organization x	denied
+koyeb app delete --output x	denied
+koyeb app delete -h	denied
+koyeb app delete -o x	denied
+koyeb app delete x	denied
+koyeb app describe	denied
+koyeb app describe --help	inert
+koyeb app describe --help --organization x	inert
+koyeb app describe --help -h	inert
+koyeb app describe --help x	inert
+koyeb app describe --organization x	inert
+koyeb app describe --output x	inert
+koyeb app describe --token x	inert
+koyeb app describe --url x	inert
+koyeb app describe -h	inert
+koyeb app describe -o x	inert
+koyeb app describe x	inert
+koyeb app get	denied
+koyeb app get --help	inert
+koyeb app get --help --organization x	inert
+koyeb app get --help -h	inert
+koyeb app get --help x	inert
+koyeb app get --organization x	inert
+koyeb app get --output x	inert
+koyeb app get --token x	inert
+koyeb app get --url x	inert
+koyeb app get -h	inert
+koyeb app get -o x	inert
+koyeb app get x	inert
+koyeb app init	denied
+koyeb app init --help	denied
+koyeb app init --help --organization x	denied
+koyeb app init --help -h	denied
+koyeb app init --help x	denied
+koyeb app init --organization x	denied
+koyeb app init --output x	denied
+koyeb app init -h	denied
+koyeb app init -o x	denied
+koyeb app init x	denied
+koyeb app list	inert
+koyeb app list --help	inert
+koyeb app list --help --organization x	inert
+koyeb app list --help -h	inert
+koyeb app list --help x	inert
+koyeb app list --organization x	inert
+koyeb app list --output x	inert
+koyeb app list --token x	inert
+koyeb app list --url x	inert
+koyeb app list -h	inert
+koyeb app list -o x	inert
+koyeb app list x	inert
+koyeb app pause	denied
+koyeb app pause --help	denied
+koyeb app pause --help --organization x	denied
+koyeb app pause --help -h	denied
+koyeb app pause --help x	denied
+koyeb app pause --organization x	denied
+koyeb app pause --output x	denied
+koyeb app pause -h	denied
+koyeb app pause -o x	denied
+koyeb app pause x	denied
+koyeb app resume	denied
+koyeb app resume --help	denied
+koyeb app resume --help --organization x	denied
+koyeb app resume --help -h	denied
+koyeb app resume --help x	denied
+koyeb app resume --organization x	denied
+koyeb app resume --output x	denied
+koyeb app resume -h	denied
+koyeb app resume -o x	denied
+koyeb app resume x	denied
+koyeb app update	denied
+koyeb app update --help	denied
+koyeb app update --help --organization x	denied
+koyeb app update --help -h	denied
+koyeb app update --help x	denied
+koyeb app update --organization x	denied
+koyeb app update --output x	denied
+koyeb app update -h	denied
+koyeb app update -o x	denied
+koyeb app update x	denied
+koyeb app x	denied
+koyeb apps	inert
+koyeb apps create	denied
+koyeb apps create --help	denied
+koyeb apps create --help --organization x	denied
+koyeb apps create --help -h	denied
+koyeb apps create --help x	denied
+koyeb apps create --organization x	denied
+koyeb apps create --output x	denied
+koyeb apps create -h	denied
+koyeb apps create -o x	denied
+koyeb apps create my-app	denied
+koyeb apps create x	denied
+koyeb apps delete	denied
+koyeb apps delete --help	denied
+koyeb apps delete --help --organization x	denied
+koyeb apps delete --help -h	denied
+koyeb apps delete --help x	denied
+koyeb apps delete --organization x	denied
+koyeb apps delete --output x	denied
+koyeb apps delete -h	denied
+koyeb apps delete -o x	denied
+koyeb apps delete x	denied
+koyeb apps describe	denied
+koyeb apps describe --help	inert
+koyeb apps describe --help --organization x	inert
+koyeb apps describe --help -h	inert
+koyeb apps describe --help x	inert
+koyeb apps describe --organization x	inert
+koyeb apps describe --output x	inert
+koyeb apps describe --token x	inert
+koyeb apps describe --url x	inert
+koyeb apps describe -h	inert
+koyeb apps describe -o x	inert
+koyeb apps describe x	inert
+koyeb apps get	denied
+koyeb apps get --help	inert
+koyeb apps get --help --organization x	inert
+koyeb apps get --help -h	inert
+koyeb apps get --help x	inert
+koyeb apps get --organization x	inert
+koyeb apps get --output x	inert
+koyeb apps get --token x	inert
+koyeb apps get --url x	inert
+koyeb apps get -h	inert
+koyeb apps get -o x	inert
+koyeb apps get x	inert
+koyeb apps init	denied
+koyeb apps init --help	denied
+koyeb apps init --help --organization x	denied
+koyeb apps init --help -h	denied
+koyeb apps init --help x	denied
+koyeb apps init --organization x	denied
+koyeb apps init --output x	denied
+koyeb apps init -h	denied
+koyeb apps init -o x	denied
+koyeb apps init x	denied
+koyeb apps list	inert
+koyeb apps list --help	inert
+koyeb apps list --help --organization x	inert
+koyeb apps list --help -h	inert
+koyeb apps list --help x	inert
+koyeb apps list --organization x	inert
+koyeb apps list --output x	inert
+koyeb apps list --token x	inert
+koyeb apps list --url x	inert
+koyeb apps list -h	inert
+koyeb apps list -o x	inert
+koyeb apps list x	inert
+koyeb apps pause	denied
+koyeb apps pause --help	denied
+koyeb apps pause --help --organization x	denied
+koyeb apps pause --help -h	denied
+koyeb apps pause --help x	denied
+koyeb apps pause --organization x	denied
+koyeb apps pause --output x	denied
+koyeb apps pause -h	denied
+koyeb apps pause -o x	denied
+koyeb apps pause x	denied
+koyeb apps resume	denied
+koyeb apps resume --help	denied
+koyeb apps resume --help --organization x	denied
+koyeb apps resume --help -h	denied
+koyeb apps resume --help x	denied
+koyeb apps resume --organization x	denied
+koyeb apps resume --output x	denied
+koyeb apps resume -h	denied
+koyeb apps resume -o x	denied
+koyeb apps resume x	denied
+koyeb apps update	denied
+koyeb apps update --help	denied
+koyeb apps update --help --organization x	denied
+koyeb apps update --help -h	denied
+koyeb apps update --help x	denied
+koyeb apps update --organization x	denied
+koyeb apps update --output x	denied
+koyeb apps update -h	denied
+koyeb apps update -o x	denied
+koyeb apps update x	denied
+koyeb apps x	denied
+koyeb archive	denied
+koyeb archive x	denied
+koyeb archives	denied
+koyeb archives x	denied
+koyeb completion	denied
+koyeb completion x	denied
+koyeb compose	denied
+koyeb compose x	denied
+koyeb d	inert
+koyeb d cancel	denied
+koyeb d cancel x	denied
+koyeb d describe	denied
+koyeb d describe --help	inert
+koyeb d describe --help --organization x	inert
+koyeb d describe --help -h	inert
+koyeb d describe --help x	inert
+koyeb d describe --organization x	inert
+koyeb d describe --output x	inert
+koyeb d describe --token x	inert
+koyeb d describe --url x	inert
+koyeb d describe -h	inert
+koyeb d describe -o x	inert
+koyeb d describe x	inert
+koyeb d get	denied
+koyeb d get --help	inert
+koyeb d get --help --organization x	inert
+koyeb d get --help -h	inert
+koyeb d get --help x	inert
+koyeb d get --organization x	inert
+koyeb d get --output x	inert
+koyeb d get --token x	inert
+koyeb d get --url x	inert
+koyeb d get -h	inert
+koyeb d get -o x	inert
+koyeb d get x	inert
+koyeb d l	denied
+koyeb d l --end-time x	inert
+koyeb d l --help	inert
+koyeb d l --help --end-time x	inert
+koyeb d l --help --tail	inert
+koyeb d l --help x	inert
+koyeb d l --order x	inert
+koyeb d l --regex-search x	inert
+koyeb d l --since x	inert
+koyeb d l --start-time x	inert
+koyeb d l --tail	inert
+koyeb d l --text-search x	inert
+koyeb d l --type x	inert
+koyeb d l -e x	inert
+koyeb d l -h	inert
+koyeb d l -s x	inert
+koyeb d l -t x	inert
+koyeb d l x	inert
+koyeb d list	inert
+koyeb d list --app x	inert
+koyeb d list --help	inert
+koyeb d list --help --app x	inert
+koyeb d list --help -h	inert
+koyeb d list --help x	inert
+koyeb d list --organization x	inert
+koyeb d list --output x	inert
+koyeb d list --service x	inert
+koyeb d list --token x	inert
+koyeb d list --url x	inert
+koyeb d list -h	inert
+koyeb d list -o x	inert
+koyeb d list x	inert
+koyeb d log	denied
+koyeb d log --end-time x	inert
+koyeb d log --help	inert
+koyeb d log --help --end-time x	inert
+koyeb d log --help --tail	inert
+koyeb d log --help x	inert
+koyeb d log --order x	inert
+koyeb d log --regex-search x	inert
+koyeb d log --since x	inert
+koyeb d log --start-time x	inert
+koyeb d log --tail	inert
+koyeb d log --text-search x	inert
+koyeb d log --type x	inert
+koyeb d log -e x	inert
+koyeb d log -h	inert
+koyeb d log -s x	inert
+koyeb d log -t x	inert
+koyeb d log x	inert
+koyeb d logs	denied
+koyeb d logs --end-time x	inert
+koyeb d logs --help	inert
+koyeb d logs --help --end-time x	inert
+koyeb d logs --help --tail	inert
+koyeb d logs --help x	inert
+koyeb d logs --order x	inert
+koyeb d logs --regex-search x	inert
+koyeb d logs --since x	inert
+koyeb d logs --start-time x	inert
+koyeb d logs --tail	inert
+koyeb d logs --text-search x	inert
+koyeb d logs --type x	inert
+koyeb d logs -e x	inert
+koyeb d logs -h	inert
+koyeb d logs -s x	inert
+koyeb d logs -t x	inert
+koyeb d logs x	inert
+koyeb d x	denied
+koyeb databases	denied
+koyeb databases x	denied
+koyeb dep	inert
+koyeb dep cancel	denied
+koyeb dep cancel x	denied
+koyeb dep describe	denied
+koyeb dep describe --help	inert
+koyeb dep describe --help --organization x	inert
+koyeb dep describe --help -h	inert
+koyeb dep describe --help x	inert
+koyeb dep describe --organization x	inert
+koyeb dep describe --output x	inert
+koyeb dep describe --token x	inert
+koyeb dep describe --url x	inert
+koyeb dep describe -h	inert
+koyeb dep describe -o x	inert
+koyeb dep describe x	inert
+koyeb dep get	denied
+koyeb dep get --help	inert
+koyeb dep get --help --organization x	inert
+koyeb dep get --help -h	inert
+koyeb dep get --help x	inert
+koyeb dep get --organization x	inert
+koyeb dep get --output x	inert
+koyeb dep get --token x	inert
+koyeb dep get --url x	inert
+koyeb dep get -h	inert
+koyeb dep get -o x	inert
+koyeb dep get x	inert
+koyeb dep l	denied
+koyeb dep l --end-time x	inert
+koyeb dep l --help	inert
+koyeb dep l --help --end-time x	inert
+koyeb dep l --help --tail	inert
+koyeb dep l --help x	inert
+koyeb dep l --order x	inert
+koyeb dep l --regex-search x	inert
+koyeb dep l --since x	inert
+koyeb dep l --start-time x	inert
+koyeb dep l --tail	inert
+koyeb dep l --text-search x	inert
+koyeb dep l --type x	inert
+koyeb dep l -e x	inert
+koyeb dep l -h	inert
+koyeb dep l -s x	inert
+koyeb dep l -t x	inert
+koyeb dep l x	inert
+koyeb dep list	inert
+koyeb dep list --app x	inert
+koyeb dep list --help	inert
+koyeb dep list --help --app x	inert
+koyeb dep list --help -h	inert
+koyeb dep list --help x	inert
+koyeb dep list --organization x	inert
+koyeb dep list --output x	inert
+koyeb dep list --service x	inert
+koyeb dep list --token x	inert
+koyeb dep list --url x	inert
+koyeb dep list -h	inert
+koyeb dep list -o x	inert
+koyeb dep list x	inert
+koyeb dep log	denied
+koyeb dep log --end-time x	inert
+koyeb dep log --help	inert
+koyeb dep log --help --end-time x	inert
+koyeb dep log --help --tail	inert
+koyeb dep log --help x	inert
+koyeb dep log --order x	inert
+koyeb dep log --regex-search x	inert
+koyeb dep log --since x	inert
+koyeb dep log --start-time x	inert
+koyeb dep log --tail	inert
+koyeb dep log --text-search x	inert
+koyeb dep log --type x	inert
+koyeb dep log -e x	inert
+koyeb dep log -h	inert
+koyeb dep log -s x	inert
+koyeb dep log -t x	inert
+koyeb dep log x	inert
+koyeb dep logs	denied
+koyeb dep logs --end-time x	inert
+koyeb dep logs --help	inert
+koyeb dep logs --help --end-time x	inert
+koyeb dep logs --help --tail	inert
+koyeb dep logs --help x	inert
+koyeb dep logs --order x	inert
+koyeb dep logs --regex-search x	inert
+koyeb dep logs --since x	inert
+koyeb dep logs --start-time x	inert
+koyeb dep logs --tail	inert
+koyeb dep logs --text-search x	inert
+koyeb dep logs --type x	inert
+koyeb dep logs -e x	inert
+koyeb dep logs -h	inert
+koyeb dep logs -s x	inert
+koyeb dep logs -t x	inert
+koyeb dep logs x	inert
+koyeb dep x	denied
+koyeb depl	inert
+koyeb depl cancel	denied
+koyeb depl cancel x	denied
+koyeb depl describe	denied
+koyeb depl describe --help	inert
+koyeb depl describe --help --organization x	inert
+koyeb depl describe --help -h	inert
+koyeb depl describe --help x	inert
+koyeb depl describe --organization x	inert
+koyeb depl describe --output x	inert
+koyeb depl describe --token x	inert
+koyeb depl describe --url x	inert
+koyeb depl describe -h	inert
+koyeb depl describe -o x	inert
+koyeb depl describe x	inert
+koyeb depl get	denied
+koyeb depl get --help	inert
+koyeb depl get --help --organization x	inert
+koyeb depl get --help -h	inert
+koyeb depl get --help x	inert
+koyeb depl get --organization x	inert
+koyeb depl get --output x	inert
+koyeb depl get --token x	inert
+koyeb depl get --url x	inert
+koyeb depl get -h	inert
+koyeb depl get -o x	inert
+koyeb depl get x	inert
+koyeb depl l	denied
+koyeb depl l --end-time x	inert
+koyeb depl l --help	inert
+koyeb depl l --help --end-time x	inert
+koyeb depl l --help --tail	inert
+koyeb depl l --help x	inert
+koyeb depl l --order x	inert
+koyeb depl l --regex-search x	inert
+koyeb depl l --since x	inert
+koyeb depl l --start-time x	inert
+koyeb depl l --tail	inert
+koyeb depl l --text-search x	inert
+koyeb depl l --type x	inert
+koyeb depl l -e x	inert
+koyeb depl l -h	inert
+koyeb depl l -s x	inert
+koyeb depl l -t x	inert
+koyeb depl l x	inert
+koyeb depl list	inert
+koyeb depl list --app x	inert
+koyeb depl list --help	inert
+koyeb depl list --help --app x	inert
+koyeb depl list --help -h	inert
+koyeb depl list --help x	inert
+koyeb depl list --organization x	inert
+koyeb depl list --output x	inert
+koyeb depl list --service x	inert
+koyeb depl list --token x	inert
+koyeb depl list --url x	inert
+koyeb depl list -h	inert
+koyeb depl list -o x	inert
+koyeb depl list x	inert
+koyeb depl log	denied
+koyeb depl log --end-time x	inert
+koyeb depl log --help	inert
+koyeb depl log --help --end-time x	inert
+koyeb depl log --help --tail	inert
+koyeb depl log --help x	inert
+koyeb depl log --order x	inert
+koyeb depl log --regex-search x	inert
+koyeb depl log --since x	inert
+koyeb depl log --start-time x	inert
+koyeb depl log --tail	inert
+koyeb depl log --text-search x	inert
+koyeb depl log --type x	inert
+koyeb depl log -e x	inert
+koyeb depl log -h	inert
+koyeb depl log -s x	inert
+koyeb depl log -t x	inert
+koyeb depl log x	inert
+koyeb depl logs	denied
+koyeb depl logs --end-time x	inert
+koyeb depl logs --help	inert
+koyeb depl logs --help --end-time x	inert
+koyeb depl logs --help --tail	inert
+koyeb depl logs --help x	inert
+koyeb depl logs --order x	inert
+koyeb depl logs --regex-search x	inert
+koyeb depl logs --since x	inert
+koyeb depl logs --start-time x	inert
+koyeb depl logs --tail	inert
+koyeb depl logs --text-search x	inert
+koyeb depl logs --type x	inert
+koyeb depl logs -e x	inert
+koyeb depl logs -h	inert
+koyeb depl logs -s x	inert
+koyeb depl logs -t x	inert
+koyeb depl logs x	inert
+koyeb depl x	denied
+koyeb deploy	denied
+koyeb deploy x	denied
+koyeb deployment	inert
+koyeb deployment cancel	denied
+koyeb deployment cancel x	denied
+koyeb deployment describe	denied
+koyeb deployment describe --help	inert
+koyeb deployment describe --help --organization x	inert
+koyeb deployment describe --help -h	inert
+koyeb deployment describe --help x	inert
+koyeb deployment describe --organization x	inert
+koyeb deployment describe --output x	inert
+koyeb deployment describe --token x	inert
+koyeb deployment describe --url x	inert
+koyeb deployment describe -h	inert
+koyeb deployment describe -o x	inert
+koyeb deployment describe x	inert
+koyeb deployment get	denied
+koyeb deployment get --help	inert
+koyeb deployment get --help --organization x	inert
+koyeb deployment get --help -h	inert
+koyeb deployment get --help x	inert
+koyeb deployment get --organization x	inert
+koyeb deployment get --output x	inert
+koyeb deployment get --token x	inert
+koyeb deployment get --url x	inert
+koyeb deployment get -h	inert
+koyeb deployment get -o x	inert
+koyeb deployment get x	inert
+koyeb deployment l	denied
+koyeb deployment l --end-time x	inert
+koyeb deployment l --help	inert
+koyeb deployment l --help --end-time x	inert
+koyeb deployment l --help --tail	inert
+koyeb deployment l --help x	inert
+koyeb deployment l --order x	inert
+koyeb deployment l --regex-search x	inert
+koyeb deployment l --since x	inert
+koyeb deployment l --start-time x	inert
+koyeb deployment l --tail	inert
+koyeb deployment l --text-search x	inert
+koyeb deployment l --type x	inert
+koyeb deployment l -e x	inert
+koyeb deployment l -h	inert
+koyeb deployment l -s x	inert
+koyeb deployment l -t x	inert
+koyeb deployment l x	inert
+koyeb deployment list	inert
+koyeb deployment list --app x	inert
+koyeb deployment list --help	inert
+koyeb deployment list --help --app x	inert
+koyeb deployment list --help -h	inert
+koyeb deployment list --help x	inert
+koyeb deployment list --organization x	inert
+koyeb deployment list --output x	inert
+koyeb deployment list --service x	inert
+koyeb deployment list --token x	inert
+koyeb deployment list --url x	inert
+koyeb deployment list -h	inert
+koyeb deployment list -o x	inert
+koyeb deployment list x	inert
+koyeb deployment log	denied
+koyeb deployment log --end-time x	inert
+koyeb deployment log --help	inert
+koyeb deployment log --help --end-time x	inert
+koyeb deployment log --help --tail	inert
+koyeb deployment log --help x	inert
+koyeb deployment log --order x	inert
+koyeb deployment log --regex-search x	inert
+koyeb deployment log --since x	inert
+koyeb deployment log --start-time x	inert
+koyeb deployment log --tail	inert
+koyeb deployment log --text-search x	inert
+koyeb deployment log --type x	inert
+koyeb deployment log -e x	inert
+koyeb deployment log -h	inert
+koyeb deployment log -s x	inert
+koyeb deployment log -t x	inert
+koyeb deployment log x	inert
+koyeb deployment logs	denied
+koyeb deployment logs --end-time x	inert
+koyeb deployment logs --help	inert
+koyeb deployment logs --help --end-time x	inert
+koyeb deployment logs --help --tail	inert
+koyeb deployment logs --help x	inert
+koyeb deployment logs --order x	inert
+koyeb deployment logs --regex-search x	inert
+koyeb deployment logs --since x	inert
+koyeb deployment logs --start-time x	inert
+koyeb deployment logs --tail	inert
+koyeb deployment logs --text-search x	inert
+koyeb deployment logs --type x	inert
+koyeb deployment logs -e x	inert
+koyeb deployment logs -h	inert
+koyeb deployment logs -s x	inert
+koyeb deployment logs -t x	inert
+koyeb deployment logs x	inert
+koyeb deployment x	denied
+koyeb deployments	inert
+koyeb deployments cancel	denied
+koyeb deployments cancel x	denied
+koyeb deployments describe	denied
+koyeb deployments describe --help	inert
+koyeb deployments describe --help --organization x	inert
+koyeb deployments describe --help -h	inert
+koyeb deployments describe --help x	inert
+koyeb deployments describe --organization x	inert
+koyeb deployments describe --output x	inert
+koyeb deployments describe --token x	inert
+koyeb deployments describe --url x	inert
+koyeb deployments describe -h	inert
+koyeb deployments describe -o x	inert
+koyeb deployments describe x	inert
+koyeb deployments get	denied
+koyeb deployments get --help	inert
+koyeb deployments get --help --organization x	inert
+koyeb deployments get --help -h	inert
+koyeb deployments get --help x	inert
+koyeb deployments get --organization x	inert
+koyeb deployments get --output x	inert
+koyeb deployments get --token x	inert
+koyeb deployments get --url x	inert
+koyeb deployments get -h	inert
+koyeb deployments get -o x	inert
+koyeb deployments get x	inert
+koyeb deployments l	denied
+koyeb deployments l --end-time x	inert
+koyeb deployments l --help	inert
+koyeb deployments l --help --end-time x	inert
+koyeb deployments l --help --tail	inert
+koyeb deployments l --help x	inert
+koyeb deployments l --order x	inert
+koyeb deployments l --regex-search x	inert
+koyeb deployments l --since x	inert
+koyeb deployments l --start-time x	inert
+koyeb deployments l --tail	inert
+koyeb deployments l --text-search x	inert
+koyeb deployments l --type x	inert
+koyeb deployments l -e x	inert
+koyeb deployments l -h	inert
+koyeb deployments l -s x	inert
+koyeb deployments l -t x	inert
+koyeb deployments l x	inert
+koyeb deployments list	inert
+koyeb deployments list --app x	inert
+koyeb deployments list --help	inert
+koyeb deployments list --help --app x	inert
+koyeb deployments list --help -h	inert
+koyeb deployments list --help x	inert
+koyeb deployments list --organization x	inert
+koyeb deployments list --output x	inert
+koyeb deployments list --service x	inert
+koyeb deployments list --token x	inert
+koyeb deployments list --url x	inert
+koyeb deployments list -h	inert
+koyeb deployments list -o x	inert
+koyeb deployments list x	inert
+koyeb deployments log	denied
+koyeb deployments log --end-time x	inert
+koyeb deployments log --help	inert
+koyeb deployments log --help --end-time x	inert
+koyeb deployments log --help --tail	inert
+koyeb deployments log --help x	inert
+koyeb deployments log --order x	inert
+koyeb deployments log --regex-search x	inert
+koyeb deployments log --since x	inert
+koyeb deployments log --start-time x	inert
+koyeb deployments log --tail	inert
+koyeb deployments log --text-search x	inert
+koyeb deployments log --type x	inert
+koyeb deployments log -e x	inert
+koyeb deployments log -h	inert
+koyeb deployments log -s x	inert
+koyeb deployments log -t x	inert
+koyeb deployments log x	inert
+koyeb deployments logs	denied
+koyeb deployments logs --end-time x	inert
+koyeb deployments logs --help	inert
+koyeb deployments logs --help --end-time x	inert
+koyeb deployments logs --help --tail	inert
+koyeb deployments logs --help x	inert
+koyeb deployments logs --order x	inert
+koyeb deployments logs --regex-search x	inert
+koyeb deployments logs --since x	inert
+koyeb deployments logs --start-time x	inert
+koyeb deployments logs --tail	inert
+koyeb deployments logs --text-search x	inert
+koyeb deployments logs --type x	inert
+koyeb deployments logs -e x	inert
+koyeb deployments logs -h	inert
+koyeb deployments logs -s x	inert
+koyeb deployments logs -t x	inert
+koyeb deployments logs x	inert
+koyeb deployments x	denied
+koyeb dom	inert
+koyeb dom attach	denied
+koyeb dom attach x	denied
+koyeb dom create	denied
+koyeb dom create x	denied
+koyeb dom delete	denied
+koyeb dom delete x	denied
+koyeb dom describe	denied
+koyeb dom describe --help	inert
+koyeb dom describe --help --organization x	inert
+koyeb dom describe --help -h	inert
+koyeb dom describe --help x	inert
+koyeb dom describe --organization x	inert
+koyeb dom describe --output x	inert
+koyeb dom describe --token x	inert
+koyeb dom describe --url x	inert
+koyeb dom describe -h	inert
+koyeb dom describe -o x	inert
+koyeb dom describe x	inert
+koyeb dom detach	denied
+koyeb dom detach x	denied
+koyeb dom get	denied
+koyeb dom get --help	inert
+koyeb dom get --help --organization x	inert
+koyeb dom get --help -h	inert
+koyeb dom get --help x	inert
+koyeb dom get --organization x	inert
+koyeb dom get --output x	inert
+koyeb dom get --token x	inert
+koyeb dom get --url x	inert
+koyeb dom get -h	inert
+koyeb dom get -o x	inert
+koyeb dom get x	inert
+koyeb dom list	inert
+koyeb dom list --help	inert
+koyeb dom list --help --organization x	inert
+koyeb dom list --help -h	inert
+koyeb dom list --help x	inert
+koyeb dom list --organization x	inert
+koyeb dom list --output x	inert
+koyeb dom list --token x	inert
+koyeb dom list --url x	inert
+koyeb dom list -h	inert
+koyeb dom list -o x	inert
+koyeb dom list x	inert
+koyeb dom refresh	denied
+koyeb dom refresh x	denied
+koyeb dom x	denied
+koyeb domain	inert
+koyeb domain attach	denied
+koyeb domain attach x	denied
+koyeb domain create	denied
+koyeb domain create x	denied
+koyeb domain delete	denied
+koyeb domain delete x	denied
+koyeb domain describe	denied
+koyeb domain describe --help	inert
+koyeb domain describe --help --organization x	inert
+koyeb domain describe --help -h	inert
+koyeb domain describe --help x	inert
+koyeb domain describe --organization x	inert
+koyeb domain describe --output x	inert
+koyeb domain describe --token x	inert
+koyeb domain describe --url x	inert
+koyeb domain describe -h	inert
+koyeb domain describe -o x	inert
+koyeb domain describe x	inert
+koyeb domain detach	denied
+koyeb domain detach x	denied
+koyeb domain get	denied
+koyeb domain get --help	inert
+koyeb domain get --help --organization x	inert
+koyeb domain get --help -h	inert
+koyeb domain get --help x	inert
+koyeb domain get --organization x	inert
+koyeb domain get --output x	inert
+koyeb domain get --token x	inert
+koyeb domain get --url x	inert
+koyeb domain get -h	inert
+koyeb domain get -o x	inert
+koyeb domain get x	inert
+koyeb domain list	inert
+koyeb domain list --help	inert
+koyeb domain list --help --organization x	inert
+koyeb domain list --help -h	inert
+koyeb domain list --help x	inert
+koyeb domain list --organization x	inert
+koyeb domain list --output x	inert
+koyeb domain list --token x	inert
+koyeb domain list --url x	inert
+koyeb domain list -h	inert
+koyeb domain list -o x	inert
+koyeb domain list x	inert
+koyeb domain refresh	denied
+koyeb domain refresh x	denied
+koyeb domain x	denied
+koyeb domains	inert
+koyeb domains attach	denied
+koyeb domains attach x	denied
+koyeb domains create	denied
+koyeb domains create x	denied
+koyeb domains delete	denied
+koyeb domains delete x	denied
+koyeb domains describe	denied
+koyeb domains describe --help	inert
+koyeb domains describe --help --organization x	inert
+koyeb domains describe --help -h	inert
+koyeb domains describe --help x	inert
+koyeb domains describe --organization x	inert
+koyeb domains describe --output x	inert
+koyeb domains describe --token x	inert
+koyeb domains describe --url x	inert
+koyeb domains describe -h	inert
+koyeb domains describe -o x	inert
+koyeb domains describe x	inert
+koyeb domains detach	denied
+koyeb domains detach x	denied
+koyeb domains get	denied
+koyeb domains get --help	inert
+koyeb domains get --help --organization x	inert
+koyeb domains get --help -h	inert
+koyeb domains get --help x	inert
+koyeb domains get --organization x	inert
+koyeb domains get --output x	inert
+koyeb domains get --token x	inert
+koyeb domains get --url x	inert
+koyeb domains get -h	inert
+koyeb domains get -o x	inert
+koyeb domains get x	inert
+koyeb domains list	inert
+koyeb domains list --help	inert
+koyeb domains list --help --organization x	inert
+koyeb domains list --help -h	inert
+koyeb domains list --help x	inert
+koyeb domains list --organization x	inert
+koyeb domains list --output x	inert
+koyeb domains list --token x	inert
+koyeb domains list --url x	inert
+koyeb domains list -h	inert
+koyeb domains list -o x	inert
+koyeb domains list x	inert
+koyeb domains refresh	denied
+koyeb domains refresh x	denied
+koyeb domains x	denied
+koyeb i	inert
+koyeb i attach	denied
+koyeb i attach x	denied
+koyeb i copy	denied
+koyeb i copy x	denied
+koyeb i cp	denied
+koyeb i cp x	denied
+koyeb i describe	denied
+koyeb i describe --help	inert
+koyeb i describe --help --organization x	inert
+koyeb i describe --help -h	inert
+koyeb i describe --help x	inert
+koyeb i describe --organization x	inert
+koyeb i describe --output x	inert
+koyeb i describe --token x	inert
+koyeb i describe --url x	inert
+koyeb i describe -h	inert
+koyeb i describe -o x	inert
+koyeb i describe x	inert
+koyeb i exec	denied
+koyeb i exec x	denied
+koyeb i get	denied
+koyeb i get --help	inert
+koyeb i get --help --organization x	inert
+koyeb i get --help -h	inert
+koyeb i get --help x	inert
+koyeb i get --organization x	inert
+koyeb i get --output x	inert
+koyeb i get --token x	inert
+koyeb i get --url x	inert
+koyeb i get -h	inert
+koyeb i get -o x	inert
+koyeb i get x	inert
+koyeb i l	denied
+koyeb i l --end-time x	inert
+koyeb i l --help	inert
+koyeb i l --help --end-time x	inert
+koyeb i l --help --tail	inert
+koyeb i l --help x	inert
+koyeb i l --order x	inert
+koyeb i l --regex-search x	inert
+koyeb i l --since x	inert
+koyeb i l --start-time x	inert
+koyeb i l --tail	inert
+koyeb i l --text-search x	inert
+koyeb i l -e x	inert
+koyeb i l -h	inert
+koyeb i l -s x	inert
+koyeb i l x	inert
+koyeb i list	inert
+koyeb i list --app x	inert
+koyeb i list --help	inert
+koyeb i list --help --app x	inert
+koyeb i list --help -h	inert
+koyeb i list --help x	inert
+koyeb i list --organization x	inert
+koyeb i list --output x	inert
+koyeb i list --service x	inert
+koyeb i list --token x	inert
+koyeb i list --url x	inert
+koyeb i list -h	inert
+koyeb i list -o x	inert
+koyeb i list x	inert
+koyeb i log	denied
+koyeb i log --end-time x	inert
+koyeb i log --help	inert
+koyeb i log --help --end-time x	inert
+koyeb i log --help --tail	inert
+koyeb i log --help x	inert
+koyeb i log --order x	inert
+koyeb i log --regex-search x	inert
+koyeb i log --since x	inert
+koyeb i log --start-time x	inert
+koyeb i log --tail	inert
+koyeb i log --text-search x	inert
+koyeb i log -e x	inert
+koyeb i log -h	inert
+koyeb i log -s x	inert
+koyeb i log x	inert
+koyeb i logs	denied
+koyeb i logs --end-time x	inert
+koyeb i logs --help	inert
+koyeb i logs --help --end-time x	inert
+koyeb i logs --help --tail	inert
+koyeb i logs --help x	inert
+koyeb i logs --order x	inert
+koyeb i logs --regex-search x	inert
+koyeb i logs --since x	inert
+koyeb i logs --start-time x	inert
+koyeb i logs --tail	inert
+koyeb i logs --text-search x	inert
+koyeb i logs -e x	inert
+koyeb i logs -h	inert
+koyeb i logs -s x	inert
+koyeb i logs x	inert
+koyeb i run	denied
+koyeb i run x	denied
+koyeb i x	denied
+koyeb inst	inert
+koyeb inst attach	denied
+koyeb inst attach x	denied
+koyeb inst copy	denied
+koyeb inst copy x	denied
+koyeb inst cp	denied
+koyeb inst cp x	denied
+koyeb inst describe	denied
+koyeb inst describe --help	inert
+koyeb inst describe --help --organization x	inert
+koyeb inst describe --help -h	inert
+koyeb inst describe --help x	inert
+koyeb inst describe --organization x	inert
+koyeb inst describe --output x	inert
+koyeb inst describe --token x	inert
+koyeb inst describe --url x	inert
+koyeb inst describe -h	inert
+koyeb inst describe -o x	inert
+koyeb inst describe x	inert
+koyeb inst exec	denied
+koyeb inst exec x	denied
+koyeb inst get	denied
+koyeb inst get --help	inert
+koyeb inst get --help --organization x	inert
+koyeb inst get --help -h	inert
+koyeb inst get --help x	inert
+koyeb inst get --organization x	inert
+koyeb inst get --output x	inert
+koyeb inst get --token x	inert
+koyeb inst get --url x	inert
+koyeb inst get -h	inert
+koyeb inst get -o x	inert
+koyeb inst get x	inert
+koyeb inst l	denied
+koyeb inst l --end-time x	inert
+koyeb inst l --help	inert
+koyeb inst l --help --end-time x	inert
+koyeb inst l --help --tail	inert
+koyeb inst l --help x	inert
+koyeb inst l --order x	inert
+koyeb inst l --regex-search x	inert
+koyeb inst l --since x	inert
+koyeb inst l --start-time x	inert
+koyeb inst l --tail	inert
+koyeb inst l --text-search x	inert
+koyeb inst l -e x	inert
+koyeb inst l -h	inert
+koyeb inst l -s x	inert
+koyeb inst l x	inert
+koyeb inst list	inert
+koyeb inst list --app x	inert
+koyeb inst list --help	inert
+koyeb inst list --help --app x	inert
+koyeb inst list --help -h	inert
+koyeb inst list --help x	inert
+koyeb inst list --organization x	inert
+koyeb inst list --output x	inert
+koyeb inst list --service x	inert
+koyeb inst list --token x	inert
+koyeb inst list --url x	inert
+koyeb inst list -h	inert
+koyeb inst list -o x	inert
+koyeb inst list x	inert
+koyeb inst log	denied
+koyeb inst log --end-time x	inert
+koyeb inst log --help	inert
+koyeb inst log --help --end-time x	inert
+koyeb inst log --help --tail	inert
+koyeb inst log --help x	inert
+koyeb inst log --order x	inert
+koyeb inst log --regex-search x	inert
+koyeb inst log --since x	inert
+koyeb inst log --start-time x	inert
+koyeb inst log --tail	inert
+koyeb inst log --text-search x	inert
+koyeb inst log -e x	inert
+koyeb inst log -h	inert
+koyeb inst log -s x	inert
+koyeb inst log x	inert
+koyeb inst logs	denied
+koyeb inst logs --end-time x	inert
+koyeb inst logs --help	inert
+koyeb inst logs --help --end-time x	inert
+koyeb inst logs --help --tail	inert
+koyeb inst logs --help x	inert
+koyeb inst logs --order x	inert
+koyeb inst logs --regex-search x	inert
+koyeb inst logs --since x	inert
+koyeb inst logs --start-time x	inert
+koyeb inst logs --tail	inert
+koyeb inst logs --text-search x	inert
+koyeb inst logs -e x	inert
+koyeb inst logs -h	inert
+koyeb inst logs -s x	inert
+koyeb inst logs x	inert
+koyeb inst run	denied
+koyeb inst run x	denied
+koyeb inst x	denied
+koyeb instance	inert
+koyeb instance attach	denied
+koyeb instance attach x	denied
+koyeb instance copy	denied
+koyeb instance copy x	denied
+koyeb instance cp	denied
+koyeb instance cp x	denied
+koyeb instance describe	denied
+koyeb instance describe --help	inert
+koyeb instance describe --help --organization x	inert
+koyeb instance describe --help -h	inert
+koyeb instance describe --help x	inert
+koyeb instance describe --organization x	inert
+koyeb instance describe --output x	inert
+koyeb instance describe --token x	inert
+koyeb instance describe --url x	inert
+koyeb instance describe -h	inert
+koyeb instance describe -o x	inert
+koyeb instance describe x	inert
+koyeb instance exec	denied
+koyeb instance exec x	denied
+koyeb instance get	denied
+koyeb instance get --help	inert
+koyeb instance get --help --organization x	inert
+koyeb instance get --help -h	inert
+koyeb instance get --help x	inert
+koyeb instance get --organization x	inert
+koyeb instance get --output x	inert
+koyeb instance get --token x	inert
+koyeb instance get --url x	inert
+koyeb instance get -h	inert
+koyeb instance get -o x	inert
+koyeb instance get x	inert
+koyeb instance l	denied
+koyeb instance l --end-time x	inert
+koyeb instance l --help	inert
+koyeb instance l --help --end-time x	inert
+koyeb instance l --help --tail	inert
+koyeb instance l --help x	inert
+koyeb instance l --order x	inert
+koyeb instance l --regex-search x	inert
+koyeb instance l --since x	inert
+koyeb instance l --start-time x	inert
+koyeb instance l --tail	inert
+koyeb instance l --text-search x	inert
+koyeb instance l -e x	inert
+koyeb instance l -h	inert
+koyeb instance l -s x	inert
+koyeb instance l x	inert
+koyeb instance list	inert
+koyeb instance list --app x	inert
+koyeb instance list --help	inert
+koyeb instance list --help --app x	inert
+koyeb instance list --help -h	inert
+koyeb instance list --help x	inert
+koyeb instance list --organization x	inert
+koyeb instance list --output x	inert
+koyeb instance list --service x	inert
+koyeb instance list --token x	inert
+koyeb instance list --url x	inert
+koyeb instance list -h	inert
+koyeb instance list -o x	inert
+koyeb instance list x	inert
+koyeb instance log	denied
+koyeb instance log --end-time x	inert
+koyeb instance log --help	inert
+koyeb instance log --help --end-time x	inert
+koyeb instance log --help --tail	inert
+koyeb instance log --help x	inert
+koyeb instance log --order x	inert
+koyeb instance log --regex-search x	inert
+koyeb instance log --since x	inert
+koyeb instance log --start-time x	inert
+koyeb instance log --tail	inert
+koyeb instance log --text-search x	inert
+koyeb instance log -e x	inert
+koyeb instance log -h	inert
+koyeb instance log -s x	inert
+koyeb instance log x	inert
+koyeb instance logs	denied
+koyeb instance logs --end-time x	inert
+koyeb instance logs --help	inert
+koyeb instance logs --help --end-time x	inert
+koyeb instance logs --help --tail	inert
+koyeb instance logs --help x	inert
+koyeb instance logs --order x	inert
+koyeb instance logs --regex-search x	inert
+koyeb instance logs --since x	inert
+koyeb instance logs --start-time x	inert
+koyeb instance logs --tail	inert
+koyeb instance logs --text-search x	inert
+koyeb instance logs -e x	inert
+koyeb instance logs -h	inert
+koyeb instance logs -s x	inert
+koyeb instance logs x	inert
+koyeb instance run	denied
+koyeb instance run x	denied
+koyeb instance x	denied
+koyeb instances	inert
+koyeb instances attach	denied
+koyeb instances attach x	denied
+koyeb instances copy	denied
+koyeb instances copy x	denied
+koyeb instances cp	denied
+koyeb instances cp x	denied
+koyeb instances describe	denied
+koyeb instances describe --help	inert
+koyeb instances describe --help --organization x	inert
+koyeb instances describe --help -h	inert
+koyeb instances describe --help x	inert
+koyeb instances describe --organization x	inert
+koyeb instances describe --output x	inert
+koyeb instances describe --token x	inert
+koyeb instances describe --url x	inert
+koyeb instances describe -h	inert
+koyeb instances describe -o x	inert
+koyeb instances describe x	inert
+koyeb instances exec	denied
+koyeb instances exec inst-1 -- /bin/sh	denied
+koyeb instances exec x	denied
+koyeb instances get	denied
+koyeb instances get --help	inert
+koyeb instances get --help --organization x	inert
+koyeb instances get --help -h	inert
+koyeb instances get --help x	inert
+koyeb instances get --organization x	inert
+koyeb instances get --output x	inert
+koyeb instances get --token x	inert
+koyeb instances get --url x	inert
+koyeb instances get -h	inert
+koyeb instances get -o x	inert
+koyeb instances get x	inert
+koyeb instances l	denied
+koyeb instances l --end-time x	inert
+koyeb instances l --help	inert
+koyeb instances l --help --end-time x	inert
+koyeb instances l --help --tail	inert
+koyeb instances l --help x	inert
+koyeb instances l --order x	inert
+koyeb instances l --regex-search x	inert
+koyeb instances l --since x	inert
+koyeb instances l --start-time x	inert
+koyeb instances l --tail	inert
+koyeb instances l --text-search x	inert
+koyeb instances l -e x	inert
+koyeb instances l -h	inert
+koyeb instances l -s x	inert
+koyeb instances l x	inert
+koyeb instances list	inert
+koyeb instances list --app x	inert
+koyeb instances list --help	inert
+koyeb instances list --help --app x	inert
+koyeb instances list --help -h	inert
+koyeb instances list --help x	inert
+koyeb instances list --organization x	inert
+koyeb instances list --output x	inert
+koyeb instances list --service x	inert
+koyeb instances list --token x	inert
+koyeb instances list --url x	inert
+koyeb instances list -h	inert
+koyeb instances list -o x	inert
+koyeb instances list x	inert
+koyeb instances log	denied
+koyeb instances log --end-time x	inert
+koyeb instances log --help	inert
+koyeb instances log --help --end-time x	inert
+koyeb instances log --help --tail	inert
+koyeb instances log --help x	inert
+koyeb instances log --order x	inert
+koyeb instances log --regex-search x	inert
+koyeb instances log --since x	inert
+koyeb instances log --start-time x	inert
+koyeb instances log --tail	inert
+koyeb instances log --text-search x	inert
+koyeb instances log -e x	inert
+koyeb instances log -h	inert
+koyeb instances log -s x	inert
+koyeb instances log x	inert
+koyeb instances logs	denied
+koyeb instances logs --end-time x	inert
+koyeb instances logs --help	inert
+koyeb instances logs --help --end-time x	inert
+koyeb instances logs --help --tail	inert
+koyeb instances logs --help x	inert
+koyeb instances logs --order x	inert
+koyeb instances logs --regex-search x	inert
+koyeb instances logs --since x	inert
+koyeb instances logs --start-time x	inert
+koyeb instances logs --tail	inert
+koyeb instances logs --text-search x	inert
+koyeb instances logs -e x	inert
+koyeb instances logs -h	inert
+koyeb instances logs -s x	inert
+koyeb instances logs x	inert
+koyeb instances run	denied
+koyeb instances run x	denied
+koyeb instances x	denied
+koyeb login	safe-write
+koyeb login --help	safe-write
+koyeb login --help --organization x	safe-write
+koyeb login --help -h	safe-write
+koyeb login --help x	safe-write
+koyeb login --organization x	safe-write
+koyeb login --output x	safe-write
+koyeb login --token x	safe-write
+koyeb login --url x	safe-write
+koyeb login -h	safe-write
+koyeb login -o x	safe-write
+koyeb login x	safe-write
+koyeb metrics	inert
+koyeb metrics get	denied
+koyeb metrics get --help	inert
+koyeb metrics get --help --organization x	inert
+koyeb metrics get --help -h	inert
+koyeb metrics get --help x	inert
+koyeb metrics get --organization x	inert
+koyeb metrics get --output x	inert
+koyeb metrics get --token x	inert
+koyeb metrics get --url x	inert
+koyeb metrics get -h	inert
+koyeb metrics get -o x	inert
+koyeb metrics get x	inert
+koyeb metrics x	denied
+koyeb org	inert
+koyeb org list	inert
+koyeb org list --help	inert
+koyeb org list --help --organization x	inert
+koyeb org list --help -h	inert
+koyeb org list --help x	inert
+koyeb org list --organization x	inert
+koyeb org list --output x	inert
+koyeb org list --token x	inert
+koyeb org list --url x	inert
+koyeb org list -h	inert
+koyeb org list -o x	inert
+koyeb org list x	inert
+koyeb org switch	denied
+koyeb org switch x	denied
+koyeb org x	denied
+koyeb organization	inert
+koyeb organization list	inert
+koyeb organization list --help	inert
+koyeb organization list --help --organization x	inert
+koyeb organization list --help -h	inert
+koyeb organization list --help x	inert
+koyeb organization list --organization x	inert
+koyeb organization list --output x	inert
+koyeb organization list --token x	inert
+koyeb organization list --url x	inert
+koyeb organization list -h	inert
+koyeb organization list -o x	inert
+koyeb organization list x	inert
+koyeb organization switch	denied
+koyeb organization switch x	denied
+koyeb organization x	denied
+koyeb organizations	inert
+koyeb organizations list	inert
+koyeb organizations list --help	inert
+koyeb organizations list --help --organization x	inert
+koyeb organizations list --help -h	inert
+koyeb organizations list --help x	inert
+koyeb organizations list --organization x	inert
+koyeb organizations list --output x	inert
+koyeb organizations list --token x	inert
+koyeb organizations list --url x	inert
+koyeb organizations list -h	inert
+koyeb organizations list -o x	inert
+koyeb organizations list x	inert
+koyeb organizations switch	denied
+koyeb organizations switch x	denied
+koyeb organizations x	denied
+koyeb region	inert
+koyeb region get	denied
+koyeb region get --help	inert
+koyeb region get --help --organization x	inert
+koyeb region get --help -h	inert
+koyeb region get --help x	inert
+koyeb region get --organization x	inert
+koyeb region get --output x	inert
+koyeb region get --token x	inert
+koyeb region get --url x	inert
+koyeb region get -h	inert
+koyeb region get -o x	inert
+koyeb region get x	inert
+koyeb region list	inert
+koyeb region list --help	inert
+koyeb region list --help --organization x	inert
+koyeb region list --help -h	inert
+koyeb region list --help x	inert
+koyeb region list --organization x	inert
+koyeb region list --output x	inert
+koyeb region list --token x	inert
+koyeb region list --url x	inert
+koyeb region list -h	inert
+koyeb region list -o x	inert
+koyeb region list x	inert
+koyeb region x	denied
+koyeb regional-deployments	denied
+koyeb regional-deployments x	denied
+koyeb regions	inert
+koyeb regions get	denied
+koyeb regions get --help	inert
+koyeb regions get --help --organization x	inert
+koyeb regions get --help -h	inert
+koyeb regions get --help x	inert
+koyeb regions get --organization x	inert
+koyeb regions get --output x	inert
+koyeb regions get --token x	inert
+koyeb regions get --url x	inert
+koyeb regions get -h	inert
+koyeb regions get -o x	inert
+koyeb regions get x	inert
+koyeb regions list	inert
+koyeb regions list --help	inert
+koyeb regions list --help --organization x	inert
+koyeb regions list --help -h	inert
+koyeb regions list --help x	inert
+koyeb regions list --organization x	inert
+koyeb regions list --output x	inert
+koyeb regions list --token x	inert
+koyeb regions list --url x	inert
+koyeb regions list -h	inert
+koyeb regions list -o x	inert
+koyeb regions list x	inert
+koyeb regions x	denied
+koyeb s	inert
+koyeb s attach	denied
+koyeb s attach x	denied
+koyeb s create	denied
+koyeb s create x	denied
+koyeb s delete	denied
+koyeb s delete x	denied
+koyeb s describe	denied
+koyeb s describe --app x	inert
+koyeb s describe --help	inert
+koyeb s describe --help --app x	inert
+koyeb s describe --help -h	inert
+koyeb s describe --help x	inert
+koyeb s describe --organization x	inert
+koyeb s describe --output x	inert
+koyeb s describe --token x	inert
+koyeb s describe --url x	inert
+koyeb s describe -a x	inert
+koyeb s describe -h	inert
+koyeb s describe -o x	inert
+koyeb s describe x	inert
+koyeb s exec	denied
+koyeb s exec x	denied
+koyeb s get	denied
+koyeb s get --app x	inert
+koyeb s get --help	inert
+koyeb s get --help --app x	inert
+koyeb s get --help -h	inert
+koyeb s get --help x	inert
+koyeb s get --organization x	inert
+koyeb s get --output x	inert
+koyeb s get --token x	inert
+koyeb s get --url x	inert
+koyeb s get -a x	inert
+koyeb s get -h	inert
+koyeb s get -o x	inert
+koyeb s get x	inert
+koyeb s l	denied
+koyeb s l --app x	inert
+koyeb s l --end-time x	inert
+koyeb s l --help	inert
+koyeb s l --help --app x	inert
+koyeb s l --help --tail	inert
+koyeb s l --help x	inert
+koyeb s l --instance x	inert
+koyeb s l --order x	inert
+koyeb s l --regex-search x	inert
+koyeb s l --since x	inert
+koyeb s l --start-time x	inert
+koyeb s l --tail	inert
+koyeb s l --text-search x	inert
+koyeb s l --type x	inert
+koyeb s l -a x	inert
+koyeb s l -h	inert
+koyeb s l -t x	inert
+koyeb s l x	inert
+koyeb s list	inert
+koyeb s list --app x	inert
+koyeb s list --help	inert
+koyeb s list --help --app x	inert
+koyeb s list --help -h	inert
+koyeb s list --help x	inert
+koyeb s list --name x	inert
+koyeb s list --organization x	inert
+koyeb s list --output x	inert
+koyeb s list --token x	inert
+koyeb s list --url x	inert
+koyeb s list -a x	inert
+koyeb s list -h	inert
+koyeb s list -n x	inert
+koyeb s list -o x	inert
+koyeb s list x	inert
+koyeb s log	denied
+koyeb s log --app x	inert
+koyeb s log --end-time x	inert
+koyeb s log --help	inert
+koyeb s log --help --app x	inert
+koyeb s log --help --tail	inert
+koyeb s log --help x	inert
+koyeb s log --instance x	inert
+koyeb s log --order x	inert
+koyeb s log --regex-search x	inert
+koyeb s log --since x	inert
+koyeb s log --start-time x	inert
+koyeb s log --tail	inert
+koyeb s log --text-search x	inert
+koyeb s log --type x	inert
+koyeb s log -a x	inert
+koyeb s log -h	inert
+koyeb s log -t x	inert
+koyeb s log x	inert
+koyeb s logs	denied
+koyeb s logs --app x	inert
+koyeb s logs --end-time x	inert
+koyeb s logs --help	inert
+koyeb s logs --help --app x	inert
+koyeb s logs --help --tail	inert
+koyeb s logs --help x	inert
+koyeb s logs --instance x	inert
+koyeb s logs --order x	inert
+koyeb s logs --regex-search x	inert
+koyeb s logs --since x	inert
+koyeb s logs --start-time x	inert
+koyeb s logs --tail	inert
+koyeb s logs --text-search x	inert
+koyeb s logs --type x	inert
+koyeb s logs -a x	inert
+koyeb s logs -h	inert
+koyeb s logs -t x	inert
+koyeb s logs x	inert
+koyeb s pause	denied
+koyeb s pause x	denied
+koyeb s redeploy	denied
+koyeb s redeploy x	denied
+koyeb s resume	denied
+koyeb s resume x	denied
+koyeb s run	denied
+koyeb s run x	denied
+koyeb s scale	denied
+koyeb s scale x	denied
+koyeb s unapplied-changes	denied
+koyeb s unapplied-changes --app x	inert
+koyeb s unapplied-changes --help	inert
+koyeb s unapplied-changes --help --app x	inert
+koyeb s unapplied-changes --help -h	inert
+koyeb s unapplied-changes --help x	inert
+koyeb s unapplied-changes --organization x	inert
+koyeb s unapplied-changes --output x	inert
+koyeb s unapplied-changes --token x	inert
+koyeb s unapplied-changes --url x	inert
+koyeb s unapplied-changes -a x	inert
+koyeb s unapplied-changes -h	inert
+koyeb s unapplied-changes -o x	inert
+koyeb s unapplied-changes x	inert
+koyeb s update	denied
+koyeb s update x	denied
+koyeb s x	denied
+koyeb sandbox	denied
+koyeb sandbox x	denied
+koyeb sec	inert
+koyeb sec create	denied
+koyeb sec create x	denied
+koyeb sec delete	denied
+koyeb sec delete x	denied
+koyeb sec describe	denied
+koyeb sec describe --help	inert
+koyeb sec describe --help --organization x	inert
+koyeb sec describe --help -h	inert
+koyeb sec describe --help x	inert
+koyeb sec describe --organization x	inert
+koyeb sec describe --output x	inert
+koyeb sec describe --token x	inert
+koyeb sec describe --url x	inert
+koyeb sec describe -h	inert
+koyeb sec describe -o x	inert
+koyeb sec describe x	inert
+koyeb sec get	denied
+koyeb sec get --help	inert
+koyeb sec get --help --organization x	inert
+koyeb sec get --help -h	inert
+koyeb sec get --help x	inert
+koyeb sec get --organization x	inert
+koyeb sec get --output x	inert
+koyeb sec get --token x	inert
+koyeb sec get --url x	inert
+koyeb sec get -h	inert
+koyeb sec get -o x	inert
+koyeb sec get x	inert
+koyeb sec list	inert
+koyeb sec list --help	inert
+koyeb sec list --help --organization x	inert
+koyeb sec list --help -h	inert
+koyeb sec list --help x	inert
+koyeb sec list --organization x	inert
+koyeb sec list --output x	inert
+koyeb sec list --token x	inert
+koyeb sec list --url x	inert
+koyeb sec list -h	inert
+koyeb sec list -o x	inert
+koyeb sec list x	inert
+koyeb sec reveal	denied
+koyeb sec reveal x	denied
+koyeb sec update	denied
+koyeb sec update x	denied
+koyeb sec x	denied
+koyeb secret	inert
+koyeb secret create	denied
+koyeb secret create x	denied
+koyeb secret delete	denied
+koyeb secret delete x	denied
+koyeb secret describe	denied
+koyeb secret describe --help	inert
+koyeb secret describe --help --organization x	inert
+koyeb secret describe --help -h	inert
+koyeb secret describe --help x	inert
+koyeb secret describe --organization x	inert
+koyeb secret describe --output x	inert
+koyeb secret describe --token x	inert
+koyeb secret describe --url x	inert
+koyeb secret describe -h	inert
+koyeb secret describe -o x	inert
+koyeb secret describe x	inert
+koyeb secret get	denied
+koyeb secret get --help	inert
+koyeb secret get --help --organization x	inert
+koyeb secret get --help -h	inert
+koyeb secret get --help x	inert
+koyeb secret get --organization x	inert
+koyeb secret get --output x	inert
+koyeb secret get --token x	inert
+koyeb secret get --url x	inert
+koyeb secret get -h	inert
+koyeb secret get -o x	inert
+koyeb secret get x	inert
+koyeb secret list	inert
+koyeb secret list --help	inert
+koyeb secret list --help --organization x	inert
+koyeb secret list --help -h	inert
+koyeb secret list --help x	inert
+koyeb secret list --organization x	inert
+koyeb secret list --output x	inert
+koyeb secret list --token x	inert
+koyeb secret list --url x	inert
+koyeb secret list -h	inert
+koyeb secret list -o x	inert
+koyeb secret list x	inert
+koyeb secret reveal	denied
+koyeb secret reveal x	denied
+koyeb secret update	denied
+koyeb secret update x	denied
+koyeb secret x	denied
+koyeb secrets	inert
+koyeb secrets create	denied
+koyeb secrets create x	denied
+koyeb secrets delete	denied
+koyeb secrets delete x	denied
+koyeb secrets describe	denied
+koyeb secrets describe --help	inert
+koyeb secrets describe --help --organization x	inert
+koyeb secrets describe --help -h	inert
+koyeb secrets describe --help x	inert
+koyeb secrets describe --organization x	inert
+koyeb secrets describe --output x	inert
+koyeb secrets describe --token x	inert
+koyeb secrets describe --url x	inert
+koyeb secrets describe -h	inert
+koyeb secrets describe -o x	inert
+koyeb secrets describe x	inert
+koyeb secrets get	denied
+koyeb secrets get --help	inert
+koyeb secrets get --help --organization x	inert
+koyeb secrets get --help -h	inert
+koyeb secrets get --help x	inert
+koyeb secrets get --organization x	inert
+koyeb secrets get --output x	inert
+koyeb secrets get --token x	inert
+koyeb secrets get --url x	inert
+koyeb secrets get -h	inert
+koyeb secrets get -o x	inert
+koyeb secrets get x	inert
+koyeb secrets list	inert
+koyeb secrets list --help	inert
+koyeb secrets list --help --organization x	inert
+koyeb secrets list --help -h	inert
+koyeb secrets list --help x	inert
+koyeb secrets list --organization x	inert
+koyeb secrets list --output x	inert
+koyeb secrets list --token x	inert
+koyeb secrets list --url x	inert
+koyeb secrets list -h	inert
+koyeb secrets list -o x	inert
+koyeb secrets list x	inert
+koyeb secrets reveal	denied
+koyeb secrets reveal API_KEY	denied
+koyeb secrets reveal x	denied
+koyeb secrets update	denied
+koyeb secrets update x	denied
+koyeb secrets x	denied
+koyeb service	inert
+koyeb service attach	denied
+koyeb service attach x	denied
+koyeb service create	denied
+koyeb service create x	denied
+koyeb service delete	denied
+koyeb service delete x	denied
+koyeb service describe	denied
+koyeb service describe --app x	inert
+koyeb service describe --help	inert
+koyeb service describe --help --app x	inert
+koyeb service describe --help -h	inert
+koyeb service describe --help x	inert
+koyeb service describe --organization x	inert
+koyeb service describe --output x	inert
+koyeb service describe --token x	inert
+koyeb service describe --url x	inert
+koyeb service describe -a x	inert
+koyeb service describe -h	inert
+koyeb service describe -o x	inert
+koyeb service describe x	inert
+koyeb service exec	denied
+koyeb service exec x	denied
+koyeb service get	denied
+koyeb service get --app x	inert
+koyeb service get --help	inert
+koyeb service get --help --app x	inert
+koyeb service get --help -h	inert
+koyeb service get --help x	inert
+koyeb service get --organization x	inert
+koyeb service get --output x	inert
+koyeb service get --token x	inert
+koyeb service get --url x	inert
+koyeb service get -a x	inert
+koyeb service get -h	inert
+koyeb service get -o x	inert
+koyeb service get x	inert
+koyeb service l	denied
+koyeb service l --app x	inert
+koyeb service l --end-time x	inert
+koyeb service l --help	inert
+koyeb service l --help --app x	inert
+koyeb service l --help --tail	inert
+koyeb service l --help x	inert
+koyeb service l --instance x	inert
+koyeb service l --order x	inert
+koyeb service l --regex-search x	inert
+koyeb service l --since x	inert
+koyeb service l --start-time x	inert
+koyeb service l --tail	inert
+koyeb service l --text-search x	inert
+koyeb service l --type x	inert
+koyeb service l -a x	inert
+koyeb service l -h	inert
+koyeb service l -t x	inert
+koyeb service l x	inert
+koyeb service list	inert
+koyeb service list --app x	inert
+koyeb service list --help	inert
+koyeb service list --help --app x	inert
+koyeb service list --help -h	inert
+koyeb service list --help x	inert
+koyeb service list --name x	inert
+koyeb service list --organization x	inert
+koyeb service list --output x	inert
+koyeb service list --token x	inert
+koyeb service list --url x	inert
+koyeb service list -a x	inert
+koyeb service list -h	inert
+koyeb service list -n x	inert
+koyeb service list -o x	inert
+koyeb service list x	inert
+koyeb service log	denied
+koyeb service log --app x	inert
+koyeb service log --end-time x	inert
+koyeb service log --help	inert
+koyeb service log --help --app x	inert
+koyeb service log --help --tail	inert
+koyeb service log --help x	inert
+koyeb service log --instance x	inert
+koyeb service log --order x	inert
+koyeb service log --regex-search x	inert
+koyeb service log --since x	inert
+koyeb service log --start-time x	inert
+koyeb service log --tail	inert
+koyeb service log --text-search x	inert
+koyeb service log --type x	inert
+koyeb service log -a x	inert
+koyeb service log -h	inert
+koyeb service log -t x	inert
+koyeb service log x	inert
+koyeb service logs	denied
+koyeb service logs --app x	inert
+koyeb service logs --end-time x	inert
+koyeb service logs --help	inert
+koyeb service logs --help --app x	inert
+koyeb service logs --help --tail	inert
+koyeb service logs --help x	inert
+koyeb service logs --instance x	inert
+koyeb service logs --order x	inert
+koyeb service logs --regex-search x	inert
+koyeb service logs --since x	inert
+koyeb service logs --start-time x	inert
+koyeb service logs --tail	inert
+koyeb service logs --text-search x	inert
+koyeb service logs --type x	inert
+koyeb service logs -a x	inert
+koyeb service logs -h	inert
+koyeb service logs -t x	inert
+koyeb service logs x	inert
+koyeb service pause	denied
+koyeb service pause x	denied
+koyeb service redeploy	denied
+koyeb service redeploy x	denied
+koyeb service resume	denied
+koyeb service resume x	denied
+koyeb service run	denied
+koyeb service run x	denied
+koyeb service scale	denied
+koyeb service scale x	denied
+koyeb service unapplied-changes	denied
+koyeb service unapplied-changes --app x	inert
+koyeb service unapplied-changes --help	inert
+koyeb service unapplied-changes --help --app x	inert
+koyeb service unapplied-changes --help -h	inert
+koyeb service unapplied-changes --help x	inert
+koyeb service unapplied-changes --organization x	inert
+koyeb service unapplied-changes --output x	inert
+koyeb service unapplied-changes --token x	inert
+koyeb service unapplied-changes --url x	inert
+koyeb service unapplied-changes -a x	inert
+koyeb service unapplied-changes -h	inert
+koyeb service unapplied-changes -o x	inert
+koyeb service unapplied-changes x	inert
+koyeb service update	denied
+koyeb service update x	denied
+koyeb service x	denied
+koyeb services	inert
+koyeb services attach	denied
+koyeb services attach x	denied
+koyeb services create	denied
+koyeb services create x	denied
+koyeb services delete	denied
+koyeb services delete svc-1	denied
+koyeb services delete x	denied
+koyeb services describe	denied
+koyeb services describe --app x	inert
+koyeb services describe --help	inert
+koyeb services describe --help --app x	inert
+koyeb services describe --help -h	inert
+koyeb services describe --help x	inert
+koyeb services describe --organization x	inert
+koyeb services describe --output x	inert
+koyeb services describe --token x	inert
+koyeb services describe --url x	inert
+koyeb services describe -a x	inert
+koyeb services describe -h	inert
+koyeb services describe -o x	inert
+koyeb services describe x	inert
+koyeb services exec	denied
+koyeb services exec x	denied
+koyeb services get	denied
+koyeb services get --app x	inert
+koyeb services get --help	inert
+koyeb services get --help --app x	inert
+koyeb services get --help -h	inert
+koyeb services get --help x	inert
+koyeb services get --organization x	inert
+koyeb services get --output x	inert
+koyeb services get --token x	inert
+koyeb services get --url x	inert
+koyeb services get -a x	inert
+koyeb services get -h	inert
+koyeb services get -o x	inert
+koyeb services get x	inert
+koyeb services l	denied
+koyeb services l --app x	inert
+koyeb services l --end-time x	inert
+koyeb services l --help	inert
+koyeb services l --help --app x	inert
+koyeb services l --help --tail	inert
+koyeb services l --help x	inert
+koyeb services l --instance x	inert
+koyeb services l --order x	inert
+koyeb services l --regex-search x	inert
+koyeb services l --since x	inert
+koyeb services l --start-time x	inert
+koyeb services l --tail	inert
+koyeb services l --text-search x	inert
+koyeb services l --type x	inert
+koyeb services l -a x	inert
+koyeb services l -h	inert
+koyeb services l -t x	inert
+koyeb services l x	inert
+koyeb services list	inert
+koyeb services list --app x	inert
+koyeb services list --help	inert
+koyeb services list --help --app x	inert
+koyeb services list --help -h	inert
+koyeb services list --help x	inert
+koyeb services list --name x	inert
+koyeb services list --organization x	inert
+koyeb services list --output x	inert
+koyeb services list --token x	inert
+koyeb services list --url x	inert
+koyeb services list -a x	inert
+koyeb services list -h	inert
+koyeb services list -n x	inert
+koyeb services list -o x	inert
+koyeb services list x	inert
+koyeb services log	denied
+koyeb services log --app x	inert
+koyeb services log --end-time x	inert
+koyeb services log --help	inert
+koyeb services log --help --app x	inert
+koyeb services log --help --tail	inert
+koyeb services log --help x	inert
+koyeb services log --instance x	inert
+koyeb services log --order x	inert
+koyeb services log --regex-search x	inert
+koyeb services log --since x	inert
+koyeb services log --start-time x	inert
+koyeb services log --tail	inert
+koyeb services log --text-search x	inert
+koyeb services log --type x	inert
+koyeb services log -a x	inert
+koyeb services log -h	inert
+koyeb services log -t x	inert
+koyeb services log x	inert
+koyeb services logs	denied
+koyeb services logs --app x	inert
+koyeb services logs --end-time x	inert
+koyeb services logs --help	inert
+koyeb services logs --help --app x	inert
+koyeb services logs --help --tail	inert
+koyeb services logs --help x	inert
+koyeb services logs --instance x	inert
+koyeb services logs --order x	inert
+koyeb services logs --regex-search x	inert
+koyeb services logs --since x	inert
+koyeb services logs --start-time x	inert
+koyeb services logs --tail	inert
+koyeb services logs --text-search x	inert
+koyeb services logs --type x	inert
+koyeb services logs -a x	inert
+koyeb services logs -h	inert
+koyeb services logs -t x	inert
+koyeb services logs x	inert
+koyeb services pause	denied
+koyeb services pause x	denied
+koyeb services redeploy	denied
+koyeb services redeploy x	denied
+koyeb services resume	denied
+koyeb services resume x	denied
+koyeb services run	denied
+koyeb services run x	denied
+koyeb services scale	denied
+koyeb services scale x	denied
+koyeb services unapplied-changes	denied
+koyeb services unapplied-changes --app x	inert
+koyeb services unapplied-changes --help	inert
+koyeb services unapplied-changes --help --app x	inert
+koyeb services unapplied-changes --help -h	inert
+koyeb services unapplied-changes --help x	inert
+koyeb services unapplied-changes --organization x	inert
+koyeb services unapplied-changes --output x	inert
+koyeb services unapplied-changes --token x	inert
+koyeb services unapplied-changes --url x	inert
+koyeb services unapplied-changes -a x	inert
+koyeb services unapplied-changes -h	inert
+koyeb services unapplied-changes -o x	inert
+koyeb services unapplied-changes x	inert
+koyeb services update	denied
+koyeb services update x	denied
+koyeb services x	denied
+koyeb snapshots	denied
+koyeb snapshots x	denied
+koyeb svc	inert
+koyeb svc attach	denied
+koyeb svc attach x	denied
+koyeb svc create	denied
+koyeb svc create x	denied
+koyeb svc delete	denied
+koyeb svc delete x	denied
+koyeb svc describe	denied
+koyeb svc describe --app x	inert
+koyeb svc describe --help	inert
+koyeb svc describe --help --app x	inert
+koyeb svc describe --help -h	inert
+koyeb svc describe --help x	inert
+koyeb svc describe --organization x	inert
+koyeb svc describe --output x	inert
+koyeb svc describe --token x	inert
+koyeb svc describe --url x	inert
+koyeb svc describe -a x	inert
+koyeb svc describe -h	inert
+koyeb svc describe -o x	inert
+koyeb svc describe x	inert
+koyeb svc exec	denied
+koyeb svc exec x	denied
+koyeb svc get	denied
+koyeb svc get --app x	inert
+koyeb svc get --help	inert
+koyeb svc get --help --app x	inert
+koyeb svc get --help -h	inert
+koyeb svc get --help x	inert
+koyeb svc get --organization x	inert
+koyeb svc get --output x	inert
+koyeb svc get --token x	inert
+koyeb svc get --url x	inert
+koyeb svc get -a x	inert
+koyeb svc get -h	inert
+koyeb svc get -o x	inert
+koyeb svc get x	inert
+koyeb svc l	denied
+koyeb svc l --app x	inert
+koyeb svc l --end-time x	inert
+koyeb svc l --help	inert
+koyeb svc l --help --app x	inert
+koyeb svc l --help --tail	inert
+koyeb svc l --help x	inert
+koyeb svc l --instance x	inert
+koyeb svc l --order x	inert
+koyeb svc l --regex-search x	inert
+koyeb svc l --since x	inert
+koyeb svc l --start-time x	inert
+koyeb svc l --tail	inert
+koyeb svc l --text-search x	inert
+koyeb svc l --type x	inert
+koyeb svc l -a x	inert
+koyeb svc l -h	inert
+koyeb svc l -t x	inert
+koyeb svc l x	inert
+koyeb svc list	inert
+koyeb svc list --app x	inert
+koyeb svc list --help	inert
+koyeb svc list --help --app x	inert
+koyeb svc list --help -h	inert
+koyeb svc list --help x	inert
+koyeb svc list --name x	inert
+koyeb svc list --organization x	inert
+koyeb svc list --output x	inert
+koyeb svc list --token x	inert
+koyeb svc list --url x	inert
+koyeb svc list -a x	inert
+koyeb svc list -h	inert
+koyeb svc list -n x	inert
+koyeb svc list -o x	inert
+koyeb svc list x	inert
+koyeb svc log	denied
+koyeb svc log --app x	inert
+koyeb svc log --end-time x	inert
+koyeb svc log --help	inert
+koyeb svc log --help --app x	inert
+koyeb svc log --help --tail	inert
+koyeb svc log --help x	inert
+koyeb svc log --instance x	inert
+koyeb svc log --order x	inert
+koyeb svc log --regex-search x	inert
+koyeb svc log --since x	inert
+koyeb svc log --start-time x	inert
+koyeb svc log --tail	inert
+koyeb svc log --text-search x	inert
+koyeb svc log --type x	inert
+koyeb svc log -a x	inert
+koyeb svc log -h	inert
+koyeb svc log -t x	inert
+koyeb svc log x	inert
+koyeb svc logs	denied
+koyeb svc logs --app x	inert
+koyeb svc logs --end-time x	inert
+koyeb svc logs --help	inert
+koyeb svc logs --help --app x	inert
+koyeb svc logs --help --tail	inert
+koyeb svc logs --help x	inert
+koyeb svc logs --instance x	inert
+koyeb svc logs --order x	inert
+koyeb svc logs --regex-search x	inert
+koyeb svc logs --since x	inert
+koyeb svc logs --start-time x	inert
+koyeb svc logs --tail	inert
+koyeb svc logs --text-search x	inert
+koyeb svc logs --type x	inert
+koyeb svc logs -a x	inert
+koyeb svc logs -h	inert
+koyeb svc logs -t x	inert
+koyeb svc logs x	inert
+koyeb svc pause	denied
+koyeb svc pause x	denied
+koyeb svc redeploy	denied
+koyeb svc redeploy x	denied
+koyeb svc resume	denied
+koyeb svc resume x	denied
+koyeb svc run	denied
+koyeb svc run x	denied
+koyeb svc scale	denied
+koyeb svc scale x	denied
+koyeb svc unapplied-changes	denied
+koyeb svc unapplied-changes --app x	inert
+koyeb svc unapplied-changes --help	inert
+koyeb svc unapplied-changes --help --app x	inert
+koyeb svc unapplied-changes --help -h	inert
+koyeb svc unapplied-changes --help x	inert
+koyeb svc unapplied-changes --organization x	inert
+koyeb svc unapplied-changes --output x	inert
+koyeb svc unapplied-changes --token x	inert
+koyeb svc unapplied-changes --url x	inert
+koyeb svc unapplied-changes -a x	inert
+koyeb svc unapplied-changes -h	inert
+koyeb svc unapplied-changes -o x	inert
+koyeb svc unapplied-changes x	inert
+koyeb svc update	denied
+koyeb svc update x	denied
+koyeb svc x	denied
+koyeb version	inert
+koyeb version --help	inert
+koyeb version --help --organization x	inert
+koyeb version --help -h	inert
+koyeb version --help x	inert
+koyeb version --organization x	inert
+koyeb version --output x	inert
+koyeb version --token x	inert
+koyeb version --url x	inert
+koyeb version -h	inert
+koyeb version -o x	inert
+koyeb version x	inert
+koyeb volumes	denied
+koyeb volumes x	denied
+koyeb whoami	inert
+koyeb whoami --help	inert
+koyeb whoami --help --organization x	inert
+koyeb whoami --help -h	inert
+koyeb whoami --help x	inert
+koyeb whoami --organization x	inert
+koyeb whoami --output x	inert
+koyeb whoami --token x	inert
+koyeb whoami --url x	inert
+koyeb whoami -h	inert
+koyeb whoami -o x	inert
+koyeb whoami x	inert
+koyeb x	denied
+kpt	denied
+kpt --help	inert
+kpt --help --version	denied
+kpt --help x	denied
+kpt --version	inert
+kpt -h	inert
+kpt -v	inert
+kpt alpha	denied
+kpt alpha x	denied
+kpt completion	denied
+kpt completion --help	inert
+kpt completion --help -h	inert
+kpt completion --help x	inert
+kpt completion -h	inert
+kpt completion x	inert
+kpt fn	inert
+kpt fn doc	denied
+kpt fn doc x	denied
+kpt fn eval	denied
+kpt fn eval x	denied
+kpt fn render	denied
+kpt fn render x	denied
+kpt fn sink	denied
+kpt fn sink x	denied
+kpt fn source	denied
+kpt fn source x	denied
+kpt fn x	denied
+kpt help	inert
+kpt help x	inert
+kpt live	denied
+kpt live x	denied
+kpt pkg	inert
+kpt pkg cat	inert
+kpt pkg cat --annotate x	inert
+kpt pkg cat --exclude-non-local x	inert
+kpt pkg cat --help	inert
+kpt pkg cat --help --annotate x	inert
+kpt pkg cat --help -h	inert
+kpt pkg cat --help x	inert
+kpt pkg cat --include-local x	inert
+kpt pkg cat --strip-comments x	inert
+kpt pkg cat --style x	inert
+kpt pkg cat -h	inert
+kpt pkg cat x	inert
+kpt pkg diff	inert
+kpt pkg diff --diff-tool x	inert
+kpt pkg diff --diff-tool-opts x	inert
+kpt pkg diff --diff-type x	inert
+kpt pkg diff --help	inert
+kpt pkg diff --help --diff-tool x	inert
+kpt pkg diff --help -h	inert
+kpt pkg diff --help x	inert
+kpt pkg diff -h	inert
+kpt pkg diff x	inert
+kpt pkg get	denied
+kpt pkg get x	denied
+kpt pkg init	denied
+kpt pkg init x	denied
+kpt pkg push	denied
+kpt pkg push x	denied
+kpt pkg tree	inert
+kpt pkg tree --help	inert
+kpt pkg tree --help -h	inert
+kpt pkg tree --help x	inert
+kpt pkg tree -h	inert
+kpt pkg tree x	inert
+kpt pkg update	denied
+kpt pkg update x	denied
+kpt pkg x	denied
+kpt version	inert
+kpt version --help	inert
+kpt version --help -h	inert
+kpt version --help x	inert
+kpt version -h	inert
+kpt version x	inert
+kpt x	denied
+kramdown	safe-read
+kramdown --auto-id-prefix	safe-read
+kramdown --auto-id-prefix --auto-ids	safe-read
+kramdown --auto-id-prefix --coderay-line-numbers x	safe-read
+kramdown --auto-id-prefix x	safe-read
+kramdown --auto-ids	safe-read
+kramdown --coderay-line-numbers x	safe-read
+kramdown --config-file x	safe-read
+kramdown --enable-coderay	safe-read
+kramdown --entity-output x	safe-read
+kramdown --footnote-nr x	safe-read
+kramdown --gfm-quirks	safe-read
+kramdown --hard-wrap	safe-read
+kramdown --header-offset x	safe-read
+kramdown --help	safe-read
+kramdown --input x	safe-read
+kramdown --math-engine x	safe-read
+kramdown --no-auto-ids	safe-read
+kramdown --no-config-file	safe-read
+kramdown --no-hard-wrap	safe-read
+kramdown --output x	safe-read
+kramdown --smart-quotes	safe-read
+kramdown --syntax-highlighter x	safe-read
+kramdown --toc-levels x	safe-read
+kramdown --version	safe-read
+kramdown -h	safe-read
+kramdown -i x	safe-read
+kramdown -o x	safe-read
+kramdown -v	safe-read
+kramdown x	safe-read
+krb5-config	inert
+krb5-config --cflags	inert
+krb5-config --cflags --exec-prefix x	inert
+krb5-config --cflags --help	inert
+krb5-config --cflags krb5	inert
+krb5-config --cflags x	inert
+krb5-config --exec-prefix x	inert
+krb5-config --help	inert
+krb5-config --libs	inert
+krb5-config --prefix x	inert
+krb5-config --version	inert
+krb5-config x	inert
+krew	denied
+krew --help	inert
+krew --help --version	denied
+krew --help x	denied
+krew --version	inert
+krew -h	inert
+krew -v	inert
+krew completion	denied
+krew completion --help	inert
+krew completion --help -h	inert
+krew completion --help x	inert
+krew completion -h	inert
+krew completion x	inert
+krew help	inert
+krew help x	inert
+krew index	inert
+krew index add	denied
+krew index add x	denied
+krew index list	inert
+krew index list --help	inert
+krew index list --help -h	inert
+krew index list --help x	inert
+krew index list -h	inert
+krew index list x	inert
+krew index remove	denied
+krew index remove x	denied
+krew index x	denied
+krew info	denied
+krew info --help	safe-read
+krew info --help -h	safe-read
+krew info --help x	safe-read
+krew info -h	safe-read
+krew info x	safe-read
+krew install	denied
+krew install x	denied
+krew list	safe-read
+krew list --help	safe-read
+krew list --help -h	safe-read
+krew list --help x	safe-read
+krew list -h	safe-read
+krew list x	safe-read
+krew search	safe-read
+krew search --help	safe-read
+krew search --help -h	safe-read
+krew search --help x	safe-read
+krew search -h	safe-read
+krew search x	safe-read
+krew uninstall	denied
+krew uninstall x	denied
+krew update	denied
+krew update x	denied
+krew upgrade	denied
+krew upgrade x	denied
+krew version	inert
+krew version --help	inert
+krew version --help -h	inert
+krew version --help x	inert
+krew version -h	inert
+krew version x	inert
+krew x	denied
+kswitch	denied
+kswitch --cache x	safe-write
+kswitch --help	safe-write
+kswitch --help --cache x	safe-write
+kswitch --help --interactive	safe-write
+kswitch --help x	safe-write
+kswitch --interactive	safe-write
+kswitch --principal x	safe-write
+kswitch --type x	safe-write
+kswitch --version	safe-write
+kswitch -c x	safe-write
+kswitch -i	safe-write
+kswitch -p x	safe-write
+kswitch -t x	safe-write
+kswitch x	safe-write
+ktlint	safe-read
+ktlint --color	safe-read
+ktlint --color --color-name	safe-read
+ktlint --color --editorconfig x	safe-read
+ktlint --color x	safe-read
+ktlint --color-name	safe-read
+ktlint --editorconfig x	safe-read
+ktlint --help	safe-read
+ktlint --relative	safe-read
+ktlint --reporter x	safe-read
+ktlint --verbose	safe-read
+ktlint --version	safe-read
+ktlint -V	safe-read
+ktlint -h	safe-read
+ktlint src/	safe-read
+ktlint x	safe-read
+ktrace	denied
+ktrace --help	inert
+ktrace --version	denied
+ktrace -o x	denied
+ktrace artrace	safe-write
+ktrace artrace --kperf x	safe-write
+ktrace artrace --notify-tracing-started x	safe-write
+ktrace artrace --remote x	safe-write
+ktrace artrace --stackshot-flags x	safe-write
+ktrace artrace --type x	safe-write
+ktrace artrace -F x	safe-write
+ktrace artrace -T x	safe-write
+ktrace artrace -b x	safe-write
+ktrace artrace -c x	safe-write
+ktrace artrace -f x	safe-write
+ktrace artrace -i x	safe-write
+ktrace artrace -n	safe-write
+ktrace artrace -n --kperf x	safe-write
+ktrace artrace -n -r	safe-write
+ktrace artrace -n x	safe-write
+ktrace artrace -o ./trace.atrc	safe-write
+ktrace artrace -o x	safe-write
+ktrace artrace -p x	safe-write
+ktrace artrace -r	safe-write
+ktrace artrace -t x	safe-write
+ktrace artrace x	safe-write
+ktrace compress	denied
+ktrace compress -l x	safe-write
+ktrace compress x	safe-write
+ktrace config	inert
+ktrace config --help	inert
+ktrace config --help -h	inert
+ktrace config --help x	inert
+ktrace config -h	inert
+ktrace config x	inert
+ktrace decode	denied
+ktrace decode --help	inert
+ktrace decode --help -h	inert
+ktrace decode --help x	inert
+ktrace decode -h	inert
+ktrace decode x	inert
+ktrace disable	denied
+ktrace disable x	denied
+ktrace dump	denied
+ktrace dump --disable-coprocessors	safe-write
+ktrace dump --disable-coprocessors --include-log-content	safe-write
+ktrace dump --disable-coprocessors --notify-tracing-started x	safe-write
+ktrace dump --disable-coprocessors x	safe-write
+ktrace dump --include-log-content	safe-write
+ktrace dump --notify-tracing-started x	safe-write
+ktrace dump --stackshot-flags x	safe-write
+ktrace dump -E	safe-write
+ktrace dump -T x	safe-write
+ktrace dump -b x	safe-write
+ktrace dump -f x	safe-write
+ktrace dump -h	safe-write
+ktrace dump -l x	safe-write
+ktrace dump -p x	safe-write
+ktrace dump x	safe-write
+ktrace emit	denied
+ktrace emit x	denied
+ktrace enable	denied
+ktrace enable x	denied
+ktrace info	inert
+ktrace info --help	inert
+ktrace info --help -h	inert
+ktrace info --help x	inert
+ktrace info -h	inert
+ktrace info x	inert
+ktrace init	denied
+ktrace init x	denied
+ktrace machine	inert
+ktrace machine --help	inert
+ktrace machine --help -h	inert
+ktrace machine --help x	inert
+ktrace machine -h	inert
+ktrace machine x	inert
+ktrace remove	denied
+ktrace remove x	denied
+ktrace reset	denied
+ktrace reset x	denied
+ktrace setopt	denied
+ktrace setopt x	denied
+ktrace symbolicate	denied
+ktrace symbolicate --help	inert
+ktrace symbolicate --help -h	inert
+ktrace symbolicate --help x	inert
+ktrace symbolicate -h	inert
+ktrace symbolicate x	inert
+ktrace trace	inert
+ktrace trace --continuous	inert
+ktrace trace --continuous --csv	inert
+ktrace trace --continuous -R x	inert
+ktrace trace --continuous x	inert
+ktrace trace --csv	inert
+ktrace trace --disable-coprocessors	inert
+ktrace trace --json	inert
+ktrace trace --json-64	inert
+ktrace trace --ndjson	inert
+ktrace trace --no-default-codes-files	inert
+ktrace trace --only-named-events	inert
+ktrace trace -A	inert
+ktrace trace -C	inert
+ktrace trace -E	inert
+ktrace trace -N	inert
+ktrace trace -R x	inert
+ktrace trace -S	inert
+ktrace trace -T x	inert
+ktrace trace -b x	inert
+ktrace trace -f x	inert
+ktrace trace -h	inert
+ktrace trace -n	inert
+ktrace trace -p x	inert
+ktrace trace -r	inert
+ktrace trace -s	inert
+ktrace trace -t	inert
+ktrace trace -u	inert
+ktrace trace -x x	inert
+ktrace trace x	inert
+ktrace x	denied
+kubectl	denied
+kubectl --help	inert
+kubectl --help --version	denied
+kubectl --help x	denied
+kubectl --version	inert
+kubectl -V	inert
+kubectl -h	inert
+kubectl api-resources	inert
+kubectl api-resources --api-group x	inert
+kubectl api-resources --help	inert
+kubectl api-resources --help --api-group x	inert
+kubectl api-resources --help --namespaced	inert
+kubectl api-resources --help x	inert
+kubectl api-resources --namespaced	inert
+kubectl api-resources --no-headers	inert
+kubectl api-resources --output x	inert
+kubectl api-resources --sort-by x	inert
+kubectl api-resources --verbs x	inert
+kubectl api-resources -h	inert
+kubectl api-resources -o x	inert
+kubectl api-resources x	inert
+kubectl api-versions	inert
+kubectl api-versions --help	inert
+kubectl api-versions --help -h	inert
+kubectl api-versions --help x	inert
+kubectl api-versions -h	inert
+kubectl api-versions x	inert
+kubectl auth	denied
+kubectl auth can-i	denied
+kubectl auth can-i --help	inert
+kubectl auth can-i --help -h	inert
+kubectl auth can-i --help x	inert
+kubectl auth can-i -h	inert
+kubectl auth can-i x	inert
+kubectl auth whoami	inert
+kubectl auth whoami --help	inert
+kubectl auth whoami --help -h	inert
+kubectl auth whoami --help x	inert
+kubectl auth whoami -h	inert
+kubectl auth whoami x	inert
+kubectl auth x	denied
+kubectl cluster-info	inert
+kubectl cluster-info --help	inert
+kubectl cluster-info --help -h	inert
+kubectl cluster-info --help x	inert
+kubectl cluster-info -h	inert
+kubectl cluster-info x	inert
+kubectl config	denied
+kubectl config current-context	inert
+kubectl config current-context --help	inert
+kubectl config current-context --help -h	inert
+kubectl config current-context --help x	inert
+kubectl config current-context -h	inert
+kubectl config current-context x	inert
+kubectl config get-contexts	inert
+kubectl config get-contexts --help	inert
+kubectl config get-contexts --help --no-headers	inert
+kubectl config get-contexts --help --output x	inert
+kubectl config get-contexts --help x	inert
+kubectl config get-contexts --no-headers	inert
+kubectl config get-contexts --output x	inert
+kubectl config get-contexts -h	inert
+kubectl config get-contexts -o x	inert
+kubectl config get-contexts x	inert
+kubectl config view	inert
+kubectl config view --flatten	inert
+kubectl config view --flatten --help	inert
+kubectl config view --flatten --output x	inert
+kubectl config view --flatten x	inert
+kubectl config view --help	inert
+kubectl config view --minify	inert
+kubectl config view --output x	inert
+kubectl config view --raw	inert
+kubectl config view -h	inert
+kubectl config view -o x	inert
+kubectl config view x	inert
+kubectl config x	denied
+kubectl describe	denied
+kubectl describe --all-namespaces	inert
+kubectl describe --all-namespaces --help	inert
+kubectl describe --all-namespaces --namespace x	inert
+kubectl describe --all-namespaces x	inert
+kubectl describe --help	inert
+kubectl describe --namespace x	inert
+kubectl describe --selector x	inert
+kubectl describe --show-events	inert
+kubectl describe -A	inert
+kubectl describe -h	inert
+kubectl describe -l x	inert
+kubectl describe -n x	inert
+kubectl describe x	inert
+kubectl diff	denied
+kubectl diff --field-manager	inert
+kubectl diff --field-manager --filename x	inert
+kubectl diff --field-manager --force-conflicts	inert
+kubectl diff --field-manager x	inert
+kubectl diff --filename x	inert
+kubectl diff --force-conflicts	inert
+kubectl diff --help	inert
+kubectl diff --kustomize x	inert
+kubectl diff --prune	inert
+kubectl diff --prune-allowlist x	inert
+kubectl diff --selector x	inert
+kubectl diff --server-side	inert
+kubectl diff -f x	inert
+kubectl diff -h	inert
+kubectl diff -k x	inert
+kubectl diff -l x	inert
+kubectl diff x	inert
+kubectl events	inert
+kubectl events --all-namespaces	inert
+kubectl events --all-namespaces --for x	inert
+kubectl events --all-namespaces --help	inert
+kubectl events --all-namespaces x	inert
+kubectl events --for x	inert
+kubectl events --help	inert
+kubectl events --namespace x	inert
+kubectl events --output x	inert
+kubectl events --types x	inert
+kubectl events --watch	inert
+kubectl events -A	inert
+kubectl events -h	inert
+kubectl events -n x	inert
+kubectl events -o x	inert
+kubectl events -w	inert
+kubectl events x	inert
+kubectl explain	denied
+kubectl explain --api-version x	inert
+kubectl explain --help	inert
+kubectl explain --help --api-version x	inert
+kubectl explain --help --recursive	inert
+kubectl explain --help x	inert
+kubectl explain --recursive	inert
+kubectl explain -h	inert
+kubectl explain x	inert
+kubectl get	denied
+kubectl get --all-namespaces	denied
+kubectl get --all-namespaces --field-selector x	denied
+kubectl get --all-namespaces --help	denied
+kubectl get --all-namespaces x	inert
+kubectl get --field-selector x	denied
+kubectl get --help	denied
+kubectl get --label-selector x	denied
+kubectl get --namespace x	denied
+kubectl get --no-headers	denied
+kubectl get --output x	denied
+kubectl get --selector x	denied
+kubectl get --show-labels	denied
+kubectl get --sort-by x	denied
+kubectl get --watch	denied
+kubectl get -A	denied
+kubectl get -h	denied
+kubectl get -l x	denied
+kubectl get -n x	denied
+kubectl get -o x	denied
+kubectl get -w	denied
+kubectl get x	inert
+kubectl get x --all-namespaces	inert
+kubectl logs	denied
+kubectl logs --all-containers	inert
+kubectl logs --all-containers --container x	inert
+kubectl logs --all-containers --follow	inert
+kubectl logs --all-containers x	inert
+kubectl logs --container x	inert
+kubectl logs --follow	inert
+kubectl logs --help	inert
+kubectl logs --namespace x	inert
+kubectl logs --previous	inert
+kubectl logs --since x	inert
+kubectl logs --tail x	inert
+kubectl logs --timestamps	inert
+kubectl logs -c x	inert
+kubectl logs -f	inert
+kubectl logs -h	inert
+kubectl logs -n x	inert
+kubectl logs -p	inert
+kubectl logs x	inert
+kubectl top	denied
+kubectl top node	inert
+kubectl top node --help	inert
+kubectl top node --help --no-headers	inert
+kubectl top node --help --selector x	inert
+kubectl top node --help x	inert
+kubectl top node --no-headers	inert
+kubectl top node --selector x	inert
+kubectl top node --sort-by x	inert
+kubectl top node -h	inert
+kubectl top node -l x	inert
+kubectl top node x	inert
+kubectl top pod	inert
+kubectl top pod --all-namespaces	inert
+kubectl top pod --all-namespaces --containers	inert
+kubectl top pod --all-namespaces --namespace x	inert
+kubectl top pod --all-namespaces x	inert
+kubectl top pod --containers	inert
+kubectl top pod --help	inert
+kubectl top pod --namespace x	inert
+kubectl top pod --no-headers	inert
+kubectl top pod --selector x	inert
+kubectl top pod --sort-by x	inert
+kubectl top pod -A	inert
+kubectl top pod -h	inert
+kubectl top pod -l x	inert
+kubectl top pod -n x	inert
+kubectl top pod x	inert
+kubectl top x	denied
+kubectl version	inert
+kubectl version --client	inert
+kubectl version --client --help	inert
+kubectl version --client --output x	inert
+kubectl version --client x	inert
+kubectl version --help	inert
+kubectl version --output x	inert
+kubectl version --short	inert
+kubectl version -h	inert
+kubectl version -o x	inert
+kubectl version x	inert
+kubectl x	denied
+kubectx	inert
+kubectx --current	inert
+kubectx --current --help	inert
+kubectx --current x	denied
+kubectx --help	inert
+kubectx --version	denied
+kubectx -c	inert
+kubectx -h	inert
+kubectx x	denied
+kubens	inert
+kubens --current	inert
+kubens --current --help	inert
+kubens --current x	denied
+kubens --help	inert
+kubens --version	denied
+kubens -c	inert
+kubens -h	inert
+kubens x	denied
+kustomize	denied
+kustomize --helm-command x	denied
+kustomize --help	inert
+kustomize --help --helm-command x	denied
+kustomize --help -h	denied
+kustomize --help x	denied
+kustomize --output x	denied
+kustomize --version	denied
+kustomize -h	inert
+kustomize -o x	denied
+kustomize build	inert
+kustomize build --enable-alpha-plugins	inert
+kustomize build --enable-alpha-plugins --enable-exec	inert
+kustomize build --enable-alpha-plugins --env x	inert
+kustomize build --enable-alpha-plugins x	inert
+kustomize build --enable-exec	inert
+kustomize build --enable-helm	inert
+kustomize build --env x	inert
+kustomize build --helm-command x	inert
+kustomize build --help	inert
+kustomize build --load-restrictor	inert
+kustomize build --mount x	inert
+kustomize build --output x	inert
+kustomize build -h	inert
+kustomize build -o ./rendered.yaml	inert
+kustomize build -o x	inert
+kustomize build ./overlays/dev	inert
+kustomize build x	inert
+kustomize version	inert
+kustomize version --help	inert
+kustomize version --help --short	inert
+kustomize version --help x	inert
+kustomize version --short	inert
+kustomize version -h	inert
+kustomize version x	inert
+kustomize x	denied

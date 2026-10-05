@@ -1,0 +1,277 @@
+qemu-img	denied
+qemu-img --help	inert
+qemu-img --help --version	denied
+qemu-img --help x	denied
+qemu-img --version	inert
+qemu-img -V	inert
+qemu-img -h	inert
+qemu-img check	denied
+qemu-img check --cache x	inert
+qemu-img check --force-share	inert
+qemu-img check --force-share --cache x	inert
+qemu-img check --force-share --help	inert
+qemu-img check --force-share x	inert
+qemu-img check --format x	inert
+qemu-img check --help	inert
+qemu-img check --image-opts	inert
+qemu-img check --object x	inert
+qemu-img check --output x	inert
+qemu-img check --quiet	inert
+qemu-img check -T x	inert
+qemu-img check -U	inert
+qemu-img check -f x	inert
+qemu-img check -h	inert
+qemu-img check -q	inert
+qemu-img check x	inert
+qemu-img compare	denied
+qemu-img compare --a-format x	inert
+qemu-img compare --b-format x	inert
+qemu-img compare --cache x	inert
+qemu-img compare --force-share	inert
+qemu-img compare --force-share --a-format x	inert
+qemu-img compare --force-share --help	inert
+qemu-img compare --force-share x	inert
+qemu-img compare --help	inert
+qemu-img compare --image-opts	inert
+qemu-img compare --object x	inert
+qemu-img compare --progress	inert
+qemu-img compare --quiet	inert
+qemu-img compare --strict	inert
+qemu-img compare -F x	inert
+qemu-img compare -T x	inert
+qemu-img compare -U	inert
+qemu-img compare -f x	inert
+qemu-img compare -h	inert
+qemu-img compare -p	inert
+qemu-img compare -q	inert
+qemu-img compare -s	inert
+qemu-img compare x	inert
+qemu-img info	denied
+qemu-img info --backing-chain	inert
+qemu-img info --backing-chain --cache x	inert
+qemu-img info --backing-chain --force-share	inert
+qemu-img info --backing-chain x	inert
+qemu-img info --cache x	inert
+qemu-img info --force-share	inert
+qemu-img info --format x	inert
+qemu-img info --help	inert
+qemu-img info --image-opts	inert
+qemu-img info --limits	inert
+qemu-img info --object x	inert
+qemu-img info --output x	inert
+qemu-img info -U	inert
+qemu-img info -f x	inert
+qemu-img info -h	inert
+qemu-img info -t x	inert
+qemu-img info x	inert
+qemu-img map	denied
+qemu-img map --force-share	inert
+qemu-img map --force-share --format x	inert
+qemu-img map --force-share --help	inert
+qemu-img map --force-share x	inert
+qemu-img map --format x	inert
+qemu-img map --help	inert
+qemu-img map --image-opts	inert
+qemu-img map --max-length x	inert
+qemu-img map --object x	inert
+qemu-img map --output x	inert
+qemu-img map --start-offset x	inert
+qemu-img map -U	inert
+qemu-img map -f x	inert
+qemu-img map -h	inert
+qemu-img map -l x	inert
+qemu-img map -s x	inert
+qemu-img map x	inert
+qemu-img measure	denied
+qemu-img measure --force-share	inert
+qemu-img measure --force-share --format x	inert
+qemu-img measure --force-share --help	inert
+qemu-img measure --force-share x	inert
+qemu-img measure --format x	inert
+qemu-img measure --help	inert
+qemu-img measure --image-opts	inert
+qemu-img measure --object x	inert
+qemu-img measure --output x	inert
+qemu-img measure --size x	inert
+qemu-img measure --snapshot x	inert
+qemu-img measure --target-format x	inert
+qemu-img measure -O x	inert
+qemu-img measure -U	inert
+qemu-img measure -f x	inert
+qemu-img measure -h	inert
+qemu-img measure -l x	inert
+qemu-img measure -o x	inert
+qemu-img measure -s x	inert
+qemu-img measure x	inert
+qemu-img snapshot	denied
+qemu-img snapshot --force-share	inert
+qemu-img snapshot --force-share --format x	inert
+qemu-img snapshot --force-share --help	inert
+qemu-img snapshot --force-share x	inert
+qemu-img snapshot --format x	inert
+qemu-img snapshot --help	inert
+qemu-img snapshot --image-opts	inert
+qemu-img snapshot --list	inert
+qemu-img snapshot --object x	inert
+qemu-img snapshot --quiet	inert
+qemu-img snapshot -U	inert
+qemu-img snapshot -f x	inert
+qemu-img snapshot -h	inert
+qemu-img snapshot -l	inert
+qemu-img snapshot -q	inert
+qemu-img snapshot x	inert
+qemu-img x	denied
+qlmanage	denied
+qlmanage --help	safe-read
+qlmanage --help -c x	safe-read
+qlmanage --help -d	safe-read
+qlmanage --help x	safe-read
+qlmanage --version	denied
+qlmanage -c x	safe-read
+qlmanage -d	safe-read
+qlmanage -f	safe-read
+qlmanage -g x	safe-read
+qlmanage -h	safe-read
+qlmanage -i	safe-read
+qlmanage -m	safe-read
+qlmanage -o	safe-write
+qlmanage -o x	safe-write
+qlmanage -p	safe-read
+qlmanage -pluginIDs x	safe-read
+qlmanage -r	safe-read
+qlmanage -s x	safe-read
+qlmanage -t	safe-write
+qlmanage -x	safe-read
+qlmanage -z	safe-read
+qlmanage x	safe-read
+qpdf	denied
+qpdf --add-attachment x	safe-write
+qpdf --allow-insecure x	safe-write
+qpdf --allow-weak-crypto	safe-write
+qpdf --allow-weak-crypto --add-attachment x	safe-write
+qpdf --allow-weak-crypto --check	safe-write
+qpdf --allow-weak-crypto x	safe-write
+qpdf --certificate x	safe-write
+qpdf --check	safe-write
+qpdf --check-linearization	safe-write
+qpdf --coalesce-contents	safe-write
+qpdf --collate	safe-write
+qpdf --compress-streams	safe-write
+qpdf --compression-level	safe-write
+qpdf --copy-attachments-from x	safe-write
+qpdf --copy-encryption	safe-write
+qpdf --copyright	safe-write
+qpdf --decode-level x	safe-write
+qpdf --decrypt	safe-write
+qpdf --deterministic-id	safe-write
+qpdf --disable-signature-verification	safe-write
+qpdf --empty	safe-write
+qpdf --encrypt x	safe-write
+qpdf --encryption-file-password	safe-write
+qpdf --externalize-inline-images	safe-write
+qpdf --externalize-inline-images x	safe-write
+qpdf --filtered-stream-data	safe-write
+qpdf --flatten-annotations	safe-write
+qpdf --flatten-rotation	safe-write
+qpdf --force-version	safe-write
+qpdf --generate-appearances	safe-write
+qpdf --help	safe-write
+qpdf --help x	safe-write
+qpdf --help=all	safe-write
+qpdf --help=encryption	safe-write
+qpdf --ignore-xref-streams	safe-write
+qpdf --in-place	safe-write
+qpdf --is-encrypted	safe-write
+qpdf --is-encrypted in.pdf	safe-write
+qpdf --job-json x	safe-write
+qpdf --job-json-file x	safe-write
+qpdf --job-json-help	safe-write
+qpdf --json-help	safe-write
+qpdf --json-key x	safe-write
+qpdf --json-key=pages --json-key=encrypt in.pdf	safe-write
+qpdf --json-object x	safe-write
+qpdf --json-stream-prefix x	safe-write
+qpdf --keep-files-open	safe-write
+qpdf --keep-files-open-threshold	safe-write
+qpdf --keep-inline-images	safe-write
+qpdf --linearize	safe-write
+qpdf --linearize in.pdf out.pdf	safe-write
+qpdf --linearize-pass1 x	safe-write
+qpdf --list-attachments	safe-write
+qpdf --newline-before-endstream	safe-write
+qpdf --no-original-object-ids	safe-write
+qpdf --no-warn	safe-write
+qpdf --normalize-content	safe-write
+qpdf --object-streams x	safe-write
+qpdf --oi-min-area	safe-write
+qpdf --oi-min-height	safe-write
+qpdf --oi-min-width	safe-write
+qpdf --optimize-images	safe-write
+qpdf --overlay x	safe-write
+qpdf --pages x	safe-write
+qpdf --password x	safe-write
+qpdf --password-file x	safe-write
+qpdf --password-is-hex-key	safe-write
+qpdf --password-mode	safe-write
+qpdf --password-mode x	safe-write
+qpdf --preserve-unreferenced	safe-write
+qpdf --preserve-unreferenced-resources	safe-write
+qpdf --qdf	safe-write
+qpdf --raw-stream-data	safe-write
+qpdf --recompress-flate	safe-write
+qpdf --remove-attachment	safe-write
+qpdf --remove-page-labels	safe-write
+qpdf --remove-restrictions	safe-write
+qpdf --remove-unreferenced-resources	safe-write
+qpdf --replace-input	safe-write
+qpdf --report-mem-usage	safe-write
+qpdf --requires-password	safe-write
+qpdf --rotate x	safe-write
+qpdf --show-attachment x	safe-write
+qpdf --show-crypto	safe-write
+qpdf --show-encryption	safe-write
+qpdf --show-encryption-key	safe-write
+qpdf --show-linearization	safe-write
+qpdf --show-npages	safe-write
+qpdf --show-object x	safe-write
+qpdf --show-pages	safe-write
+qpdf --show-pages --with-images in.pdf	safe-write
+qpdf --show-xref	safe-write
+qpdf --split-pages	safe-write
+qpdf --split-pages x	safe-write
+qpdf --static-aes-iv	safe-write
+qpdf --static-id	safe-write
+qpdf --stream-data x	safe-write
+qpdf --suppress-password-recovery	safe-write
+qpdf --suppress-recovery	safe-write
+qpdf --test-json-schema	safe-write
+qpdf --underlay	safe-write
+qpdf --update-from-json x	safe-write
+qpdf --verbose	safe-write
+qpdf --version	safe-write
+qpdf --warning-exit-0	safe-write
+qpdf --with-images	safe-write
+qpdf --zopfli	safe-write
+qpdf -h	safe-write
+qpdf in.pdf out.pdf	safe-write
+qpdf x	safe-write
+qsv	denied
+qsv --envlist	inert
+qsv --envlist --help	inert
+qsv --envlist x	inert
+qsv --help	inert
+qsv --list	inert
+qsv --update	inert
+qsv --version	inert
+qsv -h	inert
+qsv x	inert
+quota	inert
+quota --help	denied
+quota --version	denied
+quota -g	inert
+quota -g -q	inert
+quota -g x	inert
+quota -q	inert
+quota -u	inert
+quota -v	inert
+quota x	inert

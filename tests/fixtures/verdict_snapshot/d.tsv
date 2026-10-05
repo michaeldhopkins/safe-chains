@@ -1,0 +1,5622 @@
+DeRez	denied
+DeRez --help	denied
+DeRez --version	denied
+DeRez -c	inert
+DeRez -c -compatible	inert
+DeRez -c -d x	inert
+DeRez -c x	inert
+DeRez -compatible	inert
+DeRez -d x	inert
+DeRez -define x	inert
+DeRez -e	inert
+DeRez -escape	inert
+DeRez -i x	inert
+DeRez -is x	inert
+DeRez -isysroot x	inert
+DeRez -m x	inert
+DeRez -maxstringsize x	inert
+DeRez -noResolve	inert
+DeRez -only x	inert
+DeRez -p	inert
+DeRez -rd	inert
+DeRez -s x	inert
+DeRez -script x	inert
+DeRez -skip x	inert
+DeRez -u x	inert
+DeRez -undef x	inert
+DeRez -useDF	inert
+DeRez resource.rsrc	inert
+DeRez x	inert
+danetool	denied
+danetool -!	inert
+danetool -! --app-proto	inert
+danetool -! --attime x	inert
+danetool -! x	inert
+danetool --app-proto	inert
+danetool --attime x	inert
+danetool --ca	inert
+danetool --check example.com	inert
+danetool --check x	inert
+danetool --check-ca	inert
+danetool --check-ee	inert
+danetool --debug x	inert
+danetool --dlv x	inert
+danetool --domain x	inert
+danetool --hash x	inert
+danetool --help	inert
+danetool --host x	inert
+danetool --inder	inert
+danetool --inraw	inert
+danetool --insecure	inert
+danetool --load-certificate x	inert
+danetool --load-pubkey x	inert
+danetool --local	inert
+danetool --local-dns	inert
+danetool --more-help	inert
+danetool --no-domain	inert
+danetool --no-inder	inert
+danetool --no-local-dns	inert
+danetool --no-print-raw	inert
+danetool --outfile x	inert
+danetool --port x	inert
+danetool --print-raw	inert
+danetool --proto x	inert
+danetool --quiet	inert
+danetool --starttls-proto x	inert
+danetool --tlsa-rr	inert
+danetool --tlsa-rr --host www.example.com --load-certificate cert.pem	inert
+danetool --verbose	inert
+danetool --version	inert
+danetool --version x	inert
+danetool --x509	inert
+danetool -V	inert
+danetool -d x	inert
+danetool -h	inert
+danetool -v x	inert
+danetool x	inert
+danger	denied
+danger --help	inert
+danger --help --version	denied
+danger --help x	denied
+danger --version	inert
+danger -h	inert
+danger -v	inert
+danger dry_run	denied
+danger dry_run x	denied
+danger help	inert
+danger help x	inert
+danger init	denied
+danger init x	denied
+danger local	denied
+danger local x	denied
+danger plugins	denied
+danger plugins x	denied
+danger pr	denied
+danger pr x	denied
+danger runner	denied
+danger runner x	denied
+danger systems	denied
+danger systems x	denied
+danger x	denied
+dapr	denied
+dapr --help	inert
+dapr --help --version	denied
+dapr --help x	denied
+dapr --version	inert
+dapr -h	inert
+dapr -v	inert
+dapr annotate	denied
+dapr annotate x	denied
+dapr build-info	denied
+dapr build-info x	denied
+dapr completion	denied
+dapr completion --help	inert
+dapr completion --help -h	inert
+dapr completion --help x	inert
+dapr completion -h	inert
+dapr completion x	inert
+dapr components	safe-read
+dapr components --all-namespaces	safe-read
+dapr components --all-namespaces --help	safe-read
+dapr components --all-namespaces --name x	safe-read
+dapr components --all-namespaces x	safe-read
+dapr components --help	safe-read
+dapr components --kubernetes	safe-read
+dapr components --name x	safe-read
+dapr components --namespace x	safe-read
+dapr components --output x	safe-read
+dapr components -A	safe-read
+dapr components -h	safe-read
+dapr components -k	safe-read
+dapr components -n x	safe-read
+dapr components -o x	safe-read
+dapr components x	safe-read
+dapr configurations	safe-read
+dapr configurations --all-namespaces	safe-read
+dapr configurations --all-namespaces --help	safe-read
+dapr configurations --all-namespaces --name x	safe-read
+dapr configurations --all-namespaces x	safe-read
+dapr configurations --help	safe-read
+dapr configurations --kubernetes	safe-read
+dapr configurations --name x	safe-read
+dapr configurations --namespace x	safe-read
+dapr configurations --output x	safe-read
+dapr configurations -A	safe-read
+dapr configurations -h	safe-read
+dapr configurations -k	safe-read
+dapr configurations -n x	safe-read
+dapr configurations -o x	safe-read
+dapr configurations x	safe-read
+dapr dashboard	denied
+dapr dashboard x	denied
+dapr help	inert
+dapr help x	inert
+dapr init	denied
+dapr init x	denied
+dapr invoke	denied
+dapr invoke x	denied
+dapr list	safe-read
+dapr list --all-namespaces	safe-read
+dapr list --all-namespaces --help	safe-read
+dapr list --all-namespaces --kubernetes x	safe-read
+dapr list --all-namespaces x	safe-read
+dapr list --help	safe-read
+dapr list --kubernetes x	safe-read
+dapr list --namespace x	safe-read
+dapr list --output x	safe-read
+dapr list -A	safe-read
+dapr list -h	safe-read
+dapr list -k x	safe-read
+dapr list -n x	safe-read
+dapr list -o x	safe-read
+dapr list x	safe-read
+dapr logs	denied
+dapr logs --app-id x	safe-read
+dapr logs --container x	safe-read
+dapr logs --help	safe-read
+dapr logs --help --app-id x	safe-read
+dapr logs --help -h	safe-read
+dapr logs --help x	safe-read
+dapr logs --kubernetes x	safe-read
+dapr logs --namespace x	safe-read
+dapr logs --pod-name x	safe-read
+dapr logs -a x	safe-read
+dapr logs -c x	safe-read
+dapr logs -h	safe-read
+dapr logs -k x	safe-read
+dapr logs -n x	safe-read
+dapr logs -p x	safe-read
+dapr logs x	safe-read
+dapr mtls	denied
+dapr mtls x	denied
+dapr publish	denied
+dapr publish x	denied
+dapr run	denied
+dapr run x	denied
+dapr status	safe-read
+dapr status --help	safe-read
+dapr status --help --kubernetes	safe-read
+dapr status --help --output x	safe-read
+dapr status --help x	safe-read
+dapr status --kubernetes	safe-read
+dapr status --output x	safe-read
+dapr status -h	safe-read
+dapr status -k	safe-read
+dapr status -o x	safe-read
+dapr status x	safe-read
+dapr stop	denied
+dapr stop x	denied
+dapr uninstall	denied
+dapr uninstall x	denied
+dapr upgrade	denied
+dapr upgrade x	denied
+dapr version	inert
+dapr version --help	inert
+dapr version --help --output x	inert
+dapr version --help -h	inert
+dapr version --help x	inert
+dapr version --output x	inert
+dapr version -h	inert
+dapr version -o x	inert
+dapr version x	inert
+dapr x	denied
+dart	denied
+dart --help	inert
+dart --help --version	denied
+dart --help x	denied
+dart --version	inert
+dart -h	inert
+dart analyze	safe-read
+dart analyze --cache	safe-read
+dart analyze --cache --directory x	safe-read
+dart analyze --cache --enable-experiment	safe-read
+dart analyze --cache x	safe-read
+dart analyze --directory x	safe-read
+dart analyze --enable-experiment	safe-read
+dart analyze --fatal-infos	safe-read
+dart analyze --fatal-warnings	safe-read
+dart analyze --format	safe-read
+dart analyze --help	safe-read
+dart analyze --no-fatal-infos	safe-read
+dart analyze --no-fatal-warnings	safe-read
+dart analyze --packages	safe-read
+dart analyze --verbose	safe-read
+dart analyze -h	safe-read
+dart analyze -v	safe-read
+dart analyze x	safe-read
+dart compile	denied
+dart compile x	denied
+dart create	denied
+dart create x	denied
+dart devtools	denied
+dart devtools x	denied
+dart doc	denied
+dart doc x	denied
+dart fix	denied
+dart fix x	denied
+dart format	safe-read
+dart format --enable-experiment	safe-read
+dart format --enable-experiment --fix	safe-read
+dart format --enable-experiment --language-version x	safe-read
+dart format --enable-experiment x	safe-read
+dart format --fix	safe-read
+dart format --follow-links	safe-read
+dart format --help	safe-read
+dart format --language-version x	safe-read
+dart format --line-length x	safe-read
+dart format --machine	safe-read
+dart format --output	safe-write
+dart format --output x	safe-write
+dart format --page-width x	safe-read
+dart format --selection x	safe-read
+dart format --set-exit-if-changed	safe-read
+dart format --show	safe-read
+dart format --show-help-hidden	safe-read
+dart format --style x	safe-read
+dart format --summary	safe-read
+dart format -h	safe-read
+dart format -l x	safe-read
+dart format -o	safe-write
+dart format -o show ./lib	safe-write
+dart format -o write ./lib	safe-write
+dart format -o write /etc/hosts	denied
+dart format -o x	safe-write
+dart format ./lib	safe-read
+dart format x	safe-read
+dart format ~/.ssh/authorized_keys	denied
+dart help	inert
+dart help x	inert
+dart info	inert
+dart info --help	inert
+dart info --help -h	inert
+dart info --help x	inert
+dart info -h	inert
+dart info x	inert
+dart language-server	denied
+dart language-server x	denied
+dart mcp-server	denied
+dart mcp-server x	denied
+dart pub	denied
+dart pub x	denied
+dart run	denied
+dart run x	denied
+dart test	denied
+dart test x	denied
+dart version	inert
+dart version --help	inert
+dart version --help -h	inert
+dart version --help x	inert
+dart version -h	inert
+dart version x	inert
+dart x	denied
+dasel	safe-write
+dasel --colour	safe-write
+dasel --colour --compact	safe-write
+dasel --colour --config x	safe-write
+dasel --colour x	safe-write
+dasel --compact	safe-write
+dasel --config x	safe-write
+dasel --exec /bin/sh	denied
+dasel --file data.json --selector '.foo.bar'	safe-write
+dasel --file x	safe-write
+dasel --help	safe-write
+dasel --in x	safe-write
+dasel --length	safe-write
+dasel --multiple	safe-write
+dasel --no-colour	safe-write
+dasel --null	safe-write
+dasel --out x	safe-write
+dasel --parser x	safe-write
+dasel --plain	safe-write
+dasel --read x	safe-write
+dasel --read-flag x	safe-write
+dasel --root	safe-write
+dasel --rw-flag x	safe-write
+dasel --selector x	safe-write
+dasel --unstable	safe-write
+dasel --var x	safe-write
+dasel --version	safe-write
+dasel --write x	safe-write
+dasel --write-flag x	safe-write
+dasel -c x	safe-write
+dasel -f data.json '.foo'	safe-write
+dasel -f data.json --in json --out yaml '.foo'	safe-write
+dasel -f x	safe-write
+dasel -h	safe-write
+dasel -i x	safe-write
+dasel -m	safe-write
+dasel -n	safe-write
+dasel -o x	safe-write
+dasel -p x	safe-write
+dasel -r x	safe-write
+dasel -s x	safe-write
+dasel -w x	safe-write
+dasel x	safe-write
+date	inert
+date --date x	inert
+date --help	inert
+date --help --date x	inert
+date --help --rfc-2822	inert
+date --help x	inert
+date --iso-8601 x	inert
+date --reference x	inert
+date --rfc-2822	inert
+date --rfc-3339 x	inert
+date --rfc-email	inert
+date --universal	inert
+date --utc	inert
+date --version	inert
+date -I x	inert
+date -R	inert
+date -V	inert
+date -d x	inert
+date -f x	inert
+date -h	inert
+date -j	inert
+date -n	inert
+date -r x	inert
+date -u	inert
+date -v x	inert
+date -z x	inert
+date x	inert
+dawn	denied
+dawn --help	inert
+dawn --help --output x	denied
+dawn --help --version	denied
+dawn --help x	denied
+dawn --output x	denied
+dawn --version	inert
+dawn -O x	denied
+dawn -h	inert
+dawn -v	inert
+dawn help	inert
+dawn help x	inert
+dawn kb	denied
+dawn kb find	inert
+dawn kb find --debug	inert
+dawn kb find --debug --help	inert
+dawn kb find --debug x	inert
+dawn kb find --help	inert
+dawn kb find --verbose	inert
+dawn kb find -h	inert
+dawn kb find x	inert
+dawn kb lint	inert
+dawn kb lint --debug	inert
+dawn kb lint --debug --help	inert
+dawn kb lint --debug x	inert
+dawn kb lint --help	inert
+dawn kb lint --verbose	inert
+dawn kb lint -h	inert
+dawn kb lint x	inert
+dawn kb list	inert
+dawn kb list --debug	inert
+dawn kb list --debug --help	inert
+dawn kb list --debug x	inert
+dawn kb list --help	inert
+dawn kb list --verbose	inert
+dawn kb list -h	inert
+dawn kb list x	inert
+dawn kb status	inert
+dawn kb status --debug	inert
+dawn kb status --debug --help	inert
+dawn kb status --debug x	inert
+dawn kb status --help	inert
+dawn kb status --verbose	inert
+dawn kb status -h	inert
+dawn kb status x	inert
+dawn kb unpack	denied
+dawn kb unpack x	denied
+dawn kb x	denied
+dawn scan	denied
+dawn scan --config-file x	safe-write
+dawn scan --count	safe-write
+dawn scan --count --config-file x	safe-write
+dawn scan --count --debug	safe-write
+dawn scan --count x	safe-write
+dawn scan --debug	safe-write
+dawn scan --dependencies	safe-write
+dawn scan --exit-on-warn	safe-write
+dawn scan --gemfile	safe-write
+dawn scan --help	safe-write
+dawn scan --output	safe-write
+dawn scan --output ./dawn-report.json .	safe-write
+dawn scan --output x	safe-write
+dawn scan --report-format x	safe-write
+dawn scan --skip x	safe-write
+dawn scan --verbose	safe-write
+dawn scan -C	safe-write
+dawn scan -F x	safe-write
+dawn scan -G	safe-write
+dawn scan -O	safe-write
+dawn scan -O x	safe-write
+dawn scan -S x	safe-write
+dawn scan -c x	safe-write
+dawn scan -d	safe-write
+dawn scan -h	safe-write
+dawn scan -z	safe-write
+dawn scan x	safe-write
+dawn x	denied
+dbmate	denied
+dbmate --help	inert
+dbmate --help --version	denied
+dbmate --help x	denied
+dbmate --version	inert
+dbmate -h	inert
+dbmate -v	inert
+dbmate create	denied
+dbmate create x	denied
+dbmate down	denied
+dbmate down x	denied
+dbmate drop	denied
+dbmate drop x	denied
+dbmate dump	denied
+dbmate dump x	denied
+dbmate help	inert
+dbmate help x	inert
+dbmate load	denied
+dbmate load x	denied
+dbmate migrate	denied
+dbmate migrate x	denied
+dbmate new	denied
+dbmate new x	denied
+dbmate rollback	denied
+dbmate rollback x	denied
+dbmate status	safe-read
+dbmate status --config-file x	safe-read
+dbmate status --exit-code	safe-read
+dbmate status --exit-code --config-file x	safe-read
+dbmate status --exit-code --help	safe-read
+dbmate status --exit-code x	safe-read
+dbmate status --help	safe-read
+dbmate status --migrations-dir x	safe-read
+dbmate status --migrations-table x	safe-read
+dbmate status --quiet	safe-read
+dbmate status --schema-file x	safe-read
+dbmate status --url x	safe-read
+dbmate status -d x	safe-read
+dbmate status -e x	safe-read
+dbmate status -h	safe-read
+dbmate status -s x	safe-read
+dbmate status -u x	safe-read
+dbmate status x	safe-read
+dbmate up	denied
+dbmate up x	denied
+dbmate version	inert
+dbmate version --help	inert
+dbmate version --help -h	inert
+dbmate version --help x	inert
+dbmate version -h	inert
+dbmate version x	inert
+dbmate wait	denied
+dbmate wait x	denied
+dbmate x	denied
+dbt	denied
+dbt --help	inert
+dbt --help --version	denied
+dbt --help x	denied
+dbt --version	inert
+dbt -V	inert
+dbt -h	inert
+dbt build	denied
+dbt build x	denied
+dbt clean	safe-write
+dbt clean --help	safe-write
+dbt clean --help --no-clean-project-files-only	safe-write
+dbt clean --help --profile x	safe-write
+dbt clean --help x	safe-write
+dbt clean --no-clean-project-files-only	safe-write
+dbt clean --profile	safe-write
+dbt clean --profile x	safe-write
+dbt clean --profiles-dir x	safe-write
+dbt clean --project-dir x	safe-write
+dbt clean --quiet	safe-write
+dbt clean --target x	safe-write
+dbt clean -h	safe-write
+dbt clean -q	safe-write
+dbt clean x	safe-write
+dbt clone	denied
+dbt clone x	denied
+dbt compile	safe-read
+dbt compile --cache-selected-only	safe-read
+dbt compile --cache-selected-only --debug	safe-read
+dbt compile --cache-selected-only --exclude x	safe-read
+dbt compile --cache-selected-only x	safe-read
+dbt compile --debug	safe-read
+dbt compile --exclude x	safe-read
+dbt compile --exclude-resource-type	safe-read
+dbt compile --full-refresh	safe-read
+dbt compile --help	safe-read
+dbt compile --inline	safe-read
+dbt compile --inline x	safe-read
+dbt compile --no-cache-selected-only	safe-read
+dbt compile --no-defer	safe-read
+dbt compile --no-favor-state	safe-read
+dbt compile --no-full-refresh	safe-read
+dbt compile --no-introspect	safe-read
+dbt compile --no-partial-parse	safe-read
+dbt compile --no-populate-cache	safe-read
+dbt compile --no-print	safe-read
+dbt compile --no-static-parser	safe-read
+dbt compile --no-version-check	safe-read
+dbt compile --profile	safe-read
+dbt compile --profile x	safe-read
+dbt compile --profiles-dir	safe-read
+dbt compile --profiles-dir x	safe-read
+dbt compile --project-dir x	safe-read
+dbt compile --quiet	safe-read
+dbt compile --resource-type x	safe-read
+dbt compile --select x	safe-read
+dbt compile --show	safe-read
+dbt compile --state x	safe-read
+dbt compile --target	safe-read
+dbt compile --target x	safe-read
+dbt compile --target-path	safe-read
+dbt compile --target-path x	safe-read
+dbt compile --threads	safe-read
+dbt compile --threads x	safe-read
+dbt compile --vars	safe-read
+dbt compile --vars x	safe-read
+dbt compile --warn-error	safe-read
+dbt compile -d x	safe-read
+dbt compile -h	safe-read
+dbt compile -m x	safe-read
+dbt compile -q	safe-read
+dbt compile -s x	safe-read
+dbt compile -t x	safe-read
+dbt compile x	safe-read
+dbt debug	safe-read
+dbt debug --config-dir	safe-read
+dbt debug --config-dir --connection	safe-read
+dbt debug --config-dir --profile x	safe-read
+dbt debug --config-dir x	safe-read
+dbt debug --connection	safe-read
+dbt debug --help	safe-read
+dbt debug --no-version-check	safe-read
+dbt debug --profile x	safe-read
+dbt debug --profiles-dir x	safe-read
+dbt debug --project-dir x	safe-read
+dbt debug --quiet	safe-read
+dbt debug --target x	safe-read
+dbt debug --version-check	safe-read
+dbt debug -h	safe-read
+dbt debug -q	safe-read
+dbt debug -t x	safe-read
+dbt debug x	safe-read
+dbt deps	safe-write
+dbt deps --add-package	safe-write
+dbt deps --add-package --dry-run	safe-write
+dbt deps --add-package --profile x	safe-write
+dbt deps --add-package x	safe-write
+dbt deps --dry-run	safe-write
+dbt deps --help	safe-write
+dbt deps --lock	safe-write
+dbt deps --no-lock	safe-write
+dbt deps --profile x	safe-write
+dbt deps --profiles-dir x	safe-write
+dbt deps --project-dir x	safe-write
+dbt deps --quiet	safe-write
+dbt deps --source x	safe-write
+dbt deps --target x	safe-write
+dbt deps --upgrade	safe-write
+dbt deps --vars x	safe-write
+dbt deps -h	safe-write
+dbt deps -q	safe-write
+dbt deps -t x	safe-write
+dbt deps x	safe-write
+dbt docs	denied
+dbt docs x	denied
+dbt freshness	denied
+dbt freshness x	denied
+dbt help	inert
+dbt help x	inert
+dbt init	safe-write
+dbt init --help	safe-write
+dbt init --help --profiles-dir	safe-write
+dbt init --help x	safe-write
+dbt init --profiles-dir	safe-write
+dbt init --quiet	safe-write
+dbt init --skip-profile-setup	safe-write
+dbt init -h	safe-write
+dbt init -q	safe-write
+dbt init -s	safe-write
+dbt init x	safe-write
+dbt list	safe-read
+dbt list --exclude x	safe-read
+dbt list --help	safe-read
+dbt list --help --exclude x	safe-read
+dbt list --help --no-version-check	safe-read
+dbt list --help x	safe-read
+dbt list --no-version-check	safe-read
+dbt list --output x	safe-read
+dbt list --output-keys x	safe-read
+dbt list --profile x	safe-read
+dbt list --profiles-dir x	safe-read
+dbt list --project-dir x	safe-read
+dbt list --quiet	safe-read
+dbt list --resource-type x	safe-read
+dbt list --select x	safe-read
+dbt list --state x	safe-read
+dbt list --target x	safe-read
+dbt list -d x	safe-read
+dbt list -h	safe-read
+dbt list -m x	safe-read
+dbt list -q	safe-read
+dbt list -s x	safe-read
+dbt list -t x	safe-read
+dbt list x	safe-read
+dbt ls	safe-read
+dbt ls --exclude x	safe-read
+dbt ls --exclude-resource-type x	safe-read
+dbt ls --help	safe-read
+dbt ls --help --exclude x	safe-read
+dbt ls --help --no-version-check	safe-read
+dbt ls --help x	safe-read
+dbt ls --no-version-check	safe-read
+dbt ls --output x	safe-read
+dbt ls --output-keys x	safe-read
+dbt ls --profile x	safe-read
+dbt ls --profiles-dir x	safe-read
+dbt ls --project-dir x	safe-read
+dbt ls --quiet	safe-read
+dbt ls --resource-type	safe-read
+dbt ls --resource-type x	safe-read
+dbt ls --select x	safe-read
+dbt ls --state x	safe-read
+dbt ls --target x	safe-read
+dbt ls -d x	safe-read
+dbt ls -h	safe-read
+dbt ls -m x	safe-read
+dbt ls -q	safe-read
+dbt ls -s x	safe-read
+dbt ls -t x	safe-read
+dbt ls x	safe-read
+dbt parse	safe-read
+dbt parse --help	safe-read
+dbt parse --help --no-partial-parse	safe-read
+dbt parse --help --profile x	safe-read
+dbt parse --help x	safe-read
+dbt parse --no-partial-parse	safe-read
+dbt parse --no-static-parser	safe-read
+dbt parse --no-version-check	safe-read
+dbt parse --profile x	safe-read
+dbt parse --profiles-dir x	safe-read
+dbt parse --project-dir x	safe-read
+dbt parse --quiet	safe-read
+dbt parse --show-hash	safe-read
+dbt parse --target x	safe-read
+dbt parse --target-path x	safe-read
+dbt parse --threads x	safe-read
+dbt parse --vars x	safe-read
+dbt parse --write-json	safe-read
+dbt parse -h	safe-read
+dbt parse -q	safe-read
+dbt parse -t x	safe-read
+dbt parse x	safe-read
+dbt retry	denied
+dbt retry x	denied
+dbt run	denied
+dbt run x	denied
+dbt run-operation	denied
+dbt run-operation x	denied
+dbt seed	denied
+dbt seed x	denied
+dbt show	denied
+dbt show x	denied
+dbt snapshot	denied
+dbt snapshot x	denied
+dbt source	denied
+dbt source x	denied
+dbt test	denied
+dbt test x	denied
+dbt version	inert
+dbt version --help	inert
+dbt version --help -h	inert
+dbt version --help x	inert
+dbt version -h	inert
+dbt version x	inert
+dbt x	denied
+dc	inert
+dc --expression x	inert
+dc --file x	inert
+dc --help	inert
+dc --help --expression x	inert
+dc --help --version	inert
+dc --help x	inert
+dc --version	inert
+dc -V	inert
+dc -e x	inert
+dc -f x	inert
+dc -h	inert
+dc x	inert
+dcli	denied
+dcli --help	inert
+dcli --help --version	denied
+dcli --help x	denied
+dcli --version	inert
+dcli -V	inert
+dcli -h	inert
+dcli accounts	denied
+dcli accounts whoami	inert
+dcli accounts whoami --help	inert
+dcli accounts whoami --help -h	inert
+dcli accounts whoami --help x	inert
+dcli accounts whoami -h	inert
+dcli accounts whoami x	inert
+dcli accounts x	denied
+dcli devices	denied
+dcli devices list	inert
+dcli devices list --help	inert
+dcli devices list --help --json	inert
+dcli devices list --help x	inert
+dcli devices list --json	inert
+dcli devices list -h	inert
+dcli devices list x	inert
+dcli devices x	denied
+dcli lock	inert
+dcli lock --help	inert
+dcli lock --help -h	inert
+dcli lock --help x	inert
+dcli lock -h	inert
+dcli lock x	inert
+dcli sync	inert
+dcli sync --help	inert
+dcli sync --help -h	inert
+dcli sync --help x	inert
+dcli sync -h	inert
+dcli sync x	inert
+dcli team	denied
+dcli team credentials	denied
+dcli team credentials list	inert
+dcli team credentials list --help	inert
+dcli team credentials list --help --json	inert
+dcli team credentials list --help x	inert
+dcli team credentials list --json	inert
+dcli team credentials list -h	inert
+dcli team credentials list x	inert
+dcli team credentials x	denied
+dcli team dark-web-insights	denied
+dcli team dark-web-insights --count x	inert
+dcli team dark-web-insights --help	inert
+dcli team dark-web-insights --help --count x	inert
+dcli team dark-web-insights --help -h	inert
+dcli team dark-web-insights --help x	inert
+dcli team dark-web-insights --offset x	inert
+dcli team dark-web-insights --order-by x	inert
+dcli team dark-web-insights -h	inert
+dcli team dark-web-insights x	inert
+dcli team logs	inert
+dcli team logs --csv	inert
+dcli team logs --csv --end x	inert
+dcli team logs --csv --help	inert
+dcli team logs --csv x	inert
+dcli team logs --end x	inert
+dcli team logs --help	inert
+dcli team logs --human-readable	inert
+dcli team logs --start x	inert
+dcli team logs -h	inert
+dcli team logs x	inert
+dcli team members	inert
+dcli team members --csv	inert
+dcli team members --csv --help	inert
+dcli team members --csv x	inert
+dcli team members --help	inert
+dcli team members --human-readable	inert
+dcli team members -h	inert
+dcli team members x	inert
+dcli team public-api	denied
+dcli team public-api list-keys	inert
+dcli team public-api list-keys --help	inert
+dcli team public-api list-keys --help --json	inert
+dcli team public-api list-keys --help x	inert
+dcli team public-api list-keys --json	inert
+dcli team public-api list-keys -h	inert
+dcli team public-api list-keys x	inert
+dcli team public-api x	denied
+dcli team report	inert
+dcli team report --help	inert
+dcli team report --help -h	inert
+dcli team report --help x	inert
+dcli team report -h	inert
+dcli team report x	inert
+dcli team x	denied
+dcli x	denied
+dd	inert
+dd --help	inert
+dd --version	inert
+dd if=./in of=./out bs=1M	safe-write
+dd if=./x of=/dev/rdisk0	denied
+dd if=./x of=/etc/hosts	denied
+dd if=~/.ssh/id_rsa of=./x	denied
+dd x	denied
+ddev	denied
+ddev --help	inert
+ddev --help --version	denied
+ddev --help x	denied
+ddev --version	inert
+ddev -V	inert
+ddev -h	inert
+ddev aliases	inert
+ddev aliases --help	inert
+ddev aliases --help -h	inert
+ddev aliases --help x	inert
+ddev aliases -h	inert
+ddev aliases x	inert
+ddev debug	denied
+ddev debug configyaml	inert
+ddev debug configyaml --help	inert
+ddev debug configyaml --help -h	inert
+ddev debug configyaml --help x	inert
+ddev debug configyaml -h	inert
+ddev debug configyaml x	inert
+ddev debug diagnose	inert
+ddev debug diagnose --help	inert
+ddev debug diagnose --help -h	inert
+ddev debug diagnose --help x	inert
+ddev debug diagnose -h	inert
+ddev debug diagnose x	inert
+ddev debug mutagen	inert
+ddev debug mutagen --help	inert
+ddev debug mutagen --help -h	inert
+ddev debug mutagen --help x	inert
+ddev debug mutagen -h	inert
+ddev debug mutagen x	inert
+ddev debug test	inert
+ddev debug test --help	inert
+ddev debug test --help -h	inert
+ddev debug test --help x	inert
+ddev debug test -h	inert
+ddev debug test x	inert
+ddev debug x	denied
+ddev describe	inert
+ddev describe --help	inert
+ddev describe --help --json-output	inert
+ddev describe --help x	inert
+ddev describe --json-output	inert
+ddev describe -h	inert
+ddev describe -j	inert
+ddev describe x	inert
+ddev list	inert
+ddev list --help	inert
+ddev list --help --json-output	inert
+ddev list --help x	inert
+ddev list --json-output	inert
+ddev list -h	inert
+ddev list -j	inert
+ddev list x	inert
+ddev logs	inert
+ddev logs --follow	inert
+ddev logs --follow --help	inert
+ddev logs --follow --service x	inert
+ddev logs --follow x	inert
+ddev logs --help	inert
+ddev logs --service x	inert
+ddev logs --tail x	inert
+ddev logs --time	inert
+ddev logs --timestamps	inert
+ddev logs -f	inert
+ddev logs -h	inert
+ddev logs -s x	inert
+ddev logs -t x	inert
+ddev logs x	inert
+ddev snapshot	denied
+ddev snapshot --all	denied
+ddev snapshot --all --help	denied
+ddev snapshot --all x	denied
+ddev snapshot --help	inert
+ddev snapshot --list	inert
+ddev snapshot -h	inert
+ddev snapshot x	denied
+ddev status	inert
+ddev status --help	inert
+ddev status --help --json-output	inert
+ddev status --help x	inert
+ddev status --json-output	inert
+ddev status -h	inert
+ddev status -j	inert
+ddev status x	inert
+ddev version	inert
+ddev version --help	inert
+ddev version --help -h	inert
+ddev version --help x	inert
+ddev version -h	inert
+ddev version x	inert
+ddev x	denied
+debinhex.pl	denied
+debinhex.pl --help	denied
+debinhex.pl --version	denied
+debinhex.pl -o x	safe-write
+debinhex.pl -v	safe-write
+debinhex.pl -v -o x	safe-write
+debinhex.pl -v x	safe-write
+debinhex.pl x	safe-write
+debride	denied
+debride --exclude x	safe-read
+debride --focus x	safe-read
+debride --help	safe-read
+debride --help --exclude x	safe-read
+debride --help --json	safe-read
+debride --help x	safe-read
+debride --json	safe-read
+debride --legacy	safe-read
+debride --minimum x	safe-read
+debride --rails	safe-read
+debride --verbose	safe-read
+debride --version	safe-read
+debride --whitelist x	safe-read
+debride --yaml	safe-read
+debride -e x	safe-read
+debride -f x	safe-read
+debride -h	safe-read
+debride -m x	safe-read
+debride -r	safe-read
+debride -v	safe-read
+debride -w x	safe-read
+debride x	safe-read
+declare	inert
+declare --help	denied
+declare --version	denied
+declare -A	inert
+declare -A -F	inert
+declare -A x	inert
+declare -F	inert
+declare -a	inert
+declare -f	inert
+declare -g	inert
+declare -i	inert
+declare -i count=5	inert
+declare -ix FOO=42	inert
+declare -l	inert
+declare -n	inert
+declare -p	inert
+declare -p PATH	inert
+declare -r	inert
+declare -t	inert
+declare -u	inert
+declare -x	inert
+declare -x FOO=bar	inert
+declare -x LD_PRELOAD=/tmp/evil.so	denied
+declare -x PYTHONPATH=/tmp/inj	denied
+declare x	inert
+defaults	denied
+defaults --help	inert
+defaults --help --version	denied
+defaults --help x	denied
+defaults --version	inert
+defaults -V	inert
+defaults -h	inert
+defaults domains	inert
+defaults domains --help	inert
+defaults domains --help -h	inert
+defaults domains --help x	inert
+defaults domains -h	inert
+defaults domains x	inert
+defaults export	denied
+defaults export --help	inert
+defaults export --help -app x	inert
+defaults export --help -g	inert
+defaults export --help x	inert
+defaults export -app x	inert
+defaults export -g	inert
+defaults export -globalDomain	inert
+defaults export -h	inert
+defaults export x	inert
+defaults find	denied
+defaults find --help	inert
+defaults find --help -app x	inert
+defaults find --help -g	inert
+defaults find --help x	inert
+defaults find -app x	inert
+defaults find -g	inert
+defaults find -globalDomain	inert
+defaults find -h	inert
+defaults find x	inert
+defaults read	denied
+defaults read --help	inert
+defaults read --help -app x	inert
+defaults read --help -g	inert
+defaults read --help x	inert
+defaults read -app x	inert
+defaults read -g	inert
+defaults read -globalDomain	inert
+defaults read -h	inert
+defaults read x	inert
+defaults read-type	denied
+defaults read-type --help	inert
+defaults read-type --help -app x	inert
+defaults read-type --help -g	inert
+defaults read-type --help x	inert
+defaults read-type -app x	inert
+defaults read-type -g	inert
+defaults read-type -globalDomain	inert
+defaults read-type -h	inert
+defaults read-type x	inert
+defaults x	denied
+defncopy	denied
+defncopy --help	denied
+defncopy --version	denied
+defncopy -D x	safe-read
+defncopy -P x	safe-read
+defncopy -S x	safe-read
+defncopy -U x	safe-read
+defncopy -i x	safe-read
+defncopy -o x	safe-read
+defncopy -v	safe-read
+defncopy -v -D x	safe-read
+defncopy -v x	safe-read
+defncopy x	safe-read
+degit	denied
+degit --cache	safe-write
+degit --cache --force	safe-write
+degit --cache --mode x	safe-write
+degit --cache x	safe-write
+degit --force	safe-write
+degit --help	safe-write
+degit --mode	safe-write
+degit --mode x	safe-write
+degit --verbose	safe-write
+degit --version	safe-write
+degit -D	safe-write
+degit -c	safe-write
+degit -f	safe-write
+degit -h	safe-write
+degit -m x	safe-write
+degit -v	safe-write
+degit user/repo my-app	safe-write
+degit user/repo ~/.ssh/evil	denied
+degit x	safe-write
+delta	inert
+delta --blame-code-style	inert
+delta --blame-code-style --blame-palette	inert
+delta --blame-code-style --commit-decoration-style x	inert
+delta --blame-code-style x	inert
+delta --blame-palette	inert
+delta --color-only	inert
+delta --commit-decoration-style x	inert
+delta --commit-style x	inert
+delta --config x	inert
+delta --dark	inert
+delta --diff-highlight	inert
+delta --diff-so-fancy	inert
+delta --diff-stat-align-width x	inert
+delta --features x	inert
+delta --file-added-label x	inert
+delta --file-decoration-style x	inert
+delta --file-modified-label x	inert
+delta --file-removed-label x	inert
+delta --file-renamed-label x	inert
+delta --file-style x	inert
+delta --file-transformation x	inert
+delta --help	inert
+delta --hunk-header-decoration-style x	inert
+delta --hunk-header-file-style x	inert
+delta --hunk-header-line-number-style x	inert
+delta --hunk-header-style x	inert
+delta --hunk-label x	inert
+delta --hyperlinks	inert
+delta --inline-hint-style x	inert
+delta --inspect-raw-lines x	inert
+delta --keep-plus-minus-markers	inert
+delta --light	inert
+delta --line-buffer-size x	inert
+delta --line-fill-method x	inert
+delta --line-numbers	inert
+delta --line-numbers-left-format x	inert
+delta --line-numbers-left-style x	inert
+delta --line-numbers-minus-style x	inert
+delta --line-numbers-plus-style x	inert
+delta --line-numbers-right-format x	inert
+delta --line-numbers-right-style x	inert
+delta --line-numbers-zero-style x	inert
+delta --list-languages	inert
+delta --list-syntax-themes	inert
+delta --map-styles x	inert
+delta --max-line-distance x	inert
+delta --max-line-length x	inert
+delta --merge-conflict-begin-symbol x	inert
+delta --merge-conflict-end-symbol x	inert
+delta --merge-conflict-ours-diff-header-decoration-style x	inert
+delta --merge-conflict-ours-diff-header-style x	inert
+delta --merge-conflict-theirs-diff-header-decoration-style x	inert
+delta --merge-conflict-theirs-diff-header-style x	inert
+delta --minus-emph-style x	inert
+delta --minus-empty-line-marker-style x	inert
+delta --minus-non-emph-style x	inert
+delta --minus-style x	inert
+delta --navigate	inert
+delta --no-gitconfig	inert
+delta --paging x	inert
+delta --plus-emph-style x	inert
+delta --plus-empty-line-marker-style x	inert
+delta --plus-non-emph-style x	inert
+delta --plus-style x	inert
+delta --raw	inert
+delta --relative-paths	inert
+delta --show-config	inert
+delta --show-syntax-themes	inert
+delta --side-by-side	inert
+delta --syntax-theme x	inert
+delta --tabs x	inert
+delta --true-color x	inert
+delta --version	inert
+delta --whitespace-error-style x	inert
+delta --width x	inert
+delta -V	inert
+delta -h	inert
+delta -n	inert
+delta -s	inert
+delta -w x	inert
+delta x	inert
+delv	inert
+delv --help	denied
+delv --version	denied
+delv -4	inert
+delv -4 -6	inert
+delv -4 -a x	inert
+delv -4 x	inert
+delv -6	inert
+delv -a x	inert
+delv -b x	inert
+delv -c x	inert
+delv -d x	inert
+delv -h	inert
+delv -i	inert
+delv -m	inert
+delv -p x	inert
+delv -q x	inert
+delv -t AAAA example.com	inert
+delv -t x	inert
+delv -v	inert
+delv -x x	inert
+delv example.com	inert
+delv x	inert
+demandoc	inert
+demandoc --help	denied
+demandoc --version	denied
+demandoc -w	inert
+demandoc -w manpage.1	inert
+demandoc -w x	inert
+demandoc /usr/share/man/man1/ls.1	inert
+demandoc x	inert
+deno	denied
+deno --help	inert
+deno --help --version	denied
+deno --help x	denied
+deno --version	inert
+deno -V	inert
+deno -h	inert
+deno check	safe-read
+deno check --config x	safe-read
+deno check --help	safe-read
+deno check --help --config x	safe-read
+deno check --help --json	safe-read
+deno check --help x	safe-read
+deno check --import-map x	safe-read
+deno check --json	safe-read
+deno check --no-lock	safe-read
+deno check --quiet	safe-read
+deno check --unstable	safe-read
+deno check -c x	safe-read
+deno check -h	safe-read
+deno check -q	safe-read
+deno check src/main.ts	safe-read
+deno check x	safe-read
+deno doc	inert
+deno doc --config x	inert
+deno doc --help	inert
+deno doc --help --config x	inert
+deno doc --help --json	inert
+deno doc --help x	inert
+deno doc --import-map x	inert
+deno doc --json	inert
+deno doc --no-lock	inert
+deno doc --quiet	inert
+deno doc --unstable	inert
+deno doc -c x	inert
+deno doc -h	inert
+deno doc -q	inert
+deno doc x	inert
+deno fmt	denied
+deno fmt --check	inert
+deno fmt --check --config x	inert
+deno fmt --check --help	inert
+deno fmt --check x	inert
+deno fmt --config x	denied
+deno fmt --ext x	denied
+deno fmt --help	inert
+deno fmt --ignore x	denied
+deno fmt --indent-width x	denied
+deno fmt --line-width x	denied
+deno fmt --log-level x	denied
+deno fmt --no-semicolons	denied
+deno fmt --prose-wrap x	denied
+deno fmt --single-quote	denied
+deno fmt --unstable	denied
+deno fmt -c x	denied
+deno fmt -h	inert
+deno fmt -q	denied
+deno fmt x	denied
+deno info	inert
+deno info --config x	inert
+deno info --help	inert
+deno info --help --config x	inert
+deno info --help --json	inert
+deno info --help x	inert
+deno info --import-map x	inert
+deno info --json	inert
+deno info --no-lock	inert
+deno info --quiet	inert
+deno info --unstable	inert
+deno info -c x	inert
+deno info -h	inert
+deno info -q	inert
+deno info x	inert
+deno lint	safe-read
+deno lint --config x	safe-read
+deno lint --help	safe-read
+deno lint --help --config x	safe-read
+deno lint --help --json	safe-read
+deno lint --help x	safe-read
+deno lint --import-map x	safe-read
+deno lint --json	safe-read
+deno lint --no-lock	safe-read
+deno lint --quiet	safe-read
+deno lint --unstable	safe-read
+deno lint -c x	safe-read
+deno lint -h	safe-read
+deno lint -q	safe-read
+deno lint x	safe-read
+deno test	safe-read
+deno test --config x	safe-read
+deno test --help	safe-read
+deno test --help --config x	safe-read
+deno test --help --json	safe-read
+deno test --help x	safe-read
+deno test --import-map x	safe-read
+deno test --json	safe-read
+deno test --no-lock	safe-read
+deno test --quiet	safe-read
+deno test --unstable	safe-read
+deno test -c x	safe-read
+deno test -h	safe-read
+deno test -q	safe-read
+deno test x	safe-read
+deno x	denied
+depcheck	safe-read
+depcheck --config x	safe-read
+depcheck --detectors x	safe-read
+depcheck --help	safe-read
+depcheck --help --config x	safe-read
+depcheck --help --ignore-bin-package	safe-read
+depcheck --help x	safe-read
+depcheck --ignore-bin-package	safe-read
+depcheck --ignore-dirs x	safe-read
+depcheck --ignore-path x	safe-read
+depcheck --ignore-patterns x	safe-read
+depcheck --ignores x	safe-read
+depcheck --json	safe-read
+depcheck --oneline	safe-read
+depcheck --parsers x	safe-read
+depcheck --skip-missing	safe-read
+depcheck --specials x	safe-read
+depcheck --version	safe-read
+depcheck x	safe-read
+depcruise	denied
+depcruise --baseline x	safe-read
+depcruise --cache	safe-read
+depcruise --cache --baseline x	safe-read
+depcruise --cache --config	safe-read
+depcruise --cache x	safe-read
+depcruise --config	safe-read
+depcruise --detect-jsc-paths	safe-read
+depcruise --exclude x	safe-read
+depcruise --focus x	safe-read
+depcruise --focus-depth x	safe-read
+depcruise --help	safe-read
+depcruise --ignore-known	safe-read
+depcruise --ignore-known x	safe-read
+depcruise --include-only x	safe-read
+depcruise --init	safe-write
+depcruise --max-depth x	safe-read
+depcruise --metrics	safe-read
+depcruise --module-systems x	safe-read
+depcruise --no-cache	safe-read
+depcruise --no-config	safe-read
+depcruise --no-progress	safe-read
+depcruise --output-to	safe-write
+depcruise --output-to ./deps.json src	safe-write
+depcruise --output-to x	safe-write
+depcruise --output-type x	safe-read
+depcruise --prefix x	safe-read
+depcruise --preserve-symlinks	safe-read
+depcruise --reaches x	safe-read
+depcruise --ts-config x	safe-read
+depcruise --ts-pre-compilation-deps x	safe-read
+depcruise --validate	safe-read
+depcruise --validate x	safe-read
+depcruise --verbose	safe-read
+depcruise --version	safe-read
+depcruise --webpack-config x	safe-read
+depcruise -T x	safe-read
+depcruise -V	safe-read
+depcruise -X x	safe-read
+depcruise -d x	safe-read
+depcruise -f	safe-write
+depcruise -f ./deps.dot -T dot src	safe-write
+depcruise -f x	safe-write
+depcruise -h	safe-read
+depcruise -v	safe-read
+depcruise -x x	safe-read
+depcruise x	safe-read
+dependency-cruise	denied
+dependency-cruise --baseline x	safe-read
+dependency-cruise --cache	safe-read
+dependency-cruise --cache --baseline x	safe-read
+dependency-cruise --cache --config	safe-read
+dependency-cruise --cache x	safe-read
+dependency-cruise --config	safe-read
+dependency-cruise --detect-jsc-paths	safe-read
+dependency-cruise --exclude x	safe-read
+dependency-cruise --focus x	safe-read
+dependency-cruise --focus-depth x	safe-read
+dependency-cruise --help	safe-read
+dependency-cruise --ignore-known	safe-read
+dependency-cruise --ignore-known x	safe-read
+dependency-cruise --include-only x	safe-read
+dependency-cruise --init	safe-write
+dependency-cruise --max-depth x	safe-read
+dependency-cruise --metrics	safe-read
+dependency-cruise --module-systems x	safe-read
+dependency-cruise --no-cache	safe-read
+dependency-cruise --no-config	safe-read
+dependency-cruise --no-progress	safe-read
+dependency-cruise --output-to	safe-write
+dependency-cruise --output-to x	safe-write
+dependency-cruise --output-type x	safe-read
+dependency-cruise --prefix x	safe-read
+dependency-cruise --preserve-symlinks	safe-read
+dependency-cruise --reaches x	safe-read
+dependency-cruise --ts-config x	safe-read
+dependency-cruise --ts-pre-compilation-deps x	safe-read
+dependency-cruise --validate	safe-read
+dependency-cruise --validate x	safe-read
+dependency-cruise --verbose	safe-read
+dependency-cruise --version	safe-read
+dependency-cruise --webpack-config x	safe-read
+dependency-cruise -T x	safe-read
+dependency-cruise -V	safe-read
+dependency-cruise -X x	safe-read
+dependency-cruise -d x	safe-read
+dependency-cruise -f	safe-write
+dependency-cruise -f x	safe-write
+dependency-cruise -h	safe-read
+dependency-cruise -v	safe-read
+dependency-cruise -x x	safe-read
+dependency-cruise x	safe-read
+deptry	denied
+deptry --config x	safe-read
+deptry --exclude x	safe-read
+deptry --extend-exclude x	safe-read
+deptry --help	safe-read
+deptry --help --config x	safe-read
+deptry --help --ignore-unused	safe-read
+deptry --help x	safe-read
+deptry --ignore x	safe-read
+deptry --ignore-unused	safe-read
+deptry --json-output x	safe-read
+deptry --known-first-party	safe-read
+deptry --no-ansi	safe-read
+deptry --package-module-name-map x	safe-read
+deptry --pep621-dev-dependency-groups x	safe-read
+deptry --per-rule-ignores	safe-read
+deptry --per-rule-ignores x	safe-read
+deptry --requirements-files x	safe-read
+deptry --requirements-files-dev x	safe-read
+deptry --verbose	safe-read
+deptry --version	safe-read
+deptry -e x	safe-read
+deptry -ee x	safe-read
+deptry -h	safe-read
+deptry -i x	safe-read
+deptry -o x	safe-read
+deptry -pdd x	safe-read
+deptry -v	safe-read
+deptry x	safe-read
+derq	denied
+derq --help	denied
+derq --pretty	inert
+derq --pretty --raw	inert
+derq --pretty -f x	inert
+derq --pretty x	inert
+derq --raw	inert
+derq --version	denied
+derq --xml	inert
+derq -f x	inert
+derq -i x	inert
+derq -o x	inert
+derq -p x	inert
+derq query -f cert.der	inert
+derq x	inert
+desdp	denied
+desdp --help	denied
+desdp --version	denied
+desdp x	safe-write
+detekt	safe-read
+detekt --baseline x	safe-read
+detekt --build-upon-default-config	safe-read
+detekt --build-upon-default-config --baseline x	safe-read
+detekt --build-upon-default-config --debug	safe-read
+detekt --build-upon-default-config x	safe-read
+detekt --classpath x	safe-read
+detekt --config x	safe-read
+detekt --config-resource x	safe-read
+detekt --debug	safe-read
+detekt --excludes x	safe-read
+detekt --help	safe-read
+detekt --includes x	safe-read
+detekt --input x	safe-read
+detekt --jvm-target x	safe-read
+detekt --language-version x	safe-read
+detekt --parallel	safe-read
+detekt --plugins x	safe-read
+detekt --report x	safe-read
+detekt --version	safe-read
+detekt -V	safe-read
+detekt -h	safe-read
+detekt x	safe-read
+devbox	denied
+devbox --help	inert
+devbox --help --version	denied
+devbox --help x	denied
+devbox --version	inert
+devbox -h	inert
+devbox info	denied
+devbox info --help	inert
+devbox info --help --json	inert
+devbox info --help x	inert
+devbox info --json	inert
+devbox info --markdown	inert
+devbox info -h	inert
+devbox info x	inert
+devbox list	inert
+devbox list --help	inert
+devbox list --help -h	inert
+devbox list --help x	inert
+devbox list -h	inert
+devbox list x	inert
+devbox search	denied
+devbox search --help	inert
+devbox search --help -h	inert
+devbox search --help x	inert
+devbox search -h	inert
+devbox search x	inert
+devbox version	inert
+devbox version --help	inert
+devbox version --help -h	inert
+devbox version --help x	inert
+devbox version -h	inert
+devbox version x	inert
+devbox x	denied
+devenv	denied
+devenv --help	inert
+devenv --help --version	denied
+devenv --help x	denied
+devenv --version	inert
+devenv -h	inert
+devenv -v	inert
+devenv assemble	denied
+devenv assemble x	denied
+devenv build	denied
+devenv build x	denied
+devenv ci	denied
+devenv ci x	denied
+devenv completion	denied
+devenv completion --help	inert
+devenv completion --help -h	inert
+devenv completion --help x	inert
+devenv completion -h	inert
+devenv completion x	inert
+devenv container	denied
+devenv container x	denied
+devenv containers	denied
+devenv containers x	denied
+devenv direnvrc	denied
+devenv direnvrc x	denied
+devenv gc	denied
+devenv gc x	denied
+devenv help	inert
+devenv help x	inert
+devenv info	safe-read
+devenv info --help	safe-read
+devenv info --help -h	safe-read
+devenv info --help x	safe-read
+devenv info -h	safe-read
+devenv info x	safe-read
+devenv init	denied
+devenv init x	denied
+devenv inputs	safe-read
+devenv inputs --help	safe-read
+devenv inputs --help -h	safe-read
+devenv inputs --help x	safe-read
+devenv inputs -h	safe-read
+devenv inputs x	safe-read
+devenv print-dev-env	denied
+devenv print-dev-env x	denied
+devenv processes	denied
+devenv processes x	denied
+devenv repl	denied
+devenv repl x	denied
+devenv search	denied
+devenv search --help	safe-read
+devenv search --help -h	safe-read
+devenv search --help x	safe-read
+devenv search -h	safe-read
+devenv search x	safe-read
+devenv secret	denied
+devenv secret x	denied
+devenv secrets	denied
+devenv secrets x	denied
+devenv shell	denied
+devenv shell x	denied
+devenv tasks	inert
+devenv tasks list	inert
+devenv tasks list --help	inert
+devenv tasks list --help -h	inert
+devenv tasks list --help x	inert
+devenv tasks list -h	inert
+devenv tasks list x	inert
+devenv tasks run	denied
+devenv tasks run x	denied
+devenv tasks x	denied
+devenv test	denied
+devenv test x	denied
+devenv up	denied
+devenv up x	denied
+devenv update	denied
+devenv update x	denied
+devenv version	inert
+devenv version --help	inert
+devenv version --help -h	inert
+devenv version --help x	inert
+devenv version -h	inert
+devenv version x	inert
+devenv x	denied
+devicectl	denied
+devicectl --device x	denied
+devicectl --help	inert
+devicectl --help --device x	inert
+devicectl --help --quiet	inert
+devicectl --help x	denied
+devicectl --json-output x	denied
+devicectl --log-output x	denied
+devicectl --quiet	denied
+devicectl --timeout x	denied
+devicectl --verbose	denied
+devicectl --version	inert
+devicectl -d x	denied
+devicectl -h	inert
+devicectl -j x	denied
+devicectl -l x	denied
+devicectl -q	denied
+devicectl -t x	denied
+devicectl -v	denied
+devicectl device	inert
+devicectl device copy	denied
+devicectl device copy to --device 00008132-0001 a b	denied
+devicectl device copy x	denied
+devicectl device info	inert
+devicectl device info appIcon	denied
+devicectl device info appIcon x	denied
+devicectl device info apps	inert
+devicectl device info apps x	inert
+devicectl device info ddiServices	inert
+devicectl device info ddiServices x	inert
+devicectl device info details	inert
+devicectl device info details x	inert
+devicectl device info displays	inert
+devicectl device info displays x	inert
+devicectl device info files	inert
+devicectl device info files x	inert
+devicectl device info lockState	inert
+devicectl device info lockState x	inert
+devicectl device info processes	inert
+devicectl device info processes x	inert
+devicectl device info x	denied
+devicectl device install	denied
+devicectl device install app --device 00008132-0001 /tmp/My.app	denied
+devicectl device install x	denied
+devicectl device notification	denied
+devicectl device notification x	denied
+devicectl device orientation	denied
+devicectl device orientation x	denied
+devicectl device process	denied
+devicectl device process launch --device 00008132-0001 com.example.app	denied
+devicectl device process x	denied
+devicectl device reboot	denied
+devicectl device reboot --device 00008132-0001	denied
+devicectl device reboot x	denied
+devicectl device uninstall	denied
+devicectl device uninstall app --device 00008132-0001 com.example.app	denied
+devicectl device uninstall x	denied
+devicectl device x	denied
+devicectl diagnose	denied
+devicectl diagnose x	denied
+devicectl list	inert
+devicectl list devices	inert
+devicectl list devices x	inert
+devicectl list preferredDDI	inert
+devicectl list preferredDDI x	inert
+devicectl list x	denied
+devicectl manage	denied
+devicectl manage pair	denied
+devicectl manage x	denied
+devicectl x	denied
+df	inert
+df --all	inert
+df --all --block-size x	inert
+df --all --help	inert
+df --all x	inert
+df --block-size x	inert
+df --exclude-type x	inert
+df --help	inert
+df --human-readable	inert
+df --inodes	inert
+df --local	inert
+df --no-sync	inert
+df --output x	inert
+df --portability	inert
+df --print-type	inert
+df --si	inert
+df --sync	inert
+df --total	inert
+df --type x	inert
+df --version	inert
+df -B x	inert
+df -H	inert
+df -P	inert
+df -T	inert
+df -V	inert
+df -a	inert
+df -h	inert
+df -i	inert
+df -k	inert
+df -l	inert
+df -t x	inert
+df -x x	inert
+df x	inert
+dict	denied
+dict --database x	safe-read
+dict --help	safe-read
+dict --help --database x	safe-read
+dict --help --version	safe-read
+dict --help x	safe-read
+dict --host x	safe-read
+dict --match x	safe-read
+dict --port x	safe-read
+dict --strategy x	safe-read
+dict --version	safe-read
+dict -C x	safe-read
+dict -D	safe-read
+dict -I	safe-read
+dict -P x	safe-read
+dict -S	safe-read
+dict -V	safe-read
+dict -a	safe-read
+dict -c x	safe-read
+dict -d x	safe-read
+dict -h x	safe-read
+dict -i	safe-read
+dict -k x	safe-read
+dict -m x	safe-read
+dict -p x	safe-read
+dict -r	safe-read
+dict -s	safe-read
+dict -u x	safe-read
+dict x	safe-read
+diesel	denied
+diesel --config-file x	denied
+diesel --database-url x	denied
+diesel --help	inert
+diesel --help --config-file x	inert
+diesel --help --version	denied
+diesel --help x	denied
+diesel --locked-schema x	denied
+diesel --version	inert
+diesel -V	inert
+diesel -h	inert
+diesel completions	denied
+diesel completions --help	inert
+diesel completions --help -h	inert
+diesel completions --help x	inert
+diesel completions -h	inert
+diesel completions x	inert
+diesel database	denied
+diesel database x	denied
+diesel help	inert
+diesel help x	inert
+diesel migration	denied
+diesel migration generate	inert
+diesel migration generate --diff-schema x	inert
+diesel migration generate --help	inert
+diesel migration generate --help --diff-schema x	inert
+diesel migration generate --help --no-down	inert
+diesel migration generate --help x	inert
+diesel migration generate --migrations-dir x	inert
+diesel migration generate --no-down	inert
+diesel migration generate --no-up	inert
+diesel migration generate --sql x	inert
+diesel migration generate --version x	inert
+diesel migration generate -h	inert
+diesel migration generate x	inert
+diesel migration list	inert
+diesel migration list --help	inert
+diesel migration list --help --migrations-dir x	inert
+diesel migration list --help -h	inert
+diesel migration list --help x	inert
+diesel migration list --migrations-dir x	inert
+diesel migration list -h	inert
+diesel migration list x	inert
+diesel migration pending	inert
+diesel migration pending --help	inert
+diesel migration pending --help --migrations-dir x	inert
+diesel migration pending --help -h	inert
+diesel migration pending --help x	inert
+diesel migration pending --migrations-dir x	inert
+diesel migration pending -h	inert
+diesel migration pending x	inert
+diesel migration redo	denied
+diesel migration redo x	denied
+diesel migration revert	denied
+diesel migration revert x	denied
+diesel migration run	denied
+diesel migration run x	denied
+diesel migration x	denied
+diesel print-schema	safe-read
+diesel print-schema --except-tables x	safe-read
+diesel print-schema --filter x	safe-read
+diesel print-schema --help	safe-read
+diesel print-schema --help --except-tables x	safe-read
+diesel print-schema --help --with-docs	safe-read
+diesel print-schema --help x	safe-read
+diesel print-schema --import-types x	safe-read
+diesel print-schema --only-tables x	safe-read
+diesel print-schema --patch-file x	safe-read
+diesel print-schema --schema x	safe-read
+diesel print-schema --with-docs	safe-read
+diesel print-schema --with-docs-config	safe-read
+diesel print-schema -h	safe-read
+diesel print-schema -s x	safe-read
+diesel print-schema x	safe-read
+diesel setup	denied
+diesel setup x	denied
+diesel x	denied
+diff	denied
+diff --brief	inert
+diff --brief --changed-group-format x	inert
+diff --brief --ed	inert
+diff --brief x	inert
+diff --changed-group-format x	inert
+diff --color x	inert
+diff --context x	inert
+diff --ed	inert
+diff --exclude x	inert
+diff --exclude-from x	inert
+diff --expand-tabs	inert
+diff --from-file x	inert
+diff --help	inert
+diff --ifdef x	inert
+diff --ignore-all-space	inert
+diff --ignore-blank-lines	inert
+diff --ignore-case	inert
+diff --ignore-matching-lines x	inert
+diff --ignore-space-change	inert
+diff --ignore-tab-expansion	inert
+diff --label x	inert
+diff --left-column	inert
+diff --line-format x	inert
+diff --minimal	inert
+diff --new-file	inert
+diff --new-group-format x	inert
+diff --new-line-format x	inert
+diff --no-dereference	inert
+diff --no-ignore-file-name-case	inert
+diff --normal	inert
+diff --old-group-format x	inert
+diff --old-line-format x	inert
+diff --paginate	inert
+diff --rcs	inert
+diff --recursive	inert
+diff --report-identical-files	inert
+diff --show-c-function	inert
+diff --show-function-line x	inert
+diff --side-by-side	inert
+diff --speed-large-files	inert
+diff --starting-file x	inert
+diff --strip-trailing-cr	inert
+diff --suppress-blank-empty	inert
+diff --suppress-common-lines	inert
+diff --tabsize x	inert
+diff --text	inert
+diff --to-file x	inert
+diff --unchanged-group-format x	inert
+diff --unchanged-line-format x	inert
+diff --unidirectional-new-file	inert
+diff --unified x	inert
+diff --version	inert
+diff --width x	inert
+diff -B	inert
+diff -C x	inert
+diff -D x	inert
+diff -E	inert
+diff -F x	inert
+diff -I x	inert
+diff -L x	inert
+diff -N	inert
+diff -P	inert
+diff -S x	inert
+diff -T	inert
+diff -U x	inert
+diff -V	inert
+diff -W x	inert
+diff -X x	inert
+diff -a	inert
+diff -b	inert
+diff -c	inert
+diff -d	inert
+diff -e	inert
+diff -f	inert
+diff -h	inert
+diff -i	inert
+diff -l	inert
+diff -n	inert
+diff -p	inert
+diff -q	inert
+diff -r	inert
+diff -s	inert
+diff -t	inert
+diff -u	inert
+diff -w	inert
+diff -x x	inert
+diff -y	inert
+diff file1.txt file2.txt	inert
+diff x	inert
+diff3	denied
+diff3 --diff-program x	inert
+diff3 --easy-only	inert
+diff3 --easy-only --diff-program x	inert
+diff3 --easy-only --ed	inert
+diff3 --easy-only x	inert
+diff3 --ed	inert
+diff3 --help	inert
+diff3 --initial-tab	inert
+diff3 --label x	inert
+diff3 --merge	inert
+diff3 --overlap-only	inert
+diff3 --show-all	inert
+diff3 --show-overlap	inert
+diff3 --strip-trailing-cr	inert
+diff3 --text	inert
+diff3 --version	inert
+diff3 -3	inert
+diff3 -A	inert
+diff3 -E	inert
+diff3 -L x	inert
+diff3 -T	inert
+diff3 -V	inert
+diff3 -X	inert
+diff3 -a	inert
+diff3 -e	inert
+diff3 -h	inert
+diff3 -i	inert
+diff3 -m	inert
+diff3 -x	inert
+diff3 x	inert
+diffstat	inert
+diffstat --help	denied
+diffstat --version	denied
+diffstat x	inert
+difft	denied
+difft --background x	inert
+difft --byte-limit x	inert
+difft --check-only	inert
+difft --check-only --background x	inert
+difft --check-only --help	inert
+difft --check-only x	inert
+difft --color x	inert
+difft --context x	inert
+difft --display x	inert
+difft --graph-limit x	inert
+difft --help	inert
+difft --language x	inert
+difft --list-languages	inert
+difft --missing-as-empty	inert
+difft --override x	inert
+difft --parse-error-limit x	inert
+difft --skip-unchanged	inert
+difft --sort-paths x	inert
+difft --strip-cr	inert
+difft --syntax-highlight x	inert
+difft --tab-width x	inert
+difft --version	inert
+difft --width x	inert
+difft x	inert
+difftastic	denied
+difftastic --background x	inert
+difftastic --byte-limit x	inert
+difftastic --check-only	inert
+difftastic --check-only --background x	inert
+difftastic --check-only --help	inert
+difftastic --check-only x	inert
+difftastic --color x	inert
+difftastic --context x	inert
+difftastic --display x	inert
+difftastic --graph-limit x	inert
+difftastic --help	inert
+difftastic --language x	inert
+difftastic --list-languages	inert
+difftastic --missing-as-empty	inert
+difftastic --override x	inert
+difftastic --parse-error-limit x	inert
+difftastic --skip-unchanged	inert
+difftastic --sort-paths x	inert
+difftastic --strip-cr	inert
+difftastic --syntax-highlight x	inert
+difftastic --tab-width x	inert
+difftastic --version	inert
+difftastic --width x	inert
+difftastic x	inert
+dig	inert
+dig --help	inert
+dig --help --version	inert
+dig --help -b x	inert
+dig --help x	inert
+dig --version	inert
+dig -4	inert
+dig -6	inert
+dig -V	inert
+dig -b x	inert
+dig -c x	inert
+dig -f x	inert
+dig -h	inert
+dig -k x	inert
+dig -m	inert
+dig -p x	inert
+dig -q x	inert
+dig -r	inert
+dig -t x	inert
+dig -u	inert
+dig -v	inert
+dig -x x	inert
+dig -y x	inert
+dig example.com	inert
+dig x	inert
+dir	inert
+dir --all	inert
+dir --all --almost-all	inert
+dir --all --block-size x	inert
+dir --all x	inert
+dir --almost-all	inert
+dir --author	inert
+dir --block-size x	inert
+dir --classify	inert
+dir --color x	inert
+dir --context	inert
+dir --dereference	inert
+dir --dereference-command-line	inert
+dir --dereference-command-line-symlink-to-dir	inert
+dir --directory	inert
+dir --escape	inert
+dir --file-type	inert
+dir --format x	inert
+dir --full-time	inert
+dir --group-directories-first	inert
+dir --help	inert
+dir --hide x	inert
+dir --hide-control-chars	inert
+dir --human-readable	inert
+dir --hyperlink x	inert
+dir --ignore x	inert
+dir --indicator-style	inert
+dir --inode	inert
+dir --kibibytes	inert
+dir --literal	inert
+dir --no-group	inert
+dir --numeric-uid-gid	inert
+dir --quote-name	inert
+dir --quoting-style x	inert
+dir --recursive	inert
+dir --reverse	inert
+dir --show-control-chars	inert
+dir --si	inert
+dir --size	inert
+dir --sort x	inert
+dir --tabsize x	inert
+dir --time x	inert
+dir --time-style x	inert
+dir --version	inert
+dir --width x	inert
+dir -1	inert
+dir -A	inert
+dir -B	inert
+dir -C	inert
+dir -F	inert
+dir -G	inert
+dir -H	inert
+dir -I x	inert
+dir -L	inert
+dir -N	inert
+dir -Q	inert
+dir -R	inert
+dir -S	inert
+dir -T x	inert
+dir -U	inert
+dir -V	inert
+dir -X	inert
+dir -Z	inert
+dir -a	inert
+dir -c	inert
+dir -d	inert
+dir -f	inert
+dir -g	inert
+dir -h	inert
+dir -i	inert
+dir -k	inert
+dir -l	inert
+dir -m	inert
+dir -n	inert
+dir -o	inert
+dir -p	inert
+dir -q	inert
+dir -r	inert
+dir -s	inert
+dir -t	inert
+dir -u	inert
+dir -v	inert
+dir -w x	inert
+dir -x	inert
+dir x	inert
+dircolors	inert
+dircolors --bourne-shell	inert
+dircolors --bourne-shell --c-shell	inert
+dircolors --bourne-shell x	inert
+dircolors --c-shell	inert
+dircolors --csh	inert
+dircolors --help	inert
+dircolors --print-database	inert
+dircolors --print-ls-colors	inert
+dircolors --sh	inert
+dircolors --version	inert
+dircolors -V	inert
+dircolors -b	inert
+dircolors -c	inert
+dircolors -h	inert
+dircolors -p	inert
+dircolors x	inert
+direnv	denied
+direnv --help	inert
+direnv --help --version	denied
+direnv --help x	denied
+direnv --version	inert
+direnv -h	inert
+direnv export	denied
+direnv export --help	inert
+direnv export --help -h	inert
+direnv export --help x	inert
+direnv export -h	inert
+direnv export x	inert
+direnv fetchurl	denied
+direnv fetchurl --help	inert
+direnv fetchurl --help -h	inert
+direnv fetchurl --help x	inert
+direnv fetchurl -h	inert
+direnv fetchurl x	inert
+direnv hook	denied
+direnv hook --help	inert
+direnv hook --help -h	inert
+direnv hook --help x	inert
+direnv hook -h	inert
+direnv hook x	inert
+direnv status	inert
+direnv status --help	inert
+direnv status --help -h	inert
+direnv status --help x	inert
+direnv status -h	inert
+direnv status x	inert
+direnv version	inert
+direnv version --help	inert
+direnv version --help -h	inert
+direnv version --help x	inert
+direnv version -h	inert
+direnv version x	inert
+direnv x	denied
+dirname	inert
+dirname --help	inert
+dirname --help --version	inert
+dirname --help x	inert
+dirname --version	inert
+dirname --zero	inert
+dirname -V	inert
+dirname -h	inert
+dirname -z	inert
+dirname x	inert
+diskutil	denied
+diskutil --help	inert
+diskutil --help --version	denied
+diskutil --help x	denied
+diskutil --version	inert
+diskutil -V	inert
+diskutil -h	inert
+diskutil activity	inert
+diskutil activity --help	inert
+diskutil activity --help -h	inert
+diskutil activity --help x	inert
+diskutil activity -h	inert
+diskutil activity x	inert
+diskutil apfs	denied
+diskutil apfs list	inert
+diskutil apfs list --help	inert
+diskutil apfs list --help -h	inert
+diskutil apfs list --help x	inert
+diskutil apfs list -h	inert
+diskutil apfs list x	inert
+diskutil apfs listCryptoUsers	inert
+diskutil apfs listCryptoUsers --help	inert
+diskutil apfs listCryptoUsers --help -h	inert
+diskutil apfs listCryptoUsers --help x	inert
+diskutil apfs listCryptoUsers -h	inert
+diskutil apfs listCryptoUsers x	inert
+diskutil apfs listSnapshots	inert
+diskutil apfs listSnapshots --help	inert
+diskutil apfs listSnapshots --help -h	inert
+diskutil apfs listSnapshots --help x	inert
+diskutil apfs listSnapshots -h	inert
+diskutil apfs listSnapshots x	inert
+diskutil apfs listVolumeGroups	inert
+diskutil apfs listVolumeGroups --help	inert
+diskutil apfs listVolumeGroups --help -h	inert
+diskutil apfs listVolumeGroups --help x	inert
+diskutil apfs listVolumeGroups -h	inert
+diskutil apfs listVolumeGroups x	inert
+diskutil apfs x	denied
+diskutil info	denied
+diskutil info --help	inert
+diskutil info --help -all	inert
+diskutil info --help x	inert
+diskutil info -all	inert
+diskutil info -h	inert
+diskutil info -plist	inert
+diskutil info x	inert
+diskutil list	inert
+diskutil list --help	inert
+diskutil list --help -h	inert
+diskutil list --help x	inert
+diskutil list -h	inert
+diskutil list -plist	inert
+diskutil list x	inert
+diskutil listFilesystems	inert
+diskutil listFilesystems --help	inert
+diskutil listFilesystems --help -h	inert
+diskutil listFilesystems --help x	inert
+diskutil listFilesystems -h	inert
+diskutil listFilesystems -plist	inert
+diskutil listFilesystems x	inert
+diskutil x	denied
+ditto	denied
+ditto --acl	safe-write
+ditto --acl --arch x	safe-write
+ditto --acl --clone	safe-write
+ditto --acl x	safe-write
+ditto --arch x	safe-write
+ditto --bom x	safe-write
+ditto --clone	safe-write
+ditto --extattr	safe-write
+ditto --help	safe-write
+ditto --hfsCompression	safe-write
+ditto --keepBinaries	safe-write
+ditto --keepBinariesList x	safe-write
+ditto --keepBinariesPattern x	safe-write
+ditto --keepParent	safe-write
+ditto --lang x	safe-write
+ditto --noacl	safe-write
+ditto --nocache	safe-write
+ditto --noclone	safe-write
+ditto --noextattr	safe-write
+ditto --nohfsCompression	safe-write
+ditto --nonAtomicCopies	safe-write
+ditto --nopersistRootless	safe-write
+ditto --nopreserveHFSCompression	safe-write
+ditto --noqtn	safe-write
+ditto --norsrc	safe-write
+ditto --option x	safe-write
+ditto --outBom x	safe-write
+ditto --password	safe-write
+ditto --persistRootless	safe-write
+ditto --preserveHFSCompression	safe-write
+ditto --qtn	safe-write
+ditto --rsrc	safe-write
+ditto --segmentLargeFiles	safe-write
+ditto --sequesterRsrc	safe-write
+ditto --version	denied
+ditto --zlibCompressionLevel x	safe-write
+ditto -V	safe-write
+ditto -X	safe-write
+ditto -c	safe-write
+ditto -c -k ./src ./out.zip	safe-write
+ditto -h	safe-write
+ditto -j	safe-write
+ditto -k	safe-write
+ditto -v	safe-write
+ditto -x	safe-write
+ditto -z	safe-write
+ditto ./src ./dst	safe-write
+ditto src/ dest/	safe-write
+ditto x	safe-write
+dive	denied
+dive --ci	inert
+dive --ci --ci-config x	inert
+dive --ci --help	inert
+dive --ci x	denied
+dive --ci-config x	inert
+dive --config x	inert
+dive --help	inert
+dive --highestPercentage x	inert
+dive --highestUserWastedPercent x	inert
+dive --lowestEfficiency x	inert
+dive --source	inert
+dive --source x	denied
+dive --version	inert
+dive -h	inert
+dive -v	inert
+dive x	denied
+djpeg	denied
+djpeg --help	denied
+djpeg --version	denied
+djpeg -?	safe-write
+djpeg -? -bmp	safe-write
+djpeg -? -colors x	safe-write
+djpeg -? x	safe-write
+djpeg -bmp	safe-write
+djpeg -colors x	safe-write
+djpeg -colours x	safe-write
+djpeg -dct x	safe-write
+djpeg -debug	safe-write
+djpeg -dither x	safe-write
+djpeg -fast	safe-write
+djpeg -gif	safe-write
+djpeg -grayscale	safe-write
+djpeg -greyscale	safe-write
+djpeg -h	safe-write
+djpeg -help	safe-write
+djpeg -icc	safe-write
+djpeg -map x	safe-write
+djpeg -maxmemory x	safe-write
+djpeg -nosmooth	safe-write
+djpeg -o x	safe-write
+djpeg -os2	safe-write
+djpeg -outfile x	safe-write
+djpeg -pnm	safe-write
+djpeg -rgb	safe-write
+djpeg -rgb565	safe-write
+djpeg -rle	safe-write
+djpeg -scale x	safe-write
+djpeg -strict x	safe-write
+djpeg -targa	safe-write
+djpeg -tga	safe-write
+djpeg -verbose	safe-write
+djpeg -version	safe-write
+djpeg x	safe-write
+djxl	denied
+djxl --allow_more_progressive_steps	safe-write
+djxl --allow_more_progressive_steps --allow_partial_files	safe-write
+djxl --allow_more_progressive_steps --bits_per_sample x	safe-write
+djxl --allow_more_progressive_steps x	safe-write
+djxl --allow_partial_files	safe-write
+djxl --bits_per_sample x	safe-write
+djxl --color_space x	safe-write
+djxl --disable_output	safe-write
+djxl --display_nits x	safe-write
+djxl --downsampling x	safe-write
+djxl --help	safe-write
+djxl --icc_out x	safe-write
+djxl --jpeg_quality x	safe-write
+djxl --metadata_out x	safe-write
+djxl --norender_spotcolors	safe-write
+djxl --num_reps x	safe-write
+djxl --num_threads x	safe-write
+djxl --orig_icc_out x	safe-write
+djxl --output_format x	safe-write
+djxl --pixels_to_jpeg_quality x	safe-write
+djxl --preview_out x	safe-write
+djxl --print_info	safe-write
+djxl --print_profile	safe-write
+djxl --print_read_bytes	safe-write
+djxl --quiet	safe-write
+djxl --render_spotcolors x	safe-write
+djxl --tone_map x	safe-write
+djxl --verbose	safe-write
+djxl --version	safe-write
+djxl -V	safe-write
+djxl -h	safe-write
+djxl -q	safe-write
+djxl -v	safe-write
+djxl x	safe-write
+dltest	inert
+dltest --help	denied
+dltest --version	denied
+dltest /usr/lib/libc.dylib printf	inert
+dltest x	inert
+dlv	denied
+dlv --help	inert
+dlv --help --version	inert
+dlv --help x	denied
+dlv --version	inert
+dlv -h	inert
+dlv -v	inert
+dlv x	denied
+dns-sd	denied
+dns-sd --help	inert
+dns-sd --version	denied
+dns-sd -4	denied
+dns-sd -4 -6	denied
+dns-sd -4 x	denied
+dns-sd -6	denied
+dns-sd -B	inert
+dns-sd -B _http._tcp	inert
+dns-sd -E	inert
+dns-sd -E -4	inert
+dns-sd -E -6	inert
+dns-sd -E -B	inert
+dns-sd -E -E	inert
+dns-sd -E -F	inert
+dns-sd -E -G	inert
+dns-sd -E -L	inert
+dns-sd -E -V	inert
+dns-sd -E -Z	inert
+dns-sd -E -q	inert
+dns-sd -F	inert
+dns-sd -G	inert
+dns-sd -L	inert
+dns-sd -L MyService _http._tcp local.	inert
+dns-sd -R MyService _http._tcp local 8080	denied
+dns-sd -V	inert
+dns-sd -Z	inert
+dns-sd -q	inert
+dns-sd -q example.com	inert
+dns-sd x	denied
+docfx	denied
+docfx --help	inert
+docfx --help --output x	denied
+docfx --help --version	denied
+docfx --help x	denied
+docfx --output x	denied
+docfx --version	inert
+docfx -h	inert
+docfx -o x	denied
+docfx -v	inert
+docfx build	safe-write
+docfx build --changesFile	safe-write
+docfx build --changesFile --changesFile x	safe-write
+docfx build --changesFile --cleanupCacheHistory	safe-write
+docfx build --changesFile x	safe-write
+docfx build --cleanupCacheHistory	safe-write
+docfx build --debug	safe-write
+docfx build --disableGitFeatures	safe-write
+docfx build --dryRun	safe-write
+docfx build --exportRawModel	safe-write
+docfx build --exportRawModel x	safe-write
+docfx build --exportViewModel	safe-write
+docfx build --exportViewModel x	safe-write
+docfx build --fileMetadata x	safe-write
+docfx build --fileMetadataFiles x	safe-write
+docfx build --force	safe-write
+docfx build --forcePostProcess	safe-write
+docfx build --globalMetadata x	safe-write
+docfx build --globalMetadataFiles x	safe-write
+docfx build --help	safe-write
+docfx build --keepFileLink	safe-write
+docfx build --logFile x	safe-write
+docfx build --logLevel x	safe-write
+docfx build --lruSize	safe-write
+docfx build --lruSize x	safe-write
+docfx build --markdownEngineName x	safe-write
+docfx build --markdownEngineProperties x	safe-write
+docfx build --maxParallelism	safe-write
+docfx build --maxParallelism x	safe-write
+docfx build --noLangKeyword	safe-write
+docfx build --output ./_site	safe-write
+docfx build --output x	safe-write
+docfx build --postProcessors	safe-write
+docfx build --postProcessors x	safe-write
+docfx build --rawModelOutputFolder	safe-write
+docfx build --serve	safe-write
+docfx build --templateFolder	safe-write
+docfx build --templateFolder x	safe-write
+docfx build --theme x	safe-write
+docfx build --viewModelOutputFolder	safe-write
+docfx build -?	safe-write
+docfx build -f	safe-write
+docfx build -h	safe-write
+docfx build -l x	safe-write
+docfx build -o x	safe-write
+docfx build -t x	safe-write
+docfx build x	safe-write
+docfx download	denied
+docfx download x	denied
+docfx help	inert
+docfx help x	inert
+docfx init	safe-write
+docfx init --help	safe-write
+docfx init --help --output x	safe-write
+docfx init --help --quiet	safe-write
+docfx init --help x	safe-write
+docfx init --output x	safe-write
+docfx init --quiet	safe-write
+docfx init --yes	safe-write
+docfx init -h	safe-write
+docfx init -o x	safe-write
+docfx init -q	safe-write
+docfx init -y	safe-write
+docfx init x	safe-write
+docfx merge	denied
+docfx merge x	denied
+docfx metadata	safe-read
+docfx metadata --disableDefaultFilter	safe-read
+docfx metadata --disableDefaultFilter --disableGitFeatures	safe-read
+docfx metadata --disableDefaultFilter --filter x	safe-read
+docfx metadata --disableDefaultFilter x	safe-read
+docfx metadata --disableGitFeatures	safe-read
+docfx metadata --filter x	safe-read
+docfx metadata --force	safe-read
+docfx metadata --globalNamespaceId x	safe-read
+docfx metadata --help	safe-read
+docfx metadata --logFile x	safe-read
+docfx metadata --logLevel x	safe-read
+docfx metadata --memberLayout x	safe-read
+docfx metadata --namespaceLayout	safe-read
+docfx metadata --namespaceLayout x	safe-read
+docfx metadata --output x	safe-read
+docfx metadata --outputFormat x	safe-read
+docfx metadata --property x	safe-read
+docfx metadata --repositoryRoot x	safe-read
+docfx metadata --shouldSkipMarkup	safe-read
+docfx metadata -?	safe-read
+docfx metadata -h	safe-read
+docfx metadata -l x	safe-read
+docfx metadata -o ./api	safe-read
+docfx metadata -o x	safe-read
+docfx metadata -p x	safe-read
+docfx metadata x	safe-read
+docfx pdf	denied
+docfx pdf x	denied
+docfx serve	denied
+docfx serve x	denied
+docfx template	inert
+docfx template export	denied
+docfx template export x	denied
+docfx template list	inert
+docfx template list --help	inert
+docfx template list --help -h	inert
+docfx template list --help x	inert
+docfx template list -h	inert
+docfx template list x	inert
+docfx template x	denied
+docfx x	denied
+docker	denied
+docker --help	inert
+docker --help --version	denied
+docker --help x	denied
+docker --version	inert
+docker -V	inert
+docker -h	inert
+docker buildx	denied
+docker buildx --version	inert
+docker buildx --version x	denied
+docker buildx inspect	inert
+docker buildx inspect --help	inert
+docker buildx inspect --help -h	inert
+docker buildx inspect --help x	inert
+docker buildx inspect -h	inert
+docker buildx inspect x	inert
+docker buildx ls	inert
+docker buildx ls --help	inert
+docker buildx ls --help -h	inert
+docker buildx ls --help x	inert
+docker buildx ls -h	inert
+docker buildx ls x	inert
+docker buildx version	inert
+docker buildx version --help	inert
+docker buildx version --help -h	inert
+docker buildx version --help x	inert
+docker buildx version -h	inert
+docker buildx version x	inert
+docker buildx x	denied
+docker compose	denied
+docker compose --version	inert
+docker compose --version x	denied
+docker compose config	inert
+docker compose config --dry-run	inert
+docker compose config --dry-run --format x	inert
+docker compose config --dry-run --hash	inert
+docker compose config --dry-run x	inert
+docker compose config --format x	inert
+docker compose config --hash	inert
+docker compose config --help	inert
+docker compose config --images	inert
+docker compose config --no-consistency	inert
+docker compose config --no-interpolate	inert
+docker compose config --no-normalize	inert
+docker compose config --no-path-resolution	inert
+docker compose config --output x	inert
+docker compose config --profiles	inert
+docker compose config --quiet	inert
+docker compose config --resolve-image-digests	inert
+docker compose config --services	inert
+docker compose config --volumes	inert
+docker compose config -h	inert
+docker compose config -o x	inert
+docker compose config -q	inert
+docker compose config x	inert
+docker compose images	inert
+docker compose images --help	inert
+docker compose images --help -h	inert
+docker compose images --help x	inert
+docker compose images -h	inert
+docker compose images x	inert
+docker compose logs	inert
+docker compose logs --follow	inert
+docker compose logs --follow --help	inert
+docker compose logs --follow --index x	inert
+docker compose logs --follow x	inert
+docker compose logs --help	inert
+docker compose logs --index x	inert
+docker compose logs --no-color	inert
+docker compose logs --no-log-prefix	inert
+docker compose logs --since x	inert
+docker compose logs --tail x	inert
+docker compose logs --timestamps	inert
+docker compose logs --until x	inert
+docker compose logs -f	inert
+docker compose logs -f web	inert
+docker compose logs -h	inert
+docker compose logs -n x	inert
+docker compose logs -t	inert
+docker compose logs coordinator	inert
+docker compose logs x	inert
+docker compose ls	inert
+docker compose ls --help	inert
+docker compose ls --help -h	inert
+docker compose ls --help x	inert
+docker compose ls -h	inert
+docker compose ls x	inert
+docker compose port	denied
+docker compose port --help	inert
+docker compose port --help --index	inert
+docker compose port --help x	inert
+docker compose port --index	inert
+docker compose port --protocol	inert
+docker compose port -h	inert
+docker compose port x	inert
+docker compose ps	inert
+docker compose ps --all	inert
+docker compose ps --all --filter x	inert
+docker compose ps --all --help	inert
+docker compose ps --all x	inert
+docker compose ps --filter x	inert
+docker compose ps --format x	inert
+docker compose ps --help	inert
+docker compose ps --no-trunc	inert
+docker compose ps --orphans	inert
+docker compose ps --quiet	inert
+docker compose ps --services	inert
+docker compose ps --status x	inert
+docker compose ps -a	inert
+docker compose ps -h	inert
+docker compose ps -q	inert
+docker compose ps x	inert
+docker compose top	inert
+docker compose top --help	inert
+docker compose top --help -h	inert
+docker compose top --help x	inert
+docker compose top -h	inert
+docker compose top x	inert
+docker compose version	inert
+docker compose version --help	inert
+docker compose version --help -h	inert
+docker compose version --help x	inert
+docker compose version -h	inert
+docker compose version x	inert
+docker compose x	denied
+docker container	denied
+docker container diff	inert
+docker container diff --help	inert
+docker container diff --help -h	inert
+docker container diff --help x	inert
+docker container diff -h	inert
+docker container diff x	inert
+docker container inspect	inert
+docker container inspect --format x	inert
+docker container inspect --help	inert
+docker container inspect --help --format x	inert
+docker container inspect --help --size	inert
+docker container inspect --help x	inert
+docker container inspect --size	inert
+docker container inspect --type x	inert
+docker container inspect -f x	inert
+docker container inspect -h	inert
+docker container inspect -s	inert
+docker container inspect x	inert
+docker container list	inert
+docker container list --all	inert
+docker container list --all --filter x	inert
+docker container list --all --help	inert
+docker container list --all x	inert
+docker container list --filter x	inert
+docker container list --format x	inert
+docker container list --help	inert
+docker container list --last	inert
+docker container list --latest	inert
+docker container list --no-trunc	inert
+docker container list --quiet	inert
+docker container list --size	inert
+docker container list -a	inert
+docker container list -f x	inert
+docker container list -h	inert
+docker container list -l	inert
+docker container list -n	inert
+docker container list -q	inert
+docker container list -s	inert
+docker container list x	inert
+docker container logs	denied
+docker container logs --details	inert
+docker container logs --details --follow	inert
+docker container logs --details --since x	inert
+docker container logs --details x	inert
+docker container logs --follow	inert
+docker container logs --help	inert
+docker container logs --since x	inert
+docker container logs --tail x	inert
+docker container logs --timestamps	inert
+docker container logs --until x	inert
+docker container logs -f	inert
+docker container logs -h	inert
+docker container logs -n x	inert
+docker container logs -t	inert
+docker container logs x	inert
+docker container ls	inert
+docker container ls --all	inert
+docker container ls --all --filter x	inert
+docker container ls --all --help	inert
+docker container ls --all x	inert
+docker container ls --filter x	inert
+docker container ls --format x	inert
+docker container ls --help	inert
+docker container ls --last	inert
+docker container ls --latest	inert
+docker container ls --no-trunc	inert
+docker container ls --quiet	inert
+docker container ls --size	inert
+docker container ls -a	inert
+docker container ls -f x	inert
+docker container ls -h	inert
+docker container ls -l	inert
+docker container ls -n	inert
+docker container ls -q	inert
+docker container ls -s	inert
+docker container ls x	inert
+docker container port	inert
+docker container port --help	inert
+docker container port --help -h	inert
+docker container port --help x	inert
+docker container port -h	inert
+docker container port x	inert
+docker container stats	inert
+docker container stats --all	inert
+docker container stats --all --format x	inert
+docker container stats --all --help	inert
+docker container stats --all x	inert
+docker container stats --format x	inert
+docker container stats --help	inert
+docker container stats --no-stream	inert
+docker container stats --no-trunc	inert
+docker container stats -a	inert
+docker container stats -h	inert
+docker container stats x	inert
+docker container top	inert
+docker container top --help	inert
+docker container top --help -h	inert
+docker container top --help x	inert
+docker container top -h	inert
+docker container top x	inert
+docker container x	denied
+docker context	denied
+docker context inspect	inert
+docker context inspect --filter x	inert
+docker context inspect --format x	inert
+docker context inspect --help	inert
+docker context inspect --help --filter x	inert
+docker context inspect --help --no-trunc	inert
+docker context inspect --help x	inert
+docker context inspect --no-trunc	inert
+docker context inspect --quiet	inert
+docker context inspect -f x	inert
+docker context inspect -h	inert
+docker context inspect -q	inert
+docker context inspect x	inert
+docker context ls	inert
+docker context ls --filter x	inert
+docker context ls --format x	inert
+docker context ls --help	inert
+docker context ls --help --filter x	inert
+docker context ls --help --no-trunc	inert
+docker context ls --help x	inert
+docker context ls --no-trunc	inert
+docker context ls --quiet	inert
+docker context ls -f x	inert
+docker context ls -h	inert
+docker context ls -q	inert
+docker context ls x	inert
+docker context show	inert
+docker context show --filter x	inert
+docker context show --format x	inert
+docker context show --help	inert
+docker context show --help --filter x	inert
+docker context show --help --no-trunc	inert
+docker context show --help x	inert
+docker context show --no-trunc	inert
+docker context show --quiet	inert
+docker context show -f x	inert
+docker context show -h	inert
+docker context show -q	inert
+docker context show x	inert
+docker context x	denied
+docker diff	inert
+docker diff --help	inert
+docker diff --help -h	inert
+docker diff --help x	inert
+docker diff -h	inert
+docker diff x	inert
+docker history	inert
+docker history --format x	inert
+docker history --help	inert
+docker history --help --format x	inert
+docker history --help --human	inert
+docker history --help x	inert
+docker history --human	inert
+docker history --no-trunc	inert
+docker history --quiet	inert
+docker history -H	inert
+docker history -h	inert
+docker history -q	inert
+docker history x	inert
+docker image	denied
+docker image history	inert
+docker image history --format x	inert
+docker image history --help	inert
+docker image history --help --format x	inert
+docker image history --help --human	inert
+docker image history --help x	inert
+docker image history --human	inert
+docker image history --no-trunc	inert
+docker image history --quiet	inert
+docker image history -H	inert
+docker image history -h	inert
+docker image history -q	inert
+docker image history x	inert
+docker image inspect	inert
+docker image inspect --format x	inert
+docker image inspect --help	inert
+docker image inspect --help --format x	inert
+docker image inspect --help --size	inert
+docker image inspect --help x	inert
+docker image inspect --size	inert
+docker image inspect --type x	inert
+docker image inspect -f x	inert
+docker image inspect -h	inert
+docker image inspect -s	inert
+docker image inspect x	inert
+docker image list	inert
+docker image list --all	inert
+docker image list --all --digests	inert
+docker image list --all --filter x	inert
+docker image list --all x	inert
+docker image list --digests	inert
+docker image list --filter x	inert
+docker image list --format x	inert
+docker image list --help	inert
+docker image list --no-trunc	inert
+docker image list --quiet	inert
+docker image list -a	inert
+docker image list -f x	inert
+docker image list -h	inert
+docker image list -q	inert
+docker image list x	inert
+docker image ls	inert
+docker image ls --all	inert
+docker image ls --all --digests	inert
+docker image ls --all --filter x	inert
+docker image ls --all x	inert
+docker image ls --digests	inert
+docker image ls --filter x	inert
+docker image ls --format x	inert
+docker image ls --help	inert
+docker image ls --no-trunc	inert
+docker image ls --quiet	inert
+docker image ls -a	inert
+docker image ls -f x	inert
+docker image ls -h	inert
+docker image ls -q	inert
+docker image ls x	inert
+docker image x	denied
+docker images	inert
+docker images --all	inert
+docker images --all --digests	inert
+docker images --all --filter x	inert
+docker images --all x	inert
+docker images --digests	inert
+docker images --filter x	inert
+docker images --format x	inert
+docker images --help	inert
+docker images --no-trunc	inert
+docker images --quiet	inert
+docker images -a	inert
+docker images -f x	inert
+docker images -h	inert
+docker images -q	inert
+docker images x	inert
+docker info	inert
+docker info --format x	inert
+docker info --help	inert
+docker info --help --format x	inert
+docker info --help -h	inert
+docker info --help x	inert
+docker info -f x	inert
+docker info -h	inert
+docker info x	inert
+docker inspect	denied
+docker inspect --format x	inert
+docker inspect --help	inert
+docker inspect --help --format x	inert
+docker inspect --help --size	inert
+docker inspect --help x	inert
+docker inspect --size	inert
+docker inspect --type x	inert
+docker inspect -f x	inert
+docker inspect -h	inert
+docker inspect -s	inert
+docker inspect x	inert
+docker logs	denied
+docker logs --details	inert
+docker logs --details --follow	inert
+docker logs --details --since x	inert
+docker logs --details x	inert
+docker logs --follow	inert
+docker logs --help	inert
+docker logs --since x	inert
+docker logs --tail x	inert
+docker logs --timestamps	inert
+docker logs --until x	inert
+docker logs -f	inert
+docker logs -h	inert
+docker logs -n x	inert
+docker logs -t	inert
+docker logs x	inert
+docker manifest	denied
+docker manifest inspect	denied
+docker manifest inspect --format x	inert
+docker manifest inspect --help	inert
+docker manifest inspect --help --format x	inert
+docker manifest inspect --help --size	inert
+docker manifest inspect --help x	inert
+docker manifest inspect --size	inert
+docker manifest inspect --type x	inert
+docker manifest inspect -f x	inert
+docker manifest inspect -h	inert
+docker manifest inspect -s	inert
+docker manifest inspect x	inert
+docker manifest x	denied
+docker network	denied
+docker network inspect	inert
+docker network inspect --filter x	inert
+docker network inspect --format x	inert
+docker network inspect --help	inert
+docker network inspect --help --filter x	inert
+docker network inspect --help --no-trunc	inert
+docker network inspect --help x	inert
+docker network inspect --no-trunc	inert
+docker network inspect --quiet	inert
+docker network inspect -f x	inert
+docker network inspect -h	inert
+docker network inspect -q	inert
+docker network inspect x	inert
+docker network ls	inert
+docker network ls --filter x	inert
+docker network ls --format x	inert
+docker network ls --help	inert
+docker network ls --help --filter x	inert
+docker network ls --help --no-trunc	inert
+docker network ls --help x	inert
+docker network ls --no-trunc	inert
+docker network ls --quiet	inert
+docker network ls -f x	inert
+docker network ls -h	inert
+docker network ls -q	inert
+docker network ls x	inert
+docker network x	denied
+docker port	inert
+docker port --help	inert
+docker port --help -h	inert
+docker port --help x	inert
+docker port -h	inert
+docker port x	inert
+docker ps	inert
+docker ps --all	inert
+docker ps --all --filter x	inert
+docker ps --all --help	inert
+docker ps --all x	inert
+docker ps --filter x	inert
+docker ps --format x	inert
+docker ps --help	inert
+docker ps --last	inert
+docker ps --latest	inert
+docker ps --no-trunc	inert
+docker ps --quiet	inert
+docker ps --size	inert
+docker ps -a	inert
+docker ps -f x	inert
+docker ps -h	inert
+docker ps -l	inert
+docker ps -n	inert
+docker ps -q	inert
+docker ps -s	inert
+docker ps x	inert
+docker run evil --help	denied
+docker run evil --version	denied
+docker stats	inert
+docker stats --all	inert
+docker stats --all --format x	inert
+docker stats --all --help	inert
+docker stats --all x	inert
+docker stats --format x	inert
+docker stats --help	inert
+docker stats --no-stream	inert
+docker stats --no-trunc	inert
+docker stats -a	inert
+docker stats -h	inert
+docker stats x	inert
+docker system	denied
+docker system df	inert
+docker system df --format x	inert
+docker system df --help	inert
+docker system df --help --format x	inert
+docker system df --help -h	inert
+docker system df --help x	inert
+docker system df -f x	inert
+docker system df -h	inert
+docker system df x	inert
+docker system info	inert
+docker system info --format x	inert
+docker system info --help	inert
+docker system info --help --format x	inert
+docker system info --help -h	inert
+docker system info --help x	inert
+docker system info -f x	inert
+docker system info -h	inert
+docker system info x	inert
+docker system x	denied
+docker top	inert
+docker top --help	inert
+docker top --help -h	inert
+docker top --help x	inert
+docker top -h	inert
+docker top x	inert
+docker version	inert
+docker version --format x	inert
+docker version --help	inert
+docker version --help --format x	inert
+docker version --help -h	inert
+docker version --help x	inert
+docker version -f x	inert
+docker version -h	inert
+docker version x	inert
+docker volume	denied
+docker volume inspect	inert
+docker volume inspect --filter x	inert
+docker volume inspect --format x	inert
+docker volume inspect --help	inert
+docker volume inspect --help --filter x	inert
+docker volume inspect --help --no-trunc	inert
+docker volume inspect --help x	inert
+docker volume inspect --no-trunc	inert
+docker volume inspect --quiet	inert
+docker volume inspect -f x	inert
+docker volume inspect -h	inert
+docker volume inspect -q	inert
+docker volume inspect x	inert
+docker volume ls	inert
+docker volume ls --filter x	inert
+docker volume ls --format x	inert
+docker volume ls --help	inert
+docker volume ls --help --filter x	inert
+docker volume ls --help --no-trunc	inert
+docker volume ls --help x	inert
+docker volume ls --no-trunc	inert
+docker volume ls --quiet	inert
+docker volume ls -f x	inert
+docker volume ls -h	inert
+docker volume ls -q	inert
+docker volume ls x	inert
+docker volume x	denied
+docker x	denied
+docker-buildx	denied
+docker-buildx --help	inert
+docker-buildx --help --version	denied
+docker-buildx --help x	denied
+docker-buildx --version	inert
+docker-buildx -h	inert
+docker-buildx -v	inert
+docker-buildx bake	denied
+docker-buildx bake x	denied
+docker-buildx build	denied
+docker-buildx build x	denied
+docker-buildx completion	denied
+docker-buildx completion --help	inert
+docker-buildx completion --help -h	inert
+docker-buildx completion --help x	inert
+docker-buildx completion -h	inert
+docker-buildx completion x	inert
+docker-buildx create	denied
+docker-buildx create x	denied
+docker-buildx debug	denied
+docker-buildx debug x	denied
+docker-buildx dial-stdio	denied
+docker-buildx dial-stdio x	denied
+docker-buildx du	inert
+docker-buildx du --builder x	inert
+docker-buildx du --filter x	inert
+docker-buildx du --help	inert
+docker-buildx du --help --builder x	inert
+docker-buildx du --help --verbose	inert
+docker-buildx du --help x	inert
+docker-buildx du --verbose	inert
+docker-buildx du -h	inert
+docker-buildx du -v	inert
+docker-buildx du x	inert
+docker-buildx help	inert
+docker-buildx help x	inert
+docker-buildx history	denied
+docker-buildx history x	denied
+docker-buildx imagetools	denied
+docker-buildx imagetools x	denied
+docker-buildx inspect	denied
+docker-buildx inspect --bootstrap	inert
+docker-buildx inspect --bootstrap --builder x	inert
+docker-buildx inspect --bootstrap --help	inert
+docker-buildx inspect --bootstrap x	inert
+docker-buildx inspect --builder x	inert
+docker-buildx inspect --help	inert
+docker-buildx inspect -h	inert
+docker-buildx inspect x	inert
+docker-buildx install	denied
+docker-buildx install x	denied
+docker-buildx ls	inert
+docker-buildx ls --format x	inert
+docker-buildx ls --help	inert
+docker-buildx ls --help --format x	inert
+docker-buildx ls --help --no-trunc	inert
+docker-buildx ls --help x	inert
+docker-buildx ls --no-trunc	inert
+docker-buildx ls -h	inert
+docker-buildx ls x	inert
+docker-buildx prune	denied
+docker-buildx prune x	denied
+docker-buildx rm	denied
+docker-buildx rm x	denied
+docker-buildx stop	denied
+docker-buildx stop x	denied
+docker-buildx uninstall	denied
+docker-buildx uninstall x	denied
+docker-buildx use	denied
+docker-buildx use x	denied
+docker-buildx version	inert
+docker-buildx version --help	inert
+docker-buildx version --help -h	inert
+docker-buildx version --help x	inert
+docker-buildx version -h	inert
+docker-buildx version x	inert
+docker-buildx x	denied
+docker-compose	denied
+docker-compose --help	inert
+docker-compose --help --output x	denied
+docker-compose --help --version	denied
+docker-compose --help x	denied
+docker-compose --output x	denied
+docker-compose --version	inert
+docker-compose -h	inert
+docker-compose -o x	denied
+docker-compose -v	inert
+docker-compose attach	denied
+docker-compose attach x	denied
+docker-compose build	denied
+docker-compose build x	denied
+docker-compose completion	denied
+docker-compose completion --help	inert
+docker-compose completion --help -h	inert
+docker-compose completion --help x	inert
+docker-compose completion -h	inert
+docker-compose completion x	inert
+docker-compose config	safe-read
+docker-compose config --format	safe-read
+docker-compose config --format --format x	safe-read
+docker-compose config --format --help	safe-read
+docker-compose config --format x	safe-read
+docker-compose config --hash x	safe-read
+docker-compose config --help	safe-read
+docker-compose config --no-consistency	safe-read
+docker-compose config --no-interpolate	safe-read
+docker-compose config --no-normalize	safe-read
+docker-compose config --no-path-resolution	safe-read
+docker-compose config --output ./resolved-compose.yaml	safe-read
+docker-compose config --output x	safe-read
+docker-compose config --profile x	safe-read
+docker-compose config --profiles	safe-read
+docker-compose config --quiet	safe-read
+docker-compose config --resolve-image-digests	safe-read
+docker-compose config --services	safe-read
+docker-compose config --volumes	safe-read
+docker-compose config -h	safe-read
+docker-compose config -o x	safe-read
+docker-compose config -p x	safe-read
+docker-compose config -q	safe-read
+docker-compose config x	safe-read
+docker-compose convert	denied
+docker-compose convert x	denied
+docker-compose cp	denied
+docker-compose cp x	denied
+docker-compose create	denied
+docker-compose create x	denied
+docker-compose down	denied
+docker-compose down x	denied
+docker-compose events	inert
+docker-compose events --help	inert
+docker-compose events --help --json	inert
+docker-compose events --help x	inert
+docker-compose events --json	inert
+docker-compose events -h	inert
+docker-compose events x	inert
+docker-compose exec	denied
+docker-compose exec x	denied
+docker-compose help	inert
+docker-compose help x	inert
+docker-compose images	inert
+docker-compose images --format x	inert
+docker-compose images --help	inert
+docker-compose images --help --format x	inert
+docker-compose images --help --quiet	inert
+docker-compose images --help x	inert
+docker-compose images --quiet	inert
+docker-compose images -h	inert
+docker-compose images -q	inert
+docker-compose images x	inert
+docker-compose kill	denied
+docker-compose kill x	denied
+docker-compose logs	inert
+docker-compose logs --follow	inert
+docker-compose logs --follow --help	inert
+docker-compose logs --follow --since x	inert
+docker-compose logs --follow x	inert
+docker-compose logs --help	inert
+docker-compose logs --no-color	inert
+docker-compose logs --no-log-prefix	inert
+docker-compose logs --since x	inert
+docker-compose logs --tail x	inert
+docker-compose logs --timestamps	inert
+docker-compose logs --until x	inert
+docker-compose logs -f	inert
+docker-compose logs -h	inert
+docker-compose logs -t	inert
+docker-compose logs x	inert
+docker-compose ls	inert
+docker-compose ls --all	inert
+docker-compose ls --all --filter x	inert
+docker-compose ls --all --help	inert
+docker-compose ls --all x	inert
+docker-compose ls --filter x	inert
+docker-compose ls --format x	inert
+docker-compose ls --help	inert
+docker-compose ls --quiet	inert
+docker-compose ls -a	inert
+docker-compose ls -h	inert
+docker-compose ls -q	inert
+docker-compose ls x	inert
+docker-compose pause	denied
+docker-compose pause x	denied
+docker-compose port	denied
+docker-compose port --help	inert
+docker-compose port --help --index x	inert
+docker-compose port --help -h	inert
+docker-compose port --help x	inert
+docker-compose port --index x	inert
+docker-compose port --protocol x	inert
+docker-compose port -h	inert
+docker-compose port x	inert
+docker-compose ps	inert
+docker-compose ps --all	inert
+docker-compose ps --all --dry-run	inert
+docker-compose ps --all --filter x	inert
+docker-compose ps --all x	inert
+docker-compose ps --dry-run	inert
+docker-compose ps --filter x	inert
+docker-compose ps --format x	inert
+docker-compose ps --help	inert
+docker-compose ps --no-trunc	inert
+docker-compose ps --quiet	inert
+docker-compose ps --services	inert
+docker-compose ps --status x	inert
+docker-compose ps -a	inert
+docker-compose ps -h	inert
+docker-compose ps -q	inert
+docker-compose ps x	inert
+docker-compose pull	denied
+docker-compose pull x	denied
+docker-compose push	denied
+docker-compose push x	denied
+docker-compose restart	denied
+docker-compose restart x	denied
+docker-compose rm	denied
+docker-compose rm x	denied
+docker-compose run	denied
+docker-compose run x	denied
+docker-compose scale	denied
+docker-compose scale x	denied
+docker-compose start	denied
+docker-compose start x	denied
+docker-compose stop	denied
+docker-compose stop x	denied
+docker-compose top	inert
+docker-compose top --help	inert
+docker-compose top --help -h	inert
+docker-compose top --help x	inert
+docker-compose top -h	inert
+docker-compose top x	inert
+docker-compose unpause	denied
+docker-compose unpause x	denied
+docker-compose up	denied
+docker-compose up x	denied
+docker-compose version	inert
+docker-compose version --format	inert
+docker-compose version --format --format x	inert
+docker-compose version --format --help	inert
+docker-compose version --format x	inert
+docker-compose version --help	inert
+docker-compose version --short	inert
+docker-compose version -f	inert
+docker-compose version -h	inert
+docker-compose version x	inert
+docker-compose wait	denied
+docker-compose wait x	denied
+docker-compose watch	denied
+docker-compose watch x	denied
+docker-compose x	denied
+doctl	denied
+doctl --access-token x	denied
+doctl --context x	denied
+doctl --help	inert
+doctl --help --access-token x	inert
+doctl --help --version	denied
+doctl --help x	denied
+doctl --output x	denied
+doctl --version	inert
+doctl -h	inert
+doctl -o x	denied
+doctl -t x	denied
+doctl -v	inert
+doctl account	denied
+doctl account get	inert
+doctl account get --help	inert
+doctl account get --help -h	inert
+doctl account get --help x	inert
+doctl account get -h	inert
+doctl account get x	inert
+doctl account ratelimit	inert
+doctl account ratelimit --help	inert
+doctl account ratelimit --help -h	inert
+doctl account ratelimit --help x	inert
+doctl account ratelimit -h	inert
+doctl account ratelimit x	inert
+doctl account x	denied
+doctl apps	denied
+doctl apps console my-app	denied
+doctl apps get	denied
+doctl apps get --help	inert
+doctl apps get --help -h	inert
+doctl apps get --help x	inert
+doctl apps get -h	inert
+doctl apps get x	inert
+doctl apps list	inert
+doctl apps list --help	inert
+doctl apps list --help -h	inert
+doctl apps list --help x	inert
+doctl apps list -h	inert
+doctl apps list x	inert
+doctl apps x	denied
+doctl auth	denied
+doctl auth init	denied
+doctl auth list	inert
+doctl auth list --help	inert
+doctl auth list --help -h	inert
+doctl auth list --help x	inert
+doctl auth list -h	inert
+doctl auth list x	inert
+doctl auth x	denied
+doctl balance	denied
+doctl balance get	inert
+doctl balance get --help	inert
+doctl balance get --help -h	inert
+doctl balance get --help x	inert
+doctl balance get -h	inert
+doctl balance get x	inert
+doctl balance x	denied
+doctl billing-history	denied
+doctl billing-history list	inert
+doctl billing-history list --help	inert
+doctl billing-history list --help -h	inert
+doctl billing-history list --help x	inert
+doctl billing-history list -h	inert
+doctl billing-history list x	inert
+doctl billing-history x	denied
+doctl compute	denied
+doctl compute action	denied
+doctl compute action --help	inert
+doctl compute action --help -h	denied
+doctl compute action --help x	denied
+doctl compute action -h	inert
+doctl compute action get	inert
+doctl compute action get --help	inert
+doctl compute action list	inert
+doctl compute action list --help	inert
+doctl compute action x	denied
+doctl compute cdn	denied
+doctl compute cdn --help	inert
+doctl compute cdn --help -h	denied
+doctl compute cdn --help x	denied
+doctl compute cdn -h	inert
+doctl compute cdn get	inert
+doctl compute cdn get --help	inert
+doctl compute cdn list	inert
+doctl compute cdn list --help	inert
+doctl compute cdn x	denied
+doctl compute certificate	denied
+doctl compute certificate --help	inert
+doctl compute certificate --help -h	denied
+doctl compute certificate --help x	denied
+doctl compute certificate -h	inert
+doctl compute certificate get	inert
+doctl compute certificate get --help	inert
+doctl compute certificate list	inert
+doctl compute certificate list --help	inert
+doctl compute certificate x	denied
+doctl compute domain	denied
+doctl compute domain --help	inert
+doctl compute domain --help -h	denied
+doctl compute domain --help x	denied
+doctl compute domain -h	inert
+doctl compute domain get	inert
+doctl compute domain get --help	inert
+doctl compute domain list	inert
+doctl compute domain list --help	inert
+doctl compute domain x	denied
+doctl compute droplet	denied
+doctl compute droplet --format x	denied
+doctl compute droplet --help	inert
+doctl compute droplet --help --format x	denied
+doctl compute droplet --help -h	denied
+doctl compute droplet --help x	denied
+doctl compute droplet --no-header x	denied
+doctl compute droplet -h	inert
+doctl compute droplet create --region nyc1 --size s-1vcpu-1gb --image ubuntu-22-04-x64 web	denied
+doctl compute droplet delete 12345	denied
+doctl compute droplet get	inert
+doctl compute droplet get --help	inert
+doctl compute droplet get 12345	inert
+doctl compute droplet list	inert
+doctl compute droplet list --help	inert
+doctl compute droplet x	denied
+doctl compute firewall	denied
+doctl compute firewall --help	inert
+doctl compute firewall --help -h	denied
+doctl compute firewall --help x	denied
+doctl compute firewall -h	inert
+doctl compute firewall get	inert
+doctl compute firewall get --help	inert
+doctl compute firewall list	inert
+doctl compute firewall list --help	inert
+doctl compute firewall x	denied
+doctl compute image	denied
+doctl compute image --help	inert
+doctl compute image --help -h	denied
+doctl compute image --help x	denied
+doctl compute image -h	inert
+doctl compute image get	inert
+doctl compute image get --help	inert
+doctl compute image list	inert
+doctl compute image list --help	inert
+doctl compute image x	denied
+doctl compute load-balancer	denied
+doctl compute load-balancer --help	inert
+doctl compute load-balancer --help -h	denied
+doctl compute load-balancer --help x	denied
+doctl compute load-balancer -h	inert
+doctl compute load-balancer get	inert
+doctl compute load-balancer get --help	inert
+doctl compute load-balancer list	inert
+doctl compute load-balancer list --help	inert
+doctl compute load-balancer x	denied
+doctl compute region	denied
+doctl compute region --help	inert
+doctl compute region --help -h	denied
+doctl compute region --help x	denied
+doctl compute region -h	inert
+doctl compute region list	inert
+doctl compute region list --help	inert
+doctl compute region x	denied
+doctl compute reserved-ip	denied
+doctl compute reserved-ip --help	inert
+doctl compute reserved-ip --help -h	denied
+doctl compute reserved-ip --help x	denied
+doctl compute reserved-ip -h	inert
+doctl compute reserved-ip get	inert
+doctl compute reserved-ip get --help	inert
+doctl compute reserved-ip list	inert
+doctl compute reserved-ip list --help	inert
+doctl compute reserved-ip x	denied
+doctl compute size	denied
+doctl compute size --help	inert
+doctl compute size --help -h	denied
+doctl compute size --help x	denied
+doctl compute size -h	inert
+doctl compute size list	inert
+doctl compute size list --help	inert
+doctl compute size x	denied
+doctl compute snapshot	denied
+doctl compute snapshot --help	inert
+doctl compute snapshot --help -h	denied
+doctl compute snapshot --help x	denied
+doctl compute snapshot -h	inert
+doctl compute snapshot get	inert
+doctl compute snapshot get --help	inert
+doctl compute snapshot list	inert
+doctl compute snapshot list --help	inert
+doctl compute snapshot x	denied
+doctl compute ssh 12345	denied
+doctl compute ssh-key	denied
+doctl compute ssh-key --help	inert
+doctl compute ssh-key --help -h	denied
+doctl compute ssh-key --help x	denied
+doctl compute ssh-key -h	inert
+doctl compute ssh-key get	inert
+doctl compute ssh-key get --help	inert
+doctl compute ssh-key list	inert
+doctl compute ssh-key list --help	inert
+doctl compute ssh-key x	denied
+doctl compute tag	denied
+doctl compute tag --help	inert
+doctl compute tag --help -h	denied
+doctl compute tag --help x	denied
+doctl compute tag -h	inert
+doctl compute tag get	inert
+doctl compute tag get --help	inert
+doctl compute tag list	inert
+doctl compute tag list --help	inert
+doctl compute tag x	denied
+doctl compute volume	denied
+doctl compute volume --help	inert
+doctl compute volume --help -h	denied
+doctl compute volume --help x	denied
+doctl compute volume -h	inert
+doctl compute volume get	inert
+doctl compute volume get --help	inert
+doctl compute volume list	inert
+doctl compute volume list --help	inert
+doctl compute volume x	denied
+doctl compute x	denied
+doctl databases	denied
+doctl databases get	denied
+doctl databases get --help	inert
+doctl databases get --help -h	inert
+doctl databases get --help x	inert
+doctl databases get -h	inert
+doctl databases get x	inert
+doctl databases list	inert
+doctl databases list --help	inert
+doctl databases list --help -h	inert
+doctl databases list --help x	inert
+doctl databases list -h	inert
+doctl databases list x	inert
+doctl databases x	denied
+doctl invoice	denied
+doctl invoice --help	inert
+doctl invoice --help -h	denied
+doctl invoice --help x	denied
+doctl invoice -h	inert
+doctl invoice get	inert
+doctl invoice get --help	inert
+doctl invoice list	inert
+doctl invoice list --help	inert
+doctl invoice summary	inert
+doctl invoice summary --help	inert
+doctl invoice x	denied
+doctl kubernetes	denied
+doctl kubernetes cluster	denied
+doctl kubernetes cluster --help	inert
+doctl kubernetes cluster --help -h	denied
+doctl kubernetes cluster --help x	denied
+doctl kubernetes cluster -h	inert
+doctl kubernetes cluster get	inert
+doctl kubernetes cluster get --help	inert
+doctl kubernetes cluster kubeconfig save my-cluster	denied
+doctl kubernetes cluster list	inert
+doctl kubernetes cluster list --help	inert
+doctl kubernetes cluster x	denied
+doctl kubernetes x	denied
+doctl monitoring	denied
+doctl monitoring alert	denied
+doctl monitoring alert --help	inert
+doctl monitoring alert --help -h	denied
+doctl monitoring alert --help x	denied
+doctl monitoring alert -h	inert
+doctl monitoring alert get	inert
+doctl monitoring alert get --help	inert
+doctl monitoring alert list	inert
+doctl monitoring alert list --help	inert
+doctl monitoring alert x	denied
+doctl monitoring x	denied
+doctl projects	denied
+doctl projects get	denied
+doctl projects get --help	inert
+doctl projects get --help -h	inert
+doctl projects get --help x	inert
+doctl projects get -h	inert
+doctl projects get x	inert
+doctl projects list	inert
+doctl projects list --help	inert
+doctl projects list --help -h	inert
+doctl projects list --help x	inert
+doctl projects list -h	inert
+doctl projects list x	inert
+doctl projects x	denied
+doctl registry	denied
+doctl registry get	inert
+doctl registry get --help	inert
+doctl registry get --help -h	inert
+doctl registry get --help x	inert
+doctl registry get -h	inert
+doctl registry get x	inert
+doctl registry login	denied
+doctl registry x	denied
+doctl version	inert
+doctl version x	inert
+doctl vpcs	denied
+doctl vpcs get	denied
+doctl vpcs get --help	inert
+doctl vpcs get --help -h	inert
+doctl vpcs get --help x	inert
+doctl vpcs get -h	inert
+doctl vpcs get x	inert
+doctl vpcs list	inert
+doctl vpcs list --help	inert
+doctl vpcs list --help -h	inert
+doctl vpcs list --help x	inert
+doctl vpcs list -h	inert
+doctl vpcs list x	inert
+doctl vpcs x	denied
+doctl x	denied
+doggo	denied
+doggo --aa	safe-read
+doggo --aa --ad	safe-read
+doggo --aa --bufsize x	safe-read
+doggo --aa x	safe-read
+doggo --ad	safe-read
+doggo --any	safe-read
+doggo --bufsize x	safe-read
+doggo --cd	safe-read
+doggo --class x	safe-read
+doggo --color	safe-read
+doggo --cookie	safe-read
+doggo --debug	safe-read
+doggo --do	safe-read
+doggo --ecs x	safe-read
+doggo --ede	safe-read
+doggo --gp-from x	safe-read
+doggo --gp-limit x	safe-read
+doggo --help	safe-read
+doggo --ipv4	safe-read
+doggo --ipv6	safe-read
+doggo --json	safe-read
+doggo --json example.com	safe-read
+doggo --nameserver x	safe-read
+doggo --ndots x	safe-read
+doggo --nsid	safe-read
+doggo --output /tmp/dns.json example.com	denied
+doggo --padding	safe-read
+doggo --query x	safe-read
+doggo --rd	safe-read
+doggo --reverse	safe-read
+doggo --search	safe-read
+doggo --short	safe-read
+doggo --skip-hostname-verification	safe-read
+doggo --strategy x	safe-read
+doggo --time	safe-read
+doggo --tls-hostname x	safe-read
+doggo --type x	safe-read
+doggo --version	safe-read
+doggo --z	safe-read
+doggo -4	safe-read
+doggo -6	safe-read
+doggo -J	safe-read
+doggo -c x	safe-read
+doggo -h	safe-read
+doggo -n x	safe-read
+doggo -q x	safe-read
+doggo -t AAAA example.com	safe-read
+doggo -t x	safe-read
+doggo -x	safe-read
+doggo example.com	safe-read
+doggo example.com --exec curl	denied
+doggo example.com @1.1.1.1	safe-read
+doggo example.com @tls://1.1.1.1 --skip-hostname-verification	safe-read
+doggo example.com MX	safe-read
+doggo x	safe-read
+dot	denied
+dot --help	safe-write
+dot --help -?	safe-write
+dot --help -A x	safe-write
+dot --help x	safe-write
+dot --version	denied
+dot -?	safe-write
+dot -A x	safe-write
+dot -E x	safe-write
+dot -G x	safe-write
+dot -K x	safe-write
+dot -Kfdp -Tpng graph.dot -O	safe-write
+dot -N x	safe-write
+dot -O	safe-write
+dot -P	safe-write
+dot -T x	safe-write
+dot -Tpng graph.dot -o out.png	safe-write
+dot -Tsvg graph.dot	safe-write
+dot -V	safe-write
+dot -l /tmp/evil.ps -Tps graph.dot	denied
+dot -n x	safe-write
+dot -o x	safe-write
+dot -q	safe-write
+dot -s x	safe-write
+dot -v	safe-write
+dot -x	safe-write
+dot -y	safe-write
+dot x	safe-write
+dot_clean	denied
+dot_clean --help	denied
+dot_clean --keep=dotbar	safe-write
+dot_clean --keep=dotbar --keep=mostrecent	safe-write
+dot_clean --keep=dotbar x	safe-write
+dot_clean --keep=mostrecent	safe-write
+dot_clean --keep=native	safe-write
+dot_clean --version	denied
+dot_clean -f	safe-write
+dot_clean -h	safe-write
+dot_clean -m	safe-write
+dot_clean -n	safe-write
+dot_clean -s	safe-write
+dot_clean -v	safe-write
+dot_clean x	safe-write
+dotenv	denied
+dotenv -- git status	inert
+dotenv -- ls	inert
+dotenv --help	denied
+dotenv --version	denied
+dotenv --xyzzy ls	denied
+dotenv -c test bundle exec rspec	safe-read
+dotenv -c x	denied
+dotenv -e .env.local git log	inert
+dotenv -e /tmp/evil.env ls	denied
+dotenv -e x	denied
+dotenv -f .env rm -rf /	denied
+dotenv -f .env.test bundle exec rspec	safe-read
+dotenv -f .env.test cat README.md	safe-read
+dotenv -f /etc/shadow ls	denied
+dotenv -f /tmp/evil.env ls	denied
+dotenv -f x	denied
+dotenv -v x	denied
+dotenv bash -c 'ls && rm -rf /'	denied
+dotenv bundle exec rspec spec/foo_spec.rb	safe-read
+dotenv ls	inert
+dotenv rm -rf /	denied
+dotenv x	denied
+dotnet	denied
+dotnet --help	inert
+dotnet --help --info	denied
+dotnet --help --output x	denied
+dotnet --help x	denied
+dotnet --info	inert
+dotnet --list-runtimes	inert
+dotnet --list-sdks	inert
+dotnet --output x	denied
+dotnet --version	inert
+dotnet -V	inert
+dotnet -h	inert
+dotnet -o x	denied
+dotnet build	safe-write
+dotnet build --arch x	safe-write
+dotnet build --artifacts-path x	safe-write
+dotnet build --configuration x	safe-write
+dotnet build --force	safe-write
+dotnet build --force --arch x	safe-write
+dotnet build --force --help	safe-write
+dotnet build --force x	safe-write
+dotnet build --framework x	safe-write
+dotnet build --help	safe-write
+dotnet build --no-dependencies	safe-write
+dotnet build --no-incremental	safe-write
+dotnet build --no-restore	safe-write
+dotnet build --nologo	safe-write
+dotnet build --os x	safe-write
+dotnet build --output ./bin/out	safe-write
+dotnet build --output x	safe-write
+dotnet build --property x	safe-write
+dotnet build --runtime x	safe-write
+dotnet build --self-contained	safe-write
+dotnet build --source x	safe-write
+dotnet build --tl	safe-write
+dotnet build --use-current-runtime	safe-write
+dotnet build --verbosity x	safe-write
+dotnet build --version-suffix x	safe-write
+dotnet build -a x	safe-write
+dotnet build -c x	safe-write
+dotnet build -f x	safe-write
+dotnet build -h	safe-write
+dotnet build -o x	safe-write
+dotnet build -p x	safe-write
+dotnet build -r x	safe-write
+dotnet build -s x	safe-write
+dotnet build -v x	safe-write
+dotnet build x	safe-write
+dotnet clean	safe-write
+dotnet clean --artifacts-path x	safe-write
+dotnet clean --configuration x	safe-write
+dotnet clean --framework x	safe-write
+dotnet clean --help	safe-write
+dotnet clean --help --artifacts-path x	safe-write
+dotnet clean --help --nologo	safe-write
+dotnet clean --help x	safe-write
+dotnet clean --nologo	safe-write
+dotnet clean --output x	safe-write
+dotnet clean --runtime x	safe-write
+dotnet clean --tl	safe-write
+dotnet clean --verbosity x	safe-write
+dotnet clean -c x	safe-write
+dotnet clean -f x	safe-write
+dotnet clean -h	safe-write
+dotnet clean -o x	safe-write
+dotnet clean -r x	safe-write
+dotnet clean -v x	safe-write
+dotnet clean x	safe-write
+dotnet dev-certs	denied
+dotnet dev-certs x	denied
+dotnet ef	denied
+dotnet ef x	denied
+dotnet format	safe-write
+dotnet format --binarylog x	safe-write
+dotnet format --diagnostics x	safe-write
+dotnet format --exclude x	safe-write
+dotnet format --exclude-diagnostics x	safe-write
+dotnet format --exclude-generated	safe-write
+dotnet format --exclude-generated --binarylog x	safe-write
+dotnet format --exclude-generated --folder	safe-write
+dotnet format --exclude-generated x	safe-write
+dotnet format --folder	safe-write
+dotnet format --help	safe-write
+dotnet format --include x	safe-write
+dotnet format --include-generated	safe-write
+dotnet format --no-restore	safe-write
+dotnet format --report x	safe-write
+dotnet format --severity x	safe-write
+dotnet format --verbosity x	safe-write
+dotnet format --verify-no-changes	safe-write
+dotnet format -h	safe-write
+dotnet format -v x	safe-write
+dotnet format x	safe-write
+dotnet help	inert
+dotnet help x	inert
+dotnet list	inert
+dotnet list --config x	inert
+dotnet list --deprecated	inert
+dotnet list --deprecated --config x	inert
+dotnet list --deprecated --help	inert
+dotnet list --deprecated x	inert
+dotnet list --format x	inert
+dotnet list --framework x	inert
+dotnet list --help	inert
+dotnet list --highest-minor	inert
+dotnet list --highest-patch	inert
+dotnet list --include-prerelease	inert
+dotnet list --include-transitive	inert
+dotnet list --outdated	inert
+dotnet list --source x	inert
+dotnet list --verbosity x	inert
+dotnet list --vulnerable	inert
+dotnet list -h	inert
+dotnet list -v x	inert
+dotnet list x	inert
+dotnet msbuild	denied
+dotnet msbuild x	denied
+dotnet new	safe-write
+dotnet new --author x	safe-write
+dotnet new --columns x	safe-write
+dotnet new --columns-all x	safe-write
+dotnet new --diagnostics	safe-write
+dotnet new --diagnostics --author x	safe-write
+dotnet new --diagnostics --dry-run	safe-write
+dotnet new --diagnostics x	safe-write
+dotnet new --dry-run	safe-write
+dotnet new --force	safe-write
+dotnet new --help	safe-write
+dotnet new --language x	safe-write
+dotnet new --list	safe-write
+dotnet new --name x	safe-write
+dotnet new --no-update-check x	safe-write
+dotnet new --output x	safe-write
+dotnet new --project x	safe-write
+dotnet new --type x	safe-write
+dotnet new --update-apply	safe-write
+dotnet new --update-check	safe-write
+dotnet new --verbosity x	safe-write
+dotnet new -d	safe-write
+dotnet new -h	safe-write
+dotnet new -l	safe-write
+dotnet new -lang x	safe-write
+dotnet new -n x	safe-write
+dotnet new -o x	safe-write
+dotnet new x	safe-write
+dotnet nuget	inert
+dotnet nuget --help	inert
+dotnet nuget --help -h	inert
+dotnet nuget --help x	denied
+dotnet nuget -h	inert
+dotnet nuget add	denied
+dotnet nuget add x	denied
+dotnet nuget config	denied
+dotnet nuget config x	denied
+dotnet nuget delete	denied
+dotnet nuget delete x	denied
+dotnet nuget disable	denied
+dotnet nuget disable x	denied
+dotnet nuget enable	denied
+dotnet nuget enable x	denied
+dotnet nuget list	inert
+dotnet nuget list --help	inert
+dotnet nuget list --help -h	inert
+dotnet nuget list --help x	inert
+dotnet nuget list -h	inert
+dotnet nuget list x	inert
+dotnet nuget locals	denied
+dotnet nuget locals x	denied
+dotnet nuget push	denied
+dotnet nuget push x	denied
+dotnet nuget remove	denied
+dotnet nuget remove x	denied
+dotnet nuget sign	denied
+dotnet nuget sign x	denied
+dotnet nuget trust	denied
+dotnet nuget trust x	denied
+dotnet nuget update	denied
+dotnet nuget update x	denied
+dotnet nuget verify	denied
+dotnet nuget verify --all	safe-read
+dotnet nuget verify --all --certificate-fingerprint x	safe-read
+dotnet nuget verify --all --help	safe-read
+dotnet nuget verify --all x	safe-read
+dotnet nuget verify --certificate-fingerprint x	safe-read
+dotnet nuget verify --configfile x	safe-read
+dotnet nuget verify --help	safe-read
+dotnet nuget verify --verbosity x	safe-read
+dotnet nuget verify -h	safe-read
+dotnet nuget verify -v	safe-read
+dotnet nuget verify x	safe-read
+dotnet nuget why	denied
+dotnet nuget why x	denied
+dotnet nuget x	denied
+dotnet pack	safe-write
+dotnet pack --artifacts-path x	safe-write
+dotnet pack --configuration x	safe-write
+dotnet pack --force	safe-write
+dotnet pack --force --artifacts-path x	safe-write
+dotnet pack --force --help	safe-write
+dotnet pack --force x	safe-write
+dotnet pack --help	safe-write
+dotnet pack --include-source	safe-write
+dotnet pack --include-symbols	safe-write
+dotnet pack --no-build	safe-write
+dotnet pack --no-dependencies	safe-write
+dotnet pack --no-restore	safe-write
+dotnet pack --nologo	safe-write
+dotnet pack --output x	safe-write
+dotnet pack --property x	safe-write
+dotnet pack --runtime x	safe-write
+dotnet pack --serviceable	safe-write
+dotnet pack --source x	safe-write
+dotnet pack --tl	safe-write
+dotnet pack --verbosity x	safe-write
+dotnet pack --version-suffix x	safe-write
+dotnet pack -c x	safe-write
+dotnet pack -h	safe-write
+dotnet pack -o x	safe-write
+dotnet pack -p x	safe-write
+dotnet pack -r x	safe-write
+dotnet pack -s x	safe-write
+dotnet pack -v x	safe-write
+dotnet pack x	safe-write
+dotnet publish	safe-write
+dotnet publish --arch x	safe-write
+dotnet publish --artifacts-path x	safe-write
+dotnet publish --configuration x	safe-write
+dotnet publish --disable-build-servers	safe-write
+dotnet publish --disable-build-servers --arch x	safe-write
+dotnet publish --disable-build-servers --force	safe-write
+dotnet publish --disable-build-servers x	safe-write
+dotnet publish --force	safe-write
+dotnet publish --framework x	safe-write
+dotnet publish --help	safe-write
+dotnet publish --manifest x	safe-write
+dotnet publish --no-build	safe-write
+dotnet publish --no-dependencies	safe-write
+dotnet publish --no-restore	safe-write
+dotnet publish --nologo	safe-write
+dotnet publish --os x	safe-write
+dotnet publish --output x	safe-write
+dotnet publish --property x	safe-write
+dotnet publish --runtime x	safe-write
+dotnet publish --self-contained	safe-write
+dotnet publish --source x	safe-write
+dotnet publish --tl	safe-write
+dotnet publish --use-current-runtime	safe-write
+dotnet publish --verbosity x	safe-write
+dotnet publish --version-suffix x	safe-write
+dotnet publish -a x	safe-write
+dotnet publish -c x	safe-write
+dotnet publish -f x	safe-write
+dotnet publish -h	safe-write
+dotnet publish -o ./publish	safe-write
+dotnet publish -o x	safe-write
+dotnet publish -p x	safe-write
+dotnet publish -r x	safe-write
+dotnet publish -s x	safe-write
+dotnet publish -v x	safe-write
+dotnet publish x	safe-write
+dotnet restore	safe-write
+dotnet restore --arch x	safe-write
+dotnet restore --artifacts-path x	safe-write
+dotnet restore --configfile x	safe-write
+dotnet restore --disable-build-servers	safe-write
+dotnet restore --disable-build-servers --arch x	safe-write
+dotnet restore --disable-build-servers --disable-parallel	safe-write
+dotnet restore --disable-build-servers x	safe-write
+dotnet restore --disable-parallel	safe-write
+dotnet restore --force	safe-write
+dotnet restore --force-evaluate	safe-write
+dotnet restore --help	safe-write
+dotnet restore --ignore-failed-sources	safe-write
+dotnet restore --interactive	safe-write
+dotnet restore --lock-file-path x	safe-write
+dotnet restore --locked-mode x	safe-write
+dotnet restore --no-cache	safe-write
+dotnet restore --no-dependencies	safe-write
+dotnet restore --no-http-cache	safe-write
+dotnet restore --os x	safe-write
+dotnet restore --packages x	safe-write
+dotnet restore --runtime x	safe-write
+dotnet restore --source x	safe-write
+dotnet restore --use-current-runtime	safe-write
+dotnet restore --verbosity x	safe-write
+dotnet restore -a x	safe-write
+dotnet restore -h	safe-write
+dotnet restore -r x	safe-write
+dotnet restore -s x	safe-write
+dotnet restore -v x	safe-write
+dotnet restore x	safe-write
+dotnet run	denied
+dotnet run x	denied
+dotnet sln	inert
+dotnet sln --help	inert
+dotnet sln --help -h	inert
+dotnet sln --help x	denied
+dotnet sln -h	inert
+dotnet sln add	inert
+dotnet sln add --help	inert
+dotnet sln add --help --in-root	inert
+dotnet sln add --help --solution-folder x	inert
+dotnet sln add --help x	inert
+dotnet sln add --in-root	inert
+dotnet sln add --solution-folder x	inert
+dotnet sln add -h	inert
+dotnet sln add -s x	inert
+dotnet sln add x	inert
+dotnet sln list	inert
+dotnet sln list --help	inert
+dotnet sln list --help --solution-folders	inert
+dotnet sln list --help x	inert
+dotnet sln list --solution-folders	inert
+dotnet sln list -h	inert
+dotnet sln list x	inert
+dotnet sln remove	inert
+dotnet sln remove --help	inert
+dotnet sln remove --help -h	inert
+dotnet sln remove --help x	inert
+dotnet sln remove -h	inert
+dotnet sln remove x	inert
+dotnet sln x	denied
+dotnet store	denied
+dotnet store x	denied
+dotnet test	safe-read
+dotnet test --arch x	safe-read
+dotnet test --artifacts-path x	safe-read
+dotnet test --blame	safe-read
+dotnet test --blame --arch x	safe-read
+dotnet test --blame --blame-crash	safe-read
+dotnet test --blame x	safe-read
+dotnet test --blame-crash	safe-read
+dotnet test --blame-crash-collect-always x	safe-read
+dotnet test --blame-crash-dump-type x	safe-read
+dotnet test --blame-hang	safe-read
+dotnet test --blame-hang-dump-type x	safe-read
+dotnet test --blame-hang-timeout x	safe-read
+dotnet test --collect x	safe-read
+dotnet test --configuration x	safe-read
+dotnet test --diag x	safe-read
+dotnet test --environment x	safe-read
+dotnet test --filter x	safe-read
+dotnet test --force	safe-read
+dotnet test --framework x	safe-read
+dotnet test --help	safe-read
+dotnet test --list-tests	safe-read
+dotnet test --logger x	safe-read
+dotnet test --no-build	safe-read
+dotnet test --no-dependencies	safe-read
+dotnet test --no-restore	safe-read
+dotnet test --nologo	safe-read
+dotnet test --os x	safe-read
+dotnet test --output x	safe-read
+dotnet test --property x	safe-read
+dotnet test --results-directory x	safe-read
+dotnet test --runtime x	safe-read
+dotnet test --settings x	safe-read
+dotnet test --test-adapter-path x	safe-read
+dotnet test --verbosity x	safe-read
+dotnet test -a x	safe-read
+dotnet test -c x	safe-read
+dotnet test -d x	safe-read
+dotnet test -e x	safe-read
+dotnet test -f x	safe-read
+dotnet test -h	safe-read
+dotnet test -l x	safe-read
+dotnet test -o x	safe-read
+dotnet test -r x	safe-read
+dotnet test -s x	safe-read
+dotnet test -v x	safe-read
+dotnet test x	safe-read
+dotnet tool	inert
+dotnet tool --help	inert
+dotnet tool --help -h	inert
+dotnet tool --help x	denied
+dotnet tool -h	inert
+dotnet tool exec	denied
+dotnet tool exec x	denied
+dotnet tool install	denied
+dotnet tool install x	denied
+dotnet tool list	inert
+dotnet tool list --global	inert
+dotnet tool list --global --help	inert
+dotnet tool list --global --tool-path x	inert
+dotnet tool list --global x	inert
+dotnet tool list --help	inert
+dotnet tool list --local	inert
+dotnet tool list --tool-path x	inert
+dotnet tool list -g	inert
+dotnet tool list -h	inert
+dotnet tool list x	inert
+dotnet tool restore	denied
+dotnet tool restore x	denied
+dotnet tool run	denied
+dotnet tool run x	denied
+dotnet tool search	denied
+dotnet tool search x	denied
+dotnet tool uninstall	denied
+dotnet tool uninstall x	denied
+dotnet tool update	denied
+dotnet tool update x	denied
+dotnet tool x	denied
+dotnet vstest	denied
+dotnet vstest x	denied
+dotnet watch	denied
+dotnet watch x	denied
+dotnet workload	inert
+dotnet workload --help	inert
+dotnet workload --help -h	inert
+dotnet workload --help x	denied
+dotnet workload -h	inert
+dotnet workload config	denied
+dotnet workload config x	denied
+dotnet workload elevate	denied
+dotnet workload elevate x	denied
+dotnet workload history	denied
+dotnet workload history x	denied
+dotnet workload install	denied
+dotnet workload install x	denied
+dotnet workload list	inert
+dotnet workload list --help	inert
+dotnet workload list --help --verbosity x	inert
+dotnet workload list --help -h	inert
+dotnet workload list --help x	inert
+dotnet workload list --verbosity x	inert
+dotnet workload list -h	inert
+dotnet workload list -v x	inert
+dotnet workload list x	inert
+dotnet workload repair	denied
+dotnet workload repair x	denied
+dotnet workload restore	denied
+dotnet workload restore x	denied
+dotnet workload search	denied
+dotnet workload search x	denied
+dotnet workload uninstall	denied
+dotnet workload uninstall x	denied
+dotnet workload update	denied
+dotnet workload update x	denied
+dotnet workload x	denied
+dotnet x	denied
+dotnet-counters	denied
+dotnet-counters --help	inert
+dotnet-counters --help --version	denied
+dotnet-counters --help x	denied
+dotnet-counters --version	inert
+dotnet-counters -h	inert
+dotnet-counters collect	denied
+dotnet-counters collect x	denied
+dotnet-counters help	inert
+dotnet-counters help x	inert
+dotnet-counters list	safe-read
+dotnet-counters list --help	safe-read
+dotnet-counters list --help -h	safe-read
+dotnet-counters list --help x	safe-read
+dotnet-counters list -h	safe-read
+dotnet-counters list x	safe-read
+dotnet-counters monitor	denied
+dotnet-counters monitor x	denied
+dotnet-counters ps	safe-read
+dotnet-counters ps --help	safe-read
+dotnet-counters ps --help -h	safe-read
+dotnet-counters ps --help x	safe-read
+dotnet-counters ps -h	safe-read
+dotnet-counters ps x	safe-read
+dotnet-counters version	inert
+dotnet-counters version --help	inert
+dotnet-counters version --help -h	inert
+dotnet-counters version --help x	inert
+dotnet-counters version -h	inert
+dotnet-counters version x	inert
+dotnet-counters x	denied
+dotnet-dump	denied
+dotnet-dump --help	inert
+dotnet-dump --help --version	denied
+dotnet-dump --help x	denied
+dotnet-dump --version	inert
+dotnet-dump -h	inert
+dotnet-dump analyze	denied
+dotnet-dump analyze x	denied
+dotnet-dump collect	denied
+dotnet-dump collect x	denied
+dotnet-dump help	inert
+dotnet-dump help x	inert
+dotnet-dump ps	safe-read
+dotnet-dump ps --help	safe-read
+dotnet-dump ps --help -h	safe-read
+dotnet-dump ps --help x	safe-read
+dotnet-dump ps -h	safe-read
+dotnet-dump ps x	safe-read
+dotnet-dump report	denied
+dotnet-dump report x	denied
+dotnet-dump version	inert
+dotnet-dump version --help	inert
+dotnet-dump version --help -h	inert
+dotnet-dump version --help x	inert
+dotnet-dump version -h	inert
+dotnet-dump version x	inert
+dotnet-dump x	denied
+dotnet-ef	denied
+dotnet-ef --help	inert
+dotnet-ef --help --version	denied
+dotnet-ef --help x	denied
+dotnet-ef --version	inert
+dotnet-ef -h	inert
+dotnet-ef -v	inert
+dotnet-ef database	inert
+dotnet-ef database --help	inert
+dotnet-ef database --help --verbose	inert
+dotnet-ef database --help x	denied
+dotnet-ef database --verbose	inert
+dotnet-ef database -h	inert
+dotnet-ef database drop	denied
+dotnet-ef database drop x	denied
+dotnet-ef database list	inert
+dotnet-ef database list --configuration x	inert
+dotnet-ef database list --framework x	inert
+dotnet-ef database list --help	inert
+dotnet-ef database list --help --configuration x	inert
+dotnet-ef database list --help --no-build	inert
+dotnet-ef database list --help x	inert
+dotnet-ef database list --json x	inert
+dotnet-ef database list --no-build	inert
+dotnet-ef database list --prefix-output	inert
+dotnet-ef database list --project x	inert
+dotnet-ef database list --startup-project x	inert
+dotnet-ef database list -h	inert
+dotnet-ef database list -p x	inert
+dotnet-ef database list -s x	inert
+dotnet-ef database list x	inert
+dotnet-ef database update	denied
+dotnet-ef database update x	denied
+dotnet-ef database x	denied
+dotnet-ef dbcontext	inert
+dotnet-ef dbcontext --help	inert
+dotnet-ef dbcontext --help --verbose	inert
+dotnet-ef dbcontext --help x	denied
+dotnet-ef dbcontext --verbose	inert
+dotnet-ef dbcontext -h	inert
+dotnet-ef dbcontext info	inert
+dotnet-ef dbcontext info --configuration x	inert
+dotnet-ef dbcontext info --context x	inert
+dotnet-ef dbcontext info --framework x	inert
+dotnet-ef dbcontext info --help	inert
+dotnet-ef dbcontext info --help --configuration x	inert
+dotnet-ef dbcontext info --help --no-build	inert
+dotnet-ef dbcontext info --help x	inert
+dotnet-ef dbcontext info --json x	inert
+dotnet-ef dbcontext info --no-build	inert
+dotnet-ef dbcontext info --prefix-output	inert
+dotnet-ef dbcontext info --project x	inert
+dotnet-ef dbcontext info --runtime x	inert
+dotnet-ef dbcontext info --startup-project x	inert
+dotnet-ef dbcontext info -c x	inert
+dotnet-ef dbcontext info -h	inert
+dotnet-ef dbcontext info -p x	inert
+dotnet-ef dbcontext info -s x	inert
+dotnet-ef dbcontext info x	inert
+dotnet-ef dbcontext list	inert
+dotnet-ef dbcontext list --configuration x	inert
+dotnet-ef dbcontext list --framework x	inert
+dotnet-ef dbcontext list --help	inert
+dotnet-ef dbcontext list --help --configuration x	inert
+dotnet-ef dbcontext list --help --no-build	inert
+dotnet-ef dbcontext list --help x	inert
+dotnet-ef dbcontext list --json x	inert
+dotnet-ef dbcontext list --no-build	inert
+dotnet-ef dbcontext list --prefix-output	inert
+dotnet-ef dbcontext list --project x	inert
+dotnet-ef dbcontext list --startup-project x	inert
+dotnet-ef dbcontext list -h	inert
+dotnet-ef dbcontext list -p x	inert
+dotnet-ef dbcontext list -s x	inert
+dotnet-ef dbcontext list x	inert
+dotnet-ef dbcontext optimize	denied
+dotnet-ef dbcontext optimize x	denied
+dotnet-ef dbcontext scaffold	denied
+dotnet-ef dbcontext scaffold x	denied
+dotnet-ef dbcontext script	denied
+dotnet-ef dbcontext script x	denied
+dotnet-ef dbcontext x	denied
+dotnet-ef help	inert
+dotnet-ef help x	inert
+dotnet-ef migrations	inert
+dotnet-ef migrations --help	inert
+dotnet-ef migrations --help --verbose	inert
+dotnet-ef migrations --help x	denied
+dotnet-ef migrations --verbose	inert
+dotnet-ef migrations -h	inert
+dotnet-ef migrations add	denied
+dotnet-ef migrations add x	denied
+dotnet-ef migrations bundle	denied
+dotnet-ef migrations bundle x	denied
+dotnet-ef migrations has-pending-model-changes	inert
+dotnet-ef migrations has-pending-model-changes --configuration x	inert
+dotnet-ef migrations has-pending-model-changes --context x	inert
+dotnet-ef migrations has-pending-model-changes --framework x	inert
+dotnet-ef migrations has-pending-model-changes --help	inert
+dotnet-ef migrations has-pending-model-changes --help --configuration x	inert
+dotnet-ef migrations has-pending-model-changes --help --no-build	inert
+dotnet-ef migrations has-pending-model-changes --help x	inert
+dotnet-ef migrations has-pending-model-changes --no-build	inert
+dotnet-ef migrations has-pending-model-changes --project x	inert
+dotnet-ef migrations has-pending-model-changes --startup-project x	inert
+dotnet-ef migrations has-pending-model-changes -c x	inert
+dotnet-ef migrations has-pending-model-changes -h	inert
+dotnet-ef migrations has-pending-model-changes -p x	inert
+dotnet-ef migrations has-pending-model-changes -s x	inert
+dotnet-ef migrations has-pending-model-changes x	inert
+dotnet-ef migrations list	inert
+dotnet-ef migrations list --configuration x	inert
+dotnet-ef migrations list --connection x	inert
+dotnet-ef migrations list --context x	inert
+dotnet-ef migrations list --framework x	inert
+dotnet-ef migrations list --help	inert
+dotnet-ef migrations list --help --configuration x	inert
+dotnet-ef migrations list --help --no-build	inert
+dotnet-ef migrations list --help x	inert
+dotnet-ef migrations list --json x	inert
+dotnet-ef migrations list --msbuildprojectextensionspath x	inert
+dotnet-ef migrations list --no-build	inert
+dotnet-ef migrations list --no-color	inert
+dotnet-ef migrations list --no-connect	inert
+dotnet-ef migrations list --prefix-output	inert
+dotnet-ef migrations list --project x	inert
+dotnet-ef migrations list --runtime x	inert
+dotnet-ef migrations list --startup-project x	inert
+dotnet-ef migrations list -c x	inert
+dotnet-ef migrations list -h	inert
+dotnet-ef migrations list -p x	inert
+dotnet-ef migrations list -s x	inert
+dotnet-ef migrations list x	inert
+dotnet-ef migrations remove	denied
+dotnet-ef migrations remove x	denied
+dotnet-ef migrations script	denied
+dotnet-ef migrations script x	denied
+dotnet-ef migrations x	denied
+dotnet-ef x	denied
+dotnet-fsi	denied
+dotnet-fsi --help	inert
+dotnet-fsi --help --version	inert
+dotnet-fsi --help x	denied
+dotnet-fsi --version	inert
+dotnet-fsi -?	inert
+dotnet-fsi -h	inert
+dotnet-fsi x	denied
+dotnet-gcdump	denied
+dotnet-gcdump --help	inert
+dotnet-gcdump --help --version	denied
+dotnet-gcdump --help x	denied
+dotnet-gcdump --version	inert
+dotnet-gcdump -h	inert
+dotnet-gcdump collect	denied
+dotnet-gcdump collect x	denied
+dotnet-gcdump help	inert
+dotnet-gcdump help x	inert
+dotnet-gcdump ps	safe-read
+dotnet-gcdump ps --help	safe-read
+dotnet-gcdump ps --help -h	safe-read
+dotnet-gcdump ps --help x	safe-read
+dotnet-gcdump ps -h	safe-read
+dotnet-gcdump ps x	safe-read
+dotnet-gcdump report	denied
+dotnet-gcdump report --help	safe-read
+dotnet-gcdump report --help --type x	safe-read
+dotnet-gcdump report --help -h	safe-read
+dotnet-gcdump report --help x	safe-read
+dotnet-gcdump report --type x	safe-read
+dotnet-gcdump report -h	safe-read
+dotnet-gcdump report x	safe-read
+dotnet-gcdump version	inert
+dotnet-gcdump version --help	inert
+dotnet-gcdump version --help -h	inert
+dotnet-gcdump version --help x	inert
+dotnet-gcdump version -h	inert
+dotnet-gcdump version x	inert
+dotnet-gcdump x	denied
+dotnet-script	denied
+dotnet-script --help	inert
+dotnet-script --help --info	inert
+dotnet-script --help x	denied
+dotnet-script --info	inert
+dotnet-script --version	inert
+dotnet-script -h	inert
+dotnet-script x	denied
+dotnet-sos	denied
+dotnet-sos --help	inert
+dotnet-sos --help --version	denied
+dotnet-sos --help x	denied
+dotnet-sos --version	inert
+dotnet-sos -h	inert
+dotnet-sos help	inert
+dotnet-sos help x	inert
+dotnet-sos install	denied
+dotnet-sos install x	denied
+dotnet-sos uninstall	denied
+dotnet-sos uninstall x	denied
+dotnet-sos version	inert
+dotnet-sos version --help	inert
+dotnet-sos version --help -h	inert
+dotnet-sos version --help x	inert
+dotnet-sos version -h	inert
+dotnet-sos version x	inert
+dotnet-sos x	denied
+dotnet-stack	denied
+dotnet-stack --help	inert
+dotnet-stack --help --version	denied
+dotnet-stack --help x	denied
+dotnet-stack --version	inert
+dotnet-stack -h	inert
+dotnet-stack help	inert
+dotnet-stack help x	inert
+dotnet-stack ps	safe-read
+dotnet-stack ps --help	safe-read
+dotnet-stack ps --help -h	safe-read
+dotnet-stack ps --help x	safe-read
+dotnet-stack ps -h	safe-read
+dotnet-stack ps x	safe-read
+dotnet-stack report	denied
+dotnet-stack report x	denied
+dotnet-stack symbolicate	denied
+dotnet-stack symbolicate x	denied
+dotnet-stack version	inert
+dotnet-stack version --help	inert
+dotnet-stack version --help -h	inert
+dotnet-stack version --help x	inert
+dotnet-stack version -h	inert
+dotnet-stack version x	inert
+dotnet-stack x	denied
+dotnet-symbol	denied
+dotnet-symbol --authenticated-server-path x	safe-write
+dotnet-symbol --cache-directory x	safe-write
+dotnet-symbol --debugging	safe-write
+dotnet-symbol --debugging --authenticated-server-path x	safe-write
+dotnet-symbol --debugging --diagnostics	safe-write
+dotnet-symbol --debugging x	safe-write
+dotnet-symbol --diagnostics	safe-write
+dotnet-symbol --help	safe-write
+dotnet-symbol --host-only	safe-write
+dotnet-symbol --ignore-errors	safe-write
+dotnet-symbol --internal-server	safe-write
+dotnet-symbol --microsoft-symbol-server	safe-write
+dotnet-symbol --modules	safe-write
+dotnet-symbol --no-symbols	safe-write
+dotnet-symbol --output x	safe-write
+dotnet-symbol --quiet	safe-write
+dotnet-symbol --recurse-subdirectories	safe-write
+dotnet-symbol --server-path x	safe-write
+dotnet-symbol --symbols	safe-write
+dotnet-symbol --symstore x	safe-write
+dotnet-symbol --timeout x	safe-write
+dotnet-symbol --version	safe-write
+dotnet-symbol -d	safe-write
+dotnet-symbol -h	safe-write
+dotnet-symbol -o x	safe-write
+dotnet-symbol -r	safe-write
+dotnet-symbol x	safe-write
+dotnet-trace	denied
+dotnet-trace --help	inert
+dotnet-trace --help --output x	denied
+dotnet-trace --help --version	denied
+dotnet-trace --help x	denied
+dotnet-trace --output x	denied
+dotnet-trace --version	inert
+dotnet-trace -h	inert
+dotnet-trace -o x	denied
+dotnet-trace collect	denied
+dotnet-trace collect x	denied
+dotnet-trace convert	denied
+dotnet-trace convert --format x	safe-write
+dotnet-trace convert --help	safe-write
+dotnet-trace convert --help --format x	safe-write
+dotnet-trace convert --help -h	safe-write
+dotnet-trace convert --help x	safe-write
+dotnet-trace convert --output x	safe-write
+dotnet-trace convert -h	safe-write
+dotnet-trace convert -o x	safe-write
+dotnet-trace convert ./trace.nettrace --format speedscope --output ./trace.speedscope.json	safe-write
+dotnet-trace convert x	safe-write
+dotnet-trace help	inert
+dotnet-trace help x	inert
+dotnet-trace list-profiles	safe-read
+dotnet-trace list-profiles --help	safe-read
+dotnet-trace list-profiles --help -h	safe-read
+dotnet-trace list-profiles --help x	safe-read
+dotnet-trace list-profiles -h	safe-read
+dotnet-trace list-profiles x	safe-read
+dotnet-trace ps	safe-read
+dotnet-trace ps --help	safe-read
+dotnet-trace ps --help -h	safe-read
+dotnet-trace ps --help x	safe-read
+dotnet-trace ps -h	safe-read
+dotnet-trace ps x	safe-read
+dotnet-trace report	denied
+dotnet-trace report --help	safe-read
+dotnet-trace report --help --max-depth x	safe-read
+dotnet-trace report --help -h	safe-read
+dotnet-trace report --help x	safe-read
+dotnet-trace report --max-depth x	safe-read
+dotnet-trace report -h	safe-read
+dotnet-trace report x	safe-read
+dotnet-trace version	inert
+dotnet-trace version --help	inert
+dotnet-trace version --help -h	inert
+dotnet-trace version --help x	inert
+dotnet-trace version -h	inert
+dotnet-trace version x	inert
+dotnet-trace x	denied
+doxygen	safe-write
+doxygen --help	safe-write
+doxygen --help --version	safe-write
+doxygen --help -d x	safe-write
+doxygen --help x	safe-write
+doxygen --version	safe-write
+doxygen -?	safe-write
+doxygen -d x	safe-write
+doxygen -e x	safe-write
+doxygen -f x	safe-write
+doxygen -g x	safe-write
+doxygen -h	safe-write
+doxygen -l x	safe-write
+doxygen -q x	safe-write
+doxygen -s x	safe-write
+doxygen -t x	safe-write
+doxygen -u x	safe-write
+doxygen -v	safe-write
+doxygen -w x	safe-write
+doxygen -x x	safe-write
+doxygen x	safe-write
+drizzle-kit	denied
+drizzle-kit --help	inert
+drizzle-kit --help --out x	denied
+drizzle-kit --help --version	denied
+drizzle-kit --help x	denied
+drizzle-kit --out x	denied
+drizzle-kit --version	inert
+drizzle-kit -h	inert
+drizzle-kit -v	inert
+drizzle-kit check	safe-read
+drizzle-kit check --config x	safe-read
+drizzle-kit check --help	safe-read
+drizzle-kit check --help --config x	safe-read
+drizzle-kit check --help -h	safe-read
+drizzle-kit check --help x	safe-read
+drizzle-kit check --out x	safe-read
+drizzle-kit check -h	safe-read
+drizzle-kit check x	safe-read
+drizzle-kit drop	denied
+drizzle-kit drop x	denied
+drizzle-kit export	safe-read
+drizzle-kit export --config x	safe-read
+drizzle-kit export --help	safe-read
+drizzle-kit export --help --config x	safe-read
+drizzle-kit export --help --sql	safe-read
+drizzle-kit export --help x	safe-read
+drizzle-kit export --sql	safe-read
+drizzle-kit export -h	safe-read
+drizzle-kit export x	safe-read
+drizzle-kit generate	safe-write
+drizzle-kit generate --breakpoints	safe-write
+drizzle-kit generate --breakpoints --config x	safe-write
+drizzle-kit generate --breakpoints --help	safe-write
+drizzle-kit generate --breakpoints x	safe-write
+drizzle-kit generate --config x	safe-write
+drizzle-kit generate --custom x	safe-write
+drizzle-kit generate --help	safe-write
+drizzle-kit generate --name x	safe-write
+drizzle-kit generate --out x	safe-write
+drizzle-kit generate --schema x	safe-write
+drizzle-kit generate --verbose	safe-write
+drizzle-kit generate -h	safe-write
+drizzle-kit generate x	safe-write
+drizzle-kit help	inert
+drizzle-kit help x	inert
+drizzle-kit introspect	denied
+drizzle-kit introspect x	denied
+drizzle-kit migrate	denied
+drizzle-kit migrate x	denied
+drizzle-kit pull	denied
+drizzle-kit pull x	denied
+drizzle-kit push	denied
+drizzle-kit push x	denied
+drizzle-kit studio	denied
+drizzle-kit studio x	denied
+drizzle-kit up	safe-read
+drizzle-kit up --config x	safe-read
+drizzle-kit up --help	safe-read
+drizzle-kit up --help --config x	safe-read
+drizzle-kit up --help -h	safe-read
+drizzle-kit up --help x	safe-read
+drizzle-kit up --out x	safe-read
+drizzle-kit up -h	safe-read
+drizzle-kit up x	safe-read
+drizzle-kit x	denied
+dropdb	denied
+dropdb --echo	safe-write
+dropdb --echo --force	safe-write
+dropdb --echo --host x	safe-write
+dropdb --echo x	safe-write
+dropdb --force	safe-write
+dropdb --help	safe-write
+dropdb --host x	safe-write
+dropdb --if-exists	safe-write
+dropdb --interactive	safe-write
+dropdb --no-password	safe-write
+dropdb --password	safe-write
+dropdb --port x	safe-write
+dropdb --username x	safe-write
+dropdb --version	safe-write
+dropdb -?	safe-write
+dropdb -U	safe-write
+dropdb -U x	safe-write
+dropdb -V	safe-write
+dropdb -W	safe-write
+dropdb -e	safe-write
+dropdb -f	safe-write
+dropdb -h	safe-write
+dropdb -h x	safe-write
+dropdb -i	safe-write
+dropdb -p	safe-write
+dropdb -p x	safe-write
+dropdb -w	safe-write
+dropdb x	safe-write
+dropuser	denied
+dropuser --echo	safe-write
+dropuser --echo --help	safe-write
+dropuser --echo --host x	safe-write
+dropuser --echo x	safe-write
+dropuser --help	safe-write
+dropuser --host x	safe-write
+dropuser --if-exists	safe-write
+dropuser --interactive	safe-write
+dropuser --no-password	safe-write
+dropuser --password	safe-write
+dropuser --port x	safe-write
+dropuser --username x	safe-write
+dropuser --version	safe-write
+dropuser -?	safe-write
+dropuser -U	safe-write
+dropuser -U x	safe-write
+dropuser -V	safe-write
+dropuser -W	safe-write
+dropuser -e	safe-write
+dropuser -h	safe-write
+dropuser -h x	safe-write
+dropuser -i	safe-write
+dropuser -p	safe-write
+dropuser -p x	safe-write
+dropuser -w	safe-write
+dropuser x	safe-write
+drutil	denied
+drutil --help	inert
+drutil --version	denied
+drutil -drive x	denied
+drutil atip	inert
+drutil atip x	inert
+drutil bulkerase	denied
+drutil bulkerase x	denied
+drutil burn	denied
+drutil burn x	denied
+drutil cdtext	inert
+drutil cdtext x	inert
+drutil discinfo	inert
+drutil discinfo -xml	inert
+drutil discinfo -xml x	inert
+drutil discinfo x	inert
+drutil dumpiso	denied
+drutil dumpiso x	denied
+drutil dumpudf	denied
+drutil dumpudf x	denied
+drutil eject	denied
+drutil eject x	denied
+drutil erase	denied
+drutil erase x	denied
+drutil filename	inert
+drutil filename x	inert
+drutil getconfig	inert
+drutil getconfig x	inert
+drutil help	inert
+drutil help x	inert
+drutil info	inert
+drutil info -xml	inert
+drutil info -xml x	inert
+drutil info x	inert
+drutil list	inert
+drutil list -xml	inert
+drutil list -xml x	inert
+drutil list x	inert
+drutil poll	denied
+drutil poll x	denied
+drutil size	inert
+drutil size x	inert
+drutil status	inert
+drutil status -xml	inert
+drutil status -xml x	inert
+drutil status x	inert
+drutil subchannel	inert
+drutil subchannel x	inert
+drutil toc	inert
+drutil toc x	inert
+drutil trackinfo	inert
+drutil trackinfo -xml	inert
+drutil trackinfo -xml x	inert
+drutil trackinfo x	inert
+drutil tray	denied
+drutil tray x	denied
+drutil version	inert
+drutil version x	inert
+drutil x	denied
+dscacheutil	denied
+dscacheutil --help	inert
+dscacheutil --version	denied
+dscacheutil -a x	denied
+dscacheutil -buckets	denied
+dscacheutil -buckets -a x	denied
+dscacheutil -buckets -cachedump	inert
+dscacheutil -buckets x	denied
+dscacheutil -cachedump	inert
+dscacheutil -configuration	inert
+dscacheutil -entries x	denied
+dscacheutil -flushcache	denied
+dscacheutil -h	inert
+dscacheutil -q	inert
+dscacheutil -q -a x	inert
+dscacheutil -q -buckets	inert
+dscacheutil -q -cachedump	inert
+dscacheutil -q -configuration	inert
+dscacheutil -q -entries x	inert
+dscacheutil -q -h	inert
+dscacheutil -q -q x	inert
+dscacheutil -q -statistics	inert
+dscacheutil -q user -a name root	inert
+dscacheutil -q x	inert
+dscacheutil -statistics	inert
+dscacheutil x	denied
+dsmemberutil	denied
+dsmemberutil --help	inert
+dsmemberutil --version	denied
+dsmemberutil checkmembership	denied
+dsmemberutil checkmembership -G x	inert
+dsmemberutil checkmembership -S x	inert
+dsmemberutil checkmembership -U x	inert
+dsmemberutil checkmembership -X x	inert
+dsmemberutil checkmembership -g x	inert
+dsmemberutil checkmembership -s x	inert
+dsmemberutil checkmembership -u 501 -G admin	inert
+dsmemberutil checkmembership -u x	inert
+dsmemberutil checkmembership -v	inert
+dsmemberutil checkmembership -v -G x	inert
+dsmemberutil checkmembership -v x	inert
+dsmemberutil checkmembership -x x	inert
+dsmemberutil checkmembership x	inert
+dsmemberutil flushcache	denied
+dsmemberutil flushcache x	denied
+dsmemberutil getid	denied
+dsmemberutil getid -G x	inert
+dsmemberutil getid -S x	inert
+dsmemberutil getid -U x	inert
+dsmemberutil getid -X x	inert
+dsmemberutil getid -s x	inert
+dsmemberutil getid -v	inert
+dsmemberutil getid -v -G x	inert
+dsmemberutil getid -v x	inert
+dsmemberutil getid x	inert
+dsmemberutil getsid	denied
+dsmemberutil getsid -G x	inert
+dsmemberutil getsid -U x	inert
+dsmemberutil getsid -X x	inert
+dsmemberutil getsid -g x	inert
+dsmemberutil getsid -u x	inert
+dsmemberutil getsid -v	inert
+dsmemberutil getsid -v -G x	inert
+dsmemberutil getsid -v x	inert
+dsmemberutil getsid x	inert
+dsmemberutil getuuid	denied
+dsmemberutil getuuid -G x	inert
+dsmemberutil getuuid -S x	inert
+dsmemberutil getuuid -U x	inert
+dsmemberutil getuuid -X x	inert
+dsmemberutil getuuid -g x	inert
+dsmemberutil getuuid -s x	inert
+dsmemberutil getuuid -u 501	inert
+dsmemberutil getuuid -u x	inert
+dsmemberutil getuuid -v	inert
+dsmemberutil getuuid -v -G x	inert
+dsmemberutil getuuid -v x	inert
+dsmemberutil getuuid -x x	inert
+dsmemberutil getuuid x	inert
+dsmemberutil x	denied
+dsymutil	denied
+dsymutil --accelerator x	safe-write
+dsymutil --arch x	safe-write
+dsymutil --build-variant-suffix x	safe-write
+dsymutil --dump-debug-map	safe-write
+dsymutil --dump-debug-map --accelerator x	safe-write
+dsymutil --dump-debug-map --fat64	safe-write
+dsymutil --dump-debug-map x	safe-write
+dsymutil --fat64	safe-write
+dsymutil --flat	safe-write
+dsymutil --gen-reproducer	safe-write
+dsymutil --help	safe-write
+dsymutil --keep-function-for-static	safe-write
+dsymutil --minimize	safe-write
+dsymutil --no-object-timestamp	safe-write
+dsymutil --no-odr	safe-write
+dsymutil --no-output	safe-write
+dsymutil --no-swiftmodule-timestamp	safe-write
+dsymutil --num-threads x	safe-write
+dsymutil --object-prefix-map x	safe-write
+dsymutil --oso-prepend-path x	safe-write
+dsymutil --out x	safe-write
+dsymutil --quiet	safe-write
+dsymutil --remarks-drop-without-debug	safe-write
+dsymutil --remarks-output-format x	safe-write
+dsymutil --remarks-prepend-path x	safe-write
+dsymutil --reproducer x	safe-write
+dsymutil --statistics	safe-write
+dsymutil --symtab	safe-write
+dsymutil --toolchain	safe-write
+dsymutil --update	safe-write
+dsymutil --use-reproducer x	safe-write
+dsymutil --verbose	safe-write
+dsymutil --verify	safe-write
+dsymutil --version	safe-write
+dsymutil -D x	safe-write
+dsymutil -S	safe-write
+dsymutil -f	safe-write
+dsymutil -h	safe-write
+dsymutil -j x	safe-write
+dsymutil -o x	safe-write
+dsymutil -q	safe-write
+dsymutil -s	safe-write
+dsymutil -u	safe-write
+dsymutil -v	safe-write
+dsymutil -y	safe-write
+dsymutil -z	safe-write
+dsymutil x	safe-write
+dtruss	denied
+dtruss --help	denied
+dtruss --version	denied
+dtruss -L	inert
+dtruss -L -W x	inert
+dtruss -L -a	inert
+dtruss -L x	inert
+dtruss -W x	inert
+dtruss -a	inert
+dtruss -b x	inert
+dtruss -c	inert
+dtruss -d	inert
+dtruss -e	inert
+dtruss -f	inert
+dtruss -h	inert
+dtruss -l	inert
+dtruss -n x	inert
+dtruss -o	inert
+dtruss -p x	inert
+dtruss -s	inert
+dtruss -t x	inert
+dtruss x	inert
+du	inert
+du --all	inert
+du --all --apparent-size	inert
+du --all --block-size x	inert
+du --all x	inert
+du --apparent-size	inert
+du --block-size x	inert
+du --bytes	inert
+du --count-links	inert
+du --dereference	inert
+du --dereference-args	inert
+du --exclude x	inert
+du --files0-from x	inert
+du --help	inert
+du --human-readable	inert
+du --inodes	inert
+du --max-depth x	inert
+du --no-dereference	inert
+du --null	inert
+du --one-file-system	inert
+du --separate-dirs	inert
+du --si	inert
+du --summarize	inert
+du --threshold x	inert
+du --time x	inert
+du --time-style x	inert
+du --total	inert
+du --version	inert
+du -0	inert
+du -B x	inert
+du -D	inert
+du -H	inert
+du -L	inert
+du -P	inert
+du -S	inert
+du -V	inert
+du -a	inert
+du -b	inert
+du -c	inert
+du -d x	inert
+du -h	inert
+du -k	inert
+du -l	inert
+du -m	inert
+du -s	inert
+du -t x	inert
+du -x	inert
+du x	inert
+dub	denied
+dub --help	inert
+dub --help --version	denied
+dub --help x	denied
+dub --version	inert
+dub -h	inert
+dub -v	inert
+dub add	denied
+dub add x	denied
+dub add-local	denied
+dub add-local x	denied
+dub add-override	denied
+dub add-override x	denied
+dub add-path	denied
+dub add-path x	denied
+dub build	denied
+dub build x	denied
+dub clean	denied
+dub clean x	denied
+dub convert	denied
+dub convert x	denied
+dub describe	safe-read
+dub describe --arch x	safe-read
+dub describe --build x	safe-read
+dub describe --compiler x	safe-read
+dub describe --config x	safe-read
+dub describe --data x	safe-read
+dub describe --data-list	safe-read
+dub describe --data-list --arch x	safe-read
+dub describe --data-list --help	safe-read
+dub describe --data-list x	safe-read
+dub describe --help	safe-read
+dub describe --import-paths	safe-read
+dub describe -h	safe-read
+dub describe x	safe-read
+dub dustmite	denied
+dub dustmite x	denied
+dub fetch	denied
+dub fetch x	denied
+dub format	denied
+dub format x	denied
+dub gen	denied
+dub gen x	denied
+dub generate	denied
+dub generate x	denied
+dub help	inert
+dub help x	inert
+dub init	denied
+dub init x	denied
+dub lint	safe-read
+dub lint --build x	safe-read
+dub lint --config x	safe-read
+dub lint --help	safe-read
+dub lint --help --build x	safe-read
+dub lint --help --report	safe-read
+dub lint --help x	safe-read
+dub lint --report	safe-read
+dub lint --styleCheck	safe-read
+dub lint --syntax-check	safe-read
+dub lint -b x	safe-read
+dub lint -c x	safe-read
+dub lint -h	safe-read
+dub lint x	safe-read
+dub list	safe-read
+dub list --help	safe-read
+dub list --help -h	safe-read
+dub list --help x	safe-read
+dub list -h	safe-read
+dub list x	safe-read
+dub list-overrides	denied
+dub list-overrides x	denied
+dub remove	denied
+dub remove x	denied
+dub remove-local	denied
+dub remove-local x	denied
+dub remove-override	denied
+dub remove-override x	denied
+dub remove-path	denied
+dub remove-path x	denied
+dub run	denied
+dub run x	denied
+dub search	denied
+dub search --help	safe-read
+dub search --help --registry x	safe-read
+dub search --help -h	safe-read
+dub search --help x	safe-read
+dub search --registry x	safe-read
+dub search -h	safe-read
+dub search x	safe-read
+dub test	denied
+dub test x	denied
+dub upgrade	denied
+dub upgrade x	denied
+dub version	inert
+dub version --help	inert
+dub version --help -h	inert
+dub version --help x	inert
+dub version -h	inert
+dub version x	inert
+dub x	denied
+duckdb	denied
+duckdb --help	inert
+duckdb --help --version	inert
+duckdb --help x	denied
+duckdb --version	inert
+duckdb -help	inert
+duckdb -version	inert
+duckdb x	denied
+duf	inert
+duf --all	inert
+duf --all --help	inert
+duf --all --only x	inert
+duf --all x	inert
+duf --help	inert
+duf --hide-fs	inert
+duf --hide-mp	inert
+duf --inodes	inert
+duf --json	inert
+duf --only x	inert
+duf --output x	inert
+duf --sort x	inert
+duf --style x	inert
+duf --theme x	inert
+duf --version	inert
+duf --warnings	inert
+duf --width x	inert
+duf x	inert
+dune	denied
+dune --help	inert
+dune --help --version	denied
+dune --help x	denied
+dune --version	inert
+dune -h	inert
+dune build	denied
+dune build x	denied
+dune cache	denied
+dune cache x	denied
+dune clean	denied
+dune clean x	denied
+dune describe	inert
+dune describe aliases	inert
+dune describe aliases --help	inert
+dune describe aliases --help -h	inert
+dune describe aliases --help x	inert
+dune describe aliases -h	inert
+dune describe aliases x	inert
+dune describe contexts	inert
+dune describe contexts --help	inert
+dune describe contexts --help -h	inert
+dune describe contexts --help x	inert
+dune describe contexts -h	inert
+dune describe contexts x	inert
+dune describe external-lib-deps	inert
+dune describe external-lib-deps --help	inert
+dune describe external-lib-deps --help --missing	inert
+dune describe external-lib-deps --help x	inert
+dune describe external-lib-deps --missing	inert
+dune describe external-lib-deps -h	inert
+dune describe external-lib-deps x	inert
+dune describe installed-libraries	inert
+dune describe installed-libraries --help	inert
+dune describe installed-libraries --help -h	inert
+dune describe installed-libraries --help x	inert
+dune describe installed-libraries -h	inert
+dune describe installed-libraries x	inert
+dune describe opam-files	inert
+dune describe opam-files --help	inert
+dune describe opam-files --help -h	inert
+dune describe opam-files --help x	inert
+dune describe opam-files -h	inert
+dune describe opam-files x	inert
+dune describe package-entries	inert
+dune describe package-entries --help	inert
+dune describe package-entries --help -h	inert
+dune describe package-entries --help x	inert
+dune describe package-entries -h	inert
+dune describe package-entries x	inert
+dune describe pp	inert
+dune describe pp --help	inert
+dune describe pp --help -h	inert
+dune describe pp --help x	inert
+dune describe pp -h	inert
+dune describe pp x	inert
+dune describe workspace	inert
+dune describe workspace --help	inert
+dune describe workspace --help -h	inert
+dune describe workspace --help x	inert
+dune describe workspace -h	inert
+dune describe workspace x	inert
+dune describe x	denied
+dune exec	denied
+dune exec x	denied
+dune format-dune-file	denied
+dune format-dune-file x	denied
+dune help	inert
+dune help x	inert
+dune init	denied
+dune init x	denied
+dune install	denied
+dune install x	denied
+dune ocaml	denied
+dune ocaml x	denied
+dune ocaml-merlin	denied
+dune ocaml-merlin x	denied
+dune printenv	safe-read
+dune printenv --help	safe-read
+dune printenv --help -h	safe-read
+dune printenv --help x	safe-read
+dune printenv -h	safe-read
+dune printenv x	safe-read
+dune promote	denied
+dune promote x	denied
+dune rpc	denied
+dune rpc x	denied
+dune rules	safe-read
+dune rules --help	safe-read
+dune rules --help --makefile	safe-read
+dune rules --help x	safe-read
+dune rules --makefile	safe-read
+dune rules -h	safe-read
+dune rules -m	safe-read
+dune rules x	safe-read
+dune runtest	denied
+dune runtest x	denied
+dune subst	denied
+dune subst x	denied
+dune test	denied
+dune test x	denied
+dune uninstall	denied
+dune uninstall x	denied
+dune utop	denied
+dune utop x	denied
+dune version	inert
+dune version --help	inert
+dune version --help -h	inert
+dune version --help x	inert
+dune version -h	inert
+dune version x	inert
+dune x	denied
+dust	inert
+dust --bars-on-right	inert
+dust --bars-on-right --depth x	inert
+dust --bars-on-right --files0-from	inert
+dust --bars-on-right x	inert
+dust --depth x	inert
+dust --exclude x	inert
+dust --files0-from	inert
+dust --filter x	inert
+dust --help	inert
+dust --ignore-all-in-file	inert
+dust --invert-filter	inert
+dust --no-colors	inert
+dust --no-percent-bars	inert
+dust --only-dir	inert
+dust --only-file	inert
+dust --skip-total	inert
+dust --terminal_width x	inert
+dust --version	inert
+dust -D	inert
+dust -F	inert
+dust -H	inert
+dust -M x	inert
+dust -P	inert
+dust -R	inert
+dust -S	inert
+dust -V	inert
+dust -X x	inert
+dust -b	inert
+dust -c	inert
+dust -d x	inert
+dust -e x	inert
+dust -f	inert
+dust -h	inert
+dust -i	inert
+dust -n x	inert
+dust -p	inert
+dust -r	inert
+dust -s	inert
+dust -t x	inert
+dust -v x	inert
+dust -w x	inert
+dust -z x	inert
+dust x	inert
+dvc	denied
+dvc --help	inert
+dvc --help --out x	denied
+dvc --help --version	denied
+dvc --help x	denied
+dvc --out x	denied
+dvc --version	inert
+dvc -V	inert
+dvc -h	inert
+dvc -o x	denied
+dvc add	denied
+dvc add --desc x	safe-write
+dvc add --external	safe-write
+dvc add --external --desc x	safe-write
+dvc add --external --file	safe-write
+dvc add --external x	safe-write
+dvc add --file	safe-write
+dvc add --file x	safe-write
+dvc add --force	safe-write
+dvc add --glob	safe-write
+dvc add --help	safe-write
+dvc add --meta x	safe-write
+dvc add --no-commit	safe-write
+dvc add --out ./data/train.csv data.csv	safe-write
+dvc add --out x	safe-write
+dvc add --quiet	safe-write
+dvc add --recursive	safe-write
+dvc add --remote	safe-write
+dvc add --remote x	safe-write
+dvc add --to-remote data.csv	denied
+dvc add --type x	safe-write
+dvc add --verbose	safe-write
+dvc add -R	safe-write
+dvc add -f	safe-write
+dvc add -h	safe-write
+dvc add -o x	safe-write
+dvc add -q	safe-write
+dvc add -v	safe-write
+dvc add data.csv	safe-write
+dvc add x	safe-write
+dvc checkout	safe-write
+dvc checkout --allow-missing	safe-write
+dvc checkout --allow-missing --force	safe-write
+dvc checkout --allow-missing x	safe-write
+dvc checkout --force	safe-write
+dvc checkout --help	safe-write
+dvc checkout --quiet	safe-write
+dvc checkout --recursive	safe-write
+dvc checkout --relink	safe-write
+dvc checkout --summary	safe-write
+dvc checkout -R	safe-write
+dvc checkout -f	safe-write
+dvc checkout -h	safe-write
+dvc checkout -q	safe-write
+dvc checkout x	safe-write
+dvc commit	safe-write
+dvc commit --data-only	safe-write
+dvc commit --data-only --force	safe-write
+dvc commit --data-only x	safe-write
+dvc commit --force	safe-write
+dvc commit --help	safe-write
+dvc commit --no-commit	safe-write
+dvc commit --quiet	safe-write
+dvc commit --recursive	safe-write
+dvc commit --relink	safe-write
+dvc commit --verbose	safe-write
+dvc commit -R	safe-write
+dvc commit -d	safe-write
+dvc commit -f	safe-write
+dvc commit -h	safe-write
+dvc commit -q	safe-write
+dvc commit -v	safe-write
+dvc commit x	safe-write
+dvc config	denied
+dvc config x	denied
+dvc dag	safe-read
+dvc dag --dot	safe-read
+dvc dag --dot --full	safe-read
+dvc dag --dot x	safe-read
+dvc dag --full	safe-read
+dvc dag --help	safe-read
+dvc dag --md	safe-read
+dvc dag --mermaid	safe-read
+dvc dag --outs	safe-read
+dvc dag --quiet	safe-read
+dvc dag --verbose	safe-read
+dvc dag -h	safe-read
+dvc dag -q	safe-read
+dvc dag -v	safe-read
+dvc dag x	safe-read
+dvc diff	safe-read
+dvc diff --help	safe-read
+dvc diff --help --hide-missing	safe-read
+dvc diff --help x	safe-read
+dvc diff --hide-missing	safe-read
+dvc diff --json	safe-read
+dvc diff --md	safe-read
+dvc diff --quiet	safe-read
+dvc diff --show-hash	safe-read
+dvc diff --targets	safe-read
+dvc diff --verbose	safe-read
+dvc diff -h	safe-read
+dvc diff -q	safe-read
+dvc diff -v	safe-read
+dvc diff x	safe-read
+dvc doctor	safe-read
+dvc doctor --help	safe-read
+dvc doctor --help -h	safe-read
+dvc doctor --help x	safe-read
+dvc doctor -h	safe-read
+dvc doctor x	safe-read
+dvc exp	denied
+dvc exp x	denied
+dvc fetch	denied
+dvc fetch x	denied
+dvc help	inert
+dvc help x	inert
+dvc import	denied
+dvc import x	denied
+dvc import-url	denied
+dvc import-url x	denied
+dvc init	denied
+dvc init x	denied
+dvc list	denied
+dvc list --dvc-only	safe-read
+dvc list --dvc-only --help	safe-read
+dvc list --dvc-only --rev x	safe-read
+dvc list --dvc-only x	safe-read
+dvc list --help	safe-read
+dvc list --json	safe-read
+dvc list --quiet	safe-read
+dvc list --rev x	safe-read
+dvc list -R	safe-read
+dvc list -h	safe-read
+dvc list -q	safe-read
+dvc list x	safe-read
+dvc metrics	denied
+dvc metrics x	denied
+dvc move	denied
+dvc move --help	safe-write
+dvc move --help --quiet	safe-write
+dvc move --help x	safe-write
+dvc move --quiet	safe-write
+dvc move --verbose	safe-write
+dvc move -h	safe-write
+dvc move -q	safe-write
+dvc move -v	safe-write
+dvc move x	safe-write
+dvc params	denied
+dvc params x	denied
+dvc plots	denied
+dvc plots x	denied
+dvc pull	denied
+dvc pull x	denied
+dvc push	denied
+dvc push x	denied
+dvc remote	denied
+dvc remote x	denied
+dvc remove	denied
+dvc remove --help	safe-write
+dvc remove --help --outs	safe-write
+dvc remove --help x	safe-write
+dvc remove --outs	safe-write
+dvc remove --quiet	safe-write
+dvc remove --verbose	safe-write
+dvc remove -h	safe-write
+dvc remove -q	safe-write
+dvc remove -v	safe-write
+dvc remove x	safe-write
+dvc repro	denied
+dvc repro x	denied
+dvc run	denied
+dvc run x	denied
+dvc status	safe-read
+dvc status --all-branches	safe-read
+dvc status --all-branches --all-commits	safe-read
+dvc status --all-branches x	safe-read
+dvc status --all-commits	safe-read
+dvc status --all-tags	safe-read
+dvc status --cloud	safe-read
+dvc status --help	safe-read
+dvc status --json	safe-read
+dvc status --quiet	safe-read
+dvc status --remote	safe-read
+dvc status --verbose	safe-read
+dvc status -A	safe-read
+dvc status -T	safe-read
+dvc status -a	safe-read
+dvc status -c	safe-read
+dvc status -h	safe-read
+dvc status -q	safe-read
+dvc status -v	safe-read
+dvc status x	safe-read
+dvc unprotect	denied
+dvc unprotect --help	safe-write
+dvc unprotect --help --quiet	safe-write
+dvc unprotect --help x	safe-write
+dvc unprotect --quiet	safe-write
+dvc unprotect -h	safe-write
+dvc unprotect -q	safe-write
+dvc unprotect x	safe-write
+dvc version	inert
+dvc version --help	inert
+dvc version --help -h	inert
+dvc version --help x	inert
+dvc version -h	inert
+dvc version x	inert
+dvc x	denied
+dvipdf	denied
+dvipdf --help	safe-write
+dvipdf --help -?	safe-write
+dvipdf --help x	safe-write
+dvipdf --version	denied
+dvipdf -?	safe-write
+dvipdf -h	safe-write
+dvipdf paper.dvi paper.pdf	safe-write
+dvipdf x	safe-write
+dwarfdump	inert
+dwarfdump --all	inert
+dwarfdump --all --apple-names	inert
+dwarfdump --all --arch x	inert
+dwarfdump --all x	inert
+dwarfdump --apple-names	inert
+dwarfdump --apple-namespaces	inert
+dwarfdump --apple-objc	inert
+dwarfdump --apple-types	inert
+dwarfdump --arch x	inert
+dwarfdump --color	inert
+dwarfdump --debug-abbrev x	inert
+dwarfdump --debug-addr x	inert
+dwarfdump --debug-aranges x	inert
+dwarfdump --debug-cu-index x	inert
+dwarfdump --debug-frame x	inert
+dwarfdump --debug-gnu-pubnames x	inert
+dwarfdump --debug-gnu-pubtypes x	inert
+dwarfdump --debug-info x	inert
+dwarfdump --debug-line x	inert
+dwarfdump --debug-line-str x	inert
+dwarfdump --debug-loc x	inert
+dwarfdump --debug-loclists x	inert
+dwarfdump --debug-macro x	inert
+dwarfdump --debug-names x	inert
+dwarfdump --debug-pubnames x	inert
+dwarfdump --debug-pubtypes x	inert
+dwarfdump --debug-ranges x	inert
+dwarfdump --debug-rnglists x	inert
+dwarfdump --debug-str x	inert
+dwarfdump --debug-str-offsets x	inert
+dwarfdump --debug-tu-index x	inert
+dwarfdump --debug-types x	inert
+dwarfdump --diff	inert
+dwarfdump --eh-frame	inert
+dwarfdump --find x	inert
+dwarfdump --gdb-index	inert
+dwarfdump --help	inert
+dwarfdump --help-list	inert
+dwarfdump --ignore-case	inert
+dwarfdump --lookup x	inert
+dwarfdump --name x	inert
+dwarfdump --parent-recurse-depth x	inert
+dwarfdump --quiet	inert
+dwarfdump --recurse-depth x	inert
+dwarfdump --regex	inert
+dwarfdump --show-children	inert
+dwarfdump --show-form	inert
+dwarfdump --show-parents	inert
+dwarfdump --show-section-sizes	inert
+dwarfdump --show-sources	inert
+dwarfdump --statistics	inert
+dwarfdump --summarize-types	inert
+dwarfdump --uuid	inert
+dwarfdump --uuid binary	inert
+dwarfdump --verbose	inert
+dwarfdump --verify	inert
+dwarfdump --verify file.dSYM	inert
+dwarfdump --version	inert
+dwarfdump -F	inert
+dwarfdump -a	inert
+dwarfdump -c	inert
+dwarfdump -f x	inert
+dwarfdump -h	inert
+dwarfdump -i	inert
+dwarfdump -n x	inert
+dwarfdump -o x	inert
+dwarfdump -p	inert
+dwarfdump -r x	inert
+dwarfdump -u	inert
+dwarfdump -v	inert
+dwarfdump -x	inert
+dwarfdump x	inert
+dwebp	denied
+dwebp --help	denied
+dwebp --version	denied
+dwebp -H	safe-write
+dwebp -H -alpha	safe-write
+dwebp -H -alpha_dither x	safe-write
+dwebp -H x	safe-write
+dwebp -alpha	safe-write
+dwebp -alpha_dither x	safe-write
+dwebp -bmp	safe-write
+dwebp -crop x	safe-write
+dwebp -dither x	safe-write
+dwebp -flip	safe-write
+dwebp -h	safe-write
+dwebp -help	safe-write
+dwebp -incremental	safe-write
+dwebp -longhelp	safe-write
+dwebp -mt	safe-write
+dwebp -noasm	safe-write
+dwebp -nodither	safe-write
+dwebp -nofancy	safe-write
+dwebp -nofilter	safe-write
+dwebp -o x	safe-write
+dwebp -pam	safe-write
+dwebp -pgm	safe-write
+dwebp -pnm	safe-write
+dwebp -ppm	safe-write
+dwebp -quiet	safe-write
+dwebp -resize x	safe-write
+dwebp -scale x	safe-write
+dwebp -size x	safe-write
+dwebp -tiff	safe-write
+dwebp -v	safe-write
+dwebp -version	safe-write
+dwebp -yuv	safe-write
+dwebp x	safe-write
+dyld_info	denied
+dyld_info --help	inert
+dyld_info --help -all_dir x	inert
+dyld_info --help -all_dyld_cache	inert
+dyld_info --help x	inert
+dyld_info --version	denied
+dyld_info -all_dir x	inert
+dyld_info -all_dyld_cache	inert
+dyld_info -all_sections	inert
+dyld_info -all_sections_bytes	inert
+dyld_info -arch x	inert
+dyld_info -disassemble	inert
+dyld_info -dlopens	inert
+dyld_info -dlsyms	inert
+dyld_info -exports	inert
+dyld_info -fixup_chain_details	inert
+dyld_info -fixup_chain_header	inert
+dyld_info -fixup_chains	inert
+dyld_info -fixups	inert
+dyld_info -function_starts	inert
+dyld_info -function_variants	inert
+dyld_info -h	inert
+dyld_info -imports	inert
+dyld_info -inits	inert
+dyld_info -linked_dylibs	inert
+dyld_info -load_commands	inert
+dyld_info -no_validate	inert
+dyld_info -objc	inert
+dyld_info -opcodes	inert
+dyld_info -platform	inert
+dyld_info -section x	inert
+dyld_info -section_bytes x	inert
+dyld_info -segments	inert
+dyld_info -segments /usr/lib/libSystem.B.dylib	inert
+dyld_info -shared_region	inert
+dyld_info -symbolic_fixups	inert
+dyld_info -uuid	inert
+dyld_info -validate_only	inert
+dyld_info x	inert
+dyld_usage	inert
+dyld_usage --help	denied
+dyld_usage --version	denied
+dyld_usage -E x	inert
+dyld_usage -R x	inert
+dyld_usage -S x	inert
+dyld_usage -e	inert
+dyld_usage -e -E x	inert
+dyld_usage -e -h	inert
+dyld_usage -e x	inert
+dyld_usage -f x	inert
+dyld_usage -h	inert
+dyld_usage -j	inert
+dyld_usage -t x	inert
+dyld_usage x	inert

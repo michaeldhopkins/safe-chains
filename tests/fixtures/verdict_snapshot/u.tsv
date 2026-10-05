@@ -1,0 +1,2809 @@
+uconv	denied
+uconv --add-signature x	inert
+uconv --callback x	inert
+uconv --copyright x	inert
+uconv --encoding x	inert
+uconv --from-callback x	inert
+uconv --from-code x	inert
+uconv --help	inert
+uconv --help --add-signature x	inert
+uconv --help --invalid-skip	inert
+uconv --help x	inert
+uconv --invalid-skip	inert
+uconv --list-code	inert
+uconv --match x	inert
+uconv --name x	inert
+uconv --output x	inert
+uconv --show-cps	inert
+uconv --silent	inert
+uconv --to-callback x	inert
+uconv --to-code x	inert
+uconv --transliterate x	inert
+uconv --verbose	inert
+uconv --version	inert
+uconv -?	inert
+uconv -L	inert
+uconv -V	inert
+uconv -c x	inert
+uconv -f x	inert
+uconv -h	inert
+uconv -i	inert
+uconv -l	inert
+uconv -o x	inert
+uconv -s	inert
+uconv -t x	inert
+uconv -v	inert
+uconv -x x	inert
+uconv x	inert
+ul	inert
+ul --help	inert
+ul --help --terminal x	inert
+ul --help --version	inert
+ul --help x	inert
+ul --terminal x	inert
+ul --version	inert
+ul -V	inert
+ul -h	inert
+ul -i	inert
+ul -t x	inert
+ul x	inert
+umount /mnt	denied
+umtool	denied
+umtool --help	inert
+umtool --help -h	denied
+umtool --help x	denied
+umtool --version	denied
+umtool -h	inert
+umtool sysdiagnose	inert
+umtool sysdiagnose --help	inert
+umtool sysdiagnose --help -h	inert
+umtool sysdiagnose --help x	inert
+umtool sysdiagnose -h	inert
+umtool sysdiagnose x	inert
+umtool x	denied
+uname	inert
+uname --all	inert
+uname --all --help	inert
+uname --all x	denied
+uname --help	inert
+uname --kernel-name	inert
+uname --kernel-release	inert
+uname --kernel-version	inert
+uname --machine	inert
+uname --nodename	inert
+uname --operating-system	inert
+uname --processor	inert
+uname --version	inert
+uname -V	inert
+uname -a	inert
+uname -h	inert
+uname -m	inert
+uname -n	inert
+uname -o	inert
+uname -p	inert
+uname -r	inert
+uname -s	inert
+uname -v	inert
+uname x	denied
+unbound-host	denied
+unbound-host --help	denied
+unbound-host --version	denied
+unbound-host -4	inert
+unbound-host -4 -6	inert
+unbound-host -4 -C x	inert
+unbound-host -4 x	inert
+unbound-host -6	inert
+unbound-host -C x	inert
+unbound-host -D	inert
+unbound-host -F x	inert
+unbound-host -c x	inert
+unbound-host -d	inert
+unbound-host -f x	inert
+unbound-host -h	inert
+unbound-host -r	inert
+unbound-host -t x	inert
+unbound-host -v	inert
+unbound-host -v example.com	inert
+unbound-host -y x	inert
+unbound-host example.com	inert
+unbound-host x	inert
+unbrotli	safe-write
+unbrotli --force	safe-write
+unbrotli --force --help	safe-write
+unbrotli --force --output x	safe-write
+unbrotli --force x	safe-write
+unbrotli --help	safe-write
+unbrotli --keep	safe-write
+unbrotli --no-copy-stat	safe-write
+unbrotli --output x	safe-write
+unbrotli --rm	safe-write
+unbrotli --stdout	safe-write
+unbrotli --suffix	safe-write
+unbrotli --suffix x	safe-write
+unbrotli --test	safe-write
+unbrotli --verbose	safe-write
+unbrotli --version	safe-write
+unbrotli -S x	safe-write
+unbrotli -c	safe-write
+unbrotli -f	safe-write
+unbrotli -h	safe-write
+unbrotli -j	safe-write
+unbrotli -k	safe-write
+unbrotli -n	safe-write
+unbrotli -o x	safe-write
+unbrotli -t	safe-write
+unbrotli -v	safe-write
+unbrotli x	safe-write
+unbuffer	denied
+unbuffer --help	inert
+unbuffer --help -h	inert
+unbuffer --help x	denied
+unbuffer --version	denied
+unbuffer -h	inert
+unbuffer x	denied
+uncompress	safe-write
+uncompress --help	denied
+uncompress --version	denied
+uncompress -b x	safe-write
+uncompress -c	safe-write
+uncompress -c -b x	safe-write
+uncompress -c -f	safe-write
+uncompress -c x	safe-write
+uncompress -f	safe-write
+uncompress -v	safe-write
+uncompress x	safe-write
+unexpand	inert
+unexpand --all	inert
+unexpand --all --first-only	inert
+unexpand --all --tabs x	inert
+unexpand --all x	inert
+unexpand --first-only	inert
+unexpand --help	inert
+unexpand --tabs x	inert
+unexpand --version	inert
+unexpand -V	inert
+unexpand -a	inert
+unexpand -h	inert
+unexpand -t x	inert
+unexpand file.txt	inert
+unexpand x	inert
+unifdef	denied
+unifdef --help	denied
+unifdef --version	denied
+unifdef -V	safe-write
+unifdef -V -h	safe-write
+unifdef -V -o x	safe-write
+unifdef -V x	safe-write
+unifdef -h	safe-write
+unifdef -o x	safe-write
+unifdef x	safe-write
+unifdefall	denied
+unifdefall --help	denied
+unifdefall --version	denied
+unifdefall -V	safe-write
+unifdefall -V -h	safe-write
+unifdefall -V -o x	safe-write
+unifdefall -V x	safe-write
+unifdefall -h	safe-write
+unifdefall -o x	safe-write
+unifdefall x	safe-write
+uniq	inert
+uniq --all-repeated x	inert
+uniq --check-chars x	inert
+uniq --count	inert
+uniq --count --all-repeated x	inert
+uniq --count --help	inert
+uniq --count x	inert
+uniq --group x	inert
+uniq --help	inert
+uniq --ignore-case	inert
+uniq --repeated	inert
+uniq --skip-chars x	inert
+uniq --skip-fields x	inert
+uniq --unique	inert
+uniq --version	inert
+uniq --zero-terminated	inert
+uniq -D	inert
+uniq -V	inert
+uniq -c	inert
+uniq -d	inert
+uniq -f x	inert
+uniq -h	inert
+uniq -i	inert
+uniq -s x	inert
+uniq -u	inert
+uniq -w x	inert
+uniq -z	inert
+uniq x	inert
+units	inert
+units --check	inert
+units --check --compact	inert
+units --check --digits x	inert
+units --check x	inert
+units --compact	inert
+units --digits x	inert
+units --exponential	inert
+units --file x	inert
+units --help	inert
+units --history x	inert
+units --log x	inert
+units --one-line	inert
+units --output-format x	inert
+units --quiet	inert
+units --strict	inert
+units --terse	inert
+units --units	inert
+units --verbose	inert
+units --version	inert
+units -1	inert
+units -H x	inert
+units -L x	inert
+units -V	inert
+units -c	inert
+units -d x	inert
+units -e	inert
+units -f x	inert
+units -h	inert
+units -o x	inert
+units -q	inert
+units -s	inert
+units -t	inert
+units -v	inert
+units x	inert
+unknown-command subcommand --help	denied
+unlz4	safe-write
+unlz4 --best	safe-write
+unlz4 --best --block-size x	safe-write
+unlz4 --best --compress	safe-write
+unlz4 --best x	safe-write
+unlz4 --block-size x	safe-write
+unlz4 --compress	safe-write
+unlz4 --content-size x	safe-write
+unlz4 --decompress	safe-write
+unlz4 --fast	safe-write
+unlz4 --favor-decSpeed	safe-write
+unlz4 --favor-decSpeed x	safe-write
+unlz4 --force	safe-write
+unlz4 --frame-block-size x	safe-write
+unlz4 --help	safe-write
+unlz4 --keep	safe-write
+unlz4 --list	safe-write
+unlz4 --long-help	safe-write
+unlz4 --multiple	safe-write
+unlz4 --no-frame-crc	safe-write
+unlz4 --no-progress	safe-write
+unlz4 --no-sparse	safe-write
+unlz4 --no-test	safe-write
+unlz4 --quiet	safe-write
+unlz4 --rm	safe-write
+unlz4 --sparse	safe-write
+unlz4 --stdout	safe-write
+unlz4 --test	safe-write
+unlz4 --uncompress	safe-write
+unlz4 --verbose	safe-write
+unlz4 --version	safe-write
+unlz4 -1	safe-write
+unlz4 -2	safe-write
+unlz4 -3	safe-write
+unlz4 -4	safe-write
+unlz4 -5	safe-write
+unlz4 -6	safe-write
+unlz4 -7	safe-write
+unlz4 -8	safe-write
+unlz4 -9	safe-write
+unlz4 -A	safe-write
+unlz4 -B	safe-write
+unlz4 -B x	safe-write
+unlz4 -BD	safe-write
+unlz4 -BI	safe-write
+unlz4 -BX	safe-write
+unlz4 -D x	safe-write
+unlz4 -S x	safe-write
+unlz4 -V	safe-write
+unlz4 -c	safe-write
+unlz4 -d	safe-write
+unlz4 -f	safe-write
+unlz4 -h	safe-write
+unlz4 -k	safe-write
+unlz4 -l	safe-write
+unlz4 -m	safe-write
+unlz4 -q	safe-write
+unlz4 -r	safe-write
+unlz4 -t	safe-write
+unlz4 -v	safe-write
+unlz4 -z	safe-write
+unlz4 x	safe-write
+unlzma	safe-write
+unlzma --block-size x	safe-write
+unlzma --check	safe-write
+unlzma --check --block-size x	safe-write
+unlzma --check --compress	safe-write
+unlzma --check x	safe-write
+unlzma --compress	safe-write
+unlzma --decompress	safe-write
+unlzma --delta x	safe-write
+unlzma --extreme	safe-write
+unlzma --fast	safe-write
+unlzma --files	safe-write
+unlzma --files x	safe-write
+unlzma --files0	safe-write
+unlzma --files0 x	safe-write
+unlzma --filters x	safe-write
+unlzma --filters1 x	safe-write
+unlzma --filters2 x	safe-write
+unlzma --filters3 x	safe-write
+unlzma --filters4 x	safe-write
+unlzma --flush-timeout x	safe-write
+unlzma --force	safe-write
+unlzma --format	safe-write
+unlzma --format x	safe-write
+unlzma --help	safe-write
+unlzma --ignore-check	safe-write
+unlzma --info-alloc	safe-write
+unlzma --keep	safe-write
+unlzma --list	safe-write
+unlzma --lzma1	safe-write
+unlzma --lzma1 x	safe-write
+unlzma --lzma2	safe-write
+unlzma --lzma2 x	safe-write
+unlzma --memlimit	safe-write
+unlzma --memlimit-compress	safe-write
+unlzma --memlimit-compress x	safe-write
+unlzma --memlimit-decompress	safe-write
+unlzma --memlimit-decompress x	safe-write
+unlzma --memlimit-mt-decompress	safe-write
+unlzma --memlimit-mt-decompress x	safe-write
+unlzma --memory x	safe-write
+unlzma --no-adjust	safe-write
+unlzma --no-sparse	safe-write
+unlzma --no-warn	safe-write
+unlzma --presets x	safe-write
+unlzma --quiet	safe-write
+unlzma --robot	safe-write
+unlzma --single-stream	safe-write
+unlzma --stdout	safe-write
+unlzma --suffix	safe-write
+unlzma --suffix x	safe-write
+unlzma --threads	safe-write
+unlzma --threads x	safe-write
+unlzma --to-stdout	safe-write
+unlzma --uncompress	safe-write
+unlzma --verbose	safe-write
+unlzma --version	safe-write
+unlzma --x86 x	safe-write
+unlzma -0	safe-write
+unlzma -1	safe-write
+unlzma -2	safe-write
+unlzma -3	safe-write
+unlzma -4	safe-write
+unlzma -5	safe-write
+unlzma -6	safe-write
+unlzma -7	safe-write
+unlzma -8	safe-write
+unlzma -9	safe-write
+unlzma -C	safe-write
+unlzma -C x	safe-write
+unlzma -F	safe-write
+unlzma -F x	safe-write
+unlzma -H	safe-write
+unlzma -M x	safe-write
+unlzma -Q	safe-write
+unlzma -S x	safe-write
+unlzma -T	safe-write
+unlzma -T x	safe-write
+unlzma -V	safe-write
+unlzma -c	safe-write
+unlzma -d	safe-write
+unlzma -e	safe-write
+unlzma -f	safe-write
+unlzma -h	safe-write
+unlzma -k	safe-write
+unlzma -l	safe-write
+unlzma -q	safe-write
+unlzma -t	safe-write
+unlzma -v	safe-write
+unlzma -z	safe-write
+unlzma x	safe-write
+unpigz	safe-write
+unpigz --ascii	safe-write
+unpigz --ascii --best	safe-write
+unpigz --ascii --blocksize x	safe-write
+unpigz --ascii x	safe-write
+unpigz --best	safe-write
+unpigz --blocksize	safe-write
+unpigz --blocksize x	safe-write
+unpigz --compress	safe-write
+unpigz --decompress	safe-write
+unpigz --fast	safe-write
+unpigz --force	safe-write
+unpigz --help	safe-write
+unpigz --independent	safe-write
+unpigz --iterations	safe-write
+unpigz --iterations x	safe-write
+unpigz --keep	safe-write
+unpigz --license	safe-write
+unpigz --list	safe-write
+unpigz --maxsplits	safe-write
+unpigz --maxsplits x	safe-write
+unpigz --name	safe-write
+unpigz --no-name	safe-write
+unpigz --no-time	safe-write
+unpigz --objsize	safe-write
+unpigz --objsize x	safe-write
+unpigz --processes	safe-write
+unpigz --processes x	safe-write
+unpigz --quiet	safe-write
+unpigz --recursive	safe-write
+unpigz --rsyncable	safe-write
+unpigz --stdout	safe-write
+unpigz --suffix	safe-write
+unpigz --suffix x	safe-write
+unpigz --symlinks	safe-write
+unpigz --synchronous	safe-write
+unpigz --test	safe-write
+unpigz --time	safe-write
+unpigz --verbose	safe-write
+unpigz --version	safe-write
+unpigz -0	safe-write
+unpigz -1	safe-write
+unpigz -2	safe-write
+unpigz -3	safe-write
+unpigz -4	safe-write
+unpigz -5	safe-write
+unpigz -6	safe-write
+unpigz -7	safe-write
+unpigz -8	safe-write
+unpigz -9	safe-write
+unpigz -K	safe-write
+unpigz -L	safe-write
+unpigz -N	safe-write
+unpigz -S x	safe-write
+unpigz -T	safe-write
+unpigz -V	safe-write
+unpigz -b x	safe-write
+unpigz -c	safe-write
+unpigz -d	safe-write
+unpigz -f	safe-write
+unpigz -h	safe-write
+unpigz -i	safe-write
+unpigz -k	safe-write
+unpigz -l	safe-write
+unpigz -n	safe-write
+unpigz -p	safe-write
+unpigz -p x	safe-write
+unpigz -q	safe-write
+unpigz -r	safe-write
+unpigz -t	safe-write
+unpigz -v	safe-write
+unpigz -y	safe-write
+unpigz -z	safe-write
+unpigz x	safe-write
+unset	inert
+unset --help	inert
+unset --help --version	inert
+unset --help x	inert
+unset --version	inert
+unset -V	inert
+unset -f	inert
+unset -h	inert
+unset -n	inert
+unset -v	inert
+unset x	inert
+until [[ "$(gh run view 12345 --json status --jq .status)" == "completed" ]]; do sleep 30; done	inert
+until [[ "$(node /tmp/bad.js)" == "x" ]]; do sleep 1; done	denied
+until [[ "a" == "b" ]]; do sleep 1; done	inert
+until docker compose ps --format json | grep -q healthy; do sleep 1; done; mise exec -- bin/rails db:create	safe-write
+until test -f /tmp/ready; do sleep 1; done	inert
+unvis	inert
+unvis --help	denied
+unvis --version	denied
+unvis -H	inert
+unvis -H -e	inert
+unvis -H x	inert
+unvis -e	inert
+unvis -h	inert
+unvis -m	inert
+unvis x	inert
+unwinddump	denied
+unwinddump --help	denied
+unwinddump --version	denied
+unwinddump -arch x	inert
+unwinddump binary	inert
+unwinddump x	inert
+unxz	safe-write
+unxz --block-size x	safe-write
+unxz --check	safe-write
+unxz --check --block-size x	safe-write
+unxz --check --compress	safe-write
+unxz --check x	safe-write
+unxz --compress	safe-write
+unxz --decompress	safe-write
+unxz --delta x	safe-write
+unxz --extreme	safe-write
+unxz --fast	safe-write
+unxz --files	safe-write
+unxz --files x	safe-write
+unxz --files0	safe-write
+unxz --files0 x	safe-write
+unxz --filters x	safe-write
+unxz --filters1 x	safe-write
+unxz --filters2 x	safe-write
+unxz --filters3 x	safe-write
+unxz --filters4 x	safe-write
+unxz --flush-timeout x	safe-write
+unxz --force	safe-write
+unxz --format	safe-write
+unxz --format x	safe-write
+unxz --help	safe-write
+unxz --ignore-check	safe-write
+unxz --info-alloc	safe-write
+unxz --keep	safe-write
+unxz --list	safe-write
+unxz --lzma1	safe-write
+unxz --lzma1 x	safe-write
+unxz --lzma2	safe-write
+unxz --lzma2 x	safe-write
+unxz --memlimit	safe-write
+unxz --memlimit-compress	safe-write
+unxz --memlimit-compress x	safe-write
+unxz --memlimit-decompress	safe-write
+unxz --memlimit-decompress x	safe-write
+unxz --memlimit-mt-decompress	safe-write
+unxz --memlimit-mt-decompress x	safe-write
+unxz --memory x	safe-write
+unxz --no-adjust	safe-write
+unxz --no-sparse	safe-write
+unxz --no-warn	safe-write
+unxz --presets x	safe-write
+unxz --quiet	safe-write
+unxz --robot	safe-write
+unxz --single-stream	safe-write
+unxz --stdout	safe-write
+unxz --suffix	safe-write
+unxz --suffix x	safe-write
+unxz --threads	safe-write
+unxz --threads x	safe-write
+unxz --to-stdout	safe-write
+unxz --uncompress	safe-write
+unxz --verbose	safe-write
+unxz --version	safe-write
+unxz --x86 x	safe-write
+unxz -0	safe-write
+unxz -1	safe-write
+unxz -2	safe-write
+unxz -3	safe-write
+unxz -4	safe-write
+unxz -5	safe-write
+unxz -6	safe-write
+unxz -7	safe-write
+unxz -8	safe-write
+unxz -9	safe-write
+unxz -C	safe-write
+unxz -C x	safe-write
+unxz -F	safe-write
+unxz -F x	safe-write
+unxz -H	safe-write
+unxz -M x	safe-write
+unxz -Q	safe-write
+unxz -S x	safe-write
+unxz -T	safe-write
+unxz -T x	safe-write
+unxz -V	safe-write
+unxz -c	safe-write
+unxz -d	safe-write
+unxz -e	safe-write
+unxz -f	safe-write
+unxz -h	safe-write
+unxz -k	safe-write
+unxz -l	safe-write
+unxz -q	safe-write
+unxz -t	safe-write
+unxz -v	safe-write
+unxz -z	safe-write
+unxz x	safe-write
+unzip	denied
+unzip --help	inert
+unzip --help --version	denied
+unzip --help x	denied
+unzip --version	denied
+unzip -1	denied
+unzip -2	denied
+unzip -C	denied
+unzip -M	denied
+unzip -T	denied
+unzip -V	denied
+unzip -Z	inert
+unzip -Z1 ./archive.zip	inert
+unzip -c	inert
+unzip -c --help	inert
+unzip -c --version	inert
+unzip -c -1	inert
+unzip -c -2	inert
+unzip -c -C	inert
+unzip -c -M	inert
+unzip -c -T	inert
+unzip -c -V	inert
+unzip -c -Z	inert
+unzip -c -c	inert
+unzip -c -h	inert
+unzip -c -l	inert
+unzip -c -m	inert
+unzip -c -p	inert
+unzip -c -q	inert
+unzip -c -s	inert
+unzip -c -t	inert
+unzip -c -v	inert
+unzip -c -z	inert
+unzip -h	inert
+unzip -l	inert
+unzip -l ./archive.zip	inert
+unzip -m	denied
+unzip -p	inert
+unzip -p ./archive.zip notes.txt	inert
+unzip -p ~/.ssh/id_rsa	denied
+unzip -q	denied
+unzip -s	denied
+unzip -t	inert
+unzip -t ./archive.zip	inert
+unzip -v	denied
+unzip -z	denied
+unzip ./archive.zip	denied
+unzip x	denied
+unzipsfx	safe-write
+unzipsfx -$	safe-write
+unzipsfx -$ -C	safe-write
+unzipsfx -$ -d x	safe-write
+unzipsfx -$ x	safe-write
+unzipsfx --help	denied
+unzipsfx --version	denied
+unzipsfx -C	safe-write
+unzipsfx -L	safe-write
+unzipsfx -V	safe-write
+unzipsfx -a	safe-write
+unzipsfx -c	safe-write
+unzipsfx -d x	safe-write
+unzipsfx -f	safe-write
+unzipsfx -j	safe-write
+unzipsfx -n	safe-write
+unzipsfx -o	safe-write
+unzipsfx -p	safe-write
+unzipsfx -q	safe-write
+unzipsfx -s	safe-write
+unzipsfx -t	safe-write
+unzipsfx -u	safe-write
+unzipsfx -v	safe-write
+unzipsfx -x x	safe-write
+unzipsfx -z	safe-write
+unzipsfx x	safe-write
+unzstd	safe-write
+unzstd --adapt	safe-write
+unzstd --adapt --adapt x	safe-write
+unzstd --adapt --check	safe-write
+unzstd --adapt x	safe-write
+unzstd --block-size x	safe-write
+unzstd --check	safe-write
+unzstd --compress	safe-write
+unzstd --content-size	safe-write
+unzstd --decompress	safe-write
+unzstd --dictionary x	safe-write
+unzstd --exclude x	safe-write
+unzstd --exclude-compressed	safe-write
+unzstd --fast	safe-write
+unzstd --filelist	safe-write
+unzstd --filelist x	safe-write
+unzstd --force	safe-write
+unzstd --format	safe-write
+unzstd --format x	safe-write
+unzstd --from-stdin	safe-write
+unzstd --help	safe-write
+unzstd --keep	safe-write
+unzstd --list	safe-write
+unzstd --long	safe-write
+unzstd --long x	safe-write
+unzstd --max	safe-write
+unzstd --maxdict x	safe-write
+unzstd --maxmem x	safe-write
+unzstd --memory	safe-write
+unzstd --memory x	safe-write
+unzstd --no-check	safe-write
+unzstd --no-content-size	safe-write
+unzstd --no-dictID	safe-write
+unzstd --no-progress	safe-write
+unzstd --no-row-match-finder	safe-write
+unzstd --no-sparse	safe-write
+unzstd --num-threads	safe-write
+unzstd --num-threads x	safe-write
+unzstd --output x	safe-write
+unzstd --output-dir-flat x	safe-write
+unzstd --output-dir-mirror x	safe-write
+unzstd --patch-from	safe-write
+unzstd --patch-from x	safe-write
+unzstd --progress	safe-write
+unzstd --quiet	safe-write
+unzstd --rm	safe-write
+unzstd --row-match-finder	safe-write
+unzstd --rsyncable	safe-write
+unzstd --sparse	safe-write
+unzstd --stdout	safe-write
+unzstd --summary	safe-write
+unzstd --test	safe-write
+unzstd --threads	safe-write
+unzstd --threads x	safe-write
+unzstd --train	safe-write
+unzstd --train x	safe-write
+unzstd --train-cover	safe-write
+unzstd --train-cover x	safe-write
+unzstd --train-fastcover	safe-write
+unzstd --train-fastcover x	safe-write
+unzstd --ultra	safe-write
+unzstd --verbose	safe-write
+unzstd --version	safe-write
+unzstd --with-progress	safe-write
+unzstd --write-data-blocks x	safe-write
+unzstd -1	safe-write
+unzstd -2	safe-write
+unzstd -3	safe-write
+unzstd -4	safe-write
+unzstd -5	safe-write
+unzstd -6	safe-write
+unzstd -7	safe-write
+unzstd -8	safe-write
+unzstd -9	safe-write
+unzstd -D	safe-write
+unzstd -D x	safe-write
+unzstd -K	safe-write
+unzstd -M	safe-write
+unzstd -T	safe-write
+unzstd -T x	safe-write
+unzstd -V	safe-write
+unzstd -c	safe-write
+unzstd -d	safe-write
+unzstd -f	safe-write
+unzstd -h	safe-write
+unzstd -k	safe-write
+unzstd -l	safe-write
+unzstd -o x	safe-write
+unzstd -q	safe-write
+unzstd -r	safe-write
+unzstd -t	safe-write
+unzstd -v	safe-write
+unzstd -z	safe-write
+unzstd x	safe-write
+upsun	denied
+upsun --help	inert
+upsun --help --version	denied
+upsun --help x	denied
+upsun --version	inert
+upsun -V	inert
+upsun -h	inert
+upsun act	inert
+upsun act --all	inert
+upsun act --all --environment x	inert
+upsun act --all --help	inert
+upsun act --all x	inert
+upsun act --environment x	inert
+upsun act --exclude-type x	inert
+upsun act --format x	inert
+upsun act --help	inert
+upsun act --limit x	inert
+upsun act --project x	inert
+upsun act --result x	inert
+upsun act --start x	inert
+upsun act --state x	inert
+upsun act --type x	inert
+upsun act -e x	inert
+upsun act -h	inert
+upsun act -p x	inert
+upsun act -t x	inert
+upsun act x	inert
+upsun activities	inert
+upsun activities --all	inert
+upsun activities --all --environment x	inert
+upsun activities --all --help	inert
+upsun activities --all x	inert
+upsun activities --environment x	inert
+upsun activities --exclude-type x	inert
+upsun activities --format x	inert
+upsun activities --help	inert
+upsun activities --limit x	inert
+upsun activities --project x	inert
+upsun activities --result x	inert
+upsun activities --start x	inert
+upsun activities --state x	inert
+upsun activities --type x	inert
+upsun activities -e x	inert
+upsun activities -h	inert
+upsun activities -p x	inert
+upsun activities -t x	inert
+upsun activities x	inert
+upsun activity:get	inert
+upsun activity:get --environment x	inert
+upsun activity:get --format x	inert
+upsun activity:get --help	inert
+upsun activity:get --help --environment x	inert
+upsun activity:get --help -h	inert
+upsun activity:get --help x	inert
+upsun activity:get --project x	inert
+upsun activity:get --property x	inert
+upsun activity:get -e x	inert
+upsun activity:get -h	inert
+upsun activity:get -p x	inert
+upsun activity:get x	inert
+upsun activity:list	inert
+upsun activity:list --all	inert
+upsun activity:list --all --environment x	inert
+upsun activity:list --all --help	inert
+upsun activity:list --all x	inert
+upsun activity:list --environment x	inert
+upsun activity:list --exclude-type x	inert
+upsun activity:list --format x	inert
+upsun activity:list --help	inert
+upsun activity:list --limit x	inert
+upsun activity:list --project x	inert
+upsun activity:list --result x	inert
+upsun activity:list --start x	inert
+upsun activity:list --state x	inert
+upsun activity:list --type x	inert
+upsun activity:list -e x	inert
+upsun activity:list -h	inert
+upsun activity:list -p x	inert
+upsun activity:list -t x	inert
+upsun activity:list x	inert
+upsun activity:log	inert
+upsun activity:log --environment x	inert
+upsun activity:log --help	inert
+upsun activity:log --help --environment x	inert
+upsun activity:log --help --refresh	inert
+upsun activity:log --help x	inert
+upsun activity:log --project x	inert
+upsun activity:log --refresh	inert
+upsun activity:log --timestamps x	inert
+upsun activity:log -e x	inert
+upsun activity:log -h	inert
+upsun activity:log -p x	inert
+upsun activity:log -t x	inert
+upsun activity:log x	inert
+upsun app:config-get	inert
+upsun app:config-get --app x	inert
+upsun app:config-get --environment x	inert
+upsun app:config-get --format x	inert
+upsun app:config-get --help	inert
+upsun app:config-get --help --app x	inert
+upsun app:config-get --help -h	inert
+upsun app:config-get --help x	inert
+upsun app:config-get --project x	inert
+upsun app:config-get --property x	inert
+upsun app:config-get -A x	inert
+upsun app:config-get -P x	inert
+upsun app:config-get -e x	inert
+upsun app:config-get -h	inert
+upsun app:config-get -p x	inert
+upsun app:config-get x	inert
+upsun app:list	inert
+upsun app:list --environment x	inert
+upsun app:list --format x	inert
+upsun app:list --help	inert
+upsun app:list --help --environment x	inert
+upsun app:list --help --refresh	inert
+upsun app:list --help x	inert
+upsun app:list --project x	inert
+upsun app:list --refresh	inert
+upsun app:list -e x	inert
+upsun app:list -h	inert
+upsun app:list -p x	inert
+upsun app:list x	inert
+upsun apps	inert
+upsun apps --environment x	inert
+upsun apps --format x	inert
+upsun apps --help	inert
+upsun apps --help --environment x	inert
+upsun apps --help --refresh	inert
+upsun apps --help x	inert
+upsun apps --project x	inert
+upsun apps --refresh	inert
+upsun apps -e x	inert
+upsun apps -h	inert
+upsun apps -p x	inert
+upsun apps x	inert
+upsun auth:api-token-login	safe-write
+upsun auth:api-token-login --help	safe-write
+upsun auth:api-token-login --help -h	safe-write
+upsun auth:api-token-login --help x	safe-write
+upsun auth:api-token-login -h	safe-write
+upsun auth:api-token-login x	safe-write
+upsun auth:browser-login	safe-write
+upsun auth:browser-login --force	safe-write
+upsun auth:browser-login --force --help	safe-write
+upsun auth:browser-login --force --method x	safe-write
+upsun auth:browser-login --force x	safe-write
+upsun auth:browser-login --help	safe-write
+upsun auth:browser-login --method x	safe-write
+upsun auth:browser-login -f	safe-write
+upsun auth:browser-login -h	safe-write
+upsun auth:browser-login x	safe-write
+upsun auth:info	inert
+upsun auth:info --format x	inert
+upsun auth:info --help	inert
+upsun auth:info --help --format x	inert
+upsun auth:info --help --no-auto-login	inert
+upsun auth:info --help x	inert
+upsun auth:info --no-auto-login	inert
+upsun auth:info --property x	inert
+upsun auth:info --refresh	inert
+upsun auth:info -h	inert
+upsun auth:info x	inert
+upsun auth:logout	safe-write
+upsun auth:logout --all	safe-write
+upsun auth:logout --all --help	safe-write
+upsun auth:logout --all x	safe-write
+upsun auth:logout --help	safe-write
+upsun auth:logout --other	safe-write
+upsun auth:logout -h	safe-write
+upsun auth:logout x	safe-write
+upsun auth:verify-phone-number	denied
+upsun auth:verify-phone-number x	denied
+upsun autoscaling	inert
+upsun autoscaling --app x	inert
+upsun autoscaling --environment x	inert
+upsun autoscaling --format x	inert
+upsun autoscaling --help	inert
+upsun autoscaling --help --app x	inert
+upsun autoscaling --help -h	inert
+upsun autoscaling --help x	inert
+upsun autoscaling --project x	inert
+upsun autoscaling --service x	inert
+upsun autoscaling --worker x	inert
+upsun autoscaling -A x	inert
+upsun autoscaling -e x	inert
+upsun autoscaling -h	inert
+upsun autoscaling -p x	inert
+upsun autoscaling x	inert
+upsun autoscaling:get	inert
+upsun autoscaling:get --app x	inert
+upsun autoscaling:get --environment x	inert
+upsun autoscaling:get --format x	inert
+upsun autoscaling:get --help	inert
+upsun autoscaling:get --help --app x	inert
+upsun autoscaling:get --help -h	inert
+upsun autoscaling:get --help x	inert
+upsun autoscaling:get --project x	inert
+upsun autoscaling:get --service x	inert
+upsun autoscaling:get --worker x	inert
+upsun autoscaling:get -A x	inert
+upsun autoscaling:get -e x	inert
+upsun autoscaling:get -h	inert
+upsun autoscaling:get -p x	inert
+upsun autoscaling:get x	inert
+upsun autoscaling:set	denied
+upsun autoscaling:set x	denied
+upsun backup	denied
+upsun backup x	denied
+upsun backup:create	denied
+upsun backup:create x	denied
+upsun backup:delete	denied
+upsun backup:delete x	denied
+upsun backup:get	inert
+upsun backup:get --environment x	inert
+upsun backup:get --format x	inert
+upsun backup:get --help	inert
+upsun backup:get --help --environment x	inert
+upsun backup:get --help -h	inert
+upsun backup:get --help x	inert
+upsun backup:get --project x	inert
+upsun backup:get --property x	inert
+upsun backup:get -P x	inert
+upsun backup:get -e x	inert
+upsun backup:get -h	inert
+upsun backup:get -p x	inert
+upsun backup:get x	inert
+upsun backup:list	inert
+upsun backup:list --columns x	inert
+upsun backup:list --environment x	inert
+upsun backup:list --format x	inert
+upsun backup:list --help	inert
+upsun backup:list --help --columns x	inert
+upsun backup:list --help --no-header	inert
+upsun backup:list --help x	inert
+upsun backup:list --no-header	inert
+upsun backup:list --project x	inert
+upsun backup:list -c x	inert
+upsun backup:list -e x	inert
+upsun backup:list -h	inert
+upsun backup:list -p x	inert
+upsun backup:list x	inert
+upsun backup:restore	denied
+upsun backup:restore x	denied
+upsun backups	inert
+upsun backups --columns x	inert
+upsun backups --environment x	inert
+upsun backups --format x	inert
+upsun backups --help	inert
+upsun backups --help --columns x	inert
+upsun backups --help --no-header	inert
+upsun backups --help x	inert
+upsun backups --no-header	inert
+upsun backups --project x	inert
+upsun backups -c x	inert
+upsun backups -e x	inert
+upsun backups -h	inert
+upsun backups -p x	inert
+upsun backups x	inert
+upsun blue-green:concluded	denied
+upsun blue-green:concluded x	denied
+upsun blue-green:deploy	denied
+upsun blue-green:deploy x	denied
+upsun blue-green:enable	denied
+upsun blue-green:enable x	denied
+upsun branch	denied
+upsun branch x	denied
+upsun build	denied
+upsun build x	denied
+upsun cc	safe-write
+upsun cc --help	safe-write
+upsun cc --help -h	safe-write
+upsun cc --help x	safe-write
+upsun cc -h	safe-write
+upsun cc x	safe-write
+upsun certificate:add	denied
+upsun certificate:add x	denied
+upsun certificate:delete	denied
+upsun certificate:delete x	denied
+upsun certificate:get	denied
+upsun certificate:get --format x	inert
+upsun certificate:get --help	inert
+upsun certificate:get --help --format x	inert
+upsun certificate:get --help -h	inert
+upsun certificate:get --help x	inert
+upsun certificate:get --project x	inert
+upsun certificate:get --property x	inert
+upsun certificate:get -P x	inert
+upsun certificate:get -h	inert
+upsun certificate:get -p x	inert
+upsun certificate:get x	inert
+upsun certificate:list	inert
+upsun certificate:list --columns x	inert
+upsun certificate:list --domain x	inert
+upsun certificate:list --format x	inert
+upsun certificate:list --help	inert
+upsun certificate:list --help --columns x	inert
+upsun certificate:list --help --no-header	inert
+upsun certificate:list --help x	inert
+upsun certificate:list --issuer x	inert
+upsun certificate:list --no-header	inert
+upsun certificate:list --only-auto x	inert
+upsun certificate:list --only-manual x	inert
+upsun certificate:list --project x	inert
+upsun certificate:list -c x	inert
+upsun certificate:list -h	inert
+upsun certificate:list -p x	inert
+upsun certificate:list x	inert
+upsun certificates	inert
+upsun certificates --columns x	inert
+upsun certificates --domain x	inert
+upsun certificates --format x	inert
+upsun certificates --help	inert
+upsun certificates --help --columns x	inert
+upsun certificates --help --no-header	inert
+upsun certificates --help x	inert
+upsun certificates --issuer x	inert
+upsun certificates --no-header	inert
+upsun certificates --only-auto x	inert
+upsun certificates --only-manual x	inert
+upsun certificates --project x	inert
+upsun certificates -c x	inert
+upsun certificates -h	inert
+upsun certificates -p x	inert
+upsun certificates x	inert
+upsun certs	inert
+upsun certs --columns x	inert
+upsun certs --domain x	inert
+upsun certs --format x	inert
+upsun certs --help	inert
+upsun certs --help --columns x	inert
+upsun certs --help --no-header	inert
+upsun certs --help x	inert
+upsun certs --issuer x	inert
+upsun certs --no-header	inert
+upsun certs --only-auto x	inert
+upsun certs --only-manual x	inert
+upsun certs --project x	inert
+upsun certs -c x	inert
+upsun certs -h	inert
+upsun certs -p x	inert
+upsun certs x	inert
+upsun checkout	denied
+upsun checkout x	denied
+upsun clear-cache	safe-write
+upsun clear-cache --help	safe-write
+upsun clear-cache --help -h	safe-write
+upsun clear-cache --help x	safe-write
+upsun clear-cache -h	safe-write
+upsun clear-cache x	safe-write
+upsun commit:get	inert
+upsun commit:get --environment x	inert
+upsun commit:get --format x	inert
+upsun commit:get --help	inert
+upsun commit:get --help --environment x	inert
+upsun commit:get --help -h	inert
+upsun commit:get --help x	inert
+upsun commit:get --project x	inert
+upsun commit:get --property x	inert
+upsun commit:get -P x	inert
+upsun commit:get -e x	inert
+upsun commit:get -h	inert
+upsun commit:get -p x	inert
+upsun commit:get x	inert
+upsun commit:list	inert
+upsun commit:list --environment x	inert
+upsun commit:list --format x	inert
+upsun commit:list --help	inert
+upsun commit:list --help --environment x	inert
+upsun commit:list --help -h	inert
+upsun commit:list --help x	inert
+upsun commit:list --limit x	inert
+upsun commit:list --project x	inert
+upsun commit:list -e x	inert
+upsun commit:list -h	inert
+upsun commit:list -p x	inert
+upsun commit:list x	inert
+upsun console	inert
+upsun console --help	inert
+upsun console --help --project x	inert
+upsun console --help -h	inert
+upsun console --help x	inert
+upsun console --project x	inert
+upsun console -h	inert
+upsun console -p x	inert
+upsun console x	inert
+upsun db:dump	denied
+upsun db:dump x	denied
+upsun db:size	denied
+upsun db:size x	denied
+upsun db:sql	denied
+upsun db:sql x	denied
+upsun decode	denied
+upsun decode --help	inert
+upsun decode --help --property x	inert
+upsun decode --help -h	inert
+upsun decode --help x	inert
+upsun decode --property x	inert
+upsun decode -h	inert
+upsun decode x	inert
+upsun dir	inert
+upsun dir --help	inert
+upsun dir --help -h	inert
+upsun dir --help x	inert
+upsun dir -h	inert
+upsun dir x	inert
+upsun docs	inert
+upsun docs x	inert
+upsun domain:add	denied
+upsun domain:add x	denied
+upsun domain:delete	denied
+upsun domain:delete x	denied
+upsun domain:get	denied
+upsun domain:get --format x	inert
+upsun domain:get --help	inert
+upsun domain:get --help --format x	inert
+upsun domain:get --help -h	inert
+upsun domain:get --help x	inert
+upsun domain:get --project x	inert
+upsun domain:get --property x	inert
+upsun domain:get -P x	inert
+upsun domain:get -h	inert
+upsun domain:get -p x	inert
+upsun domain:get x	inert
+upsun domain:list	inert
+upsun domain:list --columns x	inert
+upsun domain:list --format x	inert
+upsun domain:list --help	inert
+upsun domain:list --help --columns x	inert
+upsun domain:list --help --no-header	inert
+upsun domain:list --help x	inert
+upsun domain:list --no-header	inert
+upsun domain:list --project x	inert
+upsun domain:list -c x	inert
+upsun domain:list -h	inert
+upsun domain:list -p x	inert
+upsun domain:list x	inert
+upsun domain:update	denied
+upsun domain:update x	denied
+upsun domains	inert
+upsun domains --columns x	inert
+upsun domains --format x	inert
+upsun domains --help	inert
+upsun domains --help --columns x	inert
+upsun domains --help --no-header	inert
+upsun domains --help x	inert
+upsun domains --no-header	inert
+upsun domains --project x	inert
+upsun domains -c x	inert
+upsun domains -h	inert
+upsun domains -p x	inert
+upsun domains x	inert
+upsun drush	denied
+upsun drush x	denied
+upsun drush-aliases	denied
+upsun drush-aliases x	denied
+upsun environment:activate	denied
+upsun environment:activate x	denied
+upsun environment:branch	denied
+upsun environment:branch x	denied
+upsun environment:checkout	denied
+upsun environment:checkout x	denied
+upsun environment:curl	denied
+upsun environment:curl x	denied
+upsun environment:deactivate	denied
+upsun environment:deactivate x	denied
+upsun environment:delete	denied
+upsun environment:delete x	denied
+upsun environment:deploy	denied
+upsun environment:deploy x	denied
+upsun environment:deploy:type	denied
+upsun environment:deploy:type x	denied
+upsun environment:drush	denied
+upsun environment:drush x	denied
+upsun environment:http-access	denied
+upsun environment:http-access x	denied
+upsun environment:info	inert
+upsun environment:info --environment x	inert
+upsun environment:info --format x	inert
+upsun environment:info --help	inert
+upsun environment:info --help --environment x	inert
+upsun environment:info --help --refresh	inert
+upsun environment:info --help x	inert
+upsun environment:info --project x	inert
+upsun environment:info --refresh	inert
+upsun environment:info -e x	inert
+upsun environment:info -h	inert
+upsun environment:info -p x	inert
+upsun environment:info x	inert
+upsun environment:init	denied
+upsun environment:init x	denied
+upsun environment:list	inert
+upsun environment:list --columns x	inert
+upsun environment:list --depth x	inert
+upsun environment:list --format x	inert
+upsun environment:list --help	inert
+upsun environment:list --help --columns x	inert
+upsun environment:list --help --no-header	inert
+upsun environment:list --help x	inert
+upsun environment:list --no-header	inert
+upsun environment:list --no-inactive	inert
+upsun environment:list --no-status x	inert
+upsun environment:list --pipe x	inert
+upsun environment:list --project x	inert
+upsun environment:list --refresh	inert
+upsun environment:list --sort x	inert
+upsun environment:list --status x	inert
+upsun environment:list --type x	inert
+upsun environment:list -I	inert
+upsun environment:list -c x	inert
+upsun environment:list -h	inert
+upsun environment:list -p x	inert
+upsun environment:list -t x	inert
+upsun environment:list x	inert
+upsun environment:logs	inert
+upsun environment:logs --app x	inert
+upsun environment:logs --environment x	inert
+upsun environment:logs --help	inert
+upsun environment:logs --help --app x	inert
+upsun environment:logs --help --tail	inert
+upsun environment:logs --help x	inert
+upsun environment:logs --lines x	inert
+upsun environment:logs --project x	inert
+upsun environment:logs --tail	inert
+upsun environment:logs --worker x	inert
+upsun environment:logs -A x	inert
+upsun environment:logs -e x	inert
+upsun environment:logs -h	inert
+upsun environment:logs -p x	inert
+upsun environment:logs x	inert
+upsun environment:merge	denied
+upsun environment:merge x	denied
+upsun environment:pause	denied
+upsun environment:pause x	denied
+upsun environment:push	denied
+upsun environment:push x	denied
+upsun environment:redeploy	denied
+upsun environment:redeploy x	denied
+upsun environment:relationships	inert
+upsun environment:relationships --app x	inert
+upsun environment:relationships --environment x	inert
+upsun environment:relationships --format x	inert
+upsun environment:relationships --help	inert
+upsun environment:relationships --help --app x	inert
+upsun environment:relationships --help --refresh	inert
+upsun environment:relationships --help x	inert
+upsun environment:relationships --project x	inert
+upsun environment:relationships --property x	inert
+upsun environment:relationships --refresh	inert
+upsun environment:relationships -A x	inert
+upsun environment:relationships -P x	inert
+upsun environment:relationships -e x	inert
+upsun environment:relationships -h	inert
+upsun environment:relationships -p x	inert
+upsun environment:relationships x	inert
+upsun environment:restore	denied
+upsun environment:restore x	denied
+upsun environment:resume	denied
+upsun environment:resume x	denied
+upsun environment:scp	denied
+upsun environment:scp x	denied
+upsun environment:set-remote	safe-write
+upsun environment:set-remote --help	safe-write
+upsun environment:set-remote --help --project x	safe-write
+upsun environment:set-remote --help -h	safe-write
+upsun environment:set-remote --help x	safe-write
+upsun environment:set-remote --project x	safe-write
+upsun environment:set-remote -h	safe-write
+upsun environment:set-remote -p x	safe-write
+upsun environment:set-remote x	safe-write
+upsun environment:ssh	denied
+upsun environment:ssh x	denied
+upsun environment:synchronize	denied
+upsun environment:synchronize x	denied
+upsun environment:url	inert
+upsun environment:url --browser	inert
+upsun environment:url --browser --environment x	inert
+upsun environment:url --browser --help	inert
+upsun environment:url --browser x	inert
+upsun environment:url --environment x	inert
+upsun environment:url --help	inert
+upsun environment:url --pipe	inert
+upsun environment:url --primary x	inert
+upsun environment:url --project x	inert
+upsun environment:url -1 x	inert
+upsun environment:url -e x	inert
+upsun environment:url -h	inert
+upsun environment:url -p x	inert
+upsun environment:url x	inert
+upsun environment:xdebug	denied
+upsun environment:xdebug x	denied
+upsun environments	inert
+upsun environments --columns x	inert
+upsun environments --depth x	inert
+upsun environments --format x	inert
+upsun environments --help	inert
+upsun environments --help --columns x	inert
+upsun environments --help --no-header	inert
+upsun environments --help x	inert
+upsun environments --no-header	inert
+upsun environments --no-inactive	inert
+upsun environments --no-status x	inert
+upsun environments --pipe x	inert
+upsun environments --project x	inert
+upsun environments --refresh	inert
+upsun environments --sort x	inert
+upsun environments --status x	inert
+upsun environments --type x	inert
+upsun environments -I	inert
+upsun environments -c x	inert
+upsun environments -h	inert
+upsun environments -p x	inert
+upsun environments -t x	inert
+upsun environments x	inert
+upsun envs	inert
+upsun envs --columns x	inert
+upsun envs --depth x	inert
+upsun envs --format x	inert
+upsun envs --help	inert
+upsun envs --help --columns x	inert
+upsun envs --help --no-header	inert
+upsun envs --help x	inert
+upsun envs --no-header	inert
+upsun envs --no-inactive	inert
+upsun envs --no-status x	inert
+upsun envs --pipe x	inert
+upsun envs --project x	inert
+upsun envs --refresh	inert
+upsun envs --sort x	inert
+upsun envs --status x	inert
+upsun envs --type x	inert
+upsun envs -I	inert
+upsun envs -c x	inert
+upsun envs -h	inert
+upsun envs -p x	inert
+upsun envs -t x	inert
+upsun envs x	inert
+upsun help	inert
+upsun help x	inert
+upsun httpaccess	denied
+upsun httpaccess x	denied
+upsun ify	denied
+upsun ify x	denied
+upsun integration:activity:get	inert
+upsun integration:activity:get --format x	inert
+upsun integration:activity:get --help	inert
+upsun integration:activity:get --help --format x	inert
+upsun integration:activity:get --help -h	inert
+upsun integration:activity:get --help x	inert
+upsun integration:activity:get --project x	inert
+upsun integration:activity:get --property x	inert
+upsun integration:activity:get -P x	inert
+upsun integration:activity:get -h	inert
+upsun integration:activity:get -p x	inert
+upsun integration:activity:get x	inert
+upsun integration:activity:list	inert
+upsun integration:activity:list --all	inert
+upsun integration:activity:list --all --exclude-type x	inert
+upsun integration:activity:list --all --help	inert
+upsun integration:activity:list --all x	inert
+upsun integration:activity:list --exclude-type x	inert
+upsun integration:activity:list --format x	inert
+upsun integration:activity:list --help	inert
+upsun integration:activity:list --limit x	inert
+upsun integration:activity:list --project x	inert
+upsun integration:activity:list --result x	inert
+upsun integration:activity:list --start x	inert
+upsun integration:activity:list --state x	inert
+upsun integration:activity:list --type x	inert
+upsun integration:activity:list -h	inert
+upsun integration:activity:list -p x	inert
+upsun integration:activity:list -t x	inert
+upsun integration:activity:list x	inert
+upsun integration:activity:log	inert
+upsun integration:activity:log --help	inert
+upsun integration:activity:log --help --project x	inert
+upsun integration:activity:log --help -h	inert
+upsun integration:activity:log --help x	inert
+upsun integration:activity:log --project x	inert
+upsun integration:activity:log --timestamps x	inert
+upsun integration:activity:log -h	inert
+upsun integration:activity:log -p x	inert
+upsun integration:activity:log -t x	inert
+upsun integration:activity:log x	inert
+upsun integration:add	denied
+upsun integration:add x	denied
+upsun integration:delete	denied
+upsun integration:delete x	denied
+upsun integration:get	denied
+upsun integration:get --format x	inert
+upsun integration:get --help	inert
+upsun integration:get --help --format x	inert
+upsun integration:get --help -h	inert
+upsun integration:get --help x	inert
+upsun integration:get --project x	inert
+upsun integration:get --property x	inert
+upsun integration:get -P x	inert
+upsun integration:get -h	inert
+upsun integration:get -p x	inert
+upsun integration:get x	inert
+upsun integration:list	inert
+upsun integration:list --columns x	inert
+upsun integration:list --format x	inert
+upsun integration:list --help	inert
+upsun integration:list --help --columns x	inert
+upsun integration:list --help --no-header	inert
+upsun integration:list --help x	inert
+upsun integration:list --no-header	inert
+upsun integration:list --project x	inert
+upsun integration:list -c x	inert
+upsun integration:list -h	inert
+upsun integration:list -p x	inert
+upsun integration:list x	inert
+upsun integration:update	denied
+upsun integration:update x	denied
+upsun integration:validate	denied
+upsun integration:validate x	denied
+upsun integrations	inert
+upsun integrations --columns x	inert
+upsun integrations --format x	inert
+upsun integrations --help	inert
+upsun integrations --help --columns x	inert
+upsun integrations --help --no-header	inert
+upsun integrations --help x	inert
+upsun integrations --no-header	inert
+upsun integrations --project x	inert
+upsun integrations -c x	inert
+upsun integrations -h	inert
+upsun integrations -p x	inert
+upsun integrations x	inert
+upsun list	inert
+upsun list --all	inert
+upsun list --all --format x	inert
+upsun list --all --help	inert
+upsun list --all x	inert
+upsun list --format x	inert
+upsun list --help	inert
+upsun list --raw	inert
+upsun list --short	inert
+upsun list -h	inert
+upsun list x	inert
+upsun local:build	denied
+upsun local:build x	denied
+upsun local:dir	inert
+upsun local:dir --help	inert
+upsun local:dir --help -h	inert
+upsun local:dir --help x	inert
+upsun local:dir -h	inert
+upsun local:dir x	inert
+upsun local:drush-aliases	denied
+upsun local:drush-aliases x	denied
+upsun login	safe-write
+upsun login --force	safe-write
+upsun login --force --help	safe-write
+upsun login --force --method x	safe-write
+upsun login --force x	safe-write
+upsun login --help	safe-write
+upsun login --method x	safe-write
+upsun login -f	safe-write
+upsun login -h	safe-write
+upsun login x	safe-write
+upsun logout	safe-write
+upsun logout --all	safe-write
+upsun logout --all --help	safe-write
+upsun logout --all x	safe-write
+upsun logout --help	safe-write
+upsun logout --other	safe-write
+upsun logout -h	safe-write
+upsun logout x	safe-write
+upsun merge	denied
+upsun merge x	denied
+upsun metrics	inert
+upsun metrics --app x	inert
+upsun metrics --bytes x	inert
+upsun metrics --environment x	inert
+upsun metrics --format x	inert
+upsun metrics --help	inert
+upsun metrics --help --app x	inert
+upsun metrics --help -h	inert
+upsun metrics --help x	inert
+upsun metrics --project x	inert
+upsun metrics --range x	inert
+upsun metrics --service x	inert
+upsun metrics --worker x	inert
+upsun metrics -A x	inert
+upsun metrics -e x	inert
+upsun metrics -h	inert
+upsun metrics -p x	inert
+upsun metrics -r x	inert
+upsun metrics x	inert
+upsun metrics:all	inert
+upsun metrics:all --app x	inert
+upsun metrics:all --bytes x	inert
+upsun metrics:all --environment x	inert
+upsun metrics:all --format x	inert
+upsun metrics:all --help	inert
+upsun metrics:all --help --app x	inert
+upsun metrics:all --help -h	inert
+upsun metrics:all --help x	inert
+upsun metrics:all --project x	inert
+upsun metrics:all --range x	inert
+upsun metrics:all --service x	inert
+upsun metrics:all --worker x	inert
+upsun metrics:all -A x	inert
+upsun metrics:all -e x	inert
+upsun metrics:all -h	inert
+upsun metrics:all -p x	inert
+upsun metrics:all -r x	inert
+upsun metrics:all x	inert
+upsun metrics:cpu	inert
+upsun metrics:cpu --app x	inert
+upsun metrics:cpu --environment x	inert
+upsun metrics:cpu --format x	inert
+upsun metrics:cpu --help	inert
+upsun metrics:cpu --help --app x	inert
+upsun metrics:cpu --help -h	inert
+upsun metrics:cpu --help x	inert
+upsun metrics:cpu --project x	inert
+upsun metrics:cpu --range x	inert
+upsun metrics:cpu --service x	inert
+upsun metrics:cpu --worker x	inert
+upsun metrics:cpu -A x	inert
+upsun metrics:cpu -e x	inert
+upsun metrics:cpu -h	inert
+upsun metrics:cpu -p x	inert
+upsun metrics:cpu -r x	inert
+upsun metrics:cpu x	inert
+upsun metrics:disk-usage	inert
+upsun metrics:disk-usage --app x	inert
+upsun metrics:disk-usage --bytes x	inert
+upsun metrics:disk-usage --environment x	inert
+upsun metrics:disk-usage --format x	inert
+upsun metrics:disk-usage --help	inert
+upsun metrics:disk-usage --help --app x	inert
+upsun metrics:disk-usage --help -h	inert
+upsun metrics:disk-usage --help x	inert
+upsun metrics:disk-usage --project x	inert
+upsun metrics:disk-usage --range x	inert
+upsun metrics:disk-usage --service x	inert
+upsun metrics:disk-usage --worker x	inert
+upsun metrics:disk-usage -A x	inert
+upsun metrics:disk-usage -e x	inert
+upsun metrics:disk-usage -h	inert
+upsun metrics:disk-usage -p x	inert
+upsun metrics:disk-usage -r x	inert
+upsun metrics:disk-usage x	inert
+upsun metrics:memory	inert
+upsun metrics:memory --app x	inert
+upsun metrics:memory --bytes x	inert
+upsun metrics:memory --environment x	inert
+upsun metrics:memory --format x	inert
+upsun metrics:memory --help	inert
+upsun metrics:memory --help --app x	inert
+upsun metrics:memory --help -h	inert
+upsun metrics:memory --help x	inert
+upsun metrics:memory --project x	inert
+upsun metrics:memory --range x	inert
+upsun metrics:memory --service x	inert
+upsun metrics:memory --worker x	inert
+upsun metrics:memory -A x	inert
+upsun metrics:memory -e x	inert
+upsun metrics:memory -h	inert
+upsun metrics:memory -p x	inert
+upsun metrics:memory -r x	inert
+upsun metrics:memory x	inert
+upsun mongo	denied
+upsun mongo x	denied
+upsun mount:download	denied
+upsun mount:download x	denied
+upsun mount:list	inert
+upsun mount:list --app x	inert
+upsun mount:list --environment x	inert
+upsun mount:list --format x	inert
+upsun mount:list --help	inert
+upsun mount:list --help --app x	inert
+upsun mount:list --help --paths	inert
+upsun mount:list --help x	inert
+upsun mount:list --paths	inert
+upsun mount:list --project x	inert
+upsun mount:list --refresh	inert
+upsun mount:list --worker x	inert
+upsun mount:list -A x	inert
+upsun mount:list -e x	inert
+upsun mount:list -h	inert
+upsun mount:list -p x	inert
+upsun mount:list x	inert
+upsun mount:upload	denied
+upsun mount:upload x	denied
+upsun mounts	inert
+upsun mounts --app x	inert
+upsun mounts --environment x	inert
+upsun mounts --format x	inert
+upsun mounts --help	inert
+upsun mounts --help --app x	inert
+upsun mounts --help --paths	inert
+upsun mounts --help x	inert
+upsun mounts --paths	inert
+upsun mounts --project x	inert
+upsun mounts --refresh	inert
+upsun mounts --worker x	inert
+upsun mounts -A x	inert
+upsun mounts -e x	inert
+upsun mounts -h	inert
+upsun mounts -p x	inert
+upsun mounts x	inert
+upsun multi	denied
+upsun multi x	denied
+upsun operation:list	inert
+upsun operation:list --app x	inert
+upsun operation:list --environment x	inert
+upsun operation:list --format x	inert
+upsun operation:list --help	inert
+upsun operation:list --help --app x	inert
+upsun operation:list --help -h	inert
+upsun operation:list --help x	inert
+upsun operation:list --project x	inert
+upsun operation:list --worker x	inert
+upsun operation:list -A x	inert
+upsun operation:list -e x	inert
+upsun operation:list -h	inert
+upsun operation:list -p x	inert
+upsun operation:list x	inert
+upsun operation:run	denied
+upsun operation:run x	denied
+upsun ops	inert
+upsun ops --app x	inert
+upsun ops --environment x	inert
+upsun ops --format x	inert
+upsun ops --help	inert
+upsun ops --help --app x	inert
+upsun ops --help -h	inert
+upsun ops --help x	inert
+upsun ops --project x	inert
+upsun ops --worker x	inert
+upsun ops -A x	inert
+upsun ops -e x	inert
+upsun ops -h	inert
+upsun ops -p x	inert
+upsun ops x	inert
+upsun organization:billing:address	inert
+upsun organization:billing:address --format x	inert
+upsun organization:billing:address --help	inert
+upsun organization:billing:address --help --format x	inert
+upsun organization:billing:address --help -h	inert
+upsun organization:billing:address --help x	inert
+upsun organization:billing:address --org x	inert
+upsun organization:billing:address --property x	inert
+upsun organization:billing:address -P x	inert
+upsun organization:billing:address -h	inert
+upsun organization:billing:address -o x	inert
+upsun organization:billing:address x	inert
+upsun organization:billing:profile	inert
+upsun organization:billing:profile --format x	inert
+upsun organization:billing:profile --help	inert
+upsun organization:billing:profile --help --format x	inert
+upsun organization:billing:profile --help -h	inert
+upsun organization:billing:profile --help x	inert
+upsun organization:billing:profile --org x	inert
+upsun organization:billing:profile --property x	inert
+upsun organization:billing:profile -P x	inert
+upsun organization:billing:profile -h	inert
+upsun organization:billing:profile -o x	inert
+upsun organization:billing:profile x	inert
+upsun organization:create	denied
+upsun organization:create x	denied
+upsun organization:curl	denied
+upsun organization:curl x	denied
+upsun organization:delete	denied
+upsun organization:delete x	denied
+upsun organization:info	inert
+upsun organization:info --format x	inert
+upsun organization:info --help	inert
+upsun organization:info --help --format x	inert
+upsun organization:info --help -h	inert
+upsun organization:info --help x	inert
+upsun organization:info --org x	inert
+upsun organization:info --property x	inert
+upsun organization:info -P x	inert
+upsun organization:info -h	inert
+upsun organization:info -o x	inert
+upsun organization:info x	inert
+upsun organization:list	inert
+upsun organization:list --columns x	inert
+upsun organization:list --filter x	inert
+upsun organization:list --format x	inert
+upsun organization:list --help	inert
+upsun organization:list --help --columns x	inert
+upsun organization:list --help --my	inert
+upsun organization:list --help x	inert
+upsun organization:list --my	inert
+upsun organization:list --sort x	inert
+upsun organization:list -c x	inert
+upsun organization:list -h	inert
+upsun organization:list x	inert
+upsun organization:subscription:list	inert
+upsun organization:subscription:list --columns x	inert
+upsun organization:subscription:list --format x	inert
+upsun organization:subscription:list --help	inert
+upsun organization:subscription:list --help --columns x	inert
+upsun organization:subscription:list --help -h	inert
+upsun organization:subscription:list --help x	inert
+upsun organization:subscription:list --org x	inert
+upsun organization:subscription:list -c x	inert
+upsun organization:subscription:list -h	inert
+upsun organization:subscription:list -o x	inert
+upsun organization:subscription:list x	inert
+upsun organization:user:add	denied
+upsun organization:user:add x	denied
+upsun organization:user:delete	denied
+upsun organization:user:delete x	denied
+upsun organization:user:get	inert
+upsun organization:user:get --email x	inert
+upsun organization:user:get --format x	inert
+upsun organization:user:get --help	inert
+upsun organization:user:get --help --email x	inert
+upsun organization:user:get --help -h	inert
+upsun organization:user:get --help x	inert
+upsun organization:user:get --org x	inert
+upsun organization:user:get --property x	inert
+upsun organization:user:get -P x	inert
+upsun organization:user:get -h	inert
+upsun organization:user:get -o x	inert
+upsun organization:user:get x	inert
+upsun organization:user:list	inert
+upsun organization:user:list --columns x	inert
+upsun organization:user:list --format x	inert
+upsun organization:user:list --help	inert
+upsun organization:user:list --help --columns x	inert
+upsun organization:user:list --help -h	inert
+upsun organization:user:list --help x	inert
+upsun organization:user:list --org x	inert
+upsun organization:user:list -c x	inert
+upsun organization:user:list -h	inert
+upsun organization:user:list -o x	inert
+upsun organization:user:list x	inert
+upsun organization:user:projects	inert
+upsun organization:user:projects --columns x	inert
+upsun organization:user:projects --email x	inert
+upsun organization:user:projects --format x	inert
+upsun organization:user:projects --help	inert
+upsun organization:user:projects --help --columns x	inert
+upsun organization:user:projects --help -h	inert
+upsun organization:user:projects --help x	inert
+upsun organization:user:projects --org x	inert
+upsun organization:user:projects -c x	inert
+upsun organization:user:projects -h	inert
+upsun organization:user:projects -o x	inert
+upsun organization:user:projects x	inert
+upsun organization:user:update	denied
+upsun organization:user:update x	denied
+upsun organizations	inert
+upsun organizations --columns x	inert
+upsun organizations --filter x	inert
+upsun organizations --format x	inert
+upsun organizations --help	inert
+upsun organizations --help --columns x	inert
+upsun organizations --help --my	inert
+upsun organizations --help x	inert
+upsun organizations --my	inert
+upsun organizations --sort x	inert
+upsun organizations -c x	inert
+upsun organizations -h	inert
+upsun organizations x	inert
+upsun orgs	inert
+upsun orgs --columns x	inert
+upsun orgs --filter x	inert
+upsun orgs --format x	inert
+upsun orgs --help	inert
+upsun orgs --help --columns x	inert
+upsun orgs --help --my	inert
+upsun orgs --help x	inert
+upsun orgs --my	inert
+upsun orgs --sort x	inert
+upsun orgs -c x	inert
+upsun orgs -h	inert
+upsun orgs x	inert
+upsun pro	inert
+upsun pro --columns x	inert
+upsun pro --format x	inert
+upsun pro --help	inert
+upsun pro --help --columns x	inert
+upsun pro --help --my	inert
+upsun pro --help x	inert
+upsun pro --host x	inert
+upsun pro --my	inert
+upsun pro --no-header	inert
+upsun pro --org x	inert
+upsun pro --pipe	inert
+upsun pro --refresh	inert
+upsun pro --region x	inert
+upsun pro --sort x	inert
+upsun pro --title x	inert
+upsun pro -c x	inert
+upsun pro -h	inert
+upsun pro -o x	inert
+upsun pro x	inert
+upsun project:clear-build-cache	denied
+upsun project:clear-build-cache x	denied
+upsun project:create	denied
+upsun project:create x	denied
+upsun project:curl	denied
+upsun project:curl x	denied
+upsun project:delete	denied
+upsun project:delete x	denied
+upsun project:get	denied
+upsun project:get x	denied
+upsun project:info	inert
+upsun project:info --format x	inert
+upsun project:info --help	inert
+upsun project:info --help --format x	inert
+upsun project:info --help --refresh	inert
+upsun project:info --help x	inert
+upsun project:info --project x	inert
+upsun project:info --property x	inert
+upsun project:info --refresh	inert
+upsun project:info -P x	inert
+upsun project:info -h	inert
+upsun project:info -p x	inert
+upsun project:info x	inert
+upsun project:init	denied
+upsun project:init x	denied
+upsun project:list	inert
+upsun project:list --columns x	inert
+upsun project:list --format x	inert
+upsun project:list --help	inert
+upsun project:list --help --columns x	inert
+upsun project:list --help --my	inert
+upsun project:list --help x	inert
+upsun project:list --host x	inert
+upsun project:list --my	inert
+upsun project:list --no-header	inert
+upsun project:list --org x	inert
+upsun project:list --pipe	inert
+upsun project:list --refresh	inert
+upsun project:list --region x	inert
+upsun project:list --sort x	inert
+upsun project:list --title x	inert
+upsun project:list -c x	inert
+upsun project:list -h	inert
+upsun project:list -o x	inert
+upsun project:list x	inert
+upsun project:set-remote	safe-write
+upsun project:set-remote --help	safe-write
+upsun project:set-remote --help -h	safe-write
+upsun project:set-remote --help x	safe-write
+upsun project:set-remote -h	safe-write
+upsun project:set-remote x	safe-write
+upsun project:variable:create	denied
+upsun project:variable:create x	denied
+upsun project:variable:delete	denied
+upsun project:variable:delete x	denied
+upsun project:variable:get	denied
+upsun project:variable:get x	denied
+upsun project:variable:list	inert
+upsun project:variable:list --columns x	inert
+upsun project:variable:list --format x	inert
+upsun project:variable:list --help	inert
+upsun project:variable:list --help --columns x	inert
+upsun project:variable:list --help --no-header	inert
+upsun project:variable:list --help x	inert
+upsun project:variable:list --no-header	inert
+upsun project:variable:list --project x	inert
+upsun project:variable:list -c x	inert
+upsun project:variable:list -h	inert
+upsun project:variable:list -p x	inert
+upsun project:variable:list x	inert
+upsun project:variable:update	denied
+upsun project:variable:update x	denied
+upsun projects	inert
+upsun projects --columns x	inert
+upsun projects --format x	inert
+upsun projects --help	inert
+upsun projects --help --columns x	inert
+upsun projects --help --my	inert
+upsun projects --help x	inert
+upsun projects --host x	inert
+upsun projects --my	inert
+upsun projects --no-header	inert
+upsun projects --org x	inert
+upsun projects --pipe	inert
+upsun projects --refresh	inert
+upsun projects --region x	inert
+upsun projects --sort x	inert
+upsun projects --title x	inert
+upsun projects -c x	inert
+upsun projects -h	inert
+upsun projects -o x	inert
+upsun projects x	inert
+upsun push	denied
+upsun push x	denied
+upsun redeploy	denied
+upsun redeploy x	denied
+upsun redis	denied
+upsun redis x	denied
+upsun redis-cli	denied
+upsun redis-cli x	denied
+upsun relationships	inert
+upsun relationships --app x	inert
+upsun relationships --environment x	inert
+upsun relationships --format x	inert
+upsun relationships --help	inert
+upsun relationships --help --app x	inert
+upsun relationships --help --refresh	inert
+upsun relationships --help x	inert
+upsun relationships --project x	inert
+upsun relationships --property x	inert
+upsun relationships --refresh	inert
+upsun relationships -A x	inert
+upsun relationships -P x	inert
+upsun relationships -e x	inert
+upsun relationships -h	inert
+upsun relationships -p x	inert
+upsun relationships x	inert
+upsun repo:cat	denied
+upsun repo:cat --app x	inert
+upsun repo:cat --commit x	inert
+upsun repo:cat --environment x	inert
+upsun repo:cat --help	inert
+upsun repo:cat --help --app x	inert
+upsun repo:cat --help -h	inert
+upsun repo:cat --help x	inert
+upsun repo:cat --project x	inert
+upsun repo:cat -A x	inert
+upsun repo:cat -c x	inert
+upsun repo:cat -e x	inert
+upsun repo:cat -h	inert
+upsun repo:cat -p x	inert
+upsun repo:cat x	inert
+upsun repo:ls	inert
+upsun repo:ls --app x	inert
+upsun repo:ls --commit x	inert
+upsun repo:ls --directories	inert
+upsun repo:ls --directories --app x	inert
+upsun repo:ls --directories --files	inert
+upsun repo:ls --directories x	inert
+upsun repo:ls --environment x	inert
+upsun repo:ls --files	inert
+upsun repo:ls --git-style	inert
+upsun repo:ls --help	inert
+upsun repo:ls --project x	inert
+upsun repo:ls -A x	inert
+upsun repo:ls -c x	inert
+upsun repo:ls -d	inert
+upsun repo:ls -e x	inert
+upsun repo:ls -h	inert
+upsun repo:ls -p x	inert
+upsun repo:ls x	inert
+upsun repo:read	inert
+upsun repo:read --app x	inert
+upsun repo:read --commit x	inert
+upsun repo:read --environment x	inert
+upsun repo:read --help	inert
+upsun repo:read --help --app x	inert
+upsun repo:read --help -h	inert
+upsun repo:read --help x	inert
+upsun repo:read --project x	inert
+upsun repo:read -A x	inert
+upsun repo:read -c x	inert
+upsun repo:read -e x	inert
+upsun repo:read -h	inert
+upsun repo:read -p x	inert
+upsun repo:read x	inert
+upsun route:get	inert
+upsun route:get --app x	inert
+upsun route:get --environment x	inert
+upsun route:get --format x	inert
+upsun route:get --help	inert
+upsun route:get --help --app x	inert
+upsun route:get --help --primary	inert
+upsun route:get --help x	inert
+upsun route:get --id x	inert
+upsun route:get --primary	inert
+upsun route:get --project x	inert
+upsun route:get --property x	inert
+upsun route:get -1	inert
+upsun route:get -A x	inert
+upsun route:get -P x	inert
+upsun route:get -e x	inert
+upsun route:get -h	inert
+upsun route:get -p x	inert
+upsun route:get x	inert
+upsun route:list	inert
+upsun route:list --columns x	inert
+upsun route:list --environment x	inert
+upsun route:list --format x	inert
+upsun route:list --help	inert
+upsun route:list --help --columns x	inert
+upsun route:list --help --no-header	inert
+upsun route:list --help x	inert
+upsun route:list --no-header	inert
+upsun route:list --project x	inert
+upsun route:list -c x	inert
+upsun route:list -e x	inert
+upsun route:list -h	inert
+upsun route:list -p x	inert
+upsun route:list x	inert
+upsun routes	inert
+upsun routes --columns x	inert
+upsun routes --environment x	inert
+upsun routes --format x	inert
+upsun routes --help	inert
+upsun routes --help --columns x	inert
+upsun routes --help --no-header	inert
+upsun routes --help x	inert
+upsun routes --no-header	inert
+upsun routes --project x	inert
+upsun routes -c x	inert
+upsun routes -e x	inert
+upsun routes -h	inert
+upsun routes -p x	inert
+upsun routes x	inert
+upsun scp	denied
+upsun scp x	denied
+upsun self:install	denied
+upsun self:install x	denied
+upsun self:stats	denied
+upsun self:stats x	denied
+upsun self:update	denied
+upsun self:update x	denied
+upsun server:run	denied
+upsun server:run x	denied
+upsun server:start	denied
+upsun server:start x	denied
+upsun server:stop	denied
+upsun server:stop x	denied
+upsun service:list	inert
+upsun service:list --columns x	inert
+upsun service:list --environment x	inert
+upsun service:list --format x	inert
+upsun service:list --help	inert
+upsun service:list --help --columns x	inert
+upsun service:list --help --no-header	inert
+upsun service:list --help x	inert
+upsun service:list --no-header	inert
+upsun service:list --project x	inert
+upsun service:list --refresh	inert
+upsun service:list -c x	inert
+upsun service:list -e x	inert
+upsun service:list -h	inert
+upsun service:list -p x	inert
+upsun service:list x	inert
+upsun service:mongo:dump	denied
+upsun service:mongo:dump x	denied
+upsun service:mongo:export	denied
+upsun service:mongo:export x	denied
+upsun service:mongo:restore	denied
+upsun service:mongo:restore x	denied
+upsun service:mongo:shell	denied
+upsun service:mongo:shell x	denied
+upsun service:redis-cli	denied
+upsun service:redis-cli x	denied
+upsun service:valkey-cli	denied
+upsun service:valkey-cli x	denied
+upsun services	inert
+upsun services --columns x	inert
+upsun services --environment x	inert
+upsun services --format x	inert
+upsun services --help	inert
+upsun services --help --columns x	inert
+upsun services --help --no-header	inert
+upsun services --help x	inert
+upsun services --no-header	inert
+upsun services --project x	inert
+upsun services --refresh	inert
+upsun services -c x	inert
+upsun services -e x	inert
+upsun services -h	inert
+upsun services -p x	inert
+upsun services x	inert
+upsun set-remote	safe-write
+upsun set-remote --help	safe-write
+upsun set-remote --help -h	safe-write
+upsun set-remote --help x	safe-write
+upsun set-remote -h	safe-write
+upsun set-remote x	safe-write
+upsun snapshot:create	denied
+upsun snapshot:create x	denied
+upsun snapshot:get	denied
+upsun snapshot:get x	denied
+upsun snapshot:list	denied
+upsun snapshot:list x	denied
+upsun snapshot:restore	denied
+upsun snapshot:restore x	denied
+upsun source-operation:list	inert
+upsun source-operation:list --environment x	inert
+upsun source-operation:list --format x	inert
+upsun source-operation:list --help	inert
+upsun source-operation:list --help --environment x	inert
+upsun source-operation:list --help -h	inert
+upsun source-operation:list --help x	inert
+upsun source-operation:list --project x	inert
+upsun source-operation:list -e x	inert
+upsun source-operation:list -h	inert
+upsun source-operation:list -p x	inert
+upsun source-operation:list x	inert
+upsun source-operation:run	denied
+upsun source-operation:run x	denied
+upsun ssh	denied
+upsun ssh x	denied
+upsun ssh-cert:load	safe-write
+upsun ssh-cert:load --help	safe-write
+upsun ssh-cert:load --help --new	safe-write
+upsun ssh-cert:load --help x	safe-write
+upsun ssh-cert:load --new	safe-write
+upsun ssh-cert:load --refresh	safe-write
+upsun ssh-cert:load -h	safe-write
+upsun ssh-cert:load x	safe-write
+upsun ssh-key:add	denied
+upsun ssh-key:add x	denied
+upsun ssh-key:delete	denied
+upsun ssh-key:delete x	denied
+upsun ssh-key:list	inert
+upsun ssh-key:list --columns x	inert
+upsun ssh-key:list --format x	inert
+upsun ssh-key:list --help	inert
+upsun ssh-key:list --help --columns x	inert
+upsun ssh-key:list --help -h	inert
+upsun ssh-key:list --help x	inert
+upsun ssh-key:list -c x	inert
+upsun ssh-key:list -h	inert
+upsun ssh-key:list x	inert
+upsun ssh-keys	inert
+upsun ssh-keys --columns x	inert
+upsun ssh-keys --format x	inert
+upsun ssh-keys --help	inert
+upsun ssh-keys --help --columns x	inert
+upsun ssh-keys --help -h	inert
+upsun ssh-keys --help x	inert
+upsun ssh-keys -c x	inert
+upsun ssh-keys -h	inert
+upsun ssh-keys x	inert
+upsun subscription:info	inert
+upsun subscription:info --format x	inert
+upsun subscription:info --help	inert
+upsun subscription:info --help --format x	inert
+upsun subscription:info --help -h	inert
+upsun subscription:info --help x	inert
+upsun subscription:info --project x	inert
+upsun subscription:info --property x	inert
+upsun subscription:info -P x	inert
+upsun subscription:info -h	inert
+upsun subscription:info -p x	inert
+upsun subscription:info x	inert
+upsun synchronize	denied
+upsun synchronize x	denied
+upsun team:create	denied
+upsun team:create x	denied
+upsun team:delete	denied
+upsun team:delete x	denied
+upsun team:get	inert
+upsun team:get --format x	inert
+upsun team:get --help	inert
+upsun team:get --help --format x	inert
+upsun team:get --help -h	inert
+upsun team:get --help x	inert
+upsun team:get --org x	inert
+upsun team:get --property x	inert
+upsun team:get --team x	inert
+upsun team:get -P x	inert
+upsun team:get -h	inert
+upsun team:get -o x	inert
+upsun team:get x	inert
+upsun team:list	inert
+upsun team:list --columns x	inert
+upsun team:list --format x	inert
+upsun team:list --help	inert
+upsun team:list --help --columns x	inert
+upsun team:list --help -h	inert
+upsun team:list --help x	inert
+upsun team:list --org x	inert
+upsun team:list --sort x	inert
+upsun team:list -c x	inert
+upsun team:list -h	inert
+upsun team:list -o x	inert
+upsun team:list x	inert
+upsun team:project:add	denied
+upsun team:project:add x	denied
+upsun team:project:delete	denied
+upsun team:project:delete x	denied
+upsun team:project:list	inert
+upsun team:project:list --columns x	inert
+upsun team:project:list --format x	inert
+upsun team:project:list --help	inert
+upsun team:project:list --help --columns x	inert
+upsun team:project:list --help -h	inert
+upsun team:project:list --help x	inert
+upsun team:project:list --org x	inert
+upsun team:project:list --team x	inert
+upsun team:project:list -c x	inert
+upsun team:project:list -h	inert
+upsun team:project:list -o x	inert
+upsun team:project:list x	inert
+upsun team:update	denied
+upsun team:update x	denied
+upsun team:user:add	denied
+upsun team:user:add x	denied
+upsun team:user:delete	denied
+upsun team:user:delete x	denied
+upsun team:user:list	inert
+upsun team:user:list --columns x	inert
+upsun team:user:list --format x	inert
+upsun team:user:list --help	inert
+upsun team:user:list --help --columns x	inert
+upsun team:user:list --help -h	inert
+upsun team:user:list --help x	inert
+upsun team:user:list --org x	inert
+upsun team:user:list --team x	inert
+upsun team:user:list -c x	inert
+upsun team:user:list -h	inert
+upsun team:user:list -o x	inert
+upsun team:user:list x	inert
+upsun team:user:update	denied
+upsun team:user:update x	denied
+upsun teams	inert
+upsun teams --columns x	inert
+upsun teams --format x	inert
+upsun teams --help	inert
+upsun teams --help --columns x	inert
+upsun teams --help -h	inert
+upsun teams --help x	inert
+upsun teams --org x	inert
+upsun teams --sort x	inert
+upsun teams -c x	inert
+upsun teams -h	inert
+upsun teams -o x	inert
+upsun teams x	inert
+upsun tunnel:close	denied
+upsun tunnel:close x	denied
+upsun tunnel:info	inert
+upsun tunnel:info --app x	inert
+upsun tunnel:info --encode	inert
+upsun tunnel:info --encode --app x	inert
+upsun tunnel:info --encode --help	inert
+upsun tunnel:info --encode x	inert
+upsun tunnel:info --environment x	inert
+upsun tunnel:info --format x	inert
+upsun tunnel:info --help	inert
+upsun tunnel:info --project x	inert
+upsun tunnel:info --property x	inert
+upsun tunnel:info --relationship x	inert
+upsun tunnel:info -A x	inert
+upsun tunnel:info -P x	inert
+upsun tunnel:info -c	inert
+upsun tunnel:info -e x	inert
+upsun tunnel:info -h	inert
+upsun tunnel:info -p x	inert
+upsun tunnel:info -r x	inert
+upsun tunnel:info x	inert
+upsun tunnel:list	inert
+upsun tunnel:list --all	inert
+upsun tunnel:list --all --app x	inert
+upsun tunnel:list --all --help	inert
+upsun tunnel:list --all x	inert
+upsun tunnel:list --app x	inert
+upsun tunnel:list --environment x	inert
+upsun tunnel:list --format x	inert
+upsun tunnel:list --help	inert
+upsun tunnel:list --project x	inert
+upsun tunnel:list -A x	inert
+upsun tunnel:list -a	inert
+upsun tunnel:list -e x	inert
+upsun tunnel:list -h	inert
+upsun tunnel:list -p x	inert
+upsun tunnel:list x	inert
+upsun tunnel:open	denied
+upsun tunnel:open x	denied
+upsun tunnel:single	denied
+upsun tunnel:single x	denied
+upsun tunnels	inert
+upsun tunnels --all	inert
+upsun tunnels --all --app x	inert
+upsun tunnels --all --help	inert
+upsun tunnels --all x	inert
+upsun tunnels --app x	inert
+upsun tunnels --environment x	inert
+upsun tunnels --format x	inert
+upsun tunnels --help	inert
+upsun tunnels --project x	inert
+upsun tunnels -A x	inert
+upsun tunnels -a	inert
+upsun tunnels -e x	inert
+upsun tunnels -h	inert
+upsun tunnels -p x	inert
+upsun tunnels x	inert
+upsun url	inert
+upsun url --browser	inert
+upsun url --browser --environment x	inert
+upsun url --browser --help	inert
+upsun url --browser x	inert
+upsun url --environment x	inert
+upsun url --help	inert
+upsun url --pipe	inert
+upsun url --primary x	inert
+upsun url --project x	inert
+upsun url -1 x	inert
+upsun url -e x	inert
+upsun url -h	inert
+upsun url -p x	inert
+upsun url x	inert
+upsun user:add	denied
+upsun user:add x	denied
+upsun user:delete	denied
+upsun user:delete x	denied
+upsun user:get	inert
+upsun user:get --email x	inert
+upsun user:get --format x	inert
+upsun user:get --help	inert
+upsun user:get --help --email x	inert
+upsun user:get --help --level	inert
+upsun user:get --help x	inert
+upsun user:get --level	inert
+upsun user:get --project x	inert
+upsun user:get --property x	inert
+upsun user:get -P x	inert
+upsun user:get -h	inert
+upsun user:get -l x	inert
+upsun user:get -p x	inert
+upsun user:get x	inert
+upsun user:list	inert
+upsun user:list --columns x	inert
+upsun user:list --format x	inert
+upsun user:list --help	inert
+upsun user:list --help --columns x	inert
+upsun user:list --help --no-header	inert
+upsun user:list --help x	inert
+upsun user:list --no-header	inert
+upsun user:list --project x	inert
+upsun user:list -c x	inert
+upsun user:list -h	inert
+upsun user:list -p x	inert
+upsun user:list x	inert
+upsun user:update	denied
+upsun user:update x	denied
+upsun users	inert
+upsun users --columns x	inert
+upsun users --format x	inert
+upsun users --help	inert
+upsun users --help --columns x	inert
+upsun users --help --no-header	inert
+upsun users --help x	inert
+upsun users --no-header	inert
+upsun users --project x	inert
+upsun users -c x	inert
+upsun users -h	inert
+upsun users -p x	inert
+upsun users x	inert
+upsun valkey-cli	denied
+upsun valkey-cli x	denied
+upsun variable:create	denied
+upsun variable:create x	denied
+upsun variable:delete	denied
+upsun variable:delete x	denied
+upsun variable:get	denied
+upsun variable:get x	denied
+upsun variable:list	inert
+upsun variable:list --columns x	inert
+upsun variable:list --environment x	inert
+upsun variable:list --format x	inert
+upsun variable:list --help	inert
+upsun variable:list --help --columns x	inert
+upsun variable:list --help --no-header	inert
+upsun variable:list --help x	inert
+upsun variable:list --no-header	inert
+upsun variable:list --project x	inert
+upsun variable:list -c x	inert
+upsun variable:list -e x	inert
+upsun variable:list -h	inert
+upsun variable:list -p x	inert
+upsun variable:list x	inert
+upsun variable:update	denied
+upsun variable:update x	denied
+upsun variables	inert
+upsun variables --columns x	inert
+upsun variables --environment x	inert
+upsun variables --format x	inert
+upsun variables --help	inert
+upsun variables --help --columns x	inert
+upsun variables --help --no-header	inert
+upsun variables --help x	inert
+upsun variables --no-header	inert
+upsun variables --project x	inert
+upsun variables -c x	inert
+upsun variables -e x	inert
+upsun variables -h	inert
+upsun variables -p x	inert
+upsun variables x	inert
+upsun vars	inert
+upsun vars --columns x	inert
+upsun vars --environment x	inert
+upsun vars --format x	inert
+upsun vars --help	inert
+upsun vars --help --columns x	inert
+upsun vars --help --no-header	inert
+upsun vars --help x	inert
+upsun vars --no-header	inert
+upsun vars --project x	inert
+upsun vars -c x	inert
+upsun vars -e x	inert
+upsun vars -h	inert
+upsun vars -p x	inert
+upsun vars x	inert
+upsun vget	denied
+upsun vget x	denied
+upsun vset	denied
+upsun vset x	denied
+upsun vupdate	denied
+upsun vupdate x	denied
+upsun web	inert
+upsun web --help	inert
+upsun web --help --project x	inert
+upsun web --help -h	inert
+upsun web --help x	inert
+upsun web --project x	inert
+upsun web -h	inert
+upsun web -p x	inert
+upsun web x	inert
+upsun worker:list	inert
+upsun worker:list --columns x	inert
+upsun worker:list --environment x	inert
+upsun worker:list --format x	inert
+upsun worker:list --help	inert
+upsun worker:list --help --columns x	inert
+upsun worker:list --help --no-header	inert
+upsun worker:list --help x	inert
+upsun worker:list --no-header	inert
+upsun worker:list --project x	inert
+upsun worker:list -c x	inert
+upsun worker:list -e x	inert
+upsun worker:list -h	inert
+upsun worker:list -p x	inert
+upsun worker:list x	inert
+upsun workers	inert
+upsun workers --columns x	inert
+upsun workers --environment x	inert
+upsun workers --format x	inert
+upsun workers --help	inert
+upsun workers --help --columns x	inert
+upsun workers --help --no-header	inert
+upsun workers --help x	inert
+upsun workers --no-header	inert
+upsun workers --project x	inert
+upsun workers -c x	inert
+upsun workers -e x	inert
+upsun workers -h	inert
+upsun workers -p x	inert
+upsun workers x	inert
+upsun x	denied
+upsun xdebug	denied
+upsun xdebug x	denied
+uptime	inert
+uptime --help	inert
+uptime --help --pretty	inert
+uptime --help x	denied
+uptime --pretty	inert
+uptime --since	inert
+uptime --version	inert
+uptime -V	inert
+uptime -h	inert
+uptime -p	inert
+uptime -s	inert
+uptime x	denied
+usdcat	denied
+usdcat --flatten	safe-write
+usdcat --flatten --flattenLayerStack	safe-write
+usdcat --flatten --layerMetadata x	safe-write
+usdcat --flatten x	safe-write
+usdcat --flattenLayerStack	safe-write
+usdcat --help	safe-write
+usdcat --layerMetadata x	safe-write
+usdcat --loadOnly	safe-write
+usdcat --mask x	safe-write
+usdcat --out x	safe-write
+usdcat --skipSourceFileComment	safe-write
+usdcat --usdFormat x	safe-write
+usdcat --validate	safe-write
+usdcat --version	denied
+usdcat -h	safe-write
+usdcat -o x	safe-write
+usdcat x	safe-write
+usdchecker	denied
+usdchecker --arkit	inert
+usdchecker --arkit --dumpRules	inert
+usdchecker --arkit --out x	inert
+usdchecker --arkit x	inert
+usdchecker --dumpRules	inert
+usdchecker --help	inert
+usdchecker --out x	inert
+usdchecker --rootPackageOnly	inert
+usdchecker --skipVariants	inert
+usdchecker --strict	inert
+usdchecker --variantSets x	inert
+usdchecker --verbose	inert
+usdchecker --version	denied
+usdchecker -h	inert
+usdchecker -o x	inert
+usdchecker -p	inert
+usdchecker -s	inert
+usdchecker -v	inert
+usdchecker x	inert
+usdcrush	denied
+usdcrush --checkCompliance	safe-write
+usdcrush --checkCompliance --help	safe-write
+usdcrush --checkCompliance --out x	safe-write
+usdcrush --checkCompliance x	safe-write
+usdcrush --help	safe-write
+usdcrush --out x	safe-write
+usdcrush --verbose	safe-write
+usdcrush --version	denied
+usdcrush -h	safe-write
+usdcrush -o x	safe-write
+usdcrush -v	safe-write
+usdcrush x	safe-write
+usdextract	denied
+usdextract --help	safe-write
+usdextract --help --out x	safe-write
+usdextract --help --verbose	safe-write
+usdextract --help x	safe-write
+usdextract --out x	safe-write
+usdextract --verbose	safe-write
+usdextract --version	denied
+usdextract -h	safe-write
+usdextract -o x	safe-write
+usdextract -v	safe-write
+usdextract x	safe-write
+usdrecord	denied
+usdrecord --camera x	safe-write
+usdrecord --colorCorrectionMode x	safe-write
+usdrecord --complexity x	safe-write
+usdrecord --disableCameraLight	safe-write
+usdrecord --disableCameraLight --camera x	safe-write
+usdrecord --disableCameraLight --disableGpu	safe-write
+usdrecord --disableCameraLight x	safe-write
+usdrecord --disableGpu	safe-write
+usdrecord --enableDomeLightVisibility	safe-write
+usdrecord --frames x	safe-write
+usdrecord --help	safe-write
+usdrecord --imageWidth x	safe-write
+usdrecord --memstats x	safe-write
+usdrecord --purposes x	safe-write
+usdrecord --renderer x	safe-write
+usdrecord --traceFormat x	safe-write
+usdrecord --traceToFile x	safe-write
+usdrecord --version	denied
+usdrecord -h	safe-write
+usdrecord x	safe-write
+usdtree	denied
+usdtree --attributes	inert
+usdtree --attributes --flatten	inert
+usdtree --attributes x	inert
+usdtree --flatten	inert
+usdtree --help	inert
+usdtree --inactive	inert
+usdtree --metadata	inert
+usdtree --population	inert
+usdtree --simple	inert
+usdtree --unloaded	inert
+usdtree --version	denied
+usdtree -a	inert
+usdtree -f	inert
+usdtree -h	inert
+usdtree -i	inert
+usdtree -m	inert
+usdtree -p	inert
+usdtree -s	inert
+usdtree -u	inert
+usdtree x	inert
+usdzip	denied
+usdzip --arkitAsset x	safe-write
+usdzip --asset x	safe-write
+usdzip --checkCompliance	safe-write
+usdzip --checkCompliance --arkitAsset x	safe-write
+usdzip --checkCompliance --dump	safe-write
+usdzip --checkCompliance x	safe-write
+usdzip --dump	safe-write
+usdzip --help	safe-write
+usdzip --list	safe-write
+usdzip --recurse	safe-write
+usdzip --version	denied
+usdzip -d	safe-write
+usdzip -h	safe-write
+usdzip -l	safe-write
+usdzip -r	safe-write
+usdzip x	safe-write
+users	inert
+users --help	inert
+users --help --version	inert
+users --help x	inert
+users --version	inert
+users x	inert
+usql	denied
+usql --help	inert
+usql --help --version	inert
+usql --help x	denied
+usql --version	inert
+usql -V	inert
+usql x	denied
+uttype	inert
+uttype --all	inert
+uttype --all --conformsto x	inert
+uttype --all --help	inert
+uttype --all x	inert
+uttype --conformsto x	inert
+uttype --description x	inert
+uttype --extension x	inert
+uttype --help	inert
+uttype --mime-type x	inert
+uttype --tag x	inert
+uttype --verbose	inert
+uttype --version	denied
+uttype -h	inert
+uttype x	inert
+uudecode	denied
+uudecode --help	denied
+uudecode --version	denied
+uudecode -c	safe-write
+uudecode -c -i	safe-write
+uudecode -c -o x	safe-write
+uudecode -c x	safe-write
+uudecode -i	safe-write
+uudecode -m	safe-write
+uudecode -o x	safe-write
+uudecode -p	safe-write
+uudecode -r	safe-write
+uudecode -s	safe-write
+uudecode encoded.uu	safe-write
+uudecode x	safe-write
+uuencode	denied
+uuencode --help	denied
+uuencode --version	denied
+uuencode -m	safe-write
+uuencode -m -o x	safe-write
+uuencode -m -r	safe-write
+uuencode -m file.bin file.bin	safe-write
+uuencode -m x	safe-write
+uuencode -o x	safe-write
+uuencode -r	safe-write
+uuencode file.bin file.bin	safe-write
+uuencode x	safe-write
+uuidgen	inert
+uuidgen --help	inert
+uuidgen --help --md5 x	inert
+uuidgen --help --random	inert
+uuidgen --help x	denied
+uuidgen --md5 x	inert
+uuidgen --name x	inert
+uuidgen --namespace x	inert
+uuidgen --random	inert
+uuidgen --sha1 x	inert
+uuidgen --time	inert
+uuidgen --version	inert
+uuidgen -N x	inert
+uuidgen -V	inert
+uuidgen -h	inert
+uuidgen -m x	inert
+uuidgen -n x	inert
+uuidgen -r	inert
+uuidgen -s x	inert
+uuidgen -t	inert
+uuidgen x	denied
+uv	denied
+uv --help	inert
+uv --help --version	denied
+uv --help x	denied
+uv --version	inert
+uv -V	inert
+uv -h	inert
+uv pip	denied
+uv pip check	inert
+uv pip check --help	inert
+uv pip check --help --python x	inert
+uv pip check --help --verbose	inert
+uv pip check --help x	inert
+uv pip check --python x	inert
+uv pip check --verbose	inert
+uv pip check -h	inert
+uv pip check -v	inert
+uv pip check x	inert
+uv pip freeze	inert
+uv pip freeze --help	inert
+uv pip freeze --help --python x	inert
+uv pip freeze --help --verbose	inert
+uv pip freeze --help x	inert
+uv pip freeze --python x	inert
+uv pip freeze --verbose	inert
+uv pip freeze -h	inert
+uv pip freeze -v	inert
+uv pip freeze x	inert
+uv pip list	inert
+uv pip list --editable	inert
+uv pip list --editable --exclude x	inert
+uv pip list --editable --exclude-editable	inert
+uv pip list --editable x	inert
+uv pip list --exclude x	inert
+uv pip list --exclude-editable	inert
+uv pip list --format x	inert
+uv pip list --help	inert
+uv pip list --outdated	inert
+uv pip list --python x	inert
+uv pip list --strict	inert
+uv pip list -h	inert
+uv pip list x	inert
+uv pip show	denied
+uv pip show --files	inert
+uv pip show --files --help	inert
+uv pip show --files --python x	inert
+uv pip show --files x	inert
+uv pip show --help	inert
+uv pip show --python x	inert
+uv pip show --verbose	inert
+uv pip show -h	inert
+uv pip show -v	inert
+uv pip show x	inert
+uv pip x	denied
+uv python	denied
+uv python list	inert
+uv python list --help	inert
+uv python list --help --python x	inert
+uv python list --help --verbose	inert
+uv python list --help x	inert
+uv python list --python x	inert
+uv python list --verbose	inert
+uv python list -h	inert
+uv python list -v	inert
+uv python list x	inert
+uv python x	denied
+uv tool	denied
+uv tool list	inert
+uv tool list --help	inert
+uv tool list --help --python x	inert
+uv tool list --help --verbose	inert
+uv tool list --help x	inert
+uv tool list --python x	inert
+uv tool list --verbose	inert
+uv tool list -h	inert
+uv tool list -v	inert
+uv tool list x	inert
+uv tool x	denied
+uv x	denied

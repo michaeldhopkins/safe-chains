@@ -1,0 +1,237 @@
+7z	denied
+7z --	safe-write
+7z -- --help	safe-write
+7z -- -ai x	safe-write
+7z -- x	safe-write
+7z --help	safe-write
+7z --version	denied
+7z -?	safe-write
+7z -ai x	safe-write
+7z -an	safe-write
+7z -aoa	safe-write
+7z -aos	safe-write
+7z -aot	safe-write
+7z -aou	safe-write
+7z -ax x	safe-write
+7z -bb	safe-write
+7z -bb x	safe-write
+7z -bd	safe-write
+7z -bse0	safe-write
+7z -bse1	safe-write
+7z -bse2	safe-write
+7z -bso0	safe-write
+7z -bso1	safe-write
+7z -bso2	safe-write
+7z -bsp0	safe-write
+7z -bsp1	safe-write
+7z -bsp2	safe-write
+7z -h	safe-write
+7z -i x	safe-write
+7z -m x	safe-write
+7z -mhe	safe-write
+7z -mhe x	safe-write
+7z -mhe=off	safe-write
+7z -mhe=on	safe-write
+7z -mmt	safe-write
+7z -mmt x	safe-write
+7z -mqs	safe-write
+7z -o x	safe-write
+7z -p x	safe-write
+7z -px x	safe-write
+7z -r	safe-write
+7z -r x	safe-write
+7z -r-	safe-write
+7z -r0	safe-write
+7z -sccUTF-8	safe-write
+7z -scrc	safe-write
+7z -scs x	safe-write
+7z -sdel	safe-write
+7z -sdel x	safe-write
+7z -sfx	safe-write
+7z -snh	safe-write
+7z -sni	safe-write
+7z -snl	safe-write
+7z -sns	safe-write
+7z -so	safe-write
+7z -spd	safe-write
+7z -spe	safe-write
+7z -spe x	safe-write
+7z -spf	safe-write
+7z -spl	safe-write
+7z -ssc	safe-write
+7z -ssc-	safe-write
+7z -ssp	safe-write
+7z -stm x	safe-write
+7z -stx	safe-write
+7z -stx x	safe-write
+7z -stx-	safe-write
+7z -t x	safe-write
+7z -t7z	safe-write
+7z -tar	safe-write
+7z -tbzip2	safe-write
+7z -tgzip	safe-write
+7z -tlzma	safe-write
+7z -txz	safe-write
+7z -tzip	safe-write
+7z -w x	safe-write
+7z -x x	safe-write
+7z -y	safe-write
+7z x	safe-write
+7za	denied
+7za --	safe-write
+7za -- --help	safe-write
+7za -- -ai x	safe-write
+7za -- x	safe-write
+7za --help	safe-write
+7za --version	denied
+7za -?	safe-write
+7za -ai x	safe-write
+7za -an	safe-write
+7za -aoa	safe-write
+7za -aos	safe-write
+7za -aot	safe-write
+7za -aou	safe-write
+7za -ax x	safe-write
+7za -bb	safe-write
+7za -bb x	safe-write
+7za -bd	safe-write
+7za -bse0	safe-write
+7za -bse1	safe-write
+7za -bse2	safe-write
+7za -bso0	safe-write
+7za -bso1	safe-write
+7za -bso2	safe-write
+7za -bsp0	safe-write
+7za -bsp1	safe-write
+7za -bsp2	safe-write
+7za -h	safe-write
+7za -i x	safe-write
+7za -m x	safe-write
+7za -mhe	safe-write
+7za -mhe x	safe-write
+7za -mhe=off	safe-write
+7za -mhe=on	safe-write
+7za -mmt	safe-write
+7za -mmt x	safe-write
+7za -mqs	safe-write
+7za -o x	safe-write
+7za -p x	safe-write
+7za -px x	safe-write
+7za -r	safe-write
+7za -r x	safe-write
+7za -r-	safe-write
+7za -r0	safe-write
+7za -sccUTF-8	safe-write
+7za -scrc	safe-write
+7za -scs x	safe-write
+7za -sdel	safe-write
+7za -sdel x	safe-write
+7za -sfx	safe-write
+7za -snh	safe-write
+7za -sni	safe-write
+7za -snl	safe-write
+7za -sns	safe-write
+7za -so	safe-write
+7za -spd	safe-write
+7za -spe	safe-write
+7za -spe x	safe-write
+7za -spf	safe-write
+7za -spl	safe-write
+7za -ssc	safe-write
+7za -ssc-	safe-write
+7za -ssp	safe-write
+7za -stm x	safe-write
+7za -stx	safe-write
+7za -stx x	safe-write
+7za -stx-	safe-write
+7za -t x	safe-write
+7za -t7z	safe-write
+7za -tar	safe-write
+7za -tbzip2	safe-write
+7za -tgzip	safe-write
+7za -tlzma	safe-write
+7za -txz	safe-write
+7za -tzip	safe-write
+7za -w x	safe-write
+7za -x x	safe-write
+7za -y	safe-write
+7za x	safe-write
+7zz	denied
+7zz --	safe-write
+7zz -- --help	safe-write
+7zz -- -ai x	safe-write
+7zz -- x	safe-write
+7zz --help	safe-write
+7zz --version	denied
+7zz -?	safe-write
+7zz -ai x	safe-write
+7zz -an	safe-write
+7zz -aoa	safe-write
+7zz -aos	safe-write
+7zz -aot	safe-write
+7zz -aou	safe-write
+7zz -ax x	safe-write
+7zz -bb	safe-write
+7zz -bb x	safe-write
+7zz -bd	safe-write
+7zz -bse0	safe-write
+7zz -bse1	safe-write
+7zz -bse2	safe-write
+7zz -bso0	safe-write
+7zz -bso1	safe-write
+7zz -bso2	safe-write
+7zz -bsp0	safe-write
+7zz -bsp1	safe-write
+7zz -bsp2	safe-write
+7zz -h	safe-write
+7zz -i x	safe-write
+7zz -m x	safe-write
+7zz -mhe	safe-write
+7zz -mhe x	safe-write
+7zz -mhe=off	safe-write
+7zz -mhe=on	safe-write
+7zz -mmt	safe-write
+7zz -mmt x	safe-write
+7zz -mqs	safe-write
+7zz -o x	safe-write
+7zz -p x	safe-write
+7zz -px x	safe-write
+7zz -r	safe-write
+7zz -r x	safe-write
+7zz -r-	safe-write
+7zz -r0	safe-write
+7zz -sccUTF-8	safe-write
+7zz -scrc	safe-write
+7zz -scs x	safe-write
+7zz -sdel	safe-write
+7zz -sdel x	safe-write
+7zz -sfx	safe-write
+7zz -snh	safe-write
+7zz -sni	safe-write
+7zz -snl	safe-write
+7zz -sns	safe-write
+7zz -so	safe-write
+7zz -spd	safe-write
+7zz -spe	safe-write
+7zz -spe x	safe-write
+7zz -spf	safe-write
+7zz -spl	safe-write
+7zz -ssc	safe-write
+7zz -ssc-	safe-write
+7zz -ssp	safe-write
+7zz -stm x	safe-write
+7zz -stx	safe-write
+7zz -stx x	safe-write
+7zz -stx-	safe-write
+7zz -t x	safe-write
+7zz -t7z	safe-write
+7zz -tar	safe-write
+7zz -tbzip2	safe-write
+7zz -tgzip	safe-write
+7zz -tlzma	safe-write
+7zz -txz	safe-write
+7zz -tzip	safe-write
+7zz -w x	safe-write
+7zz -x x	safe-write
+7zz -y	safe-write
+7zz x	safe-write

