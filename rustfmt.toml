@@ -1,0 +1,9 @@
+# The style the tree was written in before rustfmt was enforced, written down so a new toolchain
+# cannot reformat code nobody touched. The code runs long lines and packs data tables several
+# entries to a line; 140 is the narrowest width at which the one-time reformat grows none of the
+# files pinned by tests/file_length.rs, and the array threshold keeps short-entry tables packed.
+style_edition = "2024"
+max_width = 140
+use_small_heuristics = "Max"
+chain_width = 100
+short_array_element_width_threshold = 48
