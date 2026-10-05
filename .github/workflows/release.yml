@@ -44,9 +44,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy, rustfmt
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
 
       - uses: Swatinem/rust-cache@v2
 
@@ -112,9 +112,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.target }}
 
       - name: Install cross
         if: matrix.target == 'aarch64-unknown-linux-gnu'
@@ -223,7 +225,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: dtolnay/rust-toolchain@stable
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
 
       - name: Publish to crates.io
         run: cargo publish || echo "::warning::Publish failed (version may already exist)"
@@ -297,7 +301,9 @@ jobs:
 
       # generate-docs.sh builds the binary and runs --generate-book before
       # mdbook, so the docs build needs the full toolchain.
-      - uses: dtolnay/rust-toolchain@stable
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@mdbook
 

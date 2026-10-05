@@ -1,0 +1,8 @@
+# Pinned so the gates are reproducible: `clippy -D warnings` and `cargo fmt --check` both fail on a
+# toolchain bump nobody asked for, since a new stable can add a lint or change a wrapping rule. A
+# bump is a deliberate commit that fixes what the new release finds. Move to each new stable within
+# 30 days. CI installs exactly this with
+# `rustup toolchain install`, which reads this file.
+[toolchain]
+channel = "1.99.0"
+components = ["clippy", "rustfmt"]

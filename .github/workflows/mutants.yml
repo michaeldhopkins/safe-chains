@@ -38,7 +38,9 @@ jobs:
           # Need history to diff against the base ref (PR) or the previous commit (push).
           fetch-depth: 0
 
-      - uses: dtolnay/rust-toolchain@stable
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
 
       - uses: Swatinem/rust-cache@v2
 
@@ -208,7 +210,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: dtolnay/rust-toolchain@stable
+      # The version and components come from rust-toolchain.toml.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
 
       - uses: Swatinem/rust-cache@v2
 

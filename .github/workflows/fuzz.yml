@@ -88,7 +88,7 @@ jobs:
       # the seeds into the saved corpus, so the replay gate holds them too.
       - name: Generate seeds + dictionary
         run: |
-          cargo run --bin gen-fuzz-corpus --features fuzz-gen
+          cargo +nightly run --bin gen-fuzz-corpus --features fuzz-gen
           test -s fuzz/dict/parse.dict
           test "$(find fuzz/corpus/parse -name 'gen-*' | wc -l)" -gt 0
 
