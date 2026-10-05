@@ -76,3 +76,26 @@ jobs:
       # Every tracked shell script, so a new one is checked the day it lands.
       - name: shellcheck
         run: git ls-files -z '*.sh' | xargs -0 shellcheck
+
+  # The published crate declares `rust-version`; this is what makes that claim true.
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the declared minimum Rust
+        run: |
+          msrv=$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)
+          test -n "$msrv"
+          rustup toolchain install "$msrv" --profile minimal
+          echo "MSRV=$msrv" >> "$GITHUB_ENV"
+          # Every later step, rust-cache's key included, runs on the MSRV rather than installing
+          # the toolchain rust-toolchain.toml pins.
+          echo "RUSTUP_TOOLCHAIN=$msrv" >> "$GITHUB_ENV"
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo check on the MSRV
+        run: cargo +"$MSRV" check --locked

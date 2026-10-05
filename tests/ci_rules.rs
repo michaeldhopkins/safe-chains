@@ -133,3 +133,17 @@ fn ci_shellchecks_every_tracked_script() {
         "ci.yml does not shellcheck every tracked .sh file"
     );
 }
+
+#[test]
+fn ci_checks_the_declared_rust_version() {
+    let manifest = fs::read_to_string(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("Cargo.toml")).expect("Cargo.toml");
+    assert!(manifest.lines().any(|l| l.starts_with("rust-version = \"")), "Cargo.toml declares no rust-version");
+    let all = workflows();
+    let ci = &all.iter().find(|(n, _)| n == "ci.yml").expect("ci.yml").1;
+    assert!(ci.contains("sed -n 's/^rust-version"), "ci.yml does not read rust-version from Cargo.toml");
+    assert!(
+        ci.contains("echo \"RUSTUP_TOOLCHAIN=$msrv\" >> \"$GITHUB_ENV\""),
+        "the MSRV job must run every step on the MSRV, or rust-cache installs the pinned toolchain behind its back"
+    );
+    assert!(ci.lines().any(|l| l.trim() == "run: cargo +\"$MSRV\" check --locked"), "ci.yml does not check on the MSRV");
+}
