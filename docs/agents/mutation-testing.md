@@ -40,6 +40,10 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   showed that a PIPELINE is one segment to `cst::explain`, so `facet_breakdown("cat x | rm -rf /")`
   still gets the flat split the guard exists to prevent (a diagnostic only, not a verdict; see
   TODO.md).
+- **CI slice of run 37348486489 (2026-10-05):** 3 MISSED of 10 viable: `print_docs` emptied,
+  `--explain`'s exit code inverted, and `||` to `&&` in `canonicalize_home`'s no-home guard. Killed
+  by `list_commands_prints_the_command_reference` and `explain_exits_with_the_verdict` in
+  `tests/cli_gate.rs`, and the property `without_a_usable_home_every_word_is_left_alone`.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds

@@ -727,4 +727,16 @@ mod env_prefix_matching_tests {
         }
         assert!(checked > 0, "no rule/command pair matched — the property would be vacuous");
     }
+
+    proptest::proptest! {
+        /// An empty or root HOME means there is no home to canonicalize to. Expanding `~/x`
+        /// against one produced `/x`, a different file, so a grant for either would cover both.
+        #[test]
+        fn without_a_usable_home_every_word_is_left_alone(
+            text in "[~]/[a-z]{0,8}( [~]?/?[a-z.]{0,10}){0,4}",
+            home in proptest::prop_oneof![proptest::strategy::Just(""), proptest::strategy::Just("/")],
+        ) {
+            proptest::prop_assert_eq!(canonicalize_home(&text, home), text);
+        }
+    }
 }

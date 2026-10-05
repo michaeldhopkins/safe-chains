@@ -5,6 +5,10 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
+#[path = "support/hooks.rs"]
+mod hooks;
+use hooks::run_hook;
+
 /// Run the binary in claude-hook mode (bare, JSON on stdin) and return its stdout.
 ///
 /// `home` is required rather than inherited: the hook reads `~/.claude/settings.json` and
@@ -343,4 +347,24 @@ fn the_cli_and_the_hook_agree_in_the_same_directory() {
     // and prove nothing about the boundary.
     assert!(allowed_seen, "corpus must contain a command both entry points ALLOW");
     assert!(refused_seen, "corpus must contain a command both entry points REFUSE");
+}
+
+/// `--explain` is a gate as well as a report: scripts read its exit code the same way they read
+/// the bare gate's. Inverting it would report an approval as a refusal and the reverse.
+#[test]
+fn explain_exits_with_the_verdict() {
+    let (_, _, allowed) = run_hook(&["--explain", "echo hi"], "");
+    assert_eq!(allowed, 0, "--explain must exit 0 for an approved command");
+    let (_, _, refused) = run_hook(&["--explain", "rm -rf /"], "");
+    assert_eq!(refused, 1, "--explain must exit 1 for a refused command");
+}
+
+/// `--list-commands` prints the researched-command reference. An empty listing exits 0 too, so
+/// the exit code alone says nothing.
+#[test]
+fn list_commands_prints_the_command_reference() {
+    let (out, _, code) = run_hook(&["--list-commands"], "");
+    assert_eq!(code, 0, "--list-commands exits 0");
+    assert!(out.lines().any(|l| l == "### `git`"), "--list-commands must document git:\n{out}");
+    assert!(out.lines().filter(|l| l.starts_with("### ")).count() > 100, "--list-commands documented almost nothing");
 }
