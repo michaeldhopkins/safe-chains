@@ -8,7 +8,7 @@ name: Mutants
 #   slice    one rotating 1/512th of the whole tree, on pushes to main only
 #
 # Neither gates. Method: the `rust-mutation-testing` skill. This crate's numbers, N and why, and
-# what the slices have found: AGENTS.md, "Mutation testing". `.cargo/mutants.toml` selects the
+# what the slices have found: docs/agents/mutation-testing.md. `.cargo/mutants.toml` selects the
 # `mutants` profile (optimized dependencies) and the `fuzz-gen` feature for both jobs.
 on:
   pull_request:
@@ -179,7 +179,7 @@ jobs:
                   echo '```'
                   echo
                   echo 'Three legitimate responses: write a test that fails on it; judge it an'
-                  echo '*equivalent* mutant that cannot change behaviour (record why in AGENTS.md);'
+                  echo '*equivalent* mutant that cannot change behaviour (record why in docs/agents/mutation-testing.md);'
                   echo 'or exclude the code in `.cargo/mutants.toml` with a comment saying why.'
                 fi
                 ;;
@@ -197,7 +197,7 @@ jobs:
   # Old code nobody touches is never selected by --in-diff, so each push to main also runs one
   # rotating slice of the whole tree: shard k of N, k advancing with the run number. Every N
   # pushes the tree has been looked at once and no job runs long. The tree changes between
-  # slices, so coverage is approximate, which is fine. N is in AGENTS.md with how it was chosen.
+  # slices, so coverage is approximate, which is fine. N is in docs/agents/mutation-testing.md with how it was chosen.
   slice:
     name: Mutants, rotating slice
     if: github.event_name == 'push'

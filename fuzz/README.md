@@ -53,7 +53,7 @@ gate). `.github/workflows/fuzz.yml` bursts every target for 180s on each push to
 runner (ASan is happiest on Linux), merges the finds into the corpus and saves it for the replay.
 For a deeper run, trigger `fuzz.yml` from the Actions tab (`workflow_dispatch`) with a larger
 `max_total_time`; that run also renders the `parse` coverage report. There is no nightly: it was
-retired on 2026-09-26 (see AGENTS.md "Fuzzing").
+retired on 2026-09-26 (see docs/agents/fuzzing.md).
 
 ## Reproducibility
 

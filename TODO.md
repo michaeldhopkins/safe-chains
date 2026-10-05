@@ -786,7 +786,7 @@ that `[command.path_gate]` actually deserializes into is `src/pathgate.rs::Role`
 the same way; those two have diverged and the comment is wrong.
 
 All seven commands also gained `examples_safe`/`examples_denied` pinning both directions. Six of them
-had NO examples at all, so they were fuzz-coverage holes as well (AGENTS.md: un-exampled commands are
+had NO examples at all, so they were fuzz-coverage holes as well (docs/agents/fuzzing.md: un-exampled commands are
 never reached by the registry-derived seeds).
 
 ### Original report — confirmed live 2026-08-03
@@ -1658,7 +1658,7 @@ nothing against the bug class that actually dominates.
    already hand-written as guards (`FormCase` flag-form equivalence, the twin tag, the heredoc
    herestring equivalence) — they are the seed set.
 
-2. **A hook-envelope target** for `targets/*` (already noted in AGENTS.md §Fuzzing). Feed arbitrary
+2. **A hook-envelope target** for `targets/*` (already noted in docs/agents/fuzzing.md). Feed arbitrary
    bytes as an envelope to each target's `parse_input` + render path. The blank-command approval and
    the wrong-typed-key panic were both found by hand there; a target would have found both and keeps
    finding them as harnesses change. Note a subtlety: the interesting contract is not only
