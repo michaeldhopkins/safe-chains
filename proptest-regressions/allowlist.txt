@@ -5,3 +5,5 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc a169e7a2724a76a2138121e19f87c23467c5aa5e2605d1ba8d9c9fa816fd89a2 # shrinks to text = "~/", home = ""
+cc 936a9d79228efd1b184d693f1dd848cedc3965dfd3912b8fe5a60e442dd8fca1 # shrinks to parts = ["a", "a", "b"], text = "ab"
+cc a3cf19a238ce3948a88bf3d41816784717d5df2db8072542c5c02f22bd6ddde0 # shrinks to parts = ["a", "a", "a", "ab"], text = "aaab"

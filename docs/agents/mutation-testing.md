@@ -47,7 +47,10 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
 - **CI slice of run 37362532620:** 2 MISSED of 9 viable, both in `src/allowlist.rs`: the bare-`~`
   guard in `canonicalize_home` set to `false`, and `Matcher::is_empty` returning `true` (only ever
   asserted on empty matchers). Killed by `a_usable_home_expands_both_tilde_spellings` and a
-  non-empty assertion in `parse_exact_pattern` and `parse_legacy_colon_star`.
+  non-empty assertion in `parse_exact_pattern` and `parse_legacy_colon_star`. The next slice
+  (run 37365593962) missed `-` to `+` in `glob_matches`; a local run over the whole file then found
+  two more in its middle-piece loop. `a_glob_match_holds_every_piece` and
+  `a_glob_prefix_and_suffix_may_not_overlap` kill all three, and the file now has no survivors.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds

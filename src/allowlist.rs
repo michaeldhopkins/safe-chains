@@ -560,6 +560,33 @@ mod tests {
         assert!(p.matches_cmd(&cmd("npm test")));
         assert!(p.matches_cmd(&cmd("cargo test --release")));
     }
+
+    /// `ab*ba` names text that starts with `ab` and ends with `ba` as two separate pieces, so
+    /// `aba`, where they overlap, is not one of its matches.
+    #[test]
+    fn a_glob_prefix_and_suffix_may_not_overlap() {
+        let parts = ["ab".to_string(), "ba".to_string()];
+        assert!(!glob_matches(&parts, "aba"));
+        assert!(glob_matches(&parts, "abba"));
+        let repeated = ["a".to_string(), "b".to_string(), "b".to_string(), "c".to_string()];
+        assert!(!glob_matches(&repeated, "abc"), "one `b` cannot stand for both middle pieces");
+        assert!(glob_matches(&repeated, "abbc"));
+    }
+
+    proptest::proptest! {
+        /// Every literal piece of a glob appears in a match in its own place, so a match is never
+        /// shorter than the pieces put together.
+        #[test]
+        fn a_glob_match_holds_every_piece(
+            parts in proptest::collection::vec("[ab]{1,3}", 2..6),
+            text in "[ab]{0,8}",
+        ) {
+            if glob_matches(&parts, &text) {
+                let pieces: usize = parts.iter().map(String::len).sum();
+                proptest::prop_assert!(text.len() >= pieces, "{parts:?} matched {text:?}");
+            }
+        }
+    }
 }
 
 /// An allow-rule must cover the command AS TYPED, including any leading `VAR=value`.
