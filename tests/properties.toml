@@ -184,6 +184,7 @@ owed = [
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
+  "src/overreach_property_tests.rs::only_a_foreign_temp_path_is_reported_as_foreign_temp",
 ]
 "src/netloc.rs" = [
   "only_the_host_component_decides",
@@ -266,6 +267,7 @@ owed = [
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"
 "src/handler_property_tests.rs" = "the cross-handler property suite (#[cfg(test)] mod in lib.rs)"
+"src/overreach_property_tests.rs" = "the workspace_overreach property suite (#[cfg(test)] mod in lib.rs)"
 "src/registry/gate_consistency.rs" = "path-gate consistency tests (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/tests.rs" = "the registry test suite"
 "src/suggest/tests.rs" = "suggest's test suite"

@@ -68,6 +68,8 @@ mod envvars;
 mod handler_property_tests;
 mod handlers;
 pub mod netloc;
+#[cfg(test)]
+mod overreach_property_tests;
 pub mod parse;
 pub mod pathctx;
 pub mod pathgate;
