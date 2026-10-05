@@ -20,18 +20,8 @@
 use libfuzzer_sys::fuzz_target;
 
 const ADMIT_ROOTS: &[&str] = &[
-    "/usr/share",
-    "/usr/include",
-    "/usr/lib",
-    "/usr/local/share",
-    "/usr/local/lib",
-    "/opt/homebrew/share",
-    "/opt/homebrew/lib",
-    "/Library/Developer/CommandLineTools",
-    "/nix/store/abc",
-    "~/.cargo/registry",
-    "~/.rustup/toolchains",
-    "~/go/pkg/mod",
+    "/usr/share", "/usr/include", "/usr/lib", "/usr/local/share", "/usr/local/lib", "/opt/homebrew/share", "/opt/homebrew/lib",
+    "/Library/Developer/CommandLineTools", "/nix/store/abc", "~/.cargo/registry", "~/.rustup/toolchains", "~/go/pkg/mod",
     "~/.local/share/mise/installs",
 ];
 
@@ -49,8 +39,27 @@ fn is_transparent(tail: &str) -> bool {
                 || c.is_control()
                 || matches!(
                     c,
-                    '\'' | '"' | '`' | '\\' | '$' | '(' | ')' | ';' | '&' | '|' | '<' | '>' | '*'
-                        | '?' | '[' | ']' | '{' | '}' | '!' | '#' | '=' | '~'
+                    '\'' | '"'
+                        | '`'
+                        | '\\'
+                        | '$'
+                        | '('
+                        | ')'
+                        | ';'
+                        | '&'
+                        | '|'
+                        | '<'
+                        | '>'
+                        | '*'
+                        | '?'
+                        | '['
+                        | ']'
+                        | '{'
+                        | '}'
+                        | '!'
+                        | '#'
+                        | '='
+                        | '~'
                 )
         })
 }
@@ -67,19 +76,13 @@ fuzz_target!(|data: &[u8]| {
         // 1. No admit root may widen the credential shield, at any depth beneath it.
         for shield in SHIELDS {
             let path = format!("{root}/{shield}/{tail}");
-            assert!(
-                !safe_chains::is_safe_command(&format!("cat {path}")),
-                "an admit prefix widened the credential shield: `cat {path}`"
-            );
+            assert!(!safe_chains::is_safe_command(&format!("cat {path}")), "an admit prefix widened the credential shield: `cat {path}`");
         }
 
         // 2. The admit is read-only. Whatever the tail, a write to it must still refuse.
         let path = format!("{root}/{tail}");
         for write in [format!("rm -rf {path}"), format!("echo x > {path}")] {
-            assert!(
-                !safe_chains::is_safe_command(&write),
-                "a read admit granted a WRITE: `{write}`"
-            );
+            assert!(!safe_chains::is_safe_command(&write), "a read admit granted a WRITE: `{write}`");
         }
     }
 });

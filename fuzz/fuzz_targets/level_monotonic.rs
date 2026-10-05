@@ -34,9 +34,7 @@ fuzz_target!(|data: &[u8]| {
             let Some((threshold, engine_level)) = safe_chains::level_ceiling(name) else {
                 continue; // not a level this build knows; nothing to assert
             };
-            let allowed =
-                safe_chains::command_verdict_ceilinged(&command, threshold, engine_level)
-                    .is_allowed();
+            let allowed = safe_chains::command_verdict_ceilinged(&command, threshold, engine_level).is_allowed();
 
             if let Some((stricter_name, stricter_allowed)) = previous {
                 // The implication that matters: allowed at the STRICTER level implies allowed at

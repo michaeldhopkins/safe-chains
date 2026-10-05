@@ -28,40 +28,25 @@ fuzz_target!(|data: &[u8]| {
 
     // 1. The block we print and tell the user to add must be valid TOML on its own.
     let block = safe_chains::suggest::render_toml(&entries);
-    assert!(
-        toml::from_str::<toml::Value>(&block).is_ok(),
-        "render_toml produced invalid TOML for command={command:?}:\n{block}"
-    );
+    assert!(toml::from_str::<toml::Value>(&block).is_ok(), "render_toml produced invalid TOML for command={command:?}:\n{block}");
 
     // 2. The merged file we WRITE must parse. This is the roundtrip that matters: the pin we hand
     //    over is a hash of exactly these bytes, so a file that does not load makes the pin certify
     //    something unusable.
     let merged = safe_chains::suggest::merged_content("", &entries);
-    assert!(
-        toml::from_str::<toml::Value>(&merged).is_ok(),
-        "merged_content produced invalid TOML for command={command:?}:\n{merged}"
-    );
+    assert!(toml::from_str::<toml::Value>(&merged).is_ok(), "merged_content produced invalid TOML for command={command:?}:\n{merged}");
 
     // 3. Merging into an EXISTING valid config must keep it valid — appending is where a generator
     //    usually breaks the file it is extending.
     let existing = "[[command]]\nname = \"already-here\"\nmax_positional = 1\n";
     let appended = safe_chains::suggest::merged_content(existing, &entries);
-    assert!(
-        toml::from_str::<toml::Value>(&appended).is_ok(),
-        "merging into a valid config broke it for command={command:?}:\n{appended}"
-    );
-    assert!(
-        appended.contains("already-here"),
-        "merging DROPPED the user's existing entry for command={command:?}:\n{appended}"
-    );
+    assert!(toml::from_str::<toml::Value>(&appended).is_ok(), "merging into a valid config broke it for command={command:?}:\n{appended}");
+    assert!(appended.contains("already-here"), "merging DROPPED the user's existing entry for command={command:?}:\n{appended}");
 
     // 4. The pin is what the user pastes into the trust root, so it must be valid TOML too — and it
     //    must survive a directory name containing quotes or newlines, which is attacker-chosen in
     //    any cloned repo.
     let hash = safe_chains::suggest::config_hash(merged.as_bytes());
     let pin = safe_chains::suggest::pin_block(&command, &hash);
-    assert!(
-        toml::from_str::<toml::Value>(&pin).is_ok(),
-        "pin_block produced invalid TOML for dir={command:?}:\n{pin}"
-    );
+    assert!(toml::from_str::<toml::Value>(&pin).is_ok(), "pin_block produced invalid TOML for dir={command:?}:\n{pin}");
 });

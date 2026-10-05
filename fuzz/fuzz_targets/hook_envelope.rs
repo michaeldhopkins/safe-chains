@@ -65,12 +65,7 @@ fuzz_target!(|data: &[u8]| {
         // escalates, it must never be a token some harness reads as approval.
         for gated in [format.render_deny("refused"), format.render_ask("confirm")] {
             for grant in GRANTS {
-                assert!(
-                    !gated.stdout.contains(grant),
-                    "{} leaked {grant} on a gated path: `{}`",
-                    target.name(),
-                    gated.stdout
-                );
+                assert!(!gated.stdout.contains(grant), "{} leaked {grant} on a gated path: `{}`", target.name(), gated.stdout);
             }
         }
     }

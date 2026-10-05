@@ -38,6 +38,13 @@ fn every_workflow_that_lints_also_checks_formatting() {
     assert!(missing.is_empty(), "workflows that lint without `{CHECK}`: {missing:?}");
 }
 
+/// `fuzz/` is its own crate outside the workspace, so `cargo fmt --all` at the root never sees it.
+#[test]
+fn ci_also_checks_the_fuzz_crates_formatting() {
+    let ci = fs::read_to_string(root().join(".github/workflows/ci.yml")).expect("ci.yml");
+    assert!(ci.contains("cargo fmt --manifest-path fuzz/Cargo.toml --all --check"), "ci.yml does not check fuzz/'s formatting");
+}
+
 #[test]
 fn no_workflow_floats_on_stable() {
     let all = workflows();

@@ -43,9 +43,7 @@ fn beds() -> &'static Vec<Bed> {
             for dir in target.detect_paths(&home) {
                 let _ = std::fs::create_dir_all(&dir);
             }
-            if let Ok(safe_chains::targets::InstallOutcome::Installed { path }) =
-                target.install(&home)
-            {
+            if let Ok(safe_chains::targets::InstallOutcome::Installed { path }) = target.install(&home) {
                 out.push(Bed { name: target.name(), home, config: path });
             }
         }
@@ -56,10 +54,7 @@ fn beds() -> &'static Vec<Bed> {
 fuzz_target!(|data: &[u8]| {
     // Self-guard against vacuity: if discovery found no target that installs, every iteration below
     // would be a no-op and the run would report clean while asserting nothing.
-    assert!(
-        !beds().is_empty(),
-        "no target produced an installed config; setup_merge would be testing nothing"
-    );
+    assert!(!beds().is_empty(), "no target produced an installed config; setup_merge would be testing nothing");
     for bed in beds() {
         let Some(target) = safe_chains::targets::find(bed.name) else {
             continue;
@@ -74,11 +69,7 @@ fuzz_target!(|data: &[u8]| {
 
         let after = std::fs::read(&bed.config).unwrap_or_default();
         match outcome {
-            Err(_) => assert!(
-                before == after,
-                "{}: refused the merge but still rewrote the file",
-                bed.name
-            ),
+            Err(_) => assert!(before == after, "{}: refused the merge but still rewrote the file", bed.name),
             Ok(_) => assert!(
                 serde_json::from_slice::<serde_json::Value>(&after).is_ok(),
                 "{}: merge produced a file the harness cannot parse:\n{}",

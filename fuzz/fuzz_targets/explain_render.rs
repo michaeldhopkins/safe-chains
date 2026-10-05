@@ -35,10 +35,7 @@ fuzz_target!(|data: &[u8]| {
     let rendered = explanation.render();
 
     // A line may only bear a marker if it belongs to a real segment.
-    let marker_lines = rendered
-        .lines()
-        .filter(|l| l.starts_with("  \u{2713}  ") || l.starts_with("  \u{2717}  "))
-        .count();
+    let marker_lines = rendered.lines().filter(|l| l.starts_with("  \u{2713}  ") || l.starts_with("  \u{2717}  ")).count();
     // `<=`, not `==`. The renderer legitimately emits FEWER lines than there are segments — an
     // unparseable command prints one "could not parse" message and no marker lines at all. What
     // forgery needs is an EXTRA line, so the anti-forgery property is a ceiling: a command may
@@ -54,11 +51,7 @@ fuzz_target!(|data: &[u8]| {
     // that escaped neutralizing, and a `\r` or a bidi override rewrites what the reader sees just as
     // effectively as a `\n` does.
     for c in rendered.chars() {
-        assert!(
-            c == '\n' || !c.is_control(),
-            "control character {:?} reached the rendered output for command={command:?}",
-            c
-        );
+        assert!(c == '\n' || !c.is_control(), "control character {:?} reached the rendered output for command={command:?}", c);
         assert!(
             !matches!(c, '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}'),
             "bidi override {:?} reached the rendered output for command={command:?}",

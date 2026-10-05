@@ -75,6 +75,7 @@ adding a new one — extend a corpus/table where one already fits rather than st
 
 ```bash
 cargo fmt --all --check
+cargo fmt --manifest-path fuzz/Cargo.toml --all --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo deny check licenses
 ```

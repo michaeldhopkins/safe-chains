@@ -27,10 +27,10 @@ use safe_chains::verdict::Verdict;
 /// judges. Kept small on purpose: the interesting axis is the VALUE, not the command, and the
 /// exhaustive command sweep already runs as a unit test.
 const GATES: &[(&str, &str)] = &[
-    ("borg", "--rsh"),          // Exec
-    ("cargo", "--target-dir"),  // Write
-    ("asciidoctor", "-o"),      // Write
-    ("rsync", "-e"),            // Exec
+    ("borg", "--rsh"),         // Exec
+    ("cargo", "--target-dir"), // Write
+    ("asciidoctor", "-o"),     // Write
+    ("rsync", "-e"),           // Exec
 ];
 
 /// Commands whose BARE POSITIONALS carry a declared role, with the leading words needed to reach
@@ -53,9 +53,9 @@ const GATES: &[(&str, &str)] = &[
 /// it, and the three that remain cover all three roles. Re-adding them needs the target to model
 /// `Shape`, which is the walk's job, not the oracle's.
 const POSITIONALS: &[(&str, &[&str])] = &[
-    ("curl", &[]),          // Read   — Plain shape
-    ("karma", &["start"]),  // Exec   — Plain shape
-    ("tilt", &["up"]),      // Exec   — Plain shape
+    ("curl", &[]),         // Read   — Plain shape
+    ("karma", &["start"]), // Exec   — Plain shape
+    ("tilt", &["up"]),     // Exec   — Plain shape
 ];
 
 fuzz_target!(|data: &[u8]| {
@@ -75,10 +75,7 @@ fuzz_target!(|data: &[u8]| {
         if judged != Verdict::Denied {
             continue;
         }
-        let tokens: Vec<_> = [*cmd, *flag, value]
-            .iter()
-            .map(|s| safe_chains::parse::Token::from_raw(s.to_string()))
-            .collect();
+        let tokens: Vec<_> = [*cmd, *flag, value].iter().map(|s| safe_chains::parse::Token::from_raw(s.to_string())).collect();
         assert!(
             safe_chains::pathgate::should_deny(cmd, &tokens),
             "the pre-filter skipped a value its own gate would refuse: {cmd} {flag} {value:?}",
@@ -100,10 +97,7 @@ fuzz_target!(|data: &[u8]| {
         let mut words = vec![(*cmd).to_string()];
         words.extend(lead.iter().map(|s| (*s).to_string()));
         words.push(value.to_string());
-        let tokens: Vec<_> = words
-            .into_iter()
-            .map(safe_chains::parse::Token::from_raw)
-            .collect();
+        let tokens: Vec<_> = words.into_iter().map(safe_chains::parse::Token::from_raw).collect();
         assert!(
             safe_chains::pathgate::should_deny(cmd, &tokens),
             "the pre-filter skipped a POSITIONAL its own gate would refuse: {cmd} {lead:?} {value:?}",

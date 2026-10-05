@@ -79,8 +79,26 @@ fn is_transparent(v: &str) -> bool {
             c.is_control()
                 || matches!(
                     c,
-                    '\'' | '"' | '`' | '\\' | '$' | '(' | ')' | ';' | '&' | '|' | '<' | '>' | '*'
-                        | '?' | '[' | ']' | '{' | '}' | '!' | '#' | '='
+                    '\'' | '"'
+                        | '`'
+                        | '\\'
+                        | '$'
+                        | '('
+                        | ')'
+                        | ';'
+                        | '&'
+                        | '|'
+                        | '<'
+                        | '>'
+                        | '*'
+                        | '?'
+                        | '['
+                        | ']'
+                        | '{'
+                        | '}'
+                        | '!'
+                        | '#'
+                        | '='
                 )
         })
 }
@@ -106,9 +124,6 @@ fuzz_target!(|data: &[u8]| {
         let b = right.replace("{v}", &spliced);
         let va = safe_chains::is_safe_command(&a);
         let vb = safe_chains::is_safe_command(&b);
-        assert_eq!(
-            va, vb,
-            "same operation, different verdict:\n  `{a}` -> {va}\n  `{b}` -> {vb}"
-        );
+        assert_eq!(va, vb, "same operation, different verdict:\n  `{a}` -> {va}\n  `{b}` -> {vb}");
     }
 });
