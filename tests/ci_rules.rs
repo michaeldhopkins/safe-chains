@@ -108,3 +108,11 @@ fn a_job_without_a_timeout_is_found() {
     assert_eq!(jobs_without_timeout(text), ["b"]);
     assert!(jobs_without_timeout("jobs:\n  a:\n    timeout-minutes: 1\n").is_empty());
 }
+
+#[test]
+fn ci_builds_the_docs_with_warnings_denied() {
+    let all = workflows();
+    let ci = &all.iter().find(|(n, _)| n == "ci.yml").expect("ci.yml").1;
+    assert!(ci.contains("cargo doc --locked --no-deps --all-features"), "ci.yml does not build the docs");
+    assert!(ci.contains("RUSTDOCFLAGS: -D warnings"), "ci.yml builds the docs without RUSTDOCFLAGS=-D warnings");
+}

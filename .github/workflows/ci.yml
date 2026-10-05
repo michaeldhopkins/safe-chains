@@ -47,6 +47,12 @@ jobs:
       - name: cargo clippy
         run: cargo clippy --locked --all-targets --all-features -- -D warnings
 
+      # A broken intra-doc link or a link to a private item fails here rather than on docs.rs.
+      - name: cargo doc
+        run: cargo doc --locked --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
+
       # Also checked at release time. It belongs here too: release.yml only runs on a version bump,
       # so a stale or truncated COMMANDS.md can otherwise ride along for many pushes unnoticed.
       - name: Verify COMMANDS.md is up to date

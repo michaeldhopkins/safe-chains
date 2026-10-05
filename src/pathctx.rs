@@ -333,7 +333,7 @@ pub(crate) const UNRESOLVED_CWD: &str = "/__SAFE_CHAINS_CMDSUB__";
 /// Resolve a `cd` target to a new working directory. `cur` is the current cwd, needed for a
 /// *relative* target. Used by intra-line `cd` tracking (HP-19 #2).
 ///
-/// A target that cannot be pinned yields [`UNRESOLVED_CWD`], NOT `None`. This used to return `None`
+/// A target that cannot be pinned yields `UNRESOLVED_CWD`, NOT `None`. This used to return `None`
 /// for `~…` and `$VAR`, and the caller reads `None` as "no cd happened" and keeps the previous cwd
 /// — so the `cd` was silently ignored and every later relative path was judged against a workspace
 /// the shell had already left. `cd ~/.aws && cat credentials` and `cd ~/.claude && echo … >

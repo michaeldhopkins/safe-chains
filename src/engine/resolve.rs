@@ -4,9 +4,9 @@
 //! in `cst::check::leaf_verdict`) — there is no opt-out.
 //!
 //! This file holds the dispatch (`resolve`) and the per-command `resolve_*` functions;
-//! the shared toolkit they build on lives in submodules: [`flags`] (the getopt-style
-//! flag walker), [`locus`] (`classify_locus` — the [`LocalLocus`] ladder that refines the
-//! old `is_safe_write_target` boolean, v1.4 §2.2), and [`capability`] (the builders that
+//! the shared toolkit they build on lives in submodules: `flags` (the getopt-style
+//! flag walker), `locus` (`classify_locus` — the [`LocalLocus`] ladder that refines the
+//! old `is_safe_write_target` boolean, v1.4 §2.2), and `capability` (the builders that
 //! stamp out each `Capability` with the facet pairing its operation warrants).
 
 use super::facet::*;

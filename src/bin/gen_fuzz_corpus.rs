@@ -169,7 +169,7 @@ fn write_dict(path: &Path, names: &BTreeSet<String>, flags: &BTreeSet<String>) {
 }
 
 /// A libFuzzer dictionary line: a double-quoted token with `"`, `\`, and non-printables escaped
-/// (`\xHH`). See https://llvm.org/docs/LibFuzzer.html#dictionaries.
+/// (`\xHH`). See <https://llvm.org/docs/LibFuzzer.html#dictionaries>.
 fn dict_entry(tok: &str) -> String {
     let mut out = String::from("\"");
     for b in tok.bytes() {

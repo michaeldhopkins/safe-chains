@@ -290,7 +290,7 @@ impl Level {
     /// A level is a DISJUNCTION of allow clauses, so a rejected capability failed all of them and
     /// there is a choice of which complaint to report. Clauses are usually split by operation
     /// (`editor` allows observes under one clause and mutates under another), so the first clause's
-    /// gripe is frequently "operation = mutate, allowed: [observe]" — true, useless, and it hides
+    /// gripe is frequently "operation = mutate, allowed: \[observe\]" — true, useless, and it hides
     /// the facet the author actually needs to change. Preferring a clause whose OPERATION already
     /// matches surfaces the real blocker.
     pub fn nearest_miss(&self, cap: &Capability) -> Option<FacetMismatch> {
