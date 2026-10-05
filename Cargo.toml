@@ -11,6 +11,10 @@ repository = "https://github.com/michaeldhopkins/safe-chains"
 # ambiguous — CI's "Verify COMMANDS.md is up to date" step runs exactly that. Name the default.
 default-run = "safe-chains"
 
+# The verdict snapshot is ~3.5 MB of test data, so it and its test stay out. The other fixtures
+# stay in: the unit tests include_str! them, and the package's tests would not compile without them.
+exclude = ["tests/fixtures/verdict_snapshot/", "tests/verdict_snapshot.rs", "tests/verdict_snapshot/"]
+
 [[bin]]
 name = "safe-chains"
 path = "src/main.rs"
