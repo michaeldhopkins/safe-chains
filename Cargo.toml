@@ -56,6 +56,7 @@ tempfile = "3"
 # `cargo fuzz` sets `--cfg fuzzing`. Declared so the compiler checks the spelling instead of
 # warning about an unknown name — a typo'd `#[cfg(fuzzng)]` would silently never apply.
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
+unsafe_code = "forbid"
 
 [lints.clippy]
 struct_excessive_bools = "deny"
@@ -69,6 +70,7 @@ too_many_arguments = "deny"
 needless_range_loop = "deny"
 extend_with_drain = "deny"
 unwrap_used = "deny"
+dbg_macro = "deny"
 
 # For cargo-mutants only (`.cargo/mutants.toml` selects it). Every mutant reruns the whole suite, and
 # the integration tests spawn the debug binary a few hundred times; unoptimized, each spawn spends
