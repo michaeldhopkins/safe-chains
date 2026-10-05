@@ -50,3 +50,61 @@ fn a_partial_deny_is_recognised() {
     assert_eq!(partial_deny("        run: cargo deny check --hide-inclusion-graph"), None);
     assert_eq!(partial_deny("      - name: build"), None);
 }
+
+/// The jobs under `jobs:` that set no `timeout-minutes`. A hung job otherwise runs for GitHub's
+/// six-hour default.
+fn jobs_without_timeout(text: &str) -> Vec<String> {
+    let mut missing = Vec::new();
+    let mut in_jobs = false;
+    let mut current: Option<(String, bool)> = None;
+    for line in text.lines() {
+        if !line.starts_with(' ') && !line.is_empty() && !line.starts_with('#') {
+            in_jobs = line == "jobs:";
+            continue;
+        }
+        if !in_jobs {
+            continue;
+        }
+        let is_job = line.starts_with("  ") && !line.starts_with("   ") && line.trim_end().ends_with(':') && !line.trim().starts_with('#');
+        if is_job {
+            if let Some((name, false)) = current.take() {
+                missing.push(name);
+            }
+            current = Some((line.trim().trim_end_matches(':').to_string(), false));
+        } else if line.starts_with("    timeout-minutes:")
+            && let Some((_, has)) = current.as_mut()
+        {
+            *has = true;
+        }
+    }
+    if let Some((name, false)) = current {
+        missing.push(name);
+    }
+    missing
+}
+
+#[test]
+fn every_workflow_is_bounded_and_read_only_by_default() {
+    let mut problems = Vec::new();
+    for (name, text) in workflows() {
+        let top: Vec<&str> = text.lines().collect();
+        if !top.contains(&"concurrency:") {
+            problems.push(format!("{name}: no top-level concurrency group"));
+        }
+        match top.iter().position(|l| *l == "permissions:") {
+            Some(i) if top.get(i + 1).is_some_and(|l| l.trim() == "contents: read") => {}
+            _ => problems.push(format!("{name}: top-level permissions are not `contents: read`")),
+        }
+        for job in jobs_without_timeout(&text) {
+            problems.push(format!("{name}: job `{job}` has no timeout-minutes"));
+        }
+    }
+    assert!(problems.is_empty(), "{}", problems.join("\n"));
+}
+
+#[test]
+fn a_job_without_a_timeout_is_found() {
+    let text = "on:\n  push:\njobs:\n  a:\n    runs-on: x\n    timeout-minutes: 5\n    steps:\n      - run: y\n  b:\n    runs-on: x\n    steps:\n      - name: timeout-minutes: 3\n";
+    assert_eq!(jobs_without_timeout(text), ["b"]);
+    assert!(jobs_without_timeout("jobs:\n  a:\n    timeout-minutes: 1\n").is_empty());
+}

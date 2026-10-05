@@ -7,13 +7,18 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   check-version:
     name: Check for version bump
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       should_release: ${{ steps.check.outputs.should_release }}
       version: ${{ steps.check.outputs.version }}
@@ -41,6 +46,7 @@ jobs:
     needs: check-version
     if: needs.check-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
 
@@ -89,6 +95,7 @@ jobs:
     name: Build ${{ matrix.target }}
     needs: ci
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
     strategy:
       matrix:
         include:
@@ -220,6 +227,10 @@ jobs:
     name: Create release and publish
     needs: [check-version, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Pushes the version tag and creates the GitHub release.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
         with:
@@ -296,6 +307,7 @@ jobs:
     # secrets are not readable from a job-level `if`, so a variable gates it.
     if: vars.SITE_DOCS_ENABLED == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
 
