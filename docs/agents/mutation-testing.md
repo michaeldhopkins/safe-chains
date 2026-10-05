@@ -44,6 +44,10 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   `--explain`'s exit code inverted, and `||` to `&&` in `canonicalize_home`'s no-home guard. Killed
   by `list_commands_prints_the_command_reference` and `explain_exits_with_the_verdict` in
   `tests/cli_gate.rs`, and the property `without_a_usable_home_every_word_is_left_alone`.
+- **CI slice of run 37362532620:** 2 MISSED of 9 viable, both in `src/allowlist.rs`: the bare-`~`
+  guard in `canonicalize_home` set to `false`, and `Matcher::is_empty` returning `true` (only ever
+  asserted on empty matchers). Killed by `a_usable_home_expands_both_tilde_spellings` and a
+  non-empty assertion in `parse_exact_pattern` and `parse_legacy_colon_star`.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds

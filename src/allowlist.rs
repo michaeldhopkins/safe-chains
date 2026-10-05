@@ -215,6 +215,7 @@ mod tests {
         p.add_pattern("Bash(npm test)");
         assert!(p.exact.contains("npm test"));
         assert!(p.globs.is_empty());
+        assert!(!p.is_empty(), "an exact pattern alone makes the matcher non-empty");
     }
 
     #[test]
@@ -223,6 +224,7 @@ mod tests {
         p.add_pattern("Bash(npm run:*)");
         assert!(p.exact.is_empty());
         assert_eq!(p.globs.len(), 1);
+        assert!(!p.is_empty(), "a glob pattern alone makes the matcher non-empty");
     }
 
     #[test]
@@ -737,6 +739,19 @@ mod env_prefix_matching_tests {
             home in proptest::prop_oneof![proptest::strategy::Just(""), proptest::strategy::Just("/")],
         ) {
             proptest::prop_assert_eq!(canonicalize_home(&text, home), text);
+        }
+
+        /// A bare `~` and a leading `~/` both name the home directory, with or without a trailing
+        /// slash on HOME, so a grant spelled absolutely covers either.
+        #[test]
+        fn a_usable_home_expands_both_tilde_spellings(
+            home in "/[a-z]{1,8}(/[a-z]{1,8}){0,2}",
+            slash in proptest::bool::ANY,
+            rest in "[a-z.]{1,10}",
+        ) {
+            let given = if slash { format!("{home}/") } else { home.clone() };
+            let text = format!("ls ~ ~/{rest}");
+            proptest::prop_assert_eq!(canonicalize_home(&text, &given), format!("ls {home} {home}/{rest}"));
         }
     }
 }
