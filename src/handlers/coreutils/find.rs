@@ -137,20 +137,22 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 }
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("find",
-            "https://www.gnu.org/software/findutils/manual/html_mono/find.html",
-            "Read-only predicates and actions allowed (tests like -name/-type/-size, -print/-ls/-prune, \
+    vec![crate::docs::CommandDoc::handler(
+        "find",
+        "https://www.gnu.org/software/findutils/manual/html_mono/find.html",
+        "Read-only predicates and actions allowed (tests like -name/-type/-size, -print/-ls/-prune, \
              operators, positional and global options). -exec/-execdir allowed when the executed \
              command is itself safe (each `{}` binds to the traversal path).",
-            "fs"),
-    ]
+        "fs",
+    )]
 }
 
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         find_name: "find . -name '*.rb'",

@@ -13,4 +13,3 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     Vec::new()
 }
-

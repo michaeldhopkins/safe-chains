@@ -58,10 +58,7 @@ pub fn unescape(s: &str) -> Result<String, String> {
             Some('n') => out.push('\n'),
             Some('r') => out.push('\r'),
             other => {
-                return Err(format!(
-                    "bad escape \\{} in {s:?}",
-                    other.map(String::from).unwrap_or_default()
-                ));
+                return Err(format!("bad escape \\{} in {s:?}", other.map(String::from).unwrap_or_default()));
             }
         }
     }
@@ -81,15 +78,9 @@ pub fn bucket_of(invocation: &str) -> String {
 pub fn render_buckets(snapshot: &Snapshot) -> BTreeMap<String, String> {
     let mut parts: BTreeMap<String, Snapshot> = BTreeMap::new();
     for (inv, verdict) in snapshot {
-        parts
-            .entry(bucket_of(inv))
-            .or_default()
-            .insert(inv.clone(), verdict.clone());
+        parts.entry(bucket_of(inv)).or_default().insert(inv.clone(), verdict.clone());
     }
-    parts
-        .into_iter()
-        .map(|(bucket, part)| (bucket, render(&part)))
-        .collect()
+    parts.into_iter().map(|(bucket, part)| (bucket, render(&part))).collect()
 }
 
 pub fn render(snapshot: &Snapshot) -> String {
@@ -103,9 +94,7 @@ pub fn render(snapshot: &Snapshot) -> String {
 pub fn parse(text: &str) -> Result<Snapshot, String> {
     let mut snapshot = Snapshot::new();
     for (n, line) in text.lines().enumerate() {
-        let (invocation, verdict) = line
-            .split_once('\t')
-            .ok_or_else(|| format!("line {}: no tab: {line:?}", n + 1))?;
+        let (invocation, verdict) = line.split_once('\t').ok_or_else(|| format!("line {}: no tab: {line:?}", n + 1))?;
         if verdict != "denied" && rank(verdict).is_none() {
             return Err(format!("line {}: unknown verdict {verdict:?}", n + 1));
         }
@@ -183,10 +172,7 @@ impl Drift {
                 let _ = writeln!(out, "    {}    ({was} -> {now})", escape(inv));
             }
         }
-        for (title, rows) in [
-            ("not in the snapshot", &self.added),
-            ("no longer generated", &self.dropped),
-        ] {
+        for (title, rows) in [("not in the snapshot", &self.added), ("no longer generated", &self.dropped)] {
             let _ = writeln!(out, "{title}: {}", rows.len());
             for (inv, verdict) in rows.iter().take(limit) {
                 let _ = writeln!(out, "    {}    ({verdict})", escape(inv));

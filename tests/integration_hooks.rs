@@ -22,12 +22,10 @@ use hooks::{binary, run_hook};
 fn hook_at_level(level: &str, command: &str) -> (String, i32) {
     use std::sync::atomic::{AtomicU32, Ordering};
     static N: AtomicU32 = AtomicU32::new(0);
-    let home = std::env::temp_dir()
-        .join(format!("sc-lvl-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
+    let home = std::env::temp_dir().join(format!("sc-lvl-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
     std::fs::create_dir_all(home.join(".config")).unwrap();
     std::fs::write(home.join(".config/safe-chains.toml"), format!("level = \"{level}\"\n")).unwrap();
-    let payload =
-        format!(r#"{{"tool_input": {{"command": "{command}"}}, "cwd": "{}"}}"#, home.display());
+    let payload = format!(r#"{{"tool_input": {{"command": "{command}"}}, "cwd": "{}"}}"#, home.display());
     let mut child = Command::new(binary())
         .args(["hook", "claude"])
         .env("HOME", &home)
@@ -45,11 +43,7 @@ fn hook_at_level(level: &str, command: &str) -> (String, i32) {
 fn decides_allow(stdout: &str) -> bool {
     serde_json::from_str::<serde_json::Value>(stdout.trim())
         .ok()
-        .and_then(|v| {
-            v.pointer("/hookSpecificOutput/permissionDecision")
-                .and_then(|d| d.as_str())
-                .map(|s| s == "allow")
-        })
+        .and_then(|v| v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()).map(|s| s == "allow"))
         .unwrap_or(false)
 }
 
@@ -103,11 +97,7 @@ fn claude_default_invocation_allows_safe_command() {
     let (stdout, _stderr, code) = run_hook(&[], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/permissionDecision")
-            .and_then(|d| d.as_str()),
-        Some("allow"),
-    );
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("allow"),);
 }
 
 #[test]
@@ -152,14 +142,8 @@ fn claude_safewrite_carries_appropriate_reason() {
     let (stdout, _stderr, code) = run_hook(&[], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).expect(&stdout);
-    let reason = v
-        .pointer("/hookSpecificOutput/permissionDecisionReason")
-        .and_then(|s| s.as_str())
-        .unwrap_or("");
-    assert!(
-        reason.contains("safe utilities"),
-        "reason was: {reason}"
-    );
+    let reason = v.pointer("/hookSpecificOutput/permissionDecisionReason").and_then(|s| s.as_str()).unwrap_or("");
+    assert!(reason.contains("safe utilities"), "reason was: {reason}");
 }
 
 // ---------------------------------------------------------------
@@ -184,14 +168,8 @@ fn codex_hook_denies_gated_command() {
     let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()),
-        Some("deny"),
-    );
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/hookEventName").and_then(|d| d.as_str()),
-        Some("PreToolUse"),
-    );
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("deny"),);
+    assert_eq!(v.pointer("/hookSpecificOutput/hookEventName").and_then(|d| d.as_str()), Some("PreToolUse"),);
 }
 
 #[test]
@@ -306,18 +284,12 @@ fn antigravity_hook_credential_reach_names_credential_store() {
 fn unknown_tool_in_hook_subcommand_errors() {
     let (_stdout, stderr, code) = run_hook(&["hook", "made-up-tool"], "{}");
     assert_eq!(code, 1);
-    assert!(
-        stderr.contains("Unknown tool"),
-        "stderr was: {stderr}"
-    );
+    assert!(stderr.contains("Unknown tool"), "stderr was: {stderr}");
 }
 
 #[test]
 fn list_tools_includes_every_supported_target() {
-    let out = Command::new(binary())
-        .arg("--list-tools")
-        .output()
-        .expect("run");
+    let out = Command::new(binary()).arg("--list-tools").output().expect("run");
     let s = String::from_utf8_lossy(&out.stdout);
     for tool in ["claude", "codex", "cursor", "gemini", "copilot", "qwen", "droid", "opencode"] {
         assert!(s.contains(tool), "list-tools missing `{tool}`: {s}");
@@ -348,10 +320,7 @@ fn cursor_hook_allows_safe_command() {
     let (stdout, _stderr, code) = run_hook(&["hook", "cursor"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.get("permission").and_then(|s| s.as_str()),
-        Some("allow"),
-    );
+    assert_eq!(v.get("permission").and_then(|s| s.as_str()), Some("allow"),);
     assert!(v.get("permissionDecision").is_none(), "no Claude wrapper");
     assert!(v.get("decision").is_none(), "no Gemini wrapper");
 }
@@ -421,11 +390,7 @@ fn qwen_hook_allows_safe_command() {
     let (stdout, _stderr, code) = run_hook(&["hook", "qwen"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/permissionDecision")
-            .and_then(|d| d.as_str()),
-        Some("allow"),
-    );
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("allow"),);
 }
 
 // ---------------------------------------------------------------
@@ -446,11 +411,7 @@ fn droid_hook_allows_safe_command() {
     let (stdout, _stderr, code) = run_hook(&["hook", "droid"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/permissionDecision")
-            .and_then(|d| d.as_str()),
-        Some("allow"),
-    );
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("allow"),);
 }
 
 // ---------------------------------------------------------------
@@ -470,14 +431,8 @@ fn copilot_hook_allows_safe_command_via_double_decode() {
     let (stdout, _stderr, code) = run_hook(&["hook", "copilot"], payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.get("permissionDecision").and_then(|s| s.as_str()),
-        Some("allow"),
-    );
-    assert!(
-        v.get("hookSpecificOutput").is_none(),
-        "Copilot uses flat output — no wrapper",
-    );
+    assert_eq!(v.get("permissionDecision").and_then(|s| s.as_str()), Some("allow"),);
+    assert!(v.get("hookSpecificOutput").is_none(), "Copilot uses flat output — no wrapper",);
 }
 
 #[test]
@@ -560,15 +515,11 @@ fn every_target_emits_its_decision_at_the_declared_field() {
             };
             checked += 1;
             if v.pointer(mine).and_then(|d| d.as_str()).is_none() {
-                failures.push(format!(
-                    "{name}: {what} has no decision at its declared pointer `{mine}` -> `{stdout}`"
-                ));
+                failures.push(format!("{name}: {what} has no decision at its declared pointer `{mine}` -> `{stdout}`"));
             }
             for other in &pointers {
                 if *other != mine && v.pointer(other).is_some() {
-                    failures.push(format!(
-                        "{name}: {what} ALSO decides at `{other}`, another harness's field -> `{stdout}`"
-                    ));
+                    failures.push(format!("{name}: {what} ALSO decides at `{other}`, another harness's field -> `{stdout}`"));
                 }
             }
         }
@@ -624,8 +575,7 @@ fn no_target_install_panics_or_clobbers_an_unreadable_config() {
             let _ = std::fs::create_dir_all(&dir);
         }
         // A fresh install tells us which file this target owns and what shape it writes.
-        let Ok(safe_chains::targets::InstallOutcome::Installed { path }) = target.install(home.path())
-        else {
+        let Ok(safe_chains::targets::InstallOutcome::Installed { path }) = target.install(home.path()) else {
             continue;
         };
         let Ok(text) = std::fs::read_to_string(&path) else { continue };
@@ -634,9 +584,7 @@ fn no_target_install_panics_or_clobbers_an_unreadable_config() {
         for corrupt in corruptions(&installed) {
             std::fs::write(&path, &corrupt).expect("write corrupt config");
             let before = std::fs::read(&path).expect("read back");
-            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                target.install(home.path())
-            }));
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| target.install(home.path())));
             let name = target.name();
             match result {
                 Err(_) => failures.push(format!("{name}: PANICKED on config `{corrupt}`")),
@@ -671,8 +619,8 @@ fn no_target_install_panics_or_clobbers_an_unreadable_config() {
 /// there rather than in whichever caller happens to be tested.
 #[test]
 fn the_decision_seam_never_grants_on_a_blank_command() {
-    use safe_chains::targets::{may_grant, respond};
     use safe_chains::Verdict;
+    use safe_chains::targets::{may_grant, respond};
 
     let safe = safe_chains::command_verdict("ls");
     assert!(safe.is_allowed(), "precondition: `ls` classifies safe");
@@ -691,11 +639,7 @@ fn the_decision_seam_never_grants_on_a_blank_command() {
         let Some(format) = target.hook_format() else { continue };
         checked += 1;
         for blank in ["", "   ", "\n"] {
-            assert!(
-                respond(format, blank, safe).is_none(),
-                "{}: respond() produced a decision for a blank command",
-                target.name()
-            );
+            assert!(respond(format, blank, safe).is_none(), "{}: respond() produced a decision for a blank command", target.name());
         }
         // And the same target does produce one for a real safe command, or the check is empty.
         let real = respond(format, "ls", safe);
@@ -731,10 +675,7 @@ fn no_target_approves_a_blank_command() {
         ("qwen", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
         ("droid", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
         ("copilot", r#"{"toolName":"Bash","toolArgs":"{\"command\":\"{CMD}\"}"}"#),
-        (
-            "antigravity",
-            r#"{"toolCall":{"name":"Bash","args":{"CommandLine":"{CMD}"}},"workspacePaths":["/w"]}"#,
-        ),
+        ("antigravity", r#"{"toolCall":{"name":"Bash","args":{"CommandLine":"{CMD}"}},"workspacePaths":["/w"]}"#),
         ("cursor", r#"{"command":"{CMD}","cwd":"/w","workspace_roots":["/w"]}"#),
         ("grok", r#"{"tool_input":{"command":"{CMD}"},"cwd":"/w"}"#),
     ];
@@ -763,10 +704,7 @@ fn no_target_approves_a_blank_command() {
 
     for target in safe_chains::targets::registry() {
         if target.hook_format().is_some() && !ENVELOPES.iter().any(|(n, _)| *n == target.name()) {
-            failures.push(format!(
-                "{}: hook target missing from this guard's envelope table",
-                target.name()
-            ));
+            failures.push(format!("{}: hook target missing from this guard's envelope table", target.name()));
         }
     }
     assert!(failures.is_empty(), "blank-command contract:\n  {}", failures.join("\n  "));

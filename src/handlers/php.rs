@@ -10,17 +10,8 @@ use crate::verdict::{SafetyLevel, Verdict};
 // a future refinement; until then this list lives in Rust as a known
 // exception to the data-in-TOML principle.
 static PHP_SAFE_INI_DIRECTIVES: WordSet = WordSet::new(&[
-    "date.timezone",
-    "display_errors",
-    "error_reporting",
-    "max_execution_time",
-    "max_input_time",
-    "max_input_vars",
-    "memory_limit",
-    "opcache.enable",
-    "opcache.enable_cli",
-    "post_max_size",
-    "upload_max_filesize",
+    "date.timezone", "display_errors", "error_reporting", "max_execution_time", "max_input_time", "max_input_vars", "memory_limit",
+    "opcache.enable", "opcache.enable_cli", "post_max_size", "upload_max_filesize",
 ]);
 
 fn is_safe_ini_pair(value: &str) -> bool {
@@ -112,10 +103,7 @@ pub fn is_safe_php(tokens: &[Token]) -> Verdict {
     // declared sub (`artisan`, `please`). delegate_skip = 0 on the sub
     // dispatches the (normalized) token tail to command_verdict so the
     // inner top-level command's TOML drives validation.
-    let basename = std::path::Path::new(arg_str)
-        .file_name()
-        .and_then(|s| s.to_str())
-        .unwrap_or(arg_str);
+    let basename = std::path::Path::new(arg_str).file_name().and_then(|s| s.to_str()).unwrap_or(arg_str);
     let mut probe = Vec::with_capacity(tokens.len() - i + 1);
     probe.push(tokens[0].clone());
     probe.push(Token::from_raw(basename.to_string()));
@@ -285,73 +273,46 @@ mod tests {
 
     #[test]
     fn cache_clear_positional_file_is_safewrite() {
-        assert_eq!(
-            verdict("php artisan cache:clear file"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php artisan cache:clear file"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn cache_clear_bare_is_safewrite() {
-        assert_eq!(
-            verdict("php artisan cache:clear"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php artisan cache:clear"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn cache_clear_remote_store_is_safewrite() {
         // Remote stores are accepted under the recoverability argument
         // documented on check_laravel_cache_clear.
-        assert_eq!(
-            verdict("php artisan cache:clear --store=redis"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
-        assert_eq!(
-            verdict("php artisan cache:clear --store=database"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php artisan cache:clear --store=redis"), Verdict::Allowed(SafetyLevel::SafeWrite));
+        assert_eq!(verdict("php artisan cache:clear --store=database"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn cache_clear_unknown_flag_still_denied() {
         // Shape validation still rejects malformed invocations even
         // though the value allowlist is gone.
-        assert_eq!(
-            verdict("php artisan cache:clear --store=file --foo"),
-            Verdict::Denied,
-        );
+        assert_eq!(verdict("php artisan cache:clear --store=file --foo"), Verdict::Denied,);
     }
 
     #[test]
     fn cache_clear_file_is_safewrite() {
-        assert_eq!(
-            verdict("php artisan cache:clear --store=file"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php artisan cache:clear --store=file"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn cache_clear_array_is_safewrite() {
-        assert_eq!(
-            verdict("php artisan cache:clear --store=array"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php artisan cache:clear --store=array"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn please_cache_clear_file_is_safewrite() {
-        assert_eq!(
-            verdict("php please cache:clear --store=file"),
-            Verdict::Allowed(SafetyLevel::SafeWrite)
-        );
+        assert_eq!(verdict("php please cache:clear --store=file"), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     #[test]
     fn php_help_is_inert() {
-        assert_eq!(
-            verdict("php --help"),
-            Verdict::Allowed(SafetyLevel::Inert)
-        );
+        assert_eq!(verdict("php --help"), Verdict::Allowed(SafetyLevel::Inert));
     }
 }

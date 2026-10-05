@@ -14,20 +14,9 @@ use crate::verdict::Verdict;
 /// settings that cannot run code, redirect trust, or reach a program path. Namespaces that are safe
 /// for ANY value are handled by prefix in `is_allowed_git_c`.
 static GIT_C_ALLOWED_KV: WordSet = WordSet::new(&[
-    "core.askPass=",
-    "core.askPass=false",
-    "core.askpass=",
-    "core.askpass=false",
-    "core.pager=cat",
-    "core.pager=less",
-    "credential.helper=",
-    "http.sslVerify=false",
-    "http.sslVerify=true",
-    "http.sslverify=false",
-    "http.sslverify=true",
-    "init.defaultBranch=main",
-    "init.defaultBranch=master",
-    "init.defaultBranch=trunk",
+    "core.askPass=", "core.askPass=false", "core.askpass=", "core.askpass=false", "core.pager=cat", "core.pager=less",
+    "credential.helper=", "http.sslVerify=false", "http.sslVerify=true", "http.sslverify=false", "http.sslverify=true",
+    "init.defaultBranch=main", "init.defaultBranch=master", "init.defaultBranch=trunk",
 ]);
 
 /// Settings safe for ANY value, matched on the KEY alone — display and formatting knobs that only
@@ -46,22 +35,9 @@ static GIT_C_ALLOWED_KV: WordSet = WordSet::new(&[
 /// Verified against git-scm.com/docs/git-config (git 2.53) — none of these executes a program,
 /// reads a file, or reaches the network.
 static GIT_C_ALLOWED_KEYS: WordSet = WordSet::new(&[
-    "diff.algorithm",
-    "diff.colormoved",
-    "diff.colormovedws",
-    "diff.context",
-    "diff.dstprefix",
-    "diff.indentheuristic",
-    "diff.interhunkcontext",
-    "diff.mnemonicprefix",
-    "diff.noprefix",
-    "diff.relative",
-    "diff.renames",
-    "diff.srcprefix",
-    "diff.statgraphwidth",
-    "diff.submodule",
-    "diff.wordregex",
-    "diff.wserrorhighlight",
+    "diff.algorithm", "diff.colormoved", "diff.colormovedws", "diff.context", "diff.dstprefix", "diff.indentheuristic",
+    "diff.interhunkcontext", "diff.mnemonicprefix", "diff.noprefix", "diff.relative", "diff.renames", "diff.srcprefix",
+    "diff.statgraphwidth", "diff.submodule", "diff.wordregex", "diff.wserrorhighlight",
 ]);
 
 /// Whether a `-c key=value` is on the allowlist. Positive by construction: an exact setting above,
@@ -76,10 +52,7 @@ fn is_allowed_git_c(kv: &str) -> bool {
         return false;
     };
     let key = key.to_ascii_lowercase();
-    GIT_C_ALLOWED_KEYS.contains(key.as_str())
-        || key == "safe.directory"
-        || key.starts_with("advice.")
-        || key.starts_with("color.")
+    GIT_C_ALLOWED_KEYS.contains(key.as_str()) || key == "safe.directory" || key.starts_with("advice.") || key.starts_with("color.")
 }
 
 pub fn is_safe_git(tokens: &[Token]) -> Verdict {

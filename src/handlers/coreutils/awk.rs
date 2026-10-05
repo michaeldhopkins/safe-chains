@@ -1,6 +1,6 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagTolerance};
+use crate::verdict::{SafetyLevel, Verdict};
 
 fn strip_regex_literals(s: &str) -> String {
     let bytes = s.as_bytes();
@@ -56,12 +56,8 @@ fn has_dangerous_getline(code: &str) -> bool {
     while let Some(pos) = search.find("getline") {
         let after = &search[pos + 7..];
         let after_trimmed = after.trim_start();
-        let skip_var = if !after_trimmed.is_empty()
-            && after_trimmed.as_bytes()[0].is_ascii_alphabetic()
-        {
-            let var_end = after_trimmed
-                .find(|c: char| !c.is_ascii_alphanumeric() && c != '_')
-                .unwrap_or(after_trimmed.len());
+        let skip_var = if !after_trimmed.is_empty() && after_trimmed.as_bytes()[0].is_ascii_alphabetic() {
+            let var_end = after_trimmed.find(|c: char| !c.is_ascii_alphanumeric() && c != '_').unwrap_or(after_trimmed.len());
             after_trimmed[var_end..].trim_start()
         } else {
             after_trimmed
@@ -93,17 +89,11 @@ fn awk_has_dangerous_construct(token: &Token) -> bool {
 
 static AWK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--characters-as-bytes", "--copyright", "--gen-pot",
-        "--lint", "--no-optimize", "--optimize",
-        "--posix", "--re-interval", "--sandbox",
-        "--traditional", "--use-lc-numeric", "--version",
-        "-C", "-N", "-O", "-P", "-S", "-V",
-        "-b", "-c", "-g", "-r", "-s", "-t",
+        "--characters-as-bytes", "--copyright", "--gen-pot", "--lint", "--no-optimize", "--optimize", "--posix", "--re-interval",
+        "--sandbox", "--traditional", "--use-lc-numeric", "--version", "-C", "-N", "-O", "-P", "-S", "-V", "-b", "-c", "-g", "-r", "-s",
+        "-t",
     ]),
-    valued: WordSet::flags(&[
-        "--assign", "--field-separator",
-        "-F", "-v",
-    ]),
+    valued: WordSet::flags(&["--assign", "--field-separator", "-F", "-v"]),
     bare: false,
     max_positional: None,
     tolerance: FlagTolerance::strict(),
@@ -142,10 +132,9 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
         return false;
     }
     // Gate the FILE operands by read locus, so `awk '{print}' /etc/shadow` denies (audit fix).
-    !awk_file_operands(tokens).iter().any(|f| {
-        crate::policy::looks_like_path(f)
-            && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied
-    })
+    !awk_file_operands(tokens)
+        .iter()
+        .any(|f| crate::policy::looks_like_path(f) && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied)
 }
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -156,12 +145,12 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 }
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("awk / gawk / mawk / nawk",
-            "https://www.gnu.org/software/gawk/manual/gawk.html",
-            format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe()),
-            "text"),
-    ]
+    vec![crate::docs::CommandDoc::handler(
+        "awk / gawk / mawk / nawk",
+        "https://www.gnu.org/software/gawk/manual/gawk.html",
+        format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe()),
+        "text",
+    )]
 }
 
 #[cfg(test)]
@@ -175,7 +164,9 @@ pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEnt
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         awk_print_field: "awk '{print $1}' file.txt",

@@ -20,7 +20,7 @@ pub(super) fn merge<S: Ord>(best: Option<(S, bool, bool)>, next: (S, bool, bool)
 mod tests {
     use super::merge;
     use crate::engine::resolve::regions::with_user_and_derived_grants;
-    use crate::pathctx::{enter, PathCtx};
+    use crate::pathctx::{PathCtx, enter};
 
     #[test]
     fn equally_specific_grants_add_their_faces_and_the_more_specific_decides() {
@@ -50,11 +50,9 @@ mod tests {
             "a borrowed read grant alone must still write nothing"
         );
         assert!(
-            !with_user_and_derived_grants(
-                &[("~/scripts", true, true), ("~/scripts/keep", true, false)],
-                &[],
-                || check("touch ~/scripts/keep/x"),
-            ),
+            !with_user_and_derived_grants(&[("~/scripts", true, true), ("~/scripts/keep", true, false)], &[], || check(
+                "touch ~/scripts/keep/x"
+            ),),
             "a more specific read-only grant still decides for what it names"
         );
     }

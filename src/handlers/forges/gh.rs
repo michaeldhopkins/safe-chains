@@ -13,28 +13,18 @@ use crate::verdict::{SafetyLevel, Verdict};
 // GraphQL; pair as KEY=VALUE) are coupled to the validation logic
 // just above. Adding a TOML primitive for "valued flag with KEY=VALUE
 // content rules" is a future schema refinement.
-static API_STANDALONE: WordSet = WordSet::new(&[
-    "--include", "--paginate", "--silent", "--slurp", "--verbose",
-    "-i",
-]);
+static API_STANDALONE: WordSet = WordSet::new(&["--include", "--paginate", "--silent", "--slurp", "--verbose", "-i"]);
 
-static API_VALUED: WordSet = WordSet::new(&[
-    "--cache", "--hostname", "--jq", "--json", "--preview", "--template",
-    "-p", "-q", "-t",
-]);
+static API_VALUED: WordSet = WordSet::new(&["--cache", "--hostname", "--jq", "--json", "--preview", "--template", "-p", "-q", "-t"]);
 
-static API_FIELD_FLAGS: WordSet = WordSet::new(&[
-    "--field", "--raw-field",
-    "-F", "-f",
-]);
+static API_FIELD_FLAGS: WordSet = WordSet::new(&["--field", "--raw-field", "-F", "-f"]);
 
 fn is_safe_api_header(value: &str) -> bool {
     let Some((name, _)) = value.split_once(':') else {
         return false;
     };
     let trimmed = name.trim();
-    trimmed.eq_ignore_ascii_case("Accept")
-        || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
+    trimmed.eq_ignore_ascii_case("Accept") || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
 }
 
 pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
@@ -76,18 +66,13 @@ fn is_graphql_mutation(query: &str) -> bool {
             None => return false,
         };
     }
-    s.starts_with("mutation")
-        && s.as_bytes()
-            .get(8)
-            .is_none_or(|&b| b == b' ' || b == b'\t' || b == b'\n' || b == b'{' || b == b'(')
+    s.starts_with("mutation") && s.as_bytes().get(8).is_none_or(|&b| b == b' ' || b == b'\t' || b == b'\n' || b == b'{' || b == b'(')
 }
 
 fn extract_field_value(tokens: &[Token], i: usize) -> Option<(&str, &str)> {
     let token = &tokens[i];
     let s = token.as_str();
-    if let Some(rest) = s.strip_prefix("--field=")
-        .or_else(|| s.strip_prefix("--raw-field="))
-    {
+    if let Some(rest) = s.strip_prefix("--field=").or_else(|| s.strip_prefix("--raw-field=")) {
         return rest.split_once('=');
     }
     if let Some(rest) = s.strip_prefix("-f").or_else(|| s.strip_prefix("-F"))
@@ -120,18 +105,30 @@ fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
 
         if token == "-H" || token == "--header" {
             match tokens.get(i + 1) {
-                Some(val) if is_safe_api_header(val.as_str()) => { i += 2; continue; }
+                Some(val) if is_safe_api_header(val.as_str()) => {
+                    i += 2;
+                    continue;
+                }
                 _ => return Verdict::Denied,
             }
         }
         if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
-            if is_safe_api_header(rest) { i += 1; continue; }
+            if is_safe_api_header(rest) {
+                i += 1;
+                continue;
+            }
             return Verdict::Denied;
         }
 
         if token.starts_with('-') {
-            if API_STANDALONE.contains(token) { i += 1; continue; }
-            if API_VALUED.contains(token) { i += 2; continue; }
+            if API_STANDALONE.contains(token) {
+                i += 1;
+                continue;
+            }
+            if API_VALUED.contains(token) {
+                i += 2;
+                continue;
+            }
             if API_FIELD_FLAGS.contains(token) {
                 if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
                     return Verdict::Denied;
@@ -141,7 +138,10 @@ fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
             }
             if let Some((_flag, _val)) = token.split_once('=') {
                 let flag_part = Token::from_raw(_flag.to_string());
-                if API_VALUED.contains(&flag_part) { i += 1; continue; }
+                if API_VALUED.contains(&flag_part) {
+                    i += 1;
+                    continue;
+                }
                 if API_FIELD_FLAGS.contains(&flag_part) {
                     if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
                         return Verdict::Denied;
@@ -197,18 +197,30 @@ fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
 
         if token == "-H" || token == "--header" {
             match tokens.get(i + 1) {
-                Some(val) if is_safe_api_header(val.as_str()) => { i += 2; continue; }
+                Some(val) if is_safe_api_header(val.as_str()) => {
+                    i += 2;
+                    continue;
+                }
                 _ => return Verdict::Denied,
             }
         }
         if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
-            if is_safe_api_header(rest) { i += 1; continue; }
+            if is_safe_api_header(rest) {
+                i += 1;
+                continue;
+            }
             return Verdict::Denied;
         }
 
         if token.starts_with('-') {
-            if API_STANDALONE.contains(token) { i += 1; continue; }
-            if API_VALUED.contains(token) { i += 2; continue; }
+            if API_STANDALONE.contains(token) {
+                i += 1;
+                continue;
+            }
+            if API_VALUED.contains(token) {
+                i += 2;
+                continue;
+            }
             if API_FIELD_FLAGS.contains(token) {
                 has_fields = true;
                 i += 2;
@@ -216,7 +228,10 @@ fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
             }
             if let Some((_flag, _val)) = token.split_once('=') {
                 let flag_part = Token::from_raw(_flag.to_string());
-                if API_VALUED.contains(&flag_part) { i += 1; continue; }
+                if API_VALUED.contains(&flag_part) {
+                    i += 1;
+                    continue;
+                }
                 if API_FIELD_FLAGS.contains(&flag_part) {
                     has_fields = true;
                     i += 1;
@@ -235,51 +250,19 @@ fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
 }
 
 #[cfg(test)]
-pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Paths { cmd: "gh", bare_ok: false, paths: &[
-        "gh alias list",
-        "gh attestation verify artifact",
-        "gh auth status",
-        "gh browse --no-browser",
-        "gh cache list",
-        "gh codespace list",
-        "gh config list",
-        "gh extension list",
-        "gh gist list",
-        "gh gist view 123",
-        "gh gpg-key list",
-        "gh issue list",
-        "gh issue view 456",
-        "gh label list",
-        "gh org list",
-        "gh pr list",
-        "gh pr view 123",
-        "gh pr diff 123",
-        "gh pr checks 123",
-        "gh pr status 123",
-        "gh project list",
-        "gh project view 1",
-        "gh release list",
-        "gh release view v1.0",
-        "gh release download v1.0 --output -",
-        "gh repo list",
-        "gh repo view owner/repo",
-        "gh ruleset list",
-        "gh ruleset view 1",
-        "gh run list",
-        "gh run view 789",
-        "gh run watch 123",
-        "gh run rerun 12345",
-        "gh search issues foo",
-        "gh secret list",
-        "gh ssh-key list",
-        "gh status",
-        "gh variable list",
-        "gh workflow list",
-        "gh workflow view ci",
-        "gh api repos/o/r",
-    ]},
-];
+pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[crate::handlers::CommandEntry::Paths {
+    cmd: "gh",
+    bare_ok: false,
+    paths: &[
+        "gh alias list", "gh attestation verify artifact", "gh auth status", "gh browse --no-browser", "gh cache list",
+        "gh codespace list", "gh config list", "gh extension list", "gh gist list", "gh gist view 123", "gh gpg-key list", "gh issue list",
+        "gh issue view 456", "gh label list", "gh org list", "gh pr list", "gh pr view 123", "gh pr diff 123", "gh pr checks 123",
+        "gh pr status 123", "gh project list", "gh project view 1", "gh release list", "gh release view v1.0",
+        "gh release download v1.0 --output -", "gh repo list", "gh repo view owner/repo", "gh ruleset list", "gh ruleset view 1",
+        "gh run list", "gh run view 789", "gh run watch 123", "gh run rerun 12345", "gh search issues foo", "gh secret list",
+        "gh ssh-key list", "gh status", "gh variable list", "gh workflow list", "gh workflow view ci", "gh api repos/o/r",
+    ],
+}];
 
 #[cfg(test)]
 mod tests {

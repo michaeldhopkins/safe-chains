@@ -230,10 +230,7 @@ mod tests {
 
     #[test]
     fn double_quoted() {
-        let w = Word(vec![WordPart::DQuote(Word(vec![
-            WordPart::Lit("hello ".into()),
-            WordPart::Lit("world".into()),
-        ]))]);
+        let w = Word(vec![WordPart::DQuote(Word(vec![WordPart::Lit("hello ".into()), WordPart::Lit("world".into())]))]);
         assert_eq!(w.eval(), "hello world");
     }
 
@@ -255,11 +252,8 @@ mod tests {
 
     #[test]
     fn dquote_with_escape() {
-        let w = Word(vec![WordPart::DQuote(Word(vec![
-            WordPart::Lit("hello".into()),
-            WordPart::Escape('"'),
-            WordPart::Lit("world".into()),
-        ]))]);
+        let w =
+            Word(vec![WordPart::DQuote(Word(vec![WordPart::Lit("hello".into()), WordPart::Escape('"'), WordPart::Lit("world".into())]))]);
         assert_eq!(w.eval(), "hello\"world");
     }
 }

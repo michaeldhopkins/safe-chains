@@ -47,9 +47,7 @@ pub fn is_safe_magick(tokens: &[Token]) -> Verdict {
     if !leading_flag && !crate::policy::looks_like_path(first) {
         return Verdict::Denied;
     }
-    let inner = shell_words::join(
-        std::iter::once("convert").chain(tokens[1..].iter().map(|t| t.as_str())),
-    );
+    let inner = shell_words::join(std::iter::once("convert").chain(tokens[1..].iter().map(|t| t.as_str())));
     crate::command_verdict(&inner)
 }
 
@@ -104,10 +102,7 @@ mod tests {
 
     #[test]
     fn magick_implicit_is_safewrite() {
-        assert_eq!(
-            verdict("magick in.png -resize 1200x out.png"),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-        );
+        assert_eq!(verdict("magick in.png -resize 1200x out.png"), Verdict::Allowed(SafetyLevel::SafeWrite),);
     }
 
     #[test]
@@ -115,17 +110,11 @@ mod tests {
         // identify alone is Inert (read-only inspection); routing
         // `magick identify ...` through the identify top-level should
         // preserve that level.
-        assert_eq!(
-            verdict("magick identify photo.jpg"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("magick identify photo.jpg"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 
     #[test]
     fn magick_help_is_inert() {
-        assert_eq!(
-            verdict("magick --help"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("magick --help"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 }

@@ -45,9 +45,5 @@ pub fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
         Err(e) => panic!("write to safe-chains stdin failed: {e}"),
     }
     let out = child.wait_with_output().expect("wait");
-    (
-        String::from_utf8_lossy(&out.stdout).into_owned(),
-        String::from_utf8_lossy(&out.stderr).into_owned(),
-        out.status.code().unwrap_or(-1),
-    )
+    (String::from_utf8_lossy(&out.stdout).into_owned(), String::from_utf8_lossy(&out.stderr).into_owned(), out.status.code().unwrap_or(-1))
 }

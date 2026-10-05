@@ -650,21 +650,9 @@ impl Capability {
                 level: PersistenceLevel::hazard(),
                 trigger: Trigger { escape: TriggerEscape::hazard(), kind: TriggerKind::hazard() },
             },
-            disclosure: Disclosure {
-                audience: DisclosureAudience::hazard(),
-                channel: Channel::hazard(),
-                principal: Principal::hazard(),
-            },
-            secret: Secret {
-                level: SecretLevel::hazard(),
-                channel: Channel::hazard(),
-                principal: Principal::hazard(),
-            },
-            network: Network {
-                direction: NetDirection::hazard(),
-                destination: NetDestination::hazard(),
-                payload: NetPayload::hazard(),
-            },
+            disclosure: Disclosure { audience: DisclosureAudience::hazard(), channel: Channel::hazard(), principal: Principal::hazard() },
+            secret: Secret { level: SecretLevel::hazard(), channel: Channel::hazard(), principal: Principal::hazard() },
+            network: Network { direction: NetDirection::hazard(), destination: NetDestination::hazard(), payload: NetPayload::hazard() },
             execution: Execution {
                 trust: ExecutionTrust::hazard(),
                 // PRESENT, not `None`. An absent supply chain satisfies every supply-chain
@@ -702,13 +690,7 @@ mod tests {
 
     fn assert_term_strings_roundtrip<T: FacetTerm + std::fmt::Debug>() {
         for &term in T::all() {
-            assert_eq!(
-                T::from_term(term.as_str()),
-                Some(term),
-                "term {:?} did not round-trip through {:?}",
-                term,
-                term.as_str(),
-            );
+            assert_eq!(T::from_term(term.as_str()), Some(term), "term {:?} did not round-trip through {:?}", term, term.as_str(),);
         }
         for (i, &a) in T::all().iter().enumerate() {
             for &b in &T::all()[i + 1..] {

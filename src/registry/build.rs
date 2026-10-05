@@ -64,10 +64,7 @@ pub(super) fn build_policy(
         standalone.push(flag.clone());
         valued.push(flag);
     }
-    let unknown = match (
-        tolerate_unknown_short.unwrap_or(false),
-        tolerate_unknown_long.unwrap_or(false),
-    ) {
+    let unknown = match (tolerate_unknown_short.unwrap_or(false), tolerate_unknown_long.unwrap_or(false)) {
         (false, false) => UnknownTolerance::Strict,
         (true, false) => UnknownTolerance::Short,
         (false, true) => UnknownTolerance::Long,
@@ -78,10 +75,7 @@ pub(super) fn build_policy(
         valued,
         bare: bare.unwrap_or(true),
         max_positional,
-        tolerance: FlagTolerance {
-            unknown,
-            numeric_dash: numeric_dash.unwrap_or(false),
-        },
+        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false) },
     }
 }
 
@@ -91,39 +85,19 @@ fn build_matrix(toml: TomlMatrix) -> MatrixSpec {
         .into_iter()
         .map(|(name, action)| {
             let built = match action {
-                TomlMatrixAction::Policy(policy_key) => MatrixAction {
-                    policy_key,
-                    guard: None,
-                    guard_short: None,
-                },
-                TomlMatrixAction::Detailed(d) => {
-                    MatrixAction {
-                        policy_key: d.policy,
-                        guard: d.guard,
-                        guard_short: d.guard_short,
-                    }
-                }
+                TomlMatrixAction::Policy(policy_key) => MatrixAction { policy_key, guard: None, guard_short: None },
+                TomlMatrixAction::Detailed(d) => MatrixAction { policy_key: d.policy, guard: d.guard, guard_short: d.guard_short },
             };
             (name, built)
         })
         .collect();
-    MatrixSpec {
-        parents: toml.parents,
-        level: toml.level.into(),
-        actions,
-    }
+    MatrixSpec { parents: toml.parents, level: toml.level.into(), actions }
 }
 
 fn build_handler_policy(toml: TomlHandlerPolicy) -> OwnedPolicy {
     build_policy(
-        toml.standalone,
-        toml.valued,
-        toml.optional_valued,
-        toml.bare,
-        toml.max_positional,
-        toml.tolerate_unknown_short,
-        toml.tolerate_unknown_long,
-        toml.numeric_dash,
+        toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long, toml.numeric_dash,
     )
 }
 
@@ -140,14 +114,8 @@ fn build_verb_chain(toml: TomlVerbChain) -> VerbChainSpec {
 
 fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, String> {
     let policy = build_policy(
-        toml.standalone,
-        toml.valued,
-        toml.optional_valued,
-        toml.bare,
-        toml.max_positional,
-        toml.tolerate_unknown_short,
-        toml.tolerate_unknown_long,
-        toml.numeric_dash,
+        toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long, toml.numeric_dash,
     );
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     let positional_shape = match toml.positional_shape.as_deref() {
@@ -311,8 +279,8 @@ pub(super) fn build_subs(
             output: canonical.output.clone(),
             network_destination: canonical.network_destination,
             destination_flag: canonical.destination_flag.clone(),
-        loopback_valued: canonical.loopback_valued.clone(),
-        loopback_effect: canonical.loopback_effect,
+            loopback_valued: canonical.loopback_valued.clone(),
+            loopback_effect: canonical.loopback_effect,
             output_path_flags: canonical.output_path_flags.clone(),
         });
     }
@@ -381,7 +349,9 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) -> Result<(), String> {
         ensure!(
             f.classifies == "unclassified" || crate::engine::archetype::archetype(&f.classifies).is_some(),
             "{parent} sub `{}` flag `{}`: classifies `{}` is not a known archetype",
-            toml.name, f.name, f.classifies,
+            toml.name,
+            f.name,
+            f.classifies,
         );
         ensure!(cited(&f.fact), "{parent} sub `{}` flag `{}`: requires a `fact`", toml.name, f.name);
         ensure!(cited(&f.source), "{parent} sub `{}` flag `{}`: requires a `source`", toml.name, f.name);
@@ -389,7 +359,8 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) -> Result<(), String> {
         ensure!(
             !(f.when_absent == Some(true) && f.value_prefix.is_some()),
             "{parent} sub `{}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
-            toml.name, f.name,
+            toml.name,
+            f.name,
         );
     }
     Ok(())
@@ -486,11 +457,7 @@ pub(super) fn build_sub(
     let destination_flag = toml.destination_flag.clone();
     let output_path_flags = toml.output_path_flags.clone();
     let loopback_valued = toml.loopback_valued.clone();
-    let loopback_effect = if toml.loopback_localizes.unwrap_or(false) {
-        LoopbackEffect::Localizes
-    } else {
-        LoopbackEffect::AdmitOnly
-    };
+    let loopback_effect = if toml.loopback_localizes.unwrap_or(false) { LoopbackEffect::Localizes } else { LoopbackEffect::AdmitOnly };
     assert_loopback_localizes_is_coherent(parent, &name, &toml)?;
     let valued_for_check = toml.valued.clone();
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags)?;
@@ -742,10 +709,7 @@ fn build_sub_kind(
         });
     }
     if toml.allow_all.unwrap_or(false) {
-        return Ok(DispatchKind::Policy {
-            policy: allow_all_policy(),
-            level: toml.level.unwrap_or(TomlLevel::Inert).into(),
-        });
+        return Ok(DispatchKind::Policy { policy: allow_all_policy(), level: toml.level.unwrap_or(TomlLevel::Inert).into() });
     }
     if let Some(sep) = toml.delegate_after {
         return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
@@ -800,7 +764,8 @@ fn build_policy_sub_kind(
                  inline standalone/valued — pick one. Either drop the inline \
                  lists (and rely on the referenced handler_policy) or drop \
                  the `policy` field.",
-                toml.name, key,
+                toml.name,
+                key,
             );
         }
         match handler_policies.get(key).cloned() {
@@ -814,32 +779,20 @@ fn build_policy_sub_kind(
         }
     } else {
         build_policy(
-            toml.standalone,
-            toml.valued,
-            toml.optional_valued,
-            toml.bare,
-            toml.max_positional,
-            toml.tolerate_unknown_short,
-            toml.tolerate_unknown_long,
-            toml.numeric_dash,
+            toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
+            toml.tolerate_unknown_long, toml.numeric_dash,
         )
     };
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     if let Some(name) = toml.executor.as_deref() {
         let Some(kind) = ExecutorKind::from_name(name) else {
-            fail!(
-                "command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)",
-                toml.name
-            )
+            fail!("command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)", toml.name)
         };
         let shape = match toml.positional_shape.as_deref() {
             None => None,
             Some(s) => match crate::policy::PositionalShape::from_name(s) {
                 Some(shape) => Some(shape),
-                None => fail!(
-                    "command '{parent}' sub `{}`: unknown positional_shape `{s}`",
-                    toml.name
-                ),
+                None => fail!("command '{parent}' sub `{}`: unknown positional_shape `{s}`", toml.name),
             },
         };
         return Ok(DispatchKind::Executor {
@@ -852,23 +805,14 @@ fn build_policy_sub_kind(
         });
     }
     if !toml.write_flags.is_empty() {
-        return Ok(DispatchKind::WriteFlagged {
-            policy,
-            base_level: level,
-            write_flags: toml.write_flags,
-        });
+        return Ok(DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags });
     }
     if let Some(guard) = toml.guard {
         let mut require_any = vec![guard];
         if let Some(short) = toml.guard_short {
             require_any.push(short);
         }
-        return Ok(DispatchKind::RequireAny {
-            require_any,
-            policy,
-            level,
-            accept_bare_help: true,
-        });
+        return Ok(DispatchKind::RequireAny { require_any, policy, level, accept_bare_help: true });
     }
     if !toml.first_arg.is_empty() {
         return Ok(DispatchKind::FirstArg {
@@ -880,12 +824,7 @@ fn build_policy_sub_kind(
         });
     }
     if !toml.require_any.is_empty() {
-        return Ok(DispatchKind::RequireAny {
-            require_any: toml.require_any,
-            policy,
-            level,
-            accept_bare_help: false,
-        });
+        return Ok(DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false });
     }
     Ok(DispatchKind::Policy { policy, level })
 }
@@ -948,7 +887,10 @@ fn assert_matrix_policy_keys_exist(toml: &TomlCommand) -> Result<(), String> {
                     "command '{}' matrix action `{}` references \
                      handler_policy `{}` which is not declared. \
                      Add a [command.handler_policy.{}] block or fix the typo.",
-                    toml.name, action_name, policy_key, policy_key,
+                    toml.name,
+                    action_name,
+                    policy_key,
+                    policy_key,
                 );
             }
         }
@@ -970,7 +912,9 @@ fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) -> Result<(), St
                         "command '{}' matrix has duplicate (parent, action) pair \
                          (`{}`, `{}`). The first match would silently win — \
                          consolidate into one matrix block or remove the duplicate.",
-                        toml.name, parent, action,
+                        toml.name,
+                        parent,
+                        action,
                     );
                 }
             }
@@ -1006,12 +950,7 @@ fn lower_output(name: &str, o: Option<&TomlOutput>) -> Result<Option<OutputSpec>
         "atom" => OutputLocus::Atom,
         other => fail!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin, atom)"),
     };
-    Ok(Some(OutputSpec {
-        locus_from,
-        invalidated_by: o.invalidated_by.clone(),
-        valued: o.valued.clone(),
-        requires: o.requires.clone(),
-    }))
+    Ok(Some(OutputSpec { locus_from, invalidated_by: o.invalidated_by.clone(), valued: o.valued.clone(), requires: o.requires.clone() }))
 }
 
 fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Result<Option<BehaviorSpec>, String> {
@@ -1056,7 +995,9 @@ fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Result<Option<Behavio
             let role = match kind {
                 "read" => PathRole::Read,
                 "write" => PathRole::Write,
-                other => fail!("command '{name}': behavior flag `{flag}` has unknown kind `{other}` (known: read, write)"),
+                other => {
+                    fail!("command '{name}': behavior flag `{flag}` has unknown kind `{other}` (known: read, write)")
+                }
             };
             if !b.valued.contains(flag) {
                 fail!("command '{name}': behavior path-flag `{flag}` (kind = {kind}) must also be listed in `valued`");
@@ -1148,20 +1089,17 @@ fn split_flag_forms(tokens: &[String]) -> (Vec<u8>, Vec<String>) {
 /// analog of a profiled sub's escalating flags. Each must name a known archetype (or `unclassified`)
 /// and cite `fact`/`source`; `when_absent`/`value_prefix` are mutually exclusive. Mirrors the per-sub
 /// check in `assert_sub_provenance`.
-fn build_command_archetype_flags(
-    cmd: &str,
-    flags: Vec<TomlSubFlag>,
-) -> Result<Vec<crate::registry::types::FlagProvenance>, String> {
+fn build_command_archetype_flags(cmd: &str, flags: Vec<TomlSubFlag>) -> Result<Vec<crate::registry::types::FlagProvenance>, String> {
     let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
     let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
     flags
         .into_iter()
         .map(|f| {
             ensure!(
-                f.classifies == "unclassified"
-                    || crate::engine::archetype::archetype(&f.classifies).is_some(),
+                f.classifies == "unclassified" || crate::engine::archetype::archetype(&f.classifies).is_some(),
                 "command `{cmd}` flag `{}`: classifies `{}` is not a known archetype",
-                f.name, f.classifies,
+                f.name,
+                f.classifies,
             );
             ensure!(cited(&f.fact), "command `{cmd}` flag `{}`: requires a `fact`", f.name);
             ensure!(cited(&f.source), "command `{cmd}` flag `{}`: requires a `source`", f.name);
@@ -1208,25 +1146,9 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             toml.name,
         );
     }
-    assert_eval_safe_flag_values_consistent(
-        &toml.name,
-        "<command>",
-        &eval_safe_flags,
-        &eval_safe_flag_values,
-    )?;
-    assert_eval_safe_valued_flags_declared(
-        &toml.name,
-        "<command>",
-        &eval_safe_flags,
-        &toml.valued,
-        &eval_safe_flag_values,
-    )?;
-    assert_eval_safe_required_flags_consistent(
-        &toml.name,
-        "<command>",
-        &eval_safe_flags,
-        &eval_safe_required_flags,
-    )?;
+    assert_eval_safe_flag_values_consistent(&toml.name, "<command>", &eval_safe_flags, &eval_safe_flag_values)?;
+    assert_eval_safe_valued_flags_declared(&toml.name, "<command>", &eval_safe_flags, &toml.valued, &eval_safe_flag_values)?;
+    assert_eval_safe_required_flags_consistent(&toml.name, "<command>", &eval_safe_flags, &eval_safe_required_flags)?;
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
@@ -1288,11 +1210,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     if let Some(handler_name) = toml.handler {
         // Build handler_policies first so subs that use `policy = "key"`
         // can resolve the reference at build time.
-        let handler_policies: std::collections::HashMap<String, OwnedPolicy> = toml
-            .handler_policy
-            .into_iter()
-            .map(|(k, v)| (k, build_handler_policy(v)))
-            .collect();
+        let handler_policies: std::collections::HashMap<String, OwnedPolicy> =
+            toml.handler_policy.into_iter().map(|(k, v)| (k, build_handler_policy(v))).collect();
         let parent_name = toml.name.clone();
         let subs: Vec<SubSpec> = filter_candidates(toml.sub)?
             .map(|s| build_subs(&parent_name, s, &handler_policies))
@@ -1301,11 +1220,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             .flatten()
             .collect();
         let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f)).transpose()?;
-        let matrices = toml
-            .matrix
-            .into_iter()
-            .map(build_matrix)
-            .collect();
+        let matrices = toml.matrix.into_iter().map(build_matrix).collect();
         return Ok(CommandSpec {
             name: toml.name,
             description: desc,
@@ -1324,14 +1239,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             env_assignment_positionals,
-            kind: DispatchKind::Custom {
-                handler_name,
-                doc_body: toml.doc_body,
-                subs,
-                fallback,
-                handler_policies,
-                matrices,
-            },
+            kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body, subs, fallback, handler_policies, matrices },
         });
     }
 
@@ -1451,14 +1359,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     }
 
     let policy = build_policy(
-        toml.standalone,
-        toml.valued,
-        toml.optional_valued,
-        toml.bare,
-        toml.max_positional,
-        toml.tolerate_unknown_short,
-        toml.tolerate_unknown_long,
-        toml.numeric_dash,
+        toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long, toml.numeric_dash,
     );
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
@@ -1511,11 +1413,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             env_assignment_positionals,
-            kind: DispatchKind::WriteFlagged {
-                policy,
-                base_level: level,
-                write_flags: toml.write_flags,
-            },
+            kind: DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags },
         });
     }
 
@@ -1538,12 +1436,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             env_assignment_positionals,
-            kind: DispatchKind::RequireAny {
-                require_any: toml.require_any,
-                policy,
-                level,
-                accept_bare_help: false,
-            },
+            kind: DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false },
         });
     }
 
@@ -1565,10 +1458,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         archetype_flags,
         behavior,
         output,
-        kind: DispatchKind::Policy {
-            policy,
-            level,
-        },
+        kind: DispatchKind::Policy { policy, level },
     })
 }
 
@@ -1585,7 +1475,8 @@ pub fn load_toml(source: &str, category: &str) -> Result<Vec<CommandSpec>, Strin
             fail!("invalid TOML command definition: {e}\n  source begins: {preview}");
         }
     };
-    file.command.into_iter()
+    file.command
+        .into_iter()
         .filter(|cmd| !cmd.candidate.unwrap_or(false))
         .map(|cmd| build_command(cmd, category))
         .collect()
@@ -1607,32 +1498,35 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
 pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
     map.retain(|_, s| s.name != spec.name);
     for alias in &spec.aliases {
-        map.insert(alias.clone(), CommandSpec {
-            // Carried, not defaulted: `typeset` is an alias of `declare`, and dropping this here
-            // would let the alias put a variable into the environment unclassified while the
-            // canonical spelling denied.
-            env_assignment_positionals: spec.env_assignment_positionals,
-            name: spec.name.clone(),
-            description: spec.description.clone(),
-            aliases: vec![],
-            url: spec.url.clone(),
-            category: spec.category.clone(),
-            researched_version: spec.researched_version.clone(),
-            examples_safe: vec![],
-            examples_denied: vec![],
-            eval_safe: spec.eval_safe,
-            eval_safe_flags: spec.eval_safe_flags.clone(),
-            eval_safe_flag_values: spec.eval_safe_flag_values.clone(),
-            eval_safe_required_flags: spec.eval_safe_required_flags.clone(),
-            // Aliases are canonicalized (`registry::canonical_name`) before `should_deny` and
-            // before the engine's behavior lookup, so the canonical spec's `path_gate` /
-            // `behavior` is what's consulted — the alias entry never needs either.
-            path_gate: None,
-            archetype_flags: Vec::new(),
-            behavior: None,
-            output: None,
-            kind: spec.kind.clone(),
-        });
+        map.insert(
+            alias.clone(),
+            CommandSpec {
+                // Carried, not defaulted: `typeset` is an alias of `declare`, and dropping this here
+                // would let the alias put a variable into the environment unclassified while the
+                // canonical spelling denied.
+                env_assignment_positionals: spec.env_assignment_positionals,
+                name: spec.name.clone(),
+                description: spec.description.clone(),
+                aliases: vec![],
+                url: spec.url.clone(),
+                category: spec.category.clone(),
+                researched_version: spec.researched_version.clone(),
+                examples_safe: vec![],
+                examples_denied: vec![],
+                eval_safe: spec.eval_safe,
+                eval_safe_flags: spec.eval_safe_flags.clone(),
+                eval_safe_flag_values: spec.eval_safe_flag_values.clone(),
+                eval_safe_required_flags: spec.eval_safe_required_flags.clone(),
+                // Aliases are canonicalized (`registry::canonical_name`) before `should_deny` and
+                // before the engine's behavior lookup, so the canonical spec's `path_gate` /
+                // `behavior` is what's consulted — the alias entry never needs either.
+                path_gate: None,
+                archetype_flags: Vec::new(),
+                behavior: None,
+                output: None,
+                kind: spec.kind.clone(),
+            },
+        );
     }
     map.insert(spec.name.clone(), spec);
 }

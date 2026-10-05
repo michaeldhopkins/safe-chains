@@ -59,10 +59,7 @@ fn documented(out: &mut BTreeSet<String>) {
 }
 
 fn corpus(root: &Path) -> BTreeSet<String> {
-    let mut all: BTreeSet<String> = corpus::registry_corpus(root)
-        .into_values()
-        .flatten()
-        .collect();
+    let mut all: BTreeSet<String> = corpus::registry_corpus(root).into_values().flatten().collect();
     all.extend(rust_examples::rust_examples(root));
     documented(&mut all);
     all.retain(|inv| !inv.trim().is_empty());
@@ -75,19 +72,11 @@ fn verdicts(invocations: &BTreeSet<String>) -> Snapshot {
     let dir = tempfile::tempdir().expect("tempdir");
     let input = dir.path().join("in.tsv");
     let output = dir.path().join("out.tsv");
-    let listed: Snapshot = invocations
-        .iter()
-        .map(|i| (i.clone(), "denied".to_string()))
-        .collect();
+    let listed: Snapshot = invocations.iter().map(|i| (i.clone(), "denied".to_string())).collect();
     fs::write(&input, snapshot::render(&listed)).expect("write worker input");
     let exe = std::env::current_exe().expect("current_exe");
     let status = Command::new(exe)
-        .args([
-            "--exact",
-            "verdict_worker",
-            "--nocapture",
-            "--test-threads=1",
-        ])
+        .args(["--exact", "verdict_worker", "--nocapture", "--test-threads=1"])
         .env_clear()
         .env("HOME", "/nonexistent/verdict-snapshot-home")
         .env("TMPDIR", "/tmp")
@@ -98,13 +87,8 @@ fn verdicts(invocations: &BTreeSet<String>) -> Snapshot {
         .status()
         .expect("spawn verdict worker");
     assert!(status.success(), "verdict worker failed: {status}");
-    let out = snapshot::parse(&fs::read_to_string(&output).expect("worker output"))
-        .expect("worker output parses");
-    assert_eq!(
-        out.len(),
-        invocations.len(),
-        "the worker answered for a different set of invocations"
-    );
+    let out = snapshot::parse(&fs::read_to_string(&output).expect("worker output")).expect("worker output parses");
+    assert_eq!(out.len(), invocations.len(), "the worker answered for a different set of invocations");
     out
 }
 
@@ -112,15 +96,11 @@ fn verdicts(invocations: &BTreeSet<String>) -> Snapshot {
 /// harmlessly when the suite runs it directly.
 #[test]
 fn verdict_worker() {
-    let (Some(input), Some(output)) = (std::env::var_os(WORKER_IN), std::env::var_os(WORKER_OUT))
-    else {
+    let (Some(input), Some(output)) = (std::env::var_os(WORKER_IN), std::env::var_os(WORKER_OUT)) else {
         return;
     };
     let text = fs::read_to_string(input).expect("worker input");
-    let invocations: Vec<String> = snapshot::parse(&text)
-        .expect("worker input parses")
-        .into_keys()
-        .collect();
+    let invocations: Vec<String> = snapshot::parse(&text).expect("worker input parses").into_keys().collect();
     let threads = std::thread::available_parallelism().map_or(4, usize::from);
     let chunk = invocations.len().div_ceil(threads).max(1);
     let results: Snapshot = std::thread::scope(|s| {
@@ -129,34 +109,19 @@ fn verdict_worker() {
             .map(|part| {
                 s.spawn(move || {
                     part.iter()
-                        .map(|inv| {
-                            (
-                                inv.clone(),
-                                snapshot::verdict_label(safe_chains::command_verdict(inv))
-                                    .to_string(),
-                            )
-                        })
+                        .map(|inv| (inv.clone(), snapshot::verdict_label(safe_chains::command_verdict(inv)).to_string()))
                         .collect::<Vec<_>>()
                 })
             })
             .collect();
-        handles
-            .into_iter()
-            .flat_map(|h| h.join().expect("verdict thread"))
-            .collect()
+        handles.into_iter().flat_map(|h| h.join().expect("verdict thread")).collect()
     });
     fs::write(output, snapshot::render(&results)).expect("write worker output");
 }
 
 fn snapshot_files(dir: &Path) -> Vec<PathBuf> {
     let mut files: Vec<PathBuf> = fs::read_dir(dir)
-        .map(|entries| {
-            entries
-                .flatten()
-                .map(|e| e.path())
-                .filter(|p| p.extension().is_some_and(|e| e == "tsv"))
-                .collect()
-        })
+        .map(|entries| entries.flatten().map(|e| e.path()).filter(|p| p.extension().is_some_and(|e| e == "tsv")).collect())
         .unwrap_or_default();
     files.sort();
     files
@@ -167,18 +132,9 @@ fn read_snapshot(dir: &Path) -> Snapshot {
     for path in snapshot_files(dir) {
         let text = fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
         let part = snapshot::parse(&text).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
-        let bucket = path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or_default()
-            .to_string();
+        let bucket = path.file_stem().and_then(|s| s.to_str()).unwrap_or_default().to_string();
         for (inv, verdict) in part {
-            assert_eq!(
-                snapshot::bucket_of(&inv),
-                bucket,
-                "{}: {inv:?} belongs in another file",
-                path.display()
-            );
+            assert_eq!(snapshot::bucket_of(&inv), bucket, "{}: {inv:?} belongs in another file", path.display());
             all.insert(inv, verdict);
         }
     }
@@ -201,31 +157,18 @@ fn verdicts_match_the_snapshot() {
     let dir = root.join(SNAPSHOT);
     let update = std::env::var_os(UPDATE).is_some();
     let old = read_snapshot(&dir);
-    assert!(
-        update || !old.is_empty(),
-        "{SNAPSHOT} is empty; create it with {REGEN}"
-    );
+    assert!(update || !old.is_empty(), "{SNAPSHOT} is empty; create it with {REGEN}");
 
     let generated = corpus(&root);
-    assert!(
-        generated.len() > 10_000,
-        "the corpus shrank to {} invocations; the walk lost something",
-        generated.len()
-    );
+    assert!(generated.len() > 10_000, "the corpus shrank to {} invocations; the walk lost something", generated.len());
     let mut asked = generated.clone();
     asked.extend(old.keys().cloned());
-    let (all, recheck): (Snapshot, Snapshot) = verdicts(&asked)
-        .into_iter()
-        .partition(|(inv, _)| generated.contains(inv));
+    let (all, recheck): (Snapshot, Snapshot) = verdicts(&asked).into_iter().partition(|(inv, _)| generated.contains(inv));
     let drift = Drift::between(&old, &all, &recheck);
 
     if update {
         write_snapshot(&dir, &all);
-        eprintln!(
-            "wrote {} rows to {SNAPSHOT}\n{}",
-            all.len(),
-            drift.summary(SHOWN)
-        );
+        eprintln!("wrote {} rows to {SNAPSHOT}\n{}", all.len(), drift.summary(SHOWN));
         return;
     }
     assert!(
@@ -248,10 +191,7 @@ fn every_snapshot_file_stays_small_enough_for_jj_to_commit() {
         .filter_map(|p| Some((p.display().to_string(), fs::metadata(p).ok()?.len())))
         .filter(|(_, len)| *len > MAX_FILE_BYTES / 2)
         .collect();
-    assert!(
-        big.is_empty(),
-        "split these by their second character before they reach 1 MiB: {big:?}"
-    );
+    assert!(big.is_empty(), "split these by their second character before they reach 1 MiB: {big:?}");
 }
 
 #[test]
@@ -261,8 +201,5 @@ fn every_command_file_contributes_invocations() {
         .filter(|(_, invocations)| invocations.is_empty())
         .map(|(path, _)| path.display().to_string())
         .collect();
-    assert!(
-        empty.is_empty(),
-        "command files that generated nothing: {empty:?}"
-    );
+    assert!(empty.is_empty(), "command files that generated nothing: {empty:?}");
 }

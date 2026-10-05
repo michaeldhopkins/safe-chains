@@ -77,10 +77,7 @@ pub trait HookFormat: Send + Sync {
     /// overrides this only when its hook schema has a verified field for
     /// injecting model-visible context without a permission decision.
     fn render_context(&self, _context: &str) -> HookResponse {
-        HookResponse {
-            stdout: String::new(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: String::new(), exit_code: 0 }
     }
 
     /// How this harness's hook must handle a GATED command (one safe-chains does not auto-approve),
@@ -96,20 +93,14 @@ pub trait HookFormat: Send + Sync {
     /// stray call can't fail open). The shape must be exactly what the harness supports, or a
     /// harness that "continues on malformed output" (e.g. Codex) fails open.
     fn render_deny(&self, _reason: &str) -> HookResponse {
-        HookResponse {
-            stdout: String::new(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: String::new(), exit_code: 0 }
     }
 
     /// The hook output that ESCALATES a gated command to a human prompt, for an `Ask` harness.
     /// Default abstains. (Antigravity fails CLOSED on a malformed/absent decision, so an Ask target
     /// must always emit a valid decision.)
     fn render_ask(&self, _reason: &str) -> HookResponse {
-        HookResponse {
-            stdout: String::new(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: String::new(), exit_code: 0 }
     }
 }
 
@@ -197,27 +188,18 @@ pub(crate) fn append_hook_entry(
     // (`[1,2,3]`, `"a string"`, `42`). Every caller turns a MISSING file into an empty object
     // before reaching here, so refusing cannot break a first-time `--setup`.
     if !settings.is_object() {
-        return Err(format!(
-            "the settings file is {}, expected an object. Leaving the file unchanged.",
-            json_kind(settings)
-        ));
+        return Err(format!("the settings file is {}, expected an object. Leaving the file unchanged.", json_kind(settings)));
     }
     let Some(obj) = settings.as_object_mut() else {
         unreachable!("just checked it is an object");
     };
     let hooks = obj.entry(outer).or_insert_with(|| json!({}));
     let Some(hooks) = hooks.as_object_mut() else {
-        return Err(format!(
-            "`{outer}` is {}, expected an object. Leaving the file unchanged.",
-            json_kind(&obj[outer])
-        ));
+        return Err(format!("`{outer}` is {}, expected an object. Leaving the file unchanged.", json_kind(&obj[outer])));
     };
     let slot = hooks.entry(event).or_insert_with(|| json!([]));
     if !slot.is_array() {
-        return Err(format!(
-            "`{outer}.{event}` is {}, expected an array. Leaving the file unchanged.",
-            json_kind(slot)
-        ));
+        return Err(format!("`{outer}.{event}` is {}, expected an array. Leaving the file unchanged.", json_kind(slot)));
     }
     let Some(arr) = slot.as_array_mut() else {
         unreachable!("just checked it is an array");
@@ -290,20 +272,13 @@ pub fn find(name: &str) -> Option<Box<dyn Target>> {
 }
 
 pub fn detect_installed(home: &Path) -> Vec<Box<dyn Target>> {
-    registry()
-        .into_iter()
-        .filter(|t| t.detect_paths(home).iter().any(|p| p.exists()))
-        .collect()
+    registry().into_iter().filter(|t| t.detect_paths(home).iter().any(|p| p.exists())).collect()
 }
 
 pub fn allow_reason(verdict: Verdict) -> &'static str {
     match verdict {
-        Verdict::Allowed(SafetyLevel::SafeWrite) => {
-            "All commands in chain are safe utilities (includes file writes)"
-        }
-        Verdict::Allowed(SafetyLevel::SafeRead) => {
-            "All commands in chain are safe utilities (includes code execution)"
-        }
+        Verdict::Allowed(SafetyLevel::SafeWrite) => "All commands in chain are safe utilities (includes file writes)",
+        Verdict::Allowed(SafetyLevel::SafeRead) => "All commands in chain are safe utilities (includes code execution)",
         _ => "All commands in chain are safe utilities",
     }
 }
@@ -411,19 +386,13 @@ mod tool_filter_tests {
             // The shell tool must still parse, or "reject everything" would satisfy the negative
             // half and look like a working filter.
             if let Err(e) = fmt.parse_input(&shell) {
-                failures.push(format!(
-                    "{name}: rejected its own shell tool `{}`: {}",
-                    target.shell_tool_name(),
-                    e.message
-                ));
+                failures.push(format!("{name}: rejected its own shell tool `{}`: {}", target.shell_tool_name(), e.message));
             }
             for foreign in ["Read", "Write", "Edit", "WebFetch"] {
                 let Some(env) = target.sample_envelope(foreign, "rm -rf /") else { continue };
                 checked += 1;
                 if fmt.parse_input(&env).is_ok() {
-                    failures.push(format!(
-                        "{name}: parsed a `{foreign}` envelope instead of abstaining"
-                    ));
+                    failures.push(format!("{name}: parsed a `{foreign}` envelope instead of abstaining"));
                 }
             }
         }

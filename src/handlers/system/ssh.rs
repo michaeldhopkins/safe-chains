@@ -87,38 +87,11 @@ fn is_auth_probe(tokens: &[Token]) -> bool {
 /// connection without enabling execution, forwarding, or tunneling.
 /// Sorted for `binary_search`.
 const SAFE_O_KEYS: &[&str] = &[
-    "addressfamily",
-    "batchmode",
-    "bindaddress",
-    "bindinterface",
-    "checkhostip",
-    "ciphers",
-    "compression",
-    "connectionattempts",
-    "connecttimeout",
-    "gssapiauthentication",
-    "hashknownhosts",
-    "hostkeyalgorithms",
-    "hostname",
-    "identitiesonly",
-    "identityfile",
-    "kbdinteractiveauthentication",
-    "kexalgorithms",
-    "loglevel",
-    "macs",
-    "numberofpasswordprompts",
-    "passwordauthentication",
-    "port",
-    "preferredauthentications",
-    "pubkeyauthentication",
-    "serveralivecountmax",
-    "serveraliveinterval",
-    "stricthostkeychecking",
-    "tcpkeepalive",
-    "user",
-    "userknownhostsfile",
-    "verifyhostkeydns",
-    "visualhostkey",
+    "addressfamily", "batchmode", "bindaddress", "bindinterface", "checkhostip", "ciphers", "compression", "connectionattempts",
+    "connecttimeout", "gssapiauthentication", "hashknownhosts", "hostkeyalgorithms", "hostname", "identitiesonly", "identityfile",
+    "kbdinteractiveauthentication", "kexalgorithms", "loglevel", "macs", "numberofpasswordprompts", "passwordauthentication", "port",
+    "preferredauthentications", "pubkeyauthentication", "serveralivecountmax", "serveraliveinterval", "stricthostkeychecking",
+    "tcpkeepalive", "user", "userknownhostsfile", "verifyhostkeydns", "visualhostkey",
 ];
 
 fn check_o_option(option: &str, has_batchmode: &mut bool) -> bool {
@@ -137,9 +110,7 @@ pub(crate) fn check_ssh(tokens: &[Token]) -> Verdict {
     if is_auth_probe(tokens) {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    let has_inspect_flag = tokens[1..]
-        .iter()
-        .any(|t| matches!(t.as_str(), "-V" | "-G" | "-Q"));
+    let has_inspect_flag = tokens[1..].iter().any(|t| matches!(t.as_str(), "-V" | "-G" | "-Q"));
     if !has_inspect_flag {
         return Verdict::Denied;
     }
@@ -253,25 +224,16 @@ mod tests {
 
     #[test]
     fn auth_probe_returns_inert() {
-        assert_eq!(
-            verdict("ssh -T -o BatchMode=yes git@github.com"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("ssh -T -o BatchMode=yes git@github.com"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 
     #[test]
     fn config_dump_returns_inert() {
-        assert_eq!(
-            verdict("ssh -G user@example.com"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("ssh -G user@example.com"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 
     #[test]
     fn combined_short_returns_inert() {
-        assert_eq!(
-            verdict("ssh -Tq -o BatchMode=yes git@github.com"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("ssh -Tq -o BatchMode=yes git@github.com"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 }

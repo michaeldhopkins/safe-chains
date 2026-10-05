@@ -45,19 +45,10 @@ fn a_shape_invalid_config_is_reported_without_panicking() {
         let out = run_with_config(source);
         let err = String::from_utf8_lossy(&out.stderr);
 
-        assert!(
-            !err.contains("panicked at"),
-            "{what}: a malformed user config printed a panic to stderr:\n{err}"
-        );
-        assert!(
-            err.contains("ignoring"),
-            "{what}: the skipped config was not reported at all:\n{err}"
-        );
+        assert!(!err.contains("panicked at"), "{what}: a malformed user config printed a panic to stderr:\n{err}");
+        assert!(err.contains("ignoring"), "{what}: the skipped config was not reported at all:\n{err}");
         // Skipping must leave the built-in registry deciding, not disable safe-chains.
-        assert!(
-            out.status.success(),
-            "{what}: a safe command stopped being approved because a custom config was bad"
-        );
+        assert!(out.status.success(), "{what}: a safe command stopped being approved because a custom config was bad");
     }
 }
 
@@ -66,8 +57,7 @@ fn a_shape_invalid_config_is_reported_without_panicking() {
 fn a_shape_invalid_config_does_not_widen_the_allowlist() {
     let home = tempfile::tempdir().expect("tempdir");
     std::fs::create_dir_all(home.path().join(".config")).expect("mkdir .config");
-    std::fs::write(home.path().join(".config/safe-chains.toml"), SHAPE_INVALID[0].1)
-        .expect("write config");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), SHAPE_INVALID[0].1).expect("write config");
     let work = home.path().join("wk");
     std::fs::create_dir_all(&work).expect("mkdir wk");
 

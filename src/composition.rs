@@ -38,21 +38,15 @@ mod tests {
 
     /// Inner commands, each with a `{P}` path placeholder: destroys, writes, reads, inert.
     const COMMANDS: &[&str] = &[
-        "rm {P}", "rm -rf {P}", "rm -f {P}",
-        "cp {P} /tmp/dest", "mv {P} /tmp/dest", "ln -sf {P} /tmp/l",
-        "sed -i s/a/b/ {P}", "dd if={P} of=/tmp/o", "tee {P}", "truncate -s 0 {P}",
-        "cat {P}", "head {P}", "tail {P}", "wc {P}", "grep foo {P}", "sort {P}",
+        "rm {P}", "rm -rf {P}", "rm -f {P}", "cp {P} /tmp/dest", "mv {P} /tmp/dest", "ln -sf {P} /tmp/l", "sed -i s/a/b/ {P}",
+        "dd if={P} of=/tmp/o", "tee {P}", "truncate -s 0 {P}", "cat {P}", "head {P}", "tail {P}", "wc {P}", "grep foo {P}", "sort {P}",
         "echo {P}", "basename {P}", "dirname {P}",
     ];
 
     /// Loci spanning worktree → worktree-escape → temp → home → system → device/kernel.
     const LOCI: &[&str] = &[
-        ".", "./src", "src", "sub/dir",
-        "../..", "../sibling", "../../etc",
-        "/tmp", "/tmp/sub",
-        "~", "~/.ssh", "$HOME", "$HOME/.aws",
-        "/etc", "/etc/ssh", "/usr", "/", "/var/log", "/bin", "/root",
-        "/dev/sda", "/proc/1",
+        ".", "./src", "src", "sub/dir", "../..", "../sibling", "../../etc", "/tmp", "/tmp/sub", "~", "~/.ssh", "$HOME", "$HOME/.aws",
+        "/etc", "/etc/ssh", "/usr", "/", "/var/log", "/bin", "/root", "/dev/sda", "/proc/1",
     ];
 
     fn target_path(loc: &str) -> String {
@@ -100,9 +94,7 @@ mod tests {
                         allowed_comps += 1;
                     }
                     if !no_looser(comp, reference) {
-                        violations.push(format!(
-                            "[{label}] `{comp_cmd}` = {comp}  >  direct `{direct}` = {reference}"
-                        ));
+                        violations.push(format!("[{label}] `{comp_cmd}` = {comp}  >  direct `{direct}` = {reference}"));
                     }
                 }
             }
@@ -130,11 +122,7 @@ mod tests {
     fn xargs_never_launders_stdin_items() {
         let mut violations = Vec::new();
         for cmd_tpl in COMMANDS {
-            let bare = cmd_tpl
-                .replace("{P}", "")
-                .split_whitespace()
-                .collect::<Vec<_>>()
-                .join(" ");
+            let bare = cmd_tpl.replace("{P}", "").split_whitespace().collect::<Vec<_>>().join(" ");
             let reference = new_verdict(&bare);
             let braces = cmd_tpl.replace("{P}", "{}");
             let wraps = [
@@ -145,9 +133,7 @@ mod tests {
             for (label, comp_cmd) in wraps {
                 let comp = new_verdict(&comp_cmd);
                 if !no_looser(comp, reference) {
-                    violations.push(format!(
-                        "[{label}] `{comp_cmd}` = {comp}  >  bare `{bare}` = {reference}"
-                    ));
+                    violations.push(format!("[{label}] `{comp_cmd}` = {comp}  >  bare `{bare}` = {reference}"));
                 }
             }
         }
@@ -197,10 +183,7 @@ mod tests {
 
     #[test]
     fn absolute_deny_invariants_hold() {
-        let leaked: Vec<_> = MUST_DENY
-            .iter()
-            .filter(|cmd| new_verdict(cmd).is_allowed())
-            .collect();
+        let leaked: Vec<_> = MUST_DENY.iter().filter(|cmd| new_verdict(cmd).is_allowed()).collect();
         assert!(leaked.is_empty(), "these must-deny compositions auto-approve:\n{leaked:#?}");
     }
 
@@ -208,29 +191,17 @@ mod tests {
     /// blunt "deny all delegation" would pass it. These legit worktree compositions must keep
     /// auto-approving.
     const SHOULD_ALLOW: &[&str] = &[
-        "find . -exec cat {} \\;",
-        "find ./src -exec grep foo {} \\;",
-        "find . -name '*.tmp' -exec rm {} \\;",
-        "find . -exec rm {} \\;",
-        "find src -exec head {} \\;",
-        "time rm ./stale.log",
-        "time cat ./notes.md",
-        "nice cat ./x",
-        "env FOO=1 cat ./x",
+        "find . -exec cat {} \\;", "find ./src -exec grep foo {} \\;", "find . -name '*.tmp' -exec rm {} \\;", "find . -exec rm {} \\;",
+        "find src -exec head {} \\;", "time rm ./stale.log", "time cat ./notes.md", "nice cat ./x", "env FOO=1 cat ./x",
         "xargs -I{} basename {}",
         // flow-aware: a workspace-bounded pipe source keeps a file-reading inner allowed
         // (a BARE `xargs cat` — no source — now correctly denies; see the shell handler tests).
-        "find . | xargs cat",
-        "find ./src -name x | xargs grep foo",
-        "ls | xargs wc -l",
+        "find . | xargs cat", "find ./src -name x | xargs grep foo", "ls | xargs wc -l",
     ];
 
     #[test]
     fn legit_worktree_compositions_still_auto_approve() {
-        let broken: Vec<_> = SHOULD_ALLOW
-            .iter()
-            .filter(|cmd| !new_verdict(cmd).is_allowed())
-            .collect();
+        let broken: Vec<_> = SHOULD_ALLOW.iter().filter(|cmd| !new_verdict(cmd).is_allowed()).collect();
         assert!(broken.is_empty(), "legit compositions are (over-)denied:\n{broken:#?}");
     }
 }

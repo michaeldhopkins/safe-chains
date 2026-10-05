@@ -25,9 +25,7 @@ impl Target for GrokTarget {
     /// `no_target_decides_on_a_foreign_tool` rather than exempted from it.
     #[cfg(test)]
     fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
-        Some(format!(
-            r#"{{"toolName":"{tool}","toolInput":{{"command":"{command}"}},"workspaceRoot":"/w"}}"#
-        ))
+        Some(format!(r#"{{"toolName":"{tool}","toolInput":{{"command":"{command}"}},"workspaceRoot":"/w"}}"#))
     }
 
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
@@ -40,9 +38,7 @@ impl Target for GrokTarget {
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
         let dir = home.join(".grok");
         if !dir.exists() {
-            return Ok(InstallOutcome::Skipped {
-                reason: format!("~/.grok not found at {} (Grok CLI not installed)", dir.display()),
-            });
+            return Ok(InstallOutcome::Skipped { reason: format!("~/.grok not found at {} (Grok CLI not installed)", dir.display()) });
         }
 
         let hooks_dir = dir.join("hooks");
@@ -57,11 +53,9 @@ impl Target for GrokTarget {
             return Ok(InstallOutcome::AlreadyConfigured { path });
         }
 
-        std::fs::create_dir_all(&hooks_dir)
-            .map_err(|e| format!("Could not create {}: {e}", hooks_dir.display()))?;
+        std::fs::create_dir_all(&hooks_dir).map_err(|e| format!("Could not create {}: {e}", hooks_dir.display()))?;
         let output = serde_json::to_string_pretty(&hook_file(binary)).expect("serializing valid JSON");
-        std::fs::write(&path, format!("{output}\n"))
-            .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+        std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
         Ok(InstallOutcome::Installed { path })
     }
 
@@ -107,8 +101,7 @@ impl HookFormat for GrokHookFormat {
     /// Claude/Codex snake_case. Getting the casing wrong parses to nothing and fails OPEN, so it is
     /// pinned by `parse_input_rejects_snake_case_envelope` below.
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: GrokHookEnvelope =
-            serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        let envelope: GrokHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Self-filter on the tool, the same way antigravity does. An ABSENT name still passes: the
         // hook is configured with a matcher, and refusing an envelope that simply omits the field
         // would break every harness version that does not send it.
@@ -144,15 +137,9 @@ impl HookFormat for GrokHookFormat {
         // called for ALLOWED verdicts; the Denied branch is defensive — it must stay empty (never
         // emit allow) so a stray call can't fail open.
         if verdict.is_allowed() {
-            HookResponse {
-                stdout: json!({ "decision": "allow" }).to_string(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: json!({ "decision": "allow" }).to_string(), exit_code: 0 }
         } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 
@@ -167,10 +154,7 @@ impl HookFormat for GrokHookFormat {
     fn render_deny(&self, reason: &str) -> HookResponse {
         // Both signals say deny: the top-level `decision` (honored regardless of exit code) and exit
         // 2 (grok's deny code; any OTHER non-zero fails OPEN, so it must be exactly 2).
-        HookResponse {
-            stdout: json!({ "decision": "deny", "reason": reason }).to_string(),
-            exit_code: 2,
-        }
+        HookResponse { stdout: json!({ "decision": "deny", "reason": reason }).to_string(), exit_code: 2 }
     }
 }
 
@@ -196,16 +180,11 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
-                entry
-                    .get("hooks")
-                    .and_then(|h| h.as_array())
-                    .is_some_and(|hooks| {
-                        hooks.iter().any(|hook| {
-                            hook.get("command")
-                                .and_then(|c| c.as_str())
-                                .is_some_and(|cmd| cmd.contains("safe-chains"))
-                        })
-                    })
+                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                    hooks
+                        .iter()
+                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+                })
             })
         })
 }

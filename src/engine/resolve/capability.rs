@@ -117,11 +117,8 @@ pub(super) fn destroys(locus: LocalLocus, scale: Scale) -> Capability {
     // — `rm -rf /`, `rm -rf ~` wipe irreplaceable data — so it worst-cases to irreversible
     // (HP-8). That `destroy · irreversible · unbounded` signature is the one corner even yolo
     // refuses; a single or bounded system delete (rm /etc/hosts) stays effortful.
-    let reversibility = if locus >= LocalLocus::User && scale == Scale::Unbounded {
-        Reversibility::Irreversible
-    } else {
-        Reversibility::Effortful
-    };
+    let reversibility =
+        if locus >= LocalLocus::User && scale == Scale::Unbounded { Reversibility::Irreversible } else { Reversibility::Effortful };
     writes(
         Operation::Destroy,
         locus,
@@ -164,7 +161,14 @@ pub(super) fn creates(locus: LocalLocus, scale: Scale) -> Capability {
 /// `--no-clobber` guarantees no overwrite.
 pub(super) fn overwrites(locus: LocalLocus, scale: Scale, no_clobber: bool) -> Capability {
     let reversibility = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
-    writes(Operation::Create, locus, scale, reversibility, PersistenceLevel::Data, "writes the destination; may overwrite existing content unless --no-clobber")
+    writes(
+        Operation::Create,
+        locus,
+        scale,
+        reversibility,
+        PersistenceLevel::Data,
+        "writes the destination; may overwrite existing content unless --no-clobber",
+    )
 }
 
 /// A dump/export command's OUTPUT FILE (`supabase db dump -f`, `pg_dump --file`): `create` at
@@ -173,7 +177,14 @@ pub(super) fn overwrites(locus: LocalLocus, scale: Scale, no_clobber: bool) -> C
 /// redirect — `-f ./out.sql` is a worktree write, `-f /etc/cron.d/job` a system write. The bulk
 /// REMOTE read is a separate capability (the `data-export` archetype); this is only the local sink.
 pub(super) fn writes_export_file(locus: LocalLocus) -> Capability {
-    writes(Operation::Create, locus, Scale::Single, Reversibility::Recoverable, PersistenceLevel::Data, "writes the export/dump output file (may overwrite existing content)")
+    writes(
+        Operation::Create,
+        locus,
+        Scale::Single,
+        Reversibility::Recoverable,
+        PersistenceLevel::Data,
+        "writes the export/dump output file (may overwrite existing content)",
+    )
 }
 
 /// An in-place edit of an existing file (`sed -i`): `mutate` at `locus`, `recoverable` (the
@@ -188,7 +199,14 @@ pub(super) fn mutates(locus: LocalLocus, scale: Scale, because: &str) -> Capabil
 /// `trivial` to undo (`mv` back), leaving nothing behind. NOT a destroy: the content
 /// survives at the destination, which is why `mv` stays at write-local and `rm` does not.
 pub(super) fn relocates(locus: LocalLocus, scale: Scale) -> Capability {
-    writes(Operation::Mutate, locus, scale, Reversibility::Trivial, PersistenceLevel::Transient, "mv removes the source from its old location (trivially reversible: mv back)")
+    writes(
+        Operation::Mutate,
+        locus,
+        scale,
+        Reversibility::Trivial,
+        PersistenceLevel::Transient,
+        "mv removes the source from its old location (trivially reversible: mv back)",
+    )
 }
 
 /// Running code: `execute` at the EXECUTOR's `locus`, with the supplied `trust` (`SelfCode`

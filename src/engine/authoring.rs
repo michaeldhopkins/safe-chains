@@ -21,10 +21,8 @@ use super::level::{Clause, Level, OrdBound};
 
 /// The default level set, compiled once from the embedded `levels/default.toml`.
 pub fn default_levels() -> &'static [Level] {
-    static LEVELS: LazyLock<Vec<Level>> = LazyLock::new(|| {
-        build_level_set(include_str!("../../levels/default.toml"))
-            .expect("embedded levels/default.toml must compile")
-    });
+    static LEVELS: LazyLock<Vec<Level>> =
+        LazyLock::new(|| build_level_set(include_str!("../../levels/default.toml")).expect("embedded levels/default.toml must compile"));
     &LEVELS
 }
 
@@ -57,12 +55,7 @@ pub fn build_level_set(source: &str) -> Result<Vec<Level>, String> {
     Ok(built)
 }
 
-fn compile_level(
-    name: String,
-    tl: TomlLevel,
-    built: &[Level],
-    by_name: &BTreeMap<String, usize>,
-) -> Result<Level, String> {
+fn compile_level(name: String, tl: TomlLevel, built: &[Level], by_name: &BTreeMap<String, usize>) -> Result<Level, String> {
     let allow = tl
         .allow
         .into_iter()
@@ -84,12 +77,8 @@ fn compile_level(
                      loosens (R27); author a stricter level from a lower base instead"
                 ));
             }
-            let idx = *by_name
-                .get(&base_name)
-                .ok_or_else(|| format!("level `{name}`: unknown base `{base_name}`"))?;
-            let base = built
-                .get(idx)
-                .ok_or_else(|| format!("level `{name}`: base index out of range"))?;
+            let idx = *by_name.get(&base_name).ok_or_else(|| format!("level `{name}`: unknown base `{base_name}`"))?;
+            let base = built.get(idx).ok_or_else(|| format!("level `{name}`: base index out of range"))?;
             Ok(Level::extend(base, name, allow))
         }
         None => Ok(Level { name, allow, deny }),
@@ -372,10 +361,7 @@ mod tests {
         let levels = default_levels();
         let mut names: Vec<&str> = levels.iter().map(|l| l.name.as_str()).collect();
         names.sort_unstable();
-        assert_eq!(
-            names,
-            ["developer", "editor", "local-admin", "network-admin", "paranoid", "reader", "yolo"],
-        );
+        assert_eq!(names, ["developer", "editor", "local-admin", "network-admin", "paranoid", "reader", "yolo"],);
         // yolo is a base level (carries the catastrophe `deny`), so build order isn't the ladder
         // order — but the mapped auto-approve band MUST stay ascending, since `bridge::project`
         // returns the first admitting mapped level as the minimum.
@@ -540,12 +526,7 @@ mod tests {
             Profile::of(vec![c])
         };
         // In the band [sandbox-scope, worktree-trusted]: worktree-local (and sibling) code runs.
-        for local in [
-            LocalLocus::SandboxScope,
-            LocalLocus::Worktree,
-            LocalLocus::Adjacent,
-            LocalLocus::WorktreeTrusted,
-        ] {
+        for local in [LocalLocus::SandboxScope, LocalLocus::Worktree, LocalLocus::Adjacent, LocalLocus::WorktreeTrusted] {
             assert!(developer.admits(&exec_at(local)), "developer runs worktree-scope code: {local:?}");
         }
         // Below the band: foreign/downloaded (temp) or inline (process) code is denied.
@@ -559,8 +540,7 @@ mod tests {
     #[test]
     fn the_ladder_nests() {
         let levels = default_levels();
-        let (inert, read, write) =
-            (level(levels, "paranoid"), level(levels, "reader"), level(levels, "editor"));
+        let (inert, read, write) = (level(levels, "paranoid"), level(levels, "reader"), level(levels, "editor"));
         // everything inert admits, read-local and write-local admit too
         for local in [LocalLocus::Process, LocalLocus::Temp] {
             let p = observe_at(local);
@@ -644,10 +624,7 @@ mod tests {
             Profile::of(vec![c])
         };
         // the one refusal: rm -rf / — destroy the world, no recovery, no bound
-        assert!(
-            !yolo.admits(&destroy(Scale::Unbounded, Reversibility::Irreversible)),
-            "rm -rf / is denied even at yolo",
-        );
+        assert!(!yolo.admits(&destroy(Scale::Unbounded, Reversibility::Irreversible)), "rm -rf / is denied even at yolo",);
         // everything one facet away stays yolo-allowed, by facet:
         assert!(yolo.admits(&destroy(Scale::Bounded, Reversibility::Irreversible)), "terraform destroy (bounded)");
         assert!(yolo.admits(&destroy(Scale::Single, Reversibility::Irreversible)), "mkfs (single device)");
@@ -763,11 +740,7 @@ mod tests {
     use proptest::prelude::*;
 
     fn assert_monotone_from(lvl: &Level, boundary: Capability) {
-        assert!(
-            lvl.admits(&Profile::of(vec![boundary.clone()])),
-            "{}: boundary capability should be admitted",
-            lvl.name,
-        );
+        assert!(lvl.admits(&Profile::of(vec![boundary.clone()])), "{}: boundary capability should be admitted", lvl.name,);
         for lowered in lowered_variants(&boundary) {
             assert!(
                 lvl.admits(&Profile::of(vec![lowered.clone()])),
@@ -905,7 +878,10 @@ mod tests {
                         "level `{}`: admits execute at {:?} but denies it one rung lower at {:?} — a \
                          non-monotone execute band. If deliberate, add `{}` to `intended` WITH an edge \
                          test; otherwise widen or remove the floor.",
-                        lvl.name, local, lower, lvl.name,
+                        lvl.name,
+                        local,
+                        lower,
+                        lvl.name,
                     );
                 }
             }
@@ -937,54 +913,40 @@ mod tests {
     }
 
     fn clause_to_toml(c: &Clause) -> TomlClause {
-        let locus = (c.local_locus.is_some()
-            || c.remote_reach.is_some()
-            || c.remote_binding.is_some()
-            || c.provenance.is_some())
-        .then(|| TomlLocus {
-            local: opt_bound_str(c.local_locus),
-            remote: opt_bound_str(c.remote_reach),
-            binding: c.remote_binding.as_deref().map(set_str),
-            provenance: opt_bound_str(c.provenance),
-        });
-        let persistence = (c.persistence_level.is_some()
-            || c.trigger_escape.is_some()
-            || c.trigger_kind.is_some())
-        .then(|| TomlPersistence {
-            level: opt_bound_str(c.persistence_level),
-            trigger: (c.trigger_escape.is_some() || c.trigger_kind.is_some()).then(|| TomlTrigger {
-                escape: opt_bound_str(c.trigger_escape),
-                kind: c.trigger_kind.as_deref().map(set_str),
-            }),
-        });
-        let disclosure = (c.disclosure_audience.is_some()
-            || c.disclosure_channel.is_some()
-            || c.disclosure_principal.is_some())
-        .then(|| TomlDisclosure {
-            audience: opt_bound_str(c.disclosure_audience),
-            channel: c.disclosure_channel.as_deref().map(set_str),
-            principal: c.disclosure_principal.as_deref().map(set_str),
-        });
-        let secret = (c.secret_level.is_some()
-            || c.secret_channel.is_some()
-            || c.secret_principal.is_some())
-        .then(|| TomlSecret {
+        let locus =
+            (c.local_locus.is_some() || c.remote_reach.is_some() || c.remote_binding.is_some() || c.provenance.is_some()).then(|| {
+                TomlLocus {
+                    local: opt_bound_str(c.local_locus),
+                    remote: opt_bound_str(c.remote_reach),
+                    binding: c.remote_binding.as_deref().map(set_str),
+                    provenance: opt_bound_str(c.provenance),
+                }
+            });
+        let persistence =
+            (c.persistence_level.is_some() || c.trigger_escape.is_some() || c.trigger_kind.is_some()).then(|| TomlPersistence {
+                level: opt_bound_str(c.persistence_level),
+                trigger: (c.trigger_escape.is_some() || c.trigger_kind.is_some())
+                    .then(|| TomlTrigger { escape: opt_bound_str(c.trigger_escape), kind: c.trigger_kind.as_deref().map(set_str) }),
+            });
+        let disclosure =
+            (c.disclosure_audience.is_some() || c.disclosure_channel.is_some() || c.disclosure_principal.is_some()).then(|| {
+                TomlDisclosure {
+                    audience: opt_bound_str(c.disclosure_audience),
+                    channel: c.disclosure_channel.as_deref().map(set_str),
+                    principal: c.disclosure_principal.as_deref().map(set_str),
+                }
+            });
+        let secret = (c.secret_level.is_some() || c.secret_channel.is_some() || c.secret_principal.is_some()).then(|| TomlSecret {
             level: opt_bound_str(c.secret_level),
             channel: c.secret_channel.as_deref().map(set_str),
             principal: c.secret_principal.as_deref().map(set_str),
         });
-        let network = (c.net_direction.is_some()
-            || c.net_destination.is_some()
-            || c.net_payload.is_some())
-        .then(|| TomlNetwork {
+        let network = (c.net_direction.is_some() || c.net_destination.is_some() || c.net_payload.is_some()).then(|| TomlNetwork {
             direction: opt_bound_str(c.net_direction),
             destination: opt_bound_str(c.net_destination),
             payload: opt_bound_str(c.net_payload),
         });
-        let supply_chain = (c.supply_source.is_some()
-            || c.pinning.is_some()
-            || c.exec_surface.is_some())
-        .then(|| TomlSupplyChain {
+        let supply_chain = (c.supply_source.is_some() || c.pinning.is_some() || c.exec_surface.is_some()).then(|| TomlSupplyChain {
             source: c.supply_source.as_deref().map(set_str),
             pinning: opt_bound_str(c.pinning),
             exec_surface: c.exec_surface.as_deref().map(set_str),

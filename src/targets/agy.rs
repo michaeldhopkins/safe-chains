@@ -40,9 +40,7 @@ impl Target for AntigravityTarget {
 
     #[cfg(test)]
     fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
-        Some(format!(
-            r#"{{"toolCall":{{"name":"{tool}","args":{{"CommandLine":"{command}"}}}},"workspacePaths":["/w"]}}"#
-        ))
+        Some(format!(r#"{{"toolCall":{{"name":"{tool}","args":{{"CommandLine":"{command}"}}}},"workspacePaths":["/w"]}}"#))
     }
 
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
@@ -53,18 +51,14 @@ impl Target for AntigravityTarget {
         // Global customization root for the CLI (per agy-customizations/docs/json_configs.md).
         let dir = home.join(".gemini/config");
         if !dir.exists() {
-            return Ok(InstallOutcome::Skipped {
-                reason: format!("{} not found (Antigravity CLI not set up)", dir.display()),
-            });
+            return Ok(InstallOutcome::Skipped { reason: format!("{} not found (Antigravity CLI not set up)", dir.display()) });
         }
         let path = dir.join("hooks.json");
         let binary = "safe-chains hook antigravity";
 
         let mut settings: Value = if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?
         } else {
             Value::Object(Map::new())
         };
@@ -74,8 +68,7 @@ impl Target for AntigravityTarget {
         }
         add_hook(&mut settings, binary)?;
         let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-        std::fs::write(&path, format!("{output}\n"))
-            .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+        std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
         Ok(InstallOutcome::Installed { path })
     }
 
@@ -115,8 +108,7 @@ struct AntigravityEnvelope {
 
 impl HookFormat for AntigravityHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let env: AntigravityEnvelope =
-            serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        let env: AntigravityEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         let tool_call = env.tool_call;
         // Self-filter on the tool. agy is ASK-capable, so deciding on a foreign call escalates a
         // tool that was never analysed to a human prompt. Absent name still passes.
@@ -186,9 +178,8 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .is_some_and(|groups| {
             groups.iter().any(|g| {
                 g.get("hooks").and_then(Value::as_array).is_some_and(|hs| {
-                    hs.iter().any(|h| {
-                        h.get("command").and_then(Value::as_str).is_some_and(|c| c.contains("safe-chains"))
-                    })
+                    hs.iter()
+                        .any(|h| h.get("command").and_then(Value::as_str).is_some_and(|c| c.contains("safe-chains")))
                 })
             })
         })
@@ -203,10 +194,7 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
 /// caller turns a missing file into an empty object first, so refusing cannot break a fresh setup.
 fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
     let Some(obj) = settings.as_object_mut() else {
-        return Err(format!(
-            "the settings file is {}, expected an object. Leaving the file unchanged.",
-            super::json_kind(settings)
-        ));
+        return Err(format!("the settings file is {}, expected an object. Leaving the file unchanged.", super::json_kind(settings)));
     };
     obj.insert("safe-chains".to_string(), hook_entry(binary));
     Ok(())
@@ -241,11 +229,7 @@ mod tests {
             Err(err) => assert!(err.contains("expected an object"), "unhelpful error: {err}"),
             Ok(_) => panic!("a non-object settings root must be refused"),
         }
-        assert_eq!(
-            std::fs::read_to_string(&path).unwrap(),
-            ORIGINAL,
-            "--setup rewrote a settings file it could not read"
-        );
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), ORIGINAL, "--setup rewrote a settings file it could not read");
     }
 
     #[test]
@@ -253,15 +237,9 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir_all(dir.path().join(".gemini/config")).unwrap();
         assert!(matches!(AntigravityTarget.install(dir.path()).unwrap(), InstallOutcome::Installed { .. }));
-        let s: Value = serde_json::from_str(
-            &std::fs::read_to_string(dir.path().join(".gemini/config/hooks.json")).unwrap(),
-        )
-        .unwrap();
+        let s: Value = serde_json::from_str(&std::fs::read_to_string(dir.path().join(".gemini/config/hooks.json")).unwrap()).unwrap();
         assert!(has_safe_chains_hook(&s));
-        assert_eq!(
-            s.pointer("/safe-chains/PreToolUse/0/matcher").and_then(Value::as_str),
-            Some("run_command"),
-        );
+        assert_eq!(s.pointer("/safe-chains/PreToolUse/0/matcher").and_then(Value::as_str), Some("run_command"),);
     }
 
     #[test]
@@ -269,10 +247,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir_all(dir.path().join(".gemini/config")).unwrap();
         AntigravityTarget.install(dir.path()).unwrap();
-        assert!(matches!(
-            AntigravityTarget.install(dir.path()).unwrap(),
-            InstallOutcome::AlreadyConfigured { .. }
-        ));
+        assert!(matches!(AntigravityTarget.install(dir.path()).unwrap(), InstallOutcome::AlreadyConfigured { .. }));
     }
 
     #[test]
@@ -287,12 +262,10 @@ mod tests {
         )
         .unwrap();
         AntigravityTarget.install(dir.path()).unwrap();
-        let s: Value =
-            serde_json::from_str(&std::fs::read_to_string(cfg.join("hooks.json")).unwrap()).unwrap();
+        let s: Value = serde_json::from_str(&std::fs::read_to_string(cfg.join("hooks.json")).unwrap()).unwrap();
         assert!(has_safe_chains_hook(&s));
         assert!(
-            s.pointer("/lint-checker/PostToolUse/0/hooks/0/command").and_then(Value::as_str)
-                == Some("./lint.sh"),
+            s.pointer("/lint-checker/PostToolUse/0/hooks/0/command").and_then(Value::as_str) == Some("./lint.sh"),
             "the user's own named hook must survive install",
         );
     }

@@ -78,11 +78,7 @@ impl std::fmt::Display for FacetMismatch {
     }
 }
 
-fn ord_mismatch<T: Ord + Copy + FacetTerm>(
-    facet: &'static str,
-    bound: Option<OrdBound<T>>,
-    term: T,
-) -> Option<FacetMismatch> {
+fn ord_mismatch<T: Ord + Copy + FacetTerm>(facet: &'static str, bound: Option<OrdBound<T>>, term: T) -> Option<FacetMismatch> {
     let b = bound?;
     if b.admits(term) {
         return None;
@@ -97,19 +93,12 @@ fn ord_mismatch<T: Ord + Copy + FacetTerm>(
     Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count })
 }
 
-fn set_mismatch<T: PartialEq + Copy + FacetTerm>(
-    facet: &'static str,
-    set: Option<&[T]>,
-    term: T,
-) -> Option<FacetMismatch> {
+fn set_mismatch<T: PartialEq + Copy + FacetTerm>(facet: &'static str, set: Option<&[T]>, term: T) -> Option<FacetMismatch> {
     let s = set?;
     if s.contains(&term) {
         return None;
     }
-    let bound = format!(
-        "one of [{}]",
-        s.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", "),
-    );
+    let bound = format!("one of [{}]", s.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", "),);
     Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count: s.len() })
 }
 
@@ -181,11 +170,7 @@ impl Clause {
     /// chain means an allow-only equivalence proptest cannot see a deny-side inversion (it did not
     /// — a `?` that reported "no complaint" for a definitely-failing deny got through it).
     #[cfg(test)]
-    pub(crate) fn first_mismatch_for_test(
-        &self,
-        cap: &Capability,
-        deny_role: bool,
-    ) -> Option<FacetMismatch> {
+    pub(crate) fn first_mismatch_for_test(&self, cap: &Capability, deny_role: bool) -> Option<FacetMismatch> {
         self.first_mismatch(cap, if deny_role { Role::Deny } else { Role::Allow })
     }
 
@@ -237,8 +222,7 @@ impl Clause {
             return Some(FacetMismatch {
                 facet: "execution.supply_chain",
                 actual: "absent",
-                bound: "this clause constrains the supply chain, which this capability has none of"
-                    .to_string(),
+                bound: "this clause constrains the supply chain, which this capability has none of".to_string(),
                 admits_count: 0,
             });
         };
@@ -251,11 +235,7 @@ impl Clause {
         match sc {
             None => match role {
                 Role::Allow => true,
-                Role::Deny => {
-                    self.supply_source.is_none()
-                        && self.pinning.is_none()
-                        && self.exec_surface.is_none()
-                }
+                Role::Deny => self.supply_source.is_none() && self.pinning.is_none() && self.exec_surface.is_none(),
             },
             Some(sc) => {
                 set_admits(self.supply_source.as_deref(), sc.source)
@@ -331,25 +311,15 @@ impl Level {
                 admits_count: 0,
             });
         }
-        let on_topic = |c: &&Clause| {
-            c.operation.as_ref().is_none_or(|ops| ops.contains(&cap.operation))
-        };
+        let on_topic = |c: &&Clause| c.operation.as_ref().is_none_or(|ops| ops.contains(&cap.operation));
         // Among the clauses that could plausibly have admitted this capability, report the one that
         // came CLOSEST — the largest `admits_count` on the facet that stopped it. Taking the first
         // match instead named an inherited ancestor clause's much tighter bound, which points the
         // reader at a rule that was never meant to cover this capability.
-        let mut candidates: Vec<FacetMismatch> = self
-            .allow
-            .iter()
-            .filter(on_topic)
-            .filter_map(|c| c.first_mismatch(cap, Role::Allow))
-            .collect();
+        let mut candidates: Vec<FacetMismatch> =
+            self.allow.iter().filter(on_topic).filter_map(|c| c.first_mismatch(cap, Role::Allow)).collect();
         if candidates.is_empty() {
-            candidates = self
-                .allow
-                .iter()
-                .filter_map(|c| c.first_mismatch(cap, Role::Allow))
-                .collect();
+            candidates = self.allow.iter().filter_map(|c| c.first_mismatch(cap, Role::Allow)).collect();
         }
         candidates.into_iter().max_by_key(|m| m.admits_count)
     }
@@ -540,10 +510,9 @@ mod tests {
     fn a_supply_chain_deny_does_not_match_a_capability_without_one() {
         // "deny unverified-url sources" must NOT accidentally deny `cat file` (no supply
         // chain) — the vacuous-truth asymmetry between allow and deny (review finding #1).
-        let level = Level::new("x").allowing(Clause::default()).denying(Clause {
-            supply_source: Some(vec![SupplySource::UnverifiedUrl]),
-            ..Default::default()
-        });
+        let level = Level::new("x")
+            .allowing(Clause::default())
+            .denying(Clause { supply_source: Some(vec![SupplySource::UnverifiedUrl]), ..Default::default() });
 
         let plain = Profile::of(vec![cap(Operation::Observe)]);
         assert!(level.admits(&plain), "a supply-chain deny must not match a no-supply-chain cap");
@@ -568,17 +537,11 @@ mod tests {
     fn extend_inherits_deny_and_adds_allow() {
         let base = Level::new("base")
             .allowing(Clause { operation: Some(vec![Operation::Observe]), ..Default::default() })
-            .denying(Clause {
-                local_locus: Some(OrdBound::at_least(LocalLocus::Device)),
-                ..Default::default()
-            });
+            .denying(Clause { local_locus: Some(OrdBound::at_least(LocalLocus::Device)), ..Default::default() });
         let child = Level::extend(
             &base,
             "child",
-            vec![Clause {
-                operation: Some(vec![Operation::Create, Operation::Mutate]),
-                ..Default::default()
-            }],
+            vec![Clause { operation: Some(vec![Operation::Create, Operation::Mutate]), ..Default::default() }],
         );
 
         assert!(child.admits(&Profile::of(vec![cap(Operation::Create)])), "added allow");

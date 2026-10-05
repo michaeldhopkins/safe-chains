@@ -20,34 +20,17 @@ pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
 }
 
 #[cfg(test)]
-pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Paths { cmd: "glab", bare_ok: false, paths: &[
-        "glab mr list",
-        "glab mr view 123",
-        "glab mr diff 123",
-        "glab issue list",
-        "glab issue view 456",
-        "glab ci list",
-        "glab ci status",
-        "glab release list",
-        "glab label list",
-        "glab milestone list",
-        "glab snippet view 1",
-        "glab variable list",
-        "glab repo list",
-        "glab repo view owner/repo",
-        "glab cluster list",
-        "glab deploy-key list",
-        "glab gpg-key list",
-        "glab incident list",
-        "glab iteration list",
-        "glab schedule list",
-        "glab ssh-key list",
-        "glab stack list",
-        "glab auth status",
+pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[crate::handlers::CommandEntry::Paths {
+    cmd: "glab",
+    bare_ok: false,
+    paths: &[
+        "glab mr list", "glab mr view 123", "glab mr diff 123", "glab issue list", "glab issue view 456", "glab ci list", "glab ci status",
+        "glab release list", "glab label list", "glab milestone list", "glab snippet view 1", "glab variable list", "glab repo list",
+        "glab repo view owner/repo", "glab cluster list", "glab deploy-key list", "glab gpg-key list", "glab incident list",
+        "glab iteration list", "glab schedule list", "glab ssh-key list", "glab stack list", "glab auth status",
         "glab api projects/1/merge_requests",
-    ]},
-];
+    ],
+}];
 
 #[cfg(test)]
 mod tests {

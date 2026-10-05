@@ -29,22 +29,15 @@ impl Target for QwenTarget {
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
         let dir = home.join(".qwen");
         if !dir.exists() {
-            return Ok(InstallOutcome::Skipped {
-                reason: format!(
-                    "~/.qwen not found at {} (Qwen Code not installed)",
-                    dir.display()
-                ),
-            });
+            return Ok(InstallOutcome::Skipped { reason: format!("~/.qwen not found at {} (Qwen Code not installed)", dir.display()) });
         }
 
         let path = dir.join("settings.json");
         let binary = "safe-chains hook qwen";
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let mut settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
@@ -52,15 +45,13 @@ impl Target for QwenTarget {
 
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
     }
@@ -90,9 +81,7 @@ struct QwenHookEnvelope {
 
 impl HookFormat for QwenHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: QwenHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
-            message: e.to_string(),
-        })?;
+        let envelope: QwenHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Self-filter on the tool: the hook can be delivered for a non-shell call by a
         // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
         if let Some(name) = &envelope.tool_name
@@ -124,15 +113,9 @@ impl HookFormat for QwenHookFormat {
                     "permissionDecisionReason": reason,
                 }
             });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
         } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 
@@ -145,10 +128,7 @@ impl HookFormat for QwenHookFormat {
                 "additionalContext": context,
             }
         });
-        HookResponse {
-            stdout: serde_json::to_string(&body).unwrap_or_default(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
     }
 }
 
@@ -170,16 +150,11 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
-                entry
-                    .get("hooks")
-                    .and_then(|h| h.as_array())
-                    .is_some_and(|hooks| {
-                        hooks.iter().any(|hook| {
-                            hook.get("command")
-                                .and_then(|c| c.as_str())
-                                .is_some_and(|cmd| cmd.contains("safe-chains"))
-                        })
-                    })
+                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                    hooks
+                        .iter()
+                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+                })
             })
         })
 }
@@ -264,16 +239,8 @@ mod tests {
     fn render_response_emits_claude_shaped_envelope() {
         let r = QwenHookFormat.render_response(Verdict::Allowed(SafetyLevel::Inert));
         let v: Value = serde_json::from_str(&r.stdout).unwrap();
-        assert_eq!(
-            v.pointer("/hookSpecificOutput/permissionDecision")
-                .and_then(|d| d.as_str()),
-            Some("allow"),
-        );
-        assert_eq!(
-            v.pointer("/hookSpecificOutput/hookEventName")
-                .and_then(|d| d.as_str()),
-            Some("PreToolUse"),
-        );
+        assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("allow"),);
+        assert_eq!(v.pointer("/hookSpecificOutput/hookEventName").and_then(|d| d.as_str()), Some("PreToolUse"),);
     }
 
     #[test]

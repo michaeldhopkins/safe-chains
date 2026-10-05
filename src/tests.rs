@@ -1733,14 +1733,13 @@ fn intra_line_cd_reclassifies_later_relative_writes() {
     assert!(command_verdict_in("echo x > ./y && cd /etc", ctx).is_allowed(), "write precedes the cd → project");
 }
 
-
 /// End-to-end: `workspace_overreach` names a path above the parent `OutsideWorkspace`, and does
 /// NOT flag a peer's files at all — ordinary or hidden. The hidden-peer reason is gone with the
 /// dot-shield; what stops a peer's secrets is the credential shield, which reports `Credential`.
 #[test]
 fn workspace_overreach_distinguishes_a_peer_from_outside() {
-    use crate::pathctx::{enter, PathCtx};
     use crate::ReachReason;
+    use crate::pathctx::{PathCtx, enter};
     let Ok(home) = std::env::var("HOME") else { return };
     if !home.starts_with('/') {
         return;
@@ -1767,7 +1766,7 @@ fn workspace_overreach_distinguishes_a_peer_from_outside() {
 /// reason AND advising the reader to grant a path the command never touched.
 #[test]
 fn a_heredoc_body_is_never_reported_as_the_reach() {
-    use crate::pathctx::{enter, PathCtx};
+    use crate::pathctx::{PathCtx, enter};
     let Ok(home) = std::env::var("HOME") else { return };
     if !home.starts_with('/') {
         return;
@@ -1785,36 +1784,19 @@ fn a_heredoc_body_is_never_reported_as_the_reach() {
             // expansion makes substitutions live, not literals.
             format!("notacommand <<EOF\nplease read {path} for context\nEOF"),
         ] {
-            assert_eq!(
-                crate::workspace_overreach(&prose),
-                None,
-                "{path} inside a heredoc body is data, not a reach: `{prose}`"
-            );
+            assert_eq!(crate::workspace_overreach(&prose), None, "{path} inside a heredoc body is data, not a reach: `{prose}`");
         }
         // Non-vacuity, and the regression guard: moving to the CST once DROPPED redirect targets,
         // which the raw token split had caught. Every position the shell actually opens or passes
         // the path in must still be reported, or "no reach named" silently understates a denial.
         for shape in [
-            "notacommand {p}",
-            "notacommand > {p}",
-            "notacommand >> {p}",
-            "notacommand < {p}",
-            "notacommand <> {p}",
-            "notacommand <<< {p}",
-            "( notacommand {p} )",
-            "{{ notacommand {p} ; }}",
-            "if true; then notacommand {p}; fi",
-            "for x in {p}; do notacommand $x; done",
-            "while true; do notacommand {p}; done",
-            "case x in a) notacommand {p};; esac",
-            "f() {{ notacommand {p}; }}",
+            "notacommand {p}", "notacommand > {p}", "notacommand >> {p}", "notacommand < {p}", "notacommand <> {p}", "notacommand <<< {p}",
+            "( notacommand {p} )", "{{ notacommand {p} ; }}", "if true; then notacommand {p}; fi", "for x in {p}; do notacommand $x; done",
+            "while true; do notacommand {p}; done", "case x in a) notacommand {p};; esac", "f() {{ notacommand {p}; }}",
             "notacommand $(echo {p})",
         ] {
             let cmd = shape.replace("{p}", path);
-            assert!(
-                crate::workspace_overreach(&cmd).is_some(),
-                "{path} must be reported as the reach in `{cmd}`"
-            );
+            assert!(crate::workspace_overreach(&cmd).is_some(), "{path} must be reported as the reach in `{cmd}`");
         }
     }
 }
@@ -1864,9 +1846,8 @@ safe! {
 #[test]
 fn no_wrapper_launders_a_denied_inner_command() {
     const WRAPPERS: &[&str] = &[
-        "env", "nice", "ionice", "timeout 5", "nohup", "setsid", "stdbuf -oL",
-        "xargs", "sudo", "command", "watch", "parallel", "flock /tmp/l", "doas",
-        "chrt 0", "taskset 1",
+        "env", "nice", "ionice", "timeout 5", "nohup", "setsid", "stdbuf -oL", "xargs", "sudo", "command", "watch", "parallel",
+        "flock /tmp/l", "doas", "chrt 0", "taskset 1",
     ];
     const FIND_EXEC: &[&str] = &["find . -type f -exec", "find . -type f -execdir"];
     // Inner commands denied on the command itself (no redirect needed to make them unsafe).
@@ -1928,11 +1909,19 @@ fn yarn_delegates_runner_gates_without_laundering() {
 fn test_runner_code_load_flags_gate_foreign_executors() {
     // (command, flag) pairs whose value is a module the runner executes in-process.
     const CODE_FLAGS: &[(&str, &str)] = &[
-        ("jest", "--config"), ("jest", "-c"), ("jest", "--testRunner"),
-        ("jest", "--reporters"), ("jest", "--filter"),
-        ("vitest", "--config"), ("vitest", "-c"),
-        ("mocha", "--config"), ("mocha", "--require"), ("mocha", "-r"),
-        ("mocha", "--file"), ("mocha", "--reporter"), ("mocha", "--ui"),
+        ("jest", "--config"),
+        ("jest", "-c"),
+        ("jest", "--testRunner"),
+        ("jest", "--reporters"),
+        ("jest", "--filter"),
+        ("vitest", "--config"),
+        ("vitest", "-c"),
+        ("mocha", "--config"),
+        ("mocha", "--require"),
+        ("mocha", "-r"),
+        ("mocha", "--file"),
+        ("mocha", "--reporter"),
+        ("mocha", "--ui"),
     ];
     for (cmd, flag) in CODE_FLAGS {
         // Foreign executors must deny — /tmp is the one a read gate would wrongly admit.
@@ -1961,12 +1950,9 @@ fn brace_expansion_checks_every_alternative() {
     const DECOY: &str = "readme.txt";
     let mut failures = Vec::new();
     for p in HOT_READ {
-        for form in [
-            format!("cat {{{p},{DECOY}}}"),
-            format!("cat {{{DECOY},{p}}}"),
-            format!("cat {{,{p}}}"),
-            format!("head {{{p},{DECOY}}}"),
-        ] {
+        for form in
+            [format!("cat {{{p},{DECOY}}}"), format!("cat {{{DECOY},{p}}}"), format!("cat {{,{p}}}"), format!("head {{{p},{DECOY}}}")]
+        {
             if check(&form) {
                 failures.push(form);
             }
@@ -1997,16 +1983,13 @@ fn brace_expansion_checks_every_alternative() {
 #[test]
 fn operand_injection_propagates_source_locus() {
     // Sources whose emitted items point OUTSIDE the workspace → injected operand must deny.
-    const HOT_SOURCES: &[&str] =
-        &["echo /etc/shadow", "echo ~/.ssh/id_rsa", "find /", "find ~", "cat listfile"];
+    const HOT_SOURCES: &[&str] = &["echo /etc/shadow", "echo ~/.ssh/id_rsa", "find /", "find ~", "cat listfile"];
     // Sources provably bounded to the workspace → injected operand must stay allowed.
     const WS_SOURCES: &[&str] = &["find ./src", "find .", "ls", "git ls-files", "echo ./ok"];
     // Inner commands that READ their operand as a path (so the injected locus matters).
     const READERS: &[&str] = &["cat", "grep x", "head", "od", "base64"];
 
-    let forms = |src: &str, reader: &str| {
-        [format!("{src} | xargs {reader}"), format!("{src} | xargs -I{{}} {reader} {{}}")]
-    };
+    let forms = |src: &str, reader: &str| [format!("{src} | xargs {reader}"), format!("{src} | xargs -I{{}} {reader} {{}}")];
     let mut fail = Vec::new();
     for reader in READERS {
         for src in HOT_SOURCES {
@@ -2124,10 +2107,7 @@ fn a_refusal_offers_a_grant_only_when_one_would_work() {
         // And the prose has to agree with the flag, or the guard only checks half the pairing.
         let text = reason.message(command).to_lowercase();
         if reason.grant_helps() {
-            assert!(
-                text.contains("safe-chains.toml"),
-                "{reason:?} helps, so the message must say where to name it: {text}"
-            );
+            assert!(text.contains("safe-chains.toml"), "{reason:?} helps, so the message must say where to name it: {text}");
         } else {
             assert!(
                 text.contains("does not change") || text.contains("not to grant"),

@@ -1,6 +1,6 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagTolerance};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--help", "-h"]),

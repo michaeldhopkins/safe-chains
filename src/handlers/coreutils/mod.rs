@@ -9,8 +9,7 @@ use crate::parse::Token;
 use crate::verdict::Verdict;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    None
-        .or_else(|| find::dispatch(cmd, tokens))
+    None.or_else(|| find::dispatch(cmd, tokens))
         .or_else(|| sed::dispatch(cmd, tokens))
         .or_else(|| awk::dispatch(cmd, tokens))
         .or_else(|| net::dispatch(cmd, tokens))

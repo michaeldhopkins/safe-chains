@@ -49,8 +49,7 @@ fn no_inert_command_is_gated_as_a_writer() {
     let (mut inert, mut blanket, mut unpromoted) = (0usize, Vec::new(), Vec::new());
     for file in &files {
         let src = std::fs::read_to_string(file).unwrap();
-        let parsed: TomlFile =
-            toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
+        let parsed: TomlFile = toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
         for cmd in &parsed.command {
             if !matches!(cmd.level, Some(TomlLevel::Inert)) {
                 continue;

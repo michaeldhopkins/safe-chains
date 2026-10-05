@@ -103,9 +103,7 @@ impl<'a> Visit<'a> for TestItems {
 /// Is this item compiled only for tests (`#[test]`, `#[cfg(test)]`)?
 fn test_only(attrs: &[syn::Attribute]) -> bool {
     attrs.iter().any(|a| {
-        a.path().is_ident("test")
-            || (a.path().is_ident("cfg")
-                && a.parse_args::<syn::Meta>().is_ok_and(|m| m.path().is_ident("test")))
+        a.path().is_ident("test") || (a.path().is_ident("cfg") && a.parse_args::<syn::Meta>().is_ok_and(|m| m.path().is_ident("test")))
     })
 }
 
@@ -165,16 +163,12 @@ fn mod_decls(source: &str) -> Vec<(String, Option<String>, bool)> {
         .iter()
         .filter_map(|item| match item {
             syn::Item::Mod(m) if m.content.is_none() => {
-                let path = m.attrs.iter().find(|a| a.path().is_ident("path")).and_then(|a| {
-                    match &a.meta {
-                        syn::Meta::NameValue(nv) => match &nv.value {
-                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }) => {
-                                Some(s.value())
-                            }
-                            _ => None,
-                        },
+                let path = m.attrs.iter().find(|a| a.path().is_ident("path")).and_then(|a| match &a.meta {
+                    syn::Meta::NameValue(nv) => match &nv.value {
+                        syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }) => Some(s.value()),
                         _ => None,
-                    }
+                    },
+                    _ => None,
                 });
                 Some((m.ident.to_string(), path, test_only(&m.attrs)))
             }
@@ -191,18 +185,12 @@ fn mod_decls(source: &str) -> Vec<(String, Option<String>, bool)> {
 fn resolve_mod(declaring_file: &Path, name: &str, path_attr: Option<&str>) -> Option<PathBuf> {
     let parent = declaring_file.parent()?;
     let stem = declaring_file.file_stem()?.to_str()?;
-    let dir = if matches!(stem, "lib" | "main" | "mod") {
-        parent.to_path_buf()
-    } else {
-        parent.join(stem)
-    };
+    let dir = if matches!(stem, "lib" | "main" | "mod") { parent.to_path_buf() } else { parent.join(stem) };
     if let Some(rel) = path_attr {
         let candidate = dir.join(rel);
         return candidate.is_file().then_some(candidate);
     }
-    [dir.join(format!("{name}.rs")), dir.join(name).join("mod.rs")]
-        .into_iter()
-        .find(|p| p.is_file())
+    [dir.join(format!("{name}.rs")), dir.join(name).join("mod.rs")].into_iter().find(|p| p.is_file())
 }
 
 /// Every file that exists only for tests: one declared `#[cfg(test)] mod NAME;`, and everything
@@ -213,10 +201,7 @@ fn resolve_mod(declaring_file: &Path, name: &str, path_attr: Option<&str>) -> Op
 /// applies. Reading only the first level would have let a suite escape the set by being one module
 /// deeper.
 fn test_only_files(files: &[PathBuf]) -> HashSet<PathBuf> {
-    let sources: HashMap<&PathBuf, String> = files
-        .iter()
-        .map(|p| (p, std::fs::read_to_string(p).unwrap_or_default()))
-        .collect();
+    let sources: HashMap<&PathBuf, String> = files.iter().map(|p| (p, std::fs::read_to_string(p).unwrap_or_default())).collect();
     let mut found = HashSet::new();
     let mut queue: Vec<PathBuf> = Vec::new();
 
@@ -260,12 +245,7 @@ fn sources(dir: &Path, found: &mut Vec<PathBuf>) {
 /// The verdict for one file, or `None` when it is within its allowance. Split out from the walk so
 /// the ratchet stays testable: with a tree that satisfies every pin, these branches would go
 /// unexercised and rot.
-fn verdict(
-    relative: &str,
-    lines: usize,
-    limit: usize,
-    pinned: &HashMap<&'static str, usize>,
-) -> Option<String> {
+fn verdict(relative: &str, lines: usize, limit: usize, pinned: &HashMap<&'static str, usize>) -> Option<String> {
     match pinned.get(relative) {
         Some(&ceiling) if lines > ceiling => Some(format!(
             "{relative}: {lines} lines, up from its pinned {ceiling}. It is already over the \
@@ -304,15 +284,10 @@ fn measured() -> Vec<(String, usize, usize)> {
         .iter()
         .filter(|p| p.is_file())
         .map(|path| {
-            let relative =
-                path.strip_prefix(&root).unwrap_or(path).to_string_lossy().replace('\\', "/");
+            let relative = path.strip_prefix(&root).unwrap_or(path).to_string_lossy().replace('\\', "/");
             let source = std::fs::read_to_string(path).unwrap_or_default();
             let is_test = test_only.contains(path) || relative.starts_with("tests/");
-            let (limit, lines) = if is_test {
-                (TEST_LIMIT, source.lines().count())
-            } else {
-                (LIMIT, production_lines(&source))
-            };
+            let (limit, lines) = if is_test { (TEST_LIMIT, source.lines().count()) } else { (LIMIT, production_lines(&source)) };
             (relative, lines, limit)
         })
         .collect()
@@ -339,19 +314,10 @@ fn the_ratchet_holds_a_pinned_file_to_its_size() {
         verdict("a.rs", 450, 400, &pinned).is_some_and(|m| m.contains("Lower its pin to 450")),
         "a shrink must lower the pin, or the file could grow back"
     );
-    assert!(
-        verdict("a.rs", 501, 400, &pinned).is_some_and(|m| m.contains("up from its pinned")),
-        "a pinned file may not grow"
-    );
-    assert!(
-        verdict("a.rs", 400, 400, &pinned).is_some_and(|m| m.contains("remove its entry")),
-        "once under the limit the pin must go"
-    );
+    assert!(verdict("a.rs", 501, 400, &pinned).is_some_and(|m| m.contains("up from its pinned")), "a pinned file may not grow");
+    assert!(verdict("a.rs", 400, 400, &pinned).is_some_and(|m| m.contains("remove its entry")), "once under the limit the pin must go");
     assert!(verdict("b.rs", 400, 400, &pinned).is_none(), "unpinned, at the limit");
-    assert!(
-        verdict("b.rs", 401, 400, &pinned).is_some_and(|m| m.contains("over the")),
-        "unpinned, over the limit"
-    );
+    assert!(verdict("b.rs", 401, 400, &pinned).is_some_and(|m| m.contains("over the")), "unpinned, over the limit");
 }
 
 #[test]
@@ -359,8 +325,7 @@ fn every_pinned_file_still_exists() {
     // A rename leaving a stale entry would exempt nothing, and the gate would quietly stop
     // protecting the file it names.
     let measured: HashSet<String> = measured().into_iter().map(|(r, _, _)| r).collect();
-    let missing: Vec<&str> =
-        pinned().keys().copied().filter(|r| !measured.contains(*r)).collect();
+    let missing: Vec<&str> = pinned().keys().copied().filter(|r| !measured.contains(*r)).collect();
     assert!(missing.is_empty(), "pinned files are no longer measured at these paths: {missing:?}");
 }
 
@@ -371,18 +336,10 @@ fn every_pinned_file_still_exists() {
 /// count-based check that happened to be under the total.
 #[test]
 fn whole_file_test_modules_are_read_as_tests() {
-    let by_path: HashMap<String, usize> =
-        measured().into_iter().map(|(r, _, limit)| (r, limit)).collect();
+    let by_path: HashMap<String, usize> = measured().into_iter().map(|(r, _, limit)| (r, limit)).collect();
     for relative in [
-        "src/registry/tests.rs",
-        "src/handler_property_tests.rs",
-        "src/tests.rs",
-        "src/composition.rs",
-        "src/cst/proptests.rs",
-        "src/engine/testgen.rs",
-        "src/engine/resolve/scenarios.rs",
-        "src/suggest/tests.rs",
-        "src/decisionlog/tests.rs",
+        "src/registry/tests.rs", "src/handler_property_tests.rs", "src/tests.rs", "src/composition.rs", "src/cst/proptests.rs",
+        "src/engine/testgen.rs", "src/engine/resolve/scenarios.rs", "src/suggest/tests.rs", "src/decisionlog/tests.rs",
     ] {
         assert_eq!(
             by_path.get(relative),
@@ -403,10 +360,22 @@ fn only_test_items_are_left_out_of_the_count() {
     assert_eq!(production_lines(""), 0);
     let cases: &[(&str, &str, usize)] = &[
         // 3, not the inherited 4: the blank line after the declaration is now absorbed with it.
-        ("a test-only mod declaration is its own line, not the rest of the file", "mod real;\n#[cfg(test)]\nmod test_support;\n\nfn a() {}\nfn b() {}\n", 3),
-        ("a test-only helper is the helper, not the rest of the file", "fn a() {}\n#[cfg(test)]\nfn helper() {}\nfn b() {}\nfn c() {}\n", 3),
+        (
+            "a test-only mod declaration is its own line, not the rest of the file",
+            "mod real;\n#[cfg(test)]\nmod test_support;\n\nfn a() {}\nfn b() {}\n",
+            3,
+        ),
+        (
+            "a test-only helper is the helper, not the rest of the file",
+            "fn a() {}\n#[cfg(test)]\nfn helper() {}\nfn b() {}\nfn c() {}\n",
+            3,
+        ),
         // Likewise 2, not the inherited 3 — the trailing blank line goes with the declaration.
-        ("an attribute between the guard and the item goes with the item", "#[cfg(test)]\n#[path = \"t.rs\"]\nmod tests;\n\nfn a() {}\nfn b() {}\n", 2),
+        (
+            "an attribute between the guard and the item goes with the item",
+            "#[cfg(test)]\n#[path = \"t.rs\"]\nmod tests;\n\nfn a() {}\nfn b() {}\n",
+            2,
+        ),
         ("a same-line test module body is still skipped", "fn a() {}\n#[cfg(test)] mod tests {\n    fn t() {}\n}\n", 1),
         ("a one-line test module", "fn a() {}\n#[cfg(test)] mod tests { fn t() {} }\nfn b() {}\n", 2),
         (
@@ -417,8 +386,16 @@ fn only_test_items_are_left_out_of_the_count() {
             "fn a() {}\n#[cfg(test)]\nmod a_tests {\n    #[test]\n    fn t() {\n    }\n}\n\nfn b() {}\nfn c() {}\n",
             3,
         ),
-        ("a `}` in column 0 inside a test's string does not end the module", "#[cfg(test)]\nmod tests {\n    const FIX: &str = \"\n}\n\";\n    fn t() {}\n}\nfn b() {}\n", 1),
-        ("`#[cfg(test)]` in a string or comment is not an attribute", "// #[cfg(test)]\nconst A: &str = \"\n#[cfg(test)]\nmod x {\";\nfn b() {}\n", 5),
+        (
+            "a `}` in column 0 inside a test's string does not end the module",
+            "#[cfg(test)]\nmod tests {\n    const FIX: &str = \"\n}\n\";\n    fn t() {}\n}\nfn b() {}\n",
+            1,
+        ),
+        (
+            "`#[cfg(test)]` in a string or comment is not an attribute",
+            "// #[cfg(test)]\nconst A: &str = \"\n#[cfg(test)]\nmod x {\";\nfn b() {}\n",
+            5,
+        ),
         ("a test-only method in a production impl", "impl A {\n    fn a() {}\n    #[cfg(test)]\n    fn t() {}\n}\n", 3),
         ("doc comments go with their item", "/// tests\n#[cfg(test)]\nmod t {}\nfn b() {}\n", 1),
         // The correction. Each of these is what "add a test to a pinned file" actually looks like.
@@ -438,10 +415,7 @@ fn a_test_only_module_declaration_is_recognized_wherever_it_points() {
     let decls = mod_decls("#[cfg(test)]\nmod tests;\nmod real;\n#[cfg(test)]\nmod inline { }\n");
     assert_eq!(
         decls,
-        vec![
-            ("tests".to_string(), None, true),
-            ("real".to_string(), None, false),
-        ],
+        vec![("tests".to_string(), None, true), ("real".to_string(), None, false),],
         "bodyless declarations only, each tagged with whether it is test-only"
     );
     let with_path = mod_decls("#[cfg(test)]\n#[path = \"support/x.rs\"]\nmod x;\n");

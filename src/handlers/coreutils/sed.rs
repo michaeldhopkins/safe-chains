@@ -1,6 +1,6 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagTolerance};
+use crate::verdict::{SafetyLevel, Verdict};
 
 /// What scanning sed's inline script(s) found. `exec` = an `e` command/flag (executes a shell
 /// command — RCE). `unknown` = a command letter we don't model (fail closed). `writes`/`reads` are
@@ -175,8 +175,7 @@ fn scan_script(b: &[u8], scan: &mut SedScan) {
                     i += 1;
                 }
             }
-            b'p' | b'P' | b'd' | b'D' | b'n' | b'N' | b'g' | b'G' | b'h' | b'H' | b'x' | b'='
-            | b'z' | b'F' | b'{' | b'}' => {}
+            b'p' | b'P' | b'd' | b'D' | b'n' | b'N' | b'g' | b'G' | b'h' | b'H' | b'x' | b'=' | b'z' | b'F' | b'{' | b'}' => {}
             _ => {
                 scan.unknown = true;
                 return;
@@ -311,14 +310,10 @@ fn read_filename(b: &[u8], mut i: usize) -> (String, usize) {
 
 static SED_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--debug", "--help", "--posix", "--quiet", "--sandbox",
-        "--silent", "--unbuffered", "--version",
-        "-E", "-V", "-h", "-n", "-r", "-u", "-z",
+        "--debug", "--help", "--posix", "--quiet", "--sandbox", "--silent", "--unbuffered", "--version", "-E", "-V", "-h", "-n", "-r",
+        "-u", "-z",
     ]),
-    valued: WordSet::flags(&[
-        "--expression", "--file", "--line-length",
-        "-e", "-f", "-l",
-    ]),
+    valued: WordSet::flags(&["--expression", "--file", "--line-length", "-e", "-f", "-l"]),
     bare: false,
     max_positional: None,
     tolerance: FlagTolerance::strict(),
@@ -356,16 +351,16 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
     }
 }
 
-
 #[cfg(test)]
-pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Custom { cmd: "sed", valid_prefix: Some("sed 's/a/b/'") },
-];
+pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] =
+    &[crate::handlers::CommandEntry::Custom { cmd: "sed", valid_prefix: Some("sed 's/a/b/'") }];
 
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         sed_substitute: "sed 's/foo/bar/'",

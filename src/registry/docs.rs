@@ -1,8 +1,6 @@
 use super::types::*;
 
-fn matrix_policy_usage(
-    matrices: &[MatrixSpec],
-) -> std::collections::HashMap<&str, usize> {
+fn matrix_policy_usage(matrices: &[MatrixSpec]) -> std::collections::HashMap<&str, usize> {
     let mut usage: std::collections::HashMap<&str, usize> = std::collections::HashMap::new();
     for matrix in matrices {
         for action in matrix.actions.values() {
@@ -12,15 +10,9 @@ fn matrix_policy_usage(
     usage
 }
 
-fn describe_shared_policies(
-    matrices: &[MatrixSpec],
-    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> Option<String> {
+fn describe_shared_policies(matrices: &[MatrixSpec], handler_policies: &std::collections::HashMap<String, OwnedPolicy>) -> Option<String> {
     let usage = matrix_policy_usage(matrices);
-    let mut shared: Vec<&String> = handler_policies
-        .keys()
-        .filter(|k| usage.get(k.as_str()).copied().unwrap_or(0) >= 2)
-        .collect();
+    let mut shared: Vec<&String> = handler_policies.keys().filter(|k| usage.get(k.as_str()).copied().unwrap_or(0) >= 2).collect();
     shared.sort();
     if shared.is_empty() {
         return None;
@@ -37,10 +29,7 @@ fn describe_shared_policies(
     Some(lines.join("\n"))
 }
 
-fn describe_matrices(
-    matrices: &[MatrixSpec],
-    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> Option<String> {
+fn describe_matrices(matrices: &[MatrixSpec], handler_policies: &std::collections::HashMap<String, OwnedPolicy>) -> Option<String> {
     if matrices.is_empty() {
         return None;
     }
@@ -63,10 +52,7 @@ fn describe_matrices(
             if shared_count >= 2 {
                 // Reference by name — the flag list shows up in
                 // **Shared flag sets** below.
-                lines.push(format!(
-                    "  - **{name}**{guard}: see `{}` below",
-                    action.policy_key,
-                ));
+                lines.push(format!("  - **{name}**{guard}: see `{}` below", action.policy_key,));
             } else if let Some(policy) = handler_policies.get(&action.policy_key) {
                 let summary = policy.flag_summary();
                 if summary.is_empty() {
@@ -216,11 +202,7 @@ impl CommandSpec {
         // A `[command.behavior]` command documents what it DOES, from its facets — the
         // authoritative classification — rather than its legacy fallback fields (which drift:
         // e.g. cat's legacy `standalone` lists -V/-h/-l, which the behavior grammar denies).
-        let description = if let Some(b) = &self.behavior {
-            describe_behavior(b)
-        } else {
-            self.describe_kind()
-        };
+        let description = if let Some(b) = &self.behavior { describe_behavior(b) } else { self.describe_kind() };
         let mut doc = crate::docs::CommandDoc::handler(
             // These were `Box::leak`ed to satisfy a `&'static str`. `CommandDoc` owns both now,
             // so the clone is the whole cost — the leak bought nothing and paid per call.
@@ -241,11 +223,7 @@ impl CommandSpec {
             DispatchKind::RequireAny { require_any, policy, .. } => {
                 let req = require_any.join(", ");
                 let summary = policy.describe();
-                if summary.is_empty() {
-                    format!("Requires {req}.")
-                } else {
-                    format!("Requires {req}. {summary}")
-                }
+                if summary.is_empty() { format!("Requires {req}.") } else { format!("Requires {req}. {summary}") }
             }
             DispatchKind::Branching { bare_flags, subs, bare_ok, first_arg, .. } => {
                 let mut lines = Vec::new();
@@ -264,9 +242,7 @@ impl CommandSpec {
                 lines.sort();
                 lines.join("\n")
             }
-            DispatchKind::Wrapper { .. } => {
-                "- Recursively validates the inner command.".to_string()
-            }
+            DispatchKind::Wrapper { .. } => "- Recursively validates the inner command.".to_string(),
             DispatchKind::FirstArg { patterns, .. } => {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
@@ -278,11 +254,7 @@ impl CommandSpec {
             DispatchKind::VerbChain(spec) => {
                 let mut verbs: Vec<&str> = spec.verbs.iter().map(String::as_str).collect();
                 verbs.sort_unstable();
-                format!(
-                    "- Read-only verb chain (`verb [args] {} verb …`). Allowed verbs: {}",
-                    spec.separator,
-                    verbs.join(", "),
-                )
+                format!("- Read-only verb chain (`verb [args] {} verb …`). Allowed verbs: {}", spec.separator, verbs.join(", "),)
             }
             DispatchKind::Executor { policy, kind, .. } => describe_executor(policy, *kind),
             DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
@@ -334,11 +306,7 @@ impl OwnedPolicy {
 
 impl SubSpec {
     pub(super) fn doc_line(&self, prefix: &str, out: &mut Vec<String>) {
-        let label = if prefix.is_empty() {
-            self.name.clone()
-        } else {
-            format!("{prefix} {}", self.name)
-        };
+        let label = if prefix.is_empty() { self.name.clone() } else { format!("{prefix} {}", self.name) };
         match &self.kind {
             DispatchKind::Policy { policy, .. } => {
                 let summary = policy.flag_summary();
@@ -412,9 +380,7 @@ impl SubSpec {
 /// One-line doc for an executor node: what it runs and that the executor is locus-gated.
 fn describe_executor(_policy: &OwnedPolicy, kind: ExecutorKind) -> String {
     match kind {
-        ExecutorKind::File => {
-            "Runs a workspace-local script/package (the first positional).".to_string()
-        }
+        ExecutorKind::File => "Runs a workspace-local script/package (the first positional).".to_string(),
         ExecutorKind::Project => "Runs this project's own code.".to_string(),
     }
 }

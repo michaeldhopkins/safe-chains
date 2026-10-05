@@ -17,10 +17,7 @@ impl WordSet {
     pub const fn new(words: &'static [&'static str]) -> Self {
         let mut i = 1;
         while i < words.len() {
-            assert!(
-                const_less(words[i - 1].as_bytes(), words[i].as_bytes()),
-                "WordSet: entries must be sorted, no duplicates"
-            );
+            assert!(const_less(words[i - 1].as_bytes(), words[i].as_bytes()), "WordSet: entries must be sorted, no duplicates");
             i += 1;
         }
         Self(words)
@@ -173,10 +170,7 @@ pub fn has_flag(tokens: &[Token], short: Option<&str>, long: Option<&str>) -> bo
         }
         if let Some(short_flag) = short {
             let short_char = short_flag.trim_start_matches('-');
-            if token.starts_with('-')
-                && !token.starts_with("--")
-                && token[1..].contains(short_char)
-            {
+            if token.starts_with('-') && !token.starts_with("--") && token[1..].contains(short_char) {
                 return true;
             }
         }

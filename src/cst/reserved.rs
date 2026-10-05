@@ -27,9 +27,9 @@ pub(super) fn opens_compound(input: &str) -> bool {
         }
     }
     KEYWORD_OPENERS.iter().any(|kw| {
-        input.strip_prefix(kw).is_some_and(|rest| {
-            rest.is_empty() || rest.starts_with([' ', '\t', '\n', ';', '&', '|', '(', ')', '<', '>'])
-        })
+        input
+            .strip_prefix(kw)
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with([' ', '\t', '\n', ';', '&', '|', '(', ')', '<', '>']))
     })
 }
 
@@ -40,9 +40,8 @@ mod tests {
     #[test]
     fn a_reserved_word_standing_alone_opens_a_compound() {
         for input in [
-            "{ ls; }", "{\nls\n}", "[[ -f x ]]", "if true; then ls; fi", "for x in a; do ls; done",
-            "while true; do ls; done", "until true; do ls; done", "case x in a) ls;; esac",
-            "function f { ls; }", "if", "if;", "for(", "case\tx",
+            "{ ls; }", "{\nls\n}", "[[ -f x ]]", "if true; then ls; fi", "for x in a; do ls; done", "while true; do ls; done",
+            "until true; do ls; done", "case x in a) ls;; esac", "function f { ls; }", "if", "if;", "for(", "case\tx",
         ] {
             assert!(opens_compound(input), "{input:?} should commit to a compound");
         }
@@ -50,10 +49,9 @@ mod tests {
 
     #[test]
     fn a_word_that_only_starts_like_one_does_not() {
-        for input in [
-            "{a,b}", "{}", "{", "[[x", "[", "if=1 ls", "for_each", "iffy", "cases", "functions",
-            "whiled", "ls {", "echo if", "", "done",
-        ] {
+        for input in
+            ["{a,b}", "{}", "{", "[[x", "[", "if=1 ls", "for_each", "iffy", "cases", "functions", "whiled", "ls {", "echo if", "", "done"]
+        {
             assert!(!opens_compound(input), "{input:?} is not a reserved word");
         }
     }

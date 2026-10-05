@@ -27,9 +27,8 @@ pub fn names() -> impl Iterator<Item = &'static str> {
     ARCHETYPES.keys().map(String::as_str)
 }
 
-static ARCHETYPES: LazyLock<BTreeMap<String, Capability>> = LazyLock::new(|| {
-    build_archetypes(include_str!("../../archetypes.toml")).expect("embedded archetypes.toml must compile")
-});
+static ARCHETYPES: LazyLock<BTreeMap<String, Capability>> =
+    LazyLock::new(|| build_archetypes(include_str!("../../archetypes.toml")).expect("embedded archetypes.toml must compile"));
 
 /// How an archetype is told apart from a confusable neighbour.
 #[derive(Debug, Clone, Deserialize)]
@@ -50,16 +49,11 @@ type DeclaredDistinction = (String, Vec<(String, String)>, Option<String>);
 /// `near_neighbours_are_declared`.
 #[cfg(test)]
 fn declared_distinctions() -> Vec<DeclaredDistinction> {
-    let set: TomlArchetypeSet =
-        toml::from_str(include_str!("../../archetypes.toml")).expect("archetypes.toml parses");
+    let set: TomlArchetypeSet = toml::from_str(include_str!("../../archetypes.toml")).expect("archetypes.toml parses");
     set.archetype
         .into_iter()
         .map(|(name, tc)| {
-            let d = tc
-                .distinguished_from
-                .into_iter()
-                .map(|x| (x.archetype, x.by))
-                .collect();
+            let d = tc.distinguished_from.into_iter().map(|x| (x.archetype, x.by)).collect();
             (name, d, tc.same_point_as)
         })
         .collect()
@@ -67,15 +61,12 @@ fn declared_distinctions() -> Vec<DeclaredDistinction> {
 
 fn build_archetypes(src: &str) -> Result<BTreeMap<String, Capability>, String> {
     let set: TomlArchetypeSet = toml::from_str(src).map_err(|e| e.to_string())?;
-    set.archetype
-        .into_iter()
-        .map(|(name, tc)| build_capability(&name, tc).map(|c| (name, c)))
-        .collect()
+    set.archetype.into_iter().map(|(name, tc)| build_capability(&name, tc).map(|c| (name, c))).collect()
 }
 
 fn build_capability(name: &str, tc: TomlCapability) -> Result<Capability, String> {
-    let operation = Operation::from_term(&tc.operation)
-        .ok_or_else(|| format!("archetype `{name}`: unknown operation `{}`", tc.operation))?;
+    let operation =
+        Operation::from_term(&tc.operation).ok_or_else(|| format!("archetype `{name}`: unknown operation `{}`", tc.operation))?;
     let mut c = Capability::new(operation);
 
     if let Some(l) = &tc.locus {
@@ -241,7 +232,10 @@ mod tests {
         assert!(!level("editor").admits(&patch), "editor does NOT write a sibling (writes stay worktree)");
         assert!(level("developer").admits(&patch), "developer patches a sibling (create/mutate)");
         assert!(!level("editor").admits(&destroy), "editor does NOT destroy a sibling");
-        assert!(!level("developer").admits(&destroy), "developer does NOT destroy a sibling (conservative — its destroy clause stays `<= worktree`)");
+        assert!(
+            !level("developer").admits(&destroy),
+            "developer does NOT destroy a sibling (conservative — its destroy clause stays `<= worktree`)"
+        );
     }
 
     #[test]
@@ -316,12 +310,8 @@ mod tests {
         // catalog row leaves it with NO level verification at all — it would ship classifying
         // commands with nobody having checked where it lands. Enumerating the real catalog means a
         // new archetype fails here until its landing is asserted above.
-        let uncovered: Vec<&str> =
-            names().filter(|n| !cases.iter().any(|(c, _, _)| c == n)).collect();
-        assert!(
-            uncovered.is_empty(),
-            "archetype(s) with no catalog row — add (name, admitted_by, refused_by) above: {uncovered:?}",
-        );
+        let uncovered: Vec<&str> = names().filter(|n| !cases.iter().any(|(c, _, _)| c == n)).collect();
+        assert!(uncovered.is_empty(), "archetype(s) with no catalog row — add (name, admitted_by, refused_by) above: {uncovered:?}",);
     }
 
     /// The whole point of Phase 1 for the WRITE side: every remote archetype that CHANGES remote
@@ -330,8 +320,8 @@ mod tests {
     /// deliberate exception: a pure fetch is a reader-level read and auto-approves (SafeRead).
     #[test]
     fn every_remote_write_archetype_is_not_auto_approved() {
-        let write_remotes = names()
-            .filter(|n| (n.starts_with("remote-") && *n != "remote-read") || *n == "vcs-sync" || *n == "blockchain-txn");
+        let write_remotes =
+            names().filter(|n| (n.starts_with("remote-") && *n != "remote-read") || *n == "vcs-sync" || *n == "blockchain-txn");
         for name in write_remotes {
             let p = Profile::of(vec![archetype(name).expect("archetype").clone()]);
             assert_eq!(project(&p), Verdict::Denied, "{name} must not auto-approve in the 3-value projection");
@@ -354,8 +344,7 @@ mod tests {
     #[test]
     fn public_disclosure_is_recorded_not_gated_secret_transmission_is() {
         use crate::engine::facet::{
-            DisclosureAudience, NetDestination, NetDirection, NetPayload, Network, RemoteReach,
-            Reversibility, SecretLevel,
+            DisclosureAudience, NetDestination, NetDirection, NetPayload, Network, RemoteReach, Reversibility, SecretLevel,
         };
 
         let publish_to_public = || {
@@ -363,11 +352,8 @@ mod tests {
             c.locus.remote = RemoteReach::Arbitrary;
             c.reversibility = Reversibility::Effortful;
             c.disclosure.audience = DisclosureAudience::Public;
-            c.network = Network {
-                direction: NetDirection::Outbound,
-                destination: NetDestination::Arbitrary,
-                payload: NetPayload::SendsHostData,
-            };
+            c.network =
+                Network { direction: NetDirection::Outbound, destination: NetDestination::Arbitrary, payload: NetPayload::SendsHostData };
             c
         };
 
@@ -423,9 +409,7 @@ mod tests {
     /// `network-sourced`) is what keeps the clause all-`<=` and facet-monotone.
     #[test]
     fn pinned_scripts_off_install_is_developer_the_supply_chain_surface_is_yolo() {
-        use crate::engine::facet::{
-            ExecutionTrust, LocalLocus, NetDirection, NetPayload, PersistenceLevel, Reversibility,
-        };
+        use crate::engine::facet::{ExecutionTrust, LocalLocus, NetDirection, NetPayload, PersistenceLevel, Reversibility};
         let (dev, yolo) = (level("developer"), level("yolo"));
 
         // `npm ci --ignore-scripts`: install files, execute nothing foreign.
@@ -513,9 +497,7 @@ mod neighbour_tests {
         let dist_of = |n: &str| -> Vec<(String, String)> {
             declared.iter().find(|(name, ..)| name == n).map(|(_, d, _)| d.clone()).unwrap_or_default()
         };
-        let same_of = |n: &str| -> Option<String> {
-            declared.iter().find(|(name, ..)| name == n).and_then(|(_, _, s)| s.clone())
-        };
+        let same_of = |n: &str| -> Option<String> { declared.iter().find(|(name, ..)| name == n).and_then(|(_, _, s)| s.clone()) };
 
         let names: Vec<&str> = names().collect();
         let mut problems = Vec::new();
@@ -565,9 +547,7 @@ mod neighbour_tests {
                 };
                 let d = differing_facets(a, b);
                 if !d.contains(&by.as_str()) {
-                    problems.push(format!(
-                        "`{name}` claims it differs from `{other}` by `{by}`, but they differ on {d:?}",
-                    ));
+                    problems.push(format!("`{name}` claims it differs from `{other}` by `{by}`, but they differ on {d:?}",));
                 }
             }
             if let Some(other) = same {
@@ -576,9 +556,7 @@ mod neighbour_tests {
                     Some(b) => {
                         let d = differing_facets(a, b);
                         if !d.is_empty() {
-                            problems.push(format!(
-                                "`{name}` claims `same_point_as = \"{other}\"`, but they differ on {d:?}",
-                            ));
+                            problems.push(format!("`{name}` claims `same_point_as = \"{other}\"`, but they differ on {d:?}",));
                         }
                     }
                 }

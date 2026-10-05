@@ -58,18 +58,12 @@ fn suggest_never_writes_a_config_above_the_project_root() {
     // about — the write was just how it used to be observable.
     let stdout = String::from_utf8_lossy(&out.stdout);
     let offered = proj.join(".safe-chains.toml");
-    assert!(
-        stdout.contains(&offered.to_string_lossy().to_string()),
-        "expected the project-root path to be offered; stdout={stdout}"
-    );
+    assert!(stdout.contains(&offered.to_string_lossy().to_string()), "expected the project-root path to be offered; stdout={stdout}");
     assert!(
         !stdout.contains(&ancestor_cfg.to_string_lossy().to_string()),
         "--suggest offered a config ABOVE the project root; stdout={stdout}"
     );
-    assert!(
-        !offered.exists(),
-        "--suggest created a file; it is informational and must write nothing"
-    );
+    assert!(!offered.exists(), "--suggest created a file; it is informational and must write nothing");
 }
 
 /// A project config that is not valid TOML must be refused and left byte-identical — never merged
@@ -85,11 +79,7 @@ fn suggest_leaves_an_unparseable_config_byte_identical() {
 
     let out = suggest_in(&proj);
 
-    assert_eq!(
-        std::fs::read(&cfg).expect("read back"),
-        MALFORMED,
-        "--suggest modified a config it could not parse"
-    );
+    assert_eq!(std::fs::read(&cfg).expect("read back"), MALFORMED, "--suggest modified a config it could not parse");
     assert!(
         !out.status.success(),
         "--suggest reported success over an unparseable config; stdout={}",

@@ -57,21 +57,14 @@ exec perl -e '$SIG{INT} = sub { exit 72 }; print STDERR "INFO: INITED\n"; sleep 
 /// stand-in that never sees its SIGINT fails the test instead of hanging it and leaving the
 /// stand-in running.
 fn run_bounded(mut cmd: Command) -> i32 {
-    let mut child = cmd
-        .process_group(0)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .expect("run fuzz/burst.sh");
+    let mut child = cmd.process_group(0).stdout(Stdio::null()).stderr(Stdio::null()).spawn().expect("run fuzz/burst.sh");
     let deadline = Instant::now() + Duration::from_secs(60);
     loop {
         if let Some(status) = child.try_wait().expect("wait for fuzz/burst.sh") {
             return status.code().unwrap_or(-1);
         }
         if Instant::now() > deadline {
-            let _ = Command::new("kill")
-                .args(["-9", &format!("-{}", child.id())])
-                .status();
+            let _ = Command::new("kill").args(["-9", &format!("-{}", child.id())]).status();
             panic!("fuzz/burst.sh did not finish within 60s");
         }
         std::thread::sleep(Duration::from_millis(50));
@@ -91,11 +84,8 @@ impl Drop for Repo {
 impl Repo {
     fn new() -> Self {
         static N: AtomicUsize = AtomicUsize::new(0);
-        let root = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "fuzz-burst-{}-{}",
-            std::process::id(),
-            N.fetch_add(1, Ordering::SeqCst)
-        ));
+        let root =
+            Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("fuzz-burst-{}-{}", std::process::id(), N.fetch_add(1, Ordering::SeqCst)));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(root.join("fuzz")).expect("burst test fixture");
         let bin = root.join("fake-libfuzzer");
@@ -124,20 +114,14 @@ impl Repo {
         for (k, v) in env {
             cmd.env(k, v);
         }
-        (
-            run_bounded(cmd),
-            fs::read_to_string(&output).unwrap_or_default(),
-        )
+        (run_bounded(cmd), fs::read_to_string(&output).unwrap_or_default())
     }
 
     /// The contents of every file in a target's corpus, sorted.
     fn corpus(&self, target: &str) -> Vec<String> {
         let mut out: Vec<String> = fs::read_dir(self.root.join("fuzz/corpus").join(target))
             .expect("burst test fixture")
-            .map(|e| {
-                fs::read_to_string(e.expect("burst test fixture").path())
-                    .expect("burst test fixture")
-            })
+            .map(|e| fs::read_to_string(e.expect("burst test fixture").path()).expect("burst test fixture"))
             .collect();
         out.sort();
         out
@@ -146,12 +130,7 @@ impl Repo {
     fn corpus_names(&self, target: &str) -> Vec<String> {
         fs::read_dir(self.root.join("fuzz/corpus").join(target))
             .expect("burst test fixture")
-            .map(|e| {
-                e.expect("burst test fixture")
-                    .file_name()
-                    .to_string_lossy()
-                    .into_owned()
-            })
+            .map(|e| e.expect("burst test fixture").file_name().to_string_lossy().into_owned())
             .collect()
     }
 }
@@ -159,24 +138,12 @@ impl Repo {
 #[test]
 fn sequential_targets_keep_their_finds_apart() {
     let repo = Repo::new();
-    assert_eq!(
-        repo.burst("alpha", "0", &[]),
-        (0, "merged=true\n".to_string())
-    );
-    assert_eq!(
-        repo.burst("beta", "0", &[]),
-        (0, "merged=true\n".to_string())
-    );
+    assert_eq!(repo.burst("alpha", "0", &[]), (0, "merged=true\n".to_string()));
+    assert_eq!(repo.burst("beta", "0", &[]), (0, "merged=true\n".to_string()));
 
     assert_eq!(repo.corpus("alpha"), ["find from alpha\n"]);
-    assert_eq!(
-        repo.corpus("beta"),
-        ["find from beta\n"],
-        "alpha's find leaked into beta's corpus"
-    );
-    assert!(
-        !repo.root.join("fuzz/new/alpha").exists() && !repo.root.join("fuzz/new/beta").exists()
-    );
+    assert_eq!(repo.corpus("beta"), ["find from beta\n"], "alpha's find leaked into beta's corpus");
+    assert!(!repo.root.join("fuzz/new/alpha").exists() && !repo.root.join("fuzz/new/beta").exists());
 }
 
 #[test]
@@ -188,19 +155,9 @@ fn committed_seeds_keep_their_names_through_the_merge() {
     assert_eq!(repo.burst("parse", "0", &[]).0, 0);
 
     let names = repo.corpus_names("parse");
-    assert!(
-        names.contains(&"seed-ls".to_string()),
-        "seed-ls was renamed or dropped: {names:?}"
-    );
-    assert!(
-        !names.contains(&"0123abcd".to_string()),
-        "the corpus was not replaced by the merge: {names:?}"
-    );
-    assert_eq!(
-        fs::read_to_string(repo.root.join("fuzz/corpus/parse/seed-ls"))
-            .expect("burst test fixture"),
-        "ls -la"
-    );
+    assert!(names.contains(&"seed-ls".to_string()), "seed-ls was renamed or dropped: {names:?}");
+    assert!(!names.contains(&"0123abcd".to_string()), "the corpus was not replaced by the merge: {names:?}");
+    assert_eq!(fs::read_to_string(repo.root.join("fuzz/corpus/parse/seed-ls")).expect("burst test fixture"), "ls -la");
 }
 
 #[test]
@@ -239,11 +196,7 @@ fn the_target_dictionary_is_used_when_present() {
     let log = fs::read_to_string(repo.root.join("args.log")).expect("burst test fixture");
     let fuzz_runs: Vec<&str> = log.lines().filter(|l| !l.contains("-merge=1")).collect();
     assert_eq!(fuzz_runs.len(), 2);
-    assert!(
-        fuzz_runs[0].contains("-dict=fuzz/dict/parse.dict"),
-        "{}",
-        fuzz_runs[0]
-    );
+    assert!(fuzz_runs[0].contains("-dict=fuzz/dict/parse.dict"), "{}", fuzz_runs[0]);
     assert!(!fuzz_runs[1].contains("-dict="), "{}", fuzz_runs[1]);
 }
 
@@ -257,15 +210,8 @@ fn a_bad_budget_or_arity_is_a_usage_error() {
     four.arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/burst.sh"))
         .args(["./fake-libfuzzer", "t", "60", "fuzz/dict/t.dict"])
         .current_dir(&repo.root);
-    assert_eq!(
-        run_bounded(four),
-        64,
-        "the old four-argument form must be refused, not ignored"
-    );
-    assert!(
-        !repo.root.join("args.log").exists(),
-        "the fuzzer ran despite a usage error"
-    );
+    assert_eq!(run_bounded(four), 64, "the old four-argument form must be refused, not ignored");
+    assert!(!repo.root.join("args.log").exists(), "the fuzzer ran despite a usage error");
 }
 
 #[test]

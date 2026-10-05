@@ -1,5 +1,5 @@
-use super::*;
 use super::budget::{self, DepthGuard};
+use super::*;
 use winnow::ModalResult;
 use winnow::combinator::{alt, delimited, not, opt, preceded, repeat, separated, terminated};
 use winnow::error::{ContextError, ErrMode};
@@ -29,10 +29,7 @@ fn scan(bytes: usize) -> ModalResult<()> {
 }
 
 /// Run a parser, charging the step budget for what it consumed.
-fn consumed<'a, O>(
-    input: &mut &'a str,
-    p: impl FnOnce(&mut &'a str) -> ModalResult<O>,
-) -> ModalResult<O> {
+fn consumed<'a, O>(input: &mut &'a str, p: impl FnOnce(&mut &'a str) -> ModalResult<O>) -> ModalResult<O> {
     let before = input.len();
     let out = p(input);
     scan(before - input.len())?;
@@ -96,11 +93,7 @@ fn eat_keyword(input: &mut &str, kw: &str) -> ModalResult<()> {
     if !input.starts_with(kw) {
         return backtrack();
     }
-    if input
-        .as_bytes()
-        .get(kw.len())
-        .is_some_and(|&b| b.is_ascii_alphanumeric() || b == b'_')
-    {
+    if input.as_bytes().get(kw.len()).is_some_and(|&b| b.is_ascii_alphanumeric() || b == b'_') {
         return backtrack();
     }
     *input = &input[kw.len()..];
@@ -250,13 +243,9 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
         return backtrack();
     }
     let committed = super::reserved::opens_compound(input);
-    alt((
-        subshell, brace_group, for_cmd, while_cmd, until_cmd, if_cmd, case_cmd, double_bracket_cmd,
-        function_def,
-        move |i: &mut &str| {
-            if committed { backtrack() } else { simple_cmd.map(Cmd::Simple).parse_next(i) }
-        },
-    ))
+    alt((subshell, brace_group, for_cmd, while_cmd, until_cmd, if_cmd, case_cmd, double_bracket_cmd, function_def, move |i: &mut &str| {
+        if committed { backtrack() } else { simple_cmd.map(Cmd::Simple).parse_next(i) }
+    }))
     .parse_next(input)
 }
 
@@ -281,10 +270,7 @@ fn function_def(input: &mut &str) -> ModalResult<Cmd> {
 /// `function`). Returns whether it was present; only commits `*input` when it was.
 fn opt_function_keyword(input: &mut &str) -> bool {
     let mut probe = *input;
-    if eat_keyword(&mut probe, "function").is_ok()
-        && probe.starts_with([' ', '\t', '\n'])
-        && ws.parse_next(&mut probe).is_ok()
-    {
+    if eat_keyword(&mut probe, "function").is_ok() && probe.starts_with([' ', '\t', '\n']) && ws.parse_next(&mut probe).is_ok() {
         *input = probe;
         return true;
     }
@@ -350,11 +336,7 @@ fn brace_group(input: &mut &str) -> ModalResult<Cmd> {
     if !input.starts_with('{') {
         return backtrack();
     }
-    if !input
-        .as_bytes()
-        .get(1)
-        .is_some_and(|b| matches!(b, b' ' | b'\t' | b'\n'))
-    {
+    if !input.as_bytes().get(1).is_some_and(|b| matches!(b, b' ' | b'\t' | b'\n')) {
         return backtrack();
     }
     *input = &input[1..];
@@ -379,8 +361,7 @@ fn brace_group(input: &mut &str) -> ModalResult<Cmd> {
 // === Simple Command ===
 
 fn simple_cmd(input: &mut &str) -> ModalResult<SimpleCmd> {
-    let env: Vec<(String, Word)> =
-        repeat(0.., terminated(assignment, ws)).parse_next(input)?;
+    let env: Vec<(String, Word)> = repeat(0.., terminated(assignment, ws)).parse_next(input)?;
     let mut words = Vec::new();
     let mut redirs = Vec::new();
 
@@ -410,19 +391,13 @@ fn at_cmd_end(input: &str) -> bool {
     if input.starts_with("&>") {
         return false;
     }
-    input.is_empty()
-        || matches!(
-            input.as_bytes().first(),
-            Some(b'\n' | b';' | b'|' | b'&' | b')')
-        )
+    input.is_empty() || matches!(input.as_bytes().first(), Some(b'\n' | b';' | b'|' | b'&' | b')'))
 }
 
 fn assignment(input: &mut &str) -> ModalResult<(String, Word)> {
     let n = run(input, |c| c.is_ascii_alphanumeric() || c == '_')?;
     '='.parse_next(input)?;
-    let value = opt(word)
-        .parse_next(input)?
-        .unwrap_or(Word(vec![WordPart::Lit(String::new())]));
+    let value = opt(word).parse_next(input)?.unwrap_or(Word(vec![WordPart::Lit(String::new())]));
     Ok((n.to_string(), value))
 }
 
@@ -433,58 +408,25 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
     alt((
         preceded("<<<", (ws, word)).map(|(_, target)| Redir::HereStr(target)),
         heredoc,
-        preceded(">>", (ws, word)).map(move |(_, target)| Redir::Write {
-            fd: fd.unwrap_or(1),
-            target,
-            mode: WriteMode::Append,
-        }),
+        preceded(">>", (ws, word)).map(move |(_, target)| Redir::Write { fd: fd.unwrap_or(1), target, mode: WriteMode::Append }),
         // `&>>` / `&>` send stdout AND stderr to a FILE (bash). `&>` must follow `&>>` so the
         // append form is not read as a truncate followed by a stray `>`.
-        preceded("&>>", (ws, word)).map(|(_, target)| Redir::Write {
-            fd: 1,
-            target,
-            mode: WriteMode::AppendBoth,
-        }),
-        preceded("&>", (ws, word)).map(|(_, target)| Redir::Write {
-            fd: 1,
-            target,
-            mode: WriteMode::TruncateBoth,
-        }),
-        preceded(">&", fd_target).map(move |dst| Redir::DupFd {
-            src: fd.unwrap_or(1),
-            dst,
-        }),
+        preceded("&>>", (ws, word)).map(|(_, target)| Redir::Write { fd: 1, target, mode: WriteMode::AppendBoth }),
+        preceded("&>", (ws, word)).map(|(_, target)| Redir::Write { fd: 1, target, mode: WriteMode::TruncateBoth }),
+        preceded(">&", fd_target).map(move |dst| Redir::DupFd { src: fd.unwrap_or(1), dst }),
         // `>&WORD` where WORD is not a file descriptor is the older spelling of `&>`: it opens a
         // FILE for both streams. It must follow the `>&`-fd form, so `>&2` stays a descriptor dup
         // rather than a write to a file named `2`.
-        preceded(">&", (ws, word)).map(|(_, target)| Redir::Write {
-            fd: 1,
-            target,
-            mode: WriteMode::TruncateBoth,
-        }),
+        preceded(">&", (ws, word)).map(|(_, target)| Redir::Write { fd: 1, target, mode: WriteMode::TruncateBoth }),
         // `>|` (POSIX 2.7.2) overrides `noclobber`. The override is about whether the shell
         // REFUSES an existing file, not about what lands there, so it classifies as the plain
         // overwrite it is. Must precede `>` or the `|` reads as a pipe into an empty command.
-        preceded(">|", (ws, word)).map(move |(_, target)| Redir::Write {
-            fd: fd.unwrap_or(1),
-            target,
-            mode: WriteMode::Clobber,
-        }),
-        preceded('>', (ws, word)).map(move |(_, target)| Redir::Write {
-            fd: fd.unwrap_or(1),
-            target,
-            mode: WriteMode::Truncate,
-        }),
+        preceded(">|", (ws, word)).map(move |(_, target)| Redir::Write { fd: fd.unwrap_or(1), target, mode: WriteMode::Clobber }),
+        preceded('>', (ws, word)).map(move |(_, target)| Redir::Write { fd: fd.unwrap_or(1), target, mode: WriteMode::Truncate }),
         // `<>` (POSIX 2.7.5) opens the target for BOTH reading and writing. Must precede `<`,
         // which would otherwise match and leave `>` to start a bogus second redirect.
-        preceded("<>", (ws, word)).map(move |(_, target)| Redir::ReadWrite {
-            fd: fd.unwrap_or(0),
-            target,
-        }),
-        preceded('<', (ws, word)).map(move |(_, target)| Redir::Read {
-            fd: fd.unwrap_or(0),
-            target,
-        }),
+        preceded("<>", (ws, word)).map(move |(_, target)| Redir::ReadWrite { fd: fd.unwrap_or(0), target }),
+        preceded('<', (ws, word)).map(move |(_, target)| Redir::Read { fd: fd.unwrap_or(0), target }),
     ))
     .parse_next(input)
 }
@@ -500,21 +442,14 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
     // With a BARE delimiter the shell expands the body, so `cat <<EOF` with `$(rm -rf /)` in it
     // runs that command. The body is looked up now (it is already present in `input`, after this
     // line) rather than at drain time, so the expansions land on the redirect that owns them.
-    let body = if expands {
-        heredoc_body_word(input, &delimiter, strip_tabs)?
-    } else {
-        Word(Vec::new())
-    };
+    let body = if expands { heredoc_body_word(input, &delimiter, strip_tabs)? } else { Word(Vec::new()) };
     // Bash semantics: the heredoc body lives on lines AFTER the
     // command line is finished, not immediately after `<<DELIM`. The
     // command line can continue with more redirects, a pipe, etc.
     // Push the delimiter onto a thread-local queue; the body is
     // drained at the next `\n`/`;` separator by drain_pending_heredocs.
     PENDING_HEREDOCS.with(|q| {
-        q.borrow_mut().push(PendingHeredoc {
-            delimiter: delimiter.clone(),
-            strip_tabs,
-        });
+        q.borrow_mut().push(PendingHeredoc { delimiter: delimiter.clone(), strip_tabs });
     });
     Ok(Redir::HereDoc { delimiter, strip_tabs, body })
 }
@@ -571,15 +506,7 @@ fn heredoc_part(input: &mut &str) -> ModalResult<WordPart> {
         *input = &input[1..];
         return Ok(WordPart::Lit("\"".to_string()));
     }
-    alt((
-        dq_escape,
-        arith_sub,
-        cmd_sub,
-        backtick_part,
-        dollar_lit(is_heredoc_literal),
-        lit(is_heredoc_literal),
-    ))
-    .parse_next(input)
+    alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_heredoc_literal), lit(is_heredoc_literal))).parse_next(input)
 }
 
 #[derive(Debug, Clone)]
@@ -594,8 +521,7 @@ thread_local! {
 }
 
 fn drain_pending_heredocs(input: &mut &str) {
-    let pending: Vec<PendingHeredoc> =
-        PENDING_HEREDOCS.with(|q| std::mem::take(&mut *q.borrow_mut()));
+    let pending: Vec<PendingHeredoc> = PENDING_HEREDOCS.with(|q| std::mem::take(&mut *q.borrow_mut()));
     for h in pending {
         if !skip_heredoc_body(input, &h.delimiter, h.strip_tabs) {
             // Couldn't find the matching delimiter line. Leave input
@@ -621,11 +547,7 @@ fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> boo
 /// Split at the delimiter line: `(body, rest-after-the-delimiter-line)`, or `None` when the
 /// delimiter never appears. `strip_tabs` (`<<-`) strips leading TABS only, matching the shell —
 /// spaces do not terminate a `<<-` body.
-fn split_heredoc_body<'a>(
-    s: &'a str,
-    delimiter: &str,
-    strip_tabs: bool,
-) -> Option<(&'a str, &'a str)> {
+fn split_heredoc_body<'a>(s: &'a str, delimiter: &str, strip_tabs: bool) -> Option<(&'a str, &'a str)> {
     let bytes = s.as_bytes();
     let mut line_start = 0;
     while line_start <= bytes.len() {
@@ -660,8 +582,7 @@ fn heredoc_delimiter(input: &mut &str) -> ModalResult<(String, bool)> {
         delimited('\'', take_while(0.., |c| c != '\''), '\'').map(|s: &str| (s.to_string(), false)),
         delimited('"', take_while(0.., |c| c != '"'), '"').map(|s: &str| (s.to_string(), false)),
         escaped_delimiter,
-        take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_')
-            .map(|s: &str| (s.to_string(), true)),
+        take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_').map(|s: &str| (s.to_string(), true)),
     ))
     .parse_next(input)
 }
@@ -718,19 +639,13 @@ fn fd_prefix(input: &mut &str) -> ModalResult<u32> {
 }
 
 fn fd_target(input: &mut &str) -> ModalResult<String> {
-    alt((
-        '-'.value("-".to_string()),
-        take_while(1.., |c: char| c.is_ascii_digit()).map(|s: &str| s.to_string()),
-    ))
-    .parse_next(input)
+    alt(('-'.value("-".to_string()), take_while(1.., |c: char| c.is_ascii_digit()).map(|s: &str| s.to_string()))).parse_next(input)
 }
 
 // === Word ===
 
 fn word(input: &mut &str) -> ModalResult<Word> {
-    repeat(1.., word_part)
-        .map(Word)
-        .parse_next(input)
+    repeat(1.., word_part).map(Word).parse_next(input)
 }
 
 fn word_part(input: &mut &str) -> ModalResult<WordPart> {
@@ -757,9 +672,7 @@ fn single_quoted(input: &mut &str) -> ModalResult<WordPart> {
 }
 
 fn double_quoted(input: &mut &str) -> ModalResult<WordPart> {
-    delimited('"', repeat(0.., dq_part).map(Word), '"')
-        .map(WordPart::DQuote)
-        .parse_next(input)
+    delimited('"', repeat(0.., dq_part).map(Word), '"').map(WordPart::DQuote).parse_next(input)
 }
 
 /// Byte offset of the `)` that closes a substitution body starting at `body[0]` — the first `)` at
@@ -841,11 +754,7 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     let close = find_sub_close(body);
     scan(close.map_or(2 * body.len(), |rel| 3 * rel))?;
     let Some(rel) = close else {
-        return if body.contains("<<") {
-            sub_body_via_grammar(input, body)
-        } else {
-            backtrack()
-        };
+        return if body.contains("<<") { sub_body_via_grammar(input, body) } else { backtrack() };
     };
     // A heredoc body is drained out-of-band (`drain_pending_heredocs`) and can run PAST `rel`, so the
     // bounded interior would be truncated mid-heredoc and still parse "clean" — the fast path is
@@ -977,18 +886,12 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
 }
 
 fn backtick_part(input: &mut &str) -> ModalResult<WordPart> {
-    delimited_scan(input, '`', |i| {
-        delimited('`', backtick_inner, '`').map(WordPart::Backtick).parse_next(i)
-    })
+    delimited_scan(input, '`', |i| delimited('`', backtick_inner, '`').map(WordPart::Backtick).parse_next(i))
 }
 
 /// A quoted span scans to its close, or to the end of the input when there is none, so an unclosed
 /// one is charged for everything it read even though it consumes nothing.
-fn delimited_scan<O>(
-    input: &mut &str,
-    open: char,
-    p: impl FnOnce(&mut &str) -> ModalResult<O>,
-) -> ModalResult<O> {
+fn delimited_scan<O>(input: &mut &str, open: char, p: impl FnOnce(&mut &str) -> ModalResult<O>) -> ModalResult<O> {
     if !input.starts_with(open) {
         return backtrack();
     }
@@ -1024,8 +927,7 @@ fn dq_part(input: &mut &str) -> ModalResult<WordPart> {
     if input.is_empty() || input.starts_with('"') {
         return backtrack();
     }
-    alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_dq_literal), lit(is_dq_literal)))
-        .parse_next(input)
+    alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_dq_literal), lit(is_dq_literal))).parse_next(input)
 }
 
 fn dq_escape(input: &mut &str) -> ModalResult<WordPart> {
@@ -1223,10 +1125,7 @@ fn at_double_bracket_end(input: &str) -> bool {
         return false;
     }
     let after = &input[2..];
-    after.is_empty()
-        || after.starts_with(|c: char| {
-            matches!(c, ' ' | '\t' | '\n' | ';' | '&' | '|' | ')' | '>' | '<')
-        })
+    after.is_empty() || after.starts_with([' ', '\t', '\n', ';', '&', '|', ')', '>', '<'])
 }
 
 fn bracket_word(input: &mut &str) -> ModalResult<Word> {
@@ -1244,17 +1143,8 @@ fn bracket_word_part(input: &mut &str) -> ModalResult<WordPart> {
     if at_double_bracket_end(input) {
         return backtrack();
     }
-    alt((
-        single_quoted,
-        double_quoted,
-        arith_sub,
-        cmd_sub,
-        backtick_part,
-        escaped,
-        dollar_lit(is_bracket_literal),
-        bracket_lit,
-    ))
-    .parse_next(input)
+    alt((single_quoted, double_quoted, arith_sub, cmd_sub, backtick_part, escaped, dollar_lit(is_bracket_literal), bracket_lit))
+        .parse_next(input)
 }
 
 fn is_bracket_literal(c: char) -> bool {
@@ -1354,16 +1244,9 @@ mod tests {
             budget::work()
         };
         let (w2k, w4k) = (work_at(2000), work_at(4000));
-        assert!(
-            w4k <= w2k + w2k / 10,
-            "work still scales with input length: depth 2000 used {w2k}, depth 4000 used {w4k}"
-        );
-        assert!(
-            w4k < MAX_PARSE_WORK_CEILING + MAX_PARSE_WORK_CEILING / 10,
-            "work {w4k} ran far past the {MAX_PARSE_WORK_CEILING} ceiling"
-        );
+        assert!(w4k <= w2k + w2k / 10, "work still scales with input length: depth 2000 used {w2k}, depth 4000 used {w4k}");
+        assert!(w4k < MAX_PARSE_WORK_CEILING + MAX_PARSE_WORK_CEILING / 10, "work {w4k} ran far past the {MAX_PARSE_WORK_CEILING} ceiling");
     }
-
 
     use super::*;
 
@@ -1389,9 +1272,7 @@ mod tests {
             other => panic!("no unclosed form for the reserved word {other:?}; add one here"),
         };
         let tail = "\"$([[ <<\"\"<\"$( [[ x ]] ) $(ls <<EOF\n)\nEOF\n)\" ls";
-        let openers = super::super::reserved::BLANK_OPENERS
-            .iter()
-            .chain(super::super::reserved::KEYWORD_OPENERS.iter());
+        let openers = super::super::reserved::BLANK_OPENERS.iter().chain(super::super::reserved::KEYWORD_OPENERS.iter());
         for opener in openers {
             let unit = unclosed(opener);
             for prefix in [unit.to_string(), format!("{unit}{{\n")] {
@@ -1517,8 +1398,8 @@ mod tests {
     }
 
     const OPENERS: [&str; 14] = [
-        "{\n", "{ ", "[[ a\n", "if a; then\n", "for x in a; do\n", "while a; do\n", "case x in a)\n",
-        "function f {\n", "(\n", "$(", "\"$(", "<(", "$([[ ", "$({ ",
+        "{\n", "{ ", "[[ a\n", "if a; then\n", "for x in a; do\n", "while a; do\n", "case x in a)\n", "function f {\n", "(\n", "$(",
+        "\"$(", "<(", "$([[ ", "$({ ",
     ];
 
     /// Every committed seed of the two command-string fuzz targets parses without spending the
@@ -1564,10 +1445,7 @@ mod tests {
             }
         }
         let message = "it's a line of prose (with parens) and $vars\n".repeat(5_000);
-        for text in [
-            format!("git commit -m \"$(cat <<'EOF'\n{message}EOF\n)\""),
-            "ls -la foo/bar; ".repeat(20_000),
-        ] {
+        for text in [format!("git commit -m \"$(cat <<'EOF'\n{message}EOF\n)\""), "ls -la foo/bar; ".repeat(20_000)] {
             assert!(parse(&text).is_some(), "a long real command no longer parses");
             let (steps, len) = (budget::steps(), text.len() as u64);
             assert!(
@@ -1596,36 +1474,66 @@ mod tests {
     }
 
     #[test]
-    fn simple_command() { assert_eq!(words(&p("echo hello")), ["echo", "hello"]); }
+    fn simple_command() {
+        assert_eq!(words(&p("echo hello")), ["echo", "hello"]);
+    }
     #[test]
-    fn flags() { assert_eq!(words(&p("ls -la")), ["ls", "-la"]); }
+    fn flags() {
+        assert_eq!(words(&p("ls -la")), ["ls", "-la"]);
+    }
     #[test]
-    fn single_quoted() { assert_eq!(words(&p("echo 'hello world'")), ["echo", "hello world"]); }
+    fn single_quoted() {
+        assert_eq!(words(&p("echo 'hello world'")), ["echo", "hello world"]);
+    }
     #[test]
-    fn double_quoted() { assert_eq!(words(&p("echo \"hello world\"")), ["echo", "hello world"]); }
+    fn double_quoted() {
+        assert_eq!(words(&p("echo \"hello world\"")), ["echo", "hello world"]);
+    }
     #[test]
-    fn mixed_quotes() { assert_eq!(words(&p("jq '.key' file.json")), ["jq", ".key", "file.json"]); }
+    fn mixed_quotes() {
+        assert_eq!(words(&p("jq '.key' file.json")), ["jq", ".key", "file.json"]);
+    }
 
     #[test]
-    fn pipeline_test() { assert_eq!(p("grep foo | head -5").0[0].pipeline.commands.len(), 2); }
+    fn pipeline_test() {
+        assert_eq!(p("grep foo | head -5").0[0].pipeline.commands.len(), 2);
+    }
     #[test]
-    fn sequence_and() { assert_eq!(p("ls && echo done").0[0].op, Some(ListOp::And)); }
+    fn sequence_and() {
+        assert_eq!(p("ls && echo done").0[0].op, Some(ListOp::And));
+    }
     #[test]
-    fn sequence_semi() { assert_eq!(p("ls; echo done").0.len(), 2); }
+    fn sequence_semi() {
+        assert_eq!(p("ls; echo done").0.len(), 2);
+    }
     #[test]
-    fn newline_separator() { assert_eq!(p("echo foo\necho bar").0.len(), 2); }
+    fn newline_separator() {
+        assert_eq!(p("echo foo\necho bar").0.len(), 2);
+    }
     #[test]
-    fn blank_line_between_statements() { assert_eq!(p("echo foo\n\necho bar").0.len(), 2); }
+    fn blank_line_between_statements() {
+        assert_eq!(p("echo foo\n\necho bar").0.len(), 2);
+    }
     #[test]
-    fn multiple_blank_lines() { assert_eq!(p("echo foo\n\n\n\necho bar").0.len(), 2); }
+    fn multiple_blank_lines() {
+        assert_eq!(p("echo foo\n\n\n\necho bar").0.len(), 2);
+    }
     #[test]
-    fn blank_line_with_whitespace() { assert_eq!(p("echo foo\n   \necho bar").0.len(), 2); }
+    fn blank_line_with_whitespace() {
+        assert_eq!(p("echo foo\n   \necho bar").0.len(), 2);
+    }
     #[test]
-    fn comment_between_statements() { assert_eq!(p("echo foo\n# comment\necho bar").0.len(), 2); }
+    fn comment_between_statements() {
+        assert_eq!(p("echo foo\n# comment\necho bar").0.len(), 2);
+    }
     #[test]
-    fn semi_then_blank() { assert_eq!(p("echo foo;\n\necho bar").0.len(), 2); }
+    fn semi_then_blank() {
+        assert_eq!(p("echo foo;\n\necho bar").0.len(), 2);
+    }
     #[test]
-    fn and_then_blank() { assert_eq!(p("echo foo &&\n\necho bar").0.len(), 2); }
+    fn and_then_blank() {
+        assert_eq!(p("echo foo &&\n\necho bar").0.len(), 2);
+    }
 
     #[test]
     fn brace_group_simple() {
@@ -1638,32 +1546,42 @@ mod tests {
     fn brace_group_multiple_stmts() {
         if let Cmd::BraceGroup { body, .. } = &p("{ echo a; echo b; echo c; }").0[0].pipeline.commands[0] {
             assert_eq!(body.0.len(), 3);
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     #[test]
     fn brace_group_with_redirect() {
         if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; echo b; } > /tmp/out.txt").0[0].pipeline.commands[0] {
             assert_eq!(redirs.len(), 1);
             assert!(matches!(redirs[0], Redir::Write { .. }));
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     #[test]
     fn brace_group_with_append_redirect() {
         if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; } >> log.txt").0[0].pipeline.commands[0] {
             assert!(matches!(redirs[0], Redir::Write { mode: WriteMode::Append, .. }));
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     #[test]
     fn brace_group_with_stderr_redirect() {
         if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; } 2>&1").0[0].pipeline.commands[0] {
             assert!(matches!(redirs[0], Redir::DupFd { src: 2, .. }));
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     #[test]
     fn brace_group_newline_separated() {
         if let Cmd::BraceGroup { body, .. } = &p("{\n  echo a\n  echo b\n}").0[0].pipeline.commands[0] {
             assert_eq!(body.0.len(), 2);
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     /// `time` is a reserved word, so it may prefix a COMPOUND command — and those forms did not
     /// parse at all, falling to "could not parse this command" on valid shell.
@@ -1673,9 +1591,7 @@ mod tests {
     /// classification still follow the inner command rather than the wrapper.
     #[test]
     fn time_keyword_prefixes_a_compound() {
-        for (src, want_subshell) in
-            [("time (ls)", true), ("time -p (ls)", true), ("time { ls; }", false)]
-        {
+        for (src, want_subshell) in [("time (ls)", true), ("time -p (ls)", true), ("time { ls; }", false)] {
             let pl = &p(src).0[0].pipeline;
             assert_eq!(pl.commands.len(), 1, "{src}: one compound command");
             if want_subshell {
@@ -1723,14 +1639,18 @@ mod tests {
         if let Cmd::BraceGroup { body, .. } = &p("{ { echo inner; }; echo outer; }").0[0].pipeline.commands[0] {
             assert_eq!(body.0.len(), 2);
             assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::BraceGroup { .. }));
-        } else { panic!("expected outer BraceGroup"); }
+        } else {
+            panic!("expected outer BraceGroup");
+        }
     }
     #[test]
     fn brace_group_with_subshell_inside() {
         if let Cmd::BraceGroup { body, .. } = &p("{ (echo sub); echo grp; }").0[0].pipeline.commands[0] {
             assert_eq!(body.0.len(), 2);
             assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::Subshell { .. }));
-        } else { panic!("expected BraceGroup"); }
+        } else {
+            panic!("expected BraceGroup");
+        }
     }
     #[test]
     fn brace_open_requires_whitespace() {
@@ -1748,13 +1668,17 @@ mod tests {
     fn subshell_with_redirect() {
         if let Cmd::Subshell { redirs, .. } = &p("(echo hello) > /tmp/out.txt").0[0].pipeline.commands[0] {
             assert_eq!(redirs.len(), 1);
-        } else { panic!("expected Subshell with redir"); }
+        } else {
+            panic!("expected Subshell with redir");
+        }
     }
     #[test]
     fn for_loop_with_redirect() {
         if let Cmd::For { redirs, .. } = &p("for f in a b; do echo $f; done 2>/dev/null").0[0].pipeline.commands[0] {
             assert_eq!(redirs.len(), 1);
-        } else { panic!("expected For with redir"); }
+        } else {
+            panic!("expected For with redir");
+        }
     }
     #[test]
     fn for_loop_redirect_then_pipe() {
@@ -1775,7 +1699,9 @@ mod tests {
         ));
     }
     #[test]
-    fn background() { assert_eq!(p("ls & echo done").0[0].op, Some(ListOp::Amp)); }
+    fn background() {
+        assert_eq!(p("ls & echo done").0[0].op, Some(ListOp::Amp));
+    }
 
     #[test]
     fn redirect_dev_null() {
@@ -1822,11 +1748,7 @@ mod tests {
         // heredoc parser must NOT consume the pipe + downstream
         // commands as part of the body.
         let s = p("cat <<EOF | bash\nrm\nEOF");
-        assert_eq!(
-            s.0[0].pipeline.commands.len(),
-            2,
-            "pipeline must keep `bash` as a second command"
-        );
+        assert_eq!(s.0[0].pipeline.commands.len(), 2, "pipeline must keep `bash` as a second command");
     }
     #[test]
     fn heredoc_followed_by_next_statement() {
@@ -1844,7 +1766,9 @@ mod tests {
         assert_eq!(cmd.env[0].1.eval(), "bar baz");
     }
     #[test]
-    fn cmd_substitution() { assert!(matches!(&simple(&p("echo $(ls)")).words[1].0[0], WordPart::CmdSub(_))); }
+    fn cmd_substitution() {
+        assert!(matches!(&simple(&p("echo $(ls)")).words[1].0[0], WordPart::CmdSub(_)));
+    }
     #[test]
     fn backtick_substitution() {
         // `pwd` declares `[command.output]`, so its value is bounded rather than worst-cased —
@@ -1857,58 +1781,94 @@ mod tests {
     fn nested_substitution() {
         if let WordPart::CmdSub(inner) = &simple(&p("echo $(echo $(ls))")).words[1].0[0] {
             assert!(matches!(&simple(inner).words[1].0[0], WordPart::CmdSub(_)));
-        } else { panic!("expected CmdSub"); }
+        } else {
+            panic!("expected CmdSub");
+        }
     }
 
     #[test]
-    fn subshell_test() { assert!(matches!(&p("(echo hello)").0[0].pipeline.commands[0], Cmd::Subshell { .. })); }
+    fn subshell_test() {
+        assert!(matches!(&p("(echo hello)").0[0].pipeline.commands[0], Cmd::Subshell { .. }));
+    }
     #[test]
-    fn negation() { assert!(p("! echo hello").0[0].pipeline.bang); }
+    fn negation() {
+        assert!(p("! echo hello").0[0].pipeline.bang);
+    }
 
     #[test]
-    fn for_loop() { assert!(matches!(&p("for x in 1 2 3; do echo $x; done").0[0].pipeline.commands[0], Cmd::For { var, .. } if var == "x")); }
+    fn for_loop() {
+        assert!(matches!(&p("for x in 1 2 3; do echo $x; done").0[0].pipeline.commands[0], Cmd::For { var, .. } if var == "x"));
+    }
     #[test]
-    fn while_loop() { assert!(matches!(&p("while test -f /tmp/foo; do sleep 1; done").0[0].pipeline.commands[0], Cmd::While { .. })); }
+    fn while_loop() {
+        assert!(matches!(&p("while test -f /tmp/foo; do sleep 1; done").0[0].pipeline.commands[0], Cmd::While { .. }));
+    }
     #[test]
     fn if_then_fi() {
         if let Cmd::If { branches, else_body, .. } = &p("if test -f foo; then echo exists; fi").0[0].pipeline.commands[0] {
             assert_eq!(branches.len(), 1);
             assert!(else_body.is_none());
-        } else { panic!("expected If"); }
+        } else {
+            panic!("expected If");
+        }
     }
     #[test]
     fn if_elif_else() {
-        if let Cmd::If { branches, else_body, .. } = &p("if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi").0[0].pipeline.commands[0] {
+        if let Cmd::If { branches, else_body, .. } =
+            &p("if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi").0[0].pipeline.commands[0]
+        {
             assert_eq!(branches.len(), 2);
             assert!(else_body.is_some());
-        } else { panic!("expected If"); }
+        } else {
+            panic!("expected If");
+        }
     }
 
     #[test]
-    fn escaped_outside_quotes() { assert_eq!(words(&p("echo hello\\ world")), ["echo", "hello world"]); }
+    fn escaped_outside_quotes() {
+        assert_eq!(words(&p("echo hello\\ world")), ["echo", "hello world"]);
+    }
     #[test]
-    fn double_quoted_escape() { assert_eq!(words(&p("echo \"hello\\\"world\"")), ["echo", "hello\"world"]); }
+    fn double_quoted_escape() {
+        assert_eq!(words(&p("echo \"hello\\\"world\"")), ["echo", "hello\"world"]);
+    }
     #[test]
-    fn assign_subst() { assert_eq!(simple(&p("out=$(ls)")).env[0].0, "out"); }
+    fn assign_subst() {
+        assert_eq!(simple(&p("out=$(ls)")).env[0].0, "out");
+    }
 
     #[test]
-    fn unmatched_single_quote_fails() { assert!(parse("echo 'hello").is_none()); }
+    fn unmatched_single_quote_fails() {
+        assert!(parse("echo 'hello").is_none());
+    }
     #[test]
-    fn unmatched_double_quote_fails() { assert!(parse("echo \"hello").is_none()); }
+    fn unmatched_double_quote_fails() {
+        assert!(parse("echo \"hello").is_none());
+    }
     #[test]
-    fn unclosed_subshell_fails() { assert!(parse("(echo hello").is_none()); }
+    fn unclosed_subshell_fails() {
+        assert!(parse("(echo hello").is_none());
+    }
     #[test]
-    fn unclosed_cmd_sub_fails() { assert!(parse("echo $(ls").is_none()); }
+    fn unclosed_cmd_sub_fails() {
+        assert!(parse("echo $(ls").is_none());
+    }
     #[test]
-    fn for_missing_do_fails() { assert!(parse("for x in 1 2 3; echo $x; done").is_none()); }
+    fn for_missing_do_fails() {
+        assert!(parse("for x in 1 2 3; echo $x; done").is_none());
+    }
     #[test]
-    fn if_missing_fi_fails() { assert!(parse("if true; then echo hello").is_none()); }
+    fn if_missing_fi_fails() {
+        assert!(parse("if true; then echo hello").is_none());
+    }
 
     #[test]
     fn subshell_for() {
         if let Cmd::Subshell { body, .. } = &p("(for x in 1 2; do echo $x; done)").0[0].pipeline.commands[0] {
             assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::For { .. }));
-        } else { panic!("expected Subshell"); }
+        } else {
+            panic!("expected Subshell");
+        }
     }
     #[test]
     fn proc_sub_input() {
@@ -2011,27 +1971,55 @@ mod tests {
     #[test]
     fn parses_all_safe_commands() {
         let cmds = [
-            "grep foo file.txt", "cat /etc/hosts", "jq '.key' file.json", "base64 -d",
-            "ls -la", "wc -l file.txt", "ps aux", "echo hello", "cat file.txt",
-            "echo $(ls)", "ls `pwd`", "echo $(echo $(ls))", "echo \"$(ls)\"",
-            "out=$(ls)", "out=$(git status)", "a=$(ls) b=$(pwd)",
-            "(echo hello)", "(ls)", "(ls && echo done)", "(echo hello; echo world)",
-            "(ls | grep foo)", "(echo hello) | grep hello", "(ls) && echo done",
-            "((echo hello))", "(for x in 1 2; do echo $x; done)",
-            "echo 'greater > than' test", "echo '$(safe)' arg",
-            "FOO='bar baz' ls -la", "FOO=\"bar baz\" ls -la",
+            "grep foo file.txt",
+            "cat /etc/hosts",
+            "jq '.key' file.json",
+            "base64 -d",
+            "ls -la",
+            "wc -l file.txt",
+            "ps aux",
+            "echo hello",
+            "cat file.txt",
+            "echo $(ls)",
+            "ls `pwd`",
+            "echo $(echo $(ls))",
+            "echo \"$(ls)\"",
+            "out=$(ls)",
+            "out=$(git status)",
+            "a=$(ls) b=$(pwd)",
+            "(echo hello)",
+            "(ls)",
+            "(ls && echo done)",
+            "(echo hello; echo world)",
+            "(ls | grep foo)",
+            "(echo hello) | grep hello",
+            "(ls) && echo done",
+            "((echo hello))",
+            "(for x in 1 2; do echo $x; done)",
+            "echo 'greater > than' test",
+            "echo '$(safe)' arg",
+            "FOO='bar baz' ls -la",
+            "FOO=\"bar baz\" ls -la",
             "RACK_ENV=test bundle exec rspec spec/foo_spec.rb",
-            "grep foo file.txt | head -5", "cat file | sort | uniq",
-            "ls && echo done", "ls; echo done", "ls & echo done",
+            "grep foo file.txt | head -5",
+            "cat file | sort | uniq",
+            "ls && echo done",
+            "ls; echo done",
+            "ls & echo done",
             "grep -c , <<< 'hello,world,test'",
             "cat <<EOF\nhello world\nEOF",
             "cat <<'MARKER'\nsome text\nMARKER",
             "cat <<-EOF\n\thello\nEOF",
-            "echo foo\necho bar", "ls\ncat file.txt",
+            "echo foo\necho bar",
+            "ls\ncat file.txt",
             "git log --oneline -20 | head -5",
-            "echo hello > /dev/null", "echo hello 2> /dev/null",
-            "echo hello >> /dev/null", "git log > /dev/null 2>&1",
-            "ls 2>&1", "cargo clippy 2>&1", "git log < /dev/null",
+            "echo hello > /dev/null",
+            "echo hello 2> /dev/null",
+            "echo hello >> /dev/null",
+            "git log > /dev/null 2>&1",
+            "ls 2>&1",
+            "cargo clippy 2>&1",
+            "git log < /dev/null",
             "for x in 1 2 3; do echo $x; done",
             "for f in *.txt; do cat $f | grep pattern; done",
             "for x in 1 2 3; do; done",
@@ -2054,12 +2042,15 @@ mod tests {
             "# comment\necho hello",
             "echo hello # inline comment",
             "echo one\n# between\necho two",
-            "! echo hello", "! test -f foo",
+            "! echo hello",
+            "! test -f foo",
             "echo for; echo done; echo if; echo fi",
         ];
         let mut failures = Vec::new();
         for cmd in &cmds {
-            if parse(cmd).is_none() { failures.push(*cmd); }
+            if parse(cmd).is_none() {
+                failures.push(*cmd);
+            }
         }
         assert!(failures.is_empty(), "failed on {} commands:\n{}", failures.len(), failures.join("\n"));
     }

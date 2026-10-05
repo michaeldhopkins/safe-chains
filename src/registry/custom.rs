@@ -57,9 +57,7 @@ fn find_user_custom() -> Option<PathBuf> {
 }
 
 fn parse_trusted(source: &str) -> Vec<TrustedEntry> {
-    toml::from_str::<TrustedConfig>(source)
-        .map(|c| c.trusted)
-        .unwrap_or_default()
+    toml::from_str::<TrustedConfig>(source).map(|c| c.trusted).unwrap_or_default()
 }
 
 fn parse_level(source: &str) -> Option<String> {
@@ -97,10 +95,9 @@ fn repo_is_trusted(repo_file: &Path, bytes: &[u8], trusted: &[TrustedEntry]) -> 
         return false;
     };
     let hash = sha256_hex(bytes);
-    trusted.iter().any(|t| {
-        t.sha256.trim().eq_ignore_ascii_case(&hash)
-            && fs::canonicalize(&t.path).map(|p| p == dir).unwrap_or(false)
-    })
+    trusted
+        .iter()
+        .any(|t| t.sha256.trim().eq_ignore_ascii_case(&hash) && fs::canonicalize(&t.path).map(|p| p == dir).unwrap_or(false))
 }
 
 /// Load a USER-SUPPLIED custom TOML without letting a bad one take the process down.
@@ -258,10 +255,7 @@ mod tests {
         // Non-vacuity: a WELL-FORMED config does load, so the zeros above are not simply what this
         // function always returns.
         let good = "[[command]]\nname = \"fuzzprobe\"\nmax_positional = 1\nlevel = \"SafeWrite\"\n";
-        assert!(
-            super::fuzz_load_config(good, false) > 0,
-            "a valid config must load; otherwise the fail-safe assertions prove nothing"
-        );
+        assert!(super::fuzz_load_config(good, false) > 0, "a valid config must load; otherwise the fail-safe assertions prove nothing");
     }
 
     #[test]
@@ -302,8 +296,7 @@ bare = true
 [command.output]
 locus_from = "cwd"
 "#;
-        let user: Vec<_> =
-            load_toml(source, "custom-user").expect("valid test definition").into_iter().collect();
+        let user: Vec<_> = load_toml(source, "custom-user").expect("valid test definition").into_iter().collect();
         assert!(
             user.iter().any(|s| s.output.is_some()),
             "the user config must still be able to declare an output locus, or this guard is \
@@ -317,22 +310,13 @@ locus_from = "cwd"
             .into_iter()
             .map(repo_scoped)
             .collect();
-        assert!(
-            stripped.iter().all(|s| s.output.is_none()),
-            "a repo-level custom TOML must not be able to declare `[command.output]`",
-        );
+        assert!(stripped.iter().all(|s| s.output.is_none()), "a repo-level custom TOML must not be able to declare `[command.output]`",);
     }
 
     #[test]
     fn sha256_hex_known_vectors() {
-        assert_eq!(
-            sha256_hex(b""),
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        );
-        assert_eq!(
-            sha256_hex(b"abc"),
-            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-        );
+        assert_eq!(sha256_hex(b""), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+        assert_eq!(sha256_hex(b"abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     }
 
     #[test]
@@ -356,10 +340,7 @@ locus_from = "cwd"
     fn parse_level_reads_the_ceiling() {
         assert_eq!(parse_level("level = \"network-admin\"").as_deref(), Some("network-admin"));
         // alongside trusted/commands still parses.
-        assert_eq!(
-            parse_level("level = \"yolo\"\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n").as_deref(),
-            Some("yolo"),
-        );
+        assert_eq!(parse_level("level = \"yolo\"\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n").as_deref(), Some("yolo"),);
         // absent / malformed / empty → None (fail-safe to the default band).
         assert!(parse_level("[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n").is_none());
         assert!(parse_level("not valid toml {{{").is_none());
@@ -383,11 +364,8 @@ locus_from = "cwd"
                 .is_empty()
         );
         // command alongside trusted: command parsed, trusted ignored here.
-        let specs = load_toml(
-            "[[command]]\nname = \"myco\"\nbare = true\n\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n",
-            "custom-user",
-        )
-        .expect("valid test definition");
+        let specs = load_toml("[[command]]\nname = \"myco\"\nbare = true\n\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n", "custom-user")
+            .expect("valid test definition");
         assert_eq!(specs.len(), 1);
     }
 
@@ -403,10 +381,7 @@ locus_from = "cwd"
         let body = "[[command]]\nname = \"myco\"\n";
         let f = write_repo_file(dir.path(), body);
         let canon = fs::canonicalize(dir.path()).unwrap();
-        let trusted = vec![TrustedEntry {
-            path: canon.to_string_lossy().into_owned(),
-            sha256: sha256_hex(body.as_bytes()),
-        }];
+        let trusted = vec![TrustedEntry { path: canon.to_string_lossy().into_owned(), sha256: sha256_hex(body.as_bytes()) }];
         assert!(repo_is_trusted(&f, body.as_bytes(), &trusted));
     }
 
@@ -415,10 +390,7 @@ locus_from = "cwd"
         let dir = tempfile::tempdir().unwrap();
         let f = write_repo_file(dir.path(), "[[command]]\nname = \"myco\"\n");
         let canon = fs::canonicalize(dir.path()).unwrap();
-        let trusted = vec![TrustedEntry {
-            path: canon.to_string_lossy().into_owned(),
-            sha256: sha256_hex(b"different content"),
-        }];
+        let trusted = vec![TrustedEntry { path: canon.to_string_lossy().into_owned(), sha256: sha256_hex(b"different content") }];
         // An agent rewrote the file after it was pinned: hash no longer matches.
         let tampered = b"[[command]]\nname = \"curl\"\nlevel = \"Inert\"\n";
         assert!(!repo_is_trusted(&f, tampered, &trusted));
@@ -429,10 +401,7 @@ locus_from = "cwd"
         let dir = tempfile::tempdir().unwrap();
         let body = "[[command]]\nname = \"myco\"\n";
         let f = write_repo_file(dir.path(), body);
-        let trusted = vec![TrustedEntry {
-            path: "/some/other/dir".to_string(),
-            sha256: sha256_hex(body.as_bytes()),
-        }];
+        let trusted = vec![TrustedEntry { path: "/some/other/dir".to_string(), sha256: sha256_hex(body.as_bytes()) }];
         assert!(!repo_is_trusted(&f, body.as_bytes(), &trusted));
     }
 

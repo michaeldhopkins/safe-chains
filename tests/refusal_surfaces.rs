@@ -70,11 +70,7 @@ fn run(args: &[&str], home: &std::path::Path, stdin_payload: Option<&str>) -> St
     let out = child.wait_with_output().expect("wait for safe-chains");
     // Both streams: the hook answers on stdout, `--suggest` on stderr, `--explain` on stdout.
     // Which stream carries the answer is not what this guard is about.
-    format!(
-        "{}{}",
-        String::from_utf8_lossy(&out.stdout),
-        String::from_utf8_lossy(&out.stderr)
-    )
+    format!("{}{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr))
 }
 
 #[test]

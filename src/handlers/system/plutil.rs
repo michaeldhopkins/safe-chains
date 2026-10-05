@@ -46,11 +46,7 @@ fn walk_modifier_args(tokens: &[Token], start: usize) -> Verdict {
                 if value.as_str().starts_with("--") {
                     return Verdict::Denied;
                 }
-                output_mode = if value.as_str() == "-" {
-                    OutputMode::Stdout
-                } else {
-                    OutputMode::File
-                };
+                output_mode = if value.as_str() == "-" { OutputMode::Stdout } else { OutputMode::File };
                 i += 2;
             }
             "--" => break,

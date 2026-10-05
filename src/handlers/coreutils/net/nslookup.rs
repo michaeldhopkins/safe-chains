@@ -27,7 +27,6 @@ fn is_safe_nslookup(tokens: &[Token]) -> Verdict {
         return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::Inert)
-
 }
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -38,22 +37,24 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 }
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("nslookup", "https://man7.org/linux/man-pages/man1/nslookup.1.html",
-            "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=).",
-            "net"),
-    ]
+    vec![crate::docs::CommandDoc::handler(
+        "nslookup",
+        "https://man7.org/linux/man-pages/man1/nslookup.1.html",
+        "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=).",
+        "net",
+    )]
 }
 
 #[cfg(test)]
-pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Custom { cmd: "nslookup", valid_prefix: Some("nslookup example.com") },
-];
+pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] =
+    &[crate::handlers::CommandEntry::Custom { cmd: "nslookup", valid_prefix: Some("nslookup example.com") }];
 
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         nslookup_domain: "nslookup example.com",

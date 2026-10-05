@@ -24,15 +24,19 @@ impl CommandDoc {
                 // Leave already-bulleted lines (top-level OR indented
                 // sub-bullets like `  - **action**`) alone; prepend
                 // `- ` only to plain prose lines.
-                if line.is_empty() || line.trim_start().starts_with("- ") {
-                    line.to_string()
-                } else {
-                    format!("- {line}")
-                }
+                if line.is_empty() || line.trim_start().starts_with("- ") { line.to_string() } else { format!("- {line}") }
             })
             .collect::<Vec<_>>()
             .join("\n");
-        Self { name: name.into(), kind: DocKind::Handler, url: url.into(), description, aliases: Vec::new(), category: category.to_string(), examples: Vec::new() }
+        Self {
+            name: name.into(),
+            kind: DocKind::Handler,
+            url: url.into(),
+            description,
+            aliases: Vec::new(),
+            category: category.to_string(),
+            examples: Vec::new(),
+        }
     }
 
     pub fn wordset(name: &'static str, url: &'static str, words: &WordSet, category: &str) -> Self {
@@ -42,8 +46,6 @@ impl CommandDoc {
     pub fn wordset_multi(name: &'static str, url: &'static str, words: &WordSet, multi: &[(&str, WordSet)], category: &str) -> Self {
         Self::handler(name, url, doc_multi(words, multi).build(), category)
     }
-
-
 }
 
 #[derive(Default)]
@@ -133,7 +135,6 @@ pub fn wordset_items(words: &WordSet) -> String {
     let items: Vec<&str> = words.iter().collect();
     items.join(", ")
 }
-
 
 pub fn all_command_docs() -> Vec<CommandDoc> {
     let mut docs = handlers::handler_docs();
@@ -246,17 +247,14 @@ fn category_display_name(slug: &str) -> &'static str {
         "wasm" => "WebAssembly",
         "wrappers" => "Shell Wrappers",
         "xcode" => "Xcode",
-        other => panic!("unknown category '{other}' — add it to category_display_name() in src/docs.rs")
+        other => panic!("unknown category '{other}' — add it to category_display_name() in src/docs.rs"),
     }
 }
 
 fn render_command_entry(doc: &CommandDoc) -> String {
     let mut out = String::new();
     out.push_str(&format!("### `{}`\n", doc.name));
-    out.push_str(&format!(
-        "<p class=\"cmd-url\"><a href=\"{}\">{}</a></p>\n\n",
-        doc.url, doc.url,
-    ));
+    out.push_str(&format!("<p class=\"cmd-url\"><a href=\"{}\">{}</a></p>\n\n", doc.url, doc.url,));
     if !doc.aliases.is_empty() {
         let alias_str: Vec<String> = doc.aliases.iter().map(|a| format!("`{a}`")).collect();
         out.push_str(&format!("Aliases: {}\n\n", alias_str.join(", ")));
@@ -288,8 +286,7 @@ pub fn render_book(docs: &[CommandDoc], output_dir: &std::path::Path) {
 
     let includes_dir = output_dir.join("src").join("includes");
     fs::create_dir_all(&includes_dir).expect("failed to create includes dir");
-    fs::write(includes_dir.join("command-count.md"), format!("{total}\n"))
-        .expect("failed to write command-count.md");
+    fs::write(includes_dir.join("command-count.md"), format!("{total}\n")).expect("failed to write command-count.md");
 
     let version = env!("CARGO_PKG_VERSION");
     fs::write(
@@ -316,14 +313,10 @@ pub fn render_book(docs: &[CommandDoc], output_dir: &std::path::Path) {
     );
     for (slug, cmds) in &by_category {
         let name = category_display_name(slug);
-        readme.push_str(&format!(
-            "- [{}]({}.md) ({} commands)\n",
-            name, slug, cmds.len(),
-        ));
+        readme.push_str(&format!("- [{}]({}.md) ({} commands)\n", name, slug, cmds.len(),));
     }
     readme.push('\n');
-    fs::write(commands_dir.join("README.md"), &readme)
-        .expect("failed to write commands/README.md");
+    fs::write(commands_dir.join("README.md"), &readme).expect("failed to write commands/README.md");
 
     for (slug, cmds) in &by_category {
         let name = category_display_name(slug);
@@ -331,8 +324,7 @@ pub fn render_book(docs: &[CommandDoc], output_dir: &std::path::Path) {
         for doc in cmds {
             page.push_str(&render_command_entry(doc));
         }
-        fs::write(commands_dir.join(format!("{slug}.md")), &page)
-            .expect("failed to write category page");
+        fs::write(commands_dir.join(format!("{slug}.md")), &page).expect("failed to write category page");
     }
 
     eprintln!("Generated {} category pages:", by_category.len());
@@ -349,12 +341,7 @@ mod tests {
     fn all_commands_have_url() {
         for doc in all_command_docs() {
             assert!(!doc.url.is_empty(), "{} has no documentation URL", doc.name);
-            assert!(
-                doc.url.starts_with("https://"),
-                "{} URL must use https: {}",
-                doc.name,
-                doc.url
-            );
+            assert!(doc.url.starts_with("https://"), "{} URL must use https: {}", doc.name, doc.url);
         }
     }
 
@@ -396,19 +383,14 @@ mod tests {
     #[test]
     fn builder_multi_word_merged() {
         let ws = WordSet::new(&["--version", "info", "show"]);
-        let multi: &[(&str, WordSet)] =
-            &[("config", WordSet::new(&["get", "list"]))];
-        assert_eq!(
-            doc_multi(&ws, multi).build(),
-            "- Subcommands: config get, config list, info, show\n- Flags: --version"
-        );
+        let multi: &[(&str, WordSet)] = &[("config", WordSet::new(&["get", "list"]))];
+        assert_eq!(doc_multi(&ws, multi).build(), "- Subcommands: config get, config list, info, show\n- Flags: --version");
     }
 
     #[test]
     fn builder_multi_word_with_extra_section() {
         let ws = WordSet::new(&["--version", "show"]);
-        let multi: &[(&str, WordSet)] =
-            &[("config", WordSet::new(&["get", "list"]))];
+        let multi: &[(&str, WordSet)] = &[("config", WordSet::new(&["get", "list"]))];
         assert_eq!(
             doc_multi(&ws, multi).section("Guarded: foo.").build(),
             "- Subcommands: config get, config list, show\n- Flags: --version\n- Guarded: foo."
@@ -418,10 +400,7 @@ mod tests {
     #[test]
     fn builder_no_flags_with_extra() {
         let ws = WordSet::new(&["list", "show"]);
-        assert_eq!(
-            doc(&ws).section("Also: foo.").build(),
-            "- Subcommands: list, show\n- Also: foo."
-        );
+        assert_eq!(doc(&ws).section("Also: foo.").build(), "- Subcommands: list, show\n- Also: foo.");
     }
 
     #[test]
@@ -439,21 +418,13 @@ mod tests {
     #[test]
     fn builder_triple_word() {
         let ws = WordSet::new(&["--version", "diff"]);
-        let triples: &[(&str, &str, WordSet)] =
-            &[("git", "remote", WordSet::new(&["list"]))];
-        assert_eq!(
-            doc(&ws).triple_word(triples).build(),
-            "- Subcommands: diff, git remote list\n- Flags: --version"
-        );
+        let triples: &[(&str, &str, WordSet)] = &[("git", "remote", WordSet::new(&["list"]))];
+        assert_eq!(doc(&ws).triple_word(triples).build(), "- Subcommands: diff, git remote list\n- Flags: --version");
     }
 
     #[test]
     fn builder_subcommand_method() {
         let ws = WordSet::new(&["--version", "list"]);
-        assert_eq!(
-            doc(&ws).subcommand("plugin-list").build(),
-            "- Subcommands: list, plugin-list\n- Flags: --version"
-        );
+        assert_eq!(doc(&ws).subcommand("plugin-list").build(), "- Subcommands: list, plugin-list\n- Flags: --version");
     }
-
 }

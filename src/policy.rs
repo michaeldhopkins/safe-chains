@@ -86,12 +86,7 @@ impl PositionalShape {
 /// Whether `token` is a go LOCAL package/file (a filesystem path), as opposed to a
 /// module import path. See [`PositionalShape::GoPackage`].
 pub fn is_go_local_package(token: &str) -> bool {
-    token == "."
-        || token == ".."
-        || token.starts_with("./")
-        || token.starts_with("../")
-        || token.starts_with('/')
-        || token.ends_with(".go")
+    token == "." || token == ".." || token.starts_with("./") || token.starts_with("../") || token.starts_with('/') || token.ends_with(".go")
 }
 
 /// Heuristic for "this token looks like a file path." Used by the
@@ -183,18 +178,10 @@ impl FlagPolicy {
         }
         lines.join("\n")
     }
-
 }
 
 pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
-    check_flags(
-        tokens,
-        &policy.standalone,
-        &policy.valued,
-        policy.bare,
-        policy.max_positional,
-        policy.tolerance,
-    )
+    check_flags(tokens, &policy.standalone, &policy.valued, policy.bare, policy.max_positional, policy.tolerance)
 }
 
 pub(crate) fn consumes_next_value(next: Option<&Token>) -> bool {
@@ -315,13 +302,9 @@ mod tests {
 
     static TEST_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&[
-            "--color", "--count", "--help", "--recursive", "--version",
-            "-H", "-c", "-i", "-l", "-n", "-o", "-r", "-s", "-v", "-w",
+            "--color", "--count", "--help", "--recursive", "--version", "-H", "-c", "-i", "-l", "-n", "-o", "-r", "-s", "-v", "-w",
         ]),
-        valued: WordSet::flags(&[
-            "--after-context", "--before-context", "--max-count",
-            "-A", "-B", "-m",
-        ]),
+        valued: WordSet::flags(&["--after-context", "--before-context", "--max-count", "-A", "-B", "-m"]),
         bare: false,
         max_positional: None,
         tolerance: FlagTolerance::strict(),
@@ -375,10 +358,7 @@ mod tests {
 
         // The bare form must NOT eat the next token — that swallow is how a path becomes a
         // positional and slips the flag gate.
-        assert!(
-            !check(&toks(&["zstd", "--long", "somefile"]), &BOTH),
-            "the bare form must not consume the following token as its value"
-        );
+        assert!(!check(&toks(&["zstd", "--long", "somefile"]), &BOTH), "the bare form must not consume the following token as its value");
 
         // The short glued form is the one shape this does not cover.
         assert!(!check(&toks(&["7z", "-r0"]), &BOTH), "short-glued is NOT handled today");
@@ -456,10 +436,7 @@ mod tests {
 
     #[test]
     fn mixed_flags_and_positional() {
-        assert!(check(
-            &toks(&["grep", "-rn", "--color", "--max-count", "10", "pattern", "."]),
-            &TEST_POLICY,
-        ));
+        assert!(check(&toks(&["grep", "-rn", "--color", "--max-count", "10", "pattern", "."]), &TEST_POLICY,));
     }
 
     #[test]
@@ -498,10 +475,7 @@ mod tests {
 
     #[test]
     fn valued_flag_does_not_swallow_following_long_option() {
-        assert!(!check(
-            &toks(&["node", "--check", "--require=./evil.js"]),
-            &SYNTAX_CHECK_POLICY,
-        ));
+        assert!(!check(&toks(&["node", "--check", "--require=./evil.js"]), &SYNTAX_CHECK_POLICY,));
     }
 
     #[test]
@@ -664,10 +638,7 @@ mod tests {
 
     #[test]
     fn long_only_accepts_unknown_eq_form() {
-        assert!(check(
-            &toks(&["aws", "--filter=Name=tag,Values=foo"]),
-            &LONG_ONLY_POLICY,
-        ));
+        assert!(check(&toks(&["aws", "--filter=Name=tag,Values=foo"]), &LONG_ONLY_POLICY,));
     }
 
     #[test]
@@ -714,10 +685,7 @@ mod tests {
     }
 
     static NUMERIC_DASH_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::flags(&[
-            "--help", "--quiet", "--verbose", "--version",
-            "-V", "-h", "-q", "-v", "-z",
-        ]),
+        standalone: WordSet::flags(&["--help", "--quiet", "--verbose", "--version", "-V", "-h", "-q", "-v", "-z"]),
         valued: WordSet::flags(&["--bytes", "--lines", "-c", "-n"]),
         bare: true,
         max_positional: None,

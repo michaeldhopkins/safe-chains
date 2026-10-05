@@ -15,17 +15,13 @@ use safe_chains::verdict::Verdict;
 
 use crate::HOW_IT_WORKS_URL;
 
-
 pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     let Some(target) = targets::find(target_name) else {
         eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
         process::exit(1);
     };
     let Some(format) = target.hook_format() else {
-        eprintln!(
-            "{}: this target does not use a runtime hook (config-only integration).",
-            target.display_name()
-        );
+        eprintln!("{}: this target does not use a runtime hook (config-only integration).", target.display_name());
         process::exit(1);
     };
     run_hook_format(format, target_name, log_mode);
@@ -35,11 +31,7 @@ pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode)
 /// directory MISMATCH (the agent was launched from the wrong repo, a common and easy-to-forget
 /// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
 /// elsewhere" from "this command genuinely overreaches".
-pub fn run_hook_format(
-    format: &dyn HookFormat,
-    target_name: &str,
-    log_mode: safe_chains::decisionlog::Mode,
-) -> ! {
+pub fn run_hook_format(format: &dyn HookFormat, target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     // Claude's own permission files are trust ONLY when Claude is the harness being served.
     // Every other target gets safe-chains' own classification and nothing borrowed.
     if target_name == "claude" {
@@ -53,7 +45,6 @@ pub fn run_hook_format(
     let Ok(input) = format.parse_input(&buf) else {
         process::exit(0);
     };
-
 
     // HP-19: install the harness cwd/root so relative paths resolve against the real
     // directory for the whole evaluation (verdict and explainer). Most harnesses send `cwd`
@@ -79,10 +70,7 @@ pub fn run_hook_format(
     // sites cost a comparison.
     // The level in force, in the SAME vocabulary `--explain` uses. Taking `threshold.to_string()`
     // here recorded the legacy band name (`safe-write`) for a run `--explain` called `developer`.
-    let log_level = engine_level.map_or_else(
-        || safe_chains::engine::bridge::default_band_top_name().to_string(),
-        |l| l.name.clone(),
-    );
+    let log_level = engine_level.map_or_else(|| safe_chains::engine::bridge::default_band_top_name().to_string(), |l| l.name.clone());
     let log_ctx = safe_chains::decisionlog::Context {
         command: &input.command,
         cwd: input.cwd.as_deref(),
@@ -131,8 +119,7 @@ pub fn run_hook_format(
     // the HARNESS is told, not in what safe-chains decided, so the log records once here rather
     // than at each of the five. A parse failure is kept distinct: it is a correct refusal, but a
     // RISE in them is how a parser regression shows up in the field, and nothing else surfaces it.
-    let outcome =
-        if explanation.parsed { LogOutcome::Denied } else { LogOutcome::Unparseable };
+    let outcome = if explanation.parsed { LogOutcome::Denied } else { LogOutcome::Unparseable };
     log_decision(log_mode, outcome, &log_ctx, Some(&explanation));
 
     // GATED command. What the hook emits depends on the harness's capabilities
@@ -155,12 +142,12 @@ pub fn run_hook_format(
             // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
             // The reach cause carries its own remedy in `ReachReason::message`.
             let reason = safe_chains::refusal::Refusal {
-                    outcome: safe_chains::refusal::Outcome::DidNotRun,
-                    cause: match &overreach_why {
-                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
-                        None => safe_chains::refusal::Cause::no_entry(&input.command),
-                    },
-                }
+                outcome: safe_chains::refusal::Outcome::DidNotRun,
+                cause: match &overreach_why {
+                    Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
+                    None => safe_chains::refusal::Cause::no_entry(&input.command),
+                },
+            }
             .render();
             let response = format.render_deny(&reason);
             let _ = io::stdout().write_all(response.stdout.as_bytes());
@@ -173,12 +160,12 @@ pub fn run_hook_format(
             // unknown command, and two trailing URLs read as boilerplate — the reader skips both.
             // The reach cause carries its own remedy in `ReachReason::message`.
             let reason = safe_chains::refusal::Refusal {
-                    outcome: safe_chains::refusal::Outcome::GoesToHuman,
-                    cause: match &overreach_why {
-                        Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
-                        None => safe_chains::refusal::Cause::no_entry(&input.command),
-                    },
-                }
+                outcome: safe_chains::refusal::Outcome::GoesToHuman,
+                cause: match &overreach_why {
+                    Some(why) => safe_chains::refusal::Cause::Reach(why.clone()),
+                    None => safe_chains::refusal::Cause::no_entry(&input.command),
+                },
+            }
             .render();
             let response = format.render_ask(&reason);
             let _ = io::stdout().write_all(response.stdout.as_bytes());
@@ -197,10 +184,7 @@ pub fn run_hook_format(
     // workspace, say so (and how to allow it) instead of a silent prompt. Degrades to a plain
     // prompt on harnesses without additionalContext.
     if let Some((path, reason)) = overreach {
-        let nudge = format!(
-            "safe-chains did not auto-approve this: {}. {HOW_IT_WORKS_URL}",
-            reason.message(&path)
-        );
+        let nudge = format!("safe-chains did not auto-approve this: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
         let response = format.render_context(&nudge);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
@@ -208,4 +192,3 @@ pub fn run_hook_format(
 
     process::exit(0);
 }
-

@@ -1,5 +1,5 @@
-use std::fmt;
 use super::*;
+use std::fmt;
 
 fn write_sep(f: &mut fmt::Formatter<'_>, trailing_op: Option<ListOp>) -> fmt::Result {
     if !matches!(trailing_op, Some(ListOp::Semi)) {
@@ -192,17 +192,23 @@ impl fmt::Display for SimpleCmd {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut first = true;
         for (name, val) in &self.env {
-            if !first { f.write_str(" ")?; }
+            if !first {
+                f.write_str(" ")?;
+            }
             first = false;
             write!(f, "{name}={val}")?;
         }
         for w in &self.words {
-            if !first { f.write_str(" ")?; }
+            if !first {
+                f.write_str(" ")?;
+            }
             first = false;
             write!(f, "{w}")?;
         }
         for r in &self.redirs {
-            if !first { f.write_str(" ")?; }
+            if !first {
+                f.write_str(" ")?;
+            }
             first = false;
             write!(f, "{r}")?;
         }
@@ -228,11 +234,7 @@ impl fmt::Display for WordPart {
             WordPart::DQuote(w) => write!(f, "\"{w}\""),
             WordPart::CmdSub(s) => {
                 let rendered = s.to_string();
-                if rendered.starts_with('(') {
-                    write!(f, "$( {rendered})")
-                } else {
-                    write!(f, "$({rendered})")
-                }
+                if rendered.starts_with('(') { write!(f, "$( {rendered})") } else { write!(f, "$({rendered})") }
             }
             WordPart::ProcSub(s) => write!(f, "<({s})"),
             WordPart::Backtick(s) => write!(f, "`{s}`"),
@@ -248,7 +250,9 @@ impl fmt::Display for Redir {
                 // `&>`/`&>>` name both streams by construction and take no descriptor prefix —
                 // `2&> f` is not a redirect, and rendering one would not re-parse.
                 let both = matches!(mode, WriteMode::TruncateBoth | WriteMode::AppendBoth);
-                if *fd != 1 && !both { write!(f, "{fd}")?; }
+                if *fd != 1 && !both {
+                    write!(f, "{fd}")?;
+                }
                 let op = match mode {
                     WriteMode::Truncate => ">",
                     WriteMode::Append => ">>",
@@ -259,19 +263,29 @@ impl fmt::Display for Redir {
                 write!(f, "{op} {target}")
             }
             Redir::Read { fd, target } => {
-                if *fd != 0 { write!(f, "{fd}")?; }
+                if *fd != 0 {
+                    write!(f, "{fd}")?;
+                }
                 write!(f, "< {target}")
             }
             Redir::ReadWrite { fd, target } => {
-                if *fd != 0 { write!(f, "{fd}")?; }
+                if *fd != 0 {
+                    write!(f, "{fd}")?;
+                }
                 write!(f, "<> {target}")
             }
             Redir::HereStr(w) => write!(f, "<<< {w}"),
             Redir::HereDoc { delimiter, strip_tabs, .. } => {
-                if *strip_tabs { write!(f, "<<-{delimiter}") } else { write!(f, "<<{delimiter}") }
+                if *strip_tabs {
+                    write!(f, "<<-{delimiter}")
+                } else {
+                    write!(f, "<<{delimiter}")
+                }
             }
             Redir::DupFd { src, dst } => {
-                if *src != 1 { write!(f, "{src}")?; }
+                if *src != 1 {
+                    write!(f, "{src}")?;
+                }
                 write!(f, ">&{dst}")
             }
         }

@@ -42,9 +42,7 @@ impl SafetyLevel {
         Some(match name {
             "paranoid" => (SafetyLevel::Inert, None),
             "reader" => (SafetyLevel::SafeRead, None),
-            "editor" | "developer" | "local-admin" | "network-admin" | "yolo" => {
-                (SafetyLevel::SafeWrite, None)
-            }
+            "editor" | "developer" | "local-admin" | "network-admin" | "yolo" => (SafetyLevel::SafeWrite, None),
             // Legacy names — kept working so existing setups/muscle-memory don't break; the CLI
             // prints a one-line notice pointing at the current name.
             "inert" => (SafetyLevel::Inert, Some("paranoid")),

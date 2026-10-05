@@ -4,16 +4,16 @@
 //! handler here (the old one was a fail-open flag DENYLIST, fully superseded). This module keeps
 //! only tar's DOCS and registry entry; the tests below are engine integration tests for tar.
 
-
 #[cfg(test)]
-pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Custom { cmd: "tar", valid_prefix: Some("tar -tf archive.tar") },
-];
+pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] =
+    &[crate::handlers::CommandEntry::Custom { cmd: "tar", valid_prefix: Some("tar -tf archive.tar") }];
 
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         tar_list: "tar -tf archive.tar",

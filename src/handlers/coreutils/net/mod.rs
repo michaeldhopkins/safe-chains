@@ -1,13 +1,11 @@
 mod nslookup;
 mod route;
 
-use crate::verdict::Verdict;
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    None
-        .or_else(|| nslookup::dispatch(cmd, tokens))
-        .or_else(|| route::dispatch(cmd, tokens))
+    None.or_else(|| nslookup::dispatch(cmd, tokens)).or_else(|| route::dispatch(cmd, tokens))
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {

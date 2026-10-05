@@ -2,16 +2,11 @@ use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
-    "--compressed", "--fail", "--globoff", "--head", "--include", "--insecure",
-    "--ipv4", "--ipv6", "--location", "--no-buffer", "--no-progress-meter",
-    "--show-error", "--silent", "--verbose",
-    "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-i", "-k", "-s", "-v",
+    "--compressed", "--fail", "--globoff", "--head", "--include", "--insecure", "--ipv4", "--ipv6", "--location", "--no-buffer",
+    "--no-progress-meter", "--show-error", "--silent", "--verbose", "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-i", "-k", "-s", "-v",
 ]);
 
-static CURL_SAFE_VALUED: WordSet = WordSet::new(&[
-    "--connect-timeout", "--max-time", "--user-agent", "--write-out",
-    "-A", "-m", "-w",
-]);
+static CURL_SAFE_VALUED: WordSet = WordSet::new(&["--connect-timeout", "--max-time", "--user-agent", "--write-out", "-A", "-m", "-w"]);
 
 static CURL_SAFE_METHODS: WordSet = WordSet::new(&["GET", "HEAD", "OPTIONS"]);
 
@@ -31,15 +26,10 @@ fn is_safe_curl_header(value: &str) -> bool {
 }
 
 const CURL_SAFE_HEADERS: &[&str] = &[
-    "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language",
-    "Authorization",
-    "Cache-Control", "Cookie",
-    "If-Match", "If-Modified-Since", "If-None-Match", "If-Range", "If-Unmodified-Since",
-    "Origin",
-    "Range", "Referer",
-    "User-Agent",
-    "X-Correlation-ID", "X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto",
-    "X-GitHub-Api-Version", "X-Request-ID", "X-Requested-With",
+    "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language", "Authorization", "Cache-Control", "Cookie", "If-Match",
+    "If-Modified-Since", "If-None-Match", "If-Range", "If-Unmodified-Since", "Origin", "Range", "Referer", "User-Agent",
+    "X-Correlation-ID", "X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto", "X-GitHub-Api-Version", "X-Request-ID",
+    "X-Requested-With",
 ];
 
 /// curl's `--write-out` reads its format from a file when the value starts with `@` (`@-` =
@@ -75,7 +65,9 @@ fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> O
             return Some(if write_out_admits(val) { Ok(1) } else { Err(()) });
         }
         if CURL_SAFE_VALUED.contains(flag) || flag == "--output" {
-            if flag == "--output" { *has_write = true; }
+            if flag == "--output" {
+                *has_write = true;
+            }
             return Some(Ok(1));
         }
         if flag == "--request" {
@@ -118,7 +110,10 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
 
         if let Some(advance) = check_curl_valued(t, tokens.get(i + 1), &mut has_write) {
             match advance {
-                Ok(skip) => { i += skip; continue; }
+                Ok(skip) => {
+                    i += skip;
+                    continue;
+                }
                 Err(()) => return Verdict::Denied,
             }
         }
@@ -182,33 +177,23 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
-    vec![
-        CommandDoc::handler("curl",
-            "https://curl.se/docs/manpage.html",
-            DocBuilder::new()
-                .section(format!(
-                    "Allowed standalone flags: {}.",
-                    wordset_items(&CURL_SAFE_STANDALONE),
-                ))
-                .section(format!(
-                    "Allowed valued flags: {}.",
-                    wordset_items(&CURL_SAFE_VALUED),
-                ))
-                .section(format!(
-                    "Allowed methods (-X/--request): {}.",
-                    wordset_items(&CURL_SAFE_METHODS),
-                ))
-                .section("-H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).")
-                .section("-o/--output and -O/--remote-name allowed (writes files).")
-                .build(),
-            "net"),
-    ]
+    vec![CommandDoc::handler(
+        "curl",
+        "https://curl.se/docs/manpage.html",
+        DocBuilder::new()
+            .section(format!("Allowed standalone flags: {}.", wordset_items(&CURL_SAFE_STANDALONE),))
+            .section(format!("Allowed valued flags: {}.", wordset_items(&CURL_SAFE_VALUED),))
+            .section(format!("Allowed methods (-X/--request): {}.", wordset_items(&CURL_SAFE_METHODS),))
+            .section("-H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).")
+            .section("-o/--output and -O/--remote-name allowed (writes files).")
+            .build(),
+        "net",
+    )]
 }
 
 #[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Custom { cmd: "curl", valid_prefix: Some("curl https://example.com") },
-];
+pub(super) const REGISTRY: &[super::CommandEntry] =
+    &[super::CommandEntry::Custom { cmd: "curl", valid_prefix: Some("curl https://example.com") }];
 
 #[cfg(test)]
 mod tests {

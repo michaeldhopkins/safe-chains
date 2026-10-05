@@ -1,11 +1,9 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
-static XARGS_FLAGS_WITH_ARG: WordSet =
-    WordSet::new(&["-E", "-I", "-L", "-P", "-d", "-n", "-s"]);
+static XARGS_FLAGS_WITH_ARG: WordSet = WordSet::new(&["-E", "-I", "-L", "-P", "-d", "-n", "-s"]);
 
-static XARGS_FLAGS_NO_ARG: WordSet =
-    WordSet::new(&["-0", "-p", "-r", "-t", "-x"]);
+static XARGS_FLAGS_NO_ARG: WordSet = WordSet::new(&["-0", "-p", "-r", "-t", "-x"]);
 
 pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
@@ -30,9 +28,7 @@ pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
         i += 1;
     }
     match tokens.get(i) {
-        Some(script) if !script.as_str().starts_with('-') => {
-            crate::engine::resolve::execute_file_verdict(script.as_str())
-        }
+        Some(script) if !script.as_str().starts_with('-') => crate::engine::resolve::execute_file_verdict(script.as_str()),
         _ => Verdict::Denied,
     }
 }
@@ -96,9 +92,7 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
 pub fn is_safe_loop_control(tokens: &[Token]) -> Verdict {
     match tokens.len() {
         1 => Verdict::Allowed(SafetyLevel::Inert),
-        2 if tokens[1].as_str().chars().all(|c| c.is_ascii_digit())
-            && !tokens[1].as_str().is_empty() =>
-        {
+        2 if tokens[1].as_str().chars().all(|c| c.is_ascii_digit()) && !tokens[1].as_str().is_empty() => {
             Verdict::Allowed(SafetyLevel::Inert)
         }
         _ => Verdict::Denied,
@@ -117,18 +111,24 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
-        CommandDoc::handler("bash / sh",
+        CommandDoc::handler(
+            "bash / sh",
             "https://www.gnu.org/software/bash/manual/bash.html",
             "Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.",
-            "builtins"),
-        CommandDoc::handler("xargs",
+            "builtins",
+        ),
+        CommandDoc::handler(
+            "xargs",
             "https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs",
             "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x).",
-            "builtins"),
-        CommandDoc::handler("break / continue",
+            "builtins",
+        ),
+        CommandDoc::handler(
+            "break / continue",
             "https://www.gnu.org/software/bash/manual/bash.html#index-break",
             "Bare invocation or a single non-negative integer level (e.g. `break`, `break 2`).",
-            "builtins"),
+            "builtins",
+        ),
     ]
 }
 

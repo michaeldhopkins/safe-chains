@@ -1,8 +1,7 @@
-use crate::verdict::Verdict;
 use crate::parse::{Token, WordSet};
+use crate::verdict::Verdict;
 
-static NPX_FLAGS_NO_ARG: WordSet =
-    WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
+static NPX_FLAGS_NO_ARG: WordSet = WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
@@ -13,15 +12,15 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder};
-    vec![
-        CommandDoc::handler("npx",
-            "https://docs.npmjs.com/cli/commands/npx",
-            DocBuilder::new()
-                .section("Delegates to the inner command's safety rules.")
-                .section("Skips flags: --yes/-y/--no/--package/-p.")
-                .build(),
-            "node"),
-    ]
+    vec![CommandDoc::handler(
+        "npx",
+        "https://docs.npmjs.com/cli/commands/npx",
+        DocBuilder::new()
+            .section("Delegates to the inner command's safety rules.")
+            .section("Skips flags: --yes/-y/--no/--package/-p.")
+            .build(),
+        "node",
+    )]
 }
 
 #[cfg(test)]

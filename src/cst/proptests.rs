@@ -1,19 +1,13 @@
 use super::*;
 use proptest::prelude::*;
 
-const SHELL_KEYWORDS: &[&str] = &[
-    "do", "done", "for", "while", "until", "if", "then", "elif", "else", "fi", "in", "case",
-    "esac", "select",
-];
+const SHELL_KEYWORDS: &[&str] =
+    &["do", "done", "for", "while", "until", "if", "then", "elif", "else", "fi", "in", "case", "esac", "select"];
 
 fn starts_with_keyword(s: &str) -> bool {
-    SHELL_KEYWORDS.iter().any(|kw| {
-        s.starts_with(kw)
-            && !s
-                .as_bytes()
-                .get(kw.len())
-                .is_some_and(|&b| b.is_ascii_alphanumeric() || b == b'_')
-    })
+    SHELL_KEYWORDS
+        .iter()
+        .any(|kw| s.starts_with(kw) && !s.as_bytes().get(kw.len()).is_some_and(|&b| b.is_ascii_alphanumeric() || b == b'_'))
 }
 
 fn arb_shell_word() -> impl Strategy<Value = String> {
@@ -23,14 +17,11 @@ fn arb_shell_word() -> impl Strategy<Value = String> {
 }
 
 fn arb_env_name() -> impl Strategy<Value = String> {
-    prop::string::string_regex("[A-Z_][A-Z0-9_]{0,5}")
-        .expect("valid regex")
+    prop::string::string_regex("[A-Z_][A-Z0-9_]{0,5}").expect("valid regex")
 }
 
 fn arb_word(depth: u32) -> BoxedStrategy<Word> {
-    prop::collection::vec(arb_word_part(depth), 1..3)
-        .prop_map(Word)
-        .boxed()
+    prop::collection::vec(arb_word_part(depth), 1..3).prop_map(Word).boxed()
 }
 
 fn arb_word_part(depth: u32) -> BoxedStrategy<WordPart> {
@@ -54,9 +45,7 @@ fn arb_word_part(depth: u32) -> BoxedStrategy<WordPart> {
 }
 
 fn arb_dq_word(depth: u32) -> BoxedStrategy<Word> {
-    prop::collection::vec(arb_dq_part(depth), 1..3)
-        .prop_map(Word)
-        .boxed()
+    prop::collection::vec(arb_dq_part(depth), 1..3).prop_map(Word).boxed()
 }
 
 fn arb_dq_part(depth: u32) -> BoxedStrategy<WordPart> {
@@ -100,11 +89,9 @@ fn arb_redir() -> BoxedStrategy<Redir> {
         }),
         (0..3u32, arb_word(0)).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
-        (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
-            Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) }
-        }),
-        (0..3u32, prop_oneof!["0", "1", "2", "-"].prop_map(String::from))
-            .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
+        (arb_heredoc_delimiter(), any::<bool>())
+            .prop_map(|(delimiter, strip_tabs)| { Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) } }),
+        (0..3u32, prop_oneof!["0", "1", "2", "-"].prop_map(String::from)).prop_map(|(src, dst)| Redir::DupFd { src, dst }),
     ]
     .boxed()
 }
@@ -198,12 +185,7 @@ fn arb_pipeline(depth: u32) -> BoxedStrategy<Pipeline> {
 }
 
 fn arb_list_op() -> impl Strategy<Value = ListOp> {
-    prop_oneof![
-        Just(ListOp::And),
-        Just(ListOp::Or),
-        Just(ListOp::Semi),
-        Just(ListOp::Amp),
-    ]
+    prop_oneof![Just(ListOp::And), Just(ListOp::Or), Just(ListOp::Semi), Just(ListOp::Amp),]
 }
 
 fn arb_stmt(depth: u32) -> BoxedStrategy<Stmt> {
@@ -234,16 +216,12 @@ fn arb_dev_null_word() -> impl Strategy<Value = Word> {
 
 fn arb_safe_redir() -> BoxedStrategy<Redir> {
     prop_oneof![
-        (0..3u32, arb_dev_null_word(), arb_write_mode()).prop_map(|(fd, target, mode)| {
-            Redir::Write { fd, target, mode }
-        }),
+        (0..3u32, arb_dev_null_word(), arb_write_mode()).prop_map(|(fd, target, mode)| { Redir::Write { fd, target, mode } }),
         (0..3u32, arb_dev_null_word()).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
-        (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
-            Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) }
-        }),
-        (0..3u32, prop_oneof!["0", "1", "2"].prop_map(String::from))
-            .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
+        (arb_heredoc_delimiter(), any::<bool>())
+            .prop_map(|(delimiter, strip_tabs)| { Redir::HereDoc { delimiter, strip_tabs, body: Word(Vec::new()) } }),
+        (0..3u32, prop_oneof!["0", "1", "2"].prop_map(String::from)).prop_map(|(src, dst)| Redir::DupFd { src, dst }),
     ]
     .boxed()
 }
@@ -251,44 +229,25 @@ fn arb_safe_redir() -> BoxedStrategy<Redir> {
 fn unsafe_rm() -> Cmd {
     Cmd::Simple(SimpleCmd {
         env: vec![],
-        words: vec![
-            Word(vec![WordPart::Lit("rm".into())]),
-            Word(vec![WordPart::Lit("-rf".into())]),
-            Word(vec![WordPart::Lit("/".into())]),
-        ],
+        words: vec![Word(vec![WordPart::Lit("rm".into())]), Word(vec![WordPart::Lit("-rf".into())]), Word(vec![WordPart::Lit("/".into())])],
         redirs: vec![],
     })
 }
 
 fn unsafe_script() -> Script {
-    Script(vec![Stmt {
-        pipeline: Pipeline {
-            bang: false,
-            commands: vec![unsafe_rm()],
-        },
-        op: None,
-    }])
+    Script(vec![Stmt { pipeline: Pipeline { bang: false, commands: vec![unsafe_rm()] }, op: None }])
 }
 
 fn inject_unsafe_into_pipeline(pipeline: &Pipeline, pos: usize) -> Pipeline {
     let mut commands = pipeline.commands.clone();
     let idx = pos % (commands.len() + 1);
     commands.insert(idx, unsafe_rm());
-    Pipeline {
-        bang: pipeline.bang,
-        commands,
-    }
+    Pipeline { bang: pipeline.bang, commands }
 }
 
 fn inject_unsafe_into_script(script: &Script, pos: usize) -> Script {
     if script.0.is_empty() {
-        return Script(vec![Stmt {
-            pipeline: Pipeline {
-                bang: false,
-                commands: vec![unsafe_rm()],
-            },
-            op: None,
-        }]);
+        return Script(vec![Stmt { pipeline: Pipeline { bang: false, commands: vec![unsafe_rm()] }, op: None }]);
     }
     let stmt_idx = pos % script.0.len();
     let mut stmts = script.0.clone();
@@ -688,11 +647,7 @@ proptest! {
 mod resolution {
 
     fn workspace() -> crate::pathctx::Guard {
-        crate::pathctx::enter(crate::pathctx::PathCtx {
-            cwd: Some("/work".into()),
-            root: Some("/work".into()),
-            ..Default::default()
-        })
+        crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() })
     }
     fn allowed(cmd: &str) -> bool {
         crate::is_safe_command(cmd)
@@ -777,7 +732,10 @@ mod resolution {
         // `=`-glued form is a lone `-`-prefixed token that would otherwise masquerade as passthrough.
         assert!(!allowed("echo x | sort --files0-from=./list.txt | xargs rm"), "=-glued files0-from is not a passthrough");
         assert!(!allowed("echo x | sort --files0-from ./list.txt | xargs rm"), "space files0-from is not a passthrough");
-        assert!(!allowed("echo x | sort --files0-from=./list.txt | while read f; do rm \"$f\"; done"), "files0-from into while-read must not launder");
+        assert!(
+            !allowed("echo x | sort --files0-from=./list.txt | while read f; do rm \"$f\"; done"),
+            "files0-from into while-read must not launder"
+        );
     }
 
     #[test]

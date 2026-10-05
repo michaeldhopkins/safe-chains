@@ -1,14 +1,7 @@
 use super::*;
 
 fn ctx<'a>(command: &'a str) -> Context<'a> {
-    Context {
-        command,
-        cwd: Some("/w"),
-        root: Some("/w"),
-        session_id: Some("sess-1"),
-        harness: "claude",
-        level: "developer",
-    }
+    Context { command, cwd: Some("/w"), root: Some("/w"), session_id: Some("sess-1"), harness: "claude", level: "developer" }
 }
 
 fn entry(outcome: Outcome, command: &str) -> Value {
@@ -45,8 +38,8 @@ fn the_wider_flag_wins_when_both_are_given() {
 #[test]
 fn an_entry_carries_every_documented_field() {
     const FIELDS: &[&str] = &[
-        "schema", "id", "at", "version", "harness", "outcome", "level", "command", "cwd", "root",
-        "session_id", "triage", "unknown_commands", "segments", "stateful",
+        "schema", "id", "at", "version", "harness", "outcome", "level", "command", "cwd", "root", "session_id", "triage",
+        "unknown_commands", "segments", "stateful",
     ];
     for outcome in [Outcome::Allowed, Outcome::Denied, Outcome::Unparseable] {
         let e = entry(outcome, "ls -la");
@@ -89,13 +82,8 @@ fn a_resolved_refusal_records_the_clause_that_refused_it() {
     let refused = &e["segments"][0]["facets"]["refused_by"];
     assert!(refused.is_object(), "expected a refusing clause, got {refused}");
     assert_eq!(refused["level"], "developer");
-    assert!(
-        refused["clause"].as_str().is_some_and(|c| c.contains("locus.remote")),
-        "clause did not name the axis: {refused}"
-    );
-    assert!(
-        e["segments"][0]["facets"]["capabilities"].as_array().is_some_and(|c| !c.is_empty())
-    );
+    assert!(refused["clause"].as_str().is_some_and(|c| c.contains("locus.remote")), "clause did not name the axis: {refused}");
+    assert!(e["segments"][0]["facets"]["capabilities"].as_array().is_some_and(|c| !c.is_empty()));
 }
 
 /// A chain gets one segment per top-level element, with the culprit named. Reproducing "which part

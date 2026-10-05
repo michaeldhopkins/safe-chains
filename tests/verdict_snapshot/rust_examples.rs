@@ -31,11 +31,7 @@ struct Collector {
 
 impl<'a> Visit<'a> for Collector {
     fn visit_macro(&mut self, mac: &'a syn::Macro) {
-        if mac
-            .path
-            .get_ident()
-            .is_some_and(|i| EXAMPLE_MACROS.contains(&i.to_string().as_str()))
-        {
+        if mac.path.get_ident().is_some_and(|i| EXAMPLE_MACROS.contains(&i.to_string().as_str())) {
             match mac.parse_body_with(Punctuated::<Entry, syn::Token![,]>::parse_terminated) {
                 Ok(entries) => self.found.extend(entries.into_iter().map(|e| e.0)),
                 Err(_) => self.unreadable += 1,
@@ -63,10 +59,7 @@ pub fn examples_in(source: &str, label: &str) -> BTreeSet<String> {
     let file = syn::parse_file(source).unwrap_or_else(|e| panic!("parse {label}: {e}"));
     let mut collector = Collector::default();
     collector.visit_file(&file);
-    assert_eq!(
-        collector.unreadable, 0,
-        "{label}: an example macro block is not `name: \"cmd\", …`"
-    );
+    assert_eq!(collector.unreadable, 0, "{label}: an example macro block is not `name: \"cmd\", …`");
     collector.found
 }
 
@@ -77,8 +70,7 @@ pub fn rust_examples(root: &Path) -> BTreeSet<String> {
     files
         .iter()
         .flat_map(|path| {
-            let text =
-                fs::read_to_string(path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
+            let text = fs::read_to_string(path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
             examples_in(&text, &path.display().to_string())
         })
         .collect()

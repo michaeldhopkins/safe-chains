@@ -1,12 +1,12 @@
+mod budget;
 pub(crate) mod check;
 mod display;
 pub(crate) mod eval;
 mod explain;
-mod budget;
 mod parse;
-mod reserved;
 #[cfg(test)]
 mod proptests;
+mod reserved;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Script(pub Vec<Stmt>);
@@ -179,8 +179,8 @@ pub enum Redir {
 }
 
 pub use check::{command_verdict, is_safe_command, is_safe_pipeline};
-pub use explain::{Explanation, SegmentReport, explain, explain_with_coverage};
 pub(crate) use explain::denied_inner_words;
+pub use explain::{Explanation, SegmentReport, explain, explain_with_coverage};
 pub use parse::parse;
 
 impl Word {
@@ -226,15 +226,7 @@ impl Script {
     }
 
     pub fn normalize(&self) -> Self {
-        Script(
-            self.0
-                .iter()
-                .map(|stmt| Stmt {
-                    pipeline: stmt.pipeline.normalize(),
-                    op: stmt.op,
-                })
-                .collect(),
-        )
+        Script(self.0.iter().map(|stmt| Stmt { pipeline: stmt.pipeline.normalize(), op: stmt.op }).collect())
     }
 
     pub fn normalize_as_body(&self) -> Self {
@@ -250,10 +242,7 @@ impl Script {
 
 impl Pipeline {
     fn normalize(&self) -> Self {
-        Pipeline {
-            bang: self.bang,
-            commands: self.commands.iter().map(|c| c.normalize()).collect(),
-        }
+        Pipeline { bang: self.bang, commands: self.commands.iter().map(|c| c.normalize()).collect() }
     }
 }
 
@@ -261,60 +250,40 @@ impl Cmd {
     fn normalize(&self) -> Self {
         match self {
             Cmd::Simple(s) => Cmd::Simple(s.normalize()),
-            Cmd::Subshell { body, redirs } => Cmd::Subshell {
-                body: body.normalize(),
-                redirs: normalize_redirs(redirs),
-            },
-            Cmd::BraceGroup { body, redirs } => Cmd::BraceGroup {
-                body: body.normalize_as_body(),
-                redirs: normalize_redirs(redirs),
-            },
+            Cmd::Subshell { body, redirs } => Cmd::Subshell { body: body.normalize(), redirs: normalize_redirs(redirs) },
+            Cmd::BraceGroup { body, redirs } => Cmd::BraceGroup { body: body.normalize_as_body(), redirs: normalize_redirs(redirs) },
             Cmd::For { var, items, body, redirs } => Cmd::For {
                 var: var.clone(),
                 items: items.iter().map(|w| w.normalize()).collect(),
                 body: body.normalize_as_body(),
                 redirs: normalize_redirs(redirs),
             },
-            Cmd::While { cond, body, redirs } => Cmd::While {
-                cond: cond.normalize_as_body(),
-                body: body.normalize_as_body(),
-                redirs: normalize_redirs(redirs),
-            },
-            Cmd::Until { cond, body, redirs } => Cmd::Until {
-                cond: cond.normalize_as_body(),
-                body: body.normalize_as_body(),
-                redirs: normalize_redirs(redirs),
-            },
+            Cmd::While { cond, body, redirs } => {
+                Cmd::While { cond: cond.normalize_as_body(), body: body.normalize_as_body(), redirs: normalize_redirs(redirs) }
+            }
+            Cmd::Until { cond, body, redirs } => {
+                Cmd::Until { cond: cond.normalize_as_body(), body: body.normalize_as_body(), redirs: normalize_redirs(redirs) }
+            }
             Cmd::If { branches, else_body, redirs } => Cmd::If {
                 branches: branches
                     .iter()
-                    .map(|b| Branch {
-                        cond: b.cond.normalize_as_body(),
-                        body: b.body.normalize_as_body(),
-                    })
+                    .map(|b| Branch { cond: b.cond.normalize_as_body(), body: b.body.normalize_as_body() })
                     .collect(),
                 else_body: else_body.as_ref().map(|e| e.normalize_as_body()),
                 redirs: normalize_redirs(redirs),
             },
-            Cmd::DoubleBracket { words, redirs } => Cmd::DoubleBracket {
-                words: words.iter().map(|w| w.normalize()).collect(),
-                redirs: normalize_redirs(redirs),
-            },
+            Cmd::DoubleBracket { words, redirs } => {
+                Cmd::DoubleBracket { words: words.iter().map(|w| w.normalize()).collect(), redirs: normalize_redirs(redirs) }
+            }
             Cmd::Case { subject, arms, redirs } => Cmd::Case {
                 subject: subject.normalize(),
                 arms: arms
                     .iter()
-                    .map(|a| CaseArm {
-                        patterns: a.patterns.iter().map(|w| w.normalize()).collect(),
-                        body: a.body.normalize_as_body(),
-                    })
+                    .map(|a| CaseArm { patterns: a.patterns.iter().map(|w| w.normalize()).collect(), body: a.body.normalize_as_body() })
                     .collect(),
                 redirs: normalize_redirs(redirs),
             },
-            Cmd::FunctionDef { name, body } => Cmd::FunctionDef {
-                name: name.clone(),
-                body: body.normalize_as_body(),
-            },
+            Cmd::FunctionDef { name, body } => Cmd::FunctionDef { name: name.clone(), body: body.normalize_as_body() },
         }
     }
 }
@@ -322,11 +291,7 @@ impl Cmd {
 impl SimpleCmd {
     fn normalize(&self) -> Self {
         SimpleCmd {
-            env: self
-                .env
-                .iter()
-                .map(|(k, v)| (k.clone(), v.normalize()))
-                .collect(),
+            env: self.env.iter().map(|(k, v)| (k.clone(), v.normalize())).collect(),
             words: self.words.iter().map(|w| w.normalize()).collect(),
             redirs: normalize_redirs(&self.redirs),
         }
@@ -337,19 +302,9 @@ fn normalize_redirs(redirs: &[Redir]) -> Vec<Redir> {
     redirs
         .iter()
         .map(|r| match r {
-            Redir::Write { fd, target, mode } => Redir::Write {
-                fd: *fd,
-                target: target.normalize(),
-                mode: *mode,
-            },
-            Redir::Read { fd, target } => Redir::Read {
-                fd: *fd,
-                target: target.normalize(),
-            },
-            Redir::ReadWrite { fd, target } => Redir::ReadWrite {
-                fd: *fd,
-                target: target.normalize(),
-            },
+            Redir::Write { fd, target, mode } => Redir::Write { fd: *fd, target: target.normalize(), mode: *mode },
+            Redir::Read { fd, target } => Redir::Read { fd: *fd, target: target.normalize() },
+            Redir::ReadWrite { fd, target } => Redir::ReadWrite { fd: *fd, target: target.normalize() },
             Redir::HereStr(w) => Redir::HereStr(w.normalize()),
             Redir::HereDoc { .. } | Redir::DupFd { .. } => r.clone(),
         })

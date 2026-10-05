@@ -7,9 +7,7 @@ use super::rust_examples::examples_in;
 use super::snapshot::{self, Drift, Snapshot};
 
 fn snap(rows: &[(&str, &str)]) -> Snapshot {
-    rows.iter()
-        .map(|(i, v)| (i.to_string(), v.to_string()))
-        .collect()
+    rows.iter().map(|(i, v)| (i.to_string(), v.to_string())).collect()
 }
 
 fn generated(toml_text: &str) -> BTreeSet<String> {
@@ -54,12 +52,7 @@ proptest! {
 
 #[test]
 fn parse_refuses_what_render_never_writes() {
-    for bad in [
-        "no tab here",
-        "ls\tmaybe",
-        "a\\q\tdenied",
-        "ls\tdenied\nls\tinert",
-    ] {
+    for bad in ["no tab here", "ls\tmaybe", "a\\q\tdenied", "ls\tdenied\nls\tinert"] {
         assert!(snapshot::parse(bad).is_err(), "{bad:?} parsed");
     }
 }
@@ -86,13 +79,7 @@ fn drift_sorts_each_movement_into_its_own_bucket() {
     let recheck = snap(&[("gone", "safe-read"), ("gone-and-lost", "denied")]);
     let d = Drift::between(&old, &new, &recheck);
     let row = |i: &str, a: &str, b: &str| (i.to_string(), a.to_string(), b.to_string());
-    assert_eq!(
-        d.newly_denied,
-        vec![
-            row("gone-and-lost", "safe-read", "denied"),
-            row("lost", "safe-read", "denied")
-        ]
-    );
+    assert_eq!(d.newly_denied, vec![row("gone-and-lost", "safe-read", "denied"), row("lost", "safe-read", "denied")]);
     assert_eq!(d.raised, vec![row("raised", "safe-read", "safe-write")]);
     assert_eq!(d.newly_allowed, vec![row("gained", "denied", "inert")]);
     assert_eq!(d.lowered, vec![row("lowered", "safe-write", "safe-read")]);
@@ -100,12 +87,7 @@ fn drift_sorts_each_movement_into_its_own_bucket() {
     let dropped: Vec<_> = d.dropped.iter().map(|(i, _)| i.as_str()).collect();
     assert_eq!(dropped, ["gone", "gone-and-lost"]);
     let summary = d.summary(1);
-    assert!(
-        summary.contains(
-            "REGRESSION newly denied: 2\n    gone-and-lost    (safe-read -> denied)\nREGRESSION"
-        ),
-        "{summary}"
-    );
+    assert!(summary.contains("REGRESSION newly denied: 2\n    gone-and-lost    (safe-read -> denied)\nREGRESSION"), "{summary}");
 }
 
 const FROB: &str = r#"
@@ -186,10 +168,7 @@ fn a_node_generates_its_flags_subs_aliases_matrix_and_examples() {
     ] {
         assert!(got.contains(want), "missing {want:?}; generated {got:#?}");
     }
-    assert!(
-        !got.iter().any(|i| i.contains('*')),
-        "a glob reached the corpus: {got:#?}"
-    );
+    assert!(!got.iter().any(|i| i.contains('*')), "a glob reached the corpus: {got:#?}");
 }
 
 #[test]
@@ -206,16 +185,7 @@ fn rust_example_blocks_yield_their_strings_and_nothing_else() {
         }
     "#;
     let got: Vec<_> = examples_in(source, "fixture").into_iter().collect();
-    assert_eq!(
-        got,
-        [
-            "awk 1",
-            "curl -o /etc/x x",
-            "curl -s x",
-            "echo",
-            "sed -n 1p x"
-        ]
-    );
+    assert_eq!(got, ["awk 1", "curl -o /etc/x x", "curl -s x", "echo", "sed -n 1p x"]);
 }
 
 #[test]

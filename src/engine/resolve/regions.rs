@@ -155,9 +155,7 @@ impl Matcher {
             // subtree node while still yielding to a node that spells the path out in full.
             Matcher::Glob(pat) => {
                 let comps: Vec<&str> = path.split('/').collect();
-                (comps.len() == pat.len()
-                    && pat.iter().zip(&comps).all(|(p, c)| p == "*" || eq(c, p)))
-                .then_some(10_000 + path.len())
+                (comps.len() == pat.len() && pat.iter().zip(&comps).all(|(p, c)| p == "*" || eq(c, p))).then_some(10_000 + path.len())
             }
         }
     }
@@ -233,8 +231,7 @@ fn has_hidden_component(remainder: &str) -> bool {
 
 /// ASCII-case-insensitive `starts_with`, zero-alloc (for case-folded shield matching).
 fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
-    haystack.len() >= prefix.len()
-        && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
+    haystack.len() >= prefix.len() && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
 }
 
 /// Whether a role is a PROTECTION (a credential/secret shield, the pinned config, or a
@@ -325,10 +322,7 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
     let file: RegionsFile = toml::from_str(src).expect("regions/default.toml is invalid TOML");
 
     let role_of = |name: &str| -> Role {
-        let def = file
-            .role
-            .get(name)
-            .unwrap_or_else(|| panic!("regions: role `{name}` is not defined"));
+        let def = file.role.get(name).unwrap_or_else(|| panic!("regions: role `{name}` is not defined"));
         let write_locus = parse_locus(&def.write_locus);
         Role {
             read_locus: parse_locus(&def.read_locus),
@@ -341,7 +335,9 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
                 None => Frozen::Nothing,
                 Some("rebind") => Frozen::Rebind,
                 Some("write") => Frozen::Write,
-                Some(other) => panic!("regions: role `{name}` has unknown frozen face `{other}` (known: rebind, write)"),
+                Some(other) => {
+                    panic!("regions: role `{name}` has unknown frozen face `{other}` (known: rebind, write)")
+                }
             },
         }
     };
@@ -356,20 +352,11 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
         .iter()
         .map(|r| {
             let role = role_of(&r.role);
-            Node {
-                matcher: Matcher::from_path(&r.path),
-                role,
-                os: r.os.clone(),
-                fold: role_is_protective(&role),
-            }
+            Node { matcher: Matcher::from_path(&r.path), role, os: r.os.clone(), fold: role_is_protective(&role) }
         })
         .collect();
 
-    Regions {
-        nodes,
-        worktree: role_of("worktree"),
-        unknown: role_of("unknown"),
-    }
+    Regions { nodes, worktree: role_of("worktree"), unknown: role_of("unknown") }
 });
 
 // ── User trust grants ──────────────────────────────────────────────────────────────────────
@@ -428,17 +415,14 @@ fn load_user_grants() -> Vec<Grant> {
     // deliberately not honored so a redirected env var can't point the trust root at an
     // agent-writable dir (see custom.rs).
     if let Ok(src) = std::fs::read_to_string(home.join(".config/safe-chains.toml")) {
-        grants.extend(
-            toml::from_str::<GrantFile>(&src)
-                .map(|f| f.grant)
-                .unwrap_or_default()
-                .into_iter()
-                .flat_map(|g| {
-                    grant_matchers(&g.path)
-                        .into_iter()
-                        .map(move |m| Grant { matcher: m, read: g.read, write: g.write, source: GrantSource::UserConfig })
-                }),
-        );
+        grants.extend(toml::from_str::<GrantFile>(&src).map(|f| f.grant).unwrap_or_default().into_iter().flat_map(|g| {
+            grant_matchers(&g.path).into_iter().map(move |m| Grant {
+                matcher: m,
+                read: g.read,
+                write: g.write,
+                source: GrantSource::UserConfig,
+            })
+        }));
     }
     // ~/.claude/settings.json Read(...) rules — the harness's own read approvals, honored
     // read-only (an Edit()/Write() rule never becomes a write grant). The command-grant
@@ -490,11 +474,7 @@ fn claude_read_grant_paths(settings_json: &str) -> Vec<String> {
     let Ok(value) = serde_json::from_str::<serde_json::Value>(settings_json) else {
         return Vec::new();
     };
-    let Some(arr) = value
-        .get("permissions")
-        .and_then(|v| v.get("allow"))
-        .and_then(|v| v.as_array())
-    else {
+    let Some(arr) = value.get("permissions").and_then(|v| v.get("allow")).and_then(|v| v.as_array()) else {
         return Vec::new();
     };
     arr.iter()
@@ -575,17 +555,13 @@ pub(crate) fn with_derived_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOn
 /// Run `f` with the user's own grants and borrowed ones active together (tests only), as the real
 /// binary has them: the user's first, the borrowed appended after.
 #[cfg(test)]
-pub(crate) fn with_user_and_derived_grants<T>(
-    user: &[(&str, bool, bool)],
-    derived: &[(&str, bool, bool)],
-    f: impl FnOnce() -> T,
-) -> T {
+pub(crate) fn with_user_and_derived_grants<T>(user: &[(&str, bool, bool)], derived: &[(&str, bool, bool)], f: impl FnOnce() -> T) -> T {
     let parsed = [(user, GrantSource::UserConfig), (derived, GrantSource::Derived)]
         .into_iter()
         .flat_map(|(grants, source)| {
-            grants.iter().flat_map(move |&(p, read, write)| {
-                grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source })
-            })
+            grants
+                .iter()
+                .flat_map(move |&(p, read, write)| grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source }))
         })
         .collect();
     TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
@@ -598,9 +574,7 @@ pub(crate) fn with_user_and_derived_grants<T>(
 fn with_grants_of_kind<T>(grants: &[(&str, bool, bool)], source: GrantSource, f: impl FnOnce() -> T) -> T {
     let parsed = grants
         .iter()
-        .flat_map(|&(p, read, write)| {
-            grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source })
-        })
+        .flat_map(|&(p, read, write)| grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write, source }))
         .collect();
     TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
     let out = f();
@@ -642,7 +616,8 @@ fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
                 // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
                 (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
             })
-            .fold(None, grant_faces::merge).map(|(_, r, w)| (r, w))
+            .fold(None, grant_faces::merge)
+            .map(|(_, r, w)| (r, w))
     };
     #[cfg(test)]
     {
@@ -688,16 +663,8 @@ fn apply_grant(path: &str, base: Role) -> Role {
     };
     Role {
         read_locus: if read { base.read_locus.min(LocalLocus::WorktreeTrusted) } else { base.read_locus },
-        write_locus: if write && base.write_grantable() {
-            base.write_locus.min(LocalLocus::Worktree)
-        } else {
-            base.write_locus
-        },
-        rebind_locus: if write && base.rebind_grantable() {
-            base.rebind_locus.min(LocalLocus::Worktree)
-        } else {
-            base.rebind_locus
-        },
+        write_locus: if write && base.write_grantable() { base.write_locus.min(LocalLocus::Worktree) } else { base.write_locus },
+        rebind_locus: if write && base.rebind_grantable() { base.rebind_locus.min(LocalLocus::Worktree) } else { base.rebind_locus },
         // A READ grant that NAMED the store clears the shield for it. Without this the grant moved
         // the locus and nothing else, so `[[grant]] path = "~/.ssh", read = true` still refused —
         // `secret · reads` is admitted by no level below yolo, so the flag alone decided it. The
@@ -1085,7 +1052,7 @@ mod tests {
     /// safe rather than a home-wide hole.
     #[test]
     fn adjacent_sibling_classification() {
-        use crate::pathctx::{enter, PathCtx};
+        use crate::pathctx::{PathCtx, enter};
         let ws = |root: &str, path: &str| {
             let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
             classify_region(path)
@@ -1109,7 +1076,11 @@ mod tests {
         assert_eq!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Machine, "peer .npmrc is a token file, not peer content");
         assert_eq!(ws(WS, "~/projects/branchdiff/.ssh/id_rsa").read_locus, LocalLocus::Machine, "the shield still bites in a peer");
         // The .git WRITE freeze is a separate guard and is unaffected by dropping the dot-shield.
-        assert_eq!(ws(WS, "~/projects/branchdiff/.git/hooks/pre-commit").write_locus, LocalLocus::WorktreeTrusted, "peer .git hook stays frozen");
+        assert_eq!(
+            ws(WS, "~/projects/branchdiff/.git/hooks/pre-commit").write_locus,
+            LocalLocus::WorktreeTrusted,
+            "peer .git hook stays frozen"
+        );
 
         // THE danger case: a workspace at `~/work` (depth 1) must NOT make `~/.ssh` / `~/x` siblings.
         assert_ne!(ws("~/work", "~/.ssh/id_rsa").read_locus, LocalLocus::Adjacent, "~/.ssh is never adjacent");
@@ -1141,7 +1112,7 @@ mod tests {
     /// structural vote on secrecy over a shield that already names what is secret.
     #[test]
     fn a_peers_hidden_files_are_adjacent_and_the_shield_still_holds() {
-        use crate::pathctx::{enter, PathCtx};
+        use crate::pathctx::{PathCtx, enter};
         let at = |root: &str, path: &str| {
             let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
             classify_region(path).read_locus
@@ -1150,11 +1121,8 @@ mod tests {
 
         // Hidden peer content is adjacent — the same rung its ordinary source has.
         for p in [
-            "~/projects/branchdiff/.github/workflows/ci.yml",
-            "~/projects/branchdiff/.vscode/settings.json",
-            "~/projects/branchdiff/.cargo/config.toml",
-            "~/projects/branchdiff/.env",
-            "~/projects/branchdiff/sub/.config/app.toml",
+            "~/projects/branchdiff/.github/workflows/ci.yml", "~/projects/branchdiff/.vscode/settings.json",
+            "~/projects/branchdiff/.cargo/config.toml", "~/projects/branchdiff/.env", "~/projects/branchdiff/sub/.config/app.toml",
         ] {
             assert_eq!(at(WS, p), LocalLocus::Adjacent, "hidden peer content should be adjacent: {p}");
         }
@@ -1164,9 +1132,7 @@ mod tests {
         // The SHIELD is what still refuses, at any depth, in a peer as anywhere else. This is the
         // half that must never regress: removing the dot rule leaned the whole guarantee onto it.
         for p in [
-            "~/projects/branchdiff/.ssh/id_rsa",
-            "~/projects/branchdiff/.aws/credentials",
-            "~/projects/branchdiff/a/b/c/.netrc",
+            "~/projects/branchdiff/.ssh/id_rsa", "~/projects/branchdiff/.aws/credentials", "~/projects/branchdiff/a/b/c/.netrc",
             "~/projects/branchdiff/deep/.gnupg/secring.gpg",
         ] {
             assert_eq!(at(WS, p), LocalLocus::Machine, "the credential shield must still bite: {p}");
@@ -1256,9 +1222,7 @@ mod tests {
 
     #[test]
     fn claude_read_rule_admits_read_but_never_write() {
-        let paths = claude_read_grant_paths(
-            r#"{"permissions":{"allow":["Read(~/.local/share/mise/**)","Edit(~/.local/share/mise/**)"]}}"#,
-        );
+        let paths = claude_read_grant_paths(r#"{"permissions":{"allow":["Read(~/.local/share/mise/**)","Edit(~/.local/share/mise/**)"]}}"#);
         assert_eq!(paths, vec!["~/.local/share/mise/".to_string()]);
         let grants: Vec<(&str, bool, bool)> = paths.iter().map(|p| (p.as_str(), true, false)).collect();
         with_grants(&grants, || {
@@ -1285,11 +1249,7 @@ mod tests {
         let home = tempfile::tempdir().unwrap();
         let claude = home.path().join(".claude");
         std::fs::create_dir_all(&claude).unwrap();
-        std::fs::write(
-            claude.join("settings.json"),
-            r#"{"permissions":{"allow":["Read(~/.gem/**)","Edit(~/.gem/**)"]}}"#,
-        )
-        .unwrap();
+        std::fs::write(claude.join("settings.json"), r#"{"permissions":{"allow":["Read(~/.gem/**)","Edit(~/.gem/**)"]}}"#).unwrap();
         let grants = claude_settings_read_grants(home.path());
         assert!(!grants.is_empty());
         assert!(grants.iter().all(|g| g.read && !g.write), "Read() rules are read-only");
@@ -1297,7 +1257,6 @@ mod tests {
         let empty = tempfile::tempdir().unwrap();
         assert!(claude_settings_read_grants(empty.path()).is_empty());
     }
-
 
     /// A sample path inside `node`, the grant that NAMES it, and the grant on its PARENT.
     ///
@@ -1317,9 +1276,7 @@ mod tests {
         };
         match matcher {
             Matcher::Exact(s) => Some((s.clone(), s.clone(), parent_of(s)?)),
-            Matcher::Prefix(s) => {
-                Some((format!("{s}probe"), s.clone(), parent_of(s)?))
-            }
+            Matcher::Prefix(s) => Some((format!("{s}probe"), s.clone(), parent_of(s)?)),
             // BOTH spellings. Probing a segment only as `~/.ssh/probe` left the absolute form
             // unexercised, and that is precisely where the root was being computed wrongly.
             Matcher::Segment(seg) => Some((format!("~/{seg}/probe"), format!("~/{seg}"), "~/".to_string())),
@@ -1327,11 +1284,7 @@ mod tests {
             // Fill each wildcard with a concrete component, so a Glob node is probed by the
             // grant/shield guards exactly like a spelled-out one.
             Matcher::Glob(pat) => {
-                let concrete = pat
-                    .iter()
-                    .map(|c| if c == "*" { "probe" } else { c.as_str() })
-                    .collect::<Vec<_>>()
-                    .join("/");
+                let concrete = pat.iter().map(|c| if c == "*" { "probe" } else { c.as_str() }).collect::<Vec<_>>().join("/");
                 Some((concrete.clone(), concrete.clone(), parent_of(&concrete)?))
             }
         }
@@ -1404,10 +1357,7 @@ mod tests {
             }
             with_grants(&[(parent, true, true)], || {
                 for line in [format!("rm -rf {parent}"), format!("ln -s /tmp/evil {parent}")] {
-                    assert!(
-                        !crate::is_safe_command(&line),
-                        "`{line}` relocates the trust root holding {path}"
-                    );
+                    assert!(!crate::is_safe_command(&line), "`{line}` relocates the trust root holding {path}");
                 }
                 // The other half of the trade-off: freezing the directory must not freeze what is
                 // INSIDE it, or a `~/.config` grant would stop being useful for every other tool.
@@ -1435,12 +1385,9 @@ mod tests {
                 for allowed in [format!("cp a.toml {dir}"), format!("mv a.toml {dir}"), format!("touch {dir}/x")] {
                     assert!(crate::is_safe_command(&allowed), "{allowed} must stay allowed");
                 }
-                for refused in [
-                    format!("rm -rf {dir}"),
-                    format!("rmdir {dir}"),
-                    format!("ln -s /tmp/evil {dir}"),
-                    format!("mv {dir} {dir}.bak"),
-                ] {
+                for refused in
+                    [format!("rm -rf {dir}"), format!("rmdir {dir}"), format!("ln -s /tmp/evil {dir}"), format!("mv {dir} {dir}.bak")]
+                {
                     assert!(!crate::is_safe_command(&refused), "{refused} relocates the trust root");
                 }
             });
@@ -1457,11 +1404,7 @@ mod tests {
     fn a_rebinding_command_into_a_container_is_an_ordinary_write() {
         with_grants(&[("~/.config", true, true)], || {
             // Definitively a container: `-t`, its long spelling, and three-or-more operands.
-            for allowed in [
-                "ln -t ~/.config a",
-                "ln --target-directory=~/.config a",
-                "ln -s a b ~/.config",
-            ] {
+            for allowed in ["ln -t ~/.config a", "ln --target-directory=~/.config a", "ln -s a b ~/.config"] {
                 assert!(crate::is_safe_command(allowed), "{allowed} links INTO the directory");
             }
             // Two operands stay ambiguous, and the conservative reading is the safe one: this is
@@ -1521,13 +1464,8 @@ mod tests {
     #[test]
     fn a_freeze_holds_at_every_level_that_still_gates() {
         let attacks = [
-            "echo x > ~/.config/safe-chains.toml",
-            "echo x > ~/.claude/settings.json",
-            "cp a ~/.config/safe-chains.toml",
-            "rmdir ~/.config",
-            "ln -s /tmp/evil ~/.config",
-            "mv ~/.config ~/x",
-            "rm -rf ~/.claude",
+            "echo x > ~/.config/safe-chains.toml", "echo x > ~/.claude/settings.json", "cp a ~/.config/safe-chains.toml",
+            "rmdir ~/.config", "ln -s /tmp/evil ~/.config", "mv ~/.config ~/x", "rm -rf ~/.claude",
         ];
         let mut checked = 0usize;
         for name in ["local-admin", "network-admin"] {
@@ -1636,33 +1574,28 @@ mod tests {
             with_os(os, || {
                 let mut covered = 0;
                 for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.reads_secret) {
-                    let probes: Vec<_> = [naming_probe(&node.matcher), absolute_segment_probe(&node.matcher)]
-                        .into_iter()
-                        .flatten()
-                        .collect();
+                    let probes: Vec<_> =
+                        [naming_probe(&node.matcher), absolute_segment_probe(&node.matcher)].into_iter().flatten().collect();
                     if probes.is_empty() {
                         continue;
                     }
                     for (path, naming, parent) in probes {
-                    assert!(
-                        base_region(&path).reads_secret,
-                        "{os}: probe {path} does not reach the secret node it was built from"
-                    );
-                    with_grants(&[(naming.as_str(), true, true)], || {
-                        assert_eq!(
-                            classify_region(&path).read_locus,
-                            LocalLocus::WorktreeTrusted,
-                            "{os}: a grant naming {naming} must reach {path}"
-                        );
-                    });
-                    with_grants(&[(parent.as_str(), true, true)], || {
-                        assert_eq!(
-                            classify_region(&path).read_locus,
-                            LocalLocus::Machine,
-                            "{os}: a grant on the parent {parent} must NOT reach the secret at {path}"
-                        );
-                    });
-                    covered += 1;
+                        assert!(base_region(&path).reads_secret, "{os}: probe {path} does not reach the secret node it was built from");
+                        with_grants(&[(naming.as_str(), true, true)], || {
+                            assert_eq!(
+                                classify_region(&path).read_locus,
+                                LocalLocus::WorktreeTrusted,
+                                "{os}: a grant naming {naming} must reach {path}"
+                            );
+                        });
+                        with_grants(&[(parent.as_str(), true, true)], || {
+                            assert_eq!(
+                                classify_region(&path).read_locus,
+                                LocalLocus::Machine,
+                                "{os}: a grant on the parent {parent} must NOT reach the secret at {path}"
+                            );
+                        });
+                        covered += 1;
                     }
                 }
                 assert!(covered > 10, "{os}: only {covered} credential stores probed - the guard has gone vacuous");
@@ -1727,15 +1660,9 @@ mod tests {
                         with_grants(&[(grant, true, true)], || {
                             let r = classify_region(&path);
                             // The rebind face is frozen for BOTH kinds: a write freeze implies it.
-                            assert!(
-                                r.rebind_locus > LocalLocus::Worktree,
-                                "{os}: grant {grant} opens the frozen rebind at {path}"
-                            );
+                            assert!(r.rebind_locus > LocalLocus::Worktree, "{os}: grant {grant} opens the frozen rebind at {path}");
                             if role.frozen == Frozen::Write || system {
-                                assert!(
-                                    r.write_locus > LocalLocus::Worktree,
-                                    "{os}: grant {grant} opens the frozen write at {path}"
-                                );
+                                assert!(r.write_locus > LocalLocus::Worktree, "{os}: grant {grant} opens the frozen write at {path}");
                             }
                         });
                     }
@@ -1777,11 +1704,19 @@ mod tests {
             // A grant NAMING the folded spelling reaches it: on this filesystem `~/.AWS` is the
             // very same directory as `~/.aws`, so someone who granted one granted the other.
             with_grants(&[("~/.AWS/", true, false)], || {
-                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::WorktreeTrusted, "a grant naming the folded secret reaches it");
+                assert_eq!(
+                    classify_region("~/.AWS/credentials").read_locus,
+                    LocalLocus::WorktreeTrusted,
+                    "a grant naming the folded secret reaches it"
+                );
             });
             // A grant that does NOT name it still cannot reach through the fold.
             with_grants(&[("~/", true, false)], || {
-                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine, "a broad grant cannot reach a folded secret");
+                assert_eq!(
+                    classify_region("~/.AWS/credentials").read_locus,
+                    LocalLocus::Machine,
+                    "a broad grant cannot reach a folded secret"
+                );
             });
         });
     }
@@ -1791,12 +1726,19 @@ mod tests {
         // On a case-sensitive fs `.GIT` and `~/.AWS` are DIFFERENT files, not the shielded ones —
         // folding there would be a false-deny. The canonical spelling is shielded on every OS.
         with_os("linux", || {
-            assert_eq!(classify_region(".GIT/hooks/pre-commit").write_locus, LocalLocus::Worktree, "linux: .GIT is an ordinary worktree path");
+            assert_eq!(
+                classify_region(".GIT/hooks/pre-commit").write_locus,
+                LocalLocus::Worktree,
+                "linux: .GIT is an ordinary worktree path"
+            );
             assert!(!classify_region("~/.AWS/credentials").reads_secret, "linux: .AWS is not the .aws secret");
         });
         for os in ["macos", "linux"] {
             assert!(with_os(os, || classify_region("~/.aws/credentials").reads_secret), "{os}: canonical .aws shielded");
-            assert!(with_os(os, || classify_region(".git/hooks/pre-commit").write_locus > LocalLocus::Worktree), "{os}: canonical .git frozen");
+            assert!(
+                with_os(os, || classify_region(".git/hooks/pre-commit").write_locus > LocalLocus::Worktree),
+                "{os}: canonical .git frozen"
+            );
         }
     }
 
@@ -1909,10 +1851,7 @@ mod tests {
         // `~/.ssh/config` must not accidentally clear `~/.ssh/id_rsa` beside it.
         with_grants(&[("~/.ssh/config", true, false)], || {
             assert!(!classify_region("~/.ssh/config").reads_secret, "the named file opens");
-            assert!(
-                classify_region("~/.ssh/id_rsa").reads_secret,
-                "a sibling the grant did not name stays shielded"
-            );
+            assert!(classify_region("~/.ssh/id_rsa").reads_secret, "a sibling the grant did not name stays shielded");
         });
 
         // A WRITE grant does not clear the read shield, and does not open the write face of a

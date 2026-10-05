@@ -4,9 +4,7 @@ use clap::CommandFactory;
 use clap_complete::Shell;
 
 fn main() {
-    let out_dir = PathBuf::from(
-        std::env::var("SAFE_CHAINS_ASSETS_DIR").unwrap_or_else(|_| "target/assets".into()),
-    );
+    let out_dir = PathBuf::from(std::env::var("SAFE_CHAINS_ASSETS_DIR").unwrap_or_else(|_| "target/assets".into()));
     let completions_dir = out_dir.join("completions");
     std::fs::create_dir_all(&completions_dir).expect("failed to create output directories");
 
@@ -18,8 +16,7 @@ fn main() {
     std::fs::write(out_dir.join("safe-chains.1"), buf).expect("failed to write man page");
 
     for shell in [Shell::Bash, Shell::Zsh, Shell::Fish] {
-        clap_complete::generate_to(shell, &mut cmd, "safe-chains", &completions_dir)
-            .expect("failed to generate completions");
+        clap_complete::generate_to(shell, &mut cmd, "safe-chains", &completions_dir).expect("failed to generate completions");
     }
 
     println!("Generated assets in {}", out_dir.display());

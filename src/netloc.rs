@@ -171,15 +171,11 @@ mod tests {
     use proptest::prelude::*;
 
     /// Hosts this module is meant to recognize, in the spellings a developer actually types.
-    const LOCAL: &[&str] = &[
-        "localhost", "LOCALHOST", "localhost.", "app.localhost",
-        "127.0.0.1", "127.1.2.3", "127.0.0.255", "[::1]",
-    ];
+    const LOCAL: &[&str] = &["localhost", "LOCALHOST", "localhost.", "app.localhost", "127.0.0.1", "127.1.2.3", "127.0.0.255", "[::1]"];
     /// Hosts it must not, including the ones built to look local.
     const REMOTE: &[&str] = &[
-        "evil.com", "example.org", "192.168.1.1", "10.0.0.1", "169.254.169.254",
-        "localhost.evil.com", "127.0.0.1.evil.com", "notlocalhost", "localhostx",
-        "2130706433", "0177.0.0.1", "0.0.0.0",
+        "evil.com", "example.org", "192.168.1.1", "10.0.0.1", "169.254.169.254", "localhost.evil.com", "127.0.0.1.evil.com",
+        "notlocalhost", "localhostx", "2130706433", "0177.0.0.1", "0.0.0.0",
     ];
 
     proptest! {
@@ -275,28 +271,13 @@ mod tests {
         }
     }
 
-
     #[test]
     fn recognizes_the_vetted_loopback_spellings() {
         for v in [
-            "http://localhost",
-            "http://localhost:8000",
-            "http://localhost:8000/path?q=1",
-            "https://LOCALHOST:443",
-            "http://localhost.",
-            "http://localhost.:8000",
-            "http://myapp.localhost:3000",
-            "http://127.0.0.1",
-            "http://127.0.0.1:8000",
-            "http://127.1.2.3:9",
-            "http://127.0.0.255",
-            "http://[::1]",
-            "http://[::1]:8000",
-            "localhost",
-            "localhost:5432",
-            "127.0.0.1:5432",
-            "tcp://127.0.0.1:2375",
-            "http://user:pass@localhost:8000",
+            "http://localhost", "http://localhost:8000", "http://localhost:8000/path?q=1", "https://LOCALHOST:443", "http://localhost.",
+            "http://localhost.:8000", "http://myapp.localhost:3000", "http://127.0.0.1", "http://127.0.0.1:8000", "http://127.1.2.3:9",
+            "http://127.0.0.255", "http://[::1]", "http://[::1]:8000", "localhost", "localhost:5432", "127.0.0.1:5432",
+            "tcp://127.0.0.1:2375", "http://user:pass@localhost:8000",
         ] {
             assert!(is_loopback(v), "expected loopback: {v}");
         }
@@ -306,54 +287,35 @@ mod tests {
     /// redirected authenticated request, not a cosmetic bug.
     #[test]
     fn rejects_hosts_that_only_look_local() {
-        for v in [
+        let groups: &[&[&str]] = &[
             // userinfo carrying the local-looking name
-            "http://localhost@evil.com",
-            "http://localhost@evil.com/x",
-            "http://a@localhost@evil.com",
-            "http://127.0.0.1@evil.com",
+            &["http://localhost@evil.com", "http://localhost@evil.com/x", "http://a@localhost@evil.com", "http://127.0.0.1@evil.com"],
             // backslash is a path separator to WHATWG, so the host is evil.com
-            "http://evil.com\\@localhost",
-            "http://evil.com\\@127.0.0.1",
+            &["http://evil.com\\@localhost", "http://evil.com\\@127.0.0.1"],
             // the authority ends at the query/fragment
-            "http://evil.com#@localhost",
-            "http://evil.com?@localhost",
-            "http://evil.com/@localhost",
+            &["http://evil.com#@localhost", "http://evil.com?@localhost", "http://evil.com/@localhost"],
             // prefix/suffix confusion
-            "http://localhost.evil.com",
-            "http://127.0.0.1.evil.com",
-            "http://notlocalhost",
-            "http://localhostx",
-            "http://evil-localhost.com",
+            &[
+                "http://localhost.evil.com", "http://127.0.0.1.evil.com", "http://notlocalhost", "http://localhostx",
+                "http://evil-localhost.com",
+            ],
             // `.localhost` needs a real label
-            "http://.localhost",
+            &["http://.localhost"],
             // ambiguous or unrecognized address spellings — loopback in fact, denied on principle
-            "http://2130706433",
-            "http://0177.0.0.1",
-            "http://127.0.0.01",
-            "http://0x7f000001",
-            "http://127.1",
-            "http://127.0.0.256",
-            "http://127.0.0.1.1",
+            &[
+                "http://2130706433", "http://0177.0.0.1", "http://127.0.0.01", "http://0x7f000001", "http://127.1", "http://127.0.0.256",
+                "http://127.0.0.1.1",
+            ],
             // encoding tricks have no decode step to exploit
-            "http://%6cocalhost",
-            "http://loc%61lhost",
-            "http://localhos\u{0074}.evil.com",
+            &["http://%6cocalhost", "http://loc%61lhost", "http://localhos\u{0074}.evil.com"],
             // not this machine
-            "http://192.168.1.1",
-            "http://10.0.0.1",
-            "http://169.254.169.254",
-            "https://evil.com",
+            &["http://192.168.1.1", "http://10.0.0.1", "http://169.254.169.254", "https://evil.com"],
             // 0.0.0.0 means "every interface" when binding; as a target it is not a name for here
-            "http://0.0.0.0:8000",
+            &["http://0.0.0.0:8000"],
             // malformed
-            "http://",
-            "http://[::1",
-            "http://[::1]x",
-            "http://localhost:notaport",
-            "http://localhost..",
-            "",
-        ] {
+            &["http://", "http://[::1", "http://[::1]x", "http://localhost:notaport", "http://localhost..", ""],
+        ];
+        for v in groups.iter().copied().flatten() {
             assert!(!is_loopback(v), "expected NOT loopback: {v}");
         }
     }
@@ -386,11 +348,7 @@ mod tests {
         for a in [0u16, 1, 9, 10, 126, 127, 128, 192, 255] {
             for d in [0u16, 1, 127, 254, 255] {
                 let host = format!("{a}.0.0.{d}");
-                assert_eq!(
-                    is_loopback(&host),
-                    a == 127,
-                    "127.0.0.0/8 membership decides {host}",
-                );
+                assert_eq!(is_loopback(&host), a == 127, "127.0.0.0/8 membership decides {host}",);
             }
         }
     }
@@ -398,9 +356,22 @@ mod tests {
     #[test]
     fn never_panics_on_arbitrary_input() {
         for v in [
-            "\u{0}", "://", "]", "[", "@", ":", "...", "http://:", "http://@",
-            "http://[]", "http://[]:", "\\\\", "a://b://c", &"a".repeat(1024),
-            "http://[::1]:99999999", "http://localhost:00000",
+            "\u{0}",
+            "://",
+            "]",
+            "[",
+            "@",
+            ":",
+            "...",
+            "http://:",
+            "http://@",
+            "http://[]",
+            "http://[]:",
+            "\\\\",
+            "a://b://c",
+            &"a".repeat(1024),
+            "http://[::1]:99999999",
+            "http://localhost:00000",
         ] {
             let _ = is_loopback(v);
         }

@@ -58,11 +58,7 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     let Some(_guard) = super::check::ClassifyGuard::enter() else {
         return Explanation {
             overall: Verdict::Denied,
-            segments: vec![SegmentReport {
-                text: input.trim().to_string(),
-                verdict: Verdict::Denied,
-                culprit: None,
-            }],
+            segments: vec![SegmentReport { text: input.trim().to_string(), verdict: Verdict::Denied, culprit: None }],
             parsed: false,
             stateful: false,
         };
@@ -70,11 +66,7 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     let Some(script) = parse(input) else {
         return Explanation {
             overall: Verdict::Denied,
-            segments: vec![SegmentReport {
-                text: input.trim().to_string(),
-                verdict: Verdict::Denied,
-                culprit: None,
-            }],
+            segments: vec![SegmentReport { text: input.trim().to_string(), verdict: Verdict::Denied, culprit: None }],
             parsed: false,
             stateful: false,
         };
@@ -84,20 +76,11 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     // definitions), so each segment is judged in the context of the ones before it. Without this the
     // per-segment view — and the hook's coverage fallback built on it — would re-allow a call whose
     // definition shadows a builtin (`ls(){ rm; }; ls`) that the whole-command verdict denies.
-    let segments: Vec<SegmentReport> =
-        super::check::walk_with_scope(&script, |stmt| segment_report(stmt, &covered));
-    let overall = segments
-        .iter()
-        .map(|s| s.verdict)
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
+    let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, |stmt| segment_report(stmt, &covered));
+    let overall = segments.iter().map(|s| s.verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
     let stateful = segments.len() >= 2 && script.0.iter().any(establishes_shell_state);
 
-    Explanation {
-        overall,
-        segments,
-        parsed: true,
-        stateful,
-    }
+    Explanation { overall, segments, parsed: true, stateful }
 }
 
 fn segment_report(stmt: &Stmt, covered: &impl Fn(&Cmd) -> bool) -> SegmentReport {
@@ -110,16 +93,8 @@ fn segment_report(stmt: &Stmt, covered: &impl Fn(&Cmd) -> bool) -> SegmentReport
     // the whole loop; what the caller has to change is the command inside it, and suppressing that
     // is how a third of the author's decision-log denials came to read "no reason recorded".
     let redundant_with_segment_text = matches!(stmt.pipeline.commands.as_slice(), [Cmd::Simple(_)]);
-    let culprit = if verdict.is_allowed() || redundant_with_segment_text {
-        None
-    } else {
-        first_denied_label(&stmt.pipeline, covered)
-    };
-    SegmentReport {
-        text: stmt.pipeline.to_string(),
-        verdict,
-        culprit,
-    }
+    let culprit = if verdict.is_allowed() || redundant_with_segment_text { None } else { first_denied_label(&stmt.pipeline, covered) };
+    SegmentReport { text: stmt.pipeline.to_string(), verdict, culprit }
 }
 
 fn effective_verdict(pipeline: &Pipeline, covered: &impl Fn(&Cmd) -> bool) -> Verdict {
@@ -177,9 +152,7 @@ fn command_label(cmd: &Cmd) -> Option<String> {
         Cmd::FunctionDef { .. } => None,
         Cmd::Subshell { body, .. } | Cmd::BraceGroup { body, .. } => denied_label_in(body),
         Cmd::For { body, .. } => denied_label_in(body),
-        Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
-            denied_label_in(cond).or_else(|| denied_label_in(body))
-        }
+        Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => denied_label_in(cond).or_else(|| denied_label_in(body)),
         Cmd::If { branches, else_body, .. } => branches
             .iter()
             .find_map(|b| denied_label_in(&b.cond).or_else(|| denied_label_in(&b.body)))
@@ -217,30 +190,23 @@ fn first_denied_simple(cmd: &Cmd) -> Option<Vec<String>> {
     match cmd {
         Cmd::Simple(s) => Some(s.words.iter().map(Word::eval).collect()),
         Cmd::FunctionDef { .. } | Cmd::DoubleBracket { .. } => None,
-        Cmd::Subshell { body, .. } | Cmd::BraceGroup { body, .. } | Cmd::For { body, .. } => {
-            first_denied_simple_in(body)
-        }
+        Cmd::Subshell { body, .. } | Cmd::BraceGroup { body, .. } | Cmd::For { body, .. } => first_denied_simple_in(body),
         Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
             first_denied_simple_in(cond).or_else(|| first_denied_simple_in(body))
         }
         Cmd::If { branches, else_body, .. } => branches
             .iter()
-            .find_map(|b| {
-                first_denied_simple_in(&b.cond).or_else(|| first_denied_simple_in(&b.body))
-            })
+            .find_map(|b| first_denied_simple_in(&b.cond).or_else(|| first_denied_simple_in(&b.body)))
             .or_else(|| else_body.as_ref().and_then(first_denied_simple_in)),
         Cmd::Case { arms, .. } => arms.iter().find_map(|arm| first_denied_simple_in(&arm.body)),
     }
 }
 
 fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
-    script.0.iter().find_map(|stmt| {
-        stmt.pipeline
-            .commands
-            .iter()
-            .find(|c| !cmd_verdict(c).is_allowed())
-            .and_then(first_denied_simple)
-    })
+    script
+        .0
+        .iter()
+        .find_map(|stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(first_denied_simple))
 }
 
 /// The first command inside `script` that is denied on its own, by name.
@@ -250,13 +216,10 @@ fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
 /// subtree than the command containing it — which is the same property the classifier's own walk
 /// relies on.
 fn denied_label_in(script: &Script) -> Option<String> {
-    script.0.iter().find_map(|stmt| {
-        stmt.pipeline
-            .commands
-            .iter()
-            .find(|c| !cmd_verdict(c).is_allowed())
-            .and_then(command_label)
-    })
+    script
+        .0
+        .iter()
+        .find_map(|stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(command_label))
 }
 
 fn simple_cmd_name(s: &SimpleCmd) -> Option<String> {
@@ -275,10 +238,7 @@ fn establishes_shell_state(stmt: &Stmt) -> bool {
             if s.words.is_empty() && !s.env.is_empty() {
                 return true;
             }
-            matches!(
-                simple_cmd_name(s).as_deref(),
-                Some("cd" | "pushd" | "popd" | "export" | "source" | "." | "set" | "alias" | "umask")
-            )
+            matches!(simple_cmd_name(s).as_deref(), Some("cd" | "pushd" | "popd" | "export" | "source" | "." | "set" | "alias" | "umask"))
         }
         _ => false,
     })
@@ -291,11 +251,7 @@ impl Explanation {
 
     fn counts(&self) -> (usize, usize) {
         let total = self.segments.len();
-        let denied = self
-            .segments
-            .iter()
-            .filter(|s| !s.verdict.is_allowed())
-            .count();
+        let denied = self.segments.iter().filter(|s| !s.verdict.is_allowed()).count();
         (total, denied)
     }
 
@@ -316,8 +272,7 @@ impl Explanation {
     /// don't, and what to actually do about it.
     pub fn render(&self) -> String {
         if !self.parsed {
-            return "safe-chains: could not parse this command, so it will not be auto-approved.\n"
-                .to_string();
+            return "safe-chains: could not parse this command, so it will not be auto-approved.\n".to_string();
         }
         if self.segments.is_empty() {
             return "safe-chains: no command to check.\n".to_string();
@@ -350,9 +305,7 @@ impl Explanation {
             );
         }
         if denied == total {
-            return Some(
-                "This is not a block. These all need manual approval. None of them auto-approve on their own.",
-            );
+            return Some("This is not a block. These all need manual approval. None of them auto-approve on their own.");
         }
         if self.stateful {
             return Some(
@@ -379,10 +332,7 @@ fn header(total: usize, denied: usize) -> String {
     if total == 1 {
         return format!("safe-chains: {}\n", crate::refusal::EXPLAIN_SINGLE);
     }
-    format!(
-        "safe-chains: did not auto-approve {denied} of {total} segments. {}\n",
-        crate::refusal::EXPLAIN_MANY
-    )
+    format!("safe-chains: did not auto-approve {denied} of {total} segments. {}\n", crate::refusal::EXPLAIN_MANY)
 }
 
 /// One `✓`/`✗` line. The echoed text is command-derived, so it is neutralized first: a raw newline
@@ -404,11 +354,7 @@ mod tests {
     use super::*;
 
     fn marks(input: &str) -> Vec<bool> {
-        explain(input)
-            .segments
-            .iter()
-            .map(|s| s.verdict.is_allowed())
-            .collect()
+        explain(input).segments.iter().map(|s| s.verdict.is_allowed()).collect()
     }
 
     #[test]
@@ -463,28 +409,18 @@ mod tests {
     #[test]
     fn a_denied_compound_names_the_command_inside_it() {
         for src in [
-            "(cat ~/.ssh/id_rsa)",
-            "{ cat ~/.ssh/id_rsa; }",
-            "if true; then cat ~/.ssh/id_rsa; fi",
-            "for f in a b; do cat ~/.ssh/id_rsa; done",
-            "while true; do cat ~/.ssh/id_rsa; done",
+            "(cat ~/.ssh/id_rsa)", "{ cat ~/.ssh/id_rsa; }", "if true; then cat ~/.ssh/id_rsa; fi",
+            "for f in a b; do cat ~/.ssh/id_rsa; done", "while true; do cat ~/.ssh/id_rsa; done",
             "case $x in a) cat ~/.ssh/id_rsa ;; esac",
         ] {
             let ex = explain(src);
             assert_eq!(ex.segments.len(), 1, "{src}: one segment");
             assert!(!ex.is_allowed(), "{src}: denied");
-            assert_eq!(
-                ex.segments[0].culprit.as_deref(),
-                Some("cat"),
-                "{src}: must name the command inside the construct"
-            );
+            assert_eq!(ex.segments[0].culprit.as_deref(), Some("cat"), "{src}: must name the command inside the construct");
         }
 
         // And the words reach the facet breakdown, which is what puts a REASON on the refusal.
-        assert_eq!(
-            denied_inner_words("(cat ~/.ssh/id_rsa)"),
-            Some(vec!["cat".to_string(), "~/.ssh/id_rsa".to_string()]),
-        );
+        assert_eq!(denied_inner_words("(cat ~/.ssh/id_rsa)"), Some(vec!["cat".to_string(), "~/.ssh/id_rsa".to_string()]),);
         // A plain simple command keeps the existing path — this is only for what it cannot see.
         assert_eq!(denied_inner_words("cat ~/.ssh/id_rsa"), None);
         // A construct whose body is fine has no culprit to name.
@@ -565,11 +501,7 @@ mod tests {
     }
 
     fn marks_cov(input: &str, patterns: &Matcher) -> Vec<bool> {
-        explain_with_coverage(input, patterns)
-            .segments
-            .iter()
-            .map(|s| s.verdict.is_allowed())
-            .collect()
+        explain_with_coverage(input, patterns).segments.iter().map(|s| s.verdict.is_allowed()).collect()
     }
 
     // ---- rendering ----

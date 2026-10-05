@@ -1,5 +1,5 @@
-use crate::verdict::Verdict;
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
@@ -10,15 +10,15 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder};
-    vec![
-        CommandDoc::handler("bunx",
-            "https://bun.sh/docs/cli/bunx",
-            DocBuilder::new()
-                .section("Delegates to the inner command's safety rules.")
-                .section("Skips flags: --bun/--no-install/--package/-p.")
-                .build(),
-            "node"),
-    ]
+    vec![CommandDoc::handler(
+        "bunx",
+        "https://bun.sh/docs/cli/bunx",
+        DocBuilder::new()
+            .section("Delegates to the inner command's safety rules.")
+            .section("Skips flags: --bun/--no-install/--package/-p.")
+            .build(),
+        "node",
+    )]
 }
 
 #[cfg(test)]

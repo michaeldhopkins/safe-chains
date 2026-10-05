@@ -1,30 +1,13 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
-    "ARGV", "BEGIN", "END", "STDERR", "STDIN", "STDOUT",
-    "abs", "and", "atan2",
-    "chomp", "chop", "chr", "close", "cmp", "cos",
-    "defined", "delete", "die",
-    "each", "else", "elsif", "eof", "eq", "exists", "exp",
-    "for", "foreach",
-    "ge", "grep", "gt",
-    "hex",
-    "if", "int",
-    "join",
-    "keys",
-    "last", "lc", "lcfirst", "le", "length", "local", "log", "lt",
-    "map", "my",
-    "ne", "next", "no", "not",
-    "oct", "or", "ord", "our",
-    "pack", "pop", "pos", "print", "printf", "push",
-    "qq", "qr", "qw",
-    "ref", "return", "reverse", "rindex",
-    "say", "scalar", "shift", "sin", "sort", "splice", "split", "sprintf", "sqrt", "substr",
-    "tell", "tr",
-    "uc", "ucfirst", "undef", "unless", "unpack", "unshift", "until",
-    "values",
-    "wantarray", "warn", "while",
+    "ARGV", "BEGIN", "END", "STDERR", "STDIN", "STDOUT", "abs", "and", "atan2", "chomp", "chop", "chr", "close", "cmp", "cos", "defined",
+    "delete", "die", "each", "else", "elsif", "eof", "eq", "exists", "exp", "for", "foreach", "ge", "grep", "gt", "hex", "if", "int",
+    "join", "keys", "last", "lc", "lcfirst", "le", "length", "local", "log", "lt", "map", "my", "ne", "next", "no", "not", "oct", "or",
+    "ord", "our", "pack", "pop", "pos", "print", "printf", "push", "qq", "qr", "qw", "ref", "return", "reverse", "rindex", "say", "scalar",
+    "shift", "sin", "sort", "splice", "split", "sprintf", "sqrt", "substr", "tell", "tr", "uc", "ucfirst", "undef", "unless", "unpack",
+    "unshift", "until", "values", "wantarray", "warn", "while",
 ]);
 
 fn closing_delimiter(open: u8) -> u8 {
@@ -207,10 +190,7 @@ fn is_regex_context(preceding: &[u8]) -> bool {
             .map(|p| p + 1)
             .unwrap_or(0);
         let word = std::str::from_utf8(&preceding[start..=end]).unwrap_or("");
-        return matches!(
-            word,
-            "if" | "unless" | "while" | "until" | "and" | "or" | "not" | "for" | "foreach" | "return"
-        );
+        return matches!(word, "if" | "unless" | "while" | "until" | "and" | "or" | "not" | "for" | "foreach" | "return");
     }
     false
 }
@@ -279,9 +259,7 @@ fn strip_inert_string_text(code: &str) -> String {
                         }
                     } else {
                         // `$name` / `@name`: the value read is inert — skip the name…
-                        while i < bytes.len()
-                            && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric())
-                        {
+                        while i < bytes.len() && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric()) {
                             i += 1;
                         }
                         // …but an array/hash SUBSCRIPT is EVALUATED — keep its content.
@@ -474,7 +452,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         _ => None,
     }
 }
-
 
 #[cfg(test)]
 mod tests {

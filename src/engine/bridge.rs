@@ -145,22 +145,13 @@ pub struct ProfileExplanation {
 /// itself the answer: the engine never saw it and the legacy classifier decided.
 pub fn explain_profile(tokens: &[Token]) -> Option<ProfileExplanation> {
     let profile = resolve::resolve(tokens)?;
-    let capabilities = profile
-        .capabilities
-        .iter()
-        .map(|c| (c.because.clone(), c.set_facets()))
-        .collect();
+    let capabilities = profile.capabilities.iter().map(|c| (c.because.clone(), c.set_facets())).collect();
 
     // Report against the MOST PERMISSIVE level in the auto-approve band. If the top of the band
     // refuses a capability, every level below it does too, so its complaint is the binding one —
     // a lower level's would just be the first of several walls.
     let blocked_by = default_band_top_level()
-        .and_then(|top| {
-            profile
-                .capabilities
-                .iter()
-                .find_map(|c| top.nearest_miss(c).map(|m| (top.name.clone(), m)))
-        });
+        .and_then(|top| profile.capabilities.iter().find_map(|c| top.nearest_miss(c).map(|m| (top.name.clone(), m))));
 
     Some(ProfileExplanation { capabilities, blocked_by })
 }
@@ -280,21 +271,14 @@ mod tests {
         );
         // an unresolvable command → the legacy classifier still decides
         let unresolved = resolve::UNRESOLVED_CMD.join(" ");
-        assert_eq!(
-            crate::command_verdict(&unresolved),
-            legacy(&unresolved),
-            "no resolver → legacy verdict",
-        );
+        assert_eq!(crate::command_verdict(&unresolved), legacy(&unresolved), "no resolver → legacy verdict",);
     }
 
     #[test]
     fn engine_verdict_is_none_for_unresearched_commands() {
         assert!(engine_verdict(&toks(resolve::UNRESOLVED_CMD)).is_none());
         assert_eq!(engine_verdict(&toks(&["echo", "hi"])), Some(Verdict::Allowed(SafetyLevel::Inert)));
-        assert_eq!(
-            engine_verdict(&toks(&["cat", "./notes.md"])),
-            Some(Verdict::Allowed(SafetyLevel::SafeRead)),
-        );
+        assert_eq!(engine_verdict(&toks(&["cat", "./notes.md"])), Some(Verdict::Allowed(SafetyLevel::SafeRead)),);
         assert_eq!(engine_verdict(&toks(&["cat", "~/.ssh/id_rsa"])), Some(Verdict::Denied));
     }
 
@@ -314,9 +298,8 @@ mod tests {
     #[test]
     fn the_engine_is_never_looser_than_legacy() {
         let cases = [
-            "echo hi", "echo", "cat ./notes.md", "cat -n ./notes.md", "cat ~/.ssh/id_rsa",
-            "cat /etc/hosts", "cat a.txt b.txt", "grep foo src/main.rs", "grep -r foo src/",
-            "grep -r foo ~", "grep foo bar.txt",
+            "echo hi", "echo", "cat ./notes.md", "cat -n ./notes.md", "cat ~/.ssh/id_rsa", "cat /etc/hosts", "cat a.txt b.txt",
+            "grep foo src/main.rs", "grep -r foo src/", "grep -r foo ~", "grep foo bar.txt",
             // PCRE (-P/--perl-regexp) is benign — PCRE2 execs no code, just a regex engine
             "grep -P foo file", "grep -oP foo file", "grep --perl-regexp foo file",
             // unrecognized / dangerous flags must worst-case
@@ -328,10 +311,7 @@ mod tests {
             let base = legacy(cmd);
             let t = toks(&cmd.split_whitespace().collect::<Vec<_>>());
             let Some(engine) = engine_verdict(&t) else { continue };
-            assert!(
-                not_looser(base, engine),
-                "engine LOOSER than legacy for `{cmd}`: legacy {base}, engine {engine}",
-            );
+            assert!(not_looser(base, engine), "engine LOOSER than legacy for `{cmd}`: legacy {base}, engine {engine}",);
         }
     }
 
@@ -358,7 +338,10 @@ mod tests {
         let sed = "sed -i s/a/b/ ./file.txt";
         assert_eq!(legacy(sed), Verdict::Denied, "legacy sed handler denies in-place edit");
         assert_eq!(crate::command_verdict(sed), Verdict::Allowed(SafetyLevel::SafeWrite), "engine admits worktree -i — intended");
-        assert!(!not_looser(Verdict::Denied, Verdict::Allowed(SafetyLevel::SafeWrite)), "and it IS looser than the legacy sed handler, by design");
+        assert!(
+            !not_looser(Verdict::Denied, Verdict::Allowed(SafetyLevel::SafeWrite)),
+            "and it IS looser than the legacy sed handler, by design"
+        );
     }
 
     /// The data-driven corpus gate (the systematic test C1 slipped past): run **every**
@@ -408,17 +391,12 @@ mod tests {
                 // would carry — an informational flag laundering a real operand — is what
                 // `an_informational_flag_is_not_a_write_but_never_launders_an_operand` exists to
                 // rule out, and it is asserted over the whole registry rather than here.
-                if t.len() >= 2
-                    && t[1..].iter().all(|x| matches!(x.as_str(), "--help" | "--version"))
-                {
+                if t.len() >= 2 && t[1..].iter().all(|x| matches!(x.as_str(), "--help" | "--version")) {
                     continue;
                 }
                 let engine = project(&profile);
                 let base = legacy(ex);
-                assert!(
-                    not_looser(base, engine),
-                    "engine LOOSER than legacy for `{ex}` ({name}): legacy {base}, engine {engine}",
-                );
+                assert!(not_looser(base, engine), "engine LOOSER than legacy for `{ex}` ({name}): legacy {base}, engine {engine}",);
             }
         }
         // non-vacuity: the gate must actually resolve engine examples, or it is a green

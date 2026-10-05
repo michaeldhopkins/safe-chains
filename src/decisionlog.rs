@@ -127,12 +127,7 @@ pub struct Context<'a> {
 /// on the paths that computed it: an approval is decided without ever building an explanation, and
 /// making one just to log it would put the cost back on the hot path that `--log` exists to keep
 /// free.
-pub fn record(
-    mode: Mode,
-    outcome: Outcome,
-    ctx: &Context<'_>,
-    explanation: Option<&crate::cst::Explanation>,
-) {
+pub fn record(mode: Mode, outcome: Outcome, ctx: &Context<'_>, explanation: Option<&crate::cst::Explanation>) {
     if !mode.keeps(outcome) {
         return;
     }
@@ -157,11 +152,7 @@ fn log_path() -> Option<PathBuf> {
     Some(PathBuf::from(home).join(".local/state/safe-chains/log.jsonl"))
 }
 
-fn build_entry(
-    outcome: Outcome,
-    ctx: &Context<'_>,
-    explanation: Option<&crate::cst::Explanation>,
-) -> Value {
+fn build_entry(outcome: Outcome, ctx: &Context<'_>, explanation: Option<&crate::cst::Explanation>) -> Value {
     let now_ms = unix_millis();
     let mut digest = Sha256::new();
     digest.update(ctx.command.as_bytes());
@@ -192,11 +183,7 @@ fn build_entry(
 
     // An approval owes no triage and no facets: there is no refusal to explain and no registry gap,
     // and computing either would charge the hot path for something nothing reads.
-    let (triage, unknown) = if outcome == Outcome::Allowed {
-        ("allowed", Vec::new())
-    } else {
-        triage_of(ctx.command)
-    };
+    let (triage, unknown) = if outcome == Outcome::Allowed { ("allowed", Vec::new()) } else { triage_of(ctx.command) };
 
     json!({
         "schema": SCHEMA,
@@ -228,9 +215,7 @@ fn triage_of(command: &str) -> (&'static str, Vec<String>) {
         S::AlreadyAllowed => ("recognized-but-denied", Vec::new()),
         S::Unparseable => ("unparseable", Vec::new()),
         S::RecognizedButDenied { .. } => ("recognized-but-denied", Vec::new()),
-        S::Generated { entries, .. } => {
-            ("unknown-command", entries.iter().map(|e| e.name.clone()).collect())
-        }
+        S::Generated { entries, .. } => ("unknown-command", entries.iter().map(|e| e.name.clone()).collect()),
     }
 }
 
@@ -245,8 +230,7 @@ fn facets_of(command: &str) -> Value {
     if words.is_empty() {
         return Value::Null;
     }
-    let tokens: Vec<crate::parse::Token> =
-        words.into_iter().map(crate::parse::Token::from_raw).collect();
+    let tokens: Vec<crate::parse::Token> = words.into_iter().map(crate::parse::Token::from_raw).collect();
     let Some(ex) = crate::engine::bridge::explain_profile(&tokens) else {
         return Value::Null;
     };

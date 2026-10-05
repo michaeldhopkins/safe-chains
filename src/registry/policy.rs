@@ -4,14 +4,7 @@ use crate::policy::{FlagSet, check_flags};
 use super::types::OwnedPolicy;
 
 pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
-    check_flags(
-        tokens,
-        policy.standalone.as_slice(),
-        policy.valued.as_slice(),
-        policy.bare,
-        policy.max_positional,
-        policy.tolerance,
-    )
+    check_flags(tokens, policy.standalone.as_slice(), policy.valued.as_slice(), policy.bare, policy.max_positional, policy.tolerance)
 }
 
 /// Returns the first non-flag token after `tokens[0]`, treating the
@@ -20,10 +13,7 @@ pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
 /// positional (the conventional stdin marker). Used by fallback
 /// grammars that want to apply a `PositionalShape` predicate to the
 /// first positional without re-implementing flag walking.
-pub(super) fn first_positional<'a>(
-    tokens: &'a [Token],
-    policy: &OwnedPolicy,
-) -> Option<&'a str> {
+pub(super) fn first_positional<'a>(tokens: &'a [Token], policy: &OwnedPolicy) -> Option<&'a str> {
     first_positional_at(tokens, policy).map(|(_, s)| s)
 }
 
@@ -37,10 +27,7 @@ pub(super) fn first_positional<'a>(
 /// Expressed as one walk with `first_positional` delegating to it, rather than two functions that
 /// scan independently: the value and its index must never disagree about which token is the
 /// executor, and two copies of this loop is how they would.
-pub(super) fn first_positional_at<'a>(
-    tokens: &'a [Token],
-    policy: &OwnedPolicy,
-) -> Option<(usize, &'a str)> {
+pub(super) fn first_positional_at<'a>(tokens: &'a [Token], policy: &OwnedPolicy) -> Option<(usize, &'a str)> {
     let standalone = policy.standalone.as_slice();
     let valued = policy.valued.as_slice();
     let mut i = 1;

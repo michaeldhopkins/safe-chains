@@ -19,13 +19,7 @@ pub const PLACEHOLDER: &str = "x";
 
 const LOOPBACK: &str = "http://localhost:8000";
 
-const STANDALONE_KEYS: &[&str] = &[
-    "standalone",
-    "bare_flags",
-    "optional_valued",
-    "first_arg_standalone",
-    "write_flags",
-];
+const STANDALONE_KEYS: &[&str] = &["standalone", "bare_flags", "optional_valued", "first_arg_standalone", "write_flags"];
 const VALUED_KEYS: &[&str] = &["valued", "first_arg_valued", "output_path_flags"];
 const LOOPBACK_KEYS: &[&str] = &["loopback_valued", "first_arg_loopback_valued"];
 const NESTED_GRAMMARS: &[&str] = &["behavior", "fallback", "wrapper"];
@@ -49,23 +43,14 @@ impl Flags {
                 flags.absorb(grammar);
             }
         }
-        if let Some(policy) = node
-            .get("policy")
-            .and_then(Value::as_str)
-            .and_then(|p| policies.get(p))
-            .and_then(Value::as_table)
-        {
+        if let Some(policy) = node.get("policy").and_then(Value::as_str).and_then(|p| policies.get(p)).and_then(Value::as_table) {
             flags.absorb(policy);
         }
         if let Some(chain) = node.get("verb_chain").and_then(Value::as_table) {
             flags.standalone.extend(strings(chain, "main_standalone"));
             flags.valued.extend(strings(chain, "main_valued"));
         }
-        if let Some(gate) = node
-            .get("path_gate")
-            .and_then(|g| g.get("flags"))
-            .and_then(Value::as_table)
-        {
+        if let Some(gate) = node.get("path_gate").and_then(|g| g.get("flags")).and_then(Value::as_table) {
             flags.valued.extend(gate.keys().cloned());
         }
         if let Some(dest) = node.get("destination_flag").and_then(Value::as_str) {
@@ -93,13 +78,7 @@ fn strings(table: &Table, key: &str) -> Vec<String> {
     table
         .get(key)
         .and_then(Value::as_array)
-        .map(|a| {
-            a.iter()
-                .filter_map(Value::as_str)
-                .filter(|s| !s.is_empty())
-                .map(str::to_string)
-                .collect()
-        })
+        .map(|a| a.iter().filter_map(Value::as_str).filter(|s| !s.is_empty()).map(str::to_string).collect())
         .unwrap_or_default()
 }
 
@@ -155,12 +134,7 @@ fn node_invocations(prefix: &str, node: &Table, policies: &Table, out: &mut BTre
         }
     }
 
-    for flag in node
-        .get("flag")
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-    {
+    for flag in node.get("flag").and_then(Value::as_array).into_iter().flatten() {
         let Some(name) = flag.get("name").and_then(Value::as_str) else {
             continue;
         };
@@ -170,12 +144,7 @@ fn node_invocations(prefix: &str, node: &Table, policies: &Table, out: &mut BTre
         };
     }
 
-    for sub in node
-        .get("sub")
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-    {
+    for sub in node.get("sub").and_then(Value::as_array).into_iter().flatten() {
         let Some(sub) = sub.as_table() else { continue };
         let Some(name) = sub.get("name").and_then(Value::as_str) else {
             continue;
@@ -189,44 +158,22 @@ fn node_invocations(prefix: &str, node: &Table, policies: &Table, out: &mut BTre
 
 /// `[[command.matrix]]`: every parent × action, with the action's policy's flags and its guard.
 fn matrix_invocations(name: &str, command: &Table, policies: &Table, out: &mut BTreeSet<String>) {
-    for matrix in command
-        .get("matrix")
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-    {
+    for matrix in command.get("matrix").and_then(Value::as_array).into_iter().flatten() {
         let Some(actions) = matrix.get("actions").and_then(Value::as_table) else {
             continue;
         };
-        for parent in matrix
-            .get("parents")
-            .and_then(Value::as_array)
-            .into_iter()
-            .flatten()
-            .filter_map(Value::as_str)
-        {
+        for parent in matrix.get("parents").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str) {
             for (action, spec) in actions {
                 let (policy, guard) = match spec {
                     Value::String(p) => (p.as_str(), None),
-                    other => (
-                        other
-                            .get("policy")
-                            .and_then(Value::as_str)
-                            .unwrap_or_default(),
-                        other.get("guard").and_then(Value::as_str),
-                    ),
+                    other => (other.get("policy").and_then(Value::as_str).unwrap_or_default(), other.get("guard").and_then(Value::as_str)),
                 };
                 let mut node = Table::new();
                 node.insert("policy".into(), Value::String(policy.to_string()));
                 let prefix = format!("{name} {parent} {action}");
                 node_invocations(&prefix, &node, policies, out);
                 if let Some(guard) = guard {
-                    node_invocations(
-                        &format!("{prefix} {guard} {PLACEHOLDER}"),
-                        &node,
-                        policies,
-                        out,
-                    );
+                    node_invocations(&format!("{prefix} {guard} {PLACEHOLDER}"), &node, policies, out);
                 }
             }
         }
@@ -239,10 +186,7 @@ pub fn command_invocations(command: &Table, out: &mut BTreeSet<String>) {
         return;
     };
     let empty = Table::new();
-    let policies = command
-        .get("handler_policy")
-        .and_then(Value::as_table)
-        .unwrap_or(&empty);
+    let policies = command.get("handler_policy").and_then(Value::as_table).unwrap_or(&empty);
     let mut names = vec![name.to_string()];
     names.extend(strings(command, "aliases"));
     for invoked in &names {
@@ -250,11 +194,7 @@ pub fn command_invocations(command: &Table, out: &mut BTreeSet<String>) {
         matrix_invocations(invoked, command, policies, out);
         out.insert(format!("{invoked} --help"));
         out.insert(format!("{invoked} --version"));
-        if let Some(verbs) = command
-            .get("verb_chain")
-            .and_then(|c| c.get("verbs"))
-            .and_then(Value::as_array)
-        {
+        if let Some(verbs) = command.get("verb_chain").and_then(|c| c.get("verbs")).and_then(Value::as_array) {
             for verb in verbs.iter().filter_map(Value::as_str) {
                 out.insert(format!("{invoked} {verb}"));
             }
@@ -273,9 +213,7 @@ pub fn command_files(root: &Path) -> Vec<PathBuf> {
             let path = entry.path();
             if path.is_dir() {
                 walk(&path, out);
-            } else if path.extension().is_some_and(|e| e == "toml")
-                && path.file_name().is_some_and(|n| n != "SAMPLE.toml")
-            {
+            } else if path.extension().is_some_and(|e| e == "toml") && path.file_name().is_some_and(|n| n != "SAMPLE.toml") {
                 out.push(path);
             }
         }
@@ -291,17 +229,10 @@ pub fn registry_corpus(root: &Path) -> BTreeMap<PathBuf, BTreeSet<String>> {
     command_files(root)
         .into_iter()
         .map(|path| {
-            let text = fs::read_to_string(&path)
-                .unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
-            let value: Table =
-                toml::from_str(&text).unwrap_or_else(|e| panic!("parse {}: {e}", path.display()));
+            let text = fs::read_to_string(&path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
+            let value: Table = toml::from_str(&text).unwrap_or_else(|e| panic!("parse {}: {e}", path.display()));
             let mut out = BTreeSet::new();
-            for command in value
-                .get("command")
-                .and_then(Value::as_array)
-                .into_iter()
-                .flatten()
-            {
+            for command in value.get("command").and_then(Value::as_array).into_iter().flatten() {
                 if let Some(command) = command.as_table() {
                     command_invocations(command, &mut out);
                 }

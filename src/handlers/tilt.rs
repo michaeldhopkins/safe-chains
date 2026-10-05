@@ -113,26 +113,17 @@ mod tests {
 
     #[test]
     fn k8s_get_returns_safe_read() {
-        assert_eq!(
-            verdict("tilt get pod"),
-            Verdict::Allowed(SafetyLevel::SafeRead),
-        );
+        assert_eq!(verdict("tilt get pod"), Verdict::Allowed(SafetyLevel::SafeRead),);
     }
 
     #[test]
     fn ruby_render_returns_inert() {
-        assert_eq!(
-            verdict("tilt template.erb"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("tilt template.erb"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 
     #[test]
     fn k8s_doctor_returns_inert() {
-        assert_eq!(
-            verdict("tilt doctor"),
-            Verdict::Allowed(SafetyLevel::Inert),
-        );
+        assert_eq!(verdict("tilt doctor"), Verdict::Allowed(SafetyLevel::Inert),);
     }
 
     /// Proptests of the grammar-selection invariant: K8s sub name → sub

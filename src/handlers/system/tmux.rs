@@ -2,40 +2,20 @@ use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 static INERT_SUBS: &[&str] = &[
-    "display", "display-message",
-    "has", "has-session",
-    "info",
-    "list-buffers", "list-clients", "list-commands",
-    "list-keys", "list-panes", "list-sessions", "list-windows",
-    "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw",
-    "show", "show-environment", "show-options",
-    "showenv",
-    "start", "start-server",
+    "display", "display-message", "has", "has-session", "info", "list-buffers", "list-clients", "list-commands", "list-keys", "list-panes",
+    "list-sessions", "list-windows", "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw", "show", "show-environment", "show-options",
+    "showenv", "start", "start-server",
 ];
 
 static SAFE_WRITE_SUBS: &[&str] = &[
-    "a", "attach", "attach-session",
-    "detach", "detach-client",
-    "kill-pane", "kill-server", "kill-session", "kill-window",
-    "killp", "killw",
-    "new", "new-session", "new-window", "neww",
-    "rename", "rename-session", "rename-window", "renamew",
-    "resize-pane", "resize-window", "resizep", "resizew",
-    "respawn-pane", "respawn-window", "respawnp", "respawnw",
-    "select-pane", "select-window", "selectp", "selectw",
-    "set", "set-environment", "set-option",
-    "setenv",
-    "split", "split-window", "splitw",
-    "swap-pane", "swap-window", "swapp", "swapw",
-    "switch", "switch-client", "switchc",
+    "a", "attach", "attach-session", "detach", "detach-client", "kill-pane", "kill-server", "kill-session", "kill-window", "killp",
+    "killw", "new", "new-session", "new-window", "neww", "rename", "rename-session", "rename-window", "renamew", "resize-pane",
+    "resize-window", "resizep", "resizew", "respawn-pane", "respawn-window", "respawnp", "respawnw", "select-pane", "select-window",
+    "selectp", "selectw", "set", "set-environment", "set-option", "setenv", "split", "split-window", "splitw", "swap-pane", "swap-window",
+    "swapp", "swapw", "switch", "switch-client", "switchc",
 ];
 
-static DELEGATION_SUBS: &[&str] = &[
-    "confirm", "confirm-before",
-    "if", "if-shell",
-    "pipe-pane", "pipep",
-    "run", "run-shell",
-];
+static DELEGATION_SUBS: &[&str] = &["confirm", "confirm-before", "if", "if-shell", "pipe-pane", "pipep", "run", "run-shell"];
 
 fn is_inert_sub(s: &str) -> bool {
     INERT_SUBS.binary_search(&s).is_ok()
@@ -173,7 +153,8 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
             let inner = rest[arg_idx].as_str();
             let v = crate::command_verdict(inner);
             if (sub == "if-shell" || sub == "if")
-                && let Some(then_idx) = rest.get(arg_idx + 1) {
+                && let Some(then_idx) = rest.get(arg_idx + 1)
+            {
                 let then_v = crate::command_verdict(then_idx.as_str());
                 if !then_v.is_allowed() {
                     return Verdict::Denied;
@@ -204,10 +185,10 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("tmux",
-            "https://man7.org/linux/man-pages/man1/tmux.1.html",
-            "Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, \
+    vec![crate::docs::CommandDoc::handler(
+        "tmux",
+        "https://man7.org/linux/man-pages/man1/tmux.1.html",
+        "Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, \
              list-keys, list-commands, show-options, show-environment, display-message, info, \
              has-session, start-server. \
              Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, \
@@ -216,14 +197,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              set-option, set-environment, send-keys. \
              Delegation: run-shell, if-shell, pipe-pane, confirm-before \
              (recursively validates inner commands).",
-            "system"),
-    ]
+        "system",
+    )]
 }
 
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
-    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
 
     safe! {
         tmux_ls: "tmux list-sessions",

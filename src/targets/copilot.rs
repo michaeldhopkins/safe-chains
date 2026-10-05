@@ -24,9 +24,7 @@ impl Target for CopilotTarget {
     #[cfg(test)]
     fn sample_envelope(&self, tool: &str, command: &str) -> Option<String> {
         // `toolArgs` is a nested JSON STRING, not an object.
-        Some(format!(
-            r#"{{"toolName":"{tool}","toolArgs":"{{\"command\":\"{command}\"}}"}}"#
-        ))
+        Some(format!(r#"{{"toolName":"{tool}","toolArgs":"{{\"command\":\"{command}\"}}"}}"#))
     }
 
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
@@ -48,10 +46,8 @@ impl Target for CopilotTarget {
         let path = dir.join("safe-chains.json");
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
             }
@@ -59,8 +55,7 @@ impl Target for CopilotTarget {
 
         let settings = build_settings();
         let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-        std::fs::write(&path, format!("{output}\n"))
-            .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+        std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
         Ok(InstallOutcome::Installed { path })
     }
 
@@ -94,33 +89,20 @@ impl HookFormat for CopilotHookFormat {
         // Copilot's quirk: toolArgs is a JSON-encoded *string*, not a
         // nested object. We must parse the outer envelope, then parse
         // the toolArgs string a second time to recover {command}.
-        let envelope: CopilotHookEnvelope =
-            serde_json::from_str(stdin).map_err(|e| ParseError {
-                message: e.to_string(),
-            })?;
+        let envelope: CopilotHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
 
         // The hook fires for every tool by default — Copilot's config
         // has no matcher. Self-filter to the bash tool here; for other
         // tools, return Err so the runtime exits silently and Copilot
         // falls back to its own permission rules.
-        let is_bash_tool = envelope
-            .tool_name
-            .as_deref()
-            .is_some_and(|n| n == "bash");
+        let is_bash_tool = envelope.tool_name.as_deref().is_some_and(|n| n == "bash");
         if !is_bash_tool {
-            return Err(ParseError {
-                message: format!(
-                    "not a bash tool: {:?}",
-                    envelope.tool_name.as_deref().unwrap_or("<missing>")
-                ),
-            });
+            return Err(ParseError { message: format!("not a bash tool: {:?}", envelope.tool_name.as_deref().unwrap_or("<missing>")) });
         }
 
         let raw_args = envelope.tool_args.unwrap_or_default();
         let inner: CopilotToolArgs =
-            serde_json::from_str(&raw_args).map_err(|e| ParseError {
-                message: format!("toolArgs not a parseable JSON string: {e}"),
-            })?;
+            serde_json::from_str(&raw_args).map_err(|e| ParseError { message: format!("toolArgs not a parseable JSON string: {e}") })?;
         Ok(HookInput {
             command: inner.command.unwrap_or_default(),
             cwd: envelope.cwd,
@@ -147,15 +129,9 @@ impl HookFormat for CopilotHookFormat {
                 "permissionDecision": "allow",
                 "permissionDecisionReason": reason,
             });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
         } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 }
@@ -185,17 +161,11 @@ fn build_settings() -> Value {
 }
 
 fn has_safe_chains_hook(settings: &Value) -> bool {
-    settings
-        .pointer("/hooks/preToolUse")
-        .and_then(|arr| arr.as_array())
-        .is_some_and(|entries| {
-            entries.iter().any(|entry| {
-                entry
-                    .get("bash")
-                    .and_then(|c| c.as_str())
-                    .is_some_and(|cmd| cmd.contains("safe-chains"))
-            })
-        })
+    settings.pointer("/hooks/preToolUse").and_then(|arr| arr.as_array()).is_some_and(|entries| {
+        entries
+            .iter()
+            .any(|entry| entry.get("bash").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+    })
 }
 
 #[cfg(test)]
@@ -235,10 +205,7 @@ mod tests {
         // this to `command` would silently mis-configure the hook.
         let dir = tempfile::tempdir().unwrap();
         target().install(dir.path()).unwrap();
-        let contents = std::fs::read_to_string(
-            dir.path().join(".copilot/hooks/safe-chains.json"),
-        )
-        .unwrap();
+        let contents = std::fs::read_to_string(dir.path().join(".copilot/hooks/safe-chains.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
         let entry = settings.pointer("/hooks/preToolUse/0").unwrap();
         assert!(entry.get("bash").is_some(), "must use `bash` key");
@@ -249,10 +216,7 @@ mod tests {
     fn install_uses_subcommand_invocation() {
         let dir = tempfile::tempdir().unwrap();
         target().install(dir.path()).unwrap();
-        let contents = std::fs::read_to_string(
-            dir.path().join(".copilot/hooks/safe-chains.json"),
-        )
-        .unwrap();
+        let contents = std::fs::read_to_string(dir.path().join(".copilot/hooks/safe-chains.json")).unwrap();
         assert!(contents.contains("hook copilot"));
     }
 
@@ -307,25 +271,15 @@ mod tests {
         // Droid. Wrapping would be silently rejected.
         let r = CopilotHookFormat.render_response(Verdict::Allowed(SafetyLevel::Inert));
         let v: Value = serde_json::from_str(&r.stdout).unwrap();
-        assert_eq!(
-            v.get("permissionDecision").and_then(|s| s.as_str()),
-            Some("allow"),
-        );
-        assert!(
-            v.get("hookSpecificOutput").is_none(),
-            "must NOT wrap in hookSpecificOutput",
-        );
+        assert_eq!(v.get("permissionDecision").and_then(|s| s.as_str()), Some("allow"),);
+        assert!(v.get("hookSpecificOutput").is_none(), "must NOT wrap in hookSpecificOutput",);
     }
 
     #[test]
     fn render_response_includes_reason() {
         let r = CopilotHookFormat.render_response(Verdict::Allowed(SafetyLevel::SafeWrite));
         let v: Value = serde_json::from_str(&r.stdout).unwrap();
-        assert!(
-            v.get("permissionDecisionReason")
-                .and_then(|s| s.as_str())
-                .is_some()
-        );
+        assert!(v.get("permissionDecisionReason").and_then(|s| s.as_str()).is_some());
     }
 
     #[test]

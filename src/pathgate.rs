@@ -173,14 +173,7 @@ pub(crate) struct WhenClause {
 
 impl RoleSpec {
     fn simple(positional: Role, shape: Shape) -> Self {
-        RoleSpec {
-            positional,
-            shape,
-            flags: HashMap::new(),
-            handler: None,
-            write_when: Vec::new(),
-            when: Vec::new(),
-        }
+        RoleSpec { positional, shape, flags: HashMap::new(), handler: None, write_when: Vec::new(), when: Vec::new() }
     }
 
     /// The operation-aware handler name this gate delegates to, if any.
@@ -307,9 +300,9 @@ pub(crate) fn positional_write_gate(cmd: &str) -> PositionalWriteGate {
     if GATES.write.contains(cmd) || specs.iter().any(|s| s.positional == Role::Write) {
         return PositionalWriteGate::Unconditional;
     }
-    let conditional = specs.iter().any(|s| {
-        !s.write_when.is_empty() || s.when.iter().any(|w| w.positional == Some(Role::Write))
-    });
+    let conditional = specs
+        .iter()
+        .any(|s| !s.write_when.is_empty() || s.when.iter().any(|w| w.positional == Some(Role::Write)));
     if conditional { PositionalWriteGate::Conditional } else { PositionalWriteGate::None }
 }
 
@@ -322,8 +315,7 @@ pub(crate) fn positional_write_gate(cmd: &str) -> PositionalWriteGate {
 #[cfg(test)]
 pub(crate) fn declares_write_flag(cmd: &str) -> bool {
     let has_write = |spec: &RoleSpec| spec.flags.values().any(|r| *r == Role::Write);
-    GATES.roles.get(cmd).is_some_and(has_write)
-        || crate::registry::command_path_gate(cmd).is_some_and(has_write)
+    GATES.roles.get(cmd).is_some_and(has_write) || crate::registry::command_path_gate(cmd).is_some_and(has_write)
 }
 
 #[derive(Deserialize)]
@@ -349,9 +341,8 @@ static GATES: LazyLock<Gates> = LazyLock::new(|| {
 /// no sub-scoped gate, instead of a `format!` allocation per bare token on every invocation. The
 /// hook runs on every command the agent issues, and a previous regression here was a multi-second
 /// stall, so this path stays allocation-free unless a gate actually exists.
-static SUB_SCOPED: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    GATES.roles.keys().filter_map(|k| k.split_once(' ').map(|(cmd, _)| cmd)).collect()
-});
+static SUB_SCOPED: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| GATES.roles.keys().filter_map(|k| k.split_once(' ').map(|(cmd, _)| cmd)).collect());
 
 /// Whether `cmd`'s already-allowed verdict must be overridden to `Denied` because one of its
 /// path arguments reads/writes a sensitive locus. Returns `false` for commands in no gate.
@@ -396,11 +387,7 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
     let sub = SUB_SCOPED.contains(cmd)
         && tokens.iter().enumerate().skip(1).any(|(i, t)| {
             let word = t.as_str();
-            !word.starts_with('-')
-                && gates
-                    .roles
-                    .get(&format!("{cmd} {word}"))
-                    .is_some_and(|spec| apply(spec, &tokens[i..]))
+            !word.starts_with('-') && gates.roles.get(&format!("{cmd} {word}")).is_some_and(|spec| apply(spec, &tokens[i..]))
         });
     central || own || sub
 }
@@ -419,9 +406,7 @@ fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
         // flag map, `walk` gates every path argument by `spec.positional`, so running it
         // unconditionally would ADD denials to the handler-only specs (`ar`, `textutil`) that rely
         // on their handler deciding roles per operation.
-        Some(name) => {
-            handlers::dispatch(name, tokens) || (!spec.flags.is_empty() && walk(spec, tokens))
-        }
+        Some(name) => handlers::dispatch(name, tokens) || (!spec.flags.is_empty() && walk(spec, tokens)),
         None => walk(spec, tokens),
     }
 }
@@ -487,12 +472,10 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     let positional_role = if !spec.write_when.is_empty()
         && tokens[1..].iter().any(|t| {
             let t = t.as_str();
-            spec.write_when.iter().any(|w| {
-                t == w.as_str()
-                    || t.strip_prefix(w.as_str()).is_some_and(|r| r.starts_with('='))
-            })
-        })
-    {
+            spec.write_when
+                .iter()
+                .any(|w| t == w.as_str() || t.strip_prefix(w.as_str()).is_some_and(|r| r.starts_with('=')))
+        }) {
         Role::Write
     } else {
         spec.positional
@@ -501,8 +484,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     // rewriting its operands and steps DOWN to `read` under `-o show`, which no promote-only
     // mechanism can express. Where several clauses match, the most restrictive wins, so an entry
     // that overlaps itself fails safe rather than depending on the order it was written in.
-    let holding: Vec<&WhenClause> =
-        spec.when.iter().filter(|clause| clause_holds(clause, tokens)).collect();
+    let holding: Vec<&WhenClause> = spec.when.iter().filter(|clause| clause_holds(clause, tokens)).collect();
     let positional_role = holding
         .iter()
         .filter_map(|clause| clause.positional)
@@ -584,11 +566,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
                     // shield asks about a name nobody wrote, so hand it the sentinel instead.
                     // Until local reads opened, the invented absolute denied on its rung and this
                     // was invisible.
-                    if vstart > 1 && rest.starts_with('/') {
-                        Some(crate::engine::resolve::locus::UNKNOWABLE_ITEM)
-                    } else {
-                        Some(rest)
-                    }
+                    if vstart > 1 && rest.starts_with('/') { Some(crate::engine::resolve::locus::UNKNOWABLE_ITEM) } else { Some(rest) }
                 } else {
                     None
                 };
@@ -621,11 +599,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             // `curl` GET) → not gated here.
             return last_write && idx == last;
         }
-        let role = if last_write && idx == last {
-            Role::Write
-        } else {
-            positional_role
-        };
+        let role = if last_write && idx == last { Role::Write } else { positional_role };
         gate(role, p)
     })
 }
@@ -760,14 +734,7 @@ mod handlers {
     /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
     #[cfg(test)]
     pub(super) const NAMES: &[&str] = &[
-        "ar_archive",
-        "exiftool_mode",
-        "jupytext_mode",
-        "mtree_mode",
-        "ncu_mode",
-        "rdfind_mode",
-        "textutil_mode",
-        "tsc_response_file",
+        "ar_archive", "exiftool_mode", "jupytext_mode", "mtree_mode", "ncu_mode", "rdfind_mode", "textutil_mode", "tsc_response_file",
         "xattr_mode",
     ];
 
@@ -828,8 +795,7 @@ mod handlers {
             return true;
         }
         // r/q archive real files given as members — a sensitive member is a disclosing read.
-        matches!(op, Some(b'r' | b'q'))
-            && positionals.iter().skip(archive_idx + 1).any(|m| gate(Role::Read, m))
+        matches!(op, Some(b'r' | b'q')) && positionals.iter().skip(archive_idx + 1).any(|m| gate(Role::Read, m))
     }
 
     /// `tsc @FILE` — a RESPONSE FILE: tsc opens FILE and splices its contents in as arguments.
@@ -850,10 +816,7 @@ mod handlers {
     /// `should_deny` ORs the central and co-located gates, so the flag/positional roles stay
     /// declared as data in `commands/tools/tsc.toml`.
     fn tsc_response_file(tokens: &[Token]) -> bool {
-        tokens[1..]
-            .iter()
-            .filter_map(|t| t.as_str().strip_prefix('@'))
-            .any(|path| gate(Role::Read, path))
+        tokens[1..].iter().filter_map(|t| t.as_str().strip_prefix('@')).any(|path| gate(Role::Read, path))
     }
 
     /// `xattr [-lrsvx] [-p NAME | -w NAME VALUE | -d NAME | -c] file…` — the extended-attribute
@@ -918,14 +881,10 @@ mod handlers {
     fn exiftool_mode(tokens: &[Token]) -> bool {
         const VALUED: &[&str] = &["-o", "-tagsfromfile", "-api", "-charset", "-lang", "-@"];
         let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
-        let assigns = args.iter().any(|a| {
-            a.starts_with('-')
-                && a.contains('=')
-                && !VALUED.contains(a)
-        });
-        let overwrites = args.iter().any(|a| {
-            matches!(*a, "-overwrite_original" | "-overwrite_original_in_place" | "-delete_original")
-        });
+        let assigns = args.iter().any(|a| a.starts_with('-') && a.contains('=') && !VALUED.contains(a));
+        let overwrites = args
+            .iter()
+            .any(|a| matches!(*a, "-overwrite_original" | "-overwrite_original_in_place" | "-delete_original"));
         if !assigns && !overwrites {
             return false; // a read: metadata inspection, deliberately not gated here
         }
@@ -964,9 +923,7 @@ mod handlers {
     fn rdfind_mode(tokens: &[Token]) -> bool {
         const ACTIONS: &[&str] = &["-makesymlinks", "-makehardlinks", "-deleteduplicates"];
         let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
-        let enabled = |flag: &str| {
-            args.windows(2).any(|w| w[0] == flag && w[1] == "true")
-        };
+        let enabled = |flag: &str| args.windows(2).any(|w| w[0] == flag && w[1] == "true");
         let acting = ACTIONS.iter().any(|f| enabled(f));
         if !acting || enabled("-dryrun") {
             return false; // scan-and-report, or explicitly disarmed
@@ -1054,9 +1011,9 @@ mod handlers {
     fn jupytext_mode(tokens: &[Token]) -> bool {
         const VALUED: &[&str] = &["--to", "--from", "--set-formats", "--output", "-o", "--pipe"];
         let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
-        let writes = args.iter().any(|a| {
-            matches!(*a, "--sync" | "--set-formats" | "--update-metadata" | "--to" | "-o" | "--output")
-        });
+        let writes = args
+            .iter()
+            .any(|a| matches!(*a, "--sync" | "--set-formats" | "--update-metadata" | "--to" | "-o" | "--output"));
         let role = if writes { Role::Write } else { Role::Read };
         let mut it = args.iter().copied();
         while let Some(t) = it.next() {
@@ -1086,10 +1043,8 @@ mod handlers {
     /// sibling of each input, so the input's directory is written); `-info`/`-cat` READ the inputs.
     /// `-output`/`-outputdir` are always write targets.
     fn textutil_mode(tokens: &[Token]) -> bool {
-        const VALUED: &[&str] = &[
-            "-format", "-encoding", "-extension", "-fontname", "-fontsize", "-inputencoding",
-            "-output", "-outputdir",
-        ];
+        const VALUED: &[&str] =
+            &["-format", "-encoding", "-extension", "-fontname", "-fontsize", "-inputencoding", "-output", "-outputdir"];
         let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
         let writes = args.iter().any(|a| *a == "-convert" || *a == "-strip");
         let has_output = args.iter().any(|a| *a == "-output" || *a == "-outputdir");
@@ -1148,22 +1103,13 @@ mod both_gates {
             write_when: Vec::new(),
             when: Vec::new(),
         };
-        let flags_only = RoleSpec {
-            positional: Role::Ignore,
-            shape: Shape::default(),
-            flags,
-            handler: None,
-            write_when: Vec::new(),
-            when: Vec::new(),
-        };
+        let flags_only =
+            RoleSpec { positional: Role::Ignore, shape: Shape::default(), flags, handler: None, write_when: Vec::new(), when: Vec::new() };
 
         // The FLAG half fires with a handler present, exactly as it does without one.
         let sensitive = toks(&["ar", "t", "./lib.a", "--out", "/etc/x"]);
         assert!(apply(&flags_only, &sensitive), "baseline: the flag gate fires without a handler");
-        assert!(
-            apply(&with_handler, &sensitive),
-            "a declared flag gate was dropped because a handler was also present"
-        );
+        assert!(apply(&with_handler, &sensitive), "a declared flag gate was dropped because a handler was also present");
 
         // And the HANDLER half still fires on its own terms — `ar rcs` WRITES the archive.
         let handler_case = toks(&["ar", "rcs", "/etc/lib.a", "./x.o"]);
@@ -1247,14 +1193,10 @@ mod tests {
                     continue;
                 };
                 let Some(h) = gate.get("handler").and_then(toml::Value::as_str) else { continue };
-                let inert: Vec<&str> =
-                    INERT_BESIDE_HANDLER.iter().copied().filter(|k| gate.contains_key(*k)).collect();
+                let inert: Vec<&str> = INERT_BESIDE_HANDLER.iter().copied().filter(|k| gate.contains_key(*k)).collect();
                 if !inert.is_empty() {
                     let name = cmd.get("name").and_then(toml::Value::as_str).unwrap_or("?");
-                    bad.push(format!(
-                        "  {name} [command.path_gate] handler = \"{h}\" — {} ignored",
-                        inert.join(", ")
-                    ));
+                    bad.push(format!("  {name} [command.path_gate] handler = \"{h}\" — {} ignored", inert.join(", ")));
                 }
             }
         }
@@ -1282,8 +1224,7 @@ mod tests {
     /// ever needed, this test is the thing to change alongside it.
     #[test]
     fn a_sub_scoped_key_is_reachable_by_the_lookup() {
-        let unreachable: Vec<&String> =
-            GATES.roles.keys().filter(|k| k.split(' ').count() > 2).collect();
+        let unreachable: Vec<&String> = GATES.roles.keys().filter(|k| k.split(' ').count() > 2).collect();
         assert!(
             unreachable.is_empty(),
             "sub-scoped keys the lookup can never build ({}) — it constructs `\"<cmd> <word>\"`, so \
@@ -1363,9 +1304,7 @@ mod tests {
     /// write role, the third case below fails rather than quietly admitting a rewrite.
     #[test]
     fn a_when_clause_can_re_role_a_flags_value() {
-        let toks = |words: &[&str]| -> Vec<Token> {
-            words.iter().map(|s| Token::from_test(s)).collect()
-        };
+        let toks = |words: &[&str]| -> Vec<Token> { words.iter().map(|s| Token::from_test(s)).collect() };
         let deny = |words: &[&str]| should_deny("gomodifytags", &toks(words));
 
         // `.git/config` is readable and write-denied, so it tells the two roles apart.
@@ -1373,19 +1312,10 @@ mod tests {
             !deny(&["gomodifytags", "-file", ".git/config", "-add-tags", "json"]),
             "without -w the source goes to stdout, so -file is only read"
         );
-        assert!(
-            !deny(&["gomodifytags", "--file", ".git/config", "--all"]),
-            "the long spelling reads too"
-        );
-        assert!(
-            deny(&["gomodifytags", "-w", "-file", ".git/config", "-add-tags", "json"]),
-            "-w rewrites the file -file names"
-        );
+        assert!(!deny(&["gomodifytags", "--file", ".git/config", "--all"]), "the long spelling reads too");
+        assert!(deny(&["gomodifytags", "-w", "-file", ".git/config", "-add-tags", "json"]), "-w rewrites the file -file names");
         // The clause is computed over the whole token list, so the order cannot hide the write.
-        assert!(
-            deny(&["gomodifytags", "-file", ".git/config", "-w"]),
-            "-w after the path still selects the write role"
-        );
+        assert!(deny(&["gomodifytags", "-file", ".git/config", "-w"]), "-w after the path still selects the write role");
         assert!(deny(&["gomodifytags", "--w", "--file", ".git/config"]), "the --w alias too");
     }
 
@@ -1412,11 +1342,7 @@ mod tests {
             reads: &'static [&'static [&'static str]],
         }
 
-        const fn f(
-            cmd: &'static str,
-            writes: &'static [&'static [&'static str]],
-            reads: &'static [&'static [&'static str]],
-        ) -> Formatter {
+        const fn f(cmd: &'static str, writes: &'static [&'static [&'static str]], reads: &'static [&'static [&'static str]]) -> Formatter {
             Formatter { cmd, writes, reads }
         }
 
@@ -1433,11 +1359,7 @@ mod tests {
                 &[&["-i"], &["-m", "inplace"], &["--mode", "inplace"], &["--mode=inplace"]],
                 &[&[], &["--mode", "check"], &["-m", "stdout"]],
             ),
-            f(
-                "ormolu",
-                &[&["-i"], &["-m", "inplace"], &["--mode", "inplace"]],
-                &[&[], &["--mode", "check"]],
-            ),
+            f("ormolu", &[&["-i"], &["-m", "inplace"], &["--mode", "inplace"]], &[&[], &["--mode", "check"]]),
         ];
 
         // An in-workspace path that is READABLE and write-denied. A path outside the workspace
@@ -1455,17 +1377,11 @@ mod tests {
         for Formatter { cmd, writes, reads } in FAMILY {
             for flags in *reads {
                 checked += 1;
-                assert!(
-                    !should_deny(cmd, &toks(cmd, flags)),
-                    "{cmd} {flags:?} prints rather than rewriting, so {WITNESS} is a read"
-                );
+                assert!(!should_deny(cmd, &toks(cmd, flags)), "{cmd} {flags:?} prints rather than rewriting, so {WITNESS} is a read");
             }
             for flags in *writes {
                 checked += 1;
-                assert!(
-                    should_deny(cmd, &toks(cmd, flags)),
-                    "{cmd} {flags:?} REWRITES its operand — this spelling is not gated"
-                );
+                assert!(should_deny(cmd, &toks(cmd, flags)), "{cmd} {flags:?} REWRITES its operand — this spelling is not gated");
             }
         }
         assert!(checked > 20, "only {checked} spellings probed — the table shrank");
@@ -1486,15 +1402,10 @@ mod tests {
     fn a_when_clause_selects_the_positional_role_by_flag_value() {
         let home = std::env::var("HOME").expect("HOME");
         let witness = format!("{home}/notes.txt");
-        let toks = |words: &[&str]| -> Vec<Token> {
-            words.iter().map(|s| Token::from_test(s)).collect()
-        };
+        let toks = |words: &[&str]| -> Vec<Token> { words.iter().map(|s| Token::from_test(s)).collect() };
 
         // Sanity: the witness discriminates. Without this the rest is vacuous.
-        assert!(
-            !should_deny("cat", &toks(&["cat", &witness])),
-            "witness must be readable, or this test cannot tell the roles apart"
-        );
+        assert!(!should_deny("cat", &toks(&["cat", &witness])), "witness must be readable, or this test cannot tell the roles apart");
 
         let deny = |words: &[&str]| should_deny("dart", &toks(words));
 
@@ -1518,10 +1429,7 @@ mod tests {
         // place, so reading them as a mode selector judged a write as a read. Found in review; it
         // is a hole only where a clause LOWERS the role, which is precisely this mechanism's
         // reason to exist.
-        assert!(
-            deny(&["dart", "format", "--", "-o", "show", &witness]),
-            "after `--` these are operands, not a mode selector"
-        );
+        assert!(deny(&["dart", "format", "--", "-o", "show", &witness]), "after `--` these are operands, not a mode selector");
     }
 
     #[test]
@@ -1585,26 +1493,14 @@ mod tests {
         // `read` and `write` both deny a sensitive locus, so the observable difference lives at an
         // in-workspace protected path: readable, write-denied.
         let protected = ".git/config";
-        assert!(
-            !walk(&spec, &toks(&["lint", protected])),
-            "no fix flag: the operand is a READ and a protected path is readable"
-        );
-        assert!(
-            walk(&spec, &toks(&["lint", "--fix", protected])),
-            "--fix must promote the operand to a WRITE"
-        );
-        assert!(
-            walk(&spec, &toks(&["lint", "--fix=all", protected])),
-            "--fix=all is the same flag carrying a value and must promote too"
-        );
+        assert!(!walk(&spec, &toks(&["lint", protected])), "no fix flag: the operand is a READ and a protected path is readable");
+        assert!(walk(&spec, &toks(&["lint", "--fix", protected])), "--fix must promote the operand to a WRITE");
+        assert!(walk(&spec, &toks(&["lint", "--fix=all", protected])), "--fix=all is the same flag carrying a value and must promote too");
         assert!(
             walk(&spec, &toks(&["lint", protected, "--fix"])),
             "the flag may follow the paths — promotion is decided over the whole token list"
         );
-        assert!(
-            !walk(&spec, &toks(&["lint", "--fixture", protected])),
-            "--fixture merely starts with --fix and must NOT promote"
-        );
+        assert!(!walk(&spec, &toks(&["lint", "--fixture", protected])), "--fixture merely starts with --fix and must NOT promote");
     }
 
     /// `pathgates.toml` parses. Named separately so the failure SAYS SO.
@@ -1644,15 +1540,7 @@ mod tests {
     /// is deliberately boring and should stay that way.
     #[test]
     fn known_safe_commands_are_still_auto_approved() {
-        const CANARY: &[&str] = &[
-            "ls",
-            "true",
-            "pwd",
-            "echo hi",
-            "git status",
-            "cargo build",
-            "grep -rn foo ./src",
-        ];
+        const CANARY: &[&str] = &["ls", "true", "pwd", "echo hi", "git status", "cargo build", "grep -rn foo ./src"];
         for cmd in CANARY {
             assert!(
                 crate::is_safe_command(cmd),
@@ -1683,8 +1571,8 @@ mod tests {
         // Spellings of `path` attached to short `-o` / long `--output`, all naming the SAME operand.
         fn spellings(path: &str) -> Vec<Vec<String>> {
             vec![
-                vec!["cmd".into(), path.into()],                 // bare positional
-                vec!["cmd".into(), "-o".into(), path.into()],    // -o path
+                vec!["cmd".into(), path.into()],                // bare positional
+                vec!["cmd".into(), "-o".into(), path.into()],   // -o path
                 vec!["cmd".into(), format!("-o={path}")],       // -o=path
                 vec!["cmd".into(), format!("--output={path}")], // --output=path
                 vec!["cmd".into(), format!("-o{path}")],        // -opath (short glued)
@@ -1701,8 +1589,8 @@ mod tests {
                 // it. `/etc/cron.d/job` and `/etc/passwd` qualified only while all machine reads
                 // were refused; now they read, so the read-face role would fail on them. Replaced
                 // with paths the shield refuses whichever face asks.
-                "/etc/shadow", "/etc/ssl/private/x.key", "~/.ssh/id_rsa", "/root/.ssh/id_ed25519",
-                "../../../../etc/shadow", "$HOME/.ssh/authorized_keys", "~/.aws/credentials",
+                "/etc/shadow", "/etc/ssl/private/x.key", "~/.ssh/id_rsa", "/root/.ssh/id_ed25519", "../../../../etc/shadow",
+                "$HOME/.ssh/authorized_keys", "~/.aws/credentials",
             ] {
                 for s in spellings(path) {
                     assert!(deny(&spec, &s), "SENSITIVE must deny [{role:?}]: {s:?}");
@@ -1819,8 +1707,7 @@ mod tests {
     /// never silently fail-open a gate, and a removed gate can't leave a dead handler.
     #[test]
     fn pathgate_handler_names_resolve() {
-        let declared: std::collections::HashSet<&str> =
-            GATES.roles.values().filter_map(RoleSpec::handler_name).collect();
+        let declared: std::collections::HashSet<&str> = GATES.roles.values().filter_map(RoleSpec::handler_name).collect();
         for name in &declared {
             assert!(handlers::NAMES.contains(name), "pathgates.toml uses unknown handler `{name}`");
         }
@@ -1844,8 +1731,8 @@ mod tests {
     /// permissive property below.
     fn locus_corpus() -> impl proptest::strategy::Strategy<Value = &'static str> {
         proptest::sample::select(vec![
-            "./lib.a", "./sub/dir/x.a", "./.git/x.a", "./.git/hooks/y.a", "/tmp/x.a",
-            "~/.ssh/x.a", "~/.config/x.a", "~/.bashrc", "/etc/evil.a", "/usr/lib/x.a", "~/Documents/x.a",
+            "./lib.a", "./sub/dir/x.a", "./.git/x.a", "./.git/hooks/y.a", "/tmp/x.a", "~/.ssh/x.a", "~/.config/x.a", "~/.bashrc",
+            "/etc/evil.a", "/usr/lib/x.a", "~/Documents/x.a",
         ])
     }
 

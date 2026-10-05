@@ -2,25 +2,18 @@ use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static GREP_STANDALONE: WordSet = WordSet::new(&[
-    "--basic-regexp", "--binary", "--byte-offset", "--color", "--colour",
-    "--count", "--dereference-recursive", "--extended-regexp",
-    "--files-with-matches", "--files-without-match", "--fixed-strings",
-    "--help", "--ignore-case", "--initial-tab", "--invert-match", "--line-buffered",
-    "--line-number", "--line-regexp", "--no-filename", "--no-messages",
-    "--null", "--null-data", "--only-matching", "--perl-regexp", "--quiet",
-    "--recursive", "--silent", "--text", "--version", "--with-filename", "--word-regexp",
-    "-E", "-F", "-G", "-H", "-I", "-J", "-L", "-P", "-R", "-S",
-    "-T", "-U", "-V", "-Z",
-    "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
-    "-r", "-s", "-v", "-w", "-x", "-z",
+    "--basic-regexp", "--binary", "--byte-offset", "--color", "--colour", "--count", "--dereference-recursive", "--extended-regexp",
+    "--files-with-matches", "--files-without-match", "--fixed-strings", "--help", "--ignore-case", "--initial-tab", "--invert-match",
+    "--line-buffered", "--line-number", "--line-regexp", "--no-filename", "--no-messages", "--null", "--null-data", "--only-matching",
+    "--perl-regexp", "--quiet", "--recursive", "--silent", "--text", "--version", "--with-filename", "--word-regexp", "-E", "-F", "-G",
+    "-H", "-I", "-J", "-L", "-P", "-R", "-S", "-T", "-U", "-V", "-Z", "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q", "-r",
+    "-s", "-v", "-w", "-x", "-z",
 ]);
 
 static GREP_VALUED: WordSet = WordSet::new(&[
-    "--after-context", "--before-context", "--binary-files", "--color",
-    "--colour", "--context", "--devices", "--directories", "--exclude",
-    "--exclude-dir", "--exclude-from", "--file", "--group-separator",
-    "--include", "--label", "--max-count", "--regexp",
-    "-A", "-B", "-C", "-D", "-d", "-e", "-f", "-m",
+    "--after-context", "--before-context", "--binary-files", "--color", "--colour", "--context", "--devices", "--directories", "--exclude",
+    "--exclude-dir", "--exclude-from", "--file", "--group-separator", "--include", "--label", "--max-count", "--regexp", "-A", "-B", "-C",
+    "-D", "-d", "-e", "-f", "-m",
 ]);
 
 fn is_safe_grep(tokens: &[Token]) -> Verdict {

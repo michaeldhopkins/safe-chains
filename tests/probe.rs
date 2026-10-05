@@ -1,6 +1,6 @@
 #![allow(clippy::unwrap_used)]
 
-use safe_chains::{command_verdict, is_safe_command, SafetyLevel, Verdict};
+use safe_chains::{SafetyLevel, Verdict, command_verdict, is_safe_command};
 
 fn check(cmd: &str) -> bool {
     is_safe_command(cmd)
@@ -106,41 +106,14 @@ fn gh_api_bare_endpoint() {
 }
 
 const GH_API_BARE_ENDPOINTS: &[&str] = &[
-    "repos/owner/repo/pulls",
-    "repos/owner/repo/issues",
-    "repos/owner/repo/commits",
-    "repos/owner/repo/releases",
-    "repos/owner/repo/branches",
-    "repos/owner/repo/tags",
-    "repos/owner/repo/contributors",
-    "repos/owner/repo/languages",
-    "repos/owner/repo/topics",
-    "repos/owner/repo/readme",
-    "repos/owner/repo/license",
-    "repos/owner/repo/contents/src/main.rs",
-    "repos/owner/repo/git/refs",
-    "repos/owner/repo/git/trees/main",
-    "repos/owner/repo/actions/runs",
-    "repos/owner/repo/actions/workflows",
-    "repos/owner/repo/check-runs/123",
-    "repos/owner/repo/check-suites/456",
-    "repos/owner/repo/deployments",
-    "repos/owner/repo/milestones",
-    "repos/owner/repo/labels",
-    "repos/owner/repo/stargazers",
-    "repos/owner/repo/forks",
-    "repos/owner/repo/collaborators",
-    "user",
-    "user/repos",
-    "users/octocat",
-    "users/octocat/repos",
-    "orgs/github",
-    "orgs/github/repos",
-    "orgs/github/members",
-    "search/repositories?q=rust",
-    "rate_limit",
-    "notifications",
-    "gists",
+    "repos/owner/repo/pulls", "repos/owner/repo/issues", "repos/owner/repo/commits", "repos/owner/repo/releases",
+    "repos/owner/repo/branches", "repos/owner/repo/tags", "repos/owner/repo/contributors", "repos/owner/repo/languages",
+    "repos/owner/repo/topics", "repos/owner/repo/readme", "repos/owner/repo/license", "repos/owner/repo/contents/src/main.rs",
+    "repos/owner/repo/git/refs", "repos/owner/repo/git/trees/main", "repos/owner/repo/actions/runs", "repos/owner/repo/actions/workflows",
+    "repos/owner/repo/check-runs/123", "repos/owner/repo/check-suites/456", "repos/owner/repo/deployments", "repos/owner/repo/milestones",
+    "repos/owner/repo/labels", "repos/owner/repo/stargazers", "repos/owner/repo/forks", "repos/owner/repo/collaborators", "user",
+    "user/repos", "users/octocat", "users/octocat/repos", "orgs/github", "orgs/github/repos", "orgs/github/members",
+    "search/repositories?q=rust", "rate_limit", "notifications", "gists",
 ];
 
 #[test]

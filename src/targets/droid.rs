@@ -34,10 +34,7 @@ impl Target for DroidTarget {
         let dir = home.join(".factory");
         if !dir.exists() {
             return Ok(InstallOutcome::Skipped {
-                reason: format!(
-                    "~/.factory not found at {} (Factory Droid not installed)",
-                    dir.display()
-                ),
+                reason: format!("~/.factory not found at {} (Factory Droid not installed)", dir.display()),
             });
         }
 
@@ -54,10 +51,8 @@ impl Target for DroidTarget {
         let binary = resolved.as_str();
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let mut settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
@@ -65,15 +60,13 @@ impl Target for DroidTarget {
 
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
     }
@@ -103,9 +96,7 @@ struct DroidHookEnvelope {
 
 impl HookFormat for DroidHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: DroidHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
-            message: e.to_string(),
-        })?;
+        let envelope: DroidHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Self-filter on the tool: the hook can be delivered for a non-shell call by a
         // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
         if let Some(name) = &envelope.tool_name
@@ -137,15 +128,9 @@ impl HookFormat for DroidHookFormat {
                     "permissionDecisionReason": reason,
                 }
             });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
         } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 
@@ -158,10 +143,7 @@ impl HookFormat for DroidHookFormat {
                 "additionalContext": context,
             }
         });
-        HookResponse {
-            stdout: serde_json::to_string(&body).unwrap_or_default(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
     }
 }
 
@@ -185,16 +167,11 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
-                entry
-                    .get("hooks")
-                    .and_then(|h| h.as_array())
-                    .is_some_and(|hooks| {
-                        hooks.iter().any(|hook| {
-                            hook.get("command")
-                                .and_then(|c| c.as_str())
-                                .is_some_and(|cmd| cmd.contains("safe-chains"))
-                        })
-                    })
+                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                    hooks
+                        .iter()
+                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+                })
             })
         })
 }
@@ -262,15 +239,9 @@ mod tests {
         target().install(dir.path()).unwrap();
         let contents = std::fs::read_to_string(dir.path().join(".factory/settings.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
-        let cmd = settings
-            .pointer("/hooks/PreToolUse/0/hooks/0/command")
-            .and_then(|s| s.as_str())
-            .unwrap_or("");
+        let cmd = settings.pointer("/hooks/PreToolUse/0/hooks/0/command").and_then(|s| s.as_str()).unwrap_or("");
         // Either an absolute path or the fallback bare invocation.
-        assert!(
-            cmd.starts_with('/') || cmd == "safe-chains hook droid",
-            "unexpected command: {cmd}",
-        );
+        assert!(cmd.starts_with('/') || cmd == "safe-chains hook droid", "unexpected command: {cmd}",);
         assert!(cmd.ends_with(" hook droid") || cmd == "safe-chains hook droid");
     }
 
@@ -300,11 +271,7 @@ mod tests {
     fn render_response_emits_claude_shaped_envelope() {
         let r = DroidHookFormat.render_response(Verdict::Allowed(SafetyLevel::Inert));
         let v: Value = serde_json::from_str(&r.stdout).unwrap();
-        assert_eq!(
-            v.pointer("/hookSpecificOutput/permissionDecision")
-                .and_then(|d| d.as_str()),
-            Some("allow"),
-        );
+        assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("allow"),);
     }
 
     #[test]

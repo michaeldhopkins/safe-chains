@@ -33,22 +33,15 @@ impl Target for GeminiTarget {
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
         let dir = home.join(".gemini");
         if !dir.exists() {
-            return Ok(InstallOutcome::Skipped {
-                reason: format!(
-                    "~/.gemini not found at {} (Gemini CLI not installed)",
-                    dir.display()
-                ),
-            });
+            return Ok(InstallOutcome::Skipped { reason: format!("~/.gemini not found at {} (Gemini CLI not installed)", dir.display()) });
         }
 
         let path = dir.join("settings.json");
         let binary = "safe-chains hook gemini";
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let mut settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
@@ -56,15 +49,13 @@ impl Target for GeminiTarget {
 
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
             add_hook(&mut settings, binary)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
     }
@@ -92,9 +83,7 @@ struct GeminiHookEnvelope {
 
 impl HookFormat for GeminiHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: GeminiHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
-            message: e.to_string(),
-        })?;
+        let envelope: GeminiHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Gemini's matcher narrows to run_shell_command in config, but
         // some setups may dispatch all tools through the same hook.
         // For non-shell tools, return Err so the runtime exits 0
@@ -104,9 +93,7 @@ impl HookFormat for GeminiHookFormat {
             && name != "run_shell_command"
             && name != "Shell"
         {
-            return Err(ParseError {
-                message: format!("not a shell tool: {name}"),
-            });
+            return Err(ParseError { message: format!("not a shell tool: {name}") });
         }
         Ok(HookInput {
             command: envelope.tool_input.command,
@@ -131,19 +118,13 @@ impl HookFormat for GeminiHookFormat {
                 "decision": "allow",
                 "reason": reason,
             });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
         } else {
             // Empty stdout is "no opinion" — Gemini's docs note that
             // exit code drives the outcome and an unparseable stdout
             // is a warning. Exit 0 + empty body lets Gemini's own
             // permission system handle it.
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 }
@@ -166,16 +147,11 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
-                entry
-                    .get("hooks")
-                    .and_then(|h| h.as_array())
-                    .is_some_and(|hooks| {
-                        hooks.iter().any(|hook| {
-                            hook.get("command")
-                                .and_then(|c| c.as_str())
-                                .is_some_and(|cmd| cmd.contains("safe-chains"))
-                        })
-                    })
+                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                    hooks
+                        .iter()
+                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+                })
             })
         })
 }

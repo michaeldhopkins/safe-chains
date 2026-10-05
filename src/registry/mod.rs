@@ -21,15 +21,11 @@ use types::DispatchKind;
 
 type HandlerFn = fn(&[Token]) -> Verdict;
 
-static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
-    LazyLock::new(crate::handlers::custom_cmd_handlers);
+static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> = LazyLock::new(crate::handlers::custom_cmd_handlers);
 
-static SUB_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
-    LazyLock::new(crate::handlers::custom_sub_handlers);
+static SUB_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> = LazyLock::new(crate::handlers::custom_sub_handlers);
 
-static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(||
-    include!(concat!(env!("OUT_DIR"), "/toml_includes.rs"))
-);
+static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| include!(concat!(env!("OUT_DIR"), "/toml_includes.rs")));
 
 static CUSTOM_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
     let mut map = HashMap::new();
@@ -57,20 +53,14 @@ pub fn custom_dispatch(tokens: &[Token]) -> Option<Verdict> {
 /// aliased invocation: without it, `gcat /etc/shadow` misses every resolver and falls through to
 /// the (ungated) legacy classifier. Custom registry first (an override may rename), then TOML.
 pub fn canonical_name(cmd: &str) -> &str {
-    CUSTOM_REGISTRY
-        .get(cmd)
-        .or_else(|| TOML_REGISTRY.get(cmd))
-        .map_or(cmd, |spec| spec.name.as_str())
+    CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)).map_or(cmd, |spec| spec.name.as_str())
 }
 
 /// The command's own declared path-argument gate (`[command.path_gate]`), if any — consulted by
 /// `pathgate::should_deny` when a command isn't in `pathgates.toml`, so a path-bearing flag gates
 /// from the command's own definition. `cmd` is already canonicalized by the caller.
 pub(crate) fn command_path_gate(cmd: &str) -> Option<&'static crate::pathgate::RoleSpec> {
-    CUSTOM_REGISTRY
-        .get(cmd)
-        .or_else(|| TOML_REGISTRY.get(cmd))
-        .and_then(|spec| spec.path_gate.as_ref())
+    CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)).and_then(|spec| spec.path_gate.as_ref())
 }
 
 /// The command's declarative facet behavior (`[command.behavior]`), if any — the engine's
@@ -78,19 +68,13 @@ pub(crate) fn command_path_gate(cmd: &str) -> Option<&'static crate::pathgate::R
 /// hardcoded `RESOLVERS` table is gone; every facet-classified command declares behavior).
 /// `cmd` is already canonicalized by the caller.
 pub(crate) fn command_behavior(cmd: &str) -> Option<&'static crate::registry::types::BehaviorSpec> {
-    CUSTOM_REGISTRY
-        .get(cmd)
-        .or_else(|| TOML_REGISTRY.get(cmd))
-        .and_then(|spec| spec.behavior.as_ref())
+    CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)).and_then(|spec| spec.behavior.as_ref())
 }
 
 /// What `cmd`'s stdout can name, when that has been researched and declared (`[command.output]`).
 /// `None` — the default for every command — keeps a `$(cmd …)` unpinnable.
 pub(crate) fn command_output_locus(cmd: &str) -> Option<&'static crate::registry::types::OutputSpec> {
-    CUSTOM_REGISTRY
-        .get(cmd)
-        .or_else(|| TOML_REGISTRY.get(cmd))
-        .and_then(|spec| spec.output.as_ref())
+    CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)).and_then(|spec| spec.output.as_ref())
 }
 
 /// What the SUBCOMMAND in `words` prints, when that sub has declared it
@@ -114,9 +98,7 @@ pub(crate) fn sub_output_locus<'a>(
     args: &'a [String],
 ) -> Option<(&'static crate::registry::types::OutputSpec, &'a [String])> {
     let mut rest = args;
-    let spec = CUSTOM_REGISTRY
-        .get(canonical)
-        .or_else(|| TOML_REGISTRY.get(canonical))?;
+    let spec = CUSTOM_REGISTRY.get(canonical).or_else(|| TOML_REGISTRY.get(canonical))?;
     let mut kind = &spec.kind;
     let mut found: Option<(&'static crate::registry::types::OutputSpec, &'a [String])> = None;
     loop {
@@ -189,8 +171,7 @@ pub(super) fn glob_presents_unlisted_flag(
     if standalone.is_empty() && valued.is_empty() && loopback_valued.is_empty() {
         return false;
     }
-    let known =
-        |f: &str| standalone.iter().any(|a| a == f) || valued.iter().any(|a| a == f);
+    let known = |f: &str| standalone.iter().any(|a| a == f) || valued.iter().any(|a| a == f);
     for (idx, t) in tokens.iter().enumerate().skip(skip) {
         let s = t.as_str();
         if s == "--" {
@@ -351,10 +332,7 @@ fn flag_is_affirmatively_set(tokens: &[Token], flag: &str) -> bool {
     set
 }
 
-fn walk_to_profiled_sub(
-    remaining: &[Token],
-    kind: &'static DispatchKind,
-) -> Option<&'static types::SubSpec> {
+fn walk_to_profiled_sub(remaining: &[Token], kind: &'static DispatchKind) -> Option<&'static types::SubSpec> {
     let subs = match kind {
         DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
         _ => return None,
@@ -367,10 +345,7 @@ fn walk_to_profiled_sub(
 
 /// Like `walk_to_profiled_sub`, but also returns the tokens AFTER the matched sub's name — the
 /// operands the engine still needs to inspect (the destination positional, for `network_destination`).
-fn walk_to_profiled_sub_rest<'a>(
-    remaining: &'a [Token],
-    kind: &'static DispatchKind,
-) -> Option<(&'static types::SubSpec, &'a [Token])> {
+fn walk_to_profiled_sub_rest<'a>(remaining: &'a [Token], kind: &'static DispatchKind) -> Option<(&'static types::SubSpec, &'a [Token])> {
     let subs = match kind {
         DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
         _ => return None,
@@ -484,9 +459,7 @@ fn output_flag_value<'a>(tokens: &'a [Token], flag: &'a str) -> Option<&'a str> 
         return Some(v);
     }
     if flag.len() == 2 && flag.starts_with('-') && !flag.starts_with("--") {
-        return tokens
-            .iter()
-            .find_map(|t| t.as_str().strip_prefix(flag).filter(|r| !r.is_empty()));
+        return tokens.iter().find_map(|t| t.as_str().strip_prefix(flag).filter(|r| !r.is_empty()));
     }
     None
 }
@@ -514,10 +487,7 @@ fn flag_present(tokens: &[Token], flag: &str) -> bool {
 }
 
 pub fn toml_command_names() -> Vec<&'static str> {
-    TOML_REGISTRY
-        .keys()
-        .map(|k| k.as_str())
-        .collect()
+    TOML_REGISTRY.keys().map(|k| k.as_str()).collect()
 }
 
 /// EVERY declared stdout claim in the registry, command-level and sub-level alike, each paired with
@@ -529,11 +499,7 @@ pub fn toml_command_names() -> Vec<&'static str> {
 /// whatever consumes the substitution), so an unguarded one is the worst kind to add.
 #[cfg(test)]
 pub(crate) fn output_claims() -> Vec<(String, &'static crate::registry::types::OutputSpec)> {
-    fn walk(
-        prefix: &str,
-        kind: &'static DispatchKind,
-        out: &mut Vec<(String, &'static crate::registry::types::OutputSpec)>,
-    ) {
+    fn walk(prefix: &str, kind: &'static DispatchKind, out: &mut Vec<(String, &'static crate::registry::types::OutputSpec)>) {
         let subs = match kind {
             DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
             _ => return,
@@ -560,13 +526,10 @@ pub(crate) fn output_claims() -> Vec<(String, &'static crate::registry::types::O
 /// Every command's canonical name with its declared `examples_safe` / `examples_denied`
 /// — the corpus the engine's never-looser corpus gate runs against.
 #[cfg(test)]
-pub(crate) fn corpus_examples()
--> Vec<(&'static str, &'static [String], &'static [String])> {
+pub(crate) fn corpus_examples() -> Vec<(&'static str, &'static [String], &'static [String])> {
     TOML_REGISTRY
         .iter()
-        .map(|(name, spec)| {
-            (name.as_str(), spec.examples_safe.as_slice(), spec.examples_denied.as_slice())
-        })
+        .map(|(name, spec)| (name.as_str(), spec.examples_safe.as_slice(), spec.examples_denied.as_slice()))
         .collect()
 }
 
@@ -636,7 +599,9 @@ pub fn try_matrix_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> 
         if !matrix.parents.iter().any(|p| p == parent) {
             continue;
         }
-        let Some(action_spec) = matrix.actions.get(action) else { continue; };
+        let Some(action_spec) = matrix.actions.get(action) else {
+            continue;
+        };
         if let Some(long) = action_spec.guard.as_deref()
             && !crate::parse::has_flag(&tokens[2..], action_spec.guard_short.as_deref(), Some(long))
         {
@@ -657,18 +622,20 @@ pub fn try_matrix_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> 
 /// sub × action matrix) but whose per-policy WordSets should live
 /// in TOML rather than as Rust `WordSet` constants.
 pub fn check_handler_policy(cmd_name: &str, key: &str, tokens: &[Token]) -> bool {
-    let Some(spec) = handler_spec(cmd_name) else { return false; };
+    let Some(spec) = handler_spec(cmd_name) else {
+        return false;
+    };
     let DispatchKind::Custom { handler_policies, .. } = &spec.kind else {
         return false;
     };
-    let Some(policy) = handler_policies.get(key) else { return false; };
+    let Some(policy) = handler_policies.get(key) else {
+        return false;
+    };
     dispatch::check_handler_policy_owned(tokens, policy)
 }
 
 fn handler_spec(cmd_name: &str) -> Option<&'static CommandSpec> {
-    CUSTOM_REGISTRY
-        .get(cmd_name)
-        .or_else(|| TOML_REGISTRY.get(cmd_name))
+    CUSTOM_REGISTRY.get(cmd_name).or_else(|| TOML_REGISTRY.get(cmd_name))
 }
 
 /// Returns true iff this invocation is tagged eval-safe — meaning its

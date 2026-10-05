@@ -94,9 +94,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
     // read/write a sensitive path just because its own handler ignored the operand's locus.
     // Canonicalize through the alias map (`gtee` → `tee`) so a Homebrew g-alias hits the same
     // role table its base name does — otherwise the alias sails past this gate (`gtee /etc/x`).
-    if verdict.is_allowed()
-        && crate::pathgate::should_deny(crate::registry::canonical_name(cmd), tokens)
-    {
+    if verdict.is_allowed() && crate::pathgate::should_deny(crate::registry::canonical_name(cmd), tokens) {
         return Verdict::Denied;
     }
     verdict
@@ -124,7 +122,6 @@ pub(crate) enum CommandEntry {
     Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
     Paths { cmd: &'static str, bare_ok: bool, paths: &'static [&'static str] },
 }
-
 
 #[cfg(test)]
 fn full_registry() -> Vec<&'static CommandEntry> {
@@ -179,16 +176,13 @@ mod tests {
         for entry in &registry {
             check_entry(entry, &mut failures);
         }
-        assert!(
-            failures.is_empty(),
-            "unknown flags/subcommands accepted:\n{}",
-            failures.join("\n")
-        );
+        assert!(failures.is_empty(), "unknown flags/subcommands accepted:\n{}", failures.join("\n"));
     }
 
     #[test]
     fn process_substitution_safe_inner() {
-        let safe = ["echo <(cat ./data.txt)", "grep pattern <(ls)", "diff <(sort a.txt) <(sort b.txt)", "comm -23 file.txt <(sort other.txt)"];
+        let safe =
+            ["echo <(cat ./data.txt)", "grep pattern <(ls)", "diff <(sort a.txt) <(sort b.txt)", "comm -23 file.txt <(sort other.txt)"];
         for cmd in &safe {
             assert!(crate::is_safe_command(cmd), "safe process substitution rejected: {cmd}");
         }
@@ -201,5 +195,4 @@ mod tests {
             assert!(!crate::is_safe_command(cmd), "unsafe process substitution approved: {cmd}");
         }
     }
-
 }

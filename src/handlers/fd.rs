@@ -34,16 +34,11 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
     // a path under each — deny-absorbing, so a system/home search denies. Every bare pre-exec operand
     // is a candidate base (the pattern is benign worktree, `--search-path`/`--base-directory` VALUES
     // are real bases), plus fd's default `.`.
-    let mut bases: Vec<&str> = tokens[1..xi]
-        .iter()
-        .map(Token::as_str)
-        .filter(|s| !s.starts_with('-'))
-        .collect();
+    let mut bases: Vec<&str> = tokens[1..xi].iter().map(Token::as_str).filter(|s| !s.starts_with('-')).collect();
     bases.push(".");
     // With no `{}` placeholder, fd APPENDS each matched path as a trailing argument (`fd -X cat`
     // runs `cat <matches>`), so the path must still be bound in that form or a `/etc` search leaks.
-    let has_placeholder =
-        tokens[cmd_start..cmd_end].iter().any(|t| t.as_str().contains('{'));
+    let has_placeholder = tokens[cmd_start..cmd_end].iter().any(|t| t.as_str().contains('{'));
     let mut level = SafetyLevel::Inert;
     for base in &bases {
         let bound = crate::engine::resolve::locus::traversal_item(base);

@@ -25,15 +25,9 @@ fn rows() -> Vec<Row<'static>> {
         .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
         .map(|line| {
             let mut f = line.splitn(3, '\t');
-            let (want, category, command) = (
-                f.next().expect("verdict column"),
-                f.next().expect("category column"),
-                f.next().expect("command column"),
-            );
-            assert!(
-                matches!(want, "allow" | "deny"),
-                "corpus verdict must be allow/deny, got {want:?} in: {line}"
-            );
+            let (want, category, command) =
+                (f.next().expect("verdict column"), f.next().expect("category column"), f.next().expect("command column"));
+            assert!(matches!(want, "allow" | "deny"), "corpus verdict must be allow/deny, got {want:?} in: {line}");
             Row { want_allow: want == "allow", category, command }
         })
         .collect()
@@ -60,11 +54,7 @@ fn layout() -> &'static Layout {
         let workspace = home.join("projects/safe-chains");
         std::fs::create_dir_all(&workspace).expect("workspace");
         std::fs::create_dir_all(home.join("projects/branchdiff")).expect("peer");
-        Layout {
-            home: home.to_string_lossy().into_owned(),
-            workspace: workspace.to_string_lossy().into_owned(),
-            _home: dir,
-        }
+        Layout { home: home.to_string_lossy().into_owned(), workspace: workspace.to_string_lossy().into_owned(), _home: dir }
     })
 }
 
@@ -116,8 +106,7 @@ fn the_path_policy_corpus_holds() {
 fn each_face_of_the_corpus_pins_both_answers() {
     let rows = rows();
     for (face, prefix) in [("read", "read-"), ("write", "write-")] {
-        let mine: Vec<bool> =
-            rows.iter().filter(|r| r.category.starts_with(prefix)).map(|r| r.want_allow).collect();
+        let mine: Vec<bool> = rows.iter().filter(|r| r.category.starts_with(prefix)).map(|r| r.want_allow).collect();
         assert!(mine.len() >= 10, "{face}: only {} rows — too thin to discriminate", mine.len());
         assert!(mine.iter().any(|a| *a), "{face}: corpus expects no allows, so refusing everything would pass");
         assert!(mine.iter().any(|a| !*a), "{face}: corpus expects no denies, so allowing everything would pass");

@@ -33,18 +33,13 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
 }
 
 static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[
-    "--cleanup", "--command-name", "--export-asciidoc", "--export-csv",
-    "--export-json", "--export-markdown", "--max-runs",
-    "--min-benchmarking-time", "--min-runs", "--output", "--prepare",
-    "--runs", "--setup", "--shell", "--sort", "--style",
-    "--time-unit", "--warmup",
-    "-M", "-S", "-c", "-m", "-n", "-p", "-r", "-s", "-w",
+    "--cleanup", "--command-name", "--export-asciidoc", "--export-csv", "--export-json", "--export-markdown", "--max-runs",
+    "--min-benchmarking-time", "--min-runs", "--output", "--prepare", "--runs", "--setup", "--shell", "--sort", "--style", "--time-unit",
+    "--warmup", "-M", "-S", "-c", "-m", "-n", "-p", "-r", "-s", "-w",
 ]);
 
-static HYPERFINE_FLAGS_NO_ARG: WordSet = WordSet::new(&[
-    "--help", "--ignore-failure", "--no-color", "--show-output", "--version",
-    "-N", "-V", "-h", "-i", "-u",
-]);
+static HYPERFINE_FLAGS_NO_ARG: WordSet =
+    WordSet::new(&["--help", "--ignore-failure", "--no-color", "--show-output", "--version", "-N", "-V", "-h", "-i", "-u"]);
 
 pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
     let mut combined = Verdict::Allowed(SafetyLevel::Inert);
@@ -58,9 +53,7 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
         if t.starts_with("-") {
             if t.contains("=") {
                 let name = t.as_str().split_once('=').map_or("", |(k, _)| k);
-                if HYPERFINE_FLAGS_WITH_ARG.iter().any(|f| f == name)
-                    || HYPERFINE_FLAGS_NO_ARG.iter().any(|f| f == name)
-                {
+                if HYPERFINE_FLAGS_WITH_ARG.iter().any(|f| f == name) || HYPERFINE_FLAGS_NO_ARG.iter().any(|f| f == name) {
                     i += 1;
                     continue;
                 }
@@ -108,14 +101,18 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
-        CommandDoc::handler("env",
+        CommandDoc::handler(
+            "env",
             "https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation",
             "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.",
-            "wrappers"),
-        CommandDoc::handler("hyperfine",
+            "wrappers",
+        ),
+        CommandDoc::handler(
+            "hyperfine",
             "https://github.com/sharkdp/hyperfine#readme",
             "Recursively validates each benchmarked command.",
-            "wrappers"),
+            "wrappers",
+        ),
     ]
 }
 

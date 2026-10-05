@@ -47,14 +47,7 @@ pub(super) fn walk_positionals<'a>(
 }
 
 /// Classify one flag token against a flag spec (slice form — see `walk_positionals`).
-fn classify_flag(
-    short: &[u8],
-    valued_short: &[u8],
-    long: &[&str],
-    valued_long: &[&str],
-    numeric_shorthand: bool,
-    t: &str,
-) -> FlagKind {
+fn classify_flag(short: &[u8], valued_short: &[u8], long: &[&str], valued_long: &[&str], numeric_shorthand: bool, t: &str) -> FlagKind {
     if let Some(rest) = t.strip_prefix("--") {
         let name_len = rest.split('=').next().unwrap_or(rest).len();
         let full = &t[..2 + name_len];

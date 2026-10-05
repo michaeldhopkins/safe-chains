@@ -52,10 +52,7 @@ fn run_cli(
     // worst behaviour available for a flag: `safe-chains --log "cmd"` reported the right verdict and
     // wrote no entry, so the first thing anyone would try to convince themselves logging worked
     // quietly proved the opposite. `harness: "cli"` distinguishes these from real hook traffic.
-    let level_name = engine_level.map_or_else(
-        || safe_chains::engine::bridge::default_band_top_name().to_string(),
-        |l| l.name.clone(),
-    );
+    let level_name = engine_level.map_or_else(|| safe_chains::engine::bridge::default_band_top_name().to_string(), |l| l.name.clone());
     let outcome = if allowed {
         safe_chains::decisionlog::Outcome::Allowed
     } else if explanation.parsed {
@@ -66,23 +63,13 @@ fn run_cli(
     safe_chains::decisionlog::record(
         log_mode,
         outcome,
-        &safe_chains::decisionlog::Context {
-            command,
-            cwd,
-            root,
-            session_id: None,
-            harness: "cli",
-            level: &level_name,
-        },
+        &safe_chains::decisionlog::Context { command, cwd, root, session_id: None, harness: "cli", level: &level_name },
         Some(&explanation),
     );
     process::exit(i32::from(!allowed));
 }
 
-fn run_explain(
-    command: &str,
-    engine_level: Option<&'static safe_chains::engine::level::Level>,
-) -> ! {
+fn run_explain(command: &str, engine_level: Option<&'static safe_chains::engine::level::Level>) -> ! {
     // Coverage here too, and for the same reason: the hook renders THIS explanation into the
     // model's context, so an `--explain` that omitted the user's own patterns showed a `✗` beside a
     // segment the agent had just watched be approved.
@@ -126,9 +113,7 @@ fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
     if auto_detect {
         let detected = targets::detect_installed(&home);
         if detected.is_empty() {
-            eprintln!(
-                "No supported tools detected on this machine. Run with --list-tools to see candidates."
-            );
+            eprintln!("No supported tools detected on this machine. Run with --list-tools to see candidates.");
             process::exit(1);
         }
         let mut any_failed = false;
@@ -172,8 +157,7 @@ fn main() {
 
     match cli {
         Ok(cli) => {
-            let log_mode =
-                safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
+            let log_mode = safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
             if let Some(Subcommand::Hook { tool }) = cli.subcommand {
                 hook_cli::run_hook_for(&tool, log_mode);
             }
@@ -210,14 +194,11 @@ fn main() {
                 //
                 // A process cwd is always available in practice; if it somehow isn't, fall back to
                 // the old boundary-less behaviour rather than inventing a root.
-                let effective_cwd = cli.cwd.clone().or_else(|| {
-                    std::env::current_dir().ok().map(|p| p.to_string_lossy().into_owned())
-                });
+                let effective_cwd = cli.cwd.clone().or_else(|| std::env::current_dir().ok().map(|p| p.to_string_lossy().into_owned()));
                 // Captured before the PathCtx consumes them, so a logged entry records the same
                 // directory context the classification ran under — the EFFECTIVE cwd, not the flag,
                 // or the log would disagree with the verdict beside it.
-                let (log_cwd, log_root) =
-                    (effective_cwd.clone(), cli.root.clone().or_else(|| effective_cwd.clone()));
+                let (log_cwd, log_root) = (effective_cwd.clone(), cli.root.clone().or_else(|| effective_cwd.clone()));
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
                     cwd: effective_cwd.clone(),
                     root: cli.root.or(effective_cwd),
@@ -267,23 +248,14 @@ fn main() {
                 if cli.suggest {
                     suggest_cli::run_suggest(&command);
                 }
-                run_cli(
-                    &command,
-                    threshold,
-                    engine_level,
-                    log_mode,
-                    log_cwd.as_deref(),
-                    log_root.as_deref(),
-                );
+                run_cli(&command, threshold, engine_level, log_mode, log_cwd.as_deref(), log_root.as_deref());
             } else if io::stdin().is_terminal() {
                 Cli::command().print_help().ok();
                 println!();
                 process::exit(2);
             } else {
                 let claude = targets::find("claude").expect("claude target registered");
-                let format = claude
-                    .hook_format()
-                    .expect("claude target has a hook format");
+                let format = claude.hook_format().expect("claude target has a hook format");
                 // The no-argument stdin path IS the Claude hook (see the CLI docs), so it keeps
                 // Claude's permission files as a trust source.
                 hook_cli::run_hook_format(format, "claude", log_mode);

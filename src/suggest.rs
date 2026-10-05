@@ -49,10 +49,7 @@ pub enum Outcome {
     RecognizedButDenied { names: Vec<String> },
     /// One or more unknown commands can be supported by the generated entries. `also_recognized`
     /// lists any recognized commands that also appear (informational).
-    Generated {
-        entries: Vec<GeneratedEntry>,
-        also_recognized: Vec<String>,
-    },
+    Generated { entries: Vec<GeneratedEntry>, also_recognized: Vec<String> },
 }
 
 /// Analyze `command` and decide what, if anything, `--suggest` can generate. Pure — no I/O.
@@ -85,9 +82,7 @@ pub fn analyze(command: &str) -> Outcome {
     }
 
     if unknown.is_empty() {
-        return Outcome::RecognizedButDenied {
-            names: recognized.into_iter().collect(),
-        };
+        return Outcome::RecognizedButDenied { names: recognized.into_iter().collect() };
     }
     let entries = unknown
         .into_iter()
@@ -98,10 +93,7 @@ pub fn analyze(command: &str) -> Outcome {
             level: DEFAULT_LEVEL.to_string(),
         })
         .collect();
-    Outcome::Generated {
-        entries,
-        also_recognized: recognized.into_iter().collect(),
-    }
+    Outcome::Generated { entries, also_recognized: recognized.into_iter().collect() }
 }
 
 /// The basename of a simple command's name word (`/usr/bin/foo` → `foo`), or `None` for an env-only
@@ -158,11 +150,7 @@ fn collect_cmd<'a>(cmd: &'a Cmd, out: &mut Vec<&'a SimpleCmd>) {
             collect_script(cond, out);
             collect_script(body, out);
         }
-        Cmd::If {
-            branches,
-            else_body,
-            ..
-        } => {
+        Cmd::If { branches, else_body, .. } => {
             for branch in branches {
                 collect_script(&branch.cond, out);
                 collect_script(&branch.body, out);
@@ -211,10 +199,7 @@ fn is_known(name: &str) -> bool {
 fn known_names() -> &'static BTreeSet<String> {
     static KNOWN: OnceLock<BTreeSet<String>> = OnceLock::new();
     KNOWN.get_or_init(|| {
-        let mut set: BTreeSet<String> = crate::docs::all_command_docs()
-            .into_iter()
-            .map(|d| d.name)
-            .collect();
+        let mut set: BTreeSet<String> = crate::docs::all_command_docs().into_iter().map(|d| d.name).collect();
         for name in registry::toml_command_names() {
             set.insert(name.to_string());
         }
@@ -287,11 +272,7 @@ pub fn merged_content(existing: &str, entries: &[GeneratedEntry]) -> String {
 
 /// The `[[trusted]]` pin the user pastes into `~/.config/safe-chains.toml` to approve the file.
 pub fn pin_block(canonical_dir: &str, hash: &str) -> String {
-    format!(
-        "[[trusted]]\npath = {}\nsha256 = {}\n",
-        toml_str(canonical_dir),
-        toml_str(hash),
-    )
+    format!("[[trusted]]\npath = {}\nsha256 = {}\n", toml_str(canonical_dir), toml_str(hash),)
 }
 
 #[cfg(test)]

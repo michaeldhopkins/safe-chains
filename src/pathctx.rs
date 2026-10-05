@@ -56,11 +56,7 @@ pub fn enter_cwd(cwd: Option<String>) -> Guard {
         let mut b = c.borrow_mut();
         // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
         // recognition (the session is the same session whatever directory it walks into).
-        PathCtx {
-            cwd: std::mem::replace(&mut b.cwd, cwd),
-            root: b.root.clone(),
-            session_id: b.session_id.clone(),
-        }
+        PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone(), session_id: b.session_id.clone() }
     }))
 }
 
@@ -232,11 +228,7 @@ pub fn expand_vars(path: &str, want_write: bool) -> Cow<'_, str> {
         VARS.with(|v| {
             let loops = lv.borrow();
             let vars = v.borrow();
-            if loops.is_empty() && vars.is_empty() {
-                None
-            } else {
-                expand_with(path, &loops, &vars, want_write)
-            }
+            if loops.is_empty() && vars.is_empty() { None } else { expand_with(path, &loops, &vars, want_write) }
         })
     });
     replaced.map_or(Cow::Borrowed(path), Cow::Owned)
@@ -302,8 +294,7 @@ fn is_var_name(s: &str) -> bool {
         return true;
     }
     let mut bytes = s.bytes();
-    matches!(bytes.next(), Some(b) if b.is_ascii_alphabetic() || b == b'_')
-        && bytes.all(|b| b.is_ascii_alphanumeric() || b == b'_')
+    matches!(bytes.next(), Some(b) if b.is_ascii_alphabetic() || b == b'_') && bytes.all(|b| b.is_ascii_alphanumeric() || b == b'_')
 }
 
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
@@ -326,11 +317,7 @@ pub fn resolve(path: &str) -> Cow<'_, str> {
             (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
                 // Relative → join onto cwd; absolute → normalize in place. Then express relative
                 // to root if inside (worktree), else absolute.
-                let abs = if path.starts_with('/') {
-                    lexical_join("/", path)
-                } else {
-                    lexical_join(cwd, path)
-                };
+                let abs = if path.starts_with('/') { lexical_join("/", path) } else { lexical_join(cwd, path) };
                 Some(express_relative_to_root(&abs, root))
             }
             _ => None,
@@ -369,10 +356,7 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     // locus, so letting it through the joins below keeps the cwd at that locus — `cd $(pwd) && cat
     // f` stays a worktree read, while `cd $(fd d /etc) && cat f` is a machine one. Refusing both
     // would have been sound but needlessly coarse.
-    if expanded.starts_with('~')
-        || expanded.contains('$')
-        || crate::cst::check::is_opaque_value(&expanded)
-    {
+    if expanded.starts_with('~') || expanded.contains('$') || crate::cst::check::is_opaque_value(&expanded) {
         return Some(UNRESOLVED_CWD.to_string());
     }
     if expanded.starts_with('/') {
@@ -436,11 +420,7 @@ mod tests {
     const SID: &str = "7676dbc5-a265-43b3-a0f8-49666792bd9b";
 
     fn with_session<T>(id: Option<&str>, f: impl FnOnce() -> T) -> T {
-        let _g = enter(PathCtx {
-            cwd: Some("/home/u/proj".into()),
-            root: Some("/home/u/proj".into()),
-            session_id: id.map(str::to_string),
-        });
+        let _g = enter(PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()), session_id: id.map(str::to_string) });
         f()
     }
 
@@ -495,10 +475,7 @@ mod tests {
         });
         for weak in ["", "abc", "1234567", "..", "/", "a/b", "id with space", "x*y"] {
             with_session(Some(weak), || {
-                assert!(
-                    !in_session_scratchpad(&format!("/tmp/{weak}/x.sh")),
-                    "weak id {weak:?} must not anchor recognition",
-                );
+                assert!(!in_session_scratchpad(&format!("/tmp/{weak}/x.sh")), "weak id {weak:?} must not anchor recognition",);
             });
         }
     }
@@ -545,7 +522,8 @@ mod tests {
         assert_eq!(resolve("/home/u/proj/../../etc/x"), "/home/etc/x", "climbs to /home, still outside root");
         assert_eq!(resolve("/home/u/proj/../../../etc/x"), "/etc/x", "escapes to /etc via ..");
         assert_eq!(
-            resolve("/home/u/proj-evil/secret"), "/home/u/proj-evil/secret",
+            resolve("/home/u/proj-evil/secret"),
+            "/home/u/proj-evil/secret",
             "a sibling dir is not confused for inside by bare string prefix",
         );
         // home / unpinnable → returned as-is (the classifiers handle these)

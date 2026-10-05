@@ -240,11 +240,7 @@ pub(crate) fn read_is_unshieldable(path: &str) -> bool {
         return true;
     }
     let expanded = crate::pathctx::expand_vars(path, false);
-    expanded.contains(IFS_WHITESPACE)
-        && expanded
-            .split(IFS_WHITESPACE)
-            .filter(|piece| !piece.is_empty())
-            .any(unshieldable_word)
+    expanded.contains(IFS_WHITESPACE) && expanded.split(IFS_WHITESPACE).filter(|piece| !piece.is_empty()).any(unshieldable_word)
 }
 
 /// One already-split word: it names a credential store, or it cannot be pinned down at all.
@@ -367,11 +363,7 @@ fn fold_spellings(path: &str) -> Cow<'_, str> {
         return Cow::Owned(tilded);
     }
     let absolute = tilded.starts_with('/');
-    let joined = tilded
-        .split('/')
-        .filter(|seg| !seg.is_empty() && *seg != ".")
-        .collect::<Vec<_>>()
-        .join("/");
+    let joined = tilded.split('/').filter(|seg| !seg.is_empty() && *seg != ".").collect::<Vec<_>>().join("/");
     Cow::Owned(if absolute { format!("/{joined}") } else { joined })
 }
 
@@ -382,9 +374,10 @@ fn file_url_local(path: &str) -> Option<&str> {
         return None;
     }
     let rest = &path[5..];
-    Some(rest.strip_prefix("//").map_or(rest, |authority| {
-        authority.find('/').map_or("", |i| &authority[i..])
-    }))
+    Some(
+        rest.strip_prefix("//")
+            .map_or(rest, |authority| authority.find('/').map_or("", |i| &authority[i..])),
+    )
 }
 
 /// Whether `path` is a network URL: a `scheme://…` whose scheme is well-formed (a letter, then
@@ -440,7 +433,6 @@ pub(crate) fn is_unpinnable(path: &str) -> bool {
         // confine, or a path that never went through it. Either way its value is unknown text, so
         // it worst-cases exactly like an opaque substitution. This is what keeps the atom claim
         // from widening anything by itself.
-        
         || is_parent_escape(path)
 }
 
@@ -517,10 +509,7 @@ fn neutralize_atoms(path: &str) -> Cow<'_, str> {
             // value is `.` spells `..`, and `..` beside an empty atom already IS `..`. Both
             // traverse with no separator anywhere, which is exactly what this was supposed to
             // rule out — `./out/.$(seq 1 1)` was admitted before this test existed.
-            if residue.is_empty()
-                || residue.chars().all(|c| c == '.')
-                || residue.contains(crate::cst::eval::TAGGED_PREFIX)
-            {
+            if residue.is_empty() || residue.chars().all(|c| c == '.') || residue.contains(crate::cst::eval::TAGGED_PREFIX) {
                 return UNPINNABLE_MARK.to_string();
             }
             comp.replace(atom, SUB_STANDIN)
@@ -544,10 +533,7 @@ mod atom_backstop {
     fn an_atom_sentinel_is_unpinnable_without_neutralization() {
         let atom = crate::cst::eval::ATOM_SENTINEL;
         assert!(super::is_unpinnable(atom), "a bare atom sentinel must fail closed");
-        assert!(
-            super::is_unpinnable(&format!("~/.ssh/dx_{atom}.txt")),
-            "an un-neutralized atom must fail closed wherever it appears"
-        );
+        assert!(super::is_unpinnable(&format!("~/.ssh/dx_{atom}.txt")), "an un-neutralized atom must fail closed wherever it appears");
         assert!(
             !super::is_unpinnable(&format!("~/.ssh/dx_{}.txt", super::SUB_STANDIN)),
             "the NEUTRALIZED form must be pinnable, or confinement could never pay off"
@@ -588,14 +574,8 @@ pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
         super::regions::Frozen::Rebind => Some(FrozenWrite::TrustRootDir),
         // Device BEFORE SystemIntegrity: `device` outranks it on the ladder, so the broader
         // test would swallow every raw device and mislabel it.
-        super::regions::Frozen::Nothing
-            if role.write_locus >= crate::engine::facet::LocalLocus::Device =>
-        {
-            Some(FrozenWrite::RawDevice)
-        }
-        super::regions::Frozen::Nothing
-            if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity =>
-        {
+        super::regions::Frozen::Nothing if role.write_locus >= crate::engine::facet::LocalLocus::Device => Some(FrozenWrite::RawDevice),
+        super::regions::Frozen::Nothing if role.write_locus >= crate::engine::facet::LocalLocus::SystemIntegrity => {
             Some(FrozenWrite::SystemIntegrity)
         }
         super::regions::Frozen::Nothing => None,
@@ -732,13 +712,7 @@ mod tests {
     #[test]
     fn file_urls_classify_the_local_path_they_name() {
         // every `file:` form, any case, resolves to the underlying local path
-        for p in [
-            "file:///etc/shadow",
-            "file://localhost/etc/shadow",
-            "file:/etc/shadow",
-            "FILE:///etc/shadow",
-            "File:///etc/shadow",
-        ] {
+        for p in ["file:///etc/shadow", "file://localhost/etc/shadow", "file:/etc/shadow", "FILE:///etc/shadow", "File:///etc/shadow"] {
             assert_eq!(read_locus(p), LocalLocus::Machine, "read {p}");
             assert_eq!(write_locus(p), LocalLocus::Machine, "write {p}");
         }

@@ -128,10 +128,7 @@ fn repo_config_path_from(start: &std::path::Path) -> std::path::PathBuf {
 /// The hash in the pin is of the target file with exactly this block added, so it is correct for a
 /// verbatim paste; the message says to recompute it otherwise, which is the same instruction that
 /// already applied to any later edit.
-fn emit_suggestion(
-    entries: &[safe_chains::suggest::GeneratedEntry],
-    also_recognized: &[String],
-) -> ! {
+fn emit_suggestion(entries: &[safe_chains::suggest::GeneratedEntry], also_recognized: &[String]) -> ! {
     use safe_chains::suggest;
 
     let target = repo_config_path();

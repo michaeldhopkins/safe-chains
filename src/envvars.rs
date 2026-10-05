@@ -142,13 +142,9 @@ struct Entry {
 /// embedded TOML because the compiled table keeps only what classification needs.
 #[cfg(test)]
 pub(crate) fn declared_twins() -> Vec<(String, String, String)> {
-    let parsed: Table =
-        toml::from_str(include_str!("../envvars.toml")).expect("embedded envvars.toml must parse");
-    let mut out: Vec<(String, String, String)> = parsed
-        .env
-        .into_iter()
-        .filter_map(|(name, e)| Some((name, e.twin_flag?, e.twin_base?)))
-        .collect();
+    let parsed: Table = toml::from_str(include_str!("../envvars.toml")).expect("embedded envvars.toml must parse");
+    let mut out: Vec<(String, String, String)> =
+        parsed.env.into_iter().filter_map(|(name, e)| Some((name, e.twin_flag?, e.twin_base?))).collect();
     out.sort();
     out
 }
@@ -183,11 +179,17 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
         match name.split_once('*') {
             Some((pre, suf)) => {
                 assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
-                globs.push((pre.to_string(), suf.to_string(),
-                            Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags }));
+                globs.push((
+                    pre.to_string(),
+                    suf.to_string(),
+                    Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags },
+                ));
             }
             None => {
-                exact.insert(name, Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags });
+                exact.insert(
+                    name,
+                    Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags },
+                );
             }
         }
     }
@@ -201,8 +203,7 @@ fn rule_of(name: &str) -> Option<&'static Rule> {
     TABLE.globs.iter().find_map(|(pre, suf, rule)| {
         // `len()` guard so a single `*` cannot match the empty middle twice over — `A_*_B` must not
         // match `A__B` by letting prefix and suffix overlap.
-        (name.len() >= pre.len() + suf.len() && name.starts_with(pre.as_str()) && name.ends_with(suf.as_str()))
-            .then_some(rule)
+        (name.len() >= pre.len() + suf.len() && name.starts_with(pre.as_str()) && name.ends_with(suf.as_str())).then_some(rule)
     })
 }
 
@@ -266,8 +267,7 @@ fn option_string_verdict(value: &str, allowed: &[String], path_flags: &[PathFlag
         // target allows and an out-of-worktree one denies — the same answer the command-line
         // spelling of that path would get. Checked before `allowed` so a flag cannot be listed in
         // both and reach the ungated branch.
-        if let Some((role, path, used)) = path_flag_match(raw[i], raw.get(i + 1).copied(), path_flags)
-        {
+        if let Some((role, path, used)) = path_flag_match(raw[i], raw.get(i + 1).copied(), path_flags) {
             if path.is_empty() {
                 return Verdict::Denied;
             }
@@ -278,11 +278,7 @@ fn option_string_verdict(value: &str, allowed: &[String], path_flags: &[PathFlag
         // A bare short flag that takes a separate value (`-C opt-level=3`, `-I lib`) is glued to the
         // next token so the pair is matched as one unit.
         let joined;
-        let unit = if raw[i].len() <= 2
-            && raw[i].starts_with('-')
-            && i + 1 < raw.len()
-            && !raw[i + 1].starts_with('-')
-        {
+        let unit = if raw[i].len() <= 2 && raw[i].starts_with('-') && i + 1 < raw.len() && !raw[i + 1].starts_with('-') {
             joined = format!("{}{}", raw[i], raw[i + 1]);
             i += 2;
             joined.as_str()
@@ -300,16 +296,9 @@ fn option_string_verdict(value: &str, allowed: &[String], path_flags: &[PathFlag
 /// `(role, value, tokens consumed)` when `tok` is a declared path flag. A space-separated flag with
 /// nothing after it yields an empty value, which the caller refuses — a flag whose path we cannot
 /// see is not the bare flag.
-fn path_flag_match<'a>(
-    tok: &'a str,
-    next: Option<&'a str>,
-    path_flags: &[PathFlagEntry],
-) -> Option<(PathRole, &'a str, usize)> {
+fn path_flag_match<'a>(tok: &'a str, next: Option<&'a str>, path_flags: &[PathFlagEntry]) -> Option<(PathRole, &'a str, usize)> {
     path_flags.iter().find_map(|pf| match pf.sep {
-        Sep::Equals => tok
-            .split_once('=')
-            .filter(|(f, _)| *f == pf.flag)
-            .map(|(_, v)| (pf.role, v, 1)),
+        Sep::Equals => tok.split_once('=').filter(|(f, _)| *f == pf.flag).map(|(_, v)| (pf.role, v, 1)),
         // A `-`-prefixed next token is NOT the value: `java` rejects `-cp -XX:…` outright with
         // "requires class path specification". Refusing to consume it keeps that token in the
         // normal flag path instead of swallowing it unvalidated, which is the same rule the
@@ -379,11 +368,9 @@ mod tests {
     #[test]
     fn the_table_parses_and_covers_the_measured_vectors() {
         for name in [
-            "LD_PRELOAD", "DYLD_INSERT_LIBRARIES", "BASH_ENV", "PYTHONPATH", "PHPRC",
-            "PHP_INI_SCAN_DIR", "RUSTC_WRAPPER", "GIT_SSH_COMMAND", "GIT_DIR",
-            "DOTNET_STARTUP_HOOKS", "PERL5LIB", "RUBYLIB",
-            "CLASSPATH", "JAVA_TOOL_OPTIONS", "_JAVA_OPTIONS", "JDK_JAVA_OPTIONS", "GOFLAGS",
-            "LUA_INIT", "JULIA_LOAD_PATH", "JULIA_DEPOT_PATH", "R_PROFILE_USER",
+            "LD_PRELOAD", "DYLD_INSERT_LIBRARIES", "BASH_ENV", "PYTHONPATH", "PHPRC", "PHP_INI_SCAN_DIR", "RUSTC_WRAPPER",
+            "GIT_SSH_COMMAND", "GIT_DIR", "DOTNET_STARTUP_HOOKS", "PERL5LIB", "RUBYLIB", "CLASSPATH", "JAVA_TOOL_OPTIONS", "_JAVA_OPTIONS",
+            "JDK_JAVA_OPTIONS", "GOFLAGS", "LUA_INIT", "JULIA_LOAD_PATH", "JULIA_DEPOT_PATH", "R_PROFILE_USER",
         ] {
             assert!(shape_of(name).is_some(), "envvars.toml is missing a measured vector: {name}");
         }
@@ -437,14 +424,8 @@ mod tests {
             );
         }
         for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH"] {
-            assert!(
-                !assignment_verdict(single, "/tmp/evil").is_allowed(),
-                "{single} must still refuse a foreign executor"
-            );
-            assert!(
-                assignment_verdict(single, "ssh").is_allowed(),
-                "{single} must still accept a bare name on $PATH"
-            );
+            assert!(!assignment_verdict(single, "/tmp/evil").is_allowed(), "{single} must still refuse a foreign executor");
+            assert!(assignment_verdict(single, "ssh").is_allowed(), "{single} must still accept a bare name on $PATH");
         }
     }
 
@@ -471,8 +452,8 @@ mod tests {
             // original three values missed. Three values was never a proof; these span the shapes
             // that actually distinguish the two gates - colons, traversal, roots, bare names.
             for value in [
-                "/tmp/evil", "./bin/tool", "ssh", ":/:", "x:/tmp/evil", "a:b", "..", "/",
-                "./a:./b", "~/.ssh/id_rsa", ".", "/etc/shadow", "sub/dir/tool",
+                "/tmp/evil", "./bin/tool", "ssh", ":/:", "x:/tmp/evil", "a:b", "..", "/", "./a:./b", "~/.ssh/id_rsa", ".", "/etc/shadow",
+                "sub/dir/tool",
                 // Command LINES. Every value above is a single token, so the corpus could not see
                 // the case where one gate treats the value as a path and the other as a command:
                 // `--rsh 'sh -c evil'` was auto-approved (the pathgate pre-filter skipped it as
@@ -484,19 +465,13 @@ mod tests {
                 // Multi-word values are quoted so both spellings still see ONE value; unquoted,
                 // the extra words would become separate arguments and the two forms would stop
                 // denoting the same operation.
-                let quoted = if value.contains(char::is_whitespace) {
-                    format!("'{value}'")
-                } else {
-                    value.to_string()
-                };
+                let quoted = if value.contains(char::is_whitespace) { format!("'{value}'") } else { value.to_string() };
                 let flag_form = flag_tmpl.replace("{v}", &quoted);
                 let env_form = format!("{name}={quoted} {base}");
                 let by_flag = crate::is_safe_command(&flag_form);
                 let by_env = crate::is_safe_command(&env_form);
                 if by_flag != by_env {
-                    failures.push(format!(
-                        "{name}: `{flag_form}` -> {by_flag} but `{env_form}` -> {by_env}"
-                    ));
+                    failures.push(format!("{name}: `{flag_form}` -> {by_flag} but `{env_form}` -> {by_env}"));
                 }
                 verdicts.push(by_flag);
             }
@@ -597,13 +572,8 @@ mod integration_tests {
     #[test]
     fn an_unlisted_assignment_changes_nothing() {
         for cmd in [
-            "FOO=bar ls",
-            "RUSTUP_TOOLCHAIN=stable cargo test",
-            "RACK_ENV=test bundle install",
-            "RAILS_ENV=test bundle exec rspec",
-            "NODE_ENV=production npm ci --ignore-scripts",
-            "PROJECT=safe-chains QUERY=x ls",
-            "TZ=UTC date",
+            "FOO=bar ls", "RUSTUP_TOOLCHAIN=stable cargo test", "RACK_ENV=test bundle install", "RAILS_ENV=test bundle exec rspec",
+            "NODE_ENV=production npm ci --ignore-scripts", "PROJECT=safe-chains QUERY=x ls", "TZ=UTC date",
         ] {
             assert!(crate::is_safe_command(cmd), "an unlisted assignment caused a denial: {cmd}");
         }
@@ -614,12 +584,8 @@ mod integration_tests {
     #[test]
     fn a_listed_name_with_a_benign_value_still_allows() {
         for cmd in [
-            "GIT_PAGER=cat git log",
-            "GIT_PAGER= git log",          // empty un-sets it
-            "GIT_DIR=.git git log",
-            "PYTHONPATH=./lib ls",
-            "PERL5LIB=./lib ls",
-            "LD_PRELOAD= ls",
+            "GIT_PAGER= git log", // empty un-sets it
+            "GIT_PAGER=cat git log", "GIT_DIR=.git git log", "PYTHONPATH=./lib ls", "PERL5LIB=./lib ls", "LD_PRELOAD= ls",
         ] {
             assert!(crate::is_safe_command(cmd), "a benign value was denied: {cmd}");
         }
@@ -639,12 +605,15 @@ mod integration_tests {
     #[test]
     fn an_env_twin_of_a_denied_flag_also_denies() {
         for (flag_form, env_form) in [
-            ("cargo test --config target.x86_64-apple-darwin.runner=/tmp/evil",
-             "CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER=/tmp/evil cargo test"),
-            ("cargo build --config build.rustc-wrapper=/tmp/evil",
-             "RUSTC_WRAPPER=/tmp/evil cargo build"),
-            ("git -c core.pager='sh -c evil' log",
-             "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.pager GIT_CONFIG_VALUE_0='sh -c evil' git log"),
+            (
+                "cargo test --config target.x86_64-apple-darwin.runner=/tmp/evil",
+                "CARGO_TARGET_X86_64_APPLE_DARWIN_RUNNER=/tmp/evil cargo test",
+            ),
+            ("cargo build --config build.rustc-wrapper=/tmp/evil", "RUSTC_WRAPPER=/tmp/evil cargo build"),
+            (
+                "git -c core.pager='sh -c evil' log",
+                "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.pager GIT_CONFIG_VALUE_0='sh -c evil' git log",
+            ),
         ] {
             assert!(!crate::is_safe_command(flag_form), "sanity: the flag form should deny: {flag_form}");
             assert!(!crate::is_safe_command(env_form), "the env twin was allowed: {env_form}");
@@ -772,20 +741,13 @@ mod integration_tests {
     #[test]
     fn a_listed_flag_does_not_admit_a_longer_flag_that_merely_starts_the_same_way() {
         for cmd in [
-            "GOFLAGS='-modfile=/tmp/evil.mod' go list ./...",
-            "GOFLAGS='-vet=off' go vet ./...",
-            "GOFLAGS='-nolocalimports' go list ./...",
-            "GOFLAGS='-runtime=x' go list ./...",
-            "RUSTDOCFLAGS='--cfgevil' cargo doc",
+            "GOFLAGS='-modfile=/tmp/evil.mod' go list ./...", "GOFLAGS='-vet=off' go vet ./...", "GOFLAGS='-nolocalimports' go list ./...",
+            "GOFLAGS='-runtime=x' go list ./...", "RUSTDOCFLAGS='--cfgevil' cargo doc",
         ] {
             assert!(!crate::is_safe_command(cmd), "a longer flag was admitted by prefix: {cmd}");
         }
         // ...while the flag itself, bare or carrying a value, still works.
-        for cmd in [
-            "GOFLAGS='-mod=vendor' go list ./...",
-            "GOFLAGS='-v -x' go list ./...",
-            "GOFLAGS=-trimpath go list ./...",
-        ] {
+        for cmd in ["GOFLAGS='-mod=vendor' go list ./...", "GOFLAGS='-v -x' go list ./...", "GOFLAGS=-trimpath go list ./..."] {
             assert!(crate::is_safe_command(cmd), "a listed flag was denied: {cmd}");
         }
     }
@@ -880,11 +842,7 @@ mod integration_tests {
             ("RUSTFLAGS='-Cincremental=./x' true", "export RUSTFLAGS='-Cincremental=./x'"),
             ("FOO=bar true", "export FOO=bar"),
         ] {
-            assert_eq!(
-                crate::command_verdict(prefix),
-                crate::command_verdict(alternate),
-                "`{prefix}` and `{alternate}` disagree on level",
-            );
+            assert_eq!(crate::command_verdict(prefix), crate::command_verdict(alternate), "`{prefix}` and `{alternate}` disagree on level",);
         }
     }
 
@@ -902,17 +860,10 @@ mod integration_tests {
             crate::command_verdict("touch ./x"),
             "an env-spelled worktree write must classify as that write does",
         );
-        assert_eq!(
-            crate::command_verdict("RUSTFLAGS='-Cincremental=./x' echo hi"),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-        );
+        assert_eq!(crate::command_verdict("RUSTFLAGS='-Cincremental=./x' echo hi"), Verdict::Allowed(SafetyLevel::SafeWrite),);
         // ...and an assignment with no effect on state does not escalate anything.
         for cmd in ["RUSTFLAGS='-Copt-level=3' echo hi", "FOO=bar echo hi", "echo hi"] {
-            assert_eq!(
-                crate::command_verdict(cmd),
-                Verdict::Allowed(SafetyLevel::Inert),
-                "an inert assignment escalated: {cmd}",
-            );
+            assert_eq!(crate::command_verdict(cmd), Verdict::Allowed(SafetyLevel::Inert), "an inert assignment escalated: {cmd}",);
         }
     }
 
@@ -1032,10 +983,7 @@ mod integration_tests {
             for entry in &rule.allowed {
                 let core = entry.strip_suffix('*').unwrap_or(entry);
                 assert!(!core.is_empty(), "a bare `*` entry admits every token of the option string");
-                assert!(
-                    core.starts_with('-'),
-                    "`{entry}` does not start with `-`, so it matches bare value tokens, not a flag"
-                );
+                assert!(core.starts_with('-'), "`{entry}` does not start with `-`, so it matches bare value tokens, not a flag");
             }
             for pf in &rule.path_flags {
                 assert!(pf.flag.starts_with('-'), "path flag `{}` is not a flag", pf.flag);
@@ -1056,10 +1004,9 @@ mod integration_tests {
             for entry in &rule.allowed {
                 checked += 1;
                 match entry.strip_suffix('*') {
-                    Some(prefix) => assert!(
-                        super::flag_matches(&format!("{prefix}zz"), entry),
-                        "{entry} is starred but rejects its own extension"
-                    ),
+                    Some(prefix) => {
+                        assert!(super::flag_matches(&format!("{prefix}zz"), entry), "{entry} is starred but rejects its own extension")
+                    }
                     None => {
                         assert!(super::flag_matches(entry, entry), "{entry} rejects itself");
                         assert!(

@@ -40,34 +40,19 @@ mod tests {
     fn reads_reach_the_machine_rung_and_stop_at_the_shield() {
         check(
             &[
-                "cat ./notes.md",
-                "grep -r TODO ./src",
-                "cat /tmp/scratch.txt",
+                "cat ./notes.md", "grep -r TODO ./src", "cat /tmp/scratch.txt",
                 // ordinary machine-rung files: config, binaries, trust stores
-                "cat /etc/hosts",
-                "cat /etc/passwd",
-                "cat /usr/bin/python3",
-                "cat /etc/ssl/certs/ca-certificates.crt",
+                "cat /etc/hosts", "cat /etc/passwd", "cat /usr/bin/python3", "cat /etc/ssl/certs/ca-certificates.crt",
                 // ordinary home files, dotfiles included
-                "cat ~/notes.txt",
-                "cat ~/Documents/taxes.pdf",
-                "cat ~/.bashrc",
+                "cat ~/notes.txt", "cat ~/Documents/taxes.pdf", "cat ~/.bashrc",
             ],
             &[
                 // secrets — denied and un-grantable (the shield)
-                "cat /etc/shadow",
-                "cat ~/.ssh/id_rsa",
-                "cat ~/.aws/credentials",
-                "cat ~/.gnupg/secring.gpg",
-                "cat ~/.netrc",
-                "cat ~/.kube/config",
-                "cat ~/.docker/config.json",
-                // another user's home is private whatever its rung
-                "cat /root/.bashrc",
-                // unpinnable: we cannot tell WHICH file, so the shield cannot clear it
-                "cat $SECRET",
-                // climbing out does not launder the name it lands on
-                "cat ../../../etc/shadow",
+                "cat /etc/shadow", "cat ~/.ssh/id_rsa", "cat ~/.aws/credentials", "cat ~/.gnupg/secring.gpg", "cat ~/.netrc",
+                "cat ~/.kube/config", "cat ~/.docker/config.json",
+                "cat /root/.bashrc",       // another user's home is private whatever its rung
+                "cat $SECRET",             // unpinnable: we cannot tell WHICH file, so the shield cannot clear it
+                "cat ../../../etc/shadow", // climbing out does not launder the name it lands on
             ],
         );
     }
@@ -76,31 +61,13 @@ mod tests {
     fn writes_and_deletes_worktree_yes_system_no() {
         check(
             &[
-                "rm ./stale.log",
-                "rm -rf ./node_modules",
-                "sed -i s/a/b/ ./config.txt",
-                "touch ./newfile",
-                "mkdir ./build",
-                "cp ./a ./b",
-                "mv ./a ./b",
-                "rm /tmp/junk",
-                "touch /tmp/marker",
-                "cp ./a /tmp/b",
+                "rm ./stale.log", "rm -rf ./node_modules", "sed -i s/a/b/ ./config.txt", "touch ./newfile", "mkdir ./build", "cp ./a ./b",
+                "mv ./a ./b", "rm /tmp/junk", "touch /tmp/marker", "cp ./a /tmp/b",
             ],
             &[
-                "rm /etc/hosts",
-                "rm -rf /etc",
-                "sed -i s/a/b/ /etc/hosts",
-                "touch /etc/newfile",
-                "mkdir /etc/foo",
-                "cp ./a /etc/hosts",
-                "mv ./a /etc/hosts",
-                "dd if=./a of=/etc/hosts",
-                "rm /usr/bin/python3",
-                "touch /usr/local/bin/x",
-                "rm ~/.bashrc",
-                "sed -i s/a/b/ ~/.ssh/authorized_keys",
-                "cp ./key ~/.ssh/authorized_keys",
+                "rm /etc/hosts", "rm -rf /etc", "sed -i s/a/b/ /etc/hosts", "touch /etc/newfile", "mkdir /etc/foo", "cp ./a /etc/hosts",
+                "mv ./a /etc/hosts", "dd if=./a of=/etc/hosts", "rm /usr/bin/python3", "touch /usr/local/bin/x", "rm ~/.bashrc",
+                "sed -i s/a/b/ ~/.ssh/authorized_keys", "cp ./key ~/.ssh/authorized_keys",
             ],
         );
     }
@@ -110,22 +77,15 @@ mod tests {
         check(
             &[
                 // worktree→worktree / →temp transfers
-                "cp ./a ./b",
-                "cp ./a /tmp/b",
-                "dd if=./a of=/tmp/h",
-                "cp /etc/hosts ./hosts.bak",
+                "cp ./a ./b", "cp ./a /tmp/b", "dd if=./a of=/tmp/h", "cp /etc/hosts ./hosts.bak",
             ],
             &[
                 // a transfer is gated on its SOURCE's name, not its rung: copying an ordinary
                 // machine file in is fine, copying a credential store in is the same theft it
                 // would be to cat it — the worktree copy is readable afterwards.
-                "cp ~/.ssh/id_rsa ./stolen",
-                "cp /etc/shadow ./x",
-                "dd if=~/.ssh/id_rsa of=./x",
+                "cp ~/.ssh/id_rsa ./stolen", "cp /etc/shadow ./x", "dd if=~/.ssh/id_rsa of=./x",
                 // raw devices are their own rung, above where reads reach
-                "dd if=/dev/rdisk0 of=./image",
-                "dd if=./a of=/dev/sda",
-                "cat /dev/mem",
+                "dd if=/dev/rdisk0 of=./image", "dd if=./a of=/dev/sda", "cat /dev/mem",
             ],
         );
     }
@@ -137,10 +97,7 @@ mod tests {
             &[
                 // {} binds to a GENERIC /etc file (unknown → deny): the traversal could hit
                 // /etc/shadow, not only the recognized public configs.
-                "find /etc -exec cat {} \\;",
-                "find / -exec cat {} \\;",
-                "find ~ -exec cat {} \\;",
-                "find / -print0 | xargs -0 rm",
+                "find /etc -exec cat {} \\;", "find / -exec cat {} \\;", "find ~ -exec cat {} \\;", "find / -print0 | xargs -0 rm",
             ],
         );
     }
@@ -153,23 +110,14 @@ mod tests {
         check_os(
             "linux",
             &[
-                "cat ./notes.md",
-                "cat /tmp/x",
-                "cat /proc/cpuinfo",
-                "cat /proc/sys/net/ipv4/ip_forward",
-                "cat /sys/class/net/eth0/address",
-                "cat /var/log/syslog",
+                "cat ./notes.md", "cat /tmp/x", "cat /proc/cpuinfo", "cat /proc/sys/net/ipv4/ip_forward",
+                "cat /sys/class/net/eth0/address", "cat /var/log/syslog",
             ],
             &[
-                "cat /proc/self/environ",
-                "cat /proc/1234/environ",
-                "cat /proc/self/mem",
-                "cat /proc/1234/cmdline",
+                "cat /proc/self/environ", "cat /proc/1234/environ", "cat /proc/self/mem", "cat /proc/1234/cmdline",
                 // auth logs carry credentials outright — a password mistyped at a username
                 // prompt is written to them in the clear
-                "cat /var/log/auth.log",
-                "cat /var/log/secure",
-                "dd if=./a of=/dev/sda",
+                "cat /var/log/auth.log", "cat /var/log/secure", "dd if=./a of=/dev/sda",
             ],
         );
     }
@@ -188,12 +136,9 @@ mod tests {
                 "cat /usr/bin/swift",
             ],
             &[
-                "cat ~/Library/Keychains/login.keychain-db",
-                "cat /etc/master.passwd",
+                "cat ~/Library/Keychains/login.keychain-db", "cat /etc/master.passwd",
                 // the firmlinked spelling of the same file
-                "cat /private/etc/master.passwd",
-                "touch /Library/LaunchDaemons/evil.plist",
-                "dd if=/dev/rdisk0 of=./img",
+                "cat /private/etc/master.passwd", "touch /Library/LaunchDaemons/evil.plist", "dd if=/dev/rdisk0 of=./img",
             ],
         );
     }

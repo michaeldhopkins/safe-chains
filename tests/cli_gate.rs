@@ -46,12 +46,8 @@ fn overreach_nudge_names_the_working_directory() {
     // all — reading a named file outside the workspace is ordinary now, so there is nothing to
     // nudge about. The nudge fires where reaching out is still refused, and both remaining shapes
     // must name the cwd (the mismatch cue) and the path they reached.
-    for (command, reached) in [
-        (r"echo x > /other/repo/x.rs", "/other/repo/x.rs"),
-        (r"grep -r x /other/repo", "/other/repo"),
-    ] {
-        let payload =
-            format!(r#"{{"tool_input":{{"command":"{command}"}},"cwd":"/work/here"}}"#);
+    for (command, reached) in [(r"echo x > /other/repo/x.rs", "/other/repo/x.rs"), (r"grep -r x /other/repo", "/other/repo")] {
+        let payload = format!(r#"{{"tool_input":{{"command":"{command}"}},"cwd":"/work/here"}}"#);
         let out = hook_stdout(&payload, env!("CARGO_MANIFEST_DIR"), home.path());
         assert!(out.contains("/work/here"), "nudge must NAME the working directory: {out}");
         assert!(out.contains(reached), "nudge must name the reached path: {out}");
@@ -172,11 +168,7 @@ fn suggest_refuses_a_config_it_cannot_parse() {
         .code()
         .unwrap_or(-1);
     assert_eq!(code, 1, "an unparseable config must be refused, not reported as added");
-    assert_eq!(
-        std::fs::read_to_string(&cfg).expect("read"),
-        original,
-        "refusing must leave the file untouched"
-    );
+    assert_eq!(std::fs::read_to_string(&cfg).expect("read"), original, "refusing must leave the file untouched");
 
     // The VALID case, so the refusal above cannot be satisfied by declining everything: it still
     // succeeds and still produces the entry — on STDOUT. `--suggest` writes nothing at all now, so
@@ -197,11 +189,7 @@ fn suggest_refuses_a_config_it_cannot_parse() {
     let text = String::from_utf8_lossy(&out.stdout);
     assert!(text.contains("frobnicate"), "the generated entry must be printed:\n{text}");
     assert!(text.contains("[[trusted]]"), "the pin must be printed:\n{text}");
-    assert_eq!(
-        std::fs::read_to_string(&cfg).expect("read"),
-        original,
-        "--suggest must not modify the project config"
-    );
+    assert_eq!(std::fs::read_to_string(&cfg).expect("read"), original, "--suggest must not modify the project config");
 }
 
 /// `--suggest` writes NOTHING — not even to a project that has no config yet.
@@ -229,10 +217,7 @@ fn suggest_creates_no_file_in_a_fresh_project() {
     assert_eq!(out.status.code().unwrap_or(-1), 0, "suggesting is not a failure");
     let text = String::from_utf8_lossy(&out.stdout);
     assert!(text.contains("frobnicate"), "the entry must still be printed:\n{text}");
-    assert!(
-        !proj.join(".safe-chains.toml").exists(),
-        "--suggest created a config file; it is informational and must write nothing"
-    );
+    assert!(!proj.join(".safe-chains.toml").exists(), "--suggest created a config file; it is informational and must write nothing");
 }
 
 /// The levels must genuinely DISCRIMINATE, or the `level_monotonic` fuzz target is theatre.
@@ -251,8 +236,7 @@ fn levels_admit_strictly_more_as_they_loosen() {
         ("developer", [true, true, true, false]),
         ("network-admin", [true, true, true, true]),
     ];
-    const COMMANDS: [&str; 4] =
-        ["cat ./a.txt", "echo hi > ./a.txt", "rm ./a.txt", "git push origin main"];
+    const COMMANDS: [&str; 4] = ["cat ./a.txt", "echo hi > ./a.txt", "rm ./a.txt", "git push origin main"];
 
     let cwd = std::env::current_dir().expect("cwd");
     let root = cwd.display().to_string();
@@ -268,10 +252,7 @@ fn levels_admit_strictly_more_as_they_loosen() {
                 .code()
                 .unwrap_or(-1);
             let allowed = code == 0;
-            assert_eq!(
-                allowed, *want,
-                "level `{level}` on `{command}`: expected allowed={want}, got {allowed}"
-            );
+            assert_eq!(allowed, *want, "level `{level}` on `{command}`: expected allowed={want}, got {allowed}");
         }
     }
 }
@@ -306,28 +287,15 @@ fn the_cli_and_the_hook_agree_in_the_same_directory() {
     let home = tempfile::tempdir().expect("tempdir");
     std::fs::create_dir_all(home.path().join(".claude")).expect("mkdir .claude");
     std::fs::create_dir_all(home.path().join(".config")).expect("mkdir .config");
-    std::fs::write(
-        home.path().join(".claude/settings.json"),
-        r#"{"permissions":{"allow":["Bash(cat:*)","Read(//opt/vendor/**)"]}}"#,
-    )
-    .expect("write settings.json");
+    std::fs::write(home.path().join(".claude/settings.json"), r#"{"permissions":{"allow":["Bash(cat:*)","Read(//opt/vendor/**)"]}}"#)
+        .expect("write settings.json");
     std::fs::write(home.path().join(".config/safe-chains.toml"), "").expect("write config");
 
-    const OUTSIDE: &[&str] = &[
-        "/etc",
-        "/usr/share/vendor",
-        "~/Library/Preferences/calibre",
-        "/Users/someone/other-project",
-    ];
+    const OUTSIDE: &[&str] = &["/etc", "/usr/share/vendor", "~/Library/Preferences/calibre", "/Users/someone/other-project"];
     // A spread across the roles the boundary treats differently: a named read, an archive listing,
     // an unbounded sweep, a redirect write, a destroy, an in-place edit.
     const BODIES: &[&str] = &[
-        "cat notes.txt",
-        "unzip -l archive.zip",
-        "tar -tf bundle.tar",
-        "grep -r TODO .",
-        "echo x > out.txt",
-        "rm -rf build",
+        "cat notes.txt", "unzip -l archive.zip", "tar -tf bundle.tar", "grep -r TODO .", "echo x > out.txt", "rm -rf build",
         "sed -i s/a/b/ notes.txt",
     ];
 
@@ -359,8 +327,7 @@ fn the_cli_and_the_hook_agree_in_the_same_directory() {
             "cwd": workspace,
         })
         .to_string();
-        let hook_allowed = hook_stdout(&payload, workspace, home.path())
-            .contains(r#""permissionDecision":"allow""#);
+        let hook_allowed = hook_stdout(&payload, workspace, home.path()).contains(r#""permissionDecision":"allow""#);
 
         assert_eq!(
             cli_allowed, hook_allowed,

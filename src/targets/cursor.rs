@@ -25,10 +25,7 @@ impl Target for CursorTarget {
         let dir = home.join(".cursor");
         if !dir.exists() {
             return Ok(InstallOutcome::Skipped {
-                reason: format!(
-                    "~/.cursor not found at {} (Cursor not installed for this user)",
-                    dir.display()
-                ),
+                reason: format!("~/.cursor not found at {} (Cursor not installed for this user)", dir.display()),
             });
         }
 
@@ -36,10 +33,8 @@ impl Target for CursorTarget {
         let binary = "safe-chains hook cursor";
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let mut settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
@@ -47,15 +42,13 @@ impl Target for CursorTarget {
 
             add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = json!({"version": 1});
             add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
     }
@@ -92,8 +85,7 @@ struct CursorHookEnvelope {
 
 impl HookFormat for CursorHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let mut envelope: CursorHookEnvelope =
-            serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        let mut envelope: CursorHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Self-filter on the EVENT, since cursor's payload names no tool. An absent name still
         // passes: the hook is configured under a specific event, and refusing an envelope that
         // omits the field would break any version that does not send it.
@@ -127,15 +119,9 @@ impl HookFormat for CursorHookFormat {
                 "permission": "allow",
                 "agent_message": reason,
             });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
         } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+            HookResponse { stdout: String::new(), exit_code: 0 }
         }
     }
 
@@ -153,10 +139,7 @@ impl HookFormat for CursorHookFormat {
             "user_message": reason,
             "agent_message": reason,
         });
-        HookResponse {
-            stdout: serde_json::to_string(&body).unwrap_or_default(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
     }
 }
 
@@ -173,12 +156,9 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|h| h.get("beforeShellExecution"))
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
-            entries.iter().any(|entry| {
-                entry
-                    .get("command")
-                    .and_then(|c| c.as_str())
-                    .is_some_and(|cmd| cmd.contains("safe-chains"))
-            })
+            entries
+                .iter()
+                .any(|entry| entry.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
         })
 }
 
@@ -258,10 +238,7 @@ mod tests {
         let settings: Value = serde_json::from_str(&contents).unwrap();
         assert!(has_safe_chains_hook(&settings));
         assert!(
-            settings
-                .pointer("/hooks/afterFileEdit")
-                .and_then(|a| a.as_array())
-                .is_some_and(|a| !a.is_empty()),
+            settings.pointer("/hooks/afterFileEdit").and_then(|a| a.as_array()).is_some_and(|a| !a.is_empty()),
             "existing afterFileEdit hook must be preserved"
         );
     }
@@ -296,13 +273,8 @@ mod tests {
     #[test]
     fn parse_input_abstains_on_a_foreign_hook_event() {
         for event in ["beforeReadFile", "afterFileEdit", "beforeSubmitPrompt", "stop"] {
-            let envelope = format!(
-                r#"{{"hook_event_name":"{event}","command":"rm -rf /","workspace_roots":["/w"]}}"#
-            );
-            assert!(
-                CursorHookFormat.parse_input(&envelope).is_err(),
-                "decided on a {event} envelope"
-            );
+            let envelope = format!(r#"{{"hook_event_name":"{event}","command":"rm -rf /","workspace_roots":["/w"]}}"#);
+            assert!(CursorHookFormat.parse_input(&envelope).is_err(), "decided on a {event} envelope");
         }
 
         // The shell event still parses, or "reject everything" would satisfy the above.
@@ -378,10 +350,7 @@ mod tests {
         let v: Value = serde_json::from_str(&r.stdout).unwrap();
         assert_eq!(v.get("permission").and_then(|s| s.as_str()), Some("deny"));
         // Cursor renders `user_message` in the client and passes `agent_message` to the model.
-        assert_eq!(
-            v.get("user_message").and_then(|s| s.as_str()),
-            Some("safe-chains blocked this: not on the allowlist"),
-        );
+        assert_eq!(v.get("user_message").and_then(|s| s.as_str()), Some("safe-chains blocked this: not on the allowlist"),);
         assert!(v.get("agent_message").and_then(|s| s.as_str()).is_some());
         assert!(v.get("permissionDecision").is_none());
     }

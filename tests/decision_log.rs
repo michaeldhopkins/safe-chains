@@ -62,10 +62,7 @@ fn hook_env(command: &str, home: Option<&std::path::Path>, flags: &[&str]) -> Ru
         .write_all(payload.as_bytes())
         .expect("write the hook payload");
     let out = child.wait_with_output().expect("wait for safe-chains");
-    Run {
-        stdout: String::from_utf8_lossy(&out.stdout).into_owned(),
-        exit: out.status.code().unwrap_or(-1),
-    }
+    Run { stdout: String::from_utf8_lossy(&out.stdout).into_owned(), exit: out.status.code().unwrap_or(-1) }
 }
 
 fn tmp_home(tag: &str) -> std::path::PathBuf {
@@ -107,8 +104,7 @@ fn logging_never_changes_the_decision() {
     // whole write half: `create_dir_all` returns first on a read-only home, so the open, the write
     // and the rotate were never reached — replacing the open with an `expect` left it green.
     let blocked = tmp_home("nochange-blocked");
-    std::fs::create_dir_all(blocked.join(".local/state/safe-chains/log.jsonl"))
-        .expect("occupy the log path with a directory");
+    std::fs::create_dir_all(blocked.join(".local/state/safe-chains/log.jsonl")).expect("occupy the log path with a directory");
 
     for command in all_classes() {
         let baseline = hook(command, &good, &[]);
@@ -122,14 +118,8 @@ fn logging_never_changes_the_decision() {
         ];
         for (label, home, flags) in cases {
             let got = hook_env(command, home, flags);
-            assert_eq!(
-                got.stdout, baseline.stdout,
-                "{label}: stdout differs from the no-logging baseline for {command:?}"
-            );
-            assert_eq!(
-                got.exit, baseline.exit,
-                "{label}: exit code differs from the no-logging baseline for {command:?}"
-            );
+            assert_eq!(got.stdout, baseline.stdout, "{label}: stdout differs from the no-logging baseline for {command:?}");
+            assert_eq!(got.exit, baseline.exit, "{label}: exit code differs from the no-logging baseline for {command:?}");
         }
     }
 
@@ -149,10 +139,7 @@ fn without_a_flag_nothing_is_written() {
     for command in all_classes() {
         hook(command, &home, &[]);
     }
-    assert!(
-        !home.join(".local/state/safe-chains").exists(),
-        "logging was off, but a state directory was created"
-    );
+    assert!(!home.join(".local/state/safe-chains").exists(), "logging was off, but a state directory was created");
 }
 
 /// The two modes differ in exactly ONE way, and both halves need pinning because each is the
@@ -167,14 +154,8 @@ fn the_modes_differ_only_on_approvals() {
         hook(command, &loud, &["--log-everything"]);
     }
 
-    let quiet_cmds: Vec<String> = log_lines(&quiet)
-        .iter()
-        .map(|e| e["command"].as_str().unwrap_or_default().to_string())
-        .collect();
-    let loud_cmds: Vec<String> = log_lines(&loud)
-        .iter()
-        .map(|e| e["command"].as_str().unwrap_or_default().to_string())
-        .collect();
+    let quiet_cmds: Vec<String> = log_lines(&quiet).iter().map(|e| e["command"].as_str().unwrap_or_default().to_string()).collect();
+    let loud_cmds: Vec<String> = log_lines(&loud).iter().map(|e| e["command"].as_str().unwrap_or_default().to_string()).collect();
 
     assert!(!quiet_cmds.contains(&ALLOWED.to_string()), "--log recorded an approval");
     assert_eq!(quiet_cmds.len(), 3, "--log should hold the three non-approvals: {quiet_cmds:?}");
@@ -183,11 +164,7 @@ fn the_modes_differ_only_on_approvals() {
     // ...and the non-approval entries are otherwise identical between the modes.
     for cmd in [UNKNOWN, RECOGNIZED_DENIED] {
         let pick = |set: &[serde_json::Value]| {
-            let mut e = set
-                .iter()
-                .find(|e| e["command"] == cmd)
-                .unwrap_or_else(|| panic!("{cmd} missing"))
-                .clone();
+            let mut e = set.iter().find(|e| e["command"] == cmd).unwrap_or_else(|| panic!("{cmd} missing")).clone();
             // The id and timestamp are per-run by construction.
             e["id"] = serde_json::Value::Null;
             e["at"] = serde_json::Value::Null;
@@ -215,11 +192,7 @@ fn every_outcome_class_is_recorded_with_its_triage() {
     let allowed = by_cmd(ALLOWED);
     assert_eq!(allowed["outcome"], "allowed");
     assert_eq!(allowed["triage"], "allowed");
-    assert_eq!(
-        allowed["segments"][0]["facets"],
-        serde_json::Value::Null,
-        "an approved segment owes no reason"
-    );
+    assert_eq!(allowed["segments"][0]["facets"], serde_json::Value::Null, "an approved segment owes no reason");
 
     let unknown = by_cmd(UNKNOWN);
     assert_eq!(unknown["outcome"], "denied");
@@ -230,10 +203,9 @@ fn every_outcome_class_is_recorded_with_its_triage() {
     assert_eq!(known["outcome"], "denied");
     assert_eq!(known["triage"], "recognized-but-denied");
     assert!(
-        known["segments"][0]["facets"]["refused_by"]["clause"]
-            .as_str()
-            .is_some_and(|c| c.contains("locus")),
-        "expected the refusing axis, got {}", known["segments"][0]
+        known["segments"][0]["facets"]["refused_by"]["clause"].as_str().is_some_and(|c| c.contains("locus")),
+        "expected the refusing axis, got {}",
+        known["segments"][0]
     );
 
     let bad = by_cmd(UNPARSEABLE);
@@ -261,9 +233,7 @@ fn harness_context_reaches_the_entry() {
 #[test]
 fn the_cli_path_logs_too() {
     let home = tmp_home("cli");
-    for (command, flags) in
-        [(UNKNOWN, vec!["--log"]), (ALLOWED, vec!["--log"]), (ALLOWED, vec!["--log-everything"])]
-    {
+    for (command, flags) in [(UNKNOWN, vec!["--log"]), (ALLOWED, vec!["--log"]), (ALLOWED, vec!["--log-everything"])] {
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_safe-chains"));
         for f in &flags {
             cmd.arg(f);

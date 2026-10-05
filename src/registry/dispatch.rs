@@ -16,8 +16,7 @@ type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 /// name and must not inherit a schema task's classification.
 fn per_database_variant<'a>(subs: &'a [SubSpec], arg: &str) -> Option<&'a SubSpec> {
     let (base, dbname) = arg.rsplit_once(':')?;
-    let plain = !dbname.is_empty()
-        && dbname.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    let plain = !dbname.is_empty() && dbname.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
     // The character test alone is not enough, and failing to say so was a fail-open in the first
     // cut of this: a substitution reaches dispatch already rewritten to `__SAFE_CHAINS_CMDSUB__`,
     // which is alphanumeric-and-underscore and sailed straight through as a "plain identifier".
@@ -30,11 +29,7 @@ fn per_database_variant<'a>(subs: &'a [SubSpec], arg: &str) -> Option<&'a SubSpe
 
 fn short_flag_char(s: &str) -> Option<char> {
     let bytes = s.as_bytes();
-    if bytes.len() == 2 && bytes[0] == b'-' && bytes[1] != b'-' {
-        s.chars().nth(1)
-    } else {
-        None
-    }
+    if bytes.len() == 2 && bytes[0] == b'-' && bytes[1] != b'-' { s.chars().nth(1) } else { None }
 }
 
 fn is_combined_short(s: &str) -> bool {
@@ -57,13 +52,9 @@ fn dispatch_first_arg(
         return Verdict::Denied;
     };
     let arg_str = arg.as_str();
-    let matches = patterns.iter().any(|p| {
-        if let Some(prefix) = p.strip_suffix('*') {
-            arg_str.starts_with(prefix)
-        } else {
-            arg_str == p
-        }
-    });
+    let matches = patterns
+        .iter()
+        .any(|p| if let Some(prefix) = p.strip_suffix('*') { arg_str.starts_with(prefix) } else { arg_str == p });
     if !matches {
         return Verdict::Denied;
     }
@@ -104,11 +95,7 @@ fn dispatch_require_any(
             false
         })
     });
-    if has_required && check_owned(tokens, policy) {
-        Verdict::Allowed(level)
-    } else {
-        Verdict::Denied
-    }
+    if has_required && check_owned(tokens, policy) { Verdict::Allowed(level) } else { Verdict::Denied }
 }
 
 /// Whether `s` is a rustup toolchain selector (`+nightly`, `+1.90.0`, `+nightly-2026-01-01`).
@@ -126,13 +113,7 @@ fn is_toolchain_selector(s: &str) -> bool {
         && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
 }
 
-fn skip_pre_flags(
-    tokens: &[Token],
-    pre_standalone: &[String],
-    pre_valued: &[String],
-    toolchain_selector: bool,
-    start: usize,
-) -> usize {
+fn skip_pre_flags(tokens: &[Token], pre_standalone: &[String], pre_valued: &[String], toolchain_selector: bool, start: usize) -> usize {
     let mut i = start;
     // At most ONE, and only in front. `cargo +nightly build` selects which toolchain runs `build`;
     // it does not change what `build` does, which is why the sub dispatch below is reached
@@ -168,10 +149,7 @@ fn skip_pre_flags(
         // the dash must be a known standalone short. Mirrors the same
         // logic in policy::check_flags for non-wrapper subs.
         let bytes = s.as_bytes();
-        if bytes.len() > 2
-            && bytes[1] != b'-'
-            && bytes[1..].iter().all(|&b| pre_standalone.contains_short(b))
-        {
+        if bytes.len() > 2 && bytes[1] != b'-' && bytes[1..].iter().all(|&b| pre_standalone.contains_short(b)) {
             i += 1;
             continue;
         }
@@ -206,8 +184,7 @@ fn dispatch_branching(
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let arg = tokens[start].as_str();
-    let is_bare_flag = bare_flags.iter().any(|f| f == arg)
-        || (bare_flags.is_empty() && matches!(arg, "--help" | "-h"));
+    let is_bare_flag = bare_flags.iter().any(|f| f == arg) || (bare_flags.is_empty() && matches!(arg, "--help" | "-h"));
     if is_bare_flag {
         let after = skip_pre_flags(tokens, pre_standalone, pre_valued, toolchain_selector, start + 1);
         if after >= tokens.len() {
@@ -238,19 +215,14 @@ fn dispatch_branching(
     // secrets), so a case-variant must not slip past the deny into the `*` allow. The allow-glob
     // below stays case-sensitive — a case-insensitive ALLOW would be fail-open.
     let glob_match_ci = |p: &str| match p.strip_suffix('*') {
-        Some(prefix) => {
-            arg.len() >= prefix.len()
-                && arg.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
-        }
+        Some(prefix) => arg.len() >= prefix.len() && arg.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes()),
         None => arg.eq_ignore_ascii_case(p),
     };
     if glob.credential.iter().any(|p| glob_match_ci(p)) {
         return Verdict::Denied;
     }
     if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {
-        if super::glob_presents_unlisted_flag(
-            tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued,
-        ) {
+        if super::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued) {
             return Verdict::Denied;
         }
         return Verdict::Allowed(glob.level);
@@ -294,20 +266,12 @@ fn dispatch_wrapper(
     }
     for _ in 0..positional_skip {
         if i >= tokens.len() {
-            return if bare_ok {
-                Verdict::Allowed(SafetyLevel::Inert)
-            } else {
-                Verdict::Denied
-            };
+            return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
         i += 1;
     }
     if i >= tokens.len() {
-        return if bare_ok {
-            Verdict::Allowed(SafetyLevel::Inert)
-        } else {
-            Verdict::Denied
-        };
+        return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
     crate::command_verdict(&inner)
@@ -329,35 +293,42 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             dispatch_require_any(tokens, require_any, policy, *level, *accept_bare_help)
         }
         DispatchKind::Branching {
-            subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
-            first_arg_standalone, first_arg_valued, first_arg_loopback_valued,
-            credential_first_arg, toolchain_selector,
-        } => {
-            dispatch_branching(
-                tokens, subs, bare_flags, *bare_ok, (pre_standalone, pre_valued),
-                *toolchain_selector,
-                &GlobArm {
-                    patterns: first_arg,
-                    level: *first_arg_level,
-                    standalone: first_arg_standalone,
-                    valued: first_arg_valued,
-                    loopback_valued: first_arg_loopback_valued,
-                    credential: credential_first_arg,
-                },
-            )
-        }
+            subs,
+            bare_flags,
+            bare_ok,
+            pre_standalone,
+            pre_valued,
+            first_arg,
+            first_arg_level,
+            first_arg_standalone,
+            first_arg_valued,
+            first_arg_loopback_valued,
+            credential_first_arg,
+            toolchain_selector,
+        } => dispatch_branching(
+            tokens,
+            subs,
+            bare_flags,
+            *bare_ok,
+            (pre_standalone, pre_valued),
+            *toolchain_selector,
+            &GlobArm {
+                patterns: first_arg,
+                level: *first_arg_level,
+                standalone: first_arg_standalone,
+                valued: first_arg_valued,
+                loopback_valued: first_arg_loopback_valued,
+                credential: credential_first_arg,
+            },
+        ),
         DispatchKind::WriteFlagged { policy, base_level, write_flags } => {
             if !check_owned(tokens, policy) {
                 return Verdict::Denied;
             }
-            let has_write = tokens[1..].iter().any(|t| {
-                write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}=")))
-            });
-            if has_write {
-                Verdict::Allowed(SafetyLevel::SafeWrite)
-            } else {
-                Verdict::Allowed(*base_level)
-            }
+            let has_write = tokens[1..]
+                .iter()
+                .any(|t| write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}="))));
+            if has_write { Verdict::Allowed(SafetyLevel::SafeWrite) } else { Verdict::Allowed(*base_level) }
         }
         DispatchKind::DelegateAfterSeparator { separator } => {
             let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
@@ -378,29 +349,14 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
             crate::command_verdict(&inner)
         }
-        DispatchKind::Wrapper {
-            standalone, valued, positional_skip, separator, bare_ok,
-        } => {
+        DispatchKind::Wrapper { standalone, valued, positional_skip, separator, bare_ok } => {
             dispatch_wrapper(tokens, standalone, valued, *positional_skip, separator.as_deref(), *bare_ok)
         }
         DispatchKind::VerbChain(spec) => dispatch_verb_chain(tokens, spec),
         DispatchKind::Executor { policy, level, kind, redirect_flag, shape, passes_argv } => {
-            dispatch_executor(
-                tokens,
-                policy,
-                *kind,
-                *level,
-                redirect_flag.as_deref(),
-                *shape,
-                *passes_argv,
-            )
+            dispatch_executor(tokens, policy, *kind, *level, redirect_flag.as_deref(), *shape, *passes_argv)
         }
-        DispatchKind::Custom { handler_name, .. } => {
-            handlers
-                .get(handler_name.as_str())
-                .map(|f| f(tokens))
-                .unwrap_or(Verdict::Denied)
-        }
+        DispatchKind::Custom { handler_name, .. } => handlers.get(handler_name.as_str()).map(|f| f(tokens)).unwrap_or(Verdict::Denied),
     }
 }
 
@@ -430,16 +386,8 @@ pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy)
     check_owned(tokens, policy)
 }
 
-pub(super) fn dispatch_matrix_action(
-    tokens: &[Token],
-    policy: &OwnedPolicy,
-    level: SafetyLevel,
-) -> Verdict {
-    if check_owned(tokens, policy) {
-        Verdict::Allowed(level)
-    } else {
-        Verdict::Denied
-    }
+pub(super) fn dispatch_matrix_action(tokens: &[Token], policy: &OwnedPolicy, level: SafetyLevel) -> Verdict {
+    if check_owned(tokens, policy) { Verdict::Allowed(level) } else { Verdict::Denied }
 }
 
 /// A `verb-chain` grammar (`mlr`): `CMD [main-flags…] verb [args…] then verb …`. The main-flag
@@ -524,28 +472,27 @@ pub(super) fn dispatch_executor(
     passes_argv: bool,
 ) -> Verdict {
     match kind {
-        ExecutorKind::File => match super::policy::first_positional_at(tokens, policy)
-            .and_then(|(at, first)| {
-                // How much of the invocation the command's own grammar governs.
-                //
-                // This used to check NOTHING once a first positional resolved, so `max_positional`
-                // went unenforced and a command that OPENS its extra positionals was handed them:
-                // `karma start ./ok.conf.js /etc/evil.conf.js` was admitted, the second path being
-                // a second config karma loads and runs. `karma` and `tilt` each grew a `path_gate`
-                // to compensate, which worked but left the next such command to inherit the hole.
-                //
-                // Checking only the PREFIX up to the executor — TODO's first suggestion — does not
-                // fix it, which was measured rather than reasoned: the prefix contains exactly one
-                // positional by construction, so `max_positional = 1` always passes and the second
-                // config is still never counted. That approach is a no-op for the case it targets.
-                //
-                // So the command DECLARES whether trailing tokens are its own. An interpreter
-                // passes them to the script (`python3 ./task.py --flag arg`) and its grammar
-                // genuinely cannot describe them, so only the prefix is checked. Everything else is
-                // governed in full, which is the enforcing default a new entry gets for free.
-                let governed = if passes_argv { &tokens[..=at] } else { tokens };
-                check_owned(governed, policy).then_some(first)
-            }) {
+        ExecutorKind::File => match super::policy::first_positional_at(tokens, policy).and_then(|(at, first)| {
+            // How much of the invocation the command's own grammar governs.
+            //
+            // This used to check NOTHING once a first positional resolved, so `max_positional`
+            // went unenforced and a command that OPENS its extra positionals was handed them:
+            // `karma start ./ok.conf.js /etc/evil.conf.js` was admitted, the second path being
+            // a second config karma loads and runs. `karma` and `tilt` each grew a `path_gate`
+            // to compensate, which worked but left the next such command to inherit the hole.
+            //
+            // Checking only the PREFIX up to the executor — TODO's first suggestion — does not
+            // fix it, which was measured rather than reasoned: the prefix contains exactly one
+            // positional by construction, so `max_positional = 1` always passes and the second
+            // config is still never counted. That approach is a no-op for the case it targets.
+            //
+            // So the command DECLARES whether trailing tokens are its own. An interpreter
+            // passes them to the script (`python3 ./task.py --flag arg`) and its grammar
+            // genuinely cannot describe them, so only the prefix is checked. Everything else is
+            // governed in full, which is the enforcing default a new entry gets for free.
+            let governed = if passes_argv { &tokens[..=at] } else { tokens };
+            check_owned(governed, policy).then_some(first)
+        }) {
             // `-` is STDIN, not a file. Every interpreter reads its program from stdin when given
             // it, so the code being run is not in the workspace and is not in the command string
             // either — the classifier cannot see it at all. It was resolving as a bare relative
@@ -603,8 +550,13 @@ fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
 pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
     if let Some(kind) = spec.executor {
         return dispatch_executor(
-            tokens, &spec.policy, kind, spec.level,
-            spec.executor_redirect_flag.as_deref(), spec.positional_shape, spec.passes_argv,
+            tokens,
+            &spec.policy,
+            kind,
+            spec.level,
+            spec.executor_redirect_flag.as_deref(),
+            spec.positional_shape,
+            spec.passes_argv,
         );
     }
     if let Some(shape) = spec.positional_shape
@@ -651,10 +603,7 @@ mod toolchain_selector_tests {
     #[test]
     fn a_declared_toolchain_selector_is_accepted() {
         for line in [
-            "cargo +nightly build",
-            "cargo +stable test",
-            "cargo +1.90.0 check",
-            "cargo +nightly-2026-01-01 build",
+            "cargo +nightly build", "cargo +stable test", "cargo +1.90.0 check", "cargo +nightly-2026-01-01 build",
             "cargo +nightly-x86_64-apple-darwin build",
         ] {
             assert!(is_safe_command(line), "`{line}` should classify as its bare subcommand does");

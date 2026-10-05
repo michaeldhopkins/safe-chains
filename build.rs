@@ -20,12 +20,7 @@ fn main() {
             .parent()
             .and_then(|p| p.to_str())
             .filter(|s| !s.is_empty())
-            .unwrap_or_else(|| {
-                rel_path
-                    .file_stem()
-                    .and_then(|s| s.to_str())
-                    .expect("non-UTF-8 stem")
-            });
+            .unwrap_or_else(|| rel_path.file_stem().and_then(|s| s.to_str()).expect("non-UTF-8 stem"));
         code.push_str(&format!(
             // `.expect` on purpose: these definitions are compiled in, so an invalid one is a bug in
             // this repository and must stop the process loudly. User-supplied configs go through the
@@ -39,10 +34,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed=commands");
     for entry in &entries {
-        println!(
-            "cargo:rerun-if-changed=commands/{}",
-            entry.display()
-        );
+        println!("cargo:rerun-if-changed=commands/{}", entry.display());
     }
 
     // The HP-20 region model is `include_str!`d by src/engine/resolve/regions.rs; track it so
@@ -52,22 +44,14 @@ fn main() {
     println!("cargo:rerun-if-changed=pathgates.toml");
 }
 
-fn collect_toml_files(
-    base: &Path,
-    dir: &Path,
-    out: &mut Vec<std::path::PathBuf>,
-) {
+fn collect_toml_files(base: &Path, dir: &Path, out: &mut Vec<std::path::PathBuf>) {
     let Ok(read) = fs::read_dir(dir) else { return };
     for entry in read.flatten() {
         let path = entry.path();
         if path.is_dir() {
             collect_toml_files(base, &path, out);
         } else if path.extension().is_some_and(|e| e == "toml") {
-            let name = path
-                .file_name()
-                .expect("file has no name")
-                .to_str()
-                .expect("non-UTF-8 filename");
+            let name = path.file_name().expect("file has no name").to_str().expect("non-UTF-8 filename");
             if name != "SAMPLE.toml"
                 && let Ok(rel) = path.strip_prefix(base)
             {

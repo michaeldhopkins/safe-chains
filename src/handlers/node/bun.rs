@@ -1,5 +1,5 @@
-use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
 pub fn check_bun_x(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {

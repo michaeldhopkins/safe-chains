@@ -389,11 +389,7 @@ fn certain_value(word: &Word) -> String {
     // A TAGGED substitution sentinel is certain enough to BIND: it already classifies to a known
     // locus, so `OUT=$(pwd); … > "$OUT/raw/x"` gates the write at the worktree rather than
     // fail-closing on a value it can in fact bound. Every other marker stays uncertain.
-    if raw.contains('$') || is_opaque_value(&raw) {
-        UNCERTAIN_VALUE.to_string()
-    } else {
-        raw
-    }
+    if raw.contains('$') || is_opaque_value(&raw) { UNCERTAIN_VALUE.to_string() } else { raw }
 }
 
 /// Whether an evaluated word carries a marker the classifier CANNOT bound: the opaque command
@@ -460,10 +456,7 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
             let base = roots
                 .iter()
                 .max_by_key(|r| {
-                    let (read, write) = (
-                        crate::engine::resolve::locus::read_locus(r),
-                        crate::engine::resolve::locus::write_locus(r),
-                    );
+                    let (read, write) = (crate::engine::resolve::locus::read_locus(r), crate::engine::resolve::locus::write_locus(r));
                     read.max(write)
                 })
                 .copied()
@@ -497,12 +490,7 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
         // and not byte-slicing (`head -c`, which can split a path); NOT `grep -o`/`sed`/`awk`/`cut`/`tr`
         // (they can rewrite a line to ANY path — treating those as passthrough would be a bypass).
         "sort" | "uniq" | "cat" | "tac" if !reads_a_file(&args) => through(),
-        "head" | "tail"
-            if !reads_a_file_after_count(&args)
-                && !args.iter().any(|a| *a == "-c" || a.starts_with("--bytes")) =>
-        {
-            through()
-        }
+        "head" | "tail" if !reads_a_file_after_count(&args) && !args.iter().any(|a| *a == "-c" || a.starts_with("--bytes")) => through(),
         // tee always forwards stdin→stdout (its file args are extra WRITES, gated elsewhere).
         "tee" => through(),
         _ => UNKNOWN_ITEM.to_string(),
@@ -515,11 +503,8 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
 /// stream. A lone `-` (explicit stdin) doesn't count. The `=`-glued flag form is a single token
 /// starting with `-`, so it must be matched explicitly or it would masquerade as a passthrough.
 fn reads_a_file(args: &[&str]) -> bool {
-    args.iter().any(|a| {
-        (!a.starts_with('-') && *a != "-")
-            || *a == "--files0-from"
-            || a.starts_with("--files0-from=")
-    })
+    args.iter()
+        .any(|a| (!a.starts_with('-') && *a != "-") || *a == "--files0-from" || a.starts_with("--files0-from="))
 }
 
 /// Like `reads_a_file`, but skips the VALUE of `head`/`tail`'s count flags (`-n N`, `-c N`) so
@@ -590,8 +575,7 @@ pub(crate) fn has_unsafe_syntax(cmd: &Cmd) -> bool {
 }
 
 fn has_any_substitution(cmd: &SimpleCmd) -> bool {
-    cmd.words.iter().any(has_substitution)
-        || cmd.env.iter().any(|(_, v)| has_substitution(v))
+    cmd.words.iter().any(has_substitution) || cmd.env.iter().any(|(_, v)| has_substitution(v))
 }
 
 /// A command rendered for comparison against the user's own `Bash(...)` allow-rules.
@@ -688,11 +672,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             };
             cond_v.combine(script_verdict(body)).combine(redir_v)
         }
-        Cmd::If {
-            branches,
-            else_body,
-            redirs,
-        } => {
+        Cmd::If { branches, else_body, redirs } => {
             let redir_v = redirect_verdict(redirs);
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
@@ -706,9 +686,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             v
         }
-        Cmd::DoubleBracket { words, redirs } => {
-            words_sub_verdict(words).combine(redirect_verdict(redirs))
-        }
+        Cmd::DoubleBracket { words, redirs } => words_sub_verdict(words).combine(redirect_verdict(redirs)),
         // Which arm runs is decided at runtime, so — exactly as for `If` — every arm body counts
         // and the case is only as safe as its worst arm. The patterns are matched, never executed,
         // but the SUBJECT is expanded, so its substitutions are gated like any other word.
@@ -746,15 +724,11 @@ fn part_sub_verdict(part: &WordPart) -> Verdict {
 }
 
 fn word_sub_verdict(word: &Word) -> Verdict {
-    word.0.iter()
-        .map(part_sub_verdict)
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+    word.0.iter().map(part_sub_verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
 
 fn words_sub_verdict(words: &[Word]) -> Verdict {
-    words.iter()
-        .map(word_sub_verdict)
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+    words.iter().map(word_sub_verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
 
 #[cfg(test)]
@@ -768,7 +742,9 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return Verdict::Denied;
     }
 
-    let env_sub_v = cmd.env.iter()
+    let env_sub_v = cmd
+        .env
+        .iter()
         .map(|(_, v)| word_sub_verdict(v))
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
     let word_sub_v = words_sub_verdict(&cmd.words);
@@ -827,8 +803,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
     // Brace-expand each word (`cat {/etc/shadow,x}` → two operands) so every alternative bash
     // would run is classified — a braced word must not hide a system path from the gate.
-    let tokens: Vec<Token> =
-        cmd.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
+    let tokens: Vec<Token> = cmd.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
     if tokens.is_empty() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
@@ -872,8 +847,7 @@ fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
             }
             let expanded = crate::pathctx::expand_vars(raw, false);
             expanded.split([' ', '\t', '\n']).skip(1).any(|piece| piece.starts_with('-'))
-                || (expanded.split([' ', '\t', '\n']).count() > 1
-                    && expanded.starts_with('-'))
+                || (expanded.split([' ', '\t', '\n']).count() > 1 && expanded.starts_with('-'))
         })
     })
 }
@@ -972,8 +946,7 @@ fn script_yields_eval_safe(script: &Script) -> bool {
             return false;
         }
     }
-    let tokens: Vec<Token> =
-        s.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
+    let tokens: Vec<Token> = s.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
     if tokens.is_empty() {
         return false;
     }
@@ -1064,11 +1037,7 @@ fn read_face(target: &Word) -> Verdict {
     // Keyed on the EVALUATED value rather than on "is there a substitution part", so a
     // substitution whose inner command declared its output locus (`< $(pwd)/f`) is gated by that
     // locus, while an undeclared one still fail-closes on its opaque marker.
-    if is_opaque_value(&t) {
-        Verdict::Denied
-    } else {
-        crate::engine::resolve::read_content_verdict(&t)
-    }
+    if is_opaque_value(&t) { Verdict::Denied } else { crate::engine::resolve::read_content_verdict(&t) }
 }
 
 pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {

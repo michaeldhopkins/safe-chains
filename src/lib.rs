@@ -55,16 +55,17 @@ macro_rules! safe_write {
     };
 }
 
+pub mod allowlist;
 pub mod cli;
-pub mod decisionlog;
 #[cfg(test)]
 mod composition;
 pub mod cst;
-#[cfg(test)]
-mod handler_property_tests;
+pub mod decisionlog;
 pub mod docs;
 pub mod engine;
 mod envvars;
+#[cfg(test)]
+mod handler_property_tests;
 mod handlers;
 pub mod netloc;
 pub mod parse;
@@ -74,7 +75,6 @@ pub mod policy;
 pub mod refusal;
 pub mod registry;
 pub mod suggest;
-pub mod allowlist;
 pub mod targets;
 pub mod verdict;
 
@@ -92,8 +92,7 @@ pub fn facet_breakdown(command: &str) -> String {
     // profile belonging to neither segment. A diagnostic that invents a capability set no resolver
     // emitted is worse than silence, and `render()` above already breaks the chain down per segment.
     if cst::explain(command).segments.len() != 1 {
-        return "\n  (facet breakdown covers one command at a time; run --explain on a single segment)\n"
-            .to_string();
+        return "\n  (facet breakdown covers one command at a time; run --explain on a single segment)\n".to_string();
     }
     // A COMPOUND is one segment, so it reaches here — but the flat split cannot see into it.
     // `(cat ~/.ssh/id_rsa)` tokenises to `["(cat", "~/.ssh/id_rsa)"]`, no resolver recognises
@@ -126,9 +125,7 @@ pub fn facet_breakdown(command: &str) -> String {
     }
     match &ex.blocked_by {
         Some((level, mismatch)) => {
-            out.push_str(&format!(
-                "\n  refused by `{level}` (the most permissive auto-approving level):\n    {mismatch}\n",
-            ));
+            out.push_str(&format!("\n  refused by `{level}` (the most permissive auto-approving level):\n    {mismatch}\n",));
         }
         None => out.push_str("\n  admitted by the auto-approve band.\n"),
     }
@@ -189,8 +186,7 @@ pub fn level_ceiling(name: &str) -> Option<(SafetyLevel, Option<&'static engine:
     // while `reader` and `developer` decided by projection, and nothing made two mechanisms
     // adjacent in one ordered ladder agree.
     let engine_level = match canonical {
-        "paranoid" | "reader" | "editor" | "developer" | "local-admin" | "network-admin"
-        | "yolo" => {
+        "paranoid" | "reader" | "editor" | "developer" | "local-admin" | "network-admin" | "yolo" => {
             engine::authoring::default_levels().iter().find(|l| l.name == canonical)
         }
         _ => None,
@@ -203,11 +199,7 @@ pub fn level_ceiling(name: &str) -> Option<(SafetyLevel, Option<&'static engine:
 /// funnel through. `engine_level = Some` classifies via `Level::admits` (the fine per-level model);
 /// `None` uses the 3-band projection. Either way the result is gated to `threshold`, so a legacy leaf
 /// that bypasses the engine (a redirect write → `SafeWrite`) is still held under a lower ceiling.
-pub fn command_verdict_ceilinged(
-    command: &str,
-    threshold: SafetyLevel,
-    engine_level: Option<&'static engine::level::Level>,
-) -> Verdict {
+pub fn command_verdict_ceilinged(command: &str, threshold: SafetyLevel, engine_level: Option<&'static engine::level::Level>) -> Verdict {
     let verdict = match engine_level {
         Some(level) => command_verdict_at_level(command, level),
         None => command_verdict(command),
@@ -248,10 +240,7 @@ pub(crate) fn claude_config_trusted() -> bool {
     CLAUDE_CONFIG_TRUSTED.load(std::sync::atomic::Ordering::Relaxed)
 }
 
-pub fn explain_with_coverage_at_level(
-    command: &str,
-    engine_level: Option<&'static engine::level::Level>,
-) -> cst::Explanation {
+pub fn explain_with_coverage_at_level(command: &str, engine_level: Option<&'static engine::level::Level>) -> cst::Explanation {
     let patterns = allowlist::Matcher::load();
     let _guard = engine_level.map(engine::bridge::enter_eval_level);
     cst::explain_with_coverage(command, &patterns)
@@ -386,9 +375,7 @@ pub fn sanitize_display(s: &str) -> String {
             '\r' => out.push_str("\\r"),
             '\t' => out.push_str("\\t"),
             // C0/C1 controls, and the bidi overrides/isolates/marks.
-            c if c.is_control()
-                || matches!(c, '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}' | '\u{200E}' | '\u{200F}') =>
-            {
+            c if c.is_control() || matches!(c, '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}' | '\u{200E}' | '\u{200F}') => {
                 out.push_str(&format!("\\u{{{:04x}}}", c as u32));
             }
             c => out.push(c),
@@ -420,9 +407,7 @@ impl ReachReason {
             // Frozen faces stay frozen however specifically they are named: an agent that can edit
             // the trust file decides what is approved next, and one that can write `/etc/sudoers`
             // owns the machine's authorization substrate.
-            ReachReason::FrozenTrustFile
-            | ReachReason::FrozenTrustRoot
-            | ReachReason::FrozenSystemIntegrity => false,
+            ReachReason::FrozenTrustFile | ReachReason::FrozenTrustRoot | ReachReason::FrozenSystemIntegrity => false,
             // There is no path to grant. The remedy is to constrain the spelling.
             ReachReason::Unconfined => false,
         }
@@ -597,11 +582,7 @@ fn collect_part_subs(part: &cst::WordPart, out: &mut Vec<String>) {
         // Arithmetic contributes no operand of its own — its value is a number — but a `$( )`
         // inside it runs, and that command's words are operands the verdict layer classifies.
         WordPart::Arith(inner) => collect_word(inner, out),
-        WordPart::Lit(_)
-        | WordPart::Escape(_)
-        | WordPart::SQuote(_)
-        | WordPart::Backtick(_)
-        => {}
+        WordPart::Lit(_) | WordPart::Escape(_) | WordPart::SQuote(_) | WordPart::Backtick(_) => {}
     }
 }
 
@@ -620,10 +601,9 @@ fn collect_redir_words(redirs: &[cst::Redir], out: &mut Vec<String>) {
     use cst::Redir;
     for redir in redirs {
         match redir {
-            Redir::Write { target, .. }
-            | Redir::Read { target, .. }
-            | Redir::ReadWrite { target, .. }
-            | Redir::HereStr(target) => collect_word(target, out),
+            Redir::Write { target, .. } | Redir::Read { target, .. } | Redir::ReadWrite { target, .. } | Redir::HereStr(target) => {
+                collect_word(target, out)
+            }
             // Only the body's SUBSTITUTIONS, never its literal text. Behind a bare delimiter a
             // `$(cat /etc/shadow)` in the body really runs, so it is a reach worth naming; the
             // prose around it is data and naming it would state a false reason for the denial.
@@ -653,12 +633,7 @@ fn collect_cmd_words(cmd: &cst::Cmd, out: &mut Vec<String>) {
             collect_script_words(body, out);
             collect_redir_words(redirs, out);
         }
-        Cmd::For {
-            items,
-            body,
-            redirs,
-            ..
-        } => {
+        Cmd::For { items, body, redirs, .. } => {
             words(items, out);
             collect_script_words(body, out);
             collect_redir_words(redirs, out);
@@ -668,11 +643,7 @@ fn collect_cmd_words(cmd: &cst::Cmd, out: &mut Vec<String>) {
             collect_script_words(body, out);
             collect_redir_words(redirs, out);
         }
-        Cmd::If {
-            branches,
-            else_body,
-            redirs,
-        } => {
+        Cmd::If { branches, else_body, redirs } => {
             collect_redir_words(redirs, out);
             for branch in branches {
                 collect_script_words(&branch.cond, out);
@@ -686,11 +657,7 @@ fn collect_cmd_words(cmd: &cst::Cmd, out: &mut Vec<String>) {
             words(ws, out);
             collect_redir_words(redirs, out);
         }
-        Cmd::Case {
-            subject,
-            arms,
-            redirs,
-        } => {
+        Cmd::Case { subject, arms, redirs } => {
             collect_word(subject, out);
             for arm in arms {
                 collect_script_words(&arm.body, out);

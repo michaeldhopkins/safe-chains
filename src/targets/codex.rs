@@ -29,22 +29,15 @@ impl Target for CodexTarget {
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
         let dir = home.join(".codex");
         if !dir.exists() {
-            return Ok(InstallOutcome::Skipped {
-                reason: format!(
-                    "~/.codex not found at {} (Codex CLI not installed)",
-                    dir.display()
-                ),
-            });
+            return Ok(InstallOutcome::Skipped { reason: format!("~/.codex not found at {} (Codex CLI not installed)", dir.display()) });
         }
 
         let path = dir.join("hooks.json");
         let binary = "safe-chains hook codex";
 
         if path.exists() {
-            let contents = std::fs::read_to_string(&path)
-                .map_err(|e| format!("Could not read {}: {e}", path.display()))?;
-            let mut settings: Value = serde_json::from_str(&contents)
-                .map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
+            let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
+            let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
@@ -52,15 +45,13 @@ impl Target for CodexTarget {
 
             add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
             add_hook(&mut settings, binary).map_err(|e| format!("{}: {e}", path.display()))?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
-            std::fs::write(&path, format!("{output}\n"))
-                .map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+            std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
     }
@@ -90,9 +81,7 @@ struct CodexHookEnvelope {
 
 impl HookFormat for CodexHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: CodexHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
-            message: e.to_string(),
-        })?;
+        let envelope: CodexHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         // Self-filter on the tool: the hook can be delivered for a non-shell call by a
         // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
         if let Some(name) = &envelope.tool_name
@@ -118,10 +107,7 @@ impl HookFormat for CodexHookFormat {
         // rejected as unsupported on v0.144.3 (docs list it, but it errored — version drift), and
         // Codex "continues on unsupported output" anyway. Silence lets the safe command run through
         // Codex's own flow, version-robustly. (Gated commands go through `render_deny`, not here.)
-        HookResponse {
-            stdout: String::new(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: String::new(), exit_code: 0 }
     }
 
     // Codex has no human-review-on-silence (only sandbox-escape prompts) and no `ask`, but its
@@ -139,10 +125,7 @@ impl HookFormat for CodexHookFormat {
                 "permissionDecisionReason": reason,
             }
         });
-        HookResponse {
-            stdout: serde_json::to_string(&body).unwrap_or_default(),
-            exit_code: 0,
-        }
+        HookResponse { stdout: serde_json::to_string(&body).unwrap_or_default(), exit_code: 0 }
     }
 }
 
@@ -163,16 +146,11 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
-                entry
-                    .get("hooks")
-                    .and_then(|h| h.as_array())
-                    .is_some_and(|hooks| {
-                        hooks.iter().any(|hook| {
-                            hook.get("command")
-                                .and_then(|c| c.as_str())
-                                .is_some_and(|cmd| cmd.contains("safe-chains"))
-                        })
-                    })
+                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                    hooks
+                        .iter()
+                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
+                })
             })
         })
 }
@@ -253,10 +231,7 @@ mod tests {
         let contents = std::fs::read_to_string(codex_dir.join("hooks.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
         assert!(has_safe_chains_hook(&settings));
-        assert!(
-            settings.get("PostToolUse").is_some(),
-            "existing PostToolUse must be preserved"
-        );
+        assert!(settings.get("PostToolUse").is_some(), "existing PostToolUse must be preserved");
     }
 
     #[test]

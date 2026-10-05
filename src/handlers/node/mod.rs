@@ -5,14 +5,9 @@ mod npx;
 use crate::parse::{Token, WordSet};
 use crate::verdict::Verdict;
 
-pub(super) static BUNX_FLAGS_NO_ARG: WordSet =
-    WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
+pub(super) static BUNX_FLAGS_NO_ARG: WordSet = WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
 
-pub(super) fn find_runner_package_index(
-    tokens: &[Token],
-    start: usize,
-    flags: &WordSet,
-) -> Option<usize> {
+pub(super) fn find_runner_package_index(tokens: &[Token], start: usize, flags: &WordSet) -> Option<usize> {
     let mut i = start;
     while i < tokens.len() {
         if tokens[i] == "--package" || tokens[i] == "-p" {
@@ -63,16 +58,13 @@ pub(super) fn runner_verdict(tokens: &[Token], pkg_idx: usize) -> crate::verdict
         return Verdict::Denied;
     }
     let pkg = strip_version(tokens[pkg_idx].as_str());
-    let args: Vec<&str> = std::iter::once(pkg)
-        .chain(tokens[pkg_idx + 1..].iter().map(|t| t.as_str()))
-        .collect();
+    let args: Vec<&str> = std::iter::once(pkg).chain(tokens[pkg_idx + 1..].iter().map(|t| t.as_str())).collect();
     let inner = shell_words::join(args);
     crate::command_verdict(&inner)
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    npx::dispatch(cmd, tokens)
-        .or_else(|| bunx::dispatch(cmd, tokens))
+    npx::dispatch(cmd, tokens).or_else(|| bunx::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -81,4 +73,3 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(npx::command_docs());
     docs
 }
-

@@ -13,16 +13,13 @@ pub(crate) fn arb_term<T: FacetTerm + std::fmt::Debug>() -> impl Strategy<Value 
 }
 
 fn arb_bound<T: FacetTerm + Ord + std::fmt::Debug>() -> impl Strategy<Value = OrdBound<T>> {
-    (prop::option::of(arb_term::<T>()), prop::option::of(arb_term::<T>())).prop_map(|(a, b)| {
-        match (a, b) {
-            (Some(lo), Some(hi)) if lo > hi => OrdBound { min: Some(hi), max: Some(lo) },
-            (min, max) => OrdBound { min, max },
-        }
+    (prop::option::of(arb_term::<T>()), prop::option::of(arb_term::<T>())).prop_map(|(a, b)| match (a, b) {
+        (Some(lo), Some(hi)) if lo > hi => OrdBound { min: Some(hi), max: Some(lo) },
+        (min, max) => OrdBound { min, max },
     })
 }
 
-fn arb_opt_bound<T: FacetTerm + Ord + std::fmt::Debug>()
--> impl Strategy<Value = Option<OrdBound<T>>> {
+fn arb_opt_bound<T: FacetTerm + Ord + std::fmt::Debug>() -> impl Strategy<Value = Option<OrdBound<T>>> {
     prop::option::of(arb_bound::<T>())
 }
 
@@ -119,8 +116,11 @@ pub(crate) fn arb_profile() -> impl Strategy<Value = Profile> {
 }
 
 pub(crate) fn arb_level() -> impl Strategy<Value = Level> {
-    (prop::collection::vec(arb_clause(), 0..3), prop::collection::vec(arb_clause(), 0..2))
-        .prop_map(|(allow, deny)| Level { name: "generated".into(), allow, deny })
+    (prop::collection::vec(arb_clause(), 0..3), prop::collection::vec(arb_clause(), 0..2)).prop_map(|(allow, deny)| Level {
+        name: "generated".into(),
+        allow,
+        deny,
+    })
 }
 
 /// The next-lower term on an ordinal ladder, or `None` at the zero term.
@@ -133,11 +133,7 @@ pub(crate) fn predecessor<T: FacetTerm>(term: T) -> Option<T> {
 /// Every capability obtained by lowering exactly one ordinal facet by one rung.
 /// Categorical facets have no severity order and are not lowered.
 pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
-    fn lower<T: FacetTerm>(
-        cap: &Capability,
-        get: impl Fn(&Capability) -> T,
-        set: impl Fn(&mut Capability, T),
-    ) -> Option<Capability> {
+    fn lower<T: FacetTerm>(cap: &Capability, get: impl Fn(&Capability) -> T, set: impl Fn(&mut Capability, T)) -> Option<Capability> {
         let p = predecessor(get(cap))?;
         let mut c = cap.clone();
         set(&mut c, p);
@@ -266,8 +262,20 @@ pub(crate) fn all_axes_non_default() -> Capability {
 #[allow(unused_variables)]
 fn every_axis_is_enumerated(c: &Capability) {
     let Capability {
-        operation, locus, scale, retrieval, authority, isolation, reversibility, persistence,
-        disclosure, secret, network, execution, cost, because,
+        operation,
+        locus,
+        scale,
+        retrieval,
+        authority,
+        isolation,
+        reversibility,
+        persistence,
+        disclosure,
+        secret,
+        network,
+        execution,
+        cost,
+        because,
     } = c;
     let Locus { local, remote, binding, provenance } = locus;
     let Persistence { level, trigger } = persistence;
@@ -419,12 +427,7 @@ fn worst_carries_the_declared_hazard_on_every_axis() {
         ($name:literal, $actual:expr, $ty:ty) => {
             let want = <$ty as FacetTerm>::hazard();
             if $actual != want {
-                wrong.push(format!(
-                    "{} = {} but the declared hazard is {}",
-                    $name,
-                    $actual.as_str(),
-                    want.as_str(),
-                ));
+                wrong.push(format!("{} = {} but the declared hazard is {}", $name, $actual.as_str(), want.as_str(),));
             }
         };
     }
@@ -544,7 +547,9 @@ fn ord_axis_evidence<T: FacetTerm + Ord>(
                 wrong.push(format!(
                     "{}: `{}` admits the declared hazard `{}` while rejecting other terms — \
                      the hazard is pointed the wrong way on this axis",
-                    name, level.name, hz.as_str(),
+                    name,
+                    level.name,
+                    hz.as_str(),
                 ));
             }
         }
@@ -570,10 +575,7 @@ fn set_axis_evidence<T: FacetTerm>(
             seen = true;
             let hz = T::hazard();
             if set.contains(&hz) && T::all().iter().any(|t| !set.contains(t)) {
-                wrong.push(format!(
-                    "{}: `{}` admits the declared hazard `{}` while rejecting other terms",
-                    name, level.name, hz.as_str(),
-                ));
+                wrong.push(format!("{}: `{}` admits the declared hazard `{}` while rejecting other terms", name, level.name, hz.as_str(),));
             }
         }
     }
@@ -587,32 +589,32 @@ fn a_declared_hazard_is_the_term_authored_levels_reject() {
     let mut wrong = Vec::new();
     let mut unconstrained = Vec::new();
 
-    ord_axis_evidence("locus.local",                |c| c.local_locus, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("locus.remote",               |c| c.remote_reach, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("locus.provenance",           |c| c.provenance, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("scale",                      |c| c.scale, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("retrieval",                  |c| c.retrieval, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("authority",                  |c| c.authority, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("isolation",                  |c| c.isolation, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("reversibility",              |c| c.reversibility, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("persistence.level",          |c| c.persistence_level, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("locus.local", |c| c.local_locus, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("locus.remote", |c| c.remote_reach, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("locus.provenance", |c| c.provenance, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("scale", |c| c.scale, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("retrieval", |c| c.retrieval, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("authority", |c| c.authority, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("isolation", |c| c.isolation, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("reversibility", |c| c.reversibility, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("persistence.level", |c| c.persistence_level, &mut wrong, &mut unconstrained);
     ord_axis_evidence("persistence.trigger.escape", |c| c.trigger_escape, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("disclosure.audience",        |c| c.disclosure_audience, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("secret.level",               |c| c.secret_level, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("network.direction",          |c| c.net_direction, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("network.destination",        |c| c.net_destination, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("network.payload",            |c| c.net_payload, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("execution.trust",            |c| c.execution_trust, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("supply_chain.pinning",       |c| c.pinning, &mut wrong, &mut unconstrained);
-    ord_axis_evidence("cost",                       |c| c.cost, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("disclosure.audience", |c| c.disclosure_audience, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("secret.level", |c| c.secret_level, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.direction", |c| c.net_direction, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.destination", |c| c.net_destination, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("network.payload", |c| c.net_payload, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("execution.trust", |c| c.execution_trust, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("supply_chain.pinning", |c| c.pinning, &mut wrong, &mut unconstrained);
+    ord_axis_evidence("cost", |c| c.cost, &mut wrong, &mut unconstrained);
 
-    set_axis_evidence("locus.binding",             |c| c.remote_binding.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("persistence.trigger.kind",  |c| c.trigger_kind.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("disclosure.channel",        |c| c.disclosure_channel.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("disclosure.principal",      |c| c.disclosure_principal.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("secret.channel",            |c| c.secret_channel.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("secret.principal",          |c| c.secret_principal.as_deref(), &mut wrong, &mut unconstrained);
-    set_axis_evidence("supply_chain.source",       |c| c.supply_source.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("locus.binding", |c| c.remote_binding.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("persistence.trigger.kind", |c| c.trigger_kind.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("disclosure.channel", |c| c.disclosure_channel.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("disclosure.principal", |c| c.disclosure_principal.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("secret.channel", |c| c.secret_channel.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("secret.principal", |c| c.secret_principal.as_deref(), &mut wrong, &mut unconstrained);
+    set_axis_evidence("supply_chain.source", |c| c.supply_source.as_deref(), &mut wrong, &mut unconstrained);
     set_axis_evidence("supply_chain.exec_surface", |c| c.exec_surface.as_deref(), &mut wrong, &mut unconstrained);
 
     // A partitioned axis still has evidence, just of a different shape: the hazardous term should
@@ -650,9 +652,6 @@ fn a_declared_hazard_is_the_term_authored_levels_reject() {
     // declaration rests on the doc comment alone. Naming them keeps that visible instead of letting
     // the test look more thorough than it is.
     if !unconstrained.is_empty() {
-        eprintln!(
-            "hazard unverifiable (no authored clause constrains these axes): {}",
-            unconstrained.join(", "),
-        );
+        eprintln!("hazard unverifiable (no authored clause constrains these axes): {}", unconstrained.join(", "),);
     }
 }

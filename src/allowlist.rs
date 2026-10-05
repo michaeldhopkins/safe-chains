@@ -51,20 +51,12 @@ impl Matcher {
         // `crate::trust_claude_config`.
         match std::env::var_os("HOME").filter(|_| crate::claude_config_trusted()) {
             Some(home) => Self::load_from_home(Path::new(&home)),
-            None => Matcher {
-                exact: HashSet::new(),
-                globs: Vec::new(),
-                home: String::new(),
-            },
+            None => Matcher { exact: HashSet::new(), globs: Vec::new(), home: String::new() },
         }
     }
 
     fn load_from_home(home: &Path) -> Self {
-        let mut patterns = Matcher {
-            exact: HashSet::new(),
-            globs: Vec::new(),
-            home: home.to_string_lossy().into_owned(),
-        };
+        let mut patterns = Matcher { exact: HashSet::new(), globs: Vec::new(), home: home.to_string_lossy().into_owned() };
         patterns.load_file(&home.join(".claude/settings.json"));
         patterns
     }
@@ -83,11 +75,7 @@ impl Matcher {
             }
         }
 
-        if let Some(arr) = value
-            .get("permissions")
-            .and_then(|v| v.get("allow"))
-            .and_then(|v| v.as_array())
-        {
+        if let Some(arr) = value.get("permissions").and_then(|v| v.get("allow")).and_then(|v| v.as_array()) {
             for entry in arr.iter().filter_map(|e| e.as_str()) {
                 self.add_pattern(entry);
             }
@@ -101,15 +89,10 @@ impl Matcher {
         if inner.is_empty() {
             return;
         }
-        let normalized = if let Some(prefix) = inner.strip_suffix(":*") {
-            format!("{prefix} *")
-        } else {
-            inner.to_string()
-        };
+        let normalized = if let Some(prefix) = inner.strip_suffix(":*") { format!("{prefix} *") } else { inner.to_string() };
         let normalized = canonicalize_home(&normalized, &self.home);
         if normalized.contains('*') {
-            self.globs
-                .push(normalized.split('*').map(String::from).collect());
+            self.globs.push(normalized.split('*').map(String::from).collect());
         } else {
             self.exact.insert(normalized);
         }
@@ -132,9 +115,7 @@ impl Matcher {
         if self.exact.contains(normalized) {
             return true;
         }
-        self.globs
-            .iter()
-            .any(|parts| glob_matches(parts, normalized))
+        self.globs.iter().any(|parts| glob_matches(parts, normalized))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -143,11 +124,7 @@ impl Matcher {
 
     #[cfg(test)]
     pub(crate) fn from_allow_patterns(patterns: &[&str]) -> Self {
-        let mut m = Matcher {
-            exact: HashSet::new(),
-            globs: Vec::new(),
-            home: TEST_HOME.to_string(),
-        };
+        let mut m = Matcher { exact: HashSet::new(), globs: Vec::new(), home: TEST_HOME.to_string() };
         for p in patterns {
             m.add_pattern(&format!("Bash({p})"));
         }
@@ -161,10 +138,7 @@ const TEST_HOME: &str = "/home/tester";
 
 pub fn is_cmd_covered(cmd: &Cmd, patterns: &Matcher) -> bool {
     match cmd {
-        Cmd::Simple(_) => {
-            check::is_safe_cmd(cmd)
-                || (!check::has_unsafe_syntax(cmd) && patterns.matches_cmd(cmd))
-        }
+        Cmd::Simple(_) => check::is_safe_cmd(cmd) || (!check::has_unsafe_syntax(cmd) && patterns.matches_cmd(cmd)),
         _ => check::is_safe_cmd(cmd),
     }
 }
@@ -206,31 +180,19 @@ mod tests {
     use crate::cst;
 
     fn empty() -> Matcher {
-        Matcher {
-            exact: HashSet::new(),
-            globs: Vec::new(),
-            home: TEST_HOME.to_string(),
-        }
+        Matcher { exact: HashSet::new(), globs: Vec::new(), home: TEST_HOME.to_string() }
     }
 
     fn cmd(s: &str) -> Cmd {
         let script = cst::parse(s).unwrap_or_else(|| panic!("failed to parse: {s}"));
         assert_eq!(script.0.len(), 1, "expected single statement: {s}");
-        assert_eq!(
-            script.0[0].pipeline.commands.len(),
-            1,
-            "expected single command: {s}"
-        );
+        assert_eq!(script.0[0].pipeline.commands.len(), 1, "expected single command: {s}");
         script.0[0].pipeline.commands[0].clone()
     }
 
     fn segments(command: &str) -> Vec<Cmd> {
         let script = cst::parse(command).unwrap_or_else(|| panic!("failed to parse: {command}"));
-        script
-            .0
-            .into_iter()
-            .flat_map(|stmt| stmt.pipeline.commands)
-            .collect()
+        script.0.into_iter().flat_map(|stmt| stmt.pipeline.commands).collect()
     }
 
     fn is_covered(cmd: &Cmd, patterns: &Matcher) -> bool {
@@ -241,14 +203,10 @@ mod tests {
         let Some(script) = cst::parse(command) else {
             return false;
         };
-        script.0.iter().all(|stmt| {
-            check::is_safe_pipeline(&stmt.pipeline)
-                || stmt
-                    .pipeline
-                    .commands
-                    .iter()
-                    .all(|c| is_cmd_covered(c, patterns))
-        })
+        script
+            .0
+            .iter()
+            .all(|stmt| check::is_safe_pipeline(&stmt.pipeline) || stmt.pipeline.commands.iter().all(|c| is_cmd_covered(c, patterns)))
     }
 
     #[test]
@@ -517,11 +475,7 @@ mod tests {
         let home = tempfile::tempdir().unwrap();
         let claude_dir = home.path().join(".claude");
         fs::create_dir_all(&claude_dir).unwrap();
-        fs::write(
-            claude_dir.join("settings.json"),
-            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
-        )
-        .unwrap();
+        fs::write(claude_dir.join("settings.json"), r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#).unwrap();
         let p = Matcher::load_from_home(home.path());
         assert!(p.matches_cmd(&cmd("./generate-docs.sh")));
         assert!(p.matches_cmd(&cmd("./generate-docs.sh --verbose")));
@@ -537,11 +491,7 @@ mod tests {
         let project = tempfile::tempdir().unwrap();
         let project_claude = project.path().join(".claude");
         fs::create_dir_all(&project_claude).unwrap();
-        fs::write(
-            project_claude.join("settings.json"),
-            r#"{"permissions":{"allow":["Bash(rm -rf *)"]}}"#,
-        )
-        .unwrap();
+        fs::write(project_claude.join("settings.json"), r#"{"permissions":{"allow":["Bash(rm -rf *)"]}}"#).unwrap();
         let p = Matcher::load_from_home(home.path());
         assert!(!p.matches_cmd(&cmd("rm -rf /")));
         assert!(p.is_empty());
@@ -552,11 +502,7 @@ mod tests {
         let home = tempfile::tempdir().unwrap();
         let claude_dir = home.path().join(".claude");
         fs::create_dir_all(&claude_dir).unwrap();
-        fs::write(
-            claude_dir.join("settings.json"),
-            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
-        )
-        .unwrap();
+        fs::write(claude_dir.join("settings.json"), r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#).unwrap();
         let p = Matcher::load_from_home(home.path());
         assert!(all_covered("cargo test && ./generate-docs.sh", &p));
         assert!(!all_covered("cargo test && ./evil.sh", &p));
@@ -583,11 +529,7 @@ mod tests {
     fn load_file_approved_commands() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("settings.json");
-        fs::write(
-            &path,
-            r#"{"approved_commands":["Bash(npm test)","Bash(npm run *)","WebFetch"]}"#,
-        )
-        .unwrap();
+        fs::write(&path, r#"{"approved_commands":["Bash(npm test)","Bash(npm run *)","WebFetch"]}"#).unwrap();
         let mut p = empty();
         p.load_file(&path);
         assert!(p.matches_cmd(&cmd("npm test")));
@@ -599,11 +541,7 @@ mod tests {
     fn load_file_permissions_allow() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("settings.json");
-        fs::write(
-            &path,
-            r#"{"permissions":{"allow":["Bash(cargo test *)","Bash(cargo clippy *)"]}}"#,
-        )
-        .unwrap();
+        fs::write(&path, r#"{"permissions":{"allow":["Bash(cargo test *)","Bash(cargo clippy *)"]}}"#).unwrap();
         let mut p = empty();
         p.load_file(&path);
         assert!(p.matches_cmd(&cmd("cargo test")));
@@ -614,11 +552,7 @@ mod tests {
     fn load_file_both_fields() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("settings.json");
-        fs::write(
-            &path,
-            r#"{"approved_commands":["Bash(npm test)"],"permissions":{"allow":["Bash(cargo test *)"]}}"#,
-        )
-        .unwrap();
+        fs::write(&path, r#"{"approved_commands":["Bash(npm test)"],"permissions":{"allow":["Bash(cargo test *)"]}}"#).unwrap();
         let mut p = empty();
         p.load_file(&path);
         assert!(p.matches_cmd(&cmd("npm test")));
@@ -666,9 +600,7 @@ mod env_prefix_matching_tests {
         for rule in ["~/runner-scripts/x.sh:*", "/home/tester/runner-scripts/x.sh:*"] {
             let m = matcher(&[rule]);
             for c in [
-                "~/runner-scripts/x.sh",
-                "/home/tester/runner-scripts/x.sh",
-                "~/runner-scripts/x.sh --dry-run",
+                "~/runner-scripts/x.sh", "/home/tester/runner-scripts/x.sh", "~/runner-scripts/x.sh --dry-run",
                 "/home/tester/runner-scripts/x.sh --dry-run",
             ] {
                 assert!(m.matches_cmd(&cmd(c)), "rule `{rule}` missed: {c}");
@@ -682,9 +614,7 @@ mod env_prefix_matching_tests {
     fn a_home_grant_covers_both_spellings_in_an_argument() {
         let m = matcher(&["osascript -l JavaScript ~/runner-scripts/x.js:*"]);
         assert!(m.matches_cmd(&cmd("osascript -l JavaScript ~/runner-scripts/x.js --p safe-chains")));
-        assert!(m.matches_cmd(&cmd(
-            "osascript -l JavaScript /home/tester/runner-scripts/x.js --p safe-chains"
-        )));
+        assert!(m.matches_cmd(&cmd("osascript -l JavaScript /home/tester/runner-scripts/x.js --p safe-chains")));
     }
 
     /// `~user/` is somebody ELSE's home. Expanding it would let a rule for the agent's own file
@@ -708,9 +638,7 @@ mod env_prefix_matching_tests {
     fn an_env_prefix_does_not_match_a_rule_without_one() {
         let m = matcher(&["~/runner-scripts/x.sh:*"]);
         for c in [
-            "WRITE=1 ~/runner-scripts/x.sh",
-            "WRITE=1 ~/runner-scripts/x.sh --project p",
-            "PROJECT=p ~/runner-scripts/x.sh",
+            "WRITE=1 ~/runner-scripts/x.sh", "WRITE=1 ~/runner-scripts/x.sh --project p", "PROJECT=p ~/runner-scripts/x.sh",
             "LD_PRELOAD=/tmp/evil.so ~/runner-scripts/x.sh",
         ] {
             assert!(!m.matches_cmd(&cmd(c)), "rule without env matched: {c}");
@@ -761,7 +689,7 @@ mod env_prefix_matching_tests {
 
         // Same shape without the glob: two different programs must not share a rendering.
         let n = matcher(&["FOO=bar baz ls"]);
-        assert!(n.matches_cmd(&cmd("FOO=bar baz ls")));   // runs `baz`
+        assert!(n.matches_cmd(&cmd("FOO=bar baz ls"))); // runs `baz`
         assert!(!n.matches_cmd(&cmd("FOO='bar baz' ls"))); // runs `ls`
     }
 
@@ -792,10 +720,7 @@ mod env_prefix_matching_tests {
                 }
                 for a in assignments {
                     let prefixed = format!("{a} {c}");
-                    assert!(
-                        !m.matches_cmd(&cmd(&prefixed)),
-                        "rule `{rule}` matched `{prefixed}` without declaring `{a}`",
-                    );
+                    assert!(!m.matches_cmd(&cmd(&prefixed)), "rule `{rule}` matched `{prefixed}` without declaring `{a}`",);
                     checked += 1;
                 }
             }
