@@ -3315,3 +3315,11 @@ word list and prints a worst-cased `unrecognized flag` profile belonging to neit
 2026-09-27 while writing the test for a mutant in that guard. Diagnostic output only: the verdict
 comes from the CST and is unaffected. The fix is to decline (or describe per stage) when the one
 segment is a multi-command pipeline.
+
+## The verdict snapshot generates valued flags in the space-separated form only
+
+`tests/verdict_snapshot/corpus.rs` writes each valued flag as `--flag x`, never `--flag=x` or a
+glued short `-fx`. The `equivalence` fuzz target and the flag-form guards hold the spellings equal
+today, but a data source that broke only the `=` form would pass the snapshot. Add the `=` spelling
+for long valued flags (about 20k more rows) when the registry starts being rebuilt from another
+source.
