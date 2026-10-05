@@ -178,8 +178,12 @@ gatsby version --help x	inert
 gatsby version -h	inert
 gatsby version x	inert
 gatsby x	denied
+gawk '@include "inplace"; {print "x"}' file.txt	denied
+gawk '@load "filefuncs"; BEGIN{print 1}'	denied
+gawk 'BEGIN{f="sys" "tem"; @f("id")}'	denied
 gawk 'BEGIN{system("rm")}'	denied
 gawk '{print $2}' file.txt	inert
+gawk -bv n=0 'BEGIN{@f()}' file.txt	denied
 gbase64	inert
 gbase64 --decode	inert
 gbase64 --decode --help	inert

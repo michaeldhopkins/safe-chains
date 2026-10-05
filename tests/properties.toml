@@ -22,7 +22,6 @@ owed = [
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/android/adb.rs",
-  "src/handlers/coreutils/awk.rs",
   "src/handlers/coreutils/find.rs",
   "src/handlers/coreutils/grep.rs",
   "src/handlers/coreutils/net/nslookup.rs",
@@ -143,7 +142,7 @@ owed = [
 ]
 "src/envvars.rs" = []
 "src/handlers/android/adb.rs" = []
-"src/handlers/coreutils/awk.rs" = []
+"src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
 "src/handlers/coreutils/find.rs" = []
 "src/handlers/coreutils/grep.rs" = []
 "src/handlers/coreutils/net/nslookup.rs" = []

@@ -4408,6 +4408,7 @@ avrdude -x x	safe-write
 avrdude x	safe-write
 awk '$0 ~ /foo|bar/ {print}' file.txt	inert
 awk '$1 > 100 {print $0}' file.txt	inert
+awk '/"/ {print $0 | "sh"}' file.txt	denied
 awk '/[><=]/ {print}' file.txt	inert
 awk '/[|&]/ {print}' file.txt	inert
 awk '/^  def /{m=$0; l=NR} NR-l>=10 && /^  def |^class |^end/{print}' file.rb	inert
@@ -4424,6 +4425,7 @@ awk '/pattern/{getline line; print line}' file	inert
 awk '/pattern/{getline; print NR": "$0}' file	inert
 awk '/pattern/{getline; print}' file	inert
 awk '/start/,/end/ {print}' file.txt	inert
+awk '/user@example.com/ {print}' file.txt	inert
 awk 'BEGIN{"date" | getline d; print d}'	denied
 awk 'BEGIN{cmd="date"; cmd | getline d; print d}'	denied
 awk 'BEGIN{n=0} {n++} END{print n}' file.txt	inert
@@ -4457,6 +4459,7 @@ awk '{if(length($0) > 80) print NR}' file.txt	inert
 awk '{if(length($0)>=80) print NR": "$0}' file.txt	inert
 awk '{print ">"}'	inert
 awk '{print "a | b"}'	inert
+awk '{print "a@b"}' file.txt	inert
 awk '{print $0 > "file"}'	denied
 awk '{print $0 > "output.txt"}'	denied
 awk '{print $0 >> "output.txt"}'	denied
@@ -4472,7 +4475,12 @@ awk '{print >"out"}' file	denied
 awk '{print >> "log.txt"}' file	denied
 awk '{print|"cmd"}' file	denied
 awk '{print}' /etc/shadow	denied
+awk '{print}' icon@2x.txt	inert
+awk '{x=1/2; print $0 | "sh"; y=3/4}' file.txt	denied
 awk '{x=1/2;system("rm");y=3/4}' file	denied
+awk -- '-1 {print}' /etc/shadow	denied
+awk -- '-1 {system("id")}' file.txt	denied
+awk -- '{print $1}' file.txt	inert
 awk --version	inert
 awk -F: '{print $1}' ./data.txt	inert
 awk -f script.awk data.txt	denied
