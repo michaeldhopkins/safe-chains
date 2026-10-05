@@ -67,3 +67,8 @@ jobs:
 
       - name: cargo deny check
         run: cargo deny check
+
+      - uses: taiki-e/install-action@cargo-machete
+
+      - name: cargo machete
+        run: cargo machete

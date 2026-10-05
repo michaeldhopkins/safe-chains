@@ -116,3 +116,10 @@ fn ci_builds_the_docs_with_warnings_denied() {
     assert!(ci.contains("cargo doc --locked --no-deps --all-features"), "ci.yml does not build the docs");
     assert!(ci.contains("RUSTDOCFLAGS: -D warnings"), "ci.yml builds the docs without RUSTDOCFLAGS=-D warnings");
 }
+
+#[test]
+fn ci_refuses_unused_dependencies() {
+    let all = workflows();
+    let ci = &all.iter().find(|(n, _)| n == "ci.yml").expect("ci.yml").1;
+    assert!(ci.lines().any(|l| l.trim() == "run: cargo machete"), "ci.yml does not run `cargo machete`");
+}
