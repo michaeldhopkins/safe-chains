@@ -1,0 +1,272 @@
+# Every file under src/, classified. `tests/properties.rs` enforces it.
+#
+# `pure`: behaviour is a function of the inputs (the classifier reads HOME and a thread-local
+# directory context, but a property fixes both, so the classifier modules count as pure). Each
+# names the property tests stating its invariants: a bare name is a fn inside a `proptest!` block
+# in that file, `"src/x.rs::name"` one in another file (most of this crate's properties live in
+# whole-file suites). A pure file with none yet goes in `owed`, which may only shrink: a file
+# that gains a property leaves it in the same change.
+#
+# `effectful`: does I/O, owns process-wide state loaded from disk, or is module wiring with no
+# logic of its own, with the reason. `test_only`: a whole-file test suite.
+#
+# Example-only and registry-sweep tests (`every_*`) are not properties here: a property states an
+# invariant over generated inputs.
+
+owed = [
+  "src/cst/budget.rs",
+  "src/cst/reserved.rs",
+  "src/engine/archetype.rs",
+  "src/engine/bridge.rs",
+  "src/engine/resolve/capability.rs",
+  "src/engine/resolve/flags.rs",
+  "src/envvars.rs",
+  "src/handlers/android/adb.rs",
+  "src/handlers/coreutils/awk.rs",
+  "src/handlers/coreutils/find.rs",
+  "src/handlers/coreutils/grep.rs",
+  "src/handlers/coreutils/net/nslookup.rs",
+  "src/handlers/coreutils/net/route.rs",
+  "src/handlers/coreutils/sed.rs",
+  "src/handlers/coreutils/tar.rs",
+  "src/handlers/forges/gh.rs",
+  "src/handlers/forges/glab.rs",
+  "src/handlers/fuzzy/fzf.rs",
+  "src/handlers/fuzzy/sk.rs",
+  "src/handlers/jvm/jar.rs",
+  "src/handlers/jvm/mvn.rs",
+  "src/handlers/magick.rs",
+  "src/handlers/network.rs",
+  "src/handlers/node/bun.rs",
+  "src/handlers/node/bunx.rs",
+  "src/handlers/perl.rs",
+  "src/handlers/php.rs",
+  "src/handlers/ruby/bundle.rs",
+  "src/handlers/shell.rs",
+  "src/handlers/system/plutil.rs",
+  "src/handlers/system/ssh.rs",
+  "src/handlers/system/sysctl.rs",
+  "src/handlers/system/tmux.rs",
+  "src/handlers/vcs/git.rs",
+  "src/handlers/wrappers.rs",
+  "src/parse.rs",
+  "src/refusal.rs",
+  "src/registry/build.rs",
+  "src/registry/docs.rs",
+  "src/registry/policy.rs",
+  "src/verdict.rs",
+]
+
+[pure]
+"src/cst/check.rs" = [
+  "src/cst/proptests.rs::safe_redirects_always_pass",
+  "src/cst/proptests.rs::unsafe_sub_detected_in_word",
+  "src/cst/proptests.rs::unsafe_sub_in_dquote_detected",
+  "src/cst/proptests.rs::safe_word_no_subs",
+  "src/cst/proptests.rs::unsafe_injected_into_pipeline",
+  "src/cst/proptests.rs::unsafe_in_subshell_detected",
+  "src/cst/proptests.rs::unsafe_in_for_body_detected",
+  "src/cst/proptests.rs::unsafe_in_while_body_detected",
+  "src/cst/proptests.rs::unsafe_in_while_cond_detected",
+  "src/cst/proptests.rs::unsafe_in_if_body_detected",
+  "src/cst/proptests.rs::unsafe_in_if_cond_detected",
+  "src/cst/proptests.rs::unsafe_in_else_detected",
+  "src/cst/proptests.rs::unsafe_in_for_items_sub_detected",
+  "src/cst/proptests.rs::file_redirect_promotes_to_safewrite",
+  "src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied",
+  "src/cst/proptests.rs::heredoc_always_safe",
+  "src/cst/proptests.rs::a_heredoc_body_cannot_change_the_verdict",
+  "src/cst/proptests.rs::unicode_prefix_never_matches_allowlist",
+  "src/cst/proptests.rs::unicode_suffix_never_matches_allowlist",
+  "src/handler_property_tests.rs::a_heredoc_body_is_code_only_behind_a_bare_delimiter",
+]
+"src/cst/display.rs" = ["src/cst/proptests.rs::roundtrip"]
+"src/cst/eval.rs" = [
+  "src/cst/proptests.rs::eval_determinism",
+  "src/cst/proptests.rs::function_definition_is_always_inert",
+  "src/cst/proptests.rs::var_substitution_matches_manual_expansion",
+  "src/cst/proptests.rs::function_arg_binding_matches_direct_call",
+  "src/handler_property_tests.rs::a_flanked_atom_never_moves_where_the_write_lands",
+  "src/handler_property_tests.rs::an_unflanked_atom_is_never_admitted",
+]
+"src/cst/explain.rs" = [
+  "src/handler_property_tests.rs::explain_agrees_with_enforcement_whatever_the_call_order",
+  "src/handler_property_tests.rs::command_text_cannot_forge_a_segment_line",
+]
+"src/cst/mod.rs" = [
+  "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
+  "src/handler_property_tests.rs::substitution_salad_terminates_fast",
+]
+"src/cst/parse.rs" = [
+  "a_random_unclosed_nest_parses_in_linear_work",
+  "src/cst/proptests.rs::roundtrip",
+  "src/cst/proptests.rs::parse_never_panics",
+]
+"src/cst/budget.rs" = []
+"src/cst/reserved.rs" = []
+"src/engine/archetype.rs" = []
+"src/engine/authoring.rs" = [
+  "union_levels_admit_everything_but_their_declared_gap",
+  "authored_levels_are_facet_monotone",
+]
+"src/engine/bridge.rs" = []
+"src/engine/facet.rs" = [
+  "src/engine/testgen.rs::set_facets_distinguishes_capabilities_differing_in_one_axis",
+  "src/engine/testgen.rs::every_axis_index_is_reachable",
+  "src/engine/testgen.rs::set_facets_omits_exactly_the_zero_terms",
+]
+"src/engine/level.rs" = [
+  "totality",
+  "extends_is_a_superset",
+  "deny_only_shrinks",
+  "src/engine/testgen.rs::clause_diagnostic_agrees_with_admits",
+  "src/engine/testgen.rs::a_reported_mismatch_names_a_facet_that_actually_fails",
+  "src/engine/testgen.rs::clause_diagnostic_agrees_with_matches_as_deny",
+  "src/engine/testgen.rs::level_nearest_miss_agrees_with_admits_capability",
+  "src/engine/testgen.rs::the_sentinel_is_denied_even_with_any_one_axis_relaxed",
+]
+"src/engine/resolve.rs" = [
+  "transfer_commands_gate_both_operand_roles",
+  "sudo_family_flag_walk_never_panics",
+  "src/handler_property_tests.rs::declared_substitutions_deny_out_of_workspace_roots",
+  "src/handler_property_tests.rs::write_mode_flags_deny_out_of_workspace_targets",
+  "src/handler_property_tests.rs::substitution_cannot_launder_a_trusted_write",
+  "src/handler_property_tests.rs::read_commands_deny_targets_the_shield_cannot_clear",
+  "src/handler_property_tests.rs::a_flag_naming_a_program_is_gated_on_where_that_program_lives",
+  "src/handler_property_tests.rs::a_write_is_gated_by_its_target_not_its_spelling",
+]
+"src/engine/resolve/capability.rs" = []
+"src/engine/resolve/flags.rs" = []
+"src/engine/resolve/locus.rs" = [
+  "a_dollar_anywhere_forces_machine",
+  "a_parent_escape_forces_machine",
+  "src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape",
+]
+"src/envvars.rs" = []
+"src/handlers/android/adb.rs" = []
+"src/handlers/coreutils/awk.rs" = []
+"src/handlers/coreutils/find.rs" = []
+"src/handlers/coreutils/grep.rs" = []
+"src/handlers/coreutils/net/nslookup.rs" = []
+"src/handlers/coreutils/net/route.rs" = []
+"src/handlers/coreutils/sed.rs" = []
+"src/handlers/coreutils/tar.rs" = []
+"src/handlers/fd.rs" = ["fd_exec_follows_the_inner_command_locus", "fd_batch_without_placeholder_gates_the_base"]
+"src/handlers/forges/gh.rs" = []
+"src/handlers/forges/glab.rs" = []
+"src/handlers/fuzzy/fzf.rs" = []
+"src/handlers/fuzzy/sk.rs" = []
+"src/handlers/interpreter.rs" = ["src/handler_property_tests.rs::interpreter_commands_deny_shell_escapes"]
+"src/handlers/jvm/jar.rs" = []
+"src/handlers/jvm/mvn.rs" = []
+"src/handlers/magick.rs" = []
+"src/handlers/mod.rs" = ["src/handler_property_tests.rs::handlers_never_panic_and_are_deterministic"]
+"src/handlers/network.rs" = []
+"src/handlers/node/bun.rs" = []
+"src/handlers/node/bunx.rs" = []
+"src/handlers/node/npx.rs" = ["npx_verdict_matches_direct"]
+"src/handlers/perl.rs" = []
+"src/handlers/php.rs" = []
+"src/handlers/ruby/bundle.rs" = []
+"src/handlers/shell.rs" = []
+"src/handlers/system/plutil.rs" = []
+"src/handlers/system/ssh.rs" = []
+"src/handlers/system/sysctl.rs" = []
+"src/handlers/system/tmux.rs" = []
+"src/handlers/tilt.rs" = [
+  "get_with_random_resource_is_safe_read",
+  "describe_with_random_resource_is_safe_read",
+  "random_path_shaped_arg_is_inert",
+  "random_bare_word_is_denied",
+]
+"src/handlers/vcs/git.rs" = []
+"src/handlers/wrappers.rs" = []
+"src/lib.rs" = [
+  "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
+  "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
+]
+"src/netloc.rs" = [
+  "only_the_host_component_decides",
+  "case_never_changes_the_verdict",
+  "a_local_host_under_another_domain_is_remote",
+  "never_panics_on_any_input",
+  "a_port_never_changes_the_verdict",
+]
+"src/parse.rs" = []
+"src/pathgate.rs" = [
+  "ar_write_never_more_permissive_than_read",
+  "ar_ops_classify_regardless_of_modifiers",
+  "textutil_convert_never_more_permissive_than_info",
+]
+"src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
+"src/refusal.rs" = []
+"src/registry/build.rs" = []
+"src/registry/dispatch.rs" = [
+  "src/handler_property_tests.rs::code_exec_denies_foreign_executor",
+  "src/handler_property_tests.rs::code_exec_worktree_dominates_foreign",
+  "src/handler_property_tests.rs::project_runner_redirect_flag_is_locus_gated",
+  "src/handler_property_tests.rs::mlr_in_place_flag_denied_anywhere_in_main_region",
+  "src/registry/tests.rs::toml_strict_reject_random_flags",
+  "src/registry/tests.rs::a_localizing_sub_refuses_every_hostile_host",
+  "src/registry/tests.rs::an_unrecognized_local_spelling_denies",
+]
+"src/registry/docs.rs" = []
+"src/registry/policy.rs" = []
+"src/suggest.rs" = [
+  "src/suggest/tests.rs::generated_entry_admits_the_observed_command",
+  "src/suggest/tests.rs::generated_entry_rejects_an_unobserved_flag",
+  "src/suggest/tests.rs::generated_entry_bounds_positionals",
+  "src/suggest/tests.rs::generated_toml_always_loads",
+  "src/suggest/tests.rs::analyze_is_deterministic",
+]
+"src/verdict.rs" = []
+
+[effectful]
+"src/allowlist.rs" = "reads Claude Code's settings files for permissions.allow patterns"
+"src/bin/gen_fuzz_corpus.rs" = "writes the fuzz dictionary and seed files"
+"src/cli.rs" = "clap argument declarations only"
+"src/decisionlog.rs" = "appends to the decision log under HOME"
+"src/docs.rs" = "renders the command docs and writes the mdbook tree"
+"src/engine/mod.rs" = "module declarations only"
+"src/engine/resolve/regions.rs" = "loads grants from ~/.config/safe-chains.toml and Claude Code's settings, and reads HOME"
+"src/engine/resolve/regions/grant_faces.rs" = "reads HOME to place the grants it merges"
+"src/handlers/android/mod.rs" = "module declaration only"
+"src/handlers/coreutils/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
+"src/handlers/coreutils/net/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
+"src/handlers/forges/mod.rs" = "module declarations only"
+"src/handlers/fuzzy/mod.rs" = "module declaration only"
+"src/handlers/jvm/mod.rs" = "module declaration only"
+"src/handlers/node/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
+"src/handlers/ruby/mod.rs" = "module declaration only"
+"src/handlers/system/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
+"src/handlers/vcs/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
+"src/hook_cli.rs" = "reads the hook envelope from stdin and writes the decision to stdout"
+"src/main.rs" = "the binary: arguments, files, stdin and stdout"
+"src/pathctx.rs" = "owns the thread-local directory context and reads HOME and TMPDIR"
+"src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
+"src/registry/mod.rs" = "the process-wide registries, including the one loaded from the user's config"
+"src/registry/types.rs" = "type declarations and their serde shapes only"
+"src/suggest_cli.rs" = "reads and writes .safe-chains.toml for --suggest"
+"src/targets/agy.rs" = "reads and writes the harness's settings file"
+"src/targets/claude.rs" = "reads and writes the harness's settings file"
+"src/targets/codex.rs" = "reads and writes the harness's settings file"
+"src/targets/copilot.rs" = "reads and writes the harness's settings file"
+"src/targets/cursor.rs" = "reads and writes the harness's settings file"
+"src/targets/droid.rs" = "reads and writes the harness's settings file"
+"src/targets/gemini.rs" = "reads and writes the harness's settings file"
+"src/targets/grok.rs" = "reads and writes the harness's settings file"
+"src/targets/mod.rs" = "detects harnesses on disk and reads the environment"
+"src/targets/opencode.rs" = "installs into the harness's config directory"
+"src/targets/qwen.rs" = "reads and writes the harness's settings file"
+
+[test_only]
+"src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
+"src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/decisionlog/tests.rs" = "decisionlog's test suite"
+"src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
+"src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"
+"src/handler_property_tests.rs" = "the cross-handler property suite (#[cfg(test)] mod in lib.rs)"
+"src/registry/gate_consistency.rs" = "path-gate consistency tests (#[cfg(test)] mod in registry/mod.rs)"
+"src/registry/tests.rs" = "the registry test suite"
+"src/suggest/tests.rs" = "suggest's test suite"
+"src/tests.rs" = "the crate's example test suite"

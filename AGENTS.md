@@ -30,6 +30,8 @@ cargo test
 
 All tests must pass before committing.
 
+`tests/properties.toml` classifies every file under `src/` as pure, effectful or test-only and names the property tests of each pure one; a new module goes in it, and a pure file leaves `owed` when it gains a property.
+
 `tests/verdict_snapshot.rs` pins the verdict of ~117k registry-generated invocations in `tests/fixtures/verdict_snapshot/`; after an intended verdict change, regenerate with `UPDATE_VERDICT_SNAPSHOT=1 cargo test --test verdict_snapshot -- --nocapture` and review the regressions it prints before committing.
 
 ### Default to property/invariant tests, not example tests

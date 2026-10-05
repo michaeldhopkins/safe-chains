@@ -1,0 +1,20 @@
+# A tree with one of each gap, for tests/properties.rs to prove it catches them.
+owed = ["src/paid_off.rs", "src/effect.rs"]
+
+[pure]
+"src/ok.rs" = ["holds"]
+"src/misnamed.rs" = ["holds", "not_there"]
+"src/not_a_property.rs" = ["plain_test"]
+"src/bare.rs" = []
+"src/paid_off.rs" = ["holds"]
+"src/remote_ok.rs" = ["src/suite.rs::covers_remote"]
+"src/remote_bad.rs" = ["src/suite.rs::not_there"]
+
+[effectful]
+"src/effect.rs" = "writes files"
+"src/silent.rs" = ""
+"src/gone.rs" = "was deleted"
+
+[test_only]
+"src/suite.rs" = "properties for remote_ok.rs"
+"src/suite_silent.rs" = ""
