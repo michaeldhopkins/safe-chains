@@ -25,7 +25,8 @@
 # another, a shared directory would merge one target's finds into the next target's corpus.
 #
 # Exit status: the fuzzer's, if it stopped on its own (a crash, timeout, oom, or leak is
-# non-zero); 0 after a clean interrupt; 2 if only the merge failed; 64 on a usage error. The merge
+# non-zero); 0 after a clean interrupt, or after an interrupt that stalled into a timeout whose
+# unit replays in time (see below); 2 if only the merge failed; 64 on a usage error. The merge
 # runs regardless, so the corpus keeps what the burst found before a crash. Under Actions, a
 # successful merge sets the step output `merged=true`, which is what lets the workflow save the
 # corpus.
@@ -53,7 +54,8 @@ echo "Restored corpus: $(find "$CORPUS" -type f | wc -l | tr -d ' ') inputs; bud
 
 LOG="$(mktemp)"
 MIN="$(mktemp -d)"
-trap 'rm -rf "$LOG" "$MIN"' EXIT
+REPLAY="$(mktemp -d)"
+trap 'rm -rf "$LOG" "$MIN" "$REPLAY"' EXIT
 
 # ${DICT[@]+"${DICT[@]}"}: an empty array under `set -u` is an error in bash 3.2 (macOS).
 "$BIN" ${DICT[@]+"${DICT[@]}"} \
@@ -77,7 +79,28 @@ wait "$PID"
 RC=$?
 if [ "$INTERRUPTED" -eq 1 ] && [ "$RC" -eq 72 ]; then RC=0; fi
 grep -E 'INITED|DONE|interrupted|Dictionary|stat::number_of_executed_units|ERROR|SUMMARY|Test unit written' "$LOG" || true
-if [ "$RC" -ne 0 ]; then tail -40 "$LOG"; fi
+if [ "$RC" -ne 0 ]; then
+  # From libFuzzer's first report on, not a fixed tail: a tail of 40 cut a timeout's stack trace
+  # off above frame 16, which is where it showed what the process was doing.
+  REPORT="$(awk '/^==[0-9]+== /{p=1} p' "$LOG")"
+  if [ -n "$REPORT" ]; then printf '%s\n' "$REPORT"; else tail -40 "$LOG"; fi
+fi
+
+# A timeout reported after "run interrupted; exiting" is libFuzzer stalling on its way out of our
+# SIGINT, not a slow input. On 2026-10-05 a suggest_roundtrip burst was interrupted mid-unit, the
+# handler never reached its exit, and 33s later the alarm wrote the running unit out as a timeout
+# and exited 70. That unit replays in about 1 ms under ASan, and the run's slowest unit took under
+# a second. So such a unit is replayed once on its own: finishing in time drops it and counts the
+# run as a clean interrupt, and timing out again keeps it as a find.
+if [ "$INTERRUPTED" -eq 1 ] && [ "$RC" -ne 0 ] \
+  && awk '/run interrupted; exiting/{i=1} i && /ERROR: libFuzzer: timeout/{f=1} END{exit !f}' "$LOG"; then
+  UNIT="$(sed -n 's/.*Test unit written to \(.*timeout-[^/]*\)$/\1/p' "$LOG" | tail -1)"
+  if [ -n "$UNIT" ] && [ -f "$UNIT" ] && "$BIN" -timeout=25 -rss_limit_mb=4096 -runs=1 -artifact_prefix="$REPLAY/" "$UNIT" >/dev/null 2>&1; then
+    echo "Dropped $UNIT: the alarm wrote it while the interrupted fuzzer was exiting, and alone it replays in time"
+    rm -f "$UNIT"
+    RC=0
+  fi
+fi
 echo "fuzzer exit status: $RC"
 
 echo "Prior corpus + seeds: $(find "$CORPUS" -type f | wc -l | tr -d ' ') inputs"

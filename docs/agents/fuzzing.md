@@ -38,8 +38,9 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
 - **`fuzz/burst.sh` runs the same locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
   repo root). Finds go to `fuzz/new/<target>`, so bursting targets one after another never merges
   one target's finds into the next; the committed `seed-*` inputs keep their names through the
-  merge; `fuzz/dict/<target>.dict` is used when present. `tests/fuzz_burst.rs` holds those against
-  a stand-in libFuzzer binary.
+  merge; `fuzz/dict/<target>.dict` is used when present. A timeout reported after its SIGINT is
+  libFuzzer stalling on the way out (2026-10-05, `suggest_roundtrip`): the unit is replayed alone
+  and dropped if it finishes. `tests/fuzz_burst.rs` holds all of this against a stand-in libFuzzer.
 - **No nightly (retired 2026-09-26).** It ran 05:00 UTC: three 5h shards on `parse` plus 1h on each
   property target. Every real find came in a target's first days; after the first week of August it
   ran seven weeks without another, and its later red nights were job timeouts (`config_load`

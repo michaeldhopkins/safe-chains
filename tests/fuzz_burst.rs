@@ -4,7 +4,8 @@
 //! The stand-in behaves the way the real binary does where the script depends on it: in fuzz mode
 //! it prints `INITED`, writes one find into its first directory and waits for SIGINT (exit 72); with
 //! `-merge=1` it copies every input into the first directory under a content-derived name, which
-//! is how libFuzzer renames what it keeps. The things under test are the ones a local run got
+//! is how libFuzzer renames what it keeps; with `-runs=1` it replays one unit, the way burst.sh
+//! checks a timeout written after its interrupt. The things under test are the ones a local run got
 //! wrong: one shared `fuzz/new` merged each target's finds into the next target's corpus, and the
 //! merge renamed the committed `seed-*` inputs, deleting tracked files from the working copy.
 //!
@@ -25,16 +26,24 @@ use std::time::{Duration, Instant};
 
 const FAKE_LIBFUZZER: &str = r#"#!/bin/sh
 echo "$*" >> "$FAKE_ARGS_LOG"
-merge=0; dirs=""; prefix=""
+merge=0; replay=0; dirs=""; prefix=""
 for a in "$@"; do
   case "$a" in
     -merge=1) merge=1 ;;
+    -runs=1) replay=1 ;;
     -artifact_prefix=*) prefix="${a#-artifact_prefix=}" ;;
     -*) ;;
     *) dirs="$dirs $a" ;;
   esac
 done
 set -- $dirs
+if [ "$replay" = 1 ]; then
+  if [ -n "${FAKE_REPLAY_TIMEOUT:-}" ]; then
+    echo slow > "${prefix}timeout-replay"
+    exit 70
+  fi
+  exit 0
+fi
 out="$1"; shift
 if [ "$merge" = 1 ]; then
   [ -n "${FAKE_MERGE_FAIL:-}" ] && exit 1
@@ -50,7 +59,22 @@ if [ -n "${FAKE_CRASH:-}" ]; then
   echo boom > "${prefix}crash-fake"
   exit 1
 fi
-exec perl -e '$SIG{INT} = sub { exit 72 }; print STDERR "INFO: INITED\n"; sleep 1 while 1'
+unit="${prefix}timeout-0123abcd"
+written="artifact_prefix='$prefix'; Test unit written to $unit"
+if [ -n "${FAKE_TIMEOUT:-}" ]; then
+  echo slow > "$unit"
+  printf '%s\n' "$written" "==1== ERROR: libFuzzer: timeout after 26 seconds" >&2
+  exit 70
+fi
+export unit written
+exec perl -e '
+  $SIG{INT} = sub {
+    exit 72 unless $ENV{FAKE_INTERRUPT_STALLS};
+    open my $f, ">", $ENV{unit} or die; print $f "fast\n"; close $f;
+    print STDERR "==1== libFuzzer: run interrupted; exiting\n$ENV{written}\n==1== ERROR: libFuzzer: timeout after 33 seconds\n";
+    exit 70;
+  };
+  print STDERR "INFO: INITED\n"; sleep 1 while 1'
 "#;
 
 /// Runs burst.sh in its own process group and kills the whole group after a deadline, so a
@@ -110,7 +134,10 @@ impl Repo {
             .env("GITHUB_OUTPUT", &output)
             .env("FAKE_ARGS_LOG", self.root.join("args.log"))
             .env_remove("FAKE_CRASH")
-            .env_remove("FAKE_MERGE_FAIL");
+            .env_remove("FAKE_MERGE_FAIL")
+            .env_remove("FAKE_TIMEOUT")
+            .env_remove("FAKE_INTERRUPT_STALLS")
+            .env_remove("FAKE_REPLAY_TIMEOUT");
         for (k, v) in env {
             cmd.env(k, v);
         }
@@ -171,6 +198,52 @@ fn a_crash_still_merges_and_keeps_the_fuzzer_status() {
     assert_eq!(output, "merged=true\n");
     assert!(repo.root.join("fuzz/artifacts/t/crash-fake").exists());
     assert_eq!(repo.corpus("t"), ["find from t\n", "prior"]);
+}
+
+fn replays(repo: &Repo) -> usize {
+    let log = fs::read_to_string(repo.root.join("args.log")).expect("burst test fixture");
+    log.lines().filter(|l| l.contains("-runs=1")).count()
+}
+
+#[test]
+fn an_interrupt_that_stalls_into_a_timeout_is_dropped_when_the_unit_replays_in_time() {
+    let repo = Repo::new();
+    repo.write("fuzz/corpus/t/a", "prior");
+
+    let (rc, output) = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1")]);
+
+    assert_eq!(rc, 0);
+    assert_eq!(output, "merged=true\n");
+    assert!(!repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists(), "the stalled exit's unit was kept as a find");
+    assert_eq!(replays(&repo), 1);
+    assert_eq!(repo.corpus("t"), ["find from t\n", "prior"]);
+}
+
+#[test]
+fn an_interrupt_timeout_whose_unit_times_out_again_is_kept() {
+    let repo = Repo::new();
+
+    let (rc, output) = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1"), ("FAKE_REPLAY_TIMEOUT", "1")]);
+
+    assert_eq!(rc, 70);
+    assert_eq!(output, "merged=true\n");
+    assert!(repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists());
+    assert_eq!(replays(&repo), 1);
+    assert!(
+        !repo.root.join("timeout-replay").exists() && !repo.root.join("fuzz/artifacts/t/timeout-replay").exists(),
+        "the replay left its own artifact in the checkout"
+    );
+}
+
+#[test]
+fn a_timeout_before_any_interrupt_is_kept_without_a_replay() {
+    let repo = Repo::new();
+
+    let (rc, _) = repo.burst("t", "0", &[("FAKE_TIMEOUT", "1")]);
+
+    assert_eq!(rc, 70);
+    assert!(repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists());
+    assert_eq!(replays(&repo), 0);
 }
 
 #[test]
