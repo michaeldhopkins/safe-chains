@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 4820825b68536c0025d316f57a02cb3650e42bf1180994bb9a133a0879623317 # shrinks to switch = ("safe.directory", ["*", "/repo", ".", "/tmp/x", "%(prefix)/repo"]), value_pick = Index(0), flips = [false], route = "git -c {kv} {sub}", sub = "log"
+cc 84cd0b0a255451e6e81bd129aaa626253d55b053eda0c10307c5002326d86433 # shrinks to switch = ("safe.directory", ["*", "/repo", ".", "/tmp/x", "%(prefix)/repo"]), value_pick = Index(0), flips = [false], route = "GIT_CONFIG_PARAMETERS=\"'{k}'='{v}'\" git {sub}", sub = "log"

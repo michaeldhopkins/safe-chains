@@ -47,7 +47,6 @@ owed = [
   "src/handlers/system/ssh.rs",
   "src/handlers/system/sysctl.rs",
   "src/handlers/system/tmux.rs",
-  "src/handlers/vcs/git.rs",
   "src/handlers/wrappers.rs",
   "src/parse.rs",
   "src/refusal.rs",
@@ -179,7 +178,7 @@ owed = [
   "random_path_shaped_arg_is_inert",
   "random_bare_word_is_denied",
 ]
-"src/handlers/vcs/git.rs" = []
+"src/handlers/vcs/git.rs" = ["no_route_to_git_config_switches_off_a_safety_check"]
 "src/handlers/wrappers.rs" = []
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",

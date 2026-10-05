@@ -1,3 +1,4 @@
+GIT_CONFIG_PARAMETERS="'safe.directory'='*'" git log	denied
 GetFileInfo	denied
 GetFileInfo --help	denied
 GetFileInfo --version	denied
@@ -6923,11 +6924,12 @@ git -c diff.textconv=/tmp/evil.sh diff	denied
 git -c diff.tool=evil difftool	denied
 git -c diff.wordRegex=. diff --word-diff	inert
 git -c diff.wsErrorHighlight=all diff	inert
-git -c http.sslVerify=false fetch origin	inert
+git -c http.sslVerify=false fetch origin	denied
+git -c http.sslVerify=true fetch origin	inert
 git -c init.defaultBranch=main ls-remote origin	inert
 git -c log	denied
-git -c safe.directory=* log	inert
-git -c safe.directory=/repo status	inert
+git -c safe.directory=* log	denied
+git -c safe.directory=/repo status	denied
 git -c user.name=foo log	denied
 git -h	inert
 git add	safe-write

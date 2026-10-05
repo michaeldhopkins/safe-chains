@@ -13,10 +13,15 @@ use crate::verdict::Verdict;
 /// Exact `key=value` settings permitted after `-c`: display/UX toggles and safe protocol/init
 /// settings that cannot run code, redirect trust, or reach a program path. Namespaces that are safe
 /// for ANY value are handled by prefix in `is_allowed_git_c`.
+///
+/// Nothing here may switch off one of git's own safety checks. `safe.directory` exempts a
+/// repository from the ownership check that keeps git from obeying the config, hooks and pager of a
+/// repository someone else owns, and `http.sslVerify=false` drops certificate verification. Both
+/// were once listed.
 static GIT_C_ALLOWED_KV: WordSet = WordSet::new(&[
     "core.askPass=", "core.askPass=false", "core.askpass=", "core.askpass=false", "core.pager=cat", "core.pager=less",
-    "credential.helper=", "http.sslVerify=false", "http.sslVerify=true", "http.sslverify=false", "http.sslverify=true",
-    "init.defaultBranch=main", "init.defaultBranch=master", "init.defaultBranch=trunk",
+    "credential.helper=", "http.sslVerify=true", "http.sslverify=true", "init.defaultBranch=main", "init.defaultBranch=master",
+    "init.defaultBranch=trunk",
 ]);
 
 /// Settings safe for ANY value, matched on the KEY alone — display and formatting knobs that only
@@ -41,9 +46,8 @@ static GIT_C_ALLOWED_KEYS: WordSet = WordSet::new(&[
 ]);
 
 /// Whether a `-c key=value` is on the allowlist. Positive by construction: an exact setting above,
-/// a key safe for any value, or one of three namespaces safe for any value — `color.*` (output
-/// styling), `advice.*` (hint toggles), `safe.directory` (ownership exceptions). Anything else is
-/// not on the list.
+/// a key safe for any value, or one of two namespaces safe for any value — `color.*` (output
+/// styling) and `advice.*` (hint toggles). Anything else is not on the list.
 fn is_allowed_git_c(kv: &str) -> bool {
     if GIT_C_ALLOWED_KV.contains(kv) {
         return true;
@@ -52,7 +56,7 @@ fn is_allowed_git_c(kv: &str) -> bool {
         return false;
     };
     let key = key.to_ascii_lowercase();
-    GIT_C_ALLOWED_KEYS.contains(key.as_str()) || key == "safe.directory" || key.starts_with("advice.") || key.starts_with("color.")
+    GIT_C_ALLOWED_KEYS.contains(key.as_str()) || key.starts_with("advice.") || key.starts_with("color.")
 }
 
 pub fn is_safe_git(tokens: &[Token]) -> Verdict {
@@ -151,12 +155,10 @@ mod tests {
         git_config_askpass_empty: "git -c core.askPass= ls-remote https://github.com/foo/bar",
         git_config_askpass_lower: "git -c core.askpass=false fetch origin",
         git_config_credential_helper_empty: "git -c credential.helper= ls-remote origin",
-        git_config_safe_directory: "git -c safe.directory=/repo status",
-        git_config_safe_directory_star: "git -c safe.directory=* log",
         git_config_advice: "git -c advice.detachedHead=false log HEAD",
         git_config_color_ui: "git -c color.ui=never status",
         git_config_pager_cat: "git -c core.pager=cat log",
-        git_config_sslverify_false: "git -c http.sslVerify=false fetch origin",
+        git_config_sslverify_true: "git -c http.sslVerify=true fetch origin",
         git_config_init_default_branch: "git -c init.defaultBranch=main ls-remote origin",
         git_config_multiple_c: "git -c core.askPass=false -c credential.helper= ls-remote origin",
         git_config_lower_c_with_upper_c: "git -C /repo -c core.askPass=false log",
@@ -272,6 +274,122 @@ mod tests {
         git_config_hooks_path_denied: "git -c core.hooksPath=/tmp log",
         git_config_pager_arbitrary_denied: "git -c core.pager=evil log",
         git_config_no_value_denied: "git -c log",
+        git_config_safe_directory_denied: "git -c safe.directory=/repo status",
+        git_config_safe_directory_star_denied: "git -c safe.directory=* log",
+        git_config_sslverify_false_denied: "git -c http.sslVerify=false fetch origin",
+        git_config_parameters_env_denied: "GIT_CONFIG_PARAMETERS=\"'safe.directory'='*'\" git log",
         git_help_bypass_denied: "git push -- --help",
+    }
+}
+
+#[cfg(test)]
+mod properties {
+    use super::{GIT_C_ALLOWED_KEYS, GIT_C_ALLOWED_KV, is_allowed_git_c};
+    use crate::is_safe_command;
+    use proptest::prelude::*;
+
+    /// git settings that switch off one of git's own safety checks, with values that do it. The
+    /// middle component of a three-part key is a subsection, which git matches case-sensitively, so
+    /// only the section and the variable are re-cased below.
+    const SAFETY_SWITCHES: &[(&str, &[&str])] = &[
+        ("safe.directory", &["*", "/repo", ".", "/tmp/x", "%(prefix)/repo"]),
+        ("safe.bareRepository", &["all"]),
+        ("http.sslVerify", &["false", "0", "no", "off"]),
+        ("http.https://example.com.sslVerify", &["false"]),
+        ("http.sslCAInfo", &["/tmp/ca.pem"]),
+        ("protocol.allow", &["always"]),
+        ("protocol.ext.allow", &["always"]),
+        ("protocol.file.allow", &["always"]),
+        ("core.fsmonitor", &["/tmp/x", "true"]),
+        ("core.hooksPath", &["/tmp/hooks"]),
+        ("core.protectNTFS", &["false"]),
+        ("core.protectHFS", &["false"]),
+        ("transfer.fsckObjects", &["false"]),
+        ("fetch.fsckObjects", &["false"]),
+        ("receive.fsckObjects", &["false"]),
+    ];
+
+    /// Every way a caller can hand git one setting for one invocation.
+    const ROUTES: &[&str] = &[
+        "git -c {kv} {sub}",
+        "git -c '{kv}' {sub}",
+        "git -C . -c {kv} {sub}",
+        "git -c color.ui=never -c {kv} {sub}",
+        "git --config-env={k}=SC_V {sub}",
+        "git --config-env {k}=SC_V {sub}",
+        "SC_V='{v}' git --config-env={k}=SC_V {sub}",
+        "GIT_CONFIG_PARAMETERS=\"'{k}'='{v}'\" git {sub}",
+        "export GIT_CONFIG_PARAMETERS=\"'{k}'='{v}'\"; git {sub}",
+        "env GIT_CONFIG_PARAMETERS=\"'{k}'='{v}'\" git {sub}",
+        "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0={k} GIT_CONFIG_VALUE_0='{v}' git {sub}",
+        "export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0={k} GIT_CONFIG_VALUE_0='{v}'; git {sub}",
+    ];
+
+    const SUBS: &[&str] = &["log", "status", "diff", "show HEAD", "fetch origin", "ls-remote origin", "rev-parse HEAD"];
+
+    fn recase(key: &str, flips: &[bool]) -> String {
+        let parts: Vec<&str> = key.split('.').collect();
+        let last = parts.len() - 1;
+        let mut flip = flips.iter().cycle();
+        let mut out: Vec<String> = Vec::with_capacity(parts.len());
+        for (i, part) in parts.iter().enumerate() {
+            if i == 0 || i == last {
+                out.push(
+                    part.chars()
+                        .map(|c| if *flip.next().unwrap_or(&false) { c.to_ascii_uppercase() } else { c.to_ascii_lowercase() })
+                        .collect(),
+                );
+            } else {
+                out.push((*part).to_string());
+            }
+        }
+        out.join(".")
+    }
+
+    proptest! {
+        /// No spelling of a setting that switches off a git safety check is approved, whatever its
+        /// case, its value, the route that carries it or the subcommand it rides on.
+        #[test]
+        fn no_route_to_git_config_switches_off_a_safety_check(
+            switch in proptest::sample::select(SAFETY_SWITCHES.to_vec()),
+            value_pick in any::<proptest::sample::Index>(),
+            flips in proptest::collection::vec(any::<bool>(), 1..24),
+            route in proptest::sample::select(ROUTES.to_vec()),
+            sub in proptest::sample::select(SUBS.to_vec()),
+        ) {
+            let (key, values) = switch;
+            let k = recase(key, &flips);
+            let v = values[value_pick.index(values.len())];
+            let kv = format!("{k}={v}");
+            let line = route.replace("{kv}", &kv).replace("{k}", &k).replace("{v}", v).replace("{sub}", sub);
+            prop_assert!(!is_allowed_git_c(&kv), "`-c {}` is on the -c allowlist", kv);
+            prop_assert!(!is_safe_command(&line), "a git safety check can be switched off: `{}`", line);
+        }
+    }
+
+    /// The allowlist itself, entry by entry, so a later addition cannot name a safety switch the
+    /// table above does not know: no listed setting turns off a check by name (`*verify*`,
+    /// `*fsck*`, `*protect*`) or touches the `safe.` and `protocol.` sections that hold them.
+    #[test]
+    fn the_c_allowlist_names_no_safety_switch() {
+        let disabling = ["false", "0", "no", "off"];
+        for kv in GIT_C_ALLOWED_KV.iter() {
+            let (key, value) = kv.split_once('=').unwrap_or((kv, ""));
+            let key = key.to_ascii_lowercase();
+            let checks = key.contains("verify") || key.contains("fsck") || key.contains("protect");
+            assert!(!(checks && disabling.contains(&value)), "`{kv}` switches off a check");
+            assert!(!key.starts_with("safe.") && !key.starts_with("protocol."), "`{kv}` is in a safety section");
+        }
+        for key in GIT_C_ALLOWED_KEYS.iter() {
+            assert!(
+                !["verify", "fsck", "protect", "safe.", "protocol.", "fsmonitor", "hookspath"]
+                    .iter()
+                    .any(|n| key.contains(n)),
+                "`{key}` is allowed for any value and names a safety switch"
+            );
+        }
+        for (key, _) in SAFETY_SWITCHES {
+            assert!(!is_allowed_git_c(&format!("{key}=x")), "`{key}` is allowed for any value");
+        }
     }
 }

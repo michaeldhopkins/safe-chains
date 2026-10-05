@@ -222,6 +222,12 @@ because = "as GIT_CONFIG_COUNT"
 [env."GIT_CONFIG_VALUE_*"]
 shape = "opaque"
 because = "as GIT_CONFIG_COUNT"
+# The fourth spelling: git passes `-c` settings to its child processes in this variable, and obeys it
+# when the caller sets it. One value carries any number of quoted pairs, `'core.pager'='sh -c x'` or
+# `'safe.directory'='*'`.
+[env.GIT_CONFIG_PARAMETERS]
+shape = "opaque"
+because = "injects arbitrary git config, as `git -c` does, for every git process that inherits it"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
