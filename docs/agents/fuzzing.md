@@ -54,8 +54,10 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   Generated `gen-*` seeds and `fuzz/dict/` are git-ignored. The property targets take other input
   domains (a flag value, an envelope, a config file), so the registry seeds do not apply to them.
 - **Regression seeds are the one hand-kept input.** A minimized find is committed as `seed-*` in
-  its target's corpus (`.gitignore` lets `seed-*` through for `parse` and `explain_render`), so the
-  replay holds it down. `explain_render/seed-unclosed-brace-nest` is the 2026-09-26 timeout: an
+  its target's corpus (`.gitignore` lets `seed-*` through for `parse`, `explain_render` and
+  `hook_envelope`), so the replay holds it down. `hook_envelope/seed-codex-permission-request` is
+  not a find: it is a Codex `PermissionRequest` envelope, which byte mutation would not reach from
+  the other envelopes, so the second Codex format is fuzzed at all. `explain_render/seed-unclosed-brace-nest` is the 2026-09-26 timeout: an
   unclosed `{` nest was parsed once as a brace group and again as a command named `{`, doubling per
   level. The parser's guards for that class count work instead of timing it (`cst/budget.rs` holds
   the entry and step budgets; the tests in `cst/parse.rs` assert work linear in nesting and walk

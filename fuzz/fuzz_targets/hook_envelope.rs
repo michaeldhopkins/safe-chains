@@ -14,6 +14,10 @@
 //! 1. `parse_input` never panics on arbitrary bytes. Malformed JSON must be an `Err`, not a crash.
 //! 2. A target never emits an ALLOW for a command that did not classify as safe. Panic-freedom
 //!    alone would miss the blank-command bug, which never panicked — it answered `allow`.
+//!
+//! The envelope is routed by `hook_format_for`, as the binary routes it, so a target that answers
+//! several events (Codex's `PreToolUse` and `PermissionRequest`) is fuzzed in each format.
+//! `seed-codex-permission-request` gives the mutator the second event's envelope to start from.
 
 use libfuzzer_sys::fuzz_target;
 
@@ -25,7 +29,7 @@ fuzz_target!(|data: &[u8]| {
     let stdin = String::from_utf8_lossy(data);
 
     for target in safe_chains::targets::registry() {
-        let Some(format) = target.hook_format() else {
+        let Some(format) = target.hook_format_for(&stdin) else {
             continue;
         };
 
@@ -63,9 +67,11 @@ fuzz_target!(|data: &[u8]| {
 
         // The gated paths must not leak a grant either: whatever a target emits when it refuses or
         // escalates, it must never be a token some harness reads as approval.
-        for gated in [format.render_deny("refused"), format.render_ask("confirm")] {
-            for grant in GRANTS {
-                assert!(!gated.stdout.contains(grant), "{} leaked {grant} on a gated path: `{}`", target.name(), gated.stdout);
+        for any_format in target.hook_formats() {
+            for gated in [any_format.render_deny("refused"), any_format.render_ask("confirm")] {
+                for grant in GRANTS {
+                    assert!(!gated.stdout.contains(grant), "{} leaked {grant} on a gated path: `{}`", target.name(), gated.stdout);
+                }
             }
         }
     }

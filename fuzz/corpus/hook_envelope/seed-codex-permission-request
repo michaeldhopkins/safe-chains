@@ -1,0 +1,1 @@
+{"session_id":"s","turn_id":"t","transcript_path":null,"cwd":"/w","hook_event_name":"PermissionRequest","model":"m","permission_mode":"default","tool_name":"Bash","tool_input":{"command":"git status","description":"run outside the sandbox"}}

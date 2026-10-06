@@ -22,7 +22,8 @@ docs/book/
 # actions cache, one entry per target, so committing a few hundred hash-named inputs from a laptop
 # run adds noise without adding coverage. A hand-kept seed-* (a minimized regression) is committed.
 fuzz/corpus/equivalence/
-fuzz/corpus/hook_envelope/
+fuzz/corpus/hook_envelope/*
+!fuzz/corpus/hook_envelope/seed-*
 fuzz/corpus/explain_render/*
 !fuzz/corpus/explain_render/seed-*
 fuzz/corpus/suggest_roundtrip/

@@ -48,6 +48,21 @@ pub trait Target: Send + Sync {
     fn hook_format(&self) -> Option<&dyn HookFormat> {
         None
     }
+
+    /// The format that answers THIS envelope. Most harnesses send one hook event, so it is
+    /// `hook_format`. Codex sends `PreToolUse` and `PermissionRequest` to the same command and
+    /// expects a different answer to each, so it picks by the event the envelope names.
+    fn hook_format_for(&self, _stdin: &str) -> Option<&dyn HookFormat> {
+        self.hook_format()
+    }
+
+    /// Every format `hook_format_for` can return, so the contract guards that need no envelope walk
+    /// all of them and a second event's format cannot ship unchecked. The foreign-tool guard is
+    /// driven by `sample_envelope` and reaches only the format that envelope routes to; Codex's
+    /// `PermissionRequest` tool filter has its own test in `codex.rs`.
+    fn hook_formats(&self) -> Vec<&dyn HookFormat> {
+        self.hook_format().into_iter().collect()
+    }
 }
 
 pub trait HookFormat: Send + Sync {
@@ -102,6 +117,28 @@ pub trait HookFormat: Send + Sync {
     fn render_ask(&self, _reason: &str) -> HookResponse {
         HookResponse { stdout: String::new(), exit_code: 0 }
     }
+
+    /// Whether the envelope's `cwd` is the directory the command runs in. `false` when the harness
+    /// can run the command somewhere else without saying where (Codex's `exec_command` takes a
+    /// `workdir` that its `PermissionRequest` payload leaves out), so `evaluation_dirs` refuses to
+    /// resolve a relative path against it.
+    fn cwd_is_the_commands(&self) -> bool {
+        true
+    }
+}
+
+/// The working directory nothing can be inside: a relative path resolved against it lands outside
+/// every workspace, so a command whose safety rests on where its relative paths point is not
+/// approved, while one that names no such path classifies as it would anywhere.
+pub const UNKNOWN_WORKDIR: &str = "/nonexistent/safe-chains-unknown-workdir";
+
+/// The (cwd, root) a command is classified under. Most harnesses send no distinct project root, so
+/// the root defaults to the cwd, which engages the workspace boundary with the one directory known.
+/// Where the cwd is not the command's own (`HookFormat::cwd_is_the_commands`), the reported cwd
+/// stays the workspace root and the command is placed at `UNKNOWN_WORKDIR`.
+pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<String>, Option<String>) {
+    let root = input.root.clone().or_else(|| input.cwd.clone());
+    if format.cwd_is_the_commands() { (input.cwd.clone(), root) } else { (Some(UNKNOWN_WORKDIR.to_string()), root) }
 }
 
 /// How a harness's hook handles a gated command — see `HookFormat::gated_policy`.
@@ -158,7 +195,15 @@ pub fn may_grant(command: &str, verdict: crate::Verdict) -> bool {
 /// The single seam every caller goes through, so the blank-command rule cannot be bypassed by
 /// reaching for `render_response` directly.
 pub fn respond(format: &dyn HookFormat, command: &str, verdict: crate::Verdict) -> Option<HookResponse> {
-    may_grant(command, verdict).then(|| format.render_response(verdict))
+    (may_grant(command, verdict) && within_unknown_workdir_ceiling(format, verdict)).then(|| format.render_response(verdict))
+}
+
+/// Where the command may run in a directory the hook was not told (`cwd_is_the_commands` is
+/// false), only a read is granted. `UNKNOWN_WORKDIR` catches a write that NAMES a relative path,
+/// but `git commit -am x`, `cargo fmt` or `cd /elsewhere && git add .` write into whatever
+/// directory they run in without naming one, and classify the same wherever that is.
+fn within_unknown_workdir_ceiling(format: &dyn HookFormat, verdict: crate::Verdict) -> bool {
+    format.cwd_is_the_commands() || matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead)
 }
 
 /// Append `entry` to `settings[outer][event]`, creating the path when absent.
@@ -378,20 +423,25 @@ mod tool_filter_tests {
         let mut failures = Vec::new();
         let mut checked = 0usize;
         for target in registry() {
-            let Some(fmt) = target.hook_format() else { continue };
+            if target.hook_format().is_none() {
+                continue;
+            }
             let Some(shell) = target.sample_envelope(target.shell_tool_name(), "ls") else {
                 continue; // envelope carries no tool identifier — cannot self-filter
             };
             let name = target.name();
+            let routed = |env: &str| target.hook_format_for(env).map(|fmt| fmt.parse_input(env));
             // The shell tool must still parse, or "reject everything" would satisfy the negative
             // half and look like a working filter.
-            if let Err(e) = fmt.parse_input(&shell) {
-                failures.push(format!("{name}: rejected its own shell tool `{}`: {}", target.shell_tool_name(), e.message));
+            match routed(&shell) {
+                Some(Ok(_)) => {}
+                Some(Err(e)) => failures.push(format!("{name}: rejected its own shell tool `{}`: {}", target.shell_tool_name(), e.message)),
+                None => failures.push(format!("{name}: hook_format_for found no format for its own shell envelope")),
             }
             for foreign in ["Read", "Write", "Edit", "WebFetch"] {
                 let Some(env) = target.sample_envelope(foreign, "rm -rf /") else { continue };
                 checked += 1;
-                if fmt.parse_input(&env).is_ok() {
+                if matches!(routed(&env), Some(Ok(_))) {
                     failures.push(format!("{name}: parsed a `{foreign}` envelope instead of abstaining"));
                 }
             }

@@ -27,5 +27,5 @@ const PINS: [(&str, usize); 20] = [
     ("src/registry/tests.rs", 7324),
     ("src/registry/types.rs", 1162),
     ("src/tests.rs", 2119),
-    ("tests/integration_hooks.rs", 766),
+    ("tests/integration_hooks.rs", 756),
 ];

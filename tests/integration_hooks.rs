@@ -16,6 +16,9 @@ use std::process::{Command, Stdio};
 #[path = "support/hooks.rs"]
 mod hooks;
 use hooks::{binary, run_hook};
+#[path = "support/formats.rs"]
+mod formats;
+use formats::every_hook_format;
 
 /// Run the claude hook with a temp `$HOME` carrying `level = "<level>"` in the user config, and
 /// `cwd` set to that home so a relative `./f` classifies as a worktree path. Returns (stdout, exit).
@@ -490,14 +493,9 @@ fn every_target_emits_its_decision_at_the_declared_field() {
     let mut failures = Vec::new();
     let mut checked = 0usize;
 
-    let pointers: Vec<&'static str> = safe_chains::targets::registry()
-        .iter()
-        .filter_map(|t| t.hook_format().map(|f| f.decision_pointer()))
-        .collect();
+    let pointers: Vec<&'static str> = every_hook_format().iter().map(|(_, f)| f.decision_pointer()).collect();
 
-    for target in safe_chains::targets::registry() {
-        let Some(fmt) = target.hook_format() else { continue };
-        let name = target.name();
+    for (name, fmt) in every_hook_format() {
         let mine = fmt.decision_pointer();
 
         let emissions = [
@@ -635,20 +633,14 @@ fn the_decision_seam_never_grants_on_a_blank_command() {
     assert!(!may_grant("ls", Verdict::Denied), "a denied verdict must never grant");
 
     let mut checked = 0;
-    for target in safe_chains::targets::registry() {
-        let Some(format) = target.hook_format() else { continue };
+    for (name, format) in every_hook_format() {
         checked += 1;
         for blank in ["", "   ", "\n"] {
-            assert!(respond(format, blank, safe).is_none(), "{}: respond() produced a decision for a blank command", target.name());
+            assert!(respond(format, blank, safe).is_none(), "{name}: respond() produced a decision for a blank command");
         }
         // And the same target does produce one for a real safe command, or the check is empty.
         let real = respond(format, "ls", safe);
-        assert!(
-            real.is_some(),
-            "{}: respond() produced nothing for a real safe command; the blank check above proves \
-             nothing",
-            target.name()
-        );
+        assert!(real.is_some(), "{name}: respond() produced nothing for a real safe command; the blank check above proves nothing");
     }
     assert!(checked > 0, "no hook target was exercised; the guard would be vacuous");
 }
@@ -671,6 +663,7 @@ fn no_target_approves_a_blank_command() {
     const ENVELOPES: &[(&str, &str)] = &[
         ("claude", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
         ("codex", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
+        ("codex", r#"{"hook_event_name":"PermissionRequest","tool_name":"Bash","tool_input":{"command":"{CMD}"},"cwd":"/w"}"#),
         ("gemini", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
         ("qwen", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
         ("droid", r#"{"tool_name":"Bash","tool_input":{"command":"{CMD}"}}"#),
@@ -697,7 +690,8 @@ fn no_target_approves_a_blank_command() {
         // Non-vacuity: the same envelope with a REAL safe command must still reach a verdict, or
         // the rows above would pass simply because the envelope never parsed.
         let (stdout, _, _) = run_hook(&["hook", name], &template.replace("{CMD}", "ls"));
-        if stdout.trim().is_empty() && matches!(*name, "claude" | "qwen" | "cursor") {
+        let grants_on_safe = matches!(*name, "claude" | "qwen" | "cursor") || template.contains("\"PermissionRequest\"");
+        if stdout.trim().is_empty() && grants_on_safe {
             failures.push(format!("{name}: envelope no longer parses; the blank check is vacuous"));
         }
     }
@@ -714,11 +708,7 @@ fn no_target_approves_a_blank_command() {
 fn every_target_hook_contract_is_fail_safe() {
     use safe_chains::Verdict;
     let mut failures = Vec::new();
-    for target in safe_chains::targets::registry() {
-        let Some(fmt) = target.hook_format() else {
-            continue;
-        };
-        let name = target.name();
+    for (name, fmt) in every_hook_format() {
         let denied = fmt.render_response(Verdict::Denied);
         if !denied.stdout.trim().is_empty() {
             failures.push(format!("{name}: render_response(Denied) emitted `{}`", denied.stdout));

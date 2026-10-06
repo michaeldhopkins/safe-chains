@@ -101,7 +101,7 @@ confirm one harness at a time.
 | Harness | grant | deny | escalate (`ask`) | human-review-on-silence | sandbox | → SAFE | → GATED | Evidence |
 |---|---|---|---|---|---|---|---|---|
 | **Claude Code** | ✅ | ✅ | ✅ | ✅ (permission prompt) | ❌ | `allow` | silent (defer to prompt) | reference; long-standing |
-| **Codex** | ✅ per docs / ❌ v0.144.3 | ✅ | ❌ (`ask` parsed, unsupported) | ❌ (only sandbox-escape prompts) | ✅ workspace-write | **silent** | **deny** | probe 2026-07-13, v0.144.3 |
+| **Codex** `PreToolUse` | ✅ per docs / ❌ v0.144.3 | ✅ | ❌ (`ask` parsed, unsupported) | ❌ on this event (see `PermissionRequest` below) | ✅ workspace-write | **silent** | **deny** | probe 2026-07-13, v0.144.3 |
 | ~~gemini~~ | — | — | — | — | — | — | — | **DEPRECATED**: Gemini CLI retired 2026-06-18 (enterprise-only remnant) |
 | **antigravity** (`agy`) | ❌ (`allow` doesn't skip confirm) | ✅ | ✅ (`ask`/`force_ask`) | ✅ (`request-review`) | ❌ | `allow` | **`force_ask`** | probe 2026-07-13, v1.1.2 (live TUI) |
 | qwen | ? | ? | ? | ? | ? | ? | ? | unverified |
@@ -119,6 +119,14 @@ v0.144.3 despite the current docs listing it as supported (version drift), so SA
 object (not Claude's flat `PreToolUse`). Sandbox `workspace-write` blocks out-of-workspace writes +
 network but permits **broad reads** — so a gated `cat /etc/shadow` runs unchecked unless the hook
 denies it.
+
+**Codex `PermissionRequest` (v0.122.0+, read from v0.160.1 source on 2026-10-05):** a second event
+that runs only where Codex would prompt (a sandbox escalation, a network approval, the `untrusted`
+approval policy), and whose `allow` IS a grant: it answers that prompt. So on this event Codex has
+the Claude profile, grant plus human-review-on-silence, and safe-chains answers it the Claude way:
+`allow` for a safe READ, silent for everything else (Codex does not report the directory the command runs in, so a write cannot be placed). The `PreToolUse` row above is unchanged and still does the
+vetoing; the two are installed together and routed on `hook_event_name`. See HARNESS-BEHAVIORS.md
+§Codex `PermissionRequest`.
 
 **Antigravity evidence (v1.1.2 CLI, probed 2026-07-13 live):** the `run_command` PreToolUse hook
 reads protojson on stdin (`toolCall.args.CommandLine`, `workspacePaths`) and writes a `{decision}`.

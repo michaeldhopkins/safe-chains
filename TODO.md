@@ -3340,3 +3340,23 @@ rather than the whole-command list, and the same hook would serve other converte
 Five rotating slices in a row (2026-10-06) each found one to three survivors in this file. Run
 `cargo mutants -f src/decisionlog.rs` locally (128 mutants; needs disk above the 10 GB floor) and
 give every MISSED one a test, rather than meeting them one slice at a time.
+
+## Codex runs a command in a `workdir` the hook is not told
+
+Codex's `exec_command` takes a `workdir`, and neither the `PreToolUse` nor the `PermissionRequest`
+payload carries it. On `PermissionRequest` the hook places the command at `UNKNOWN_WORKDIR` and
+grants only reads (`targets::evaluation_dirs`, `within_unknown_workdir_ceiling`). Two gaps remain:
+
+- **The credential shield matches file names.** With `workdir` set to `~/.ssh`, `cat id_rsa` names
+  no credential path and is approved on both events (`cat .ssh/id_rsa` is not). The sandbox permits
+  that read anyway, so escalation adds only network. Closing it needs either the `workdir` in the
+  payload (an upstream request) or treating a bare relative read as unknown-directory too.
+- **The decision log does not record the event.** Under the `untrusted` policy a safe command
+  fires both events and is logged as allowed twice, and a gated `execve` child on
+  `PermissionRequest` is logged as denied although Codex prompts. An `event` field, or a harness
+  label per event, would separate them (docs/design/decision-log.md).
+- **Reads that run project code.** `cargo test`, `cargo check`, `cargo clippy`, `npm test`,
+  `go test ./...`, `pytest` and `git fetch` classify as reads, so `PermissionRequest` approves them,
+  and they run outside the sandbox in whatever `workdir` the model chose, writing build output (or
+  `.git`) there and executing that directory's code. Whether these should need a prompt on this
+  event is the owner's call; the docs disclose `cargo test`.

@@ -72,30 +72,58 @@ This removes every `Bash(...)` entry but leaves non-Bash permissions (WebFetch, 
 
 ## Codex (OpenAI)
 
-Run `safe-chains --setup --tool=codex` to write `~/.codex/hooks.json` with safe-chains as a `PreToolUse` hook. Or manually add to `~/.codex/hooks.json`:
+Run `safe-chains --setup --tool=codex` to write `~/.codex/hooks.json` with safe-chains on two hook events. Running it again after an upgrade adds whichever entry is missing. Or manually add to `~/.codex/hooks.json`:
 
 ```json
 {
-  "PreToolUse": [
-    {
-      "matcher": "Bash",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "safe-chains hook codex"
-        }
-      ]
-    }
-  ]
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "safe-chains hook codex"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "safe-chains hook codex"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
-Codex requires `[features] codex_hooks = true` in `~/.codex/config.toml` for hooks to fire. Add it manually if it isn't already there:
+The two events do different jobs:
+
+- **`PreToolUse`** runs before every shell command. A command safe-chains recognizes as safe runs as usual; any other command is refused, because inside Codex's sandbox it would otherwise run without a prompt, and the sandbox still allows reading files anywhere on the machine.
+- **`PermissionRequest`** runs only when Codex is about to ask you to approve a command: one that needs to run outside the sandbox or reach the network, or, under the `untrusted` approval policy, one Codex does not already trust. safe-chains approves a command it recognizes as safe, and leaves every other command to Codex's own approval prompt.
+
+Codex does not tell the hook which directory a command will run in (a command can name its own working directory). So on `PermissionRequest`, safe-chains approves only commands that read. Every command that writes, such as `git commit` or `cargo fmt`, and every search through a relative directory, such as `grep -r foo src`, goes to Codex's prompt.
+
+A command approved through `PermissionRequest` runs outside the sandbox. That includes commands that run the project's own code, such as `cargo test`, and commands that read from the network, such as `curl -s https://example.com` or `git fetch`, which can carry anything the agent has already read to the address it names. If you want the sandbox to hold for those, leave the `PermissionRequest` entry out.
+
+`PermissionRequest` needs Codex 0.122.0 or later. Older versions ignore that entry and keep using `PreToolUse`.
+
+Codex runs a new or changed hook only after you have trusted it. After installing, open `/hooks` in Codex, review the safe-chains entries and trust them. Until then Codex skips them without saying so.
+
+Hooks are on by default from Codex 0.124.0. On older versions add this to `~/.codex/config.toml`:
 
 ```toml
 [features]
 codex_hooks = true
 ```
+
+If `~/.codex/config.toml` has `hooks = false` (or `codex_hooks = false`) under `[features]`, remove it.
 
 Restart your Codex sessions after the first install. Updating the `safe-chains` binary takes effect immediately.
 

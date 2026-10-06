@@ -20,11 +20,23 @@ pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode)
         eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
         process::exit(1);
     };
-    let Some(format) = target.hook_format() else {
+    let Some(default_format) = target.hook_format() else {
         eprintln!("{}: this target does not use a runtime hook (config-only integration).", target.display_name());
         process::exit(1);
     };
-    run_hook_format(format, target_name, log_mode);
+    let buf = read_stdin_or_abstain();
+    // A harness that sends several hook events to the one command (Codex: PreToolUse and
+    // PermissionRequest) is answered in the shape of the event the envelope names.
+    let format = target.hook_format_for(&buf).unwrap_or(default_format);
+    run_hook_on(format, target_name, &buf, log_mode);
+}
+
+fn read_stdin_or_abstain() -> String {
+    let mut buf = String::new();
+    if io::stdin().read_to_string(&mut buf).is_err() {
+        process::exit(0);
+    }
+    buf
 }
 
 /// The "outside the working directory" clause, NAMING the cwd when the harness reported one — so a
@@ -32,29 +44,26 @@ pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode)
 /// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
 /// elsewhere" from "this command genuinely overreaches".
 pub fn run_hook_format(format: &dyn HookFormat, target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
+    let buf = read_stdin_or_abstain();
+    run_hook_on(format, target_name, &buf, log_mode);
+}
+
+fn run_hook_on(format: &dyn HookFormat, target_name: &str, buf: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     // Claude's own permission files are trust ONLY when Claude is the harness being served.
     // Every other target gets safe-chains' own classification and nothing borrowed.
     if target_name == "claude" {
         safe_chains::trust_claude_config();
     }
-    let mut buf = String::new();
-    if io::stdin().read_to_string(&mut buf).is_err() {
-        process::exit(0);
-    }
 
-    let Ok(input) = format.parse_input(&buf) else {
+    let Ok(input) = format.parse_input(buf) else {
         process::exit(0);
     };
 
     // HP-19: install the harness cwd/root so relative paths resolve against the real
-    // directory for the whole evaluation (verdict and explainer). Most harnesses send `cwd`
-    // but no distinct project `root`; default root to cwd so the workspace boundary (and the
-    // "reaches above your workspace" nudge) engages with the one directory we do know.
-    let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
-        cwd: input.cwd.clone(),
-        root: input.root.clone().or_else(|| input.cwd.clone()),
-        session_id: input.session_id.clone(),
-    });
+    // directory for the whole evaluation (verdict and explainer). `evaluation_dirs` owns the
+    // defaults, including a harness whose reported cwd is not where the command runs.
+    let (cwd, root) = targets::evaluation_dirs(format, &input);
+    let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx { cwd, root, session_id: input.session_id.clone() });
     // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
     // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —
     // git push / bulk-object-read become reachable; a LOWER level (reader/editor) TIGHTENS it — a read-
@@ -108,10 +117,13 @@ pub fn run_hook_format(format: &dyn HookFormat, target_name: &str, log_mode: saf
     if let Verdict::Allowed(level) = explanation.overall
         && level <= threshold
     {
-        log_decision(log_mode, LogOutcome::Allowed, &log_ctx, Some(&explanation));
-        let response = format.render_response(Verdict::Allowed(level));
-        let _ = io::stdout().write_all(response.stdout.as_bytes());
-        process::exit(response.exit_code);
+        // Through `respond`, like the first grant: on a harness whose safe answer is a real grant
+        // (Codex's PermissionRequest), this is one too.
+        if let Some(response) = targets::respond(format, &input.command, Verdict::Allowed(level)) {
+            log_decision(log_mode, LogOutcome::Allowed, &log_ctx, Some(&explanation));
+            let _ = io::stdout().write_all(response.stdout.as_bytes());
+            process::exit(response.exit_code);
+        }
     }
 
     // Past this point every exit is a non-approval — Deny, Ask, a surfaced explanation, the
