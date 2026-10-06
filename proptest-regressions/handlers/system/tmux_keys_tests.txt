@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc fce49510d3afca5926929d77e213e07468f3bdd08ab19a9f4e65102822dae351 # shrinks to text = "git status", after = []
+cc 59be19e8c8a55a3495978fe9452d36a3f7d96c038e9a262f4f8f28a833184336 # shrinks to before = [], text = "rm -rf /", submit = "Enter"

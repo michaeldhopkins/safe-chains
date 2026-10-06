@@ -2,6 +2,7 @@ pub(crate) mod plutil;
 pub(crate) mod ssh;
 pub(crate) mod sysctl;
 mod tmux;
+mod tmux_keys;
 
 use crate::parse::Token;
 use crate::verdict::Verdict;

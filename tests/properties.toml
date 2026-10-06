@@ -177,6 +177,11 @@ owed = [
 "src/handlers/system/ssh.rs" = []
 "src/handlers/system/sysctl.rs" = []
 "src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command", "global_flags_alone_never_name_a_command"]
+"src/handlers/system/tmux_keys.rs" = [
+  "src/handlers/system/tmux_keys_tests.rs::navigation_alone_is_always_approved",
+  "src/handlers/system/tmux_keys_tests.rs::submitted_text_is_never_more_permissive_than_running_it",
+  "src/handlers/system/tmux_keys_tests.rs::text_left_unsubmitted_is_refused",
+]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",
@@ -268,6 +273,7 @@ owed = [
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"
+"src/handlers/system/tmux_keys_tests.rs" = "the tmux send-keys suite (#[cfg(test)] mod in tmux_keys.rs)"
 "src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"

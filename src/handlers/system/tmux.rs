@@ -347,7 +347,7 @@ fn tmux_command(rest: &[Token]) -> Verdict {
     }
 
     if sub == "send-keys" || sub == "send" {
-        return Verdict::Allowed(SafetyLevel::SafeWrite);
+        return super::tmux_keys::send_keys_verdict(rest);
     }
 
     Verdict::Denied
@@ -370,7 +370,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, \
              kill-server, attach-session, detach-client, switch-client, new-window, split-window, \
              select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, \
-             set-option for options that hold data, set-environment, send-keys. \
+             set-option for options that hold data, set-environment, send-keys for keys that type \
+             nothing (Left, Right, Home, End, paging, Escape, C-c) or for text submitted with Enter that is \
+             itself an allowed command. \
              Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command \
              given to new-session, new-window, split-window, respawn-pane and respawn-window \
              (recursively validates inner commands, in the -c directory).",
