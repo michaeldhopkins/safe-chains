@@ -17,7 +17,7 @@ use std::sync::LazyLock;
 
 use serde::Deserialize;
 
-use super::{Redir, Script, SimpleCmd, Word, WordPart};
+use super::{Cmd, Pipeline, Redir, Script, SimpleCmd, Word, WordPart};
 use crate::engine::facet::{Capability, NetDestination, NetDirection, NetPayload, Network, Operation, Profile, Provenance, RemoteReach};
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
@@ -65,14 +65,47 @@ pub(crate) fn with_args(cmd: &SimpleCmd, leaf: impl FnOnce() -> Verdict) -> Verd
 }
 
 fn simple_carries(cmd: &SimpleCmd) -> bool {
-    cmd.words.iter().skip(1).any(word_carries)
-        || cmd.env.iter().any(|(_, v)| word_carries(v))
-        || cmd.redirs.iter().any(|r| match r {
-            Redir::Read { target, .. } | Redir::ReadWrite { target, .. } => word_carries(target),
-            Redir::Write { .. } => false,
-            Redir::HereStr(w) | Redir::HereDoc { body: w, .. } => word_carries(w),
-            Redir::DupFd { .. } => false,
-        })
+    cmd.words.iter().skip(1).any(word_carries) || cmd.env.iter().any(|(_, v)| word_carries(v)) || redirs_carry(&cmd.redirs)
+}
+
+/// An input redirect hands the command a file from this machine; a here-string or heredoc hands it
+/// text, which carries only what the shell fills in.
+fn redirs_carry(redirs: &[Redir]) -> bool {
+    redirs.iter().any(|r| match r {
+        Redir::Read { target, .. } | Redir::ReadWrite { target, .. } => target.eval() != "/dev/null",
+        Redir::Write { .. } | Redir::DupFd { .. } => false,
+        Redir::HereStr(w) | Redir::HereDoc { body: w, .. } => word_carries(w),
+    })
+}
+
+/// Classify one pipeline stage, marked when its standard input brings data from this machine: the
+/// stage before it is anything but `echo`/`printf` of literal text, or the stage is a compound
+/// command whose input is redirected from a file. `cat ./notes | http https://example.com` sends
+/// the file as the request body.
+pub(crate) fn with_stdin(pipeline: &Pipeline, position: usize, run: impl FnOnce() -> Verdict) -> Verdict {
+    let piped = position > 0 && pipeline.commands.get(position - 1).is_some_and(|prev| !prints_literal_text(prev));
+    let redirected = match &pipeline.commands[position] {
+        Cmd::Subshell { redirs, .. }
+        | Cmd::BraceGroup { redirs, .. }
+        | Cmd::For { redirs, .. }
+        | Cmd::While { redirs, .. }
+        | Cmd::Until { redirs, .. }
+        | Cmd::If { redirs, .. }
+        | Cmd::Case { redirs, .. }
+        | Cmd::DoubleBracket { redirs, .. } => redirs_carry(redirs),
+        Cmd::Simple(_) | Cmd::FunctionDef { .. } => false,
+    };
+    let _mark = enter(piped || redirected);
+    run()
+}
+
+fn prints_literal_text(cmd: &Cmd) -> bool {
+    let Cmd::Simple(s) = cmd else { return false };
+    let Some(name) = s.words.first() else { return false };
+    matches!(name.eval().as_str(), "echo" | "printf")
+        && s.env.is_empty()
+        && s.redirs.is_empty()
+        && !s.words.iter().any(|w| word_carries(w) || w.eval().contains(['*', '?', '[', '~']))
 }
 
 /// Whether the shell fills in any part of `word` at run time. Every `$` in unquoted or

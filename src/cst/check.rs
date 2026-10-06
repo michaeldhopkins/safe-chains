@@ -414,9 +414,9 @@ pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
     // instead of worst-casing. In `A | xargs CMD`, xargs injects A's items as CMD's operands (the
     // same idea as `find -exec`'s `{}` binding, sourced from the pipe).
     let mut stream: Option<String> = None;
-    for cmd in &pipeline.commands {
+    for (stage, cmd) in pipeline.commands.iter().enumerate() {
         let _stdin = stream.clone().map(crate::pathctx::enter_stdin_repr);
-        acc = acc.combine(cmd_verdict(cmd));
+        acc = acc.combine(super::netargs::with_stdin(pipeline, stage, || cmd_verdict(cmd)));
         stream = Some(stage_output_repr(cmd, stream.as_deref()));
     }
     acc
