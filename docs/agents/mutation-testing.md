@@ -57,7 +57,9 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   `normalizing_keeps_every_redirect` in `src/cst/normalize_tests.rs` and
   `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`. The next slice (run
   37508602217) missed `Outcome`'s `Display` returning nothing; `an_outcome_displays_as_its_log_name`
-  kills it.
+  kills it. Run 37511064101 missed `rotate_if_large` emptied and `<` to `<=` at the rotation cap;
+  `appending_to_a_full_log_starts_a_fresh_one` (a sparse file at the real cap) and
+  `a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not` kill them.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
