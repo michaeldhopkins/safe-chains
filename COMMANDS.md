@@ -3120,6 +3120,12 @@ Aliases: `gcomm`
 - Requires -v, -V, --version. - Allowed standalone flags: --help, --version, -h
 - Allowed valued flags: -v, -V
 
+**Examples:**
+
+- `command -v git`
+- `command -V git`
+- `command -v git -v`
+
 ### `composer`
 <p class="cmd-url"><a href="https://getcomposer.org/doc/03-cli.md">https://getcomposer.org/doc/03-cli.md</a></p>
 
@@ -15503,7 +15509,7 @@ Aliases: `gtimeout`
 ### `tmux`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
 
-- Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
+- Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option for options that hold data, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command given to new-session, new-window, split-window, respawn-pane and respawn-window (recursively validates inner commands, in the -c directory).
 
 ### `tns`
 <p class="cmd-url"><a href="https://docs.nativescript.org/CLI">https://docs.nativescript.org/CLI</a></p>

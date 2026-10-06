@@ -29,6 +29,12 @@
 - Requires -v, -V, --version. - Allowed standalone flags: --help, --version, -h
 - Allowed valued flags: -v, -V
 
+**Examples:**
+
+- `command -v git`
+- `command -V git`
+- `command -v git -v`
+
 ### `declare`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html">https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html</a></p>
 
