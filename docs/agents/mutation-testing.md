@@ -55,7 +55,9 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   (the roundtrip property renders the normalized form, so a dropped redirect round-trips cleanly),
   and `*` to `+` in either factor of `ROTATE_AT_BYTES`. Killed by the property
   `normalizing_keeps_every_redirect` in `src/cst/normalize_tests.rs` and
-  `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`.
+  `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`. The next slice (run
+  37508602217) missed `Outcome`'s `Display` returning nothing; `an_outcome_displays_as_its_log_name`
+  kills it.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds

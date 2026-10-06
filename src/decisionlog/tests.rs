@@ -236,3 +236,16 @@ fn the_rotation_cap_is_sixteen_mebibytes() {
     assert_eq!(ROTATE_AT_BYTES, 16_777_216);
     assert_eq!(GENERATIONS, 5);
 }
+
+#[test]
+fn an_outcome_displays_as_its_log_name() {
+    for (outcome, name) in [
+        (Outcome::Allowed, "allowed"),
+        (Outcome::Denied, "denied"),
+        (Outcome::Abstained, "abstained"),
+        (Outcome::Unparseable, "unparseable"),
+    ] {
+        assert_eq!(outcome.to_string(), name);
+        assert_eq!(outcome.as_str(), name);
+    }
+}
