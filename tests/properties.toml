@@ -93,6 +93,7 @@ owed = [
 "src/cst/mod.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::substitution_salad_terminates_fast",
+  "src/cst/normalize_tests.rs::normalizing_keeps_every_redirect",
 ]
 "src/cst/netargs.rs" = [
   "src/cst/netargs_tests.rs::a_network_command_never_approves_an_expanded_argument",
@@ -266,6 +267,7 @@ owed = [
 [test_only]
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"

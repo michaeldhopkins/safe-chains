@@ -194,7 +194,7 @@ fn arb_stmt(depth: u32) -> BoxedStrategy<Stmt> {
         .boxed()
 }
 
-fn arb_script(depth: u32) -> BoxedStrategy<Script> {
+pub(super) fn arb_script(depth: u32) -> BoxedStrategy<Script> {
     prop::collection::vec(arb_stmt(depth), 1..3)
         .prop_map(|mut stmts| {
             let len = stmts.len();

@@ -4,6 +4,8 @@ mod display;
 pub(crate) mod eval;
 mod explain;
 pub(crate) mod netargs;
+#[cfg(test)]
+mod normalize_tests;
 mod parse;
 #[cfg(test)]
 mod proptests;

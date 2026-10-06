@@ -228,3 +228,11 @@ fn civil_from_days_round_trips_over_a_century() {
         assert!((1..=12).contains(&m) && (1..=31).contains(&d), "bad date at day {z}");
     }
 }
+
+/// The cap is the documented one: 16 MiB, logrotate's band for an application log. A slip in the
+/// arithmetic (`16 + 1024 * 1024`) would rotate at about 1 MB and keep a twentieth of the history.
+#[test]
+fn the_rotation_cap_is_sixteen_mebibytes() {
+    assert_eq!(ROTATE_AT_BYTES, 16_777_216);
+    assert_eq!(GENERATIONS, 5);
+}

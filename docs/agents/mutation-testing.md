@@ -51,6 +51,11 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   (run 37365593962) missed `-` to `+` in `glob_matches`; a local run over the whole file then found
   two more in its middle-piece loop. `a_glob_match_holds_every_piece` and
   `a_glob_prefix_and_suffix_may_not_overlap` kill all three, and the file now has no survivors.
+- **CI slice of run 37505805989 (2026-10-06):** 3 MISSED of 9 viable: `normalize_redirs` emptied
+  (the roundtrip property renders the normalized form, so a dropped redirect round-trips cleanly),
+  and `*` to `+` in either factor of `ROTATE_AT_BYTES`. Killed by the property
+  `normalizing_keeps_every_redirect` in `src/cst/normalize_tests.rs` and
+  `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
