@@ -278,3 +278,17 @@ fn appending_to_a_full_log_starts_a_fresh_one() {
     assert_eq!(std::fs::metadata(dir.join("log.jsonl.1")).map(|m| m.len()).ok(), Some(ROTATE_AT_BYTES));
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn the_clock_reads_the_current_time_in_milliseconds() {
+    let before = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("after the epoch")
+        .as_millis() as u64;
+    let read = unix_millis();
+    let after = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("after the epoch")
+        .as_millis() as u64;
+    assert!((before..=after).contains(&read), "{before} <= {read} <= {after}");
+}
