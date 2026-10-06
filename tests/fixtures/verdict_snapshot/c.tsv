@@ -5109,9 +5109,14 @@ command -v -h	inert
 command -v -v x	inert
 command -v /usr/bin/git	inert
 command -v git	inert
+command -v git -v	inert
 command -v x	inert
+command curl https://example.com -v	denied
+command git push -v	denied
 command git status	denied
 command rm -rf /	denied
+command rm ./x -V	denied
+command rm /etc/hosts -v	denied
 command x	denied
 composer	denied
 composer --ansi	denied

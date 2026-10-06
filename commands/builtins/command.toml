@@ -1,9 +1,21 @@
 [[command]]
 name = "command"
-description = "Resolves and describes how a command name would be interpreted by the shell. With -v/-V it only performs lookup, printing the path or type to stdout without executing anything. Without those flags it can execute arbitrary commands, bypassing shell functions. POSIX builtin; no independent release cycle."
+description = "Resolves and describes how a command name would be interpreted by the shell. With -v/-V before the command name it only performs lookup, printing the path or type to stdout without executing anything. Without those flags, or with them only after the name (`command rm x -v` runs `rm x -v`), it executes the named command, bypassing shell functions. POSIX builtin; no independent release cycle."
 url = "https://man7.org/linux/man-pages/man1/command.1p.html"
 level = "Inert"
 bare = false
 require_any = ["-v", "-V", "--version"]
 standalone = ["--help", "--version", "-h"]
 valued = ["-v", "-V"]
+max_positional = 0
+examples_safe = [
+  "command -v git",
+  "command -V git",
+  "command -v git -v",
+]
+examples_denied = [
+  "command rm /etc/hosts -v",
+  "command rm ./x -V",
+  "command curl https://example.com -v",
+  "command git push -v",
+]
