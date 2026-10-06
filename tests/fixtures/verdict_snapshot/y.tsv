@@ -516,7 +516,7 @@ youtube-dl --allow-playlist-files	safe-write
 youtube-dl --audio-format x	safe-write
 youtube-dl --audio-multistreams	safe-write
 youtube-dl --audio-quality x	safe-write
-youtube-dl --batch-file x	safe-write
+youtube-dl --batch-file x	denied
 youtube-dl --bidi-workaround x	safe-write
 youtube-dl --break-match-filter x	safe-write
 youtube-dl --break-on-existing x	safe-write
@@ -534,7 +534,7 @@ youtube-dl --concurrent-fragments x	safe-write
 youtube-dl --continue	safe-write
 youtube-dl --convert-subs x	safe-write
 youtube-dl --convert-thumbnails x	safe-write
-youtube-dl --cookies x	safe-write
+youtube-dl --cookies x	denied
 youtube-dl --cookies-from-browser x	safe-write
 youtube-dl --cookies-from-firefox x	safe-write
 youtube-dl --credentials x	safe-write
@@ -596,7 +596,7 @@ youtube-dl --limit-rate x	safe-write
 youtube-dl --list-formats	safe-write
 youtube-dl --list-subs	safe-write
 youtube-dl --list-thumbnails	safe-write
-youtube-dl --load-info-json x	safe-write
+youtube-dl --load-info-json x	denied
 youtube-dl --mark-watched	safe-write
 youtube-dl --match-filter x	safe-write
 youtube-dl --match-title x	safe-write
@@ -733,7 +733,7 @@ youtube-dl -P x	safe-write
 youtube-dl -R x	safe-write
 youtube-dl -S x	safe-write
 youtube-dl -T x	safe-write
-youtube-dl -a x	safe-write
+youtube-dl -a x	denied
 youtube-dl -c	safe-write
 youtube-dl -f x	safe-write
 youtube-dl -h	safe-write
@@ -795,7 +795,7 @@ yt-dlp --allow-playlist-files	safe-write
 yt-dlp --audio-format x	safe-write
 yt-dlp --audio-multistreams	safe-write
 yt-dlp --audio-quality x	safe-write
-yt-dlp --batch-file x	safe-write
+yt-dlp --batch-file x	denied
 yt-dlp --bidi-workaround x	safe-write
 yt-dlp --break-match-filter x	safe-write
 yt-dlp --break-on-existing x	safe-write
@@ -814,7 +814,7 @@ yt-dlp --config-location /tmp/evil https://example.com/v	denied
 yt-dlp --continue	safe-write
 yt-dlp --convert-subs x	safe-write
 yt-dlp --convert-thumbnails x	safe-write
-yt-dlp --cookies x	safe-write
+yt-dlp --cookies x	denied
 yt-dlp --cookies-from-browser x	safe-write
 yt-dlp --cookies-from-firefox x	safe-write
 yt-dlp --credentials x	safe-write
@@ -879,7 +879,7 @@ yt-dlp --limit-rate x	safe-write
 yt-dlp --list-formats	safe-write
 yt-dlp --list-subs	safe-write
 yt-dlp --list-thumbnails	safe-write
-yt-dlp --load-info-json x	safe-write
+yt-dlp --load-info-json x	denied
 yt-dlp --mark-watched	safe-write
 yt-dlp --match-filter x	safe-write
 yt-dlp --match-title x	safe-write
@@ -1024,7 +1024,7 @@ yt-dlp -P x	safe-write
 yt-dlp -R x	safe-write
 yt-dlp -S x	safe-write
 yt-dlp -T x	safe-write
-yt-dlp -a x	safe-write
+yt-dlp -a x	denied
 yt-dlp -c	safe-write
 yt-dlp -f best https://example.com/v	safe-write
 yt-dlp -f x	safe-write

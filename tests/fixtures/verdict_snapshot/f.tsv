@@ -2584,7 +2584,7 @@ fping -c --count x	inert
 fping -c --dontfrag	inert
 fping -c --elapsed	inert
 fping -c --fast-reachable x	inert
-fping -c --file x	inert
+fping -c --file x	denied
 fping -c --generate x	inert
 fping -c --help	inert
 fping -c --iface x	inert
@@ -2633,7 +2633,7 @@ fping -c -b x	inert
 fping -c -c x	inert
 fping -c -d	inert
 fping -c -e	inert
-fping -c -f x	inert
+fping -c -f x	denied
 fping -c -g x	inert
 fping -c -h	inert
 fping -c -i x	inert

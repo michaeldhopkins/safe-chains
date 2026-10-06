@@ -3277,7 +3277,7 @@ siege --benchmark x	safe-read
 siege --config	safe-read
 siege --config x	safe-read
 siege --delay x	safe-read
-siege --file x	safe-read
+siege --file x	denied
 siege --get	safe-read
 siege --header x	safe-read
 siege --help	safe-read
@@ -3310,8 +3310,8 @@ siege -b	safe-read
 siege -c	safe-read
 siege -d	safe-read
 siege -d x	safe-read
-siege -f	safe-read
-siege -f x	safe-read
+siege -f	denied
+siege -f x	denied
 siege -g	safe-read
 siege -h	safe-read
 siege -i	safe-read
@@ -6294,7 +6294,7 @@ ssh-keyscan -O x	safe-read
 ssh-keyscan -T x	safe-read
 ssh-keyscan -c	safe-read
 ssh-keyscan -c x	safe-read
-ssh-keyscan -f x	safe-read
+ssh-keyscan -f x	denied
 ssh-keyscan -h	safe-read
 ssh-keyscan -p x	safe-read
 ssh-keyscan -q	safe-read

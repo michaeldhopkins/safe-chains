@@ -75,6 +75,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
                     .iter()
                     .map(|t| crate::handlers::fd::synthetic_operand(&t.as_str().replace("{}", &bound), t.as_str()))
                     .collect();
+                let _mark = crate::cst::netargs::enter(true);
                 match crate::command_verdict(&shell_words::join(&exec_words)) {
                     Verdict::Denied => return Verdict::Denied,
                     Verdict::Allowed(l) => level = level.max(l),

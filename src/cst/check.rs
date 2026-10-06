@@ -133,7 +133,7 @@ fn define_function(name: String, body: Script) -> FuncScope {
     FuncScope
 }
 
-fn lookup_function(name: &str) -> Option<Script> {
+pub(super) fn lookup_function(name: &str) -> Option<Script> {
     if POISONED_FUNCS.with(|p| p.borrow().iter().any(|n| n == name)) {
         return None; // body unknown — deny rather than use a stale one
     }
@@ -647,7 +647,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             let body_v = match crate::engine::resolve::loop_reprs(&item_strs) {
                 Some((read_repr, write_repr)) => {
                     let _g = crate::pathctx::enter_loop_var(var.clone(), read_repr, write_repr);
-                    script_verdict(body)
+                    super::netargs::with_loop(var, items, body, || script_verdict(body))
                 }
                 None => script_verdict(body),
             };
@@ -811,7 +811,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return Verdict::Denied;
     }
 
-    let cmd_v = leaf_verdict(&tokens);
+    let cmd_v = super::netargs::with_args(cmd, || leaf_verdict(&tokens));
     sub_v.combine(cmd_v).combine(redir_v)
 }
 
@@ -857,7 +857,7 @@ fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
 /// no opt-out — the engine is the default and only path.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
     let legacy = handlers::dispatch(tokens);
-    crate::engine::bridge::engine_verdict(tokens).unwrap_or(legacy)
+    super::netargs::with_egress(tokens, crate::engine::bridge::engine_verdict(tokens).unwrap_or(legacy))
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {

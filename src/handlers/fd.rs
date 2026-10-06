@@ -49,6 +49,7 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
         if !has_placeholder {
             words.push(bound.clone());
         }
+        let _mark = crate::cst::netargs::enter(true);
         match crate::command_verdict(&shell_words::join(&words)) {
             Verdict::Denied => return Verdict::Denied,
             Verdict::Allowed(l) => level = level.max(l),

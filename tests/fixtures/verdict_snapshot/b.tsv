@@ -693,7 +693,7 @@ black -t x	denied
 black x	denied
 bombardier	denied
 bombardier --body x	safe-read
-bombardier --body-file x	safe-read
+bombardier --body-file x	denied
 bombardier --cert x	safe-read
 bombardier --connections x	safe-read
 bombardier --duration x	safe-read
@@ -719,7 +719,7 @@ bombardier -H x	safe-read
 bombardier -T x	safe-read
 bombardier -c x	safe-read
 bombardier -d x	safe-read
-bombardier -f x	safe-read
+bombardier -f x	denied
 bombardier -h	safe-read
 bombardier -i x	safe-read
 bombardier -k x	safe-read

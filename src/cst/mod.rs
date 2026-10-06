@@ -3,6 +3,7 @@ pub(crate) mod check;
 mod display;
 pub(crate) mod eval;
 mod explain;
+pub(crate) mod netargs;
 mod parse;
 #[cfg(test)]
 mod proptests;

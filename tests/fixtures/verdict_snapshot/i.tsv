@@ -1324,7 +1324,7 @@ iperf --debug x	safe-read
 iperf --dscp x	safe-read
 iperf --extra-data x	safe-read
 iperf --fec x	safe-read
-iperf --file x	safe-read
+iperf --file x	denied
 iperf --flowlabel x	safe-read
 iperf --format x	safe-read
 iperf --get-server-output x	safe-read
@@ -1360,7 +1360,7 @@ iperf -A x	safe-read
 iperf -B x	safe-read
 iperf -C x	safe-read
 iperf -D	safe-read
-iperf -F x	safe-read
+iperf -F x	denied
 iperf -J	safe-read
 iperf -K x	safe-read
 iperf -L x	safe-read
@@ -1404,7 +1404,7 @@ iperf3 --debug x	safe-read
 iperf3 --dscp x	safe-read
 iperf3 --extra-data x	safe-read
 iperf3 --fec x	safe-read
-iperf3 --file x	safe-read
+iperf3 --file x	denied
 iperf3 --flowlabel x	safe-read
 iperf3 --format x	safe-read
 iperf3 --get-server-output x	safe-read
@@ -1440,7 +1440,7 @@ iperf3 -A x	safe-read
 iperf3 -B x	safe-read
 iperf3 -C x	safe-read
 iperf3 -D	safe-read
-iperf3 -F x	safe-read
+iperf3 -F x	denied
 iperf3 -J	safe-read
 iperf3 -K x	safe-read
 iperf3 -L x	safe-read

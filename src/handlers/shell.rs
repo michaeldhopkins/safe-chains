@@ -84,6 +84,7 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             words.push(repr);
             shell_words::join(&words)
         };
+        let _mark = crate::cst::netargs::enter(true);
         return crate::command_verdict(&inner);
     }
     Verdict::Allowed(SafetyLevel::Inert)

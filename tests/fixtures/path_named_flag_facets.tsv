@@ -143,7 +143,6 @@ biome format	--config-path	untriaged	-	-	-
 biome format	--stdin-file-path	untriaged	-	-	-	
 biome lint	--config-path	untriaged	-	-	-	
 biome lint	--stdin-file-path	untriaged	-	-	-	
-bombardier	--body-file	untriaged	-	-	-	
 brakeman	--add-checks-path	untriaged	-	-	-	
 brakeman	--app-path	untriaged	-	-	-	
 brakeman	--config-file	untriaged	-	-	-	
@@ -429,7 +428,6 @@ influxd print-config	--engine-path	untriaged	-	-	-
 inso generate config	--working-dir	untriaged	-	-	-	
 inso lint spec	--working-dir	untriaged	-	-	-	
 iperf3	--bidir	untriaged	-	-	-	
-iperf3	--file	untriaged	-	-	-	
 iperf3	--logfile	untriaged	-	-	-	
 iperf3	--pidfile	untriaged	-	-	-	
 ippfind	--path	untriaged	-	-	-	
@@ -482,7 +480,6 @@ marp	--allow-local-files	untriaged	-	-	-
 marp	--browser-path	untriaged	-	-	-	
 marp	--input-dir	untriaged	-	-	-	
 masscan	--excludefile	untriaged	-	-	-	
-masscan	--includefile	untriaged	-	-	-	
 masscan	--output-filename	untriaged	-	-	-	
 masscan	--rotate-dir	untriaged	-	-	-	
 mc find	--path	untriaged	-	-	-	
@@ -745,7 +742,6 @@ shellcheck	--rcfile	untriaged	-	-	-
 shellcheck	--source-path	untriaged	-	-	-	
 shfmt	--filename	untriaged	-	-	-	
 shfmt	-filename	untriaged	-	-	-	
-siege	--file	untriaged	-	-	-	
 skaffold diagnose	--filename	untriaged	-	-	-	
 skaffold find-configs	--directory	untriaged	-	-	-	
 skaffold inspect	--filename	untriaged	-	-	-	
@@ -979,7 +975,6 @@ yamllint	--config-file	untriaged	-	-	-
 yard doc	--template-path	untriaged	-	-	-	
 yard graph	--file	untriaged	-	-	-	
 yardoc	--template-path	untriaged	-	-	-	
-yt-dlp	--batch-file	untriaged	-	-	-	
 yt-dlp	--cache-dir	untriaged	-	-	-	
 yt-dlp	--file-access-retries	untriaged	-	-	-	
 yt-dlp	--max-filesize	untriaged	-	-	-	

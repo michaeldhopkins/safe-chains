@@ -95,6 +95,11 @@ owed = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::substitution_salad_terminates_fast",
 ]
+"src/cst/netargs.rs" = [
+  "src/cst/netargs_tests.rs::a_network_command_never_approves_an_expanded_argument",
+  "src/cst/netargs_tests.rs::a_network_command_never_approves_an_xargs_or_exec_item",
+  "src/cst/netargs_tests.rs::a_quoted_dollar_never_trips_the_mark",
+]
 "src/cst/parse.rs" = [
   "a_random_unclosed_nest_parses_in_linear_work",
   "src/cst/proptests.rs::roundtrip",
@@ -261,6 +266,7 @@ owed = [
 [test_only]
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"

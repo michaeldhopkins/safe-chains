@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f7540a7827db069f1c415c278baefc6af641e8a91d76f56f7445323afc9e2873 # shrinks to index = Index(12312161909512278709), position = 0, glue = false, value = "$X", prefix = "command "
+cc 20aea37da64fd5b9e4b92c453451f3f9794239e11e145f748644fd2600ca7ad8 # shrinks to index = Index(2886310354303088006), position = 6, glue = true, value = "$X", prefix = ""

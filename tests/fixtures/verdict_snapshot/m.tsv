@@ -434,8 +434,8 @@ masscan --excludefile x	safe-write
 masscan --help	safe-write
 masscan --http-user-agent	safe-write
 masscan --http-user-agent x	safe-write
-masscan --includefile	safe-write
-masscan --includefile x	safe-write
+masscan --includefile	denied
+masscan --includefile x	denied
 masscan --output-filename x	safe-write
 masscan --output-format x	safe-write
 masscan --ping	safe-write
@@ -459,12 +459,12 @@ masscan --version	safe-write
 masscan --wait	safe-write
 masscan --wait x	safe-write
 masscan -?	safe-write
-masscan -c	safe-write
-masscan -c x	safe-write
+masscan -c	denied
+masscan -c x	denied
 masscan -d	safe-write
 masscan -h	safe-write
-masscan -iL	safe-write
-masscan -iL x	safe-write
+masscan -iL	denied
+masscan -iL x	denied
 masscan -iR	safe-write
 masscan -iR x	safe-write
 masscan -oG	safe-write

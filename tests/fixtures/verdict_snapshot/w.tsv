@@ -1328,8 +1328,8 @@ wget --certificate-type	safe-write
 wget --certificate-type x	safe-write
 wget --check-certificate	safe-write
 wget --ciphers x	safe-write
-wget --config	safe-write
-wget --config x	safe-write
+wget --config	denied
+wget --config x	denied
 wget --connect-timeout	safe-write
 wget --connect-timeout x	safe-write
 wget --content-disposition	safe-write
@@ -1356,8 +1356,8 @@ wget --exclude-directories	safe-write
 wget --exclude-directories x	safe-write
 wget --exclude-domains	safe-write
 wget --exclude-domains x	safe-write
-wget --execute	safe-write
-wget --execute x	safe-write
+wget --execute	denied
+wget --execute x	denied
 wget --follow-ftp	safe-write
 wget --follow-tags	safe-write
 wget --follow-tags x	safe-write
@@ -1387,8 +1387,8 @@ wget --include-directories	safe-write
 wget --include-directories x	safe-write
 wget --inet4-only	safe-write
 wget --inet6-only	safe-write
-wget --input-file	safe-write
-wget --input-file x	safe-write
+wget --input-file	denied
+wget --input-file x	denied
 wget --input-metalink	safe-write
 wget --input-metalink x	safe-write
 wget --keep-badhash	safe-write
@@ -1566,11 +1566,11 @@ wget -a x	safe-write
 wget -b	safe-write
 wget -c	safe-write
 wget -d	safe-write
-wget -e	safe-write
-wget -e x	safe-write
+wget -e	denied
+wget -e x	denied
 wget -h	safe-write
-wget -i	safe-write
-wget -i x	safe-write
+wget -i	denied
+wget -i x	denied
 wget -k	safe-write
 wget -l	safe-write
 wget -l x	safe-write

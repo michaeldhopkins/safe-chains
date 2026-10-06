@@ -1995,7 +1995,7 @@ dig -6	inert
 dig -V	inert
 dig -b x	inert
 dig -c x	inert
-dig -f x	inert
+dig -f x	denied
 dig -h	inert
 dig -k x	inert
 dig -m	inert
