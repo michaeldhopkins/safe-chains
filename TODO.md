@@ -3323,3 +3323,14 @@ glued short `-fx`. The `equivalence` fuzz target and the flag-form guards hold t
 today, but a data source that broke only the `=` form would pass the snapshot. Add the `=` spelling
 for long valued flags (about 20k more rows) when the registry starts being rebuilt from another
 source.
+
+## Media tools that accept a URL as an input are not in `network.toml`
+
+`ffmpeg -i` and `ffprobe` open `http://`, `https://`, `rtmp://` and other protocol inputs, so an
+input whose name the shell fills in at run time reaches another host the way a `curl` argument does.
+They are left out of `network.toml` because the same expansion is the everyday way to name a local
+file (`for f in *.mp4; do ffprobe "$f"; done`), and listing the whole command would prompt on that.
+The finer rule is a positional or `-i` value that is not provably a local path: one carrying an
+expansion, or a literal with a `scheme://` prefix. That needs a per-flag hook in `network.toml`
+rather than the whole-command list, and the same hook would serve other converters that fetch
+(`magick`, `pandoc`, `yt-dlp`'s already-listed relatives).
