@@ -111,6 +111,40 @@ fn find_command_arg(tokens: &[Token], sub: &str) -> Option<usize> {
     }
 }
 
+/// Options whose value tmux later runs: a command, a shell, or (hooks and aliases) tmux commands
+/// such as `run-shell`.
+static COMMAND_OPTIONS: &[&str] = &[
+    "alert-activity", "alert-bell", "alert-silence", "client-active", "client-attached", "client-detached", "client-focus-in",
+    "client-focus-out", "client-resized", "client-session-changed", "command-alias", "copy-command", "default-command", "default-shell",
+    "editor", "lock-command", "pane-died", "pane-exited", "pane-focus-in", "pane-focus-out", "pane-set-clipboard", "session-closed",
+    "session-created", "session-renamed", "window-layout-changed", "window-linked", "window-pane-changed", "window-renamed",
+    "window-resized", "window-unlinked",
+];
+
+/// `set-option [-aFgopqsuUw] [-t target] option [value]`: refused when the option is one tmux runs,
+/// and `set-environment [-Fhgru] [-t target] name [value]` classified like `name=value cmd`.
+fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
+    let mut words = rest.iter().skip(1).map(Token::as_str);
+    let mut positionals = Vec::new();
+    while let Some(w) = words.next() {
+        if w == "-t" {
+            words.next();
+        } else if !w.starts_with('-') || w == "-" {
+            positionals.push(w);
+        }
+    }
+    let Some(name) = positionals.first() else { return Verdict::Allowed(SafetyLevel::SafeWrite) };
+    if matches!(sub, "set-environment" | "setenv") {
+        let value = positionals.get(1).copied().unwrap_or("");
+        return Verdict::Allowed(SafetyLevel::SafeWrite).combine(crate::envvars::assignment_verdict(name, value));
+    }
+    let option = name.split('[').next().unwrap_or(name);
+    if option.starts_with("after-") || COMMAND_OPTIONS.contains(&option) {
+        return Verdict::Denied;
+    }
+    Verdict::Allowed(SafetyLevel::SafeWrite)
+}
+
 /// The flags of a subcommand that starts a shell command in a new pane or window, as
 /// `(flags without a value, flags with one)`. Each takes `[flags] [shell-command [argument ...]]`.
 fn spawn_flags(sub: &str) -> Option<(&'static str, &'static str)> {
@@ -185,7 +219,10 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
     let mut cmd_idx = 1;
     while cmd_idx < tokens.len() {
         let t = tokens[cmd_idx].as_str();
-        if t == "-S" || t == "-L" || t == "-f" {
+        if t == "-f" {
+            return Verdict::Denied;
+        }
+        if t == "-S" || t == "-L" {
             cmd_idx += 2;
             continue;
         }
@@ -205,8 +242,18 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
 
     let sub = tokens[cmd_idx].as_str();
 
+    // `#(…)` in a format runs a shell command when tmux expands it, and formats are expanded in
+    // display-message, names, -F templates, option values and run-shell's own command line.
+    if tokens[cmd_idx..].iter().any(|t| t.as_str().contains("#(")) {
+        return Verdict::Denied;
+    }
+
     if is_inert_sub(sub) {
         return Verdict::Allowed(SafetyLevel::Inert);
+    }
+
+    if matches!(sub, "set" | "set-option" | "set-environment" | "setenv") {
+        return option_verdict(sub, &tokens[cmd_idx..]);
     }
 
     if let Some((plain, valued)) = spawn_flags(sub) {
@@ -264,7 +311,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, \
              kill-server, attach-session, detach-client, switch-client, new-window, split-window, \
              select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, \
-             set-option, set-environment, send-keys. \
+             set-option for options that hold data, set-environment, send-keys. \
              Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command \
              given to new-session, new-window, split-window, respawn-pane and respawn-window \
              (recursively validates inner commands, in the -c directory).",
@@ -352,6 +399,9 @@ mod tests {
         tmux_new_window_safe_command: "tmux new-window -n logs 'ls -la'",
         tmux_split_window_safe_command: "tmux split-window -h -c . 'git log'",
         tmux_new_session_detached: "tmux new-session -d -s work",
+        tmux_set_mouse: "tmux set -g mouse on",
+        tmux_setenv_plain: "tmux setenv -g EDITOR_THEME dark",
+        tmux_display_format: "tmux display-message -p '#{session_name}'",
     }
 
     denied! {
@@ -376,6 +426,16 @@ mod tests {
         tmux_new_session_env_denied: "tmux new-session -e LD_PRELOAD=/tmp/x.so 'ls'",
         tmux_new_session_unknown_flag_denied: "tmux new-session -Q 'ls'",
         tmux_new_session_dangling_value_denied: "tmux new-session -s",
+        tmux_display_format_command_denied: "tmux display-message -p '#(rm -rf /)'",
+        tmux_new_session_format_command_denied: "tmux new-session -d -P -F '#(id)'",
+        tmux_rename_format_command_denied: "tmux rename-window '#(id)'",
+        tmux_set_default_command_denied: "tmux set-option -g default-command 'rm -rf /'",
+        tmux_set_default_shell_denied: "tmux set -g default-shell /tmp/x",
+        tmux_set_hook_option_denied: "tmux set-option -g after-new-window 'run-shell id'",
+        tmux_set_alias_denied: "tmux set -s command-alias[100] x=run-shell",
+        tmux_set_status_format_denied: "tmux set -g status-right '#(id)'",
+        tmux_setenv_preload_denied: "tmux set-environment -g LD_PRELOAD /tmp/x.so",
+        tmux_config_file_denied: "tmux -f /tmp/x.conf new-session -d",
     }
 
     inert! {

