@@ -291,7 +291,8 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
         break;
     }
 
-    let commands = split_sequence(&tokens[cmd_idx..]);
+    let Some(rest) = tokens.get(cmd_idx..) else { return Verdict::Denied };
+    let commands = split_sequence(rest);
     if commands.is_empty() {
         return Verdict::Denied;
     }
@@ -498,6 +499,9 @@ mod tests {
         tmux_set_status_format_denied: "tmux set -g status-right '#(id)'",
         tmux_setenv_preload_denied: "tmux set-environment -g LD_PRELOAD /tmp/x.so",
         tmux_config_file_denied: "tmux -f /tmp/x.conf new-session -d",
+        tmux_socket_name_without_value_denied: "tmux -L",
+        tmux_socket_path_without_value_denied: "tmux -S",
+        tmux_socket_name_without_command_denied: "tmux -L work",
         tmux_sequence_after_inert_denied: "tmux ls \\; run-shell 'rm -rf /'",
         tmux_sequence_glued_separator_denied: "tmux ls 'x;' run-shell 'rm -rf /'",
         tmux_sequence_after_spawn_denied: "tmux new-session -d ls \\; run-shell 'rm -rf /'",
@@ -523,6 +527,16 @@ mod tests {
     ];
 
     proptest::proptest! {
+        #[test]
+        fn global_flags_alone_never_name_a_command(
+            flags in proptest::collection::vec(proptest::sample::select(&["-L", "-S", "-l", "-u", "-v", "-T", "-N", "work"][..]), 0..6),
+        ) {
+            let cmd = format!("tmux {}", flags.join(" "));
+            let named = flags.iter().enumerate().any(|(i, f)| *f == "work" && !(i > 0 && matches!(flags[i - 1], "-L" | "-S")));
+            proptest::prop_assume!(!named);
+            proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
+        }
+
         #[test]
         fn a_sequence_is_as_strict_as_its_strictest_command(
             a in proptest::sample::select(SEQUENCE_PARTS),

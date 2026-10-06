@@ -175,7 +175,7 @@ owed = [
 "src/handlers/system/plutil.rs" = []
 "src/handlers/system/ssh.rs" = []
 "src/handlers/system/sysctl.rs" = []
-"src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command"]
+"src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command", "global_flags_alone_never_name_a_command"]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",

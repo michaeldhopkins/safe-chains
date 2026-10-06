@@ -3018,7 +3018,10 @@ tmutil x	denied
 tmux	denied
 tmux --help	inert
 tmux --version	inert
+tmux -L	denied
 tmux -L test ls	inert
+tmux -L work	denied
+tmux -S	denied
 tmux -S /tmp/sock ls	inert
 tmux -f /tmp/x.conf new-session -d	denied
 tmux a	safe-write
