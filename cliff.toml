@@ -25,7 +25,9 @@ require_conventional = true
 split_commits = false
 commit_preprocessors = []
 protect_breaking_commits = false
+exclude_paths = ["TODO.md"]
 commit_parsers = [
+    { message = "^[a-z]+\\(todo\\)", skip = true },
     { message = "^feat", group = "<!-- 0 -->Features" },
     { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
     { message = "^doc", group = "<!-- 3 -->Documentation" },
