@@ -292,3 +292,12 @@ fn the_clock_reads_the_current_time_in_milliseconds() {
         .as_millis() as u64;
     assert!((before..=after).contains(&read), "{before} <= {read} <= {after}");
 }
+
+/// Days before 0000-03-01 fall in a negative era, the branch the century round trip never reaches.
+#[test]
+fn civil_from_days_handles_dates_before_year_zero() {
+    assert_eq!(civil_from_days(-719_468), (0, 3, 1));
+    assert_eq!(civil_from_days(-719_469), (0, 2, 29));
+    assert_eq!(civil_from_days(-719_468 - 146_097), (-400, 3, 1));
+    assert_eq!(civil_from_days(-719_469 - 146_097), (-400, 2, 29));
+}

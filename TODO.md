@@ -3337,6 +3337,6 @@ rather than the whole-command list, and the same hook would serve other converte
 
 ## A whole-file mutation run over `src/decisionlog.rs`
 
-Four rotating slices in a row (2026-10-06) each found one to three survivors in this file. Run
+Five rotating slices in a row (2026-10-06) each found one to three survivors in this file. Run
 `cargo mutants -f src/decisionlog.rs` locally (128 mutants; needs disk above the 10 GB floor) and
 give every MISSED one a test, rather than meeting them one slice at a time.

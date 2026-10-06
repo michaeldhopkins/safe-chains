@@ -61,7 +61,8 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   `appending_to_a_full_log_starts_a_fresh_one` (a sparse file at the real cap) and
   `a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not` kill them. Run 37511608360
   missed `unix_millis` returning 0 or 1; `the_clock_reads_the_current_time_in_milliseconds` kills
-  both. Four slices in a row landed in `src/decisionlog.rs`: a whole-file local run over it
+  both. Run 37515672271 missed `-` to `+` or `/` in `civil_from_days`'s negative-era branch;
+  `civil_from_days_handles_dates_before_year_zero` kills both. Five slices in a row landed in `src/decisionlog.rs`: a whole-file local run over it
   (128 mutants) is owed, in `TODO.md`.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
