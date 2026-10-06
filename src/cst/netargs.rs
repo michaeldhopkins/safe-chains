@@ -25,6 +25,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 #[derive(Deserialize)]
 struct NetworkList {
     commands: HashSet<String>,
+    request_item_files: HashMap<String, Vec<String>>,
     file_inputs: HashMap<String, Vec<String>>,
     subcommands: HashMap<String, Vec<String>>,
 }
@@ -242,11 +243,33 @@ fn names_word(token: &str, word: &str) -> bool {
 pub(crate) fn reads_targets_from_file(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else { return false };
     let name = crate::registry::canonical_name(first.command_name());
+    if let Some(valued) = LIST.request_item_files.get(name) {
+        let words: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let item_reads = words.iter().enumerate().any(|(i, w)| {
+            let is_value = i > 0 && valued.iter().any(|f| f == words[i - 1]);
+            !w.starts_with('-') && !is_value && item_reads_file(w)
+        });
+        if item_reads {
+            return true;
+        }
+    }
     let Some(flags) = LIST.file_inputs.get(name) else { return false };
     tokens[1..]
         .iter()
         .take_while(|t| t.as_str() != "--")
         .any(|t| flags.iter().any(|f| flag_present(t.as_str(), f)))
+}
+
+const ITEM_SEPARATORS: &[&str] = &[":=@", "=@", ":@", "@", ":=", "==", "=", ":"];
+
+/// Whether an httpie-style request item reads a file. The item splits at its first separator,
+/// the longest one when several start at the same place, so `email=a@example.com` is a plain field.
+pub(crate) fn item_reads_file(item: &str) -> bool {
+    let first = ITEM_SEPARATORS
+        .iter()
+        .filter_map(|sep| item.find(sep).map(|at| (at, std::cmp::Reverse(sep.len()), *sep)))
+        .min();
+    first.is_some_and(|(_, _, sep)| sep.ends_with('@'))
 }
 
 fn flag_present(token: &str, flag: &str) -> bool {

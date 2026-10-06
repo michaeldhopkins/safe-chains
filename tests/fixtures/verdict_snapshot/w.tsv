@@ -1436,8 +1436,8 @@ wget --password	safe-write
 wget --password x	safe-write
 wget --post-data	safe-write
 wget --post-data x	safe-write
-wget --post-file	safe-write
-wget --post-file x	safe-write
+wget --post-file	denied
+wget --post-file x	denied
 wget --post-file=/etc/shadow http://x	denied
 wget --prefer-family	safe-write
 wget --prefer-family x	safe-write

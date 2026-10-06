@@ -794,7 +794,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
             .enumerate()
             .map(|(i, w)| crate::pathctx::enter_var((i + 1).to_string(), certain_value(w)))
             .collect();
-        return sub_v.combine(script_verdict(&body)).combine(redir_v);
+        return sub_v.combine(super::netargs::with_args(cmd, || script_verdict(&body))).combine(redir_v);
     }
 
     if name == "eval" {

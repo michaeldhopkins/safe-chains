@@ -71,12 +71,22 @@ local = [
   "pg_test_timing", "pg_upgrade", "pg_verifybackup", "pg_waldump", "pg_walsummary",
 ]
 
+# HTTP clients whose request items read a file: `field@FILE` uploads it, `field=@FILE` and
+# `field:=@FILE` embed its text, `@FILE` sends it as the body. Each lists the flags whose value is
+# the next word and may hold an `@` (a user name), so that word is not read as an item.
+[request_item_files]
+http = ["-a", "--auth"]
+https = ["-a", "--auth"]
+xh = ["-a", "--auth"]
+xhs = ["-a", "--auth"]
+curlie = []
+
 # Flags that make a network command read its targets or its payload from a FILE. The file's
 # content then leaves the machine with no expansion in sight: `wget -i ./.env` requests every line
 # as a URL. Spellings: `-f FILE`, `-fFILE`, `--flag=FILE`, and a short flag bundled with others
 # (`wget -qi urls.txt`).
 [file_inputs]
-wget = ["-i", "--input-file", "--config", "-e", "--execute"]
+wget = ["-i", "--input-file", "--config", "-e", "--execute", "--post-file", "--body-file"]
 curl = ["-K", "--config"]
 aria2c = ["-i", "--input-file", "--conf-path"]
 yt-dlp = ["-a", "--batch-file", "--config-locations", "--cookies", "--load-info-json"]
