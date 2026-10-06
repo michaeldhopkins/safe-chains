@@ -45,7 +45,6 @@ owed = [
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
   "src/handlers/system/sysctl.rs",
-  "src/handlers/system/tmux.rs",
   "src/handlers/wrappers.rs",
   "src/parse.rs",
   "src/refusal.rs",
@@ -99,6 +98,7 @@ owed = [
   "src/cst/netargs_tests.rs::a_network_command_never_approves_an_expanded_argument",
   "src/cst/netargs_tests.rs::a_network_command_never_approves_an_xargs_or_exec_item",
   "src/cst/netargs_tests.rs::a_quoted_dollar_never_trips_the_mark",
+  "src/cst/netargs_tests.rs::a_request_item_reads_a_file_only_through_an_at_separator",
 ]
 "src/cst/parse.rs" = [
   "a_random_unclosed_nest_parses_in_linear_work",
@@ -175,7 +175,7 @@ owed = [
 "src/handlers/system/plutil.rs" = []
 "src/handlers/system/ssh.rs" = []
 "src/handlers/system/sysctl.rs" = []
-"src/handlers/system/tmux.rs" = []
+"src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command"]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",

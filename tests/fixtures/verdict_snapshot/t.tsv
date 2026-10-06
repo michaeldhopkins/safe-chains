@@ -3028,9 +3028,12 @@ tmux confirm-before 'ls'	inert
 tmux confirm-before 'rm -rf /'	denied
 tmux detach-client	safe-write
 tmux display	inert
+tmux display -p '#{E:@x}'	denied
+tmux display -p '#{T;=10:@x}'	denied
 tmux display-message	inert
 tmux display-message -p '#(rm -rf /)'	denied
 tmux display-message -p '#{session_name}'	inert
+tmux display-message -p '#{t:window_activity}'	inert
 tmux has	inert
 tmux has-session	inert
 tmux if-shell 'true' 'ls'	inert
@@ -3051,6 +3054,8 @@ tmux list-sessions	inert
 tmux list-windows	inert
 tmux load-buffer foo	denied
 tmux ls	inert
+tmux ls 'x;' run-shell 'rm -rf /'	denied
+tmux ls \\; run-shell 'rm -rf /'	denied
 tmux lsp	inert
 tmux lsw	inert
 tmux new	safe-write
@@ -3061,7 +3066,9 @@ tmux new-session -Q 'ls'	denied
 tmux new-session -d -P -F '#(id)'	denied
 tmux new-session -d -s work	safe-write
 tmux new-session -d -s work 'git status'	safe-write
+tmux new-session -d -s work \\; split-window -h \\; select-pane -t 0	safe-write
 tmux new-session -d -s work rm -rf /	denied
+tmux new-session -d ls \\; run-shell 'rm -rf /'	denied
 tmux new-session -e LD_PRELOAD=/tmp/x.so 'ls'	denied
 tmux new-session -s	denied
 tmux new-window	safe-write
@@ -3074,6 +3081,7 @@ tmux pipe-pane -o /tmp/log 'rm -rf /'	denied
 tmux rename-session	safe-write
 tmux rename-window	safe-write
 tmux rename-window '#(id)'	denied
+tmux rename-window 'a\\;'	safe-write
 tmux resize-pane	safe-write
 tmux resize-window	safe-write
 tmux respawn-pane	safe-write
@@ -3090,9 +3098,21 @@ tmux select-pane	safe-write
 tmux select-window	safe-write
 tmux send	safe-write
 tmux send-keys	safe-write
+tmux set -a -g status-right '(id)'	denied
+tmux set -g client-created 'run-shell id'	denied
+tmux set -g command-error 'run-shell id'	denied
+tmux set -g default-client-command 'run-shell id'	denied
 tmux set -g default-shell /tmp/x	denied
+tmux set -g history-file ./x	denied
 tmux set -g mouse on	safe-write
+tmux set -g mouse on \\; set -g default-command 'rm -rf /'	denied
+tmux set -g pane-title-changed 'run-shell id'	denied
 tmux set -g status-right '#(id)'	denied
+tmux set -gF status-right '#{l:#}(id)'	denied
+tmux set -ga @x '(id)'	denied
+tmux set -ga status-right ' #S'	safe-write
+tmux set -gt work default-command 'rm -rf /'	denied
+tmux set -gtwork default-command 'rm -rf /'	denied
 tmux set -s command-alias[100] x=run-shell	denied
 tmux set-environment	safe-write
 tmux set-environment -g LD_PRELOAD /tmp/x.so	denied

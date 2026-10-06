@@ -114,23 +114,42 @@ fn find_command_arg(tokens: &[Token], sub: &str) -> Option<usize> {
 /// Options whose value tmux later runs: a command, a shell, or (hooks and aliases) tmux commands
 /// such as `run-shell`.
 static COMMAND_OPTIONS: &[&str] = &[
-    "alert-activity", "alert-bell", "alert-silence", "client-active", "client-attached", "client-detached", "client-focus-in",
-    "client-focus-out", "client-resized", "client-session-changed", "command-alias", "copy-command", "default-command", "default-shell",
-    "editor", "lock-command", "pane-died", "pane-exited", "pane-focus-in", "pane-focus-out", "pane-set-clipboard", "session-closed",
-    "session-created", "session-renamed", "window-layout-changed", "window-linked", "window-pane-changed", "window-renamed",
-    "window-resized", "window-unlinked",
+    "alert-activity", "alert-bell", "alert-silence", "client-active", "client-attached", "client-closed", "client-created",
+    "client-dark-theme", "client-detached", "client-focus-in", "client-focus-out", "client-light-theme", "client-resized",
+    "client-session-changed", "command-alias", "command-error", "copy-command", "default-client-command", "default-command",
+    "default-shell", "editor", "history-file", "lock-command", "marked-pane-changed", "pane-died", "pane-exited", "pane-focus-in",
+    "pane-focus-out", "pane-mode-changed", "pane-set-clipboard", "pane-title-changed", "session-added-to-group", "session-closed",
+    "session-created", "session-removed-from-group", "session-renamed", "session-window-changed", "window-layout-changed", "window-linked",
+    "window-pane-changed", "window-renamed", "window-resized", "window-unlinked",
 ];
 
-/// `set-option [-aFgopqsuUw] [-t target] option [value]`: refused when the option is one tmux runs,
-/// and `set-environment [-Fhgru] [-t target] name [value]` classified like `name=value cmd`.
+/// `set-option [-aFgopqsuUw] [-t target] option [value]`: refused when the option is one tmux runs
+/// or writes to, when `-F` expands the value as a format before storing it, and when `-a` appends
+/// a value starting with `(` (which completes a `#(` begun by the stored value).
+/// `set-environment [-Fhgru] [-t target] name [value]` is classified like `name=value cmd`.
 fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
-    let mut words = rest.iter().skip(1).map(Token::as_str);
     let mut positionals = Vec::new();
-    while let Some(w) = words.next() {
-        if w == "-t" {
-            words.next();
-        } else if !w.starts_with('-') || w == "-" {
+    let mut flags = String::new();
+    let mut i = 1;
+    while i < rest.len() {
+        let w = rest[i].as_str();
+        i += 1;
+        let Some(cluster) = w.strip_prefix('-').filter(|c| !c.is_empty()) else {
             positionals.push(w);
+            continue;
+        };
+        if cluster == "-" {
+            positionals.extend(rest[i..].iter().map(Token::as_str));
+            break;
+        }
+        match cluster.find('t') {
+            Some(at) => {
+                flags.push_str(&cluster[..at]);
+                if at + 1 == cluster.len() {
+                    i += 1;
+                }
+            }
+            None => flags.push_str(cluster),
         }
     }
     let Some(name) = positionals.first() else { return Verdict::Allowed(SafetyLevel::SafeWrite) };
@@ -139,10 +158,46 @@ fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::SafeWrite).combine(crate::envvars::assignment_verdict(name, value));
     }
     let option = name.split('[').next().unwrap_or(name);
-    if option.starts_with("after-") || COMMAND_OPTIONS.contains(&option) {
+    if option.starts_with("after-") || COMMAND_OPTIONS.contains(&option) || flags.contains('F') {
+        return Verdict::Denied;
+    }
+    if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with('(')) {
         return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::SafeWrite)
+}
+
+/// `#{E:…}` and `#{T:…}` expand a value a second time, so a `#(…)` stored in an option or a pane
+/// title (which any program can set) would run.
+fn expands_twice(word: &str) -> bool {
+    word.match_indices("#{").any(|(at, _)| {
+        let inner = &word[at + 2..];
+        let end = inner.find([':', '}']);
+        end.is_some_and(|e| inner[e..].starts_with(':') && inner[..e].contains(['E', 'T']))
+    })
+}
+
+/// tmux ends a command at an argument that is `;` or ends in one; `\;` keeps a literal semicolon.
+fn split_sequence(tokens: &[Token]) -> Vec<Vec<Token>> {
+    let mut commands = Vec::new();
+    let mut current = Vec::new();
+    for t in tokens {
+        match t.as_str().strip_suffix(';') {
+            Some(head) if head.ends_with('\\') => {
+                current.push(Token::from_raw(format!("{};", &head[..head.len() - 1])));
+            }
+            Some(head) => {
+                if !head.is_empty() {
+                    current.push(Token::from_raw(head.to_string()));
+                }
+                commands.push(std::mem::take(&mut current));
+            }
+            None => current.push(t.clone()),
+        }
+    }
+    commands.push(current);
+    commands.retain(|c| !c.is_empty());
+    commands
 }
 
 /// The flags of a subcommand that starts a shell command in a new pane or window, as
@@ -236,15 +291,19 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
         break;
     }
 
-    if cmd_idx >= tokens.len() {
+    let commands = split_sequence(&tokens[cmd_idx..]);
+    if commands.is_empty() {
         return Verdict::Denied;
     }
+    commands.iter().fold(Verdict::Allowed(SafetyLevel::Inert), |acc, c| acc.combine(tmux_command(c)))
+}
 
-    let sub = tokens[cmd_idx].as_str();
+fn tmux_command(rest: &[Token]) -> Verdict {
+    let sub = rest[0].as_str();
 
     // `#(…)` in a format runs a shell command when tmux expands it, and formats are expanded in
     // display-message, names, -F templates, option values and run-shell's own command line.
-    if tokens[cmd_idx..].iter().any(|t| t.as_str().contains("#(")) {
+    if rest.iter().any(|t| t.as_str().contains("#(") || expands_twice(t.as_str())) {
         return Verdict::Denied;
     }
 
@@ -253,11 +312,11 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
     }
 
     if matches!(sub, "set" | "set-option" | "set-environment" | "setenv") {
-        return option_verdict(sub, &tokens[cmd_idx..]);
+        return option_verdict(sub, rest);
     }
 
     if let Some((plain, valued)) = spawn_flags(sub) {
-        return spawn_verdict(&tokens[cmd_idx..], plain, valued);
+        return spawn_verdict(rest, plain, valued);
     }
 
     if is_safe_write_sub(sub) {
@@ -265,7 +324,6 @@ pub fn is_safe_tmux(tokens: &[Token]) -> Verdict {
     }
 
     if is_delegation_sub(sub) {
-        let rest = &tokens[cmd_idx..];
         if let Some(arg_idx) = find_command_arg(rest, sub) {
             let inner = rest[arg_idx].as_str();
             let v = crate::command_verdict(inner);
@@ -402,6 +460,10 @@ mod tests {
         tmux_set_mouse: "tmux set -g mouse on",
         tmux_setenv_plain: "tmux setenv -g EDITOR_THEME dark",
         tmux_display_format: "tmux display-message -p '#{session_name}'",
+        tmux_display_time_format: "tmux display-message -p '#{t:window_activity}'",
+        tmux_sequence_safe: "tmux new-session -d -s work \\; split-window -h \\; select-pane -t 0",
+        tmux_set_append_plain: "tmux set -ga status-right ' #S'",
+        tmux_escaped_semicolon_is_data: "tmux rename-window 'a\\;'",
     }
 
     denied! {
@@ -436,6 +498,41 @@ mod tests {
         tmux_set_status_format_denied: "tmux set -g status-right '#(id)'",
         tmux_setenv_preload_denied: "tmux set-environment -g LD_PRELOAD /tmp/x.so",
         tmux_config_file_denied: "tmux -f /tmp/x.conf new-session -d",
+        tmux_sequence_after_inert_denied: "tmux ls \\; run-shell 'rm -rf /'",
+        tmux_sequence_glued_separator_denied: "tmux ls 'x;' run-shell 'rm -rf /'",
+        tmux_sequence_after_spawn_denied: "tmux new-session -d ls \\; run-shell 'rm -rf /'",
+        tmux_sequence_after_set_denied: "tmux set -g mouse on \\; set -g default-command 'rm -rf /'",
+        tmux_set_format_flag_denied: "tmux set -gF status-right '#{l:#}(id)'",
+        tmux_set_append_paren_denied: "tmux set -ga @x '(id)'",
+        tmux_set_append_bundled_denied: "tmux set -a -g status-right '(id)'",
+        tmux_set_history_file_denied: "tmux set -g history-file ./x",
+        tmux_set_command_error_hook_denied: "tmux set -g command-error 'run-shell id'",
+        tmux_set_client_created_hook_denied: "tmux set -g client-created 'run-shell id'",
+        tmux_set_pane_title_hook_denied: "tmux set -g pane-title-changed 'run-shell id'",
+        tmux_set_default_client_command_denied: "tmux set -g default-client-command 'run-shell id'",
+        tmux_display_expand_twice_denied: "tmux display -p '#{E:@x}'",
+        tmux_display_expand_twice_time_denied: "tmux display -p '#{T;=10:@x}'",
+        tmux_set_bundled_target_denied: "tmux set -gt work default-command 'rm -rf /'",
+        tmux_set_glued_target_denied: "tmux set -gtwork default-command 'rm -rf /'",
+    }
+
+    const SEQUENCE_PARTS: &[&str] = &[
+        "ls", "display -p '#{session_name}'", "new-session -d -s w", "split-window -h", "select-pane -t 0", "set -g mouse on",
+        "set -g default-command 'rm -rf /'", "run-shell 'rm -rf /'", "run-shell 'git status'", "new-window 'rm -rf /'", "rename-window x",
+        "load-buffer x", "kill-server",
+    ];
+
+    proptest::proptest! {
+        #[test]
+        fn a_sequence_is_as_strict_as_its_strictest_command(
+            a in proptest::sample::select(SEQUENCE_PARTS),
+            b in proptest::sample::select(SEQUENCE_PARTS),
+            glued in proptest::bool::ANY,
+        ) {
+            let alone = crate::command_verdict(&format!("tmux {a}")).combine(crate::command_verdict(&format!("tmux {b}")));
+            let joined = if glued && !a.ends_with('\'') { format!("tmux {a}\\; {b}") } else { format!("tmux {a} \\; {b}") };
+            proptest::prop_assert_eq!(crate::command_verdict(&joined), alone, "{}", joined);
+        }
     }
 
     inert! {
