@@ -53,22 +53,17 @@ jobs:
         with:
           tool: cargo-mutants
 
-      # A PR diffs against its base; a push diffs against the commit it replaced.
-      # `github.event.before` is all-zeros for a newly created branch, in which case fall back to
-      # the first parent.
+      # A PR diffs against its base; a push diffs against the commit it replaced, or HEAD~1 when
+      # that commit is gone or off HEAD's ancestry (a new branch, a force-push). The choice lives in
+      # the script so tests/mutants_base.rs can test it.
       - name: Compute diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="origin/${{ github.base_ref }}"
-          else
-            before="${{ github.event.before }}"
-            if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
-              base="HEAD~1"
-            else
-              base="$before"
-            fi
-          fi
+          base="$(scripts/mutants-base.sh "$EVENT_NAME" "$BASE_REF" "$BEFORE")"
           echo "Diffing against $base"
           # Force standard a/ b/ prefixes. `diff.mnemonicPrefix` emits `i/` and `w/` instead, which
           # cargo-mutants does not recognise: it matches no files, logs "No mutants to filter" and
