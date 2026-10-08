@@ -32,6 +32,7 @@ pub mod magick;
 pub mod network;
 pub mod node;
 pub mod perl;
+mod perl_load;
 pub mod php;
 pub mod ruby;
 pub mod shell;

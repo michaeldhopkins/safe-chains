@@ -17,7 +17,7 @@ const PINS: [(&str, usize); 19] = [
     ("src/engine/resolve/regions.rs", 929),
     ("src/engine/testgen.rs", 657),
     ("src/handler_property_tests.rs", 2439),
-    ("src/handlers/perl.rs", 454),
+    ("src/handlers/perl.rs", 451),
     ("src/lib.rs", 612),
     ("src/pathgate.rs", 932),
     ("src/registry/build.rs", 1532),

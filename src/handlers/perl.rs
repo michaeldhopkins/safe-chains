@@ -339,6 +339,8 @@ pub(crate) struct PerlScan {
     /// Operands left after the flag walk. With `-e` these are input files; without it the first
     /// would be a SCRIPT file, which [`PerlCode::Opaque`] already refuses.
     pub files: Vec<String>,
+    /// Directories `-I` and `-Mlib=` put on the module path, whose modules a `-M` then runs.
+    pub load_paths: Vec<String>,
 }
 
 /// What perl was asked to run.
@@ -356,7 +358,7 @@ pub(crate) enum PerlCode {
 /// Walk `perl`'s flag grammar. `None` when a token shape isn't modeled, so the caller worst-cases
 /// rather than guessing which operands were files.
 pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
-    let mut scan = PerlScan { code: PerlCode::Opaque, in_place: false, files: Vec::new() };
+    let mut scan = PerlScan { code: PerlCode::Opaque, in_place: false, files: Vec::new(), load_paths: Vec::new() };
     if tokens.len() == 2 && tokens[1].is_one_of(&["--version", "--help", "-v", "-V"]) {
         scan.code = PerlCode::None;
         return Some(scan);
@@ -381,13 +383,8 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
             return None;
         }
         let flags = &token.as_str()[1..];
-        // `-Mmodule` / `-Idir` glued, and their split forms, consume a value rather than an operand.
-        if flags.len() > 1 && matches!(flags.as_bytes()[0], b'M' | b'm' | b'I') {
-            i += 1;
-            continue;
-        }
-        if *token == "-M" || *token == "-m" || *token == "-I" {
-            i += 2;
+        if let Some(used) = super::perl_load::load_flag(tokens, i, &mut scan.load_paths)? {
+            i += used;
             continue;
         }
         // Scan the cluster LEFT TO RIGHT, because both `-e` and `-i` swallow the rest of it and

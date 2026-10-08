@@ -2113,7 +2113,7 @@ perl	denied
 perl --help	inert
 perl --version	inert
 perl -E 'say "hello"'	inert
-perl -Ilib -e 'print "ok\\n"'	inert
+perl -Ilib -e 'print "ok\\n"'	safe-write
 perl -MList::Util -e 'print length "test"'	inert
 perl -V	inert
 perl -e 'chmod(0755, "file")'	denied

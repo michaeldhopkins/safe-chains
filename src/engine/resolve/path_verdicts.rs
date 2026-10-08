@@ -63,3 +63,12 @@ pub(crate) fn worst_path_element(value: &str, judge: fn(&str) -> crate::verdict:
     }
     worst
 }
+
+/// Running code a module directory supplies: `perl -I DIR -MMod` loads `DIR/Mod.pm` and runs it,
+/// the same as running a script from DIR, so each directory is gated as that script would be.
+pub(super) fn runs_modules_from(dirs: &[String]) -> impl Iterator<Item = super::Capability> + '_ {
+    use super::capability::executes;
+    use crate::engine::facet::ExecutionTrust;
+    dirs.iter()
+        .map(|dir| executes(super::classify_locus(dir), ExecutionTrust::CallerFile, "loads and runs modules from this directory"))
+}

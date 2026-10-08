@@ -1507,7 +1507,7 @@ fn resolve_perl(tokens: &[Token]) -> Profile {
     } else {
         reads_to_model(&files, scale)
     };
-    Profile::of(caps)
+    Profile::of(caps.into_iter().chain(path_verdicts::runs_modules_from(&scan.load_paths)).collect())
 }
 
 /// The outcome of parsing one `sed` short-option cluster.

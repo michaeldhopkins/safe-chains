@@ -137,6 +137,10 @@ because = "ruby load path, so a planted file satisfies a later require"
 [env.PERL5LIB]
 shape = "exec-path"
 because = "perl @INC, the lever that makes -M load attacker code"
+[env.PERL_USE_UNSAFE_INC]
+shape = "opaque"
+because = "puts the working directory on perl's @INC, so `-MMod` loads and runs `./Mod.pm`; a switch, not a path, so its value names nothing to gate"
+measured = false
 [env.NODE_PATH]
 shape = "exec-path"
 because = "node module search path"
