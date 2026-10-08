@@ -179,3 +179,17 @@ proptest! {
         prop_assert_ne!(of_path(&path), Anchor::RelativePlain, "{}", path);
     }
 }
+
+/// Which relative names are sensitive does not depend on the platform: the macOS start-up places
+/// are named on Linux too (CI runs there), where they only refuse more.
+#[test]
+fn sensitivity_is_the_same_on_every_platform() {
+    for os in ["macos", "linux"] {
+        crate::engine::resolve::regions::with_os(os, || {
+            for path in ["Library/LaunchAgents/x.plist", "LaunchAgents/a.plist", "Applications/x.app", ".zshrc", "authorized_keys"] {
+                assert_eq!(of_path(path), Anchor::RelativeSensitive, "{path} on {os}");
+            }
+            assert_eq!(placement("../Library/LaunchAgents/x", Use::Write, FolderLevel::Workspace), None, "on {os}");
+        });
+    }
+}

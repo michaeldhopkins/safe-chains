@@ -614,7 +614,9 @@ researched = "2026-08-02"
 #    `~`. Hidden places (`~/.local/bin`, `~/.config/autostart`, `~/.config/systemd/user`, shell
 #    startup files) need no node: any hidden segment already makes a relative write sensitive there.
 #    PREFIX matchers on their own directories only. Not `~/Library/` as a whole, which would shadow
-#    peer-project adjacency for projects kept under `~/Library/Mobile Documents`. ─────────────────
+#    peer-project adjacency for projects kept under `~/Library/Mobile Documents`. No `os` list, on the macOS
+#    places either: on Linux they only refuse more, and which relative names are sensitive must not
+#    depend on the platform the hook runs on. ─────────────────
 [role.persistence]
 description = "A home location whose contents run later without being asked (login items, PATH directories, plug-in folders). Read and written like any other home path; named so a relative path that would land here when the command runs in the home directory is recognized."
 read_locus = "user"
@@ -624,91 +626,76 @@ reads_secret = false
 [[region]]
 path = "~/Library/LaunchAgents/"
 role = "persistence"
-os = ["macos"]
 note = "launchd loads every plist here at login and runs its ProgramArguments (launchd.plist(5))."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Application Support/"
 role = "persistence"
-os = ["macos"]
 note = "Per-app data, including plug-in, extension and startup-script folders apps load on launch (editors, terminals, browsers)."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Preferences/"
 role = "persistence"
-os = ["macos"]
 note = "App defaults; several apps read commands or helper paths from them (a terminal's startup command, an editor's shell)."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Services/"
 role = "persistence"
-os = ["macos"]
 note = "Automator and Services workflows, run from the Services menu and keyboard shortcuts."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Scripts/"
 role = "persistence"
-os = ["macos"]
 note = "Script menu and Folder Action scripts, run by the system on menu use or folder events."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Application Scripts/"
 role = "persistence"
-os = ["macos"]
 note = "Scripts sandboxed apps are allowed to run (NSUserScriptTask)."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Workflows/"
 role = "persistence"
-os = ["macos"]
 note = "Automator workflows and Quick Actions, run from Finder and the Services menu."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Input Methods/"
 role = "persistence"
-os = ["macos"]
 note = "Input method bundles, loaded into every app that takes text."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/QuickLook/"
 role = "persistence"
-os = ["macos"]
 note = "Quick Look generator plug-ins, loaded when Finder previews a file."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Spotlight/"
 role = "persistence"
-os = ["macos"]
 note = "Spotlight importer plug-ins, run by mds on every matching file."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/PreferencePanes/"
 role = "persistence"
-os = ["macos"]
 note = "System Settings panes, loaded as code when opened."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Internet Plug-Ins/"
 role = "persistence"
-os = ["macos"]
 note = "Browser plug-in bundles."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Audio/Plug-Ins/"
 role = "persistence"
-os = ["macos"]
 note = "Audio Unit and HAL plug-ins, loaded by every app that plays or records sound."
 researched = "2026-10-08"
 [[region]]
 path = "~/Library/Screen Savers/"
 role = "persistence"
-os = ["macos"]
 note = "Screen saver bundles, loaded as code by the system."
 researched = "2026-10-08"
 [[region]]
 path = "~/Applications/"
 role = "persistence"
-os = ["macos"]
 note = "Per-user applications; a bundle placed here is launched by name from Spotlight, the Dock and `open -a`."
 researched = "2026-10-08"
 [[region]]
