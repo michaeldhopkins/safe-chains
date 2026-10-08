@@ -114,16 +114,51 @@ proptest! {
     ) {
         let (command, _) = argv_command(&name, &[], &positionals);
         let entry = only_entry(&command);
-        prop_assert_eq!(entry.max_positional, positionals.len());
-
         let toml = render_toml(std::slice::from_ref(&entry));
         let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
         let mut argv = vec![name.clone()];
-        argv.extend(std::iter::repeat_n("x".to_string(), entry.max_positional + 1));
+        match entry.subs.as_slice() {
+            [] => {
+                prop_assert_eq!(entry.max_positional, positionals.len());
+                argv.extend(std::iter::repeat_n("x".to_string(), entry.max_positional + 1));
+            }
+            [sub] => {
+                prop_assert_eq!(&sub.name, &positionals[0]);
+                prop_assert_eq!(sub.max_positional, positionals.len() - 1);
+                argv.push(sub.name.clone());
+                argv.extend(std::iter::repeat_n("x".to_string(), sub.max_positional + 1));
+            }
+            more => prop_assert!(false, "one use produced {} subs", more.len()),
+        }
         prop_assert!(
             !dispatch_spec(&tokens(&argv), &specs[0]).is_allowed(),
-            "entry admitted {}+1 positionals; toml:\n{}", entry.max_positional, toml
+            "entry admitted one positional more than it saw; toml:\n{}", toml
         );
+    }
+
+    /// SCOPING (subcommands): a use that starts with a plain word names that word, so the entry
+    /// admits the observed subcommand and refuses a different one. A flat entry for
+    /// `deploytool status` admitted `deploytool destroy`.
+    #[test]
+    fn generated_entry_admits_only_the_observed_subcommand(
+        name in arb_unknown_name(),
+        sub in "[a-z][a-z0-9-]{1,8}",
+        flags in prop::collection::vec(arb_flag(), 0..3),
+        rest in prop::collection::vec(arb_positional(), 0..3),
+    ) {
+        let mut argv = vec![name.clone(), sub.clone()];
+        argv.extend(flags.iter().cloned());
+        argv.extend(rest.iter().cloned());
+        let command = argv.join(" ");
+        let entry = only_entry(&command);
+        prop_assert_eq!(entry.subs.len(), 1, "expected one sub for `{}`", command);
+        let toml = render_toml(std::slice::from_ref(&entry));
+        let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
+        prop_assert!(dispatch_spec(&tokens(&argv), &specs[0]).is_allowed(), "observed use refused; toml:\n{}", toml);
+        let other = tokens(&[name.clone(), format!("{sub}-other")]);
+        prop_assert!(!dispatch_spec(&other, &specs[0]).is_allowed(), "a different subcommand was admitted; toml:\n{}", toml);
+        let bare = tokens(std::slice::from_ref(&name));
+        prop_assert!(!dispatch_spec(&bare, &specs[0]).is_allowed(), "the bare command was admitted; toml:\n{}", toml);
     }
 
     /// The emitted TOML is always valid and round-trips its names, for any entry shape.
@@ -142,6 +177,7 @@ proptest! {
             },
             max_positional,
             level: "SafeWrite".to_string(),
+            subs: Vec::new(),
         };
         let toml = render_toml(std::slice::from_ref(&entry));
         let specs = load_toml(&toml, "suggest-test").expect("valid test definition");
@@ -174,7 +210,7 @@ fn config_hash_matches_trust_sha256() {
 /// `config_hash` equals hashing the file a user would `shasum` — the property the trust check needs.
 #[test]
 fn pin_hash_is_over_the_merged_file() {
-    let entry = GeneratedEntry { name: "mytool".into(), standalone: vec!["-x".into()], max_positional: 1, level: "SafeWrite".into() };
+    let entry = GeneratedEntry { name: "mytool".into(), standalone: vec!["-x".into()], max_positional: 1, level: "SafeWrite".into(), subs: Vec::new() };
     let merged = merged_content("", std::slice::from_ref(&entry));
     assert_eq!(config_hash(merged.as_bytes()), config_hash(render_toml(std::slice::from_ref(&entry)).as_bytes()));
     // Appending to an existing file keeps the existing content verbatim ahead of the new block.
@@ -265,7 +301,7 @@ fn path_basename_is_used_for_the_name() {
 #[test]
 fn generated_pin_matches_the_written_file_and_dir() {
     let dir = tempfile::tempdir().unwrap();
-    let entry = GeneratedEntry { name: "zztool-42".into(), standalone: vec!["-x".into()], max_positional: 0, level: "SafeWrite".into() };
+    let entry = GeneratedEntry { name: "zztool-42".into(), standalone: vec!["-x".into()], max_positional: 0, level: "SafeWrite".into(), subs: Vec::new() };
     let content = merged_content("", std::slice::from_ref(&entry));
     let file = dir.path().join(".safe-chains.toml");
     std::fs::write(&file, &content).unwrap();

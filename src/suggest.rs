@@ -27,14 +27,32 @@ use crate::registry;
 const DEFAULT_LEVEL: &str = "SafeWrite";
 
 /// A scoped custom-command entry for one unknown command name.
+///
+/// When every observed use starts with a plain word (`mytool sync`), that word is a SUBCOMMAND and
+/// the entry lists each one as a `[[command.sub]]` with its own flags and count. Otherwise the
+/// entry is flat. Flat is what this always was, and it read `deploytool status` as "deploytool with
+/// any one argument", which also admits `deploytool destroy`. Naming the word keeps an entry to
+/// what was actually run.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GeneratedEntry {
     pub name: String,
-    /// Observed flags, sorted and de-duplicated (every `-`-prefixed argument, verbatim).
+    /// Observed flags, sorted and de-duplicated (every `-`-prefixed argument, verbatim). Empty
+    /// when `subs` is not.
     pub standalone: Vec<String>,
-    /// The largest positional-argument count observed across occurrences.
+    /// The largest positional-argument count observed across occurrences. Zero when `subs` is not
+    /// empty.
     pub max_positional: usize,
     pub level: String,
+    /// The subcommands observed, sorted by name. Empty for a flat entry.
+    pub subs: Vec<GeneratedSub>,
+}
+
+/// One observed subcommand: its flags and the most positionals seen after it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GeneratedSub {
+    pub name: String,
+    pub standalone: Vec<String>,
+    pub max_positional: usize,
 }
 
 /// What `analyze` concluded about a command.
@@ -64,8 +82,7 @@ pub fn analyze(command: &str) -> Outcome {
     let mut simples: Vec<&SimpleCmd> = Vec::new();
     collect_script(&script, &mut simples);
 
-    // name -> (observed flags, max observed positional count)
-    let mut unknown: BTreeMap<String, (BTreeSet<String>, usize)> = BTreeMap::new();
+    let mut unknown: BTreeMap<String, Vec<Observed>> = BTreeMap::new();
     let mut recognized: BTreeSet<String> = BTreeSet::new();
     for sc in simples {
         let Some(name) = command_basename(sc) else {
@@ -75,25 +92,52 @@ pub fn analyze(command: &str) -> Outcome {
             recognized.insert(name);
             continue;
         }
-        let (flags, positionals) = observed_shape(sc);
-        let entry = unknown.entry(name).or_default();
-        entry.0.extend(flags);
-        entry.1 = entry.1.max(positionals);
+        unknown.entry(name).or_default().push(observed_shape(sc));
     }
 
     if unknown.is_empty() {
         return Outcome::RecognizedButDenied { names: recognized.into_iter().collect() };
     }
-    let entries = unknown
-        .into_iter()
-        .map(|(name, (flags, max_positional))| GeneratedEntry {
-            name,
-            standalone: flags.into_iter().collect(),
-            max_positional,
-            level: DEFAULT_LEVEL.to_string(),
-        })
-        .collect();
+    let entries = unknown.into_iter().map(|(name, uses)| entry_for(name, &uses)).collect();
     Outcome::Generated { entries, also_recognized: recognized.into_iter().collect() }
+}
+
+/// One observed use of a command: its flags, and its positionals in order.
+struct Observed {
+    flags: Vec<String>,
+    positionals: Vec<String>,
+    /// The first argument is a plain word, so it is in the subcommand position.
+    leads_with_word: bool,
+}
+
+fn entry_for(name: String, uses: &[Observed]) -> GeneratedEntry {
+    let level = DEFAULT_LEVEL.to_string();
+    let every_use_starts_with_a_word = uses.iter().all(|u| u.leads_with_word);
+    if !every_use_starts_with_a_word {
+        let standalone: BTreeSet<String> = uses.iter().flat_map(|u| u.flags.iter().cloned()).collect();
+        let max_positional = uses.iter().map(|u| u.positionals.len()).max().unwrap_or(0);
+        return GeneratedEntry { name, standalone: standalone.into_iter().collect(), max_positional, level, subs: Vec::new() };
+    }
+    let mut subs: BTreeMap<String, (BTreeSet<String>, usize)> = BTreeMap::new();
+    for u in uses {
+        let Some((sub, rest)) = u.positionals.split_first() else { continue };
+        let shape = subs.entry(sub.clone()).or_default();
+        shape.0.extend(u.flags.iter().cloned());
+        shape.1 = shape.1.max(rest.len());
+    }
+    let subs = subs
+        .into_iter()
+        .map(|(name, (flags, max_positional))| GeneratedSub { name, standalone: flags.into_iter().collect(), max_positional })
+        .collect();
+    GeneratedEntry { name, standalone: Vec::new(), max_positional: 0, level, subs }
+}
+
+/// A word that reads as a subcommand name: lower-case letters, digits, `-`, `_` and `:`, starting
+/// with a letter. A path, a number, a URL, or anything with a dot or a space is an argument.
+fn is_sub_word(word: &str) -> bool {
+    word.len() <= 40
+        && word.starts_with(|c: char| c.is_ascii_lowercase())
+        && word.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, '-' | '_' | ':'))
 }
 
 /// The basename of a simple command's name word (`/usr/bin/foo` → `foo`), or `None` for an env-only
@@ -109,18 +153,19 @@ fn command_basename(sc: &SimpleCmd) -> Option<String> {
 /// The observed flags (each `-`-prefixed argument, but not a lone `-`) and the count of positional
 /// arguments. A valued flag's value counts as a positional, which is fine: the generated grammar
 /// still admits the observed invocation, just classified as flag + positional.
-fn observed_shape(sc: &SimpleCmd) -> (Vec<String>, usize) {
+fn observed_shape(sc: &SimpleCmd) -> Observed {
     let mut flags = Vec::new();
-    let mut positionals = 0;
+    let mut positionals = Vec::new();
     for word in sc.words.iter().skip(1) {
         let s = word.eval();
         if s.starts_with('-') && s != "-" {
             flags.push(s);
         } else {
-            positionals += 1;
+            positionals.push(s);
         }
     }
-    (flags, positionals)
+    let leads_with_word = sc.words.get(1).is_some_and(|w| is_sub_word(&w.eval()));
+    Observed { flags, positionals, leads_with_word }
 }
 
 fn collect_script<'a>(script: &'a Script, out: &mut Vec<&'a SimpleCmd>) {
@@ -217,14 +262,25 @@ pub fn render_toml(entries: &[GeneratedEntry]) -> String {
         }
         out.push_str("[[command]]\n");
         out.push_str(&format!("name = {}\n", toml_str(&entry.name)));
-        if !entry.standalone.is_empty() {
-            let items: Vec<String> = entry.standalone.iter().map(|f| toml_str(f)).collect();
-            out.push_str(&format!("standalone = [{}]\n", items.join(", ")));
+        if entry.subs.is_empty() {
+            push_shape(&mut out, &entry.standalone, entry.max_positional, &entry.level);
         }
-        out.push_str(&format!("max_positional = {}\n", entry.max_positional));
-        out.push_str(&format!("level = {}\n", toml_str(&entry.level)));
+        for sub in &entry.subs {
+            out.push_str("\n[[command.sub]]\n");
+            out.push_str(&format!("name = {}\n", toml_str(&sub.name)));
+            push_shape(&mut out, &sub.standalone, sub.max_positional, &entry.level);
+        }
     }
     out
+}
+
+fn push_shape(out: &mut String, standalone: &[String], max_positional: usize, level: &str) {
+    if !standalone.is_empty() {
+        let items: Vec<String> = standalone.iter().map(|f| toml_str(f)).collect();
+        out.push_str(&format!("standalone = [{}]\n", items.join(", ")));
+    }
+    out.push_str(&format!("max_positional = {max_positional}\n"));
+    out.push_str(&format!("level = {}\n", toml_str(level)));
 }
 
 /// A TOML basic (double-quoted) string with the control/quote/backslash escapes TOML requires, so
