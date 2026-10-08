@@ -1,0 +1,12 @@
+title = "config help and the new --help examples"
+caption = "safe-chains config --help, and the examples at the end of safe-chains --help"
+height = 1000
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains config --help
+run safe-chains --help | sed -n '/^EXAMPLES/,$p'
+"""

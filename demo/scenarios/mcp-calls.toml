@@ -1,0 +1,14 @@
+title = "MCP tool calls"
+caption = "Over MCP the fix names a tool; an edit reports how to undo it; a client that approves edits unasked is refused"
+height = 420
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run mcp-call check_command '{"command":"deploytool status"}' | tail -4
+run mcp-call grant_path '{"path":"~/notes","access":"write"}'
+run mkdir -p .claude && echo '{"permissions":{"allow":["mcp__safe-chains"]}}' > .claude/settings.json
+run mcp-call grant_path '{"path":"~/notes","access":"read"}'
+"""

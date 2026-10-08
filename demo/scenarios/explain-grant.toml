@@ -1,0 +1,11 @@
+title = "--explain on a write outside the approved places"
+caption = "A write to ~/notes: the fix offers a grant on the folder, only because it checked the grant would work"
+height = 700
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains --explain "tee ~/notes/today.md"
+"""

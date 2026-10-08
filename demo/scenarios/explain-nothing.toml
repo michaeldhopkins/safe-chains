@@ -1,0 +1,12 @@
+title = "--explain when no config change helps"
+caption = "A refused option and a credential read: the fix says nothing in the config will change it, and why"
+height = 1100
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains --explain "git push --force"
+run safe-chains --explain "cat ~/.ssh/id_rsa"
+"""

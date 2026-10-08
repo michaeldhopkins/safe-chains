@@ -1,0 +1,11 @@
+title = "--explain on a command safe-chains has no entry for"
+caption = "--explain on an unknown command now ends with the fix: add an entry, with the exact command"
+height = 520
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains --explain "deploytool status --env prod"
+"""

@@ -1,0 +1,11 @@
+title = "The MCP server's instructions and tools"
+caption = "What an MCP client is shown: the server's instructions and each tool's description"
+height = 1150
+width = 1700
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run mcp-tools
+"""

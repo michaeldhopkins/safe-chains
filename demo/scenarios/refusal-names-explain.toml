@@ -1,0 +1,11 @@
+title = "A hook refusal names --explain"
+caption = "The refusal a blocking harness (Codex here) receives now ends by pointing at --explain"
+height = 420
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run echo '{"tool_input":{"command":"deploytool status"},"cwd":"/x"}' | safe-chains hook codex | jq -r .hookSpecificOutput.permissionDecisionReason
+"""

@@ -1,0 +1,14 @@
+title = "config add, and what it approves"
+caption = "config add writes an entry scoped to the subcommand and flags used; another subcommand stays unapproved"
+height = 680
+width = 1500
+cwd = "home/work/app"
+prompt = "app $ "
+path = "target/debug"
+setup = "../setup/home.sh"
+steps = """
+run safe-chains config add "deploytool status --env prod"
+run safe-chains "deploytool status --env staging"; echo "exit $?"
+run safe-chains "deploytool destroy"; echo "exit $?"
+run safe-chains config list
+"""
