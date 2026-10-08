@@ -167,19 +167,19 @@ proptest! {
 }
 
 /// The root arrives as the harness spelled it: macOS reports a session started in `/etc` as
-/// `/private/etc`, and a root may carry `.`, `..` or a case variant. Each names a root that holds
-/// protected places and must be recognised as one.
+/// `/private/etc` (a firmlink only there), and a root may carry `.`, `..` or a case variant.
+/// Each names a root that holds protected places and must be recognised as one.
 #[test]
 fn a_root_holding_protected_places_is_recognised_in_every_spelling() {
     let Some(home) = absolute_home() else { return };
     let mut cases = vec![
-        ("/private/etc".to_string(), vec!["cat master.passwd", "echo x > sudoers", "rm -rf ."]),
-        ("/private".to_string(), vec!["cat etc/master.passwd", "echo x > etc/sudoers", "rm -rf etc"]),
         ("/.".to_string(), vec!["cat etc/master.passwd", "rm -rf etc"]),
         (format!("{home}/."), vec!["echo x >> .zshrc", "rm -rf ."]),
         (format!("{home}/projects/.."), vec!["echo x >> .zshrc", "cat .config/gh/hosts.yml"]),
     ];
     if cfg!(target_os = "macos") {
+        cases.push(("/private/etc".to_string(), vec!["cat master.passwd", "echo x > sudoers", "rm -rf ."]));
+        cases.push(("/private".to_string(), vec!["cat etc/master.passwd", "echo x > etc/sudoers", "rm -rf etc"]));
         cases.push(("/ETC".to_string(), vec!["echo x > sudoers"]));
         cases.push((home.to_uppercase(), vec!["echo x >> .zshrc", "echo x > .config/safe-chains.toml"]));
     }
