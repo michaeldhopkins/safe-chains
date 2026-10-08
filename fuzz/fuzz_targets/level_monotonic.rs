@@ -16,10 +16,18 @@
 //! `network-admin` are SIBLINGS that flex disjoint facets (local privilege versus remote reach), so
 //! neither admits the other. Each chain below is a path through that lattice, and the property is
 //! asserted along chains only.
+//!
+//! The folder levels (docs/design/unknown-folder-writes.md) get the same treatment, and one more:
+//! with the folder unknown, no level approves what the same command would be refused with the
+//! project root as its folder. An unknown folder may only take approvals away.
 
 use libfuzzer_sys::fuzz_target;
+use safe_chains::pathctx::anchor::FolderLevel;
+use safe_chains::pathctx::{self, PathCtx, folder};
 
 /// Paths through the level lattice, strictest first. Every adjacent pair must be non-loosening.
+const ROOT: &str = "/work/fuzz/app";
+
 const CHAINS: &[&[&str]] = &[
     &["paranoid", "reader", "editor", "developer", "local-admin", "yolo"],
     &["paranoid", "reader", "editor", "developer", "network-admin", "yolo"],
@@ -47,5 +55,34 @@ fuzz_target!(|data: &[u8]| {
             }
             previous = Some((name, allowed));
         }
+    }
+
+    let folder_verdict = |level: Option<FolderLevel>| {
+        let cwd = if level.is_some() { safe_chains::targets::UNKNOWN_WORKDIR } else { ROOT };
+        let _ctx = pathctx::enter(PathCtx { cwd: Some(cwd.to_string()), root: Some(ROOT.to_string()), session_id: None });
+        let _folder = level.map(folder::enter);
+        match safe_chains::command_verdict(&command) {
+            safe_chains::Verdict::Allowed(l) => level != Some(FolderLevel::Reads) || l <= safe_chains::SafetyLevel::SafeRead,
+            safe_chains::Verdict::Denied => false,
+        }
+    };
+    let at_root = folder_verdict(None);
+    let mut stricter: Option<(FolderLevel, bool)> = None;
+    for level in [FolderLevel::Reads, FolderLevel::Developer, FolderLevel::Workspace] {
+        let allowed = folder_verdict(Some(level));
+        assert!(
+            !allowed || at_root,
+            "`{command}` is approved with the folder unknown at `{}` but refused in the project root",
+            level.name()
+        );
+        if let Some((name, was)) = stricter {
+            assert!(
+                !was || allowed,
+                "`{command}` is approved at the stricter folder level `{}` but refused at `{}`",
+                name.name(),
+                level.name()
+            );
+        }
+        stricter = Some((level, allowed));
     }
 });

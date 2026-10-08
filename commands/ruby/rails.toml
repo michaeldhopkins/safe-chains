@@ -80,12 +80,14 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:create"
+writes_cwd = "code"
 per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:migrate"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
@@ -102,114 +104,136 @@ standalone = ["--help", "--trace", "-h"]
 # prompts — the honest limit of enumeration, and the reason the other eleven tasks use the rule.
 [[command.sub]]
 name = "db:migrate:primary"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
 [[command.sub]]
 name = "db:migrate:cache"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
 [[command.sub]]
 name = "db:migrate:queue"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
 [[command.sub]]
 name = "db:migrate:cable"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--trace", "-h"]
 
 [[command.sub]]
 name = "db:seed"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:prepare"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:setup"
+writes_cwd = "code"
 per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:test:prepare"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:test:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:fixtures:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:schema:load"
+writes_cwd = "code"
 per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:schema:dump"
+writes_cwd = "code"
 per_database = true
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:structure:dump"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:structure:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "tmp:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "tmp:create"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "tmp:cache:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "log:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "assets:precompile"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "assets:clean"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "assets:clobber"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "cache:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
@@ -242,6 +266,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "generate"
+writes_cwd = "code"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -249,6 +274,7 @@ bare = false
 
 [[command.sub]]
 name = "g"
+writes_cwd = "code"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true

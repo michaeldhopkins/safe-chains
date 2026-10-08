@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "sox"
 description = "Audio file processor and converter. Reads input file(s) and writes output (or `-` for stdout). Effects (reverb, normalize, compand, fade, etc.) are passed as positional words after the output. Network reads when input is a URL. Stable, mature."
 url = "https://sox.sourceforge.net/"

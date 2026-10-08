@@ -16,24 +16,8 @@ use std::borrow::Cow;
 use super::regions::classify_region;
 use crate::engine::facet::LocalLocus;
 
-/// Which face of a region role a given operation reads.
-#[derive(Clone, Copy, PartialEq)]
-pub(crate) enum Face {
-    Read,
-    Write,
-    /// Changes what the NAME refers to, rather than the bytes underneath it: `rm` unbinds it, `ln`
-    /// points it elsewhere, `mv` takes it away. Identical to `Write` for almost every path; the two
-    /// diverge only where a role says a directory may be written INTO but not replaced.
-    Rebind,
-}
-
-impl Face {
-    /// Whether this face changes state, which is what `expand_vars` needs to pick a loop
-    /// variable's representative item. A rebind is a write for that purpose.
-    fn mutates(self) -> bool {
-        self != Face::Read
-    }
-}
+/// Which face of a region role a given operation reads: the use a path is put to.
+pub(crate) use crate::pathctx::anchor::Use as Face;
 
 /// The locus a READ of `path` reaches (the read face of its region role).
 pub(crate) fn read_locus(path: &str) -> LocalLocus {
@@ -183,7 +167,7 @@ fn classify_one(path: &str, want_write: Face) -> LocalLocus {
     //     Reachable since `cd $(…)` began carrying a locus instead of being silently ignored:
     //     `cd $(fd d /etc) && cat f` classified `f` as an ordinary relative name and approved a
     //     read under /etc. Same ordering mistake as (1), one layer further down.
-    let resolved = crate::pathctx::resolve(&base);
+    let resolved = crate::pathctx::resolve_for(&base, want_write);
     let (cwd_tag, base) = match tagged_substitution(&resolved) {
         Some((tag, rewritten)) => (Some(tag), Cow::Owned(rewritten)),
         None => (None, resolved),

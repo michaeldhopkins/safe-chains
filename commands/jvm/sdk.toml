@@ -28,45 +28,53 @@ allow_all = true
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "use"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "default"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "upgrade"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "update"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "flush"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "offline"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 

@@ -3345,7 +3345,9 @@ give every MISSED one a test, rather than meeting them one slice at a time.
 
 Codex's `exec_command` takes a `workdir`, and neither the `PreToolUse` nor the `PermissionRequest`
 payload carries it. On `PermissionRequest` the hook places the command at `UNKNOWN_WORKDIR` and
-grants only reads (`targets::evaluation_dirs`, `within_unknown_workdir_ceiling`). Two gaps remain:
+judges writes at the folder level (docs/design/unknown-folder-writes.md; default `developer`).
+A weekly check of each Codex release flags the day Codex starts
+sending the folder. Gaps remain:
 
 - **The credential shield matches file names.** With `workdir` set to `~/.ssh`, `cat id_rsa` names
   no credential path and is approved on both events (`cat .ssh/id_rsa` is not). The sandbox permits
@@ -3360,3 +3362,25 @@ grants only reads (`targets::evaluation_dirs`, `within_unknown_workdir_ceiling`)
   and they run outside the sandbox in whatever `workdir` the model chose, writing build output (or
   `.git`) there and executing that directory's code. Whether these should need a prompt on this
   event is the owner's call; the docs disclose `cargo test`.
+- **Unlabelled writers.** `tests/fixtures/unknown_folder_owed.txt` lists 1,384 command keys that
+  write without naming a path and declare no `writes_cwd`, so an unknown folder refuses them. Label
+  one when it is next researched; most write a file named after their input and should stay.
+
+## Known-folder holes the unknown-folder review turned up (2026-10-08)
+
+Found while reviewing the unknown-folder levels; each is approved with the folder KNOWN too, so they
+predate that work. The unknown folder refuses all of them.
+
+- **A run-time item is judged by a stand-in name.** `echo .git/hooks/pre-commit | xargs touch` and
+  `ls -A | while read f; do echo x >> "$f"; done` are approved in a project: the xargs or loop item
+  is classified as an ordinary name, while the real item can be a hook or `.envrc`.
+- **A path in a flag or an environment variable a resolver does not gate.** `mise set --file
+  ~/.zshrc FOO=1`, `mise use --path .envrc node@20`, `GIT_INDEX_FILE=.envrc git add .`.
+- **A brace-expanded redirect target.** `echo x > {.,}envrc` is approved; zsh's MULTIOS writes it
+  to `.envrc` (bash refuses it as an ambiguous redirect).
+
+## The unknown-folder `--explain` section uses its own words
+
+The `--explain` section for `--unknown-folder` (`src/folder_cli.rs`) names anchor values
+(`relative-plain`, `implicit-source`). The plain-words dictionary being built for `--explain`
+replaces facet and locus terms elsewhere; once it lands, describe these in the same words.

@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "ln"
 aliases = ["gln", "link", "glink"]
 description = "Creates a directory entry (hard link by default, symbolic link with -s/--symbolic) that points to an existing file. -f overwrites an existing target, -i prompts. When invoked as `link`, takes exactly two non-flag arguments and performs a single link(2) call. Always operates on the local filesystem under the user's permissions. BSD ln (macOS) and GNU ln share short flags; GNU adds --backup, --relative, and other long forms. Stable utility, frozen surface."

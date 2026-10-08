@@ -68,6 +68,7 @@ standalone = ["--help", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "reshim"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--force", "--help", "-h"]
 
@@ -84,6 +85,7 @@ valued = ["--cd"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
@@ -93,18 +95,21 @@ valued = ["--jobs", "-j"]
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "upgrade"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
 
 [[command.sub]]
 name = "prune"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--plugins", "--tools", "-n", "-h"]
 
@@ -134,6 +139,7 @@ candidate = true
 
 [[command.sub]]
 name = "u"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [
@@ -145,6 +151,7 @@ valued = ["--cd"]
 
 [[command.sub]]
 name = "i"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
@@ -154,18 +161,21 @@ valued = ["--jobs", "-j"]
 
 [[command.sub]]
 name = "rm"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "remove"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "up"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]

@@ -73,12 +73,14 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "add"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "--skip-existing", "-h"]
 
 [[command.sub]]
 name = "remove"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
@@ -90,27 +92,32 @@ standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "global"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "shell"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "rehash"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "enable-plugin"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "disable-plugin"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]

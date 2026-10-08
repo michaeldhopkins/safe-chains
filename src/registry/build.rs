@@ -32,6 +32,10 @@ macro_rules! ensure {
     };
 }
 
+#[path = "build_lower.rs"]
+mod lower;
+use lower::{lower_behavior, lower_output};
+
 /// `optional_valued` compiles down to membership in BOTH other lists, and that is the whole
 /// mechanism — the walk needs no third state.
 ///
@@ -282,6 +286,7 @@ pub(super) fn build_subs(
             loopback_valued: canonical.loopback_valued.clone(),
             loopback_effect: canonical.loopback_effect,
             output_path_flags: canonical.output_path_flags.clone(),
+            writes_cwd: canonical.writes_cwd,
         });
     }
     out.push(canonical);
@@ -465,10 +470,12 @@ pub(super) fn build_sub(
     assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values)?;
     assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags)?;
     assert_sub_eval_safe_only_on_leaf(parent, &toml)?;
+    let writes_cwd = super::cwd_writes::lower(parent, &name, toml.writes_cwd.as_deref(), &toml.output_dirs, toml.executor.as_deref())?;
     let output = lower_output(&format!("{parent} {name}"), toml.output.as_ref())?;
     Ok(SubSpec {
         name,
         output,
+        writes_cwd,
         name_match: if toml.per_database { NameMatch::WithDatabaseSuffix } else { NameMatch::Exact },
         kind: build_sub_kind(parent, toml, handler_policies)?,
         policy_ref,
@@ -937,154 +944,6 @@ fn assert_fallback_requires_handler(toml: &TomlCommand) -> Result<(), String> {
     Ok(())
 }
 
-/// Lower a `[command.behavior]` block into a typed `BehaviorSpec`. Every facet string is
-/// resolved to its enum here (via `FacetTerm::from_term`); an unknown term PANICS naming the
-/// command, so a typo fails the build (the registry loads in a test) rather than silently
-/// mis-classifying. `None` when the command declares no behavior.
-fn lower_output(name: &str, o: Option<&TomlOutput>) -> Result<Option<OutputSpec>, String> {
-    let Some(o) = o else { return Ok(None) };
-    let locus_from = match o.locus_from.as_str() {
-        "operands" => OutputLocus::Operands,
-        "cwd" => OutputLocus::Cwd,
-        "stdin" => OutputLocus::Stdin,
-        "atom" => OutputLocus::Atom,
-        other => fail!("command '{name}': unknown output locus_from `{other}` (known: operands, cwd, stdin, atom)"),
-    };
-    Ok(Some(OutputSpec { locus_from, invalidated_by: o.invalidated_by.clone(), valued: o.valued.clone(), requires: o.requires.clone() }))
-}
-
-fn lower_behavior(name: &str, b: Option<&TomlBehavior>) -> Result<Option<BehaviorSpec>, String> {
-    use crate::engine::facet::{FacetTerm, Operation};
-    let Some(b) = b else { return Ok(None) };
-    let Some(operation) = Operation::from_term(&b.operation) else {
-        fail!("command '{name}': unknown behavior operation `{}`", b.operation)
-    };
-    let positionals = match b.positionals.as_str() {
-        "none" => PositionalRole::None,
-        "read" => PositionalRole::Read,
-        "write" => PositionalRole::Write,
-        "pattern-then-read" => PositionalRole::PatternThenRead,
-        "transfer" => PositionalRole::Transfer,
-        other => fail!("command '{name}': unknown behavior positionals `{other}` (known: none, read, write, pattern-then-read, transfer)"),
-    };
-    let scale = match b.scale.as_deref() {
-        None | Some("single") => ScaleModel::Single,
-        Some("breadth") => ScaleModel::Breadth,
-        Some(other) => fail!("command '{name}': unknown behavior scale `{other}` (known: single, breadth)"),
-    };
-    let hook = match b.hook.as_deref() {
-        None => None,
-        Some("grep") => Some(BehaviorHook::Grep),
-        Some("dd") => Some(BehaviorHook::Dd),
-        Some("tar") => Some(BehaviorHook::Tar),
-        Some("sed") => Some(BehaviorHook::Sed),
-        Some("perl") => Some(BehaviorHook::Perl),
-        Some(other) => fail!("command '{name}': unknown behavior hook `{other}` (known: grep, dd, tar, sed, perl)"),
-    };
-    let (short, long) = split_flag_forms(&b.standalone);
-    let (valued_short, valued_long) = split_flag_forms(&b.valued);
-    let mut unbounded_flags = Vec::new();
-    let mut path_flags = Vec::new();
-    for (flag, delta) in &b.flags {
-        if delta.scale.as_deref() == Some("unbounded") {
-            unbounded_flags.push(flag.clone());
-        } else if let Some(other) = delta.scale.as_deref() {
-            fail!("command '{name}': behavior flag `{flag}` has unknown scale `{other}` (known: unbounded)");
-        }
-        if let Some(kind) = delta.kind.as_deref() {
-            let role = match kind {
-                "read" => PathRole::Read,
-                "write" => PathRole::Write,
-                other => {
-                    fail!("command '{name}': behavior flag `{flag}` has unknown kind `{other}` (known: read, write)")
-                }
-            };
-            if !b.valued.contains(flag) {
-                fail!("command '{name}': behavior path-flag `{flag}` (kind = {kind}) must also be listed in `valued`");
-            }
-            let (short, long) = if let Some(rest) = flag.strip_prefix("--") {
-                (None, Some(format!("--{rest}")))
-            } else if let Some(rest) = flag.strip_prefix('-') {
-                if rest.len() == 1 {
-                    (Some(rest.as_bytes()[0]), None)
-                } else {
-                    fail!("command '{name}': behavior path-flag `{flag}` must be a single-char short or a `--long`");
-                }
-            } else {
-                fail!("command '{name}': behavior path-flag `{flag}` must start with `-`");
-            };
-            path_flags.push(PathFlag { short, long, role });
-        }
-    }
-    let transfer = lower_transfer(name, b.transfer.as_ref())?;
-    // A transfer role needs its knobs; anything else must not carry them.
-    match (positionals, &transfer) {
-        (PositionalRole::Transfer, None) => {
-            fail!("command '{name}': positionals = \"transfer\" requires a [command.behavior.transfer] block")
-        }
-        (role, Some(_)) if role != PositionalRole::Transfer => {
-            fail!("command '{name}': [command.behavior.transfer] is only valid with positionals = \"transfer\"")
-        }
-        _ => {}
-    }
-    Ok(Some(BehaviorSpec {
-        operation,
-        positionals,
-        scale,
-        short,
-        valued_short,
-        long,
-        valued_long,
-        numeric_shorthand: b.numeric_shorthand.unwrap_or(false),
-        unbounded_flags,
-        path_flags,
-        hook,
-        transfer,
-    }))
-}
-
-/// Lower a `[command.behavior.transfer]` block, resolving the `source` term and enforcing that
-/// the two clobber-flag sets are mutually exclusive (a command declares whether the default is
-/// clobber or no-clobber, never both).
-fn lower_transfer(name: &str, t: Option<&TomlTransfer>) -> Result<Option<TransferSpec>, String> {
-    let Some(t) = t else { return Ok(None) };
-    let source = match t.source.as_str() {
-        "observe" => TransferSource::Observe,
-        "relocate" => TransferSource::Relocate,
-        other => fail!("command '{name}': unknown transfer source `{other}` (known: observe, relocate)"),
-    };
-    if !t.no_clobber_flags.is_empty() && !t.clobber_flags.is_empty() {
-        fail!("command '{name}': transfer declares both no_clobber_flags and clobber_flags (mutually exclusive)");
-    }
-    Ok(Some(TransferSpec {
-        source,
-        rebinds_destination: t.rebinds_destination,
-        no_clobber_flags: t.no_clobber_flags.clone(),
-        clobber_flags: t.clobber_flags.clone(),
-        recursive_flags: t.recursive_flags.clone(),
-    }))
-}
-
-/// Split a behavior flag list into (single-dash single-char shorts as bytes, `--long`
-/// tokens). A single-dash multi-char token is kept whole in `long` — it then only matches as
-/// a literal, which for a non-`--` token means it never classifies as known and fails closed.
-fn split_flag_forms(tokens: &[String]) -> (Vec<u8>, Vec<String>) {
-    let mut short = Vec::new();
-    let mut long = Vec::new();
-    for t in tokens {
-        if t.starts_with("--") {
-            long.push(t.clone());
-        } else if let Some(rest) = t.strip_prefix('-') {
-            if rest.len() == 1 {
-                short.push(rest.as_bytes()[0]);
-            } else {
-                long.push(t.clone());
-            }
-        }
-    }
-    (short, long)
-}
-
 /// Validate and lower a top-level command's `[[command.flag]]` classifying flags — the flat-command
 /// analog of a profiled sub's escalating flags. Each must name a known archetype (or `unclassified`)
 /// and cite `fact`/`source`; `when_absent`/`value_prefix` are mutually exclusive. Mirrors the per-sub
@@ -1151,6 +1010,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     assert_eval_safe_required_flags_consistent(&toml.name, "<command>", &eval_safe_flags, &eval_safe_required_flags)?;
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
+    let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
     let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
     let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag)?;
     if toml.deny.unwrap_or(false) {
@@ -1171,6 +1031,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
@@ -1202,6 +1063,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         });
@@ -1238,6 +1100,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body, subs, fallback, handler_policies, matrices },
         });
@@ -1264,6 +1127,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 archetype_flags: archetype_flags.clone(),
                 behavior: behavior.clone(),
                 output,
+                writes_cwd,
                 env_assignment_positionals,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
@@ -1303,6 +1167,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
@@ -1334,6 +1199,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
@@ -1383,6 +1249,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
@@ -1412,6 +1279,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags },
         });
@@ -1435,6 +1303,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             output,
+            writes_cwd,
             env_assignment_positionals,
             kind: DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false },
         });
@@ -1458,6 +1327,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         archetype_flags,
         behavior,
         output,
+        writes_cwd,
         kind: DispatchKind::Policy { policy, level },
     })
 }
@@ -1524,6 +1394,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
                 archetype_flags: Vec::new(),
                 behavior: None,
                 output: None,
+                writes_cwd: None,
                 kind: spec.kind.clone(),
             },
         );

@@ -13265,7 +13265,7 @@ Aliases: `psed`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
 - Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --log, --log-everything, --suggest, --version, -V, -h, -v
-- Allowed valued flags: --cwd, --level, --root, --session-id
+- Allowed valued flags: --cwd, --level, --root, --session-id, --unknown-folder
 
 **Examples:**
 
@@ -13280,6 +13280,8 @@ Aliases: `psed`
 - `safe-chains --session-id abc12345 'cat foo'`
 - `safe-chains hook claude`
 - `safe-chains hook codex`
+- `safe-chains hook codex --unknown-folder reads`
+- `safe-chains --unknown-folder developer --explain 'cargo fmt'`
 - `safe-chains hook cursor`
 - `safe-chains hook gemini`
 - `safe-chains hook copilot`

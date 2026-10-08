@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "source"
 name = "ncu"
 description = "npm-check-updates — finds outdated dependencies in package.json (or package-lock equivalents) by comparing installed versions against the registry (network read). Without -u/--upgrade, prints the report to stdout. With -u, rewrites package.json with upgraded version specs (project-local SafeWrite via write_flags). --doctor mode upgrades and runs project tests in a loop (executes test scripts — candidate)."
 url = "https://github.com/raineorshine/npm-check-updates"

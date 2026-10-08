@@ -7,6 +7,7 @@ bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
 name = "build"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--build-cache", "--configure-on-demand", "--console",

@@ -9,6 +9,7 @@ bare = true
 standalone = ["--help", "--version"]
 
 [[command]]
+writes_cwd = "named"
 name = "tee"
 aliases = ["gtee"]
 description = "Reads from stdin and writes to stdout AND to each named file. Writes local files only (does not access network or invoke other programs). -a/--append extends rather than truncates. Part of GNU coreutils; surface frozen for decades."
@@ -80,6 +81,7 @@ eval_safe = true
 eval_safe_flags = ["--bourne-shell", "--sh", "-b", "--c-shell", "--csh", "-c"]
 
 [[command]]
+writes_cwd = "named"
 name = "shred"
 aliases = ["gshred"]
 description = "Overwrites files repeatedly to make recovery harder, optionally removing them. Destructive local-filesystem write; safety level reflects that. -u removes the file after overwriting. Coreutils."

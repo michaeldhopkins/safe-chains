@@ -50,9 +50,11 @@ standalone = ["--help", "--installed", "-h", "-v"]
 
 [[command.sub]]
 name = "target"
+writes_cwd = "none"
 
 [[command.sub.sub]]
 name = "list"
+writes_cwd = "none"
 level = "Inert"
 standalone = ["--help", "--installed", "-h", "-v"]
 valued = ["--toolchain"]
@@ -62,6 +64,7 @@ valued = ["--toolchain"]
 # ~/.rustup. Inbound download + local write; no user data leaves.
 [[command.sub.sub]]
 name = "add"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 valued = ["--toolchain"]
@@ -70,6 +73,7 @@ valued = ["--toolchain"]
 # toolchain. Local write only.
 [[command.sub.sub]]
 name = "remove"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 valued = ["--toolchain"]

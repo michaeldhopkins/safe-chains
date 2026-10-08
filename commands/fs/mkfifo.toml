@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "mkfifo"
 aliases = ["gmkfifo"]
 description = "Creates named pipes (FIFOs) on the local filesystem. -m/--mode sets explicit permission bits, otherwise the umask applies. Does not access the network; creates only the named entries given. BSD and GNU implementations both expose -m; GNU adds long --mode and SELinux/SMACK context flags. Stable utility with a frozen surface."

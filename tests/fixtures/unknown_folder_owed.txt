@@ -1,0 +1,1384 @@
+7z
+7z x
+7za
+7za x
+7zz
+7zz x
+@11ty/eleventy
+@11ty/eleventy x
+PlistBuddy
+ResMerger
+ResMerger x
+Rez
+Rez x
+SetFile
+SplitForks
+SplitForks x
+aa append
+aa archive
+aa check-and-fix
+aa convert
+aa extract
+aa manifest
+aclocal
+aclocal x
+actool
+actool x
+aea append
+aea decrypt
+aea encrypt
+aea sign
+afconvert
+afconvert x
+afhash
+afscexpand
+afscexpand file.txt
+afscexpand x
+age
+age x
+agvtool bump
+agvtool new-marketing-version
+agvtool new-version
+alembic init
+alembic revision
+allume board-create
+allume card-move
+allume delete
+allume note-create
+allume url-create
+ameba
+ansible-lint
+ansible-vault encrypt
+applesingle
+applesingle x
+ar
+ar rb
+ar rcs
+ar t
+ar x
+archiveutil extractXcodeAEA
+arduino-cli compile
+aria2c
+aria2c x
+artillery report
+artisan cache:clear
+artisan config:clear
+artisan event:clear
+artisan route:clear
+artisan view:clear
+as
+as foo.s
+as x
+asciidoctor
+asciidoctor README.adoc
+asciidoctor x
+asdf set
+asn1Coding
+asn1Coding x
+asn1Parser
+asn1Parser x
+astro build
+astro sync
+at
+at x
+atrm
+atrm x
+autoconf
+autoconf x
+autoflake
+autoheader
+autoheader x
+autom4te
+autom4te x
+automake
+automake x
+autopep8
+autopoint
+autopoint x
+autoreconf
+autoreconf x
+autoscan
+autoscan x
+autoupdate
+autoupdate x
+avbutil
+avbutil disable
+avbutil enable
+avbutil list
+avbutil show
+avbutil status
+avbutil x
+avconvert
+avconvert x
+avrdude
+avrdude x
+aws dynamodb
+b64decode
+b64decode x
+b64encode
+b64encode x
+bash
+bash script.sh
+batch
+batch x
+biber
+biber x
+binhex
+binhex x
+binhex.pl
+binhex.pl x
+bintrans
+bintrans x
+bison
+bison grammar.y
+bison x
+bitcode_strip
+bitcode_strip x
+borg check
+borg config
+brakeman
+brotli
+brotli x
+buf format
+buf generate
+bun build
+bundle-audit check
+bundle-audit update
+bundler-audit check
+bundler-audit update
+bunzip2
+bunzip2 x
+byacc
+byacc x
+bzcat
+bzcat x
+bzip2
+bzip2 x
+bzip2recover
+bzip2recover x
+caddy fmt
+caddy manpage
+cancel
+cancel x
+cap_mkdb
+cap_mkdb x
+cargo clean
+cargo cyclonedx
+cargo init
+cargo new
+cargo nextest
+cargo sweep
+cargo swift
+cdk synth
+cdk synthesize
+chflags
+chflags uchg
+chflags x
+circo
+circo x
+circuschief
+cjpeg
+cjpeg x
+cjxl
+clang-format
+clang-tidy
+claude auth
+claude mcp
+claude plugin
+claude plugins
+clever link
+clever login
+clever logout
+clever unlink
+clusterdb
+clusterdb x
+cmake-format
+code
+code-insiders
+codesign_allocate
+codesign_allocate x
+codex apply
+codex cloud
+codex exec
+codex features
+codex fork
+codex mcp
+codex resume
+codex sandbox
+codium
+composer
+compress
+compress x
+compression_tool
+compression_tool x
+convert
+convert in.jpg
+convert in.png
+convert x
+coqc
+coqc x
+coverage combine
+coverage html
+coverage json
+cpio
+cpio x
+cppcheck
+create-next-app
+create-next-app my-app
+create-next-app x
+create-react-app
+create-react-app x
+create-vite
+create-vite x
+createdb
+createdb x
+createuser
+createuser x
+crystal build
+crystal docs
+crystal init
+csplit
+csplit file.txt
+csplit x
+csreq
+csreq x
+ctags
+ctags x
+ctf_insert
+ctf_insert x
+curl
+cwebp
+cwebp x
+cx config
+dart format
+dasel
+dasel x
+dawn scan
+dbt clean
+dbt deps
+dbt init
+debinhex.pl
+debinhex.pl x
+degit
+degit x
+depcruise
+dependency-cruise
+desdp x
+ditto
+ditto x
+djpeg
+djpeg x
+djxl
+docfx build
+docfx init
+dot
+dot x
+dot_clean
+dot_clean x
+dotnet clean
+dotnet new
+dotnet-symbol
+dotnet-symbol x
+dotnet-trace convert
+doxygen
+doxygen x
+drizzle-kit generate
+dropdb
+dropdb x
+dropuser
+dropuser x
+dsymutil
+dsymutil x
+dvc add
+dvc checkout
+dvc commit
+dvc move
+dvc remove
+dvc unprotect
+dvipdf
+dvipdf paper.dvi
+dvipdf x
+dwebp
+dwebp x
+ecpg
+ecpg x
+eleventy
+eleventy x
+em++
+em++ x
+emar
+emar x
+emcc
+emcc x
+enc2xs
+enc2xs x
+eps2eps
+eps2eps in.eps
+eps2eps x
+erb_lint
+erblint
+esbuild
+esbuild x
+exiftool
+eyapp
+eyapp grammar.eyp
+eyapp x
+fantomas
+fantomas x
+fax2ps
+fax2ps x
+fax2tiff
+fax2tiff x
+fdp
+fdp x
+ffmpeg
+ffmpeg x
+fido2-assert
+fido2-assert x
+fido2-cred
+fido2-cred x
+fix-qdf
+fix-qdf x
+flang
+flang x
+flang-new
+flang-new x
+flex
+flex scan.l
+flex scanner.l
+flex x
+flutter analyze
+fourmolu
+fpm
+fpm x
+frames
+frames x
+gas
+gas x
+gatherheaderdoc
+gatherheaderdoc x
+gatsby build
+gatsby clean
+gci write
+gcore
+gcore x
+gcsplit
+gcsplit x
+gdbm_dump
+gdbm_dump x
+gdbm_load
+gdbm_load x
+gen_bridge_metadata
+gen_bridge_metadata x
+gencat
+gencat x
+genstrings
+genstrings x
+gettextize
+gettextize x
+gfortran
+gfortran x
+gh release
+gh run
+gif2webp
+gif2webp x
+gifsicle
+gifsicle x
+git mv
+gleam build
+gleam format
+glibtool
+glibtool x
+glibtoolize
+glibtoolize x
+gmkfifo
+gmknod
+gmknod x
+gmktemp
+gmktemp x
+gnatchop
+gnatchop x
+gnatfind
+gnatfind x
+gnatkr
+gnatkr x
+gnatls
+gnatls x
+gnatmake
+gnatmake x
+gnatpp
+gnatpp x
+gnatprep
+gnatprep x
+gnatxref
+gnatxref x
+gnutls-certtool
+gnutls-certtool x
+go run
+gofumpt
+goimports
+gomodifytags
+goreleaser init
+gosec
+gperf
+gperf keywords.gperf
+gperf x
+gs
+gs x
+gshred
+gsnd
+gsnd x
+gtee
+gtruncate
+gtruncate x
+gunlink
+gunlink x
+h2ph
+h2ph stdio.h
+h2ph x
+h2xs
+h2xs x
+haml-lint
+hatch
+hatch build
+hatch clean
+hatch new
+headerdoc2html
+headerdoc2html x
+heif-dec
+heif-dec x
+heif-enc
+heif-enc x
+heif-thumbnailer
+heif-thumbnailer x
+helmfile fetch
+herb format
+herb lint
+hexo clean
+hexo g
+hexo generate
+hexo init
+hexo new
+hexo render
+hey auth
+http
+https
+hugo new
+husky
+husky x
+i18n-tasks add-missing
+i18n-tasks check-prism
+i18n-tasks cp
+i18n-tasks data-merge
+i18n-tasks data-remove
+i18n-tasks data-write
+i18n-tasks mv
+i18n-tasks normalize
+i18n-tasks prune
+i18n-tasks remove-unused
+i18n-tasks rm
+ibtool
+ibtool x
+iconutil
+iconutil x
+img2webp
+img2webp x
+indent
+indent file.c
+indent x
+initdb
+initdb x
+ipcrm
+ipcrm x
+jasper
+jasper x
+jbig2dec
+jbig2dec x
+jenv local
+jira init
+jj
+jj bookmark
+jj fix
+jj git
+jj resolve
+jj workspace
+jpegoptim
+jpegtran
+jpegtran x
+jpgicc
+jpgicc x
+jsonlint
+jupyter-nbconvert
+jupyter-nbconvert x
+jupytext
+k6 archive
+karma start
+kdestroy
+kdestroy x
+kgetcred
+kgetcred x
+kinit
+kinit x
+knex init
+knex migrate:make
+knex seed:make
+kotlinc
+kotlinc x
+koyeb login
+kswitch
+kswitch x
+ktrace artrace
+ktrace compress
+ktrace dump
+lame
+lame x
+latex
+latex x
+latexmk
+latexmk x
+layerutil
+layerutil x
+ld
+ld x
+ld.lld
+ld.lld x
+ld64.lld
+ld64.lld x
+lesskey
+lesskey x
+libnetcfg
+libnetcfg x
+libtool
+libtool x
+libtoolize
+libtoolize x
+linkicc
+linkicc x
+lipo
+lipo MyBinary
+liquibase db-doc
+liquibase diff-changelog
+liquibase generate-changelog
+liquibase init
+llc
+llc x
+lld
+lld x
+lld-link
+lld-link x
+llvm-ar
+llvm-ar x
+llvm-as
+llvm-as x
+llvm-cov
+llvm-cov x
+llvm-dis
+llvm-dis x
+llvm-dwp
+llvm-dwp x
+llvm-libtool-darwin
+llvm-libtool-darwin x
+llvm-link
+llvm-link x
+llvm-mc
+llvm-mc x
+llvm-objcopy
+llvm-profdata
+llvm-profdata x
+llvm-ranlib
+llvm-ranlib x
+llvm-strip
+localedef
+localedef x
+logger
+logger test
+logger x
+lp
+lp doc.pdf
+lp x
+lpoptions
+lpoptions x
+lpr
+lpr doc.pdf
+lpr x
+lprm
+lprm 42
+lprm x
+lualatex
+lualatex x
+lunzip
+lunzip x
+lz4
+lz4 x
+lz4c
+lz4c x
+lz4cat
+lz4cat x
+lzcat
+lzcat x
+lzip
+lzip x
+lzma
+lzma x
+macbinary
+macbinary x
+magick combine
+magick compare
+magick composite
+magick mogrify
+magick montage
+magick stream
+markdownlint
+markdownlint-cli2
+marp
+marp x
+masscan
+masscan x
+mcs
+mcs x
+mdbook build
+mdbook clean
+mig
+mig x
+migcom
+migcom x
+mise set
+mise trust
+mise unset
+mise untrust
+mise use
+mkbom
+mkbom x
+mkcert
+mkcert x
+mkdocs build
+mkdocs new
+mkfifo
+mkfile
+mkfile x
+mktemp
+mktemp x
+mongodump
+mongodump x
+mongoimport
+mongoimport x
+mongorestore
+mongorestore x
+mprof clean
+mprof rm
+msbuild
+msbuild x
+msgfmt
+msgfmt x
+msginit
+msginit x
+msgmerge
+msgmerge x
+msgunfmt
+msgunfmt x
+mtree
+muse board-create
+muse card-move
+muse delete
+muse note-create
+muse url-create
+mutool bake
+mutool barcode
+mutool clean
+mutool convert
+mutool create
+mutool draw
+mutool extract
+mutool merge
+mutool pages
+mutool poster
+mutool recolor
+mutool sign
+mutool trim
+mvn compile
+mvn test-compile
+mysqlcheck
+mysqlcheck x
+nasm
+nasm x
+nbconvert
+nbconvert x
+nbstripout
+neato
+neato x
+neon set-context
+neonctl set-context
+next build
+nix-collect-garbage
+nix-collect-garbage x
+nix-prefetch-url
+nix-prefetch-url x
+nmedit
+nmedit x
+nomad fmt
+nop
+nop x
+northflank context
+northflank login
+northflank logout
+notifyutil
+notifyutil x
+npm ci
+nuget spec
+nyc instrument
+nyc merge
+ocamlformat
+openssl ca
+openssl cms
+openssl crl
+openssl crl2pkcs7
+openssl dgst
+openssl dh
+openssl dhparam
+openssl dsaparam
+openssl ecparam
+openssl enc
+openssl fipsinstall
+openssl gendh
+openssl gendsa
+openssl genpkey
+openssl genrsa
+openssl kdf
+openssl mac
+openssl nseq
+openssl passwd
+openssl pkcs12
+openssl pkcs7
+openssl rand
+openssl rehash
+openssl req
+openssl rsa
+openssl smime
+openssl spkac
+openssl ts
+openssl x509
+opj_compress
+opj_compress x
+opj_decompress
+opj_decompress x
+opt
+opt x
+optipng
+optipng x
+ormolu
+osacompile
+osacompile x
+osage
+osage x
+overcommit
+overmind connect
+overmind kill
+overmind quit
+overmind restart
+overmind start
+overmind stop
+packwerk init
+packwerk update-todo
+pal2rgb
+pal2rgb x
+pandoc
+pandoc x
+pants fmt
+par.pl
+par.pl x
+parcel build
+parcel watch
+parl
+parl x
+patchwork
+patchwork x
+pax
+pax x
+pbzip2
+pbzip2 x
+pdf2dsc
+pdf2dsc x
+pdf2ps
+pdf2ps in.pdf
+pdf2ps x
+pdfcrop
+pdfcrop input.pdf
+pdfcrop x
+pdfdetach
+pdfdetach x
+pdfimages
+pdfimages x
+pdfjam
+pdfjam x
+pdflatex
+pdflatex x
+pdfseparate
+pdfseparate x
+pdftk
+pdftocairo
+pdftocairo x
+pdftohtml
+pdftohtml x
+pdftoppm
+pdftoppm x
+pdftops
+pdftops x
+pdftotext
+pdftotext report.pdf
+pdftotext x
+pdfunite
+periphery clear-cache
+pf2afm x
+pfbtopfa font.pfb
+pfbtopfa x
+pg_archivecleanup
+pg_archivecleanup x
+pg_basebackup
+pg_basebackup x
+pg_checksums
+pg_checksums x
+pg_combinebackup
+pg_combinebackup x
+pg_receivewal
+pg_receivewal x
+pg_recvlogical
+pg_recvlogical x
+pg_rewind
+pg_rewind x
+pg_test_fsync
+pg_test_fsync x
+pg_upgrade
+pg_upgrade x
+pgbench
+pgbench x
+phpstan clear-result-cache
+pigz
+pigz x
+pip-compile
+pip-compile x
+pip-sync
+pip-sync x
+pipx ensurepath
+pkgbuild
+pkgbuild x
+pl2pm
+pl2pm legacy.pl
+pl2pm x
+platform auth:api-token-login
+platform auth:browser-login
+platform auth:logout
+platform cc
+platform clear-cache
+platform environment:set-remote
+platform login
+platform logout
+platform project:set-remote
+platform set-remote
+platform ssh-cert:load
+please addons:discover
+please assets:clear-cache
+please assets:generate-presets
+please assets:meta
+please assets:meta-clean
+please auth:migration
+please cache:clear
+please glide:clear
+please make:action
+please make:addon
+please make:dictionary
+please make:fieldtype
+please make:filter
+please make:modifier
+please make:scope
+please make:tag
+please make:widget
+please nocache:migration
+please search:insert
+please search:update
+please setup-cp-vite
+please stache:clear
+please stache:refresh
+please stache:warm
+please starter-kit:export
+please starter-kit:init
+please static:clear
+please static:warm
+please support:zip-blueprint
+plenv global
+plenv local
+plutil
+plzip
+plzip x
+pngquant
+pngquant x
+pod init
+pod install
+pod repo
+pod update
+pod2html
+pod2html x
+pod2man
+pod2man Module.pm
+pod2man x
+pod2readme
+pod2readme Module.pm
+pod2readme x
+pod2text
+pod2text Module.pm
+pod2text x
+pod2usage
+pod2usage Module.pm
+pod2usage x
+porter auth
+porter config
+pp
+pp x
+ppm2tiff
+ppm2tiff x
+pre-commit autoupdate
+pre-commit clean
+pre-commit gc
+pre-commit install
+pre-commit install-hooks
+pre-commit uninstall
+prisma init
+productbuild
+productbuild x
+ps2ascii
+ps2ascii input.pdf
+ps2ascii x
+ps2epsi x
+ps2pdf
+ps2pdf x
+ps2pdf12
+ps2pdf12 x
+ps2pdf13
+ps2pdf13 x
+ps2pdf14
+ps2pdf14 x
+ps2pdfwr
+ps2pdfwr x
+ps2ps
+ps2ps x
+psicc
+psicc x
+psktool
+psktool x
+ptar
+ptar x
+ptargrep
+ptargrep x
+pyenv local
+pyupgrade
+pyupgrade x
+qlmanage
+qpdf
+racc
+racc x
+railway link
+railway login
+railway logout
+railway open
+railway unlink
+raw2tiff
+raw2tiff x
+rbenv local
+rbs annotate
+rbs prototype
+rbs vendor
+rdfind
+rdoc
+rdoc lib
+rdoc x
+re2c
+re2c x
+re2d
+re2d x
+re2go
+re2go x
+re2hs
+re2hs x
+re2js
+re2js x
+re2ocaml
+re2ocaml x
+re2py
+re2py x
+re2rust
+re2rust x
+re2swift
+re2swift x
+re2v
+re2v x
+re2zig
+re2zig x
+reindexdb
+reindexdb x
+rename
+rename x
+render login
+resolveLinks
+resolveLinks x
+rex
+rex x
+rgb2ycbcr
+rgb2ycbcr x
+roc build
+roc docs
+roc format
+rollup
+rollup x
+ros use
+rspec
+rsync
+rsync x
+rubycritic
+rufo
+rufo x
+safe-chains
+safety check
+scalac
+scalac x
+scalafix
+scalafix x
+scalafmt
+scalafmt x
+scalingo login
+scalingo logout
+scp
+scp x
+screencapture
+screencapture x
+sdk env
+sdp
+sdp x
+segedit
+segedit x
+sentry-cli debug-files
+sentry-cli sourcemaps
+sequelize init
+sequelize migration:generate
+sequelize model:generate
+sequelize seed:generate
+sfdp
+sfdp x
+sh setup.sh
+shards init
+shards install
+shards lock
+shards prune
+shards update
+shazam signature
+shred
+simctl addmedia
+simctl boot
+simctl clone
+simctl create
+simctl delete
+simctl erase
+simctl install
+simctl keyboard
+simctl keychain
+simctl launch
+simctl openurl
+simctl pair
+simctl privacy
+simctl push
+simctl rename
+simctl shutdown
+simctl status_bar
+simctl terminate
+simctl ui
+simctl uninstall
+simctl unpair
+sips
+sk
+slither
+slither .
+solc
+solc x
+sox
+sphinx-apidoc
+sphinx-apidoc x
+sphinx-build
+sphinx-build x
+sphinx-quickstart
+sphinx-quickstart x
+sponge
+spring binstub
+srb tc
+ssh-add
+ssh-add x
+ssh-copy-id
+ssh-copy-id x
+ssh-keygen
+ssh-keygen x
+stapler staple
+steep binstub
+steep check
+steep init
+steep vendor
+streamzip
+streamzip x
+stree w
+stree write
+strip
+strip x
+stz extract
+supabase db
+supabase functions
+supabase init
+supabase migration
+supabase test
+swc
+swc x
+swiftformat
+swiftformat x
+swiftlint autocorrect
+swiftlint fix
+tab2space x
+tailscale down
+tailscale login
+tailscale logout
+tailscale switch
+tailscale up
+tar
+tar cf
+tee
+terraform fmt
+terraform-docs
+terragrunt render-json
+textutil
+textutil x
+tflint
+tfsec
+thumbnail
+thumbnail x
+tidy
+tidy x
+tiff2bw
+tiff2bw x
+tiff2icns
+tiff2icns x
+tiff2pdf
+tiff2pdf x
+tiff2ps
+tiff2ps x
+tiff2rgba
+tiff2rgba x
+tiffcp
+tiffcp x
+tiffcrop
+tiffcrop x
+tiffdither
+tiffdither x
+tiffmedian
+tiffmedian x
+tiffset
+tiffset x
+tiffsplit
+tiffsplit x
+tiffutil
+tiffutil x
+tificc
+tificc x
+tiged
+tiged x
+tmux a
+tmux attach
+tmux attach-session
+tmux detach-client
+tmux kill-pane
+tmux kill-server
+tmux kill-session
+tmux kill-window
+tmux new
+tmux new-session
+tmux new-window
+tmux rename-session
+tmux rename-window
+tmux resize-pane
+tmux resize-window
+tmux respawn-pane
+tmux respawn-window
+tmux select-pane
+tmux select-window
+tmux send
+tmux send-keys
+tmux set
+tmux set-environment
+tmux set-option
+tmux setenv
+tmux split-window
+tmux swap-pane
+tmux swap-window
+tmux switch-client
+tofu fmt
+tofu get
+tofu init
+tofu logout
+tofu providers
+trace amend
+trace record
+trace trim
+tsup
+tsup x
+tuist clean
+tuist edit
+twopi
+twopi x
+typedoc
+typedoc x
+typeprof
+unbrotli
+unbrotli x
+uncompress
+uncompress x
+unifdef
+unifdef x
+unifdefall
+unifdefall x
+unlz4
+unlz4 x
+unlzma
+unlzma x
+unpigz
+unpigz x
+unxz
+unxz x
+unzipsfx
+unzipsfx x
+unzstd
+unzstd x
+upsun auth:api-token-login
+upsun auth:browser-login
+upsun auth:logout
+upsun cc
+upsun clear-cache
+upsun environment:set-remote
+upsun login
+upsun logout
+upsun project:set-remote
+upsun set-remote
+upsun ssh-cert:load
+usdcat
+usdcat x
+usdcrush
+usdcrush x
+usdextract
+usdextract x
+usdrecord
+usdrecord x
+usdzip
+usdzip x
+uudecode
+uudecode encoded.uu
+uudecode x
+uuencode
+uuencode file.bin
+uuencode x
+vacuumdb
+vacuumdb x
+valet restart
+valet start
+valet stop
+vite build
+vite optimize
+vitepress build
+vitepress init
+vyper
+vyper x
+wasm-ld
+wasm-ld x
+wasm-strip
+wasm-tools parse
+wasm-tools strip
+wasmtime compile
+wat2wasm
+wat2wasm x
+weasyprint
+webpack
+webpack x
+webpmux
+webpmux x
+wget
+wget x
+whisper
+whisper audio.mp3
+whisper meeting.wav
+whisper x
+whisper-cli
+whisper-cli x
+whisper-cpp
+whisper-cpp x
+wkhtmltopdf
+workon attach
+workon create
+workon destroy
+wrjpgcom
+wrjpgcom x
+xar
+xar x
+xattr
+xccov merge
+xcresulttool export
+xcresulttool merge
+xctrace import
+xctrace symbolicate
+xelatex
+xelatex x
+xgettext
+xgettext x
+xgettext.pl
+xgettext.pl x
+xip
+xip x
+xsltproc
+xsltproc x
+xsubpp
+xsubpp Module.xs
+xsubpp x
+xz
+xz x
+xzcat
+xzcat x
+yacc
+yacc grammar.y
+yacc x
+yapf
+yapp
+yapp grammar.yp
+yapp x
+yard doc
+yard graph
+yardoc
+yardoc x
+yasm
+yasm x
+youtube-dl
+youtube-dl x
+yt-dlp
+yt-dlp x
+ytt
+zforce x
+zip
+zipcloak
+zipcloak x
+zipmerge
+zipmerge x
+zipnote
+zipnote x
+zipsplit
+zipsplit x
+ziptool
+ziptool x
+znew
+znew x
+zola build
+zola init
+zstd
+zstd x
+zstdcat
+zstdcat x
+zstdmt
+zstdmt x

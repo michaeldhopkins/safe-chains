@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 95561e52755fb028bb0919ccb2151cc70d0e93762c211ebc9bf4b27d690905ad # shrinks to spelling = "echo x > {t}", t = ".envrc/..", d = "a", level = Developer
+cc a0ab447bafe75b19459983463a120b20117f24416ffadea84c187f084daf0066 # shrinks to spelling = "echo x > {t}", t = "bin", d = "a", level = Developer
+cc c6d6dac1f2587f6ca21b7e8d6810a26af8a25627c433462d77e5d137c390585e # shrinks to spelling = "cat {t}", t = "..", d = "a", elsewhere = true

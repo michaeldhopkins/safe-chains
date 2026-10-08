@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "rmdir"
 aliases = ["grmdir"]
 description = "Removes empty directories. Fails with a diagnostic if the directory is non-empty. -p/--parents removes each pathname component bottom-up, stopping at the first non-empty component. Operates only on the local filesystem under the user's permissions and never recursively deletes content. Stable utility on BSD and GNU with a frozen surface."

@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "jpegoptim"
 description = "Lossless and lossy JPEG optimizer. Bare invocation rewrites the input files in place. -t/--test reports compression without modifying. -d / --dest writes optimized copies to a different directory. -n / --noaction is a dry-run."
 url = "https://github.com/tjko/jpegoptim"

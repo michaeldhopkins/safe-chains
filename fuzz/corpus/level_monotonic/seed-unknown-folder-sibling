@@ -1,0 +1,1 @@
+cd sub && cp a.txt ../lib/x && cargo build

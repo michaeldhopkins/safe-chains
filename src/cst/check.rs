@@ -1,7 +1,7 @@
 use super::*;
-use crate::handlers;
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
+use crate::{handlers, pathctx::judging};
 
 thread_local! {
     /// Total (re-)classifications spent on one top-level `command_verdict`. Delegating handlers
@@ -810,7 +810,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return Verdict::Denied;
     }
 
-    let cmd_v = super::netargs::with_args(cmd, || super::opaque::probed_verdict(cmd, &words, leaf_verdict));
+    let cmd_v = super::netargs::with_args(cmd, || super::opaque::probed_verdict(cmd, &words, judging(!cmd.env.is_empty(), leaf_verdict)));
     sub_v.combine(cmd_v).combine(redir_v)
 }
 

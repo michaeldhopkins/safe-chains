@@ -183,6 +183,8 @@ valued = [
 
 [[command.sub]]
 name = "build"
+writes_cwd = "output"
+output_dirs = ["target"]
 level = "SafeWrite"
 standalone = [
     "--all", "--workspace",
@@ -248,6 +250,8 @@ valued = [
 
 [[command.sub]]
 name = "doc"
+writes_cwd = "output"
+output_dirs = ["target"]
 level = "SafeWrite"
 standalone = [
     "--all", "--all-features", "--bins", "--document-private-items", "--examples",
@@ -272,6 +276,7 @@ valued = [
 # only case a future per-flag split would refine).
 [[command.sub]]
 name = "fmt"
+writes_cwd = "source"
 level = "SafeWrite"
 # No positionals: `cargo fmt` selects its target by --package/--manifest-path, never by path. This
 # also denies the `cargo fmt -- <rustfmt args>` passthrough, whose trailing FILE args rustfmt would
@@ -296,6 +301,7 @@ valued = ["--color", "--index", "--registry"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 max_positional = 0
@@ -660,6 +666,8 @@ valued = ["--features", "--lib-type", "--name", "--platforms", "-F", "-n", "-p"]
 
 [[command.sub]]
 name = "expand"
+writes_cwd = "output"
+output_dirs = ["target"]
 level = "SafeWrite"
 standalone = [
     "--all-features", "--help", "--lib", "--no-default-features",
@@ -693,6 +701,7 @@ valued = [
 
 [[command.sub]]
 name = "update"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = [
     "--aggressive", "--dry-run", "--frozen", "--help",
@@ -707,6 +716,7 @@ valued = [
 
 [[command.sub]]
 name = "generate-lockfile"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
@@ -721,6 +731,8 @@ tolerate_unknown_short = true
 
 [[command.sub]]
 name = "bloat"
+writes_cwd = "output"
+output_dirs = ["target"]
 level = "SafeWrite"
 standalone = [
     "--crates", "--filter", "--help", "--lib",
@@ -751,6 +763,7 @@ valued = [
 
 [[command.sub]]
 name = "fetch"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
@@ -764,6 +777,8 @@ valued = [
 
 [[command.sub]]
 name = "vendor"
+writes_cwd = "output"
+output_dirs = ["vendor"]
 level = "SafeWrite"
 max_positional = 1
 standalone = [

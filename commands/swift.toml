@@ -6,6 +6,8 @@ bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
 name = "build"
+writes_cwd = "output"
+output_dirs = [".build"]
 level = "SafeWrite"
 standalone = [
     "--enable-code-coverage", "--help", "--show-bin-path",

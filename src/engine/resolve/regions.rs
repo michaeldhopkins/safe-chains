@@ -18,7 +18,7 @@ mod protection;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
-pub(crate) use protection::{keeps_absolute, protection_covers};
+pub(crate) use protection::{home_nodes, keeps_absolute, names_a_region, names_a_secret, protection_covers};
 
 /// Which faces a user grant may NOT widen.
 ///

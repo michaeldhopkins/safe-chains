@@ -49,6 +49,12 @@ pub struct Cli {
     #[arg(long)]
     pub root: Option<String>,
 
+    /// Check the command as a hook does when the tool does not say which folder it runs in, with
+    /// writes approved as far as LEVEL allows: reads, developer or workspace. --root is the
+    /// workspace; --cwd is ignored.
+    #[arg(long, value_name = "LEVEL", value_parser = ["reads", "developer", "workspace"])]
+    pub unknown_folder: Option<String>,
+
     /// The harness session id (as a hook would pass), used to recognize this session's scratchpad
     /// under a temp root as a trusted working area rather than anonymous `/tmp`.
     #[arg(long, value_name = "ID")]
@@ -113,5 +119,11 @@ pub enum Subcommand {
         /// Tool to read/write the hook envelope for. See --list-tools.
         #[arg(value_name = "TOOL")]
         tool: String,
+
+        /// How far to approve writes when this tool does not say which folder the command runs
+        /// in: reads, developer or workspace. Overrides `[unknown_folder] writes` in
+        /// ~/.config/safe-chains.toml. Default: developer.
+        #[arg(long, value_name = "LEVEL", value_parser = ["reads", "developer", "workspace"])]
+        unknown_folder: Option<String>,
     },
 }

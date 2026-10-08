@@ -63,6 +63,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--default", "--force", "--help", "-h"]
@@ -70,35 +71,41 @@ valued = ["--with-openssl-dir", "--with-readline-dir"]
 
 [[command.sub]]
 name = "reinstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-h"]
 
 [[command.sub]]
 name = "use"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--create", "--default", "--help", "-h"]
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-h"]
 
 [[command.sub]]
 name = "remove"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-h"]
 
 [[command.sub]]
 name = "cleanup"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "repair"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
@@ -140,6 +147,7 @@ candidate = true
 
 [[command.sub]]
 name = "gemset"
+writes_cwd = "none"
 nested_bare = true
 
 [[command.sub.sub]]
@@ -160,36 +168,42 @@ standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "create"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "use"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--create", "--default", "--help", "-h"]
 
 [[command.sub.sub]]
 name = "delete"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-h"]
 
 [[command.sub.sub]]
 name = "empty"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-h"]
 
 [[command.sub.sub]]
 name = "copy"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "rename"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
@@ -212,6 +226,7 @@ candidate = true
 
 [[command.sub]]
 name = "alias"
+writes_cwd = "none"
 nested_bare = true
 
 [[command.sub.sub]]
@@ -224,12 +239,14 @@ standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "create"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "delete"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]

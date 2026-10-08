@@ -1,6 +1,7 @@
 # Writes in an unknown folder
 
-Status: design draft (2026-10-07), not built. Nothing here changes behaviour yet.
+Status: built (2026-10-08). Design approved 2026-10-08 with `developer` as the default; §12 records
+what the build changed from the draft, and the measurements.
 
 ## 1. The problem
 
@@ -268,3 +269,109 @@ that never send one.
 4. `writes_cwd` and `executor = "project"` across the swept commands, with the `every_*` guard.
 5. The setting and the flag, `--explain` output, the docs.
 6. Measure; record the numbers here; set the ratchet.
+
+## 12. As built (2026-10-08)
+
+**Where it lives.** Not quite §9's layout: the anchor value and the placement rules are
+`src/pathctx/anchor.rs`, beside the resolver they change; the per-evaluation state (the level in
+force, the record `--explain` reads, the frame each command leaf is judged in) is
+`src/pathctx/folder.rs`; the registry field is `src/registry/cwd_writes.rs`; the setting is
+`src/registry/folder_config.rs`; the home persistence list is the `persistence` role in
+`regions/default.toml`. `targets::respond` keeps the `reads` ceiling and lifts it only when a folder
+level above `reads` judged the command.
+
+**How a write is judged.** Two seams, both fail-closed:
+
+- `pathctx::resolve_for` places each relative path a command writes by its anchor value and use
+  (`anchor::placement`): into the workspace when the level approves it, otherwise into the unknown
+  folder, where no write is approvable. A relative read is placed at every level, `reads` included
+  (the owner, 2026-10-08: "If a user chose to run from home, that's their choice"), so `grep -r foo
+  src`, `ls src` and `grep x tests/*.rs` are approved; a glob is allowed only in the last segment, and
+  a read that could be a secret (a credential-shield node as written or under `~`, the end of one, a
+  key file) is placed nowhere. A path that climbs out of the folder, or cannot be read off the
+  command line (`$VAR`, a glob above the last segment, braces), is placed nowhere at every level,
+  reads included: joined onto the unknown folder it named an ordinary directory,
+  while the real parent of an unknown folder can be anything. That change also applies at `reads`,
+  so it tightens what shipped: `cat ../x` now goes to the prompt there too. The `level_monotonic`
+  fuzz target found it on its first burst (`cp a ../ x`, approved at `developer` while the project
+  root, under another user's home, refused it).
+- `folder::judge_leaf` wraps every command leaf. A leaf whose verdict is a write, run in the unknown
+  folder, is approved only if it declares what it writes (`writes_cwd`), or a command nested in it
+  was accounted for. Anything else is refused, so a writer nobody labelled fails closed. A command
+  that writes only the paths it names declares `named`, and each of those paths is placed or
+  refused on its own; naming a path is not enough without the declaration, because a decompressor
+  names its input and writes a name derived from it (`unxz -f authorized_keys.xz`). An assignment
+  in front of a command voids an implicit declaration, since it can move the write
+  (`GIT_INDEX_FILE=.zshrc git add .`).
+- While a run-time item is in scope, an `xargs` item or a loop variable (`while read f`), no write is
+  placed: the classifier sees an ordinary stand-in name, and the real item can be `.zshrc`
+  (`ls -A | xargs -I{} sh -c 'echo x >> {}'`).
+- The folder itself (`.`) is a write target only for a command that declares it writes its own
+  files there (`gofmt -w .`, `rubocop -a`). A copy, move, link or sync into `.` writes the names its
+  sources bring (`cp /tmp/.zshrc .` writes `~/.zshrc` when the folder is home).
+- A transfer into a directory is also judged at the name each source arrives under
+  (`capability::transfer_profile`, shipped in 0.231.3). That closed the same hole in known folders: `cp /tmp/.envrc .`
+  wrote `./.envrc`, which direnv runs, and had been approved because only `.` was classified. A
+  source copied by its contents (`cp -r src/. dest`) brings names nobody wrote down, which an unknown
+  folder treats as hidden and so refuses.
+- An in-place edit's backup is judged where it lands (`resolve::backup`, shipped in 0.231.3). GNU sed and perl put the
+  file's name where the suffix has a `*` and accept a directory there, so in known folders too
+  `sed -i'.git/hooks/*' s/x/x/ pre-commit` wrote a git hook and had been approved.
+
+**Sensitive names.** Beyond §5's two probes (the path as written, and under `~`), a relative path is
+sensitive when it starts with the end of any node under `~` (`LaunchAgents/x.plist` for
+`~/Library/LaunchAgents/`, `git/config` for `~/.config/git/`, `autostart/x.desktop` for
+`~/.config/autostart/`), so it is caught whichever folder under home the command runs in. The
+`persistence` role names XDG and macOS start-up places and Codex's own folder (`~/.codex/`), and the
+named files include Claude Code's and Codex's hook and permission files (`hooks.json`,
+`settings.local.json`, `rules/default.rules`).
+
+**The declaration.** `writes_cwd` on a command or a sub takes five values, not §5's two:
+`"output"` (with `output_dirs`), `"source"`, `"none"` for a writer whose writes are somewhere fixed
+and not in its folder (`pkill`, `rustup target add`, `pyenv install`), `"code"` for a task that runs
+the folder's code without the `executor = "project"` dispatch (`rake db:migrate`, `xcodebuild`), and
+`"named"`. `executor = "project"` counts as `"code"`. Values are checked when the registry loads.
+
+**The sweep (§11 step 1).** The verdict snapshot's 21,758 write invocations, run with the folder
+unknown at `developer`, named 1,406 command keys whose write nothing accounted for before `named`
+existed. 225 commands and subs are labelled (cargo, git, jj, rake and rails tasks, version
+managers, Apple and .NET build tools, formatters, and `named` for coreutils' writers, `sed`, `perl`,
+interpreters and named-output converters); 1,384 keys remain in
+`tests/fixtures/unknown_folder_owed.txt`, which may only shrink: `tests/unknown_folder_owed.rs` fails
+on a new unlabelled writer and on a labelled one still listed. Most of the remainder write a file
+named after their input (`unxz`, `pigz`, `lame`), bring a source's names (`rsync`, `ditto`, `tar`),
+or take a path in a flag that can point anywhere (`mise use -p`, `curl -O`); they stay refused. A
+label is research, not a guess. Commands decided by a Rust handler with no TOML entry (`bash`, `sh`)
+cannot be labelled yet and are refused.
+
+**Test runners.** `cargo test`, `npm test` and `pytest` classify at the read level, so they were
+approved at `reads` before any of this and are at every level. `runs-folder-code` matters only for
+commands classified as writes (`cargo run`, `swift build`, `rake db:migrate`).
+
+**Measurements.**
+
+- Adversarial set (`tests/unknown_folder.rs`): every relative spelling of every region node, the
+  anchor module's named files and git hooks, the usual dotfiles and climbing paths, in 13 write
+  spellings, plain and below a `cd`: 4,836 hazards, 0 approved at any level. Every named file and
+  hook copied, moved, linked or synced into the folder itself, and contents copies: 0 approved.
+  The 32 cases an adversarial review found on the first build: 0 approved. 23 near-miss writes, all
+  approved at `developer`, none at `reads`.
+- Accepted risk (§8 set 3): 9 ordinary names (`config`, `config.json`, `config.toml`, `hosts`,
+  `settings.yml`, `x.plist`, `data.txt`, `ls`, `AGENTS.md`) written into 12 sensitive folders
+  (`~/.ssh`, `~/.aws`, `~/.kube`, `~/.docker`, `~/.gnupg`, `~/.config/git`, `~/Library/LaunchAgents`,
+  `~/bin`, `~/.local/bin`, `~/.codex`, `~/.claude`, `.git`): 108 approvals at `developer` and at
+  `workspace`, 0 at `reads`. Since the folder is what is unknown, every ordinary name counts in every
+  folder. `ls` written into `~/bin` shadows the real `ls`; `config.toml` in `~/.codex` reconfigures
+  Codex; `AGENTS.md` there gives it new instructions. The test pins the number.
+- Anchor soundness: a property (`pathctx::folder::soundness`) that whatever a level approves, run in
+  the project root, a subdirectory, a sibling or scratch, writes nowhere at `worktree-trusted` or
+  above, and at `developer` names nothing the region table names when run in `~`; and that no level
+  approves what the project root refuses, each approving at least what the stricter one does. The
+  `level_monotonic` fuzz target asserts the second over arbitrary input.
+- Realistic set: 300 commands sampled from this machine's agent transcripts among those approved
+  with their folder known, kept outside this repository. Two labellers, one reading every command
+  and one applying the §6 table, both labelled all 300 approve; no rulings were needed. Approved with
+  the folder unknown: `reads` 269 (90.0%), `developer` 288 (96.3%), `workspace` 288. Misses: 0. The
+  11 `developer` still prompts for are mostly words whose value the parser cannot know (a `jq`
+  filter, a glob above the last segment, a `$(…)`) and 2 `curl -o`, unlabelled because `-O` names
+  its output after the URL. The ratchet starts at 96.3%.

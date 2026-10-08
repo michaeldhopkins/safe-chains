@@ -90,25 +90,86 @@ fn anything_short_of_safe_leaves_codex_to_ask() {
     }
 }
 
+/// The codex hook with extra arguments (`--unknown-folder …`).
+fn codex_with(args: &[&str], payload: &str) -> String {
+    let mut all = vec!["hook", "codex"];
+    all.extend_from_slice(args);
+    let (stdout, _stderr, code) = run_hook(&all, payload);
+    assert_eq!(code, 0, "a non-zero exit is a failed hook to Codex: {payload}");
+    stdout
+}
+
 /// Codex runs `exec_command` in a `workdir` the payload does not carry, and an approval here runs
-/// outside the sandbox. A write is safe only if it lands in the workspace, which the hook cannot
-/// know: a relative path, or a command that writes into whatever directory it runs in, may land
-/// anywhere. So no write is approved on this event, and every one goes to Codex's prompt.
+/// outside the sandbox. So writes are judged at the folder level (docs/design/unknown-folder-
+/// writes.md): `developer` by default approves an ordinary relative write, a write the tool makes
+/// in its own folder (`cargo fmt`, `git commit`) and an absolute one the level allows, and leaves a
+/// dotfile, a path that climbs out and any deletion to Codex's prompt. `reads` approves no write.
 #[test]
-fn no_write_is_approved_because_the_workdir_is_unknown() {
-    let inside_the_workspace = [
-        "echo x >> .zshrc", "rm -rf target", "echo hi > out.txt", "touch notes.md", "git commit -am x", "git add .", "cargo fmt",
-        "echo hi > /work/proj/out.txt",
+fn writes_are_judged_at_the_folder_level_because_the_workdir_is_unknown() {
+    let approved_at_developer = [
+        "echo hi > out.txt", "touch notes.md", "git commit -am x", "git add .", "cargo fmt", "cargo build", "echo hi > /work/proj/out.txt",
     ];
-    for command in inside_the_workspace {
+    for command in approved_at_developer {
         assert_eq!(codex(&pre_tool_use(command)), "", "precondition: `{command}` runs inside the sandbox on PreToolUse");
-        assert_eq!(codex(&permission_request("Bash", command)), "", "`{command}` must not be approved outside the sandbox");
+        assert_eq!(behavior(&codex(&permission_request("Bash", command))).as_deref(), Some("allow"), "`{command}` at developer");
+        let explicit = codex_with(&["--unknown-folder", "developer"], &permission_request("Bash", command));
+        assert_eq!(behavior(&explicit).as_deref(), Some("allow"), "`{command}` at an explicit developer");
+        assert_eq!(
+            codex_with(&["--unknown-folder", "reads"], &permission_request("Bash", command)),
+            "",
+            "`{command}` must not be approved at reads"
+        );
     }
-    for command in ["cd /work/other && git commit -am x", "echo hi > /work/other/f", "cargo build", "wget https://example.com"] {
-        assert_eq!(codex(&permission_request("Bash", command)), "", "`{command}` must not be approved outside the sandbox");
+    for command in [
+        "echo x >> .zshrc", "rm -rf target", "echo x > ../x", "tee .git/hooks/pre-commit", "echo hi > /work/other/f",
+        "wget https://example.com",
+    ] {
+        assert_eq!(codex(&permission_request("Bash", command)), "", "`{command}` must go to Codex's prompt at developer");
     }
-    let read = codex(&permission_request("Bash", "cat /work/proj/README.md"));
-    assert_eq!(behavior(&read).as_deref(), Some("allow"), "a read is still approved: `{read}`");
+    let removal = permission_request("Bash", "rm -rf target");
+    assert_eq!(
+        behavior(&codex_with(&["--unknown-folder=workspace"], &removal)).as_deref(),
+        Some("allow"),
+        "workspace approves a relative deletion"
+    );
+    let dotfile = permission_request("Bash", "echo x >> .zshrc");
+    assert_eq!(codex_with(&["--unknown-folder=workspace"], &dotfile), "", "no level approves a dotfile");
+    let read = codex_with(&["--unknown-folder", "reads"], &permission_request("Bash", "cat /work/proj/README.md"));
+    assert_eq!(behavior(&read).as_deref(), Some("allow"), "a read is still approved at reads: `{read}`");
+}
+
+/// The level comes from the flag, else `[unknown_folder] writes` in the user config, else
+/// `developer`; a value that cannot be read falls back to `reads`. PreToolUse, where Codex reports
+/// the folder, ignores both.
+#[test]
+fn the_folder_level_comes_from_the_flag_then_the_user_config() {
+    let config = |body: &str| {
+        let home = tempfile::tempdir().expect("tempdir");
+        std::fs::create_dir_all(home.path().join(".config")).expect("mkdir");
+        std::fs::write(home.path().join(".config/safe-chains.toml"), body).expect("write config");
+        home
+    };
+    let write = permission_request("Bash", "echo hi > out.txt");
+    let reads = config("[unknown_folder]\nwrites = \"reads\"\n");
+    assert_eq!(codex_at_home(reads.path(), &write), "", "the config's reads holds");
+    let typo = config("[unknown_folder]\nwrites = \"devloper\"\n");
+    assert_eq!(codex_at_home(typo.path(), &write), "", "an unreadable value is reads");
+    let workspace = config("[unknown_folder]\nwrites = \"workspace\"\n");
+    let removal = permission_request("Bash", "rm -rf target");
+    assert_eq!(behavior(&codex_at_home(workspace.path(), &removal)).as_deref(), Some("allow"), "the config's workspace holds");
+    let mut flagged = std::process::Command::new(hooks::binary())
+        .args(["hook", "codex", "--unknown-folder", "developer"])
+        .env("HOME", workspace.path())
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn");
+    std::io::Write::write_all(flagged.stdin.as_mut().expect("stdin"), removal.as_bytes()).expect("write stdin");
+    let out = String::from_utf8_lossy(&flagged.wait_with_output().expect("wait").stdout).into_owned();
+    assert_eq!(out, "", "the flag wins over the config");
+    assert_eq!(codex_at_home(reads.path(), &pre_tool_use("echo hi > out.txt")), "", "PreToolUse ignores the setting");
+    let (_out, err, code) = run_hook(&["hook", "codex", "--unknown-folder", "everything"], &write);
+    assert_ne!(code, 0, "an unknown level is refused by the argument parser: {err}");
 }
 
 #[test]
@@ -238,7 +299,7 @@ fn claude_with_the_folder_unknown(command: &str) -> bool {
         == Some("allow")
 }
 
-/// The event answers as Claude Code's hook would with the same missing folder, less every write:
+/// The event answers as Claude Code's hook would with the same missing folder (less every write at `reads`):
 /// shell syntax and network commands go to the classifier, which refuses what could carry a file
 /// or the environment out on either harness, and approves a network read on either.
 #[test]
@@ -274,7 +335,9 @@ fn a_read_is_approved_exactly_when_claude_would_approve_it_without_the_folder() 
     }
     for command in writes_claude_would_approve {
         assert!(claude_with_the_folder_unknown(command), "precondition: Claude approves `{command}`");
-        assert_eq!(codex(&permission_request("Bash", command)), "", "`{command}` writes, so it must go to Codex's prompt");
+        let at_reads = codex_with(&["--unknown-folder", "reads"], &permission_request("Bash", command));
+        assert_eq!(at_reads, "", "`{command}` writes, so at reads it must go to Codex's prompt");
+        assert_eq!(behavior(&codex(&permission_request("Bash", command))).as_deref(), Some("allow"), "`{command}` at developer");
     }
 }
 

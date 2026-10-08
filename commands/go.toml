@@ -25,6 +25,7 @@ flags = { "-o" = "write" }
 
 [[command.sub]]
 name = "build"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [

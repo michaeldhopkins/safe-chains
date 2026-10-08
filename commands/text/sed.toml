@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "sed"
 aliases = ["gsed"]
 description = "Stream editor: applies a script of editing commands to its input and prints the result to stdout. Read-only by default (an `observe` of each file operand, gated by locus — `sed s/a/b/ ~/.ssh/id_rsa` denies on the read). `-i`/`--in-place` flips it to a MUTATE that rewrites the file in place, gated by the file's write locus so a worktree edit auto-approves but `sed -i s/a/b/ /etc/hosts` denies. The script itself is a mini-language: the `e` command/modifier EXECUTES text as a shell command (arbitrary code execution → worst-cased), and `w`/`W`/`r`/`R`/`s///w` read and WRITE files named INSIDE the script, each gated by its own locus. A `-f`/`--file` script comes from a file that can't be inspected, so its embedded `e`/`w`/`r` are invisible → worst-cased. No network. Part of GNU sed / BSD sed; the command language is long-frozen."

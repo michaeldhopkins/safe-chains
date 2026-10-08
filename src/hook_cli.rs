@@ -10,12 +10,13 @@
 use std::io::{self, Read, Write};
 use std::process;
 
+use safe_chains::pathctx::anchor::FolderLevel;
 use safe_chains::targets::{self, HookFormat};
 use safe_chains::verdict::Verdict;
 
 use crate::HOW_IT_WORKS_URL;
 
-pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
+pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode, unknown_folder: Option<FolderLevel>) -> ! {
     let Some(target) = targets::find(target_name) else {
         eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
         process::exit(1);
@@ -28,7 +29,7 @@ pub fn run_hook_for(target_name: &str, log_mode: safe_chains::decisionlog::Mode)
     // A harness that sends several hook events to the one command (Codex: PreToolUse and
     // PermissionRequest) is answered in the shape of the event the envelope names.
     let format = target.hook_format_for(&buf).unwrap_or(default_format);
-    run_hook_on(format, target_name, &buf, log_mode);
+    run_hook_on(format, target_name, &buf, log_mode, unknown_folder);
 }
 
 fn read_stdin_or_abstain() -> String {
@@ -45,10 +46,16 @@ fn read_stdin_or_abstain() -> String {
 /// elsewhere" from "this command genuinely overreaches".
 pub fn run_hook_format(format: &dyn HookFormat, target_name: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
     let buf = read_stdin_or_abstain();
-    run_hook_on(format, target_name, &buf, log_mode);
+    run_hook_on(format, target_name, &buf, log_mode, None);
 }
 
-fn run_hook_on(format: &dyn HookFormat, target_name: &str, buf: &str, log_mode: safe_chains::decisionlog::Mode) -> ! {
+fn run_hook_on(
+    format: &dyn HookFormat,
+    target_name: &str,
+    buf: &str,
+    log_mode: safe_chains::decisionlog::Mode,
+    unknown_folder: Option<FolderLevel>,
+) -> ! {
     // Claude's own permission files are trust ONLY when Claude is the harness being served.
     // Every other target gets safe-chains' own classification and nothing borrowed.
     if target_name == "claude" {
@@ -64,6 +71,9 @@ fn run_hook_on(format: &dyn HookFormat, target_name: &str, buf: &str, log_mode: 
     // defaults, including a harness whose reported cwd is not where the command runs.
     let (cwd, root) = targets::evaluation_dirs(format, &input);
     let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx { cwd, root, session_id: input.session_id.clone() });
+    // A harness that does not report the command's folder: writes are judged at the folder level
+    // (docs/design/unknown-folder-writes.md), installed for the verdict AND the coverage fallback.
+    let _folder = targets::unknown_folder_level(format, unknown_folder).map(safe_chains::pathctx::folder::enter);
     // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
     // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —
     // git push / bulk-object-read become reachable; a LOWER level (reader/editor) TIGHTENS it — a read-

@@ -1,6 +1,9 @@
-//! Which region nodes protect something, and whether a workspace root sits above one of them.
+//! Which region nodes protect something, whether a workspace root sits above one of them, and what
+//! the table can say about a name with no folder to place it in.
 
-use super::{Frozen, Matcher, REGIONS, Role, absolute_other_home, current_os};
+use std::sync::LazyLock;
+
+use super::{Frozen, Matcher, REGIONS, Role, absolute_other_home, current_os, secret_node};
 use crate::engine::facet::LocalLocus;
 
 /// Whether a role is a PROTECTION (a credential/secret shield, the pinned config, or a
@@ -123,6 +126,86 @@ pub(crate) fn anchored_protected_paths_here() -> Vec<String> {
                 .any(|n| n.applies_here() && role_is_protective(&n.role) && n.matcher.specificity(p, false).is_some())
         })
         .collect()
+}
+
+/// Whether `path` falls under any node of the region table, whatever its role, ignoring grants.
+///
+/// The unknown-folder classifier asks this of a relative path twice, once as written (a segment
+/// node such as `.git` or `.ssh` bites at any depth) and once placed under `~`, so a node added to
+/// the table later is a sensitive name without anyone extending a list.
+pub(crate) fn names_a_region(path: &str) -> bool {
+    let path = &super::super::locus::canonicalize(path);
+    let fold = current_os() == "macos";
+    secret_node(path).is_some()
+        || REGIONS
+            .nodes
+            .iter()
+            .any(|n| n.applies_here() && n.matcher.specificity(path, n.fold && fold).is_some())
+}
+
+/// A node under `~`, for the unknown-folder classifier, which has a relative path and no folder to
+/// put it in: its segments, whether it pins one file, and whether it shields a secret.
+pub(crate) struct HomeNode {
+    pub segments: Vec<String>,
+    pub exact: bool,
+    pub secret: bool,
+}
+
+/// Every node under `~`. A relative path that starts with the end of one (`LaunchAgents/x` for
+/// `~/Library/LaunchAgents/`, `git/config` for `~/.config/git/`) can be that place whichever folder
+/// under home the command runs in, and an exact node's file name (`credentials` from
+/// `~/.cargo/credentials`) can be that file.
+pub(crate) fn home_nodes() -> &'static [HomeNode] {
+    static NODES: LazyLock<Vec<HomeNode>> = LazyLock::new(|| {
+        REGIONS
+            .nodes
+            .iter()
+            .filter_map(|n| match &n.matcher {
+                Matcher::Exact(p) => p.strip_prefix("~/").map(|p| (p, true, n.role.reads_secret)),
+                Matcher::Prefix(p) => p.strip_prefix("~/").map(|p| (p, false, n.role.reads_secret)),
+                _ => None,
+            })
+            .map(|(p, exact, secret)| HomeNode {
+                segments: p.split('/').filter(|s| !s.is_empty()).map(str::to_string).collect(),
+                exact,
+                secret,
+            })
+            .filter(|n| !n.segments.is_empty())
+            .collect()
+    });
+    &NODES
+}
+
+/// Whether `path` falls under a node that shields a secret (`.ssh`, `~/.aws/`).
+pub(crate) fn names_a_secret(path: &str) -> bool {
+    secret_node(&super::super::locus::canonicalize(path)).is_some()
+}
+
+#[cfg(test)]
+mod names_tests {
+    use super::*;
+
+    #[test]
+    fn segment_nodes_name_a_relative_path_and_home_nodes_a_home_one() {
+        for named in
+            [".git/hooks/pre-commit", "a/.ssh/id_rsa", ".envrc", "~/.ssh/config", "~/.config", "~/Library/LaunchAgents/x.plist", "~/bin/ls"]
+        {
+            assert!(names_a_region(named), "{named}");
+        }
+        for unnamed in ["src/main.rs", "notes.md", "~/notes.md", "~/projects/app/src/x.rs", "bin/ls"] {
+            assert!(!names_a_region(unnamed), "{unnamed}");
+        }
+    }
+
+    #[test]
+    fn home_nodes_carry_their_segments_and_whether_they_shield_a_secret() {
+        let find = |p: &[&str]| home_nodes().iter().find(|n| n.segments.iter().map(String::as_str).eq(p.iter().copied()));
+        let creds = find(&[".cargo", "credentials"]).expect("~/.cargo/credentials");
+        assert!(creds.exact && creds.secret);
+        let agents = find(&["Library", "LaunchAgents"]).expect("~/Library/LaunchAgents/");
+        assert!(!agents.exact && !agents.secret);
+        assert!(home_nodes().iter().all(|n| !n.segments.is_empty() && n.segments.iter().all(|s| !s.is_empty())));
+    }
 }
 
 #[cfg(test)]

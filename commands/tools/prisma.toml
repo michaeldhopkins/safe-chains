@@ -30,6 +30,7 @@ valued = ["--schema"]
 
 [[command.sub]]
 name = "format"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = true
 standalone = ["--help", "--check", "-h"]
@@ -37,6 +38,8 @@ valued = ["--schema"]
 
 [[command.sub]]
 name = "generate"
+writes_cwd = "output"
+output_dirs = ["node_modules"]
 level = "SafeWrite"
 bare = true
 standalone = ["--allow-no-models", "--data-proxy", "--help", "--no-engine", "--no-hints", "--watch", "-h"]

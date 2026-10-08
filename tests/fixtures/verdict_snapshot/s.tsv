@@ -52,6 +52,8 @@ safe-chains --session-id abc12345 'cat foo'	inert
 safe-chains --session-id x	inert
 safe-chains --setup	denied
 safe-chains --suggest	inert
+safe-chains --unknown-folder developer --explain 'cargo fmt'	inert
+safe-chains --unknown-folder x	inert
 safe-chains --version	inert
 safe-chains -V	inert
 safe-chains -h	inert
@@ -60,6 +62,7 @@ safe-chains help	inert
 safe-chains help hook	inert
 safe-chains hook claude	inert
 safe-chains hook codex	inert
+safe-chains hook codex --unknown-folder reads	inert
 safe-chains hook copilot	inert
 safe-chains hook cursor	inert
 safe-chains hook droid	inert

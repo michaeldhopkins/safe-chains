@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "code"
 name = "ruby"
 description = "Ruby interpreter. `ruby script.rb` executes the script; `-e CODE` runs inline code; `-r LIB` requires (loads and executes) a library; `-x` finds a `#!ruby` line in the file and starts execution from there; a bare invocation reads a program from stdin. Each executes arbitrary code with the invoking user's permissions. `-c` is a parse-only syntax check — it does not execute the script body, BEGIN blocks, or END blocks; it prints `Syntax OK` or a parse error and exits. `--version`/`--help` are informational. Ruby's CLI surface is very stable across major releases; flag semantics do not change between minor versions."
 url = "https://www.ruby-lang.org/en/documentation/"

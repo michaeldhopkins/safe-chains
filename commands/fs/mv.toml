@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "mv"
 aliases = ["gmv"]
 description = "Renames or moves files and directories on the local filesystem. Cross-filesystem moves are implemented internally via cp(1) + rm(1), so a failed mv can leave a partial copy. Operates under the user's permissions only and does not access the network. BSD mv (macOS) keeps a smaller flag surface than GNU mv; both share -f/-i/-n/-v. Stable utility, frozen surface."

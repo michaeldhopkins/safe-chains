@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "weasyprint"
 description = "Renders HTML/CSS to PDF (and PNG). Reads HTML or URL, writes PDF/PNG to the second positional argument. Network reads when input is a URL."
 url = "https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api"

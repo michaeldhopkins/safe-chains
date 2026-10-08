@@ -50,7 +50,7 @@ fn find_repo_custom() -> Option<PathBuf> {
 /// an agent-writable directory (plant a "grant everything" config, load it as trusted). Reading
 /// only from the real home directory closes that off — a common stance for a security-sensitive
 /// CLI. Trades away XDG relocation until a protected third-party config location exists.
-fn find_user_custom() -> Option<PathBuf> {
+pub(super) fn find_user_custom() -> Option<PathBuf> {
     let dir = env::var_os("HOME").map(|h| PathBuf::from(h).join(".config"))?;
     let candidate = dir.join(USER_FILENAME);
     candidate.is_file().then_some(candidate)

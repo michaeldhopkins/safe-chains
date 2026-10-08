@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "sponge"
 description = "moreutils sponge — soaks up all of stdin before opening the output file, allowing pipes that read from and write to the same file. Bare requires one positional argument (the output file). Writes to that file (project-local SafeWrite)."
 url = "https://joeyh.name/code/moreutils/"

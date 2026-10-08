@@ -19,18 +19,21 @@ flags = { "--repository" = "write", "-R" = "write" }
 
 [[command.sub]]
 name = "abandon"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "absorb"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "backout"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -43,12 +46,14 @@ bare = false
 
 [[command.sub]]
 name = "commit"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "describe"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -88,12 +93,14 @@ valued = ["--context", "--from", "--revisions", "--to", "-f", "-r", "-t"]
 
 [[command.sub]]
 name = "duplicate"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "edit"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -116,18 +123,21 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "new"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "parallelize"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "rebase"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -140,6 +150,7 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "restore"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -156,18 +167,21 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "simplify-parents"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "split"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "squash"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -184,12 +198,14 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "undo"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "unsquash"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -204,6 +220,7 @@ name = "bookmark"
 nested_bare = true
 [[command.sub.sub]]
 name = "create"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -223,26 +240,31 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "move"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "rename"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "set"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "track"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "untrack"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
@@ -284,6 +306,7 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "import"
+writes_cwd = "source"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
@@ -334,6 +357,7 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "rename"
+writes_cwd = "source"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true

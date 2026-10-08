@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "sips"
 description = "macOS scriptable image processing system (`sips`), for querying and transforming raster images and ICC colour profiles. Query functions — `-g/--getProperty`, `-x/--extractProfile`, `-X/--extractTag`, `--verify`, `-1/--oneLine` — observe an image or profile; a few of them extract data to a new file on disk. Modification functions rewrite the image IN PLACE by default — `-s/--setProperty` (e.g. format, dpiWidth), `-r/--rotate`, `-f/--flip`, `-c/--cropToHeightWidth`, `-p/--padToHeightWidth`, `-z/-Z/--resample*`, `-e/--embedProfile`, `-m/--matchTo`, `-i/--addIcon` — unless `-o/--out` redirects the result to a separate file or directory. All effects are local to the filesystem; there is no network access. The in-place rewrites are irreversible except via a backup or version control. One flag stands apart: `-j/--js file` executes an arbitrary JavaScript file through sips's scripting bridge — that is code execution, not image processing. macOS-only; the tool surface is effectively frozen."
 url = "https://ss64.com/mac/sips.html"

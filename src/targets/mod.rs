@@ -199,11 +199,28 @@ pub fn respond(format: &dyn HookFormat, command: &str, verdict: crate::Verdict) 
 }
 
 /// Where the command may run in a directory the hook was not told (`cwd_is_the_commands` is
-/// false), only a read is granted. `UNKNOWN_WORKDIR` catches a write that NAMES a relative path,
-/// but `git commit -am x`, `cargo fmt` or `cd /elsewhere && git add .` write into whatever
-/// directory they run in without naming one, and classify the same wherever that is.
+/// false), a write is granted only when the unknown-folder mode judged it.
+///
+/// `UNKNOWN_WORKDIR` alone catches a write that NAMES a relative path, but `git commit -am x`,
+/// `cargo fmt` or `cargo build` write into whatever directory they run in without naming one, and
+/// classify the same wherever that is. At a folder level above `reads` (`pathctx::folder`), each
+/// relative path was placed or left out by its anchor value and each such write was refused unless
+/// it is accounted for, so the verdict already says what the level allows. Without that, only a
+/// read is granted, which is the `reads` level.
 fn within_unknown_workdir_ceiling(format: &dyn HookFormat, verdict: crate::Verdict) -> bool {
-    format.cwd_is_the_commands() || matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead)
+    format.cwd_is_the_commands()
+        || crate::pathctx::folder::judges_writes()
+        || matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead)
+}
+
+/// The folder level a hook judges writes at when `format` does not report the command's folder:
+/// the `--unknown-folder` flag, else the user config, else `developer`. `None` when the folder is
+/// known, where the dial does not apply.
+pub fn unknown_folder_level(
+    format: &dyn HookFormat,
+    flag: Option<crate::pathctx::anchor::FolderLevel>,
+) -> Option<crate::pathctx::anchor::FolderLevel> {
+    (!format.cwd_is_the_commands()).then(|| flag.unwrap_or_else(|| crate::registry::folder_config::user_setting().level()))
 }
 
 /// Append `entry` to `settings[outer][event]`, creating the path when absent.

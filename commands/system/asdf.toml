@@ -51,11 +51,13 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
@@ -68,24 +70,29 @@ standalone = ["--help", "--home", "--parent", "-h", "-p", "-u"]
 
 [[command.sub]]
 name = "reshim"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "plugin"
+writes_cwd = "none"
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "--refs", "--urls", "-h"]
 [[command.sub.sub]]
 name = "remove"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 [[command.sub.sub]]
 name = "add"
+writes_cwd = "none"
 candidate = true
 [[command.sub.sub]]
 name = "update"
+writes_cwd = "none"
 candidate = true
 
 [[command.sub]]

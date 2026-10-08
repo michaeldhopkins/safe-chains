@@ -27,6 +27,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = [
@@ -42,12 +43,14 @@ valued = [
 
 [[command.sub]]
 name = "install-all"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--global", "--help", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "upgrade"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--global", "--help", "--include-injected", "--install", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
@@ -55,6 +58,7 @@ valued = ["--pip-args", "--python"]
 
 [[command.sub]]
 name = "upgrade-all"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = true
 standalone = ["--force", "--global", "--help", "--include-injected", "--quiet", "--skip", "--verbose", "-f", "-h", "-q", "-v"]
@@ -62,18 +66,21 @@ valued = ["--pip-args"]
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--global", "--help", "-h"]
 
 [[command.sub]]
 name = "uninstall-all"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = true
 standalone = ["--global", "--help", "-h"]
 
 [[command.sub]]
 name = "reinstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--global", "--help", "-h"]
@@ -81,6 +88,7 @@ valued = ["--python"]
 
 [[command.sub]]
 name = "reinstall-all"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = true
 standalone = ["--global", "--help", "-h"]
@@ -88,6 +96,7 @@ valued = ["--python", "--skip"]
 
 [[command.sub]]
 name = "inject"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--global", "--help", "--include-apps", "--include-deps", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
@@ -95,6 +104,7 @@ valued = ["--index-url", "--pip-args"]
 
 [[command.sub]]
 name = "uninject"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--global", "--help", "--leave-deps", "-h"]

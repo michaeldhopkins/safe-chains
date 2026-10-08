@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "qpdf"
 description = "QPDF — PDF transformation library / CLI. Reads a PDF and writes the transformed output. Inspection forms: --check, --show-encryption, --show-pages, --show-object, --json, --is-encrypted, --requires-password, --copyright, --show-crypto, --json-help, --job-json-help, --zopfli. Transformation forms: --linearize, --encrypt, --decrypt, --pages, --rotate, --object-streams, --remove-restrictions, --replace-input. The `--help` flag accepts a topic selector (`--help=encryption`, `--help=all`, etc.) for focused help output."
 url = "https://qpdf.readthedocs.io/en/stable/cli.html"

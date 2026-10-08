@@ -122,6 +122,18 @@ owed = [
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/budget.rs" = []
 "src/cst/reserved.rs" = []
+"src/pathctx/anchor.rs" = [
+  "src/pathctx/anchor_tests.rs::a_placed_write_is_plain_and_stays_put",
+  "src/pathctx/anchor_tests.rs::a_placed_read_stays_put_and_names_no_secret",
+  "src/pathctx/anchor_tests.rs::placement_is_monotone_in_the_level",
+  "src/pathctx/anchor_tests.rs::a_hidden_segment_is_never_plain",
+]
+"src/pathctx/folder.rs" = ["src/pathctx/folder_soundness_tests.rs::an_approved_write_lands_nowhere_protected_in_any_covered_folder"]
+"src/engine/resolve/backup.rs" = ["a_backup_is_the_file_renamed_by_its_suffix"]
+"src/engine/resolve/path_verdicts.rs" = ["src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied", "src/cst/proptests.rs::file_redirect_promotes_to_safewrite"]
+"src/registry/cwd_writes.rs" = ["only_a_well_formed_declaration_lowers"]
+"src/registry/build_lower.rs" = ["output_lowers_only_a_known_source"]
+"src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses"]
 "src/engine/archetype.rs" = []
 "src/engine/authoring.rs" = [
   "union_levels_admit_everything_but_their_declared_gap",
@@ -143,8 +155,6 @@ owed = [
   "src/engine/testgen.rs::level_nearest_miss_agrees_with_admits_capability",
   "src/engine/testgen.rs::the_sentinel_is_denied_even_with_any_one_axis_relaxed",
 ]
-"src/engine/resolve/backup.rs" = ["a_backup_is_the_file_renamed_by_its_suffix"]
-"src/engine/resolve/path_verdicts.rs" = ["src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied", "src/cst/proptests.rs::file_redirect_promotes_to_safewrite"]
 "src/engine/resolve.rs" = [
   "transfer_commands_gate_both_operand_roles",
   "sudo_family_flag_walk_never_panics",
@@ -257,6 +267,8 @@ owed = [
 "src/engine/resolve/regions.rs" = "loads grants from ~/.config/safe-chains.toml and Claude Code's settings, and reads HOME"
 "src/engine/resolve/regions/grant_faces.rs" = "reads HOME to place the grants it merges"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
+"src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
+"src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"
 "src/handlers/android/mod.rs" = "module declaration only"
 "src/handlers/coreutils/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
 "src/handlers/coreutils/net/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
@@ -276,6 +288,7 @@ owed = [
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
 "src/registry/mod.rs" = "the process-wide registries, including the one loaded from the user's config"
 "src/registry/types.rs" = "type declarations and their serde shapes only"
+"src/registry/types_tables.rs" = "type declarations and their serde shapes only"
 "src/suggest_cli.rs" = "reads and writes .safe-chains.toml for --suggest"
 "src/targets/agy.rs" = "reads and writes the harness's settings file"
 "src/targets/claude.rs" = "reads and writes the harness's settings file"
@@ -290,6 +303,9 @@ owed = [
 "src/targets/qwen.rs" = "reads and writes the harness's settings file"
 
 [test_only]
+"src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
+"src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
+"src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"

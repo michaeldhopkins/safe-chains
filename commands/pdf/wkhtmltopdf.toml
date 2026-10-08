@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "wkhtmltopdf"
 description = "wkhtmltopdf — converts HTML to PDF using WebKit. Reads HTML files or URLs (network) and writes a PDF. Note: upstream is no longer maintained but the binary is widely deployed."
 url = "https://wkhtmltopdf.org/usage/wkhtmltopdf.txt"

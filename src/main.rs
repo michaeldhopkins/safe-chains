@@ -4,9 +4,11 @@ use std::process;
 use clap::{CommandFactory, Parser};
 
 use safe_chains::cli::{Cli, Subcommand};
+use safe_chains::pathctx::anchor::FolderLevel;
 use safe_chains::targets;
 use safe_chains::verdict::{SafetyLevel, Verdict};
 
+mod folder_cli;
 mod hook_cli;
 mod suggest_cli;
 
@@ -69,11 +71,20 @@ fn run_cli(
     process::exit(i32::from(!allowed));
 }
 
-fn run_explain(command: &str, engine_level: Option<&'static safe_chains::engine::level::Level>) -> ! {
+fn run_explain(
+    command: &str,
+    engine_level: Option<&'static safe_chains::engine::level::Level>,
+    threshold: SafetyLevel,
+    folder_level: Option<FolderLevel>,
+) -> ! {
     // Coverage here too, and for the same reason: the hook renders THIS explanation into the
     // model's context, so an `--explain` that omitted the user's own patterns showed a `✗` beside a
     // segment the agent had just watched be approved.
     let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
+    // Held to the same `<= threshold` gate `run_cli` applies, or a write `--level reader` (or an
+    // unknown folder at `reads`) refuses was explained as approved.
+    let uncapped = explanation.overall;
+    let explanation = folder_cli::under_threshold(explanation, threshold);
     print!("{}", explanation.render());
     // The facet breakdown is CLI-only. `render()` also feeds the hook's injected context, where an
     // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
@@ -93,6 +104,7 @@ fn run_explain(command: &str, engine_level: Option<&'static safe_chains::engine:
     // The facet breakdown covers the engine's own commands; this covers the legacy surface, where
     // the breakdown is empty and there is otherwise nothing to read.
     if !explanation.is_allowed()
+        && folder_level.is_none()
         && let Some((path, reason)) = safe_chains::workspace_overreach(command)
     {
         // "Why:" rather than the hook's "safe-chains did not auto-approve this:" lead-in, which the
@@ -100,7 +112,8 @@ fn run_explain(command: &str, engine_level: Option<&'static safe_chains::engine:
         // it needs something in front of it or it reads as an orphan.
         println!("\nWhy: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
     }
-    process::exit(i32::from(!explanation.is_allowed()));
+    let allowed = folder_cli::explain(folder_level, uncapped) && explanation.is_allowed();
+    process::exit(i32::from(!allowed));
 }
 
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
@@ -158,8 +171,8 @@ fn main() {
     match cli {
         Ok(cli) => {
             let log_mode = safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
-            if let Some(Subcommand::Hook { tool }) = cli.subcommand {
-                hook_cli::run_hook_for(&tool, log_mode);
+            if let Some(Subcommand::Hook { tool, unknown_folder }) = cli.subcommand {
+                hook_cli::run_hook_for(&tool, log_mode, unknown_folder.as_deref().and_then(FolderLevel::parse));
             }
             if cli.list_tools {
                 run_list_tools();
@@ -199,8 +212,9 @@ fn main() {
                 // directory context the classification ran under — the EFFECTIVE cwd, not the flag,
                 // or the log would disagree with the verdict beside it.
                 let (log_cwd, log_root) = (effective_cwd.clone(), cli.root.clone().or_else(|| effective_cwd.clone()));
+                let folder_level = cli.unknown_folder.as_deref().and_then(FolderLevel::parse);
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
-                    cwd: effective_cwd.clone(),
+                    cwd: if folder_level.is_some() { Some(targets::UNKNOWN_WORKDIR.to_string()) } else { effective_cwd.clone() },
                     root: cli.root.or(effective_cwd),
                     session_id: cli.session_id,
                 });
@@ -211,7 +225,9 @@ fn main() {
                 // same command and the same config. The bare stdin mode IS the Claude hook (see the
                 // CLI docs), so Claude is this binary's default persona; `hook <tool>` is how you
                 // ask about a different harness.
-                safe_chains::trust_claude_config();
+                if folder_level.is_none() {
+                    safe_chains::trust_claude_config();
+                }
                 // The level is resolved BEFORE `--explain`, which used to run first and so
                 // explained at the default band whatever `--level` said. The hook explains under
                 // its configured level; asking why something was refused under `reader` should
@@ -242,8 +258,10 @@ fn main() {
                 // `--explain` still wins over `--suggest` when both are passed, as it did before the
                 // level resolution moved above them. Swapping that precedence would have been a
                 // silent side effect of an unrelated change.
+                let _folder = folder_level.map(safe_chains::pathctx::folder::enter);
+                let (threshold, engine_level) = folder_cli::ceiling(folder_level, threshold, engine_level);
                 if cli.explain {
-                    run_explain(&command, engine_level);
+                    run_explain(&command, engine_level, threshold, folder_level);
                 }
                 if cli.suggest {
                     suggest_cli::run_suggest(&command);

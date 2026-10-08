@@ -568,6 +568,7 @@ name = "show"
 
 [[command.sub]]
 name = "pull"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = [
     "--all", "--allow-unrelated-histories", "--append", "--autostash",
@@ -893,6 +894,7 @@ valued = [
 
 [[command.sub]]
 name = "switch"
+writes_cwd = "source"
 profile = "local-mutate-trivial"
 fact = "Switches HEAD to an existing branch, updating tracked files to match. git REFUSES to proceed when the switch would overwrite local modifications unless --force/--discard-changes/--merge is given; `git switch -` returns to the previous branch. -c/--create makes a new branch from the current HEAD."
 source = "https://git-scm.com/docs/git-switch"
@@ -903,6 +905,7 @@ valued = ["--orphan"]
 
 [[command.sub]]
 name = "add"
+writes_cwd = "source"
 profile = "local-mutate-recoverable"
 fact = "Stages worktree content into the index. Does not alter working-tree files; the index entry it replaces is recoverable while the prior commit exists, and `git restore --staged` unstages."
 source = "https://git-scm.com/docs/git-add"
@@ -920,6 +923,7 @@ standalone = ["--dry-run", "--force", "--help", "--verbose", "-f", "-h", "-k", "
 
 [[command.sub]]
 name = "commit"
+writes_cwd = "source"
 profile = "local-mutate-recoverable"
 fact = "Records the staged index as a new commit on the current branch, running the pre-commit, prepare-commit-msg, commit-msg and post-commit hooks. --amend replaces the tip commit; the replaced commit stays reachable through the reflog for the gc grace period."
 source = "https://git-scm.com/docs/git-commit"
@@ -929,6 +933,7 @@ valued = ["--author", "--date", "--file", "--message", "--reuse-message", "--squ
 
 [[command.sub]]
 name = "merge"
+writes_cwd = "source"
 profile = "local-mutate-recoverable"
 fact = "Joins another history into the current branch, creating a merge commit (or fast-forwarding). Runs the pre-merge-commit and post-merge hooks. A conflicted merge leaves markers in the worktree; `git merge --abort` restores the pre-merge state."
 source = "https://git-scm.com/docs/git-merge"
@@ -938,6 +943,7 @@ valued = ["--into-name", "--log", "--message", "--strategy", "--strategy-option"
 
 [[command.sub]]
 name = "rebase"
+writes_cwd = "source"
 profile = "local-destroy-recoverable"
 fact = "Replays commits onto a new base, producing NEW commit objects; the original commits become unreachable from any branch but remain in the reflog (and thus recoverable via ORIG_HEAD / `git rebase --abort`) until gc prunes them. Runs the pre-rebase and post-rewrite hooks."
 source = "https://git-scm.com/docs/git-rebase"

@@ -70,6 +70,8 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "build"
+writes_cwd = "output"
+output_dirs = ["public", "resources"]
 level = "SafeWrite"
 bare = true
 standalone = [

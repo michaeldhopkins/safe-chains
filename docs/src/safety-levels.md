@@ -23,6 +23,12 @@ safe-chains --level reader "cargo build"     # exit 1 (developer > reader)
 
 Without `--level`, the default threshold is `developer` (all allowed commands pass).
 
+The hook takes its level from `~/.config/safe-chains.toml` (a project's `.safe-chains.toml` cannot set it):
+
+```toml
+level = "reader"
+```
+
 Levels propagate through pipelines, wrappers, and substitutions. A pipeline's level is the maximum of its components.
 
 ## Levels and your own approved commands
@@ -48,3 +54,28 @@ Both rules are needed there: a pipeline counts as covered only when *every* comm
 So `--level paranoid` means what it says even in a home directory full of accumulated `Bash(...)`
 rules — useful when you want a read-only pass over a project without first auditing every approval
 you have ever clicked through.
+
+## When the hook cannot see the folder
+
+Some tools don't tell the hook which folder a command runs in (Codex's `PermissionRequest`). There, a
+second setting decides how far writes are approved:
+
+| Level | Approves | Examples |
+|-------|----------|----------|
+| `reads` | Reads only; every write goes to your tool's prompt | `cat notes.md`, `grep -r foo src` |
+| `developer` | Also ordinary writes, a tool's own build output and edits, and running the project (default) | `echo x > notes.md`, `cargo build`, `git commit -am x` |
+| `workspace` | Also deleting and writing into a neighbouring project | `rm -rf build`, `cp a ../lib/` |
+
+No level approves a path that climbs out of the folder, or a write to a name that means something
+wherever it lands: a dotfile, a git hook, a key file or a startup folder.
+
+Set it in `~/.config/safe-chains.toml`:
+
+```toml
+[unknown_folder]
+writes = "reads"
+```
+
+For one tool, pass it to the hook, which wins over the file: `safe-chains hook codex --unknown-folder=reads`.
+To check a single command the way the hook would: `safe-chains --unknown-folder reads "cargo fmt"`, and
+add `--explain` to see how each write was judged.

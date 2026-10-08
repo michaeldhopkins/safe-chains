@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "nbstripout"
 description = "Strips outputs from Jupyter notebooks. Without --textconv, modifies notebooks in place (project-local SafeWrite). `--install` writes a git filter config; `--uninstall` removes it; `--status`/`--is-installed` are read-only. Active project."
 url = "https://github.com/kynan/nbstripout"

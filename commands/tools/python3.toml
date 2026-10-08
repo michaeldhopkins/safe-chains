@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "code"
 name = "python3"
 description = "CPython interpreter. `python3 FILE` runs a script file; `-c CODE` runs inline code; `-m MODULE` runs a module; a bare invocation starts an interactive REPL. Each of those executes arbitrary code with the invoking user's permissions and full filesystem/network access. `--version`/`-V` and `--help`/`-h` are purely informational and run no user code. Python follows an annual release cycle with a stable, slow-moving command-line surface."
 url = "https://docs.python.org/3/using/cmdline.html"

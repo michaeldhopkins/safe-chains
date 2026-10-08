@@ -104,6 +104,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "generate"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = true
 standalone = [
@@ -125,6 +126,7 @@ valued = [
 
 [[command.sub]]
 name = "build"
+writes_cwd = "code"
 level = "SafeWrite"
 bare = true
 standalone = [
@@ -151,6 +153,7 @@ valued = [
 
 [[command.sub]]
 name = "test"
+writes_cwd = "code"
 level = "SafeWrite"
 bare = true
 standalone = [
@@ -194,6 +197,8 @@ valued = ["--path", "-p"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "output"
+output_dirs = ["Tuist"]
 level = "SafeWrite"
 bare = true
 standalone = ["--help", "--update", "--verbose", "-h"]
@@ -208,6 +213,8 @@ valued = ["--path", "-p"]
 
 [[command.sub]]
 name = "fetch"
+writes_cwd = "output"
+output_dirs = ["Tuist"]
 level = "SafeWrite"
 bare = true
 standalone = ["--help", "--update", "--verbose", "-h"]

@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "wasm-strip"
 description = "WABT — strips custom sections from a WebAssembly binary. Bare invocation rewrites the file in place (project-local SafeWrite). -k / --keep-section preserves named sections."
 url = "https://github.com/WebAssembly/wabt"

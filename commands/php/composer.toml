@@ -60,6 +60,8 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "dump-autoload"
+writes_cwd = "output"
+output_dirs = ["vendor"]
 level = "SafeWrite"
 standalone = [
     "--apcu", "--classmap-authoritative", "--dev", "--dry-run",
@@ -89,6 +91,7 @@ valued = ["--format", "--ignore", "-f"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--ansi", "--apcu-autoloader", "--audit", "--classmap-authoritative",

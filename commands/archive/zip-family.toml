@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "zip"
 description = "Info-ZIP zip — package and compress files into a .zip archive. Bare `zip archive files...` adds entries; -u/--update and -f/--freshen update; -d/--delete removes entries; -U/--copy copies entries between archives; -FS synchronizes archive with the filesystem (can delete archive entries); -F/-FF repair. -e/--encrypt prompts for a password and encrypts entries using the legacy (weak) ZIP encryption. -T tests after building; -@ reads file list from stdin."
 url = "https://infozip.sourceforge.net/Zip.html"

@@ -744,6 +744,38 @@
 # numeric_dash = false
 
 # ─────────────────────────────────────────────────────────────────────
+# WRITES_CWD — what a command writes in its folder without naming a path
+# ─────────────────────────────────────────────────────────────────────
+#
+# Some harnesses do not tell the hook which folder a command runs in
+# (Codex's PermissionRequest). There, a command whose verdict is a write
+# is approved only when its write is accounted for: it names the path it
+# writes, or it declares here what it writes in its folder. An undeclared
+# writer that names no path is refused, and tests/unknown_folder_owed.rs
+# fails until it is declared or listed as owed.
+# See docs/design/unknown-folder-writes.md.
+#
+# On a [[command]] or a [[command.sub]]. The deepest declaring sub wins;
+# a sub that declares nothing does not inherit its parent's value.
+#   writes_cwd = "output"   writes only into subtrees it owns and
+#                           regenerates; name them in output_dirs
+#   writes_cwd = "source"   rewrites its own kind of project files
+#                           (a formatter, git commit, a lockfile update)
+#   writes_cwd = "none"     writes nothing in its folder; whatever it
+#                           writes is somewhere fixed (pkill, pyenv install)
+#   writes_cwd = "code"     runs code the folder holds (a rake task);
+#                           executor = "project" already means this
+# Research before labelling. A command that writes a file named after
+# its input, or a dotfile, or a hook, does not get a label: it stays
+# refused when the folder is unknown.
+#
+# [[command.sub]]
+# name = "build"
+# level = "SafeWrite"
+# writes_cwd = "output"
+# output_dirs = ["target"]
+
+# ─────────────────────────────────────────────────────────────────────
 # VERB CHAIN — `CMD [main-flags] verb [args] then verb …` (e.g. mlr)
 # ─────────────────────────────────────────────────────────────────────
 #

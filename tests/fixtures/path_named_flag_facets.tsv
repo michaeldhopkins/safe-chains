@@ -709,6 +709,7 @@ rspec	--profile	untriaged	-	-	-
 rufo	--filename	untriaged	-	-	-	
 rvm install	--with-openssl-dir	untriaged	-	-	-	
 rvm install	--with-readline-dir	untriaged	-	-	-	
+safe-chains	--unknown-folder	not-a-path	-	-	-	Takes a level name (reads, developer or workspace), not a path: a false positive of the "folder" name test.
 sam list endpoints	--config-file	untriaged	-	-	-	
 sam list endpoints	--profile	untriaged	-	-	-	
 sam list resources	--config-file	untriaged	-	-	-	

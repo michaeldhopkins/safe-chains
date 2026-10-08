@@ -67,71 +67,85 @@ standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:create"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:migrate"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:seed"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:prepare"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:setup"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:fixtures:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:schema:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:schema:dump"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:structure:load"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "db:structure:dump"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "tmp:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "tmp:create"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "tmp:cache:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "log:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
@@ -146,27 +160,32 @@ standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 # rake-compiler tasks (fat binaries, cross toolchains, packaging) and are not covered here.
 [[command.sub]]
 name = "compile"
+writes_cwd = "code"
 level = "SafeWrite"
 max_positional = 0
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "assets:precompile"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "assets:clean"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "assets:clobber"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "cache:clear"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
 

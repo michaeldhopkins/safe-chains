@@ -24,6 +24,7 @@ examples_denied = [
 
 [[command.sub]]
 name = "generate"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = true
 standalone = [

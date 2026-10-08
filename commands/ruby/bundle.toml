@@ -22,6 +22,7 @@ handler = "bundle_exec"
 
 [[command.sub]]
 name = "install"
+writes_cwd = "source"
 level = "SafeWrite"
 standalone = [
     "--clean", "--deployment", "--frozen", "--full-index",

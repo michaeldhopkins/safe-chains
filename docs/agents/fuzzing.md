@@ -15,7 +15,9 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
     cannot forge a marker line or smuggle a control/bidi character into it.
   - `suggest_roundtrip` — every config `--suggest` generates parses back, and merging never drops
     what was there.
-  - `level_monotonic` — a stricter level never approves what a looser one refused.
+  - `level_monotonic` — a stricter level never approves what a looser one refused; with the folder
+    unknown, no folder level approves what the project root refuses, and `reads` ⊆ `developer` ⊆
+    `workspace`. Its `seed-*` inputs are the unknown-folder regressions.
   - `config_load` — a repo `.safe-chains.toml` (the one attacker-placed input) never aborts the
     loader, loads NOTHING when it is not valid TOML, and loads deterministically.
   - `setup_merge` — `--setup` into an arbitrary existing settings file: on refusal the file is

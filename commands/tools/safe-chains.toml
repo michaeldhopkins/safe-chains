@@ -1,6 +1,6 @@
 [[command]]
 name = "safe-chains"
-description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. The `hook <TOOL>` subcommand reads the named tool's hook envelope from stdin, classifies the embedded shell command, and writes that tool's hook reply to stdout — used as the integration point with Claude Code, Codex, Cursor, Gemini, Copilot, Qwen, Droid, and OpenCode. `--list-commands`, `--list-tools`, `--version` (also `-v`/`-V`), `--help`, and `--explain` (which prints a per-segment breakdown of the classification) are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies, `--cwd`/`--root` set the directory context it resolves paths against, and `--session-id` supplies the harness session key used to recognize that session's scratchpad — none of them execute the candidate. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--generate-book` writes documentation to the local filesystem. `--log` appends a JSON record of each command that did not auto-approve — the command verbatim, the directory it ran in, and the classification that refused it — to `~/.local/state/safe-chains/log.jsonl`, created owner-only; `--log-everything` records approvals as well. The destination is a compiled-in constant with no flag to redirect it, and neither flag reads or transmits anything. `--suggest` analyzes a command safe-chains does not recognize and PRINTS the `.safe-chains.toml` entry that would describe it, the path that file belongs at, and a `[[trusted]]` pin for the user to paste into `~/.config/safe-chains.toml`. It writes nothing: it reads the project config to compute the pin hash and emits text, so it is a read-only meta operation like `--explain`. Surface stable; new command data ships in roughly biweekly minor releases."
+description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. The `hook <TOOL>` subcommand reads the named tool's hook envelope from stdin, classifies the embedded shell command, and writes that tool's hook reply to stdout — used as the integration point with Claude Code, Codex, Cursor, Gemini, Copilot, Qwen, Droid, and OpenCode. `--list-commands`, `--list-tools`, `--version` (also `-v`/`-V`), `--help`, and `--explain` (which prints a per-segment breakdown of the classification) are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies, `--cwd`/`--root` set the directory context it resolves paths against, `--session-id` supplies the harness session key used to recognize that session's scratchpad, and `--unknown-folder` (also on `hook <TOOL>`) judges writes as when the tool does not say which folder the command runs in — none of them execute the candidate. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--generate-book` writes documentation to the local filesystem. `--log` appends a JSON record of each command that did not auto-approve — the command verbatim, the directory it ran in, and the classification that refused it — to `~/.local/state/safe-chains/log.jsonl`, created owner-only; `--log-everything` records approvals as well. The destination is a compiled-in constant with no flag to redirect it, and neither flag reads or transmits anything. `--suggest` analyzes a command safe-chains does not recognize and PRINTS the `.safe-chains.toml` entry that would describe it, the path that file belongs at, and a `[[trusted]]` pin for the user to paste into `~/.config/safe-chains.toml`. It writes nothing: it reads the project config to compute the pin hash and emits text, so it is a read-only meta operation like `--explain`. Surface stable; new command data ships in roughly biweekly minor releases."
 url = "https://github.com/michaeldhopkins/safe-chains"
 researched_version = "safe-chains 0.211.0"
 level = "Inert"
@@ -16,7 +16,7 @@ standalone = [
     "--log", "--log-everything", "--suggest",
     "--version", "-V", "-h", "-v",
 ]
-valued = ["--cwd", "--level", "--root", "--session-id"]
+valued = ["--cwd", "--level", "--root", "--session-id", "--unknown-folder"]
 examples_safe = [
     "safe-chains --version",
     "safe-chains -v",
@@ -29,6 +29,8 @@ examples_safe = [
     "safe-chains --session-id abc12345 'cat foo'",
     "safe-chains hook claude",
     "safe-chains hook codex",
+    "safe-chains hook codex --unknown-folder reads",
+    "safe-chains --unknown-folder developer --explain 'cargo fmt'",
     "safe-chains hook cursor",
     "safe-chains hook gemini",
     "safe-chains hook copilot",

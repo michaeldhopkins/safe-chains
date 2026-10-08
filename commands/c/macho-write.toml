@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "install_name_tool"
 description = "Edits LC_ID_DYLIB, LC_LOAD_DYLIB, and LC_RPATH load commands in an existing Mach-O binary. -id rewrites the install name of a dylib; -change rewrites one dependent install name; -rpath rewrites an existing rpath; -add_rpath appends an rpath; -delete_rpath drops one. All operations modify the file passed as the final positional argument in place. No new file is produced and the surface contains no read-only forms. No network."
 url = "https://keith.github.io/xcode-man-pages/install_name_tool.1.html"

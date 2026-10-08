@@ -78,6 +78,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "install"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--keep", "--list", "--list-all", "--patch",
@@ -87,6 +88,7 @@ standalone = [
 
 [[command.sub]]
 name = "uninstall"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--force", "--help", "-f", "-h"]
@@ -98,17 +100,20 @@ standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "global"
+writes_cwd = "none"
 level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "shell"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "rehash"
+writes_cwd = "none"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 

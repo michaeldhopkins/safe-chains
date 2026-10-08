@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "named"
 name = "touch"
 aliases = ["gtouch"]
 description = "Updates the access and modification timestamps of a file and creates the file if it does not exist. Local-only: operates on the file system under the user's permissions and does not access the network. BSD touch (macOS) and GNU touch (gtouch on macOS) have overlapping but not identical flag surfaces — BSD adds -A (adjust by relative offset), GNU adds --no-create / --no-dereference long forms. Stable utility with a frozen flag surface for years."

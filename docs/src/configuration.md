@@ -108,7 +108,13 @@ The two events do different jobs:
 - **`PreToolUse`** runs before every shell command. A command safe-chains recognizes as safe runs as usual; any other command is refused, because inside Codex's sandbox it would otherwise run without a prompt, and the sandbox still allows reading files anywhere on the machine.
 - **`PermissionRequest`** runs only when Codex is about to ask you to approve a command: one that needs to run outside the sandbox or reach the network, or, under the `untrusted` approval policy, one Codex does not already trust. safe-chains approves a command it recognizes as safe, and leaves every other command to Codex's own approval prompt.
 
-Codex does not tell the hook which directory a command will run in (a command can name its own working directory). So on `PermissionRequest`, safe-chains approves only commands that read. Every command that writes, such as `git commit` or `cargo fmt`, and every search through a relative directory, such as `grep -r foo src`, goes to Codex's prompt.
+Codex does not tell the hook which directory a command will run in (a command can name its own working directory). So on `PermissionRequest`, safe-chains judges each write by how much it depends on that directory, at one of three levels:
+
+- **`developer`** (the default) approves what you would approve in a project: a write to an ordinary relative path (`echo x > notes.md`, `mkdir -p build`), a tool's own build output and edits (`cargo build`, `cargo fmt`, `git commit -am x`) and running the project's code (`cargo run`). It leaves to Codex's prompt any deletion, move or link of a relative path (`rm -rf build`), any path that climbs out of the directory (`../x`), and any name that means something wherever it lands: a dotfile, a git hook, a key file or a startup folder (`.zshrc`, `.git/hooks/pre-commit`, `authorized_keys`, `Library/LaunchAgents`).
+- **`reads`** approves only commands that read. Every write goes to Codex's prompt.
+- **`workspace`** treats the directory as the project: it also approves relative deletions and writes into a neighbouring project (`../lib/x`). It never approves a sensitive name either.
+
+See [Safety Levels](safety-levels.md#when-the-hook-cannot-see-the-folder) if you want a level besides developer.
 
 A command approved through `PermissionRequest` runs outside the sandbox. That includes commands that run the project's own code, such as `cargo test`, and commands that read from the network, such as `curl -s https://example.com` or `git fetch`, which can carry anything the agent has already read to the address it names. If you want the sandbox to hold for those, leave the `PermissionRequest` entry out.
 

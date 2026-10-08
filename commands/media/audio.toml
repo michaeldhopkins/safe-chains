@@ -89,6 +89,7 @@ valued = ["-v", "-vt", "-de", "-f"]
 examples_safe = ["auval -a", "auval -v aufx dely appl"]
 
 [[command]]
+writes_cwd = "named"
 name = "say"
 description = "macOS speech synthesiser. Speaks the supplied text (or stdin / -f file) through the default audio output, or writes synthesised audio to --output-file. -v selects a voice; -r sets the rate. No network. Frozen surface."
 url = "https://ss64.com/mac/say.html"

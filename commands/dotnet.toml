@@ -10,6 +10,8 @@ flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
 name = "build"
+writes_cwd = "output"
+output_dirs = ["bin", "obj"]
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--no-dependencies", "--no-incremental",
@@ -59,6 +61,8 @@ valued = [
 
 [[command.sub]]
 name = "restore"
+writes_cwd = "output"
+output_dirs = ["obj"]
 level = "SafeWrite"
 standalone = [
     "--disable-build-servers", "--disable-parallel",
@@ -78,6 +82,8 @@ valued = [
 
 [[command.sub]]
 name = "publish"
+writes_cwd = "output"
+output_dirs = ["bin", "obj"]
 level = "SafeWrite"
 standalone = [
     "--disable-build-servers", "--force",
@@ -97,6 +103,8 @@ valued = [
 
 [[command.sub]]
 name = "pack"
+writes_cwd = "output"
+output_dirs = ["bin", "obj"]
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--include-source",
@@ -137,6 +145,7 @@ valued = [
 
 [[command.sub]]
 name = "format"
+writes_cwd = "source"
 level = "SafeWrite"
 bare = true
 standalone = [

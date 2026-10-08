@@ -43,6 +43,7 @@ positional = "read"
 flags = { "-o" = "write" }
 
 [[command]]
+writes_cwd = "named"
 name = "SetFile"
 description = "Sets HFS+ file attributes (creator, type, creation/modification date, Finder attribute bits) on the named files. Modifies the files in place. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
 url = "https://keith.github.io/xcode-man-pages/SetFile.1.html"

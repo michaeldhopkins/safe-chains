@@ -16,6 +16,9 @@
 use std::borrow::Cow;
 use std::cell::RefCell;
 
+pub mod anchor;
+pub mod folder;
+pub(crate) use folder::judging;
 mod home;
 pub mod item_shape;
 mod lexical;
@@ -314,8 +317,21 @@ fn is_var_name(s: &str) -> bool {
 /// and relative spellings of the SAME in-root file classify identically — safety on the OPERATION,
 /// not the SYNTAX. A `~/…` path that expands into `root` comes back root-relative too, as its
 /// `$HOME/…` spelling does; any other `~` path, a `$`-unpinnable one, or no context, is returned
-/// as-is for the home classifiers.
+/// as-is for the home classifiers. In an unknown folder (`folder`), a placed path joins the root.
 pub fn resolve(path: &str) -> Cow<'_, str> {
+    resolve_placed(path, None)
+}
+
+/// As [`resolve`], for a path put to `use_`. A write or a rebind is recorded as one the command leaf
+/// being judged NAMED (`folder`).
+pub fn resolve_for(path: &str, use_: anchor::Use) -> Cow<'_, str> {
+    if use_.mutates() {
+        folder::note_named_write();
+    }
+    resolve_placed(path, Some(use_))
+}
+
+fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, str> {
     if path.is_empty() || path.contains('$') {
         return Cow::Borrowed(path);
     }
@@ -328,7 +344,11 @@ pub fn resolve(path: &str) -> Cow<'_, str> {
             (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
                 // Relative → join onto cwd; absolute → normalize in place. Then express relative
                 // to root if inside (worktree), else absolute.
-                let abs = if path.starts_with('/') { lexical_join("/", path) } else { lexical_join(cwd, path) };
+                let abs = if path.starts_with('/') {
+                    lexical_join("/", path)
+                } else {
+                    folder::place(cwd, path, use_).map_or_else(|| lexical_join(cwd, path), |placed| lexical_join(root, &placed))
+                };
                 Some(express_relative_to_root(&abs, root))
             }
             _ => None,

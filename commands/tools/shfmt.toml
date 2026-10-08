@@ -1,4 +1,5 @@
 [[command]]
+writes_cwd = "source"
 name = "shfmt"
 description = "Shell formatter (mvdan/sh). Without -w, prints formatted source to stdout. -d shows a diff (read). -l lists files that would be reformatted. -w rewrites files in place (project-local SafeWrite via write_flags). Static — does not execute the shell scripts."
 url = "https://github.com/mvdan/sh"

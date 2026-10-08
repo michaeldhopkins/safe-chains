@@ -56,6 +56,7 @@ valued = [
 flags = { "-outfile" = "write" }
 
 [[command]]
+writes_cwd = "named"
 name = "cjxl"
 description = "libjxl JPEG XL encoder. Reads PNG/JPEG/APNG/EXR/PPM/PFM/PGX and writes a .jxl file. Many flags control distance (quality), effort, modular vs VarDCT, progressive, animation. No network. libjxl 0.10+ — surface still evolving but core flags stable."
 url = "https://github.com/libjxl/libjxl"
@@ -117,6 +118,7 @@ valued = [
 ]
 
 [[command]]
+writes_cwd = "named"
 name = "djxl"
 description = "libjxl JPEG XL decoder. Reads a .jxl file and writes PNG/PPM/PFM/EXR/JPG. The output extension picks the format. No network. libjxl 0.10+; surface stable for the common decode path."
 url = "https://github.com/libjxl/libjxl"
