@@ -65,6 +65,9 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   level. The parser's guards for that class count work instead of timing it (`cst/budget.rs` holds
   the entry and step budgets; the tests in `cst/parse.rs` assert work linear in nesting and walk
   every committed command seed), so they hold on a loaded machine.
+  `level_monotonic/seed-timeout-brace-glob` (2026-10-08): brace copies ending `/bunx` made each
+  delegation re-parse every remaining copy, 9.6 MB from 769 bytes; `cst/classify_budget.rs` now caps
+  parser bytes too, and its tests bound generated fan-outs.
 - **Measured coverage** (region, authored source): mutation corpus alone ~26%, registry seeds alone
   ~37%, **combined ~61%**. The two are complementary — seeds unlock the per-command grammars,
   mutation covers parser byte-paths.

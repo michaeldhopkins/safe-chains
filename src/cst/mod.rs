@@ -1,6 +1,9 @@
 mod ansi_c;
 mod budget;
 pub(crate) mod check;
+mod classify_budget;
+#[cfg(test)]
+mod classify_budget_tests;
 mod display;
 pub(crate) mod eval;
 mod explain;

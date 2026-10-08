@@ -19,6 +19,15 @@ thread_local! {
     static STEPS: Cell<u64> = const { Cell::new(0) };
     static STEP_LIMIT: Cell<u64> = const { Cell::new(u64::MAX) };
     static SPENT: Cell<bool> = const { Cell::new(false) };
+    #[cfg(test)]
+    static PARSED: Cell<u64> = const { Cell::new(0) };
+}
+
+/// Bytes handed to `parse()` on this thread so far, for tests that bound a whole classification's
+/// parsing rather than one parse.
+#[cfg(test)]
+pub(super) fn parsed_bytes() -> u64 {
+    PARSED.with(Cell::get)
 }
 
 /// Nesting depth beyond which the parser bails instead of recursing further. Every recursion
@@ -46,6 +55,8 @@ const STEP_BASE: u64 = 4_096;
 
 pub(super) fn reset(input_len: usize) {
     let len = input_len as u64;
+    #[cfg(test)]
+    PARSED.with(|p| p.set(p.get().saturating_add(len)));
     DEPTH.with(|d| d.set(0));
     WORK.with(|w| w.set(0));
     WORK_LIMIT.with(|l| l.set((WORK_BASE + WORK_PER_BYTE * len).min(MAX_PARSE_WORK_CEILING)));

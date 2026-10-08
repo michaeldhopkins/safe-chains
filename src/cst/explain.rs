@@ -55,7 +55,7 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     // before it) nor deterministic (two consecutive calls on one dense input rendered different
     // answers). Entering here resets once, at the top, and keeps every nested classification at
     // depth >= 1, which is what makes explaining and enforcing spend from the same pool.
-    let Some(_guard) = super::check::ClassifyGuard::enter() else {
+    let Some(_guard) = super::check::ClassifyGuard::enter(input.len()) else {
         return Explanation {
             overall: Verdict::Denied,
             segments: vec![SegmentReport { text: input.trim().to_string(), verdict: Verdict::Denied, culprit: None }],
@@ -173,7 +173,7 @@ fn command_label(cmd: &Cmd) -> Option<String> {
 /// Returns `None` for a plain simple command, so the caller keeps its existing path and this is
 /// only consulted where that path has nothing to say.
 pub(crate) fn denied_inner_words(input: &str) -> Option<Vec<String>> {
-    let _guard = super::check::ClassifyGuard::enter()?;
+    let _guard = super::check::ClassifyGuard::enter(input.len())?;
     let script = parse(input)?;
     let [stmt] = &script.0[..] else { return None };
     let [cmd] = &stmt.pipeline.commands[..] else { return None };
