@@ -146,6 +146,31 @@ Fold the bump into the final feat/fix/refactor commit of the stack — do not cr
 - Do not add comments to code
 - All files must end with a newline
 
+## Config commands and the MCP server
+
+`safe-chains config list|add|remove|grant` (`src/userconfig/`) edits `~/.config/safe-chains.toml`
+with `toml_edit`, so the rest of the file survives. `--explain` ends with a fix
+(`src/explain_fix.rs`); a grant is offered only after asking the classifier with that grant in place
+(`regions/hypothetical.rs`). `safe-chains mcp` (`src/mcp/`) serves the same operations, and every
+tool runs the binary itself, so the two surfaces cannot drift and a long-lived server never answers
+from rules it has just changed.
+
+- **Nothing that changes the rules may ever auto-approve.** `src/handlers/safe_chains.rs` refuses
+  `config add|remove|grant` and `mcp` wherever they sit on the line; its property test must stay.
+- **The editing commands refuse what a built-in rule protects**: built-in command names, commands
+  that run an agent, credential stores, trust files, system login files, devices, `/` and `~`.
+  Do not add a way around these; a person can still write the file by hand.
+- **MCP ratchet:** `tests/mcp_rules.rs` checks the spawned server's listing and answers, and
+  `tests/mcp_tools.toml` records each tool's risk (rewrite with
+  `SAFE_CHAINS_WRITE_MCP_MANIFEST=1 cargo test --test mcp_rules`). The server refuses edits when it
+  can see the client approves them unasked (`src/mcp/client_approval.rs`).
+- **Blind weak-model evaluation:** `eval/blind/` (its README says how to run a round). The drift
+  test `tests/blind_eval_drift.rs` fails when the MCP surface has moved far enough from the last
+  recorded round in `eval/blind/results.toml`. Claude Code cannot tag OpenRouter requests itself, so
+  the weak-model runs go through a local proxy that adds the tags (`BLIND_OPENROUTER_BASE`). Weakest
+  scores of the last round (2026-10-08): Qwen 3 30B 42% on `d-audit` (owed), Mistral Small 3.2 50%
+  on `c-no-fix`, Haiku 4.5 68% on `b-notes-folder` (owed).
+
 ## Targets and hooks
 
 Before touching any `src/targets/*.rs` (per-tool hook integration) or the

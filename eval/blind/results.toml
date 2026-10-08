@@ -1,0 +1,122 @@
+# Blind weak-model evaluation of `safe-chains mcp` (eval/blind/README.md). One [[round]] per round,
+# scores as a percent of each scenario's rubric, per model, per run. `tests/blind_eval_drift.rs`
+# reads this file and surface.lock to say when the next round is due.
+
+[[round]]
+date = "2026-10-08"
+kind = "full"
+note = "Mid reference only. Haiku 5.5 is not known to Claude Code 2.1.291, so the mid reference is Haiku 4.5. Scores after the rig fixes R1-R3 (runs regraded)."
+surface = "eval/blind/surface.lock"
+models = ["claude-haiku-4-5"]
+grader = "claude-sonnet-5-5"
+spend_usd = 0.0
+[round.scores]
+a-unknown-tool = { "claude-haiku-4-5" = [71, 86] }
+b-notes-folder = { "claude-haiku-4-5" = [57, 64] }
+c-no-fix = { "claude-haiku-4-5" = [83, 67] }
+d-audit = { "claude-haiku-4-5" = [83, 92] }
+
+[[round]]
+date = "2026-10-08"
+kind = "change"
+note = "Round 1b, after P1 and P2: the scenarios under the bar, same model."
+surface = "eval/blind/surface.lock"
+models = ["claude-haiku-4-5"]
+grader = "claude-sonnet-5-5"
+spend_usd = 0.0
+[round.scores]
+a-unknown-tool = { "claude-haiku-4-5" = [86, 71] }
+b-notes-folder = { "claude-haiku-4-5" = [71, 64] }
+c-no-fix = { "claude-haiku-4-5" = [67, 92] }
+
+
+[[round]]
+date = "2026-10-08"
+kind = "full"
+note = "Round 2: the two small open models, on OpenRouter's general evals key through a local proxy that tags each request (user safe-chains/blind-eval). OpenRouter's usage counter still read 0 afterwards; about 330,000 input tokens at these models' prices is a few cents."
+surface = "eval/blind/surface.lock"
+models = ["qwen/qwen3-30b-a3b-instruct-2507", "mistralai/mistral-small-3.2-24b-instruct"]
+grader = "claude-sonnet-5-5"
+spend_usd = 0.04
+[round.scores]
+a-unknown-tool = { "qwen/qwen3-30b-a3b-instruct-2507" = [93, 79], "mistralai/mistral-small-3.2-24b-instruct" = [36, 29] }
+b-notes-folder = { "qwen/qwen3-30b-a3b-instruct-2507" = [71, 86], "mistralai/mistral-small-3.2-24b-instruct" = [71, 71] }
+c-no-fix = { "qwen/qwen3-30b-a3b-instruct-2507" = [33, 75], "mistralai/mistral-small-3.2-24b-instruct" = [25, 75] }
+d-audit = { "qwen/qwen3-30b-a3b-instruct-2507" = [25, 25], "mistralai/mistral-small-3.2-24b-instruct" = [75, 83] }
+
+[[round]]
+date = "2026-10-08"
+kind = "change"
+note = "Round 2b, after P3 and P4: the two scenario and model pairs under the bar."
+surface = "eval/blind/surface.lock"
+models = ["qwen/qwen3-30b-a3b-instruct-2507", "mistralai/mistral-small-3.2-24b-instruct"]
+grader = "claude-sonnet-5-5"
+spend_usd = 0.01
+[round.scores]
+a-unknown-tool = { "mistralai/mistral-small-3.2-24b-instruct" = [93, 86] }
+d-audit = { "qwen/qwen3-30b-a3b-instruct-2507" = [33, 50] }
+
+# What the rounds found. product: fixed in safe-chains. rig: fixed in the harness.
+[[finding]]
+id = "C1"
+kind = "product"
+status = "fixed before round 1; tests/mcp_rules.rs holds it"
+what = "Claude Code connected and listed no tools: revision 2026-07-28 needs resultType on every result and ttlMs/cacheScope on tools/list."
+
+[[finding]]
+id = "R1"
+kind = "rig"
+status = "fixed"
+what = "The grader saw only editing calls, so it marked down a check_command diagnosis it could not see. It now sees every call and the start of its result."
+
+[[finding]]
+id = "R2"
+kind = "rig"
+status = "fixed"
+what = "The grader saw only the agent's last message; a rundown given earlier scored nothing. It now sees everything the agent said."
+
+[[finding]]
+id = "R3"
+kind = "rig"
+status = "fixed"
+what = "The grader called 'safe-chains will ask' invented. The prompt now states that an unapproved command goes to the person's prompt."
+
+[[finding]]
+id = "P1"
+kind = "product"
+status = "fixed; round 1b: b-notes-folder 61 -> 68"
+what = "Haiku granted ~/notes without check_command and did not say other places still ask. The editing tools now say to call check_command first, and a grant's result says anywhere it does not cover still asks."
+
+[[finding]]
+id = "P2"
+kind = "product"
+status = "fixed; round 1b: c-no-fix 75 -> 79"
+what = "Told a credential grant must be written by hand, one run offered to write it itself. The fix now says that decision is the user's, not an agent's."
+
+[[owed]]
+scenario = "b-notes-folder"
+model = "claude-haiku-4-5"
+blocked_by = "Every run made exactly the right grant and nothing else. The points lost are for not passing on the undo step the tool returned, and for not calling check_command first, which the tool description now asks for."
+
+[[owed]]
+scenario = "d-audit"
+model = "qwen/qwen3-30b-a3b-instruct-2507"
+blocked_by = "Qwen reads the rules, then reports the grant removed without ever calling remove_rule (33 and 50 after P4). The tool and its description are clear; the model claims an action it did not take."
+
+[[finding]]
+id = "P3"
+kind = "product"
+status = "fixed; round 2b: a-unknown-tool on mistral 32 -> 89"
+what = "Mistral passed cwd as /Users/<name>/work/app for ~/work/app, was refused, retried the same call and gave up. A cwd that does not exist is now checked from the server's own directory, with a note saying so."
+
+[[finding]]
+id = "P4"
+kind = "product"
+status = "description fixed; round 2b: d-audit on qwen 25 -> 42, still owed"
+what = "Qwen listed the rules, never called remove_rule, and reported the grant removed. list_rules now says it changes nothing and that remove_rule takes a rule out."
+
+[[finding]]
+id = "R4"
+kind = "rig"
+status = "fixed"
+what = "Claude Code cannot tag OpenRouter requests, so the weak-model runs go through a local proxy that adds user and trace (BLIND_OPENROUTER_BASE)."
