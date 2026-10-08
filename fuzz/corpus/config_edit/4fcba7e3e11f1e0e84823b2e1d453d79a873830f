@@ -1,0 +1,5 @@
+´[[grant]]
+path = "~/notes"
+read = true
+
+ion = 1

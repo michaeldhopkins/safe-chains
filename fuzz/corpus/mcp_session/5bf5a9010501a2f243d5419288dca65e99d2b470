@@ -1,0 +1,3 @@
+{":grant_path","aead"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"/"}}}

@@ -1,0 +1,8 @@
+[[grant]]
+patad = true
+
+[[command]]
+namh = "otes"
+read= true
+
+x_p= 5

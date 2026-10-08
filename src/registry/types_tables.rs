@@ -64,6 +64,9 @@ pub(in crate::registry) struct TomlFallback {
     /// Defaults to false, which is the enforcing answer — see `TomlSub::passes_argv`.
     #[serde(default)]
     pub passes_argv: Option<bool>,
+    /// As on a command: any of these present raises the level to `SafeWrite`.
+    #[serde(default)]
+    pub write_flags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]

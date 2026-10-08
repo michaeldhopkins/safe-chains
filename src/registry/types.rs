@@ -1086,9 +1086,9 @@ pub(super) struct FallbackSpec {
     /// gated by the execution-origin engine instead of the flat `level`. `ExecutorKind::File`
     /// is the only form used by fallbacks (interpreters). See `dispatch::dispatch_executor`.
     pub executor: Option<ExecutorKind>,
-    /// See `DispatchKind::Executor::redirect_flag`. Unused for `File` fallbacks.
+    /// See `DispatchKind::Executor::redirect_flag` (unused for `File` fallbacks).
     pub executor_redirect_flag: Option<String>,
-    /// See `DispatchKind::Executor::passes_argv`. This is where the interpreters set it: their
-    /// trailing tokens are the script's argv, which their own grammar cannot describe.
+    /// See `DispatchKind::Executor::passes_argv`, set by interpreters, whose trailing tokens are argv.
     pub passes_argv: bool,
+    pub write_flags: Vec<String>,
 }

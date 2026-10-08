@@ -1,0 +1,6 @@
+[[grant]]
+path = "./notes"
+re = true
+
+[[c9999.and]]
+npoal = 0

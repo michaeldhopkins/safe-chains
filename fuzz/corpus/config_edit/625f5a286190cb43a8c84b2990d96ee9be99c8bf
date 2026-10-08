@@ -1,0 +1,12 @@
+th = "~/notes"
+read = true
+
+[[command]]
+name = "fuzzdool"
+maead = true
+
+[[command]]
+name = "fuzztool"
+max_poal = 0#
+#atgE
+#at = a= 

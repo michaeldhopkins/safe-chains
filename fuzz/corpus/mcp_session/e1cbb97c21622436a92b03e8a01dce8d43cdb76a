@@ -1,0 +1,6 @@
+access":"rea
+{"j"name":"g/g/rant_patx","access":"read"}}}
+{"jsonrpc":"0.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"/ÿÿ2ÿd"}}}
+{"jsonrpc":"0.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwdrant_patx","access":"read"}}}
+{"jsonrpc":"0.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"/ÿÿ2ÿd"}}}
+{"jsonrpc":"0.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"/ÿÿ2ÿÿÿÿÿÿ"}}}

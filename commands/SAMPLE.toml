@@ -769,6 +769,7 @@
 # tolerate_unknown_short = false
 # tolerate_unknown_long = false
 # numeric_dash = false
+# write_flags = ["--log"]              # as on a command: any of these present → SafeWrite
 
 # ─────────────────────────────────────────────────────────────────────
 # WRITES_CWD — what a command writes in its folder without naming a path

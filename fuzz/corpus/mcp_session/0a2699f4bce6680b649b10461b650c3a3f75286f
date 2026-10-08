@@ -1,0 +1,8 @@
+{"jso1rpc:nzed"}
+99999","argu“š‘ˆs":{"path":"~/x","access":"id":2,"method":"tools/list"}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"gra}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"":"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"chnt_path","argu“š‘ˆs"B{"path":"~/x","access":"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"":"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"c"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/}=}

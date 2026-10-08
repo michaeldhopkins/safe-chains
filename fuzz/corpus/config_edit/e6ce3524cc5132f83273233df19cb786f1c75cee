@@ -1,0 +1,12 @@
+patame = "fuzzfuzztool"
+ma_xpoh = "~/notes" 
+epad= true
+
+[[command]]
+name = "fuzzttool"
+max_poh = "~/notes"
+pead = true
+
+[[command]]
+name = "fuzztool"
+max_posfuzztoo = 0

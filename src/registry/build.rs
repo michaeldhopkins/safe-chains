@@ -13,8 +13,7 @@ use super::types::*;
 /// typo in a config file used to disable safe-chains altogether. It was caught downstream by
 /// `catch_unwind`, but panicking across a library boundary as control flow left two marks: the
 /// default hook printed a panic and a backtrace to stderr on every invocation before anything could
-/// catch it, and under libFuzzer a caught panic is still an abort, which is how `config_load` kept
-/// failing.
+/// catch it, and under libFuzzer a caught panic is still an abort (how `config_load` kept failing).
 ///
 /// The built-in definitions are compiled in and turn an `Err` back into a panic AT THE CALL SITE,
 /// where it belongs: a broken `commands/*.toml` is a bug in this repository, not something a user
@@ -147,6 +146,7 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, Stri
         executor,
         executor_redirect_flag: toml.executor_redirect_flag,
         passes_argv: toml.passes_argv.unwrap_or(false),
+        write_flags: toml.write_flags,
     })
 }
 

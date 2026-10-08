@@ -1,0 +1,11 @@
+ad = true
+
+[[command]]
+name = "fuzztool"
+maead = true
+
+[[command]]
+name = "fuzztmol"
+max_poal = 0#
+#at`  a=[gE
+#at` = a= 

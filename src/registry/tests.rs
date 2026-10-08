@@ -3334,8 +3334,7 @@ fn a_path_named_flag_records_its_facet_profile() {
     );
 }
 
-/// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so the operands are the
-/// write targets and must be gated as such.
+/// A BOOLEAN write-mode flag makes the command rewrite its OPERANDS, so those must be gated.
 ///
 /// This exists because the sweep that was supposed to find these could not see them. Every
 /// output-flag probe has the shape `<cmd> <flag> <sensitive>` — ONE operand — which cannot
@@ -3344,10 +3343,8 @@ fn a_path_named_flag_records_its_facet_profile() {
 /// gate looked correct, while `shfmt -w ./a.sh ~/.ssh/config` auto-approved and overwrote a
 /// credential file with formatted shell.
 ///
-/// So the probe here puts a plausible first operand ahead of the sensitive one. The population
-/// is derived, not guessed: a flag the entry ITSELF declares in `write_flags` (the author's
-/// claim that this flag makes the run write) that is also declared `standalone` and NOT
-/// `valued` (so it takes no value, and the operands are what gets written).
+/// So the probe puts a plausible operand ahead of the sensitive one. The population is every flag
+/// an entry declares in `write_flags` that is `standalone` and not `valued` (it takes no value).
 #[test]
 fn a_boolean_write_flag_gates_its_operands() {
     use super::types::TomlFile;
@@ -3403,6 +3400,9 @@ fn a_boolean_write_flag_gates_its_operands() {
             let mut scopes =
                 vec![Scope { label: cmd.name.clone(), write_flags: &cmd.write_flags, standalone: &cmd.standalone, valued: &cmd.valued }];
             collect(&cmd.name, &cmd.sub, &mut scopes);
+            if let Some(f) = &cmd.fallback {
+                scopes.push(Scope { label: cmd.name.clone(), write_flags: &f.write_flags, standalone: &f.standalone, valued: &f.valued });
+            }
             for Scope { label, write_flags, standalone, valued } in scopes {
                 for flag in write_flags {
                     let boolean = standalone.contains(flag) && !valued.contains(flag);
@@ -6781,7 +6781,7 @@ fn ambiguous_output_flags_do_not_write_sensitive_paths() {
                 .valued
                 .iter()
                 .filter(|f| OUTPUT_FLAGS.contains(&f.as_str()))
-                .chain(cmd.write_flags.iter())
+                .chain(cmd.write_flags.iter().chain(cmd.fallback.iter().flat_map(|f| f.write_flags.iter())))
                 .collect();
             for flag in declared {
                 if crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name)) {

@@ -11,9 +11,8 @@ type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 /// The `per_database` sub that `arg` is a variant of: `arg` is `<sub.name>:<dbname>`.
 ///
 /// The suffix must be ONE plain identifier — the shape of a key in `config/database.yml`. That is
-/// what keeps this from degenerating into "ignore anything after a colon": a further `:` would
-/// name a different task, and a suffix carrying a `/`, a space or a substitution is not a database
-/// name and must not inherit a schema task's classification.
+/// what keeps this from degenerating into "ignore anything after a colon": a further `:` names
+/// another task, and a suffix with a `/`, a space or a substitution is no database name at all.
 fn per_database_variant<'a>(subs: &'a [SubSpec], arg: &str) -> Option<&'a SubSpec> {
     let (base, dbname) = arg.rsplit_once(':')?;
     let plain = !dbname.is_empty() && dbname.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
@@ -297,10 +296,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             if !check_owned(tokens, policy) {
                 return Verdict::Denied;
             }
-            let has_write = tokens[1..]
-                .iter()
-                .any(|t| write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}="))));
-            if has_write { Verdict::Allowed(SafetyLevel::SafeWrite) } else { Verdict::Allowed(*base_level) }
+            write_flagged(tokens, *base_level, write_flags)
         }
         DispatchKind::DelegateAfterSeparator { separator } => {
             let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
@@ -348,8 +344,7 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
         .fold(verdict, Verdict::combine)
 }
 
-/// Dispatches a sub's kind directly, used by `registry::try_sub_dispatch`
-/// when a handler-using command consults its TOML-declared subs.
+/// A sub's kind, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs).
 pub(super) fn dispatch_sub_kind(tokens: &[Token], kind: &DispatchKind) -> Verdict {
     dispatch_kind(tokens, kind, &SUB_HANDLERS)
 }
@@ -517,8 +512,7 @@ fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
     None
 }
 
-/// Applies a TOML-declared fallback grammar. Used by
-/// `registry::try_fallback_grammar()`.
+/// Applies a TOML-declared fallback grammar, for `registry::try_fallback_grammar()`.
 pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
     if let Some(kind) = spec.executor {
         return dispatch_executor(
@@ -540,7 +534,13 @@ pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdic
     if !check_owned(tokens, &spec.policy) {
         return Verdict::Denied;
     }
-    Verdict::Allowed(spec.level)
+    write_flagged(tokens, spec.level, &spec.write_flags)
+}
+
+/// `base`, or `SafeWrite` when any of `write_flags` is present (bare or `--flag=value`).
+fn write_flagged(tokens: &[Token], base: SafetyLevel, write_flags: &[String]) -> Verdict {
+    let flagged = |t: &Token| write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}=")));
+    Verdict::Allowed(if tokens[1..].iter().any(flagged) { SafetyLevel::SafeWrite } else { base })
 }
 
 #[cfg(test)]
