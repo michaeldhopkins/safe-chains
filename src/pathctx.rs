@@ -16,6 +16,11 @@
 use std::borrow::Cow;
 use std::cell::RefCell;
 
+mod home;
+mod lexical;
+use home::home_path_inside_root;
+use lexical::{expand_home, express_relative_to_root, lexical_join};
+
 /// The working directory and project root for the command under evaluation. Both optional:
 /// a harness may supply neither (e.g. opencode), and classification falls back to the
 /// relative-is-worktree assumption.
@@ -305,11 +310,15 @@ fn is_var_name(s: &str) -> bool {
 /// classifiers see "worktree"), and if it escaped `root` (e.g. `cwd` is `/etc`, or an absolute
 /// `/etc/hosts`) it comes back **absolute** (so they see `machine`/etc.). This makes the absolute
 /// and relative spellings of the SAME in-root file classify identically — safety on the OPERATION,
-/// not the SYNTAX. A `~` (home) or `$`-unpinnable path, or no context, is returned as-is.
+/// not the SYNTAX. A `~/…` path that expands into `root` comes back root-relative too, as its
+/// `$HOME/…` spelling does; any other `~` path, a `$`-unpinnable one, or no context, is returned
+/// as-is for the home classifiers.
 pub fn resolve(path: &str) -> Cow<'_, str> {
-    // Home (`~`) is handled by the classifiers directly; a `$` path can't be joined at all.
-    if path.is_empty() || path.starts_with('~') || path.contains('$') {
+    if path.is_empty() || path.contains('$') {
         return Cow::Borrowed(path);
+    }
+    if path.starts_with('~') {
+        return home_path_inside_root(path).map_or(Cow::Borrowed(path), Cow::Owned);
     }
     let resolved = CURRENT.with(|c| {
         let ctx = c.borrow();
@@ -366,51 +375,6 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     // nothing about how later paths are judged. Left as "no update" rather than tightened, so the
     // fix stays aimed at the hole (a cd to a KNOWN-elsewhere place being dropped).
     cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, &expanded))
-}
-
-/// `~` / `~/rest` expanded against `$HOME`. `~user` is left alone (we cannot resolve another user's
-/// home); `None` only when `~` is used and `$HOME` is unusable.
-fn expand_home(target: &str) -> Option<Cow<'_, str>> {
-    let rest = match target {
-        "~" => "",
-        t => match t.strip_prefix("~/") {
-            Some(r) => r,
-            None => return Some(Cow::Borrowed(target)),
-        },
-    };
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'))?;
-    Some(Cow::Owned(if rest.is_empty() { home } else { format!("{home}/{rest}") }))
-}
-
-/// Express an absolute `abs` path relative to `root`: `.` if it IS the root, a root-relative path
-/// if it's inside (classified as worktree), or the absolute path unchanged if it escaped (classified
-/// as machine/etc.). The `inside.starts_with('/')` guard prevents a sibling like `/proj-evil` from
-/// matching root `/proj` by bare string prefix.
-fn express_relative_to_root(abs: &str, root: &str) -> String {
-    let root = root.trim_end_matches('/');
-    if abs == root {
-        return ".".to_string(); // the project root itself
-    }
-    match abs.strip_prefix(root) {
-        Some(inside) if inside.starts_with('/') => inside.trim_start_matches('/').to_string(),
-        _ => abs.to_string(),
-    }
-}
-
-/// Join a relative path onto an absolute base, resolving `.` and `..` purely lexically. A
-/// `..` that would climb above `/` is clamped there.
-fn lexical_join(base: &str, rel: &str) -> String {
-    let mut parts: Vec<&str> = base.split('/').filter(|s| !s.is_empty()).collect();
-    for seg in rel.split('/') {
-        match seg {
-            "" | "." => {}
-            ".." => {
-                parts.pop();
-            }
-            s => parts.push(s),
-        }
-    }
-    format!("/{}", parts.join("/"))
 }
 
 #[cfg(test)]
@@ -529,6 +493,91 @@ mod tests {
         // home / unpinnable → returned as-is (the classifiers handle these)
         assert_eq!(resolve("$HOME/x"), "$HOME/x");
         assert_eq!(resolve("~/x"), "~/x");
+    }
+
+    #[test]
+    fn a_home_spelled_path_inside_root_becomes_root_relative() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let root = format!("{home}/projects/app");
+        let _g = enter(PathCtx { cwd: Some(format!("{root}/sub")), root: Some(root), ..Default::default() });
+        assert_eq!(resolve("~/projects/app/src/main.rs"), "src/main.rs");
+        assert_eq!(resolve("~/projects/app"), ".");
+        assert_eq!(resolve("~/projects/app/"), ".");
+        let under = |rest: &str| format!("~/projects/{rest}");
+        assert_eq!(resolve(&under("app/a/../b")), "b");
+        assert_eq!(resolve(&under("app/.git/hooks/pre-commit")), ".git/hooks/pre-commit");
+        for (outside, why) in [("peer/x", "a sibling"), ("app-evil/x", "no bare string prefix"), ("app/../../.ssh/id_rsa", "an escape")] {
+            assert_eq!(resolve(&under(outside)), under(outside), "{why} stays home-spelled");
+        }
+        assert_eq!(resolve("~/.ssh/id_rsa"), "~/.ssh/id_rsa");
+        assert_eq!(resolve("~"), "~");
+        assert_eq!(resolve("~bob/projects/app/x"), "~bob/projects/app/x", "another user's home is not ours");
+    }
+
+    #[test]
+    fn a_home_spelled_path_needs_an_absolute_root() {
+        let _none = enter(PathCtx { cwd: Some("/w".into()), root: None, ..Default::default() });
+        assert_eq!(resolve("~/x"), "~/x");
+        drop(_none);
+        let _rel = enter(PathCtx { cwd: Some("/w".into()), root: Some("w".into()), ..Default::default() });
+        assert_eq!(resolve("~/x"), "~/x");
+    }
+
+    #[test]
+    fn a_home_rooted_workspace_leaves_home_paths_to_the_home_classifiers() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let _g = enter(PathCtx { cwd: Some(home.clone()), root: Some(home.clone()), ..Default::default() });
+        assert_eq!(resolve("~"), "~");
+        assert_eq!(resolve("~/notes.txt"), "~/notes.txt");
+        assert_eq!(resolve("notes.txt"), format!("{home}/notes.txt"));
+        assert_eq!(resolve("."), home);
+    }
+
+    #[test]
+    fn a_home_spelled_path_is_not_resolved_from_outside_the_root_or_through_a_glob() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let root = format!("{home}/projects/app");
+        let outside = enter(PathCtx { cwd: Some("/etc".into()), root: Some(root.clone()), ..Default::default() });
+        assert_eq!(resolve("~/projects/app/x"), "~/projects/app/x", "a quoted `~` would name a directory under the cwd");
+        drop(outside);
+        let _g = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), ..Default::default() });
+        for glob in ["app/.ss?/id_rsa", "app/*"].map(|rest| format!("~/projects/{rest}")) {
+            assert_eq!(resolve(&glob), glob);
+        }
+    }
+
+    #[test]
+    fn a_home_spelled_path_is_not_resolved_into_a_protected_root() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let root = format!("{home}/.ssh");
+        let _g = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), ..Default::default() });
+        assert_eq!(resolve("~/.ssh/id_rsa"), "~/.ssh/id_rsa");
+    }
+
+    #[test]
+    fn a_root_holding_a_protected_place_keeps_every_path_absolute() {
+        let _g = enter(PathCtx { cwd: Some("/".into()), root: Some("/".into()), ..Default::default() });
+        assert_eq!(resolve("/etc/shadow"), "/etc/shadow");
+        assert_eq!(resolve("etc/sudoers"), "/etc/sudoers");
+        assert_eq!(resolve("etc"), "/etc");
+        assert_eq!(resolve("/srv/app/x"), "/srv/app/x");
+        assert_eq!(resolve("."), "/");
+        drop(_g);
+        let _etc = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/etc".into()), ..Default::default() });
+        assert_eq!(resolve("hosts"), "hosts", "an unprotected file in a root below every home is the worktree");
+        assert_eq!(resolve("sudoers"), "/etc/sudoers");
+        assert_eq!(resolve("."), "/etc", "the root itself is above a protected place");
+        drop(_etc);
+        let _inside = enter(PathCtx { cwd: Some("/root/app".into()), root: Some("/root/app".into()), ..Default::default() });
+        assert_eq!(resolve("/root/app/x"), "x", "a root inside the protected place is where the user works");
     }
 
     #[test]

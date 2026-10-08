@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc afd23e37fb2be8ffd659b5b53073950e9f4c0cc3bba9bb07fdf158a73a49f9b2 # shrinks to target = "/etc/*", ctx = "cat {}", root_pick = 0
+cc 6e0d5d0363698d0c2d17eee4235b5876d7448938428dc627f306acf4e195f02e # shrinks to target = "~", ctx = "grep -r token {}", root_pick = 0

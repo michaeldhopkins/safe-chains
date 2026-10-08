@@ -1374,10 +1374,10 @@ fn an_unconfined_interpolation_is_explained_as_such() {
     // it is an OPERAND (the function walks words, and a redirect target is not one), and the
     // interpolation is a SUBSTITUTION rather than a bare `$i`. An unbound variable evaluates to
     // the empty string, so `./out/$i` becomes `./out/` — a perfectly ordinary path with nothing
-    // to report. Only a substitution survives evaluation as a sentinel. And the path is spelled
-    // ABSOLUTELY: this function deliberately skips relative worktree paths, so a relative
-    // unconfined path never reaches the nudge at all.
-    let (_, reason) = crate::workspace_overreach("cat ~/scproj/out/$(id)").expect("an unconfined read is a reach worth nudging about");
+    // to report. Only a substitution survives evaluation as a sentinel. And the path lies OUTSIDE
+    // the workspace: this function deliberately skips worktree paths, however they are spelled, so
+    // an unconfined path inside it never reaches the nudge at all.
+    let (_, reason) = crate::workspace_overreach("cat ../elsewhere/out/$(id)").expect("an unconfined read is a reach worth nudging about");
     assert_eq!(reason, crate::ReachReason::Unconfined);
 
     // The confined spelling is approved outright, so there is nothing to nudge about at all.

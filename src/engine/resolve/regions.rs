@@ -14,6 +14,11 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
+mod protection;
+#[cfg(test)]
+pub(crate) use protection::anchored_protected_paths_here;
+use protection::role_is_protective;
+pub(crate) use protection::{keeps_absolute, protection_covers};
 
 /// Which faces a user grant may NOT widen.
 ///
@@ -232,18 +237,6 @@ fn has_hidden_component(remainder: &str) -> bool {
 /// ASCII-case-insensitive `starts_with`, zero-alloc (for case-folded shield matching).
 fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
     haystack.len() >= prefix.len() && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
-}
-
-/// Whether a role is a PROTECTION (a credential/secret shield, the pinned config, or a
-/// write-freeze) rather than an admit — it makes some face stricter than an ordinary worktree.
-/// Only protection nodes are matched case-insensitively on a case-insensitive filesystem: folding
-/// an ADMIT (`/tmp`, worktree) could admit a case-variant that is a DIFFERENT path on a
-/// case-sensitive volume (fail-open), whereas folding a protection only ever denies more.
-fn role_is_protective(role: &Role) -> bool {
-    role.reads_secret
-        || role.frozen != Frozen::Nothing
-        || role.write_locus > LocalLocus::Worktree
-        || role.read_locus > LocalLocus::WorktreeTrusted
 }
 
 struct Node {

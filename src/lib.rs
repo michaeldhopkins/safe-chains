@@ -71,6 +71,8 @@ pub mod netloc;
 #[cfg(test)]
 mod overreach_property_tests;
 pub mod parse;
+#[cfg(test)]
+mod path_placement_tests;
 pub mod pathctx;
 pub mod pathgate;
 pub mod policy;
