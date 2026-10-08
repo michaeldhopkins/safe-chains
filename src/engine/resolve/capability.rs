@@ -305,6 +305,26 @@ pub(super) fn transfer_profile(
             c
         })
         .collect();
-    caps.push(per_dest(at(dest, dest_face), scale));
+    // The destination is judged at its worst landing: itself, or the name a source arrives under.
+    let landing = sources
+        .iter()
+        .filter_map(|s| received_name(s))
+        .map(|name| at(&format!("{}/{name}", dest.trim_end_matches('/')), dest_face))
+        .fold(at(dest, dest_face), LocalLocus::max);
+    caps.push(per_dest(landing, scale));
     Profile::of(caps)
+}
+
+/// The name a source arrives under when the destination is a directory: `cp /tmp/.envrc .` writes
+/// `./.envrc`, which the destination `.` alone never shows. A source copied by its CONTENTS
+/// (`rsync -a src/ dest`, `cp -r src/. dest`) brings names nobody wrote down; they stand in as a
+/// hidden name, which only an unknown folder treats as sensitive. Unpinnable sources name nothing.
+fn received_name(source: &str) -> Option<String> {
+    const UNNAMED: &str = ".names-the-copy-brings";
+    let trimmed = source.trim_end_matches('/');
+    if source.ends_with('/') || trimmed.is_empty() || trimmed == "." || trimmed.ends_with("/.") {
+        return Some(UNNAMED.to_string());
+    }
+    let name = trimmed.rsplit('/').next()?;
+    (name != ".." && !super::locus::is_unpinnable(name)).then(|| name.to_string())
 }

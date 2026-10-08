@@ -205,3 +205,42 @@ fn a_project_root_holding_a_trust_file_still_writes_its_other_files() {
         assert!(!command_verdict_in(line, here.clone()).is_allowed(), "`{line}` should ask");
     }
 }
+
+proptest! {
+    /// A copy into a directory writes the name the source arrives under, so it is judged there too.
+    /// `cp /tmp/.envrc .` wrote `./.envrc`, which direnv runs on the next `cd`, and was approved in
+    /// a known workspace because only the destination `.` was classified. Every spelling of a
+    /// transfer with a frozen basename is refused, wherever in the workspace it lands.
+    #[test]
+    fn a_transfer_is_judged_at_the_name_it_arrives_under(
+        verb in proptest::sample::select(vec!["cp", "cp -r", "mv", "cp -f"]),
+        frozen in proptest::sample::select(vec![".envrc", ".git"]),
+        from in proptest::sample::select(vec!["/tmp", "/tmp/x", "./src", "vendor"]),
+        into in proptest::sample::select(vec![".", "./", "sub", "sub/", "a/b"]),
+    ) {
+        let command = format!("{verb} {from}/{frozen} {into}");
+        prop_assert!(!command_verdict_in(&command, workspace()).is_allowed(), "`{command}` writes {into}/{frozen}");
+    }
+}
+
+#[test]
+fn a_transfer_with_an_ordinary_name_still_lands_in_the_workspace() {
+    for command in ["cp /tmp/notes.md .", "cp a.txt b.txt", "cp a.txt out/", "mv a.txt sub/", "cp -r /tmp/d ."] {
+        assert!(command_verdict_in(command, workspace()).is_allowed(), "{command}");
+    }
+}
+
+/// An in-place edit's backup is a write too. GNU sed and perl put the file's name where the
+/// suffix has a `*` and accept a directory in it, so this wrote a git hook from a plain file name.
+#[test]
+fn an_in_place_backup_is_judged_where_it_lands() {
+    for command in [
+        "sed -i'.git/hooks/*' s/x/x/ pre-commit", "sed --in-place=.git/hooks/* s/x/x/ pre-commit",
+        "perl -i'.git/hooks/*' -pe 1 pre-commit", "perl -pi.git/hooks/* -e 1 pre-commit",
+    ] {
+        assert!(!command_verdict_in(command, workspace()).is_allowed(), "`{command}` writes its backup into a protected place");
+    }
+    for command in ["sed -i.bak s/x/y/ notes", "sed -i '' s/x/y/ notes", "perl -pi.orig -e 1 notes"] {
+        assert!(command_verdict_in(command, workspace()).is_allowed(), "{command}");
+    }
+}

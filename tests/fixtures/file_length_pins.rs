@@ -12,7 +12,7 @@ const PINS: [(&str, usize); 19] = [
     ("src/cst/parse.rs", 1150),
     ("src/cst/proptests.rs", 759),
     ("src/engine/facet.rs", 685),
-    ("src/engine/resolve.rs", 1622),
+    ("src/engine/resolve.rs", 1579),
     ("src/engine/resolve/locus.rs", 600),
     ("src/engine/resolve/regions.rs", 929),
     ("src/engine/testgen.rs", 657),

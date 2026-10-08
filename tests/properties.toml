@@ -141,6 +141,8 @@ owed = [
   "src/engine/testgen.rs::level_nearest_miss_agrees_with_admits_capability",
   "src/engine/testgen.rs::the_sentinel_is_denied_even_with_any_one_axis_relaxed",
 ]
+"src/engine/resolve/backup.rs" = ["a_backup_is_the_file_renamed_by_its_suffix"]
+"src/engine/resolve/path_verdicts.rs" = ["src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied", "src/cst/proptests.rs::file_redirect_promotes_to_safewrite"]
 "src/engine/resolve.rs" = [
   "transfer_commands_gate_both_operand_roles",
   "sudo_family_flag_walk_never_panics",

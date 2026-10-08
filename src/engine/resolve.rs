@@ -12,7 +12,12 @@
 use super::facet::*;
 use crate::parse::{Token, has_flag};
 
+mod backup;
 mod capability;
+mod path_verdicts;
+pub(crate) use path_verdicts::{
+    read_content_verdict, read_tree_verdict, rebind_is_stricter_than_write, worst_path_element, write_target_verdict,
+};
 mod flags;
 pub(crate) mod locus;
 pub(crate) mod regions;
@@ -69,65 +74,6 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     };
     let write_repr = crate::pathctx::expand_vars(&write_item, true).into_owned();
     Some((read_repr, write_repr))
-}
-
-/// The verdict for READING the content of `path` — used to gate an input-redirect source
-/// (`cmd < path`) by its read locus, exactly as an operand read is gated, so `cat < /etc/shadow`
-/// denies like `cat /etc/shadow`. `-` / stdin never reaches here (redirects always name a file).
-pub(crate) fn read_content_verdict(path: &str) -> crate::verdict::Verdict {
-    let cap = reads_path(path, Scale::Single, "reads a redirect source");
-    crate::engine::bridge::project(&Profile::of(vec![cap]))
-}
-
-/// The verdict for reading everything UNDER `path` — a recursive searcher or an archiver's source
-/// tree, where the operand is the root of a sweep and not the file that gets read.
-pub(crate) fn read_tree_verdict(path: &str) -> crate::verdict::Verdict {
-    let cap = reads_path(path, Scale::Unbounded, "reads a tree of files");
-    crate::engine::bridge::project(&Profile::of(vec![cap]))
-}
-
-/// The verdict for WRITING/overwriting `path` — used to gate a legacy writer command's file
-/// operand (`tee`/`shred`/`bzip2`) by its write locus, so `shred /etc/hosts` denies.
-pub(crate) fn write_target_verdict(path: &str) -> crate::verdict::Verdict {
-    let cap = overwrites(write_locus(path), Scale::Single, false);
-    crate::engine::bridge::project(&Profile::of(vec![cap]))
-}
-
-/// Whether REBINDING `path` (removing it, or pointing the name elsewhere) is refused where an
-/// ordinary write is not. Only the trust-root directories answer true.
-///
-/// The nudge needs this, because its "does this reach outside" test reads the read and write faces
-/// only. A grant on `~/.config` opens both, so `rm -rf ~/.config` looked entirely unremarkable to
-/// the nudge while the engine refused it — a denial with no explanation at all, which is the worst
-/// of the outcomes available.
-pub(crate) fn rebind_is_stricter_than_write(path: &str) -> bool {
-    let rebind = overwrites(locus::rebind_locus(path), Scale::Single, false);
-    let refused = !crate::engine::bridge::project(&Profile::of(vec![rebind])).is_allowed();
-    refused && write_target_verdict(path).is_allowed()
-}
-
-/// Judge a path value, taking the WORST element when it is a colon-separated LIST.
-///
-/// The one place the list rule lives, so the environment gate and the flag gate cannot drift apart.
-/// They HAD drifted: the env gate always split on `:` while the flag gate never did, so
-/// `BORG_RSH=x:/tmp/evil` denied and `borg --rsh x:/tmp/evil` — the same operation — was approved.
-///
-/// Splitting is opt-OUT rather than opt-in, because the two mistakes are not symmetric. Treating a
-/// real list as one string is a FAIL-OPEN: `PYTHONPATH=/tmp/evil:/ok` read whole matches no locus
-/// rule and sails through. Treating a single value as a list is merely stricter. So a value splits
-/// unless its entry says it is a single value, and the entries that say so are commands
-/// (`BORG_RSH`, `RSYNC_RSH`) rather than search paths.
-///
-/// A URL is never split: `https://example.com` is not `https` plus `//example.com`, and splitting
-/// it denied every `curl` invocation in the suite.
-pub(crate) fn worst_path_element(value: &str, judge: fn(&str) -> crate::verdict::Verdict, split_list: bool) -> crate::verdict::Verdict {
-    let mut worst = judge(value);
-    if split_list && value.contains(':') && !value.contains("://") {
-        for element in value.split(':').filter(|s| !s.is_empty()) {
-            worst = worst.combine(judge(element));
-        }
-    }
-    worst
 }
 
 /// The verdict for EXECUTING the code in file `path` — used to gate an interpreter/runner's
@@ -1304,6 +1250,11 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     caps.extend(script.reads.iter().map(|f| observes_path(f, Scale::Single, "sed r/R reads a file")));
     if in_place {
         caps.extend(files.iter().map(|f| mutates(classify_locus(f), scale, "sed -i edits the file in place")));
+        caps.extend(
+            backup::in_place_backups(tokens, &files, true)
+                .iter()
+                .map(|b| mutates(classify_locus(b), scale, "sed -i writes a backup")),
+        );
     } else {
         caps.extend(reads_to_model(&files, scale));
     }
@@ -1546,7 +1497,13 @@ fn resolve_perl(tokens: &[Token]) -> Profile {
     // and writes below, and those ARE the profile. If the gate's vocabulary ever admits an
     // identifier with side effects, the fix belongs in the gate, not in a capability here.
     let caps: Vec<Capability> = if scan.in_place {
-        files.iter().map(|f| mutates(classify_locus(f), scale, "perl -i edits the file in place")).collect()
+        let backups = backup::in_place_backups(tokens, &files, false);
+        files
+            .iter()
+            .copied()
+            .chain(backups.iter().map(String::as_str))
+            .map(|f| mutates(classify_locus(f), scale, "perl -i edits the file in place"))
+            .collect()
     } else {
         reads_to_model(&files, scale)
     };
