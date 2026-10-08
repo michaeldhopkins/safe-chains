@@ -1,7 +1,0 @@
-patame = "fuzzfuzztool"
-max_poh = "~/notes"
-pead = true
-
-[[command]]
-naoe = "fuzzttool"
-m_posfuzztoo = 0

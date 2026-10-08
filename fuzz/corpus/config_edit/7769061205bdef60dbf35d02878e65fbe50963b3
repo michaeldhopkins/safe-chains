@@ -1,6 +1,0 @@
-
-read = true
-
-[[command]]
-name = "fuzztool"
-maxa_pos = 1

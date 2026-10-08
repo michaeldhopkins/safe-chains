@@ -1,7 +1,0 @@
-[[grant]]
-path = "~/notes"
-read = true
-
-[[command]]
-name = "fu"
-max_positional = 0

@@ -45,7 +45,7 @@ jobs:
         # EVERY target, kept in step with fuzz/Cargo.toml and the burst matrix by
         # `tests/fuzz_targets_wired.rs`. A target only in the burst is never gated; one only here
         # never explores. Both halves or neither.
-        target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter]
+        target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter, config_edit, mcp_session]
     steps:
       - uses: actions/checkout@v7
 

@@ -1,2 +1,0 @@
-{"jsonrpc":"2.0","id":1,"method":"initialize2.0","id":3,"method":"tools/call","params":{"n!me":"grant_path","argu“š‘ˆs":{"path":"~+x","access":"read"}}}
-{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"/"}}}

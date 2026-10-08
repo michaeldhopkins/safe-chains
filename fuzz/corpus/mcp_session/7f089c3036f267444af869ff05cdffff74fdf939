@@ -1,3 +1,0 @@
-{'jsonrpc":"2.0","i
-{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"g>ant_path","arguments":{"path":"~/x","喜cess":"read"}}}
-{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"chec)_command","arguments":{"command":"ls","cwd":"/"}}}

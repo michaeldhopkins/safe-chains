@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#fÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿs"
+read = true
+
+[[command]]
+name = "fuzztool"
+maxa_pos = 1
+
+
+
+
+#fÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿs"
+read = true
+
+[[command]]
+name = "fuzztool"
+maxa_pos = 1

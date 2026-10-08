@@ -33,6 +33,10 @@ fuzz/corpus/config_load/
 fuzz/corpus/setup_merge/
 fuzz/corpus/path_admit/
 fuzz/corpus/gate_prefilter/
+fuzz/corpus/config_edit/*
+!fuzz/corpus/config_edit/seed-*
+fuzz/corpus/mcp_session/*
+!fuzz/corpus/mcp_session/seed-*
 fuzz/artifacts/
 
 # cargo-mutants working output: the copied trees, per-mutant logs and the outcome lists. Multi-MB

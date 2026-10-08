@@ -90,3 +90,17 @@ path = "fuzz_targets/gate_prefilter.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "config_edit"
+path = "fuzz_targets/config_edit.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "mcp_session"
+path = "fuzz_targets/mcp_session.rs"
+test = false
+doc = false
+bench = false

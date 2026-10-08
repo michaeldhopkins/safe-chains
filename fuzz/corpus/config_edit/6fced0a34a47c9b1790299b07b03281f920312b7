@@ -1,7 +1,0 @@
-[[grant]]
-pathp= "0es"
-read = true
-
-[[command]]
-name = "fuzztool"
-max_pos = 1

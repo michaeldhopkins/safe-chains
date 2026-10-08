@@ -116,7 +116,7 @@ jobs:
       matrix:
         # EVERY target, kept in step with fuzz/Cargo.toml and fuzz-replay.yml by
         # `tests/fuzz_targets_wired.rs`.
-        target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter]
+        target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter, config_edit, mcp_session]
     steps:
       - uses: actions/checkout@v7
 

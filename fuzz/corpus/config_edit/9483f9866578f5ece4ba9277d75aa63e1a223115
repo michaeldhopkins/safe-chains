@@ -1,7 +1,0 @@
-[[gran]]
-path = "~/notes"
-read = true
-
-[[command]]
-name = "fuzztool"
-max_poal = 0

@@ -25,6 +25,8 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   - `path_admit` — the credential shield outranks every package-content read admit, and those
     admits never grant a write.
   - `gate_prefilter` — a declared path gate never skips a value its own judge would refuse.
+  - `config_edit` — edits keep a file loading; grant-then-remove is the identity.
+  - `mcp_session` — one reply per request id.
 - **Not fuzzed:** `docs.rs` (no security property) and `pathctx` (proptests cover it and shrink
   better for a pure function).
 - **CI:** `fuzz-replay.yml` replays every target's cached corpus (`-runs=0`) on every push and PR —

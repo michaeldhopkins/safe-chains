@@ -299,6 +299,7 @@ dependencies = [
  "sha2",
  "shell-words",
  "toml 0.8.23",
+ "toml_edit",
  "winnow 0.7.15",
 ]
 

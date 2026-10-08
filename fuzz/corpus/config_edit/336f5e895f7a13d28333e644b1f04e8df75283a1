@@ -1,8 +1,0 @@
-[[grant]]
-path = "~/notes"
-read = true
-
-[[command]]
-
-uax_posfuzztoo = 0
-x_posfuzztoo = 0

@@ -1,6 +1,0 @@
-thx_poal  = true
-
-[[command]]
-name = "fuzztool"
-max_poal = 0
-#at` = a=·
