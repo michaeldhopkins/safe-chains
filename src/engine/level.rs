@@ -62,6 +62,8 @@ pub struct FacetMismatch {
     pub actual: &'static str,
     /// The constraint it failed (`<= fetches`, `one of [pinned, na]`).
     pub bound: String,
+    /// The same constraint in plain words, for `--explain`.
+    pub plain_bound: Option<String>,
     /// How many of that axis's terms the bound DOES admit — how close this clause came.
     ///
     /// Used to rank clauses, not shown. A level inherits its ancestors' clauses (`developer`
@@ -83,14 +85,18 @@ fn ord_mismatch<T: Ord + Copy + FacetTerm>(facet: &'static str, bound: Option<Or
     if b.admits(term) {
         return None;
     }
-    let bound = match (b.min, b.max) {
-        (None, Some(hi)) => format!("<= {}", hi.as_str()),
-        (Some(lo), None) => format!(">= {}", lo.as_str()),
-        (Some(lo), Some(hi)) => format!("{}..={}", lo.as_str(), hi.as_str()),
-        (None, None) => "any".to_string(),
+    let say = |t: T| super::plain::spoken(facet, t.as_str());
+    let (bound, plain_bound) = match (b.min, b.max) {
+        (None, Some(hi)) => (format!("<= {}", hi.as_str()), say(hi).map(|h| format!("allowed up to: {h}"))),
+        (Some(lo), None) => (format!(">= {}", lo.as_str()), say(lo).map(|l| format!("allowed at least: {l}"))),
+        (Some(lo), Some(hi)) if lo == hi => (format!("{}..={}", lo.as_str(), hi.as_str()), say(lo).map(|l| format!("allowed: {l}"))),
+        (Some(lo), Some(hi)) => {
+            (format!("{}..={}", lo.as_str(), hi.as_str()), say(lo).zip(say(hi)).map(|(l, h)| format!("allowed: {l} to {h}")))
+        }
+        (None, None) => ("any".to_string(), Some("allowed: any".to_string())),
     };
     let admits_count = T::all().iter().filter(|t| b.admits(**t)).count();
-    Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count })
+    Some(FacetMismatch { facet, actual: term.as_str(), bound, plain_bound, admits_count })
 }
 
 fn set_mismatch<T: PartialEq + Copy + FacetTerm>(facet: &'static str, set: Option<&[T]>, term: T) -> Option<FacetMismatch> {
@@ -99,7 +105,9 @@ fn set_mismatch<T: PartialEq + Copy + FacetTerm>(facet: &'static str, set: Optio
         return None;
     }
     let bound = format!("one of [{}]", s.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", "),);
-    Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count: s.len() })
+    let spoken: Option<Vec<&str>> = s.iter().map(|t| super::plain::spoken(facet, t.as_str())).collect();
+    let plain_bound = spoken.map(|p| format!("allowed: one of: {}", p.join(" / ")));
+    Some(FacetMismatch { facet, actual: term.as_str(), bound, plain_bound, admits_count: s.len() })
 }
 
 /// A conjunction of per-facet constraints. A default (all-`None`) clause admits every
@@ -223,6 +231,7 @@ impl Clause {
                 facet: "execution.supply_chain",
                 actual: "absent",
                 bound: "this clause constrains the supply chain, which this capability has none of".to_string(),
+                plain_bound: None,
                 admits_count: 0,
             });
         };
@@ -300,6 +309,7 @@ impl Level {
                 facet: "deny-clause",
                 actual: "matched",
                 bound: "removed by an explicit deny clause".to_string(),
+                plain_bound: None,
                 admits_count: 0,
             });
         }
@@ -308,6 +318,7 @@ impl Level {
                 facet: "level",
                 actual: "any capability",
                 bound: "nothing — this level declares no allow clause".to_string(),
+                plain_bound: None,
                 admits_count: 0,
             });
         }

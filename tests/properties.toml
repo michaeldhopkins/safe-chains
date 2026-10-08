@@ -306,6 +306,10 @@ owed = [
   "dispatch_hyperfine_matches_is_safe_hyperfine",
   "is_safe_env_assignment_loop_combines_assignment_verdict",
 ]
+"src/engine/plain.rs" = [
+  "src/engine/plain/tests.rs::every_printed_facet_of_any_capability_has_plain_words",
+  "src/engine/plain/tests.rs::rows_are_never_empty_and_account_for_every_facet",
+]
 "src/explain_fix.rs" = ["src/explain_fix/tests.rs::an_offered_grant_always_works", "src/explain_fix/tests.rs::command_text_cannot_add_a_line"]
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
@@ -470,6 +474,7 @@ owed = [
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
+"src/engine/plain/tests.rs" = "the plain-words dictionary's test suite"
 "src/explain_fix/tests.rs" = "explain_fix's test suite"
 "src/mcp/tests.rs" = "the MCP server's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"

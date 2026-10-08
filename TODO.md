@@ -17,6 +17,15 @@ about one command is one wrong answer. A gap in the mechanism is every command t
 would have used it — which is why the backlog below is ordered by how much of the
 model a gap makes inexpressible, not by how many commands are waiting on it.
 
+## AWAITING THE OWNER: wording of the held `--explain` phrases
+
+`src/engine/plain.rs` rows with an empty phrase print today's term (the `HELD` list in
+`src/engine/plain/tests.rs`): `machine` in six operations and as a place, `locus.remote = none`, the
+two `n/a` terms of `locus.binding` and `locus.provenance`, and the reversibility terms `trivial`,
+`recoverable` and `effortful`. The owner (2026-10-15) found "elsewhere", "no other computer" and the
+reversibility names unclear. Replacement wording is proposed to him; approving it is filling the
+empty strings and deleting the rows from `HELD`.
+
 ## DECISION NEEDED: a git store under temp is plantable without a `.git` component
 
 Writes into `.git`, `.jj`, `.hg` and `.sl` are frozen wherever they sit (`regions/metadata.rs`),

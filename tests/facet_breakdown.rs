@@ -18,3 +18,25 @@ fn facet_breakdown_profiles_a_single_command_and_declines_a_chain() {
         assert!(!out.contains("resolved profile:"), "{chain}: {out}");
     }
 }
+
+#[test]
+fn the_breakdown_speaks_plainly_where_the_wording_is_approved() {
+    let out = facet_breakdown("rm -rf ./build");
+    assert!(out.contains("does                         deletes files in your project"), "{out}");
+    assert!(!out.contains("operation  "), "{out}");
+    assert!(!out.contains("locus.local"), "{out}");
+}
+
+#[test]
+fn the_breakdown_keeps_todays_terms_where_the_wording_is_held() {
+    let out = facet_breakdown("rm -rf ~/notes");
+    assert!(out.contains("operation                    destroy"), "{out}");
+    assert!(out.contains("locus.local                  machine"), "{out}");
+    assert!(out.contains("irreversible") || out.contains("cannot be undone"), "{out}");
+}
+
+#[test]
+fn a_refusal_in_the_breakdown_reads_in_plain_words() {
+    let out = facet_breakdown("git push");
+    assert!(out.contains("talks to another system (allowed: one of: reads or looks / creates / changes)"), "{out}");
+}

@@ -123,18 +123,7 @@ pub fn facet_breakdown(command: &str) -> String {
     if let Some(w) = &inner {
         out.push_str(&format!("    (the refused command inside it: `{}`)\n", w.join(" ")));
     }
-    for (because, facets) in &ex.capabilities {
-        out.push_str(&format!("    · {because}\n"));
-        for (name, term) in facets {
-            out.push_str(&format!("        {name:<28} {term}\n"));
-        }
-    }
-    match &ex.blocked_by {
-        Some((level, mismatch)) => {
-            out.push_str(&format!("\n  refused by `{level}` (the most permissive auto-approving level):\n    {mismatch}\n",));
-        }
-        None => out.push_str("\n  admitted by the auto-approve band.\n"),
-    }
+    out.push_str(&engine::plain::render(&ex));
     out
 }
 

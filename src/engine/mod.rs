@@ -12,6 +12,7 @@ pub mod authoring;
 pub mod bridge;
 pub mod facet;
 pub mod level;
+pub mod plain;
 pub mod resolve;
 
 #[cfg(test)]
