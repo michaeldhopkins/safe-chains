@@ -3,23 +3,9 @@
 use crate::verdict::Verdict;
 
 const SIGNALS: &[&str] = &[
-    "pkill -f \"cat\" -U $(id -u) -x",
-    "pkill -f cat",
-    "pkill foo",
-    "pkill -9 -x node",
-    "killall foo",
-    "killall -s foo",
-    "killall -l",
-    "kill 123",
-    "kill -9 123",
-    "kill -TERM %1",
-    "kill $!",
-    "sleep 5 & kill $!",
-    "echo 1 | xargs kill",
-    "echo 1 | xargs -I{} kill {}",
-    "pgrep node | xargs kill -9",
-    "echo foo | xargs pkill",
-    "echo foo | xargs killall",
+    "pkill -f \"cat\" -U $(id -u) -x", "pkill -f cat", "pkill foo", "pkill -9 -x node", "killall foo", "killall -s foo", "killall -l",
+    "kill 123", "kill -9 123", "kill -TERM %1", "kill $!", "sleep 5 & kill $!", "echo 1 | xargs kill", "echo 1 | xargs -I{} kill {}",
+    "pgrep node | xargs kill -9", "echo foo | xargs pkill", "echo foo | xargs killall",
 ];
 
 #[test]

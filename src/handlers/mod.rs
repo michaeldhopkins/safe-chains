@@ -33,11 +33,11 @@ pub mod network;
 pub mod node;
 pub mod perl;
 mod perl_load;
-#[cfg(test)]
-mod signal_tests;
 pub mod php;
 pub mod ruby;
 pub mod shell;
+#[cfg(test)]
+mod signal_tests;
 pub mod system;
 pub mod tilt;
 pub mod vcs;
