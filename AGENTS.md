@@ -18,6 +18,11 @@ static classifier must not, and it would be TOCTOU-racy anyway):
 - Symlinks are not followed: a path is classified by its literal spelling, so a worktree
   symlink pointing outside the worktree reads as worktree-local.
 
+One deliberate exception: a glob starting with a pattern character (`ls *`) is listed against the
+known working directory at decision time, so its matches can be checked for a name that reads as a
+flag (`src/cst/opaque/glob.rs`, accepted race in `docs/design/hard-problems.md` HP-5). Keep it the
+only one.
+
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`
 §0.2.

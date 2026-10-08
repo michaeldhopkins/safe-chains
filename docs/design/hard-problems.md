@@ -67,6 +67,14 @@ resolve safely at check time (resolving may itself have effects; the FS can chan
 after).
 *Lead:* worst-case any path whose target isn't statically pinnable — but that is
 coarse and may over-deny common safe cases. No clean answer yet.
+*Accepted (glob listing):* a glob that starts with a pattern character could match a file named
+like a flag (`-delete`), so it is unknown unless the hook knows the working directory. When it does,
+the folder is listed at decision time and the matches classify as the words the command receives,
+provided none begins with `-` or holds a newline. A file created between the decision and the shell
+expanding the glob is not seen; that window is accepted. Shell options that change matching
+(`dotglob`, `nocaseglob`, `GLOBIGNORE`, `nullglob`) set earlier in the session are not seen either:
+bash's defaults are assumed. This is the one place the classifier reads the filesystem
+(`src/cst/opaque/glob.rs`).
 *Partial (creation-time):* when a link is *created* (`ln [-s] TARGET LINK`), the target
 is **explicit on the command line**, not something we'd have to resolve — so the `ln`
 resolver gates the target on its own locus (`observes`), closing the in-session

@@ -19,16 +19,22 @@ pub(crate) fn items_shape(items: &[Word]) -> ItemShape {
         let s = shape(item, tokens.len());
         let texts = s.concrete.clone().unwrap_or(tokens);
         let globs = texts.iter().any(|t| t.contains(GLOB_CHARS));
-        let leads_a_glob = !s.facts.has(GLOB) && texts.iter().any(|t| t.starts_with(GLOB_CHARS));
+        let listed = s.concrete.is_some() && s.facts.has(GLOB);
+        let unmatched = listed && texts == [item.eval()];
+        let leads_a_glob = ((listed && !unmatched) || !s.facts.has(GLOB)) && texts.iter().any(|t| t.starts_with(GLOB_CHARS));
         out.set(LEAD, s.lead != Lead::No || s.facts.has(WORD_SPLIT) || leads_a_glob || texts.iter().any(|t| t.starts_with('-')));
-        out.set(SPLIT, s.facts.has(BLANK | GLOB) || globs || texts.iter().any(|t| t.contains(char::is_whitespace)));
+        out.set(
+            SPLIT,
+            s.facts.has(BLANK) || (s.facts.has(GLOB) && !listed) || globs || texts.iter().any(|t| t.contains(char::is_whitespace)),
+        );
         out.set(EMPTY, s.facts.has(OPAQUE) || texts.iter().any(String::is_empty));
     }
     out
 }
 
 /// The shape of the items a pipeline stage writes, given the shape of what it reads. `find`'s
-/// items each begin with the root it was given, `echo` writes its own known words, `pwd` the
+/// items each begin with the root it was given, `echo` writes its own known words, `which` absolute
+/// paths, `id -u` a number or a name, `pwd` the
 /// working directory (as trusted as `$PWD`), and a line-preserving filter passes its input
 /// through. Anything else could print anything.
 pub(crate) fn stage_shape(cmd: &Cmd, input: ItemShape) -> ItemShape {
@@ -53,6 +59,14 @@ pub(crate) fn stage_shape(cmd: &Cmd, input: ItemShape) -> ItemShape {
     match name.as_str() {
         "find" if prints_only_paths(&texts_str) => SPLIT,
         "pwd" => ItemShape::NONE,
+        "id" if !texts.is_empty()
+            && texts
+                .iter()
+                .all(|t| matches!(t.as_str(), "-u" | "-g" | "-n" | "-r" | "-un" | "-gn" | "-nu" | "-ng" | "-ur" | "-gr")) =>
+        {
+            ItemShape::NONE
+        }
+        "which" => SPLIT | EMPTY,
         "echo" if !texts.iter().any(|t| t.starts_with('-') || t.contains('\\')) => {
             ItemShape::when(SPLIT, texts.iter().any(|t| t.contains(char::is_whitespace))) | ItemShape::when(EMPTY, texts.is_empty())
         }

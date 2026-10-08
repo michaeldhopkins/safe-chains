@@ -36,6 +36,12 @@ const IFS_CHANGED: Facts<Progress> = Facts::bit(5);
 /// What `word` can turn into at run time. `expanded` is how many tokens brace expansion made of
 /// it; a fanned-out word holding anything unknown is treated as wholly unknown.
 pub(crate) fn shape(word: &Word, expanded: usize) -> Shape {
+    if expanded == 1
+        && let Some(names) = super::glob::expand(word)
+        && names.iter().all(|n| !n.starts_with('-') && !n.contains('\n'))
+    {
+        return Shape { lead: Lead::No, facts: GLOB, concrete: Some(names) };
+    }
     let ifs = !matches!(crate::pathctx::binding("IFS"), Binding::Unbound);
     let mut walk = Walk { state: AT_START | VANISHABLE | Facts::when(IFS_CHANGED, ifs), ..Walk::default() };
     walk.parts(&word.0, false);

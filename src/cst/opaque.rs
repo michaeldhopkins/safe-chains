@@ -20,6 +20,7 @@
 //! classifications however many unknown words it holds.
 
 mod declared;
+mod glob;
 mod items;
 mod walk;
 
@@ -120,7 +121,7 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
         .iter()
         .zip(words)
         .enumerate()
-        .map(|(i, (w, toks))| (i > 0).then(|| shape(w, toks.len())))
+        .map(|(i, (w, toks))| (i > 0 && !declares(cmd, w)).then(|| shape(w, toks.len())))
         .collect();
     let probes = [FLAG_PROBE, SHORT_PROBE]
         .map(Probe::Lead)
@@ -203,4 +204,16 @@ pub(super) fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
                 || (expanded.split([' ', '\t', '\n']).count() > 1 && expanded.starts_with('-'))
         })
     })
+}
+
+/// `export NAME=$X`: bash reads an assignment given to a declaration builtin as an assignment, so
+/// it is neither split nor globbed, and it is no flag whatever `$X` holds.
+fn declares(cmd: &SimpleCmd, word: &super::Word) -> bool {
+    let builtin = cmd.words.first().map(super::Word::eval);
+    let Some(WordPart::Lit(head)) = word.0.first() else { return false };
+    let name = head.split('=').next().unwrap_or_default();
+    matches!(builtin.as_deref(), Some("export" | "declare" | "typeset" | "local" | "readonly"))
+        && head.contains('=')
+        && name.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_')
+        && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
 }

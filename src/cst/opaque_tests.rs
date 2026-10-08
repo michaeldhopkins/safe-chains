@@ -248,3 +248,15 @@ cases! { true,
     prefixed_glob_in_value: "X='./*'; cat $X",
     perl_switch_arguments: "perl -F: -0777 -CSD -lane print ./f",
 }
+
+cases! { true,
+    declaration_assignment: "export PATH=/opt/homebrew/bin:$PATH",
+    declaration_substitution: "export X=$(id -u)",
+    numeric_id: "launchctl print gui/$(id -u)/x",
+    which_path: "ls -la \"$(which docker)\"",
+}
+
+cases! { false,
+    declaration_without_assignment: "export $X",
+    perl_module_dir_unknown: "PERL_USE_UNSAFE_INC=1 perl -MEvil -e 1",
+}
