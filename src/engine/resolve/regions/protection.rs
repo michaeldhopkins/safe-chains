@@ -124,3 +124,44 @@ pub(crate) fn anchored_protected_paths_here() -> Vec<String> {
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::with_os;
+    use super::*;
+
+    fn role(read: LocalLocus, write: LocalLocus, reads_secret: bool, frozen: Frozen) -> Role {
+        Role { read_locus: read, write_locus: write, rebind_locus: write, reads_secret, frozen }
+    }
+
+    #[test]
+    fn each_stricter_face_alone_makes_a_role_protective() {
+        let w = LocalLocus::Worktree;
+        assert!(!role_is_protective(&role(w, w, false, Frozen::Nothing)), "the worktree itself");
+        assert!(!role_is_protective(&role(LocalLocus::WorktreeTrusted, w, false, Frozen::Nothing)), "a trusted read at the bound");
+        assert!(role_is_protective(&role(w, w, true, Frozen::Nothing)), "a secret alone");
+        assert!(role_is_protective(&role(w, w, false, Frozen::Rebind)), "a freeze alone");
+        assert!(role_is_protective(&role(w, LocalLocus::WorktreeTrusted, false, Frozen::Nothing)), "a write past the worktree alone");
+        assert!(role_is_protective(&role(LocalLocus::Machine, w, false, Frozen::Nothing)), "a read past the trusted rung alone");
+    }
+
+    #[test]
+    fn a_root_holding_only_admitted_places_still_resolves_relative() {
+        assert!(!keeps_absolute("/tmp/x", "/tmp"), "the scratch node admits, it does not protect");
+    }
+
+    #[test]
+    fn a_glob_node_is_anchored_at_its_literal_directory() {
+        assert!(keeps_absolute("/proc/1/environ", "/proc"));
+        assert!(keeps_absolute("/proc", "/proc"), "the root itself is above the protected place");
+    }
+
+    #[test]
+    fn protection_covers_only_protections_and_folds_case_only_on_macos() {
+        assert!(!protection_covers("/tmp/x"), "an admit node is not a protection");
+        assert!(!protection_covers("/srv/app/src"));
+        assert!(protection_covers("/srv/app/.ssh/id_rsa"));
+        assert!(with_os("macos", || protection_covers("/srv/app/.SSH/id_rsa")), "one file on a case-insensitive volume");
+        assert!(!with_os("linux", || protection_covers("/srv/app/.SSH/id_rsa")), "a different directory on Linux");
+    }
+}
