@@ -8,6 +8,7 @@
 - [Configuration](configuration.md)
 - [Safety Levels](safety-levels.md)
 - [Custom Commands](custom-commands.md)
+- [Your Rules](rules.md)
 
 # How It Works
 

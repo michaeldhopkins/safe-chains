@@ -113,8 +113,32 @@ fn run_explain(
         // it needs something in front of it or it reads as an orphan.
         println!("\nWhy: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
     }
+    if !explanation.is_allowed() {
+        print!("\n{}", explain_fixes(&explanation, engine_level));
+    }
     let allowed = folder_cli::explain(folder_level, uncapped) && explanation.is_allowed();
     process::exit(i32::from(!allowed));
+}
+
+/// One fix per refused segment, so `--explain` always ends by saying what would change the answer.
+fn explain_fixes(explanation: &safe_chains::cst::Explanation, engine_level: Option<&'static safe_chains::engine::level::Level>) -> String {
+    let approved = |c: &str| safe_chains::explain_with_coverage_at_level(c, engine_level).is_allowed();
+    let refused: Vec<&str> = if explanation.parsed {
+        explanation.segments.iter().filter(|s| !s.verdict.is_allowed()).map(|s| s.text.as_str()).collect()
+    } else {
+        explanation.segments.iter().map(|s| s.text.as_str()).collect()
+    };
+    let many = refused.len() > 1;
+    let mut out = String::new();
+    for segment in refused {
+        let by_default = engine_level.is_some() && safe_chains::explain_with_coverage_at_level(segment, None).is_allowed();
+        let fix = safe_chains::explain_fix::fix_for(segment, &approved, by_default).render();
+        if many {
+            out.push_str(&format!("For `{}`:\n", safe_chains::sanitize_display(segment)));
+        }
+        out.push_str(&fix);
+    }
+    out
 }
 
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {

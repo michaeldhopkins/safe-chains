@@ -32,7 +32,7 @@ safe-chains allows reaching into sibling directories of the current working dire
 
 ## Trusted directories
 
-If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`. The binary will pick up these preferences. `read` and `write` are independent, so you can grant one without the other.
+If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`, or run `safe-chains config grant <path> --read --write` (see [Your Rules](rules.md)). The binary will pick up these preferences. `read` and `write` are independent, so you can grant one without the other.
 
 Most of the time you want `write = true`: ordinary reads already work everywhere. A `read = true` grant is still worth setting on a directory you want to **search or copy wholesale** — that is the case safe-chains otherwise refuses, because a sweep names no files, and granting the tree is exactly the statement that clears it.
 

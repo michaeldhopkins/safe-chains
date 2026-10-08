@@ -206,7 +206,11 @@ fn run_hook_on(
     // workspace, say so (and how to allow it) instead of a silent prompt. Degrades to a plain
     // prompt on harnesses without additionalContext.
     if let Some((path, reason)) = overreach {
-        let nudge = format!("safe-chains did not auto-approve this: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
+        let nudge = format!(
+            "safe-chains did not auto-approve this: {}. {} {HOW_IT_WORKS_URL}",
+            reason.message(&path),
+            safe_chains::refusal::EXPLAIN_HINT
+        );
         let response = format.render_context(&nudge);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);

@@ -327,9 +327,7 @@ impl Explanation {
         // normal approval flow and most likely already run — so the guidance is
         // feedback for next time, never an instruction to re-run.
         if total == 1 {
-            return Some(
-                "This is not a block. It just needs manual approval. Next time send a command that needs approval on its own, not in the same call as commands that auto-approve.",
-            );
+            return None;
         }
         if denied == total {
             return Some("This is not a block. These all need manual approval. None of them auto-approve on their own.");
@@ -607,8 +605,8 @@ mod tests {
         // no test". Wording is the copy guards' job (`refusal::tests`).
         assert!(out.contains("did not auto-approve"), "says what happened: {out}");
         assert!(out.contains("has researched"), "says why, without rating the command: {out}");
-        assert!(out.contains("not a block"));
-        assert!(out.contains("needs manual approval"));
+        // No advice to send it "on its own": it already was. `--explain` ends with the fix instead.
+        assert!(!out.contains("on its own"), "{out}");
     }
 
     #[test]

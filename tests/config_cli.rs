@@ -95,3 +95,31 @@ fn a_file_that_does_not_load_is_left_alone() {
     assert!(!run.ok && run.stderr.contains("does not load"), "{}", run.stderr);
     assert_eq!(config_file(home.path()), "[[[ broken");
 }
+
+#[test]
+fn explain_ends_with_the_fix() {
+    let home = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let (home, cwd) = (home.path(), cwd.path());
+    for (command, fix) in [
+        ("zzcfgtool sync", "Fix: add an entry for `zzcfgtool`:\n  safe-chains config add 'zzcfgtool sync'"),
+        ("tee /opt/zzfix/out.txt", "Fix: grant write access to `/opt/zzfix`:\n  safe-chains config grant /opt/zzfix --write"),
+        ("git push --force", "Fix: none in safe-chains' config. `git` is built in"),
+    ] {
+        let run = safe_chains(home, cwd, &["--explain", command], None);
+        assert!(!run.ok, "{command} must be refused");
+        assert!(run.stdout.contains(fix), "{command}:\n{}", run.stdout);
+        assert!(run.stdout.trim_end().lines().last().is_some_and(|l| !l.is_empty()), "{}", run.stdout);
+    }
+    let approved = safe_chains(home, cwd, &["--explain", "ls"], None);
+    assert!(approved.ok && !approved.stdout.contains("Fix:"), "{}", approved.stdout);
+}
+
+#[test]
+fn over_mcp_the_next_step_names_a_tool() {
+    let home = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let run = safe_chains(home.path(), cwd.path(), &["--explain", "zzcfgtool sync"], Some("mcp"));
+    assert!(run.stdout.contains("call add_command_entry with command \"zzcfgtool sync\""), "{}", run.stdout);
+    assert!(!run.stdout.contains("safe-chains config add"), "{}", run.stdout);
+}

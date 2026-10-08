@@ -97,6 +97,11 @@ pub const EXPLAIN_SINGLE: &str = "did not auto-approve this command. safe-chains
 pub const EXPLAIN_MANY: &str = "safe-chains approves commands it has researched and has no \
                                 opinion about the rest.";
 
+/// Where a refusal points next. `--explain` ends with what would change the answer: an entry, a
+/// grant, or nothing in the config. Before it said so, an agent given only a refusal read
+/// safe-chains' source code for most of an hour to work that out.
+pub const EXPLAIN_HINT: &str = "Running `safe-chains --explain` on the command shows what would change the answer.";
+
 /// Words that characterise the COMMAND rather than describing what happened.
 ///
 /// "this command is not on the allowlist" reads as a verdict, and an agent's natural response to a
@@ -178,6 +183,9 @@ impl Refusal {
         if let Outcome::GoesToHuman = self.outcome {
             out.push_str(" The normal approval prompt follows.");
         }
+
+        out.push(' ');
+        out.push_str(EXPLAIN_HINT);
 
         if let Cause::NoEntry { command, .. } = &self.cause {
             out.push_str(&format!(

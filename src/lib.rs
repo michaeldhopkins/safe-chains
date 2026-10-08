@@ -61,6 +61,7 @@ pub mod decisionlog;
 pub mod docs;
 pub mod engine;
 mod envvars;
+pub mod explain_fix;
 #[cfg(test)]
 mod handler_property_tests;
 mod handlers;

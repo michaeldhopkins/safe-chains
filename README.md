@@ -52,6 +52,19 @@ The legacy names `inert` / `safe-read` / `safe-write` still work. They map to
 
 Drop a `.safe-chains.toml` in your repo (or `~/.config/safe-chains.toml` for all projects) to add tools safe-chains doesn't know about, or to lock down a built-in command. See the [Custom Commands docs](https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html).
 
+## Changing your rules
+
+`safe-chains --explain "<command>"` ends with what would get a refused command approved: an entry for the command, a grant on a folder, or nothing, because a built-in rule refused it. The `config` commands make those changes to `~/.config/safe-chains.toml` and list every rule with the file it came from:
+
+```bash
+safe-chains config list
+safe-chains config add "deploytool status --env prod"
+safe-chains config grant ~/notes --write
+safe-chains config remove grant ~/notes
+```
+
+safe-chains never auto-approves its own config changes, so a person approves each one. See [Your Rules](https://www.michaeldhopkins.com/docs/safe-chains/rules.html).
+
 ## Development
 
 Add `--log` to the hook command to record what safe-chains didn't approve, and why, as JSON Lines in `~/.local/state/safe-chains/log.jsonl`. `--log-everything` records approvals too. Off by default; the file holds commands verbatim, credentials included. See the [Logging docs](https://www.michaeldhopkins.com/docs/safe-chains/logging.html).

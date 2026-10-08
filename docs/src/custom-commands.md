@@ -67,7 +67,7 @@ safe-chains --suggest "acmedeploy --env prod ./service"
 
 It prints three things: a scoped `[[command]]` block — allowing exactly the flags and positional count you ran, nothing more — the path the `.safe-chains.toml` belongs at, and the `[[trusted]]` pin to paste into `~/.config/safe-chains.toml`.
 
-**It writes nothing.** Copy the block into the file yourself, then add the pin. safe-chains never edits either file, so nothing takes effect until you have done both by hand.
+**It writes nothing.** Copy the block into the file yourself, then add the pin. `--suggest` edits neither file, so nothing takes effect until you have done both by hand. For an entry that applies everywhere, `safe-chains config add` writes it into `~/.config/safe-chains.toml` for you (see [Your Rules](rules.md)).
 
 The hash in the pin is for that file with exactly the printed block added. If you change either, recompute it with `shasum -a 256 .safe-chains.toml`.
 
