@@ -1,0 +1,37 @@
+# Every MCP tool safe-chains lists, with what it can do. Written by the test
+# `the_tool_manifest_is_what_the_server_lists` (SAFE_CHAINS_WRITE_MCP_MANIFEST=1 rewrites it).
+
+[check_command]
+read_only = true
+destructive = false
+spends = false
+network = false
+sends = false
+
+[list_rules]
+read_only = true
+destructive = false
+spends = false
+network = false
+sends = false
+
+[add_command_entry]
+read_only = false
+destructive = true
+spends = false
+network = false
+sends = false
+
+[grant_path]
+read_only = false
+destructive = true
+spends = false
+network = false
+sends = false
+
+[remove_rule]
+read_only = false
+destructive = true
+spends = false
+network = false
+sends = false

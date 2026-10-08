@@ -11,6 +11,7 @@ use safe_chains::verdict::{SafetyLevel, Verdict};
 mod config_cli;
 mod folder_cli;
 mod hook_cli;
+mod mcp_cli;
 mod suggest_cli;
 
 /// The page that documents the path model and, with it, the `[[grant]]` that widens it. Every
@@ -201,6 +202,7 @@ fn main() {
                     hook_cli::run_hook_for(&tool, log_mode, unknown_folder.as_deref().and_then(FolderLevel::parse))
                 }
                 Some(Subcommand::Config { action }) => config_cli::run_config(action),
+                Some(Subcommand::Mcp) => mcp_cli::run_mcp(),
                 None => {}
             }
             if cli.list_tools {

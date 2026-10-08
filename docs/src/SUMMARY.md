@@ -9,6 +9,7 @@
 - [Safety Levels](safety-levels.md)
 - [Custom Commands](custom-commands.md)
 - [Your Rules](rules.md)
+- [MCP Server](mcp.md)
 
 # How It Works
 

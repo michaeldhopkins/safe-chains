@@ -312,6 +312,8 @@ owed = [
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
   "src/overreach_property_tests.rs::only_a_foreign_temp_path_is_reported_as_foreign_temp",
 ]
+"src/mcp/args.rs" = ["an_undeclared_argument_is_always_refused"]
+"src/mcp/client_approval.rs" = ["only_editing_tools_count"]
 "src/netloc.rs" = [
   "only_the_host_component_decides",
   "case_never_changes_the_verdict",
@@ -425,6 +427,9 @@ owed = [
 "src/handlers/vcs/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
 "src/hook_cli.rs" = "reads the hook envelope from stdin and writes the decision to stdout"
 "src/main.rs" = "the binary: arguments, files, stdin and stdout"
+"src/mcp/mod.rs" = "the MCP server loop on stdin and stdout"
+"src/mcp/tools.rs" = "runs the safe-chains binary for each tool call"
+"src/mcp_cli.rs" = "starts the MCP server on stdin and stdout"
 "src/pathctx.rs" = "owns the thread-local directory context and reads HOME and TMPDIR"
 "src/pathctx/home.rs" = "reads the thread-local directory context and HOME"
 "src/pathctx/item_shape.rs" = "owns the thread-local shapes of loop variables and piped items"
@@ -466,6 +471,7 @@ owed = [
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/explain_fix/tests.rs" = "explain_fix's test suite"
+"src/mcp/tests.rs" = "the MCP server's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"
 "src/handler_property_tests.rs" = "the cross-handler property suite (#[cfg(test)] mod in lib.rs)"

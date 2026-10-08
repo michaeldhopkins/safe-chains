@@ -139,6 +139,9 @@ pub enum Subcommand {
         #[command(subcommand)]
         action: ConfigAction,
     },
+    /// Serve the same checks and config changes over MCP on stdin and stdout, for agents that call
+    /// tools rather than run commands.
+    Mcp,
 }
 
 #[derive(clap::Subcommand)]

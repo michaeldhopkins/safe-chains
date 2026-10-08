@@ -65,6 +65,10 @@ safe-chains config remove grant ~/notes
 
 safe-chains never auto-approves its own config changes, so a person approves each one. See [Your Rules](https://www.michaeldhopkins.com/docs/safe-chains/rules.html).
 
+## MCP server
+
+`safe-chains mcp` offers the same checks and changes as MCP tools, for agents and models that call tools rather than run commands. Do not let a client approve its editing tools without asking you. See [MCP Server](https://www.michaeldhopkins.com/docs/safe-chains/mcp.html).
+
 ## Development
 
 Add `--log` to the hook command to record what safe-chains didn't approve, and why, as JSON Lines in `~/.local/state/safe-chains/log.jsonl`. `--log-everything` records approvals too. Off by default; the file holds commands verbatim, credentials included. See the [Logging docs](https://www.michaeldhopkins.com/docs/safe-chains/logging.html).

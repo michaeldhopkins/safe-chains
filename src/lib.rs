@@ -65,6 +65,7 @@ pub mod explain_fix;
 #[cfg(test)]
 mod handler_property_tests;
 mod handlers;
+pub mod mcp;
 pub mod netloc;
 #[cfg(test)]
 mod overreach_property_tests;
