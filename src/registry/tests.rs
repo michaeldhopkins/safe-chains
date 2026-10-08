@@ -3733,7 +3733,7 @@ fn safe_chains_knows_its_own_cli_flags() {
             continue;
         }
         let long = spelling.trim_start_matches('-');
-        let takes_value = arg.get_num_args().is_none_or(|r| r.takes_values());
+        let takes_value = arg.get_action().takes_values();
         let invocation = if takes_value { format!("safe-chains {spelling} X 'ls'") } else { format!("safe-chains {spelling} 'ls'") };
         let allowed = crate::is_safe_command(&invocation);
         let intended = !NOT_AUTO_APPROVED.contains(&long);

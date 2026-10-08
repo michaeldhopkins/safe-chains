@@ -1,0 +1,7 @@
+3[[grant]]
+pd = true
+
+[[command]]
+gname = "futool"
+max_positionai = 0
+ggg= ""

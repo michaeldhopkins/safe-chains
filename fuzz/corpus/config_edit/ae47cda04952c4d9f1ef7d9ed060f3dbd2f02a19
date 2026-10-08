@@ -1,0 +1,9 @@
+T[[grant]]
+path = "~/notes"
+readz = true
+
+[[NoHmandgrant]]
+path = "~/notes"
+readz = true
+
+[[NoHmand]]

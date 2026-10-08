@@ -1,0 +1,6 @@
+[[grant]]
+path = "~/fs"
+ra = true
+
+s.l = 0
+ipot= 0

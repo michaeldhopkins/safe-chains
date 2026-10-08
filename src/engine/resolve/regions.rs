@@ -14,6 +14,7 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
+pub(crate) mod hypothetical;
 mod metadata;
 mod protection;
 #[cfg(test)]
@@ -590,9 +591,8 @@ fn with_grants_of_kind<T>(grants: &[(&str, bool, bool)], source: GrantSource, f:
 /// remainders, so without the naming test a `~/Library/` grant would silently unlock Keychains,
 /// Safari history and Messages.
 fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
-    let pick = |grants: &[Grant]| {
+    let pick = |grants: &mut dyn Iterator<Item = &Grant>| {
         grants
-            .iter()
             .filter_map(|g| {
                 let spec = g.matcher.specificity(path, false)?;
                 if let Some(root) = secret_root {
@@ -615,11 +615,11 @@ fn best_grant(path: &str, secret_root: Option<&str>) -> Option<(bool, bool)> {
     };
     #[cfg(test)]
     {
-        TEST_GRANTS.with(|g| pick(&g.borrow()))
+        TEST_GRANTS.with(|g| hypothetical::with_extra(|extra| pick(&mut g.borrow().iter().chain(extra))))
     }
     #[cfg(not(test))]
     {
-        pick(&USER_GRANTS)
+        hypothetical::with_extra(|extra| pick(&mut USER_GRANTS.iter().chain(extra)))
     }
 }
 

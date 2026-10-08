@@ -1,0 +1,7 @@
+[[g.rant]]
+path = "~/notes"
+read = true
+
+[[command]]
+name = "fuzztool"
+max_pos = 1

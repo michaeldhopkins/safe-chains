@@ -1,0 +1,24 @@
+path = "~/nosed"
+pead = true
+
+[[command]]
+name = "fuzztes"
+path = "~/s"
+pead = true
+
+[[command]]
+name = "fuzztes"
+p = "~/nodes"
+pead = true
+
+[[command]]
+name = "fuzztes"
+path = "~/nodes"
+pead = true
+
+[[command]]
+name = "fuzztõè"
+pd = true
+
+[[co0mand]]
+nametoo = 0

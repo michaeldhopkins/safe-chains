@@ -1,0 +1,7 @@
+th = "~/notes"
+read = true
+
+[[command]]
+name = "fuzztool"
+
+#aŠŸßÂßÂß

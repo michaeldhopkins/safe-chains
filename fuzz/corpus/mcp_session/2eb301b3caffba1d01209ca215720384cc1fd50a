@@ -1,0 +1,4 @@
+{"jst"}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"oame":"grant_path","arguments":{"path":"~/x","access":"rÌad"}}}
+{"jsonrpc":"1.0","id":4,"method":"to‘“ŒÐcall","params":{"name":"check_command","arguments":{"comcess":"rÌad"}}}
+{"jsonrpc":"1.0","id":4,"method":"to‘“ŒÐcall","params":{"name":"check_command","arguments":{"comm!nd":"ls","cwd":"/"}}}

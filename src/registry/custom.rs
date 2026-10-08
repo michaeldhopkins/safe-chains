@@ -186,6 +186,19 @@ fn repo_scoped(mut spec: CommandSpec) -> CommandSpec {
     spec
 }
 
+/// The project `.safe-chains.toml` this directory would use, and whether the user config trusts it
+/// as it stands. For `safe-chains config list`, which has to say why a project's rules are ignored.
+pub(crate) fn project_config() -> Option<(PathBuf, bool)> {
+    let repo_file = find_repo_custom()?;
+    let bytes = fs::read(&repo_file).ok()?;
+    let trusted = find_user_custom()
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| parse_trusted(&s))
+        .unwrap_or_default();
+    let is_trusted = repo_is_trusted(&repo_file, &bytes, &trusted);
+    Some((repo_file, is_trusted))
+}
+
 /// Apply user-level then repo-level custom TOMLs to the registry, in that order
 /// so a trusted repo-level definition wins on conflicts. The user file
 /// (`~/.config/safe-chains.toml`) is trusted as-is and also carries the

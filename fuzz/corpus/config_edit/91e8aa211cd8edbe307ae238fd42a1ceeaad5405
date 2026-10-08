@@ -1,0 +1,12 @@
+c[[granx]]
+path  ="~/WnoteS"
+d = true
+
+[[command]]
+name = "fuzztool"
+
+[[commagranx]]
+path  ="~/WnoteS"
+read = true
+
+[[command]]

@@ -1,0 +1,14 @@
+path = "~/notes"
+pead = true
+
+[[command]]
+name = "fuzztes"
+pead = true
+
+[[command]]
+name = "fues"
+pead = true
+
+[[command]]
+name = "fuzztool"
+max_pos = 0

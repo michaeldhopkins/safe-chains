@@ -266,6 +266,7 @@ owed = [
   "check_laravel_cache_clear_safe_write_survives_inert_flag_insertion",
 ]
 "src/handlers/ruby/bundle.rs" = []
+"src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved"]
 "src/handlers/shell.rs" = [
   "loop_control_bare_or_single_digit_is_inert",
   "loop_control_other_inputs_are_denied",
@@ -305,11 +306,14 @@ owed = [
   "dispatch_hyperfine_matches_is_safe_hyperfine",
   "is_safe_env_assignment_loop_combines_assignment_verdict",
 ]
+"src/explain_fix.rs" = ["src/explain_fix/tests.rs::an_offered_grant_always_works", "src/explain_fix/tests.rs::command_text_cannot_add_a_line"]
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
   "src/overreach_property_tests.rs::only_a_foreign_temp_path_is_reported_as_foreign_temp",
 ]
+"src/mcp/args.rs" = ["an_undeclared_argument_is_always_refused"]
+"src/mcp/client_approval.rs" = ["only_editing_tools_count"]
 "src/netloc.rs" = [
   "only_the_host_component_decides",
   "case_never_changes_the_verdict",
@@ -374,6 +378,20 @@ owed = [
   "src/suggest/tests.rs::generated_toml_always_loads",
   "src/suggest/tests.rs::analyze_is_deterministic",
 ]
+"src/userconfig/edit.rs" = [
+  "src/userconfig/tests.rs::grant_then_remove_is_the_identity",
+  "src/userconfig/tests.rs::a_grant_keeps_every_line",
+  "src/userconfig/tests.rs::granting_twice_is_granting_once",
+  "src/userconfig/tests.rs::add_then_remove_is_the_identity",
+]
+"src/userconfig/surgery.rs" = [
+  "src/userconfig/tests.rs::grant_then_remove_is_the_identity",
+  "src/userconfig/tests.rs::add_then_remove_is_the_identity",
+]
+"src/userconfig/guard.rs" = [
+  "src/userconfig/tests.rs::normalizing_twice_is_normalizing_once",
+  "src/userconfig/tests.rs::nothing_inside_a_credential_store_is_grantable",
+]
 "src/verdict.rs" = [
   "combine_takes_the_max_of_levels_when_both_allowed",
   "combine_is_denied_iff_either_operand_is_denied",
@@ -385,6 +403,7 @@ owed = [
 "src/allowlist.rs" = "reads Claude Code's settings files for permissions.allow patterns"
 "src/bin/gen_fuzz_corpus.rs" = "writes the fuzz dictionary and seed files"
 "src/cli.rs" = "clap argument declarations only"
+"src/config_cli.rs" = "prints what a config change did and exits"
 "src/decisionlog.rs" = "appends to the decision log under HOME"
 "src/docs.rs" = "renders the command docs and writes the mdbook tree"
 "src/engine/mod.rs" = "module declarations only"
@@ -392,6 +411,7 @@ owed = [
 "src/engine/resolve/regions.rs" = "loads grants from ~/.config/safe-chains.toml and Claude Code's settings, and reads HOME"
 "src/engine/resolve/regions/grant_faces.rs" = "reads HOME to place the grants it merges"
 "src/engine/resolve/regions/metadata.rs" = "reads the process-wide region table and the running OS"
+"src/engine/resolve/regions/hypothetical.rs" = "holds the thread-local hypothetical grant and reads HOME"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
 "src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
 "src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"
@@ -407,6 +427,9 @@ owed = [
 "src/handlers/vcs/mod.rs" = "module wiring: declarations and name-to-handler dispatch"
 "src/hook_cli.rs" = "reads the hook envelope from stdin and writes the decision to stdout"
 "src/main.rs" = "the binary: arguments, files, stdin and stdout"
+"src/mcp/mod.rs" = "the MCP server loop on stdin and stdout"
+"src/mcp/tools.rs" = "runs the safe-chains binary for each tool call"
+"src/mcp_cli.rs" = "starts the MCP server on stdin and stdout"
 "src/pathctx.rs" = "owns the thread-local directory context and reads HOME and TMPDIR"
 "src/pathctx/home.rs" = "reads the thread-local directory context and HOME"
 "src/pathctx/item_shape.rs" = "owns the thread-local shapes of loop variables and piped items"
@@ -427,6 +450,8 @@ owed = [
 "src/targets/mod.rs" = "detects harnesses on disk and reads the environment"
 "src/targets/opencode.rs" = "installs into the harness's config directory"
 "src/targets/qwen.rs" = "reads and writes the harness's settings file"
+"src/userconfig/list.rs" = "reads the config files it lists"
+"src/userconfig/mod.rs" = "reads and writes ~/.config/safe-chains.toml"
 
 [test_only]
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
@@ -445,6 +470,8 @@ owed = [
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
+"src/explain_fix/tests.rs" = "explain_fix's test suite"
+"src/mcp/tests.rs" = "the MCP server's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"
 "src/handler_property_tests.rs" = "the cross-handler property suite (#[cfg(test)] mod in lib.rs)"
@@ -456,3 +483,4 @@ owed = [
 "src/registry/tests.rs" = "the registry test suite"
 "src/suggest/tests.rs" = "suggest's test suite"
 "src/tests.rs" = "the crate's example test suite"
+"src/userconfig/tests.rs" = "userconfig's test suite"

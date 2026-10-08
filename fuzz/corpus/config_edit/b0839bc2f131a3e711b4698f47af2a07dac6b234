@@ -1,0 +1,19 @@
+path = "~------------/nodes"
+pead = true
+
+[[command]]
+name = "fuzztes"
+path = "~/nodes"
+pead = true
+
+[[command]]
+name = "fuz}‹es"
+pead = true
+
+[[command]]
+name = "fuïol"
+max_poead = true
+
+[[command]]
+nime = "fuooÿÿÿÿÿÿÿÿl"
+maxoo = 2

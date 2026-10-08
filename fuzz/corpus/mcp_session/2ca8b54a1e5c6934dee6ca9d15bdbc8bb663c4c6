@@ -1,0 +1,1 @@
+{"jd":3,"metame":"grant_path","argumerpc":"2.0","id":66666666666666666666666666666666666666666666664,"method":"tools/call","params":{"name":"che/k_command","arguments":{"command":"ls","cwd":"/"}}}

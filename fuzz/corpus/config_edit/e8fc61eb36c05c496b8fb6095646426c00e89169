@@ -1,0 +1,8 @@
+[[grant]]
+pd = true
+
+[[command]]
+name = "fuzztnol"
+[[command]]
+name = "fuzztnol"
+max_p= 1

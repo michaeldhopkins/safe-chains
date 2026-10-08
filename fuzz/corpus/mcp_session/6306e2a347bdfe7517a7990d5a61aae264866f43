@@ -1,0 +1,2 @@
+s"jsonrall","}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"naee":"check_command","arguments":{"command":"s","cwd":","}}}

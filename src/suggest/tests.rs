@@ -210,7 +210,13 @@ fn config_hash_matches_trust_sha256() {
 /// `config_hash` equals hashing the file a user would `shasum` — the property the trust check needs.
 #[test]
 fn pin_hash_is_over_the_merged_file() {
-    let entry = GeneratedEntry { name: "mytool".into(), standalone: vec!["-x".into()], max_positional: 1, level: "SafeWrite".into(), subs: Vec::new() };
+    let entry = GeneratedEntry {
+        name: "mytool".into(),
+        standalone: vec!["-x".into()],
+        max_positional: 1,
+        level: "SafeWrite".into(),
+        subs: Vec::new(),
+    };
     let merged = merged_content("", std::slice::from_ref(&entry));
     assert_eq!(config_hash(merged.as_bytes()), config_hash(render_toml(std::slice::from_ref(&entry)).as_bytes()));
     // Appending to an existing file keeps the existing content verbatim ahead of the new block.
@@ -301,7 +307,13 @@ fn path_basename_is_used_for_the_name() {
 #[test]
 fn generated_pin_matches_the_written_file_and_dir() {
     let dir = tempfile::tempdir().unwrap();
-    let entry = GeneratedEntry { name: "zztool-42".into(), standalone: vec!["-x".into()], max_positional: 0, level: "SafeWrite".into(), subs: Vec::new() };
+    let entry = GeneratedEntry {
+        name: "zztool-42".into(),
+        standalone: vec!["-x".into()],
+        max_positional: 0,
+        level: "SafeWrite".into(),
+        subs: Vec::new(),
+    };
     let content = merged_content("", std::slice::from_ref(&entry));
     let file = dir.path().join(".safe-chains.toml");
     std::fs::write(&file, &content).unwrap();

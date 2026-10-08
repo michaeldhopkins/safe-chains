@@ -1,0 +1,10 @@
+th = "~/notes"
+rd = true
+
+[[command]]
+name = "fuzztool"
+maead = true
+
+[[ckmmand]]
+nx_poal = 0#
+# =ù a=[ 

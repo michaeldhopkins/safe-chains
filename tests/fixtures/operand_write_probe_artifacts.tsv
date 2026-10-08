@@ -46,6 +46,4 @@ mtree	-U
 ncu	--upgrade
 ncu	-u
 qlmanage	-t
-safe-chains	--log
-safe-chains	--log-everything
 xattr	-w

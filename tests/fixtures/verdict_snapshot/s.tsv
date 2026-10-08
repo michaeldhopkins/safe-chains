@@ -26,6 +26,7 @@ safe-chains	denied
 safe-chains "ls -la"	inert
 safe-chains 'cargo test'	inert
 safe-chains 'foo' 'bar' 'baz'	denied
+safe-chains 'git config --get user.name'	inert
 safe-chains 'mandoc -mdoc /usr/share/man/man1/ls.1'	inert
 safe-chains 'pod install'	inert
 safe-chains --cwd /w --root /w --level reader 'cat ../peer/src/main.rs'	inert
@@ -44,6 +45,7 @@ safe-chains --list-commands	inert
 safe-chains --list-tools	inert
 safe-chains --log	safe-write
 safe-chains --log 'cat foo'	safe-write
+safe-chains --log config add mytool	denied
 safe-chains --log hook claude	safe-write
 safe-chains --log-everything	safe-write
 safe-chains --log-everything hook claude	safe-write
@@ -58,6 +60,19 @@ safe-chains --version	inert
 safe-chains -V	inert
 safe-chains -h	inert
 safe-chains -v	inert
+safe-chains config	denied
+safe-chains config add --level inert -- mytool	denied
+safe-chains config add mytool	denied
+safe-chains config grant ~/notes --read	denied
+safe-chains config list	safe-read
+safe-chains config list --help	safe-read
+safe-chains config list --help -h	safe-read
+safe-chains config list --help x	denied
+safe-chains config list -h	safe-read
+safe-chains config list x	denied
+safe-chains config remove command mytool	denied
+safe-chains config remove grant ~/notes	denied
+safe-chains config x	denied
 safe-chains help	inert
 safe-chains help hook	inert
 safe-chains hook claude	inert
@@ -69,6 +84,7 @@ safe-chains hook droid	inert
 safe-chains hook gemini	inert
 safe-chains hook opencode	inert
 safe-chains hook qwen	inert
+safe-chains mcp	denied
 safe-chains x	inert
 safety	denied
 safety --help	inert

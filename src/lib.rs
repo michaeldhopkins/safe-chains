@@ -1,7 +1,4 @@
-// The generated test names spell the command and its flags verbatim, and FLAG CASE IS MEANINGFUL:
-// find takes both `-D` and `-d`, `-P` and `-p`, `-L` and `-l`, and commands like `asn1Decoding` and
-// `checkLocalKDC` are camel-case upstream. Lowercasing to satisfy `non_snake_case` would erase the
-// distinction the test exists to pin, so the generated items opt out instead.
+// Generated test names keep the flag case they spell (`-D` and `-d` differ), so they opt out of non_snake_case.
 #[cfg(test)]
 macro_rules! safe {
     ($($name:ident: $cmd:expr),* $(,)?) => {
@@ -82,6 +79,7 @@ pub mod registry;
 mod substitution_property_tests;
 pub mod suggest;
 pub mod targets;
+pub mod userconfig;
 pub mod verdict;
 
 pub use verdict::{SafetyLevel, Verdict};

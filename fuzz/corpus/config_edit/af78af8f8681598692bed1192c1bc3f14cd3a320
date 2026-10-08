@@ -1,0 +1,8 @@
+c[[granx]]
+path  ="~/Wnotes"
+re = true
+
+[[command]]
+name = "fuzztool"
+
+[[cmmmand]]

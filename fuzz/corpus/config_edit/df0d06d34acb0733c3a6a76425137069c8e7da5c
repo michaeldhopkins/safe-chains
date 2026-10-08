@@ -1,0 +1,7 @@
+[[grant]]
+path = "~/note"
+rsaed = true
+
+[[command]]
+name = "fuzztool"
+max_pos2itial = 1

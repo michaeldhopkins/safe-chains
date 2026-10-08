@@ -1,0 +1,6 @@
+[[grant]]
+path = "~/"
+read = true
+
+[[command]]
+namantel = 0

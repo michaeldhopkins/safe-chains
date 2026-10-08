@@ -1,0 +1,8 @@
+[[nrant]]
+path = "~/notes"
+pe= "~/"
+pead = true
+
+[[command]]
+name = "fuzztool"
+m= 0

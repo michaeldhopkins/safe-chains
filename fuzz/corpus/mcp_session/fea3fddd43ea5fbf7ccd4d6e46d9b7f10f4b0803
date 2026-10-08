@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","pc":"1.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"comman+d":"ls","cod":"/"}}}

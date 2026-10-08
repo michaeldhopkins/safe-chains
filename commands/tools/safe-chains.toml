@@ -1,22 +1,10 @@
 [[command]]
 name = "safe-chains"
-description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. The `hook <TOOL>` subcommand reads the named tool's hook envelope from stdin, classifies the embedded shell command, and writes that tool's hook reply to stdout — used as the integration point with Claude Code, Codex, Cursor, Gemini, Copilot, Qwen, Droid, and OpenCode. `--list-commands`, `--list-tools`, `--version` (also `-v`/`-V`), `--help`, and `--explain` (which prints a per-segment breakdown of the classification) are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies, `--cwd`/`--root` set the directory context it resolves paths against, `--session-id` supplies the harness session key used to recognize that session's scratchpad, and `--unknown-folder` (also on `hook <TOOL>`) judges writes as when the tool does not say which folder the command runs in — none of them execute the candidate. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--generate-book` writes documentation to the local filesystem. `--log` appends a JSON record of each command that did not auto-approve — the command verbatim, the directory it ran in, and the classification that refused it — to `~/.local/state/safe-chains/log.jsonl`, created owner-only; `--log-everything` records approvals as well. The destination is a compiled-in constant with no flag to redirect it, and neither flag reads or transmits anything. `--suggest` analyzes a command safe-chains does not recognize and PRINTS the `.safe-chains.toml` entry that would describe it, the path that file belongs at, and a `[[trusted]]` pin for the user to paste into `~/.config/safe-chains.toml`. It writes nothing: it reads the project config to compute the pin hash and emits text, so it is a read-only meta operation like `--explain`. Surface stable; new command data ships in roughly biweekly minor releases."
+description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. The `hook <TOOL>` subcommand reads the named tool's hook envelope from stdin, classifies the embedded shell command, and writes that tool's hook reply to stdout — used as the integration point with Claude Code, Codex, Cursor, Gemini, Copilot, Qwen, Droid, and OpenCode. `--list-commands`, `--list-tools`, `--version` (also `-v`/`-V`), `--help`, and `--explain` (which prints a per-segment breakdown of the classification and what would change it) are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies, `--cwd`/`--root` set the directory context it resolves paths against, `--session-id` supplies the harness session key used to recognize that session's scratchpad, and `--unknown-folder` (also on `hook <TOOL>`) judges writes as when the tool does not say which folder the command runs in — none of them execute the candidate. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--generate-book` writes documentation to the local filesystem. `--log` appends a JSON record of each command that did not auto-approve — the command verbatim, the directory it ran in, and the classification that refused it — to `~/.local/state/safe-chains/log.jsonl`, created owner-only; `--log-everything` records approvals as well. The destination is a compiled-in constant with no flag to redirect it, and neither flag reads or transmits anything. `--suggest` analyzes a command safe-chains does not recognize and PRINTS the `.safe-chains.toml` entry that would describe it, the path that file belongs at, and a `[[trusted]]` pin for the user to paste into `~/.config/safe-chains.toml`. It writes nothing. The `config` subcommand edits the user's own rules: `config list` reads `~/.config/safe-chains.toml`, the nearest project `.safe-chains.toml` and `~/.claude/settings.json` and prints every rule; `config add`, `config remove` and `config grant` rewrite `~/.config/safe-chains.toml`, which reconfigures what every later command is judged by — an agent that runs one unasked could approve itself. The `mcp` subcommand serves the same operations as MCP tools over stdin/stdout for as long as its input stays open, so a piped request can make any of those edits. Surface stable; new command data ships in roughly biweekly minor releases."
 url = "https://github.com/michaeldhopkins/safe-chains"
-researched_version = "safe-chains 0.211.0"
-level = "Inert"
-bare = false
-max_positional = 2
-# `--log` / `--log-everything` append a JSON line to ~/.local/state/safe-chains/log.jsonl, so an
-# invocation carrying either WRITES — the base Inert level would be a false claim. The path is a
-# compiled-in constant with no flag to redirect it, which is why there is no path gate to declare:
-# there is no path argument to gate.
-write_flags = ["--log", "--log-everything"]
-standalone = [
-    "--explain", "--help", "--list-commands", "--list-tools",
-    "--log", "--log-everything", "--suggest",
-    "--version", "-V", "-h", "-v",
-]
-valued = ["--cwd", "--level", "--root", "--session-id", "--unknown-folder"]
+researched_version = "safe-chains 0.231.0"
+handler = "safe_chains"
+doc_body = "Checks a command given as an argument, or a hook envelope on stdin with `hook <TOOL>`. Subcommands: `config list`."
 examples_safe = [
     "safe-chains --version",
     "safe-chains -v",
@@ -42,9 +30,45 @@ examples_safe = [
     "safe-chains --log hook claude",
     "safe-chains --log-everything hook claude",
     "safe-chains --log 'cat foo'",
+    "safe-chains config list",
+    "safe-chains 'git config --get user.name'",
 ]
 examples_denied = [
     "safe-chains",
     "safe-chains --generate-book",
     "safe-chains --setup",
+    "safe-chains config add mytool",
+    "safe-chains config add --level inert -- mytool",
+    "safe-chains config grant ~/notes --read",
+    "safe-chains config remove command mytool",
+    "safe-chains config remove grant ~/notes",
+    "safe-chains --log config add mytool",
+    "safe-chains mcp",
 ]
+
+# Only `list` reads. `add`, `remove` and `grant` rewrite ~/.config/safe-chains.toml, so they are
+# absent here and go to a person.
+[[command.sub]]
+name = "config"
+
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[command.fallback]
+level = "Inert"
+bare = false
+max_positional = 2
+# `--log` / `--log-everything` append a JSON line to ~/.local/state/safe-chains/log.jsonl, so an
+# invocation carrying either WRITES — the base Inert level would be a false claim. The path is a
+# compiled-in constant with no flag to redirect it, which is why there is no path gate to declare:
+# there is no path argument to gate.
+write_flags = ["--log", "--log-everything"]
+standalone = [
+    "--explain", "--help", "--list-commands", "--list-tools",
+    "--log", "--log-everything", "--suggest",
+    "--version", "-V", "-h", "-v",
+]
+valued = ["--cwd", "--level", "--root", "--session-id", "--unknown-folder"]

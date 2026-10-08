@@ -163,10 +163,7 @@ fn emit_suggestion(entries: &[safe_chains::suggest::GeneratedEntry], also_recogn
     }
 
     println!("Add this to {shown}:\n\n{block}");
-    println!(
-        "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
-         (which safe-chains never edits):\n\n{pin}"
-    );
+    println!("That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml:\n\n{pin}");
     println!(
         "The level defaults to \"SafeWrite\". Edit it to \"SafeRead\" (runs code, no \
          artifacts) or \"Inert\" (read-only) if that fits the tool. The hash above is of {shown} \

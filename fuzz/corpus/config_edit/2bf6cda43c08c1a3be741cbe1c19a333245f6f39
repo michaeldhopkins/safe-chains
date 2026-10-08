@@ -1,0 +1,11 @@
+[[g.rant]]
+path = "~/notes"
+read = true
+
+[[comiand]]
+tsaed = true
+
+[[command]]
+gna.e = "fuzz"
+name = "fuzztool"
+max_pos = 2

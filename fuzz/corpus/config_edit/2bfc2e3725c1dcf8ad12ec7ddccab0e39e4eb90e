@@ -1,0 +1,6 @@
+x= "~/notes"
+read = true
+
+[[command]]
+name = "fu"
+max_posinal = 0

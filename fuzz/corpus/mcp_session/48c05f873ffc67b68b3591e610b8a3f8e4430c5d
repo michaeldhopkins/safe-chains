@@ -1,0 +1,2 @@
+{"jsonrpc":"2.0","id":1,"id":3,"htmeod":"tools/call","params":{"name":"grant_path","argu“š‘ˆs":{"path":"~/x","access":"read"}}}
+{"sjonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"check_command","arguments":{"command":"ls","cwd":"ã/"}}}

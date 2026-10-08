@@ -134,7 +134,7 @@ fn entry_for(name: String, uses: &[Observed]) -> GeneratedEntry {
 
 /// A word that reads as a subcommand name: lower-case letters, digits, `-`, `_` and `:`, starting
 /// with a letter. A path, a number, a URL, or anything with a dot or a space is an argument.
-fn is_sub_word(word: &str) -> bool {
+pub(crate) fn is_sub_word(word: &str) -> bool {
     word.len() <= 40
         && word.starts_with(|c: char| c.is_ascii_lowercase())
         && word.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, '-' | '_' | ':'))
@@ -237,8 +237,8 @@ fn collect_word<'a>(word: &'a Word, out: &mut Vec<&'a SimpleCmd>) {
 /// Whether safe-chains recognizes `name` (built-in handler or registry command, via its canonical
 /// spelling). Custom user commands that already ALLOW an invocation are caught earlier by the
 /// `AlreadyAllowed` check, so they need not be enumerated here.
-fn is_known(name: &str) -> bool {
-    known_names().contains(registry::canonical_name(name))
+pub(crate) fn is_known(name: &str) -> bool {
+    known_names().contains(registry::canonical_name(name)) || crate::handlers::is_built_in(name)
 }
 
 fn known_names() -> &'static BTreeSet<String> {
@@ -285,7 +285,7 @@ fn push_shape(out: &mut String, standalone: &[String], max_positional: usize, le
 
 /// A TOML basic (double-quoted) string with the control/quote/backslash escapes TOML requires, so
 /// even an odd flag spelling produces valid TOML.
-fn toml_str(s: &str) -> String {
+pub(crate) fn toml_str(s: &str) -> String {
     let mut out = String::from("\"");
     for c in s.chars() {
         match c {

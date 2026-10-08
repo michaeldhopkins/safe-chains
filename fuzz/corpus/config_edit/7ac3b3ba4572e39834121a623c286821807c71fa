@@ -1,0 +1,5 @@
+tsaed = true
+
+[[command]]
+gname = ""
+max_positional = 1

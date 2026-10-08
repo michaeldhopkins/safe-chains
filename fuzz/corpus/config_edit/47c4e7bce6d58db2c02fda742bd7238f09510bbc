@@ -1,0 +1,7 @@
+[[nt]]
+pa=true
+
+[[command]]
+gname = "fzztool"
+name = "fuzztool"
+max_pos = 2

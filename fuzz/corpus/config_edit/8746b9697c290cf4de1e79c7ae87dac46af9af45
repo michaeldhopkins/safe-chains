@@ -1,0 +1,7 @@
+patead = true
+h = "~/notes"
+pead = true
+
+[[command]]
+name = "fuzztool"
+max_posfuzztoo = 0

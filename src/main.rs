@@ -8,6 +8,7 @@ use safe_chains::pathctx::anchor::FolderLevel;
 use safe_chains::targets;
 use safe_chains::verdict::{SafetyLevel, Verdict};
 
+mod config_cli;
 mod folder_cli;
 mod hook_cli;
 mod suggest_cli;
@@ -171,8 +172,12 @@ fn main() {
     match cli {
         Ok(cli) => {
             let log_mode = safe_chains::decisionlog::Mode::from_flags(cli.log, cli.log_everything);
-            if let Some(Subcommand::Hook { tool, unknown_folder }) = cli.subcommand {
-                hook_cli::run_hook_for(&tool, log_mode, unknown_folder.as_deref().and_then(FolderLevel::parse));
+            match cli.subcommand {
+                Some(Subcommand::Hook { tool, unknown_folder }) => {
+                    hook_cli::run_hook_for(&tool, log_mode, unknown_folder.as_deref().and_then(FolderLevel::parse))
+                }
+                Some(Subcommand::Config { action }) => config_cli::run_config(action),
+                None => {}
             }
             if cli.list_tools {
                 run_list_tools();

@@ -5,16 +5,23 @@ EXAMPLES:
   # Check whether a command would auto-approve (exit 0 = allowed):
   safe-chains \"git status\"
 
-  # See a per-segment breakdown of why a command does or doesn't approve:
+  # See why a command does or doesn't approve, and what would change that:
   safe-chains --explain \"grep foo . && ./deploy.sh\"
 
   # For a single command, --explain also shows the behavior it resolved to and
   # names the facet that refused it (e.g. locus.remote = fixed):
   safe-chains --explain \"aws dynamodb put-item --table-name t --item {}\"
 
-  # Offer to support a command safe-chains doesn't recognize. This writes or
-  # upgrades the local .safe-chains.toml, then prints the pin to hand-add to
-  # ~/.config/safe-chains.toml so the definition takes effect:
+  # List the rules safe-chains reads from your files, and where each came from:
+  safe-chains config list
+
+  # Change them. safe-chains never approves these itself, so a person does:
+  safe-chains config add \"mytool sync --dry-run\"
+  safe-chains config grant ~/notes --write
+  safe-chains config remove grant ~/notes
+
+  # Show the project .safe-chains.toml entry for a command safe-chains doesn't
+  # recognize, and the pin that trusts it. Writes nothing:
   safe-chains --suggest \"mytool sync --dry-run\"
 ";
 
@@ -126,4 +133,53 @@ pub enum Subcommand {
         #[arg(long, value_name = "LEVEL", value_parser = ["reads", "developer", "workspace"])]
         unknown_folder: Option<String>,
     },
+    /// List or change the rules in ~/.config/safe-chains.toml. safe-chains never approves `add`,
+    /// `remove` or `grant` by itself, so a person approves each change.
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction,
+    },
+}
+
+#[derive(clap::Subcommand)]
+pub enum ConfigAction {
+    /// List every rule safe-chains reads from a file, under the file it came from.
+    List,
+    /// Add an entry for a command safe-chains has no entry for, approving it used the way it is
+    /// here: the same subcommand and flags, and up to as many other arguments.
+    Add {
+        /// The command, as one quoted string or as separate words.
+        #[arg(required = true, num_args = 1.., trailing_var_arg = true, allow_hyphen_values = true, value_name = "COMMAND")]
+        command: Vec<String>,
+        /// How much the command may do: inert, safe-read or safe-write.
+        #[arg(long, default_value = "safe-write")]
+        level: String,
+    },
+    /// Remove a command entry or a grant from ~/.config/safe-chains.toml.
+    Remove {
+        /// What to remove.
+        #[arg(value_enum)]
+        kind: RuleKind,
+        /// The command's name, or the grant's path.
+        #[arg(value_name = "NAME_OR_PATH")]
+        key: String,
+    },
+    /// Let commands read or write in a folder outside the places safe-chains approves by default.
+    Grant {
+        /// The folder or file. A relative path is taken from the current directory.
+        path: String,
+        /// Approve reading there.
+        #[arg(long)]
+        read: bool,
+        /// Approve writing there.
+        #[arg(long)]
+        write: bool,
+    },
+}
+
+/// The two kinds of rule `config remove` can remove.
+#[derive(clap::ValueEnum, Clone, Copy)]
+pub enum RuleKind {
+    Command,
+    Grant,
 }

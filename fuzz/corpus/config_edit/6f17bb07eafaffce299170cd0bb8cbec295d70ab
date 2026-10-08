@@ -1,0 +1,22 @@
+th = "~notes"
+read = true
+
+[[command]]
+name = "fu/notes"
+read = true
+
+[[command]]
+name = "fu/notes"
+read = true
+
+[[command]]
+name = "fuzzzool"
+max_poal = 0#
+#at` = E
+#at` = a
+
+[[command]]
+name = "fuzztool"
+max_poal = 0#
+#at` = E
+#at` = a= 

@@ -476,8 +476,6 @@ render whoami	--output
 render whoami	-o
 render workspaces	--output
 render workspaces	-o
-safe-chains	--log
-safe-chains	--log-everything
 scp	-o
 shellcheck	-o
 slither	--checklist

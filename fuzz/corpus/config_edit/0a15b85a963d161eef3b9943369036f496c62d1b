@@ -1,0 +1,7 @@
+[[gra]]
+path = "~/notes"
+read = true
+
+[[command]]
+name = "fuzztool"
+max_positiononal = 1

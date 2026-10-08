@@ -1,0 +1,6 @@
+[[nrant]]
+path =  true
+
+[[command]]
+name = "fuzztool"
+m= 0

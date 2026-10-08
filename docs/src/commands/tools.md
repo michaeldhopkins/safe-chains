@@ -1506,6 +1506,11 @@ Aliases: `python`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
+- Checks a command given as an argument, or a hook envelope on stdin with `hook <TOOL>`. Subcommands: `config list`.
+
+- **config list**: Flags: --help, -h
+
+- **Without a subcommand:**
 - Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --log, --log-everything, --suggest, --version, -V, -h, -v
 - Allowed valued flags: --cwd, --level, --root, --session-id, --unknown-folder
 
@@ -1535,6 +1540,8 @@ Aliases: `python`
 - `safe-chains --log hook claude`
 - `safe-chains --log-everything hook claude`
 - `safe-chains --log 'cat foo'`
+- `safe-chains config list`
+- `safe-chains 'git config --get user.name'`
 
 ### `screen`
 <p class="cmd-url"><a href="https://www.gnu.org/software/screen/manual/screen.html">https://www.gnu.org/software/screen/manual/screen.html</a></p>

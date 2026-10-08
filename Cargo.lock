@@ -621,6 +621,7 @@ dependencies = [
  "syn",
  "tempfile",
  "toml",
+ "toml_edit",
  "winnow",
 ]
 

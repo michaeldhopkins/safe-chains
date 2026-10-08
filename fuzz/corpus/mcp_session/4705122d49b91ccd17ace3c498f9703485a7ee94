@@ -1,0 +1,3 @@
+{'jsonrpc":"2.0:"2.0","method":"notifications/initialized"}
+{"c":"2.0","id":3,"method":"tools/call","params":{"name":"grant_path","arguments":{"path":"~/x","–œcess":"read"}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"chec)_command","arguments":{"comma!d":"ls","cwd":"/"}}}

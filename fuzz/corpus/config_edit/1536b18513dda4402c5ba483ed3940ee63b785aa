@@ -1,0 +1,7 @@
+[[g.rd]]
+tsaed = true
+
+[[command]]
+giiina.e = "fuzz"
+name = "fuzztool"
+max_pos = 3

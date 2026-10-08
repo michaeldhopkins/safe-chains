@@ -1,0 +1,8 @@
+c[[granx]]
+path  ="~/Wnotes"
+read = true
+
+[[command]]
+name = "ftool"
+
+[[command]]

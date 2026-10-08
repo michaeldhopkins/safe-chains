@@ -36,6 +36,7 @@ pub mod perl;
 mod perl_load;
 pub mod php;
 pub mod ruby;
+pub mod safe_chains;
 pub mod shell;
 #[cfg(test)]
 mod signal_tests;
@@ -61,6 +62,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("php", php::is_safe_php as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
+        ("safe_chains", safe_chains::check_safe_chains as HandlerFn),
         ("tilt", tilt::check_tilt as HandlerFn),
     ])
 }
@@ -139,6 +141,27 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries
 }
 
+/// Whether safe-chains has a built-in rule for the command `name`: a handler or a TOML entry,
+/// leaving out the user's own entries. `suggest` and `safe-chains config add` ask this before
+/// drafting an entry, because an entry would replace the built-in rule (custom entries are
+/// consulted first). The docs list some handlers under combined names (`bash / sh`), so a name
+/// list missed them and `config add 'bash -c x'` drafted an override for bash.
+pub(crate) fn is_built_in(name: &str) -> bool {
+    let tokens = [Token::from_raw(name.to_string())];
+    let cmd = tokens[0].command_name();
+    shell::dispatch(cmd, &tokens).is_some()
+        || wrappers::dispatch(cmd, &tokens).is_some()
+        || node::dispatch(cmd, &tokens).is_some()
+        || jvm::dispatch(cmd, &tokens).is_some()
+        || android::dispatch(cmd, &tokens).is_some()
+        || network::dispatch(cmd, &tokens).is_some()
+        || system::dispatch(cmd, &tokens).is_some()
+        || perl::dispatch(cmd, &tokens).is_some()
+        || coreutils::dispatch(cmd, &tokens).is_some()
+        || fuzzy::dispatch(cmd, &tokens).is_some()
+        || vcs::dispatch(cmd, &tokens).is_some()
+        || crate::registry::toml_dispatch(&tokens).is_some()
+}
 #[cfg(test)]
 mod tests {
     use super::*;

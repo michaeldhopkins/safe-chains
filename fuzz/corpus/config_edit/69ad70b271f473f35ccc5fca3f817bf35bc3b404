@@ -1,0 +1,12 @@
+c[[granx]]
+path  ="~/Wnotes"
+read = true
+
+[[command]]
+name = "fuzztooes"
+read = true
+
+[[command]]
+name = "fuzzl"
+
+[[command]]

@@ -1,0 +1,7 @@
+[[grant]]
+path = "~/~/notes"
+pead = true
+
+[[command]]
+name = "fuzztool"
+m= 0

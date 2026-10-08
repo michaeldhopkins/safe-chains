@@ -1,0 +1,14 @@
+path = "~/nodeQs"
+pead =true
+
+[[command]]
+e = "fuzztes"
+pd = true
+
+[[command]]
+name = "fuool"
+maxead = true
+
+[[command]]
+name = "fuool"
+max_posfuzztoo = 0

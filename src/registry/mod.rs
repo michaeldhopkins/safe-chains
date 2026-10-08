@@ -1,5 +1,5 @@
 mod build;
-mod custom;
+pub(crate) mod custom;
 mod cwd_writes;
 pub mod folder_config;
 pub use custom::fuzz_load_config;

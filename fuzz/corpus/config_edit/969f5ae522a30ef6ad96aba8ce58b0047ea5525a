@@ -1,0 +1,9 @@
+[[grant]]
+path = "~/notes"
+pe= "~/notes"
+pead = true
+
+[[command]]
+name = "fuzes"
+pe= "ztool"
+m= 5

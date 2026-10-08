@@ -1,0 +1,7 @@
+[[g.rant]]
+path ="~/noes"
+read = true
+
+[[com.and]]
+3ame = "fuzztool"
+max_pos = 1

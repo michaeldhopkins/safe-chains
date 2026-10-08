@@ -1,0 +1,7 @@
+[[grant]]
+path = "~/notes"
+read = true
+
+[[command]]
+name = "fuzztnol"
+max_position = 1

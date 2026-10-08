@@ -1,0 +1,3 @@
+{"jsonrpc"2.0",""}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"grant_path","arguments":{"path":"~/x","access":"readjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"}}}
+{"js":"/"}}}
