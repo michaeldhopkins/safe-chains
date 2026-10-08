@@ -7784,13 +7784,6 @@ Aliases: `nbconvert`
 
 - Requires -0, -L, -l. - Allowed standalone flags: --help, -0, -L, -h, -l
 
-### `killall`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/killall.1.html">https://man7.org/linux/man-pages/man1/killall.1.html</a></p>
-
-- Allowed standalone flags: --help, -I, -d, -e, -l, -m, -q, -s, -v, -z
-- Allowed valued flags: -SIGNAL, -c, -t, -u
-- Hyphen-prefixed positional arguments accepted
-
 ### `kind`
 <p class="cmd-url"><a href="https://kind.sigs.k8s.io/">https://kind.sigs.k8s.io/</a></p>
 
@@ -11577,13 +11570,6 @@ Aliases: `pip3`
 
 - Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
 - Allowed valued flags: --volume
-
-### `pkill`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pkill.1.html">https://man7.org/linux/man-pages/man1/pkill.1.html</a></p>
-
-- Allowed standalone flags: --help, -I, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
-- Allowed valued flags: -F, -G, -P, -SIGNAL, -U, -d, -g, -t, -u
-- Hyphen-prefixed positional arguments accepted
 
 ### `pl`
 <p class="cmd-url"><a href="https://ss64.com/mac/pl.html">https://ss64.com/mac/pl.html</a></p>

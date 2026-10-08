@@ -313,6 +313,7 @@ owed = [
 "src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
 "src/cst/opaque_tests.rs" = "the unknown-word suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/glob_tests.rs" = "the glob-listing suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"

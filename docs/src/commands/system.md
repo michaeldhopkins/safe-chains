@@ -483,13 +483,6 @@ Aliases: `fly`
 
 - Requires -0, -L, -l. - Allowed standalone flags: --help, -0, -L, -h, -l
 
-### `killall`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/killall.1.html">https://man7.org/linux/man-pages/man1/killall.1.html</a></p>
-
-- Allowed standalone flags: --help, -I, -d, -e, -l, -m, -q, -s, -v, -z
-- Allowed valued flags: -SIGNAL, -c, -t, -u
-- Hyphen-prefixed positional arguments accepted
-
 ### `klist_cdhashes`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html">https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html</a></p>
 
@@ -1145,13 +1138,6 @@ Aliases: `neonctl`
 - Allowed standalone flags: --help, --quiet, --version, -V, -q
 - Allowed valued flags: --dbname, --host, --port, --timeout, --username, -U, -d, -h, -p, -t
 - Bare invocation allowed
-
-### `pkill`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pkill.1.html">https://man7.org/linux/man-pages/man1/pkill.1.html</a></p>
-
-- Allowed standalone flags: --help, -I, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
-- Allowed valued flags: -F, -G, -P, -SIGNAL, -U, -d, -g, -t, -u
-- Hyphen-prefixed positional arguments accepted
 
 ### `platform`
 <p class="cmd-url"><a href="https://docs.platform.sh/administration/cli.html">https://docs.platform.sh/administration/cli.html</a></p>

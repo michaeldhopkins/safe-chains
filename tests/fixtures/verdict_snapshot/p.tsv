@@ -4960,32 +4960,32 @@ pkgutil --volume x	denied
 pkgutil -h	inert
 pkgutil x	denied
 pkill	denied
-pkill --help	safe-write
-pkill --help -F x	safe-write
-pkill --help -I	safe-write
-pkill --help x	safe-write
+pkill --help	denied
+pkill --help -F x	denied
+pkill --help -I	denied
+pkill --help x	denied
 pkill --version	denied
-pkill -F x	safe-write
-pkill -G x	safe-write
-pkill -I	safe-write
-pkill -L	safe-write
-pkill -P x	safe-write
-pkill -SIGNAL x	safe-write
-pkill -U x	safe-write
-pkill -a	safe-write
-pkill -d x	safe-write
-pkill -f	safe-write
-pkill -g x	safe-write
-pkill -i	safe-write
-pkill -l	safe-write
-pkill -n	safe-write
-pkill -o	safe-write
-pkill -q	safe-write
-pkill -t x	safe-write
-pkill -u x	safe-write
-pkill -v	safe-write
-pkill -x	safe-write
-pkill x	safe-write
+pkill -F x	denied
+pkill -G x	denied
+pkill -I	denied
+pkill -L	denied
+pkill -P x	denied
+pkill -SIGNAL x	denied
+pkill -U x	denied
+pkill -a	denied
+pkill -d x	denied
+pkill -f	denied
+pkill -g x	denied
+pkill -i	denied
+pkill -l	denied
+pkill -n	denied
+pkill -o	denied
+pkill -q	denied
+pkill -t x	denied
+pkill -u x	denied
+pkill -v	denied
+pkill -x	denied
+pkill x	denied
 pl	inert
 pl --help	denied
 pl --input x	inert

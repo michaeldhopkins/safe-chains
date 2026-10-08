@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1620 commands across 75 categories.
+safe-chains knows 1618 commands across 75 categories.
 
 ## Glossary
 
@@ -84,7 +84,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (55 commands)
-- [System](system.md) (114 commands)
+- [System](system.md) (112 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (96 commands)
 - [Developer Tools](tools.md) (236 commands)

@@ -434,7 +434,6 @@ safe! {
 
     at_list: "at -l",
     atq_bare: "atq",
-    killall_list: "killall -l",
     pgrep_list: "pgrep -l ssh",
     vmmap_help: "vmmap -h",
     kextstat_bare: "kextstat",

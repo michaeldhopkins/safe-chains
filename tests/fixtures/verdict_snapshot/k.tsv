@@ -613,25 +613,25 @@ kill -h	inert
 kill -l	inert
 kill x	denied
 killall	denied
-killall --help	safe-write
-killall --help -I	safe-write
-killall --help -SIGNAL x	safe-write
-killall --help x	safe-write
+killall --help	denied
+killall --help -I	denied
+killall --help -SIGNAL x	denied
+killall --help x	denied
 killall --version	denied
-killall -I	safe-write
-killall -SIGNAL x	safe-write
-killall -c x	safe-write
-killall -d	safe-write
-killall -e	safe-write
-killall -l	safe-write
-killall -m	safe-write
-killall -q	safe-write
-killall -s	safe-write
-killall -t x	safe-write
-killall -u x	safe-write
-killall -v	safe-write
-killall -z	safe-write
-killall x	safe-write
+killall -I	denied
+killall -SIGNAL x	denied
+killall -c x	denied
+killall -d	denied
+killall -e	denied
+killall -l	denied
+killall -m	denied
+killall -q	denied
+killall -s	denied
+killall -t x	denied
+killall -u x	denied
+killall -v	denied
+killall -z	denied
+killall x	denied
 kind	denied
 kind --help	inert
 kind --help --version	denied
