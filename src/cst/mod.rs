@@ -1,3 +1,4 @@
+mod ansi_c;
 mod budget;
 pub(crate) mod check;
 mod display;
@@ -6,10 +7,14 @@ mod explain;
 pub(crate) mod netargs;
 #[cfg(test)]
 mod normalize_tests;
+pub(crate) mod opaque;
+#[cfg(test)]
+mod opaque_tests;
 mod parse;
 #[cfg(test)]
 mod proptests;
 mod reserved;
+mod sub_close;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Script(pub Vec<Stmt>);
@@ -116,6 +121,8 @@ pub enum WordPart {
     Lit(String),
     Escape(char),
     SQuote(String),
+    /// `$'…'`, holding the text between the quotes as typed; [`Word::eval`] decodes it.
+    AnsiC(String),
     DQuote(Word),
     CmdSub(Script),
     ProcSub(Script),

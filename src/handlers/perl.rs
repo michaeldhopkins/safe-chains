@@ -362,8 +362,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
         return Some(scan);
     }
 
-    let mut has_code = false;
-    let mut code_all_safe = true;
+    let (mut has_code, mut code_all_safe) = (false, true);
     let mut flags_done = false;
     let mut i = 1;
     while i < tokens.len() {
@@ -379,8 +378,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
             continue;
         }
         if token.starts_with("--") {
-            i += 1;
-            continue;
+            return None;
         }
         let flags = &token.as_str()[1..];
         // `-Mmodule` / `-Idir` glued, and their split forms, consume a value rather than an operand.
@@ -419,7 +417,9 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
                     scan.in_place = true;
                     break;
                 }
-                _ => {}
+                'F' | 'C' | '0' => break,
+                'a' | 'c' | 'l' | 'n' | 'p' | 't' | 'T' | 'w' | 'W' | 'X' | '1'..='9' => {}
+                _ => return None,
             }
         }
         i += 1 + usize::from(consumed_next);

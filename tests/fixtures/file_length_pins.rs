@@ -8,8 +8,8 @@
 // under the limit. Nothing is ever ADDED here: a file that outgrows its limit after this point is
 // split, and new code goes in a new module rather than into a file on this list.
 const PINS: [(&str, usize); 19] = [
-    ("src/cst/check.rs", 1072),
-    ("src/cst/parse.rs", 1182),
+    ("src/cst/check.rs", 1034),
+    ("src/cst/parse.rs", 1150),
     ("src/cst/proptests.rs", 759),
     ("src/engine/facet.rs", 685),
     ("src/engine/resolve.rs", 1622),
@@ -25,6 +25,6 @@ const PINS: [(&str, usize); 19] = [
     ("src/registry/mod.rs", 733),
     ("src/registry/tests.rs", 7324),
     ("src/registry/types.rs", 1162),
-    ("src/tests.rs", 2119),
+    ("src/tests.rs", 2118),
     ("tests/integration_hooks.rs", 756),
 ];

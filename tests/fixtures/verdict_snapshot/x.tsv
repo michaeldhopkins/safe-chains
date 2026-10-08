@@ -64,7 +64,7 @@ xargs -0 grep foo	denied
 xargs -I X rm X	denied
 xargs -I {} cat {}	denied
 xargs -I {} rm {}	denied
-xargs -I{} basename {}	inert
+xargs -I{} basename {}	denied
 xargs -I{} rm -rf {}.bak	denied
 xargs -I{} rm -rf {}/sub	denied
 xargs -I{} rm {}	denied
@@ -72,11 +72,11 @@ xargs bash -c 'git status'	inert
 xargs bash -c 'ls && rm -rf /'	denied
 xargs cat	denied
 xargs curl	denied
-xargs find . -name '*.py'	inert
+xargs find . -name '*.py'	denied
 xargs find /etc -delete	denied
 xargs grep pattern	denied
 xargs npx cowsay	denied
-xargs npx eslint src/	safe-read
+xargs npx eslint src/	denied
 xargs rm	denied
 xargs rm -rf --version	denied
 xargs sed 's/foo/bar/'	denied

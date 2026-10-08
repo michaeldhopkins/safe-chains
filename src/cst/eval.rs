@@ -184,11 +184,12 @@ fn sub_sentinel(inner: &super::Script) -> String {
     }
 }
 
-fn eval_part(part: &WordPart, out: &mut String) {
+pub(super) fn eval_part(part: &WordPart, out: &mut String) {
     match part {
         WordPart::Lit(s) => out.push_str(s),
         WordPart::Escape(c) => out.push(*c),
         WordPart::SQuote(s) => out.push_str(s),
+        WordPart::AnsiC(raw) => out.push_str(&super::ansi_c::decode(raw)),
         WordPart::DQuote(inner) => {
             for p in &inner.0 {
                 eval_part(p, out);

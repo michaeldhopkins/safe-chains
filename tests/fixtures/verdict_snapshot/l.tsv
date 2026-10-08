@@ -2529,7 +2529,7 @@ ls >| out.txt	safe-write
 ls >| ~/.ssh/authorized_keys	denied
 ls `pwd`	inert
 ls x	inert
-ls | xargs wc -l	safe-read
+ls | xargs wc -l	denied
 ls; echo done	inert
 lsappinfo	denied
 lsappinfo --help	inert

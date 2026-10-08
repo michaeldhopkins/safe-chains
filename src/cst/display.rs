@@ -231,6 +231,7 @@ impl fmt::Display for WordPart {
             WordPart::Lit(s) => f.write_str(s),
             WordPart::Escape(c) => write!(f, "\\{c}"),
             WordPart::SQuote(s) => write!(f, "'{s}'"),
+            WordPart::AnsiC(s) => write!(f, "$'{s}'"),
             WordPart::DQuote(w) => write!(f, "\"{w}\""),
             WordPart::CmdSub(s) => {
                 let rendered = s.to_string();

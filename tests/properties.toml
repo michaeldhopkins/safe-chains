@@ -106,6 +106,18 @@ owed = [
   "src/cst/proptests.rs::roundtrip",
   "src/cst/proptests.rs::parse_never_panics",
 ]
+"src/cst/sub_close.rs" = [
+  "src/cst/parse.rs::a_random_unclosed_nest_parses_in_linear_work",
+  "src/cst/proptests.rs::roundtrip",
+]
+"src/cst/ansi_c.rs" = [
+  "src/cst/opaque_tests.rs::ansi_c_hex_spelling_is_the_same_word",
+  "src/cst/opaque_tests.rs::locale_quote_is_the_double_quoted_string",
+]
+"src/cst/opaque.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
+"src/cst/opaque/declared.rs" = ["src/cst/opaque_tests.rs::a_rebound_variable_is_not_read_stale"]
+"src/cst/opaque/items.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
+"src/cst/opaque/walk.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/budget.rs" = []
 "src/cst/reserved.rs" = []
 "src/engine/archetype.rs" = []
@@ -255,6 +267,7 @@ owed = [
 "src/main.rs" = "the binary: arguments, files, stdin and stdout"
 "src/pathctx.rs" = "owns the thread-local directory context and reads HOME and TMPDIR"
 "src/pathctx/home.rs" = "reads the thread-local directory context and HOME"
+"src/pathctx/item_shape.rs" = "owns the thread-local shapes of loop variables and piped items"
 "src/pathctx/lexical.rs" = "reads HOME, and the process-wide region table to keep a protected place absolute"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
 "src/registry/mod.rs" = "the process-wide registries, including the one loaded from the user's config"
@@ -278,6 +291,7 @@ owed = [
 "src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/system/tmux_keys_tests.rs" = "the tmux send-keys suite (#[cfg(test)] mod in tmux_keys.rs)"
 "src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
+"src/cst/opaque_tests.rs" = "the unknown-word suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"

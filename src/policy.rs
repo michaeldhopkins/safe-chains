@@ -187,6 +187,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
 pub(crate) fn consumes_next_value(next: Option<&Token>) -> bool {
     match next {
         None => false,
+        Some(t) if crate::cst::opaque::is_flag_probe(t.as_str()) => true,
         Some(t) => {
             let b = t.as_bytes();
             // An option-like token (starts with `-` and isn't a negative

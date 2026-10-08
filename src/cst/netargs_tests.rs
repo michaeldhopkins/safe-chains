@@ -149,12 +149,12 @@ fn parsed_simple(cmd: &str) -> crate::cst::SimpleCmd {
 #[test]
 fn what_counts_as_carrying() {
     for cmd in [
-        "x \"$1\"", "x $@", "x ${X:-y}", "x ${#X}", "x $'a'", "x a$", "x $(id)", "x `id`", "x $((1+1))", "x <(id)", "X=$(id) x",
-        "x < \"$F\"", "x <<< \"$X\"", "x <<EOF\n$X\nEOF",
+        "x \"$1\"", "x $@", "x ${X:-y}", "x ${#X}", "x a$", "x $(id)", "x `id`", "x $((1+1))", "x <(id)", "X=$(id) x", "x < \"$F\"",
+        "x <<< \"$X\"", "x <<EOF\n$X\nEOF",
     ] {
         assert!(simple_carries(&parsed_simple(cmd)), "should carry: {cmd}");
     }
-    for cmd in ["x 'a$b'", "x \\$X", "x a b", "x > \"$OUT\"", "x 2>&1", "x <<'EOF'\n$X\nEOF", "X=1 x"] {
+    for cmd in ["x 'a$b'", "x $'a'", "x \\$X", "x a b", "x > \"$OUT\"", "x 2>&1", "x <<'EOF'\n$X\nEOF", "X=1 x"] {
         assert!(!simple_carries(&parsed_simple(cmd)), "should not carry: {cmd}");
     }
 }

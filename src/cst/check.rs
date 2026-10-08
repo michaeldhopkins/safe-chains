@@ -282,6 +282,7 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
             let Some(name) = s.words.first().map(Word::eval) else {
                 return; // a bare `VAR=x` — handled precisely by `statement_assignments`
             };
+            out.vars.extend(super::opaque::declared_names(s));
             if name == "cd" {
                 out.cwd = true;
                 return;
@@ -413,10 +414,11 @@ pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
     // cat`, `head`'s output items are still `find`'s worktree paths, so `xargs` gates them there
     // instead of worst-casing. In `A | xargs CMD`, xargs injects A's items as CMD's operands (the
     // same idea as `find -exec`'s `{}` binding, sourced from the pipe).
-    let mut stream: Option<String> = None;
+    let (mut stream, mut items): (Option<String>, _) = (None, crate::pathctx::item_shape::UNKNOWN);
     for (stage, cmd) in pipeline.commands.iter().enumerate() {
-        let _stdin = stream.clone().map(crate::pathctx::enter_stdin_repr);
+        let _stdin = stream.clone().map(|r| super::opaque::enter_stdin(r, items));
         acc = acc.combine(super::netargs::with_stdin(pipeline, stage, || cmd_verdict(cmd)));
+        items = super::opaque::stage_shape(cmd, items);
         stream = Some(stage_output_repr(cmd, stream.as_deref()));
     }
     acc
@@ -432,7 +434,7 @@ const UNKNOWN_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
 /// (`input`), used to gate an operand-injecting consumer downstream (`… | xargs cat`). A PRODUCER
 /// that provably emits workspace-bounded paths yields a worktree representative; a line-preserving
 /// FILTER carries `input` through unchanged; everything else worst-cases to `UNKNOWN_ITEM`.
-fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
+pub(super) fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
     let Cmd::Simple(s) = cmd else {
         return UNKNOWN_ITEM.to_string();
     };
@@ -451,7 +453,7 @@ fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
         // `find app/.git | while read f; do echo hi > "$f"; done` wrote into the frozen rung that
         // `echo hi > app/.git/config` refuses. `.git` is exactly the path that reads fine and must
         // not be written, so a read-face test could never see it.
-        "find" | "fd" | "fdfind" => {
+        "find" | "fd" | "fdfind" if super::opaque::prints_only_paths(&args) => {
             let roots = find_roots(&args);
             let base = roots
                 .iter()
@@ -646,7 +648,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             let item_strs: Vec<String> = items.iter().map(Word::eval).collect();
             let body_v = match crate::engine::resolve::loop_reprs(&item_strs) {
                 Some((read_repr, write_repr)) => {
-                    let _g = crate::pathctx::enter_loop_var(var.clone(), read_repr, write_repr);
+                    let _g = super::opaque::enter_loop(var, items, read_repr, write_repr);
                     super::netargs::with_loop(var, items, body, || script_verdict(body))
                 }
                 None => script_verdict(body),
@@ -663,11 +665,8 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             // exactly as the `for`-loop binds its list var, so `find ./src | while read f; do cat "$f"`
             // reads the worktree instead of fail-closing on the bare `$f`. Only when a modeled source
             // set the stdin repr; otherwise the vars stay unbound (fail-closed).
-            let _binds: Vec<crate::pathctx::LoopGuard> = match crate::pathctx::stdin_item_repr() {
-                Some(repr) => read_loop_vars(cond)
-                    .into_iter()
-                    .map(|v| crate::pathctx::enter_loop_var(v, repr.clone(), repr.clone()))
-                    .collect(),
+            let _binds: Vec<_> = match crate::pathctx::stdin_item_repr() {
+                Some(repr) => read_loop_vars(cond).into_iter().map(|v| super::opaque::enter_read_var(v, &repr)).collect(),
                 None => Vec::new(),
             };
             cond_v.combine(script_verdict(body)).combine(redir_v)
@@ -803,53 +802,16 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
     // Brace-expand each word (`cat {/etc/shadow,x}` → two operands) so every alternative bash
     // would run is classified — a braced word must not hide a system path from the gate.
-    let tokens: Vec<Token> = cmd.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
-    if tokens.is_empty() {
+    let words: Vec<Vec<Token>> = cmd.words.iter().map(|w| w.expand().into_iter().map(Token::from_raw).collect()).collect();
+    if words.iter().all(Vec::is_empty) {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    if smuggles_a_flag(cmd) {
+    if super::opaque::smuggles_a_flag(cmd) {
         return Verdict::Denied;
     }
 
-    let cmd_v = super::netargs::with_args(cmd, || leaf_verdict(&tokens));
+    let cmd_v = super::netargs::with_args(cmd, || super::opaque::probed_verdict(cmd, &words, leaf_verdict));
     sub_v.combine(cmd_v).combine(redir_v)
-}
-
-/// Whether an operand hides a FLAG behind an unquoted expansion.
-///
-/// The word-splitting problem again, on the dimension the locus gate cannot see. One CST word
-/// becomes several arguments at run time, and when a piece starts with `-` the command's flag
-/// allowlist was simply never shown it:
-///
-/// ```text
-/// VAR="--exec rm"; fd pat $VAR        ran `rm` on every match
-/// VAR="-exec rm {} ;"; find . $VAR    deleted the tree
-/// ```
-///
-/// Splitting for LOCUS (see `locus::classify_local`) does not help here, because the danger is not
-/// where a path points — it is a capability the grammar would have refused outright.
-///
-/// This refuses rather than re-tokenizing. Re-tokenizing would be more precise, and the machinery
-/// is close at hand (`Word::expand` already turns one word into many for brace expansion) — but a
-/// bound value carries SEPARATE read and write representatives for loop variables, so feeding it
-/// back into tokenization would have to pick a face before the face is known. Refusing costs a
-/// prompt on `VAR="-rf ./sub"; rm $VAR`, which is a rare way to write a command; see TODO.md.
-///
-/// Only UNQUOTED expansions split, so `cat "$VAR"` with a spacey filename is untouched — a quoted
-/// expansion is one word to the shell too.
-fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
-    cmd.words.iter().skip(1).any(|w| {
-        // A top-level `Lit` is the unquoted case; a `DQuote` part is not split by the shell.
-        w.0.iter().any(|part| {
-            let WordPart::Lit(raw) = part else { return false };
-            if !raw.contains('$') {
-                return false;
-            }
-            let expanded = crate::pathctx::expand_vars(raw, false);
-            expanded.split([' ', '\t', '\n']).skip(1).any(|piece| piece.starts_with('-'))
-                || (expanded.split([' ', '\t', '\n']).count() > 1 && expanded.starts_with('-'))
-        })
-    })
 }
 
 /// The command leaf's verdict. The behavioral-capability engine is authoritative for every
@@ -909,7 +871,7 @@ fn arg_is_eval_safe(word: &Word) -> bool {
                     found_safe = true;
                 }
             }
-            WordPart::ProcSub(_) | WordPart::Arith(_) => return false,
+            WordPart::ProcSub(_) | WordPart::Arith(_) | WordPart::AnsiC(_) => return false,
         }
     }
     found_safe
@@ -974,7 +936,7 @@ fn part_is_plain_literal(part: &WordPart) -> bool {
         WordPart::Lit(s) | WordPart::SQuote(s) => s.chars().all(is_bare_literal_char),
         WordPart::Escape(c) => is_bare_literal_char(*c),
         WordPart::DQuote(inner) => word_is_plain_literal(inner),
-        WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => false,
+        WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) | WordPart::AnsiC(_) => false,
     }
 }
 
@@ -1096,10 +1058,10 @@ mod tests {
         // A worktree `in`-list → the body reads/writes the worktree → allowed. The bare `$f`
         // used to fail-closed to machine; now it binds to the list, like find's `{}`→path.
         for cmd in [
-            "for f in *.txt; do cat $f; done",
-            "for f in *.txt; do rm $f; done",
-            "for f in src/*.rs; do grep foo $f; done",
-            "for f in *.log; do sed -i s/a/b/ $f; done",
+            "for f in ./*.txt; do cat \"$f\"; done",
+            "for f in ./*.txt; do rm \"$f\"; done",
+            "for f in src/*.rs; do grep foo \"$f\"; done",
+            "for f in ./*.log; do sed -i s/a/b/ \"$f\"; done",
             "for f in a b c; do cat $f.bak; done",
             "for x in 1 2 3; do rm $x; done",
             "for d in a b; do for f in $d/x; do cat $f; done; done", // nested loops compose
@@ -1118,6 +1080,13 @@ mod tests {
             // read-worst ≠ write-worst: reading must worst-case the credential store even though
             // the write-worst item is /etc/hosts — a single representative would be unsound.
             "for f in /etc/hosts ~/.aws/credentials; do cat $f; done",
+            // A glob can match a file named `-n` or `--files0-from=x.txt`, and an unquoted use
+            // splits a name at its blanks: either puts a flag where the command reads one.
+            "for f in *.txt; do cat \"$f\"; done",
+            "for f in *.txt; do rm $f; done",
+            "for f in src/*.rs; do grep foo $f; done",
+            "for f in -delete; do find / $f; done",
+            "for f in -delete; do find / \"$f\"; done",
         ] {
             assert!(!check(cmd), "non-worktree loop should deny: {cmd}");
         }
@@ -1183,11 +1152,10 @@ mod tests {
         // rule: the deny corpus only asserts that hot roots are refused, which a blanket refusal
         // would satisfy vacuously — so without these, reverting `loop_reprs` to its old
         // `__SAFE_CHAINS_` prefix test would silently re-deny the whole form and stay green.
-        loop_over_bounded_sub: "for f in $(fd a app/); do cat $f; done",
-        loop_over_bounded_sub_quoted: "for f in $(fd a app/); do cat \"$f\"; done",
         loop_over_bounded_sub_write: "for f in $(fd a app/); do echo hi > $f; done",
-        loop_over_bounded_sub_pipeline: "for f in $(fd a app/ | head -3); do cat $f; done",
         loop_over_pwd: "for f in $(pwd); do cat $f; done",
+        loop_over_pwd_quoted: "for f in $(pwd); do cat \"$f/x\"; done",
+        loop_over_pwd_pipeline: "for f in $(pwd | head -3); do cat $f; done",
 
         case_single_arm: "case x in x) echo a;; esac",
         case_alternation: "case $x in a|b) ls;; *) echo n;; esac",
@@ -1290,6 +1258,11 @@ mod tests {
         loop_over_home_sub: "for f in $(fd a ~); do cat $f; done",
         loop_over_undeclared_sub: "for f in $(hostname); do cat $f; done",
         loop_over_bounded_sub_escaping_body: "for f in $(pwd); do cat $f/../../etc/shadow; done",
+        // An unquoted list splits file names at their blanks, so an item can be `-n` or
+        // `--files0-from=x` however bounded the paths are.
+        loop_over_bounded_sub: "for f in $(fd a app/); do cat $f; done",
+        loop_over_bounded_sub_quoted: "for f in $(fd a app/); do cat \"$f\"; done",
+        loop_over_bounded_sub_pipeline: "for f in $(fd a app/ | head -3); do cat $f; done",
 
         // A case is only as safe as its worst arm — which arm runs is a runtime decision.
         case_unsafe_only_arm: "case x in *) rm -rf /;; esac",

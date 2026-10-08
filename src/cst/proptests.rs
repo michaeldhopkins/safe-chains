@@ -721,8 +721,8 @@ mod resolution {
         let _w = workspace();
         // A line-preserving filter (head/tail/sort/uniq/cat/tee) between a producer and an injecting
         // consumer must carry the producer's item locus THROUGH — else xargs worst-cases and denies.
-        assert!(allowed("find /work -type f | head -1 | xargs cat"), "head passes find's locus");
-        assert!(allowed("find ./src | sort | uniq | xargs cat"), "sort|uniq chain passes through");
+        assert!(allowed("find /work -type f | head -1 | xargs -I{} cat {}"), "head passes find's locus");
+        assert!(allowed("find ./src | sort | uniq | xargs -I{} cat {}"), "sort|uniq chain passes through");
         // …but a TRANSFORMING filter must NOT (it can rewrite a line to any path — a bypass).
         assert!(!allowed("find ./src | sed s@.*@/etc/shadow@ | xargs cat"), "sed rewrite must not pass through");
         assert!(!allowed("find ./src | head -1 realfile | xargs cat"), "head reading a FILE isn't a stdin passthrough");

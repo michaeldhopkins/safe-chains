@@ -3,7 +3,6 @@
 # comment\necho hello	inert
 # just a comment	inert
 $'\\x72\\x6d' -rf /	denied
-$'git' log	denied
 $(echo rm) -rf /	denied
 $(rm -rf /)	denied
 $cmd log	denied

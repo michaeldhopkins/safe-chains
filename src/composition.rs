@@ -193,10 +193,10 @@ mod tests {
     const SHOULD_ALLOW: &[&str] = &[
         "find . -exec cat {} \\;", "find ./src -exec grep foo {} \\;", "find . -name '*.tmp' -exec rm {} \\;", "find . -exec rm {} \\;",
         "find src -exec head {} \\;", "time rm ./stale.log", "time cat ./notes.md", "nice cat ./x", "env FOO=1 cat ./x",
-        "xargs -I{} basename {}",
-        // flow-aware: a workspace-bounded pipe source keeps a file-reading inner allowed
-        // (a BARE `xargs cat` — no source — now correctly denies; see the shell handler tests).
-        "find . | xargs cat", "find ./src -name x | xargs grep foo", "ls | xargs wc -l",
+        // flow-aware: a workspace-bounded pipe source keeps a file-reading inner allowed, its items
+        // whole and each beginning with find's root (a BARE `xargs cat` — no source — denies, and
+        // so does an item that could be a flag; see the shell handler tests).
+        "find . -print0 | xargs -0 cat", "find ./src -name x | xargs -I{} grep foo {}", "find . -print0 | xargs -0 wc -l",
     ];
 
     #[test]

@@ -177,7 +177,7 @@ pub(super) fn glob_presents_unlisted_flag(
         if s == "--" {
             break;
         }
-        if !s.starts_with('-') || s == "-" {
+        if !s.starts_with('-') || s == "-" || crate::cst::opaque::probe_is_value(tokens, idx, valued) {
             continue;
         }
         let head = s.split_once('=').map_or(s, |(f, _)| f);
@@ -230,7 +230,7 @@ fn presents_unlisted_flag(tokens: &[Token], sub: &types::SubSpec) -> bool {
         if s == "--" {
             break;
         }
-        if !s.starts_with('-') || s == "-" {
+        if !s.starts_with('-') || s == "-" || crate::cst::opaque::probe_is_value(tokens, idx, &sub.allowed_valued) {
             continue;
         }
         let head = s.split_once('=').map_or(s, |(f, _)| f);

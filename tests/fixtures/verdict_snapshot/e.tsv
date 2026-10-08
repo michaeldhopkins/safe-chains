@@ -279,9 +279,12 @@ echo --version	inert
 echo -E	inert
 echo -E -e	inert
 echo -E x	inert
+echo -delete | xargs -I{} find / {}	denied
+echo -delete | xargs find /	denied
 echo -e	inert
 echo -n	inert
 echo -n done	inert
+echo ./a ./b | xargs cat	safe-read
 echo /etc/shadow | xargs cat	denied
 echo `rm -rf /`	denied
 echo a | { read x; echo $x; }	inert

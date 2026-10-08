@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 1cb996b5975e275e80130856ff9d9e30aa4f9f5b25db5abd8cd7b528b447f1f8 # shrinks to pick = Index(6646380978580205333), at = 5
+cc 05edab9c1d19e034eaa31f3972efcd639ebed635087dc235bf43c78abd5f41c2 # shrinks to pick = Index(7062864381937711673), at = 3
+cc 14bc35a19e7712b9e3f939d53344bd6222cc2e1f70100fbb7d19c1d8cd58d814 # shrinks to pick = Index(503250779056986827), at = 5
+cc b32f3ffefe09274ad72b7e403f36f205d4baaade74a01fa1ee114572907d9b28 # shrinks to pick = Index(8867625796486905810), at = 5

@@ -7113,7 +7113,6 @@ csrutil status -h	inert
 csrutil status x	inert
 csrutil x	denied
 ctags	denied
-ctags *.c	safe-write
 ctags --help	denied
 ctags --version	denied
 ctags -B	safe-write
@@ -7129,6 +7128,7 @@ ctags -u	safe-write
 ctags -v	safe-write
 ctags -w	safe-write
 ctags -x	safe-write
+ctags src/*.c	safe-write
 ctags x	safe-write
 ctf_insert	denied
 ctf_insert --help	denied

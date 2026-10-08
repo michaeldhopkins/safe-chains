@@ -6,8 +6,9 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
 - **Targets** (`fuzz/fuzz_targets/`; each file's header states its properties in full):
   - `parse` — `is_safe_command` on arbitrary bytes: never panics, never hangs, across parse → CST →
     engine → handlers. It **discards the verdict**, so it finds availability bugs only.
-  - `equivalence` — a semantics-preserving respelling (flag forms, env-var forms) cannot change the
-    verdict.
+  - `equivalence` — a semantics-preserving respelling (flag forms, env-var forms, a value spelled
+    byte by byte in `$'\xHH'`) cannot change the verdict, and a word whose value is unknown (`$X`,
+    `$(…)`, a glob) is never approved where a flag it could be is refused.
   - `hook_envelope` — the `targets/*` hook I/O never panics and never emits a grant it was not
     asked for.
   - `explain_render` — the explanation describes the verdict that was enforced, and a command

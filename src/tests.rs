@@ -393,7 +393,7 @@ safe! {
 
     dwarfdump_help2: "dwarfdump --help",
     indent_format: "indent file.c",
-    ctags_create: "ctags *.c",
+    ctags_create: "ctags src/*.c",
 
     bison_grammar: "bison -d grammar.y",
     flex_lex: "flex scan.l",
@@ -752,7 +752,7 @@ safe! {
     pipeline_xxd_head: "xxd file | head -20",
     pipeline_find_wc: "find . -name '*.py' | wc -l",
     pipeline_find_sort_head: "find . -name '*.py' | sort | head -10",
-    pipeline_find_xargs_grep: "find . -name '*.py' | xargs grep pattern",
+    pipeline_find_xargs_grep: "find . -name '*.py' -print0 | xargs -0 grep pattern",
     pipeline_pip_grep: "pip list | grep requests",
     pipeline_npm_grep: "npm list | grep react",
     pipeline_ps_grep: "ps aux | grep python",
@@ -763,8 +763,8 @@ safe! {
     for_empty_body: "for x in 1 2 3; do; done",
     // loop-variable binding: `$f` inherits the `in`-list's worktree locus (the {}→path
     // binding, one layer up), so a loop over a worktree glob reads/writes the worktree.
-    for_loop_variable_read: "for f in *.txt; do cat $f | grep pattern; done",
-    brace_group_variable_write: "for f in *.txt; do { echo $f; cat $f; } > combined.txt; done",
+    for_loop_variable_read: "for f in ./*.txt; do cat \"$f\" | grep pattern; done",
+    brace_group_variable_write: "for f in ./*.txt; do { echo \"$f\"; cat \"$f\"; } > combined.txt; done",
     for_loop_worktree_rm_redirect: "for f in a b; do rm -rf $f; done 2>/dev/null",
     for_rm_worktree: "for x in 1 2 3; do rm $x; done",
     // engine-authoritative: sed -i on a worktree file is write-local; piping to head is inert.
@@ -1473,7 +1473,6 @@ denied! {
     unicode_zwnj_in_cmd: "g\u{200C}it log",
     unicode_combining_in_cmd: "g\u{0300}it log",
     ansi_c_quote_rm: "$'\\x72\\x6d' -rf /",
-    ansi_c_quote_git: "$'git' log",
     eval_rm: "eval 'rm -rf /'",
     eval_git: "eval 'git log'",
     cmd_sub_in_cmd_position: "$(echo rm) -rf /",
@@ -1984,12 +1983,12 @@ fn brace_expansion_checks_every_alternative() {
 fn operand_injection_propagates_source_locus() {
     // Sources whose emitted items point OUTSIDE the workspace → injected operand must deny.
     const HOT_SOURCES: &[&str] = &["echo /etc/shadow", "echo ~/.ssh/id_rsa", "find /", "find ~", "cat listfile"];
-    // Sources provably bounded to the workspace → injected operand must stay allowed.
-    const WS_SOURCES: &[&str] = &["find ./src", "find .", "ls", "git ls-files", "echo ./ok"];
+    // Sources provably bounded to the workspace, whose items cannot be flags → must stay allowed.
+    const WS_SOURCES: &[&str] = &["find ./src", "find .", "echo ./ok"];
     // Inner commands that READ their operand as a path (so the injected locus matters).
     const READERS: &[&str] = &["cat", "grep x", "head", "od", "base64"];
 
-    let forms = |src: &str, reader: &str| [format!("{src} | xargs {reader}"), format!("{src} | xargs -I{{}} {reader} {{}}")];
+    let forms = |src: &str, reader: &str| [format!("{src} | xargs -I{{}} {reader} {{}}"), format!("{src} | xargs {reader}")];
     let mut fail = Vec::new();
     for reader in READERS {
         for src in HOT_SOURCES {
@@ -2000,8 +1999,8 @@ fn operand_injection_propagates_source_locus() {
             }
         }
         for src in WS_SOURCES {
-            for cmd in forms(src, reader) {
-                if !check(&cmd) {
+            for cmd in &forms(src, reader)[..if src.starts_with("find") { 1 } else { 2 }] {
+                if !check(cmd) {
                     fail.push(format!("  workspace source denied: {cmd}"));
                 }
             }

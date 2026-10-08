@@ -1,6 +1,7 @@
 #![no_main]
 
-//! METAMORPHIC target: a semantics-preserving respelling must not change the verdict.
+//! METAMORPHIC target: a semantics-preserving respelling must not change the verdict, and a word
+//! the classifier cannot read must not be approved where a flag it could be is refused.
 //!
 //! The `parse` target discards the verdict, so it can only find availability bugs. This one asserts
 //! a property OF the verdict, which is what makes it able to find a FAIL-OPEN. It needs no oracle:
@@ -103,10 +104,58 @@ fn is_transparent(v: &str) -> bool {
         })
 }
 
+/// Bash decodes `$'…'` byte for byte, so a value with every byte spelled `\xHH` is the same word
+/// as the value single-quoted. Any value at all, which is what makes this a test of the decoder:
+/// the two spellings share no character.
+const ANSI_C: &[&str] = &["cat {v}", "find / {v}", "git {v} log", "rm ./a {v}"];
+
+fn ansi_c_spellings_agree(value: &str) {
+    if value.contains(['\'', '\0']) || value.len() > 200 {
+        return;
+    }
+    let hex: String = value.bytes().map(|b| format!("\\x{b:02x}")).collect();
+    for template in ANSI_C {
+        let quoted = template.replace("{v}", &format!("'{value}'"));
+        let ansi = template.replace("{v}", &format!("$'{hex}'"));
+        let (vq, va) = (safe_chains::is_safe_command(&quoted), safe_chains::is_safe_command(&ansi));
+        assert_eq!(vq, va, "one word, two verdicts:\n  `{quoted}` -> {vq}\n  `{ansi}` -> {va}");
+    }
+}
+
+/// Positions where a word is read as a flag or an operand, never as the value of a flag.
+const FLAG_SLOTS: &[&str] = &["find / {v}", "rm ./a {v}", "sort {v} ./f", "git log {v}", "cat {v}", "grep foo {v}", "sed s/a/b/ {v}"];
+
+/// Words whose value the classifier cannot read. Each could be the flag, so none may be approved
+/// where the flag is refused. Globs only match names, which hold no `/`.
+const UNKNOWN: &[&str] = &["$X", "\"$X\"", "${X}", "$(cat ./x)", "\"$(cat ./x)\"", "`cat ./x`", "$X-x", "\"$@\""];
+const GLOBS: &[&str] = &["*", "?", "[ab]"];
+
+/// MONOTONIC, not an equivalence: an unknown word is never more permissive than a flag it could
+/// be. The fuzzer mutates the flag.
+fn unknown_words_are_no_looser_than_a_flag(value: &str) {
+    let shell_special = |c: char| c.is_control() || c.is_whitespace() || "'\"`\\$();&|<>*?[]{}!#~".contains(c);
+    if !value.starts_with('-') || value.len() > 64 || value.chars().any(shell_special) {
+        return;
+    }
+    let number = value.len() > 1 && value[1..].bytes().all(|b| b.is_ascii_digit());
+    let globs = GLOBS.iter().filter(|_| !value.contains('/'));
+    for slot in FLAG_SLOTS {
+        if safe_chains::is_safe_command(&slot.replace("{v}", value)) {
+            continue;
+        }
+        for unknown in UNKNOWN.iter().chain(globs.clone()).chain(number.then_some(&"$(($N))")) {
+            let cmd = slot.replace("{v}", unknown);
+            assert!(!safe_chains::is_safe_command(&cmd), "`{cmd}` approved where `{}` is refused", slot.replace("{v}", value));
+        }
+    }
+}
+
 fuzz_target!(|data: &[u8]| {
     let Ok(value) = std::str::from_utf8(data) else {
         return;
     };
+    ansi_c_spellings_agree(value);
+    unknown_words_are_no_looser_than_a_flag(value);
     if !is_transparent(value) {
         return;
     }

@@ -757,12 +757,14 @@ find . -mtime -7 -delete	safe-write
 find . -mtime -7 -type f	inert
 find . -name '*.log' -print	inert
 find . -name '*.log' -print0	inert
-find . -name '*.log' | xargs cat	safe-read
+find . -name '*.log' -print0 | xargs -0 cat	safe-read
+find . -name '*.log' | xargs -I{} cat {}	safe-read
+find . -name '*.log' | xargs cat	denied
 find . -name '*.py' -exec grep pattern {} +	safe-read
+find . -name '*.py' -print0 | xargs -0 grep pattern	safe-read
 find . -name '*.py' > listing.txt	safe-write
 find . -name '*.py' | sort | head -10	inert
 find . -name '*.py' | wc -l	inert
-find . -name '*.py' | xargs grep pattern	safe-read
 find . -name '*.rb'	inert
 find . -name '*.rb' -exec grep -l pattern {} +	safe-read
 find . -name '*.rb' -exec grep -l pattern {} \\;	safe-read
@@ -1880,16 +1882,18 @@ footprint x	inert
 for c in a b c; do out=$(jj diff -r $c --summary); if [ -n "$out" ]; then echo "$c: $out"; fi; done	inert
 for c in a b; do result=$(jj diff -r $c --git | grep -c pattern || echo 0); if [ "$result" -gt 0 ]; then desc=$(jj log --no-graph -r $c -T template); echo "$c: $desc"; fi; done	inert
 for f in $(fd a /etc); do cat $f; done	denied
-for f in $(fd a app/ | head -3); do cat $f; done	safe-read
-for f in $(fd a app/); do cat "$f"; done	safe-read
-for f in $(fd a app/); do cat $f; done	safe-read
+for f in $(fd a app/ | head -3); do cat $f; done	denied
+for f in $(fd a app/); do cat "$f"; done	denied
+for f in $(fd a app/); do cat $f; done	denied
 for f in $(fd a app/); do echo hi > $f; done	safe-write
 for f in $(fd a ~); do cat $f; done	denied
 for f in $(hostname); do cat $f; done	denied
+for f in $(pwd | head -3); do cat $f; done	safe-read
+for f in $(pwd); do cat "$f/x"; done	safe-read
 for f in $(pwd); do cat $f/../../etc/shadow; done	denied
 for f in $(pwd); do cat $f; done	safe-read
-for f in *.txt; do cat $f | grep pattern; done	safe-read
-for f in *.txt; do { echo $f; cat $f; } > combined.txt; done	safe-write
+for f in ./*.txt; do cat "$f" | grep pattern; done	safe-read
+for f in ./*.txt; do { echo "$f"; cat "$f"; } > combined.txt; done	safe-write
 for f in a b; do echo $f; done 2>/dev/null	inert
 for f in a b; do echo $f; done > $(evil)	denied
 for f in a b; do echo $f; done > out.txt	safe-write

@@ -110,14 +110,14 @@ fn prints_literal_text(cmd: &Cmd) -> bool {
 }
 
 /// Whether the shell fills in any part of `word` at run time. Every `$` in unquoted or
-/// double-quoted text counts (`${X:-y}`, `$@`, `$'…'` and a stray `$` alike), except a plain `$name`
+/// double-quoted text counts (`${X:-y}`, `$@` and a stray `$` alike), except a plain `$name`
 /// or `${name}` naming a `for` variable whose list was literal text.
 pub(crate) fn word_carries(word: &Word) -> bool {
     word.0.iter().any(|part| match part {
         WordPart::Lit(s) => text_carries(s),
         WordPart::DQuote(inner) => word_carries(inner),
         WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => true,
-        WordPart::SQuote(_) | WordPart::Escape(_) => false,
+        WordPart::SQuote(_) | WordPart::AnsiC(_) | WordPart::Escape(_) => false,
     })
 }
 
@@ -188,7 +188,7 @@ fn is_plain_item(word: &Word) -> bool {
     word.0.iter().all(|part| match part {
         WordPart::Lit(s) => !s.contains(['$', '*', '?', '[', '{', '~']),
         WordPart::DQuote(inner) => is_plain_item(inner),
-        WordPart::SQuote(_) | WordPart::Escape(_) => true,
+        WordPart::SQuote(_) | WordPart::AnsiC(_) | WordPart::Escape(_) => true,
         WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => false,
     })
 }

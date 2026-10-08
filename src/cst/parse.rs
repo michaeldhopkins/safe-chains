@@ -1,4 +1,5 @@
 use super::budget::{self, DepthGuard};
+use super::sub_close::find_sub_close;
 use super::*;
 use winnow::ModalResult;
 use winnow::combinator::{alt, delimited, not, opt, preceded, repeat, separated, terminated};
@@ -659,8 +660,18 @@ fn word_part(input: &mut &str) -> ModalResult<WordPart> {
     if is_word_boundary(input.as_bytes()[0] as char) {
         return backtrack();
     }
-    alt((single_quoted, double_quoted, arith_sub, cmd_sub, backtick_part, escaped, dollar_lit(is_word_literal), lit(is_word_literal)))
-        .parse_next(input)
+    alt((
+        single_quoted,
+        double_quoted,
+        dollar_quoted,
+        arith_sub,
+        cmd_sub,
+        backtick_part,
+        escaped,
+        dollar_lit(is_word_literal),
+        lit(is_word_literal),
+    ))
+    .parse_next(input)
 }
 
 fn single_quoted(input: &mut &str) -> ModalResult<WordPart> {
@@ -675,61 +686,8 @@ fn double_quoted(input: &mut &str) -> ModalResult<WordPart> {
     delimited('"', repeat(0.., dq_part).map(Word), '"').map(WordPart::DQuote).parse_next(input)
 }
 
-/// Byte offset of the `)` that closes a substitution body starting at `body[0]` — the first `)` at
-/// paren-depth zero — or `None` if it is never closed. Quote (`'…'`, `"…"`), backtick, and backslash
-/// spans are skipped so a `)` inside them does not count, mirroring how the grammar's own
-/// `single_quoted`/`double_quoted`/`backtick`/`escaped` parsers treat those regions. This is what
-/// keeps `cmd_sub`/`proc_sub` linear: the interior is parsed only once, over a bounded slice, instead
-/// of the old `delimited(script, ')')` shape that recursed into the tail BEFORE knowing a close even
-/// existed — the source of the `a$(a<(a` × N exponential.
-fn find_sub_close(body: &str) -> Option<usize> {
-    let b = body.as_bytes();
-    let mut i = 0;
-    let mut depth: usize = 0;
-    while i < b.len() {
-        match b[i] {
-            b'\\' => i += 1, // escape: skip the next byte too (the trailing `+= 1` handles it)
-            b'\'' => {
-                i += 1;
-                while i < b.len() && b[i] != b'\'' {
-                    i += 1;
-                }
-                if i >= b.len() {
-                    return None;
-                }
-            }
-            b'"' => {
-                i += 1;
-                while i < b.len() && b[i] != b'"' {
-                    i += if b[i] == b'\\' { 2 } else { 1 };
-                }
-                if i >= b.len() {
-                    return None;
-                }
-            }
-            b'`' => {
-                i += 1;
-                while i < b.len() && b[i] != b'`' {
-                    // `bt_escape` treats `\<any>` inside backticks as a literal, so an escaped
-                    // backtick does NOT close the span — skip the escaped byte too.
-                    i += if b[i] == b'\\' { 2 } else { 1 };
-                }
-                if i >= b.len() {
-                    return None;
-                }
-            }
-            b'(' => depth += 1,
-            b')' => {
-                if depth == 0 {
-                    return Some(i);
-                }
-                depth -= 1;
-            }
-            _ => {}
-        }
-        i += 1;
-    }
-    None
+fn dollar_quoted(input: &mut &str) -> ModalResult<WordPart> {
+    alt((super::ansi_c::ansi_c_quoted, |i: &mut &str| super::ansi_c::locale_quoted(i, double_quoted))).parse_next(input)
 }
 
 /// Parse a substitution body (`$( … )`, `<( … )`, `>( … )`) as a full script.
@@ -1143,8 +1101,18 @@ fn bracket_word_part(input: &mut &str) -> ModalResult<WordPart> {
     if at_double_bracket_end(input) {
         return backtrack();
     }
-    alt((single_quoted, double_quoted, arith_sub, cmd_sub, backtick_part, escaped, dollar_lit(is_bracket_literal), bracket_lit))
-        .parse_next(input)
+    alt((
+        single_quoted,
+        double_quoted,
+        dollar_quoted,
+        arith_sub,
+        cmd_sub,
+        backtick_part,
+        escaped,
+        dollar_lit(is_bracket_literal),
+        bracket_lit,
+    ))
+    .parse_next(input)
 }
 
 fn is_bracket_literal(c: char) -> bool {

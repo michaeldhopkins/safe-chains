@@ -17,8 +17,10 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 
 mod home;
+pub mod item_shape;
 mod lexical;
 use home::home_path_inside_root;
+pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
 use lexical::{expand_home, express_relative_to_root, lexical_join};
 
 /// The working directory and project root for the command under evaluation. Both optional:
