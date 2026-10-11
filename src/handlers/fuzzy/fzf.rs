@@ -164,3 +164,90 @@ mod tests {
         fzf_history: "fzf --history /tmp/fzf-history",
     }
 }
+
+#[cfg(test)]
+mod property_tests {
+    use proptest::prelude::*;
+
+    use super::{dispatch, is_safe_fzf};
+    use crate::parse::Token;
+    use crate::verdict::Verdict;
+
+    /// Build a token slice from a fixed program name plus arbitrary positional/flag-shaped tokens.
+    /// Filter out the program token from the generated payload so the slice is always well-formed
+    /// (a leading `fzf` we append ourselves, plus any number of stray `--`/value-flag shapes).
+    fn tokens_with_program(payload: Vec<String>) -> Vec<Token> {
+        let mut out: Vec<Token> = Vec::with_capacity(payload.len() + 1);
+        out.push(Token::from_raw("fzf".to_string()));
+        for s in payload {
+            out.push(Token::from_raw(s));
+        }
+        out
+    }
+
+    proptest! {
+        /// `bind_value_is_safe` IS the single rule `!contains('(')`: for every input string its
+        /// verdict matches the negation of "has an opening paren". Anything else (any other
+        /// punctuation, any other bracket, quotes, semicolons, shell metacharacters) is irrelevant
+        /// to the function — only the `(` character is. This pins the complete specification.
+        #[test]
+        fn bind_value_is_safe_equals_not_contains_paren(value in ".*") {
+            prop_assert_eq!(super::bind_value_is_safe(&value), !value.contains('('));
+        }
+
+        /// `dispatch` is a tiny router whose only branch is `"fzf"`. For every other program name
+        /// it must return `None`, regardless of how the token stream looks — so a future addition
+        /// of a sibling command cannot accidentally swallow `fzf`-like shapes and the router
+        /// cannot start claiming work for an unrelated program.
+        #[test]
+        fn dispatch_returns_none_for_any_non_fzf_program(
+            cmd in "[a-z]{1,8}",
+            payload in proptest::collection::vec(any::<String>(), 0..8),
+        ) {
+            prop_assume!(cmd != "fzf");
+            let toks: Vec<Token> = std::iter::once(Token::from_raw(cmd.clone()))
+                .chain(payload.into_iter().map(Token::from_raw))
+                .collect();
+            prop_assert!(dispatch(&cmd, &toks).is_none());
+        }
+
+        /// When the router does match `"fzf"`, the verdict it hands back is exactly the verdict
+        /// the dedicated `is_safe_fzf` checker computes on the same token slice — no clamping, no
+        /// shadow level, no extra wrapping. The router is a pass-through to that one function,
+        /// not a place where a verdict is re-derived.
+        #[test]
+        fn dispatch_for_fzf_matches_is_safe_fzf(payload in proptest::collection::vec(any::<String>(), 0..8)) {
+            let toks = tokens_with_program(payload);
+            prop_assert_eq!(dispatch("fzf", &toks), Some(is_safe_fzf(&toks)));
+        }
+
+        /// The `--bind` value rule is a hard cut: a `(` anywhere in the bind value DENIES,
+        /// whatever other tokens ride in alongside it — inert allowlist flags, valued flags,
+        /// random positionals, empty trailing tokens, anything. The function short-circuits on
+        /// that one character before any other check runs, so the rule cannot leak through a
+        /// well-formed command line.
+        #[test]
+        fn bind_with_paren_dominates_other_flags(
+            prefix in ".*",
+            suffix in ".*",
+            extra in proptest::collection::vec(any::<String>(), 0..6),
+        ) {
+            // Force the bind value to contain `(` so the rejection ratio stays bounded; the
+            // property is "contains `(` ⇒ deny", so any test string must include it.
+            let bind_value = format!("{prefix}({suffix}");
+            // Space-form: `fzf --bind <bind_value> <extra...>`.
+            let mut space_form = tokens_with_program(vec!["--bind".into(), bind_value.clone()]);
+            for s in &extra {
+                space_form.push(Token::from_raw(s.clone()));
+            }
+            // Equal-form: `fzf --bind=<bind_value> <extra...>`.
+            let eq_arg = format!("--bind={bind_value}");
+            let mut eq_form = tokens_with_program(vec![eq_arg]);
+            for s in &extra {
+                eq_form.push(Token::from_raw(s.clone()));
+            }
+            prop_assert_eq!(is_safe_fzf(&space_form), Verdict::Denied);
+            prop_assert_eq!(is_safe_fzf(&eq_form), Verdict::Denied);
+        }
+    }
+}

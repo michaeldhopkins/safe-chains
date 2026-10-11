@@ -27,7 +27,6 @@ owed = [
   "src/handlers/coreutils/tar.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/fuzzy/fzf.rs",
   "src/handlers/fuzzy/sk.rs",
   "src/handlers/jvm/jar.rs",
   "src/handlers/jvm/mvn.rs",
@@ -193,7 +192,12 @@ owed = [
 "src/handlers/fd.rs" = ["fd_exec_follows_the_inner_command_locus", "fd_batch_without_placeholder_gates_the_base"]
 "src/handlers/forges/gh.rs" = []
 "src/handlers/forges/glab.rs" = []
-"src/handlers/fuzzy/fzf.rs" = []
+"src/handlers/fuzzy/fzf.rs" = [
+  "bind_value_is_safe_equals_not_contains_paren",
+  "dispatch_returns_none_for_any_non_fzf_program",
+  "dispatch_for_fzf_matches_is_safe_fzf",
+  "bind_with_paren_dominates_other_flags",
+]
 "src/handlers/fuzzy/sk.rs" = []
 "src/handlers/interpreter.rs" = ["src/handler_property_tests.rs::interpreter_commands_deny_shell_escapes"]
 "src/handlers/jvm/jar.rs" = []
