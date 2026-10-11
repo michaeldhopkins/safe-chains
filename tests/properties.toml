@@ -30,7 +30,6 @@ owed = [
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
-  "src/handlers/wrappers.rs",
   "src/parse.rs",
   "src/refusal.rs",
   "src/registry/build.rs",
@@ -267,7 +266,12 @@ owed = [
   "random_bare_word_is_denied",
 ]
 "src/handlers/vcs/git.rs" = ["no_route_to_git_config_switches_off_a_safety_check"]
-"src/handlers/wrappers.rs" = []
+"src/handlers/wrappers.rs" = [
+  "dispatch_unknown_command_returns_none",
+  "dispatch_env_matches_is_safe_env",
+  "dispatch_hyperfine_matches_is_safe_hyperfine",
+  "is_safe_env_assignment_loop_combines_assignment_verdict",
+]
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",

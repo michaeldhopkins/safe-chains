@@ -118,7 +118,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
+    use proptest::prelude::*;
+
     use crate::is_safe_command;
+    use crate::parse::Token;
+    use crate::verdict::{SafetyLevel, Verdict};
 
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
@@ -190,5 +194,96 @@ mod tests {
         env_unknown_short_flag_denied: "env -x FOO=bar ls",
         hyperfine_unknown_flag_denied: "hyperfine --xyzzy 'ls'",
         hyperfine_unknown_eq_flag_denied: "hyperfine --xyzzy=foo 'ls'",
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(500))]
+
+        /// INVARIANT (dispatch-table closure). `dispatch` only forwards to the two wrapper
+        /// handlers it is wired to (`env` and `hyperfine`). For every OTHER command name — any
+        /// ASCII string the gate might be asked about — it returns `None`, leaving the verdict
+        /// to the engine / registry. A regression that added or removed a wired name without
+        /// updating both the dispatch arm and the handlers that match it would flip this.
+        #[test]
+        fn dispatch_unknown_command_returns_none(
+            name in "[a-zA-Z][a-zA-Z0-9_-]{0,12}",
+            tail in proptest::collection::vec(any::<String>(), 0..4),
+        ) {
+            prop_assume!(name != "env" && name != "hyperfine");
+            let tokens: Vec<Token> = std::iter::once(Token::from_test(&name))
+                .chain(tail.into_iter().map(|s| Token::from_test(&s)))
+                .collect();
+            prop_assert!(
+                super::dispatch(&name, &tokens).is_none(),
+                "dispatch({:?}, …) leaked Some(_) for an unwired command", name
+            );
+        }
+
+        /// INVARIANT (dispatch forwarding for `env`). The `env` arm of `dispatch` is a thin
+        /// pass-through to `is_safe_env`. For ANY token list the two must agree, including the
+        /// case where the wrapper accepts and the case where it denies. A regression that
+        /// replaced the call with a different function (or applied a transform on the way in)
+        /// would break the equality in exactly one direction.
+        #[test]
+        fn dispatch_env_matches_is_safe_env(
+            tail in proptest::collection::vec(any::<String>(), 0..6),
+        ) {
+            let tokens: Vec<Token> = std::iter::once(Token::from_test("env"))
+                .chain(tail.into_iter().map(|s| Token::from_test(&s)))
+                .collect();
+            prop_assert_eq!(
+                super::dispatch("env", &tokens),
+                Some(super::is_safe_env(&tokens)),
+                "dispatch(\"env\", …) drifted from is_safe_env"
+            );
+        }
+
+        /// INVARIANT (dispatch forwarding for `hyperfine`). Same closure as the `env` case but
+        /// for the second wired command — pinning both arms of the match independently so a
+        /// regression that touched only one is caught here.
+        #[test]
+        fn dispatch_hyperfine_matches_is_safe_hyperfine(
+            tail in proptest::collection::vec(any::<String>(), 0..6),
+        ) {
+            let tokens: Vec<Token> = std::iter::once(Token::from_test("hyperfine"))
+                .chain(tail.into_iter().map(|s| Token::from_test(&s)))
+                .collect();
+            prop_assert_eq!(
+                super::dispatch("hyperfine", &tokens),
+                Some(super::is_safe_hyperfine(&tokens)),
+                "dispatch(\"hyperfine\", …) drifted from is_safe_hyperfine"
+            );
+        }
+
+        /// ORACLE (assignment-loop = fold over `assignment_verdict`). The `env` handler, when
+        /// fed only recognized flags followed by `KEY=VALUE` pairs and NO command, must
+        /// produce exactly the reduce-combine (starting from `Allowed(Inert)`) of
+        /// `assignment_verdict` for each pair. The names are drawn from the unlisted prefix
+        /// `XX…` so `assignment_verdict` itself collapses to `Allowed(Inert)` for every pair
+        /// and the property pins the loop's start value, its combine operator, and the fact
+        /// that the function does not over-merge the trailing `Allowed(Inert)` (e.g. by also
+        /// classifying the empty tail). A regression that swallowed a token, started from
+        /// `Denied`, or used `.min` instead of `.max` for the level would break this.
+        #[test]
+        fn is_safe_env_assignment_loop_combines_assignment_verdict(
+            pairs in proptest::collection::vec(
+                    ("XX[a-z]{1,4}", "[a-z]{1,4}"),
+                    0..5,
+                ),
+        ) {
+            let mut tokens: Vec<Token> = vec![Token::from_test("env")];
+            let mut expected = Verdict::Allowed(SafetyLevel::Inert);
+            for (k, v) in &pairs {
+                tokens.push(Token::from_test(&format!("{k}={v}")));
+                expected = expected.combine(crate::envvars::assignment_verdict(k, v));
+            }
+            // No command follows, so the loop runs to completion and the function returns the
+            // accumulated verdict (the early-return path also takes the same value).
+            prop_assert_eq!(
+                super::is_safe_env(&tokens),
+                expected,
+                "env assignment loop drifted from reduce-combine of assignment_verdict"
+            );
+        }
     }
 }
