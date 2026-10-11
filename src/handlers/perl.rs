@@ -533,4 +533,83 @@ mod tests {
         perl_interp_hash_subscript: "perl -e 'print \"$h{`id`}\"'",
         perl_interp_array_subscript: "perl -e 'print \"$a[`id`]\"'",
     }
+
+    use crate::parse::Token;
+    use proptest::prelude::*;
+
+    proptest::proptest! {
+        // IDEMPOTENCE (identity-on-non-paired). `closing_delimiter` is the identity on every byte
+        // that is NOT a paired opener — unpaired punctuation, control bytes, and the CLOSING half
+        // of a pair like `)` or `>` all round-trip unchanged. On a paired opener the function
+        // returns a closer that is itself NOT a paired opener (so calling it again would be a
+        // no-op, not a recursion). Together this is the full byte-wise characterization of the
+        // function across all 256 values, which `skip_delimited` relies on: closing what is not
+        // already a paired opener would pair up a delimiter the caller intended as plain text.
+        #[test]
+        fn closing_delimiter_is_identity_exactly_on_non_paired_bytes(
+            o in any::<u8>(),
+        ) {
+            if super::is_paired_delimiter(o) {
+                let c = super::closing_delimiter(o);
+                proptest::prop_assert_ne!(c, o,
+                    "paired opener 0x{:02x} must map to a different closer", o);
+                proptest::prop_assert!(!super::is_paired_delimiter(c),
+                    "the closer of paired opener 0x{:02x} must itself not be a paired opener", o);
+                proptest::prop_assert_eq!(super::closing_delimiter(c), c,
+                    "the closer of a paired opener must be a fixed point of closing_delimiter");
+            } else {
+                proptest::prop_assert_eq!(super::closing_delimiter(o), o,
+                    "non-paired byte 0x{:02x} must be the identity under closing_delimiter", o);
+            }
+        }
+
+        // INVARIANT (long-flag bail-out). The flag walker models short flags and the `--` sentinel,
+        // but anything else starting with `--` is unknown — the handler returns `None` so the engine
+        // can worst-case instead of guessing which operands matter. The two informational forms
+        // (`--version`, `--help`) short-circuit BEFORE this rule and only when tokens.len() == 2, so
+        // excluding them keeps this property pinning the bail-out path specifically.
+        #[test]
+        fn scan_perl_with_unknown_long_flag_returns_none(
+            flag in "--[a-z][a-z0-9]{1,8}",
+            tail in proptest::collection::vec("[a-z.]{0,6}", 0..=4),
+        ) {
+            proptest::prop_assume!(flag != "--version");
+            proptest::prop_assume!(flag != "--help");
+            let mut raw: Vec<String> = vec!["perl".to_string(), flag];
+            raw.extend(tail);
+            let tokens: Vec<Token> = raw.iter().map(|s| Token::from_test(s)).collect();
+            proptest::prop_assert!(
+                super::scan_perl(&tokens).is_none(),
+                "unknown long flag must return None, got tokens {:?}",
+                raw,
+            );
+        }
+
+        // EQUIVALENCE (single-substitution /e detection). `has_substitution_eval` walks the code
+        // looking for `s<delim>...<delim>...<delim><flags>` and reports whether `e` is among the
+        // flags. With ONE isolated substitution whose bodies contain no `s`, the scan cannot find
+        // any other `s` to trigger on, and the only `s` present is the literal starting the
+        // substitution — so the answer is exactly whether `e` appears in the flags. Bodies come
+        // from a body-friendly alphabet that does not include the chosen delimiter, so no stray
+        // match inside either body can short-circuit the walker.
+        #[test]
+        fn has_substitution_eval_matches_e_flag_for_isolated_substitution(
+            delim in proptest::sample::select(&['/', '|', '!', '?', ',', ';', ':', '^', '#'][..]),
+            body1 in "[a-z0-9]{0,4}",
+            body2 in "[a-z0-9]{0,4}",
+            flags in "[a-z]{0,5}",
+        ) {
+            proptest::prop_assume!(!body1.contains('s'));
+            proptest::prop_assume!(!body2.contains('s'));
+            let code = format!("s{delim}{body1}{delim}{body2}{delim}{flags}");
+            let expected = flags.contains('e');
+            proptest::prop_assert_eq!(
+                super::has_substitution_eval(&code),
+                expected,
+                "isolated substitution {:?} (expected e={})",
+                code,
+                expected,
+            );
+        }
+    }
 }

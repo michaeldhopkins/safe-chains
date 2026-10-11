@@ -26,7 +26,6 @@ owed = [
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/node/bun.rs",
-  "src/handlers/perl.rs",
   "src/handlers/php.rs",
   "src/handlers/ruby/bundle.rs",
   "src/handlers/shell.rs",
@@ -238,7 +237,11 @@ owed = [
   "find_runner_package_index_double_dash_yields_start_plus_one",
 ]
 "src/handlers/node/npx.rs" = ["npx_verdict_matches_direct"]
-"src/handlers/perl.rs" = []
+"src/handlers/perl.rs" = [
+  "closing_delimiter_is_identity_exactly_on_non_paired_bytes",
+  "scan_perl_with_unknown_long_flag_returns_none",
+  "has_substitution_eval_matches_e_flag_for_isolated_substitution",
+]
 "src/handlers/php.rs" = []
 "src/handlers/ruby/bundle.rs" = []
 "src/handlers/shell.rs" = []
