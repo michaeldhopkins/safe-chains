@@ -25,7 +25,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/magick.rs",
   "src/handlers/network.rs",
   "src/handlers/node/bun.rs",
   "src/handlers/node/bunx.rs",
@@ -221,7 +220,12 @@ owed = [
   "appending_a_standalone_flag_preserves_verdict_and_level",
   "version_phase_is_inert_only_when_solitary",
 ]
-"src/handlers/magick.rs" = []
+"src/handlers/magick.rs" = [
+  "magick_with_fewer_than_two_tokens_is_denied",
+  "a_script_flag_anywhere_in_the_tail_denies_magick",
+  "a_first_token_that_is_a_bare_non_path_word_outside_known_subs_denies_magick",
+  "magick_with_a_non_fallback_long_flag_delegates_to_convert",
+]
 "src/handlers/mod.rs" = ["src/handler_property_tests.rs::handlers_never_panic_and_are_deterministic"]
 "src/handlers/network.rs" = []
 "src/handlers/node/bun.rs" = []
