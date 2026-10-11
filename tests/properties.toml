@@ -22,7 +22,6 @@ owed = [
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/coreutils/find.rs",
-  "src/handlers/coreutils/net/nslookup.rs",
   "src/handlers/coreutils/net/route.rs",
   "src/handlers/coreutils/sed.rs",
   "src/handlers/coreutils/tar.rs",
@@ -184,7 +183,10 @@ owed = [
   "dispatch_is_some_iff_command_is_a_grep_family_name",
   "an_allowed_invocation_stays_allowed_when_trailing_tokens_are_appended",
 ]
-"src/handlers/coreutils/net/nslookup.rs" = []
+"src/handlers/coreutils/net/nslookup.rs" = [
+  "only_known_safe_tokens_yield_inert_verdict",
+  "every_allowed_verdict_is_exactly_inert",
+]
 "src/handlers/coreutils/net/route.rs" = []
 "src/handlers/coreutils/sed.rs" = []
 "src/handlers/coreutils/tar.rs" = []
