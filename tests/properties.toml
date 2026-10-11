@@ -32,7 +32,6 @@ owed = [
   "src/handlers/system/ssh.rs",
   "src/registry/build.rs",
   "src/registry/docs.rs",
-  "src/verdict.rs",
 ]
 
 [pure]
@@ -323,7 +322,12 @@ owed = [
   "src/suggest/tests.rs::generated_toml_always_loads",
   "src/suggest/tests.rs::analyze_is_deterministic",
 ]
-"src/verdict.rs" = []
+"src/verdict.rs" = [
+  "combine_takes_the_max_of_levels_when_both_allowed",
+  "combine_is_denied_iff_either_operand_is_denied",
+  "combine_is_associative",
+  "level_display_string_resolves_back_to_the_same_level",
+]
 
 [effectful]
 "src/allowlist.rs" = "reads Claude Code's settings files for permissions.allow patterns"

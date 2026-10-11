@@ -89,6 +89,28 @@ impl clap::ValueEnum for SafetyLevel {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+
+    /// A `SafetyLevel` strategy: enumerate the three variants so `proptest::sample::select` covers
+    /// the whole lattice uniformly and shrinks toward `Inert`. Needed because `Proptest` does not
+    /// derive `Arbitrary` for non-`unit`-carrier enums, and the four-arity `Verdict` strategy is
+    /// built on top of this.
+    fn arb_safety_level() -> proptest::strategy::BoxedStrategy<SafetyLevel> {
+        proptest::sample::select(vec![SafetyLevel::Inert, SafetyLevel::SafeRead, SafetyLevel::SafeWrite]).boxed()
+    }
+
+    /// A `Verdict` strategy: `Denied` plus every `Allowed(level)`. Uniform coverage matters
+    /// because the property tests partition on whether at least one operand is denied — picking
+    /// only `Allowed` values would silently degenerate into a single-case lattice check.
+    fn arb_verdict() -> proptest::strategy::BoxedStrategy<Verdict> {
+        proptest::sample::select(vec![
+            Verdict::Denied,
+            Verdict::Allowed(SafetyLevel::Inert),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+            Verdict::Allowed(SafetyLevel::SafeWrite),
+        ])
+        .boxed()
+    }
 
     #[test]
     fn level_ordering() {
@@ -136,5 +158,60 @@ mod tests {
         let a = Verdict::Allowed(SafetyLevel::SafeWrite);
         let identity = Verdict::Allowed(SafetyLevel::Inert);
         assert_eq!(identity.combine(a), a);
+    }
+
+    proptest::proptest! {
+        // Invariant (differential). `combine` is the lattice join of the verdict monoid: `Denied`
+        // is the absorbing element and the `SafetyLevel` carries the max. When both operands are
+        // `Allowed` it has to reduce to the `PartialOrd`-derived `max` of the two levels — without
+        // that reduction the engine's "weakest writer wins" semantics break.
+        #[test]
+        fn combine_takes_the_max_of_levels_when_both_allowed(
+            a in arb_safety_level(),
+            b in arb_safety_level(),
+        ) {
+            let joined = Verdict::Allowed(a).combine(Verdict::Allowed(b));
+            let expected = Verdict::Allowed(a.max(b));
+            proptest::prop_assert_eq!(joined, expected);
+        }
+
+        // Invariant. `Denied` is the absorbing element of `combine` from either side, so the
+        // join is `Denied` iff at least one operand is. The converse (right-to-left) direction is
+        // the load-bearing one — `combine` must never synthesise a deny from two allows.
+        #[test]
+        fn combine_is_denied_iff_either_operand_is_denied(
+            a in arb_verdict(),
+            b in arb_verdict(),
+        ) {
+            let joined = a.combine(b);
+            let one_denied = a == Verdict::Denied || b == Verdict::Denied;
+            proptest::prop_assert_eq!(joined == Verdict::Denied, one_denied);
+        }
+
+        // Metamorphic. `combine` is the join of an `Allowed`-monoid-with-bottom lattice, so it
+        // must be associative. Proptest canary: a non-associative `combine` would break every
+        // caller that folds verdicts in a tree (e.g. per-argument aggregation into a command-wide
+        // verdict).
+        #[test]
+        fn combine_is_associative(
+            a in arb_verdict(),
+            b in arb_verdict(),
+            c in arb_verdict(),
+        ) {
+            proptest::prop_assert_eq!(a.combine(b).combine(c), a.combine(b.combine(c)));
+        }
+
+        // Roundtrip. `SafetyLevel`'s `Display` writes the legacy name. For every variant, that
+        // string has to resolve back through `resolve_threshold` to the same level (and never to
+        // `None`). Without this, anything that round-trips a level through a string (config files,
+        // error messages, persisted state) silently flips safety class.
+        #[test]
+        fn level_display_string_resolves_back_to_the_same_level(
+            level in arb_safety_level(),
+        ) {
+            let rendered = level.to_string();
+            let resolved = SafetyLevel::resolve_threshold(&rendered);
+            proptest::prop_assert_eq!(resolved.map(|(ceiling, _)| ceiling), Some(level));
+        }
     }
 }
