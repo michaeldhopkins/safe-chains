@@ -21,7 +21,6 @@ owed = [
   "src/engine/resolve/capability.rs",
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
-  "src/handlers/android/adb.rs",
   "src/handlers/coreutils/find.rs",
   "src/handlers/coreutils/grep.rs",
   "src/handlers/coreutils/net/nslookup.rs",
@@ -174,7 +173,11 @@ owed = [
   "src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape",
 ]
 "src/envvars.rs" = []
-"src/handlers/android/adb.rs" = []
+"src/handlers/android/adb.rs" = [
+  "a_dash_s_prefix_serial_does_not_change_the_verdict",
+  "a_shell_bare_command_is_inert_regardless_of_trailing_args",
+  "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
+]
 "src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
 "src/handlers/coreutils/find.rs" = []
 "src/handlers/coreutils/grep.rs" = []

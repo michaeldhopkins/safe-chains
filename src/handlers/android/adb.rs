@@ -200,4 +200,103 @@ mod tests {
         adb_shell_settings_put_denied: "adb shell settings put global airplane_mode_on 1",
         adb_shell_wm_reset_denied: "adb shell wm size reset",
     }
+
+    use proptest::prelude::*;
+    use crate::parse::Token;
+    use crate::verdict::Verdict;
+
+    proptest! {
+        /// `-s SERIAL` is a device-selector prefix that the handler MUST skip without affecting
+        /// the verdict on the rest of the line. Synthesising a random serial and arbitrary
+        /// trailing tokens, then comparing the verdict of `[adb, -s, serial, rest...]` against
+        /// `[adb, rest...]`, guards the prefix-skip code path: any regression that either fails
+        /// to skip the prefix (consuming the serial as the subcommand) or over-skips it (eating
+        /// the real subcommand as a second serial) changes one verdict without the other.
+        #[test]
+        fn a_dash_s_prefix_serial_does_not_change_the_verdict(
+            serial in "[A-Za-z0-9._:-]{1,20}",
+            rest in proptest::collection::vec(any::<String>(), 0..6),
+        ) {
+            let rest_tokens: Vec<Token> = rest
+                .iter()
+                .map(|s| Token::from_test(s))
+                .collect();
+            let mut with_prefix: Vec<Token> = vec![
+                Token::from_test("adb"),
+                Token::from_test("-s"),
+                Token::from_test(&serial),
+            ];
+            with_prefix.extend(rest_tokens.iter().cloned());
+
+            let mut plain: Vec<Token> = vec![Token::from_test("adb")];
+            plain.extend(rest_tokens);
+
+            let with_verdict = super::is_safe_adb(&with_prefix);
+            let plain_verdict = super::is_safe_adb(&plain);
+            prop_assert_eq!(
+                with_verdict,
+                plain_verdict,
+                "serial prefix must not alter verdict: serial={:?} rest={:?}",
+                serial,
+                rest
+            );
+        }
+
+        /// Every bare shell command in `SHELL_BARE_CMDS` (df, getprop, id, ps, uname, whoami)
+        /// is inert — `check_shell` returns as soon as it recognises the bare name and ignores
+        /// whatever else follows. Suffixes that would change the verdict for any OTHER shell
+        /// command (random extra args, args that look like sub-subcommands, anything) must leave
+        /// the bare-command verdict untouched. Pinning this guards against a future change that
+        /// adds a length check or a "max positional" gate to the bare branch.
+        #[test]
+        fn a_shell_bare_command_is_inert_regardless_of_trailing_args(
+            cmd in proptest::sample::select(super::SHELL_BARE_CMDS.iter().collect::<Vec<_>>()),
+            suffix in proptest::collection::vec("[a-zA-Z0-9._/=:-]{1,16}", 0..8),
+        ) {
+            let mut tokens: Vec<Token> = vec![
+                Token::from_test("adb"),
+                Token::from_test("shell"),
+                Token::from_test(cmd),
+            ];
+            for s in &suffix {
+                tokens.push(Token::from_test(s));
+            }
+            prop_assert_eq!(
+                super::is_safe_adb(&tokens),
+                Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
+                "bare shell command must stay inert: cmd={} suffix={:?}",
+                cmd,
+                suffix
+            );
+        }
+
+        /// `dispatch` is the table-routing facade — `Some(v)` exactly when the command name is
+        /// `"adb"` and `v` equals `is_safe_adb(tokens)`; `None` for every other command name.
+        /// This is the contract every other handler in the crate relies on, so a regression
+        /// that double-routes (returning a verdict for non-adb commands) or drops the adb route
+        /// breaks the whole command table; a property over a random command-name proves the
+        /// bijection holds for ALL strings, not just the few the example tests enumerate.
+        #[test]
+        fn dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise(
+            name in any::<String>(),
+            rest in proptest::collection::vec(any::<String>(), 0..4),
+        ) {
+            let tokens: Vec<Token> = rest.iter().map(|s| Token::from_test(s)).collect();
+            let dispatched = super::dispatch(&name, &tokens);
+            if name == "adb" {
+                prop_assert_eq!(
+                    dispatched,
+                    Some(super::is_safe_adb(&tokens)),
+                    "dispatch must delegate to is_safe_adb for cmd=adb"
+                );
+            } else {
+                prop_assert_eq!(
+                    dispatched,
+                    None,
+                    "dispatch must return None for non-adb cmd={:?}",
+                    name
+                );
+            }
+        }
+    }
 }
