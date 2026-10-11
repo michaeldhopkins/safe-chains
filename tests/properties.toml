@@ -25,7 +25,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/jvm/mvn.rs",
   "src/handlers/magick.rs",
   "src/handlers/network.rs",
   "src/handlers/node/bun.rs",
@@ -216,7 +215,12 @@ owed = [
   "is_safe_jar_with_short_flag_matches_is_list_mode_when_tail_is_clean",
   "no_flags_after_agrees_with_a_freshly_filtered_tail",
 ]
-"src/handlers/jvm/mvn.rs" = []
+"src/handlers/jvm/mvn.rs" = [
+  "too_short_input_is_always_denied",
+  "unknown_phase_is_always_denied",
+  "appending_a_standalone_flag_preserves_verdict_and_level",
+  "version_phase_is_inert_only_when_solitary",
+]
 "src/handlers/magick.rs" = []
 "src/handlers/mod.rs" = ["src/handler_property_tests.rs::handlers_never_panic_and_are_deterministic"]
 "src/handlers/network.rs" = []
