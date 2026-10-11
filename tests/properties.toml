@@ -25,7 +25,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/fuzzy/sk.rs",
   "src/handlers/jvm/jar.rs",
   "src/handlers/jvm/mvn.rs",
   "src/handlers/magick.rs",
@@ -206,7 +205,11 @@ owed = [
   "dispatch_for_fzf_matches_is_safe_fzf",
   "bind_with_paren_dominates_other_flags",
 ]
-"src/handlers/fuzzy/sk.rs" = []
+"src/handlers/fuzzy/sk.rs" = [
+  "a_history_block_within_a_passing_policy_yields_exactly_safe_write",
+  "a_policy_failure_yields_denied_with_or_without_history",
+  "appending_a_non_history_token_keeps_has_history",
+]
 "src/handlers/interpreter.rs" = ["src/handler_property_tests.rs::interpreter_commands_deny_shell_escapes"]
 "src/handlers/jvm/jar.rs" = []
 "src/handlers/jvm/mvn.rs" = []
