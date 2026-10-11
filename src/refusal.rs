@@ -409,4 +409,134 @@ mod tests {
         // The suggestion has to name the value the user meant, or it explains nothing.
         assert!(surprised.contains("`-D warnings`"), "{surprised}");
     }
+
+    proptest::proptest! {
+        // INVARIANT (outcome-shaped consequence). The whole module exists so that copy follows
+        // EMISSION, not the harness's name: a deny-harness we abstain on prompts a human, so "did
+        // not run" would be false there. Pinned as a property over the full input space — every
+        // combination of generated `command`, optional `swallowed_by` assignment, arbitrary
+        // `Reach(why)` text, and `Outcome` — so a regression that, say, lifted the
+        // "approval prompt follows" line into the `DidNotRun` branch (or, conversely, dropped it
+        // from `GoesToHuman`) breaks here rather than only on hand-picked examples.
+        #[test]
+        fn the_outcome_controls_which_consequence_phrase_a_refusal_names(
+            command in "[a-zA-Z0-9._/]{0,24}",
+            assignment in proptest::option::of("[A-Za-z_][A-Za-z0-9_]{0,8}=[A-Za-z0-9_./-]{0,12}"),
+            why in "[a-zA-Z0-9 .,'`/~_-]{0,48}",
+            outcome in proptest::sample::select(&[
+                Outcome::DidNotRun,
+                Outcome::GoesToHuman,
+                Outcome::Unknown,
+            ]),
+        ) {
+            // The `Reach` arm is exercised by a separate cause so the property covers BOTH branches
+            // of `render`, not only `NoEntry`.
+            let from_no_entry = Refusal {
+                outcome,
+                cause: Cause::NoEntry {
+                    command,
+                    swallowed_by: assignment.clone(),
+                },
+            }
+            .render();
+            let from_reach =
+                Refusal { outcome, cause: Cause::Reach(why.clone()) }.render();
+            for text in [&from_no_entry, &from_reach] {
+                match outcome {
+                    Outcome::DidNotRun => {
+                        proptest::prop_assert!(text.contains("did not run"),
+                            "{outcome:?} output must name the consequence it blocks, but it did not: {text}");
+                        proptest::prop_assert!(!text.contains("approval prompt follows"),
+                            "a blocked command asks nobody: {text}");
+                    }
+                    Outcome::GoesToHuman => {
+                        proptest::prop_assert!(text.contains("approval prompt follows"),
+                            "{outcome:?} output must name the human-in-the-loop, but it did not: {text}");
+                        proptest::prop_assert!(!text.contains("did not run"),
+                            "an abstain did not stop anything: {text}");
+                    }
+                    Outcome::Unknown => {
+                        proptest::prop_assert!(!text.contains("did not run"),
+                            "we cannot know that: {text}");
+                        proptest::prop_assert!(!text.contains("approval prompt follows"),
+                            "we cannot know that either: {text}");
+                    }
+                }
+            }
+        }
+
+        // ORACLE / DIFFERENTIAL (the assignment swallowed the program name). The whole reason
+        // `RUSTDOCFLAGS=-D warnings` looks like a typo and runs `warnings` is the unquoted
+        // shell-word rule, and `Cause::no_entry` is the function that names the program the shell
+        // would actually run. The reference oracle is a hand-stepped one: `shell_words::split` the
+        // input, advance until the first non-assignment token, and report it. Pinned as a property
+        // over a generated pair (`ASSIGNMENT PROGRAM`), `command == PROGRAM` and
+        // `swallowed_by == Some(ASSIGNMENT)` — matching what the oracle returns. A regression
+        // that took the first word unconditionally (ignoring the assignment prefix) or that
+        // recorded the FIRST assignment instead of the last would diverge from the reference.
+        #[test]
+        fn no_entry_after_a_single_assignment_names_program_and_assignment(
+            // Shell-word alphabet: no whitespace, no quotes, no `=`, so `shell_words::split` and
+            // `is_assignment` behave deterministically. The assignment name must start with an
+            // ASCII letter or `_` per `is_assignment`; the value is anything in the alphabet.
+            name in "[A-Za-z_][A-Za-z0-9_]{0,8}",
+            value in "[a-zA-Z0-9_./-]{0,12}",
+            // The program word is required to be shell-word-alphabet so its `command_name`
+            // (a `/`-rsplit or `@`-prefix) is the word itself.
+            program in "[a-zA-Z_][a-zA-Z0-9_.]{0,12}",
+        ) {
+            let assignment = format!("{name}={value}");
+            let input = format!("{assignment} {program}");
+            let oracle_program = program.clone();
+
+            match Cause::no_entry(&input) {
+                Cause::NoEntry { command, swallowed_by } => {
+                    proptest::prop_assert_eq!(command, oracle_program,
+                        "no_entry({:?}) reported the wrong program", input);
+                    proptest::prop_assert_eq!(swallowed_by.as_deref(), Some(assignment.as_str()),
+                        "no_entry({:?}) recorded the wrong assignment as the swallowed prefix", input);
+                }
+                other => {
+                    proptest::prop_assert!(false,
+                        "expected NoEntry for {:?}, got {:?}", input, other);
+                }
+            }
+        }
+
+        // INVARIANT (fallback path). With NO non-assignment word, `no_entry` cannot name a
+        // program — and indeed the function falls through to `Cause::NoEntry { command: trim,
+        // swallowed_by: None }`. Pinned as a property over sequences of valid assignments (none
+        // of them a program), with optional leading and trailing whitespace contributed by the
+        // string itself. Inputs that would round-trip through `shell_words::split` to a sequence
+        // consisting only of valid assignments therefore always reach this path; inputs that
+        // contain an assignment-like word but no program reach it the same way. A regression
+        // that returned `swallowed_by: Some(...)` in the fallback, or that returned an empty
+        // `command`, would surface here.
+        #[test]
+        fn no_entry_with_only_assignments_uses_the_trimmed_input_and_no_swallow(
+            // Two or more valid assignment words. The names follow `is_assignment`'s rules; the
+            // values stay inside the shell-word alphabet so `shell_words::split` does not
+            // decompose them. Empty padding inside the value is impossible here because the
+            // alphabet excludes whitespace.
+            assigns in proptest::collection::vec(
+                ("[A-Za-z_][A-Za-z0-9_]{0,6}", "[a-zA-Z0-9_./-]{0,6}"),
+                1..=4,
+            ),
+        ) {
+            let input = assigns.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join(" ");
+
+            match Cause::no_entry(&input) {
+                Cause::NoEntry { command, swallowed_by } => {
+                    proptest::prop_assert_eq!(swallowed_by.clone(), None,
+                        "only-assignments input {:?} must not record a swallow, but did: {:?}", input, swallowed_by);
+                    proptest::prop_assert_eq!(command, input.trim(),
+                        "only-assignments input {:?} must report the trimmed input as the command", input);
+                }
+                other => {
+                    proptest::prop_assert!(false,
+                        "expected NoEntry for {:?}, got {:?}", input, other);
+                }
+            }
+        }
+    }
 }

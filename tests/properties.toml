@@ -30,7 +30,6 @@ owed = [
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
-  "src/refusal.rs",
   "src/registry/build.rs",
   "src/registry/docs.rs",
   "src/registry/policy.rs",
@@ -295,7 +294,11 @@ owed = [
   "textutil_convert_never_more_permissive_than_info",
 ]
 "src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
-"src/refusal.rs" = []
+"src/refusal.rs" = [
+  "the_outcome_controls_which_consequence_phrase_a_refusal_names",
+  "no_entry_after_a_single_assignment_names_program_and_assignment",
+  "no_entry_with_only_assignments_uses_the_trimmed_input_and_no_swallow",
+]
 "src/registry/build.rs" = []
 "src/registry/dispatch.rs" = [
   "src/handler_property_tests.rs::code_exec_denies_foreign_executor",
