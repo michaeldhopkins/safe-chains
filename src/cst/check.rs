@@ -1,5 +1,7 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
+pub(super) use super::scope_budget::scope_budget_spent;
+use super::scope_budget::{ScopeWalk, UNCERTAIN_VALUE, rebind_uncertain};
 use super::*;
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
@@ -12,7 +14,11 @@ pub fn command_verdict(input: &str) -> Verdict {
     let Some(script) = parse(input) else {
         return Verdict::Denied;
     };
-    script_verdict(&script)
+    let verdict = script_verdict(&script);
+    if scope_budget_spent() {
+        return Verdict::Denied; // shell state untrackable within budget — fail closed
+    }
+    verdict
 }
 
 pub fn is_safe_command(input: &str) -> bool {
@@ -37,11 +43,6 @@ thread_local! {
 }
 
 const MAX_FUNC_DEPTH: usize = 32;
-
-/// The value a `$VAR`/`$1` binds to when the assigned/argument value is UNCERTAIN (a substitution,
-/// an unbound var, a reassignment to same). It looks like a path AND is unpinnable, so `$VAR/x`
-/// fail-closes in both gate layers rather than resolving to a stale or dropped value.
-const UNCERTAIN_VALUE: &str = "/__SAFE_CHAINS_CMDSUB__";
 
 struct FuncScope;
 impl Drop for FuncScope {
@@ -117,6 +118,7 @@ fn script_verdict(script: &Script) -> Verdict {
 /// per-segment explain classified the `ls` call without the definition in scope, the hook's coverage
 /// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
 pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
+    let _walk = ScopeWalk::enter();
     let mut running = crate::pathctx::cwd();
     let mut _vars: Vec<crate::pathctx::VarGuard> = Vec::new();
     let mut _funcs: Vec<FuncScope> = Vec::new();
@@ -126,7 +128,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
             let _cwd = crate::pathctx::enter_cwd(running.clone());
             per_stmt(stmt)
         });
-        let effects = shell_effects(&stmt.pipeline);
+        let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
         let next = cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
         if next.is_some() {
             running = next;
@@ -142,9 +144,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
         // Rebinds the shell keeps but we cannot attribute — a `VAR=…` or `name() {…}` inside a
         // compound or a called function. Pushed AFTER the precise bindings above so the uncertain
         // value wins for that name; a statement handled precisely contributes nothing here.
-        for name in effects.vars {
-            _vars.push(crate::pathctx::enter_var(name, UNCERTAIN_VALUE.to_string()));
-        }
+        rebind_uncertain(effects.vars, &mut _vars);
         for name in effects.funcs {
             poison_function(name);
         }
@@ -970,6 +970,23 @@ mod tests {
 
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
+    }
+
+    #[test]
+    fn the_fuzz_input_that_exhausted_memory_is_refused_quickly_in_both_layers() {
+        let seed = String::from_utf8_lossy(include_bytes!("../../fuzz/corpus/explain_render/seed-oom-c54"));
+        let started = std::time::Instant::now();
+        assert!(!is_safe_command(&seed));
+        assert!(!crate::cst::explain(&seed).is_allowed());
+        assert!(started.elapsed() < std::time::Duration::from_secs(5), "{:?}", started.elapsed());
+    }
+
+    #[test]
+    fn many_sources_stay_cheap_and_a_plain_command_after_them_is_judged_as_before() {
+        let started = std::time::Instant::now();
+        let sourced = ". ./a; ".repeat(64) + "ls";
+        assert_eq!(is_safe_command(&sourced), is_safe_command(". ./a; ls"));
+        assert!(started.elapsed() < std::time::Duration::from_secs(5), "{:?}", started.elapsed());
     }
 
     #[test]

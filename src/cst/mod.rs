@@ -19,6 +19,7 @@ mod parse;
 #[cfg(test)]
 mod proptests;
 mod reserved;
+mod scope_budget;
 mod sub_close;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
