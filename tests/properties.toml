@@ -22,7 +22,6 @@ owed = [
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/coreutils/find.rs",
-  "src/handlers/coreutils/grep.rs",
   "src/handlers/coreutils/net/nslookup.rs",
   "src/handlers/coreutils/net/route.rs",
   "src/handlers/coreutils/sed.rs",
@@ -180,7 +179,11 @@ owed = [
 ]
 "src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
 "src/handlers/coreutils/find.rs" = []
-"src/handlers/coreutils/grep.rs" = []
+"src/handlers/coreutils/grep.rs" = [
+  "naive_oracle_matches_is_safe_grep_on_every_token_sequence",
+  "dispatch_is_some_iff_command_is_a_grep_family_name",
+  "an_allowed_invocation_stays_allowed_when_trailing_tokens_are_appended",
+]
 "src/handlers/coreutils/net/nslookup.rs" = []
 "src/handlers/coreutils/net/route.rs" = []
 "src/handlers/coreutils/sed.rs" = []
