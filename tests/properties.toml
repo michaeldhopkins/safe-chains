@@ -25,7 +25,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/network.rs",
   "src/handlers/node/bun.rs",
   "src/handlers/node/bunx.rs",
   "src/handlers/perl.rs",
@@ -227,7 +226,12 @@ owed = [
   "magick_with_a_non_fallback_long_flag_delegates_to_convert",
 ]
 "src/handlers/mod.rs" = ["src/handler_property_tests.rs::handlers_never_panic_and_are_deterministic"]
-"src/handlers/network.rs" = []
+"src/handlers/network.rs" = [
+  "is_safe_method_matches_a_simple_case_insensitive_reference_set",
+  "a_safe_curl_header_value_lacks_a_colon_it_is_denied",
+  "a_safe_curl_header_value_round_trips_through_name_case_and_whitespace",
+  "is_safe_curl_help_or_version_in_two_tokens_is_always_inert",
+]
 "src/handlers/node/bun.rs" = []
 "src/handlers/node/bunx.rs" = []
 "src/handlers/node/npx.rs" = ["npx_verdict_matches_direct"]

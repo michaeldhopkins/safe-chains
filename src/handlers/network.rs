@@ -197,7 +197,11 @@ pub(super) const REGISTRY: &[super::CommandEntry] =
 
 #[cfg(test)]
 mod tests {
+    use proptest::prelude::*;
+
     use crate::is_safe_command;
+    use crate::parse::Token;
+    use crate::verdict::{SafetyLevel, Verdict};
 
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
@@ -313,5 +317,105 @@ mod tests {
         curl_level_output: "curl -s https://example.com -o /tmp/file.html",
         curl_level_remote_name: "curl -O https://example.com/file.tar.gz",
         curl_level_combined_output: "curl -sSo /tmp/file https://example.com",
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(500))]
+
+        /// `is_safe_method` is the case-insensitive membership test for the allowed-method set,
+        /// defined here against an explicit reference oracle rather than against the implementation's
+        /// own body. The implementation calls `to_ascii_uppercase` and then a `WordSet::contains`
+        /// binary search; the oracle is `eq_ignore_ascii_case` against the literal list. Equating the
+        /// two pins the project-wide rule "method equality is ASCII-case-insensitive" — a regression
+        /// that flipped either side (e.g. dropped the call to `to_ascii_uppercase` or tightened the
+        /// set) would break one side of the equation, not both.
+        #[test]
+        fn is_safe_method_matches_a_simple_case_insensitive_reference_set(method in any::<String>()) {
+            const REFERENCE: &[&str] = &["GET", "HEAD", "OPTIONS"];
+            let expected = REFERENCE.iter().any(|m| method.eq_ignore_ascii_case(m));
+            prop_assert_eq!(
+                super::is_safe_method(&method),
+                expected,
+                "method {:?} should match the reference set iff {:?}", method, expected
+            );
+        }
+
+        /// The header predicate parses `value` by splitting on the first `:`. A value that contains
+        /// no colon at all is rejected before any name comparison runs, so the absence of a colon
+        /// is an unconditional deny — independently of what the rest of `value` looks like, what
+        /// case the bytes are in, and how much whitespace surrounds them. Pins the structural
+        /// pre-check the function relies on: a regression that "fixed" the no-colon case by also
+        /// tolerating an empty name (or matched the `CURL_SAFE_HEADERS` set directly on the whole
+        /// value) would let `Content-Type application/json` and every other word that happens to be
+        /// a safe-header string slip through.
+        #[test]
+        fn a_safe_curl_header_value_lacks_a_colon_it_is_denied(value in any::<String>()) {
+            prop_assume!(!value.contains(':'));
+            prop_assert!(
+                !super::is_safe_curl_header(&value),
+                "header value without `:` must be denied, but `{}` was admitted", value
+            );
+        }
+
+        /// Roundtrip: a known-safe header name, whatever its original case and whatever whitespace
+        /// surrounds it, still gets the value admitted as long as the colon is present. The
+        /// implementation calls `name.trim()` and `eq_ignore_ascii_case`, so the surface the
+        /// predicate is invariant on is `(name-after-trim, ASCII-case)` — anything that preserves
+        /// that surface must keep admitting, anything that breaks it must keep denying. Pins the
+        /// shape the surrounding `-H`/`--header` flag handlers rely on (the value the hook inspects
+        /// is quoted, untokenized, and may come in mixed case from a real `curl` invocation).
+        #[test]
+        fn a_safe_curl_header_value_round_trips_through_name_case_and_whitespace(
+            header in proptest::sample::select(super::CURL_SAFE_HEADERS),
+            flip in any::<bool>(),
+            leading_ws in "[ \t]{0,3}",
+            trailing_ws in "[ \t]{0,3}",
+            value in "[A-Za-z0-9./_+-]{0,12}",
+        ) {
+            // Fold once one way and once the other. `flip` selects between them so each iteration
+            // lands somewhere along the case spectrum — `Accept`, `accept`, `ACCEPT`, and any mix
+            // the half-way turns produce by inspecting byte position vs. flip. A regression that
+            // dropped the `to_ascii_uppercase` fold (or compared against the set without
+            // `eq_ignore_ascii_case`) would let one of these admits land on the wrong side.
+            let name = if flip { header.to_ascii_uppercase() } else { header.to_ascii_lowercase() };
+
+            let spelling = format!("{leading_ws}{name}{trailing_ws}:{value}");
+            prop_assert!(
+                super::is_safe_curl_header(&spelling),
+                "header {:?} in case `{}` (whitespace + `:` + body) must remain admitted",
+                header, name,
+            );
+
+            // The other half of the contract: a header that is NEITHER in the safe set NOR
+            // case-insensitively equal to one must keep denying, regardless of whitespace around
+            // its first-colon half. Constructed by inserting a leading `x` so the name cannot hit
+            // the set; the leading byte stays put across any case fold.
+            let bad = format!("{leading_ws}x{name}{trailing_ws}:{value}");
+            prop_assert!(
+                !super::is_safe_curl_header(&bad),
+                "a header prefixed with `x` must be denied, but `{}` was admitted", bad
+            );
+        }
+
+        /// The two-token `curl --help`/`-h`/`--version`/`-V` short-circuit returns exactly
+        /// `Allowed(Inert)` — neither a write lift nor a denial. Stated as "tokens.len() == 2 and
+        /// the second is one of the four help/version flags implies Allowed(Inert)"; combined with
+        /// the existing `denied!` and `safe_write!` corpus covering non-help forms, this pins the
+        /// precise contract the public surface advertises. A regression that promoted the
+        /// short-circuit through `SafeWrite` would surface here as a level mismatch; one that turned
+        /// it into `Denied` would surface as the wrong variant.
+        #[test]
+        fn is_safe_curl_help_or_version_in_two_tokens_is_always_inert(
+            flag in proptest::sample::select(&["--help", "-h", "--version", "-V"]),
+        ) {
+            let tokens: Vec<Token> = vec![Token::from_test("curl"), Token::from_test(flag)];
+            let verdict = super::is_safe_curl(&tokens);
+            prop_assert_eq!(
+                verdict,
+                Verdict::Allowed(SafetyLevel::Inert),
+                "two-token `curl {}` must short-circuit to Allowed(Inert)",
+                flag
+            );
+        }
     }
 }
