@@ -147,4 +147,148 @@ mod tests {
         let tokens = toks(&["cmd", "--unknown", "file"]);
         assert_eq!(first_positional(&tokens, &p), None);
     }
+
+    /// Property tests for `first_positional` / `first_positional_at` / `check_owned`.
+    ///
+    /// Each property pins an invariant of the function pair rather than an example. They share
+    /// the in-module `policy`/`toks` builders and run under `proptest` so the synthesized tokens
+    /// stay inside the alphabet those builders already understand.
+    mod prop {
+        use super::*;
+        use proptest::prelude::*;
+
+        /// A flag-shaped tail token (regex covers `-`, `--`, and `--name=value` shapes).
+        const FLAG_RE: &str = "--?[a-zA-Z][a-zA-Z0-9._-]{0,7}(=[a-zA-Z0-9._-]{1,8})?";
+        /// A never-flag-shaped token (no leading `-`, otherwise printable).
+        const NON_FLAG_RE: &str = "[a-zA-Z][a-zA-Z0-9._]{0,7}";
+
+        fn toks_owned(words: &[String]) -> Vec<Token> {
+            words.iter().cloned().map(Token::from_raw).collect()
+        }
+
+        /// Reference implementation of `first_positional_at` for the case where BOTH flag lists
+        /// are empty. In that mode the documented behavior reduces to: walk forward, return
+        /// `(i + 1, next)` after a bare `--`, return `(i, s)` for `-` or any non-`-`-starting
+        /// token, and return `None` on any other flag-shaped token. Used as the oracle.
+        fn oracle_first_positional_at(tokens: &[Token]) -> Option<(usize, &str)> {
+            // Skips index 0 and returns the same answer the documented walk would on an empty
+            // grammar: look at one token, then stop. Encoded as `if let` rather than a loop
+            // because every branch decides the result on the first token and a loop would loop
+            // at most once.
+            let (offset, t) = tokens.iter().enumerate().nth(1)?;
+            let s = t.as_str();
+            if s == "--" {
+                let i = offset + 1;
+                return tokens.get(i).map(|t| (i, t.as_str()));
+            }
+            if s == "-" || !s.starts_with('-') {
+                return Some((offset, s));
+            }
+            None
+        }
+
+        proptest! {
+            /// Consistency / roundtrip: `first_positional` delegates to `first_positional_at`,
+            /// so the string it returns must equal the string half of the indexed pair for
+            /// EVERY (tokens, policy) pair. A regression that splits the two walks apart —
+            /// the very thing the docstring warns against — fails here.
+            #[test]
+            fn first_positional_and_first_positional_at_agree_on_the_returned_string(
+                tail in proptest::collection::vec("(-|--|--?[a-zA-Z][a-zA-Z0-9._-]{0,7}(=[a-zA-Z0-9._-]{1,8})?|[a-zA-Z][a-zA-Z0-9._]{0,7})", 0..8),
+                standalone in proptest::collection::vec(FLAG_RE, 0..4),
+                valued in proptest::collection::vec(FLAG_RE, 0..4),
+            ) {
+                let mut words = vec!["cmd".to_string()];
+                words.extend(tail);
+                let tokens = toks_owned(&words);
+                let p = policy(
+                    &standalone.iter().map(String::as_str).collect::<Vec<_>>(),
+                    &valued.iter().map(String::as_str).collect::<Vec<_>>(),
+                    None,
+                );
+                let expected = first_positional_at(&tokens, &p).map(|(_, s)| s.to_string());
+                let actual = first_positional(&tokens, &p).map(|s| s.to_string());
+                proptest::prop_assert_eq!(actual, expected);
+            }
+
+            /// Index honesty: the index returned by `first_positional_at` must really point
+            /// at the token whose text it pairs with. The walk stores `(i, s)` as one
+            /// expression so they cannot disagree by construction, and this property pins
+            /// that coupling against any future change that recomputes one half from a
+            /// different loop variable.
+            #[test]
+            fn first_positional_at_index_points_at_the_returned_token(
+                standalone in proptest::collection::vec(FLAG_RE, 0..3),
+                valued in proptest::collection::vec(FLAG_RE, 0..3),
+                tail in proptest::collection::vec(
+                    "(--|--?[a-zA-Z][a-zA-Z0-9._-]{0,7}(=[a-zA-Z0-9._-]{1,8})?|[a-zA-Z][a-zA-Z0-9._]{0,7})",
+                    1..6,
+                ),
+            ) {
+                let mut words = vec!["cmd".to_string()];
+                words.extend(tail);
+                let tokens = toks_owned(&words);
+                let p = policy(
+                    &standalone.iter().map(String::as_str).collect::<Vec<_>>(),
+                    &valued.iter().map(String::as_str).collect::<Vec<_>>(),
+                    None,
+                );
+                if let Some((i, s)) = first_positional_at(&tokens, &p) {
+                    proptest::prop_assert!(i < tokens.len(), "index {} past tokens.len()={}", i, tokens.len());
+                    proptest::prop_assert_eq!(tokens[i].as_str(), s);
+                }
+            }
+
+            /// Oracle / differential: with both `standalone` and `valued` empty the walk
+            /// collapses to a four-line scan. This property states that the contracted
+            /// implementation equals the inlined reference for EVERY generated shape, so
+            /// a refactor that introduced extra logic for the empty-grammar case would be
+            /// caught — the empty case is the one that has to match the docstring.
+            #[test]
+            fn first_positional_with_empty_grammars_matches_a_simple_scan(
+                tail in proptest::collection::vec(
+                    "(-|--|--?[a-zA-Z][a-zA-Z0-9._-]{0,7}(=[a-zA-Z0-9._-]{1,8})?|[a-zA-Z][a-zA-Z0-9._]{0,7})",
+                    0..6,
+                ),
+            ) {
+                let mut words = vec!["cmd".to_string()];
+                words.extend(tail);
+                let tokens = toks_owned(&words);
+                let p = policy(&[], &[], None);
+                let oracle = oracle_first_positional_at(&tokens).map(|(i, s)| (i, s.to_string()));
+                let actual = first_positional_at(&tokens, &p).map(|(i, s)| (i, s.to_string()));
+                proptest::prop_assert_eq!(actual, oracle);
+            }
+
+            /// Monotonicity: prepending a token that the policy declares as a STANDALONE flag
+            /// does not change the first positional found later. The walk consumes a standalone
+            /// in exactly one step (`i += 1`), so the rest of the scan is identical; the
+            /// property locks that "additive, not destructive" behavior in. The prepended flag
+            /// is taken from the SAME generated standalone list so we are asserting on real
+            /// acceptance, not on unknown-flag bailouts.
+            #[test]
+            fn prepending_a_known_standalone_flag_does_not_change_the_first_positional(
+                standalone in proptest::collection::vec(FLAG_RE, 1..4),
+                tail in proptest::collection::vec(NON_FLAG_RE, 0..5),
+            ) {
+                let prefix_token = standalone[0].clone();
+                let mut base = vec!["cmd".to_string()];
+                base.extend(tail.clone());
+                let base_tokens = toks_owned(&base);
+                let p = policy(
+                    &standalone.iter().map(String::as_str).collect::<Vec<_>>(),
+                    &[],
+                    None,
+                );
+                let before = first_positional(&base_tokens, &p).map(|s| s.to_string());
+
+                let mut prefixed = vec!["cmd".to_string(), prefix_token];
+                prefixed.extend(tail);
+                let prefixed_tokens = toks_owned(&prefixed);
+                let after = first_positional(&prefixed_tokens, &p).map(|s| s.to_string());
+
+                proptest::prop_assert_eq!(after, before);
+            }
+        }
+    }
 }

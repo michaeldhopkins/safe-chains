@@ -32,7 +32,6 @@ owed = [
   "src/handlers/system/ssh.rs",
   "src/registry/build.rs",
   "src/registry/docs.rs",
-  "src/registry/policy.rs",
   "src/verdict.rs",
 ]
 
@@ -310,7 +309,12 @@ owed = [
   "src/registry/tests.rs::an_unrecognized_local_spelling_denies",
 ]
 "src/registry/docs.rs" = []
-"src/registry/policy.rs" = []
+"src/registry/policy.rs" = [
+  "first_positional_and_first_positional_at_agree_on_the_returned_string",
+  "first_positional_at_index_points_at_the_returned_token",
+  "first_positional_with_empty_grammars_matches_a_simple_scan",
+  "prepending_a_known_standalone_flag_does_not_change_the_first_positional",
+]
 "src/suggest.rs" = [
   "src/suggest/tests.rs::generated_entry_admits_the_observed_command",
   "src/suggest/tests.rs::generated_entry_rejects_an_unobserved_flag",
