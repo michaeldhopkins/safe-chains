@@ -38,6 +38,22 @@ impl Target for CopilotTarget {
     }
 
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
+        let exe = std::env::current_exe().ok().and_then(|p| p.canonicalize().ok());
+        self.install_with(home, exe.as_deref())
+    }
+
+    fn hook_format(&self) -> Option<&dyn HookFormat> {
+        Some(&CopilotHookFormat)
+    }
+}
+
+impl CopilotTarget {
+    /// `install`'s body with the hook binary's path injected: the real install passes the
+    /// canonicalized `current_exe` (falling back to the bare invocation when discovery fails),
+    /// while the tests pass a fixed path — under `cargo test` the running binary is
+    /// `safe_chains-<hash>`, which `has_safe_chains_hook` only recognizes when some directory in
+    /// the checkout's path is literally named "safe-chains".
+    fn install_with(&self, home: &Path, exe: Option<&Path>) -> Result<InstallOutcome, String> {
         let dir = home.join(".copilot").join("hooks");
         if let Err(e) = std::fs::create_dir_all(&dir) {
             return Err(format!("Could not create {}: {e}", dir.display()));
@@ -53,14 +69,10 @@ impl Target for CopilotTarget {
             }
         }
 
-        let settings = build_settings();
+        let settings = build_settings(exe);
         let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
         std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
         Ok(InstallOutcome::Installed { path })
-    }
-
-    fn hook_format(&self) -> Option<&dyn HookFormat> {
-        Some(&CopilotHookFormat)
     }
 }
 
@@ -136,13 +148,12 @@ impl HookFormat for CopilotHookFormat {
     }
 }
 
-fn build_settings() -> Value {
+fn build_settings(exe: Option<&Path>) -> Value {
     // Copilot's config: flat object with `version` and `hooks.preToolUse[]`.
     // No `matcher` in entries — script self-filters on `toolName`. Field
-    // name is `bash` (the script path), NOT `command`.
-    let resolved = std::env::current_exe()
-        .ok()
-        .and_then(|p| p.canonicalize().ok())
+    // name is `bash` (the script path), NOT `command`. `None` means the
+    // binary's path is unknown — the bare invocation Copilot resolves itself.
+    let resolved = exe
         .map(|p| format!("{} hook copilot", p.display()))
         .unwrap_or_else(|| "safe-chains hook copilot".to_string());
     json!({
@@ -177,6 +188,12 @@ mod tests {
         CopilotTarget
     }
 
+    /// Fixed hook-binary path for the install tests, so they pass wherever the checkout lives:
+    /// under `cargo test` the running binary is `safe_chains-<hash>`, which `has_safe_chains_hook`
+    /// only recognizes when some directory in the checkout's path is literally named
+    /// "safe-chains".
+    const EXE: &str = "/opt/homebrew/bin/safe-chains";
+
     /// Verbatim shape from docs.github.com/en/copilot/reference/
     /// hooks-configuration. The `toolArgs` field is a JSON-encoded
     /// STRING, not a nested object — must be parsed twice.
@@ -190,7 +207,7 @@ mod tests {
     #[test]
     fn install_creates_hooks_file() {
         let dir = tempfile::tempdir().unwrap();
-        let outcome = target().install(dir.path()).unwrap();
+        let outcome = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
         assert!(matches!(outcome, InstallOutcome::Installed { .. }));
         let path = dir.path().join(".copilot/hooks/safe-chains.json");
         assert!(path.exists());
@@ -223,9 +240,23 @@ mod tests {
     #[test]
     fn install_idempotent() {
         let dir = tempfile::tempdir().unwrap();
-        target().install(dir.path()).unwrap();
-        let outcome = target().install(dir.path()).unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        let outcome = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
         assert!(matches!(outcome, InstallOutcome::AlreadyConfigured { .. }));
+    }
+
+    #[test]
+    fn install_idempotent_outside_a_safe_chains_directory() {
+        // The regression this file's fix is for: detection must survive a binary path in which no
+        // DIRECTORY is named "safe-chains" — the FILE name alone carries it. Under `cargo test`
+        // the running binary is `safe_chains-<hash>` (underscore), so the real install only
+        // round-tripped when the checkout itself sat inside a "safe-chains" directory.
+        let dir = tempfile::tempdir().unwrap();
+        let exe = Path::new("/usr/local/bin/safe-chains");
+        let first = target().install_with(dir.path(), Some(exe)).unwrap();
+        assert!(matches!(first, InstallOutcome::Installed { .. }));
+        let second = target().install_with(dir.path(), Some(exe)).unwrap();
+        assert!(matches!(second, InstallOutcome::AlreadyConfigured { .. }));
     }
 
     #[test]

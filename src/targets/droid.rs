@@ -31,6 +31,22 @@ impl Target for DroidTarget {
     }
 
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
+        let exe = std::env::current_exe().ok().and_then(|p| p.canonicalize().ok());
+        self.install_with(home, exe.as_deref())
+    }
+
+    fn hook_format(&self) -> Option<&dyn HookFormat> {
+        Some(&DroidHookFormat)
+    }
+}
+
+impl DroidTarget {
+    /// `install`'s body with the hook binary's path injected: the real install passes the
+    /// canonicalized `current_exe` (falling back to the bare invocation when discovery fails),
+    /// while the tests pass a fixed path — under `cargo test` the running binary is
+    /// `safe_chains-<hash>`, which `has_safe_chains_hook` only recognizes when some directory in
+    /// the checkout's path is literally named "safe-chains".
+    fn install_with(&self, home: &Path, exe: Option<&Path>) -> Result<InstallOutcome, String> {
         let dir = home.join(".factory");
         if !dir.exists() {
             return Ok(InstallOutcome::Skipped {
@@ -39,13 +55,11 @@ impl Target for DroidTarget {
         }
 
         let path = dir.join("settings.json");
-        // Droid docs require absolute paths for hook commands. We
-        // discover the absolute path of the running binary and embed
-        // it in the config; falls back to bare "safe-chains hook
-        // droid" if discovery fails (and the install message warns).
-        let resolved = std::env::current_exe()
-            .ok()
-            .and_then(|p| p.canonicalize().ok())
+        // Droid docs require absolute paths for hook commands. The
+        // caller resolves the running binary's absolute path and we
+        // embed it in the config; falls back to bare "safe-chains
+        // hook droid" if discovery fails (and the install message warns).
+        let resolved = exe
             .map(|p| format!("{} hook droid", p.display()))
             .unwrap_or_else(|| "safe-chains hook droid".to_string());
         let binary = resolved.as_str();
@@ -69,10 +83,6 @@ impl Target for DroidTarget {
             std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         }
-    }
-
-    fn hook_format(&self) -> Option<&dyn HookFormat> {
-        Some(&DroidHookFormat)
     }
 }
 
@@ -189,6 +199,12 @@ mod tests {
         DroidTarget
     }
 
+    /// Fixed hook-binary path for the install tests, so they pass wherever the checkout lives:
+    /// under `cargo test` the running binary is `safe_chains-<hash>`, which `has_safe_chains_hook`
+    /// only recognizes when some directory in the checkout's path is literally named
+    /// "safe-chains".
+    const EXE: &str = "/opt/homebrew/bin/safe-chains";
+
     /// Verbatim shape from the Factory Droid hooks reference. Note
     /// tool_name is "Execute", not "Bash".
     const DROID_DOCS_SAMPLE: &str = r#"{
@@ -212,7 +228,7 @@ mod tests {
     fn install_creates_settings_file() {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir(dir.path().join(".factory")).unwrap();
-        let outcome = target().install(dir.path()).unwrap();
+        let outcome = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
         assert!(matches!(outcome, InstallOutcome::Installed { .. }));
         let contents = std::fs::read_to_string(dir.path().join(".factory/settings.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
@@ -249,9 +265,24 @@ mod tests {
     fn install_idempotent() {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir(dir.path().join(".factory")).unwrap();
-        target().install(dir.path()).unwrap();
-        let outcome = target().install(dir.path()).unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        let outcome = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
         assert!(matches!(outcome, InstallOutcome::AlreadyConfigured { .. }));
+    }
+
+    #[test]
+    fn install_idempotent_outside_a_safe_chains_directory() {
+        // The regression this file's fix is for: detection must survive a binary path in which no
+        // DIRECTORY is named "safe-chains" — the FILE name alone carries it. Under `cargo test`
+        // the running binary is `safe_chains-<hash>` (underscore), so the real install only
+        // round-tripped when the checkout itself sat inside a "safe-chains" directory.
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        let exe = Path::new("/usr/local/bin/safe-chains");
+        let first = target().install_with(dir.path(), Some(exe)).unwrap();
+        assert!(matches!(first, InstallOutcome::Installed { .. }));
+        let second = target().install_with(dir.path(), Some(exe)).unwrap();
+        assert!(matches!(second, InstallOutcome::AlreadyConfigured { .. }));
     }
 
     #[test]
