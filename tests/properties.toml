@@ -23,7 +23,6 @@ owed = [
   "src/envvars.rs",
   "src/handlers/coreutils/find.rs",
   "src/handlers/coreutils/sed.rs",
-  "src/handlers/coreutils/tar.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/fuzzy/sk.rs",
@@ -192,7 +191,12 @@ owed = [
   "command_docs_is_a_single_route_entry",
 ]
 "src/handlers/coreutils/sed.rs" = []
-"src/handlers/coreutils/tar.rs" = []
+"src/handlers/coreutils/tar.rs" = [
+  "command_verdict_and_is_safe_command_agree_on_allowance",
+  "tar_list_with_benign_archive_is_allowed",
+  "tar_list_verdict_is_invariant_under_verbose_flag",
+  "tar_extract_with_benign_archive_is_denied",
+]
 "src/handlers/fd.rs" = ["fd_exec_follows_the_inner_command_locus", "fd_batch_without_placeholder_gates_the_base"]
 "src/handlers/forges/gh.rs" = []
 "src/handlers/forges/glab.rs" = []
