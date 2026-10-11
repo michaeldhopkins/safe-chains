@@ -25,7 +25,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/jvm/jar.rs",
   "src/handlers/jvm/mvn.rs",
   "src/handlers/magick.rs",
   "src/handlers/network.rs",
@@ -211,7 +210,12 @@ owed = [
   "appending_a_non_history_token_keeps_has_history",
 ]
 "src/handlers/interpreter.rs" = ["src/handler_property_tests.rs::interpreter_commands_deny_shell_escapes"]
-"src/handlers/jvm/jar.rs" = []
+"src/handlers/jvm/jar.rs" = [
+  "a_short_flag_containing_a_forbidden_letter_is_not_list_mode",
+  "a_long_flag_is_list_mode_only_when_it_equals_dash_dash_list",
+  "is_safe_jar_with_short_flag_matches_is_list_mode_when_tail_is_clean",
+  "no_flags_after_agrees_with_a_freshly_filtered_tail",
+]
 "src/handlers/jvm/mvn.rs" = []
 "src/handlers/magick.rs" = []
 "src/handlers/mod.rs" = ["src/handler_property_tests.rs::handlers_never_panic_and_are_deterministic"]
