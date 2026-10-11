@@ -181,6 +181,7 @@ pub fn has_flag(tokens: &[Token], short: Option<&str>, long: Option<&str>) -> bo
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
 
     fn tok(s: &str) -> Token {
         Token(s.to_string())
@@ -314,5 +315,101 @@ mod tests {
     #[test]
     fn content_outside_double_quotes_no_quotes() {
         assert_eq!(tok("{print $1}").content_outside_double_quotes(), "{print $1}");
+    }
+
+    proptest! {
+        /// `command_name` is the last `/`-separated segment of its input, with one carve-out: any
+        /// string starting with `@` (a scoped npm package name) is returned verbatim. This is the
+        /// contract callers rely on — `git command_name` returns `git`, `./bin/foo` returns `foo`,
+        /// `@scope/pkg` returns `@scope/pkg` — so the property states it exactly.
+        #[test]
+        fn command_name_is_last_slash_segment_or_full_at_prefixed(
+            s in "\\PC{0,128}",
+        ) {
+            let token = Token::from_raw(s.clone());
+            let expected = if s.starts_with('@') {
+                s.as_str()
+            } else {
+                s.rsplit('/').next().unwrap_or(&s)
+            };
+            prop_assert_eq!(token.command_name(), expected);
+        }
+
+        /// `split_value(sep)` returns `Some(suffix)` iff `sep` occurs in the input, and that
+        /// `suffix` is exactly the substring after the FIRST occurrence of `sep`. Empty
+        /// `sep` is meaningless to `split_once`, so it is filtered out. Together this means
+        /// a flag of the form `--key=value` yields `Some("value")` and the prefix is the
+        /// smallest possible one — no caller can be surprised by where the split lands.
+        #[test]
+        fn split_value_is_some_iff_separator_present_and_yields_first_suffix(
+            s in "\\PC{0,128}",
+            sep in "\\PC{1,8}",
+        ) {
+            let token = Token::from_raw(s.clone());
+            let result = token.split_value(&sep);
+            let first_at = s.find(&sep);
+            prop_assert_eq!(result.is_some(), first_at.is_some());
+            if let (Some(suffix), Some(idx)) = (result, first_at) {
+                prop_assert_eq!(suffix, &s[idx + sep.len()..]);
+            }
+        }
+
+        /// The stripper replaces every closed `"…"` region with a single space and copies
+        /// everything else through unchanged. The fact that each `"` either becomes a space
+        /// or is consumed (escapes skip ahead, the closing `"` ends the loop with `i += 1`)
+        /// means a second application never sees a `"` to act on, so the operation is
+        /// idempotent. A regression that, say, copied the closing `"` through would break
+        /// this on the very next iteration.
+        #[test]
+        fn content_outside_double_quotes_is_idempotent(
+            s in "\\PC{0,256}",
+        ) {
+            let once = Token::from_raw(s).content_outside_double_quotes();
+            let twice = Token::from_raw(once.clone()).content_outside_double_quotes();
+            prop_assert_eq!(once, twice);
+        }
+
+        /// The `--` token terminates argument parsing; `has_flag` must respect it on every
+        /// input shape. Whether the flags asked about appear before `--` or after it, in the
+        /// leading tokens, in a later `--key=value`, or nowhere at all, the verdict computed
+        /// on `prefix + ["--"] + tail` is identical to the verdict on `prefix` alone. This
+        /// is the property the implementation's `if token == "--" { return false; }` line
+        /// promises; arbitrary fillers after `--` exercise the loop continuing past the
+        /// terminator.
+        #[test]
+        fn has_flag_verdict_is_invariant_under_appending_a_double_dash_tail(
+            prefix in proptest::collection::vec("\\PC{0,16}", 0..4),
+            tail in proptest::collection::vec("\\PC{0,16}", 0..4),
+            short in proptest::option::of("\\PC{2,16}"),
+            long in proptest::option::of("\\PC{3,32}"),
+        ) {
+            // Force the flag forms into the shapes `has_flag` actually recognises; anything
+            // else would be testing the regex, not the function.
+            let short = short.filter(|s| s.starts_with('-') && !s.starts_with("--") && s.len() >= 2);
+            let long = long.filter(|s| s.starts_with("--") && s.len() >= 3 && !s.contains('='));
+
+            let mut base: Vec<Token> = Vec::with_capacity(prefix.len() + 2);
+            base.push(tok("cmd"));
+            for p in &prefix {
+                base.push(tok(p));
+            }
+            if let Some(s) = &short {
+                base.push(tok(s));
+            }
+            if let Some(l) = &long {
+                base.push(tok(l));
+            }
+
+            let mut with_tail = base.clone();
+            with_tail.push(tok("--"));
+            for t in &tail {
+                with_tail.push(tok(t));
+            }
+
+            prop_assert_eq!(
+                has_flag(&base, short.as_deref(), long.as_deref()),
+                has_flag(&with_tail, short.as_deref(), long.as_deref()),
+            );
+        }
     }
 }

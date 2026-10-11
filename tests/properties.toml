@@ -30,7 +30,6 @@ owed = [
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
-  "src/parse.rs",
   "src/refusal.rs",
   "src/registry/build.rs",
   "src/registry/docs.rs",
@@ -284,7 +283,12 @@ owed = [
   "never_panics_on_any_input",
   "a_port_never_changes_the_verdict",
 ]
-"src/parse.rs" = []
+"src/parse.rs" = [
+  "command_name_is_last_slash_segment_or_full_at_prefixed",
+  "split_value_is_some_iff_separator_present_and_yields_first_suffix",
+  "content_outside_double_quotes_is_idempotent",
+  "has_flag_verdict_is_invariant_under_appending_a_double_dash_tail",
+]
 "src/pathgate.rs" = [
   "ar_write_never_more_permissive_than_read",
   "ar_ops_classify_regardless_of_modifiers",
