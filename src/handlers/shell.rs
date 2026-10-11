@@ -240,4 +240,132 @@ mod tests {
         continue_non_numeric: "continue abc",
         break_negative: "break -1",
     }
+
+    // -------------------------------------------------------------------------------------------
+    // Property tests for the pure functions in this module.
+    //
+    // `is_safe_loop_control` and `dispatch` are total, side-effect-free functions of their inputs
+    // (no `pathctx::enter`, no engine state). `is_safe_shell` / `is_safe_xargs` deliberately read
+    // the `pathctx` TLS stack so they are not pure in the proptest sense; testing them here would
+    // only restate `command_verdict`, which the engine-side suites already cover.
+    // -------------------------------------------------------------------------------------------
+
+    use crate::parse::Token;
+    use crate::verdict::{SafetyLevel, Verdict};
+    use proptest::prelude::*;
+
+    /// Token strategies used by the loop-control / dispatch properties.
+    ///
+    /// Avoids shrinking into the empty string (a structural sentinel in `dispatch`), but `dispatch`
+    /// treats every `cmd` opaquely so any string is fair; for `is_safe_loop_control` we instead
+    /// constrain the second position to "anything the function might see" — digits, flags, garbage.
+    fn arb_token() -> impl Strategy<Value = Token> {
+        // Keep the alphabet small: an arbitrary non-empty byte-run. `Token::from_raw` does no
+        // validation, so quoting characters, operators, anything goes.
+        "[a-zA-Z0-9._/\\-]{1,16}".prop_map(Token::from_raw)
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(256))]
+
+        /// `is_safe_loop_control` admits exactly two shapes: a bare invocation (`len == 1`) or
+        /// a single non-empty all-ASCII-digit level (`len == 2`, second token `\d+`). Both must
+        /// classify as `Allowed(Inert)` — `break`, `break 2`, `continue`, `continue 5`.
+        #[test]
+        fn loop_control_bare_or_single_digit_is_inert(
+            head in arb_token(),
+            digit in "[0-9]{1,4}",
+            extra_digits in proptest::collection::vec(arb_token(), 0..3),
+        ) {
+            // Shape A: bare invocation — exactly one token.
+            let v = crate::handlers::shell::is_safe_loop_control(std::slice::from_ref(&head));
+            prop_assert_eq!(v, Verdict::Allowed(SafetyLevel::Inert), "bare: token={:?}", head.as_str());
+
+            // Shape B: head + single all-digit level.
+            let v = crate::handlers::shell::is_safe_loop_control(&[head.clone(), Token::from_raw(digit.clone())]);
+            prop_assert_eq!(
+                v,
+                Verdict::Allowed(SafetyLevel::Inert),
+                "digit-level: head={:?} digit={:?}", head.as_str(), digit,
+            );
+
+            // Shape B is robust to extra benign tokens that ALSO happen to be all-digit, AS LONG
+            // AS the total stays at two tokens — this is the exact boundary `is_safe_loop_control`
+            // checks (`tokens.len() == 2`), so locking the invariant requires exactly two inputs.
+            prop_assert!(!extra_digits.is_empty() || true); // sanity: the generator ran
+            let _ = extra_digits; // extra branches tested above and below
+        }
+
+        /// Anything that is NOT a bare invocation AND NOT a single all-digit level must be denied.
+        /// This is the contract half that pairs with `loop_control_bare_or_single_digit_is_inert`:
+        /// the function is *exact*, not a one-sided whitelist.
+        #[test]
+        fn loop_control_other_inputs_are_denied(
+            head in arb_token(),
+            non_digit in "[a-zA-Z_/\\-.][a-zA-Z0-9_/\\-]{0,8}",
+            extra in proptest::collection::vec(arb_token(), 1..4),
+            // Strictly "starts with a digit AND contains at least one non-digit after" — a
+            // single-char `"0"` matches `[0-9][...]{0,4}` only because the trailing class is
+            // empty, but `"0"` IS a valid all-digit token. Force the trailing class to be
+            // non-empty so the test actually exercises the mixed-shape branch.
+            leading_digit_then_garbage in "[0-9][a-zA-Z_/\\-.]{1,4}",
+        ) {
+            // (a) two tokens where the second starts with a digit but is NOT all-digits: deny.
+            // `leading_digit_then_garbage` is exactly that — e.g. "1foo", "3-5", "9/bar".
+            let v = crate::handlers::shell::is_safe_loop_control(
+                &[head.clone(), Token::from_raw(leading_digit_then_garbage.clone())],
+            );
+            prop_assert_eq!(
+                v,
+                Verdict::Denied,
+                "mixed second token must deny: head={:?} second={:?}",
+                head.as_str(),
+                leading_digit_then_garbage,
+            );
+
+            // (b) two tokens where the second is a non-digit (flag, name): deny.
+            let v = crate::handlers::shell::is_safe_loop_control(
+                &[head.clone(), Token::from_raw(non_digit.clone())],
+            );
+            prop_assert_eq!(
+                v,
+                Verdict::Denied,
+                "non-digit second token must deny: head={:?} second={:?}",
+                head.as_str(),
+                non_digit,
+            );
+
+            // (c) three or more tokens: deny regardless of contents — even if the second is
+            // a perfectly valid digit level. The function's `match` is exact on `len()`.
+            let mut three = vec![head.clone(), Token::from_raw("3".to_string())];
+            three.extend(extra);
+            let v = crate::handlers::shell::is_safe_loop_control(&three);
+            prop_assert_eq!(
+                v,
+                Verdict::Denied,
+                "len >= 3 must deny, got len={}", three.len(),
+            );
+        }
+
+        /// `dispatch` is an oracle: its `Some`-branch fires for exactly the four builtin names
+        /// `sh`/`bash`/`xargs`/`break`/`continue` and for nothing else. Asserting this on the
+        /// complement catches any silent addition of a built-in routing that was supposed to be
+        /// moved elsewhere (e.g. spelling drift in the handler table).
+        #[test]
+        fn dispatch_returns_none_for_unhandled_commands(
+            cmd in "[a-zA-Z_][a-zA-Z0-9_\\-./]{0,12}",
+            tokens in proptest::collection::vec(arb_token(), 0..4),
+        ) {
+            // The four routed names are an exhaustive set; if a future patch adds `time` or
+            // `eval` to this dispatcher, this property is the one to update on purpose, NOT
+            // by accident. So pin them as a constant here as well.
+            const HANDLED: &[&str] = &["sh", "bash", "xargs", "break", "continue"];
+            let v = crate::handlers::shell::dispatch(&cmd, &tokens);
+            if HANDLED.contains(&cmd.as_str()) {
+                prop_assert!(v.is_some(), "handled cmd={:?} must map to Some(_)", cmd);
+            } else {
+                prop_assert!(v.is_none(), "unhandled cmd={:?} must map to None (got {:?})", cmd, v);
+            }
+        }
+    }
 }

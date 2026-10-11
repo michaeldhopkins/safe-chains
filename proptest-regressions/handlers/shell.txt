@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 6fdac60f361b2e24c2173f35922238cce5a041d77063a2fa83043765f83fefaa # shrinks to head = Token("A"), non_digit = "-", extra = [Token("a")], leading_digit_then_garbage = "0"

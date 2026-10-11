@@ -28,7 +28,6 @@ owed = [
   "src/handlers/node/bun.rs",
   "src/handlers/php.rs",
   "src/handlers/ruby/bundle.rs",
-  "src/handlers/shell.rs",
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
   "src/handlers/system/sysctl.rs",
@@ -244,7 +243,11 @@ owed = [
 ]
 "src/handlers/php.rs" = []
 "src/handlers/ruby/bundle.rs" = []
-"src/handlers/shell.rs" = []
+"src/handlers/shell.rs" = [
+  "loop_control_bare_or_single_digit_is_inert",
+  "loop_control_other_inputs_are_denied",
+  "dispatch_returns_none_for_unhandled_commands",
+]
 "src/handlers/system/plutil.rs" = []
 "src/handlers/system/ssh.rs" = []
 "src/handlers/system/sysctl.rs" = []
