@@ -21,7 +21,6 @@ owed = [
   "src/engine/resolve/capability.rs",
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
-  "src/handlers/coreutils/find.rs",
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
@@ -161,7 +160,12 @@ owed = [
   "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
 ]
 "src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
-"src/handlers/coreutils/find.rs" = []
+"src/handlers/coreutils/find.rs" = [
+  "dispatch_routes_find_to_is_safe_find_with_some_wrapper",
+  "dispatch_returns_none_for_every_non_find_command",
+  "is_safe_find_denies_any_unknown_primary_regardless_of_position",
+  "is_safe_find_verdict_is_invariant_under_appending_a_read_only_standalone_primary",
+]
 "src/handlers/coreutils/grep.rs" = [
   "naive_oracle_matches_is_safe_grep_on_every_token_sequence",
   "dispatch_is_some_iff_command_is_a_grep_family_name",

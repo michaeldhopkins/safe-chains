@@ -223,3 +223,211 @@ mod tests {
         find_unknown_action_after_test_denied: "find . -type f -flushcache",
     }
 }
+
+#[cfg(test)]
+mod proptests {
+    // Property tests for the pure-logic functions in this file: `dispatch` and `is_safe_find`.
+    // Each property asserts a real invariant of one of those functions:
+    //   - `dispatch` is a thin router: a property states its exact routing contract.
+    //   - `is_safe_find` is the read-only allowlist walk; properties state the deny-by-omission
+    //     arm (a non-allow-listed primary forces Denied), and the read-only-monotone case
+    //     (a known-safe primary appended to an already-allowed expression does not flip it).
+    use super::{dispatch, is_safe_find};
+    use crate::parse::Token;
+    use crate::verdict::Verdict;
+    use proptest::prelude::*;
+
+    /// A token composed solely of read-only allow-listed standalone primaries (`-print`,
+    /// `-print0`, `-ls`, `-prune`, `-quit`, `-readable`, `-writable`, `-executable`, `-empty`,
+    /// `-true`, `-false`, `-depth`, `-xdev`, …) and a benign `-`-free tail. None of these
+    /// performs a write that crosses the worktree, none takes a value, and none changes the
+    /// predicate's verdict beyond the read-only band. Composing them is the property the
+    /// walk's "standalone advances by 1" branch promises.
+    fn arb_read_only_primary() -> impl Strategy<Value = String> {
+        prop_oneof![
+            Just("-print".to_string()),
+            Just("-print0".to_string()),
+            Just("-ls".to_string()),
+            Just("-prune".to_string()),
+            Just("-quit".to_string()),
+            Just("-readable".to_string()),
+            Just("-writable".to_string()),
+            Just("-executable".to_string()),
+            Just("-empty".to_string()),
+            Just("-true".to_string()),
+            Just("-false".to_string()),
+            Just("-depth".to_string()),
+            Just("-xdev".to_string()),
+        ]
+    }
+
+    /// A token that the deny-by-omission arm catches: starts with `-`, is NOT a leading global
+    /// option (`-H`/`-L`/`-P`/`-D`/`-O*`), is NOT `-exec`/`-execdir`/`-delete` (which have
+    /// dedicated delegation branches), and is NOT in the standalone or valued allowlists in
+    /// `commands/search/find.toml`. Such a token is a primary the registry doesn't know, so
+    /// the walk must hit the explicit `Verdict::Denied` arm at the bottom of the loop.
+    fn arb_unknown_primary() -> impl Strategy<Value = String> {
+        prop_oneof![
+            // outright unknowns (the BSD/macOS `-fprint` family is in the engine's interceptor
+            // layer too, but here we hit the handler's own allowlist-fail-closed branch).
+            Just("-frobnicate".to_string()),
+            Just("-flushcache".to_string()),
+            Just("-z".to_string()),
+            Just("-E".to_string()),
+            // well-known deny-by-omission primaries documented in find's toml `[command.output]`.
+            Just("-fprint".to_string()),
+            Just("-fprint0".to_string()),
+            Just("-fprintf".to_string()),
+            Just("-fls".to_string()),
+            Just("-ok".to_string()),
+            Just("-okdir".to_string()),
+        ]
+    }
+
+    /// An arbitrary token the walk must accept as a benign operand: arbitrary-but-non-empty text
+    /// that does not start with `-`, so it gets classified as a path operand or a valued
+    /// primary's value rather than a primary. Used to vary the suffix without forcing the walk
+    /// into a deny branch.
+    fn arb_benign_operand() -> impl Strategy<Value = String> {
+        "[a-zA-Z0-9_./]{1,16}".prop_filter("must not start with a dash", |s| !s.starts_with('-'))
+    }
+
+    proptest! {
+        // Differential. `dispatch`'s contract is a one-arm router on `cmd`: it forwards
+        // `find` to `is_safe_find` and returns `None` for anything else. Wrapping the
+        // forward in `Some(_)` must therefore mirror `is_safe_find` exactly. A regression
+        // that lost the `Some(...)` wrapper, swapped arms, or skipped the call would fail
+        // here on the very first generated input.
+        #[test]
+        fn dispatch_routes_find_to_is_safe_find_with_some_wrapper(
+            args in proptest::collection::vec(any::<String>(), 0..16),
+        ) {
+            let mut tokens: Vec<Token> = Vec::with_capacity(args.len() + 1);
+            tokens.push(Token::from_test("find"));
+            for a in &args {
+                tokens.push(Token::from_test(a));
+            }
+            proptest::prop_assert_eq!(
+                dispatch("find", &tokens),
+                Some(is_safe_find(&tokens)),
+                "tokens after program name: {:?}",
+                &args[..],
+            );
+        }
+
+        // Differential (complement). The non-`find` arm of `dispatch` returns `None` for
+        // every input — there is no path by which a non-`find` command name ever reaches a
+        // verdict. A regression that defaulted to `Some(Allowed(Inert))` instead of `None`
+        // would let every command through `find.rs` and silently bypass the rest of the
+        // classifier. The cmd list is built as `String` (`select` over `&str` would yield
+        // `&str` and trip `needless_borrow`); `cmd.as_str()` then gives the uniform `&str`
+        // both consumers need.
+        #[test]
+        fn dispatch_returns_none_for_every_non_find_command(
+            cmd in proptest::sample::select(vec![
+                "".to_string(), "ls".to_string(), "cat".to_string(),
+                "grep".to_string(), "tar".to_string(),
+                "FIND".to_string(), "FIND ".to_string(), "Find".to_string(),
+                "findutils".to_string(), "-find".to_string(), "_find".to_string(),
+                "find-extra".to_string(), "xfind".to_string(),
+            ]),
+            args in proptest::collection::vec(any::<String>(), 0..8),
+        ) {
+            let mut tokens: Vec<Token> = Vec::with_capacity(args.len() + 1);
+            tokens.push(Token::from_test(cmd.as_str()));
+            for a in &args {
+                tokens.push(Token::from_test(a));
+            }
+            proptest::prop_assert_eq!(
+                dispatch(cmd.as_str(), &tokens),
+                None,
+                "non-find cmd `{}` must return None, got Some",
+                cmd,
+            );
+        }
+
+        // Invariant (allowlist fail-closed). The walk's terminal branch is the explicit
+        // `return Verdict::Denied` for any primary the registry doesn't list. Promising
+        // that branch is reachable is the *point* of the allowlist — the old denylist
+        // falsely admitted primaries it hadn't enumerated. For any expression made of
+        // a benign worktree base plus a deny-by-omission primary (anywhere — leading,
+        // middle, trailing), `is_safe_find` must deny. A regression that accidentally
+        // swallowed the primary, treated it as a value, or added it to the allowlist
+        // would surface here.
+        #[test]
+        fn is_safe_find_denies_any_unknown_primary_regardless_of_position(
+            unknown in arb_unknown_primary(),
+            position in 0usize..=2,
+            suffix in proptest::collection::vec(arb_read_only_primary(), 0..4),
+        ) {
+            // Build the expression: `find . [read-only prefix] <unknown> [read-only suffix]`.
+            // `position` selects whether the unknown primary sits first, second, or last
+            // (position 0/1 within the test primaries), so a position-sensitive bug in the
+            // walk (off-by-one after a valued primary, e.g.) fails the property.
+            let mut tokens: Vec<Token> = vec![Token::from_test("find"), Token::from_test(".")];
+            match position {
+                0 => {
+                    tokens.push(Token::from_test(&unknown));
+                    tokens.extend(suffix.iter().map(|s| Token::from_test(s)));
+                }
+                _ => {
+                    tokens.push(Token::from_test("-print"));
+                    if position == 1 {
+                        tokens.push(Token::from_test(&unknown));
+                    }
+                    tokens.extend(suffix.iter().map(|s| Token::from_test(s)));
+                    if position == 2 {
+                        tokens.push(Token::from_test(&unknown));
+                    }
+                }
+            }
+            proptest::prop_assert_eq!(
+                is_safe_find(&tokens),
+                Verdict::Denied,
+                "deny-by-omission primary `{}` at position {} of {:?} was not denied",
+                unknown,
+                position,
+                &tokens[..],
+            );
+        }
+
+        // Metamorphic. Once `is_safe_find` has classified an expression as Allowed, appending
+        // a read-only standalone primary (one whose allowlist presence advances the cursor
+        // by exactly one token and adds no destructive capacity) must keep the verdict
+        // unchanged. The test composes a benign worktree expression with an arbitrary
+        // read-only primary tail and asserts the tail-appended expression classifies
+        // identically — Allowed iff Allowed, exactly the property the walk's
+        // `safe_standalone.contains_flag(s)` branch implements. A regression that, say,
+        // re-classified the expression from scratch on every primary (or made the tail's
+        // safety decision depend on what came before) would flip the verdict here.
+        #[test]
+        fn is_safe_find_verdict_is_invariant_under_appending_a_read_only_standalone_primary(
+            prefix_primaries in proptest::collection::vec(arb_read_only_primary(), 0..4),
+            tail_primary in arb_read_only_primary(),
+            operand in arb_benign_operand(),
+        ) {
+            let base = {
+                let mut tokens: Vec<Token> = vec![Token::from_test("find"), Token::from_test(".")];
+                for p in &prefix_primaries {
+                    tokens.push(Token::from_test(p));
+                }
+                tokens.push(Token::from_test(&operand));
+                tokens
+            };
+            let tail = {
+                let mut tokens = base.clone();
+                tokens.push(Token::from_test(&tail_primary));
+                tokens
+            };
+            proptest::prop_assert_eq!(
+                is_safe_find(&base),
+                is_safe_find(&tail),
+                "appending `{}` to {:?} flipped the verdict: base -> {:?}, tail -> {:?}",
+                tail_primary,
+                &base[..],
+                is_safe_find(&base),
+                is_safe_find(&tail),
+            );
+        }
+    }
+}
