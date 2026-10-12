@@ -24,7 +24,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/node/bun.rs",
   "src/handlers/php.rs",
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/plutil.rs",
@@ -228,7 +227,11 @@ owed = [
   "a_safe_curl_header_value_round_trips_through_name_case_and_whitespace",
   "is_safe_curl_help_or_version_in_two_tokens_is_always_inert",
 ]
-"src/handlers/node/bun.rs" = []
+"src/handlers/node/bun.rs" = [
+  "help_shortcut_yields_inert_for_any_program_token_at_length_two",
+  "tokens_shorter_than_two_are_always_denied",
+  "flag_only_tail_after_program_with_no_help_shortcut_is_denied",
+]
 "src/handlers/node/bunx.rs" = [
   "dispatch_only_routes_bunx",
   "runner_dispatch_denies_when_no_package_is_named",
