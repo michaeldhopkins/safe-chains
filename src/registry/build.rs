@@ -1401,3 +1401,188 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
     }
     map.insert(spec.name.clone(), spec);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    /// Strategies for built-policy inputs. `flag_name` keeps test strings small and distinct
+    /// enough that overlap between `standalone`/`valued` is rare; the policy builder does not
+    /// dedup, so properties that compare counts must tolerate the duplicates the generator
+    /// produces naturally.
+    fn flag_name() -> impl Strategy<Value = String> {
+        "[a-zA-Z][a-zA-Z0-9_-]{0,8}".prop_map(String::from)
+    }
+
+    fn opt_bool() -> impl Strategy<Value = Option<bool>> {
+        proptest::option::of(any::<bool>())
+    }
+
+    /// Pure-reference `first_arg_matches`: same branch table the function uses, expressed once
+    /// here so a property can compare the function against an oracle. Proptest keeps both
+    /// implementations out of the main code path so a future refactor (e.g. migrating the
+    /// glob mechanism to `regex`) can be checked against the prior contract.
+    fn oracle_first_arg_matches(name: &str, patterns: &[String]) -> bool {
+        patterns.iter().any(|p| match p.strip_suffix('*') {
+            Some(prefix) => name.starts_with(prefix),
+            None => p == name,
+        })
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(256))]
+
+        /// INVARIANT (`build_policy` optional-valued mechanism). The whole point of the
+        /// `optional_valued` list — see the docstring on `build_policy` — is that each entry
+        /// lands in BOTH the `standalone` and the `valued` allowlist, so the rest of the walk
+        /// can use one canonical "did the user declare this flag?" test. This property pins
+        /// that contract: for every generated set of inputs, the count of each
+        /// `optional_valued` flag in the output lists is the original count plus however
+        /// many times the flag was also declared in `optional_valued`. The originals are
+        /// preserved at the front (the function appends, it does not rebuild), and the
+        /// append fires once per `optional_valued` occurrence — duplicates in the input
+        /// propagate, which matters for the overlap audit in `check_flags`. A regression
+        /// that folded the two push-loops into one, or that dropped the append for one list
+        /// only, would break one direction while keeping the other, and the asymmetry is
+        /// what this property catches.
+        #[test]
+        fn build_policy_optional_valued_mechanism_appends_to_both_lists(
+            standalone in proptest::collection::vec(flag_name(), 0..5),
+            valued in proptest::collection::vec(flag_name(), 0..5),
+            optional_valued in proptest::collection::vec(flag_name(), 0..5),
+            bare in opt_bool(),
+            max_positional in proptest::option::of(any::<usize>()),
+            tolerate_unknown_short in opt_bool(),
+            tolerate_unknown_long in opt_bool(),
+            numeric_dash in opt_bool(),
+        ) {
+            let p = build_policy(
+                standalone.clone(),
+                valued.clone(),
+                optional_valued.clone(),
+                bare,
+                max_positional,
+                tolerate_unknown_short,
+                tolerate_unknown_long,
+                numeric_dash,
+            );
+            // The set of unique `optional_valued` entries — covers the union of every flag
+            // appended in this test, including any duplicates the generator happened to
+            // produce (which the function faithfully copies through).
+            let unique: std::collections::BTreeSet<String> =
+                optional_valued.iter().cloned().collect();
+            for flag in &unique {
+                let sa = p.standalone.iter().filter(|f| f.as_str() == flag.as_str()).count();
+                let va = p.valued.iter().filter(|f| f.as_str() == flag.as_str()).count();
+                let s_orig = standalone.iter().filter(|f| f.as_str() == flag.as_str()).count();
+                let v_orig = valued.iter().filter(|f| f.as_str() == flag.as_str()).count();
+                let s_ov = optional_valued.iter().filter(|f| f.as_str() == flag.as_str()).count();
+                prop_assert_eq!(
+                    sa,
+                    s_orig + s_ov,
+                    "optional_valued entry {} ended up {} times in standalone (expected originals {} + ov {})",
+                    flag, sa, s_orig, s_ov,
+                );
+                prop_assert_eq!(
+                    va,
+                    v_orig + s_ov,
+                    "optional_valued entry {} ended up {} times in valued (expected originals {} + ov {})",
+                    flag, va, v_orig, s_ov,
+                );
+            }
+            // The pre-existing lists are kept verbatim — `optional_valued` is *appended*, not
+            // used to rebuild the lists from scratch.
+            prop_assert!(
+                p.standalone.starts_with(&standalone),
+                "standalone prefix not preserved: {:?}", p.standalone,
+            );
+            prop_assert!(
+                p.valued.starts_with(&valued),
+                "valued prefix not preserved: {:?}", p.valued,
+            );
+        }
+
+        /// INVARIANT (`build_policy` unknown tolerance). The 2x2 (short, long) boolean
+        /// combination must map to the matching `UnknownTolerance` variant — the four-way
+        /// truth table the function documents. A regression that dropped one arm or wired
+        /// the booleans to the wrong variants (e.g. swapped Short and Long) would land here
+        /// on exactly those inputs and nowhere else, since this is the only place those
+        /// four values are produced.
+        #[test]
+        fn build_policy_unknown_tolerance_tracks_the_boolean_pair(
+            short in any::<bool>(),
+            long in any::<bool>(),
+        ) {
+            let p = build_policy(
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                Some(true),
+                None,
+                Some(short),
+                Some(long),
+                None,
+            );
+            let expected = match (short, long) {
+                (false, false) => UnknownTolerance::Strict,
+                (true, false) => UnknownTolerance::Short,
+                (false, true) => UnknownTolerance::Long,
+                (true, true) => UnknownTolerance::Both,
+            };
+            prop_assert_eq!(p.tolerance.unknown, expected);
+        }
+
+        /// INVARIANT / differential (oracle). `first_arg_matches` is a four-line branch over
+        /// each pattern, and the pattern language is small enough to spell out a reference
+        /// implementation that has no other behavior. This property pins the function to
+        /// the reference for every generated (name, patterns) pair so a future refactor —
+        /// switching to `regex`, anchoring the prefix, or skipping empty patterns — has to
+        /// keep the documented outcomes identical, not just "panics less than before".
+        #[test]
+        fn first_arg_matches_agrees_with_a_simple_reference(
+            name in "[a-zA-Z0-9][a-zA-Z0-9._:-]{0,12}",
+            patterns in proptest::collection::vec(
+                "(-\\*|[a-zA-Z][a-zA-Z0-9._:-]{0,8}(\\*)?)",
+                0..6,
+            ),
+        ) {
+            let patterns: Vec<String> = patterns;
+            prop_assert_eq!(
+                first_arg_matches(&name, &patterns),
+                oracle_first_arg_matches(&name, &patterns),
+            );
+        }
+
+        /// MONOTONICITY (`first_arg_matches`). The function tests `any` over the pattern
+        /// list, so adding a matching pattern can never turn a hit into a miss — the
+        /// property holds for a synthetic name (forced not to match any base pattern) and a
+        /// single `*`-suffixed pattern whose prefix the name starts with. A regression that
+        /// replaced `any` with `all`, or that re-applied the loop on each pattern's match
+        /// to update some shared state, would break the monotonicity direction on the second
+        /// assertion: matches on a pattern that was already a miss would need a flip, and
+        /// that's exactly the failure mode the property isolates.
+        #[test]
+        fn first_arg_matches_is_monotone_in_adding_a_matching_pattern(
+            base in proptest::collection::vec(
+                "[a-zA-Z][a-zA-Z0-9._:-]{0,8}",
+                0..4,
+            ),
+            prefix in "[a-zA-Z][a-zA-Z0-9._:-]{0,4}",
+            tail in "[a-zA-Z0-9._:-]{1,6}",
+        ) {
+            let name = format!("{}{}", prefix, tail);
+            // The base patterns do NOT match `name` (no pattern starts with `prefix*`, and
+            // none equals `name`). The added pattern `prefix*` does.
+            prop_assume!(!base.iter().any(|p| p == &name
+                || (p.ends_with('*') && name.starts_with(&p[..p.len() - 1]))));
+
+            let before = first_arg_matches(&name, &base);
+            let mut extended = base.clone();
+            extended.push(format!("{}*", prefix));
+            let after = first_arg_matches(&name, &extended);
+            prop_assert!(!before, "base should not match: base={:?} name={}", base, name);
+            prop_assert!(after, "adding matching pattern should have flipped to true");
+        }
+    }
+}

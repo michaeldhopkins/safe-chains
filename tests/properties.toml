@@ -26,7 +26,6 @@ owed = [
   "src/handlers/forges/glab.rs",
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/ssh.rs",
-  "src/registry/build.rs",
   "src/registry/docs.rs",
 ]
 
@@ -314,7 +313,12 @@ owed = [
   "no_entry_after_a_single_assignment_names_program_and_assignment",
   "no_entry_with_only_assignments_uses_the_trimmed_input_and_no_swallow",
 ]
-"src/registry/build.rs" = []
+"src/registry/build.rs" = [
+  "build_policy_optional_valued_mechanism_appends_to_both_lists",
+  "build_policy_unknown_tolerance_tracks_the_boolean_pair",
+  "first_arg_matches_agrees_with_a_simple_reference",
+  "first_arg_matches_is_monotone_in_adding_a_matching_pattern",
+]
 "src/registry/dispatch.rs" = [
   "src/handler_property_tests.rs::code_exec_denies_foreign_executor",
   "src/handler_property_tests.rs::code_exec_worktree_dominates_foreign",
