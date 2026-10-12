@@ -25,7 +25,6 @@ owed = [
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/ruby/bundle.rs",
-  "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
   "src/registry/build.rs",
   "src/registry/docs.rs",
@@ -255,7 +254,12 @@ owed = [
   "loop_control_other_inputs_are_denied",
   "dispatch_returns_none_for_unhandled_commands",
 ]
-"src/handlers/system/plutil.rs" = []
+"src/handlers/system/plutil.rs" = [
+  "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
+  "convert_format_outside_allowlist_is_denied_for_any_modifier_tail",
+  "convert_help_or_h_in_two_token_slice_is_inert",
+  "convert_reordering_dash_r_and_dash_s_preserves_the_verdict",
+]
 "src/handlers/system/ssh.rs" = []
 "src/handlers/system/sysctl.rs" = [
   "sysctl_with_equals_in_any_tail_token_is_denied",

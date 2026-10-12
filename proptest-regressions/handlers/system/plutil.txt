@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc e6aedaa9f453342b50aeb6e4227905c55fb7778fb2128cac42e56405be364542 # shrinks to modifiers = [], non_dash = Token("out")
+cc d7065fc9ef64e4a9b629b7c03231fc2b835782de337eabcaa81c494d7c0b5792 # shrinks to base = [Token("-convert"), Token("binary1")], modifiers = [Token("-o"), Token("out")], non_dash = Token("out")
