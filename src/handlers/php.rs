@@ -315,4 +315,151 @@ mod tests {
     fn php_help_is_inert() {
         assert_eq!(verdict("php --help"), Verdict::Allowed(SafetyLevel::Inert));
     }
+
+    use crate::parse::Token;
+    use proptest::prelude::*;
+
+    // The 11 allowlisted ini directives, in the same order as `PHP_SAFE_INI_DIRECTIVES`. Proptest
+    // samples one element at a time to drive the differential property against the static list.
+    const PHP_SAFE_INI_KEYS: &[&str] = &[
+        "date.timezone", "display_errors", "error_reporting", "max_execution_time", "max_input_time", "max_input_vars", "memory_limit",
+        "opcache.enable", "opcache.enable_cli", "post_max_size", "upload_max_filesize",
+    ];
+
+    proptest! {
+        // METAMORPHIC (value-side irrelevant). `is_safe_ini_pair` returns true iff the KEY half of
+        // a `KEY=VALUE` string is in the static allowlist; the function never inspects what comes
+        // after the first `=`. So two pairs that share a KEY must agree, regardless of how the
+        // values differ — including when one side has no `=` and the other has a long value, when
+        // the value itself contains further `=` signs (the first `=` is the split), and when the
+        // value is empty. The oracle is the SAME function called twice; the property is that the
+        // call's result depends only on KEY.
+        #[test]
+        fn is_safe_ini_pair_only_depends_on_the_key_half(
+            key in proptest::sample::select(PHP_SAFE_INI_KEYS.to_vec()),
+            v1 in "[a-zA-Z0-9._/+-]{0,12}",
+            v2 in "[a-zA-Z0-9._/+]{0,12}",
+        ) {
+            let a = super::is_safe_ini_pair(&format!("{key}={v1}"));
+            let b = super::is_safe_ini_pair(&format!("{key}={v2}"));
+            proptest::prop_assert_eq!(a, b,
+                "is_safe_ini_pair must agree on shared KEY {} regardless of value side", key);
+        }
+
+        // DIFFERENTIAL (oracle = the explicit allowlist). For each allowlisted KEY the pair must
+        // be safe; for a KEY drawn from the SAME alphanumeric+`.`/`-`/`_` alphabet but guaranteed
+        // not to be in the list, the pair must be denied. This is differential because the
+        // reference is the literal allowlist declared above — not a property of `is_safe_ini_pair`
+        // itself — and pins the function to that allowlist as the registry evolves.
+        #[test]
+        fn is_safe_ini_pair_matches_the_allowlist_exactly(
+            safe_key in proptest::sample::select(PHP_SAFE_INI_KEYS.to_vec()),
+            unsafe_key in "[a-z][a-z0-9._-]{0,10}",
+            value in "[a-zA-Z0-9]{0,6}",
+        ) {
+            // The unsafe_key strategy overlaps the allowlist alphabet; assume it sampled a key NOT
+            // in the list so we are genuinely comparing safe vs unsafe branches.
+            proptest::prop_assume!(!PHP_SAFE_INI_KEYS.contains(&unsafe_key.as_str()));
+            proptest::prop_assert!(
+                super::is_safe_ini_pair(&format!("{safe_key}={value}")),
+                "allowlisted key {} must be safe",
+                safe_key,
+            );
+            proptest::prop_assert!(
+                !super::is_safe_ini_pair(&format!("{unsafe_key}={value}")),
+                "non-allowlisted key {} must be denied",
+                unsafe_key,
+            );
+        }
+
+        // INVARIANT (no `=` ⇒ denied). The first thing the function does is `split_once('=')`;
+        // a missing `=` short-circuits to `false` before the allowlist is even consulted. Every
+        // string without `=` therefore lands on the same branch — the value side cannot rescue it.
+        // This pins the missing-equals rejection independently of the allowlist membership.
+        #[test]
+        fn is_safe_ini_pair_rejects_any_string_without_equals(
+            s in "[a-zA-Z0-9._/ +-]{1,16}",
+        ) {
+            proptest::prop_assume!(!s.contains('='));
+            proptest::prop_assert!(
+                !super::is_safe_ini_pair(&s),
+                "string {:?} without = must be denied, got accepted",
+                s,
+            );
+        }
+
+        // INVARIANT (two positionals ⇒ denied). `check_laravel_cache_clear` accepts at most one
+        // bare positional after `cache:clear` — a second one trips the catch-all `Denied` branch
+        // at the bottom of the loop. The handler is invoked with a slice that begins with the
+        // sub-command itself (`cache:clear`) at index 0, then the cache:clear args; here `cache:clear`
+        // is consumed as the one allowed positional, so adding a second non-flag token after it
+        // must trip the deny. `mid_flags` are well-formed inert flags that the walker consumes
+        // without bumping `saw_positional`; they cannot rescue the second positional, which the
+        // loop always sees.
+        #[test]
+        fn check_laravel_cache_clear_denies_two_positionals(
+            pos1 in "[a-z][a-z0-9._-]{0,10}",
+            pos2 in "[a-z][a-z0-9._-]{0,10}",
+            mid_flags in proptest::collection::vec(
+                proptest::sample::select(&[
+                    "--help", "-h", "--store=x", "--tags=y",
+                ][..]),
+                0..=3,
+            ),
+        ) {
+            proptest::prop_assume!(!pos1.starts_with('-'));
+            proptest::prop_assume!(!pos2.starts_with('-'));
+            proptest::prop_assume!(pos1 != pos2 || mid_flags.is_empty());
+            let mut tokens: Vec<Token> = Vec::with_capacity(3 + mid_flags.len());
+            tokens.push(Token::from_test("cache:clear"));
+            tokens.push(Token::from_test(&pos1));
+            for f in &mid_flags {
+                tokens.push(Token::from_test(f));
+            }
+            tokens.push(Token::from_test(&pos2));
+            proptest::prop_assert_eq!(
+                super::check_laravel_cache_clear(&tokens),
+                Verdict::Denied,
+                "two positionals {:?},{:?} with mid flags {:?} must be denied",
+                pos1, pos2, mid_flags,
+            );
+        }
+
+        // IDEMPOTENCE (inert flags leave SafeWrite unchanged). The walker treats `--help`/`-h` as
+        // a no-op advance and consumes well-formed `--store=X`/`--tags=X`/`--store X`/`--tags X`
+        // without changing the verdict. So a base input that already returns `SafeWrite` keeps
+        // returning `SafeWrite` no matter which of those inert flags you append to it (any
+        // subset, any order). The base is built to be SafeWrite: `cache:clear` plus one
+        // positional; the property then sweeps every inert insertion and confirms the verdict
+        // is unchanged.
+        #[test]
+        fn check_laravel_cache_clear_safe_write_survives_inert_flag_insertion(
+            pos in "[a-z][a-z0-9._-]{0,8}",
+            extras in proptest::collection::vec(
+                proptest::sample::select(&[
+                    "--help",
+                    "-h",
+                    "--store=file",
+                    "--tags=foo",
+                    "--store=redis",
+                    "--tags=bar",
+                ][..]),
+                0..=4,
+            ),
+        ) {
+            proptest::prop_assume!(!pos.starts_with('-'));
+            let mut tokens: Vec<Token> = Vec::with_capacity(2 + extras.len());
+            tokens.push(Token::from_test("cache:clear"));
+            tokens.push(Token::from_test(&pos));
+            for f in &extras {
+                tokens.push(Token::from_test(f));
+            }
+            proptest::prop_assert_eq!(
+                super::check_laravel_cache_clear(&tokens),
+                Verdict::Allowed(SafetyLevel::SafeWrite),
+                "base [cache:clear, {:?}] with extras {:?} must stay SafeWrite",
+                pos, extras,
+            );
+        }
+    }
 }

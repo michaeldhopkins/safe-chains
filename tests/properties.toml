@@ -24,7 +24,6 @@ owed = [
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
-  "src/handlers/php.rs",
   "src/handlers/ruby/bundle.rs",
   "src/handlers/system/plutil.rs",
   "src/handlers/system/ssh.rs",
@@ -243,7 +242,13 @@ owed = [
   "scan_perl_with_unknown_long_flag_returns_none",
   "has_substitution_eval_matches_e_flag_for_isolated_substitution",
 ]
-"src/handlers/php.rs" = []
+"src/handlers/php.rs" = [
+  "is_safe_ini_pair_only_depends_on_the_key_half",
+  "is_safe_ini_pair_matches_the_allowlist_exactly",
+  "is_safe_ini_pair_rejects_any_string_without_equals",
+  "check_laravel_cache_clear_denies_two_positionals",
+  "check_laravel_cache_clear_safe_write_survives_inert_flag_insertion",
+]
 "src/handlers/ruby/bundle.rs" = []
 "src/handlers/shell.rs" = [
   "loop_control_bare_or_single_digit_is_inert",
