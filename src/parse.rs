@@ -318,6 +318,15 @@ mod tests {
     }
 
     proptest! {
+        #[test]
+        fn const_less_is_the_strict_byte_order(
+            a in proptest::collection::vec(b'a'..=b'c', 0..5),
+            b in proptest::collection::vec(b'a'..=b'c', 0..5),
+        ) {
+            prop_assert_eq!(const_less(&a, &b), a < b);
+            prop_assert!(!const_less(&a, &a));
+        }
+
         /// `command_name` is the last `/`-separated segment of its input, with one carve-out: any
         /// string starting with `@` (a scoped npm package name) is returned verbatim. This is the
         /// contract callers rely on — `git command_name` returns `git`, `./bin/foo` returns `foo`,

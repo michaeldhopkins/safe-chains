@@ -302,6 +302,7 @@ owed = [
   "split_value_is_some_iff_separator_present_and_yields_first_suffix",
   "content_outside_double_quotes_is_idempotent",
   "has_flag_verdict_is_invariant_under_appending_a_double_dash_tail",
+  "const_less_is_the_strict_byte_order",
 ]
 "src/pathgate.rs" = [
   "ar_write_never_more_permissive_than_read",
