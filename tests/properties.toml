@@ -64,6 +64,7 @@ owed = [
 "src/cst/explain.rs" = [
   "src/handler_property_tests.rs::explain_agrees_with_enforcement_whatever_the_call_order",
   "src/handler_property_tests.rs::command_text_cannot_forge_a_segment_line",
+  "src/cst/explain.rs::hook_context_has_one_line_per_listed_segment",
 ]
 "src/cst/mod.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",

@@ -263,7 +263,7 @@ installed hook inside a live Claude Code session (this is the harness safe-chain
   `{hookSpecificOutput: {permissionDecision: "allow", permissionDecisionReason}}` and is **auto-approved
   silently** — no prompt. Observed hundreds of times.
 - **Abstain + context works.** A non-allowlisted command returns `additionalContext` with NO
-  `permissionDecision`; Claude injects the "not auto-approved … This is not a block" text and the
+  `permissionDecision`; Claude injects the "did not auto-approve" text and the
   command proceeds through the **normal permission flow** (the user's own allowlist / a prompt) —
   exactly the abstain contract in `src/targets/claude.rs` (allow → `permissionDecision:"allow"`, else
   `additionalContext` only). `permissionDecision: "deny"`/`"ask"` are supported by the shape but

@@ -197,7 +197,7 @@ fn run_hook_on(
     }
 
     if explanation.should_surface() {
-        let response = format.render_context(&explanation.render());
+        let response = format.render_context(&explanation.render_context());
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }

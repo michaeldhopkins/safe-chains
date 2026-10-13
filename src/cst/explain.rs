@@ -306,6 +306,17 @@ impl Explanation {
         out
     }
 
+    pub fn render_context(&self) -> String {
+        if !(self.parsed && self.stateful) {
+            return self.render();
+        }
+        let mut out = String::from("safe-chains did not auto-approve:\n");
+        for s in self.segments.iter().filter(|s| !s.verdict.is_allowed()) {
+            out.push_str(&render_line(s));
+        }
+        out
+    }
+
     fn guidance(&self, total: usize, denied: usize) -> Option<&'static str> {
         if denied == 0 {
             return None;
@@ -494,6 +505,34 @@ mod tests {
         assert!(!explain("rm -rf / && rm -rf /etc").should_surface(), "all-denied: no rescue");
         assert!(!explain("rm -rf /").should_surface(), "single denied: no chaining lesson");
         assert!(!explain("echo 'unterminated").should_surface(), "unparseable");
+    }
+
+    // ---- render_context (what the hook injects) ----
+
+    #[test]
+    fn stateful_chain_context_names_only_the_refused_segments() {
+        assert_eq!(explain("cd build && cargo publish").render_context(), "safe-chains did not auto-approve:\n  ✗  cargo publish\n");
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn hook_context_has_one_line_per_listed_segment(
+            cmd in proptest::sample::select(crate::handler_property_tests::FORGERY_PAYLOADS.to_vec()),
+        ) {
+            let e = explain(&format!("cd x && {cmd}"));
+            let context = e.render_context();
+            let short = e.parsed && e.stateful;
+            let expected = if short { e.segments.iter().filter(|s| !s.verdict.is_allowed()).count() } else { e.segments.len() };
+            let lines = context.lines().filter(|l| l.starts_with("  \u{2713}  ") || l.starts_with("  \u{2717}  ")).count();
+            proptest::prop_assert_eq!(lines, expected, "{}", context);
+            proptest::prop_assert!(!short || !context.contains('\u{2713}'), "{}", context);
+        }
+    }
+
+    #[test]
+    fn stateless_chain_context_keeps_the_full_breakdown() {
+        let e = explain("git status && rm -rf / && echo done");
+        assert_eq!(e.render_context(), e.render());
     }
 
     // ---- coverage overlay ----
