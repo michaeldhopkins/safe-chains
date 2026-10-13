@@ -783,4 +783,29 @@ mod tests {
         assert_eq!(PositionalShape::from_name("path"), Some(PositionalShape::Path));
         assert_eq!(PositionalShape::from_name("nope"), None);
     }
+
+    #[test]
+    fn a_vec_of_flags_answers_short_lookups_as_its_slice_does() {
+        let lists: [&[&str]; 3] = [&[], &["-x", "--long", "-y"], &["--x", "-", "-xy"]];
+        for list in lists {
+            let flags: Vec<String> = list.iter().map(|s| (*s).to_string()).collect();
+            for byte in 0..=u8::MAX {
+                let expected = list.iter().any(|f| f.len() == 2 && f.as_bytes()[1] == byte);
+                assert_eq!(flags.contains_short(byte), expected, "{list:?} byte {byte}");
+                assert_eq!(flags.as_slice().contains_short(byte), expected, "{list:?} byte {byte}");
+            }
+        }
+    }
+
+    #[test]
+    fn an_opaque_probe_is_consumed_as_a_flag_value_where_other_options_are_not() {
+        let next = |w: &str| consumes_next_value(Some(&Token::from_test(w)));
+        assert!(next(crate::cst::opaque::FLAG_PROBE));
+        assert!(next(crate::cst::opaque::SHORT_PROBE));
+        assert!(!next("--require=evil.js"));
+        assert!(!next("-%x"));
+        assert!(next("-5"));
+        assert!(next("-"));
+        assert!(!consumes_next_value(None));
+    }
 }
