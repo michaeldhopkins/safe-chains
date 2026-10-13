@@ -3,9 +3,9 @@
 General method is in the `rust-mutation-testing` skill. This is what is specific to safe-chains.
 
 - **Per change** (`.github/workflows/mutants.yml`, not gating): `--in-diff` on every PR and push to
-  `main`, skipped with a warning above 20 selected mutants; and on each push to `main` one
-  **rotating slice**, `--shard (run_number % 512)/512`. PR runs advance the same counter, so
-  coverage is roughly one pass per 512 runs rather than exactly one per 512 pushes. There is no
+  `main`, skipped with a warning above 7 selected mutants; and on each push to `main` one
+  **rotating slice**, `--shard (run_number % 1024)/1024`. PR runs advance the same counter, so
+  coverage is roughly one pass per 1024 runs rather than exactly one per 1024 pushes. There is no
   whole-tree sweep: ~5,300 mutants at ~39s of runner wall clock each is ~58 hours.
 - **N = 512, from the runner.** The first CI slice (run 36363446362, slice 1/256, 21 mutants) took
   16.7 minutes: baseline 105s build + 98s test, then ~39s of wall clock per mutant at `-j2`, against
@@ -77,3 +77,7 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   `src/substitution_property_tests.rs` (suite 149s to 54s under the `mutants` profile). If the
   baseline test step passes ~150s on the runner again, find the slowest test with `cargo nextest
   run --cargo-profile mutants --features fuzz-gen` before touching N or the timeout.
+- **N = 1024 and an in-diff cap of 7, from 2026-10-13.** With that test fixed, the runner's baseline
+  was 100s build + 166s test and each mutant about 100s of wall clock at `-j2` (rebuilds of 40-90s,
+  not the laptop's 2-5s), so a 13-mutant slice at N = 512 still hit the timeout. 1024 gives about 5
+  mutants a slice.
