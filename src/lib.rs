@@ -78,6 +78,8 @@ pub mod pathgate;
 pub mod policy;
 pub mod refusal;
 pub mod registry;
+#[cfg(test)]
+mod substitution_property_tests;
 pub mod suggest;
 pub mod targets;
 pub mod verdict;

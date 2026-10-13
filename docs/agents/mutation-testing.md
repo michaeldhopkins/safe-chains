@@ -69,3 +69,11 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
   `~/projects/safe-chains` and a peer under a HOME of its own.
 
+- **Every CI run cancelled at the 20-minute timeout, 2026-10-12 to 10-13** (runs 38266072545 to
+  38423646672): the baseline test step had grown from 98s to 338s, because one exhaustive test,
+  `substitution_is_never_more_permissive_than_a_path_it_could_produce`, took 143s of a 149s local
+  suite. It classified each abstraction once per refused witness and ran serially; it now
+  classifies each once per root and suffix, one thread per context, in
+  `src/substitution_property_tests.rs` (suite 149s to 54s under the `mutants` profile). If the
+  baseline test step passes ~150s on the runner again, find the slowest test with `cargo nextest
+  run --cargo-profile mutants --features fuzz-gen` before touching N or the timeout.

@@ -414,6 +414,7 @@ owed = [
 "src/handler_property_tests.rs" = "the cross-handler property suite (#[cfg(test)] mod in lib.rs)"
 "src/overreach_property_tests.rs" = "the workspace_overreach property suite (#[cfg(test)] mod in lib.rs)"
 "src/path_placement_tests.rs" = "the path-placement property suite (#[cfg(test)] mod in lib.rs)"
+"src/substitution_property_tests.rs" = "the exhaustive substitution-permissiveness suite (#[cfg(test)] mod in lib.rs)"
 "src/registry/gate_consistency.rs" = "path-gate consistency tests (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/tests.rs" = "the registry test suite"
 "src/suggest/tests.rs" = "suggest's test suite"

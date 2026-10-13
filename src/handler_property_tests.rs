@@ -21,7 +21,7 @@ use proptest::prelude::*;
 use crate::pathctx::PathCtx;
 use crate::{command_verdict, command_verdict_in, is_safe_command};
 
-fn workspace() -> PathCtx {
+pub(crate) fn workspace() -> PathCtx {
     PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() }
 }
 
@@ -607,18 +607,18 @@ const TRUSTED_WRITE_VIA_SUB_CASES: &[&str] = &[
 /// root that is itself hidden/trusted (`app/.git`, `app/.envrc`) or a credential store is how an
 /// operation POINTS at the frozen rung, which is the thing the rung exists to refuse — as opposed
 /// to a sweep passing over it, which policy admits (see `Reach`).
-const ABSTRACTION_ROOTS: &[&str] = &["app", "/etc", "~", "~/.ssh", "..", "/work", "app/.git", "app/.envrc", "app/.ssh"];
+pub(crate) const ABSTRACTION_ROOTS: &[&str] = &["app", "/etc", "~", "~/.ssh", "..", "/work", "app/.git", "app/.envrc", "app/.ssh"];
 
 /// Contexts that consume a path, spanning the OPERATIONS that gate differently — a plain read, all
 /// three write-redirect modes, a copy destination, a path-gated output flag, a loop body, and a
 /// variable binding. `{}` is the path slot.
-const ABSTRACTION_CONTEXTS: &[&str] = &[
+pub(crate) const ABSTRACTION_CONTEXTS: &[&str] = &[
     "cat {}", "echo hi > {}", "echo hi >> {}", "echo hi >| {}", "cat < {}", "cp ./src.txt {}", "asciidoctor -o {} in.adoc",
     "for f in {}; do cat $f; done", "for f in {}; do echo hi > $f; done", "OUT={}; cat \"$OUT\"", "OUT={}; echo hi > \"$OUT\"",
 ];
 
 /// Every spelling that puts `{root}` in front of a declared substitution.
-const ABSTRACTION_SUBS: &[&str] = &[
+pub(crate) const ABSTRACTION_SUBS: &[&str] = &[
     "$(fd pat {root})", "$(fd -a pat {root})", "`fd pat {root}`", "$(fd pat {root} | head -1)", "$(fd pat {root} | sort | uniq)",
     "$(fd --base-directory {root} pat)", "$(fd --search-path={root} pat)",
 ];
@@ -628,14 +628,14 @@ const ABSTRACTION_SUBS: &[&str] = &[
 /// the same fact `fd.toml` encodes by voiding its claim under `-H`/`-u`/`--no-ignore`. Widening γ
 /// past what the claim allows produces false positives, not findings; `fd_claim_assumption_holds`
 /// checks the coupling rather than trusting this comment.
-fn abstraction_witnesses(root: &str) -> Vec<String> {
+pub(crate) fn abstraction_witnesses(root: &str) -> Vec<String> {
     ["", "/plain.txt", "/sub/plain.txt"].iter().map(|s| format!("{root}{s}")).collect()
 }
 
 /// Literal text appended AFTER the path expression — the residue that the tag says nothing about,
 /// and where `$(pwd)/.git/hooks/pre-commit` lived. Drawn from the region table so a newly-declared
 /// protected path becomes a probe the moment it exists, rather than when someone remembers it.
-fn abstraction_suffixes() -> Vec<String> {
+pub(crate) fn abstraction_suffixes() -> Vec<String> {
     let mut out = vec![String::new()];
     for region in crate::engine::resolve::regions::declared_region_paths() {
         // Only the ANCHORLESS entries make sense beneath another directory — those are exactly the
@@ -1007,58 +1007,6 @@ fn an_unresolvable_cd_makes_later_relative_paths_unpinnable() {
             "`{allowed}` must still be allowed — the fix is aimed at UNRESOLVABLE targets only",
         );
     }
-}
-
-/// A substitution must never be MORE PERMISSIVE than a concrete path it could produce.
-///
-/// The general form of every substitution fail-open found so far. It needs no hand-written
-/// expectation: the literal spelling — already correct and heavily tested — IS the expectation, so
-/// a laundering bug shows up without anyone having imagined that particular route to it.
-///
-/// EXHAUSTIVE rather than sampled, deliberately. As a `proptest` over the same space this passed
-/// against a reintroduced pathgate bug: the space is ~10k combinations, proptest draws 256, and the
-/// one pairing that mattered (`asciidoctor -o` with an `/etc` root) simply never came up. A finite
-/// cross-product this cheap should be enumerated — it also makes the red demos deterministic.
-///
-/// Red→green, all four historical bugs, each caught with its corpus entries removed: the shape
-/// test on roots, the pathgate `is_unpinnable` key, the pre-expansion tag read, and the
-/// unclassified residue.
-#[test]
-fn substitution_is_never_more_permissive_than_a_path_it_could_produce() {
-    let suffixes = abstraction_suffixes();
-    let mut violations = Vec::new();
-    let mut constrained = 0usize;
-
-    for ctx in ABSTRACTION_CONTEXTS {
-        for root in ABSTRACTION_ROOTS {
-            for suffix in &suffixes {
-                for witness in abstraction_witnesses(root) {
-                    let concrete = ctx.replace("{}", &format!("{witness}{suffix}"));
-                    // Only a witness the classifier REFUSES constrains the abstraction; an allowed
-                    // one says nothing, since a different witness may still force the denial.
-                    if command_verdict_in(&concrete, workspace()).is_allowed() {
-                        continue;
-                    }
-                    constrained += 1;
-                    for sub in ABSTRACTION_SUBS {
-                        let path = format!("{}{suffix}", sub.replace("{root}", root));
-                        let abstracted = ctx.replace("{}", &path);
-                        if command_verdict_in(&abstracted, workspace()).is_allowed() {
-                            violations.push(format!("  `{concrete}` denies but `{abstracted}` allows"));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    assert!(constrained > 0, "no witness was refused — the property is vacuous");
-    assert!(
-        violations.is_empty(),
-        "a substitution was more permissive than a path it could produce ({} cases):\n{}",
-        violations.len(),
-        violations.join("\n"),
-    );
 }
 
 proptest! {
