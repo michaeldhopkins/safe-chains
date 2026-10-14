@@ -81,3 +81,11 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   was 100s build + 166s test and each mutant about 100s of wall clock at `-j2` (rebuilds of 40-90s,
   not the laptop's 2-5s), so a 13-mutant slice at N = 512 still hit the timeout. 1024 gives about 5
   mutants a slice.
+- **Run 38612754676 (2026-10-14), cancelled at the timeout with nothing MISSED:** its slice held 7
+  mutants in `Token::content_outside_double_quotes`. 6 were caught before the 20-minute limit. A
+  local run of all 27 mutants in that function took 43 minutes: 18 caught, 6 timeouts (a `+=` turned
+  into `-=` or `*=` never advances the loop, so each runs until the test timeout), and 3 MISSED. All
+  three MISSED mutated the `i + 1 < len` guard on a backslash, which was redundant because the loop
+  exits on overshoot either way. The guard is gone, and a trailing-backslash test pins what it did.
+  The six timeouts are each about 280s of wall clock, so a slice that lands on several of them can
+  run past the job limit however small N is.

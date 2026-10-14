@@ -109,7 +109,7 @@ impl Token {
                 result.push(b' ');
                 i += 1;
                 while i < bytes.len() {
-                    if bytes[i] == b'\\' && i + 1 < bytes.len() {
+                    if bytes[i] == b'\\' {
                         i += 2;
                         continue;
                     }
@@ -310,6 +310,12 @@ mod tests {
     fn content_outside_double_quotes_escaped() {
         let result = tok(r#"{print "he said \"hi\""}"#).content_outside_double_quotes();
         assert_eq!(result, "{print  }");
+    }
+
+    #[test]
+    fn content_outside_double_quotes_unterminated_string_ending_in_a_backslash() {
+        assert_eq!(tok(r#"x "ab\"#).content_outside_double_quotes(), "x  ");
+        assert_eq!(tok(r#"x "\"#).content_outside_double_quotes(), "x  ");
     }
 
     #[test]
