@@ -1,8 +1,9 @@
 [[command]]
 name = "exiftool"
-description = "Reads, writes, and edits EXIF / IPTC / XMP / makernotes / etc. metadata in image, video, and audio files. Bare invocation prints metadata to stdout (read). -all=, -tag=value, -overwrite_original, -overwrite_original_in_place rewrite the file (project-local SafeWrite via write_flags). Stable, mature."
+description = "Reads, writes, and edits EXIF / IPTC / XMP / makernotes / etc. metadata in image, video, and audio files. Bare invocation prints metadata to stdout (read); -v, -b and -htmlDump also print raw file bytes, so a read discloses what it is pointed at, and -r descends directories. -all=, -tag=value, -overwrite_original, -overwrite_original_in_place rewrite the file. Several options EXECUTE caller-supplied Perl: -if EXPR evaluates an expression per file, -config FILE loads a Perl config, and -p/-printFormat with a ${tag;EXPR} advanced formatting expression runs EXPR. -@ ARGFILE reads further arguments (any of the above) from a file, and -stay_open/-execute run batches from one. -w/-textOut write an output file per input at a caller-chosen path, -tagsFromFile copies tags into the target files, and -geotag writes GPS tags from a track file. exiftool also loads the .ExifTool_config file in the home directory (Perl) on every run when present. Stable, mature; releases every few weeks."
 url = "https://exiftool.org/"
 researched_version = "exiftool 12.x"
+single_dash_words = true
 level = "SafeRead"
 bare = false
 standalone = [
@@ -12,7 +13,7 @@ standalone = [
     "-c", "-coordFormat", "-csv",
     "-d", "-dateFormat", "-deletegps",
     "-deleteByName", "-duplicates",
-    "-e", "-extracted",
+    "-e", "-ee", "-extracted",
     "-f", "-fast", "-fast2", "-fast4",
     "-fileOrder", "-h", "-htmlDump",
     "-i", "-ignore", "-ifd0",
@@ -23,24 +24,38 @@ standalone = [
     "-php", "-progress", "-psum",
     "-q", "-quiet", "-r",
     "-recurse", "-S", "-sep",
-    "-short", "-srcfile", "-stay_open",
-    "-struct", "-tab", "-tagsFromFile",
-    "-textOut", "-u", "-unknown",
+    "-short",
+    "-struct", "-tab",
+    "-u", "-unknown",
     "-unknown2", "-v", "-V",
-    "-verbose", "-w", "-wext",
+    "-verbose", "-wext",
     "-xmlFormat", "-xmp", "-z",
-    "-version",
+    "-ver", "-version",
 ]
 valued = [
-    "-@", "-config",
-    "-csvDelim", "-csv+",
-    "-d", "-dateFormat", "-execute",
-    "-ext", "-fileOrder", "-geosync",
-    "-geotag", "-globalTimeShift", "-htmlDump",
-    "-i", "-if", "-lang",
+    "-csvDelim",
+    "-d", "-dateFormat",
+    "-ext", "-fileOrder",
+    "-globalTimeShift", "-htmlDump",
+    "-i", "-lang",
     "-listr", "-progress", "-progressOptions",
-    "-q", "-r", "-srcfile",
-    "-tab", "-textOut", "-w", "-wext",
+    "-q", "-r",
+    "-tab", "-wext",
     "-x", "-XML", "-xmlFormat",
 ]
 write_flags = ["-overwrite_original", "-overwrite_original_in_place"]
+examples_safe = [
+    "exiftool photo.jpg",
+    "exiftool -a -G photos/IMG_0001.jpg",
+    "exiftool -r -ext jpg photos",
+]
+examples_denied = [
+    "exiftool -if 'system(1)' photo.jpg",
+    "exiftool -config evil.pl photo.jpg",
+    "exiftool -@ args.txt photo.jpg",
+    "exiftool -w! ~/.zshrc photo.jpg",
+    "exiftool -tagsFromFile src.jpg ~/.ssh/id_rsa",
+    "exiftool -v3 ~/.ssh/id_rsa",
+    "exiftool -htmlDump /etc/shadow",
+    "exiftool -r ~",
+]

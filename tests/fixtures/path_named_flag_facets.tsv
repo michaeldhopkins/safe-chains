@@ -320,8 +320,6 @@ erb_lint	--custom-rule-files	untriaged	-	-	-
 eslint	--ignore-path	untriaged	-	-	-	
 eslint	--rulesdir	untriaged	-	-	-	
 espeak-ng	--path	untriaged	-	-	-	
-exiftool	-fileOrder	untriaged	-	-	-	
-exiftool	-srcfile	untriaged	-	-	-	
 eza	--group-directories-first-dirs	untriaged	-	-	-	
 file	--files-from	untriaged	-	-	-	
 file	--magic-file	untriaged	-	-	-	

@@ -141,13 +141,12 @@ fn xattr_mode(tokens: &[Token]) -> bool {
     false
 }
 
-/// `exiftool [-TAG=VALUE …] files…` — a tag ASSIGNMENT rewrites the file's metadata in place.
-///
-/// Write-only on purpose. This file's standing note defers the question of read-gating the
-/// disclosure inspectors (`pdfinfo`, `ffprobe`, `mediainfo`, `exiftool`) because doing so
-/// over-denies ordinary home-file inspection — that deferral is about READS, and nothing here
-/// changes it: a bare `exiftool ~/photo.jpg` is untouched. What was never deferred is the write
-/// form, and `exiftool -Author=x ~/.ssh/id_rsa` auto-approved.
+/// `exiftool [-TAG=VALUE …] files…` — a tag ASSIGNMENT rewrites the file's metadata in place;
+/// without one, exiftool READS its operands and prints what it finds, which for `-v`, `-b` and
+/// `-htmlDump` includes the bytes themselves. So a read gates every bare token as a read (an
+/// option value such as a date format reads as a worktree name and passes), and `-r`/`-recurse`
+/// makes each a tree. Read-gating once over-denied home inspection, which is why it was deferred;
+/// home reads open now, so `exiftool ~/photo.jpg` passes and only the credential shields refuse.
 ///
 /// Detecting the write is the whole difficulty, because exiftool's writing syntax IS its flag
 /// syntax: `-TAG=VALUE` assigns, and `-all=` DELETES every tag. So any dash-led token carrying
@@ -162,7 +161,12 @@ fn exiftool_mode(tokens: &[Token]) -> bool {
         .iter()
         .any(|a| matches!(*a, "-overwrite_original" | "-overwrite_original_in_place" | "-delete_original"));
     if !assigns && !overwrites {
-        return false; // a read: metadata inspection, deliberately not gated here
+        let role = if args.iter().any(|a| a.eq_ignore_ascii_case("-r") || a.eq_ignore_ascii_case("-recurse")) {
+            Role::ReadTree
+        } else {
+            Role::Read
+        };
+        return args.iter().any(|a| !(a.starts_with('-') && *a != "-") && gate(role, a));
     }
     let mut it = args.iter().copied();
     while let Some(t) = it.next() {

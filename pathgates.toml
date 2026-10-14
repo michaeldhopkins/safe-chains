@@ -1065,8 +1065,8 @@ handler = "textutil_mode"
 # because the read form is the common one and a blanket write gate would over-deny it.
 [roles."xattr"]
 handler = "xattr_mode"
-# exiftool: a `-TAG=VALUE` assignment rewrites the file's metadata in place. WRITE-only — the
-# read-gating deferral recorded above (disclosure inspectors over-deny home inspection) is untouched.
+# exiftool: a `-TAG=VALUE` assignment rewrites the file's metadata in place, and without one its
+# operands are reads (trees under -r): it prints what it finds, raw bytes included under -v/-b.
 [roles."exiftool"]
 handler = "exiftool_mode"
 # rdfind: -makesymlinks/-makehardlinks/-deleteduplicates destroy duplicates in the scanned trees;

@@ -34,18 +34,21 @@ impl UnknownTolerance {
 
 /// How the dispatcher treats tokens that look like flags but aren't in the
 /// allowlist. `unknown` controls flag-shaped unknowns; `numeric_dash` opts
-/// into `-NUMBER` shorthand (e.g. `head -20`).
+/// into `-NUMBER` shorthand (e.g. `head -20`); `single_dash_words` stops a single-dash token
+/// being read as a cluster of short flags, for tools whose options are whole words (`exiftool -if`
+/// is one option that runs Perl, never `-i -f`).
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FlagTolerance {
     pub unknown: UnknownTolerance,
     pub numeric_dash: bool,
+    pub single_dash_words: bool,
 }
 
 impl FlagTolerance {
     /// Strict allowlist: deny every unrecognized flag-shaped token.
     /// `const`-callable for use in static `FlagPolicy` literals.
     pub const fn strict() -> Self {
-        Self { unknown: UnknownTolerance::Strict, numeric_dash: false }
+        Self { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false }
     }
 }
 
@@ -264,6 +267,15 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
 
         if t.starts_with("--") {
             if tolerance.unknown.allows_long() {
+                positionals += 1;
+                i += 1;
+                continue;
+            }
+            return false;
+        }
+
+        if tolerance.single_dash_words && t.len() > 1 {
+            if tolerance.unknown.allows_short() {
                 positionals += 1;
                 i += 1;
                 continue;
@@ -539,7 +551,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: true,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
     };
 
     #[test]
@@ -588,7 +600,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false, single_dash_words: false },
     };
 
     #[test]
@@ -629,7 +641,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false, single_dash_words: false },
     };
 
     #[test]
@@ -679,7 +691,7 @@ mod tests {
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: Some(2),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
@@ -736,6 +748,38 @@ mod tests {
     #[test]
     fn numeric_dash_disabled_rejects_multi_digit() {
         assert!(!check(&toks(&["grep", "-20", "pattern"]), &TEST_POLICY));
+    }
+
+    static WORDS_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&["-a", "-f", "-i", "-ifd0"]),
+        valued: WordSet::flags(&["-ext"]),
+        bare: false,
+        max_positional: None,
+        tolerance: FlagTolerance { single_dash_words: true, ..FlagTolerance::strict() },
+    };
+
+    #[test]
+    fn single_dash_words_never_split_a_word_into_letters() {
+        assert!(!check(&toks(&["exiftool", "-if", "system(1)", "a.jpg"]), &WORDS_POLICY));
+        assert!(!check(&toks(&["exiftool", "-fa", "a.jpg"]), &WORDS_POLICY));
+        assert!(check(&toks(&["exiftool", "-fa", "a.jpg"]), &FlagPolicy { tolerance: FlagTolerance::strict(), ..WORDS_POLICY }));
+    }
+
+    #[test]
+    fn single_dash_words_accept_listed_words_values_and_stdin() {
+        assert!(check(&toks(&["exiftool", "-ifd0", "-a", "-ext", "jpg", "a.jpg"]), &WORDS_POLICY));
+        assert!(check(&toks(&["exiftool", "-i", "-f", "-"]), &WORDS_POLICY));
+    }
+
+    #[test]
+    fn single_dash_words_under_short_tolerance_count_unknowns_as_positionals() {
+        let policy = FlagPolicy {
+            max_positional: Some(1),
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Short, single_dash_words: true, numeric_dash: false },
+            ..WORDS_POLICY
+        };
+        assert!(check(&toks(&["exiftool", "-if"]), &policy));
+        assert!(!check(&toks(&["exiftool", "-if", "-zz"]), &policy));
     }
 
     #[test]

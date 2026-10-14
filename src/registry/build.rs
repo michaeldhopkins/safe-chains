@@ -82,7 +82,7 @@ pub(super) fn build_policy(
         valued,
         bare: bare.unwrap_or(true),
         max_positional,
-        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false) },
+        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false },
     }
 }
 
@@ -155,7 +155,7 @@ fn allow_all_policy() -> OwnedPolicy {
         valued: Vec::new(),
         bare: true,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
     }
 }
 
@@ -177,12 +177,8 @@ fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) -> Result<(), 
 fn filter_candidates(subs: Vec<TomlSub>) -> Result<impl Iterator<Item = TomlSub>, String> {
     // Asserted HERE, not in `build_subs`, because that is the whole point: a candidate sub is
     // dropped by this filter and never reaches `build_subs`, so a check placed there could never
-    // fire for the case it targets. (It was written there first, and the red demo caught it.)
-    //
-    // Any nested subs a candidate declares are dropped with it — silently, since the file still
-    // parses and builds. That is dead data wearing the shape of configuration: a reader sees the
-    // nested surface declared and reasonably concludes it is in force. Same family as the
-    // profiled-leaf assert in `build_subs`, where one field also makes another unreachable.
+    // fire for the case it targets. Nested subs a candidate declares are dropped with it, silently:
+    // dead data that a reader would take to be in force.
     for s in &subs {
         ensure!(
             !s.candidate.unwrap_or(false) || s.sub.is_empty(),
@@ -677,14 +673,10 @@ fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) -> Result<(), Strin
             toml.name,
         );
     }
-    // Note: command-level eval_safe IS allowed alongside `handler =
-    // "..."`. The walker reads `spec.eval_safe` directly at the leaf
-    // — it does not need to introspect the handler's dispatch logic.
-    // The contributor takes responsibility for vouching that every
-    // invocation the handler accepts AND that passes the eval_safe_*
-    // flag checks produces shell-init stdout (typically narrowed via
-    // `eval_safe_required_flags`). See fzf's TOML for the canonical
-    // pattern.
+    // Command-level eval_safe IS allowed alongside `handler = "..."`: the walker reads
+    // `spec.eval_safe` at the leaf, and the contributor vouches that every invocation the handler
+    // accepts AND that passes the eval_safe_* flag checks prints shell-init stdout (typically
+    // narrowed via `eval_safe_required_flags`; see fzf's TOML).
     if toml.wrapper.is_some() {
         fail!(
             "command '{}' sets `eval_safe = true` AND `[command.wrapper]`. \
@@ -868,6 +860,9 @@ fn assert_flat_or_structured(toml: &TomlCommand) -> Result<(), String> {
     }
     if toml.numeric_dash.is_some() {
         conflicts.push("numeric_dash");
+    }
+    if toml.single_dash_words.is_some() {
+        conflicts.push("single_dash_words");
     }
     if !conflicts.is_empty() {
         fail!(
@@ -1193,10 +1188,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         });
     }
 
-    let policy = build_policy(
+    let mut policy = build_policy(
         toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
         toml.tolerate_unknown_long, toml.numeric_dash,
     );
+    policy.tolerance.single_dash_words = toml.single_dash_words.unwrap_or(false);
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
 
@@ -1375,6 +1371,16 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
 mod tests {
     use super::*;
     use proptest::prelude::*;
+
+    /// `single_dash_words` is read only on the flat path, so on a structured command it would
+    /// silently leave every sub clustering its single-dash words.
+    #[test]
+    fn single_dash_words_on_a_structured_command_is_rejected() {
+        crate::registry::tests::assert_rejected(
+            "[[command]]\nname = \"tc\"\nsingle_dash_words = true\n[[command.sub]]\nname = \"ls\"\n",
+            "single_dash_words",
+        );
+    }
 
     /// Strategies for built-policy inputs. `flag_name` keeps test strings small and distinct
     /// enough that overlap between `standalone`/`valued` is rare; the policy builder does not

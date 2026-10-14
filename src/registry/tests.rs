@@ -303,7 +303,7 @@ fn load_one(toml_str: &str) -> CommandSpec {
 /// of the two failures occurred — accepted when it should not have been, or rejected for an
 /// unrelated reason.
 #[track_caller]
-fn assert_rejected(toml_str: &str, expected: &str) {
+pub(super) fn assert_rejected(toml_str: &str, expected: &str) {
     match load_toml(toml_str, "test") {
         Ok(specs) => {
             panic!("definition was ACCEPTED ({} spec(s)); expected rejection naming {expected:?}", specs.len())

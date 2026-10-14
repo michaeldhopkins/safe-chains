@@ -1373,11 +1373,11 @@ exa -x	inert
 exa x	inert
 exiftool	denied
 exiftool --help	safe-read
-exiftool --help -@ x	safe-read
 exiftool --help -G	safe-read
+exiftool --help -XML x	safe-read
 exiftool --help x	safe-read
 exiftool --version	denied
-exiftool -@ x	safe-read
+exiftool -@ args.txt photo.jpg	denied
 exiftool -G	safe-read
 exiftool -S	safe-read
 exiftool -T	safe-read
@@ -1385,14 +1385,14 @@ exiftool -V	safe-read
 exiftool -X	safe-read
 exiftool -XML x	safe-read
 exiftool -a	safe-read
+exiftool -a -G photos/IMG_0001.jpg	safe-read
 exiftool -args	safe-read
 exiftool -b	safe-read
 exiftool -binary	safe-read
 exiftool -c	safe-read
-exiftool -config x	safe-read
+exiftool -config evil.pl photo.jpg	denied
 exiftool -coordFormat	safe-read
 exiftool -csv	safe-read
-exiftool -csv+ x	safe-read
 exiftool -csvDelim x	safe-read
 exiftool -d	safe-read
 exiftool -d x	safe-read
@@ -1402,7 +1402,7 @@ exiftool -deleteByName	safe-read
 exiftool -deletegps	safe-read
 exiftool -duplicates	safe-read
 exiftool -e	safe-read
-exiftool -execute x	safe-read
+exiftool -ee	safe-read
 exiftool -ext x	safe-read
 exiftool -extracted	safe-read
 exiftool -f	safe-read
@@ -1411,15 +1411,14 @@ exiftool -fast2	safe-read
 exiftool -fast4	safe-read
 exiftool -fileOrder	safe-read
 exiftool -fileOrder x	safe-read
-exiftool -geosync x	safe-read
-exiftool -geotag x	safe-read
 exiftool -globalTimeShift x	safe-read
 exiftool -h	safe-read
 exiftool -htmlDump	safe-read
+exiftool -htmlDump /etc/shadow	denied
 exiftool -htmlDump x	safe-read
 exiftool -i	safe-read
 exiftool -i x	safe-read
-exiftool -if x	safe-read
+exiftool -if 'system(1)' photo.jpg	denied
 exiftool -ifd0	safe-read
 exiftool -ignore	safe-read
 exiftool -j	safe-read
@@ -1445,27 +1444,25 @@ exiftool -q	safe-read
 exiftool -q x	safe-read
 exiftool -quiet	safe-read
 exiftool -r	safe-read
+exiftool -r -ext jpg photos	safe-read
 exiftool -r x	safe-read
+exiftool -r ~	denied
 exiftool -recurse	safe-read
 exiftool -sep	safe-read
 exiftool -short	safe-read
-exiftool -srcfile	safe-read
-exiftool -srcfile x	safe-read
-exiftool -stay_open	safe-read
 exiftool -struct	safe-read
 exiftool -tab	safe-read
 exiftool -tab x	safe-read
-exiftool -tagsFromFile	safe-read
-exiftool -textOut	safe-read
-exiftool -textOut x	safe-read
+exiftool -tagsFromFile src.jpg ~/.ssh/id_rsa	denied
 exiftool -u	safe-read
 exiftool -unknown	safe-read
 exiftool -unknown2	safe-read
 exiftool -v	safe-read
+exiftool -v3 ~/.ssh/id_rsa	denied
+exiftool -ver	safe-read
 exiftool -verbose	safe-read
 exiftool -version	safe-read
-exiftool -w	safe-read
-exiftool -w x	safe-read
+exiftool -w! ~/.zshrc photo.jpg	denied
 exiftool -wext	safe-read
 exiftool -wext x	safe-read
 exiftool -x x	safe-read
@@ -1473,6 +1470,7 @@ exiftool -xmlFormat	safe-read
 exiftool -xmlFormat x	safe-read
 exiftool -xmp	safe-read
 exiftool -z	safe-read
+exiftool photo.jpg	safe-read
 exiftool x	safe-read
 exit	inert
 exit --help	denied

@@ -37,10 +37,8 @@ pub(super) struct TomlCommand {
     /// so the two spellings of one capability cannot disagree.
     #[serde(default)]
     pub env_assignment_positionals: Option<bool>,
-    /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`.
-    /// Build panics if any TOML still sets this — see SAMPLE.toml for the
-    /// migration guidance. Kept on the deserializer struct so the panic
-    /// message can name the offending command instead of a serde error.
+    /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`; build panics if a TOML
+    /// still sets it (SAMPLE.toml has the migration), and keeping it here lets the panic name the command.
     #[serde(default)]
     pub positional_style: Option<bool>,
     #[serde(default)]
@@ -49,6 +47,8 @@ pub(super) struct TomlCommand {
     pub tolerate_unknown_long: Option<bool>,
     #[serde(default)]
     pub numeric_dash: Option<bool>,
+    #[serde(default)]
+    pub single_dash_words: Option<bool>,
     #[serde(default)]
     pub standalone: Vec<String>,
     #[serde(default)]
