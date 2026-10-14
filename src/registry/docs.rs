@@ -274,6 +274,9 @@ impl OwnedPolicy {
         if self.bare {
             lines.push("- Bare invocation allowed".to_string());
         }
+        if let Some(n) = self.min_positional {
+            lines.push(format!("- Requires at least {n} positional argument{}", if n == 1 { "" } else { "s" }));
+        }
         if self.tolerance.unknown != crate::policy::UnknownTolerance::Strict {
             lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
@@ -299,6 +302,9 @@ impl OwnedPolicy {
         }
         if self.tolerance.numeric_dash {
             parts.push("Numeric -N accepted".to_string());
+        }
+        if let Some(n) = self.min_positional {
+            parts.push(format!("At least {n} positional argument{}", if n == 1 { "" } else { "s" }));
         }
         parts.join(". ")
     }

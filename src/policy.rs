@@ -215,7 +215,16 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
     if tokens.len() == 1 {
         return bare;
     }
+    count_positionals(tokens, standalone, valued, tolerance).is_some_and(|n| max_positional.is_none_or(|max| n <= max))
+}
 
+/// The positional operands `check_flags` counts, or `None` where it would refuse a flag.
+pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
+    tokens: &[Token],
+    standalone: &S,
+    valued: &V,
+    tolerance: FlagTolerance,
+) -> Option<usize> {
     let mut i = 1;
     let mut positionals: usize = 0;
     while i < tokens.len() {
@@ -262,7 +271,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 i += 1;
                 continue;
             }
-            return false;
+            return None;
         }
 
         if t.starts_with("--") {
@@ -271,7 +280,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 i += 1;
                 continue;
             }
-            return false;
+            return None;
         }
 
         if tolerance.single_dash_words && t.len() > 1 {
@@ -280,7 +289,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 i += 1;
                 continue;
             }
-            return false;
+            return None;
         }
 
         let bytes = t.as_bytes();
@@ -302,11 +311,11 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 positionals += 1;
                 break;
             }
-            return false;
+            return None;
         }
         i += 1;
     }
-    max_positional.is_none_or(|max| positionals <= max)
+    Some(positionals)
 }
 
 #[cfg(test)]

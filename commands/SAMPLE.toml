@@ -492,6 +492,19 @@
 # require_any = ["--show", "--show-sources"]
 # standalone = ["--help", "--json", "--show", "--show-sources", "-h"]
 # valued = ["--file", "--name", "-f", "-n"]
+#
+# A required flag counts only where it is given AS A FLAG: not as the value of
+# the flag before it, not glued after a short flag that takes the rest of its
+# cluster as a value (`-rm` is `-r m`), and not after `--`.
+#
+# MIN_POSITIONAL — a sub that is only safe with operands. `jj split` with no
+# filesets opens a diff editor; with filesets it does not. Values of `valued`
+# flags are not operands, so `jj split -r src/a` still has none.
+#
+# [[command.sub]]
+# name = "split"
+# require_any = ["--message", "-m"]
+# min_positional = 1
 
 # ─────────────────────────────────────────────────────────────────────
 # ALLOW ALL — subcommand that accepts anything

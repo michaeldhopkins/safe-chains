@@ -1,10 +1,92 @@
 use crate::parse::Token;
-use crate::policy::{FlagSet, check_flags};
+use crate::policy::{FlagSet, FlagTolerance, UnknownTolerance, check_flags, consumes_next_value, count_positionals};
 
-use super::types::OwnedPolicy;
+#[derive(Debug, Clone)]
+pub struct OwnedPolicy {
+    pub standalone: Vec<String>,
+    pub valued: Vec<String>,
+    pub bare: bool,
+    pub max_positional: Option<usize>,
+    pub min_positional: Option<usize>,
+    pub tolerance: FlagTolerance,
+}
+
+impl OwnedPolicy {
+    pub(super) fn allow_all() -> Self {
+        OwnedPolicy {
+            standalone: Vec::new(),
+            valued: Vec::new(),
+            bare: true,
+            max_positional: None,
+            min_positional: None,
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+        }
+    }
+}
 
 pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
-    check_flags(tokens, policy.standalone.as_slice(), policy.valued.as_slice(), policy.bare, policy.max_positional, policy.tolerance)
+    let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
+    check_flags(tokens, standalone, valued, policy.bare, policy.max_positional, policy.tolerance)
+        && policy
+            .min_positional
+            .is_none_or(|min| count_positionals(tokens, standalone, valued, policy.tolerance).is_some_and(|n| n >= min))
+}
+
+/// Whether one of `wanted` is given AS A FLAG: not as the value of the flag before it, not glued
+/// into a short cluster after a flag that takes the rest as its value (`-rm` is `-r m`), and not
+/// after `--`.
+///
+/// A required flag that only appears to be present is how a guarded sub runs its unguarded form:
+/// `jj describe -rm` names revision `m` and opens the editor.
+pub(super) fn flag_given(tokens: &[Token], policy: &OwnedPolicy, wanted: &[String]) -> bool {
+    let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
+    let wants = |flag: &str| wanted.iter().any(|w| w == flag);
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            return false;
+        }
+        i += 1;
+        if wants(t) {
+            return true;
+        }
+        if !t.starts_with('-') || t == "-" {
+            continue;
+        }
+        if t.starts_with("--") {
+            let name = t.split_once('=').map_or(t, |(name, _)| name);
+            if wants(name) {
+                return true;
+            }
+            if !t.contains('=') && valued.contains_flag(name) && consumes_next_value(tokens.get(i)) {
+                i += 1;
+            }
+            continue;
+        }
+        if policy.tolerance.single_dash_words || valued.contains_flag(t) {
+            if valued.contains_flag(t) && consumes_next_value(tokens.get(i)) {
+                i += 1;
+            }
+            continue;
+        }
+        let bytes = t.as_bytes();
+        for (j, &b) in bytes.iter().enumerate().skip(1) {
+            if wanted.iter().any(|w| w.as_bytes() == [b'-', b]) {
+                return true;
+            }
+            if valued.contains_short(b) {
+                if j == bytes.len() - 1 && consumes_next_value(tokens.get(i)) {
+                    i += 1;
+                }
+                break;
+            }
+            if !standalone.contains_short(b) {
+                break;
+            }
+        }
+    }
+    false
 }
 
 /// Returns the first non-flag token after `tokens[0]`, treating the
@@ -13,6 +95,17 @@ pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
 /// positional (the conventional stdin marker). Used by fallback
 /// grammars that want to apply a `PositionalShape` predicate to the
 /// first positional without re-implementing flag walking.
+pub(super) fn min_positional_fits(parent: &str, toml: &super::types::TomlSub, policy_free: bool) -> Result<(), String> {
+    let Some(min) = toml.min_positional else { return Ok(()) };
+    if policy_free || !toml.sub.is_empty() || !toml.first_arg.is_empty() || !toml.credential_first_arg.is_empty() {
+        return Err(format!("command '{parent}' sub `{}`: min_positional needs a flag policy to count operands against", toml.name));
+    }
+    match toml.max_positional {
+        Some(max) if min > max => Err(format!("command '{parent}' sub `{}`: min_positional {min} exceeds max_positional {max}", toml.name)),
+        _ => Ok(()),
+    }
+}
+
 pub(super) fn first_positional<'a>(tokens: &'a [Token], policy: &OwnedPolicy) -> Option<&'a str> {
     first_positional_at(tokens, policy).map(|(_, s)| s)
 }
@@ -78,6 +171,7 @@ mod tests {
             valued: valued.iter().map(|s| s.to_string()).collect(),
             bare: true,
             max_positional,
+            min_positional: None,
             tolerance: FlagTolerance::strict(),
         }
     }
@@ -289,6 +383,147 @@ mod tests {
 
                 proptest::prop_assert_eq!(after, before);
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod flag_given_tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    fn jj_like(min_positional: Option<usize>) -> OwnedPolicy {
+        OwnedPolicy {
+            standalone: vec!["--quiet".into(), "-a".into(), "-k".into()],
+            valued: vec!["--message".into(), "--revision".into(), "-m".into(), "-r".into()],
+            bare: true,
+            max_positional: None,
+            min_positional,
+            tolerance: FlagTolerance::strict(),
+        }
+    }
+
+    fn toks(words: &[&str]) -> Vec<Token> {
+        std::iter::once("cmd").chain(words.iter().copied()).map(Token::from_test).collect()
+    }
+
+    fn given(words: &[&str]) -> bool {
+        flag_given(&toks(words), &jj_like(None), &["--message".to_string(), "-m".to_string()])
+    }
+
+    #[test]
+    fn a_flag_is_given_in_each_of_its_spellings() {
+        for words in [&["-m", "x"][..], &["-mx"], &["--message", "x"], &["--message=x"], &["-km", "x"], &["-r", "@", "-m", "x"]] {
+            assert!(given(words), "{words:?}");
+        }
+    }
+
+    #[test]
+    fn a_flag_that_only_looks_given_is_not() {
+        for words in [&[][..], &["-rm"], &["-r", "m"], &["--", "-m", "x"], &["--revision=-m"], &["--revision", "m"], &["m"]] {
+            assert!(!given(words), "{words:?}");
+        }
+    }
+
+    #[test]
+    fn a_required_word_matches_whole() {
+        let mut words = jj_like(None);
+        words.tolerance.single_dash_words = true;
+        let want = |w: &str| vec![w.to_string()];
+        assert!(flag_given(&toks(&["-statistics"]), &words, &want("-statistics")));
+        assert!(!flag_given(&toks(&["-statsonly"]), &words, &want("-s")));
+        assert!(flag_given(&toks(&["-", "bash"]), &jj_like(None), &want("-")));
+        assert!(!flag_given(&toks(&["--", "-"]), &jj_like(None), &want("-")));
+    }
+
+    #[test]
+    fn min_positional_counts_operands_not_flag_values() {
+        let p = jj_like(Some(1));
+        assert!(!check_owned(&toks(&["-m", "x"]), &p));
+        assert!(!check_owned(&toks(&["-m", "x", "-r", "src/a"]), &p));
+        assert!(check_owned(&toks(&["-m", "x", "src/a"]), &p));
+        assert!(check_owned(&toks(&["-m", "x", "--", "src/a"]), &p));
+        assert!(check_owned(&toks(&["-m", "x"]), &jj_like(None)));
+    }
+
+    #[test]
+    fn min_positional_is_named_in_the_reference() {
+        assert!(jj_like(Some(1)).flag_summary().ends_with("At least 1 positional argument"));
+        assert!(jj_like(Some(2)).flag_summary().ends_with("At least 2 positional arguments"));
+        assert!(!jj_like(None).flag_summary().contains("positional argument"));
+    }
+
+    fn demo(sub_fields: &str) -> Result<Vec<crate::registry::CommandSpec>, String> {
+        crate::registry::load_toml(&format!("[[command]]\nname = \"demo\"\n[[command.sub]]\nname = \"split\"\n{sub_fields}\n"), "test")
+    }
+
+    #[test]
+    fn min_positional_dispatches_through_a_loaded_definition() {
+        let specs = demo("level = \"SafeWrite\"\nrequire_any = [\"-m\"]\nmin_positional = 1\nvalued = [\"-m\", \"-r\"]").expect("loads");
+        let verdict = |words: &[&str]| crate::registry::dispatch_spec(&toks(words), &specs[0]);
+        assert_eq!(verdict(&["split", "-m", "x", "a"]), crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite));
+        assert_eq!(verdict(&["split", "-m", "x"]), crate::verdict::Verdict::Denied);
+        assert_eq!(verdict(&["split", "-m", "x", "-r", "a"]), crate::verdict::Verdict::Denied);
+        assert_eq!(verdict(&["split", "a"]), crate::verdict::Verdict::Denied);
+    }
+
+    #[test]
+    fn min_positional_is_refused_where_nothing_would_count_operands() {
+        for fields in [
+            "min_positional = 1\nallow_all = true",
+            "min_positional = 1\nfirst_arg = [\"x\"]",
+            "min_positional = 1\nhandler = \"demo\"",
+            "level = \"SafeWrite\"\nmin_positional = 2\nmax_positional = 1",
+        ] {
+            let err = demo(fields).err().unwrap_or_else(|| panic!("{fields:?} loaded"));
+            assert!(err.contains("min_positional"), "{fields:?}: {err}");
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    enum Unit {
+        Standalone(&'static str),
+        Valued(&'static str, &'static str),
+        Glued(&'static str),
+        Operand(&'static str),
+        Wanted(Vec<&'static str>),
+        End,
+    }
+
+    fn unit() -> impl Strategy<Value = Unit> {
+        let value = prop::sample::select(vec!["m", "x", "mx", "@-"]);
+        prop_oneof![
+            prop::sample::select(vec!["-a", "-k", "-ak", "--quiet"]).prop_map(Unit::Standalone),
+            (prop::sample::select(vec!["-r", "--revision"]), value.clone()).prop_map(|(f, v)| Unit::Valued(f, v)),
+            prop::sample::select(vec!["-rm", "-rx", "-arm", "--revision=m", "--revision=-m"]).prop_map(Unit::Glued),
+            value.prop_map(Unit::Operand),
+            prop::sample::select(vec![vec!["-m", "x"], vec!["-mx"], vec!["-am", "x"], vec!["--message", "m"], vec!["--message=m"]])
+                .prop_map(Unit::Wanted),
+            Just(Unit::End),
+        ]
+    }
+
+    proptest! {
+        #[test]
+        fn flag_given_matches_a_reading_unit_by_unit(units in prop::collection::vec(unit(), 0..8)) {
+            let mut words = Vec::new();
+            let mut expected = false;
+            let mut ended = false;
+            for u in &units {
+                match u {
+                    Unit::Standalone(f) | Unit::Glued(f) | Unit::Operand(f) => words.push(*f),
+                    Unit::Valued(f, v) => words.extend([*f, *v]),
+                    Unit::Wanted(w) => {
+                        expected |= !ended;
+                        words.extend(w.iter().copied());
+                    }
+                    Unit::End => {
+                        ended = true;
+                        words.push("--");
+                    }
+                }
+            }
+            prop_assert_eq!(given(&words), expected, "{:?}", words);
         }
     }
 }

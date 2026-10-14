@@ -444,6 +444,8 @@ pub(super) struct TomlSub {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
+    #[serde(default)]
+    pub min_positional: Option<usize>,
     /// Removed; see TomlCommand::positional_style.
     #[serde(default)]
     pub positional_style: Option<bool>,
@@ -1049,14 +1051,7 @@ impl ExecutorKind {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct OwnedPolicy {
-    pub standalone: Vec<String>,
-    pub valued: Vec<String>,
-    pub bare: bool,
-    pub max_positional: Option<usize>,
-    pub tolerance: crate::policy::FlagTolerance,
-}
+pub use super::policy::OwnedPolicy;
 
 #[derive(Debug, Clone)]
 pub(super) struct MatrixSpec {

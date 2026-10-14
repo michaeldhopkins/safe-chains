@@ -82,6 +82,7 @@ pub(super) fn build_policy(
         valued,
         bare: bare.unwrap_or(true),
         max_positional,
+        min_positional: None,
         tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false },
     }
 }
@@ -147,16 +148,6 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, Stri
         executor_redirect_flag: toml.executor_redirect_flag,
         passes_argv: toml.passes_argv.unwrap_or(false),
     })
-}
-
-fn allow_all_policy() -> OwnedPolicy {
-    OwnedPolicy {
-        standalone: Vec::new(),
-        valued: Vec::new(),
-        bare: true,
-        max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
-    }
 }
 
 fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) -> Result<(), String> {
@@ -700,6 +691,8 @@ fn build_sub_kind(
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Result<DispatchKind, String> {
+    let policy_free = toml.handler.is_some() || toml.allow_all.is_some() || toml.delegate_after.is_some() || toml.delegate_skip.is_some();
+    super::policy::min_positional_fits(parent, &toml, policy_free)?;
     if let Some(handler_name) = toml.handler {
         return Ok(DispatchKind::Custom {
             handler_name,
@@ -711,7 +704,7 @@ fn build_sub_kind(
         });
     }
     if toml.allow_all.unwrap_or(false) {
-        return Ok(DispatchKind::Policy { policy: allow_all_policy(), level: toml.level.unwrap_or(TomlLevel::Inert).into() });
+        return Ok(DispatchKind::Policy { policy: OwnedPolicy::allow_all(), level: toml.level.unwrap_or(TomlLevel::Inert).into() });
     }
     if let Some(sep) = toml.delegate_after {
         return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
@@ -759,7 +752,7 @@ fn build_policy_sub_kind(
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Result<DispatchKind, String> {
-    let policy = if let Some(key) = &toml.policy {
+    let mut policy = if let Some(key) = &toml.policy {
         if !toml.standalone.is_empty() || !toml.valued.is_empty() {
             fail!(
                 "command '{parent}' sub `{}` sets both `policy = \"{}\"` and \
@@ -785,6 +778,7 @@ fn build_policy_sub_kind(
             toml.tolerate_unknown_long, toml.numeric_dash,
         )
     };
+    policy.min_positional = toml.min_positional;
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     if let Some(name) = toml.executor.as_deref() {
         let Some(kind) = ExecutorKind::from_name(name) else {
@@ -1003,6 +997,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                     valued: Vec::new(),
                     bare: false,
                     max_positional: Some(0),
+                    min_positional: None,
                     tolerance: FlagTolerance::default(),
                 },
                 level: SafetyLevel::Inert,
