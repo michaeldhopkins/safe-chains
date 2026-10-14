@@ -64,3 +64,13 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   the run; and the verdict now reads `mutants.out/missed.txt`, not the exit status (exit 3 used to
   map to 0 even with misses). `tests/mutants_run.rs` covers it with a stand-in cargo. Both jobs
   call the script. If hangs still dominate, a per-test cap under nextest is the next lever.
+- **The timeout was not the whole cause (run 38633541332, both attempts, 2026-10-14).** After the
+  2x multiplier and the budget wrapper the slice job was still cancelled, at 9m51s and 11m21s
+  (well inside the 20-minute limit and the 15-minute budget), during the second mutant, with
+  cargo-mutants logging `interrupted`. The mutants were `i += 1` to `-=`/`*=` in
+  `Token::content_outside_double_quotes`: the index stops advancing while the loop pushes into a
+  `Vec`, so memory grows without bound until the test timeout. The runner's cancellation fits
+  running out of memory (an inference; the log shows no OOM message). Those mutants can only ever
+  read TIMEOUT, so `.cargo/mutants.toml` now excludes them (10 of the function's 21; checked with
+  `--list`). Any new loop whose counter can be mutated to stand still and which allocates per
+  iteration needs the same exclusion.

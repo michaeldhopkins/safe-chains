@@ -17,4 +17,11 @@ features = ["fuzz-gen"]
 # The corpus generator's `main` only binds this checkout's path and prints two counts; everything it
 # does is `generate`, which the bin's tests run against a scratch tree. Testing `main` itself would
 # mean running it, and it writes into this checkout's `fuzz/`.
-exclude_re = ['gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$']
+# The `i += 1`/`i += 2` mutants in `content_outside_double_quotes` (`-=`, `*=`) stop the index advancing
+# while the loop keeps pushing into a Vec, so they allocate without bound until the test timeout and
+# only ever read as TIMEOUT. On the runner that exhausted memory and cancelled the job at 10-11
+# minutes (runs 38633541332, both attempts). The function's other mutants stay.
+exclude_re = [
+    'gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$',
+    'src/parse\.rs:\d+:\d+: replace \+= with (-=|\*=) in Token::content_outside_double_quotes$',
+]
