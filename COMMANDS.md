@@ -206,7 +206,7 @@ Aliases: `7zz`, `7za`
 <p class="cmd-url"><a href="https://beyondgrep.com/documentation/">https://beyondgrep.com/documentation/</a></p>
 
 - Allowed standalone flags: --color, --column, --count, --files-with-matches, --files-without-matches, --flush, --follow, --group, --heading, --help, --ignore-case, --invert-match, --line, --literal, --match, --no-color, --no-filename, --no-follow, --no-group, --no-heading, --nocolor, --noenv, --nofilter, --nofollow, --nogroup, --noheading, --nopager, --nosmart-case, --passthru, --print0, --show-types, --smart-case, --sort-files, --version, --with-filename, --word-regexp, -1, -H, -L, -V, -c, -f, -h, -i, -l, -n, -s, -v, -w, -x
-- Allowed valued flags: --after-context, --before-context, --context, --ignore-dir, --max-count, --noignore-dir, --output, --pager, --type, --type-add, --type-del, --type-set, -A, -B, -C, -m
+- Allowed valued flags: --after-context, --before-context, --context, --ignore-dir, --max-count, --noignore-dir, --output, --type, --type-add, --type-del, --type-set, -A, -B, -C, -m
 
 ### `aclocal`
 <p class="cmd-url"><a href="https://www.gnu.org/software/automake/manual/html_node/aclocal-Invocation.html">https://www.gnu.org/software/automake/manual/html_node/aclocal-Invocation.html</a></p>
@@ -316,7 +316,7 @@ Aliases: `7zz`, `7za`
 <p class="cmd-url"><a href="https://github.com/ggreer/the_silver_searcher">https://github.com/ggreer/the_silver_searcher</a></p>
 
 - Allowed standalone flags: --ackmate, --all-text, --all-types, --case-sensitive, --color, --column, --count, --filename, --files-with-matches, --files-without-matches, --fixed-strings, --follow, --group, --heading, --help, --hidden, --ignore-case, --invert-match, --line-numbers, --literal, --no-break, --no-color, --no-filename, --no-follow, --no-group, --no-heading, --no-numbers, --nobreak, --nocolor, --nofilename, --nofollow, --nogroup, --noheading, --nonumbers, --null, --numbers, --one-device, --only-matching, --print-all-files, --print-long-lines, --search-binary, --search-files, --search-zip, --silent, --smart-case, --stats, --unrestricted, --version, --vimgrep, --word-regexp, -0, -H, -L, -Q, -S, -U, -V, -a, -c, -f, -h, -i, -l, -n, -s, -u, -v, -w
-- Allowed valued flags: --after, --before, --context, --depth, --file-search-regex, --ignore, --max-count, --pager, --path-to-ignore, --workers, -A, -B, -C, -G, -g, -m
+- Allowed valued flags: --after, --before, --context, --depth, --file-search-regex, --ignore, --max-count, --path-to-ignore, --workers, -A, -B, -C, -G, -g, -m
 
 ### `agda`
 <p class="cmd-url"><a href="https://agda.readthedocs.io/en/latest/tools/command-line-options.html">https://agda.readthedocs.io/en/latest/tools/command-line-options.html</a></p>

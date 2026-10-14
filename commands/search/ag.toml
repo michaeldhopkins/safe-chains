@@ -2,6 +2,7 @@
 name = "ag"
 description = "The Silver Searcher, a fast code search tool similar to ack; full flag support for pattern matching and output formatting."
 url = "https://github.com/ggreer/the_silver_searcher"
+examples_denied = ["ag --pager less foo"]
 level = "Inert"
 bare = false
 standalone = [
@@ -24,6 +25,6 @@ standalone = [
 valued = [
     "--after", "--before", "--context", "--depth",
     "--file-search-regex", "--ignore", "--max-count",
-    "--pager", "--path-to-ignore", "--workers",
+    "--path-to-ignore", "--workers",
     "-A", "-B", "-C", "-G", "-g", "-m",
 ]

@@ -4576,6 +4576,7 @@ rg --engine x	inert
 rg --field-context-separator x	inert
 rg --field-match-separator x	inert
 rg --file x	inert
+rg --file ~/.ssh/id_rsa src	denied
 rg --files	inert
 rg --files-with-matches	inert
 rg --files-without-match	inert
@@ -4632,6 +4633,7 @@ rg --pcre2-version	inert
 rg --pretty	inert
 rg --quiet	inert
 rg --regex-size-limit x	inert
+rg --regexp "$P" -- src	inert
 rg --regexp x	inert
 rg --regexp=x ~/.ssh/id_rsa	denied
 rg --replace x	inert
@@ -4673,13 +4675,19 @@ rg -V	inert
 rg -a	inert
 rg -b	inert
 rg -c	inert
+rg -e "$PAT"	inert
+rg -e "$PAT" src	inert
+rg -e "$PAT" ~/.ssh/id_rsa	denied
+rg -e /etc/passwd src	inert
 rg -e TODO src	inert
 rg -e x	inert
 rg -ex ~/.ssh/id_rsa	denied
 rg -f x	inert
+rg -f ~/.ssh/id_rsa src	denied
 rg -g x	inert
 rg -h	inert
 rg -i	inert
+rg -ie "$PAT" src	inert
 rg -j x	inert
 rg -l	inert
 rg -m x	inert

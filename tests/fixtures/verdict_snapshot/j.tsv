@@ -1,4 +1,5 @@
 JJ_CONFIG=/tmp/x jj log	denied
+JJ_EDITOR=/tmp/x jj describe	denied
 jai	denied
 jai --bare	denied
 jai --bare --casual	denied
@@ -676,6 +677,7 @@ jj describe	safe-write
 jj describe --message "$MSG"	safe-write
 jj describe -m 'hello'	safe-write
 jj describe -m x --no-edit "$X"	denied
+jj describe -mfoo "$X"	denied
 jj describe x	safe-write
 jj diff	inert
 jj diff $X	denied
@@ -684,6 +686,7 @@ jj diff --config ui.diff-formatter=/tmp/evil.sh	denied
 jj diff --name-only "$X"	denied
 jj diff --summary "$X"	denied
 jj diff --tool /tmp/evil.sh	denied
+jj diff -fmaster "$X"	denied
 jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt	safe-write
 jj diff -s "$X"	denied
 jj diff x	inert
@@ -725,8 +728,13 @@ jj log --config-toml x=1	denied
 jj log --no-graph "$X" -p	denied
 jj log --no-graph -T "$T"	inert
 jj log --oneline	inert
+jj log -Tr "$X"	denied
+jj log -n1 -Tauthor "$X" -p	denied
+jj log -pr "$X"	denied
 jj log -r "$REV"	inert
 jj log -r main $X	denied
+jj log -rmaster "$X" -p	denied
+jj log -rr "$X"	denied
 jj log x	inert
 jj new	safe-write
 jj new $X	denied

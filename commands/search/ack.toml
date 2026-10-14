@@ -2,6 +2,7 @@
 name = "ack"
 description = "Perl-based source code search tool optimized for programmers; full flag support for pattern matching and output formatting."
 url = "https://beyondgrep.com/documentation/"
+examples_denied = ["ack --pager=less foo", "ack --pager less foo", "ACK_PAGER=/tmp/x ack foo", "ACK_PAGER_COLOR=/tmp/x ack foo", "ACK_OPTIONS=--pager=/tmp/x ack foo", "ACKRC=/tmp/x ack foo"]
 level = "Inert"
 bare = false
 standalone = [
@@ -20,7 +21,7 @@ standalone = [
 valued = [
     "--after-context", "--before-context", "--context",
     "--ignore-dir", "--max-count", "--noignore-dir",
-    "--output", "--pager", "--type", "--type-add",
+    "--output", "--type", "--type-add",
     "--type-del", "--type-set",
     "-A", "-B", "-C", "-m",
 ]

@@ -1,3 +1,7 @@
+ACKRC=/tmp/x ack foo	denied
+ACK_OPTIONS=--pager=/tmp/x ack foo	denied
+ACK_PAGER=/tmp/x ack foo	denied
+ACK_PAGER_COLOR=/tmp/x ack foo	denied
 a2p	inert
 a2p --help	denied
 a2p --version	denied
@@ -210,7 +214,8 @@ ack --noignore-dir x	inert
 ack --nopager	inert
 ack --nosmart-case	inert
 ack --output x	inert
-ack --pager x	inert
+ack --pager less foo	denied
+ack --pager=less foo	denied
 ack --passthru	inert
 ack --print0	inert
 ack --show-types	inert
@@ -621,7 +626,7 @@ ag --null	inert
 ag --numbers	inert
 ag --one-device	inert
 ag --only-matching	inert
-ag --pager x	inert
+ag --pager less foo	denied
 ag --path-to-ignore x	inert
 ag --print-all-files	inert
 ag --print-long-lines	inert
