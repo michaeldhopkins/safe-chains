@@ -30,6 +30,7 @@ denied! {
     jj_describe_variable_after_no_edit_denied: "jj describe -m x --no-edit \"$X\"",
     jj_diff_variable_after_ambiguous_short_denied: "jj diff -s \"$X\"",
     jj_variable_after_glued_value_denied: "jj log --color=never \"$X\"",
+    jj_config_env_foreign_denied: "JJ_CONFIG=/tmp/x jj log",
     jj_variable_after_glued_short_template_denied: "jj log -n1 -Tauthor \"$X\" -p",
     jj_variable_after_glued_short_revision_denied: "jj log -rmaster \"$X\" -p",
     jj_variable_after_glued_short_from_denied: "jj diff -fmaster \"$X\"",
@@ -37,4 +38,5 @@ denied! {
     jj_variable_after_one_letter_glued_value_denied: "jj log -Tr \"$X\"",
     jj_variable_after_valued_letter_glued_to_valued_letter_denied: "jj log -rr \"$X\"",
     jj_variable_after_cluster_ending_in_valued_letter_denied: "jj log -pr \"$X\"",
+    jj_editor_env_denied: "JJ_EDITOR=/tmp/x jj describe",
 }

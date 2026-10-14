@@ -232,6 +232,38 @@ because = "as GIT_CONFIG_COUNT"
 [env.GIT_CONFIG_PARAMETERS]
 shape = "opaque"
 because = "injects arbitrary git config, as `git -c` does, for every git process that inherits it"
+# fzf reads its options from the environment before its argument list, so every option the command
+# line is checked for (`--bind`, `--preview`, `--listen`) has a second spelling here.
+[env.FZF_DEFAULT_OPTS]
+shape = "opaque"
+because = "fzf parses this as options before its arguments, including ones that run commands"
+[env.FZF_DEFAULT_OPTS_FILE]
+shape = "opaque"
+because = "a file of fzf options, read as FZF_DEFAULT_OPTS is"
+[env.FZF_DEFAULT_COMMAND]
+shape = "command"
+because = "fzf runs this to list its input when stdin is a terminal"
+[env.RIPGREP_CONFIG_PATH]
+shape = "exec-path"
+because = "a file of rg arguments, which can add --pre (a program rg runs on every file searched)"
+[env.JJ_CONFIG]
+shape = "exec-path"
+because = "a jj config file or directory, which can name programs jj runs (ui.pager, ui.diff-formatter, merge-tools)"
+[env.JJ_EDITOR]
+shape = "command"
+because = "jj launches this for descriptions and interactive edits, ahead of ui.editor and EDITOR"
+[env.ACK_PAGER]
+shape = "command"
+because = "ack pipes its output through this, as with --pager"
+[env.ACK_PAGER_COLOR]
+shape = "command"
+because = "as ACK_PAGER, when output is colored"
+[env.ACK_OPTIONS]
+shape = "opaque"
+because = "ack parses this as options before its arguments, including --pager"
+[env.ACKRC]
+shape = "exec-path"
+because = "an ack config file, which can set --pager"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
