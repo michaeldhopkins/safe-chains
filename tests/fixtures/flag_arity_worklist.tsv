@@ -139,9 +139,6 @@ xmllint	--format
 xsel	--input
 xsel	--output
 xsltproc	--encoding
-yard doc	--exclude
-yard list	--exclude
 yard list	--method
-yardoc	--exclude
 zip	--exclude
 zoxide query	--exclude

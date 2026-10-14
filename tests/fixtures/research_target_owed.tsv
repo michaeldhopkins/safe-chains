@@ -1550,8 +1550,8 @@ yacc	description,examples
 yamllint	description,examples,no-tolerance
 yapf	description,examples
 yapp	description,examples
-yard	examples,no-tolerance,profiled
-yardoc	description,examples
+yard	profiled
+yardoc	description
 yarn	version
 yasm	description,examples,no-tolerance
 yes	description,examples

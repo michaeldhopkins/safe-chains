@@ -2253,8 +2253,8 @@ bundle exec thor list	denied
 bundle exec typeprof -o sig/app.rbs app.rb	safe-write
 bundle exec typeprof app.rb	safe-read
 bundle exec x	denied
-bundle exec yard list	safe-read
-bundle exec yard stats	safe-read
+bundle exec yard list	safe-write
+bundle exec yard stats	safe-write
 bundle exec yardoc	safe-write
 bundle info	inert
 bundle info --help	inert

@@ -89,13 +89,22 @@ yapp -v	safe-write
 yapp grammar.yp	safe-write
 yapp x	safe-write
 yard	denied
+yard --db x	denied
+yard --docroot x	denied
+yard --file x	denied
 yard --help	inert
-yard --help --output-dir x	denied
+yard --help --db x	denied
 yard --help --version	denied
 yard --help x	denied
+yard --main x	denied
 yard --output-dir x	denied
+yard --readme x	denied
 yard --version	inert
+yard -b x	denied
+yard -f x	denied
 yard -h	inert
+yard -o x	denied
+yard -r x	denied
 yard -v	inert
 yard config	safe-read
 yard config --debug	safe-read
@@ -109,103 +118,77 @@ yard config -a	safe-read
 yard config -h	safe-read
 yard config -l	safe-read
 yard config -q	safe-read
+yard config load_plugins true	denied
 yard config x	safe-read
 yard diff	denied
-yard diff --added	safe-read
-yard diff --added --all	safe-read
-yard diff --added x	safe-read
-yard diff --all	safe-read
-yard diff --compact	safe-read
-yard diff --debug	safe-read
-yard diff --help	safe-read
-yard diff --modified	safe-read
-yard diff --no-progress	safe-read
-yard diff --query	safe-read
-yard diff --quiet	safe-read
-yard diff --removed	safe-read
-yard diff --verbose	safe-read
-yard diff --visibility	safe-read
-yard diff -a	safe-read
-yard diff -h	safe-read
-yard diff -q	safe-read
-yard diff x	safe-read
+yard diff -e script.rb a b	denied
+yard diff a.yardoc b.yardoc	denied
+yard diff x	denied
 yard doc	safe-write
-yard doc --api	safe-write
-yard doc --api --asset	safe-write
-yard doc --api --db x	safe-write
 yard doc --api x	safe-write
-yard doc --asset	safe-write
-yard doc --charset	safe-write
+yard doc --asset ~/.ssh:keys	denied
+yard doc --charset x	safe-write
 yard doc --db x	safe-write
 yard doc --debug	safe-write
-yard doc --default-return	safe-write
-yard doc --default-tag x	safe-write
+yard doc --debug --api x	safe-write
+yard doc --debug --embed-mixins	safe-write
+yard doc --debug x	safe-write
+yard doc --default-return x	safe-write
 yard doc --embed-mixins	safe-write
-yard doc --exclude	safe-write
+yard doc --exclude x	safe-write
 yard doc --exclude-tag	safe-write
 yard doc --fail-on-warning	safe-write
-yard doc --files	safe-write
-yard doc --format x	safe-write
+yard doc --format ../../../../tmp/evil	denied
 yard doc --has-tag	safe-write
 yard doc --help	safe-write
-yard doc --hide-api	safe-write
-yard doc --hide-tag	safe-write
+yard doc --hide-api x	safe-write
+yard doc --hide-tag x	safe-write
 yard doc --hide-void-return	safe-write
 yard doc --list-undoc	safe-write
-yard doc --load-plugin x	safe-write
 yard doc --locale x	safe-write
-yard doc --macro x	safe-write
-yard doc --main	safe-write
+yard doc --main x	safe-write
 yard doc --markup x	safe-write
-yard doc --markup-provider	safe-write
+yard doc --markup-provider x	safe-write
 yard doc --no-api	safe-write
 yard doc --no-cache	safe-write
 yard doc --no-output	safe-write
 yard doc --no-private	safe-write
 yard doc --no-progress	safe-write
-yard doc --no-protected x	safe-write
+yard doc --no-protected	safe-write
 yard doc --no-public	safe-write
-yard doc --no-public x	safe-write
 yard doc --no-save	safe-write
 yard doc --no-stats	safe-write
 yard doc --one-file	safe-write
 yard doc --output-dir x	safe-write
-yard doc --plugin	safe-write
-yard doc --plugin x	safe-write
 yard doc --private	safe-write
 yard doc --protected	safe-write
-yard doc --query	safe-write
-yard doc --query-tag x	safe-write
+yard doc --query 'system("id")'	denied
 yard doc --quiet	safe-write
-yard doc --readme	safe-write
+yard doc --readme x	safe-write
 yard doc --single	safe-write
-yard doc --tag x	safe-write
-yard doc --template x	safe-write
-yard doc --template-path x	safe-write
+yard doc --tag x:Title	denied
 yard doc --title x	safe-write
 yard doc --transitive-tag x	safe-write
-yard doc --type-tag x	safe-write
-yard doc --use-cache	safe-write
 yard doc --verbose	safe-write
 yard doc --visibility	safe-write
-yard doc --with-name-tag x	safe-write
-yard doc --with-tag x	safe-write
-yard doc --with-title-tag x	safe-write
-yard doc --with-types-tag x	safe-write
 yard doc -D	safe-write
-yard doc -M	safe-write
+yard doc -M x	safe-write
 yard doc -T	safe-write
-yard doc -b	safe-write
-yard doc -c	safe-write
-yard doc -e	safe-write
+yard doc -b x	safe-write
+yard doc -c ~/Library/LaunchAgents/x	denied
+yard doc -e script.rb	denied
 yard doc -h	safe-write
-yard doc -m	safe-write
+yard doc -m x	safe-write
 yard doc -n	safe-write
-yard doc -o	safe-write
-yard doc -p	safe-write
+yard doc -o ./doc lib	safe-write
+yard doc -o /etc/doc	denied
+yard doc -o x	safe-write
+yard doc -p ./templates	denied
 yard doc -q	safe-write
-yard doc -r	safe-write
-yard doc -t	safe-write
+yard doc -r README.md	safe-write
+yard doc -r x	safe-write
+yard doc -r ~/.ssh/id_rsa	denied
+yard doc -t ../../../../tmp/evil	denied
 yard doc x	safe-write
 yard gems	denied
 yard gems x	denied
@@ -218,7 +201,6 @@ yard graph --db x	safe-write
 yard graph --debug	safe-write
 yard graph --dependencies	safe-write
 yard graph --file x	safe-write
-yard graph --format x	safe-write
 yard graph --full	safe-write
 yard graph --help	safe-write
 yard graph --no-color	safe-write
@@ -231,7 +213,9 @@ yard graph --quiet	safe-write
 yard graph --verbose	safe-write
 yard graph -F x	safe-write
 yard graph -d	safe-write
-yard graph -f	safe-write
+yard graph -f /etc/classes.dot	denied
+yard graph -f classes.dot	safe-write
+yard graph -f x	safe-write
 yard graph -h	safe-write
 yard graph -q	safe-write
 yard graph x	safe-write
@@ -239,135 +223,114 @@ yard help	inert
 yard help x	inert
 yard i18n	denied
 yard i18n x	denied
-yard list	safe-read
-yard list --all	safe-read
-yard list --all --api	safe-read
-yard list --all --db x	safe-read
-yard list --all x	safe-read
-yard list --api	safe-read
-yard list --attr	safe-read
-yard list --class	safe-read
-yard list --constant	safe-read
-yard list --db x	safe-read
-yard list --debug	safe-read
-yard list --exception	safe-read
-yard list --exclude	safe-read
-yard list --exclude-tag x	safe-read
-yard list --extra	safe-read
-yard list --full	safe-read
-yard list --has-tag	safe-read
-yard list --help	safe-read
-yard list --inherit	safe-read
-yard list --inherited	safe-read
-yard list --kind	safe-read
-yard list --macro	safe-read
-yard list --method	safe-read
-yard list --module	safe-read
-yard list --module-function	safe-read
-yard list --no-api x	safe-read
-yard list --no-color	safe-read
-yard list --no-private	safe-read
-yard list --no-protected	safe-read
-yard list --no-public	safe-read
-yard list --protected	safe-read
-yard list --query	safe-read
-yard list --quiet	safe-read
-yard list --single	safe-read
-yard list --tag x	safe-read
-yard list --verbose	safe-read
-yard list --visibility	safe-read
-yard list -a	safe-read
-yard list -c	safe-read
-yard list -h	safe-read
-yard list -q	safe-read
-yard list x	safe-read
+yard list	safe-write
+yard list --all	safe-write
+yard list --all --api x	safe-write
+yard list --all --attr	safe-write
+yard list --all x	safe-write
+yard list --api x	safe-write
+yard list --attr	safe-write
+yard list --class	safe-write
+yard list --constant	safe-write
+yard list --db /tmp/evil.yardoc	denied
+yard list --db x	safe-write
+yard list --debug	safe-write
+yard list --exception	safe-write
+yard list --exclude x	safe-write
+yard list --extra	safe-write
+yard list --full	safe-write
+yard list --has-tag	safe-write
+yard list --help	safe-write
+yard list --inherit	safe-write
+yard list --inherited	safe-write
+yard list --kind	safe-write
+yard list --macro	safe-write
+yard list --method	safe-write
+yard list --module	safe-write
+yard list --module-function	safe-write
+yard list --no-api	safe-write
+yard list --no-color	safe-write
+yard list --no-private	safe-write
+yard list --no-protected	safe-write
+yard list --no-public	safe-write
+yard list --protected	safe-write
+yard list --query 'system("id")'	denied
+yard list --quiet	safe-write
+yard list --single	safe-write
+yard list --type-tag x:Title	denied
+yard list --verbose	safe-write
+yard list --visibility	safe-write
+yard list -a	safe-write
+yard list -h	safe-write
+yard list -q	safe-write
+yard list x	safe-write
 yard ri	denied
+yard ri --db x	safe-read
+yard ri --debug	safe-read
+yard ri --debug --db x	safe-read
+yard ri --debug --help	safe-read
+yard ri --debug x	safe-read
 yard ri --help	safe-read
-yard ri --help -h	safe-read
-yard ri --help x	safe-read
+yard ri --no-pager	safe-read
+yard ri --quiet	safe-read
+yard ri --verbose	safe-read
+yard ri -T	safe-read
+yard ri -b x	safe-read
 yard ri -h	safe-read
+yard ri -p less String	denied
+yard ri -q	safe-read
 yard ri x	safe-read
-yard server	safe-read
-yard server --bind x	safe-read
-yard server --debug	safe-read
-yard server --debug --bind x	safe-read
-yard server --debug --docroot	safe-read
-yard server --debug x	safe-read
-yard server --docroot	safe-read
-yard server --gems	safe-read
-yard server --help	safe-read
-yard server --lib-version x	safe-read
-yard server --no-cache	safe-read
-yard server --no-protected	safe-read
-yard server --no-public	safe-read
-yard server --port x	safe-read
-yard server --protected	safe-read
-yard server --quiet	safe-read
-yard server --reload	safe-read
-yard server --server x	safe-read
-yard server --single-library	safe-read
-yard server --use-cache	safe-read
-yard server -B	safe-read
-yard server -c	safe-read
-yard server -d	safe-read
-yard server -g	safe-read
-yard server -h	safe-read
-yard server -p x	safe-read
-yard server -q	safe-read
-yard server -r	safe-read
-yard server x	safe-read
-yard stats	safe-read
-yard stats --all	safe-read
-yard stats --all --compact	safe-read
-yard stats --all --db x	safe-read
-yard stats --all x	safe-read
-yard stats --compact	safe-read
-yard stats --db x	safe-read
-yard stats --debug	safe-read
-yard stats --exclude x	safe-read
-yard stats --help	safe-read
-yard stats --list-incomplete	safe-read
-yard stats --list-undoc	safe-read
-yard stats --no-cache	safe-read
-yard stats --query x	safe-read
-yard stats --quiet	safe-read
-yard stats --use-cache	safe-read
-yard stats --verbose	safe-read
-yard stats -a	safe-read
-yard stats -c	safe-read
-yard stats -h	safe-read
-yard stats -q	safe-read
-yard stats x	safe-read
+yard server	denied
+yard server --gems	denied
+yard server --server ../../../../tmp/evil	denied
+yard server -c --docroot ~/Library/LaunchAgents	denied
+yard server lib /tmp/evil	denied
+yard server x	denied
+yard stats	safe-write
+yard stats --all	safe-write
+yard stats --all --compact	safe-write
+yard stats --all --db x	safe-write
+yard stats --all x	safe-write
+yard stats --compact	safe-write
+yard stats --db x	safe-write
+yard stats --debug	safe-write
+yard stats --exclude x	safe-write
+yard stats --help	safe-write
+yard stats --list-incomplete	safe-write
+yard stats --list-undoc	safe-write
+yard stats --no-cache	safe-write
+yard stats --quiet	safe-write
+yard stats --verbose	safe-write
+yard stats -a	safe-write
+yard stats -c /tmp/evil.yardoc	denied
+yard stats -h	safe-write
+yard stats -q	safe-write
+yard stats x	safe-write
 yard x	denied
 yardoc	safe-write
-yardoc --api	safe-write
-yardoc --api --asset	safe-write
-yardoc --api --db x	safe-write
 yardoc --api x	safe-write
-yardoc --asset	safe-write
-yardoc --charset	safe-write
+yardoc --charset x	safe-write
 yardoc --db x	safe-write
 yardoc --debug	safe-write
-yardoc --default-return	safe-write
-yardoc --default-tag x	safe-write
+yardoc --debug --api x	safe-write
+yardoc --debug --embed-mixins	safe-write
+yardoc --debug x	safe-write
+yardoc --default-return x	safe-write
 yardoc --embed-mixins	safe-write
-yardoc --exclude	safe-write
+yardoc --exclude x	safe-write
 yardoc --exclude-tag	safe-write
 yardoc --fail-on-warning	safe-write
-yardoc --files	safe-write
-yardoc --format x	safe-write
+yardoc --format ../../../../tmp/evil	denied
 yardoc --has-tag	safe-write
 yardoc --help	safe-write
-yardoc --hide-api	safe-write
-yardoc --hide-tag	safe-write
+yardoc --hide-api x	safe-write
+yardoc --hide-tag x	safe-write
 yardoc --hide-void-return	safe-write
 yardoc --list-undoc	safe-write
-yardoc --load-plugin x	safe-write
 yardoc --locale x	safe-write
-yardoc --macro x	safe-write
-yardoc --main	safe-write
+yardoc --main x	safe-write
 yardoc --markup x	safe-write
-yardoc --markup-provider	safe-write
+yardoc --markup-provider x	safe-write
 yardoc --no-api	safe-write
 yardoc --no-cache	safe-write
 yardoc --no-output	safe-write
@@ -378,43 +341,37 @@ yardoc --no-save	safe-write
 yardoc --no-stats	safe-write
 yardoc --one-file	safe-write
 yardoc --output-dir x	safe-write
-yardoc --plugin	safe-write
-yardoc --plugin x	safe-write
 yardoc --private	safe-write
 yardoc --protected	safe-write
-yardoc --query	safe-write
-yardoc --query-tag x	safe-write
+yardoc --query 'system("id")'	denied
 yardoc --quiet	safe-write
-yardoc --readme	safe-write
+yardoc --readme x	safe-write
 yardoc --single	safe-write
-yardoc --tag x	safe-write
-yardoc --template x	safe-write
-yardoc --template-path x	safe-write
+yardoc --tag x:Title	denied
 yardoc --title x	safe-write
 yardoc --transitive-tag x	safe-write
-yardoc --type-tag x	safe-write
-yardoc --use-cache	safe-write
 yardoc --verbose	safe-write
 yardoc --version	safe-write
 yardoc --visibility	safe-write
-yardoc --with-name-tag x	safe-write
-yardoc --with-tag x	safe-write
-yardoc --with-title-tag x	safe-write
-yardoc --with-types-tag x	safe-write
 yardoc -D	safe-write
-yardoc -M	safe-write
+yardoc -M x	safe-write
 yardoc -T	safe-write
-yardoc -b	safe-write
-yardoc -c	safe-write
-yardoc -e	safe-write
+yardoc -b /tmp/evil.yardoc	denied
+yardoc -b x	safe-write
+yardoc -c ~/Library/LaunchAgents/x	denied
+yardoc -e script.rb	denied
 yardoc -h	safe-write
-yardoc -m	safe-write
+yardoc -m x	safe-write
 yardoc -n	safe-write
-yardoc -o	safe-write
-yardoc -p	safe-write
+yardoc -o ./doc lib	safe-write
+yardoc -o /etc/doc	denied
+yardoc -o x	safe-write
+yardoc -p ./templates	denied
 yardoc -q	safe-write
-yardoc -r	safe-write
-yardoc -t	safe-write
+yardoc -r README.md	safe-write
+yardoc -r x	safe-write
+yardoc -r ~/.ssh/id_rsa	denied
+yardoc -t ../../../../tmp/evil	denied
 yardoc x	safe-write
 yarn	denied
 yarn --help	inert

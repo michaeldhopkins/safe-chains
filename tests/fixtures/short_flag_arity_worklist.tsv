@@ -178,6 +178,20 @@ hg id	-t
 hg status	-T
 hg status	-u
 hg tip	-T
+jj bookmark list	-c
+jj bookmark list	-t
+jj bookmark move	-B
+jj bookmark set	-B
+jj diff	-b
+jj diff	-s
+jj log	-s
+jj op log	-d
+jj op log	-s
+jj show	-b
+jj show	-s
+jj squash	-k
+jj tag list	-c
+jj tag list	-t
 ktrace trace	-t
 kubectl logs	-f
 nerdctl logs	-f
@@ -214,6 +228,5 @@ svn propget	-R
 svn proplist	-R
 tilt [fallback]	-l
 wasm-pack test	-r
-yard doc	-p
 zellij list-sessions	-s
 zellij ls	-s

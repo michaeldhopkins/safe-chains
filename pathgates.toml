@@ -770,12 +770,12 @@ flags = { "-f" = "read" }
 [roles."smbutil smbstat"]
 flags = { "-f" = "read" }
 
-# `hugo new` writes each path it is given (`hugo new site DIR`, `hugo new content FILE`), and `-c` is
-# its `--contentDir`, under which the content file is written; the other hugo subs only read their
-# positionals or take none.
+# `hugo new` writes each path it is given (`hugo new site DIR`, `hugo new content FILE`). Its `-c`
+# (`--contentDir`), `--source` and `--kind` (an archetype, itself a template) name code
+# the build runs, so they are gated as executors; the other hugo subs only read their positionals.
 [roles."hugo new"]
 positional = "write"
-flags = { "-c" = "write", "--source" = "write", "-s" = "write", "--config" = "read", "--kind" = "ignore" }
+flags = { "-c" = "exec", "--contentDir" = "exec", "--source" = "exec", "-s" = "exec", "--kind" = "exec", "-k" = "exec", "--environment" = "exec", "-e" = "exec", "--baseURL" = "ignore", "-b" = "ignore" }
 
 # `rbs annotate` UPDATES each RBS file it is given (upstream calls `annotate_file(path)` per
 # positional); its siblings — `validate`, `prototype`, `list` — only read. There is no flag to key

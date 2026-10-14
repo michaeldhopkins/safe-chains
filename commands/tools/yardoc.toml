@@ -1,36 +1,40 @@
 [[command]]
 name = "yardoc"
-description = "Standalone binary equivalent to `yard doc`. Renders Ruby documentation into ./doc by default (or wherever -o/--output-dir points); honours all of YARD's templating, plugin, and parsing options. Distributed alongside the yard gem. Does not execute application code at parse time, but loaded plugins and template hooks are arbitrary Ruby."
+description = "Standalone binary equivalent to `yard doc`. Renders Ruby documentation into ./doc by default (or wherever -o/--output-dir points); honours all of YARD's templating, plugin, and parsing options. Distributed alongside the yard gem. Does not execute application code at parse time, but several options run Ruby: `-e`/`--load` loads a script, `--plugin` requires a gem, `-p`/`--template-path` registers a template directory whose `setup.rb` files are evaluated, `-t`/`--template` and `--format` are joined onto that directory unsanitised (a `..` value reaches any `setup.rb`), and `--query` is evaluated as Ruby against every object; `--tag` and `--type-tag` splice their tag name into Ruby source that is `class_eval`'d. `--asset FROM[:TO]`, `--files` and `-r`/`--readme` copy or render arbitrary files into the output, and `-c`/`--use-cache [FILE]` and `-b`/`--db FILE` save the .yardoc database wherever they point."
 url = "https://yardoc.org/guides/index.html"
 researched_version = "yard v0.9.43 (April 2026)"
 level = "SafeWrite"
 bare = true
+examples_safe = ["yardoc -o ./doc lib", "yardoc -r README.md"]
+examples_denied = ["yardoc -o /etc/doc", "yardoc -e script.rb", "yardoc -p ./templates", "yardoc --query 'system(\"id\")'", "yardoc -r ~/.ssh/id_rsa", "yardoc -t ../../../../tmp/evil", "yardoc --format ../../../../tmp/evil", "yardoc -c ~/Library/LaunchAgents/x", "yardoc -b /tmp/evil.yardoc", "yardoc --tag x:Title"]
 standalone = [
-    "--api", "--asset", "--charset", "--debug",
-    "--default-return", "--embed-mixins", "--exclude",
-    "--exclude-tag", "--fail-on-warning", "--files",
-    "--has-tag", "--help", "--hide-api",
-    "--hide-tag", "--hide-void-return",
-    "--list-undoc", "--main", "--markup-provider",
-    "--no-api", "--no-cache", "--no-output", "--no-private",
-    "--no-progress", "--no-public", "--no-save", "--no-stats",
-    "--one-file", "--plugin", "--private",
-    "--protected", "--quiet", "--query",
-    "--readme", "--single", "--use-cache", "--verbose",
+    "--debug",
+    "--embed-mixins",
+    "--exclude-tag", "--fail-on-warning",
+    "--has-tag", "--help",
+    "--hide-void-return",
+    "--list-undoc",
+    "--no-cache", "--no-output", "--no-private",
+    "--no-api", "--no-progress", "--no-public", "--no-save", "--no-stats",
+    "--one-file", "--private",
+    "--protected", "--quiet",
+    "--single", "--verbose",
     "--version", "--visibility",
-    "-c", "-D", "-M", "-T", "-b", "-e", "-h", "-m",
-    "-n", "-o", "-p", "-q", "-r", "-t",
+    "-D", "-T", "-h",
+    "-n", "-q",
 ]
 valued = [
-    "--db", "--default-tag", "--format",
-    "--load-plugin", "--locale", "--macro",
-    "--markup", "--output-dir", "--plugin",
-    "--query-tag", "--tag", "--template",
-    "--template-path", "--title",
-    "--transitive-tag", "--type-tag",
-    "--with-name-tag", "--with-tag",
-    "--with-title-tag", "--with-types-tag",
+    "--api", "--charset", "--db", "--default-return",
+    "--exclude",
+    "--hide-api", "--hide-tag",
+    "--locale", "--main",
+    "--markup", "--output-dir",
+    "--readme",
+    "--title",
+    "--transitive-tag",
+    "--markup-provider", "-M", "-b", "-m", "-o", "-r",
 ]
 
 [command.path_gate]
-flags = { "--output-dir" = "write" }
+positional = "read"
+flags = { "--output-dir" = "write", "-o" = "write", "--db" = "exec", "-b" = "exec", "--readme" = "read", "--main" = "read", "-r" = "read" }

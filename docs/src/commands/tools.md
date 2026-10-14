@@ -809,7 +809,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `hugo`
 <p class="cmd-url"><a href="https://gohugo.io/commands/hugo/">https://gohugo.io/commands/hugo/</a></p>
 
-- **build**: Flags: --cleanDestinationDir, --clock, --config, --configDir, --debug, --destination, --disableFastRender, --enableGitInfo, --forceSyncStatic, --gc, --help, --ignoreCache, --minify, --noBuildLock, --noChmod, --noTimes, --printI18nWarnings, --printMemoryUsage, --printPathWarnings, --printUnusedTemplates, --quiet, --renderToMemory, --templateMetrics, --templateMetricsHints, --trace, --verbose, -D, -E, -F, -d, -e, -h, -q, -s, -t, -v. Valued: --baseURL, --cacheDir, --clock, --contentDir, --destination, --environment, --i18n, --layoutDir, --logFile, --logLevel, --memstats, --noChmod, --noTimes, --panicOnWarning, --source, --theme, --themesDir, --workers, -b, -l
+- **build**: Flags: --cleanDestinationDir, --debug, --panicOnWarning, --disableFastRender, --enableGitInfo, --forceSyncStatic, --gc, --help, --ignoreCache, --minify, --noBuildLock, --noChmod, --noTimes, --printI18nWarnings, --printMemoryUsage, --printPathWarnings, --printUnusedTemplates, --quiet, --renderToMemory, --templateMetrics, --templateMetricsHints, --verbose, -D, -E, -F, -h, -q, -v. Valued: --baseURL, --cacheDir, --clock, --contentDir, --destination, --environment, --i18n, --configDir, --layoutDir, --logFile, --logLevel, --memstats, --source, --themesDir, --trace, --workers, -b, -d, -e, -l, -s
 - **check ulimit**: Flags: --help, -h
 - **completion**: Flags: --help, -h. Positional args accepted
 - **config mounts**: Flags: --help, -h
@@ -826,9 +826,16 @@ Aliases: `g++`, `cc`, `c++`
 - **list expired**: Flags: --help, -h. Valued: --source, -s
 - **list future**: Flags: --help, -h. Valued: --source, -s
 - **list published**: Flags: --help, -h. Valued: --source, -s
-- **new**: Flags: --force, --help, --quiet, -f, -h. Valued: --config, --editor, --kind, --source, -c, -s. Positional args accepted
+- **new**: Flags: --force, --help, --quiet, -f, -h. Valued: --baseURL, --contentDir, --environment, --kind, --source, -b, -c, -e, -k, -s
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `hugo build -d ./public`
+- `hugo build -s ./site`
+- `hugo list drafts -s .`
+- `hugo new content posts/x.md`
 
 ### `husky`
 <p class="cmd-url"><a href="https://typicode.github.io/husky/">https://typicode.github.io/husky/</a></p>
@@ -1290,8 +1297,8 @@ Aliases: `run-p`, `run-s`
 ### `pup`
 <p class="cmd-url"><a href="https://github.com/ericchiang/pup">https://github.com/ericchiang/pup</a></p>
 
-- Allowed standalone flags: --charset, --color, --help, --number, --plain, --version, -c, -h, -n, -p
-- Allowed valued flags: --file, -f
+- Allowed standalone flags: --color, --help, --number, --plain, --version, -c, -h, -n, -p
+- Allowed valued flags: --charset, --file, -f
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
@@ -2113,22 +2120,31 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://yardoc.org/guides/index.html">https://yardoc.org/guides/index.html</a></p>
 
 - **config**: Flags: --debug, --help, --list, --quiet, --verbose, -a, -h, -l, -q
-- **diff**: Flags: --added, --all, --compact, --debug, --help, --modified, --no-progress, --quiet, --query, --removed, --verbose, --visibility, -a, -h, -q. Positional args accepted
-- **doc**: Flags: --api, --asset, --charset, --debug, --default-return, --embed-mixins, --exclude, --exclude-tag, --fail-on-warning, --files, --has-tag, --help, --hide-api, --hide-tag, --hide-void-return, --list-undoc, --main, --markup-provider, --no-api, --no-cache, --no-output, --no-private, --no-progress, --no-public, --no-save, --no-stats, --one-file, --plugin, --private, --protected, --quiet, --query, --readme, --single, --use-cache, --verbose, --visibility, -c, -D, -M, -T, -b, -e, -h, -m, -n, -o, -p, -q, -r, -t. Valued: --db, --default-tag, --format, --load-plugin, --locale, --macro, --markup, --no-protected, --no-public, --output-dir, --plugin, --query-tag, --tag, --template, --template-path, --title, --transitive-tag, --type-tag, --with-name-tag, --with-tag, --with-title-tag, --with-types-tag
-- **graph**: Flags: --all, --debug, --dependencies, --full, --help, --no-color, --no-public, --no-private, --no-protected, --private, --protected, --quiet, --verbose, -d, -f, -h, -q. Valued: --db, --file, --format, -F
+- **doc**: Flags: --debug, --embed-mixins, --exclude-tag, --fail-on-warning, --has-tag, --help, --hide-void-return, --list-undoc, --no-cache, --no-output, --no-private, --no-api, --no-progress, --no-protected, --no-public, --no-save, --no-stats, --one-file, --private, --protected, --quiet, --single, --verbose, --visibility, -D, -T, -h, -n, -q. Valued: --api, --charset, --db, --default-return, --exclude, --hide-api, --hide-tag, --locale, --main, --markup, --output-dir, --readme, --title, --transitive-tag, --markup-provider, -M, -b, -m, -o, -r
+- **graph**: Flags: --all, --debug, --dependencies, --full, --help, --no-color, --no-public, --no-private, --no-protected, --private, --protected, --quiet, --verbose, -d, -h, -q. Valued: --db, --file, -F, -f
 - **help**: Positional args accepted
-- **list**: Flags: --all, --api, --attr, --class, --constant, --debug, --exception, --exclude, --extra, --full, --has-tag, --help, --inherit, --inherited, --kind, --macro, --method, --module, --module-function, --no-color, --no-private, --no-protected, --no-public, --protected, --query, --quiet, --single, --verbose, --visibility, -a, -c, -h, -q. Valued: --db, --exclude-tag, --no-api, --tag
-- **ri**: Flags: --help, -h. Positional args accepted
-- **server**: Flags: --debug, --docroot, --gems, --help, --no-cache, --no-public, --no-protected, --protected, --quiet, --reload, --single-library, --use-cache, -B, -c, -d, -g, -h, -q, -r. Valued: --bind, --lib-version, --port, --server, -p
-- **stats**: Flags: --all, --compact, --debug, --help, --list-incomplete, --list-undoc, --no-cache, --quiet, --use-cache, --verbose, -a, -c, -h, -q. Valued: --db, --exclude, --query
+- **list**: Flags: --all, --attr, --class, --constant, --debug, --exception, --extra, --full, --has-tag, --help, --inherit, --inherited, --kind, --macro, --method, --module, --module-function, --no-color, --no-api, --no-private, --no-protected, --no-public, --protected, --quiet, --single, --verbose, --visibility, -a, -h, -q. Valued: --api, --db, --exclude
+- **ri**: Flags: --debug, --help, --no-pager, --quiet, --verbose, -T, -h, -q. Valued: --db, -b
+- **stats**: Flags: --all, --compact, --debug, --help, --list-incomplete, --list-undoc, --no-cache, --quiet, --verbose, -a, -h, -q. Valued: --db, --exclude
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `yard doc -o ./doc lib`
+- `yard doc -r README.md`
+- `yard graph -f classes.dot`
 
 ### `yardoc`
 <p class="cmd-url"><a href="https://yardoc.org/guides/index.html">https://yardoc.org/guides/index.html</a></p>
 
-- Allowed standalone flags: --api, --asset, --charset, --debug, --default-return, --embed-mixins, --exclude, --exclude-tag, --fail-on-warning, --files, --has-tag, --help, --hide-api, --hide-tag, --hide-void-return, --list-undoc, --main, --markup-provider, --no-api, --no-cache, --no-output, --no-private, --no-progress, --no-public, --no-save, --no-stats, --one-file, --plugin, --private, --protected, --quiet, --query, --readme, --single, --use-cache, --verbose, --version, --visibility, -c, -D, -M, -T, -b, -e, -h, -m, -n, -o, -p, -q, -r, -t
-- Allowed valued flags: --db, --default-tag, --format, --load-plugin, --locale, --macro, --markup, --output-dir, --plugin, --query-tag, --tag, --template, --template-path, --title, --transitive-tag, --type-tag, --with-name-tag, --with-tag, --with-title-tag, --with-types-tag
+- Allowed standalone flags: --debug, --embed-mixins, --exclude-tag, --fail-on-warning, --has-tag, --help, --hide-void-return, --list-undoc, --no-cache, --no-output, --no-private, --no-api, --no-progress, --no-public, --no-save, --no-stats, --one-file, --private, --protected, --quiet, --single, --verbose, --version, --visibility, -D, -T, -h, -n, -q
+- Allowed valued flags: --api, --charset, --db, --default-return, --exclude, --hide-api, --hide-tag, --locale, --main, --markup, --output-dir, --readme, --title, --transitive-tag, --markup-provider, -M, -b, -m, -o, -r
 - Bare invocation allowed
+
+**Examples:**
+
+- `yardoc -o ./doc lib`
+- `yardoc -r README.md`
 
 ### `zig`
 <p class="cmd-url"><a href="https://ziglang.org/documentation/">https://ziglang.org/documentation/</a></p>

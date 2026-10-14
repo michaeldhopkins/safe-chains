@@ -951,9 +951,6 @@ xgettext.pl	--directory	untriaged	-	-	-
 xgettext.pl	--files-from	untriaged	-	-	-	
 xsel	--logfile	untriaged	-	-	-	
 yamllint	--config-file	untriaged	-	-	-	
-yard doc	--template-path	untriaged	-	-	-	
-yard graph	--file	untriaged	-	-	-	
-yardoc	--template-path	untriaged	-	-	-	
 yt-dlp	--cache-dir	untriaged	-	-	-	
 yt-dlp	--file-access-retries	untriaged	-	-	-	
 yt-dlp	--max-filesize	untriaged	-	-	-	

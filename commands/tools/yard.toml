@@ -1,45 +1,74 @@
 [[command]]
 name = "yard"
-description = "Documentation generator for Ruby. Parses Ruby source via its own parser plus YARD's tag system to extract structure and comments; does not execute application code at parse time. The CLI is dispatched by subcommand. `list` and `stats` print summaries to stdout (read-only). `server` runs an HTTP preview that re-parses sources on demand (read-only). `doc` (also reachable as the standalone `yardoc` binary) renders HTML or other formats into ./doc by default. `graph` renders a Graphviz dot file describing class hierarchy. `config` reads or writes the per-user ~/.yard/config file; the read forms are listed here (write modes are not promoted). Releases follow Ruby's cadence — v0.9.x has been the stable line for years."
+description = "Documentation generator for Ruby. Parses Ruby source via its own parser plus YARD's tag system to extract structure and comments; does not execute application code at parse time. Several options do run Ruby, though: `-e`/`--load` loads a script, `--plugin` requires a gem, `-p`/`--template-path` registers a template directory whose `setup.rb` files are evaluated, `-t`/`--template` and `--format` are joined onto that directory unsanitised (a `..` value reaches any `setup.rb`), and `--query` is an expression evaluated as Ruby (`instance_eval`) against every object; `--tag` and `--type-tag` splice their tag name into Ruby source that is `class_eval`'d. `--asset FROM[:TO]`, `--files` and `-r`/`--readme` copy or render arbitrary files into the output, and `-c`/`--use-cache [FILE]` and `-b`/`--db FILE` save the .yardoc database wherever they point. The CLI is dispatched by subcommand. `list` and `stats` print summaries to stdout, and like `doc` they save the .yardoc database in the project and read its .yardopts. `server` is not promoted, since it listens for inbound connections (it runs an HTTP preview that re-parses sources on demand); for each `LIB DIR` it is given it runs yardoc inside DIR, reading DIR/.yardopts (whose options can load Ruby) and writing DIR/.yardoc; its `-a`/`--adapter` is evaluated and `-s`/`--server` is joined onto a `require` path unsanitised, so neither is admitted. `doc` (also reachable as the standalone `yardoc` binary) renders HTML or other formats into ./doc by default. `graph` renders a Graphviz dot file describing class hierarchy. `config` reads or writes the per-user ~/.yard/config file; the read forms are listed here (write modes are not promoted). Releases follow Ruby's cadence — v0.9.x has been the stable line for years."
 url = "https://yardoc.org/guides/index.html"
 researched_version = "yard v0.9.43 (April 2026)"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+examples_safe = ["yard doc -o ./doc lib", "yard doc -r README.md", "yard graph -f classes.dot"]
+examples_denied = [
+    "yard doc -o /etc/doc",
+    "yard doc -e script.rb",
+    "yard doc -p ./templates",
+    "yard doc --query 'system(\"id\")'",
+    "yard list --query 'system(\"id\")'",
+    "yard doc -r ~/.ssh/id_rsa",
+    "yard doc --asset ~/.ssh:keys",
+    "yard graph -f /etc/classes.dot",
+    "yard ri -p less String",
+    "yard diff -e script.rb a b",
+    "yard config load_plugins true",
+    "yard doc -t ../../../../tmp/evil",
+    "yard doc --format ../../../../tmp/evil",
+    "yard server -c --docroot ~/Library/LaunchAgents",
+    "yard doc -c ~/Library/LaunchAgents/x",
+    "yard stats -c /tmp/evil.yardoc",
+    "yard server lib /tmp/evil",
+    "yard list --db /tmp/evil.yardoc",
+    "yard diff a.yardoc b.yardoc",
+    "yard server --gems",
+    "yard doc --tag x:Title",
+    "yard list --type-tag x:Title",
+    "yard server --server ../../../../tmp/evil",
+]
+
 [command.path_gate]
-flags = { "--output-dir" = "write" }
+positional = "read"
+flags = { "--output-dir" = "write", "-o" = "write", "--db" = "exec", "-b" = "exec", "--readme" = "read", "--main" = "read", "-r" = "read", "--file" = "write", "-f" = "write", "--docroot" = "write" }
 
 [[command.sub]]
 name = "list"
-level = "SafeRead"
+writes_cwd = "code"
+level = "SafeWrite"
 bare = true
 standalone = [
-    "--all", "--api", "--attr", "--class", "--constant",
-    "--debug", "--exception", "--exclude", "--extra",
+    "--all", "--attr", "--class", "--constant",
+    "--debug", "--exception", "--extra",
     "--full", "--has-tag", "--help", "--inherit",
     "--inherited", "--kind", "--macro", "--method",
     "--module", "--module-function", "--no-color",
-    "--no-private", "--no-protected", "--no-public",
-    "--protected", "--query", "--quiet", "--single",
+    "--no-api", "--no-private", "--no-protected", "--no-public",
+    "--protected", "--quiet", "--single",
     "--verbose", "--visibility",
-    "-a", "-c", "-h", "-q",
+    "-a", "-h", "-q",
 ]
 valued = [
-    "--db", "--exclude-tag", "--no-api",
-    "--tag",
+    "--api", "--db", "--exclude",
 ]
 
 [[command.sub]]
 name = "stats"
-level = "SafeRead"
+writes_cwd = "code"
+level = "SafeWrite"
 bare = true
 standalone = [
     "--all", "--compact", "--debug",
     "--help", "--list-incomplete", "--list-undoc",
-    "--no-cache", "--quiet", "--use-cache", "--verbose",
-    "-a", "-c", "-h", "-q",
+    "--no-cache", "--quiet", "--verbose",
+    "-a", "-h", "-q",
 ]
 valued = [
-    "--db", "--exclude", "--query",
+    "--db", "--exclude",
 ]
 
 [[command.sub]]
@@ -47,30 +76,30 @@ name = "doc"
 level = "SafeWrite"
 bare = true
 standalone = [
-    "--api", "--asset", "--charset", "--debug",
-    "--default-return", "--embed-mixins", "--exclude",
-    "--exclude-tag", "--fail-on-warning", "--files",
-    "--has-tag", "--help", "--hide-api",
-    "--hide-tag", "--hide-void-return",
-    "--list-undoc", "--main", "--markup-provider",
-    "--no-api", "--no-cache", "--no-output", "--no-private",
-    "--no-progress", "--no-public", "--no-save", "--no-stats",
-    "--one-file", "--plugin", "--private",
-    "--protected", "--quiet", "--query",
-    "--readme", "--single", "--use-cache", "--verbose",
+    "--debug",
+    "--embed-mixins",
+    "--exclude-tag", "--fail-on-warning",
+    "--has-tag", "--help",
+    "--hide-void-return",
+    "--list-undoc",
+    "--no-cache", "--no-output", "--no-private",
+    "--no-api", "--no-progress", "--no-protected", "--no-public", "--no-save", "--no-stats",
+    "--one-file", "--private",
+    "--protected", "--quiet",
+    "--single", "--verbose",
     "--visibility",
-    "-c", "-D", "-M", "-T", "-b", "-e", "-h", "-m",
-    "-n", "-o", "-p", "-q", "-r", "-t",
+    "-D", "-T", "-h",
+    "-n", "-q",
 ]
 valued = [
-    "--db", "--default-tag", "--format",
-    "--load-plugin", "--locale", "--macro",
-    "--markup", "--no-protected", "--no-public",
-    "--output-dir", "--plugin", "--query-tag",
-    "--tag", "--template", "--template-path",
-    "--title", "--transitive-tag", "--type-tag",
-    "--with-name-tag", "--with-tag", "--with-title-tag",
-    "--with-types-tag",
+    "--api", "--charset", "--db", "--default-return",
+    "--exclude",
+    "--hide-api", "--hide-tag",
+    "--locale", "--main",
+    "--markup",
+    "--output-dir", "--readme",
+    "--title", "--transitive-tag",
+    "--markup-provider", "-M", "-b", "-m", "-o", "-r",
 ]
 
 [[command.sub]]
@@ -82,17 +111,18 @@ standalone = [
     "--full", "--help", "--no-color",
     "--no-public", "--no-private", "--no-protected",
     "--private", "--protected", "--quiet", "--verbose",
-    "-d", "-f", "-h", "-q",
+    "-d", "-h", "-q",
 ]
 valued = [
-    "--db", "--file", "--format",
-    "-F",
+    "--db", "--file",
+    "-F", "-f",
 ]
 
 [[command.sub]]
 name = "config"
 level = "SafeRead"
 bare = true
+max_positional = 1
 standalone = [
     "--debug", "--help", "--list", "--quiet",
     "--verbose",
@@ -102,33 +132,11 @@ valued = []
 
 [[command.sub]]
 name = "diff"
-level = "SafeRead"
-bare = false
-tolerate_unknown_short = true
-standalone = [
-    "--added", "--all", "--compact", "--debug",
-    "--help", "--modified", "--no-progress",
-    "--quiet", "--query", "--removed",
-    "--verbose", "--visibility",
-    "-a", "-h", "-q",
-]
-valued = []
+candidate = true
 
 [[command.sub]]
 name = "server"
-level = "SafeRead"
-bare = true
-standalone = [
-    "--debug", "--docroot", "--gems", "--help",
-    "--no-cache", "--no-public", "--no-protected",
-    "--protected", "--quiet", "--reload",
-    "--single-library", "--use-cache",
-    "-B", "-c", "-d", "-g", "-h", "-q", "-r",
-]
-valued = [
-    "--bind", "--lib-version", "--port",
-    "--server", "-p",
-]
+candidate = true
 
 [[command.sub]]
 name = "help"
@@ -138,8 +146,8 @@ allow_all = true
 name = "ri"
 level = "SafeRead"
 bare = false
-tolerate_unknown_short = true
-standalone = ["--help", "-h"]
+standalone = ["--debug", "--help", "--no-pager", "--quiet", "--verbose", "-T", "-h", "-q"]
+valued = ["--db", "-b"]
 
 [[command.sub]]
 name = "gems"

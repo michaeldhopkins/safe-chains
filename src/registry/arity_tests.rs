@@ -176,7 +176,10 @@ fn a_short_flag_is_not_standalone_where_its_own_command_declares_it_valued() {
 #[test]
 fn a_short_spelling_of_a_gated_long_flag_is_gated_too() {
     let mut central: HashMap<String, Vec<String>> = HashMap::new();
-    for (key, flag, _role) in crate::pathgate::central_flag_gates() {
+    for (key, flag, role) in crate::pathgate::central_flag_gates() {
+        if role == crate::pathgate::Role::Ignore {
+            continue;
+        }
         let cmd = key.split(' ').next().unwrap_or_default().to_string();
         central.entry(cmd).or_default().push(flag);
     }
@@ -186,7 +189,7 @@ fn a_short_spelling_of_a_gated_long_flag_is_gated_too() {
         for cmd in &file.command {
             let mut gated: BTreeSet<String> = BTreeSet::new();
             if let Some(gate) = &cmd.path_gate {
-                gated.extend(gate.flag_roles().map(|(f, _)| f.to_string()));
+                gated.extend(gate.flag_roles().filter(|(_, r)| *r != crate::pathgate::Role::Ignore).map(|(f, _)| f.to_string()));
             }
             if let Some(flags) = central.get(&cmd.name) {
                 gated.extend(flags.iter().cloned());
