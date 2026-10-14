@@ -298,6 +298,7 @@ zforce --help	denied
 zforce --version	denied
 zforce x	safe-write
 zgrep	denied
+zgrep -- -e ~/.ssh/id_rsa	denied
 zgrep --after-context x	inert
 zgrep --before-context x	inert
 zgrep --context x	inert
@@ -306,6 +307,7 @@ zgrep --count --after-context x	inert
 zgrep --count --extended-regexp	inert
 zgrep --count x	inert
 zgrep --extended-regexp	inert
+zgrep --fil=~/.ssh/id_rsa x	denied
 zgrep --file x	inert
 zgrep --files-with-matches	inert
 zgrep --files-without-match	inert

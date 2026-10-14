@@ -4552,6 +4552,7 @@ rex -o x	safe-write
 rex -s	safe-write
 rex x	safe-write
 rg	denied
+rg -- -e ~/.ssh/id_rsa	denied
 rg --after-context x	inert
 rg --before-context x	inert
 rg --binary	inert
@@ -4681,13 +4682,15 @@ rg -e "$PAT" ~/.ssh/id_rsa	denied
 rg -e /etc/passwd src	inert
 rg -e TODO src	inert
 rg -e x	inert
+rg -e x -- -e ~/.ssh/id_rsa	denied
 rg -ex ~/.ssh/id_rsa	denied
 rg -f x	inert
 rg -f ~/.ssh/id_rsa src	denied
 rg -g x	inert
 rg -h	inert
 rg -i	inert
-rg -ie "$PAT" src	inert
+rg -i -e "$PAT" src	inert
+rg -ie foo src	inert
 rg -j x	inert
 rg -l	inert
 rg -m x	inert
@@ -4706,6 +4709,9 @@ rg -z	inert
 rg /etc/passwd ./code.rs	inert
 rg secret ~/.ssh/id_rsa	denied
 rg x	inert
+rg x -Te /etc/shadow	denied
+rg x -ge ~/.ssh/id_rsa	denied
+rg x -re ~/.ssh/id_rsa	denied
 rgb2ycbcr	denied
 rgb2ycbcr --help	denied
 rgb2ycbcr --version	denied

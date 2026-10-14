@@ -374,6 +374,7 @@ owed = [
 "src/decisionlog.rs" = "appends to the decision log under HOME"
 "src/docs.rs" = "renders the command docs and writes the mdbook tree"
 "src/engine/mod.rs" = "module declarations only"
+"src/pathgate/fuzz_judges.rs" = "reads the process-wide gate tables; a seam whose invariant the gate_prefilter fuzz target checks"
 "src/engine/resolve/regions.rs" = "loads grants from ~/.config/safe-chains.toml and Claude Code's settings, and reads HOME"
 "src/engine/resolve/regions/grant_faces.rs" = "reads HOME to place the grants it merges"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"

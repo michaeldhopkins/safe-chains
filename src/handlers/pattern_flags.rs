@@ -3,7 +3,7 @@ use crate::parse::Token;
 const PATTERN_LONG_FLAGS: &[&str] = &["regexp", "regex", "file", "match"];
 
 pub(crate) fn supplies_pattern(tokens: &[Token]) -> bool {
-    tokens.iter().skip(1).any(|t| is_pattern_flag(t.as_str()))
+    tokens.iter().skip(1).take_while(|t| t.as_str() != "--").any(|t| is_pattern_flag(t.as_str()))
 }
 
 fn is_pattern_flag(token: &str) -> bool {
@@ -19,7 +19,7 @@ fn is_pattern_flag(token: &str) -> bool {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum PatternWord {
     Pattern,
-    File,
+    Read,
 }
 
 pub(crate) fn takes_next_word(token: &str) -> Option<PatternWord> {
@@ -28,7 +28,7 @@ pub(crate) fn takes_next_word(token: &str) -> Option<PatternWord> {
             return None;
         }
         if "file".starts_with(name) {
-            return Some(PatternWord::File);
+            return Some(PatternWord::Read);
         }
         return ["regexp", "regex", "match"].iter().any(|f| f.starts_with(name)).then_some(PatternWord::Pattern);
     }
@@ -37,7 +37,7 @@ pub(crate) fn takes_next_word(token: &str) -> Option<PatternWord> {
     if at + 1 != cluster.len() {
         return None;
     }
-    Some(if cluster.as_bytes()[at] == b'f' { PatternWord::File } else { PatternWord::Pattern })
+    Some(if at > 0 || cluster.as_bytes()[at] == b'f' { PatternWord::Read } else { PatternWord::Pattern })
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +48,7 @@ pub(crate) enum PatternStep {
 
 pub(crate) fn step_over(tokens: &[Token], i: usize, read_denied: impl Fn(&str) -> bool) -> Option<PatternStep> {
     let word = takes_next_word(tokens.get(i)?.as_str())?;
-    if word == PatternWord::File && tokens.get(i + 1).is_some_and(|t| read_denied(t.as_str())) {
+    if word == PatternWord::Read && tokens.get(i + 1).is_some_and(|t| read_denied(t.as_str())) {
         return Some(PatternStep::Deny);
     }
     Some(PatternStep::Next(i + 2))
@@ -77,11 +77,11 @@ mod tests {
 
     #[test]
     fn a_pattern_flag_spelled_alone_takes_the_next_word() {
-        for flag in ["-e", "-ie", "-wie", "--regexp", "--regex", "--reg", "--match", "--m"] {
+        for flag in ["-e", "--regexp", "--regex", "--reg", "--match", "--m"] {
             assert_eq!(takes_next_word(flag), Some(PatternWord::Pattern), "{flag}");
         }
-        for flag in ["-f", "-if", "--file", "--fi"] {
-            assert_eq!(takes_next_word(flag), Some(PatternWord::File), "{flag}");
+        for flag in ["-f", "-if", "-ie", "-wie", "-re", "-ge", "--file", "--fi"] {
+            assert_eq!(takes_next_word(flag), Some(PatternWord::Read), "{flag}");
         }
         for flag in ["-ex", "-fpats", "-ei", "--regexp=x", "--file=p", "-i", "-A3", "--", "-", "--ignore-case", "x"] {
             assert_eq!(takes_next_word(flag), None, "{flag}");
@@ -98,6 +98,12 @@ mod tests {
         assert_eq!(step_over(&tokens, 7, secret), None);
         assert_eq!(step_over(&tokens, 8, secret), Some(PatternStep::Next(10)));
         assert_eq!(step_over(&tokens, 10, secret), None);
+    }
+
+    #[test]
+    fn a_pattern_flag_after_the_double_dash_is_an_operand() {
+        assert!(!supplies_pattern(&toks(&["rg", "--", "-e", "x"])));
+        assert!(supplies_pattern(&toks(&["rg", "-e", "x", "--", "-e"])));
     }
 
     #[test]
@@ -129,6 +135,18 @@ mod tests {
                 None => format!("--{name}"),
             };
             prop_assert!(is_pattern_flag(&token), "{token}");
+        }
+
+        #[test]
+        fn a_letter_before_the_pattern_flag_gates_the_next_word_as_a_read(
+            before in "[a-zA-Z]{1,3}",
+            letter in prop::sample::select(vec!['e', 'f']),
+        ) {
+            let flag = format!("-{before}{letter}");
+            prop_assume!(takes_next_word(&flag).is_some());
+            prop_assert_eq!(takes_next_word(&flag), Some(PatternWord::Read), "{}", flag);
+            let tokens = toks(&["rg", &flag, "~/.ssh/id_rsa"]);
+            prop_assert_eq!(step_over(&tokens, 1, |p| p.contains(".ssh")), Some(PatternStep::Deny));
         }
 
         #[test]

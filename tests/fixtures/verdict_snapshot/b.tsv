@@ -2769,6 +2769,7 @@ bzfgrep --help	denied
 bzfgrep --version	denied
 bzfgrep x	inert
 bzgrep	denied
+bzgrep -- -e ~/.ssh/id_rsa	denied
 bzgrep --help	denied
 bzgrep --version	denied
 bzgrep TODO ./log.bz2	inert

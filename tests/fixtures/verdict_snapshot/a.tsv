@@ -666,6 +666,7 @@ ag -u	inert
 ag -v	inert
 ag -w	inert
 ag x	inert
+ag x -Ge ~/.ssh/id_rsa	denied
 agda	denied
 agda --help	inert
 agda --help --version	inert

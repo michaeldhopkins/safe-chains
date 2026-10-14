@@ -22,6 +22,7 @@ use crate::handlers::pattern_flags::{self, PatternStep};
 use crate::parse::Token;
 use crate::verdict::Verdict;
 use flag_match::match_flag;
+pub use fuzz_judges::{judge_for_flag, judge_for_positional};
 
 /// What to do with a path found in a given argument slot.
 #[derive(Deserialize, Clone, Copy, PartialEq, Default, Debug)]
@@ -521,6 +522,10 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         let t = tokens[i].as_str();
+        if t == "--" {
+            positionals.extend(tokens[i + 1..].iter().map(Token::as_str));
+            break;
+        }
         if let Some((role, value, consumed)) = match_flag(flags, tokens, i) {
             // A DECLARED flag's value skips the pre-filter and is always judged. The declaration
             // already says this token is a path operand of this role, so asking "does it look like
@@ -616,53 +621,6 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
     })
 }
 
-/// What the ROLE's judge says about `value` for a declared `cmd`/`flag` gate, or `None` when that
-/// flag declares no gate.
-///
-/// Exposed for the `gate_prefilter` fuzz target, which asserts the one invariant the pre-filter can
-/// break: a value the judge refuses must not be skipped before the judge ever sees it. Deliberately
-/// returns the JUDGE's answer rather than the gate's, so the two can be compared.
-///
-/// `doc(hidden)` for the same reason as `registry::fuzz_load_config`: the fuzz target is a separate
-/// crate so this must be `pub`, but this crate publishes to crates.io and a test seam is not API.
-#[doc(hidden)]
-pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
-    let role = GATES
-        .roles
-        .get(cmd)
-        .and_then(|spec| spec.role_of(flag))
-        .or_else(|| crate::registry::command_path_gate(cmd)?.role_of(flag))?;
-    Some(match role {
-        Role::Ignore => return None,
-        Role::Read => crate::engine::resolve::read_content_verdict(value),
-        Role::ReadTree => crate::engine::resolve::read_tree_verdict(value),
-        Role::Write => crate::engine::resolve::write_target_verdict(value),
-        Role::Exec => crate::engine::resolve::execute_file_verdict(value),
-    })
-}
-
-/// What the POSITIONAL role's judge says about `value` for `cmd`, or `None` when the command
-/// declares no positional role (or declares `ignore`).
-///
-/// The positional companion to [`judge_for_flag`], for the same fuzz target. The target still skips
-/// flag-shaped values here, because `walk` peels those off before a token is treated as a
-/// positional at all — feeding one in would test a path the real code never takes.
-#[doc(hidden)]
-pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
-    let role = GATES
-        .roles
-        .get(cmd)
-        .map(|spec| spec.positional)
-        .or_else(|| crate::registry::command_path_gate(cmd).map(|spec| spec.positional))?;
-    match role {
-        Role::Ignore => None,
-        Role::Read => Some(crate::engine::resolve::read_content_verdict(value)),
-        Role::ReadTree => Some(crate::engine::resolve::read_tree_verdict(value)),
-        Role::Write => Some(crate::engine::resolve::write_target_verdict(value)),
-        Role::Exec => Some(crate::engine::resolve::execute_file_verdict(value)),
-    }
-}
-
 /// A `host:path` remote endpoint: a `:` appears before any `/`.
 fn is_remote(operand: &str) -> bool {
     operand.find(':').is_some_and(|c| !operand[..c].contains('/'))
@@ -703,6 +661,7 @@ fn gate(role: Role, path: &str) -> bool {
 }
 
 mod flag_match;
+mod fuzz_judges;
 mod handlers;
 
 #[cfg(test)]
@@ -1466,7 +1425,8 @@ mod behavior_specs {
         spec_pdfgrep_worktree: "pdfgrep needle report.pdf",
         spec_rg_regexp_flag_variable_pattern: "rg -e \"$PAT\" src",
         spec_rg_regexp_flag_variable_pattern_alone: "rg -e \"$PAT\"",
-        spec_rg_clustered_regexp_flag_variable_pattern: "rg -ie \"$PAT\" src",
+        spec_rg_clustered_regexp_flag_literal_pattern: "rg -ie foo src",
+        spec_rg_separate_ignore_case_regexp_variable_pattern: "rg -i -e \"$PAT\" src",
         spec_rg_long_regexp_variable_pattern: "rg --regexp \"$P\" -- src",
         spec_rg_regexp_pattern_spelled_like_a_path: "rg -e /etc/passwd src",
     }
@@ -1559,5 +1519,14 @@ mod behavior_specs {
         spec_rg_regexp_flag_then_secret: "rg -e \"$PAT\" ~/.ssh/id_rsa",
         spec_rg_pattern_file_secret: "rg -f ~/.ssh/id_rsa src",
         spec_rg_long_pattern_file_secret: "rg --file ~/.ssh/id_rsa src",
+        spec_rg_replace_glued_to_regexp_then_secret: "rg x -re ~/.ssh/id_rsa",
+        spec_rg_glob_glued_to_regexp_then_secret: "rg x -ge ~/.ssh/id_rsa",
+        spec_rg_type_glued_to_regexp_then_shadow: "rg x -Te /etc/shadow",
+        spec_ag_file_glob_glued_to_regexp_then_secret: "ag x -Ge ~/.ssh/id_rsa",
+        spec_rg_regexp_after_double_dash_then_secret: "rg -- -e ~/.ssh/id_rsa",
+        spec_rg_second_regexp_after_double_dash_then_secret: "rg -e x -- -e ~/.ssh/id_rsa",
+        spec_zgrep_regexp_after_double_dash_then_secret: "zgrep -- -e ~/.ssh/id_rsa",
+        spec_bzgrep_regexp_after_double_dash_then_secret: "bzgrep -- -e ~/.ssh/id_rsa",
+        spec_zgrep_abbreviated_file_secret: "zgrep --fil=~/.ssh/id_rsa x",
     }
 }
