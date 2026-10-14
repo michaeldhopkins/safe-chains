@@ -1,18 +1,20 @@
 [[command]]
 name = "tail"
 aliases = ["gtail"]
-description = "Outputs the last part (lines or bytes) of files, with an option to follow appended data in real time (-f/--follow). Read-only: never modifies the files it reads. The --follow mode keeps a file descriptor open for ongoing reads but still performs no writes. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
+description = "Prints the last part of each file (the last 10 lines by default; -n and -c choose a line or byte count, and a leading + counts from the start instead) to stdout, and with -f or -F keeps following the file and prints data as it is appended, so it runs until interrupted or until --pid names a process that has exited. It observes: it opens each named file read-only, or standard input when given none or -, and writes only to stdout, so nothing on disk is created, changed or removed, no program is run and no network is touched (a file on a network mount can only be slow to open, and following one is polling). The disclosure surface is the content that reaches the caller, so which file is named matters (a credential file prints in full), and a followed file can stall a session indefinitely. Part of GNU coreutils (and the BSD tail on macOS, with -r and -b), which ships a release roughly twice a year; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation"
+researched_version = "GNU coreutils 9.12"
 level = "Inert"
 bare = true
 numeric_dash = true
 standalone = [
-    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z",
+    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z", "--debug",
     "--follow", "--help", "--quiet", "--retry", "--silent",
     "--verbose", "--version", "--zero-terminated",
 ]
-valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
-examples_safe = ["tail -n 50 src/main.rs", "tail -f ./app.log"]
+valued = ["-b", "-c", "-n", "-s", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+examples_safe = ["tail -n 50 src/main.rs", "tail -f ./app.log", "tail -n +5 src/main.rs", "tail -s 2 -f ./app.log"]
+examples_denied = ["tail -f ~/.ssh/id_rsa", "tail --bogus ./app.log"]
 
 # Declarative facet behavior: tail OBSERVES a bounded suffix of each file (content → the model),
 # gated per-operand by locus. `-f`/`--follow` keeps reading appended data but never writes.
@@ -22,11 +24,11 @@ operation = "observe"
 positionals = "read"
 numeric_shorthand = true
 standalone = [
-    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z",
+    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z", "--debug",
     "--follow", "--help", "--quiet", "--retry", "--silent",
     "--verbose", "--version", "--zero-terminated",
 ]
-valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+valued = ["-b", "-c", "-n", "-s", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
 
 # The suffix counterpart of head's rule: `… | tail -1` emits a SUBSET of the piped lines and
 # carries that stage's locus, and only while filtering a stream (a file operand makes it print
@@ -34,5 +36,5 @@ valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pi
 # stream, so they do not change what the output IS.
 [command.output]
 locus_from = "stdin"
-valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+valued = ["-b", "-c", "-n", "-s", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
 invalidated_by = ["--help", "--version", "-h", "-V"]

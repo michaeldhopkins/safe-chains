@@ -14148,10 +14148,11 @@ gtac -s x	inert
 gtac x	inert
 gtail	inert
 gtail --bytes x	inert
+gtail --debug	inert
+gtail --debug --bytes x	inert
+gtail --debug --follow	inert
+gtail --debug x	safe-read
 gtail --follow	inert
-gtail --follow --bytes x	inert
-gtail --follow --help	inert
-gtail --follow x	safe-read
 gtail --help	inert
 gtail --lines x	inert
 gtail --max-unchanged-stats x	inert
@@ -14172,6 +14173,7 @@ gtail -h	inert
 gtail -n x	inert
 gtail -q	inert
 gtail -r	inert
+gtail -s x	inert
 gtail -v	inert
 gtail -z	inert
 gtail x	safe-read

@@ -3384,3 +3384,9 @@ predate that work. The unknown folder refuses all of them.
 The `--explain` section for `--unknown-folder` (`src/folder_cli.rs`) names anchor values
 (`relative-plain`, `implicit-source`). The plain-words dictionary being built for `--explain`
 replaces facet and locus terms elsewhere; once it lands, describe these in the same words.
+
+## A command whose dash-prefixed words are all text has no flag grammar (echo)
+
+`echo` is the research target's only open `no-tolerance` case among the first batch, and it is a mechanism gap, not a missing flag list. Its only options are `-n`, `-e`, `-E`, and `--help`/`--version` when sole; every other dash-prefixed word (`echo --- done ---`, `echo -x`, `echo --bogus`) is printed as text, and shells differ on `-e`. `tolerate_unknown_short`/`tolerate_unknown_long` is the only way the schema says so, and the target forbids them, so the entry keeps both and `tests/fixtures/research_target_owed.tsv` pins `echo` as owing `no-tolerance`.
+
+Dropping the two flags would deny rule lines such as `echo "--- section ---"`, which is wrong because no such word can do anything. What is missing is a declaration that a flat command prints its operands (`operands = "text"`), under which an unknown dash word is an operand rather than a flag and the `no-tolerance` criterion has nothing to find. Needs a field in `TomlCommand`, a guard that no flag-gated command declares it, and a criterion exemption for it.

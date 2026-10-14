@@ -214,6 +214,7 @@ Aliases: `ghead`
 - `head README.md`
 - `head -n 20 src/main.rs`
 - `head -20 src/main.rs`
+- `head -c 100 Cargo.toml`
 
 ### `hunspell`
 <p class="cmd-url"><a href="https://hunspell.github.io/">https://hunspell.github.io/</a></p>
@@ -547,14 +548,16 @@ Aliases: `gtac`
 Aliases: `gtail`
 
 - Reads its file operands to stdout within your workspace.
-- Allowed standalone flags: --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
-- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
+- Allowed standalone flags: --debug, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
+- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n, -s
 - Bare invocation reads stdin
 
 **Examples:**
 
 - `tail -n 50 src/main.rs`
 - `tail -f ./app.log`
+- `tail -n +5 src/main.rs`
+- `tail -s 2 -f ./app.log`
 
 ### `tee`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tee-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tee-invocation</a></p>

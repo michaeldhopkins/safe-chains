@@ -1,14 +1,16 @@
 [[command]]
 name = "echo"
 aliases = ["gecho"]
-description = "Prints arguments to stdout. Completely inert — no flags cause side effects. The only consideration is output redirection, which is handled by the redirect system, not by echo itself."
+description = "Writes its arguments to stdout separated by spaces and followed by a newline; -n drops the newline, -e turns backslash escapes (\\n, \\t, \\xHH, \\0NNN, \\c) into characters, and -E turns them off. It observes nothing: no file is opened, no program is run, no network is touched and no state is changed, so the only effect is the text it prints, which reaches the caller as given. Only --help and --version as the sole argument, and the three short flags, are options; every other dash-prefixed word, such as a rule line of dashes, is printed as text, and the shell builtins (bash, zsh, sh) differ in how they treat -e and escapes by default. Where the output goes is decided by shell redirection, not by echo, so echo into a file is judged as that write. Part of GNU coreutils, whose release comes roughly twice a year; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation"
+researched_version = "GNU coreutils 9.12; bash 5.3 and zsh 5.9 builtins"
 level = "Inert"
 bare = true
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 standalone = ["-E", "-e", "-n"]
-examples_safe = ["echo hello world", "echo -n done"]
+examples_safe = ["echo hello world", "echo -n done", "echo -e one\\ntwo"]
+examples_denied = ["echo hi > ~/.ssh/authorized_keys"]
 
 # Declarative facet behavior: echo OBSERVES nothing on the filesystem — it prints its literal
 # arguments to stdout (which reaches the model), touching no file, network, process, or secret.

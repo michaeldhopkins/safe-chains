@@ -33,6 +33,12 @@ Aliases: `gbasename`
 - Allowed standalone flags: --help, --version, -L, -P, -V, -e, -h
 - Bare invocation allowed
 
+**Examples:**
+
+- `cd src`
+- `cd ..`
+- `cd -P ./build`
+
 ### `chflags`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?chflags">https://man.freebsd.org/cgi/man.cgi?chflags</a></p>
 

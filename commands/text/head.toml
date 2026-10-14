@@ -1,8 +1,9 @@
 [[command]]
 name = "head"
 aliases = ["ghead"]
-description = "Outputs the first part (lines or bytes) of files. Purely read-only: reads input and writes a prefix to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
+description = "Prints the first part of each file (the first 10 lines by default; -n and -c choose a line or byte count, a leading - on the count means all but the last N, and the obsolete -NUM form means -n NUM) to stdout. It observes: it opens each named file read-only, or standard input when given none or -, and writes only to stdout, so nothing on disk is created, changed or removed, no program is run and no network is touched (a file on a network mount can only be slow to open). With several files it prefixes each with a header unless -q is given. The disclosure surface is the content that reaches the caller, so which file is named matters (a credential file prints in full), and a device or FIFO operand such as a terminal can block on input. Part of GNU coreutils (and the BSD head on macOS, a smaller subset), which ships a release roughly twice a year; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation"
+researched_version = "GNU coreutils 9.12"
 level = "Inert"
 bare = true
 numeric_dash = true
@@ -11,7 +12,8 @@ standalone = [
     "--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated",
 ]
 valued = ["-c", "-n", "--bytes", "--lines"]
-examples_safe = ["head README.md", "head -n 20 src/main.rs", "head -20 src/main.rs"]
+examples_safe = ["head README.md", "head -n 20 src/main.rs", "head -20 src/main.rs", "head -c 100 Cargo.toml"]
+examples_denied = ["head ~/.ssh/id_rsa", "head --bogus README.md"]
 
 # Declarative facet behavior: head OBSERVES a bounded prefix of each file (content → the model),
 # gated per-operand by locus. Same observe/read shape as cat; `-c`/`-n` and the obsolete `-NUM`

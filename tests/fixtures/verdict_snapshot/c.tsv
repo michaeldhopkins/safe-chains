@@ -2490,16 +2490,21 @@ cc_fips_test --help	denied
 cc_fips_test --version	denied
 cc_fips_test x	denied
 cd	inert
+cd --bogus	denied
 cd --help	inert
 cd --help --version	inert
 cd --help x	inert
 cd --version	inert
 cd -L	inert
 cd -P	inert
+cd -P ./build	inert
 cd -V	inert
 cd -e	inert
 cd -h	inert
+cd ..	inert
 cd /tmp && cargo clippy -- -D warnings 2>&1	safe-read
+cd one two	denied
+cd src	inert
 cd x	inert
 cdk	denied
 cdk --help	inert

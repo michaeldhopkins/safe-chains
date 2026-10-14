@@ -36,6 +36,7 @@ Aliases: `gecho`
 
 - `echo hello world`
 - `echo -n done`
+- `echo -e one\ntwo`
 
 ### `expr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation</a></p>

@@ -1019,6 +1019,7 @@ hdiutil verify image.dmg	inert
 hdiutil verify x	inert
 hdiutil x	denied
 head	inert
+head --bogus README.md	denied
 head --bytes x	inert
 head --help	inert
 head --help --bytes x	inert
@@ -1033,6 +1034,7 @@ head --zero-terminated	inert
 head -20 file.txt	safe-read
 head -20 src/main.rs	safe-read
 head -V	inert
+head -c 100 Cargo.toml	safe-read
 head -c x	inert
 head -h	inert
 head -n 20 src/main.rs	safe-read
@@ -1044,6 +1046,7 @@ head -z	inert
 head < ~/.ssh/id_rsa	denied
 head README.md	safe-read
 head x	safe-read
+head ~/.ssh/id_rsa	denied
 headerdoc2html	denied
 headerdoc2html --help	denied
 headerdoc2html --version	denied

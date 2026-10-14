@@ -1,8 +1,11 @@
 [[command]]
 name = "cd"
-description = "Shell built-in that changes the current working directory for the calling process. Modifies process state (the working directory) but does not modify the filesystem or access the network. The -L and -P flags control symlink resolution behavior. The CLI surface is defined by POSIX and essentially frozen."
+description = "Shell built-in that changes the working directory of the shell that runs it, with -L and -P choosing whether symlinks are followed logically or physically, -e making -P report failure to determine the new directory, and a lone - meaning the previous directory (which it also prints). It observes only the existence and permissions of the target path and writes one piece of process state, the directory plus PWD and OLDPWD, which dies with the shell. No file is created, changed or removed and no network is touched, though zsh runs any chpwd hook functions; a directory on a network or remote mount can only be slow to resolve. CDPATH can redirect a relative name to another directory and make cd print it. bash takes one operand; zsh also accepts a two-word substitution form. Specified by POSIX and unchanged in practice for decades; bash and zsh add a few options but the surface is stable."
 url = "https://man7.org/linux/man-pages/man1/cd.1p.html"
+researched_version = "POSIX.1-2024 cd; bash 5.3 and zsh 5.9 builtins"
 level = "Inert"
 bare = true
 max_positional = 1
 standalone = ["--help", "--version", "-L", "-P", "-V", "-e", "-h"]
+examples_safe = ["cd src", "cd ..", "cd -P ./build"]
+examples_denied = ["cd one two", "cd --bogus"]

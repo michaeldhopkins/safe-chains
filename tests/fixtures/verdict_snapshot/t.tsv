@@ -41,11 +41,13 @@ tac -s x	inert
 tac file.txt	inert
 tac x	inert
 tail	inert
+tail --bogus ./app.log	denied
 tail --bytes x	inert
+tail --debug	inert
+tail --debug --bytes x	inert
+tail --debug --follow	inert
+tail --debug x	safe-read
 tail --follow	inert
-tail --follow --bytes x	inert
-tail --follow --help	inert
-tail --follow x	safe-read
 tail --help	inert
 tail --lines x	inert
 tail --max-unchanged-stats x	inert
@@ -64,11 +66,15 @@ tail -b x	inert
 tail -c x	inert
 tail -f	inert
 tail -f ./app.log	safe-read
+tail -f ~/.ssh/id_rsa	denied
 tail -h	inert
+tail -n +5 src/main.rs	safe-read
 tail -n 50 src/main.rs	safe-read
 tail -n x	inert
 tail -q	inert
 tail -r	inert
+tail -s 2 -f ./app.log	safe-read
+tail -s x	inert
 tail -v	inert
 tail -z	inert
 tail x	safe-read
