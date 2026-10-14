@@ -637,4 +637,64 @@ mod tests {
         }
         assert_eq!(resolve("x"), "x", "context cleared after the guard drops");
     }
+
+    const PROBE_VAR: &str = "SAFE_CHAINS_TMPDIR_PROBE_PATH";
+
+    fn tmpdir_verdict(tmpdir: &str, path: &str) -> bool {
+        let out = std::process::Command::new(std::env::current_exe().expect("test exe"))
+            .args(["--exact", "pathctx::tests::tmpdir_probe", "--nocapture", "--test-threads=1"])
+            .env("TMPDIR", tmpdir)
+            .env(PROBE_VAR, path)
+            .output()
+            .expect("spawn probe");
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        assert!(out.status.success(), "probe failed for TMPDIR={tmpdir:?} path={path:?}: {stdout}");
+        match (stdout.contains("PROBE_VERDICT=true"), stdout.contains("PROBE_VERDICT=false")) {
+            (true, false) => true,
+            (false, true) => false,
+            _ => panic!("probe did not run for TMPDIR={tmpdir:?} path={path:?}: {stdout}"),
+        }
+    }
+
+    #[test]
+    fn tmpdir_probe() {
+        let Ok(path) = std::env::var(PROBE_VAR) else {
+            return;
+        };
+        println!("PROBE_VERDICT={}", under_temp_root(&path));
+    }
+
+    #[test]
+    fn a_tmpdir_root_counts_only_when_absolute_and_non_empty() {
+        for (tmpdir, path, expected) in [
+            ("/work/scratch", "/work/scratch/x.sh", true),
+            ("/work/scratch/", "/work/scratch/x.sh", true),
+            ("/work/scratch//", "/work/scratch/nested/x.sh", true),
+            ("/work/scratch", "/work/scratch", false),
+            ("/work/scratch", "/work/scratchy/x.sh", false),
+            ("/work/scratch", "/work/other/x.sh", false),
+            ("/work/scratch", "work/scratch/x.sh", false),
+            ("", "/x.sh", false),
+            ("", "/", false),
+            ("/", "/x.sh", false),
+            ("//", "/x.sh", false),
+            ("scratch", "scratch/x.sh", false),
+            ("scratch/", "scratch/x.sh", false),
+            ("./scratch", "./scratch/x.sh", false),
+            ("$SCRATCH", "$SCRATCH/x.sh", false),
+            ("relative/dir", "relative/dir/x.sh", false),
+        ] {
+            assert_eq!(tmpdir_verdict(tmpdir, path), expected, "TMPDIR={tmpdir:?} path={path:?}");
+        }
+    }
+
+    #[test]
+    fn the_fixed_temp_roots_hold_whatever_tmpdir_says() {
+        for tmpdir in ["", "scratch", "/work/scratch"] {
+            for path in ["/tmp/x", "/private/tmp/x", "/var/tmp/x", "/private/var/tmp/x"] {
+                assert!(tmpdir_verdict(tmpdir, path), "TMPDIR={tmpdir:?} path={path:?}");
+            }
+            assert!(!tmpdir_verdict(tmpdir, "/tmp"), "the bare root is not under itself");
+        }
+    }
 }
