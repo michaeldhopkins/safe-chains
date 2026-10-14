@@ -723,6 +723,8 @@ pub fn toml_command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+mod arity_tests;
+#[cfg(test)]
 mod gate_consistency;
 #[cfg(test)]
 mod tests;

@@ -1,0 +1,107 @@
+# Short flags admitted by a command whose path gate names a long flag of the same first letter,
+# while the short flag itself is not gated.
+#
+# WHY THIS EXISTS. Path gates are keyed by flag NAME, and the schema cannot say that `-d` and
+# `--destination` are one option. A gate on the long spelling therefore leaves the short spelling
+# ungated whatever its arity: `hugo build -d /etc/out` auto-approved while
+# `hugo build --destination /etc/out` was refused. `a_gated_flag_is_never_declared_value_less`
+# checks the gated name only, so it cannot see the other spelling.
+#
+# HOW THE CANDIDATES ARE PICKED. For each gated `--long` flag, the short flag spelled with its
+# first letter, when the command admits it anywhere and the gate does not name it.
+#
+# IT IS A HEURISTIC, NOT A VERDICT. Many letters are a different option (`git -c` is config,
+# not `--color`). Resolving a row means checking the tool's option list: gate the short spelling
+# with the same role and declare it `valued`, or keep the row because it is a different flag.
+#
+# SHRINKS ONLY. `a_short_spelling_of_a_gated_long_flag_is_gated_too` fails on a candidate that is
+# not listed and on a listed row that is no longer a candidate.
+#
+# Seeded 2026-10-14 with 85 rows.
+#
+# FORMAT: <command>\t<short flag>\t<gated long flag>
+aria2c	-i	--input-file
+as	-M	--MD
+asciidoctor	-d	--destination-dir
+cargo	-f	--fuzz-dir
+cargo	-m	--manifest-path
+cargo	-t	--target-dir
+ditto	-k	--keepBinariesList
+ditto	-k	--keepBinariesPattern
+ditto	-z	--zlibCompressionLevel
+flex	-h	--header-file
+flex	-s	--skel
+flex	-t	--tables-file
+frames	-s	--subfolder
+git	-a	--abbrev
+git	-c	--color
+git	-c	--color-moved
+git	-c	--contents
+git	-d	--diff-algorithm
+git	-d	--diff-filter
+git	-d	--diff-merges
+git	-d	--dirstat
+git	-d	--dst-prefix
+git	-i	--ignore-revs-file
+git	-i	--inter-hunk-context
+git	-l	--line-prefix
+git	-o	--output-indicator-new
+git	-o	--output-indicator-old
+git	-p	--pathspec-from-file
+git	-r	--relative
+git	-s	--src-prefix
+git	-s	--stat-count
+git	-s	--stat-graph-width
+git	-s	--stat-name-width
+git	-s	--stat-width
+git	-s	--submodule
+git	-u	--unified
+git	-w	--word-diff
+git	-w	--word-diff-regex
+gnutls-certtool	-i	--infile
+hatch	-c	--cache-dir
+hatch	-c	--config
+helm	-o	--output-dir
+helmfile	-h	--helm-binary
+helmfile	-h	--helmfile
+helmfile	-o	--output-dir
+hugo	-d	--destination
+hurl	-c	--cacert
+jest	-o	--outputFile
+jest	-t	--testRunner
+karma	-h	--hostname
+kinit	-p	--password-file
+kustomize	-h	--helm-command
+mkdocs	-c	--config-file
+mkdocs	-s	--site-dir
+mocha	-c	--config
+mocha	-f	--file
+mocha	-u	--ui
+mypy	-p	--python-executable
+nano	-b	--backupdir
+ocsptool	-i	--infile
+oras	-c	--ca-file
+oras	-c	--cert-file
+pip-compile	-o	--output-file
+pulumi	-c	--cwd
+racc	-l	--log-file
+re2c	-d	--depfile
+re2c	-h	--header
+re2c	-i	--include
+redis-benchmark	-c	--cacert
+restic	-c	--cacert
+rollup	-f	--file
+rsync	-p	--password-file
+rsync	-r	--rsh
+say	-i	--input-file
+wget	-d	--directory-prefix
+wget	-p	--post-file
+wget	-s	--save-cookies
+wget	-w	--warc-file
+wget	-w	--warc-tempdir
+yard	-o	--output-dir
+yardoc	-o	--output-dir
+ytt	-o	--output-directory
+ytt	-o	--output-files
+ytt	-o	--output-multi-files
+zgrep	-c	--context

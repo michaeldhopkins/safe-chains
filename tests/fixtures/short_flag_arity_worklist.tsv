@@ -1,0 +1,220 @@
+# Short flags declared `standalone` in one scope of a command while another scope of the SAME
+# command declares them `valued`.
+#
+# WHY THIS EXISTS. The short-flag half of `flag_arity_worklist.tsv`. A valued flag mismodelled as
+# `standalone` lets its value fall through as a POSITIONAL, so any gate on the flag never fires.
+# Comparing a short flag across tools carries no information (`-o` is an output path in one tool
+# and a boolean in the next), but within ONE tool a letter usually keeps its meaning from
+# subcommand to subcommand, so the tool's own entry is the comparison.
+#
+# HOW THE CANDIDATES ARE PICKED. A short flag standalone-only in one scope (the command, a nested
+# sub, the fallback, a `handler_policy` block, the `behavior` grammar) and valued-only in another
+# scope of the same command. A flag in both lists of a scope, or in `optional_valued`, is neither.
+#
+# IT IS A HEURISTIC, NOT A VERDICT. Suites of separate programs (git, cargo, docker) reuse letters
+# freely, so many rows are correct as written: `git status -s` is a boolean and `git merge -s`
+# names a strategy. Resolving a row means checking that one scope's grammar, then moving the flag
+# to `valued` / `optional_valued`, or adding a `# right: <reason>` comment line above the row.
+# A correct row stays listed: the guard cannot tell it apart, and removing it fails the test.
+#
+# SHRINKS ONLY. `a_short_flag_is_not_standalone_where_its_own_command_declares_it_valued` fails on
+# a candidate that is not listed and on a listed row that is no longer a candidate.
+#
+# Seeded 2026-10-14 with 194 rows.
+#
+# FORMAT: <scope>\t<flag>   where scope is "<command>", "<command> <sub>...", or
+# "<command> [fallback]" / "[policy KEY]" / "[behavior]".
+brew cleanup	-n
+brew deps	-n
+brew desc	-n
+brew upgrade	-n
+cargo audit	-n
+cargo clean	-n
+cargo geiger	-f
+cargo geiger	-i
+cargo install	-f
+cargo outdated	-n
+cargo public-api	-s
+cargo publish	-n
+cargo sweep	-f
+cargo sweep	-i
+cargo sweep	-s
+cargo swift	-s
+cargo swift init	-s
+cargo swift package	-s
+cargo tree	-e
+cargo tree	-i
+composer depends	-t
+composer info	-t
+composer prohibits	-t
+composer show	-t
+composer why	-t
+composer why-not	-t
+conda list	-f
+cp	-S
+dapr components	-k
+dapr configurations	-k
+dapr status	-k
+dbt init	-s
+docker compose logs	-f
+docker container list	-n
+docker container logs	-f
+docker container ls	-n
+docker logs	-f
+docker ps	-n
+dotnet new	-d
+dotnet new	-l
+dotnet nuget verify	-v
+fossil branch list	-c
+fossil status	-c
+gh [policy browse]	-p
+gh [policy browse]	-r
+gh [policy browse]	-s
+gh [policy browse]	-w
+gh [policy checks]	-w
+gh [policy diff]	-w
+gh [policy list]	-w
+gh [policy release_view]	-w
+gh [policy run_view]	-w
+gh [policy search]	-w
+gh [policy simple_list]	-w
+gh [policy simple_view]	-w
+gh [policy status]	-w
+gh [policy view]	-w
+git add	-A
+git add	-f
+git add	-n
+git add	-u
+git blame	-b
+git blame	-c
+git blame	-e
+git blame	-f
+git blame	-n
+git blame	-s
+git blame	-t
+git blame	-w
+git branch	-r
+git cat-file	-e
+git cat-file	-s
+git cat-file	-t
+git check-ignore	-n
+git cliff	-u
+git commit	-n
+git commit	-s
+git diff	-b
+git diff	-B
+git diff	-C
+git diff	-M
+git diff	-u
+git diff	-w
+git diff-tree	-B
+git diff-tree	-c
+git diff-tree	-C
+git diff-tree	-m
+git diff-tree	-M
+git diff-tree	-r
+git diff-tree	-s
+git diff-tree	-t
+git diff-tree	-u
+git fetch	-f
+git fetch	-m
+git fetch	-n
+git fetch	-t
+git fetch	-u
+git for-each-ref	-s
+git grep	-c
+git grep	-F
+git grep	-G
+git grep	-L
+git grep	-n
+git grep	-o
+git grep	-r
+git grep	-w
+git log	-s
+git log	-u
+git ls-files	-c
+git ls-files	-f
+git ls-files	-m
+git ls-files	-o
+git ls-files	-r
+git ls-files	-s
+git ls-files	-t
+git ls-files	-u
+git ls-remote	-b
+git ls-remote	-t
+git ls-tree	-r
+git ls-tree	-t
+git mv	-f
+git mv	-n
+git pull	-e
+git pull	-f
+git pull	-n
+git pull	-t
+git reflog	-s
+git reflog	-u
+git remote show	-n
+git shortlog	-c
+git shortlog	-e
+git shortlog	-n
+git shortlog	-s
+git show	-s
+git show	-u
+git show	-w
+git stash show	-u
+git status	-b
+git status	-s
+git switch	-c
+git switch	-t
+glab [policy view]	-s
+go doc	-c
+herb analyze	-j
+herb parse	-j
+heroku apps	-a
+heroku apps:info	-s
+heroku config	-s
+heroku logs	-t
+hg annotate	-u
+hg id	-t
+hg status	-T
+hg status	-u
+hg tip	-T
+hugo build	-s
+ktrace trace	-t
+kubectl logs	-f
+nerdctl logs	-f
+nerdctl ps	-n
+oc logs	-f
+oc whoami	-c
+opam lint	-s
+oras blob fetch	-v
+oras manifest fetch	-v
+overmind connect	-c
+pip list	-i
+pip show	-f
+pipx inject	-v
+pipx install	-v
+pipx install-all	-v
+pipx upgrade	-v
+pipx upgrade-all	-v
+platform route:get	-1
+platform tunnel:info	-c
+podman container list	-n
+podman container logs	-f
+podman container ls	-n
+podman logs	-f
+podman ps	-n
+qemu-img compare	-s
+qemu-img snapshot	-l
+railway metrics	-w
+railway open	-p
+security find-certificate	-p
+smbutil view	-f
+svn info	-R
+svn list	-R
+svn propget	-R
+svn proplist	-R
+tilt [fallback]	-l
+wasm-pack test	-r
+yard doc	-p
+zellij list-sessions	-s
+zellij ls	-s
