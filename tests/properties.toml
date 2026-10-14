@@ -189,10 +189,12 @@ owed = [
 "src/handlers/forges/gh.rs" = []
 "src/handlers/forges/glab.rs" = []
 "src/handlers/fuzzy/fzf.rs" = [
-  "bind_value_is_safe_equals_not_contains_paren",
+  "a_command_running_action_is_refused_in_every_delimiter_form",
+  "bindings_built_only_from_ui_actions_are_accepted",
+  "an_action_outside_the_ui_lists_is_refused",
   "dispatch_returns_none_for_any_non_fzf_program",
   "dispatch_for_fzf_matches_is_safe_fzf",
-  "bind_with_paren_dominates_other_flags",
+  "a_command_running_bind_dominates_other_flags",
 ]
 "src/handlers/fuzzy/sk.rs" = [
   "a_history_block_within_a_passing_policy_yields_exactly_safe_write",
