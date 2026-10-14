@@ -43,14 +43,13 @@ the schema that carries it.
 | # | item | section |
 |---|---|---|
 | ~~1~~ | ~~Optional-value flags have no representation~~ — **DONE**, `optional_valued` | "Support OPTIONAL-VALUE flags by design" |
-| 2 | A valued flag mismodelled as `standalone`. **Enumerated** for long flags (118 rows, ratcheted); the short-flag half is not enumerable this way | "A valued flag mismodelled as `standalone`…" |
+| ~~2~~ | ~~A valued flag mismodelled as `standalone`~~ — **DONE**: enumerated and ratcheted for long flags (cross-tool) and short flags (within one command, and short spellings of gated flags). The rows are per-command research now, not mechanism | "A valued flag mismodelled as `standalone`…" |
 | 3 | The `standalone`+`valued` overlap audit — unblocked by #1. **Measured: 233 scopes, 1527 (scope,flag) pairs, 869 distinct flags** — and the bulk is short flags. Sort them, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
 | 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
 | ~~5~~ | ~~`[command.output]` cannot describe a command that prints a path to somewhere else~~ — **CLOSED as not buildable.** A locus-only claim can never clear a NAME-based shield, so both candidate forms (`which`/`bundle show`, `git rev-parse --show-toplevel`) are fail-opens. Needs a which-FILES claim or harness ground truth, neither of which is a `locus_from` variant | "RESEARCHED, not doing: binding `$(which X)`…" |
 
-#3 is next, and #2 wants doing alongside it: the audit visits exactly the scopes
-where a mismodelled arity would live, so the two sweeps read the same data. Do #3
-first — it removes the population #2 would otherwise have to filter.
+#3 is next. #2's worklists visit the same scopes, so a scope sorted for #3 is the
+moment to resolve its arity rows too.
 
 **The short glued form (`-r0`) is still not expressible** and was left that way
 deliberately: the closed value sets that need it are better enumerated
@@ -1287,11 +1286,14 @@ opposite error, a valued flag declared ONLY in `standalone`, which IS live and i
 Still do NOT write a guard against the raw ambiguity until the sort is done: before then it cannot
 distinguish a typo from an optional-value flag, which is exactly what the sort decides.
 
-## A valued flag mismodelled as `standalone` defeats every flag gate — NOT swept
+## A valued flag mismodelled as `standalone` defeats every flag gate — DONE (enumerated, ratcheted)
+
+DONE 2026-10-14: both halves are enumerated and ratcheted. What is left is resolving the worklist
+rows command by command, which is data, not mechanism; some rows are already known to be wrong
+(listed below).
 
 Promoted 2026-08-04 out of "THIRD PASS", where it was a closing paragraph. This is a live bug CLASS
-with no enumeration, and it silently disables the gating mechanism the passes above spent themselves
-building.
+that silently disables the gating mechanism the passes above spent themselves building.
 
 The shape: webpack's `-c` was listed in `standalone` though it TAKES a value, so
 `webpack -c /tmp/evil.js` parsed the path as a POSITIONAL — it never reached the flag policy at all,
@@ -1303,31 +1305,56 @@ Why it is not just the section above: an overlap (`standalone` AND `valued`) is 
 flag declared ONLY in `standalone` that actually takes a value looks completely normal, and nothing
 compares a declaration against the tool's real grammar.
 
-ENUMERATED 2026-08-29 for LONG flags, via the registry-internal differential below. The guard is
+**Long flags** — ENUMERATED 2026-08-29 by a cross-tool differential:
 `a_long_flag_is_not_standalone_where_it_is_valued_elsewhere`, ratcheting
-`tests/fixtures/flag_arity_worklist.tsv` (118 rows, 61 distinct flags). It fails on a candidate
-that is not listed AND on a listed row that is no longer a candidate, so a new mismodelling cannot
-land quietly and the file cannot rot.
+`tests/fixtures/flag_arity_worklist.tsv` (seeded with 118 rows; 114 now). It re-flagged webpack and
+turned up pre-commit's `-c`/`--config` and `-j`/`--jobs`, both fixed.
 
-The differential works: it independently re-flagged webpack (`--target`, `--mode`) — the command
-whose `-c` produced this section — and seeding it turned up pre-commit's `-c`/`--config` on
-install / uninstall / install-hooks / autoupdate (a config PATH, on subs that WRITE git hooks) and
-`-j`/`--jobs` on autoupdate (a thread count). Both confirmed against pre-commit.com and fixed.
+**Short flags** — ENUMERATED 2026-10-14 by two differentials in `src/registry/arity_tests.rs`. The
+cross-tool comparison carries no information for a short flag (`-o` is an output path in one tool
+and a boolean in the next), so neither compares tools:
+  - `a_short_flag_is_not_standalone_where_its_own_command_declares_it_valued` compares the scopes
+    of ONE command (subs, fallback, handler policies, the `behavior` grammar): within one tool a
+    letter usually keeps its meaning. Ratchets `tests/fixtures/short_flag_arity_worklist.tsv`
+    (seeded with 194 rows; 206 now, the 14 added being jj scopes checked right against jj 0.45.1's help, e.g. `jj log -s` is `--summary`). Suites of separate programs (git: 84 rows, cargo, docker) reuse
+    letters freely, so many rows are right as written. `hugo build -s` was a real one and is
+    fixed. **Known wrong and NOT yet fixed** (each still a row): `docker/podman/nerdctl ps -n`,
+    `git switch -c`, `cargo tree -e`/`-i`, `hg status -T`/`hg tip -T`, `pip list -i` (an index
+    URL) and `dotnet nuget verify -v`. None bypasses a gate as far as the review found (their values
+    are counts, names, templates or a URL on a command that already reaches the network), but they
+    are mismodellings, not open questions: fix them first when working those commands.
+  - `a_short_spelling_of_a_gated_long_flag_is_gated_too`: path gates are keyed by NAME and the
+    schema cannot pair `-d` with `--destination`, so a gate on the long spelling leaves the short
+    one ungated whatever its arity. `a_gated_flag_is_never_declared_value_less` checks only the
+    gated name and could not see it. Pairs by first letter, ratchets
+    `tests/fixtures/gated_short_spelling_worklist.tsv` (seeded with 85 rows; 63 now, after an `ignore` role stopped counting as gated and `jj -r`, which is `--revision`, joined). Found
+    `hugo build -d /etc/out` and `yard doc -o /etc/x` auto-approving beside a refused long
+    spelling (both fixed).
 
-**The short-flag half is NOT enumerable this way, and that is a finding rather than a gap in the
-implementation.** `-o` is an output path in one tool and a boolean in the next, so the cross-tool
-comparison carries no information — and short flags are most of the population (`-r` overlaps in 34
-scopes, `-c` in 26, `-d` and `-p` in 23). Whatever catches those has to come from the tools, not
-from comparing them to each other. The remaining angle is the second one below.
+The behavioural probe once proposed here (classify `<cmd> <flag> /etc/x` and see whether the path
+lands as a positional) is CLOSED as uninformative: on any scope that accepts a positional, EVERY
+standalone flag passes that test, true booleans included, so it enumerates the grammar rather than
+the mismodellings. Its useful core — "a value that a gate would have caught lands where no gate
+applies" — is exactly what the gated-spelling guard checks.
 
-DONE when: the short-flag half also has an enumeration. Two angles, one now built —
-  - ~~**Registry-internal differential**~~ — BUILT, long flags only, for the reason above.
-  - **Behavioural probe**: for each `standalone` flag on an auto-approving command, classify
-    `<cmd> <flag> /etc/x` and see whether the path landed as a positional. Directly tests the
-    property that matters rather than a proxy, and is the only one of the two that can speak to
-    short flags. Note the probe needs care about what it concludes: a path landing as a positional
-    is only a DEFECT where something would have gated it, which is why the gated subset already has
-    its own guard (`a_gated_flag_is_never_declared_value_less`) and is not this population.
+Not enumerable from the registry, and left to per-command research: a letter mismodelled the same
+way in every scope of a command, with no gated long spelling to pair it with. Research of a command
+reads its real option list, which is the only source that can catch that.
+
+Coverage limits of the two short-flag guards: their scopes leave out `first_arg_*`,
+`loopback_valued`, `flag_valued`, `main_*` and the behavior grammar's per-flag table (each used by
+one or two commands), and the gated-spelling guard reads a gate's `flags` map only, not flags a
+`when` clause re-roles. It also pools a command's gates across its subs, so a long flag gated in one sub is paired with short flags admitted in a sibling (and a short gated in one sub hides an ungated one elsewhere); keying both by scope would be stricter. A scope with `tolerate_unknown_short` admits letters it never declares, which neither guard sees (`hugo new -t` and `-k` were found by review, and the scope now lists its flags). An `ignore` role does not count as gated.
+
+Found while fixing the rows above, and fixed: `yard list`, `stats` and `server` were SafeRead though each saves `.yardoc` in the project (now SafeWrite); yard listed eight valued flags 0.9.43 does not have, which yard skips while parsing the next token as an option (removed); yard's `--tag` and `--type-tag` splice their tag name into `class_eval`'d Ruby; its `--query` is `instance_eval`'d Ruby and was
+auto-approved on `list`, `stats` and `doc`; `-e`/`--load`, `--plugin`, `-p`/`--template-path`
+and `yard ri -p PAGER` run code; `-t`/`--template` and `--format` are joined onto a template
+directory unsanitised, so a `..` value reaches any `setup.rb`; `yard config NAME VALUE` writes the
+user config; `yard server -c --docroot DIR` wrote cached HTML anywhere; `-c`/`--use-cache FILE` on `doc`, `list` and `stats` was read as a boolean, so its FILE (where the database is saved, or loaded) went ungated; `yard server LIB DIR` runs yardoc inside DIR, loading its `.yardopts`. `hugo new --editor` runs a
+command, `hugo new`'s positionals and `-c` were ungated writes, `hugo build --memstats FILE` wrote ungated, and `--config`/`--configDir` were read as booleans. Directories that hold code a build runs are now gated as executors, which also refuses them under /tmp: `-s`/`--source` (PostCSS, Tailwind and Babel run from its `node_modules/.bin`), `--config`, `--configDir`, `--themesDir`, `--layoutDir`/`-l`, `--contentDir` (content adapters are templates) and `-e`/`--environment` (joined onto the config directory unsanitised) on hugo, with `hugo new`'s `-c` and `--kind`; hugo `-t`/`--theme` is no longer admitted (it also takes a module path, fetched and run), nor `--config` (a comma-separated list, so one path gate cannot cover it); `yard server`'s `LIB DIR` (yardoc runs inside DIR and loads its `.yardopts`), and yard's `--db`/`-b` (a Marshal load). `yard diff` is no longer admitted: it Marshal-loads its `.yardoc` arguments, runs yardoc inside an unpacked `.gem` (loading its `.yardopts`), and fetches unknown names from rubygems.org. `yard server` is no longer admitted at all: it listens for inbound connections (on every interface, as WEBrick binds with no host), `-d` keeps it running after the command returns, and `-g`/`--gems` runs yardoc in every installed gem.
+
+Open, noticed and not fixed:
+`yard doc`/`yardoc` list `--exclude-tag`, `--has-tag`, `--visibility`, `-D` and `-T`, and `yard graph` `-F`, which 0.9.43 does not have, and `yard graph -f`/`--file` is modelled `valued` where its value is optional; `yard ri` always writes, and later Marshal-loads, `~/.yard/yri_cache`; `hugo build` admits its positionals ungated; `yardoc --locale` is joined onto the po directory, so a `..` value reads any `*.po` file into the docs; pup tolerates unknown short flags (no write or exec surface).
 
 ## The registry validators are largely UNTESTED — found by adversarial review
 
