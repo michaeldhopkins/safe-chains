@@ -397,14 +397,6 @@ hlint	--cpp-file	untriaged	-	-	-
 hlint	--data-dir	untriaged	-	-	-	
 hlint	--path	untriaged	-	-	-	
 huggingface-cli scan-cache	--dir	untriaged	-	-	-	
-hugo build	--cacheDir	untriaged	-	-	-	
-hugo build	--contentDir	untriaged	-	-	-	
-hugo build	--layoutDir	untriaged	-	-	-	
-hugo build	--logFile	untriaged	-	-	-	
-hugo build	--themesDir	untriaged	-	-	-	
-hugo gen autocomplete	--completionfile	untriaged	-	-	-	
-hugo gen docs	--dir	untriaged	-	-	-	
-hugo gen man	--dir	untriaged	-	-	-	
 hurl	--file-root	untriaged	-	-	-	
 hurl	--max-filesize	untriaged	-	-	-	
 hurl	--max-redirs	untriaged	-	-	-	

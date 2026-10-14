@@ -178,7 +178,6 @@ hg id	-t
 hg status	-T
 hg status	-u
 hg tip	-T
-hugo build	-s
 ktrace trace	-t
 kubectl logs	-f
 nerdctl logs	-f

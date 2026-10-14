@@ -17,7 +17,8 @@
 # SHRINKS ONLY. `a_short_spelling_of_a_gated_long_flag_is_gated_too` fails on a candidate that is
 # not listed and on a listed row that is no longer a candidate.
 #
-# Seeded 2026-10-14 with 85 rows.
+# Seeded 2026-10-14 with 85 rows. `hugo -c` is --contentDir, `-l` --layoutDir and `-t` --theme, so their rows
+# are right as listed.
 #
 # FORMAT: <command>\t<short flag>\t<gated long flag>
 aria2c	-i	--input-file
@@ -65,7 +66,10 @@ helm	-o	--output-dir
 helmfile	-h	--helm-binary
 helmfile	-h	--helmfile
 helmfile	-o	--output-dir
-hugo	-d	--destination
+hugo	-c	--cacheDir
+hugo	-t	--trace
+hugo	-c	--completionfile
+hugo	-l	--logFile
 hurl	-c	--cacert
 jest	-o	--outputFile
 jest	-t	--testRunner

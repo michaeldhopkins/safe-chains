@@ -4,9 +4,11 @@ description = "Hugo — Go-powered static site generator. Bare invocation runs `
 url = "https://gohugo.io/commands/hugo/"
 researched_version = "Hugo 0.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = ["hugo build -d ./public", "hugo build -s ./site", "hugo list drafts -s .", "hugo new content posts/x.md"]
+examples_denied = ["hugo build -d /etc/out", "hugo build -s /etc", "hugo build --cacheDir /etc/cache", "hugo build --trace /etc/trace.out", "hugo new site /etc/site", "hugo new content posts/x.md --editor vim", "hugo build --memstats ~/Library/LaunchAgents/x", "hugo build -s /tmp/site", "hugo build --themesDir /tmp/themes -t evil", "hugo new content --config /tmp/c.toml x.md", "hugo build -e ../../../../tmp/evil", "hugo build -t github.com/evil/theme", "hugo new content -t github.com/evil/theme x.md", "hugo new content -k ../../../../tmp/evil x.md", "hugo build --config hugo.toml,/tmp/evil.toml"]
 
 [command.path_gate]
-flags = { "--destination" = "write" }
+flags = { "--destination" = "write", "-d" = "write", "--source" = "exec", "-s" = "exec", "--configDir" = "exec", "--themesDir" = "exec", "--layoutDir" = "exec", "-l" = "exec", "--contentDir" = "exec", "--environment" = "exec", "-e" = "exec", "--cacheDir" = "write", "--trace" = "write", "--logFile" = "write", "--memstats" = "write", "--dir" = "write", "--completionfile" = "write" }
 
 [[command.sub]]
 name = "version"
@@ -75,9 +77,9 @@ output_dirs = ["public", "resources"]
 level = "SafeWrite"
 bare = true
 standalone = [
-    "--cleanDestinationDir", "--clock",
-    "--config", "--configDir", "--debug",
-    "--destination", "--disableFastRender",
+    "--cleanDestinationDir",
+    "--debug", "--panicOnWarning",
+    "--disableFastRender",
     "--enableGitInfo", "--forceSyncStatic",
     "--gc", "--help", "--ignoreCache",
     "--minify", "--noBuildLock", "--noChmod",
@@ -85,30 +87,28 @@ standalone = [
     "--printMemoryUsage", "--printPathWarnings",
     "--printUnusedTemplates", "--quiet",
     "--renderToMemory", "--templateMetrics",
-    "--templateMetricsHints", "--trace", "--verbose",
-    "-D", "-E", "-F", "-d", "-e", "-h", "-q", "-s",
-    "-t", "-v",
+    "--templateMetricsHints", "--verbose",
+    "-D", "-E", "-F", "-h", "-q",
+    "-v",
 ]
 valued = [
     "--baseURL", "--cacheDir", "--clock",
     "--contentDir", "--destination",
     "--environment", "--i18n",
-    "--layoutDir", "--logFile",
+    "--configDir", "--layoutDir", "--logFile",
     "--logLevel", "--memstats",
-    "--noChmod", "--noTimes",
-    "--panicOnWarning", "--source",
-    "--theme", "--themesDir",
-    "--workers",
-    "-b", "-l",
+    "--source",
+    "--themesDir",
+    "--trace", "--workers",
+    "-b", "-d", "-e", "-l", "-s",
 ]
 
 [[command.sub]]
 name = "new"
 level = "SafeWrite"
 bare = false
-tolerate_unknown_short = true
 standalone = ["--force", "--help", "--quiet", "-f", "-h"]
-valued = ["--config", "--editor", "--kind", "--source", "-c", "-s"]
+valued = ["--baseURL", "--contentDir", "--environment", "--kind", "--source", "-b", "-c", "-e", "-k", "-s"]
 
 [[command.sub]]
 name = "gen"

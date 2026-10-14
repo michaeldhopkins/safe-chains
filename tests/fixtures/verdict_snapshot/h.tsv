@@ -3663,28 +3663,43 @@ huggingface-cli whoami -h	safe-read
 huggingface-cli whoami x	safe-read
 huggingface-cli x	denied
 hugo	denied
+hugo --cacheDir x	denied
+hugo --completionfile x	denied
+hugo --configDir x	denied
+hugo --contentDir x	denied
 hugo --destination x	denied
+hugo --dir x	denied
+hugo --environment x	denied
 hugo --help	inert
-hugo --help --destination x	denied
+hugo --help --cacheDir x	denied
 hugo --help --version	denied
 hugo --help x	denied
+hugo --layoutDir x	denied
+hugo --logFile x	denied
+hugo --memstats x	denied
+hugo --source x	denied
+hugo --themesDir x	denied
+hugo --trace x	denied
 hugo --version	inert
 hugo -V	inert
+hugo -d x	denied
+hugo -e x	denied
 hugo -h	inert
+hugo -l x	denied
+hugo -s x	denied
 hugo build	safe-write
 hugo build --baseURL x	safe-write
+hugo build --cacheDir /etc/cache	denied
 hugo build --cacheDir x	safe-write
 hugo build --cleanDestinationDir	safe-write
 hugo build --cleanDestinationDir --baseURL x	safe-write
-hugo build --cleanDestinationDir --clock	safe-write
+hugo build --cleanDestinationDir --debug	safe-write
 hugo build --cleanDestinationDir x	safe-write
-hugo build --clock	safe-write
 hugo build --clock x	safe-write
-hugo build --config	safe-write
-hugo build --configDir	safe-write
+hugo build --config hugo.toml,/tmp/evil.toml	denied
+hugo build --configDir x	safe-write
 hugo build --contentDir x	safe-write
 hugo build --debug	safe-write
-hugo build --destination	safe-write
 hugo build --destination x	safe-write
 hugo build --disableFastRender	safe-write
 hugo build --enableGitInfo	safe-write
@@ -3698,13 +3713,12 @@ hugo build --layoutDir x	safe-write
 hugo build --logFile x	safe-write
 hugo build --logLevel x	safe-write
 hugo build --memstats x	safe-write
+hugo build --memstats ~/Library/LaunchAgents/x	denied
 hugo build --minify	safe-write
 hugo build --noBuildLock	safe-write
 hugo build --noChmod	safe-write
-hugo build --noChmod x	safe-write
 hugo build --noTimes	safe-write
-hugo build --noTimes x	safe-write
-hugo build --panicOnWarning x	safe-write
+hugo build --panicOnWarning	safe-write
 hugo build --printI18nWarnings	safe-write
 hugo build --printMemoryUsage	safe-write
 hugo build --printPathWarnings	safe-write
@@ -3714,22 +3728,29 @@ hugo build --renderToMemory	safe-write
 hugo build --source x	safe-write
 hugo build --templateMetrics	safe-write
 hugo build --templateMetricsHints	safe-write
-hugo build --theme x	safe-write
+hugo build --themesDir /tmp/themes -t evil	denied
 hugo build --themesDir x	safe-write
-hugo build --trace	safe-write
+hugo build --trace /etc/trace.out	denied
+hugo build --trace x	safe-write
 hugo build --verbose	safe-write
 hugo build --workers x	safe-write
 hugo build -D	safe-write
 hugo build -E	safe-write
 hugo build -F	safe-write
 hugo build -b x	safe-write
-hugo build -d	safe-write
-hugo build -e	safe-write
+hugo build -d ./public	safe-write
+hugo build -d /etc/out	denied
+hugo build -d x	safe-write
+hugo build -e ../../../../tmp/evil	denied
+hugo build -e x	safe-write
 hugo build -h	safe-write
 hugo build -l x	safe-write
 hugo build -q	safe-write
-hugo build -s	safe-write
-hugo build -t	safe-write
+hugo build -s ./site	safe-write
+hugo build -s /etc	denied
+hugo build -s /tmp/site	denied
+hugo build -s x	safe-write
+hugo build -t github.com/evil/theme	denied
 hugo build -v	safe-write
 hugo build x	safe-write
 hugo check	inert
@@ -3834,6 +3855,7 @@ hugo list drafts --help -h	inert
 hugo list drafts --help x	inert
 hugo list drafts --source x	inert
 hugo list drafts -h	inert
+hugo list drafts -s .	inert
 hugo list drafts -s x	inert
 hugo list drafts x	inert
 hugo list expired	inert
@@ -3867,20 +3889,30 @@ hugo list x	denied
 hugo mod	denied
 hugo mod x	denied
 hugo new	denied
-hugo new --config x	safe-write
-hugo new --editor x	safe-write
+hugo new --baseURL x	safe-write
+hugo new --contentDir x	safe-write
+hugo new --environment x	safe-write
 hugo new --force	safe-write
-hugo new --force --config x	safe-write
+hugo new --force --baseURL x	safe-write
 hugo new --force --help	safe-write
 hugo new --force x	safe-write
 hugo new --help	safe-write
 hugo new --kind x	safe-write
 hugo new --quiet	safe-write
 hugo new --source x	safe-write
+hugo new -b x	safe-write
 hugo new -c x	safe-write
+hugo new -e x	safe-write
 hugo new -f	safe-write
 hugo new -h	safe-write
+hugo new -k x	safe-write
 hugo new -s x	safe-write
+hugo new content --config /tmp/c.toml x.md	denied
+hugo new content -k ../../../../tmp/evil x.md	denied
+hugo new content -t github.com/evil/theme x.md	denied
+hugo new content posts/x.md	safe-write
+hugo new content posts/x.md --editor vim	denied
+hugo new site /etc/site	denied
 hugo new x	safe-write
 hugo serve	denied
 hugo serve x	denied

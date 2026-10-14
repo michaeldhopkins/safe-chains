@@ -770,6 +770,13 @@ flags = { "-f" = "read" }
 [roles."smbutil smbstat"]
 flags = { "-f" = "read" }
 
+# `hugo new` writes each path it is given (`hugo new site DIR`, `hugo new content FILE`), and `-c` is
+# its `--contentDir`, under which the content file is written; the other hugo subs only read their
+# positionals or take none.
+[roles."hugo new"]
+positional = "write"
+flags = { "-c" = "write", "--source" = "write", "-s" = "write", "--config" = "read", "--kind" = "ignore" }
+
 # `rbs annotate` UPDATES each RBS file it is given (upstream calls `annotate_file(path)` per
 # positional); its siblings — `validate`, `prototype`, `list` — only read. There is no flag to key
 # on here: the SUBCOMMAND is the mode, so before sub-scoped keys the only expressible choices were

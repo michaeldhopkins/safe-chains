@@ -65,7 +65,6 @@ hg id	--id
 hg tip	--style
 hg tip	--template
 http	--style
-hugo build	--config
 id	--context
 id	--name
 jasmine	--filter

@@ -558,7 +558,7 @@ http	examples
 http-server	examples
 httpyac	examples
 huggingface-cli	examples,profiled
-hugo	description,examples,no-tolerance,profiled
+hugo	description,no-tolerance,profiled
 hunspell	description,examples
 hurl	description,examples,no-tolerance
 husky	description,examples
