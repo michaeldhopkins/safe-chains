@@ -1156,6 +1156,24 @@ mod tests {
     }
 
     #[test]
+    fn every_vcs_metadata_dir_is_write_frozen_at_any_depth() {
+        for dir in [".git", ".jj", ".hg", ".sl"] {
+            for path in [
+                format!("{dir}/config"),
+                format!("{dir}/repo/config.toml"),
+                format!("./{dir}/hooks/pre-commit"),
+                format!("sub/{dir}/hgrc"),
+                dir.to_string(),
+            ] {
+                let r = classify_region(&path);
+                assert_eq!(r.write_locus, LocalLocus::WorktreeTrusted, "{path} must be write-frozen");
+                assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "{path} stays readable");
+            }
+        }
+        assert_eq!(classify_region("src/jj/config.toml").write_locus, LocalLocus::Worktree, "a plain dir named like one is not");
+    }
+
+    #[test]
     fn user_grant_widens_read_and_write() {
         with_grants(&[("~/projects/", true, true)], || {
             let r = classify_region("~/projects/other/src/main.rs");
