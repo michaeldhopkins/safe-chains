@@ -655,6 +655,7 @@ mkdocs build
 mkdocs new
 mkfifo
 mkfile
+mkfile 1m
 mkfile x
 mktemp
 mktemp x

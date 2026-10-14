@@ -45,6 +45,8 @@ read = [
   "shasum", "cksum", "sum", "b2sum", "b3sum", "xxhsum", "rhash",
   # compressed-content viewers
   "zcat", "gzcat", "bzcat", "xzcat", "lzcat", "zstdcat", "zless", "bzless", "xzless", "zmore",
+  # visible-encoding filters (`vis`/`unvis` print their file operands transformed)
+  "vis", "unvis",
 ]
 
 # ── grep-like tools: `CMD [flags] PATTERN [flags] files…` — gate the FILE operands, skipping
@@ -57,7 +59,14 @@ read = [
 #    touching the filesystem, this also refuses `rg foo ~/notes.txt`, which is a false deny; it
 #    matches what these tools did before local reads opened up, and `grep` (engine-modelled, so
 #    its recursion is actually known) reads that file fine. See TODO.md.
-read_tree_after_first = ["rg", "ag", "ack", "ugrep", "sift", "pt"]
+#
+#    The first positional is the pattern only when no flag supplied one. `rg -ex FILE` and
+#    `rg --regexp=x FILE` take the pattern from the flag, so FILE is the first positional; the walk
+#    therefore stops skipping it whenever a token spells `-e`/`-f` (alone or in a cluster) or a
+#    prefix of `--regexp`/`--regex`/`--file`/`--match` (`handlers/pattern_flags.rs`). A tool whose
+#    `-e`/`-f` is a boolean (`pt -e`, `ag -f`) then gates its pattern as well, which can only add a
+#    denial, and only for a pattern spelled like a sensitive path.
+read_tree_after_first = ["rg", "ag", "ack", "ugrep", "sift", "pt", "pcre2grep", "pdfgrep"]
 
 # ── Commands that WRITE / modify / destroy their file operands → gated by write locus ──────
 # (Every positional is a write-target. Tools whose args play mixed roles — an output flag, a
@@ -229,6 +238,36 @@ flags = { "--input" = "read", "--output" = "write" }
 positional = "read"
 shape = "first_only"
 flags = { "-f" = "write", "--prefix" = "write" }
+
+# Single-file grep wrappers and `look STRING FILE`: the first positional is the pattern, the rest
+# are files whose matching lines print. None recurses, so the files gate as reads. As in the
+# `read_tree_after_first` list, a pattern supplied by `-e`/`-f`/`--regexp`/`--file` makes the first
+# positional a file too, and the walk then gates every positional.
+[roles.zgrep]
+positional = "read"
+shape = "skip_first"
+flags = { "-e" = "ignore", "--regexp" = "ignore", "-f" = "read", "--file" = "read", "-A" = "ignore", "-B" = "ignore", "-C" = "ignore", "-m" = "ignore", "--after-context" = "ignore", "--before-context" = "ignore", "--context" = "ignore", "--max-count" = "ignore" }
+
+[roles.bzgrep]
+positional = "read"
+shape = "skip_first"
+
+[roles.xzgrep]
+positional = "read"
+shape = "skip_first"
+
+[roles.zstdgrep]
+positional = "read"
+shape = "skip_first"
+
+[roles.zipgrep]
+positional = "read"
+shape = "skip_first"
+
+[roles.look]
+positional = "read"
+shape = "skip_first"
+flags = { "-t" = "ignore", "--terminate" = "ignore" }
 
 # NOT here yet (documented follow-ups — policy calls, not detection):
 #   disclosure inspectors pdfinfo/pdffonts/ffprobe/mediainfo/exiftool (read-gating over-denies

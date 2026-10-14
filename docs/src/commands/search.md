@@ -71,6 +71,11 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: --alphanum, --ignore-case, -d, -f
 - Allowed valued flags: --terminate, -t
 
+**Examples:**
+
+- `look abc`
+- `look abc ./words`
+
 ### `manpath`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/manpath.1.html">https://man7.org/linux/man-pages/man1/manpath.1.html</a></p>
 
@@ -84,6 +89,11 @@ Aliases: `pcregrep`
 
 - Allowed standalone flags: --allow-lookaround-bsk, --file-offsets, --help, --line-buffered, --line-offsets, --no-group-separator, --no-jit, --posix-digit, --posix-pattern-file, --text, --count, --case-restrict, --fixed-strings, --with-filename, --no-filename, --ignore-case, --files-with-matches, --files-without-match, --multiline, --line-number, --no-ucp, --quiet, --recursive, --no-messages, --total-count, --utf, --utf-allow-invalid, --version, --invert-match, --word-regex, --word-regexp, --line-regex, --line-regexp, --null, -E, -F, -H, -I, -L, -M, -P, -U, -V, -Z, -a, -c, -h, -i, -l, -n, -q, -r, -s, -t, -u, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --binary-files, --buffer-size, --color, --colour, --context, --depth-limit, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --file-list, --group-separator, --heap-limit, --include, --include-dir, --include-from, --label, --locale, --match-limit, --max-buffer-size, --max-count, --newline, --om-capture, --om-separator, --only-matching, --output, --recursion-limit, --regex, --regexp, -A, -B, -C, -D, -N, -O, -d, -e, -f, -m, -o
+
+**Examples:**
+
+- `pcre2grep TODO ./src/main.rs`
+- `pcre2grep -r TODO ./src`
 
 ### `pcre2test`
 <p class="cmd-url"><a href="https://www.pcre.org/current/doc/html/pcre2test.html">https://www.pcre.org/current/doc/html/pcre2test.html</a></p>
@@ -107,4 +117,9 @@ Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
+
+**Examples:**
+
+- `zgrep TODO ./log.gz`
+- `zgrep -e TODO ./log.gz`
 

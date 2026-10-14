@@ -18,8 +18,10 @@ use std::sync::LazyLock;
 
 use serde::Deserialize;
 
+use crate::handlers::pattern_flags::{self, PatternStep};
 use crate::parse::Token;
 use crate::verdict::Verdict;
+use flag_match::match_flag;
 
 /// What to do with a path found in a given argument slot.
 #[derive(Deserialize, Clone, Copy, PartialEq, Default, Debug)]
@@ -536,6 +538,16 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             i += consumed;
             continue;
         }
+        if spec.shape == Shape::SkipFirst {
+            match pattern_flags::step_over(tokens, i, |p| judge(Role::Read, p) == Verdict::Denied) {
+                Some(PatternStep::Deny) => return true,
+                Some(PatternStep::Next(next)) => {
+                    i = next;
+                    continue;
+                }
+                None => {}
+            }
+        }
         if t.starts_with('-') && t != "-" {
             // A whole-command file gate (the simple read/write lists — `openssl`, `aria2c`, `cpio` — map
             // no specific flags) reads/writes EVERY path argument, including one glued into the flag
@@ -583,10 +595,10 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
         positionals.push(t);
         i += 1;
     }
-    let last = positionals.len().wrapping_sub(1);
     let last_write = matches!(spec.shape, Shape::LastWrite | Shape::Remote);
+    let skip_first = spec.shape == Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
     positionals.iter().enumerate().any(|(idx, &p)| {
-        if spec.shape == Shape::SkipFirst && idx == 0 {
+        if skip_first && idx == 0 {
             return false;
         }
         if spec.shape == Shape::FirstOnly && idx != 0 {
@@ -597,43 +609,11 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             // uploading local data to an arbitrary remote (exfil), which SafeWrite (local-only)
             // must never auto-approve → deny. As a SOURCE it's a fetch (remote → local, like a
             // `curl` GET) → not gated here.
-            return last_write && idx == last;
+            return last_write && idx + 1 == positionals.len();
         }
-        let role = if last_write && idx == last { Role::Write } else { positional_role };
+        let role = if last_write && idx + 1 == positionals.len() { Role::Write } else { positional_role };
         gate(role, p)
     })
-}
-
-/// If `tokens[i]` is one of `spec`'s mapped flags in any form — `-o V`, `--output=V`, glued
-/// `-oV`, or clustered `-qO/etc/x` — return its (role, value, tokens-consumed).
-fn match_flag<'a>(flags: &HashMap<String, Role>, tokens: &'a [Token], i: usize) -> Option<(Role, &'a str, usize)> {
-    let t = tokens[i].as_str();
-    for (flag, &role) in flags {
-        if t == flag {
-            return Some((role, tokens.get(i + 1).map_or("", Token::as_str), 2));
-        }
-        // A glued `flag=value`. Handles BOTH `--flag=v` (GNU) and single-dash-long `-flag=v`
-        // (the Go-flag convention — terraform's `-out=…`/`-state-out=…`, which otherwise sailed
-        // past this gate). The `=` must follow the EXACT flag name, so a short flag like `-o`
-        // can't spuriously match `-output=…` — only its own `-o=…`.
-        if let Some(v) = t.strip_prefix(flag.as_str()).and_then(|r| r.strip_prefix('=')) {
-            return Some((role, v, 1));
-        }
-    }
-    // A short flag glued to its value, possibly behind boolean flags in a cluster (`-o/etc/x`,
-    // `-qO/etc/x`). Take the LEFTMOST mapped short-flag letter — a boolean prefix can't hide the
-    // write. Its value is the rest of the token, or the NEXT token when the letter is last
-    // (`-qO /etc/x`); `-qO-` reads `-` (stdout).
-    let cluster = t.strip_prefix('-').filter(|c| !c.starts_with('-') && !c.is_empty())?;
-    flags
-        .iter()
-        .filter(|(flag, _)| flag.len() == 2 && flag.starts_with('-'))
-        .filter_map(|(flag, &role)| cluster.find(&flag[1..]).map(|p| (p, role)))
-        .min_by_key(|&(p, _)| p)
-        .map(|(p, role)| match &cluster[p + 1..] {
-            "" => (role, tokens.get(i + 1).map_or("", Token::as_str), 2),
-            glued => (role, glued, 1),
-        })
 }
 
 /// What the ROLE's judge says about `value` for a declared `cmd`/`flag` gate, or `None` when that
@@ -722,6 +702,7 @@ fn gate(role: Role, path: &str) -> bool {
     verdict(path) == Verdict::Denied
 }
 
+mod flag_match;
 mod handlers;
 
 #[cfg(test)]
@@ -1477,6 +1458,17 @@ mod behavior_specs {
         spec_pl2pm_worktree: "pl2pm ./mod.pl",
         spec_create_next_worktree: "create-next-app my-app --typescript",
         spec_degit_worktree: "degit user/repo my-app",
+        spec_rg_regexp_flag_worktree: "rg -e TODO src",
+        spec_grep_regexp_flag_worktree: "grep --regexp=TODO -r src",
+        spec_zgrep_worktree: "zgrep x log.gz",
+        spec_look_worktree: "look abc ./words",
+        spec_vis_worktree: "vis f.txt",
+        spec_pdfgrep_worktree: "pdfgrep needle report.pdf",
+        spec_rg_regexp_flag_variable_pattern: "rg -e \"$PAT\" src",
+        spec_rg_regexp_flag_variable_pattern_alone: "rg -e \"$PAT\"",
+        spec_rg_clustered_regexp_flag_variable_pattern: "rg -ie \"$PAT\" src",
+        spec_rg_long_regexp_variable_pattern: "rg --regexp \"$P\" -- src",
+        spec_rg_regexp_pattern_spelled_like_a_path: "rg -e /etc/passwd src",
     }
 
     denied! {
@@ -1550,5 +1542,22 @@ mod behavior_specs {
         spec_create_next_ssh: "create-next-app ~/.ssh/evil",
         spec_create_react_system: "create-react-app /etc/evil",
         spec_degit_ssh: "degit user/repo ~/.ssh/evil",
+        spec_rg_cluster_e_secret: "rg -ex ~/.ssh/id_rsa",
+        spec_rg_regexp_glued_secret: "rg --regexp=x ~/.ssh/id_rsa",
+        spec_grep_pattern_file_secret: "grep -f pats ~/.ssh/id_rsa",
+        spec_grep_regex_prefix_secret: "grep --regex x ~/.ssh/id_rsa",
+        spec_pcre2grep_secret: "pcre2grep x ~/.ssh/id_rsa",
+        spec_pdfgrep_secret: "pdfgrep x ~/.ssh/id_rsa",
+        spec_zgrep_secret: "zgrep x ~/.ssh/id_rsa",
+        spec_bzgrep_secret: "bzgrep x ~/.ssh/id_rsa",
+        spec_xzgrep_secret: "xzgrep x ~/.ssh/id_rsa",
+        spec_zstdgrep_secret: "zstdgrep x ~/.ssh/id_rsa",
+        spec_zipgrep_secret: "zipgrep x ~/.ssh/id_rsa",
+        spec_look_secret: "look x ~/.ssh/id_rsa",
+        spec_vis_secret: "vis ~/.ssh/id_rsa",
+        spec_unvis_secret: "unvis /etc/shadow",
+        spec_rg_regexp_flag_then_secret: "rg -e \"$PAT\" ~/.ssh/id_rsa",
+        spec_rg_pattern_file_secret: "rg -f ~/.ssh/id_rsa src",
+        spec_rg_long_pattern_file_secret: "rg --file ~/.ssh/id_rsa src",
     }
 }

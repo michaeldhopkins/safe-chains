@@ -3,6 +3,7 @@ name = "pcre2grep"
 aliases = ["pcregrep"]
 description = "grep variant that uses Perl-compatible regular expressions (PCRE2 or, for the legacy `pcregrep`, PCRE1). Read-only: matches input lines against a pattern and writes matches to stdout. Reads files, stdin, or transparently decompresses `.gz` and `.bz2`. The `-O/--output` flag emits substituted text but only to stdout. PCRE2 ships as part of the pcre2 project; PCRE1 (pcregrep) is end-of-life as of 2025 but the surface is frozen and still safe."
 url = "https://www.pcre.org/current/doc/html/pcre2grep.html"
+examples_safe = ["pcre2grep TODO ./src/main.rs", "pcre2grep -r TODO ./src"]
 researched_version = "PCRE2 10.45 (2026); PCRE1 8.45 EOL"
 level = "Inert"
 bare = false

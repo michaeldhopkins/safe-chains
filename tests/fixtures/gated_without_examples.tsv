@@ -206,7 +206,6 @@ marp
 md5
 md5sum
 mdbook
-mkbom
 mkcert
 mkdocs
 mkfifo
@@ -409,7 +408,6 @@ xsltproc
 xsv
 xxd
 xz
-xzless
 yacc
 yapf
 yapp
@@ -418,8 +416,6 @@ yardoc
 yq
 ytt
 zcat
-zip
-zipcloak
 zless
 znew
 zola

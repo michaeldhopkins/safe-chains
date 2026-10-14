@@ -31,6 +31,7 @@ pub mod jvm;
 pub mod magick;
 pub mod network;
 pub mod node;
+pub(crate) mod pattern_flags;
 pub mod perl;
 mod perl_load;
 pub mod php;

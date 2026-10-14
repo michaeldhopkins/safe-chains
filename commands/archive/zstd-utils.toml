@@ -2,6 +2,7 @@
 name = "zstdgrep"
 description = "Run grep on the contents of zstandard-compressed (or uncompressed) files. Flags before the pattern are passed through to grep(1); files default to stdin when none are given."
 url = "https://github.com/facebook/zstd"
+examples_safe = ["zstdgrep TODO ./log.zst"]
 researched_version = "zstd 1.5.6"
 level = "Inert"
 bare = false
@@ -11,6 +12,7 @@ tolerate_unknown_short = true
 name = "zstdless"
 description = "View zstandard-compressed (or uncompressed) files through less(1). Any flags are passed through to less."
 url = "https://github.com/facebook/zstd"
+examples_safe = ["zstdless ./a.zst"]
 researched_version = "zstd 1.5.6"
 level = "Inert"
 bare = true

@@ -114,6 +114,10 @@ Aliases: `gdirname`
 
 - Allowed standalone flags: --keep=mostrecent, --keep=dotbar, --keep=native, -f, -h, -m, -n, -s, -v
 
+**Examples:**
+
+- `dot_clean ./dir`
+
 ### `drutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/drutil.html">https://ss64.com/mac/drutil.html</a></p>
 
@@ -168,12 +172,20 @@ Aliases: `exa`
 - Allowed valued flags: -E, -R, -S, -f, -t
 - Bare invocation allowed
 
+**Examples:**
+
+- `fs_usage`
+
 ### `GetFileInfo`
 <p class="cmd-url"><a href="https://ss64.com/mac/getfileinfo.html">https://ss64.com/mac/getfileinfo.html</a></p>
 
 - Allowed standalone flags: -P, -c, -d, -m, -t
 - Allowed valued flags: -a
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `GetFileInfo ./a.txt`
 
 ### `gmknod`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mknod-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mknod-invocation</a></p>
@@ -231,11 +243,19 @@ Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
 - Allowed standalone flags: --help, -b, -c, -d, -f, -h, -l, -m, -s, -x
 - Allowed valued flags: --arch, -p
 
+**Examples:**
+
+- `lsbom ./a.bom`
+
 ### `mkbom`
 <p class="cmd-url"><a href="https://ss64.com/mac/mkbom.html">https://ss64.com/mac/mkbom.html</a></p>
 
 - Allowed standalone flags: --help, -h, -s
 - Allowed valued flags: -i
+
+**Examples:**
+
+- `mkbom ./dir ./a.bom`
 
 ### `mkdir`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation</a></p>
@@ -258,6 +278,10 @@ Aliases: `gmkfifo`
 <p class="cmd-url"><a href="https://ss64.com/mac/mkfile.html">https://ss64.com/mac/mkfile.html</a></p>
 
 - Allowed standalone flags: -n, -v
+
+**Examples:**
+
+- `mkfile 1m ./big.bin`
 
 ### `mktemp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation</a></p>
@@ -399,6 +423,10 @@ Aliases: `gtouch`
 - Allowed standalone flags: -H, -e, -h, -m
 - Bare invocation allowed
 
+**Examples:**
+
+- `unvis ./notes.txt`
+
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
@@ -418,10 +446,18 @@ Aliases: `gtouch`
 - Allowed valued flags: -F, -e
 - Bare invocation allowed
 
+**Examples:**
+
+- `vis ./notes.txt`
+
 ### `wait4path`
 <p class="cmd-url"><a href="https://ss64.com/mac/wait4path.html">https://ss64.com/mac/wait4path.html</a></p>
 
 - Positional arguments only
+
+**Examples:**
+
+- `wait4path ./a.txt`
 
 ### `xattr`
 <p class="cmd-url"><a href="https://ss64.com/mac/xattr.html">https://ss64.com/mac/xattr.html</a></p>
