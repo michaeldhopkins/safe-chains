@@ -498,7 +498,6 @@ jenv local
 jira init
 jj
 jj bookmark
-jj fix
 jj git
 jj resolve
 jj workspace

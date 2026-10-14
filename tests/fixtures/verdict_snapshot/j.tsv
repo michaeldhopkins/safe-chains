@@ -902,27 +902,44 @@ jj cat -R x	inert
 jj cat -h	inert
 jj cat -r x	inert
 jj cat x	inert
-jj commit	safe-write
-jj commit --at-op x	safe-write
-jj commit --at-operation x	safe-write
-jj commit --color x	safe-write
-jj commit --debug	safe-write
-jj commit --debug --at-op x	safe-write
-jj commit --debug --help	safe-write
-jj commit --debug x	safe-write
-jj commit --help	safe-write
-jj commit --ignore-immutable	safe-write
-jj commit --ignore-working-copy	safe-write
+jj commit	denied
+jj commit --at-op x	denied
+jj commit --at-operation x	denied
+jj commit --color x	denied
+jj commit --debug	denied
+jj commit --debug --at-op x	denied
+jj commit --debug --help	denied
+jj commit --debug x	denied
+jj commit --help	inert
+jj commit --ignore-immutable	denied
+jj commit --ignore-working-copy	denied
+jj commit --message	safe-write
+jj commit --message --at-op x	safe-write
+jj commit --message --at-operation x	safe-write
+jj commit --message --color x	safe-write
+jj commit --message --debug	safe-write
+jj commit --message --help	safe-write
+jj commit --message --ignore-immutable	safe-write
+jj commit --message --ignore-working-copy	safe-write
+jj commit --message --message x	safe-write
+jj commit --message --no-pager	safe-write
+jj commit --message --quiet	safe-write
+jj commit --message --repository x	safe-write
+jj commit --message -R x	safe-write
+jj commit --message -h	safe-write
+jj commit --message -m x	safe-write
 jj commit --message x	safe-write
-jj commit --no-pager	safe-write
-jj commit --quiet	safe-write
-jj commit --repository x	safe-write
-jj commit -R x	safe-write
-jj commit -h	safe-write
+jj commit --message=msg	safe-write
+jj commit --no-pager	denied
+jj commit --quiet	denied
+jj commit --repository x	denied
+jj commit -R x	denied
+jj commit -h	inert
+jj commit -m	safe-write
 jj commit -m "$MSG"	safe-write
 jj commit -m 'msg'	safe-write
 jj commit -m x	safe-write
-jj commit x	safe-write
+jj commit x	denied
 jj config	inert
 jj config edit --user	denied
 jj config get	inert
@@ -992,31 +1009,49 @@ jj config set --user ui.editor x	denied
 jj config set --user user.name t	denied
 jj config unset --user user.name	denied
 jj config x	denied
-jj describe	safe-write
-jj describe --at-op x	safe-write
-jj describe --at-operation x	safe-write
-jj describe --color x	safe-write
-jj describe --debug	safe-write
-jj describe --debug --at-op x	safe-write
-jj describe --debug --help	safe-write
-jj describe --debug x	safe-write
-jj describe --help	safe-write
-jj describe --ignore-immutable	safe-write
-jj describe --ignore-working-copy	safe-write
+jj describe	denied
+jj describe --at-op x	denied
+jj describe --at-operation x	denied
+jj describe --color x	denied
+jj describe --debug	denied
+jj describe --debug --at-op x	denied
+jj describe --debug --help	denied
+jj describe --debug x	denied
+jj describe --help	inert
+jj describe --ignore-immutable	denied
+jj describe --ignore-working-copy	denied
+jj describe --message	safe-write
 jj describe --message "$MSG"	safe-write
+jj describe --message --at-op x	safe-write
+jj describe --message --at-operation x	safe-write
+jj describe --message --color x	safe-write
+jj describe --message --debug	safe-write
+jj describe --message --help	safe-write
+jj describe --message --ignore-immutable	safe-write
+jj describe --message --ignore-working-copy	safe-write
+jj describe --message --message x	safe-write
+jj describe --message --no-pager	safe-write
+jj describe --message --quiet	safe-write
+jj describe --message --repository x	safe-write
+jj describe --message --stdin	safe-write
+jj describe --message -R x	safe-write
+jj describe --message -h	safe-write
+jj describe --message -m x	safe-write
+jj describe --message -r x	safe-write
 jj describe --message x	safe-write
-jj describe --no-pager	safe-write
-jj describe --quiet	safe-write
-jj describe --repository x	safe-write
+jj describe --no-pager	denied
+jj describe --quiet	denied
+jj describe --repository x	denied
 jj describe --stdin	safe-write
-jj describe -R x	safe-write
-jj describe -h	safe-write
+jj describe -R x	denied
+jj describe -h	inert
+jj describe -m	safe-write
 jj describe -m 'hello'	safe-write
 jj describe -m x	safe-write
 jj describe -m x --no-edit "$X"	denied
 jj describe -mfoo "$X"	denied
-jj describe -r x	safe-write
-jj describe x	safe-write
+jj describe -r x	denied
+jj describe x	denied
 jj diff	inert
 jj diff $X	denied
 jj diff -- $X	inert
@@ -1157,28 +1192,7 @@ jj file show -h	inert
 jj file show -r x	inert
 jj file show x	inert
 jj file x	denied
-jj fix	safe-write
-jj fix --all-lines	safe-write
-jj fix --all-lines --at-op x	safe-write
-jj fix --all-lines --debug	safe-write
-jj fix --all-lines x	safe-write
-jj fix --at-op x	safe-write
-jj fix --at-operation x	safe-write
-jj fix --color x	safe-write
-jj fix --debug	safe-write
-jj fix --help	safe-write
-jj fix --ignore-immutable	safe-write
-jj fix --ignore-working-copy	safe-write
-jj fix --include-unchanged-files	safe-write
-jj fix --no-pager	safe-write
-jj fix --quiet	safe-write
-jj fix --repository x	safe-write
-jj fix --source x	safe-write
-jj fix -R x	safe-write
-jj fix -a	safe-write
-jj fix -h	safe-write
-jj fix -s x	safe-write
-jj fix x	safe-write
+jj fix	denied
 jj git	inert
 jj git fetch	inert
 jj git fetch --all-remotes	inert
@@ -1472,27 +1486,44 @@ jj rebase -r @ -o "$DEST"	safe-write
 jj rebase -r x	safe-write
 jj rebase -s x	safe-write
 jj rebase x	safe-write
-jj resolve	safe-write
-jj resolve --at-op x	safe-write
-jj resolve --at-operation x	safe-write
-jj resolve --color x	safe-write
-jj resolve --debug	safe-write
-jj resolve --debug --at-op x	safe-write
-jj resolve --debug --help	safe-write
-jj resolve --debug x	safe-write
-jj resolve --help	safe-write
-jj resolve --ignore-immutable	safe-write
-jj resolve --ignore-working-copy	safe-write
+jj resolve	denied
+jj resolve --at-op x	denied
+jj resolve --at-operation x	denied
+jj resolve --color x	denied
+jj resolve --debug	denied
+jj resolve --debug --at-op x	denied
+jj resolve --debug --help	denied
+jj resolve --debug x	denied
+jj resolve --help	inert
+jj resolve --ignore-immutable	denied
+jj resolve --ignore-working-copy	denied
 jj resolve --list	safe-write
-jj resolve --no-pager	safe-write
-jj resolve --quiet	safe-write
-jj resolve --repository x	safe-write
-jj resolve --revision x	safe-write
-jj resolve -R x	safe-write
-jj resolve -h	safe-write
+jj resolve --list --at-op x	safe-write
+jj resolve --list --at-operation x	safe-write
+jj resolve --list --color x	safe-write
+jj resolve --list --debug	safe-write
+jj resolve --list --help	safe-write
+jj resolve --list --ignore-immutable	safe-write
+jj resolve --list --ignore-working-copy	safe-write
+jj resolve --list --list	safe-write
+jj resolve --list --no-pager	safe-write
+jj resolve --list --quiet	safe-write
+jj resolve --list --repository x	safe-write
+jj resolve --list --revision x	safe-write
+jj resolve --list -R x	safe-write
+jj resolve --list -h	safe-write
+jj resolve --list -l	safe-write
+jj resolve --list -r x	safe-write
+jj resolve --no-pager	denied
+jj resolve --quiet	denied
+jj resolve --repository x	denied
+jj resolve --revision x	denied
+jj resolve -R x	denied
+jj resolve -h	inert
 jj resolve -l	safe-write
-jj resolve -r x	safe-write
-jj resolve x	safe-write
+jj resolve -l -r @-	safe-write
+jj resolve -r x	denied
+jj resolve x	denied
 jj restore	safe-write
 jj restore --at-op x	safe-write
 jj restore --at-operation x	safe-write
@@ -1594,80 +1625,152 @@ jj simplify-parents -h	safe-write
 jj simplify-parents -r x	safe-write
 jj simplify-parents -s x	safe-write
 jj simplify-parents x	safe-write
-jj split	safe-write
-jj split --after x	safe-write
-jj split --at-op x	safe-write
-jj split --at-operation x	safe-write
-jj split --before x	safe-write
-jj split --color x	safe-write
-jj split --debug	safe-write
-jj split --debug --after x	safe-write
-jj split --debug --help	safe-write
-jj split --debug x	safe-write
-jj split --destination x	safe-write
-jj split --help	safe-write
-jj split --ignore-immutable	safe-write
-jj split --ignore-working-copy	safe-write
-jj split --insert-after x	safe-write
-jj split --insert-before x	safe-write
-jj split --message x	safe-write
-jj split --no-pager	safe-write
-jj split --onto x	safe-write
-jj split --parallel	safe-write
-jj split --quiet	safe-write
-jj split --repository x	safe-write
-jj split --revision x	safe-write
-jj split -A x	safe-write
-jj split -B x	safe-write
-jj split -R x	safe-write
-jj split -d x	safe-write
-jj split -h	safe-write
-jj split -m x	safe-write
-jj split -o x	safe-write
-jj split -p	safe-write
-jj split -r x	safe-write
-jj split x	safe-write
-jj squash	safe-write
-jj squash --after x	safe-write
-jj squash --at-op x	safe-write
-jj squash --at-operation x	safe-write
-jj squash --before x	safe-write
-jj squash --color x	safe-write
-jj squash --debug	safe-write
-jj squash --debug --after x	safe-write
-jj squash --debug --help	safe-write
-jj squash --debug x	safe-write
-jj squash --destination x	safe-write
-jj squash --from x	safe-write
-jj squash --help	safe-write
-jj squash --ignore-immutable	safe-write
-jj squash --ignore-working-copy	safe-write
-jj squash --insert-after x	safe-write
-jj squash --insert-before x	safe-write
-jj squash --into x	safe-write
-jj squash --keep-emptied	safe-write
+jj split	denied
+jj split --after x	denied
+jj split --at-op x	denied
+jj split --at-operation x	denied
+jj split --before x	denied
+jj split --color x	denied
+jj split --debug	denied
+jj split --debug --after x	denied
+jj split --debug --help	denied
+jj split --debug x	denied
+jj split --destination x	denied
+jj split --help	inert
+jj split --ignore-immutable	denied
+jj split --ignore-working-copy	denied
+jj split --insert-after x	denied
+jj split --insert-before x	denied
+jj split --message	denied
+jj split --message --after x	denied
+jj split --message --at-op x	denied
+jj split --message --at-operation x	denied
+jj split --message --before x	denied
+jj split --message --color x	denied
+jj split --message --debug	denied
+jj split --message --destination x	denied
+jj split --message --help	denied
+jj split --message --ignore-immutable	denied
+jj split --message --ignore-working-copy	denied
+jj split --message --insert-after x	denied
+jj split --message --insert-before x	denied
+jj split --message --message x	denied
+jj split --message --no-pager	denied
+jj split --message --onto x	denied
+jj split --message --parallel	denied
+jj split --message --quiet	denied
+jj split --message --repository x	denied
+jj split --message --revision x	denied
+jj split --message -A x	denied
+jj split --message -B x	denied
+jj split --message -R x	denied
+jj split --message -d x	denied
+jj split --message -h	denied
+jj split --message -m x	denied
+jj split --message -o x	denied
+jj split --message -p	denied
+jj split --message -r x	denied
+jj split --message x	denied
+jj split --no-pager	denied
+jj split --onto x	denied
+jj split --parallel	denied
+jj split --quiet	denied
+jj split --repository x	denied
+jj split --revision x	denied
+jj split -A x	denied
+jj split -B x	denied
+jj split -R x	denied
+jj split -d x	denied
+jj split -h	inert
+jj split -m	denied
+jj split -m 'msg' src/a.rs	safe-write
+jj split -m x	denied
+jj split -m x src/a.rs	safe-write
+jj split -o x	denied
+jj split -p	denied
+jj split -r @- -m 'msg' -- src/a.rs	safe-write
+jj split -r x	denied
+jj split x	denied
+jj squash	denied
+jj squash --after x	denied
+jj squash --at-op x	denied
+jj squash --at-operation x	denied
+jj squash --before x	denied
+jj squash --color x	denied
+jj squash --debug	denied
+jj squash --debug --after x	denied
+jj squash --debug --help	denied
+jj squash --debug x	denied
+jj squash --destination x	denied
+jj squash --from x	denied
+jj squash --help	inert
+jj squash --ignore-immutable	denied
+jj squash --ignore-working-copy	denied
+jj squash --insert-after x	denied
+jj squash --insert-before x	denied
+jj squash --into x	denied
+jj squash --keep-emptied	denied
+jj squash --message	safe-write
+jj squash --message --after x	safe-write
+jj squash --message --at-op x	safe-write
+jj squash --message --at-operation x	safe-write
+jj squash --message --before x	safe-write
+jj squash --message --color x	safe-write
+jj squash --message --debug	safe-write
+jj squash --message --destination x	safe-write
+jj squash --message --from x	safe-write
+jj squash --message --help	safe-write
+jj squash --message --ignore-immutable	safe-write
+jj squash --message --ignore-working-copy	safe-write
+jj squash --message --insert-after x	safe-write
+jj squash --message --insert-before x	safe-write
+jj squash --message --into x	safe-write
+jj squash --message --keep-emptied	safe-write
+jj squash --message --message x	safe-write
+jj squash --message --no-pager	safe-write
+jj squash --message --onto x	safe-write
+jj squash --message --quiet	safe-write
+jj squash --message --repository x	safe-write
+jj squash --message --revision x	safe-write
+jj squash --message --to x	safe-write
+jj squash --message --use-destination-message	safe-write
+jj squash --message -A x	safe-write
+jj squash --message -B x	safe-write
+jj squash --message -R x	safe-write
+jj squash --message -d x	safe-write
+jj squash --message -f x	safe-write
+jj squash --message -h	safe-write
+jj squash --message -k	safe-write
+jj squash --message -m x	safe-write
+jj squash --message -o x	safe-write
+jj squash --message -r x	safe-write
+jj squash --message -t x	safe-write
+jj squash --message -u	safe-write
 jj squash --message x	safe-write
-jj squash --no-pager	safe-write
-jj squash --onto x	safe-write
-jj squash --quiet	safe-write
-jj squash --repository x	safe-write
-jj squash --revision x	safe-write
-jj squash --to x	safe-write
+jj squash --no-pager	denied
+jj squash --onto x	denied
+jj squash --quiet	denied
+jj squash --repository x	denied
+jj squash --revision x	denied
+jj squash --to x	denied
 jj squash --use-destination-message	safe-write
-jj squash -A x	safe-write
-jj squash -B x	safe-write
-jj squash -R x	safe-write
-jj squash -d x	safe-write
-jj squash -f x	safe-write
-jj squash -h	safe-write
+jj squash -A x	denied
+jj squash -B x	denied
+jj squash -R x	denied
+jj squash -d x	denied
+jj squash -f x	denied
+jj squash -h	inert
 jj squash -i	denied
-jj squash -k	safe-write
+jj squash -k	denied
+jj squash -m	safe-write
+jj squash -m 'msg'	safe-write
 jj squash -m x	safe-write
-jj squash -o x	safe-write
-jj squash -r x	safe-write
-jj squash -t x	safe-write
+jj squash -o x	denied
+jj squash -r x	denied
+jj squash -t x	denied
 jj squash -u	safe-write
-jj squash x	safe-write
+jj squash -u --into @-	safe-write
+jj squash x	denied
 jj st	inert
 jj st --at-op x	inert
 jj st --at-operation x	inert
@@ -1751,25 +1854,6 @@ jj undo --repository x	safe-write
 jj undo -R x	safe-write
 jj undo -h	safe-write
 jj undo x	safe-write
-jj unsquash	safe-write
-jj unsquash --at-op x	safe-write
-jj unsquash --at-operation x	safe-write
-jj unsquash --color x	safe-write
-jj unsquash --debug	safe-write
-jj unsquash --debug --at-op x	safe-write
-jj unsquash --debug --help	safe-write
-jj unsquash --debug x	safe-write
-jj unsquash --help	safe-write
-jj unsquash --ignore-immutable	safe-write
-jj unsquash --ignore-working-copy	safe-write
-jj unsquash --no-pager	safe-write
-jj unsquash --quiet	safe-write
-jj unsquash --repository x	safe-write
-jj unsquash --revision x	safe-write
-jj unsquash -R x	safe-write
-jj unsquash -h	safe-write
-jj unsquash -r x	safe-write
-jj unsquash x	safe-write
 jj version	inert
 jj version --at-op x	inert
 jj version --at-operation x	inert
@@ -1813,7 +1897,7 @@ jj workspace add -R x	safe-write
 jj workspace add -h	safe-write
 jj workspace add -m x	safe-write
 jj workspace add -r x	safe-write
-jj workspace add ../ws2	safe-write
+jj workspace add ws2	safe-write
 jj workspace add x	safe-write
 jj workspace forget	safe-write
 jj workspace forget --at-op x	safe-write

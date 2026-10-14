@@ -1,11 +1,11 @@
 [[command]]
 name = "jj"
-description = "Git-compatible version control system (Jujutsu) with automatic working-copy snapshots, first-class conflicts and an operation log that can undo any command. Observing subcommands (log, show, diff, status, file list/show, bookmark/tag/workspace/operation list and log, config get/list/path, root, help, version) read the repository and config and print to stdout; with a repository chosen by -R or --repository they read that one instead, and any jj command snapshots the working copy first, which writes to the repository's own store. Mutating subcommands (new, commit, describe, edit, rebase, squash, split, restore, abandon, absorb, duplicate, parallelize, bookmark create/set/move/delete/forget, git import, git init, workspace add/forget, undo) rewrite the local change graph and working-copy files, are reversible through the operation log, and never contact a remote; git init and workspace add also create a repository or workspace directory at any path they are given. git fetch is an outbound network read from the configured remotes and writes the fetched commits locally; git push uploads commits and moves remote bookmarks, which is remote and effectively irreversible; git clone and remote add/set-url name hosts. Several subcommands run programs named in configuration rather than by the command line: diff and split tools, merge tools (resolve, diffedit, -i/--interactive, --tool), the editor and pager, fix tools (jj fix), signing backends, jj run and jj util exec; and config set/unset/edit can write those very keys, so a config write is a deferred execution vector, not a contained local edit. --config, --config-file and --tool put such a program on the command line. Credentials are read only through git's own helpers during fetch and push. Pre-1.0, with a release about every month (0.46.0 on 2026-10-07) that adds, renames and removes subcommands and flags, so the surface needs ongoing review."
+description = "Git-compatible version control system (Jujutsu) with automatic working-copy snapshots, first-class conflicts and an operation log that can undo any command. Observing subcommands (log, show, diff, status, file list/show, bookmark/tag/workspace/operation list and log, config get/list/path, root, help, version) read the repository and config and print to stdout; with a repository chosen by -R or --repository they read that one instead, and any jj command snapshots the working copy first, which writes to the repository's own store. Mutating subcommands (new, commit, describe, edit, rebase, squash, split, restore, abandon, absorb, duplicate, parallelize, bookmark create/set/move/delete/forget, git import, git init, workspace add/forget, undo) rewrite the local change graph and working-copy files, are reversible through the operation log, and never contact a remote; git init and workspace add also create a repository or workspace directory at any path they are given. git fetch is an outbound network read from the configured remotes and writes the fetched commits locally; git push uploads commits and moves remote bookmarks, which is remote and effectively irreversible; git clone and remote add/set-url name hosts. Several subcommands run programs named in configuration rather than by the command line: diff and split tools, merge tools (resolve, diffedit, -i/--interactive, --tool), the editor and pager, fix tools (jj fix), signing backends, jj run and jj util exec. The editor opens from describe and commit unless a description is given (-m, or --stdin for describe), from split likewise, and from squash when both sides of the squash carry a description, unless -m or -u settles it; split also opens the diff editor unless filesets are given, and resolve runs a merge tool unless --list. unsquash, deprecated in favour of squash, opens the editor the same way and has no message flag to settle it. Repository config lives in the user config directory under an id named by .jj/repo/config-id; with that file missing (a fresh repo, or one deleted) jj 0.45 reads .jj/repo/config.toml and migrates it there, so deleting config-id and writing that file takes effect on the next jj diff or log; and config set/unset/edit can write those very keys, so a config write is a deferred execution vector, not a contained local edit. --config, --config-file and --tool put such a program on the command line. Credentials are read only through git's own helpers during fetch and push. Pre-1.0, with a release about every month (0.46.0 on 2026-10-07) that adds, renames and removes subcommands and flags, so the surface needs ongoing review."
 url = "https://docs.jj-vcs.dev/latest/cli-reference/"
 researched_version = "jj 0.46.0 (CLI reference of 0.45.1 and the 0.46.0 changelog)"
 bare_flags = ["--help", "--version", "-h"]
-examples_safe = ["jj new", "jj -R ./sub new", "jj log -r @ --no-graph -T description", "jj diff --name-only -r @-", "jj status --no-pager"]
-examples_denied = ["jj -R /etc new", "jj new -R /etc", "jj log -GR/etc", "jj log --bogus", "jj log --tool /tmp/x", "jj squash -i", "jj git push", "jj config set --user ui.editor x"]
+examples_safe = ["jj new", "jj describe -m x", "jj split -m x src/a.rs", "jj resolve --list", "jj -R ./sub new", "jj log -r @ --no-graph -T description", "jj diff --name-only -r @-", "jj status --no-pager"]
+examples_denied = ["jj -R /etc new", "jj new -R /etc", "jj log -GR/etc", "jj log --bogus", "jj log --tool /tmp/x", "jj squash -i", "jj describe", "jj split -m x", "jj resolve", "jj fix", "jj git push", "jj config set --user ui.editor x"]
 # Flags that take a value in every jj subcommand that has them (checked against
 # `jj util markdown-help` for jj 0.45.1). Spellings that are a value flag in one sub and a switch
 # in another (`-s`, `-b`, `-B`, `-n`, `-p`, `-t`) are left out.
@@ -104,6 +104,7 @@ bare = false
 name = "commit"
 writes_cwd = "source"
 level = "SafeWrite"
+require_any = ["--message", "-m"]
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
     "-h",
@@ -116,6 +117,7 @@ valued = [
 name = "describe"
 writes_cwd = "source"
 level = "SafeWrite"
+require_any = ["--message", "--stdin", "-m"]
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
     "--stdin", "-h",
@@ -191,17 +193,6 @@ valued = [
 ]
 
 [[command.sub]]
-name = "fix"
-level = "SafeWrite"
-standalone = [
-    "--all-lines", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
-    "--include-unchanged-files", "--no-pager", "--quiet", "-a", "-h",
-]
-valued = [
-    "--at-op", "--at-operation", "--color", "--repository", "--source", "-R", "-s",
-]
-
-[[command.sub]]
 name = "help"
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
@@ -266,6 +257,7 @@ valued = [
 [[command.sub]]
 name = "resolve"
 level = "SafeWrite"
+require_any = ["--list", "-l"]
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--list", "--no-pager",
     "--quiet", "-h", "-l",
@@ -326,6 +318,8 @@ valued = [
 name = "split"
 writes_cwd = "source"
 level = "SafeWrite"
+require_any = ["--message", "-m"]
+min_positional = 1
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--parallel",
     "--quiet", "-h", "-p",
@@ -340,6 +334,7 @@ valued = [
 name = "squash"
 writes_cwd = "source"
 level = "SafeWrite"
+require_any = ["--message", "--use-destination-message", "-m", "-u"]
 standalone = [
     "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--keep-emptied",
     "--no-pager", "--quiet", "--use-destination-message", "-h", "-k", "-u",
@@ -380,18 +375,6 @@ standalone = [
 ]
 valued = [
     "--at-op", "--at-operation", "--color", "--repository", "-R",
-]
-
-[[command.sub]]
-name = "unsquash"
-writes_cwd = "source"
-level = "SafeWrite"
-standalone = [
-    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
-    "-h",
-]
-valued = [
-    "--at-op", "--at-operation", "--color", "--repository", "--revision", "-r", "-R",
 ]
 
 [[command.sub]]
