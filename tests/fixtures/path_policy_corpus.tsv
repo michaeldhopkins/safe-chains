@@ -146,3 +146,23 @@ allow	read-autoexec	cat .envrc
 allow	read-autoexec	cat .jj/repo/config.toml
 allow	read-autoexec	cat .hg/hgrc
 allow	read-autoexec	cat ~/.config/safe-chains.toml
+
+# ── A repository or workspace jj creates lands where it is pointed, so the path is a write. ──
+deny	write-vcs-create	jj git init /root/.ssh
+deny	write-vcs-create	jj git init /etc/repo
+deny	write-vcs-create	jj git init --colocate /var/db/notes
+deny	write-vcs-create	jj git init --git-repo /root/repo
+deny	write-vcs-create	jj git init --git-repo=/etc/repo .
+deny	write-vcs-create	jj workspace add /root/ws
+deny	write-vcs-create	jj workspace add /etc/ws
+deny	write-vcs-create	jj workspace add --name ws -r @ /opt/ws
+deny	write-vcs-create	jj --quiet workspace add /etc/ws
+allow	write-vcs-create	jj git init
+allow	write-vcs-create	jj git init sub
+deny	write-vcs-create	jj git init --git-repo .
+deny	write-vcs-create	jj git init --git-repo /tmp/gd
+allow	write-vcs-create	jj git init /tmp/scratch-repo
+allow	write-vcs-create	jj workspace add ws
+allow	write-vcs-create	jj workspace add --name ws ./ws
+allow	write-vcs-create	jj workspace add ../branchdiff/ws
+allow	write-vcs-create	jj workspace add -m wip /tmp/ws

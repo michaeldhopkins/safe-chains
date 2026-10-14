@@ -833,6 +833,22 @@ flags = { "-F" = "read", "--file" = "read" }
 [roles."git config"]
 flags = { "-f" = "read", "--file" = "read" }
 
+# `jj git init DIR` and `jj workspace add DIR` create a repository or a workspace at DIR, and
+# `jj git init --git-repo DIR` attaches to the git repository there and writes refs into it, so
+# each is a write at that path (jj.toml does not list --git-repo at all, because the adopted
+# store's config is run by the git that jj spawns for fetch; the role keeps it gated if listed).
+# `jj git init /root/x` and `jj workspace add /etc/ws` both auto-approved before. Their other
+# sibling subs take remote, bookmark and workspace NAMES, which a path gate passes unless they are
+# spelled like a path. The remaining valued flags take a revision, a name, a message or a mode, so
+# each is `ignore`.
+[roles."jj git"]
+positional = "write"
+flags = { "--git-repo" = "write", "--object-hash" = "ignore", "--remote" = "ignore", "--branch" = "ignore", "-b" = "ignore", "--tag" = "ignore", "-t" = "ignore" }
+
+[roles."jj workspace"]
+positional = "write"
+flags = { "--name" = "ignore", "--message" = "ignore", "-m" = "ignore", "--revision" = "ignore", "--revisions" = "ignore", "-r" = "ignore", "--sparse-patterns" = "ignore" }
+
 # ── Directory-changing global flags. `git -C DIR` moves into DIR before it reads anything, so a
 #    relative operand names a file in DIR: `git -C /etc diff shadow` is `/etc/shadow`. Every gate of
 #    the command is judged with the cwd moved to DIR, and DIR is itself gated as a read, since git

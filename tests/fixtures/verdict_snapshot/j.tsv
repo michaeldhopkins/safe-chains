@@ -1244,7 +1244,6 @@ jj git init --colocate --debug	safe-write
 jj git init --colocate x	safe-write
 jj git init --color x	safe-write
 jj git init --debug	safe-write
-jj git init --git-repo x	safe-write
 jj git init --help	safe-write
 jj git init --ignore-immutable	safe-write
 jj git init --ignore-working-copy	safe-write

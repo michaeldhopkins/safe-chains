@@ -1614,7 +1614,7 @@ safe_write! {
     jj_bookmark_move: "jj bookmark move feature --to @",
     jj_bookmark_track: "jj bookmark track feature@origin",
     jj_git_init: "jj git init --colocate",
-    jj_workspace_add: "jj workspace add ../ws2",
+    jj_workspace_add: "jj workspace add ws2",
     jj_workspace_forget: "jj workspace forget default",
     jj_workspace_rename: "jj workspace rename new-name",
 

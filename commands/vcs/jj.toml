@@ -575,7 +575,7 @@ standalone = [
     "--no-colocate", "--no-pager", "--quiet", "-h",
 ]
 valued = [
-    "--at-op", "--at-operation", "--color", "--git-repo", "--object-hash", "--repository", "-R",
+    "--at-op", "--at-operation", "--color", "--object-hash", "--repository", "-R",
 ]
 [[command.sub.sub]]
 name = "remote"
