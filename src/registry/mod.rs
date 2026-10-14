@@ -227,7 +227,7 @@ pub(crate) fn command_flag_archetypes(tokens: &[Token]) -> Option<Vec<&'static s
     let present: Vec<&'static str> = spec
         .archetype_flags
         .iter()
-        .filter(|f| flag_escalates(tokens, f))
+        .filter(|f| flag_escalates(tokens, f) || (!f.when_absent && spec.archetype_flags.may_hide_a_flag(tokens)))
         .map(|f| f.classifies.as_str())
         .collect();
     (!present.is_empty()).then_some(present)

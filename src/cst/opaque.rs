@@ -153,7 +153,19 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
 /// grammar's own `valued` list. A grammar refuses a separate value that looks like a flag (`-m
 /// --amend` is read as two flags), which is right for text it can see; an unknown word in that slot
 /// is the flag's value whatever it holds, as getopt reads it.
+///
+///
+/// In a short cluster the first valued letter takes the rest of the cluster as its value, so it
+/// takes the next word only when it is the cluster's last letter: `-am "$MSG"` gives `$MSG` to
+/// `-m`, while `-rmaster "$X"` and `-Tr "$X"` leave the word free.
 pub(crate) fn probe_is_value(tokens: &[Token], idx: usize, valued_flags: &[String]) -> bool {
+    probe_follows_valued(tokens, idx, valued_flags, true)
+}
+
+/// As [`probe_is_value`], with clusters read only when `clusters` holds. Reading a cluster assumes
+/// the letters before its valued one are switches, which holds for a grammar that refuses unknown
+/// letters and not for a list shared across subcommands that disagree about a letter.
+fn probe_follows_valued(tokens: &[Token], idx: usize, valued_flags: &[String], clusters: bool) -> bool {
     let valued = |f: &str| valued_flags.iter().any(|a| a == f);
     let (Some(t), Some(prev)) = (tokens.get(idx), idx.checked_sub(1).and_then(|p| tokens.get(p))) else {
         return false;
@@ -162,11 +174,35 @@ pub(crate) fn probe_is_value(tokens: &[Token], idx: usize, valued_flags: &[Strin
     if !is_flag_probe(t.as_str()) || !prev.starts_with('-') || prev.contains('=') {
         return false;
     }
-    valued(prev) || (!prev.starts_with("--") && prev.len() > 2 && prev.chars().last().is_some_and(|c| valued(&format!("-{c}"))))
+    if valued(prev) {
+        return true;
+    }
+    if !clusters || prev.starts_with("--") || prev.len() <= 2 {
+        return false;
+    }
+    let letters: Vec<char> = prev[1..].chars().collect();
+    letters.iter().position(|c| valued(&format!("-{c}"))).is_some_and(|at| at + 1 == letters.len())
 }
 
 pub(crate) fn is_flag_probe(s: &str) -> bool {
     s == FLAG_PROBE || s == SHORT_PROBE
+}
+
+/// Whether a probe stands where the unknown word could be any flag: before `--`, and not the value
+/// of a flag in `valued_flags`. A grammar that tolerates unknown flags accepts the probe, so a
+/// command's classifying flags count it as present themselves. A probe after a flag that is not
+/// known to take a value is a flag of its own: `--no-graph "$X"` passes `$X` as an option.
+pub(crate) fn may_be_any_flag(tokens: &[Token], valued_flags: &[String]) -> bool {
+    for (idx, t) in tokens.iter().enumerate().skip(1) {
+        let s = t.as_str();
+        if s == "--" {
+            return false;
+        }
+        if is_flag_probe(s) && !probe_follows_valued(tokens, idx, valued_flags, false) {
+            return true;
+        }
+    }
+    false
 }
 
 /// Whether an operand hides a FLAG behind an unquoted expansion.

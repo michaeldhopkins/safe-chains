@@ -290,6 +290,13 @@
 # classifies = "decrypt-read"
 # fact = "…"
 # source = "…"
+#
+# A word the classifier cannot read (a quoted `"$X"`) counts as each listed flag being present,
+# unless it is the value of the flag before it. The command's own `valued` and its wrapper's
+# `valued` say which flags take one; a structured command whose subs tolerate unknown flags
+# declares the rest in `flag_valued`, listing only spellings that take a value in EVERY sub:
+#
+# flag_valued = ["--message", "--revision", "-m", "-r"]
 
 # ─────────────────────────────────────────────────────────────────────
 # GUARDED SUBCOMMAND — requires a specific flag to be present

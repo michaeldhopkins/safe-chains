@@ -6,6 +6,15 @@ researched_version = "jj 0.39.0 (config subcommand reviewed)"
 bare_flags = ["--help", "--version", "-h"]
 examples_safe = ["jj new", "jj -R ./sub new"]
 examples_denied = ["jj -R /etc new"]
+# Flags that take a value in every jj subcommand that has them (checked against
+# `jj util markdown-help` for jj 0.45.1). Spellings that are a value flag in one sub and a switch
+# in another (`-s`, `-b`, `-B`, `-n`, `-p`, `-t`) are left out.
+flag_valued = [
+    "--after", "--author", "--before", "--bookmark", "--branch", "--context", "--destination",
+    "--file", "--from", "--insert-after", "--insert-before", "--into", "--limit", "--message",
+    "--onto", "--op", "--operation", "--remote", "--revision", "--revisions", "--source",
+    "--template", "--to", "-A", "-T", "-f", "-m", "-o", "-r",
+]
 [command.wrapper]
 standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
 valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
@@ -16,6 +25,32 @@ valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 # `-R /tmp/scratch-repo` stays workable while system and home paths do not.
 [command.path_gate]
 flags = { "--repository" = "write", "-R" = "write" }
+
+# jj's global options are accepted after the subcommand as well as before it, and most subs
+# tolerate unknown long flags, so a global that makes jj run a program has to be refused for the
+# whole invocation rather than per sub. `--config`/`--config-file` can set `ui.diff-formatter`,
+# `ui.pager`, `merge-tools.*.program` or `git.executable-path`; `--tool` names the program that
+# renders a diff.
+[[command.flag]]
+name = "--config"
+classifies = "unclassified"
+fact = "Sets a config value for this invocation; keys such as ui.diff-formatter, ui.pager and merge-tools.*.program name a program jj runs."
+source = "https://jj-vcs.github.io/jj/latest/config/ — `--config` and `ui.diff-formatter`"
+[[command.flag]]
+name = "--config-file"
+classifies = "unclassified"
+fact = "Loads an extra config file for this invocation, which can name programs jj runs (ui.diff-formatter, merge-tools.*.program)."
+source = "https://jj-vcs.github.io/jj/latest/cli-reference/ — `--config-file`"
+[[command.flag]]
+name = "--config-toml"
+classifies = "unclassified"
+fact = "Older spelling of --config taking inline TOML, with the same reach."
+source = "https://jj-vcs.github.io/jj/latest/cli-reference/ — `--config-toml`"
+[[command.flag]]
+name = "--tool"
+classifies = "unclassified"
+fact = "`jj diff/show/log --tool NAME` renders the diff by running NAME (a merge-tools entry, or else a program of that name) on two snapshot directories."
+source = "https://jj-vcs.github.io/jj/latest/cli-reference/#jj-diff — `--tool`"
 
 [[command.sub]]
 name = "abandon"

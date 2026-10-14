@@ -2151,7 +2151,7 @@ fn decrypt_read_denies_at_the_band_and_is_a_secret_read() {
     // (a flag-classified bimodal sub).
     let mut prefixes = Vec::new();
     for (name, spec) in TOML_REGISTRY.iter() {
-        for f in &spec.archetype_flags {
+        for f in spec.archetype_flags.iter() {
             if f.classifies == "decrypt-read" {
                 prefixes.push(format!("{name} {}", f.name));
             }

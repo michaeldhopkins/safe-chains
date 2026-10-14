@@ -94,6 +94,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub flag: Vec<TomlSubFlag>,
     #[serde(default)]
+    pub flag_valued: Vec<String>,
+    #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
     #[serde(default)]
     pub write_flags: Vec<String>,
@@ -663,10 +665,8 @@ pub struct CommandSpec {
     /// The command's own path-argument gate (`[command.path_gate]`), if declared. Read by
     /// `registry::command_path_gate` → `pathgate::should_deny`.
     pub(super) path_gate: Option<crate::pathgate::RoleSpec>,
-    /// Top-level classifying flags (`[[command.flag]]`), lowered from `TomlSubFlag`. A present flag
-    /// classifies the whole invocation as its archetype — read by `registry::command_flag_archetypes`
-    /// → `engine::resolve::resolve` (the flat-command analog of a profiled sub's escalating flags).
-    pub(super) archetype_flags: Vec<FlagProvenance>,
+    /// `[[command.flag]]`, read by `registry::command_flag_archetypes` → `engine::resolve::resolve`.
+    pub(super) archetype_flags: super::build::ArchetypeFlags,
     /// Declarative facet behavior (`[command.behavior]`), lowered to typed facet enums. Read
     /// by `registry::command_behavior` → `engine::resolve::resolve_behavior`. When present,
     /// the engine classifies this command from its declared facets instead of a Rust resolver.

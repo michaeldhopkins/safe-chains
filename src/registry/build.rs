@@ -32,8 +32,11 @@ macro_rules! ensure {
     };
 }
 
+#[path = "build_archetype_flags.rs"]
+mod archetype_flags;
 #[path = "build_lower.rs"]
 mod lower;
+pub(crate) use archetype_flags::ArchetypeFlags;
 use lower::{lower_behavior, lower_output};
 
 /// `optional_valued` compiles down to membership in BOTH other lists, and that is the whole
@@ -944,40 +947,6 @@ fn assert_fallback_requires_handler(toml: &TomlCommand) -> Result<(), String> {
     Ok(())
 }
 
-/// Validate and lower a top-level command's `[[command.flag]]` classifying flags — the flat-command
-/// analog of a profiled sub's escalating flags. Each must name a known archetype (or `unclassified`)
-/// and cite `fact`/`source`; `when_absent`/`value_prefix` are mutually exclusive. Mirrors the per-sub
-/// check in `assert_sub_provenance`.
-fn build_command_archetype_flags(cmd: &str, flags: Vec<TomlSubFlag>) -> Result<Vec<crate::registry::types::FlagProvenance>, String> {
-    let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
-    let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
-    flags
-        .into_iter()
-        .map(|f| {
-            ensure!(
-                f.classifies == "unclassified" || crate::engine::archetype::archetype(&f.classifies).is_some(),
-                "command `{cmd}` flag `{}`: classifies `{}` is not a known archetype",
-                f.name,
-                f.classifies,
-            );
-            ensure!(cited(&f.fact), "command `{cmd}` flag `{}`: requires a `fact`", f.name);
-            ensure!(cited(&f.source), "command `{cmd}` flag `{}`: requires a `source`", f.name);
-            ensure!(judged(&f.judgment), "command `{cmd}` flag `{}`: `judgment`, if given, must not be blank", f.name);
-            ensure!(
-                !(f.when_absent == Some(true) && f.value_prefix.is_some()),
-                "command `{cmd}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
-                f.name,
-            );
-            Ok(crate::registry::types::FlagProvenance {
-                name: f.name,
-                classifies: f.classifies,
-                value_prefix: f.value_prefix,
-                when_absent: f.when_absent.unwrap_or(false),
-            })
-        })
-        .collect()
-}
-
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<CommandSpec, String> {
     assert_flat_or_structured(&toml)?;
@@ -1012,7 +981,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
     let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
-    let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag)?;
+    let archetype_flags = archetype_flags::lower(&toml.name, toml.flag, &toml.flag_valued, &toml.valued, toml.wrapper.as_ref())?;
     if toml.deny.unwrap_or(false) {
         return Ok(CommandSpec {
             name: toml.name,
@@ -1391,7 +1360,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
                 // before the engine's behavior lookup, so the canonical spec's `path_gate` /
                 // `behavior` is what's consulted — the alias entry never needs either.
                 path_gate: None,
-                archetype_flags: Vec::new(),
+                archetype_flags: ArchetypeFlags::default(),
                 behavior: None,
                 output: None,
                 writes_cwd: None,

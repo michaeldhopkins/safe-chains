@@ -1,4 +1,6 @@
 pub(crate) mod git;
+#[cfg(test)]
+mod jj_tests;
 
 use crate::parse::Token;
 use crate::verdict::Verdict;

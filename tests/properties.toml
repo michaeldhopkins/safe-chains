@@ -114,6 +114,7 @@ owed = [
 "src/engine/resolve/backup.rs" = ["a_backup_is_the_file_renamed_by_its_suffix"]
 "src/engine/resolve/path_verdicts.rs" = ["src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied", "src/cst/proptests.rs::file_redirect_promotes_to_safewrite"]
 "src/registry/cwd_writes.rs" = ["only_a_well_formed_declaration_lowers"]
+"src/registry/build_archetype_flags.rs" = ["valued_joins_the_flag_and_command_lists"]
 "src/registry/build_lower.rs" = ["output_lowers_only_a_known_source"]
 "src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses"]
 "src/engine/archetype.rs" = []
