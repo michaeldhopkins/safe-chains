@@ -17,6 +17,22 @@ about one command is one wrong answer. A gap in the mechanism is every command t
 would have used it — which is why the backlog below is ordered by how much of the
 model a gap makes inexpressible, not by how many commands are waiting on it.
 
+## DECISION NEEDED: a git store under temp is plantable without a `.git` component
+
+Writes into `.git`, `.jj`, `.hg` and `.sl` are frozen wherever they sit (`regions/metadata.rs`),
+but git does not need the directory to be called `.git`. A bare repository, or one whose store was
+moved by `git init --separate-git-dir`, keeps `config` and `hooks/` at the top of a plain
+directory. Everything needed to fake one under `/tmp` is an ordinary scratch write (`HEAD`,
+`objects/`, `refs/`, and a `config` with `core.worktree`, `core.fsmonitor` or `core.sshCommand`),
+and `git -C /tmp/b status` would then run the planted program (reasoned from git's discovery rules; the `.git` form was verified end to end). Found in review, 2026-10-14.
+
+The fix is a model change, not a row: treat a VCS command whose repository is reached through
+`-C`, `--git-dir`, `-R` or a cwd under temp as executing code of temp origin, so it meets the same
+execute floor that refuses `sh /tmp/x.sh`. That denies `git -C /tmp/clone log` too, which agents
+do run, so the trade-off is the owner's. Separately, `git init` itself is approved only by a
+`Bash(git init:*)` rule in the user's own Claude settings (see "`permissions.allow` out-ranks every
+level" below), which also admits `--template` and `--separate-git-dir`.
+
 ## The open mechanism backlog, in order
 
 **Tier 1 — the schema cannot express what the model already knows.** These come

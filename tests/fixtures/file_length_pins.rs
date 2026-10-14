@@ -14,7 +14,7 @@ const PINS: [(&str, usize); 19] = [
     ("src/engine/facet.rs", 685),
     ("src/engine/resolve.rs", 1579),
     ("src/engine/resolve/locus.rs", 584),
-    ("src/engine/resolve/regions.rs", 929),
+    ("src/engine/resolve/regions.rs", 928),
     ("src/engine/testgen.rs", 657),
     ("src/handler_property_tests.rs", 2387),
     ("src/handlers/perl.rs", 451),

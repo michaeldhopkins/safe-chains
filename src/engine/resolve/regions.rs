@@ -14,6 +14,7 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
+mod metadata;
 mod protection;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;
@@ -695,10 +696,8 @@ pub(crate) fn classify_region(path: &str) -> Role {
     // enforcement path knew it. Enforcement was never wrong, but the NUDGE was, which is how a
     // denial for one reason came out explained as another.
     let path = &super::locus::canonicalize(path);
-    if let Some(role) = scratchpad_role(path) {
-        return role;
-    }
-    apply_grant(path, base_region(path))
+    let role = scratchpad_role(path).unwrap_or_else(|| apply_grant(path, base_region(path)));
+    metadata::frozen_metadata_wins(path, role)
 }
 
 /// This session's SCRATCHPAD — the harness's own per-session working directory — earns

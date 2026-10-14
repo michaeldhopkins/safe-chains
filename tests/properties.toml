@@ -381,6 +381,7 @@ owed = [
 "src/pathgate/fuzz_judges.rs" = "reads the process-wide gate tables; a seam whose invariant the gate_prefilter fuzz target checks"
 "src/engine/resolve/regions.rs" = "loads grants from ~/.config/safe-chains.toml and Claude Code's settings, and reads HOME"
 "src/engine/resolve/regions/grant_faces.rs" = "reads HOME to place the grants it merges"
+"src/engine/resolve/regions/metadata.rs" = "reads the process-wide region table and the running OS"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
 "src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
 "src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"

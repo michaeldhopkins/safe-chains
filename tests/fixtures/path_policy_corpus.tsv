@@ -136,6 +136,15 @@ deny	write-autoexec	cp conf.toml sub/.jj/repo/config.toml
 deny	write-autoexec	echo x > .git/config
 deny	write-autoexec	echo x > .hg/hgrc
 deny	write-autoexec	echo x > .sl/config
+deny	write-autoexec	jj git init /tmp/r && printf x > /tmp/r/.jj/repo/config.toml && jj -R /tmp/r diff
+deny	write-autoexec	git init -q /tmp/g && printf x >> /tmp/g/.git/config && git -C /tmp/g status
+deny	write-autoexec	rm /tmp/foo/.jj/repo/config-id
+deny	write-autoexec	cp hook /var/tmp/r/.git/hooks/pre-commit
+deny	write-autoexec	echo x > .j?/repo/config.toml
+deny	write-autoexec	tee .[j]j/repo/config.toml
+deny	write-autoexec	cp pre-commit .gi?/hooks/
+deny	write-autoexec	touch .en?rc
+deny	write-autoexec	printf x >> .gi[t]/config && git status
 deny	write-autoexec	echo x > ~/.config/safe-chains.toml
 deny	write-autoexec	echo x > /etc/sudoers
 deny	write-autoexec	echo x > /etc/ld.so.preload
@@ -145,6 +154,9 @@ allow	read-autoexec	cat .git/config
 allow	read-autoexec	cat .envrc
 allow	read-autoexec	cat .jj/repo/config.toml
 allow	read-autoexec	cat .hg/hgrc
+allow	read-autoexec	cat /tmp/r/.git/config
+allow	write-scratch	echo x > /tmp/r/notes.txt
+allow	write-worktree	rm -rf target/*
 allow	read-autoexec	cat ~/.config/safe-chains.toml
 
 # ── A repository or workspace jj creates lands where it is pointed, so the path is a write. ──

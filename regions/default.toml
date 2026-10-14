@@ -129,7 +129,7 @@ researched = "2026-07-12"
 [[region]]
 path = ".jj"
 role = "worktree-trusted"
-note = "Jujutsu metadata dir. A .jj/repo/config.toml is read, and on jj 0.45 migrated into the user config, on the next jj command, so a write there sets ui.diff-formatter, ui.pager, ui.editor, merge-tools.*.program or fix.tools and the next jj diff or log runs it (verified: printf to it, then jj diff ran the formatter). .jj/repo/config-id and a secondary workspace's .jj/repo file redirect which config and store jj uses. Nests at any depth."
+note = "Jujutsu metadata dir. On jj 0.45 a .jj/repo/config.toml is read and migrated into the user config whenever .jj/repo/config-id is missing (a fresh repo, or after an rm of config-id), so a write there sets ui.diff-formatter, ui.pager, ui.editor, merge-tools.*.program or fix.tools and the next jj diff or log runs it (verified: rm config-id, printf to config.toml, then jj diff ran the formatter). config-id itself and a secondary workspace's .jj/repo file redirect which config and store jj uses. Nests at any depth, under temp too."
 researched = "2026-10-14"
 [[region]]
 path = ".hg"
