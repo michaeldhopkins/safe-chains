@@ -192,6 +192,12 @@ mod tests {
     }
 
     #[test]
+    fn display_renders_the_token_text() {
+        assert_eq!(tok("git status").to_string(), "git status");
+        assert_eq!(format!("[{}]", tok("-x")), "[-x]");
+    }
+
+    #[test]
     fn has_flag_short() {
         let tokens = toks(&["sed", "-i", "s/foo/bar/"]);
         assert!(has_flag(&tokens, Some("-i"), Some("--in-place")));
