@@ -3778,6 +3778,12 @@ Aliases: `typeset`
 - **read-type**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `defaults read com.apple.finder`
+- `defaults read -g AppleLocale`
+- `defaults export com.apple.finder -`
+
 ### `defncopy`
 <p class="cmd-url"><a href="https://www.freetds.org/userguide/defncopy.htm">https://www.freetds.org/userguide/defncopy.htm</a></p>
 
@@ -4800,8 +4806,14 @@ Aliases: `esptool.py`
 ### `exiftool`
 <p class="cmd-url"><a href="https://exiftool.org/">https://exiftool.org/</a></p>
 
-- Allowed standalone flags: --help, -G, -S, -T, -X, -a, -args, -b, -binary, -c, -coordFormat, -csv, -d, -dateFormat, -deletegps, -deleteByName, -duplicates, -e, -extracted, -f, -fast, -fast2, -fast4, -fileOrder, -h, -htmlDump, -i, -ignore, -ifd0, -j, -json, -l, -lang, -list, -listf, -listr, -listg, -m, -n, -overwrite_original, -overwrite_original_in_place, -php, -progress, -psum, -q, -quiet, -r, -recurse, -S, -sep, -short, -srcfile, -stay_open, -struct, -tab, -tagsFromFile, -textOut, -u, -unknown, -unknown2, -v, -V, -verbose, -w, -wext, -xmlFormat, -xmp, -z, -version
-- Allowed valued flags: -@, -config, -csvDelim, -csv+, -d, -dateFormat, -execute, -ext, -fileOrder, -geosync, -geotag, -globalTimeShift, -htmlDump, -i, -if, -lang, -listr, -progress, -progressOptions, -q, -r, -srcfile, -tab, -textOut, -w, -wext, -x, -XML, -xmlFormat
+- Allowed standalone flags: --help, -G, -S, -T, -X, -a, -args, -b, -binary, -c, -coordFormat, -csv, -d, -dateFormat, -deletegps, -deleteByName, -duplicates, -e, -ee, -extracted, -f, -fast, -fast2, -fast4, -fileOrder, -h, -htmlDump, -i, -ignore, -ifd0, -j, -json, -l, -lang, -list, -listf, -listr, -listg, -m, -n, -overwrite_original, -overwrite_original_in_place, -php, -progress, -psum, -q, -quiet, -r, -recurse, -S, -sep, -short, -struct, -tab, -u, -unknown, -unknown2, -v, -V, -verbose, -wext, -xmlFormat, -xmp, -z, -ver, -version
+- Allowed valued flags: -csvDelim, -d, -dateFormat, -ext, -fileOrder, -globalTimeShift, -htmlDump, -i, -lang, -listr, -progress, -progressOptions, -q, -r, -tab, -wext, -x, -XML, -xmlFormat
+
+**Examples:**
+
+- `exiftool photo.jpg`
+- `exiftool -a -G photos/IMG_0001.jpg`
+- `exiftool -r -ext jpg photos`
 
 ### `exit`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/exit.1p.html">https://man7.org/linux/man-pages/man1/exit.1p.html</a></p>
@@ -5953,7 +5965,7 @@ Aliases: `g++`, `cc`, `c++`
 - **diff-tree**: Flags: --cc, --combined-all-paths, --find-copies-harder, --full-index, --help, --ignore-all-space, --ignore-space-at-eol, --ignore-space-change, --merge-base, --minimal, --name-only, --name-status, --no-commit-id, --no-ext-diff, --no-patch, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --pickaxe-all, --raw, --root, --shortstat, --stat, --stdin, --summary, --text, -B, -C, -M, -R, -a, -c, -h, -m, -p, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --diff-algorithm, --diff-filter, --pretty, -O, -S
 - **fetch**: Flags: --all, --append, --atomic, --dry-run, --force, --help, --ipv4, --ipv6, --keep, --multiple, --negotiate-only, --no-auto-gc, --no-auto-maintenance, --no-show-forced-updates, --no-tags, --no-write-fetch-head, --porcelain, --prefetch, --progress, --prune, --prune-tags, --quiet, --refetch, --set-upstream, --show-forced-updates, --stdin, --tags, --unshallow, --update-head-ok, --update-shallow, --verbose, --write-commit-graph, --write-fetch-head, -4, -6, -P, -a, -f, -h, -k, -m, -n, -p, -q, -t, -u, -v. Valued: --deepen, --depth, --filter, --jobs, --negotiation-tip, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, -j, -o
 - **for-each-ref**: Flags: --help, --ignore-case, --include-root-refs, --omit-empty, --perl, --python, --shell, --stdin, --tcl, -h, -p, -s. Valued: --color, --contains, --count, --exclude, --format, --merged, --no-contains, --no-merged, --points-at, --sort
-- **grep**: Flags: --all-match, --and, --basic-regexp, --break, --cached, --column, --count, --exclude-standard, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --full-name, --function-context, --heading, --help, --ignore-case, --index, --invert-match, --line-number, --name-only, --no-color, --null, --only-matching, --perl-regexp, --quiet, --recurse-submodules, --recursive, --show-function, --text, --textconv, --untracked, --word-regexp, -E, -F, -G, -H, -I, -L, -P, -W, -a, -c, -h, -i, -l, -n, -o, -p, -q, -r, -v, -w, -z. Valued: --after-context, --before-context, --color, --context, --max-count, --max-depth, --threads, -A, -B, -C, -e, -f, -m
+- **grep**: Flags: --all-match, --and, --basic-regexp, --break, --cached, --column, --count, --exclude-standard, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --full-name, --function-context, --heading, --help, --ignore-case, --index, --invert-match, --line-number, --name-only, --no-color, --null, --only-matching, --perl-regexp, --quiet, --recurse-submodules, --recursive, --show-function, --text, --textconv, --untracked, --word-regexp, -E, -F, -G, -H, -I, -L, -P, -W, -a, -c, -h, -i, -l, -n, -o, -p, -q, -r, -v, -w, -z. Valued: --after-context, --before-context, --color, --context, --file, --max-count, --max-depth, --threads, -A, -B, -C, -e, -f, -m
 - **help**: Positional args accepted
 - **log**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -s, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -G, -L, -S, -n
 - **ls-files**: Flags: --cached, --debug, --deduplicate, --deleted, --directory, --empty-directory, --eol, --error-unmatch, --exclude-standard, --full-name, --help, --ignored, --killed, --modified, --no-empty-directory, --others, --recurse-submodules, --resolve-undo, --sparse, --stage, --unmerged, -c, -d, -f, -h, -i, -k, -m, -o, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --exclude, --exclude-from, --exclude-per-directory, --format, --with-tree, -X, -x
@@ -6004,6 +6016,13 @@ Aliases: `g++`, `cc`, `c++`
 - `git diff -S /etc/passwd`
 - `git diff -G /etc/passwd`
 - `git diff -O orderfile`
+- `git grep -f patterns.txt`
+- `git commit -F msg.txt`
+- `git blame --contents edited.rs edited.rs`
+- `git config -f .gitmodules --list`
+- `git add --pathspec-from-file=paths.txt`
+- `git grep --file=patterns.txt -n`
+- `git -C sub diff src/x.rs`
 
 ### `git-cliff`
 <p class="cmd-url"><a href="https://git-cliff.org/">https://git-cliff.org/</a></p>
@@ -9151,6 +9170,11 @@ Aliases: `gmd5sum`
 - Allowed standalone flags: -V, -h, -r, --help, --raw, --version
 - Allowed valued flags: -n, --name, --nullMarker
 
+**Examples:**
+
+- `mdls README.md`
+- `mdls -n kMDItemFSName ~/Library/Preferences/com.apple.finder.plist`
+
 ### `mediainfo`
 <p class="cmd-url"><a href="https://mediaarea.net/en/MediaInfo">https://mediaarea.net/en/MediaInfo</a></p>
 
@@ -11827,6 +11851,12 @@ Aliases: `upsun`
 - **-p**: Flags: --help, -h
 - **-type**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h, -help
+
+**Examples:**
+
+- `plutil -p Info.plist`
+- `plutil -lint a.plist b.plist`
+- `plutil -convert json -o - ~/Library/Preferences/com.apple.finder.plist`
 
 ### `pm2`
 <p class="cmd-url"><a href="https://pm2.keymetrics.io/">https://pm2.keymetrics.io/</a></p>

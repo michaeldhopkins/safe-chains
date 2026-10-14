@@ -6,3 +6,8 @@ level = "Inert"
 bare = false
 standalone = ["-V", "-h", "-r", "--help", "--raw", "--version"]
 valued = ["-n", "--name", "--nullMarker"]
+examples_safe = ["mdls README.md", "mdls -n kMDItemFSName ~/Library/Preferences/com.apple.finder.plist"]
+examples_denied = ["mdls ~/.ssh/id_rsa", "mdls -n kMDItemFSName /etc/shadow"]
+
+[command.path_gate]
+positional = "read"

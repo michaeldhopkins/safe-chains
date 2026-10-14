@@ -331,6 +331,8 @@ struct Gates {
     write: HashSet<String>,
     #[serde(default)]
     roles: HashMap<String, RoleSpec>,
+    #[serde(default)]
+    chdir: HashMap<String, chdir::Chdir>,
 }
 
 static GATES: LazyLock<Gates> = LazyLock::new(|| {
@@ -350,6 +352,10 @@ static SUB_SCOPED: LazyLock<HashSet<&'static str>> =
 /// Whether `cmd`'s already-allowed verdict must be overridden to `Denied` because one of its
 /// path arguments reads/writes a sensitive locus. Returns `false` for commands in no gate.
 pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
+    chdir::should_deny(GATES.chdir.get(cmd), tokens, || deny_in_place(cmd, tokens))
+}
+
+fn deny_in_place(cmd: &str, tokens: &[Token]) -> bool {
     let gates = &*GATES;
     // A command's path-gate can live centrally in `pathgates.toml` (a `[roles.X]` block or the
     // flat read/write lists) AND/OR co-located in its own `[command.path_gate]`. Consult BOTH and
@@ -645,21 +651,13 @@ fn gate(role: Role, path: &str) -> bool {
         Role::Write => crate::engine::resolve::write_target_verdict,
         Role::Exec => crate::engine::resolve::execute_file_verdict,
     };
-    // No pre-filter. There used to be one — a positive shape test (`looks_like_path`, plus
-    // whitespace, plus a colon, plus substitutions) deciding which values were worth judging — and
-    // it was fail-OPEN by construction: a shape it did not recognize was skipped, unjudged, and so
-    // approved. It leaked four times, each as a shape nobody had listed: a command line with
-    // spaces, `file:~`, a `$VAR`, and a bare glob. Each was patched by teaching it one more shape.
-    //
-    // The filter's stated job was skipping flags and bare keywords so only operands got judged. Its
-    // CALLER already does that: `walk` peels flags off before pushing to `positionals`, so nothing
-    // flag-shaped reaches here. The filter was re-asking a question already answered, and answering
-    // it worse. A bare keyword judged anyway classifies worktree-relative and allows, so dropping
-    // it costs nothing — the whole registry corpus and the ordinary invocations of every
-    // positional-gated command are unchanged.
+    // No pre-filter on the value's shape: the old one skipped (so approved) any shape it did not
+    // list, and leaked four times (spaces, `file:~`, `$VAR`, a bare glob). `walk` already peels
+    // flags off, and a bare keyword judged anyway reads as worktree-relative and allows.
     verdict(path) == Verdict::Denied
 }
 
+mod chdir;
 mod flag_match;
 mod fuzz_judges;
 mod handlers;

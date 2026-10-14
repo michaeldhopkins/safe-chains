@@ -344,10 +344,7 @@ fpm	--fpm-options-file	untriaged	-	-	-
 fpm	--workdir	untriaged	-	-	-	
 geth dump	--datadir	untriaged	-	-	-	
 gettextize	--po-dir	untriaged	-	-	-	
-git add	--pathspec-from-file	untriaged	-	-	-	
-git blame	--ignore-revs-file	untriaged	-	-	-	
 git cat-file	--path	untriaged	-	-	-	
-git commit	--file	untriaged	-	-	-	
 git describe	--dirty	untriaged	-	-	-	
 git diff	--dirstat	not-a-path	-	-	-	Takes dirstat PARAMETERS (changes,lines,files,cumulative,<limit>), not a path — a false positive of the "dir" name test. The positional gate on `git diff` marks it `ignore` for the same reason.
 git ls-files	--exclude-per-directory	untriaged	-	-	-	

@@ -878,10 +878,14 @@ mdls --raw	inert
 mdls --version	inert
 mdls -V	inert
 mdls -h	inert
+mdls -n kMDItemFSName /etc/shadow	denied
+mdls -n kMDItemFSName ~/Library/Preferences/com.apple.finder.plist	inert
 mdls -n x	inert
 mdls -r	inert
+mdls README.md	inert
 mdls file.txt	inert
 mdls x	inert
+mdls ~/.ssh/id_rsa	denied
 mediainfo	denied
 mediainfo --BlockMethod x	safe-read
 mediainfo --Help	safe-read

@@ -4,6 +4,17 @@ description = "macOS property list utility for inspecting and converting plist f
 url = "https://ss64.com/mac/plutil.html"
 researched_version = "macOS 15.x plutil"
 bare_flags = ["--help", "--version", "-V", "-h", "-help"]
+examples_safe = [
+    "plutil -p Info.plist",
+    "plutil -lint a.plist b.plist",
+    "plutil -convert json -o - ~/Library/Preferences/com.apple.finder.plist",
+]
+examples_denied = [
+    "plutil -p ~/.aws/credentials",
+    "plutil -lint ~/.ssh/id_rsa",
+    "plutil -convert xml1 /etc/hosts",
+    "plutil -convert xml1 -o /etc/x.plist a.plist",
+]
 
 [[command.sub]]
 name = "-lint"

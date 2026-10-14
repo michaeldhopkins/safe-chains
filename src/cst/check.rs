@@ -738,7 +738,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 /// no opt-out — the engine is the default and only path.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
     let legacy = handlers::dispatch(tokens);
-    super::netargs::with_egress(tokens, crate::engine::bridge::engine_verdict(tokens).unwrap_or(legacy))
+    super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {

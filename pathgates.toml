@@ -270,8 +270,8 @@ shape = "skip_first"
 flags = { "-t" = "ignore", "--terminate" = "ignore" }
 
 # NOT here yet (documented follow-ups — policy calls, not detection):
-#   disclosure inspectors pdfinfo/pdffonts/ffprobe/mediainfo/exiftool (read-gating over-denies
-#   home-file inspection — a separate "should we gate metadata reads" decision); converter
+#   disclosure inspectors pdfinfo/pdffonts/ffprobe/mediainfo (read-gating once over-denied
+#   home-file inspection; exiftool, plutil, defaults and mdls are read-gated now); converter
 #   stdout disclosure (`pdftotext ~/x.pdf -`) and file:-protocol inputs, both consequences of
 #   the ignore-input policy that lets home transcodes through.
 [roles."aclocal"]
@@ -811,6 +811,37 @@ positional = "write"
 positional = "read"
 flags = { "-O" = "read", "--relative" = "read", "-S" = "ignore", "-G" = "ignore", "-U" = "ignore", "--unified" = "ignore", "--abbrev" = "ignore", "--color" = "ignore", "--color-moved" = "ignore", "--diff-algorithm" = "ignore", "--diff-filter" = "ignore", "--diff-merges" = "ignore", "--dirstat" = "ignore", "--src-prefix" = "ignore", "--dst-prefix" = "ignore", "--inter-hunk-context" = "ignore", "--line-prefix" = "ignore", "--output-indicator-new" = "ignore", "--output-indicator-old" = "ignore", "--stat-count" = "ignore", "--stat-graph-width" = "ignore", "--stat-name-width" = "ignore", "--stat-width" = "ignore", "--submodule" = "ignore", "--word-diff" = "ignore", "--word-diff-regex" = "ignore" }
 
+# `git grep -f FILE` reads its patterns from FILE, and a match against the tree then discloses what
+# FILE holds a line at a time. The positionals are a pattern, revisions and pathspecs, none of which
+# git reads as a file of the caller's choosing, so only the flag is gated.
+[roles."git grep"]
+flags = { "-f" = "read", "--file" = "read" }
+
+# The same disclosure through other subcommands' file flags: `git blame --contents FILE` prints FILE
+# line by line, `git commit -F FILE` stores it as the message, and `git config -f FILE --list`
+# prints every key = value of an INI-shaped file. `git blame -S FILE` and `git add
+# --pathspec-from-file FILE` quote a line of FILE back in their errors.
+[roles."git blame"]
+flags = { "--contents" = "read", "--ignore-revs-file" = "read", "-S" = "read" }
+
+[roles."git add"]
+flags = { "--pathspec-from-file" = "read" }
+
+[roles."git commit"]
+flags = { "-F" = "read", "--file" = "read" }
+
+[roles."git config"]
+flags = { "-f" = "read", "--file" = "read" }
+
+# ── Directory-changing global flags. `git -C DIR` moves into DIR before it reads anything, so a
+#    relative operand names a file in DIR: `git -C /etc diff shadow` is `/etc/shadow`. Every gate of
+#    the command is judged with the cwd moved to DIR, and DIR is itself gated as a read, since git
+#    renders whatever repository it is pointed at. `valued` lists the command's other global flags
+#    that take a value, so the scan for the subcommand steps over them (`git -c k=v -C DIR …`).
+[chdir.git]
+flag = "-C"
+valued = ["-c"]
+
 # `-w`/`--write` do NOT take a value — they rewrite every file OPERAND in place. Gating them as
 # path-valued flags looked right on a one-operand probe (`shfmt -w ~/.ssh/config` denied, because
 # the gate ate the path as `-w`'s value) and left the real shape wide open:
@@ -1069,6 +1100,18 @@ handler = "xattr_mode"
 # operands are reads (trees under -r): it prints what it finds, raw bytes included under -v/-b.
 [roles."exiftool"]
 handler = "exiftool_mode"
+# plutil: -p/-lint/-type read and print the plist; -convert/-extract rewrite it IN PLACE unless
+# `-o` names the output, so the operands' role follows the mode and the `-o` value is a write.
+[roles."plutil"]
+handler = "plutil_mode"
+# defaults: the domain may be a path to a plist (read, with `.plist` appended when missing), and
+# `export` writes the domain to its last operand. Sub-scoped: `find` and `domains` take no path.
+[roles."defaults read"]
+handler = "defaults_domain"
+[roles."defaults read-type"]
+handler = "defaults_domain"
+[roles."defaults export"]
+handler = "defaults_domain"
 # rdfind: -makesymlinks/-makehardlinks/-deleteduplicates destroy duplicates in the scanned trees;
 # a bare scan only reports (and writes results.txt into the cwd). -dryrun disarms them.
 [roles."rdfind"]

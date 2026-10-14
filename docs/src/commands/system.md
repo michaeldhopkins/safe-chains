@@ -289,6 +289,12 @@
 - **read-type**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `defaults read com.apple.finder`
+- `defaults read -g AppleLocale`
+- `defaults export com.apple.finder -`
+
 ### `direnv`
 <p class="cmd-url"><a href="https://direnv.net/">https://direnv.net/</a></p>
 

@@ -148,6 +148,12 @@
 - **-type**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h, -help
 
+**Examples:**
+
+- `plutil -p Info.plist`
+- `plutil -lint a.plist b.plist`
+- `plutil -convert json -o - ~/Library/Preferences/com.apple.finder.plist`
+
 ### `pod`
 <p class="cmd-url"><a href="https://guides.cocoapods.org/terminal/commands.html">https://guides.cocoapods.org/terminal/commands.html</a></p>
 

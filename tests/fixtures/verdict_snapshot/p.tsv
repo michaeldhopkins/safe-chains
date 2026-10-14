@@ -7373,6 +7373,7 @@ plutil -convert -h	inert
 plutil -convert binary1 -o - /tmp/foo.plist	inert
 plutil -convert invalid -o - /tmp/foo.plist	denied
 plutil -convert json -o - /tmp/foo.plist	inert
+plutil -convert json -o - ~/Library/Preferences/com.apple.finder.plist	inert
 plutil -convert json -r -o - /tmp/foo.plist	inert
 plutil -convert json Info.plist -o out.json	safe-write
 plutil -convert objc -o - /tmp/foo.plist	denied
@@ -7385,8 +7386,10 @@ plutil -convert xml1 -o - --unknown /tmp/in	denied
 plutil -convert xml1 -o - /tmp/foo.plist	inert
 plutil -convert xml1 -o - /tmp/foo.plist | grep boundary	inert
 plutil -convert xml1 -o -- /tmp/in	denied
+plutil -convert xml1 -o /etc/x.plist a.plist	denied
 plutil -convert xml1 -o /tmp/out.plist /tmp/in.plist	safe-write
 plutil -convert xml1 -s -o - /tmp/foo.plist	inert
+plutil -convert xml1 /etc/hosts	denied
 plutil -convert xml1 /tmp/foo.plist	safe-write
 plutil -extract	denied
 plutil -extract --help	inert
@@ -7405,13 +7408,17 @@ plutil -lint --help -h	inert
 plutil -lint --help x	inert
 plutil -lint -h	inert
 plutil -lint -s	inert
+plutil -lint a.plist b.plist	inert
 plutil -lint x	inert
+plutil -lint ~/.ssh/id_rsa	denied
 plutil -p	denied
 plutil -p --help	inert
 plutil -p --help -h	inert
 plutil -p --help x	inert
 plutil -p -h	inert
+plutil -p Info.plist	inert
 plutil -p x	inert
+plutil -p ~/.aws/credentials	denied
 plutil -type	denied
 plutil -type --help	inert
 plutil -type --help -h	inert

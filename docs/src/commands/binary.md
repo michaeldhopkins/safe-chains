@@ -13,6 +13,11 @@
 - Allowed standalone flags: -V, -h, -r, --help, --raw, --version
 - Allowed valued flags: -n, --name, --nullMarker
 
+**Examples:**
+
+- `mdls README.md`
+- `mdls -n kMDItemFSName ~/Library/Preferences/com.apple.finder.plist`
+
 ### `nm`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/nm.1.html">https://man7.org/linux/man-pages/man1/nm.1.html</a></p>
 

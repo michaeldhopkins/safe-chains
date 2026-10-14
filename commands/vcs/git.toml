@@ -15,6 +15,13 @@ examples_safe = [
     "git diff -S /etc/passwd",
     "git diff -G /etc/passwd",
     "git diff -O orderfile",
+    "git grep -f patterns.txt",
+    "git commit -F msg.txt",
+    "git blame --contents edited.rs edited.rs",
+    "git config -f .gitmodules --list",
+    "git add --pathspec-from-file=paths.txt",
+    "git grep --file=patterns.txt -n",
+    "git -C sub diff src/x.rs",
 ]
 examples_denied = [
     # `git diff` renders file CONTENT. Given paths outside the tree it is a file reader rather than
@@ -29,6 +36,20 @@ examples_denied = [
     "git -c diff.orderFile=/etc/shadow diff",
     # `-O` names a file git READS; its flag name would never have caught the path-named heuristic.
     "git diff -O /etc/shadow",
+    # `-f` reads the pattern file, and the matches disclose it a line at a time.
+    "git grep -f ~/.ssh/id_rsa",
+    "git grep --file=/etc/shadow",
+    "git grep -nf/etc/shadow",
+    # `-C` moves git before it reads: the operand is relative to the new directory.
+    "git -C ~ diff --no-index .ssh/id_rsa notes.txt",
+    "git -C ~/.ssh log -p",
+    "git commit -F ~/.ssh/id_rsa",
+    "git commit --file=/etc/shadow",
+    "git blame --contents ~/.ssh/id_rsa a.rs",
+    "git config -f ~/.aws/credentials --list",
+    "git blame -S ~/.ssh/id_rsa a.rs",
+    "git add --pathspec-from-file=~/.ssh/id_rsa",
+    "git add --pathspec-from-file /etc/shadow",
 ]
 [command.wrapper]
 valued = ["-C"]
@@ -372,7 +393,7 @@ standalone = [
 ]
 valued = [
     "--after-context", "--before-context",
-    "--color", "--context",
+    "--color", "--context", "--file",
     "--max-count", "--max-depth",
     "--threads",
     "-A", "-B", "-C",

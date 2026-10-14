@@ -48,6 +48,15 @@ pub fn engine_verdict(tokens: &[Token]) -> Option<Verdict> {
     resolve::resolve(tokens).map(|p| project(&p))
 }
 
+/// [`engine_verdict`], with the path gate the legacy dispatch applies also applied to an engine
+/// approval: a profile describes what a subcommand does, not which file a flag names, so
+/// `git commit -F ~/.ssh/id_rsa` resolves to a worktree commit while it reads the key.
+pub fn gated_engine_verdict(tokens: &[Token]) -> Option<Verdict> {
+    let verdict = engine_verdict(tokens)?;
+    let cmd = crate::registry::canonical_name(tokens.first()?.command_name());
+    Some(if verdict.is_allowed() && crate::pathgate::should_deny(cmd, tokens) { Verdict::Denied } else { verdict })
+}
+
 /// Project a resolved profile to a legacy [`Verdict`]: the **lowest** authored level
 /// that admits it, mapped back to its legacy [`SafetyLevel`]; `Denied` if no
 /// legacy-mapped level admits it (above the auto-approve band → worst-case, §0).

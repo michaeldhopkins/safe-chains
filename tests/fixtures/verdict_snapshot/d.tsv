@@ -1019,6 +1019,8 @@ defaults export -app x	inert
 defaults export -g	inert
 defaults export -globalDomain	inert
 defaults export -h	inert
+defaults export com.apple.finder -	inert
+defaults export com.apple.finder /etc/x.plist	denied
 defaults export x	inert
 defaults find	denied
 defaults find --help	inert
@@ -1037,9 +1039,12 @@ defaults read --help -g	inert
 defaults read --help x	inert
 defaults read -app x	inert
 defaults read -g	inert
+defaults read -g AppleLocale	inert
 defaults read -globalDomain	inert
 defaults read -h	inert
+defaults read com.apple.finder	inert
 defaults read x	inert
+defaults read ~/.ssh/id_rsa	denied
 defaults read-type	denied
 defaults read-type --help	inert
 defaults read-type --help -app x	inert
@@ -1050,6 +1055,7 @@ defaults read-type -g	inert
 defaults read-type -globalDomain	inert
 defaults read-type -h	inert
 defaults read-type x	inert
+defaults read-type ~/.aws/credentials key	denied
 defaults x	denied
 defncopy	denied
 defncopy --help	denied

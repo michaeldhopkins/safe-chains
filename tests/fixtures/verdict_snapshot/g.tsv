@@ -6889,7 +6889,10 @@ git -C /some/repo -C nested log	inert
 git -C /some/repo diff --stat	inert
 git -C /some/repo log --oneline | head -3	inert
 git -C /tmp grep --no-index x	denied
+git -C sub diff src/x.rs	inert
 git -C x	denied
+git -C ~ diff --no-index .ssh/id_rsa notes.txt	denied
+git -C ~/.ssh log -p	denied
 git -V	inert
 git -c DIFF.NOPREFIX=true diff	inert
 git -c advice.detachedHead=false log HEAD	inert
@@ -6950,7 +6953,10 @@ git add --help	safe-write
 git add --ignore-errors	safe-write
 git add --intent-to-add	safe-write
 git add --no-all	safe-write
+git add --pathspec-from-file /etc/shadow	denied
 git add --pathspec-from-file x	safe-write
+git add --pathspec-from-file=paths.txt	safe-write
+git add --pathspec-from-file=~/.ssh/id_rsa	denied
 git add --refresh	safe-write
 git add --renormalize	safe-write
 git add --update	safe-write
@@ -6970,7 +6976,9 @@ git blame --color-by-age --abbrev x	inert
 git blame --color-by-age --color-lines	inert
 git blame --color-by-age x	inert
 git blame --color-lines	inert
+git blame --contents edited.rs edited.rs	inert
 git blame --contents x	inert
+git blame --contents ~/.ssh/id_rsa a.rs	denied
 git blame --date x	inert
 git blame --help	inert
 git blame --ignore-rev x	inert
@@ -6990,6 +6998,7 @@ git blame -L 10,20 -w file.rb	inert
 git blame -L x	inert
 git blame -M x	inert
 git blame -S x	inert
+git blame -S ~/.ssh/id_rsa a.rs	denied
 git blame -b	inert
 git blame -c	denied
 git blame -e	inert
@@ -7185,6 +7194,7 @@ git commit --author x	safe-write
 git commit --date x	safe-write
 git commit --dry-run	safe-write
 git commit --file x	safe-write
+git commit --file=/etc/shadow	denied
 git commit --help	safe-write
 git commit --message x	safe-write
 git commit --no-edit	safe-write
@@ -7197,7 +7207,9 @@ git commit --signoff	safe-write
 git commit --squash x	safe-write
 git commit --verbose	safe-write
 git commit -C x	safe-write
+git commit -F msg.txt	safe-write
 git commit -F x	safe-write
+git commit -F ~/.ssh/id_rsa	denied
 git commit -a	safe-write
 git commit -h	safe-write
 git commit -m x	safe-write
@@ -7250,7 +7262,9 @@ git config --unset user.name	denied
 git config --worktree	denied
 git config --worktree -l	inert
 git config -f .gitconfig -l	inert
+git config -f .gitmodules --list	inert
 git config -f x	denied
+git config -f ~/.aws/credentials --list	denied
 git config -h	inert
 git config -h x	denied
 git config -l	inert
@@ -7564,6 +7578,9 @@ git grep --context x	inert
 git grep --count	inert
 git grep --exclude-standard	inert
 git grep --extended-regexp	inert
+git grep --file x	inert
+git grep --file=/etc/shadow	denied
+git grep --file=patterns.txt -n	inert
 git grep --files-with-matches	inert
 git grep --files-without-match	inert
 git grep --fixed-strings	inert
@@ -7609,13 +7626,16 @@ git grep -W	inert
 git grep -a	inert
 git grep -c	denied
 git grep -e x	inert
+git grep -f patterns.txt	inert
 git grep -f x	inert
+git grep -f ~/.ssh/id_rsa	denied
 git grep -h	inert
 git grep -i	inert
 git grep -l	inert
 git grep -m x	inert
 git grep -n	inert
 git grep -n -i --count pattern	inert
+git grep -nf/etc/shadow	denied
 git grep -o	inert
 git grep -p	inert
 git grep -q	inert
