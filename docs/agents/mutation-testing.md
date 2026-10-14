@@ -27,43 +27,7 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
 - **Equivalent, not excluded:** `delete !` in `sed_cluster`'s `-f` arm (`consumes_next: !has`).
   `scan_sed` flags every `-f` spelling and `resolve_sed` worst-cases before the cluster parser runs,
   so the `ScriptFile` arm's word count is never observed. A slice that lands on it reports it.
-- **Findings of the first slices (2026-09-27):** slice 128/256 had 5 MISSED of 20 viable (75%): no
-  test pinned which word `sed -e`/`-l` consume, that a trailing `-l` fails closed, or that an unknown
-  byte in a short cluster fails closed when the script itself is harmless (`sed -Q ./foo` was caught
-  only because `./foo` is an unknown sed command). Four now have
-  `sed_short_flags_consume_exactly_their_own_value`; the fifth is the equivalent one above.
-  `gen-fuzz-corpus` was never built by `cargo test` and had no tests; it now has four, and a run
-  over the file caught 27 of 28 viable (the 28th is the excluded `main`).
-- **CI slice 1/256 (run 36363446362):** 1 MISSED of 17 viable: `!=` to `==` in `facet_breakdown`'s
-  one-segment guard. Nothing called the function directly. Now killed by
-  `facet_breakdown_profiles_a_single_command_and_declines_a_chain` in `tests/facet_breakdown.rs`. Writing it
-  showed that a PIPELINE is one segment to `cst::explain`, so `facet_breakdown("cat x | rm -rf /")`
-  still gets the flat split the guard exists to prevent (a diagnostic only, not a verdict; see
-  TODO.md).
-- **CI slice of run 37348486489 (2026-10-05):** 3 MISSED of 10 viable: `print_docs` emptied,
-  `--explain`'s exit code inverted, and `||` to `&&` in `canonicalize_home`'s no-home guard. Killed
-  by `list_commands_prints_the_command_reference` and `explain_exits_with_the_verdict` in
-  `tests/cli_gate.rs`, and the property `without_a_usable_home_every_word_is_left_alone`.
-- **CI slice of run 37362532620:** 2 MISSED of 9 viable, both in `src/allowlist.rs`: the bare-`~`
-  guard in `canonicalize_home` set to `false`, and `Matcher::is_empty` returning `true` (only ever
-  asserted on empty matchers). Killed by `a_usable_home_expands_both_tilde_spellings` and a
-  non-empty assertion in `parse_exact_pattern` and `parse_legacy_colon_star`. The next slice
-  (run 37365593962) missed `-` to `+` in `glob_matches`; a local run over the whole file then found
-  two more in its middle-piece loop. `a_glob_match_holds_every_piece` and
-  `a_glob_prefix_and_suffix_may_not_overlap` kill all three, and the file now has no survivors.
-- **CI slice of run 37505805989 (2026-10-06):** 3 MISSED of 9 viable: `normalize_redirs` emptied
-  (the roundtrip property renders the normalized form, so a dropped redirect round-trips cleanly),
-  and `*` to `+` in either factor of `ROTATE_AT_BYTES`. Killed by the property
-  `normalizing_keeps_every_redirect` in `src/cst/normalize_tests.rs` and
-  `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`. The next slice (run
-  37508602217) missed `Outcome`'s `Display` returning nothing; `an_outcome_displays_as_its_log_name`
-  kills it. Run 37511064101 missed `rotate_if_large` emptied and `<` to `<=` at the rotation cap;
-  `appending_to_a_full_log_starts_a_fresh_one` (a sparse file at the real cap) and
-  `a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not` kill them. Run 37511608360
-  missed `unix_millis` returning 0 or 1; `the_clock_reads_the_current_time_in_milliseconds` kills
-  both. Run 37515672271 missed `-` to `+` or `/` in `civil_from_days`'s negative-era branch;
-  `civil_from_days_handles_dates_before_year_zero` kills both. Five slices in a row landed in `src/decisionlog.rs`: a whole-file local run over it
-  (128 mutants) is owed, in `TODO.md`.
+- **Findings of past slices** are in `docs/agents/mutation-findings.md`; add an entry there when you kill a slice's misses.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
   its baseline failed there (a sibling is `adjacent` only under `$HOME`). The test now builds
@@ -89,3 +53,14 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   exits on overshoot either way. The guard is gone, and a trailing-backslash test pins what it did.
   The six timeouts are each about 280s of wall clock, so a slice that lands on several of them can
   run past the job limit however small N is.
+- **Run 38628070688 (2026-10-14), cancelled again, the cause fixed rather than N.** A hung mutant
+  runs to cargo-mutants' auto timeout, 5x the baseline test time (~280s here, over 800s on the
+  runner's 166s baseline), so N cannot bound a slice that lands on several. Three changes:
+  `timeout_multiplier = 2.0` in `.cargo/mutants.toml` (a hang now costs 2x the baseline: measured
+  116s each against a 57s baseline, both timeouts of lines 110 and 124 of `Token::content_outside_double_quotes`;
+  not lower, since a real mutant runs the whole suite and a spurious timeout reads as caught);
+  `scripts/mutants-run.sh` runs cargo-mutants under a 15-minute budget (`MUTANTS_BUDGET`, 15 minutes), stops it
+  with TERM and reports the slice as incomplete instead of letting the 20-minute job limit cancel
+  the run; and the verdict now reads `mutants.out/missed.txt`, not the exit status (exit 3 used to
+  map to 0 even with misses). `tests/mutants_run.rs` covers it with a stand-in cargo. Both jobs
+  call the script. If hangs still dominate, a per-test cap under nextest is the next lever.

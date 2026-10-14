@@ -50,3 +50,4 @@ COMMANDS.md.check
 # lands in a commit with nobody running an `add` — which happened while reviewing this stack.
 # A real `.safe-chains.toml` for this project would need `git add -f`, deliberately.
 .safe-chains.toml
+/mutants-run-status.txt

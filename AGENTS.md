@@ -75,8 +75,10 @@ adding a new one — extend a corpus/table where one already fits rather than st
   seeding, regression seeds, and coverage holes. Read before adding or changing a fuzz target,
   `fuzz/`, or the fuzz workflows.
 - `docs/agents/mutation-testing.md`: the per-change mutants job, slice sizing, the `mutants`
-  profile, exclusions and past findings. Read before changing `.cargo/mutants.toml`, the mutants
+  profile, exclusions and the run-failure history. Read before changing `.cargo/mutants.toml`, the mutants
   workflow, or triaging a MISSED mutant.
+- `docs/agents/mutation-findings.md`: what past rotating slices found and the tests that killed
+  each miss. Read when a slice reports a MISSED mutant in code a past slice already covered.
 
 ## Linting
 

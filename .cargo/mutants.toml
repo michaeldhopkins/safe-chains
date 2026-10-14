@@ -4,6 +4,11 @@
 # Dependencies optimized, this crate not (see the profile's comment in Cargo.toml): the suite is
 # test-bound, and most of the test time was the debug binary parsing its registry on every spawn.
 profile = "mutants"
+# A hung mutant (a loop counter turned the wrong way) costs this multiple of the baseline test time
+# before it is stopped; the default is 5, which was ~280s locally and more on the runner. Not lower:
+# a legitimate mutant runs the whole suite, slower under -j2, and a spurious timeout reads as caught
+# (the job summaries list every timeout so one that is not a hang gets noticed).
+timeout_multiplier = 2.0
 
 # `gen-fuzz-corpus` is a feature-gated bin. Without the feature `cargo test` never builds it, so
 # every mutant in it would pass untested and read as MISSED.

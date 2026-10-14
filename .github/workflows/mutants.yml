@@ -118,15 +118,11 @@ jobs:
           # is malformed, both harness bugs in "Compute diff" above rather than findings about
           # safe-chains.
           #
-          # No --timeout: cargo-mutants derives one from the measured baseline, so it adapts to
-          # the runner.
-          rc=0
-          cargo mutants --no-shuffle -vV -j2 --in-diff mutants.diff || rc=$?
-          if [ "$rc" -eq 3 ]; then
-            echo "::notice::timeouts counted as caught; see mutants.out/timeout.txt"
-            rc=0
-          fi
-          exit "$rc"
+          # The per-mutant timeout is derived from the measured baseline (multiplier in
+          # .cargo/mutants.toml), so it adapts to the runner. scripts/mutants-run.sh stops
+          # cargo-mutants after a wall-clock budget and decides the verdict from missed.txt, so a
+          # slice full of hangs ends the run early instead of cancelling the job.
+          scripts/mutants-run.sh --no-shuffle -vV -j2 --in-diff mutants.diff
 
       - name: Summarise
         if: always()
@@ -165,6 +161,10 @@ jobs:
                   echo '**Treat this as no coverage, not as a pass.**'
                   exit 0
                 fi
+                if [ "$(cat mutants-run-status.txt 2>/dev/null)" = budget ]; then
+                  echo '**Stopped at the time budget: part of the selection went untested.**'
+                  echo
+                fi
                 for kind in missed caught unviable timeout; do
                   f="mutants.out/$kind.txt"
                   n=0
@@ -182,6 +182,14 @@ jobs:
                   echo 'Three legitimate responses: write a test that fails on it; judge it an'
                   echo '*equivalent* mutant that cannot change behaviour (record why in docs/agents/mutation-testing.md);'
                   echo 'or exclude the code in `.cargo/mutants.toml` with a comment saying why.'
+                fi
+                if [ -s mutants.out/timeout.txt ]; then
+                  echo
+                  echo '### Timed out (counted as caught; a loop-counter flip is expected, anything else may be a slow runner)'
+                  echo
+                  echo '```'
+                  cat mutants.out/timeout.txt
+                  echo '```'
                 fi
                 ;;
             esac
@@ -225,13 +233,7 @@ jobs:
           k=$(( ${{ github.run_number }} % SLICES ))
           echo "$k" > mutants-slice.txt
           echo "Slice $k of $SLICES"
-          rc=0
-          cargo mutants --no-shuffle -vV -j2 --shard "$k/$SLICES" || rc=$?
-          if [ "$rc" -eq 3 ]; then
-            echo "::notice::timeouts counted as caught; see mutants.out/timeout.txt"
-            rc=0
-          fi
-          exit "$rc"
+          MUTANTS_BUDGET_PASSES=1 scripts/mutants-run.sh --no-shuffle -vV -j2 --shard "$k/$SLICES"
 
       - name: Summarise
         if: always()
@@ -245,6 +247,11 @@ jobs:
               echo 'No results directory: the run failed before reporting.'
               echo '**Treat this as no coverage, not as a pass.**'
               exit 0
+            fi
+            if [ "$(cat mutants-run-status.txt 2>/dev/null)" = budget ]; then
+              echo '**Stopped at the time budget: part of this slice went untested.** Hung mutants'
+              echo '(see `timeout`) ran to their timeout. Counts below are those finished.'
+              echo
             fi
             for kind in missed caught unviable timeout; do
               f="mutants.out/$kind.txt"
@@ -262,6 +269,14 @@ jobs:
               echo
               echo 'Old code, not this push: give each a test or an exclusion with its reason,'
               echo 'as for any other miss.'
+            fi
+            if [ -s mutants.out/timeout.txt ]; then
+              echo
+              echo '### Timed out (counted as caught; a loop-counter flip is expected, anything else may be a slow runner)'
+              echo
+              echo '```'
+              cat mutants.out/timeout.txt
+              echo '```'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 

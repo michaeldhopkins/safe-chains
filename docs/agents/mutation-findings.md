@@ -1,0 +1,41 @@
+# Mutation testing: findings of past slices
+
+What each rotating slice found and which tests killed it. Add an entry when you kill a slice's misses. The job, sizing and costs are in `mutation-testing.md`.
+
+- **Findings of the first slices (2026-09-27):** slice 128/256 had 5 MISSED of 20 viable (75%): no
+  test pinned which word `sed -e`/`-l` consume, that a trailing `-l` fails closed, or that an unknown
+  byte in a short cluster fails closed when the script itself is harmless (`sed -Q ./foo` was caught
+  only because `./foo` is an unknown sed command). Four now have
+  `sed_short_flags_consume_exactly_their_own_value`; the fifth is the equivalent one above.
+  `gen-fuzz-corpus` was never built by `cargo test` and had no tests; it now has four, and a run
+  over the file caught 27 of 28 viable (the 28th is the excluded `main`).
+- **CI slice 1/256 (run 36363446362):** 1 MISSED of 17 viable: `!=` to `==` in `facet_breakdown`'s
+  one-segment guard. Nothing called the function directly. Now killed by
+  `facet_breakdown_profiles_a_single_command_and_declines_a_chain` in `tests/facet_breakdown.rs`. Writing it
+  showed that a PIPELINE is one segment to `cst::explain`, so `facet_breakdown("cat x | rm -rf /")`
+  still gets the flat split the guard exists to prevent (a diagnostic only, not a verdict; see
+  TODO.md).
+- **CI slice of run 37348486489 (2026-10-05):** 3 MISSED of 10 viable: `print_docs` emptied,
+  `--explain`'s exit code inverted, and `||` to `&&` in `canonicalize_home`'s no-home guard. Killed
+  by `list_commands_prints_the_command_reference` and `explain_exits_with_the_verdict` in
+  `tests/cli_gate.rs`, and the property `without_a_usable_home_every_word_is_left_alone`.
+- **CI slice of run 37362532620:** 2 MISSED of 9 viable, both in `src/allowlist.rs`: the bare-`~`
+  guard in `canonicalize_home` set to `false`, and `Matcher::is_empty` returning `true` (only ever
+  asserted on empty matchers). Killed by `a_usable_home_expands_both_tilde_spellings` and a
+  non-empty assertion in `parse_exact_pattern` and `parse_legacy_colon_star`. The next slice
+  (run 37365593962) missed `-` to `+` in `glob_matches`; a local run over the whole file then found
+  two more in its middle-piece loop. `a_glob_match_holds_every_piece` and
+  `a_glob_prefix_and_suffix_may_not_overlap` kill all three, and the file now has no survivors.
+- **CI slice of run 37505805989 (2026-10-06):** 3 MISSED of 9 viable: `normalize_redirs` emptied
+  (the roundtrip property renders the normalized form, so a dropped redirect round-trips cleanly),
+  and `*` to `+` in either factor of `ROTATE_AT_BYTES`. Killed by the property
+  `normalizing_keeps_every_redirect` in `src/cst/normalize_tests.rs` and
+  `the_rotation_cap_is_sixteen_mebibytes` in `src/decisionlog/tests.rs`. The next slice (run
+  37508602217) missed `Outcome`'s `Display` returning nothing; `an_outcome_displays_as_its_log_name`
+  kills it. Run 37511064101 missed `rotate_if_large` emptied and `<` to `<=` at the rotation cap;
+  `appending_to_a_full_log_starts_a_fresh_one` (a sparse file at the real cap) and
+  `a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not` kill them. Run 37511608360
+  missed `unix_millis` returning 0 or 1; `the_clock_reads_the_current_time_in_milliseconds` kills
+  both. Run 37515672271 missed `-` to `+` or `/` in `civil_from_days`'s negative-era branch;
+  `civil_from_days_handles_dates_before_year_zero` kills both. Five slices in a row landed in `src/decisionlog.rs`: a whole-file local run over it
+  (128 mutants) is owed, in `TODO.md`.
