@@ -25,7 +25,6 @@ owed = [
   "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/ruby/bundle.rs",
-  "src/handlers/system/ssh.rs",
   "src/registry/docs.rs",
 ]
 
@@ -262,7 +261,10 @@ owed = [
   "convert_help_or_h_in_two_token_slice_is_inert",
   "convert_reordering_dash_r_and_dash_s_preserves_the_verdict",
 ]
-"src/handlers/system/ssh.rs" = []
+"src/handlers/system/ssh.rs" = [
+  "a_file_named_to_the_auth_probe_is_refused_in_every_spelling",
+  "naming_no_file_keeps_the_auth_probe_approved_in_every_spelling",
+]
 "src/handlers/system/sysctl.rs" = [
   "sysctl_with_equals_in_any_tail_token_is_denied",
   "sysctl_without_equals_falls_through_to_fallback_grammar",

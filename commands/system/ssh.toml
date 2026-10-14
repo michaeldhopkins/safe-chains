@@ -1,6 +1,6 @@
 [[command]]
 name = "ssh"
-description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections. Coverage is restricted to two patterns: (1) read-only inspection flags that perform no network I/O -- -V (version), -G (print resolved ssh_config and exit), -Q (query supported algorithms); (2) the auth-probe pattern `ssh -T -o BatchMode=yes <host>` which opens a TCP connection only to test whether authentication succeeds and exits with no remote command executed, no PTY allocated, and no interactive prompts. Additional connection-shaping flags (-l, -p, -i, -F, -4, -6, -q, -v) and extra -o KEY=VALUE pairs are accepted in the probe form, but -o values that enable forwarding, tunneling, X11, agent forwarding, proxy commands, or local-command execution are rejected so they can't be smuggled in via -o."
+description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections. Coverage is restricted to two patterns: (1) read-only inspection flags that perform no network I/O -- -V (version), -G (print resolved ssh_config and exit), -Q (query supported algorithms); (2) the auth-probe pattern `ssh -T -o BatchMode=yes <host>` which opens a TCP connection only to test whether authentication succeeds and exits with no remote command executed, no PTY allocated, and no interactive prompts. Additional connection-shaping flags (-l, -p, -i, -4, -6, -q, -v, and -F naming no file) and extra -o KEY=VALUE pairs are accepted in the probe form, but -o values that enable forwarding, tunneling, X11, agent forwarding, proxy commands, or local-command execution are rejected so they can't be smuggled in via -o. A config file named with -F can change how the connection is made, and UserKnownHostsFile writes to the path it names; the probe form takes either only when it names no file."
 url = "https://man.openbsd.org/ssh"
 researched_version = "OpenSSH ~10.x (man page authoritative as of 2026-05)"
 handler = "ssh"
@@ -9,7 +9,7 @@ doc_body = """
   - `ssh -V` — print version, no network
   - `ssh -G [host]` — print resolved ssh_config and exit, no network
   - `ssh -Q <query>` — list locally compiled-in algorithms, no network
-  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-F/-4/-6/-q/-v.
+  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-4/-6/-q/-v, and -F /dev/null.
 """
 
 [command.fallback]

@@ -4,7 +4,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 /// Recognises the auth-probe pattern: `ssh -T -o BatchMode=yes <host>`
 /// plus a small set of harmless connection-shaping flags (-l, -p, -i,
-/// -F, -4, -6, -q, -v). The probe opens a TCP connection and exchanges
+/// -F /dev/null, -4, -6, -q, -v). The probe opens a TCP connection and exchanges
 /// auth packets, but with -T (no PTY), BatchMode=yes (no interactive
 /// prompts), and no remote command, nothing is executed on the remote
 /// host -- it succeeds or fails depending on whether auth works, then
@@ -57,11 +57,15 @@ fn is_auth_probe(tokens: &[Token]) -> bool {
                         ci = chars.len();
                     }
                     'l' | 'p' | 'i' | 'F' => {
-                        if ci + 1 < chars.len() {
-                            // value attached to the flag chain: -p22, -iFILE, etc.
-                        } else if tokens.get(i + 1).is_some() {
+                        let value: String = if ci + 1 < chars.len() {
+                            chars[ci + 1..].iter().collect()
+                        } else if let Some(next) = tokens.get(i + 1) {
                             i += 1;
+                            next.as_str().to_string()
                         } else {
+                            return false;
+                        };
+                        if c == 'F' && !names_no_file(&value) {
                             return false;
                         }
                         ci = chars.len();
@@ -94,11 +98,22 @@ const SAFE_O_KEYS: &[&str] = &[
     "tcpkeepalive", "user", "userknownhostsfile", "verifyhostkeydns", "visualhostkey",
 ];
 
+fn names_no_file(value: &str) -> bool {
+    value == "/dev/null" || value.eq_ignore_ascii_case("none")
+}
+
 fn check_o_option(option: &str, has_batchmode: &mut bool) -> bool {
     let lower = option.to_ascii_lowercase();
-    let key = lower.split(['=', ' ']).next().unwrap_or("");
+    let key = lower.split(['=', ' ', '\t']).next().unwrap_or("");
     if SAFE_O_KEYS.binary_search(&key).is_err() {
         return false;
+    }
+    if key == "userknownhostsfile" {
+        let value = option[key.len()..].trim_start_matches([' ', '\t']);
+        let value = value.strip_prefix('=').unwrap_or(value).trim_matches([' ', '\t']);
+        if !names_no_file(value) {
+            return false;
+        }
     }
     if lower == "batchmode=yes" || lower == "batchmode=true" {
         *has_batchmode = true;
@@ -150,7 +165,8 @@ mod tests {
         probe_with_port: "ssh -T -o BatchMode=yes -p 2222 git@example.com",
         probe_with_identity: "ssh -T -o BatchMode=yes -i ~/.ssh/id_ed25519 git@example.com",
         probe_with_login: "ssh -T -o BatchMode=yes -l git github.com",
-        probe_with_config: "ssh -T -o BatchMode=yes -F /tmp/sshconf git@example.com",
+        probe_with_no_config: "ssh -T -o BatchMode=yes -F /dev/null git@example.com",
+        probe_with_config_none: "ssh -T -o BatchMode=yes -F none git@example.com",
         probe_v4: "ssh -4 -T -o BatchMode=yes git@github.com",
         probe_quiet: "ssh -q -T -o BatchMode=yes git@github.com",
         probe_case_insensitive: "ssh -T -o batchmode=YES git@github.com",
@@ -174,7 +190,8 @@ mod tests {
 
         // Safe -o options on the allowlist
         probe_o_stricthostkey: "ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no git@example.com",
-        probe_o_user_known_hosts: "ssh -T -o BatchMode=yes -o UserKnownHostsFile=/tmp/kh github.com",
+        probe_o_user_known_hosts_dev_null: "ssh -T -o BatchMode=yes -o UserKnownHostsFile=/dev/null github.com",
+        probe_o_user_known_hosts_none: "ssh -T -o BatchMode=yes -o UserKnownHostsFile=none github.com",
         probe_o_log_level: "ssh -T -o BatchMode=yes -o LogLevel=ERROR github.com",
         probe_o_server_alive: "ssh -T -o BatchMode=yes -o ServerAliveInterval=60 github.com",
         probe_o_preferred_auth: "ssh -T -o BatchMode=yes -o PreferredAuthentications=publickey github.com",
@@ -214,6 +231,14 @@ mod tests {
         probe_o_match: "ssh -T -o BatchMode=yes -o Match=all user@example.com",
         probe_o_permitlocalcommand: "ssh -T -o BatchMode=yes -o PermitLocalCommand=yes user@example.com",
         probe_o_no_space_unsafe: "ssh -T -oProxyCommand=evil -o BatchMode=yes user@example.com",
+        probe_with_config_file: "ssh -T -o BatchMode=yes -F /tmp/sshconf git@example.com",
+        probe_with_worktree_config: "ssh -T -o BatchMode=yes -F ./cfg git@example.com",
+        probe_with_glued_config: "ssh -T -o BatchMode=yes -F./cfg git@example.com",
+        probe_with_clustered_config: "ssh -TF ./cfg -o BatchMode=yes git@example.com",
+        probe_o_user_known_hosts_file: "ssh -T -o BatchMode=yes -o UserKnownHostsFile=/tmp/kh github.com",
+        probe_o_user_known_hosts_space: "ssh -T -o BatchMode=yes -o 'UserKnownHostsFile /etc/cron.d/x' github.com",
+        probe_o_user_known_hosts_glued: "ssh -T -o BatchMode=yes -oUserKnownHostsFile=/etc/cron.d/x github.com",
+        probe_o_user_known_hosts_second_file: "ssh -T -o BatchMode=yes -o 'UserKnownHostsFile=/dev/null /etc/x' github.com",
 
         probe_no_host: "ssh -T -o BatchMode=yes",
         probe_two_hosts: "ssh -T -o BatchMode=yes user@a user@b",
@@ -235,5 +260,45 @@ mod tests {
     #[test]
     fn combined_short_returns_inert() {
         assert_eq!(verdict("ssh -Tq -o BatchMode=yes git@github.com"), Verdict::Allowed(SafetyLevel::Inert),);
+    }
+}
+
+#[cfg(test)]
+mod property_tests {
+    use proptest::prelude::*;
+
+    use crate::is_safe_command;
+
+    fn spellings(flag_form: usize, value: &str) -> String {
+        match flag_form {
+            0 => format!("-F {value}"),
+            1 => format!("-F{value}"),
+            2 => format!("-o UserKnownHostsFile={value}"),
+            3 => format!("-oUserKnownHostsFile={value}"),
+            _ => format!("-o 'UserKnownHostsFile {value}'"),
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn a_file_named_to_the_auth_probe_is_refused_in_every_spelling(
+            flag_form in 0usize..5,
+            value in "(\\./|/tmp/|/etc/|~/)?[a-z][a-z0-9_.]{0,10}",
+            host in "[a-z]{1,8}\\.com",
+        ) {
+            prop_assume!(!value.eq_ignore_ascii_case("none"));
+            let cmd = format!("ssh -T -o BatchMode=yes {} {host}", spellings(flag_form, &value));
+            prop_assert!(!is_safe_command(&cmd), "{cmd}");
+        }
+
+        #[test]
+        fn naming_no_file_keeps_the_auth_probe_approved_in_every_spelling(
+            flag_form in 0usize..5,
+            value in prop::sample::select(vec!["/dev/null", "none", "NONE"]),
+            host in "[a-z]{1,8}\\.com",
+        ) {
+            let cmd = format!("ssh -T -o BatchMode=yes {} {host}", spellings(flag_form, value));
+            prop_assert!(is_safe_command(&cmd), "{cmd}");
+        }
     }
 }
