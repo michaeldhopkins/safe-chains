@@ -2753,6 +2753,7 @@ bzcat x	safe-write
 bzcmp	denied
 bzcmp --help	denied
 bzcmp --version	denied
+bzcmp ./a.bz2 ./b.bz2	inert
 bzcmp a.bz2 b.bz2	inert
 bzcmp x	inert
 bzdiff	denied
@@ -2770,7 +2771,9 @@ bzfgrep x	inert
 bzgrep	denied
 bzgrep --help	denied
 bzgrep --version	denied
+bzgrep TODO ./log.bz2	inert
 bzgrep x	inert
+bzgrep x ~/.ssh/id_rsa	denied
 bzip2	safe-write
 bzip2 --compress	safe-write
 bzip2 --compress --decompress	safe-write
@@ -2860,4 +2863,5 @@ bzless x	inert
 bzmore	inert
 bzmore --help	denied
 bzmore --version	denied
+bzmore ./a.bz2	inert
 bzmore x	inert

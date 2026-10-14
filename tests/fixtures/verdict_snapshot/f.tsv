@@ -2831,6 +2831,7 @@ fsi x	denied
 funzip	inert
 funzip --help	denied
 funzip --version	denied
+funzip ./out.zip	inert
 funzip archive.zip	inert
 funzip x	inert
 fuser	denied
@@ -2856,18 +2857,49 @@ fx -s	inert
 fx x	inert
 fzf	inert
 fzf --ansi	inert
+fzf --bind 'ctrl-/:toggle-wrap'	inert
+fzf --bind 'ctrl-a:+accept'	inert
+fzf --bind 'ctrl-a:accept,ctrl-x:execute~whoami~'	denied
+fzf --bind 'ctrl-a:change-prompt(New> )'	inert
+fzf --bind 'ctrl-a:change-prompt:x> '	inert
+fzf --bind 'ctrl-a:change-prompt[(x)> ]'	inert
 fzf --bind 'ctrl-a:select-all+accept,ctrl-j:toggle'	inert
+fzf --bind 'ctrl-a:select-all+execute:whoami'	denied
+fzf --bind 'ctrl-d:delete-char/eof'	inert
+fzf --bind 'ctrl-g:pos(1)+unbind(ctrl-g)'	inert
 fzf --bind 'ctrl-j:down,ctrl-k:up'	inert
+fzf --bind 'ctrl-l:change-preview-label(x)'	inert
 fzf --bind 'ctrl-o:execute(vim {})'	denied
+fzf --bind 'ctrl-p:change-preview:cat {}'	denied
+fzf --bind 'ctrl-p:change-preview[cat {}]'	denied
 fzf --bind 'ctrl-p:preview(cat {})'	denied
+fzf --bind 'ctrl-p:preview[cat {}]'	denied
 fzf --bind 'ctrl-r:reload(find .)'	denied
+fzf --bind 'ctrl-t:bg-transform[whoami]'	denied
 fzf --bind 'ctrl-t:transform(echo toggle)'	denied
+fzf --bind 'ctrl-t:transform-query:whoami'	denied
+fzf --bind 'ctrl-x:EXECUTE:whoami'	denied
+fzf --bind 'ctrl-x:accept(x)'	denied
+fzf --bind 'ctrl-x:change-prompt(x'	denied
+fzf --bind 'ctrl-x:execute[whoami]'	denied
+fzf --bind 'ctrl-x:execute{whoami}'	denied
+fzf --bind 'ctrl-x:execute|whoami|'	denied
 fzf --bind 'ctrl-y:execute-silent(echo {} | pbcopy)'	denied
 fzf --bind 'enter:become(vim {})'	denied
+fzf --bind 'load:reload-sync[ls]'	denied
+fzf --bind 'shift-down:preview-down,shift-up:preview-up'	inert
+fzf --bind 'start:toggle-preview'	inert
+fzf --bind 'tab:toggle+down,btab:toggle+up'	inert
 fzf --bind ctrl-c:abort	inert
 fzf --bind ctrl-j:accept	inert
+fzf --bind ctrl-x:become:whoami	denied
+fzf --bind ctrl-x:execute:whoami	denied
+fzf --bind ctrl-x:frobnicate	denied
+fzf --bind ctrl-x:reload:whoami	denied
+fzf --bind start:execute-silent:whoami	denied
 fzf --bind=ctrl-j:accept	inert
 fzf --bind=ctrl-o:execute(vim {})	denied
+fzf --bind=ctrl-x:execute:whoami	denied
 fzf --border	inert
 fzf --color=dark	inert
 fzf --exact	inert

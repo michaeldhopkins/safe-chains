@@ -1395,6 +1395,7 @@ xzcmp --help	inert
 xzcmp --help --version	inert
 xzcmp --help x	inert
 xzcmp --version	inert
+xzcmp ./a.xz ./b.xz	inert
 xzcmp x	inert
 xzdec	inert
 xzdec --decompress	inert
@@ -1415,6 +1416,7 @@ xzdec -d	inert
 xzdec -h	inert
 xzdec -k	inert
 xzdec -q	inert
+xzdec ./a.xz	inert
 xzdec x	inert
 xzdiff	denied
 xzdiff --help	inert
@@ -1433,10 +1435,13 @@ xzfgrep x	inert
 xzgrep	denied
 xzgrep --help	denied
 xzgrep --version	denied
+xzgrep TODO ./log.xz	inert
 xzgrep x	inert
+xzgrep x ~/.ssh/id_rsa	denied
 xzless	inert
 xzless --help	denied
 xzless --version	denied
+xzless ./a.xz	inert
 xzless x	inert
 xzmore	inert
 xzmore --help	denied

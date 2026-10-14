@@ -1943,6 +1943,7 @@ mkbom --version	denied
 mkbom -h	safe-write
 mkbom -i x	safe-write
 mkbom -s	safe-write
+mkbom ./dir ./a.bom	safe-write
 mkbom x	safe-write
 mkcert	safe-write
 mkcert --CAROOT	safe-write
@@ -2067,6 +2068,7 @@ mkfile -n	safe-write
 mkfile -n -v	safe-write
 mkfile -n x	safe-write
 mkfile -v	safe-write
+mkfile 1m ./big.bin	safe-write
 mkfile x	safe-write
 mktemp	safe-write
 mktemp --directory	safe-write

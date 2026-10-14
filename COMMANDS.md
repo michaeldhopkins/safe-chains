@@ -2407,12 +2407,20 @@ Aliases: `bzdiff`
 
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `bzcmp ./a.bz2 ./b.bz2`
+
 ### `bzgrep`
 <p class="cmd-url"><a href="https://sourceware.org/bzip2/">https://sourceware.org/bzip2/</a></p>
 
 Aliases: `bzegrep`, `bzfgrep`
 
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `bzgrep TODO ./log.bz2`
 
 ### `bzip2`
 <p class="cmd-url"><a href="https://sourceware.org/bzip2/">https://sourceware.org/bzip2/</a></p>
@@ -2429,6 +2437,10 @@ Aliases: `bzless`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `bzmore ./a.bz2`
 
 ### `c8`
 <p class="cmd-url"><a href="https://github.com/bcoe/c8">https://github.com/bcoe/c8</a></p>
@@ -4240,6 +4252,10 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 
 - Allowed standalone flags: --keep=mostrecent, --keep=dotbar, --keep=native, -f, -h, -m, -n, -s, -v
 
+**Examples:**
+
+- `dot_clean ./dir`
+
 ### `dotenv`
 <p class="cmd-url"><a href="https://github.com/bkeepers/dotenv">https://github.com/bkeepers/dotenv</a></p>
 
@@ -5291,6 +5307,10 @@ Aliases: `gfold`
 - Allowed valued flags: -E, -R, -S, -f, -t
 - Bare invocation allowed
 
+**Examples:**
+
+- `fs_usage`
+
 ### `fsi`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/fsharp/tools/fsharp-interactive/">https://learn.microsoft.com/en-us/dotnet/fsharp/tools/fsharp-interactive/</a></p>
 
@@ -5303,6 +5323,10 @@ Aliases: `dotnet-fsi`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `funzip ./out.zip`
 
 ### `fuser`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/fuser.1.html">https://man7.org/linux/man-pages/man1/fuser.1.html</a></p>
@@ -5784,6 +5808,10 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed valued flags: -a
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `GetFileInfo ./a.txt`
+
 ### `geth`
 <p class="cmd-url"><a href="https://geth.ethereum.org/docs/fundamentals/command-line-options">https://geth.ethereum.org/docs/fundamentals/command-line-options</a></p>
 
@@ -5925,7 +5953,7 @@ Aliases: `g++`, `cc`, `c++`
 - **diff-tree**: Flags: --cc, --combined-all-paths, --find-copies-harder, --full-index, --help, --ignore-all-space, --ignore-space-at-eol, --ignore-space-change, --merge-base, --minimal, --name-only, --name-status, --no-commit-id, --no-ext-diff, --no-patch, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --pickaxe-all, --raw, --root, --shortstat, --stat, --stdin, --summary, --text, -B, -C, -M, -R, -a, -c, -h, -m, -p, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --diff-algorithm, --diff-filter, --pretty, -O, -S
 - **fetch**: Flags: --all, --append, --atomic, --dry-run, --force, --help, --ipv4, --ipv6, --keep, --multiple, --negotiate-only, --no-auto-gc, --no-auto-maintenance, --no-show-forced-updates, --no-tags, --no-write-fetch-head, --porcelain, --prefetch, --progress, --prune, --prune-tags, --quiet, --refetch, --set-upstream, --show-forced-updates, --stdin, --tags, --unshallow, --update-head-ok, --update-shallow, --verbose, --write-commit-graph, --write-fetch-head, -4, -6, -P, -a, -f, -h, -k, -m, -n, -p, -q, -t, -u, -v. Valued: --deepen, --depth, --filter, --jobs, --negotiation-tip, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, -j, -o
 - **for-each-ref**: Flags: --help, --ignore-case, --include-root-refs, --omit-empty, --perl, --python, --shell, --stdin, --tcl, -h, -p, -s. Valued: --color, --contains, --count, --exclude, --format, --merged, --no-contains, --no-merged, --points-at, --sort
-- **grep**: Flags: --all-match, --and, --basic-regexp, --break, --cached, --column, --count, --exclude-standard, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --full-name, --function-context, --heading, --help, --ignore-case, --index, --invert-match, --line-number, --name-only, --no-color, --no-index, --null, --only-matching, --perl-regexp, --quiet, --recurse-submodules, --recursive, --show-function, --text, --textconv, --untracked, --word-regexp, -E, -F, -G, -H, -I, -L, -P, -W, -a, -c, -h, -i, -l, -n, -o, -p, -q, -r, -v, -w, -z. Valued: --after-context, --before-context, --color, --context, --max-count, --max-depth, --open-files-in-pager, --threads, -A, -B, -C, -O, -e, -f, -m
+- **grep**: Flags: --all-match, --and, --basic-regexp, --break, --cached, --column, --count, --exclude-standard, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --full-name, --function-context, --heading, --help, --ignore-case, --index, --invert-match, --line-number, --name-only, --no-color, --no-index, --null, --only-matching, --perl-regexp, --quiet, --recurse-submodules, --recursive, --show-function, --text, --textconv, --untracked, --word-regexp, -E, -F, -G, -H, -I, -L, -P, -W, -a, -c, -h, -i, -l, -n, -o, -p, -q, -r, -v, -w, -z. Valued: --after-context, --before-context, --color, --context, --max-count, --max-depth, --threads, -A, -B, -C, -e, -f, -m
 - **help**: Positional args accepted
 - **log**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -s, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -G, -L, -S, -n
 - **ls-files**: Flags: --cached, --debug, --deduplicate, --deleted, --directory, --empty-directory, --eol, --error-unmatch, --exclude-standard, --full-name, --help, --ignored, --killed, --modified, --no-empty-directory, --others, --recurse-submodules, --resolve-undo, --sparse, --stage, --unmerged, -c, -d, -f, -h, -i, -k, -m, -o, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --exclude, --exclude-from, --exclude-per-directory, --format, --with-tree, -X, -x
@@ -8760,6 +8788,11 @@ Aliases: `glogname`
 - Allowed standalone flags: --alphanum, --ignore-case, -d, -f
 - Allowed valued flags: --terminate, -t
 
+**Examples:**
+
+- `look abc`
+- `look abc ./words`
+
 ### `lorder`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lorder.1.html">https://keith.github.io/xcode-man-pages/lorder.1.html</a></p>
 
@@ -8853,6 +8886,10 @@ Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
 - Allowed standalone flags: --help, -b, -c, -d, -f, -h, -l, -m, -s, -x
 - Allowed valued flags: --arch, -p
 
+**Examples:**
+
+- `lsbom ./a.bom`
+
 ### `lskq`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lskq.1.html">https://keith.github.io/xcode-man-pages/lskq.1.html</a></p>
 
@@ -8926,6 +8963,10 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 
 - Allowed standalone flags: --help, --version
 - Bare invocation allowed
+
+**Examples:**
+
+- `lzmainfo ./a.lzma`
 
 ### `m`
 <p class="cmd-url"><a href="https://github.com/qrush/m">https://github.com/qrush/m</a></p>
@@ -9295,6 +9336,10 @@ Aliases: `gmd5sum`
 - Allowed standalone flags: --help, -h, -s
 - Allowed valued flags: -i
 
+**Examples:**
+
+- `mkbom ./dir ./a.bom`
+
 ### `mkcert`
 <p class="cmd-url"><a href="https://github.com/FiloSottile/mkcert">https://github.com/FiloSottile/mkcert</a></p>
 
@@ -9332,6 +9377,10 @@ Aliases: `gmkfifo`
 <p class="cmd-url"><a href="https://ss64.com/mac/mkfile.html">https://ss64.com/mac/mkfile.html</a></p>
 
 - Allowed standalone flags: -n, -v
+
+**Examples:**
+
+- `mkfile 1m ./big.bin`
 
 ### `mktemp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation</a></p>
@@ -11047,6 +11096,11 @@ Aliases: `pcregrep`
 - Allowed standalone flags: --allow-lookaround-bsk, --file-offsets, --help, --line-buffered, --line-offsets, --no-group-separator, --no-jit, --posix-digit, --posix-pattern-file, --text, --count, --case-restrict, --fixed-strings, --with-filename, --no-filename, --ignore-case, --files-with-matches, --files-without-match, --multiline, --line-number, --no-ucp, --quiet, --recursive, --no-messages, --total-count, --utf, --utf-allow-invalid, --version, --invert-match, --word-regex, --word-regexp, --line-regex, --line-regexp, --null, -E, -F, -H, -I, -L, -M, -P, -U, -V, -Z, -a, -c, -h, -i, -l, -n, -q, -r, -s, -t, -u, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --binary-files, --buffer-size, --color, --colour, --context, --depth-limit, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --file-list, --group-separator, --heap-limit, --include, --include-dir, --include-from, --label, --locale, --match-limit, --max-buffer-size, --max-count, --newline, --om-capture, --om-separator, --only-matching, --output, --recursion-limit, --regex, --regexp, -A, -B, -C, -D, -N, -O, -d, -e, -f, -m, -o
 
+**Examples:**
+
+- `pcre2grep TODO ./src/main.rs`
+- `pcre2grep -r TODO ./src`
+
 ### `pcre2test`
 <p class="cmd-url"><a href="https://www.pcre.org/current/doc/html/pcre2test.html">https://www.pcre.org/current/doc/html/pcre2test.html</a></p>
 
@@ -11106,6 +11160,10 @@ Aliases: `pcretest`
 
 - Allowed standalone flags: --cache, --debug, --help, --unac, --version, --warn-empty, -F, -H, -L, -P, -R, -V, -Z, -c, -h, -i, -l, -n, -o, -p, -q, -r
 - Allowed valued flags: --after-context, --before-context, --color, --context, --exclude, --file, --include, --match-prefix-separator, --max-count, --page-range, --password, --regexp, -A, -B, -C, -e, -f, -m
+
+**Examples:**
+
+- `pdfgrep needle ./report.pdf`
 
 ### `pdfimages`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html</a></p>
@@ -14415,7 +14473,7 @@ Aliases: `gsort`
   - `ssh -V` — print version, no network
   - `ssh -G [host]` — print resolved ssh_config and exit, no network
   - `ssh -Q <query>` — list locally compiled-in algorithms, no network
-  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-F/-4/-6/-q/-v.
+  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-4/-6/-q/-v, and -F /dev/null.
 
 
 - **Without a subcommand:**
@@ -14607,6 +14665,10 @@ Aliases: `gstat`
 - Allowed valued flags: -member-name, -method, -zipfile
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `streamzip`
 
 ### `stree`
 <p class="cmd-url"><a href="https://github.com/ruby-syntax-tree/syntax_tree">https://github.com/ruby-syntax-tree/syntax_tree</a></p>
@@ -15999,6 +16061,10 @@ Aliases: `guniq`
 - Allowed standalone flags: -H, -e, -h, -m
 - Bare invocation allowed
 
+**Examples:**
+
+- `unvis ./notes.txt`
+
 ### `unwinddump`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/unwinddump.1.html">https://keith.github.io/xcode-man-pages/unwinddump.1.html</a></p>
 
@@ -16023,6 +16089,10 @@ Aliases: `guniq`
 - Allowed valued flags: -d, -x
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `unzipsfx ./out.exe`
 
 ### `uptime`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation</a></p>
@@ -16265,6 +16335,10 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 - Allowed valued flags: -F, -e
 - Bare invocation allowed
 
+**Examples:**
+
+- `vis ./notes.txt`
+
 ### `vite`
 <p class="cmd-url"><a href="https://vite.dev/">https://vite.dev/</a></p>
 
@@ -16379,6 +16453,10 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 <p class="cmd-url"><a href="https://ss64.com/mac/wait4path.html">https://ss64.com/mac/wait4path.html</a></p>
 
 - Positional arguments only
+
+**Examples:**
+
+- `wait4path ./a.txt`
 
 ### `wandb`
 <p class="cmd-url"><a href="https://docs.wandb.ai/ref/cli/">https://docs.wandb.ai/ref/cli/</a></p>
@@ -17004,6 +17082,10 @@ Aliases: `xzdiff`, `lzcmp`, `lzdiff`
 - Allowed standalone flags: --help, --version
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `xzcmp ./a.xz ./b.xz`
+
 ### `xzdec`
 <p class="cmd-url"><a href="https://tukaani.org/xz/">https://tukaani.org/xz/</a></p>
 
@@ -17012,12 +17094,20 @@ Aliases: `lzmadec`
 - Allowed standalone flags: --decompress, --help, --keep, --no-warn, --quiet, --stdout, --to-stdout, --uncompress, --version, -Q, -V, -c, -d, -h, -k, -q
 - Bare invocation allowed
 
+**Examples:**
+
+- `xzdec ./a.xz`
+
 ### `xzgrep`
 <p class="cmd-url"><a href="https://tukaani.org/xz/">https://tukaani.org/xz/</a></p>
 
 Aliases: `xzegrep`, `xzfgrep`, `lzgrep`, `lzegrep`, `lzfgrep`
 
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `xzgrep TODO ./log.xz`
 
 ### `xzless`
 <p class="cmd-url"><a href="https://tukaani.org/xz/">https://tukaani.org/xz/</a></p>
@@ -17026,6 +17116,10 @@ Aliases: `xzmore`, `lzless`, `lzmore`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `xzless ./a.xz`
 
 ### `yacc`
 <p class="cmd-url"><a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/yacc.html">https://pubs.opengroup.org/onlinepubs/9699919799/utilities/yacc.html</a></p>
@@ -17206,6 +17300,11 @@ Aliases: `zegrep`, `zfgrep`
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
 
+**Examples:**
+
+- `zgrep TODO ./log.gz`
+- `zgrep -e TODO ./log.gz`
+
 ### `zig`
 <p class="cmd-url"><a href="https://ziglang.org/documentation/">https://ziglang.org/documentation/</a></p>
 
@@ -17218,6 +17317,10 @@ Aliases: `zegrep`, `zfgrep`
 - Allowed valued flags: --compression-method, --password, --temp-path, -O, -P, -Z, -b, -n, -s, -t, -tt
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `zip -r ./out.zip ./src`
+
 ### `zipalign`
 <p class="cmd-url"><a href="https://developer.android.com/tools/zipalign">https://developer.android.com/tools/zipalign</a></p>
 
@@ -17229,20 +17332,36 @@ Aliases: `zegrep`, `zfgrep`
 - Allowed standalone flags: --decrypt, --help, --license, --quiet, --version, -L, -b, -d, -h, -q, -v
 - Allowed valued flags: --output-file, --temp-path, -O
 
+**Examples:**
+
+- `zipcloak ./out.zip`
+
 ### `zipcmp`
 <p class="cmd-url"><a href="https://libzip.org/">https://libzip.org/</a></p>
 
 - Allowed standalone flags: -C, -T, -V, -h, -i, -p, -q, -s, -t, -v
+
+**Examples:**
+
+- `zipcmp ./a.zip ./b.zip`
 
 ### `zipdetails`
 <p class="cmd-url"><a href="https://perldoc.perl.org/zipdetails">https://perldoc.perl.org/zipdetails</a></p>
 
 - Allowed standalone flags: --scan, --version, -h, -v
 
+**Examples:**
+
+- `zipdetails ./out.zip`
+
 ### `zipgrep`
 <p class="cmd-url"><a href="https://infozip.sourceforge.net/">https://infozip.sourceforge.net/</a></p>
 
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `zipgrep TODO ./bundle.zip`
 
 ### `zipinfo`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/zipinfo">https://linux.die.net/man/1/zipinfo</a></p>
@@ -17254,10 +17373,18 @@ Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: -D, -I, -S, -V, -h, -i, -k, -s
 
+**Examples:**
+
+- `zipmerge ./all.zip ./a.zip ./b.zip`
+
 ### `zipnote`
 <p class="cmd-url"><a href="https://infozip.sourceforge.net/">https://infozip.sourceforge.net/</a></p>
 
 - Allowed standalone flags: --help, --license, --version, -L, -b, -h, -v, -w
+
+**Examples:**
+
+- `zipnote ./out.zip`
 
 ### `zipsplit`
 <p class="cmd-url"><a href="https://infozip.sourceforge.net/">https://infozip.sourceforge.net/</a></p>
@@ -17265,12 +17392,20 @@ Aliases: `zegrep`, `zfgrep`
 - Allowed standalone flags: --help, --license, --version, -L, -h, -i, -p, -s, -t, -v
 - Allowed valued flags: -b, -n, -r
 
+**Examples:**
+
+- `zipsplit -n 100000 ./out.zip`
+
 ### `ziptool`
 <p class="cmd-url"><a href="https://libzip.org/">https://libzip.org/</a></p>
 
 - Allowed standalone flags: -c, -e, -g, -h, -n, -r, -s, -t
 - Allowed valued flags: -l, -o
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `ziptool ./out.zip stat 0`
 
 ### `zless`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gzip/">https://www.gnu.org/software/gzip/</a></p>
@@ -17335,9 +17470,17 @@ Aliases: `unzstd`, `zstdcat`, `zstdmt`
 
 - Hyphen-prefixed positional arguments accepted
 
+**Examples:**
+
+- `zstdgrep TODO ./log.zst`
+
 ### `zstdless`
 <p class="cmd-url"><a href="https://github.com/facebook/zstd">https://github.com/facebook/zstd</a></p>
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `zstdless ./a.zst`
 

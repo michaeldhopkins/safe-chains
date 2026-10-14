@@ -11,6 +11,7 @@ GetFileInfo -c	inert
 GetFileInfo -d	inert
 GetFileInfo -m	inert
 GetFileInfo -t	inert
+GetFileInfo ./a.txt	inert
 GetFileInfo x	inert
 g++	denied
 g++ --help	inert
@@ -7580,7 +7581,7 @@ git grep --no-color	inert
 git grep --no-index	inert
 git grep --null	inert
 git grep --only-matching	inert
-git grep --open-files-in-pager x	inert
+git grep --open-files-in-pager=touch pat	denied
 git grep --perl-regexp	inert
 git grep --quiet	inert
 git grep --recurse-submodules	inert
@@ -7600,7 +7601,8 @@ git grep -G	inert
 git grep -H	inert
 git grep -I	inert
 git grep -L	inert
-git grep -O x	inert
+git grep -O touch pat	denied
+git grep -Otouch pat	denied
 git grep -P	inert
 git grep -W	inert
 git grep -a	inert
@@ -13578,6 +13580,8 @@ grep '--some-pattern' file.txt	safe-read
 grep -- '-->' file.txt	safe-read
 grep --color=always pattern file.txt	safe-read
 grep --help	denied
+grep --regex x ~/.ssh/id_rsa	denied
+grep --regexp=TODO -r src	safe-read
 grep --regexp=pattern file.txt	safe-read
 grep --version	denied
 grep -A 3 -B 2 error log.txt	safe-read
@@ -13589,6 +13593,7 @@ grep -c error log.txt	safe-read
 grep -e foo -e bar file.txt	safe-read
 grep -e pattern file.txt	safe-read
 grep -f /etc/shadow foo ./file.txt	denied
+grep -f pats ~/.ssh/id_rsa	denied
 grep -f patterns.txt file.txt	safe-read
 grep -i -r -n '-->' src/	safe-read
 grep -i Error ./log.txt	safe-read

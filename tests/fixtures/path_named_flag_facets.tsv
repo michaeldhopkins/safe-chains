@@ -352,7 +352,6 @@ git cat-file	--path	untriaged	-	-	-
 git commit	--file	untriaged	-	-	-	
 git describe	--dirty	untriaged	-	-	-	
 git diff	--dirstat	not-a-path	-	-	-	Takes dirstat PARAMETERS (changes,lines,files,cumulative,<limit>), not a path — a false positive of the "dir" name test. The positional gate on `git diff` marks it `ignore` for the same reason.
-git grep	--open-files-in-pager	untriaged	-	-	-	
 git ls-files	--exclude-per-directory	untriaged	-	-	-	
 git rev-parse	--resolve-git-dir	untriaged	-	-	-	
 git status	--untracked-files	untriaged	-	-	-	
@@ -608,10 +607,8 @@ parcel watch	--dist-dir	untriaged	-	-	-
 pcre2grep	--binary-files	untriaged	-	-	-	
 pcre2grep	--directories	untriaged	-	-	-	
 pcre2grep	--exclude-dir	untriaged	-	-	-	
-pcre2grep	--file	untriaged	-	-	-	
 pcre2grep	--file-list	untriaged	-	-	-	
 pcre2grep	--include-dir	untriaged	-	-	-	
-pdfgrep	--file	untriaged	-	-	-	
 pdflatex	--output-directory	untriaged	-	-	-	
 pdflatex	--translate-file	untriaged	-	-	-	
 periphery scan	--index-store-path	untriaged	-	-	-	
@@ -696,7 +693,6 @@ restic snapshots	--path	untriaged	-	-	-
 restic stats	--path	untriaged	-	-	-	
 revive	--max_open_files	untriaged	-	-	-	
 revive	-max_open_files	untriaged	-	-	-	
-rg	--file	untriaged	-	-	-	
 rg	--ignore-file	untriaged	-	-	-	
 rg	--max-filesize	untriaged	-	-	-	
 rg	--path-separator	untriaged	-	-	-	
@@ -987,5 +983,4 @@ ytt	--data-value-file	untriaged	-	-	-
 ytt	--data-values-file	untriaged	-	-	-	
 ytt	--file-mark	untriaged	-	-	-	
 ytt	--ignored-paths	untriaged	-	-	-	
-zgrep	--file	untriaged	-	-	-	
 zipcloak	--temp-path	untriaged	-	-	-	

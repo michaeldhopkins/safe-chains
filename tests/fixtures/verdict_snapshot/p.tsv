@@ -1182,6 +1182,7 @@ pcre2grep -o1 '(\\w+)' file	inert
 pcre2grep -q	inert
 pcre2grep -r	inert
 pcre2grep -r --exclude-dir node_modules pattern src/	inert
+pcre2grep -r TODO ./src	inert
 pcre2grep -r pattern src/	inert
 pcre2grep -s	inert
 pcre2grep -t	inert
@@ -1189,7 +1190,9 @@ pcre2grep -u	inert
 pcre2grep -v	inert
 pcre2grep -w	inert
 pcre2grep -x	inert
+pcre2grep TODO ./src/main.rs	inert
 pcre2grep x	inert
+pcre2grep x ~/.ssh/id_rsa	denied
 pcre2test	inert
 pcre2test --evil	denied
 pcre2test --help	inert
@@ -1520,7 +1523,10 @@ pdfgrep -o	safe-read
 pdfgrep -p	safe-read
 pdfgrep -q	safe-read
 pdfgrep -r	safe-read
+pdfgrep needle ./report.pdf	safe-read
+pdfgrep needle report.pdf	safe-read
 pdfgrep x	safe-read
+pdfgrep x ~/.ssh/id_rsa	denied
 pdfimages	denied
 pdfimages --help	safe-write
 pdfimages --help -?	safe-write

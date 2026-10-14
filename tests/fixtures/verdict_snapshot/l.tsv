@@ -2253,10 +2253,13 @@ look -f	inert
 look -f Hello	inert
 look -t : foo:	inert
 look -t x	inert
+look abc	inert
+look abc ./words	inert
 look hello	inert
 look hello /usr/share/dict/words	inert
 look hello words.txt extra	denied
 look x	inert
+look x ~/.ssh/id_rsa	denied
 lorder	denied
 lorder --help	denied
 lorder --version	denied
@@ -2638,6 +2641,7 @@ lsbom -m	inert
 lsbom -p x	inert
 lsbom -s	inert
 lsbom -x	inert
+lsbom ./a.bom	inert
 lsbom Receipt.bom	inert
 lsbom x	inert
 lskq	inert
@@ -3449,6 +3453,7 @@ lzmainfo --help	inert
 lzmainfo --help --version	inert
 lzmainfo --help x	inert
 lzmainfo --version	inert
+lzmainfo ./a.lzma	inert
 lzmainfo x	inert
 lzmore	inert
 lzmore --help	denied

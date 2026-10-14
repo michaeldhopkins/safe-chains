@@ -217,6 +217,11 @@ mod tests {
     }
 
     denied! {
+        git_grep_open_files_in_pager_denied: "git grep -Otouch pat",
+        git_grep_open_files_in_pager_spaced_denied: "git grep -O touch pat",
+        git_grep_open_files_in_pager_long_denied: "git grep --open-files-in-pager=touch pat",
+        git_grep_no_index_denied: "git grep --no-index x /etc/passwd",
+        git_grep_no_index_dash_c_denied: "git -C /tmp grep --no-index x",
         // The `diff.` namespace is NOT uniformly safe, which is why the display keys are listed
         // exactly rather than by prefix. Each of these runs a program or reads a file, and each
         // would be reachable the moment `diff.*` became a prefix rule.

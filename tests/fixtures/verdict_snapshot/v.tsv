@@ -989,7 +989,10 @@ vis -o	inert
 vis -s	inert
 vis -t	inert
 vis -w	inert
+vis ./notes.txt	inert
+vis f.txt	inert
 vis x	inert
+vis ~/.ssh/id_rsa	denied
 vite	denied
 vite --base x	denied
 vite --clearScreen	denied

@@ -342,6 +342,8 @@ valued = [
     "--points-at", "--sort",
 ]
 
+# `-O`/`--open-files-in-pager` runs its value as a command with the matching files as arguments,
+# so the grep sub takes neither.
 [[command.sub]]
 name = "grep"
 bare = false
@@ -355,7 +357,7 @@ standalone = [
     "--heading", "--help",
     "--ignore-case", "--index", "--invert-match",
     "--line-number",
-    "--name-only", "--no-color", "--no-index", "--null",
+    "--name-only", "--no-color", "--null",
     "--only-matching",
     "--perl-regexp",
     "--quiet",
@@ -372,8 +374,8 @@ valued = [
     "--after-context", "--before-context",
     "--color", "--context",
     "--max-count", "--max-depth",
-    "--open-files-in-pager", "--threads",
-    "-A", "-B", "-C", "-O",
+    "--threads",
+    "-A", "-B", "-C",
     "-e", "-f", "-m",
 ]
 

@@ -6066,12 +6066,18 @@ ssh -Q x	inert
 ssh -R 8080:localhost:80 user@example.com	denied
 ssh -T -o BatchMode=true git@github.com	inert
 ssh -T -o BatchMode=yes	denied
-ssh -T -o BatchMode=yes -F /tmp/sshconf git@example.com	inert
+ssh -T -o BatchMode=yes -F ./cfg git@example.com	denied
+ssh -T -o BatchMode=yes -F /dev/null git@example.com	inert
+ssh -T -o BatchMode=yes -F /tmp/sshconf git@example.com	denied
+ssh -T -o BatchMode=yes -F none git@example.com	inert
+ssh -T -o BatchMode=yes -F./cfg git@example.com	denied
 ssh -T -o BatchMode=yes -L 8080:localhost:80 user@example.com	denied
 ssh -T -o BatchMode=yes -i ~/.ssh/id_ed25519 git@example.com	inert
 ssh -T -o BatchMode=yes -i/tmp/key github.com	inert
 ssh -T -o BatchMode=yes -l git github.com	inert
 ssh -T -o BatchMode=yes -lgit github.com	inert
+ssh -T -o BatchMode=yes -o 'UserKnownHostsFile /etc/cron.d/x' github.com	denied
+ssh -T -o BatchMode=yes -o 'UserKnownHostsFile=/dev/null /etc/x' github.com	denied
 ssh -T -o BatchMode=yes -o ConnectTimeout=3 git@github.com	inert
 ssh -T -o BatchMode=yes -o ControlMaster=yes user@example.com	denied
 ssh -T -o BatchMode=yes -o DynamicForward=1080 user@example.com	denied
@@ -6093,7 +6099,10 @@ ssh -T -o BatchMode=yes -o ServerAliveInterval=60 github.com	inert
 ssh -T -o BatchMode=yes -o SessionType=subsystem user@example.com	denied
 ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no git@example.com	inert
 ssh -T -o BatchMode=yes -o Tunnel=point-to-point user@example.com	denied
-ssh -T -o BatchMode=yes -o UserKnownHostsFile=/tmp/kh github.com	inert
+ssh -T -o BatchMode=yes -o UserKnownHostsFile=/dev/null github.com	inert
+ssh -T -o BatchMode=yes -o UserKnownHostsFile=/tmp/kh github.com	denied
+ssh -T -o BatchMode=yes -o UserKnownHostsFile=none github.com	inert
+ssh -T -o BatchMode=yes -oUserKnownHostsFile=/etc/cron.d/x github.com	denied
 ssh -T -o BatchMode=yes -p 2222 git@example.com	inert
 ssh -T -o BatchMode=yes -p2222 git@example.com	inert
 ssh -T -o BatchMode=yes git@github.com	inert
@@ -6105,6 +6114,7 @@ ssh -T -oBatchMode=yes git@github.com	inert
 ssh -T -oProxyCommand=evil -o BatchMode=yes user@example.com	denied
 ssh -T user@example.com	denied
 ssh -T4q -o BatchMode=yes git@github.com	inert
+ssh -TF ./cfg -o BatchMode=yes git@example.com	denied
 ssh -Tq -o BatchMode=yes git@github.com	inert
 ssh -Tqp2222 -o BatchMode=yes git@example.com	inert
 ssh -Tqz -o BatchMode=yes git@example.com	denied

@@ -598,6 +598,9 @@ jj	denied
 jj --at-op x	denied
 jj --at-operation x	denied
 jj --color x	denied
+jj --config	denied
+jj --config-file	denied
+jj --config-toml	denied
 jj --debug	denied
 jj --debug --at-op x	denied
 jj --debug --help	inert
@@ -608,6 +611,7 @@ jj --ignore-working-copy	denied
 jj --no-pager	denied
 jj --quiet	denied
 jj --repository x	denied
+jj --tool	denied
 jj --verbose	denied
 jj --version	inert
 jj -R ./sub new	safe-write
@@ -650,6 +654,7 @@ jj bookmark x	denied
 jj cat	denied
 jj cat x	inert
 jj commit	safe-write
+jj commit -m "$MSG"	safe-write
 jj commit -m 'msg'	safe-write
 jj commit x	safe-write
 jj config	inert
@@ -669,6 +674,10 @@ jj describe	safe-write
 jj describe -m 'hello'	safe-write
 jj describe x	safe-write
 jj diff	inert
+jj diff $X	denied
+jj diff -- $X	inert
+jj diff --config ui.diff-formatter=/tmp/evil.sh	denied
+jj diff --tool /tmp/evil.sh	denied
 jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt	safe-write
 jj diff x	inert
 jj duplicate	safe-write
@@ -703,9 +712,15 @@ jj git x	denied
 jj help	inert
 jj help x	inert
 jj log	inert
+jj log --config-file /tmp/evil.toml	denied
+jj log --config-toml x=1	denied
 jj log --oneline	inert
+jj log -r "$REV"	inert
+jj log -r main $X	denied
 jj log x	inert
 jj new	safe-write
+jj new $X	denied
+jj new --config=ui.editor=/tmp/evil.sh	denied
 jj new main -m 'start feature'	safe-write
 jj new x	safe-write
 jj op	inert
@@ -727,6 +742,7 @@ jj restore x	safe-write
 jj root	inert
 jj root x	inert
 jj show	inert
+jj show --tool=/tmp/evil.sh	denied
 jj show @-	inert
 jj show x	inert
 jj simplify-parents	safe-write

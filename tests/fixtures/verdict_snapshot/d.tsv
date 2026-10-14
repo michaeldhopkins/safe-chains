@@ -3727,6 +3727,7 @@ dot_clean -m	safe-write
 dot_clean -n	safe-write
 dot_clean -s	safe-write
 dot_clean -v	safe-write
+dot_clean ./dir	safe-write
 dot_clean x	safe-write
 dotenv	denied
 dotenv -- git status	inert

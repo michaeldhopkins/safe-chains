@@ -4632,6 +4632,7 @@ rg --pretty	inert
 rg --quiet	inert
 rg --regex-size-limit x	inert
 rg --regexp x	inert
+rg --regexp=x ~/.ssh/id_rsa	denied
 rg --replace x	inert
 rg --search-zip	inert
 rg --smart-case	inert
@@ -4671,7 +4672,9 @@ rg -V	inert
 rg -a	inert
 rg -b	inert
 rg -c	inert
+rg -e TODO src	inert
 rg -e x	inert
+rg -ex ~/.ssh/id_rsa	denied
 rg -f x	inert
 rg -g x	inert
 rg -h	inert

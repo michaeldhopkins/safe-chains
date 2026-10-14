@@ -62,6 +62,7 @@ wait x	inert
 wait4path	denied
 wait4path --help	denied
 wait4path --version	denied
+wait4path ./a.txt	inert
 wait4path x	inert
 wandb	denied
 wandb --help	inert

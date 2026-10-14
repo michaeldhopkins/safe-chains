@@ -503,6 +503,8 @@ unvis -H x	inert
 unvis -e	inert
 unvis -h	inert
 unvis -m	inert
+unvis ./notes.txt	inert
+unvis /etc/shadow	denied
 unvis x	inert
 unwinddump	denied
 unwinddump --help	denied
@@ -674,6 +676,7 @@ unzipsfx -u	safe-write
 unzipsfx -v	safe-write
 unzipsfx -x x	safe-write
 unzipsfx -z	safe-write
+unzipsfx ./out.exe	safe-write
 unzipsfx x	safe-write
 unzstd	safe-write
 unzstd --adapt	safe-write

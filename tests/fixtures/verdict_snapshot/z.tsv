@@ -334,6 +334,7 @@ zgrep -L	inert
 zgrep -V	inert
 zgrep -Z	inert
 zgrep -c	inert
+zgrep -e TODO ./log.gz	inert
 zgrep -e x	inert
 zgrep -f x	inert
 zgrep -h	inert
@@ -347,7 +348,10 @@ zgrep -s	inert
 zgrep -v	inert
 zgrep -w	inert
 zgrep -x	inert
+zgrep TODO ./log.gz	inert
 zgrep x	inert
+zgrep x log.gz	inert
+zgrep x ~/.ssh/id_rsa	denied
 zig	denied
 zig --help	inert
 zig --help --version	inert
@@ -430,6 +434,7 @@ zip -o	safe-write
 zip -p	safe-write
 zip -q	safe-write
 zip -r	safe-write
+zip -r ./out.zip ./src	safe-write
 zip -s	safe-write
 zip -s x	safe-write
 zip -t	safe-write
@@ -479,6 +484,7 @@ zipcloak -d	safe-write
 zipcloak -h	safe-write
 zipcloak -q	safe-write
 zipcloak -v	safe-write
+zipcloak ./out.zip	safe-write
 zipcloak x	safe-write
 zipcmp	denied
 zipcmp --help	denied
@@ -495,6 +501,7 @@ zipcmp -q	inert
 zipcmp -s	inert
 zipcmp -t	inert
 zipcmp -v	inert
+zipcmp ./a.zip ./b.zip	inert
 zipcmp x	inert
 zipdetails	denied
 zipdetails --help	denied
@@ -504,12 +511,15 @@ zipdetails --scan x	inert
 zipdetails --version	inert
 zipdetails -h	inert
 zipdetails -v	inert
+zipdetails ./out.zip	inert
 zipdetails x	inert
 zipgrep	denied
 zipgrep --help	denied
 zipgrep --version	denied
+zipgrep TODO ./bundle.zip	inert
 zipgrep pattern archive.zip	inert
 zipgrep x	inert
+zipgrep x ~/.ssh/id_rsa	denied
 zipinfo	denied
 zipinfo --help	inert
 zipinfo --help --version	inert
@@ -543,6 +553,7 @@ zipmerge -h	safe-write
 zipmerge -i	safe-write
 zipmerge -k	safe-write
 zipmerge -s	safe-write
+zipmerge ./all.zip ./a.zip ./b.zip	safe-write
 zipmerge x	safe-write
 zipnote	denied
 zipnote --help	safe-write
@@ -555,6 +566,7 @@ zipnote -b	safe-write
 zipnote -h	safe-write
 zipnote -v	safe-write
 zipnote -w	safe-write
+zipnote ./out.zip	safe-write
 zipnote x	safe-write
 zipsplit	denied
 zipsplit --help	safe-write
@@ -567,6 +579,7 @@ zipsplit -L	safe-write
 zipsplit -b x	safe-write
 zipsplit -h	safe-write
 zipsplit -i	safe-write
+zipsplit -n 100000 ./out.zip	safe-write
 zipsplit -n x	safe-write
 zipsplit -p	safe-write
 zipsplit -r x	safe-write
@@ -590,6 +603,7 @@ ziptool -o x	safe-write
 ziptool -r	safe-write
 ziptool -s	safe-write
 ziptool -t	safe-write
+ziptool ./out.zip stat 0	safe-write
 ziptool x	safe-write
 zless	inert
 zless --help	denied
@@ -917,10 +931,13 @@ zstdcat x	safe-write
 zstdgrep	denied
 zstdgrep --help	denied
 zstdgrep --version	denied
+zstdgrep TODO ./log.zst	inert
 zstdgrep x	inert
+zstdgrep x ~/.ssh/id_rsa	denied
 zstdless	inert
 zstdless --help	denied
 zstdless --version	denied
+zstdless ./a.zst	inert
 zstdless x	inert
 zstdmt	safe-write
 zstdmt --adapt	safe-write
