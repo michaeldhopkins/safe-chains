@@ -313,6 +313,11 @@ owed = [
   "ar_ops_classify_regardless_of_modifiers",
   "textutil_convert_never_more_permissive_than_info",
 ]
+"src/pathgate/handlers.rs" = [
+  "src/pathgate.rs::ar_write_never_more_permissive_than_read",
+  "src/pathgate.rs::ar_ops_classify_regardless_of_modifiers",
+  "src/pathgate.rs::textutil_convert_never_more_permissive_than_info",
+]
 "src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
 "src/refusal.rs" = [
   "the_outcome_controls_which_consequence_phrase_a_refusal_names",
