@@ -849,7 +849,7 @@ safe! {
     jj_workspace_list: "jj workspace list",
     jj_workspace_root: "jj workspace root",
     jj_workspace_update_stale: "jj workspace update-stale",
-    jj_log: "jj log --oneline",
+    jj_log: "jj log --no-graph",
     jj_diff: "jj diff",
     jj_show: "jj show @-",
     jj_status: "jj status",

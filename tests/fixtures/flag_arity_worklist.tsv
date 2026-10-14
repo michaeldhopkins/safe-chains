@@ -133,6 +133,7 @@ w	--from
 wc	--lines
 webpack	--mode
 webpack	--target
+who	--message
 wkhtmltopdf	--log-level
 wkhtmltopdf	--title
 xmllint	--format

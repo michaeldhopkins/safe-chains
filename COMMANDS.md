@@ -2725,6 +2725,12 @@ Aliases: `gcat`
 - Allowed standalone flags: --help, --version, -L, -P, -V, -e, -h
 - Bare invocation allowed
 
+**Examples:**
+
+- `cd src`
+- `cd ..`
+- `cd -P ./build`
+
 ### `cdk`
 <p class="cmd-url"><a href="https://docs.aws.amazon.com/cdk/v2/guide/cli.html">https://docs.aws.amazon.com/cdk/v2/guide/cli.html</a></p>
 
@@ -4612,6 +4618,7 @@ Aliases: `gecho`
 
 - `echo hello world`
 - `echo -n done`
+- `echo -e one\ntwo`
 
 ### `ecpg`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-ecpg.html">https://www.postgresql.org/docs/current/app-ecpg.html</a></p>
@@ -6601,6 +6608,7 @@ Aliases: `ghead`
 - `head README.md`
 - `head -n 20 src/main.rs`
 - `head -20 src/main.rs`
+- `head -c 100 Cargo.toml`
 
 ### `headerdoc2html`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/">https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/</a></p>
@@ -7505,67 +7513,70 @@ Aliases: `iperf`
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `jj`
-<p class="cmd-url"><a href="https://jj-vcs.github.io/jj/latest/cli-reference/">https://jj-vcs.github.io/jj/latest/cli-reference/</a></p>
+<p class="cmd-url"><a href="https://docs.jj-vcs.dev/latest/cli-reference/">https://docs.jj-vcs.dev/latest/cli-reference/</a></p>
 
-- **abandon**: Positional args accepted
-- **absorb**: Positional args accepted
-- **backout**: Positional args accepted
-- **bookmark create**: Positional args accepted
-- **bookmark delete**: Positional args accepted
-- **bookmark forget**: Positional args accepted
-- **bookmark list**: Positional args accepted
-- **bookmark move**: Positional args accepted
-- **bookmark rename**: Positional args accepted
-- **bookmark set**: Positional args accepted
-- **bookmark track**: Positional args accepted
-- **bookmark untrack**: Positional args accepted
-- **cat**: Positional args accepted
-- **commit**: Positional args accepted
-- **config get**: Positional args accepted
-- **config list**: Positional args accepted
-- **config path**: Positional args accepted
-- **describe**: Positional args accepted
-- **diff**: Positional args accepted
-- **duplicate**: Positional args accepted
-- **edit**: Positional args accepted
-- **file list**: Positional args accepted
-- **file show**: Positional args accepted
-- **fix**: Positional args accepted
-- **git fetch**: Positional args accepted
-- **git import**: Positional args accepted
-- **git init**: Positional args accepted
-- **git remote list**: Positional args accepted
-- **help**: Positional args accepted
-- **log**: Positional args accepted
-- **new**: Positional args accepted
-- **op log**: Positional args accepted
-- **parallelize**: Positional args accepted
-- **rebase**: Positional args accepted
-- **resolve**: Positional args accepted
-- **restore**: Positional args accepted
-- **root**: Positional args accepted
-- **show**: Positional args accepted
-- **simplify-parents**: Positional args accepted
-- **split**: Positional args accepted
-- **squash**: Positional args accepted
-- **st**: Positional args accepted
-- **status**: Positional args accepted
-- **tag list**: Positional args accepted
-- **undo**: Positional args accepted
-- **unsquash**: Positional args accepted
-- **version**: Positional args accepted
-- **workspace add**: Positional args accepted
-- **workspace forget**: Positional args accepted
-- **workspace list**: Positional args accepted
-- **workspace rename**: Positional args accepted
-- **workspace root**: Positional args accepted
-- **workspace update-stale**: Positional args accepted
+- **abandon**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --restore-descendants, --retain-bookmarks, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
+- **absorb**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --from, --into, --repository, --to, -f, -R, -t
+- **backout**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --destination, --insert-after, --insert-before, --repository, --revisions, -A, -B, -d, -r, -R
+- **bookmark create**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --to, -r, -R
+- **bookmark delete**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **bookmark forget**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --include-remotes, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **bookmark list**: Flags: --all, --all-remotes, --conflicted, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --tracked, -a, -c, -h, -t. Valued: --at-op, --at-operation, --color, --remote, --repository, --revision, --revisions, --sort, --template, -r, -R, -T
+- **bookmark move**: Flags: --allow-backwards, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -B, -h. Valued: --at-op, --at-operation, --color, --from, --repository, --to, -f, -R, -t
+- **bookmark rename**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --overwrite-existing, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **bookmark set**: Flags: --allow-backwards, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -B, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --to, -r, -R
+- **bookmark track**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --remote, --repository, -R
+- **bookmark untrack**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --remote, --repository, -R
+- **cat**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, -r, -R
+- **commit**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --message, --repository, -m, -R
+- **config get**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **config list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --include-defaults, --include-overridden, --no-pager, --quiet, --repo, --user, --workspace, -h. Valued: --at-op, --at-operation, --color, --repository, --template, -R, -T
+- **config path**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --repo, --user, --workspace, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **describe**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --stdin, -h. Valued: --at-op, --at-operation, --color, --message, --repository, -m, -r, -R
+- **diff**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-pager, --quiet, --stat, --summary, --types, -b, -h, -s, -w. Valued: --at-op, --at-operation, --color, --context, --from, --repository, --revision, --revisions, --template, --to, -f, -r, -R, -t, -T
+- **duplicate**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --after, --at-op, --at-operation, --before, --color, --destination, --insert-after, --insert-before, --onto, --repository, -A, -B, -d, -o, -r, -R
+- **edit**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
+- **file list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --template, -r, -R, -T
+- **file show**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --template, -r, -R, -T
+- **fix**: Flags: --all-lines, --debug, --help, --ignore-immutable, --ignore-working-copy, --include-unchanged-files, --no-pager, --quiet, -a, -h. Valued: --at-op, --at-operation, --color, --repository, --source, -R, -s
+- **git fetch**: Flags: --all-remotes, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --tracked, -h. Valued: --at-op, --at-operation, --branch, --color, --remote, --repository, --tag, -b, -R, -t
+- **git import**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **git init**: Flags: --colocate, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-colocate, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --git-repo, --object-hash, --repository, -R
+- **git remote list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **help**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --keyword, --repository, -k, -R
+- **log**: Flags: --color-words, --count, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --patch, --quiet, --reversed, --stat, --summary, --types, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --revision, --revisions, --template, -n, -r, -R, -T
+- **new**: Flags: --debug, --edit, --help, --ignore-immutable, --ignore-working-copy, --no-edit, --no-pager, --quiet, -h. Valued: --after, --at-op, --at-operation, --before, --color, --insert-after, --insert-before, --message, --repository, -A, -B, -d, -m, -o, -r, -R
+- **op log**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --op-diff, --patch, --quiet, --reversed, --stat, --summary, --types, -d, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --show-changes-in, --template, -n, -R, -T
+- **parallelize**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
+- **rebase**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --keep-divergent, --no-pager, --quiet, --simplify-parents, --skip-emptied, -h. Valued: --after, --at-op, --at-operation, --before, --branch, --color, --destination, --insert-after, --insert-before, --onto, --repository, --revision, --revisions, --source, -A, -b, -B, -d, -o, -r, -R, -s
+- **resolve**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --list, --no-pager, --quiet, -h, -l. Valued: --at-op, --at-operation, --color, --repository, --revision, -r, -R
+- **restore**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --restore-descendants, -h. Valued: --at-op, --at-operation, --changes-in, --color, --from, --into, --repository, --to, -c, -f, -R, -t
+- **root**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **show**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-pager, --no-patch, --quiet, --reversed, --stat, --summary, --types, -b, -h, -s, -w. Valued: --at-op, --at-operation, --color, --context, --repository, --template, -r, -R, -T
+- **simplify-parents**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --revisions, --source, -r, -R, -s
+- **split**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --parallel, --quiet, -h, -p. Valued: --after, --at-op, --at-operation, --before, --color, --destination, --insert-after, --insert-before, --message, --onto, --repository, --revision, -A, -B, -d, -m, -o, -r, -R
+- **squash**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --keep-emptied, --no-pager, --quiet, --use-destination-message, -h, -k, -u. Valued: --after, --at-op, --at-operation, --before, --color, --destination, --from, --insert-after, --insert-before, --into, --message, --onto, --repository, --revision, --to, -A, -B, -d, -f, -m, -o, -r, -R, -t
+- **st**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **status**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **tag list**: Flags: --all-remotes, --conflicted, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --tracked, -a, -c, -h, -t. Valued: --at-op, --at-operation, --color, --remote, --repository, --revision, --sort, --template, -r, -R, -T
+- **undo**: Flags: --allow-cross-workspace, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **unsquash**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, -r, -R
+- **version**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **workspace add**: Flags: --colocate, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-colocate, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --message, --name, --repository, --revision, --revisions, --sparse-patterns, -m, -r, -R
+- **workspace forget**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **workspace list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --template, -R, -T
+- **workspace rename**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **workspace root**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --name, --repository, -R
+- **workspace update-stale**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - Allowed standalone flags: --help, --version, -h
 
 **Examples:**
 
 - `jj new`
 - `jj -R ./sub new`
+- `jj log -r @ --no-graph -T description`
+- `jj diff --name-only -r @-`
+- `jj status --no-pager`
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>
@@ -15083,14 +15094,16 @@ Aliases: `gtac`
 Aliases: `gtail`
 
 - Reads its file operands to stdout within your workspace.
-- Allowed standalone flags: --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
-- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
+- Allowed standalone flags: --debug, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
+- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n, -s
 - Bare invocation reads stdin
 
 **Examples:**
 
 - `tail -n 50 src/main.rs`
 - `tail -f ./app.log`
+- `tail -n +5 src/main.rs`
+- `tail -s 2 -f ./app.log`
 
 ### `tailscale`
 <p class="cmd-url"><a href="https://tailscale.com/kb/1080/cli">https://tailscale.com/kb/1080/cli</a></p>

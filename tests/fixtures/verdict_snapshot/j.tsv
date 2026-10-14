@@ -608,6 +608,7 @@ jj --debug	denied
 jj --debug --at-op x	denied
 jj --debug --help	inert
 jj --debug x	denied
+jj --destination x	denied
 jj --help	inert
 jj --ignore-immutable	denied
 jj --ignore-working-copy	denied
@@ -622,185 +623,1287 @@ jj -R /etc new	denied
 jj -R x	denied
 jj -h	inert
 jj abandon	safe-write
+jj abandon --at-op x	safe-write
+jj abandon --at-operation x	safe-write
+jj abandon --color x	safe-write
+jj abandon --debug	safe-write
+jj abandon --debug --at-op x	safe-write
+jj abandon --debug --help	safe-write
+jj abandon --debug x	safe-write
+jj abandon --help	safe-write
+jj abandon --ignore-immutable	safe-write
+jj abandon --ignore-working-copy	safe-write
+jj abandon --no-pager	safe-write
+jj abandon --quiet	safe-write
+jj abandon --repository x	safe-write
+jj abandon --restore-descendants	safe-write
+jj abandon --retain-bookmarks	safe-write
+jj abandon -R x	safe-write
+jj abandon -h	safe-write
+jj abandon -r x	safe-write
 jj abandon @-	safe-write
 jj abandon x	safe-write
 jj absorb	safe-write
+jj absorb --at-op x	safe-write
+jj absorb --at-operation x	safe-write
+jj absorb --color x	safe-write
+jj absorb --debug	safe-write
+jj absorb --debug --at-op x	safe-write
+jj absorb --debug --help	safe-write
+jj absorb --debug x	safe-write
+jj absorb --from x	safe-write
+jj absorb --help	safe-write
+jj absorb --ignore-immutable	safe-write
+jj absorb --ignore-working-copy	safe-write
+jj absorb --into x	safe-write
+jj absorb --no-pager	safe-write
+jj absorb --quiet	safe-write
+jj absorb --repository x	safe-write
+jj absorb --to x	safe-write
+jj absorb -R x	safe-write
+jj absorb -f x	safe-write
+jj absorb -h	safe-write
+jj absorb -t x	safe-write
 jj absorb x	safe-write
 jj backout	safe-write
+jj backout --at-op x	safe-write
+jj backout --at-operation x	safe-write
+jj backout --color x	safe-write
+jj backout --debug	safe-write
+jj backout --debug --at-op x	safe-write
+jj backout --debug --help	safe-write
+jj backout --debug x	safe-write
+jj backout --destination x	safe-write
+jj backout --help	safe-write
+jj backout --ignore-immutable	safe-write
+jj backout --ignore-working-copy	safe-write
+jj backout --insert-after x	safe-write
+jj backout --insert-before x	safe-write
+jj backout --no-pager	safe-write
+jj backout --quiet	safe-write
+jj backout --repository x	safe-write
+jj backout --revisions x	safe-write
+jj backout -A x	safe-write
+jj backout -B x	safe-write
+jj backout -R x	safe-write
+jj backout -d x	safe-write
+jj backout -h	safe-write
 jj backout -r @-	safe-write
+jj backout -r x	safe-write
 jj backout x	safe-write
 jj bookmark	inert
 jj bookmark create	safe-write
+jj bookmark create --at-op x	safe-write
+jj bookmark create --at-operation x	safe-write
+jj bookmark create --color x	safe-write
+jj bookmark create --debug	safe-write
+jj bookmark create --debug --at-op x	safe-write
+jj bookmark create --debug --help	safe-write
+jj bookmark create --debug x	safe-write
+jj bookmark create --help	safe-write
+jj bookmark create --ignore-immutable	safe-write
+jj bookmark create --ignore-working-copy	safe-write
+jj bookmark create --no-pager	safe-write
+jj bookmark create --quiet	safe-write
+jj bookmark create --repository x	safe-write
+jj bookmark create --revision x	safe-write
+jj bookmark create --to x	safe-write
+jj bookmark create -R x	safe-write
+jj bookmark create -h	safe-write
+jj bookmark create -r x	safe-write
 jj bookmark create feature	safe-write
 jj bookmark create x	safe-write
 jj bookmark delete	safe-write
+jj bookmark delete --at-op x	safe-write
+jj bookmark delete --at-operation x	safe-write
+jj bookmark delete --color x	safe-write
+jj bookmark delete --debug	safe-write
+jj bookmark delete --debug --at-op x	safe-write
+jj bookmark delete --debug --help	safe-write
+jj bookmark delete --debug x	safe-write
+jj bookmark delete --help	safe-write
+jj bookmark delete --ignore-immutable	safe-write
+jj bookmark delete --ignore-working-copy	safe-write
+jj bookmark delete --no-pager	safe-write
+jj bookmark delete --quiet	safe-write
+jj bookmark delete --repository x	safe-write
+jj bookmark delete -R x	safe-write
+jj bookmark delete -h	safe-write
 jj bookmark delete feature	safe-write
 jj bookmark delete x	safe-write
 jj bookmark forget	safe-write
+jj bookmark forget --at-op x	safe-write
+jj bookmark forget --at-operation x	safe-write
+jj bookmark forget --color x	safe-write
+jj bookmark forget --debug	safe-write
+jj bookmark forget --debug --at-op x	safe-write
+jj bookmark forget --debug --help	safe-write
+jj bookmark forget --debug x	safe-write
+jj bookmark forget --help	safe-write
+jj bookmark forget --ignore-immutable	safe-write
+jj bookmark forget --ignore-working-copy	safe-write
+jj bookmark forget --include-remotes	safe-write
+jj bookmark forget --no-pager	safe-write
+jj bookmark forget --quiet	safe-write
+jj bookmark forget --repository x	safe-write
+jj bookmark forget -R x	safe-write
+jj bookmark forget -h	safe-write
 jj bookmark forget x	safe-write
 jj bookmark list	inert
+jj bookmark list --all	inert
+jj bookmark list --all --all-remotes	inert
+jj bookmark list --all --at-op x	inert
+jj bookmark list --all x	inert
+jj bookmark list --all-remotes	inert
+jj bookmark list --at-op x	inert
+jj bookmark list --at-operation x	inert
+jj bookmark list --color x	inert
+jj bookmark list --conflicted	inert
+jj bookmark list --debug	inert
+jj bookmark list --help	inert
+jj bookmark list --ignore-immutable	inert
+jj bookmark list --ignore-working-copy	inert
+jj bookmark list --no-pager	inert
+jj bookmark list --quiet	inert
+jj bookmark list --remote x	inert
+jj bookmark list --repository x	inert
+jj bookmark list --revision x	inert
+jj bookmark list --revisions x	inert
+jj bookmark list --sort x	inert
+jj bookmark list --template x	inert
+jj bookmark list --tracked	inert
+jj bookmark list -R x	inert
+jj bookmark list -T x	inert
+jj bookmark list -a	inert
+jj bookmark list -c	inert
+jj bookmark list -h	inert
+jj bookmark list -r x	inert
+jj bookmark list -t	inert
 jj bookmark list x	inert
 jj bookmark move	safe-write
+jj bookmark move --allow-backwards	safe-write
+jj bookmark move --allow-backwards --at-op x	safe-write
+jj bookmark move --allow-backwards --debug	safe-write
+jj bookmark move --allow-backwards x	safe-write
+jj bookmark move --at-op x	safe-write
+jj bookmark move --at-operation x	safe-write
+jj bookmark move --color x	safe-write
+jj bookmark move --debug	safe-write
+jj bookmark move --from x	safe-write
+jj bookmark move --help	safe-write
+jj bookmark move --ignore-immutable	safe-write
+jj bookmark move --ignore-working-copy	safe-write
+jj bookmark move --no-pager	safe-write
+jj bookmark move --quiet	safe-write
+jj bookmark move --repository x	safe-write
+jj bookmark move --to x	safe-write
+jj bookmark move -B	safe-write
+jj bookmark move -R x	safe-write
+jj bookmark move -f x	safe-write
+jj bookmark move -h	safe-write
+jj bookmark move -t x	safe-write
 jj bookmark move feature --to @	safe-write
 jj bookmark move x	safe-write
 jj bookmark rename	safe-write
+jj bookmark rename --at-op x	safe-write
+jj bookmark rename --at-operation x	safe-write
+jj bookmark rename --color x	safe-write
+jj bookmark rename --debug	safe-write
+jj bookmark rename --debug --at-op x	safe-write
+jj bookmark rename --debug --help	safe-write
+jj bookmark rename --debug x	safe-write
+jj bookmark rename --help	safe-write
+jj bookmark rename --ignore-immutable	safe-write
+jj bookmark rename --ignore-working-copy	safe-write
+jj bookmark rename --no-pager	safe-write
+jj bookmark rename --overwrite-existing	safe-write
+jj bookmark rename --quiet	safe-write
+jj bookmark rename --repository x	safe-write
+jj bookmark rename -R x	safe-write
+jj bookmark rename -h	safe-write
 jj bookmark rename x	safe-write
 jj bookmark set	safe-write
+jj bookmark set --allow-backwards	safe-write
+jj bookmark set --allow-backwards --at-op x	safe-write
+jj bookmark set --allow-backwards --debug	safe-write
+jj bookmark set --allow-backwards x	safe-write
+jj bookmark set --at-op x	safe-write
+jj bookmark set --at-operation x	safe-write
+jj bookmark set --color x	safe-write
+jj bookmark set --debug	safe-write
+jj bookmark set --help	safe-write
+jj bookmark set --ignore-immutable	safe-write
+jj bookmark set --ignore-working-copy	safe-write
+jj bookmark set --no-pager	safe-write
+jj bookmark set --quiet	safe-write
+jj bookmark set --repository x	safe-write
+jj bookmark set --revision x	safe-write
+jj bookmark set --to x	safe-write
+jj bookmark set -B	safe-write
+jj bookmark set -R x	safe-write
+jj bookmark set -h	safe-write
+jj bookmark set -r x	safe-write
 jj bookmark set feature	safe-write
 jj bookmark set x	safe-write
 jj bookmark track	safe-write
+jj bookmark track --at-op x	safe-write
+jj bookmark track --at-operation x	safe-write
+jj bookmark track --color x	safe-write
+jj bookmark track --debug	safe-write
+jj bookmark track --debug --at-op x	safe-write
+jj bookmark track --debug --help	safe-write
+jj bookmark track --debug x	safe-write
+jj bookmark track --help	safe-write
+jj bookmark track --ignore-immutable	safe-write
+jj bookmark track --ignore-working-copy	safe-write
+jj bookmark track --no-pager	safe-write
+jj bookmark track --quiet	safe-write
+jj bookmark track --remote x	safe-write
+jj bookmark track --repository x	safe-write
+jj bookmark track -R x	safe-write
+jj bookmark track -h	safe-write
 jj bookmark track feature@origin	safe-write
 jj bookmark track x	safe-write
 jj bookmark untrack	safe-write
+jj bookmark untrack --at-op x	safe-write
+jj bookmark untrack --at-operation x	safe-write
+jj bookmark untrack --color x	safe-write
+jj bookmark untrack --debug	safe-write
+jj bookmark untrack --debug --at-op x	safe-write
+jj bookmark untrack --debug --help	safe-write
+jj bookmark untrack --debug x	safe-write
+jj bookmark untrack --help	safe-write
+jj bookmark untrack --ignore-immutable	safe-write
+jj bookmark untrack --ignore-working-copy	safe-write
+jj bookmark untrack --no-pager	safe-write
+jj bookmark untrack --quiet	safe-write
+jj bookmark untrack --remote x	safe-write
+jj bookmark untrack --repository x	safe-write
+jj bookmark untrack -R x	safe-write
+jj bookmark untrack -h	safe-write
 jj bookmark untrack x	safe-write
 jj bookmark x	denied
 jj cat	denied
+jj cat --at-op x	inert
+jj cat --at-operation x	inert
+jj cat --color x	inert
+jj cat --debug	inert
+jj cat --debug --at-op x	inert
+jj cat --debug --help	inert
+jj cat --debug x	inert
+jj cat --help	inert
+jj cat --ignore-immutable	inert
+jj cat --ignore-working-copy	inert
+jj cat --no-pager	inert
+jj cat --quiet	inert
+jj cat --repository x	inert
+jj cat --revision x	inert
+jj cat -R x	inert
+jj cat -h	inert
+jj cat -r x	inert
 jj cat x	inert
 jj commit	safe-write
+jj commit --at-op x	safe-write
+jj commit --at-operation x	safe-write
+jj commit --color x	safe-write
+jj commit --debug	safe-write
+jj commit --debug --at-op x	safe-write
+jj commit --debug --help	safe-write
+jj commit --debug x	safe-write
+jj commit --help	safe-write
+jj commit --ignore-immutable	safe-write
+jj commit --ignore-working-copy	safe-write
+jj commit --message x	safe-write
+jj commit --no-pager	safe-write
+jj commit --quiet	safe-write
+jj commit --repository x	safe-write
+jj commit -R x	safe-write
+jj commit -h	safe-write
 jj commit -m "$MSG"	safe-write
 jj commit -m 'msg'	safe-write
+jj commit -m x	safe-write
 jj commit x	safe-write
 jj config	inert
 jj config edit --user	denied
 jj config get	inert
+jj config get --at-op x	inert
+jj config get --at-operation x	inert
+jj config get --color x	inert
+jj config get --debug	inert
+jj config get --debug --at-op x	inert
+jj config get --debug --help	inert
+jj config get --debug x	inert
+jj config get --help	inert
+jj config get --ignore-immutable	inert
+jj config get --ignore-working-copy	inert
+jj config get --no-pager	inert
+jj config get --quiet	inert
+jj config get --repository x	inert
+jj config get -R x	inert
+jj config get -h	inert
 jj config get user.name	inert
 jj config get x	inert
 jj config list	inert
+jj config list --at-op x	inert
+jj config list --at-operation x	inert
+jj config list --color x	inert
+jj config list --debug	inert
+jj config list --debug --at-op x	inert
+jj config list --debug --help	inert
+jj config list --debug x	inert
+jj config list --help	inert
+jj config list --ignore-immutable	inert
+jj config list --ignore-working-copy	inert
+jj config list --include-defaults	inert
+jj config list --include-overridden	inert
+jj config list --no-pager	inert
+jj config list --quiet	inert
+jj config list --repo	inert
+jj config list --repository x	inert
+jj config list --template x	inert
+jj config list --user	inert
+jj config list --workspace	inert
+jj config list -R x	inert
+jj config list -T x	inert
+jj config list -h	inert
 jj config list x	inert
 jj config path	inert
+jj config path --at-op x	inert
+jj config path --at-operation x	inert
+jj config path --color x	inert
+jj config path --debug	inert
+jj config path --debug --at-op x	inert
+jj config path --debug --help	inert
+jj config path --debug x	inert
+jj config path --help	inert
+jj config path --ignore-immutable	inert
+jj config path --ignore-working-copy	inert
+jj config path --no-pager	inert
+jj config path --quiet	inert
+jj config path --repo	inert
+jj config path --repository x	inert
+jj config path --user	inert
+jj config path --workspace	inert
+jj config path -R x	inert
+jj config path -h	inert
 jj config path x	inert
 jj config set --user git.executable-path /tmp/evil	denied
+jj config set --user ui.editor x	denied
 jj config set --user user.name t	denied
 jj config unset --user user.name	denied
 jj config x	denied
 jj describe	safe-write
+jj describe --at-op x	safe-write
+jj describe --at-operation x	safe-write
+jj describe --color x	safe-write
+jj describe --debug	safe-write
+jj describe --debug --at-op x	safe-write
+jj describe --debug --help	safe-write
+jj describe --debug x	safe-write
+jj describe --help	safe-write
+jj describe --ignore-immutable	safe-write
+jj describe --ignore-working-copy	safe-write
 jj describe --message "$MSG"	safe-write
+jj describe --message x	safe-write
+jj describe --no-pager	safe-write
+jj describe --quiet	safe-write
+jj describe --repository x	safe-write
+jj describe --stdin	safe-write
+jj describe -R x	safe-write
+jj describe -h	safe-write
 jj describe -m 'hello'	safe-write
+jj describe -m x	safe-write
 jj describe -m x --no-edit "$X"	denied
 jj describe -mfoo "$X"	denied
+jj describe -r x	safe-write
 jj describe x	safe-write
 jj diff	inert
 jj diff $X	denied
 jj diff -- $X	inert
+jj diff --at-op x	inert
+jj diff --at-operation x	inert
+jj diff --color x	inert
+jj diff --color-words	inert
+jj diff --color-words --at-op x	inert
+jj diff --color-words --debug	inert
+jj diff --color-words x	inert
 jj diff --config ui.diff-formatter=/tmp/evil.sh	denied
+jj diff --context x	inert
+jj diff --debug	inert
+jj diff --from x	inert
+jj diff --git	inert
+jj diff --help	inert
+jj diff --ignore-all-space	inert
+jj diff --ignore-immutable	inert
+jj diff --ignore-space-change	inert
+jj diff --ignore-working-copy	inert
+jj diff --name-only	inert
 jj diff --name-only "$X"	denied
+jj diff --name-only -r @-	inert
+jj diff --no-pager	inert
+jj diff --quiet	inert
+jj diff --repository x	inert
+jj diff --revision x	inert
+jj diff --revisions x	inert
+jj diff --stat	inert
+jj diff --summary	inert
 jj diff --summary "$X"	denied
+jj diff --template x	inert
+jj diff --to x	inert
 jj diff --tool /tmp/evil.sh	denied
+jj diff --types	inert
+jj diff -R x	inert
+jj diff -T x	inert
+jj diff -b	inert
+jj diff -f x	inert
 jj diff -fmaster "$X"	denied
+jj diff -h	inert
 jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt	safe-write
+jj diff -r x	inert
+jj diff -s	inert
 jj diff -s "$X"	denied
+jj diff -t x	inert
+jj diff -w	inert
 jj diff x	inert
 jj duplicate	safe-write
+jj duplicate --after x	safe-write
+jj duplicate --at-op x	safe-write
+jj duplicate --at-operation x	safe-write
+jj duplicate --before x	safe-write
+jj duplicate --color x	safe-write
+jj duplicate --debug	safe-write
+jj duplicate --debug --after x	safe-write
+jj duplicate --debug --help	safe-write
+jj duplicate --debug x	safe-write
+jj duplicate --destination x	safe-write
+jj duplicate --help	safe-write
+jj duplicate --ignore-immutable	safe-write
+jj duplicate --ignore-working-copy	safe-write
+jj duplicate --insert-after x	safe-write
+jj duplicate --insert-before x	safe-write
+jj duplicate --no-pager	safe-write
+jj duplicate --onto x	safe-write
+jj duplicate --quiet	safe-write
+jj duplicate --repository x	safe-write
+jj duplicate -A x	safe-write
+jj duplicate -B x	safe-write
+jj duplicate -R x	safe-write
+jj duplicate -d x	safe-write
+jj duplicate -h	safe-write
+jj duplicate -o x	safe-write
+jj duplicate -r x	safe-write
 jj duplicate @-	safe-write
 jj duplicate x	safe-write
 jj edit	safe-write
+jj edit --at-op x	safe-write
+jj edit --at-operation x	safe-write
+jj edit --color x	safe-write
+jj edit --debug	safe-write
+jj edit --debug --at-op x	safe-write
+jj edit --debug --help	safe-write
+jj edit --debug x	safe-write
+jj edit --help	safe-write
+jj edit --ignore-immutable	safe-write
+jj edit --ignore-working-copy	safe-write
+jj edit --no-pager	safe-write
+jj edit --quiet	safe-write
+jj edit --repository x	safe-write
+jj edit -R x	safe-write
+jj edit -h	safe-write
+jj edit -r x	safe-write
 jj edit @-	safe-write
 jj edit x	safe-write
 jj file	inert
 jj file list	inert
+jj file list --at-op x	inert
+jj file list --at-operation x	inert
+jj file list --color x	inert
+jj file list --debug	inert
+jj file list --debug --at-op x	inert
+jj file list --debug --help	inert
+jj file list --debug x	inert
+jj file list --help	inert
+jj file list --ignore-immutable	inert
+jj file list --ignore-working-copy	inert
+jj file list --no-pager	inert
+jj file list --quiet	inert
+jj file list --repository x	inert
+jj file list --revision x	inert
+jj file list --template x	inert
+jj file list -R x	inert
+jj file list -T x	inert
+jj file list -h	inert
+jj file list -r x	inert
 jj file list x	inert
 jj file show	inert
+jj file show --at-op x	inert
+jj file show --at-operation x	inert
+jj file show --color x	inert
+jj file show --debug	inert
+jj file show --debug --at-op x	inert
+jj file show --debug --help	inert
+jj file show --debug x	inert
+jj file show --help	inert
+jj file show --ignore-immutable	inert
+jj file show --ignore-working-copy	inert
+jj file show --no-pager	inert
+jj file show --quiet	inert
+jj file show --repository x	inert
+jj file show --revision x	inert
+jj file show --template x	inert
+jj file show -R x	inert
+jj file show -T x	inert
+jj file show -h	inert
+jj file show -r x	inert
 jj file show x	inert
 jj file x	denied
 jj fix	safe-write
+jj fix --all-lines	safe-write
+jj fix --all-lines --at-op x	safe-write
+jj fix --all-lines --debug	safe-write
+jj fix --all-lines x	safe-write
+jj fix --at-op x	safe-write
+jj fix --at-operation x	safe-write
+jj fix --color x	safe-write
+jj fix --debug	safe-write
+jj fix --help	safe-write
+jj fix --ignore-immutable	safe-write
+jj fix --ignore-working-copy	safe-write
+jj fix --include-unchanged-files	safe-write
+jj fix --no-pager	safe-write
+jj fix --quiet	safe-write
+jj fix --repository x	safe-write
+jj fix --source x	safe-write
+jj fix -R x	safe-write
+jj fix -a	safe-write
+jj fix -h	safe-write
+jj fix -s x	safe-write
 jj fix x	safe-write
 jj git	inert
 jj git fetch	inert
+jj git fetch --all-remotes	inert
+jj git fetch --all-remotes --at-op x	inert
+jj git fetch --all-remotes --debug	inert
+jj git fetch --all-remotes x	inert
+jj git fetch --at-op x	inert
+jj git fetch --at-operation x	inert
+jj git fetch --branch x	inert
+jj git fetch --color x	inert
+jj git fetch --debug	inert
+jj git fetch --help	inert
+jj git fetch --ignore-immutable	inert
+jj git fetch --ignore-working-copy	inert
+jj git fetch --no-pager	inert
+jj git fetch --quiet	inert
+jj git fetch --remote x	inert
+jj git fetch --repository x	inert
+jj git fetch --tag x	inert
+jj git fetch --tracked	inert
+jj git fetch -R x	inert
+jj git fetch -b x	inert
+jj git fetch -h	inert
+jj git fetch -t x	inert
 jj git fetch x	inert
 jj git import	inert
+jj git import --at-op x	inert
+jj git import --at-operation x	inert
+jj git import --color x	inert
+jj git import --debug	inert
+jj git import --debug --at-op x	inert
+jj git import --debug --help	inert
+jj git import --debug x	inert
+jj git import --help	inert
+jj git import --ignore-immutable	inert
+jj git import --ignore-working-copy	inert
+jj git import --no-pager	inert
+jj git import --quiet	inert
+jj git import --repository x	inert
+jj git import -R x	inert
+jj git import -h	inert
 jj git import x	inert
 jj git init	safe-write
+jj git init --at-op x	safe-write
+jj git init --at-operation x	safe-write
 jj git init --colocate	safe-write
+jj git init --colocate --at-op x	safe-write
+jj git init --colocate --debug	safe-write
+jj git init --colocate x	safe-write
+jj git init --color x	safe-write
+jj git init --debug	safe-write
+jj git init --git-repo x	safe-write
+jj git init --help	safe-write
+jj git init --ignore-immutable	safe-write
+jj git init --ignore-working-copy	safe-write
+jj git init --no-colocate	safe-write
+jj git init --no-pager	safe-write
+jj git init --object-hash x	safe-write
+jj git init --quiet	safe-write
+jj git init --repository x	safe-write
+jj git init -R x	safe-write
+jj git init -h	safe-write
 jj git init x	safe-write
 jj git push	denied
 jj git push --bookmark main	denied
 jj git remote	inert
 jj git remote list	inert
+jj git remote list --at-op x	inert
+jj git remote list --at-operation x	inert
+jj git remote list --color x	inert
+jj git remote list --debug	inert
+jj git remote list --debug --at-op x	inert
+jj git remote list --debug --help	inert
+jj git remote list --debug x	inert
+jj git remote list --help	inert
+jj git remote list --ignore-immutable	inert
+jj git remote list --ignore-working-copy	inert
+jj git remote list --no-pager	inert
+jj git remote list --quiet	inert
+jj git remote list --repository x	inert
+jj git remote list -R x	inert
+jj git remote list -h	inert
 jj git remote list x	inert
 jj git remote x	denied
 jj git x	denied
 jj help	inert
+jj help --at-op x	inert
+jj help --at-operation x	inert
+jj help --color x	inert
+jj help --debug	inert
+jj help --debug --at-op x	inert
+jj help --debug --help	inert
+jj help --debug x	inert
+jj help --help	inert
+jj help --ignore-immutable	inert
+jj help --ignore-working-copy	inert
+jj help --keyword x	inert
+jj help --no-pager	inert
+jj help --quiet	inert
+jj help --repository x	inert
+jj help -R x	inert
+jj help -h	inert
+jj help -k x	inert
 jj help x	inert
 jj log	inert
+jj log --at-op x	inert
+jj log --at-operation x	inert
+jj log --bogus	denied
+jj log --color x	inert
+jj log --color-words	inert
+jj log --color-words --at-op x	inert
+jj log --color-words --count	inert
+jj log --color-words x	inert
 jj log --color=never "$X"	denied
 jj log --config-file /tmp/evil.toml	denied
 jj log --config-toml x=1	denied
+jj log --context x	inert
+jj log --count	inert
+jj log --debug	inert
+jj log --git	inert
+jj log --help	inert
+jj log --ignore-all-space	inert
+jj log --ignore-immutable	inert
+jj log --ignore-space-change	inert
+jj log --ignore-working-copy	inert
+jj log --limit x	inert
+jj log --name-only	inert
+jj log --no-graph	inert
 jj log --no-graph "$X" -p	denied
 jj log --no-graph -T "$T"	inert
-jj log --oneline	inert
+jj log --no-pager	inert
+jj log --patch	inert
+jj log --quiet	inert
+jj log --repository x	inert
+jj log --reversed	inert
+jj log --revision x	inert
+jj log --revisions x	inert
+jj log --stat	inert
+jj log --summary	inert
+jj log --template x	inert
+jj log --tool /tmp/x	denied
+jj log --types	inert
+jj log -G	inert
+jj log -GR/etc	denied
+jj log -R x	inert
+jj log -T x	inert
 jj log -Tr "$X"	denied
+jj log -h	inert
+jj log -n x	inert
 jj log -n1 -Tauthor "$X" -p	denied
+jj log -p	inert
 jj log -pr "$X"	denied
 jj log -r "$REV"	inert
+jj log -r @ --no-graph -T description	inert
 jj log -r main $X	denied
+jj log -r x	inert
 jj log -rmaster "$X" -p	denied
 jj log -rr "$X"	denied
+jj log -s	inert
 jj log x	inert
 jj new	safe-write
 jj new $X	denied
+jj new --after x	safe-write
+jj new --at-op x	safe-write
+jj new --at-operation x	safe-write
+jj new --before x	safe-write
+jj new --color x	safe-write
 jj new --config=ui.editor=/tmp/evil.sh	denied
+jj new --debug	safe-write
+jj new --debug --after x	safe-write
+jj new --debug --edit	safe-write
+jj new --debug x	safe-write
+jj new --edit	safe-write
+jj new --help	safe-write
+jj new --ignore-immutable	safe-write
+jj new --ignore-working-copy	safe-write
+jj new --insert-after x	safe-write
+jj new --insert-before x	safe-write
+jj new --message x	safe-write
+jj new --no-edit	safe-write
+jj new --no-pager	safe-write
+jj new --quiet	safe-write
+jj new --repository x	safe-write
+jj new -A x	safe-write
+jj new -B x	safe-write
+jj new -R /etc	denied
+jj new -R x	safe-write
+jj new -d x	safe-write
+jj new -h	safe-write
+jj new -m x	safe-write
+jj new -o x	safe-write
+jj new -r x	safe-write
 jj new main -m 'start feature'	safe-write
 jj new x	safe-write
 jj op	inert
 jj op log	inert
+jj op log --at-op x	inert
+jj op log --at-operation x	inert
+jj op log --color x	inert
+jj op log --color-words	inert
+jj op log --color-words --at-op x	inert
+jj op log --color-words --debug	inert
+jj op log --color-words x	inert
+jj op log --context x	inert
+jj op log --debug	inert
+jj op log --git	inert
+jj op log --help	inert
+jj op log --ignore-all-space	inert
+jj op log --ignore-immutable	inert
+jj op log --ignore-space-change	inert
+jj op log --ignore-working-copy	inert
+jj op log --limit x	inert
+jj op log --name-only	inert
+jj op log --no-graph	inert
+jj op log --no-pager	inert
+jj op log --op-diff	inert
+jj op log --patch	inert
+jj op log --quiet	inert
+jj op log --repository x	inert
+jj op log --reversed	inert
+jj op log --show-changes-in x	inert
+jj op log --stat	inert
+jj op log --summary	inert
+jj op log --template x	inert
+jj op log --types	inert
+jj op log -G	inert
+jj op log -R x	inert
+jj op log -T x	inert
+jj op log -d	inert
+jj op log -h	inert
+jj op log -n x	inert
+jj op log -p	inert
+jj op log -s	inert
 jj op log x	inert
 jj op x	denied
 jj parallelize	safe-write
+jj parallelize --at-op x	safe-write
+jj parallelize --at-operation x	safe-write
+jj parallelize --color x	safe-write
+jj parallelize --debug	safe-write
+jj parallelize --debug --at-op x	safe-write
+jj parallelize --debug --help	safe-write
+jj parallelize --debug x	safe-write
+jj parallelize --help	safe-write
+jj parallelize --ignore-immutable	safe-write
+jj parallelize --ignore-working-copy	safe-write
+jj parallelize --no-pager	safe-write
+jj parallelize --quiet	safe-write
+jj parallelize --repository x	safe-write
+jj parallelize -R x	safe-write
+jj parallelize -h	safe-write
+jj parallelize -r x	safe-write
 jj parallelize @::@-	safe-write
 jj parallelize x	safe-write
 jj rebase	safe-write
+jj rebase --after x	safe-write
+jj rebase --at-op x	safe-write
+jj rebase --at-operation x	safe-write
+jj rebase --before x	safe-write
+jj rebase --branch x	safe-write
+jj rebase --color x	safe-write
+jj rebase --debug	safe-write
+jj rebase --debug --after x	safe-write
+jj rebase --debug --help	safe-write
+jj rebase --debug x	safe-write
+jj rebase --destination x	safe-write
+jj rebase --help	safe-write
+jj rebase --ignore-immutable	safe-write
+jj rebase --ignore-working-copy	safe-write
+jj rebase --insert-after x	safe-write
+jj rebase --insert-before x	safe-write
+jj rebase --keep-divergent	safe-write
+jj rebase --no-pager	safe-write
+jj rebase --onto x	safe-write
+jj rebase --quiet	safe-write
+jj rebase --repository x	safe-write
+jj rebase --revision x	safe-write
+jj rebase --revisions x	safe-write
+jj rebase --simplify-parents	safe-write
+jj rebase --skip-emptied	safe-write
+jj rebase --source x	safe-write
+jj rebase -A x	safe-write
+jj rebase -B x	safe-write
+jj rebase -R x	safe-write
+jj rebase -b x	safe-write
 jj rebase -d main	safe-write
+jj rebase -d x	safe-write
+jj rebase -h	safe-write
+jj rebase -o x	safe-write
 jj rebase -r @ -o "$DEST"	safe-write
+jj rebase -r x	safe-write
+jj rebase -s x	safe-write
 jj rebase x	safe-write
 jj resolve	safe-write
+jj resolve --at-op x	safe-write
+jj resolve --at-operation x	safe-write
+jj resolve --color x	safe-write
+jj resolve --debug	safe-write
+jj resolve --debug --at-op x	safe-write
+jj resolve --debug --help	safe-write
+jj resolve --debug x	safe-write
+jj resolve --help	safe-write
+jj resolve --ignore-immutable	safe-write
+jj resolve --ignore-working-copy	safe-write
 jj resolve --list	safe-write
+jj resolve --no-pager	safe-write
+jj resolve --quiet	safe-write
+jj resolve --repository x	safe-write
+jj resolve --revision x	safe-write
+jj resolve -R x	safe-write
+jj resolve -h	safe-write
+jj resolve -l	safe-write
+jj resolve -r x	safe-write
 jj resolve x	safe-write
 jj restore	safe-write
+jj restore --at-op x	safe-write
+jj restore --at-operation x	safe-write
+jj restore --changes-in x	safe-write
+jj restore --color x	safe-write
+jj restore --debug	safe-write
+jj restore --debug --at-op x	safe-write
+jj restore --debug --help	safe-write
+jj restore --debug x	safe-write
 jj restore --from @-	safe-write
+jj restore --from x	safe-write
+jj restore --help	safe-write
+jj restore --ignore-immutable	safe-write
+jj restore --ignore-working-copy	safe-write
+jj restore --into x	safe-write
+jj restore --no-pager	safe-write
+jj restore --quiet	safe-write
+jj restore --repository x	safe-write
+jj restore --restore-descendants	safe-write
+jj restore --to x	safe-write
+jj restore -R x	safe-write
+jj restore -c x	safe-write
+jj restore -f x	safe-write
+jj restore -h	safe-write
+jj restore -t x	safe-write
 jj restore x	safe-write
 jj root	inert
+jj root --at-op x	inert
+jj root --at-operation x	inert
+jj root --color x	inert
+jj root --debug	inert
+jj root --debug --at-op x	inert
+jj root --debug --help	inert
+jj root --debug x	inert
+jj root --help	inert
+jj root --ignore-immutable	inert
+jj root --ignore-working-copy	inert
+jj root --no-pager	inert
+jj root --quiet	inert
+jj root --repository x	inert
+jj root -R x	inert
+jj root -h	inert
 jj root x	inert
 jj show	inert
+jj show --at-op x	inert
+jj show --at-operation x	inert
+jj show --color x	inert
+jj show --color-words	inert
+jj show --color-words --at-op x	inert
+jj show --color-words --debug	inert
+jj show --color-words x	inert
+jj show --context x	inert
+jj show --debug	inert
+jj show --git	inert
+jj show --help	inert
+jj show --ignore-all-space	inert
+jj show --ignore-immutable	inert
+jj show --ignore-space-change	inert
+jj show --ignore-working-copy	inert
+jj show --name-only	inert
+jj show --no-pager	inert
+jj show --no-patch	inert
+jj show --quiet	inert
+jj show --repository x	inert
+jj show --reversed	inert
+jj show --stat	inert
+jj show --summary	inert
+jj show --template x	inert
 jj show --tool=/tmp/evil.sh	denied
+jj show --types	inert
+jj show -R x	inert
+jj show -T x	inert
+jj show -b	inert
+jj show -h	inert
+jj show -r x	inert
+jj show -s	inert
+jj show -w	inert
 jj show @-	inert
 jj show x	inert
 jj simplify-parents	safe-write
+jj simplify-parents --at-op x	safe-write
+jj simplify-parents --at-operation x	safe-write
+jj simplify-parents --color x	safe-write
+jj simplify-parents --debug	safe-write
+jj simplify-parents --debug --at-op x	safe-write
+jj simplify-parents --debug --help	safe-write
+jj simplify-parents --debug x	safe-write
+jj simplify-parents --help	safe-write
+jj simplify-parents --ignore-immutable	safe-write
+jj simplify-parents --ignore-working-copy	safe-write
+jj simplify-parents --no-pager	safe-write
+jj simplify-parents --quiet	safe-write
+jj simplify-parents --repository x	safe-write
+jj simplify-parents --revision x	safe-write
+jj simplify-parents --revisions x	safe-write
+jj simplify-parents --source x	safe-write
+jj simplify-parents -R x	safe-write
+jj simplify-parents -h	safe-write
+jj simplify-parents -r x	safe-write
+jj simplify-parents -s x	safe-write
 jj simplify-parents x	safe-write
 jj split	safe-write
+jj split --after x	safe-write
+jj split --at-op x	safe-write
+jj split --at-operation x	safe-write
+jj split --before x	safe-write
+jj split --color x	safe-write
+jj split --debug	safe-write
+jj split --debug --after x	safe-write
+jj split --debug --help	safe-write
+jj split --debug x	safe-write
+jj split --destination x	safe-write
 jj split --help	safe-write
+jj split --ignore-immutable	safe-write
+jj split --ignore-working-copy	safe-write
+jj split --insert-after x	safe-write
+jj split --insert-before x	safe-write
+jj split --message x	safe-write
+jj split --no-pager	safe-write
+jj split --onto x	safe-write
+jj split --parallel	safe-write
+jj split --quiet	safe-write
+jj split --repository x	safe-write
+jj split --revision x	safe-write
+jj split -A x	safe-write
+jj split -B x	safe-write
+jj split -R x	safe-write
+jj split -d x	safe-write
+jj split -h	safe-write
+jj split -m x	safe-write
+jj split -o x	safe-write
+jj split -p	safe-write
+jj split -r x	safe-write
 jj split x	safe-write
 jj squash	safe-write
+jj squash --after x	safe-write
+jj squash --at-op x	safe-write
+jj squash --at-operation x	safe-write
+jj squash --before x	safe-write
+jj squash --color x	safe-write
+jj squash --debug	safe-write
+jj squash --debug --after x	safe-write
+jj squash --debug --help	safe-write
+jj squash --debug x	safe-write
+jj squash --destination x	safe-write
+jj squash --from x	safe-write
 jj squash --help	safe-write
+jj squash --ignore-immutable	safe-write
+jj squash --ignore-working-copy	safe-write
+jj squash --insert-after x	safe-write
+jj squash --insert-before x	safe-write
+jj squash --into x	safe-write
+jj squash --keep-emptied	safe-write
+jj squash --message x	safe-write
+jj squash --no-pager	safe-write
+jj squash --onto x	safe-write
+jj squash --quiet	safe-write
+jj squash --repository x	safe-write
+jj squash --revision x	safe-write
+jj squash --to x	safe-write
+jj squash --use-destination-message	safe-write
+jj squash -A x	safe-write
+jj squash -B x	safe-write
+jj squash -R x	safe-write
+jj squash -d x	safe-write
+jj squash -f x	safe-write
+jj squash -h	safe-write
+jj squash -i	denied
+jj squash -k	safe-write
+jj squash -m x	safe-write
+jj squash -o x	safe-write
+jj squash -r x	safe-write
+jj squash -t x	safe-write
+jj squash -u	safe-write
 jj squash x	safe-write
 jj st	inert
+jj st --at-op x	inert
+jj st --at-operation x	inert
+jj st --color x	inert
+jj st --debug	inert
+jj st --debug --at-op x	inert
+jj st --debug --help	inert
+jj st --debug x	inert
+jj st --help	inert
+jj st --ignore-immutable	inert
+jj st --ignore-working-copy	inert
+jj st --no-pager	inert
+jj st --quiet	inert
+jj st --repository x	inert
+jj st -R x	inert
+jj st -h	inert
 jj st x	inert
 jj status	inert
+jj status --at-op x	inert
+jj status --at-operation x	inert
+jj status --color x	inert
+jj status --debug	inert
+jj status --debug --at-op x	inert
+jj status --debug --help	inert
+jj status --debug x	inert
+jj status --help	inert
+jj status --ignore-immutable	inert
+jj status --ignore-working-copy	inert
+jj status --no-pager	inert
+jj status --quiet	inert
+jj status --repository x	inert
+jj status -R x	inert
+jj status -h	inert
 jj status x	inert
 jj tag	inert
 jj tag list	inert
+jj tag list --all-remotes	inert
+jj tag list --all-remotes --at-op x	inert
+jj tag list --all-remotes --conflicted	inert
+jj tag list --all-remotes x	inert
+jj tag list --at-op x	inert
+jj tag list --at-operation x	inert
+jj tag list --color x	inert
+jj tag list --conflicted	inert
+jj tag list --debug	inert
+jj tag list --help	inert
+jj tag list --ignore-immutable	inert
+jj tag list --ignore-working-copy	inert
+jj tag list --no-pager	inert
+jj tag list --quiet	inert
+jj tag list --remote x	inert
+jj tag list --repository x	inert
+jj tag list --revision x	inert
+jj tag list --sort x	inert
+jj tag list --template x	inert
+jj tag list --tracked	inert
+jj tag list -R x	inert
+jj tag list -T x	inert
+jj tag list -a	inert
+jj tag list -c	inert
+jj tag list -h	inert
+jj tag list -r x	inert
+jj tag list -t	inert
 jj tag list x	inert
 jj tag x	denied
 jj undo	safe-write
+jj undo --allow-cross-workspace	safe-write
+jj undo --allow-cross-workspace --at-op x	safe-write
+jj undo --allow-cross-workspace --debug	safe-write
+jj undo --allow-cross-workspace x	safe-write
+jj undo --at-op x	safe-write
+jj undo --at-operation x	safe-write
+jj undo --color x	safe-write
+jj undo --debug	safe-write
+jj undo --help	safe-write
+jj undo --ignore-immutable	safe-write
+jj undo --ignore-working-copy	safe-write
+jj undo --no-pager	safe-write
+jj undo --quiet	safe-write
+jj undo --repository x	safe-write
+jj undo -R x	safe-write
+jj undo -h	safe-write
 jj undo x	safe-write
 jj unsquash	safe-write
+jj unsquash --at-op x	safe-write
+jj unsquash --at-operation x	safe-write
+jj unsquash --color x	safe-write
+jj unsquash --debug	safe-write
+jj unsquash --debug --at-op x	safe-write
+jj unsquash --debug --help	safe-write
+jj unsquash --debug x	safe-write
+jj unsquash --help	safe-write
+jj unsquash --ignore-immutable	safe-write
+jj unsquash --ignore-working-copy	safe-write
+jj unsquash --no-pager	safe-write
+jj unsquash --quiet	safe-write
+jj unsquash --repository x	safe-write
+jj unsquash --revision x	safe-write
+jj unsquash -R x	safe-write
+jj unsquash -h	safe-write
+jj unsquash -r x	safe-write
 jj unsquash x	safe-write
 jj version	inert
+jj version --at-op x	inert
+jj version --at-operation x	inert
+jj version --color x	inert
+jj version --debug	inert
+jj version --debug --at-op x	inert
+jj version --debug --help	inert
+jj version --debug x	inert
+jj version --help	inert
+jj version --ignore-immutable	inert
+jj version --ignore-working-copy	inert
+jj version --no-pager	inert
+jj version --quiet	inert
+jj version --repository x	inert
+jj version -R x	inert
+jj version -h	inert
 jj version x	inert
 jj workspace	inert
 jj workspace add	safe-write
+jj workspace add --at-op x	safe-write
+jj workspace add --at-operation x	safe-write
+jj workspace add --colocate	safe-write
+jj workspace add --colocate --at-op x	safe-write
+jj workspace add --colocate --debug	safe-write
+jj workspace add --colocate x	safe-write
+jj workspace add --color x	safe-write
+jj workspace add --debug	safe-write
+jj workspace add --help	safe-write
+jj workspace add --ignore-immutable	safe-write
+jj workspace add --ignore-working-copy	safe-write
+jj workspace add --message x	safe-write
+jj workspace add --name x	safe-write
+jj workspace add --no-colocate	safe-write
+jj workspace add --no-pager	safe-write
+jj workspace add --quiet	safe-write
+jj workspace add --repository x	safe-write
+jj workspace add --revision x	safe-write
+jj workspace add --revisions x	safe-write
+jj workspace add --sparse-patterns x	safe-write
+jj workspace add -R x	safe-write
+jj workspace add -h	safe-write
+jj workspace add -m x	safe-write
+jj workspace add -r x	safe-write
 jj workspace add ../ws2	safe-write
 jj workspace add x	safe-write
 jj workspace forget	safe-write
+jj workspace forget --at-op x	safe-write
+jj workspace forget --at-operation x	safe-write
+jj workspace forget --color x	safe-write
+jj workspace forget --debug	safe-write
+jj workspace forget --debug --at-op x	safe-write
+jj workspace forget --debug --help	safe-write
+jj workspace forget --debug x	safe-write
+jj workspace forget --help	safe-write
+jj workspace forget --ignore-immutable	safe-write
+jj workspace forget --ignore-working-copy	safe-write
+jj workspace forget --no-pager	safe-write
+jj workspace forget --quiet	safe-write
+jj workspace forget --repository x	safe-write
+jj workspace forget -R x	safe-write
+jj workspace forget -h	safe-write
 jj workspace forget default	safe-write
 jj workspace forget x	safe-write
 jj workspace list	inert
+jj workspace list --at-op x	inert
+jj workspace list --at-operation x	inert
+jj workspace list --color x	inert
+jj workspace list --debug	inert
+jj workspace list --debug --at-op x	inert
+jj workspace list --debug --help	inert
+jj workspace list --debug x	inert
+jj workspace list --help	inert
+jj workspace list --ignore-immutable	inert
+jj workspace list --ignore-working-copy	inert
+jj workspace list --no-pager	inert
+jj workspace list --quiet	inert
+jj workspace list --repository x	inert
+jj workspace list --template x	inert
+jj workspace list -R x	inert
+jj workspace list -T x	inert
+jj workspace list -h	inert
 jj workspace list x	inert
 jj workspace rename	safe-write
+jj workspace rename --at-op x	safe-write
+jj workspace rename --at-operation x	safe-write
+jj workspace rename --color x	safe-write
+jj workspace rename --debug	safe-write
+jj workspace rename --debug --at-op x	safe-write
+jj workspace rename --debug --help	safe-write
+jj workspace rename --debug x	safe-write
+jj workspace rename --help	safe-write
+jj workspace rename --ignore-immutable	safe-write
+jj workspace rename --ignore-working-copy	safe-write
+jj workspace rename --no-pager	safe-write
+jj workspace rename --quiet	safe-write
+jj workspace rename --repository x	safe-write
+jj workspace rename -R x	safe-write
+jj workspace rename -h	safe-write
 jj workspace rename new-name	safe-write
 jj workspace rename x	safe-write
 jj workspace root	inert
+jj workspace root --at-op x	inert
+jj workspace root --at-operation x	inert
+jj workspace root --color x	inert
+jj workspace root --debug	inert
+jj workspace root --debug --at-op x	inert
+jj workspace root --debug --help	inert
+jj workspace root --debug x	inert
+jj workspace root --help	inert
+jj workspace root --ignore-immutable	inert
+jj workspace root --ignore-working-copy	inert
+jj workspace root --name x	inert
+jj workspace root --no-pager	inert
+jj workspace root --quiet	inert
+jj workspace root --repository x	inert
+jj workspace root -R x	inert
+jj workspace root -h	inert
 jj workspace root x	inert
 jj workspace update-stale	inert
+jj workspace update-stale --at-op x	inert
+jj workspace update-stale --at-operation x	inert
+jj workspace update-stale --color x	inert
+jj workspace update-stale --debug	inert
+jj workspace update-stale --debug --at-op x	inert
+jj workspace update-stale --debug --help	inert
+jj workspace update-stale --debug x	inert
+jj workspace update-stale --help	inert
+jj workspace update-stale --ignore-immutable	inert
+jj workspace update-stale --ignore-working-copy	inert
+jj workspace update-stale --no-pager	inert
+jj workspace update-stale --quiet	inert
+jj workspace update-stale --repository x	inert
+jj workspace update-stale -R x	inert
+jj workspace update-stale -h	inert
 jj workspace update-stale x	inert
 jj workspace x	denied
 jj x	denied

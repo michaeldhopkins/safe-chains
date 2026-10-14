@@ -1,11 +1,11 @@
 [[command]]
 name = "jj"
-description = "Git-compatible version control system with an opinionated, simpler model — automatic working-copy commits, first-class conflicts, and operation log for undo. Read-only operations (log, diff, show, status, file show, bookmark list, config get/list/path) inspect repo state. Write operations (new, commit, describe, rebase, squash, split, abandon, restore) modify the local change graph but never contact the network. git fetch downloads from remotes; git push uploads — both are network operations. `config set`/`unset`/`edit` write config files: although local and offline, the value of a config key can name a program jj later executes — `git.executable-path`, `merge-tools.*.program`, `signing.backends.*.program`, `ui.pager`, `ui.editor` — so a single config write (e.g. `jj config set --user git.executable-path /tmp/x`) reconfigures how the next jj command runs and is a deferred code-execution vector, not a contained local edit; `config edit` additionally spawns $EDITOR. The CLI is evolving rapidly with releases roughly every 1-2 weeks (still pre-1.0); new subcommands and flag changes are frequent and require ongoing review."
-url = "https://jj-vcs.github.io/jj/latest/cli-reference/"
-researched_version = "jj 0.39.0 (config subcommand reviewed)"
+description = "Git-compatible version control system (Jujutsu) with automatic working-copy snapshots, first-class conflicts and an operation log that can undo any command. Observing subcommands (log, show, diff, status, file list/show, bookmark/tag/workspace/operation list and log, config get/list/path, root, help, version) read the repository and config and print to stdout; with a repository chosen by -R or --repository they read that one instead, and any jj command snapshots the working copy first, which writes to the repository's own store. Mutating subcommands (new, commit, describe, edit, rebase, squash, split, restore, abandon, absorb, duplicate, parallelize, bookmark create/set/move/delete/forget, git import, git init, workspace add/forget, undo) rewrite the local change graph and working-copy files, are reversible through the operation log, and never contact a remote; git init and workspace add also create a repository or workspace directory at any path they are given. git fetch is an outbound network read from the configured remotes and writes the fetched commits locally; git push uploads commits and moves remote bookmarks, which is remote and effectively irreversible; git clone and remote add/set-url name hosts. Several subcommands run programs named in configuration rather than by the command line: diff and split tools, merge tools (resolve, diffedit, -i/--interactive, --tool), the editor and pager, fix tools (jj fix), signing backends, jj run and jj util exec; and config set/unset/edit can write those very keys, so a config write is a deferred execution vector, not a contained local edit. --config, --config-file and --tool put such a program on the command line. Credentials are read only through git's own helpers during fetch and push. Pre-1.0, with a release about every month (0.46.0 on 2026-10-07) that adds, renames and removes subcommands and flags, so the surface needs ongoing review."
+url = "https://docs.jj-vcs.dev/latest/cli-reference/"
+researched_version = "jj 0.46.0 (CLI reference of 0.45.1 and the 0.46.0 changelog)"
 bare_flags = ["--help", "--version", "-h"]
-examples_safe = ["jj new", "jj -R ./sub new"]
-examples_denied = ["jj -R /etc new"]
+examples_safe = ["jj new", "jj -R ./sub new", "jj log -r @ --no-graph -T description", "jj diff --name-only -r @-", "jj status --no-pager"]
+examples_denied = ["jj -R /etc new", "jj new -R /etc", "jj log -GR/etc", "jj log --bogus", "jj log --tool /tmp/x", "jj squash -i", "jj git push", "jj config set --user ui.editor x"]
 # Flags that take a value in every jj subcommand that has them (checked against
 # `jj util markdown-help` for jj 0.45.1). Spellings that are a value flag in one sub and a switch
 # in another (`-s`, `-b`, `-B`, `-n`, `-p`, `-t`) are left out.
@@ -24,13 +24,12 @@ valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 # rather than `exec` because jj mutates that repo's store — it does not run code out of it — so
 # `-R /tmp/scratch-repo` stays workable while system and home paths do not.
 [command.path_gate]
-flags = { "--repository" = "write", "-R" = "write" }
+flags = { "--destination" = "ignore", "--repository" = "write", "-R" = "write" }
 
-# jj's global options are accepted after the subcommand as well as before it, and most subs
-# tolerate unknown long flags, so a global that makes jj run a program has to be refused for the
-# whole invocation rather than per sub. `--config`/`--config-file` can set `ui.diff-formatter`,
-# `ui.pager`, `merge-tools.*.program` or `git.executable-path`; `--tool` names the program that
-# renders a diff.
+# jj's global options are accepted after the subcommand as well as before it, so a global that
+# makes jj run a program is refused for the whole invocation rather than per sub.
+# `--config`/`--config-file` can set `ui.diff-formatter`, `ui.pager`, `merge-tools.*.program` or
+# `git.executable-path`; `--tool` names the program that renders a diff.
 [[command.flag]]
 name = "--config"
 classifies = "unclassified"
@@ -56,53 +55,92 @@ source = "https://jj-vcs.github.io/jj/latest/cli-reference/#jj-diff — `--tool`
 name = "abandon"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "--restore-descendants", "--retain-bookmarks", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-r", "-R",
+]
 
 [[command.sub]]
 name = "absorb"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--from", "--into", "--repository", "--to", "-f", "-R",
+    "-t",
+]
 
 [[command.sub]]
 name = "backout"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--destination", "--insert-after", "--insert-before",
+    "--repository", "--revisions", "-A", "-B", "-d", "-r", "-R",
+]
 
 [[command.sub]]
 name = "cat"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "-r", "-R",
+]
 bare = false
 
 [[command.sub]]
 name = "commit"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--message", "--repository", "-m", "-R",
+]
 
 [[command.sub]]
 name = "describe"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "--stdin", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--message", "--repository", "-m", "-r", "-R",
+]
 
 [[command.sub]]
 name = "diff"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--color-words", "--debug", "--git", "--help", "--ignore-all-space", "--ignore-immutable",
+    "--ignore-space-change", "--ignore-working-copy", "--name-only", "--no-pager", "--quiet",
+    "--stat", "--summary", "--types", "-b", "-h", "-s", "-w",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--context", "--from", "--repository", "--revision",
+    "--revisions", "--template", "--to", "-f", "-r", "-R", "-t", "-T",
+]
 # `jj diff --name-only` prints workspace-relative paths, one per line — jj's own help recommends it
 # for exactly this ("useful for shell commands like: jj diff -r @- --name-only | xargs ..."), so
 # leaving the value unpinnable denied the idiom the tool documents.
 #
-# jj enforces the exclusivity itself, which is what makes this claim safe under
-# `tolerate_unknown_long`: --template/--summary/--stat/--types are declared conflicting with
+# jj enforces the exclusivity itself, which is what makes this claim safe:
+# --template/--summary/--stat/--types are declared conflicting with
 # --name-only and jj exits with an error rather than combining them. A future format flag would
 # almost certainly join that conflict set; the ones known today are listed regardless, because a
 # claim that leans on another layer breaks the moment that layer moves.
@@ -130,125 +168,241 @@ valued = ["--context", "--from", "--revisions", "--to", "-f", "-r", "-t"]
 name = "duplicate"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--after", "--at-op", "--at-operation", "--before", "--color", "--destination",
+    "--insert-after", "--insert-before", "--onto", "--repository", "-A", "-B", "-d", "-o", "-r",
+    "-R",
+]
 
 [[command.sub]]
 name = "edit"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-r", "-R",
+]
 
 [[command.sub]]
 name = "fix"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--all-lines", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--include-unchanged-files", "--no-pager", "--quiet", "-a", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--source", "-R", "-s",
+]
 
 [[command.sub]]
 name = "help"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--keyword", "--repository", "-k", "-R",
+]
 
 [[command.sub]]
 name = "log"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--color-words", "--count", "--debug", "--git", "--help", "--ignore-all-space",
+    "--ignore-immutable", "--ignore-space-change", "--ignore-working-copy", "--name-only",
+    "--no-graph", "--no-pager", "--patch", "--quiet", "--reversed", "--stat", "--summary",
+    "--types", "-G", "-h", "-p", "-s",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--context", "--limit", "--repository", "--revision",
+    "--revisions", "--template", "-n", "-r", "-R", "-T",
+]
 
 [[command.sub]]
 name = "new"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--edit", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-edit",
+    "--no-pager", "--quiet", "-h",
+]
+valued = [
+    "--after", "--at-op", "--at-operation", "--before", "--color", "--insert-after",
+    "--insert-before", "--message", "--repository", "-A", "-B", "-d", "-m", "-o", "-r", "-R",
+]
 
 [[command.sub]]
 name = "parallelize"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-r", "-R",
+]
 
 [[command.sub]]
 name = "rebase"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--keep-divergent",
+    "--no-pager", "--quiet", "--simplify-parents", "--skip-emptied", "-h",
+]
+valued = [
+    "--after", "--at-op", "--at-operation", "--before", "--branch", "--color", "--destination",
+    "--insert-after", "--insert-before", "--onto", "--repository", "--revision", "--revisions",
+    "--source", "-A", "-b", "-B", "-d", "-o", "-r", "-R", "-s",
+]
 
 [[command.sub]]
 name = "resolve"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--list", "--no-pager",
+    "--quiet", "-h", "-l",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "-r", "-R",
+]
 
 [[command.sub]]
 name = "restore"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "--restore-descendants", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--changes-in", "--color", "--from", "--into", "--repository",
+    "--to", "-c", "-f", "-R", "-t",
+]
 
 [[command.sub]]
 name = "root"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "show"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--color-words", "--debug", "--git", "--help", "--ignore-all-space", "--ignore-immutable",
+    "--ignore-space-change", "--ignore-working-copy", "--name-only", "--no-pager", "--no-patch",
+    "--quiet", "--reversed", "--stat", "--summary", "--types", "-b", "-h", "-s", "-w",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--context", "--repository", "--template", "-r", "-R",
+    "-T",
+]
 
 [[command.sub]]
 name = "simplify-parents"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "--revisions", "--source",
+    "-r", "-R", "-s",
+]
 
 [[command.sub]]
 name = "split"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--parallel",
+    "--quiet", "-h", "-p",
+]
+valued = [
+    "--after", "--at-op", "--at-operation", "--before", "--color", "--destination",
+    "--insert-after", "--insert-before", "--message", "--onto", "--repository", "--revision", "-A",
+    "-B", "-d", "-m", "-o", "-r", "-R",
+]
 
 [[command.sub]]
 name = "squash"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--keep-emptied",
+    "--no-pager", "--quiet", "--use-destination-message", "-h", "-k", "-u",
+]
+valued = [
+    "--after", "--at-op", "--at-operation", "--before", "--color", "--destination", "--from",
+    "--insert-after", "--insert-before", "--into", "--message", "--onto", "--repository",
+    "--revision", "--to", "-A", "-B", "-d", "-f", "-m", "-o", "-r", "-R", "-t",
+]
 
 [[command.sub]]
 name = "st"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "status"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "undo"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--allow-cross-workspace", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-pager", "--quiet", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "unsquash"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "-r", "-R",
+]
 
 [[command.sub]]
 name = "version"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "bookmark"
@@ -257,121 +411,232 @@ nested_bare = true
 name = "create"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "--to", "-r", "-R",
+]
 [[command.sub.sub]]
 name = "delete"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "forget"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--include-remotes",
+    "--no-pager", "--quiet", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--all", "--all-remotes", "--conflicted", "--debug", "--help", "--ignore-immutable",
+    "--ignore-working-copy", "--no-pager", "--quiet", "--tracked", "-a", "-c", "-h",
+    "-t",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--remote", "--repository", "--revision", "--revisions",
+    "--sort", "--template", "-r", "-R", "-T",
+]
 [[command.sub.sub]]
 name = "move"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--allow-backwards", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-pager", "--quiet", "-B", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--from", "--repository", "--to", "-f", "-R", "-t",
+]
 [[command.sub.sub]]
 name = "rename"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager",
+    "--overwrite-existing", "--quiet", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "set"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--allow-backwards", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-pager", "--quiet", "-B", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "--to", "-r", "-R",
+]
 [[command.sub.sub]]
 name = "track"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--remote", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "untrack"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--remote", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "config"
 nested_bare = true
 [[command.sub.sub]]
 name = "get"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--include-defaults",
+    "--include-overridden", "--no-pager", "--quiet", "--repo", "--user", "--workspace",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--template", "-R", "-T",
+]
 [[command.sub.sub]]
 name = "path"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "--repo", "--user", "--workspace", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "file"
 nested_bare = true
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "--template", "-r", "-R",
+    "-T",
+]
 [[command.sub.sub]]
 name = "show"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--revision", "--template", "-r", "-R",
+    "-T",
+]
 
 [[command.sub]]
 name = "git"
 nested_bare = true
 [[command.sub.sub]]
 name = "fetch"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--all-remotes", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-pager", "--quiet", "--tracked", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--branch", "--color", "--remote", "--repository", "--tag", "-b",
+    "-R", "-t",
+]
 [[command.sub.sub]]
 name = "import"
 writes_cwd = "source"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "init"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--colocate", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-colocate", "--no-pager", "--quiet", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--git-repo", "--object-hash", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "remote"
 nested_bare = true
 [[command.sub.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 
 [[command.sub]]
 name = "op"
 nested_bare = true
 [[command.sub.sub]]
 name = "log"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--color-words", "--debug", "--git", "--help", "--ignore-all-space", "--ignore-immutable",
+    "--ignore-space-change", "--ignore-working-copy", "--name-only", "--no-graph", "--no-pager",
+    "--op-diff", "--patch", "--quiet", "--reversed", "--stat", "--summary", "--types",
+    "-d", "-G", "-h", "-p", "-s",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--context", "--limit", "--repository",
+    "--show-changes-in", "--template", "-n", "-R", "-T",
+]
 
 [[command.sub]]
 name = "tag"
 nested_bare = true
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--all-remotes", "--conflicted", "--debug", "--help", "--ignore-immutable",
+    "--ignore-working-copy", "--no-pager", "--quiet", "--tracked", "-a", "-c", "-h",
+    "-t",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--remote", "--repository", "--revision", "--sort",
+    "--template", "-r", "-R", "-T",
+]
 
 [[command.sub]]
 name = "workspace"
@@ -379,28 +644,59 @@ nested_bare = true
 [[command.sub.sub]]
 name = "add"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--colocate", "--debug", "--help", "--ignore-immutable", "--ignore-working-copy",
+    "--no-colocate", "--no-pager", "--quiet", "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--message", "--name", "--repository", "--revision",
+    "--revisions", "--sparse-patterns", "-m", "-r", "-R",
+]
 [[command.sub.sub]]
 name = "forget"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "--template", "-R", "-T",
+]
 [[command.sub.sub]]
 name = "rename"
 writes_cwd = "source"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "root"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--name", "--repository", "-R",
+]
 [[command.sub.sub]]
 name = "update-stale"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = [
+    "--debug", "--help", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet",
+    "-h",
+]
+valued = [
+    "--at-op", "--at-operation", "--color", "--repository", "-R",
+]

@@ -191,7 +191,6 @@ carton	examples,no-tolerance,profiled
 cast	description,examples,no-tolerance,profiled
 cat	description,examples,version
 cc_fips_test	description,examples
-cd	examples,version
 cdk	no-tolerance,profiled
 certbot	examples,profiled
 cf	examples,version
@@ -366,7 +365,7 @@ dyld_info	description,examples
 dyld_usage	description,examples
 earthly	description,examples,no-tolerance,profiled
 eb	no-tolerance,profiled
-echo	description,examples,no-tolerance,version
+echo	no-tolerance
 ecpg	description,examples
 editorconfig-checker	description,examples,no-tolerance
 elan	description,examples,no-tolerance,profiled
@@ -529,7 +528,6 @@ hardhat	description,examples,no-tolerance,profiled
 hash	description,examples,no-tolerance,version
 hatch	no-tolerance,profiled
 hdiutil	description,examples,profiled
-head	description,examples,version
 headerdoc2html	description,examples
 heap	examples,no-tolerance
 heif-dec	examples
@@ -628,7 +626,6 @@ jekyll	description,examples,profiled
 jenv	description,examples,profiled
 jest	examples,version
 jira	examples,no-tolerance,version
-jj	no-tolerance
 jjpr	description,version
 jless	description,examples,version
 join	description,examples
@@ -1343,7 +1340,6 @@ systemstats	description,examples,no-tolerance
 tab2space	description,examples,no-tolerance
 tabs	description,examples
 tac	description,examples,version
-tail	description,examples,version
 tailscale	examples,no-tolerance,version
 tap	description,examples,no-tolerance,profiled
 task	description

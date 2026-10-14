@@ -521,3 +521,13 @@ xattr	-w
 ytt	--output
 ytt	-o
 ziptool	-o
+jj backout	--destination
+jj duplicate	--destination
+jj duplicate	-o
+jj new	-o
+jj rebase	--destination
+jj rebase	-o
+jj split	--destination
+jj split	-o
+jj squash	--destination
+jj squash	-o
