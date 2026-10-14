@@ -79,6 +79,9 @@ adding a new one — extend a corpus/table where one already fits rather than st
   workflow, or triaging a MISSED mutant.
 - `docs/agents/mutation-findings.md`: what past rotating slices found and the tests that killed
   each miss. Read when a slice reports a MISSED mutant in code a past slice already covered.
+- `docs/agents/research-target.md`: what "researched" means for one command, the ratcheted
+  `tests/research_target.rs` and its pin, and how to work a command up to the target. Read before
+  researching or revising any command.
 
 ## Linting
 
