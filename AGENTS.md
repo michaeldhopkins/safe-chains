@@ -260,3 +260,5 @@ Doc strings in `command_docs()` must only describe what is **allowed**. This is 
 - Instead of "No flags allowed" → "Bare invocation allowed." or just list the subcommands
 - Instead of "Guarded: fmt (--check only)" → "fmt (requires --check)"
 - Don't say "explicit flag allowlist" — the whole program is an allowlist, this is redundant
+
+Dependencies move through the owner's `safe-chains-deps` upkeep job, never Dependabot.
