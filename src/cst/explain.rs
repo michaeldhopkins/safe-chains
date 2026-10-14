@@ -314,6 +314,7 @@ impl Explanation {
         for s in self.segments.iter().filter(|s| !s.verdict.is_allowed()) {
             out.push_str(&render_line(s));
         }
+        out.push_str("The command has likely already run. This is feedback, not a request to re-run it.\n");
         out
     }
 
@@ -511,7 +512,10 @@ mod tests {
 
     #[test]
     fn stateful_chain_context_names_only_the_refused_segments() {
-        assert_eq!(explain("cd build && cargo publish").render_context(), "safe-chains did not auto-approve:\n  ✗  cargo publish\n");
+        assert_eq!(
+            explain("cd build && cargo publish").render_context(),
+            "safe-chains did not auto-approve:\n  ✗  cargo publish\nThe command has likely already run. This is feedback, not a request to re-run it.\n"
+        );
     }
 
     proptest::proptest! {
