@@ -10136,11 +10136,11 @@ pulumi whoami -h	inert
 pulumi whoami x	inert
 pulumi x	denied
 pup	inert
-pup --charset	inert
-pup --charset --color	inert
-pup --charset --file x	inert
 pup --charset x	inert
 pup --color	inert
+pup --color --charset x	inert
+pup --color --help	inert
+pup --color x	inert
 pup --file x	inert
 pup --help	inert
 pup --number	inert

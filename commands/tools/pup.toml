@@ -4,5 +4,5 @@ description = "Command-line HTML parser (like jq for HTML). Reads HTML from stdi
 url = "https://github.com/ericchiang/pup"
 level = "Inert"
 tolerate_unknown_short = true
-standalone = ["--charset", "--color", "--help", "--number", "--plain", "--version", "-c", "-h", "-n", "-p"]
-valued = ["--file", "-f"]
+standalone = ["--color", "--help", "--number", "--plain", "--version", "-c", "-h", "-n", "-p"]
+valued = ["--charset", "--file", "-f"]
