@@ -6888,6 +6888,7 @@ git -C /repo -c core.askPass=false log	inert
 git -C /some/repo -C nested log	inert
 git -C /some/repo diff --stat	inert
 git -C /some/repo log --oneline | head -3	inert
+git -C /tmp grep --no-index x	denied
 git -C x	denied
 git -V	inert
 git -c DIFF.NOPREFIX=true diff	inert
@@ -7578,7 +7579,7 @@ git grep --max-count x	inert
 git grep --max-depth x	inert
 git grep --name-only	inert
 git grep --no-color	inert
-git grep --no-index	inert
+git grep --no-index x /etc/passwd	denied
 git grep --null	inert
 git grep --only-matching	inert
 git grep --open-files-in-pager=touch pat	denied

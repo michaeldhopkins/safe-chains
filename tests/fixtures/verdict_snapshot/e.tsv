@@ -287,6 +287,7 @@ echo -n done	inert
 echo ./a ./b | xargs cat	safe-read
 echo /etc/shadow | xargs cat	denied
 echo `rm -rf /`	denied
+echo a | pcre2grep '(?C"sh|-c|whoami")a'	denied
 echo a | { read x; echo $x; }	inert
 echo foo\necho bar	inert
 echo foo\nrm -rf /	denied

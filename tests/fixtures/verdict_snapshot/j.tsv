@@ -1,3 +1,4 @@
+JJ_CONFIG=/tmp/x jj log	denied
 jai	denied
 jai --bare	denied
 jai --bare --casual	denied
@@ -595,6 +596,7 @@ jira sprint list x	inert
 jira sprint x	denied
 jira x	denied
 jj	denied
+jj --at-op "$OP" log	inert
 jj --at-op x	denied
 jj --at-operation x	denied
 jj --color x	denied
@@ -671,14 +673,19 @@ jj config set --user user.name t	denied
 jj config unset --user user.name	denied
 jj config x	denied
 jj describe	safe-write
+jj describe --message "$MSG"	safe-write
 jj describe -m 'hello'	safe-write
+jj describe -m x --no-edit "$X"	denied
 jj describe x	safe-write
 jj diff	inert
 jj diff $X	denied
 jj diff -- $X	inert
 jj diff --config ui.diff-formatter=/tmp/evil.sh	denied
+jj diff --name-only "$X"	denied
+jj diff --summary "$X"	denied
 jj diff --tool /tmp/evil.sh	denied
 jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt	safe-write
+jj diff -s "$X"	denied
 jj diff x	inert
 jj duplicate	safe-write
 jj duplicate @-	safe-write
@@ -712,8 +719,11 @@ jj git x	denied
 jj help	inert
 jj help x	inert
 jj log	inert
+jj log --color=never "$X"	denied
 jj log --config-file /tmp/evil.toml	denied
 jj log --config-toml x=1	denied
+jj log --no-graph "$X" -p	denied
+jj log --no-graph -T "$T"	inert
 jj log --oneline	inert
 jj log -r "$REV"	inert
 jj log -r main $X	denied
@@ -732,6 +742,7 @@ jj parallelize @::@-	safe-write
 jj parallelize x	safe-write
 jj rebase	safe-write
 jj rebase -d main	safe-write
+jj rebase -r @ -o "$DEST"	safe-write
 jj rebase x	safe-write
 jj resolve	safe-write
 jj resolve --list	safe-write

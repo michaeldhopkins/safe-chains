@@ -1075,123 +1075,116 @@ pcp-htop -t	inert
 pcp-htop -u x	inert
 pcp-htop x	denied
 pcre2grep	denied
-pcre2grep 'foo.*bar' file.txt	inert
-pcre2grep --after-context x	inert
-pcre2grep --allow-lookaround-bsk	inert
-pcre2grep --allow-lookaround-bsk --after-context x	inert
-pcre2grep --allow-lookaround-bsk --case-restrict	inert
-pcre2grep --allow-lookaround-bsk x	inert
-pcre2grep --before-context x	inert
-pcre2grep --binary-files x	inert
-pcre2grep --buffer-size x	inert
-pcre2grep --case-restrict	inert
-pcre2grep --color x	inert
-pcre2grep --colour x	inert
-pcre2grep --context x	inert
-pcre2grep --count	inert
-pcre2grep --depth-limit x	inert
-pcre2grep --devices x	inert
-pcre2grep --directories x	inert
+pcre2grep --after-context x	denied
+pcre2grep --allow-lookaround-bsk	denied
+pcre2grep --allow-lookaround-bsk --after-context x	denied
+pcre2grep --allow-lookaround-bsk --case-restrict	denied
+pcre2grep --allow-lookaround-bsk x	denied
+pcre2grep --before-context x	denied
+pcre2grep --binary-files x	denied
+pcre2grep --buffer-size x	denied
+pcre2grep --case-restrict	denied
+pcre2grep --color x	denied
+pcre2grep --colour x	denied
+pcre2grep --context x	denied
+pcre2grep --count	denied
+pcre2grep --depth-limit x	denied
+pcre2grep --devices x	denied
+pcre2grep --directories x	denied
 pcre2grep --evil pattern file	denied
-pcre2grep --exclude x	inert
-pcre2grep --exclude-dir x	inert
-pcre2grep --exclude-from x	inert
-pcre2grep --file x	inert
-pcre2grep --file-list x	inert
-pcre2grep --file-offsets	inert
-pcre2grep --files-with-matches	inert
-pcre2grep --files-without-match	inert
-pcre2grep --fixed-strings	inert
-pcre2grep --group-separator x	inert
-pcre2grep --heap-limit x	inert
-pcre2grep --help	inert
-pcre2grep --ignore-case	inert
-pcre2grep --include x	inert
-pcre2grep --include-dir x	inert
-pcre2grep --include-from x	inert
-pcre2grep --invert-match	inert
-pcre2grep --label x	inert
-pcre2grep --line-buffered	inert
-pcre2grep --line-number	inert
-pcre2grep --line-offsets	inert
-pcre2grep --line-regex	inert
-pcre2grep --line-regexp	inert
-pcre2grep --locale x	inert
-pcre2grep --match-limit x	inert
-pcre2grep --max-buffer-size x	inert
-pcre2grep --max-count x	inert
-pcre2grep --multiline	inert
-pcre2grep --newline x	inert
-pcre2grep --no-filename	inert
-pcre2grep --no-group-separator	inert
-pcre2grep --no-jit	inert
-pcre2grep --no-messages	inert
-pcre2grep --no-ucp	inert
-pcre2grep --null	inert
-pcre2grep --om-capture x	inert
-pcre2grep --om-separator x	inert
-pcre2grep --only-matching x	inert
-pcre2grep --output x	inert
-pcre2grep --posix-digit	inert
-pcre2grep --posix-pattern-file	inert
-pcre2grep --quiet	inert
-pcre2grep --recursion-limit x	inert
-pcre2grep --recursive	inert
-pcre2grep --regex x	inert
-pcre2grep --regexp x	inert
-pcre2grep --text	inert
-pcre2grep --total-count	inert
-pcre2grep --utf	inert
-pcre2grep --utf-allow-invalid	inert
-pcre2grep --version	inert
-pcre2grep --with-filename	inert
-pcre2grep --word-regex	inert
-pcre2grep --word-regexp	inert
-pcre2grep -A 2 -B 2 'pattern' file	inert
-pcre2grep -A x	inert
-pcre2grep -B x	inert
-pcre2grep -C 3 'pattern' file	inert
-pcre2grep -C x	inert
-pcre2grep -D x	inert
-pcre2grep -E	inert
-pcre2grep -F	inert
-pcre2grep -H	inert
-pcre2grep -I	inert
-pcre2grep -L	inert
-pcre2grep -M	inert
-pcre2grep -N x	inert
-pcre2grep -O x	inert
-pcre2grep -P	inert
-pcre2grep -U	inert
-pcre2grep -V	inert
-pcre2grep -Z	inert
-pcre2grep -a	inert
-pcre2grep -c	inert
-pcre2grep -d x	inert
-pcre2grep -e x	inert
-pcre2grep -f patterns.txt file	inert
-pcre2grep -f x	inert
-pcre2grep -h	inert
-pcre2grep -i	inert
-pcre2grep -i 'pattern' file	inert
-pcre2grep -l	inert
-pcre2grep -m x	inert
-pcre2grep -n	inert
-pcre2grep -o x	inert
-pcre2grep -o1 '(\\w+)' file	inert
-pcre2grep -q	inert
-pcre2grep -r	inert
-pcre2grep -r --exclude-dir node_modules pattern src/	inert
-pcre2grep -r TODO ./src	inert
-pcre2grep -r pattern src/	inert
-pcre2grep -s	inert
-pcre2grep -t	inert
-pcre2grep -u	inert
-pcre2grep -v	inert
-pcre2grep -w	inert
-pcre2grep -x	inert
-pcre2grep TODO ./src/main.rs	inert
-pcre2grep x	inert
+pcre2grep --exclude x	denied
+pcre2grep --exclude-dir x	denied
+pcre2grep --exclude-from x	denied
+pcre2grep --file x	denied
+pcre2grep --file-list x	denied
+pcre2grep --file-offsets	denied
+pcre2grep --files-with-matches	denied
+pcre2grep --files-without-match	denied
+pcre2grep --fixed-strings	denied
+pcre2grep --group-separator x	denied
+pcre2grep --heap-limit x	denied
+pcre2grep --help	denied
+pcre2grep --ignore-case	denied
+pcre2grep --include x	denied
+pcre2grep --include-dir x	denied
+pcre2grep --include-from x	denied
+pcre2grep --invert-match	denied
+pcre2grep --label x	denied
+pcre2grep --line-buffered	denied
+pcre2grep --line-number	denied
+pcre2grep --line-offsets	denied
+pcre2grep --line-regex	denied
+pcre2grep --line-regexp	denied
+pcre2grep --locale x	denied
+pcre2grep --match-limit x	denied
+pcre2grep --max-buffer-size x	denied
+pcre2grep --max-count x	denied
+pcre2grep --multiline	denied
+pcre2grep --newline x	denied
+pcre2grep --no-filename	denied
+pcre2grep --no-group-separator	denied
+pcre2grep --no-jit	denied
+pcre2grep --no-messages	denied
+pcre2grep --no-ucp	denied
+pcre2grep --null	denied
+pcre2grep --om-capture x	denied
+pcre2grep --om-separator x	denied
+pcre2grep --only-matching x	denied
+pcre2grep --output x	denied
+pcre2grep --posix-digit	denied
+pcre2grep --posix-pattern-file	denied
+pcre2grep --quiet	denied
+pcre2grep --recursion-limit x	denied
+pcre2grep --recursive	denied
+pcre2grep --regex x	denied
+pcre2grep --regexp x	denied
+pcre2grep --text	denied
+pcre2grep --total-count	denied
+pcre2grep --utf	denied
+pcre2grep --utf-allow-invalid	denied
+pcre2grep --version	denied
+pcre2grep --with-filename	denied
+pcre2grep --word-regex	denied
+pcre2grep --word-regexp	denied
+pcre2grep -A x	denied
+pcre2grep -B x	denied
+pcre2grep -C x	denied
+pcre2grep -D x	denied
+pcre2grep -E	denied
+pcre2grep -F	denied
+pcre2grep -H	denied
+pcre2grep -I	denied
+pcre2grep -L	denied
+pcre2grep -M	denied
+pcre2grep -N x	denied
+pcre2grep -O x	denied
+pcre2grep -P	denied
+pcre2grep -U	denied
+pcre2grep -V	denied
+pcre2grep -Z	denied
+pcre2grep -a	denied
+pcre2grep -c	denied
+pcre2grep -d x	denied
+pcre2grep -e x	denied
+pcre2grep -f x	denied
+pcre2grep -h	denied
+pcre2grep -i	denied
+pcre2grep -l	denied
+pcre2grep -m x	denied
+pcre2grep -n	denied
+pcre2grep -o x	denied
+pcre2grep -q	denied
+pcre2grep -r	denied
+pcre2grep -r TODO ./src	denied
+pcre2grep -s	denied
+pcre2grep -t	denied
+pcre2grep -u	denied
+pcre2grep -v	denied
+pcre2grep -w	denied
+pcre2grep -x	denied
+pcre2grep TODO ./src/main.rs	denied
+pcre2grep foo file.txt	denied
+pcre2grep x	denied
 pcre2grep x ~/.ssh/id_rsa	denied
 pcre2test	inert
 pcre2test --evil	denied
@@ -1239,114 +1232,113 @@ pcre2test patterns.txt	inert
 pcre2test patterns.txt output.txt	denied
 pcre2test x	inert
 pcregrep	denied
-pcregrep 'foo' file.txt	inert
-pcregrep --after-context x	inert
-pcregrep --allow-lookaround-bsk	inert
-pcregrep --allow-lookaround-bsk --after-context x	inert
-pcregrep --allow-lookaround-bsk --case-restrict	inert
-pcregrep --allow-lookaround-bsk x	inert
-pcregrep --before-context x	inert
-pcregrep --binary-files x	inert
-pcregrep --buffer-size x	inert
-pcregrep --case-restrict	inert
-pcregrep --color x	inert
-pcregrep --colour x	inert
-pcregrep --context x	inert
-pcregrep --count	inert
-pcregrep --depth-limit x	inert
-pcregrep --devices x	inert
-pcregrep --directories x	inert
-pcregrep --exclude x	inert
-pcregrep --exclude-dir x	inert
-pcregrep --exclude-from x	inert
-pcregrep --file x	inert
-pcregrep --file-list x	inert
-pcregrep --file-offsets	inert
-pcregrep --files-with-matches	inert
-pcregrep --files-without-match	inert
-pcregrep --fixed-strings	inert
-pcregrep --group-separator x	inert
-pcregrep --heap-limit x	inert
-pcregrep --help	inert
-pcregrep --ignore-case	inert
-pcregrep --include x	inert
-pcregrep --include-dir x	inert
-pcregrep --include-from x	inert
-pcregrep --invert-match	inert
-pcregrep --label x	inert
-pcregrep --line-buffered	inert
-pcregrep --line-number	inert
-pcregrep --line-offsets	inert
-pcregrep --line-regex	inert
-pcregrep --line-regexp	inert
-pcregrep --locale x	inert
-pcregrep --match-limit x	inert
-pcregrep --max-buffer-size x	inert
-pcregrep --max-count x	inert
-pcregrep --multiline	inert
-pcregrep --newline x	inert
-pcregrep --no-filename	inert
-pcregrep --no-group-separator	inert
-pcregrep --no-jit	inert
-pcregrep --no-messages	inert
-pcregrep --no-ucp	inert
-pcregrep --null	inert
-pcregrep --om-capture x	inert
-pcregrep --om-separator x	inert
-pcregrep --only-matching x	inert
-pcregrep --output x	inert
-pcregrep --posix-digit	inert
-pcregrep --posix-pattern-file	inert
-pcregrep --quiet	inert
-pcregrep --recursion-limit x	inert
-pcregrep --recursive	inert
-pcregrep --regex x	inert
-pcregrep --regexp x	inert
-pcregrep --text	inert
-pcregrep --total-count	inert
-pcregrep --utf	inert
-pcregrep --utf-allow-invalid	inert
-pcregrep --version	inert
-pcregrep --with-filename	inert
-pcregrep --word-regex	inert
-pcregrep --word-regexp	inert
-pcregrep -A x	inert
-pcregrep -B x	inert
-pcregrep -C x	inert
-pcregrep -D x	inert
-pcregrep -E	inert
-pcregrep -F	inert
-pcregrep -H	inert
-pcregrep -I	inert
-pcregrep -L	inert
-pcregrep -M	inert
-pcregrep -N x	inert
-pcregrep -O x	inert
-pcregrep -P	inert
-pcregrep -U	inert
-pcregrep -V	inert
-pcregrep -Z	inert
-pcregrep -a	inert
-pcregrep -c	inert
-pcregrep -d x	inert
-pcregrep -e x	inert
-pcregrep -f x	inert
-pcregrep -h	inert
-pcregrep -i	inert
-pcregrep -l	inert
-pcregrep -m x	inert
-pcregrep -n	inert
-pcregrep -o x	inert
-pcregrep -q	inert
-pcregrep -r	inert
-pcregrep -r 'pattern' src/	inert
-pcregrep -s	inert
-pcregrep -t	inert
-pcregrep -u	inert
-pcregrep -v	inert
-pcregrep -w	inert
-pcregrep -x	inert
-pcregrep x	inert
+pcregrep --after-context x	denied
+pcregrep --allow-lookaround-bsk	denied
+pcregrep --allow-lookaround-bsk --after-context x	denied
+pcregrep --allow-lookaround-bsk --case-restrict	denied
+pcregrep --allow-lookaround-bsk x	denied
+pcregrep --before-context x	denied
+pcregrep --binary-files x	denied
+pcregrep --buffer-size x	denied
+pcregrep --case-restrict	denied
+pcregrep --color x	denied
+pcregrep --colour x	denied
+pcregrep --context x	denied
+pcregrep --count	denied
+pcregrep --depth-limit x	denied
+pcregrep --devices x	denied
+pcregrep --directories x	denied
+pcregrep --exclude x	denied
+pcregrep --exclude-dir x	denied
+pcregrep --exclude-from x	denied
+pcregrep --file x	denied
+pcregrep --file-list x	denied
+pcregrep --file-offsets	denied
+pcregrep --files-with-matches	denied
+pcregrep --files-without-match	denied
+pcregrep --fixed-strings	denied
+pcregrep --group-separator x	denied
+pcregrep --heap-limit x	denied
+pcregrep --help	denied
+pcregrep --ignore-case	denied
+pcregrep --include x	denied
+pcregrep --include-dir x	denied
+pcregrep --include-from x	denied
+pcregrep --invert-match	denied
+pcregrep --label x	denied
+pcregrep --line-buffered	denied
+pcregrep --line-number	denied
+pcregrep --line-offsets	denied
+pcregrep --line-regex	denied
+pcregrep --line-regexp	denied
+pcregrep --locale x	denied
+pcregrep --match-limit x	denied
+pcregrep --max-buffer-size x	denied
+pcregrep --max-count x	denied
+pcregrep --multiline	denied
+pcregrep --newline x	denied
+pcregrep --no-filename	denied
+pcregrep --no-group-separator	denied
+pcregrep --no-jit	denied
+pcregrep --no-messages	denied
+pcregrep --no-ucp	denied
+pcregrep --null	denied
+pcregrep --om-capture x	denied
+pcregrep --om-separator x	denied
+pcregrep --only-matching x	denied
+pcregrep --output x	denied
+pcregrep --posix-digit	denied
+pcregrep --posix-pattern-file	denied
+pcregrep --quiet	denied
+pcregrep --recursion-limit x	denied
+pcregrep --recursive	denied
+pcregrep --regex x	denied
+pcregrep --regexp x	denied
+pcregrep --text	denied
+pcregrep --total-count	denied
+pcregrep --utf	denied
+pcregrep --utf-allow-invalid	denied
+pcregrep --version	denied
+pcregrep --with-filename	denied
+pcregrep --word-regex	denied
+pcregrep --word-regexp	denied
+pcregrep -A x	denied
+pcregrep -B x	denied
+pcregrep -C x	denied
+pcregrep -D x	denied
+pcregrep -E	denied
+pcregrep -F	denied
+pcregrep -H	denied
+pcregrep -I	denied
+pcregrep -L	denied
+pcregrep -M	denied
+pcregrep -N x	denied
+pcregrep -O x	denied
+pcregrep -P	denied
+pcregrep -U	denied
+pcregrep -V	denied
+pcregrep -Z	denied
+pcregrep -a	denied
+pcregrep -c	denied
+pcregrep -d x	denied
+pcregrep -e x	denied
+pcregrep -f x	denied
+pcregrep -h	denied
+pcregrep -i	denied
+pcregrep -l	denied
+pcregrep -m x	denied
+pcregrep -n	denied
+pcregrep -o x	denied
+pcregrep -q	denied
+pcregrep -r	denied
+pcregrep -s	denied
+pcregrep -t	denied
+pcregrep -u	denied
+pcregrep -v	denied
+pcregrep -w	denied
+pcregrep -x	denied
+pcregrep foo file.txt	denied
+pcregrep x	denied
 pcretest	inert
 pcretest --help	inert
 pcretest --help --version	inert

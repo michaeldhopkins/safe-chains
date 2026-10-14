@@ -604,11 +604,6 @@ parcel build	--cache-dir	untriaged	-	-	-
 parcel build	--dist-dir	untriaged	-	-	-	
 parcel watch	--cache-dir	untriaged	-	-	-	
 parcel watch	--dist-dir	untriaged	-	-	-	
-pcre2grep	--binary-files	untriaged	-	-	-	
-pcre2grep	--directories	untriaged	-	-	-	
-pcre2grep	--exclude-dir	untriaged	-	-	-	
-pcre2grep	--file-list	untriaged	-	-	-	
-pcre2grep	--include-dir	untriaged	-	-	-	
 pdflatex	--output-directory	untriaged	-	-	-	
 pdflatex	--translate-file	untriaged	-	-	-	
 periphery scan	--index-store-path	untriaged	-	-	-	

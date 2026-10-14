@@ -438,8 +438,6 @@ oid2name	-o
 packer validate	-o
 parallel_test	-o
 pax	-o
-pcre2grep	--output
-pcre2grep	-o
 pg_recvlogical	-o
 pg_upgrade	-o
 platform organization:billing:address	-o

@@ -1,7 +1,8 @@
 [[command]]
 name = "pcre2grep"
 aliases = ["pcregrep"]
-description = "grep variant that uses Perl-compatible regular expressions (PCRE2 or, for the legacy `pcregrep`, PCRE1). Read-only: matches input lines against a pattern and writes matches to stdout. Reads files, stdin, or transparently decompresses `.gz` and `.bz2`. The `-O/--output` flag emits substituted text but only to stdout. PCRE2 ships as part of the pcre2 project; PCRE1 (pcregrep) is end-of-life as of 2025 but the surface is frozen and still safe."
+candidate = true
+description = "grep variant that uses Perl-compatible regular expressions (PCRE2 or, for the legacy `pcregrep`, PCRE1). Matches input lines against a pattern and writes matches to stdout. Reads files, stdin, or transparently decompresses `.gz` and `.bz2`. The `-O/--output` flag emits substituted text but only to stdout. Since PCRE2 10.31 a pattern callout can run a program (unless pcre2grep was built without that support), so the pattern itself, including one read with `-f` or held in a variable, can execute code; `--file-list` reads the names of further files to search from a file. PCRE2 ships as part of the pcre2 project; PCRE1 (pcregrep) is end-of-life as of 2025 and its surface is frozen."
 url = "https://www.pcre.org/current/doc/html/pcre2grep.html"
 examples_safe = ["pcre2grep TODO ./src/main.rs", "pcre2grep -r TODO ./src"]
 researched_version = "PCRE2 10.45 (2026); PCRE1 8.45 EOL"

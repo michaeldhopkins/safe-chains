@@ -23,6 +23,7 @@ RACK_ENV=test bundle exec rspec spec/foo_spec.rb	safe-read
 RACK_ENV=test rm -rf /	denied
 RAILS_ENV=test bundle exec rspec	safe-read
 RAILS_ENV=test echo foo > bar	safe-write
+RIPGREP_CONFIG_PATH=/tmp/rc rg foo	denied
 ResMerger	denied
 ResMerger --help	denied
 ResMerger --version	denied

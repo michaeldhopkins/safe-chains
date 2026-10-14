@@ -20,11 +20,11 @@ const PINS: [(&str, usize); 19] = [
     ("src/handlers/perl.rs", 451),
     ("src/lib.rs", 612),
     ("src/pathgate.rs", 569),
-    ("src/registry/build.rs", 1403),
+    ("src/registry/build.rs", 1372),
     ("src/registry/dispatch.rs", 572),
     ("src/registry/mod.rs", 679),
     ("src/registry/tests.rs", 7324),
     ("src/registry/types.rs", 1099),
-    ("src/tests.rs", 2117),
+    ("src/tests.rs", 2109),
     ("tests/integration_hooks.rs", 756),
 ];
