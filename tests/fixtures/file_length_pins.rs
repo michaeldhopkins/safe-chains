@@ -22,7 +22,7 @@ const PINS: [(&str, usize); 19] = [
     ("src/pathgate.rs", 526),
     ("src/registry/build.rs", 1363),
     ("src/registry/dispatch.rs", 544),
-    ("src/registry/mod.rs", 679),
+    ("src/registry/mod.rs", 659),
     ("src/registry/tests.rs", 7324),
     ("src/registry/types.rs", 1050),
     ("src/tests.rs", 2109),

@@ -841,7 +841,9 @@
 # be data, not Rust constants.
 #
 # `[command.handler_policy.NAME]` — a named flag policy. The handler
-#   reads it via `registry::check_handler_policy(cmd, key, tokens)`.
+#   reads it via `registry::check_handler_policy(cmd, key, tokens)`,
+#   or, when it walks its own grammar and needs only the flag SETS,
+#   via `registry::handler_policy_flag_sets(cmd, key)`.
 #   Same fields as [command.fallback]: standalone, valued, bare,
 #   max_positional, tolerate_unknown_short, tolerate_unknown_long,
 #   numeric_dash.
