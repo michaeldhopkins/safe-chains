@@ -174,8 +174,7 @@ fn a_cd_into_an_outside_repository_is_judged_like_its_repository_flag() {
     for (sub, args) in OBSERVING {
         assert!(approved(&format!("cd ./sub && jj {args}")), "{sub}: a cd inside the workspace stays approved");
         for dir in OUTSIDE {
-            let positional_gated = sub.starts_with("git ") || sub.starts_with("workspace ");
-            assert!(positional_gated || approved(&format!("cd {dir} && jj --ignore-working-copy {args}")), "{sub}: only reads {dir}");
+            assert!(approved(&format!("cd {dir} && jj --ignore-working-copy {args}")), "{sub}: only reads {dir}");
             assert!(!approved(&format!("cd {dir} && jj {args}")), "{sub}: snapshots into {dir}");
         }
     }
@@ -218,4 +217,28 @@ fn global_flags_after_a_group_word_are_judged_like_leading_ones() {
     assert!(checked > 20, "only {checked} grouped subs checked");
     assert!(approved("jj --ignore-working-copy git remote -R ~/x list"));
     assert!(!approved("jj git remote -R ~/x list"));
+}
+
+#[test]
+fn only_the_destination_of_init_and_add_is_judged_as_a_path() {
+    for dir in ["/etc/x", "~/x", "~/.ssh/x", "../../elsewhere"] {
+        for command in [
+            format!("jj git init {dir}"),
+            format!("jj --quiet git init {dir}"),
+            format!("jj workspace add {dir}"),
+            format!("jj workspace add --name n -r @ {dir}"),
+            format!("jj workspace --quiet add {dir}"),
+        ] {
+            assert!(!approved_in_project(&command), "{command} creates {dir}");
+        }
+    }
+    for command in ["jj git init ./sub", "jj workspace add ./ws", "jj workspace add --name n ./ws"] {
+        assert!(approved_in_project(command), "{command} stays inside the workspace");
+    }
+    for dir in OUTSIDE {
+        for args in ["git remote list", "workspace list", "workspace root"] {
+            let command = format!("cd {dir} && jj --ignore-working-copy {args}");
+            assert!(approved_in_project(&command), "{command}: a subcommand word is not a path");
+        }
+    }
 }

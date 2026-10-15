@@ -55,6 +55,26 @@ fn judges_here(moved: bool) -> bool {
     moved || crate::engine::resolve::frozen_write_kind(".") != Some(crate::engine::resolve::FrozenWrite::TrustRootDir)
 }
 
+pub(super) fn jj_destination(tokens: &[Token]) -> bool {
+    let creates = match tokens.first().map(Token::as_str) {
+        Some("git") => "init",
+        Some("workspace") => "add",
+        _ => return true,
+    };
+    let Some(scope) = crate::pathgate::GATES.roles.get(&format!("jj {}", tokens[0].as_str())) else {
+        return true;
+    };
+    let spec = RoleSpec {
+        positional: Role::Write,
+        shape: Shape::Plain,
+        flags: scope.flags.clone(),
+        handler: None,
+        write_when: Vec::new(),
+        when: Vec::new(),
+    };
+    tokens.iter().enumerate().skip(1).any(|(i, t)| t.as_str() == creates && walk(&spec, &tokens[i..]))
+}
+
 fn moved_from_root() -> bool {
     let cwd = crate::pathctx::cwd();
     let trim = |p: &Option<String>| p.as_deref().map(|p| p.trim_end_matches('/').to_string());

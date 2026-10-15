@@ -844,20 +844,22 @@ flags = { "-f" = "read", "--file" = "read" }
 # `jj git init --git-repo DIR` attaches to the git repository there and writes refs into it, so
 # each is a write at that path (jj.toml does not list --git-repo at all, because the adopted
 # store's config is run by the git that jj spawns for fetch; the role keeps it gated if listed).
-# `jj git init /root/x` and `jj workspace add /etc/ws` both auto-approved before. Their other
-# sibling subs take remote, bookmark and workspace NAMES, which a path gate passes unless they are
-# spelled like a path. The remaining valued flags take a revision, a name, a message or a mode, so
-# each is `ignore`. `-R`/`--repository` are `ignore` here because `[roles.jj]`, the handler that
+# `jj git init /root/x` and `jj workspace add /etc/ws` both auto-approved before. The
+# `jj_destination` handler gates only the operands after `init` and `add`: the sibling subs take
+# remote, bookmark and workspace NAMES, and a word such as `remote` or `list` judged as a path
+# refused `cd DIR && jj --ignore-working-copy git remote list` once DIR was outside the workspace.
+# The remaining valued flags take a revision, a name, a message or a mode, so each is `ignore`.
+# `-R`/`--repository` are `ignore` here because `[roles.jj]`, the handler that
 # judges -R as a read only for an observing sub under --ignore-working-copy, gates them everywhere.
 [roles.jj]
 handler = "jj_repository"
 
 [roles."jj git"]
-positional = "write"
+handler = "jj_destination"
 flags = { "--git-repo" = "write", "-R" = "ignore", "--repository" = "ignore", "--object-hash" = "ignore", "--remote" = "ignore", "--branch" = "ignore", "-b" = "ignore", "--tag" = "ignore", "-t" = "ignore", "--at-op" = "ignore", "--at-operation" = "ignore", "--color" = "ignore" }
 
 [roles."jj workspace"]
-positional = "write"
+handler = "jj_destination"
 flags = { "-R" = "ignore", "--repository" = "ignore", "--name" = "ignore", "--message" = "ignore", "-m" = "ignore", "--revision" = "ignore", "--revisions" = "ignore", "-r" = "ignore", "--sparse-patterns" = "ignore", "--at-op" = "ignore", "--at-operation" = "ignore", "--color" = "ignore" }
 
 # ── Directory-changing global flags. `git -C DIR` moves into DIR before it reads anything, so a
