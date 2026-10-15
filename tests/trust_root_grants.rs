@@ -155,3 +155,18 @@ fn a_session_working_below_the_trust_root_keeps_its_own_repository() {
     assert!(machine.approves_in(hooks, "jj new"));
     assert!(!machine.approves_in(hooks, "jj -R ~/.claude new"));
 }
+
+#[test]
+fn an_equals_sign_after_the_short_repository_flag_does_not_hide_the_path() {
+    let machine = Machine::with_grants(&["~/.claude", "~/notes"]);
+    std::fs::create_dir_all(machine.home.join(".claude/hooks")).expect("mkdir");
+    let home = machine.home.to_str().expect("utf-8 path");
+    for command in [
+        format!("jj -R={home}/.claude new"),
+        format!("jj -R={home}/.claude/hooks new"),
+        "jj -R=/etc new".to_string(),
+        "jj -R=~/notes new".to_string(),
+    ] {
+        assert!(!machine.approves(&command), "approved {command}");
+    }
+}

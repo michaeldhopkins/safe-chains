@@ -48,6 +48,7 @@ pub(super) fn jj_repository(tokens: &[Token]) -> bool {
     let spec = RoleSpec { positional: Role::Ignore, shape: Shape::Plain, flags, handler: None, write_when: Vec::new(), when: Vec::new() };
     let moved = moved_from_root();
     walk(&spec, tokens)
+        || tokens.iter().skip(1).map(Token::as_str).take_while(|t| *t != "--").any(|t| t.starts_with("-R="))
         || (judges_here(moved) && crate::pathgate::judge(role, ".") == crate::verdict::Verdict::Denied)
         || (role == Role::Write && writes_a_trust_root(tokens, moved))
 }
@@ -129,7 +130,7 @@ fn repositories(tokens: &[Token], moved: bool) -> Vec<String> {
         } else if let Some(value) = word.strip_prefix("--repository=") {
             found.push(value.to_string());
         } else if let Some(value) = word.strip_prefix("-R").filter(|v| !v.is_empty()) {
-            found.push(value.to_string());
+            found.push(value.strip_prefix('=').unwrap_or(value).to_string());
         } else if VALUED_GLOBALS.contains(&word) {
             i += 1;
         }
