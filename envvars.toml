@@ -75,6 +75,23 @@ because = "sourced by non-interactive bash before the script runs (measured: exe
 [env.ENV]
 shape = "exec-path"
 because = "the POSIX-sh equivalent of BASH_ENV"
+[env.SHELLOPTS]
+shape = "opaque"
+because = "bash reads it at startup to turn options on, so SHELLOPTS=xtrace expands PS4 (a command substitution in it runs) before every command (measured: executes)"
+[env.BASHOPTS]
+shape = "opaque"
+because = "bash reads it at startup to turn shopt options on, extdebug among them"
+measured = false
+[env.PS4]
+shape = "opaque"
+because = "expanded before each traced command, so a command substitution in it runs once tracing is on (measured: executes with SHELLOPTS=xtrace)"
+[env."BASH_FUNC_*"]
+shape = "opaque"
+because = "bash imports BASH_FUNC_<name>%% as a function definition, so the command it names runs the value's body instead (measured: executes)"
+[env."__BASH_FUNC*"]
+shape = "opaque"
+because = "the macOS /bin/bash spelling of BASH_FUNC_ (__BASH_FUNC<name>%%)"
+measured = false
 
 # ── Command substitution: the value IS a command ─────────────────────────────
 [env.GIT_SSH_COMMAND]
