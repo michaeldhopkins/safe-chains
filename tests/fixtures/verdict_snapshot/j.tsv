@@ -692,6 +692,20 @@ jj backout -r @-	safe-write
 jj backout -r x	safe-write
 jj backout x	safe-write
 jj bookmark	inert
+jj bookmark --at-op x	inert
+jj bookmark --at-operation x	inert
+jj bookmark --color x	inert
+jj bookmark --debug	inert
+jj bookmark --debug --at-op x	inert
+jj bookmark --debug --ignore-immutable	inert
+jj bookmark --debug x	denied
+jj bookmark --ignore-immutable	inert
+jj bookmark --ignore-working-copy	inert
+jj bookmark --no-pager	inert
+jj bookmark --quiet	inert
+jj bookmark --repository x	inert
+jj bookmark --verbose	inert
+jj bookmark -R x	inert
 jj bookmark create	safe-write
 jj bookmark create --at-op x	safe-write
 jj bookmark create --at-operation x	safe-write
@@ -941,6 +955,20 @@ jj commit -m 'msg'	safe-write
 jj commit -m x	safe-write
 jj commit x	denied
 jj config	inert
+jj config --at-op x	inert
+jj config --at-operation x	inert
+jj config --color x	inert
+jj config --debug	inert
+jj config --debug --at-op x	inert
+jj config --debug --ignore-immutable	inert
+jj config --debug x	denied
+jj config --ignore-immutable	inert
+jj config --ignore-working-copy	inert
+jj config --no-pager	inert
+jj config --quiet	inert
+jj config --repository x	inert
+jj config --verbose	inert
+jj config -R x	inert
 jj config edit --user	denied
 jj config get	inert
 jj config get --at-op x	inert
@@ -1149,6 +1177,20 @@ jj edit -r x	safe-write
 jj edit @-	safe-write
 jj edit x	safe-write
 jj file	inert
+jj file --at-op x	inert
+jj file --at-operation x	inert
+jj file --color x	inert
+jj file --debug	inert
+jj file --debug --at-op x	inert
+jj file --debug --ignore-immutable	inert
+jj file --debug x	denied
+jj file --ignore-immutable	inert
+jj file --ignore-working-copy	inert
+jj file --no-pager	inert
+jj file --quiet	inert
+jj file --repository x	inert
+jj file --verbose	inert
+jj file -R x	inert
 jj file list	inert
 jj file list --at-op x	inert
 jj file list --at-operation x	inert
@@ -1194,6 +1236,20 @@ jj file show x	inert
 jj file x	denied
 jj fix	denied
 jj git	inert
+jj git --at-op x	inert
+jj git --at-operation x	inert
+jj git --color x	inert
+jj git --debug	inert
+jj git --debug --at-op x	inert
+jj git --debug --ignore-immutable	inert
+jj git --debug x	denied
+jj git --ignore-immutable	inert
+jj git --ignore-working-copy	inert
+jj git --no-pager	inert
+jj git --quiet	inert
+jj git --repository x	inert
+jj git --verbose	inert
+jj git -R x	inert
 jj git fetch	inert
 jj git fetch --all-remotes	inert
 jj git fetch --all-remotes --at-op x	inert
@@ -1258,6 +1314,20 @@ jj git init x	safe-write
 jj git push	denied
 jj git push --bookmark main	denied
 jj git remote	inert
+jj git remote --at-op x	inert
+jj git remote --at-operation x	inert
+jj git remote --color x	inert
+jj git remote --debug	inert
+jj git remote --debug --at-op x	inert
+jj git remote --debug --ignore-immutable	inert
+jj git remote --debug x	denied
+jj git remote --ignore-immutable	inert
+jj git remote --ignore-working-copy	inert
+jj git remote --no-pager	inert
+jj git remote --quiet	inert
+jj git remote --repository x	inert
+jj git remote --verbose	inert
+jj git remote -R x	inert
 jj git remote list	inert
 jj git remote list --at-op x	inert
 jj git remote list --at-operation x	inert
@@ -1387,6 +1457,20 @@ jj new -r x	safe-write
 jj new main -m 'start feature'	safe-write
 jj new x	safe-write
 jj op	inert
+jj op --at-op x	inert
+jj op --at-operation x	inert
+jj op --color x	inert
+jj op --debug	inert
+jj op --debug --at-op x	inert
+jj op --debug --ignore-immutable	inert
+jj op --debug x	denied
+jj op --ignore-immutable	inert
+jj op --ignore-working-copy	inert
+jj op --no-pager	inert
+jj op --quiet	inert
+jj op --repository x	inert
+jj op --verbose	inert
+jj op -R x	inert
 jj op log	inert
 jj op log --at-op x	inert
 jj op log --at-operation x	inert
@@ -1805,6 +1889,20 @@ jj status -R x	inert
 jj status -h	inert
 jj status x	inert
 jj tag	inert
+jj tag --at-op x	inert
+jj tag --at-operation x	inert
+jj tag --color x	inert
+jj tag --debug	inert
+jj tag --debug --at-op x	inert
+jj tag --debug --ignore-immutable	inert
+jj tag --debug x	denied
+jj tag --ignore-immutable	inert
+jj tag --ignore-working-copy	inert
+jj tag --no-pager	inert
+jj tag --quiet	inert
+jj tag --repository x	inert
+jj tag --verbose	inert
+jj tag -R x	inert
 jj tag list	inert
 jj tag list --all-remotes	inert
 jj tag list --all-remotes --at-op x	inert
@@ -1871,6 +1969,20 @@ jj version -R x	inert
 jj version -h	inert
 jj version x	inert
 jj workspace	inert
+jj workspace --at-op x	inert
+jj workspace --at-operation x	inert
+jj workspace --color x	inert
+jj workspace --debug	inert
+jj workspace --debug --at-op x	inert
+jj workspace --debug --ignore-immutable	inert
+jj workspace --debug x	denied
+jj workspace --ignore-immutable	inert
+jj workspace --ignore-working-copy	inert
+jj workspace --no-pager	inert
+jj workspace --quiet	inert
+jj workspace --repository x	inert
+jj workspace --verbose	inert
+jj workspace -R x	inert
 jj workspace add	safe-write
 jj workspace add --at-op x	safe-write
 jj workspace add --at-operation x	safe-write

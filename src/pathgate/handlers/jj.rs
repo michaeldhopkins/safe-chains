@@ -1,7 +1,9 @@
 //! `jj -R`/`--repository` names the repository a subcommand acts on. Every jj command snapshots
 //! the working copy first, which writes into that repository's store, so the value is a write
 //! target. `--ignore-working-copy` skips the snapshot, and a subcommand that only observes then
-//! writes nothing, so for those the value is only read.
+//! writes nothing, so for those the value is only read. Without -R jj acts on the repository the
+//! working directory sits in, which after `cd DIR` is DIR, so the working directory is judged with
+//! the same role. It is judged even when -R is given, which fails closed.
 
 use crate::parse::Token;
 use crate::pathgate::{Role, RoleSpec, Shape, walk};
@@ -40,7 +42,7 @@ pub(super) fn jj_repository(tokens: &[Token]) -> bool {
         .map(|(f, r)| (f.to_string(), r))
         .collect();
     let spec = RoleSpec { positional: Role::Ignore, shape: Shape::Plain, flags, handler: None, write_when: Vec::new(), when: Vec::new() };
-    walk(&spec, tokens)
+    walk(&spec, tokens) || crate::pathgate::judge(role, ".") == crate::verdict::Verdict::Denied
 }
 
 fn reads_without_snapshot(tokens: &[Token]) -> bool {

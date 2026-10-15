@@ -496,11 +496,6 @@ jbig2dec
 jbig2dec x
 jenv local
 jira init
-jj
-jj bookmark
-jj git
-jj resolve
-jj workspace
 jpegoptim
 jpegtran
 jpegtran x

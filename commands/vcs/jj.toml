@@ -28,8 +28,10 @@ valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 # (`[roles.jj]`), and -R/--repository are gated there in every position.
 # `config path` is not an observing sub here: it creates the repository's config id to print
 # the path. Loading a repository reads its config, and a legacy .jj/repo/config.toml can name a
-# program jj runs; that is the same exposure as `cd DIR && jj log` or `git -C DIR diff`, which
-# are approved already, so it is accepted here rather than refused only for -R.
+# program jj runs; that is the same exposure as `cd DIR && jj --ignore-working-copy log` or
+# `git -C DIR diff`, which are approved, so it is accepted here rather than refused only for -R.
+# The handler judges the working directory the same way, so `cd DIR && jj log` without the flag
+# is a write into DIR.
 [command.path_gate]
 flags = { "--destination" = "ignore" }
 
@@ -397,6 +399,8 @@ valued = [
 [[command.sub]]
 name = "bookmark"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "create"
 writes_cwd = "source"
@@ -498,6 +502,8 @@ valued = [
 [[command.sub]]
 name = "config"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "get"
 standalone = [
@@ -530,6 +536,8 @@ valued = [
 [[command.sub]]
 name = "file"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "list"
 standalone = [
@@ -554,6 +562,8 @@ valued = [
 [[command.sub]]
 name = "git"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "fetch"
 standalone = [
@@ -587,6 +597,8 @@ valued = [
 [[command.sub.sub]]
 name = "remote"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub.sub]]
 name = "list"
 standalone = [
@@ -600,6 +612,8 @@ valued = [
 [[command.sub]]
 name = "op"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "log"
 standalone = [
@@ -616,6 +630,8 @@ valued = [
 [[command.sub]]
 name = "tag"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "list"
 standalone = [
@@ -631,6 +647,8 @@ valued = [
 [[command.sub]]
 name = "workspace"
 nested_bare = true
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 [[command.sub.sub]]
 name = "add"
 level = "SafeWrite"

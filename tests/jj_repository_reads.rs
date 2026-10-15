@@ -159,3 +159,63 @@ fn a_read_never_reaches_a_credential_store_or_hides_the_sub() {
         assert!(!approved(command), "{command}");
     }
 }
+
+fn approved_in_project(command: &str) -> bool {
+    use safe_chains::pathctx::{PathCtx, enter};
+    let home = std::env::var("HOME").expect("HOME");
+    let project = format!("{home}/projects/jjprobe");
+    let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
+    approved(command)
+}
+
+#[test]
+fn a_cd_into_an_outside_repository_is_judged_like_its_repository_flag() {
+    let approved = approved_in_project;
+    for (sub, args) in OBSERVING {
+        assert!(approved(&format!("cd ./sub && jj {args}")), "{sub}: a cd inside the workspace stays approved");
+        for dir in OUTSIDE {
+            let positional_gated = sub.starts_with("git ") || sub.starts_with("workspace ");
+            assert!(positional_gated || approved(&format!("cd {dir} && jj --ignore-working-copy {args}")), "{sub}: only reads {dir}");
+            assert!(!approved(&format!("cd {dir} && jj {args}")), "{sub}: snapshots into {dir}");
+        }
+    }
+    for (sub, args) in MUTATING {
+        assert!(approved(&format!("cd ./sub && jj --ignore-working-copy {args}")), "{sub}: a cd inside the workspace stays approved");
+        for dir in OUTSIDE {
+            for command in [format!("cd {dir} && jj --ignore-working-copy {args}"), format!("cd {dir} && jj {args}")] {
+                assert!(!approved(&command), "{sub}: {command} writes {dir}'s store");
+            }
+        }
+    }
+}
+
+#[test]
+fn global_flags_after_a_group_word_are_judged_like_leading_ones() {
+    let after_group = |sub: &str, args: &str, flags: &str| {
+        let depth = sub.split(' ').count() - 1;
+        let mut words: Vec<&str> = args.split(' ').collect();
+        let tail = words.split_off(depth.min(1));
+        format!("jj {} {flags} {}", words.join(" "), tail.join(" "))
+    };
+    let mut checked = 0;
+    for (sub, args) in OBSERVING.iter().filter(|(sub, _)| sub.contains(' ')) {
+        checked += 1;
+        assert!(approved(&after_group(sub, args, "-R ./sub --quiet")), "{sub}: local, after the group");
+        for dir in OUTSIDE {
+            let with = after_group(sub, args, &format!("-R {dir} --ignore-working-copy"));
+            let without = after_group(sub, args, &format!("-R {dir}"));
+            assert!(approved(&with), "{with} only reads {dir}");
+            assert!(!approved(&without), "{without} snapshots into {dir}");
+        }
+    }
+    for (sub, args) in MUTATING.iter().filter(|(sub, _)| sub.contains(' ')) {
+        checked += 1;
+        for dir in OUTSIDE {
+            let command = after_group(sub, args, &format!("-R {dir} --ignore-working-copy"));
+            assert!(!approved(&command), "{command} writes {dir}'s store");
+        }
+    }
+    assert!(checked > 20, "only {checked} grouped subs checked");
+    assert!(approved("jj --ignore-working-copy git remote -R ~/x list"));
+    assert!(!approved("jj git remote -R ~/x list"));
+}

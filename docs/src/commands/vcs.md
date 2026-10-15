@@ -188,25 +188,31 @@
 - **bookmark set**: Flags: --allow-backwards, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -B, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --to, -r, -R
 - **bookmark track**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --remote, --repository, -R
 - **bookmark untrack**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --remote, --repository, -R
+- **bookmark**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **cat**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, -r, -R
 - **commit** (requires --message, -m): Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --message, --repository, -m, -R
 - **config get**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **config list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --include-defaults, --include-overridden, --no-pager, --quiet, --repo, --user, --workspace, -h. Valued: --at-op, --at-operation, --color, --repository, --template, -R, -T
 - **config path**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --repo, --user, --workspace, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **config**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **describe** (requires --message, --stdin, -m): Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --stdin, -h. Valued: --at-op, --at-operation, --color, --message, --repository, -m, -r, -R
 - **diff**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-pager, --quiet, --stat, --summary, --types, -b, -h, -s, -w. Valued: --at-op, --at-operation, --color, --context, --from, --repository, --revision, --revisions, --template, --to, -f, -r, -R, -t, -T
 - **duplicate**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --after, --at-op, --at-operation, --before, --color, --destination, --insert-after, --insert-before, --onto, --repository, -A, -B, -d, -o, -r, -R
 - **edit**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
 - **file list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --template, -r, -R, -T
 - **file show**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, --revision, --template, -r, -R, -T
+- **file**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **git fetch**: Flags: --all-remotes, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --tracked, -h. Valued: --at-op, --at-operation, --branch, --color, --remote, --repository, --tag, -b, -R, -t
 - **git import**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **git init**: Flags: --colocate, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-colocate, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --object-hash, --repository, -R
 - **git remote list**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **git remote**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
+- **git**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **help**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --keyword, --repository, -k, -R
 - **log**: Flags: --color-words, --count, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --patch, --quiet, --reversed, --stat, --summary, --types, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --revision, --revisions, --template, -n, -r, -R, -T
 - **new**: Flags: --debug, --edit, --help, --ignore-immutable, --ignore-working-copy, --no-edit, --no-pager, --quiet, -h. Valued: --after, --at-op, --at-operation, --before, --color, --insert-after, --insert-before, --message, --repository, -A, -B, -d, -m, -o, -r, -R
 - **op log**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --op-diff, --patch, --quiet, --reversed, --stat, --summary, --types, -d, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --show-changes-in, --template, -n, -R, -T
+- **op**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **parallelize**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
 - **rebase**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --keep-divergent, --no-pager, --quiet, --simplify-parents, --skip-emptied, -h. Valued: --after, --at-op, --at-operation, --before, --branch, --color, --destination, --insert-after, --insert-before, --onto, --repository, --revision, --revisions, --source, -A, -b, -B, -d, -o, -r, -R, -s
 - **resolve** (requires --list, -l): Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --list, --no-pager, --quiet, -h, -l. Valued: --at-op, --at-operation, --color, --repository, --revision, -r, -R
@@ -219,6 +225,7 @@
 - **st**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **status**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **tag list**: Flags: --all-remotes, --conflicted, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --tracked, -a, -c, -h, -t. Valued: --at-op, --at-operation, --color, --remote, --repository, --revision, --sort, --template, -r, -R, -T
+- **tag**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **undo**: Flags: --allow-cross-workspace, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **version**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **workspace add**: Flags: --colocate, --debug, --help, --ignore-immutable, --ignore-working-copy, --no-colocate, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --message, --name, --repository, --revision, --revisions, --sparse-patterns, -m, -r, -R
@@ -227,6 +234,7 @@
 - **workspace rename**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
 - **workspace root**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --name, --repository, -R
 - **workspace update-stale**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -R
+- **workspace**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - Allowed standalone flags: --help, --version, -h
 
 **Examples:**
