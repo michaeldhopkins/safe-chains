@@ -15,7 +15,7 @@ use crate::parse::Token;
 pub(crate) fn declared_names(cmd: &SimpleCmd) -> Vec<String> {
     let any = || {
         let mut names = crate::pathctx::item_shape::bound_names();
-        names.extend(TRUSTED_VARS.iter().chain(&["IFS"]).map(|s| (*s).to_string()));
+        names.extend(TRUSTED_VARS.iter().chain(&["IFS", "CDPATH", "cdpath"]).map(|s| (*s).to_string()));
         names
     };
     if cmd.words.iter().any(assigns_in_arithmetic) {

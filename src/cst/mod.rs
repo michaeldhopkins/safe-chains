@@ -1,5 +1,6 @@
 mod ansi_c;
 mod budget;
+mod cd;
 pub(crate) mod check;
 mod classify_budget;
 #[cfg(test)]

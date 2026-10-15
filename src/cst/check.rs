@@ -129,7 +129,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
             per_stmt(stmt)
         });
         let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
-        let next = cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
+        let next = super::cd::cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
         if next.is_some() {
             running = next;
         } else if effects.cwd {
@@ -255,18 +255,6 @@ fn scan_script_effects(script: &Script, depth: usize, seen: &mut Vec<String>, ou
             scan_effects(only, depth, seen, out);
         }
     }
-}
-
-/// The target of a statement-level `cd DIR` (a single simple command named `cd`), for cwd
-/// tracking. `None` for anything else, or `cd` with no plain positional (bare `cd`, `cd -`).
-fn cd_target(pipeline: &Pipeline) -> Option<String> {
-    let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
-        return None;
-    };
-    if s.words.first()?.eval() != "cd" {
-        return None;
-    }
-    s.words.iter().skip(1).map(|w| w.eval()).find(|a| !a.starts_with('-'))
 }
 
 /// The variables a `while`/`until` condition of the form `read VAR…` (incl. `IFS= read -r VAR`) binds

@@ -29,6 +29,7 @@ owed = [
 ]
 
 [pure]
+"src/cst/cd.rs" = ["cdpath_redirects_only_an_unanchored_name"]
 "src/cst/check.rs" = [
   "src/cst/proptests.rs::safe_redirects_always_pass",
   "src/cst/proptests.rs::unsafe_sub_detected_in_word",

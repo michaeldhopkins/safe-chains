@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 175a0cdf402ec899a85e036ed5a9c6ce979e829230949ecd24d1bc06b84dbf8e # shrinks to names = [], sources = 2
+cc b5329ccd568ae6e22aa6fff97704685c72b030772dd33e02cf078b5a29b0934f # shrinks to names = ["do"], sources = 20

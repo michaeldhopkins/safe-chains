@@ -142,6 +142,7 @@ mod tests {
                 cmd.push_str(". ./e; ");
             }
             cmd.push_str("ls");
+            SCOPE_BINDINGS.with(|c| c.set(0));
             let allowed = crate::is_safe_command(&cmd);
             // One sentinel per distinct bound name (plus the trusted session names `.` re-binds),
             // whatever the source count — never a multiple of it.
