@@ -27,7 +27,8 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
         .position(|t| *t == ";" || *t == "+")
         .map(|p| cmd_start + p)
         .unwrap_or(tokens.len());
-    if cmd_start >= cmd_end {
+    let exec: Vec<&str> = tokens[cmd_start..cmd_end].iter().map(Token::as_str).collect();
+    if cmd_start >= cmd_end || climbs_past_placeholder(&exec) {
         return Verdict::Denied;
     }
     // `{}` is substituted with each matched path, which lives UNDER fd's search path(s). Bind it to
@@ -71,6 +72,20 @@ pub(crate) fn synthetic_operand(bound_word: &str, original: &str) -> String {
         return UNKNOWABLE_ITEM.to_string();
     }
     bound_word.to_string()
+}
+
+/// Whether a `..` follows a match placeholder anywhere in the command it runs.
+///
+/// The stand-in is a file one level below the search path, but a match can be the search path
+/// itself, so `{}/..` and `cd {} && rm -rf ..` reach the directory above it. A `..` after the
+/// placeholder, in the same word or a later one (`env -C {} rm -rf ..`), is refused.
+pub(crate) fn climbs_past_placeholder(words: &[&str]) -> bool {
+    let joined = words.join(" ");
+    ["{//}", "{/.}", "{/}", "{.}", "{}"]
+        .iter()
+        .filter_map(|p| joined.find(p))
+        .min()
+        .is_some_and(|at| joined[at..].contains(".."))
 }
 
 /// fd's placeholders (`{}` full path, `{.}` no-ext, `{/}` basename, `{//}` parent, `{/.}` basename
@@ -141,6 +156,20 @@ mod tests {
 
         /// A batch exec with NO placeholder (`fd <base> -X <cmd>`) appends the match as a trailing arg;
         /// it must gate the base identically to the placeholder form — never a silent leak.
+        #[test]
+        fn a_climb_anywhere_after_a_placeholder_is_seen(
+            placeholder in prop::sample::select(vec!["{}", "{//}", "{/}", "{.}", "{/.}"]),
+            before in "[a-z /]{0,8}",
+            between in "[a-z /]{0,8}",
+            split in any::<bool>(),
+        ) {
+            let climb = format!("{between}/..");
+            let words: Vec<&str> = if split { vec![&before, placeholder, &climb] } else { vec![placeholder, &climb] };
+            prop_assert!(super::climbs_past_placeholder(&words));
+            let earlier = format!("../{before}");
+            prop_assert!(!super::climbs_past_placeholder(&[&earlier, placeholder, &between]));
+        }
+
         #[test]
         fn fd_batch_without_placeholder_gates_the_base(
             reader in prop::sample::select(vec!["cat", "od", "base64"]),

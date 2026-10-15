@@ -206,7 +206,11 @@ owed = [
   "tar_list_verdict_is_invariant_under_verbose_flag",
   "tar_extract_with_benign_archive_is_denied",
 ]
-"src/handlers/fd.rs" = ["fd_exec_follows_the_inner_command_locus", "fd_batch_without_placeholder_gates_the_base"]
+"src/handlers/fd.rs" = [
+  "fd_exec_follows_the_inner_command_locus",
+  "fd_batch_without_placeholder_gates_the_base",
+  "a_climb_anywhere_after_a_placeholder_is_seen",
+]
 "src/handlers/forges/gh.rs" = []
 "src/handlers/forges/glab.rs" = []
 "src/handlers/fuzzy/fzf.rs" = [

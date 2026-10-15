@@ -66,19 +66,25 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
                 .position(|t| *t == ";" || *t == "+")
                 .map(|p| cmd_start + p)
                 .unwrap_or(tokens.len());
-            if cmd_start >= cmd_end {
+            let exec: Vec<&str> = tokens[cmd_start..cmd_end].iter().map(Token::as_str).collect();
+            if cmd_start >= cmd_end || crate::handlers::fd::climbs_past_placeholder(&exec) {
                 return Verdict::Denied;
             }
             for base in &bases {
-                let bound = crate::engine::resolve::locus::traversal_item(base);
-                let exec_words: Vec<String> = tokens[cmd_start..cmd_end]
-                    .iter()
-                    .map(|t| crate::handlers::fd::synthetic_operand(&t.as_str().replace("{}", &bound), t.as_str()))
-                    .collect();
-                let _mark = crate::cst::netargs::enter(true);
-                match crate::command_verdict(&shell_words::join(&exec_words)) {
-                    Verdict::Denied => return Verdict::Denied,
-                    Verdict::Allowed(l) => level = level.max(l),
+                let mut runs_in = vec![(crate::pathctx::cwd(), *base)];
+                if s == "-execdir" {
+                    if base.trim_end_matches('/').rsplit('/').next() == Some("..") {
+                        return Verdict::Denied;
+                    }
+                    let item_base = if base.starts_with(['/', '~', '$']) { *base } else { "." };
+                    runs_in.extend(execdir_directories(base).into_iter().map(|dir| (dir, item_base)));
+                }
+                for (dir, item_base) in runs_in {
+                    let _there = crate::pathctx::enter_cwd(dir);
+                    match judge_exec(&exec, item_base) {
+                        Verdict::Denied => return Verdict::Denied,
+                        Verdict::Allowed(l) => level = level.max(l),
+                    }
                 }
             }
             i = cmd_end + 1;
@@ -128,6 +134,38 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
         return Verdict::Denied;
     }
     Verdict::Allowed(level)
+}
+
+fn judge_exec(exec: &[&str], base: &str) -> Verdict {
+    let bound = crate::engine::resolve::locus::traversal_item(base);
+    let words: Vec<String> = exec.iter().map(|w| crate::handlers::fd::synthetic_operand(&w.replace("{}", &bound), w)).collect();
+    let _mark = crate::cst::netargs::enter(true);
+    crate::command_verdict(&shell_words::join(&words))
+}
+
+/// The directories `-execdir` runs its command in for one search path: the directory holding the
+/// path itself (`dirname`, as find spells it, so `..` and `.` both run in `.`), and the path, which
+/// holds its first level of matches. Deeper matches run further down the same tree. A path whose
+/// parent cannot be named gives a directory no relative path resolves in.
+/// The caller also judges from the working directory, since implementations differ on where the
+/// search path itself runs.
+fn execdir_directories(base: &str) -> Vec<Option<String>> {
+    let cwd = crate::pathctx::cwd();
+    let unnamed = || Some(crate::pathctx::UNRESOLVED_CWD.to_string());
+    let trimmed = base.trim_end_matches('/');
+    let parent = match trimmed.rfind('/') {
+        _ if trimmed.is_empty() => Some("/"),
+        None if trimmed.starts_with('~') || trimmed.contains('$') || trimmed.contains(crate::cst::eval::TAGGED_PREFIX) => None,
+        None => Some("."),
+        Some(at) if trimmed[at..].contains('$') || trimmed[at..].contains(crate::cst::eval::TAGGED_PREFIX) => None,
+        Some(at) => Some(match trimmed[..at].trim_end_matches('/') {
+            "" => "/",
+            head => head,
+        }),
+    };
+    let parent = parent.map_or_else(unnamed, |p| crate::pathctx::join_cwd(cwd.as_deref(), p).or_else(|| cwd.clone()));
+    let own = crate::pathctx::join_cwd(cwd.as_deref(), base).or_else(|| cwd.clone());
+    vec![parent, own]
 }
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
