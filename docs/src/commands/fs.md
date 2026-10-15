@@ -44,6 +44,25 @@ Aliases: `gbasename`
 
 - Allowed standalone flags: -H, -L, -P, -R, -f, -h, -v, -x
 
+### `chmod`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation</a></p>
+
+Aliases: `gchmod`
+
+- Edits its file operands in place within your workspace.
+- Allowed standalone flags: --changes, --dereference, --help, --no-dereference, --preserve-root, --quiet, --recursive, --silent, --verbose, --version, -P, -R, -c, -f, -h, -v
+- Allowed valued flags: --reference
+- Recurses into directory trees with: --recursive, -R
+
+**Examples:**
+
+- `chmod +x scripts/build.sh`
+- `chmod 644 README.md`
+- `chmod -R u+rwX,go-w src`
+- `chmod --reference=a.txt b.txt`
+- `gchmod -v 755 bin/tool`
+- `chmod --version`
+
 ### `cmp`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/cmp.1.html">https://man7.org/linux/man-pages/man1/cmp.1.html</a></p>
 
@@ -65,6 +84,15 @@ Aliases: `gcp`
 - Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -n, -p, -r, -u, -v, -x
 - Allowed valued flags: --suffix, --target-directory, -S, -t
 - Recurses into directory trees with: --archive, --recursive, -R, -a, -r
+
+**Examples:**
+
+- `cp a.txt b.txt`
+- `cp -r src backup`
+- `cp -a assets dist/assets`
+- `cp -n config.example.toml config.toml`
+- `cp -t dist a.txt b.txt`
+- `gcp -p a.txt b.txt`
 
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>

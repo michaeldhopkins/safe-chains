@@ -1083,7 +1083,7 @@ denied! {
     help_brew_install_denied: "brew install --help",
     help_cargo_login_redirect_denied: "cargo login --help 2>&1",
 
-    version_unhandled_chmod: "chmod --version",
+    version_unhandled_chown: "chown --version",
     help_pip_install_trailing: "pip install evil --help",
     help_curl_data_trailing: "curl -d data --help",
     version_pip_install_trailing: "pip install evil --version",

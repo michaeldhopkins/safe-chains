@@ -1,0 +1,53 @@
+[[command]]
+writes_cwd = "named"
+name = "chmod"
+aliases = ["gchmod"]
+description = "Changes the permission bits of each FILE operand on the local filesystem; the first operand is the MODE (symbolic like u+x or go-w, or octal like 755), not a path. It mutates inode metadata only, never file content, and never reaches the network. The change is recoverable by setting the old mode again, but nothing records the old mode, and -R applies it to a whole tree. Effects to weigh: +x makes a file runnable, which matters when the file is one another tool executes on its own (a git hook, a direnv file); setuid and setgid bits on a file the caller owns grant nothing beyond the caller's own rights; removing read or write bits can lock the caller out of files until restored. Symlink operands are followed (GNU -h and BSD -h act on the link itself), and -R with -L or -H also follows symlinks met inside the tree, which can lead outside it. GNU --reference=RFILE reads RFILE's mode. BSD chmod on macOS also edits ACLs (+a, -a, =a, -E, -C, -N, -i, -I). Long-stable utility: coreutils releases several times a year with no new chmod options in years, and BSD chmod's surface is unchanged."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation"
+researched_version = "GNU coreutils 9.12 + BSD chmod (macOS 27)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--changes", "--dereference", "--help", "--no-dereference", "--preserve-root",
+    "--quiet", "--recursive", "--silent", "--verbose", "--version",
+    "-P", "-R", "-c", "-f", "-h", "-v",
+]
+valued = ["--reference"]
+examples_safe = [
+    "chmod +x scripts/build.sh",
+    "chmod 644 README.md",
+    "chmod -R u+rwX,go-w src",
+    "chmod --reference=a.txt b.txt",
+    "gchmod -v 755 bin/tool",
+    "chmod --version",
+]
+examples_denied = [
+    "chmod",
+    "chmod -RL 755 src",
+    "chmod 600 ~/.ssh/config",
+    "chmod 4755 /usr/local/bin/tool",
+    "chmod -R 777 /",
+    "chmod +x .git/hooks/pre-commit",
+    "chmod --reference=/etc/shadow out.txt",
+    "chmod -w notes.txt",
+    "chmod --no-preserve-root -R 755 src",
+]
+
+# chmod MUTATES each operand's mode bits, gated per operand by locus. The MODE operand is read as a
+# relative worktree path, which is harmless: a mode never contains `/` or `~`. A mode spelled with a
+# leading `-` (`-w`) reads as an unknown flag and fails closed. `-R` recurses (unbounded scale).
+# `--reference` reads RFILE's mode, gated as a read.
+[command.behavior]
+operation = "mutate"
+positionals = "write"
+scale = "breadth"
+standalone = [
+    "--changes", "--dereference", "--help", "--no-dereference", "--preserve-root",
+    "--quiet", "--recursive", "--silent", "--verbose", "--version",
+    "-P", "-R", "-c", "-f", "-h", "-v",
+]
+valued = ["--reference"]
+[command.behavior.flags]
+"-R" = { scale = "unbounded" }
+"--recursive" = { scale = "unbounded" }
+"--reference" = { kind = "read" }
