@@ -45,6 +45,38 @@ do run, so the trade-off is the owner's. Separately, `git init` itself is approv
 `Bash(git init:*)` rule in the user's own Claude settings (see "`permissions.allow` out-ranks every
 level" below), which also admits `--template` and `--separate-git-dir`.
 
+## DEFERRED: `jj -Rpath` (the short flag with its value joined) is refused
+
+`jj -R ~/x --ignore-working-copy log` is approved and `jj -R~/x --ignore-working-copy log` is not.
+The path gate reads the joined spelling (`src/pathgate/handlers/jj.rs`), but the registry refuses it
+first: `skip_pre_flags` in `src/registry/dispatch.rs` and `policy::check_flags` do not split a short
+flag from a glued value, and `src/policy.rs` pins that (`7z -r0`: "short-glued is NOT handled
+today"). Approving it means either teaching the registry glued short values for every command, which
+widens what every short valued flag accepts and needs its own review, or a TOML field that opts one
+command's short flags in (documented in `commands/SAMPLE.toml`). The refusal fails closed, so this
+waits for a decision between the two.
+
+## A CDPATH set outside the command line is not always seen
+
+A relative `cd` is left unresolved when CDPATH is assigned, exported (`export -n` too) or given as a
+prefix earlier in the command, or when safe-chains' own environment holds it (`src/cst/cd.rs`).
+Still unseen: a CDPATH the agent's shell sets in a startup file the hook process did not inherit,
+and one passed to an inner shell, as in `env CDPATH=/etc sh -c 'cd NAME && touch a'` or
+`CDPATH=/etc bash -c '…'`, whose script is judged without it. The second needs the inner script's
+scope to start from the environment the outer command gives it.
+Also unseen: CDPATH bound inside a compound whose body holds the `cd`
+(`echo /etc | while read CDPATH; do cd NAME && touch a; done`, `if CDPATH=/etc; then cd NAME …; fi`),
+and a quoted tilde: `cd '~/proj'` is tracked as `$HOME/proj`, while the shell neither expands it
+nor treats it as anchored, so it is a relative name that searches CDPATH.
+
+## DEFERRED: a jj repository above the named path
+
+`jj -R ~/.claude/hooks restore`, or `cd ~/.claude/hooks && jj restore`, acts on the nearest
+ancestor holding `.jj`, which may be the trust root itself, so a grant on the subdirectory reaches
+the trust file. safe-chains judges paths lexically and cannot see which ancestor holds the
+repository. Refusing every repository below a trust root would also refuse nested repositories a
+grant was meant to open (a skills repository under `~/.claude`). Needs a decision between the two.
+
 ## The open mechanism backlog, in order
 
 **Tier 1 — the schema cannot express what the model already knows.** These come
