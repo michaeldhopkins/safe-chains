@@ -280,6 +280,14 @@ Aliases: `gsleep`
 
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `sleep 5`
+- `sleep 0.5`
+- `sleep 1m 30s`
+- `gsleep 2`
+- `sleep --version`
+
 ### `sw_vers`
 <p class="cmd-url"><a href="https://ss64.com/mac/sw_vers.html">https://ss64.com/mac/sw_vers.html</a></p>
 

@@ -1,8 +1,21 @@
 [[command]]
 name = "sleep"
 aliases = ["gsleep"]
-description = "Pauses execution for a specified duration; supported with a required time argument."
+description = "Suspends the calling process for the given duration and exits; it observes and changes nothing, opens no files and never touches the network. GNU sleep takes one or more NUMBER[SUFFIX] operands (s, m, h, d; integers or floating point, `infinity` allowed) and sleeps for their sum; BSD sleep on macOS takes the same suffixed form. The only cost is time: a very long or infinite duration blocks the caller until it is interrupted, which a harness's own timeout bounds. GNU accepts --help and --version; uutils also accepts -h and -V. A tiny utility whose surface has been unchanged for decades; coreutils releases a few times a year without touching it."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation"
+researched_version = "GNU coreutils 9.12 + BSD sleep (macOS 27)"
 level = "Inert"
 bare = false
 standalone = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "sleep 5",
+    "sleep 0.5",
+    "sleep 1m 30s",
+    "gsleep 2",
+    "sleep --version",
+]
+examples_denied = [
+    "sleep",
+    "sleep --xyzzy 5",
+    "sleep 5 && rm -rf /",
+]
