@@ -48,7 +48,6 @@ earthly ls	--args
 erb_lint	--fail-level
 errcheck	--exclude
 eza	--context
-file	--extension
 fossil diff	--context
 fossil diff	--exclude
 fossil finfo	--offset

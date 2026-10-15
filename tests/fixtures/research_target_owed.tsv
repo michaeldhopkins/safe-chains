@@ -542,7 +542,7 @@ hexdump	description,examples,version
 hexo	description,no-tolerance,profiled
 hey	description,examples,profiled
 hf	examples,version
-hg	no-tolerance,profiled
+hg	profiled
 hiutil	description,examples
 hlint	description,examples
 home-manager	examples,no-tolerance,profiled

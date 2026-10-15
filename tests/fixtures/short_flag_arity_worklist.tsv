@@ -166,8 +166,22 @@ heroku apps	-a
 heroku apps:info	-s
 heroku config	-s
 heroku logs	-t
+hg annotate	-b
+hg annotate	-d
+hg annotate	-l
 hg annotate	-u
+hg bookmarks	-d
+hg bookmarks	-l
+hg config	-u
+hg diff	-b
+hg grep	-d
+hg grep	-l
+hg grep	-u
+hg help	-k
+hg id	-b
 hg id	-t
+hg status	-d
+hg status	-r
 hg status	-u
 jj bookmark list	-c
 jj bookmark list	-t

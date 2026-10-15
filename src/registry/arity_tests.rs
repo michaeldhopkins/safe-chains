@@ -255,3 +255,49 @@ fn a_value_that_looks_like_a_flag_is_read_as_the_value_of_a_valued_short_flag() 
         assert!(crate::is_safe_command(cmd), "should be allowed: {cmd}");
     }
 }
+
+#[test]
+fn an_unknown_word_anywhere_in_hg_may_be_an_early_global_option() {
+    let files = registry();
+    let hg = files.iter().flat_map(|f| &f.command).find(|c| c.name == "hg").expect("hg is declared");
+    let mut checked = 0;
+    for s in scopes(hg) {
+        let mut refused = vec![
+            format!("{} -R /tmp/other", s.label),
+            format!("{} -vR/tmp/other", s.label),
+            format!("{} --repo=/tmp/other", s.label),
+            format!("{} --cwd /tmp/other", s.label),
+            format!("{} --config=extensions.e=/tmp/e.py", s.label),
+            format!("{} \"-$X\"", s.label),
+            format!("{} -*", s.label),
+            format!("{} -?/x", s.label),
+        ];
+        refused.extend(s.valued.iter().map(|f| format!("{} {f} \"$X\"", s.label)));
+        refused.extend(s.valued.iter().map(|f| format!("{} {f} \"$(cat f)\"", s.label)));
+        refused.extend(s.valued.iter().map(|f| format!("{} {f} \"-$X\"", s.label)));
+        for cmd in refused {
+            assert!(!crate::is_safe_command(&cmd), "{cmd} may run code through an hg early option");
+            checked += 1;
+        }
+    }
+    assert!(checked > 100, "only {checked} hg invocations checked");
+    for cmd in ["hg status -T json", "hg tip --style compact", "hg log -r tip", "hg status --rev=tip"] {
+        assert!(crate::is_safe_command(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn hg_takes_its_global_options_after_any_sub_and_refuses_what_runs_or_reaches_out() {
+    for cmd in [
+        "hg status -v", "hg diff -q", "hg summary -q", "hg help -v log", "hg status --color=always", "hg log --pager=never",
+        "hg status -S", "hg log -l5", "hg log -I '*.py'", "hg log -m", "hg grep -u foo", "hg id -T json", "hg config -u", "hg status -r",
+    ] {
+        assert!(crate::is_safe_command(cmd), "should be allowed: {cmd}");
+    }
+    for cmd in [
+        "hg incoming --ssh 'touch /tmp/x' ssh://h/r", "hg outgoing --remotecmd x", "hg incoming", "hg outgoing", "hg config --edit",
+        "hg config -e", "hg summary --remote",
+    ] {
+        assert!(!crate::is_safe_command(cmd), "should be refused: {cmd}");
+    }
+}

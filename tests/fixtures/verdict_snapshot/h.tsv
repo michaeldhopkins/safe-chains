@@ -2403,12 +2403,17 @@ hf whoami -h	safe-read
 hf whoami x	safe-read
 hf x	denied
 hg	denied
+hg --config	denied
+hg --cwd	denied
 hg --help	inert
 hg --help --output x	denied
 hg --help --version	denied
 hg --help x	denied
 hg --output x	denied
+hg --repo	denied
+hg --repository	denied
 hg --version	inert
+hg -R	denied
 hg -h	inert
 hg -o x	denied
 hg -v	inert
@@ -2418,14 +2423,19 @@ hg addremove	denied
 hg addremove x	denied
 hg annotate	denied
 hg annotate --changeset	safe-read
+hg annotate --changeset --color x	safe-read
 hg annotate --changeset --date	safe-read
-hg annotate --changeset --exclude x	safe-read
 hg annotate --changeset x	safe-read
+hg annotate --color x	safe-read
 hg annotate --date	safe-read
+hg annotate --debug	safe-read
+hg annotate --encoding x	safe-read
+hg annotate --encodingmode x	safe-read
 hg annotate --exclude x	safe-read
 hg annotate --file	safe-read
 hg annotate --follow	safe-read
 hg annotate --help	safe-read
+hg annotate --hidden	safe-read
 hg annotate --ignore-all-space	safe-read
 hg annotate --ignore-blank-lines	safe-read
 hg annotate --ignore-space-at-eol	safe-read
@@ -2434,15 +2444,21 @@ hg annotate --include x	safe-read
 hg annotate --line-number	safe-read
 hg annotate --no-binary	safe-read
 hg annotate --no-follow	safe-read
+hg annotate --noninteractive	safe-read
 hg annotate --number	safe-read
+hg annotate --pager x	safe-read
 hg annotate --quiet	safe-read
 hg annotate --rev x	safe-read
 hg annotate --skip x	safe-read
+hg annotate --template x	safe-read
 hg annotate --text	safe-read
+hg annotate --time	safe-read
+hg annotate --traceback	safe-read
 hg annotate --user	safe-read
 hg annotate --verbose	safe-read
 hg annotate -B	safe-read
 hg annotate -I x	safe-read
+hg annotate -T x	safe-read
 hg annotate -X x	safe-read
 hg annotate -Z	safe-read
 hg annotate -a	safe-read
@@ -2458,18 +2474,24 @@ hg annotate -r x	safe-read
 hg annotate -u	safe-read
 hg annotate -v	safe-read
 hg annotate -w	safe-read
+hg annotate -y	safe-read
 hg annotate foo.py	safe-read
 hg annotate x	safe-read
 hg blame	denied
 hg blame --changeset	safe-read
+hg blame --changeset --color x	safe-read
 hg blame --changeset --date	safe-read
-hg blame --changeset --exclude x	safe-read
 hg blame --changeset x	safe-read
+hg blame --color x	safe-read
 hg blame --date	safe-read
+hg blame --debug	safe-read
+hg blame --encoding x	safe-read
+hg blame --encodingmode x	safe-read
 hg blame --exclude x	safe-read
 hg blame --file	safe-read
 hg blame --follow	safe-read
 hg blame --help	safe-read
+hg blame --hidden	safe-read
 hg blame --ignore-all-space	safe-read
 hg blame --ignore-blank-lines	safe-read
 hg blame --ignore-space-at-eol	safe-read
@@ -2478,15 +2500,21 @@ hg blame --include x	safe-read
 hg blame --line-number	safe-read
 hg blame --no-binary	safe-read
 hg blame --no-follow	safe-read
+hg blame --noninteractive	safe-read
 hg blame --number	safe-read
+hg blame --pager x	safe-read
 hg blame --quiet	safe-read
 hg blame --rev x	safe-read
 hg blame --skip x	safe-read
+hg blame --template x	safe-read
 hg blame --text	safe-read
+hg blame --time	safe-read
+hg blame --traceback	safe-read
 hg blame --user	safe-read
 hg blame --verbose	safe-read
 hg blame -B	safe-read
 hg blame -I x	safe-read
+hg blame -T x	safe-read
 hg blame -X x	safe-read
 hg blame -Z	safe-read
 hg blame -a	safe-read
@@ -2502,117 +2530,209 @@ hg blame -r x	safe-read
 hg blame -u	safe-read
 hg blame -v	safe-read
 hg blame -w	safe-read
+hg blame -y	safe-read
 hg blame foo.py	safe-read
 hg blame x	safe-read
 hg bm	safe-read
 hg bm --active	safe-read
 hg bm --active --all	safe-read
-hg bm --active --rev x	safe-read
+hg bm --active --color x	safe-read
 hg bm --active x	safe-read
 hg bm --all	safe-read
+hg bm --color x	safe-read
+hg bm --debug	safe-read
 hg bm --delete	safe-read
+hg bm --encoding x	safe-read
+hg bm --encodingmode x	safe-read
 hg bm --force	safe-read
 hg bm --help	safe-read
+hg bm --hidden	safe-read
 hg bm --inactive	safe-read
+hg bm --noninteractive	safe-read
+hg bm --pager x	safe-read
+hg bm --quiet	safe-read
 hg bm --rename	safe-read
 hg bm --rev x	safe-read
+hg bm --template x	safe-read
+hg bm --time	safe-read
+hg bm --traceback	safe-read
+hg bm --verbose	safe-read
 hg bm -B	safe-read
+hg bm -T x	safe-read
 hg bm -d	safe-read
 hg bm -f	safe-read
 hg bm -h	safe-read
 hg bm -i	safe-read
 hg bm -l	safe-read
 hg bm -m	safe-read
+hg bm -q	safe-read
 hg bm -r x	safe-read
+hg bm -v	safe-read
+hg bm -y	safe-read
 hg bm x	safe-read
 hg bookmark	safe-read
 hg bookmark --active	safe-read
 hg bookmark --active --all	safe-read
-hg bookmark --active --rev x	safe-read
+hg bookmark --active --color x	safe-read
 hg bookmark --active x	safe-read
 hg bookmark --all	safe-read
+hg bookmark --color x	safe-read
+hg bookmark --debug	safe-read
 hg bookmark --delete	safe-read
+hg bookmark --encoding x	safe-read
+hg bookmark --encodingmode x	safe-read
 hg bookmark --force	safe-read
 hg bookmark --help	safe-read
+hg bookmark --hidden	safe-read
 hg bookmark --inactive	safe-read
+hg bookmark --noninteractive	safe-read
+hg bookmark --pager x	safe-read
+hg bookmark --quiet	safe-read
 hg bookmark --rename	safe-read
 hg bookmark --rev x	safe-read
+hg bookmark --template x	safe-read
+hg bookmark --time	safe-read
+hg bookmark --traceback	safe-read
+hg bookmark --verbose	safe-read
 hg bookmark -B	safe-read
+hg bookmark -T x	safe-read
 hg bookmark -d	safe-read
 hg bookmark -f	safe-read
 hg bookmark -h	safe-read
 hg bookmark -i	safe-read
 hg bookmark -l	safe-read
 hg bookmark -m	safe-read
+hg bookmark -q	safe-read
 hg bookmark -r x	safe-read
+hg bookmark -v	safe-read
+hg bookmark -y	safe-read
 hg bookmark x	safe-read
 hg bookmarks	safe-read
 hg bookmarks --active	safe-read
 hg bookmarks --active --all	safe-read
-hg bookmarks --active --rev x	safe-read
+hg bookmarks --active --color x	safe-read
 hg bookmarks --active x	safe-read
 hg bookmarks --all	safe-read
+hg bookmarks --color x	safe-read
+hg bookmarks --debug	safe-read
 hg bookmarks --delete	safe-read
+hg bookmarks --encoding x	safe-read
+hg bookmarks --encodingmode x	safe-read
 hg bookmarks --force	safe-read
 hg bookmarks --help	safe-read
+hg bookmarks --hidden	safe-read
 hg bookmarks --inactive	safe-read
+hg bookmarks --noninteractive	safe-read
+hg bookmarks --pager x	safe-read
+hg bookmarks --quiet	safe-read
 hg bookmarks --rename	safe-read
 hg bookmarks --rev x	safe-read
+hg bookmarks --template x	safe-read
+hg bookmarks --time	safe-read
+hg bookmarks --traceback	safe-read
+hg bookmarks --verbose	safe-read
 hg bookmarks -B	safe-read
+hg bookmarks -T x	safe-read
 hg bookmarks -d	safe-read
 hg bookmarks -f	safe-read
 hg bookmarks -h	safe-read
 hg bookmarks -i	safe-read
 hg bookmarks -l	safe-read
 hg bookmarks -m	safe-read
+hg bookmarks -q	safe-read
 hg bookmarks -r x	safe-read
+hg bookmarks -v	safe-read
+hg bookmarks -y	safe-read
 hg bookmarks x	safe-read
 hg branch	safe-read
 hg branch --clean	safe-read
-hg branch --clean --force	safe-read
+hg branch --clean --color x	safe-read
+hg branch --clean --debug	safe-read
 hg branch --clean x	safe-read
+hg branch --color x	safe-read
+hg branch --debug	safe-read
+hg branch --encoding x	safe-read
+hg branch --encodingmode x	safe-read
 hg branch --force	safe-read
 hg branch --help	safe-read
+hg branch --hidden	safe-read
+hg branch --noninteractive	safe-read
+hg branch --pager x	safe-read
+hg branch --quiet	safe-read
+hg branch --time	safe-read
+hg branch --traceback	safe-read
+hg branch --verbose	safe-read
 hg branch -C	safe-read
 hg branch -f	safe-read
 hg branch -h	safe-read
+hg branch -q	safe-read
+hg branch -v	safe-read
+hg branch -y	safe-read
 hg branch x	safe-read
 hg branches	safe-read
 hg branches --active	safe-read
 hg branches --active --closed	safe-read
-hg branches --active --rev x	safe-read
+hg branches --active --color x	safe-read
 hg branches --active x	safe-read
 hg branches --closed	safe-read
+hg branches --color x	safe-read
+hg branches --debug	safe-read
+hg branches --encoding x	safe-read
+hg branches --encodingmode x	safe-read
 hg branches --help	safe-read
+hg branches --hidden	safe-read
+hg branches --noninteractive	safe-read
+hg branches --pager x	safe-read
+hg branches --quiet	safe-read
 hg branches --rev x	safe-read
 hg branches --style x	safe-read
 hg branches --template x	safe-read
+hg branches --time	safe-read
+hg branches --traceback	safe-read
+hg branches --verbose	safe-read
 hg branches -T x	safe-read
 hg branches -a	safe-read
 hg branches -c	safe-read
 hg branches -h	safe-read
+hg branches -q	safe-read
 hg branches -r x	safe-read
+hg branches -v	safe-read
+hg branches -y	safe-read
 hg branches x	safe-read
 hg bundle	denied
 hg bundle x	denied
 hg cat	denied
+hg cat --color x	safe-read
+hg cat --debug	safe-read
+hg cat --debug --color x	safe-read
+hg cat --debug --decode	safe-read
+hg cat --debug x	safe-read
 hg cat --decode	safe-read
-hg cat --decode --exclude x	safe-read
-hg cat --decode --help	safe-read
-hg cat --decode x	safe-read
+hg cat --encoding x	safe-read
+hg cat --encodingmode x	safe-read
 hg cat --exclude x	safe-read
 hg cat --help	safe-read
+hg cat --hidden	safe-read
 hg cat --include x	safe-read
+hg cat --noninteractive	safe-read
 hg cat --output x	safe-read
+hg cat --pager x	safe-read
+hg cat --quiet	safe-read
 hg cat --rev x	safe-read
 hg cat --template x	safe-read
+hg cat --time	safe-read
+hg cat --traceback	safe-read
+hg cat --verbose	safe-read
 hg cat -I x	safe-read
 hg cat -T x	safe-read
 hg cat -X x	safe-read
 hg cat -h	safe-read
 hg cat -o ./extracted-%s foo.py	safe-read
 hg cat -o x	safe-read
+hg cat -q	safe-read
 hg cat -r x	safe-read
+hg cat -v	safe-read
+hg cat -y	safe-read
 hg cat x	safe-read
 hg checkout	denied
 hg checkout x	denied
@@ -2625,23 +2745,34 @@ hg co x	denied
 hg commit	denied
 hg commit x	denied
 hg config	safe-read
+hg config --color x	safe-read
 hg config --debug	safe-read
-hg config --debug --edit	safe-read
-hg config --debug --source x	safe-read
+hg config --debug --color x	safe-read
+hg config --debug --global	safe-read
 hg config --debug x	safe-read
-hg config --edit	safe-read
+hg config --encoding x	safe-read
+hg config --encodingmode x	safe-read
 hg config --global	safe-read
 hg config --help	safe-read
+hg config --hidden	safe-read
 hg config --local	safe-read
 hg config --non-shared	safe-read
+hg config --noninteractive	safe-read
+hg config --pager x	safe-read
 hg config --quiet	safe-read
 hg config --source x	safe-read
 hg config --template x	safe-read
+hg config --time	safe-read
+hg config --traceback	safe-read
+hg config --untrusted	safe-read
 hg config --user	safe-read
+hg config --verbose	safe-read
 hg config -T x	safe-read
-hg config -e	safe-read
 hg config -h	safe-read
 hg config -q	safe-read
+hg config -u	safe-read
+hg config -v	safe-read
+hg config -y	safe-read
 hg config x	safe-read
 hg convert	denied
 hg convert x	denied
@@ -2650,12 +2781,19 @@ hg copy x	denied
 hg cp	denied
 hg cp x	denied
 hg diff	safe-read
+hg diff --binary	safe-read
+hg diff --binary --change	safe-read
+hg diff --binary --change x	safe-read
+hg diff --binary x	safe-read
 hg diff --change	safe-read
-hg diff --change --change x	safe-read
-hg diff --change --git	safe-read
 hg diff --change x	safe-read
+hg diff --color x	safe-read
+hg diff --debug	safe-read
+hg diff --encoding x	safe-read
+hg diff --encodingmode x	safe-read
 hg diff --exclude x	safe-read
 hg diff --git	safe-read
+hg diff --hidden	safe-read
 hg diff --ignore-all-space	safe-read
 hg diff --ignore-blank-lines	safe-read
 hg diff --ignore-changes	safe-read
@@ -2666,19 +2804,27 @@ hg diff --mar	safe-read
 hg diff --no-binary	safe-read
 hg diff --no-dates	safe-read
 hg diff --nodates	safe-read
+hg diff --noninteractive	safe-read
 hg diff --noprefix	safe-read
+hg diff --pager x	safe-read
 hg diff --patch	safe-read
+hg diff --quiet	safe-read
 hg diff --rev x	safe-read
 hg diff --reverse	safe-read
 hg diff --root x	safe-read
 hg diff --show-function	safe-read
 hg diff --stat	safe-read
+hg diff --subrepos	safe-read
 hg diff --text	safe-read
+hg diff --time	safe-read
+hg diff --traceback	safe-read
 hg diff --unified	safe-read
 hg diff --unified x	safe-read
+hg diff --verbose	safe-read
 hg diff --word-diff	safe-read
 hg diff -B	safe-read
 hg diff -I x	safe-read
+hg diff -S	safe-read
 hg diff -U x	safe-read
 hg diff -X x	safe-read
 hg diff -Z	safe-read
@@ -2689,31 +2835,46 @@ hg diff -c x	safe-read
 hg diff -g	safe-read
 hg diff -h	safe-read
 hg diff -p	safe-read
+hg diff -q	safe-read
 hg diff -r	safe-read
 hg diff -r x	safe-read
+hg diff -v	safe-read
 hg diff -w	safe-read
+hg diff -y	safe-read
 hg diff x	safe-read
 hg export	denied
 hg export x	denied
 hg files	safe-read
+hg files --color x	safe-read
+hg files --debug	safe-read
+hg files --debug --color x	safe-read
+hg files --debug --help	safe-read
+hg files --debug x	safe-read
+hg files --encoding x	safe-read
+hg files --encodingmode x	safe-read
 hg files --exclude x	safe-read
 hg files --help	safe-read
-hg files --help --exclude x	safe-read
-hg files --help --print0	safe-read
-hg files --help x	safe-read
+hg files --hidden	safe-read
 hg files --include x	safe-read
+hg files --noninteractive	safe-read
+hg files --pager x	safe-read
 hg files --print0	safe-read
 hg files --quiet	safe-read
 hg files --rev x	safe-read
+hg files --subrepos	safe-read
+hg files --time	safe-read
+hg files --traceback	safe-read
 hg files --verbose	safe-read
 hg files -0	safe-read
 hg files -I x	safe-read
+hg files -S	safe-read
 hg files -T x	safe-read
 hg files -X x	safe-read
 hg files -h	safe-read
 hg files -q	safe-read
 hg files -r x	safe-read
 hg files -v	safe-read
+hg files -y	safe-read
 hg files x	safe-read
 hg fixup	denied
 hg fixup x	denied
@@ -2724,137 +2885,201 @@ hg graft x	denied
 hg grep	denied
 hg grep --all	safe-read
 hg grep --all --all-files	safe-read
-hg grep --all --exclude x	safe-read
+hg grep --all --color x	safe-read
 hg grep --all x	safe-read
 hg grep --all-files	safe-read
+hg grep --color x	safe-read
+hg grep --debug	safe-read
 hg grep --diff	safe-read
+hg grep --encoding x	safe-read
+hg grep --encodingmode x	safe-read
 hg grep --exclude x	safe-read
 hg grep --files-with-matches	safe-read
+hg grep --follow	safe-read
 hg grep --help	safe-read
+hg grep --hidden	safe-read
 hg grep --ignore-case	safe-read
 hg grep --include x	safe-read
 hg grep --line-number	safe-read
+hg grep --noninteractive	safe-read
+hg grep --pager x	safe-read
 hg grep --print0	safe-read
+hg grep --quiet	safe-read
 hg grep --rev	safe-read
 hg grep --rev x	safe-read
-hg grep --user x	safe-read
+hg grep --template x	safe-read
+hg grep --time	safe-read
+hg grep --traceback	safe-read
+hg grep --user	safe-read
+hg grep --verbose	safe-read
 hg grep -0	safe-read
 hg grep -I x	safe-read
+hg grep -T x	safe-read
 hg grep -X x	safe-read
 hg grep -a	safe-read
 hg grep -d	safe-read
+hg grep -f	safe-read
 hg grep -h	safe-read
 hg grep -i	safe-read
 hg grep -l	safe-read
 hg grep -n	safe-read
+hg grep -q	safe-read
 hg grep -r	safe-read
 hg grep -r x	safe-read
-hg grep -u x	safe-read
+hg grep -u	safe-read
+hg grep -v	safe-read
+hg grep -y	safe-read
 hg grep x	safe-read
 hg heads	safe-read
 hg heads --active	safe-read
 hg heads --active --closed	safe-read
-hg heads --active --rev x	safe-read
+hg heads --active --color x	safe-read
 hg heads --active x	safe-read
 hg heads --closed	safe-read
+hg heads --color x	safe-read
+hg heads --debug	safe-read
+hg heads --encoding x	safe-read
+hg heads --encodingmode x	safe-read
 hg heads --help	safe-read
+hg heads --hidden	safe-read
+hg heads --noninteractive	safe-read
+hg heads --pager x	safe-read
+hg heads --quiet	safe-read
 hg heads --rev x	safe-read
 hg heads --style x	safe-read
 hg heads --template x	safe-read
+hg heads --time	safe-read
+hg heads --traceback	safe-read
+hg heads --verbose	safe-read
 hg heads -T x	safe-read
 hg heads -a	safe-read
 hg heads -c	safe-read
 hg heads -h	safe-read
+hg heads -q	safe-read
 hg heads -r x	safe-read
+hg heads -v	safe-read
+hg heads -y	safe-read
 hg heads x	safe-read
 hg help	inert
+hg help --color x	inert
+hg help --command	inert
+hg help --command --color x	inert
+hg help --command --debug	inert
+hg help --command x	inert
+hg help --debug	inert
+hg help --encoding x	inert
+hg help --encodingmode x	inert
+hg help --extension	inert
+hg help --help	inert
+hg help --hidden	inert
+hg help --keyword	inert
+hg help --noninteractive	inert
+hg help --pager x	inert
+hg help --quiet	inert
+hg help --system x	inert
+hg help --time	inert
+hg help --traceback	inert
+hg help --verbose	inert
+hg help -c	inert
+hg help -e	inert
+hg help -h	inert
+hg help -k	inert
+hg help -q	inert
+hg help -s x	inert
+hg help -v	inert
+hg help -y	inert
 hg help x	inert
 hg histedit	denied
 hg histedit x	denied
 hg id	safe-read
 hg id --bookmarks	safe-read
 hg id --bookmarks --branch	safe-read
-hg id --bookmarks --rev x	safe-read
+hg id --bookmarks --color x	safe-read
 hg id --bookmarks x	safe-read
 hg id --branch	safe-read
+hg id --color x	safe-read
 hg id --debug	safe-read
+hg id --encoding x	safe-read
+hg id --encodingmode x	safe-read
 hg id --help	safe-read
+hg id --hidden	safe-read
 hg id --id	safe-read
+hg id --noninteractive	safe-read
 hg id --num	safe-read
+hg id --pager x	safe-read
+hg id --quiet	safe-read
 hg id --rev x	safe-read
 hg id --tags	safe-read
+hg id --template x	safe-read
+hg id --time	safe-read
+hg id --traceback	safe-read
+hg id --verbose	safe-read
 hg id -B	safe-read
+hg id -T x	safe-read
 hg id -b	safe-read
 hg id -h	safe-read
 hg id -i	safe-read
 hg id -n	safe-read
+hg id -q	safe-read
 hg id -r	safe-read
 hg id -r x	safe-read
 hg id -t	safe-read
+hg id -v	safe-read
+hg id -y	safe-read
 hg id x	safe-read
 hg identify	safe-read
 hg identify --bookmarks	safe-read
 hg identify --bookmarks --branch	safe-read
-hg identify --bookmarks --rev x	safe-read
+hg identify --bookmarks --color x	safe-read
 hg identify --bookmarks x	safe-read
 hg identify --branch	safe-read
+hg identify --color x	safe-read
 hg identify --debug	safe-read
+hg identify --encoding x	safe-read
+hg identify --encodingmode x	safe-read
 hg identify --help	safe-read
+hg identify --hidden	safe-read
 hg identify --id	safe-read
+hg identify --noninteractive	safe-read
 hg identify --num	safe-read
+hg identify --pager x	safe-read
+hg identify --quiet	safe-read
 hg identify --rev x	safe-read
 hg identify --tags	safe-read
+hg identify --template x	safe-read
+hg identify --time	safe-read
+hg identify --traceback	safe-read
+hg identify --verbose	safe-read
 hg identify -B	safe-read
+hg identify -T x	safe-read
 hg identify -b	safe-read
 hg identify -h	safe-read
 hg identify -i	safe-read
 hg identify -n	safe-read
+hg identify -q	safe-read
 hg identify -r	safe-read
 hg identify -r x	safe-read
 hg identify -t	safe-read
+hg identify -v	safe-read
+hg identify -y	safe-read
 hg identify x	safe-read
 hg import	denied
 hg import x	denied
-hg incoming	safe-read
-hg incoming --bookmarks	safe-read
-hg incoming --bookmarks --branch	safe-read
-hg incoming --bookmarks --branch x	safe-read
-hg incoming --bookmarks x	safe-read
-hg incoming --branch	safe-read
-hg incoming --branch x	safe-read
-hg incoming --bundle	safe-read
-hg incoming --bundle x	safe-read
-hg incoming --force	safe-read
-hg incoming --graph	safe-read
-hg incoming --help	safe-read
-hg incoming --insecure	safe-read
-hg incoming --newest-first	safe-read
-hg incoming --patch	safe-read
-hg incoming --remotecmd x	safe-read
-hg incoming --rev x	safe-read
-hg incoming --ssh x	safe-read
-hg incoming -B	safe-read
-hg incoming -G	safe-read
-hg incoming -S	safe-read
-hg incoming -b	safe-read
-hg incoming -f	safe-read
-hg incoming -h	safe-read
-hg incoming -l	safe-read
-hg incoming -n	safe-read
-hg incoming -p	safe-read
-hg incoming -r	safe-read
-hg incoming -r x	safe-read
-hg incoming x	safe-read
+hg incoming	denied
+hg incoming x	denied
 hg init	denied
 hg init x	denied
 hg log	safe-read
-hg log --branch	safe-read
-hg log --branch --branch x	safe-read
-hg log --branch --copies	safe-read
 hg log --branch x	safe-read
+hg log --color x	safe-read
 hg log --copies	safe-read
+hg log --copies --branch x	safe-read
+hg log --copies --debug	safe-read
+hg log --copies x	safe-read
 hg log --date x	safe-read
 hg log --debug	safe-read
+hg log --encoding x	safe-read
+hg log --encodingmode x	safe-read
 hg log --exclude x	safe-read
 hg log --follow	safe-read
 hg log --follow-first	safe-read
@@ -2865,7 +3090,11 @@ hg log --hidden	safe-read
 hg log --include x	safe-read
 hg log --keyword x	safe-read
 hg log --limit x	safe-read
+hg log --line-range x	safe-read
 hg log --no-merges	safe-read
+hg log --noninteractive	safe-read
+hg log --only-merges	safe-read
+hg log --pager x	safe-read
 hg log --patch	safe-read
 hg log --prune x	safe-read
 hg log --quiet	safe-read
@@ -2873,104 +3102,115 @@ hg log --removed	safe-read
 hg log --rev x	safe-read
 hg log --reverse	safe-read
 hg log --stat	safe-read
-hg log --style	safe-read
 hg log --style x	safe-read
-hg log --template	safe-read
 hg log --template x	safe-read
-hg log --user	safe-read
+hg log --time	safe-read
+hg log --traceback	safe-read
 hg log --user x	safe-read
 hg log --verbose	safe-read
+hg log -C	safe-read
 hg log -G	safe-read
+hg log -I x	safe-read
+hg log -L x	safe-read
 hg log -M	safe-read
-hg log -T	safe-read
+hg log -P x	safe-read
 hg log -T x	safe-read
 hg log -X x	safe-read
-hg log -b	safe-read
+hg log -b x	safe-read
 hg log -c	safe-read
-hg log -d	safe-read
 hg log -d x	safe-read
 hg log -f	safe-read
-hg log -f x	safe-read
 hg log -g	safe-read
 hg log -h	safe-read
-hg log -k	safe-read
 hg log -k x	safe-read
-hg log -l	safe-read
 hg log -l x	safe-read
+hg log -m	safe-read
 hg log -p	safe-read
 hg log -q	safe-read
-hg log -r	safe-read
 hg log -r x	safe-read
-hg log -u	safe-read
 hg log -u x	safe-read
 hg log -v	safe-read
 hg log -y	safe-read
 hg log x	safe-read
 hg manifest	safe-read
 hg manifest --all	safe-read
+hg manifest --all --color x	safe-read
 hg manifest --all --debug	safe-read
-hg manifest --all --rev x	safe-read
 hg manifest --all x	safe-read
+hg manifest --color x	safe-read
 hg manifest --debug	safe-read
+hg manifest --encoding x	safe-read
+hg manifest --encodingmode x	safe-read
 hg manifest --help	safe-read
+hg manifest --hidden	safe-read
+hg manifest --noninteractive	safe-read
+hg manifest --pager x	safe-read
+hg manifest --quiet	safe-read
 hg manifest --rev x	safe-read
+hg manifest --template x	safe-read
+hg manifest --time	safe-read
+hg manifest --traceback	safe-read
+hg manifest --verbose	safe-read
+hg manifest -T x	safe-read
 hg manifest -h	safe-read
+hg manifest -q	safe-read
 hg manifest -r x	safe-read
+hg manifest -v	safe-read
+hg manifest -y	safe-read
 hg manifest x	safe-read
 hg merge	denied
 hg merge x	denied
 hg mv	denied
 hg mv x	denied
-hg outgoing	safe-read
-hg outgoing --bookmarks	safe-read
-hg outgoing --bookmarks --branch	safe-read
-hg outgoing --bookmarks --branch x	safe-read
-hg outgoing --bookmarks x	safe-read
-hg outgoing --branch	safe-read
-hg outgoing --branch x	safe-read
-hg outgoing --force	safe-read
-hg outgoing --graph	safe-read
-hg outgoing --help	safe-read
-hg outgoing --insecure	safe-read
-hg outgoing --newest-first	safe-read
-hg outgoing --patch	safe-read
-hg outgoing --remotecmd	safe-read
-hg outgoing --remotecmd x	safe-read
-hg outgoing --rev x	safe-read
-hg outgoing --ssh	safe-read
-hg outgoing --ssh x	safe-read
-hg outgoing -B	safe-read
-hg outgoing -G	safe-read
-hg outgoing -S	safe-read
-hg outgoing -b	safe-read
-hg outgoing -f	safe-read
-hg outgoing -h	safe-read
-hg outgoing -l	safe-read
-hg outgoing -n	safe-read
-hg outgoing -p	safe-read
-hg outgoing -r	safe-read
-hg outgoing -r x	safe-read
-hg outgoing x	safe-read
+hg outgoing	denied
+hg outgoing x	denied
 hg parents	safe-read
+hg parents --color x	safe-read
+hg parents --debug	safe-read
+hg parents --debug --color x	safe-read
+hg parents --debug --help	safe-read
+hg parents --debug x	safe-read
+hg parents --encoding x	safe-read
+hg parents --encodingmode x	safe-read
 hg parents --help	safe-read
-hg parents --help --rev x	safe-read
-hg parents --help -h	safe-read
-hg parents --help x	safe-read
+hg parents --hidden	safe-read
+hg parents --noninteractive	safe-read
+hg parents --pager x	safe-read
+hg parents --quiet	safe-read
 hg parents --rev x	safe-read
 hg parents --style x	safe-read
 hg parents --template x	safe-read
+hg parents --time	safe-read
+hg parents --traceback	safe-read
+hg parents --verbose	safe-read
 hg parents -T x	safe-read
 hg parents -h	safe-read
+hg parents -q	safe-read
 hg parents -r x	safe-read
+hg parents -v	safe-read
+hg parents -y	safe-read
 hg parents x	safe-read
 hg paths	safe-read
+hg paths --color x	safe-read
+hg paths --debug	safe-read
+hg paths --debug --color x	safe-read
+hg paths --debug --help	safe-read
+hg paths --debug x	safe-read
+hg paths --encoding x	safe-read
+hg paths --encodingmode x	safe-read
 hg paths --help	safe-read
-hg paths --help --quiet	safe-read
-hg paths --help x	safe-read
+hg paths --hidden	safe-read
+hg paths --noninteractive	safe-read
+hg paths --pager x	safe-read
 hg paths --quiet	safe-read
+hg paths --template x	safe-read
+hg paths --time	safe-read
+hg paths --traceback	safe-read
 hg paths --verbose	safe-read
+hg paths -T x	safe-read
 hg paths -q	safe-read
 hg paths -v	safe-read
+hg paths -y	safe-read
 hg paths x	safe-read
 hg phase	denied
 hg phase x	denied
@@ -2997,23 +3237,34 @@ hg serve x	denied
 hg shelve	denied
 hg shelve x	denied
 hg showconfig	safe-read
+hg showconfig --color x	safe-read
 hg showconfig --debug	safe-read
-hg showconfig --debug --edit	safe-read
-hg showconfig --debug --source x	safe-read
+hg showconfig --debug --color x	safe-read
+hg showconfig --debug --global	safe-read
 hg showconfig --debug x	safe-read
-hg showconfig --edit	safe-read
+hg showconfig --encoding x	safe-read
+hg showconfig --encodingmode x	safe-read
 hg showconfig --global	safe-read
 hg showconfig --help	safe-read
+hg showconfig --hidden	safe-read
 hg showconfig --local	safe-read
 hg showconfig --non-shared	safe-read
+hg showconfig --noninteractive	safe-read
+hg showconfig --pager x	safe-read
 hg showconfig --quiet	safe-read
 hg showconfig --source x	safe-read
 hg showconfig --template x	safe-read
+hg showconfig --time	safe-read
+hg showconfig --traceback	safe-read
+hg showconfig --untrusted	safe-read
 hg showconfig --user	safe-read
+hg showconfig --verbose	safe-read
 hg showconfig -T x	safe-read
-hg showconfig -e	safe-read
 hg showconfig -h	safe-read
 hg showconfig -q	safe-read
+hg showconfig -u	safe-read
+hg showconfig -v	safe-read
+hg showconfig -y	safe-read
 hg showconfig x	safe-read
 hg st	safe-read
 hg st --added	safe-read
@@ -3023,24 +3274,36 @@ hg st --added x	safe-read
 hg st --all	safe-read
 hg st --change x	safe-read
 hg st --clean	safe-read
+hg st --color x	safe-read
 hg st --copies	safe-read
+hg st --debug	safe-read
 hg st --deleted	safe-read
+hg st --encoding x	safe-read
+hg st --encodingmode x	safe-read
 hg st --exclude x	safe-read
+hg st --hidden	safe-read
 hg st --ignored	safe-read
 hg st --include x	safe-read
 hg st --modified	safe-read
 hg st --no-status	safe-read
+hg st --noninteractive	safe-read
+hg st --pager x	safe-read
 hg st --print0	safe-read
 hg st --quiet	safe-read
 hg st --removed	safe-read
 hg st --rev x	safe-read
+hg st --subrepos	safe-read
 hg st --template x	safe-read
 hg st --terse x	safe-read
+hg st --time	safe-read
+hg st --traceback	safe-read
 hg st --unknown	safe-read
+hg st --verbose	safe-read
 hg st -0	safe-read
 hg st -A	safe-read
 hg st -C	safe-read
 hg st -I x	safe-read
+hg st -S	safe-read
 hg st -T x	safe-read
 hg st -X x	safe-read
 hg st -a	safe-read
@@ -3051,9 +3314,11 @@ hg st -i	safe-read
 hg st -m	safe-read
 hg st -n	safe-read
 hg st -q	safe-read
-hg st -r x	safe-read
+hg st -r	safe-read
 hg st -t x	safe-read
 hg st -u	safe-read
+hg st -v	safe-read
+hg st -y	safe-read
 hg st x	safe-read
 hg status	safe-read
 hg status --added	safe-read
@@ -3063,24 +3328,36 @@ hg status --added x	safe-read
 hg status --all	safe-read
 hg status --change x	safe-read
 hg status --clean	safe-read
+hg status --color x	safe-read
 hg status --copies	safe-read
+hg status --debug	safe-read
 hg status --deleted	safe-read
+hg status --encoding x	safe-read
+hg status --encodingmode x	safe-read
 hg status --exclude x	safe-read
+hg status --hidden	safe-read
 hg status --ignored	safe-read
 hg status --include x	safe-read
 hg status --modified	safe-read
 hg status --no-status	safe-read
+hg status --noninteractive	safe-read
+hg status --pager x	safe-read
 hg status --print0	safe-read
 hg status --quiet	safe-read
 hg status --removed	safe-read
 hg status --rev x	safe-read
+hg status --subrepos	safe-read
 hg status --template x	safe-read
 hg status --terse x	safe-read
+hg status --time	safe-read
+hg status --traceback	safe-read
 hg status --unknown	safe-read
+hg status --verbose	safe-read
 hg status -0	safe-read
 hg status -A	safe-read
 hg status -C	safe-read
 hg status -I x	safe-read
+hg status -S	safe-read
 hg status -T x	safe-read
 hg status -X x	safe-read
 hg status -a	safe-read
@@ -3091,50 +3368,106 @@ hg status -i	safe-read
 hg status -m	safe-read
 hg status -n	safe-read
 hg status -q	safe-read
-hg status -r x	safe-read
+hg status -r	safe-read
 hg status -t x	safe-read
 hg status -u	safe-read
+hg status -v	safe-read
+hg status -y	safe-read
 hg status x	safe-read
 hg strip	denied
 hg strip x	denied
 hg sum	safe-read
+hg sum --color x	safe-read
+hg sum --debug	safe-read
+hg sum --debug --color x	safe-read
+hg sum --debug --help	safe-read
+hg sum --debug x	safe-read
+hg sum --encoding x	safe-read
+hg sum --encodingmode x	safe-read
 hg sum --help	safe-read
-hg sum --help --remote	safe-read
-hg sum --help x	safe-read
-hg sum --remote	safe-read
+hg sum --hidden	safe-read
+hg sum --noninteractive	safe-read
+hg sum --pager x	safe-read
+hg sum --quiet	safe-read
+hg sum --time	safe-read
+hg sum --traceback	safe-read
+hg sum --verbose	safe-read
 hg sum -h	safe-read
+hg sum -q	safe-read
+hg sum -v	safe-read
+hg sum -y	safe-read
 hg sum x	safe-read
 hg summary	safe-read
+hg summary --color x	safe-read
+hg summary --debug	safe-read
+hg summary --debug --color x	safe-read
+hg summary --debug --help	safe-read
+hg summary --debug x	safe-read
+hg summary --encoding x	safe-read
+hg summary --encodingmode x	safe-read
 hg summary --help	safe-read
-hg summary --help --remote	safe-read
-hg summary --help x	safe-read
-hg summary --remote	safe-read
+hg summary --hidden	safe-read
+hg summary --noninteractive	safe-read
+hg summary --pager x	safe-read
+hg summary --quiet	safe-read
+hg summary --time	safe-read
+hg summary --traceback	safe-read
+hg summary --verbose	safe-read
 hg summary -h	safe-read
+hg summary -q	safe-read
+hg summary -v	safe-read
+hg summary -y	safe-read
 hg summary x	safe-read
 hg tag	denied
 hg tag x	denied
 hg tags	safe-read
+hg tags --color x	safe-read
 hg tags --debug	safe-read
+hg tags --debug --color x	safe-read
 hg tags --debug --help	safe-read
 hg tags --debug x	safe-read
+hg tags --encoding x	safe-read
+hg tags --encodingmode x	safe-read
 hg tags --help	safe-read
+hg tags --hidden	safe-read
+hg tags --noninteractive	safe-read
+hg tags --pager x	safe-read
 hg tags --quiet	safe-read
+hg tags --template x	safe-read
+hg tags --time	safe-read
+hg tags --traceback	safe-read
 hg tags --verbose	safe-read
+hg tags -T x	safe-read
 hg tags -h	safe-read
 hg tags -q	safe-read
 hg tags -v	safe-read
+hg tags -y	safe-read
 hg tags x	safe-read
 hg tip	safe-read
+hg tip --color x	safe-read
+hg tip --debug	safe-read
+hg tip --debug --color x	safe-read
+hg tip --debug --help	safe-read
+hg tip --debug x	safe-read
+hg tip --encoding x	safe-read
+hg tip --encodingmode x	safe-read
 hg tip --help	safe-read
-hg tip --help --patch	safe-read
-hg tip --help --style x	safe-read
-hg tip --help x	safe-read
+hg tip --hidden	safe-read
+hg tip --noninteractive	safe-read
+hg tip --pager x	safe-read
 hg tip --patch	safe-read
+hg tip --quiet	safe-read
 hg tip --style x	safe-read
 hg tip --template x	safe-read
+hg tip --time	safe-read
+hg tip --traceback	safe-read
+hg tip --verbose	safe-read
 hg tip -T x	safe-read
 hg tip -h	safe-read
 hg tip -p	safe-read
+hg tip -q	safe-read
+hg tip -v	safe-read
+hg tip -y	safe-read
 hg tip x	safe-read
 hg unbundle	denied
 hg unbundle x	denied
@@ -3145,19 +3478,48 @@ hg up x	denied
 hg update	denied
 hg update x	denied
 hg verify	safe-read
+hg verify --color x	safe-read
+hg verify --debug	safe-read
+hg verify --debug --color x	safe-read
+hg verify --debug --help	safe-read
+hg verify --debug x	safe-read
+hg verify --encoding x	safe-read
+hg verify --encodingmode x	safe-read
 hg verify --help	safe-read
-hg verify --help -h	safe-read
-hg verify --help x	safe-read
+hg verify --hidden	safe-read
+hg verify --noninteractive	safe-read
+hg verify --pager x	safe-read
+hg verify --quiet	safe-read
+hg verify --time	safe-read
+hg verify --traceback	safe-read
+hg verify --verbose	safe-read
 hg verify -h	safe-read
+hg verify -q	safe-read
+hg verify -v	safe-read
+hg verify -y	safe-read
 hg verify x	safe-read
 hg version	inert
+hg version --color x	inert
+hg version --debug	inert
+hg version --debug --color x	inert
+hg version --debug --help	inert
+hg version --debug x	inert
+hg version --encoding x	inert
+hg version --encodingmode x	inert
 hg version --help	inert
-hg version --help --template x	inert
-hg version --help -h	inert
-hg version --help x	inert
+hg version --hidden	inert
+hg version --noninteractive	inert
+hg version --pager x	inert
+hg version --quiet	inert
 hg version --template x	inert
+hg version --time	inert
+hg version --traceback	inert
+hg version --verbose	inert
 hg version -T x	inert
 hg version -h	inert
+hg version -q	inert
+hg version -v	inert
+hg version -y	inert
 hg version x	inert
 hg x	denied
 hiutil	denied
