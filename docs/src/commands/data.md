@@ -167,8 +167,17 @@ Aliases: `gshuf`
 Aliases: `gsort`
 
 - Allowed standalone flags: --check, --debug, --dictionary-order, --general-numeric-sort, --help, --human-numeric-sort, --ignore-case, --ignore-leading-blanks, --ignore-nonprinting, --merge, --month-sort, --numeric-sort, --random-sort, --reverse, --stable, --unique, --version, --version-sort, --zero-terminated, -C, -M, -R, -V, -b, -c, -d, -f, -g, -h, -i, -m, -n, -r, -s, -u, -z
-- Allowed valued flags: --batch-size, --buffer-size, --field-separator, --files0-from, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t
+- Allowed valued flags: --batch-size, --buffer-size, --field-separator, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t
 - Bare invocation allowed
+
+**Examples:**
+
+- `sort ./a.txt`
+- `sort -u -k2,2 ./a.txt`
+- `sort -t: -k3 -n ./a.txt`
+- `sort -rh ./sizes.txt`
+- `sort --check ./a.txt`
+- `sort --version`
 
 ### `test`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation</a></p>

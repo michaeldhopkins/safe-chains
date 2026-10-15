@@ -91,8 +91,17 @@ Aliases: `gcomm`
 
 Aliases: `gcut`
 
-- Allowed standalone flags: -V, -h, -n, -s, -w, -z, --complement, --help, --only-delimited, --version, --zero-terminated
-- Allowed valued flags: -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
+- Allowed standalone flags: -n, -s, -w, -z, --complement, --help, --no-partial, --only-delimited, --version, --whitespace-delimited, --zero-terminated
+- Allowed valued flags: -F, -O, -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
+
+**Examples:**
+
+- `cut -d: -f1 ./passwd.txt`
+- `cut -c1-8 ./a.txt`
+- `cut -f2,4 -s ./a.tsv`
+- `cut -F1 -O, ./a.txt`
+- `cut --complement -b1 ./a.bin`
+- `cut --version`
 
 ### `dc`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bc/manual/dc-1.05/html_mono/dc.html">https://www.gnu.org/software/bc/manual/dc-1.05/html_mono/dc.html</a></p>
@@ -660,13 +669,17 @@ Aliases: `guniq`
 Aliases: `gwc`
 
 - Reads its file operands to stdout within your workspace.
-- Allowed standalone flags: --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -V, -c, -l, -m, -w
+- Allowed standalone flags: --bytes, --chars, --debug, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -c, -l, -m, -w
+- Allowed valued flags: --total
 - Bare invocation reads stdin
 
 **Examples:**
 
 - `wc -l src/main.rs`
 - `wc -w README.md`
+- `wc -lwc ./a.txt ./b.txt`
+- `wc --total=only ./a.txt`
+- `wc --version`
 
 ### `wdiff`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wdiff/">https://www.gnu.org/software/wdiff/</a></p>

@@ -3561,8 +3561,17 @@ Aliases: `@cucumber/cucumber`
 
 Aliases: `gcut`
 
-- Allowed standalone flags: -V, -h, -n, -s, -w, -z, --complement, --help, --only-delimited, --version, --zero-terminated
-- Allowed valued flags: -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
+- Allowed standalone flags: -n, -s, -w, -z, --complement, --help, --no-partial, --only-delimited, --version, --whitespace-delimited, --zero-terminated
+- Allowed valued flags: -F, -O, -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
+
+**Examples:**
+
+- `cut -d: -f1 ./passwd.txt`
+- `cut -c1-8 ./a.txt`
+- `cut -f2,4 -s ./a.tsv`
+- `cut -F1 -O, ./a.txt`
+- `cut --complement -b1 ./a.bin`
+- `cut --version`
 
 ### `cwebp`
 <p class="cmd-url"><a href="https://developers.google.com/speed/webp/docs/cwebp">https://developers.google.com/speed/webp/docs/cwebp</a></p>
@@ -14373,8 +14382,17 @@ Aliases: `serverless`
 Aliases: `gsort`
 
 - Allowed standalone flags: --check, --debug, --dictionary-order, --general-numeric-sort, --help, --human-numeric-sort, --ignore-case, --ignore-leading-blanks, --ignore-nonprinting, --merge, --month-sort, --numeric-sort, --random-sort, --reverse, --stable, --unique, --version, --version-sort, --zero-terminated, -C, -M, -R, -V, -b, -c, -d, -f, -g, -h, -i, -m, -n, -r, -s, -u, -z
-- Allowed valued flags: --batch-size, --buffer-size, --field-separator, --files0-from, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t
+- Allowed valued flags: --batch-size, --buffer-size, --field-separator, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t
 - Bare invocation allowed
+
+**Examples:**
+
+- `sort ./a.txt`
+- `sort -u -k2,2 ./a.txt`
+- `sort -t: -k3 -n ./a.txt`
+- `sort -rh ./sizes.txt`
+- `sort --check ./a.txt`
+- `sort --version`
 
 ### `sox`
 <p class="cmd-url"><a href="https://sox.sourceforge.net/">https://sox.sourceforge.net/</a></p>
@@ -16667,13 +16685,17 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 Aliases: `gwc`
 
 - Reads its file operands to stdout within your workspace.
-- Allowed standalone flags: --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -V, -c, -l, -m, -w
+- Allowed standalone flags: --bytes, --chars, --debug, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -c, -l, -m, -w
+- Allowed valued flags: --total
 - Bare invocation reads stdin
 
 **Examples:**
 
 - `wc -l src/main.rs`
 - `wc -w README.md`
+- `wc -lwc ./a.txt ./b.txt`
+- `wc --total=only ./a.txt`
+- `wc --version`
 
 ### `wdiff`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wdiff/">https://www.gnu.org/software/wdiff/</a></p>
