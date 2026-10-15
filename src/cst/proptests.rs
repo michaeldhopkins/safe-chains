@@ -528,14 +528,14 @@ proptest! {
     fn file_redirect_promotes_to_safewrite(
         cmd_word in arb_shell_word(),
         // Safe write targets only: an in-tree relative data path. Absolute,
-        // home, parent-escaping, and auto-executed (.git/.envrc) targets are
+        // home, parent-escaping, and auto-executed (.git/.jj/.envrc) targets are
         // covered by the unsafe-target test below.
         target in arb_shell_word().prop_filter("safe in-tree write target", |s| {
             !s.is_empty()
                 && !s.starts_with('/')
                 && !s.starts_with('~')
                 && !s.contains('$')
-                && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".envrc")
+                && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".jj" || seg == ".envrc")
         }),
         fd in 0..3u32,
         mode in arb_write_mode(),
