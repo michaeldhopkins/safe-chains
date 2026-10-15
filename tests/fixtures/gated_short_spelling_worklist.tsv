@@ -75,6 +75,13 @@ wget	-p	--post-file
 wget	-s	--save-cookies
 wget	-w	--warc-file
 wget	-w	--warc-tempdir
+wget	-c	--certificate
+wget	-c	--crl-file
+wget	-h	--hsts-file
+wget	-l	--load-cookies
+wget	-p	--private-key
+wget	-r	--random-file
+wget	-r	--rejected-log
 ytt	-o	--output-directory
 ytt	-o	--output-files
 ytt	-o	--output-multi-files

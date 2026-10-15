@@ -1493,7 +1493,7 @@ webpinfo	description,examples
 webpmux	description,examples,no-tolerance
 west	description,no-tolerance,profiled
 wg	description,profiled
-wget	description,examples,no-tolerance
+wget	description,no-tolerance
 what	description,examples
 whenever	description,examples
 whereis	description,examples,version

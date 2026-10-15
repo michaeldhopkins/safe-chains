@@ -918,12 +918,10 @@ wasmtime compile	--profile	untriaged	-	-	-
 wasmtime wast	--profile	untriaged	-	-	-	
 webpack	--output-filename	untriaged	-	-	-	
 webpack	--output-public-path	untriaged	-	-	-	
-wget	--crl-file	untriaged	-	-	-	
 wget	--cut-dirs	untriaged	-	-	-	
 wget	--exclude-directories	untriaged	-	-	-	
 wget	--include-directories	untriaged	-	-	-	
 wget	--max-redirect	untriaged	-	-	-	
-wget	--random-file	untriaged	-	-	-	
 wget	--restrict-file-names	untriaged	-	-	-	
 wrjpgcom	-cfile	untriaged	-	-	-	
 xar	--file-cksum	untriaged	-	-	-	
