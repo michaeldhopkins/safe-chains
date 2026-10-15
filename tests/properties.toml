@@ -326,7 +326,11 @@ owed = [
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
   "src/overreach_property_tests.rs::only_a_foreign_temp_path_is_reported_as_foreign_temp",
 ]
-"src/reach.rs" = ["every_reason_names_the_path_on_one_line", "a_trust_root_repository_is_explained_by_its_snapshot_only_for_an_observing_sub"]
+"src/reach.rs" = [
+  "every_reason_names_the_path_on_one_line",
+  "a_trust_root_reason_stays_short_and_plain",
+  "a_trust_root_repository_is_explained_by_its_snapshot_only_for_an_observing_sub",
+]
 "src/mcp/args.rs" = ["an_undeclared_argument_is_always_refused"]
 "src/mcp/client_approval.rs" = ["only_editing_tools_count"]
 "src/netloc.rs" = [

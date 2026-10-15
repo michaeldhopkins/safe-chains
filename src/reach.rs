@@ -98,22 +98,17 @@ impl ReachReason {
                  name that path in ~/.config/safe-chains.toml; the write stays refused"
             ),
             ReachReason::FrozenTrustFile => format!(
-                "it reaches `{path}`. safe-chains reads its own permissions from that file, so a \
-                 write there is never auto-approved. Granting the path does not change that, \
-                 because an agent that can edit this file can decide what gets approved next. Edit \
-                 it yourself if you meant to change it"
+                "it reaches `{path}`. safe-chains reads its permissions from that file, so a write \
+                 there is never auto-approved. No grant changes this. Run it yourself if you meant to"
             ),
             ReachReason::FrozenTrustRoot => format!(
-                "it reaches `{path}`. safe-chains reads its own permissions from a file in that \
-                 directory, so removing or replacing the directory itself is never auto-approved: \
-                 doing that would point the trust root somewhere else. Writing files into it is \
-                 fine, and granting the path does not change either half. Move or delete it \
-                 yourself if you meant to"
+                "it reaches `{path}`. safe-chains reads its permissions from a file in that \
+                 directory, so removing or replacing it, or writing to a jj repository there, is \
+                 never auto-approved. No grant changes this. Run it yourself if you meant to"
             ),
             ReachReason::FrozenSystemIntegrity => format!(
-                "it reaches `{path}`. That file decides who may log in and what they may do, so a \
-                 write there is never auto-approved. Granting the path does not change that. Edit \
-                 it yourself if you meant to change it"
+                "it reaches `{path}`. That file decides who may log in, so a write there is never \
+                 auto-approved. No grant changes this. Run it yourself if you meant to"
             ),
             ReachReason::ForeignTemp => format!(
                 "it runs code from `{path}`, a temporary directory that is not this session's \
@@ -130,13 +125,9 @@ impl ReachReason {
                  is not: the first is a filename whatever `$i` holds, and the second could be `..`"
             ),
             ReachReason::RepositorySnapshot => format!(
-                "it names `{path}` as the repository to use, and jj snapshots the working copy into \
-                 that repository before it reads anything: a write outside the working directory. \
-                 With --ignore-working-copy right after `jj`, an observing command (log, show, \
-                 status) skips the snapshot and only reads the repository, so it is judged as a \
-                 read; it then shows the repository as last recorded, without edits made since. Granting \
-                 the path does not change that: a write to that repository can rewrite the trust \
-                 file inside it, so a command that needs the snapshot is one to run yourself"
+                "it uses `{path}` as the jj repository, and jj writes a snapshot there before it \
+                 reads. Add --ignore-working-copy after `jj` to read without the snapshot. Edits \
+                 since the last snapshot will not show. No grant changes this"
             ),
             ReachReason::OutsideWorkspace => match pathctx::cwd().map(|c| sanitize_display(&c)) {
                 Some(cwd) => format!(
@@ -227,6 +218,22 @@ pub(crate) mod tests {
                 let text = reason.message(&path);
                 prop_assert_eq!(text.lines().count(), 1, "{:?}: {}", reason, text);
                 prop_assert!(text.contains(&crate::sanitize_display(&path)), "{:?}: {}", reason, text);
+            }
+        }
+
+        #[test]
+        fn a_trust_root_reason_stays_short_and_plain(path in "[~/a-z.]{1,24}") {
+            let trust = [
+                ReachReason::FrozenTrustFile,
+                ReachReason::FrozenTrustRoot,
+                ReachReason::FrozenSystemIntegrity,
+                ReachReason::RepositorySnapshot,
+            ];
+            for reason in trust {
+                let text = reason.message(&path);
+                let body = text.replacen(&path, "", 1);
+                prop_assert!(body.chars().count() <= 240, "{:?} is {} characters: {}", reason, body.chars().count(), text);
+                prop_assert!(!text.contains('\u{2014}') && !text.contains(':') && !text.contains(';'), "{:?}: {}", reason, text);
             }
         }
     }

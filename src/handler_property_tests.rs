@@ -2182,6 +2182,7 @@ fn every_actionable_reach_reason_names_a_remedy() {
         Manual,
         /// Nothing to grant — the path is not a fixed path. Respell it.
         Respell,
+        ReadFlag,
     }
 
     /// Exhaustive BY CONSTRUCTION: adding a `ReachReason` fails to compile here.
@@ -2193,7 +2194,8 @@ fn every_actionable_reach_reason_names_a_remedy() {
     fn owed(r: ReachReason) -> Remedy {
         match r {
             Credential | ForeignTemp | OutsideWorkspace | RawDevice => Remedy::Grant,
-            FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity | RepositorySnapshot => Remedy::Manual,
+            FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity => Remedy::Manual,
+            RepositorySnapshot => Remedy::ReadFlag,
             Unconfined => Remedy::Respell,
         }
     }
@@ -2207,13 +2209,11 @@ fn every_actionable_reach_reason_names_a_remedy() {
             // The frozen faces must do the OPPOSITE: never point at a grant, because for them
             // that advice is false rather than vague, and for safe-chains' own config it is
             // circular as well. Their remedy is that there is no automated one.
-            Remedy::Manual => {
-                assert!(!msg.contains("grant that path"), "{reason:?} must not advise a grant: {msg}");
-                assert!(
-                    msg.to_lowercase().contains("granting the path does not change"),
-                    "{reason:?} must say granting will not help: {msg}"
-                );
-                assert!(msg.contains("yourself"), "{reason:?} must give the real remedy: {msg}");
+            Remedy::Manual | Remedy::ReadFlag => {
+                assert!(!msg.contains("safe-chains.toml"), "{reason:?} must not advise a grant: {msg}");
+                assert!(msg.contains("No grant changes this"), "{reason:?} must say granting will not help: {msg}");
+                let remedy = if owed(reason) == Remedy::ReadFlag { "--ignore-working-copy" } else { "Run it yourself" };
+                assert!(msg.contains(remedy), "{reason:?} must give the real remedy: {msg}");
             }
             Remedy::Respell => {
                 assert!(msg.contains("literal text"), "{reason:?} must say how to respell the path: {msg}")

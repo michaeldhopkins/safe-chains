@@ -2100,7 +2100,7 @@ fn a_refusal_offers_a_grant_only_when_one_would_work() {
             assert!(text.contains("safe-chains.toml"), "{reason:?} helps, so the message must say where to name it: {text}");
         } else {
             assert!(
-                text.contains("does not change") || text.contains("not to grant"),
+                text.contains("does not change") || text.contains("no grant changes") || text.contains("not to grant"),
                 "{reason:?} does not help, so the message must say so: {text}"
             );
         }

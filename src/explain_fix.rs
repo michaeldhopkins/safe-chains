@@ -167,7 +167,7 @@ impl Fix {
                 );
                 let rewrite = matches!(because, Because::ProtectedPath { reason: ReachReason::RepositorySnapshot, .. });
                 let (lead, close) = if rewrite {
-                    ("Fix: none in safe-chains' config.", "Otherwise a person approves the command each time it runs.")
+                    ("Fix:", "Otherwise a person approves the command each time it runs.")
                 } else if by_hand {
                     ("Fix: none that safe-chains will make.", "Otherwise a person approves the command each time it runs.")
                 } else {
@@ -201,10 +201,7 @@ impl Because {
                         "`{shown}` is a raw device, so neither `safe-chains config` nor its MCP tools will grant it. \
                          A read grant you write into ~/.config/safe-chains.toml by hand would allow reading it. That is the user's decision, not an agent's."
                     ),
-                    ReachReason::RepositorySnapshot => format!(
-                        "Neither `safe-chains config` nor its MCP tools will grant `{shown}`. Adding \
-                         --ignore-working-copy right after `jj` gets the command approved without a grant; it then shows the repository as last recorded."
-                    ),
+                    ReachReason::RepositorySnapshot => format!("add --ignore-working-copy after `jj`. No grant covers `{shown}`."),
                     _ => format!("A built-in rule protects `{shown}`, and no grant can cover it."),
                 }
             }
