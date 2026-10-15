@@ -21,6 +21,17 @@
 #              `--manifest-path`. Worktree allows; /tmp, home and system paths deny. This is not the
 #              read rule: `cat /tmp/x.so` is a fine read, while LOADING /tmp/x.so is not.
 #   data-path  the value names a path read or written as DATA → ordinary read/write locus.
+#   config-dir   the value is a directory whose config files programs read (HOME) → allowed only
+#                when it is absolute and lies in the project or under $HOME, and neither it nor a
+#                file in it is a temp root (so the session scratchpad), a sibling project, or the
+#                projects folder above it, in any letter case. Every other folder is refused, since
+#                macOS reaches /tmp by other names too (/System/Volumes/Data, /Volumes/<disk>, /.vol).
+#                A relative value is refused: `git -C`, `jj -R` and the like resolve it from another
+#                folder than the one the command starts in. A `for` loop over the variable is judged
+#                item by item the same way, and `read` into it or a bash nameref (`declare -n`) is
+#                refused, since either sets it without an assignment.
+#   config-file  the value names a config file or repository that can name programs to run → the
+#                exec-path rule, and never a temp root or sibling project either.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -163,11 +174,24 @@ because = "names a php.ini, which can set auto_prepend_file to execute code befo
 [env.PHP_INI_SCAN_DIR]
 shape = "exec-path"
 because = "a directory of additional php.ini files, same effect as PHPRC (measured: executes)"
+# ── Config locations ─────────────────────────────────────────────────────────
+# git and jj config can name programs they run (core.pager, diff tools, core.fsmonitor, aliases,
+# ui.pager, merge-tools). A variable that moves where that config is read from passes only for a
+# normal folder: never a temp root (which holds the session scratchpad) or a sibling project, where
+# an agent can write a config file without being asked and then run it with `HOME=<there> git log`.
+# `config-dir` is a directory whose config files programs read; `config-file` is the executor rule
+# of `exec-path` with the same refusal added, since the executor rule alone admits the scratchpad.
+[env.HOME]
+shape = "config-dir"
+because = "git reads $HOME/.gitconfig and jj $HOME/.config/jj, and both can name programs to run; so does nearly every other tool's per-user config"
+[env.XDG_CONFIG_HOME]
+shape = "config-dir"
+because = "git reads $XDG_CONFIG_HOME/git/config and jj $XDG_CONFIG_HOME/jj/config.toml"
 [env.GIT_CONFIG_GLOBAL]
-shape = "exec-path"
+shape = "config-file"
 because = "git config can define aliases and core.pager, so a caller-controlled config file is code execution"
 [env.GIT_CONFIG_SYSTEM]
-shape = "exec-path"
+shape = "config-file"
 because = "as GIT_CONFIG_GLOBAL"
 [env.R_PROFILE_USER]
 shape = "exec-path"
@@ -178,8 +202,14 @@ because = "R sources this at startup (measured: ran under Rscript)"
 # config defines aliases and core.pager. Pointing git at a foreign repo therefore runs foreign code —
 # the same reasoning that makes cargo's --manifest-path an `exec` role rather than a read.
 [env.GIT_DIR]
-shape = "exec-path"
+shape = "config-file"
 because = "selects which repository — and therefore whose config, aliases and pager — git obeys"
+[env.GIT_COMMON_DIR]
+shape = "config-file"
+because = "retargets the shared git dir, which holds config"
+[env.GIT_EXEC_PATH]
+shape = "config-file"
+because = "git runs its helpers from this directory (git-upload-pack on fetch, git-remote-*), so a planted helper runs"
 [env.GIT_WORK_TREE]
 shape = "exec-path"
 because = "retargets the working tree git acts on"
@@ -192,9 +222,6 @@ because = "retargets object storage"
 [env.GIT_ALTERNATE_OBJECT_DIRECTORIES]
 shape = "data-path"
 because = "additional object directories to read"
-[env.GIT_COMMON_DIR]
-shape = "exec-path"
-because = "retargets the shared git dir, which holds config"
 
 # ── Env twins of flags we already gate ───────────────────────────────────────
 # A tool that mirrors its config surface into the environment gives every guarded flag a second
@@ -247,7 +274,7 @@ because = "fzf runs this to list its input when stdin is a terminal"
 shape = "exec-path"
 because = "a file of rg arguments, which can add --pre (a program rg runs on every file searched)"
 [env.JJ_CONFIG]
-shape = "exec-path"
+shape = "config-file"
 because = "a jj config file or directory, which can name programs jj runs (ui.pager, ui.diff-formatter, merge-tools)"
 [env.JJ_EDITOR]
 shape = "command"

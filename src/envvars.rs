@@ -29,6 +29,10 @@ use serde::Deserialize;
 
 use crate::verdict::{SafetyLevel, Verdict};
 
+mod config_dir;
+mod rebind;
+pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
+
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) enum Shape {
@@ -53,6 +57,8 @@ pub(crate) enum Shape {
     /// and documented — ruby and perl even refuse `-e` themselves, so the eval vector is already
     /// closed upstream.
     OptionString,
+    ConfigDir,
+    ConfigFile,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -238,6 +244,8 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::DataPath => data_path_verdict(value, !rule.single_value),
         Shape::Opaque => Verdict::Denied,
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
+        Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
+        Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
     }
 }
 
@@ -585,7 +593,7 @@ mod integration_tests {
     fn a_listed_name_with_a_benign_value_still_allows() {
         for cmd in [
             "GIT_PAGER= git log", // empty un-sets it
-            "GIT_PAGER=cat git log", "GIT_DIR=.git git log", "PYTHONPATH=./lib ls", "PERL5LIB=./lib ls", "LD_PRELOAD= ls",
+            "GIT_PAGER=cat git log", "PYTHONPATH=./lib ls", "PERL5LIB=./lib ls", "LD_PRELOAD= ls",
         ] {
             assert!(crate::is_safe_command(cmd), "a benign value was denied: {cmd}");
         }

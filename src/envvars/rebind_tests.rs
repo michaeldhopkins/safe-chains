@@ -1,0 +1,93 @@
+use crate::pathctx::{PathCtx, enter};
+
+const ROOT: &str = "/work/u/proj";
+
+fn allowed(cmd: &str) -> bool {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    crate::command_verdict(cmd).is_allowed()
+}
+
+#[test]
+fn a_loop_over_a_listed_variable_is_judged_as_its_assignment() {
+    for cmd in [
+        "for HOME in /tmp/x; do git log; done",
+        "for HOME in /tmp/x; do :; done; git log",
+        "for XDG_CONFIG_HOME in /tmp/x; do jj log; done",
+        "for GIT_CONFIG_GLOBAL in /tmp/g; do git log; done",
+        "for LD_PRELOAD in /tmp/x.so; do ls; done",
+        "for HOME in /work/u/proj /tmp/x; do git log; done",
+        "for HOME in .; do git log; done",
+        "for HOME in $X; do git log; done",
+        "for HOME in /work/u/*; do git log; done",
+        "for HOME in $(mktemp -d); do git log; done",
+        "for HOME; do git log; done",
+        "for HOME in /{tmp,x}/y; do git log; done",
+        "for HOME in /t{m,}p/y; do git log; done",
+        "for XDG_CONFIG_HOME in /{tmp,x}/y; do jj log; done",
+        "for HOME in /work/u/proj/~x; do git log; done",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in [
+        "for HOME in /work/u/proj/home; do git log; done",
+        "declare -x FOO=bar",
+        "declare +n r",
+        "for f in /tmp/x; do echo hi; done",
+        "for HOME in ''; do echo hi; done",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn reading_into_a_listed_variable_is_refused_since_its_value_is_unknown() {
+    for cmd in [
+        "read HOME <<< /tmp/x; git log",
+        "read -r HOME < /work/u/proj/home.txt; git log",
+        "echo /tmp/x | while read HOME; do git log; done",
+        "while read HOME; do git log; done <<< /tmp/x",
+        "read -r a XDG_CONFIG_HOME <<< 'x y'",
+        "read -a HOME <<< x",
+        "read -raHOME <<< x",
+        "IFS= read -r GIT_CONFIG_GLOBAL <<< x",
+        "read 'HOME?prompt' <<< /tmp/x; git log",
+        "builtin read HOME <<< x",
+        "declare -n r=HOME; r=/tmp/x; git log",
+        "typeset -n r=HOME; r=/tmp/x; git log",
+        "declare -n r; r=HOME; r=/tmp/x; git log",
+        "declare -gn r=LD_PRELOAD; export r=/tmp/x.so; ls",
+        "bash -c 'declare -n r=HOME; r=/tmp/x; git log'",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in ["read -r line <<< x", "read -p 'Name?' line <<< x", "read XHOME <<< x", "echo HOME"] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+mod properties {
+    use proptest::prelude::*;
+
+    use super::allowed;
+
+    proptest! {
+        #[test]
+        fn a_loop_variable_agrees_with_the_same_assignment(
+            var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME", "GIT_CONFIG_GLOBAL", "LD_PRELOAD", "PATHX", "f"]),
+            value in prop::sample::select(vec!["/tmp/x", "/private/tmp/a/b", "/work/u/proj/home", "/opt/x", "/TMP/y"]),
+        ) {
+            let looped = allowed(&format!("for {var} in {value}; do git log; done"));
+            let assigned = allowed(&format!("{var}={value} git log"));
+            prop_assert_eq!(looped, assigned, "{} {}", var, value);
+        }
+
+        #[test]
+        fn reading_into_a_listed_variable_is_always_refused(
+            var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME", "GIT_CONFIG_GLOBAL", "JJ_CONFIG", "LD_PRELOAD", "GIT_DIR"]),
+            flags in prop::sample::select(vec!["", "-r ", "-r -a ", "-ra", "-t 1 "]),
+        ) {
+            let cmd = format!("read {flags}{var} <<< x");
+            prop_assert!(!allowed(&cmd), "should be refused: {}", cmd);
+        }
+    }
+}

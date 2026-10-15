@@ -156,6 +156,16 @@ owed = [
   "src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape",
 ]
 "src/envvars.rs" = []
+"src/envvars/config_dir.rs" = [
+  "src/envvars/config_dir_tests.rs::any_config_location_under_a_temp_root_is_refused",
+  "src/envvars/config_dir_tests.rs::a_config_directory_outside_the_scratch_places_is_allowed",
+  "src/envvars/config_dir_tests.rs::the_refusal_is_the_same_with_and_without_the_prefix_spellings",
+  "src/envvars/config_dir_tests.rs::a_case_variant_of_a_temp_root_is_refused",
+]
+"src/envvars/rebind.rs" = [
+  "src/envvars/rebind_tests.rs::a_loop_variable_agrees_with_the_same_assignment",
+  "src/envvars/rebind_tests.rs::reading_into_a_listed_variable_is_always_refused",
+]
 "src/handlers/android/adb.rs" = [
   "a_dash_s_prefix_serial_does_not_change_the_verdict",
   "a_shell_bare_command_is_inert_regardless_of_trailing_args",
@@ -420,6 +430,8 @@ owed = [
 
 [test_only]
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
+"src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
+"src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"

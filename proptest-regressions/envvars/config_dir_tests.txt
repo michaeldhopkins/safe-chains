@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 2d77d96fc384e4db699795b271fe2b45bc145b8732c2d9aeb0882a2b32b7201d # shrinks to root = "/tmp", a = "a", b = "A", var = "HOME", tool = "git log"
+cc 22e5f10bee1fd6abe7f0fdd8401b968a0c25c4f817c63f35ca95dada72c8433b # shrinks to root = "/var/folders", a = "a", b = "0", var = "HOME", tool = "git log"

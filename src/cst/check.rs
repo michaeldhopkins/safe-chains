@@ -557,7 +557,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             body_v.combine(redir_v)
         }
         Cmd::For { var, items, body, redirs } => {
-            let redir_v = redirect_verdict(redirs);
+            let redir_v = redirect_verdict(redirs).combine(crate::envvars::loop_var_verdict(var, items));
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
             }
@@ -680,7 +680,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         .env
         .iter()
         .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
+        .fold(crate::envvars::rebinding_verdict(&cmd.words), Verdict::combine);
     let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v);
 
     if let Verdict::Denied = sub_v {
