@@ -18,7 +18,7 @@
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
-- **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied.
+- **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints, and a -F/--field value starting with @ (a file or stdin) is denied; on the graphql endpoint, a query containing the word mutation is denied.
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
 - **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
 - **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
@@ -62,6 +62,18 @@
 - **Shared flag sets:**
 - **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
 - **simple_view**: Flags: --web, --yaml, -w, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
+
+**Examples:**
+
+- `gh pr list --state open --json number,title`
+- `gh pr view 123 --comments`
+- `gh run view 789 --log-failed`
+- `gh api repos/o/r/pulls --paginate --jq '.[].title'`
+- `gh api repos/o/r/contents/f -X GET -f ref=main`
+- `gh api graphql -f query='{viewer{login}}'`
+- `gh release download v1.0 -p '*.tar.gz' -O dist/app.tar.gz`
+- `gh browse --no-browser`
+- `gh --version`
 
 ### `glab`
 <p class="cmd-url"><a href="https://gitlab.com/gitlab-org/cli">https://gitlab.com/gitlab-org/cli</a></p>

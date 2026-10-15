@@ -21,7 +21,6 @@ owed = [
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/coreutils/sed.rs",
-  "src/handlers/forges/gh.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/ruby/bundle.rs",
   "src/registry/docs.rs",
@@ -214,7 +213,11 @@ owed = [
   "fd_batch_without_placeholder_gates_the_base",
   "a_climb_anywhere_after_a_placeholder_is_seen",
 ]
-"src/handlers/forges/gh.rs" = []
+"src/handlers/forges/gh.rs" = [
+  "a_typed_field_reading_a_file_never_approves",
+  "a_graphql_query_naming_mutation_anywhere_never_approves",
+  "a_download_into_a_home_dotfile_never_approves",
+]
 "src/handlers/forges/glab.rs" = []
 "src/handlers/fuzzy/fzf.rs" = [
   "a_command_running_action_is_refused_in_every_delimiter_form",
@@ -284,6 +287,7 @@ owed = [
   "loop_control_bare_or_single_digit_is_inert",
   "loop_control_other_inputs_are_denied",
   "dispatch_returns_none_for_unhandled_commands",
+  "a_cluster_holding_any_letter_outside_the_policy_never_approves",
 ]
 "src/handlers/system/plutil.rs" = [
   "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
@@ -459,6 +463,7 @@ owed = [
 "src/pathctx/lexical.rs" = "reads HOME, and the process-wide region table to keep a protected place absolute"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
 "src/registry/mod.rs" = "the process-wide registries, including the one loaded from the user's config"
+"src/registry/flag_sets.rs" = "reads the process-wide registries in registry/mod.rs"
 "src/registry/types.rs" = "type declarations and their serde shapes only"
 "src/registry/transfer.rs" = "type declarations and their serde shapes only"
 "src/registry/types_tables.rs" = "type declarations and their serde shapes only"

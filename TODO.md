@@ -92,6 +92,24 @@ the trust file. safe-chains judges paths lexically and cannot see which ancestor
 repository. Refusing every repository below a trust root would also refuse nested repositories a
 grant was meant to open (a skills repository under `~/.claude`). Needs a decision between the two.
 
+## A flag value that names a write target cannot be declared in a matrix policy
+
+`gh release download -O PATH` and `-D DIR` write where the flag says, but a
+`[command.handler_policy.*]` block can only say that a flag takes a value, not that the value is a
+write target. So the gate is Rust (`download_targets_verdict` in `src/handlers/forges/gh.rs`), reading
+its flags from `[command.handler_policy.release_download_targets]`. The behavior grammar already has
+per-flag kinds (`[command.behavior.flags]`, `kind = "write"`); giving matrix actions the same would
+retire that function. The same holds for `bash -n FILE`, whose read is gated in `src/handlers/shell.rs`.
+
+## A PATH prefix runs a program from outside the project
+
+`PATH=/tmp ls` and `PATH=/tmp:$PATH bash -c ls` are approved: the command name is resolved through
+the assigned PATH, so the program that runs can come from any folder. PATH is not in `envvars.toml`
+because no existing shape fits it (each element is a directory the shell searches for every later
+command name, not a path supplying one piece of code). An `exec-path` list shape with the executor
+locus per element would cover it; it needs measuring against the PATH values agents set in practice
+(`PATH=./node_modules/.bin:$PATH`, a toolchain's bin directory) before it can refuse anything.
+
 ## The open mechanism backlog, in order
 
 **Tier 1 — the schema cannot express what the model already knows.** These come

@@ -1,30 +1,57 @@
 //! GitHub CLI dispatch. All flag-policy data and the sub × action
-//! allowlists live in `commands/forges/gh.toml`. The handler is the
-//! sub × action matrix routing logic plus a sub-handler for `gh api`
-//! whose REST-vs-GraphQL routing, explicit-GET-for-fields rule, header
-//! allowlist, and GraphQL mutation veto can't move to TOML.
-use crate::parse::{Token, WordSet};
+//! allowlists live in `commands/forges/gh.toml`, including the `gh api`
+//! flag, header and field sets and the flags naming where
+//! `gh release download` writes. The handler is the sub × action matrix
+//! routing plus the `gh api` walk (REST-vs-GraphQL routing, the
+//! explicit-GET-for-fields rule, the file-reading field veto and the
+//! GraphQL mutation veto) and the write-target gate on downloads.
+use crate::parse::Token;
 use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
 
-// The api sub's flag surface. These lists stay in Rust as a known
-// exception to the data-in-TOML principle: the field flags' semantics
-// (require explicit `-X GET` on REST; veto mutation queries on
-// GraphQL; pair as KEY=VALUE) are coupled to the validation logic
-// just above. Adding a TOML primitive for "valued flag with KEY=VALUE
-// content rules" is a future schema refinement.
-static API_STANDALONE: WordSet = WordSet::new(&["--include", "--paginate", "--silent", "--slurp", "--verbose", "-i"]);
+fn policy(key: &str) -> (&'static [String], &'static [String]) {
+    registry::handler_policy_flag_sets("gh", key).unwrap_or((&[], &[]))
+}
 
-static API_VALUED: WordSet = WordSet::new(&["--cache", "--hostname", "--jq", "--json", "--preview", "--template", "-p", "-q", "-t"]);
+fn listed(set: &[String], word: &str) -> bool {
+    set.iter().any(|f| f == word)
+}
 
-static API_FIELD_FLAGS: WordSet = WordSet::new(&["--field", "--raw-field", "-F", "-f"]);
+fn flag_value_at<'a>(tokens: &'a [Token], i: usize, flags: &'static [String]) -> Option<(&'static str, &'a str, usize)> {
+    let word = tokens[i].as_str();
+    for flag in flags {
+        if word == flag {
+            return tokens.get(i + 1).map(|next| (flag.as_str(), next.as_str(), 2));
+        }
+        let Some(rest) = word.strip_prefix(flag.as_str()) else {
+            continue;
+        };
+        if let Some(value) = rest.strip_prefix('=') {
+            return Some((flag.as_str(), value, 1));
+        }
+        if !flag.starts_with("--") && !rest.is_empty() {
+            return Some((flag.as_str(), rest, 1));
+        }
+    }
+    None
+}
 
 fn is_safe_api_header(value: &str) -> bool {
     let Some((name, _)) = value.split_once(':') else {
         return false;
     };
-    let trimmed = name.trim();
-    trimmed.eq_ignore_ascii_case("Accept") || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
+    let name = name.trim();
+    policy("api_header_names").0.iter().any(|allowed| allowed.eq_ignore_ascii_case(name))
+}
+
+fn names_graphql_mutation(query: &str) -> bool {
+    let is_name_byte = |b: u8| b == b'_' || b.is_ascii_alphanumeric();
+    let bytes = query.as_bytes();
+    query.match_indices("mutation").any(|(at, word)| {
+        let before = at.checked_sub(1).and_then(|p| bytes.get(p)).is_some_and(|&b| is_name_byte(b));
+        let after = bytes.get(at + word.len()).is_some_and(|&b| is_name_byte(b));
+        !before && !after
+    })
 }
 
 pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
@@ -34,16 +61,34 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
     if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("gh", tokens) {
         return v;
     }
-    // Universal `gh <sub> --help` at length 3. The only piece of pure
-    // handler logic — every sub forwards `--help` to its own help text,
-    // which we don't model per-sub.
     if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     if let Some(v) = registry::try_sub_dispatch("gh", tokens) {
         return v;
     }
-    registry::try_matrix_dispatch("gh", tokens).unwrap_or(Verdict::Denied)
+    let verdict = registry::try_matrix_dispatch("gh", tokens).unwrap_or(Verdict::Denied);
+    if verdict.is_allowed() && tokens[1] == "release" && tokens[2] == "download" {
+        return verdict.combine(download_targets_verdict(&tokens[3..]));
+    }
+    verdict
+}
+
+fn download_targets_verdict(args: &[Token]) -> Verdict {
+    let (_, targets) = policy("release_download_targets");
+    let mut verdict = Verdict::Allowed(SafetyLevel::Inert);
+    let mut i = 0;
+    while i < args.len() {
+        let Some((_, value, consumed)) = flag_value_at(args, i, targets) else {
+            i += 1;
+            continue;
+        };
+        if value != "-" {
+            verdict = verdict.combine(crate::engine::resolve::write_target_verdict(value));
+        }
+        i += consumed;
+    }
+    verdict
 }
 
 /// Sub-handler for `gh api ...` / `glab api ...`. Called with tokens
@@ -51,199 +96,61 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
 /// endpoint`, `tokens[2..] = args`. glab dispatches with
 /// `super::gh::is_safe_gh_api(&tokens[1..])`.
 pub fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
-    let endpoint = tokens.get(1).map(|t| t.as_str()).unwrap_or("");
-    if endpoint == "graphql" {
-        return is_safe_gh_api_graphql(tokens);
-    }
-    is_safe_gh_api_rest(tokens)
-}
-
-fn is_graphql_mutation(query: &str) -> bool {
-    let mut s = query.trim_start();
-    while s.starts_with('#') {
-        s = match s.find('\n') {
-            Some(pos) => s[pos + 1..].trim_start(),
-            None => return false,
-        };
-    }
-    s.starts_with("mutation") && s.as_bytes().get(8).is_none_or(|&b| b == b' ' || b == b'\t' || b == b'\n' || b == b'{' || b == b'(')
-}
-
-fn extract_field_value(tokens: &[Token], i: usize) -> Option<(&str, &str)> {
-    let token = &tokens[i];
-    let s = token.as_str();
-    if let Some(rest) = s.strip_prefix("--field=").or_else(|| s.strip_prefix("--raw-field=")) {
-        return rest.split_once('=');
-    }
-    if let Some(rest) = s.strip_prefix("-f").or_else(|| s.strip_prefix("-F"))
-        && let Some(pair) = rest.split_once('=')
-    {
-        return Some(pair);
-    }
-    if API_FIELD_FLAGS.contains(token)
-        && let Some(next) = tokens.get(i + 1)
-    {
-        return next.as_str().split_once('=');
-    }
-    None
-}
-
-fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
-    // tokens[0] = "api", tokens[1] = "graphql", args start at i=2.
-    let mut i = 2;
-    while i < tokens.len() {
-        let token = &tokens[i];
-
-        if token == "-X" || token == "--method" {
-            i += 2;
-            continue;
-        }
-        if token.starts_with("-X") || token.starts_with("--method=") {
-            i += 1;
-            continue;
-        }
-
-        if token == "-H" || token == "--header" {
-            match tokens.get(i + 1) {
-                Some(val) if is_safe_api_header(val.as_str()) => {
-                    i += 2;
-                    continue;
-                }
-                _ => return Verdict::Denied,
-            }
-        }
-        if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
-            if is_safe_api_header(rest) {
-                i += 1;
-                continue;
-            }
-            return Verdict::Denied;
-        }
-
-        if token.starts_with('-') {
-            if API_STANDALONE.contains(token) {
-                i += 1;
-                continue;
-            }
-            if API_VALUED.contains(token) {
-                i += 2;
-                continue;
-            }
-            if API_FIELD_FLAGS.contains(token) {
-                if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
-                    return Verdict::Denied;
-                }
-                i += 2;
-                continue;
-            }
-            if let Some((_flag, _val)) = token.split_once('=') {
-                let flag_part = Token::from_raw(_flag.to_string());
-                if API_VALUED.contains(&flag_part) {
-                    i += 1;
-                    continue;
-                }
-                if API_FIELD_FLAGS.contains(&flag_part) {
-                    if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
-                        return Verdict::Denied;
-                    }
-                    i += 1;
-                    continue;
-                }
-            }
-            return Verdict::Denied;
-        }
-
-        i += 1;
-    }
-    Verdict::Allowed(SafetyLevel::Inert)
-}
-
-fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
-    // tokens[0] = "api", tokens[1] = endpoint, tokens[2..] = args.
-    // Start at i=1 so the endpoint walks past as a positional (no-op
-    // in every flag branch), matching the original `is_safe_gh_api_rest`
-    // semantics under the full-tokens convention.
-    let mut i = 1;
+    let graphql = tokens.get(1).is_some_and(|t| t == "graphql");
+    let (standalone, valued) = policy("api");
+    let (_, method_flags) = policy("api_method");
+    let (_, header_flags) = policy("api_header");
+    let (_, field_flags) = policy("api_fields");
+    let (_, file_field_flags) = policy("api_file_fields");
     let mut has_fields = false;
     let mut has_explicit_get = false;
+    let mut i = 1;
     while i < tokens.len() {
-        let token = &tokens[i];
-
-        if token == "-X" || token == "--method" {
-            if tokens.get(i + 1).is_some_and(|m| m.eq_ignore_ascii_case("GET")) {
-                has_explicit_get = true;
-                i += 2;
-                continue;
+        let word = tokens[i].as_str();
+        if let Some((_, method, consumed)) = flag_value_at(tokens, i, method_flags) {
+            if !graphql && !method.eq_ignore_ascii_case("GET") {
+                return Verdict::Denied;
             }
-            return Verdict::Denied;
+            has_explicit_get = true;
+            i += consumed;
+            continue;
         }
-        if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
-            if token.get(2..).is_some_and(|s| s.eq_ignore_ascii_case("GET")) {
-                has_explicit_get = true;
+        if let Some((_, header, consumed)) = flag_value_at(tokens, i, header_flags) {
+            if !is_safe_api_header(header) {
+                return Verdict::Denied;
+            }
+            i += consumed;
+            continue;
+        }
+        if let Some((flag, pair, consumed)) = flag_value_at(tokens, i, field_flags) {
+            let (key, value) = pair.split_once('=').unwrap_or((pair, ""));
+            if listed(file_field_flags, flag) && value.starts_with('@') {
+                return Verdict::Denied;
+            }
+            if graphql && key == "query" && names_graphql_mutation(value) {
+                return Verdict::Denied;
+            }
+            has_fields = true;
+            i += consumed;
+            continue;
+        }
+        if word.starts_with('-') {
+            if listed(standalone, word) {
                 i += 1;
                 continue;
             }
-            return Verdict::Denied;
-        }
-        if token.starts_with("-X=") || token.starts_with("--method=") {
-            let val = token.split_value("=").unwrap_or("");
-            if val.eq_ignore_ascii_case("GET") {
-                has_explicit_get = true;
-                i += 1;
+            if let Some((_, _, consumed)) = flag_value_at(tokens, i, valued) {
+                i += consumed;
                 continue;
             }
             return Verdict::Denied;
         }
-
-        if token == "-H" || token == "--header" {
-            match tokens.get(i + 1) {
-                Some(val) if is_safe_api_header(val.as_str()) => {
-                    i += 2;
-                    continue;
-                }
-                _ => return Verdict::Denied,
-            }
-        }
-        if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
-            if is_safe_api_header(rest) {
-                i += 1;
-                continue;
-            }
+        if i > 1 && word == "graphql" {
             return Verdict::Denied;
         }
-
-        if token.starts_with('-') {
-            if API_STANDALONE.contains(token) {
-                i += 1;
-                continue;
-            }
-            if API_VALUED.contains(token) {
-                i += 2;
-                continue;
-            }
-            if API_FIELD_FLAGS.contains(token) {
-                has_fields = true;
-                i += 2;
-                continue;
-            }
-            if let Some((_flag, _val)) = token.split_once('=') {
-                let flag_part = Token::from_raw(_flag.to_string());
-                if API_VALUED.contains(&flag_part) {
-                    i += 1;
-                    continue;
-                }
-                if API_FIELD_FLAGS.contains(&flag_part) {
-                    has_fields = true;
-                    i += 1;
-                    continue;
-                }
-            }
-            return Verdict::Denied;
-        }
-
         i += 1;
     }
-    if has_fields && !has_explicit_get {
+    if !graphql && has_fields && !has_explicit_get {
         return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::Inert)
@@ -403,6 +310,10 @@ mod tests {
         api_graphql_named_query: "gh api graphql -f query='query GetViewer{viewer{login}}'",
         api_graphql_with_vars: "gh api graphql -f query='{repository(owner:\"o\",name:\"r\"){name}}' -F owner=o",
         api_graphql_paginate: "gh api graphql --paginate -f query='{viewer{repositories(first:100){nodes{name}}}}'",
+        api_raw_field_at_literal: "gh api -X GET search/issues -f q=@octocat",
+        api_graphql_mutation_inside_a_name: "gh api graphql -f query='{viewer{mutationCount: login}}'",
+        release_download_worktree_output: "gh release download v1.0 -p '*.tar.gz' -O dist/app.tar.gz",
+        release_download_worktree_dir: "gh release download v1.0 -O - -D dist",
     }
 
     denied! {
@@ -434,5 +345,83 @@ mod tests {
         api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
         api_unknown_flag_denied: "gh api repos/o/r/pulls --some-unknown-flag",
+        api_field_file_denied: "gh api -X GET search/code -F q=@/etc/passwd",
+        api_field_stdin_denied: "gh api -X GET search/code -F q=@-",
+        api_field_eq_file_denied: "gh api -X GET search/code --field=q=@notes.txt",
+        api_field_attached_file_denied: "gh api -X GET search/code -Fq=@notes.txt",
+        api_field_short_eq_file_denied: "gh api -X GET search/code -F=q=@notes.txt",
+        api_graphql_query_file_denied: "gh api graphql -F query=@q.graphql",
+        api_graphql_short_eq_mutation_denied: "gh api graphql -F=query='mutation{addStar}'",
+        api_graphql_raw_short_eq_mutation_denied: "gh api graphql -f=query='mutation{addStar}'",
+        api_graphql_fragment_then_mutation_denied: "gh api graphql -f query='fragment F on User{login} mutation{addStar}'",
+        api_graphql_second_operation_mutation_denied: "gh api graphql -f query='query A{viewer{login}} mutation B{addStar}' -f operationName=B",
+        api_graphql_endpoint_after_flags_denied: "gh api -X GET graphql -f query='mutation{addStar}'",
+        api_json_not_an_api_flag_denied: "gh api repos/o/r/pulls --json title",
+        release_download_home_denied: "gh release download v1.0 -O ~/.bashrc --clobber",
+        release_download_hook_denied: "gh release download v1.0 -O .git/hooks/pre-commit",
+        release_download_output_eq_denied: "gh release download v1.0 --output=$HOME/.zshrc",
+        release_download_dir_config_denied: "gh release download v1.0 -O - --dir ~/.config/fish",
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn a_typed_field_reading_a_file_never_approves(
+            key in "[a-z_]{1,8}",
+            path in "[A-Za-z0-9_./~-]{0,20}",
+            form in 0usize..5,
+            graphql in proptest::bool::ANY,
+        ) {
+            let pair = format!("{key}=@{path}");
+            let field = match form {
+                0 => format!("-F '{pair}'"),
+                1 => format!("--field '{pair}'"),
+                2 => format!("'--field={pair}'"),
+                3 => format!("'-F{pair}'"),
+                _ => format!("'-F={pair}'"),
+            };
+            let cmd = if graphql {
+                format!("gh api graphql -f query='{{viewer{{login}}}}' {field}")
+            } else {
+                format!("gh api -X GET search/code {field}")
+            };
+            proptest::prop_assert!(!check(&cmd), "{cmd}");
+        }
+
+        #[test]
+        fn a_graphql_query_naming_mutation_anywhere_never_approves(
+            before in "[a-z{}() ]{0,16}",
+            after in "[a-z{}() ]{0,16}",
+            left in "[ {}(),\n]",
+            right in "[ {}(),\n]",
+            form in 0usize..6,
+        ) {
+            let query = format!("{before}{left}mutation{right}{after}");
+            let field = match form {
+                0 => format!("-f 'query={query}'"),
+                1 => format!("-F 'query={query}'"),
+                2 => format!("'--raw-field=query={query}'"),
+                3 => format!("'-f=query={query}'"),
+                4 => format!("'-fquery={query}'"),
+                _ => format!("--field 'query={query}'"),
+            };
+            let cmd = format!("gh api graphql {field}");
+            proptest::prop_assert!(!check(&cmd), "{cmd}");
+        }
+
+        #[test]
+        fn a_download_into_a_home_dotfile_never_approves(
+            name in "[a-z]{1,10}",
+            form in 0usize..4,
+        ) {
+            let target = format!("~/.{name}");
+            let flag = match form {
+                0 => format!("-O {target}"),
+                1 => format!("--output={target}"),
+                2 => format!("-O - -D {target}"),
+                _ => format!("-O - --dir={target}"),
+            };
+            let cmd = format!("gh release download v1.0 {flag}");
+            proptest::prop_assert!(!check(&cmd), "{cmd}");
+        }
     }
 }

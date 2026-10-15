@@ -2051,10 +2051,29 @@ Aliases: `gbasename`
 - Allowed valued flags: --wrap, -w
 - Bare invocation allowed
 
-### `bash / sh`
+### `bash`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html">https://www.gnu.org/software/bash/manual/bash.html</a></p>
 
-- Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.
+Aliases: `sh`
+
+- Allowed: --version, --help; `bash -c` / `sh -c` with a safe inner command; a script inside the project; `bash -n FILE` as a read of FILE. Options: -c, -e, -u, -f, -n, -v, -C, -o errexit/nounset/noglob/noclobber/verbose/pipefail/posix, --norc, --noprofile, --noediting, --posix, --verbose.
+
+- **Without a subcommand:**
+- Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `bash -c 'grep foo file'`
+- `sh -c 'ls -la'`
+- `bash -euo pipefail -c 'ls'`
+- `bash -ec 'ls'`
+- `bash -c -e 'ls'`
+- `bash scripts/build.sh`
+- `bash -e ./run.sh arg`
+- `bash -n scripts/build.sh`
+- `bash --norc --noprofile -c 'ls'`
+- `bash --version`
+- `sh --help`
 
 ### `bat`
 <p class="cmd-url"><a href="https://github.com/sharkdp/bat#readme">https://github.com/sharkdp/bat#readme</a></p>
@@ -2844,6 +2863,25 @@ Aliases: `knife`, `chef-solo`, `chef-shell`, `chef`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `chmod`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation</a></p>
+
+Aliases: `gchmod`
+
+- Edits its file operands in place within your workspace.
+- Allowed standalone flags: --changes, --dereference, --help, --no-dereference, --preserve-root, --quiet, --recursive, --silent, --verbose, --version, -P, -R, -c, -f, -h, -v
+- Allowed valued flags: --reference
+- Recurses into directory trees with: --recursive, -R
+
+**Examples:**
+
+- `chmod +x scripts/build.sh`
+- `chmod 644 README.md`
+- `chmod -R u+rwX,go-w src`
+- `chmod --reference=a.txt b.txt`
+- `gchmod -v 755 bin/tool`
+- `chmod --version`
+
 ### `chronic`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
 
@@ -3349,6 +3387,15 @@ Aliases: `gcp`
 - Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -n, -p, -r, -u, -v, -x
 - Allowed valued flags: --suffix, --target-directory, -S, -t
 - Recurses into directory trees with: --archive, --recursive, -R, -a, -r
+
+**Examples:**
+
+- `cp a.txt b.txt`
+- `cp -r src backup`
+- `cp -a assets dist/assets`
+- `cp -n config.example.toml config.toml`
+- `cp -t dist a.txt b.txt`
+- `gcp -p a.txt b.txt`
 
 ### `cpan`
 <p class="cmd-url"><a href="https://metacpan.org/pod/cpan">https://metacpan.org/pod/cpan</a></p>
@@ -5892,7 +5939,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
-- **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied.
+- **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints, and a -F/--field value starting with @ (a file or stdin) is denied; on the graphql endpoint, a query containing the word mutation is denied.
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
 - **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
 - **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
@@ -5936,6 +5983,18 @@ Aliases: `g++`, `cc`, `c++`
 - **Shared flag sets:**
 - **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
 - **simple_view**: Flags: --web, --yaml, -w, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
+
+**Examples:**
+
+- `gh pr list --state open --json number,title`
+- `gh pr view 123 --comments`
+- `gh run view 789 --log-failed`
+- `gh api repos/o/r/pulls --paginate --jq '.[].title'`
+- `gh api repos/o/r/contents/f -X GET -f ref=main`
+- `gh api graphql -f query='{viewer{login}}'`
+- `gh release download v1.0 -p '*.tar.gz' -O dist/app.tar.gz`
+- `gh browse --no-browser`
+- `gh --version`
 
 ### `ghc`
 <p class="cmd-url"><a href="https://www.haskell.org/ghc/">https://www.haskell.org/ghc/</a></p>
@@ -14169,6 +14228,14 @@ Aliases: `gshuf`
 Aliases: `gsleep`
 
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `sleep 5`
+- `sleep 0.5`
+- `sleep 1m 30s`
+- `gsleep 2`
+- `sleep --version`
 
 ### `slim-lint`
 <p class="cmd-url"><a href="https://github.com/sds/slim-lint">https://github.com/sds/slim-lint</a></p>

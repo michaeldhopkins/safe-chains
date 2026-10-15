@@ -220,34 +220,65 @@ basenc -i	inert
 basenc -w x	inert
 basenc x	inert
 bash	denied
+bash +n ./run.sh	denied
+bash +x	denied
+bash +x /tmp/evil.sh	denied
+bash -	denied
+bash -- -c 'ls'	denied
 bash -- ./run.sh	safe-write
+bash --debugger -c 'ls'	denied
 bash --help	inert
+bash --help --version	denied
+bash --help x	denied
+bash --init-file /tmp/evil -c 'ls'	denied
+bash --login -c 'ls'	denied
+bash --norc --noprofile -c 'ls'	inert
+bash --rcfile /tmp/evil -c 'ls'	denied
 bash --version	inert
+bash -O extdebug -c 'ls'	denied
+bash -a -c 'ls'	denied
+bash -c	denied
 bash -c "cat file | head -5"	safe-read
 bash -c "grep foo file"	safe-read
 bash -c "rm file"	safe-write
 bash -c 'for x in 1 2 3; do echo $x; done'	inert
 bash -c 'for x in do done; do echo $x; done'	inert
+bash -c 'grep foo file'	safe-read
 bash -c 'if test -f foo; then echo yes; fi'	inert
 bash -c 'rm -rf /'	denied
 bash -c 'rm -rf /' --help	denied
 bash -c 'rm -rf /' --version	denied
+bash -c 'rm -rf ~'	denied
 bash -c 'while test -f /tmp/foo; do sleep 1; done'	inert
+bash -c -e 'ls'	inert
+bash -e ./run.sh arg	safe-write
+bash -ec 'ls'	inert
+bash -euo pipefail -c 'ls'	inert
+bash -h	denied
 bash -i	denied
-bash -n /etc/profile	inert
-bash -n script.sh	inert
-bash -o pipefail run.sh	denied
+bash -i -c 'ls'	denied
+bash -k -c 'git status'	denied
+bash -l -c 'ls'	denied
+bash -n +n	denied
+bash -n -i	denied
+bash -n /etc/profile	safe-read
+bash -n script.sh	safe-read
+bash -n scripts/build.sh	safe-read
+bash -n ~/.ssh/id_rsa	denied
+bash -o	denied
+bash -o xtrace -c 'ls'	denied
+bash -o xtrace run.sh	denied
+bash -s	denied
+bash -x -c 'ls'	denied
 bash ../x.sh	denied
 bash ./run.sh	safe-write
-bash / sh	denied
-bash / sh --help	denied
-bash / sh --version	denied
-bash / sh x	denied
 bash /tmp/evil.sh	denied
 bash /tmp/script.sh	denied
 bash /usr/local/bin/x	denied
 bash script.sh	safe-write
+bash scripts/build.sh	safe-write
 bash scripts/deploy.sh	safe-write
+bash x	safe-write
 bash ~/Downloads/x.sh	denied
 bat	inert
 bat --color x	inert

@@ -61,6 +61,8 @@ dotnet new	-d
 dotnet new	-l
 fossil branch list	-c
 fossil status	-c
+# right: gh api -i is --include (print response headers), a boolean; checks/run watch -i is --interval
+gh [policy api]	-i
 gh [policy browse]	-p
 gh [policy browse]	-r
 gh [policy browse]	-s

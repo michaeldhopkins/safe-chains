@@ -132,7 +132,6 @@ base64	description,examples,version
 basecamp	examples,no-tolerance,version
 basename	examples,version
 basenc	description,examples
-bash	entry
 bat	examples,version
 batch	description,examples
 bazel	description,examples,version
@@ -244,7 +243,6 @@ coqtop	description,examples
 corelist	examples,no-tolerance
 cosign	examples,version
 coverage	examples,no-overlap,no-tolerance,version
-cp	examples
 cpan	description,examples
 cpanm	examples
 cpio	description,examples,no-tolerance
@@ -468,7 +466,6 @@ geth	description,examples,no-tolerance,profiled
 gettext	description,examples
 gettextize	description,examples
 gfortran	description,examples,no-tolerance
-gh	description,examples
 ghc	description,examples
 ghostty	profiled
 gif2webp	description,examples
@@ -1252,7 +1249,6 @@ size-limit	examples,version
 sk	entry
 skaffold	description,no-tolerance,profiled
 skopeo	examples,version
-sleep	description,examples,version
 slim-lint	description,examples
 slimrb	description,examples
 slither	description,no-overlap

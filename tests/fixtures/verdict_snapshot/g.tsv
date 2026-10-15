@@ -264,6 +264,29 @@ gcc --help x	denied
 gcc --version	inert
 gcc -v	inert
 gcc x	denied
+gchmod	denied
+gchmod --changes	denied
+gchmod --changes --dereference	denied
+gchmod --changes --reference x	denied
+gchmod --changes x	safe-write
+gchmod --dereference	denied
+gchmod --help	inert
+gchmod --no-dereference	denied
+gchmod --preserve-root	denied
+gchmod --quiet	denied
+gchmod --recursive	denied
+gchmod --reference x	denied
+gchmod --silent	denied
+gchmod --verbose	denied
+gchmod --version	inert
+gchmod -P	denied
+gchmod -R	denied
+gchmod -c	denied
+gchmod -f	denied
+gchmod -h	denied
+gchmod -v	denied
+gchmod -v 755 bin/tool	safe-write
+gchmod x	safe-write
 gci	denied
 gci --help	inert
 gci --help -h	denied
@@ -2137,6 +2160,7 @@ gcp -h	denied
 gcp -i	denied
 gcp -n	denied
 gcp -p	denied
+gcp -p a.txt b.txt	safe-write
 gcp -r	denied
 gcp -t x	denied
 gcp -u	denied
@@ -3111,16 +3135,31 @@ gh alias watch -y	inert
 gh alias watch x	inert
 gh api	inert
 gh api --help	inert
+gh api -X GET graphql -f query='mutation{addStar}'	denied
+gh api -X GET search/code --field=q=@notes.txt	denied
+gh api -X GET search/code -F q=@-	denied
+gh api -X GET search/code -F q=@/etc/passwd	denied
+gh api -X GET search/code -F=q=@notes.txt	denied
+gh api -X GET search/code -Fq=@notes.txt	denied
+gh api -X GET search/issues -f q=@octocat	inert
 gh api graphql --field query='{repository(owner:"o",name:"r"){name}}'	inert
 gh api graphql --paginate -f query='{viewer{repositories(first:100){nodes{name}}}}'	inert
+gh api graphql -F query=@q.graphql	denied
+gh api graphql -F=query='mutation{addStar}'	denied
 gh api graphql -f query='  mutation{addStar}'	denied
+gh api graphql -f query='fragment F on User{login} mutation{addStar}'	denied
 gh api graphql -f query='mutation AddStar{addStar}'	denied
+gh api graphql -f query='mutation{addStar(input:{starrableId:"x"}){clientMutationId}}'	denied
 gh api graphql -f query='mutation{addStar}'	denied
+gh api graphql -f query='query A{viewer{login}} mutation B{addStar}' -f operationName=B	denied
 gh api graphql -f query='query GetViewer{viewer{login}}'	inert
 gh api graphql -f query='{repository(owner:"o",name:"r"){name}}' -F owner=o	inert
+gh api graphql -f query='{viewer{login}}'	inert
 gh api graphql -f query='{viewer{login}}' --jq '.data.viewer.login'	inert
 gh api graphql -f query='{viewer{login}}' -q '.data'	inert
+gh api graphql -f query='{viewer{mutationCount: login}}'	inert
 gh api graphql -f query=mutation	denied
+gh api graphql -f=query='mutation{addStar}'	denied
 gh api repos/o/r/contents/f --header 'Accept: application/vnd.github.raw'	inert
 gh api repos/o/r/contents/f --jq '.content'	inert
 gh api repos/o/r/contents/f --jq .content | base64 -d | head -50	inert
@@ -3130,6 +3169,7 @@ gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.raw' -H 'X-GitHub
 gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.v3+json'	inert
 gh api repos/o/r/contents/f -X GET -F ref=abc	inert
 gh api repos/o/r/contents/f -X GET -f ref=abc --jq '.content'	inert
+gh api repos/o/r/contents/f -X GET -f ref=main	inert
 gh api repos/o/r/contents/f?ref=branch -H 'Accept: application/vnd.github.raw'	inert
 gh api repos/o/r/issues --raw-field body=x	denied
 gh api repos/o/r/issues -F title=x	denied
@@ -3139,6 +3179,7 @@ gh api repos/o/r/issues -f title=x	denied
 gh api repos/o/r/pulls --cache 3600s	inert
 gh api repos/o/r/pulls --header 'Authorization: Bearer xxx'	denied
 gh api repos/o/r/pulls --hostname github.example.com	inert
+gh api repos/o/r/pulls --json title	denied
 gh api repos/o/r/pulls --method=GET	inert
 gh api repos/o/r/pulls --paginate	inert
 gh api repos/o/r/pulls --paginate --jq '.[].title'	inert
@@ -3150,6 +3191,7 @@ gh api repos/o/r/pulls --verbose	inert
 gh api repos/o/r/pulls -H	denied
 gh api repos/o/r/pulls -H 'Accept'	denied
 gh api repos/o/r/pulls -H 'Authorization: token ghp_xxx'	denied
+gh api repos/o/r/pulls -H 'Authorization: token x'	denied
 gh api repos/o/r/pulls -H 'Content-Type: application/json'	denied
 gh api repos/o/r/pulls -H 'X-GitHub-Api-Version: 2022-11-28'	inert
 gh api repos/o/r/pulls -HAuthorization:token	denied
@@ -4816,6 +4858,7 @@ gh pr checks 123	inert
 gh pr checks 123 --required	inert
 gh pr checks 123 --watch	inert
 gh pr checks x	inert
+gh pr create --fill	denied
 gh pr diff	denied
 gh pr diff --color x	inert
 gh pr diff --name-only	inert
@@ -4869,6 +4912,7 @@ gh pr list --search x	inert
 gh pr list --sort x	inert
 gh pr list --source	inert
 gh pr list --state open	inert
+gh pr list --state open --json number,title	inert
 gh pr list --state x	inert
 gh pr list --template x	inert
 gh pr list --topic x	inert
@@ -5240,9 +5284,15 @@ gh release download v1.0	denied
 gh release download v1.0 --archive tar.gz --output out.tar.gz	safe-write
 gh release download v1.0 --output -	safe-write
 gh release download v1.0 --output /tmp/out --dir /tmp	safe-write
+gh release download v1.0 --output=$HOME/.zshrc	denied
 gh release download v1.0 --pattern '*.tar.gz'	denied
 gh release download v1.0 --repo o/r --pattern 'SHA256SUMS.txt' --output -	safe-write
+gh release download v1.0 -O - --dir ~/.config/fish	denied
+gh release download v1.0 -O - -D dist	safe-write
 gh release download v1.0 -O - -p '*.tar.gz'	safe-write
+gh release download v1.0 -O .git/hooks/pre-commit	denied
+gh release download v1.0 -O ~/.bashrc --clobber	denied
+gh release download v1.0 -p '*.tar.gz' -O dist/app.tar.gz	safe-write
 gh release download x	denied
 gh release list	inert
 gh release list --exclude-drafts	inert
@@ -14031,6 +14081,7 @@ gsleep --help x	inert
 gsleep --version	inert
 gsleep -V	inert
 gsleep -h	inert
+gsleep 2	inert
 gsleep x	inert
 gsnd	denied
 gsnd --help	safe-write
