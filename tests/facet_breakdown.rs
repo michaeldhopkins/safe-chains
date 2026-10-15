@@ -28,16 +28,16 @@ fn the_breakdown_speaks_plainly_where_the_wording_is_approved() {
 }
 
 #[test]
-fn the_breakdown_keeps_todays_terms_where_the_wording_is_held() {
+fn the_breakdown_says_how_hard_a_delete_is_to_undo() {
     let out = facet_breakdown("rm -rf ./build");
-    assert!(out.contains("reversibility                effortful"), "{out}");
+    assert!(out.contains("reversibility                hard to undo; it may take a backup, a rebuild or a reverse operation"), "{out}");
 }
 
 #[test]
-fn the_breakdown_keeps_a_held_place() {
+fn the_breakdown_names_a_place_without_a_rule() {
     let out = facet_breakdown("rm -rf ~/notes");
-    assert!(out.contains("operation                    destroy"), "{out}");
-    assert!(out.contains("locus.local                  machine"), "{out}");
+    assert!(out.contains("does                         deletes files in a place safe-chains has no rule for"), "{out}");
+    assert!(!out.contains("locus.local"), "{out}");
 }
 
 #[test]

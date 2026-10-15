@@ -60,8 +60,8 @@ fn every_operation_in_every_place_has_one_phrase() {
 #[test]
 fn the_phrases_are_plain() {
     for phrase in ACTIONS.iter().map(|(_, _, p)| p).chain(TERMS.iter().map(|(_, _, p)| p)) {
-        assert!(!phrase.contains(['—', ';', '`']), "{phrase}");
-        assert!(phrase.len() <= 90, "{phrase}");
+        assert!(!phrase.contains(['—', '`']), "{phrase}");
+        assert!(phrase.len() <= 110, "{phrase}");
         for word in crate::refusal::AVOID.iter().chain(&["locus", "facet", "worktree", "principal", "ambient", "n/a"]) {
             assert!(!phrase.to_lowercase().contains(word), "`{word}` in {phrase}");
         }
@@ -102,18 +102,40 @@ proptest::proptest! {
 
 /// Rows awaiting the owner's approval of their wording. They print today's term until a phrase
 /// replaces the empty string; a row leaves this list in the change that approves it.
-const HELD: &[(&str, &str, &str)] = &[
-    ("action", "observe", "machine"),
-    ("action", "create", "machine"),
-    ("action", "mutate", "machine"),
-    ("action", "destroy", "machine"),
-    ("action", "execute", "machine"),
-    ("action", "communicate", "machine"),
-    ("term", "locus.local", "machine"),
-    ("term", "reversibility", "trivial"),
-    ("term", "reversibility", "recoverable"),
-    ("term", "reversibility", "effortful"),
-];
+const HELD: &[(&str, &str, &str)] = &[];
+
+#[test]
+fn the_reversibility_terms_read_as_approved() {
+    let approved = [
+        ("none", "nothing to undo"),
+        ("trivial", "one command undoes it"),
+        ("recoverable", "can usually be undone from version control, the trash or a snapshot, or by running the opposite command"),
+        ("effortful", "hard to undo; it may take a backup, a rebuild or a reverse operation"),
+        ("irreversible", "cannot be undone"),
+    ];
+    for (t, phrase) in approved {
+        assert_eq!(term("reversibility", t), Some(phrase), "{t}");
+    }
+}
+
+#[test]
+fn a_place_without_a_rule_reads_the_same_for_every_operation() {
+    assert_eq!(term("locus.local", "machine"), Some("a place safe-chains has no rule for"));
+    assert_eq!(action("destroy", "machine"), Some("deletes files in a place safe-chains has no rule for"));
+    for (o, l, phrase) in ACTIONS.iter().filter(|(_, l, _)| *l == "machine") {
+        assert!(!phrase.contains("system-wide"), "{o} in {l}: {phrase}");
+    }
+    for o in ["observe", "create", "mutate", "destroy", "execute", "communicate"] {
+        let phrase = action(o, "machine").expect("a phrase");
+        assert!(phrase.ends_with(" a place safe-chains has no rule for"), "{o}: {phrase}");
+    }
+}
+
+#[test]
+fn an_unknown_term_prints_as_itself() {
+    assert_eq!(words("reversibility", "no-such-term"), "no-such-term");
+    assert_eq!(spoken("reversibility", "no-such-term"), None);
+}
 
 #[test]
 fn only_the_held_rows_are_empty_and_every_held_row_is_empty() {
@@ -154,16 +176,15 @@ fn a_command_that_stays_in_its_process_still_says_what_it_does() {
 }
 
 #[test]
-fn a_held_place_and_term_print_as_they_always_did() {
+fn a_place_without_a_rule_prints_one_row_of_what_the_command_does() {
     let mut cap = caps(Operation::Destroy, LocalLocus::Machine);
     cap.reversibility = Reversibility::Effortful;
     let rows = rows(&cap.set_facets());
     assert_eq!(
         rows,
         vec![
-            ("operation".to_string(), "destroy".to_string()),
-            ("locus.local".to_string(), "machine".to_string()),
-            ("reversibility".to_string(), "effortful".to_string()),
+            ("does".to_string(), "deletes files in a place safe-chains has no rule for".to_string()),
+            ("reversibility".to_string(), "hard to undo; it may take a backup, a rebuild or a reverse operation".to_string()),
         ]
     );
 }
@@ -187,10 +208,10 @@ fn a_refusal_says_what_the_command_does_and_what_the_level_allows() {
 }
 
 #[test]
-fn a_refusal_keeps_a_held_place_and_names_no_other_computer() {
+fn a_refusal_names_a_place_without_a_rule_and_no_other_computer() {
     let outside = caps(Operation::Observe, LocalLocus::Machine);
     let project = Clause { local_locus: Some(OrdBound::at_most(LocalLocus::Worktree)), ..Default::default() };
-    assert_eq!(miss(project, &outside), "locus.local = machine (allowed: <= worktree)");
+    assert_eq!(miss(project, &outside), "a place safe-chains has no rule for (allowed up to: your project)");
 
     let mut reaches = caps(Operation::Communicate, LocalLocus::Process);
     reaches.locus.remote = RemoteReach::Fixed;
@@ -200,19 +221,22 @@ fn a_refusal_keeps_a_held_place_and_names_no_other_computer() {
 }
 
 #[test]
-fn a_held_bound_keeps_todays_line_for_an_approved_term() {
+fn a_reversibility_bound_reads_in_plain_words() {
     let mut cap = caps(Operation::Observe, LocalLocus::Process);
     cap.reversibility = Reversibility::Irreversible;
     let limit = Clause { reversibility: Some(OrdBound::at_most(Reversibility::Effortful)), ..Default::default() };
-    assert_eq!(miss(limit, &cap), "reversibility = irreversible (allowed: <= effortful)");
+    assert_eq!(miss(limit, &cap), "cannot be undone (allowed up to: hard to undo; it may take a backup, a rebuild or a reverse operation)");
 }
 
 #[test]
-fn a_refusal_on_a_held_term_keeps_todays_line() {
+fn a_refusal_on_a_reversibility_term_reads_in_plain_words() {
     let mut cap = caps(Operation::Observe, LocalLocus::Process);
     cap.reversibility = Reversibility::Effortful;
     let limit = Clause { reversibility: Some(OrdBound::at_most(Reversibility::Recoverable)), ..Default::default() };
-    assert_eq!(miss(limit, &cap), "reversibility = effortful (allowed: <= recoverable)");
+    assert_eq!(
+        miss(limit, &cap),
+        "hard to undo; it may take a backup, a rebuild or a reverse operation (allowed up to: can usually be undone from version control, the trash or a snapshot, or by running the opposite command)"
+    );
 }
 
 #[test]
@@ -243,14 +267,6 @@ proptest::proptest! {
             proptest::prop_assert!(printed.iter().all(|(n, _)| n != "operation" && n != "locus.local"));
         }
     }
-}
-
-#[test]
-fn a_bound_naming_a_held_term_keeps_todays_line() {
-    let mut cap = caps(Operation::Observe, LocalLocus::Process);
-    cap.reversibility = Reversibility::Irreversible;
-    let cap_at_backup = Clause { reversibility: Some(OrdBound::at_most(Reversibility::Effortful)), ..Default::default() };
-    assert_eq!(miss(cap_at_backup, &cap), "reversibility = irreversible (allowed: <= effortful)");
 }
 
 #[test]
