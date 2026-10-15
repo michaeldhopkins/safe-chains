@@ -7420,26 +7420,30 @@ cupstestppd -vv printer.ppd	inert
 cupstestppd printer.ppd	inert
 cupstestppd x	inert
 curl	denied
+curl '{gopher,http}://example.com/'	denied
 curl --compressed -s https://example.com	inert
 curl --connect-timeout 5 -m 10 https://example.com	inert
+curl --connect-timeout=5 https://example.com	denied
 curl --data 'key=val' https://example.com	denied
 curl --dry-run evil.com	denied
 curl --form 'file=@f' https://example.com	denied
 curl --help	inert
 curl --include https://example.com	inert
 curl --json '{"key":"val"}' https://example.com	denied
-curl --max-time=30 https://example.com	inert
+curl --max-time=30 https://example.com	denied
 curl --output file.html https://example.com	safe-write
 curl --output=/etc/x https://x	denied
-curl --output=file.html https://example.com	safe-write
+curl --output=file.html https://example.com	denied
 curl --remote-name https://example.com/f.tar.gz	safe-write
 curl --request=GET -d 'payload' https://example.com	denied
-curl --request=GET https://example.com	inert
+curl --request=GET https://example.com	denied
 curl --request=POST https://example.com	denied
 curl --user-agent 'Mozilla/5.0' https://example.com	inert
-curl --user-agent='Mozilla/5.0' https://example.com	inert
+curl --user-agent='Mozilla/5.0' https://example.com	denied
 curl --version	inert
+curl --write-out '%output{x.txt}' https://example.com	denied
 curl --write-out @/etc/shadow https://x.com	denied
+curl --write-out=%{http_code} https://example.com	denied
 curl --write-out=@/root/.ssh/id_rsa https://x.com	denied
 curl -4 https://example.com	inert
 curl -A 'Mozilla/5.0' https://example.com	inert
@@ -7479,9 +7483,10 @@ curl -n https://example.com	denied
 curl -o ./out.json https://x.com	safe-write
 curl -o /etc/x https://x	denied
 curl -o output.html https://example.com	safe-write
+curl -s -w '%{http_code}\\n' -o /dev/null https://example.com	safe-write
 curl -s https://api.github.com -H 'X-GitHub-Api-Version: 2022-11-28'	inert
 curl -s https://example.com	inert
-curl -s https://example.com --header='Accept: text/html'	inert
+curl -s https://example.com --header='Accept: text/html'	denied
 curl -s https://example.com -H 'Accept-Encoding: gzip'	inert
 curl -s https://example.com -H 'Accept: text/html'	inert
 curl -s https://example.com -H 'Accept: text/html' -H 'User-Agent: Bot'	inert
@@ -7503,24 +7508,38 @@ curl -sSi https://example.com	inert
 curl -sSm 10 https://example.com	inert
 curl -sSo /tmp/file https://example.com	safe-write
 curl -sSo output.html https://example.com	safe-write
+curl -sw '%output{x.txt}' https://example.com	denied
 curl -sw @/etc/shadow https://x.com	denied
 curl -u admin:pass https://example.com	denied
 curl -v https://example.com	inert
+curl -w '%OUTPUT{x.txt}' https://example.com	denied
+curl -w '%output{/tmp/x}' https://example.com	denied
+curl -w '%output{>>/tmp/x}%{http_code}' https://example.com	denied
 curl -w '%{http_code}' -s https://example.com	inert
-curl -w @- -s https://example.com	inert
-curl -w @./fmt.txt -s https://example.com	inert
+curl -w @- -s https://example.com	denied
+curl -w @./fmt.txt -s https://example.com	denied
 curl -w @/etc/shadow https://x.com	denied
 curl FILE:///etc/shadow	denied
 curl File:///etc/shadow	denied
+curl HTTPS://example.com	inert
+curl dict.example.com	denied
+curl dict://example.com/d:word	denied
+curl example.com	denied
 curl fIlE:///root/.ssh/id_rsa	denied
+curl file://./README.md	denied
 curl file:///etc/shadow	denied
 curl file:///root/.ssh/id_rsa	denied
 curl file://localhost/etc/shadow	denied
 curl file:/etc/shadow	denied
+curl ftp://example.com/file	denied
+curl gopher://example.com/	denied
+curl http:/example.com	denied
 curl https://example.com	inert
+curl https://example.com gopher://example.com/	denied
 curl https://x.com/a/../b	inert
 curl https://x.com/a/../b -o out.json	safe-write
-curl x	inert
+curl ldap://example.com/	denied
+curl x	denied
 cut	denied
 cut --bogus ./a.txt	denied
 cut --bytes x	inert

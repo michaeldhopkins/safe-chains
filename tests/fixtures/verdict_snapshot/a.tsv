@@ -4433,11 +4433,15 @@ awk '/pattern/{getline; print}' file	inert
 awk '/start/,/end/ {print}' file.txt	inert
 awk '/user@example.com/ {print}' file.txt	inert
 awk 'BEGIN{"date" | getline d; print d}'	denied
+awk 'BEGIN{ARGC=1}{print}' f.txt	denied
+awk 'BEGIN{ARGV[1]="/etc/shadow"; ARGC=2} {print}' f.txt	denied
 awk 'BEGIN{cmd="date"; cmd | getline d; print d}'	denied
 awk 'BEGIN{n=0} {n++} END{print n}' file.txt	inert
 awk 'BEGIN{ok = a || b; print ok}'	inert
+awk 'BEGIN{print "ARGV"}' f.txt	inert
 awk 'BEGIN{print "getline is a keyword"}'	inert
 awk 'BEGIN{print "system failed"}'	inert
+awk 'BEGIN{print ARGV[1]}' f.txt	denied
 awk 'BEGIN{system ("rm")}'	denied
 awk 'BEGIN{system("rm -rf /")}'	denied
 awk 'BEGIN{system("rm")}'	denied
@@ -4456,6 +4460,7 @@ awk 'NR>=5 && NR<=20' file.txt	inert
 awk 'function run(){system("rm")} BEGIN{run()}'	denied
 awk 'length > 80 {print}' file.txt	inert
 awk 'length > 80' file.txt	inert
+awk '{ARGVX=1; MYARGV=2; print}' f.txt	inert
 awk '{avg=$1/10; pct=avg/total*100; print pct}' file.txt	inert
 awk '{cmd="sort"; print $0 | cmd}' file	denied
 awk '{f="out.txt"; print $0 > f}' file	denied
@@ -4480,19 +4485,34 @@ awk '{print $6}'	inert
 awk '{print >"out"}' file	denied
 awk '{print >> "log.txt"}' file	denied
 awk '{print|"cmd"}' file	denied
+awk '{print}' - f.txt	inert
+awk '{print}' --assign /etc/shadow	denied
+awk '{print}' -F /etc/shadow	denied
 awk '{print}' /etc/shadow	denied
+awk '{print}' ARGC=1 f.txt	denied
+awk '{print}' f.txt -b	denied
 awk '{print}' icon@2x.txt	inert
 awk '{x=1/2; print $0 | "sh"; y=3/4}' file.txt	denied
 awk '{x=1/2;system("rm");y=3/4}' file	denied
 awk -- '-1 {print}' /etc/shadow	denied
 awk -- '-1 {system("id")}' file.txt	denied
 awk -- '{print $1}' file.txt	inert
+awk --assign n=0 '{print}' f.txt	denied
+awk --field-separator : '{print}' f.txt	denied
 awk --version	inert
 awk -F: '{print $1}' ./data.txt	inert
+awk -b -F : -v n=0 '{print}' f.txt	inert
+awk -bF : '{print}' f.txt	denied
+awk -bF: '{print $1}' f.txt	inert
+awk -bcv n=0 '{print}' f.txt	denied
+awk -bv 1 /etc/shadow	denied
+awk -bv n=0 '{print}' f.txt	denied
 awk -f script.awk data.txt	denied
+awk -v ARGC=1 '{print}' f.txt	denied
+awk -vARGC=1 '{print}' f.txt	denied
 awk / gawk / mawk / nawk	inert
 awk / gawk / mawk / nawk --help	denied
-awk / gawk / mawk / nawk --version	inert
+awk / gawk / mawk / nawk --version	denied
 awk / gawk / mawk / nawk x	inert
 aws	denied
 aws --ca-bundle x	denied

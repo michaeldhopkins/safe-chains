@@ -191,12 +191,29 @@ fn awk_code(src: &str, brackets: bool) -> String {
 fn awk_program_runs_code(src: &str, program: bool) -> bool {
     [false, true].into_iter().any(|brackets| {
         let code = awk_code(src, brackets);
-        (program && code.contains('@'))
+        (program && (code.contains('@') || names_reserved_variable(&code)))
             || code.contains("system")
             || has_dangerous_getline(&code)
             || has_shell_pipe(&code)
             || has_redirect(&code)
     })
+}
+
+/// Variables through which a program chooses which files awk reads (`ARGV`, `ARGC`), reaches any
+/// variable by name (gawk's `SYMTAB`) or changes the interpreter's behaviour (gawk's `PROCINFO`).
+const RESERVED_VARIABLES: &[&str] = &["ARGC", "ARGV", "PROCINFO", "SYMTAB"];
+
+/// Whether awk code (literals already blanked) names a reserved variable as a whole word.
+fn names_reserved_variable(code: &str) -> bool {
+    code.split(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+        .any(|word| RESERVED_VARIABLES.contains(&word))
+}
+
+/// Whether an option's word count differs between awks. gawk reads `-bv x` as `-b -v x` and
+/// `--field-separator :` as one option and its value; BSD awk ignores an unknown option word whole,
+/// so both take one word there, and the program starts a word earlier than gawk's reading.
+fn ambiguous_option(s: &str) -> bool {
+    matches!(s, "--assign" | "--field-separator") || (!s.starts_with("--") && s.len() > 2 && takes_next_token(s))
 }
 
 /// Whether an option token takes the NEXT token as its value: `-F`/`-v` alone, the long forms, or a
@@ -226,7 +243,8 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
 
 /// awk's operands: the inline program, then the files (`awk 'prog' files…`). Everything after `--`
 /// is an operand, a program starting with `-` included. (`-f progfile` is already denied by the
-/// flag policy, so the first operand is always the program.)
+/// flag policy, so the first operand is always the program.) Options end at the program, as in
+/// every awk, so a later `-v` or `-F` is an operand.
 fn awk_operands(tokens: &[Token]) -> Vec<&str> {
     let mut positionals = Vec::new();
     let mut options_done = false;
@@ -247,6 +265,7 @@ fn awk_operands(tokens: &[Token]) -> Vec<&str> {
             continue;
         }
         positionals.push(s);
+        options_done = true;
         i += 1;
     }
     positionals
@@ -258,8 +277,21 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
             return false;
         }
     }
+    if tokens[1..].iter().any(|t| ambiguous_option(t.as_str())) {
+        return false;
+    }
     let operands = awk_operands(tokens);
     if operands.iter().enumerate().any(|(n, o)| awk_program_runs_code(o, n == 0)) {
+        return false;
+    }
+    if operands.iter().skip(1).any(|o| o.starts_with('-') && *o != "-") {
+        return false;
+    }
+    let program = operands.first().copied();
+    if tokens[1..]
+        .iter()
+        .any(|t| program.is_none_or(|p| !std::ptr::eq(p, t.as_str())) && names_reserved_variable(t.as_str()))
+    {
         return false;
     }
     if !policy::check(tokens, &AWK_POLICY) {
@@ -358,6 +390,13 @@ mod tests {
         awk_string_with_at: "awk '{print \"a@b\"}' file.txt",
         awk_dashdash_program: "awk -- '{print $1}' file.txt",
         awk_file_name_with_at: "awk '{print}' icon@2x.txt",
+        awk_argv_in_string: "awk 'BEGIN{print \"ARGV\"}' f.txt",
+        awk_argv_like_name: "awk '{ARGVX=1; MYARGV=2; print}' f.txt",
+        awk_separate_short_flags: "awk -b -F : -v n=0 '{print}' f.txt",
+        awk_glued_long_assign: "gawk --assign=n=0 '{print n}' f.txt",
+        awk_glued_long_field_separator: "gawk --field-separator=: '{print $1}' f.txt",
+        awk_glued_cluster_value: "awk -bF: '{print $1}' f.txt",
+        awk_stdin_operand_after_program: "awk '{print}' - f.txt",
     }
 
     denied! {
@@ -392,6 +431,25 @@ mod tests {
         awk_dashdash_program_denied: "awk -- '-1 {system(\"id\")}' file.txt",
         awk_dashdash_program_file_locus_denied: "awk -- '-1 {print}' /etc/shadow",
         gawk_cluster_value_then_indirect_call_denied: "gawk -bv n=0 'BEGIN{@f()}' file.txt",
+        awk_argv_assign_denied: "awk 'BEGIN{ARGV[1]=\"/etc/shadow\"; ARGC=2} {print}' f.txt",
+        awk_argv_read_denied: "awk 'BEGIN{print ARGV[1]}' f.txt",
+        awk_argc_denied: "awk 'BEGIN{ARGC=1}{print}' f.txt",
+        gawk_symtab_denied: "gawk 'BEGIN{SYMTAB[\"x\"]=1}'",
+        gawk_procinfo_denied: "gawk 'BEGIN{PROCINFO[\"sorted_in\"]=\"f\"}'",
+        gawk_namespaced_argv_denied: "gawk 'BEGIN{awk::ARGV[1]=\"x\"}' f.txt",
+        awk_v_assign_argc_denied: "awk -v ARGC=1 '{print}' f.txt",
+        awk_v_glued_assign_argv_denied: "awk -vARGC=1 '{print}' f.txt",
+        awk_operand_assign_argc_denied: "awk '{print}' ARGC=1 f.txt",
+        awk_cluster_v_denied: "awk -bv n=0 '{print}' f.txt",
+        awk_cluster_f_denied: "awk -bF : '{print}' f.txt",
+        awk_cluster_three_denied: "awk -bcv n=0 '{print}' f.txt",
+        awk_long_field_separator_denied: "awk --field-separator : '{print}' f.txt",
+        awk_long_assign_denied: "awk --assign n=0 '{print}' f.txt",
+        awk_cluster_shifts_program_to_secret_denied: "awk -bv 1 /etc/shadow",
+        gawk_option_after_program_hides_secret_denied: "gawk '{print}' -v /etc/shadow",
+        awk_field_separator_after_program_hides_secret_denied: "awk '{print}' -F /etc/shadow",
+        awk_assign_after_program_hides_secret_denied: "awk '{print}' --assign /etc/shadow",
+        awk_flag_after_program_denied: "awk '{print}' f.txt -b",
     }
 }
 
@@ -426,8 +484,15 @@ mod properties {
 
     /// How the program reaches awk, `{p}` standing for it.
     const SHAPES: &[&str] = &[
-        "{c} '{p}' f.txt", "{c} -bF : '{p}' f.txt", "{c} -bv n=0 '{p}' icon@2x.txt", "{c} -F: '{p}' f.txt", "{c} -v n=0 -- '{p}' f.txt",
-        "{c} '{p}'",
+        "{c} '{p}' f.txt", "{c} -b -F : '{p}' f.txt", "{c} -b -v n=0 '{p}' icon@2x.txt", "{c} -F: '{p}' f.txt", "{c} -bF: '{p}' f.txt",
+        "{c} -v n=0 -- '{p}' f.txt", "{c} '{p}'",
+    ];
+
+    /// Option words that gawk and BSD awk consume differently, so the program is a different word
+    /// in each.
+    const AMBIGUOUS_SHAPES: &[&str] = &[
+        "{c} -bF : '{p}' f.txt", "{c} -bv n=0 '{p}' icon@2x.txt", "{c} -cbv n=0 '{p}' f.txt", "{c} --field-separator : '{p}' f.txt",
+        "{c} --assign n=0 '{p}' f.txt", "{c} -b --assign n=0 '{p}' f.txt",
     ];
 
     fn programs(pre: &str, post: &str, stmt: &str, directive: &str) -> Vec<String> {
@@ -450,7 +515,7 @@ mod properties {
             stmt in proptest::sample::select(STATEMENTS.to_vec()),
             directive in proptest::sample::select(DIRECTIVES.to_vec()),
             cmd in proptest::sample::select(COMMANDS.to_vec()),
-            shape in proptest::sample::select(SHAPES.to_vec()),
+            shape in proptest::sample::select([SHAPES, AMBIGUOUS_SHAPES].concat()),
         ) {
             for program in programs(pre, post, stmt, directive) {
                 let line = shape.replace("{c}", cmd).replace("{p}", &program);
@@ -469,6 +534,65 @@ mod properties {
         ) {
             let line = shape.replace("{c}", cmd).replace("{p}", &format!("BEGIN {{ {pre}; {post} }}"));
             prop_assert!(is_safe_command(&line), "benign awk program was refused: `{}`", line);
+        }
+
+        /// An option word that gawk and BSD awk consume differently is refused whatever program
+        /// follows, since the check cannot know which word awk will run.
+        #[test]
+        fn an_option_whose_word_count_differs_between_awks_is_refused(
+            pre in proptest::sample::select(BENIGN.to_vec()),
+            cmd in proptest::sample::select(COMMANDS.to_vec()),
+            shape in proptest::sample::select(AMBIGUOUS_SHAPES.to_vec()),
+        ) {
+            let line = shape.replace("{c}", cmd).replace("{p}", &format!("BEGIN {{ {pre} }}"));
+            prop_assert!(!is_safe_command(&line), "ambiguous awk option was approved: `{}`", line);
+        }
+
+        /// A short cluster of standalone letters ending in `F` or `v` takes the next word in gawk
+        /// and not in BSD awk; every such cluster is refused, and the same letters given as
+        /// separate words are approved.
+        #[test]
+        fn a_short_cluster_ending_in_a_valued_letter_is_refused(
+            letters in proptest::collection::vec(proptest::sample::select(b"bcCgNOPrsSt".to_vec()), 1..4),
+            valued in proptest::sample::select(vec!['F', 'v']),
+        ) {
+            let cluster: String = letters.iter().map(|&b| b as char).collect();
+            let value = if valued == 'F' { ":" } else { "n=0" };
+            let clustered = format!("awk -{cluster}{valued} {value} '{{print}}' f.txt");
+            prop_assert!(!is_safe_command(&clustered), "clustered option was approved: `{}`", clustered);
+            let separate: Vec<String> = letters.iter().map(|&b| format!("-{}", b as char)).collect();
+            let spread = format!("awk {} -{valued} {value} '{{print}}' f.txt", separate.join(" "));
+            prop_assert!(is_safe_command(&spread), "separate options were refused: `{}`", spread);
+        }
+
+        /// A program that names `ARGV`, `ARGC`, `SYMTAB` or `PROCINFO` as code is refused wherever
+        /// the name sits; the same name inside a string literal is text and is approved.
+        #[test]
+        fn a_program_naming_a_reserved_variable_is_refused(
+            pre in proptest::sample::select(BENIGN.to_vec()),
+            name in proptest::sample::select(vec!["ARGV", "ARGC", "SYMTAB", "PROCINFO", "awk::ARGV"]),
+            use_form in proptest::sample::select(vec!["{n}[1] = \"x\"", "{n} = 1", "print {n}[1]", "for (k in {n}) n++", "x = {n}"]),
+            cmd in proptest::sample::select(COMMANDS.to_vec()),
+            shape in proptest::sample::select(SHAPES.to_vec()),
+        ) {
+            let stmt = use_form.replace("{n}", name);
+            let line = shape.replace("{c}", cmd).replace("{p}", &format!("BEGIN {{ {pre}; {stmt} }}"));
+            prop_assert!(!is_safe_command(&line), "program naming {} was approved: `{}`", name, line);
+            let quoted = shape.replace("{c}", cmd).replace("{p}", &format!("BEGIN {{ {pre}; print \"{name}\" }}"));
+            prop_assert!(is_safe_command(&quoted), "string naming {} was refused: `{}`", name, quoted);
+        }
+
+        /// Options end at the program in every awk, so an option word after it is an operand to
+        /// awk; any such word is refused, and a protected file that follows it is never read.
+        #[test]
+        fn an_option_word_after_the_program_is_refused(
+            cmd in proptest::sample::select(COMMANDS.to_vec()),
+            shape in proptest::sample::select(SHAPES.to_vec()),
+            option in proptest::sample::select(vec!["-v", "-F", "-b", "--assign", "--field-separator", "--version", "-bv", "--"]),
+            target in proptest::sample::select(vec!["/etc/shadow", "~/.ssh/id_rsa", "f.txt"]),
+        ) {
+            let line = format!("{} {option} {target}", shape.replace("{c}", cmd).replace("{p}", "{print}"));
+            prop_assert!(!is_safe_command(&line), "option after the program was approved: `{}`", line);
         }
     }
 }

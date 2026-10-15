@@ -33,13 +33,18 @@ const CURL_SAFE_HEADERS: &[&str] = &[
 ];
 
 /// curl's `--write-out` reads its format from a file when the value starts with `@` (`@-` =
-/// stdin), printing that file to stdout — an arbitrary-file disclosure. Admit only `@-`, a
-/// non-`@` literal format, or an `@path` whose read locus is admitted.
+/// stdin), and `%output{file}` (curl 8.3+) sends the rest of the output to a file. Admit only a
+/// literal format that does neither.
 fn write_out_admits(value: &str) -> bool {
-    match value.strip_prefix('@') {
-        None | Some("-") => true,
-        Some(path) => crate::engine::resolve::read_content_verdict(path).is_allowed(),
-    }
+    !value.starts_with('@') && !value.to_ascii_lowercase().contains("%output")
+}
+
+/// curl guesses a protocol for a URL without a scheme (`dict.example.com` becomes `dict://`) and
+/// expands `{a,b}` and `[a-b]` globs before reading the scheme, so only a literal `http://` or
+/// `https://` prefix is admitted.
+fn is_allowed_url(value: &str) -> bool {
+    let lower = value.to_ascii_lowercase();
+    lower.starts_with("http://") || lower.starts_with("https://")
 }
 
 fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> Option<Result<usize, ()>> {
@@ -59,25 +64,6 @@ fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> O
     if CURL_SAFE_VALUED.contains(t) {
         return Some(Ok(2));
     }
-    if let Some(val) = t.split_value("=") {
-        let flag = t.as_str().split_once('=').map_or(t.as_str(), |(k, _)| k);
-        if flag == "--write-out" {
-            return Some(if write_out_admits(val) { Ok(1) } else { Err(()) });
-        }
-        if CURL_SAFE_VALUED.contains(flag) || flag == "--output" {
-            if flag == "--output" {
-                *has_write = true;
-            }
-            return Some(Ok(1));
-        }
-        if flag == "--request" {
-            return if is_safe_method(val) { Some(Ok(1)) } else { Some(Err(())) };
-        }
-        if flag == "--header" {
-            return if is_safe_curl_header(val) { Some(Ok(1)) } else { Some(Err(())) };
-        }
-        return Some(Err(()));
-    }
     None
 }
 
@@ -91,8 +77,9 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
         let t = &tokens[i];
 
         if !t.starts_with('-') {
-            // a URL operand — the pathgate locus-gates it (roles.curl positional = read), so a
-            // `file:` URL to a secret denies and a network URL admits, all in one place.
+            if !is_allowed_url(t.as_str()) {
+                return Verdict::Denied;
+            }
             i += 1;
             continue;
         }
@@ -215,12 +202,9 @@ mod tests {
         curl_timeout: "curl --connect-timeout 5 -m 10 https://example.com",
         curl_explicit_get: "curl -X GET https://example.com",
         curl_combined_x: "curl -XGET https://example.com",
-        curl_request_eq: "curl --request=GET https://example.com",
         curl_head_method: "curl -X HEAD https://example.com",
         curl_options_method: "curl -X OPTIONS https://example.com",
         curl_write_out: "curl -w '%{http_code}' -s https://example.com",
-        curl_write_out_at_worktree: "curl -w @./fmt.txt -s https://example.com",
-        curl_write_out_at_stdin: "curl -w @- -s https://example.com",
         curl_multiple_urls: "curl -s https://example.com https://example.org",
         curl_compressed: "curl --compressed -s https://example.com",
         curl_no_progress: "curl -sS --no-progress-meter https://example.com",
@@ -233,11 +217,9 @@ mod tests {
         curl_version: "curl --version",
         curl_help: "curl --help",
         curl_method_case_insensitive: "curl -X get https://example.com",
-        curl_valued_eq: "curl --max-time=30 https://example.com",
         curl_combined_then_valued: "curl -sSm 10 https://example.com",
         curl_output: "curl -o output.html https://example.com",
         curl_output_long: "curl --output file.html https://example.com",
-        curl_output_eq: "curl --output=file.html https://example.com",
         curl_remote_name: "curl -O https://example.com/file.tar.gz",
         curl_remote_name_long: "curl --remote-name https://example.com/f.tar.gz",
         curl_combined_with_output: "curl -sSo output.html https://example.com",
@@ -253,16 +235,16 @@ mod tests {
         curl_header_referer: "curl -s https://example.com -H 'Referer: https://example.com'",
         curl_header_accept_encoding: "curl -s https://example.com -H 'Accept-Encoding: gzip'",
         curl_header_github_api: "curl -s https://api.github.com -H 'X-GitHub-Api-Version: 2022-11-28'",
-        curl_header_eq: "curl -s https://example.com --header='Accept: text/html'",
         curl_multiple_headers: "curl -s https://example.com -H 'Accept: text/html' -H 'User-Agent: Bot'",
         curl_user_agent_short: "curl -A 'Mozilla/5.0' https://example.com",
         curl_user_agent_long: "curl --user-agent 'Mozilla/5.0' https://example.com",
-        curl_user_agent_eq: "curl --user-agent='Mozilla/5.0' https://example.com",
         curl_user_agent_combined: "curl -sLA 'Mozilla/5.0' --max-time 15 https://example.com",
         curl_include_short: "curl -i https://example.com",
         curl_include_long: "curl --include https://example.com",
         curl_include_combined: "curl -sSi https://example.com",
         curl_include_localhost: "curl -sS -i http://127.0.0.1:8001/",
+        curl_scheme_uppercase: "curl HTTPS://example.com",
+        curl_write_out_percent_literal: "curl -s -w '%{http_code}\\n' -o /dev/null https://example.com",
     }
 
     denied! {
@@ -306,6 +288,30 @@ mod tests {
         curl_write_out_at_secret_long: "curl --write-out @/etc/shadow https://x.com",
         curl_write_out_at_secret_eq: "curl --write-out=@/root/.ssh/id_rsa https://x.com",
         curl_write_out_at_secret_cluster: "curl -sw @/etc/shadow https://x.com",
+        curl_write_out_at_worktree: "curl -w @./fmt.txt -s https://example.com",
+        curl_write_out_at_stdin: "curl -w @- -s https://example.com",
+        curl_write_out_output_file: "curl -w '%output{/tmp/x}' https://example.com",
+        curl_write_out_output_append: "curl -w '%output{>>/tmp/x}%{http_code}' https://example.com",
+        curl_write_out_output_long: "curl --write-out '%output{x.txt}' https://example.com",
+        curl_write_out_output_cluster: "curl -sw '%output{x.txt}' https://example.com",
+        curl_write_out_output_upper: "curl -w '%OUTPUT{x.txt}' https://example.com",
+        curl_gopher_scheme: "curl gopher://example.com/",
+        curl_dict_scheme: "curl dict://example.com/d:word",
+        curl_ftp_scheme: "curl ftp://example.com/file",
+        curl_ldap_scheme: "curl ldap://example.com/",
+        curl_file_scheme_worktree: "curl file://./README.md",
+        curl_scheme_less: "curl example.com",
+        curl_scheme_less_guessed: "curl dict.example.com",
+        curl_scheme_glob: "curl '{gopher,http}://example.com/'",
+        curl_scheme_single_slash: "curl http:/example.com",
+        curl_second_url_gopher: "curl https://example.com gopher://example.com/",
+        curl_request_eq: "curl --request=GET https://example.com",
+        curl_valued_eq: "curl --max-time=30 https://example.com",
+        curl_output_eq: "curl --output=file.html https://example.com",
+        curl_header_eq: "curl -s https://example.com --header='Accept: text/html'",
+        curl_user_agent_eq: "curl --user-agent='Mozilla/5.0' https://example.com",
+        curl_connect_timeout_eq: "curl --connect-timeout=5 https://example.com",
+        curl_write_out_eq: "curl --write-out=%{http_code} https://example.com",
     }
 
     inert! {
@@ -416,6 +422,60 @@ mod tests {
                 "two-token `curl {}` must short-circuit to Allowed(Inert)",
                 flag
             );
+        }
+
+        /// A URL operand is admitted only when it begins with a literal `http://` or `https://`.
+        /// Any other scheme, a scheme-less host curl would guess a protocol for, or a glob in the
+        /// scheme position is refused.
+        #[test]
+        fn a_curl_url_is_admitted_only_with_an_http_scheme(url in "[a-zA-Z0-9:/.{},\\[\\]_@-]{1,24}") {
+            prop_assume!(!url.starts_with('-'));
+            let tokens: Vec<Token> = ["curl", "-s", url.as_str()].iter().map(|s| Token::from_test(s)).collect();
+            let lower = url.to_ascii_lowercase();
+            let expected = lower.starts_with("http://") || lower.starts_with("https://");
+            prop_assert_eq!(super::is_safe_curl(&tokens).is_allowed(), expected, "url {:?}", url);
+        }
+
+        #[test]
+        fn a_curl_url_with_an_http_scheme_in_any_case_is_admitted(
+            scheme in "[hH][tT][tT][pP][sS]?",
+            host in "[a-z0-9.-]{1,16}",
+            path in "[a-zA-Z0-9/._-]{0,16}",
+        ) {
+            let url = format!("{scheme}://{host}/{path}");
+            let tokens: Vec<Token> = ["curl", "-s", url.as_str()].iter().map(|s| Token::from_test(s)).collect();
+            prop_assert!(super::is_safe_curl(&tokens).is_allowed(), "url {:?} was refused", url);
+        }
+
+        /// curl reads `--flag=value` as an unknown option, so no long flag is admitted in that
+        /// spelling: the check and curl must agree on which word is the value.
+        #[test]
+        fn a_curl_long_flag_glued_with_equals_is_refused(
+            flag in proptest::sample::select(
+                ["--connect-timeout", "--max-time", "--user-agent", "--write-out", "--output", "--header", "--request"].to_vec()
+            ),
+            value in "[a-zA-Z0-9 :./%{}_-]{0,16}",
+        ) {
+            let glued = format!("{flag}={value}");
+            let tokens: Vec<Token> =
+                ["curl", glued.as_str(), "https://example.com"].iter().map(|s| Token::from_test(s)).collect();
+            prop_assert_eq!(super::is_safe_curl(&tokens), Verdict::Denied, "`{}` was admitted", glued);
+        }
+
+        /// A `--write-out` format that reads a file (`@…`) or writes one (`%output{…}`) is refused
+        /// in every spelling of the flag.
+        #[test]
+        fn a_curl_write_out_that_reads_or_writes_a_file_is_refused(
+            form in proptest::sample::select(["-w", "--write-out", "-sw", "-Sw"].to_vec()),
+            before in "[a-z%{}_ ]{0,8}",
+            directive in proptest::sample::select(["%output{", "%OUTPUT{", "%Output{>>"].to_vec()),
+            path in "[a-zA-Z0-9/._-]{1,12}",
+            at in any::<bool>(),
+        ) {
+            let value = if at { format!("@{path}") } else { format!("{before}{directive}{path}}}") };
+            let tokens: Vec<Token> =
+                ["curl", form, value.as_str(), "https://example.com"].iter().map(|s| Token::from_test(s)).collect();
+            prop_assert_eq!(super::is_safe_curl(&tokens), Verdict::Denied, "`{} {}` was admitted", form, value);
         }
     }
 }
