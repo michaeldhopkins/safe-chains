@@ -30,7 +30,7 @@ impl Machine {
     fn approves_in(&self, dir: &str, command: &str) -> bool {
         Command::new(env!("CARGO_BIN_EXE_safe-chains"))
             .args(["--cwd", dir, "--root", dir, command])
-            .current_dir(dir)
+            .current_dir(&self.work)
             .env_clear()
             .env("HOME", &self.home)
             .env("PATH", "/usr/bin:/bin")
@@ -105,7 +105,11 @@ fn a_session_rooted_outside_any_project_still_has_its_working_directory_judged()
     let agents = machine.home.join("Library/LaunchAgents");
     std::fs::create_dir_all(&agents).expect("mkdir");
     let agents = agents.to_str().expect("utf-8 path").to_string();
-    for dir in ["/", "/etc", "/private/etc", home.as_str(), agents.as_str()] {
+    let mut dirs = vec!["/", "/etc", home.as_str()];
+    if cfg!(target_os = "macos") {
+        dirs.extend(["/private/etc", agents.as_str()]);
+    }
+    for dir in dirs {
         for command in ["jj new", "jj restore", "jj describe -m x"] {
             assert!(!machine.approves_in(dir, command), "a session rooted at {dir} approved {command}");
         }
