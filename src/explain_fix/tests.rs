@@ -171,3 +171,19 @@ fn a_place_that_runs_later_is_never_offered() {
     let fix = fix(&format!("tee {}/Library/LaunchAgents/x.plist", home()));
     assert!(matches!(fix, Fix::Nothing(Because::RunsLater { .. })), "{fix:?}");
 }
+
+#[test]
+fn the_snapshot_fix_names_the_flag_only_when_the_flag_is_approved() {
+    let command = format!("jj -R {}/.claude log", home());
+    let snapshot = Fix::Nothing(Because::ProtectedPath { path: format!("{}/.claude", home()), reason: ReachReason::RepositorySnapshot });
+    assert_eq!(fix(&command), snapshot);
+    assert!(snapshot.render().contains("--ignore-working-copy"));
+    let project = format!("{}/projects/fixprobe", home());
+    let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
+    let stricter = fix_for(&command, &|_| false, false);
+    assert_eq!(
+        stricter,
+        Fix::Nothing(Because::ProtectedPath { path: format!("{}/.claude", home()), reason: ReachReason::FrozenTrustRoot })
+    );
+    assert!(!stricter.render().contains("--ignore-working-copy"));
+}

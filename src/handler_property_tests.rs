@@ -2193,13 +2193,12 @@ fn every_actionable_reach_reason_names_a_remedy() {
     fn owed(r: ReachReason) -> Remedy {
         match r {
             Credential | ForeignTemp | OutsideWorkspace | RawDevice => Remedy::Grant,
-            FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity => Remedy::Manual,
+            FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity | RepositorySnapshot => Remedy::Manual,
             Unconfined => Remedy::Respell,
         }
     }
 
-    let all = [Credential, ForeignTemp, OutsideWorkspace, RawDevice, FrozenTrustFile, FrozenTrustRoot, FrozenSystemIntegrity, Unconfined];
-    for reason in all {
+    for &reason in crate::reach::tests::ALL {
         let msg = reason.message("~/.ssh/id_rsa");
         match owed(reason) {
             Remedy::Grant => {

@@ -112,7 +112,12 @@ fn run_explain(
         // "Why:" rather than the hook's "safe-chains did not auto-approve this:" lead-in, which the
         // header three lines up has already said. `message` opens mid-sentence ("it reaches …"), so
         // it needs something in front of it or it reads as an orphan.
-        println!("\nWhy: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
+        println!(
+            "\nWhy: {}. {HOW_IT_WORKS_URL}",
+            reason
+                .settled(command, &|c| safe_chains::explain_with_coverage_at_level(c, engine_level).is_allowed())
+                .message(&path)
+        );
     }
     if !explanation.is_allowed() {
         print!("\n{}", explain_fixes(&explanation, engine_level));
@@ -295,7 +300,7 @@ fn main() {
                     run_explain(&command, engine_level, threshold, folder_level);
                 }
                 if cli.suggest {
-                    suggest_cli::run_suggest(&command);
+                    suggest_cli::run_suggest(&command, threshold, engine_level);
                 }
                 run_cli(&command, threshold, engine_level, log_mode, log_cwd.as_deref(), log_root.as_deref());
             } else if io::stdin().is_terminal() {

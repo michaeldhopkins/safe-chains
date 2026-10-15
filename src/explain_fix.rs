@@ -82,6 +82,7 @@ pub fn fix_for(command: &str, approved: &dyn Fn(&str) -> bool, approved_by_defau
     let Some((path, reason)) = crate::workspace_overreach(command) else {
         return Fix::Nothing(Because::BuiltInRule { names });
     };
+    let reason = reason.settled(command, approved);
     match reason {
         ReachReason::OutsideWorkspace | ReachReason::ForeignTemp => {
             let resolved = crate::pathctx::resolve(&path).into_owned();
@@ -164,7 +165,10 @@ impl Fix {
                     because,
                     Because::ProtectedPath { reason: ReachReason::Credential | ReachReason::RawDevice, .. } | Because::RunsLater { .. }
                 );
-                let (lead, close) = if by_hand {
+                let rewrite = matches!(because, Because::ProtectedPath { reason: ReachReason::RepositorySnapshot, .. });
+                let (lead, close) = if rewrite {
+                    ("Fix: none in safe-chains' config.", "Otherwise a person approves the command each time it runs.")
+                } else if by_hand {
                     ("Fix: none that safe-chains will make.", "Otherwise a person approves the command each time it runs.")
                 } else {
                     ("Fix: none in safe-chains' config.", "A person approves the command each time it runs.")
@@ -196,6 +200,10 @@ impl Because {
                     ReachReason::RawDevice => format!(
                         "`{shown}` is a raw device, so neither `safe-chains config` nor its MCP tools will grant it. \
                          A read grant you write into ~/.config/safe-chains.toml by hand would allow reading it. That is the user's decision, not an agent's."
+                    ),
+                    ReachReason::RepositorySnapshot => format!(
+                        "Neither `safe-chains config` nor its MCP tools will grant `{shown}`. Adding \
+                         --ignore-working-copy right after `jj` gets the command approved without a grant; it then shows the repository as last recorded."
                     ),
                     _ => format!("A built-in rule protects `{shown}`, and no grant can cover it."),
                 }

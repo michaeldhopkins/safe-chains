@@ -348,6 +348,9 @@ pub fn sanitize_display(s: &str) -> String {
 /// credential store outranks the hidden-peer wording; a hidden peer path outranks the generic
 /// outside-workspace reason.
 pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
+    if let Some(found) = reach::repository_snapshot(command) {
+        return Some(found);
+    }
     let tokens = operand_words(command)?;
     tokens.into_iter().find_map(|t| {
         if !policy::looks_like_path(&t) {
@@ -372,39 +375,7 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         if !outside {
             return None;
         }
-        // Asked on the LITERAL structure, so an interpolated component cannot strip the credential
-        // warning off a path that plainly names one. `cat ~/.ssh/$(id)` was reported as merely
-        // "built by an interpolation" — offering to flank it, which can never help, while dropping
-        // the one sentence that matters — and the CONFINED spelling fell through to
-        // "outside the working directory", whose remedy is to GRANT the path.
-        //
-        // Granting a credential store IS possible now (a grant covers what it names), so the
-        // objection is no longer "that remedy cannot work". It is that the generic wording says
-        // "grant that path" while meaning the ordinary parent-directory grant, which is exactly
-        // the form a credential store does not accept. The Credential arm spells out the
-        // difference instead.
-        let reason = if engine::resolve::names_credential_store(&resolved) {
-            ReachReason::Credential
-        } else if let Some(kind) = engine::resolve::frozen_write_kind(&resolved) {
-            // Ahead of Unconfined and OutsideWorkspace for the same reason Credential is: both of
-            // those end in "grant that path", which for a frozen write face is FALSE rather than
-            // merely vague, and for safe-chains' own config it is circular as well.
-            match kind {
-                engine::resolve::FrozenWrite::TrustFile => ReachReason::FrozenTrustFile,
-                engine::resolve::FrozenWrite::TrustRootDir => ReachReason::FrozenTrustRoot,
-                engine::resolve::FrozenWrite::SystemIntegrity => ReachReason::FrozenSystemIntegrity,
-                engine::resolve::FrozenWrite::RawDevice => ReachReason::RawDevice,
-            }
-        } else if engine::resolve::anchoring_of(&resolved) == crate::engine::facet::Anchoring::Opaque {
-            // Ahead of OutsideWorkspace because it is the more specific diagnosis of the SAME
-            // refusal, and the generic wording actively misleads here: it names a working-directory
-            // problem the user does not have and a remedy (grant the path) that cannot work,
-            // since the path is not a fixed path at all.
-            ReachReason::Unconfined
-        } else {
-            ReachReason::OutsideWorkspace
-        };
-        Some((t, reason))
+        Some((t, reach::classify(&resolved)))
     })
 }
 

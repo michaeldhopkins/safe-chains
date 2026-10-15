@@ -15,7 +15,11 @@ use crate::HOW_IT_WORKS_URL;
 /// `--suggest`: help a user support a command safe-chains doesn't recognize. OPT-IN — reached only
 /// by the explicit flag, never mentioned in any deny/hook output. Writes/updates a project
 /// `.safe-chains.toml` and prints the `[[trusted]]` pin the user hand-adds to ~/ to approve it.
-pub fn run_suggest(command: &str) -> ! {
+pub fn run_suggest(
+    command: &str,
+    threshold: safe_chains::verdict::SafetyLevel,
+    engine_level: Option<&'static safe_chains::engine::level::Level>,
+) -> ! {
     use safe_chains::suggest::{self, Outcome};
     const DOCS: &str = "https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html";
 
@@ -41,7 +45,8 @@ pub fn run_suggest(command: &str) -> ! {
             //
             // So when the reach check can name the path, say which one and where the remedy lives.
             // `--suggest` still generates nothing either way — the command is already known.
-            match safe_chains::workspace_overreach(command) {
+            let approved = |c: &str| matches!(safe_chains::explain_with_coverage_at_level(c, engine_level).overall, safe_chains::verdict::Verdict::Allowed(l) if l <= threshold);
+            match safe_chains::workspace_overreach(command).map(|(path, reason)| (path, reason.settled(command, &approved))) {
                 Some((path, reason)) => eprintln!(
                     "Every command here is one safe-chains already recognizes ({}). It isn't \
                      auto-approving because of the PATH it reaches, not because the command is \

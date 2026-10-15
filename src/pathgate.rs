@@ -660,7 +660,7 @@ fn gate(role: Role, path: &str) -> bool {
 mod chdir;
 mod flag_match;
 mod fuzz_judges;
-mod handlers;
+pub(crate) mod handlers;
 
 #[cfg(test)]
 mod both_gates {

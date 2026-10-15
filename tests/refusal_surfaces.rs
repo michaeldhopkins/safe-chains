@@ -132,3 +132,14 @@ fn a_grammar_refusal_still_points_at_custom_commands() {
         );
     }
 }
+
+#[test]
+fn suggest_offers_the_snapshot_flag_only_where_the_flag_would_be_approved() {
+    let home = bare_home();
+    let command = "jj -R ~/.claude log";
+    let default = run(&["--suggest", command], home.path(), None);
+    assert!(default.contains("--ignore-working-copy"), "the default level approves the flagged read:\n{default}");
+    let paranoid = run(&["--level", "paranoid", "--suggest", command], home.path(), None);
+    assert!(!paranoid.contains("--ignore-working-copy"), "paranoid refuses the flagged read too:\n{paranoid}");
+    assert!(paranoid.contains("No grant changes this"), "{paranoid}");
+}

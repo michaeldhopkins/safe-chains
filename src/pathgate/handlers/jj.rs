@@ -138,6 +138,19 @@ fn repositories(tokens: &[Token], moved: bool) -> Vec<String> {
     found
 }
 
+pub(crate) fn repository_value(words: &[String]) -> Option<String> {
+    let mut words = words.iter().skip(1).take_while(|w| *w != "--");
+    while let Some(word) = words.next() {
+        if word == "-R" || word == "--repository" {
+            return words.next().cloned();
+        }
+        if let Some(value) = word.strip_prefix("--repository=").or_else(|| word.strip_prefix("-R")) {
+            return Some(value.to_string());
+        }
+    }
+    None
+}
+
 fn reads_without_snapshot(tokens: &[Token]) -> bool {
     let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).take_while(|t| *t != "--").collect();
     words.contains(&"--ignore-working-copy") && names_an_observing_sub(&words)

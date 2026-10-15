@@ -153,7 +153,11 @@ fn run_hook_on(
     // When the command was gated because it reaches OUTSIDE the workspace, fold that specific reason
     // into the Deny/Ask message so the human/model sees *why* — Defer surfaces it via render_context
     // below, but Deny/Ask exit here, so without this they'd get only the generic reason.
-    let overreach = safe_chains::workspace_overreach(&input.command);
+    let overreach = safe_chains::workspace_overreach(&input.command).map(|(path, reason)| {
+        let approved =
+            |c: &str| matches!(safe_chains::explain_with_coverage_at_level(c, engine_level).overall, Verdict::Allowed(l) if l <= threshold);
+        (path, reason.settled(&input.command, &approved))
+    });
     let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
     match format.gated_policy() {
         safe_chains::targets::GatedPolicy::Deny => {

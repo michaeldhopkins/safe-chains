@@ -7,7 +7,7 @@
 use super::{Role, gate};
 use crate::parse::Token;
 
-mod jj;
+pub(crate) mod jj;
 mod plist;
 
 /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
