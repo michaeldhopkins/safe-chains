@@ -6,7 +6,8 @@
 //! the same role, even when -R is given, which fails closed. The one exception is a session whose
 //! root is itself a trust root directory: the session works there. A repository write
 //! reaches every file beneath it, a trust file among them (`jj restore` rewrites one), so no grant
-//! opens a write to a repository at a trust root such as `~/.claude`.
+//! opens a write to a repository at a trust root such as `~/.claude`, or below one, where jj finds
+//! the same repository by walking up.
 
 use crate::parse::Token;
 use crate::pathgate::{Role, RoleSpec, Shape, walk};
@@ -82,9 +83,30 @@ fn moved_from_root() -> bool {
 }
 
 fn writes_a_trust_root(tokens: &[Token], moved: bool) -> bool {
-    repositories(tokens, moved)
-        .iter()
-        .any(|path| crate::engine::resolve::frozen_write_kind(trim_slashes(path)).is_some())
+    repositories(tokens, moved).iter().any(|path| at_or_below_a_trust_root(trim_slashes(path)))
+}
+
+fn at_or_below_a_trust_root(path: &str) -> bool {
+    use crate::engine::resolve::{FrozenWrite, frozen_write_kind};
+    if frozen_write_kind(path).is_some() {
+        return true;
+    }
+    let cwd = crate::pathctx::cwd();
+    let Some(absolute) = crate::pathctx::join_cwd(cwd.as_deref(), path).filter(|p| p.starts_with('/')) else {
+        return false;
+    };
+    let mut current = absolute.as_str();
+    while let Some((parent, _)) = current.rsplit_once('/') {
+        let parent = if parent.is_empty() { "/" } else { parent };
+        if frozen_write_kind(parent) == Some(FrozenWrite::TrustRootDir) {
+            return true;
+        }
+        if parent == "/" {
+            return false;
+        }
+        current = parent;
+    }
+    false
 }
 
 fn trim_slashes(path: &str) -> &str {

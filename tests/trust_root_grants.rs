@@ -115,3 +115,43 @@ fn a_session_rooted_outside_any_project_still_has_its_working_directory_judged()
         }
     }
 }
+
+#[test]
+fn a_repository_below_a_trust_root_is_refused_like_the_root() {
+    for grant in ["~/.claude", "~/.config"] {
+        let machine = Machine::with_grants(&[grant]);
+        for sub in ["hooks", "skills", "sub", "sub/deeper"] {
+            std::fs::create_dir_all(machine.home.join(&grant[2..]).join(sub)).expect("mkdir");
+            let below = format!("{grant}/{sub}");
+            for command in [
+                format!("jj -R {below} new"),
+                format!("jj -R {below}/ restore"),
+                format!("jj --repository={below} describe -m x"),
+                format!("cd {below} && jj restore"),
+                format!("cd {below} && jj new"),
+            ] {
+                assert!(!machine.approves(&command), "grant {grant} approved {command}");
+            }
+            let read = format!("jj --ignore-working-copy -R {below} log");
+            assert!(machine.approves(&read), "grant {grant}: {read} writes nothing and should be approved");
+        }
+    }
+}
+
+#[test]
+fn a_repository_below_an_ordinary_grant_still_opens() {
+    let machine = Machine::with_grants(&["~/notes"]);
+    std::fs::create_dir_all(machine.home.join("notes/sub")).expect("mkdir");
+    assert!(machine.approves("jj -R ~/notes/sub new"));
+    assert!(machine.approves("cd ~/notes/sub && jj new"));
+}
+
+#[test]
+fn a_session_working_below_the_trust_root_keeps_its_own_repository() {
+    let machine = Machine::with_grants(&[]);
+    let hooks = machine.home.join(".claude/hooks");
+    std::fs::create_dir_all(&hooks).expect("mkdir");
+    let hooks = hooks.to_str().expect("utf-8 path");
+    assert!(machine.approves_in(hooks, "jj new"));
+    assert!(!machine.approves_in(hooks, "jj -R ~/.claude new"));
+}
