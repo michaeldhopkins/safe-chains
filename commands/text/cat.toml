@@ -1,7 +1,8 @@
 [[command]]
 name = "cat"
 aliases = ["gcat"]
-description = "Concatenates files and writes to stdout. Purely read-only: reads input files sequentially and never modifies them. Output destination is controlled by shell redirection, not by cat itself. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
+description = "Concatenates files and writes them to stdout. Observe-only: it opens each operand for reading in order (`-` is standard input) and never modifies, creates or deletes anything; where the output goes is decided by the shell, not by cat. Every operand is a content read, so what it exposes depends on which file is named: a credential file such as a private key is read in full and shown to whoever holds the output, and a FIFO or device operand can block. It runs no code and makes no network connection of its own, and the formatting flags (-n, -b, -s, -v, -E, -T, -A, -e, -t) only change how bytes are displayed. -u is ignored. Part of GNU coreutils (9.12), which has a stable release cadence of a few releases a year; the cat interface has been unchanged for decades, and BSD cat adds only -l (a lock) and lacks the long options and GNU's -A, -E and -T."
+researched_version = "GNU coreutils 9.12"
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation"
 level = "Inert"
 bare = true
@@ -10,7 +11,8 @@ standalone = [
     "--help", "--number", "--number-nonblank", "--show-all", "--show-ends",
     "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--version",
 ]
-examples_safe = ["cat README.md", "cat src/main.rs", "cat ./notes.txt"]
+examples_safe = ["cat README.md", "cat src/main.rs", "cat ./notes.txt", "cat -n ./a.txt ./b.txt", "cat --show-all ./log.txt", "cat --version"]
+examples_denied = ["cat ~/.ssh/id_rsa", "cat --bogus ./a.txt", "cat -z ./a.txt"]
 
 # Declarative facet behavior: cat OBSERVES each positional (a read whose content flows to the
 # model), gated per-operand by locus so `cat ~/.ssh/id_rsa` denies. No network, exec, or

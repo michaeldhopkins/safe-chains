@@ -44,7 +44,6 @@ dbt debug	--config-dir
 dbt init	--profiles-dir
 depcruise	--config
 doggo	--cookie
-earthly ls	--args
 erb_lint	--fail-level
 errcheck	--exclude
 eza	--context

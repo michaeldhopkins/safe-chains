@@ -39,6 +39,7 @@
 - **about**: Flags: --help, --version, -V, -h. Valued: --color, -L
 - **audit**: Flags: --deny, --help, --json, --no-fetch, --stale, -h, -n, --quiet, -q, -v. Valued: --color, --db, --file, --ignore, --target-arch, --target-os, -f
 - **bench**: Flags: --all, --workspace, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **binstall**
 - **bloat**: Flags: --crates, --filter, --help, --lib, --no-default-features, --release, --time, --wide, -h. Valued: --bin, --example, --features, --jobs, --manifest-path, --message-format, --package, --target, -j, -n, -p
 - **build**: Flags: --all, --workspace, --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **check**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
@@ -55,7 +56,7 @@
 - **fuzz**: Flags: --help, --version, -V, -h
 - **geiger**: Flags: --all, --all-dependencies, --all-features, --all-targets, --build-dependencies, --dev-dependencies, --forbid-only, --frozen, --help, --include-tests, --invert, --locked, --no-default-features, --no-indent, --offline, --prefix-depth, --quiet, --verbose, --version, -V, -a, -f, -h, -i, -q, -v. Valued: --color, --features, --format, --manifest-path, --output-format, --package, --section-name, --target, -Z, -p
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
-- **help**: Positional args accepted
+- **help**: Flags: --frozen, --help, --locked, --offline, --quiet, --verbose, -h, -q, -v. Valued: --color
 - **info**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --index, --registry
 - **init**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --edition, --name, --registry, --vcs, -Z
 - **install**: Flags: --all-features, --bins, --debug, --force, --frozen, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-track, --offline, --quiet, --timings, --verbose, -f, -h, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --message-format, --path, --profile, --root, --target, --target-dir, -F, -Z, -j
@@ -96,7 +97,7 @@
 - **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --manifest-path, --package, --precise, -p
 - **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --sync, -Z, -s
 - **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
-- **version**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --frozen, --help, --locked, --offline, --quiet, --verbose, -h, -q, -v. Valued: --color
 - **vet check**: Flags: --help, -h
 - **vet dump-graph**: Flags: --help, -h. Valued: --depth
 - **vet explain-audit**: Flags: --help, -h. Valued: --criteria
@@ -130,6 +131,10 @@
 - `cargo fmt --manifest-path ./crates/core/Cargo.toml`
 - `cargo about --version`
 - `cargo about --help`
+- `cargo help build`
+- `cargo help --quiet test`
+- `cargo version`
+- `cargo version --verbose`
 - `cargo about generate about.hbs`
 - `cargo swift --version`
 - `cargo swift package --help`

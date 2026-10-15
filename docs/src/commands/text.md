@@ -54,6 +54,9 @@ Aliases: `gcat`
 - `cat README.md`
 - `cat src/main.rs`
 - `cat ./notes.txt`
+- `cat -n ./a.txt ./b.txt`
+- `cat --show-all ./log.txt`
+- `cat --version`
 
 ### `col`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/col.1.html">https://man7.org/linux/man-pages/man1/col.1.html</a></p>

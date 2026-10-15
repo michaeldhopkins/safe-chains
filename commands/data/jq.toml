@@ -1,17 +1,34 @@
 [[command]]
 name = "jq"
-description = "Lightweight JSON processor. Pure data transformation — reads JSON, applies filters, writes to stdout. No flag causes side effects. The filter language is Turing-complete but has no I/O primitives, so arbitrary jq programs are safe. Stable and slow-moving; flag coverage is essentially complete."
-url = "https://jqlang.github.io/jq/manual/"
+description = "Command-line JSON processor. Observe-and-transform: it reads JSON from standard input or from the file operands, runs a filter and writes the result to stdout (or stderr, through debug, stderr and halt_error); the jq language has no function that writes a file, runs a program or opens a socket. The reads are the exposure. Every file operand is a content read, so a credential file named as an operand is shown whole. -f/--from-file reads the filter itself from a file, --rawfile and --slurpfile read a named file into a variable, and -L/--library-path (and the default search path, ~/.jq) lets import and include load module and data files from a directory; an import's own search metadata can name any directory, so a filter held in a file can load any .json file it can name. The process environment is readable from inside a filter through env and $ENV, which is an exposure when it holds secrets. --arg and --argjson only bind a value, --args and --jsonargs turn the trailing operands into strings or JSON values rather than files, and --run-tests reads and runs a test file. No network of its own. Releases are irregular (1.8.0 in mid-2025, 1.8.1 in July 2025, 1.8.2 in June 2026), and the recent patch releases are almost all memory-safety fixes found by fuzzing a parser and evaluator that take untrusted input, so an old binary is the risk and not the flag surface, which has been stable."
+url = "https://jqlang.org/manual/"
+researched_version = "jq 1.8.2 (2026-06-20)"
 level = "Inert"
 bare = true
 standalone = [
-    "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--help",
-    "--join-output", "--monochrome-output", "--null-input", "--raw-input",
-    "--raw-output", "--raw-output0", "--seq", "--slurp", "--sort-keys", "--tab", "--version",
-    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-g", "-h", "-j", "-n", "-r", "-s",
+    "--args", "--ascii-output", "--binary", "--build-configuration", "--color-output", "--compact-output",
+    "--exit-status", "--from-file", "--help", "--join-output", "--jsonargs", "--monochrome-output", "--null-input",
+    "--raw-input", "--raw-output", "--raw-output0", "--seq", "--slurp", "--sort-keys", "--stream",
+    "--stream-errors", "--tab", "--unbuffered", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-a", "-b", "-c", "-e", "-f", "-g", "-h", "-j", "-n", "-r", "-s",
 ]
 valued = [
-    "--arg", "--argjson", "--args", "--from-file",
-    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
-    "-f",
+    "--arg", "--argjson", "--indent", "--rawfile", "--slurpfile",
+]
+examples_safe = [
+    "jq . ./data.json",
+    "jq -r .name ./package.json",
+    "jq -c '.items[] | select(.ok)' ./data.json",
+    "jq -n '[1,2,3] | add'",
+    "jq --arg k v . ./data.json",
+    "jq --stream -c . ./data.json",
+    "jq --args -n null a b",
+]
+examples_denied = [
+    "jq . ~/.ssh/id_rsa",
+    "jq -f ~/.ssh/id_rsa .",
+    "jq --rawfile k ~/.ssh/id_rsa -n null",
+    "jq --from-file ~/.aws/credentials .",
+    "jq --run-tests ./tests.json",
+    "jq -L ~/modules -n 'include \"m\"; f'",
 ]

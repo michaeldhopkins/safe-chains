@@ -1,7 +1,8 @@
 [[command]]
 name = "cargo"
-description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. `--manifest-path DIR/Cargo.toml` points any of these at a DIFFERENT project, so it selects whose code runs. The `--config KEY=VALUE` flag sets arbitrary Cargo config on the command line, including code-execution keys like `target.<cfg>.runner`, `build.rustc-wrapper`, and `[alias]` shell escapes — it is a general command-injection surface, so it is not exposed here (use `.cargo/config.toml` instead). install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust edition (roughly every 6 weeks) and frequently adds new flags."
+description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. `--manifest-path DIR/Cargo.toml` points any of these at a DIFFERENT project, so it selects whose code runs. The `--config KEY=VALUE` flag sets arbitrary Cargo config on the command line, including code-execution keys like `target.<cfg>.runner`, `build.rustc-wrapper`, and `[alias]` shell escapes — it is a general command-injection surface, so it is not exposed here (use `.cargo/config.toml` instead). install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust release (every 6 weeks) and frequently adds new flags. `cargo help NAME` shows a manual page through man (and so whatever MANPAGER names), and for a NAME that is not built in it runs the external `cargo-NAME --help` found on PATH; a one-word alias in project config is expanded first, so `cargo help NAME` can run `cargo-<alias target> --help`; `cargo version` only prints. Among third-party plugins, `cargo binstall` downloads prebuilt executables from GitHub Releases or the quickinstall host and installs them into the cargo bin directory, and `cargo watch` (in maintenance mode since its last release in 2024) re-runs cargo commands or arbitrary shell commands on every file change."
 url = "https://doc.rust-lang.org/cargo/commands/"
+researched_version = "Rust 1.99.0 / cargo 0.100.0 (2026-10-01)"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
   "cargo fuzz --version",
@@ -28,6 +29,10 @@ examples_safe = [
   "cargo fmt --manifest-path ./crates/core/Cargo.toml",
   "cargo about --version",
   "cargo about --help",
+  "cargo help build",
+  "cargo help --quiet test",
+  "cargo version",
+  "cargo version --verbose",
   "cargo about generate about.hbs",
   "cargo swift --version",
   "cargo swift package --help",
@@ -79,6 +84,10 @@ examples_denied = [
   "cargo run --config target.x86_64-unknown-linux-gnu.runner='sh -c evil'",
   "cargo build --config build.rustc-wrapper=/tmp/evil",
   "cargo swift package --platforms ios macos",
+  "cargo help --config build.rustc-wrapper=/tmp/evil",
+  "cargo version --bogus",
+  "cargo binstall ripgrep",
+  "cargo watch -x check",
 ]
 
 # `cargo +nightly test` picks WHICH rustup toolchain runs `test`; it does not change what `test`
@@ -289,8 +298,8 @@ valued = ["--manifest-path", "--message-format", "--package", "-p"]
 name = "help"
 level = "Inert"
 max_positional = 1
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = ["--frozen", "--help", "--locked", "--offline", "--quiet", "--verbose", "-h", "-q", "-v"]
+valued = ["--color"]
 
 [[command.sub]]
 name = "info"
@@ -726,8 +735,8 @@ valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "version"
-standalone = ["--help", "-h"]
-tolerate_unknown_short = true
+standalone = ["--frozen", "--help", "--locked", "--offline", "--quiet", "--verbose", "-h", "-q", "-v"]
+valued = ["--color"]
 
 [[command.sub]]
 name = "bloat"
@@ -1050,7 +1059,22 @@ candidate = true
 
 [[command.sub]]
 name = "binstall"
-candidate = true
+profile = "supply-chain-build"
+fact = "cargo-binstall is a drop-in for `cargo install` that downloads prebuilt binaries for the crate from GitHub Releases or the third-party quickinstall host (verifying signatures only when the crate declares them), installs them into the cargo bin directory, and falls back to compiling from source."
+source = "https://github.com/cargo-bins/cargo-binstall (README, v1.25.3, 2026-10-10)"
+judgment = "Network-fetched executables are installed and later run, with a source-build fallback that runs build scripts: the supply-chain install surface, not auto-approved."
+standalone = [
+    "--continue-on-failure", "--disable-telemetry", "--dry-run", "--force", "--help", "--json-output",
+    "--list", "--locked", "--no-cleanup", "--no-confirm", "--no-discover-github-token", "--no-symlinks",
+    "--no-track", "--only-signed", "--prune", "--quiet", "--skip-signatures", "--verbose",
+    "-V", "-h", "-q", "-v", "-y",
+]
+valued = [
+    "--bin", "--bin-dir", "--disable-strategies", "--dns", "--features", "--git", "--index", "--install-path",
+    "--log-level", "--manifest-path", "--maximum-resolution-timeout", "--min-tls-version", "--pkg-fmt",
+    "--pkg-url", "--rate-limit", "--registry", "--root", "--settings", "--strategies", "--target",
+    "--targets", "--version",
+]
 
 
 # `max_positional` is a SAFETY bound here, not tidiness. `cmin` minifies a corpus by rewriting the

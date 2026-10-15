@@ -186,10 +186,9 @@ cal	description,examples,version
 cancel	description,examples
 cap	description,examples,no-tolerance,profiled
 cap_mkdb	description,examples
-cargo	no-tolerance,profiled,version
+cargo	profiled
 carton	examples,no-tolerance,profiled
 cast	description,examples,no-tolerance,profiled
-cat	description,examples,version
 cc_fips_test	description,examples
 cdk	no-tolerance,profiled
 certbot	examples,profiled
@@ -634,7 +633,6 @@ journalctl	examples,version
 jpegoptim	description,examples
 jpegtran	examples
 jpgicc	description,examples
-jq	description,examples,version
 json_pp	description,examples
 json_xs	description,examples
 jsonlint	description,examples
@@ -763,7 +761,6 @@ lpq	description,examples
 lpr	description,examples
 lprm	description,examples
 lpstat	examples
-ls	examples,version
 lsappinfo	description,examples,profiled
 lsblk	description,examples,version
 lsbom	description,examples
@@ -1012,7 +1009,6 @@ pdm	examples,version
 peco	examples,version
 pee	description,examples
 periphery	examples,version
-perl	description
 pest	examples,version
 pf2afm	description,examples
 pfbtopfa	description,examples

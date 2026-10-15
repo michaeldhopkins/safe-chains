@@ -3,6 +3,7 @@ name = "ls"
 aliases = ["gls", "gdir", "gvdir", "dir", "vdir"]
 description = "Lists directory contents and file metadata. Strictly read-only: reads directory entries and file attributes (permissions, timestamps, sizes), then prints formatted output to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface, though macOS and GNU versions have slightly different flag sets."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation"
+researched_version = "GNU coreutils 9.12"
 level = "Inert"
 bare = true
 standalone = [
@@ -21,6 +22,8 @@ standalone = [
     "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
     "-t", "-u", "-v", "-x",
 ]
+examples_safe = ["ls", "ls -la ./src", "ls -R ./src", "ls -lah --time-style=long-iso ./src", "ls --color=always --group-directories-first"]
+examples_denied = ["ls --bogus", "ls --dired ./src", "ls -z ./src"]
 valued = [
     "--block-size", "--color", "--format", "--hide",
     "--hyperlink", "--ignore",

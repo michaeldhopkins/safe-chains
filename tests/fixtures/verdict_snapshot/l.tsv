@@ -2443,13 +2443,16 @@ ls --all x	inert
 ls --almost-all	inert
 ls --author	inert
 ls --block-size x	inert
+ls --bogus	denied
 ls --classify	inert
 ls --color x	inert
+ls --color=always --group-directories-first	inert
 ls --context	inert
 ls --dereference	inert
 ls --dereference-command-line	inert
 ls --dereference-command-line-symlink-to-dir	inert
 ls --directory	inert
+ls --dired ./src	denied
 ls --escape	inert
 ls --file-type	inert
 ls --format x	inert
@@ -2492,6 +2495,7 @@ ls -L	inert
 ls -N	inert
 ls -Q	inert
 ls -R	inert
+ls -R ./src	inert
 ls -S	inert
 ls -T x	inert
 ls -U	inert
@@ -2508,6 +2512,8 @@ ls -i	inert
 ls -k	inert
 ls -l	inert
 ls -la	inert
+ls -la ./src	inert
+ls -lah --time-style=long-iso ./src	inert
 ls -m	inert
 ls -n	inert
 ls -o	inert
@@ -2520,6 +2526,7 @@ ls -u	inert
 ls -v	inert
 ls -w x	inert
 ls -x	inert
+ls -z ./src	denied
 ls 1>| out.txt	safe-write
 ls 2> errors.txt	safe-write
 ls 2>&1	inert

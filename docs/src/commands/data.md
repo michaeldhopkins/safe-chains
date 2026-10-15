@@ -92,11 +92,21 @@ Aliases: `gexpr`
 - Allowed valued flags: --mode, --scrolloff
 
 ### `jq`
-<p class="cmd-url"><a href="https://jqlang.github.io/jq/manual/">https://jqlang.github.io/jq/manual/</a></p>
+<p class="cmd-url"><a href="https://jqlang.org/manual/">https://jqlang.org/manual/</a></p>
 
-- Allowed standalone flags: --ascii-output, --color-output, --compact-output, --exit-status, --help, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -g, -h, -j, -n, -r, -s
-- Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
+- Allowed standalone flags: --args, --ascii-output, --binary, --build-configuration, --color-output, --compact-output, --exit-status, --from-file, --help, --join-output, --jsonargs, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --stream, --stream-errors, --tab, --unbuffered, --version, -C, -M, -R, -S, -V, -a, -b, -c, -e, -f, -g, -h, -j, -n, -r, -s
+- Allowed valued flags: --arg, --argjson, --indent, --rawfile, --slurpfile
 - Bare invocation allowed
+
+**Examples:**
+
+- `jq . ./data.json`
+- `jq -r .name ./package.json`
+- `jq -c '.items[] | select(.ok)' ./data.json`
+- `jq -n '[1,2,3] | add'`
+- `jq --arg k v . ./data.json`
+- `jq --stream -c . ./data.json`
+- `jq --args -n null a b`
 
 ### `mlr`
 <p class="cmd-url"><a href="https://miller.readthedocs.io/">https://miller.readthedocs.io/</a></p>

@@ -243,6 +243,14 @@ Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
 - Bare invocation allowed
 
+**Examples:**
+
+- `ls`
+- `ls -la ./src`
+- `ls -R ./src`
+- `ls -lah --time-style=long-iso ./src`
+- `ls --color=always --group-directories-first`
+
 ### `lsbom`
 <p class="cmd-url"><a href="https://ss64.com/mac/lsbom.html">https://ss64.com/mac/lsbom.html</a></p>
 

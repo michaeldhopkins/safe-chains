@@ -2396,47 +2396,67 @@ jpgicc -x	safe-write
 jpgicc x	safe-write
 jq	inert
 jq '.key' file.json	inert
+jq --arg k v . ./data.json	inert
 jq --arg x	inert
 jq --argjson x	inert
+jq --args	inert
+jq --args --arg x	inert
+jq --args --ascii-output	inert
+jq --args -n null a b	inert
 jq --args x	inert
 jq --ascii-output	inert
-jq --ascii-output --arg x	inert
-jq --ascii-output --color-output	inert
-jq --ascii-output x	inert
+jq --binary	inert
+jq --build-configuration	inert
 jq --color-output	inert
 jq --compact-output	inert
 jq --exit-status	inert
-jq --from-file x	inert
+jq --from-file	inert
+jq --from-file ~/.aws/credentials .	denied
 jq --help	inert
 jq --indent x	inert
 jq --join-output	inert
-jq --jsonargs x	inert
+jq --jsonargs	inert
 jq --monochrome-output	inert
 jq --null-input	inert
 jq --raw-input	inert
 jq --raw-output	inert
 jq --raw-output0	inert
+jq --rawfile k ~/.ssh/id_rsa -n null	denied
 jq --rawfile x	inert
+jq --run-tests ./tests.json	denied
 jq --seq	inert
 jq --slurp	inert
 jq --slurpfile x	inert
 jq --sort-keys	inert
+jq --stream	inert
+jq --stream -c . ./data.json	inert
+jq --stream-errors	inert
 jq --tab	inert
+jq --unbuffered	inert
 jq --version	inert
 jq -C	inert
+jq -L ~/modules -n 'include "m"; f'	denied
 jq -M	inert
 jq -R	inert
 jq -S	inert
 jq -V	inert
+jq -a	inert
+jq -b	inert
 jq -c	inert
+jq -c '.items[] | select(.ok)' ./data.json	inert
 jq -e	inert
-jq -f x	inert
+jq -f	inert
+jq -f ~/.ssh/id_rsa .	denied
 jq -g	inert
 jq -h	inert
 jq -j	inert
 jq -n	inert
+jq -n '[1,2,3] | add'	inert
 jq -r	inert
+jq -r .name ./package.json	inert
 jq -s	inert
+jq . ./data.json	inert
+jq . ~/.ssh/id_rsa	denied
 jq x	inert
 json_pp	inert
 json_pp --help	denied

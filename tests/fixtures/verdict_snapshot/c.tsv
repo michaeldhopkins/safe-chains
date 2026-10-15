@@ -600,6 +600,55 @@ cargo bench -q	safe-read
 cargo bench -v	safe-read
 cargo bench x	safe-read
 cargo binstall	denied
+cargo binstall --bin x	denied
+cargo binstall --bin-dir x	denied
+cargo binstall --continue-on-failure	denied
+cargo binstall --continue-on-failure --bin x	denied
+cargo binstall --continue-on-failure --disable-telemetry	denied
+cargo binstall --continue-on-failure x	denied
+cargo binstall --disable-strategies x	denied
+cargo binstall --disable-telemetry	denied
+cargo binstall --dns x	denied
+cargo binstall --dry-run	denied
+cargo binstall --features x	denied
+cargo binstall --force	denied
+cargo binstall --git x	denied
+cargo binstall --help	denied
+cargo binstall --index x	denied
+cargo binstall --install-path x	denied
+cargo binstall --json-output	denied
+cargo binstall --list	denied
+cargo binstall --locked	denied
+cargo binstall --log-level x	denied
+cargo binstall --manifest-path x	denied
+cargo binstall --maximum-resolution-timeout x	denied
+cargo binstall --min-tls-version x	denied
+cargo binstall --no-cleanup	denied
+cargo binstall --no-confirm	denied
+cargo binstall --no-discover-github-token	denied
+cargo binstall --no-symlinks	denied
+cargo binstall --no-track	denied
+cargo binstall --only-signed	denied
+cargo binstall --pkg-fmt x	denied
+cargo binstall --pkg-url x	denied
+cargo binstall --prune	denied
+cargo binstall --quiet	denied
+cargo binstall --rate-limit x	denied
+cargo binstall --registry x	denied
+cargo binstall --root x	denied
+cargo binstall --settings x	denied
+cargo binstall --skip-signatures	denied
+cargo binstall --strategies x	denied
+cargo binstall --target x	denied
+cargo binstall --targets x	denied
+cargo binstall --verbose	denied
+cargo binstall --version x	denied
+cargo binstall -V	denied
+cargo binstall -h	denied
+cargo binstall -q	denied
+cargo binstall -v	denied
+cargo binstall -y	denied
+cargo binstall ripgrep	denied
 cargo binstall x	denied
 cargo bloat	safe-write
 cargo bloat --bin x	safe-write
@@ -1099,6 +1148,22 @@ cargo generate-lockfile -q	safe-write
 cargo generate-lockfile -v	safe-write
 cargo generate-lockfile x	safe-write
 cargo help	inert
+cargo help --color x	inert
+cargo help --config build.rustc-wrapper=/tmp/evil	denied
+cargo help --frozen	inert
+cargo help --frozen --color x	inert
+cargo help --frozen --help	inert
+cargo help --frozen x	inert
+cargo help --help	inert
+cargo help --locked	inert
+cargo help --offline	inert
+cargo help --quiet	inert
+cargo help --quiet test	inert
+cargo help --verbose	inert
+cargo help -h	inert
+cargo help -q	inert
+cargo help -v	inert
+cargo help build	inert
 cargo help x	inert
 cargo info	denied
 cargo info --color x	inert
@@ -2139,10 +2204,20 @@ cargo verify-project -q	inert
 cargo verify-project -v	inert
 cargo verify-project x	inert
 cargo version	inert
+cargo version --bogus	denied
+cargo version --color x	inert
+cargo version --frozen	inert
+cargo version --frozen --color x	inert
+cargo version --frozen --help	inert
+cargo version --frozen x	inert
 cargo version --help	inert
-cargo version --help -h	inert
-cargo version --help x	inert
+cargo version --locked	inert
+cargo version --offline	inert
+cargo version --quiet	inert
+cargo version --verbose	inert
 cargo version -h	inert
+cargo version -q	inert
+cargo version -v	inert
 cargo version x	inert
 cargo vet	denied
 cargo vet --cache-dir x	denied
@@ -2200,6 +2275,7 @@ cargo vet suggest -h	safe-read
 cargo vet suggest x	safe-read
 cargo vet x	denied
 cargo watch	denied
+cargo watch -x check	denied
 cargo watch x	denied
 cargo x	denied
 carton	denied
@@ -2428,12 +2504,14 @@ cast wallet x	denied
 cast x	denied
 cat	inert
 cat $(echo /etc/shadow)	denied
+cat --bogus ./a.txt	denied
 cat --help	inert
 cat --help --number	inert
 cat --help x	safe-read
 cat --number	inert
 cat --number-nonblank	inert
 cat --show-all	inert
+cat --show-all ./log.txt	safe-read
 cat --show-ends	inert
 cat --show-nonprinting	inert
 cat --show-tabs	inert
@@ -2448,10 +2526,12 @@ cat -e	inert
 cat -h	denied
 cat -l	denied
 cat -n	inert
+cat -n ./a.txt ./b.txt	safe-read
 cat -s	inert
 cat -t	inert
 cat -u	inert
 cat -v	inert
+cat -z ./a.txt	denied
 cat ./notes.txt	safe-read
 cat 3< /etc/shadow	denied
 cat < $(echo /etc/shadow)	denied
@@ -2478,6 +2558,7 @@ cat file.txt	safe-read
 cat s3://../../.ssh/id_rsa	denied
 cat src/main.rs	safe-read
 cat x	safe-read
+cat ~/.ssh/id_rsa	denied
 cc	denied
 cc --help	inert
 cc --help --version	inert
