@@ -103,12 +103,12 @@ the schema that carries it.
 |---|---|---|
 | ~~1~~ | ~~Optional-value flags have no representation~~ — **DONE**, `optional_valued` | "Support OPTIONAL-VALUE flags by design" |
 | ~~2~~ | ~~A valued flag mismodelled as `standalone`~~ — **DONE**: enumerated and ratcheted for long flags (cross-tool) and short flags (within one command, and short spellings of gated flags). The rows are per-command research now, not mechanism | "A valued flag mismodelled as `standalone`…" |
-| 3 | The `standalone`+`valued` overlap audit — unblocked by #1. **Measured: 233 scopes, 1527 (scope,flag) pairs, 869 distinct flags** — and the bulk is short flags. Sort them, then make a raw overlap a build error | "The `standalone` + `valued` overlap audit" |
+| 3 | The `standalone`+`valued` overlap audit — **the build error is BUILT** (2026-10-15): a new overlap fails `a_flag_is_never_both_standalone_and_valued_in_one_scope`, and the 1,443 that remain are pinned in a shrink-only worklist. Sorting them is per-tool research that moves flags toward approval, so it waits on the owner's choice of how to run it | "The `standalone` + `valued` overlap audit" |
 | 4 | Command MODES: the schema says one behaviour per command, but behaviour varies by flag. Four mechanisms each express a sliver | "Command MODES — design written, not built" |
 | ~~5~~ | ~~`[command.output]` cannot describe a command that prints a path to somewhere else~~ — **CLOSED as not buildable.** A locus-only claim can never clear a NAME-based shield, so both candidate forms (`which`/`bundle show`, `git rev-parse --show-toplevel`) are fail-opens. Needs a which-FILES claim or harness ground truth, neither of which is a `locus_from` variant | "RESEARCHED, not doing: binding `$(which X)`…" |
 
-#3 is next. #2's worklists visit the same scopes, so a scope sorted for #3 is the
-moment to resolve its arity rows too.
+#3's guard is built; its worklist is sorted a tool at a time. #2's worklists visit the same
+scopes, so a scope sorted for #3 is the moment to resolve its arity rows too.
 
 **The short glued form (`-r0`) is still not expressible** and was left that way
 deliberately: the closed value sets that need it are better enumerated
@@ -1364,7 +1364,40 @@ REMAINING for (b), in the order they should be taken:
     basis rather than left unfinished by accident. The design doc now carries the measured table, so
     the next person re-derives the list instead of trusting it.
 
-## The `standalone` + `valued` overlap audit (blocked on the above)
+## The `standalone` + `valued` overlap audit — guard BUILT, sort in progress
+
+**BUILT 2026-10-15.** `registry/overlap_tests.rs`: a flag in both lists of one scope (command,
+nested sub, fallback, `handler_policy`, `behavior`, `wrapper`) fails the build unless it is pinned
+in `tests/fixtures/standalone_valued_overlap.tsv`, which may only shrink. It also walks the
+`first_arg` grammars, `loopback_valued` lists and `verb_chain` main flags, none of which overlaps
+today. Three properties pin the mechanism under it: a built policy lists a flag twice only when it
+is declared `optional_valued` or overlaps, and disjoint declarations give each long flag and each
+short letter (spaced, glued and in a cluster) exactly one arity. Red-demoed both ways.
+
+**The measurement below was off.** Re-measured over the command, sub, fallback, policy, behavior
+and wrapper scopes: 1,517 pairs in 245 scopes, 862 distinct flags, and **936 of the pairs are LONG flags**, not short. Most of the bulk is whole
+`valued` lists copied into `standalone` (wget 74, aria2c 72, pandoc 53, fossil 50, msbuild 45,
+rsync 41), not attempts at an optional value.
+
+**First batch: wget** (74 pairs), sorted from the option table in wget's `src/main.c`: every
+`OPT_VALUE` option is `required_argument`, so `valued` only; `OPT_BOOLEAN` long options take an
+optional `=on/off`, so `--cookies` and `--restrict-file-names` are `optional_valued`. Spaced and
+`=` forms kept their verdicts; a glued short cluster now reads as getopt does (`wget -aO F URL`
+logs to `./O`, approved where it was refused). Sorting it exposed live holes the overlap had
+nothing to do with: `-a`, `--rejected-log` and `--hsts-file` wrote anywhere, six file-reading
+flags were ungated, `--use-askpass PROGRAM` was approved because it sat in `standalone` (now
+refused), and `--warc-dedup FILE`, `--egd-file`, `--level`, `--private-key-type` and `-Y` were
+OPT_VALUE options declared boolean (now valued, the two files gated as reads). Fixed.
+Expect the same per tool: reading the option table finds the gates as well as the arity.
+
+**Why the rest is not a mechanical sweep.** Measured by building the registry with every overlap
+moved to `valued` and classifying `<scope> <flag> VALUE`, `VALUE ./x`, and the glued short form
+against six values (benign, worktree, `~/.ssh/id_rsa`, `/etc/passwd`, `/tmp/evil.sh`,
+`~/.bashrc`): 1,139 of 20,862 verdicts went from deny to allow, none the other way. 978 are glued
+short forms (`-ofile`, refused today because the cluster walk reads the letter as a boolean). The
+spaced forms that changed include `task -d DIR` and `task -t FILE`, which run a Taskfile from
+anywhere, so a blanket move would open real holes. Each tool needs its option table read and its
+file-valued flags given roles, and each such resolution is a loosening that needs review.
 
 Promoted 2026-08-04 out of the "FIFTH PASS" narrative above, where it was easy to miss.
 
@@ -1392,8 +1425,8 @@ already (see the corrected section above), so this migration is about making int
 letting the build reject the real typos — not about fixing live wrong answers. The exception is the
 opposite error, a valued flag declared ONLY in `standalone`, which IS live and is the next section.
 
-Still do NOT write a guard against the raw ambiguity until the sort is done: before then it cannot
-distinguish a typo from an optional-value flag, which is exactly what the sort decides.
+The guard was written before the sort after all, as a ratchet: it does not judge the pinned rows,
+it only refuses new ones, so it encodes no convention beyond "say which of the three it is".
 
 ## A valued flag mismodelled as `standalone` defeats every flag gate — DONE (enumerated, ratcheted)
 
