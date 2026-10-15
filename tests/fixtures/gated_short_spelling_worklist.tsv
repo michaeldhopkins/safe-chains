@@ -20,6 +20,9 @@
 # Seeded 2026-10-14 with 85 rows. `hugo -c` is --contentDir, `-l` --layoutDir and `-t` --theme, so their rows
 # are right as listed.
 #
+# wget's rows are checked against its option table: -c is --continue, -d --debug, -e --execute,
+# -h --help, -l --level, -p --page-requisites, -r --recursive, -w --wait; the table has no -s.
+#
 # FORMAT: <command>\t<short flag>\t<gated long flag>
 aria2c	-i	--input-file
 as	-M	--MD
@@ -75,8 +78,10 @@ wget	-p	--post-file
 wget	-s	--save-cookies
 wget	-w	--warc-file
 wget	-w	--warc-tempdir
+wget	-w	--warc-dedup
 wget	-c	--certificate
 wget	-c	--crl-file
+wget	-e	--egd-file
 wget	-h	--hsts-file
 wget	-l	--load-cookies
 wget	-p	--private-key

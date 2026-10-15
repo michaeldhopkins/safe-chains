@@ -1351,7 +1351,7 @@ wget --dns-servers x	safe-write
 wget --dns-timeout x	safe-write
 wget --domains x	safe-write
 wget --dont-remove-listing	safe-write
-wget --egd-file	safe-write
+wget --egd-file x	safe-write
 wget --exclude-directories x	safe-write
 wget --exclude-domains x	safe-write
 wget --execute x	denied
@@ -1382,7 +1382,7 @@ wget --input-file x	denied
 wget --input-metalink x	safe-write
 wget --keep-badhash	safe-write
 wget --keep-session-cookies	safe-write
-wget --level	safe-write
+wget --level x	safe-write
 wget --limit-rate x	safe-write
 wget --load-cookies x	safe-write
 wget --load-cookies ~/.ssh/id_rsa https://example.com	denied
@@ -1424,7 +1424,7 @@ wget --preferred-location x	safe-write
 wget --preserve-permissions	safe-write
 wget --private-key x	safe-write
 wget --private-key ~/.ssh/id_rsa https://example.com	denied
-wget --private-key-type	safe-write
+wget --private-key-type x	safe-write
 wget --progress x	safe-write
 wget --protocol-directories	safe-write
 wget --proxy	safe-write
@@ -1463,7 +1463,7 @@ wget --timeout x	safe-write
 wget --timestamping	safe-write
 wget --tries x	safe-write
 wget --unlink	safe-write
-wget --use-askpass	safe-write
+wget --use-askpass /tmp/evil.sh https://example.com	denied
 wget --use-server-timestamps	safe-write
 wget --user x	safe-write
 wget --user-agent x	safe-write
@@ -1472,7 +1472,8 @@ wget --version	safe-write
 wget --wait x	safe-write
 wget --waitretry x	safe-write
 wget --warc-cdx	safe-write
-wget --warc-dedup	safe-write
+wget --warc-dedup x	safe-write
+wget --warc-dedup ~/.ssh/id_rsa --warc-file=./w https://example.com	denied
 wget --warc-file x	safe-write
 wget --warc-file=~/.ssh/id_rsa http://x	denied
 wget --warc-header x	safe-write
@@ -1503,7 +1504,7 @@ wget -T x	safe-write
 wget -U x	safe-write
 wget -V	safe-write
 wget -X x	safe-write
-wget -Y	safe-write
+wget -Y x	safe-write
 wget -Z	safe-write
 wget -a ./wget.log https://example.com	safe-write
 wget -a x	safe-write
