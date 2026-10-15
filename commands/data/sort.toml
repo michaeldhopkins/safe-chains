@@ -2,7 +2,8 @@
 writes_cwd = "named"
 name = "sort"
 aliases = ["gsort"]
-description = "Sorts lines of text from stdin or files according to various orderings (lexicographic, numeric, month, version, random), writing to stdout. May create temporary files in the directory specified by -T during large sorts, but does not modify input files. No network access and no ability to execute commands. Ships with GNU coreutils and macOS."
+description = "Sorts lines from its inputs into stdout. Without -o it observes: it opens each operand for reading (`-` is standard input) and writes only to stdout, and a credential file named as an operand is read in full and its lines shown. Several flags reach beyond that: -o and --output write the result to a named file, which can create or overwrite any file the user may write, irreversibly; --compress-program runs a named program on temporary files, which is arbitrary execution; --files0-from reads the operand list from a second file, so the files read cannot be known from the command line; --random-source reads a file for randomness. Large inputs spill to temporary files in $TMPDIR or the -T directory, removed on exit. It makes no network connection. Part of GNU coreutils (9.12), which has a stable release cadence of a few releases a year; the sort interface is stable. macOS ships its own sort (2.3-Apple) with the same ordering flags and -o, but not every GNU long option."
+researched_version = "GNU coreutils 9.12"
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation"
 level = "Inert"
 bare = true
@@ -18,10 +19,12 @@ standalone = [
 ]
 valued = [
     "--batch-size", "--buffer-size", "--field-separator",
-    "--files0-from", "--key", "--parallel",
+    "--key", "--parallel",
     "--random-source", "--sort", "--temporary-directory",
     "-S", "-T", "-k", "-t",
 ]
+examples_safe = ["sort ./a.txt", "sort -u -k2,2 ./a.txt", "sort -t: -k3 -n ./a.txt", "sort -rh ./sizes.txt", "sort --check ./a.txt", "sort --version"]
+examples_denied = ["sort -o ./a.txt ./a.txt", "sort --output=./a.txt ./a.txt", "sort --compress-program=sh ./a.txt", "sort --files0-from=list.txt", "sort ~/.ssh/id_rsa"]
 
 # Sorting reorders the piped lines without inventing new ones, so stdout is a permutation of the
 # input and carries that stage's locus — `$(fd … | sort | head -1)`. The invalidating flags are the

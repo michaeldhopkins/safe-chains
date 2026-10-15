@@ -85,7 +85,6 @@ create-vite
 csplit
 ctf_insert
 cucumber
-cut
 cwebp
 danetool
 debinhex.pl
@@ -329,7 +328,6 @@ shazam
 shred
 shuf
 solc
-sort
 sox
 sphinx-build
 spindump

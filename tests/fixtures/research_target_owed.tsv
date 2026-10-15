@@ -272,7 +272,6 @@ cucumber	description,examples,version
 cucumber-js	description,examples
 cupstestppd	description,examples
 curl	entry
-cut	description,examples,version
 cwebp	description,examples
 cx	examples,profiled
 danetool	examples
@@ -1278,7 +1277,6 @@ soelim	description,examples
 solana	description,examples,no-tolerance,profiled
 solc	description,examples,no-tolerance
 sops	profiled
-sort	examples,version
 sox	examples,no-tolerance
 spack	description,examples,no-tolerance,profiled
 specdiff	description,examples,version
@@ -1487,7 +1485,6 @@ wasmer	description,examples,no-tolerance,profiled
 wasmtime	description,no-tolerance,profiled
 wat2wasm	description,examples,no-tolerance
 watchexec	description,examples,version
-wc	description,examples,version
 wdiff	description,examples
 wdutil	description,examples,profiled
 weasyprint	description,examples,no-tolerance

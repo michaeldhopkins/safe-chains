@@ -1,15 +1,19 @@
 [[command]]
 name = "cut"
 aliases = ["gcut"]
-description = "Extracts sections (bytes, characters, or delimited fields) from each line of input. Purely read-only: reads input and writes selected portions to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
+description = "Extracts bytes, characters or delimited fields from each line of its inputs. Observe-only: it opens each operand for reading (`-` is standard input) and writes the selected parts to stdout, and never modifies, creates or deletes anything; where the output goes is decided by the shell. Every operand is a content read, so a credential file named as an operand is shown in part or whole to whoever holds the output, and a FIFO or device operand can block. It runs no code and makes no network connection, and every flag only chooses which parts are selected or how they are joined. Part of GNU coreutils (9.12), which has a stable release cadence of a few releases a year; 9.12 has -F, -O, -w and --whitespace-delimited, which older releases lack. BSD cut has only -b, -c, -d, -f, -n, -s and -w, and no long options."
+researched_version = "GNU coreutils 9.12"
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation"
 level = "Inert"
 bare = false
 standalone = [
-    "-V", "-h", "-n", "-s", "-w", "-z",
-    "--complement", "--help", "--only-delimited", "--version", "--zero-terminated",
+    "-n", "-s", "-w", "-z",
+    "--complement", "--help", "--no-partial", "--only-delimited", "--version",
+    "--whitespace-delimited", "--zero-terminated",
 ]
 valued = [
-    "-b", "-c", "-d", "-f",
+    "-F", "-O", "-b", "-c", "-d", "-f",
     "--bytes", "--characters", "--delimiter", "--fields", "--output-delimiter",
 ]
+examples_safe = ["cut -d: -f1 ./passwd.txt", "cut -c1-8 ./a.txt", "cut -f2,4 -s ./a.tsv", "cut -F1 -O, ./a.txt", "cut --complement -b1 ./a.bin", "cut --version"]
+examples_denied = ["cut -d: -f1 ~/.ssh/id_rsa", "cut --bogus ./a.txt"]

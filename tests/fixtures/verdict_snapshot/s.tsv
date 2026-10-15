@@ -5048,12 +5048,14 @@ sort --buffer-size x	inert
 sort --check	inert
 sort --check --batch-size x	inert
 sort --check --debug	inert
+sort --check ./a.txt	inert
 sort --check x	inert
+sort --compress-program=sh ./a.txt	denied
 sort --debug	inert
 sort --dictionary-order	inert
 sort --field-separator x	inert
 sort --field-separator=/ file.txt	inert
-sort --files0-from x	inert
+sort --files0-from=list.txt	denied
 sort --general-numeric-sort	inert
 sort --help	inert
 sort --human-numeric-sort	inert
@@ -5064,6 +5066,7 @@ sort --key x	inert
 sort --merge	inert
 sort --month-sort	inert
 sort --numeric-sort	inert
+sort --output=./a.txt ./a.txt	denied
 sort --parallel x	inert
 sort --random-sort	inert
 sort --random-source x	inert
@@ -5091,14 +5094,20 @@ sort -i	inert
 sort -k x	inert
 sort -m	inert
 sort -n	inert
+sort -o ./a.txt ./a.txt	denied
 sort -r	inert
+sort -rh ./sizes.txt	inert
 sort -s	inert
 sort -t x	inert
 sort -t/ -k1 file.txt	inert
+sort -t: -k3 -n ./a.txt	inert
 sort -u	inert
+sort -u -k2,2 ./a.txt	inert
 sort -z	inert
+sort ./a.txt	inert
 sort file.txt > /dev/null	inert
 sort x	inert
+sort ~/.ssh/id_rsa	denied
 sox	denied
 sox --add-comment x	safe-write
 sox --bits x	safe-write

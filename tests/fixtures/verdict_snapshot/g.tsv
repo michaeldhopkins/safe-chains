@@ -2167,16 +2167,18 @@ gcut --complement x	inert
 gcut --delimiter x	inert
 gcut --fields x	inert
 gcut --help	inert
+gcut --no-partial	inert
 gcut --only-delimited	inert
 gcut --output-delimiter x	inert
 gcut --version	inert
+gcut --whitespace-delimited	inert
 gcut --zero-terminated	inert
-gcut -V	inert
+gcut -F x	inert
+gcut -O x	inert
 gcut -b x	inert
 gcut -c x	inert
 gcut -d x	inert
 gcut -f x	inert
-gcut -h	inert
 gcut -n	inert
 gcut -s	inert
 gcut -w	inert
@@ -14037,7 +14039,6 @@ gsort --check x	inert
 gsort --debug	inert
 gsort --dictionary-order	inert
 gsort --field-separator x	inert
-gsort --files0-from x	inert
 gsort --general-numeric-sort	inert
 gsort --help	inert
 gsort --human-numeric-sort	inert
@@ -14490,20 +14491,19 @@ gvdir x	inert
 gwc	inert
 gwc --bytes	inert
 gwc --bytes --chars	inert
-gwc --bytes --files0-from x	denied
+gwc --bytes --total x	inert
 gwc --bytes x	safe-read
 gwc --chars	inert
-gwc --files0-from x	denied
+gwc --debug	inert
 gwc --help	inert
 gwc --lines	inert
 gwc --max-line-length	inert
+gwc --total x	inert
 gwc --version	inert
 gwc --words	inert
 gwc --zero-terminated	inert
 gwc -L	inert
-gwc -V	inert
 gwc -c	inert
-gwc -h	denied
 gwc -l	inert
 gwc -m	inert
 gwc -w	inert

@@ -866,26 +866,30 @@ watchexec -v	denied
 watchexec -w	denied
 watchexec x	denied
 wc	inert
+wc --bogus ./a.txt	denied
 wc --bytes	inert
 wc --bytes --chars	inert
-wc --bytes --files0-from x	denied
+wc --bytes --total x	inert
 wc --bytes x	safe-read
 wc --chars	inert
-wc --files0-from x	denied
+wc --debug	inert
+wc --files0-from=list.txt	denied
 wc --help	inert
 wc --lines	inert
 wc --max-line-length	inert
+wc --total x	inert
+wc --total=only ./a.txt	safe-read
 wc --version	inert
 wc --words	inert
 wc --zero-terminated	inert
 wc -L	inert
-wc -V	inert
 wc -c	inert
-wc -h	denied
 wc -l	inert
 wc -l < /tmp/foo.log	inert
 wc -l file.txt	safe-read
 wc -l src/main.rs	safe-read
+wc -l ~/.ssh/id_rsa	denied
+wc -lwc ./a.txt ./b.txt	safe-read
 wc -m	inert
 wc -w	inert
 wc -w README.md	safe-read

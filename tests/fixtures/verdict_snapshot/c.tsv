@@ -7522,25 +7522,34 @@ curl https://x.com/a/../b	inert
 curl https://x.com/a/../b -o out.json	safe-write
 curl x	inert
 cut	denied
+cut --bogus ./a.txt	denied
 cut --bytes x	inert
 cut --characters x	inert
 cut --complement	inert
 cut --complement --bytes x	inert
 cut --complement --help	inert
+cut --complement -b1 ./a.bin	inert
 cut --complement x	inert
 cut --delimiter x	inert
 cut --fields x	inert
 cut --help	inert
+cut --no-partial	inert
 cut --only-delimited	inert
 cut --output-delimiter x	inert
 cut --version	inert
+cut --whitespace-delimited	inert
 cut --zero-terminated	inert
-cut -V	inert
+cut -F x	inert
+cut -F1 -O, ./a.txt	inert
+cut -O x	inert
 cut -b x	inert
 cut -c x	inert
+cut -c1-8 ./a.txt	inert
 cut -d x	inert
+cut -d: -f1 ./passwd.txt	inert
+cut -d: -f1 ~/.ssh/id_rsa	denied
 cut -f x	inert
-cut -h	inert
+cut -f2,4 -s ./a.tsv	inert
 cut -n	inert
 cut -s	inert
 cut -w	inert

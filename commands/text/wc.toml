@@ -1,17 +1,19 @@
 [[command]]
 name = "wc"
 aliases = ["gwc"]
-description = "Counts lines, words, characters, and bytes in input files. Purely read-only: reads input and writes counts to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
+description = "Counts lines, words, characters, bytes and the longest line in its inputs. Observe-only: it opens each operand for reading (`-` is standard input) and writes counts to stdout, and never modifies, creates or deletes anything; where the output goes is decided by the shell. Every operand is a content read, so a credential file named as an operand has its size and line counts disclosed, and a FIFO or device operand can block. --files0-from reads the operand list from a second file or from standard input, so the set of files read cannot be known from the command line. It runs no code and makes no network connection. Part of GNU coreutils (9.12), which has a stable release cadence of a few releases a year; the wc interface has been unchanged for decades apart from --total and --debug. BSD wc has -L, -c, -l, -m and -w and no GNU long options, only --libxo for structured output."
+researched_version = "GNU coreutils 9.12"
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation"
 level = "Inert"
 bare = true
 standalone = [
-    "-L", "-V", "-c", "-h", "-l", "-m", "-w",
-    "--bytes", "--chars", "--help", "--lines",
+    "-L", "-c", "-l", "-m", "-w",
+    "--bytes", "--chars", "--debug", "--help", "--lines",
     "--max-line-length", "--version", "--words", "--zero-terminated",
 ]
-valued = ["--files0-from"]
-examples_safe = ["wc -l src/main.rs", "wc -w README.md"]
+valued = ["--total"]
+examples_safe = ["wc -l src/main.rs", "wc -w README.md", "wc -lwc ./a.txt ./b.txt", "wc --total=only ./a.txt", "wc --version"]
+examples_denied = ["wc -l ~/.ssh/id_rsa", "wc --files0-from=list.txt", "wc --bogus ./a.txt"]
 
 # Declarative facet behavior: wc OBSERVES each file to count it (content → the model), gated
 # per-operand by locus. `--files0-from` is deliberately OMITTED from the behavior grammar so it
@@ -21,7 +23,8 @@ examples_safe = ["wc -l src/main.rs", "wc -w README.md"]
 operation = "observe"
 positionals = "read"
 standalone = [
-    "-L", "-V", "-c", "-l", "-m", "-w",
-    "--bytes", "--chars", "--help", "--lines",
+    "-L", "-c", "-l", "-m", "-w",
+    "--bytes", "--chars", "--debug", "--help", "--lines",
     "--max-line-length", "--version", "--words", "--zero-terminated",
 ]
+valued = ["--total"]
