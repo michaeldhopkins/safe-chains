@@ -322,6 +322,16 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
 mod tests {
     use super::*;
 
+    #[test]
+    fn go_local_package_each_alternative_alone() {
+        for local in [".", "..", "./x", "../x", "/x", "x.go"] {
+            assert!(is_go_local_package(local), "{local} is local");
+        }
+        for module in ["fmt", "github.com/a/b", "a/../b", "~/x", ""] {
+            assert!(!is_go_local_package(module), "{module} is a module path");
+        }
+    }
+
     static TEST_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&[
             "--color", "--count", "--help", "--recursive", "--version", "-H", "-c", "-i", "-l", "-n", "-o", "-r", "-s", "-v", "-w",
