@@ -15,10 +15,10 @@ use crate::policy::{FlagTolerance, UnknownTolerance, count_positionals};
 use proptest::prelude::*;
 use std::collections::BTreeSet;
 
-struct Scope<'a> {
+struct Scope {
     label: String,
-    standalone: &'a [String],
-    valued: &'a [String],
+    standalone: Vec<String>,
+    valued: Vec<String>,
 }
 
 fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
@@ -32,29 +32,48 @@ fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
     }
 }
 
-fn sub_scopes<'a>(prefix: &str, list: &'a [TomlSub], out: &mut Vec<Scope<'a>>) {
+fn scope(label: String, standalone: &[String], valued: &[String]) -> Scope {
+    Scope { label, standalone: standalone.to_vec(), valued: valued.to_vec() }
+}
+
+/// The `first_arg` grammar: `first_arg_loopback_valued` has the same arity as `first_arg_valued`.
+fn first_arg_scope(label: &str, standalone: &[String], valued: &[String], loopback: &[String]) -> Scope {
+    let valued = valued.iter().chain(loopback).cloned().collect();
+    Scope { label: format!("{label} [first_arg]"), standalone: standalone.to_vec(), valued }
+}
+
+fn sub_scopes(prefix: &str, list: &[TomlSub], out: &mut Vec<Scope>) {
     for sub in list {
         let label = format!("{prefix} {}", sub.name);
-        out.push(Scope { label: label.clone(), standalone: &sub.standalone, valued: &sub.valued });
+        let valued: Vec<String> = sub.valued.iter().chain(&sub.loopback_valued).cloned().collect();
+        out.push(scope(label.clone(), &sub.standalone, &valued));
+        out.push(first_arg_scope(&label, &sub.first_arg_standalone, &sub.first_arg_valued, &sub.first_arg_loopback_valued));
         sub_scopes(&label, &sub.sub, out);
     }
 }
 
-fn scopes(cmd: &TomlCommand) -> Vec<Scope<'_>> {
-    let mut out = vec![Scope { label: cmd.name.clone(), standalone: &cmd.standalone, valued: &cmd.valued }];
+fn scopes(cmd: &TomlCommand) -> Vec<Scope> {
+    let name = &cmd.name;
+    let mut out = vec![
+        scope(name.clone(), &cmd.standalone, &cmd.valued),
+        first_arg_scope(name, &cmd.first_arg_standalone, &cmd.first_arg_valued, &cmd.first_arg_loopback_valued),
+    ];
     if let Some(fb) = &cmd.fallback {
-        out.push(Scope { label: format!("{} [fallback]", cmd.name), standalone: &fb.standalone, valued: &fb.valued });
+        out.push(scope(format!("{name} [fallback]"), &fb.standalone, &fb.valued));
     }
     for (key, hp) in &cmd.handler_policy {
-        out.push(Scope { label: format!("{} [policy {key}]", cmd.name), standalone: &hp.standalone, valued: &hp.valued });
+        out.push(scope(format!("{name} [policy {key}]"), &hp.standalone, &hp.valued));
     }
     if let Some(b) = &cmd.behavior {
-        out.push(Scope { label: format!("{} [behavior]", cmd.name), standalone: &b.standalone, valued: &b.valued });
+        out.push(scope(format!("{name} [behavior]"), &b.standalone, &b.valued));
     }
     if let Some(w) = &cmd.wrapper {
-        out.push(Scope { label: format!("{} [wrapper]", cmd.name), standalone: &w.standalone, valued: &w.valued });
+        out.push(scope(format!("{name} [wrapper]"), &w.standalone, &w.valued));
     }
-    sub_scopes(&cmd.name, &cmd.sub, &mut out);
+    if let Some(vc) = &cmd.verb_chain {
+        out.push(scope(format!("{name} [verb_chain]"), &vc.main_standalone, &vc.main_valued));
+    }
+    sub_scopes(name, &cmd.sub, &mut out);
     out
 }
 
@@ -78,10 +97,12 @@ fn pinned() -> BTreeSet<(String, String)> {
 /// Every flag declared in both `standalone` and `valued` of one scope is on the pinned list, and
 /// every pinned row is still such a flag.
 ///
-/// The scopes are the command, every nested sub, the fallback grammar, each `handler_policy`
-/// block, the `behavior` grammar and the `wrapper`. A flag that genuinely takes an optional value
-/// goes in `optional_valued`; one that always takes a value goes in `valued` alone; a boolean goes
-/// in `standalone` alone. Nothing is ever added to the pinned list.
+/// The scopes are the grammars that pair a standalone list with a valued one: the command and
+/// every nested sub (a sub's `loopback_valued` counts as valued), the `first_arg` grammar of each,
+/// the fallback grammar, each `handler_policy` block, the `behavior` grammar, the `wrapper` and
+/// the `verb_chain` main flags. A flag that genuinely takes an optional value goes in
+/// `optional_valued`; one that always takes a value goes in `valued` alone; a boolean goes in
+/// `standalone` alone. Nothing is ever added to the pinned list.
 #[test]
 fn a_flag_is_never_both_standalone_and_valued_in_one_scope() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
@@ -94,7 +115,7 @@ fn a_flag_is_never_both_standalone_and_valued_in_one_scope() {
         for cmd in &parsed.command {
             for s in scopes(cmd) {
                 walked += 1;
-                found.extend(raw_overlap(s.standalone, s.valued).into_iter().map(|flag| (s.label.clone(), flag)));
+                found.extend(raw_overlap(&s.standalone, &s.valued).into_iter().map(|flag| (s.label.clone(), flag)));
             }
         }
     }
@@ -181,6 +202,39 @@ proptest! {
         for f in &optional {
             prop_assert_eq!(count_positionals(&tokens(&["cmd", f, "w"]), s, v, STRICT), Some(1));
             prop_assert_eq!(count_positionals(&tokens(&["cmd", &format!("{f}=w")]), s, v, STRICT), Some(0));
+        }
+    }
+
+    /// The short-flag arm: a disjoint `valued` letter takes the next word or the rest of its
+    /// cluster as its value (`-o w`, `-ow`, `-so w`), a `standalone` letter never takes a value
+    /// and leaves the rest of the cluster to be read as flags, and an `optional_valued` letter,
+    /// which can only be spelled with `=` when long, takes no value in either short spelling.
+    #[test]
+    fn a_disjoint_short_declaration_gives_each_letter_one_arity(
+        letters in proptest::collection::btree_set(proptest::char::range('a', 'e'), 1..6),
+        split in proptest::collection::vec(0u8..3, 6),
+    ) {
+        let (mut standalone, mut valued, mut optional) = (Vec::new(), Vec::new(), Vec::new());
+        for (letter, kind) in letters.iter().zip(&split) {
+            match kind {
+                0 => standalone.push(format!("-{letter}")),
+                1 => valued.push(format!("-{letter}")),
+                _ => optional.push(format!("-{letter}")),
+            }
+        }
+        let p = build_policy(standalone.clone(), valued.clone(), optional.clone(), None, None, None, None, None);
+        let (s, v) = (p.standalone.as_slice(), p.valued.as_slice());
+        for f in standalone.iter().chain(&optional) {
+            prop_assert_eq!(count_positionals(&tokens(&["cmd", f, "w"]), s, v, STRICT), Some(1));
+            prop_assert_eq!(count_positionals(&tokens(&["cmd", &format!("{f}w")]), s, v, STRICT), None);
+        }
+        for f in &valued {
+            prop_assert_eq!(count_positionals(&tokens(&["cmd", f, "w"]), s, v, STRICT), Some(0));
+            prop_assert_eq!(count_positionals(&tokens(&["cmd", &format!("{f}w")]), s, v, STRICT), Some(0));
+            for b in &standalone {
+                prop_assert_eq!(count_positionals(&tokens(&["cmd", &format!("{b}{}", &f[1..]), "w"]), s, v, STRICT), Some(0));
+                prop_assert_eq!(count_positionals(&tokens(&["cmd", &format!("{f}{}", &b[1..]), "w"]), s, v, STRICT), Some(1));
+            }
         }
     }
 }
