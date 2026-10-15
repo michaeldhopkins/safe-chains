@@ -1,0 +1,1536 @@
+# Flags declared in BOTH `standalone` and `valued` of one scope, pinned when the overlap became a
+# build error (2026-10-15). Nothing is ever added here: a new scope declares the flag once.
+#
+# WHAT AN OVERLAP DOES. It behaves as an optional-value flag: the bare spelling takes no value (the
+# next word is a positional) and the `=` spelling takes one. A short flag in both lists also refuses
+# its glued value (`-ofile`), because the cluster walk reads `o` as a boolean first.
+#
+# RESOLVING A ROW. Read the tool's own option table, then move the flag to `optional_valued` (it
+# takes `--flag` and `--flag=VALUE`), `valued` alone (it always takes a value) or `standalone` alone
+# (it never does), and delete the row. Moving a flag to `valued` approves `--flag VALUE` and `-fVALUE`
+# forms that deny today, so it needs the value's path role checked first: on 2026-10-15 a blanket
+# move turned 1,139 probe verdicts from deny to allow, `task -d DIR` and `task -t FILE` (which run a
+# Taskfile from anywhere) among them.
+#
+# SHRINKS ONLY. `a_flag_is_never_both_standalone_and_valued_in_one_scope` fails on an overlap that
+# is not listed and on a listed row that is no longer one.
+#
+# FORMAT: <scope>\t<flag>   where scope is "<command>", "<command> <sub>...", or
+# "<command> [fallback]" / "[policy KEY]" / "[behavior]" / "[wrapper]".
+7z	-bb
+7z	-mhe
+7z	-mmt
+7z	-r
+7z	-sdel
+7z	-spe
+7z	-stx
+ameba	--fail-level
+ansible-lint	--profile
+ansible-vault encrypt	--encrypt-vault-id
+ansible-vault encrypt_string	--stdin-name
+ansible-vault view	--vault-password-file
+ar	--plugin
+ar	--target
+arduino-cli compile	--show-properties
+arduino-cli compile	--warnings
+argocd version	--loglevel
+argocd version	--output
+argocd version	--server
+aria2c	--all-proxy
+aria2c	--bt-tracker
+aria2c	--ca-certificate
+aria2c	--certificate
+aria2c	--checksum
+aria2c	--conf-path
+aria2c	--connect-timeout
+aria2c	--console-log-level
+aria2c	--continue
+aria2c	--dht-entry-point
+aria2c	--dht-file-path
+aria2c	--dir
+aria2c	--disk-cache
+aria2c	--dns-timeout
+aria2c	--exclude-paths
+aria2c	--ftp-passwd
+aria2c	--ftp-proxy
+aria2c	--ftp-user
+aria2c	--header
+aria2c	--http-passwd
+aria2c	--http-proxy
+aria2c	--http-user
+aria2c	--https-proxy
+aria2c	--index-out
+aria2c	--input-file
+aria2c	--listen-port
+aria2c	--load-cookies
+aria2c	--log
+aria2c	--log-level
+aria2c	--lowest-speed-limit
+aria2c	--max-concurrent-downloads
+aria2c	--max-connection-per-server
+aria2c	--max-download-limit
+aria2c	--max-overall-download-limit
+aria2c	--max-overall-upload-limit
+aria2c	--max-tries
+aria2c	--max-upload-limit
+aria2c	--metalink-file
+aria2c	--min-split-size
+aria2c	--out
+aria2c	--parameterized-uri
+aria2c	--proxy-method
+aria2c	--referer
+aria2c	--retry-wait
+aria2c	--rpc-listen-port
+aria2c	--rpc-passwd
+aria2c	--rpc-secret
+aria2c	--rpc-user
+aria2c	--save-cookies
+aria2c	--save-session
+aria2c	--seed-ratio
+aria2c	--seed-time
+aria2c	--select-file
+aria2c	--server-stat-of
+aria2c	--split
+aria2c	--stderr
+aria2c	--summary-interval
+aria2c	--timeout
+aria2c	--torrent-file
+aria2c	--uri-selector
+aria2c	--user-agent
+aria2c	-c
+aria2c	-d
+aria2c	-i
+aria2c	-j
+aria2c	-l
+aria2c	-m
+aria2c	-n
+aria2c	-o
+aria2c	-s
+aria2c	-t
+aria2c	-x
+arp	-H
+arp	-i
+arp	-I
+arp	-s
+atlas migrate diff	--format
+atlas migrate status	--format
+atlas migrate test	--run
+atlas schema diff	--format
+atlas schema inspect	--exclude
+atlas schema inspect	--format
+atlas schema status	--format
+atlas schema test	--run
+atuin search	--cmd-only
+atuin search	--cwd
+atuin search	--exit
+atuin search	--filter-mode
+atuin search	--limit
+autoconf	--trace
+autoconf	-o
+autoconf	-t
+automake	-o
+automake	-W
+autopep8	--global-config
+ava	--config
+ava	--node-arguments
+ava	--watch
+avrdude	-l
+avrdude	-V
+biber	--cache
+biber	--decodecharsset
+biber	--input-format
+biber	--logfile
+biber	--mincrossrefs
+biber	--mssplit
+biber	--output-encoding
+biber	--output-format
+biber	--output-indent
+biber	--output-resolve
+biber	--output-safecharsset
+biber	--recodedata
+borg [wrapper]	--bypass-lock
+borg [wrapper]	--lock-wait
+borg check	--archives-only
+borg check	--first
+borg check	--last
+borg check	--sort-by
+borg info	--first
+borg info	--last
+borg info	--sort-by
+borg list	--first
+borg list	--format
+borg list	--last
+borg list	--sort-by
+brotli	--quality
+brotli	--suffix
+brotli	--window
+brotli	-q
+brotli	-w
+buf generate	--include-types
+bw list	--organizationid
+bw list	--session
+cabal outdated	--minor
+caddy validate	--config
+cargo outdated	--color
+cargo outdated	--depth
+cargo outdated	--features
+cargo outdated	--manifest-path
+cargo outdated	--packages
+cargo outdated	-d
+clusterdb	--maintenance-db
+clusterdb	--table
+clusterdb	-d
+clusterdb	-h
+clusterdb	-p
+clusterdb	-t
+clusterdb	-U
+code	--add
+code	--category
+code	--diff
+code	--extensions-dir
+code	--goto
+code	--inspect-brk-extensions
+code	--inspect-extensions
+code	--locale
+code	--log
+code	--max-memory
+code	--merge
+code	--open-url
+code	--port
+code	--profile
+code	--remove
+code	--show-versions
+code	--sync
+code	--user-data-dir
+consul version	-format
+coqc	-async-proofs-cache
+coqc	-color
+coqc	-mangle-names
+coqc	-native-compiler
+coqc	-native-output-dir
+coqc	-Q
+coqc	-R
+coqc	-time-file
+coqc	-w
+coverage run	--source
+cppcheck	--config-exclude
+cppcheck	--executor
+cppcheck	--exitcode-suppressions
+cppcheck	--include
+cppcheck	--includes-file
+cppcheck	--language
+cppcheck	--library
+cppcheck	--max-configs
+cppcheck	--max-ctu-depth
+cppcheck	--platform
+cppcheck	--rule
+cppcheck	--rule-file
+cppcheck	--std
+cppcheck	--suppress
+cppcheck	--suppressions-list
+cppcheck	--template
+cppcheck	--template-location
+cppcheck	-D
+cppcheck	-j
+cppcheck	-l
+cppcheck	-U
+create-react-app	--scripts-version
+createdb	--password
+createdb	-h
+createdb	-p
+createdb	-U
+createuser	-h
+createuser	-p
+createuser	-U
+credo	--config-name
+credo	--format
+credo	--ignore-checks
+credo	--strict
+crystal build	--no-color
+crystal build	-D
+cucumber	--retry
+cwebp	-blend_alpha
+cwebp	-d
+cwebp	-f
+cwebp	-hint
+cwebp	-m
+cwebp	-map
+cwebp	-near_lossless
+cwebp	-progress
+cwebp	-q
+cwebp	-quiet
+cwebp	-resize
+cwebp	-segments
+cwebp	-sharpness
+cwebp	-size
+cwebp	-sns
+cwebp	-targetsize
+cwebp	-thread_level
+dbt clean	--profile
+dbt compile	--inline
+dbt compile	--profile
+dbt compile	--profiles-dir
+dbt compile	--target
+dbt compile	--target-path
+dbt compile	--threads
+dbt compile	--vars
+dbt ls	--resource-type
+degit	--mode
+depcruise	--ignore-known
+depcruise	--validate
+deptry	--per-rule-ignores
+dive	--source
+docfx build	--changesFile
+docfx build	--exportRawModel
+docfx build	--exportViewModel
+docfx build	--lruSize
+docfx build	--maxParallelism
+docfx build	--postProcessors
+docfx build	--templateFolder
+docfx metadata	--namespaceLayout
+docker-compose config	--format
+docker-compose version	--format
+dropdb	-h
+dropdb	-p
+dropdb	-U
+dropuser	-h
+dropuser	-p
+dropuser	-U
+dvc add	--file
+dvc add	--remote
+eb logs	--instance
+editorconfig-checker	--exclude
+editorconfig-checker	--format
+editorconfig-checker	-config
+editorconfig-checker	-exclude
+editorconfig-checker	-format
+eleventy	--input
+eleventy	--output
+eleventy	--to
+exiftool	-d
+exiftool	-dateFormat
+exiftool	-fileOrder
+exiftool	-htmlDump
+exiftool	-i
+exiftool	-lang
+exiftool	-listr
+exiftool	-progress
+exiftool	-q
+exiftool	-r
+exiftool	-tab
+exiftool	-wext
+exiftool	-xmlFormat
+fantomas	--out
+ffmpeg	-an
+ffmpeg	-loglevel
+ffprobe	-loglevel
+ffprobe	-of
+ffprobe	-output_format
+ffprobe	-print_format
+ffprobe	-show_entries
+ffprobe	-show_format_entry
+fossil branch info	--repository
+fossil branch info	-R
+fossil branch list	--repository
+fossil cat	--repository
+fossil cat	-r
+fossil cat	-R
+fossil diff	--diff-binary
+fossil diff	--from
+fossil diff	--internal
+fossil diff	--repository
+fossil diff	--strip-trailing-spaces
+fossil diff	--strip-trailing-whitespace
+fossil diff	--to
+fossil diff	--unified
+fossil diff	-c
+fossil diff	-N
+fossil diff	-r
+fossil diff	-R
+fossil diff	-W
+fossil diff	-y
+fossil extras	--ignore
+fossil extras	--repository
+fossil extras	-R
+fossil finfo	--limit
+fossil finfo	--repository
+fossil finfo	--type
+fossil finfo	--width
+fossil finfo	-l
+fossil finfo	-R
+fossil finfo	-w
+fossil info	--repository
+fossil info	-R
+fossil ls	--repository
+fossil ls	--type
+fossil ls	-r
+fossil ls	-R
+fossil status	--repository
+fossil status	-R
+fossil tag list	--repository
+fossil tag list	-R
+fossil timeline	--limit
+fossil timeline	--repository
+fossil timeline	-l
+fossil timeline	-n
+fossil timeline	-R
+fossil timeline	-w
+fossil timeline	-W
+fossil whatis	--repository
+fossil whatis	--type
+fossil whatis	-R
+fpm	--version
+gifsicle	--app-extension
+gifsicle	--background
+gifsicle	--change-color
+gifsicle	--color-method
+gifsicle	--colors
+gifsicle	--comment
+gifsicle	--disposal
+gifsicle	--dither
+gifsicle	--explode-by-name
+gifsicle	--extension
+gifsicle	--first-frame
+gifsicle	--gamma
+gifsicle	--insert-before
+gifsicle	--last-frame
+gifsicle	--logical-screen
+gifsicle	--loopcount
+gifsicle	--name
+gifsicle	--screen
+gifsicle	--size-info
+gifsicle	--terminal
+gifsicle	--threads
+gifsicle	--transform-colormap
+gifsicle	--transparent
+gifsicle	--use-colormap
+gifsicle	-d
+gifsicle	-S
+glab [policy list]	-a
+glab [policy list]	-g
+glab [policy view]	-p
+gleam check	--target
+goimports	--srcdir
+gomodifytags	--remove-options
+gomodifytags	--remove-tags
+gomodifytags	--transform
+gpustat	--id
+gpustat	--watch
+gpustat	-i
+grpcurl	-authority
+grpcurl	-cacert
+grpcurl	-cert
+grpcurl	-connect-timeout
+grpcurl	-d
+grpcurl	-format
+grpcurl	-format-error
+grpcurl	-H
+grpcurl	-import-path
+grpcurl	-keepalive-time
+grpcurl	-key
+grpcurl	-keysize-options
+grpcurl	-max-msg-sz
+grpcurl	-max-time
+grpcurl	-msg-template
+grpcurl	-proto
+grpcurl	-protoset
+grpcurl	-protoset-out
+grpcurl	-rpc-header
+grpcurl	-servername
+grpcurl	-unix
+grpcurl	-userconfig
+hadolint	--config
+hadolint	--failure-threshold
+hadolint	--format
+hadolint	--ignore
+hadolint	--require-label
+hadolint	--trusted-registry
+hadolint	-c
+hadolint	-t
+helmfile list	--output
+helmfile version	--output
+hg diff	--change
+hg diff	--unified
+hg diff	-c
+hg diff	-r
+hg grep	--rev
+hg grep	-r
+hg id	-r
+hlint	-c
+http	--default-scheme
+hugo gen autocomplete	--type
+hurl	--connect-to
+hurl	--cookie-jar
+hurl	--error-format
+hurl	--file-root
+hurl	--from-entry
+hurl	--glob
+hurl	--max-filesize
+hurl	--max-redirs
+hurl	--max-time
+hurl	--netrc-file
+hurl	--output
+hurl	--parallel
+hurl	--proxy
+hurl	--repeat
+hurl	--report-html
+hurl	--report-junit
+hurl	--report-tap
+hurl	--resolve
+hurl	--retry
+hurl	--retry-interval
+hurl	--to-entry
+hurl	--unix-socket
+hurl	--user
+hurl	--user-agent
+hurl	--variable
+hurl	--variables-file
+hurl	-A
+hurl	-b
+hurl	-c
+hurl	-d
+hurl	-H
+hurl	-m
+hurl	-o
+hurl	-r
+hurl	-u
+hurl	-X
+istioctl analyze	--failure-threshold
+istioctl analyze	--meshConfigFile
+istioctl analyze	--output
+istioctl analyze	--output-threshold
+istioctl analyze	--revision
+istioctl analyze	--suppress
+istioctl analyze	--timeout
+istioctl analyze	--use-kube
+istioctl analyze	--verbose
+istioctl analyze	-o
+istioctl analyze	-S
+istioctl proxy-status	--file
+istioctl proxy-status	--multi-xds
+istioctl proxy-status	-f
+istioctl validate	--output
+istioctl validate	-f
+istioctl validate	-o
+istioctl version	--revision
+jdeps	--ignore-missing-deps
+jdeps	--print-module-deps
+jdeps	--regex
+jdeps	-cp
+jpegoptim	--threshold
+jupyter-nbconvert	--from
+jupyter-nbconvert	--log-level
+jupyter-nbconvert	--writer
+jupyter-nbconvert	-y
+jupytext	--warn-only
+kapp list	--namespace
+kapp list	-n
+kotlinc	-language-version
+last	--time-format
+latexmk	-time
+linkerd check	--cni-namespace
+linkerd check	--config
+linkerd check	--expected-version
+linkerd check	--output
+linkerd check	--retry-deadline
+linkerd check	--wait
+linkerd check	-o
+lz4	--favor-decSpeed
+lz4	-B
+lzip	-n
+lzip	-s
+markdownlint-cli2	--no-globs
+marp	--browser-protocol
+marp	--config-file
+marp	--description
+marp	--engine
+marp	--input-dir
+marp	--ogImage
+marp	--output
+marp	--pdf-notes
+marp	--theme
+marp	--themeSet
+marp	--title
+marp	--url
+marp	-c
+marp	-o
+masscan	--exclude
+masscan	--excludefile
+masscan	--http-user-agent
+masscan	--includefile
+masscan	--rate
+masscan	--retries
+masscan	--source-ip
+masscan	--source-port
+masscan	--ttl
+masscan	--wait
+masscan	-c
+masscan	-iL
+masscan	-iR
+masscan	-oG
+masscan	-oJ
+masscan	-oL
+masscan	-oU
+masscan	-oX
+masscan	-p
+mc cat	--encrypt-key
+mc cat	--rewind
+mc du	--depth
+mc du	--rewind
+mc find	--name
+mc find	--newer-than
+mc find	--older-than
+mc find	--path
+mc find	--print
+mc find	--regex
+mc head	--encrypt-key
+mc head	--rewind
+mc stat	--encrypt-key
+mc stat	--rewind
+mc tree	--depth
+mcs	/recurse
+mcs	/warnaserror
+mediainfo	--LogFile
+mediainfo	--Output
+mkcert	--cert-file
+mkcert	--csr
+mkcert	--key-file
+mkcert	--p12-file
+mkcert	-cert-file
+mkcert	-csr
+mkcert	-key-file
+mkcert	-p12-file
+mktemp	--tmpdir
+mktemp	-t
+mongodump	--archive
+mongodump	--authenticationDatabase
+mongodump	--authenticationMechanism
+mongodump	--collection
+mongodump	--db
+mongodump	--excludeCollection
+mongodump	--excludeCollectionsWithPrefix
+mongodump	--numParallelCollections
+mongodump	--out
+mongodump	--password
+mongodump	--port
+mongodump	--readPreference
+mongodump	--sslCAFile
+mongodump	--sslPEMKeyFile
+mongodump	--sslPEMKeyPassword
+mongodump	--username
+mongodump	--writeConcern
+mongodump	-c
+mongodump	-d
+mongodump	-h
+mongodump	-j
+mongodump	-o
+mongodump	-p
+mongodump	-u
+mongoexport	--authenticationDatabase
+mongoexport	--authenticationMechanism
+mongoexport	--collection
+mongoexport	--db
+mongoexport	--password
+mongoexport	--port
+mongoexport	--readPreference
+mongoexport	--type
+mongoexport	--username
+mongoexport	-c
+mongoexport	-d
+mongoexport	-f
+mongoexport	-h
+mongoexport	-o
+mongoexport	-p
+mongoexport	-q
+mongoexport	-u
+mongoimport	--authenticationDatabase
+mongoimport	--authenticationMechanism
+mongoimport	--collection
+mongoimport	--columnsHaveTypes
+mongoimport	--db
+mongoimport	--file
+mongoimport	--mode
+mongoimport	--numInsertionWorkers
+mongoimport	--password
+mongoimport	--port
+mongoimport	--readPreference
+mongoimport	--type
+mongoimport	--upsertFields
+mongoimport	--username
+mongoimport	--writeConcern
+mongoimport	-c
+mongoimport	-d
+mongoimport	-f
+mongoimport	-h
+mongoimport	-j
+mongoimport	-p
+mongoimport	-u
+mongorestore	--archive
+mongorestore	--authenticationDatabase
+mongorestore	--authenticationMechanism
+mongorestore	--collection
+mongorestore	--db
+mongorestore	--gzip
+mongorestore	--nsExclude
+mongorestore	--nsFrom
+mongorestore	--nsInclude
+mongorestore	--nsTo
+mongorestore	--numInsertionWorkersPerCollection
+mongorestore	--numParallelCollections
+mongorestore	--objcheck
+mongorestore	--oplogLimit
+mongorestore	--password
+mongorestore	--port
+mongorestore	--readPreference
+mongorestore	--sslCAFile
+mongorestore	--sslPEMKeyFile
+mongorestore	--sslPEMKeyPassword
+mongorestore	--username
+mongorestore	--writeConcern
+mongorestore	-c
+mongorestore	-d
+mongorestore	-h
+mongorestore	-j
+mongorestore	-p
+mongorestore	-u
+mongostat	--authenticationDatabase
+mongostat	--authenticationMechanism
+mongostat	--password
+mongostat	--port
+mongostat	--username
+mongostat	-h
+mongostat	-n
+mongostat	-o
+mongostat	-p
+mongostat	-u
+mongotop	--authenticationDatabase
+mongotop	--authenticationMechanism
+mongotop	--password
+mongotop	--port
+mongotop	--username
+mongotop	-h
+mongotop	-p
+mongotop	-u
+msbuild	-binaryLogger
+msbuild	-clp
+msbuild	-consoleLoggerParameters
+msbuild	-distributedFileLogger
+msbuild	-distributedlogger
+msbuild	-fileLogger
+msbuild	-getItem
+msbuild	-getProperty
+msbuild	-getTargetResult
+msbuild	-maxcpucount
+msbuild	-nodeReuse
+msbuild	-preprocess
+msbuild	-profileEvaluation
+msbuild	-restore
+msbuild	-target
+msbuild	-terminalLogger
+msbuild	-toolsVersion
+msbuild	-tv
+msbuild	-verbosity
+msbuild	-warnAsError
+msbuild	-warnAsMessage
+msbuild	-warnNotAsError
+msbuild	/binaryLogger
+msbuild	/clp
+msbuild	/consoleLoggerParameters
+msbuild	/distributedFileLogger
+msbuild	/distributedlogger
+msbuild	/fileLogger
+msbuild	/getItem
+msbuild	/getProperty
+msbuild	/getTargetResult
+msbuild	/inputResultsCaches
+msbuild	/maxcpucount
+msbuild	/nodeReuse
+msbuild	/preprocess
+msbuild	/profileEvaluation
+msbuild	/restore
+msbuild	/target
+msbuild	/terminalLogger
+msbuild	/toolsVersion
+msbuild	/tv
+msbuild	/verbosity
+msbuild	/warnAsError
+msbuild	/warnAsMessage
+msbuild	/warnNotAsError
+mysqladmin	--connect-timeout
+mysqladmin	--count
+mysqladmin	--default-auth
+mysqladmin	--default-character-set
+mysqladmin	--host
+mysqladmin	--login-path
+mysqladmin	--login-timeout
+mysqladmin	--password
+mysqladmin	--port
+mysqladmin	--protocol
+mysqladmin	--shutdown-timeout
+mysqladmin	--sleep
+mysqladmin	--socket
+mysqladmin	--ssl-mode
+mysqladmin	--user
+mysqladmin	-c
+mysqladmin	-h
+mysqladmin	-i
+mysqladmin	-p
+mysqladmin	-S
+mysqladmin	-u
+mysqlcheck	--databases
+mysqlcheck	--default-auth
+mysqlcheck	--default-character-set
+mysqlcheck	--host
+mysqlcheck	--login-path
+mysqlcheck	--password
+mysqlcheck	--port
+mysqlcheck	--protocol
+mysqlcheck	--socket
+mysqlcheck	--ssl-mode
+mysqlcheck	--user
+mysqlcheck	-h
+mysqlcheck	-p
+mysqlcheck	-S
+mysqlcheck	-u
+mysqldump	--compatible
+mysqldump	--databases
+mysqldump	--default-character-set
+mysqldump	--fields-enclosed-by
+mysqldump	--fields-escaped-by
+mysqldump	--fields-optionally-enclosed-by
+mysqldump	--fields-terminated-by
+mysqldump	--host
+mysqldump	--ignore-error
+mysqldump	--ignore-table
+mysqldump	--lines-terminated-by
+mysqldump	--login-path
+mysqldump	--max-allowed-packet
+mysqldump	--mysqld-long-query-time
+mysqldump	--net-buffer-length
+mysqldump	--password
+mysqldump	--port
+mysqldump	--protocol
+mysqldump	--set-gtid-purged
+mysqldump	--socket
+mysqldump	--tab
+mysqldump	--user
+mysqldump	--where
+mysqldump	-h
+mysqldump	-r
+mysqldump	-u
+mysqldump	-w
+mythril	--quick
+mythril	--strategy
+mythril	-c
+mythril	-l
+mythril	-o
+mythril	-r
+mythril	-s
+mythril	-t
+mythril	-x
+nbstripout	--attributes
+nbstripout	--extra-keys
+nbstripout	--keep-metadata-keys
+nbstripout	--max-size
+ncu	--cwd
+nerdctl image inspect	--mode
+nerdctl info	--mode
+nerdctl inspect	--mode
+nerdctl version	--format
+nerdctl version	-f
+newman run	--delay-request
+newman run	--export-cookie-jar
+newman run	--export-environment
+newman run	--export-globals
+newman run	--reporter
+newman run	--reporters
+newman run	--ssl-extra-ca-certs
+newman run	--timeout
+newman run	--timeout-request
+newman run	--timeout-script
+newman run	--working-dir
+nix eval	--expr
+nix eval	--file
+nix eval	--store
+nix eval	-f
+nix search	--exclude
+nix search	--inputs-from
+nix-collect-garbage	--delete-older-than
+nix-collect-garbage	--max-freed
+nix-prefetch-url	--name
+nix-prefetch-url	--type
+nuget sources	-Format
+oc version	--output
+oc version	-o
+ocamlformat	--enable-outside-detected-project
+oha	-A
+oha	-c
+oha	-d
+oha	-H
+oha	-m
+oha	-n
+oha	-q
+oha	-r
+oha	-t
+oha	-z
+op account list	--format
+op item list	--include-archive
+opam env	--shell
+opam lint	--package
+optipng	-log
+optipng	-strip
+pandoc	--bibliography
+pandoc	--columns
+pandoc	--csl
+pandoc	--epub-chapter-level
+pandoc	--epub-cover-image
+pandoc	--epub-embed-font
+pandoc	--epub-metadata
+pandoc	--epub-stylesheet
+pandoc	--epub-subdirectory
+pandoc	--file-scope
+pandoc	--from
+pandoc	--gladtex
+pandoc	--id-prefix
+pandoc	--include-after-body
+pandoc	--include-before-body
+pandoc	--include-in-header
+pandoc	--ipynb-output
+pandoc	--katex
+pandoc	--katex-stylesheet
+pandoc	--latex-engine
+pandoc	--log
+pandoc	--mathjax
+pandoc	--mathml
+pandoc	--metadata
+pandoc	--natbib
+pandoc	--number-offset
+pandoc	--output
+pandoc	--pdf-engine
+pandoc	--read
+pandoc	--reference-doc
+pandoc	--reference-location
+pandoc	--resource-path
+pandoc	--shift-heading-level-by
+pandoc	--slide-level
+pandoc	--syntax-definition
+pandoc	--tab-stop
+pandoc	--template
+pandoc	--to
+pandoc	--toc-depth
+pandoc	--top-level-division
+pandoc	--track-changes
+pandoc	--variable
+pandoc	--webtex
+pandoc	--wrap
+pandoc	--write
+pandoc	-D
+pandoc	-H
+pandoc	-i
+pandoc	-N
+pandoc	-o
+pandoc	-t
+pandoc	-V
+pandoc	-w
+pdflatex	--cnf-line
+pdflatex	--enc
+pdflatex	--fmt
+pdflatex	--halt-on-error
+pdflatex	--interaction
+pdflatex	--mktex
+pdflatex	--no-mktex
+pdflatex	--no-shell-escape
+pdflatex	--progname
+pdflatex	--recorder
+pdflatex	--shell-restricted
+pdflatex	--src-specials
+pdflatex	--synctex
+pdflatex	--translate-file
+pdftocairo	-antialias
+pdftocairo	-r
+pdftotext	-enc
+pdftotext	-eol
+pdftotext	-fixed
+pdftotext	-r
+pdftotext	-upw
+pg_basebackup	--checkpoint
+pg_basebackup	--compress
+pg_basebackup	--create-slot
+pg_basebackup	--format
+pg_basebackup	--max-rate
+pg_basebackup	--pgdata
+pg_basebackup	--target
+pg_basebackup	--waldir
+pg_basebackup	-c
+pg_basebackup	-d
+pg_basebackup	-D
+pg_basebackup	-F
+pg_basebackup	-h
+pg_basebackup	-l
+pg_basebackup	-p
+pg_basebackup	-r
+pg_basebackup	-s
+pg_basebackup	-S
+pg_basebackup	-t
+pg_basebackup	-T
+pg_basebackup	-U
+pg_basebackup	-Z
+pg_dumpall	--encoding
+pg_dumpall	--exclude-database
+pg_dumpall	--filter
+pg_dumpall	--lock-wait-timeout
+pg_dumpall	--rows-per-insert
+pg_dumpall	-h
+pg_dumpall	-l
+pg_restore	--no-data-for-failed-tables
+pgbench	--builtin
+pgbench	--define
+pgbench	--fillfactor
+pgbench	--foreign-keys
+pgbench	--init-steps
+pgbench	--latency-limit
+pgbench	--log-prefix
+pgbench	--max-tries
+pgbench	--partition-method
+pgbench	--partitions
+pgbench	--protocol
+pgbench	--rate
+pgbench	--retries
+pgbench	--sampling-rate
+pgbench	--scale
+pgbench	--show-script
+pgbench	-c
+pgbench	-d
+pgbench	-f
+pgbench	-F
+pgbench	-h
+pgbench	-j
+pgbench	-p
+pgbench	-r
+pgbench	-s
+pgbench	-t
+pgbench	-T
+pgbench	-U
+pigz	--blocksize
+pigz	--iterations
+pigz	--maxsplits
+pigz	--objsize
+pigz	--processes
+pigz	--suffix
+pigz	-p
+pijul log	--description
+pijul log	--filter
+pijul log	--limit
+pkg-config	--atleast-version
+pkg-config	--define-variable
+pkg-config	--exact-version
+pkg-config	--max-version
+pkg-config	--maximum-traverse-depth
+pkg-config	--variable
+pngquant	--posterize
+pngquant	--skip-if-larger
+pngquant	--speed
+pod update	--sources
+qpdf	--externalize-inline-images
+qpdf	--help
+qpdf	--password-mode
+qpdf	--split-pages
+rclone cat	--head
+rclone cat	--tail
+rclone check	--checkfile
+rclone check	--combined
+rclone check	--differ
+rclone check	--error
+rclone check	--match
+rclone check	--missing-on-dst
+rclone check	--missing-on-src
+rclone hashsum	--checkfile
+rclone md5sum	--checkfile
+rclone sha1sum	--checkfile
+rebar3 path	--separator
+redis-benchmark	--cluster
+redis-benchmark	--keyspacelen
+redis-benchmark	--precision
+redis-benchmark	--rps
+redis-benchmark	--seed
+redis-benchmark	--threads
+redis-benchmark	--user
+redis-benchmark	-a
+redis-benchmark	-A
+redis-benchmark	-c
+redis-benchmark	-d
+redis-benchmark	-D
+redis-benchmark	-e
+redis-benchmark	-h
+redis-benchmark	-i
+redis-benchmark	-I
+redis-benchmark	-k
+redis-benchmark	-l
+redis-benchmark	-n
+redis-benchmark	-p
+redis-benchmark	-P
+redis-benchmark	-Q
+redis-benchmark	-r
+redis-benchmark	-t
+redis-benchmark	-u
+reindexdb	--concurrently
+reindexdb	--index
+reindexdb	--maintenance-db
+reindexdb	--schema
+reindexdb	--table
+reindexdb	--tablespace
+reindexdb	-d
+reindexdb	-h
+reindexdb	-i
+reindexdb	-j
+reindexdb	-n
+reindexdb	-p
+reindexdb	-t
+reindexdb	-U
+roc build	--linker
+roc build	--main
+roc build	--optimize
+roc build	--prebuilt-platform
+roc check	--main
+rollup	--exports
+rollup	--input
+rollup	--outro
+rollup	--sourcemap
+rspec	--bisect
+rspec	--fail-fast
+rspec	--profile
+rspec	-p
+rsync	--address
+rsync	--bwlimit
+rsync	--checksum-choice
+rsync	--chmod
+rsync	--chown
+rsync	--compress-level
+rsync	--contimeout
+rsync	--copy-as
+rsync	--debug
+rsync	--exclude
+rsync	--exclude-from
+rsync	--files-from
+rsync	--filter
+rsync	--info
+rsync	--log-file
+rsync	--log-file-format
+rsync	--max-alloc
+rsync	--max-delete
+rsync	--max-size
+rsync	--min-size
+rsync	--modify-window
+rsync	--partial-dir
+rsync	--password-file
+rsync	--port
+rsync	--protocol
+rsync	--read-batch
+rsync	--remote-option
+rsync	--rsh
+rsync	--rsync-path
+rsync	--secret-file
+rsync	--skip-compress
+rsync	--sockopts
+rsync	--stop-after
+rsync	--stop-at
+rsync	--stop-fmt
+rsync	--suffix
+rsync	--temp-dir
+rsync	--timeout
+rsync	-e
+rsync	-f
+rsync	-T
+scalac	-encoding
+scalac	-language
+scalac	-source
+scalafix	--exclude
+scalafix	--include
+scalafmt	--exclude
+scalafmt	--include
+scp	-D
+scp	-P
+selene	--display-style
+selene	--num-threads
+shellcheck	--severity
+shellcheck	--wiki-link-count
+shfmt	-i
+shfmt	-ln
+siege	--config
+siege	--mark
+siege	--reps
+siege	--time
+siege	--user-agent
+siege	-A
+siege	-d
+siege	-f
+siege	-H
+siege	-l
+siege	-m
+siege	-r
+siege	-t
+slither	--checklist
+slither	--detect
+slither	--exclude
+slither	--exclude-dependencies
+slither	--filter-paths
+slither	--include-paths
+slither	--markdown-root
+slither	--printers-to-run
+slither	--triage-database
+snyk test	--severity-threshold
+solc	--allow-paths
+solc	--combined-json
+solc	--include-path
+solc	--input-file
+solc	--metadata-hash
+solc	--model-checker-engine
+solc	--model-checker-targets
+solc	--model-checker-timeout
+solc	--optimize-runs
+sox	--combine
+sox	--effects-file
+sox	--input-buffer
+sox	--magic
+sox	--play-rate-arg
+sox	--plot
+sox	--replay-gain
+sox	--temp
+sox	--type
+sox	--volume
+sox	-r
+spctl	--verbose
+sphinx-apidoc	--version
+sphinx-quickstart	--version
+sqlx migrate add	--source
+ssh-add	-c
+ssh-add	-h
+ssh-add	-T
+ssh-keygen	-a
+ssh-keygen	-A
+ssh-keygen	-b
+ssh-keygen	-B
+ssh-keygen	-D
+ssh-keygen	-e
+ssh-keygen	-E
+ssh-keygen	-f
+ssh-keygen	-F
+ssh-keygen	-G
+ssh-keygen	-h
+ssh-keygen	-i
+ssh-keygen	-I
+ssh-keygen	-k
+ssh-keygen	-K
+ssh-keygen	-m
+ssh-keygen	-M
+ssh-keygen	-n
+ssh-keygen	-N
+ssh-keygen	-o
+ssh-keygen	-O
+ssh-keygen	-P
+ssh-keygen	-Q
+ssh-keygen	-r
+ssh-keygen	-R
+ssh-keygen	-s
+ssh-keygen	-S
+ssh-keygen	-t
+ssh-keygen	-T
+ssh-keygen	-u
+ssh-keygen	-V
+ssh-keygen	-w
+ssh-keygen	-W
+ssh-keygen	-Y
+ssh-keygen	-z
+ssh-keyscan	-c
+ssh-keyscan	-O
+svn blame	-r
+svn blame	-x
+svn cat	-r
+svn diff	--diff-cmd
+svn diff	-c
+svn diff	-r
+svn diff	-x
+svn info	--targets
+svn info	-r
+svn list	--depth
+svn list	-r
+svn log	-c
+svn log	-g
+svn log	-l
+svn log	-r
+svn propget	--depth
+svn propget	-r
+svn proplist	--depth
+svn proplist	-r
+svn status	--changelist
+svn status	--config-dir
+svn status	--depth
+task	-d
+task	-t
+tcpdump	-B
+tcpdump	-c
+tcpdump	-C
+tcpdump	-G
+tcpdump	-i
+tcpdump	-j
+tcpdump	-M
+tcpdump	-Q
+tcpdump	-r
+tcpdump	-s
+tcpdump	-w
+tcpdump	-W
+tcpdump	-y
+tcpdump	-Z
+terraform-docs	--footer-from
+terraform-docs	--header-from
+terraform-docs	--lockfile
+terraform-docs	--sort-by
+terraform-docs	-c
+tflint	--config
+tflint	--filter
+tflint	--format
+tflint	--ignore-module
+tflint	--module
+tflint	--var-file
+tflint	-v
+tfsec	--config-file
+tfsec	--custom-check-dir
+tfsec	--custom-check-url
+tfsec	--exclude-paths
+tfsec	--format
+tfsec	--minimum-severity
+tfsec	--out
+tfsec	--rego-policy-dir
+tfsec	--tfvars-file
+tfsec	--var-file
+tfsec	--workspace
+tofu init	--backend
+tofu init	--get
+tofu init	--input
+tofu init	--lock
+tofu init	-backend
+tofu init	-get
+tofu init	-input
+tofu init	-lock
+trivy fs	--severity
+tshark	-A
+tshark	-b
+tshark	-B
+tshark	-c
+tshark	-C
+tshark	-d
+tshark	-D
+tshark	-e
+tshark	-E
+tshark	-f
+tshark	-F
+tshark	-i
+tshark	-j
+tshark	-l
+tshark	-n
+tshark	-N
+tshark	-o
+tshark	-O
+tshark	-p
+tshark	-P
+tshark	-r
+tshark	-s
+tshark	-S
+tshark	-t
+tshark	-T
+tshark	-w
+tshark	-W
+tshark	-X
+tshark	-y
+tshark	-Y
+tshark	-z
+tshark	-Z
+tsup	--external
+turbo run	--env-mode
+turbo run	--graph
+turbo run	--output-logs
+unbrotli	--suffix
+vacuumdb	--buffer-usage-limit
+vacuumdb	--exclude-schema
+vacuumdb	--jobs
+vacuumdb	--maintenance-db
+vacuumdb	--min-mxid-age
+vacuumdb	--min-xid-age
+vacuumdb	--schema
+vacuumdb	--table
+vacuumdb	-d
+vacuumdb	-h
+vacuumdb	-j
+vacuumdb	-n
+vacuumdb	-p
+vacuumdb	-t
+vacuumdb	-U
+vault kv get	--field
+vault status	--format
+vegeta dump	--dumper
+vegeta dump	--output
+vegeta encode	--output
+vegeta encode	--to
+vegeta plot	--output
+vegeta plot	--threshold
+vegeta plot	--title
+vegeta report	--every
+vegeta report	--output
+vegeta report	--type
+velero get	--output
+velero get	-o
+velero version	--timeout
+vyper	--storage-layout
+vyper	-f
+weasyprint	--encoding
+weasyprint	--media-type
+weasyprint	--pdf-identifier
+weasyprint	--pdf-variant
+weasyprint	--pdf-version
+weasyprint	--timeout
+weasyprint	-c
+weasyprint	-D
+weasyprint	-e
+weasyprint	-f
+weasyprint	-m
+weasyprint	-o
+weasyprint	-O
+weasyprint	-s
+weasyprint	-t
+weasyprint	-u
+wget	--certificate-type
+wget	--config
+wget	--connect-timeout
+wget	--cookies
+wget	--cut-dirs
+wget	--dns-timeout
+wget	--exclude-directories
+wget	--exclude-domains
+wget	--execute
+wget	--follow-tags
+wget	--ftp-password
+wget	--ftp-user
+wget	--header
+wget	--http-password
+wget	--http-user
+wget	--ignore-tags
+wget	--include-directories
+wget	--input-file
+wget	--input-metalink
+wget	--limit-rate
+wget	--load-cookies
+wget	--local-encoding
+wget	--max-redirect
+wget	--metalink-index
+wget	--output-document
+wget	--output-file
+wget	--password
+wget	--post-data
+wget	--post-file
+wget	--prefer-family
+wget	--progress
+wget	--proxy-password
+wget	--proxy-user
+wget	--quota
+wget	--random-file
+wget	--read-timeout
+wget	--referer
+wget	--regex-type
+wget	--reject
+wget	--reject-regex
+wget	--rejected-log
+wget	--remote-encoding
+wget	--restrict-file-names
+wget	--retry-on-http-error
+wget	--save-cookies
+wget	--start-pos
+wget	--timeout
+wget	--tries
+wget	--user
+wget	--user-agent
+wget	--wait
+wget	--waitretry
+wget	--warc-file
+wget	--warc-header
+wget	--warc-max-size
+wget	--warc-tempdir
+wget	-a
+wget	-A
+wget	-B
+wget	-D
+wget	-e
+wget	-i
+wget	-I
+wget	-l
+wget	-o
+wget	-O
+wget	-P
+wget	-Q
+wget	-R
+wget	-t
+wget	-T
+wget	-U
+wget	-w
+wget	-X
+wkhtmltopdf	--cookie-jar
+wkhtmltopdf	--margin-bottom
+wkhtmltopdf	--margin-left
+wkhtmltopdf	--margin-right
+wkhtmltopdf	--margin-top
+wkhtmltopdf	--orientation
+wkhtmltopdf	--user-style-sheet
+wkhtmltopdf	-B
+wkhtmltopdf	-d
+wkhtmltopdf	-l
+wkhtmltopdf	-L
+wkhtmltopdf	-O
+wkhtmltopdf	-R
+wkhtmltopdf	-s
+wkhtmltopdf	-T
+xclip	-display
+xclip	-loops
+xclip	-target
+xh	--auth-type
+xh	--bearer
+xh	--print
+xh	--style
+xh	-A
+xh	-o
+xh	-p
+xsel	--display
+xsel	--logfile
+xsel	--selection-name
+xz	--check
+xz	--files
+xz	--files0
+xz	--format
+xz	--lzma1
+xz	--lzma2
+xz	--memlimit-compress
+xz	--memlimit-decompress
+xz	--memlimit-mt-decompress
+xz	--suffix
+xz	--threads
+xz	-C
+xz	-F
+xz	-T
+ytt	--symlink-allow
+zip	-n
+zip	-O
+zip	-P
+zip	-s
+zip	-t
+zip	-Z
+zstd	--adapt
+zstd	--filelist
+zstd	--format
+zstd	--long
+zstd	--memory
+zstd	--num-threads
+zstd	--patch-from
+zstd	--threads
+zstd	--train
+zstd	--train-cover
+zstd	--train-fastcover
+zstd	-D
+zstd	-T

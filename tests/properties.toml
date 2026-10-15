@@ -504,6 +504,7 @@ owed = [
 "src/path_placement_tests.rs" = "the path-placement property suite (#[cfg(test)] mod in lib.rs)"
 "src/substitution_property_tests.rs" = "the exhaustive substitution-permissiveness suite (#[cfg(test)] mod in lib.rs)"
 "src/registry/arity_tests.rs" = "short-flag arity worklist guards (#[cfg(test)] mod in registry/mod.rs)"
+"src/registry/overlap_tests.rs" = "the standalone+valued overlap guard and its properties (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/gate_consistency.rs" = "path-gate consistency tests (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/tests.rs" = "the registry test suite"
 "src/suggest/tests.rs" = "suggest's test suite"
