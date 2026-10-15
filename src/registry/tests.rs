@@ -2737,9 +2737,9 @@ fn assert_tree_problems_are_known(problems: &[String]) {
 /// duplicate is silent otherwise: the built policy is identical either way, so nothing would
 /// ever surface it.
 ///
-/// This is deliberately NOT a guard against a raw `standalone`+`valued` overlap. Those scopes
-/// still exist and are not all errors; sorting them is the migration this field unblocks, and
-/// a guard written before that would encode a convention nobody has chosen (TODO.md).
+/// A raw `standalone`+`valued` overlap is a different guard,
+/// `overlap_tests::a_flag_is_never_both_standalone_and_valued_in_one_scope`, which pins the
+/// overlaps that predate it and refuses new ones.
 /// A File executor is governed by its own flag grammar unless it declares `passes_argv`.
 ///
 /// `dispatch_executor` used to return the locus verdict INSTEAD of checking the policy, so
@@ -3278,21 +3278,21 @@ fn a_path_named_flag_records_its_facet_profile() {
             // Recurses into NESTED subs. Walking only one level left 32 path-named spellings
             // (across 2421 nested sub blocks) unswept — a guard that claims coverage has to
             // cover, or its green is a statement about its own reach rather than the tree's.
-            fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<(String, &'a Vec<String>)>) {
+            fn collect<'a>(prefix: &str, subs: &'a [TomlSub], out: &mut Vec<(String, &'a Vec<String>, &'a Vec<String>)>) {
                 for sub in subs {
                     let label = format!("{prefix} {}", sub.name);
-                    out.push((label.clone(), &sub.valued));
+                    out.push((label.clone(), &sub.valued, &sub.optional_valued));
                     collect(&label, &sub.sub, out);
                 }
             }
-            let mut scopes: Vec<(String, &Vec<String>)> = vec![(cmd.name.clone(), &cmd.valued)];
+            let mut scopes: Vec<(String, &Vec<String>, &Vec<String>)> = vec![(cmd.name.clone(), &cmd.valued, &cmd.optional_valued)];
             collect(&cmd.name, &cmd.sub, &mut scopes);
-            for (label, valued) in scopes {
-                for flag in valued {
+            for (label, valued, optional) in scopes {
+                for (flag, sep) in valued.iter().map(|f| (f, ' ')).chain(optional.iter().map(|f| (f, '='))) {
                     if !PATH_NAMED.iter().any(|s| flag.contains(s)) {
                         continue;
                     }
-                    if crate::is_safe_command(&format!("{label} {flag} {SENSITIVE}")) {
+                    if crate::is_safe_command(&format!("{label} {flag}{sep}{SENSITIVE}")) {
                         candidates.push((label.clone(), flag.clone()));
                     }
                 }
