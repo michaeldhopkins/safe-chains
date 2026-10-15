@@ -3,7 +3,10 @@
 //! target. `--ignore-working-copy` skips the snapshot, and a subcommand that only observes then
 //! writes nothing, so for those the value is only read. Without -R jj acts on the repository the
 //! working directory sits in, which after `cd DIR` is DIR, so the working directory is judged with
-//! the same role. It is judged even when -R is given, which fails closed.
+//! the same role, even when -R is given, which fails closed. The one exception is a session whose
+//! root is itself a trust root directory: the session works there. A repository write
+//! reaches every file beneath it, a trust file among them (`jj restore` rewrites one), so no grant
+//! opens a write to a repository at a trust root such as `~/.claude`.
 
 use crate::parse::Token;
 use crate::pathgate::{Role, RoleSpec, Shape, walk};
@@ -42,7 +45,54 @@ pub(super) fn jj_repository(tokens: &[Token]) -> bool {
         .map(|(f, r)| (f.to_string(), r))
         .collect();
     let spec = RoleSpec { positional: Role::Ignore, shape: Shape::Plain, flags, handler: None, write_when: Vec::new(), when: Vec::new() };
-    walk(&spec, tokens) || crate::pathgate::judge(role, ".") == crate::verdict::Verdict::Denied
+    let moved = moved_from_root();
+    walk(&spec, tokens)
+        || (judges_here(moved) && crate::pathgate::judge(role, ".") == crate::verdict::Verdict::Denied)
+        || (role == Role::Write && writes_a_trust_root(tokens, moved))
+}
+
+fn judges_here(moved: bool) -> bool {
+    moved || crate::engine::resolve::frozen_write_kind(".") != Some(crate::engine::resolve::FrozenWrite::TrustRootDir)
+}
+
+fn moved_from_root() -> bool {
+    let cwd = crate::pathctx::cwd();
+    let trim = |p: &Option<String>| p.as_deref().map(|p| p.trim_end_matches('/').to_string());
+    cwd.is_some() && trim(&cwd) != trim(&crate::pathctx::root())
+}
+
+fn writes_a_trust_root(tokens: &[Token], moved: bool) -> bool {
+    repositories(tokens, moved)
+        .iter()
+        .any(|path| crate::engine::resolve::frozen_write_kind(trim_slashes(path)).is_some())
+}
+
+fn trim_slashes(path: &str) -> &str {
+    match path.trim_end_matches('/') {
+        "" if path.starts_with('/') => "/",
+        trimmed => trimmed,
+    }
+}
+
+fn repositories(tokens: &[Token], moved: bool) -> Vec<String> {
+    let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).take_while(|t| *t != "--").collect();
+    let mut found = if moved { vec![".".to_string()] } else { Vec::new() };
+    let mut i = 0;
+    while i < words.len() {
+        let word = words[i];
+        i += 1;
+        if word == "-R" || word == "--repository" {
+            found.extend(words.get(i).map(|v| (*v).to_string()));
+            i += 1;
+        } else if let Some(value) = word.strip_prefix("--repository=") {
+            found.push(value.to_string());
+        } else if let Some(value) = word.strip_prefix("-R").filter(|v| !v.is_empty()) {
+            found.push(value.to_string());
+        } else if VALUED_GLOBALS.contains(&word) {
+            i += 1;
+        }
+    }
+    found
 }
 
 fn reads_without_snapshot(tokens: &[Token]) -> bool {
