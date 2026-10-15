@@ -110,9 +110,6 @@ const HELD: &[(&str, &str, &str)] = &[
     ("action", "execute", "machine"),
     ("action", "communicate", "machine"),
     ("term", "locus.local", "machine"),
-    ("term", "locus.remote", "none"),
-    ("term", "locus.binding", "n/a"),
-    ("term", "locus.provenance", "n/a"),
     ("term", "reversibility", "trivial"),
     ("term", "reversibility", "recoverable"),
     ("term", "reversibility", "effortful"),
@@ -157,7 +154,7 @@ fn a_command_that_stays_in_its_process_still_says_what_it_does() {
 }
 
 #[test]
-fn a_held_place_prints_the_two_rows_it_always_did() {
+fn a_held_place_and_term_print_as_they_always_did() {
     let mut cap = caps(Operation::Destroy, LocalLocus::Machine);
     cap.reversibility = Reversibility::Effortful;
     let rows = rows(&cap.set_facets());
@@ -190,7 +187,7 @@ fn a_refusal_says_what_the_command_does_and_what_the_level_allows() {
 }
 
 #[test]
-fn a_refusal_keeps_the_term_while_its_wording_is_held() {
+fn a_refusal_keeps_a_held_place_and_names_no_other_computer() {
     let outside = caps(Operation::Observe, LocalLocus::Machine);
     let project = Clause { local_locus: Some(OrdBound::at_most(LocalLocus::Worktree)), ..Default::default() };
     assert_eq!(miss(project, &outside), "locus.local = machine (allowed: <= worktree)");
@@ -199,7 +196,23 @@ fn a_refusal_keeps_the_term_while_its_wording_is_held() {
     reaches.locus.remote = RemoteReach::Fixed;
     let nowhere =
         Clause { remote_reach: Some(OrdBound { min: Some(RemoteReach::None), max: Some(RemoteReach::None) }), ..Default::default() };
-    assert_eq!(miss(nowhere, &reaches), "locus.remote = fixed (allowed: none..=none)");
+    assert_eq!(miss(nowhere, &reaches), "one other computer or service, named in the command (allowed: no other computer)");
+}
+
+#[test]
+fn a_held_bound_keeps_todays_line_for_an_approved_term() {
+    let mut cap = caps(Operation::Observe, LocalLocus::Process);
+    cap.reversibility = Reversibility::Irreversible;
+    let limit = Clause { reversibility: Some(OrdBound::at_most(Reversibility::Effortful)), ..Default::default() };
+    assert_eq!(miss(limit, &cap), "reversibility = irreversible (allowed: <= effortful)");
+}
+
+#[test]
+fn a_refusal_on_a_held_term_keeps_todays_line() {
+    let mut cap = caps(Operation::Observe, LocalLocus::Process);
+    cap.reversibility = Reversibility::Effortful;
+    let limit = Clause { reversibility: Some(OrdBound::at_most(Reversibility::Recoverable)), ..Default::default() };
+    assert_eq!(miss(limit, &cap), "reversibility = effortful (allowed: <= recoverable)");
 }
 
 #[test]

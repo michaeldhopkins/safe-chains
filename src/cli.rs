@@ -9,7 +9,7 @@ EXAMPLES:
   safe-chains --explain \"grep foo . && ./deploy.sh\"
 
   # For a single command, --explain also shows the behavior it resolved to and
-  # names the facet that refused it (e.g. locus.remote = fixed):
+  # says in plain words what it does and which limit refused it:
   safe-chains --explain \"aws dynamodb put-item --table-name t --item {}\"
 
   # List the rules safe-chains reads from your files, and where each came from:
@@ -69,7 +69,7 @@ pub struct Cli {
 
     /// Print a per-segment breakdown of why a command would or would not auto-approve. For a
     /// single command it also prints the behavior it resolved to and, when it does not approve,
-    /// names the facet that refused it.
+    /// says which limit refused it.
     #[arg(long)]
     pub explain: bool,
 

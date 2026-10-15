@@ -29,10 +29,15 @@ fn the_breakdown_speaks_plainly_where_the_wording_is_approved() {
 
 #[test]
 fn the_breakdown_keeps_todays_terms_where_the_wording_is_held() {
+    let out = facet_breakdown("rm -rf ./build");
+    assert!(out.contains("reversibility                effortful"), "{out}");
+}
+
+#[test]
+fn the_breakdown_keeps_a_held_place() {
     let out = facet_breakdown("rm -rf ~/notes");
     assert!(out.contains("operation                    destroy"), "{out}");
     assert!(out.contains("locus.local                  machine"), "{out}");
-    assert!(out.contains("irreversible") || out.contains("cannot be undone"), "{out}");
 }
 
 #[test]

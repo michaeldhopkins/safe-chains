@@ -20,11 +20,14 @@ model a gap makes inexpressible, not by how many commands are waiting on it.
 ## AWAITING THE OWNER: wording of the held `--explain` phrases
 
 `src/engine/plain.rs` rows with an empty phrase print today's term (the `HELD` list in
-`src/engine/plain/tests.rs`): `machine` in six operations and as a place, `locus.remote = none`, the
-two `n/a` terms of `locus.binding` and `locus.provenance`, and the reversibility terms `trivial`,
-`recoverable` and `effortful`. The owner (2026-10-15) found "elsewhere", "no other computer" and the
-reversibility names unclear. Replacement wording is proposed to him; approving it is filling the
-empty strings and deleting the rows from `HELD`.
+`src/engine/plain/tests.rs`). Two sets are held because the proposed wording is false for some
+profiles. The `machine` place is the fail-closed face for every path safe-chains has not mapped, so
+"system-wide" is wrong for `rm -rf ~/notes`, `/opt` or `/Volumes`. The reversibility terms `trivial`,
+`recoverable` and `effortful`: the owner proposed "a single built-in command puts it back", "version
+control, the trash or a snapshot exists and can bring it back" and "only a backup can bring it back,
+if you made one", and `touch` on an existing file, `cp` and `sed -i` outside a repository,
+`systemctl restart`, remote creates and reads, and `git push` break them. Corrected wording went back
+to him. Approving it is filling the empty strings and deleting the rows from `HELD`.
 
 ## DECISION NEEDED: a git store under temp is plantable without a `.git` component
 
