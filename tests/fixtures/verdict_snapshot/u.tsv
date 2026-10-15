@@ -2380,9 +2380,9 @@ upsun user:get --email x	inert
 upsun user:get --format x	inert
 upsun user:get --help	inert
 upsun user:get --help --email x	inert
-upsun user:get --help --level	inert
+upsun user:get --help -h	inert
 upsun user:get --help x	inert
-upsun user:get --level	inert
+upsun user:get --level x	inert
 upsun user:get --project x	inert
 upsun user:get --property x	inert
 upsun user:get -P x	inert

@@ -6607,9 +6607,9 @@ platform user:get --email x	inert
 platform user:get --format x	inert
 platform user:get --help	inert
 platform user:get --help --email x	inert
-platform user:get --help --level	inert
+platform user:get --help -h	inert
 platform user:get --help x	inert
-platform user:get --level	inert
+platform user:get --level x	inert
 platform user:get --project x	inert
 platform user:get --property x	inert
 platform user:get -P x	inert

@@ -418,8 +418,8 @@ valued = ["--app", "--environment", "--format", "--project", "-A", "-e", "-p"]
 
 [[command.sub]]
 name = "user:get"
-standalone = ["--help", "--level", "-h"]
-valued = ["--email", "--format", "--project", "--property", "-l", "-p", "-P"]
+standalone = ["--help", "-h"]
+valued = ["--email", "--format", "--level", "--project", "--property", "-l", "-p", "-P"]
 
 [[command.sub]]
 name = "user:list"
