@@ -93,7 +93,7 @@ pub use verdict::{SafetyLevel, Verdict};
 /// Answers the question the boolean cannot: not "is this allowed" but "on which axis was it
 /// refused". Empty when no resolver claims the command — that is the answer too, since it means the
 /// legacy classifier decided and there are no facets to show.
-pub fn facet_breakdown(command: &str) -> String {
+pub fn facet_breakdown(command: &str, named_place: bool) -> String {
     // One simple command only. `shell_words` has no idea what `&&` means, so on a chain it hands
     // back one flat token list and the resolver reads the SECOND command's arguments as flags of
     // the first — `aws dynamodb scan --table-name t && rm -rf /` produced a single worst-case
@@ -125,7 +125,7 @@ pub fn facet_breakdown(command: &str) -> String {
     if let Some(w) = &inner {
         out.push_str(&format!("    (the refused command inside it: `{}`)\n", w.join(" ")));
     }
-    out.push_str(&engine::plain::render(&ex));
+    out.push_str(&engine::plain::render(&ex, named_place));
     out
 }
 

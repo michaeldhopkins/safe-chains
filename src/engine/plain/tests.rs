@@ -161,7 +161,7 @@ fn an_approved_place_prints_one_row_of_what_the_command_does() {
     let mut cap = caps(Operation::Destroy, LocalLocus::Worktree);
     cap.scale = Scale::Unbounded;
     cap.reversibility = Reversibility::Irreversible;
-    let rows = rows(&cap.set_facets());
+    let rows = rows(&cap.set_facets(), false);
     assert_eq!(
         rows,
         vec![
@@ -174,7 +174,7 @@ fn an_approved_place_prints_one_row_of_what_the_command_does() {
 
 #[test]
 fn a_command_that_stays_in_its_process_still_says_what_it_does() {
-    let rows = rows(&caps(Operation::Observe, LocalLocus::Process).set_facets());
+    let rows = rows(&caps(Operation::Observe, LocalLocus::Process).set_facets(), false);
     assert_eq!(rows, vec![("does".to_string(), "looks only at its own input".to_string())]);
 }
 
@@ -182,13 +182,50 @@ fn a_command_that_stays_in_its_process_still_says_what_it_does() {
 fn a_place_without_a_rule_prints_one_row_of_what_the_command_does() {
     let mut cap = caps(Operation::Destroy, LocalLocus::Machine);
     cap.reversibility = Reversibility::Effortful;
-    let rows = rows(&cap.set_facets());
+    let rows = rows(&cap.set_facets(), false);
     assert_eq!(
         rows,
         vec![
             ("does".to_string(), "deletes files in a place safe-chains has no rule for".to_string()),
             ("reversibility".to_string(), "hard to undo; it may take a backup, a rebuild or a reverse operation".to_string()),
         ]
+    );
+}
+
+#[test]
+fn a_named_place_is_not_said_to_have_no_rule() {
+    let mut swapped = 0;
+    for &operation in Operation::all() {
+        let cap = caps(operation, LocalLocus::Machine);
+        let named = rows(&cap.set_facets(), true);
+        let unnamed = rows(&cap.set_facets(), false);
+        assert!(named.iter().all(|(_, words)| !words.contains("no rule for")), "{named:?}");
+        if unnamed[0].1.ends_with("a place safe-chains has no rule for") {
+            let does = spoken("operation", operation.as_str()).expect("every operation has words");
+            assert_eq!(named[0], ("does".to_string(), does.to_string()), "{named:?}");
+            swapped += 1;
+        } else {
+            assert_eq!(named, unnamed);
+        }
+    }
+    assert_eq!(swapped, 6);
+    let project = caps(Operation::Observe, LocalLocus::Worktree);
+    assert_eq!(rows(&project.set_facets(), true), rows(&project.set_facets(), false));
+}
+
+#[test]
+fn a_refusal_of_a_secret_read_names_the_secret_before_the_place() {
+    let clause = Clause {
+        operation: Some(vec![Operation::Observe]),
+        local_locus: Some(OrdBound::at_most(LocalLocus::Worktree)),
+        secret_level: Some(OrdBound::at_most(SecretLevel::UsesAmbient)),
+        ..Default::default()
+    };
+    let mut cap = caps(Operation::Observe, LocalLocus::Machine);
+    cap.secret.level = SecretLevel::Reads;
+    assert_eq!(
+        miss(clause, &cap),
+        "reads a password, key or token (allowed up to: uses sign-ins you already set up, without reading them)"
     );
 }
 
@@ -252,12 +289,12 @@ proptest::proptest! {
     /// Whatever the engine resolves, no row is empty, none reads a dotted axis name where the
     /// operation or place was, and a row appears for every other facet.
     #[test]
-    fn rows_are_never_empty_and_account_for_every_facet(op in proptest::sample::select(Operation::all()), place in proptest::sample::select(LocalLocus::all()), worst in proptest::bool::ANY) {
+    fn rows_are_never_empty_and_account_for_every_facet(op in proptest::sample::select(Operation::all()), place in proptest::sample::select(LocalLocus::all()), worst in proptest::bool::ANY, named in proptest::bool::ANY) {
         let mut cap = if worst { Capability::worst("probe") } else { Capability::default() };
         cap.operation = op;
         cap.locus.local = place;
         let facets = cap.set_facets();
-        let printed = rows(&facets);
+        let printed = rows(&facets, named);
         for (name, words) in &printed {
             proptest::prop_assert!(!name.is_empty() && !words.is_empty());
         }

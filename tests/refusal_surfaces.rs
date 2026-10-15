@@ -143,3 +143,103 @@ fn suggest_offers_the_snapshot_flag_only_where_the_flag_would_be_approved() {
     assert!(!paranoid.contains("--ignore-working-copy"), "paranoid refuses the flagged read too:\n{paranoid}");
     assert!(paranoid.contains("No grant changes this"), "{paranoid}");
 }
+
+const KNOWN_PLACES: &[&str] =
+    &[", a credential store", ", a raw device", "safe-chains reads its own permissions", "decides who may log in"];
+
+const REACHES_A_KNOWN_PLACE: &[&str] = &[
+    "cat ~/.ssh/id_rsa", "cat ~/.aws/credentials", "cat ~/.gnupg/secring.gpg", "cat /etc/shadow", "cat ~root/.bashrc",
+    "cat ~/Library/Keychains/login.keychain-db", "grep -r x ~/.ssh", "cp ~/.aws/credentials ./c", "tar -cf x.tar ~/.ssh",
+    "mv ~/.ssh/id_rsa /tmp/x", "ln -s x ~/.ssh/id_rsa",
+];
+
+const REFUSAL_OWED: &[&str] = &["rm ~/.aws/credentials", "touch ~/.ssh/x", "sed -i s/a/b/ ~/.ssh/config", "cp x ~/.ssh/authorized_keys"];
+
+fn without_bounds(text: &str) -> String {
+    text.lines()
+        .map(|line| line.split(" (allowed up to:").next().unwrap_or(line))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+fn explained(command: &str, home: &std::path::Path) -> String {
+    let text = run(&["--explain", command], home, None);
+    assert!(text.contains("resolved profile:"), "`{command}` prints no profile to check:\n{text}");
+    assert!(KNOWN_PLACES.iter().any(|m| text.contains(m)), "`{command}` no longer names a known place:\n{text}");
+    text
+}
+
+#[test]
+fn explain_never_says_there_is_no_rule_for_a_place_it_names() {
+    let home = bare_home();
+    for command in REACHES_A_KNOWN_PLACE {
+        let text = explained(command, home.path());
+        assert!(
+            !without_bounds(&text).contains("no rule for"),
+            "`{command}` is said to reach a place without a rule while its Why names the place:\n{text}"
+        );
+    }
+}
+
+#[test]
+fn a_write_to_a_named_place_says_no_rule_only_in_its_refusal_until_that_line_has_words() {
+    let home = bare_home();
+    for command in REFUSAL_OWED {
+        let text = explained(command, home.path());
+        let said = without_bounds(&text);
+        let lines: Vec<&str> = said.lines().filter(|l| l.contains("no rule for")).collect();
+        assert_eq!(
+            lines,
+            vec!["    a place safe-chains has no rule for"],
+            "`{command}`: move it to REACHES_A_KNOWN_PLACE once its refusal no longer says this:\n{text}"
+        );
+    }
+}
+
+const NO_NAMED_PLACE: &[(&str, &str)] = &[
+    ("rm /opt/y", "outside the working directory"),
+    ("cat ~/$X", "is built by an interpolation"),
+    ("rm -rf /tmp/foo /opt/y", "a temporary directory that is not this session's scratchpad"),
+    ("cat /tmp/x /opt/y", "resolved profile:"),
+];
+
+#[test]
+fn a_place_the_why_line_does_not_name_is_still_said_to_have_no_rule() {
+    let home = bare_home();
+    for (command, why) in NO_NAMED_PLACE {
+        let text = run(&["--explain", command], home.path(), None);
+        assert!(text.contains(why), "`{command}` no longer says `{why}`:\n{text}");
+        assert!(!KNOWN_PLACES.iter().any(|m| text.contains(m)), "`{command}` now names a known place:\n{text}");
+        let does = text
+            .lines()
+            .filter(|l| l.trim_start().starts_with("does "))
+            .any(|l| l.ends_with("a place safe-chains has no rule for"));
+        assert!(does, "`{command}` lost the words for a place with no rule:\n{text}");
+    }
+}
+
+#[test]
+fn which_place_the_why_line_names_follows_the_order_of_the_paths() {
+    let home = bare_home();
+    let named_first = without_bounds(&explained("cat ~/.ssh/id_rsa /opt/y", home.path()));
+    assert!(!named_first.contains("no rule for"), "see TODO.md, the place a Why line names:\n{named_first}");
+    let named_second = run(&["--explain", "cat /opt/y ~/.ssh/id_rsa"], home.path(), None);
+    assert!(named_second.contains("outside the working directory"), "{named_second}");
+    let rows: Vec<&str> = named_second.lines().filter(|l| l.trim_start().starts_with("does ")).collect();
+    assert_eq!(rows.len(), 2, "{named_second}");
+    assert!(
+        rows.iter().all(|l| l.ends_with("a place safe-chains has no rule for")),
+        "see TODO.md, the place a Why line names:\n{named_second}"
+    );
+}
+
+#[test]
+fn explain_settles_the_snapshot_reason_the_way_suggest_does() {
+    let home = bare_home();
+    let command = "jj -R ~/.claude log";
+    let default = run(&["--explain", command], home.path(), None);
+    assert!(default.contains("Add --ignore-working-copy"), "{default}");
+    let paranoid = run(&["--level", "paranoid", "--explain", command], home.path(), None);
+    assert!(!paranoid.contains("Add --ignore-working-copy"), "{paranoid}");
+    assert!(paranoid.contains("safe-chains reads its permissions"), "{paranoid}");
+}

@@ -17,6 +17,33 @@ about one command is one wrong answer. A gap in the mechanism is every command t
 would have used it — which is why the backlog below is ordered by how much of the
 model a gap makes inexpressible, not by how many commands are waiting on it.
 
+## AWAITING THE OWNER: words for a place safe-chains names
+
+`--explain` calls the `machine` place "a place safe-chains has no rule for". That term also holds
+credential stores, so a refusal of a write or delete there (`rm ~/.aws/credentials`) says "a place
+safe-chains has no rule for" above a Why line naming a credential store. Reads and the "does" row
+no longer contradict it. Two phrases would finish it, both for the owner to approve:
+
+- the refusal's subject when the Why line names the place: proposed "a place safe-chains protects";
+- a ceiling of `machine` in "(allowed up to: …)", which today reads "a place safe-chains has no
+  rule for" (`cat /dev/disk0`): proposed "anywhere but login and startup files, devices and the
+  operating system's core".
+
+`REFUSAL_OWED` in `tests/refusal_surfaces.rs` lists the commands; each moves to
+`REACHES_A_KNOWN_PLACE` when its refusal has words.
+
+The Why line names the first path outside the working directory, and the "does" rows follow it for
+the whole command. `cat ~/.ssh/id_rsa /opt/y` drops "no rule for" from both rows, `/opt/y`'s
+included; `cat /opt/y ~/.ssh/id_rsa` keeps it on both. Neither is false, since the secret row still
+names the credential, but the wording depends on argument order. It crosses capabilities too:
+`cp ~/.aws/credentials /opt/y` says only "creates" for the write to `/opt/y`, which has no rule.
+Fixing it needs each capability to carry the path it reaches into the profile.
+
+Separately, `facet_breakdown` treats `cat ~/.ssh/id_rsa | grep x` as one command: `|`, `grep` and
+`x` are resolved as cat's file operands and print spurious "reads files in your project" rows. This
+predates the wording above. `which_place_the_why_line_names_follows_the_order_of_the_paths`
+pins today's behaviour.
+
 ## DECISION NEEDED: a git store under temp is plantable without a `.git` component
 
 Writes into `.git`, `.jj`, `.hg` and `.sl` are frozen wherever they sit (`regions/metadata.rs`),

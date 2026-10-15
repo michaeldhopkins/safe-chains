@@ -284,12 +284,19 @@ pub fn words<'a>(axis: &str, value: &'a str) -> &'a str {
 
 /// The rows `--explain` prints for one capability's facets, in order. The operation and the local
 /// place become one row of what the command does; while that wording is held the two rows stay as
-/// they were. Every other axis keeps its name and prints its phrase.
-pub fn rows(facets: &[(&'static str, &'static str)]) -> Vec<(String, String)> {
+/// they were. Every other axis keeps its name and prints its phrase. With `named_place` (the command
+/// reaches a place its Why line names, such as a credential store) a row that would call the
+/// place one without a rule says only what the command does.
+pub fn rows(facets: &[(&'static str, &'static str)], named_place: bool) -> Vec<(String, String)> {
     let find = |axis: &str| facets.iter().find(|(a, _)| *a == axis).map(|(_, t)| *t);
     let operation = find("operation");
     let place = find("locus.local").unwrap_or("process");
-    let does = operation.and_then(|o| action(o, place)).filter(|p| !is_held(p));
+    let unruled = |p: &str| term("locus.local", "machine").is_some_and(|t| p.ends_with(t));
+    let does = operation.and_then(|o| match action(o, place) {
+        Some(p) if named_place && unruled(p) => spoken("operation", o),
+        phrase => phrase,
+    });
+    let does = does.filter(|p| !is_held(p));
     let mut out = Vec::new();
     for (axis, value) in facets {
         match (*axis, does) {
@@ -303,11 +310,11 @@ pub fn rows(facets: &[(&'static str, &'static str)]) -> Vec<(String, String)> {
 }
 
 /// The body of the `resolved profile` section: each capability's rows, then the verdict of the band.
-pub fn render(ex: &super::bridge::ProfileExplanation) -> String {
+pub fn render(ex: &super::bridge::ProfileExplanation, named_place: bool) -> String {
     let mut out = String::new();
     for (because, facets) in &ex.capabilities {
         out.push_str(&format!("    · {because}\n"));
-        for (name, words) in rows(facets) {
+        for (name, words) in rows(facets, named_place) {
             out.push_str(&format!("        {name:<28} {words}\n"));
         }
     }

@@ -187,10 +187,11 @@ impl Clause {
     ///
     /// Order is the taxonomy's axis order, not severity: it reports A failing facet, not the most
     /// important one, since a clause is a conjunction and every failure is disqualifying. The one
-    /// exception: `secret.level` is checked ahead of reversibility, persistence and disclosure, so
-    /// a secret read is refused for the secret rather than for being `exposed`.
+    /// exception: `secret.level` is checked straight after the operation, so a secret read is refused
+    /// for the secret rather than for where it sits or for being `exposed`.
     fn first_mismatch(&self, cap: &Capability, role: Role) -> Option<FacetMismatch> {
         set_mismatch("operation", self.operation.as_deref(), cap.operation)
+            .or_else(|| ord_mismatch("secret.level", self.secret_level, cap.secret.level))
             .or_else(|| ord_mismatch("locus.local", self.local_locus, cap.locus.local))
             .or_else(|| ord_mismatch("locus.remote", self.remote_reach, cap.locus.remote))
             .or_else(|| set_mismatch("locus.binding", self.remote_binding.as_deref(), cap.locus.binding))
@@ -199,7 +200,6 @@ impl Clause {
             .or_else(|| ord_mismatch("retrieval", self.retrieval, cap.retrieval))
             .or_else(|| ord_mismatch("authority", self.authority, cap.authority))
             .or_else(|| ord_mismatch("isolation", self.isolation, cap.isolation))
-            .or_else(|| ord_mismatch("secret.level", self.secret_level, cap.secret.level))
             .or_else(|| ord_mismatch("reversibility", self.reversibility, cap.reversibility))
             .or_else(|| ord_mismatch("persistence.level", self.persistence_level, cap.persistence.level))
             .or_else(|| ord_mismatch("persistence.trigger.escape", self.trigger_escape, cap.persistence.trigger.escape))

@@ -91,7 +91,11 @@ fn run_explain(
     // The facet breakdown is CLI-only. `render()` also feeds the hook's injected context, where an
     // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
     // cannot act on. Someone who typed `--explain` is asking why, so they get why.
-    print!("{}", safe_chains::facet_breakdown(command));
+    let approved = |c: &str| safe_chains::explain_with_coverage_at_level(c, engine_level).is_allowed();
+    let reach = if !explanation.is_allowed() && folder_level.is_none() { safe_chains::workspace_overreach(command) } else { None };
+    let reach = reach.map(|(path, reason)| (path, reason.settled(command, &approved)));
+    let named_place = reach.as_ref().is_some_and(|(_, reason)| names_the_place(reason));
+    print!("{}", safe_chains::facet_breakdown(command, named_place));
     // …and the reach clause, which is the rest of "why" for anything refused over a PATH.
     //
     // The hook has always emitted this; `--explain` did not, so the two disagreed about the reason
@@ -105,25 +109,28 @@ fn run_explain(
     //
     // The facet breakdown covers the engine's own commands; this covers the legacy surface, where
     // the breakdown is empty and there is otherwise nothing to read.
-    if !explanation.is_allowed()
-        && folder_level.is_none()
-        && let Some((path, reason)) = safe_chains::workspace_overreach(command)
-    {
+    if let Some((path, reason)) = reach {
         // "Why:" rather than the hook's "safe-chains did not auto-approve this:" lead-in, which the
         // header three lines up has already said. `message` opens mid-sentence ("it reaches …"), so
         // it needs something in front of it or it reads as an orphan.
-        println!(
-            "\nWhy: {}. {HOW_IT_WORKS_URL}",
-            reason
-                .settled(command, &|c| safe_chains::explain_with_coverage_at_level(c, engine_level).is_allowed())
-                .message(&path)
-        );
+        println!("\nWhy: {}. {HOW_IT_WORKS_URL}", reason.message(&path));
     }
     if !explanation.is_allowed() {
         print!("\n{}", explain_fixes(&explanation, engine_level));
     }
     let allowed = folder_cli::explain(folder_level, uncapped) && explanation.is_allowed();
     process::exit(i32::from(!allowed));
+}
+
+fn names_the_place(reason: &safe_chains::ReachReason) -> bool {
+    use safe_chains::ReachReason::{
+        Credential, ForeignTemp, FrozenSystemIntegrity, FrozenTrustFile, FrozenTrustRoot, OutsideWorkspace, RawDevice, RepositorySnapshot,
+        Unconfined,
+    };
+    match reason {
+        Credential | FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity | RawDevice => true,
+        ForeignTemp | OutsideWorkspace | Unconfined | RepositorySnapshot => false,
+    }
 }
 
 /// One fix per refused segment, so `--explain` always ends by saying what would change the answer.
