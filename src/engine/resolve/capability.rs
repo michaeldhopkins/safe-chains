@@ -25,9 +25,16 @@ use crate::engine::facet::*;
 pub(super) fn reads_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = reads_content(read_locus(path), scale, because);
     if unclearable_read(path, scale) {
-        c.secret.level = SecretLevel::Reads;
+        claims_secret_read(&mut c);
     }
     c
+}
+
+pub(super) fn claims_secret_read(c: &mut Capability) {
+    c.secret.level = SecretLevel::Reads;
+    if c.operation == Operation::Observe {
+        c.reversibility = c.reversibility.max(Reversibility::Exposed);
+    }
 }
 
 /// The ONE test for "this read cannot be cleared by the shield" — either the path names a store,
@@ -68,7 +75,7 @@ fn names_many(path: &str) -> bool {
 pub(super) fn observes_path(path: &str, scale: Scale, because: &str) -> Capability {
     let mut c = observes(read_locus(path), scale, because);
     if unclearable_read(path, scale) {
-        c.secret.level = SecretLevel::Reads;
+        claims_secret_read(&mut c);
     }
     c
 }
@@ -300,7 +307,7 @@ pub(super) fn transfer_profile(
         .map(|s| {
             let mut c = per_source(at(s, source_face), scale);
             if unclearable_read(s, scale) {
-                c.secret.level = SecretLevel::Reads;
+                claims_secret_read(&mut c);
             }
             c
         })
@@ -327,4 +334,74 @@ fn received_name(source: &str) -> Option<String> {
     }
     let name = trimmed.rsplit('/').next()?;
     (name != ".." && !super::locus::is_unpinnable(name)).then(|| name.to_string())
+}
+
+#[cfg(test)]
+mod secret_read_tests {
+    use super::*;
+    use crate::engine::authoring::default_levels;
+    use crate::engine::testgen::arb_capability;
+    use proptest::prelude::*;
+
+    fn admitted_by(cap: &Capability) -> Vec<bool> {
+        default_levels().iter().map(|l| l.admits(&Profile::of(vec![cap.clone()]))).collect()
+    }
+
+    proptest! {
+        #[test]
+        fn a_secret_read_is_exposed_and_nothing_else_moves(cap in arb_capability()) {
+            let mut marked = cap.clone();
+            claims_secret_read(&mut marked);
+            prop_assert_eq!(marked.secret.level, SecretLevel::Reads);
+            prop_assert_eq!(marked.reversibility >= Reversibility::Exposed, cap.operation == Operation::Observe || cap.reversibility >= Reversibility::Exposed);
+            prop_assert!(marked.reversibility >= cap.reversibility);
+            let mut rest = cap.clone();
+            rest.secret.level = marked.secret.level;
+            rest.reversibility = marked.reversibility;
+            prop_assert_eq!(rest, marked);
+        }
+
+        #[test]
+        fn marking_a_secret_read_exposed_changes_no_default_level(cap in arb_capability()) {
+            let mut before = cap.clone();
+            before.secret.level = SecretLevel::Reads;
+            let mut after = cap;
+            claims_secret_read(&mut after);
+            prop_assert_eq!(admitted_by(&before), admitted_by(&after));
+        }
+
+        #[test]
+        fn a_read_is_exposed_exactly_when_it_claims_a_secret(
+            root in proptest::sample::select(vec!["", "./", "../", "~/", "~/.ssh/", "~/.aws/", "/etc/", "/tmp/", "$X/", "/usr/lib/"]),
+            name in "[a-z_.*]{1,10}",
+            scale in proptest::sample::select(Scale::all().to_vec()),
+        ) {
+            let path = format!("{root}{name}");
+            for c in [reads_path(&path, scale, "probe"), observes_path(&path, scale, "probe")] {
+                prop_assert_eq!(c.secret.level == SecretLevel::Reads, c.reversibility == Reversibility::Exposed, "{}", path);
+            }
+        }
+    }
+
+    #[test]
+    fn a_credential_store_read_is_exposed() {
+        let c = reads_path("~/.ssh/id_rsa", Scale::Single, "probe");
+        assert_eq!(c.secret.level, SecretLevel::Reads);
+        assert_eq!(c.reversibility, Reversibility::Exposed);
+        let plain = reads_path("./src/main.rs", Scale::Single, "probe");
+        assert_eq!(plain.reversibility, Reversibility::None);
+    }
+
+    #[test]
+    fn a_threshold_at_effortful_refuses_a_secret_read_on_reversibility_alone() {
+        let levels = crate::engine::authoring::build_level_set(
+            "[level.old]\n[[level.old.allow]]\noperation = [\"observe\"]\nreversibility = \"<= effortful\"\n",
+        )
+        .expect("compiles");
+        let old = &levels[0];
+        let read = reads_path("~/.ssh/id_rsa", Scale::Single, "probe");
+        assert!(!old.admits(&Profile::of(vec![read])), "a ceiling at effortful must refuse a secret read");
+        let plain = reads_path("./notes", Scale::Single, "probe");
+        assert!(old.admits(&Profile::of(vec![plain])));
+    }
 }

@@ -170,6 +170,7 @@ pub const TERMS: &[(&str, &str, &str)] = &[
         "can usually be undone from version control, the trash or a snapshot, or by running the opposite command",
     ),
     ("reversibility", "effortful", "hard to undo; it may take a backup, a rebuild or a reverse operation"),
+    ("reversibility", "exposed", "cannot be taken back once seen"),
     ("reversibility", "irreversible", "cannot be undone"),
     ("persistence.level", "transient", "leaves nothing behind"),
     ("persistence.level", "data", "leaves data behind"),

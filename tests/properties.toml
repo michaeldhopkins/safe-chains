@@ -18,7 +18,6 @@ owed = [
   "src/cst/reserved.rs",
   "src/engine/archetype.rs",
   "src/engine/bridge.rs",
-  "src/engine/resolve/capability.rs",
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/coreutils/sed.rs",
@@ -154,7 +153,11 @@ owed = [
   "src/handler_property_tests.rs::a_flag_naming_a_program_is_gated_on_where_that_program_lives",
   "src/handler_property_tests.rs::a_write_is_gated_by_its_target_not_its_spelling",
 ]
-"src/engine/resolve/capability.rs" = []
+"src/engine/resolve/capability.rs" = [
+  "a_secret_read_is_exposed_and_nothing_else_moves",
+  "marking_a_secret_read_exposed_changes_no_default_level",
+  "a_read_is_exposed_exactly_when_it_claims_a_secret",
+]
 "src/engine/resolve/flags.rs" = []
 "src/engine/resolve/locus.rs" = [
   "a_dollar_anywhere_forces_machine",

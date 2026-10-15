@@ -564,4 +564,36 @@ mod neighbour_tests {
         }
         assert!(problems.is_empty(), "inaccurate distinctions:\n  {}", problems.join("\n  "));
     }
+
+    #[test]
+    fn reads_of_secrets_are_exposed_and_every_level_judges_them_as_before() {
+        use crate::engine::authoring::default_levels;
+        use crate::engine::facet::{Operation, Profile, RetrievalGranularity, Reversibility, SecretLevel};
+        let expected = ["credential-read", "decrypt-read", "bulk-object-read"];
+        let mut found = Vec::new();
+        for name in names() {
+            let c = archetype(name).expect("archetype");
+            let reads_secret = c.operation == Operation::Observe
+                && (c.secret.level == SecretLevel::Reads || c.retrieval == RetrievalGranularity::BulkContent);
+            assert_eq!(c.reversibility == Reversibility::Exposed, reads_secret, "{name}");
+            if !reads_secret {
+                continue;
+            }
+            found.push(name);
+            let mut before = c.clone();
+            before.reversibility = Reversibility::None;
+            for l in default_levels() {
+                assert_eq!(
+                    l.admits(&Profile::of(vec![c.clone()])),
+                    l.admits(&Profile::of(vec![before.clone()])),
+                    "`{}` judges {name} differently now",
+                    l.name
+                );
+            }
+        }
+        found.sort_unstable();
+        let mut want = expected.to_vec();
+        want.sort_unstable();
+        assert_eq!(found, want);
+    }
 }

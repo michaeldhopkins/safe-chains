@@ -165,15 +165,6 @@ impl Clause {
         self.first_mismatch(cap, role).is_none()
     }
 
-    /// The first facet constraint `cap` fails, or `None` if this clause admits it.
-    ///
-    /// `check` is defined in terms of THIS rather than the other way round. A parallel
-    /// "explain" walk beside a separate `&&` chain would drift the moment a facet is added, and a
-    /// diagnostic that disagrees with the predicate is worse than none — it would send an author
-    /// chasing the wrong axis. `clause_diagnostic_agrees_with_admits` pins the equivalence.
-    ///
-    /// Order is the taxonomy's axis order, not severity: it reports A failing facet, not the most
-    /// important one, since a clause is a conjunction and every failure is disqualifying.
     /// Test-only view of `first_mismatch`. Takes the ROLE: the allow/deny asymmetry on the supply
     /// chain means an allow-only equivalence proptest cannot see a deny-side inversion (it did not
     /// — a `?` that reported "no complaint" for a definitely-failing deny got through it).
@@ -187,6 +178,17 @@ impl Clause {
         self.matches_as_deny(cap)
     }
 
+    /// The first facet constraint `cap` fails, or `None` if this clause admits it.
+    ///
+    /// `check` is defined in terms of THIS rather than the other way round. A parallel
+    /// "explain" walk beside a separate `&&` chain would drift the moment a facet is added, and a
+    /// diagnostic that disagrees with the predicate is worse than none — it would send an author
+    /// chasing the wrong axis. `clause_diagnostic_agrees_with_admits` pins the equivalence.
+    ///
+    /// Order is the taxonomy's axis order, not severity: it reports A failing facet, not the most
+    /// important one, since a clause is a conjunction and every failure is disqualifying. The one
+    /// exception: `secret.level` is checked ahead of reversibility, persistence and disclosure, so
+    /// a secret read is refused for the secret rather than for being `exposed`.
     fn first_mismatch(&self, cap: &Capability, role: Role) -> Option<FacetMismatch> {
         set_mismatch("operation", self.operation.as_deref(), cap.operation)
             .or_else(|| ord_mismatch("locus.local", self.local_locus, cap.locus.local))
@@ -197,6 +199,7 @@ impl Clause {
             .or_else(|| ord_mismatch("retrieval", self.retrieval, cap.retrieval))
             .or_else(|| ord_mismatch("authority", self.authority, cap.authority))
             .or_else(|| ord_mismatch("isolation", self.isolation, cap.isolation))
+            .or_else(|| ord_mismatch("secret.level", self.secret_level, cap.secret.level))
             .or_else(|| ord_mismatch("reversibility", self.reversibility, cap.reversibility))
             .or_else(|| ord_mismatch("persistence.level", self.persistence_level, cap.persistence.level))
             .or_else(|| ord_mismatch("persistence.trigger.escape", self.trigger_escape, cap.persistence.trigger.escape))
@@ -204,7 +207,6 @@ impl Clause {
             .or_else(|| ord_mismatch("disclosure.audience", self.disclosure_audience, cap.disclosure.audience))
             .or_else(|| set_mismatch("disclosure.channel", self.disclosure_channel.as_deref(), cap.disclosure.channel))
             .or_else(|| set_mismatch("disclosure.principal", self.disclosure_principal.as_deref(), cap.disclosure.principal))
-            .or_else(|| ord_mismatch("secret.level", self.secret_level, cap.secret.level))
             .or_else(|| set_mismatch("secret.channel", self.secret_channel.as_deref(), cap.secret.channel))
             .or_else(|| set_mismatch("secret.principal", self.secret_principal.as_deref(), cap.secret.principal))
             .or_else(|| ord_mismatch("network.direction", self.net_direction, cap.network.direction))

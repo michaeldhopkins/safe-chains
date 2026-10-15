@@ -284,13 +284,13 @@ ordinal_term! {
 // ── 2.3 Durability ─────────────────────────────────────────────────────────────
 
 ordinal_term! {
-    /// How hard the effect is to undo (v1.4 §2.3). Environment-dependent cases
-    /// resolve worst-case (HP-8).
+    /// How hard the effect is to undo (v1.4 §2.3). Environment-dependent cases resolve worst-case (HP-8).
     Reversibility {
         None => "none",              // pure observe
         Trivial => "trivial",        // idempotent/undo
         Recoverable => "recoverable",// VCS/recycle/snapshot
         Effortful => "effortful",    // out-of-band backups only
+        Exposed => "exposed",
         Irreversible => "irreversible",
     }
 }
@@ -806,6 +806,8 @@ mod tests {
         assert!(RetrievalGranularity::Record < RetrievalGranularity::BulkContent);
         assert!(Authority::User < Authority::Root && Authority::Root < Authority::OtherUser);
         assert!(Reversibility::Recoverable < Reversibility::Irreversible);
+        assert!(Reversibility::Effortful < Reversibility::Exposed && Reversibility::Exposed < Reversibility::Irreversible);
+        assert_eq!(Reversibility::hazard(), Reversibility::Irreversible);
         assert!(PersistenceLevel::Data < PersistenceLevel::Installing);
         assert!(TriggerEscape::Immediate < TriggerEscape::Boot);
         assert!(DisclosureAudience::LocalProcess < DisclosureAudience::Public);

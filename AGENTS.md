@@ -233,8 +233,8 @@ flag) along:
 - **execution** — does it run code, and whose? (self / caller-inline / caller-file / ambient-config /
   network-sourced — the last is the install / supply-chain surface, e.g. `npm install` postinstall.)
 - **reversibility & persistence** — trivially undone / recoverable (VCS/snapshot) / effortful (backups
-  only) / irreversible; and does it persist as data, RECONFIGURE future commands, or INSTALL
-  executables/services/hooks?
+  only) / exposed (a secret read: seen once, it cannot be taken back) / irreversible; and does it
+  persist as data, RECONFIGURE future commands, or INSTALL executables/services/hooks?
 - **secret & disclosure** — does it read a credential store, and where does the output flow (the
   model / a local file / a remote / the public)?
 

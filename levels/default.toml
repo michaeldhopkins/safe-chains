@@ -282,6 +282,23 @@ network = { direction = "<= outbound", destination = "<= arbitrary", payload = "
 execution = "<= caller-file"
 cost = "<= quota"
 
+# A bulk download (an object body, a block, an archive) cannot be taken back once seen, which ranks it
+# above effortful; the bulk-content read above was already this level's, so it stays here. Reads only:
+# every other operation keeps the `<= effortful` cap.
+[[level.network-admin.allow]]
+operation = ["observe"]
+locus = { local = "<= worktree-trusted", remote = "<= arbitrary", provenance = "<= literal" }
+scale = "<= unbounded"
+retrieval = "<= bulk-content"
+authority = "user"
+reversibility = "<= exposed"
+persistence = { level = "<= reconfiguring" }
+disclosure = { audience = "<= public" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= sends-host-data" }
+execution = "<= caller-file"
+cost = "<= quota"
+
 [level.yolo]
 # No limits — it allows ALMOST everything, and it does so POSITIVELY, with no `deny`. yolo is a
 # base level (no `extends`). The one thing it withholds — unbounded irreversible destruction,
@@ -294,10 +311,10 @@ cost = "<= quota"
 # Non-destroy operations: unrestricted — any locus, authority, network, execution, reversibility.
 [[level.yolo.allow]]
 operation = ["observe", "create", "mutate", "execute", "communicate", "configure", "authorize", "control"]
-# Destruction that is RECOVERABLE (at any scale) ...
+# Destruction short of IRREVERSIBLE (at any scale) ...
 [[level.yolo.allow]]
 operation = ["destroy"]
-reversibility = "<= effortful"
+reversibility = "<= exposed"
 # ... OR BOUNDED (at any reversibility). The union of these two admits every destroy except the
 # one that is BOTH irreversible AND unbounded — terraform destroy (bounded) and mkfs (single
 # device) stay in, `rm -rf /` (irreversible + unbounded) is the sole capability nothing admits.

@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 55a5a4d40de9a81c5c1a07afd249a69350a9fac9c6e19c778abd6103f3604e9b # shrinks to cap = Capability { operation: Observe, locus: Locus { local: Process, remote: None, binding: Na, provenance: Na }, scale: Single, retrieval: Metadata, authority: User, isolation: None, reversibility: None, persistence: Persistence { level: Transient, trigger: Trigger { escape: Immediate, kind: None } }, disclosure: Disclosure { audience: None, channel: None, principal: Own }, secret: Secret { level: None, channel: None, principal: Own }, network: Network { direction: None, destination: Na, payload: None }, execution: Execution { trust: None, supply_chain: None }, cost: None, because: "" }
+cc e6608000df7394bae97252abe924050457cd964c14cd8ebc5add2f1d2f966443 # shrinks to root = "../", name = "a", scale = Single
+cc 74e816c2f534c546440bc3eef49fe6724b2318f6f5807bb0a72ed62e823b52d3 # shrinks to cap = Capability { operation: Destroy, locus: Locus { local: Process, remote: None, binding: Na, provenance: Na }, scale: Unbounded, retrieval: Metadata, authority: User, isolation: None, reversibility: None, persistence: Persistence { level: Transient, trigger: Trigger { escape: Immediate, kind: None } }, disclosure: Disclosure { audience: None, channel: None, principal: Own }, secret: Secret { level: None, channel: None, principal: Own }, network: Network { direction: None, destination: Na, payload: None }, execution: Execution { trust: None, supply_chain: None }, cost: None, because: "" }

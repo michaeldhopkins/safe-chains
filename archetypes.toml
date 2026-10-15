@@ -115,6 +115,7 @@ because = "runs a caller-supplied command on a remote host or container (kubectl
 # exfiltrated. `secret = reads`.
 [archetype.credential-read]
 operation = "observe"
+reversibility = "exposed"
 secret = { level = "reads" }
 disclosure = { audience = "local-process" }
 same_point_as = "decrypt-read"
@@ -129,6 +130,7 @@ because = "reads and exposes EXISTING credential material to the caller (prints 
 # is a deliberate reveal of encrypted-at-rest secret material, classified at the credential tier.
 [archetype.decrypt-read]
 operation = "observe"
+reversibility = "exposed"
 secret = { level = "reads" }
 disclosure = { audience = "local-process" }
 same_point_as = "credential-read"
@@ -140,6 +142,7 @@ because = "decrypts secret material and reveals the plaintext to the caller — 
 # comment defers to).
 [archetype.bulk-object-read]
 operation = "observe"
+reversibility = "exposed"
 locus = { remote = "fixed" }
 scale = "unbounded"
 retrieval = "bulk-content"

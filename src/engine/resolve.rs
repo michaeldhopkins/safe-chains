@@ -2013,6 +2013,7 @@ mod tests {
         let mut cat_dot = cat.clone();
         cat_dot.locus.local = LocalLocus::Machine;
         cat_dot.secret.level = SecretLevel::Reads;
+        cat_dot.reversibility = Reversibility::Exposed;
         assert_eq!(one_cap(&["cat", "~/.git-credentials"]), cat_dot, "cat ~/.git-credentials");
 
         // cat of a home CREDENTIAL store: machine locus AND — the part that was missing until
@@ -2023,6 +2024,7 @@ mod tests {
         let mut cat_cred = cat.clone();
         cat_cred.locus.local = LocalLocus::Machine;
         cat_cred.secret.level = SecretLevel::Reads;
+        cat_cred.reversibility = Reversibility::Exposed;
         assert_eq!(one_cap(&["cat", "~/.ssh/id_rsa"]), cat_cred, "cat ~/.ssh/id_rsa");
 
         // grep of a worktree file — like cat, bounded to the single searched file.

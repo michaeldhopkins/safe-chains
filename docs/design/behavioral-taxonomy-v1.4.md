@@ -129,6 +129,7 @@ flags re-add loci (§3.2).
 ### 2.3 Durability
 **Reversibility** (ordinal): `none` (pure observe) → `trivial` (idempotent/undo) →
 `recoverable` (VCS/recycle/snapshot) → `effortful` (out-of-band backups only) →
+`exposed` (a read of a secret: nothing changed, but what was seen cannot be unseen) →
 `irreversible`. Environment-dependent cases resolve worst-case (HP-8).
 
 **Persistence** (compound). *Level*: `transient` → `data` → `reconfiguring`

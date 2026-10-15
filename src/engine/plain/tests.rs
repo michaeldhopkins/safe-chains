@@ -111,8 +111,11 @@ fn the_reversibility_terms_read_as_approved() {
         ("trivial", "one command undoes it"),
         ("recoverable", "can usually be undone from version control, the trash or a snapshot, or by running the opposite command"),
         ("effortful", "hard to undo; it may take a backup, a rebuild or a reverse operation"),
+        ("exposed", "cannot be taken back once seen"),
         ("irreversible", "cannot be undone"),
     ];
+    let ladder: Vec<&str> = Reversibility::all().iter().map(|r| r.as_str()).collect();
+    assert_eq!(approved.iter().map(|(t, _)| *t).collect::<Vec<_>>(), ladder, "one approved phrase per term, in ladder order");
     for (t, phrase) in approved {
         assert_eq!(term("reversibility", t), Some(phrase), "{t}");
     }

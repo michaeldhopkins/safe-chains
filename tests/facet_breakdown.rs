@@ -45,3 +45,20 @@ fn a_refusal_in_the_breakdown_reads_in_plain_words() {
     let out = facet_breakdown("git push");
     assert!(out.contains("talks to another system (allowed: one of: reads or looks / creates / changes)"), "{out}");
 }
+
+#[test]
+fn a_read_of_a_secret_cannot_be_taken_back_and_is_refused_for_the_secret() {
+    for command in ["sops -d secrets.yaml", "cat ~/.ssh/id_rsa", "gcloud auth print-access-token"] {
+        let out = facet_breakdown(command);
+        assert!(out.contains("reversibility                cannot be taken back once seen"), "{command}: {out}");
+        assert!(!out.contains("    cannot be taken back once seen (allowed"), "{command}: {out}");
+    }
+    let moved = facet_breakdown("mv ~/.ssh/id_rsa /tmp/x");
+    assert!(moved.contains("secret.level                 reads a password, key or token"), "{moved}");
+    assert!(!moved.contains("cannot be taken back once seen"), "a move is undone by moving back: {moved}");
+    let out = facet_breakdown("sops -d secrets.yaml");
+    assert!(
+        out.contains("reads a password, key or token (allowed up to: uses sign-ins you already set up, without reading them)"),
+        "{out}"
+    );
+}
