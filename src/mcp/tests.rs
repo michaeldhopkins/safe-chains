@@ -164,3 +164,12 @@ fn a_failed_read_is_an_error_and_an_unknown_revision_gets_ours() {
     .unwrap();
     assert_eq!(init["result"]["protocolVersion"], PROTOCOL_VERSION);
 }
+
+#[test]
+fn a_request_id_beyond_exact_float_range_is_echoed_as_the_client_sent_it() {
+    let stub = Stub::new((true, "ok"));
+    let line = r#"{"jsonrpc":"2.0","id":466666666666666666666666666666666666666666666666666666666666666666666666666666666666,"method":"tools/list"}"#;
+    let sent: Value = serde_json::from_str(line).unwrap();
+    let reply: Value = serde_json::from_str(&handle_line(&stub, line).expect("a request gets a reply")).unwrap();
+    assert_eq!(reply["id"], sent["id"]);
+}
