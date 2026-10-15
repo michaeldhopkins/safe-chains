@@ -871,4 +871,55 @@ mod tests {
         assert!(next("-"));
         assert!(!consumes_next_value(None));
     }
+
+    fn described(standalone: &'static [&'static str], valued: &'static [&'static str], bare: bool, tolerance: FlagTolerance) -> String {
+        FlagPolicy { standalone: WordSet::flags(standalone), valued: WordSet::flags(valued), bare, max_positional: None, tolerance }
+            .describe()
+    }
+
+    #[test]
+    fn describe_lists_each_flag_group_on_its_own_line() {
+        assert_eq!(
+            described(&["--all"], &["--max"], true, FlagTolerance::strict()),
+            "- Allowed standalone flags: --all\n- Allowed valued flags: --max\n- Bare invocation allowed"
+        );
+    }
+
+    #[test]
+    fn describe_names_every_flag_of_a_group() {
+        let text = described(&["--all", "-a"], &[], false, FlagTolerance::strict());
+        assert!(text.starts_with("- Allowed standalone flags: "));
+        assert!(text.contains("--all") && text.contains("-a"));
+        assert!(!text.contains("valued"));
+    }
+
+    #[test]
+    fn describe_an_empty_strict_policy_says_positional_only() {
+        assert_eq!(described(&[], &[], false, FlagTolerance::strict()), "- Positional arguments only");
+    }
+
+    #[test]
+    fn describe_an_empty_bare_policy_says_bare_only() {
+        assert_eq!(described(&[], &[], true, FlagTolerance::strict()), "- Bare invocation allowed");
+    }
+
+    #[test]
+    fn describe_reports_tolerances() {
+        let lenient = FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false };
+        assert_eq!(
+            described(&[], &[], false, lenient),
+            "- Hyphen-prefixed positional arguments accepted\n- Numeric shorthand accepted (e.g. -20 for -n 20)"
+        );
+        let numeric_only = FlagTolerance { numeric_dash: true, ..FlagTolerance::strict() };
+        assert_eq!(described(&[], &[], false, numeric_only), "- Numeric shorthand accepted (e.g. -20 for -n 20)");
+    }
+
+    #[test]
+    fn describe_of_the_shared_test_policy_names_its_flags() {
+        let text = TEST_POLICY.describe();
+        let lines: Vec<&str> = text.lines().collect();
+        assert_eq!(lines.len(), 2);
+        assert!(lines[0].starts_with("- Allowed standalone flags: ") && lines[0].contains("--recursive"));
+        assert!(lines[1].starts_with("- Allowed valued flags: ") && lines[1].contains("--max-count"));
+    }
 }
