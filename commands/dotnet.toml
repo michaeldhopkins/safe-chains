@@ -230,8 +230,8 @@ name = "verify"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--help", "-h", "--all", "-v"]
-valued = ["--certificate-fingerprint", "--configfile", "--verbosity"]
+standalone = ["--help", "-h", "--all"]
+valued = ["--certificate-fingerprint", "--configfile", "--verbosity", "-v"]
 
 [[command.sub.sub]]
 name = "trust"

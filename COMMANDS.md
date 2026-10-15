@@ -2590,7 +2590,7 @@ Aliases: `capacitor`
 - **swift package**: Flags: --accept-all, --all-features, --help, --no-default-features, --release, --silent, --skip-toolchains-check, --suppress-warnings, -h, -r, -s, -y. Valued: --features, --lib-type, --name, --platforms, -F, -n, -p
 - **swift**: Flags: --accept-all, --help, --silent, --version, -V, -h, -s, -y
 - **test**: Flags: --all, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
+- **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -h, --quiet, -q, -v. Valued: --charset, --color, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -e, -i, -p
 - **udeps**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --help, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --workspace, --version, -V, -h, --quiet, -q, -v. Valued: --backend, --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --output, --package, --profile, --target, --target-dir, --test, -j, -p
 - **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --manifest-path, --package, --precise, -p
 - **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --sync, -Z, -s
@@ -4106,9 +4106,9 @@ Aliases: `gdirname`
 - **compose version**: Flags: --help, -h
 - **container diff**: Flags: --help, -h
 - **container inspect**: Flags: --help, --size, -h, -s. Valued: --format, --type, -f
-- **container list**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container list**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container logs**: Flags: --details, --follow, --help, --timestamps, -f, -h, -t. Valued: --since, --tail, --until, -n
-- **container ls**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container ls**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container port**: Flags: --help, -h
 - **container stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **container top**: Flags: --help, -h
@@ -4129,7 +4129,7 @@ Aliases: `gdirname`
 - **network inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h
-- **ps**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **system df**: Flags: --help, -h. Valued: --format, -f
 - **system info**: Flags: --help, -h. Valued: --format, -f
@@ -4289,7 +4289,7 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 - **list**: Flags: --deprecated, --help, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable, -h. Valued: --config, --format, --framework, --source, --verbosity, -v
 - **new**: Flags: --diagnostics, --dry-run, --force, --help, --list, --update-apply, --update-check, -d, -h, -l. Valued: --author, --columns, --columns-all, --language, --name, --no-update-check, --output, --project, --type, --verbosity, -lang, -n, -o
 - **nuget list**: Flags: --help, -h
-- **nuget verify**: Flags: --help, -h, --all, -v. Valued: --certificate-fingerprint, --configfile, --verbosity. Positional args accepted
+- **nuget verify**: Flags: --help, -h, --all. Valued: --certificate-fingerprint, --configfile, --verbosity, -v. Positional args accepted
 - **nuget**: Flags: --help, -h
 - **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --property, --runtime, --source, --verbosity, --version-suffix, -c, -o, -p, -r, -s, -v
 - **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
@@ -6800,12 +6800,12 @@ Aliases: `ghead`
 - **parents**: Flags: --help, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
 - **paths**: Flags: --help, --quiet, --verbose, -q, -v. Positional args accepted
 - **showconfig**: Flags: --debug, --edit, --global, --help, --local, --non-shared, --quiet, --user, -e, -h, -q. Valued: --source, -T, --template. Positional args accepted
-- **st**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
-- **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
+- **st**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --unknown, -0, -A, -C, -a, -c, -d, -h, -i, -m, -n, -q, -u. Valued: --change, --exclude, --include, --rev, --template, --terse, -I, -T, -X, -r, -t. Positional args accepted
+- **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --unknown, -0, -A, -C, -a, -c, -d, -h, -i, -m, -n, -q, -u. Valued: --change, --exclude, --include, --rev, --template, --terse, -I, -T, -X, -r, -t. Positional args accepted
 - **sum**: Flags: --help, --remote, -h
 - **summary**: Flags: --help, --remote, -h
 - **tags**: Flags: --debug, --help, --quiet, --verbose, -h, -q, -v
-- **tip**: Flags: --help, --patch, --style, --template, -T, -h, -p
+- **tip**: Flags: --help, --patch, -h, -p. Valued: --style, --template, -T
 - **verify**: Flags: --help, -h
 - **version**: Flags: --help, -h. Valued: -T, --template
 - Allowed standalone flags: --help, --version, -h, -v
@@ -9940,7 +9940,7 @@ Aliases: `neonctl`
 - **network inspect**: Flags: --help, -h. Valued: --format, --mode, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h. Positional args accepted
-- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, --last, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format. Positional args accepted
 - **system info**: Flags: --help, -h. Valued: --format, --mode, -f
 - **top**: Flags: --help, -h. Positional args accepted
@@ -11596,7 +11596,7 @@ Aliases: `pip3`
 - **index**: Flags: --help, -h
 - **inspect**: Flags: --help, -h
 - **install** (requires --dry-run): Flags: --dry-run, --help, --no-deps, --pre, --quiet, --require-hashes, --user, --verbose, -U, -h, -q, -v. Valued: --constraint, --extra-index-url, --find-links, --index-url, --no-binary, --only-binary, --platform, --python-version, --requirement, --target, --upgrade-strategy, -c, -f, -i, -r, -t
-- **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -i, -l, -o. Valued: --exclude, --format, --index-url, --path
+- **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -l, -o. Valued: --exclude, --format, --index-url, --path, -i
 - **show**: Flags: --files, --help, --verbose, -f, -h, -v
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -12001,9 +12001,9 @@ Aliases: `upsun`
 - **compose version**: Flags: --help, -h
 - **container diff**: Flags: --help, -h
 - **container inspect**: Flags: --help, --size, -h, -s. Valued: --format, --type, -f
-- **container list**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container list**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container logs**: Flags: --details, --follow, --help, --timestamps, -f, -h, -t. Valued: --since, --tail, --until, -n
-- **container ls**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container ls**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container port**: Flags: --help, -h
 - **container stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **container top**: Flags: --help, -h
@@ -12024,7 +12024,7 @@ Aliases: `upsun`
 - **network inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h
-- **ps**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **system df**: Flags: --help, -h. Valued: --format, -f
 - **system info**: Flags: --help, -h. Valued: --format, -f

@@ -2024,9 +2024,9 @@ cargo tree --prune x	inert
 cargo tree --quiet	inert
 cargo tree --target x	inert
 cargo tree -d	inert
-cargo tree -e	inert
+cargo tree -e x	inert
 cargo tree -h	inert
-cargo tree -i	inert
+cargo tree -i x	inert
 cargo tree -p x	inert
 cargo tree -q	inert
 cargo tree -v	inert

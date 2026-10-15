@@ -69,11 +69,11 @@ valued = ["--format", "--type", "-f"]
 [[command.sub.sub]]
 name = "list"
 standalone = [
-    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--all", "--help", "--latest", "--no-trunc",
     "--quiet", "--size",
-    "-a", "-h", "-l", "-n", "-q", "-s",
+    "-a", "-h", "-l", "-q", "-s",
 ]
-valued = ["--filter", "--format", "-f"]
+valued = ["--filter", "--format", "--last", "-f", "-n"]
 [[command.sub.sub]]
 name = "logs"
 bare = false
@@ -85,11 +85,11 @@ valued = ["--since", "--tail", "--until", "-n"]
 [[command.sub.sub]]
 name = "ls"
 standalone = [
-    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--all", "--help", "--latest", "--no-trunc",
     "--quiet", "--size",
-    "-a", "-h", "-l", "-n", "-q", "-s",
+    "-a", "-h", "-l", "-q", "-s",
 ]
-valued = ["--filter", "--format", "-f"]
+valued = ["--filter", "--format", "--last", "-f", "-n"]
 [[command.sub.sub]]
 name = "port"
 standalone = ["--help", "-h"]
@@ -204,11 +204,11 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "ps"
 standalone = [
-    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--all", "--help", "--latest", "--no-trunc",
     "--quiet", "--size",
-    "-a", "-h", "-l", "-n", "-q", "-s",
+    "-a", "-h", "-l", "-q", "-s",
 ]
-valued = ["--filter", "--format", "-f"]
+valued = ["--filter", "--format", "--last", "-f", "-n"]
 
 [[command.sub]]
 name = "stats"

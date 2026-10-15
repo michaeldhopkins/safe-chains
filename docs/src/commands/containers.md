@@ -99,9 +99,9 @@
 - **compose version**: Flags: --help, -h
 - **container diff**: Flags: --help, -h
 - **container inspect**: Flags: --help, --size, -h, -s. Valued: --format, --type, -f
-- **container list**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container list**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container logs**: Flags: --details, --follow, --help, --timestamps, -f, -h, -t. Valued: --since, --tail, --until, -n
-- **container ls**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container ls**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container port**: Flags: --help, -h
 - **container stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **container top**: Flags: --help, -h
@@ -122,7 +122,7 @@
 - **network inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h
-- **ps**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **system df**: Flags: --help, -h. Valued: --format, -f
 - **system info**: Flags: --help, -h. Valued: --format, -f
@@ -368,7 +368,7 @@
 - **network inspect**: Flags: --help, -h. Valued: --format, --mode, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h. Positional args accepted
-- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, --last, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format. Positional args accepted
 - **system info**: Flags: --help, -h. Valued: --format, --mode, -f
 - **top**: Flags: --help, -h. Positional args accepted
@@ -444,9 +444,9 @@
 - **compose version**: Flags: --help, -h
 - **container diff**: Flags: --help, -h
 - **container inspect**: Flags: --help, --size, -h, -s. Valued: --format, --type, -f
-- **container list**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container list**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container logs**: Flags: --details, --follow, --help, --timestamps, -f, -h, -t. Valued: --since, --tail, --until, -n
-- **container ls**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **container ls**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **container port**: Flags: --help, -h
 - **container stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **container top**: Flags: --help, -h
@@ -467,7 +467,7 @@
 - **network inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **port**: Flags: --help, -h
-- **ps**: Flags: --all, --help, --last, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, -f
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -q, -s. Valued: --filter, --format, --last, -f, -n
 - **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format
 - **system df**: Flags: --help, -h. Valued: --format, -f
 - **system info**: Flags: --help, -h. Valued: --format, -f

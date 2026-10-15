@@ -4342,7 +4342,7 @@ pip list --uptodate	inert
 pip list --user	inert
 pip list -e	inert
 pip list -h	inert
-pip list -i	inert
+pip list -i x	inert
 pip list -l	inert
 pip list -o	inert
 pip list x	inert
@@ -4635,7 +4635,7 @@ pip3 list --uptodate	inert
 pip3 list --user	inert
 pip3 list -e	inert
 pip3 list -h	inert
-pip3 list -i	inert
+pip3 list -i x	inert
 pip3 list -l	inert
 pip3 list -o	inert
 pip3 list x	inert
@@ -8097,7 +8097,7 @@ podman container list --all x	inert
 podman container list --filter x	inert
 podman container list --format x	inert
 podman container list --help	inert
-podman container list --last	inert
+podman container list --last x	inert
 podman container list --latest	inert
 podman container list --no-trunc	inert
 podman container list --quiet	inert
@@ -8106,7 +8106,7 @@ podman container list -a	inert
 podman container list -f x	inert
 podman container list -h	inert
 podman container list -l	inert
-podman container list -n	inert
+podman container list -n x	inert
 podman container list -q	inert
 podman container list -s	inert
 podman container list x	inert
@@ -8134,7 +8134,7 @@ podman container ls --all x	inert
 podman container ls --filter x	inert
 podman container ls --format x	inert
 podman container ls --help	inert
-podman container ls --last	inert
+podman container ls --last x	inert
 podman container ls --latest	inert
 podman container ls --no-trunc	inert
 podman container ls --quiet	inert
@@ -8143,7 +8143,7 @@ podman container ls -a	inert
 podman container ls -f x	inert
 podman container ls -h	inert
 podman container ls -l	inert
-podman container ls -n	inert
+podman container ls -n x	inert
 podman container ls -q	inert
 podman container ls -s	inert
 podman container ls x	inert
@@ -8400,7 +8400,7 @@ podman ps --all x	inert
 podman ps --filter x	inert
 podman ps --format x	inert
 podman ps --help	inert
-podman ps --last	inert
+podman ps --last x	inert
 podman ps --latest	inert
 podman ps --no-trunc	inert
 podman ps --quiet	inert
@@ -8409,7 +8409,7 @@ podman ps -a	inert
 podman ps -f x	inert
 podman ps -h	inert
 podman ps -l	inert
-podman ps -n	inert
+podman ps -n x	inert
 podman ps -q	inert
 podman ps -s	inert
 podman ps x	inert

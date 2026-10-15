@@ -14,9 +14,9 @@ standalone = [
     "--editable", "--exclude-editable", "--help", "--include-editable",
     "--local", "--not-required", "--outdated", "--pre",
     "--uptodate", "--user",
-    "-e", "-h", "-i", "-l", "-o",
+    "-e", "-h", "-l", "-o",
 ]
-valued = ["--exclude", "--format", "--index-url", "--path"]
+valued = ["--exclude", "--format", "--index-url", "--path", "-i"]
 
 [[command.sub]]
 name = "show"

@@ -3033,16 +3033,15 @@ hg st --no-status	safe-read
 hg st --print0	safe-read
 hg st --quiet	safe-read
 hg st --removed	safe-read
-hg st --rev	safe-read
 hg st --rev x	safe-read
-hg st --terse	safe-read
+hg st --template x	safe-read
 hg st --terse x	safe-read
 hg st --unknown	safe-read
 hg st -0	safe-read
 hg st -A	safe-read
 hg st -C	safe-read
 hg st -I x	safe-read
-hg st -T	safe-read
+hg st -T x	safe-read
 hg st -X x	safe-read
 hg st -a	safe-read
 hg st -c	safe-read
@@ -3052,7 +3051,6 @@ hg st -i	safe-read
 hg st -m	safe-read
 hg st -n	safe-read
 hg st -q	safe-read
-hg st -r	safe-read
 hg st -r x	safe-read
 hg st -t x	safe-read
 hg st -u	safe-read
@@ -3075,16 +3073,15 @@ hg status --no-status	safe-read
 hg status --print0	safe-read
 hg status --quiet	safe-read
 hg status --removed	safe-read
-hg status --rev	safe-read
 hg status --rev x	safe-read
-hg status --terse	safe-read
+hg status --template x	safe-read
 hg status --terse x	safe-read
 hg status --unknown	safe-read
 hg status -0	safe-read
 hg status -A	safe-read
 hg status -C	safe-read
 hg status -I x	safe-read
-hg status -T	safe-read
+hg status -T x	safe-read
 hg status -X x	safe-read
 hg status -a	safe-read
 hg status -c	safe-read
@@ -3094,7 +3091,6 @@ hg status -i	safe-read
 hg status -m	safe-read
 hg status -n	safe-read
 hg status -q	safe-read
-hg status -r	safe-read
 hg status -r x	safe-read
 hg status -t x	safe-read
 hg status -u	safe-read
@@ -3131,11 +3127,12 @@ hg tags x	safe-read
 hg tip	safe-read
 hg tip --help	safe-read
 hg tip --help --patch	safe-read
+hg tip --help --style x	safe-read
 hg tip --help x	safe-read
 hg tip --patch	safe-read
-hg tip --style	safe-read
-hg tip --template	safe-read
-hg tip -T	safe-read
+hg tip --style x	safe-read
+hg tip --template x	safe-read
+hg tip -T x	safe-read
 hg tip -h	safe-read
 hg tip -p	safe-read
 hg tip x	safe-read

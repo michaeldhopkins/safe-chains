@@ -42,8 +42,6 @@ cargo sweep	-s
 cargo swift	-s
 cargo swift init	-s
 cargo swift package	-s
-cargo tree	-e
-cargo tree	-i
 composer depends	-t
 composer info	-t
 composer prohibits	-t
@@ -57,14 +55,10 @@ dapr configurations	-k
 dapr status	-k
 dbt init	-s
 docker compose logs	-f
-docker container list	-n
 docker container logs	-f
-docker container ls	-n
 docker logs	-f
-docker ps	-n
 dotnet new	-d
 dotnet new	-l
-dotnet nuget verify	-v
 fossil branch list	-c
 fossil status	-c
 gh [policy browse]	-p
@@ -163,7 +157,6 @@ git show	-w
 git stash show	-u
 git status	-b
 git status	-s
-git switch	-c
 git switch	-t
 glab [policy view]	-s
 go doc	-c
@@ -175,9 +168,7 @@ heroku config	-s
 heroku logs	-t
 hg annotate	-u
 hg id	-t
-hg status	-T
 hg status	-u
-hg tip	-T
 jj bookmark list	-c
 jj bookmark list	-t
 jj bookmark move	-B
@@ -195,14 +186,12 @@ jj tag list	-t
 ktrace trace	-t
 kubectl logs	-f
 nerdctl logs	-f
-nerdctl ps	-n
 oc logs	-f
 oc whoami	-c
 opam lint	-s
 oras blob fetch	-v
 oras manifest fetch	-v
 overmind connect	-c
-pip list	-i
 pip show	-f
 pipx inject	-v
 pipx install	-v
@@ -211,11 +200,8 @@ pipx upgrade	-v
 pipx upgrade-all	-v
 platform route:get	-1
 platform tunnel:info	-c
-podman container list	-n
 podman container logs	-f
-podman container ls	-n
 podman logs	-f
-podman ps	-n
 qemu-img compare	-s
 qemu-img snapshot	-l
 railway metrics	-w

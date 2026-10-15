@@ -2597,7 +2597,7 @@ nerdctl ps -a	inert
 nerdctl ps -f x	inert
 nerdctl ps -h	inert
 nerdctl ps -l	inert
-nerdctl ps -n	inert
+nerdctl ps -n x	inert
 nerdctl ps -q	inert
 nerdctl ps -s	inert
 nerdctl ps x	inert

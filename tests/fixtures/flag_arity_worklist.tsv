@@ -62,8 +62,6 @@ helmfile diff	--context
 hg annotate	--date
 hg annotate	--file
 hg id	--id
-hg tip	--style
-hg tip	--template
 http	--style
 id	--context
 id	--name

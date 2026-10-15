@@ -217,3 +217,41 @@ fn a_short_spelling_of_a_gated_long_flag_is_gated_too() {
          add the row",
     );
 }
+
+#[test]
+fn the_researched_value_taking_flags_are_declared_valued() {
+    let wanted: &[(&str, &[&str])] = &[
+        ("docker ps", &["-n", "--last"]),
+        ("docker container ls", &["-n", "--last"]),
+        ("docker container list", &["-n", "--last"]),
+        ("podman ps", &["-n", "--last"]),
+        ("podman container ls", &["-n", "--last"]),
+        ("podman container list", &["-n", "--last"]),
+        ("nerdctl ps", &["-n", "--last"]),
+        ("git switch", &["-c", "--create"]),
+        ("cargo tree", &["-e", "--edges", "-i", "--invert"]),
+        ("hg status", &["-T", "--template", "--rev", "--terse"]),
+        ("hg tip", &["-T", "--template", "--style"]),
+        ("pip list", &["-i", "--index-url"]),
+        ("dotnet nuget verify", &["-v", "--verbosity"]),
+    ];
+    let files = registry();
+    let all: Vec<Scope<'_>> = files.iter().flat_map(|f| f.command.iter().flat_map(scopes)).collect();
+    for (label, flags) in wanted {
+        let found: Vec<&Scope<'_>> = all.iter().filter(|s| s.label == *label).collect();
+        assert!(!found.is_empty(), "no scope named {label}");
+        for s in found {
+            for f in *flags {
+                let f = (*f).to_string();
+                assert!(s.valued.contains(&f) && !s.standalone.contains(&f), "{label} must declare {f} valued and only valued");
+            }
+        }
+    }
+}
+
+#[test]
+fn a_value_that_looks_like_a_flag_is_read_as_the_value_of_a_valued_short_flag() {
+    for cmd in ["docker ps -n -1", "docker container ls -n -1", "podman ps --last -1", "nerdctl ps -n -1"] {
+        assert!(crate::is_safe_command(cmd), "should be allowed: {cmd}");
+    }
+}

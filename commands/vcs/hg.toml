@@ -59,8 +59,8 @@ aliases = ["st"]
 level = "SafeRead"
 bare = true
 tolerate_unknown_short = true
-standalone = ["--all", "--added", "--clean", "--copies", "--deleted", "--ignored", "--modified", "--no-status", "--print0", "--quiet", "--removed", "--rev", "--terse", "--unknown", "-0", "-A", "-C", "-T", "-a", "-c", "-d", "-h", "-i", "-m", "-n", "-q", "-r", "-u"]
-valued = ["--change", "--exclude", "--include", "--rev", "--terse", "-I", "-X", "-r", "-t"]
+standalone = ["--all", "--added", "--clean", "--copies", "--deleted", "--ignored", "--modified", "--no-status", "--print0", "--quiet", "--removed", "--unknown", "-0", "-A", "-C", "-a", "-c", "-d", "-h", "-i", "-m", "-n", "-q", "-u"]
+valued = ["--change", "--exclude", "--include", "--rev", "--template", "--terse", "-I", "-T", "-X", "-r", "-t"]
 
 [[command.sub]]
 name = "summary"
@@ -175,7 +175,8 @@ valued = ["--exclude", "--include", "--rev", "--user", "-I", "-X", "-r", "-u"]
 name = "tip"
 level = "SafeRead"
 bare = true
-standalone = ["--help", "--patch", "--style", "--template", "-T", "-h", "-p"]
+standalone = ["--help", "--patch", "-h", "-p"]
+valued = ["--style", "--template", "-T"]
 
 [[command.sub]]
 name = "verify"

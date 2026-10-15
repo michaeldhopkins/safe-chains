@@ -923,8 +923,8 @@ fact = "Switches HEAD to an existing branch, updating tracked files to match. gi
 source = "https://git-scm.com/docs/git-switch"
 judgment = "The mildest possible worktree mutate: every resulting state is already in the object store, the inverse is one command, and git's own refusal makes data loss impossible — hence `trivial` rather than `recoverable`. The force family is deliberately omitted: --force/--discard-changes exist precisely to defeat that refusal and discard uncommitted work, which is a different (irreversible) capability."
 max_positional = 1
-standalone = ["--create", "--detach", "--guess", "--help", "--no-guess", "--no-track", "--track", "-c", "-d", "-h", "-t"]
-valued = ["--orphan"]
+standalone = ["--detach", "--guess", "--help", "--no-guess", "--no-track", "--track", "-d", "-h", "-t"]
+valued = ["--create", "--orphan", "-c"]
 
 [[command.sub]]
 name = "add"

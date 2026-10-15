@@ -289,7 +289,7 @@ Aliases: `pip3`
 - **index**: Flags: --help, -h
 - **inspect**: Flags: --help, -h
 - **install** (requires --dry-run): Flags: --dry-run, --help, --no-deps, --pre, --quiet, --require-hashes, --user, --verbose, -U, -h, -q, -v. Valued: --constraint, --extra-index-url, --find-links, --index-url, --no-binary, --only-binary, --platform, --python-version, --requirement, --target, --upgrade-strategy, -c, -f, -i, -r, -t
-- **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -i, -l, -o. Valued: --exclude, --format, --index-url, --path
+- **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -l, -o. Valued: --exclude, --format, --index-url, --path, -i
 - **show**: Flags: --files, --help, --verbose, -f, -h, -v
 - Allowed standalone flags: --help, --version, -V, -h
 

@@ -148,12 +148,12 @@
 - **parents**: Flags: --help, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
 - **paths**: Flags: --help, --quiet, --verbose, -q, -v. Positional args accepted
 - **showconfig**: Flags: --debug, --edit, --global, --help, --local, --non-shared, --quiet, --user, -e, -h, -q. Valued: --source, -T, --template. Positional args accepted
-- **st**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
-- **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
+- **st**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --unknown, -0, -A, -C, -a, -c, -d, -h, -i, -m, -n, -q, -u. Valued: --change, --exclude, --include, --rev, --template, --terse, -I, -T, -X, -r, -t. Positional args accepted
+- **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --unknown, -0, -A, -C, -a, -c, -d, -h, -i, -m, -n, -q, -u. Valued: --change, --exclude, --include, --rev, --template, --terse, -I, -T, -X, -r, -t. Positional args accepted
 - **sum**: Flags: --help, --remote, -h
 - **summary**: Flags: --help, --remote, -h
 - **tags**: Flags: --debug, --help, --quiet, --verbose, -h, -q, -v
-- **tip**: Flags: --help, --patch, --style, --template, -T, -h, -p
+- **tip**: Flags: --help, --patch, -h, -p. Valued: --style, --template, -T
 - **verify**: Flags: --help, -h
 - **version**: Flags: --help, -h. Valued: -T, --template
 - Allowed standalone flags: --help, --version, -h, -v

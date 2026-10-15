@@ -2678,7 +2678,7 @@ docker container list --all x	inert
 docker container list --filter x	inert
 docker container list --format x	inert
 docker container list --help	inert
-docker container list --last	inert
+docker container list --last x	inert
 docker container list --latest	inert
 docker container list --no-trunc	inert
 docker container list --quiet	inert
@@ -2687,7 +2687,7 @@ docker container list -a	inert
 docker container list -f x	inert
 docker container list -h	inert
 docker container list -l	inert
-docker container list -n	inert
+docker container list -n x	inert
 docker container list -q	inert
 docker container list -s	inert
 docker container list x	inert
@@ -2715,7 +2715,7 @@ docker container ls --all x	inert
 docker container ls --filter x	inert
 docker container ls --format x	inert
 docker container ls --help	inert
-docker container ls --last	inert
+docker container ls --last x	inert
 docker container ls --latest	inert
 docker container ls --no-trunc	inert
 docker container ls --quiet	inert
@@ -2724,7 +2724,7 @@ docker container ls -a	inert
 docker container ls -f x	inert
 docker container ls -h	inert
 docker container ls -l	inert
-docker container ls -n	inert
+docker container ls -n x	inert
 docker container ls -q	inert
 docker container ls -s	inert
 docker container ls x	inert
@@ -2981,7 +2981,7 @@ docker ps --all x	inert
 docker ps --filter x	inert
 docker ps --format x	inert
 docker ps --help	inert
-docker ps --last	inert
+docker ps --last x	inert
 docker ps --latest	inert
 docker ps --no-trunc	inert
 docker ps --quiet	inert
@@ -2990,7 +2990,7 @@ docker ps -a	inert
 docker ps -f x	inert
 docker ps -h	inert
 docker ps -l	inert
-docker ps -n	inert
+docker ps -n x	inert
 docker ps -q	inert
 docker ps -s	inert
 docker ps x	inert
@@ -3946,7 +3946,7 @@ dotnet nuget verify --configfile x	safe-read
 dotnet nuget verify --help	safe-read
 dotnet nuget verify --verbosity x	safe-read
 dotnet nuget verify -h	safe-read
-dotnet nuget verify -v	safe-read
+dotnet nuget verify -v x	safe-read
 dotnet nuget verify x	safe-read
 dotnet nuget why	denied
 dotnet nuget why x	denied

@@ -450,13 +450,13 @@ level = "Inert"
 standalone = [
     "--all-features", "--duplicates", "--frozen", "--help", "--ignore-rust-version",
     "--locked", "--no-dedupe", "--no-default-features", "--offline",
-    "-d", "-e", "-h", "-i", "--quiet", "-q", "-v",
+    "-d", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--charset", "--color", "--depth", "--edges",
     "--features", "--format", "--invert", "--manifest-path",
     "--package", "--prefix", "--prune", "--target",
-    "-p",
+    "-e", "-i", "-p",
 ]
 
 [[command.sub]]

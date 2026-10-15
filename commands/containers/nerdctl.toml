@@ -21,8 +21,8 @@ valued = ["--format", "--mode", "-f"]
 name = "ps"
 level = "Inert"
 bare = true
-standalone = ["--all", "--help", "--latest", "--no-trunc", "--quiet", "--size", "-a", "-h", "-l", "-n", "-q", "-s"]
-valued = ["--filter", "--format", "--last", "-f"]
+standalone = ["--all", "--help", "--latest", "--no-trunc", "--quiet", "--size", "-a", "-h", "-l", "-q", "-s"]
+valued = ["--filter", "--format", "--last", "-f", "-n"]
 
 [[command.sub]]
 name = "inspect"

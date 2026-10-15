@@ -8469,18 +8469,18 @@ git status -v	inert
 git status -z	inert
 git status x	inert
 git switch	safe-write
-git switch --create	safe-write
-git switch --create --detach	safe-write
-git switch --create --orphan x	safe-write
 git switch --create x	safe-write
 git switch --detach	safe-write
+git switch --detach --create x	safe-write
+git switch --detach --guess	safe-write
+git switch --detach x	safe-write
 git switch --guess	safe-write
 git switch --help	safe-write
 git switch --no-guess	safe-write
 git switch --no-track	safe-write
 git switch --orphan x	safe-write
 git switch --track	safe-write
-git switch -c	safe-write
+git switch -c x	safe-write
 git switch -d	safe-write
 git switch -h	safe-write
 git switch -t	safe-write
