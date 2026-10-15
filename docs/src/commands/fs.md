@@ -62,7 +62,7 @@ Aliases: `gbasename`
 Aliases: `gcp`
 
 - Reads each source and writes the destination within your workspace.
-- Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
+- Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -n, -p, -r, -u, -v, -x
 - Allowed valued flags: --suffix, --target-directory, -S, -t
 - Recurses into directory trees with: --archive, --recursive, -R, -a, -r
 

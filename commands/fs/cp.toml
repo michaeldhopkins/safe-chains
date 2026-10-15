@@ -11,9 +11,9 @@ standalone = [
     "--archive", "--force", "--help", "--interactive",
     "--no-clobber", "--no-dereference", "--no-target-directory",
     "--one-file-system", "--parents", "--recursive",
-    "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
+    "--remove-destination", "--update", "--verbose", "--version",
     "-H", "-L", "-N", "-P", "-R", "-S", "-T", "-X",
-    "-a", "-c", "-f", "-h", "-i", "-l", "-n", "-p", "-r", "-s", "-u", "-v", "-x",
+    "-a", "-c", "-f", "-h", "-i", "-n", "-p", "-r", "-u", "-v", "-x",
 ]
 valued = [
     "--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory",
@@ -33,9 +33,9 @@ standalone = [
     "--archive", "--backup", "--force", "--help", "--interactive", "--no-clobber",
     "--no-dereference", "--no-target-directory", "--one-file-system", "--parents",
     "--preserve", "--recursive", "--reflink", "--remove-destination", "--sparse",
-    "--symbolic-link", "--update", "--verbose", "--version",
-    "-H", "-L", "-N", "-P", "-R", "-X", "-a", "-c", "-d", "-f", "-h", "-i", "-l",
-    "-n", "-p", "-r", "-s", "-u", "-v", "-x",
+    "--update", "--verbose", "--version",
+    "-H", "-L", "-N", "-P", "-R", "-X", "-a", "-c", "-d", "-f", "-h", "-i",
+    "-n", "-p", "-r", "-u", "-v", "-x",
 ]
 valued = ["-S", "-t", "--suffix", "--target-directory"]
 [command.behavior.transfer]

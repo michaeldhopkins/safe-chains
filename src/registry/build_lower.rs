@@ -128,6 +128,8 @@ fn lower_transfer(name: &str, t: Option<&TomlTransfer>) -> Result<Option<Transfe
         no_clobber_flags: t.no_clobber_flags.clone(),
         clobber_flags: t.clobber_flags.clone(),
         recursive_flags: t.recursive_flags.clone(),
+        symbolic_flags: t.symbolic_flags.clone(),
+        relative_flags: t.relative_flags.clone(),
     }))
 }
 

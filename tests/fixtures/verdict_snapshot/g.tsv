@@ -2105,7 +2105,6 @@ gcp --remove-destination	denied
 gcp --sparse	denied
 gcp --sparse x	denied
 gcp --suffix x	denied
-gcp --symbolic-link	denied
 gcp --target-directory x	denied
 gcp --update	denied
 gcp --verbose	denied
@@ -2125,11 +2124,9 @@ gcp -d	denied
 gcp -f	denied
 gcp -h	denied
 gcp -i	denied
-gcp -l	denied
 gcp -n	denied
 gcp -p	denied
 gcp -r	denied
-gcp -s	denied
 gcp -t x	denied
 gcp -u	denied
 gcp -v	denied

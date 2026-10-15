@@ -15,9 +15,11 @@ use crate::parse::{Token, has_flag};
 mod backup;
 mod capability;
 mod path_verdicts;
+mod transfer;
 pub(crate) use path_verdicts::{
     read_content_verdict, read_tree_verdict, rebind_is_stricter_than_write, worst_path_element, write_target_verdict,
 };
+use transfer::resolve_transfer;
 mod flags;
 pub(crate) mod locus;
 pub(crate) mod regions;
@@ -26,7 +28,7 @@ mod scenarios;
 
 use capability::{
     breadth_scale, creates, destroys, executes, mutates, observes, observes_path, overwrites, reads_content, reads_path, reads_to_model,
-    relocates, transfer_profile, worst, writes_export_file,
+    worst, writes_export_file,
 };
 use flags::{walk_positionals, walk_value};
 pub(crate) use locus::is_unpinnable;
@@ -654,74 +656,6 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
         // (grep). Neither reaches here, so both fail closed.
         PositionalRole::None | PositionalRole::PatternThenRead => worst("behavior: operand role not resolvable without a hook (§0)"),
     }
-}
-
-/// The transfer arm of `resolve_behavior` (cp/mv/ln): split the operands into sources and a
-/// destination (`-t`/`--target-directory` value, else the last operand), gate each at its locus
-/// — a relocate source at its WRITE face — and fold in any path-flag capabilities. Fails closed
-/// on a missing spec, a missing dest, or a `-t` dest with no sources.
-fn resolve_transfer(
-    spec: &crate::registry::types::BehaviorSpec,
-    operands: Vec<&str>,
-    flag_caps: Vec<Capability>,
-    tokens: &[Token],
-) -> Profile {
-    use crate::registry::types::TransferSource;
-    let Some(t) = &spec.transfer else {
-        return worst("behavior: transfer role without transfer spec — worst-cased (§0)");
-    };
-    // Whether the destination is DEFINITIVELY a container rather than the entry being created.
-    // `-t DIR` says so outright, and with two or more sources the last operand must be a directory
-    // for the command to make sense at all. Only the two-operand form is ambiguous, and there the
-    // conservative reading (the destination is the entry) is the safe one.
-    let (sources, dest, dest_is_container) = if let Some(d) = walk_value(&spec.valued_short, tokens, b't', "--target-directory") {
-        if operands.is_empty() {
-            return worst("behavior: transfer -t with no source operand — worst-cased (§0)");
-        }
-        (operands, d, true)
-    } else {
-        match operands.split_last() {
-            Some((last, rest)) if !rest.is_empty() => (rest.to_vec(), *last, rest.len() >= 2),
-            _ => return worst("behavior: transfer needs a source and a destination — worst-cased (§0)"),
-        }
-    };
-    let no_clobber = if t.clobber_flags.is_empty() {
-        t.no_clobber_flags.iter().any(|f| behavior_flag_present(tokens, f))
-    } else {
-        // A clobber flag PRESENT means overwrite; its absence is the no-clobber default.
-        !t.clobber_flags.iter().any(|f| behavior_flag_present(tokens, f))
-    };
-    let recursive = t.recursive_flags.iter().any(|f| behavior_flag_present(tokens, f));
-    let transfer_scale = breadth_scale(&sources, recursive);
-    // A relocate REMOVES its source, so the source name stops referring to anything: that is a
-    // REBIND, not merely a write, and it is what makes `mv ~/.config elsewhere` a relocation of the
-    // trust root rather than an edit of it.
-    let source_face = match t.source {
-        TransferSource::Relocate => locus::Face::Rebind,
-        TransferSource::Observe => locus::Face::Read,
-    };
-    // `ln` points the destination NAME at something else; `cp`/`mv` write bytes at or under it.
-    // Both are `create`/`transfer`, so only the command's own declaration separates them.
-    //
-    // But the declaration is about the ENTRY the command creates, and `ln -t DIR a` or
-    // `ln a b DIR` puts that entry INSIDE the directory instead of replacing it. Treating those as
-    // rebinds denied `ln -t ~/.config a`, which is an ordinary link into a directory you granted —
-    // the same container-versus-object mistake the write face made before this face existed.
-    let dest_face = if t.rebinds_destination && !dest_is_container { locus::Face::Rebind } else { locus::Face::Write };
-    let mut prof = transfer_profile(
-        &sources,
-        dest,
-        transfer_scale,
-        source_face,
-        dest_face,
-        |loc, sc| match t.source {
-            TransferSource::Observe => observes(loc, sc, "transfer reads the source at its locus"),
-            TransferSource::Relocate => relocates(loc, sc),
-        },
-        |loc, sc| overwrites(loc, sc, no_clobber),
-    );
-    prof.capabilities.extend(flag_caps);
-    prof
 }
 
 /// Capabilities for a command's declared PATH-FLAGS: a valued flag whose value is a path
@@ -2301,18 +2235,13 @@ mod tests {
         // locus, exactly as `cp` of it would (a link would otherwise alias the secret in).
         assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home credential");
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/shadow", "./x"])).expect("ln")), Verdict::Denied, "symlink to secret");
-        // An ORDINARY out-of-workspace target links fine, for the same reason `cat /etc/hosts`
-        // reads: the link aliases whatever the target could disclose, no more. What the two
-        // asserts above pin is that the alias cannot launder a target the shield refuses.
-        assert_eq!(
-            project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")),
-            Verdict::Allowed(SafetyLevel::SafeWrite),
-            "symlink to ordinary system path"
-        );
+        // An out-of-workspace target is judged as a write too: whatever later writes through the link
+        // writes the target.
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Denied, "symlink to a system path");
         // writing the LINK outside the worktree denies on the link locus.
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "./a", "~/evil"])).expect("ln")), Verdict::Denied, "link into home");
         // -t DIR, lone operand, unknown flag.
-        assert_eq!(resolve(&toks(&["ln", "-t", "./dir", "./a", "./b"])).expect("ln -t").capabilities.len(), 3);
+        assert_eq!(resolve(&toks(&["ln", "-t", "./dir", "./a", "./b"])).expect("ln -t").capabilities.len(), 5);
         assert_eq!(project(&resolve(&toks(&["ln", "./only"])).expect("ln")), Verdict::Denied, "no link name");
         assert_eq!(project(&resolve(&toks(&["ln", "-Q", "./a", "./b"])).expect("ln")), Verdict::Denied, "unknown flag");
         // -f (a clobber flag PRESENT) flips the link-create from the no-clobber default
@@ -2320,9 +2249,9 @@ mod tests {
         // branch of the transfer arm, the inverse of cp/mv's `no_clobber_flags`.
         let forced = resolve(&toks(&["ln", "-f", "./a", "./b"])).expect("ln -f");
         assert_eq!(project(&forced), Verdict::Allowed(SafetyLevel::SafeWrite), "ln -f worktree link");
-        assert_eq!(forced.capabilities.last().unwrap().reversibility, Reversibility::Recoverable, "ln -f overwrites → recoverable");
+        assert_eq!(forced.capabilities[1].reversibility, Reversibility::Recoverable, "ln -f overwrites → recoverable");
         assert_eq!(
-            resolve(&toks(&["ln", "./a", "./b"])).expect("ln").capabilities.last().unwrap().reversibility,
+            resolve(&toks(&["ln", "./a", "./b"])).expect("ln").capabilities[1].reversibility,
             Reversibility::Trivial,
             "ln default no-clobber → trivial",
         );

@@ -43,3 +43,5 @@ source = "observe"
 # not — see the `frozen = "rebind"` roles in regions/default.toml.
 rebinds_destination = true
 clobber_flags = ["-f", "--force"]
+symbolic_flags = ["-s", "--symbolic"]
+relative_flags = ["-r", "--relative"]

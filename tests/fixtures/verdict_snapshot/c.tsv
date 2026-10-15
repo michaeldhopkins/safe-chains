@@ -6255,7 +6255,6 @@ cp --remove-destination	denied
 cp --sparse	denied
 cp --sparse x	denied
 cp --suffix x	denied
-cp --symbolic-link	denied
 cp --target-directory x	denied
 cp --update	denied
 cp --verbose	denied
@@ -6275,11 +6274,9 @@ cp -d	denied
 cp -f	denied
 cp -h	denied
 cp -i	denied
-cp -l	denied
 cp -n	denied
 cp -p	denied
 cp -r	denied
-cp -s	denied
 cp -t x	denied
 cp -u	denied
 cp -v	denied
