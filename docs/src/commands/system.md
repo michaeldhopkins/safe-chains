@@ -1250,7 +1250,7 @@ Aliases: `upsun`
 - **tunnel:list**: Flags: --all, --help, -a, -h. Valued: --app, --environment, --format, --project, -A, -e, -p
 - **tunnels**: Flags: --all, --help, -a, -h. Valued: --app, --environment, --format, --project, -A, -e, -p
 - **url**: Flags: --browser, --help, --pipe, -h. Valued: --environment, --primary, --project, -1, -e, -p
-- **user:get**: Flags: --help, --level, -h. Valued: --email, --format, --project, --property, -l, -p, -P
+- **user:get**: Flags: --help, -h. Valued: --email, --format, --level, --project, --property, -l, -p, -P
 - **user:list**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
 - **users**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
 - **variable:list**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
