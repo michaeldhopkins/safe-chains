@@ -24,7 +24,7 @@ pub mod item_shape;
 mod lexical;
 use home::home_path_inside_root;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
-use lexical::{expand_home, express_relative_to_root, lexical_join};
+use lexical::{expand_home, express_relative_to_root, lexical_join, names_no_known_directory};
 
 /// The working directory and project root for the command under evaluation. Both optional:
 /// a harness may supply neither (e.g. opencode), and classification falls back to the
@@ -387,7 +387,7 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     // locus, so letting it through the joins below keeps the cwd at that locus — `cd $(pwd) && cat
     // f` stays a worktree read, while `cd $(fd d /etc) && cat f` is a machine one. Refusing both
     // would have been sound but needlessly coarse.
-    if expanded.starts_with('~') || expanded.contains('$') || crate::cst::check::is_opaque_value(&expanded) {
+    if names_no_known_directory(&expanded) {
         return Some(UNRESOLVED_CWD.to_string());
     }
     if expanded.starts_with('/') {

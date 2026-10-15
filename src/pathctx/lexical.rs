@@ -37,17 +37,28 @@ pub(super) fn express_relative_to_root(abs: &str, root: &str) -> String {
 }
 
 /// Join a relative path onto an absolute base, resolving `.` and `..` purely lexically. A
-/// `..` that would climb above `/` is clamped there.
+/// `..` that would climb above `/` is clamped there. A `..` that would climb out of a substitution
+/// placeholder is unresolved, since nobody knows what the placeholder stood for.
 pub(super) fn lexical_join(base: &str, rel: &str) -> String {
     let mut parts: Vec<&str> = base.split('/').filter(|s| !s.is_empty()).collect();
     for seg in rel.split('/') {
         match seg {
             "" | "." => {}
             ".." => {
-                parts.pop();
+                if parts.pop().is_some_and(|part| part.contains(crate::cst::eval::TAGGED_PREFIX)) {
+                    return super::UNRESOLVED_CWD.to_string();
+                }
             }
             s => parts.push(s),
         }
     }
     format!("/{}", parts.join("/"))
+}
+
+/// Whether a `cd` target names a place we cannot pin: another user's home, a variable, an
+/// undeclared substitution, or a climb out of a declared one, whose locus says nothing about what
+/// lies above it.
+pub(super) fn names_no_known_directory(expanded: &str) -> bool {
+    let climbs_out_of_a_substitution = expanded.contains(crate::cst::eval::TAGGED_PREFIX) && expanded.split('/').any(|part| part == "..");
+    expanded.starts_with('~') || expanded.contains('$') || crate::cst::check::is_opaque_value(expanded) || climbs_out_of_a_substitution
 }

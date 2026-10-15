@@ -455,7 +455,7 @@ fn tagged_substitution(path: &str) -> Option<(LocalLocus, String)> {
     let worst = worst?;
     out.push_str(rest);
     // Anything the region model cannot see through still fails closed here.
-    if out.contains('$') || out.contains(UNPINNABLE_MARK) {
+    if out.contains('$') || out.contains(UNPINNABLE_MARK) || out.split('/').any(|part| part == "..") {
         return Some((LocalLocus::Machine, String::new()));
     }
     Some((worst, out))
