@@ -444,6 +444,56 @@ schema change to the level files and wants its own release.
 Note the design note does not presuppose the verdict changes. Once the crossing is expressible,
 allowing `mv` out of a sibling may well be the right answer.
 
+**A second edge, noticed 2026-10-15 in review:** the `adjacent` rung also covers a file straight in
+the projects folder, beside the project rather than inside a sibling. So `touch ../x` and
+`yard doc -o ../x` are approved at developer, while `touch ../../x` and `rm ../x` are refused. That
+follows from `regions.rs` placing `~/projects/notes.txt` at `adjacent` on purpose (its test calls it
+"a file peer to the workspace dir"), so it is not a bug. But the decision above was argued for
+sibling checkouts, never for loose files in the parent, and the parent holds every project: a file
+written there becomes a new top-level entry that `for d in ../*` or a tool scanning the projects
+folder picks up. Open question for the owner: should a loose file in the parent stay `adjacent`, or
+drop to `machine` while a sibling's contents stay `adjacent`? Until decided, nothing changes.
+
+**`jj -R` into a directory outside the workspace, noticed 2026-10-15.** From `~/projects`,
+`jj -R ~/.claude status` and `jj -R ~/.claude diff` are refused, and so were they on 0.234.1: not a
+regression. Two separate things:
+
+- **The verdict is by design today.** `-R`/`--repository` is gated at the write locus because every
+  jj command snapshots the working copy into that repository's store, and a repository jj reads can
+  carry a migrated `.jj/repo/config.toml` naming a diff formatter, pager or fsmonitor program. So a
+  repository in home or system space is refused, while `git -C ~/.claude status` is approved because
+  git's observing subs are read-gated. Approving observing jj subs against any repository (read locus
+  for `-R` when the sub only observes, perhaps only with `--ignore-working-copy`) is a widening and an
+  open question for the owner: what stops a program named in a repository config jj reads.
+- **The nudge names the wrong reason.** The gate checks the `-R` directory itself, and `~/.claude`
+  itself is a frozen trust root (`Frozen::Rebind`), so the message says "removing or replacing the
+  directory itself is never auto-approved", although jj writes into the `.jj` inside it, never replaces
+  the directory. `frozen_write_kind` only picks the nudge, not the verdict. A fix gates the
+  `-R` value as a write into the directory (`<dir>/.jj`), which gives the "outside the working
+  directory" nudge instead; it changes refusal text users read, so it waits for the owner's
+  before/after.
+
+Scripts run by a path outside the workspace (`~/.claude/hooks/push-guard.sh --check`,
+`printf x | ~/.claude/hooks/rm-guard.sh`) are refused by the trust model (a non-standard path is
+worst-cased); they are approved by a Claude Code allow rule in the harness, not by safe-chains.
+
+**hg follow-ups, noticed 2026-10-15 while closing hg's early-option hole (0.234.3):**
+
+- A bare glob can expand to a filename spelled like an option: `hg status *` in a checkout holding a
+  file named `--config=extensions.e=e.py` runs `e.py`, because hg's early pass reads it from argv.
+  The same class reaches `rg foo *` and `git log *` (approved), where a matching name is at worst a
+  flag; for hg it is code execution with no flag typed. The glob listing in `src/cst/opaque/glob.rs`
+  already checks matches for a name that reads as a flag when the glob starts with a pattern
+  character; a glob like `src/*` or `*` whose matches start with `-` is the case to check.
+- `hg branch NAME` and `hg bookmarks NAME` (also `-d`, `-m`) change repository metadata but sit at
+  `SafeRead`. They are local and recoverable, so the level is mislabelled rather than unsafe; give
+  the naming forms `SafeWrite`, as `git branch NAME` is.
+- `hg id SOURCE` (`hg id https://x/y`, `hg id ssh://h/r`) contacts that remote and, for ssh, runs
+  `ui.ssh`; it is approved, as `git ls-remote URL` is. 0.234.3 made `incoming`/`outgoing`
+  candidates and dropped `summary --remote` because they also run `--ssh`/`--remotecmd` programs or
+  read a remote; whether a bare remote read like `id SOURCE` or `ls-remote URL` belongs above the
+  line is one decision for both.
+
 ## Permissive reads: what is left, and the one finding that changes its shape
 
 Landed so far (all zero-behavioural-delta, so they are safe on their own):
@@ -1328,13 +1378,14 @@ and a boolean in the next), so neither compares tools:
   - `a_short_flag_is_not_standalone_where_its_own_command_declares_it_valued` compares the scopes
     of ONE command (subs, fallback, handler policies, the `behavior` grammar): within one tool a
     letter usually keeps its meaning. Ratchets `tests/fixtures/short_flag_arity_worklist.tsv`
-    (seeded with 194 rows; 206 now, the 14 added being jj scopes checked right against jj 0.45.1's help, e.g. `jj log -s` is `--summary`). Suites of separate programs (git: 84 rows, cargo, docker) reuse
+    (seeded with 194 rows; 206 now: 14 jj scopes checked right against jj 0.45.1's help joined, e.g. `jj log -s` is `--summary`, 14 known-wrong rows fixed, and 14 hg rows added in 0.234.3 that are right, such as `hg status -r` being `--removed`). Suites of separate programs (git: 84 rows, cargo, docker) reuse
     letters freely, so many rows are right as written. `hugo build -s` was a real one and is
-    fixed. **Known wrong and NOT yet fixed** (each still a row): `docker/podman/nerdctl ps -n`,
-    `git switch -c`, `cargo tree -e`/`-i`, `hg status -T`/`hg tip -T`, `pip list -i` (an index
-    URL) and `dotnet nuget verify -v`. None bypasses a gate as far as the review found (their values
-    are counts, names, templates or a URL on a command that already reaches the network), but they
-    are mismodellings, not open questions: fix them first when working those commands.
+    fixed. The rows the review found wrong are fixed too (2026-10-15): `-n`/`--last` of
+    `docker`/`podman` `ps` and `container ls`/`list` and of `nerdctl ps`, `git switch -c`/`--create`,
+    `cargo tree -e`/`-i`, `hg status -T` (with `--rev` and `--terse`, which were also listed as
+    boolean) and `hg tip -T`/`--template`/`--style`, `pip list -i` and `dotnet nuget verify -v`.
+    `the_researched_value_taking_flags_are_declared_valued` pins them. `git switch -t` (its mode
+    goes only after `=`) and `hg status -u` (`--unknown`) stay listed because they are right.
   - `a_short_spelling_of_a_gated_long_flag_is_gated_too`: path gates are keyed by NAME and the
     schema cannot pair `-d` with `--destination`, so a gate on the long spelling leaves the short
     one ungated whatever its arity. `a_gated_flag_is_never_declared_value_less` checks only the
