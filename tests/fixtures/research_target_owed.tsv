@@ -120,7 +120,6 @@ avconvert	examples,no-tolerance
 avdmanager	examples,version
 avmediainfo	description,examples
 avrdude	description,examples,no-overlap
-awk	entry
 aws	description,no-tolerance
 az	description,no-tolerance,version
 b2sum	examples,version
@@ -271,7 +270,6 @@ ctr	examples,profiled
 cucumber	description,examples,no-overlap,version
 cucumber-js	description,examples
 cupstestppd	description,examples
-curl	entry
 cwebp	description,examples,no-overlap
 cx	examples,profiled
 danetool	examples

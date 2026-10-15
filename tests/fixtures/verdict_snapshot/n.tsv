@@ -124,6 +124,10 @@ nativescript update x	denied
 nativescript usage-reports	denied
 nativescript usage-reports x	denied
 nativescript x	denied
+nawk	denied
+nawk --help	denied
+nawk --version	inert
+nawk x	inert
 nbconvert	denied
 nbconvert --ExecutePreprocessor.kernel-name x	safe-write
 nbconvert --ExecutePreprocessor.kernel_name x	safe-write

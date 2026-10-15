@@ -1,4 +1,4 @@
-mod awk;
+pub(crate) mod awk;
 mod find;
 mod grep;
 mod net;
@@ -11,7 +11,6 @@ use crate::verdict::Verdict;
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     None.or_else(|| find::dispatch(cmd, tokens))
         .or_else(|| sed::dispatch(cmd, tokens))
-        .or_else(|| awk::dispatch(cmd, tokens))
         .or_else(|| net::dispatch(cmd, tokens))
         .or_else(|| grep::dispatch(cmd, tokens))
 }
@@ -19,7 +18,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
     docs.extend(find::command_docs());
-    docs.extend(awk::command_docs());
     docs.extend(net::command_docs());
     // grep/sed/tar are now `[command.behavior]` commands (engine-authoritative); their docs render
     // from the behavior (via `toml_command_docs`), with egrep/fgrep/rgrep folded into grep's single

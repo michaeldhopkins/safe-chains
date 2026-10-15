@@ -68,7 +68,7 @@ fn registry() -> BTreeMap<String, Command> {
         }
     }
     let named: BTreeSet<String> = out.iter().flat_map(|(n, c)| std::iter::once(n.clone()).chain(c.aliases.iter().cloned())).collect();
-    // A handler documents several programs under one heading ("awk / gawk / mawk / nawk").
+    // A handler documents several programs under one heading ("bash / sh").
     for doc in safe_chains::docs::all_command_docs() {
         let mut names = doc.name.split(" / ").map(str::trim).filter(|n| !n.is_empty()).map(str::to_string);
         let Some(first) = names.next() else { continue };

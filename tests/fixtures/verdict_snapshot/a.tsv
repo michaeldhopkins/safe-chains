@@ -4412,6 +4412,7 @@ avrdude -u	safe-write
 avrdude -v	safe-write
 avrdude -x x	safe-write
 avrdude x	safe-write
+awk	denied
 awk '$0 ~ /foo|bar/ {print}' file.txt	inert
 awk '$1 > 100 {print $0}' file.txt	inert
 awk '/"/ {print $0 | "sh"}' file.txt	denied
@@ -4422,6 +4423,7 @@ awk '/^#/ {print}' file.txt	inert
 awk '/^$/ {print NR}' file.txt	inert
 awk '/^def |^class |^end/ {print}' file.rb	inert
 awk '/a>b/ {print}' file.txt	inert
+awk '/error/ {c++} END{print c}' ./log.txt	inert
 awk '/error/ {print $0}' log.txt	inert
 awk '/error|warn/ {c++} END{print c>=0 ? c : 0}' log.txt	inert
 awk '/error|warning/ && NR>=10 {print}' log.txt	inert
@@ -4432,6 +4434,7 @@ awk '/pattern/{getline; print NR": "$0}' file	inert
 awk '/pattern/{getline; print}' file	inert
 awk '/start/,/end/ {print}' file.txt	inert
 awk '/user@example.com/ {print}' file.txt	inert
+awk '@include "x"' ./data.txt	denied
 awk 'BEGIN{"date" | getline d; print d}'	denied
 awk 'BEGIN{ARGC=1}{print}' f.txt	denied
 awk 'BEGIN{ARGV[1]="/etc/shadow"; ARGC=2} {print}' f.txt	denied
@@ -4441,8 +4444,10 @@ awk 'BEGIN{ok = a || b; print ok}'	inert
 awk 'BEGIN{print "ARGV"}' f.txt	inert
 awk 'BEGIN{print "getline is a keyword"}'	inert
 awk 'BEGIN{print "system failed"}'	inert
+awk 'BEGIN{print ARGV[1]}' ./data.txt	denied
 awk 'BEGIN{print ARGV[1]}' f.txt	denied
 awk 'BEGIN{system ("rm")}'	denied
+awk 'BEGIN{system("id")}'	denied
 awk 'BEGIN{system("rm -rf /")}'	denied
 awk 'BEGIN{system("rm")}'	denied
 awk 'BEGIN{system("rm")}' --help	denied
@@ -4464,6 +4469,7 @@ awk '{ARGVX=1; MYARGV=2; print}' f.txt	inert
 awk '{avg=$1/10; pct=avg/total*100; print pct}' file.txt	inert
 awk '{cmd="sort"; print $0 | cmd}' file	denied
 awk '{f="out.txt"; print $0 > f}' file	denied
+awk '{getline l < "/etc/hosts"; print l}'	denied
 awk '{getline line < "/etc/shadow"; print line}'	denied
 awk '{getline line < "input.txt"; print line}' file	denied
 awk '{if(length($0) > 80) print NR}' file.txt	inert
@@ -4476,12 +4482,15 @@ awk '{print $0 > "output.txt"}'	denied
 awk '{print $0 >> "output.txt"}'	denied
 awk '{print $0 | "cmd"}'	denied
 awk '{print $0 | "mail user@host"}'	denied
+awk '{print $0 | "sh"}' ./data.txt	denied
 awk '{print $1%10, $1/10}' file.txt	inert
 awk '{print $1, $3}' file.txt	inert
 awk '{print $1/100}' file.txt	inert
+awk '{print $1}' ./data.txt	inert
 awk '{print $1}' file.txt	inert
 awk '{print $1}' file.txt > /dev/null	inert
 awk '{print $6}'	inert
+awk '{print > "out.txt"}' ./data.txt	denied
 awk '{print >"out"}' file	denied
 awk '{print >> "log.txt"}' file	denied
 awk '{print|"cmd"}' file	denied
@@ -4492,6 +4501,7 @@ awk '{print}' /etc/shadow	denied
 awk '{print}' ARGC=1 f.txt	denied
 awk '{print}' f.txt -b	denied
 awk '{print}' icon@2x.txt	inert
+awk '{print}' ~/.ssh/id_rsa	denied
 awk '{x=1/2; print $0 | "sh"; y=3/4}' file.txt	denied
 awk '{x=1/2;system("rm");y=3/4}' file	denied
 awk -- '-1 {print}' /etc/shadow	denied
@@ -4499,6 +4509,7 @@ awk -- '-1 {system("id")}' file.txt	denied
 awk -- '{print $1}' file.txt	inert
 awk --assign n=0 '{print}' f.txt	denied
 awk --field-separator : '{print}' f.txt	denied
+awk --help	denied
 awk --version	inert
 awk -F: '{print $1}' ./data.txt	inert
 awk -b -F : -v n=0 '{print}' f.txt	inert
@@ -4507,13 +4518,13 @@ awk -bF: '{print $1}' f.txt	inert
 awk -bcv n=0 '{print}' f.txt	denied
 awk -bv 1 /etc/shadow	denied
 awk -bv n=0 '{print}' f.txt	denied
+awk -bv x '{print}' ./data.txt	denied
+awk -f prog.awk ./data.txt	denied
 awk -f script.awk data.txt	denied
 awk -v ARGC=1 '{print}' f.txt	denied
+awk -v n=2 'NR>n' ./data.txt	inert
 awk -vARGC=1 '{print}' f.txt	denied
-awk / gawk / mawk / nawk	inert
-awk / gawk / mawk / nawk --help	denied
-awk / gawk / mawk / nawk --version	denied
-awk / gawk / mawk / nawk x	inert
+awk x	inert
 aws	denied
 aws --ca-bundle x	denied
 aws --cli-connect-timeout x	denied

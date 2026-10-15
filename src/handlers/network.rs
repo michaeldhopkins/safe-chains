@@ -18,6 +18,9 @@ fn is_safe_method(method: &str) -> bool {
 }
 
 fn is_safe_curl_header(value: &str) -> bool {
+    if value.contains(['\r', '\n']) {
+        return false;
+    }
     let Some((name, _)) = value.split_once(':') else {
         return false;
     };
@@ -58,6 +61,12 @@ fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> O
     if t == "-w" || t == "--write-out" {
         return Some(match next {
             Some(v) if !write_out_admits(v.as_str()) => Err(()),
+            _ => Ok(2),
+        });
+    }
+    if t == "-A" || t == "--user-agent" {
+        return Some(match next {
+            Some(v) if v.contains(['\r', '\n']) => Err(()),
             _ => Ok(2),
         });
     }
@@ -137,6 +146,9 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
                     if b == b'w' && tokens.get(i + 1).is_some_and(|v| !write_out_admits(v.as_str())) {
                         return Verdict::Denied;
                     }
+                    if b == b'A' && tokens.get(i + 1).is_some_and(|v| v.contains(['\r', '\n'])) {
+                        return Verdict::Denied;
+                    }
                     i += 1;
                     break;
                 }
@@ -153,29 +165,6 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
     }
     let level = if has_write { SafetyLevel::SafeWrite } else { SafetyLevel::Inert };
     Verdict::Allowed(level)
-}
-
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    match cmd {
-        "curl" => Some(is_safe_curl(tokens)),
-        _ => None,
-    }
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
-    vec![CommandDoc::handler(
-        "curl",
-        "https://curl.se/docs/manpage.html",
-        DocBuilder::new()
-            .section(format!("Allowed standalone flags: {}.", wordset_items(&CURL_SAFE_STANDALONE),))
-            .section(format!("Allowed valued flags: {}.", wordset_items(&CURL_SAFE_VALUED),))
-            .section(format!("Allowed methods (-X/--request): {}.", wordset_items(&CURL_SAFE_METHODS),))
-            .section("-H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).")
-            .section("-o/--output and -O/--remote-name allowed (writes files).")
-            .build(),
-        "net",
-    )]
 }
 
 #[cfg(test)]
@@ -258,6 +247,11 @@ mod tests {
         curl_header_method_override: "curl -H 'X-HTTP-Method-Override: DELETE' https://example.com",
         curl_header_transfer_encoding: "curl -H 'Transfer-Encoding: chunked' https://example.com",
         curl_header_no_colon: "curl -H 'BadHeader' https://example.com",
+        curl_header_crlf_injection: "curl -H $'Accept: x\\r\\nContent-Length: 5\\r\\n\\r\\nhello' https://example.com",
+        curl_header_newline_injection: "curl -H $'Accept: x\\nX-Evil: 1' https://example.com",
+        curl_user_agent_crlf: "curl -A $'x\\r\\nContent-Length: 5' https://example.com",
+        curl_user_agent_long_newline: "curl --user-agent $'x\\nX-Evil: 1' https://example.com",
+        curl_user_agent_cluster_crlf: "curl -sA $'x\\r\\nX: 1' https://example.com",
         curl_cookie_flag: "curl -b 'session=abc' https://example.com",
         curl_user: "curl -u admin:pass https://example.com",
         curl_referer_flag: "curl -e 'https://evil.com' https://example.com",
@@ -323,6 +317,29 @@ mod tests {
         curl_level_output: "curl -s https://example.com -o /tmp/file.html",
         curl_level_remote_name: "curl -O https://example.com/file.tar.gz",
         curl_level_combined_output: "curl -sSo /tmp/file https://example.com",
+    }
+
+    #[test]
+    fn the_reference_lists_every_admitted_flag_method_and_header() {
+        let toml = include_str!("../../commands/net/curl.toml");
+        let body = toml.lines().find(|l| l.starts_with("doc_body")).expect("doc_body");
+        let standalone = crate::docs::wordset_items(&super::CURL_SAFE_STANDALONE);
+        let valued = crate::docs::wordset_items(&super::CURL_SAFE_VALUED);
+        let methods = crate::docs::wordset_items(&super::CURL_SAFE_METHODS);
+        assert!(body.contains(&format!("Allowed standalone flags: {standalone}.")));
+        assert!(body.contains(&format!("Allowed valued flags: {valued}.")));
+        assert!(body.contains(&format!("Allowed methods (-X/--request): {methods}.")));
+        for header in super::CURL_SAFE_HEADERS {
+            assert!(body.contains(header), "{header}");
+        }
+    }
+
+    #[test]
+    fn header_values_with_line_breaks_are_refused() {
+        assert!(super::is_safe_curl_header("Accept: text/html"));
+        assert!(!super::is_safe_curl_header("Accept: x\r\nContent-Length: 5"));
+        assert!(!super::is_safe_curl_header("Accept: x\nX-Evil: 1"));
+        assert!(!super::is_safe_curl_header("Accept: x\r"));
     }
 
     proptest! {

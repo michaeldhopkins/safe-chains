@@ -19,12 +19,20 @@
 - **soundslike**: Flags: --help. Valued: --lang, -l
 - Allowed standalone flags: --help, --version, -?
 
-### `awk / gawk / mawk / nawk`
+### `awk`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gawk/manual/gawk.html">https://www.gnu.org/software/gawk/manual/gawk.html</a></p>
 
-- Program validated: system, getline, |, > constructs checked
-- Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t
-- Allowed valued flags: --assign, --field-separator, -F, -v
+Aliases: `gawk`, `mawk`, `nawk`
+
+- Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t. Allowed valued flags: --assign, --field-separator (as --flag=value), -F, -v. Program: no system, no | pipe, no > or >> redirect, no getline from a file or command, no @ construct, no ARGV, ARGC, SYMTAB or PROCINFO. ENVIRON is allowed and shows the environment. Options end at the program. -f, ambiguous short clusters (-bv x) and --assign or --field-separator with a separate value are refused. File operands that look like paths are gated by read locus, and gawk's /inet network special files are refused as operands.
+
+**Examples:**
+
+- `awk '{print $1}' ./data.txt`
+- `awk -F: '{print $1}' ./data.txt`
+- `awk -v n=2 'NR>n' ./data.txt`
+- `awk '/error/ {c++} END{print c}' ./log.txt`
+- `awk --version`
 
 ### `base32`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#base32-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#base32-invocation</a></p>

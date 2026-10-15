@@ -1,0 +1,26 @@
+[[command]]
+name = "awk"
+aliases = ["gawk", "mawk", "nawk"]
+description = "Pattern-scanning and text-processing language. The program is the first operand and the files follow; every file operand is a content read, so a credential file named there is shown whole. The program is the exposure: awk can run a command (system, a pipe to or from a command), write a file (print redirected with > or >>), read a file or command with getline, and in gawk load a shared library or another program (@load, @include), call a function by name (@name()) or open a network connection through the /inet special files. A program is approved only when none of those appear outside a string or regex literal, and an /inet operand is refused, so an approved command cannot open a connection. It can still print its own process environment through ENVIRON, an exposure when the environment holds secrets. ARGV, ARGC, SYMTAB and PROCINFO are refused as code and in any word outside the program text. -f reads the program from a file and is refused. Option words are read the same in every awk: a short cluster that takes a value (-bv x) and a long option with a separate value (--assign x) are refused, and options end at the program. gawk 5.4.1 is the current release, which has a slow cadence of about one feature release a year with patch releases between; the macOS awk is the one-true-awk 20200816, mawk is a separate small implementation and nawk is usually the one-true-awk, so only the common core is admitted."
+url = "https://www.gnu.org/software/gawk/manual/gawk.html"
+researched_version = "gawk 5.4.1"
+handler = "awk"
+doc_body = "Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t. Allowed valued flags: --assign, --field-separator (as --flag=value), -F, -v. Program: no system, no | pipe, no > or >> redirect, no getline from a file or command, no @ construct, no ARGV, ARGC, SYMTAB or PROCINFO. ENVIRON is allowed and shows the environment. Options end at the program. -f, ambiguous short clusters (-bv x) and --assign or --field-separator with a separate value are refused. File operands that look like paths are gated by read locus, and gawk's /inet network special files are refused as operands."
+examples_safe = [
+    "awk '{print $1}' ./data.txt",
+    "awk -F: '{print $1}' ./data.txt",
+    "awk -v n=2 'NR>n' ./data.txt",
+    "awk '/error/ {c++} END{print c}' ./log.txt",
+    "awk --version",
+]
+examples_denied = [
+    "awk '@include \"x\"' ./data.txt",
+    "awk '{getline l < \"/etc/hosts\"; print l}'",
+    "awk 'BEGIN{system(\"id\")}'",
+    "awk '{print > \"out.txt\"}' ./data.txt",
+    "awk '{print $0 | \"sh\"}' ./data.txt",
+    "awk -f prog.awk ./data.txt",
+    "awk 'BEGIN{print ARGV[1]}' ./data.txt",
+    "awk -bv x '{print}' ./data.txt",
+    "awk '{print}' ~/.ssh/id_rsa",
+]

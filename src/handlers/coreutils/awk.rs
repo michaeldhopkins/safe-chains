@@ -277,6 +277,9 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
             return false;
         }
     }
+    if awk_operands(tokens).iter().skip(1).any(|o| o.starts_with("/inet")) {
+        return false;
+    }
     if tokens[1..].iter().any(|t| ambiguous_option(t.as_str())) {
         return false;
     }
@@ -305,20 +308,8 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
         .any(|f| crate::policy::looks_like_path(f) && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    match cmd {
-        "awk" | "gawk" | "mawk" | "nawk" => Some(if is_safe_awk(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }),
-        _ => None,
-    }
-}
-
-pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![crate::docs::CommandDoc::handler(
-        "awk / gawk / mawk / nawk",
-        "https://www.gnu.org/software/gawk/manual/gawk.html",
-        format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe()),
-        "text",
-    )]
+pub(crate) fn check_awk(tokens: &[Token]) -> Verdict {
+    if is_safe_awk(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 #[cfg(test)]
@@ -331,6 +322,17 @@ pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEnt
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn the_reference_lists_every_admitted_flag() {
+        let toml = include_str!("../../../commands/text/awk.toml");
+        let body = toml.lines().find(|l| l.starts_with("doc_body")).expect("doc_body");
+        let standalone = crate::docs::wordset_items(&super::AWK_POLICY.standalone);
+        assert!(body.contains(&format!("Allowed standalone flags: {standalone}.")));
+        for flag in super::AWK_POLICY.valued.iter() {
+            assert!(body.contains(flag), "{flag}");
+        }
+    }
+
     use crate::is_safe_command;
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
@@ -401,6 +403,7 @@ mod tests {
 
     denied! {
         awk_system_denied: "awk 'BEGIN{system(\"rm -rf /\")}'",
+        awk_inet_operand_denied: "gawk '{print}' /inet/tcp/0/example.com/80",
         awk_getline_denied: "awk '{getline line < \"/etc/shadow\"; print line}'",
         awk_pipe_output_denied: "awk '{print $0 | \"mail user@host\"}'",
         awk_redirect_denied: "awk '{print $0 > \"output.txt\"}'",

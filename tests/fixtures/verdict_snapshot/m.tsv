@@ -483,6 +483,10 @@ masscan -r x	safe-write
 masscan -v	safe-write
 masscan -w x	safe-write
 masscan x	safe-write
+mawk	denied
+mawk --help	denied
+mawk --version	inert
+mawk x	inert
 mc	denied
 mc --config-dir ./.mc ls x	safe-read
 mc --config-dir /etc ls x	denied

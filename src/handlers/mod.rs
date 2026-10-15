@@ -58,6 +58,8 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("glab", forges::glab::is_safe_glab as HandlerFn),
         ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),
+        ("awk", coreutils::awk::check_awk as HandlerFn),
+        ("curl", network::is_safe_curl as HandlerFn),
         ("fd", fd::check_fd as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
@@ -88,7 +90,6 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| node::dispatch(cmd, tokens))
         .or_else(|| jvm::dispatch(cmd, tokens))
         .or_else(|| android::dispatch(cmd, tokens))
-        .or_else(|| network::dispatch(cmd, tokens))
         .or_else(|| system::dispatch(cmd, tokens))
         .or_else(|| perl::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
@@ -111,7 +112,6 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(node::command_docs());
     docs.extend(jvm::command_docs());
     docs.extend(android::command_docs());
-    docs.extend(network::command_docs());
     docs.extend(system::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(fuzzy::command_docs());
@@ -154,7 +154,6 @@ pub(crate) fn is_built_in(name: &str) -> bool {
         || node::dispatch(cmd, &tokens).is_some()
         || jvm::dispatch(cmd, &tokens).is_some()
         || android::dispatch(cmd, &tokens).is_some()
-        || network::dispatch(cmd, &tokens).is_some()
         || system::dispatch(cmd, &tokens).is_some()
         || perl::dispatch(cmd, &tokens).is_some()
         || coreutils::dispatch(cmd, &tokens).is_some()

@@ -7438,6 +7438,7 @@ curl --remote-name https://example.com/f.tar.gz	safe-write
 curl --request=GET -d 'payload' https://example.com	denied
 curl --request=GET https://example.com	denied
 curl --request=POST https://example.com	denied
+curl --user-agent $'x\\nX-Evil: 1' https://example.com	denied
 curl --user-agent 'Mozilla/5.0' https://example.com	inert
 curl --user-agent='Mozilla/5.0' https://example.com	denied
 curl --version	inert
@@ -7446,9 +7447,12 @@ curl --write-out @/etc/shadow https://x.com	denied
 curl --write-out=%{http_code} https://example.com	denied
 curl --write-out=@/root/.ssh/id_rsa https://x.com	denied
 curl -4 https://example.com	inert
+curl -A $'x\\r\\nContent-Length: 5' https://example.com	denied
 curl -A 'Mozilla/5.0' https://example.com	inert
 curl -D headers.txt https://example.com	denied
 curl -F 'file=@secret.txt' https://example.com	denied
+curl -H $'Accept: x\\nX-Evil: 1' https://example.com	denied
+curl -H $'Accept: x\\r\\nContent-Length: 5\\r\\n\\r\\nhello' https://example.com	denied
 curl -H 'BadHeader' https://example.com	denied
 curl -H 'Content-Type: application/json' https://example.com	denied
 curl -H 'Transfer-Encoding: chunked' https://example.com	denied
@@ -7472,6 +7476,7 @@ curl -XGET https://example.com	inert
 curl -XPOST https://example.com	denied
 curl -b 'session=abc' https://example.com	denied
 curl -c cookies.txt https://example.com	denied
+curl -d 'a=b' https://example.com	denied
 curl -d '{"key":"val"}' https://example.com	denied
 curl -d data --help	denied
 curl -e 'https://evil.com' https://example.com	denied
@@ -7483,6 +7488,10 @@ curl -n https://example.com	denied
 curl -o ./out.json https://x.com	safe-write
 curl -o /etc/x https://x	denied
 curl -o output.html https://example.com	safe-write
+curl -s 'https://example.com/[1-3]'	inert
+curl -s -H 'Accept: application/json' https://api.github.com/zen	inert
+curl -s -L gopher://example.com/	denied
+curl -s -w '%{http_code}' -o /dev/null https://example.com	safe-write
 curl -s -w '%{http_code}\\n' -o /dev/null https://example.com	safe-write
 curl -s https://api.github.com -H 'X-GitHub-Api-Version: 2022-11-28'	inert
 curl -s https://example.com	inert
@@ -7500,9 +7509,11 @@ curl -s https://example.com -H 'Referer: https://example.com'	inert
 curl -s https://example.com -H 'User-Agent: Mozilla/5.0'	inert
 curl -s https://example.com -o /tmp/file.html	safe-write
 curl -s https://example.com https://example.org	inert
+curl -sA $'x\\r\\nX: 1' https://example.com	denied
 curl -sLA 'Mozilla/5.0' --max-time 15 https://example.com	inert
 curl -sS --no-progress-meter https://example.com	inert
 curl -sS -i http://127.0.0.1:8001/	inert
+curl -sSL -I https://example.com	inert
 curl -sSLk https://example.com	inert
 curl -sSi https://example.com	inert
 curl -sSm 10 https://example.com	inert
@@ -7515,10 +7526,12 @@ curl -v https://example.com	inert
 curl -w '%OUTPUT{x.txt}' https://example.com	denied
 curl -w '%output{/tmp/x}' https://example.com	denied
 curl -w '%output{>>/tmp/x}%{http_code}' https://example.com	denied
+curl -w '%output{x.txt}' https://example.com	denied
 curl -w '%{http_code}' -s https://example.com	inert
 curl -w @- -s https://example.com	denied
 curl -w @./fmt.txt -s https://example.com	denied
 curl -w @/etc/shadow https://x.com	denied
+curl -w @fmt.txt https://example.com	denied
 curl FILE:///etc/shadow	denied
 curl File:///etc/shadow	denied
 curl HTTPS://example.com	inert
@@ -7527,6 +7540,7 @@ curl dict://example.com/d:word	denied
 curl example.com	denied
 curl fIlE:///root/.ssh/id_rsa	denied
 curl file://./README.md	denied
+curl file:///etc/hosts	denied
 curl file:///etc/shadow	denied
 curl file:///root/.ssh/id_rsa	denied
 curl file://localhost/etc/shadow	denied

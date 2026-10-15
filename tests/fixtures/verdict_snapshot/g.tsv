@@ -179,6 +179,7 @@ gatsby version --help x	inert
 gatsby version -h	inert
 gatsby version x	inert
 gatsby x	denied
+gawk	denied
 gawk '@include "inplace"; {print "x"}' file.txt	denied
 gawk '@load "filefuncs"; BEGIN{print 1}'	denied
 gawk 'BEGIN{PROCINFO["sorted_in"]="f"}'	denied
@@ -188,9 +189,13 @@ gawk 'BEGIN{f="sys" "tem"; @f("id")}'	denied
 gawk 'BEGIN{system("rm")}'	denied
 gawk '{print $2}' file.txt	inert
 gawk '{print}' -v /etc/shadow	denied
+gawk '{print}' /inet/tcp/0/example.com/80	denied
 gawk --assign=n=0 '{print n}' f.txt	inert
 gawk --field-separator=: '{print $1}' f.txt	inert
+gawk --help	denied
+gawk --version	inert
 gawk -bv n=0 'BEGIN{@f()}' file.txt	denied
+gawk x	inert
 gbase64	inert
 gbase64 --decode	inert
 gbase64 --decode --help	inert

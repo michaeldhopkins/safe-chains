@@ -1447,11 +1447,11 @@ fn custom_handler_returns_denied_by_default() {
     let spec = load_one(
         r#"
             [[command]]
-            name = "curl"
-            handler = "curl"
+            name = "unwired"
+            handler = "unwired"
         "#,
     );
-    assert_eq!(dispatch_spec(&toks(&["curl", "http://example.com"]), &spec), Verdict::Denied,);
+    assert_eq!(dispatch_spec(&toks(&["unwired", "http://example.com"]), &spec), Verdict::Denied,);
 }
 
 // Structured with wrapper (global flag stripping)

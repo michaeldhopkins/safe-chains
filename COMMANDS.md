@@ -1061,12 +1061,20 @@ Aliases: `gas`
 - Allowed standalone flags: --help, -?, -D, -F, -O, -V, -e, -h, -l, -n, -q, -s, -t, -u, -v
 - Allowed valued flags: -A, -B, -C, -E, -P, -T, -U, -V, -X, -b, -c, -i, -l, -p, -r, -x
 
-### `awk / gawk / mawk / nawk`
+### `awk`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gawk/manual/gawk.html">https://www.gnu.org/software/gawk/manual/gawk.html</a></p>
 
-- Program validated: system, getline, |, > constructs checked
-- Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t
-- Allowed valued flags: --assign, --field-separator, -F, -v
+Aliases: `gawk`, `mawk`, `nawk`
+
+- Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t. Allowed valued flags: --assign, --field-separator (as --flag=value), -F, -v. Program: no system, no | pipe, no > or >> redirect, no getline from a file or command, no @ construct, no ARGV, ARGC, SYMTAB or PROCINFO. ENVIRON is allowed and shows the environment. Options end at the program. -f, ambiguous short clusters (-bv x) and --assign or --field-separator with a separate value are refused. File operands that look like paths are gated by read locus, and gawk's /inet network special files are refused as operands.
+
+**Examples:**
+
+- `awk '{print $1}' ./data.txt`
+- `awk -F: '{print $1}' ./data.txt`
+- `awk -v n=2 'NR>n' ./data.txt`
+- `awk '/error/ {c++} END{print c}' ./log.txt`
+- `awk --version`
 
 ### `aws`
 <p class="cmd-url"><a href="https://docs.aws.amazon.com/cli/latest/">https://docs.aws.amazon.com/cli/latest/</a></p>
@@ -3550,11 +3558,16 @@ Aliases: `@cucumber/cucumber`
 ### `curl`
 <p class="cmd-url"><a href="https://curl.se/docs/manpage.html">https://curl.se/docs/manpage.html</a></p>
 
-- Allowed standalone flags: --compressed, --fail, --globoff, --head, --include, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -i, -k, -s, -v.
-- Allowed valued flags: --connect-timeout, --max-time, --user-agent, --write-out, -A, -m, -w.
-- Allowed methods (-X/--request): GET, HEAD, OPTIONS.
-- -H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).
-- -o/--output and -O/--remote-name allowed (writes files).
+- Allowed standalone flags: --compressed, --fail, --globoff, --head, --include, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -i, -k, -s, -v. Allowed valued flags: --connect-timeout, --max-time, --user-agent, --write-out, -A, -m, -w. Allowed methods (-X/--request): GET, HEAD, OPTIONS. URL operands: http:// or https:// only (any case); no scheme-less, file, ftp, gopher, dict or ldap operands, and no glob before the scheme. --help, -h, --version and -V are allowed alone. -w/--write-out: inline format only (no @file, no %output). Flag values are given as a separate word: every --flag=value spelling is refused. -H/--header: Accept, Accept-Charset, Accept-Encoding, Accept-Language, Authorization, Cache-Control, Cookie, If-Match, If-Modified-Since, If-None-Match, If-Range, If-Unmodified-Since, Origin, Range, Referer, User-Agent, X-Correlation-ID, X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Proto, X-GitHub-Api-Version, X-Request-ID and X-Requested-With only, and no header or -A value may hold a line break. -X/--request: GET, HEAD or OPTIONS. -o/--output and -O/--remote-name write a file.
+
+**Examples:**
+
+- `curl -s https://example.com`
+- `curl -sSL -I https://example.com`
+- `curl -s -H 'Accept: application/json' https://api.github.com/zen`
+- `curl -s -w '%{http_code}' -o /dev/null https://example.com`
+- `curl --version`
+- `curl -s 'https://example.com/[1-3]'`
 
 ### `cut`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation</a></p>
