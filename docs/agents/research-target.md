@@ -17,6 +17,7 @@ structurally, per command name (`tests/research_target/criteria.rs`):
 | `examples` | at least one `examples_safe` and one `examples_denied`; a command wholly above the line (`candidate = true` on the command) owes only the denial |
 | `profiled` | no node in the tree is `candidate = true` without a `profile` archetype: `profile` is the facet-derived successor to `candidate` |
 | `no-tolerance` | no node sets `tolerate_unknown_short` or `tolerate_unknown_long`: every admitted flag was researched |
+| `no-overlap` | no scope of the command (or an alias) has a row in `tests/fixtures/standalone_valued_overlap.tsv`: no flag is listed in both `standalone` and `valued` of one scope |
 
 These are proxies. They prove a step was taken, never that it was taken well: the review of each
 change is what judges the research. A criterion is added here, with its check and tests, when a
@@ -43,6 +44,7 @@ misses. It may only shrink:
 Deleting the pin to recreate it is a rebaseline, which review must refuse.
 
 The pin was created on 2026-10-14 with 30 of 1,622 commands at the target (1.8%).
+The `no-overlap` criterion was added on 2026-10-15 and owed by every command with a pinned pair.
 
 A command a handler dispatches but `--list-commands` does not document is invisible to this
 test; handler docs are the only list of handler-only commands there is.
@@ -68,7 +70,12 @@ One command per change, as AGENTS.md's commit rules say.
 3. Replace each `candidate = true` with the archetype the research supports (`archetypes.toml`),
    with `fact` and `source`. When no archetype fits, that is a mechanism gap, not a reason to
    guess: record it in TODO.md and leave the candidate in place.
-4. Replace blanket tolerance with the flags the research found, valued and standalone.
+4. Replace blanket tolerance with the flags the research found, valued and standalone. Sort each
+   of the command's pinned standalone/valued overlap pairs from the tool's own option table into
+   `optional_valued`, `valued` alone or `standalone` alone, and delete its rows from
+   `tests/fixtures/standalone_valued_overlap.tsv` (the criterion `no-overlap`). A move to `valued`
+   approves `--flag VALUE` and `-fVALUE` forms that deny today, so any move that approves something
+   new gets the Opus review below, with the value's path role checked first.
 5. For custom code, move any data the handler holds into TOML first.
 6. Run the gates in AGENTS.md, regenerate the pin, and look at the verdict snapshot's regressions.
 

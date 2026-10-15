@@ -19,6 +19,7 @@ use std::path::{Path, PathBuf};
 
 use toml::Value;
 
+const OVERLAP: &str = "tests/fixtures/standalone_valued_overlap.tsv";
 const OWED: &str = "tests/fixtures/research_target_owed.tsv";
 const UPDATE: &str = "UPDATE_RESEARCH_TARGET";
 const REPORT: &str = "RESEARCH_TARGET_REPORT";
@@ -77,6 +78,13 @@ fn registry() -> BTreeMap<String, Command> {
             command.missing.insert(criteria::ENTRY);
             command.custom = true;
             command.aliases.extend(aliases);
+        }
+    }
+    let overlaps = criteria::overlap_commands(&fs::read_to_string(root().join(OVERLAP)).expect("overlap pin"));
+    for (name, command) in &mut out {
+        let names: Vec<&str> = std::iter::once(name.as_str()).chain(command.aliases.iter().map(String::as_str)).collect();
+        if criteria::has_overlap(&names, &overlaps) {
+            command.missing.insert(criteria::NO_OVERLAP);
         }
     }
     out

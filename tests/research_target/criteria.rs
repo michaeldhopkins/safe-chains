@@ -14,7 +14,9 @@ pub const EXAMPLES: &str = "examples";
 pub const PROFILED: &str = "profiled";
 pub const NO_TOLERANCE: &str = "no-tolerance";
 
-pub const ALL: [&str; 6] = [ENTRY, DESCRIPTION, VERSION, EXAMPLES, PROFILED, NO_TOLERANCE];
+pub const NO_OVERLAP: &str = "no-overlap";
+
+pub const ALL: [&str; 7] = [ENTRY, DESCRIPTION, VERSION, EXAMPLES, PROFILED, NO_TOLERANCE, NO_OVERLAP];
 
 /// Below this a description cannot cover the axes AGENTS.md asks for; the shortest complete ones
 /// in the registry (`basename`, `true`) run to about 200 characters.
@@ -86,6 +88,24 @@ pub fn no_tolerance_ok(entry: &Value) -> bool {
     nodes(entry)
         .into_iter()
         .all(|n| !flag(n, "tolerate_unknown_short") && !flag(n, "tolerate_unknown_long"))
+}
+
+/// The command names that still have a pinned standalone/valued overlap pair: the first word of each
+/// scope in the pin file. A flag listed in both lists of one scope was never sorted from the tool's
+/// own option table.
+pub fn overlap_commands(pin_text: &str) -> BTreeSet<String> {
+    pin_text
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split('\t').next())
+        .filter_map(|scope| scope.split_whitespace().next())
+        .map(str::to_string)
+        .collect()
+}
+
+/// Whether the command or one of its aliases has a pinned overlap pair.
+pub fn has_overlap(names: &[&str], pinned: &BTreeSet<String>) -> bool {
+    names.iter().any(|n| pinned.contains(*n))
 }
 
 type Check = (&'static str, fn(&Value) -> bool);
@@ -196,6 +216,16 @@ mod tests {
         assert!(!no_tolerance_ok(&entry("[[sub]]\nname = \"a\"\ntolerate_unknown_long = true\n")));
         assert!(!no_tolerance_ok(&entry("tolerate_unknown_short = true")));
         assert!(no_tolerance_ok(&entry("tolerate_unknown_short = false")));
+    }
+
+    #[test]
+    fn a_pinned_overlap_pair_is_owed_by_its_command_or_alias() {
+        let pinned = overlap_commands("# c\n7z\t-bb\nansible-vault encrypt\t--x\ntask [fallback]\t-d\n");
+        assert_eq!(pinned.len(), 3);
+        assert!(has_overlap(&["ansible-vault"], &pinned));
+        assert!(has_overlap(&["zip", "7z"], &pinned));
+        assert!(has_overlap(&["task"], &pinned));
+        assert!(!has_overlap(&["ansible"], &pinned));
     }
 
     #[test]
