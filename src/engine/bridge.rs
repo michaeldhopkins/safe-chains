@@ -449,4 +449,79 @@ mod tests {
         // the lower band is UNCHANGED — no eval-level context, projection still tightens cat to read.
         assert_eq!(crate::command_verdict("cat ./README.md"), Verdict::Allowed(SafetyLevel::SafeRead), "lower band untouched");
     }
+
+    // ── properties ────────────────────────────────────────────────────────────
+    //
+    // Generators live in `crate::engine::testgen` (shared with the level/authoring
+    // property tests). No eval-level is set in these tests, so `project` exercises
+    // the default-band walk on every case.
+    use crate::engine::testgen::{arb_capability, arb_profile};
+    use proptest::prelude::*;
+
+    /// How permissive a projected verdict is: `Denied` the least, then the legacy
+    /// ladder Inert < SafeRead < SafeWrite.
+    fn permissiveness(verdict: Verdict) -> u8 {
+        match verdict {
+            Verdict::Denied => 0,
+            Verdict::Allowed(sl) => sl as u8 + 1,
+        }
+    }
+
+    /// The straightforward reading of `project`'s contract, written independently: the
+    /// empty profile fails closed; otherwise the first level in the ascending chain
+    /// with a legacy mapping that admits the profile decides; nothing → `Denied`.
+    fn reference_project(profile: &Profile) -> Verdict {
+        if profile.capabilities.is_empty() {
+            return Verdict::Denied;
+        }
+        for level in default_levels() {
+            if let Some(sl) = to_legacy(&level.name)
+                && level.admits(profile)
+            {
+                return Verdict::Allowed(sl);
+            }
+        }
+        Verdict::Denied
+    }
+
+    proptest! {
+        /// Differential: `project` agrees with the direct band walk on every profile.
+        #[test]
+        fn projection_matches_a_direct_walk_of_the_band(profile in arb_profile()) {
+            prop_assert_eq!(project(&profile), reference_project(&profile));
+        }
+
+        /// Minimality: an `Allowed(sl)` verdict is EARNED by the first band level
+        /// mapping to `sl` (it admits the profile) and by nothing lower — every
+        /// legacy-mapped level strictly before it refuses the profile. That is what
+        /// "lowest admitting level" (the doc on `project`) means.
+        #[test]
+        fn an_allowed_projection_is_earned_by_that_level_and_refused_by_every_lower_one(profile in arb_profile()) {
+            let Verdict::Allowed(sl) = project(&profile) else {
+                return Ok(()); // a Denied admits no minimality claim
+            };
+            let mapped: Vec<&Level> = default_levels().iter().filter(|l| to_legacy(&l.name).is_some()).collect();
+            let pos = mapped.iter().position(|l| to_legacy(&l.name) == Some(sl) && l.admits(&profile));
+            let pos = pos.expect("the level the verdict names must admit the profile");
+            for lower in &mapped[..pos] {
+                prop_assert!(!lower.admits(&profile), "`{}` projects at a lower level than the verdict claims", lower.name);
+            }
+        }
+
+        /// Monotonicity: a profile passes a level iff EVERY capability is admissible,
+        /// so adding a capability can only shrink the admitting levels — the
+        /// projection can never become MORE permissive by doing more.
+        #[test]
+        fn adding_a_capability_never_makes_the_projection_more_permissive(
+            profile in arb_profile(),
+            extra in arb_capability(),
+        ) {
+            let mut more = profile.clone();
+            more.capabilities.push(extra.clone());
+            prop_assert!(
+                permissiveness(project(&more)) <= permissiveness(project(&profile)),
+                "doing more became more permissive: {profile:?} -> {extra:?}",
+            );
+        }
+    }
 }

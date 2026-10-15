@@ -17,7 +17,6 @@ owed = [
   "src/cst/budget.rs",
   "src/cst/reserved.rs",
   "src/engine/archetype.rs",
-  "src/engine/bridge.rs",
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
   "src/handlers/coreutils/sed.rs",
@@ -126,7 +125,11 @@ owed = [
   "union_levels_admit_everything_but_their_declared_gap",
   "authored_levels_are_facet_monotone",
 ]
-"src/engine/bridge.rs" = []
+"src/engine/bridge.rs" = [
+  "projection_matches_a_direct_walk_of_the_band",
+  "an_allowed_projection_is_earned_by_that_level_and_refused_by_every_lower_one",
+  "adding_a_capability_never_makes_the_projection_more_permissive",
+]
 "src/engine/facet.rs" = [
   "src/engine/testgen.rs::set_facets_distinguishes_capabilities_differing_in_one_axis",
   "src/engine/testgen.rs::every_axis_index_is_reachable",
