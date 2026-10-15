@@ -67,7 +67,7 @@ pub(super) fn lookup_function(name: &str) -> Option<Script> {
 
 /// Mark `name`'s body unknown for the rest of this evaluation. Not scoped by a guard: the shell's
 /// redefinition is not scoped either, and every classification starts with a fresh thread-local.
-fn poison_function(name: String) {
+pub(super) fn poison_function(name: String) {
     POISONED_FUNCS.with(|p| p.borrow_mut().push(name));
 }
 
@@ -100,7 +100,7 @@ fn begin_resolving(name: &str) -> Option<ResolveScope> {
     })
 }
 
-fn script_verdict(script: &Script) -> Verdict {
+pub(super) fn script_verdict(script: &Script) -> Verdict {
     walk_with_scope(script, |stmt| pipeline_verdict(&stmt.pipeline))
         .into_iter()
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
@@ -157,7 +157,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
 
 /// How deep to chase function bodies. Bounded so a recursive definition cannot spin; hitting the
 /// bound reports a possible effect, which fails closed.
-const MAX_CD_SCAN_DEPTH: usize = 16;
+pub(super) const MAX_CD_SCAN_DEPTH: usize = 16;
 
 /// What running a statement may do to the CURRENT shell's state that we cannot attribute exactly.
 ///
@@ -172,23 +172,36 @@ const MAX_CD_SCAN_DEPTH: usize = 16;
 /// Whether the effect happened is unknowable (a branch may not be taken, a loop may not run), so
 /// the caller marks the cwd and the named bindings UNCERTAIN rather than guessing a value.
 #[derive(Default)]
-struct ShellEffects {
-    cwd: bool,
-    vars: Vec<String>,
-    funcs: Vec<String>,
+pub(super) struct ShellEffects {
+    pub(super) cwd: bool,
+    pub(super) vars: Vec<String>,
+    pub(super) funcs: Vec<String>,
 }
 
-/// The effects of one statement. Empty for a multi-stage pipeline, whose stages are subshells.
+/// The effects of one statement.
 fn shell_effects(pipeline: &Pipeline) -> ShellEffects {
     let mut out = ShellEffects::default();
-    if let [only] = pipeline.commands.as_slice() {
-        // `seen` memoizes function bodies. Without it `f0(){ f1; f1; }; f1(){ f2; f2; }; …` costs
-        // 2^depth traversals — a depth cap bounds depth but not FAN-OUT, the same blow-up the
-        // classifier's own work budget exists for. Caught by the termination guard.
-        let mut seen = Vec::new();
-        scan_effects(only, MAX_CD_SCAN_DEPTH, &mut seen, &mut out);
-    }
+    // `seen` memoizes function bodies. Without it `f0(){ f1; f1; }; f1(){ f2; f2; }; …` costs
+    // 2^depth traversals — a depth cap bounds depth but not FAN-OUT, the same blow-up the
+    // classifier's own work budget exists for. Caught by the termination guard.
+    let mut seen = Vec::new();
+    pipeline_effects(pipeline, MAX_CD_SCAN_DEPTH, &mut seen, &mut out);
     out
+}
+
+/// A lone command's effects, or a pipeline's last stage's: zsh, and bash with `lastpipe`, run the
+/// last stage in the current shell, so `echo x | read f` may set `f`. A bare assignment or a
+/// definition there is an effect too, since `statement_assignments` binds only a lone one.
+fn pipeline_effects(pipeline: &Pipeline, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
+    let Some(last) = pipeline.commands.last() else { return };
+    if pipeline.commands.len() > 1 {
+        match last {
+            Cmd::Simple(s) if s.words.is_empty() => out.vars.extend(s.env.iter().map(|(name, _)| name.clone())),
+            Cmd::FunctionDef { name, .. } => out.funcs.push(name.clone()),
+            _ => {}
+        }
+    }
+    scan_effects(last, depth, seen, out);
 }
 
 fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
@@ -217,7 +230,9 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
         }
         // The two constructs the shell really does isolate, plus forms that run nothing.
         Cmd::Subshell { .. } | Cmd::DoubleBracket { .. } | Cmd::FunctionDef { .. } => {}
-        Cmd::BraceGroup { body, .. } | Cmd::For { body, .. } => {
+        Cmd::BraceGroup { body, .. } => scan_script_effects(body, depth, seen, out),
+        Cmd::For { var, body, .. } => {
+            out.vars.push(var.clone());
             scan_script_effects(body, depth, seen, out);
         }
         Cmd::While { cond, body, .. } | Cmd::Until { cond, body, .. } => {
@@ -243,7 +258,7 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
 
 /// Every statement of a body that the shell would run in the current shell: its assignments and
 /// function definitions rebind here, and its commands are scanned in turn.
-fn scan_script_effects(script: &Script, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
+pub(super) fn scan_script_effects(script: &Script, depth: usize, seen: &mut Vec<String>, out: &mut ShellEffects) {
     for st in &script.0 {
         for (name, _) in statement_assignments(&st.pipeline) {
             out.vars.push(name);
@@ -251,28 +266,8 @@ fn scan_script_effects(script: &Script, depth: usize, seen: &mut Vec<String>, ou
         if let [Cmd::FunctionDef { name, .. }] = st.pipeline.commands.as_slice() {
             out.funcs.push(name.clone());
         }
-        if let [only] = st.pipeline.commands.as_slice() {
-            scan_effects(only, depth, seen, out);
-        }
+        pipeline_effects(&st.pipeline, depth, seen, out);
     }
-}
-
-/// The variables a `while`/`until` condition of the form `read VAR…` (incl. `IFS= read -r VAR`) binds
-/// from stdin — its non-flag positionals — so the body's `$VAR` can be gated at the pipe's item locus.
-/// Empty for any other condition. (An exotic valued read flag's value may be over-included as a var
-/// name; harmless — it just binds a never-referenced name to the same workspace locus.)
-fn read_loop_vars(cond: &Script) -> Vec<String> {
-    let [stmt] = cond.0.as_slice() else {
-        return Vec::new();
-    };
-    let [Cmd::Simple(s)] = stmt.pipeline.commands.as_slice() else {
-        return Vec::new();
-    };
-    let words: Vec<String> = s.words.iter().map(Word::eval).collect();
-    if words.first().map(String::as_str) != Some("read") {
-        return Vec::new();
-    }
-    words[1..].iter().filter(|w| !w.starts_with('-')).cloned().collect()
 }
 
 /// The persistent bindings a STATEMENT establishes: a pure assignment `VAR=value` (a simple command
@@ -293,7 +288,11 @@ fn statement_assignments(pipeline: &Pipeline) -> Vec<(String, String)> {
 /// `$refs` against the current scope first, then requires no residual `$` and no substitution
 /// sentinel — a substitution (`$(…)`), an unbound var, or a reassignment-to-uncertain all fail here.
 fn certain_value(word: &Word) -> String {
-    let raw = crate::pathctx::expand_vars(&word.eval(), false).into_owned();
+    let text = word.eval();
+    if crate::pathctx::names_a_loop_var(&text) {
+        return UNCERTAIN_VALUE.to_string();
+    }
+    let raw = crate::pathctx::expand_vars(&text, false).into_owned();
     // A TAGGED substitution sentinel is certain enough to BIND: it already classifies to a known
     // locus, so `OUT=$(pwd); … > "$OUT/raw/x"` gates the write at the worktree rather than
     // fail-closing on a value it can in fact bound. Every other marker stays uncertain.
@@ -544,40 +543,8 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             body_v.combine(redir_v)
         }
-        Cmd::For { var, items, body, redirs } => {
-            let redir_v = redirect_verdict(redirs).combine(crate::envvars::loop_var_verdict(var, items));
-            if let Verdict::Denied = redir_v {
-                return Verdict::Denied;
-            }
-            // Bind `$var` in the body to the loop list's locus (the `find … {}`→path binding,
-            // one layer up), so `for f in *.txt; do cat $f` reads the worktree instead of
-            // fail-closing on the bare `$f`.
-            let item_strs: Vec<String> = items.iter().map(Word::eval).collect();
-            let body_v = match crate::engine::resolve::loop_reprs(&item_strs) {
-                Some((read_repr, write_repr)) => {
-                    let _g = super::opaque::enter_loop(var, items, read_repr, write_repr);
-                    super::netargs::with_loop(var, items, body, || script_verdict(body))
-                }
-                None => script_verdict(body),
-            };
-            words_sub_verdict(items).combine(body_v).combine(redir_v)
-        }
-        Cmd::While { cond, body, redirs } | Cmd::Until { cond, body, redirs } => {
-            let redir_v = redirect_verdict(redirs);
-            if let Verdict::Denied = redir_v {
-                return Verdict::Denied;
-            }
-            let cond_v = script_verdict(cond);
-            // `while read VAR; do … "$VAR" …` — bind each read var to the piped stdin's item locus,
-            // exactly as the `for`-loop binds its list var, so `find ./src | while read f; do cat "$f"`
-            // reads the worktree instead of fail-closing on the bare `$f`. Only when a modeled source
-            // set the stdin repr; otherwise the vars stay unbound (fail-closed).
-            let _binds: Vec<_> = match crate::pathctx::stdin_item_repr() {
-                Some(repr) => read_loop_vars(cond).into_iter().map(|v| super::opaque::enter_read_var(v, &repr)).collect(),
-                None => Vec::new(),
-            };
-            cond_v.combine(script_verdict(body)).combine(redir_v)
-        }
+        Cmd::For { var, items, body, redirs } => super::loops::for_verdict(var, items, body, redirs),
+        Cmd::While { cond, body, redirs } | Cmd::Until { cond, body, redirs } => super::loops::while_verdict(cond, body, redirs),
         Cmd::If { branches, else_body, redirs } => {
             let redir_v = redirect_verdict(redirs);
             if let Verdict::Denied = redir_v {
@@ -633,7 +600,7 @@ fn word_sub_verdict(word: &Word) -> Verdict {
     word.0.iter().map(part_sub_verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
 
-fn words_sub_verdict(words: &[Word]) -> Verdict {
+pub(super) fn words_sub_verdict(words: &[Word]) -> Verdict {
     words.iter().map(word_sub_verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
 

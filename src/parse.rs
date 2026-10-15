@@ -1,5 +1,19 @@
 use std::ops::Deref;
 
+/// What a word holds where its value is unknown (a variable bound to unknown items, a substitution,
+/// a stdin item) in the classification that asks what the word's TEXT could be. A handler that reads
+/// a word as code or a header value (an awk or sed program, a `perl -e` script) refuses a word
+/// holding it; one that reads a path judges it as the relative name it spells. It is a fixed string
+/// rather than a bit beside the token so that it survives being re-spelled: a wrapper (`env`,
+/// `timeout`, `bash -c`, `xargs`) rebuilds its inner command from text, and a side bit dropped there
+/// would read as known content.
+pub const UNKNOWN_CONTENT: &str = "__SAFE_CHAINS_UNKNOWN__";
+
+/// Whether `s` holds a part whose content is unknown ([`UNKNOWN_CONTENT`]).
+pub fn has_unknown_content(s: &str) -> bool {
+    s.contains(UNKNOWN_CONTENT)
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Token(String);
 

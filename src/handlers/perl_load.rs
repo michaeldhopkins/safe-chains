@@ -8,7 +8,8 @@ use crate::parse::Token;
 /// Reads the flag at `tokens[i]` when it is `-M`, `-m` or `-I`, glued (`-Ilib`) or split (`-I lib`).
 /// `Some(Some(n))`: it used `n` tokens and any directory it names is in `load_paths`.
 /// `Some(None)`: not one of these flags. `None`: a form not modeled (a missing value, or `lib`
-/// given its directories some other way than `lib=A,B`), so the caller worst-cases.
+/// given its directories some other way than `lib=A,B`, a module that is not a plain name, or
+/// import arguments holding a brace or backslash), so the caller worst-cases.
 pub(crate) fn load_flag(tokens: &[Token], i: usize, load_paths: &mut Vec<String>) -> Option<Option<usize>> {
     let token = tokens.get(i)?.as_str();
     let Some(flag @ ('M' | 'm' | 'I')) = token.strip_prefix('-').and_then(|r| r.chars().next()) else {
@@ -21,6 +22,10 @@ pub(crate) fn load_flag(tokens: &[Token], i: usize, load_paths: &mut Vec<String>
         return Some(Some(used));
     }
     let module = value.trim_start_matches('-');
+    let (name, args) = module.split_once('=').unwrap_or((module, ""));
+    if crate::parse::has_unknown_content(value) || !is_module_name(name) || args.contains(['{', '}', '\\']) {
+        return None;
+    }
     if let Some(dirs) = module.strip_prefix("lib=") {
         load_paths.extend(dirs.split(',').filter(|d| !d.is_empty()).map(str::to_string));
     } else if module
@@ -30,6 +35,14 @@ pub(crate) fn load_flag(tokens: &[Token], i: usize, load_paths: &mut Vec<String>
         return None;
     }
     Some(Some(used))
+}
+
+/// `Foo`, `Foo::Bar`: what perl pastes after `use` must be a module name and nothing more, or the
+/// rest of the text runs as code.
+fn is_module_name(name: &str) -> bool {
+    name.split("::").all(|seg| {
+        seg.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_') && seg.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+    })
 }
 
 #[cfg(test)]

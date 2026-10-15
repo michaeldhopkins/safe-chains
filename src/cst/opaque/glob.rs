@@ -51,6 +51,9 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
             if names.len() > MAX_ENTRIES {
                 return None;
             }
+            if component.starts_with('.') {
+                names.extend([".".to_string(), "..".to_string()]);
+            }
             for name in names {
                 if (!name.starts_with('.') || component.starts_with('.')) && matches(component.as_bytes(), name.as_bytes())? {
                     next.push(join(prefix, &name));
@@ -120,7 +123,7 @@ fn matches(pattern: &[u8], name: &[u8]) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-    use super::matches;
+    use super::{expand, matches};
     use proptest::prelude::*;
 
     #[test]
@@ -140,6 +143,16 @@ mod tests {
         for (p, n, want) in cases {
             assert_eq!(matches(p.as_bytes(), n.as_bytes()), *want, "{p} vs {n}");
         }
+    }
+
+    #[test]
+    fn a_dot_pattern_matches_the_folder_and_its_parent() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        std::fs::write(dir.path().join(".x"), "").expect("write");
+        let at = dir.path().canonicalize().expect("canonical").to_string_lossy().into_owned();
+        let _cwd = crate::pathctx::enter_cwd(Some(at));
+        assert_eq!(expand(&crate::cst::Word::literal(".*")), Some(vec![".".into(), "..".into(), ".x".into()]));
+        assert_eq!(expand(&crate::cst::Word::literal("*")), Some(vec!["*".into()]));
     }
 
     proptest! {

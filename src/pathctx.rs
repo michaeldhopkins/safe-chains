@@ -22,9 +22,11 @@ pub(crate) use folder::judging;
 mod home;
 pub mod item_shape;
 mod lexical;
+mod vars;
 use home::home_path_inside_root;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
 use lexical::{expand_home, express_relative_to_root, lexical_join, names_no_known_directory};
+pub use vars::{LoopGuard, VarGuard, enter_loop_var, enter_var, expand_vars, names_a_loop_var};
 
 /// The working directory and project root for the command under evaluation. Both optional:
 /// a harness may supply neither (e.g. opencode), and classification falls back to the
@@ -132,70 +134,6 @@ pub fn under_temp_root(path: &str) -> bool {
     })
 }
 
-/// A bound `for` loop variable: `$name` in the body inherits the loop's `in`-list locus (the
-/// `find … {}`→path binding, one layer up). Read and write representatives can differ — a list
-/// like `/etc/hosts ~/notes` reads worst at `~/notes` but writes worst at `/etc/hosts`.
-struct LoopVar {
-    name: String,
-    read_repr: String,
-    write_repr: String,
-}
-
-thread_local! {
-    static LOOP_VARS: RefCell<Vec<LoopVar>> = const { RefCell::new(Vec::new()) };
-}
-
-/// A bound `VAR=value` assignment or a function positional (`$1`). Unlike a loop var, a certain
-/// literal value has ONE representative for both read and write.
-struct VarBinding {
-    name: String,
-    value: String,
-}
-
-thread_local! {
-    static VARS: RefCell<Vec<VarBinding>> = const { RefCell::new(Vec::new()) };
-}
-
-/// Bind `name` to a CERTAIN literal `value` (a `VAR=/path` assignment, or `$1` at a function call)
-/// for the duration of the guard; consulted by `expand_vars` AFTER loop vars, so the innermost/latest
-/// binding wins. The caller binds only values it is certain of — an uncertain value (`VAR=$(cmd)`,
-/// `VAR=$UNBOUND`) is bound to the unpinnable sentinel so `$VAR` still fail-closes rather than
-/// resolving to a stale or dropped value.
-#[must_use]
-pub fn enter_var(name: String, value: String) -> VarGuard {
-    VARS.with(|v| v.borrow_mut().push(VarBinding { name, value }));
-    VarGuard
-}
-
-pub struct VarGuard;
-
-impl Drop for VarGuard {
-    fn drop(&mut self) {
-        VARS.with(|v| {
-            v.borrow_mut().pop();
-        });
-    }
-}
-
-/// Bind loop variable `name` to its list's representative items for the duration of the guard
-/// (the loop body's classification). Nested loops stack; the innermost binding of a name wins.
-#[must_use]
-pub fn enter_loop_var(name: String, read_repr: String, write_repr: String) -> LoopGuard {
-    LOOP_VARS.with(|v| v.borrow_mut().push(LoopVar { name, read_repr, write_repr }));
-    LoopGuard
-}
-
-/// Pops the loop binding when dropped.
-pub struct LoopGuard;
-
-impl Drop for LoopGuard {
-    fn drop(&mut self) {
-        LOOP_VARS.with(|v| {
-            v.borrow_mut().pop();
-        });
-    }
-}
-
 thread_local! {
     static STDIN_REPR: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
@@ -224,87 +162,6 @@ impl Drop for StdinReprGuard {
             v.borrow_mut().pop();
         });
     }
-}
-
-/// Expand any bound loop variable (`$name` / `${name}`) in `path` to its representative list
-/// item — the read representative when `want_write` is false, the write representative when
-/// true. Unbound `$…` is left untouched (so it still fail-closes to machine). Returns `path`
-/// unchanged when nothing is bound.
-pub fn expand_vars(path: &str, want_write: bool) -> Cow<'_, str> {
-    if !path.contains('$') {
-        return Cow::Borrowed(path);
-    }
-    let replaced = LOOP_VARS.with(|lv| {
-        VARS.with(|v| {
-            let loops = lv.borrow();
-            let vars = v.borrow();
-            if loops.is_empty() && vars.is_empty() { None } else { expand_with(path, &loops, &vars, want_write) }
-        })
-    });
-    replaced.map_or(Cow::Borrowed(path), Cow::Owned)
-}
-
-fn expand_with(path: &str, loops: &[LoopVar], vars: &[VarBinding], want_write: bool) -> Option<String> {
-    let mut out = String::with_capacity(path.len());
-    let mut rest = path;
-    let mut replaced = false;
-    while let Some(dollar) = rest.find('$') {
-        out.push_str(&rest[..dollar]);
-        let after = &rest[dollar + 1..];
-        match parse_var(after) {
-            Some((name, consumed)) => {
-                // Loop bindings first (they carry read/write reprs), then assignment/positional
-                // bindings; innermost/latest wins in each. Unbound in BOTH → left untouched.
-                if let Some(lv) = loops.iter().rev().find(|v| v.name == name) {
-                    out.push_str(if want_write { &lv.write_repr } else { &lv.read_repr });
-                    replaced = true;
-                } else if let Some(vb) = vars.iter().rev().find(|v| v.name == name) {
-                    out.push_str(&vb.value);
-                    replaced = true;
-                } else {
-                    out.push('$');
-                    out.push_str(&after[..consumed]);
-                }
-                rest = &after[consumed..];
-            }
-            None => {
-                out.push('$');
-                rest = after;
-            }
-        }
-    }
-    out.push_str(rest);
-    replaced.then_some(out)
-}
-
-/// Parse a shell variable name immediately after a `$`: `name`, `{name}`, a single-digit positional
-/// (`$1`; bash reads `$12` as `$1` then `2`), or a braced positional (`${10}`). Returns the name and
-/// how many bytes of `after` it consumed, or `None` if it isn't a variable reference.
-fn parse_var(after: &str) -> Option<(&str, usize)> {
-    if let Some(braced) = after.strip_prefix('{') {
-        let close = braced.find('}')?;
-        let name = &braced[..close];
-        is_var_name(name).then_some((name, close + 2)) // '{' + name + '}'
-    } else if after.as_bytes().first().is_some_and(u8::is_ascii_digit) {
-        Some((&after[..1], 1)) // unbraced positional: exactly one digit
-    } else {
-        let len = after.bytes().take_while(|&b| b.is_ascii_alphanumeric() || b == b'_').count();
-        let name = &after[..len];
-        is_var_name(name).then_some((name, len))
-    }
-}
-
-/// A `${…}` interior is a variable name — an identifier (`[A-Za-z_][A-Za-z0-9_]*`) OR an all-digit
-/// positional (`${10}`).
-fn is_var_name(s: &str) -> bool {
-    if s.is_empty() {
-        return false;
-    }
-    if s.bytes().all(|b| b.is_ascii_digit()) {
-        return true;
-    }
-    let mut bytes = s.bytes();
-    matches!(bytes.next(), Some(b) if b.is_ascii_alphabetic() || b == b'_') && bytes.all(|b| b.is_ascii_alphanumeric() || b == b'_')
 }
 
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a

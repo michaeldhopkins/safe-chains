@@ -121,8 +121,8 @@ pub fn stdin_shape() -> ItemShape {
     STDIN_SHAPES.with(|v| v.borrow().last().copied().unwrap_or(UNKNOWN))
 }
 
-/// What `$name` is bound to, by [`super::expand_vars`]' precedence: a loop (unknown items) or a
-/// certain value.
+/// What `$name` is bound to, by [`super::expand_vars`]' precedence (the latest binding of either
+/// kind): a loop (unknown items) or a certain value.
 pub enum Binding {
     Loop,
     Value(String),
@@ -130,22 +130,16 @@ pub enum Binding {
 }
 
 pub fn binding(name: &str) -> Binding {
-    if super::LOOP_VARS.with(|v| v.borrow().iter().any(|l| l.name == name)) {
-        return Binding::Loop;
+    match super::vars::lookup(name) {
+        Some(super::vars::Bound::Loop { .. }) => Binding::Loop,
+        Some(super::vars::Bound::Value(value)) => Binding::Value(value),
+        None => Binding::Unbound,
     }
-    super::VARS.with(|v| {
-        v.borrow()
-            .iter()
-            .rev()
-            .find(|b| b.name == name)
-            .map_or(Binding::Unbound, |b| Binding::Value(b.value.clone()))
-    })
 }
 
 /// Every name a loop or an assignment has bound so far.
 pub fn bound_names() -> Vec<String> {
-    let loops: Vec<String> = super::LOOP_VARS.with(|v| v.borrow().iter().map(|l| l.name.clone()).collect());
-    super::VARS.with(|v| loops.into_iter().chain(v.borrow().iter().map(|b| b.name.clone())).collect())
+    super::vars::bound_names()
 }
 
 #[cfg(test)]

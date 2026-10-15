@@ -101,7 +101,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
         // more conservative one.
         if s == "-delete" {
             for base in &bases {
-                let bound = crate::engine::resolve::locus::traversal_item(base);
+                let bound = crate::engine::resolve::locus::traversal_item(base) + crate::parse::UNKNOWN_CONTENT;
                 let words = vec!["rm".to_string(), "-r".to_string(), bound];
                 match crate::command_verdict(&shell_words::join(&words)) {
                     Verdict::Denied => return Verdict::Denied,
@@ -137,7 +137,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
 }
 
 fn judge_exec(exec: &[&str], base: &str) -> Verdict {
-    let bound = crate::engine::resolve::locus::traversal_item(base);
+    let bound = crate::engine::resolve::locus::traversal_item(base) + crate::parse::UNKNOWN_CONTENT;
     let words: Vec<String> = exec.iter().map(|w| crate::handlers::fd::synthetic_operand(&w.replace("{}", &bound), w)).collect();
     let _mark = crate::cst::netargs::enter(true);
     crate::command_verdict(&shell_words::join(&words))

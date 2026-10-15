@@ -40,12 +40,15 @@ pub(crate) fn shape(word: &Word, expanded: usize) -> Shape {
         && let Some(names) = super::glob::expand(word)
         && names.iter().all(|n| !n.starts_with('-') && !n.contains('\n'))
     {
-        return Shape { lead: Lead::No, facts: GLOB, concrete: Some(names) };
+        return Shape { lead: Lead::No, facts: GLOB, concrete: Some(names), content: None };
     }
     let ifs = !matches!(crate::pathctx::binding("IFS"), Binding::Unbound);
     let mut walk = Walk { state: AT_START | VANISHABLE | Facts::when(IFS_CHANGED, ifs), ..Walk::default() };
     walk.parts(&word.0, false);
     let mut shape = walk.shape;
+    if shape.facts.has(OPAQUE) {
+        shape.content = Some(walk.content.clone());
+    }
     shape.facts.set(VANISH, walk.state.has(VANISHABLE) && shape.facts.has(OPAQUE));
     if walk.state.has(SUBSTITUTED) {
         let words = if walk.state.has(RESPLIT) { walk.text.split_whitespace().map(str::to_string).collect() } else { vec![walk.text] };
@@ -72,6 +75,8 @@ fn lead_of(items: ItemShape) -> Lead {
 struct Walk {
     shape: Shape,
     text: String,
+    /// The word with each unknown part replaced by what stands for its content.
+    content: String,
     state: Facts<Progress>,
 }
 
@@ -114,12 +119,14 @@ impl Walk {
             self.lead(Lead::Any);
         }
         self.text.push_str(s);
+        self.content.push_str(s);
         self.state.clear(AT_START | VANISHABLE);
     }
 
     /// An unknown part. `facts` says whether it may split ([`SPLIT`]), expand to nothing
     /// ([`VANISH`]) or hold a blank ([`BLANK`]).
     fn opaque(&mut self, lead: Lead, facts: Facts<Parts>, spelled: &str) {
+        self.content.push_str(if lead == Lead::Number { "1" } else { crate::parse::UNKNOWN_CONTENT });
         self.shape.facts.set(OPAQUE, true);
         self.shape.facts.set(SPLIT, facts.has(SPLIT));
         self.shape.facts.set(BLANK, facts.has(BLANK));
@@ -227,9 +234,7 @@ impl Walk {
                 let items = crate::pathctx::loop_shape(name);
                 self.opaque(lead_of(items), in_word(items, quoted), spelled);
             }
-            Binding::Value(value)
-                if !value.contains('$') && !value.contains("__SAFE_CHAINS_") && (quoted || !value.starts_with(GLOB_CHARS)) =>
-            {
+            Binding::Value(value) if !value.contains("__SAFE_CHAINS_") && (quoted || stays_in_folder(&value)) => {
                 self.state.set(SUBSTITUTED, true);
                 self.state.set(RESPLIT, !quoted && (value.is_empty() || value.contains(char::is_whitespace)));
                 self.known(&value);
@@ -263,4 +268,14 @@ fn nonnegative_constant(body: &Word) -> bool {
     text.len() <= 18
         && body.0.iter().all(|p| matches!(p, WordPart::Lit(_)))
         && text.chars().all(|c| c.is_ascii_digit() || c == '+' || c.is_ascii_whitespace())
+}
+
+/// Unquoted, a value is globbed again where it is used, so its spelling is what the command
+/// receives only when it has no pattern, or its pattern can match nothing but names below `./`:
+/// a pattern in a part that starts with `.` can match `..`.
+fn stays_in_folder(value: &str) -> bool {
+    !value.contains(GLOB_CHARS)
+        || value
+            .strip_prefix("./")
+            .is_some_and(|rest| rest.split('/').all(|part| !part.starts_with('.') || !part.contains(GLOB_CHARS)))
 }

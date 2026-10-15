@@ -117,7 +117,7 @@ fn declares_writes_in_its_folder() -> bool {
 /// loop variable (`while read f`, `for f in …`). The classifier sees a stand-in for it, an ordinary
 /// name, while the real item can be `.zshrc` (`ls -A | xargs -I{} sh -c 'echo x >> {}'`).
 fn items_in_scope() -> bool {
-    super::stdin_item_repr().is_some() || super::LOOP_VARS.with(|v| !v.borrow().is_empty())
+    super::stdin_item_repr().is_some() || super::vars::any_loop()
 }
 
 /// The command leaf being judged wrote to a path it named.

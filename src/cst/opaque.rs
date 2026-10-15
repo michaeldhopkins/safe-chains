@@ -14,9 +14,12 @@
 //!   or flag slot, not the value of a valued flag or the words after `--`;
 //! - the word followed by that flag, where it could split into several words;
 //! - nothing, where it could expand to no word at all;
-//! - the value itself, where every unknown part is a variable whose value IS known.
+//! - the value itself, where every unknown part is a variable whose value IS known;
+//! - the word's text with each unknown part read as [`UNKNOWN_CONTENT`](crate::parse::UNKNOWN_CONTENT),
+//!   which a handler refuses where it reads code and judges as a relative name where it reads a
+//!   path: `awk "$p"` runs whatever `$p` holds.
 //!
-//! Probing replaces every probed word at once, so a command costs at most six more
+//! Probing replaces every probed word at once, so a command costs at most seven more
 //! classifications however many unknown words it holds.
 
 mod declared;
@@ -70,6 +73,8 @@ pub(crate) struct Shape {
     pub(crate) facts: Facts<Parts>,
     /// The words bash makes of the word once every certain variable is substituted, when any was.
     pub(crate) concrete: Option<Vec<String>>,
+    /// The word with each unknown part replaced by what stands for its content, when any is unknown.
+    pub(crate) content: Option<String>,
 }
 
 #[derive(Clone, Copy)]
@@ -78,6 +83,7 @@ enum Probe {
     Split(&'static str),
     Vanish,
     Concrete,
+    Content,
 }
 
 impl Shape {
@@ -87,6 +93,7 @@ impl Shape {
             Probe::Split(_) => self.facts.has(SPLIT),
             Probe::Vanish => self.facts.has(VANISH),
             Probe::Concrete => self.concrete.is_some(),
+            Probe::Content => self.content.is_some(),
         }
     }
 
@@ -103,6 +110,11 @@ impl Shape {
             },
             Probe::Split(flag) if self.wants(probe) => default.iter().cloned().chain([Token::from_raw(flag.to_string())]).collect(),
             Probe::Vanish if self.wants(probe) => Vec::new(),
+            Probe::Content => match (&self.content, default) {
+                (Some(text), [_]) => vec![Token::from_raw(text.clone())],
+                (Some(_), _) => default.iter().map(|_| Token::from_raw(crate::parse::UNKNOWN_CONTENT.to_string())).collect(),
+                (None, _) => fallback(),
+            },
             _ => fallback(),
         }
     }
@@ -127,7 +139,7 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
         .map(Probe::Lead)
         .into_iter()
         .chain([FLAG_PROBE, SHORT_PROBE].map(Probe::Split));
-    for probe in probes.chain([Probe::Vanish, Probe::Concrete]) {
+    for probe in probes.chain([Probe::Vanish, Probe::Concrete, Probe::Content]) {
         if !shapes.iter().flatten().any(|s| s.wants(probe)) {
             continue;
         }
@@ -252,4 +264,20 @@ fn declares(cmd: &SimpleCmd, word: &super::Word) -> bool {
         && head.contains('=')
         && name.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_')
         && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+}
+
+/// The words `word` certainly becomes, when no part of it is unknown: its literal text with every
+/// variable of certain value substituted. `None` for anything unknown, a glob, a brace fan-out, or
+/// a value holding a glob or `~`, which bash would expand again.
+pub(crate) fn known_words(word: &super::Word) -> Option<Vec<String>> {
+    let expanded = word.expand();
+    if expanded.len() != 1 {
+        return None;
+    }
+    let s = shape(word, 1);
+    if s.facts.has(OPAQUE | GLOB) || s.lead != Lead::No {
+        return None;
+    }
+    let words = s.concrete.unwrap_or(expanded);
+    (!words.iter().any(|w| w.contains(['*', '?', '[', '~']))).then_some(words)
 }

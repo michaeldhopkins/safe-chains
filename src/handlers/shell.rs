@@ -156,6 +156,10 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
         };
         let _mark = crate::cst::netargs::enter(true);
         let verdict = crate::command_verdict(&render(&repr));
+        if !verdict.is_allowed() {
+            return verdict;
+        }
+        let verdict = verdict.combine(crate::command_verdict(&render(crate::parse::UNKNOWN_CONTENT)));
         // The representative says where an item points, not whether it is a flag: `echo -delete |
         // xargs find /` hands find `-delete`. Unless every item is known to begin with something
         // else (find's root), the inner command must also stand an item that is an unknown flag.

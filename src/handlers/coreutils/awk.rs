@@ -189,14 +189,15 @@ fn awk_code(src: &str, brackets: bool) -> String {
 /// `program` is false for a file operand, where an `@` is part of a file name (`icon@2x.txt`);
 /// the other checks still apply, so an operand mistaken for a file is not waved through.
 fn awk_program_runs_code(src: &str, program: bool) -> bool {
-    [false, true].into_iter().any(|brackets| {
-        let code = awk_code(src, brackets);
-        (program && (code.contains('@') || names_reserved_variable(&code)))
-            || code.contains("system")
-            || has_dangerous_getline(&code)
-            || has_shell_pipe(&code)
-            || has_redirect(&code)
-    })
+    (program && crate::parse::has_unknown_content(src))
+        || [false, true].into_iter().any(|brackets| {
+            let code = awk_code(src, brackets);
+            (program && (code.contains('@') || names_reserved_variable(&code)))
+                || code.contains("system")
+                || has_dangerous_getline(&code)
+                || has_shell_pipe(&code)
+                || has_redirect(&code)
+        })
 }
 
 /// Variables through which a program chooses which files awk reads (`ARGV`, `ARGC`), reaches any
@@ -297,15 +298,24 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
     {
         return false;
     }
+    if tokens
+        .windows(2)
+        .any(|w| takes_next_token(w[0].as_str()) && crate::parse::has_unknown_content(w[1].as_str()))
+        || tokens
+            .iter()
+            .any(|t| (t.starts_with("-v") || t.starts_with("--assign=")) && crate::parse::has_unknown_content(t.as_str()))
+    {
+        return false;
+    }
     if !policy::check(tokens, &AWK_POLICY) {
         return false;
     }
     // Gate the FILE operands by read locus, so `awk '{print}' /etc/shadow` denies (audit fix). The
     // program is skipped: it is a regex/action, not a path, and would false-positive the gate.
-    !operands
-        .iter()
-        .skip(1)
-        .any(|f| crate::policy::looks_like_path(f) && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied)
+    !operands.iter().skip(1).any(|f| {
+        (crate::policy::looks_like_path(f) || f.contains('$') || crate::parse::has_unknown_content(f))
+            && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied
+    })
 }
 
 pub(crate) fn check_awk(tokens: &[Token]) -> Verdict {

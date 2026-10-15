@@ -10,6 +10,9 @@ pub(crate) mod eval;
 mod explain;
 #[cfg(test)]
 mod glob_tests;
+mod loops;
+#[cfg(test)]
+mod loops_tests;
 pub(crate) mod netargs;
 #[cfg(test)]
 mod normalize_tests;

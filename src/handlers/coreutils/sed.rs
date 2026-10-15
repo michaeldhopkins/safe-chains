@@ -115,6 +115,12 @@ pub(crate) fn scan_sed(tokens: &[Token]) -> SedScan {
 // `/regex/` addresses (so a `w`/`r`/`e` inside a regex or replacement is NOT mistaken for a command),
 // and record the file/exec commands. Unknown command letters fail closed.
 fn scan_script(b: &[u8], scan: &mut SedScan) {
+    if b.windows(crate::parse::UNKNOWN_CONTENT.len())
+        .any(|w| w == crate::parse::UNKNOWN_CONTENT.as_bytes())
+    {
+        scan.unknown = true;
+        return;
+    }
     let n = b.len();
     let mut i = 0;
     while i < n {

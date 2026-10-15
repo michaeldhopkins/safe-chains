@@ -291,7 +291,7 @@ fn strip_inert_string_text(code: &str) -> String {
 
 pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
     let no_strings = strip_inert_string_text(token.as_str());
-    if no_strings.contains('`') {
+    if no_strings.contains('`') || crate::parse::has_unknown_content(token) {
         return false;
     }
     if has_substitution_eval(&no_strings) {
