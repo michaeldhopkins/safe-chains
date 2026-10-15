@@ -13,10 +13,29 @@
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
-### `bash / sh`
+### `bash`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html">https://www.gnu.org/software/bash/manual/bash.html</a></p>
 
-- Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.
+Aliases: `sh`
+
+- Allowed: --version, --help; `bash -c` / `sh -c` with a safe inner command; a script inside the project; `bash -n FILE` as a read of FILE. Options: -c, -e, -u, -f, -n, -v, -C, -o errexit/nounset/noglob/noclobber/verbose/pipefail/posix, --norc, --noprofile, --noediting, --posix, --verbose.
+
+- **Without a subcommand:**
+- Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `bash -c 'grep foo file'`
+- `sh -c 'ls -la'`
+- `bash -euo pipefail -c 'ls'`
+- `bash -ec 'ls'`
+- `bash -c -e 'ls'`
+- `bash scripts/build.sh`
+- `bash -e ./run.sh arg`
+- `bash -n scripts/build.sh`
+- `bash --norc --noprofile -c 'ls'`
+- `bash --version`
+- `sh --help`
 
 ### `break / continue`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html#index-break">https://www.gnu.org/software/bash/manual/bash.html#index-break</a></p>

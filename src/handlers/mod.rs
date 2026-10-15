@@ -55,6 +55,7 @@ type HandlerFn = fn(&[Token]) -> Verdict;
 pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
     HashMap::from([
         ("gh", forges::gh::is_safe_gh as HandlerFn),
+        ("bash", shell::is_safe_shell as HandlerFn),
         ("glab", forges::glab::is_safe_glab as HandlerFn),
         ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),

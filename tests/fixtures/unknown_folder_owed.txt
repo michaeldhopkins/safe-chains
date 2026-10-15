@@ -117,8 +117,6 @@ b64decode
 b64decode x
 b64encode
 b64encode x
-bash
-bash script.sh
 batch
 batch x
 biber
@@ -1057,7 +1055,6 @@ sequelize model:generate
 sequelize seed:generate
 sfdp
 sfdp x
-sh setup.sh
 shards init
 shards install
 shards lock
