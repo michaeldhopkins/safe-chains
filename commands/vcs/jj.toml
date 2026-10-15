@@ -22,9 +22,16 @@ valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 # `-R`/`--repository` picks the repo every sub acts on, so a write sub lands outside the workspace:
 # `jj -R /etc new` created a commit in a repo under /etc and auto-approved. Gated at the WRITE locus
 # rather than `exec` because jj mutates that repo's store — it does not run code out of it — so
-# `-R /tmp/scratch-repo` stays workable while system and home paths do not.
+# `-R /tmp/scratch-repo` stays workable while system and home paths do not. With
+# `--ignore-working-copy` an observing sub (log, diff, status, …) skips the snapshot and writes
+# nothing, so the handler judges the value as a read there. The handler is declared in pathgates.toml
+# (`[roles.jj]`), and -R/--repository are gated there in every position.
+# `config path` is not an observing sub here: it creates the repository's config id to print
+# the path. Loading a repository reads its config, and a legacy .jj/repo/config.toml can name a
+# program jj runs; that is the same exposure as `cd DIR && jj log` or `git -C DIR diff`, which
+# are approved already, so it is accepted here rather than refused only for -R.
 [command.path_gate]
-flags = { "--destination" = "ignore", "--repository" = "write", "-R" = "write" }
+flags = { "--destination" = "ignore" }
 
 # jj's global options are accepted after the subcommand as well as before it, so a global that
 # makes jj run a program is refused for the whole invocation rather than per sub.

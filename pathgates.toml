@@ -847,14 +847,18 @@ flags = { "-f" = "read", "--file" = "read" }
 # `jj git init /root/x` and `jj workspace add /etc/ws` both auto-approved before. Their other
 # sibling subs take remote, bookmark and workspace NAMES, which a path gate passes unless they are
 # spelled like a path. The remaining valued flags take a revision, a name, a message or a mode, so
-# each is `ignore`.
+# each is `ignore`. `-R`/`--repository` are `ignore` here because `[roles.jj]`, the handler that
+# judges -R as a read only for an observing sub under --ignore-working-copy, gates them everywhere.
+[roles.jj]
+handler = "jj_repository"
+
 [roles."jj git"]
 positional = "write"
-flags = { "--git-repo" = "write", "--object-hash" = "ignore", "--remote" = "ignore", "--branch" = "ignore", "-b" = "ignore", "--tag" = "ignore", "-t" = "ignore" }
+flags = { "--git-repo" = "write", "-R" = "ignore", "--repository" = "ignore", "--object-hash" = "ignore", "--remote" = "ignore", "--branch" = "ignore", "-b" = "ignore", "--tag" = "ignore", "-t" = "ignore" }
 
 [roles."jj workspace"]
 positional = "write"
-flags = { "--name" = "ignore", "--message" = "ignore", "-m" = "ignore", "--revision" = "ignore", "--revisions" = "ignore", "-r" = "ignore", "--sparse-patterns" = "ignore" }
+flags = { "-R" = "ignore", "--repository" = "ignore", "--name" = "ignore", "--message" = "ignore", "-m" = "ignore", "--revision" = "ignore", "--revisions" = "ignore", "-r" = "ignore", "--sparse-patterns" = "ignore" }
 
 # ── Directory-changing global flags. `git -C DIR` moves into DIR before it reads anything, so a
 #    relative operand names a file in DIR: `git -C /etc diff shadow` is `/etc/shadow`. Every gate of

@@ -46,7 +46,6 @@ helmfile	-o	--output-dir
 hurl	-c	--cacert
 jest	-o	--outputFile
 jest	-t	--testRunner
-jj	-r	--repository
 kinit	-p	--password-file
 kustomize	-h	--helm-command
 mkdocs	-c	--config-file

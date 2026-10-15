@@ -7,13 +7,14 @@
 use super::{Role, gate};
 use crate::parse::Token;
 
+mod jj;
 mod plist;
 
 /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
 #[cfg(test)]
 pub(super) const NAMES: &[&str] = &[
-    "ar_archive", "defaults_domain", "exiftool_mode", "jupytext_mode", "mtree_mode", "ncu_mode", "plutil_mode", "rdfind_mode",
-    "textutil_mode", "tsc_response_file", "xattr_mode",
+    "ar_archive", "defaults_domain", "exiftool_mode", "jj_repository", "jupytext_mode", "mtree_mode", "ncu_mode", "plutil_mode",
+    "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode",
 ];
 
 pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
@@ -21,6 +22,7 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "ar_archive" => ar_archive(tokens),
         "defaults_domain" => plist::defaults_domain(tokens),
         "exiftool_mode" => exiftool_mode(tokens),
+        "jj_repository" => jj::jj_repository(tokens),
         "jupytext_mode" => jupytext_mode(tokens),
         "mtree_mode" => mtree_mode(tokens),
         "ncu_mode" => ncu_mode(tokens),

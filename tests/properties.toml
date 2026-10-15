@@ -345,6 +345,7 @@ owed = [
   "src/pathgate.rs::textutil_convert_never_more_permissive_than_info",
   "src/pathgate/handlers/plist.rs::plist_readers_are_never_laxer_than_cat",
 ]
+"src/pathgate/handlers/jj.rs" = ["the_repository_is_read_only_with_the_flag_and_an_observing_sub"]
 "src/pathgate/handlers/plist.rs" = ["plist_readers_are_never_laxer_than_cat", "a_non_option_dash_o_never_relaxes_a_rewrite"]
 "src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
 "src/refusal.rs" = [
