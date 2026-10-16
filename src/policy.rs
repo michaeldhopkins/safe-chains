@@ -134,7 +134,7 @@ impl FlagSet for [String] {
         self.iter().any(|f| f.as_str() == token)
     }
     fn contains_short(&self, byte: u8) -> bool {
-        self.iter().any(|f| f.len() == 2 && f.as_bytes()[1] == byte)
+        self.iter().any(|f| f.len() == 2 && f.as_bytes()[0] == b'-' && f.as_bytes()[1] == byte)
     }
 }
 
@@ -849,11 +849,11 @@ mod tests {
 
     #[test]
     fn a_vec_of_flags_answers_short_lookups_as_its_slice_does() {
-        let lists: [&[&str]; 3] = [&[], &["-x", "--long", "-y"], &["--x", "-", "-xy"]];
+        let lists: [&[&str]; 4] = [&[], &["-x", "--long", "-y"], &["--x", "-", "-xy"], &["id", "if", "-i"]];
         for list in lists {
             let flags: Vec<String> = list.iter().map(|s| (*s).to_string()).collect();
             for byte in 0..=u8::MAX {
-                let expected = list.iter().any(|f| f.len() == 2 && f.as_bytes()[1] == byte);
+                let expected = list.iter().any(|f| f.len() == 2 && f.as_bytes()[0] == b'-' && f.as_bytes()[1] == byte);
                 assert_eq!(flags.contains_short(byte), expected, "{list:?} byte {byte}");
                 assert_eq!(flags.as_slice().contains_short(byte), expected, "{list:?} byte {byte}");
             }

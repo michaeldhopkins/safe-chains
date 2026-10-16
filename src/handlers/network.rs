@@ -1,20 +1,13 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::Token;
+use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
 
-static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
-    "--compressed", "--fail", "--globoff", "--head", "--include", "--insecure", "--ipv4", "--ipv6", "--location", "--no-buffer",
-    "--no-progress-meter", "--show-error", "--silent", "--verbose", "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-i", "-k", "-s", "-v",
-]);
-
-static CURL_SAFE_VALUED: WordSet = WordSet::new(&["--connect-timeout", "--max-time", "--user-agent", "--write-out", "-A", "-m", "-w"]);
-
-static CURL_SAFE_METHODS: WordSet = WordSet::new(&["GET", "HEAD", "OPTIONS"]);
-
-const CURL_STANDALONE_SHORT: &[u8] = b"46ILNOSfgiksv";
-const CURL_VALUED_SHORT: &[u8] = b"Amow";
+fn policy(key: &str) -> (&'static [String], &'static [String]) {
+    crate::registry::handler_policy_flag_sets("curl", key).unwrap_or((&[], &[]))
+}
 
 fn is_safe_method(method: &str) -> bool {
-    CURL_SAFE_METHODS.contains(&method.to_ascii_uppercase())
+    policy("methods").0.iter().any(|m| m.eq_ignore_ascii_case(method))
 }
 
 fn is_safe_curl_header(value: &str) -> bool {
@@ -25,15 +18,8 @@ fn is_safe_curl_header(value: &str) -> bool {
         return false;
     };
     let trimmed = name.trim();
-    CURL_SAFE_HEADERS.iter().any(|h| trimmed.eq_ignore_ascii_case(h))
+    policy("headers").0.iter().any(|h| trimmed.eq_ignore_ascii_case(h))
 }
-
-const CURL_SAFE_HEADERS: &[&str] = &[
-    "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language", "Authorization", "Cache-Control", "Cookie", "If-Match",
-    "If-Modified-Since", "If-None-Match", "If-Range", "If-Unmodified-Since", "Origin", "Range", "Referer", "User-Agent",
-    "X-Correlation-ID", "X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto", "X-GitHub-Api-Version", "X-Request-ID",
-    "X-Requested-With",
-];
 
 /// curl's `--write-out` reads its format from a file when the value starts with `@` (`@-` =
 /// stdin), and `%output{file}` (curl 8.3+) sends the rest of the output to a file. Admit only a
@@ -50,7 +36,7 @@ fn is_allowed_url(value: &str) -> bool {
     lower.starts_with("http://") || lower.starts_with("https://")
 }
 
-fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> Option<Result<usize, ()>> {
+fn check_curl_valued(t: &Token, next: Option<&Token>, valued: &[String], has_write: &mut bool) -> Option<Result<usize, ()>> {
     if t == "-o" || t == "--output" {
         *has_write = true;
         return Some(Ok(2));
@@ -70,7 +56,7 @@ fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> O
             _ => Ok(2),
         });
     }
-    if CURL_SAFE_VALUED.contains(t) {
+    if valued.contains_flag(t.as_str()) {
         return Some(Ok(2));
     }
     None
@@ -80,6 +66,7 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
+    let (standalone, valued) = policy("options");
     let mut has_write = false;
     let mut i = 1;
     while i < tokens.len() {
@@ -93,7 +80,7 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
             continue;
         }
 
-        if CURL_SAFE_STANDALONE.contains(t) {
+        if standalone.contains_flag(t.as_str()) {
             i += 1;
             continue;
         }
@@ -104,7 +91,7 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
             continue;
         }
 
-        if let Some(advance) = check_curl_valued(t, tokens.get(i + 1), &mut has_write) {
+        if let Some(advance) = check_curl_valued(t, tokens.get(i + 1), valued, &mut has_write) {
             match advance {
                 Ok(skip) => {
                     i += skip;
@@ -133,13 +120,13 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
             let bytes = t.as_bytes();
             for (j, &b) in bytes[1..].iter().enumerate() {
                 let is_last = j == bytes.len() - 2;
-                if CURL_STANDALONE_SHORT.contains(&b) {
+                if standalone.contains_short(b) || b == b'O' {
                     if b == b'O' {
                         has_write = true;
                     }
                     continue;
                 }
-                if is_last && CURL_VALUED_SHORT.contains(&b) {
+                if is_last && (valued.contains_short(b) || b == b'o') {
                     if b == b'o' {
                         has_write = true;
                     }
@@ -323,14 +310,18 @@ mod tests {
     fn the_reference_lists_every_admitted_flag_method_and_header() {
         let toml = include_str!("../../commands/net/curl.toml");
         let body = toml.lines().find(|l| l.starts_with("doc_body")).expect("doc_body");
-        let standalone = crate::docs::wordset_items(&super::CURL_SAFE_STANDALONE);
-        let valued = crate::docs::wordset_items(&super::CURL_SAFE_VALUED);
-        let methods = crate::docs::wordset_items(&super::CURL_SAFE_METHODS);
+        let (standalone, valued) = super::policy("options");
+        let (methods, _) = super::policy("methods");
+        let (headers, _) = super::policy("headers");
+        let standalone = standalone.join(", ");
+        let valued = valued.join(", ");
+        let methods = methods.join(", ");
         assert!(body.contains(&format!("Allowed standalone flags: {standalone}.")));
         assert!(body.contains(&format!("Allowed valued flags: {valued}.")));
         assert!(body.contains(&format!("Allowed methods (-X/--request): {methods}.")));
-        for header in super::CURL_SAFE_HEADERS {
-            assert!(body.contains(header), "{header}");
+        assert!(!headers.is_empty());
+        for header in headers {
+            assert!(body.contains(header.as_str()), "{header}");
         }
     }
 
@@ -347,11 +338,11 @@ mod tests {
 
         /// `is_safe_method` is the case-insensitive membership test for the allowed-method set,
         /// defined here against an explicit reference oracle rather than against the implementation's
-        /// own body. The implementation calls `to_ascii_uppercase` and then a `WordSet::contains`
-        /// binary search; the oracle is `eq_ignore_ascii_case` against the literal list. Equating the
-        /// two pins the project-wide rule "method equality is ASCII-case-insensitive" — a regression
-        /// that flipped either side (e.g. dropped the call to `to_ascii_uppercase` or tightened the
-        /// set) would break one side of the equation, not both.
+        /// own body. The implementation checks `policy("methods")` via `eq_ignore_ascii_case`; the
+        /// oracle is `eq_ignore_ascii_case` against the literal list. Equating the two pins the
+        /// project-wide rule "method equality is ASCII-case-insensitive" — a regression that flipped
+        /// either side (e.g. switched to case-sensitive comparison or tightened the set) would break
+        /// one side of the equation, not both.
         #[test]
         fn is_safe_method_matches_a_simple_case_insensitive_reference_set(method in any::<String>()) {
             const REFERENCE: &[&str] = &["GET", "HEAD", "OPTIONS"];
@@ -368,7 +359,7 @@ mod tests {
         /// is an unconditional deny — independently of what the rest of `value` looks like, what
         /// case the bytes are in, and how much whitespace surrounds them. Pins the structural
         /// pre-check the function relies on: a regression that "fixed" the no-colon case by also
-        /// tolerating an empty name (or matched the `CURL_SAFE_HEADERS` set directly on the whole
+        /// tolerating an empty name (or matched the `policy("headers")` set directly on the whole
         /// value) would let `Content-Type application/json` and every other word that happens to be
         /// a safe-header string slip through.
         #[test]
@@ -389,7 +380,7 @@ mod tests {
         /// is quoted, untokenized, and may come in mixed case from a real `curl` invocation).
         #[test]
         fn a_safe_curl_header_value_round_trips_through_name_case_and_whitespace(
-            header in proptest::sample::select(super::CURL_SAFE_HEADERS),
+            header in proptest::sample::select(super::policy("headers").0),
             flip in any::<bool>(),
             leading_ws in "[ \t]{0,3}",
             trailing_ws in "[ \t]{0,3}",
@@ -398,8 +389,8 @@ mod tests {
             // Fold once one way and once the other. `flip` selects between them so each iteration
             // lands somewhere along the case spectrum — `Accept`, `accept`, `ACCEPT`, and any mix
             // the half-way turns produce by inspecting byte position vs. flip. A regression that
-            // dropped the `to_ascii_uppercase` fold (or compared against the set without
-            // `eq_ignore_ascii_case`) would let one of these admits land on the wrong side.
+            // compared against `policy("headers")` without `eq_ignore_ascii_case` would let one of
+            // these admits land on the wrong side.
             let name = if flip { header.to_ascii_uppercase() } else { header.to_ascii_lowercase() };
 
             let spelling = format!("{leading_ws}{name}{trailing_ws}:{value}");

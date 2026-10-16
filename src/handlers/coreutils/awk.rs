@@ -1,5 +1,5 @@
-use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagTolerance};
+use crate::parse::Token;
+use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
 
 fn strip_regex_literals(s: &str) -> String {
@@ -210,43 +210,49 @@ fn names_reserved_variable(code: &str) -> bool {
         .any(|word| RESERVED_VARIABLES.contains(&word))
 }
 
+fn policy() -> (&'static [String], &'static [String]) {
+    crate::registry::handler_policy_flag_sets("awk", "options").unwrap_or((&[], &[]))
+}
+
 /// Whether an option's word count differs between awks. gawk reads `-bv x` as `-b -v x` and
 /// `--field-separator :` as one option and its value; BSD awk ignores an unknown option word whole,
 /// so both take one word there, and the program starts a word earlier than gawk's reading.
 fn ambiguous_option(s: &str) -> bool {
-    matches!(s, "--assign" | "--field-separator") || (!s.starts_with("--") && s.len() > 2 && takes_next_token(s))
+    (s.starts_with("--") || s.len() > 2) && takes_next_token(s)
 }
 
 /// Whether an option token takes the NEXT token as its value: `-F`/`-v` alone, the long forms, or a
 /// short cluster ending in one of them (`-bF :`), as the flag policy reads a cluster.
 fn takes_next_token(s: &str) -> bool {
-    if matches!(s, "--assign" | "--field-separator") {
-        return true;
-    }
-    if s.starts_with("--") {
+    let Some(cluster) = s.strip_prefix('-') else {
+        return false;
+    };
+    let (standalone, valued) = policy();
+    if standalone.contains_flag(s) {
         return false;
     }
-    let cluster = s.as_bytes().get(1..).unwrap_or_default();
-    cluster.iter().position(|&c| matches!(c, b'F' | b'v')).is_some_and(|p| p + 1 == cluster.len())
+    if valued.contains_flag(s) {
+        return true;
+    }
+    if cluster.is_empty() || cluster.starts_with('-') {
+        return false;
+    }
+    for (i, &c) in cluster.as_bytes().iter().enumerate() {
+        if standalone.contains_short(c) {
+            continue;
+        }
+        return valued.contains_short(c) && i + 1 == cluster.len();
+    }
+    false
 }
-
-static AWK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--characters-as-bytes", "--copyright", "--gen-pot", "--lint", "--no-optimize", "--optimize", "--posix", "--re-interval",
-        "--sandbox", "--traditional", "--use-lc-numeric", "--version", "-C", "-N", "-O", "-P", "-S", "-V", "-b", "-c", "-g", "-r", "-s",
-        "-t",
-    ]),
-    valued: WordSet::flags(&["--assign", "--field-separator", "-F", "-v"]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
 
 /// awk's operands: the inline program, then the files (`awk 'prog' files…`). Everything after `--`
 /// is an operand, a program starting with `-` included. (`-f progfile` is already denied by the
 /// flag policy, so the first operand is always the program.) Options end at the program, as in
-/// every awk, so a later `-v` or `-F` is an operand.
-fn awk_operands(tokens: &[Token]) -> Vec<&str> {
+/// every awk, so a later `-v` or `-F` is an operand. Returns `None` when a valued option (`-F`,
+/// `-v`) is not followed by a value `count_positionals` also consumes (e.g. `awk -F -- -f x`), so
+/// the operand walk and the flag policy never desynchronize.
+fn awk_operands(tokens: &[Token]) -> Option<Vec<&str>> {
     let mut positionals = Vec::new();
     let mut options_done = false;
     let mut i = 1;
@@ -257,7 +263,10 @@ fn awk_operands(tokens: &[Token]) -> Vec<&str> {
             i += 1;
             continue;
         }
-        if !options_done && s.starts_with('-') && takes_next_token(s) {
+        if !options_done && takes_next_token(s) {
+            if !crate::policy::consumes_next_value(tokens.get(i + 1)) {
+                return None;
+            }
             i += 2; // valued flag + its separate value
             continue;
         }
@@ -269,7 +278,7 @@ fn awk_operands(tokens: &[Token]) -> Vec<&str> {
         options_done = true;
         i += 1;
     }
-    positionals
+    Some(positionals)
 }
 
 fn is_safe_awk(tokens: &[Token]) -> bool {
@@ -278,13 +287,15 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
             return false;
         }
     }
-    if awk_operands(tokens).iter().skip(1).any(|o| o.starts_with("/inet")) {
-        return false;
-    }
     if tokens[1..].iter().any(|t| ambiguous_option(t.as_str())) {
         return false;
     }
-    let operands = awk_operands(tokens);
+    let Some(operands) = awk_operands(tokens) else {
+        return false;
+    };
+    if operands.iter().skip(1).any(|o| o.starts_with("/inet")) {
+        return false;
+    }
     if operands.iter().enumerate().any(|(n, o)| awk_program_runs_code(o, n == 0)) {
         return false;
     }
@@ -307,7 +318,7 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
     {
         return false;
     }
-    if !policy::check(tokens, &AWK_POLICY) {
+    if !crate::registry::check_handler_policy("awk", "options", tokens) {
         return false;
     }
     // Gate the FILE operands by read locus, so `awk '{print}' /etc/shadow` denies (audit fix). The
@@ -336,10 +347,13 @@ mod tests {
     fn the_reference_lists_every_admitted_flag() {
         let toml = include_str!("../../../commands/text/awk.toml");
         let body = toml.lines().find(|l| l.starts_with("doc_body")).expect("doc_body");
-        let standalone = crate::docs::wordset_items(&super::AWK_POLICY.standalone);
+        let (standalone, valued) = super::policy();
+        assert!(standalone.iter().all(|f| !valued.contains(f)));
+        let standalone = standalone.join(", ");
         assert!(body.contains(&format!("Allowed standalone flags: {standalone}.")));
-        for flag in super::AWK_POLICY.valued.iter() {
-            assert!(body.contains(flag), "{flag}");
+        assert!(!valued.is_empty());
+        for flag in valued {
+            assert!(body.contains(flag.as_str()), "{flag}");
         }
     }
 
@@ -463,6 +477,14 @@ mod tests {
         awk_field_separator_after_program_hides_secret_denied: "awk '{print}' -F /etc/shadow",
         awk_assign_after_program_hides_secret_denied: "awk '{print}' --assign /etc/shadow",
         awk_flag_after_program_denied: "awk '{print}' f.txt -b",
+    }
+
+    #[test]
+    fn awk_valued_option_and_operand_regressions() {
+        assert!(check("awk '{print}' abv xbF"));
+        for cmd in ["awk -F -- -f script.awk", "awk -F -- -f /etc/shadow", "awk -v -- -f script.awk", "awk -F -f script.awk"] {
+            assert!(!check(cmd), "{cmd}");
+        }
     }
 }
 
@@ -606,6 +628,36 @@ mod properties {
         ) {
             let line = format!("{} {option} {target}", shape.replace("{c}", cmd).replace("{p}", "{print}"));
             prop_assert!(!is_safe_command(&line), "option after the program was approved: `{}`", line);
+        }
+
+        /// `awk_operands` and the option policy walk every admitted option form in lockstep, so
+        /// both agree on where the options end and how many operands follow; when a valued option
+        /// is followed by `--` or a flag-shaped token (`-f`) that `count_positionals` does not
+        /// consume, `awk_operands` returns `None` and the invocation is refused.
+        #[test]
+        fn awk_operands_and_the_option_policy_count_the_same_operands(
+            standalone_flag in proptest::sample::select(super::policy().0),
+            valued_form in proptest::sample::select(vec![
+                vec!["-F", ":"], vec!["-v", "n=0"], vec!["-F:"], vec!["-bF:"],
+                vec!["--assign=n=0"], vec!["--field-separator=:"],
+            ]),
+            bad_value in proptest::sample::select(vec!["--", "-f", "-x"]),
+            files in proptest::collection::vec(proptest::sample::select(vec!["f.txt", "g.txt", "icon@2x.txt", "abv"]), 0..3),
+        ) {
+            let (standalone, valued) = super::policy();
+            let mut words: Vec<&str> = vec!["awk", standalone_flag.as_str()];
+            words.extend(valued_form);
+            words.push("{print}");
+            words.extend(&files);
+            let tokens: Vec<crate::parse::Token> = words.iter().map(|s| crate::parse::Token::from_test(s)).collect();
+            let counted = crate::policy::count_positionals(&tokens, standalone, valued, crate::policy::FlagTolerance::strict());
+            prop_assert_eq!(counted, Some(1 + files.len()));
+            prop_assert_eq!(super::awk_operands(&tokens).map(|ops| ops.len()), Some(1 + files.len()));
+
+            let smuggled = ["awk", "-F", bad_value, "-f", "script.awk"];
+            let smuggled_tokens: Vec<crate::parse::Token> = smuggled.iter().map(|s| crate::parse::Token::from_test(s)).collect();
+            prop_assert!(super::awk_operands(&smuggled_tokens).is_none());
+            prop_assert!(!super::is_safe_awk(&smuggled_tokens));
         }
     }
 }

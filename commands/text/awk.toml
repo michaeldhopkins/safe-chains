@@ -24,3 +24,13 @@ examples_denied = [
     "awk -bv x '{print}' ./data.txt",
     "awk '{print}' ~/.ssh/id_rsa",
 ]
+
+[command.handler_policy.options]
+bare = false
+standalone = [
+    "--characters-as-bytes", "--copyright", "--gen-pot", "--lint", "--no-optimize",
+    "--optimize", "--posix", "--re-interval", "--sandbox", "--traditional",
+    "--use-lc-numeric", "--version", "-C", "-N", "-O", "-P", "-S", "-V", "-b", "-c",
+    "-g", "-r", "-s", "-t",
+]
+valued = ["--assign", "--field-separator", "-F", "-v"]

@@ -24,3 +24,23 @@ examples_denied = [
     "curl -w '%output{x.txt}' https://example.com",
     "curl --max-time=30 https://example.com",
 ]
+
+[command.handler_policy.options]
+standalone = [
+    "--compressed", "--fail", "--globoff", "--head", "--include", "--insecure", "--ipv4",
+    "--ipv6", "--location", "--no-buffer", "--no-progress-meter", "--show-error", "--silent",
+    "--verbose", "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-i", "-k", "-s", "-v",
+]
+valued = ["--connect-timeout", "--max-time", "--user-agent", "--write-out", "-A", "-m", "-w"]
+
+[command.handler_policy.methods]
+standalone = ["GET", "HEAD", "OPTIONS"]
+
+[command.handler_policy.headers]
+standalone = [
+    "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language", "Authorization",
+    "Cache-Control", "Cookie", "If-Match", "If-Modified-Since", "If-None-Match", "If-Range",
+    "If-Unmodified-Since", "Origin", "Range", "Referer", "User-Agent", "X-Correlation-ID",
+    "X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto", "X-GitHub-Api-Version",
+    "X-Request-ID", "X-Requested-With",
+]

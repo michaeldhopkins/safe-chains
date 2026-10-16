@@ -184,7 +184,11 @@ owed = [
   "a_shell_bare_command_is_inert_regardless_of_trailing_args",
   "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
 ]
-"src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
+"src/handlers/coreutils/awk.rs" = [
+  "an_awk_program_that_runs_code_is_never_approved",
+  "the_surroundings_alone_are_approved",
+  "awk_operands_and_the_option_policy_count_the_same_operands",
+]
 "src/engine/resolve/link_mode.rs" = ["a_follow_flag_before_the_operands_end_always_follows"]
 "src/handlers/coreutils/find_skip.rs" = ["src/handlers/coreutils/find_skip_tests.rs::only_a_word_that_keeps_entries_away_keeps_any"]
 "src/handlers/coreutils/find.rs" = [
