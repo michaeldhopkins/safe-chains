@@ -165,7 +165,7 @@ fn every_approved_wrapper_carries_the_mark_inward() {
     let wrappers = [
         "timeout 5", "env", "env X=1", "nice", "nice -n 5", "nohup", "time", "exec", "builtin", "stdbuf -oL", "caffeinate", "chronic",
         "unbuffer", "sudo", "doas", "command", "dotenv", "hyperfine", "watch", "flock ./l", "xcrun", "npx", "uv run", "bundle exec",
-        "mise exec --", "direnv exec .", "sh -c", "bash -c", "zsh -c", "ssh host", "tmux run-shell",
+        "mise exec --", "direnv exec .", "heavy-slot.sh run --label l --", "sh -c", "bash -c", "zsh -c", "ssh host", "tmux run-shell",
     ];
     let mut failures = Vec::new();
     let mut checked = Vec::new();

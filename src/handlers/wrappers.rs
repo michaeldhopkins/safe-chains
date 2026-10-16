@@ -90,9 +90,161 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
     combined
 }
 
+fn is_plain_cmd_name(s: &str) -> bool {
+    !s.is_empty()
+        && s != "."
+        && s != ".."
+        && !s.starts_with('-')
+        && !crate::cst::check::is_opaque_value(s)
+        && !s.contains("__SAFE_CHAINS_")
+        && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-' | '+'))
+}
+
+fn is_safe_segment(s: &str) -> bool {
+    !s.is_empty()
+        && s != "."
+        && s != ".."
+        && !crate::cst::check::is_opaque_value(s)
+        && !s.contains("__SAFE_CHAINS_")
+        && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
+}
+
+fn trusted_inner_command(arg0: &str) -> bool {
+    const STD_BINS: &[&str] = &["/usr/bin/", "/bin/", "/usr/local/bin/", "/opt/homebrew/bin/", "/opt/bin/", "/sbin/", "/usr/sbin/"];
+    if !arg0.contains('/') {
+        return is_plain_cmd_name(arg0);
+    }
+    STD_BINS.iter().find_map(|p| arg0.strip_prefix(p)).is_some_and(is_plain_cmd_name)
+}
+
+fn strip_env_home(s: &str) -> Option<&str> {
+    let home = std::env::var("HOME").ok()?;
+    let home = home.trim_end_matches('/');
+    if home.is_empty() || !home.starts_with('/') {
+        return None;
+    }
+    if let Some(rel) = s.strip_prefix(home).and_then(|r| r.strip_prefix('/')) {
+        return Some(rel);
+    }
+    let canon = std::fs::canonicalize(home).ok()?;
+    let canon = canon.to_str()?.trim_end_matches('/');
+    (!canon.is_empty() && canon.starts_with('/')).then(|| s.strip_prefix(canon)?.strip_prefix('/'))?
+}
+
+fn valid_home_rel_heavy_slot(rel: &str) -> bool {
+    let mut segs = rel.split('/');
+    let Some(first) = segs.next() else {
+        return false;
+    };
+    if matches!(first, "projects" | "Downloads" | "Desktop" | "Public" | "tmp") || !is_safe_segment(first) {
+        return false;
+    }
+    let rest: Vec<&str> = segs.collect();
+    !rest.is_empty() && rest.last() == Some(&"heavy-slot.sh") && rest.iter().copied().all(is_safe_segment)
+}
+
+fn trusted_heavy_slot_path(arg0: &str) -> bool {
+    if !matches!(crate::pathctx::binding("HOME"), crate::pathctx::Binding::Unbound) {
+        return false;
+    }
+    if trusted_inner_command(arg0) {
+        if !arg0.contains('/') {
+            return true;
+        }
+        let resolved = crate::pathctx::resolve(arg0);
+        return trusted_inner_command(&resolved)
+            || resolved
+                .strip_prefix("~/")
+                .or_else(|| strip_env_home(&resolved))
+                .is_some_and(valid_home_rel_heavy_slot);
+    }
+    let raw_rel = arg0
+        .strip_prefix("~/")
+        .or_else(|| arg0.strip_prefix("$HOME/"))
+        .or_else(|| arg0.strip_prefix("${HOME}/"))
+        .or_else(|| strip_env_home(arg0));
+    let Some(rel) = raw_rel.filter(|r| valid_home_rel_heavy_slot(r)) else {
+        return false;
+    };
+    let tilde = format!("~/{rel}");
+    let resolved = crate::pathctx::resolve(&tilde);
+    resolved
+        .strip_prefix("~/")
+        .or_else(|| strip_env_home(&resolved))
+        .is_some_and(valid_home_rel_heavy_slot)
+}
+
+fn valid_heavy_slot_label(val: &str) -> bool {
+    !val.is_empty()
+        && val != "--"
+        && !crate::cst::check::is_opaque_value(val)
+        && !val.contains("__SAFE_CHAINS_")
+        && !val.contains(['\n', '\r', '\0'])
+}
+
+fn valid_heavy_slot_wait(val: &str) -> bool {
+    !val.is_empty()
+        && !crate::cst::check::is_opaque_value(val)
+        && !val.contains("__SAFE_CHAINS_")
+        && val.bytes().all(|b| b.is_ascii_digit())
+}
+
+pub fn is_safe_heavy_slot(tokens: &[Token]) -> Verdict {
+    let Some(arg0) = tokens.first() else {
+        return Verdict::Denied;
+    };
+    if !trusted_heavy_slot_path(arg0.as_str()) {
+        return Verdict::Denied;
+    }
+    if tokens.get(1).map(Token::as_str) != Some("run") {
+        return Verdict::Denied;
+    }
+    let mut i = 2;
+    let mut saw_sep = false;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            i += 1;
+            saw_sep = true;
+            break;
+        }
+        if t == "--label" {
+            let Some(val) = tokens.get(i + 1) else {
+                return Verdict::Denied;
+            };
+            if !valid_heavy_slot_label(val.as_str()) {
+                return Verdict::Denied;
+            }
+            i += 2;
+            continue;
+        }
+        if t == "--wait" {
+            let Some(val) = tokens.get(i + 1) else {
+                return Verdict::Denied;
+            };
+            if !valid_heavy_slot_wait(val.as_str()) {
+                return Verdict::Denied;
+            }
+            i += 2;
+            continue;
+        }
+        if t.strip_prefix("--label=").is_some_and(valid_heavy_slot_label) || t.strip_prefix("--wait=").is_some_and(valid_heavy_slot_wait) {
+            i += 1;
+            continue;
+        }
+        return Verdict::Denied;
+    }
+    if !saw_sep || i >= tokens.len() || !trusted_inner_command(tokens[i].as_str()) {
+        return Verdict::Denied;
+    }
+    let inner = shell_words::join(tokens[i..].iter().map(Token::as_str));
+    crate::command_verdict(&inner)
+}
+
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "env" => Some(is_safe_env(tokens)),
+        "heavy-slot.sh" => Some(is_safe_heavy_slot(tokens)),
         "hyperfine" => Some(is_safe_hyperfine(tokens)),
         _ => None,
     }
@@ -196,20 +348,125 @@ mod tests {
         hyperfine_unknown_eq_flag_denied: "hyperfine --xyzzy=foo 'ls'",
     }
 
+    fn tilde(rel: &str) -> String {
+        format!("~{rel}")
+    }
+
+    #[test]
+    fn heavy_slot_wrapper_cases() {
+        let mut paths = vec![
+            "heavy-slot.sh".to_string(),
+            tilde("/bin/heavy-slot.sh"),
+            "$HOME/bin/heavy-slot.sh".to_string(),
+            "${HOME}/bin/heavy-slot.sh".to_string(),
+            "/opt/bin/heavy-slot.sh".to_string(),
+        ];
+        if let Ok(home) = std::env::var("HOME")
+            && home.starts_with('/')
+        {
+            paths.push(format!("{}/bin/heavy-slot.sh", home.trim_end_matches('/')));
+        }
+        for p in &paths {
+            assert_eq!(
+                crate::command_verdict(&format!("RUST_TEST_THREADS=4 {p} run --label sc -- cargo test --jobs 4")),
+                Verdict::Allowed(SafetyLevel::SafeRead),
+            );
+            assert_eq!(crate::command_verdict(&format!("{p} run --label sc -- cargo fmt")), Verdict::Allowed(SafetyLevel::SafeWrite));
+            assert_eq!(
+                crate::command_verdict(&format!("{p} run --label=sc -- cargo clippy --all-targets -- -D warnings")),
+                Verdict::Allowed(SafetyLevel::SafeRead),
+            );
+            assert_eq!(
+                crate::command_verdict(&format!("{p} run --wait 60 --label sc -- git status")),
+                Verdict::Allowed(SafetyLevel::Inert)
+            );
+            assert_eq!(crate::command_verdict(&format!("{p} run --wait=60 -- ls -la")), Verdict::Allowed(SafetyLevel::Inert));
+            assert_eq!(crate::command_verdict(&format!("{p} run -- cat Cargo.toml")), Verdict::Allowed(SafetyLevel::SafeRead));
+            assert_eq!(crate::command_verdict(&format!("{p} run -- /usr/bin/git status")), Verdict::Allowed(SafetyLevel::Inert));
+            for denied_cmd in [
+                format!("{p} run --label sc -- rm -rf /"),
+                format!("{p} run --label sc -- git push origin main"),
+                format!("{p} run -- '/x$(touch /tmp/pwned)/ls'"),
+                format!("{p} run -- 'ls; rm -rf /'"),
+                format!("{p} run -- ./ls"),
+                format!("{p} run -- /tmp/ls"),
+                format!("{p} run -- $(pwd)"),
+                format!("{p} run -- __SAFE_CHAINS_UNKNOWN__"),
+                p.clone(),
+                format!("{p} status"),
+                format!("{p} gc"),
+                format!("{p} status -- cargo test"),
+                format!("{p} run"),
+                format!("{p} run --"),
+                format!("{p} run --label sc"),
+                format!("{p} run --label sc --"),
+                format!("{p} run --label -- cargo test"),
+                format!("{p} run --label -- -- cargo test"),
+                format!("{p} run --label= -- cargo test"),
+                format!("{p} run --label $(pwd) -- cargo test"),
+                format!("{p} run --wait= -- cargo test"),
+                format!("{p} run --wait soon -- cargo test"),
+                format!("{p} run --wait=soon -- cargo test"),
+                format!("{p} run --wait -1 -- cargo test"),
+                format!("{p} run --wait $(echo 5) -- cargo test"),
+                format!("{p} run cargo test"),
+                format!("{p} run --label sc cargo test"),
+                format!("{p} run --unknown -- cargo test"),
+                format!("{p} run --label sc --extra -- cargo test"),
+                format!("{p} run extra --label sc -- cargo test"),
+            ] {
+                assert_eq!(crate::command_verdict(&denied_cmd), Verdict::Denied, "{denied_cmd}");
+            }
+        }
+        for untrusted_path in [
+            "./heavy-slot.sh".to_string(),
+            "../heavy-slot.sh".to_string(),
+            "scripts/heavy-slot.sh".to_string(),
+            "/tmp/heavy-slot.sh".to_string(),
+            "/var/tmp/heavy-slot.sh".to_string(),
+            tilde("/heavy-slot.sh"),
+            tilde("/projects/repo/heavy-slot.sh"),
+            tilde("/Downloads/heavy-slot.sh"),
+            tilde("/bin/../tmp/heavy-slot.sh"),
+            tilde("/$(pwd)/heavy-slot.sh"),
+        ] {
+            let cmd = format!("{untrusted_path} run -- git status");
+            assert_eq!(crate::command_verdict(&cmd), Verdict::Denied, "{cmd}");
+        }
+        assert_eq!(crate::command_verdict("HOME=/tmp; $HOME/bin/heavy-slot.sh run -- git status"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HOME=./evil; $HOME/bin/heavy-slot.sh run -- git status"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_PERL=/tmp/evil heavy-slot.sh run -- ls"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_DIR=/etc heavy-slot.sh run -- ls"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_DIR=./slots heavy-slot.sh run -- ls"), Verdict::Allowed(SafetyLevel::SafeWrite));
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_HELD=/tmp/slot-0 heavy-slot.sh run -- ls"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_FD=9 heavy-slot.sh run -- ls"), Verdict::Denied);
+        assert_eq!(crate::command_verdict("HEAVY_SLOT_FD_BASE=9 heavy-slot.sh run -- ls"), Verdict::Denied);
+    }
+
+    fn arb_heavy_slot_flag() -> impl Strategy<Value = String> {
+        prop_oneof![
+            "[a-zA-Z0-9._-]{1,10}".prop_filter("not --", |l| l != "--").prop_map(|l| format!("--label {l}")),
+            "[a-zA-Z0-9._-]{1,10}".prop_filter("not --", |l| l != "--").prop_map(|l| format!("--label={l}")),
+            "[0-9]{1,4}".prop_map(|w| format!("--wait {w}")),
+            "[0-9]{1,4}".prop_map(|w| format!("--wait={w}")),
+        ]
+    }
+
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(500))]
 
-        /// INVARIANT (dispatch-table closure). `dispatch` only forwards to the two wrapper
-        /// handlers it is wired to (`env` and `hyperfine`). For every OTHER command name — any
-        /// ASCII string the gate might be asked about — it returns `None`, leaving the verdict
-        /// to the engine / registry. A regression that added or removed a wired name without
-        /// updating both the dispatch arm and the handlers that match it would flip this.
+        /// INVARIANT (dispatch-table closure). `dispatch` only forwards to the wrapper
+        /// handlers it is wired to (`env`, `heavy-slot.sh`, and `hyperfine`). For every OTHER
+        /// command name — any ASCII string the gate might be asked about — it returns `None`,
+        /// leaving the verdict to the engine / registry. A regression that added or removed a
+        /// wired name without updating both the dispatch arm and the handlers that match it
+        /// would flip this.
         #[test]
         fn dispatch_unknown_command_returns_none(
             name in "[a-zA-Z][a-zA-Z0-9_-]{0,12}",
             tail in proptest::collection::vec(any::<String>(), 0..4),
         ) {
-            prop_assume!(name != "env" && name != "hyperfine");
+            prop_assume!(name != "env" && name != "hyperfine" && name != "heavy-slot.sh");
             let tokens: Vec<Token> = std::iter::once(Token::from_test(&name))
                 .chain(tail.into_iter().map(|s| Token::from_test(&s)))
                 .collect();
@@ -255,6 +512,20 @@ mod tests {
             );
         }
 
+        #[test]
+        fn dispatch_heavy_slot_matches_is_safe_heavy_slot(
+            tail in proptest::collection::vec(any::<String>(), 0..6),
+        ) {
+            let tokens: Vec<Token> = std::iter::once(Token::from_test("heavy-slot.sh"))
+                .chain(tail.into_iter().map(|s| Token::from_test(&s)))
+                .collect();
+            prop_assert_eq!(
+                super::dispatch("heavy-slot.sh", &tokens),
+                Some(super::is_safe_heavy_slot(&tokens)),
+                "dispatch(\"heavy-slot.sh\", …) drifted from is_safe_heavy_slot"
+            );
+        }
+
         /// ORACLE (assignment-loop = fold over `assignment_verdict`). The `env` handler, when
         /// fed only recognized flags followed by `KEY=VALUE` pairs and NO command, must
         /// produce exactly the reduce-combine (starting from `Allowed(Inert)`) of
@@ -284,6 +555,54 @@ mod tests {
                 expected,
                 "env assignment loop drifted from reduce-combine of assignment_verdict"
             );
+        }
+
+        #[test]
+        fn heavy_slot_verdict_matches_inner(
+            prefix in prop::sample::select(vec!["".to_string(), tilde("/bin/"), "$HOME/bin/".to_string(), "/opt/bin/".to_string()]),
+            flags in proptest::collection::vec(arb_heavy_slot_flag(), 0..4),
+            inner in prop::sample::select(vec![
+                "git status",
+                "ls -la",
+                "cat Cargo.toml",
+                "cargo test --jobs 4",
+                "cargo clippy --all-targets -- -D warnings",
+                "rm file.txt",
+                "rm -rf /",
+                "git push origin main",
+                "curl -X POST https://example.com",
+                "unknown-tool --flag",
+            ]),
+        ) {
+            let flag_str = flags.join(" ");
+            let wrapped = if flag_str.is_empty() {
+                format!("{prefix}heavy-slot.sh run -- {inner}")
+            } else {
+                format!("{prefix}heavy-slot.sh run {flag_str} -- {inner}")
+            };
+            prop_assert_eq!(
+                crate::command_verdict(&wrapped),
+                crate::command_verdict(inner),
+                "wrapped `{}` drifted from inner `{}`",
+                wrapped,
+                inner
+            );
+        }
+
+        #[test]
+        fn heavy_slot_rejects_bad_preamble_or_missing_separator(
+            prefix in prop::sample::select(vec!["".to_string(), tilde("/bin/"), "$HOME/bin/".to_string(), "/opt/bin/".to_string()]),
+            bad in prop_oneof![
+                prop::sample::select(vec!["status", "gc", "acquire", "release"]).prop_map(|s| format!("{s} -- git status")),
+                "[a-zA-Z0-9_-]{1,8}".prop_filter("not run", |s| s != "run").prop_map(|s| format!("{s} -- git status")),
+                "--[a-z]{1,8}".prop_filter("not allowed flag", |f| f != "--label" && f != "--wait").prop_map(|f| format!("run {f} -- git status")),
+                "[a-z]{1,8}".prop_map(|pos| format!("run {pos} -- git status")),
+                arb_heavy_slot_flag().prop_map(|f| format!("run {f} git status")),
+                arb_heavy_slot_flag().prop_map(|f| format!("run {f} --")),
+            ],
+        ) {
+            let cmd = format!("{prefix}heavy-slot.sh {bad}");
+            prop_assert_eq!(crate::command_verdict(&cmd), Verdict::Denied, "expected Denied for `{}`", cmd);
         }
     }
 }

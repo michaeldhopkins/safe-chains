@@ -1028,3 +1028,20 @@ because = "the remote shell rsync executes (the --rsh/-e twin)"
 [env.KUBECONFIG]
 shape = "exec-path"
 because = "a kubeconfig can carry a users[].user.exec credential plugin the client RUNS (the --kubeconfig twin)"
+[env.HEAVY_SLOT_PERL]
+shape = "exec-path"
+single_value = true
+because = "the perl interpreter heavy-slot.sh executes to lock and run the command"
+[env.HEAVY_SLOT_DIR]
+shape = "data-write"
+single_value = true
+because = "the directory heavy-slot.sh creates slot files and appends its log in"
+[env.HEAVY_SLOT_HELD]
+shape = "opaque"
+because = "internal lock-file path heavy-slot.sh truncates on release"
+[env.HEAVY_SLOT_FD]
+shape = "opaque"
+because = "internal descriptor number heavy-slot.sh locks and closes on release"
+[env.HEAVY_SLOT_FD_BASE]
+shape = "opaque"
+because = "first descriptor number heavy-slot.sh opens slot files on"

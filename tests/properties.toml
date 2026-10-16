@@ -333,6 +333,8 @@ owed = [
   "dispatch_env_matches_is_safe_env",
   "dispatch_hyperfine_matches_is_safe_hyperfine",
   "is_safe_env_assignment_loop_combines_assignment_verdict",
+  "heavy_slot_verdict_matches_inner",
+  "heavy_slot_rejects_bad_preamble_or_missing_separator",
 ]
 "src/engine/plain.rs" = [
   "src/engine/plain/tests.rs::every_printed_facet_of_any_capability_has_plain_words",

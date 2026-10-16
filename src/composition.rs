@@ -69,6 +69,7 @@ mod tests {
             ("ionice", format!("ionice {direct}")),
             ("nohup", format!("nohup {direct}")),
             ("env", format!("env FOO=1 {direct}")),
+            ("heavy-slot.sh", format!("heavy-slot.sh run --label l -- {direct}")),
             ("dotenv", format!("dotenv {direct}")),
             ("sudo", format!("sudo {direct}")),
             ("bash -c", format!("bash -c '{direct}'")),
