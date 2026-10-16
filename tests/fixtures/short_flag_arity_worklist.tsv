@@ -67,16 +67,6 @@ gh [policy browse]	-p
 gh [policy browse]	-r
 gh [policy browse]	-s
 gh [policy browse]	-w
-gh [policy checks]	-w
-gh [policy diff]	-w
-gh [policy list]	-w
-gh [policy release_view]	-w
-gh [policy run_view]	-w
-gh [policy search]	-w
-gh [policy simple_list]	-w
-gh [policy simple_view]	-w
-gh [policy status]	-w
-gh [policy view]	-w
 git add	-A
 git add	-f
 git add	-n

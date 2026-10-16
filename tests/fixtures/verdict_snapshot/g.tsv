@@ -2889,11 +2889,9 @@ gh alias checks --repo x	inert
 gh alias checks --required	inert
 gh alias checks --template x	inert
 gh alias checks --watch	inert
-gh alias checks --web	inert
 gh alias checks -R x	inert
 gh alias checks -i x	inert
 gh alias checks -q x	inert
-gh alias checks -w	inert
 gh alias checks x	inert
 gh alias diff	denied
 gh alias diff --color x	inert
@@ -2903,9 +2901,7 @@ gh alias diff --name-only --patch	inert
 gh alias diff --name-only x	inert
 gh alias diff --patch	inert
 gh alias diff --repo x	inert
-gh alias diff --web	inert
 gh alias diff -R x	inert
-gh alias diff -w	inert
 gh alias diff x	inert
 gh alias list	inert
 gh alias list --all	inert
@@ -2943,7 +2939,6 @@ gh alias list --template x	inert
 gh alias list --topic x	inert
 gh alias list --user x	inert
 gh alias list --visibility x	inert
-gh alias list --web	inert
 gh alias list -B x	inert
 gh alias list -H x	inert
 gh alias list -L x	inert
@@ -2958,7 +2953,6 @@ gh alias list -o x	inert
 gh alias list -q x	inert
 gh alias list -r x	inert
 gh alias list -u x	inert
-gh alias list -w	inert
 gh alias list x	inert
 gh alias status	denied
 gh alias status --exit-status	inert
@@ -2971,10 +2965,8 @@ gh alias status --log	inert
 gh alias status --log-failed	inert
 gh alias status --repo x	inert
 gh alias status --template x	inert
-gh alias status --web	inert
 gh alias status -R x	inert
 gh alias status -q x	inert
-gh alias status -w	inert
 gh alias status x	inert
 gh alias verify	denied
 gh alias verify --jq x	inert
@@ -2982,36 +2974,32 @@ gh alias verify --json x	inert
 gh alias verify --ref x	inert
 gh alias verify --repo x	inert
 gh alias verify --template x	inert
-gh alias verify --web	inert
-gh alias verify --web --jq x	inert
-gh alias verify --web --yaml	inert
-gh alias verify --web x	inert
 gh alias verify --yaml	inert
+gh alias verify --yaml --jq x	inert
+gh alias verify --yaml -y	inert
+gh alias verify --yaml x	inert
 gh alias verify -R x	inert
 gh alias verify -q x	inert
 gh alias verify -r x	inert
-gh alias verify -w	inert
 gh alias verify -y	inert
 gh alias verify x	inert
 gh alias view	denied
 gh alias view --branch x	inert
 gh alias view --comments	inert
 gh alias view --comments --branch x	inert
-gh alias view --comments --web	inert
+gh alias view --comments --yaml	inert
 gh alias view --comments x	inert
 gh alias view --jq x	inert
 gh alias view --json x	inert
 gh alias view --ref x	inert
 gh alias view --repo x	inert
 gh alias view --template x	inert
-gh alias view --web	inert
 gh alias view --yaml	inert
 gh alias view -R x	inert
 gh alias view -b x	inert
 gh alias view -c	inert
 gh alias view -q x	inert
 gh alias view -r x	inert
-gh alias view -w	inert
 gh alias view -y	inert
 gh alias view x	inert
 gh alias watch	denied
@@ -3020,15 +3008,13 @@ gh alias watch --json x	inert
 gh alias watch --ref x	inert
 gh alias watch --repo x	inert
 gh alias watch --template x	inert
-gh alias watch --web	inert
-gh alias watch --web --jq x	inert
-gh alias watch --web --yaml	inert
-gh alias watch --web x	inert
 gh alias watch --yaml	inert
+gh alias watch --yaml --jq x	inert
+gh alias watch --yaml -y	inert
+gh alias watch --yaml x	inert
 gh alias watch -R x	inert
 gh alias watch -q x	inert
 gh alias watch -r x	inert
-gh alias watch -w	inert
 gh alias watch -y	inert
 gh alias watch x	inert
 gh api	inert
@@ -3118,11 +3104,9 @@ gh attestation checks --repo x	inert
 gh attestation checks --required	inert
 gh attestation checks --template x	inert
 gh attestation checks --watch	inert
-gh attestation checks --web	inert
 gh attestation checks -R x	inert
 gh attestation checks -i x	inert
 gh attestation checks -q x	inert
-gh attestation checks -w	inert
 gh attestation checks x	inert
 gh attestation diff	denied
 gh attestation diff --color x	inert
@@ -3132,9 +3116,7 @@ gh attestation diff --name-only --patch	inert
 gh attestation diff --name-only x	inert
 gh attestation diff --patch	inert
 gh attestation diff --repo x	inert
-gh attestation diff --web	inert
 gh attestation diff -R x	inert
-gh attestation diff -w	inert
 gh attestation diff x	inert
 gh attestation list	inert
 gh attestation list --all	inert
@@ -3172,7 +3154,6 @@ gh attestation list --template x	inert
 gh attestation list --topic x	inert
 gh attestation list --user x	inert
 gh attestation list --visibility x	inert
-gh attestation list --web	inert
 gh attestation list -B x	inert
 gh attestation list -H x	inert
 gh attestation list -L x	inert
@@ -3187,7 +3168,6 @@ gh attestation list -o x	inert
 gh attestation list -q x	inert
 gh attestation list -r x	inert
 gh attestation list -u x	inert
-gh attestation list -w	inert
 gh attestation list x	inert
 gh attestation status	denied
 gh attestation status --exit-status	inert
@@ -3200,10 +3180,8 @@ gh attestation status --log	inert
 gh attestation status --log-failed	inert
 gh attestation status --repo x	inert
 gh attestation status --template x	inert
-gh attestation status --web	inert
 gh attestation status -R x	inert
 gh attestation status -q x	inert
-gh attestation status -w	inert
 gh attestation status x	inert
 gh attestation verify	denied
 gh attestation verify --jq x	inert
@@ -3211,15 +3189,13 @@ gh attestation verify --json x	inert
 gh attestation verify --ref x	inert
 gh attestation verify --repo x	inert
 gh attestation verify --template x	inert
-gh attestation verify --web	inert
-gh attestation verify --web --jq x	inert
-gh attestation verify --web --yaml	inert
-gh attestation verify --web x	inert
 gh attestation verify --yaml	inert
+gh attestation verify --yaml --jq x	inert
+gh attestation verify --yaml -y	inert
+gh attestation verify --yaml x	inert
 gh attestation verify -R x	inert
 gh attestation verify -q x	inert
 gh attestation verify -r x	inert
-gh attestation verify -w	inert
 gh attestation verify -y	inert
 gh attestation verify artifact.tar.gz	inert
 gh attestation verify x	inert
@@ -3227,21 +3203,19 @@ gh attestation view	denied
 gh attestation view --branch x	inert
 gh attestation view --comments	inert
 gh attestation view --comments --branch x	inert
-gh attestation view --comments --web	inert
+gh attestation view --comments --yaml	inert
 gh attestation view --comments x	inert
 gh attestation view --jq x	inert
 gh attestation view --json x	inert
 gh attestation view --ref x	inert
 gh attestation view --repo x	inert
 gh attestation view --template x	inert
-gh attestation view --web	inert
 gh attestation view --yaml	inert
 gh attestation view -R x	inert
 gh attestation view -b x	inert
 gh attestation view -c	inert
 gh attestation view -q x	inert
 gh attestation view -r x	inert
-gh attestation view -w	inert
 gh attestation view -y	inert
 gh attestation view x	inert
 gh attestation watch	denied
@@ -3250,15 +3224,13 @@ gh attestation watch --json x	inert
 gh attestation watch --ref x	inert
 gh attestation watch --repo x	inert
 gh attestation watch --template x	inert
-gh attestation watch --web	inert
-gh attestation watch --web --jq x	inert
-gh attestation watch --web --yaml	inert
-gh attestation watch --web x	inert
 gh attestation watch --yaml	inert
+gh attestation watch --yaml --jq x	inert
+gh attestation watch --yaml -y	inert
+gh attestation watch --yaml x	inert
 gh attestation watch -R x	inert
 gh attestation watch -q x	inert
 gh attestation watch -r x	inert
-gh attestation watch -w	inert
 gh attestation watch -y	inert
 gh attestation watch x	inert
 gh auth --help	inert
@@ -3287,7 +3259,6 @@ gh auth status --template x	inert
 gh auth status --topic x	inert
 gh auth status --user x	inert
 gh auth status --visibility x	inert
-gh auth status --web	inert
 gh auth status -L x	inert
 gh auth status -O x	inert
 gh auth status -R x	inert
@@ -3300,7 +3271,6 @@ gh auth status -o x	inert
 gh auth status -q x	inert
 gh auth status -r x	inert
 gh auth status -u x	inert
-gh auth status -w	inert
 gh auth status x	inert
 gh browse	denied
 gh browse --actions	denied
@@ -3339,11 +3309,9 @@ gh cache checks --repo x	inert
 gh cache checks --required	inert
 gh cache checks --template x	inert
 gh cache checks --watch	inert
-gh cache checks --web	inert
 gh cache checks -R x	inert
 gh cache checks -i x	inert
 gh cache checks -q x	inert
-gh cache checks -w	inert
 gh cache checks x	inert
 gh cache diff	denied
 gh cache diff --color x	inert
@@ -3353,9 +3321,7 @@ gh cache diff --name-only --patch	inert
 gh cache diff --name-only x	inert
 gh cache diff --patch	inert
 gh cache diff --repo x	inert
-gh cache diff --web	inert
 gh cache diff -R x	inert
-gh cache diff -w	inert
 gh cache diff x	inert
 gh cache list	inert
 gh cache list --all	inert
@@ -3394,7 +3360,6 @@ gh cache list --template x	inert
 gh cache list --topic x	inert
 gh cache list --user x	inert
 gh cache list --visibility x	inert
-gh cache list --web	inert
 gh cache list -B x	inert
 gh cache list -H x	inert
 gh cache list -L x	inert
@@ -3409,7 +3374,6 @@ gh cache list -o x	inert
 gh cache list -q x	inert
 gh cache list -r x	inert
 gh cache list -u x	inert
-gh cache list -w	inert
 gh cache list x	inert
 gh cache status	denied
 gh cache status --exit-status	inert
@@ -3422,10 +3386,8 @@ gh cache status --log	inert
 gh cache status --log-failed	inert
 gh cache status --repo x	inert
 gh cache status --template x	inert
-gh cache status --web	inert
 gh cache status -R x	inert
 gh cache status -q x	inert
-gh cache status -w	inert
 gh cache status x	inert
 gh cache verify	denied
 gh cache verify --jq x	inert
@@ -3433,36 +3395,32 @@ gh cache verify --json x	inert
 gh cache verify --ref x	inert
 gh cache verify --repo x	inert
 gh cache verify --template x	inert
-gh cache verify --web	inert
-gh cache verify --web --jq x	inert
-gh cache verify --web --yaml	inert
-gh cache verify --web x	inert
 gh cache verify --yaml	inert
+gh cache verify --yaml --jq x	inert
+gh cache verify --yaml -y	inert
+gh cache verify --yaml x	inert
 gh cache verify -R x	inert
 gh cache verify -q x	inert
 gh cache verify -r x	inert
-gh cache verify -w	inert
 gh cache verify -y	inert
 gh cache verify x	inert
 gh cache view	denied
 gh cache view --branch x	inert
 gh cache view --comments	inert
 gh cache view --comments --branch x	inert
-gh cache view --comments --web	inert
+gh cache view --comments --yaml	inert
 gh cache view --comments x	inert
 gh cache view --jq x	inert
 gh cache view --json x	inert
 gh cache view --ref x	inert
 gh cache view --repo x	inert
 gh cache view --template x	inert
-gh cache view --web	inert
 gh cache view --yaml	inert
 gh cache view -R x	inert
 gh cache view -b x	inert
 gh cache view -c	inert
 gh cache view -q x	inert
 gh cache view -r x	inert
-gh cache view -w	inert
 gh cache view -y	inert
 gh cache view x	inert
 gh cache watch	denied
@@ -3471,15 +3429,13 @@ gh cache watch --json x	inert
 gh cache watch --ref x	inert
 gh cache watch --repo x	inert
 gh cache watch --template x	inert
-gh cache watch --web	inert
-gh cache watch --web --jq x	inert
-gh cache watch --web --yaml	inert
-gh cache watch --web x	inert
 gh cache watch --yaml	inert
+gh cache watch --yaml --jq x	inert
+gh cache watch --yaml -y	inert
+gh cache watch --yaml x	inert
 gh cache watch -R x	inert
 gh cache watch -q x	inert
 gh cache watch -r x	inert
-gh cache watch -w	inert
 gh cache watch -y	inert
 gh cache watch x	inert
 gh codespace checks	denied
@@ -3494,11 +3450,9 @@ gh codespace checks --repo x	inert
 gh codespace checks --required	inert
 gh codespace checks --template x	inert
 gh codespace checks --watch	inert
-gh codespace checks --web	inert
 gh codespace checks -R x	inert
 gh codespace checks -i x	inert
 gh codespace checks -q x	inert
-gh codespace checks -w	inert
 gh codespace checks x	inert
 gh codespace diff	denied
 gh codespace diff --color x	inert
@@ -3508,9 +3462,7 @@ gh codespace diff --name-only --patch	inert
 gh codespace diff --name-only x	inert
 gh codespace diff --patch	inert
 gh codespace diff --repo x	inert
-gh codespace diff --web	inert
 gh codespace diff -R x	inert
-gh codespace diff -w	inert
 gh codespace diff x	inert
 gh codespace list	inert
 gh codespace list --all	inert
@@ -3549,7 +3501,6 @@ gh codespace list --template x	inert
 gh codespace list --topic x	inert
 gh codespace list --user x	inert
 gh codespace list --visibility x	inert
-gh codespace list --web	inert
 gh codespace list -B x	inert
 gh codespace list -H x	inert
 gh codespace list -L x	inert
@@ -3564,7 +3515,6 @@ gh codespace list -o x	inert
 gh codespace list -q x	inert
 gh codespace list -r x	inert
 gh codespace list -u x	inert
-gh codespace list -w	inert
 gh codespace list x	inert
 gh codespace status	denied
 gh codespace status --exit-status	inert
@@ -3577,10 +3527,8 @@ gh codespace status --log	inert
 gh codespace status --log-failed	inert
 gh codespace status --repo x	inert
 gh codespace status --template x	inert
-gh codespace status --web	inert
 gh codespace status -R x	inert
 gh codespace status -q x	inert
-gh codespace status -w	inert
 gh codespace status x	inert
 gh codespace verify	denied
 gh codespace verify --jq x	inert
@@ -3588,36 +3536,32 @@ gh codespace verify --json x	inert
 gh codespace verify --ref x	inert
 gh codespace verify --repo x	inert
 gh codespace verify --template x	inert
-gh codespace verify --web	inert
-gh codespace verify --web --jq x	inert
-gh codespace verify --web --yaml	inert
-gh codespace verify --web x	inert
 gh codespace verify --yaml	inert
+gh codespace verify --yaml --jq x	inert
+gh codespace verify --yaml -y	inert
+gh codespace verify --yaml x	inert
 gh codespace verify -R x	inert
 gh codespace verify -q x	inert
 gh codespace verify -r x	inert
-gh codespace verify -w	inert
 gh codespace verify -y	inert
 gh codespace verify x	inert
 gh codespace view	denied
 gh codespace view --branch x	inert
 gh codespace view --comments	inert
 gh codespace view --comments --branch x	inert
-gh codespace view --comments --web	inert
+gh codespace view --comments --yaml	inert
 gh codespace view --comments x	inert
 gh codespace view --jq x	inert
 gh codespace view --json x	inert
 gh codespace view --ref x	inert
 gh codespace view --repo x	inert
 gh codespace view --template x	inert
-gh codespace view --web	inert
 gh codespace view --yaml	inert
 gh codespace view -R x	inert
 gh codespace view -b x	inert
 gh codespace view -c	inert
 gh codespace view -q x	inert
 gh codespace view -r x	inert
-gh codespace view -w	inert
 gh codespace view -y	inert
 gh codespace view x	inert
 gh codespace watch	denied
@@ -3626,15 +3570,13 @@ gh codespace watch --json x	inert
 gh codespace watch --ref x	inert
 gh codespace watch --repo x	inert
 gh codespace watch --template x	inert
-gh codespace watch --web	inert
-gh codespace watch --web --jq x	inert
-gh codespace watch --web --yaml	inert
-gh codespace watch --web x	inert
 gh codespace watch --yaml	inert
+gh codespace watch --yaml --jq x	inert
+gh codespace watch --yaml -y	inert
+gh codespace watch --yaml x	inert
 gh codespace watch -R x	inert
 gh codespace watch -q x	inert
 gh codespace watch -r x	inert
-gh codespace watch -w	inert
 gh codespace watch -y	inert
 gh codespace watch x	inert
 gh completion	denied
@@ -3659,11 +3601,9 @@ gh config checks --repo x	inert
 gh config checks --required	inert
 gh config checks --template x	inert
 gh config checks --watch	inert
-gh config checks --web	inert
 gh config checks -R x	inert
 gh config checks -i x	inert
 gh config checks -q x	inert
-gh config checks -w	inert
 gh config checks x	inert
 gh config diff	denied
 gh config diff --color x	inert
@@ -3673,9 +3613,7 @@ gh config diff --name-only --patch	inert
 gh config diff --name-only x	inert
 gh config diff --patch	inert
 gh config diff --repo x	inert
-gh config diff --web	inert
 gh config diff -R x	inert
-gh config diff -w	inert
 gh config diff x	inert
 gh config list	inert
 gh config list --all	inert
@@ -3713,7 +3651,6 @@ gh config list --template x	inert
 gh config list --topic x	inert
 gh config list --user x	inert
 gh config list --visibility x	inert
-gh config list --web	inert
 gh config list -B x	inert
 gh config list -H x	inert
 gh config list -L x	inert
@@ -3728,7 +3665,6 @@ gh config list -o x	inert
 gh config list -q x	inert
 gh config list -r x	inert
 gh config list -u x	inert
-gh config list -w	inert
 gh config list x	inert
 gh config status	denied
 gh config status --exit-status	inert
@@ -3741,10 +3677,8 @@ gh config status --log	inert
 gh config status --log-failed	inert
 gh config status --repo x	inert
 gh config status --template x	inert
-gh config status --web	inert
 gh config status -R x	inert
 gh config status -q x	inert
-gh config status -w	inert
 gh config status x	inert
 gh config verify	denied
 gh config verify --jq x	inert
@@ -3752,36 +3686,32 @@ gh config verify --json x	inert
 gh config verify --ref x	inert
 gh config verify --repo x	inert
 gh config verify --template x	inert
-gh config verify --web	inert
-gh config verify --web --jq x	inert
-gh config verify --web --yaml	inert
-gh config verify --web x	inert
 gh config verify --yaml	inert
+gh config verify --yaml --jq x	inert
+gh config verify --yaml -y	inert
+gh config verify --yaml x	inert
 gh config verify -R x	inert
 gh config verify -q x	inert
 gh config verify -r x	inert
-gh config verify -w	inert
 gh config verify -y	inert
 gh config verify x	inert
 gh config view	denied
 gh config view --branch x	inert
 gh config view --comments	inert
 gh config view --comments --branch x	inert
-gh config view --comments --web	inert
+gh config view --comments --yaml	inert
 gh config view --comments x	inert
 gh config view --jq x	inert
 gh config view --json x	inert
 gh config view --ref x	inert
 gh config view --repo x	inert
 gh config view --template x	inert
-gh config view --web	inert
 gh config view --yaml	inert
 gh config view -R x	inert
 gh config view -b x	inert
 gh config view -c	inert
 gh config view -q x	inert
 gh config view -r x	inert
-gh config view -w	inert
 gh config view -y	inert
 gh config view x	inert
 gh config watch	denied
@@ -3790,15 +3720,13 @@ gh config watch --json x	inert
 gh config watch --ref x	inert
 gh config watch --repo x	inert
 gh config watch --template x	inert
-gh config watch --web	inert
-gh config watch --web --jq x	inert
-gh config watch --web --yaml	inert
-gh config watch --web x	inert
 gh config watch --yaml	inert
+gh config watch --yaml --jq x	inert
+gh config watch --yaml -y	inert
+gh config watch --yaml x	inert
 gh config watch -R x	inert
 gh config watch -q x	inert
 gh config watch -r x	inert
-gh config watch -w	inert
 gh config watch -y	inert
 gh config watch x	inert
 gh extension checks	denied
@@ -3813,11 +3741,9 @@ gh extension checks --repo x	inert
 gh extension checks --required	inert
 gh extension checks --template x	inert
 gh extension checks --watch	inert
-gh extension checks --web	inert
 gh extension checks -R x	inert
 gh extension checks -i x	inert
 gh extension checks -q x	inert
-gh extension checks -w	inert
 gh extension checks x	inert
 gh extension diff	denied
 gh extension diff --color x	inert
@@ -3827,9 +3753,7 @@ gh extension diff --name-only --patch	inert
 gh extension diff --name-only x	inert
 gh extension diff --patch	inert
 gh extension diff --repo x	inert
-gh extension diff --web	inert
 gh extension diff -R x	inert
-gh extension diff -w	inert
 gh extension diff x	inert
 gh extension list	inert
 gh extension list --all	inert
@@ -3867,7 +3791,6 @@ gh extension list --template x	inert
 gh extension list --topic x	inert
 gh extension list --user x	inert
 gh extension list --visibility x	inert
-gh extension list --web	inert
 gh extension list -B x	inert
 gh extension list -H x	inert
 gh extension list -L x	inert
@@ -3882,7 +3805,6 @@ gh extension list -o x	inert
 gh extension list -q x	inert
 gh extension list -r x	inert
 gh extension list -u x	inert
-gh extension list -w	inert
 gh extension list x	inert
 gh extension status	denied
 gh extension status --exit-status	inert
@@ -3895,10 +3817,8 @@ gh extension status --log	inert
 gh extension status --log-failed	inert
 gh extension status --repo x	inert
 gh extension status --template x	inert
-gh extension status --web	inert
 gh extension status -R x	inert
 gh extension status -q x	inert
-gh extension status -w	inert
 gh extension status x	inert
 gh extension verify	denied
 gh extension verify --jq x	inert
@@ -3906,36 +3826,32 @@ gh extension verify --json x	inert
 gh extension verify --ref x	inert
 gh extension verify --repo x	inert
 gh extension verify --template x	inert
-gh extension verify --web	inert
-gh extension verify --web --jq x	inert
-gh extension verify --web --yaml	inert
-gh extension verify --web x	inert
 gh extension verify --yaml	inert
+gh extension verify --yaml --jq x	inert
+gh extension verify --yaml -y	inert
+gh extension verify --yaml x	inert
 gh extension verify -R x	inert
 gh extension verify -q x	inert
 gh extension verify -r x	inert
-gh extension verify -w	inert
 gh extension verify -y	inert
 gh extension verify x	inert
 gh extension view	denied
 gh extension view --branch x	inert
 gh extension view --comments	inert
 gh extension view --comments --branch x	inert
-gh extension view --comments --web	inert
+gh extension view --comments --yaml	inert
 gh extension view --comments x	inert
 gh extension view --jq x	inert
 gh extension view --json x	inert
 gh extension view --ref x	inert
 gh extension view --repo x	inert
 gh extension view --template x	inert
-gh extension view --web	inert
 gh extension view --yaml	inert
 gh extension view -R x	inert
 gh extension view -b x	inert
 gh extension view -c	inert
 gh extension view -q x	inert
 gh extension view -r x	inert
-gh extension view -w	inert
 gh extension view -y	inert
 gh extension view x	inert
 gh extension watch	denied
@@ -3944,15 +3860,13 @@ gh extension watch --json x	inert
 gh extension watch --ref x	inert
 gh extension watch --repo x	inert
 gh extension watch --template x	inert
-gh extension watch --web	inert
-gh extension watch --web --jq x	inert
-gh extension watch --web --yaml	inert
-gh extension watch --web x	inert
 gh extension watch --yaml	inert
+gh extension watch --yaml --jq x	inert
+gh extension watch --yaml -y	inert
+gh extension watch --yaml x	inert
 gh extension watch -R x	inert
 gh extension watch -q x	inert
 gh extension watch -r x	inert
-gh extension watch -w	inert
 gh extension watch -y	inert
 gh extension watch x	inert
 gh gist checks	denied
@@ -3967,11 +3881,9 @@ gh gist checks --repo x	inert
 gh gist checks --required	inert
 gh gist checks --template x	inert
 gh gist checks --watch	inert
-gh gist checks --web	inert
 gh gist checks -R x	inert
 gh gist checks -i x	inert
 gh gist checks -q x	inert
-gh gist checks -w	inert
 gh gist checks x	inert
 gh gist diff	denied
 gh gist diff --color x	inert
@@ -3981,9 +3893,7 @@ gh gist diff --name-only --patch	inert
 gh gist diff --name-only x	inert
 gh gist diff --patch	inert
 gh gist diff --repo x	inert
-gh gist diff --web	inert
 gh gist diff -R x	inert
-gh gist diff -w	inert
 gh gist diff x	inert
 gh gist list	inert
 gh gist list --all	inert
@@ -4021,7 +3931,6 @@ gh gist list --template x	inert
 gh gist list --topic x	inert
 gh gist list --user x	inert
 gh gist list --visibility x	inert
-gh gist list --web	inert
 gh gist list -B x	inert
 gh gist list -H x	inert
 gh gist list -L x	inert
@@ -4036,7 +3945,6 @@ gh gist list -o x	inert
 gh gist list -q x	inert
 gh gist list -r x	inert
 gh gist list -u x	inert
-gh gist list -w	inert
 gh gist list x	inert
 gh gist status	denied
 gh gist status --exit-status	inert
@@ -4049,10 +3957,8 @@ gh gist status --log	inert
 gh gist status --log-failed	inert
 gh gist status --repo x	inert
 gh gist status --template x	inert
-gh gist status --web	inert
 gh gist status -R x	inert
 gh gist status -q x	inert
-gh gist status -w	inert
 gh gist status x	inert
 gh gist verify	denied
 gh gist verify --jq x	inert
@@ -4060,36 +3966,32 @@ gh gist verify --json x	inert
 gh gist verify --ref x	inert
 gh gist verify --repo x	inert
 gh gist verify --template x	inert
-gh gist verify --web	inert
-gh gist verify --web --jq x	inert
-gh gist verify --web --yaml	inert
-gh gist verify --web x	inert
 gh gist verify --yaml	inert
+gh gist verify --yaml --jq x	inert
+gh gist verify --yaml -y	inert
+gh gist verify --yaml x	inert
 gh gist verify -R x	inert
 gh gist verify -q x	inert
 gh gist verify -r x	inert
-gh gist verify -w	inert
 gh gist verify -y	inert
 gh gist verify x	inert
 gh gist view	denied
 gh gist view --branch x	inert
 gh gist view --comments	inert
 gh gist view --comments --branch x	inert
-gh gist view --comments --web	inert
+gh gist view --comments --yaml	inert
 gh gist view --comments x	inert
 gh gist view --jq x	inert
 gh gist view --json x	inert
 gh gist view --ref x	inert
 gh gist view --repo x	inert
 gh gist view --template x	inert
-gh gist view --web	inert
 gh gist view --yaml	inert
 gh gist view -R x	inert
 gh gist view -b x	inert
 gh gist view -c	inert
 gh gist view -q x	inert
 gh gist view -r x	inert
-gh gist view -w	inert
 gh gist view -y	inert
 gh gist view abc123	inert
 gh gist view x	inert
@@ -4099,15 +4001,13 @@ gh gist watch --json x	inert
 gh gist watch --ref x	inert
 gh gist watch --repo x	inert
 gh gist watch --template x	inert
-gh gist watch --web	inert
-gh gist watch --web --jq x	inert
-gh gist watch --web --yaml	inert
-gh gist watch --web x	inert
 gh gist watch --yaml	inert
+gh gist watch --yaml --jq x	inert
+gh gist watch --yaml -y	inert
+gh gist watch --yaml x	inert
 gh gist watch -R x	inert
 gh gist watch -q x	inert
 gh gist watch -r x	inert
-gh gist watch -w	inert
 gh gist watch -y	inert
 gh gist watch x	inert
 gh gpg-key checks	denied
@@ -4122,11 +4022,9 @@ gh gpg-key checks --repo x	inert
 gh gpg-key checks --required	inert
 gh gpg-key checks --template x	inert
 gh gpg-key checks --watch	inert
-gh gpg-key checks --web	inert
 gh gpg-key checks -R x	inert
 gh gpg-key checks -i x	inert
 gh gpg-key checks -q x	inert
-gh gpg-key checks -w	inert
 gh gpg-key checks x	inert
 gh gpg-key diff	denied
 gh gpg-key diff --color x	inert
@@ -4136,9 +4034,7 @@ gh gpg-key diff --name-only --patch	inert
 gh gpg-key diff --name-only x	inert
 gh gpg-key diff --patch	inert
 gh gpg-key diff --repo x	inert
-gh gpg-key diff --web	inert
 gh gpg-key diff -R x	inert
-gh gpg-key diff -w	inert
 gh gpg-key diff x	inert
 gh gpg-key list	inert
 gh gpg-key list --all	inert
@@ -4176,7 +4072,6 @@ gh gpg-key list --template x	inert
 gh gpg-key list --topic x	inert
 gh gpg-key list --user x	inert
 gh gpg-key list --visibility x	inert
-gh gpg-key list --web	inert
 gh gpg-key list -B x	inert
 gh gpg-key list -H x	inert
 gh gpg-key list -L x	inert
@@ -4191,7 +4086,6 @@ gh gpg-key list -o x	inert
 gh gpg-key list -q x	inert
 gh gpg-key list -r x	inert
 gh gpg-key list -u x	inert
-gh gpg-key list -w	inert
 gh gpg-key list x	inert
 gh gpg-key status	denied
 gh gpg-key status --exit-status	inert
@@ -4204,10 +4098,8 @@ gh gpg-key status --log	inert
 gh gpg-key status --log-failed	inert
 gh gpg-key status --repo x	inert
 gh gpg-key status --template x	inert
-gh gpg-key status --web	inert
 gh gpg-key status -R x	inert
 gh gpg-key status -q x	inert
-gh gpg-key status -w	inert
 gh gpg-key status x	inert
 gh gpg-key verify	denied
 gh gpg-key verify --jq x	inert
@@ -4215,36 +4107,32 @@ gh gpg-key verify --json x	inert
 gh gpg-key verify --ref x	inert
 gh gpg-key verify --repo x	inert
 gh gpg-key verify --template x	inert
-gh gpg-key verify --web	inert
-gh gpg-key verify --web --jq x	inert
-gh gpg-key verify --web --yaml	inert
-gh gpg-key verify --web x	inert
 gh gpg-key verify --yaml	inert
+gh gpg-key verify --yaml --jq x	inert
+gh gpg-key verify --yaml -y	inert
+gh gpg-key verify --yaml x	inert
 gh gpg-key verify -R x	inert
 gh gpg-key verify -q x	inert
 gh gpg-key verify -r x	inert
-gh gpg-key verify -w	inert
 gh gpg-key verify -y	inert
 gh gpg-key verify x	inert
 gh gpg-key view	denied
 gh gpg-key view --branch x	inert
 gh gpg-key view --comments	inert
 gh gpg-key view --comments --branch x	inert
-gh gpg-key view --comments --web	inert
+gh gpg-key view --comments --yaml	inert
 gh gpg-key view --comments x	inert
 gh gpg-key view --jq x	inert
 gh gpg-key view --json x	inert
 gh gpg-key view --ref x	inert
 gh gpg-key view --repo x	inert
 gh gpg-key view --template x	inert
-gh gpg-key view --web	inert
 gh gpg-key view --yaml	inert
 gh gpg-key view -R x	inert
 gh gpg-key view -b x	inert
 gh gpg-key view -c	inert
 gh gpg-key view -q x	inert
 gh gpg-key view -r x	inert
-gh gpg-key view -w	inert
 gh gpg-key view -y	inert
 gh gpg-key view x	inert
 gh gpg-key watch	denied
@@ -4253,15 +4141,13 @@ gh gpg-key watch --json x	inert
 gh gpg-key watch --ref x	inert
 gh gpg-key watch --repo x	inert
 gh gpg-key watch --template x	inert
-gh gpg-key watch --web	inert
-gh gpg-key watch --web --jq x	inert
-gh gpg-key watch --web --yaml	inert
-gh gpg-key watch --web x	inert
 gh gpg-key watch --yaml	inert
+gh gpg-key watch --yaml --jq x	inert
+gh gpg-key watch --yaml -y	inert
+gh gpg-key watch --yaml x	inert
 gh gpg-key watch -R x	inert
 gh gpg-key watch -q x	inert
 gh gpg-key watch -r x	inert
-gh gpg-key watch -w	inert
 gh gpg-key watch -y	inert
 gh gpg-key watch x	inert
 gh issue --help	inert
@@ -4277,11 +4163,9 @@ gh issue checks --repo x	inert
 gh issue checks --required	inert
 gh issue checks --template x	inert
 gh issue checks --watch	inert
-gh issue checks --web	inert
 gh issue checks -R x	inert
 gh issue checks -i x	inert
 gh issue checks -q x	inert
-gh issue checks -w	inert
 gh issue checks x	inert
 gh issue diff	denied
 gh issue diff --color x	inert
@@ -4291,9 +4175,7 @@ gh issue diff --name-only --patch	inert
 gh issue diff --name-only x	inert
 gh issue diff --patch	inert
 gh issue diff --repo x	inert
-gh issue diff --web	inert
 gh issue diff -R x	inert
-gh issue diff -w	inert
 gh issue diff x	inert
 gh issue download	denied
 gh issue list	inert
@@ -4334,7 +4216,6 @@ gh issue list --template x	inert
 gh issue list --topic x	inert
 gh issue list --user x	inert
 gh issue list --visibility x	inert
-gh issue list --web	inert
 gh issue list -B x	inert
 gh issue list -H x	inert
 gh issue list -L x	inert
@@ -4350,7 +4231,6 @@ gh issue list -q '.[] | .title' --json title	inert
 gh issue list -q x	inert
 gh issue list -r x	inert
 gh issue list -u x	inert
-gh issue list -w	inert
 gh issue list x	inert
 gh issue status	denied
 gh issue status --exit-status	inert
@@ -4363,10 +4243,8 @@ gh issue status --log	inert
 gh issue status --log-failed	inert
 gh issue status --repo x	inert
 gh issue status --template x	inert
-gh issue status --web	inert
 gh issue status -R x	inert
 gh issue status -q x	inert
-gh issue status -w	inert
 gh issue status x	inert
 gh issue verify	denied
 gh issue verify --jq x	inert
@@ -4374,36 +4252,32 @@ gh issue verify --json x	inert
 gh issue verify --ref x	inert
 gh issue verify --repo x	inert
 gh issue verify --template x	inert
-gh issue verify --web	inert
-gh issue verify --web --jq x	inert
-gh issue verify --web --yaml	inert
-gh issue verify --web x	inert
 gh issue verify --yaml	inert
+gh issue verify --yaml --jq x	inert
+gh issue verify --yaml -y	inert
+gh issue verify --yaml x	inert
 gh issue verify -R x	inert
 gh issue verify -q x	inert
 gh issue verify -r x	inert
-gh issue verify -w	inert
 gh issue verify -y	inert
 gh issue verify x	inert
 gh issue view	denied
 gh issue view --branch x	inert
 gh issue view --comments	inert
 gh issue view --comments --branch x	inert
-gh issue view --comments --web	inert
+gh issue view --comments --yaml	inert
 gh issue view --comments x	inert
 gh issue view --jq x	inert
 gh issue view --json x	inert
 gh issue view --ref x	inert
 gh issue view --repo x	inert
 gh issue view --template x	inert
-gh issue view --web	inert
 gh issue view --yaml	inert
 gh issue view -R x	inert
 gh issue view -b x	inert
 gh issue view -c	inert
 gh issue view -q x	inert
 gh issue view -r x	inert
-gh issue view -w	inert
 gh issue view -y	inert
 gh issue view 456	inert
 gh issue view x	inert
@@ -4413,15 +4287,13 @@ gh issue watch --json x	inert
 gh issue watch --ref x	inert
 gh issue watch --repo x	inert
 gh issue watch --template x	inert
-gh issue watch --web	inert
-gh issue watch --web --jq x	inert
-gh issue watch --web --yaml	inert
-gh issue watch --web x	inert
 gh issue watch --yaml	inert
+gh issue watch --yaml --jq x	inert
+gh issue watch --yaml -y	inert
+gh issue watch --yaml x	inert
 gh issue watch -R x	inert
 gh issue watch -q x	inert
 gh issue watch -r x	inert
-gh issue watch -w	inert
 gh issue watch -y	inert
 gh issue watch x	inert
 gh label checks	denied
@@ -4436,11 +4308,9 @@ gh label checks --repo x	inert
 gh label checks --required	inert
 gh label checks --template x	inert
 gh label checks --watch	inert
-gh label checks --web	inert
 gh label checks -R x	inert
 gh label checks -i x	inert
 gh label checks -q x	inert
-gh label checks -w	inert
 gh label checks x	inert
 gh label diff	denied
 gh label diff --color x	inert
@@ -4450,9 +4320,7 @@ gh label diff --name-only --patch	inert
 gh label diff --name-only x	inert
 gh label diff --patch	inert
 gh label diff --repo x	inert
-gh label diff --web	inert
 gh label diff -R x	inert
-gh label diff -w	inert
 gh label diff x	inert
 gh label list	inert
 gh label list --all	inert
@@ -4492,7 +4360,6 @@ gh label list --template x	inert
 gh label list --topic x	inert
 gh label list --user x	inert
 gh label list --visibility x	inert
-gh label list --web	inert
 gh label list -B x	inert
 gh label list -H x	inert
 gh label list -L x	inert
@@ -4507,7 +4374,6 @@ gh label list -o x	inert
 gh label list -q x	inert
 gh label list -r x	inert
 gh label list -u x	inert
-gh label list -w	inert
 gh label list x	inert
 gh label status	denied
 gh label status --exit-status	inert
@@ -4520,10 +4386,8 @@ gh label status --log	inert
 gh label status --log-failed	inert
 gh label status --repo x	inert
 gh label status --template x	inert
-gh label status --web	inert
 gh label status -R x	inert
 gh label status -q x	inert
-gh label status -w	inert
 gh label status x	inert
 gh label verify	denied
 gh label verify --jq x	inert
@@ -4531,36 +4395,32 @@ gh label verify --json x	inert
 gh label verify --ref x	inert
 gh label verify --repo x	inert
 gh label verify --template x	inert
-gh label verify --web	inert
-gh label verify --web --jq x	inert
-gh label verify --web --yaml	inert
-gh label verify --web x	inert
 gh label verify --yaml	inert
+gh label verify --yaml --jq x	inert
+gh label verify --yaml -y	inert
+gh label verify --yaml x	inert
 gh label verify -R x	inert
 gh label verify -q x	inert
 gh label verify -r x	inert
-gh label verify -w	inert
 gh label verify -y	inert
 gh label verify x	inert
 gh label view	denied
 gh label view --branch x	inert
 gh label view --comments	inert
 gh label view --comments --branch x	inert
-gh label view --comments --web	inert
+gh label view --comments --yaml	inert
 gh label view --comments x	inert
 gh label view --jq x	inert
 gh label view --json x	inert
 gh label view --ref x	inert
 gh label view --repo x	inert
 gh label view --template x	inert
-gh label view --web	inert
 gh label view --yaml	inert
 gh label view -R x	inert
 gh label view -b x	inert
 gh label view -c	inert
 gh label view -q x	inert
 gh label view -r x	inert
-gh label view -w	inert
 gh label view -y	inert
 gh label view x	inert
 gh label watch	denied
@@ -4569,15 +4429,13 @@ gh label watch --json x	inert
 gh label watch --ref x	inert
 gh label watch --repo x	inert
 gh label watch --template x	inert
-gh label watch --web	inert
-gh label watch --web --jq x	inert
-gh label watch --web --yaml	inert
-gh label watch --web x	inert
 gh label watch --yaml	inert
+gh label watch --yaml --jq x	inert
+gh label watch --yaml -y	inert
+gh label watch --yaml x	inert
 gh label watch -R x	inert
 gh label watch -q x	inert
 gh label watch -r x	inert
-gh label watch -w	inert
 gh label watch -y	inert
 gh label watch x	inert
 gh org checks	denied
@@ -4592,11 +4450,9 @@ gh org checks --repo x	inert
 gh org checks --required	inert
 gh org checks --template x	inert
 gh org checks --watch	inert
-gh org checks --web	inert
 gh org checks -R x	inert
 gh org checks -i x	inert
 gh org checks -q x	inert
-gh org checks -w	inert
 gh org checks x	inert
 gh org diff	denied
 gh org diff --color x	inert
@@ -4606,9 +4462,7 @@ gh org diff --name-only --patch	inert
 gh org diff --name-only x	inert
 gh org diff --patch	inert
 gh org diff --repo x	inert
-gh org diff --web	inert
 gh org diff -R x	inert
-gh org diff -w	inert
 gh org diff x	inert
 gh org list	inert
 gh org list --all	inert
@@ -4646,7 +4500,6 @@ gh org list --template x	inert
 gh org list --topic x	inert
 gh org list --user x	inert
 gh org list --visibility x	inert
-gh org list --web	inert
 gh org list -B x	inert
 gh org list -H x	inert
 gh org list -L x	inert
@@ -4661,7 +4514,6 @@ gh org list -o x	inert
 gh org list -q x	inert
 gh org list -r x	inert
 gh org list -u x	inert
-gh org list -w	inert
 gh org list x	inert
 gh org status	denied
 gh org status --exit-status	inert
@@ -4674,10 +4526,8 @@ gh org status --log	inert
 gh org status --log-failed	inert
 gh org status --repo x	inert
 gh org status --template x	inert
-gh org status --web	inert
 gh org status -R x	inert
 gh org status -q x	inert
-gh org status -w	inert
 gh org status x	inert
 gh org verify	denied
 gh org verify --jq x	inert
@@ -4685,36 +4535,32 @@ gh org verify --json x	inert
 gh org verify --ref x	inert
 gh org verify --repo x	inert
 gh org verify --template x	inert
-gh org verify --web	inert
-gh org verify --web --jq x	inert
-gh org verify --web --yaml	inert
-gh org verify --web x	inert
 gh org verify --yaml	inert
+gh org verify --yaml --jq x	inert
+gh org verify --yaml -y	inert
+gh org verify --yaml x	inert
 gh org verify -R x	inert
 gh org verify -q x	inert
 gh org verify -r x	inert
-gh org verify -w	inert
 gh org verify -y	inert
 gh org verify x	inert
 gh org view	denied
 gh org view --branch x	inert
 gh org view --comments	inert
 gh org view --comments --branch x	inert
-gh org view --comments --web	inert
+gh org view --comments --yaml	inert
 gh org view --comments x	inert
 gh org view --jq x	inert
 gh org view --json x	inert
 gh org view --ref x	inert
 gh org view --repo x	inert
 gh org view --template x	inert
-gh org view --web	inert
 gh org view --yaml	inert
 gh org view -R x	inert
 gh org view -b x	inert
 gh org view -c	inert
 gh org view -q x	inert
 gh org view -r x	inert
-gh org view -w	inert
 gh org view -y	inert
 gh org view x	inert
 gh org watch	denied
@@ -4723,15 +4569,13 @@ gh org watch --json x	inert
 gh org watch --ref x	inert
 gh org watch --repo x	inert
 gh org watch --template x	inert
-gh org watch --web	inert
-gh org watch --web --jq x	inert
-gh org watch --web --yaml	inert
-gh org watch --web x	inert
 gh org watch --yaml	inert
+gh org watch --yaml --jq x	inert
+gh org watch --yaml -y	inert
+gh org watch --yaml x	inert
 gh org watch -R x	inert
 gh org watch -q x	inert
 gh org watch -r x	inert
-gh org watch -w	inert
 gh org watch -y	inert
 gh org watch x	inert
 gh pr --help	inert
@@ -4747,11 +4591,9 @@ gh pr checks --repo x	inert
 gh pr checks --required	inert
 gh pr checks --template x	inert
 gh pr checks --watch	inert
-gh pr checks --web	inert
 gh pr checks -R x	inert
 gh pr checks -i x	inert
 gh pr checks -q x	inert
-gh pr checks -w	inert
 gh pr checks 123	inert
 gh pr checks 123 --required	inert
 gh pr checks 123 --watch	inert
@@ -4765,9 +4607,7 @@ gh pr diff --name-only --patch	inert
 gh pr diff --name-only x	inert
 gh pr diff --patch	inert
 gh pr diff --repo x	inert
-gh pr diff --web	inert
 gh pr diff -R x	inert
-gh pr diff -w	inert
 gh pr diff 123	inert
 gh pr diff 123 --color always	inert
 gh pr diff 123 --name-only	inert
@@ -4816,7 +4656,7 @@ gh pr list --template x	inert
 gh pr list --topic x	inert
 gh pr list --user x	inert
 gh pr list --visibility x	inert
-gh pr list --web	inert
+gh pr list --web	denied
 gh pr list -B x	inert
 gh pr list -H x	inert
 gh pr list -L x	inert
@@ -4831,7 +4671,7 @@ gh pr list -o x	inert
 gh pr list -q x	inert
 gh pr list -r x	inert
 gh pr list -u x	inert
-gh pr list -w	inert
+gh pr list -w	denied
 gh pr list x	inert
 gh pr status	denied
 gh pr status --exit-status	inert
@@ -4844,10 +4684,8 @@ gh pr status --log	inert
 gh pr status --log-failed	inert
 gh pr status --repo x	inert
 gh pr status --template x	inert
-gh pr status --web	inert
 gh pr status -R x	inert
 gh pr status -q x	inert
-gh pr status -w	inert
 gh pr status x	inert
 gh pr verify	denied
 gh pr verify --jq x	inert
@@ -4855,42 +4693,37 @@ gh pr verify --json x	inert
 gh pr verify --ref x	inert
 gh pr verify --repo x	inert
 gh pr verify --template x	inert
-gh pr verify --web	inert
-gh pr verify --web --jq x	inert
-gh pr verify --web --yaml	inert
-gh pr verify --web x	inert
 gh pr verify --yaml	inert
+gh pr verify --yaml --jq x	inert
+gh pr verify --yaml -y	inert
+gh pr verify --yaml x	inert
 gh pr verify -R x	inert
 gh pr verify -q x	inert
 gh pr verify -r x	inert
-gh pr verify -w	inert
 gh pr verify -y	inert
 gh pr verify x	inert
 gh pr view	denied
 gh pr view --branch x	inert
 gh pr view --comments	inert
 gh pr view --comments --branch x	inert
-gh pr view --comments --web	inert
+gh pr view --comments --yaml	inert
 gh pr view --comments x	inert
 gh pr view --jq x	inert
 gh pr view --json x	inert
 gh pr view --ref x	inert
 gh pr view --repo x	inert
 gh pr view --template x	inert
-gh pr view --web	inert
 gh pr view --yaml	inert
 gh pr view -R x	inert
 gh pr view -b x	inert
 gh pr view -c	inert
 gh pr view -q x	inert
 gh pr view -r x	inert
-gh pr view -w	inert
 gh pr view -y	inert
 gh pr view 123	inert
 gh pr view 123 --comments	inert
 gh pr view 123 --json title,body	inert
 gh pr view 123 --repo o/r --json title 2>&1 & gh pr view 456 --repo o/r --json title 2>&1 & wait	inert
-gh pr view 123 --web	inert
 gh pr view x	inert
 gh pr watch	denied
 gh pr watch --jq x	inert
@@ -4898,15 +4731,13 @@ gh pr watch --json x	inert
 gh pr watch --ref x	inert
 gh pr watch --repo x	inert
 gh pr watch --template x	inert
-gh pr watch --web	inert
-gh pr watch --web --jq x	inert
-gh pr watch --web --yaml	inert
-gh pr watch --web x	inert
 gh pr watch --yaml	inert
+gh pr watch --yaml --jq x	inert
+gh pr watch --yaml -y	inert
+gh pr watch --yaml x	inert
 gh pr watch -R x	inert
 gh pr watch -q x	inert
 gh pr watch -r x	inert
-gh pr watch -w	inert
 gh pr watch -y	inert
 gh pr watch x	inert
 gh project checks	denied
@@ -4921,11 +4752,9 @@ gh project checks --repo x	inert
 gh project checks --required	inert
 gh project checks --template x	inert
 gh project checks --watch	inert
-gh project checks --web	inert
 gh project checks -R x	inert
 gh project checks -i x	inert
 gh project checks -q x	inert
-gh project checks -w	inert
 gh project checks x	inert
 gh project diff	denied
 gh project diff --color x	inert
@@ -4935,9 +4764,7 @@ gh project diff --name-only --patch	inert
 gh project diff --name-only x	inert
 gh project diff --patch	inert
 gh project diff --repo x	inert
-gh project diff --web	inert
 gh project diff -R x	inert
-gh project diff -w	inert
 gh project diff x	inert
 gh project list	inert
 gh project list --all	inert
@@ -4975,7 +4802,6 @@ gh project list --template x	inert
 gh project list --topic x	inert
 gh project list --user x	inert
 gh project list --visibility x	inert
-gh project list --web	inert
 gh project list -B x	inert
 gh project list -H x	inert
 gh project list -L x	inert
@@ -4990,7 +4816,6 @@ gh project list -o x	inert
 gh project list -q x	inert
 gh project list -r x	inert
 gh project list -u x	inert
-gh project list -w	inert
 gh project list x	inert
 gh project status	denied
 gh project status --exit-status	inert
@@ -5003,10 +4828,8 @@ gh project status --log	inert
 gh project status --log-failed	inert
 gh project status --repo x	inert
 gh project status --template x	inert
-gh project status --web	inert
 gh project status -R x	inert
 gh project status -q x	inert
-gh project status -w	inert
 gh project status x	inert
 gh project verify	denied
 gh project verify --jq x	inert
@@ -5014,36 +4837,32 @@ gh project verify --json x	inert
 gh project verify --ref x	inert
 gh project verify --repo x	inert
 gh project verify --template x	inert
-gh project verify --web	inert
-gh project verify --web --jq x	inert
-gh project verify --web --yaml	inert
-gh project verify --web x	inert
 gh project verify --yaml	inert
+gh project verify --yaml --jq x	inert
+gh project verify --yaml -y	inert
+gh project verify --yaml x	inert
 gh project verify -R x	inert
 gh project verify -q x	inert
 gh project verify -r x	inert
-gh project verify -w	inert
 gh project verify -y	inert
 gh project verify x	inert
 gh project view	denied
 gh project view --branch x	inert
 gh project view --comments	inert
 gh project view --comments --branch x	inert
-gh project view --comments --web	inert
+gh project view --comments --yaml	inert
 gh project view --comments x	inert
 gh project view --jq x	inert
 gh project view --json x	inert
 gh project view --ref x	inert
 gh project view --repo x	inert
 gh project view --template x	inert
-gh project view --web	inert
 gh project view --yaml	inert
 gh project view -R x	inert
 gh project view -b x	inert
 gh project view -c	inert
 gh project view -q x	inert
 gh project view -r x	inert
-gh project view -w	inert
 gh project view -y	inert
 gh project view 1	inert
 gh project view x	inert
@@ -5053,15 +4872,13 @@ gh project watch --json x	inert
 gh project watch --ref x	inert
 gh project watch --repo x	inert
 gh project watch --template x	inert
-gh project watch --web	inert
-gh project watch --web --jq x	inert
-gh project watch --web --yaml	inert
-gh project watch --web x	inert
 gh project watch --yaml	inert
+gh project watch --yaml --jq x	inert
+gh project watch --yaml -y	inert
+gh project watch --yaml x	inert
 gh project watch -R x	inert
 gh project watch -q x	inert
 gh project watch -r x	inert
-gh project watch -w	inert
 gh project watch -y	inert
 gh project watch x	inert
 gh release --help	inert
@@ -5090,7 +4907,6 @@ gh release checks --template x	inert
 gh release checks --topic x	inert
 gh release checks --user x	inert
 gh release checks --visibility x	inert
-gh release checks --web	inert
 gh release checks -L x	inert
 gh release checks -O x	inert
 gh release checks -R x	inert
@@ -5103,7 +4919,6 @@ gh release checks -o x	inert
 gh release checks -q x	inert
 gh release checks -r x	inert
 gh release checks -u x	inert
-gh release checks -w	inert
 gh release checks x	inert
 gh release diff	inert
 gh release diff --all	inert
@@ -5130,7 +4945,6 @@ gh release diff --template x	inert
 gh release diff --topic x	inert
 gh release diff --user x	inert
 gh release diff --visibility x	inert
-gh release diff --web	inert
 gh release diff -L x	inert
 gh release diff -O x	inert
 gh release diff -R x	inert
@@ -5143,7 +4957,6 @@ gh release diff -o x	inert
 gh release diff -q x	inert
 gh release diff -r x	inert
 gh release diff -u x	inert
-gh release diff -w	inert
 gh release diff x	inert
 gh release download	denied
 gh release download --archive x	denied
@@ -5234,7 +5047,6 @@ gh release status --template x	inert
 gh release status --topic x	inert
 gh release status --user x	inert
 gh release status --visibility x	inert
-gh release status --web	inert
 gh release status -L x	inert
 gh release status -O x	inert
 gh release status -R x	inert
@@ -5247,7 +5059,6 @@ gh release status -o x	inert
 gh release status -q x	inert
 gh release status -r x	inert
 gh release status -u x	inert
-gh release status -w	inert
 gh release status x	inert
 gh release verify	inert
 gh release verify --all	inert
@@ -5274,7 +5085,6 @@ gh release verify --template x	inert
 gh release verify --topic x	inert
 gh release verify --user x	inert
 gh release verify --visibility x	inert
-gh release verify --web	inert
 gh release verify -L x	inert
 gh release verify -O x	inert
 gh release verify -R x	inert
@@ -5287,22 +5097,15 @@ gh release verify -o x	inert
 gh release verify -q x	inert
 gh release verify -r x	inert
 gh release verify -u x	inert
-gh release verify -w	inert
 gh release verify x	inert
 gh release view	denied
 gh release view --jq x	inert
 gh release view --json x	inert
 gh release view --repo x	inert
 gh release view --template x	inert
-gh release view --web	inert
-gh release view --web --jq x	inert
-gh release view --web -w	inert
-gh release view --web x	inert
 gh release view -R x	inert
 gh release view -q x	inert
-gh release view -w	inert
 gh release view v1.0	inert
-gh release view v1.0 --web	inert
 gh release view x	inert
 gh release watch	inert
 gh release watch --all	inert
@@ -5329,7 +5132,6 @@ gh release watch --template x	inert
 gh release watch --topic x	inert
 gh release watch --user x	inert
 gh release watch --visibility x	inert
-gh release watch --web	inert
 gh release watch -L x	inert
 gh release watch -O x	inert
 gh release watch -R x	inert
@@ -5342,7 +5144,6 @@ gh release watch -o x	inert
 gh release watch -q x	inert
 gh release watch -r x	inert
 gh release watch -u x	inert
-gh release watch -w	inert
 gh release watch x	inert
 gh repo checks	denied
 gh repo checks --fail-fast	inert
@@ -5356,11 +5157,9 @@ gh repo checks --repo x	inert
 gh repo checks --required	inert
 gh repo checks --template x	inert
 gh repo checks --watch	inert
-gh repo checks --web	inert
 gh repo checks -R x	inert
 gh repo checks -i x	inert
 gh repo checks -q x	inert
-gh repo checks -w	inert
 gh repo checks x	inert
 gh repo diff	denied
 gh repo diff --color x	inert
@@ -5370,9 +5169,7 @@ gh repo diff --name-only --patch	inert
 gh repo diff --name-only x	inert
 gh repo diff --patch	inert
 gh repo diff --repo x	inert
-gh repo diff --web	inert
 gh repo diff -R x	inert
-gh repo diff -w	inert
 gh repo diff x	inert
 gh repo list	inert
 gh repo list --all	inert
@@ -5411,7 +5208,6 @@ gh repo list --template x	inert
 gh repo list --topic x	inert
 gh repo list --user x	inert
 gh repo list --visibility x	inert
-gh repo list --web	inert
 gh repo list -B x	inert
 gh repo list -H x	inert
 gh repo list -L x	inert
@@ -5426,7 +5222,6 @@ gh repo list -o x	inert
 gh repo list -q x	inert
 gh repo list -r x	inert
 gh repo list -u x	inert
-gh repo list -w	inert
 gh repo list x	inert
 gh repo status	denied
 gh repo status --exit-status	inert
@@ -5439,10 +5234,8 @@ gh repo status --log	inert
 gh repo status --log-failed	inert
 gh repo status --repo x	inert
 gh repo status --template x	inert
-gh repo status --web	inert
 gh repo status -R x	inert
 gh repo status -q x	inert
-gh repo status -w	inert
 gh repo status x	inert
 gh repo verify	denied
 gh repo verify --jq x	inert
@@ -5450,36 +5243,33 @@ gh repo verify --json x	inert
 gh repo verify --ref x	inert
 gh repo verify --repo x	inert
 gh repo verify --template x	inert
-gh repo verify --web	inert
-gh repo verify --web --jq x	inert
-gh repo verify --web --yaml	inert
-gh repo verify --web x	inert
 gh repo verify --yaml	inert
+gh repo verify --yaml --jq x	inert
+gh repo verify --yaml -y	inert
+gh repo verify --yaml x	inert
 gh repo verify -R x	inert
 gh repo verify -q x	inert
 gh repo verify -r x	inert
-gh repo verify -w	inert
 gh repo verify -y	inert
 gh repo verify x	inert
 gh repo view	denied
 gh repo view --branch x	inert
 gh repo view --comments	inert
 gh repo view --comments --branch x	inert
-gh repo view --comments --web	inert
+gh repo view --comments --yaml	inert
 gh repo view --comments x	inert
 gh repo view --jq x	inert
 gh repo view --json x	inert
 gh repo view --ref x	inert
 gh repo view --repo x	inert
 gh repo view --template x	inert
-gh repo view --web	inert
+gh repo view --web	denied
 gh repo view --yaml	inert
 gh repo view -R x	inert
 gh repo view -b x	inert
 gh repo view -c	inert
 gh repo view -q x	inert
 gh repo view -r x	inert
-gh repo view -w	inert
 gh repo view -y	inert
 gh repo view owner/repo --branch dev	inert
 gh repo view x	inert
@@ -5489,15 +5279,13 @@ gh repo watch --json x	inert
 gh repo watch --ref x	inert
 gh repo watch --repo x	inert
 gh repo watch --template x	inert
-gh repo watch --web	inert
-gh repo watch --web --jq x	inert
-gh repo watch --web --yaml	inert
-gh repo watch --web x	inert
 gh repo watch --yaml	inert
+gh repo watch --yaml --jq x	inert
+gh repo watch --yaml -y	inert
+gh repo watch --yaml x	inert
 gh repo watch -R x	inert
 gh repo watch -q x	inert
 gh repo watch -r x	inert
-gh repo watch -w	inert
 gh repo watch -y	inert
 gh repo watch x	inert
 gh ruleset checks	denied
@@ -5512,11 +5300,9 @@ gh ruleset checks --repo x	inert
 gh ruleset checks --required	inert
 gh ruleset checks --template x	inert
 gh ruleset checks --watch	inert
-gh ruleset checks --web	inert
 gh ruleset checks -R x	inert
 gh ruleset checks -i x	inert
 gh ruleset checks -q x	inert
-gh ruleset checks -w	inert
 gh ruleset checks x	inert
 gh ruleset diff	denied
 gh ruleset diff --color x	inert
@@ -5526,9 +5312,7 @@ gh ruleset diff --name-only --patch	inert
 gh ruleset diff --name-only x	inert
 gh ruleset diff --patch	inert
 gh ruleset diff --repo x	inert
-gh ruleset diff --web	inert
 gh ruleset diff -R x	inert
-gh ruleset diff -w	inert
 gh ruleset diff x	inert
 gh ruleset list	inert
 gh ruleset list --all	inert
@@ -5566,7 +5350,6 @@ gh ruleset list --template x	inert
 gh ruleset list --topic x	inert
 gh ruleset list --user x	inert
 gh ruleset list --visibility x	inert
-gh ruleset list --web	inert
 gh ruleset list -B x	inert
 gh ruleset list -H x	inert
 gh ruleset list -L x	inert
@@ -5581,7 +5364,6 @@ gh ruleset list -o x	inert
 gh ruleset list -q x	inert
 gh ruleset list -r x	inert
 gh ruleset list -u x	inert
-gh ruleset list -w	inert
 gh ruleset list x	inert
 gh ruleset status	denied
 gh ruleset status --exit-status	inert
@@ -5594,10 +5376,8 @@ gh ruleset status --log	inert
 gh ruleset status --log-failed	inert
 gh ruleset status --repo x	inert
 gh ruleset status --template x	inert
-gh ruleset status --web	inert
 gh ruleset status -R x	inert
 gh ruleset status -q x	inert
-gh ruleset status -w	inert
 gh ruleset status x	inert
 gh ruleset verify	denied
 gh ruleset verify --jq x	inert
@@ -5605,36 +5385,32 @@ gh ruleset verify --json x	inert
 gh ruleset verify --ref x	inert
 gh ruleset verify --repo x	inert
 gh ruleset verify --template x	inert
-gh ruleset verify --web	inert
-gh ruleset verify --web --jq x	inert
-gh ruleset verify --web --yaml	inert
-gh ruleset verify --web x	inert
 gh ruleset verify --yaml	inert
+gh ruleset verify --yaml --jq x	inert
+gh ruleset verify --yaml -y	inert
+gh ruleset verify --yaml x	inert
 gh ruleset verify -R x	inert
 gh ruleset verify -q x	inert
 gh ruleset verify -r x	inert
-gh ruleset verify -w	inert
 gh ruleset verify -y	inert
 gh ruleset verify x	inert
 gh ruleset view	denied
 gh ruleset view --branch x	inert
 gh ruleset view --comments	inert
 gh ruleset view --comments --branch x	inert
-gh ruleset view --comments --web	inert
+gh ruleset view --comments --yaml	inert
 gh ruleset view --comments x	inert
 gh ruleset view --jq x	inert
 gh ruleset view --json x	inert
 gh ruleset view --ref x	inert
 gh ruleset view --repo x	inert
 gh ruleset view --template x	inert
-gh ruleset view --web	inert
 gh ruleset view --yaml	inert
 gh ruleset view -R x	inert
 gh ruleset view -b x	inert
 gh ruleset view -c	inert
 gh ruleset view -q x	inert
 gh ruleset view -r x	inert
-gh ruleset view -w	inert
 gh ruleset view -y	inert
 gh ruleset view 1	inert
 gh ruleset view x	inert
@@ -5644,15 +5420,13 @@ gh ruleset watch --json x	inert
 gh ruleset watch --ref x	inert
 gh ruleset watch --repo x	inert
 gh ruleset watch --template x	inert
-gh ruleset watch --web	inert
-gh ruleset watch --web --jq x	inert
-gh ruleset watch --web --yaml	inert
-gh ruleset watch --web x	inert
 gh ruleset watch --yaml	inert
+gh ruleset watch --yaml --jq x	inert
+gh ruleset watch --yaml -y	inert
+gh ruleset watch --yaml x	inert
 gh ruleset watch -R x	inert
 gh ruleset watch -q x	inert
 gh ruleset watch -r x	inert
-gh ruleset watch -w	inert
 gh ruleset watch -y	inert
 gh ruleset watch x	inert
 gh run --help	inert
@@ -5662,15 +5436,13 @@ gh run checks --json x	inert
 gh run checks --ref x	inert
 gh run checks --repo x	inert
 gh run checks --template x	inert
-gh run checks --web	inert
-gh run checks --web --jq x	inert
-gh run checks --web --yaml	inert
-gh run checks --web x	inert
 gh run checks --yaml	inert
+gh run checks --yaml --jq x	inert
+gh run checks --yaml -y	inert
+gh run checks --yaml x	inert
 gh run checks -R x	inert
 gh run checks -q x	inert
 gh run checks -r x	inert
-gh run checks -w	inert
 gh run checks -y	inert
 gh run checks x	inert
 gh run diff	denied
@@ -5679,15 +5451,13 @@ gh run diff --json x	inert
 gh run diff --ref x	inert
 gh run diff --repo x	inert
 gh run diff --template x	inert
-gh run diff --web	inert
-gh run diff --web --jq x	inert
-gh run diff --web --yaml	inert
-gh run diff --web x	inert
 gh run diff --yaml	inert
+gh run diff --yaml --jq x	inert
+gh run diff --yaml -y	inert
+gh run diff --yaml x	inert
 gh run diff -R x	inert
 gh run diff -q x	inert
 gh run diff -r x	inert
-gh run diff -w	inert
 gh run diff -y	inert
 gh run diff x	inert
 gh run list	inert
@@ -5736,15 +5506,13 @@ gh run status --json x	inert
 gh run status --ref x	inert
 gh run status --repo x	inert
 gh run status --template x	inert
-gh run status --web	inert
-gh run status --web --jq x	inert
-gh run status --web --yaml	inert
-gh run status --web x	inert
 gh run status --yaml	inert
+gh run status --yaml --jq x	inert
+gh run status --yaml -y	inert
+gh run status --yaml x	inert
 gh run status -R x	inert
 gh run status -q x	inert
 gh run status -r x	inert
-gh run status -w	inert
 gh run status -y	inert
 gh run status x	inert
 gh run verify	denied
@@ -5753,15 +5521,13 @@ gh run verify --json x	inert
 gh run verify --ref x	inert
 gh run verify --repo x	inert
 gh run verify --template x	inert
-gh run verify --web	inert
-gh run verify --web --jq x	inert
-gh run verify --web --yaml	inert
-gh run verify --web x	inert
 gh run verify --yaml	inert
+gh run verify --yaml --jq x	inert
+gh run verify --yaml -y	inert
+gh run verify --yaml x	inert
 gh run verify -R x	inert
 gh run verify -q x	inert
 gh run verify -r x	inert
-gh run verify -w	inert
 gh run verify -y	inert
 gh run verify x	inert
 gh run view	denied
@@ -5778,12 +5544,10 @@ gh run view --log-failed	inert
 gh run view --repo x	inert
 gh run view --template x	inert
 gh run view --verbose	inert
-gh run view --web	inert
 gh run view -R x	inert
 gh run view -j x	inert
 gh run view -q x	inert
 gh run view -v	inert
-gh run view -w	inert
 gh run view 789	inert
 gh run view 789 --exit-status	inert
 gh run view 789 --json conclusion	inert
@@ -5866,11 +5630,10 @@ gh search --template x	inert
 gh search --topic x	inert
 gh search --updated x	inert
 gh search --visibility x	inert
-gh search --web	inert
 gh search -L x	inert
 gh search -R x	inert
 gh search -q x	inert
-gh search -w	inert
+gh search issues bug --web	denied
 gh search issues foo	inert
 gh search issues foo --json number,title	inert
 gh search issues foo --state open	inert
@@ -5889,11 +5652,9 @@ gh secret checks --repo x	inert
 gh secret checks --required	inert
 gh secret checks --template x	inert
 gh secret checks --watch	inert
-gh secret checks --web	inert
 gh secret checks -R x	inert
 gh secret checks -i x	inert
 gh secret checks -q x	inert
-gh secret checks -w	inert
 gh secret checks x	inert
 gh secret diff	denied
 gh secret diff --color x	inert
@@ -5903,9 +5664,7 @@ gh secret diff --name-only --patch	inert
 gh secret diff --name-only x	inert
 gh secret diff --patch	inert
 gh secret diff --repo x	inert
-gh secret diff --web	inert
 gh secret diff -R x	inert
-gh secret diff -w	inert
 gh secret diff x	inert
 gh secret list	inert
 gh secret list --all	inert
@@ -5943,7 +5702,6 @@ gh secret list --template x	inert
 gh secret list --topic x	inert
 gh secret list --user x	inert
 gh secret list --visibility x	inert
-gh secret list --web	inert
 gh secret list -B x	inert
 gh secret list -H x	inert
 gh secret list -L x	inert
@@ -5958,7 +5716,6 @@ gh secret list -o x	inert
 gh secret list -q x	inert
 gh secret list -r x	inert
 gh secret list -u x	inert
-gh secret list -w	inert
 gh secret list x	inert
 gh secret status	denied
 gh secret status --exit-status	inert
@@ -5971,10 +5728,8 @@ gh secret status --log	inert
 gh secret status --log-failed	inert
 gh secret status --repo x	inert
 gh secret status --template x	inert
-gh secret status --web	inert
 gh secret status -R x	inert
 gh secret status -q x	inert
-gh secret status -w	inert
 gh secret status x	inert
 gh secret verify	denied
 gh secret verify --jq x	inert
@@ -5982,36 +5737,32 @@ gh secret verify --json x	inert
 gh secret verify --ref x	inert
 gh secret verify --repo x	inert
 gh secret verify --template x	inert
-gh secret verify --web	inert
-gh secret verify --web --jq x	inert
-gh secret verify --web --yaml	inert
-gh secret verify --web x	inert
 gh secret verify --yaml	inert
+gh secret verify --yaml --jq x	inert
+gh secret verify --yaml -y	inert
+gh secret verify --yaml x	inert
 gh secret verify -R x	inert
 gh secret verify -q x	inert
 gh secret verify -r x	inert
-gh secret verify -w	inert
 gh secret verify -y	inert
 gh secret verify x	inert
 gh secret view	denied
 gh secret view --branch x	inert
 gh secret view --comments	inert
 gh secret view --comments --branch x	inert
-gh secret view --comments --web	inert
+gh secret view --comments --yaml	inert
 gh secret view --comments x	inert
 gh secret view --jq x	inert
 gh secret view --json x	inert
 gh secret view --ref x	inert
 gh secret view --repo x	inert
 gh secret view --template x	inert
-gh secret view --web	inert
 gh secret view --yaml	inert
 gh secret view -R x	inert
 gh secret view -b x	inert
 gh secret view -c	inert
 gh secret view -q x	inert
 gh secret view -r x	inert
-gh secret view -w	inert
 gh secret view -y	inert
 gh secret view x	inert
 gh secret watch	denied
@@ -6020,15 +5771,13 @@ gh secret watch --json x	inert
 gh secret watch --ref x	inert
 gh secret watch --repo x	inert
 gh secret watch --template x	inert
-gh secret watch --web	inert
-gh secret watch --web --jq x	inert
-gh secret watch --web --yaml	inert
-gh secret watch --web x	inert
 gh secret watch --yaml	inert
+gh secret watch --yaml --jq x	inert
+gh secret watch --yaml -y	inert
+gh secret watch --yaml x	inert
 gh secret watch -R x	inert
 gh secret watch -q x	inert
 gh secret watch -r x	inert
-gh secret watch -w	inert
 gh secret watch -y	inert
 gh secret watch x	inert
 gh ssh-key checks	denied
@@ -6043,11 +5792,9 @@ gh ssh-key checks --repo x	inert
 gh ssh-key checks --required	inert
 gh ssh-key checks --template x	inert
 gh ssh-key checks --watch	inert
-gh ssh-key checks --web	inert
 gh ssh-key checks -R x	inert
 gh ssh-key checks -i x	inert
 gh ssh-key checks -q x	inert
-gh ssh-key checks -w	inert
 gh ssh-key checks x	inert
 gh ssh-key diff	denied
 gh ssh-key diff --color x	inert
@@ -6057,9 +5804,7 @@ gh ssh-key diff --name-only --patch	inert
 gh ssh-key diff --name-only x	inert
 gh ssh-key diff --patch	inert
 gh ssh-key diff --repo x	inert
-gh ssh-key diff --web	inert
 gh ssh-key diff -R x	inert
-gh ssh-key diff -w	inert
 gh ssh-key diff x	inert
 gh ssh-key list	inert
 gh ssh-key list --all	inert
@@ -6097,7 +5842,6 @@ gh ssh-key list --template x	inert
 gh ssh-key list --topic x	inert
 gh ssh-key list --user x	inert
 gh ssh-key list --visibility x	inert
-gh ssh-key list --web	inert
 gh ssh-key list -B x	inert
 gh ssh-key list -H x	inert
 gh ssh-key list -L x	inert
@@ -6112,7 +5856,6 @@ gh ssh-key list -o x	inert
 gh ssh-key list -q x	inert
 gh ssh-key list -r x	inert
 gh ssh-key list -u x	inert
-gh ssh-key list -w	inert
 gh ssh-key list x	inert
 gh ssh-key status	denied
 gh ssh-key status --exit-status	inert
@@ -6125,10 +5868,8 @@ gh ssh-key status --log	inert
 gh ssh-key status --log-failed	inert
 gh ssh-key status --repo x	inert
 gh ssh-key status --template x	inert
-gh ssh-key status --web	inert
 gh ssh-key status -R x	inert
 gh ssh-key status -q x	inert
-gh ssh-key status -w	inert
 gh ssh-key status x	inert
 gh ssh-key verify	denied
 gh ssh-key verify --jq x	inert
@@ -6136,36 +5877,32 @@ gh ssh-key verify --json x	inert
 gh ssh-key verify --ref x	inert
 gh ssh-key verify --repo x	inert
 gh ssh-key verify --template x	inert
-gh ssh-key verify --web	inert
-gh ssh-key verify --web --jq x	inert
-gh ssh-key verify --web --yaml	inert
-gh ssh-key verify --web x	inert
 gh ssh-key verify --yaml	inert
+gh ssh-key verify --yaml --jq x	inert
+gh ssh-key verify --yaml -y	inert
+gh ssh-key verify --yaml x	inert
 gh ssh-key verify -R x	inert
 gh ssh-key verify -q x	inert
 gh ssh-key verify -r x	inert
-gh ssh-key verify -w	inert
 gh ssh-key verify -y	inert
 gh ssh-key verify x	inert
 gh ssh-key view	denied
 gh ssh-key view --branch x	inert
 gh ssh-key view --comments	inert
 gh ssh-key view --comments --branch x	inert
-gh ssh-key view --comments --web	inert
+gh ssh-key view --comments --yaml	inert
 gh ssh-key view --comments x	inert
 gh ssh-key view --jq x	inert
 gh ssh-key view --json x	inert
 gh ssh-key view --ref x	inert
 gh ssh-key view --repo x	inert
 gh ssh-key view --template x	inert
-gh ssh-key view --web	inert
 gh ssh-key view --yaml	inert
 gh ssh-key view -R x	inert
 gh ssh-key view -b x	inert
 gh ssh-key view -c	inert
 gh ssh-key view -q x	inert
 gh ssh-key view -r x	inert
-gh ssh-key view -w	inert
 gh ssh-key view -y	inert
 gh ssh-key view x	inert
 gh ssh-key watch	denied
@@ -6174,15 +5911,13 @@ gh ssh-key watch --json x	inert
 gh ssh-key watch --ref x	inert
 gh ssh-key watch --repo x	inert
 gh ssh-key watch --template x	inert
-gh ssh-key watch --web	inert
-gh ssh-key watch --web --jq x	inert
-gh ssh-key watch --web --yaml	inert
-gh ssh-key watch --web x	inert
 gh ssh-key watch --yaml	inert
+gh ssh-key watch --yaml --jq x	inert
+gh ssh-key watch --yaml -y	inert
+gh ssh-key watch --yaml x	inert
 gh ssh-key watch -R x	inert
 gh ssh-key watch -q x	inert
 gh ssh-key watch -r x	inert
-gh ssh-key watch -w	inert
 gh ssh-key watch -y	inert
 gh ssh-key watch x	inert
 gh status	inert
@@ -6210,7 +5945,6 @@ gh status --template x	inert
 gh status --topic x	inert
 gh status --user x	inert
 gh status --visibility x	inert
-gh status --web	inert
 gh status -L x	inert
 gh status -O x	inert
 gh status -R x	inert
@@ -6223,7 +5957,6 @@ gh status -o x	inert
 gh status -q x	inert
 gh status -r x	inert
 gh status -u x	inert
-gh status -w	inert
 gh status x	inert
 gh variable checks	denied
 gh variable checks --fail-fast	inert
@@ -6237,11 +5970,9 @@ gh variable checks --repo x	inert
 gh variable checks --required	inert
 gh variable checks --template x	inert
 gh variable checks --watch	inert
-gh variable checks --web	inert
 gh variable checks -R x	inert
 gh variable checks -i x	inert
 gh variable checks -q x	inert
-gh variable checks -w	inert
 gh variable checks x	inert
 gh variable diff	denied
 gh variable diff --color x	inert
@@ -6251,9 +5982,7 @@ gh variable diff --name-only --patch	inert
 gh variable diff --name-only x	inert
 gh variable diff --patch	inert
 gh variable diff --repo x	inert
-gh variable diff --web	inert
 gh variable diff -R x	inert
-gh variable diff -w	inert
 gh variable diff x	inert
 gh variable list	inert
 gh variable list --all	inert
@@ -6293,7 +6022,6 @@ gh variable list --template x	inert
 gh variable list --topic x	inert
 gh variable list --user x	inert
 gh variable list --visibility x	inert
-gh variable list --web	inert
 gh variable list -B x	inert
 gh variable list -H x	inert
 gh variable list -L x	inert
@@ -6308,7 +6036,6 @@ gh variable list -o x	inert
 gh variable list -q x	inert
 gh variable list -r x	inert
 gh variable list -u x	inert
-gh variable list -w	inert
 gh variable list x	inert
 gh variable status	denied
 gh variable status --exit-status	inert
@@ -6321,10 +6048,8 @@ gh variable status --log	inert
 gh variable status --log-failed	inert
 gh variable status --repo x	inert
 gh variable status --template x	inert
-gh variable status --web	inert
 gh variable status -R x	inert
 gh variable status -q x	inert
-gh variable status -w	inert
 gh variable status x	inert
 gh variable verify	denied
 gh variable verify --jq x	inert
@@ -6332,36 +6057,32 @@ gh variable verify --json x	inert
 gh variable verify --ref x	inert
 gh variable verify --repo x	inert
 gh variable verify --template x	inert
-gh variable verify --web	inert
-gh variable verify --web --jq x	inert
-gh variable verify --web --yaml	inert
-gh variable verify --web x	inert
 gh variable verify --yaml	inert
+gh variable verify --yaml --jq x	inert
+gh variable verify --yaml -y	inert
+gh variable verify --yaml x	inert
 gh variable verify -R x	inert
 gh variable verify -q x	inert
 gh variable verify -r x	inert
-gh variable verify -w	inert
 gh variable verify -y	inert
 gh variable verify x	inert
 gh variable view	denied
 gh variable view --branch x	inert
 gh variable view --comments	inert
 gh variable view --comments --branch x	inert
-gh variable view --comments --web	inert
+gh variable view --comments --yaml	inert
 gh variable view --comments x	inert
 gh variable view --jq x	inert
 gh variable view --json x	inert
 gh variable view --ref x	inert
 gh variable view --repo x	inert
 gh variable view --template x	inert
-gh variable view --web	inert
 gh variable view --yaml	inert
 gh variable view -R x	inert
 gh variable view -b x	inert
 gh variable view -c	inert
 gh variable view -q x	inert
 gh variable view -r x	inert
-gh variable view -w	inert
 gh variable view -y	inert
 gh variable view x	inert
 gh variable watch	denied
@@ -6370,15 +6091,13 @@ gh variable watch --json x	inert
 gh variable watch --ref x	inert
 gh variable watch --repo x	inert
 gh variable watch --template x	inert
-gh variable watch --web	inert
-gh variable watch --web --jq x	inert
-gh variable watch --web --yaml	inert
-gh variable watch --web x	inert
 gh variable watch --yaml	inert
+gh variable watch --yaml --jq x	inert
+gh variable watch --yaml -y	inert
+gh variable watch --yaml x	inert
 gh variable watch -R x	inert
 gh variable watch -q x	inert
 gh variable watch -r x	inert
-gh variable watch -w	inert
 gh variable watch -y	inert
 gh variable watch x	inert
 gh workflow checks	denied
@@ -6393,11 +6112,9 @@ gh workflow checks --repo x	inert
 gh workflow checks --required	inert
 gh workflow checks --template x	inert
 gh workflow checks --watch	inert
-gh workflow checks --web	inert
 gh workflow checks -R x	inert
 gh workflow checks -i x	inert
 gh workflow checks -q x	inert
-gh workflow checks -w	inert
 gh workflow checks x	inert
 gh workflow diff	denied
 gh workflow diff --color x	inert
@@ -6407,9 +6124,7 @@ gh workflow diff --name-only --patch	inert
 gh workflow diff --name-only x	inert
 gh workflow diff --patch	inert
 gh workflow diff --repo x	inert
-gh workflow diff --web	inert
 gh workflow diff -R x	inert
-gh workflow diff -w	inert
 gh workflow diff x	inert
 gh workflow list	inert
 gh workflow list --all	inert
@@ -6447,7 +6162,6 @@ gh workflow list --template x	inert
 gh workflow list --topic x	inert
 gh workflow list --user x	inert
 gh workflow list --visibility x	inert
-gh workflow list --web	inert
 gh workflow list -B x	inert
 gh workflow list -H x	inert
 gh workflow list -L x	inert
@@ -6462,7 +6176,6 @@ gh workflow list -o x	inert
 gh workflow list -q x	inert
 gh workflow list -r x	inert
 gh workflow list -u x	inert
-gh workflow list -w	inert
 gh workflow list x	inert
 gh workflow status	denied
 gh workflow status --exit-status	inert
@@ -6475,10 +6188,8 @@ gh workflow status --log	inert
 gh workflow status --log-failed	inert
 gh workflow status --repo x	inert
 gh workflow status --template x	inert
-gh workflow status --web	inert
 gh workflow status -R x	inert
 gh workflow status -q x	inert
-gh workflow status -w	inert
 gh workflow status x	inert
 gh workflow verify	denied
 gh workflow verify --jq x	inert
@@ -6486,36 +6197,32 @@ gh workflow verify --json x	inert
 gh workflow verify --ref x	inert
 gh workflow verify --repo x	inert
 gh workflow verify --template x	inert
-gh workflow verify --web	inert
-gh workflow verify --web --jq x	inert
-gh workflow verify --web --yaml	inert
-gh workflow verify --web x	inert
 gh workflow verify --yaml	inert
+gh workflow verify --yaml --jq x	inert
+gh workflow verify --yaml -y	inert
+gh workflow verify --yaml x	inert
 gh workflow verify -R x	inert
 gh workflow verify -q x	inert
 gh workflow verify -r x	inert
-gh workflow verify -w	inert
 gh workflow verify -y	inert
 gh workflow verify x	inert
 gh workflow view	denied
 gh workflow view --branch x	inert
 gh workflow view --comments	inert
 gh workflow view --comments --branch x	inert
-gh workflow view --comments --web	inert
+gh workflow view --comments --yaml	inert
 gh workflow view --comments x	inert
 gh workflow view --jq x	inert
 gh workflow view --json x	inert
 gh workflow view --ref x	inert
 gh workflow view --repo x	inert
 gh workflow view --template x	inert
-gh workflow view --web	inert
 gh workflow view --yaml	inert
 gh workflow view -R x	inert
 gh workflow view -b x	inert
 gh workflow view -c	inert
 gh workflow view -q x	inert
 gh workflow view -r x	inert
-gh workflow view -w	inert
 gh workflow view -y	inert
 gh workflow view ci --ref main	inert
 gh workflow view ci --yaml	inert
@@ -6526,15 +6233,13 @@ gh workflow watch --json x	inert
 gh workflow watch --ref x	inert
 gh workflow watch --repo x	inert
 gh workflow watch --template x	inert
-gh workflow watch --web	inert
-gh workflow watch --web --jq x	inert
-gh workflow watch --web --yaml	inert
-gh workflow watch --web x	inert
 gh workflow watch --yaml	inert
+gh workflow watch --yaml --jq x	inert
+gh workflow watch --yaml -y	inert
+gh workflow watch --yaml x	inert
 gh workflow watch -R x	inert
 gh workflow watch -q x	inert
 gh workflow watch -r x	inert
-gh workflow watch -w	inert
 gh workflow watch -y	inert
 gh workflow watch x	inert
 gh x	denied
@@ -8915,7 +8620,6 @@ glab ci view --repo x	inert
 glab ci view --resolved	inert
 glab ci view --system-logs	inert
 glab ci view --unresolved	inert
-glab ci view --web	inert
 glab ci view -F x	inert
 glab ci view -P x	inert
 glab ci view -R x	inert
@@ -8924,7 +8628,6 @@ glab ci view -h	inert
 glab ci view -p	inert
 glab ci view -p x	inert
 glab ci view -s	inert
-glab ci view -w	inert
 glab ci view x	inert
 glab cluster diff	denied
 glab cluster diff --color x	inert
@@ -9062,7 +8765,6 @@ glab cluster view --repo x	inert
 glab cluster view --resolved	inert
 glab cluster view --system-logs	inert
 glab cluster view --unresolved	inert
-glab cluster view --web	inert
 glab cluster view -F x	inert
 glab cluster view -P x	inert
 glab cluster view -R x	inert
@@ -9071,7 +8773,6 @@ glab cluster view -h	inert
 glab cluster view -p	inert
 glab cluster view -p x	inert
 glab cluster view -s	inert
-glab cluster view -w	inert
 glab cluster view x	inert
 glab deploy-key diff	denied
 glab deploy-key diff --color x	inert
@@ -9209,7 +8910,6 @@ glab deploy-key view --repo x	inert
 glab deploy-key view --resolved	inert
 glab deploy-key view --system-logs	inert
 glab deploy-key view --unresolved	inert
-glab deploy-key view --web	inert
 glab deploy-key view -F x	inert
 glab deploy-key view -P x	inert
 glab deploy-key view -R x	inert
@@ -9218,7 +8918,6 @@ glab deploy-key view -h	inert
 glab deploy-key view -p	inert
 glab deploy-key view -p x	inert
 glab deploy-key view -s	inert
-glab deploy-key view -w	inert
 glab deploy-key view x	inert
 glab gpg-key diff	denied
 glab gpg-key diff --color x	inert
@@ -9356,7 +9055,6 @@ glab gpg-key view --repo x	inert
 glab gpg-key view --resolved	inert
 glab gpg-key view --system-logs	inert
 glab gpg-key view --unresolved	inert
-glab gpg-key view --web	inert
 glab gpg-key view -F x	inert
 glab gpg-key view -P x	inert
 glab gpg-key view -R x	inert
@@ -9365,7 +9063,6 @@ glab gpg-key view -h	inert
 glab gpg-key view -p	inert
 glab gpg-key view -p x	inert
 glab gpg-key view -s	inert
-glab gpg-key view -w	inert
 glab gpg-key view x	inert
 glab incident diff	denied
 glab incident diff --color x	inert
@@ -9503,7 +9200,6 @@ glab incident view --repo x	inert
 glab incident view --resolved	inert
 glab incident view --system-logs	inert
 glab incident view --unresolved	inert
-glab incident view --web	inert
 glab incident view -F x	inert
 glab incident view -P x	inert
 glab incident view -R x	inert
@@ -9512,7 +9208,6 @@ glab incident view -h	inert
 glab incident view -p	inert
 glab incident view -p x	inert
 glab incident view -s	inert
-glab incident view -w	inert
 glab incident view x	inert
 glab issue diff	denied
 glab issue diff --color x	inert
@@ -9651,7 +9346,6 @@ glab issue view --repo x	inert
 glab issue view --resolved	inert
 glab issue view --system-logs	inert
 glab issue view --unresolved	inert
-glab issue view --web	inert
 glab issue view -F x	inert
 glab issue view -P x	inert
 glab issue view -R x	inert
@@ -9660,7 +9354,6 @@ glab issue view -h	inert
 glab issue view -p	inert
 glab issue view -p x	inert
 glab issue view -s	inert
-glab issue view -w	inert
 glab issue view 456	inert
 glab issue view x	inert
 glab iteration diff	denied
@@ -9799,7 +9492,6 @@ glab iteration view --repo x	inert
 glab iteration view --resolved	inert
 glab iteration view --system-logs	inert
 glab iteration view --unresolved	inert
-glab iteration view --web	inert
 glab iteration view -F x	inert
 glab iteration view -P x	inert
 glab iteration view -R x	inert
@@ -9808,7 +9500,6 @@ glab iteration view -h	inert
 glab iteration view -p	inert
 glab iteration view -p x	inert
 glab iteration view -s	inert
-glab iteration view -w	inert
 glab iteration view x	inert
 glab label diff	denied
 glab label diff --color x	inert
@@ -9946,7 +9637,6 @@ glab label view --repo x	inert
 glab label view --resolved	inert
 glab label view --system-logs	inert
 glab label view --unresolved	inert
-glab label view --web	inert
 glab label view -F x	inert
 glab label view -P x	inert
 glab label view -R x	inert
@@ -9955,7 +9645,6 @@ glab label view -h	inert
 glab label view -p	inert
 glab label view -p x	inert
 glab label view -s	inert
-glab label view -w	inert
 glab label view x	inert
 glab milestone diff	denied
 glab milestone diff --color x	inert
@@ -10093,7 +9782,6 @@ glab milestone view --repo x	inert
 glab milestone view --resolved	inert
 glab milestone view --system-logs	inert
 glab milestone view --unresolved	inert
-glab milestone view --web	inert
 glab milestone view -F x	inert
 glab milestone view -P x	inert
 glab milestone view -R x	inert
@@ -10102,7 +9790,6 @@ glab milestone view -h	inert
 glab milestone view -p	inert
 glab milestone view -p x	inert
 glab milestone view -s	inert
-glab milestone view -w	inert
 glab milestone view x	inert
 glab mr diff	denied
 glab mr diff --color x	inert
@@ -10247,7 +9934,6 @@ glab mr view --repo x	inert
 glab mr view --resolved	inert
 glab mr view --system-logs	inert
 glab mr view --unresolved	inert
-glab mr view --web	inert
 glab mr view -F x	inert
 glab mr view -P x	inert
 glab mr view -R x	inert
@@ -10256,10 +9942,8 @@ glab mr view -h	inert
 glab mr view -p	inert
 glab mr view -p x	inert
 glab mr view -s	inert
-glab mr view -w	inert
 glab mr view 123	inert
 glab mr view 123 --comments	inert
-glab mr view 123 --web	inert
 glab mr view x	inert
 glab release diff	denied
 glab release diff --color x	inert
@@ -10397,7 +10081,6 @@ glab release view --repo x	inert
 glab release view --resolved	inert
 glab release view --system-logs	inert
 glab release view --unresolved	inert
-glab release view --web	inert
 glab release view -F x	inert
 glab release view -P x	inert
 glab release view -R x	inert
@@ -10406,7 +10089,6 @@ glab release view -h	inert
 glab release view -p	inert
 glab release view -p x	inert
 glab release view -s	inert
-glab release view -w	inert
 glab release view x	inert
 glab repo diff	denied
 glab repo diff --color x	inert
@@ -10544,7 +10226,6 @@ glab repo view --repo x	inert
 glab repo view --resolved	inert
 glab repo view --system-logs	inert
 glab repo view --unresolved	inert
-glab repo view --web	inert
 glab repo view -F x	inert
 glab repo view -P x	inert
 glab repo view -R x	inert
@@ -10553,7 +10234,6 @@ glab repo view -h	inert
 glab repo view -p	inert
 glab repo view -p x	inert
 glab repo view -s	inert
-glab repo view -w	inert
 glab repo view x	inert
 glab schedule diff	denied
 glab schedule diff --color x	inert
@@ -10691,7 +10371,6 @@ glab schedule view --repo x	inert
 glab schedule view --resolved	inert
 glab schedule view --system-logs	inert
 glab schedule view --unresolved	inert
-glab schedule view --web	inert
 glab schedule view -F x	inert
 glab schedule view -P x	inert
 glab schedule view -R x	inert
@@ -10700,7 +10379,6 @@ glab schedule view -h	inert
 glab schedule view -p	inert
 glab schedule view -p x	inert
 glab schedule view -s	inert
-glab schedule view -w	inert
 glab schedule view x	inert
 glab snippet diff	denied
 glab snippet diff --color x	inert
@@ -10838,7 +10516,6 @@ glab snippet view --repo x	inert
 glab snippet view --resolved	inert
 glab snippet view --system-logs	inert
 glab snippet view --unresolved	inert
-glab snippet view --web	inert
 glab snippet view -F x	inert
 glab snippet view -P x	inert
 glab snippet view -R x	inert
@@ -10847,7 +10524,6 @@ glab snippet view -h	inert
 glab snippet view -p	inert
 glab snippet view -p x	inert
 glab snippet view -s	inert
-glab snippet view -w	inert
 glab snippet view 1	inert
 glab snippet view x	inert
 glab ssh-key diff	denied
@@ -10986,7 +10662,6 @@ glab ssh-key view --repo x	inert
 glab ssh-key view --resolved	inert
 glab ssh-key view --system-logs	inert
 glab ssh-key view --unresolved	inert
-glab ssh-key view --web	inert
 glab ssh-key view -F x	inert
 glab ssh-key view -P x	inert
 glab ssh-key view -R x	inert
@@ -10995,7 +10670,6 @@ glab ssh-key view -h	inert
 glab ssh-key view -p	inert
 glab ssh-key view -p x	inert
 glab ssh-key view -s	inert
-glab ssh-key view -w	inert
 glab ssh-key view x	inert
 glab stack diff	denied
 glab stack diff --color x	inert
@@ -11133,7 +10807,6 @@ glab stack view --repo x	inert
 glab stack view --resolved	inert
 glab stack view --system-logs	inert
 glab stack view --unresolved	inert
-glab stack view --web	inert
 glab stack view -F x	inert
 glab stack view -P x	inert
 glab stack view -R x	inert
@@ -11142,7 +10815,6 @@ glab stack view -h	inert
 glab stack view -p	inert
 glab stack view -p x	inert
 glab stack view -s	inert
-glab stack view -w	inert
 glab stack view x	inert
 glab variable diff	denied
 glab variable diff --color x	inert
@@ -11280,7 +10952,6 @@ glab variable view --repo x	inert
 glab variable view --resolved	inert
 glab variable view --system-logs	inert
 glab variable view --unresolved	inert
-glab variable view --web	inert
 glab variable view -F x	inert
 glab variable view -P x	inert
 glab variable view -R x	inert
@@ -11289,7 +10960,6 @@ glab variable view -h	inert
 glab variable view -p	inert
 glab variable view -p x	inert
 glab variable view -s	inert
-glab variable view -w	inert
 glab variable view x	inert
 glab version	inert
 glab version --extra	denied

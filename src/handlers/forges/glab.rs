@@ -47,7 +47,6 @@ mod tests {
         glab_mr_list_label: "glab mr list --label bug",
         glab_mr_list_output: "glab mr list --output json",
         glab_mr_view: "glab mr view 123",
-        glab_mr_view_web: "glab mr view 123 --web",
         glab_mr_view_comments: "glab mr view 123 --comments",
         glab_mr_diff: "glab mr diff 123",
         glab_mr_diff_color: "glab mr diff 123 --color always",

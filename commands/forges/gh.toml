@@ -1,6 +1,6 @@
 [[command]]
 name = "gh"
-description = "GitHub's official CLI, a network client: nearly every subcommand is an authenticated HTTPS call to the GitHub REST or GraphQL API (api.github.com, or a GitHub Enterprise server named by --hostname or GH_HOST) using the token in the gh config or keychain. Reads: list/view/diff/checks/status of pull requests, issues, runs, releases, repositories and the like, `gh search`, `gh auth status`, and `gh api` with GET (implicit, or -X GET when fields are sent) or a GraphQL query; the output is remote data on stdout. Remote writes: `gh run rerun` re-queues a workflow run (history kept); every create/edit/close/merge/delete verb mutates remote state and is not covered, nor is a GraphQL mutation (the word `mutation` anywhere in the query is refused) or any header but Accept and X-GitHub-Api-Version. Local reads: a typed field (`-F key=@file`, `@-` for stdin) and `--input` read a file into the request and are refused. Local writes: `gh release download` writes asset bytes to the -O/--output file or -D/--dir directory, gated as a file write (stdout with `-O -`); `--cache` writes gh's own response cache. `gh browse` opens a web browser unless -n/--no-browser. Active project releasing about every two weeks with a stable command surface; flags are added, rarely removed."
+description = "GitHub's official CLI, a network client: nearly every subcommand is an authenticated HTTPS call to the GitHub REST or GraphQL API (api.github.com, or a GitHub Enterprise server named by --hostname or GH_HOST) using the token in the gh config or keychain. Reads: list/view/diff/checks/status of pull requests, issues, runs, releases, repositories and the like, `gh search`, `gh auth status`, and `gh api` with GET (implicit, or -X GET when fields are sent) or a GraphQL query; the output is remote data on stdout. Remote writes: `gh run rerun` re-queues a workflow run (history kept); every create/edit/close/merge/delete verb mutates remote state and is not covered, nor is a GraphQL mutation (the word `mutation` anywhere in the query is refused) or any header but Accept and X-GitHub-Api-Version. Local reads: a typed field (`-F key=@file`, `@-` for stdin) and `--input` read a file into the request and are refused. Local writes: `gh release download` writes asset bytes to the -O/--output file or -D/--dir directory, gated as a file write (stdout with `-O -`); `--cache` writes gh's own response cache. `gh browse` opens a web browser unless -n/--no-browser, and the --web/-w flag of a list, view, diff, checks, status or search opens the page in a browser instead of printing it; neither browser form is covered. Active project releasing about every two weeks with a stable command surface; flags are added, rarely removed."
 url = "https://cli.github.com/manual/"
 handler = "gh"
 researched_version = "v2.102.0 (2026-09-30)"
@@ -28,6 +28,7 @@ examples_denied = [
     "gh release download v1.0 -O ~/.bashrc --clobber",
     "gh release download v1.0",
     "gh browse",
+    "gh pr list --web",
 ]
 
 # --version / --help at length 2.
@@ -166,8 +167,8 @@ status = "simple_list"
 bare = true
 standalone = [
   "--all", "--archived", "--comments", "--draft",
-  "--fork", "--no-archived", "--source", "--web",
-  "-a", "-w",
+  "--fork", "--no-archived", "--source",
+  "-a",
 ]
 valued = [
   "--app", "--assignee", "--author", "--base",
@@ -182,22 +183,22 @@ valued = [
 
 [command.handler_policy.view]
 bare = false
-standalone = ["--comments", "--web", "--yaml", "-c", "-w", "-y"]
+standalone = ["--comments", "--yaml", "-c", "-y"]
 valued = ["--branch", "--jq", "--json", "--ref", "--repo", "--template", "-R", "-b", "-q", "-r"]
 
 [command.handler_policy.diff]
 bare = false
-standalone = ["--name-only", "--patch", "--web", "-w"]
+standalone = ["--name-only", "--patch"]
 valued = ["--color", "--repo", "-R"]
 
 [command.handler_policy.checks]
 bare = false
-standalone = ["--fail-fast", "--required", "--watch", "--web", "-w"]
+standalone = ["--fail-fast", "--required", "--watch"]
 valued = ["--interval", "--jq", "--json", "--repo", "--template", "-R", "-i", "-q"]
 
 [command.handler_policy.status]
 bare = false
-standalone = ["--exit-status", "--log", "--log-failed", "--web", "-w"]
+standalone = ["--exit-status", "--log", "--log-failed"]
 valued = ["--jq", "--json", "--repo", "--template", "-R", "-q"]
 
 [command.handler_policy.run_list]
@@ -212,7 +213,7 @@ valued = [
 
 [command.handler_policy.run_view]
 bare = false
-standalone = ["--exit-status", "--log", "--log-failed", "--verbose", "--web", "-v", "-w"]
+standalone = ["--exit-status", "--log", "--log-failed", "--verbose", "-v"]
 valued = ["--attempt", "--job", "--jq", "--json", "--repo", "--template", "-R", "-j", "-q"]
 
 [command.handler_policy.run_watch]
@@ -227,7 +228,7 @@ valued = ["--jq", "--json", "--limit", "--order", "--repo", "--template", "-L", 
 
 [command.handler_policy.release_view]
 bare = false
-standalone = ["--web", "-w"]
+standalone = []
 valued = ["--jq", "--json", "--repo", "--template", "-R", "-q"]
 
 [command.handler_policy.search]
@@ -235,7 +236,6 @@ bare = false
 standalone = [
   "--archived", "--draft", "--include-forks", "--locked", "--merged",
   "--no-assignee", "--no-label", "--no-milestone", "--no-project",
-  "--web", "-w",
 ]
 valued = [
   "--app", "--assignee", "--author",
@@ -260,7 +260,7 @@ valued = ["--archive", "--dir", "--output", "--pattern", "--repo", "-A", "-D", "
 
 [command.handler_policy.simple_list]
 bare = true
-standalone = ["--all", "--archived", "--fork", "--no-archived", "--source", "--web", "-a", "-w"]
+standalone = ["--all", "--archived", "--fork", "--no-archived", "--source", "-a"]
 valued = [
   "--env", "--jq", "--json", "--key", "--language", "--limit",
   "--order", "--org", "--ref", "--repo", "--search",
@@ -270,7 +270,7 @@ valued = [
 
 [command.handler_policy.simple_view]
 bare = false
-standalone = ["--web", "--yaml", "-w", "-y"]
+standalone = ["--yaml", "-y"]
 valued = ["--jq", "--json", "--ref", "--repo", "--template", "-R", "-q", "-r"]
 
 [command.handler_policy.run_rerun]

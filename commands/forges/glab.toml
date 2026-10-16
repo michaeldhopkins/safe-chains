@@ -1,6 +1,6 @@
 [[command]]
 name = "glab"
-description = "Third-party GitLab CLI (gitlab-org/cli, formerly profclems/glab). Wraps GitLab's REST/GraphQL APIs over authenticated HTTPS. Read-only operations (`glab mr list`, `glab issue view`, `glab ci status`, `glab release list`, etc.) query data; write operations like `glab mr create`, `glab issue close`, etc. are not covered. `glab api` issues arbitrary REST requests and is governed by gh's API sub-handler (read-only methods, header allowlist). Top-level always-safe forms: `glab --version`, `glab -v`, `glab version`, `glab check-update`. Active project with monthly-ish releases."
+description = "Third-party GitLab CLI (gitlab-org/cli, formerly profclems/glab). Wraps GitLab's REST/GraphQL APIs over authenticated HTTPS. Read-only operations (`glab mr list`, `glab issue view`, `glab ci status`, `glab release list`, etc.) query data; write operations like `glab mr create`, `glab issue close`, etc. are not covered. `glab api` issues arbitrary REST requests and is governed by gh's API sub-handler (read-only methods, header allowlist). `view --web` opens the page in a browser and is not covered. Top-level always-safe forms: `glab --version`, `glab -v`, `glab version`, `glab check-update`. Active project with monthly-ish releases."
 url = "https://gitlab.com/gitlab-org/cli"
 handler = "glab"
 researched_version = "glab 1.x (2026)"
@@ -76,8 +76,8 @@ valued = [
 bare = false
 standalone = [
   "--comments", "--help", "--resolved", "--system-logs",
-  "--unresolved", "--web",
-  "-c", "-h", "-p", "-s", "-w",
+  "--unresolved",
+  "-c", "-h", "-p", "-s",
 ]
 valued = [
   "--output", "--page", "--per-page", "--repo",

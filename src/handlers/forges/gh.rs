@@ -182,7 +182,6 @@ mod tests {
     safe! {
         pr_view: "gh pr view 123",
         pr_view_json: "gh pr view 123 --json title,body",
-        pr_view_web: "gh pr view 123 --web",
         pr_view_comments: "gh pr view 123 --comments",
         pr_list: "gh pr list",
         pr_list_state: "gh pr list --state open",
@@ -238,7 +237,6 @@ mod tests {
         release_list: "gh release list",
         release_list_limit: "gh release list --limit 10",
         release_view: "gh release view v1.0",
-        release_view_web: "gh release view v1.0 --web",
         release_download_stdout: "gh release download v1.0 --output -",
         release_download_pattern: "gh release download v1.0 --repo o/r --pattern 'SHA256SUMS.txt' --output -",
         release_download_short: "gh release download v1.0 -O - -p '*.tar.gz'",
@@ -361,6 +359,45 @@ mod tests {
         release_download_hook_denied: "gh release download v1.0 -O .git/hooks/pre-commit",
         release_download_output_eq_denied: "gh release download v1.0 --output=$HOME/.zshrc",
         release_download_dir_config_denied: "gh release download v1.0 -O - --dir ~/.config/fish",
+        pr_list_web_denied: "gh pr list --web",
+        pr_list_w_denied: "gh pr list -w",
+        repo_view_web_denied: "gh repo view --web",
+        search_web_denied: "gh search issues bug --web",
+    }
+
+    #[test]
+    fn no_form_that_opens_a_browser_approves() {
+        let mut forms: Vec<String> = Vec::new();
+        for parent in [
+            "alias", "attestation", "cache", "codespace", "config", "extension", "gist", "gpg-key", "issue", "label", "org", "pr",
+            "project", "repo", "ruleset", "secret", "ssh-key", "variable", "workflow", "run", "release",
+        ] {
+            for action in ["checks", "diff", "list", "status", "verify", "view", "watch"] {
+                forms.push(format!("gh {parent} {action}"));
+                forms.push(format!("gh {parent} {action} 123"));
+            }
+        }
+        for search in ["code", "commits", "issues", "prs", "repos"] {
+            forms.push(format!("gh search {search} x"));
+        }
+        forms.push("gh status".into());
+        forms.push("gh auth status".into());
+        for parent in ["mr", "issue", "ci", "release", "repo", "snippet", "label", "milestone"] {
+            for action in ["list", "view", "status", "diff"] {
+                forms.push(format!("glab {parent} {action} 123"));
+            }
+        }
+        for form in &forms {
+            for flag in ["--web", "-w"] {
+                if flag == "-w" && form.starts_with("gh run list") {
+                    continue;
+                }
+                let cmd = format!("{form} {flag}");
+                assert!(!check(&cmd), "{cmd} was approved");
+            }
+        }
+        assert!(check("gh pr view 123"), "the plain form must still approve");
+        assert!(check("gh run list -w ci.yml"), "-w names a workflow on run list");
     }
 
     proptest::proptest! {
