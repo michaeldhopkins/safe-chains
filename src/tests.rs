@@ -259,7 +259,6 @@ safe! {
     glogname_bare: "glogname",
     users_bare: "users",
     gusers_bare: "gusers",
-    gid_alias: "gid",
     guname_alias: "guname -a",
     gwho_alias: "gwho",
     gwhoami_alias: "gwhoami",
@@ -1805,7 +1804,7 @@ denied! {
     gbase64_ssh_key: "gbase64 ~/.ssh/id_rsa",
     god_ssh_key: "god ~/.ssh/id_rsa",
     gsort_aws_creds: "gsort ~/.aws/credentials",
-    gcp_ssh_key_exfil: "gcp ~/.ssh/id_rsa out",
+    gmv_ssh_key_exfil: "gmv ~/.ssh/id_rsa out",
     glink_into_system: "glink a /etc/x",
     // csplit: its first positional is a disclosing read; base name and g-alias both gated now.
     csplit_system_input: "csplit /etc/shadow 1",
@@ -1821,7 +1820,6 @@ denied! {
 safe! {
     // the aliases and csplit still work for legit workspace operations
     gcat_workspace: "gcat ./notes.txt",
-    gcp_workspace: "gcp a.txt b.txt",
     csplit_workspace_count: "csplit ./file.txt 10",
     // csplit's `/regex/` split-patterns must not be misread as absolute paths
     csplit_workspace_regex: "csplit ./book.txt /^Chapter/ {*}",

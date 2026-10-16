@@ -1,7 +1,6 @@
 [[command]]
 writes_cwd = "named"
 name = "cp"
-aliases = ["gcp"]
 description = "Copies files and directory trees on the local filesystem. Always writes new files under the user's permissions; -R/-r recurses, -f silently overwrites, -p preserves attributes, -c uses clonefile(2) on APFS. Does not reach the network. BSD cp (macOS) and GNU cp differ on long flags (only GNU exposes --recursive, --preserve, --archive long forms); the short-flag set is broadly compatible. Stable utility with a long-frozen flag surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation"
 researched_version = "GNU coreutils 9.12 + BSD cp (macOS 27)"
@@ -25,7 +24,6 @@ examples_safe = [
     "cp -a assets dist/assets",
     "cp -n config.example.toml config.toml",
     "cp -t dist a.txt b.txt",
-    "gcp -p a.txt b.txt",
 ]
 examples_denied = [
     "cp",

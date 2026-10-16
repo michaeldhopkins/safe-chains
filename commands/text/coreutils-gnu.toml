@@ -118,7 +118,6 @@ valued = [
 
 [[command]]
 name = "pr"
-aliases = ["gpr"]
 description = "Paginates and formats text for printing, with options for headers, columns, line numbering, and double-spacing. Read-only filter to stdout. Coreutils."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation"
 researched_version = "GNU coreutils 9.7"

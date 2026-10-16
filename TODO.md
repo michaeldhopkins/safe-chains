@@ -44,6 +44,15 @@ Separately, `facet_breakdown` treats `cat ~/.ssh/id_rsa | grep x` as one command
 predates the wording above. `which_place_the_why_line_names_follows_the_order_of_the_paths`
 pins today's behaviour.
 
+## DECISION NEEDED: `gs` is both Ghostscript and a common shell alias for `git stash`
+
+The Prezto git module aliases `gs` to `git stash`, so in a Prezto shell `gs` approved as
+Ghostscript runs git. Ghostscript's own name is `gs`, so dropping it would leave Ghostscript
+users with no coverage. It stays covered for now, kept by name in `KEPT` in
+`tests/shell_alias_names.rs`. The other Prezto clashes (`gid`, `gwc`, `gdu`, `gls`) were GNU
+spellings of `id`, `wc`, `du` and `ls` and were dropped. Options: keep `gs` (today), or drop it
+and leave Ghostscript to a prompt.
+
 ## DECISION NEEDED: a git store under temp is plantable without a `.git` component
 
 Writes into `.git`, `.jj`, `.hg` and `.sl` are frozen wherever they sit (`regions/metadata.rs`),
@@ -183,6 +192,7 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 
 | question | section |
 |---|---|
+| `gs` is both Ghostscript and a shell alias for `git stash` (kept today) | "DECISION NEEDED: `gs` is both Ghostscript…" |
 | Three sources disagree about what a grant NAMING a credential store does (currently fails closed) | "DECISION NEEDED: three sources disagree…" |
 | `permissions.allow` out-ranks every level, including `paranoid` | "DECISION NEEDED: `permissions.allow` out-ranks…" |
 

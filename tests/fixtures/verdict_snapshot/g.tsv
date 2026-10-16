@@ -2115,60 +2115,6 @@ gcore -s x	safe-write
 gcore -v	safe-write
 gcore -x x	safe-write
 gcore x	safe-write
-gcp	denied
-gcp --archive	denied
-gcp --archive --backup	denied
-gcp --archive --backup x	denied
-gcp --archive x	denied
-gcp --backup	denied
-gcp --backup x	denied
-gcp --force	denied
-gcp --help	denied
-gcp --interactive	denied
-gcp --no-clobber	denied
-gcp --no-dereference	denied
-gcp --no-target-directory	denied
-gcp --one-file-system	denied
-gcp --parents	denied
-gcp --preserve	denied
-gcp --preserve x	denied
-gcp --recursive	denied
-gcp --reflink	denied
-gcp --reflink x	denied
-gcp --remove-destination	denied
-gcp --sparse	denied
-gcp --sparse x	denied
-gcp --suffix x	denied
-gcp --target-directory x	denied
-gcp --update	denied
-gcp --verbose	denied
-gcp --version	denied
-gcp -H	denied
-gcp -L	denied
-gcp -N	denied
-gcp -P	denied
-gcp -R	denied
-gcp -S	denied
-gcp -S x	denied
-gcp -T	denied
-gcp -X	denied
-gcp -a	denied
-gcp -c	denied
-gcp -d	denied
-gcp -f	denied
-gcp -h	denied
-gcp -i	denied
-gcp -n	denied
-gcp -p	denied
-gcp -p a.txt b.txt	safe-write
-gcp -r	denied
-gcp -t x	denied
-gcp -u	denied
-gcp -v	denied
-gcp -x	denied
-gcp a.txt b.txt	safe-write
-gcp x	denied
-gcp ~/.ssh/id_rsa out	denied
 gcsplit	denied
 gcsplit --digits x	safe-write
 gcsplit --elide-empty-files	safe-write
@@ -2434,54 +2380,6 @@ gdirname -V	inert
 gdirname -h	inert
 gdirname -z	inert
 gdirname x	inert
-gdu	inert
-gdu --all	inert
-gdu --all --apparent-size	inert
-gdu --all --block-size x	inert
-gdu --all x	inert
-gdu --apparent-size	inert
-gdu --block-size x	inert
-gdu --bytes	inert
-gdu --count-links	inert
-gdu --dereference	inert
-gdu --dereference-args	inert
-gdu --exclude x	inert
-gdu --files0-from x	inert
-gdu --help	inert
-gdu --human-readable	inert
-gdu --inodes	inert
-gdu --max-depth x	inert
-gdu --no-dereference	inert
-gdu --null	inert
-gdu --one-file-system	inert
-gdu --separate-dirs	inert
-gdu --si	inert
-gdu --summarize	inert
-gdu --threshold x	inert
-gdu --time x	inert
-gdu --time-style x	inert
-gdu --total	inert
-gdu --version	inert
-gdu -0	inert
-gdu -B x	inert
-gdu -D	inert
-gdu -H	inert
-gdu -L	inert
-gdu -P	inert
-gdu -S	inert
-gdu -V	inert
-gdu -a	inert
-gdu -b	inert
-gdu -c	inert
-gdu -d x	inert
-gdu -h	inert
-gdu -k	inert
-gdu -l	inert
-gdu -m	inert
-gdu -s	inert
-gdu -t x	inert
-gdu -x	inert
-gdu x	inert
 gecho	inert
 gecho --help	inert
 gecho --version	inert
@@ -6766,29 +6664,6 @@ ghostty --help x	denied
 ghostty --version	inert
 ghostty -e top	denied
 ghostty x	denied
-gid	inert
-gid --context	inert
-gid --context --group	inert
-gid --context x	inert
-gid --group	inert
-gid --groups	inert
-gid --help	inert
-gid --name	inert
-gid --real	inert
-gid --user	inert
-gid --version	inert
-gid --zero	inert
-gid -G	inert
-gid -V	inert
-gid -Z	inert
-gid -g	inert
-gid -h	inert
-gid -n	inert
-gid -p	inert
-gid -r	inert
-gid -u	inert
-gid -z	inert
-gid x	inert
 gif2webp	denied
 gif2webp --help	denied
 gif2webp --version	denied
@@ -11692,91 +11567,6 @@ glow -s x	inert
 glow -v	inert
 glow -w x	inert
 glow x	inert
-gls	inert
-gls --all	inert
-gls --all --almost-all	inert
-gls --all --block-size x	inert
-gls --all x	inert
-gls --almost-all	inert
-gls --author	inert
-gls --block-size x	inert
-gls --classify	inert
-gls --color x	inert
-gls --context	inert
-gls --dereference	inert
-gls --dereference-command-line	inert
-gls --dereference-command-line-symlink-to-dir	inert
-gls --directory	inert
-gls --escape	inert
-gls --file-type	inert
-gls --format x	inert
-gls --full-time	inert
-gls --group-directories-first	inert
-gls --help	inert
-gls --hide x	inert
-gls --hide-control-chars	inert
-gls --human-readable	inert
-gls --hyperlink x	inert
-gls --ignore x	inert
-gls --indicator-style	inert
-gls --inode	inert
-gls --kibibytes	inert
-gls --literal	inert
-gls --no-group	inert
-gls --numeric-uid-gid	inert
-gls --quote-name	inert
-gls --quoting-style x	inert
-gls --recursive	inert
-gls --reverse	inert
-gls --show-control-chars	inert
-gls --si	inert
-gls --size	inert
-gls --sort x	inert
-gls --tabsize x	inert
-gls --time x	inert
-gls --time-style x	inert
-gls --version	inert
-gls --width x	inert
-gls -1	inert
-gls -A	inert
-gls -B	inert
-gls -C	inert
-gls -F	inert
-gls -G	inert
-gls -H	inert
-gls -I x	inert
-gls -L	inert
-gls -N	inert
-gls -Q	inert
-gls -R	inert
-gls -S	inert
-gls -T x	inert
-gls -U	inert
-gls -V	inert
-gls -X	inert
-gls -Z	inert
-gls -a	inert
-gls -c	inert
-gls -d	inert
-gls -f	inert
-gls -g	inert
-gls -h	inert
-gls -i	inert
-gls -k	inert
-gls -l	inert
-gls -m	inert
-gls -n	inert
-gls -o	inert
-gls -p	inert
-gls -q	inert
-gls -r	inert
-gls -s	inert
-gls -t	inert
-gls -u	inert
-gls -v	inert
-gls -w x	inert
-gls -x	inert
-gls x	inert
 gmd5sum	inert
 gmd5sum --binary	inert
 gmd5sum --binary --check	inert
@@ -11882,6 +11672,7 @@ gmv -t x	denied
 gmv -u	denied
 gmv -v	denied
 gmv x	denied
+gmv ~/.ssh/id_rsa out	denied
 gnatchop	denied
 gnatchop --help	safe-write
 gnatchop --help --version	safe-write
@@ -13139,56 +12930,6 @@ gpg -q	denied
 gpg -v	denied
 gpg secret.gpg	denied
 gpg x	denied
-gpr	inert
-gpr --columns x	inert
-gpr --double-space	inert
-gpr --double-space --columns x	inert
-gpr --double-space --expand-tabs	inert
-gpr --double-space x	inert
-gpr --expand-tabs	inert
-gpr --first-line-number	inert
-gpr --form-feed	inert
-gpr --header x	inert
-gpr --help	inert
-gpr --indent x	inert
-gpr --join-lines	inert
-gpr --length x	inert
-gpr --merge	inert
-gpr --no-file-warnings	inert
-gpr --number-lines	inert
-gpr --omit-header	inert
-gpr --omit-pagination	inert
-gpr --page-width	inert
-gpr --pages	inert
-gpr --sep-string x	inert
-gpr --separator x	inert
-gpr --show-control-chars	inert
-gpr --show-nonprinting	inert
-gpr --show-tabs	inert
-gpr --version	inert
-gpr --width x	inert
-gpr -F	inert
-gpr -J	inert
-gpr -N x	inert
-gpr -S x	inert
-gpr -T	inert
-gpr -V	inert
-gpr -W x	inert
-gpr -d	inert
-gpr -e x	inert
-gpr -f	inert
-gpr -h	inert
-gpr -i x	inert
-gpr -l	inert
-gpr -m	inert
-gpr -n x	inert
-gpr -o x	inert
-gpr -r	inert
-gpr -s x	inert
-gpr -t	inert
-gpr -v	inert
-gpr -w x	inert
-gpr x	inert
 gprintenv	inert
 gprintenv --help	inert
 gprintenv --help --null	inert
@@ -13708,50 +13449,6 @@ grep pattern file1.txt file2.txt file3.txt	safe-read
 grep secret ~/.ssh/id_rsa	denied
 grep x	inert
 grep x s3://../../etc/shadow	denied
-grev	inert
-grev --help	inert
-grev --help --version	inert
-grev --help x	inert
-grev --version	inert
-grev -V	inert
-grev -h	inert
-grev x	inert
-grm	denied
-grm --dir	denied
-grm --dir --force	denied
-grm --dir x	safe-write
-grm --force	denied
-grm --help	inert
-grm --help --dir	inert
-grm --help --force	inert
-grm --help --help	inert
-grm --help --interactive	inert
-grm --help --one-file-system	inert
-grm --help --preserve-root	inert
-grm --help --recursive	inert
-grm --help --verbose	inert
-grm --help --version	inert
-grm --help -I	inert
-grm --help -R	inert
-grm --help -d	inert
-grm --help -f	inert
-grm --help -i	inert
-grm --help -r	inert
-grm --help -v	inert
-grm --interactive	denied
-grm --one-file-system	denied
-grm --preserve-root	denied
-grm --recursive	denied
-grm --verbose	denied
-grm --version	inert
-grm -I	denied
-grm -R	denied
-grm -d	denied
-grm -f	denied
-grm -i	denied
-grm -r	denied
-grm -v	denied
-grm x	safe-write
 grmdir	denied
 grmdir --help	inert
 grmdir --help --ignore-fail-on-non-empty	inert
@@ -14550,26 +14247,6 @@ gvdir -v	inert
 gvdir -w x	inert
 gvdir -x	inert
 gvdir x	inert
-gwc	inert
-gwc --bytes	inert
-gwc --bytes --chars	inert
-gwc --bytes --total x	inert
-gwc --bytes x	safe-read
-gwc --chars	inert
-gwc --debug	inert
-gwc --help	inert
-gwc --lines	inert
-gwc --max-line-length	inert
-gwc --total x	inert
-gwc --version	inert
-gwc --words	inert
-gwc --zero-terminated	inert
-gwc -L	inert
-gwc -c	inert
-gwc -l	inert
-gwc -m	inert
-gwc -w	inert
-gwc x	safe-read
 gwho	inert
 gwho --all	inert
 gwho --all --boot	inert
