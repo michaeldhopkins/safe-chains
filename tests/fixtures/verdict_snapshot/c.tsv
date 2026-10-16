@@ -3079,19 +3079,27 @@ chef-solo -h	inert
 chef-solo -v	inert
 chef-solo x	denied
 chflags	denied
-chflags --help	denied
-chflags --version	denied
-chflags -H	safe-write
-chflags -H -L	safe-write
-chflags -H x	safe-write
-chflags -L	safe-write
-chflags -P	safe-write
-chflags -R	safe-write
-chflags -f	safe-write
-chflags -h	safe-write
-chflags -v	safe-write
-chflags -x	safe-write
+chflags --help	inert
+chflags --help --version	inert
+chflags --help x	safe-write
+chflags --version	inert
+chflags -P	denied
+chflags -R	denied
+chflags -R nodump target	safe-write
+chflags -R uchg ..	denied
+chflags -R uchg .git	denied
+chflags -RL uchg src	denied
+chflags -f	denied
+chflags -h	denied
+chflags -h hidden link-in-tree	safe-write
+chflags -v	denied
+chflags -x	denied
+chflags hidden build/out.log	safe-write
+chflags nouchg notes.txt	safe-write
+chflags uchg .git/hooks/pre-commit	denied
+chflags uchg /etc/passwd	denied
 chflags uchg secret.txt	safe-write
+chflags uchg ~/.zshrc	denied
 chflags x	safe-write
 chisel	denied
 chisel --help	inert

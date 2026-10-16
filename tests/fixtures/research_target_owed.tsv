@@ -194,7 +194,6 @@ cf	examples,version
 chalice	description,examples,no-tolerance,profiled
 checkLocalKDC	description,examples
 chef-client	description,examples
-chflags	description,examples
 chisel	description,examples
 chronic	description,examples
 circuschief	examples

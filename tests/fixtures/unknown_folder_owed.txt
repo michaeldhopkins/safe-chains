@@ -169,9 +169,6 @@ cargo sweep
 cargo swift
 cdk synth
 cdk synthesize
-chflags
-chflags uchg
-chflags x
 circo
 circo x
 circuschief

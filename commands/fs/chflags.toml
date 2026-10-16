@@ -1,8 +1,35 @@
 [[command]]
+writes_cwd = "named"
 name = "chflags"
-description = "Modifies BSD file flags on local files (archive, immutable, append-only, hidden, nodump, opaque). -R recurses; some flags require super-user. Operates only on the local filesystem. Setting system-immutable or system-append flags can lock files against the owner — undo requires the same elevation. BSD-derived utility, surface unchanged since 4.4BSD."
+description = "Sets or clears BSD file flags on each FILE operand on the local filesystem; the first operand is the FLAGS word (a comma-separated list such as uchg, nouchg, hidden, nodump, uappnd, or an octal number), not a path. It mutates inode metadata only, never file content, and never reaches the network. User flags (uchg, uappnd, hidden, nodump, opaque) are recoverable by clearing them again; system flags (schg, sappnd, arch) need the super-user to set, and schg and sappnd cannot be cleared again while the system runs at a raised securelevel. Effects to weigh: uchg or uappnd on a file another program must rewrite (a shell startup file, a repository's own files) makes later writes fail until cleared; nothing records the old flags, and -R applies the change to a whole tree. Symlink operands are followed unless -h, and -R with -L or -H also follows symlinks met inside the tree, which can lead outside it; -x stays on one file system. It has no long options: --help or --version is refused as an unknown option and prints the usage line. Part of the BSD base system on macOS and FreeBSD; the option surface has been stable since 4.4BSD, with -x the newest addition."
 url = "https://man.freebsd.org/cgi/man.cgi?chflags"
-researched_version = "macOS 14 (Apple stock, BSD-derived)"
+researched_version = "FreeBSD 15.0 + macOS 27 (Apple stock, BSD-derived)"
 level = "SafeWrite"
 bare = false
-standalone = ["-H", "-L", "-P", "-R", "-f", "-h", "-v", "-x"]
+standalone = ["--help", "--version", "-P", "-R", "-f", "-h", "-v", "-x"]
+examples_safe = [
+    "chflags hidden build/out.log",
+    "chflags nouchg notes.txt",
+    "chflags -R nodump target",
+    "chflags -h hidden link-in-tree",
+]
+examples_denied = [
+    "chflags",
+    "chflags uchg /etc/passwd",
+    "chflags uchg ~/.zshrc",
+    "chflags -R uchg .git",
+    "chflags uchg .git/hooks/pre-commit",
+    "chflags -RL uchg src",
+    "chflags -R uchg ..",
+]
+
+# chflags MUTATES each operand's flags, gated per operand by locus like chmod. The FLAGS operand is
+# read as a relative worktree path, which is harmless: a flags word never contains `/` or `~`. -R
+# recurses (unbounded scale); -L and -H, which follow links met inside the tree, are left out.
+[command.behavior]
+operation = "mutate"
+positionals = "write"
+scale = "breadth"
+standalone = ["--help", "--version", "-P", "-R", "-f", "-h", "-v", "-x"]
+[command.behavior.flags]
+"-R" = { scale = "unbounded" }
