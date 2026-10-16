@@ -21,6 +21,8 @@
 #              `--manifest-path`. Worktree allows; /tmp, home and system paths deny. This is not the
 #              read rule: `cat /tmp/x.so` is a fine read, while LOADING /tmp/x.so is not.
 #   data-path  the value names a path read or written as DATA → ordinary read/write locus.
+#   data-write the value names a file the process WRITES (a trace, a key log) → the write locus.
+#   opaque     the value cannot be judged on its own → presence denies, whatever the value.
 #   config-dir   the value is a directory whose config files programs read (HOME) → allowed only
 #                when it is absolute and lies in the project or under $HOME, and neither it nor a
 #                file in it is a temp root (so the session scratchpad), a sibling project, or the
@@ -67,6 +69,63 @@ because = "macOS library search path"
 [env.DYLD_FRAMEWORK_PATH]
 shape = "exec-path"
 because = "macOS framework search path"
+# The rest of each loader's variables. glibc's LD_* and dyld's DYLD_* also include path searches
+# (LD_ORIGIN_PATH, DYLD_FALLBACK_LIBRARY_PATH, DYLD_VERSIONED_*), a library-name swap
+# (DYLD_IMAGE_SUFFIX), profiling (LD_PROFILE) and debug output written to a named file
+# (LD_DEBUG_OUTPUT, LD_PROFILE_OUTPUT, DYLD_PRINT_TO_FILE). No build step sets one of these on a
+# command line, so every name not listed above is refused whatever its value. LD_BIND_NOW and the
+# like are refused with them; the cost is a debugging prefix that now asks.
+[env."LD_*"]
+shape = "opaque"
+because = "the rest of glibc's loader variables: further library searches, LD_PROFILE, and debug output written to a named file"
+measured = false
+[env."DYLD_*"]
+shape = "opaque"
+because = "the rest of dyld's variables: fallback and versioned library searches, DYLD_IMAGE_SUFFIX, and DYLD_PRINT_TO_FILE"
+measured = false
+
+# ── C library: locale, conversion, resolver, allocator ───────────────────────
+# glibc loads iconv converters as shared objects from GCONV_PATH, and getconf runs helper programs
+# from GETCONF_DIR. Locale data and message catalogs are parsed binary files whose readers have had
+# memory-safety bugs, so a foreign one is refused like code. GLIBC_TUNABLES and the MALLOC_*
+# tunables only change allocator behaviour (their past exploit needed a setuid binary) and stay
+# unlisted; MALLOC_TRACE names a file the process writes.
+[env.GCONV_PATH]
+shape = "exec-path"
+because = "glibc iconv loads its converter modules (.so) from these directories"
+measured = false
+[env.GETCONF_DIR]
+shape = "exec-path"
+because = "glibc getconf runs the per-environment helper programs it finds in this directory"
+measured = false
+[env.NLSPATH]
+shape = "exec-path"
+because = "the template catopen() uses to find message catalogs, parsed binary files"
+measured = false
+[env.LOCPATH]
+shape = "exec-path"
+because = "glibc reads compiled locale data from here instead of the system locales"
+measured = false
+[env.MALLOC_TRACE]
+shape = "data-write"
+because = "glibc mtrace() writes its allocation trace to this file"
+measured = false
+[env.HOSTALIASES]
+shape = "opaque"
+because = "a file of host-name aliases the resolver applies, so a name resolves to another host"
+measured = false
+[env.RES_OPTIONS]
+shape = "opaque"
+because = "overrides resolv.conf options for the process"
+measured = false
+[env.LOCALDOMAIN]
+shape = "opaque"
+because = "replaces the resolver's search domains, so a short name resolves under another domain"
+measured = false
+[env."RESOLV_*"]
+shape = "opaque"
+because = "older glibc resolver settings (RESOLV_HOST_CONF names a host.conf to read)"
+measured = false
 
 # ── Shell ────────────────────────────────────────────────────────────────────
 [env.BASH_ENV]
@@ -148,6 +207,38 @@ because = "names the directory cargo-mutants creates mutants.out in — the envi
 [env.RUSTC]
 shape = "command"
 because = "replaces the compiler cargo invokes"
+[env.CARGO_BUILD_RUSTC]
+shape = "command"
+because = "the CARGO_* config-mirror spelling of RUSTC"
+measured = false
+[env.CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER]
+shape = "command"
+because = "the CARGO_* config-mirror spelling of RUSTC_WORKSPACE_WRAPPER"
+measured = false
+[env.RUSTDOC]
+shape = "command"
+because = "replaces the rustdoc cargo doc and cargo test --doc invoke"
+measured = false
+[env.CARGO_BUILD_RUSTDOC]
+shape = "command"
+because = "the CARGO_* config-mirror spelling of RUSTDOC"
+measured = false
+[env.CARGO_HOME]
+shape = "config-dir"
+because = "cargo reads config.toml from here, which can name a rustc wrapper, a linker, aliases and credential providers"
+measured = false
+[env.MANPAGER]
+shape = "command"
+because = "man pipes the page through this, ahead of PAGER"
+measured = false
+[env.GH_PAGER]
+shape = "command"
+because = "gh pipes output through this, ahead of PAGER"
+measured = false
+[env.SSH_ASKPASS]
+shape = "command"
+because = "ssh runs this program to ask for a passphrase. SSH_ASKPASS_REQUIRE only says when it runs, so it is not listed"
+measured = false
 
 # ── Code-supplying paths ─────────────────────────────────────────────────────
 [env.PYTHONPATH]
@@ -165,6 +256,90 @@ because = "ruby load path, so a planted file satisfies a later require"
 [env.PERL5LIB]
 shape = "exec-path"
 because = "perl @INC, the lever that makes -M load attacker code"
+[env.PERLLIB]
+shape = "exec-path"
+because = "perl's older @INC variable, read when PERL5LIB is unset"
+measured = false
+[env.PERL5DB]
+shape = "opaque"
+because = "perl code the debugger runs in place of perl5db.pl under -d"
+measured = false
+[env.PYTHONUSERBASE]
+shape = "exec-path"
+because = "the user site-packages root; python processes its .pth files at startup, and a .pth line starting with import runs"
+measured = false
+[env.PYTHONWARNINGS]
+shape = "opaque"
+because = "a warning filter whose category names a module.Class, which python imports to resolve it"
+measured = false
+[env.PYTHONBREAKPOINT]
+shape = "opaque"
+because = "names the callable breakpoint() imports and calls"
+measured = false
+[env.GEM_HOME]
+shape = "exec-path"
+because = "where rubygems installs and loads gems, so a planted gem satisfies a require"
+measured = false
+[env.GEM_PATH]
+shape = "exec-path"
+because = "additional gem directories rubygems loads from"
+measured = false
+[env.BUNDLE_GEMFILE]
+shape = "exec-path"
+because = "the Gemfile bundler evaluates as Ruby"
+measured = false
+[env.RUBYGEMS_GEMDEPS]
+shape = "exec-path"
+because = "a Gemfile rubygems evaluates as Ruby at interpreter start"
+measured = false
+[env.OPENSSL_CONF]
+shape = "exec-path"
+because = "an openssl.cnf can load engines and providers, which are shared objects"
+measured = false
+[env.OPENSSL_ENGINES]
+shape = "exec-path"
+because = "the directory OpenSSL loads engine shared objects from"
+measured = false
+[env.OPENSSL_MODULES]
+shape = "exec-path"
+because = "the directory OpenSSL 3 loads provider shared objects from"
+measured = false
+[env.PKG_CONFIG_PATH]
+shape = "exec-path"
+because = "pkg-config reads .pc files from here, and the compiler and linker flags they hold (-fplugin, -Wl,…) reach the build"
+measured = false
+[env.TERMINFO]
+shape = "exec-path"
+because = "curses reads compiled terminal descriptions from here, parsed binary files"
+measured = false
+[env.TERMINFO_DIRS]
+shape = "exec-path"
+because = "as TERMINFO, a list of directories"
+measured = false
+[env.MAGIC]
+shape = "exec-path"
+because = "file and libmagic read their compiled pattern database from here, a parsed binary file"
+measured = false
+[env.SSL_CERT_FILE]
+shape = "exec-path"
+because = "replaces the CA bundle OpenSSL trusts, so a planted root certificate makes a forged server pass"
+measured = false
+[env.SSL_CERT_DIR]
+shape = "exec-path"
+because = "as SSL_CERT_FILE, a directory of CA certificates"
+measured = false
+[env.CURL_CA_BUNDLE]
+shape = "exec-path"
+because = "as SSL_CERT_FILE, for curl"
+measured = false
+[env.VIMINIT]
+shape = "opaque"
+because = "Ex commands vim runs at startup in place of the vimrc, and :! runs a program"
+measured = false
+[env.EXINIT]
+shape = "opaque"
+because = "as VIMINIT, for vi and ex"
+measured = false
 [env.PERL_USE_UNSAFE_INC]
 shape = "opaque"
 because = "puts the working directory on perl's @INC, so `-MMod` loads and runs `./Mod.pm`; a switch, not a path, so its value names nothing to gate"
@@ -210,6 +385,54 @@ because = "git config can define aliases and core.pager, so a caller-controlled 
 [env.GIT_CONFIG_SYSTEM]
 shape = "config-file"
 because = "as GIT_CONFIG_GLOBAL"
+[env.ZDOTDIR]
+shape = "config-dir"
+because = "zsh sources .zshenv (and for a login or interactive shell .zprofile and .zshrc) from this directory"
+measured = false
+[env.GH_CONFIG_DIR]
+shape = "config-dir"
+because = "gh reads config.yml from here, whose aliases can run shell commands"
+measured = false
+[env.CURL_HOME]
+shape = "config-dir"
+because = "curl reads .curlrc from here, which can add options to every request, output files among them"
+measured = false
+[env.WGETRC]
+shape = "config-file"
+because = "a wgetrc sets wget options for every run, output paths and proxies among them"
+measured = false
+[env.PIP_CONFIG_FILE]
+shape = "config-file"
+because = "a pip.conf can point installs at another package index, whose packages run setup code"
+measured = false
+[env.npm_config_script_shell]
+shape = "command"
+because = "the shell npm runs package scripts with. npm reads its npm_config_* variables in any letter case"
+measured = false
+[env.npm_config_shell]
+shape = "command"
+because = "the shell npm exec and npm explore start"
+measured = false
+[env.npm_config_git]
+shape = "command"
+because = "the git program npm runs for git dependencies"
+measured = false
+[env.npm_config_userconfig]
+shape = "config-file"
+because = "the user .npmrc npm reads, which can set script-shell, node-options and the registry"
+measured = false
+[env.npm_config_globalconfig]
+shape = "config-file"
+because = "as npm_config_userconfig, for the global npmrc"
+measured = false
+[env.GIT_TEMPLATE_DIR]
+shape = "config-file"
+because = "git init and git clone copy this directory's hooks into the new repository, where git later runs them"
+measured = false
+[env.GIT_CONFIG]
+shape = "config-file"
+because = "the file git config reads and writes, which can define aliases and core.pager"
+measured = false
 [env.R_PROFILE_USER]
 shape = "exec-path"
 because = "R sources this at startup (measured: ran under Rscript)"
@@ -239,6 +462,22 @@ because = "retargets object storage"
 [env.GIT_ALTERNATE_OBJECT_DIRECTORIES]
 shape = "data-path"
 because = "additional object directories to read"
+[env.GIT_ALLOW_PROTOCOL]
+shape = "opaque"
+because = "the transports git may use; listing ext lets a remote URL name a command git runs"
+measured = false
+[env."GIT_TRACE*"]
+shape = "data-write"
+because = "an absolute path sends git's trace (packets, curl, performance) to that file, which git creates or appends to"
+measured = false
+[env.SSLKEYLOGFILE]
+shape = "data-write"
+because = "curl, OpenSSL-based clients and browsers append TLS session secrets to this file"
+measured = false
+[env.BROWSER]
+shape = "command"
+because = "the program many tools (python webbrowser, git web--browse, gh) run to open a URL"
+measured = false
 
 # ── Env twins of flags we already gate ───────────────────────────────────────
 # A tool that mirrors its config surface into the environment gives every guarded flag a second
@@ -363,6 +602,14 @@ allowed = ["--max-old-space-size", "--max-semi-space-size", "--enable-source-map
            "--trace-deprecation", "--unhandled-rejections", "--use-openssl-ca", "--use-bundled-ca",
            "--disable-warning", "--title", "--v8-pool-size"]
 because = "node flag string; --require/--import execute (measured), --inspect exposes a debugger, --allow-* relax the permission model"
+[env.npm_config_node_options]
+shape = "option-string"
+allowed = ["--max-old-space-size", "--max-semi-space-size", "--enable-source-maps",
+           "--stack-size", "--no-warnings", "--no-deprecation", "--trace-warnings",
+           "--trace-deprecation", "--unhandled-rejections", "--use-openssl-ca", "--use-bundled-ca",
+           "--disable-warning", "--title", "--v8-pool-size"]
+because = "the NODE_OPTIONS npm passes to the scripts it runs"
+measured = false
 
 # `--config build.rustflags=[...]` is already denied; this is its environment twin. -C linker= and
 # -C link-arg= invoke an arbitrary binary (measured: the linker ran), and -Z / --extern reach
@@ -381,10 +628,61 @@ allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-check
            "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
 path_flags = [{ flag = "-Cincremental", role = "write" }]
 because = "the CARGO_* config-mirror spelling of RUSTFLAGS"
+[env.CARGO_ENCODED_RUSTFLAGS]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
+because = "cargo reads this ahead of RUSTFLAGS and build.rustflags"
+measured = false
 [env.RUSTDOCFLAGS]
 shape = "option-string"
 allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
 because = "rustdoc flag string, same family as RUSTFLAGS"
+[env.CARGO_BUILD_RUSTDOCFLAGS]
+shape = "option-string"
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
+because = "the CARGO_* config-mirror spelling of RUSTDOCFLAGS"
+measured = false
+[env.CARGO_ENCODED_RUSTDOCFLAGS]
+shape = "option-string"
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
+because = "cargo reads this ahead of RUSTDOCFLAGS and build.rustdocflags"
+measured = false
+[env.CFLAGS]
+shape = "option-string"
+allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic", "-Wshadow", "-Wconversion",
+           "-Wformat*", "-Wunused*", "-w", "-std=*", "-pedantic", "-pipe", "-fPIC", "-fPIE", "-fno-*",
+           "-march=*", "-mtune=*", "-D*", "-U*", "-pthread"]
+path_flags = [{ flag = "-I", role = "exec", sep = "space" }, { flag = "-L", role = "exec", sep = "space" }]
+because = "C compiler flags read by make and cargo build scripts; -fplugin, -B, --specs and -Wl, load code or invoke a linker"
+measured = false
+[env.CXXFLAGS]
+shape = "option-string"
+allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic", "-Wshadow", "-Wconversion",
+           "-Wformat*", "-Wunused*", "-w", "-std=*", "-pedantic", "-pipe", "-fPIC", "-fPIE", "-fno-*",
+           "-march=*", "-mtune=*", "-D*", "-U*", "-pthread"]
+path_flags = [{ flag = "-I", role = "exec", sep = "space" }, { flag = "-L", role = "exec", sep = "space" }]
+because = "as CFLAGS, for C++"
+measured = false
+[env.CPPFLAGS]
+shape = "option-string"
+allowed = ["-Wall", "-Wextra", "-Werror*", "-Wno-*", "-w", "-D*", "-U*"]
+path_flags = [{ flag = "-I", role = "exec", sep = "space" }]
+because = "as CFLAGS, for the C preprocessor"
+measured = false
+[env.LDFLAGS]
+shape = "option-string"
+allowed = ["-s", "-S", "-pthread", "-rdynamic", "-shared", "-static", "-pie", "-no-pie", "-flto*"]
+path_flags = [{ flag = "-L", role = "exec", sep = "space" }]
+because = "linker flags read by make and build scripts"
+measured = false
+[env.PYTEST_ADDOPTS]
+shape = "option-string"
+allowed = ["-v", "-q", "-s", "-x", "--tb=*", "-k", "-m", "--maxfail", "--durations", "--strict-markers", "--no-header", "-r*"]
+because = "pytest prepends these options to its command line; -p loads a plugin module and -c/--rootdir read a foreign conftest.py"
+measured = false
 
 # Applies to EVERY JVM started while set. Enumerated from the Oracle java launcher reference, then
 # MEASURED on OpenJDK 26.0.2: all three variables were confirmed to execute a `-javaagent:` jar.
@@ -436,6 +734,48 @@ allowed = [
 ]
 path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
 because = "as JAVA_TOOL_OPTIONS; takes precedence over it (measured: -javaagent ran)"
+[env.JAVA_OPTS]
+shape = "option-string"
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
+because = "passed to the JVM launcher by wrapper scripts and build tools"
+measured = false
+[env.GRADLE_OPTS]
+shape = "option-string"
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
+because = "passed to the JVM running the Gradle client and daemon"
+measured = false
+[env.MAVEN_OPTS]
+shape = "option-string"
+allowed = [
+  "-Xms*", "-Xmx*", "-Xmn*", "-Xss*", "-verbose:*",
+  "-XX:MaxDirectMemorySize", "-XX:ThreadStackSize", "-XX:MaxGCPauseMillis",
+  "-XX:ReservedCodeCacheSize", "-XX:InitialCodeCacheSize", "-XX:CompileThresholdScaling",
+  "-XX:+UseG1GC", "-XX:+UseSerialGC", "-XX:+UseParallelGC", "-XX:+UseZGC",
+  "-XX:+ScavengeBeforeFullGC", "-XX:+UseStringDeduplication",
+  "-XX:+TieredCompilation", "-XX:-TieredCompilation",
+  "-XX:+PrintCommandLineFlags", "-XX:+PrintCompilation", "-XX:+HeapDumpOnOutOfMemoryError",
+]
+path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
+because = "passed to the JVM running Maven"
+measured = false
 [env.JDK_JAVA_OPTIONS]
 shape = "option-string"
 allowed = [
@@ -492,6 +832,168 @@ because = "the depot CONTAINS config/startup.jl, so pointing it anywhere runs th
 shape = "opaque"
 measured = false
 because = "arms the CoreCLR profiler pair; the library it loads is named by CORECLR_PROFILER_PATH, so neither value certifies alone"
+[env.CARGO_REGISTRY_CREDENTIAL_PROVIDER]
+shape = "command"
+because = "cargo runs this executable to obtain registry credentials"
+measured = false
+[env.CARGO_TARGET_DIR]
+shape = "data-write"
+single_value = true
+because = "names the directory cargo writes build artifacts into (the --target-dir twin)"
+measured = false
+[env.CARGO_BUILD_TARGET_DIR]
+shape = "data-write"
+single_value = true
+because = "the CARGO_* config-mirror spelling of CARGO_TARGET_DIR"
+measured = false
+[env.RUSTUP_HOME]
+shape = "config-dir"
+single_value = true
+because = "rustup resolves toolchains under $RUSTUP_HOME/toolchains, so pointing it at a scratch directory runs binaries from there"
+measured = false
+[env.CC]
+shape = "exec-path"
+single_value = true
+because = "the C compiler invoked by make and cargo build scripts"
+measured = false
+[env.CXX]
+shape = "exec-path"
+single_value = true
+because = "the C++ compiler invoked by make and cargo build scripts"
+measured = false
+[env.LD]
+shape = "exec-path"
+single_value = true
+because = "the linker invoked by make and build scripts"
+measured = false
+[env.AR]
+shape = "exec-path"
+single_value = true
+because = "the archiver invoked by make and cargo build scripts"
+measured = false
+[env.JAVA_HOME]
+shape = "exec-path"
+single_value = true
+because = "selects the JDK directory whose bin/java the wrapper and build tools execute"
+measured = false
+[env.GRADLE_USER_HOME]
+shape = "config-dir"
+single_value = true
+because = "gradle runs init.gradle and reads gradle.properties from this directory"
+measured = false
+[env.YARN_YARN_PATH]
+shape = "exec-path"
+single_value = true
+because = "yarn executes this script in place of itself"
+measured = false
+[env.npm_config_node_gyp]
+shape = "exec-path"
+single_value = true
+because = "the node-gyp program npm runs for native addons"
+measured = false
+[env.BUNDLE_APP_CONFIG]
+shape = "config-dir"
+single_value = true
+because = "bundler reads its config file from this directory"
+measured = false
+[env.PYTEST_PLUGINS]
+shape = "exec-path"
+because = "pytest imports every plugin module named here at startup"
+measured = false
+[env.PYTHONPYCACHEPREFIX]
+shape = "data-write"
+single_value = true
+because = "python writes compiled .pyc files under this directory"
+measured = false
+[env.COVERAGE_PROCESS_START]
+shape = "exec-path"
+single_value = true
+because = "coverage.py's startup hook reads this config file at interpreter start"
+measured = false
+[env.HGRCPATH]
+shape = "config-file"
+because = "mercurial reads .hgrc files from here, whose [hooks] and [extensions] run commands and Python files"
+measured = false
+[env.TF_CLI_CONFIG_FILE]
+shape = "config-file"
+single_value = true
+because = "terraform reads CLI config from here, whose dev_overrides replace provider binaries"
+measured = false
+[env.AWS_CONFIG_FILE]
+shape = "config-file"
+single_value = true
+because = "aws reads config from here, which can set credential_process to run a command"
+measured = false
+[env.AWS_SHARED_CREDENTIALS_FILE]
+shape = "config-file"
+single_value = true
+because = "as AWS_CONFIG_FILE"
+measured = false
+[env.AWS_PAGER]
+shape = "command"
+because = "aws pipes output through this, ahead of PAGER"
+measured = false
+[env.BAT_PAGER]
+shape = "command"
+because = "bat pipes output through this, ahead of PAGER"
+measured = false
+[env.DELTA_PAGER]
+shape = "command"
+because = "delta pipes output through this, ahead of PAGER"
+measured = false
+[env.BAT_CONFIG_PATH]
+shape = "exec-path"
+single_value = true
+because = "a file of bat options, which can set --pager"
+measured = false
+[env.LESS]
+shape = "opaque"
+because = "less parses this as options before its arguments, including +cmd and -o log-file"
+measured = false
+[env.LESSKEYIN]
+shape = "exec-path"
+single_value = true
+because = "less reads key bindings and shell-escape macros from this file"
+measured = false
+[env.LESSKEY]
+shape = "exec-path"
+single_value = true
+because = "older compiled lesskey file path"
+measured = false
+[env.DOCKER_HOST]
+shape = "opaque"
+because = "redirects docker to another daemon or an ssh:// transport"
+measured = false
+[env.GOROOT]
+shape = "exec-path"
+single_value = true
+because = "relocates the Go toolchain binaries and standard library"
+measured = false
+[env.GOENV]
+shape = "exec-path"
+single_value = true
+because = "a file of default Go environment variables, GOFLAGS among them"
+measured = false
+[env.GOTOOLCHAIN]
+shape = "opaque"
+because = "selects or downloads the Go toolchain binary go executes"
+measured = false
+[env.MAKEFILES]
+shape = "exec-path"
+because = "make reads and evaluates these makefiles before the main Makefile"
+measured = false
+[env.MAKEFLAGS]
+shape = "opaque"
+because = "make parses this as options, including -f and -C"
+measured = false
+[env.MFLAGS]
+shape = "opaque"
+because = "as MAKEFLAGS"
+measured = false
+[env.GNUMAKEFLAGS]
+shape = "opaque"
+because = "GNU make parses this as options before MAKEFLAGS"
+measured = false
 
 # ── Env twins of executor FLAGS ──────────────────────────────────────────────
 # Each of these is the environment spelling of a flag that is already gated at the

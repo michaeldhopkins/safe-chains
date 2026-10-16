@@ -575,6 +575,16 @@ mechanism:
 - **Variables with no entry yet** — `GOPATH`/`GOPROXY`/`GOTOOLCHAIN`, `LUA_PATH`/`LUA_CPATH`,
   `R_HOME`, `DENO_DIR`/`DENO_AUTH_TOKENS`. These are candidates the sweep named but never researched,
   so they are ignored like any unlisted name. New research, not validation.
+- **The loader and locale audit (2026-10-15)** added `GCONV_PATH`, `GETCONF_DIR`, `NLSPATH`,
+  `LOCPATH`, the rest of `LD_*` and `DYLD_*` (opaque globs), the resolver variables
+  (`HOSTALIASES`, `RES_OPTIONS`, `LOCALDOMAIN`, `RESOLV_*`), `MALLOC_TRACE`, `PERLLIB`, `PERL5DB`,
+  `PYTHONUSERBASE`, `PYTHONWARNINGS`, `PYTHONBREAKPOINT`, `GEM_HOME`, `GEM_PATH`, `BUNDLE_GEMFILE`,
+  `RUBYGEMS_GEMDEPS`, the OpenSSL trio, `ZDOTDIR`, `GIT_TEMPLATE_DIR`, `GIT_CONFIG`,
+  `GIT_ALLOW_PROTOCOL`, `GIT_TRACE*`, `SSLKEYLOGFILE` and `BROWSER`, and the `data-write` shape for
+  the ones that name a file the process writes. All are `measured = false`. Looked at and left
+  unlisted: `GLIBC_TUNABLES` and the `MALLOC_*` tunables (allocator behaviour; the known exploit
+  needs a setuid binary), `TZ`/`TZDIR`, `TMPDIR`, `TERMINFO`, `PROMPT_COMMAND` (interactive bash
+  only). `PATH` is still open (`TODO.md`, "A PATH prefix runs a program from outside the project").
 - **Widening the option-string allowlists** as real usage turns up inert flags that were omitted. A
   missing entry costs one approval, never a wrong verdict — which is why erring narrow is right for
   the rows that were never measured.

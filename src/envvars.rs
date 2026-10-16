@@ -45,6 +45,9 @@ pub(crate) enum Shape {
     ExecPath,
     /// The value names a path read or written as data — ordinary locus rules.
     DataPath,
+    /// The value names a file the process WRITES (a trace or log) — the write locus, so a path
+    /// outside the project or into a trusted directory is refused.
+    DataWrite,
     /// The variable's effect CANNOT be certified from its own value, because the meaning depends on
     /// another assignment. `GIT_CONFIG_VALUE_0` is a command when `GIT_CONFIG_KEY_0` is
     /// `core.pager` and inert when it is `user.name`; nothing in this per-assignment model can see
@@ -176,6 +179,8 @@ struct Compiled {
     globs: Vec<(String, String, Rule)>,
 }
 
+const NPM_CONFIG: &str = "npm_config_";
+
 static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
     let src = include_str!("../envvars.toml");
     let parsed: Table = toml::from_str(src).expect("embedded envvars.toml must parse");
@@ -205,6 +210,11 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
 fn rule_of(name: &str) -> Option<&'static Rule> {
     if let Some(r) = TABLE.exact.get(name) {
         return Some(r);
+    }
+    // npm matches `npm_config_` in any letter case and reads the rest as a lowercase key in which
+    // `_` and `-` are the same.
+    if name.get(..NPM_CONFIG.len()).is_some_and(|p| p.eq_ignore_ascii_case(NPM_CONFIG)) {
+        return TABLE.exact.get(&name.to_ascii_lowercase().replace('-', "_"));
     }
     TABLE.globs.iter().find_map(|(pre, suf, rule)| {
         // `len()` guard so a single `*` cannot match the empty middle twice over — `A_*_B` must not
@@ -242,6 +252,7 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::Command => crate::command_verdict(value),
         Shape::ExecPath => exec_path_verdict(value, !rule.single_value),
         Shape::DataPath => data_path_verdict(value, !rule.single_value),
+        Shape::DataWrite => worst_element(value, crate::engine::resolve::write_target_verdict, !rule.single_value),
         Shape::Opaque => Verdict::Denied,
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
@@ -512,7 +523,7 @@ mod tests {
         assert_eq!(shape_of("GIT_CONFIG_KEY_0"), Some(Shape::Opaque));
         assert_eq!(shape_of("GIT_CONFIG_VALUE_17"), Some(Shape::Opaque));
         // ...and does not over-reach onto neighbouring names.
-        assert_eq!(shape_of("CARGO_TARGET_DIR"), None);
+        assert_eq!(shape_of("CARGO_TARGET_DIR"), Some(Shape::DataWrite));
         assert_eq!(shape_of("CARGO_TERM_COLOR"), None);
     }
 
@@ -571,6 +582,151 @@ mod integration_tests {
             "R_PROFILE_USER=/tmp/evil.R ls",
         ] {
             assert!(!crate::is_safe_command(cmd), "a measured injection vector was allowed: {cmd}");
+        }
+    }
+
+    /// The loader, locale, resolver and interpreter variables audited after `GCONV_PATH` was found
+    /// missing. Each names code, a program, or a file the process writes, from outside the project.
+    #[test]
+    fn every_audited_loader_and_locale_variable_denies_a_foreign_value() {
+        for cmd in [
+            "GCONV_PATH=/tmp/m iconv -l",
+            "GETCONF_DIR=/tmp/m getconf -a",
+            "NLSPATH=/tmp/m/%N ls",
+            "LOCPATH=/tmp/m ls",
+            "LD_ORIGIN_PATH=/tmp/m ls",
+            "LD_DEBUG_OUTPUT=/etc/m ls",
+            "LD_PROFILE=libc.so.6 ls",
+            "DYLD_FALLBACK_LIBRARY_PATH=/tmp/m ls",
+            "DYLD_FALLBACK_FRAMEWORK_PATH=/tmp/m ls",
+            "DYLD_VERSIONED_LIBRARY_PATH=/tmp/m ls",
+            "DYLD_IMAGE_SUFFIX=_m ls",
+            "DYLD_PRINT_TO_FILE=/tmp/m ls",
+            "HOSTALIASES=/tmp/m curl https://example.com",
+            "RES_OPTIONS=debug ls",
+            "LOCALDOMAIN=example.test ls",
+            "RESOLV_HOST_CONF=/tmp/m ls",
+            "MALLOC_TRACE=/etc/m ls",
+            "PERLLIB=/tmp/m perl --version",
+            "PERL5DB='BEGIN{}' perl --version",
+            "PYTHONUSERBASE=/tmp/m python3 --version",
+            "PYTHONWARNINGS=ignore::m.W python3 --version",
+            "PYTHONBREAKPOINT=m.f python3 --version",
+            "GEM_HOME=/tmp/m ruby --version",
+            "GEM_PATH=/tmp/m ruby --version",
+            "BUNDLE_GEMFILE=/tmp/m/Gemfile bundle exec rspec",
+            "RUBYGEMS_GEMDEPS=/tmp/m/Gemfile ruby --version",
+            "OPENSSL_CONF=/tmp/m.cnf openssl version",
+            "OPENSSL_ENGINES=/tmp/m openssl version",
+            "OPENSSL_MODULES=/tmp/m openssl version",
+            "ZDOTDIR=/tmp/m zsh -c ls",
+            "GIT_TEMPLATE_DIR=/tmp/m git init",
+            "GIT_CONFIG=/tmp/m.cfg git status",
+            "GIT_ALLOW_PROTOCOL=ext git status",
+            "GIT_TRACE=/etc/m git status",
+            "GIT_TRACE_PACKET=/etc/m git status",
+            "SSLKEYLOGFILE=/etc/m curl https://example.com",
+            "BROWSER='sh -c m' ls",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "an audited variable was allowed: {cmd}");
+        }
+    }
+
+    /// The second audit: build tools, pagers, prompts, editors and config locations. Each pair is
+    /// the variable with a foreign value, refused, and with a benign one, still approved.
+    #[test]
+    fn every_variable_of_the_second_audit_judges_its_value() {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work/u/proj".into()),
+            root: Some("/work/u/proj".into()),
+            ..Default::default()
+        });
+        for (foreign, benign) in [
+            ("CARGO_BUILD_RUSTC=/tmp/m cargo build", "CARGO_BUILD_RUSTC= cargo build"),
+            ("CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER=/tmp/m cargo build", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER= cargo build"),
+            ("RUSTDOC=/tmp/m cargo doc", "RUSTDOC= cargo doc"),
+            ("CARGO_BUILD_RUSTDOC=/tmp/m cargo doc", "CARGO_BUILD_RUSTDOC= cargo doc"),
+            ("CARGO_ENCODED_RUSTFLAGS='-Clinker=/tmp/m' cargo build", "CARGO_ENCODED_RUSTFLAGS=-Dwarnings cargo build"),
+            ("CARGO_ENCODED_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_ENCODED_RUSTDOCFLAGS=-Dwarnings cargo doc"),
+            ("CARGO_BUILD_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_BUILD_RUSTDOCFLAGS=-Dwarnings cargo doc"),
+            ("CARGO_REGISTRY_CREDENTIAL_PROVIDER=/tmp/m cargo build", "CARGO_REGISTRY_CREDENTIAL_PROVIDER= cargo build"),
+            ("CARGO_TARGET_DIR=/etc/m cargo build", "CARGO_TARGET_DIR=./target cargo build"),
+            ("CARGO_BUILD_TARGET_DIR=/etc/m cargo build", "CARGO_BUILD_TARGET_DIR=./target cargo build"),
+            ("CARGO_HOME=/tmp/m cargo build", "CARGO_HOME=~/.cargo cargo build"),
+            ("RUSTUP_HOME=/tmp/m cargo build", "RUSTUP_HOME=~/.rustup cargo build"),
+            ("CC=/tmp/m cargo build", "CC=clang cargo build"),
+            ("CXX=/tmp/m cargo build", "CXX=clang++ cargo build"),
+            ("LD=/tmp/m cargo build", "LD=ld cargo build"),
+            ("AR=/tmp/m cargo build", "AR=ar cargo build"),
+            ("CFLAGS='-fplugin=/tmp/m.so' cargo build", "CFLAGS='-O2 -g' cargo build"),
+            ("CXXFLAGS='-fplugin=/tmp/m.so' cargo build", "CXXFLAGS='-O2 -Wall' cargo build"),
+            ("LDFLAGS='-Wl,/tmp/m' cargo build", "LDFLAGS='-L ./lib' cargo build"),
+            ("GRADLE_OPTS='-javaagent:/tmp/m.jar' gradle test", "GRADLE_OPTS=-Xmx2g gradle test"),
+            ("MAVEN_OPTS='-javaagent:/tmp/m.jar' mvn test", "MAVEN_OPTS=-Xmx2g mvn test"),
+            ("JAVA_OPTS='-javaagent:/tmp/m.jar' java -version", "JAVA_OPTS=-Xmx2g java -version"),
+            ("JAVA_HOME=/tmp/m gradle test", "JAVA_HOME=./jdk gradle test"),
+            ("GRADLE_USER_HOME=/tmp/m gradle test", "GRADLE_USER_HOME=~/.gradle gradle test"),
+            ("YARN_YARN_PATH=/tmp/m.js ls", "YARN_YARN_PATH=./.yarn/releases/yarn.cjs ls"),
+            ("npm_config_node_gyp=/tmp/m npm test", "npm_config_node_gyp=./scripts/gyp npm test"),
+            ("BUNDLE_APP_CONFIG=/tmp/m bundle exec rspec", "BUNDLE_APP_CONFIG=~/.bundle bundle exec rspec"),
+            ("PYTEST_ADDOPTS='-p /tmp/m' pytest", "PYTEST_ADDOPTS='-v -q' pytest"),
+            ("PYTEST_PLUGINS=/tmp/m pytest", "PYTEST_PLUGINS=./plugin.py pytest"),
+            ("PYTHONPYCACHEPREFIX=/etc/m pytest", "PYTHONPYCACHEPREFIX=./.cache pytest"),
+            ("COVERAGE_PROCESS_START=/tmp/m pytest", "COVERAGE_PROCESS_START=./.coveragerc pytest"),
+            ("HGRCPATH=/tmp/m ls", "HGRCPATH=/work/u/proj/hgrc ls"),
+            ("TF_CLI_CONFIG_FILE=/tmp/m ls", "TF_CLI_CONFIG_FILE=/work/u/proj/terraformrc ls"),
+            ("AWS_CONFIG_FILE=/tmp/m ls", "AWS_CONFIG_FILE=/work/u/proj/aws.cfg ls"),
+            ("AWS_SHARED_CREDENTIALS_FILE=/tmp/m ls", "AWS_SHARED_CREDENTIALS_FILE=/work/u/proj/aws.cred ls"),
+            ("AWS_PAGER='sh -c m' ls", "AWS_PAGER=cat ls"),
+            ("BAT_PAGER='sh -c m' ls", "BAT_PAGER=cat ls"),
+            ("DELTA_PAGER='sh -c m' ls", "DELTA_PAGER=cat ls"),
+            ("BAT_CONFIG_PATH=/tmp/m ls", "BAT_CONFIG_PATH=./bat.conf ls"),
+            ("LESS='+/!m' ls", "LESS= ls"),
+            ("LESSKEYIN=/tmp/m ls", "LESSKEYIN=./lesskey ls"),
+            ("DOCKER_HOST=ssh://m ls", "DOCKER_HOST= ls"),
+            ("GOROOT=/tmp/m go list ./...", "GOROOT=./go go list ./..."),
+            ("GOENV=/tmp/m go list ./...", "GOENV=./go.env go list ./..."),
+            ("GOTOOLCHAIN=path go list ./...", "GOTOOLCHAIN= go list ./..."),
+            ("MAKEFILES=/tmp/m ls", "MAKEFILES=./extra.mk ls"),
+            ("MAKEFLAGS='-f /tmp/m' ls", "MAKEFLAGS= ls"),
+            ("npm_config_script_shell=/tmp/m npm test", "npm_config_script_shell=cat npm test"),
+            ("NPM_CONFIG_SCRIPT_SHELL=/tmp/m npm test", "NPM_CONFIG_SCRIPT_SHELL=cat npm test"),
+            ("Npm_Config_Script-Shell=/tmp/m npm test", "npm_config_loglevel=silent npm test"),
+            ("npm_config_shell=/tmp/m npm test", "npm_config_shell=cat npm test"),
+            ("npm_config_git=/tmp/m npm test", "npm_config_git=cat npm test"),
+            ("npm_config_node_options='--require /tmp/m.js' npm test", "npm_config_node_options=--no-warnings npm test"),
+            ("NPM_CONFIG_NODE_OPTIONS='--require /tmp/m.js' npm test", "NPM_CONFIG_NODE_OPTIONS=--no-warnings npm test"),
+            ("npm_config_userconfig=/tmp/m npm test", "npm_config_userconfig=/work/u/proj/npmrc npm test"),
+            ("npm_config_globalconfig=/tmp/m npm test", "npm_config_globalconfig=/work/u/proj/npmrc npm test"),
+            ("MANPAGER='sh -c m' ls", "MANPAGER=cat ls"),
+            ("GH_PAGER='sh -c m' ls", "GH_PAGER=cat ls"),
+            ("SSH_ASKPASS=/tmp/m ls", "SSH_ASKPASS= ls"),
+            ("VIMINIT='!m' ls", "VIMINIT= ls"),
+            ("EXINIT='!m' ls", "EXINIT= ls"),
+            ("GH_CONFIG_DIR=/tmp/m ls", "GH_CONFIG_DIR=~/.config/gh ls"),
+            ("CURL_HOME=/tmp/m curl https://example.com", "CURL_HOME=~ curl https://example.com"),
+            ("WGETRC=/tmp/m ls", "WGETRC=/work/u/proj/wgetrc ls"),
+            ("PIP_CONFIG_FILE=/tmp/m ls", "PIP_CONFIG_FILE=/work/u/proj/pip.conf ls"),
+            ("PKG_CONFIG_PATH=/tmp/m ls", "PKG_CONFIG_PATH=./pkgconfig ls"),
+            ("TERMINFO=/tmp/m ls", "TERMINFO=./terminfo ls"),
+            ("TERMINFO_DIRS=/tmp/m ls", "TERMINFO_DIRS=./terminfo ls"),
+            ("MAGIC=/tmp/m ls", "MAGIC=./magic.mgc ls"),
+            ("SSL_CERT_FILE=/tmp/m ls", "SSL_CERT_FILE=./ca.pem ls"),
+            ("SSL_CERT_DIR=/tmp/m ls", "SSL_CERT_DIR=./certs ls"),
+            ("CURL_CA_BUNDLE=/tmp/m curl https://example.com", "CURL_CA_BUNDLE=./ca.pem curl https://example.com"),
+        ] {
+            assert!(!crate::command_verdict(foreign).is_allowed(), "a foreign value was allowed: {foreign}");
+            assert!(crate::command_verdict(benign).is_allowed(), "a benign value was refused: {benign}");
+        }
+    }
+
+    #[test]
+    fn an_audited_variable_with_a_project_value_still_allows() {
+        for cmd in [
+            "GCONV_PATH=./gconv ls", "GEM_HOME=./vendor/gems ls", "BUNDLE_GEMFILE=./Gemfile ls", "GIT_TRACE=1 git status",
+            "GIT_TRACE=trace.log git status", "SSLKEYLOGFILE=keys.log ls", "BROWSER=cat ls", "LD_PRELOAD= ls",
+        ] {
+            assert!(crate::is_safe_command(cmd), "a project value was denied: {cmd}");
         }
     }
 
@@ -717,7 +873,7 @@ mod integration_tests {
     /// on top (the launcher-only classpath options), so it is a superset, never a divergence.
     #[test]
     fn the_jvm_option_variables_classify_identically() {
-        let names = ["JAVA_TOOL_OPTIONS", "_JAVA_OPTIONS", "JDK_JAVA_OPTIONS"];
+        let names = ["JAVA_TOOL_OPTIONS", "_JAVA_OPTIONS", "JAVA_OPTS", "GRADLE_OPTS", "MAVEN_OPTS", "JDK_JAVA_OPTIONS"];
         let rules: Vec<_> = names
             .iter()
             .map(|n| super::rule_of(n).unwrap_or_else(|| panic!("{n} is missing from envvars.toml")))
