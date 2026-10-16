@@ -142,7 +142,6 @@ gnutls-certtool
 gofmt
 gofumpt
 goimports
-gojq
 gosec
 gperf
 gron
@@ -168,7 +167,6 @@ indent
 initdb
 install_name_tool
 iperf3
-jaq
 jasper
 jbig2dec
 jest
@@ -359,7 +357,6 @@ tiffcrop
 tiffdither
 tiffmedian
 tificc
-tomlq
 tpmtool
 transicc
 tsort
@@ -397,7 +394,6 @@ xgettext
 xgettext.pl
 xh
 xmllint
-xq
 xsltproc
 xsv
 xxd
@@ -405,7 +401,6 @@ xz
 yacc
 yapf
 yapp
-yq
 ytt
 zcat
 zless

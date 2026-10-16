@@ -87,6 +87,48 @@ fn an_unknown_word_never_approves_what_a_refused_flag_would() {
     assert!(bad.is_empty(), "unknown words more permissive than a flag:\n  {}", bad.join("\n  "));
 }
 
+/// Commands that read their next word as a program, and programs each would refuse.
+const PROGRAM_SLOTS: &[&str] = &["awk", "awk -F,", "sed", "sed -n", "jq -n", "gojq -n", "jaq -n", "xq -n", "yq", "sh -c", "bash -c"];
+const PROGRAMS: &[&str] = &["BEGIN{system(\"x\")}", "1e", "w ./x", "include \"m\"; .", "\"m\" | modulemeta", "load(\"x\")", "rm -rf ./x"];
+
+/// Ways to put a word nobody has seen where `{}` stands: a variable, a loop over files, piped and
+/// found file names.
+const UNSEEN: &[&str] = &[
+    "{} \"$X\"",
+    "for p in $LIST; do {} \"$p\"; done",
+    "for p in ./*; do {} \"$p\"; done",
+    "find ./src | while read -r p; do {} \"$p\"; done",
+    "find ./src -print0 | xargs -0 {}",
+    "find ./src | xargs -I@ {} @",
+    "find ./src -exec {} '{}' ';'",
+    "fd . ./src -x {} '{}'",
+];
+
+proptest! {
+    /// An unknown word never approves where a program the command refuses could stand: it could be
+    /// that program. The flag property above asks the same of options.
+    #[test]
+    fn an_unknown_word_never_approves_what_a_refused_program_would(
+        slot in prop::sample::select(PROGRAM_SLOTS.to_vec()),
+        program in prop::sample::select(PROGRAMS.to_vec()),
+        form in prop::sample::select(UNSEEN.to_vec()),
+    ) {
+        let literal = format!("{slot} {}", shell_words::quote(program));
+        prop_assume!(!is_safe_command(&literal));
+        let unseen = form.replacen("{}", slot, 1);
+        prop_assert!(!is_safe_command(&unseen), "`{}` approved, `{}` refused", unseen, literal);
+    }
+}
+
+#[test]
+fn a_seen_word_in_a_program_slot_is_judged_as_written() {
+    assert!(!is_safe_command("for p in 'BEGIN{system(1)}'; do awk \"$p\"; done"));
+    assert!(!is_safe_command("for p in 'include \"m\"; f'; do jq -n \"$p\"; done"));
+    assert!(is_safe_command("for f in ./a ./b; do awk '{print}' \"$f\"; done"));
+    assert!(is_safe_command("find ./src -print0 | xargs -0 grep -l foo"));
+    assert!(is_safe_command("find ./src -exec wc -l '{}' ';'"));
+}
+
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(256))]
 
@@ -261,4 +303,47 @@ cases! { true,
 cases! { false,
     declaration_without_assignment: "export $X",
     perl_module_dir_unknown: "PERL_USE_UNSAFE_INC=1 perl -MEvil -e 1",
+}
+
+const GLUED_PROGRAMS: &[&str] = &[
+    "awk '{print \"{}\"}' f", "awk 'BEGIN{x=\"{}\"}'", "awk '/{}/' f", "perl -ne 'print \"{}\"' f", "sed 's/{}/b/' f", "sed -n '/{}/p' f",
+    "sed 'y/{}/b/' f",
+];
+
+const BREAKOUT_ITEMS: &[&str] =
+    &["x\"; system(\"id\"); \"", "/ {system(\"id\")} /", "@{[system q(id)]}", "h/y/w /tmp/o\n;s/q", "a/b/w ~/.zshrc"];
+
+#[test]
+fn an_item_glued_into_a_program_is_refused() {
+    for program in GLUED_PROGRAMS {
+        for line in [
+            format!("xargs -I{{}} {program} < list"),
+            format!("ls | xargs -I{{}} {program}"),
+            format!("find . -exec {program} \\;"),
+            format!("fd -x {program}"),
+        ] {
+            assert!(!is_safe_command(&line), "{line} must not approve");
+        }
+    }
+    for line in ["find . -name '*.rs' -exec cp {} {}.bak \\;", "fd -e txt -x cat {.}.md", "ls | xargs -I{} cat ./{}"] {
+        assert!(is_safe_command(line), "{line} must still approve");
+    }
+}
+
+proptest! {
+    /// An item xargs, find or fd glues into a word can be any text, so a command that carries one
+    /// is approved only where every text it could be is approved written in place.
+    #[test]
+    fn a_glued_item_never_approves_what_its_text_would_not(
+        program in prop::sample::select(GLUED_PROGRAMS.to_vec()),
+        item in prop::sample::select(BREAKOUT_ITEMS.to_vec()),
+        runner in prop::sample::select(vec!["xargs -I{} ", "find . -exec ", "fd -x "]),
+    ) {
+        let tail = if runner.starts_with("find") { " \\;" } else { "" };
+        let glued = format!("ls | {runner}{program}{tail}");
+        let direct = program.replace("{}", item);
+        if is_safe_command(&glued) {
+            prop_assert!(is_safe_command(&direct), "{glued} approves but {direct} does not");
+        }
+    }
 }

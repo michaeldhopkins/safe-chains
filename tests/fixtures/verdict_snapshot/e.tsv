@@ -285,7 +285,8 @@ echo -e	inert
 echo -e one\\ntwo	inert
 echo -n	inert
 echo -n done	inert
-echo ./a ./b | xargs cat	safe-read
+echo ./a ./b | xargs awk	denied
+echo ./a | xargs cat	safe-read
 echo /etc/shadow | xargs cat	denied
 echo `rm -rf /`	denied
 echo a | pcre2grep '(?C"sh|-c|whoami")a'	denied

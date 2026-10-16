@@ -1,6 +1,6 @@
 [[command]]
 name = "jaq"
-description = "Rust reimplementation of jq that filters and transforms JSON from stdin or files, writing results to stdout. The expression language is sandboxed with no filesystem writes, no network access, and no shell execution. Aims for jq compatibility with improved performance."
+description = "Rust reimplementation of jq that filters and transforms JSON from stdin or files, writing results to stdout. The expression language is sandboxed with no filesystem writes, no network access, and no shell execution. Aims for jq compatibility with improved performance. Like jq it reads beyond its operands in three ways: -f/--from-file takes the filter from a file, --rawfile and --slurpfile read a named file into a variable, and import and include load module and data files from -L/--library-path or a search directory the directive names."
 url = "https://github.com/01mf02/jaq"
 level = "Inert"
 bare = true
@@ -10,4 +10,6 @@ standalone = [
     "--raw-output", "--slurp", "--sort-keys", "--tab", "--version",
     "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
 ]
-valued = ["--arg", "--argjson", "--from-file", "--indent", "--rawfile", "--slurpfile", "-f"]
+valued = ["--arg", "--argjson", "--indent", "--rawfile", "--slurpfile"]
+examples_safe = ["jaq . ./data.json", "jaq -r .name ./package.json"]
+examples_denied = ["jaq -f ./p.jq ./data.json", "jaq -n 'include \"m\"; f'", "jaq --rawfile k ~/.ssh/id_rsa -n null"]

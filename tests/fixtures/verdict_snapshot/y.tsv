@@ -710,6 +710,9 @@ youtube-dl -x	safe-write
 youtube-dl https://example.com/v	safe-write
 youtube-dl x	safe-write
 yq	denied
+yq '.a = load_str("x")' ./a.yml	denied
+yq 'eval(strenv(Q))' ./a.yml	denied
+yq 'load("/etc/passwd")' ./a.yml	denied
 yq --arg x	inert
 yq --argjson x	inert
 yq --colors	inert
@@ -718,6 +721,7 @@ yq --colors --exit-status	inert
 yq --colors x	inert
 yq --exit-status	inert
 yq --expression x	inert
+yq --from-file ./p.yq ./a.yml	denied
 yq --front-matter x	inert
 yq --help	inert
 yq --indent x	inert
@@ -738,6 +742,8 @@ yq -e	inert
 yq -h	inert
 yq -p x	inert
 yq -r	inert
+yq .a ./a.yml	inert
+yq eval .metadata.name ./a.yml	inert
 yq x	inert
 yt-dlp	denied
 yt-dlp --abort-on-error	safe-write

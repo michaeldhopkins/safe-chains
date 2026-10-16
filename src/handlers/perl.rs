@@ -1,3 +1,4 @@
+use super::perl_regex::{has_substitution_eval, strip_inert_text};
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
@@ -10,294 +11,14 @@ static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
     "unshift", "until", "values", "wantarray", "warn", "while",
 ]);
 
-fn closing_delimiter(open: u8) -> u8 {
-    match open {
-        b'(' => b')',
-        b'[' => b']',
-        b'{' => b'}',
-        b'<' => b'>',
-        _ => open,
-    }
-}
-
-fn is_paired_delimiter(b: u8) -> bool {
-    matches!(b, b'(' | b'[' | b'{' | b'<')
-}
-
-fn skip_delimited(bytes: &[u8], start: usize) -> Option<usize> {
-    if start >= bytes.len() {
-        return None;
-    }
-    let open = bytes[start];
-    let close = closing_delimiter(open);
-    let paired = is_paired_delimiter(open);
-    let mut depth = 1u32;
-    let mut i = start + 1;
-    while i < bytes.len() {
-        if bytes[i] == b'\\' {
-            i += 2;
-            continue;
-        }
-        if paired {
-            if bytes[i] == open {
-                depth += 1;
-            } else if bytes[i] == close {
-                depth -= 1;
-                if depth == 0 {
-                    return Some(i + 1);
-                }
-            }
-        } else if bytes[i] == close {
-            return Some(i + 1);
-        }
-        i += 1;
-    }
-    None
-}
-
-fn skip_regex_body(bytes: &[u8], start: usize, sections: usize) -> Option<(usize, &[u8])> {
-    if start >= bytes.len() {
-        return None;
-    }
-    let delim = bytes[start];
-    let mut pos = start;
-
-    if is_paired_delimiter(delim) {
-        for _ in 0..sections {
-            if pos >= bytes.len() {
-                return None;
-            }
-            pos = skip_delimited(bytes, pos)?;
-        }
-    } else {
-        pos += 1;
-        for _ in 0..sections {
-            loop {
-                if pos >= bytes.len() {
-                    return None;
-                }
-                if bytes[pos] == b'\\' {
-                    pos += 2;
-                    continue;
-                }
-                if bytes[pos] == delim {
-                    pos += 1;
-                    break;
-                }
-                pos += 1;
-            }
-        }
-    }
-    let flags_start = pos;
-    while pos < bytes.len() && bytes[pos].is_ascii_alphabetic() {
-        pos += 1;
-    }
-    Some((pos, &bytes[flags_start..pos]))
-}
-
-fn at_word_boundary(bytes: &[u8], i: usize) -> bool {
-    i == 0 || !(bytes[i - 1].is_ascii_alphanumeric() || bytes[i - 1] == b'_')
-}
-
-fn strip_regex_content(code: &str) -> String {
-    let bytes = code.as_bytes();
-    let mut result = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-
-    while i < bytes.len() {
-        if bytes[i] == b's'
-            && at_word_boundary(bytes, i)
-            && i + 1 < bytes.len()
-            && !bytes[i + 1].is_ascii_alphanumeric()
-            && bytes[i + 1] != b'_'
-            && let Some((end, _)) = skip_regex_body(bytes, i + 1, 2)
-        {
-            result.push(b's');
-            i = end;
-            continue;
-        }
-
-        if (bytes[i] == b'm' || bytes[i] == b'y')
-            && at_word_boundary(bytes, i)
-            && i + 1 < bytes.len()
-            && !bytes[i + 1].is_ascii_alphanumeric()
-            && bytes[i + 1] != b'_'
-            && let Some((end, _)) = skip_regex_body(bytes, i + 1, if bytes[i] == b'y' { 2 } else { 1 })
-        {
-            result.push(bytes[i]);
-            i = end;
-            continue;
-        }
-
-        if i + 1 < bytes.len()
-            && bytes[i] == b't'
-            && at_word_boundary(bytes, i)
-            && bytes[i + 1] == b'r'
-            && i + 2 < bytes.len()
-            && !bytes[i + 2].is_ascii_alphanumeric()
-            && bytes[i + 2] != b'_'
-            && let Some((end, _)) = skip_regex_body(bytes, i + 2, 2)
-        {
-            result.extend_from_slice(b"tr");
-            i = end;
-            continue;
-        }
-
-        if bytes[i] == b'/' && is_regex_context(&result) {
-            let start = i + 1;
-            let mut j = start;
-            while j < bytes.len() {
-                if bytes[j] == b'\\' {
-                    j += 2;
-                    continue;
-                }
-                if bytes[j] == b'/' {
-                    j += 1;
-                    while j < bytes.len() && bytes[j].is_ascii_alphabetic() {
-                        j += 1;
-                    }
-                    i = j;
-                    break;
-                }
-                j += 1;
-            }
-            if i != j {
-                i = bytes.len();
-            }
-            continue;
-        }
-
-        result.push(bytes[i]);
-        i += 1;
-    }
-
-    String::from_utf8(result).unwrap_or_default()
-}
-
-fn is_regex_context(preceding: &[u8]) -> bool {
-    let end = match preceding.iter().rposition(|b| !b.is_ascii_whitespace()) {
-        Some(pos) => pos,
-        None => return true,
-    };
-    let last = preceding[end];
-    if matches!(last, b'~' | b'(' | b',' | b';' | b'!' | b'&' | b'|' | b'?' | b':' | b'=' | b'{') {
-        return true;
-    }
-    if last.is_ascii_alphabetic() || last == b'_' {
-        let start = preceding[..=end]
-            .iter()
-            .rposition(|b| !b.is_ascii_alphanumeric() && *b != b'_')
-            .map(|p| p + 1)
-            .unwrap_or(0);
-        let word = std::str::from_utf8(&preceding[start..=end]).unwrap_or("");
-        return matches!(word, "if" | "unless" | "while" | "until" | "and" | "or" | "not" | "for" | "foreach" | "return");
-    }
-    false
-}
-
-fn has_substitution_eval(code: &str) -> bool {
-    let bytes = code.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b's'
-            && at_word_boundary(bytes, i)
-            && i + 1 < bytes.len()
-            && !bytes[i + 1].is_ascii_alphanumeric()
-            && bytes[i + 1] != b'_'
-            && let Some((_, flags)) = skip_regex_body(bytes, i + 1, 2)
-            && flags.contains(&b'e')
-        {
-            return true;
-        }
-        i += 1;
-    }
-    false
-}
-
-/// Perl double-quoted strings INTERPOLATE code — `@{[ EXPR ]}`, `${\ EXPR }`, `${ EXPR }`,
-/// `@{ EXPR }`, and array/hash SUBSCRIPTS (`$a[ EXPR ]`, `$h{ EXPR }`) all evaluate EXPR at
-/// runtime. Naively dropping the whole quoted string (the old `content_outside_double_quotes`)
-/// hid `print "@{[system(...)]}"`. This keeps interpolated EXPRESSION content for the allowlist
-/// walk while dropping inert literal text and simple value interpolation (`$name`/`@name`), so
-/// `"system is down"` stays safe but `"@{[system(...)]}"` is analyzed and denied. Single-quoted
-/// perl strings do not interpolate and are left as-is (a keyword inside them just over-denies).
-fn strip_inert_string_text(code: &str) -> String {
-    let bytes = code.as_bytes();
-    let mut out: Vec<u8> = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] != b'"' {
-            out.push(bytes[i]);
-            i += 1;
-            continue;
-        }
-        out.push(b' '); // opening quote
-        i += 1;
-        while i < bytes.len() {
-            match bytes[i] {
-                b'\\' => {
-                    out.push(b' '); // an escaped char is inert
-                    i = (i + 2).min(bytes.len());
-                }
-                b'"' => {
-                    i += 1;
-                    break;
-                }
-                b'$' | b'@' => {
-                    out.push(b' ');
-                    i += 1;
-                    if bytes.get(i) == Some(&b'{') {
-                        // block interpolation `${…}` / `@{…}`: keep the inner expression
-                        if let Some(end) = skip_delimited(bytes, i) {
-                            out.extend_from_slice(&bytes[i + 1..end - 1]);
-                            i = end;
-                        } else {
-                            // Unbalanced (malformed) — copy the remainder for the walk and STOP,
-                            // rather than `i += 1` and re-scanning per `{` (O(n²) on `"@{@{@{…"`).
-                            out.extend_from_slice(&bytes[i..]);
-                            i = bytes.len();
-                        }
-                    } else {
-                        // `$name` / `@name`: the value read is inert — skip the name…
-                        while i < bytes.len() && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric()) {
-                            i += 1;
-                        }
-                        // …but an array/hash SUBSCRIPT is EVALUATED — keep its content.
-                        while matches!(bytes.get(i), Some(b'[') | Some(b'{')) {
-                            match skip_delimited(bytes, i) {
-                                Some(end) => {
-                                    out.extend_from_slice(&bytes[i + 1..end - 1]);
-                                    i = end;
-                                }
-                                // Unbalanced — copy the rest and STOP (avoids O(n²) on `"$a[$a[…"`).
-                                None => {
-                                    out.extend_from_slice(&bytes[i..]);
-                                    i = bytes.len();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                _ => {
-                    out.push(b' '); // inert literal char
-                    i += 1;
-                }
-            }
-        }
-    }
-    String::from_utf8(out).unwrap_or_default()
-}
-
 pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
-    let no_strings = strip_inert_string_text(token.as_str());
-    if no_strings.contains('`') || crate::parse::has_unknown_content(token) {
+    if crate::parse::has_unknown_content(token) || has_substitution_eval(token.as_str()) {
         return false;
     }
-    if has_substitution_eval(&no_strings) {
+    let Some(stripped) = strip_inert_text(token.as_str()) else { return false };
+    if stripped.contains('`') {
         return false;
     }
-    let stripped = strip_regex_content(&no_strings);
     let bytes = stripped.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
@@ -549,16 +270,16 @@ mod tests {
         fn closing_delimiter_is_identity_exactly_on_non_paired_bytes(
             o in any::<u8>(),
         ) {
-            if super::is_paired_delimiter(o) {
-                let c = super::closing_delimiter(o);
+            if super::super::perl_regex::is_paired_delimiter(o) {
+                let c = super::super::perl_regex::closing_delimiter(o);
                 proptest::prop_assert_ne!(c, o,
                     "paired opener 0x{:02x} must map to a different closer", o);
-                proptest::prop_assert!(!super::is_paired_delimiter(c),
+                proptest::prop_assert!(!super::super::perl_regex::is_paired_delimiter(c),
                     "the closer of paired opener 0x{:02x} must itself not be a paired opener", o);
-                proptest::prop_assert_eq!(super::closing_delimiter(c), c,
+                proptest::prop_assert_eq!(super::super::perl_regex::closing_delimiter(c), c,
                     "the closer of a paired opener must be a fixed point of closing_delimiter");
             } else {
-                proptest::prop_assert_eq!(super::closing_delimiter(o), o,
+                proptest::prop_assert_eq!(super::super::perl_regex::closing_delimiter(o), o,
                     "non-paired byte 0x{:02x} must be the identity under closing_delimiter", o);
             }
         }

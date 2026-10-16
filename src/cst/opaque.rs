@@ -17,7 +17,7 @@
 //! - the value itself, where every unknown part is a variable whose value IS known;
 //! - the word's text with each unknown part read as [`UNKNOWN_CONTENT`](crate::parse::UNKNOWN_CONTENT),
 //!   which a handler refuses where it reads code and judges as a relative name where it reads a
-//!   path: `awk "$p"` runs whatever `$p` holds.
+//!   path: `awk "$p"` or `jq -n "$p"` runs whatever `$p` holds.
 //!
 //! Probing replaces every probed word at once, so a command costs at most seven more
 //! classifications however many unknown words it holds.
@@ -42,6 +42,39 @@ pub(crate) const FLAG_PROBE: &str = "--safe-chains-opaque";
 pub(crate) const SHORT_PROBE: &str = "-%";
 /// Every digit, so a grammar that takes this as a cluster of number flags takes any one of them.
 const NUMBER_PROBE: &str = "-1234567890";
+/// Program text that every interpreter safe-chains approves would refuse, written so that it reads
+/// as code only where a command reads a program: an awk `@` (gawk's indirect call, refused in a
+/// program but not in a file name), sed's `e` and `w` commands, a jq `include` and `modulemeta`,
+/// and a yq `load`; to a shell, `1e` is an unknown command. It holds no `system`, pipe or `>`,
+/// which awk also refuses in a file operand, and no substitution or glob, so as a path it is a
+/// plain relative one.
+///
+/// An unknown word can be any text, so wherever a command reads a word as a program it is
+/// classified as this too. Where the word is a path or a pattern this changes nothing: the probe
+/// only ever adds a refusal, and the word's locus is judged on the main reading.
+pub(crate) const CONTENT_PROBE: &str = "1e;w x;@;include \"m\";modulemeta;load(\"x\")";
+
+/// [`CONTENT_PROBE`] behind text that closes whatever a placeholder is embedded in (a string, a
+/// regex, a bracket, a perl interpolation) and ends the line, for a word that GLUES an unknown
+/// item into a program: `awk '{print "{}"}'` runs whatever an item writes after a `"`.
+pub(crate) const BREAKOUT_PROBE: &str = "@{[1]}\"'/)}]/w x\n1e;w x;@;include \"m\";modulemeta;load(\"x\")\n;";
+
+/// The probes an unknown item stands as: the program text, and, where some word embeds the item
+/// in more text, the same text breaking out of it.
+pub(crate) fn content_probes(embedded: bool) -> &'static [&'static str] {
+    if embedded { &[CONTENT_PROBE, BREAKOUT_PROBE] } else { &[CONTENT_PROBE] }
+}
+
+/// `verdict`, refused when any of `probes` read through `judge` is refused.
+pub(crate) fn refused_as_any_content(verdict: Verdict, embedded: bool, judge: impl Fn(&str) -> Verdict) -> Verdict {
+    content_probes(embedded).iter().fold(verdict, |v, probe| refused_as_content(v, judge(probe)))
+}
+
+/// `verdict`, refused when the [`CONTENT_PROBE`] reading `probed` is. Only the refusal carries
+/// over: the probe is a relative name, so the level it earns says nothing about the word's locus.
+pub(crate) fn refused_as_content(verdict: Verdict, probed: Verdict) -> Verdict {
+    if probed.is_allowed() { verdict } else { Verdict::Denied }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum Lead {
@@ -153,7 +186,8 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
         if !super::check::charge_classify_work(u32::try_from(tokens.len()).unwrap_or(u32::MAX)) {
             return Verdict::Denied;
         }
-        verdict = verdict.combine(classify(&tokens));
+        let probed = classify(&tokens);
+        verdict = if matches!(probe, Probe::Content) { refused_as_content(verdict, probed) } else { verdict.combine(probed) };
         if !verdict.is_allowed() {
             return verdict;
         }

@@ -201,7 +201,7 @@ pub(super) fn eval_part(part: &WordPart, out: &mut String) {
         // (`[command.output]`), the value is bounded by that locus instead and gets a tagged
         // sentinel — see docs/design/behavioral-taxonomy-substitution-locus.md.
         WordPart::CmdSub(inner) => out.push_str(&sub_sentinel(inner)),
-        WordPart::Backtick(raw) => match super::parse(raw) {
+        WordPart::Backtick(raw) => match super::parse(&super::escape::backtick_command(raw)) {
             Some(inner) => out.push_str(&sub_sentinel(&inner)),
             None => out.push_str(UNPINNABLE),
         },

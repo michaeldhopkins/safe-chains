@@ -7,10 +7,10 @@ level = "Inert"
 bare = true
 standalone = [
     "--args", "--ascii-output", "--binary", "--build-configuration", "--color-output", "--compact-output",
-    "--exit-status", "--from-file", "--help", "--join-output", "--jsonargs", "--monochrome-output", "--null-input",
+    "--exit-status", "--help", "--join-output", "--jsonargs", "--monochrome-output", "--null-input",
     "--raw-input", "--raw-output", "--raw-output0", "--seq", "--slurp", "--sort-keys", "--stream",
     "--stream-errors", "--tab", "--unbuffered", "--version",
-    "-C", "-M", "-R", "-S", "-V", "-a", "-b", "-c", "-e", "-f", "-g", "-h", "-j", "-n", "-r", "-s",
+    "-C", "-M", "-R", "-S", "-V", "-a", "-b", "-c", "-e", "-g", "-h", "-j", "-n", "-r", "-s",
 ]
 valued = [
     "--arg", "--argjson", "--indent", "--rawfile", "--slurpfile",
@@ -31,4 +31,8 @@ examples_denied = [
     "jq --from-file ~/.aws/credentials .",
     "jq --run-tests ./tests.json",
     "jq -L ~/modules -n 'include \"m\"; f'",
+    "jq -n -f ./p.jq",
+    "jq -n 'import \"config\" as c; c::f'",
+    "jq -n 'include \"m\"; f'",
+    "jq -n '\"m\" | modulemeta'",
 ]

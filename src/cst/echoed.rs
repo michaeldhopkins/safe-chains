@@ -59,12 +59,7 @@ pub(crate) fn ls_item(args: &[&str]) -> Option<String> {
 fn echo_items<'a>(args: &[&'a str]) -> Vec<&'a str> {
     let flags = args
         .iter()
-        .take_while(|a| {
-            a.starts_with('-')
-                && a.len() > 1
-                && a[1..].chars().all(|c| matches!(c, 'n' | 'e' | 'E'))
-                && crate::engine::resolve::write_target_verdict(a).is_allowed()
-        })
+        .take_while(|a| a.starts_with('-') && a.len() > 1 && a[1..].chars().all(|c| matches!(c, 'n' | 'e' | 'E')))
         .count();
     args[flags..].to_vec()
 }

@@ -1,4 +1,6 @@
 use super::budget::{self, DepthGuard};
+use super::escape::{self, dq_escape, escaped, fd_target, join_continuation, only_continuations, skip_continuation};
+use super::heredocs;
 use super::sub_close::find_sub_close;
 use super::*;
 use winnow::ModalResult;
@@ -8,10 +10,11 @@ use winnow::prelude::*;
 use winnow::token::{any, take_while};
 
 pub fn parse(input: &str) -> Option<Script> {
-    reset_heredoc_queue();
+    heredocs::reset();
     budget::reset(input.len());
-    let result = script.parse(input).ok().filter(|_| !budget::spent());
-    reset_heredoc_queue();
+    escape::begin(input);
+    let result = script.parse(input).ok().filter(|_| !budget::spent() && heredocs::drained() && escape::all_plain());
+    heredocs::reset();
     result
 }
 
@@ -39,11 +42,7 @@ fn consumed<'a, O>(input: &mut &'a str, p: impl FnOnce(&mut &'a str) -> ModalRes
 
 fn comment(input: &mut &str) -> ModalResult<()> {
     if input.starts_with('#') {
-        if let Some(pos) = input.find('\n') {
-            *input = &input[pos + 1..];
-        } else {
-            *input = "";
-        }
+        *input = input.find('\n').map_or("", |pos| &input[pos..]);
     }
     Ok(())
 }
@@ -57,7 +56,7 @@ fn ws_raw(input: &mut &str) -> ModalResult<()> {
         take_while(0.., [' ', '\t']).void().parse_next(input)?;
         if input.starts_with('#') {
             comment(input)?;
-        } else {
+        } else if !skip_continuation(input) {
             break;
         }
     }
@@ -65,21 +64,27 @@ fn ws_raw(input: &mut &str) -> ModalResult<()> {
 }
 
 fn sep(input: &mut &str) -> ModalResult<()> {
-    consumed(input, sep_raw)
+    while consumed(input, sep_raw)? {
+        heredocs::drain(input);
+    }
+    Ok(())
 }
 
-fn sep_raw(input: &mut &str) -> ModalResult<()> {
+fn sep_raw(input: &mut &str) -> ModalResult<bool> {
     loop {
         // Consume separators one at a time so a `;;` stays intact: it terminates a case arm, and
         // eating its first `;` here would let the arm's body run on into the next arm's pattern.
         while let Some(c) = input.chars().next() {
             if input.starts_with(";;") {
-                return Ok(());
+                return Ok(false);
             }
             if !matches!(c, ' ' | '\t' | ';' | '\n') {
                 break;
             }
             *input = &input[c.len_utf8()..];
+            if c == '\n' && heredocs::pending() {
+                return Ok(true);
+            }
         }
         if input.starts_with('#') {
             comment(input)?;
@@ -87,7 +92,7 @@ fn sep_raw(input: &mut &str) -> ModalResult<()> {
             break;
         }
     }
-    Ok(())
+    Ok(false)
 }
 
 fn eat_keyword(input: &mut &str, kw: &str) -> ModalResult<()> {
@@ -142,13 +147,12 @@ fn script(input: &mut &str) -> ModalResult<Script> {
     let mut stmts = Vec::new();
     while let Some(pl) = opt(pipeline).parse_next(input)? {
         ws.parse_next(input)?;
+        let before = *input;
         let op = opt(list_op).parse_next(input)?;
         stmts.push(Stmt { pipeline: pl, op });
-        // Drain any heredoc bodies pending from this statement before
-        // the next pipeline starts; otherwise the body would be parsed
-        // as the next statement (which would either misvalidate or
-        // misalign the line counter).
-        drain_pending_heredocs(input);
+        if before[..before.len() - input.len()].ends_with('\n') {
+            heredocs::drain(input);
+        }
         if op.is_none() {
             break;
         }
@@ -440,45 +444,33 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
     let delimiter = heredoc_delimiter.parse_next(input);
     scan(if delimiter.is_ok() { before - input.len() } else { before })?;
     let (delimiter, expands) = delimiter?;
+    if delimiter.contains('\n') {
+        escape::refuse();
+    }
     // With a BARE delimiter the shell expands the body, so `cat <<EOF` with `$(rm -rf /)` in it
     // runs that command. The body is looked up now (it is already present in `input`, after this
     // line) rather than at drain time, so the expansions land on the redirect that owns them.
-    let body = if expands { heredoc_body_word(input, &delimiter, strip_tabs)? } else { Word(Vec::new()) };
+    let start = heredocs::expected_body_start(input);
+    let body = if expands { heredoc_body_word(input, start, &delimiter, strip_tabs)? } else { Word(Vec::new()) };
     // Bash semantics: the heredoc body lives on lines AFTER the
     // command line is finished, not immediately after `<<DELIM`. The
     // command line can continue with more redirects, a pipe, etc.
     // Push the delimiter onto a thread-local queue; the body is
-    // drained at the next `\n`/`;` separator by drain_pending_heredocs.
-    PENDING_HEREDOCS.with(|q| {
-        q.borrow_mut().push(PendingHeredoc { delimiter: delimiter.clone(), strip_tabs });
-    });
+    // drained at the next newline by heredocs::drain.
+    let start = start.map_or(0, |s| s.as_ptr() as usize);
+    heredocs::push(heredocs::Pending { delimiter: delimiter.clone(), strip_tabs, joins: expands, start });
     Ok(Redir::HereDoc { delimiter, strip_tabs, body })
 }
 
-/// This heredoc's body, parsed for the expansions the shell performs on it.
-///
-/// Bodies begin after the CURRENT line, and a heredoc declared earlier on the same line
-/// (`cat <<A <<B`) owns an earlier body — so the pending queue is replayed to find where this
-/// one starts. Reads without consuming; `drain_pending_heredocs` still does the consuming.
+/// This heredoc's body, parsed for the expansions the shell performs on it. Reads without
+/// consuming; `heredocs::drain` still does the consuming, and refuses when the body it
+/// reaches does not start where this one was read.
 ///
 /// FAILS CLOSED: a body that does not parse (a lone backtick opens a substitution that is never
 /// closed) refuses the whole parse, which denies. That matches the shell, which reports
 /// `unexpected EOF while looking for matching backquote` and runs nothing.
-fn heredoc_body_word(input: &str, delimiter: &str, strip_tabs: bool) -> ModalResult<Word> {
-    let Some(nl) = input.find('\n') else {
-        scan(input.len())?;
-        return Ok(Word(Vec::new())); // no body yet; the drain will fail the parse
-    };
-    let mut rest = &input[nl + 1..];
-    let priors: Vec<PendingHeredoc> = PENDING_HEREDOCS.with(|q| q.borrow().clone());
-    for prior in &priors {
-        let Some((_, after)) = split_heredoc_body(rest, &prior.delimiter, prior.strip_tabs) else {
-            scan(input.len())?;
-            return Ok(Word(Vec::new()));
-        };
-        rest = after;
-    }
-    let Some((body, after)) = split_heredoc_body(rest, delimiter, strip_tabs) else {
+fn heredoc_body_word(input: &str, start: Option<&str>, delimiter: &str, strip_tabs: bool) -> ModalResult<Word> {
+    let Some((body, after)) = start.and_then(|rest| heredocs::split_body(rest, delimiter, strip_tabs, true)) else {
         scan(input.len())?;
         return Ok(Word(Vec::new()));
     };
@@ -510,70 +502,6 @@ fn heredoc_part(input: &mut &str) -> ModalResult<WordPart> {
     alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_heredoc_literal), lit(is_heredoc_literal))).parse_next(input)
 }
 
-#[derive(Debug, Clone)]
-struct PendingHeredoc {
-    delimiter: String,
-    strip_tabs: bool,
-}
-
-thread_local! {
-    static PENDING_HEREDOCS: std::cell::RefCell<Vec<PendingHeredoc>> =
-        const { std::cell::RefCell::new(Vec::new()) };
-}
-
-fn drain_pending_heredocs(input: &mut &str) {
-    let pending: Vec<PendingHeredoc> = PENDING_HEREDOCS.with(|q| std::mem::take(&mut *q.borrow_mut()));
-    for h in pending {
-        if !skip_heredoc_body(input, &h.delimiter, h.strip_tabs) {
-            // Couldn't find the matching delimiter line. Leave input
-            // as-is; the parser will likely fail on the leftover body
-            // text, which is the safe outcome (we deny on parse fail).
-            return;
-        }
-    }
-}
-
-fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> bool {
-    let split = split_heredoc_body(input, delimiter, strip_tabs);
-    let _ = scan(split.map_or(input.len(), |(_, rest)| input.len() - rest.len()));
-    match split {
-        Some((_, rest)) => {
-            *input = rest;
-            true
-        }
-        None => false,
-    }
-}
-
-/// Split at the delimiter line: `(body, rest-after-the-delimiter-line)`, or `None` when the
-/// delimiter never appears. `strip_tabs` (`<<-`) strips leading TABS only, matching the shell —
-/// spaces do not terminate a `<<-` body.
-fn split_heredoc_body<'a>(s: &'a str, delimiter: &str, strip_tabs: bool) -> Option<(&'a str, &'a str)> {
-    let bytes = s.as_bytes();
-    let mut line_start = 0;
-    while line_start <= bytes.len() {
-        let line_end = match s[line_start..].find('\n') {
-            Some(rel) => line_start + rel,
-            None => bytes.len(),
-        };
-        let line = &s[line_start..line_end];
-        let line = if strip_tabs { line.trim_start_matches('\t') } else { line };
-        if line == delimiter {
-            let advance = line_end + usize::from(line_end < bytes.len());
-            return Some((&s[..line_start], &s[advance..]));
-        }
-        if line_end >= bytes.len() {
-            return None;
-        }
-        line_start = line_end + 1;
-    }
-    None
-}
-
-fn reset_heredoc_queue() {
-    PENDING_HEREDOCS.with(|q| q.borrow_mut().clear());
-}
-
 /// The delimiter, and whether the body EXPANDS. Any quoting or escaping anywhere in the delimiter
 /// suppresses expansion (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, `<<E"O"F`); only a wholly bare word leaves
 /// the body live. Reported as a flag because that single bit decides whether the body is data or
@@ -596,9 +524,11 @@ fn escaped_delimiter(input: &mut &str) -> ModalResult<(String, bool)> {
     let mut rest = *input;
     let mut name = String::new();
     let mut quoted = false;
+    let mut joined = false;
     loop {
         let mut chars = rest.chars();
         match chars.next() {
+            Some('\\') if join_continuation(&mut rest) => joined = true,
             Some('\\') => match chars.next() {
                 Some(c) => {
                     name.push(c);
@@ -621,11 +551,11 @@ fn escaped_delimiter(input: &mut &str) -> ModalResult<(String, bool)> {
             _ => break,
         }
     }
-    if !quoted || name.is_empty() {
+    if !(quoted || joined) || name.is_empty() {
         return backtrack();
     }
     *input = rest;
-    Ok((name, false))
+    Ok((name, !quoted))
 }
 
 fn fd_prefix(input: &mut &str) -> ModalResult<u32> {
@@ -639,14 +569,10 @@ fn fd_prefix(input: &mut &str) -> ModalResult<u32> {
     }
 }
 
-fn fd_target(input: &mut &str) -> ModalResult<String> {
-    alt(('-'.value("-".to_string()), take_while(1.., |c: char| c.is_ascii_digit()).map(|s: &str| s.to_string()))).parse_next(input)
-}
-
 // === Word ===
 
 fn word(input: &mut &str) -> ModalResult<Word> {
-    repeat(1.., word_part).map(Word).parse_next(input)
+    repeat(1.., word_part).map(Word).verify(|w: &Word| !only_continuations(&w.0)).parse_next(input)
 }
 
 fn word_part(input: &mut &str) -> ModalResult<WordPart> {
@@ -714,7 +640,7 @@ fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
     let Some(rel) = close else {
         return if body.contains("<<") { sub_body_via_grammar(input, body) } else { backtrack() };
     };
-    // A heredoc body is drained out-of-band (`drain_pending_heredocs`) and can run PAST `rel`, so the
+    // A heredoc body is drained out-of-band (`heredocs::drain`) and can run PAST `rel`, so the
     // bounded interior would be truncated mid-heredoc and still parse "clean" — the fast path is
     // unreliable whenever the interior holds a heredoc operator. Skip straight to the grammar fallback
     // there. `<<` covers `<<`, `<<-`, and `<<<`; the latter (herestring) is inline and would be fine,
@@ -756,14 +682,14 @@ fn cmd_sub(input: &mut &str) -> ModalResult<WordPart> {
     if !input.starts_with("$(") {
         return backtrack();
     }
-    sub_body(input, 2).map(WordPart::CmdSub)
+    heredocs::own(|| sub_body(input, 2)).map(WordPart::CmdSub)
 }
 
 fn proc_sub(input: &mut &str) -> ModalResult<WordPart> {
     if !(input.starts_with("<(") || input.starts_with(">(")) {
         return backtrack();
     }
-    sub_body(input, 2).map(WordPart::ProcSub)
+    heredocs::own(|| sub_body(input, 2)).map(WordPart::ProcSub)
 }
 
 /// The parts of an arithmetic BODY: literal text plus the substitutions that actually run.
@@ -844,7 +770,7 @@ fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
 }
 
 fn backtick_part(input: &mut &str) -> ModalResult<WordPart> {
-    delimited_scan(input, '`', |i| delimited('`', backtick_inner, '`').map(WordPart::Backtick).parse_next(i))
+    delimited_scan(input, '`', |i| delimited('`', backtick_inner, '`').map(escape::backtick).parse_next(i))
 }
 
 /// A quoted span scans to its close, or to the end of the input when there is none, so an unclosed
@@ -857,10 +783,6 @@ fn delimited_scan<O>(input: &mut &str, open: char, p: impl FnOnce(&mut &str) -> 
     let out = p(input);
     scan(if out.is_ok() { before - input.len() } else { before })?;
     out
-}
-
-fn escaped(input: &mut &str) -> ModalResult<WordPart> {
-    preceded('\\', any).map(WordPart::Escape).parse_next(input)
 }
 
 fn lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<WordPart> {
@@ -886,15 +808,6 @@ fn dq_part(input: &mut &str) -> ModalResult<WordPart> {
         return backtrack();
     }
     alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_dq_literal), lit(is_dq_literal))).parse_next(input)
-}
-
-fn dq_escape(input: &mut &str) -> ModalResult<WordPart> {
-    preceded('\\', any)
-        .map(|c: char| match c {
-            '"' | '\\' | '$' | '`' => WordPart::Escape(c),
-            _ => WordPart::Lit(format!("\\{c}")),
-        })
-        .parse_next(input)
 }
 
 // === Backtick inner content ===
@@ -1049,7 +962,7 @@ fn case_arm(input: &mut &str) -> ModalResult<CaseArm> {
 
 /// Whitespace including newlines, but NOT `;` — used where a `;;` must stay visible to the caller.
 fn blank(input: &mut &str) -> ModalResult<()> {
-    consumed(input, |i| take_while(0.., [' ', '\t', '\n']).void().parse_next(i))
+    consumed(input, heredocs::skip_blank)
 }
 
 fn double_bracket_cmd(input: &mut &str) -> ModalResult<Cmd> {
@@ -1727,6 +1640,37 @@ mod tests {
     }
 
     #[test]
+    fn a_heredoc_body_starts_after_the_line_not_after_the_separator() {
+        for line in [
+            "cat <<EOF; rm -rf ~/x\nhi\nEOF",
+            "cat <<EOF && rm -rf ~/x\nhi\nEOF",
+            "cat <<EOF; echo ok\nhi $(rm -rf ~/x)\nEOF",
+            "cat <<EOF\nhi\nEOF\nrm -rf ~/x",
+            "cat <<EOF\necho $(rm -rf ~/x)",
+            "cat <<EOF; echo \"a\nEOF\n\"\n$(rm -rf ~/x)\nEOF",
+            "cat <<EOF; echo $(\nrm -rf ~/x\nEOF\necho)",
+            "echo $(cat <<EOF)\nrm -rf ~/x\nEOF",
+            "cat <<true; echo \"[$(cat <<'ls')]\"\ntrue\nls\necho '$(rm -rf ~/x)'\ntrue",
+            "echo \"[$(cat <<'ls')]\"\nls\necho hi",
+        ] {
+            assert!(!crate::is_safe_command(line), "{line:?} must not approve");
+        }
+        for line in [
+            "cat <<EOF; echo ok\nhi\nEOF",
+            "cat <<EOF | grep h\nhi\nEOF",
+            "cat <<EOF;\nhi\nEOF\necho done",
+            "cat <<EOF &&\nhi\nEOF\necho done",
+            "cat <<A <<B; echo x\na\nA\nb\nB",
+            "{ cat <<EOF; }\nhi\nEOF",
+            "x=$(cat <<EOF\nhi\nEOF\n); echo $x",
+            "cat <<true; echo \"[`cat <<'ls'`]\"\ntrue\nls\necho '$(rm -rf ~/x)'\ntrue",
+        ] {
+            assert!(crate::is_safe_command(line), "{line:?} should approve");
+        }
+        assert_eq!(p("cat <<EOF; ls\nhi\nEOF").0.len(), 2);
+    }
+
+    #[test]
     fn env_prefix() {
         let s = p("FOO='bar baz' ls -la");
         let cmd = simple(&s);
@@ -1795,6 +1739,18 @@ mod tests {
     #[test]
     fn escaped_outside_quotes() {
         assert_eq!(words(&p("echo hello\\ world")), ["echo", "hello world"]);
+    }
+    #[test]
+    fn a_line_continuation_joins_a_word() {
+        assert_eq!(words(&p("imp\\\nort a")), ["import", "a"]);
+        assert_eq!(words(&p("echo \"incl\\\nude\"")), ["echo", "include"]);
+        assert_eq!(words(&p("echo 'incl\\\nude'")), ["echo", "incl\\\nude"]);
+    }
+    #[test]
+    fn a_line_continuation_between_words_is_whitespace() {
+        assert_eq!(words(&p("echo a \\\n b")), ["echo", "a", "b"]);
+        assert_eq!(words(&p("echo a\\\n b")), ["echo", "a", "b"]);
+        assert_eq!(words(&p("echo \\\n\\\nb")), ["echo", "b"]);
     }
     #[test]
     fn double_quoted_escape() {

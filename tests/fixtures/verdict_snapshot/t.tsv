@@ -3580,6 +3580,7 @@ tokei -s x	inert
 tokei -t x	inert
 tokei x	inert
 tomlq	denied
+tomlq 'import "x" as d; d::f' ./a.toml	denied
 tomlq --arg x	inert
 tomlq --argjson x	inert
 tomlq --compact-output	inert
@@ -3604,12 +3605,14 @@ tomlq -S	inert
 tomlq -V	inert
 tomlq -c	inert
 tomlq -e	inert
-tomlq -f x	inert
+tomlq -f ./p.jq ./a.toml	denied
 tomlq -h	inert
 tomlq -n	inert
 tomlq -r	inert
+tomlq -r .package.name ./Cargo.toml	inert
 tomlq -s	inert
 tomlq -t	inert
+tomlq . ./a.toml	inert
 tomlq x	inert
 toolbox	denied
 toolbox --help	inert

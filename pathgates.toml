@@ -33,11 +33,11 @@ read = [
   # encoding / format converters (read a file, emit transformed content)
   "iconv", "recode", "pv", "pandoc", "xmllint", "xmlstarlet",
   # CSV / structured-data tools (their positional after flags is a file)
-  "xsv", "qsv", "mlr", "csvtool", "jaq", "gojq", "pup", "yj",
+  "xsv", "qsv", "mlr", "csvtool", "pup", "yj",
   # diff family
   "diff", "diff3", "sdiff", "colordiff", "delta", "difft", "cmp",
   # encoders / structured-data query (their FILTER positional classifies worktree, harmless)
-  "base64", "base32", "basenc", "jq", "yq", "xq", "tomlq", "dasel", "gron", "htmlq", "fx", "jless",
+  "base64", "base32", "basenc", "dasel", "gron", "htmlq", "fx", "jless",
   # crypto tools that read a key/cert/data file via a path arg (`openssl rsa -in ~/.ssh/id_rsa`)
   "openssl",
   # checksums / hashes (disclose a hash of the secret)
@@ -1118,6 +1118,21 @@ handler = "ar_archive"
 handler = "ar_archive"
 [roles."llvm-ar"]
 handler = "ar_archive"
+# The jq family (jq, gojq, jaq, xq, tomlq, yq): every operand is a read, and the filter itself can
+# read files no operand names: a program file (-f), modules (import, include, modulemeta, -L) and
+# yq's load operators. The handler refuses those and then gates the operands as reads.
+[roles."jq"]
+handler = "jq_program"
+[roles."gojq"]
+handler = "jq_program"
+[roles."jaq"]
+handler = "jq_program"
+[roles."xq"]
+handler = "jq_program"
+[roles."tomlq"]
+handler = "jq_program"
+[roles."yq"]
+handler = "yq_program"
 # textutil -convert/-strip write (a sibling of each input, or -output/-outputdir); -info/-cat read.
 [roles."textutil"]
 handler = "textutil_mode"

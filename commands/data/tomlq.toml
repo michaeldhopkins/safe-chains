@@ -1,6 +1,6 @@
 [[command]]
 name = "tomlq"
-description = "Transcodes TOML to JSON, pipes it through jq for filtering/transformation, and optionally converts back to TOML. Reads from files or stdin and writes to stdout. Supports --in-place for file modification, but is otherwise side-effect-free. No network access and no shell execution. Part of the kislyuk/yq package."
+description = "Transcodes TOML to JSON, pipes it through jq for filtering/transformation, and optionally converts back to TOML. Reads from files or stdin and writes to stdout. Supports --in-place for file modification, but is otherwise side-effect-free. No network access and no shell execution. Part of the kislyuk/yq package. Every argument it does not handle itself goes to jq, so the filter can read what a jq filter reads: a program file (-f/--from-file), and modules or JSON data through import and include."
 url = "https://github.com/kislyuk/yq"
 level = "Inert"
 bare = false
@@ -10,4 +10,6 @@ standalone = [
     "--slurp", "--sort-keys", "--tab", "--toml-output", "--version",
     "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-t",
 ]
-valued = ["--arg", "--argjson", "--indent", "-f"]
+valued = ["--arg", "--argjson", "--indent"]
+examples_safe = ["tomlq . ./a.toml", "tomlq -r .package.name ./Cargo.toml"]
+examples_denied = ["tomlq -f ./p.jq ./a.toml", "tomlq 'import \"x\" as d; d::f' ./a.toml"]

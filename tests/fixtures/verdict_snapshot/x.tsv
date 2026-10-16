@@ -1005,6 +1005,7 @@ xpath -q	inert
 xpath -s x	inert
 xpath x	inert
 xq	denied
+xq 'include "m"; f' ./a.xml	denied
 xq --arg x	inert
 xq --argjson x	inert
 xq --compact-output	inert
@@ -1021,7 +1022,7 @@ xq --slurp	inert
 xq --sort-keys	inert
 xq --tab	inert
 xq --version	inert
-xq --xml-dtd x	inert
+xq --xml-dtd	inert
 xq --xml-item-depth x	inert
 xq --xml-output	inert
 xq --xml-root x	inert
@@ -1032,12 +1033,14 @@ xq -S	inert
 xq -V	inert
 xq -c	inert
 xq -e	inert
-xq -f x	inert
+xq -f ./p.jq ./a.xml	denied
 xq -h	inert
 xq -n	inert
 xq -r	inert
+xq -r .root.name ./a.xml	inert
 xq -s	inert
 xq -x	inert
+xq . ./a.xml	inert
 xq x	inert
 xsel	safe-read
 xsel --append	safe-read

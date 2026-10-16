@@ -79,8 +79,11 @@ pub const LEAD: ItemShape = Facts::bit(0);
 pub const SPLIT: ItemShape = Facts::bit(1);
 /// Some value may be empty, so an unquoted use becomes none.
 pub const EMPTY: ItemShape = Facts::bit(2);
+/// Some value is text nobody has seen (a file name `find` will meet), so a command that reads it as
+/// a program could be reading anything.
+pub const TEXT: ItemShape = Facts::bit(3);
 /// Nothing is known about the values.
-pub const UNKNOWN: ItemShape = LEAD.union(SPLIT).union(EMPTY);
+pub const UNKNOWN: ItemShape = LEAD.union(SPLIT).union(EMPTY).union(TEXT);
 
 thread_local! {
     static LOOP_SHAPES: RefCell<Vec<(String, ItemShape)>> = const { RefCell::new(Vec::new()) };
@@ -175,7 +178,7 @@ mod tests {
         assert_eq!(f, ItemShape::NONE);
         f.set(LEAD, true);
         assert!(f.has(LEAD) && !f.has(SPLIT));
-        assert_eq!(LEAD | SPLIT | EMPTY, UNKNOWN);
+        assert_eq!(LEAD | SPLIT | EMPTY | TEXT, UNKNOWN);
         f.clear(LEAD);
         assert_eq!(f, ItemShape::NONE);
         assert_eq!(ItemShape::when(SPLIT, true), SPLIT);

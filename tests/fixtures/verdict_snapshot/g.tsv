@@ -12077,18 +12077,17 @@ goimports x	safe-read
 gojq	inert
 gojq --arg x	inert
 gojq --argjson x	inert
+gojq --args	inert
+gojq --args --arg x	inert
+gojq --args --color-output	inert
 gojq --args x	inert
 gojq --color-output	inert
-gojq --color-output --arg x	inert
-gojq --color-output --compact-output	inert
-gojq --color-output x	inert
 gojq --compact-output	inert
 gojq --exit-status	inert
-gojq --from-file x	inert
 gojq --help	inert
 gojq --indent x	inert
 gojq --join-output	inert
-gojq --jsonargs x	inert
+gojq --jsonargs	inert
 gojq --monochrome-output	inert
 gojq --null-input	inert
 gojq --raw-input	inert
@@ -12101,20 +12100,24 @@ gojq --sort-keys	inert
 gojq --tab	inert
 gojq --version	inert
 gojq --yaml-input	inert
+gojq --yaml-input .a ./a.yml	inert
 gojq --yaml-output	inert
 gojq -C	inert
+gojq -L . -n 'include "m"; f'	denied
 gojq -M	inert
 gojq -R	inert
 gojq -S	inert
 gojq -V	inert
 gojq -c	inert
 gojq -e	inert
-gojq -f x	inert
+gojq -f ./p.jq ./data.json	denied
 gojq -h	inert
 gojq -j	inert
 gojq -n	inert
+gojq -n 'import "config" as $c; $c'	denied
 gojq -r	inert
 gojq -s	inert
+gojq . ./data.json	inert
 gojq x	inert
 golangci-lint	denied
 golangci-lint --help	inert

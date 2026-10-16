@@ -1,11 +1,12 @@
 [[command]]
 name = "gojq"
-description = "Pure Go reimplementation of jq that filters and transforms JSON (and optionally YAML) from stdin or files, writing results to stdout. Like jq, the expression language is sandboxed: no filesystem writes, no network access, no shell execution. Adds YAML input/output support beyond what jq offers."
+description = "Pure Go reimplementation of jq that filters and transforms JSON (and optionally YAML) from stdin or files, writing results to stdout. Like jq, the expression language is sandboxed: no filesystem writes, no network access, no shell execution. Adds YAML input/output support beyond what jq offers. Like jq it reads beyond its operands: -f/--from-file takes the filter from a file, --rawfile and --slurpfile read a named file, and import, include and modulemeta load modules and JSON data from ~/.jq, -L directories or a search directory the directive names."
 url = "https://github.com/itchyny/gojq"
 level = "Inert"
 bare = true
 standalone = [
-    "--color-output", "--compact-output", "--exit-status", "--help",
+    "--args", "--color-output", "--compact-output", "--exit-status", "--help",
+    "--jsonargs",
     "--join-output", "--monochrome-output", "--null-input",
     "--raw-input", "--raw-output", "--raw-output0",
     "--slurp", "--sort-keys", "--tab", "--version",
@@ -13,7 +14,7 @@ standalone = [
     "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
 ]
 valued = [
-    "--arg", "--argjson", "--args", "--from-file",
-    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
-    "-f",
+    "--arg", "--argjson", "--indent", "--rawfile", "--slurpfile",
 ]
+examples_safe = ["gojq . ./data.json", "gojq --yaml-input .a ./a.yml"]
+examples_denied = ["gojq -f ./p.jq ./data.json", "gojq -n 'import \"config\" as $c; $c'", "gojq -L . -n 'include \"m\"; f'"]

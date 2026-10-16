@@ -232,6 +232,7 @@ fd -u	inert
 fd -x	denied
 fd -x cat {//}/{/}	safe-read
 fd -x echo {}	inert
+fd -x perl -ne 'print if /{}/' a.txt	denied
 fd -x rm /etc/{}	denied
 fd -x rm {}	safe-write
 fd /etc -X cat	denied
@@ -745,6 +746,7 @@ find . -empty	inert
 find . -exec bash -c 'git status' \\;	inert
 find . -exec bash -c 'ls && rm -rf /' \\;	denied
 find . -exec cat {} \\;	safe-read
+find . -exec perl -ne 'print if /{}/' a.txt \\;	denied
 find . -exec rm -rf {} +	safe-write
 find . -exec rm {} \\;	safe-write
 find . -execdir cat {} \\;	safe-read

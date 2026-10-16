@@ -1,13 +1,15 @@
 [[command]]
 name = "xq"
-description = "Transcodes XML to JSON, pipes it through jq for filtering/transformation, and optionally converts back to XML. Reads from files or stdin and writes to stdout. Supports --in-place for file modification, but is otherwise side-effect-free. No network access and no shell execution. Part of the kislyuk/yq package."
+description = "Transcodes XML to JSON, pipes it through jq for filtering/transformation, and optionally converts back to XML. Reads from files or stdin and writes to stdout. Supports --in-place for file modification, but is otherwise side-effect-free. No network access and no shell execution. Part of the kislyuk/yq package. Every argument it does not handle itself goes to jq, so the filter can read what a jq filter reads: a program file (-f/--from-file), and modules or JSON data through import and include."
 url = "https://github.com/kislyuk/yq"
 level = "Inert"
 bare = false
 standalone = [
     "--compact-output", "--exit-status", "--help",
     "--null-input", "--raw-input", "--raw-output",
-    "--slurp", "--sort-keys", "--tab", "--version", "--xml-output",
+    "--slurp", "--sort-keys", "--tab", "--version", "--xml-dtd", "--xml-output",
     "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-x",
 ]
-valued = ["--arg", "--argjson", "--indent", "--xml-dtd", "--xml-item-depth", "--xml-root", "-f"]
+valued = ["--arg", "--argjson", "--indent", "--xml-item-depth", "--xml-root"]
+examples_safe = ["xq . ./a.xml", "xq -r .root.name ./a.xml"]
+examples_denied = ["xq -f ./p.jq ./a.xml", "xq 'include \"m\"; f' ./a.xml"]

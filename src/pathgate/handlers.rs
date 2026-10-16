@@ -8,13 +8,14 @@ use super::{Role, gate};
 use crate::parse::Token;
 
 pub(crate) mod jj;
+mod jq;
 mod plist;
 
 /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
 #[cfg(test)]
 pub(super) const NAMES: &[&str] = &[
-    "ar_archive", "defaults_domain", "exiftool_mode", "jj_destination", "jj_repository", "jupytext_mode", "mtree_mode", "ncu_mode",
-    "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode",
+    "ar_archive", "defaults_domain", "exiftool_mode", "jj_destination", "jj_repository", "jq_program", "jupytext_mode", "mtree_mode",
+    "ncu_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "yq_program",
 ];
 
 pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
@@ -24,6 +25,7 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "exiftool_mode" => exiftool_mode(tokens),
         "jj_destination" => jj::jj_destination(tokens),
         "jj_repository" => jj::jj_repository(tokens),
+        "jq_program" => jq::jq_program(tokens),
         "jupytext_mode" => jupytext_mode(tokens),
         "mtree_mode" => mtree_mode(tokens),
         "ncu_mode" => ncu_mode(tokens),
@@ -32,6 +34,7 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "textutil_mode" => textutil_mode(tokens),
         "tsc_response_file" => tsc_response_file(tokens),
         "xattr_mode" => xattr_mode(tokens),
+        "yq_program" => jq::yq_program(tokens),
         // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
         // misconfigured name so a typo can never silently ungate a command.
         _ => true,

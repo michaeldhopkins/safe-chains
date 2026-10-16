@@ -34,6 +34,7 @@ pub mod node;
 pub(crate) mod pattern_flags;
 pub mod perl;
 mod perl_load;
+mod perl_regex;
 pub mod php;
 pub mod ruby;
 pub mod safe_chains;

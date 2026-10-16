@@ -4,7 +4,7 @@ use super::walk::GLOB_CHARS;
 use super::{BLANK, GLOB, Lead, OPAQUE, SPLIT as WORD_SPLIT, shape};
 use crate::cst::{Cmd, Script, Word};
 use crate::parse::Token;
-use crate::pathctx::item_shape::{EMPTY, LEAD, SPLIT, UNKNOWN};
+use crate::pathctx::item_shape::{EMPTY, LEAD, SPLIT, TEXT, UNKNOWN};
 use crate::pathctx::{ItemShape, ItemShapeGuard};
 
 /// A stream representative no stage names, so a stage that hands it back unchanged is one that
@@ -57,7 +57,7 @@ pub(crate) fn stage_shape(cmd: &Cmd, input: ItemShape) -> ItemShape {
     let texts: Vec<String> = args.iter().flat_map(Word::expand).collect();
     let texts_str: Vec<&str> = texts.iter().map(String::as_str).collect();
     match name.as_str() {
-        "find" if prints_only_paths(&texts_str) => SPLIT,
+        "find" if prints_only_paths(&texts_str) => SPLIT | TEXT,
         "pwd" => ItemShape::NONE,
         "id" if !texts.is_empty()
             && texts
@@ -67,9 +67,16 @@ pub(crate) fn stage_shape(cmd: &Cmd, input: ItemShape) -> ItemShape {
             ItemShape::NONE
         }
         "which" => SPLIT | EMPTY,
-        "echo" if !texts.iter().any(|t| t.starts_with('-') || t.contains('\\')) => {
-            ItemShape::when(SPLIT, texts.iter().any(|t| t.contains(char::is_whitespace))) | ItemShape::when(EMPTY, texts.is_empty())
-        }
+        // Known only when the item is known exactly; otherwise the stream could be anything.
+        "echo" | "printf" => match crate::cst::printed::printed_item(&name, &texts_str).as_str() {
+            crate::cst::check::UNKNOWN_ITEM if crate::cst::echoed::printed_item(&name, &texts_str).is_some() => {
+                let leads = texts_str.iter().flat_map(|s| s.split_whitespace()).any(|p| p.starts_with('-'));
+                ItemShape::when(EMPTY, texts_str.iter().all(|s| s.trim().is_empty())) | ItemShape::when(LEAD, leads) | TEXT
+            }
+            crate::cst::check::UNKNOWN_ITEM => UNKNOWN,
+            "sc_item" => EMPTY,
+            item => ItemShape::when(LEAD, item.starts_with('-')),
+        },
         _ => UNKNOWN,
     }
 }
@@ -86,7 +93,7 @@ pub(super) fn substitution_shape(script: &Script) -> ItemShape {
     for cmd in &stmt.pipeline.commands {
         items = stage_shape(cmd, items);
     }
-    items
+    items | ItemShape::when(SPLIT, items.has(TEXT))
 }
 
 /// Binds a `for` variable's locus representatives and the shape of its list's values together.

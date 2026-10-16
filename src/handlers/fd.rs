@@ -44,25 +44,30 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
     let hidden = crate::engine::resolve::frozen_reach::fd_lists_hidden(&words);
     let follow = crate::engine::resolve::frozen_reach::fd_follows(&words);
     let walk = crate::engine::resolve::frozen_walk::Walk::items(hidden, follow);
+    let judge = |bound: &str, shield: bool| {
+        let mut words: Vec<String> = tokens[cmd_start..cmd_end]
+            .iter()
+            .map(|t| {
+                let word = bind_placeholders(t.as_str(), bound);
+                if shield { synthetic_operand(&word, t.as_str(), bound) } else { word }
+            })
+            .collect();
+        if !has_placeholder {
+            words.push(bound.to_string());
+        }
+        let _mark = crate::cst::netargs::enter(true);
+        crate::command_verdict(&shell_words::join(&words))
+    };
     let mut level = SafetyLevel::Inert;
     for base in &bases {
-        let judge = |bound: &str| {
-            let mut words: Vec<String> = tokens[cmd_start..cmd_end]
-                .iter()
-                .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), bound), t.as_str(), bound))
-                .collect();
-            if !has_placeholder {
-                words.push(bound.to_string());
-            }
-            let _mark = crate::cst::netargs::enter(true);
-            crate::command_verdict(&shell_words::join(&words))
-        };
-        match crate::engine::resolve::frozen_reach::judged_over(base, walk, judge) {
+        match crate::engine::resolve::frozen_reach::judged_over(base, walk, |bound| judge(bound, true)) {
             Verdict::Denied => return Verdict::Denied,
             Verdict::Allowed(l) => level = level.max(l),
         }
     }
-    Verdict::Allowed(level)
+    // A match's name is text nobody has seen, so the command must also stand one that is code.
+    let embedded = exec.iter().any(|w| w.contains('{') && !matches!(*w, "{}" | "{/}" | "{//}" | "{.}" | "{/.}"));
+    crate::cst::opaque::refused_as_any_content(Verdict::Allowed(level), embedded, |probe| judge(probe, false))
 }
 
 /// A word built by GLUING a match onto a literal prefix is as unknowable as the bare match.

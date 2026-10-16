@@ -336,7 +336,7 @@ pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
 /// leading `/` makes it LOOK like a path (so `pathgate`-gated readers like `od` gate it) and the
 /// cmdsub marker makes it unpinnable (so engine-resolved readers like `cat` worst-case it) — it
 /// must deny in BOTH gate layers.
-const UNKNOWN_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
+pub(super) const UNKNOWN_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
 
 /// A representative PATH for the items `cmd` emits on stdout given the stream repr it RECEIVED
 /// (`input`), used to gate an operand-injecting consumer downstream (`… | xargs cat`). A PRODUCER
@@ -575,7 +575,7 @@ pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
 fn part_sub_verdict(part: &WordPart) -> Verdict {
     match part {
         WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => script_verdict(inner),
-        WordPart::Backtick(raw) => command_verdict(raw),
+        WordPart::Backtick(raw) => command_verdict(&super::escape::backtick_command(raw)),
         WordPart::DQuote(inner) => word_sub_verdict(inner),
         // Arithmetic is inert, but a `$( )` inside it runs — judged, not skipped.
         WordPart::Arith(inner) => word_sub_verdict(inner),
@@ -716,7 +716,7 @@ fn arg_is_eval_safe(word: &Word) -> bool {
                 found_safe = true;
             }
             WordPart::Backtick(raw) => {
-                let Some(script) = parse(raw) else {
+                let Some(script) = parse(&super::escape::backtick_command(raw)) else {
                     return false;
                 };
                 if !script_yields_eval_safe(&script) {

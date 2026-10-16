@@ -17,13 +17,13 @@ jaq --compact-output --arg x	inert
 jaq --compact-output --exit-status	inert
 jaq --compact-output x	inert
 jaq --exit-status	inert
-jaq --from-file x	inert
 jaq --help	inert
 jaq --indent x	inert
 jaq --join-output	inert
 jaq --null-input	inert
 jaq --raw-input	inert
 jaq --raw-output	inert
+jaq --rawfile k ~/.ssh/id_rsa -n null	denied
 jaq --rawfile x	inert
 jaq --slurp	inert
 jaq --slurpfile x	inert
@@ -37,12 +37,15 @@ jaq -S	inert
 jaq -V	inert
 jaq -c	inert
 jaq -e	inert
-jaq -f x	inert
+jaq -f ./p.jq ./data.json	denied
 jaq -h	inert
 jaq -j	inert
 jaq -n	inert
+jaq -n 'include "m"; f'	denied
 jaq -r	inert
+jaq -r .name ./package.json	inert
 jaq -s	inert
+jaq . ./data.json	inert
 jaq x	inert
 jar	denied
 jar --help	inert
@@ -2410,7 +2413,6 @@ jq --build-configuration	inert
 jq --color-output	inert
 jq --compact-output	inert
 jq --exit-status	inert
-jq --from-file	inert
 jq --from-file ~/.aws/credentials .	denied
 jq --help	inert
 jq --indent x	inert
@@ -2445,13 +2447,16 @@ jq -b	inert
 jq -c	inert
 jq -c '.items[] | select(.ok)' ./data.json	inert
 jq -e	inert
-jq -f	inert
 jq -f ~/.ssh/id_rsa .	denied
 jq -g	inert
 jq -h	inert
 jq -j	inert
 jq -n	inert
+jq -n '"m" | modulemeta'	denied
 jq -n '[1,2,3] | add'	inert
+jq -n 'import "config" as c; c::f'	denied
+jq -n 'include "m"; f'	denied
+jq -n -f ./p.jq	denied
 jq -r	inert
 jq -r .name ./package.json	inert
 jq -s	inert

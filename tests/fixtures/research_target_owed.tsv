@@ -487,7 +487,7 @@ goenv	description
 gofmt	description,examples
 gofumpt	description,examples
 goimports	description,examples,no-overlap
-gojq	description,examples,version
+gojq	description,version
 golangci-lint	examples,version
 gomodifytags	description,examples,no-overlap
 goose	description,examples,profiled
@@ -603,7 +603,7 @@ ispell	description,examples
 istioctl	examples,no-overlap,no-tolerance,profiled
 isutf8	description,examples,no-tolerance
 jai	description,examples,version
-jaq	description,examples,version
+jaq	description,version
 jar	entry
 jarsigner	examples,version
 jasmine	description,examples
@@ -1379,7 +1379,7 @@ tns	description,examples,profiled
 todoist	examples,no-tolerance,version
 tofu	description,no-overlap,profiled
 tokei	description,examples,version
-tomlq	description,examples,version
+tomlq	description,version
 toolbox	examples,profiled
 top	description,examples,version
 touch	examples
@@ -1522,7 +1522,7 @@ xmake	description,examples,no-tolerance,profiled
 xmlcatalog	description,examples,no-tolerance
 xmllint	description,examples,version
 xpath	description,examples
-xq	description,examples,version
+xq	description,version
 xsel	description,examples,no-overlap,no-tolerance
 xsltproc	description,examples,no-tolerance
 xsubpp	description,examples
@@ -1544,7 +1544,7 @@ yarn	version
 yasm	description,examples,no-tolerance
 yes	description,examples
 yo	description,examples
-yq	examples,version
+yq	version
 yt-dlp	description
 ytt	description,examples,no-overlap
 zcat	description,examples,version

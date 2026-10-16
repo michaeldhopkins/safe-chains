@@ -7,10 +7,12 @@ mod classify_budget;
 mod classify_budget_tests;
 mod display;
 mod echoed;
+pub(crate) mod escape;
 pub(crate) mod eval;
 mod explain;
 #[cfg(test)]
 mod glob_tests;
+pub(crate) mod heredocs;
 mod loops;
 #[cfg(test)]
 mod loops_tests;
@@ -21,6 +23,7 @@ pub(crate) mod opaque;
 #[cfg(test)]
 mod opaque_tests;
 mod parse;
+mod printed;
 #[cfg(test)]
 mod proptests;
 mod reserved;

@@ -79,6 +79,7 @@ owed = [
   "a_random_unclosed_nest_parses_in_linear_work",
   "src/cst/proptests.rs::roundtrip",
   "src/cst/proptests.rs::parse_never_panics",
+  "src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict",
 ]
 "src/cst/sub_close.rs" = [
   "src/cst/parse.rs::a_random_unclosed_nest_parses_in_linear_work",
@@ -89,7 +90,14 @@ owed = [
   "src/cst/opaque_tests.rs::locale_quote_is_the_double_quoted_string",
 ]
 "src/cst/loops.rs" = ["src/cst/loops_tests.rs::a_literal_loop_approves_exactly_when_every_substituted_body_does"]
-"src/cst/opaque.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
+"src/cst/opaque.rs" = [
+  "src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word",
+  "src/cst/opaque_tests.rs::an_unknown_word_never_approves_what_a_refused_program_would",
+  "src/cst/opaque_tests.rs::a_glued_item_never_approves_what_its_text_would_not",
+]
+"src/cst/printed.rs" = ["src/cst/printed_tests.rs::a_printed_word_is_never_safer_through_xargs", "src/cst/printed_tests.rs::the_utility_is_never_replaced"]
+"src/cst/heredocs.rs" = ["src/cst/heredocs_tests.rs::commands_after_a_heredoc_on_its_line_are_judged_as_written", "src/cst/heredocs_tests.rs::an_expansion_in_a_body_never_approves_more_than_the_command"]
+"src/cst/escape.rs" = ["src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict"]
 "src/cst/opaque/declared.rs" = ["src/cst/opaque_tests.rs::a_rebound_variable_is_not_read_stale"]
 "src/cst/opaque/items.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/opaque/walk.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
@@ -285,6 +293,11 @@ owed = [
   "scan_perl_with_unknown_long_flag_returns_none",
   "has_substitution_eval_matches_e_flag_for_isolated_substitution",
 ]
+"src/handlers/perl_regex.rs" = [
+  "a_regex_that_evaluates_code_is_never_approved",
+  "code_between_inert_pieces_is_always_read",
+  "src/handlers/perl.rs::has_substitution_eval_matches_e_flag_for_isolated_substitution",
+]
 "src/handlers/php.rs" = [
   "is_safe_ini_pair_only_depends_on_the_key_half",
   "is_safe_ini_pair_matches_the_allowlist_exactly",
@@ -299,6 +312,7 @@ owed = [
   "loop_control_other_inputs_are_denied",
   "dispatch_returns_none_for_unhandled_commands",
   "a_cluster_holding_any_letter_outside_the_policy_never_approves",
+  "src/cst/printed_tests.rs::the_utility_is_never_replaced",
 ]
 "src/handlers/system/plutil.rs" = [
   "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
@@ -381,6 +395,15 @@ owed = [
   "src/pathgate/handlers/plist.rs::plist_readers_are_never_laxer_than_cat",
 ]
 "src/pathgate/handlers/jj.rs" = ["the_repository_is_read_only_with_the_flag_and_an_observing_sub"]
+"src/pathgate/handlers/jq.rs" = [
+  "src/pathgate/handlers/jq_tests.rs::a_directive_at_any_directive_position_is_seen",
+  "src/pathgate/handlers/jq_tests.rs::modulemeta_after_any_operator_is_seen",
+  "src/pathgate/handlers/jq_tests.rs::a_field_or_a_longer_name_never_reads_as_a_directive",
+  "src/pathgate/handlers/jq_tests.rs::every_short_cluster_holding_f_or_l_is_seen",
+  "src/pathgate/handlers/jq_tests.rs::every_yq_loader_spelling_is_seen_outside_a_field",
+  "src/pathgate/handlers/jq_tests.rs::checking_never_panics",
+  "src/pathgate/handlers/jq_tests.rs::the_filter_is_found_behind_any_options",
+]
 "src/pathgate/handlers/plist.rs" = ["plist_readers_are_never_laxer_than_cat", "a_non_option_dash_o_never_relaxes_a_rewrite"]
 "src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
 "src/refusal.rs" = [
@@ -517,7 +540,11 @@ owed = [
 "src/cst/netargs_tests.rs" = "the network-argument suite (#[cfg(test)] mod in cst/netargs.rs)"
 "src/cst/loops_tests.rs" = "the loop-variable and unknown-content suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/opaque_tests.rs" = "the unknown-word suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/cst/printed_tests.rs" = "the printed-item suite (#[cfg(test)] mod in cst/printed.rs)"
+"src/cst/heredocs_tests.rs" = "the heredoc queue suite (#[cfg(test)] mod in cst/heredocs.rs)"
+"src/cst/escape_tests.rs" = "the escape and line-continuation suite (#[cfg(test)] mod in cst/escape.rs)"
 "src/handlers/vcs/jj_tests.rs" = "the jj suite (#[cfg(test)] mod in handlers/vcs/mod.rs)"
+"src/pathgate/handlers/jq_tests.rs" = "the jq-family program suite (#[cfg(test)] mod in pathgate/handlers/jq.rs)"
 "src/cst/glob_tests.rs" = "the glob-listing suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"

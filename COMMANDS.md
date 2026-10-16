@@ -6308,9 +6308,14 @@ Aliases: `godot4`
 ### `gojq`
 <p class="cmd-url"><a href="https://github.com/itchyny/gojq">https://github.com/itchyny/gojq</a></p>
 
-- Allowed standalone flags: --color-output, --compact-output, --exit-status, --help, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --slurp, --sort-keys, --tab, --version, --yaml-input, --yaml-output, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
-- Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
+- Allowed standalone flags: --args, --color-output, --compact-output, --exit-status, --help, --jsonargs, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --slurp, --sort-keys, --tab, --version, --yaml-input, --yaml-output, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
+- Allowed valued flags: --arg, --argjson, --indent, --rawfile, --slurpfile
 - Bare invocation allowed
+
+**Examples:**
+
+- `gojq . ./data.json`
+- `gojq --yaml-input .a ./a.yml`
 
 ### `golangci-lint`
 <p class="cmd-url"><a href="https://golangci-lint.run/">https://golangci-lint.run/</a></p>
@@ -7488,8 +7493,13 @@ Aliases: `iperf`
 <p class="cmd-url"><a href="https://github.com/01mf02/jaq">https://github.com/01mf02/jaq</a></p>
 
 - Allowed standalone flags: --compact-output, --exit-status, --help, --join-output, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
-- Allowed valued flags: --arg, --argjson, --from-file, --indent, --rawfile, --slurpfile, -f
+- Allowed valued flags: --arg, --argjson, --indent, --rawfile, --slurpfile
 - Bare invocation allowed
+
+**Examples:**
+
+- `jaq . ./data.json`
+- `jaq -r .name ./package.json`
 
 ### `jar`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jar.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/jar.html</a></p>
@@ -7751,7 +7761,7 @@ Aliases: `gjoin`
 ### `jq`
 <p class="cmd-url"><a href="https://jqlang.org/manual/">https://jqlang.org/manual/</a></p>
 
-- Allowed standalone flags: --args, --ascii-output, --binary, --build-configuration, --color-output, --compact-output, --exit-status, --from-file, --help, --join-output, --jsonargs, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --stream, --stream-errors, --tab, --unbuffered, --version, -C, -M, -R, -S, -V, -a, -b, -c, -e, -f, -g, -h, -j, -n, -r, -s
+- Allowed standalone flags: --args, --ascii-output, --binary, --build-configuration, --color-output, --compact-output, --exit-status, --help, --join-output, --jsonargs, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --stream, --stream-errors, --tab, --unbuffered, --version, -C, -M, -R, -S, -V, -a, -b, -c, -e, -g, -h, -j, -n, -r, -s
 - Allowed valued flags: --arg, --argjson, --indent, --rawfile, --slurpfile
 - Bare invocation allowed
 
@@ -15836,7 +15846,12 @@ Aliases: `td`
 <p class="cmd-url"><a href="https://github.com/kislyuk/yq">https://github.com/kislyuk/yq</a></p>
 
 - Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --toml-output, --version, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -t
-- Allowed valued flags: --arg, --argjson, --indent, -f
+- Allowed valued flags: --arg, --argjson, --indent
+
+**Examples:**
+
+- `tomlq . ./a.toml`
+- `tomlq -r .package.name ./Cargo.toml`
 
 ### `toolbox`
 <p class="cmd-url"><a href="https://github.com/containers/toolbox">https://github.com/containers/toolbox</a></p>
@@ -17202,8 +17217,13 @@ Aliases: `gwhoami`
 ### `xq`
 <p class="cmd-url"><a href="https://github.com/kislyuk/yq">https://github.com/kislyuk/yq</a></p>
 
-- Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, --xml-output, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -x
-- Allowed valued flags: --arg, --argjson, --indent, --xml-dtd, --xml-item-depth, --xml-root, -f
+- Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, --xml-dtd, --xml-output, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -x
+- Allowed valued flags: --arg, --argjson, --indent, --xml-item-depth, --xml-root
+
+**Examples:**
+
+- `xq . ./a.xml`
+- `xq -r .root.name ./a.xml`
 
 ### `xsel`
 <p class="cmd-url"><a href="https://github.com/kfish/xsel">https://github.com/kfish/xsel</a></p>
@@ -17404,6 +17424,11 @@ Aliases: `gyes`
 
 - Allowed standalone flags: --colors, --exit-status, --help, --no-colors, --no-doc, --null-input, --prettyPrint, --version, -C, -M, -N, -P, -V, -e, -h, -r
 - Allowed valued flags: --arg, --argjson, --expression, --front-matter, --indent, --input-format, --output-format, -I, -p
+
+**Examples:**
+
+- `yq .a ./a.yml`
+- `yq eval .metadata.name ./a.yml`
 
 ### `yt-dlp`
 <p class="cmd-url"><a href="https://github.com/yt-dlp/yt-dlp">https://github.com/yt-dlp/yt-dlp</a></p>

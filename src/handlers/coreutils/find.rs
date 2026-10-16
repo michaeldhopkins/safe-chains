@@ -141,15 +141,24 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
 }
 
 fn judge_exec(exec: &[&str], base: &str, walk: Walk) -> Verdict {
-    frozen_reach::judged_over(base, walk, |bound| {
-        let item = if bound.ends_with("/f") { format!("{bound}{}", crate::parse::UNKNOWN_CONTENT) } else { bound.to_string() };
+    let judge = |item: &str, shield: bool| {
         let words: Vec<String> = exec
             .iter()
-            .map(|w| crate::handlers::fd::synthetic_operand(&w.replace("{}", &item), w, &item))
+            .map(|w| {
+                let bound = w.replace("{}", item);
+                if shield { crate::handlers::fd::synthetic_operand(&bound, w, item) } else { bound }
+            })
             .collect();
         let _mark = crate::cst::netargs::enter(true);
         crate::command_verdict(&shell_words::join(&words))
-    })
+    };
+    let verdict = frozen_reach::judged_over(base, walk, |bound| {
+        let item = if bound.ends_with("/f") { format!("{bound}{}", crate::parse::UNKNOWN_CONTENT) } else { bound.to_string() };
+        judge(&item, true)
+    });
+    // A match's name is text nobody has seen, so the command must also stand one that is code.
+    let embedded = exec.iter().any(|w| w.contains("{}") && *w != "{}");
+    crate::cst::opaque::refused_as_any_content(verdict, embedded, |probe| judge(probe, false))
 }
 
 /// The directories `-execdir` runs its command in for one search path: the directory holding the
