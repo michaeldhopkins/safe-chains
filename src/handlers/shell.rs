@@ -103,6 +103,7 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     let mut replstr: Option<String> = None;
     let mut whole_items = false;
+    let mut split_anywhere = false;
     while i < tokens.len() {
         let s = tokens[i].as_str();
         // `-I R` names a replacement string that xargs substitutes with each stdin item. The
@@ -121,6 +122,8 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             continue;
         }
         whole_items |= s == "-0" || s.starts_with("-d");
+        let delimiter = if s == "-d" { tokens.get(i + 1).map(Token::as_str) } else { s.strip_prefix("-d") };
+        split_anywhere |= delimiter.is_some_and(|d| !matches!(d, "\\n" | "\n"));
         if XARGS_FLAGS_WITH_ARG.contains(&tokens[i]) {
             i += 2;
             continue;
@@ -142,6 +145,9 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
         // `find ./src | xargs cat` → `cat ./src/sc_item` (allow), bare `xargs cat` → `cat <?>`
         // (deny). This is the same operand-binding `find -exec` gives `{}`, sourced from the pipe.
         let repr = crate::pathctx::stdin_item_repr().unwrap_or_else(|| "/__SAFE_CHAINS_CMDSUB__".to_string());
+        // A delimiter other than a newline cuts an item anywhere, so a piece of the representative
+        // can lead somewhere it does not: `echo a/.gitx/hooks | xargs -d x touch` touches `a/.git`.
+        let repr = if split_anywhere { "/__SAFE_CHAINS_CMDSUB__".to_string() } else { repr };
         let render = |item: &str| {
             if let Some(r) = &replstr {
                 // `-I R`: substitute each occurrence of R with the item representative

@@ -22,6 +22,8 @@ pub(crate) use path_verdicts::{
 use transfer::resolve_transfer;
 mod flags;
 pub(crate) mod frozen_reach;
+pub(crate) mod frozen_walk;
+pub(crate) mod link_mode;
 pub(crate) mod locus;
 pub(crate) mod regions;
 #[cfg(test)]
@@ -637,17 +639,16 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
                 }
                 return worst("behavior: write operation with no operand — worst-cased (§0)");
             }
-            let mut caps: Vec<Capability> = frozen_reach::with_reached(spec, &operands, tokens)
-                .iter()
-                .map(|p| match spec.operation {
-                    // A destroy UNBINDS the name, so it reads the rebind face: `rm -rf ~/.config`
-                    // removes what the trust root points at, while `touch ~/.config/x` does not.
-                    Operation::Destroy => destroys(locus::rebind_locus(p), scale),
-                    Operation::Create => creates(classify_locus(p), scale),
-                    Operation::Mutate => mutates(classify_locus(p), scale, "behavior: in-place mutate"),
-                    _ => Capability::worst("behavior: unsupported write operation — worst-cased (§0)"),
-                })
-                .collect();
+            let judge = |p: &String| match spec.operation {
+                // A destroy UNBINDS the name, so it reads the rebind face: `rm -rf ~/.config`
+                // removes what the trust root points at, while `touch ~/.config/x` does not.
+                Operation::Destroy => destroys(locus::rebind_locus(p), scale),
+                Operation::Create => creates(classify_locus(p), scale),
+                Operation::Mutate => mutates(classify_locus(p), scale, "behavior: in-place mutate"),
+                _ => Capability::worst("behavior: unsupported write operation — worst-cased (§0)"),
+            };
+            let mut caps: Vec<Capability> =
+                link_mode::judged(tokens, || frozen_reach::with_reached(spec, &operands, tokens).iter().map(judge).collect());
             caps.extend(flag_caps);
             Profile::of(caps)
         }
@@ -1004,6 +1005,8 @@ struct TarParse<'a> {
     want_archive: bool,
     reject: bool,
     long_archive: Option<&'a str>,
+    /// `h` or `--dereference` archives what a member that is a link leads to.
+    members: link_mode::LinkUse,
     /// Each positional with the `-C` directory active when it appeared (`None` = cwd).
     positionals: Vec<TarPositional<'a>>,
 }
@@ -1015,6 +1018,7 @@ impl<'a> TarParse<'a> {
             match b {
                 b'c' | b'x' | b't' | b'r' | b'u' | b'A' | b'd' => self.mode = Some(b),
                 b'f' => self.want_archive = true,
+                b'h' => self.members = link_mode::LinkUse::Target,
                 b'C' | b'T' | b'X' | b'b' | b'H' | b'g' | b'K' | b'N' => self.reject = true,
                 x if NOVAL.contains(&x) => {}
                 _ => self.reject = true,
@@ -1028,6 +1032,7 @@ impl<'a> TarParse<'a> {
             "create" => self.mode = Some(b'c'),
             "extract" | "get" => self.mode = Some(b'x'),
             "list" => self.mode = Some(b't'),
+            "dereference" => self.members = link_mode::LinkUse::Target,
             "append" => self.mode = Some(b'r'),
             "update" => self.mode = Some(b'u'),
             "file" => match long.split_once('=') {
@@ -1045,7 +1050,6 @@ impl<'a> TarParse<'a> {
             | "to-stdout"
             | "help"
             | "version"
-            | "dereference"
             | "totals" => {}
             _ => self.reject = true,
         }
@@ -1072,14 +1076,13 @@ impl<'a> TarParse<'a> {
 
         match mode {
             b'c' | b'r' | b'u' => {
-                let mut caps: Vec<Capability> = members
-                    .iter()
-                    // UNBOUNDED, not bounded: a member that is a directory is archived with
-                    // everything under it, so `tar -cf x.tar ~` packs every key in home into a
-                    // worktree file that is then ordinary to read. The member names the root of a
-                    // sweep, not a file, and the shield cannot clear a root.
-                    .map(|(dir, m)| observes_path(&tar_bound(dir.as_deref(), m), Scale::Unbounded, "tar reads a member into the archive"))
-                    .collect();
+                // UNBOUNDED, not bounded: a member that is a directory is archived with everything
+                // under it, so `tar -cf x.tar ~` packs every key in home into a worktree file that
+                // is then ordinary to read. The member names the root of a sweep, not a file.
+                let member =
+                    |(dir, m): &TarPositional| observes_path(&tar_bound(dir.as_deref(), m), Scale::Unbounded, "tar reads a member");
+                let read = || members.iter().map(member).collect::<Vec<Capability>>();
+                let mut caps = if self.members == link_mode::LinkUse::Target { read() } else { crate::pathctx::on_the_link(read) };
                 if let Some((dir, a)) = archive_file {
                     caps.push(overwrites(classify_locus(&tar_bound(dir, a)), Scale::Single, false));
                 }
@@ -1257,7 +1260,7 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     // At least one required flag must be present, or the command prints something other than paths
     // entirely — `git diff` without `--name-only` prints a patch. Checked before `invalidated_by`
     // because it is the stronger condition: absent, there is no claim to invalidate.
-    if !rule.requires.is_empty() && !rule.requires.iter().any(|r| args.iter().any(|a| flag_present(a, std::slice::from_ref(r)))) {
+    if !rule.requires.is_empty() && !rule.requires.iter().any(|r| args.iter().any(|a| flags::flag_present(a, std::slice::from_ref(r)))) {
         return None;
     }
     // `--help` and `--version` replace the command's DATA output with prose, and EVERY output
@@ -1278,7 +1281,7 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
     }
     // A flag that changes what stdout CONTAINS (`fd -x cat {}` prints file bodies, `fd -l` prints
     // `ls -l` rows) voids the claim — the output is no longer a path at all.
-    if args.iter().any(|a| flag_present(a, &rule.invalidated_by)) {
+    if args.iter().any(|a| flags::flag_present(a, &rule.invalidated_by)) {
         return None;
     }
 
@@ -1333,22 +1336,6 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
             }
         }
     }
-}
-
-/// Whether `arg` is one of `flags`, in any spelling that carries a value (`-x`, `--exec`,
-/// `--exec=…`). A short flag may also be CLUSTERED (`-lx`), so single-char forms are matched
-/// against the cluster's letters.
-fn flag_present(arg: &str, flags: &[String]) -> bool {
-    let head = arg.split('=').next().unwrap_or(arg);
-    flags.iter().any(|f| {
-        if head == f {
-            return true;
-        }
-        match (f.strip_prefix('-'), arg.strip_prefix('-')) {
-            (Some(letter), Some(cluster)) if f.len() == 2 && !arg.starts_with("--") => cluster.contains(letter),
-            _ => false,
-        }
-    })
 }
 
 /// Every argument that could name a search ROOT, over-approximated on purpose.

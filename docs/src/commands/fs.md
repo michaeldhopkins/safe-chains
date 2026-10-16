@@ -42,7 +42,16 @@ Aliases: `gbasename`
 ### `chflags`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?chflags">https://man.freebsd.org/cgi/man.cgi?chflags</a></p>
 
-- Allowed standalone flags: -H, -L, -P, -R, -f, -h, -v, -x
+- Edits its file operands in place within your workspace.
+- Allowed standalone flags: --help, --version, -P, -R, -f, -h, -v, -x
+- Recurses into directory trees with: -R
+
+**Examples:**
+
+- `chflags hidden build/out.log`
+- `chflags nouchg notes.txt`
+- `chflags -R nodump target`
+- `chflags -h hidden link-in-tree`
 
 ### `chmod`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#chmod-invocation</a></p>
@@ -78,8 +87,6 @@ Aliases: `gchmod`
 ### `cp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation</a></p>
 
-Aliases: `gcp`
-
 - Reads each source and writes the destination within your workspace.
 - Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -n, -p, -r, -u, -v, -x
 - Allowed valued flags: --suffix, --target-directory, -S, -t
@@ -92,7 +99,6 @@ Aliases: `gcp`
 - `cp -a assets dist/assets`
 - `cp -n config.example.toml config.toml`
 - `cp -t dist a.txt b.txt`
-- `gcp -p a.txt b.txt`
 
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
@@ -172,8 +178,6 @@ Aliases: `gdirname`
 
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
-
-Aliases: `gdu`
 
 - Allowed standalone flags: --all, --apparent-size, --bytes, --count-links, --dereference, --dereference-args, --help, --human-readable, --inodes, --no-dereference, --null, --one-file-system, --separate-dirs, --si, --summarize, --total, --version, -0, -D, -H, -L, -P, -S, -V, -a, -b, -c, -h, -k, -l, -m, -s, -x
 - Allowed valued flags: --block-size, --exclude, --files0-from, --max-depth, --threshold, --time, --time-style, -B, -d, -t
@@ -265,7 +269,7 @@ Aliases: `gln`, `link`, `glink`
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
 
-Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
+Aliases: `gdir`, `gvdir`, `dir`, `vdir`
 
 - Allowed standalone flags: --all, --almost-all, --author, --classify, --context, --dereference, --dereference-command-line, --dereference-command-line-symlink-to-dir, --directory, --escape, --file-type, --full-time, --group-directories-first, --help, --hide-control-chars, --human-readable, --indicator-style, --inode, --kibibytes, --literal, --no-group, --numeric-uid-gid, --quote-name, --recursive, --reverse, --show-control-chars, --si, --size, --version, -1, -A, -B, -C, -F, -G, -H, -L, -N, -Q, -R, -S, -U, -V, -X, -Z, -a, -c, -d, -f, -g, -h, -i, -k, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
@@ -400,8 +404,6 @@ Aliases: `grealpath`
 
 ### `rm`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation</a></p>
-
-Aliases: `grm`
 
 - Deletes its file operands within your workspace.
 - Allowed standalone flags: --dir, --force, --help, --interactive, --one-file-system, --preserve-root, --recursive, --verbose, --version, -I, -R, -d, -f, -i, -r, -v

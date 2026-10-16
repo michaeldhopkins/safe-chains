@@ -3,7 +3,7 @@
 //! name the intent (`creates`/`overwrites`/`relocates`/`destroys`/`reads_*`/`worst`); the
 //! enum choices and `because` strings live here, in one place.
 
-use super::locus::{read_is_unshieldable, read_locus, write_locus};
+use super::locus::{read_is_unshieldable, read_locus};
 use crate::engine::facet::*;
 
 /// A read capability for `path`: its read locus AND, when the path cannot be cleared by the
@@ -264,6 +264,17 @@ pub(super) fn observes(locus: LocalLocus, scale: Scale, because: &str) -> Capabi
     c
 }
 
+/// How a transfer places its operands: the face its sources are judged at, whether the command acts
+/// on a link named as a source rather than on what it leads to (`cp -R link x`), and whether the
+/// destination is the entry made.
+pub(super) struct Placing {
+    pub face: super::locus::Face,
+    pub on_link: bool,
+    /// The destination is the entry made, never a folder a source lands in: `ln -sf a link` over an
+    /// existing link to a file replaces it.
+    pub dest_is_entry: bool,
+}
+
 /// The profile of a content-transfer command (`cp`/`mv`/`ln`): one capability per SOURCE
 /// operand plus one for the DEST, each gated at its own locus. Assembling it here — rather
 /// than by hand in each resolver — makes a *dropped operand role* unrepresentable: every
@@ -281,18 +292,14 @@ pub(super) fn transfer_profile(
     sources: &[&str],
     dest: &str,
     scale: Scale,
-    source_face: super::locus::Face,
+    source: Placing,
     dest_face: super::locus::Face,
     per_source: impl Fn(LocalLocus, Scale) -> Capability,
     per_dest: impl Fn(LocalLocus, Scale) -> Capability,
 ) -> Profile {
     // Faces rather than a `source_writes` bool: `mv` REBINDS its source (the name stops referring
     // to anything) and `ln` rebinds its destination, and neither is expressible as read-or-write.
-    let at = |p: &str, f: super::locus::Face| match f {
-        super::locus::Face::Read => read_locus(p),
-        super::locus::Face::Write => write_locus(p),
-        super::locus::Face::Rebind => super::locus::rebind_locus(p),
-    };
+    let at = super::locus::face;
     // A SOURCE the shield cannot clear carries the same `secret · reads` claim a plain reader gets.
     // `per_source` takes only a locus, so it could never make this claim itself, and every transfer
     // command routes through here — `cp`, `mv`, `ln`, `scp`, `rsync`. Without it `cp ~/.ssh/id_rsa
@@ -305,16 +312,20 @@ pub(super) fn transfer_profile(
     let mut caps: Vec<Capability> = sources
         .iter()
         .map(|s| {
-            let mut c = per_source(at(s, source_face), scale);
-            if unclearable_read(s, scale) {
-                claims_secret_read(&mut c);
-            }
-            c
+            let judge = || {
+                let mut c = per_source(at(s, source.face), scale);
+                if unclearable_read(s, scale) {
+                    claims_secret_read(&mut c);
+                }
+                c
+            };
+            if source.on_link { crate::pathctx::on_the_link(judge) } else { judge() }
         })
         .collect();
     // The destination is judged at its worst landing: itself, or the name a source arrives under.
     let landing = sources
         .iter()
+        .filter(|_| !source.dest_is_entry)
         .filter_map(|s| received_name(s))
         .map(|name| at(&format!("{}/{name}", dest.trim_end_matches('/')), dest_face))
         .fold(at(dest, dest_face), LocalLocus::max);

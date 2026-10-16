@@ -52,7 +52,7 @@ fn a_glob_reaches_what_its_matches_reach() {
 #[test]
 fn a_tree_too_large_to_list_is_judged_as_reaching() {
     let (_d, root) = project(&["big"]);
-    for i in 0..super::MAX_ENTRIES + 1 {
+    for i in 0..crate::engine::resolve::frozen_walk::MAX_ENTRIES + 1 {
         std::fs::write(format!("{root}/big/{i}"), "").expect("file");
     }
     assert_eq!(within(&root, || frozen_below("big", true)), Some(Reach::Unlisted("big/.git/f".to_string())));

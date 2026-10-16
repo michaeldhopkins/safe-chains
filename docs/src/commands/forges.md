@@ -21,7 +21,7 @@
 - **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints, and a -F/--field value starting with @ (a file or stdin) is denied; on the graphql endpoint, a query containing the word mutation is denied.
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
 - **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
-- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
+- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
 - **status**: see `simple_list` below
 
 - **Without a subcommand:**
@@ -29,12 +29,12 @@
 
 - **Subcommands by action verb:**
 - **alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, repo, ruleset, secret, ssh-key, variable, workflow** (Inert)
-  - **checks**: Flags: --fail-fast, --required, --watch, --web, -w. Valued: --interval, --jq, --json, --repo, --template, -R, -i, -q
-  - **diff**: Flags: --name-only, --patch, --web, -w. Valued: --color, --repo, -R
-  - **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, --web, -a, -w. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
-  - **status**: Flags: --exit-status, --log, --log-failed, --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+  - **checks**: Flags: --fail-fast, --required, --watch. Valued: --interval, --jq, --json, --repo, --template, -R, -i, -q
+  - **diff**: Flags: --name-only, --patch. Valued: --color, --repo, -R
+  - **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, -a. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+  - **status**: Flags: --exit-status, --log, --log-failed. Valued: --jq, --json, --repo, --template, -R, -q
   - **verify**: see `simple_view` below
-  - **view**: Flags: --comments, --web, --yaml, -c, -w, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
+  - **view**: Flags: --comments, --yaml, -c, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
   - **watch**: see `simple_view` below
 - **run** (Inert)
   - **checks**: see `simple_view` below
@@ -42,7 +42,7 @@
   - **list**: Valued: --branch, --commit, --created, --event, --jq, --json, --limit, --repo, --status, --template, --user, --workflow, -L, -R, -b, -q, -u, -w
   - **status**: see `simple_view` below
   - **verify**: see `simple_view` below
-  - **view**: Flags: --exit-status, --log, --log-failed, --verbose, --web, -v, -w. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
+  - **view**: Flags: --exit-status, --log, --log-failed, --verbose, -v. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
   - **watch**: Flags: --exit-status. Valued: --interval, --repo, -R, -i
 - **run** (SafeWrite)
   - **rerun**: Flags: --debug, --failed. Valued: --job, --repo, -R, -j
@@ -52,7 +52,7 @@
   - **list**: Flags: --exclude-drafts, --exclude-pre-releases. Valued: --jq, --json, --limit, --order, --repo, --template, -L, -R, -q
   - **status**: see `simple_list` below
   - **verify**: see `simple_list` below
-  - **view**: Flags: --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+  - **view**: Valued: --jq, --json, --repo, --template, -R, -q
   - **watch**: see `simple_list` below
 - **release** (SafeWrite)
   - **download** (requires -O/--output): Flags: --clobber, --skip-existing. Valued: --archive, --dir, --output, --pattern, --repo, -A, -D, -O, -R, -p
@@ -60,8 +60,8 @@
   - **status**: see `simple_list` below
 
 - **Shared flag sets:**
-- **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
-- **simple_view**: Flags: --web, --yaml, -w, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
+- **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, -a. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+- **simple_view**: Flags: --yaml, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
 
 **Examples:**
 
@@ -91,7 +91,7 @@
   - **issues**: see `list` below
   - **list**: see `list` below
   - **status**: see `simple` below
-  - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, --web, -c, -h, -p, -s, -w. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
+  - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, -c, -h, -p, -s. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
 - **auth** (Inert)
   - **status**: see `simple` below
 

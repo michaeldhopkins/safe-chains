@@ -69,7 +69,7 @@ pub(crate) fn rebind_locus(path: &str) -> LocalLocus {
     face(path, Face::Rebind)
 }
 
-fn face(path: &str, want_write: Face) -> LocalLocus {
+pub(crate) fn face(path: &str, want_write: Face) -> LocalLocus {
     // Scheme-aware: a URL is not an ordinary local path. `file:` names a LOCAL file, so classify
     // the path it points at (`file:///etc/shadow` denies like reading /etc/shadow). Any other
     // scheme (`http://`, `s3://`, `ssh://`, …) is a NETWORK endpoint — not a local filesystem

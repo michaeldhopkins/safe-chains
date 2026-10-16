@@ -73,15 +73,28 @@ level" below), which also admits `--template` and `--separate-git-dir`.
 
 A recursive write is judged by the write-frozen names below its operand
 (`src/engine/resolve/frozen_reach.rs`), and `find`, and `fd -H`, stand for an item inside
-the first one they would reach. So `find . -name '*.orig' -delete` and
-`find . -name '*.rs' -exec sed -i … {} +` are refused in any repository, though the name filter
-keeps them out of `.git`: the stand-in does not read `-name`, `-path` or `-prune`. `fd` without
-`-H` skips hidden entries and is unaffected, but its search always includes `.`, so
-`fd -H . src -x chmod +x` is refused too. Narrowing needs the stand-in to test the filter
-against the frozen tree's names (and `.git/objects` is large). Found 2026-10-15.
+the first one they would reach. `find`'s own filters now narrow that walk where their meaning is
+certain (`src/handlers/coreutils/find_skip.rs`): `find . -path ./.git -prune -o -type f -exec …`
+and `find . -type f -not -path './.git/*' -exec …` are judged without `.git`. A positive name filter
+does not narrow it, so `find . -name '*.orig' -delete` and `find . -name '*.rs' -exec sed -i … {} +`
+are still refused in any repository: a branch named `x.rs` is `.git/refs/heads/x.rs`, so no name
+pattern is known to miss every file under `.git`. Narrowing those would need the frozen tree's
+names listed and matched on every check (`.git/objects` is large) and would still race a new ref.
+`fd -H . src -x chmod +x` is refused for the same reason. Found 2026-10-15.
 
 Also open: a tree with more than 20,000 entries below a recursive `chmod`/`cp` operand is refused
-unlisted (a removal or a read lets it through).
+unlisted (a removal or a read lets it through). Repository backup copies (`cp -a . ../backup`,
+`rsync -a ./ ../backup/`) are refused because they copy `.git` out; the owner is deciding whether a
+copy that only reads `.git` may be approved.
+
+## DEFERRED: archive extractors and link-following readers are not judged by the tree they reach
+
+`pax -r`, `cpio -i`, `xar -x` and `aa extract` can write a member named `.git/hooks/x`, and the
+recursive-reach walk lists folders on disk, not the members an archive holds.
+Readers that follow links inside a tree (`zip -r` by default, `rg -L`, `grep -R`) read where those
+links lead. Reads inside the project are allowed anyway, and a committed link out of it is the
+hostile checkout that safe-chains does not defend against (AGENTS.md, scope). Recorded in
+`docs/design/hard-problems.md`, HP-5.
 
 ## DEFERRED: `jj -Rpath` (the short flag with its value joined) is refused
 

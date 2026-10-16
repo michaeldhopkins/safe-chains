@@ -107,8 +107,6 @@ Aliases: `ggroups`
 ### `id`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation</a></p>
 
-Aliases: `gid`
-
 - Allowed standalone flags: --context, --group, --groups, --help, --name, --real, --user, --version, --zero, -G, -V, -Z, -g, -h, -n, -p, -r, -u, -z
 - Bare invocation allowed
 

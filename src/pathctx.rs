@@ -27,6 +27,7 @@ mod placing;
 mod vars;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
 use lexical::{expand_home, lexical_join, names_no_known_directory};
+pub(crate) use placing::on_the_link;
 use placing::resolve_placed;
 pub use vars::{LoopGuard, VarGuard, enter_loop_var, enter_var, expand_vars, names_a_loop_var};
 
@@ -209,6 +210,10 @@ pub(crate) const UNRESOLVED_CWD: &str = "/__SAFE_CHAINS_CMDSUB__";
 /// `cd ~/.aws && cat credentials` gated as the credential read it is instead of coarsely denying
 /// everything downstream.
 pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
+    join_cwd_mode(cur, target, false)
+}
+
+pub fn join_cwd_mode(cur: Option<&str>, target: &str, physical: bool) -> Option<String> {
     let expanded = match expand_home(target) {
         Some(t) => t,
         None => return Some(UNRESOLVED_CWD.to_string()), // `~` with no HOME
@@ -223,13 +228,13 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     if names_no_known_directory(&expanded) {
         return Some(UNRESOLVED_CWD.to_string());
     }
-    if expanded.starts_with('/') {
-        return Some(lexical_join("/", &expanded)); // absolute — normalize
-    }
-    // Relative with no known base: the base was already unknown before the `cd`, so this changes
-    // nothing about how later paths are judged. Left as "no update" rather than tightened, so the
-    // fix stays aimed at the hole (a cd to a KNOWN-elsewhere place being dropped).
-    cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, &expanded))
+    let raw = if expanded.starts_with('/') {
+        expanded.into_owned()
+    } else {
+        let c = cur.filter(|c| c.starts_with('/'))?;
+        format!("{c}/{expanded}")
+    };
+    Some(if physical { physical::resolve(&raw, true).unwrap_or_else(|| lexical_join("/", &raw)) } else { lexical_join("/", &raw) })
 }
 
 #[cfg(test)]

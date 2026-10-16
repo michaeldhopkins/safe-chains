@@ -118,3 +118,19 @@ pub(super) fn walk_value<'a>(valued_short: &[u8], tokens: &'a [Token], short: u8
     }
     None
 }
+
+/// Whether `arg` is one of `flags`, in any spelling that carries a value (`-x`, `--exec`,
+/// `--exec=…`). A short flag may also be CLUSTERED (`-lx`), so single-char forms are matched
+/// against the cluster's letters.
+pub(super) fn flag_present(arg: &str, flags: &[String]) -> bool {
+    let head = arg.split('=').next().unwrap_or(arg);
+    flags.iter().any(|f| {
+        if head == f {
+            return true;
+        }
+        match (f.strip_prefix('-'), arg.strip_prefix('-')) {
+            (Some(letter), Some(cluster)) if f.len() == 2 && !arg.starts_with("--") => cluster.contains(letter),
+            _ => false,
+        }
+    })
+}

@@ -2,16 +2,35 @@
 //! written relative to the project root when it lands inside it.
 
 use std::borrow::Cow;
+use std::cell::Cell;
 
 use super::home::home_path_inside_root;
 use super::lexical::{expand_home, express_relative_to_root, lexical_join};
 use super::{CURRENT, anchor, folder, physical};
 
+thread_local! {
+    static ON_THE_LINK: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Runs `judge` with the last component of every path kept, not followed: the command acts on a link
+/// named there (`cp -R link x`, `chmod -h`), not on what it leads to. A path ending in `/` or `/.`
+/// is still followed, as the kernel follows it.
+pub(crate) fn on_the_link<T>(judge: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            ON_THE_LINK.set(self.0);
+        }
+    }
+    let _restore = Restore(ON_THE_LINK.replace(true));
+    judge()
+}
+
 pub(super) fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, str> {
     if path.is_empty() || path.contains('$') {
         return Cow::Borrowed(path);
     }
-    let follow_last = use_ != Some(anchor::Use::Rebind);
+    let follow_last = use_ != Some(anchor::Use::Rebind) && !ON_THE_LINK.get();
     let root = CURRENT.with(|c| c.borrow().root.clone()).filter(|r| r.starts_with('/'));
     if path.starts_with('~') {
         let real = expand_home(path)

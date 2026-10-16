@@ -50,6 +50,7 @@ owed = [
   "src/handler_property_tests.rs::a_heredoc_body_is_code_only_behind_a_bare_delimiter",
 ]
 "src/cst/display.rs" = ["src/cst/proptests.rs::roundtrip"]
+"src/cst/echoed.rs" = ["src/cst/echoed_tests.rs::printed_items_are_written_only_where_each_may_be"]
 "src/cst/eval.rs" = [
   "src/cst/proptests.rs::eval_determinism",
   "src/cst/proptests.rs::function_definition_is_always_inert",
@@ -184,6 +185,8 @@ owed = [
   "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
 ]
 "src/handlers/coreutils/awk.rs" = ["an_awk_program_that_runs_code_is_never_approved", "the_surroundings_alone_are_approved"]
+"src/engine/resolve/link_mode.rs" = ["a_follow_flag_before_the_operands_end_always_follows"]
+"src/handlers/coreutils/find_skip.rs" = ["src/handlers/coreutils/find_skip_tests.rs::only_a_word_that_keeps_entries_away_keeps_any"]
 "src/handlers/coreutils/find.rs" = [
   "dispatch_routes_find_to_is_safe_find_with_some_wrapper",
   "dispatch_returns_none_for_every_non_find_command",
@@ -467,6 +470,7 @@ owed = [
 "src/pathctx/item_shape.rs" = "owns the thread-local shapes of loop variables and piped items"
 "src/pathctx/lexical.rs" = "reads HOME, and the process-wide region table to keep a protected place absolute"
 "src/engine/resolve/frozen_reach.rs" = "lists the folders below a recursive operand on disk"
+"src/engine/resolve/frozen_walk.rs" = "walks the folders below a recursive operand on disk, following links when asked"
 "src/pathctx/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
 "src/pathctx/placing.rs" = "reads the thread-local directory context and, through physical, the filesystem"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
@@ -498,7 +502,9 @@ owed = [
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/physical.rs)"
 "src/engine/resolve/frozen_reach_tests.rs" = "the recursive-reach suite (#[cfg(test)] mod in engine/resolve/frozen_reach.rs)"
+"src/handlers/coreutils/find_skip_tests.rs" = "the find-filter suite (#[cfg(test)] mod in handlers/coreutils/find_skip.rs)"
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
+"src/cst/echoed_tests.rs" = "the printed-item suite (#[cfg(test)] mod in cst/echoed.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/system/tmux_keys_tests.rs" = "the tmux send-keys suite (#[cfg(test)] mod in tmux_keys.rs)"

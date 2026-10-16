@@ -83,16 +83,32 @@ in `/`. A component that does not exist yet is kept as written, since nothing be
 A loop, more than 40 links, an unreadable link, or a glob whose matches lead to different places
 (through a link and not) is unpinnable and worst-cased. Limits: the lookup happens when the hook
 decides, not when the shell runs, so a link created or swapped in between is not seen. An earlier
-command in the same line cannot plant one, because `ln -s` to a target outside the project is gated
-(below); another process racing the decision can, and no check made before execution can close
-that. Hard links are not seen.
+command in the same line cannot write a new one out of the project, because `ln -s` to a target
+outside the project is gated (below). It can still copy or move a link that already exists under a
+new name (`cp -R`, `rsync -a`, `mv`), and a later command in the line is judged on the name as it
+stood at decision time. Another process racing the decision can do the same, and no check made
+before execution can close that. Hard links are not seen. A command that acts on a link named as
+its operand (`cp -R`, `rsync -a`, `chmod -h`, `chflags -h`, `tar -c`) is judged at the link, not
+where it leads, unless a flag makes it follow (`-L`, `-H`, `--dereference`, `rsync -k`).
 *Accepted (recursive reach):* a recursive write names one folder and writes everything below it, so
 `chmod -R 755 .` reaches `.git/hooks`. The tree below a recursive operand (and below a tree copy's
 source, for `cp -r`, `rsync`, `ditto`) is listed at decision time, without following links, for a
 write-frozen name; the command is judged as writing the first one found. `find`, and `fd` when it
 lists hidden entries, stand for an item inside it. A tree past 20,000 entries is judged as reaching
 one by a write, but not by a removal, which plants nothing, or a read (`src/engine/resolve/frozen_reach.rs`). Same race as
-above.
+above. A walk that follows links (`find -L`, `fd -L`, `cp -RL`, `rsync -L`) enters links to folders
+inside the project and is judged on each link that leads out of the tree, as a write or read inside
+where it leads (`src/engine/resolve/frozen_walk.rs`); `rsync -K` is judged through the links to
+folders already in its destination. `find`'s own filters narrow the walk only in shapes whose
+meaning is certain: a leading `-path ./.git -prune -o`, and `-not -path`/`-type f` filters ANDed
+before the first action (`src/handlers/coreutils/find_skip.rs`). A positive `-name` filter does not,
+since the files inside `.git` have names nobody chose. Items that `echo`, `printf` or `ls -d` hand to
+`xargs` are judged at the worst blank-separated piece by where it may be written as well as read
+(`src/cst/echoed.rs`), and a custom `xargs -d` delimiter makes them unknown. Not covered: `pax`,
+`cpio`, `xar` and `aa` extraction writing a `.git` member, and readers that follow links inside a
+tree by default or by flag (`zip -r`, `rg -L`, `grep -R`), which read where the links lead; reads
+inside the project are allowed anyway, and a link out of it is a committed link (the hostile
+checkout this tool does not defend against).
 *Partial (creation-time):* when a link is *created* (`ln [-s] TARGET LINK`), the target
 is **explicit on the command line**, not something we'd have to resolve — so the `ln`
 resolver gates the target on its own locus (`observes`), closing the in-session

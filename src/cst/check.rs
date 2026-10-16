@@ -129,7 +129,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
             per_stmt(stmt)
         });
         let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
-        let next = super::cd::cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
+        let next = super::cd::cd_target(&stmt.pipeline).and_then(|(t, p)| crate::pathctx::join_cwd_mode(running.as_deref(), &t, p));
         if next.is_some() {
             running = next;
         } else if effects.cwd {
@@ -325,7 +325,9 @@ pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
         let _stdin = stream.clone().map(|r| super::opaque::enter_stdin(r, items));
         acc = acc.combine(super::netargs::with_stdin(pipeline, stage, || cmd_verdict(cmd)));
         items = super::opaque::stage_shape(cmd, items);
-        stream = Some(stage_output_repr(cmd, stream.as_deref()));
+        if stage + 1 < pipeline.commands.len() {
+            stream = Some(stage_output_repr(cmd, stream.as_deref()));
+        }
     }
     acc
 }
@@ -354,7 +356,7 @@ pub(super) fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
     match name.as_str() {
         // find/fd emit paths UNDER their roots — the child of the worst root carries its locus.
         //
-        // "Worst" by BOTH faces, not by whether the read is allowed. Selecting on `source_ok`
+        // "Worst" by BOTH faces, not by whether the read is allowed. Selecting on whether the read is admitted
         // dropped any root that merely reads fine, so `find app/.git` fell through to `.` and
         // `find app/.git | while read f; do echo hi > "$f"; done` wrote into the frozen rung that
         // `echo hi > app/.git/config` refuses. `.git` is exactly the path that reads fine and must
@@ -380,14 +382,14 @@ pub(super) fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
         }
         // ls emits cwd-relative BASENAMES (worktree) unless `-d` echoes its (possibly absolute) args.
         "ls" => {
-            if args.contains(&"-d") {
-                worst_arg_repr(&args)
+            if super::echoed::ls_prints_operands(&args) {
+                super::echoed::printed_item("ls", &args).unwrap_or_else(|| UNKNOWN_ITEM.to_string())
             } else {
-                "sc_item".to_string()
+                super::echoed::ls_item(&args).unwrap_or_else(|| UNKNOWN_ITEM.to_string())
             }
         }
-        // echo/printf emit their args verbatim; the worst-locus arg is the representative.
-        "echo" | "printf" => worst_arg_repr(&args),
+        // echo/printf emit their args verbatim; the worst piece of them is the representative.
+        "echo" | "printf" => super::echoed::printed_item(&name, &args).unwrap_or_else(|| UNKNOWN_ITEM.to_string()),
         // git path-listers emit repo-relative paths (worktree, assuming the repo is the workspace).
         "git" => match args.first() {
             Some(&"ls-files") | Some(&"diff") | Some(&"status") | Some(&"grep") => "sc_item".to_string(),
@@ -432,21 +434,6 @@ fn reads_a_file_after_count(args: &[&str]) -> bool {
         return true; // a bare positional → a file operand
     }
     false
-}
-
-/// Whether reading `path` is admitted — i.e. it is a workspace-bounded source (worktree, `/tmp`,
-/// a granted dir), so paths derived from it are safe operands.
-fn source_ok(path: &str) -> bool {
-    crate::engine::resolve::read_content_verdict(path).is_allowed()
-}
-
-/// The worst-locus non-flag arg (for `echo`/`printf`, which emit args verbatim): the first arg
-/// whose read is denied, else a worktree placeholder.
-fn worst_arg_repr(args: &[&str]) -> String {
-    args.iter()
-        .filter(|a| !a.starts_with('-'))
-        .find(|a| !source_ok(a))
-        .map_or_else(|| "sc_item".to_string(), |a| (*a).to_string())
 }
 
 /// `find`'s root operands: after any leading global options (`-H`/`-L`/`-P`, `-D`/`-O V`), the

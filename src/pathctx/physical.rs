@@ -8,13 +8,15 @@
 //! be a link.
 //!
 //! The final component is followed for a read or a write, which open through it, and kept for a
-//! rebind (`rm`, `mv`, `ln`), which acts on the link itself, unless the path ends in `/`.
+//! rebind (`rm`, `mv`, `ln`), which acts on the link itself, unless the path ends in `/` or `/.`,
+//! which the kernel resolves through the link.
 //!
 //! The lookup happens when the hook decides, not when the shell runs the command. A link created
 //! or changed in between (by an earlier command in the same line, or by another process) is not
-//! seen. safe-chains refuses `ln -s` to a target outside the project, so a line cannot plant its own
-//! escape; the window that remains is another process racing the decision, which no check made
-//! before execution can close. Recorded in `docs/design/hard-problems.md`, HP-5.
+//! seen. safe-chains refuses `ln -s` to a target outside the project, so a line cannot write a new
+//! escape, though it can copy or move a link that already exists under a new name. Another process
+//! racing the decision can do the same, and no check made before execution can close that window.
+//! Recorded in `docs/design/hard-problems.md`, HP-5.
 
 use std::collections::VecDeque;
 
@@ -47,7 +49,7 @@ pub(super) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
     if !raw.starts_with('/') {
         return None;
     }
-    let follow_last = follow_last || raw.ends_with('/');
+    let follow_last = follow_last || raw.ends_with('/') || raw.ends_with("/.");
     let mut budget = Budget { links: 0, matches: 0 };
     match walk(Vec::new(), parts(raw, true), follow_last, &mut budget) {
         Outcome::Plain => None,

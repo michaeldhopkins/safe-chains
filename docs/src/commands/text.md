@@ -459,8 +459,6 @@ Aliases: `gpaste`
 ### `pr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation</a></p>
 
-Aliases: `gpr`
-
 - Allowed standalone flags: --double-space, --expand-tabs, --first-line-number, --form-feed, --help, --join-lines, --merge, --no-file-warnings, --number-lines, --omit-header, --omit-pagination, --page-width, --pages, --show-control-chars, --show-nonprinting, --show-tabs, --version, -F, -J, -T, -V, -d, -f, -h, -l, -m, -r, -t, -v
 - Allowed valued flags: --columns, --header, --indent, --length, --separator, --sep-string, --width, -N, -S, -W, -e, -i, -n, -o, -s, -w
 - Bare invocation allowed
@@ -495,8 +493,6 @@ Aliases: `gptx`
 
 ### `rev`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/rev.1.html">https://man7.org/linux/man-pages/man1/rev.1.html</a></p>
-
-Aliases: `grev`
 
 - Allowed standalone flags: -V, -h, --help, --version
 - Bare invocation allowed
@@ -673,8 +669,6 @@ Aliases: `guniq`
 
 ### `wc`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation</a></p>
-
-Aliases: `gwc`
 
 - Reads its file operands to stdout within your workspace.
 - Allowed standalone flags: --bytes, --chars, --debug, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -c, -l, -m, -w

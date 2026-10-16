@@ -29,7 +29,8 @@ Three deliberate exceptions read the filesystem, all racing the shell (accepted 
   component is kept as written for `rm`/`mv`/`ln`, which act on the link itself.
 - A recursive write (`chmod -R`, `cp -r`, `rsync -a`, `find -exec`) lists the tree below its operand
   for a write-frozen name (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) and is judged as writing the first
-  one it finds (`src/engine/resolve/frozen_reach.rs`).
+  one it finds (`src/engine/resolve/frozen_reach.rs`). A walk that follows links also reports each
+  link out of the tree (`src/engine/resolve/frozen_walk.rs`).
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`

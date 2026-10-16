@@ -1,5 +1,6 @@
 pub(crate) mod awk;
 mod find;
+pub(crate) mod find_skip;
 mod grep;
 mod net;
 pub(crate) mod sed;

@@ -144,3 +144,105 @@ fn copying_a_metadata_folder_itself_is_refused() {
     }
     assert!(at(&p, "rsync -a sub/.git/hooks/ d/").is_allowed());
 }
+
+#[test]
+fn a_traversal_that_prunes_the_metadata_folder_is_judged_without_it() {
+    let p = project(&["src", ".git/hooks"]);
+    for cmd in [
+        "find . -path ./.git -prune -o -exec chmod +x {} +",
+        "find . -path ./.git -prune -o -type f -exec sed -i s/a/b/ {} +",
+        "find . \\( -name .git -o -name .jj \\) -prune -o -exec chmod +x {} +",
+        "find . -type f -not -path './.git/*' -exec sed -i s/a/b/ {} +",
+        "find . -type f ! -path '*/.git/*' -exec chmod 644 {} +",
+        "find . -path ./.git -prune -o -print0 | xargs -0 chmod +x",
+    ] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+    for cmd in [
+        "find . -path ./.git -prune -o -delete",
+        "find . -not -path './.git/*' -exec chmod +x {} +",
+        "find . -exec chmod +x {} + -not -path './.git/*'",
+        "find . -name '*.txt' -exec sed -i s/a/b/ {} +",
+        "find . -path ./.gi -prune -o -exec chmod +x {} +",
+        "find . ! -path ./.git -prune -o -exec chmod +x {} +",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    let nested = project(&["src", ".git/hooks", "sub/.git/hooks"]);
+    assert!(!at(&nested, "find . -path ./.git -prune -o -exec chmod +x {} +").is_allowed());
+    assert!(at(&nested, "find . -name .git -prune -o -exec chmod +x {} +").is_allowed());
+}
+
+#[test]
+fn a_walk_that_follows_links_is_judged_where_they_lead() {
+    let p = project(&["src", ".git/hooks", "work/x", "onlylinks"]);
+    std::os::unix::fs::symlink("/etc", format!("{}/work/el", p.root)).expect("link out");
+    std::os::unix::fs::symlink(format!("{}/.git", p.root), format!("{}/work/gl", p.root)).expect("link in");
+    std::os::unix::fs::symlink("../.git/hooks", format!("{}/onlylinks/hk", p.root)).expect("link to hooks");
+    for cmd in [
+        "find -L work -exec chmod +x {} +",
+        "find work -follow -exec chmod +x {} +",
+        "fd -L . work -x chmod +x",
+        "fd --follow -H . work -x chmod +x",
+        "cp -RL work y",
+        "rsync -aL work/ y",
+        "rsync -a --copy-links work y",
+        "find -L work -print0 | xargs -0 chmod +x",
+        "find work -exec chmod +x {} +",
+        "fd . work -x chmod +x",
+        "cp -RL onlylinks y",
+        "find onlylinks -exec cp src/a.txt {}/pre-commit \\;",
+        "fd . onlylinks -x cp src/a.txt {}/pre-commit",
+        "ls onlylinks | xargs -I{} cp src/a.txt onlylinks/{}/pre-commit",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["find work -type f -exec chmod +x {} +", "find work -exec rm {} +", "chmod -R 755 work", "cp -R work y", "rsync -a work/ y"]
+    {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn a_read_that_follows_links_is_judged_where_they_lead() {
+    let p = project(&["src", "work/x"]);
+    let key = "/etc/ssh/ssh_host_ed25519_key";
+    std::os::unix::fs::symlink(key, format!("{}/work/k", p.root)).expect("link to a key");
+    assert!(!at(&p, &format!("cat {key}")).is_allowed());
+    for cmd in ["find -L work -exec cat {} +", "fd -L . work -x cat", "cp -RL work y", "find work -exec cat {} +", "fd . work -x cat"] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["find work -type f -exec cat {} +", "cp -R work y"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn a_followed_link_within_the_project_is_walked_not_refused() {
+    let p = project(&["src", "work/x", ".git/hooks"]);
+    std::os::unix::fs::symlink("../src", format!("{}/work/in", p.root)).expect("link in the project");
+    assert!(at(&p, "find -L work -exec chmod +x {} +").is_allowed());
+    assert!(at(&p, "cp -RL work y").is_allowed());
+}
+
+#[test]
+fn rsync_keeping_destination_links_is_judged_through_them() {
+    let p = project(&["src", "d"]);
+    std::os::unix::fs::symlink("/etc", format!("{}/d/el", p.root)).expect("link in the destination");
+    assert!(!at(&p, "rsync -aK src/ d/").is_allowed());
+    assert!(!at(&p, "rsync -a --keep-dirlinks src/ d/").is_allowed());
+    assert!(at(&p, "rsync -a src/ d/").is_allowed());
+}
+
+#[test]
+fn a_prune_find_does_not_test_above_its_minimum_depth_keeps_nothing_away() {
+    let p = project(&["src", ".git/hooks", "sub/.git/hooks"]);
+    for cmd in [
+        "find . -mindepth 2 -name .git -prune -o -exec chmod +x {} +",
+        "find . -mindepth 2 \\( -path ./.git -o -path ./sub/.git \\) -prune -o -exec chmod +x {} +",
+        "find . -mindepth 2 -type d -name .git -prune -o -type f -exec chmod +x {} +",
+        "find . -name .git -prune -o -mindepth 2 -exec chmod +x {} +",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+}

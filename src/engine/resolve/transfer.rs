@@ -1,6 +1,6 @@
 //! The transfer arm of behavior resolution: `cp`, `mv` and `ln`, and the paths a link reaches.
 
-use super::capability::{breadth_scale, mutates, observes, overwrites, relocates, transfer_profile, worst};
+use super::capability::{Placing, breadth_scale, mutates, observes, observes_path, overwrites, relocates, transfer_profile, worst};
 use super::flags::walk_value;
 use super::{behavior_flag_present, locus};
 use crate::engine::facet::{Capability, Profile, Scale};
@@ -43,6 +43,8 @@ pub(super) fn resolve_transfer(
         !t.clobber_flags.iter().any(|f| behavior_flag_present(tokens, f))
     };
     let recursive = t.recursive_flags.iter().any(|f| behavior_flag_present(tokens, f));
+    let words: Vec<&str> = tokens.iter().map(Token::as_str).collect();
+    let (on_link, follow) = (super::link_mode::acts_on_link(&words), super::link_mode::follows_links(&words));
     let transfer_scale = breadth_scale(&sources, recursive);
     // A relocate REMOVES its source, so the source name stops referring to anything: that is a
     // REBIND, not merely a write, and it is what makes `mv ~/.config elsewhere` a relocation of the
@@ -59,17 +61,16 @@ pub(super) fn resolve_transfer(
     // rebinds denied `ln -t ~/.config a`, which is an ordinary link into a directory you granted —
     // the same container-versus-object mistake the write face made before this face existed.
     let dest_face = if t.rebinds_destination && !dest_is_container { locus::Face::Rebind } else { locus::Face::Write };
-    let targets = if t.rebinds_destination {
-        link_targets(t, &sources, dest, dest_is_container, &set_flags(&spec.valued_short, &spec.valued_long, tokens))
-    } else {
-        Vec::new()
-    };
+    let set = set_flags(&spec.valued_short, &spec.valued_long, tokens);
+    let no_deref = set.iter().any(|(f, _)| matches!(f.as_str(), "-n" | "-h" | "--no-dereference"));
+    let replaced = t.rebinds_destination && !dest_is_container && !dest.ends_with('/') && replaces(dest, no_deref);
+    let targets = if t.rebinds_destination { link_targets(t, &sources, dest, (dest_is_container, replaced), &set) } else { Vec::new() };
     let read_at: Vec<&str> = if t.rebinds_destination { targets.iter().map(String::as_str).collect() } else { sources.clone() };
     let mut prof = transfer_profile(
         &read_at,
         dest,
         transfer_scale,
-        source_face,
+        Placing { face: source_face, on_link, dest_is_entry: replaced },
         dest_face,
         |loc, sc| match t.source {
             TransferSource::Observe => observes(loc, sc, "transfer reads the source at its locus"),
@@ -80,9 +81,15 @@ pub(super) fn resolve_transfer(
     prof.capabilities.extend(flag_caps);
     prof.capabilities.extend(targets.iter().map(String::as_str).map(reaches));
     if recursive && !t.rebinds_destination {
-        let landed = sources.iter().filter_map(|source| super::frozen_reach::landed(source, dest));
+        let landed = |source: &&str| super::frozen_reach::landed(source, dest, follow);
+        let landed = sources
+            .iter()
+            .flat_map(|source| if on_link { crate::pathctx::on_the_link(|| landed(source)) } else { landed(source) });
         prof.capabilities
             .extend(landed.map(|at| overwrites(locus::write_locus(&at), Scale::Single, no_clobber)));
+        let through = sources.iter().filter(|_| follow).flat_map(|source| super::frozen_reach::read_through(source));
+        prof.capabilities
+            .extend(through.map(|at| observes_path(&at, Scale::Unbounded, "a copy that follows links reads where they lead")));
     }
     prof
 }
@@ -96,15 +103,28 @@ fn reaches(target: &str) -> Capability {
 /// The paths each source names once it is a link target. A hard link, or a symbolic link made with
 /// a relative-flag, resolves the source as written. A symbolic link's relative target resolves
 /// against the directory the link is made in: the destination itself when it is a container, and
-/// otherwise its parent, or the destination when that turns out to be a directory, so both.
-fn link_targets(t: &TransferSpec, sources: &[&str], dest: &str, dest_is_container: bool, set: &[(String, bool)]) -> Vec<String> {
+/// otherwise its parent, or the destination when that turns out to be a directory, so both. A destination
+/// `ln` replaces rather than enters is made in its parent alone.
+fn link_targets(
+    t: &TransferSpec,
+    sources: &[&str],
+    dest: &str,
+    (dest_is_container, replaced): (bool, bool),
+    set: &[(String, bool)],
+) -> Vec<String> {
     let present = |flags: &[String], leading_only: bool| set.iter().any(|(f, leading)| (*leading || !leading_only) && flags.contains(f));
     let as_written = !present(&t.symbolic_flags, true) || present(&t.relative_flags, false);
     let joined = present(&t.symbolic_flags, false) && !present(&t.relative_flags, true);
     let container = dest_is_container || dest.ends_with('/');
     let dest = dest.trim_end_matches('/');
     let dest = if dest.is_empty() { "/" } else { dest };
-    let bases: Vec<&str> = if container { vec![dest] } else { vec![parent(dest), dest] };
+    let bases: Vec<&str> = if container {
+        vec![dest]
+    } else if replaced {
+        vec![parent(dest)]
+    } else {
+        vec![parent(dest), dest]
+    };
     let mut targets = Vec::new();
     for source in sources {
         let pinned = source.starts_with(['/', '~', '$']);
@@ -116,6 +136,14 @@ fn link_targets(t: &TransferSpec, sources: &[&str], dest: &str, dest_is_containe
         }
     }
     targets
+}
+
+/// Whether `ln` makes its link in the destination's place rather than inside it: the destination
+/// exists and is not a folder, or is a link that `-n` (`-h`) says to replace rather than enter.
+fn replaces(dest: &str, no_deref: bool) -> bool {
+    let Some(path) = crate::pathctx::on_the_link(|| super::frozen_walk::on_disk(dest)) else { return false };
+    let Ok(own) = std::fs::symlink_metadata(&path) else { return false };
+    (no_deref && own.file_type().is_symlink()) || std::fs::metadata(&path).is_ok_and(|m| !m.is_dir())
 }
 
 /// Every flag the command sets, each short flag of a cluster on its own. A valued flag ends its
@@ -245,23 +273,28 @@ mod tests {
         let tokens = |words: &[&str]| words.iter().map(|w| Token::from_test(w)).collect::<Vec<_>>();
         let set = |words: &[&str]| set_flags(b"St", &["--suffix".to_string()], &tokens(words));
         let symbolic = set(&["ln", "-s"]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &symbolic), ["t", "sub/t"]);
-        assert_eq!(link_targets(&spec, &["t"], "sub/", false, &symbolic), ["sub/t"]);
-        assert_eq!(link_targets(&spec, &["t"], "dir", true, &symbolic), ["dir/t"]);
-        assert_eq!(link_targets(&spec, &["/etc/t", "~/t"], "dir", true, &symbolic), ["/etc/t", "~/t"]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(&["ln"])), ["../t"]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(&["ln", "-sr"])), ["../t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &symbolic), ["t", "sub/t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, true), &symbolic), ["t"]);
+        assert_eq!(link_targets(&spec, &["t"], "sub/", (false, false), &symbolic), ["sub/t"]);
+        assert_eq!(link_targets(&spec, &["t"], "dir", (true, false), &symbolic), ["dir/t"]);
+        assert_eq!(link_targets(&spec, &["/etc/t", "~/t"], "dir", (true, false), &symbolic), ["/etc/t", "~/t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(&["ln"])), ["../t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(&["ln", "-sr"])), ["../t"]);
         for hard in [&["ln", "-Ss", "x"][..], &["ln", "-S", "-s"], &["ln", "-tsub"], &["ln", "--suffix", "-s"], &["ln", "--", "-s"]] {
-            assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(hard)), ["../t"], "{hard:?} makes a hard link");
+            assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(hard)), ["../t"], "{hard:?} makes a hard link");
         }
         for as_written in [&["ln", "-s", "-Sr"][..], &["ln", "-s", "-S", "-r"]] {
-            assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(as_written)), ["t", "sub/t"], "{as_written:?} is not relative");
+            assert_eq!(
+                link_targets(&spec, &["../t"], "sub/l", (false, false), &set(as_written)),
+                ["t", "sub/t"],
+                "{as_written:?} is not relative"
+            );
         }
         let names = |words: &[&str]| set(words).into_iter().map(|(f, _)| f).collect::<Vec<_>>();
         assert_eq!(names(&["ln", "-fsSx", "--suffix=y", "-vt", "d"]), ["-f", "-s", "-S", "--suffix", "-v", "-t"]);
         assert_eq!(set(&["ln", "-f", "a", "-s"]), [("-f".to_string(), true), ("-s".to_string(), false)]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(&["ln", "-s", "-r"])), ["../t"]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(&["ln", "x", "-s"])), ["../t", "t", "sub/t"]);
-        assert_eq!(link_targets(&spec, &["../t"], "sub/l", false, &set(&["ln", "-s", "x", "-r"])), ["../t", "t", "sub/t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(&["ln", "-s", "-r"])), ["../t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(&["ln", "x", "-s"])), ["../t", "t", "sub/t"]);
+        assert_eq!(link_targets(&spec, &["../t"], "sub/l", (false, false), &set(&["ln", "-s", "x", "-r"])), ["../t", "t", "sub/t"]);
     }
 }

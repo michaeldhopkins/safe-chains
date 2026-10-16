@@ -1,3 +1,5 @@
+use crate::engine::resolve::frozen_reach;
+use crate::engine::resolve::frozen_walk::Walk;
 use crate::parse::Token;
 use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
@@ -54,6 +56,9 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
         return Verdict::Denied;
     };
 
+    let words: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+    let skip = crate::handlers::coreutils::find_skip::skip_of(&words);
+    let walk = Walk { skip: &skip, ..Walk::items(true, frozen_reach::find_follows(&words)) };
     let mut level = SafetyLevel::Inert;
     let mut i = 1;
     while i < tokens.len() {
@@ -81,7 +86,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
                 }
                 for (dir, item_base) in runs_in {
                     let _there = crate::pathctx::enter_cwd(dir);
-                    match judge_exec(&exec, item_base) {
+                    match judge_exec(&exec, item_base, walk) {
                         Verdict::Denied => return Verdict::Denied,
                         Verdict::Allowed(l) => level = level.max(l),
                     }
@@ -102,7 +107,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
         if s == "-delete" {
             for base in &bases {
                 let judge = |bound: &str| crate::command_verdict(&shell_words::join(["rm", "-r", bound]));
-                match crate::engine::resolve::frozen_reach::judged_over(base, true, judge) {
+                match frozen_reach::judged_over(base, walk, judge) {
                     Verdict::Denied => return Verdict::Denied,
                     Verdict::Allowed(l) => level = level.max(l),
                 }
@@ -135,10 +140,13 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
     Verdict::Allowed(level)
 }
 
-fn judge_exec(exec: &[&str], base: &str) -> Verdict {
-    crate::engine::resolve::frozen_reach::judged_over(base, true, |bound| {
-        let bound = format!("{bound}{}", crate::parse::UNKNOWN_CONTENT);
-        let words: Vec<String> = exec.iter().map(|w| crate::handlers::fd::synthetic_operand(&w.replace("{}", &bound), w)).collect();
+fn judge_exec(exec: &[&str], base: &str, walk: Walk) -> Verdict {
+    frozen_reach::judged_over(base, walk, |bound| {
+        let item = if bound.ends_with("/f") { format!("{bound}{}", crate::parse::UNKNOWN_CONTENT) } else { bound.to_string() };
+        let words: Vec<String> = exec
+            .iter()
+            .map(|w| crate::handlers::fd::synthetic_operand(&w.replace("{}", &item), w, &item))
+            .collect();
         let _mark = crate::cst::netargs::enter(true);
         crate::command_verdict(&shell_words::join(&words))
     })

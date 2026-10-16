@@ -18,6 +18,7 @@ use std::sync::LazyLock;
 
 use serde::Deserialize;
 
+use crate::engine::resolve::frozen_reach::copy_reaches;
 use crate::handlers::pattern_flags::{self, PatternStep};
 use crate::parse::Token;
 use crate::verdict::Verdict;
@@ -607,6 +608,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
         i += 1;
     }
     let last_write = matches!(spec.shape, Shape::LastWrite | Shape::Remote);
+    let links = crate::engine::resolve::link_mode::Links::of(tokens);
     let skip_first = spec.shape == Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
     positionals.iter().enumerate().any(|(idx, &p)| {
         if skip_first && idx == 0 {
@@ -623,7 +625,8 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             return last_write && idx + 1 == positionals.len();
         }
         let role = if last_write && idx + 1 == positionals.len() { Role::Write } else { positional_role };
-        gate(role, p) || (last_write && role == Role::ReadTree && crate::engine::resolve::frozen_reach::lands_frozen(p, &positionals))
+        let judged = || gate(role, p) || copy_reaches(p, &positionals, links, (last_write && role == Role::ReadTree, role == Role::Write));
+        if links.on_link && role != Role::Write { crate::pathctx::on_the_link(judged) } else { judged() }
     })
 }
 
@@ -644,17 +647,10 @@ fn judge(role: Role, path: &str) -> Verdict {
 }
 
 fn gate(role: Role, path: &str) -> bool {
-    let verdict: fn(&str) -> Verdict = match role {
-        Role::Ignore => return false,
-        Role::Read => crate::engine::resolve::read_content_verdict,
-        Role::ReadTree => crate::engine::resolve::read_tree_verdict,
-        Role::Write => crate::engine::resolve::write_target_verdict,
-        Role::Exec => crate::engine::resolve::execute_file_verdict,
-    };
     // No pre-filter on the value's shape: the old one skipped (so approved) any shape it did not
     // list, and leaked four times (spaces, `file:~`, `$VAR`, a bare glob). `walk` already peels
     // flags off, and a bare keyword judged anyway reads as worktree-relative and allows.
-    verdict(path) == Verdict::Denied
+    judge(role, path) == Verdict::Denied
 }
 
 mod chdir;

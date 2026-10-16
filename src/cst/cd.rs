@@ -12,16 +12,43 @@ use super::{Cmd, Pipeline};
 /// The target of a statement-level `cd DIR` (a single simple command named `cd`). `None` for
 /// anything else, for `cd` with no plain positional (bare `cd`, `cd -`), and for a target CDPATH
 /// may redirect.
-pub(super) fn cd_target(pipeline: &Pipeline) -> Option<String> {
+pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
     let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
         return None;
     };
     if s.words.first()?.eval() != "cd" {
         return None;
     }
+    let mut physical = false;
+    let mut args = s.words.iter().skip(1).map(super::Word::eval);
+    let mut target = None;
+    for arg in &mut args {
+        if arg == "--" {
+            target = args.next();
+            break;
+        }
+        if let Some(flags) = arg.strip_prefix('-') {
+            if flags.is_empty() || !flags.chars().all(|c| matches!(c, 'L' | 'P' | 'e' | '@')) {
+                return None;
+            }
+            for c in flags.chars() {
+                match c {
+                    'L' => physical = false,
+                    'P' => physical = true,
+                    _ => {}
+                }
+            }
+            continue;
+        }
+        target = Some(arg);
+        break;
+    }
+    if args.next().is_some() {
+        return None;
+    }
+    let target = target?;
     let prefixed = s.env.iter().any(|(name, _)| name == "CDPATH" || name == "cdpath");
-    let target = s.words.iter().skip(1).map(|w| w.eval()).find(|a| !a.starts_with('-'))?;
-    (!searches_cdpath(&target, prefixed || cdpath_in_scope())).then_some(target)
+    (!searches_cdpath(&target, prefixed || cdpath_in_scope())).then_some((target, physical))
 }
 
 fn cdpath_in_scope() -> bool {

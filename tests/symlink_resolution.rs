@@ -146,6 +146,9 @@ fn a_cd_through_a_link_moves_to_the_target() {
     let p = project();
     symlink("/etc", format!("{}/sys", p.root)).expect("link");
     assert!(!at(&p, "cd sys && echo x > hosts").is_allowed());
+    assert!(!at(&p, "cd -P sys/.. && echo x > etc/hosts").is_allowed());
+    assert!(!at(&p, "cd sys && cd -P .. && echo x > etc/hosts").is_allowed());
+    assert!(at(&p, "cd sys/.. && echo x > src/a.txt").is_allowed());
 }
 
 #[test]
@@ -199,4 +202,50 @@ fn a_glob_over_plain_files_and_links_within_the_project_still_approves() {
     }
     symlink(format!("{}/.git/hooks", p.root), format!("{}/zhk", p.root)).expect("link");
     assert!(!at(&p, "touch *").is_allowed(), "a glob reaching .git/hooks through a link was approved");
+}
+
+/// Commands that act on a link named as an operand (copy it, archive it, change its own mode,
+/// replace it) never open its target, so a link out of the project does not refuse them. The same
+/// commands told to follow links, or reaching through a trailing slash, are judged at the target.
+#[test]
+fn a_command_acting_on_the_link_itself_is_judged_at_the_link() {
+    let p = project();
+    symlink("/etc/hosts", format!("{}/out", p.root)).expect("link to a file");
+    symlink("/etc", format!("{}/outd", p.root)).expect("link to a folder");
+    for cmd in [
+        "cp -R out x", "cp -a out x", "cp -R outd y", "rsync -a out x", "rsync -a outd y", "tar -cf t.tar out", "tar -cf t.tar outd",
+        "chmod -h 644 out", "chflags -h uchg out", "ln -sf src/a.txt out", "ln -sfn src/a.txt outd", "mv out x", "mv outd y",
+    ] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+    for cmd in [
+        "cp -RL outd y", "cp -R -H outd y", "rsync -aL outd y", "rsync -a --copy-links outd y", "tar -chf t.tar outd",
+        "tar --dereference -cf t.tar outd", "chmod 644 out", "chmod -h 644 outd/", "ln -sf src/a.txt outd", "cp -R src outd",
+        "rsync -a src outd", "cp -tR outd",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+}
+
+/// A link operand spelled so that the kernel goes through it (`link/`, `link/.`, `link/./.`) is
+/// judged at the target even by a command that would otherwise act on the link itself.
+#[test]
+fn a_link_operand_spelled_through_it_is_judged_at_the_target() {
+    let p = project();
+    symlink("/etc", format!("{}/outd", p.root)).expect("link out");
+    symlink(format!("{}/.git", p.root), format!("{}/gl", p.root)).expect("link to the metadata folder");
+    for tail in ["/", "/.", "/./", "/./.", "//."] {
+        for link in ["outd", "gl"] {
+            let op = format!("{link}{tail}");
+            for cmd in [format!("chmod -h 777 {op}"), format!("chflags -h uchg {op}"), format!("echo {op} | xargs chmod -h 777")] {
+                assert!(!at(&p, &cmd).is_allowed(), "{cmd} was approved");
+            }
+        }
+        let op = format!("outd{tail}");
+        for cmd in [format!("cp -R {op} y"), format!("cp -a {op} y"), format!("rsync -a {op} y"), format!("tar -cf t.tar {op}")] {
+            assert!(!at(&p, &cmd).is_allowed(), "{cmd} was approved");
+        }
+        assert!(at(&p, &format!("cp -R gl{tail} y")).is_allowed(), "copying out of the metadata folder was refused");
+    }
+    assert!(!at(&p, "tar -cf t.tar -C outd .").is_allowed());
 }

@@ -2856,7 +2856,16 @@ Aliases: `knife`, `chef-solo`, `chef-shell`, `chef`
 ### `chflags`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?chflags">https://man.freebsd.org/cgi/man.cgi?chflags</a></p>
 
-- Allowed standalone flags: -H, -L, -P, -R, -f, -h, -v, -x
+- Edits its file operands in place within your workspace.
+- Allowed standalone flags: --help, --version, -P, -R, -f, -h, -v, -x
+- Recurses into directory trees with: -R
+
+**Examples:**
+
+- `chflags hidden build/out.log`
+- `chflags nouchg notes.txt`
+- `chflags -R nodump target`
+- `chflags -h hidden link-in-tree`
 
 ### `chisel`
 <p class="cmd-url"><a href="https://book.getfoundry.sh/reference/chisel/">https://book.getfoundry.sh/reference/chisel/</a></p>
@@ -3381,8 +3390,6 @@ Aliases: `uncompress`
 ### `cp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation</a></p>
 
-Aliases: `gcp`
-
 - Reads each source and writes the destination within your workspace.
 - Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -n, -p, -r, -u, -v, -x
 - Allowed valued flags: --suffix, --target-directory, -S, -t
@@ -3395,7 +3402,6 @@ Aliases: `gcp`
 - `cp -a assets dist/assets`
 - `cp -n config.example.toml config.toml`
 - `cp -t dist a.txt b.txt`
-- `gcp -p a.txt b.txt`
 
 ### `cpan`
 <p class="cmd-url"><a href="https://metacpan.org/pod/cpan">https://metacpan.org/pod/cpan</a></p>
@@ -4544,8 +4550,6 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
-
-Aliases: `gdu`
 
 - Allowed standalone flags: --all, --apparent-size, --bytes, --count-links, --dereference, --dereference-args, --help, --human-readable, --inodes, --no-dereference, --null, --one-file-system, --separate-dirs, --si, --summarize, --total, --version, -0, -D, -H, -L, -P, -S, -V, -a, -b, -c, -h, -k, -l, -m, -s, -x
 - Allowed valued flags: --block-size, --exclude, --files0-from, --max-depth, --threshold, --time, --time-style, -B, -d, -t
@@ -5942,7 +5946,7 @@ Aliases: `g++`, `cc`, `c++`
 - **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints, and a -F/--field value starting with @ (a file or stdin) is denied; on the graphql endpoint, a query containing the word mutation is denied.
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
 - **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
-- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
+- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
 - **status**: see `simple_list` below
 
 - **Without a subcommand:**
@@ -5950,12 +5954,12 @@ Aliases: `g++`, `cc`, `c++`
 
 - **Subcommands by action verb:**
 - **alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, repo, ruleset, secret, ssh-key, variable, workflow** (Inert)
-  - **checks**: Flags: --fail-fast, --required, --watch, --web, -w. Valued: --interval, --jq, --json, --repo, --template, -R, -i, -q
-  - **diff**: Flags: --name-only, --patch, --web, -w. Valued: --color, --repo, -R
-  - **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, --web, -a, -w. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
-  - **status**: Flags: --exit-status, --log, --log-failed, --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+  - **checks**: Flags: --fail-fast, --required, --watch. Valued: --interval, --jq, --json, --repo, --template, -R, -i, -q
+  - **diff**: Flags: --name-only, --patch. Valued: --color, --repo, -R
+  - **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, -a. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+  - **status**: Flags: --exit-status, --log, --log-failed. Valued: --jq, --json, --repo, --template, -R, -q
   - **verify**: see `simple_view` below
-  - **view**: Flags: --comments, --web, --yaml, -c, -w, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
+  - **view**: Flags: --comments, --yaml, -c, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
   - **watch**: see `simple_view` below
 - **run** (Inert)
   - **checks**: see `simple_view` below
@@ -5963,7 +5967,7 @@ Aliases: `g++`, `cc`, `c++`
   - **list**: Valued: --branch, --commit, --created, --event, --jq, --json, --limit, --repo, --status, --template, --user, --workflow, -L, -R, -b, -q, -u, -w
   - **status**: see `simple_view` below
   - **verify**: see `simple_view` below
-  - **view**: Flags: --exit-status, --log, --log-failed, --verbose, --web, -v, -w. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
+  - **view**: Flags: --exit-status, --log, --log-failed, --verbose, -v. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
   - **watch**: Flags: --exit-status. Valued: --interval, --repo, -R, -i
 - **run** (SafeWrite)
   - **rerun**: Flags: --debug, --failed. Valued: --job, --repo, -R, -j
@@ -5973,7 +5977,7 @@ Aliases: `g++`, `cc`, `c++`
   - **list**: Flags: --exclude-drafts, --exclude-pre-releases. Valued: --jq, --json, --limit, --order, --repo, --template, -L, -R, -q
   - **status**: see `simple_list` below
   - **verify**: see `simple_list` below
-  - **view**: Flags: --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+  - **view**: Valued: --jq, --json, --repo, --template, -R, -q
   - **watch**: see `simple_list` below
 - **release** (SafeWrite)
   - **download** (requires -O/--output): Flags: --clobber, --skip-existing. Valued: --archive, --dir, --output, --pattern, --repo, -A, -D, -O, -R, -p
@@ -5981,8 +5985,8 @@ Aliases: `g++`, `cc`, `c++`
   - **status**: see `simple_list` below
 
 - **Shared flag sets:**
-- **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
-- **simple_view**: Flags: --web, --yaml, -w, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
+- **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, -a. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+- **simple_view**: Flags: --yaml, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
 
 **Examples:**
 
@@ -6166,7 +6170,7 @@ Aliases: `g++`, `cc`, `c++`
   - **issues**: see `list` below
   - **list**: see `list` below
   - **status**: see `simple` below
-  - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, --web, -c, -h, -p, -s, -w. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
+  - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, -c, -h, -p, -s. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
 - **auth** (Inert)
   - **status**: see `simple` below
 
@@ -7146,8 +7150,6 @@ Aliases: `hf`
 
 ### `id`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation</a></p>
-
-Aliases: `gid`
 
 - Allowed standalone flags: --context, --group, --groups, --help, --name, --real, --user, --version, --zero, -G, -V, -Z, -g, -h, -n, -p, -r, -u, -z
 - Bare invocation allowed
@@ -8998,7 +9000,7 @@ Aliases: `glogname`
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
 
-Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
+Aliases: `gdir`, `gvdir`, `dir`, `vdir`
 
 - Allowed standalone flags: --all, --almost-all, --author, --classify, --context, --dereference, --dereference-command-line, --dereference-command-line-symlink-to-dir, --directory, --escape, --file-type, --full-time, --group-directories-first, --help, --hide-control-chars, --human-readable, --indicator-style, --inode, --kibibytes, --literal, --no-group, --numeric-uid-gid, --quote-name, --recursive, --reverse, --show-control-chars, --si, --size, --version, -1, -A, -B, -C, -F, -G, -H, -L, -N, -Q, -R, -S, -U, -V, -X, -Z, -a, -c, -d, -f, -g, -h, -i, -k, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
@@ -12223,8 +12225,6 @@ Aliases: `upsun`
 ### `pr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation</a></p>
 
-Aliases: `gpr`
-
 - Allowed standalone flags: --double-space, --expand-tabs, --first-line-number, --form-feed, --help, --join-lines, --merge, --no-file-warnings, --number-lines, --omit-header, --omit-pagination, --page-width, --pages, --show-control-chars, --show-nonprinting, --show-tabs, --version, -F, -J, -T, -V, -d, -f, -h, -l, -m, -r, -t, -v
 - Allowed valued flags: --columns, --header, --indent, --length, --separator, --sep-string, --width, -N, -S, -W, -e, -i, -n, -o, -s, -w
 - Bare invocation allowed
@@ -13176,8 +13176,6 @@ Aliases: `grealpath`
 ### `rev`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/rev.1.html">https://man7.org/linux/man-pages/man1/rev.1.html</a></p>
 
-Aliases: `grev`
-
 - Allowed standalone flags: -V, -h, --help, --version
 - Bare invocation allowed
 
@@ -13223,8 +13221,6 @@ Aliases: `grev`
 
 ### `rm`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation</a></p>
-
-Aliases: `grm`
 
 - Deletes its file operands within your workspace.
 - Allowed standalone flags: --dir, --force, --help, --interactive, --one-file-system, --preserve-root, --recursive, --verbose, --version, -I, -R, -d, -f, -i, -r, -v
@@ -16761,8 +16757,6 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 
 ### `wc`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation</a></p>
-
-Aliases: `gwc`
 
 - Reads its file operands to stdout within your workspace.
 - Allowed standalone flags: --bytes, --chars, --debug, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -c, -l, -m, -w

@@ -40,13 +40,16 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
     // With no `{}` placeholder, fd APPENDS each matched path as a trailing argument (`fd -X cat`
     // runs `cat <matches>`), so the path must still be bound in that form or a `/etc` search leaks.
     let has_placeholder = tokens[cmd_start..cmd_end].iter().any(|t| t.as_str().contains('{'));
-    let hidden = crate::engine::resolve::frozen_reach::fd_lists_hidden(&tokens[1..xi].iter().map(Token::as_str).collect::<Vec<_>>());
+    let words: Vec<&str> = tokens[1..xi].iter().map(Token::as_str).collect();
+    let hidden = crate::engine::resolve::frozen_reach::fd_lists_hidden(&words);
+    let follow = crate::engine::resolve::frozen_reach::fd_follows(&words);
+    let walk = crate::engine::resolve::frozen_walk::Walk::items(hidden, follow);
     let mut level = SafetyLevel::Inert;
     for base in &bases {
         let judge = |bound: &str| {
             let mut words: Vec<String> = tokens[cmd_start..cmd_end]
                 .iter()
-                .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), bound), t.as_str()))
+                .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), bound), t.as_str(), bound))
                 .collect();
             if !has_placeholder {
                 words.push(bound.to_string());
@@ -54,7 +57,7 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
             let _mark = crate::cst::netargs::enter(true);
             crate::command_verdict(&shell_words::join(&words))
         };
-        match crate::engine::resolve::frozen_reach::judged_over(base, hidden, judge) {
+        match crate::engine::resolve::frozen_reach::judged_over(base, walk, judge) {
             Verdict::Denied => return Verdict::Denied,
             Verdict::Allowed(l) => level = level.max(l),
         }
@@ -69,9 +72,10 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
 /// asked about the stand-in and cleared it, and a checkout containing a file called `shadow` then
 /// read `/etc/shadow`. Only words that actually carried a placeholder are affected; a literal the
 /// caller wrote stays literal, so the shield can still be asked about it properly.
-pub(crate) fn synthetic_operand(bound_word: &str, original: &str) -> String {
+pub(crate) fn synthetic_operand(bound_word: &str, original: &str, bound: &str) -> String {
     use crate::engine::resolve::locus::{UNKNOWABLE_ITEM, read_locus};
-    if bound_word != original && read_locus(bound_word) >= crate::engine::facet::LocalLocus::User {
+    let stand_in = bound_word != bound || bound.ends_with("/f") || bound.ends_with(crate::parse::UNKNOWN_CONTENT);
+    if stand_in && bound_word != original && read_locus(bound_word) >= crate::engine::facet::LocalLocus::User {
         return UNKNOWABLE_ITEM.to_string();
     }
     bound_word.to_string()
