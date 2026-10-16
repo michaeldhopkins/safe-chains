@@ -22,10 +22,12 @@ pub(crate) use folder::judging;
 mod home;
 pub mod item_shape;
 mod lexical;
+mod physical;
+mod placing;
 mod vars;
-use home::home_path_inside_root;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
-use lexical::{expand_home, express_relative_to_root, lexical_join, names_no_known_directory};
+use lexical::{expand_home, lexical_join, names_no_known_directory};
+use placing::resolve_placed;
 pub use vars::{LoopGuard, VarGuard, enter_loop_var, enter_var, expand_vars, names_a_loop_var};
 
 /// The working directory and project root for the command under evaluation. Both optional:
@@ -188,32 +190,6 @@ pub fn resolve_for(path: &str, use_: anchor::Use) -> Cow<'_, str> {
     resolve_placed(path, Some(use_))
 }
 
-fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, str> {
-    if path.is_empty() || path.contains('$') {
-        return Cow::Borrowed(path);
-    }
-    if path.starts_with('~') {
-        return home_path_inside_root(path).map_or(Cow::Borrowed(path), Cow::Owned);
-    }
-    let resolved = CURRENT.with(|c| {
-        let ctx = c.borrow();
-        match (ctx.cwd.as_deref(), ctx.root.as_deref()) {
-            (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
-                // Relative → join onto cwd; absolute → normalize in place. Then express relative
-                // to root if inside (worktree), else absolute.
-                let abs = if path.starts_with('/') {
-                    lexical_join("/", path)
-                } else {
-                    folder::place(cwd, path, use_).map_or_else(|| lexical_join(cwd, path), |placed| lexical_join(root, &placed))
-                };
-                Some(express_relative_to_root(&abs, root))
-            }
-            _ => None,
-        }
-    });
-    resolved.map_or(Cow::Borrowed(path), Cow::Owned)
-}
-
 /// The cwd after a `cd` whose target cannot be pinned. It looks like a path AND is unpinnable, so
 /// every later relative path resolved against it worst-cases in both gate layers.
 pub(crate) const UNRESOLVED_CWD: &str = "/__SAFE_CHAINS_CMDSUB__";
@@ -343,7 +319,7 @@ mod tests {
         let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         assert_eq!(resolve("x"), "/etc/x", "cd /etc → the real target");
         assert_eq!(resolve("passwd"), "/etc/passwd");
-        assert_eq!(resolve("*"), "/etc/*");
+        assert_eq!(resolve("no-such-dir/*"), "/etc/no-such-dir/*");
     }
 
     #[test]

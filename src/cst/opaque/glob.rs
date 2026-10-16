@@ -76,7 +76,7 @@ fn join(prefix: &str, name: &str) -> String {
 
 /// fnmatch for `*`, `?` and `[…]` (with `!`/`^` negation and ranges), byte-wise. `None` for a
 /// bracket form not modeled (`[[:alpha:]]`, an unclosed `[`), so the caller gives up.
-fn matches(pattern: &[u8], name: &[u8]) -> Option<bool> {
+pub(crate) fn matches(pattern: &[u8], name: &[u8]) -> Option<bool> {
     if pattern.iter().filter(|&&b| b == b'*').count() > 8 {
         return None;
     }

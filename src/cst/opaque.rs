@@ -23,7 +23,7 @@
 //! classifications however many unknown words it holds.
 
 mod declared;
-mod glob;
+pub(crate) mod glob;
 mod items;
 mod walk;
 

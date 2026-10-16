@@ -59,7 +59,7 @@ profile cannot express as a concrete effect. `persistence = reconfiguring` flags
 (a sink), so a later `execute` reading a poisoned PATH is a low-integrity flow —
 but this needs the session state of HP-3 to connect the two.
 
-### HP-5 · Path shape ≠ resolved target (symlink / TOCTOU) — `status: open`
+### HP-5 · Path shape ≠ resolved target (symlink / TOCTOU) — `status: partial`
 Facets like Locus are inferred from the *argument string* (`classify_locus`), but
 a worktree-local path can be a symlink to `/etc`, or be swapped between check and
 use. The string says `worktree`; the resolved target is `machine`. We cannot
@@ -73,15 +73,25 @@ the folder is listed at decision time and the matches classify as the words the 
 provided none begins with `-` or holds a newline. A file created between the decision and the shell
 expanding the glob is not seen; that window is accepted. Shell options that change matching
 (`dotglob`, `nocaseglob`, `GLOBIGNORE`, `nullglob`) set earlier in the session are not seen either:
-bash's defaults are assumed. This is the one place the classifier reads the filesystem
-(`src/cst/opaque/glob.rs`).
+bash's defaults are assumed (`src/cst/opaque/glob.rs`).
+*Accepted (links on disk):* when the hook knows the working directory and root, a path is followed
+through every symbolic link that exists at decision time before it is placed (`src/pathctx/physical.rs`):
+each component is looked up with `lstat`, a link is replaced by its target relative to the link's
+folder, `..` steps back from the physical place, and the project root is resolved the same way. A
+read or write follows the last component; a rebind (`rm`, `mv`, `ln`) keeps it unless the path ends
+in `/`. A component that does not exist yet is kept as written, since nothing below it can be a link.
+A loop, more than 40 links, an unreadable link, or a glob whose matches lead to different places
+(through a link and not) is unpinnable and worst-cased. Limits: the lookup happens when the hook
+decides, not when the shell runs, so a link created or swapped in between is not seen. An earlier
+command in the same line cannot plant one, because `ln -s` to a target outside the project is gated
+(below); another process racing the decision can, and no check made before execution can close
+that. Hard links are not seen.
 *Partial (creation-time):* when a link is *created* (`ln [-s] TARGET LINK`), the target
 is **explicit on the command line**, not something we'd have to resolve — so the `ln`
 resolver gates the target on its own locus (`observes`), closing the in-session
 "`ln` as a `cp`-bypass" hole (`ln ~/.ssh/id_rsa ./x` denies like `cp`). This does *not*
-touch the residual: a symlink created *outside* our observation still reads worktree-local
-when later followed (we classify by literal spelling, §0.2). Creation we can gate; a
-pre-existing link we cannot.
+touch the race above: a link created *outside* our observation after the decision is not
+seen. A link that already exists is followed (above).
 
 ### HP-6 · Indirection: safe-looking names that run project code — `status: partial`
 `./gradlew`, `./mvnw`, `npm run x`, a shell function or alias shadowing a real

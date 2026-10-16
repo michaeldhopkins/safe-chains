@@ -15,13 +15,18 @@ static classifier must not, and it would be TOCTOU-racy anyway):
   tool. (Mitigation the capability engine applies: a resolvable name reached via a
   *non-standard path* — `./cat`, `/tmp/cat` — is worst-cased; a bare name resolved via
   `$PATH`, and standard bin paths, are trusted.)
-- Symlinks are not followed: a path is classified by its literal spelling, so a worktree
-  symlink pointing outside the worktree reads as worktree-local.
+- A hard link is not seen: two names for one file are two paths.
 
-One deliberate exception: a glob starting with a pattern character (`ls *`) is listed against the
-known working directory at decision time, so its matches can be checked for a name that reads as a
-flag (`src/cst/opaque/glob.rs`, accepted race in `docs/design/hard-problems.md` HP-5). Keep it the
-only one.
+Two deliberate exceptions read the filesystem, both racing the shell (accepted in
+`docs/design/hard-problems.md` HP-5); keep them the only ones:
+
+- A glob starting with a pattern character (`ls *`) is listed against the known working directory at
+  decision time, so its matches can be checked for a name that reads as a flag
+  (`src/cst/opaque/glob.rs`).
+- Symbolic links are followed before a path is placed against the project root
+  (`src/pathctx/physical.rs`): every component that exists is looked up with `lstat`, so a committed
+  `rc -> ~/.zshrc` is judged as `~/.zshrc`, and `link/..` climbs from the link's target. The last
+  component is kept as written for `rm`/`mv`/`ln`, which act on the link itself.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`

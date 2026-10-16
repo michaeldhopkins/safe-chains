@@ -101,15 +101,14 @@ stays strictly opt-in.
 
 ## 0.2 Residuals of static analysis (named, not hidden)
 
-The resolver is a **pure function of the command string** — it never touches the
-filesystem (which would be TOCTOU-racy against a mutable tree anyway). Three limits
+The resolver is a **function of the command string** — it touches the filesystem only to
+list a leading glob and to follow existing links (HP-5), both racy against a mutable tree. Three limits
 follow, and the honest posture is to name them:
 
-- **Symlinks/hardlinks defeat `locus`.** `classify_locus` sees the literal path, so a
-  worktree symlink `./link → /etc/shadow` classifies as `worktree` and is admitted at a
-  worktree-trusting level, though it reads a machine-scope file. The `..` normalization
-  escape *is* caught (→ worst-case); symbolic links cannot be, statically. A residual of
-  path-based classification, accepted by levels that trust worktree content.
+- **Links on disk.** When the directory context is known, a path is followed through the
+  symbolic links that exist at decision time before `classify_locus` sees it
+  (`src/pathctx/physical.rs`), so `./link → /etc/shadow` classifies as `machine`. A link
+  swapped in after the decision, and any hard link, still defeat `locus` (HP-5).
 - **Command identity is name + path, never binary content (a deliberate scope boundary).**
   safe-chains classifies by a command's executable name and path; verifying that a binary
   is genuinely the tool it is named is *out of scope* — this is a string classifier, not
