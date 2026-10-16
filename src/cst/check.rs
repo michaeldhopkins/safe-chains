@@ -376,7 +376,7 @@ pub(super) fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
             // Deliberately not applied to the arms below. `echo /etc/passwd | xargs cat` keeps its
             // literal representative because the shield genuinely CAN check that one; the
             // distinction is whether we hold the actual path or a placeholder for it.
-            crate::engine::resolve::locus::traversal_item(base)
+            crate::engine::resolve::frozen_reach::stage_item(&name, base, &args)
         }
         // ls emits cwd-relative BASENAMES (worktree) unless `-d` echoes its (possibly absolute) args.
         "ls" => {

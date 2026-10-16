@@ -69,6 +69,20 @@ do run, so the trade-off is the owner's. Separately, `git init` itself is approv
 `Bash(git init:*)` rule in the user's own Claude settings (see "`permissions.allow` out-ranks every
 level" below), which also admits `--template` and `--separate-git-dir`.
 
+## DECISION NEEDED: a traversal over a repository refuses every write it runs
+
+A recursive write is judged by the write-frozen names below its operand
+(`src/engine/resolve/frozen_reach.rs`), and `find`, and `fd -H`, stand for an item inside
+the first one they would reach. So `find . -name '*.orig' -delete` and
+`find . -name '*.rs' -exec sed -i … {} +` are refused in any repository, though the name filter
+keeps them out of `.git`: the stand-in does not read `-name`, `-path` or `-prune`. `fd` without
+`-H` skips hidden entries and is unaffected, but its search always includes `.`, so
+`fd -H . src -x chmod +x` is refused too. Narrowing needs the stand-in to test the filter
+against the frozen tree's names (and `.git/objects` is large). Found 2026-10-15.
+
+Also open: a tree with more than 20,000 entries below a recursive `chmod`/`cp` operand is refused
+unlisted (a removal or a read lets it through).
+
 ## DEFERRED: `jj -Rpath` (the short flag with its value joined) is refused
 
 `jj -R ~/x --ignore-working-copy log` is approved and `jj -R~/x --ignore-working-copy log` is not.

@@ -40,18 +40,21 @@ pub fn check_fd(tokens: &[Token]) -> Verdict {
     // With no `{}` placeholder, fd APPENDS each matched path as a trailing argument (`fd -X cat`
     // runs `cat <matches>`), so the path must still be bound in that form or a `/etc` search leaks.
     let has_placeholder = tokens[cmd_start..cmd_end].iter().any(|t| t.as_str().contains('{'));
+    let hidden = crate::engine::resolve::frozen_reach::fd_lists_hidden(&tokens[1..xi].iter().map(Token::as_str).collect::<Vec<_>>());
     let mut level = SafetyLevel::Inert;
     for base in &bases {
-        let bound = crate::engine::resolve::locus::traversal_item(base);
-        let mut words: Vec<String> = tokens[cmd_start..cmd_end]
-            .iter()
-            .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), &bound), t.as_str()))
-            .collect();
-        if !has_placeholder {
-            words.push(bound.clone());
-        }
-        let _mark = crate::cst::netargs::enter(true);
-        match crate::command_verdict(&shell_words::join(&words)) {
+        let judge = |bound: &str| {
+            let mut words: Vec<String> = tokens[cmd_start..cmd_end]
+                .iter()
+                .map(|t| synthetic_operand(&bind_placeholders(t.as_str(), bound), t.as_str()))
+                .collect();
+            if !has_placeholder {
+                words.push(bound.to_string());
+            }
+            let _mark = crate::cst::netargs::enter(true);
+            crate::command_verdict(&shell_words::join(&words))
+        };
+        match crate::engine::resolve::frozen_reach::judged_over(base, hidden, judge) {
             Verdict::Denied => return Verdict::Denied,
             Verdict::Allowed(l) => level = level.max(l),
         }

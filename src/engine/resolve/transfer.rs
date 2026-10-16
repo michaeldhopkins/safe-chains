@@ -79,6 +79,11 @@ pub(super) fn resolve_transfer(
     );
     prof.capabilities.extend(flag_caps);
     prof.capabilities.extend(targets.iter().map(String::as_str).map(reaches));
+    if recursive && !t.rebinds_destination {
+        let landed = sources.iter().filter_map(|source| super::frozen_reach::landed(source, dest));
+        prof.capabilities
+            .extend(landed.map(|at| overwrites(locus::write_locus(&at), Scale::Single, no_clobber)));
+    }
     prof
 }
 

@@ -15,7 +15,7 @@ use serde::Deserialize;
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
 pub(crate) mod hypothetical;
-mod metadata;
+pub(crate) mod metadata;
 mod protection;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;

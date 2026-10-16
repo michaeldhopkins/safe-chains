@@ -21,6 +21,7 @@ pub(crate) use path_verdicts::{
 };
 use transfer::resolve_transfer;
 mod flags;
+pub(crate) mod frozen_reach;
 pub(crate) mod locus;
 pub(crate) mod regions;
 #[cfg(test)]
@@ -31,8 +32,7 @@ use capability::{
     worst, writes_export_file,
 };
 use flags::{walk_positionals, walk_value};
-pub(crate) use locus::is_unpinnable;
-pub(crate) use locus::{FrozenWrite, anchoring_of, frozen_write_kind, names_credential_store};
+pub(crate) use locus::{FrozenWrite, anchoring_of, frozen_write_kind, is_unpinnable, names_credential_store};
 use locus::{classify_locus, read_locus, write_locus};
 
 /// For `for VAR in ITEMS; do …$VAR…`, the representatives to bind `$VAR` to in the body: the
@@ -637,7 +637,7 @@ fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token
                 }
                 return worst("behavior: write operation with no operand — worst-cased (§0)");
             }
-            let mut caps: Vec<Capability> = operands
+            let mut caps: Vec<Capability> = frozen_reach::with_reached(spec, &operands, tokens)
                 .iter()
                 .map(|p| match spec.operation {
                     // A destroy UNBINDS the name, so it reads the rebind face: `rm -rf ~/.config`

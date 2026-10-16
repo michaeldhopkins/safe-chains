@@ -86,6 +86,13 @@ decides, not when the shell runs, so a link created or swapped in between is not
 command in the same line cannot plant one, because `ln -s` to a target outside the project is gated
 (below); another process racing the decision can, and no check made before execution can close
 that. Hard links are not seen.
+*Accepted (recursive reach):* a recursive write names one folder and writes everything below it, so
+`chmod -R 755 .` reaches `.git/hooks`. The tree below a recursive operand (and below a tree copy's
+source, for `cp -r`, `rsync`, `ditto`) is listed at decision time, without following links, for a
+write-frozen name; the command is judged as writing the first one found. `find`, and `fd` when it
+lists hidden entries, stand for an item inside it. A tree past 20,000 entries is judged as reaching
+one by a write, but not by a removal, which plants nothing, or a read (`src/engine/resolve/frozen_reach.rs`). Same race as
+above.
 *Partial (creation-time):* when a link is *created* (`ln [-s] TARGET LINK`), the target
 is **explicit on the command line**, not something we'd have to resolve — so the `ln`
 resolver gates the target on its own locus (`observes`), closing the in-session

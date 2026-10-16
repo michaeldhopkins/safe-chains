@@ -17,7 +17,7 @@ static classifier must not, and it would be TOCTOU-racy anyway):
   `$PATH`, and standard bin paths, are trusted.)
 - A hard link is not seen: two names for one file are two paths.
 
-Two deliberate exceptions read the filesystem, both racing the shell (accepted in
+Three deliberate exceptions read the filesystem, all racing the shell (accepted in
 `docs/design/hard-problems.md` HP-5); keep them the only ones:
 
 - A glob starting with a pattern character (`ls *`) is listed against the known working directory at
@@ -27,6 +27,9 @@ Two deliberate exceptions read the filesystem, both racing the shell (accepted i
   (`src/pathctx/physical.rs`): every component that exists is looked up with `lstat`, so a committed
   `rc -> ~/.zshrc` is judged as `~/.zshrc`, and `link/..` climbs from the link's target. The last
   component is kept as written for `rm`/`mv`/`ln`, which act on the link itself.
+- A recursive write (`chmod -R`, `cp -r`, `rsync -a`, `find -exec`) lists the tree below its operand
+  for a write-frozen name (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) and is judged as writing the first
+  one it finds (`src/engine/resolve/frozen_reach.rs`).
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`

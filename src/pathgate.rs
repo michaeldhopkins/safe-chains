@@ -623,7 +623,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             return last_write && idx + 1 == positionals.len();
         }
         let role = if last_write && idx + 1 == positionals.len() { Role::Write } else { positional_role };
-        gate(role, p)
+        gate(role, p) || (last_write && role == Role::ReadTree && crate::engine::resolve::frozen_reach::lands_frozen(p, &positionals))
     })
 }
 

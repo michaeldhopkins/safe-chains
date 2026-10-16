@@ -26,6 +26,19 @@ pub(super) fn frozen_metadata_wins(path: &str, role: Role) -> Role {
     }
 }
 
+/// The write-frozen names that apply on this system, as the region table spells them.
+pub(crate) fn frozen_names() -> Vec<&'static str> {
+    REGIONS
+        .nodes
+        .iter()
+        .filter(|n| n.applies_here() && n.role.write_locus == LocalLocus::WorktreeTrusted)
+        .filter_map(|n| match &n.matcher {
+            Matcher::Segment(seg) => Some(seg.as_str()),
+            _ => None,
+        })
+        .collect()
+}
+
 fn component_may_name(component: &str, name: &str, fold: bool) -> bool {
     if component.contains(['*', '?', '[']) {
         return glob_may_match(component, name);
