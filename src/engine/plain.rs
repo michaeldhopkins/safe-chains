@@ -250,6 +250,14 @@ pub const TERMS: &[(&str, &str, &str)] = &[
     ("supply_chain.exec_surface", "build-script", "runs downloaded code while building"),
     ("supply_chain.exec_surface", "call-time", "runs downloaded code when your program runs"),
     ("supply_chain.exec_surface", "run-artifact", "runs the downloaded program itself"),
+    ("anchor", "anchor-free", ""),
+    ("anchor", "relative-plain", ""),
+    ("anchor", "relative-sensitive", ""),
+    ("anchor", "relative-unplaced", ""),
+    ("anchor", "implicit-output", ""),
+    ("anchor", "implicit-source", ""),
+    ("anchor", "runs-folder-code", ""),
+    ("anchor", "names-its-writes", ""),
 ];
 
 /// An empty phrase is a row whose wording awaits the owner's approval: `--explain` keeps printing

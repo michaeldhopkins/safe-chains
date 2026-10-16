@@ -38,9 +38,29 @@ fn every_term_of_every_axis_has_a_phrase() {
         }
     }
     assert!(missing.is_empty(), "no plain phrase for:\n{}", missing.join("\n"));
-    let known: Vec<(&str, &str)> = vocabulary().into_iter().flat_map(|(a, ts)| ts.into_iter().map(move |t| (a, t))).collect();
+    let mut known: Vec<(&str, &str)> = vocabulary().into_iter().flat_map(|(a, ts)| ts.into_iter().map(move |t| (a, t))).collect();
+    known.extend(crate::pathctx::anchor::Anchor::ALL.into_iter().map(|a| ("anchor", a.name())));
     for (axis, t, _) in TERMS {
         assert!(known.contains(&(*axis, *t)), "a phrase for {axis} = {t}, which the code no longer has");
+    }
+}
+
+#[test]
+fn every_anchor_has_a_term_row() {
+    use crate::pathctx::anchor::Anchor;
+    let index = |a: Anchor| match a {
+        Anchor::Free => 0,
+        Anchor::RelativePlain => 1,
+        Anchor::RelativeSensitive => 2,
+        Anchor::RelativeUnplaced => 3,
+        Anchor::ImplicitOutput => 4,
+        Anchor::ImplicitSource => 5,
+        Anchor::RunsFolderCode => 6,
+        Anchor::NamesItsWrites => 7,
+    };
+    for (i, a) in Anchor::ALL.into_iter().enumerate() {
+        assert_eq!(index(a), i);
+        assert!(term("anchor", a.name()).is_some(), "no plain phrase for anchor = {}", a.name());
     }
 }
 
@@ -59,7 +79,12 @@ fn every_operation_in_every_place_has_one_phrase() {
 
 #[test]
 fn the_phrases_are_plain() {
-    for phrase in ACTIONS.iter().map(|(_, _, p)| p).chain(TERMS.iter().map(|(_, _, p)| p)) {
+    let phrases = ACTIONS
+        .iter()
+        .map(|(_, _, p)| p)
+        .chain(TERMS.iter().map(|(_, _, p)| p))
+        .chain(HELD.iter().map(|(_, _, p)| p));
+    for phrase in phrases {
         assert!(!phrase.contains(['—', '`']), "{phrase}");
         assert!(phrase.len() <= 110, "{phrase}");
         for word in crate::refusal::AVOID.iter().chain(&["locus", "facet", "worktree", "principal", "ambient", "n/a"]) {
@@ -100,9 +125,19 @@ proptest::proptest! {
     }
 }
 
-/// Rows awaiting the owner's approval of their wording. They print today's term until a phrase
-/// replaces the empty string; a row leaves this list in the change that approves it.
-const HELD: &[(&str, &str, &str)] = &[];
+/// Rows awaiting the owner's approval of their wording, with the drafted phrase for each. They
+/// print today's term until the phrase replaces the empty string in `TERMS`; a row leaves this list
+/// in the change that approves it.
+const HELD: &[(&str, &str, &str)] = &[
+    ("anchor", "anchor-free", "pinned without the folder"),
+    ("anchor", "relative-plain", "an ordinary path inside the folder"),
+    ("anchor", "relative-sensitive", "a relative path to a hidden file, hook or settings folder"),
+    ("anchor", "relative-unplaced", "a relative path that climbs out or uses a variable or glob"),
+    ("anchor", "implicit-output", "writes only into its own build output"),
+    ("anchor", "implicit-source", "rewrites the project's own files in the folder"),
+    ("anchor", "runs-folder-code", "runs code the folder holds"),
+    ("anchor", "names-its-writes", "writes only the paths it names"),
+];
 
 #[test]
 fn the_reversibility_terms_read_as_approved() {
@@ -142,9 +177,12 @@ fn an_unknown_term_prints_as_itself() {
 
 #[test]
 fn only_the_held_rows_are_empty_and_every_held_row_is_empty() {
-    let mut empty: Vec<(&str, &str, &str)> = ACTIONS.iter().filter(|(_, _, p)| is_held(p)).map(|(o, l, _)| ("action", *o, *l)).collect();
-    empty.extend(TERMS.iter().filter(|(_, _, p)| is_held(p)).map(|(a, t, _)| ("term", *a, *t)));
-    let mut held = HELD.to_vec();
+    for (axis, t, draft) in HELD {
+        assert!(!is_held(draft), "held row {axis} = {t} is missing its drafted phrase");
+    }
+    let mut empty: Vec<(&str, &str)> = ACTIONS.iter().filter(|(_, _, p)| is_held(p)).map(|(o, l, _)| (*o, *l)).collect();
+    empty.extend(TERMS.iter().filter(|(_, _, p)| is_held(p)).map(|(a, t, _)| (*a, *t)));
+    let mut held: Vec<(&str, &str)> = HELD.iter().map(|(a, t, _)| (*a, *t)).collect();
     empty.sort();
     held.sort();
     assert_eq!(empty, held);

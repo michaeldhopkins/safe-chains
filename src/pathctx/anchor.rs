@@ -33,6 +33,17 @@ pub enum Anchor {
 }
 
 impl Anchor {
+    pub const ALL: [Anchor; 8] = [
+        Anchor::Free,
+        Anchor::RelativePlain,
+        Anchor::RelativeSensitive,
+        Anchor::RelativeUnplaced,
+        Anchor::ImplicitOutput,
+        Anchor::ImplicitSource,
+        Anchor::RunsFolderCode,
+        Anchor::NamesItsWrites,
+    ];
+
     pub fn name(self) -> &'static str {
         match self {
             Anchor::Free => "anchor-free",

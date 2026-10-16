@@ -3622,9 +3622,10 @@ predate that work. The unknown folder refuses all of them.
 
 ## The unknown-folder `--explain` section uses its own words
 
-The `--explain` section for `--unknown-folder` (`src/folder_cli.rs`) names anchor values
-(`relative-plain`, `implicit-source`). The plain-words dictionary being built for `--explain`
-replaces facet and locus terms elsewhere; once it lands, describe these in the same words.
+The `--explain` section for `--unknown-folder` (`src/folder_cli.rs`) now goes through the
+plain-words dictionary (`src/engine/plain.rs`, axis `anchor`), and the eight anchor phrases are
+held in `HELD` (`src/engine/plain/tests.rs`) waiting for the owner's approval. Remove this entry
+once the phrases are approved.
 
 ## A command whose dash-prefixed words are all text has no flag grammar (echo)
 

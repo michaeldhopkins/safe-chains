@@ -69,9 +69,10 @@ fn render(level: FolderLevel, notes: &[Note], writes: bool) -> String {
 
 fn describe(level: FolderLevel, note: &Note) -> Option<String> {
     let shown = |s: &str| safe_chains::sanitize_display(s);
+    let anchor_words = |a: &Anchor| safe_chains::engine::plain::words("anchor", a.name());
     Some(match note {
         Note::Path { path, anchor, placed: true, .. } => {
-            format!("`{}` is {}: judged as a path in the workspace", shown(path), anchor.name())
+            format!("`{}` is {}: judged as a path in the workspace", shown(path), anchor_words(anchor))
         }
         Note::Path { path, anchor, use_, placed: false } => {
             let why = match (anchor, use_) {
@@ -82,11 +83,11 @@ fn describe(level: FolderLevel, note: &Note) -> Option<String> {
                 (Anchor::RelativeSensitive, _) => "its name means something wherever the folder is".to_string(),
                 _ => "it could land outside the folder".to_string(),
             };
-            format!("`{}` is {}: {why}, so it goes to the prompt", shown(path), anchor.name())
+            format!("`{}` is {}: {why}, so it goes to the prompt", shown(path), anchor_words(anchor))
         }
         Note::Leaf { anchor: Some(Anchor::NamesItsWrites), admitted: true, .. } => return None,
         Note::Leaf { command, anchor: Some(anchor), admitted: true } => {
-            format!("`{}` is {}: approved at `{}`", shown(command), anchor.name(), level.name())
+            format!("`{}` ({}): approved at `{}`", shown(command), anchor_words(anchor), level.name())
         }
         Note::Leaf { admitted: true, .. } => return None,
         Note::Leaf { command, admitted: false, .. } => format!(
@@ -120,7 +121,8 @@ mod tests {
             Note::Leaf { command: "git stash".into(), anchor: None, admitted: false },
         ];
         let text = render(FolderLevel::Developer, &notes, true);
-        for expected in ["out.txt", "deleting", ".zshrc", "outside the folder", "implicit-output", "no record"] {
+        let implicit_output = safe_chains::engine::plain::words("anchor", "implicit-output");
+        for expected in ["out.txt", "deleting", ".zshrc", "outside the folder", implicit_output, "no record"] {
             assert!(text.contains(expected), "{expected} missing from:\n{text}");
         }
         assert!(render(FolderLevel::Reads, &notes, true).contains("`reads` approves no write"));

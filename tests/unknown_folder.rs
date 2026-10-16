@@ -202,14 +202,23 @@ fn the_cli_checks_and_explains_with_the_folder_unknown() {
     ]
     .concat());
     assert_eq!(code, 1);
+    let plain = safe_chains::engine::plain::words("anchor", "relative-plain");
+    let sensitive = safe_chains::engine::plain::words("anchor", "relative-sensitive");
     for expected in [
-        "folder unknown: writes are judged at `developer`",
-        "`notes.md` is relative-plain",
-        "`.zshrc` is relative-sensitive",
-        "`build` is relative-plain: `developer` leaves deleting",
-        "`mise trust` writes in its folder",
+        "folder unknown: writes are judged at `developer`".to_string(),
+        format!("`notes.md` is {plain}: judged as a path in the workspace"),
+        format!("`.zshrc` is {sensitive}: its name means something wherever the folder is"),
+        format!("`build` is {plain}: `developer` leaves deleting"),
+        "`mise trust` writes in its folder".to_string(),
     ] {
-        assert!(out.contains(expected), "missing `{expected}` in:\n{out}");
+        assert!(out.contains(&expected), "missing `{expected}` in:\n{out}");
+    }
+    let (held_out, held_code) =
+        cli(&[&root[..], &["--unknown-folder", "developer", "--explain", "echo x > notes.md && rm -rf build"]].concat());
+    assert_eq!(held_code, 1);
+    if safe_chains::engine::plain::spoken("anchor", "relative-plain").is_none() {
+        assert!(held_out.contains("`notes.md` is relative-plain: judged as a path in the workspace"), "{held_out}");
+        assert!(held_out.contains("`build` is relative-plain: `developer` leaves deleting"), "{held_out}");
     }
     assert!(!out.contains("outside the working directory"), "the known-folder advice does not apply:\n{out}");
     assert!(!out.contains("`x` is"), "an echoed word is not a path:\n{out}");
