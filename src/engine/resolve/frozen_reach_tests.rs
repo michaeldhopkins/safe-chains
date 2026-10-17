@@ -1,13 +1,34 @@
 use super::{Reach, frozen_below};
 use crate::pathctx::{self, PathCtx};
 
-fn project(dirs: &[&str]) -> (tempfile::TempDir, String) {
-    let dir = tempfile::tempdir().expect("scratch project");
-    let root = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+fn project_in(dir: tempfile::TempDir, dirs: &[&str]) -> (tempfile::TempDir, String) {
+    let base = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+    let root = format!("{base}/work");
+    std::fs::create_dir_all(&root).expect("work folder");
     for d in dirs {
         std::fs::create_dir_all(format!("{root}/{d}")).expect("folder");
     }
     (dir, root)
+}
+
+fn project(dirs: &[&str]) -> (tempfile::TempDir, String) {
+    project_in(tempfile::tempdir().expect("scratch project"), dirs)
+}
+
+fn outside_project(dirs: &[&str]) -> (tempfile::TempDir, String) {
+    let target = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("target");
+    let base = if std::fs::create_dir_all(&target)
+        .and_then(|()| target.canonicalize())
+        .is_ok_and(|p| p.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x"))))
+    {
+        target
+    } else {
+        let cache = std::path::PathBuf::from(std::env::var("HOME").expect("HOME")).join(".cache");
+        std::fs::create_dir_all(&cache).expect("cache folder");
+        cache
+    };
+    let dir = tempfile::Builder::new().prefix("sc-").tempdir_in(base).expect("outside project");
+    project_in(dir, dirs)
 }
 
 fn within<T>(root: &str, f: impl FnOnce() -> T) -> T {
@@ -69,7 +90,9 @@ fn a_linked_folder_is_not_walked_into() {
 fn an_ungranted_folder_outside_the_workspace_is_not_walked() {
     use crate::engine::resolve::regions::with_grants;
     let (_d, root) = project(&["src"]);
-    let (_outside_d, outside) = project(&[".git/hooks"]);
+    let (_scratch_d, scratch) = project_in(tempfile::tempdir_in("/tmp").expect("tmp project"), &[".git/hooks"]);
+    assert_eq!(within(&root, || frozen_below(&scratch, true)), Some(Reach::Found(format!("{scratch}/.git/f"))));
+    let (_outside_d, outside) = outside_project(&[".git/hooks"]);
     assert_eq!(within(&root, || frozen_below(&outside, true)), None);
     assert_eq!(within(&root, || frozen_below(&format!("{outside}/*"), true)), None);
     let granted = crate::engine::resolve::locus::canonicalize(&outside);
