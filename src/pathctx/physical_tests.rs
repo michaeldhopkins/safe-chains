@@ -79,3 +79,21 @@ fn the_macos_system_links_are_written_back_short() {
     assert_eq!(super::system_spelling("/System/Volumes/Data/private/tmp/x".into()), "/tmp/x");
     assert_eq!(super::system_spelling("/System/Volumes/Dataless".into()), "/System/Volumes/Dataless");
 }
+
+#[test]
+fn a_glob_budget_counts_entries_across_nested_directories() {
+    let (_dir, base) = tree();
+    for d in 0..5 {
+        let sub = format!("{base}/p/d{d}");
+        std::fs::create_dir_all(&sub).unwrap();
+        for f in 0..900 {
+            std::fs::write(format!("{sub}/file-{f}-long-enough-to-expose-backtracking"), "").unwrap();
+        }
+    }
+    assert_eq!(resolve(&format!("{base}/p/d*/******."), true).as_deref(), Some(super::super::UNRESOLVED_CWD));
+    let tokens: Vec<_> = ["cargo", "--target-dir", "--output-dir=/**/******./.."]
+        .into_iter()
+        .map(|s| crate::parse::Token::from_raw(s.to_string()))
+        .collect();
+    assert!(crate::pathgate::should_deny("cargo", &tokens));
+}

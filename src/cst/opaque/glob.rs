@@ -13,7 +13,7 @@
 
 use crate::cst::{Word, WordPart};
 
-/// More entries than this in one directory, or more matches in all, and the word stays unknown.
+/// More entries than this across the walk, or more matches in all, and the word stays unknown.
 const MAX_ENTRIES: usize = 4096;
 const MAX_MATCHES: usize = 256;
 
@@ -29,6 +29,7 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
     }
     let cwd = crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD)?;
     let mut found = vec![String::new()];
+    let mut seen = 0usize;
     for component in pattern.split('/') {
         let mut next = Vec::new();
         for prefix in &found {
@@ -45,11 +46,12 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
                 Err(_) => continue,
             };
             let mut names = Vec::new();
-            for entry in entries.take(MAX_ENTRIES + 1) {
+            for entry in entries {
+                seen += 1;
+                if seen > MAX_ENTRIES {
+                    return None;
+                }
                 names.push(entry.ok()?.file_name().into_string().ok()?);
-            }
-            if names.len() > MAX_ENTRIES {
-                return None;
             }
             if component.starts_with('.') {
                 names.extend([".".to_string(), "..".to_string()]);
@@ -77,33 +79,59 @@ fn join(prefix: &str, name: &str) -> String {
 /// fnmatch for `*`, `?` and `[…]` (with `!`/`^` negation and ranges), byte-wise. `None` for a
 /// bracket form not modeled (`[[:alpha:]]`, an unclosed `[`), so the caller gives up.
 pub(crate) fn matches(pattern: &[u8], name: &[u8]) -> Option<bool> {
-    if pattern.iter().filter(|&&b| b == b'*').count() > 8 {
+    if !brackets_valid(pattern) {
         return None;
     }
-    let Some((&p, rest)) = pattern.split_first() else {
-        return Some(name.is_empty());
-    };
-    match p {
-        b'*' => {
-            for skip in 0..=name.len() {
-                if matches(rest, &name[skip..])? {
-                    return Some(true);
-                }
-            }
-            Some(false)
+    let (mut pi, mut ni, mut star, mut mark) = (0, 0, None, 0);
+    while ni < name.len() {
+        if pi < pattern.len() && pattern[pi] == b'*' {
+            star = Some(pi);
+            mark = ni;
+            pi += 1;
+        } else if let Some((true, width)) = step(&pattern[pi..], name[ni]) {
+            pi += width;
+            ni += 1;
+        } else if let Some(s) = star {
+            pi = s + 1;
+            mark += 1;
+            ni = mark;
+        } else {
+            return Some(false);
         }
-        b'?' => Some(!name.is_empty() && matches(rest, &name[1..])?),
-        b'[' => {
-            let close = rest.iter().skip(1).position(|&b| b == b']')? + 1;
-            let set = &rest[..close];
-            if set.contains(&b'[') {
-                return None;
-            }
-            let (negate, set) = match set.first() {
-                Some(b'!' | b'^') => (true, &set[1..]),
-                _ => (false, set),
+    }
+    Some(pattern[pi..].iter().all(|&b| b == b'*'))
+}
+
+fn brackets_valid(mut pattern: &[u8]) -> bool {
+    while let Some((&b, rest)) = pattern.split_first() {
+        if b == b'[' {
+            let Some((_, _, width)) = bracket_set(rest) else {
+                return false;
             };
-            let Some((&c, tail)) = name.split_first() else { return Some(false) };
+            pattern = &pattern[width..];
+        } else {
+            pattern = rest;
+        }
+    }
+    true
+}
+
+fn bracket_set(rest: &[u8]) -> Option<(bool, &[u8], usize)> {
+    let (negate, body) = match rest.split_first() {
+        Some((b'!' | b'^', tail)) => (true, tail),
+        _ => (false, rest),
+    };
+    let end = body.iter().skip(1).position(|&b| b == b']')? + 1;
+    let set = &body[..end];
+    (!set.contains(&b'[')).then_some((negate, set, 2 + usize::from(negate) + end))
+}
+
+fn step(pattern: &[u8], c: u8) -> Option<(bool, usize)> {
+    let (&p, rest) = pattern.split_first()?;
+    match p {
+        b'?' => Some((true, 1)),
+        b'[' => {
+            let (negate, set, width) = bracket_set(rest)?;
             let mut hit = false;
             let mut i = 0;
             while i < set.len() {
@@ -115,9 +143,9 @@ pub(crate) fn matches(pattern: &[u8], name: &[u8]) -> Option<bool> {
                     i += 1;
                 }
             }
-            Some(hit != negate && matches(&rest[close + 1..], tail)?)
+            Some((hit != negate, width))
         }
-        _ => Some(name.first() == Some(&p) && matches(rest, &name[1..])?),
+        _ => Some((p == c, 1)),
     }
 }
 
@@ -136,9 +164,20 @@ mod tests {
             ("[!a]*", "a", Some(false)),
             ("[a-c]", "b", Some(true)),
             ("[]]", "]", Some(true)),
+            ("[!]", "a", None),
+            ("[^]", "a", None),
+            ("[!]a]", "b", Some(true)),
+            ("[!]a]", "]", Some(false)),
+            ("[^]a]", "a", Some(false)),
             ("[[:alpha:]]", "a", None),
             ("[ab", "a", None),
+            ("a[b", "x", None),
             ("*", "", Some(true)),
+            ("[*]", "*", Some(true)),
+            ("[*]", "a", Some(false)),
+            ("******.", "systemd-networkd.service", Some(false)),
+            ("*a*a*a*a*a*a*a*a*a*a*b", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", Some(false)),
+            ("a*b*c*d*e*f*g*h*i*j", "abcdefghij", Some(true)),
         ];
         for (p, n, want) in cases {
             assert_eq!(matches(p.as_bytes(), n.as_bytes()), *want, "{p} vs {n}");
@@ -155,6 +194,21 @@ mod tests {
         assert_eq!(expand(&crate::cst::Word::literal("*")), Some(vec!["*".into()]));
     }
 
+    #[test]
+    fn expand_counts_entries_across_nested_directories() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        for d in 0..5 {
+            let sub = dir.path().join(format!("d{d}"));
+            std::fs::create_dir_all(&sub).expect("mkdir");
+            for f in 0..900 {
+                std::fs::write(sub.join(format!("f{f}")), "").expect("write");
+            }
+        }
+        let at = dir.path().canonicalize().expect("canonical").to_string_lossy().into_owned();
+        let _cwd = crate::pathctx::enter_cwd(Some(at));
+        assert_eq!(expand(&crate::cst::Word::literal("d*/none*")), None);
+    }
+
     proptest! {
         /// A literal pattern matches only itself, and `*` matches anything.
         #[test]
@@ -163,6 +217,33 @@ mod tests {
             prop_assert_eq!(matches(b"*", name.as_bytes()), Some(true));
             let prefixed = format!("{name}*");
             prop_assert_eq!(matches(prefixed.as_bytes(), format!("{name}{other}").as_bytes()), Some(true));
+        }
+
+        #[test]
+        fn repeating_stars_never_changes_the_match(
+            parts in prop::collection::vec("[a-d?]|\\[[!^]?\\]?[a-d]-?[a-d]\\]", 1..12),
+            runs in prop::collection::vec(1usize..8, 1..12),
+            lead in 0usize..6,
+            trail in 0usize..6,
+            name in "[a-e\\]]{0,40}",
+        ) {
+            let mut single = "*".repeat(usize::from(lead > 0));
+            let mut repeated = "*".repeat(lead);
+            for (i, part) in parts.iter().enumerate() {
+                if i > 0 {
+                    single.push('*');
+                    repeated.push_str(&"*".repeat(runs[i % runs.len()]));
+                }
+                single.push_str(part);
+                repeated.push_str(part);
+            }
+            if trail > 0 {
+                single.push('*');
+                repeated.push_str(&"*".repeat(trail));
+            }
+            let got = matches(repeated.as_bytes(), name.as_bytes());
+            prop_assert!(got.is_some(), "{}", repeated);
+            prop_assert_eq!(got, matches(single.as_bytes(), name.as_bytes()), "{} vs {} on {}", repeated, single, name);
         }
     }
 }

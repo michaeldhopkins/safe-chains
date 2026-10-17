@@ -39,6 +39,7 @@ enum Outcome {
 
 struct Budget {
     links: usize,
+    entries: usize,
     matches: usize,
 }
 
@@ -50,7 +51,7 @@ pub(super) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
         return None;
     }
     let follow_last = follow_last || raw.ends_with('/') || raw.ends_with("/.");
-    let mut budget = Budget { links: 0, matches: 0 };
+    let mut budget = Budget { links: 0, entries: 0, matches: 0 };
     match walk(Vec::new(), parts(raw, true), follow_last, &mut budget) {
         Outcome::Plain => None,
         Outcome::Followed(real) => (real != super::lexical::lexical_join("/", raw)).then_some(real),
@@ -153,14 +154,15 @@ fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_
     let dir = joined(done);
     let entries = std::fs::read_dir(&dir).ok()?;
     let mut names = Vec::new();
-    for entry in entries.take(MAX_ENTRIES + 1) {
+    for entry in entries {
+        budget.entries += 1;
+        if budget.entries > MAX_ENTRIES {
+            return Some(unresolved());
+        }
         let Some(name) = entry.ok().and_then(|e| e.file_name().into_string().ok()) else {
             return Some(unresolved());
         };
         names.push(name);
-    }
-    if names.len() > MAX_ENTRIES {
-        return Some(unresolved());
     }
     let mut reached: Vec<String> = Vec::new();
     let mut plain = 0usize;
@@ -180,6 +182,7 @@ fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_
         let mut next = rest.clone();
         next.push_front((name, false));
         match walk(done.to_vec(), next, follow_last, budget) {
+            Outcome::Followed(real) if real == super::UNRESOLVED_CWD => return Some(unresolved()),
             Outcome::Followed(real) => reached.push(real),
             Outcome::Plain => plain += 1,
         }

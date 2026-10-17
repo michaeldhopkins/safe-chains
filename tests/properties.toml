@@ -101,7 +101,11 @@ owed = [
 "src/cst/opaque/declared.rs" = ["src/cst/opaque_tests.rs::a_rebound_variable_is_not_read_stale"]
 "src/cst/opaque/items.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/opaque/walk.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
-"src/cst/opaque/glob.rs" = ["literals_match_themselves", "src/cst/glob_tests.rs::a_glob_is_approved_only_when_no_match_can_lead_with_a_dash"]
+"src/cst/opaque/glob.rs" = [
+  "literals_match_themselves",
+  "repeating_stars_never_changes_the_match",
+  "src/cst/glob_tests.rs::a_glob_is_approved_only_when_no_match_can_lead_with_a_dash",
+]
 "src/handlers/pattern_flags.rs" = [
   "a_cluster_carrying_e_or_f_supplies_a_pattern",
   "every_prefix_of_a_pattern_long_flag_supplies_a_pattern",

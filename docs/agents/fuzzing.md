@@ -59,37 +59,29 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   Generated `gen-*` seeds and `fuzz/dict/` are git-ignored. The property targets take other input
   domains (a flag value, an envelope, a config file), so the registry seeds do not apply to them.
 - **Regression seeds are the one hand-kept input.** A minimized find is committed as `seed-*` in
-  its target's corpus (`.gitignore` lets `seed-*` through for `parse`, `explain_render` and
-  `hook_envelope`), so the replay holds it down. `hook_envelope/seed-codex-permission-request` is
-  not a find: it is a Codex `PermissionRequest` envelope, which byte mutation would not reach from
-  the other envelopes, so the second Codex format is fuzzed at all. `explain_render/seed-unclosed-brace-nest` is the 2026-09-26 timeout: an
-  unclosed `{` nest was parsed once as a brace group and again as a command named `{`, doubling per
-  level. The parser's guards for that class count work instead of timing it (`cst/budget.rs` holds
-  the entry and step budgets; the tests in `cst/parse.rs` assert work linear in nesting and walk
-  every committed command seed), so they hold on a loaded machine.
-  `level_monotonic/seed-timeout-brace-glob` (2026-10-08): brace copies ending `/bunx` made each
-  delegation re-parse every remaining copy, 9.6 MB from 769 bytes; `cst/classify_budget.rs` now caps
-  parser bytes too, and its tests bound generated fan-outs.
+  its target's corpus (`.gitignore` lets `seed-*` through for `parse`, `explain_render`,
+  `hook_envelope`, `level_monotonic`, `gate_prefilter`, `config_edit` and `mcp_session`), so the
+  replay holds it down. `hook_envelope/seed-codex-permission-request` is a Codex
+  `PermissionRequest` envelope (not a find) so the second Codex format is reached.
+  `explain_render/seed-unclosed-brace-nest` (2026-09-26): an unclosed `{` nest parsed once as a
+  brace group and again as `{`, doubling per level; `cst/budget.rs` and `cst/parse.rs` count work
+  instead of timing it. `level_monotonic/seed-timeout-brace-glob` (2026-10-08): brace copies ending
+  `/bunx` made each delegation re-parse every remaining copy (9.6 MB from 769 B);
+  `cst/classify_budget.rs` caps parser bytes too. `gate_prefilter/seed-timeout-repeated-stars`
+  (2026-10-17): `--output-dir=/**/******./..` made `pathctx::physical::resolve` match `******\.`
+  across `/`, where recursive `*` backtracking took $\binom{N+6}{6}$ calls per filename;
+  `glob::matches` now matches in linear time and `physical::resolve` charges entries walk-wide.
 - **Measured coverage** (region, authored source): mutation corpus alone ~26%, registry seeds alone
-  ~37%, **combined ~61%**. The two are complementary — seeds unlock the per-command grammars,
-  mutation covers parser byte-paths.
+  ~37%, **combined ~61%**. Seeds unlock per-command grammars; mutation covers parser byte-paths.
 - **Two kinds of coverage hole, and what each means:**
-  - **Un-exampled commands** — a handler at ~0% (e.g. `glab`, `magick`, `sysctl`) almost always has
-    NO `examples_safe`/`examples_denied`, so nothing seeds it and byte mutation never synthesizes
+  - **Un-exampled commands** — a handler at ~0% (`glab`, `magick`, `sysctl`) almost always has NO
+    `examples_safe`/`examples_denied`, so nothing seeds it and byte mutation never synthesizes
     `glab mr list`. Adding examples is the **cheapest coverage win** and doubles as a
-    `toml_examples_match_dispatch` guard. Prefer this before anything fancier.
-  - **Out-of-scope layers** — `targets/*` (hook-envelope I/O), `docs.rs`/`registry/docs.rs`, and
-    `suggest.rs` sit at ~0% because `is_safe_command` never calls them. They are not blind spots of
-    the `parse` target; reaching them needs a **new** target (a hook-envelope target for
-    `targets/`). Don't chase these by seeding `parse`.
-  - **`cst/explain.rs` + `cst/display.rs` no longer need a target of their own.** The `parse` fuzz
-    target still does not reach them — it calls `is_safe_command` — so their FUZZ coverage is
-    unchanged and this bullet is not a claim about the corpus. What changed is that the two
-    property guards in `handler_property_tests.rs`, which already generate adversarial command
-    strings, now also call the renderer.
-    `arbitrary_command_strings_never_panic` and `classifier_terminates_on_adversarial_input` now
-    run `explain(&line).render()` alongside `command_verdict`, so the renderer is held to the same
-    never-panics / never-hangs / deterministic contract. That matters because the layer is not
-    merely cosmetic: `--explain` is user-facing AND renders the hook's injected context, where a
-    panic is a crash — which for a PreToolUse hook fails OPEN. Extending a corpus beat building a
-    target; check that before reaching for new machinery on the layers above.
+    `toml_examples_match_dispatch` guard.
+  - **Out-of-scope layers** — `targets/*`, `docs.rs`/`registry/docs.rs`, and `suggest.rs` sit at ~0%
+    in `parse` because `is_safe_command` never calls them; reaching them takes their own target
+    (`hook_envelope`, `suggest_roundtrip`), not seeding `parse`.
+  - **`cst/explain.rs` + `cst/display.rs` in property tests:** `arbitrary_command_strings_never_panic`
+    and `classifier_terminates_on_adversarial_input` in `handler_property_tests.rs` also run
+    `explain(&line).render()` alongside `command_verdict`, holding the renderer (`--explain` and
+    hook injected context, where a panic fails OPEN) to the same contract.

@@ -72,11 +72,20 @@ fn a_glob_reaches_what_its_matches_reach() {
 
 #[test]
 fn a_tree_too_large_to_list_is_judged_as_reaching() {
-    let (_d, root) = project(&["big"]);
-    for i in 0..crate::engine::resolve::frozen_walk::MAX_ENTRIES + 1 {
-        std::fs::write(format!("{root}/big/{i}"), "").expect("file");
+    use crate::engine::resolve::frozen_walk::{MAX_ENTRIES, Walk, reach_below};
+    let (_d, root) = project(&["big/d0", "big/d1", "big/d2", "big/d3", "big/d4"]);
+    for d in 0..5 {
+        for i in 0..MAX_ENTRIES / 4 + 1 {
+            std::fs::write(format!("{root}/big/d{d}/{i}"), "").expect("file");
+        }
     }
     assert_eq!(within(&root, || frozen_below("big", true)), Some(Reach::Unlisted("big/.git/f".to_string())));
+    assert!(matches!(within(&root, || frozen_below("big/d*", true)), Some(Reach::Unlisted(_))));
+    assert!(
+        within(&root, || reach_below("big/d*", Walk::follow()))
+            .iter()
+            .any(|r| matches!(r, Reach::Unlisted(_)))
+    );
 }
 
 #[test]

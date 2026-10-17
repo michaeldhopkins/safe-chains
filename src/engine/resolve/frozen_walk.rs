@@ -107,8 +107,13 @@ pub(crate) fn unlisted(base: &str) -> Reach {
 /// outside the readable and writable sandbox. Without `follow` the walk stops at the first frozen
 /// name.
 pub(crate) fn reach_below(base: &str, walk: Walk) -> Vec<Reach> {
+    let mut seen = 0;
+    reach_below_with(base, walk, &mut seen)
+}
+
+fn reach_below_with(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     if base.contains(['*', '?', '[']) {
-        return through_glob(base, walk);
+        return through_glob(base, walk, seen);
     }
     let Some(dir) = on_disk(base) else {
         let unplaced = base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX);
@@ -123,7 +128,7 @@ pub(crate) fn reach_below(base: &str, walk: Walk) -> Vec<Reach> {
     }
     // A filter is matched against the path as find prints it, which a trailing `/` changes.
     let skip = if base.len() > 1 && base.ends_with('/') { &NO_SKIP } else { walk.skip };
-    Walker { base: base.trim_end_matches('/'), dir: &dir, walk: Walk { skip, ..walk }, reached: Vec::new(), links: 0 }.run()
+    Walker { base: base.trim_end_matches('/'), dir: &dir, walk: Walk { skip, ..walk }, reached: Vec::new(), links: 0 }.run(seen)
 }
 
 struct Walker<'a> {
@@ -135,7 +140,7 @@ struct Walker<'a> {
 }
 
 impl Walker<'_> {
-    fn run(mut self) -> Vec<Reach> {
+    fn run(mut self, seen: &mut usize) -> Vec<Reach> {
         let root = (self.walk.links != WalkLinks::Ignore)
             .then(crate::pathctx::root)
             .flatten()
@@ -143,13 +148,12 @@ impl Walker<'_> {
         let walked = std::fs::canonicalize(self.dir).unwrap_or_else(|_| self.dir.into());
         let mut entered = HashSet::new();
         let mut queue = VecDeque::from([String::new()]);
-        let mut seen = 0usize;
         while let Some(rel) = queue.pop_front() {
             let here = if rel.is_empty() { self.dir.to_string() } else { format!("{}/{rel}", self.dir) };
             let Ok(entries) = std::fs::read_dir(&here) else { continue };
             for entry in entries {
-                seen += 1;
-                let Some(entry) = entry.ok().filter(|_| seen <= MAX_ENTRIES) else { return vec![unlisted(self.base)] };
+                *seen += 1;
+                let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(self.base)] };
                 let Ok(name) = entry.file_name().into_string() else { return vec![unlisted(self.base)] };
                 if !self.walk.hidden && name.starts_with('.') {
                     continue;
@@ -227,7 +231,7 @@ impl Walker<'_> {
 
 /// A glob operand reaches what each of its matches reaches. Only a pattern in the last component is
 /// listed; one higher up names folders that are not listed, so it is judged as unlisted.
-fn through_glob(base: &str, walk: Walk) -> Vec<Reach> {
+fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let walk = Walk { skip: &NO_SKIP, ..walk };
     let trimmed = base.trim_end_matches('/');
     let (parent, pattern) = trimmed.rsplit_once('/').map_or((".", trimmed), |(p, l)| (if p.is_empty() { "/" } else { p }, l));
@@ -240,7 +244,10 @@ fn through_glob(base: &str, walk: Walk) -> Vec<Reach> {
     let Some(Ok(entries)) = on_disk(parent).map(std::fs::read_dir) else { return Vec::new() };
     let mut reached = Vec::new();
     for entry in entries {
-        let Some(name) = entry.ok().and_then(|e| e.file_name().into_string().ok()) else { return vec![unlisted(base)] };
+        *seen += 1;
+        let Some(name) = entry.ok().filter(|_| *seen <= MAX_ENTRIES).and_then(|e| e.file_name().into_string().ok()) else {
+            return vec![unlisted(base)];
+        };
         if name.starts_with('.') && !pattern.starts_with('.') {
             continue;
         }
@@ -254,10 +261,13 @@ fn through_glob(base: &str, walk: Walk) -> Vec<Reach> {
         if frozen {
             reached.push(Reach::Found(format!("{each}/f")));
         } else {
-            reached.extend(reach_below(&each, walk));
+            reached.extend(reach_below_with(&each, walk, seen));
         }
         if walk.links == WalkLinks::Ignore && !reached.is_empty() {
             reached.truncate(1);
+            return reached;
+        }
+        if reached.iter().any(|r| matches!(r, Reach::Unlisted(_))) {
             return reached;
         }
     }
