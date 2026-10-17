@@ -3052,7 +3052,15 @@ mod tests {
             vec!["supabase", "db", "dump", "--file=/etc/passwd"],
             vec!["supabase", "db", "dump", "-f/etc/passwd"],
         ] {
-            assert_eq!(project(&resolve(&toks(&cmd)).expect("resolves")), Verdict::Denied, "{cmd:?} writes a system path");
+            let p = resolve(&toks(&cmd)).expect("resolves");
+            assert!(
+                p.capabilities
+                    .iter()
+                    .any(|c| c.operation == Operation::Create && c.locus.local == LocalLocus::SystemIntegrity),
+                "{cmd:?} must emit a system-integrity create capability, got {:?}",
+                p.capabilities,
+            );
+            assert_eq!(project(&p), Verdict::Denied, "{cmd:?} writes a system path");
         }
     }
 

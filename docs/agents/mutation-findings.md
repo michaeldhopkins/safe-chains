@@ -39,3 +39,11 @@ What each rotating slice found and which tests killed it. Add an entry when you 
   both. Run 37515672271 missed `-` to `+` or `/` in `civil_from_days`'s negative-era branch;
   `civil_from_days_handles_dates_before_year_zero` kills both. Five slices in a row landed in `src/decisionlog.rs`: a whole-file local run over it
   (128 mutants) is owed, in `TODO.md`.
+- **CI slice 113/1024 (run 39045369068, 2026-10-17):** 1 MISSED (`delete !` on `!flag.starts_with("--")` in
+  `output_flag_value`, `src/registry/mod.rs:409:52`), and stopped at the 15-minute budget during `delete !` on
+  `!r.is_empty()` (`410:84`) with `flag_present` (`423`–`426`) still queued. `data_export_gates_its_output_file`
+  asserted only `Verdict::Denied` on `supabase db dump -f/etc/passwd`, which still held when `output_flag_value`
+  dropped the glued short path because `presents_unlisted_flag` also marks `-f/etc/passwd` `unclassified`. Now killed
+  by asserting the `SystemIntegrity` `Create` capability in `data_export_gates_its_output_file` (`src/engine/resolve.rs`)
+  and by `output_flag_value_extracts_every_spelling_and_rejects_non_short_glued_forms` and
+  `flag_present_matches_bare_glued_and_short_clusters_only` in `src/registry/arity_tests.rs`.

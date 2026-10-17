@@ -301,3 +301,85 @@ fn hg_takes_its_global_options_after_any_sub_and_refuses_what_runs_or_reaches_ou
         assert!(!crate::is_safe_command(cmd), "should be refused: {cmd}");
     }
 }
+
+fn toks(words: &[&str]) -> Vec<crate::parse::Token> {
+    words.iter().map(|s| crate::parse::Token::from_test(s)).collect()
+}
+
+fn collect_output_path_subs(
+    prefix: &mut Vec<String>,
+    kind: &'static super::types::DispatchKind,
+    out: &mut Vec<(Vec<String>, &'static [String])>,
+) {
+    use super::types::DispatchKind as D;
+    let (D::Branching { subs, .. } | D::Custom { subs, .. }) = kind else {
+        return;
+    };
+    for sub in subs {
+        prefix.push(sub.name.clone());
+        if !sub.output_path_flags.is_empty() {
+            out.push((prefix.clone(), &sub.output_path_flags));
+        }
+        collect_output_path_subs(prefix, &sub.kind, out);
+        prefix.pop();
+    }
+}
+
+#[test]
+fn output_flag_value_extracts_every_spelling_and_rejects_non_short_glued_forms() {
+    let mut subs = Vec::new();
+    for (name, spec) in super::TOML_REGISTRY.iter() {
+        if name == &spec.name {
+            collect_output_path_subs(&mut vec![spec.name.clone()], &spec.kind, &mut subs);
+        }
+    }
+    assert!(!subs.is_empty(), "expected at least one sub with output_path_flags");
+
+    for (path, flags) in subs {
+        let base: Vec<&str> = path.iter().map(String::as_str).collect();
+        assert_eq!(super::sub_output_path_token(&toks(&base)), None);
+        for flag in flags {
+            let mut spaced = base.clone();
+            spaced.extend([flag.as_str(), "/etc/passwd"]);
+            assert_eq!(super::sub_output_path_token(&toks(&spaced)), Some("/etc/passwd"));
+
+            let eq = format!("{flag}=/etc/passwd");
+            let mut eq_tokens = base.clone();
+            eq_tokens.push(&eq);
+            assert_eq!(super::sub_output_path_token(&toks(&eq_tokens)), Some("/etc/passwd"));
+
+            let mut bare = base.clone();
+            bare.push(flag.as_str());
+            assert_eq!(super::sub_output_path_token(&toks(&bare)), None);
+
+            let fused = format!("{flag}/etc/passwd");
+            let mut fused_tokens = base.clone();
+            fused_tokens.push(&fused);
+            let expected = is_short(flag).then_some("/etc/passwd");
+            assert_eq!(super::sub_output_path_token(&toks(&fused_tokens)), expected);
+        }
+    }
+
+    assert_eq!(super::output_flag_value(&toks(&["-f/etc/passwd"]), "-f"), Some("/etc/passwd"));
+    assert_eq!(super::output_flag_value(&toks(&["-f", "out.sql"]), "-f"), Some("out.sql"));
+    assert_eq!(super::output_flag_value(&toks(&["--file=out.sql"]), "--file"), Some("out.sql"));
+    assert_eq!(super::output_flag_value(&toks(&["-f"]), "-f"), None);
+    assert_eq!(super::output_flag_value(&toks(&["--file"]), "--"), None);
+    assert_eq!(super::output_flag_value(&toks(&["-file/etc/passwd"]), "-file"), None);
+    assert_eq!(super::output_flag_value(&toks(&["db/etc/passwd"]), "db"), None);
+}
+
+#[test]
+fn flag_present_matches_bare_glued_and_short_clusters_only() {
+    assert!(super::flag_present(&toks(&["--force"]), "--force"));
+    assert!(super::flag_present(&toks(&["--force=true"]), "--force"));
+    assert!(super::flag_present(&toks(&["-d"]), "-d"));
+    assert!(super::flag_present(&toks(&["-d=1"]), "-d"));
+    assert!(super::flag_present(&toks(&["-vd"]), "-d"));
+    assert!(super::flag_present(&toks(&["-da=val"]), "-d"));
+    assert!(!super::flag_present(&toks(&["-o=d"]), "-d"));
+    assert!(!super::flag_present(&toks(&["--other"]), "--force"));
+    assert!(!super::flag_present(&toks(&["-a-b"]), "--force"));
+    assert!(!super::flag_present(&toks(&["-fa"]), "-file"));
+    assert!(!super::flag_present(&toks(&["-ba"]), "ab"));
+}
