@@ -66,6 +66,27 @@ fn a_linked_folder_is_not_walked_into() {
 }
 
 #[test]
+fn an_ungranted_folder_outside_the_workspace_is_not_walked() {
+    use crate::engine::resolve::regions::with_grants;
+    let (_d, root) = project(&["src"]);
+    let (_outside_d, outside) = project(&[".git/hooks"]);
+    assert_eq!(within(&root, || frozen_below(&outside, true)), None);
+    assert_eq!(within(&root, || frozen_below(&format!("{outside}/*"), true)), None);
+    let granted = crate::engine::resolve::locus::canonicalize(&outside);
+    let expected = Some(Reach::Found(format!("{outside}/.git/f")));
+    assert_eq!(within(&root, || with_grants(&[(granted.as_ref(), true, false)], || frozen_below(&outside, true))), expected);
+    assert_eq!(within(&root, || with_grants(&[(granted.as_ref(), false, true)], || frozen_below(&outside, true))), expected);
+}
+
+#[test]
+fn a_symlink_named_f_or_a_shielded_segment_inside_the_workspace_does_not_skip_the_walk() {
+    let (_d, root) = project(&[".git/hooks", ".docker/.git/hooks"]);
+    std::os::unix::fs::symlink("/etc/hosts", format!("{root}/f")).expect("link");
+    assert_eq!(within(&root, || frozen_below(".", true)), Some(Reach::Found("./.git/f".to_string())));
+    assert_eq!(within(&root, || frozen_below(".d*", true)), Some(Reach::Found(".docker/.git/f".to_string())));
+}
+
+#[test]
 fn no_context_places_nothing() {
     assert_eq!(frozen_below(".", true), None);
 }

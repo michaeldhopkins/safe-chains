@@ -103,8 +103,9 @@ pub(crate) fn unlisted(base: &str) -> Reach {
 }
 
 /// The frozen names, and with `follow` the links out of the tree, below the operand `base`. Empty
-/// when nothing is reached, or when `base` cannot be placed on disk. Without `follow` the walk stops
-/// at the first frozen name.
+/// when nothing is reached, when `base` cannot be placed on disk, or when `base` already lies
+/// outside the readable and writable sandbox. Without `follow` the walk stops at the first frozen
+/// name.
 pub(crate) fn reach_below(base: &str, walk: Walk) -> Vec<Reach> {
     if base.contains(['*', '?', '[']) {
         return through_glob(base, walk);
@@ -113,6 +114,9 @@ pub(crate) fn reach_below(base: &str, walk: Walk) -> Vec<Reach> {
         let unplaced = base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX);
         return if unplaced && crate::pathctx::root().is_some_and(|r| r.starts_with('/')) { vec![unlisted(base)] } else { Vec::new() };
     };
+    if outside_sandbox(base) {
+        return Vec::new();
+    }
     if walk.links != WalkLinks::Follow && !base.ends_with('/') && std::fs::symlink_metadata(&dir).is_ok_and(|m| m.file_type().is_symlink())
     {
         return Vec::new();
@@ -230,6 +234,9 @@ fn through_glob(base: &str, walk: Walk) -> Vec<Reach> {
     if parent.contains(['*', '?', '[']) {
         return on_disk(".").map(|_| unlisted(base)).into_iter().collect();
     }
+    if outside_sandbox(parent) {
+        return Vec::new();
+    }
     let Some(Ok(entries)) = on_disk(parent).map(std::fs::read_dir) else { return Vec::new() };
     let mut reached = Vec::new();
     for entry in entries {
@@ -255,6 +262,17 @@ fn through_glob(base: &str, walk: Walk) -> Vec<Reach> {
         }
     }
     reached
+}
+
+fn outside_sandbox(base: &str) -> bool {
+    let repr = format!("{}/f", base.trim_end_matches('/'));
+    let placed = crate::pathctx::on_the_link(|| crate::pathctx::resolve(&repr));
+    let canonical = super::locus::canonicalize(&placed);
+    (placed.starts_with('/') || placed.starts_with('~'))
+        && (super::locus::is_unpinnable(&canonical) || {
+            let role = super::regions::classify_region(&canonical);
+            role.read_locus >= crate::engine::facet::LocalLocus::User && role.write_locus >= crate::engine::facet::LocalLocus::User
+        })
 }
 
 fn clean_in_root(target: &std::path::Path, root: Option<&std::path::Path>) -> bool {
