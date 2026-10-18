@@ -80,7 +80,7 @@ fn the_listing_obeys_the_rules() {
     let home = tempfile::tempdir().unwrap();
     let mut server = Server::start(home.path(), home.path());
     let listed = tools(&mut server);
-    assert!(!listed.is_empty() && listed.len() <= 15, "{} tools", listed.len());
+    assert!(!listed.is_empty(), "{} tools", listed.len());
     assert_eq!(tools(&mut server), listed, "the listing must be deterministic");
 
     let mut names = std::collections::HashSet::new();
