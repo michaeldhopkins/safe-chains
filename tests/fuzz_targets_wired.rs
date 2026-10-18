@@ -1,20 +1,19 @@
-// @template-sha256: ddd6c3871d5c7761d20d934591ffeb9afefc2ef8720736efbad2458a22bf93a4
+// @template-sha256: 33fb733897ab1149b4ccc7ed2e8ed80617f35b085b0575e9534f6fab394148b3
 //! Fuzz-target wiring ratchet.
 //! Per-repo configuration lives in `tests/ratchets.toml`.
 
 use std::fs;
 use std::path::Path;
 
+#[rustfmt::skip]
 struct Config {
     fuzz_min_targets: usize,
     fuzz_check_uploaded_binaries: bool,
 }
 
+#[rustfmt::skip]
 fn load_config(root: &Path) -> Config {
-    let mut cfg = Config {
-        fuzz_min_targets: 2,
-        fuzz_check_uploaded_binaries: false,
-    };
+    let mut cfg = Config { fuzz_min_targets: 2, fuzz_check_uploaded_binaries: false };
     let Ok(raw) = fs::read_to_string(root.join("tests/ratchets.toml")) else {
         return cfg;
     };
@@ -47,6 +46,7 @@ fn load_config(root: &Path) -> Config {
     cfg
 }
 
+#[rustfmt::skip]
 fn declared_targets() -> Vec<String> {
     let src = fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/Cargo.toml"))
         .expect("read fuzz/Cargo.toml");
@@ -67,15 +67,13 @@ fn declared_targets() -> Vec<String> {
     out
 }
 
+#[rustfmt::skip]
 fn workflow(name: &str) -> String {
-    fs::read_to_string(
-        Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join(".github/workflows")
-            .join(name),
-    )
-    .unwrap_or_else(|e| panic!("read {name}: {e}"))
+    fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows").join(name))
+        .unwrap_or_else(|e| panic!("read {name}: {e}"))
 }
 
+#[rustfmt::skip]
 fn matrix_targets(name: &str) -> Vec<String> {
     let src = workflow(name);
     let line = src
@@ -84,29 +82,26 @@ fn matrix_targets(name: &str) -> Vec<String> {
         .find(|l| l.starts_with("target: ["))
         .unwrap_or_else(|| panic!("{name} declares no `target: [...]` matrix"));
     let inner = line.trim_start_matches("target: [").trim_end_matches(']');
-    let mut out: Vec<String> = inner
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
+    let mut out: Vec<String> =
+        inner.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     out.sort();
     out
 }
 
+#[rustfmt::skip]
 fn corpus_cache_keys(src: &str) -> Vec<String> {
     src.lines()
         .map(str::trim)
-        .filter_map(|l| {
-            l.strip_prefix("key: ")
-                .or_else(|| l.strip_prefix("restore-keys: "))
-        })
+        .filter_map(|l| l.strip_prefix("key: ").or_else(|| l.strip_prefix("restore-keys: ")))
         .filter(|v| v.starts_with("fuzz-corpus-"))
         .map(str::to_string)
         .collect()
 }
 
+#[rustfmt::skip]
 const MATRIX_CORPUS_PREFIX: &str = "fuzz-corpus-${{ matrix.target }}-";
 
+#[rustfmt::skip]
 #[test]
 fn every_fuzz_target_is_wired_into_the_burst() {
     let cfg = load_config(Path::new(env!("CARGO_MANIFEST_DIR")));
@@ -124,6 +119,7 @@ fn every_fuzz_target_is_wired_into_the_burst() {
     );
 }
 
+#[rustfmt::skip]
 #[test]
 fn the_replay_restores_the_corpus_the_burst_saves() {
     let burst = corpus_cache_keys(&workflow("fuzz.yml"));
@@ -143,6 +139,7 @@ fn the_replay_restores_the_corpus_the_burst_saves() {
     );
 }
 
+#[rustfmt::skip]
 #[test]
 fn fuzzing_runs_on_no_schedule() {
     for name in ["fuzz.yml", "fuzz-replay.yml"] {
@@ -154,6 +151,7 @@ fn fuzzing_runs_on_no_schedule() {
     }
 }
 
+#[rustfmt::skip]
 #[test]
 fn every_fuzz_target_is_wired_into_the_per_push_replay() {
     let declared = declared_targets();
@@ -164,6 +162,7 @@ fn every_fuzz_target_is_wired_into_the_per_push_replay() {
     );
 }
 
+#[rustfmt::skip]
 #[test]
 fn the_burst_saves_only_a_merged_corpus_and_fails_on_a_broken_burst() {
     let src = workflow("fuzz.yml");
@@ -183,14 +182,13 @@ fn the_burst_saves_only_a_merged_corpus_and_fails_on_a_broken_burst() {
         .map(str::to_string)
         .expect("fuzz.yml does not run `bash fuzz/burst.sh`");
     assert_eq!(
-        call.replace("${{ matrix.target }}", "T")
-            .split_whitespace()
-            .count(),
+        call.replace("${{ matrix.target }}", "T").split_whitespace().count(),
         3,
         "fuzz/burst.sh takes <binary> <target> <budget> and refuses anything else: `{call}`"
     );
 }
 
+#[rustfmt::skip]
 #[test]
 fn the_burst_uploads_every_target_it_fuzzes() {
     let cfg = load_config(Path::new(env!("CARGO_MANIFEST_DIR")));
