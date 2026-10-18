@@ -1,0 +1,23 @@
+# Declarative quality ratchet manifest.
+lint_roots = ["src", "tests", "fuzz/fuzz_targets"]
+suppressions = 25
+check_baseline_lints = true
+fuzz_min_targets = 8
+
+[rust_pinned]
+"src/cst/check.rs" = 900
+"src/cst/parse.rs" = 1064
+"src/engine/facet.rs" = 686
+"src/engine/resolve/locus.rs" = 587
+"src/engine/resolve/regions.rs" = 932
+"src/engine/resolve.rs" = 1504
+"src/lib.rs" = 449
+"src/pathgate.rs" = 538
+"src/registry/build.rs" = 1364
+"src/registry/dispatch.rs" = 545
+"src/registry/mod.rs" = 663
+"src/registry/types.rs" = 1050
+
+[pinned_thresholds]
+"cognitive-complexity-threshold" = 30
+"too-many-arguments-threshold" = 8
