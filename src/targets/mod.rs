@@ -104,6 +104,19 @@ pub trait HookFormat: Send + Sync {
         GatedPolicy::Defer
     }
 
+    /// The policy for one gated command, given its kind and the harness's permission mode. Only a
+    /// harness that can put a not-yet-approved command to a person, and still refuse a boundary,
+    /// answers differently from `gated_policy` (Grok).
+    fn gated_policy_for(&self, _kind: crate::explain_fix::gate::GateKind, _permission_mode: Option<&str>) -> GatedPolicy {
+        self.gated_policy()
+    }
+
+    /// Pointers besides `decision_pointer` where this harness ALSO reads a decision, each carrying
+    /// the same value. Grok reads `hookSpecificOutput.permissionDecision` ahead of `decision`.
+    fn extra_decision_pointers(&self) -> &'static [&'static str] {
+        &[]
+    }
+
     /// The hook output that VETOES a gated command, for a `Deny` harness. Default abstains (so a
     /// stray call can't fail open). The shape must be exactly what the harness supports, or a
     /// harness that "continues on malformed output" (e.g. Codex) fails open.
