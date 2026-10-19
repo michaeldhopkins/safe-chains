@@ -1,12 +1,9 @@
 //! Walking the tree below a recursive operand for the write-frozen names it reaches.
 //!
-//! Without `follow`, links below the operand are not entered, as `chmod -R`, `cp -r` and `find` do
-//! not enter them. With it (`find -L`, `fd -L`, `cp -RL`, `rsync -L`), a link is entered when it
-//! leads to a folder inside the project, once per folder, and a link that leads out of the walked
-//! tree is reported under its own name, so the caller judges where it leads: a link to a file as the
-//! file, a link to a folder as a frozen name inside that folder, since nothing outside the project
-//! is listed. A traversal's own filters (`find -path ./.git -prune`) narrow what is reached; see
-//! [`Skip`].
+//! Without `follow`, links below the operand are not entered (`chmod -R`, `cp -r`, `find`). With it
+//! (`find -L`, `fd -L`, `cp -RL`, `rsync -L`), a link to a folder inside the project is entered once,
+//! and a link out of the tree is reported under its own name so the caller judges where it leads.
+//! A traversal's own filters (`find -path ./.git -prune`) narrow what is reached; see [`Skip`].
 
 use std::collections::{HashSet, VecDeque};
 
@@ -105,17 +102,54 @@ pub(crate) fn unlisted(base: &str) -> Reach {
 /// The frozen names, and with `follow` the links out of the tree, below the operand `base`. Empty
 /// when nothing is reached, when `base` cannot be placed on disk, or when `base` already lies
 /// outside the readable and writable sandbox. Without `follow` the walk stops at the first frozen
-/// name.
+/// name. A spelling that contains `*`, `?` or `[` is the literal path, when it exists, and every match.
 pub(crate) fn reach_below(base: &str, walk: Walk) -> Vec<Reach> {
     let mut seen = 0;
     reach_below_with(base, walk, &mut seen)
 }
 
 fn reach_below_with(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
-    if base.contains(['*', '?', '[']) {
-        return through_glob(base, walk, seen);
+    if !base.contains(['*', '?', '[']) {
+        return walk_literal(base, walk, seen);
     }
-    walk_literal(base, walk, seen)
+    // Literal first, so a clean match cannot hide a frozen name there. `outside_sandbox` globs `*` and `[`.
+    let spelled = spelled_dir(base).filter(|dir| in_project(dir) || !outside_sandbox(base));
+    let mut reached = spelled.as_ref().map(|dir| walk_placed(base, dir, walk, seen)).unwrap_or_default();
+    if halt(&reached, walk) {
+        return reached;
+    }
+    reached.extend(through_glob(base, walk, seen, spelled.as_deref()));
+    reached
+}
+
+fn halt(reached: &[Reach], walk: Walk) -> bool {
+    (walk.links == WalkLinks::Ignore && !reached.is_empty()) || reached.iter().any(|r| matches!(r, Reach::Unlisted(_)))
+}
+
+/// The operand joined onto the working directory when that path exists. Lexical, so `*` and `[` stay literal.
+fn spelled_dir(base: &str) -> Option<String> {
+    if base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX) {
+        return None;
+    }
+    let cwd = crate::pathctx::cwd().filter(|c| c.starts_with('/'))?;
+    let trimmed = base.trim_end_matches('/');
+    let path = if base.starts_with('/') {
+        if trimmed.is_empty() { "/".to_string() } else { trimmed.to_string() }
+    } else if trimmed.is_empty() || trimmed == "." {
+        cwd
+    } else {
+        format!("{}/{trimmed}", cwd.trim_end_matches('/'))
+    };
+    std::fs::symlink_metadata(&path).is_ok().then_some(path)
+}
+
+fn in_project(path: &str) -> bool {
+    let Some(root) = crate::pathctx::root().filter(|r| r.starts_with('/')) else { return false };
+    let root = root.trim_end_matches('/');
+    let path = path.trim_end_matches('/');
+    std::fs::canonicalize(path)
+        .unwrap_or_else(|_| path.into())
+        .starts_with(std::fs::canonicalize(root).unwrap_or_else(|_| root.into()))
 }
 
 /// The concrete directory `base`, placed through the ordinary path resolver.
@@ -159,7 +193,11 @@ impl Walker<'_> {
         let mut queue = VecDeque::from([String::new()]);
         while let Some(rel) = queue.pop_front() {
             let here = if rel.is_empty() { self.dir.to_string() } else { format!("{}/{rel}", self.dir) };
-            let Ok(entries) = std::fs::read_dir(&here) else { continue };
+            let entries = match open_dir(&here) {
+                Opened::Entries(entries) => entries,
+                Opened::Unlisted => return vec![unlisted(self.base)],
+                Opened::Absent => continue,
+            };
             for entry in entries {
                 *seen += 1;
                 let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(self.base)] };
@@ -238,11 +276,9 @@ impl Walker<'_> {
     }
 }
 
-/// A glob operand reaches what each of its matches reaches. A match is a literal name: handing it
-/// back to glob expansion makes a directory named with `*`, `?` or `[` match itself and never
-/// return. Only a pattern in the last component is listed; one higher up names folders that are not
-/// listed, so it is judged as unlisted.
-fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
+/// Each match of a glob operand, as a literal name (`*` in a match must not be re-globbed). `walked`
+/// was already visited. A pattern above the last component is unlisted.
+fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) -> Vec<Reach> {
     let walk = Walk { skip: &NO_SKIP, ..walk };
     let trimmed = base.trim_end_matches('/');
     let (parent, pattern) = trimmed.rsplit_once('/').map_or((".", trimmed), |(p, l)| (if p.is_empty() { "/" } else { p }, l));
@@ -252,13 +288,17 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     if outside_sandbox(parent) {
         return Vec::new();
     }
-    let Some(Ok(entries)) = on_disk(parent).map(std::fs::read_dir) else { return Vec::new() };
+    let Some(parent_path) = on_disk(parent) else { return Vec::new() };
+    let entries = match open_dir(&parent_path) {
+        Opened::Entries(entries) => entries,
+        Opened::Unlisted => return vec![unlisted(base)],
+        Opened::Absent => return Vec::new(),
+    };
     let mut reached = Vec::new();
     for entry in entries {
         *seen += 1;
         let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(base)] };
-        // The listed path, kept before the name is resolved again. A second resolution treats
-        // `*`, `?` or `[` in the name as a pattern, and one sibling symlink makes that fail open.
+        // Keep the listed path. Resolving the name again treats `*`, `?` or `[` as a pattern.
         let listed = entry.path();
         let Some(name) = entry.file_name().into_string().ok() else { return vec![unlisted(base)] };
         if name.starts_with('.') && !pattern.starts_with('.') {
@@ -268,6 +308,9 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
             Some(true) => {}
             Some(false) => continue,
             None => return vec![unlisted(base)],
+        }
+        if walked.is_some_and(|dir| same_place(dir, &listed)) {
+            continue;
         }
         let frozen = is_frozen(&name);
         let each = if parent == "." { name } else { format!("{}/{name}", parent.trim_end_matches('/')) };
@@ -287,6 +330,37 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
         }
     }
     reached
+}
+
+enum Opened {
+    Entries(std::fs::ReadDir),
+    Unlisted,
+    Absent,
+}
+
+/// [`Opened::Unlisted`] when a directory cannot be listed. [`Opened::Absent`] for a missing path or a file.
+fn open_dir(path: &str) -> Opened {
+    match std::fs::read_dir(path) {
+        Ok(entries) => Opened::Entries(entries),
+        Err(err) if dir_unreadable(&err, path) => Opened::Unlisted,
+        Err(_) => Opened::Absent,
+    }
+}
+
+fn dir_unreadable(err: &std::io::Error, path: &str) -> bool {
+    !matches!(err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory)
+        && match std::fs::metadata(path) {
+            Ok(meta) => meta.is_dir(),
+            Err(stat_err) => !matches!(stat_err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory),
+        }
+}
+
+fn same_place(walked: &str, listed: &std::path::Path) -> bool {
+    listed.to_str() == Some(walked)
+        || std::fs::canonicalize(walked)
+            .ok()
+            .zip(std::fs::canonicalize(listed).ok())
+            .is_some_and(|(a, b)| a == b)
 }
 
 fn outside_sandbox(base: &str) -> bool {
