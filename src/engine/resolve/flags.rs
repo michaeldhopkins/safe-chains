@@ -3,7 +3,7 @@
 //! its own parser — its short options carry richer semantics (a value-short can supply a
 //! pattern vs a count). Flag lists are lowered from TOML at build time and passed as slices.
 
-use crate::parse::Token;
+use crate::parse::{Token, has_flag};
 
 enum FlagKind {
     Unknown,
@@ -133,4 +133,10 @@ pub(super) fn flag_present(arg: &str, flags: &[String]) -> bool {
             _ => false,
         }
     })
+}
+
+/// Whether a declared behavior flag (a bare token like `-r` or `--recursive`) is present,
+/// via the shared `has_flag` (which handles short clustering and `--flag=value`).
+pub(super) fn behavior_flag_present(tokens: &[Token], flag: &str) -> bool {
+    if flag.starts_with("--") { has_flag(tokens, None, Some(flag)) } else { has_flag(tokens, Some(flag), None) }
 }

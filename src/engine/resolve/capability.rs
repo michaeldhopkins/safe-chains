@@ -347,6 +347,25 @@ fn received_name(source: &str) -> Option<String> {
     (name != ".." && !super::locus::is_unpinnable(name)).then(|| name.to_string())
 }
 
+/// A mutating command is refused when one of its own operands is still a shell glob. Paths the
+/// walk derives (`operand/.git/f`, the name a copy lands under) are not operands: only a path
+/// that is a current command word is recorded.
+pub(super) fn with_operands(
+    tokens: &[crate::parse::Token],
+    resolve: impl FnOnce(&[crate::parse::Token]) -> Option<Profile>,
+) -> Option<Profile> {
+    let _tokens = crate::cst::opaque::glob::enter_tokens(tokens.iter().map(|token| token.as_str().to_string()).collect());
+    let _unresolved = crate::cst::opaque::glob::enter_unresolved();
+    resolve(tokens).map(|mut profile| {
+        if crate::cst::opaque::glob::take_unresolved() {
+            profile
+                .capabilities
+                .push(mutates(LocalLocus::Machine, Scale::Unbounded, "behavior: an operand still names a glob"));
+        }
+        profile
+    })
+}
+
 #[cfg(test)]
 mod secret_read_tests {
     use super::*;

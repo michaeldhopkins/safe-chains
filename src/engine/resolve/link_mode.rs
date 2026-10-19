@@ -38,9 +38,13 @@ fn rule(name: &str) -> Option<Rule> {
             valued_long: &["--suffix", "--target-directory"],
             ..NONE
         },
-        "chmod" => {
-            Rule { itself_short: b"h", itself_long: &["--no-dereference"], follow_short: b"LH", follow_long: &["--dereference"], ..NONE }
-        }
+        "chmod" => Rule {
+            itself_short: b"hR",
+            itself_long: &["--no-dereference", "--recursive"],
+            follow_short: b"LH",
+            follow_long: &["--dereference"],
+            ..NONE
+        },
         "chflags" => Rule { itself_short: b"h", follow_short: b"LH", ..NONE },
         "rsync" => {
             Rule { by_default: true, follow_short: b"Lk", follow_long: &["--copy-links", "--copy-unsafe-links", "--copy-dirlinks"], ..NONE }
@@ -168,7 +172,10 @@ mod tests {
 
     #[test]
     fn a_recursive_copy_acts_on_the_link() {
-        for line in ["cp -R l x", "cp -a l x", "/bin/cp -pR l x", "cp --recursive l x", "chmod -h 644 l", "chflags -h uchg l"] {
+        for line in [
+            "cp -R l x", "cp -a l x", "/bin/cp -pR l x", "cp --recursive l x", "chmod -h 644 l", "chmod -R 755 l",
+            "chmod --recursive 755 l", "chflags -h uchg l",
+        ] {
             assert!(on(line), "{line}");
         }
         assert!(on("rsync -a l x"));

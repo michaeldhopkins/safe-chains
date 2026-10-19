@@ -157,9 +157,21 @@ impl Shape {
 /// could be. `words[i]` holds the tokens `cmd.words[i]` expanded to; the command name is never
 /// probed (an unknown name is refused as unknown).
 pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: impl Fn(&[Token]) -> Verdict) -> Verdict {
-    let mut verdict = classify(&words.concat());
+    let (tokens, expanded, harvest) = shell_tokens(cmd, words);
+    let _expanded = glob::replace_expanded(expanded);
+    let mut verdict = classify(&tokens);
     if !verdict.is_allowed() {
         return verdict;
+    }
+    // A `*` or `?` that a read expanded into today's names is still a harvest: `cat /usr/local/etc/*`
+    // must stay refused even though each current file would read. A write is judged on those names,
+    // which is what the shell actually changes.
+    if harvest && !matches!(verdict, Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite)) {
+        let original: Vec<Token> = words.iter().flatten().cloned().collect();
+        let raw = classify(&original);
+        if !raw.is_allowed() {
+            return raw;
+        }
     }
     let shapes: Vec<Option<Shape>> = cmd
         .words
@@ -193,6 +205,36 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
         }
     }
     verdict
+}
+
+/// Tokens the shell actually passes, and the matches an unquoted glob was replaced by. A result
+/// that is only the original spelling is bash leaving an unmatched pattern in place, not a match.
+fn shell_tokens(cmd: &SimpleCmd, words: &[Vec<Token>]) -> (Vec<Token>, Vec<String>, bool) {
+    let mut expanded = Vec::new();
+    let mut harvest = false;
+    let tokens = cmd
+        .words
+        .iter()
+        .zip(words)
+        .enumerate()
+        .flat_map(|(i, (word, toks))| {
+            if i == 0 || declares(cmd, word) || toks.len() != 1 {
+                return toks.clone();
+            }
+            match glob::shell_word(word) {
+                Some(names) if names.iter().all(|name| !name.starts_with('-') && !name.contains('\n')) => {
+                    let pattern = word.eval();
+                    if !(names.len() == 1 && names[0] == pattern) {
+                        harvest |= pattern.contains(['*', '?']);
+                        expanded.extend(names.iter().cloned());
+                    }
+                    names.into_iter().map(Token::from_raw).collect()
+                }
+                _ => toks.clone(),
+            }
+        })
+        .collect();
+    (tokens, expanded, harvest)
 }
 
 /// Whether `tokens[idx]` is the probe standing as the value of the valued flag before it, by the

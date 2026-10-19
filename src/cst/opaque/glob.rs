@@ -24,20 +24,28 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
     let [WordPart::Lit(pattern)] = word.0.as_slice() else {
         return None;
     };
-    if !pattern.contains(['*', '?', '[']) || pattern.contains(['$', '{', '\\', '~']) || pattern.starts_with('/') {
+    if !pattern.contains(['*', '?', '[']) || pattern.contains(['$', '{', '\\', '~']) {
         return None;
     }
-    let cwd = crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD)?;
+    let absolute = pattern.starts_with('/');
+    let cwd = if absolute {
+        String::new()
+    } else {
+        crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD)?
+    };
     let mut found = vec![String::new()];
     let mut seen = 0usize;
     for component in pattern.split('/') {
+        if component.is_empty() {
+            continue;
+        }
         let mut next = Vec::new();
         for prefix in &found {
             if !component.contains(['*', '?', '[']) {
-                next.push(join(prefix, component));
+                next.push(join(prefix, component, absolute));
                 continue;
             }
-            let dir = if prefix.is_empty() { cwd.clone() } else { format!("{cwd}/{prefix}") };
+            let dir = listing_dir(prefix, &cwd, absolute);
             // The folder itself must list: when it cannot (a `cd` into a folder that does not
             // exist fails, and the glob then expands wherever the shell still is), nothing is known.
             let entries = match std::fs::read_dir(&dir) {
@@ -58,7 +66,7 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
             }
             for name in names {
                 if (!name.starts_with('.') || component.starts_with('.')) && matches(component.as_bytes(), name.as_bytes())? {
-                    next.push(join(prefix, &name));
+                    next.push(join(prefix, &name, absolute));
                 }
             }
         }
@@ -67,13 +75,206 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
             return None;
         }
     }
-    let mut found: Vec<String> = found.into_iter().filter(|m| std::fs::symlink_metadata(format!("{cwd}/{m}")).is_ok()).collect();
+    let mut found: Vec<String> = found.into_iter().filter(|m| std::fs::symlink_metadata(on_disk(m, &cwd)).is_ok()).collect();
     found.sort();
-    Some(if found.is_empty() { vec![pattern.clone()] } else { found })
+    if found.is_empty() {
+        return Some(vec![pattern.clone()]);
+    }
+    if pattern.ends_with('/') {
+        for matched in &mut found {
+            if !matched.ends_with('/') {
+                matched.push('/');
+            }
+        }
+    }
+    Some(found)
 }
 
-fn join(prefix: &str, name: &str) -> String {
-    if prefix.is_empty() { name.to_string() } else { format!("{prefix}/{name}") }
+/// The words an unquoted glob word becomes, when every match can be listed.
+pub(super) fn shell_word(word: &Word) -> Option<Vec<String>> {
+    unquoted_glob(word).then(|| expand(&Word::literal(&word.eval())))?
+}
+
+thread_local! {
+    static EXPANDED: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+    static TOKENS: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+    static UNRESOLVED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+pub(super) struct ExpandedGuard(Vec<String>);
+
+impl Drop for ExpandedGuard {
+    fn drop(&mut self) {
+        EXPANDED.with(|cell| *cell.borrow_mut() = std::mem::take(&mut self.0));
+    }
+}
+
+/// Remembers the concrete paths an unquoted glob just became, until `guard` drops.
+pub(super) fn replace_expanded(names: Vec<String>) -> ExpandedGuard {
+    EXPANDED.with(|cell| ExpandedGuard(cell.replace(names)))
+}
+
+fn already_expanded(path: &str) -> bool {
+    EXPANDED.with(|cell| cell.borrow().iter().any(|name| name == path))
+}
+
+pub(crate) struct TokenGuard(Vec<String>);
+
+impl Drop for TokenGuard {
+    fn drop(&mut self) {
+        TOKENS.with(|cell| *cell.borrow_mut() = std::mem::take(&mut self.0));
+    }
+}
+
+pub(crate) fn enter_tokens(tokens: Vec<String>) -> TokenGuard {
+    TOKENS.with(|cell| TokenGuard(cell.replace(tokens)))
+}
+
+pub(crate) struct UnresolvedGuard(bool);
+
+impl Drop for UnresolvedGuard {
+    fn drop(&mut self) {
+        UNRESOLVED.with(|cell| cell.set(self.0));
+    }
+}
+
+pub(crate) fn enter_unresolved() -> UnresolvedGuard {
+    UnresolvedGuard(UNRESOLVED.with(|cell| cell.replace(false)))
+}
+
+pub(crate) fn take_unresolved() -> bool {
+    UNRESOLVED.with(|cell| cell.replace(false))
+}
+
+/// A command word that is still a glob, not a path the walk derived from one. A `key=path`
+/// operand (`dd of=…`) names `path`; the shell expands that whole word, and the walk sees `path`.
+pub(crate) fn note_operand(path: &str) {
+    let named = TOKENS.with(|cell| cell.borrow().iter().any(|token| names_operand(token, path)));
+    if named && unresolved_glob(path) {
+        UNRESOLVED.with(|cell| cell.set(true));
+    }
+}
+
+fn names_operand(token: &str, path: &str) -> bool {
+    token == path || token.split_once('=').is_some_and(|(_, value)| value == path)
+}
+
+/// A mutating path still spelled with a glob character. A component is unresolved when its
+/// directory cannot be listed, when the glob matches some other name, or when a bracket spelling
+/// matches nothing and does not exist as written (`plain[ok]`). A `*` or `?` whose directory is
+/// absent or lists nothing was expanded to nothing. A path the shell already replaced with one
+/// concrete match is that match, not a pattern.
+pub(crate) fn unresolved_glob(path: &str) -> bool {
+    if already_expanded(path) || !path.contains(['*', '?', '[']) {
+        return false;
+    }
+    // Classifier probes are text we injected, not a glob the shell will expand.
+    if path.contains(crate::parse::UNKNOWN_CONTENT) || path.contains(super::BREAKOUT_PROBE) || path.contains(super::CONTENT_PROBE) {
+        return false;
+    }
+    if path.contains(['$', '{', '\\', '~']) {
+        return true;
+    }
+    let absolute = path.starts_with('/');
+    let mut parent = if absolute {
+        String::from("/")
+    } else {
+        // No directory context: the spelling's locus is the whole answer (`sed -i *` in a worktree).
+        match crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD) {
+            Some(cwd) => cwd,
+            None => return false,
+        }
+    };
+    for component in path.split('/').filter(|part| !part.is_empty() && *part != ".") {
+        if component.contains(['*', '?', '[']) && !component_resolved(&parent, component) {
+            return true;
+        }
+        parent = join(&parent, component, true);
+    }
+    false
+}
+
+/// Whether `component` is a glob whose every match in `parent` is known. An absent directory has
+/// no matches. A bracket that matches nothing is the literal name only when that name exists.
+fn component_resolved(parent: &str, component: &str) -> bool {
+    let mut seen = 0usize;
+    match listed(parent, component, &mut seen) {
+        Some(names) if names.len() == 1 && names[0] == component => true,
+        Some(names) if names.is_empty() => !component.contains('[') || std::fs::symlink_metadata(join(parent, component, true)).is_ok(),
+        Some(_) => false,
+        None => {
+            let absent = std::fs::symlink_metadata(parent).err().is_some_and(|e| e.kind() == std::io::ErrorKind::NotFound);
+            absent && !component.contains('[')
+        }
+    }
+}
+
+fn unquoted_glob(word: &Word) -> bool {
+    fn plain(parts: &[WordPart]) -> bool {
+        parts.iter().all(|part| match part {
+            WordPart::Lit(_) | WordPart::SQuote(_) | WordPart::Escape(_) | WordPart::AnsiC(_) => true,
+            WordPart::DQuote(inner) => plain(&inner.0),
+            _ => false,
+        })
+    }
+    fn active(parts: &[WordPart], quoted: bool) -> bool {
+        parts.iter().any(|part| match part {
+            WordPart::Lit(text) => !quoted && text.contains(['*', '?', '[']),
+            WordPart::DQuote(inner) => active(&inner.0, true),
+            _ => false,
+        })
+    }
+    plain(&word.0) && active(&word.0, false)
+}
+
+fn listed(dir: &str, component: &str, seen: &mut usize) -> Option<Vec<String>> {
+    let entries = std::fs::read_dir(dir).ok()?;
+    let mut names = Vec::new();
+    for entry in entries {
+        *seen += 1;
+        if *seen > MAX_ENTRIES {
+            return None;
+        }
+        names.push(entry.ok()?.file_name().into_string().ok()?);
+    }
+    if component.starts_with('.') {
+        names.extend([".".to_string(), "..".to_string()]);
+    }
+    let mut matched = Vec::new();
+    for name in names {
+        if (!name.starts_with('.') || component.starts_with('.')) && matches(component.as_bytes(), name.as_bytes())? {
+            matched.push(name);
+            if matched.len() > MAX_MATCHES {
+                return None;
+            }
+        }
+    }
+    matched.sort();
+    Some(matched)
+}
+
+fn join(prefix: &str, name: &str, absolute: bool) -> String {
+    if prefix.is_empty() {
+        if absolute { format!("/{name}") } else { name.to_string() }
+    } else if prefix == "/" {
+        format!("/{name}")
+    } else {
+        format!("{prefix}/{name}")
+    }
+}
+
+fn listing_dir(prefix: &str, cwd: &str, absolute: bool) -> String {
+    if prefix.is_empty() {
+        if absolute { "/".to_string() } else { cwd.to_string() }
+    } else if prefix.starts_with('/') {
+        prefix.to_string()
+    } else {
+        format!("{cwd}/{prefix}")
+    }
+}
+
+fn on_disk(matched: &str, cwd: &str) -> String {
+    if matched.starts_with('/') { matched.to_string() } else { format!("{cwd}/{matched}") }
 }
 
 /// fnmatch for `*`, `?` and `[…]` (with `!`/`^` negation and ranges), byte-wise. `None` for a

@@ -684,9 +684,7 @@ proptest! {
             );
         } else if finished(&reached) {
             prop_assert!(reached.is_empty(), "nothing frozen under {operand}, walk returned {reached:?}");
-            if !absolute && !symlink_operand && !match_is_symlink {
-                prop_assert!(chmod, "finished walk of clean {operand} was refused: {reached:?}");
-            }
+            prop_assert!(!chmod, "clean {operand} beside another match was approved: {reached:?}");
         }
         if sealed.is_some() {
             let unreadable = reach_below("sealed", Walk::plain(true));

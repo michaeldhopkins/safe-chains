@@ -28,6 +28,9 @@ pub(crate) mod locus;
 pub(crate) mod regions;
 #[cfg(test)]
 mod scenarios;
+#[cfg(test)]
+#[path = "resolve/shell_operand_tests.rs"]
+mod shell_operand_tests;
 
 use capability::{
     breadth_scale, creates, destroys, executes, mutates, observes, observes_path, overwrites, reads_content, reads_path, reads_to_model,
@@ -164,6 +167,10 @@ pub(crate) fn execute_project_verdict() -> crate::verdict::Verdict {
 /// classifier — §0 fail-closed). Redirects, substitutions, and chain semantics are the
 /// surrounding CST's job, not this leaf's (annex `…-engine` §1).
 pub fn resolve(tokens: &[Token]) -> Option<Profile> {
+    capability::with_operands(tokens, resolve_command)
+}
+
+fn resolve_command(tokens: &[Token]) -> Option<Profile> {
     let arg0 = tokens.first()?;
     // Canonicalize the invoked token through the registry's alias map (`gcat` → `cat`) BEFORE the
     // resolver lookup: Homebrew installs GNU coreutils as g-prefixed aliases, and without this
@@ -685,16 +692,10 @@ fn behavior_scale(spec: &crate::registry::types::BehaviorSpec, operands: &[&str]
     match spec.scale {
         ScaleModel::Single => Scale::Single,
         ScaleModel::Breadth => {
-            let recursive = spec.unbounded_flags.iter().any(|f| behavior_flag_present(tokens, f));
+            let recursive = spec.unbounded_flags.iter().any(|f| flags::behavior_flag_present(tokens, f));
             breadth_scale(operands, recursive)
         }
     }
-}
-
-/// Whether a declared behavior flag (a bare token like `-r` or `--recursive`) is present,
-/// via the shared `has_flag` (which handles short clustering and `--flag=value`).
-fn behavior_flag_present(tokens: &[Token], flag: &str) -> bool {
-    if flag.starts_with("--") { has_flag(tokens, None, Some(flag)) } else { has_flag(tokens, Some(flag), None) }
 }
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for

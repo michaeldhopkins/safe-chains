@@ -66,7 +66,7 @@ pub(crate) fn stops_before_matches(ignore_links: bool, seen: Sight) -> bool {
 /// A glob is not a plain name: when the walk cannot list what it reaches, the removal is refused.
 pub(super) fn with_reached(spec: &crate::registry::types::BehaviorSpec, operands: &[&str], tokens: &[crate::parse::Token]) -> Vec<String> {
     let mut all: Vec<String> = operands.iter().map(|p| (*p).to_string()).collect();
-    if spec.unbounded_flags.iter().any(|f| super::behavior_flag_present(tokens, f)) {
+    if spec.unbounded_flags.iter().any(|f| super::flags::behavior_flag_present(tokens, f)) {
         let removes = spec.operation == crate::engine::facet::Operation::Destroy;
         all.extend(
             operands

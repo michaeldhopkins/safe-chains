@@ -63,8 +63,7 @@ pub(crate) fn glob_above_workspace(path: &str) -> bool {
 /// fails closed instead of clearing a filename nobody has seen.
 pub(crate) const UNKNOWABLE_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
 
-/// The locus a REBIND of `path` reaches: `rm`/`rmdir` on it, `mv` away from it, `ln` onto it.
-/// Equal to the write face unless a role separates them.
+/// The locus a REBIND of `path` reaches (`rm`, `mv`, `ln`). Equal to the write face unless a role separates them.
 pub(crate) fn rebind_locus(path: &str) -> LocalLocus {
     face(path, Face::Rebind)
 }
@@ -120,6 +119,7 @@ fn url_escapes_cwd(url: &str) -> bool {
 const IFS_WHITESPACE: [char; 3] = [' ', '\t', '\n'];
 
 fn classify_local(path: &str, want_write: Face) -> LocalLocus {
+    let _ = want_write.mutates().then(|| crate::cst::opaque::glob::note_operand(path));
     let whole = classify_one(path, want_write);
 
     // WORD SPLITTING. A variable holding whitespace expands to several words, and the classifier

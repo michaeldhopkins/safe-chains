@@ -1,8 +1,8 @@
 //! The transfer arm of behavior resolution: `cp`, `mv` and `ln`, and the paths a link reaches.
 
 use super::capability::{Placing, breadth_scale, mutates, observes, observes_path, overwrites, relocates, transfer_profile, worst};
-use super::flags::walk_value;
-use super::{behavior_flag_present, locus};
+use super::flags::{behavior_flag_present, walk_value};
+use super::locus;
 use crate::engine::facet::{Capability, Profile, Scale};
 use crate::parse::Token;
 use crate::registry::types::TransferSpec;
