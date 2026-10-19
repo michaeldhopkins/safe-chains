@@ -28,10 +28,10 @@ independently exercised.
 | **Droid** | ✅ | 📄 **Docs-checked** CLI v0.245.0 (2026-10-21); not installed, not driven live | `allow` can bypass the prompt; `deny` and `ask` are honored. Shell matcher is `Execute`. `additionalContext` is not listed on `PreToolUse`. See §Droid. |
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
-| **Grok** | ✅ | 📄 **Docs-checked** v1.0.62 (2026-10-21); last live drive v0.2.106 | `grok --version` could not be run. The installed build is 1.0.62. `allow` declines to deny. Settings-file hooks can `ask`, `defer`, and send `additionalContext`. safe-chains still only denies. See §Grok. |
+| **Grok** | ✅ | ✅ **ASK for not-yet, DENY for boundaries** (v1.0.62, 2026-10-21) | A command safe-chains has not approved yet gets `hookSpecificOutput.permissionDecision:"ask"` (top-level `decision:"deny"`, exit 0) in `default`/`auto`/`plan`. A boundary, or any command in `bypassPermissions` or an unknown mode, gets top-level `decision:"deny"` and exit 2. `allow` declines to deny. See §Grok. |
 | **opencode** | ❌ | 📄 **Docs-checked** v2.0.26 (2026-10-21); install still skipped | `opencode --version` is v2.0.26. v1 `permission.ask` does not fire ([#7006](https://github.com/anomalyco/opencode/issues/7006)). v2 documents `ctx.permission.hook("evaluate")`. safe-chains does not install a plugin. See §opencode. |
 
-**Remaining live-verification work:** Qwen is docs-checked at v0.25.3 and was not driven live (see §Qwen). Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
+**Remaining live-verification work:** Qwen is docs-checked at v0.25.3 and was not driven live (see §Qwen). Grok asks about not-yet commands and denies boundaries (v1.0.62, 2026-10-21 — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
 Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude is docs-checked at v2.1.302 (see §Claude); Codex is docs-checked at CLI 0.163.0 and was not re-driven (see §Codex); opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
@@ -104,7 +104,7 @@ target looks like.
 | agy     | `run_command`           | `{decision, reason}`                   | `decision`          | `allow` (delegates), `auto_approve`, `deny`, `ask`, `force_ask`, `deny_unless_prior_grant` | seconds (default 30) |
 | Cursor  | `beforeShellExecution` (matcher is the command string; safe-chains sets none) | flat object | `permission` | docs: `allow` / `deny` / `ask`. Live v2026.07.16: **deny** honored, `allow` ignored | seconds |
 | Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
-| Grok    | `Bash` (also matches `run_terminal_command`); config nests under `hooks` | camelCase `{toolInput: {command}, workspaceRoot}` | top-level `decision`, or `hookSpecificOutput.permissionDecision` when present | `allow` (not a grant), **deny**, **ask**, **defer** | seconds (default 5) |
+| Grok    | `Bash` (also matches `run_terminal_command`); config nests under `hooks` | camelCase `{toolInput: {command}, workspaceRoot, permissionMode}` | top-level `decision`, or `hookSpecificOutput.permissionDecision` when present | **ask** (not-yet, in `default`/`auto`/`plan`, exit 0); **deny** (boundary, or any other mode); `allow` declines to deny | seconds (default 5) |
 
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash`. A `Bash` matcher never fires.
@@ -120,9 +120,9 @@ Notes:
 
 ### Grok — docs-checked v1.0.62, 2026-10-21
 
-`grok --version` could not be run. The installed build is 1.0.62 (changelog date
-2026-10-16). Sources: `~/.grok/docs/user-guide/10-hooks.md` and
-`22-permissions-and-safety.md`. The live drive below is v0.2.106 and was not repeated.
+`grok --version` could not be run on the 2026-10-21 docs pass. The installed build is 1.0.62 (changelog date
+2026-10-16). Sources: `~/.grok/docs/user-guide/10-hooks.md`,
+`22-permissions-and-safety.md`, and `14-headless-mode.md`. v1.0.62 was driven for the ask/deny split. The earlier live drive is v0.2.106.
 
 - **Config.** Every `~/.grok/hooks/*.json` is loaded and those global files are
   trusted. safe-chains writes `~/.grok/hooks/safe-chains.json` as
@@ -154,11 +154,14 @@ Notes:
   JSON contains `deny` or `continue: false`, which are honored at any exit code.
   A timeout, a crash, or malformed output fails open. An explicit deny, a reply
   past the read limit, or an unusable `updatedInput` blocks.
-- **What safe-chains emits.** `{"decision":"allow"}` exit 0 for a safe command.
-  `{"decision":"deny","reason":...}` exit 2 for a gated command. It does not emit
-  `ask`, `defer`, or `additionalContext`.
+- **What safe-chains emits.** ASK for not-yet, DENY for boundaries.
+  A safe command is `{"decision":"allow"}` exit 0. A hook `allow` declines to deny and is not a grant.
+  A command safe-chains has not approved yet (no entry or grant applies, a built-in rule refused an option, a level stricter than the default, an unparseable command, a jj snapshot) in `default`, `auto`, or `plan` exits 0 with `{"decision":"deny","reason":R,"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":R}}`. R is the same text agy's `force_ask` carries. A grok that reads only the top-level field sees a deny.
+  A boundary (credentials, raw devices, trust and login files, writes or execs under places that run later, other AI agents, safe-chains' own rule edits), and every gated command in `bypassPermissions`, a missing mode, or an unknown mode, is `{"decision":"deny","reason":R}` exit 2. The split is `explain_fix::gate`.
+  safe-chains does not emit `defer`. A `defer` would let grok's built-in read-only list run `cat /etc/hosts` or `git diff --output=~/.zshrc` unasked. It does not emit `additionalContext`.
+- **Ask, driven on v1.0.62.** In the TUI's normal mode (`default`) an ask prompts, names the hook, and shows the reason; reject cancels the turn. `bypassPermissions` (TUI always-approve, or headless `--always-approve`) is a deny and the command does not run. Headless `default` does not run an ask ("a headless run cannot ask for approval"). Headless `auto` does not run it: auto mode's classifier blocks it before a prompt. Headless `plan`, `dontAsk`, and `acceptEdits` send `default` and the ask does not run. An ask outranks an allow rule such as `Bash(zzgatetool:*)`. The envelopes and replies are in `tests/fixtures/grok/1.0.62/`, replayed by `tests/grok_fixtures.rs`. Plan mode was not driven in the TUI.
 - **Live drive (v0.2.106, 2026-07).** `cat /etc/hosts` was blocked, the command
-  did not run, and the reason reached the UI and the model. `ls -la` ran.
+  did not run, and the reason reached the UI and the model. `ls -la` ran. That was before the ask; `cat /etc/hosts` is a not-yet command and prompts.
 - **Compat.** `compat.claude.hooks` defaults to on, so Grok also loads
   `~/.claude/settings.json` hooks. The Claude parser cannot read Grok's camelCase
   envelope and fails open. Set `[compat.claude] hooks = false` to skip that load.
