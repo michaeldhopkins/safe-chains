@@ -1,0 +1,26 @@
+{
+  "cwd": "/Users/me/project",
+  "hookEventName": "pre_tool_use",
+  "hook_event_name": "PreToolUse",
+  "permissionMode": "auto",
+  "permission_mode": "auto",
+  "sessionId": "00000000-0000-0000-0000-000000000000",
+  "session_id": "00000000-0000-0000-0000-000000000000",
+  "timestamp": "2026-10-19T00:00:00+00:00",
+  "toolInput": {
+    "command": "zzgatetool sync",
+    "description": "Run zzgatetool sync once"
+  },
+  "toolInputTruncated": false,
+  "toolName": "run_terminal_command",
+  "toolUseId": "call-0",
+  "tool_input": {
+    "command": "zzgatetool sync",
+    "description": "Run zzgatetool sync once"
+  },
+  "tool_name": "run_terminal_command",
+  "tool_use_id": "call-0",
+  "transcriptPath": "/Users/me/.grok/sessions/project/session/updates.jsonl",
+  "transcript_path": "/Users/me/.grok/sessions/project/session/updates.jsonl",
+  "workspaceRoot": "/Users/me/project"
+}

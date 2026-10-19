@@ -1,0 +1,19 @@
+# What grok 1.0.62 did with each reply, observed 2026-10-19 by running grok with a logging wrapper
+# around `safe-chains hook grok` (see scripts/capture-grok-fixtures.sh).
+# Each case's envelope is what grok sent; its reply and exit code are what the hook answered.
+
+[default]
+interactive = "prompted: the permission prompt named the hook and showed the reason; rejecting cancelled the turn"
+headless = "not run: a headless run cannot ask for approval"
+nested_field_won = true
+allow_rule = "an --allow 'Bash(zzgatetool:*)' rule did not lift the ask; headless still did not run it"
+
+[auto]
+headless = "not run: auto mode's classifier blocked it before any prompt"
+
+[bypassPermissions]
+interactive = "always-approve (Ctrl+O) sends bypassPermissions; denied, did not run"
+headless = "--permission-mode bypassPermissions, --always-approve, and --always-approve with an allow rule all send bypassPermissions; denied, did not run"
+
+[headless_mode_mapping]
+note = "headless --permission-mode plan, dontAsk and acceptEdits all send permissionMode default; the ask was not run in each"

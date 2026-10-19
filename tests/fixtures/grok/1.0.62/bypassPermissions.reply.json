@@ -1,0 +1,4 @@
+{
+  "decision": "deny",
+  "reason": "safe-chains did not approve this, and the command did not run. safe-chains has no entry for the command `zzgatetool`. That is not a rating of the command. safe-chains approves commands it has researched and has no opinion about the rest. Rewriting the command to get it approved is not the fix. Running `safe-chains --explain` on the command shows what would change the answer. If `zzgatetool` is a real command that should be approved, please open an issue: https://github.com/michaeldhopkins/safe-chains/issues"
+}

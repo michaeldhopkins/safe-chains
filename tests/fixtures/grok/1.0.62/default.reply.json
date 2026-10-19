@@ -1,0 +1,9 @@
+{
+  "decision": "deny",
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "ask",
+    "permissionDecisionReason": "safe-chains has no entry for the command `zzgatetool`, so it did not auto-approve this. That is not a rating of the command. safe-chains approves commands it has researched and has no opinion about the rest. Rewriting the command to get it approved is not the fix. The normal approval prompt follows. Running `safe-chains --explain` on the command shows what would change the answer. If `zzgatetool` is a real command that should be approved, please open an issue: https://github.com/michaeldhopkins/safe-chains/issues"
+  },
+  "reason": "safe-chains has no entry for the command `zzgatetool`, so it did not auto-approve this. That is not a rating of the command. safe-chains approves commands it has researched and has no opinion about the rest. Rewriting the command to get it approved is not the fix. The normal approval prompt follows. Running `safe-chains --explain` on the command shows what would change the answer. If `zzgatetool` is a real command that should be approved, please open an issue: https://github.com/michaeldhopkins/safe-chains/issues"
+}
