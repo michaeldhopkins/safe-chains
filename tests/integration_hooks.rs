@@ -515,8 +515,13 @@ fn every_target_emits_its_decision_at_the_declared_field() {
             if v.pointer(mine).and_then(|d| d.as_str()).is_none() {
                 failures.push(format!("{name}: {what} has no decision at its declared pointer `{mine}` -> `{stdout}`"));
             }
+            for extra in fmt.extra_decision_pointers() {
+                if v.pointer(extra).is_some() && v.pointer(extra).and_then(|d| d.as_str()).is_none() {
+                    failures.push(format!("{name}: {what} has a non-string decision at its extra pointer `{extra}` -> `{stdout}`"));
+                }
+            }
             for other in &pointers {
-                if *other != mine && v.pointer(other).is_some() {
+                if *other != mine && !fmt.extra_decision_pointers().contains(other) && v.pointer(other).is_some() {
                     failures.push(format!("{name}: {what} ALSO decides at `{other}`, another harness's field -> `{stdout}`"));
                 }
             }
@@ -724,32 +729,44 @@ fn every_target_hook_contract_is_fail_safe() {
         }
         // Capability ↔ emission consistency: a target's gated policy must match what it emits, and
         // the unused render_* paths must stay empty (a stray call can't fail open).
+        // A SPLIT target (Grok) answers Deny for a boundary and Ask for a not-yet command in some
+        // modes, so it needs a valid deny AND a valid ask; the policies it never uses stay empty.
+        use safe_chains::explain_fix::gate::GateKind;
         use safe_chains::targets::GatedPolicy;
-        match fmt.gated_policy() {
-            GatedPolicy::Deny => {
-                if !fmt.render_deny("blocked").stdout.contains("\"deny\"") {
-                    failures.push(format!("{name}: Deny policy but render_deny has no deny decision"));
-                }
-                if !fmt.render_ask("x").stdout.trim().is_empty() {
-                    failures.push(format!("{name}: Deny policy but render_ask is non-empty"));
+        let modes = [None, Some("default"), Some("auto"), Some("plan"), Some("bypassPermissions"), Some("dontAsk"), Some("zz")];
+        let policies: Vec<GatedPolicy> = [GateKind::NotYet, GateKind::Boundary]
+            .into_iter()
+            .flat_map(|kind| modes.iter().map(move |mode| fmt.gated_policy_for(kind, *mode)))
+            .chain([fmt.gated_policy()])
+            .collect();
+        let deny = fmt.render_deny("blocked");
+        let ask = fmt.render_ask("confirm");
+        if policies.contains(&GatedPolicy::Deny) {
+            if !deny.stdout.contains("\"deny\"") {
+                failures.push(format!("{name}: Deny policy but render_deny has no deny decision"));
+            }
+        } else if !deny.stdout.trim().is_empty() {
+            failures.push(format!("{name}: never Deny but render_deny is non-empty"));
+        }
+        if policies.contains(&GatedPolicy::Ask) {
+            // An Ask escalates to a human prompt: `ask` or `force_ask` (agy uses the latter to
+            // bypass its Always-Allow cache — see targets/agy.rs).
+            if !ask.stdout.contains("\"ask\"") && !ask.stdout.contains("\"force_ask\"") {
+                failures.push(format!("{name}: Ask policy but render_ask has no ask decision"));
+            }
+            if ask.exit_code != 0 {
+                failures.push(format!("{name}: render_ask exits {}, not 0", ask.exit_code));
+            }
+            // A target that ALSO decides at an extra pointer keeps a deny at its base one, so a
+            // harness version that reads only the base field refuses rather than runs.
+            if !fmt.extra_decision_pointers().is_empty() {
+                let v: serde_json::Value = serde_json::from_str(&ask.stdout).unwrap_or_default();
+                if v.pointer(fmt.decision_pointer()).and_then(|d| d.as_str()) != Some("deny") {
+                    failures.push(format!("{name}: render_ask's base decision is not deny -> `{}`", ask.stdout));
                 }
             }
-            GatedPolicy::Ask => {
-                // An Ask target escalates to a human prompt: `ask` or `force_ask` (agy uses the
-                // latter to bypass its Always-Allow cache — see targets/agy.rs).
-                let ask = fmt.render_ask("confirm").stdout;
-                if !ask.contains("\"ask\"") && !ask.contains("\"force_ask\"") {
-                    failures.push(format!("{name}: Ask policy but render_ask has no ask decision"));
-                }
-                if !fmt.render_deny("x").stdout.trim().is_empty() {
-                    failures.push(format!("{name}: Ask policy but render_deny is non-empty"));
-                }
-            }
-            GatedPolicy::Defer => {
-                if !fmt.render_deny("x").stdout.trim().is_empty() || !fmt.render_ask("x").stdout.trim().is_empty() {
-                    failures.push(format!("{name}: Defer policy but a render_deny/ask emitted output"));
-                }
-            }
+        } else if !ask.stdout.trim().is_empty() {
+            failures.push(format!("{name}: never Ask but render_ask is non-empty"));
         }
     }
     assert!(failures.is_empty(), "target hook contract violations:\n{}", failures.join("\n"));

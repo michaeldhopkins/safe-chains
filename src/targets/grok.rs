@@ -148,18 +148,50 @@ impl HookFormat for GrokHookFormat {
         }
     }
 
-    /// Grok, like Codex/Cursor, has no hook `grant` and no hook `ask`: a hook can only DENY. A gated
-    /// command must therefore be vetoed — otherwise in `bypassPermissions`/`dontAsk` mode grok would
-    /// run it (the hook's `allow` only "declines to deny"). Deny protects in every mode; the escape
-    /// valve is a `~/.config/safe-chains.toml` grant or a grok `--allow` rule.
+    /// Grok has no hook grant: its `allow` only "declines to deny". The baseline for a gated
+    /// command is therefore a veto, which protects in every mode; see `gated_policy_for` for the one
+    /// case that asks instead.
     fn gated_policy(&self) -> super::GatedPolicy {
         super::GatedPolicy::Deny
+    }
+
+    /// Grok does have a hook `ask` (1.0.62): it sends the call to the permission prompt, past
+    /// always-approve, auto mode, saved grants and its safe-command list, and shows our reason. So a
+    /// command safe-chains simply has not approved yet is put to the user, in the modes where a
+    /// prompt is shown. A boundary is still refused. So is everything in `bypassPermissions`, a
+    /// missing mode or one we do not know, since an `ask` there may be answered by nobody.
+    /// `defer` is never used: it would let grok's own read-only list run `cat /etc/hosts` unasked.
+    fn gated_policy_for(&self, kind: crate::explain_fix::gate::GateKind, permission_mode: Option<&str>) -> super::GatedPolicy {
+        match (kind, permission_mode) {
+            (crate::explain_fix::gate::GateKind::NotYet, Some("default" | "auto" | "plan")) => super::GatedPolicy::Ask,
+            _ => super::GatedPolicy::Deny,
+        }
+    }
+
+    fn extra_decision_pointers(&self) -> &'static [&'static str] {
+        &["/hookSpecificOutput/permissionDecision"]
     }
 
     fn render_deny(&self, reason: &str) -> HookResponse {
         // Both signals say deny: the top-level `decision` (honored regardless of exit code) and exit
         // 2 (grok's deny code; any OTHER non-zero fails OPEN, so it must be exactly 2).
         HookResponse { stdout: json!({ "decision": "deny", "reason": reason }).to_string(), exit_code: 2 }
+    }
+
+    /// The nested `permissionDecision` decides when present, so a grok that reads it asks. A grok
+    /// that reads only the top-level `decision` sees a deny, so an older one fails closed. Exit 0,
+    /// because exit 2 is a deny whatever the body says.
+    fn render_ask(&self, reason: &str) -> HookResponse {
+        let body = json!({
+            "decision": "deny",
+            "reason": reason,
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": reason,
+            },
+        });
+        HookResponse { stdout: body.to_string(), exit_code: 0 }
     }
 }
 
@@ -290,8 +322,31 @@ mod tests {
     }
 
     #[test]
-    fn grok_is_a_deny_harness() {
-        assert_eq!(GrokHookFormat.gated_policy(), super::super::GatedPolicy::Deny);
+    fn grok_denies_by_default_and_asks_only_for_a_not_yet_command_in_a_prompting_mode() {
+        use super::super::GatedPolicy;
+        use crate::explain_fix::gate::GateKind;
+        assert_eq!(GrokHookFormat.gated_policy(), GatedPolicy::Deny);
+        let modes =
+            [None, Some("default"), Some("auto"), Some("plan"), Some("bypassPermissions"), Some("dontAsk"), Some(""), Some("Default")];
+        for mode in modes {
+            let asks = matches!(mode, Some("default" | "auto" | "plan"));
+            let expected = if asks { GatedPolicy::Ask } else { GatedPolicy::Deny };
+            assert_eq!(GrokHookFormat.gated_policy_for(GateKind::NotYet, mode), expected, "{mode:?}");
+            assert_eq!(GrokHookFormat.gated_policy_for(GateKind::Boundary, mode), GatedPolicy::Deny, "{mode:?}");
+        }
+    }
+
+    #[test]
+    fn render_ask_asks_in_the_nested_field_and_denies_in_the_top_level_one() {
+        let r = GrokHookFormat.render_ask("not approved yet");
+        let v: Value = serde_json::from_str(&r.stdout).unwrap();
+        assert_eq!(v.pointer("/decision").and_then(Value::as_str), Some("deny"));
+        assert_eq!(v.pointer("/reason").and_then(Value::as_str), Some("not approved yet"));
+        assert_eq!(v.pointer("/hookSpecificOutput/hookEventName").and_then(Value::as_str), Some("PreToolUse"));
+        assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(Value::as_str), Some("ask"));
+        assert_eq!(v.pointer("/hookSpecificOutput/permissionDecisionReason").and_then(Value::as_str), Some("not approved yet"));
+        // Exit 2 is a deny whatever the body says, so an ask must exit 0.
+        assert_eq!(r.exit_code, 0);
     }
 
     #[test]

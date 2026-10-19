@@ -111,8 +111,8 @@ pub trait HookFormat: Send + Sync {
         self.gated_policy()
     }
 
-    /// Pointers besides `decision_pointer` where this harness ALSO reads a decision, each carrying
-    /// the same value. Grok reads `hookSpecificOutput.permissionDecision` ahead of `decision`.
+    /// Pointers besides `decision_pointer` where this harness ALSO reads a decision. Grok reads
+    /// `hookSpecificOutput.permissionDecision` ahead of `decision` when both are present.
     fn extra_decision_pointers(&self) -> &'static [&'static str] {
         &[]
     }
