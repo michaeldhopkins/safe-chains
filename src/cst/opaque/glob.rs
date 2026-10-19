@@ -165,6 +165,11 @@ fn names_operand(token: &str, path: &str) -> bool {
 /// absent or lists nothing was expanded to nothing. A path the shell already replaced with one
 /// concrete match is that match, not a pattern.
 pub(crate) fn unresolved_glob(path: &str) -> bool {
+    // A sequence we did not expand (`{1..10000}`) has no glob metacharacter. It is still not a
+    // path the walk can judge, and a destructive write of it is refused.
+    if path.contains(crate::cst::eval::UNRESOLVED_BRACE) {
+        return true;
+    }
     if already_expanded(path) || !path.contains(['*', '?', '[']) {
         return false;
     }

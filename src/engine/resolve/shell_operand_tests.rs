@@ -356,3 +356,79 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn a_brace_sequence_that_names_git_is_refused() {
+    let (scratch, root) = project();
+    file(format!("{root}/.git/config"));
+    file(format!("{root}/sub/.git/config"));
+    file(format!("{root}/log.1"));
+    file(format!("{root}/log.2"));
+    file(format!("{root}/log.3"));
+    file(format!("{root}/notes.txt"));
+    dir(format!("{root}/build"));
+    let cwd = Path::new(&root);
+    let expanded = bash_expansions(cwd, ".gi{t..t}");
+    assert_eq!(expanded, [".git".to_string()], "bash expands .gi{{t..t}} onto .git");
+    assert!(cwd.join(".git/config").is_file(), "the tree holds .git/config, which bash's rm removes");
+    expect(
+        &root,
+        &[
+            ("rm -rf .gi{t..t}", false),
+            ("rm -r .gi{t..t}", false),
+            ("rm .gi{t..t}/config", false),
+            ("rm -rf -- .gi{t..t}", false),
+            ("chmod 755 .gi{t..t}", false),
+            ("chmod -R 755 .gi{t..t}", false),
+            ("find .gi{t..t} -delete", false),
+            ("mv .gi{t..t} saved", false),
+            ("cp -R .gi{t..t} dest", false),
+            ("mkdir .gi{t..t}", false),
+            ("rm -rf .{g..i}it", false),
+            ("rm -rf .g{i..i}t", false),
+            ("rm -rf .GI{T..T}", false),
+            ("rm -rf sub/.gi{t..t}", false),
+            ("chmod -R 755 sub/.gi{t..t}", false),
+            ("find sub/.gi{t..t} -delete", false),
+            ("echo x > .gi{t..t}/config", false),
+            ("sed -i 's/a/b/' .gi{t..t}/config", false),
+            ("tee .gi{t..t}/config", false),
+            ("dd if=/dev/null of=.gi{t..t}/config", false),
+            ("rm -rf {notes,.git}", false),
+            ("rm -rf {.gi{t..t},notes.txt}", false),
+            // Quotes suppress the sequence. Bash keeps the spelling and does not remove `.git`.
+            ("rm -rf '.gi{t..t}'", true),
+            ("rm -f log.{1..3}", true),
+            ("rm notes.txt", true),
+            ("chmod 644 notes.txt", true),
+            ("rm -rf build", true),
+        ],
+    );
+    let _keep = scratch;
+}
+
+#[test]
+fn a_sequence_past_the_expansion_cap_refuses_a_destructive_write() {
+    let (scratch, root) = project();
+    file(format!("{root}/notes.txt"));
+    file(format!("{root}/log.1"));
+    expect(
+        &root,
+        &[
+            ("rm -rf {1..257}", false),
+            ("rm -r {1..257}", false),
+            ("chmod -R 755 {1..257}", false),
+            ("find {1..257} -delete", false),
+            ("echo x > {1..257}", false),
+            ("echo {1..257}", true),
+            // The marker keeps the directory, so an over-cap sequence is not a weaker read than one
+            // name in that directory.
+            ("cat ~/.ssh/{1..257}", false),
+            ("cat ~/.ssh/1", false),
+            ("cat {~/.ssh/id_rsa,}{1..257}", false),
+            ("rm -f log.{1..3}", true),
+            ("rm notes.txt", true),
+        ],
+    );
+    let _keep = scratch;
+}

@@ -11,8 +11,11 @@ pub fn eval_word(word: &Word) -> String {
 /// Past this many words from one expansion we stop enumerating and fail CLOSED — a hostile
 /// `{a,b}{a,b}…` would otherwise blow up 2^n. The word becomes an unpinnable sentinel (→ machine
 /// → deny) rather than a DoS.
-const BRACE_EXPANSION_CAP: usize = 256;
-const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
+pub(super) const BRACE_EXPANSION_CAP: usize = 256;
+pub(super) const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
+/// A brace sequence that was not expanded: it is longer than [`BRACE_EXPANSION_CAP`], or its size
+/// cannot be bounded. A destructive or recursive write of a word carrying this marker is refused.
+pub(crate) const UNRESOLVED_BRACE: &str = "__SAFE_CHAINS_UNRESOLVED_BRACE__";
 /// Prefix of the BOUNDED substitution sentinel. Deliberately not a prefix-match of [`UNPINNABLE`]
 /// (`…CMDSUB_WORKTREE__` does not contain `…CMDSUB__`), so the fail-closed guard keyed on the
 /// latter can never fire on a declared substitution, nor vice versa.
@@ -40,7 +43,7 @@ pub fn expand_word(word: &Word) -> Vec<String> {
     let mut acc = vec![String::new()];
     for part in &word.0 {
         let alts: Vec<String> = match part {
-            WordPart::Lit(s) => brace_expand(s),
+            WordPart::Lit(s) => super::brace::expand(s),
             other => {
                 let mut t = String::new();
                 eval_part(other, &mut t);
@@ -78,93 +81,6 @@ pub fn expand_word(word: &Word) -> Vec<String> {
         return vec![UNPINNABLE.to_string()];
     }
     acc
-}
-
-/// Brace-expand a literal's comma groups: `a{1,2}b` → [`a1b`, `a2b`]; nested groups recurse. A
-/// `{...}` with no top-level comma is literal (bash: `{x}` stays `{x}`); sequence forms (`{1..5}`)
-/// are left literal (they can't name a hot path). Fails closed to an unpinnable sentinel if the
-/// word carries a pathological number of brace groups.
-fn brace_expand(s: &str) -> Vec<String> {
-    if s.matches('{').count() > 8 {
-        return vec![UNPINNABLE.to_string()];
-    }
-    let chars: Vec<char> = s.chars().collect();
-    let mut i = 0;
-    while i < chars.len() {
-        if chars[i] == '{' {
-            let mut depth = 1;
-            let mut j = i + 1;
-            let mut comma = false;
-            while j < chars.len() {
-                match chars[j] {
-                    '{' => depth += 1,
-                    '}' => {
-                        depth -= 1;
-                        if depth == 0 {
-                            break;
-                        }
-                    }
-                    ',' if depth == 1 => comma = true,
-                    _ => {}
-                }
-                j += 1;
-            }
-            // A closed group with a top-level comma expands; otherwise skip this `{` (it is
-            // literal, e.g. `{x}` or an unclosed brace) and look for a later group.
-            if j < chars.len() && depth == 0 && comma {
-                let prefix: String = chars[..i].iter().collect();
-                let content: String = chars[i + 1..j].iter().collect();
-                let suffix: String = chars[j + 1..].iter().collect();
-                // The suffix expansion does not depend on the alternative, so compute it ONCE.
-                // Recomputing it inside the loops repeated an identical expansion per alternative,
-                // multiplying the work by the alternative count at every nesting level.
-                let suffix_alts = brace_expand(&suffix);
-                let mut out = Vec::new();
-                for alt in split_top_commas(&content) {
-                    for alt_x in brace_expand(&alt) {
-                        for suf_x in &suffix_alts {
-                            // Bound the WORDS PRODUCED, not the brace count. The `{` count above is
-                            // a proxy that does not track fan-out: six groups of eight alternatives
-                            // is only six braces but 8^6 = 262144 words, and eight groups is 16.7M —
-                            // seconds of wall clock inside a PreToolUse hook, from ~300 bytes. This
-                            // is the same ceiling the caller applies to `alts`, enforced here so the
-                            // product is never materialized before anyone checks its size.
-                            if out.len() >= BRACE_EXPANSION_CAP {
-                                return vec![UNPINNABLE.to_string()];
-                            }
-                            out.push(format!("{prefix}{alt_x}{suf_x}"));
-                        }
-                    }
-                }
-                return out;
-            }
-        }
-        i += 1;
-    }
-    vec![s.to_string()]
-}
-
-/// Split on commas at brace-nesting depth 0, so `a,{b,c},d` → [`a`, `{b,c}`, `d`].
-fn split_top_commas(s: &str) -> Vec<String> {
-    let mut parts = Vec::new();
-    let mut depth = 0i32;
-    let mut cur = String::new();
-    for c in s.chars() {
-        match c {
-            '{' => {
-                depth += 1;
-                cur.push(c);
-            }
-            '}' => {
-                depth -= 1;
-                cur.push(c);
-            }
-            ',' if depth == 0 => parts.push(std::mem::take(&mut cur)),
-            _ => cur.push(c),
-        }
-    }
-    parts.push(cur);
-    parts
 }
 
 /// The placeholder a substitution's value evaluates to: the bounded, locus-tagged form when the
@@ -211,6 +127,48 @@ pub(super) fn eval_part(part: &WordPart, out: &mut String) {
         WordPart::ProcSub(_) => out.push_str(PROCSUB_SENTINEL),
         WordPart::Arith(_) => out.push_str("__SAFE_CHAINS_ARITH__"),
     }
+}
+
+/// The words a redirect opens, judged after brace expansion. `> .gi{t..t}/config` is `> .git/config`.
+/// An unresolved sequence refuses the write: the shell would open a list we did not enumerate.
+pub(super) fn judge_write(word: &Word, safe: impl Fn(&str) -> bool) -> crate::verdict::Verdict {
+    use crate::verdict::{SafetyLevel, Verdict};
+    let Ok(words) = opened(word) else {
+        return Verdict::Denied;
+    };
+    let mut level = Verdict::Allowed(SafetyLevel::Inert);
+    for target in &words {
+        if target == "/dev/null" {
+            continue;
+        }
+        if !safe(target) {
+            return Verdict::Denied;
+        }
+        level = Verdict::Allowed(SafetyLevel::SafeWrite);
+    }
+    level
+}
+
+/// The words a redirect reads, judged after brace expansion. An unresolved sequence names a file
+/// we cannot point at, so the read is refused.
+pub(super) fn judge_read(word: &Word, opaque: impl Fn(&str) -> bool) -> crate::verdict::Verdict {
+    use crate::verdict::{SafetyLevel, Verdict};
+    let Ok(words) = opened(word) else {
+        return Verdict::Denied;
+    };
+    let mut level = Verdict::Allowed(SafetyLevel::Inert);
+    for target in &words {
+        if opaque(target) {
+            return Verdict::Denied;
+        }
+        level = level.combine(crate::engine::resolve::read_content_verdict(target));
+    }
+    level
+}
+
+fn opened(word: &Word) -> Result<Vec<String>, ()> {
+    let words = expand_word(word);
+    if words.iter().any(|word| word.contains(UNRESOLVED_BRACE)) { Err(()) } else { Ok(words) }
 }
 
 #[cfg(test)]

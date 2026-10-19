@@ -839,28 +839,17 @@ fn is_safe_write_target(path: &str) -> bool {
     crate::engine::resolve::write_target_verdict(path).is_allowed()
 }
 
-/// The verdict for a redirect that OPENS `target` for writing.
+/// The verdict for a redirect that OPENS `target` for writing. Brace sequences expand first.
 fn write_face(target: &Word) -> Verdict {
-    let t = target.eval();
-    if t == "/dev/null" {
-        // Inert: no side effect, no promotion.
-        Verdict::Allowed(SafetyLevel::Inert)
-    } else if is_safe_write_target(&t) {
-        Verdict::Allowed(SafetyLevel::SafeWrite)
-    } else {
-        Verdict::Denied
-    }
+    super::eval::judge_write(target, is_safe_write_target)
 }
 
 /// The verdict for a redirect that OPENS `target` for reading. Gates the SOURCE by its read locus,
 /// like an operand read: `cat < /etc/shadow` must deny just as `cat /etc/shadow` does. A
-/// substitution-derived source names an unknowable file → fail-closed to Denied.
+/// substitution-derived source names an unknowable file → fail-closed to Denied. Brace sequences
+/// expand first, and the locus is read off that expanded spelling.
 fn read_face(target: &Word) -> Verdict {
-    let t = target.eval();
-    // Keyed on the EVALUATED value rather than on "is there a substitution part", so a
-    // substitution whose inner command declared its output locus (`< $(pwd)/f`) is gated by that
-    // locus, while an undeclared one still fail-closes on its opaque marker.
-    if is_opaque_value(&t) { Verdict::Denied } else { crate::engine::resolve::read_content_verdict(&t) }
+    super::eval::judge_read(target, is_opaque_value)
 }
 
 pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {

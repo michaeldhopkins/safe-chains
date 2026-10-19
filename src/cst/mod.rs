@@ -1,4 +1,5 @@
 mod ansi_c;
+mod brace;
 mod budget;
 mod cd;
 pub(crate) mod check;
