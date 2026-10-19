@@ -94,6 +94,10 @@ struct GrokHookEnvelope {
     cwd: Option<String>,
     #[serde(default)]
     workspace_root: Option<String>,
+    /// `permissionMode`: `default`, `auto`, `plan` or `bypassPermissions`. Read as any JSON value so
+    /// an unexpected type cannot fail the whole parse (which would abstain, and fail open).
+    #[serde(default)]
+    permission_mode: Option<Value>,
 }
 
 impl HookFormat for GrokHookFormat {
@@ -121,6 +125,7 @@ impl HookFormat for GrokHookFormat {
                 .or_else(|| super::env_root("CLAUDE_PROJECT_DIR")),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
+            permission_mode: envelope.permission_mode.as_ref().and_then(Value::as_str).map(str::to_string),
         })
     }
 
@@ -256,6 +261,18 @@ mod tests {
         assert_eq!(parsed.command, "npm test");
         assert_eq!(parsed.cwd.as_deref(), Some("/Users/me/project/sub"));
         assert_eq!(parsed.root.as_deref(), Some("/Users/me/project"));
+    }
+
+    #[test]
+    fn parse_input_reads_the_permission_mode_and_never_fails_on_its_type() {
+        let with = |mode: &str| GROK_DOCS_SAMPLE.replace(r#""toolName""#, &format!(r#""permissionMode": {mode}, "toolName""#));
+        assert_eq!(GrokHookFormat.parse_input(&with(r#""auto""#)).unwrap().permission_mode.as_deref(), Some("auto"));
+        assert_eq!(GrokHookFormat.parse_input(GROK_DOCS_SAMPLE).unwrap().permission_mode, None);
+        for odd in ["7", "null", "{}", "[\"default\"]"] {
+            let parsed = GrokHookFormat.parse_input(&with(odd)).expect("an odd mode must still parse");
+            assert_eq!(parsed.permission_mode, None, "{odd}");
+            assert_eq!(parsed.command, "npm test");
+        }
     }
 
     #[test]

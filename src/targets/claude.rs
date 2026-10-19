@@ -102,6 +102,7 @@ impl HookFormat for ClaudeHookFormat {
             cwd: envelope.cwd,
             root: super::env_root("CLAUDE_PROJECT_DIR"),
             session_id: envelope.session_id,
+            permission_mode: None,
         })
     }
 

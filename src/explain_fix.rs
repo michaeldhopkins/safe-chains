@@ -16,6 +16,8 @@
 use crate::userconfig::{Access, Step, step};
 use crate::{ReachReason, sanitize_display, suggest};
 
+pub mod gate;
+
 /// What would change the verdict on one refused command.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fix {

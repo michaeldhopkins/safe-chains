@@ -173,6 +173,9 @@ pub struct HookInput {
     /// the harness's own envelope, so the agent cannot forge it — which is what makes it usable as
     /// the anchor for recognizing the session's scratchpad (see `pathctx::session_scratchpad`).
     pub session_id: Option<String>,
+    /// The harness's permission mode as its envelope names it (Grok's `permissionMode`). Only a
+    /// target whose `gated_policy_for` depends on it reads it; the rest leave it `None`.
+    pub permission_mode: Option<String>,
 }
 
 /// May a GRANT be emitted for this command?

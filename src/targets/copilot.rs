@@ -121,6 +121,7 @@ impl HookFormat for CopilotHookFormat {
             root: None, // copilot sends cwd but no documented project root
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
+            permission_mode: None,
         })
     }
 

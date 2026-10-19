@@ -360,6 +360,10 @@ owed = [
   "src/engine/plain/tests.rs::rows_are_never_empty_and_account_for_every_facet",
 ]
 "src/explain_fix.rs" = ["src/explain_fix/tests.rs::an_offered_grant_always_works", "src/explain_fix/tests.rs::command_text_cannot_add_a_line"]
+"src/explain_fix/gate.rs" = [
+  "src/explain_fix/gate/tests.rs::one_boundary_segment_makes_the_whole_chain_a_boundary",
+  "src/explain_fix/gate/tests.rs::a_write_to_a_runs_later_place_is_a_boundary_whatever_the_command",
+]
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",
   "src/handler_property_tests.rs::sanitized_text_is_always_a_single_line",
@@ -559,6 +563,7 @@ owed = [
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/plain/tests.rs" = "the plain-words dictionary's test suite"
 "src/explain_fix/tests.rs" = "explain_fix's test suite"
+"src/explain_fix/gate/tests.rs" = "the gate-kind suite"
 "src/mcp/tests.rs" = "the MCP server's test suite"
 "src/engine/resolve/scenarios.rs" = "resolver scenario tests (#[cfg(test)] mod in resolve.rs)"
 "src/engine/testgen.rs" = "the level-algebra property suite (#[cfg(test)] mod in engine/mod.rs)"

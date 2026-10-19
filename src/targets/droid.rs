@@ -120,6 +120,7 @@ impl HookFormat for DroidHookFormat {
             root: super::env_root("FACTORY_PROJECT_DIR"),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
+            permission_mode: None,
         })
     }
 

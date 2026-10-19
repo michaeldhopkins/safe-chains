@@ -101,6 +101,7 @@ impl HookFormat for CursorHookFormat {
             root: (!envelope.workspace_roots.is_empty()).then(|| envelope.workspace_roots.swap_remove(0)),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
+            permission_mode: None,
         })
     }
 

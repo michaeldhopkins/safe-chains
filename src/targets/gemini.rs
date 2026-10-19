@@ -101,6 +101,7 @@ impl HookFormat for GeminiHookFormat {
             root: super::env_root("GEMINI_PROJECT_DIR"),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
+            permission_mode: None,
         })
     }
 
