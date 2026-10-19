@@ -115,6 +115,11 @@ fn reach_below_with(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     if base.contains(['*', '?', '[']) {
         return through_glob(base, walk, seen);
     }
+    walk_literal(base, walk, seen)
+}
+
+/// The concrete directory `base`, placed through the ordinary path resolver.
+fn walk_literal(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let Some(dir) = on_disk(base) else {
         let unplaced = base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX);
         return if unplaced && crate::pathctx::root().is_some_and(|r| r.starts_with('/')) { vec![unlisted(base)] } else { Vec::new() };
@@ -122,13 +127,17 @@ fn reach_below_with(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     if outside_sandbox(base) {
         return Vec::new();
     }
-    if walk.links != WalkLinks::Follow && !base.ends_with('/') && std::fs::symlink_metadata(&dir).is_ok_and(|m| m.file_type().is_symlink())
-    {
+    walk_placed(base, &dir, walk, seen)
+}
+
+/// `dir` is the directory already listed for the operand spelling `base`.
+fn walk_placed(base: &str, dir: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
+    if walk.links != WalkLinks::Follow && !base.ends_with('/') && std::fs::symlink_metadata(dir).is_ok_and(|m| m.file_type().is_symlink()) {
         return Vec::new();
     }
     // A filter is matched against the path as find prints it, which a trailing `/` changes.
     let skip = if base.len() > 1 && base.ends_with('/') { &NO_SKIP } else { walk.skip };
-    Walker { base: base.trim_end_matches('/'), dir: &dir, walk: Walk { skip, ..walk }, reached: Vec::new(), links: 0 }.run(seen)
+    Walker { base: base.trim_end_matches('/'), dir, walk: Walk { skip, ..walk }, reached: Vec::new(), links: 0 }.run(seen)
 }
 
 struct Walker<'a> {
@@ -229,8 +238,10 @@ impl Walker<'_> {
     }
 }
 
-/// A glob operand reaches what each of its matches reaches. Only a pattern in the last component is
-/// listed; one higher up names folders that are not listed, so it is judged as unlisted.
+/// A glob operand reaches what each of its matches reaches. A match is a literal name: handing it
+/// back to glob expansion makes a directory named with `*`, `?` or `[` match itself and never
+/// return. Only a pattern in the last component is listed; one higher up names folders that are not
+/// listed, so it is judged as unlisted.
 fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let walk = Walk { skip: &NO_SKIP, ..walk };
     let trimmed = base.trim_end_matches('/');
@@ -245,9 +256,11 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let mut reached = Vec::new();
     for entry in entries {
         *seen += 1;
-        let Some(name) = entry.ok().filter(|_| *seen <= MAX_ENTRIES).and_then(|e| e.file_name().into_string().ok()) else {
-            return vec![unlisted(base)];
-        };
+        let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(base)] };
+        // The listed path, kept before the name is resolved again. A second resolution treats
+        // `*`, `?` or `[` in the name as a pattern, and one sibling symlink makes that fail open.
+        let listed = entry.path();
+        let Some(name) = entry.file_name().into_string().ok() else { return vec![unlisted(base)] };
         if name.starts_with('.') && !pattern.starts_with('.') {
             continue;
         }
@@ -260,8 +273,10 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
         let each = if parent == "." { name } else { format!("{}/{name}", parent.trim_end_matches('/')) };
         if frozen {
             reached.push(Reach::Found(format!("{each}/f")));
+        } else if let Some(dir) = listed.to_str().filter(|_| each.contains(['*', '?', '['])) {
+            reached.extend(walk_placed(&each, dir, walk, seen));
         } else {
-            reached.extend(reach_below_with(&each, walk, seen));
+            reached.extend(walk_literal(&each, walk, seen));
         }
         if walk.links == WalkLinks::Ignore && !reached.is_empty() {
             reached.truncate(1);
@@ -308,3 +323,7 @@ pub(crate) fn on_disk(base: &str) -> Option<String> {
     }
     Some(if placed.is_empty() || placed == "." { root } else { format!("{root}/{placed}") })
 }
+
+#[cfg(test)]
+#[path = "frozen_walk_tests.rs"]
+mod tests;

@@ -535,6 +535,7 @@ owed = [
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/physical.rs)"
 "src/engine/resolve/frozen_reach_tests.rs" = "the recursive-reach suite (#[cfg(test)] mod in engine/resolve/frozen_reach.rs)"
+"src/engine/resolve/frozen_walk_tests.rs" = "the bounded-walk suite (#[cfg(test)] mod in engine/resolve/frozen_walk.rs)"
 "src/handlers/coreutils/find_skip_tests.rs" = "the find-filter suite (#[cfg(test)] mod in handlers/coreutils/find_skip.rs)"
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/echoed_tests.rs" = "the printed-item suite (#[cfg(test)] mod in cst/echoed.rs)"
