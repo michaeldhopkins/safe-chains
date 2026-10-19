@@ -386,7 +386,7 @@ fn a_brace_sequence_that_names_git_is_refused() {
             ("mkdir .gi{t..t}", false),
             ("rm -rf .{g..i}it", false),
             ("rm -rf .g{i..i}t", false),
-            ("rm -rf .GI{T..T}", false),
+            ("rm -rf .GI{T..T}", !cwd.join(".GIT").exists()),
             ("rm -rf sub/.gi{t..t}", false),
             ("chmod -R 755 sub/.gi{t..t}", false),
             ("find sub/.gi{t..t} -delete", false),
