@@ -1,3 +1,4 @@
+use std::os::unix::ffi::OsStringExt;
 use std::os::unix::fs::{PermissionsExt, symlink};
 
 use super::{Reach, Walk, reach_below};
@@ -46,6 +47,15 @@ fn project() -> (tempfile::TempDir, String) {
     let dir = tempfile::tempdir().expect("scratch");
     let root = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
     (dir, root)
+}
+
+/// The spelling a resolved path comes back with. macOS rewrites `/private/{tmp,var,etc}` to the
+/// short form, and a project root spelled the other way classifies that path as outside.
+fn spelled_root(canonical: &str) -> String {
+    match canonical.strip_prefix("/private") {
+        Some(rest) if rest.starts_with("/var/") || rest.starts_with("/tmp/") || rest.starts_with("/etc/") => rest.to_string(),
+        _ => canonical.to_string(),
+    }
 }
 
 fn ctx(root: &str) -> PathCtx {
@@ -333,54 +343,145 @@ fn an_unquoted_glob_does_not_delete_a_readable_match_the_literal_never_opened() 
     assert!(!rm_glob.0, "rm of unquoted foo[bar] deleted foob/.git: {}", rm_glob.1);
 }
 
-/// A mode-000 child listed before a readable `.git` used to abort the walk. `rm -r` then dropped
-/// the unlisted result and deleted the repository. A tree whose only `.git` is inside the sealed
-/// directory stays allowed: removal cannot list it and does not plant a hook.
+/// An absolute glob is not expanded, and neither is one whose listing gave up. The operand is a
+/// symlink onto the only match, which holds `.git`. The shell deletes or chmods that match.
+#[test]
+fn an_unexpanded_glob_does_not_approve_the_match_behind_a_symlink() {
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/foob/.git")).expect("git");
+    symlink("foob", format!("{root}/foo[bar]")).expect("operand symlink");
+    let root_for = root.clone();
+    let (rm_abs, chmod_abs) = on_hook_stack(move || {
+        (
+            verdict_and_reason(&root_for, &format!("rm -rf {root_for}/foo[bar]")),
+            verdict_and_reason(&root_for, &format!("chmod -R 755 {root_for}/foo[bar]")),
+        )
+    });
+    assert!(!rm_abs.0, "absolute glob rm was approved: {}", rm_abs.1);
+    assert!(!chmod_abs.0, "absolute glob chmod was approved: {}", chmod_abs.1);
+
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/foob/.git")).expect("git");
+    symlink("foob", format!("{root}/foo[bar]")).expect("operand symlink");
+    for i in 0..4096 {
+        std::fs::write(format!("{root}/p{i}"), "").expect("filler");
+    }
+    let root_for = root.clone();
+    let (rm_entries, chmod_entries) =
+        on_hook_stack(move || (verdict_and_reason(&root_for, "rm -rf foo[bar]"), verdict_and_reason(&root_for, "chmod -R 755 foo[bar]")));
+    assert!(!rm_entries.0, "rm was approved after the entry cap: {}", rm_entries.1);
+    assert!(!chmod_entries.0, "chmod was approved after the entry cap: {}", chmod_entries.1);
+
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/a0/.git")).expect("git");
+    symlink("a0", format!("{root}/a*")).expect("operand symlink");
+    for i in 1..257 {
+        std::fs::write(format!("{root}/a{i}"), "").expect("match");
+    }
+    let root_for = root.clone();
+    let (rm_matches, chmod_matches) =
+        on_hook_stack(move || (verdict_and_reason(&root_for, "rm -rf a*"), verdict_and_reason(&root_for, "chmod -R 755 a*")));
+    assert!(!rm_matches.0, "rm was approved after the match cap: {}", rm_matches.1);
+    assert!(!chmod_matches.0, "chmod was approved after the match cap: {}", chmod_matches.1);
+
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/foob/.git")).expect("git");
+    symlink("foob", format!("{root}/foo[bar]")).expect("operand symlink");
+    let bad = std::ffi::OsString::from_vec({
+        let mut bytes = b"zz-".to_vec();
+        bytes.push(0xff);
+        bytes
+    });
+    let created = std::fs::File::create(std::path::Path::new(&root).join(&bad));
+    if created.is_err() {
+        // This filesystem rejects a non-UTF-8 file name, so a listing cannot give up on one here.
+        return;
+    }
+    let root_for = root.clone();
+    let (rm_bytes, chmod_bytes) =
+        on_hook_stack(move || (verdict_and_reason(&root_for, "rm -rf foo[bar]"), verdict_and_reason(&root_for, "chmod -R 755 foo[bar]")));
+    assert!(!rm_bytes.0, "rm was approved beside a non-UTF-8 name: {}", rm_bytes.1);
+    assert!(!chmod_bytes.0, "chmod was approved beside a non-UTF-8 name: {}", chmod_bytes.1);
+}
+
+/// `foo[bar]` holds more entries than the walk keeps, the parent has more names than expansion
+/// keeps, and `foob/.git` is the match. `rm -rf foo[bar]` deletes `foob`.
+#[test]
+fn a_literal_directory_budget_does_not_let_rm_delete_a_sibling_match() {
+    let (_dir, root) = project();
+    let literal = format!("{root}/foo[bar]");
+    std::fs::create_dir(&literal).expect("literal");
+    for i in 0..=super::MAX_ENTRIES {
+        std::fs::write(format!("{literal}/{i}"), "").expect("literal file");
+    }
+    std::fs::create_dir_all(format!("{root}/foob/.git")).expect("match git");
+    for i in 0..4100 {
+        std::fs::write(format!("{root}/p{i}"), "").expect("sibling");
+    }
+    let root_for = root.clone();
+    let (rm_glob, chmod_glob) =
+        on_hook_stack(move || (verdict_and_reason(&root_for, "rm -rf foo[bar]"), verdict_and_reason(&root_for, "chmod -R 755 foo[bar]")));
+    assert!(!chmod_glob.0, "chmod was approved when the literal spent the budget: {}", chmod_glob.1);
+    assert!(!rm_glob.0, "rm deleted the sibling match the budget hid: {}", rm_glob.1);
+}
+
+/// `foo[bar]` points at `.git` and `foob` is a symlink to an ordinary file. The quoted operand is
+/// the first symlink. `chmod` and `rm -rf` of it change `.git`.
+#[test]
+fn a_quoted_symlink_is_judged_when_another_match_is_a_symlink() {
+    let (_dir, canonical) = project();
+    let root = spelled_root(&canonical);
+    let git = format!("{root}/repo/.git");
+    std::fs::create_dir_all(format!("{git}/hooks")).expect("git");
+    let hook = format!("{git}/hooks/pre-commit");
+    std::fs::write(&hook, "#!/bin/sh\n").expect("hook");
+    let mut perms = std::fs::metadata(&hook).expect("hook metadata").permissions();
+    perms.set_mode(0o700);
+    std::fs::set_permissions(&hook, perms).expect("hook mode");
+    symlink("repo/.git", format!("{root}/foo[bar]")).expect("operand symlink");
+    std::fs::write(format!("{root}/readme"), "ok").expect("readme");
+    symlink("readme", format!("{root}/foob")).expect("harmless match");
+    let root_for = root.clone();
+    let verdicts =
+        on_hook_stack(move || ["chmod 755 'foo[bar]'", "rm -rf 'foo[bar]/'"].map(|line| (line, verdict_and_reason(&root_for, line))));
+    for (line, (allowed, why)) in &verdicts {
+        assert!(!*allowed, "{line} was approved over a symlink to .git: {why}");
+        assert!(why.contains(".git"), "{line} was refused without judging .git: {why}");
+    }
+}
+
+/// A mode-000 child beside a readable `.git` must not hide it, whatever order `read_dir` uses.
+/// A tree whose only `.git` is inside the sealed directory stays allowed: removal cannot list it
+/// and does not plant a hook.
 #[test]
 fn an_unreadable_child_does_not_hide_a_readable_git() {
-    let mut held = None;
-    let mut orders = Vec::new();
-    for n in 0..40 {
-        let (dir, root) = project();
-        let proj = format!("{root}/proj");
-        let sealed = format!("{proj}/s{n}");
-        std::fs::create_dir_all(format!("{proj}/repo/.git")).expect("git");
-        std::fs::create_dir(&sealed).expect("sealed");
-        seal(&sealed);
-        let names: Vec<String> = std::fs::read_dir(&proj)
-            .expect("list")
-            .map(|e| e.expect("entry").file_name().into_string().expect("utf-8"))
-            .collect();
-        let sealed_first = names.first().is_some_and(|name| name.starts_with('s'));
-        orders.push(names);
-        if sealed_first {
-            held = Some((dir, root, sealed));
-            break;
-        }
-        let mut perms = std::fs::metadata(&sealed).expect("metadata").permissions();
-        perms.set_mode(0o755);
-        std::fs::set_permissions(&sealed, perms).expect("unseal");
-    }
-    let Some((_dir, root, sealed)) = held else {
-        panic!("read_dir never listed the sealed child first: {orders:?}");
-    };
+    let (_dir, root) = project();
+    let proj = format!("{root}/proj");
+    let sealed = format!("{proj}/sealed");
+    std::fs::create_dir_all(format!("{proj}/repo/.git")).expect("git");
+    std::fs::create_dir(&sealed).expect("sealed");
+    seal(&sealed);
     let _unseal = Unseal(vec![sealed]);
     let root_for = root.clone();
-    let (rm_proj, chmod_proj, find_proj, rm_only) = on_hook_stack(move || {
+    let (rm_proj, chmod_proj, find_proj, rm_only, reached) = on_hook_stack(move || {
         let only = format!("{root_for}/only");
         std::fs::create_dir_all(format!("{only}/.git")).expect("only git");
         seal(&only);
+        let _guard = pathctx::enter(ctx(&root_for));
+        let reached = reach_below("proj", Walk::plain(true));
         let verdicts = (
             verdict_and_reason(&root_for, "rm -rf proj"),
             verdict_and_reason(&root_for, "chmod -R 755 proj"),
             verdict_and_reason(&root_for, "find proj -delete"),
             verdict_and_reason(&root_for, "rm -rf only"),
+            reached,
         );
         let mut perms = std::fs::metadata(&only).expect("metadata").permissions();
         perms.set_mode(0o755);
         std::fs::set_permissions(&only, perms).expect("unseal only");
         verdicts
     });
+    assert!(reached.iter().any(|r| matches!(r, Reach::Found(p) if p.contains("repo/.git"))), "sealed sibling hid repo/.git: {reached:?}");
     assert!(!chmod_proj.0, "chmod of the mixed tree was approved: {}", chmod_proj.1);
     assert!(!find_proj.0, "find -delete of the mixed tree was approved: {}", find_proj.1);
     assert!(rm_only.0, "rm of a sealed tree whose only .git is inside it was refused: {}", rm_only.1);
@@ -501,7 +602,8 @@ proptest! {
 
     /// An operand drawn from the glob-like names is the literal directory when that exists, plus
     /// every match. A frozen name anywhere under either is refused. An unreadable directory is
-    /// unfinished, so it is refused too.
+    /// unfinished, so it is refused too. The operand may be a symlink, an absolute path, or sit
+    /// beside a match that is itself a symlink.
     #[test]
     fn a_literal_glob_operand_and_an_unreadable_directory_are_not_approved(
         name in prop::sample::select(OPERAND_NAMES),
@@ -510,27 +612,57 @@ proptest! {
         frozen in prop::sample::select(FROZEN_NAMES),
         sibling_frozen in any::<bool>(),
         seal_tree in any::<bool>(),
+        symlink_operand in any::<bool>(),
+        absolute in any::<bool>(),
+        match_is_symlink in any::<bool>(),
     ) {
-        let (_dir, root) = project();
-        let mut at = format!("{root}/{name}");
-        std::fs::create_dir_all(&at).expect("operand directory");
-        let mut planted = plant_at == 0;
-        if planted {
-            std::fs::create_dir(format!("{at}/{frozen}")).expect("frozen");
-        }
-        for i in 1..=depth {
-            at = format!("{at}/n");
-            std::fs::create_dir(&at).expect("nested");
-            if i == plant_at {
-                std::fs::create_dir(format!("{at}/{frozen}")).expect("frozen");
-                planted = true;
+        let (_dir, canonical) = project();
+        let root = spelled_root(&canonical);
+        let sibling = glob_sibling(name);
+        let sibling_path = format!("{root}/{sibling}");
+        let match_dir = if match_is_symlink {
+            let payload = format!("{root}/payload");
+            std::fs::create_dir_all(&payload).expect("payload");
+            symlink("payload", &sibling_path).expect("match symlink");
+            payload
+        } else {
+            std::fs::create_dir_all(&sibling_path).expect("glob match");
+            sibling_path
+        };
+        if sibling_frozen {
+            let git = format!("{match_dir}/.git");
+            if !std::path::Path::new(&git).exists() {
+                std::fs::create_dir(&git).expect("match git");
             }
         }
-        let sibling = glob_sibling(name);
-        let sibling_dir = format!("{root}/{sibling}");
-        std::fs::create_dir_all(&sibling_dir).expect("glob match");
-        if sibling_frozen {
-            std::fs::create_dir(format!("{sibling_dir}/.git")).expect("match git");
+        let mut planted = false;
+        if symlink_operand {
+            symlink(sibling, format!("{root}/{name}")).expect("operand symlink");
+            if plant_at == 0 || (1..=depth).contains(&plant_at) {
+                let dest = format!("{match_dir}/{frozen}");
+                if !std::path::Path::new(&dest).exists() {
+                    std::fs::create_dir(&dest).expect("frozen");
+                }
+                planted = true;
+            }
+        } else {
+            let mut at = format!("{root}/{name}");
+            std::fs::create_dir_all(&at).expect("operand directory");
+            planted = plant_at == 0;
+            if planted {
+                let dest = format!("{at}/{frozen}");
+                if !std::path::Path::new(&dest).exists() {
+                    std::fs::create_dir(&dest).expect("frozen");
+                }
+            }
+            for i in 1..=depth {
+                at = format!("{at}/n");
+                std::fs::create_dir(&at).expect("nested");
+                if i == plant_at {
+                    std::fs::create_dir(format!("{at}/{frozen}")).expect("frozen");
+                    planted = true;
+                }
+            }
         }
         let sealed = seal_tree.then(|| {
             let path = format!("{root}/sealed");
@@ -540,18 +672,21 @@ proptest! {
         });
         let _unseal = Unseal(sealed.clone().into_iter().collect());
         let _guard = pathctx::enter(ctx(&root));
-        let reached = reach_below(name, Walk::plain(true));
-        let chmod = crate::command_verdict(&format!("chmod -R 755 '{name}'")).is_allowed();
-        prop_assert!(finished(&reached) || !chmod, "unfinished walk of {name} was approved: {reached:?}");
+        let operand = if absolute { format!("{root}/{name}") } else { name.to_string() };
+        let reached = reach_below(&operand, Walk::plain(true));
+        let chmod = crate::command_verdict(&format!("chmod -R 755 '{operand}'")).is_allowed();
+        prop_assert!(finished(&reached) || !chmod, "unfinished walk of {operand} was approved: {reached:?}");
         if planted || sibling_frozen {
-            prop_assert!(!chmod, "approved {name} with a frozen name below it: {reached:?}");
+            prop_assert!(!chmod, "approved {operand} with a frozen name below it: {reached:?}");
             prop_assert!(
-                reached.iter().any(|r| matches!(r, Reach::Found(_))),
-                "walk of {name} missed a frozen name (planted {planted} at {plant_at}, sibling {sibling_frozen}): {reached:?}"
+                reached.iter().any(|r| matches!(r, Reach::Found(_) | Reach::Unlisted(_))),
+                "walk of {operand} missed a frozen name (planted {planted} at {plant_at}, sibling {sibling_frozen}, link {symlink_operand}, absolute {absolute}, match link {match_is_symlink}): {reached:?}"
             );
         } else if finished(&reached) {
-            prop_assert!(reached.is_empty(), "nothing frozen under {name}, walk returned {reached:?}");
-            prop_assert!(chmod, "finished walk of clean {name} was refused: {reached:?}");
+            prop_assert!(reached.is_empty(), "nothing frozen under {operand}, walk returned {reached:?}");
+            if !absolute && !symlink_operand && !match_is_symlink {
+                prop_assert!(chmod, "finished walk of clean {operand} was refused: {reached:?}");
+            }
         }
         if sealed.is_some() {
             let unreadable = reach_below("sealed", Walk::plain(true));

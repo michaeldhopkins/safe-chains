@@ -277,8 +277,7 @@ impl Walker<'_> {
     }
 }
 
-/// Each match of a glob operand, as a literal name (`*` in a match must not be re-globbed). `walked`
-/// was already visited. A pattern above the last component is unlisted.
+/// Each match of a glob operand, as a literal name (`*` in a match must not be re-globbed).
 fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) -> Vec<Reach> {
     let walk = Walk { skip: &NO_SKIP, ..walk };
     let trimmed = base.trim_end_matches('/');
@@ -299,7 +298,6 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
     for entry in entries {
         *seen += 1;
         let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(base)] };
-        // Keep the listed path. Resolving the name again treats `*`, `?` or `[` as a pattern.
         let listed = entry.path();
         let Some(name) = entry.file_name().into_string().ok() else { return vec![unlisted(base)] };
         if name.starts_with('.') && !pattern.starts_with('.') {
@@ -317,8 +315,10 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
         let each = if parent == "." { name } else { format!("{}/{name}", parent.trim_end_matches('/')) };
         if frozen {
             reached.push(Reach::Found(format!("{each}/f")));
-        } else if let Some(dir) = listed.to_str().filter(|_| each.contains(['*', '?', '['])) {
-            reached.extend(walk_placed(&each, dir, walk, seen));
+        } else if each.contains(['*', '?', '[']) {
+            let dir = link_dir(&listed).or_else(|| listed.to_str().map(str::to_string));
+            let Some(dir) = dir else { return vec![unlisted(base)] };
+            reached.extend(walk_placed(&each, &dir, walk, seen));
         } else {
             reached.extend(walk_literal(&each, walk, seen));
         }
@@ -356,10 +356,11 @@ fn dir_unreadable(err: &std::io::Error, path: &str) -> bool {
 
 fn same_place(walked: &str, listed: &std::path::Path) -> bool {
     listed.to_str() == Some(walked)
-        || std::fs::canonicalize(walked)
-            .ok()
-            .zip(std::fs::canonicalize(listed).ok())
-            .is_some_and(|(a, b)| a == b)
+}
+fn link_dir(listed: &std::path::Path) -> Option<String> {
+    let target = std::fs::read_link(listed).ok()?;
+    let joined = if target.is_absolute() { target } else { listed.parent()?.join(target) };
+    joined.is_dir().then(|| joined.to_str().map(str::to_string)).flatten()
 }
 
 fn outside_sandbox(base: &str) -> bool {

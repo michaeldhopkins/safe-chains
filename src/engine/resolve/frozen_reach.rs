@@ -62,15 +62,30 @@ pub(crate) fn stops_before_matches(ignore_links: bool, seen: Sight) -> bool {
 
 /// The operands of a write-role command, followed by the frozen places a recursive one reaches
 /// below them. `rm -r .` removes `.git` as `rm -r .git` does, so a frozen name found below a removal
-/// counts too; but a removal plants nothing to run, so an unlisted tree is let through for it.
+/// counts too. A removal of a plain name plants nothing to run, so an unlisted tree is let through.
+/// A glob is not a plain name: when the walk cannot list what it reaches, the removal is refused.
 pub(super) fn with_reached(spec: &crate::registry::types::BehaviorSpec, operands: &[&str], tokens: &[crate::parse::Token]) -> Vec<String> {
     let mut all: Vec<String> = operands.iter().map(|p| (*p).to_string()).collect();
     if spec.unbounded_flags.iter().any(|f| super::behavior_flag_present(tokens, f)) {
         let removes = spec.operation == crate::engine::facet::Operation::Destroy;
-        let reached = operands.iter().filter_map(|p| frozen_below(p, true));
-        all.extend(reached.filter(|r| !removes || matches!(r, Reach::Found(_))).map(|r| r.path().to_string()));
+        all.extend(
+            operands
+                .iter()
+                .filter_map(|p| frozen_below(p, true).filter(|r| !removes || removal_keeps(p, r)).map(|r| r.path().to_string())),
+        );
     }
     all
+}
+
+/// A removal keeps a frozen name it found. It also keeps an unlisted tree when the operand's last
+/// component is a glob: the shell can expand onto a match the walk did not open. A bracket in an
+/// earlier component is a directory name (`plain[ok]/f`), which a removal still lets through.
+fn removal_keeps(operand: &str, reach: &Reach) -> bool {
+    if matches!(reach, Reach::Found(_)) {
+        return true;
+    }
+    let last = operand.trim_end_matches('/').rsplit('/').next().unwrap_or(operand);
+    last.contains(['*', '?', '['])
 }
 
 /// Where a recursive copy of `source` into `dest` writes what it reaches below `source`:
@@ -184,8 +199,7 @@ pub(crate) fn find_follows(args: &[&str]) -> bool {
 /// The first write-frozen name under the operand `base`, links below it not entered. `None` when
 /// nothing frozen lies below, or when `base` cannot be placed on disk.
 pub(crate) fn frozen_below(base: &str, hidden: bool) -> Option<Reach> {
-    // A found name wins over an unlisted sibling. `rm` keeps only `Found`, so the unlisted
-    // entry must not be the one returned when a readable match was also walked.
+    // A found name wins over an unlisted sibling, so a readable match is what a removal sees.
     let reached = reach_below(base, Walk::plain(hidden));
     let found = reached.iter().position(|r| matches!(r, Reach::Found(_))).unwrap_or(0);
     reached.into_iter().nth(found)

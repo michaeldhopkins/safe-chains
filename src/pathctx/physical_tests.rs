@@ -63,6 +63,15 @@ fn a_symlink_whose_name_looks_like_a_glob_is_followed() {
 }
 
 #[test]
+fn a_literal_symlink_is_judged_when_a_glob_match_is_also_a_symlink() {
+    let (_dir, base) = tree();
+    symlink(format!("{base}/o/f"), format!("{base}/p/foo[bar]")).unwrap();
+    symlink(format!("{base}/p/src/a"), format!("{base}/p/foob")).unwrap();
+    assert_eq!(resolve(&format!("{base}/p/foo[bar]"), true), Some(format!("{base}/o/f")));
+    assert_eq!(resolve(&format!("{base}/p/foo[bar]/"), false), Some(format!("{base}/o/f")));
+}
+
+#[test]
 fn a_glob_through_a_link_reaches_the_link_target() {
     let (_dir, base) = tree();
     symlink(format!("{base}/o/f"), format!("{base}/p/rc")).unwrap();

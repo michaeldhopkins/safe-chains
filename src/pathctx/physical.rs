@@ -108,15 +108,21 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
             done.push(part);
             continue;
         }
+        let candidate = format!("{}/{part}", joined(&done).trim_end_matches('/'));
         // None: no match went through a link, so the literal component is still judged. A symlink
-        // named `foo[bar]` does not match that pattern and would otherwise never be `lstat`ed.
+        // named `foo[bar]` does not match that pattern. When another match did go through a link,
+        // the literal symlink is still what a quoted operand names, so it is judged too. An
+        // unresolvable listing is a refusal, not a guess at the literal.
         if from_shell
             && part.contains(['*', '?', '['])
             && let Some(outcome) = glob(&done, &part, &todo, follow_last, budget)
         {
-            return outcome;
+            let literal_link = std::fs::symlink_metadata(&candidate).is_ok_and(|m| m.file_type().is_symlink());
+            let unresolved = matches!(&outcome, Outcome::Followed(real) if real == super::UNRESOLVED_CWD);
+            if !literal_link || unresolved {
+                return outcome;
+            }
         }
-        let candidate = format!("{}/{part}", joined(&done).trim_end_matches('/'));
         match std::fs::symlink_metadata(&candidate) {
             Ok(meta) if meta.file_type().is_symlink() => {
                 budget.links += 1;

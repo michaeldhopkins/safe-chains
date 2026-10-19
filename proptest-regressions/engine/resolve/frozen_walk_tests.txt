@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 80cfaf8be87de41de74b64c36c3cbea2594d2dba9de68e0eafe99f2d9eeb68dd # shrinks to name = "[q]", depth = 0, plant_at = 0, frozen = ".git", sibling_frozen = false, seal_tree = false
+cc 8daa2c91af0123c414f828871fd6746f6fd34b730791570ec805801d34d6f0e0 # shrinks to name = "[q]", depth = 0, plant_at = 1, frozen = ".git", sibling_frozen = true, seal_tree = false, symlink_operand = false, absolute = false, match_is_symlink = true
