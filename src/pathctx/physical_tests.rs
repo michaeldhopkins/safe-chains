@@ -54,6 +54,15 @@ fn a_loop_is_unresolvable() {
 }
 
 #[test]
+fn a_symlink_whose_name_looks_like_a_glob_is_followed() {
+    let (_dir, base) = tree();
+    symlink(format!("{base}/o/f"), format!("{base}/p/foo[bar]")).unwrap();
+    assert_eq!(resolve(&format!("{base}/p/foo[bar]"), true), Some(format!("{base}/o/f")));
+    assert_eq!(resolve(&format!("{base}/p/foo[bar]/"), false), Some(format!("{base}/o/f")));
+    assert_eq!(resolve(&format!("{base}/p/foo[bar]"), false), None);
+}
+
+#[test]
 fn a_glob_through_a_link_reaches_the_link_target() {
     let (_dir, base) = tree();
     symlink(format!("{base}/o/f"), format!("{base}/p/rc")).unwrap();

@@ -108,15 +108,13 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
             done.push(part);
             continue;
         }
-        if from_shell && part.contains(['*', '?', '[']) {
-            match glob(&done, &part, &todo, follow_last, budget) {
-                Some(outcome) => return outcome,
-                None => {
-                    missing = Some(done.len());
-                    done.push(part);
-                    continue;
-                }
-            }
+        // None: no match went through a link, so the literal component is still judged. A symlink
+        // named `foo[bar]` does not match that pattern and would otherwise never be `lstat`ed.
+        if from_shell
+            && part.contains(['*', '?', '['])
+            && let Some(outcome) = glob(&done, &part, &todo, follow_last, budget)
+        {
+            return outcome;
         }
         let candidate = format!("{}/{part}", joined(&done).trim_end_matches('/'));
         match std::fs::symlink_metadata(&candidate) {

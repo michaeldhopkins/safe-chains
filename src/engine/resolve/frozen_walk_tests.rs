@@ -285,6 +285,136 @@ fn a_glob_operand_walks_the_literal_directory_and_every_match() {
     );
 }
 
+/// `rm -rf a*` where `a*` is mode 000, `a0/.git` is readable, and the parent has more matches than
+/// the expander keeps. The shell still deletes `a0`. The same shape with `foo[bar]` over the entry cap.
+#[test]
+fn an_unquoted_glob_does_not_delete_a_readable_match_the_literal_never_opened() {
+    let (_dir, root) = project();
+    let literal = format!("{root}/a*");
+    std::fs::create_dir(&literal).expect("literal");
+    seal(&literal);
+    std::fs::create_dir_all(format!("{root}/a0/.git")).expect("match git");
+    for i in 1..260 {
+        std::fs::write(format!("{root}/a{i}"), "").expect("filler");
+    }
+    let _unseal = Unseal(vec![literal]);
+    let root_for = root.clone();
+    let (rm_glob, rm_match, chmod_glob, reached) = on_hook_stack(move || {
+        let _guard = pathctx::enter(ctx(&root_for));
+        let reached = reach_below("a*", Walk::plain(true));
+        (
+            verdict_and_reason(&root_for, "rm -rf a*"),
+            verdict_and_reason(&root_for, "rm -rf a0"),
+            verdict_and_reason(&root_for, "chmod -R 755 a*"),
+            reached,
+        )
+    });
+    assert!(!rm_match.0, "rm of the readable match was approved: {}", rm_match.1);
+    assert!(!chmod_glob.0, "chmod of the glob was approved: {}", chmod_glob.1);
+    assert!(
+        reached.iter().any(|r| matches!(r, Reach::Found(p) if p.contains("a0") && p.ends_with(".git/f"))),
+        "literal unlisted hid a0/.git: {reached:?}"
+    );
+    assert!(!rm_glob.0, "rm of the unexpanded glob deleted a readable match: {}", rm_glob.1);
+
+    let (_dir, root) = project();
+    let literal = format!("{root}/foo[bar]");
+    std::fs::create_dir(&literal).expect("literal");
+    seal(&literal);
+    std::fs::create_dir_all(format!("{root}/foob/.git")).expect("match git");
+    for i in 0..4095 {
+        std::fs::write(format!("{root}/p{i}"), "").expect("filler");
+    }
+    let _unseal = Unseal(vec![literal]);
+    let root_for = root.clone();
+    let (rm_glob, rm_match) =
+        on_hook_stack(move || (verdict_and_reason(&root_for, "rm -rf foo[bar]"), verdict_and_reason(&root_for, "rm -rf foob")));
+    assert!(!rm_match.0, "rm of foob was approved: {}", rm_match.1);
+    assert!(!rm_glob.0, "rm of unquoted foo[bar] deleted foob/.git: {}", rm_glob.1);
+}
+
+/// A mode-000 child listed before a readable `.git` used to abort the walk. `rm -r` then dropped
+/// the unlisted result and deleted the repository. A tree whose only `.git` is inside the sealed
+/// directory stays allowed: removal cannot list it and does not plant a hook.
+#[test]
+fn an_unreadable_child_does_not_hide_a_readable_git() {
+    let mut held = None;
+    let mut orders = Vec::new();
+    for n in 0..40 {
+        let (dir, root) = project();
+        let proj = format!("{root}/proj");
+        let sealed = format!("{proj}/s{n}");
+        std::fs::create_dir_all(format!("{proj}/repo/.git")).expect("git");
+        std::fs::create_dir(&sealed).expect("sealed");
+        seal(&sealed);
+        let names: Vec<String> = std::fs::read_dir(&proj)
+            .expect("list")
+            .map(|e| e.expect("entry").file_name().into_string().expect("utf-8"))
+            .collect();
+        let sealed_first = names.first().is_some_and(|name| name.starts_with('s'));
+        orders.push(names);
+        if sealed_first {
+            held = Some((dir, root, sealed));
+            break;
+        }
+        let mut perms = std::fs::metadata(&sealed).expect("metadata").permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(&sealed, perms).expect("unseal");
+    }
+    let Some((_dir, root, sealed)) = held else {
+        panic!("read_dir never listed the sealed child first: {orders:?}");
+    };
+    let _unseal = Unseal(vec![sealed]);
+    let root_for = root.clone();
+    let (rm_proj, chmod_proj, find_proj, rm_only) = on_hook_stack(move || {
+        let only = format!("{root_for}/only");
+        std::fs::create_dir_all(format!("{only}/.git")).expect("only git");
+        seal(&only);
+        let verdicts = (
+            verdict_and_reason(&root_for, "rm -rf proj"),
+            verdict_and_reason(&root_for, "chmod -R 755 proj"),
+            verdict_and_reason(&root_for, "find proj -delete"),
+            verdict_and_reason(&root_for, "rm -rf only"),
+        );
+        let mut perms = std::fs::metadata(&only).expect("metadata").permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(&only, perms).expect("unseal only");
+        verdicts
+    });
+    assert!(!chmod_proj.0, "chmod of the mixed tree was approved: {}", chmod_proj.1);
+    assert!(!find_proj.0, "find -delete of the mixed tree was approved: {}", find_proj.1);
+    assert!(rm_only.0, "rm of a sealed tree whose only .git is inside it was refused: {}", rm_only.1);
+    assert!(!rm_proj.0, "rm deleted a readable .git hidden by a sealed sibling: {}", rm_proj.1);
+}
+
+/// A symlink whose name contains `[` used to skip `lstat`, so `chmod` and `rm -rf` of it never saw
+/// the `.git` it points at. `cp -RL` of that link stays allowed: the walk of `.git` finds no nested
+/// frozen name.
+#[test]
+fn a_glob_named_symlink_to_git_is_judged_as_git() {
+    let (_dir, root) = project();
+    let git = format!("{root}/repo/.git");
+    std::fs::create_dir_all(format!("{git}/hooks")).expect("git");
+    std::fs::write(format!("{git}/hooks/pre-commit"), "#!/bin/sh\n").expect("hook");
+    symlink(&git, format!("{root}/foo[bar]")).expect("glob link");
+    symlink(&git, format!("{root}/link")).expect("plain link");
+    let root_for = root.clone();
+    let verdicts = on_hook_stack(move || {
+        [
+            "chmod -R 755 'foo[bar]/'", "rm -rf 'foo[bar]/'", "chmod 755 'foo[bar]'", "chmod -R 755 link/", "rm -rf link/",
+            "chmod 755 link", "cp -RL 'foo[bar]' dest", "cp -RL link dest",
+        ]
+        .map(|line| (line, verdict_and_reason(&root_for, line)))
+    });
+    for (line, (allowed, why)) in &verdicts {
+        if line.starts_with("cp ") {
+            assert!(*allowed, "{line} was refused: {why}");
+        } else {
+            assert!(!*allowed, "{line} was approved over a symlink to .git: {why}");
+        }
+    }
+}
+
 #[test]
 fn an_unreadable_directory_is_unlisted() {
     let (_dir, root) = project();

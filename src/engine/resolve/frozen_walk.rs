@@ -7,7 +7,7 @@
 
 use std::collections::{HashSet, VecDeque};
 
-use super::frozen_reach::Reach;
+use super::frozen_reach::{Reach, Sight, fold_sight, sight_of, stops_before_matches};
 
 pub(crate) const MAX_ENTRIES: usize = 20_000;
 const MAX_LINKS: usize = 64;
@@ -115,15 +115,11 @@ fn reach_below_with(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     // Literal first, so a clean match cannot hide a frozen name there. `outside_sandbox` globs `*` and `[`.
     let spelled = spelled_dir(base).filter(|dir| in_project(dir) || !outside_sandbox(base));
     let mut reached = spelled.as_ref().map(|dir| walk_placed(base, dir, walk, seen)).unwrap_or_default();
-    if halt(&reached, walk) {
+    if stops_before_matches(walk.links == WalkLinks::Ignore, sight_of(&reached)) {
         return reached;
     }
     reached.extend(through_glob(base, walk, seen, spelled.as_deref()));
     reached
-}
-
-fn halt(reached: &[Reach], walk: Walk) -> bool {
-    (walk.links == WalkLinks::Ignore && !reached.is_empty()) || reached.iter().any(|r| matches!(r, Reach::Unlisted(_)))
 }
 
 /// The operand joined onto the working directory when that path exists. Lexical, so `*` and `[` stay literal.
@@ -190,12 +186,16 @@ impl Walker<'_> {
             .and_then(|r| std::fs::canonicalize(r).ok());
         let walked = std::fs::canonicalize(self.dir).unwrap_or_else(|_| self.dir.into());
         let mut entered = HashSet::new();
+        let mut missed = false;
         let mut queue = VecDeque::from([String::new()]);
         while let Some(rel) = queue.pop_front() {
             let here = if rel.is_empty() { self.dir.to_string() } else { format!("{}/{rel}", self.dir) };
             let entries = match open_dir(&here) {
                 Opened::Entries(entries) => entries,
-                Opened::Unlisted => return vec![unlisted(self.base)],
+                Opened::Unlisted => {
+                    missed = true;
+                    continue;
+                }
                 Opened::Absent => continue,
             };
             for entry in entries {
@@ -253,7 +253,8 @@ impl Walker<'_> {
                 }
             }
         }
-        self.reached
+        let seen = fold_sight(sight_of(&self.reached), if missed { Sight::Unlisted } else { Sight::Empty });
+        if seen == Sight::Unlisted { vec![unlisted(self.base)] } else { self.reached }
     }
 
     fn push_link(&mut self, item: String) -> bool {
@@ -321,11 +322,9 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
         } else {
             reached.extend(walk_literal(&each, walk, seen));
         }
-        if walk.links == WalkLinks::Ignore && !reached.is_empty() {
+        if stops_before_matches(walk.links == WalkLinks::Ignore, sight_of(&reached)) {
+            reached.retain(|r| matches!(r, Reach::Found(_)));
             reached.truncate(1);
-            return reached;
-        }
-        if reached.iter().any(|r| matches!(r, Reach::Unlisted(_))) {
             return reached;
         }
     }

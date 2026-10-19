@@ -30,6 +30,36 @@ impl Reach {
     }
 }
 
+/// What a walk has seen. [`Sight::Found`] dominates [`Sight::Unlisted`], so one unreadable
+/// directory cannot erase a frozen name listed beside it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Sight {
+    Empty,
+    Unlisted,
+    Found,
+}
+
+/// `seen` combined with `next`. Order does not matter: a frozen name stays found.
+pub(crate) fn fold_sight(seen: Sight, next: Sight) -> Sight {
+    match (seen, next) {
+        (Sight::Found, _) | (_, Sight::Found) => Sight::Found,
+        (Sight::Unlisted, _) | (_, Sight::Unlisted) => Sight::Unlisted,
+        (Sight::Empty, Sight::Empty) => Sight::Empty,
+    }
+}
+
+pub(crate) fn sight_of(reached: &[Reach]) -> Sight {
+    reached
+        .iter()
+        .fold(Sight::Empty, |seen, reach| fold_sight(seen, if matches!(reach, Reach::Found(_)) { Sight::Found } else { Sight::Unlisted }))
+}
+
+/// A walk that stops at the first frozen name may stop before other glob matches only once one
+/// is found. An unlisted literal is not that: the shell can still expand onto a match.
+pub(crate) fn stops_before_matches(ignore_links: bool, seen: Sight) -> bool {
+    ignore_links && seen == Sight::Found
+}
+
 /// The operands of a write-role command, followed by the frozen places a recursive one reaches
 /// below them. `rm -r .` removes `.git` as `rm -r .git` does, so a frozen name found below a removal
 /// counts too; but a removal plants nothing to run, so an unlisted tree is let through for it.
@@ -154,7 +184,11 @@ pub(crate) fn find_follows(args: &[&str]) -> bool {
 /// The first write-frozen name under the operand `base`, links below it not entered. `None` when
 /// nothing frozen lies below, or when `base` cannot be placed on disk.
 pub(crate) fn frozen_below(base: &str, hidden: bool) -> Option<Reach> {
-    reach_below(base, Walk::plain(hidden)).into_iter().next()
+    // A found name wins over an unlisted sibling. `rm` keeps only `Found`, so the unlisted
+    // entry must not be the one returned when a readable match was also walked.
+    let reached = reach_below(base, Walk::plain(hidden));
+    let found = reached.iter().position(|r| matches!(r, Reach::Found(_))).unwrap_or(0);
+    reached.into_iter().nth(found)
 }
 
 #[cfg(test)]

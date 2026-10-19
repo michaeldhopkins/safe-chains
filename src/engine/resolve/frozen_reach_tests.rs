@@ -1,5 +1,6 @@
-use super::{Reach, frozen_below};
+use super::{Reach, Sight, fold_sight, frozen_below, stops_before_matches};
 use crate::pathctx::{self, PathCtx};
+use proptest::prelude::*;
 
 fn project_in(dir: tempfile::TempDir, dirs: &[&str]) -> (tempfile::TempDir, String) {
     let base = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
@@ -121,4 +122,29 @@ fn a_symlink_named_f_or_a_shielded_segment_inside_the_workspace_does_not_skip_th
 #[test]
 fn no_context_places_nothing() {
     assert_eq!(frozen_below(".", true), None);
+}
+
+fn sights() -> impl Strategy<Value = Sight> {
+    prop::sample::select(vec![Sight::Empty, Sight::Unlisted, Sight::Found])
+}
+
+proptest! {
+    /// Folding sights is the walk's rule for an unreadable directory beside a frozen name, and for
+    /// an unlisted literal beside a glob match. A found name survives an unlisted one in either order.
+    #[test]
+    fn an_unlisted_sight_never_hides_a_found_one(seen in sights(), next in sights(), ignore_links in any::<bool>()) {
+        let folded = fold_sight(seen, next);
+        prop_assert_eq!(folded, fold_sight(next, seen));
+        prop_assert_eq!(fold_sight(folded, Sight::Empty), folded);
+        if seen == Sight::Found || next == Sight::Found {
+            prop_assert_eq!(folded, Sight::Found);
+        } else if seen == Sight::Unlisted || next == Sight::Unlisted {
+            prop_assert_eq!(folded, Sight::Unlisted);
+        } else {
+            prop_assert_eq!(folded, Sight::Empty);
+        }
+        prop_assert!(!stops_before_matches(ignore_links, Sight::Unlisted));
+        prop_assert!(!stops_before_matches(ignore_links, Sight::Empty));
+        prop_assert_eq!(stops_before_matches(ignore_links, Sight::Found), ignore_links);
+    }
 }
