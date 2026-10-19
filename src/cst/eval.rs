@@ -39,11 +39,22 @@ pub(crate) const PROCSUB_SENTINEL: &str = "__SAFE_CHAINS_PROCSUB__";
 /// (`{/etc/shadow,x}` → two words). Quoted / escaped / substituted parts are fixed (bash does not
 /// brace-expand inside quotes), so only `Lit` parts expand. The classifier checks EVERY produced
 /// word, so a hidden alternative can't smuggle a system read/write past the `/`-prefix path gate.
+///
+/// Bash expands braces over the whole word, taking quoted characters literally, so a group that
+/// opens in one literal and closes in a later one (`{".git",x}`) is not modeled: the word is
+/// unpinnable: its words could name anything.
 pub fn expand_word(word: &Word) -> Vec<String> {
+    let parts = merged_literals(word);
     let mut acc = vec![String::new()];
-    for part in &word.0 {
+    for (index, part) in parts.iter().enumerate() {
         let alts: Vec<String> = match part {
-            WordPart::Lit(s) => super::brace::expand(s),
+            WordPart::Lit(s) => {
+                let starts = index == 0 || matches!(parts[index - 1], WordPart::Escape(' ' | '\t'));
+                if super::brace::spanning_open(s, starts).is_some() && closes_later(&parts[index + 1..]) {
+                    return vec![UNPINNABLE.to_string()];
+                }
+                if starts { super::brace::expand(s) } else { super::brace::expand_after(s) }
+            }
             other => {
                 let mut t = String::new();
                 eval_part(other, &mut t);
@@ -71,6 +82,27 @@ pub fn expand_word(word: &Word) -> Vec<String> {
             acc = next;
         }
     }
+    charged(acc)
+}
+
+/// Adjacent literals joined, so a group is seen whole however the parser split the text.
+fn merged_literals(word: &Word) -> Vec<WordPart> {
+    let mut parts: Vec<WordPart> = Vec::with_capacity(word.0.len());
+    for part in &word.0 {
+        if let (WordPart::Lit(s), Some(WordPart::Lit(prev))) = (part, parts.last_mut()) {
+            prev.push_str(s);
+        } else {
+            parts.push(part.clone());
+        }
+    }
+    parts
+}
+
+fn closes_later(rest: &[WordPart]) -> bool {
+    rest.iter().any(|part| matches!(part, WordPart::Lit(s) if s.contains('}')))
+}
+
+fn charged(acc: Vec<String>) -> Vec<String> {
     // Charge only the EXTRA words this expansion created (`acc.len() - 1`), against the same budget
     // delegation and function resolution use. An ordinary word yields one alternative and charges
     // nothing, so normal commands are untouched; a fanned-out word charges its fan-out, so expansion

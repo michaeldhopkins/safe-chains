@@ -432,3 +432,131 @@ fn a_sequence_past_the_expansion_cap_refuses_a_destructive_write() {
     );
     let _keep = scratch;
 }
+
+#[test]
+fn a_brace_group_with_quotes_or_a_version_dependent_sequence_is_refused() {
+    let (scratch, root) = project();
+    file(format!("{root}/.git/config"));
+    file(format!("{root}/notes.txt"));
+    file(format!("{root}/log.1"));
+    file(format!("{root}/log.01/.git/config"));
+    dir(format!("{root}/dest"));
+    dir(format!("{root}/saved"));
+    dir(format!("{root}/build"));
+    expect(
+        &root,
+        &[
+            (r#"rm -rf .g{"i",x}t"#, false),
+            (r#"rm -rf {".git",notes}"#, false),
+            ("rm -rf {'.git',notes}", false),
+            (r#"rm -rf {.git,"notes"}"#, false),
+            ("rm -rf {$'.git',notes}", false),
+            (r"rm -rf {.git,no\,tes}", false),
+            (r#"rm -rf ./{".git",notes}"#, false),
+            (r#"rm -rf ""{},.git}"#, false),
+            ("rm -rf {ab},.git}", false),
+            (r#"chmod -R 700 .g{"i",x}t"#, false),
+            (r#"tee .g{"i",x}t/config"#, false),
+            (r#"cp -R {".git",notes} dest"#, false),
+            (r#"mv {".git",notes} saved"#, false),
+            (r#"rsync -a {".git",notes} dest/"#, false),
+            (r#"rsync -a --remove-source-files {".git",notes} dest/"#, false),
+            (r#"mkdir .g{"i",x}t"#, false),
+            (r#"sed -i 's/a/b/' .g{"i",x}t/config"#, false),
+            (r#"echo x > {".git",notes}/config"#, false),
+            ("rm -rf .gi{t..t..1}", false),
+            ("rm -rf log.{01..01}", false),
+            ("rm -rf log.{1..01}", false),
+            ("rm -rf {a..Z}", false),
+            ("rm -rf {1..2{a,b}}", false),
+            ("rm -rf '.gi{t..t}'", true),
+            (r"rm -rf .gi\{t..t\}", true),
+            ("rm -f log.{1..3}", true),
+            ("rm -f log.{1,2}", true),
+            ("rm notes.txt", true),
+            ("chmod 644 notes.txt", true),
+            ("rm -rf build", true),
+            ("find . -name '*.rs' -exec grep -n x {} +", true),
+        ],
+    );
+    let _keep = scratch;
+}
+
+#[test]
+fn every_write_route_refuses_an_operand_it_cannot_expand() {
+    let (scratch, root) = project();
+    file(format!("{root}/.git/config"));
+    file(format!("{root}/sub/.git/config"));
+    file(format!("{root}/notes"));
+    file(format!("{root}/w {{}},x}}/.git/config"));
+    file(format!("{root}/w{{a..1}},x}}/.git/config"));
+    file(format!("{root}/w{{../}},x}}/.git/config"));
+    file(format!("{root}/w{{..a}}{{b,c}}/.git/config"));
+    dir(format!("{root}/dest"));
+    let operands = [
+        r#"./{".git/config",x}"#, r#"sub/{".git/config",x}"#, ".gi{t..t..1}/config", "log.{01..01}", ".gi{t..t}{1..300}", r"w\ {},x}",
+        "w{a..1},x}", "w{../},x}", "w{..a}{b,c}",
+    ];
+    let routes = [
+        "rm -rf {}", "chmod -R 700 {}", "mv {} dest", "cp -R {} dest", "rsync -a {} dest/", "rsync -a --remove-source-files {} dest/",
+        "echo planted | tee {}", "shred -u {}", "mkfifo {}", "zip -m {}.zip notes", "touch {}", "truncate -s 0 {}", "sed -i 's/a/b/' {}",
+        "dd if=/dev/null of={}", "find {} -delete", "echo x > {}", "for f in {}; do rm -rf \"$f\"; done",
+    ];
+    let bashes: Vec<&str> = ["/bin/bash", "/opt/homebrew/bin/bash", "/usr/local/bin/bash"]
+        .into_iter()
+        .filter(|b| Path::new(b).is_file())
+        .collect();
+    assert!(bashes.contains(&"/bin/bash"), "/bin/bash is required");
+    for operand in operands {
+        let spellings: Vec<String> = bashes
+            .iter()
+            .map(|bash| {
+                let script = format!("set -f; printf '%s\\0' {operand}");
+                let out = Command::new(bash)
+                    .args(["--noprofile", "--norc", "-c", &script])
+                    .current_dir(&root)
+                    .env_clear()
+                    .output()
+                    .expect("bash");
+                assert!(out.status.success(), "{bash} {operand}: {}", String::from_utf8_lossy(&out.stderr));
+                out.stdout
+                    .split(|b| *b == 0)
+                    .filter(|s| !s.is_empty())
+                    .map(|s| format!("'{}'", String::from_utf8(s.to_vec()).expect("utf-8")))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            })
+            .collect();
+        for route in routes {
+            let cmd = route.replace("{}", operand);
+            if !allows(&root, &cmd) {
+                continue;
+            }
+            for words in &spellings {
+                let literal = route.replace("{}", words);
+                assert!(allows(&root, &literal), "{cmd}: approved, while what bash runs, {literal}, is refused");
+            }
+        }
+    }
+    let secret = format!("{}/.ssh/config", std::env::var("HOME").unwrap_or_default());
+    let climb = "../".repeat(root.matches('/').count());
+    for read in [
+        format!(r#"cat ./{{"{climb}{secret}",x}}"#),
+        format!(r#"head x/{{"{climb}{secret}",y}}"#),
+        format!(r#"cp ./{{"{climb}{secret}",x}} y"#),
+    ] {
+        assert!(!allows(&root, &read), "{read}: approved a read that leaves the tree");
+    }
+    expect(
+        &root,
+        &[
+            ("rm -f log.{1..3}", true),
+            ("rm -rf build/{debug,release}", true),
+            ("cp notes{,.bak}", true),
+            ("touch a{1..3}.txt", true),
+            (r"rm -f a\ {b,c}", true),
+            ("find . -name '*.o' -exec echo {} +", true),
+        ],
+    );
+    let _keep = scratch;
+}

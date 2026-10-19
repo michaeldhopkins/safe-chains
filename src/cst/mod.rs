@@ -1,5 +1,7 @@
 mod ansi_c;
 mod brace;
+#[cfg(test)]
+mod brace_bash_tests;
 mod budget;
 mod cd;
 pub(crate) mod check;

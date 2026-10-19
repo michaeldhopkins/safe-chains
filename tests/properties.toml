@@ -112,7 +112,7 @@ owed = [
   "a_bare_word_never_supplies_a_pattern",
 ]
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
-"src/cst/brace.rs" = ["src/cst/brace.rs::a_sequence_brace_matches_bash"]
+"src/cst/brace.rs" = ["src/cst/brace_bash_tests.rs::a_brace_word_is_exact_or_unresolved", "src/cst/brace_bash_tests.rs::a_sequence_brace_is_exact_or_unresolved"]
 "src/cst/budget.rs" = []
 "src/cst/classify_budget.rs" = ["src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance"]
 "src/cst/scope_budget.rs" = ["src/cst/scope_budget.rs::sources_never_multiply_the_binding_set"]
@@ -552,6 +552,7 @@ owed = [
 "src/cst/escape_tests.rs" = "the escape and line-continuation suite (#[cfg(test)] mod in cst/escape.rs)"
 "src/handlers/vcs/jj_tests.rs" = "the jj suite (#[cfg(test)] mod in handlers/vcs/mod.rs)"
 "src/pathgate/handlers/jq_tests.rs" = "the jq-family program suite (#[cfg(test)] mod in pathgate/handlers/jq.rs)"
+"src/cst/brace_bash_tests.rs" = "the brace-expansion-against-bash suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/glob_tests.rs" = "the glob-listing suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"

@@ -412,11 +412,11 @@ pub(crate) fn classify_locus(path: &str) -> LocalLocus {
 pub(crate) fn is_unpinnable(path: &str) -> bool {
     path.contains('$')
         || path.contains("__SAFE_CHAINS_CMDSUB__")
+        || path.contains(crate::cst::eval::UNRESOLVED_BRACE)
         || path.contains(crate::cst::eval::ATOM_SENTINEL)
-        // An atom sentinel that reached here UNNEUTRALIZED is one `neutralize_atoms` did not
-        // confine, or a path that never went through it. Either way its value is unknown text, so
-        // it worst-cases exactly like an opaque substitution. This is what keeps the atom claim
-        // from widening anything by itself.
+        // An atom sentinel that reached here UNNEUTRALIZED was not confined by `neutralize_atoms`,
+        // so its value is unknown text and worst-cases like an opaque substitution. This keeps the
+        // atom claim from widening anything by itself.
         || is_parent_escape(path)
 }
 
