@@ -5,7 +5,7 @@
 //! with no names or with `-p` they list every exported variable with its value, and zsh prints a
 //! name given without a value or an attribute flag. A lone `-` or `+` ends the options, so zsh's
 //! `export -` lists too, and zsh's `typeset -m` treats each name as a pattern and lists every match
-//! unless it assigns. `ps` shows each process's environment with the BSD `e` modifier.
+//! unless it assigns. `ps` shows each process's environment with the BSD `e` or `E` modifier.
 use crate::parse::Token;
 
 pub(crate) fn prints_the_environment(tokens: &[Token]) -> bool {
@@ -70,7 +70,7 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
 }
 
 fn bsd_options_show_the_environment(word: &str) -> bool {
-    !word.starts_with('-') && word.chars().all(|c| c.is_ascii_alphabetic()) && word.contains('e')
+    !word.starts_with('-') && word.chars().all(|c| c.is_ascii_alphabetic()) && word.contains(['e', 'E'])
 }
 
 #[cfg(test)]
@@ -86,7 +86,7 @@ mod tests {
             "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
             "mise set OPENAI_API_KEY", "mise set -g", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
             "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
-            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO",
+            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
         }
