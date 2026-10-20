@@ -70,7 +70,10 @@ re2c	-i	--include
 redis-benchmark	-c	--cacert
 restic	-c	--cacert
 rollup	-f	--file
+rsync	-f	--files-from
+rsync	-l	--log-file
 rsync	-p	--password-file
+rsync	-r	--read-batch
 rsync	-r	--rsh
 say	-i	--input-file
 wget	-d	--directory-prefix

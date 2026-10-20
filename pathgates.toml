@@ -173,7 +173,7 @@ flags = { "-i" = "ignore", "-F" = "ignore", "-o" = "ignore", "-J" = "ignore", "-
 # worktree.
 positional = "read_tree"
 shape = "remote"
-flags = { "-e" = "ignore", "--rsh" = "ignore" }
+flags = { "-e" = "ignore", "--rsh" = "ignore", "-M" = "ignore", "--remote-option" = "ignore" }
 
 # Converters whose OUTPUT is the last positional: the input is a non-disclosing transcode
 # (ignore, so a home input like ~/Downloads/x still allows), the last operand is the write.

@@ -1,6 +1,6 @@
 [[command]]
 name = "rsync"
-description = "File / directory synchronizer. Copies files locally or over SSH / rsyncd. The destination (last positional argument) gets written; with -n / --dry-run, no writes happen. Remote sources or destinations (user@host:path or rsync://host/path) make network operations. --delete removes files at the destination. The wide flag set covers compression, attributes, filters, and bandwidth limits. Stable, ubiquitous."
+description = "File / directory synchronizer. Copies files locally or over SSH / rsyncd. The destination (last positional argument) gets written; with -n / --dry-run, no writes happen. Remote sources or destinations (user@host:path or rsync://host/path) make network operations. --delete removes files at the destination. The wide flag set covers compression, attributes, filters, and bandwidth limits. -M / --remote-option pass an option to the second rsync process, which a local copy also runs on this machine, so each is judged as if it were given directly; --log-file and --write-batch write the file they name. Stable, ubiquitous."
 url = "https://rsync.samba.org/"
 researched_version = "rsync 3.x"
 level = "SafeWrite"
@@ -63,7 +63,7 @@ standalone = [
     "--version", "--whole-file",
     "-0", "-4", "-6", "-8", "-A", "-B", "-C", "-D",
     "-E", "-F", "-H", "-I", "-J", "-K",
-    "-L", "-M", "-N", "-O", "-P", "-R", "-S",
+    "-L", "-N", "-O", "-P", "-R", "-S",
     "-T", "-U", "-V", "-W", "-X", "-Z", "-a",
     "-b", "-c", "-d", "-e", "-f", "-g", "-h",
     "-i", "-k", "-l", "-m", "-n", "-o",
@@ -86,10 +86,10 @@ valued = [
     "--skip-compress", "--sockopts", "--stop-after",
     "--stop-at", "--stop-fmt", "--suffix",
     "--temp-dir", "--timeout", "--write-batch",
-    "-T", "-e", "-f",
+    "-M", "-T", "-e", "-f",
 ]
 
 [command.path_gate]
 # `--rsh`/`-e` is the remote SHELL rsync EXECUTES to reach the far side, so its value is a
 # program. A bare name (`-e ssh`) resolves on $PATH and stays trusted; a path into /tmp does not.
-flags = { "--password-file" = "read", "--rsh" = "exec", "-e" = "exec" }
+flags = { "--password-file" = "read", "--rsh" = "exec", "-e" = "exec", "--log-file" = "write", "--write-batch" = "write", "--read-batch" = "read", "--files-from" = "read", "--exclude-from" = "read", "-M" = "ignore", "--remote-option" = "ignore" }

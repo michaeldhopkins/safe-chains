@@ -223,6 +223,9 @@ owed = [
   "a_mode_without_s_or_high_octal_bits_sets_none",
   "a_mode_given_to_mkdir_or_rsync_is_judged_as_chmod_judges_it",
 ]
+"src/handlers/coreutils/rsync_remote.rs" = [
+  "a_remote_option_is_judged_as_the_same_option_given_locally",
+]
 "src/handlers/coreutils/awk.rs" = [
   "an_awk_program_that_runs_code_is_never_approved",
   "the_surroundings_alone_are_approved",

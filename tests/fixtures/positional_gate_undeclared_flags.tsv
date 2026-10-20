@@ -156,7 +156,6 @@ rsync	--password-file
 rsync	--port
 rsync	--protocol
 rsync	--read-batch
-rsync	--remote-option
 rsync	--rsync-path
 rsync	--secret-file
 rsync	--skip-compress
