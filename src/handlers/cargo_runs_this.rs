@@ -3,8 +3,11 @@
 //! The rule-change check only matters when the binary run is this one, so it applies when `--bin`
 //! names it, or when no `--bin` or `--example` is given and the package run is safe-chains: the one
 //! `-p` / `--package` names, or the package of the nearest `Cargo.toml` above the folder cargo runs
-//! in. That last case reads the manifest from disk. Anything not known before the shell runs, an
-//! unknown working directory, or a manifest that names no package of its own counts as safe-chains.
+//! in, found after symbolic links and `..` are resolved. That last case reads the manifest from disk:
+//! it is safe-chains when its package, one of its binaries or one of its dependencies is named
+//! safe-chains (with `_` read as `-`). Anything not known before the shell runs, an unknown or
+//! missing working directory, or a manifest that does not parse or names no package of its own
+//! counts as safe-chains.
 use crate::parse::Token;
 use crate::registry;
 
@@ -105,6 +108,9 @@ fn nearest_manifest_names_this(manifest_path: Option<&str>, chdir: Option<&str>)
     }) else {
         return true;
     };
+    let Ok(start) = std::fs::canonicalize(start) else {
+        return true;
+    };
     start
         .ancestors()
         .map(|dir| dir.join("Cargo.toml"))
@@ -113,10 +119,28 @@ fn nearest_manifest_names_this(manifest_path: Option<&str>, chdir: Option<&str>)
 }
 
 fn manifest_names_this(path: &std::path::Path) -> bool {
-    let Ok(text) = std::fs::read_to_string(path) else {
+    let Some(manifest) = std::fs::read_to_string(path).ok().and_then(|text| toml::from_str::<toml::Table>(&text).ok()) else {
         return true;
     };
-    text.contains(THIS) || !text.lines().any(|line| line.trim() == "[package]")
+    let Some(package) = manifest.get("package").and_then(toml::Value::as_table) else {
+        return true;
+    };
+    let is_this = |name: &str| name.replace('_', "-") == THIS;
+    let field_is_this =
+        |table: Option<&toml::Table>, field: &str| table.and_then(|t| t.get(field)).and_then(toml::Value::as_str).is_some_and(is_this);
+    let mut binaries = manifest.get("bin").and_then(toml::Value::as_array).into_iter().flatten();
+    field_is_this(Some(package), "name")
+        || binaries.any(|bin| field_is_this(bin.as_table(), "name"))
+        || dependency_tables(&manifest)
+            .any(|deps| deps.iter().any(|(name, spec)| is_this(name) || field_is_this(spec.as_table(), "package")))
+}
+
+fn dependency_tables(manifest: &toml::Table) -> impl Iterator<Item = &toml::Table> {
+    const KINDS: [&str; 3] = ["dependencies", "dev-dependencies", "build-dependencies"];
+    let targets = manifest.get("target").and_then(toml::Value::as_table).into_iter().flat_map(|t| t.values());
+    std::iter::once(manifest)
+        .chain(targets.filter_map(toml::Value::as_table))
+        .flat_map(|table| KINDS.iter().filter_map(|kind| table.get(*kind).and_then(toml::Value::as_table)))
 }
 
 #[cfg(test)]
@@ -177,5 +201,63 @@ mod tests {
         let _cwd = crate::pathctx::enter_cwd(None);
         assert!(!is_safe_command("cargo run -- mcp"));
         assert!(is_safe_command("cargo run -p tool -- mcp"));
+    }
+
+    fn in_manifest(label: &str, manifest: &str, cmd: &str) -> bool {
+        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-{label}", std::process::id()));
+        std::fs::create_dir_all(dir.join("src")).expect("project dir");
+        std::fs::write(dir.join("Cargo.toml"), manifest).expect("manifest");
+        let _cwd = crate::pathctx::enter_cwd(Some(dir.join("src").to_string_lossy().into_owned()));
+        is_safe_command(cmd)
+    }
+
+    #[test]
+    fn a_manifest_is_this_project_by_its_names_not_its_text() {
+        let package = |rest: &str| format!("[package]\nname = \"tool\"\nversion = \"0.1.0\"\n{rest}");
+        for (label, manifest) in [
+            ("comment", "[package] # the classifier\nname = \"safe-chains\"\nversion = \"0.1.0\"\n".to_string()),
+            ("underscore", "[package]\nname = \"safe_chains\"\n".to_string()),
+            ("dependency", package("[dependencies]\nsafe_chains = { path = \"..\" }\n")),
+            ("renamed", package("[dependencies]\nclassifier = { package = \"safe-chains\", version = \"0.1\" }\n")),
+            ("dev", package("[dev-dependencies]\nsafe-chains = \"0.1\"\n")),
+            ("target", package("[target.'cfg(unix)'.dependencies]\nsafe-chains = \"0.1\"\n")),
+            ("binary", package("[[bin]]\nname = \"safe-chains\"\npath = \"src/main.rs\"\n")),
+            ("unparsed", "[package\nname = \"tool\"\n".to_string()),
+        ] {
+            assert!(!in_manifest(label, &manifest, "cargo run -- mcp"), "{label} must count as this project");
+        }
+        for (label, manifest) in [
+            ("mention", package("description = \"a wrapper around safe-chains\"\n# safe-chains\n")),
+            ("near", package("[dependencies]\nsafe-chains-extra = \"1\"\n")),
+        ] {
+            assert!(in_manifest(label, &manifest, "cargo run -- mcp"), "{label} is another project");
+        }
+    }
+
+    #[test]
+    fn a_folder_is_placed_after_its_links_are_followed() {
+        let root = std::env::temp_dir().join(format!("sc-cargo-run-{}-links", std::process::id()));
+        let this = root.join("this");
+        let other = root.join("other");
+        std::fs::create_dir_all(this.join("src")).expect("this project");
+        std::fs::create_dir_all(other.join("sub")).expect("other project");
+        std::fs::write(this.join("Cargo.toml"), "[package]\nname = \"safe-chains\"\n").expect("manifest");
+        std::fs::write(other.join("Cargo.toml"), "[package]\nname = \"tool\"\n").expect("manifest");
+        let link = other.join("link");
+        if !link.exists() {
+            std::os::unix::fs::symlink(this.join("src"), &link).expect("link");
+        }
+        let runs_from = |dir: &str| {
+            let _cwd = crate::pathctx::enter_cwd(Some(other.join(dir).to_string_lossy().into_owned()));
+            is_safe_command("cargo run -- mcp")
+        };
+        assert!(runs_from("."));
+        assert!(runs_from("sub"));
+        assert!(!runs_from("link"));
+        assert!(!runs_from("link/../src"));
+        assert!(!runs_from("missing"));
+        let _cwd = crate::pathctx::enter_cwd(Some(other.to_string_lossy().into_owned()));
+        assert!(!is_safe_command("cargo run --manifest-path link/../Cargo.toml -- mcp"));
+        assert!(!is_safe_command("cargo run --manifest-path missing/Cargo.toml -- mcp"));
     }
 }

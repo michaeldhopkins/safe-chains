@@ -33,8 +33,8 @@ Four deliberate exceptions read the filesystem, all racing the shell (accepted i
   link out of the tree (`src/engine/resolve/frozen_walk.rs`).
 - A `cargo run` whose arguments could change safe-chains' own rules reads the nearest `Cargo.toml`
   when no `--bin`, `--example` or `-p` says which binary runs, so the check applies only to this
-  project (`src/handlers/cargo_runs_this.rs`). An unknown folder or a manifest with no package of
-  its own counts as this project.
+  project (`src/handlers/cargo_runs_this.rs`), after following links. An unknown or missing folder, or a
+  manifest that does not parse or has no package of its own, counts as this project.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`
