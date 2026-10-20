@@ -1,10 +1,10 @@
 [[command]]
 name = "screen"
-description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r reattaches an existing session; -ls / -list lists sessions; -wipe cleans up dead sessions. Sessions create utmp records and persist after detach. Entirely local."
+description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r reattaches an existing session; -ls / -list lists sessions; -wipe cleans up dead sessions. Sessions create utmp records and persist after detach. Entirely local. A positional operand is the program the new window runs (`screen sh -c '...'`), -s names the shell program, -c reads a screenrc whose `screen` lines start programs, and -X / -Q send a command to a running session (`-X stuff` types input into it, `-X exec` runs a program), so each of those executes code of the caller's choosing."
 url = "https://www.gnu.org/software/screen/manual/screen.html"
 researched_version = "GNU screen 5.0 (matches macOS-shipped screen)"
 level = "SafeRead"
-tolerate_unknown_short = true
+max_positional = 0
 standalone = [
     "-a", "-A",
     "-d", "-D",
@@ -20,4 +20,16 @@ standalone = [
     "-wipe",
     "-x",
 ]
-valued = ["-c", "-e", "-p", "-s", "-S", "-t", "-T"]
+valued = ["-e", "-p", "-S", "-t", "-T"]
+examples_denied = [
+    "screen sh -c 'rm -rf ~'",
+    "screen -dm sh -c 'rm -rf ~'",
+    "screen -X stuff x",
+    "screen -S work -X stuff 'rm -rf ~\\n'",
+    "screen -S work -X exec rm -rf ~",
+    "screen -Q windows",
+    "screen -c evil.rc",
+    "screen -s /tmp/evil.sh -dm",
+    "screen -- sh",
+    "screen -dmS work rm -rf ~",
+]

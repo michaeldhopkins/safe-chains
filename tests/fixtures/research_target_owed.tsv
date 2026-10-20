@@ -1197,7 +1197,7 @@ scalingo	profiled
 scandeps.pl	description,examples
 sccache	examples
 scp	description,examples,no-overlap,no-tolerance
-screen	description,examples,no-tolerance
+screen	description,examples
 screencapture	examples,no-tolerance
 scutil	description,examples
 scw	examples,version

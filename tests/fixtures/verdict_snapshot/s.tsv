@@ -1472,22 +1472,29 @@ scp x	safe-write
 scp x /etc/hosts	denied
 scp ~/.ssh/id_rsa host:/tmp	denied
 screen	safe-read
+screen -- sh	denied
 screen --help	safe-read
 screen --help --version	safe-read
 screen --help -S x	safe-read
-screen --help x	safe-read
+screen --help x	denied
 screen --version	safe-read
 screen -A	safe-read
 screen -D	safe-read
 screen -L	safe-read
 screen -O	safe-read
+screen -Q windows	denied
 screen -R	safe-read
+screen -S work -X exec rm -rf ~	denied
+screen -S work -X stuff 'rm -rf ~\\n'	denied
 screen -S x	safe-read
 screen -T x	safe-read
 screen -U	safe-read
+screen -X stuff x	denied
 screen -a	safe-read
-screen -c x	safe-read
+screen -c evil.rc	denied
 screen -d	safe-read
+screen -dm sh -c 'rm -rf ~'	denied
+screen -dmS work rm -rf ~	denied
 screen -e x	safe-read
 screen -h	safe-read
 screen -l	safe-read
@@ -1497,12 +1504,13 @@ screen -m	safe-read
 screen -p x	safe-read
 screen -q	safe-read
 screen -r	safe-read
-screen -s x	safe-read
+screen -s /tmp/evil.sh -dm	denied
 screen -t x	safe-read
 screen -v	safe-read
 screen -wipe	safe-read
 screen -x	safe-read
-screen x	safe-read
+screen sh -c 'rm -rf ~'	denied
+screen x	denied
 screencapture	denied
 screencapture --help	denied
 screencapture --version	denied
