@@ -647,6 +647,23 @@ mod integration_tests {
         }
     }
 
+    /// `CODEX_HOME` picks the folder whose config.toml names the notify program and MCP servers, and
+    /// `CODEX_CLOUD_TASKS_BASE_URL` picks the server the cloud subcommands send the sign-in token to.
+    #[test]
+    fn no_codex_config_or_server_arrives_through_the_environment() {
+        for cmd in [
+            "CODEX_HOME=./x codex cloud list",
+            "CODEX_HOME=/tmp/x codex apply x",
+            "env CODEX_HOME=./x codex features list",
+            "export CODEX_HOME=./x; codex cloud status x",
+            "CODEX_CLOUD_TASKS_BASE_URL=http://x codex cloud list",
+            "env CODEX_CLOUD_TASKS_BASE_URL=http://x codex cloud diff x",
+            "export CODEX_CLOUD_TASKS_BASE_URL=http://x; codex apply x",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+    }
+
     /// mise reads every setting from a `MISE_` variable, and several of them choose which config
     /// files load or are trusted, so a trusted config's hooks, tasks and `[env]` scripts run.
     #[test]

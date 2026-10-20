@@ -2229,3 +2229,32 @@ proptest::proptest! {
         proptest::prop_assert!(!is_safe_command(&line), "{}", line);
     }
 }
+
+/// Every codex subcommand takes `-c` / `--config`, `--enable` and `--disable` too, so the override
+/// is refused wherever it sits on the line, not only in front of the subcommand.
+#[test]
+fn a_codex_config_override_never_passes_anywhere_on_the_line() {
+    let flags = [
+        "-c x=y", "-cx=y", "-c=x=y", "--config x=y", "--config=x=y", "--enable x", "--enable=x", "--disable x", "--disable=x",
+        "-c chatgpt_base_url=http://x", "-c notify=[\"sh\",\"-c\",\"id\"]",
+    ];
+    let subs = [
+        "cloud list", "cloud list --json", "cloud list --limit 5", "cloud status x", "cloud diff x", "cloud diff x --attempt 2",
+        "cloud apply x", "apply x", "features list", "completion --shell zsh",
+    ];
+    for sub in subs {
+        assert!(is_safe_command(&format!("codex {sub}")), "codex {sub}");
+        let words: Vec<&str> = sub.split(' ').collect();
+        for flag in flags {
+            for at in 0..=words.len() {
+                let mut line = words.clone();
+                line.insert(at, flag);
+                let cmd = format!("codex {}", line.join(" "));
+                assert!(!is_safe_command(&cmd), "{cmd} must not be approved");
+            }
+        }
+    }
+    for cmd in ["codex cloud list --enable x", "codex cloud list --disable=x", "codex cloud list -cx=y", "codex cloud list --conf x=y"] {
+        assert!(!is_safe_command(cmd), "{cmd} must not be approved");
+    }
+}

@@ -1,6 +1,6 @@
 [[command]]
 name = "codex"
-description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. debug app-server starts the app server and sends it a message, which runs an agent turn. mcp add / remove and features enable / disable write ~/.codex/config.toml, so the server command added, or the feature turned on, runs at every later start. -c / --config, --enable and --disable set the same keys for one run (an MCP server command, the notify program, the sandbox and approval policy), whatever subcommand follows. mcp list and mcp get print each configured server, including the environment variables set for it, which often hold tokens. The project is under active development with frequent CLI changes."
+description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. debug app-server starts the app server and sends it a message, which runs an agent turn. mcp add / remove and features enable / disable write ~/.codex/config.toml, so the server command added, or the feature turned on, runs at every later start. -c / --config, --enable and --disable set the same keys for one run (an MCP server command, the notify program, the sandbox and approval policy, the cloud server), and every subcommand takes them, before or after its own name. CODEX_HOME picks the folder config.toml is read from. mcp list and mcp get print each configured server, including the environment variables set for it, which often hold tokens. The project is under active development with frequent CLI changes."
 url = "https://github.com/openai/codex"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_denied = [
@@ -25,6 +25,10 @@ examples_denied = [
     "codex --config x=y mcp list --help",
     "codex --enable x features list",
     "codex --disable x login status",
+    "codex cloud list -c chatgpt_base_url=http://x",
+    "codex cloud status x -c x=y",
+    "codex apply x --config=notify=x",
+    "codex cloud list --enable x",
 ]
 examples_safe = [
     "codex debug app-server --help",
@@ -35,8 +39,9 @@ examples_safe = [
 [[command.sub]]
 name = "apply"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 1
 
 [[command.sub]]
 name = "cloud"
@@ -44,20 +49,26 @@ nested_bare = true
 [[command.sub.sub]]
 name = "apply"
 level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--attempt"]
+max_positional = 1
 [[command.sub.sub]]
 name = "diff"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--attempt"]
+max_positional = 1
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+standalone = ["--help", "--json", "-h"]
+valued = ["--cursor", "--env", "--limit"]
+max_positional = 0
 [[command.sub.sub]]
 name = "status"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 1
 
 [[command.sub]]
 name = "completion"

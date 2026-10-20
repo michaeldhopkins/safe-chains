@@ -211,6 +211,18 @@ measured = false
 shape = "opaque"
 because = "every mise setting, including which config files load and whether they are trusted (measured: MISE_TRUSTED_CONFIG_PATHS made mise env run an untrusted config's _.source script)"
 
+# ── codex ────────────────────────────────────────────────────────────────────
+# codex reads its config.toml from CODEX_HOME, and that file names the notify program and the MCP
+# servers it starts. The cloud subcommands send the sign-in token to CODEX_CLOUD_TASKS_BASE_URL.
+[env.CODEX_HOME]
+shape = "opaque"
+because = "codex reads config.toml from it, whose notify program and MCP server commands run"
+measured = false
+[env.CODEX_CLOUD_TASKS_BASE_URL]
+shape = "opaque"
+because = "codex cloud sends the ChatGPT sign-in token to this server"
+measured = false
+
 # ── Command substitution: the value IS a command ─────────────────────────────
 [env.GIT_SSH_COMMAND]
 shape = "command"
