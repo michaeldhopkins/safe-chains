@@ -26,7 +26,8 @@ pub(crate) fn check_screen(tokens: &[Token]) -> Verdict {
 
 /// Unless it reattaches (`-r`, `-x`), lists, detaches with `-d` / `-D` alone, or prints its help or
 /// version, screen starts a new session running the user's shell, and `-R` / `-RR` do too when
-/// there is nothing to resume: an attached shell that whatever drives the terminal can type into.
+/// there is nothing to resume, even beside `-r` or `-x`: an attached shell that whatever drives the
+/// terminal can type into.
 fn starts_a_session(arguments: &[Token], valued: &[String]) -> bool {
     let takes_a_value = |c: char| valued.iter().any(|v| v.len() == 2 && v.ends_with(c));
     let mut letters = String::new();
@@ -48,8 +49,11 @@ fn starts_a_session(arguments: &[Token], valued: &[String]) -> bool {
             }
         }
     }
+    if letters.contains('R') {
+        return true;
+    }
     let resumes = letters.contains(['r', 'x', 'v']);
-    let only_detaches = letters.contains(['d', 'D']) && !letters.contains('R');
+    let only_detaches = letters.contains(['d', 'D']);
     !(resumes || only_detaches)
 }
 
@@ -78,7 +82,6 @@ mod tests {
         screen_detach_reattach: "screen -dr work",
         screen_detach_elsewhere: "screen -D work",
         screen_detach_named: "screen -d -S work",
-        screen_resume_or_create_with_reattach: "screen -R -r work",
         screen_help: "screen --help",
         screen_version: "screen -v",
         screen_list_matching: "screen -ls work",
@@ -101,6 +104,10 @@ mod tests {
         screen_resume_or_create_twice: "screen -RR",
         screen_resume_or_create_named: "screen -R work",
         screen_detach_elsewhere_or_create: "screen -D -R work",
+        screen_reattach_or_create: "screen -r -R work",
+        screen_reattach_or_create_cluster: "screen -rR work",
+        screen_share_or_create: "screen -x -R work",
+        screen_detach_reattach_or_create: "screen -d -r -R work",
         screen_new_named_session: "screen -S work",
         screen_new_logged_session: "screen -L",
         screen_new_login_session: "screen -l",
@@ -114,7 +121,7 @@ mod tests {
         /// and a cluster with `m` never passes.
         #[test]
         fn an_option_takes_one_session_name_and_never_starts_a_detached_session(
-            option in prop::sample::select(vec!["-r", "-x", "-dr", "-d -r", "-R -r", "-ls", "-list", "-wipe"]),
+            option in prop::sample::select(vec!["-r", "-x", "-dr", "-d -r", "-D -r", "-ls", "-list", "-wipe"]),
             name in "[a-z][a-z0-9.]{0,8}",
             program in prop::sample::select(vec!["sh", "bash -c id", "./x.sh", "/tmp/evil"]),
             m_at in 0usize..2,
@@ -132,6 +139,18 @@ mod tests {
             options in prop::sample::subsequence(vec!["-R", "-RR", "-S work", "-a", "-A", "-U", "-L", "-l", "-q", "-O", "-h 500", "-T xterm", "-t title", "-p 0"], 0..4),
         ) {
             let line = format!("screen {}", options.join(" "));
+            prop_assert!(!is_safe_command(&line), "{}", line);
+        }
+
+        /// `-R` creates a session when there is none to resume, and a reattach beside it does not
+        /// change that, so an R anywhere among the letters is refused.
+        #[test]
+        fn an_r_that_may_create_a_session_never_passes_beside_a_reattach(
+            reattach in prop::sample::select(vec!["-r", "-x", "-d -r", "-D -r", "-dr", "-r -d", ""]),
+            create in prop::sample::select(vec!["-R", "-RR", "-rR", "-xR", "-Rx", "-dR", "-DR", "-Rr", "-rRR"]),
+            first in proptest::bool::ANY,
+        ) {
+            let line = if first { format!("screen {create} {reattach} work") } else { format!("screen {reattach} {create} work") };
             prop_assert!(!is_safe_command(&line), "{}", line);
         }
     }
