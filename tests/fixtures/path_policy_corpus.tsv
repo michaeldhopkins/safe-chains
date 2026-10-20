@@ -92,6 +92,17 @@ deny	read-shield	cat ~/Library/Keychains/login.keychain-db
 deny	read-shield	cat ~/Library/Cookies/Cookies.binarycookies
 deny	read-shield	cat /root/.bashrc
 deny	read-shield	cat /var/root/x
+deny	read-shield	cat ~/.claude/.credentials.json
+deny	read-shield	cat ~/.codex/auth.json
+deny	read-shield	cat ~/.gemini/oauth_creds.json
+deny	read-shield	cat ~/.qwen/oauth_creds.json
+deny	read-shield	cat ~/.grok/auth.json
+deny	read-shield	cat ~/.local/share/opencode/auth.json
+deny	read-shield	cat ~/.config/github-copilot/apps.json
+deny	read-shield	grep token ~/.codex/auth.json
+deny	read-shield	jq . ~/.claude/.credentials.json
+allow	read-home	cat ~/.codex/config.toml
+allow	read-home	cat ~/.gemini/settings.json
 
 # ── Writes: the workspace and below ────────────────────────────────────────────────────────
 allow	write-workspace	touch out.txt

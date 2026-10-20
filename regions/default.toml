@@ -449,6 +449,44 @@ role = "credential-store"
 note = "Mercurial config; the `[auth]` section holds per-prefix usernames and passwords in cleartext."
 researched = "2026-08-15"
 
+# ── Coding agents' sign-ins. Each CLI keeps its OAuth or API token in a plain file under its own
+#    folder; the rest of that folder (settings, logs, transcripts) stays readable. ───────────────
+[[region]]
+path = "~/.claude/.credentials.json"
+role = "credential-store"
+note = "Claude Code's OAuth access and refresh tokens where no system keychain holds them (Linux, and macOS when the keychain is unavailable)."
+researched = "2026-10-19"
+[[region]]
+path = "~/.codex/auth.json"
+role = "credential-store"
+note = "Codex CLI's sign-in: the ChatGPT OAuth tokens or the OpenAI API key, unless cli_auth_credentials_store moves them to the keychain."
+researched = "2026-10-19"
+[[region]]
+path = "~/.gemini/oauth_creds.json"
+role = "credential-store"
+note = "Gemini CLI's Google OAuth access and refresh tokens from a Login with Google sign-in."
+researched = "2026-10-19"
+[[region]]
+path = "~/.qwen/oauth_creds.json"
+role = "credential-store"
+note = "Qwen Code's OAuth tokens; it is a fork of Gemini CLI and keeps them the same way."
+researched = "2026-10-19"
+[[region]]
+path = "~/.grok/auth.json"
+role = "credential-store"
+note = "Grok CLI's sign-in tokens."
+researched = "2026-10-19"
+[[region]]
+path = "~/.local/share/opencode/auth.json"
+role = "credential-store"
+note = "OpenCode's provider API keys and OAuth tokens, written by `opencode auth login`."
+researched = "2026-10-19"
+[[region]]
+path = "~/.config/github-copilot/"
+role = "credential-store"
+note = "GitHub Copilot's OAuth tokens (hosts.json, apps.json), shared by the editor plugins and the CLI."
+researched = "2026-10-19"
+
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
 #    covers hidden entries; these are not dotfiles). ──────────────────────────────────────────
