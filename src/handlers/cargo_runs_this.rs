@@ -196,6 +196,9 @@ mod tests {
             "cargo run -p safe_chains -- mcp",
             "cargo run --bin safe_chains -- mcp",
             "cargo run --manifest-path ../../elsewhere/Cargo.toml -- mcp",
+            "cargo run -p 'safe-chain?' -- mcp",
+            "cargo run -p 'tool?' -- mcp",
+            "cargo run --package='[st]*' -- mcp",
         ] {
             assert!(!in_project(Some("tool"), cmd), "{cmd} must not be approved from another project");
         }
