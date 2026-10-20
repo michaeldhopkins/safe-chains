@@ -10,6 +10,10 @@ use crate::parse::Token;
 /// the first operand. bsdcpio stops reading options there, and so does pax when POSIXLY_CORRECT is
 /// set, so `cpio -i '*' -t` extracts every member and reads `-t` as one more pattern. A letter
 /// that extracts counts wherever it appears.
+///
+/// bsdcpio reads `-W name` as the long option `--name`, abbreviations included, so `cpio -W ext`
+/// is `cpio --extract`. Its value is a long option no list here can check, so cpio's `-W` is
+/// refused whatever else the line says.
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
@@ -23,7 +27,7 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
         "cpio" => {
             let given = given();
             let extract = given.anywhere.contains('i') || given.long_anywhere.contains(&"--extract");
-            extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list"))
+            given.anywhere.contains('W') || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
         }
         "ditto" => given().anywhere.contains('x'),
         "xar" => tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
@@ -44,7 +48,7 @@ impl<'a> Given<'a> {
     fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
         let takes_a_value: &[char] = match command {
             "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
-            "cpio" => &['C', 'E', 'F', 'H', 'I', 'O', 'R', 'f'],
+            "cpio" => &['C', 'E', 'F', 'H', 'I', 'O', 'R', 'W', 'f'],
             _ => &[],
         };
         let mut given = Given { anywhere: String::new(), leading: String::new(), long_anywhere: Vec::new(), long_leading: Vec::new() };
@@ -131,6 +135,10 @@ mod tests {
         pax_extract_write_letter_after_an_operand: "pax -r ./a -w ./b",
         cpio_extract_list_letter_after_a_pattern: "cpio -i '*' -t",
         cpio_extract_list_long_after_a_pattern: "cpio -i x --list",
+        cpio_extract_spelled_as_a_long_name: "cpio -W extract",
+        cpio_extract_spelled_as_a_long_name_glued: "cpio -Wextract",
+        cpio_extract_spelled_as_an_abbreviated_long_name: "cpio -v -W ext",
+        cpio_list_letter_with_a_long_name: "cpio -t -W extract",
     }
 
     proptest! {
