@@ -37,6 +37,7 @@ examples_denied = ["atq -f x.sh"]
 
 [[command]]
 name = "atrm"
+writes_cwd = "none"
 description = "Removes one or more pending at(1) jobs by job id. Modifies the local at spool but does not execute arbitrary code; restricted to the invoking user's own jobs (or anyone's, for the superuser)."
 url = "https://man7.org/linux/man-pages/man1/atrm.1p.html"
 researched_version = "POSIX at(1); surface frozen"

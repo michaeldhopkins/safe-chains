@@ -93,10 +93,10 @@ asn1Parser	examples
 aspell	description,examples,profiled
 assetutil	description,examples
 astro	description,examples,profiled
-at	description,examples
+at	description
 atlas	description,no-overlap,no-tolerance,profiled
-atq	description,examples
-atrm	description,examples
+atq	description
+atrm	description
 atuin	description,no-overlap,no-tolerance,profiled
 autoconf	description,examples,no-overlap
 autoflake	description,examples

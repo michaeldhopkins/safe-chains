@@ -80,8 +80,6 @@ asn1Parser x
 astro build
 astro sync
 at
-atrm
-atrm x
 autoconf
 autoconf x
 autoflake
