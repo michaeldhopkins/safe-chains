@@ -35,10 +35,12 @@
 #   config-file  the value names a config file or repository that can name programs to run → the
 #                exec-path rule, and never a temp root or sibling project either.
 #   shell-program  the value names the shell a program starts for a new window or a shell escape →
-#                allowed only as a name in a standard system bin directory (/bin, /usr/bin,
-#                /usr/local/bin, /opt/homebrew/bin). A bare name is refused as well, so the program
-#                started is always one named in full whatever PATH holds; a relative, home or temp
-#                path, or a word carrying arguments, is refused too.
+#                allowed only as a shell (sh, bash, zsh, dash, ksh, tcsh, csh, fish) named in full
+#                in a standard system bin directory (/bin, /usr/bin, /usr/local/bin,
+#                /opt/homebrew/bin). A bare name is refused, so the program started is always one
+#                named in full whatever PATH holds; a relative, home or temp path, a word carrying
+#                arguments, or another program in those directories (make, an interpreter) is
+#                refused too.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value

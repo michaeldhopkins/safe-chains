@@ -62,8 +62,8 @@ pub(crate) enum Shape {
     OptionString,
     ConfigDir,
     ConfigFile,
-    /// The value names the shell a program starts (`SHELL`). Allowed only as a bare name or a
-    /// standard system path, the way a command word is trusted.
+    /// The value names the shell a program starts (`SHELL`). Allowed only as one of the shells,
+    /// named in full in a standard system bin directory.
     ShellProgram,
 }
 
@@ -264,17 +264,16 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     }
 }
 
-/// A shell another program starts: a bare name found on `PATH`, or one in a standard system bin
-/// directory, as a command word is trusted. Anything else (a relative path, a home path, a word
-/// with arguments) may be a planted script.
+/// A shell another program starts: one of the shells by name, in a standard system bin directory.
+/// Anything else (a relative, home or temp path, a word with arguments, or another program in a bin
+/// directory, such as make reading a Makefile) may run a planted script.
 fn shell_program_verdict(value: &str) -> Verdict {
     const STD_BINS: &[&str] = &["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
+    const SHELLS: &[&str] = &["sh", "bash", "zsh", "dash", "ksh", "tcsh", "csh", "fish"];
     let Some(name) = STD_BINS.iter().find_map(|p| value.strip_prefix(p)) else {
         return Verdict::Denied;
     };
-    let plain =
-        !name.is_empty() && name != "." && name != ".." && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'));
-    if plain { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+    if SHELLS.contains(&name) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 /// Every token of an interpreter flag string must match a researched-inert prefix.
@@ -624,6 +623,27 @@ mod integration_tests {
             ["SHELL=/bin/zsh tmux new -d", "SHELL=/opt/homebrew/bin/fish tmux new -d", "SHELL=/bin/zsh screen -r x", "SHELL= tmux new -d"]
         {
             assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
+        }
+    }
+
+    /// A standard bin directory holds programs that are not shells. Started as `$SHELL`, make and
+    /// just read a Makefile or justfile from the folder, and an interpreter or editor takes the
+    /// session's command string as its own input, so only a shell's name is accepted.
+    #[test]
+    fn a_session_shell_must_be_a_shell() {
+        for cmd in [
+            "SHELL=/usr/bin/make tmux new -d", "SHELL=/opt/homebrew/bin/just tmux new -d", "SHELL=/usr/bin/make screen -r -R x",
+            "SHELL=/opt/homebrew/bin/python3 screen -r x", "SHELL=/usr/bin/vim screen -r x", "SHELL=/usr/bin/env screen -r x",
+            "SHELL=/usr/local/bin/x screen -r x", "SHELL=/usr/bin/gmake tmux new -d", "SHELL=/bin/sh.evil tmux new -d",
+            "SHELL=/usr/bin/bash5 tmux new -d",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for shell in ["sh", "bash", "zsh", "dash", "ksh", "tcsh", "csh", "fish"] {
+            for dir in ["/bin", "/usr/bin", "/usr/local/bin", "/opt/homebrew/bin"] {
+                let cmd = format!("SHELL={dir}/{shell} tmux new -d");
+                assert!(crate::is_safe_command(&cmd), "{cmd} should be approved");
+            }
         }
     }
 
