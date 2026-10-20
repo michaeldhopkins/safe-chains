@@ -40,11 +40,31 @@ pub(crate) fn as_local_options(tokens: &[Token]) -> RemoteOptions {
         };
         found = true;
         match value {
-            Some(option) if option.len() > 1 && option.starts_with('-') => spliced.push(Token::from_raw(option.to_string())),
+            Some(option) if option.len() > 1 && option.starts_with('-') && !cannot_stand_alone(option) => {
+                spliced.push(Token::from_raw(option.to_string()))
+            }
             _ => return RemoteOptions::Refuse,
         }
     }
     if found { RemoteOptions::Judge(spliced) } else { RemoteOptions::None }
+}
+
+/// An option the other rsync could not take as written: one whose value would be the next word on
+/// the line here but is missing there (`-M -e`, `-M --temp-dir`), or `--server`, which only rsync
+/// itself passes.
+fn cannot_stand_alone(option: &str) -> bool {
+    let takes = |flag: &str| crate::registry::command_valued_flags("rsync").is_some_and(|valued| valued.iter().any(|v| v == flag));
+    if option == "--server" {
+        return true;
+    }
+    if option.starts_with("--") {
+        return !option.contains('=') && takes(option);
+    }
+    let letters = &option[1..];
+    letters
+        .char_indices()
+        .find(|(_, letter)| takes(&format!("-{letter}")))
+        .is_some_and(|(at, letter)| at + letter.len_utf8() == letters.len())
 }
 
 pub(crate) fn refuses_its_remote_options(tokens: &[Token]) -> bool {
@@ -101,6 +121,11 @@ mod tests {
         rsync_partial_dir_absolute: "rsync --partial-dir=/abs src/ dst/",
         rsync_partial_dir_spaced_absolute: "rsync --partial-dir /abs src/ dst/",
         rsync_partial_dir_home: "rsync --partial-dir=~/x src/ dst/",
+        rsync_remote_bare_shell_flag: "rsync -a -M -e src/ dst/",
+        rsync_remote_bare_temp_flag: "rsync -a -M -T src/ dst/",
+        rsync_remote_bare_long_flag: "rsync -a -M --temp-dir src/ dst/",
+        rsync_remote_bare_cluster_flag: "rsync -a -M -ve src/ dst/",
+        rsync_remote_server: "rsync -a -M--server src/ dst/",
     }
 
     #[test]
@@ -108,6 +133,23 @@ mod tests {
         assert_eq!(as_local_options(&words("rsync -avM--fake-super a b")), RemoteOptions::Judge(words("rsync -av --fake-super a b")));
         assert_eq!(as_local_options(&words("rsync -av a b")), RemoteOptions::None);
         assert_eq!(as_local_options(&words("rsync -a -- -Mx b")), RemoteOptions::None);
+    }
+
+    /// A value-taking option handed to the other rsync without its value would take the next word
+    /// here, so the line judged would not be the line run.
+    #[test]
+    fn a_remote_option_missing_its_value_is_never_approved() {
+        let manifest: toml::Value = toml::from_str(include_str!("../../../commands/tools/rsync.toml")).expect("rsync.toml parses");
+        let valued = manifest["command"][0]["valued"].as_array().expect("rsync declares valued flags");
+        assert!(valued.len() > 10, "the valued list was not read");
+        for flag in valued.iter().filter_map(toml::Value::as_str) {
+            for spelling in
+                [format!("-M {flag}"), format!("-M{flag}"), format!("--remote-option={flag}"), format!("--remote-option {flag}")]
+            {
+                let line = format!("rsync -a {spelling} src/ dst/");
+                assert!(!is_safe_command(&line), "{line} must not be approved");
+            }
+        }
     }
 
     proptest! {
