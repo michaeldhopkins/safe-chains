@@ -3,8 +3,9 @@
 //! The environment carries credentials (`OPENAI_API_KEY`, `GITHUB_TOKEN`), and what a command
 //! prints reaches the agent. `export`, `declare` and `typeset` set variables, which is fine, but
 //! with no names or with `-p` they list every exported variable with its value, and zsh prints a
-//! name given without a value or an attribute flag. `ps` shows each process's environment with the
-//! BSD `e` modifier.
+//! name given without a value or an attribute flag. A lone `-` or `+` ends the options, so zsh's
+//! `export -` lists too, and zsh's `typeset -m` treats each name as a pattern and lists every match
+//! unless it assigns. `ps` shows each process's environment with the BSD `e` modifier.
 use crate::parse::Token;
 
 pub(crate) fn prints_the_environment(tokens: &[Token]) -> bool {
@@ -46,18 +47,20 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
     let mut names = 0;
     let mut bare_name = false;
     let mut after_separator = false;
+    let mut assigns = false;
     for argument in arguments {
         let word = argument.as_str();
-        if !after_separator && word == "--" {
+        if !after_separator && matches!(word, "--" | "-" | "+") {
             after_separator = true;
         } else if !after_separator && word.len() > 1 && word.starts_with(['-', '+']) {
             letters.push_str(&word[1..]);
         } else {
             names += 1;
             bare_name |= !word.contains('=');
+            assigns |= word.contains('=');
         }
     }
-    if letters.contains('p') {
+    if letters.contains('p') || (letters.contains('m') && !assigns) {
         return true;
     }
     if names == 0 {
@@ -82,6 +85,8 @@ mod tests {
             "declare -xp", "declare -r", "declare OPENAI_API_KEY", "typeset", "typeset -x", "typeset -p", "typeset GITHUB_TOKEN",
             "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
             "mise set OPENAI_API_KEY", "mise set -g", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
+            "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
+            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
         }
@@ -94,7 +99,7 @@ mod tests {
             "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
             "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise env --help", "launchctl list",
-            "launchctl print-disabled gui/501",
+            "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }
@@ -117,6 +122,15 @@ mod tests {
             words.insert(p_at.min(words.len()), "-p".to_string());
             let listing = format!("{cmd} {}", words.join(" "));
             prop_assert!(!is_safe_command(&listing), "{}", listing);
+            let ended = format!("{cmd} {} -", flags.join(" "));
+            prop_assert!(!is_safe_command(&ended), "{}", ended);
+            let ended_then_set = format!("{cmd} {} - {}", flags.join(" "), values.join(" "));
+            prop_assert!(is_safe_command(&ended_then_set), "{}", ended_then_set);
+            if cmd != "export" {
+                let names: Vec<&str> = values.iter().filter_map(|v| v.split('=').next()).collect();
+                let matched = format!("{cmd} -m {} {}", flags.join(" "), names.join(" "));
+                prop_assert!(!is_safe_command(&matched), "{}", matched);
+            }
         }
     }
 }
