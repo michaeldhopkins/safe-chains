@@ -28,6 +28,11 @@ examples_safe = [
 ]
 examples_denied = [
     "mise exec",
+    "mise trust",
+    "mise trust .",
+    "mise trust --all",
+    "mise trust --ignore",
+    "mise trust -a -q",
     "mise tasks run my-task",
     "eval \"$(mise activate --help)\"",
     "eval \"$(mise list)\"",
@@ -115,8 +120,9 @@ standalone = ["--dry-run", "--help", "--plugins", "--tools", "-n", "-h"]
 
 [[command.sub]]
 name = "trust"
-level = "SafeWrite"
-standalone = ["--all", "--help", "--ignore", "--quiet", "--show", "-a", "-h", "-q"]
+level = "SafeRead"
+guard = "--show"
+standalone = ["--all", "--help", "--quiet", "--show", "-a", "-h", "-q"]
 
 [[command.sub]]
 name = "untrust"

@@ -64,15 +64,15 @@ fn an_unlabelled_writer_fails_closed_and_is_recorded() {
     let _folder = enter(FolderLevel::Workspace);
     let known = {
         let _known = crate::pathctx::enter_cwd(Some(ROOT.to_string()));
-        crate::cst::command_verdict("mise trust")
+        crate::cst::command_verdict("mise untrust")
     };
-    assert!(writes(known), "precondition: `mise trust` writes in a known folder");
+    assert!(writes(known), "precondition: `mise untrust` writes in a known folder");
     let _fresh = enter(FolderLevel::Workspace);
-    assert!(!crate::cst::command_verdict("mise trust").is_allowed());
+    assert!(!crate::cst::command_verdict("mise untrust").is_allowed());
     assert!(
         notes()
             .iter()
-            .any(|n| matches!(n, Note::Leaf { command, admitted: false, .. } if command.starts_with("mise trust"))),
+            .any(|n| matches!(n, Note::Leaf { command, admitted: false, .. } if command.starts_with("mise untrust"))),
         "{:?}",
         notes()
     );

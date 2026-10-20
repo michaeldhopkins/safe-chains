@@ -629,7 +629,6 @@ mig x
 migcom
 migcom x
 mise set
-mise trust
 mise unset
 mise untrust
 mise use

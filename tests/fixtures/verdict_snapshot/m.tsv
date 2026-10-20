@@ -1790,18 +1790,20 @@ mise tool-alias unset --help x	denied
 mise tool-alias unset -h	inert
 mise tool-alias unset x	denied
 mise tool-alias x	denied
-mise trust	safe-write
-mise trust --all	safe-write
-mise trust --all --help	safe-write
-mise trust --all x	safe-write
-mise trust --help	safe-write
-mise trust --ignore	safe-write
-mise trust --quiet	safe-write
-mise trust --show	safe-write
-mise trust -a	safe-write
-mise trust -h	safe-write
-mise trust -q	safe-write
-mise trust x	safe-write
+mise trust	denied
+mise trust --all	denied
+mise trust --all --help	denied
+mise trust --all x	denied
+mise trust --help	inert
+mise trust --ignore	denied
+mise trust --quiet	denied
+mise trust --show	safe-read
+mise trust -a	denied
+mise trust -a -q	denied
+mise trust -h	inert
+mise trust -q	denied
+mise trust .	denied
+mise trust x	denied
 mise u	denied
 mise u --cd x	safe-write
 mise u --env	safe-write

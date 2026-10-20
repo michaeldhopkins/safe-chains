@@ -79,7 +79,6 @@ minikube status	--format
 minikube status	--output
 minikube version	--output
 mise set	--file
-mise trust	--ignore
 mise unset	--file
 ncu	--target
 ncu	--timeout
