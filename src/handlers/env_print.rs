@@ -1,0 +1,122 @@
+//! The spellings that print the environment rather than set it.
+//!
+//! The environment carries credentials (`OPENAI_API_KEY`, `GITHUB_TOKEN`), and what a command
+//! prints reaches the agent. `export`, `declare` and `typeset` set variables, which is fine, but
+//! with no names or with `-p` they list every exported variable with its value, and zsh prints a
+//! name given without a value or an attribute flag. `ps` shows each process's environment with the
+//! BSD `e` modifier.
+use crate::parse::Token;
+
+pub(crate) fn prints_the_environment(tokens: &[Token]) -> bool {
+    let Some(first) = tokens.first() else {
+        return false;
+    };
+    match crate::registry::canonical_name(first.command_name()) {
+        "export" => lists_variables(&tokens[1..], false),
+        "declare" => lists_variables(&tokens[1..], true),
+        "ps" => ps_shows_the_environment(&tokens[1..]),
+        "mise" => tokens.get(1).is_some_and(|t| *t == "set") && mise_set_shows_values(&tokens[2..]),
+        _ => false,
+    }
+}
+
+fn mise_set_shows_values(arguments: &[Token]) -> bool {
+    if arguments.iter().any(|t| *t == "--remove") {
+        return false;
+    }
+    let mut names = arguments.iter().filter(|t| !t.starts_with("-")).peekable();
+    names.peek().is_none() || names.any(|t| !t.contains("="))
+}
+
+fn ps_shows_the_environment(arguments: &[Token]) -> bool {
+    let valued = crate::registry::command_valued_flags("ps").unwrap_or_default();
+    let mut words = arguments.iter().map(Token::as_str);
+    while let Some(word) = words.next() {
+        if valued.iter().any(|v| v == word) {
+            words.next();
+        } else if bsd_options_show_the_environment(word) {
+            return true;
+        }
+    }
+    false
+}
+
+fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
+    let mut letters = String::new();
+    let mut names = 0;
+    let mut bare_name = false;
+    let mut after_separator = false;
+    for argument in arguments {
+        let word = argument.as_str();
+        if !after_separator && word == "--" {
+            after_separator = true;
+        } else if !after_separator && word.len() > 1 && word.starts_with(['-', '+']) {
+            letters.push_str(&word[1..]);
+        } else {
+            names += 1;
+            bare_name |= !word.contains('=');
+        }
+    }
+    if letters.contains('p') {
+        return true;
+    }
+    if names == 0 {
+        return !(a_bare_name_prints && !letters.is_empty() && letters.chars().all(|c| matches!(c, 'f' | 'F')));
+    }
+    a_bare_name_prints && bare_name && letters.is_empty()
+}
+
+fn bsd_options_show_the_environment(word: &str) -> bool {
+    !word.starts_with('-') && word.chars().all(|c| c.is_ascii_alphabetic()) && word.contains('e')
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::is_safe_command;
+    use proptest::prelude::*;
+
+    #[test]
+    fn listing_the_environment_is_never_approved() {
+        for cmd in [
+            "export", "export -p", "export -n", "export -p FOO", "export -- ", "declare", "declare -p", "declare -p PATH", "declare -x",
+            "declare -xp", "declare -r", "declare OPENAI_API_KEY", "typeset", "typeset -x", "typeset -p", "typeset GITHUB_TOKEN",
+            "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
+            "mise set OPENAI_API_KEY", "mise set -g", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
+        ] {
+            assert!(!is_safe_command(cmd), "{cmd} must not be approved");
+        }
+    }
+
+    #[test]
+    fn setting_variables_and_listing_processes_are_unaffected() {
+        for cmd in [
+            "export FOO=bar", "export FOO", "export -n FOO", "export PATH_EXTRA=./bin", "declare -i count=5", "declare -x FOO=bar",
+            "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
+            "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
+            "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise env --help", "launchctl list",
+            "launchctl print-disabled gui/501",
+        ] {
+            assert!(is_safe_command(cmd), "{cmd} should be approved");
+        }
+    }
+
+    proptest! {
+        /// However the attribute flags and assignments are spelled, a `-p` anywhere lists, and a
+        /// line made only of assignments never does.
+        #[test]
+        fn a_p_flag_lists_and_assignments_alone_do_not(
+            cmd in prop::sample::select(vec!["export", "declare", "typeset"]),
+            flags in prop::collection::vec(prop::sample::select(vec!["-x", "-i", "-r", "-a", "-g", "-l", "-u"]), 0..3),
+            values in prop::collection::vec("FOO[A-Z0-9_]{0,6}=[a-z0-9]{0,6}", 1..4),
+            p_at in 0usize..4,
+        ) {
+            let flags: Vec<&str> = if cmd == "export" { Vec::new() } else { flags };
+            let line = format!("{cmd} {} {}", flags.join(" "), values.join(" "));
+            prop_assert!(is_safe_command(&line), "{}", line);
+            let mut words: Vec<String> = flags.iter().map(|f| (*f).to_string()).chain(values.iter().cloned()).collect();
+            words.insert(p_at.min(words.len()), "-p".to_string());
+            let listing = format!("{cmd} {}", words.join(" "));
+            prop_assert!(!is_safe_command(&listing), "{}", listing);
+        }
+    }
+}

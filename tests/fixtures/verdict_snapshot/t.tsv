@@ -5082,22 +5082,22 @@ typeprof -o x	safe-write
 typeprof -q	safe-read
 typeprof -v	safe-read
 typeprof x	safe-read
-typeset	inert
+typeset	denied
 typeset --help	denied
 typeset --version	denied
-typeset -A	inert
-typeset -A -F	inert
+typeset -A	denied
+typeset -A -F	denied
 typeset -A x	inert
 typeset -F	inert
-typeset -a	inert
+typeset -a	denied
 typeset -f	inert
-typeset -g	inert
-typeset -i	inert
-typeset -l	inert
-typeset -n	inert
-typeset -p	inert
-typeset -r	inert
-typeset -t	inert
-typeset -u	inert
-typeset -x	inert
-typeset x	inert
+typeset -g	denied
+typeset -i	denied
+typeset -l	denied
+typeset -n	denied
+typeset -r	denied
+typeset -t	denied
+typeset -u	denied
+typeset -x	denied
+typeset OPENAI_API_KEY	denied
+typeset x	denied

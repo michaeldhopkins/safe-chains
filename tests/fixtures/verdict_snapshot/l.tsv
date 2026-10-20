@@ -460,12 +460,6 @@ launchctl blame --help -h	inert
 launchctl blame --help x	inert
 launchctl blame -h	inert
 launchctl blame x	inert
-launchctl dumpstate	inert
-launchctl dumpstate --help	inert
-launchctl dumpstate --help -h	inert
-launchctl dumpstate --help x	inert
-launchctl dumpstate -h	inert
-launchctl dumpstate x	inert
 launchctl error	inert
 launchctl error --help	inert
 launchctl error --help -h	inert
@@ -496,12 +490,6 @@ launchctl list --help -h	inert
 launchctl list --help x	inert
 launchctl list -h	inert
 launchctl list x	inert
-launchctl print	inert
-launchctl print --help	inert
-launchctl print --help -h	inert
-launchctl print --help x	inert
-launchctl print -h	inert
-launchctl print x	inert
 launchctl print-cache	inert
 launchctl print-cache --help	inert
 launchctl print-cache --help -h	inert

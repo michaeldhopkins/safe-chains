@@ -1335,17 +1335,12 @@ mise en --help -h	inert
 mise en --help x	denied
 mise en -h	inert
 mise en x	denied
-mise env	inert
+mise env	denied
 mise env --help	inert
-mise env --help --json	inert
-mise env --help --shell x	inert
-mise env --help x	inert
-mise env --json	inert
-mise env --shell x	inert
-mise env -J	inert
+mise env --help -h	inert
+mise env --help x	denied
 mise env -h	inert
-mise env -s x	inert
-mise env x	inert
+mise env x	denied
 mise exec	denied
 mise exec -- bin/rails db:create	safe-write
 mise exec x	denied
@@ -1586,17 +1581,17 @@ mise search -h	inert
 mise search x	inert
 mise self-update	denied
 mise self-update x	denied
-mise set	safe-write
-mise set --file	safe-write
-mise set --file --global	safe-write
-mise set --file x	safe-write
-mise set --global	safe-write
-mise set --help	safe-write
+mise set	denied
+mise set --file	denied
+mise set --file --global	denied
+mise set --file x	denied
+mise set --global	denied
+mise set --help	denied
 mise set --remove	safe-write
-mise set -f	safe-write
-mise set -g	safe-write
-mise set -h	safe-write
-mise set x	safe-write
+mise set -f	denied
+mise set -g	denied
+mise set -h	denied
+mise set x	denied
 mise settings	inert
 mise settings add	denied
 mise settings add --help	inert

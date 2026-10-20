@@ -129,6 +129,7 @@ owed = [
   "every_prefix_of_a_pattern_long_flag_supplies_a_pattern",
   "a_bare_word_never_supplies_a_pattern",
 ]
+"src/handlers/env_print.rs" = ["a_p_flag_lists_and_assignments_alone_do_not"]
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/brace.rs" = ["src/cst/brace_bash_tests.rs::a_brace_word_is_exact_or_unresolved", "src/cst/brace_bash_tests.rs::a_sequence_brace_is_exact_or_unresolved"]
 "src/cst/budget.rs" = []

@@ -1702,14 +1702,16 @@ expo whoami --help x	safe-read
 expo whoami -h	safe-read
 expo whoami x	safe-read
 expo x	denied
-export	inert
+export	denied
 export --help	denied
 export --version	denied
-export -f	inert
-export -f -n	inert
+export -f	denied
+export -f -n	denied
 export -f x	inert
-export -n	inert
-export -p	inert
+export -n	denied
+export -n FOO	inert
+export -p	denied
+export FOO	inert
 export FOO=bar	inert
 export GIT_DIR=/tmp/evil	denied
 export LD_PRELOAD=/tmp/evil.so	denied

@@ -1,12 +1,12 @@
 [[command]]
 name = "declare"
-description = "Declares shell variables and sets their attributes (integer, readonly, export, array, etc.). Effects are process-local to the current shell session. With -x it exports to child processes' environments; with -r it makes variables readonly. Cannot modify the filesystem or execute commands. Bash/zsh builtin; no independent release cycle."
+description = "Declares shell variables and sets their attributes (integer, readonly, export, array, etc.). Effects are process-local to the current shell session. With -x it exports to child processes' environments; with -r it makes variables readonly. Cannot modify the filesystem or execute commands. With no names, or with -p, it prints variables with their values, exported ones included, and zsh prints any set variable named without a value or an attribute flag; the environment often holds credentials (API keys, tokens). -f and -F list function definitions and names. Bash/zsh builtin; no independent release cycle."
 aliases = ["typeset"]
 url = "https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html"
 level = "Inert"
 bare = true
 tolerate_unknown_short = true
-standalone = ["-A", "-F", "-a", "-f", "-g", "-i", "-l", "-n", "-p", "-r", "-t", "-u", "-x"]
+standalone = ["-A", "-F", "-a", "-f", "-g", "-i", "-l", "-n", "-r", "-t", "-u", "-x"]
 env_assignment_positionals = true
-examples_safe = ["declare -p", "declare -i count=5", "declare -x FOO=bar"]
-examples_denied = ["declare -x LD_PRELOAD=/tmp/evil.so", "declare -x PYTHONPATH=/tmp/inj"]
+examples_safe = ["declare -i count=5", "declare -x FOO=bar", "declare -f"]
+examples_denied = ["declare -x LD_PRELOAD=/tmp/evil.so", "declare -x PYTHONPATH=/tmp/inj", "declare", "declare -p", "declare -x", "typeset OPENAI_API_KEY"]

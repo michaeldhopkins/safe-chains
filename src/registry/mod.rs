@@ -7,7 +7,7 @@ pub(crate) use cwd_writes::cwd_writes;
 mod dispatch;
 mod docs;
 mod flag_sets;
-pub(crate) use flag_sets::{fallback_flag_sets, handler_policy_flag_sets, sub_valued_flags};
+pub(crate) use flag_sets::{command_valued_flags, fallback_flag_sets, handler_policy_flag_sets, sub_valued_flags};
 mod glob_flags;
 use glob_flags::glob_presents_unlisted_flag;
 mod passthrough_gate;

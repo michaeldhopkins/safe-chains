@@ -281,7 +281,7 @@ dcli	description,examples,version
 ddev	description,examples,version
 debinhex.pl	description,examples
 debride	description,examples,no-tolerance
-declare	description,no-tolerance,version
+declare	no-tolerance,version
 defaults	description,version
 defncopy	examples
 degit	description,examples,no-overlap,no-tolerance
@@ -391,7 +391,7 @@ exo	examples,version
 expand	description,examples,version
 expect	description,examples
 expo	examples,profiled
-export	description,no-tolerance,version
+export	no-tolerance,version
 expr	description,examples,no-tolerance,version
 eyapp	description,examples
 eza	examples,version

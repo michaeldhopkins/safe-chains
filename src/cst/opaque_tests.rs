@@ -296,7 +296,7 @@ cases! { true,
 cases! { true,
     declaration_assignment: "export PATH=/opt/homebrew/bin:$PATH",
     declaration_substitution: "export X=$(id -u)",
-    numeric_id: "launchctl print gui/$(id -u)/x",
+    numeric_id: "launchctl print-disabled gui/$(id -u)",
     which_path: "ls -la \"$(which docker)\"",
 }
 

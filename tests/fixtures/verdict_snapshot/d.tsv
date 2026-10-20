@@ -972,31 +972,31 @@ debride -r	safe-read
 debride -v	safe-read
 debride -w x	safe-read
 debride x	safe-read
-declare	inert
+declare	denied
 declare --help	denied
 declare --version	denied
-declare -A	inert
-declare -A -F	inert
+declare -A	denied
+declare -A -F	denied
 declare -A x	inert
 declare -F	inert
-declare -a	inert
+declare -a	denied
 declare -f	inert
-declare -g	inert
-declare -i	inert
+declare -g	denied
+declare -i	denied
 declare -i count=5	inert
 declare -ix FOO=42	inert
-declare -l	inert
-declare -n	inert
-declare -p	inert
-declare -p PATH	inert
-declare -r	inert
-declare -t	inert
-declare -u	inert
-declare -x	inert
+declare -l	denied
+declare -n	denied
+declare -p	denied
+declare -p PATH	denied
+declare -r	denied
+declare -t	denied
+declare -u	denied
+declare -x	denied
 declare -x FOO=bar	inert
 declare -x LD_PRELOAD=/tmp/evil.so	denied
 declare -x PYTHONPATH=/tmp/inj	denied
-declare x	inert
+declare x	denied
 defaults	denied
 defaults --help	inert
 defaults --help --version	denied
