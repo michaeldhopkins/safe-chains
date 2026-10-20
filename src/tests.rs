@@ -1093,6 +1093,11 @@ safe! {
 }
 
 denied! {
+    env_bare_prints_the_environment: "env",
+    printenv_bare_prints_the_environment: "printenv",
+    printenv_named_variable: "printenv OPENAI_API_KEY",
+    printenv_gnu_alias: "gprintenv",
+    printenv_absolute: "/usr/bin/printenv HOME",
     workon_destroy_no_save_denied: "workon destroy --no-save",
     workon_unknown_sub_denied: "workon frobnicate",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
@@ -1559,7 +1564,6 @@ inert! {
     level_cargo_msrv_list: "cargo msrv list",
     level_cargo_msrv_show: "cargo msrv show",
     level_cargo_vet_dump_graph: "cargo vet dump-graph",
-    level_env_bare: "env",
     level_timeout_ls: "timeout 5 ls -la",
     level_bash_version: "bash --version",
     level_df_bare: "df",

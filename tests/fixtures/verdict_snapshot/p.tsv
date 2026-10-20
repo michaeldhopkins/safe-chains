@@ -9375,16 +9375,8 @@ printafm --help	denied
 printafm --version	denied
 printafm Helvetica	inert
 printafm x	inert
-printenv	inert
-printenv --help	inert
-printenv --help --null	inert
-printenv --help x	inert
-printenv --null	inert
-printenv --version	inert
-printenv -0	inert
-printenv -V	inert
-printenv -h	inert
-printenv x	inert
+printenv	denied
+printenv OPENAI_API_KEY	denied
 printf	denied
 printf '%s\\n' hello	inert
 printf --help	inert

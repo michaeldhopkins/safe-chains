@@ -31,7 +31,9 @@ ${cmd} log	denied
 ./vendor/bin/phpstan analyse --no-progress	inert
 ./vendor/bin/phpunit --testsuite Unit	safe-read
 /bin/chmod +s x	denied
+/usr/bin/env	denied
 /usr/bin/open x.command	denied
+/usr/bin/printenv HOME	denied
 :	inert
 : && echo hello	inert
 : --help	denied

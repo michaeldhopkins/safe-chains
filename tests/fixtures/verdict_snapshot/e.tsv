@@ -641,14 +641,16 @@ entr --help x	denied
 entr --version	inert
 entr -h	inert
 entr x	denied
-env	inert
+env	denied
 env --help	denied
 env --version	denied
 env --xyzzy FOO=bar cat	denied
+env -i FOO=bar	inert
 env -i PATH=/usr/bin ls	inert
+env -u FOO	denied
 env -u FOO git log	inert
 env -x FOO=bar ls	denied
-env FOO=bar	inert
+env FOO=bar	denied
 env FOO=bar BAZ=qux git status	inert
 env FOO=bar bash -c 'git status'	inert
 env FOO=bar ls -la	inert
@@ -662,6 +664,7 @@ env rm -rf / --help	denied
 env rm -rf / --version	denied
 env sh -c 'rm -rf /'	denied
 env x	denied
+env | grep KEY	denied
 envoy	denied
 envoy --help	inert
 envoy --help --hot-restart-version	inert

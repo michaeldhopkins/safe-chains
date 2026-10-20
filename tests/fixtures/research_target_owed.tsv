@@ -1072,7 +1072,6 @@ pr	description,examples,no-tolerance
 pre-commit	description,examples,no-tolerance,profiled
 prettier	description,examples,version
 printafm	description,examples
-printenv	examples,version
 printf	description,examples,version
 prisma	description,examples,profiled
 procs	description,examples,version

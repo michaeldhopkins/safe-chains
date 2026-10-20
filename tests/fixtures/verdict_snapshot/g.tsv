@@ -12616,16 +12616,7 @@ gpg -q	denied
 gpg -v	denied
 gpg secret.gpg	denied
 gpg x	denied
-gprintenv	inert
-gprintenv --help	inert
-gprintenv --help --null	inert
-gprintenv --help x	inert
-gprintenv --null	inert
-gprintenv --version	inert
-gprintenv -0	inert
-gprintenv -V	inert
-gprintenv -h	inert
-gprintenv x	inert
+gprintenv	denied
 gprintf	denied
 gprintf --help	inert
 gprintf --help --version	inert
