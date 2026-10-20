@@ -747,6 +747,19 @@ mod integration_tests {
     /// The second audit: build tools, pagers, prompts, editors and config locations. Each pair is
     /// the variable with a foreign value, refused, and with a benign one, still approved.
     #[test]
+    fn the_program_rsync_connects_through_is_judged_as_a_command() {
+        for cmd in [
+            "RSYNC_CONNECT_PROG='ssh proxy nc %H 873' rsync host::mod/ ./dst/",
+            "RSYNC_CONNECT_PROG='curl x | sh' rsync host::mod/ ./dst/",
+            "env RSYNC_CONNECT_PROG='rm -rf ~' rsync ./src/ ./dst/",
+            "export RSYNC_CONNECT_PROG='sh -c \"rm -rf ~\"'; rsync ./src/ ./dst/",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        assert!(crate::is_safe_command("RSYNC_CONNECT_PROG=cat rsync ./src/ ./dst/"));
+    }
+
+    #[test]
     fn every_variable_of_the_second_audit_judges_its_value() {
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
             cwd: Some("/work/u/proj".into()),
