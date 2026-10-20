@@ -14,6 +14,7 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
+mod home_spelling;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
 mod protection;
@@ -731,33 +732,13 @@ fn scratchpad_role(path: &str) -> Option<Role> {
 /// role) and `apply_grant` (which wants the root the naming test compares against) so the two can
 /// never disagree about which node is in play.
 fn secret_node(path: &str) -> Option<&'static Node> {
-    shield_spellings(path).into_iter().find_map(|p| {
+    home_spelling::shield_spellings(path).into_iter().find_map(|p| {
         REGIONS
             .nodes
             .iter()
             .filter(|n| n.applies_here() && n.role.reads_secret)
             .find(|n| n.matcher.specificity(&p, n.fold && current_os() == "macos").is_some())
     })
-}
-
-/// Every spelling a SHIELD must be asked about: the path itself, plus its macOS firmlink form
-/// when the `/private` prefix only matches under case folding.
-///
-/// `canonicalize` already folds `/private/etc/x` → `/etc/x`, but case-sensitively, because that
-/// fold also feeds admits and folding an admit would hand `/PRIVATE/tmp` the scratch rung. So the
-/// case variant of a firmlink never reached the shield: `/etc/SHADOW` was refused (nodes fold) and
-/// `/PRIVATE/etc/shadow` was not, though on the default macOS volume they are one file.
-///
-/// Extra spellings are offered to the shield ONLY. Everything else classifies the path as written,
-/// which is what keeps a case variant from reaching a permissive node.
-fn shield_spellings(path: &str) -> Vec<String> {
-    let mut out = vec![path.to_string()];
-    if let Some(folded) = super::locus::firmlink_fold_case_insensitive(path)
-        && folded != path
-    {
-        out.push(folded);
-    }
-    out
 }
 
 /// The root the naming test compares a grant against: the DEEPEST matching credential-store node.
@@ -770,7 +751,7 @@ fn shield_spellings(path: &str) -> Vec<String> {
 /// happen to give the deeper root; that is an accident of file order, not a property to rely on.
 fn secret_node_root(path: &str) -> Option<String> {
     let fold_shields = current_os() == "macos";
-    shield_spellings(path)
+    home_spelling::shield_spellings(path)
         .iter()
         .flat_map(|p| {
             REGIONS
@@ -1458,6 +1439,38 @@ mod tests {
             compare("no grant");
             with_grants(&[(tilde, true, true)], || compare("granted"));
         }
+    }
+
+    /// On macOS the home folder answers to any case of its absolute spelling (`/users/me`,
+    /// `/USERS/ME`) and to its data-volume spelling (`/System/Volumes/Data/Users/me`), so every
+    /// credential store declared under `~/` stays a credential store in each of them. The tilde
+    /// fold matched `$HOME` case-sensitively, so `/users/me/.s3cfg` was an ordinary readable file.
+    /// Walks the region table, so a newly declared store is covered the day it lands.
+    #[test]
+    fn a_home_credential_store_is_shielded_in_every_spelling_of_home() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let stores: Vec<String> = declared_region_paths()
+            .into_iter()
+            .filter(|p| p.starts_with("~/") && !p.contains('*'))
+            .map(|p| p.trim_end_matches('/').to_string())
+            .filter(|p| classify_region(p).reads_secret)
+            .collect();
+        assert!(stores.iter().any(|p| p == "~/.s3cfg"), "the walk must reach ~/.s3cfg: {stores:?}");
+        with_os("macos", || {
+            for store in &stores {
+                let rest = &store[1..];
+                for spelling in [
+                    format!("{}{rest}", home.to_ascii_lowercase()),
+                    format!("{}{rest}", home.to_ascii_uppercase()),
+                    format!("/System/Volumes/Data{home}{rest}"),
+                    format!("/system/volumes/data{}{rest}", home.to_ascii_lowercase()),
+                ] {
+                    assert!(classify_region(&spelling).reads_secret, "{spelling} must stay a credential store like {store}");
+                }
+            }
+        });
     }
 
     /// A freeze must survive a RAISED LEVEL, not just a grant.
