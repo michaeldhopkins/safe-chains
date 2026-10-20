@@ -657,8 +657,10 @@ proptest! {
 #[cfg(test)]
 mod resolution {
 
+    const ROOT: &str = "/nonexistent/safe-chains-test-work";
+
     fn workspace() -> crate::pathctx::Guard {
-        crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() })
+        crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), ..Default::default() })
     }
     fn allowed(cmd: &str) -> bool {
         crate::is_safe_command(cmd)
@@ -839,7 +841,7 @@ mod resolution {
         let _w = workspace();
         // A line-preserving filter (head/tail/sort/uniq/cat/tee) between a producer and an injecting
         // consumer must carry the producer's item locus THROUGH — else xargs worst-cases and denies.
-        assert!(allowed("find /work -type f | head -1 | xargs -I{} cat {}"), "head passes find's locus");
+        assert!(allowed(&format!("find {ROOT} -type f | head -1 | xargs -I{{}} cat {{}}")), "head passes find's locus");
         assert!(allowed("find ./src | sort | uniq | xargs -I{} cat {}"), "sort|uniq chain passes through");
         // …but a TRANSFORMING filter must NOT (it can rewrite a line to any path — a bypass).
         assert!(!allowed("find ./src | sed s@.*@/etc/shadow@ | xargs cat"), "sed rewrite must not pass through");
@@ -860,7 +862,7 @@ mod resolution {
     fn while_read_binds_the_loop_var_to_the_pipe_locus() {
         let _w = workspace();
         assert!(allowed("find ./src -type f | while read f; do cat \"$f\"; done"), "read var reads worktree");
-        assert!(allowed("find /work | head | while IFS= read -r f; do cat \"$f\"; done"), "passthrough + read compose");
+        assert!(allowed(&format!("find {ROOT} | head | while IFS= read -r f; do cat \"$f\"; done")), "passthrough + read compose");
         assert!(!allowed("find /etc -type f | while read f; do cat \"$f\"; done"), "system source → deny");
         assert!(!allowed("find /etc | while read f; do rm \"$f\"; done"), "system write via read var → deny");
         assert!(!allowed("while read f; do cat \"$f\"; done"), "no pipe source → unbound → fail closed");
