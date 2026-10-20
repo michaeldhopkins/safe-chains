@@ -65,6 +65,9 @@ pub(crate) enum Shape {
     /// The value names the shell a program starts (`SHELL`). Allowed only as one of the shells,
     /// named in full in a standard system bin directory.
     ShellProgram,
+    /// The value is the remote shell rsync starts (`RSYNC_RSH`). Allowed only as ssh or rsh with
+    /// plain options, the same rule as rsync's `-e`.
+    RemoteShell,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -261,6 +264,8 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
         Shape::ShellProgram => shell_program_verdict(value),
+        Shape::RemoteShell if crate::handlers::coreutils::rsync_shell::remote_shell_is_plain(value) => exec_path_verdict(value, false),
+        Shape::RemoteShell => Verdict::Denied,
     }
 }
 

@@ -41,6 +41,9 @@
 #                named in full whatever PATH holds; a relative, home or temp path, a word carrying
 #                arguments, or another program in those directories (make, an interpreter) is
 #                refused too.
+#   remote-shell the value is the remote shell rsync starts → allowed only as ssh or rsh with plain
+#                options (no ProxyCommand, LocalCommand or config file), then gated as exec-path,
+#                the same rule as rsync -e.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -1100,7 +1103,7 @@ twin_flag = "restic --password-command {v} snapshots"
 twin_base = "restic snapshots"
 because = "restic runs this to obtain the repository password (the --password-command twin)"
 [env.RSYNC_RSH]
-shape = "exec-path"
+shape = "remote-shell"
 single_value = true
 twin_flag = "rsync -e {v} ./src/ ./dst/"
 twin_base = "rsync ./src/ ./dst/"

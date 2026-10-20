@@ -229,6 +229,9 @@ owed = [
 "src/handlers/coreutils/rsync_remote.rs" = [
   "a_remote_option_is_judged_as_the_same_option_given_locally",
 ]
+"src/handlers/coreutils/rsync_shell.rs" = [
+  "a_remote_shell_other_than_ssh_is_never_approved",
+]
 "src/handlers/coreutils/awk.rs" = [
   "an_awk_program_that_runs_code_is_never_approved",
   "the_surroundings_alone_are_approved",

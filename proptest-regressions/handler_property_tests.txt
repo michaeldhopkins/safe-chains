@@ -15,3 +15,4 @@ cc 03d9dd21e12d4a248e28cac46f386350a126cdbf8cb3d63ed92bfe725a7cd65d # shrinks to
 cc de20cc41c94f46197232787b1d904ec66262ddc945758bbb5d01c9e794c760cf # shrinks to prefix = ".", lead = "", trail = "."
 cc 0fb7eba00acec0b341f0a00c8a58237bd381af732eec98e86533d616fa3113f2 # shrinks to prefix = ".", lead = "", trail = ".txt"
 cc e0ff1d0f2b2cecbf59dc8399c216cfe71e5e1f4ea97fba72087e8614278498e5 # shrinks to frags = ["rm", "{", "{", "=", "{,}{,}{,}{,}{,}{,}{,}{,}", "{,}{,}{,}{,}{,}{,}{,}{,}"]
+cc 553cbca11ccdb0b69d7c9d773445d018a37add9a9b02bc40c438466738386b8f # shrinks to case = ("rsync --rsh {p} ./src/ ./dst/", "the remote shell rsync executes")

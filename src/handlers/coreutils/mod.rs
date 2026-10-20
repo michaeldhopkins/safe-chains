@@ -6,6 +6,7 @@ pub(crate) mod find_skip;
 mod grep;
 mod net;
 pub(crate) mod rsync_remote;
+pub(crate) mod rsync_shell;
 pub(crate) mod sed;
 mod tar;
 
