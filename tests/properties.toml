@@ -362,7 +362,8 @@ owed = [
 "src/explain_fix.rs" = ["src/explain_fix/tests.rs::an_offered_grant_always_works", "src/explain_fix/tests.rs::command_text_cannot_add_a_line"]
 "src/explain_fix/gate.rs" = [
   "src/explain_fix/gate/tests.rs::one_boundary_segment_makes_the_whole_chain_a_boundary",
-  "src/explain_fix/gate/tests.rs::a_write_to_a_runs_later_place_is_a_boundary_whatever_the_command",
+  "src/explain_fix/gate/tests.rs::a_write_to_a_runs_later_place_is_a_boundary_whatever_the_command_or_spelling",
+  "src/explain_fix/gate/tests.rs::an_agent_is_a_boundary_however_its_name_is_quoted",
 ]
 "src/lib.rs" = [
   "src/handler_property_tests.rs::arbitrary_command_strings_never_panic",

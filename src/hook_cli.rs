@@ -159,7 +159,7 @@ fn run_hook_on(
         (path, reason.settled(&input.command, &approved))
     });
     let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
-    match gated_policy(format, &explanation, input.permission_mode.as_deref(), threshold, engine_level) {
+    match gated_policy(format, &input.command, &explanation, input.permission_mode.as_deref(), threshold, engine_level) {
         safe_chains::targets::GatedPolicy::Deny => {
             // The copy follows what we EMIT, not which harness this is: here we emit deny and the
             // harness honours it, so "the command did not run" is accurate. On the Ask arm below
@@ -227,16 +227,17 @@ fn run_hook_on(
 /// the kinds apart is spared there, which is every Claude Code call.
 fn gated_policy(
     format: &dyn HookFormat,
+    command: &str,
     explanation: &safe_chains::cst::Explanation,
     permission_mode: Option<&str>,
     threshold: safe_chains::SafetyLevel,
     engine_level: Option<&'static safe_chains::engine::level::Level>,
 ) -> targets::GatedPolicy {
-    if format.gated_policy() == targets::GatedPolicy::Defer {
-        return targets::GatedPolicy::Defer;
+    if !format.splits_by_kind() {
+        return format.gated_policy();
     }
     let approved =
         |c: &str| matches!(safe_chains::explain_with_coverage_at_level(c, engine_level).overall, Verdict::Allowed(l) if l <= threshold);
     let by_default = |c: &str| engine_level.is_some() && safe_chains::explain_with_coverage_at_level(c, None).is_allowed();
-    format.gated_policy_for(safe_chains::explain_fix::gate::gate_kind(explanation, &approved, &by_default), permission_mode)
+    format.gated_policy_for(safe_chains::explain_fix::gate::gate_kind(command, explanation, &approved, &by_default), permission_mode)
 }

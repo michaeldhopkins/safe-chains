@@ -172,6 +172,10 @@ impl HookFormat for GrokHookFormat {
         &["/hookSpecificOutput/permissionDecision"]
     }
 
+    fn splits_by_kind(&self) -> bool {
+        true
+    }
+
     fn render_deny(&self, reason: &str) -> HookResponse {
         // Both signals say deny: the top-level `decision` (honored regardless of exit code) and exit
         // 2 (grok's deny code; any OTHER non-zero fails OPEN, so it must be exactly 2).

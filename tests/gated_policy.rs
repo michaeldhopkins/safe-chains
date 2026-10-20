@@ -34,6 +34,14 @@ fn the_split_list_names_real_targets() {
     }
 }
 
+/// A target that does not split never has its kind worked out, so no new code runs ahead of its refusal.
+#[test]
+fn only_the_split_targets_work_out_the_kind() {
+    for (name, format) in every_hook_format() {
+        assert_eq!(format.splits_by_kind(), SPLIT_TARGETS.contains(&name), "{name}");
+    }
+}
+
 #[path = "support/hooks.rs"]
 mod hooks;
 

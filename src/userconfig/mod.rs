@@ -185,6 +185,11 @@ pub fn runs_an_agent(name: &str) -> bool {
     guard::check_entry_name(name).is_err()
 }
 
+/// The commands that run an AI coding agent.
+pub fn agent_commands() -> &'static [&'static str] {
+    guard::AGENT_COMMANDS
+}
+
 /// `path` as `safe-chains config grant` would write it, or why that command would refuse it.
 pub fn grantable_path(path: &str) -> Result<String, EditError> {
     let path = guard::normalize_path(path)?;

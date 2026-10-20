@@ -111,6 +111,12 @@ pub trait HookFormat: Send + Sync {
         self.gated_policy()
     }
 
+    /// Whether `gated_policy_for` depends on the kind. Only then is the kind worked out, so a harness
+    /// that does not split pays nothing for it and runs no new code ahead of its refusal.
+    fn splits_by_kind(&self) -> bool {
+        false
+    }
+
     /// Pointers besides `decision_pointer` where this harness ALSO reads a decision. Grok reads
     /// `hookSpecificOutput.permissionDecision` ahead of `decision` when both are present.
     fn extra_decision_pointers(&self) -> &'static [&'static str] {
