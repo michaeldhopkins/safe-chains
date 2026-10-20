@@ -467,6 +467,7 @@ owed = [
   "src/pathgate.rs::textutil_convert_never_more_permissive_than_info",
   "src/pathgate/handlers/plist.rs::plist_readers_are_never_laxer_than_cat",
 ]
+"src/pathgate/role.rs" = ["roles_parse_by_name_and_rank_along_the_ladder"]
 "src/pathgate/handlers/jj.rs" = ["the_repository_is_read_only_with_the_flag_and_an_observing_sub"]
 "src/pathgate/handlers/jq.rs" = [
   "src/pathgate/handlers/jq_tests.rs::a_directive_at_any_directive_position_is_seen",

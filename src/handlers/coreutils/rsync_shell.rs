@@ -1,4 +1,5 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
 const VALUED_SHORT: &[char] = &['B', 'e', 'f', 'M', 'T'];
 const SSH_FLAGS: &[&str] = &["-4", "-6", "-a", "-C", "-k", "-q", "-T", "-v", "-vv", "-vvv", "-x"];
@@ -38,7 +39,7 @@ pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
             continue;
         };
         let plain = match value {
-            Some(value) if is_shell => remote_shell_is_plain(value),
+            Some(value) if is_shell => remote_shell_verdict(value).is_allowed(),
             Some(value) => rsync_path_is_plain(value),
             None => false,
         };
@@ -101,6 +102,21 @@ pub(crate) fn remote_shell_is_plain(value: &str) -> bool {
     true
 }
 
+/// The verdict on a remote shell rsync would start: ssh or rsh with plain options is allowed, and a
+/// program named by a relative path is judged as the file it runs. Shared by `-e`, `--rsh` and
+/// `RSYNC_RSH`, so the flag and the variable cannot disagree.
+pub(crate) fn remote_shell_verdict(value: &str) -> Verdict {
+    if !remote_shell_is_plain(value) {
+        return Verdict::Denied;
+    }
+    let program = value.split_ascii_whitespace().next().unwrap_or_default();
+    if program.contains('/') && !program.starts_with('/') {
+        crate::engine::resolve::execute_file_verdict(program)
+    } else {
+        Verdict::Allowed(SafetyLevel::Inert)
+    }
+}
+
 /// A path whose last part is rsync, with nothing a shell would read as more than one word.
 fn rsync_path_is_plain(value: &str) -> bool {
     value.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '/' | '.' | '_' | '-' | '+'))
@@ -124,6 +140,12 @@ mod tests {
         rsync_shell_env_ssh: "RSYNC_RSH=ssh rsync x:foo dst/",
         rsync_path_plain: "rsync --rsync-path=/usr/local/bin/rsync host:src/ dst/",
         rsync_path_bare: "rsync --rsync-path rsync host:src/ dst/",
+        rsync_shell_ssh_with_a_port: "rsync -e 'ssh -p 22' x:foo dst/",
+        rsync_shell_ssh_with_a_port_locally: "rsync -e 'ssh -p 22' src/ dst/",
+        rsync_shell_ssh_in_usr_bin: "rsync -e /usr/bin/ssh x:foo dst/",
+        rsync_shell_ssh_in_usr_bin_with_a_user: "rsync -e '/usr/bin/ssh -l x' x:foo dst/",
+        rsync_shell_long_ssh_with_a_port: "rsync --rsh='ssh -p 22 -o BatchMode=yes' x:foo dst/",
+        rsync_shell_env_ssh_with_a_port: "RSYNC_RSH='ssh -p 22' rsync x:foo dst/",
     }
 
     denied! {
@@ -143,6 +165,10 @@ mod tests {
         rsync_path_other_program: "rsync --rsync-path=/bin/sh host:src/ dst/",
         rsync_path_metacharacter: "rsync --rsync-path='rsync;id' host:src/ dst/",
         rsync_path_remote_option: "rsync -a -M--rsync-path=sh src/ dst/",
+        rsync_shell_ssh_with_a_config_file: "rsync -e 'ssh -p 22 -F ./cfg' x:foo dst/",
+        rsync_shell_ssh_in_tmp: "rsync -e /tmp/ssh x:foo dst/",
+        rsync_shell_project_program_outside: "rsync -e ../../x/ssh x:foo dst/",
+        rsync_shell_project_program_with_options: "rsync -e '/tmp/x/tool -p 22' x:foo dst/",
     }
 
     #[test]

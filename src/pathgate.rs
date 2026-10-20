@@ -25,53 +25,6 @@ use crate::verdict::Verdict;
 use flag_match::match_flag;
 pub use fuzz_judges::{judge_for_flag, judge_for_positional};
 
-/// What to do with a path found in a given argument slot.
-#[derive(Deserialize, Clone, Copy, PartialEq, Default, Debug)]
-#[serde(rename_all = "lowercase")]
-pub(crate) enum Role {
-    /// Gate by read locus — a disclosing read (`od FILE`, `scp` source, `wget --post-file`).
-    Read,
-    /// Gate by read locus, as a SWEEP — the command descends the path rather than reading it as
-    /// one file (`rg PATTERN DIR`, `ag`, an archiver's source tree).
-    ///
-    /// The distinction matters only above the workspace, and it is the shield that makes it
-    /// matter: `rg foo ~` names `~`, which is not a credential store, and then reads
-    /// `~/.ssh/id_rsa` out of it. A name test can only clear a name someone wrote, so a root that
-    /// stands for everything beneath it cannot be cleared at all. `read` stays correct for the
-    /// commands that open exactly the file they are given.
-    #[serde(rename = "read_tree")]
-    ReadTree,
-    /// Gate by write locus — a write-target (`tee FILE`, `curl -o`, a converter's output).
-    Write,
-    /// Gate by EXECUTOR locus — a flag whose value selects code to run (`cargo --manifest-path
-    /// DIR/Cargo.toml` runs that project's build.rs/tests). Denies a foreign or `/tmp` executor
-    /// (the execution-origin band), where `write` would allow `/tmp`. See
-    /// docs/design/behavioral-taxonomy-execution-origin.md.
-    Exec,
-    /// Never gate — a URL, an `-i` identity, a converter's non-disclosing transcode input. The
-    /// default, so a command declaring only path-bearing flags leaves its positionals ungated.
-    #[default]
-    Ignore,
-}
-
-impl Role {
-    /// How much this role withholds, for picking between clauses that both hold.
-    ///
-    /// Written out rather than derived from declaration order so that reordering the enum — which
-    /// looks cosmetic — cannot quietly change which role a self-overlapping gate selects. `Exec`
-    /// outranks `Write` because it withholds strictly more: it refuses `/tmp` and home, where a
-    /// write target is allowed to land.
-    pub(crate) fn restrictiveness(self) -> u8 {
-        match self {
-            Role::Ignore => 0,
-            Role::Read => 1,
-            Role::ReadTree => 2,
-            Role::Write => 3,
-            Role::Exec => 4,
-        }
-    }
-}
-
 /// How bare positionals map to roles, beyond the flat `positional` default.
 #[derive(Deserialize, Clone, Copy, PartialEq, Default, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -643,6 +596,7 @@ fn judge(role: Role, path: &str) -> Verdict {
         Role::ReadTree => crate::engine::resolve::read_tree_verdict(path),
         Role::Write => crate::engine::resolve::write_target_verdict(path),
         Role::Exec => crate::engine::resolve::execute_file_verdict(path),
+        Role::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(path),
     }
 }
 
@@ -654,6 +608,8 @@ fn gate(role: Role, path: &str) -> bool {
 }
 
 mod chdir;
+mod role;
+pub(crate) use role::Role;
 mod flag_match;
 mod fuzz_judges;
 pub(crate) mod handlers;

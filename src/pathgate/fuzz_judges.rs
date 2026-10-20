@@ -23,6 +23,7 @@ pub fn judge_for_flag(cmd: &str, flag: &str, value: &str) -> Option<Verdict> {
         Role::ReadTree => crate::engine::resolve::read_tree_verdict(value),
         Role::Write => crate::engine::resolve::write_target_verdict(value),
         Role::Exec => crate::engine::resolve::execute_file_verdict(value),
+        Role::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value),
     })
 }
 
@@ -45,5 +46,6 @@ pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
         Role::ReadTree => Some(crate::engine::resolve::read_tree_verdict(value)),
         Role::Write => Some(crate::engine::resolve::write_target_verdict(value)),
         Role::Exec => Some(crate::engine::resolve::execute_file_verdict(value)),
+        Role::RemoteShell => Some(crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value)),
     }
 }

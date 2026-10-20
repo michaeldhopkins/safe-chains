@@ -4096,7 +4096,7 @@ fn an_executor_named_flag_is_gated_at_the_executor_locus() {
                     }
                     checked += 1;
                     let role = gate_of(scope, &flag).or_else(|| gate_of(cmd, &flag));
-                    if role.as_deref() != Some("exec") {
+                    if !matches!(role.as_deref(), Some("exec" | "remote_shell")) {
                         failures.push(format!(
                             "{}: `{label} {flag}` names a program but its path_gate role is \
                                  {role:?} (needs \"exec\"; read/write would admit /tmp). If its \
@@ -6705,6 +6705,7 @@ fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
             Role::ReadTree => crate::engine::resolve::read_tree_verdict,
             Role::Write => crate::engine::resolve::write_target_verdict,
             Role::Exec => crate::engine::resolve::execute_file_verdict,
+            Role::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict,
         };
         for value in VALUES {
             let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
@@ -6773,6 +6774,7 @@ fn every_declared_path_flag_actually_gates() {
             // A /tmp executor is the discriminating hot path: `write` would ALLOW it
             // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
             Role::Exec => "/tmp/sc-probe/Cargo.toml",
+            Role::RemoteShell => "/tmp/sc-probe/ssh",
             Role::Ignore => continue,
         };
         // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must

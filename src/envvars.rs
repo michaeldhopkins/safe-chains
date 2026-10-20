@@ -264,8 +264,7 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
         Shape::ShellProgram => shell_program_verdict(value),
-        Shape::RemoteShell if crate::handlers::coreutils::rsync_shell::remote_shell_is_plain(value) => exec_path_verdict(value, false),
-        Shape::RemoteShell => Verdict::Denied,
+        Shape::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value),
     }
 }
 
