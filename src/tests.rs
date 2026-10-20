@@ -440,7 +440,6 @@ safe! {
     bzcmp_compare: "bzcmp a.bz2 b.bz2",
     xzdec_basic: "xzdec",
     zless_view: "zless file.gz",
-    cpio_extract: "cpio -idv",
     ditto_copy: "ditto src/ dest/",
     zip_create: "zip archive.zip file.txt",
     zipgrep_search: "zipgrep pattern archive.zip",

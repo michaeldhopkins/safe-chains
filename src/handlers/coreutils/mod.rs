@@ -1,9 +1,11 @@
+pub(crate) mod archive_extract;
 pub(crate) mod awk;
 pub(crate) mod chmod_mode;
 mod find;
 pub(crate) mod find_skip;
 mod grep;
 mod net;
+pub(crate) mod rsync_remote;
 pub(crate) mod sed;
 mod tar;
 

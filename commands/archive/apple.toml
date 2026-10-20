@@ -91,7 +91,7 @@ max_positional = 1
 
 [[command]]
 name = "xar"
-description = "eXtensible ARchiver (used for .pkg and similar). One of -c (create), -t (list), -x (extract) is required; all three require -f to name the archive. Flags include --compression, --compression-args, --toc-cksum, --file-cksum, --exclude, --keep-existing, -C (chdir before extract). Apple has deprecated xar and recommends alternative formats."
+description = "eXtensible ARchiver (used for .pkg and similar). One of -c (create), -t (list), -x (extract) is required; all three require -f to name the archive. Flags include --compression, --compression-args, --toc-cksum, --file-cksum, --exclude, --keep-existing, -C (chdir before extract). Apple has deprecated xar and recommends alternative formats. --keep-setuid, which keeps set-id bits when extracting, is refused."
 url = "https://mackyle.github.io/xar/"
 researched_version = "xar 1.8 (macOS bundled)"
 level = "SafeWrite"
