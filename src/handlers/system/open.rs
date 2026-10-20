@@ -64,7 +64,7 @@ mod tests {
 
     safe! {
         open_https: "open https://example.com",
-        open_http_localhost: "open http://localhost:8097/",
+        open_http_localhost: "open http://localhost:8000/",
         open_upper_scheme: "open HTTPS://example.com",
         open_reveal: "open -R target/release/app",
         open_reveal_app: "open -R Build/Foo.app",
