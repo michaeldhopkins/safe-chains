@@ -175,10 +175,7 @@ fn dispatch_branching(
     if let Some(sub) = per_database_variant(subs, arg) {
         return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
     }
-    let glob_match = |p: &str| match p.strip_suffix('*') {
-        Some(prefix) => arg.starts_with(prefix),
-        None => arg == p,
-    };
+    let glob_match = |p: &str| !arg.starts_with('-') && p.strip_suffix('*').map_or(arg == p, |prefix| arg.starts_with(prefix));
     // A first positional naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
     // aws_secret_access_key`) is a CREDENTIAL-READ — deny before the allow-glob admits it. The
     // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware. Matched

@@ -2087,6 +2087,38 @@ fn credential_store_reads_are_denied() {
     );
 }
 
+/// A `first_arg` glob admits a VERB or resource name, never a flag. `*` matches any word, and the
+/// flag check after it starts one word further on, so an unlisted flag standing where the verb goes
+/// was admitted unexamined: `kubectl get --raw /api/v1/secrets` read every Secret through the raw
+/// API, and `kubectl get -oyaml secrets` slipped past the Secret gate as an unknown first word.
+/// Walks every glob arm in the registry, so a new one is covered the day it lands.
+#[test]
+fn a_first_arg_glob_never_admits_an_unlisted_flag_in_the_verb_position() {
+    fn collect(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+        let DispatchKind::Branching { subs, first_arg, .. } = kind else { return };
+        if !first_arg.is_empty() {
+            out.push(prefix.to_string());
+        }
+        for s in subs {
+            collect(&format!("{prefix} {}", s.name), &s.kind, out);
+        }
+    }
+    let mut prefixes = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        collect(name, &spec.kind, &mut prefixes);
+    }
+    assert!(prefixes.iter().any(|p| p == "kubectl get"), "the walk must reach kubectl get: {prefixes:?}");
+    for prefix in &prefixes {
+        for tail in ["--sc-unlisted", "--sc-unlisted x", "--sc-unlisted=x", "-Z", "-Zvalue x"] {
+            let inv = format!("{prefix} {tail}");
+            assert_eq!(crate::command_verdict(&inv), Verdict::Denied, "an unlisted flag in the verb position must deny: {inv}");
+        }
+    }
+    for c in ["kubectl get --raw /api/v1/secrets", "kubectl get --raw=/api/v1/namespaces/x/secrets", "kubectl get -oyaml secrets"] {
+        assert!(!crate::is_safe_command(c), "must deny: {c}");
+    }
+}
+
 /// The `credential_first_arg` mechanism (dispatch_branching): a first-positional glob classifies
 /// the invocation as a credential-read (deny) while every other value falls through the allow-glob.
 /// Guards the value-dependent credential class — every NAME FORM of the secret resource denies
