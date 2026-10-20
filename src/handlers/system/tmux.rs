@@ -3,8 +3,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 static INERT_SUBS: &[&str] = &[
     "display", "display-message", "has", "has-session", "info", "list-buffers", "list-clients", "list-commands", "list-keys", "list-panes",
-    "list-sessions", "list-windows", "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw", "show", "show-environment", "show-options",
-    "showenv", "start", "start-server",
+    "list-sessions", "list-windows", "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw", "show", "show-options", "start", "start-server",
 ];
 
 static SAFE_WRITE_SUBS: &[&str] = &[
@@ -304,7 +303,10 @@ fn tmux_command(rest: &[Token]) -> Verdict {
 
     // `#(…)` in a format runs a shell command when tmux expands it, and formats are expanded in
     // display-message, names, -F templates, option values and run-shell's own command line.
-    if rest.iter().any(|t| t.as_str().contains("#(") || expands_twice(t.as_str())) {
+    if rest
+        .iter()
+        .any(|t| t.as_str().contains("#(") || expands_twice(t.as_str()) || !super::tmux_formats::reads_only_tmux_values(t.as_str()))
+    {
         return Verdict::Denied;
     }
 
@@ -365,7 +367,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         "tmux",
         "https://man7.org/linux/man-pages/man1/tmux.1.html",
         "Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, \
-             list-keys, list-commands, show-options, show-environment, display-message, info, \
+             list-keys, list-commands, show-options, display-message with formats naming tmux values, info, \
              has-session, start-server. \
              Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, \
              kill-server, attach-session, detach-client, switch-client, new-window, split-window, \
@@ -409,8 +411,6 @@ mod tests {
         tmux_lscm: "tmux list-commands",
         tmux_show: "tmux show-options",
         tmux_show_short: "tmux show",
-        tmux_showenv: "tmux show-environment",
-        tmux_showenv_short: "tmux showenv",
         tmux_display: "tmux display-message",
         tmux_display_short: "tmux display",
         tmux_info: "tmux info",
@@ -470,6 +470,14 @@ mod tests {
     }
 
     denied! {
+        tmux_showenv_denied: "tmux show-environment",
+        tmux_showenv_short_denied: "tmux showenv",
+        tmux_showenv_global_denied: "tmux showenv -g",
+        tmux_showenv_named_denied: "tmux show-environment -g OPENAI_API_KEY",
+        tmux_showenv_hidden_denied: "tmux show-environment -h",
+        tmux_display_environment_denied: "tmux display -p '#{OPENAI_API_KEY}'",
+        tmux_list_format_environment_denied: "tmux ls -F '#{session_name} #{GITHUB_TOKEN}'",
+        tmux_display_condition_environment_denied: "tmux display -p '#{?OPENAI_API_KEY,set,unset}'",
         tmux_bare_denied: "tmux",
         tmux_source_denied: "tmux source-file ~/.tmux.conf",
         tmux_run_unsafe_denied: "tmux run-shell 'rm -rf /'",

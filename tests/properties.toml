@@ -373,6 +373,7 @@ owed = [
   "sysctl_safe_standalone_flag_does_not_change_verdict",
 ]
 "src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command", "global_flags_alone_never_name_a_command"]
+"src/handlers/system/tmux_formats.rs" = ["an_unknown_name_is_refused_wherever_it_is_looked_up"]
 "src/handlers/system/tmux_keys.rs" = [
   "src/handlers/system/tmux_keys_tests.rs::navigation_alone_is_always_approved",
   "src/handlers/system/tmux_keys_tests.rs::submitted_text_is_never_more_permissive_than_running_it",

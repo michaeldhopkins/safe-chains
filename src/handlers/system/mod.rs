@@ -4,6 +4,7 @@ pub(crate) mod screen;
 pub(crate) mod ssh;
 pub(crate) mod sysctl;
 mod tmux;
+mod tmux_formats;
 mod tmux_keys;
 
 use crate::parse::Token;
