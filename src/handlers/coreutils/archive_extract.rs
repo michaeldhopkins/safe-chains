@@ -13,7 +13,8 @@ use crate::parse::Token;
 ///
 /// bsdcpio reads `-W name` as the long option `--name`, abbreviations included, so `cpio -W ext`
 /// is `cpio --extract`. Its value is a long option no list here can check, so cpio's `-W` is
-/// refused whatever else the line says.
+/// refused whatever else the line says. pax's `-s` rewrites each member's name by a regular
+/// expression, so where a copy writes is no longer the path it was given, and it is refused too.
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
@@ -22,7 +23,7 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
     match first.command_name() {
         "pax" => {
             let given = given();
-            given.anywhere.contains('r') && !given.leading.contains('w')
+            given.anywhere.contains('s') || (given.anywhere.contains('r') && !given.leading.contains('w'))
         }
         "cpio" => {
             let given = given();
@@ -106,7 +107,6 @@ mod tests {
         pax_copy: "pax -rw ./src ./dst",
         pax_copy_keeping_modes: "pax -r -w -p e ./src ./dst",
         pax_list_archive_named_r: "pax -f r",
-        pax_list_substitution_with_r: "pax -s ,r,w, -f ./archive.tar",
         cpio_list: "cpio -it",
         cpio_list_spaced: "cpio -i -t",
         cpio_list_long: "cpio --extract --list",
@@ -119,6 +119,10 @@ mod tests {
     }
 
     denied! {
+        pax_copy_renaming_members: "pax -rw -s ,^,../../, ./src ./dst",
+        pax_copy_renaming_to_a_file: "pax -rw -s ,.*,/x/.zshrc, ./x ./dst",
+        pax_list_renaming: "pax -s ,r,w, -f ./archive.tar",
+        pax_write_renaming: "pax -w -s ,a,b, -f ./out.tar ./src",
         pax_extract: "pax -r -f ./archive.tar",
         pax_extract_keeping_modes: "pax -r -p e -f ./archive.tar",
         pax_extract_cluster: "pax -rf ./archive.tar",

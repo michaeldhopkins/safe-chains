@@ -1,6 +1,6 @@
 [[command]]
 name = "pax"
-description = "Read, write, and list members of file archives and copy directory hierarchies. The presence of -r and/or -w selects mode: neither = list, -r = extract, -w = write archive, -r -w = copy. Supports cpio, bcpio, svr4cpio, svr4crc, tar, and ustar formats via -x. -f names the archive (default stdin for list/read, stdout for write). -z and -j select gzip and bzip2 compression. -k refuses to overwrite. Extracting (-r without -w) is refused, as tar extraction is: the archive decides the paths written and their modes, set-id bits included."
+description = "Read, write, and list members of file archives and copy directory hierarchies. The presence of -r and/or -w selects mode: neither = list, -r = extract, -w = write archive, -r -w = copy. Supports cpio, bcpio, svr4cpio, svr4crc, tar, and ustar formats via -x. -f names the archive (default stdin for list/read, stdout for write). -z and -j select gzip and bzip2 compression. -k refuses to overwrite. -s rewrites member names by a regular expression and is refused, since a copy then writes somewhere other than the paths it was given. Extracting (-r without -w) is refused, as tar extraction is: the archive decides the paths written and their modes, set-id bits included."
 url = "https://www.freebsd.org/cgi/man.cgi?pax"
 researched_version = "BSD pax (macOS bundled)"
 level = "SafeWrite"
@@ -22,14 +22,14 @@ examples_safe = ["pax -w ./src -f ./out.tar", "pax -f ./archive.tar"]
 # pax had no path gate: `pax -w ~` archived every key in home to stdout, and a shell redirect put
 # it in the worktree. Predates the read-policy change — it was open in 0.226.0 too.
 #
-# `read_tree` on the operands because `-w` takes source hierarchies, which are sweep roots the
-# credential shield cannot clear. In list/extract mode the operands are match patterns instead;
-# gating those as reads is harmless, since a pattern classifies worktree-relative.
+# The `pax_mode` handler (pathgates.toml) reads the operands as trees (`-w` takes source hierarchies, which are sweep
+# roots the credential shield cannot clear; list patterns classify worktree-relative). With `-r -w`
+# the last operand is the destination: it is written, each source lands below it under its own
+# path, and a write-frozen name below either one is refused.
 #
 # `-f` is gated as a WRITE although its role actually flips with the mode (`-w` writes the
 # archive, `-r` and list read it). Gating the strictest of the two is the fail-closed choice and
 # keeps this declarative — the cost is that reading an archive from outside the workspace prompts.
 # Same treatment 7z, cpio and unzip already get.
 [command.path_gate]
-positional = "read_tree"
 flags = { "-f" = "write", "-B" = "ignore", "-E" = "ignore", "-G" = "ignore", "-T" = "ignore", "-U" = "ignore", "-b" = "ignore", "-o" = "ignore", "-p" = "ignore", "-s" = "ignore", "-x" = "ignore" }

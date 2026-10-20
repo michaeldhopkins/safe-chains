@@ -554,6 +554,7 @@ owed = [
 "src/engine/resolve/regions/hypothetical.rs" = "holds the thread-local hypothetical grant and reads HOME"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
 "src/engine/resolve/regions/unicode_spelling.rs" = "reads the process-wide region table and HOME"
+"src/pathgate/handlers/pax.rs" = "walks the copy's destination and sources on disk for frozen names"
 "src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
 "src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"
 "src/handlers/android/mod.rs" = "module declaration only"

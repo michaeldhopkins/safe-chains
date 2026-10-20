@@ -246,3 +246,30 @@ fn a_prune_find_does_not_test_above_its_minimum_depth_keeps_nothing_away() {
         assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
     }
 }
+
+#[test]
+fn a_pax_copy_is_judged_by_what_it_writes_below_its_destination() {
+    let p = project(&["src", ".git/hooks", "other/.git/hooks", "hooks", "dest"]);
+    for cmd in [
+        "pax -rw other dest", "pax -r -w other dest", "pax -wr other dest", "pax -rw hooks .git", "pax -rw src .", "pax -rw src .jj",
+        "pax -rwk src .git/hooks", "pax -rw -s ,^,../../, src dest",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["pax -rw src dest", "pax -r -w -p e src dest", "pax -w -f out.tar src", "pax -f out.tar"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn every_spelling_of_a_pax_copy_into_frozen_metadata_is_refused() {
+    let p = project(&["src", "dest"]);
+    for mode in ["-rw", "-wr", "-r -w", "-w -r", "-rwv", "-v -r -k -w", "-rwpe"] {
+        for frozen in [".git", ".jj", ".hg", ".sl", ".envrc", "sub/.git/hooks", "dest/.jj/repo"] {
+            let cmd = format!("pax {mode} src {frozen}");
+            assert!(!at(&p, &cmd).is_allowed(), "{cmd} was approved");
+        }
+        let cmd = format!("pax {mode} src dest");
+        assert!(at(&p, &cmd).is_allowed(), "{cmd} was refused");
+    }
+}
