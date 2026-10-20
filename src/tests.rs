@@ -2215,3 +2215,18 @@ proptest::proptest! {
         proptest::prop_assert!(is_safe_command(&listing), "{}", listing);
     }
 }
+
+proptest::proptest! {
+    /// codex's `-c` / `--config`, `--enable` and `--disable` set config for the run, which can name
+    /// a program to start, so no subcommand that passes on its own passes behind one.
+    #[test]
+    fn a_codex_config_override_never_passes_in_front_of_a_subcommand(
+        flag in proptest::sample::select(vec!["-c x=y", "-cx=y", "--config x=y", "--config=x=y", "--enable x", "--disable x", "--enable=x"]),
+        sub in proptest::sample::select(vec!["features list", "mcp list --help", "debug app-server --help", "cloud list", "apply x", "completion --shell zsh"]),
+    ) {
+        let plain = format!("codex {sub}");
+        proptest::prop_assert!(is_safe_command(&plain), "{}", plain);
+        let line = format!("codex {flag} {sub}");
+        proptest::prop_assert!(!is_safe_command(&line), "{}", line);
+    }
+}
