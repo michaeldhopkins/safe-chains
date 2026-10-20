@@ -2199,3 +2199,19 @@ fn workspace_overreach_reports_an_absolute_path_as_written() {
         assert_eq!(reach.map(|(named, _)| named).as_deref(), Some(path), "{path} must be named as written");
     }
 }
+
+proptest::proptest! {
+    /// `cargo install` writes into the cargo bin directory, outside the project, whatever it
+    /// builds from, so no source, root or build flag makes it pass; only `--list` and `--help` do.
+    #[test]
+    fn cargo_install_never_passes_unless_it_only_lists(
+        toolchain in proptest::sample::select(vec!["", "+nightly ", "+1.90.0 "]),
+        source in proptest::sample::select(vec!["--path .", "--path ./crates/tool", "ripgrep", "--git https://github.com/x/y", "--path=."]),
+        extra in proptest::sample::subsequence(vec!["--force", "--locked", "--root ./out", "--bin safe-chains", "-q", "--offline", "--debug"], 0..3),
+    ) {
+        let line = format!("cargo {toolchain}install {source} {}", extra.join(" "));
+        proptest::prop_assert!(!is_safe_command(&line), "{}", line);
+        let listing = format!("cargo {toolchain}install --list");
+        proptest::prop_assert!(is_safe_command(&listing), "{}", listing);
+    }
+}

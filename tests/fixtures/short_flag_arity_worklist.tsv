@@ -32,7 +32,6 @@ cargo audit	-n
 cargo clean	-n
 cargo geiger	-f
 cargo geiger	-i
-cargo install	-f
 cargo outdated	-n
 cargo public-api	-s
 cargo publish	-n

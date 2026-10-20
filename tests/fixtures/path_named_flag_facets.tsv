@@ -184,8 +184,6 @@ cargo criterion	--criterion-manifest-path	untriaged	-	-	-
 cargo cyclonedx	--override-filename	untriaged	-	-	-	
 cargo doc	--profile	untriaged	-	-	-	
 cargo fetch	--lockfile-path	untriaged	-	-	-	
-cargo install	--path	untriaged	-	-	-	
-cargo install	--profile	untriaged	-	-	-	
 cargo llvm-cov	--ignore-filename-regex	untriaged	-	-	-	
 cargo llvm-cov	--profile	untriaged	-	-	-	
 cargo msrv find	--path	untriaged	-	-	-	
