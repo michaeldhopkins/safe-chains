@@ -10,12 +10,17 @@ const SSH_OPTIONS: &[&str] = &[
 
 /// Whether the line names a remote shell (`-e`, `--rsh`) that is not ssh or rsh with plain options,
 /// or an `--rsync-path` that is not a plain path to rsync. rsync starts the first itself, so `-e sh`
-/// with `x:foo` runs `./x` here, and the remote shell runs the second as a command line.
+/// with `x:foo` runs `./x` here, and the remote shell runs the second as a command line. A local
+/// `--server` is refused too: it is the far side's half of a transfer, reading its options and
+/// file list from standard input, so nothing on the line says what it will write.
 pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
     let mut words = tokens.iter().skip(1).map(Token::as_str);
     while let Some(word) = words.next() {
         if word == "--" {
             break;
+        }
+        if word == "--server" {
+            return true;
         }
         let (is_shell, value) = if let Some(long) = word.strip_prefix("--") {
             let (name, glued) = long.split_once('=').map_or((long, None), |(name, value)| (name, Some(value)));
@@ -165,6 +170,9 @@ mod tests {
         rsync_path_other_program: "rsync --rsync-path=/bin/sh host:src/ dst/",
         rsync_path_metacharacter: "rsync --rsync-path='rsync;id' host:src/ dst/",
         rsync_path_remote_option: "rsync -a -M--rsync-path=sh src/ dst/",
+        rsync_local_server: "rsync --server src/ dst/",
+        rsync_local_server_sender: "rsync --server --sender -vlogDtpre.iLsfxC . src/",
+        rsync_local_server_after_options: "rsync -a --server src/ dst/",
         rsync_shell_ssh_with_a_config_file: "rsync -e 'ssh -p 22 -F ./cfg' x:foo dst/",
         rsync_shell_ssh_in_tmp: "rsync -e /tmp/ssh x:foo dst/",
         rsync_shell_project_program_outside: "rsync -e ../../x/ssh x:foo dst/",
