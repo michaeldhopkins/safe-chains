@@ -693,6 +693,12 @@ role = "credential-store"
 os = ["macos"]
 note = "Edge profile credential/cookie stores."
 researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Claude/"
+role = "credential-store"
+os = ["macos"]
+note = "Claude desktop app's folder: claude_desktop_config.json gives each MCP server the environment it runs with, often API keys, and config.json, the extension settings and the local session store sit beside it. Shielded whole, since config.json is too common a name to refuse in every folder."
+researched = "2026-10-20"
 
 # ── safe-chains' own config: read-OK, write-DENIED, un-grantable (the trust root). An
 #    UNPROTECTED path (no harness blesses a third-party config location) — a stopgap until one
