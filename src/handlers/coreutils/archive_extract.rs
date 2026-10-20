@@ -36,7 +36,8 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
 }
 
 /// The option letters and long options given, everywhere and in front of the first operand,
-/// skipping the value each value-taking letter consumes.
+/// skipping the value each value-taking letter consumes. cpio's list is the union of bsdcpio's and GNU
+/// cpio's (`-D` dir, `-M` message), so `cpio -Dt -i` extracts into `t` rather than listing.
 struct Given<'a> {
     anywhere: String,
     leading: String,
@@ -48,7 +49,7 @@ impl<'a> Given<'a> {
     fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
         let takes_a_value: &[char] = match command {
             "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
-            "cpio" => &['C', 'E', 'F', 'H', 'I', 'O', 'R', 'W', 'f'],
+            "cpio" => &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W', 'f'],
             _ => &[],
         };
         let mut given = Given { anywhere: String::new(), leading: String::new(), long_anywhere: Vec::new(), long_leading: Vec::new() };
@@ -139,6 +140,9 @@ mod tests {
         cpio_extract_spelled_as_a_long_name_glued: "cpio -Wextract",
         cpio_extract_spelled_as_an_abbreviated_long_name: "cpio -v -W ext",
         cpio_list_letter_with_a_long_name: "cpio -t -W extract",
+        cpio_extract_into_a_directory_named_t: "cpio -Dt -i",
+        cpio_extract_with_a_message_t: "cpio -iMt",
+        cpio_extract_with_a_spaced_message: "cpio -i -M t",
     }
 
     proptest! {
