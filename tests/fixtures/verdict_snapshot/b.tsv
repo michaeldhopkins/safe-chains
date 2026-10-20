@@ -321,18 +321,7 @@ bat -p	inert
 bat -r x	inert
 bat -u	inert
 bat x	inert
-batch	safe-write
-batch --help	safe-write
-batch --help -V	safe-write
-batch --help -f x	safe-write
-batch --help x	safe-write
-batch --version	denied
-batch -V	safe-write
-batch -f x	safe-write
-batch -m	safe-write
-batch -q x	safe-write
-batch -v	safe-write
-batch x	safe-write
+batch -f x.sh	denied
 bazel	denied
 bazel --help	inert
 bazel --help --version	denied

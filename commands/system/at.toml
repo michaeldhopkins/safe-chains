@@ -5,8 +5,22 @@ url = "https://man7.org/linux/man-pages/man1/at.1p.html"
 researched_version = "POSIX at(1); BSD implementation on macOS, surface frozen"
 level = "SafeWrite"
 bare = false
-standalone = ["--help", "-V", "-b", "-c", "-d", "-l", "-m", "-r", "-v"]
-valued = ["-f", "-q", "-t"]
+require_any = ["-c", "-d", "-l", "-r"]
+standalone = ["--help", "-c", "-d", "-l", "-r"]
+valued = ["-q"]
+examples_denied = [
+    "echo ls | at now",
+    "at now",
+    "at -f x.sh now",
+    "at -m now + 1 minute",
+    "at -t 202601010000",
+    "at -l -f x.sh now",
+    "at -q a now",
+    "at -b",
+    "at -V",
+    "echo ls | batch",
+    "batch -f x.sh",
+]
 
 [[command]]
 name = "atq"
@@ -17,6 +31,7 @@ level = "Inert"
 bare = true
 standalone = ["--help", "-V", "-v"]
 valued = ["-q"]
+examples_denied = ["atq -f x.sh"]
 
 [[command]]
 name = "atrm"
@@ -27,13 +42,4 @@ level = "SafeWrite"
 bare = false
 standalone = ["--help", "-V"]
 max_positional = 16
-
-[[command]]
-name = "batch"
-description = "Alias for `at -b`. Spools a shell-script job (read from stdin or -f file) to run when the system load average drops below 1.5 times the number of active CPUs. Same atrun-based execution model as at(1); jobs run with the invoking user's environment and uid."
-url = "https://man7.org/linux/man-pages/man1/batch.1p.html"
-researched_version = "POSIX at(1); surface frozen"
-level = "SafeWrite"
-bare = true
-standalone = ["--help", "-V", "-m", "-v"]
-valued = ["-f", "-q"]
+examples_denied = ["atrm"]

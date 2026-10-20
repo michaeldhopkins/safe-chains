@@ -80,7 +80,6 @@ asn1Parser x
 astro build
 astro sync
 at
-at x
 atrm
 atrm x
 autoconf
@@ -117,8 +116,6 @@ b64decode
 b64decode x
 b64encode
 b64encode x
-batch
-batch x
 biber
 biber x
 binhex

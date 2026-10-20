@@ -3480,23 +3480,31 @@ astro version -h	inert
 astro version x	inert
 astro x	denied
 at	denied
-at --help	safe-write
-at --help -V	safe-write
-at --help -f x	safe-write
-at --help x	safe-write
+at --help	inert
+at --help -c	safe-write
+at --help -q x	denied
+at --help x	denied
 at --version	denied
-at -V	safe-write
-at -b	safe-write
+at -V	denied
+at -b	denied
 at -c	safe-write
+at -c --help	safe-write
+at -c -c	safe-write
+at -c -d	safe-write
+at -c -l	safe-write
+at -c -q x	safe-write
+at -c -r	safe-write
 at -d	safe-write
-at -f x	safe-write
+at -f x.sh now	denied
 at -l	safe-write
-at -m	safe-write
-at -q x	safe-write
+at -l -f x.sh now	denied
+at -m now + 1 minute	denied
+at -q a now	denied
+at -q x	denied
 at -r	safe-write
-at -t x	safe-write
-at -v	safe-write
-at x	safe-write
+at -t 202601010000	denied
+at now	denied
+at x	denied
 atlas	denied
 atlas --help	inert
 atlas --help --version	denied
@@ -3766,6 +3774,7 @@ atq --help -q x	inert
 atq --help x	inert
 atq --version	denied
 atq -V	inert
+atq -f x.sh	denied
 atq -q x	inert
 atq -v	inert
 atq x	inert
