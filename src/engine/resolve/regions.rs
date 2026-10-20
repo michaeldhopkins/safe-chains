@@ -18,7 +18,10 @@ mod home_spelling;
 pub(crate) use home_spelling::absolute_other_home;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
+mod path_text;
 mod protection;
+use path_text::{at_or_below, ci_starts_with, has_hidden_component};
+mod unicode_spelling;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
@@ -213,34 +216,6 @@ impl Matcher {
             }
         })
     }
-}
-
-/// Whether `inner` sits at or below `outer` as a path, by whole components.
-///
-/// `~/.ssh` is at-or-below `~/.ssh` and `~/.ssh/known_hosts` is below it, but `~/.sshfoo` is not —
-/// hence the component boundary rather than a bare `starts_with`.
-fn at_or_below(inner: &str, outer: &str) -> bool {
-    let inner = inner.trim_end_matches('/');
-    let outer = outer.trim_end_matches('/');
-    // An empty `outer` would make every absolute path read as "below" it. No node roots at `/`
-    // today, so this is a fail-closed backstop rather than a live case: nothing NAMES a node that
-    // claims the whole filesystem.
-    if outer.is_empty() {
-        return false;
-    }
-    inner == outer || inner.strip_prefix(outer).is_some_and(|rest| rest.starts_with('/'))
-}
-
-/// Whether `remainder` (a path below a grant root) contains a hidden component — a dotfile/
-/// dotdir like `.ssh`, `.env`, `.git-credentials`. Credentials and config live in these, so a
-/// broad grant must not sweep them up; grant such a directory explicitly to reach inside it.
-fn has_hidden_component(remainder: &str) -> bool {
-    remainder.split('/').any(|seg| seg.len() > 1 && seg.starts_with('.'))
-}
-
-/// ASCII-case-insensitive `starts_with`, zero-alloc (for case-folded shield matching).
-fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
-    haystack.len() >= prefix.len() && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
 }
 
 struct Node {
@@ -787,6 +762,9 @@ fn base_region(path: &str) -> Role {
     // swallowing something sensitive underneath it.
     if let Some(node) = secret_node(path) {
         return node.role;
+    }
+    if let Some(role) = unicode_spelling::shield_role(path) {
+        return role;
     }
 
     let mut best: Option<(usize, Role)> = None;

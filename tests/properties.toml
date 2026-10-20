@@ -156,6 +156,7 @@ owed = [
 "src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses"]
 "src/registry/dispatch/credential_args.rs" = ["a_credential_name_is_found_in_any_position"]
 "src/engine/resolve/regions/home_spelling.rs" = ["a_prefix_strips_in_any_case_only_at_a_component_boundary"]
+"src/engine/resolve/regions/path_text.rs" = ["a_path_is_below_a_root_only_past_a_component_boundary", "the_folded_prefix_agrees_with_lowercasing", "a_hidden_component_is_found_wherever_it_is"]
 "src/engine/archetype.rs" = []
 "src/engine/authoring.rs" = [
   "union_levels_admit_everything_but_their_declared_gap",
@@ -552,6 +553,7 @@ owed = [
 "src/engine/resolve/regions/metadata.rs" = "reads the process-wide region table and the running OS"
 "src/engine/resolve/regions/hypothetical.rs" = "holds the thread-local hypothetical grant and reads HOME"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
+"src/engine/resolve/regions/unicode_spelling.rs" = "reads the process-wide region table and HOME"
 "src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
 "src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"
 "src/handlers/android/mod.rs" = "module declaration only"

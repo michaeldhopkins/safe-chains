@@ -40,13 +40,16 @@ pub(crate) fn frozen_names() -> Vec<&'static str> {
 }
 
 fn component_may_name(component: &str, name: &str, fold: bool) -> bool {
+    if let Some(pattern) = super::unicode_spelling::wildcard_component(component) {
+        return glob_may_match(&pattern, name);
+    }
     if component.contains(['*', '?', '[']) {
         return glob_may_match(component, name);
     }
     if fold { component.eq_ignore_ascii_case(name) } else { component == name }
 }
 
-fn glob_may_match(pattern: &str, name: &str) -> bool {
+pub(super) fn glob_may_match(pattern: &str, name: &str) -> bool {
     if name.starts_with('.') && !pattern.starts_with('.') {
         return false;
     }
