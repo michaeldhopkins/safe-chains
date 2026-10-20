@@ -22,6 +22,7 @@ macro_rules! handler_module {
 }
 
 pub mod android;
+mod cargo_runs_this;
 pub mod coreutils;
 pub mod df;
 mod env_print;

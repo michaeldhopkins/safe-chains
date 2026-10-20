@@ -17,7 +17,7 @@ static classifier must not, and it would be TOCTOU-racy anyway):
   `$PATH`, and standard bin paths, are trusted.)
 - A hard link is not seen: two names for one file are two paths.
 
-Three deliberate exceptions read the filesystem, all racing the shell (accepted in
+Four deliberate exceptions read the filesystem, all racing the shell (accepted in
 `docs/design/hard-problems.md` HP-5); keep them the only ones:
 
 - A glob starting with a pattern character (`ls *`) is listed against the known working directory at
@@ -31,6 +31,10 @@ Three deliberate exceptions read the filesystem, all racing the shell (accepted 
   for a write-frozen name (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) and is judged as writing the first
   one it finds (`src/engine/resolve/frozen_reach.rs`). A walk that follows links also reports each
   link out of the tree (`src/engine/resolve/frozen_walk.rs`).
+- A `cargo run` whose arguments could change safe-chains' own rules reads the nearest `Cargo.toml`
+  when no `--bin`, `--example` or `-p` says which binary runs, so the check applies only to this
+  project (`src/handlers/cargo_runs_this.rs`). An unknown folder or a manifest with no package of
+  its own counts as this project.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`

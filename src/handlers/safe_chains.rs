@@ -78,6 +78,9 @@ pub(crate) fn cargo_run_reaches_a_rule_change(tokens: &[Token]) -> bool {
     {
         return false;
     }
+    if !super::cargo_runs_this::runs_safe_chains(tokens, k) {
+        return false;
+    }
     let mut as_safe_chains = vec![Token::from_raw("safe-chains".to_string())];
     as_safe_chains.extend(arguments.iter().cloned());
     !check_safe_chains(&as_safe_chains).is_allowed()
@@ -192,7 +195,6 @@ mod tests {
             "FOO=1 cargo run -- config add zz",
             "(cargo run -- mcp)",
             "ls && cargo run -- config add zz",
-            "cargo run --bin x config add zz",
             "cargo run --features a,b -- mcp",
             "echo mcp | xargs cargo run --",
         ] {
@@ -205,7 +207,7 @@ mod tests {
         for cmd in [
             "cargo run", "cargo run -- config list", "cargo run -- 'git status'", "cargo run --release -- --explain 'cat foo'",
             "cargo run -q -- hook claude", "cargo run -- ./input.txt", "cargo run --manifest-path ./sub/Cargo.toml",
-            "cargo run --bin config", "cargo run -p mcp -- ~/notes", "cargo run -- 'cat *.txt'",
+            "cargo run --bin config", "cargo run -p mcp -- ~/notes", "cargo run -- 'cat *.txt'", "cargo run --bin x config add zz",
         ] {
             assert!(verdict(cmd).is_allowed(), "{cmd} should be approved");
         }

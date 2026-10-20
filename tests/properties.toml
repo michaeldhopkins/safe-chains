@@ -528,6 +528,7 @@ owed = [
 "src/allowlist.rs" = "reads Claude Code's settings files for permissions.allow patterns"
 "src/bin/gen_fuzz_corpus.rs" = "writes the fuzz dictionary and seed files"
 "src/cli.rs" = "clap argument declarations only"
+"src/handlers/cargo_runs_this.rs" = "reads the nearest Cargo.toml to learn which package cargo run starts"
 "src/config_cli.rs" = "prints what a config change did and exits"
 "src/decisionlog.rs" = "appends to the decision log under HOME"
 "src/docs.rs" = "renders the command docs and writes the mdbook tree"
