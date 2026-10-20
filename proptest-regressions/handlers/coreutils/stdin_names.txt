@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 48c7f384db3e62f3c49571e7c562c503d657a426eec542136f0346721a0aae85 # shrinks to name = "./notes.txt", line = "cpio -o"

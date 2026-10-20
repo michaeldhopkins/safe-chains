@@ -1333,7 +1333,7 @@ mod behavior_specs {
         // the glued-flag gate must NOT over-deny a worktree path or a non-path delimiter value
         spec_openssl_glued_in_worktree: "openssl asn1parse -in=./cert.pem",
         spec_aria2c_shortglued_worktree: "aria2c -oout.zip http://x/f",
-        spec_cpio_cluster_worktree: "cpio -oO ./archive.cpio",
+        spec_cpio_cluster_worktree: "find ./src | cpio -oO ./archive.cpio",
         spec_base64_wrap_zero: "base64 -w0 f",
         spec_xxd_cols: "xxd -c16 f",
         spec_scp_identity_download: "scp -i ~/.ssh/key host:f ./",

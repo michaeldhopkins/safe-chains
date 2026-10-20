@@ -236,6 +236,9 @@ owed = [
 "src/handlers/coreutils/rsync_shell.rs" = [
   "a_remote_shell_other_than_ssh_is_never_approved",
 ]
+"src/handlers/coreutils/stdin_names.rs" = [
+  "a_name_from_stdin_is_approved_only_where_reading_it_is",
+]
 "src/handlers/coreutils/awk.rs" = [
   "an_awk_program_that_runs_code_is_never_approved",
   "the_surroundings_alone_are_approved",

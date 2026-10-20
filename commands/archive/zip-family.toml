@@ -1,7 +1,7 @@
 [[command]]
 writes_cwd = "named"
 name = "zip"
-description = "Info-ZIP zip — package and compress files into a .zip archive. Bare `zip archive files...` adds entries; -u/--update and -f/--freshen update; -d/--delete removes entries; -U/--copy copies entries between archives; -FS synchronizes archive with the filesystem (can delete archive entries); -F/-FF repair. -e/--encrypt prompts for a password and encrypts entries using the legacy (weak) ZIP encryption. -T tests after building; -@ reads file list from stdin."
+description = "Info-ZIP zip — package and compress files into a .zip archive. Bare `zip archive files...` adds entries; -u/--update and -f/--freshen update; -d/--delete removes entries; -U/--copy copies entries between archives; -FS synchronizes archive with the filesystem (can delete archive entries); -F/-FF repair. -e/--encrypt prompts for a password and encrypts entries using the legacy (weak) ZIP encryption. -T tests after building; -@ reads file list from stdin; each name is judged as the path the previous stage of the pipeline prints, and a list from nowhere that can be checked is refused."
 url = "https://infozip.sourceforge.net/Zip.html"
 examples_safe = ["zip -r ./out.zip ./src"]
 researched_version = "Info-ZIP 3.0 (2008-07-07)"

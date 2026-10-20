@@ -8,6 +8,7 @@ mod net;
 pub(crate) mod rsync_remote;
 pub(crate) mod rsync_shell;
 pub(crate) mod sed;
+pub(crate) mod stdin_names;
 mod tar;
 
 use crate::parse::Token;

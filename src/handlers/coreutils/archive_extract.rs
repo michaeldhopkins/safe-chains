@@ -52,26 +52,34 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
 /// The option letters and long options given, everywhere and in front of the first operand,
 /// skipping the value each value-taking letter consumes. cpio's list is the union of bsdcpio's and GNU
 /// cpio's (`-D` dir, `-M` message), so `cpio -Dt -i` extracts into `t` rather than listing.
-struct Given<'a> {
-    anywhere: String,
+pub(super) struct Given<'a> {
+    pub(super) anywhere: String,
     leading: String,
-    long_anywhere: Vec<&'a str>,
+    pub(super) long_anywhere: Vec<&'a str>,
     long_leading: Vec<&'a str>,
+    pub(super) operands: Vec<&'a str>,
 }
 
 impl<'a> Given<'a> {
-    fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
+    pub(super) fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
         let takes_a_value: &[char] = match command {
             "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
             "ptar" => &['T', 'f'],
             "cpio" => &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W', 'f'],
             _ => &[],
         };
-        let mut given = Given { anywhere: String::new(), leading: String::new(), long_anywhere: Vec::new(), long_leading: Vec::new() };
+        let mut given = Given {
+            anywhere: String::new(),
+            leading: String::new(),
+            long_anywhere: Vec::new(),
+            long_leading: Vec::new(),
+            operands: Vec::new(),
+        };
         let mut operand_seen = false;
         let mut words = arguments.iter().map(Token::as_str);
         while let Some(word) = words.next() {
             if word == "--" {
+                given.operands.extend(words.by_ref());
                 break;
             }
             if word.starts_with("--") {
@@ -86,6 +94,7 @@ impl<'a> Given<'a> {
             }
             let Some(cluster) = word.strip_prefix('-').filter(|c| !c.is_empty()) else {
                 operand_seen = true;
+                given.operands.push(word);
                 continue;
             };
             for (at, c) in cluster.char_indices() {
@@ -124,8 +133,8 @@ mod tests {
         cpio_list: "cpio -it",
         cpio_list_spaced: "cpio -i -t",
         cpio_list_long: "cpio --extract --list",
-        cpio_create: "cpio -o",
-        cpio_pass_through: "cpio -p ./dst",
+        cpio_create: "find ./src | cpio -o",
+        cpio_pass_through: "find ./src | cpio -p ./dst",
         cpio_list_file_named_i: "cpio -t -F i",
         ditto_copy: "ditto ./src ./dst",
         ditto_archive: "ditto -c -k ./src ./out.zip",
