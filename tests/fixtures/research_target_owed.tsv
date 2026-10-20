@@ -665,7 +665,7 @@ krew	description,examples,no-tolerance,profiled
 kswitch	description,examples
 ktlint	examples,version
 ktrace	description,examples,no-tolerance,profiled
-kubectl	examples,no-tolerance,version
+kubectl	no-tolerance,version
 kubectx	description,examples,version
 kubens	description,examples,version
 kustomize	examples,version

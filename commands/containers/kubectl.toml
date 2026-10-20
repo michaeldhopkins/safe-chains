@@ -1,8 +1,10 @@
 [[command]]
 name = "kubectl"
-description = "Primary CLI for Kubernetes cluster management with a large and growing surface area. Read-only subcommands (get, describe, logs, events, top, explain, api-resources, api-versions, cluster-info, auth can-i/whoami, config view/get-contexts, diff, version) query cluster state. Write subcommands (apply, delete, create, edit, patch, scale, rollout, label, annotate, taint, cordon, drain) modify cluster resources. exec and port-forward open network connections into pods and can execute arbitrary code. cp copies files to/from containers. Kubernetes releases three times per year and kubectl gains new flags and subcommands in each release (e.g. --subresource was added across multiple subcommands in v1.35)."
+description = "Primary CLI for Kubernetes cluster management with a large and growing surface area. Read-only subcommands (get, describe, logs, events, top, explain, api-resources, api-versions, cluster-info, auth can-i/whoami, config view/get-contexts, diff, version) query cluster state. Write subcommands (apply, delete, create, edit, patch, scale, rollout, label, annotate, taint, cordon, drain) modify cluster resources. exec and port-forward open network connections into pods and can execute arbitrary code. cp copies files to/from containers. Kubernetes releases three times per year and kubectl gains new flags and subcommands in each release (e.g. --subresource was added across multiple subcommands in v1.35). config view --raw is refused: it prints the kubeconfig with its tokens, keys and passwords, which config view otherwise redacts."
 url = "https://kubernetes.io/docs/reference/kubectl/"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = ["kubectl config view", "kubectl config view --flatten --minify"]
+examples_denied = ["kubectl config view --raw", "kubectl config view --flatten --raw", "kubectl config view --raw=true"]
 
 [[command.sub]]
 name = "api-resources"
@@ -38,7 +40,7 @@ standalone = ["--help", "--no-headers", "-h"]
 valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "view"
-standalone = ["--flatten", "--help", "--minify", "--raw", "-h"]
+standalone = ["--flatten", "--help", "--minify", "-h"]
 valued = ["--output", "-o"]
 
 [[command.sub]]

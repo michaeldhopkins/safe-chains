@@ -107,6 +107,19 @@ deny	read-shield	cat ~/.claude.json
 deny	read-shield	jq .mcpServers ~/.claude.json
 deny	read-shield	grep token ~/.codex/auth.json
 deny	read-shield	jq . ~/.claude/.credentials.json
+deny	read-shield	cat ~/.config/hub
+deny	read-shield	cat ~/.s3cfg
+deny	read-shield	cat ~/.env
+deny	read-shield	cat ~/.cursor/mcp.json
+deny	read-shield	cat ~/.codeium/windsurf/mcp_config.json
+deny	read-shield	cat ~/.continue/config.json
+deny	read-shield	cat ~/.continue/config.yaml
+deny	read-shield	cat ~/.config/goose/config.yaml
+deny	read-shield	cat ~/.config/goose/secrets.yaml
+deny	read-shield	cat ~/.aider.conf.yml
+deny	read-shield	cat ~/.codex/history.jsonl
+deny	read-shield	cat ~/.codex/sessions/2026/10/20/rollout.jsonl
+deny	read-shield	tail -n 5 ~/.codex/history.jsonl
 allow	read-home	cat ~/.codex/config.toml
 allow	read-home	cat ~/.gemini/settings.json
 

@@ -511,6 +511,41 @@ path = "~/.claude.json"
 role = "credential-store"
 note = "Claude Code's user state: its MCP server entries carry the environment and headers given to `claude mcp add`, often API keys, and an API-key sign-in may be kept here."
 researched = "2026-10-20"
+[[region]]
+path = "~/.codex/history.jsonl"
+role = "credential-store"
+note = "Codex CLI's prompt history: every message typed into it, keys and tokens pasted into a prompt among them."
+researched = "2026-10-20"
+[[region]]
+path = "~/.codex/sessions/"
+role = "credential-store"
+note = "Codex CLI's session rollouts: each session's prompts, commands and the output they printed, secrets a command printed among them."
+researched = "2026-10-20"
+[[region]]
+path = "~/.cursor/mcp.json"
+role = "credential-store"
+note = "Cursor's global MCP servers, with the environment and headers given to each, often API keys."
+researched = "2026-10-20"
+[[region]]
+path = "~/.codeium/windsurf/mcp_config.json"
+role = "credential-store"
+note = "Windsurf's MCP servers, with the environment and headers given to each, often API keys."
+researched = "2026-10-20"
+[[region]]
+path = "~/.continue/"
+role = "credential-store"
+note = "Continue's folder: config.yaml and the older config.json give each model its provider's apiKey, and .env and the session store sit beside them. Shielded whole, since config.json and config.yaml are too common to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.config/goose/"
+role = "credential-store"
+note = "Goose's folder: config.yaml holds its extensions' environment, often API keys, and secrets.yaml its provider keys when no system keyring holds them. Shielded whole, since config.yaml is too common to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.aider.conf.yml"
+role = "credential-store"
+note = "aider's user config, which may set openai-api-key, anthropic-api-key and other api-key entries."
+researched = "2026-10-20"
 
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
@@ -568,6 +603,21 @@ path = "~/.config/gh/"
 role = "credential-store"
 note = "GitHub CLI OAuth token (hosts.yml)."
 researched = "2026-07-12"
+[[region]]
+path = "~/.config/hub"
+role = "credential-store"
+note = "hub's config: the GitHub oauth_token it signs in with."
+researched = "2026-10-20"
+[[region]]
+path = "~/.s3cfg"
+role = "credential-store"
+note = "s3cmd's config: access_key and secret_key in plain text."
+researched = "2026-10-20"
+[[region]]
+path = "~/.env"
+role = "credential-store"
+note = "A dotenv file in the home folder, which aider and other tools load for their API keys. A project's own .env is not covered here."
+researched = "2026-10-20"
 [[region]]
 path = "~/.config/gcloud/"
 role = "credential-store"
