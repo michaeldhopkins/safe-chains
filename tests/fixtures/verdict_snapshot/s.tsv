@@ -1481,12 +1481,14 @@ screen --version	safe-read
 screen -A	safe-read
 screen -A -dm	denied
 screen -D	safe-read
+screen -D -R work	safe-read
 screen -D -m	denied
 screen -Dm	denied
 screen -L	safe-read
 screen -O	safe-read
 screen -Q windows	denied
 screen -R	safe-read
+screen -R work sh -c id	denied
 screen -S work -X exec rm -rf ~	denied
 screen -S work -X stuff 'rm -rf ~\\n'	denied
 screen -S work -d -m	denied
@@ -1502,20 +1504,32 @@ screen -dm	denied
 screen -dm sh -c 'rm -rf ~'	denied
 screen -dmS work	denied
 screen -dmS work rm -rf ~	denied
+screen -dmr work	denied
+screen -dr work	safe-read
 screen -e x	safe-read
-screen -h	safe-read
+screen -h 5000 -r work	safe-read
+screen -h x	safe-read
 screen -l	safe-read
 screen -list	safe-read
+screen -list work	safe-read
 screen -ls	safe-read
+screen -ls work	safe-read
 screen -m	denied
 screen -p x	safe-read
 screen -q	safe-read
+screen -q sh	denied
 screen -r	safe-read
+screen -r work	safe-read
+screen -r work -m	denied
+screen -r work sh	denied
 screen -s /tmp/evil.sh -dm	denied
 screen -t x	safe-read
 screen -v	safe-read
 screen -wipe	safe-read
+screen -wipe work	safe-read
 screen -x	safe-read
+screen -x work	safe-read
+screen sh	denied
 screen sh -c 'rm -rf ~'	denied
 screen x	denied
 screencapture	denied

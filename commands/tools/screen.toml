@@ -1,25 +1,10 @@
 [[command]]
 name = "screen"
-description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r reattaches an existing session; -ls / -list lists sessions; -wipe cleans up dead sessions. Sessions create utmp records and persist after detach. Entirely local. A positional operand is the program the new window runs (`screen sh -c '...'`), -s names the shell program, -c reads a screenrc whose `screen` lines start programs, and -X / -Q send a command to a running session (`-X stuff` types input into it, `-X exec` runs a program), so each of those executes code of the caller's choosing. -m starts a new session even inside one, and with -d it starts that session detached, needing no terminal: the shell named by $SHELL, and the rc file named by $SCREENRC or $SYSSCREENRC, then run unseen."
+description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r and -x reattach an existing session, -d / -D detach one, and each may be followed by the session's name; -ls / -list lists sessions and -wipe cleans up dead ones, either optionally matching a name; -h N sets the scrollback length. Sessions create utmp records and persist after detach. Entirely local. A positional operand is the program the new window runs (`screen sh -c '...'`), -s names the shell program, -c reads a screenrc whose `screen` lines start programs, and -X / -Q send a command to a running session (`-X stuff` types input into it, `-X exec` runs a program), so each of those executes code of the caller's choosing. -m starts a new session even inside one, and with -d it starts that session detached, needing no terminal: the shell named by $SHELL, and the rc file named by $SCREENRC or $SYSSCREENRC, then run unseen."
 url = "https://www.gnu.org/software/screen/manual/screen.html"
 researched_version = "GNU screen 5.0 (matches macOS-shipped screen)"
-level = "SafeRead"
-max_positional = 0
-standalone = [
-    "-a", "-A",
-    "-d", "-D",
-    "-h", "--help",
-    "-l", "-L",
-    "-list", "-ls",
-    "-O",
-    "-q",
-    "-r", "-R",
-    "-U",
-    "-v", "--version",
-    "-wipe",
-    "-x",
-]
-valued = ["-e", "-p", "-S", "-t", "-T"]
+handler = "screen"
+examples_safe = ["screen -r work", "screen -dr work", "screen -x work", "screen -ls work", "screen -h 5000 -r work"]
 examples_denied = [
     "screen sh -c 'rm -rf ~'",
     "screen -dm sh -c 'rm -rf ~'",
@@ -40,3 +25,22 @@ examples_denied = [
     "screen -A -dm",
     "screen -U -dmS work",
 ]
+
+[command.fallback]
+level = "SafeRead"
+max_positional = 0
+standalone = [
+    "-a", "-A",
+    "-d", "-D",
+    "--help",
+    "-l", "-L",
+    "-list", "-ls",
+    "-O",
+    "-q",
+    "-r", "-R",
+    "-U",
+    "-v", "--version",
+    "-wipe",
+    "-x",
+]
+valued = ["-e", "-h", "-p", "-S", "-t", "-T"]
