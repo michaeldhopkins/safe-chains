@@ -21,6 +21,7 @@ ${cmd} log	denied
 (ls | rm -rf /)	denied
 (ls)	inert
 (ls) && echo done	inert
+(open x.command)	denied
 (rm -rf /)	denied
 (x=1)	inert
 (x=1; ls)	inert
@@ -28,6 +29,7 @@ ${cmd} log	denied
 ./vendor/bin/pest --no-progress	safe-read
 ./vendor/bin/phpstan analyse --no-progress	inert
 ./vendor/bin/phpunit --testsuite Unit	safe-read
+/usr/bin/open x.command	denied
 :	inert
 : && echo hello	inert
 : --help	denied

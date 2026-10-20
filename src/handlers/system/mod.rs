@@ -1,3 +1,4 @@
+pub(crate) mod open;
 pub(crate) mod plutil;
 pub(crate) mod ssh;
 pub(crate) mod sysctl;

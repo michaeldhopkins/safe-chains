@@ -1352,32 +1352,57 @@ opam version -h	inert
 opam version x	inert
 opam x	denied
 open	safe-read
-open --arch x	safe-read
-open --env x	safe-read
+open 'x.command'	denied
+open -- -x.command	denied
+open --env DYLD_INSERT_LIBRARIES=x.dylib Foo.app	denied
+open --env DYLD_INSERT_LIBRARIES=x.dylib https://example.com	denied
 open --help	denied
-open --stderr x	safe-read
-open --stdin x	safe-read
-open --stdout x	safe-read
+open --reveal x.command	denied
+open --stdin in.txt Foo.app	denied
+open --stdout out.txt https://example.com	denied
 open --version	denied
 open -F	safe-read
-open -F --arch x	safe-read
 open -F -R	safe-read
-open -F x	safe-read
+open -F -u x	denied
+open -F x	denied
 open -R	safe-read
+open -R Build/Foo.app	safe-read
+open -R target/release/app	safe-read
 open -W	safe-read
-open -a x	safe-read
-open -b x	safe-read
+open -W https://example.com	safe-read
+open -a Terminal https://example.com	denied
+open -a Terminal x.sh	denied
+open -b com.apple.Terminal x.sh	denied
 open -e	safe-read
+open -e -u file:///tmp/x.command	denied
+open -e notes.command	safe-read
 open -f	safe-read
+open -f x.command	denied
 open -g	safe-read
+open -gR x.command	safe-read
 open -h	safe-read
 open -j	safe-read
 open -n	safe-read
-open -s x	safe-read
+open -n Foo.app	denied
+open -n https://example.com	safe-read
 open -t	safe-read
-open -u x	safe-read
+open -t script.sh	safe-read
+open -u file:///tmp/x.command	denied
+open -u https://example.com	safe-read
+open -u x	denied
+open -uW https://example.com x.command	denied
+open .	denied
+open Foo.app	denied
+open HTTPS://example.com	safe-read
+open README.md	denied
+open file:///tmp/x.command	denied
+open http://localhost:8097/	safe-read
 open https://example.com	safe-read
-open x	safe-read
+open https://example.com --args -x	denied
+open https://example.com x.command	denied
+open x	denied
+open x.command	denied
+open x.sh	denied
 opencode	denied
 opencode --help	inert
 opencode --help --version	denied

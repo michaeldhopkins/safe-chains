@@ -72,6 +72,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("df", df::check_df as HandlerFn),
         ("fd", fd::check_fd as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
+        ("open", system::open::check_open as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
         ("safe_chains", safe_chains::check_safe_chains as HandlerFn),

