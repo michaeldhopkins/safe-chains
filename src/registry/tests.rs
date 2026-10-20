@@ -2161,6 +2161,19 @@ fn credential_first_arg_gates_every_secret_name_form() {
     ] {
         assert!(!crate::is_safe_command(c), "a pattern that could spell a credential name must deny: {c}");
     }
+    // A listed valued short flag may carry its value glued on, as pflag reads it.
+    for c in [
+        "kubectl get -oyaml pods", "kubectl get -nx pods", "kubectl get -lapp=x pods", "kubectl get -nsecrets pods",
+        "kubectl get -nx -oyaml pods", "kubectl get -ojsonpath={.items} pods",
+    ] {
+        assert!(crate::is_safe_command(c), "a glued listed value must allow: {c}");
+    }
+    for c in [
+        "kubectl get -oyaml secrets", "kubectl get -nx secret/db", "kubectl get -lapp=x pods,secrets", "kubectl get -oyaml pods secrets",
+        "kubectl get -Xyaml pods", "kubectl get -wyaml pods",
+    ] {
+        assert!(!crate::is_safe_command(c), "a glued value must not hide a credential or an unlisted flag: {c}");
+    }
     for c in ["kubectl get pod*", "kubectl get p?ds", "kubectl get d?ployments", "aws configure get reg*", "kubectl get deploy*"] {
         assert!(crate::is_safe_command(c), "a pattern no credential name fits must allow: {c}");
     }
