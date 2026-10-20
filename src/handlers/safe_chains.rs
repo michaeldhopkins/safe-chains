@@ -52,6 +52,41 @@ pub fn check_safe_chains(tokens: &[Token]) -> Verdict {
     }
 }
 
+pub(crate) fn cargo_run_reaches_a_rule_change(tokens: &[Token]) -> bool {
+    let Some(run_at) = tokens.iter().skip(1).position(|t| t.as_str() == "run").map(|p| p + 1) else {
+        return false;
+    };
+    let valued = registry::sub_valued_flags("cargo", "run").unwrap_or_default();
+    let mut k = run_at + 1;
+    while k < tokens.len() {
+        let word = tokens[k].as_str();
+        if word == "--" {
+            k += 1;
+            break;
+        }
+        if !word.starts_with('-') || word == "-" {
+            break;
+        }
+        k += if valued.iter().any(|v| v == word) { 2 } else { 1 };
+    }
+    let Some(arguments) = tokens.get(k..) else {
+        return false;
+    };
+    if !arguments
+        .iter()
+        .any(|t| matches!(t.as_str(), "config" | "mcp") || could_change_at_run_time(t.as_str()))
+    {
+        return false;
+    }
+    let mut as_safe_chains = vec![Token::from_raw("safe-chains".to_string())];
+    as_safe_chains.extend(arguments.iter().cloned());
+    !check_safe_chains(&as_safe_chains).is_allowed()
+}
+
+fn could_change_at_run_time(word: &str) -> bool {
+    word.contains(['$', '`', '*', '?', '[', '{']) || word.contains("__SAFE_CHAINS") || word.contains("sc_item")
+}
+
 /// Every word clap reads as a subcommand.
 const SUBCOMMANDS: &[&str] = &["config", "help", "hook", "mcp"];
 
@@ -140,6 +175,43 @@ mod tests {
     }
 
     #[test]
+    fn running_this_project_to_change_the_rules_is_never_approved() {
+        for cmd in [
+            "cargo run -- config add zz",
+            "cargo run config add zz",
+            "cargo run -q -- config grant ~/x --write",
+            "cargo run --release -- --log config remove command zz",
+            "cargo run --bin safe-chains -- mcp",
+            "cargo +nightly run -- mcp",
+            "cargo -q run -- config add zz",
+            "cargo run -- $'mcp'",
+            "cargo run -- $(printf mcp)",
+            "cargo run -- m*",
+            "cargo run -- 'config' add zz",
+            "/usr/bin/env cargo run -- config add zz",
+            "FOO=1 cargo run -- config add zz",
+            "(cargo run -- mcp)",
+            "ls && cargo run -- config add zz",
+            "cargo run --bin x config add zz",
+            "cargo run --features a,b -- mcp",
+            "echo mcp | xargs cargo run --",
+        ] {
+            assert!(!verdict(cmd).is_allowed(), "{cmd} must not be approved");
+        }
+    }
+
+    #[test]
+    fn running_this_project_for_anything_else_is_unaffected() {
+        for cmd in [
+            "cargo run", "cargo run -- config list", "cargo run -- 'git status'", "cargo run --release -- --explain 'cat foo'",
+            "cargo run -q -- hook claude", "cargo run -- ./input.txt", "cargo run --manifest-path ./sub/Cargo.toml",
+            "cargo run --bin config", "cargo run -p mcp -- ~/notes", "cargo run -- 'cat *.txt'",
+        ] {
+            assert!(verdict(cmd).is_allowed(), "{cmd} should be approved");
+        }
+    }
+
+    #[test]
     fn checking_a_command_that_mentions_config_is_unaffected() {
         assert!(verdict("safe-chains 'git config --get user.name'").is_allowed());
         assert!(verdict("safe-chains --explain 'cat foo'").is_allowed());
@@ -169,6 +241,20 @@ mod properties {
         ) {
             prop_assume!(!(before.is_empty() && sub == "config" && matches!(after.as_slice(), [flag] if flag == "-h" || flag == "--help")));
             let cmd = format!("safe-chains {} {sub} {}", before.join(" "), after.join(" "));
+            prop_assert!(!crate::command_verdict(&cmd).is_allowed(), "{}", cmd);
+        }
+
+        /// The same holds when `cargo run` starts this project's binary with those words.
+        #[test]
+        fn no_rule_change_is_approved_through_cargo_run(
+            cargo_flags in prop::collection::vec(prop::sample::select(vec!["-q", "--release", "--bin safe-chains", "-p safe-chains", "--offline"]), 0..3),
+            separator in prop::sample::select(vec!["--", ""]),
+            before in prop::collection::vec(prop::sample::select(vec!["--log", "--explain", "--level yolo", "-v"]), 0..3),
+            sub in prop::sample::select(vec!["config add", "config remove command", "config remove grant", "config grant", "mcp", "config", "$'mcp'", "m*", "$(printf mcp)", "c* add", "`echo mcp`", "[m]cp"]),
+            after in prop::collection::vec("[a-z~/.-]{1,8}", 0..4),
+        ) {
+            prop_assume!(!(sub == "config" && after.first().is_some_and(|a| a == "-h")));
+            let cmd = format!("cargo run {} {separator} {} {sub} {}", cargo_flags.join(" "), before.join(" "), after.join(" "));
             prop_assert!(!crate::command_verdict(&cmd).is_allowed(), "{}", cmd);
         }
     }

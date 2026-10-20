@@ -335,7 +335,7 @@ owed = [
   "check_laravel_cache_clear_safe_write_survives_inert_flag_insertion",
 ]
 "src/handlers/ruby/bundle.rs" = []
-"src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved"]
+"src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved", "no_rule_change_is_approved_through_cargo_run"]
 "src/handlers/shell.rs" = [
   "loop_control_bare_or_single_digit_is_inert",
   "loop_control_other_inputs_are_denied",

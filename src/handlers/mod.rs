@@ -115,7 +115,20 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
     if verdict.is_allowed() && crate::pathgate::should_deny(crate::registry::canonical_name(cmd), tokens) {
         return Verdict::Denied;
     }
+    if verdict.is_allowed() && refuses_its_arguments(tokens) {
+        return Verdict::Denied;
+    }
     verdict
+}
+
+pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
+    let Some(first) = tokens.first() else {
+        return false;
+    };
+    match crate::registry::canonical_name(first.command_name()) {
+        "cargo" => safe_chains::cargo_run_reaches_a_rule_change(tokens),
+        _ => false,
+    }
 }
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
