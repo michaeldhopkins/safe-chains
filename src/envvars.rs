@@ -269,7 +269,9 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
 /// with arguments) may be a planted script.
 fn shell_program_verdict(value: &str) -> Verdict {
     const STD_BINS: &[&str] = &["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
-    let name = STD_BINS.iter().find_map(|p| value.strip_prefix(p)).unwrap_or(value);
+    let Some(name) = STD_BINS.iter().find_map(|p| value.strip_prefix(p)) else {
+        return Verdict::Denied;
+    };
     let plain =
         !name.is_empty() && name != "." && name != ".." && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'));
     if plain { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
@@ -613,12 +615,13 @@ mod integration_tests {
             "SHELL=./x.sh tmux new -d", "SHELL=~/bin/zsh tmux new -d", "SHELL='/bin/sh -c id' tmux new -d",
             "SHELL=/bin/../tmp/x tmux new -d", "SCREENRC=./evil.rc screen -r", "SCREENRC=/tmp/evil.rc screen",
             "SYSSCREENRC=/tmp/evil.rc screen", "env SCREENRC=./evil.rc screen", "export SCREENRC=./evil.rc && screen",
-            "export SYSSCREENRC=./evil.rc; screen",
+            "export SYSSCREENRC=./evil.rc; screen", "SHELL=bash screen -r x", "SHELL=x.sh screen -r x", "export SHELL=zsh; screen -r x",
+            "env SHELL=sh screen -x x", "SHELL=bash tmux new -d", "SHELL=x.sh tmux new -d",
         ] {
             assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
         }
         for cmd in
-            ["SHELL=/bin/zsh tmux new -d", "SHELL=/opt/homebrew/bin/fish tmux new -d", "SHELL=bash tmux new -d", "SHELL= tmux new -d"]
+            ["SHELL=/bin/zsh tmux new -d", "SHELL=/opt/homebrew/bin/fish tmux new -d", "SHELL=/bin/zsh screen -r x", "SHELL= tmux new -d"]
         {
             assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
         }
