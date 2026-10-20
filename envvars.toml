@@ -180,6 +180,62 @@ measured = false
 [env.PS4]
 shape = "opaque"
 because = "expanded before each traced command, so a command substitution in it runs once tracing is on (measured: executes with SHELLOPTS=xtrace)"
+[env.PROMPT_COMMAND]
+shape = "command"
+because = "an interactive bash runs it before each prompt, so a shell tmux or screen starts for a new window runs it with nothing on the screen"
+measured = false
+[env.PS0]
+shape = "opaque"
+because = "an interactive bash expands it after reading each command, so a command substitution in it runs"
+measured = false
+[env.PS1]
+shape = "opaque"
+because = "an interactive bash or ksh expands it before each prompt, so a command substitution in it runs (zsh too with PROMPT_SUBST)"
+measured = false
+[env.PS2]
+shape = "opaque"
+because = "expanded like PS1 before each continuation line"
+measured = false
+[env.PS3]
+shape = "opaque"
+because = "the select prompt, expanded like PS1 by ksh and zsh"
+measured = false
+[env.PROMPT]
+shape = "opaque"
+because = "zsh's name for PS1, expanded before each prompt, so a command substitution in it runs with PROMPT_SUBST"
+measured = false
+[env.PROMPT2]
+shape = "opaque"
+because = "zsh's name for PS2"
+measured = false
+[env.PROMPT3]
+shape = "opaque"
+because = "zsh's name for PS3"
+measured = false
+[env.PROMPT4]
+shape = "opaque"
+because = "zsh's name for PS4, expanded before each traced command"
+measured = false
+[env.RPROMPT]
+shape = "opaque"
+because = "zsh's right-hand prompt, expanded like PROMPT"
+measured = false
+[env.RPS1]
+shape = "opaque"
+because = "zsh's other name for RPROMPT"
+measured = false
+[env.RPROMPT2]
+shape = "opaque"
+because = "zsh's right-hand continuation prompt"
+measured = false
+[env.RPS2]
+shape = "opaque"
+because = "zsh's other name for RPROMPT2"
+measured = false
+[env.SPROMPT]
+shape = "opaque"
+because = "zsh's spelling-correction prompt, expanded like PROMPT"
+measured = false
 [env."BASH_FUNC_*"]
 shape = "opaque"
 because = "bash imports BASH_FUNC_<name>%% as a function definition, so the command it names runs the value's body instead (measured: executes)"
