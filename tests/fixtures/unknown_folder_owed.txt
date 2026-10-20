@@ -945,7 +945,6 @@ psktool x
 ptar
 ptar x
 ptargrep
-ptargrep x
 pyenv local
 pyupgrade
 pyupgrade x

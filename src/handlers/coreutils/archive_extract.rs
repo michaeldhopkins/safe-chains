@@ -17,6 +17,9 @@ use crate::parse::Token;
 /// against `..`, absolute paths and symlinks, so it is refused as extraction is. pax's `-s`
 /// rewrites each member's name by a regular expression, so where a copy writes is no longer the
 /// path it was given, and it is refused too.
+///
+/// ptar extracts with `-x`, and ptargrep extracts every member that matches unless `-l` or
+/// `--list-only` comes before the first operand (Getopt::Long stops there under POSIXLY_CORRECT).
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
@@ -36,6 +39,11 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
                 || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
         }
         "ditto" => given().anywhere.contains('x'),
+        "ptar" => given().anywhere.contains('x'),
+        "ptargrep" => {
+            let given = given();
+            !(given.leading.contains('l') || given.long_leading.contains(&"--list-only"))
+        }
         "xar" => tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
         _ => false,
     }
@@ -55,6 +63,7 @@ impl<'a> Given<'a> {
     fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
         let takes_a_value: &[char] = match command {
             "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
+            "ptar" => &['T', 'f'],
             "cpio" => &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W', 'f'],
             _ => &[],
         };
@@ -121,6 +130,11 @@ mod tests {
         ditto_copy: "ditto ./src ./dst",
         ditto_archive: "ditto -c -k ./src ./out.zip",
         xar_extract: "xar -x -f ./archive.xar",
+        ptar_list: "ptar -t -f ./a.tar",
+        ptar_create: "ptar -c -f ./out.tar ./src",
+        ptar_list_archive_named_x: "ptar -t -f x",
+        ptargrep_list: "ptargrep -l pattern ./a.tar",
+        ptargrep_list_long: "ptargrep --list-only -i pattern ./a.tar",
     }
 
     denied! {
@@ -143,6 +157,13 @@ mod tests {
         xar_extract_keeping_set_id_bits: "xar -x --keep-setuid -f ./archive.xar",
         pax_extract_write_letter_after_a_pattern: "pax -r -f ./archive.tar '*' -w",
         pax_extract_write_letter_after_an_operand: "pax -r ./a -w ./b",
+        ptar_extract: "ptar -x -f ./a.tar",
+        ptar_extract_cluster: "ptar -xvf ./a.tar",
+        ptar_extract_bare: "ptar -x",
+        ptar_extract_after_the_archive: "ptar -f ./a.tar -x",
+        ptargrep_extracts_matches: "ptargrep pattern ./a.tar",
+        ptargrep_list_letter_after_an_operand: "ptargrep pattern ./a.tar -l",
+        ptargrep_list_after_separator: "ptargrep -- pattern ./a.tar --list-only",
         cpio_pass_through_without_its_defenses: "cpio -p --insecure ./dst",
         cpio_pass_through_without_its_defenses_after: "cpio -pd ./dst --insecure",
         cpio_pass_through_long_without_its_defenses: "cpio --pass-through --insecure ./dst",
