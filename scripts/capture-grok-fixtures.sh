@@ -5,8 +5,10 @@
 #
 # Runs `grok -p` once per mode in a scratch directory, with a `safe-chains` wrapper first on PATH so
 # the installed global hook (`safe-chains hook grok`) runs this checkout's build and logs what it
-# saw and said. Nothing under ~/.grok is changed. Each run spends one short grok turn. Writes only
-# the fixture directory; the interactive outcomes in outcomes.toml are recorded by hand.
+# saw and said. No grok config or hook file is changed (grok -p still writes its own session
+# files). It captures nothing if the installed hook names safe-chains by an absolute path, and
+# reports "the hook was not called". Each run spends one short grok turn. Writes only the
+# fixture directory; the interactive outcomes in outcomes.toml are recorded by hand.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
