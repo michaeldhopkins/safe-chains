@@ -20,6 +20,50 @@ pub(crate) fn sets_an_id_bit(tokens: &[Token]) -> bool {
     false
 }
 
+pub(crate) fn mkdir_mode_sets_an_id_bit(tokens: &[Token]) -> bool {
+    let mut words = tokens[1..].iter().map(Token::as_str);
+    while let Some(word) = words.next() {
+        if word == "--" {
+            return false;
+        }
+        let value = if word == "--mode" {
+            words.next()
+        } else if let Some(value) = word.strip_prefix("--mode=") {
+            Some(value)
+        } else if !word.starts_with("--") && word.len() > 1 && word.starts_with('-') && word.contains('m') {
+            let rest = &word[word.find('m').map_or(word.len(), |at| at + 1)..];
+            if rest.is_empty() { words.next() } else { Some(rest) }
+        } else {
+            continue;
+        };
+        if value.is_none_or(mode_sets_an_id_bit) {
+            return true;
+        }
+    }
+    false
+}
+
+pub(crate) fn rsync_chmod_sets_an_id_bit(tokens: &[Token]) -> bool {
+    let mut words = tokens[1..].iter().map(Token::as_str);
+    while let Some(word) = words.next() {
+        let value = if word == "--chmod" {
+            words.next()
+        } else if let Some(value) = word.strip_prefix("--chmod=") {
+            Some(value)
+        } else {
+            continue;
+        };
+        let Some(value) = value else { return true };
+        if value
+            .split(',')
+            .any(|clause| mode_sets_an_id_bit(clause.strip_prefix(['D', 'F']).unwrap_or(clause)))
+        {
+            return true;
+        }
+    }
+    false
+}
+
 fn is_mode_spelled_as_a_flag(word: &str) -> bool {
     word.len() > 1 && word[1..].chars().all(|c| matches!(c, 'r' | 'w' | 'x' | 'X' | 's' | 't'))
 }
@@ -31,7 +75,11 @@ fn mode_sets_an_id_bit(mode: &str) -> bool {
     {
         return true;
     }
-    mode.split(',').any(clause_sets_an_id_bit)
+    edits_an_acl(mode) || mode.split(',').any(clause_sets_an_id_bit)
+}
+
+fn edits_an_acl(mode: &str) -> bool {
+    mode.as_bytes().windows(2).any(|pair| matches!(pair[0], b'+' | b'-' | b'=') && pair[1] == b'a')
 }
 
 fn clause_sets_an_id_bit(clause: &str) -> bool {
@@ -81,6 +129,12 @@ mod tests {
         chmod_sticky: "chmod +t tmpdir",
         chmod_drop_setuid: "chmod u-s bin/tool",
         chmod_symbolic_list: "chmod -R u+rwX,go-w src",
+        mkdir_mode_plain: "mkdir -m 755 d",
+        mkdir_mode_cluster_plain: "mkdir -pm 0755 d",
+        mkdir_mode_symbolic: "mkdir --mode=u+rwx d",
+        mkdir_parents: "mkdir -p a/b",
+        rsync_chmod_plain: "rsync --chmod=Du+rwx,Fgo-w src/ dst/",
+        rsync_chmod_octal: "rsync --chmod=F644 a b",
     }
 
     denied! {
@@ -111,6 +165,24 @@ mod tests {
         chmod_via_xargs: "echo x | xargs chmod +s",
         chmod_reference_to_a_setuid_file: "chmod --reference=/bin/su x",
         chmod_reference_spaced: "chmod --reference /bin/su x",
+        chmod_acl_add: "chmod +a 'everyone allow write' x",
+        chmod_acl_replace: "chmod =a# 0 'everyone deny read' x",
+        chmod_acl_add_at: "chmod +a# 0 'everyone allow read' x",
+        chmod_acl_inherited: "chmod +ai 'everyone allow read' x",
+        chmod_acl_remove: "chmod -a 'everyone deny read' x",
+        chmod_acl_from_stdin: "chmod -E x",
+        mkdir_mode_setuid: "mkdir -m 4755 d",
+        mkdir_mode_attached: "mkdir -m4755 d",
+        mkdir_mode_long_equals: "mkdir --mode=u+s d",
+        mkdir_mode_long_spaced: "mkdir --mode g+s d",
+        mkdir_mode_cluster: "mkdir -pm 2775 d",
+        mkdir_mode_cluster_attached: "mkdir -pm2775 d",
+        mkdir_mode_before_parents: "mkdir -m 2775 -p d",
+        mkdir_gnu_alias: "gmkdir -m u+s d",
+        rsync_chmod_setuid: "rsync --chmod=u+s a b",
+        rsync_chmod_spaced: "rsync --chmod Du+s a b",
+        rsync_chmod_octal_file: "rsync --chmod=F4755 a b",
+        rsync_chmod_list: "rsync -a --chmod=D2775,F644 src/ dst/",
     }
 
     proptest! {
@@ -139,6 +211,26 @@ mod tests {
         ) {
             let mode = format!("{who}{op}{perms}");
             prop_assert!(!mode_sets_an_id_bit(&mode), "{}", mode);
+        }
+
+        /// Every spelling of a mode given to mkdir or rsync is judged the same way chmod judges it.
+        #[test]
+        fn a_mode_given_to_mkdir_or_rsync_is_judged_as_chmod_judges_it(
+            id_bit in prop::bool::ANY,
+            perms in "[rwx]{1,3}",
+            spelling in 0usize..7,
+        ) {
+            let mode = if id_bit { format!("u+{perms}s") } else { format!("u+{perms}") };
+            let line = match spelling {
+                0 => format!("mkdir -m {mode} d"),
+                1 => format!("mkdir -m{mode} d"),
+                2 => format!("mkdir --mode={mode} d"),
+                3 => format!("mkdir --mode {mode} d"),
+                4 => format!("mkdir -pm {mode} d"),
+                5 => format!("rsync --chmod=D{mode},F644 src/ dst/"),
+                _ => format!("rsync --chmod {mode} a b"),
+            };
+            prop_assert_eq!(is_safe_command(&line), !id_bit, "{}", line);
         }
     }
 }

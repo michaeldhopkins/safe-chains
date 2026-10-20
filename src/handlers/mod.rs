@@ -129,6 +129,8 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
     match crate::registry::canonical_name(first.command_name()) {
         "cargo" => safe_chains::cargo_run_reaches_a_rule_change(tokens),
         "chmod" => coreutils::chmod_mode::sets_an_id_bit(tokens),
+        "mkdir" => coreutils::chmod_mode::mkdir_mode_sets_an_id_bit(tokens),
+        "rsync" => coreutils::chmod_mode::rsync_chmod_sets_an_id_bit(tokens),
         "export" | "declare" | "ps" | "mise" => env_print::prints_the_environment(tokens),
         _ => false,
     }

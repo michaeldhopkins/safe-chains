@@ -11284,6 +11284,7 @@ gmkdir --parents	denied
 gmkdir --verbose	denied
 gmkdir --version	inert
 gmkdir -Z	denied
+gmkdir -m u+s d	denied
 gmkdir -m x	denied
 gmkdir -p	denied
 gmkdir -v	denied

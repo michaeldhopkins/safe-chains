@@ -3134,6 +3134,9 @@ chmod	denied
 chmod "$MODE" x	denied
 chmod '+s' x	denied
 chmod +4000 x	denied
+chmod +a 'everyone allow write' x	denied
+chmod +a# 0 'everyone allow read' x	denied
+chmod +ai 'everyone allow read' x	denied
 chmod +s x	denied
 chmod +t tmpdir	safe-write
 chmod +x .git/hooks/pre-commit	denied
@@ -3156,12 +3159,14 @@ chmod --reference=/etc/shadow out.txt	denied
 chmod --silent	denied
 chmod --verbose	denied
 chmod --version	inert
+chmod -E x	denied
 chmod -P	denied
 chmod -R	denied
 chmod -R 777 /	denied
 chmod -R g+s dir	denied
 chmod -R u+rwX,go-w src	safe-write
 chmod -RL 755 src	denied
+chmod -a 'everyone deny read' x	denied
 chmod -c	denied
 chmod -f	denied
 chmod -h	denied
@@ -3178,6 +3183,7 @@ chmod 600 ~/.ssh/config	denied
 chmod 644 README.md	safe-write
 chmod 6755 x	denied
 chmod =2755 x	denied
+chmod =a# 0 'everyone deny read' x	denied
 chmod a=rwxs x	denied
 chmod g+s x	denied
 chmod go-w,u+s x	denied

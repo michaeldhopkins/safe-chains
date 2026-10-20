@@ -1993,13 +1993,24 @@ mkdir --help	inert
 mkdir --help --context x	inert
 mkdir --help --parents	inert
 mkdir --help x	safe-write
+mkdir --mode g+s d	denied
 mkdir --mode x	denied
+mkdir --mode=u+rwx d	safe-write
+mkdir --mode=u+s d	denied
 mkdir --parents	denied
 mkdir --verbose	denied
 mkdir --version	inert
 mkdir -Z	denied
+mkdir -m 2775 -p d	denied
+mkdir -m 4755 d	denied
+mkdir -m 755 d	safe-write
 mkdir -m x	denied
+mkdir -m4755 d	denied
 mkdir -p	denied
+mkdir -p a/b	safe-write
+mkdir -pm 0755 d	safe-write
+mkdir -pm 2775 d	denied
+mkdir -pm2775 d	denied
 mkdir -v	denied
 mkdir x	safe-write
 mkdocs	denied
