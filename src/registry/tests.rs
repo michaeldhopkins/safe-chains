@@ -2152,6 +2152,18 @@ fn credential_first_arg_gates_every_secret_name_form() {
             assert!(!crate::is_safe_command(&c), "a credential name in any position must deny: {c}");
         }
     }
+    // An unquoted pattern is expanded by the shell against the directory before kubectl or aws
+    // sees it, so one that could spell a credential name reads as that name.
+    for c in [
+        "kubectl get sec*", "kubectl get 'sec*'", "kubectl get s?cret", "kubectl get secr[e]ts", "kubectl get *", "kubectl get pods,*ets",
+        "kubectl get S*", "kubectl get secret/*", "kubectl get secret.*", "kubectl get [s]ecret/db", "aws configure get aws_*",
+        "aws configure get *token", "kubectl get pods s*",
+    ] {
+        assert!(!crate::is_safe_command(c), "a pattern that could spell a credential name must deny: {c}");
+    }
+    for c in ["kubectl get pod*", "kubectl get p?ds", "kubectl get d?ployments", "aws configure get reg*", "kubectl get deploy*"] {
+        assert!(crate::is_safe_command(c), "a pattern no credential name fits must allow: {c}");
+    }
     for c in [
         "kubectl get pods,services", "kubectl get pods -n secrets", "kubectl get pods -l app=secret", "kubectl get pod/x service/y -o yaml",
     ] {
