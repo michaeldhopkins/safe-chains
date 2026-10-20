@@ -191,8 +191,6 @@ codesign_allocate
 codesign_allocate x
 codex apply
 codex cloud
-codex features
-codex mcp
 codium
 composer
 compress

@@ -4957,6 +4957,7 @@ codex --help --version	denied
 codex --help x	denied
 codex --version	inert
 codex -V	inert
+codex -c approval_policy=never debug app-server send-message-v2 'rm -rf ~'	denied
 codex -c sandbox_mode=danger-full-access exec hi	denied
 codex -c x	denied
 codex -h	inert
@@ -4982,16 +4983,19 @@ codex completion -h	inert
 codex completion -s x	inert
 codex completion x	denied
 codex debug	inert
-codex debug app-server	inert
-codex debug app-server x	inert
+codex debug app-server	denied
+codex debug app-server --help	inert
+codex debug app-server --help -h	inert
+codex debug app-server --help x	denied
+codex debug app-server -h	inert
+codex debug app-server send-message-v2 hi	denied
+codex debug app-server x	denied
 codex debug x	denied
 codex exec --full-auto hi	denied
 codex exec hi	denied
 codex features	inert
-codex features disable	safe-write
-codex features disable x	safe-write
-codex features enable	safe-write
-codex features enable x	safe-write
+codex features disable x	denied
+codex features enable x	denied
 codex features list	inert
 codex features list --help	inert
 codex features list --help -h	inert
@@ -5001,14 +5005,12 @@ codex features list x	denied
 codex features x	denied
 codex fork	denied
 codex mcp	inert
-codex mcp add	safe-write
-codex mcp add x	safe-write
+codex mcp add x -- sh -c id	denied
 codex mcp get	inert
 codex mcp get x	inert
 codex mcp list	inert
 codex mcp list x	inert
-codex mcp remove	safe-write
-codex mcp remove x	safe-write
+codex mcp remove x	denied
 codex mcp x	denied
 codex resume --last	denied
 codex review	denied

@@ -216,7 +216,7 @@ cockroach	examples,no-tolerance,profiled
 code	examples,no-overlap
 codesign	description
 codesign_allocate	description,examples
-codex	examples,no-tolerance,version
+codex	no-tolerance,version
 col	description,examples,version
 colordiff	examples,version
 colrm	description,examples

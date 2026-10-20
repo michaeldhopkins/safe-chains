@@ -1,6 +1,6 @@
 [[command]]
 name = "codex"
-description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. The project is under active development with frequent CLI changes."
+description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. debug app-server starts the app server and sends it a message, which runs an agent turn. mcp add / remove and features enable / disable write ~/.codex/config.toml, so the server command added, or the feature turned on, runs at every later start. The project is under active development with frequent CLI changes."
 url = "https://github.com/openai/codex"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_denied = [
@@ -11,6 +11,18 @@ examples_denied = [
     "codex fork",
     "codex review",
     "codex sandbox macos rm -rf ~",
+    "codex debug app-server",
+    "codex debug app-server send-message-v2 hi",
+    "codex -c approval_policy=never debug app-server send-message-v2 'rm -rf ~'",
+    "codex mcp add x -- sh -c id",
+    "codex mcp remove x",
+    "codex features enable x",
+    "codex features disable x",
+]
+examples_safe = [
+    "codex debug app-server --help",
+    "codex mcp list",
+    "codex features list",
 ]
 [command.wrapper]
 valued = ["--config", "--disable", "--enable", "-c"]
@@ -53,22 +65,13 @@ name = "debug"
 nested_bare = true
 [[command.sub.sub]]
 name = "app-server"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 0
 
 [[command.sub]]
 name = "features"
 nested_bare = true
-[[command.sub.sub]]
-name = "disable"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-[[command.sub.sub]]
-name = "enable"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "-h"]
@@ -78,20 +81,10 @@ max_positional = 0
 name = "mcp"
 nested_bare = true
 [[command.sub.sub]]
-name = "add"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-[[command.sub.sub]]
 name = "get"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-[[command.sub.sub]]
-name = "remove"
-level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
