@@ -1,9 +1,11 @@
 //! Which binary a `cargo run` starts, as far as it decides whether that binary is safe-chains.
 //!
 //! The rule-change check only matters when the binary run is this one, so it applies when `--bin`
-//! names it, or when no `--bin` or `--example` is given and the package run is safe-chains: the one
-//! `-p` / `--package` names, or the package of the nearest `Cargo.toml` above the folder cargo runs
-//! in, found after symbolic links and `..` are resolved. That last case reads the manifest from disk:
+//! names it, when `-p` / `--package` names safe-chains and no `--bin` or `--example` is given, and
+//! otherwise when the package of the nearest `Cargo.toml` is safe-chains. A `--bin` or `--example`
+//! naming another target still reads that manifest, since any target of a package that is or uses
+//! safe-chains can reach its rule changes. The nearest manifest is the one above the folder cargo
+//! runs in, found after symbolic links and `..` are resolved, read from disk:
 //! it is safe-chains when its package, one of its binaries or one of its dependencies is named
 //! safe-chains (with `_` read as `-`). Anything not known before the shell runs, an unknown or
 //! missing working directory, or a manifest that does not parse or names no package of its own
@@ -17,13 +19,13 @@ pub(crate) fn runs_safe_chains(tokens: &[Token], arguments_at: usize) -> bool {
     let Some(target) = Target::of(&tokens[1..arguments_at.min(tokens.len())]) else {
         return true;
     };
-    if let Some(bin) = target.bin {
-        return bin.contains(THIS);
+    if target.bin.is_some_and(|bin| bin.contains(THIS)) {
+        return true;
     }
-    if target.example {
-        return false;
-    }
-    if let Some(package) = target.package {
+    if target.bin.is_none()
+        && !target.example
+        && let Some(package) = target.package
+    {
         return package.contains(THIS);
     }
     nearest_manifest_names_this(target.manifest_path, target.chdir)
@@ -187,6 +189,24 @@ mod tests {
             "cargo run --manifest-path ../../elsewhere/Cargo.toml -- mcp",
         ] {
             assert!(!in_project(Some("tool"), cmd), "{cmd} must not be approved from another project");
+        }
+    }
+
+    /// Any binary or example of a package that is or depends on safe-chains can call its rule
+    /// changes, so `--bin` and `--example` are taken at face value only in another project. Telling
+    /// which target's source reaches that code would mean reading Rust, which this does not do.
+    #[test]
+    fn a_named_target_of_this_project_counts_as_this_project() {
+        for cmd in [
+            "cargo run --bin gen_fuzz_corpus -- config add x",
+            "cargo run --bin=tool -- config add x",
+            "cargo run --example generate_assets -- config add x",
+            "cargo run --example=demo -- mcp",
+        ] {
+            assert!(!in_manifest("this-target", "[package]\nname = \"safe-chains\"\n", cmd), "{cmd} must not be approved in this project");
+            let dependent = "[package]\nname = \"tool\"\n[dependencies]\nsafe-chains = \"0.1\"\n";
+            assert!(!in_manifest("dependent-target", dependent, cmd), "{cmd} must not be approved in a dependent");
+            assert!(in_manifest("other-target", "[package]\nname = \"tool\"\n", cmd), "{cmd} should be approved in another project");
         }
     }
 

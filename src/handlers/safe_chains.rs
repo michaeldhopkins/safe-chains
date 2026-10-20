@@ -197,6 +197,7 @@ mod tests {
             "ls && cargo run -- config add zz",
             "cargo run --features a,b -- mcp",
             "echo mcp | xargs cargo run --",
+            "cargo run --bin x config add zz",
         ] {
             assert!(!verdict(cmd).is_allowed(), "{cmd} must not be approved");
         }
@@ -207,7 +208,7 @@ mod tests {
         for cmd in [
             "cargo run", "cargo run -- config list", "cargo run -- 'git status'", "cargo run --release -- --explain 'cat foo'",
             "cargo run -q -- hook claude", "cargo run -- ./input.txt", "cargo run --manifest-path ./sub/Cargo.toml",
-            "cargo run --bin config", "cargo run -p mcp -- ~/notes", "cargo run -- 'cat *.txt'", "cargo run --bin x config add zz",
+            "cargo run --bin config", "cargo run -p mcp -- ~/notes", "cargo run -- 'cat *.txt'",
         ] {
             assert!(verdict(cmd).is_allowed(), "{cmd} should be approved");
         }
