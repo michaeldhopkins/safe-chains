@@ -72,18 +72,30 @@ pub(crate) fn cargo_run_reaches_a_rule_change(tokens: &[Token]) -> bool {
     let Some(arguments) = tokens.get(k..) else {
         return false;
     };
-    if !arguments
-        .iter()
-        .any(|t| matches!(t.as_str(), "config" | "mcp") || could_change_at_run_time(t.as_str()))
+    let writes_outside_the_check = arguments.iter().any(|t| writes_outside_the_check(t.as_str()));
+    if !writes_outside_the_check
+        && !arguments
+            .iter()
+            .any(|t| matches!(t.as_str(), "config" | "mcp") || could_change_at_run_time(t.as_str()))
     {
         return false;
     }
     if !super::cargo_runs_this::runs_safe_chains(tokens, k) {
         return false;
     }
+    if writes_outside_the_check {
+        return true;
+    }
     let mut as_safe_chains = vec![Token::from_raw("safe-chains".to_string())];
     as_safe_chains.extend(arguments.iter().cloned());
     !check_safe_chains(&as_safe_chains).is_allowed()
+}
+
+/// A flag that makes the binary write besides judging: `--setup` and `--auto-detect` install the
+/// hook into another tool's settings, and `--log` and `--log-everything` append to the log. The
+/// binary being built may not be the one installed, so what those writes do is not known here.
+fn writes_outside_the_check(word: &str) -> bool {
+    matches!(word, "--setup" | "--auto-detect") || word.starts_with("--log")
 }
 
 fn could_change_at_run_time(word: &str) -> bool {
@@ -198,6 +210,14 @@ mod tests {
             "cargo run --features a,b -- mcp",
             "echo mcp | xargs cargo run --",
             "cargo run --bin x config add zz",
+            "cargo run -- --setup",
+            "cargo run -- --setup --tool codex",
+            "cargo run -- --auto-detect --setup",
+            "cargo run -q -- --auto-detect",
+            "cargo run -- --log 'ls'",
+            "cargo run -- --log-everything ls",
+            "cargo run --release -- --log=x ls",
+            "cargo run --bin safe-chains -- --setup",
         ] {
             assert!(!verdict(cmd).is_allowed(), "{cmd} must not be approved");
         }
