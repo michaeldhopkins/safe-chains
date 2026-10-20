@@ -75,10 +75,13 @@ Rez -undef x	safe-write
 Rez -useDF	safe-write
 Rez x	safe-write
 Rscript	denied
+Rscript -	denied
+Rscript - --version	denied
 Rscript --help	inert
 Rscript --help --version	inert
 Rscript --help x	denied
 Rscript --version	inert
+Rscript --version -	denied
 Rscript -V	inert
 Rscript -h	inert
 Rscript x	denied

@@ -235,7 +235,7 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
             break;
         }
 
-        if !t.starts_with('-') {
+        if !t.starts_with('-') || (*t == "-" && !standalone.contains_flag(t)) {
             positionals += 1;
             i += 1;
             continue;
@@ -361,6 +361,25 @@ mod tests {
             tolerance: FlagTolerance::strict(),
         };
         assert!(check(&toks(&["uname"]), &policy));
+    }
+
+    #[test]
+    fn a_lone_dash_is_an_operand_and_counts_toward_max_positional() {
+        for max in 0..3usize {
+            let policy = FlagPolicy {
+                standalone: WordSet::flags(&["--version", "-V"]),
+                valued: WordSet::flags(&["-e"]),
+                bare: true,
+                max_positional: Some(max),
+                tolerance: FlagTolerance::strict(),
+            };
+            for dashes in 0..5usize {
+                let mut words = vec!["Rscript", "--version"];
+                words.extend(std::iter::repeat_n("-", dashes));
+                assert_eq!(check(&toks(&words), &policy), dashes <= max, "max {max}, {dashes} dashes");
+                assert_eq!(count_positionals(&toks(&words), &policy.standalone, &policy.valued, policy.tolerance), Some(dashes));
+            }
+        }
     }
 
     /// What a flag declared in BOTH lists actually does — measured, because the answer decides
