@@ -38,7 +38,15 @@ fn launches_an_operand(tokens: &[Token]) -> bool {
             }
         }
     }
-    !as_document && operands.iter().any(|operand| !is_web_address(operand))
+    operands.iter().any(|operand| has_a_scheme(operand) && !is_web_address(operand))
+        || (!as_document && operands.iter().any(|operand| !is_web_address(operand)))
+}
+
+fn has_a_scheme(word: &str) -> bool {
+    word.split_once(':').is_some_and(|(scheme, _)| {
+        scheme.starts_with(|c: char| c.is_ascii_alphabetic())
+            && scheme.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '.' | '-'))
+    })
 }
 
 fn is_web_address(word: &str) -> bool {
@@ -97,6 +105,14 @@ mod tests {
         open_long_reveal: "open --reveal x.command",
         open_subshell: "(open x.command)",
         open_after_chain: "ls && open x.command",
+        open_reveal_ssh: "open -R ssh://host",
+        open_editor_man_page: "open -e x-man-page://ls",
+        open_text_vnc: "open -t vnc://host",
+        open_reveal_file_url: "open -R file:///tmp/x.command",
+        open_reveal_upper_file_url: "open -R FILE:///tmp/x.command",
+        open_reveal_scheme_without_slashes: "open -R https:x.command",
+        open_reveal_after_separator_scheme: "open -R -- ssh://host",
+        open_editor_opaque_scheme: "open -e mailto:x@example.com",
     }
 
     use super::{Token, Verdict, check_open};
@@ -141,6 +157,23 @@ mod tests {
             words.extend(document.map(str::to_string));
             words.push("-u".to_string());
             words.push(format!("{scheme}{rest}"));
+            prop_assert_eq!(check_open(&toks(&words)), Verdict::Denied);
+        }
+
+        /// An address with a scheme is handed to the scheme's handler, whatever a document flag
+        /// says, so only a web address passes as an operand.
+        #[test]
+        fn an_operand_with_a_scheme_other_than_the_web_is_denied_with_any_flag(
+            document in prop_oneof![Just(None), Just(Some("-R")), Just(Some("-e")), Just(Some("-t")), Just(Some("-W"))],
+            scheme in "[a-zA-Z][a-zA-Z0-9+.-]{0,8}",
+            slashes in prop_oneof![Just(""), Just("//"), Just("///")],
+            rest in "[a-z0-9./]{1,12}",
+        ) {
+            let lower = scheme.to_ascii_lowercase();
+            prop_assume!(!((lower == "http" || lower == "https") && slashes.len() == 2));
+            let mut words = vec!["open".to_string()];
+            words.extend(document.map(str::to_string));
+            words.push(format!("{scheme}:{slashes}{rest}"));
             prop_assert_eq!(check_open(&toks(&words)), Verdict::Denied);
         }
     }

@@ -1366,7 +1366,12 @@ open -F -R	safe-read
 open -F -u x	denied
 open -F x	denied
 open -R	safe-read
+open -R -- ssh://host	denied
 open -R Build/Foo.app	safe-read
+open -R FILE:///tmp/x.command	denied
+open -R file:///tmp/x.command	denied
+open -R https:x.command	denied
+open -R ssh://host	denied
 open -R target/release/app	safe-read
 open -W	safe-read
 open -W https://example.com	safe-read
@@ -1375,7 +1380,9 @@ open -a Terminal x.sh	denied
 open -b com.apple.Terminal x.sh	denied
 open -e	safe-read
 open -e -u file:///tmp/x.command	denied
+open -e mailto:x@example.com	denied
 open -e notes.command	safe-read
+open -e x-man-page://ls	denied
 open -f	safe-read
 open -f x.command	denied
 open -g	safe-read
@@ -1387,6 +1394,7 @@ open -n Foo.app	denied
 open -n https://example.com	safe-read
 open -t	safe-read
 open -t script.sh	safe-read
+open -t vnc://host	denied
 open -u file:///tmp/x.command	denied
 open -u https://example.com	safe-read
 open -u x	denied
