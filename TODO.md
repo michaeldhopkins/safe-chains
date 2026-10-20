@@ -161,6 +161,14 @@ command name, not a path supplying one piece of code). An `exec-path` list shape
 locus per element would cover it; it needs measuring against the PATH values agents set in practice
 (`PATH=./node_modules/.bin:$PATH`, a toolchain's bin directory) before it can refuse anything.
 
+## `cargo run -p <member>` is judged by the member's name, not its manifest
+
+`cargo run -p tool -- config add x` is approved when `tool` is not spelled like safe-chains, because
+the rule-change check asks only whether the package name could be this project. A workspace member
+can still depend on safe-chains, or build a binary that calls it. A better check reads the member's
+own manifest, as `cargo run --bin` reads this package's, and judges its binary names and
+dependencies.
+
 ## The open mechanism backlog, in order
 
 **Tier 1 — the schema cannot express what the model already knows.** These come
