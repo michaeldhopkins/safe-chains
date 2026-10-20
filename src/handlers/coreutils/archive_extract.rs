@@ -13,8 +13,10 @@ use crate::parse::Token;
 ///
 /// bsdcpio reads `-W name` as the long option `--name`, abbreviations included, so `cpio -W ext`
 /// is `cpio --extract`. Its value is a long option no list here can check, so cpio's `-W` is
-/// refused whatever else the line says. pax's `-s` rewrites each member's name by a regular
-/// expression, so where a copy writes is no longer the path it was given, and it is refused too.
+/// refused whatever else the line says. A pass-through copy with `--insecure` drops the defenses
+/// against `..`, absolute paths and symlinks, so it is refused as extraction is. pax's `-s`
+/// rewrites each member's name by a regular expression, so where a copy writes is no longer the
+/// path it was given, and it is refused too.
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
@@ -28,7 +30,10 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
         "cpio" => {
             let given = given();
             let extract = given.anywhere.contains('i') || given.long_anywhere.contains(&"--extract");
-            given.anywhere.contains('W') || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
+            let passes = given.anywhere.contains('p') || given.long_anywhere.contains(&"--pass-through");
+            given.anywhere.contains('W')
+                || (passes && given.long_anywhere.contains(&"--insecure"))
+                || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
         }
         "ditto" => given().anywhere.contains('x'),
         "xar" => tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
@@ -138,6 +143,9 @@ mod tests {
         xar_extract_keeping_set_id_bits: "xar -x --keep-setuid -f ./archive.xar",
         pax_extract_write_letter_after_a_pattern: "pax -r -f ./archive.tar '*' -w",
         pax_extract_write_letter_after_an_operand: "pax -r ./a -w ./b",
+        cpio_pass_through_without_its_defenses: "cpio -p --insecure ./dst",
+        cpio_pass_through_without_its_defenses_after: "cpio -pd ./dst --insecure",
+        cpio_pass_through_long_without_its_defenses: "cpio --pass-through --insecure ./dst",
         cpio_extract_list_letter_after_a_pattern: "cpio -i '*' -t",
         cpio_extract_list_long_after_a_pattern: "cpio -i x --list",
         cpio_extract_spelled_as_a_long_name: "cpio -W extract",
