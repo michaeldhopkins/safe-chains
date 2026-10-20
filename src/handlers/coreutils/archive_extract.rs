@@ -5,57 +5,84 @@ use crate::parse::Token;
 /// reason, so pax, cpio and ditto are refused the same way when they extract. Listing stays
 /// approved, and so do their copy modes: those keep the modes of files already on disk. xar strips
 /// set-id bits unless told to keep them, so only that option is refused there.
+///
+/// A letter that makes a line safe (pax's `-w`, cpio's `-t` and `--list`) counts only in front of
+/// the first operand. bsdcpio stops reading options there, and so does pax when POSIXLY_CORRECT is
+/// set, so `cpio -i '*' -t` extracts every member and reads `-t` as one more pattern. A letter
+/// that extracts counts wherever it appears.
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
     };
-    let letters = || short_letters(&tokens[1..], first.command_name());
+    let given = || Given::read(&tokens[1..], first.command_name());
     match first.command_name() {
         "pax" => {
-            let letters = letters();
-            letters.contains('r') && !letters.contains('w')
+            let given = given();
+            given.anywhere.contains('r') && !given.leading.contains('w')
         }
         "cpio" => {
-            let letters = letters();
-            let long = |name: &str| tokens[1..].iter().any(|t| t.as_str() == name);
-            (letters.contains('i') || long("--extract")) && !(letters.contains('t') || long("--list"))
+            let given = given();
+            let extract = given.anywhere.contains('i') || given.long_anywhere.contains(&"--extract");
+            extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list"))
         }
-        "ditto" => letters().contains('x'),
+        "ditto" => given().anywhere.contains('x'),
         "xar" => tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
         _ => false,
     }
 }
 
-/// The option letters given, skipping the value each value-taking letter consumes.
-fn short_letters(arguments: &[Token], command: &str) -> String {
-    let takes_a_value: &[char] = match command {
-        "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
-        "cpio" => &['C', 'E', 'F', 'H', 'I', 'O', 'R', 'f'],
-        _ => &[],
-    };
-    let mut letters = String::new();
-    let mut words = arguments.iter().map(Token::as_str);
-    while let Some(word) = words.next() {
-        if word == "--" {
-            break;
-        }
-        let Some(cluster) = word.strip_prefix('-').filter(|c| !c.is_empty() && !c.starts_with('-')) else {
-            if matches!(word, "--file" | "--format" | "--owner" | "--passphrase") && command == "cpio" {
-                words.next();
-            }
-            continue;
+/// The option letters and long options given, everywhere and in front of the first operand,
+/// skipping the value each value-taking letter consumes.
+struct Given<'a> {
+    anywhere: String,
+    leading: String,
+    long_anywhere: Vec<&'a str>,
+    long_leading: Vec<&'a str>,
+}
+
+impl<'a> Given<'a> {
+    fn read(arguments: &'a [Token], command: &str) -> Given<'a> {
+        let takes_a_value: &[char] = match command {
+            "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
+            "cpio" => &['C', 'E', 'F', 'H', 'I', 'O', 'R', 'f'],
+            _ => &[],
         };
-        for (at, c) in cluster.char_indices() {
-            if takes_a_value.contains(&c) {
-                if at + c.len_utf8() == cluster.len() {
-                    words.next();
-                }
+        let mut given = Given { anywhere: String::new(), leading: String::new(), long_anywhere: Vec::new(), long_leading: Vec::new() };
+        let mut operand_seen = false;
+        let mut words = arguments.iter().map(Token::as_str);
+        while let Some(word) = words.next() {
+            if word == "--" {
                 break;
             }
-            letters.push(c);
+            if word.starts_with("--") {
+                given.long_anywhere.push(word);
+                if !operand_seen {
+                    given.long_leading.push(word);
+                }
+                if matches!(word, "--file" | "--format" | "--owner" | "--passphrase") && command == "cpio" {
+                    words.next();
+                }
+                continue;
+            }
+            let Some(cluster) = word.strip_prefix('-').filter(|c| !c.is_empty()) else {
+                operand_seen = true;
+                continue;
+            };
+            for (at, c) in cluster.char_indices() {
+                given.anywhere.push(c);
+                if !operand_seen {
+                    given.leading.push(c);
+                }
+                if takes_a_value.contains(&c) {
+                    if at + c.len_utf8() == cluster.len() {
+                        words.next();
+                    }
+                    break;
+                }
+            }
         }
+        given
     }
-    letters
 }
 
 #[cfg(test)]
@@ -100,24 +127,36 @@ mod tests {
         ditto_extract_zip: "ditto -xk ./archive.zip ./out",
         ditto_extract_spaced: "ditto -x -k ./archive.zip ./out",
         xar_extract_keeping_set_id_bits: "xar -x --keep-setuid -f ./archive.xar",
+        pax_extract_write_letter_after_a_pattern: "pax -r -f ./archive.tar '*' -w",
+        pax_extract_write_letter_after_an_operand: "pax -r ./a -w ./b",
+        cpio_extract_list_letter_after_a_pattern: "cpio -i '*' -t",
+        cpio_extract_list_long_after_a_pattern: "cpio -i x --list",
     }
 
     proptest! {
         /// Whatever else is given, a pax, cpio or ditto line that extracts is refused, and one
-        /// that only lists is not refused for extracting.
+        /// that only lists is not refused for extracting. A letter after the first operand is a
+        /// pattern to a parser that stops there (bsdcpio, or pax under POSIXLY_CORRECT), so a
+        /// listing or copy letter only counts in front of the operands.
         #[test]
         fn an_extraction_is_refused_and_a_listing_is_not(
             command in prop::sample::select(vec!["pax -r", "pax -rv", "cpio -i", "cpio -iv", "cpio --extract", "ditto -x", "ditto -xk"]),
             extra in prop::sample::subsequence(vec!["-v", "-k", "-p e", "-m", "-d"], 0..3),
         ) {
+            let extracts = |line: &str| {
+                let tokens: Vec<crate::parse::Token> = line.split_whitespace().map(crate::parse::Token::from_test).collect();
+                super::extracts(&tokens)
+            };
             let line = format!("{command} {} ./archive ./out", extra.join(" "));
-            let tokens: Vec<crate::parse::Token> = line.split_whitespace().map(crate::parse::Token::from_test).collect();
-            prop_assert!(super::extracts(&tokens), "{}", line);
+            prop_assert!(extracts(&line), "{}", line);
             prop_assert!(!is_safe_command(&line), "{}", line);
             if !command.starts_with("ditto") {
-                let listing = format!("{line} -t");
-                let tokens: Vec<crate::parse::Token> = listing.split_whitespace().map(crate::parse::Token::from_test).collect();
-                prop_assert_eq!(super::extracts(&tokens), command.starts_with("pax"), "{}", listing);
+                let safe_letter = if command.starts_with("pax") { "-w" } else { "-t" };
+                let before = format!("{command} {safe_letter} {} ./archive ./out", extra.join(" "));
+                prop_assert!(!extracts(&before), "{}", before);
+                let after = format!("{line} {safe_letter}");
+                prop_assert!(extracts(&after), "{}", after);
+                prop_assert!(!is_safe_command(&after), "{}", after);
             }
         }
     }
