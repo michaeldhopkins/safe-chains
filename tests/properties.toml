@@ -216,6 +216,11 @@ owed = [
   "a_shell_bare_command_is_inert_regardless_of_trailing_args",
   "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
 ]
+"src/handlers/coreutils/chmod_mode.rs" = [
+  "an_octal_mode_sets_an_id_bit_exactly_when_its_value_has_one",
+  "adding_s_for_any_class_sets_an_id_bit",
+  "a_mode_without_s_or_high_octal_bits_sets_none",
+]
 "src/handlers/coreutils/awk.rs" = [
   "an_awk_program_that_runs_code_is_never_approved",
   "the_surroundings_alone_are_approved",

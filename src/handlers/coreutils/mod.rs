@@ -1,4 +1,5 @@
 pub(crate) mod awk;
+pub(crate) mod chmod_mode;
 mod find;
 pub(crate) mod find_skip;
 mod grep;

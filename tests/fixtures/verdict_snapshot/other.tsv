@@ -8,6 +8,7 @@ $(rm -rf /)	denied
 $cmd log	denied
 ${cmd} log	denied
 ((echo hello))	inert
+(chmod +s x)	denied
 (echo a; echo b) | head -1	inert
 (echo a; rm -rf /)	denied
 (echo hello)	inert
@@ -29,6 +30,7 @@ ${cmd} log	denied
 ./vendor/bin/pest --no-progress	safe-read
 ./vendor/bin/phpstan analyse --no-progress	inert
 ./vendor/bin/phpunit --testsuite Unit	safe-read
+/bin/chmod +s x	denied
 /usr/bin/open x.command	denied
 :	inert
 : && echo hello	inert

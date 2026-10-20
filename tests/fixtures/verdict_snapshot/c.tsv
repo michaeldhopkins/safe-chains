@@ -3131,11 +3131,16 @@ chisel -h	inert
 chisel -v	inert
 chisel x	denied
 chmod	denied
+chmod "$MODE" x	denied
+chmod '+s' x	denied
+chmod +4000 x	denied
+chmod +s x	denied
+chmod +t tmpdir	safe-write
 chmod +x .git/hooks/pre-commit	denied
 chmod +x scripts/build.sh	safe-write
+chmod -- +s x	denied
 chmod --changes	denied
 chmod --changes --dereference	denied
-chmod --changes --reference x	denied
 chmod --changes x	safe-write
 chmod --dereference	denied
 chmod --help	inert
@@ -3144,25 +3149,42 @@ chmod --no-preserve-root -R 755 src	denied
 chmod --preserve-root	denied
 chmod --quiet	denied
 chmod --recursive	denied
-chmod --reference x	denied
+chmod --reference /bin/su x	denied
+chmod --reference=/bin/su tool	denied
+chmod --reference=/bin/su x	denied
 chmod --reference=/etc/shadow out.txt	denied
-chmod --reference=a.txt b.txt	safe-write
 chmod --silent	denied
 chmod --verbose	denied
 chmod --version	inert
 chmod -P	denied
 chmod -R	denied
 chmod -R 777 /	denied
+chmod -R g+s dir	denied
 chmod -R u+rwX,go-w src	safe-write
 chmod -RL 755 src	denied
 chmod -c	denied
 chmod -f	denied
 chmod -h	denied
 chmod -v	denied
+chmod -v u+s x	denied
 chmod -w notes.txt	denied
+chmod 0004755 x	denied
+chmod 04755 x	denied
+chmod 0755 bin/tool	safe-write
+chmod 2755 x	denied
 chmod 4755 /usr/local/bin/tool	denied
+chmod 4755 x	denied
 chmod 600 ~/.ssh/config	denied
 chmod 644 README.md	safe-write
+chmod 6755 x	denied
+chmod =2755 x	denied
+chmod a=rwxs x	denied
+chmod g+s x	denied
+chmod go-w,u+s x	denied
+chmod u+s x	denied
+chmod u-s bin/tool	safe-write
+chmod u-x+s x	denied
+chmod u=rwxs x	denied
 chmod x	safe-write
 chown --version	denied
 chronic	denied

@@ -319,6 +319,7 @@ echo x > .git/hooks/pre-commit	denied
 echo x > /etc/passwd	denied
 echo x > ~/.ssh/authorized_keys	denied
 echo x >> .git/hooks/post-commit	denied
+echo x | xargs chmod +s	denied
 ecpg	denied
 ecpg --help	safe-write
 ecpg --help --regression	safe-write

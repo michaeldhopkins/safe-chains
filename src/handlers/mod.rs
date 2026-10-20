@@ -127,6 +127,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
     };
     match crate::registry::canonical_name(first.command_name()) {
         "cargo" => safe_chains::cargo_run_reaches_a_rule_change(tokens),
+        "chmod" => coreutils::chmod_mode::sets_an_id_bit(tokens),
         _ => false,
     }
 }

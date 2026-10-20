@@ -12,12 +12,10 @@ standalone = [
     "--quiet", "--recursive", "--silent", "--verbose", "--version",
     "-P", "-R", "-c", "-f", "-h", "-v",
 ]
-valued = ["--reference"]
 examples_safe = [
     "chmod +x scripts/build.sh",
     "chmod 644 README.md",
     "chmod -R u+rwX,go-w src",
-    "chmod --reference=a.txt b.txt",
     "gchmod -v 755 bin/tool",
     "chmod --version",
 ]
@@ -31,12 +29,13 @@ examples_denied = [
     "chmod --reference=/etc/shadow out.txt",
     "chmod -w notes.txt",
     "chmod --no-preserve-root -R 755 src",
+    "chmod --reference=/bin/su tool",
 ]
 
 # chmod MUTATES each operand's mode bits, gated per operand by locus. The MODE operand is read as a
 # relative worktree path, which is harmless: a mode never contains `/` or `~`. A mode spelled with a
 # leading `-` (`-w`) reads as an unknown flag and fails closed. `-R` recurses (unbounded scale).
-# `--reference` reads RFILE's mode, gated as a read.
+# `--reference` copies another file's mode, which may carry setuid or setgid, so it is left out.
 [command.behavior]
 operation = "mutate"
 positionals = "write"
@@ -46,8 +45,6 @@ standalone = [
     "--quiet", "--recursive", "--silent", "--verbose", "--version",
     "-P", "-R", "-c", "-f", "-h", "-v",
 ]
-valued = ["--reference"]
 [command.behavior.flags]
 "-R" = { scale = "unbounded" }
 "--recursive" = { scale = "unbounded" }
-"--reference" = { kind = "read" }

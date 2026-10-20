@@ -265,9 +265,9 @@ gcc --version	inert
 gcc -v	inert
 gcc x	denied
 gchmod	denied
+gchmod +s x	denied
 gchmod --changes	denied
 gchmod --changes --dereference	denied
-gchmod --changes --reference x	denied
 gchmod --changes x	safe-write
 gchmod --dereference	denied
 gchmod --help	inert
@@ -275,7 +275,6 @@ gchmod --no-dereference	denied
 gchmod --preserve-root	denied
 gchmod --quiet	denied
 gchmod --recursive	denied
-gchmod --reference x	denied
 gchmod --silent	denied
 gchmod --verbose	denied
 gchmod --version	inert
