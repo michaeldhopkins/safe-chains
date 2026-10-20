@@ -72,9 +72,11 @@ restic	-c	--cacert
 rollup	-f	--file
 rsync	-f	--files-from
 rsync	-l	--log-file
+rsync	-p	--partial-dir
 rsync	-p	--password-file
 rsync	-r	--read-batch
 rsync	-r	--rsh
+rsync	-t	--temp-dir
 say	-i	--input-file
 wget	-d	--directory-prefix
 wget	-p	--post-file

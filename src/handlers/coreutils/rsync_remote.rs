@@ -78,6 +78,8 @@ mod tests {
         rsync_remote_plain_chmod: "rsync -a --remote-option=--chmod=go-w src/ dst/",
         rsync_remote_spaced_plain_chmod: "rsync -a -M --chmod=go-w src/ dst/",
         rsync_log_in_worktree: "rsync -a --log-file=./rsync.log src/ dst/",
+        rsync_temp_dir_in_worktree: "rsync --temp-dir=./tmp src/ dst/",
+        rsync_partial_dir_relative: "rsync --partial-dir=.rsync-partial src/ dst/",
     }
 
     denied! {
@@ -93,6 +95,12 @@ mod tests {
         rsync_log_outside: "rsync -a --log-file=/etc/rsync.log src/ dst/",
         rsync_log_outside_spaced: "rsync -a --log-file /etc/rsync.log src/ dst/",
         rsync_batch_outside: "rsync -a --write-batch=/etc/batch src/ dst/",
+        rsync_temp_dir_absolute: "rsync --temp-dir=/abs src/ dst/",
+        rsync_temp_dir_spaced_absolute: "rsync --temp-dir /abs src/ dst/",
+        rsync_temp_dir_short_absolute: "rsync -T/abs src/ dst/",
+        rsync_partial_dir_absolute: "rsync --partial-dir=/abs src/ dst/",
+        rsync_partial_dir_spaced_absolute: "rsync --partial-dir /abs src/ dst/",
+        rsync_partial_dir_home: "rsync --partial-dir=~/x src/ dst/",
     }
 
     #[test]
