@@ -1,6 +1,6 @@
 [[command]]
 name = "codex"
-description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. debug app-server starts the app server and sends it a message, which runs an agent turn. mcp add / remove and features enable / disable write ~/.codex/config.toml, so the server command added, or the feature turned on, runs at every later start. -c / --config, --enable and --disable set the same keys for one run (an MCP server command, the notify program, the sandbox and approval policy, the cloud server), and every subcommand takes them, before or after its own name. CODEX_HOME picks the folder config.toml is read from. mcp list and mcp get print each configured server, including the environment variables set for it, which often hold tokens. The project is under active development with frequent CLI changes."
+description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files, so exec, resume and sandbox are approved only with --help or -h alone; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. debug app-server starts the app server and sends it a message, which runs an agent turn. mcp add / remove and features enable / disable write ~/.codex/config.toml, so the server command added, or the feature turned on, runs at every later start. -c / --config, --enable and --disable set the same keys for one run (an MCP server command, the notify program, the sandbox and approval policy, the cloud server), and every subcommand takes them, before or after its own name. CODEX_HOME picks the folder config.toml is read from. mcp list and mcp get print each configured server, including the environment variables set for it, which often hold tokens. The project is under active development with frequent CLI changes."
 url = "https://github.com/openai/codex"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_denied = [
@@ -55,7 +55,7 @@ valued = ["--attempt"]
 max_positional = 1
 [[command.sub.sub]]
 name = "diff"
-bare = false
+bare = true
 standalone = ["--help", "-h"]
 valued = ["--attempt"]
 max_positional = 1
@@ -66,9 +66,27 @@ valued = ["--cursor", "--env", "--limit"]
 max_positional = 0
 [[command.sub.sub]]
 name = "status"
-bare = false
+bare = true
 standalone = ["--help", "-h"]
 max_positional = 1
+
+[[command.sub]]
+name = "exec"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "resume"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "sandbox"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "completion"

@@ -22,6 +22,10 @@ pub(crate) fn prints_the_environment(tokens: &[Token]) -> bool {
 }
 
 fn mise_set_shows_values(arguments: &[Token]) -> bool {
+    // clap prints the help and stops at the first `--help` or `-h`, before reading any name.
+    if arguments.first().is_some_and(|t| *t == "--help" || *t == "-h") {
+        return false;
+    }
     if arguments.iter().any(|t| *t == "--remove") {
         return false;
     }
