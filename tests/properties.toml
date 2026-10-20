@@ -154,6 +154,7 @@ owed = [
 "src/registry/build_archetype_flags.rs" = ["valued_joins_the_flag_and_command_lists"]
 "src/registry/build_lower.rs" = ["output_lowers_only_a_known_source"]
 "src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses"]
+"src/registry/dispatch/credential_args.rs" = ["a_credential_name_is_found_in_any_position"]
 "src/engine/archetype.rs" = []
 "src/engine/authoring.rs" = [
   "union_levels_admit_everything_but_their_declared_gap",

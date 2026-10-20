@@ -1,7 +1,7 @@
 use crate::parse::Token;
 use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
-
+mod credential_args;
 use super::policy::{check_owned, flag_given};
 use super::types::*;
 use super::{CMD_HANDLERS, SUB_HANDLERS};
@@ -176,17 +176,10 @@ fn dispatch_branching(
         return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
     }
     let glob_match = |p: &str| !arg.starts_with('-') && p.strip_suffix('*').map_or(arg == p, |prefix| arg.starts_with(prefix));
-    // A first positional naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
+    // An argument naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
     // aws_secret_access_key`) is a CREDENTIAL-READ — deny before the allow-glob admits it. The
-    // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware. Matched
-    // CASE-INSENSITIVELY: kubectl resource kinds are case-insensitive (`get Secret`/`SECRET` reads
-    // secrets), so a case-variant must not slip past the deny into the `*` allow. The allow-glob
-    // below stays case-sensitive — a case-insensitive ALLOW would be fail-open.
-    let glob_match_ci = |p: &str| match p.strip_suffix('*') {
-        Some(prefix) => arg.len() >= prefix.len() && arg.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes()),
-        None => arg.eq_ignore_ascii_case(p),
-    };
-    if glob.credential.iter().any(|p| glob_match_ci(p)) {
+    // value-dependent complement to `profile=credential-read`.
+    if credential_args::names_a_credential(&tokens[start..], glob.credential, &[pre_valued, glob.valued]) {
         return Verdict::Denied;
     }
     if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {

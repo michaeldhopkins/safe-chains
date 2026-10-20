@@ -475,7 +475,8 @@
 # syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
 # invocation as a credential exposure instead of allowing it. Checked after
 # explicit sub-subs and BEFORE the first_arg allow-glob, and it is flag-aware
-# (skips leading flags to find the real first positional). Use it when a
+# (asks every positional and each comma-separated item in it, skipping flags
+# and the values of listed valued flags: `get pods,secrets` reads Secrets too). Use it when a
 # specific resource/key name turns an otherwise-safe read into secret
 # disclosure — while every OTHER value stays a normal read via first_arg.
 # It is the value-dependent complement to `profile = "credential-read"`

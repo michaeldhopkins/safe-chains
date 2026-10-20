@@ -2136,6 +2136,27 @@ fn credential_first_arg_gates_every_secret_name_form() {
     ] {
         assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
     }
+    // kubectl reads several kinds in one call (`pods,secrets`, `pod/a secret/b`), so a credential
+    // name is one wherever the glob's arguments put it, not only first.
+    for name in ["secret", "secrets", "Secret", "SECRETS", "secret.v1.core"] {
+        for args in [
+            format!("pods,{name}"),
+            format!("{name},pods"),
+            format!("all,{name} -o yaml"),
+            format!("pod/x {name}/y -o yaml"),
+            format!("pods {name}"),
+            format!("-n prod pods,{name}"),
+            format!("pods -o yaml {name}"),
+        ] {
+            let c = format!("kubectl get {args}");
+            assert!(!crate::is_safe_command(&c), "a credential name in any position must deny: {c}");
+        }
+    }
+    for c in [
+        "kubectl get pods,services", "kubectl get pods -n secrets", "kubectl get pods -l app=secret", "kubectl get pod/x service/y -o yaml",
+    ] {
+        assert!(crate::is_safe_command(c), "a credential word as a flag's value or a lookalike must allow: {c}");
+    }
     for c in [
         "kubectl get pods", "kubectl get mycustomresource",
         "kubectl get secretstore db", // a CRD whose name merely starts with "secret" — not gated
