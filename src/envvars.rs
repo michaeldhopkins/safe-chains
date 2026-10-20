@@ -624,6 +624,34 @@ mod integration_tests {
         }
     }
 
+    /// mise reads every setting from a `MISE_` variable, and several of them choose which config
+    /// files load or are trusted, so a trusted config's hooks, tasks and `[env]` scripts run.
+    #[test]
+    fn no_mise_setting_arrives_through_the_environment() {
+        for cmd in [
+            "MISE_TRUSTED_CONFIG_PATHS=/ mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=. mise env",
+            "env MISE_TRUSTED_CONFIG_PATHS=/ mise ls",
+            "export MISE_TRUSTED_CONFIG_PATHS=/; mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=/ mise exec -- ls",
+            "MISE_GLOBAL_CONFIG_FILE=./evil.toml mise ls",
+            "MISE_CONFIG_FILE=./evil.toml mise ls",
+            "MISE_SYSTEM_CONFIG_FILE=./e.toml mise ls",
+            "MISE_PARANOID=0 mise ls",
+            "MISE_YES=1 mise ls",
+            "MISE_CONFIG_DIR=./x mise ls",
+            "MISE_DATA_DIR=./x mise ls",
+            "MISE_OVERRIDE_CONFIG_FILENAMES=evil.toml mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=/ cargo build",
+            "mise set MISE_TRUSTED_CONFIG_PATHS=/",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for cmd in ["mise ls", "MISE_TRUSTED_CONFIG_PATHS= mise ls", "MISEX=1 mise ls"] {
+            assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
+        }
+    }
+
     /// The loader, locale, resolver and interpreter variables audited after `GCONV_PATH` was found
     /// missing. Each names code, a program, or a file the process writes, from outside the project.
     #[test]
