@@ -15,6 +15,7 @@ use serde::Deserialize;
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
 mod home_spelling;
+pub(crate) use home_spelling::absolute_other_home;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
 mod protection;
@@ -844,25 +845,6 @@ fn other_user_home_role(path: &str) -> Option<Role> {
     })
 }
 
-/// `/Users/someone/…`, `/home/someone/…` — another user's home written out in full.
-///
-/// Only the `~name` spelling was recognised, and while every machine-rung path was refused that
-/// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
-/// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
-/// `canonicalize` has already folded it to `~/…`.
-pub(crate) fn absolute_other_home(path: &str) -> bool {
-    let home = std::env::var("HOME").unwrap_or_default();
-    let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
-    // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
-    // path handed to a macOS run must not come back with a different answer.
-    ["/Users", "/home"].iter().any(|parent| {
-        path.strip_prefix(parent)
-            .and_then(|r| r.strip_prefix('/'))
-            .and_then(|r| r.split('/').next())
-            .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
-    })
-}
-
 /// Anything under `$HOME` that matched no node and is not a sibling: readable, not writable.
 ///
 /// This is the first production construction site `LocalLocus::User` has ever had. The rung was
@@ -1471,6 +1453,35 @@ mod tests {
                 }
             }
         });
+    }
+
+    /// Another user's home written out in full is theirs in every spelling the default macOS
+    /// volume accepts: any case of `/Users` or `/home`, and the data-volume prefix. Only the exact
+    /// `/Users/someone` was recognised, so `/users/someone/notes` read out as an ordinary file.
+    #[test]
+    fn another_users_home_is_shielded_in_every_spelling_of_its_parent() {
+        let ours = std::env::var("HOME")
+            .ok()
+            .and_then(|h| h.rsplit_once('/').map(|(_, n)| n.to_string()))
+            .unwrap_or_default();
+        for os in ["macos", "linux"] {
+            with_os(os, || {
+                for spelling in [
+                    "/users/sc-someone-else/notes",
+                    "/USERS/sc-someone-else/notes",
+                    "/HOME/sc-someone-else/notes",
+                    "/System/Volumes/Data/Users/sc-someone-else/notes",
+                    "/system/volumes/data/users/sc-someone-else/notes",
+                    "/System/Volumes/Data/home/sc-someone-else/notes",
+                ] {
+                    assert!(classify_region(spelling).reads_secret, "{spelling} ({os}) is another user's home");
+                }
+                if !ours.is_empty() {
+                    let own = format!("/users/{ours}/notes.txt");
+                    assert!(!absolute_other_home(&own), "{own} ({os}) is our own home");
+                }
+            });
+        }
     }
 
     /// A freeze must survive a RAISED LEVEL, not just a grant.

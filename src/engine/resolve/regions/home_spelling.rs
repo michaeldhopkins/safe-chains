@@ -54,6 +54,28 @@ fn home_fold_case_insensitive(path: &str) -> Option<String> {
     Some(format!("~{rest}"))
 }
 
+/// `/Users/someone/…`, `/home/someone/…` — another user's home written out in full.
+///
+/// Only the `~name` spelling was recognised, and while every machine-rung path was refused that
+/// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
+/// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
+/// `canonicalize` has already folded it to `~/…`.
+pub(crate) fn absolute_other_home(path: &str) -> bool {
+    let home = std::env::var("HOME").unwrap_or_default();
+    let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
+    // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
+    // path handed to a macOS run must not come back with a different answer. The parent matches in
+    // any case and below the data volume, as the default macOS volume does (`/users/someone` is
+    // `/Users/someone`); the user's own name stays exact, so a case variant of ours is not ours.
+    let path = strip_prefix_ci(path, "/System/Volumes/Data").unwrap_or(path);
+    ["/Users", "/home"].iter().any(|parent| {
+        strip_prefix_ci(path, parent)
+            .and_then(|r| r.strip_prefix('/'))
+            .and_then(|r| r.split('/').next())
+            .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::strip_prefix_ci;
