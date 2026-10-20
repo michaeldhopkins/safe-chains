@@ -1479,28 +1479,35 @@ screen --help -S x	safe-read
 screen --help x	denied
 screen --version	safe-read
 screen -A	safe-read
+screen -A -dm	denied
 screen -D	safe-read
+screen -D -m	denied
+screen -Dm	denied
 screen -L	safe-read
 screen -O	safe-read
 screen -Q windows	denied
 screen -R	safe-read
 screen -S work -X exec rm -rf ~	denied
 screen -S work -X stuff 'rm -rf ~\\n'	denied
+screen -S work -d -m	denied
 screen -S x	safe-read
 screen -T x	safe-read
 screen -U	safe-read
+screen -U -dmS work	denied
 screen -X stuff x	denied
 screen -a	safe-read
 screen -c evil.rc	denied
 screen -d	safe-read
+screen -dm	denied
 screen -dm sh -c 'rm -rf ~'	denied
+screen -dmS work	denied
 screen -dmS work rm -rf ~	denied
 screen -e x	safe-read
 screen -h	safe-read
 screen -l	safe-read
 screen -list	safe-read
 screen -ls	safe-read
-screen -m	safe-read
+screen -m	denied
 screen -p x	safe-read
 screen -q	safe-read
 screen -r	safe-read

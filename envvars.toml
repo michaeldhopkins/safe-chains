@@ -34,6 +34,10 @@
 #                refused, since either sets it without an assignment.
 #   config-file  the value names a config file or repository that can name programs to run → the
 #                exec-path rule, and never a temp root or sibling project either.
+#   shell-program  the value names the shell a program starts for a new window or a shell escape →
+#                allowed as a bare name found on PATH or a name in a standard system bin directory,
+#                as a command word is trusted; a relative, home or temp path, or a word carrying
+#                arguments, is refused.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -176,6 +180,21 @@ because = "bash imports BASH_FUNC_<name>%% as a function definition, so the comm
 [env."__BASH_FUNC*"]
 shape = "opaque"
 because = "the macOS /bin/bash spelling of BASH_FUNC_ (__BASH_FUNC<name>%%)"
+measured = false
+
+# ── Terminal multiplexers ────────────────────────────────────────────────────
+# screen and tmux start the user's shell for every new window, and screen reads an rc file whose
+# `screen` and `exec` lines start programs. A detached session needs no terminal, so each of these
+# ran a planted script with nothing on the screen.
+[env.SHELL]
+shape = "shell-program"
+because = "screen and tmux start it for each new window and run their command strings through it (measured: SHELL=./x.sh tmux new -d and screen -dm executed x.sh)"
+[env.SCREENRC]
+shape = "opaque"
+because = "screen reads it in place of ~/.screenrc, and a screen line in it starts a program (measured: executes)"
+[env.SYSSCREENRC]
+shape = "opaque"
+because = "screen reads it in place of /etc/screenrc, with the same commands as SCREENRC"
 measured = false
 
 # ── Command substitution: the value IS a command ─────────────────────────────

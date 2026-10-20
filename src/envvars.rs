@@ -62,6 +62,9 @@ pub(crate) enum Shape {
     OptionString,
     ConfigDir,
     ConfigFile,
+    /// The value names the shell a program starts (`SHELL`). Allowed only as a bare name or a
+    /// standard system path, the way a command word is trusted.
+    ShellProgram,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -257,7 +260,19 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
+        Shape::ShellProgram => shell_program_verdict(value),
     }
+}
+
+/// A shell another program starts: a bare name found on `PATH`, or one in a standard system bin
+/// directory, as a command word is trusted. Anything else (a relative path, a home path, a word
+/// with arguments) may be a planted script.
+fn shell_program_verdict(value: &str) -> Verdict {
+    const STD_BINS: &[&str] = &["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
+    let name = STD_BINS.iter().find_map(|p| value.strip_prefix(p)).unwrap_or(value);
+    let plain =
+        !name.is_empty() && name != "." && name != ".." && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'));
+    if plain { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 /// Every token of an interpreter flag string must match a researched-inert prefix.
@@ -586,6 +601,26 @@ mod integration_tests {
             "R_PROFILE_USER=/tmp/evil.R ls",
         ] {
             assert!(!crate::is_safe_command(cmd), "a measured injection vector was allowed: {cmd}");
+        }
+    }
+
+    /// screen and tmux start `$SHELL` for a new window, and screen reads its rc file from
+    /// `SCREENRC` or `SYSSCREENRC`. Measured on screen 4.00.03 and tmux 3.6: each ran a planted script.
+    #[test]
+    fn a_session_never_starts_a_planted_shell_or_rc_file() {
+        for cmd in [
+            "SHELL=./x.sh screen -r x", "SHELL=/tmp/evil screen", "env SHELL=./x.sh screen -r", "export SHELL=./x.sh; screen -r",
+            "SHELL=./x.sh tmux new -d", "SHELL=~/bin/zsh tmux new -d", "SHELL='/bin/sh -c id' tmux new -d",
+            "SHELL=/bin/../tmp/x tmux new -d", "SCREENRC=./evil.rc screen -r", "SCREENRC=/tmp/evil.rc screen",
+            "SYSSCREENRC=/tmp/evil.rc screen", "env SCREENRC=./evil.rc screen", "export SCREENRC=./evil.rc && screen",
+            "export SYSSCREENRC=./evil.rc; screen",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for cmd in
+            ["SHELL=/bin/zsh tmux new -d", "SHELL=/opt/homebrew/bin/fish tmux new -d", "SHELL=bash tmux new -d", "SHELL= tmux new -d"]
+        {
+            assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
         }
     }
 
