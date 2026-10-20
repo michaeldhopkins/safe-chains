@@ -4,8 +4,8 @@
 //! prints reaches the agent. `export`, `declare` and `typeset` set variables, which is fine, but
 //! with no names or with `-p` they list every exported variable with its value, and zsh prints a
 //! name given without a value or an attribute flag. A lone `-` or `+` ends the options, so zsh's
-//! `export -` lists too, and zsh's `typeset -m` treats each name as a pattern and lists every match
-//! unless it assigns. `ps` shows each process's environment with the BSD `e` or `E` modifier.
+//! `export -` lists too, and zsh's `typeset -m` treats each name as a pattern and lists every match,
+//! even beside an assignment. `ps` shows each process's environment with the BSD `e` or `E` modifier.
 use crate::parse::Token;
 
 pub(crate) fn prints_the_environment(tokens: &[Token]) -> bool {
@@ -47,7 +47,6 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
     let mut names = 0;
     let mut bare_name = false;
     let mut after_separator = false;
-    let mut assigns = false;
     for argument in arguments {
         let word = argument.as_str();
         if !after_separator && matches!(word, "--" | "-" | "+") {
@@ -57,10 +56,9 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
         } else {
             names += 1;
             bare_name |= !word.contains('=');
-            assigns |= word.contains('=');
         }
     }
-    if letters.contains('p') || (letters.contains('m') && !assigns) {
+    if letters.contains(['p', 'm']) {
         return true;
     }
     if names == 0 {
@@ -86,7 +84,8 @@ mod tests {
             "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
             "mise set OPENAI_API_KEY", "mise set -g", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
             "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
-            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE",
+            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE", "typeset -m 'OPENAI*' X=1",
+            "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'", "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
         }
@@ -130,6 +129,8 @@ mod tests {
                 let names: Vec<&str> = values.iter().filter_map(|v| v.split('=').next()).collect();
                 let matched = format!("{cmd} -m {} {}", flags.join(" "), names.join(" "));
                 prop_assert!(!is_safe_command(&matched), "{}", matched);
+                let matched_and_set = format!("{cmd} -m {} {} {}", flags.join(" "), names.join(" "), values.join(" "));
+                prop_assert!(!is_safe_command(&matched_and_set), "{}", matched_and_set);
             }
         }
     }
