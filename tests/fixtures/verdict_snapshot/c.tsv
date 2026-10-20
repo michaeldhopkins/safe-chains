@@ -4957,6 +4957,7 @@ codex --help --version	denied
 codex --help x	denied
 codex --version	inert
 codex -V	inert
+codex -c sandbox_mode=danger-full-access exec hi	denied
 codex -c x	denied
 codex -h	inert
 codex apply	safe-write
@@ -4984,8 +4985,8 @@ codex debug	inert
 codex debug app-server	inert
 codex debug app-server x	inert
 codex debug x	denied
-codex exec	safe-write
-codex exec x	safe-write
+codex exec --full-auto hi	denied
+codex exec hi	denied
 codex features	inert
 codex features disable	safe-write
 codex features disable x	safe-write
@@ -4998,8 +4999,7 @@ codex features list --help x	denied
 codex features list -h	inert
 codex features list x	denied
 codex features x	denied
-codex fork	safe-write
-codex fork x	safe-write
+codex fork	denied
 codex mcp	inert
 codex mcp add	safe-write
 codex mcp add x	safe-write
@@ -5010,12 +5010,9 @@ codex mcp list x	inert
 codex mcp remove	safe-write
 codex mcp remove x	safe-write
 codex mcp x	denied
-codex resume	safe-write
-codex resume x	safe-write
-codex review	inert
-codex review x	inert
-codex sandbox	safe-write
-codex sandbox x	safe-write
+codex resume --last	denied
+codex review	denied
+codex sandbox macos rm -rf ~	denied
 codex x	denied
 codium	safe-read
 codium --add	safe-read

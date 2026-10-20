@@ -1,8 +1,17 @@
 [[command]]
 name = "codex"
-description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff, review) are read-only, while others (apply, exec, fork, resume) modify local state. The project is under active development with frequent CLI changes."
+description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff) only read, and apply modifies the worktree. exec, resume and fork run an agent session that executes shell commands and edits files; review runs one over the current changes; sandbox runs any command it is given under the Seatbelt or Landlock policy it names. The project is under active development with frequent CLI changes."
 url = "https://github.com/openai/codex"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_denied = [
+    "codex exec hi",
+    "codex exec --full-auto hi",
+    "codex -c sandbox_mode=danger-full-access exec hi",
+    "codex resume --last",
+    "codex fork",
+    "codex review",
+    "codex sandbox macos rm -rf ~",
+]
 [command.wrapper]
 valued = ["--config", "--disable", "--enable", "-c"]
 
@@ -48,12 +57,6 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
-name = "exec"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-
-[[command.sub]]
 name = "features"
 nested_bare = true
 [[command.sub.sub]]
@@ -70,12 +73,6 @@ tolerate_unknown_long = true
 name = "list"
 standalone = ["--help", "-h"]
 max_positional = 0
-
-[[command.sub]]
-name = "fork"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
 
 [[command.sub]]
 name = "mcp"
@@ -95,23 +92,6 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "remove"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-
-[[command.sub]]
-name = "resume"
-level = "SafeWrite"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-
-[[command.sub]]
-name = "review"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-
-[[command.sub]]
-name = "sandbox"
 level = "SafeWrite"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
