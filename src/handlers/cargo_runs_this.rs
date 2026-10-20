@@ -154,7 +154,9 @@ mod tests {
     use crate::is_safe_command;
 
     fn in_project(name: Option<&str>, cmd: &str) -> bool {
-        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-{}", std::process::id(), name.unwrap_or("virtual")));
+        static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let call = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-{}-{call}", std::process::id(), name.unwrap_or("virtual")));
         std::fs::create_dir_all(dir.join("src")).expect("project dir");
         let manifest = match name {
             Some(name) => format!("[package]\nname = \"{name}\"\nversion = \"0.1.0\"\n"),
