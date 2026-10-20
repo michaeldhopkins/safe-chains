@@ -7,20 +7,21 @@ const SSH_OPTIONS: &[&str] = &[
     "stricthostkeychecking", "user",
 ];
 
-/// Whether the line names a remote shell (`-e`, `--rsh`) that is not ssh or rsh with plain options.
-/// rsync starts it itself, so `-e sh` with `x:foo` runs `./x` here, and `-e make` reads a Makefile.
+/// Whether the line names a remote shell (`-e`, `--rsh`) that is not ssh or rsh with plain options,
+/// or an `--rsync-path` that is not a plain path to rsync. rsync starts the first itself, so `-e sh`
+/// with `x:foo` runs `./x` here, and the remote shell runs the second as a command line.
 pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
     let mut words = tokens.iter().skip(1).map(Token::as_str);
     while let Some(word) = words.next() {
         if word == "--" {
             break;
         }
-        let value = if let Some(long) = word.strip_prefix("--") {
+        let (is_shell, value) = if let Some(long) = word.strip_prefix("--") {
             let (name, glued) = long.split_once('=').map_or((long, None), |(name, value)| (name, Some(value)));
-            if name != "rsh" {
+            if name != "rsh" && name != "rsync-path" {
                 continue;
             }
-            if glued.is_some() { glued } else { words.next() }
+            (name == "rsh", if glued.is_some() { glued } else { words.next() })
         } else if let Some(cluster) = word.strip_prefix('-') {
             let Some(at) = cluster.find(VALUED_SHORT) else {
                 continue;
@@ -32,11 +33,16 @@ pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
                 }
                 continue;
             }
-            if glued.is_empty() { words.next() } else { Some(glued) }
+            (true, if glued.is_empty() { words.next() } else { Some(glued) })
         } else {
             continue;
         };
-        if !value.is_some_and(remote_shell_is_plain) {
+        let plain = match value {
+            Some(value) if is_shell => remote_shell_is_plain(value),
+            Some(value) => rsync_path_is_plain(value),
+            None => false,
+        };
+        if !plain {
             return true;
         }
     }
@@ -95,6 +101,12 @@ pub(crate) fn remote_shell_is_plain(value: &str) -> bool {
     true
 }
 
+/// A path whose last part is rsync, with nothing a shell would read as more than one word.
+fn rsync_path_is_plain(value: &str) -> bool {
+    value.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '/' | '.' | '_' | '-' | '+'))
+        && value.rsplit('/').next() == Some("rsync")
+}
+
 #[cfg(test)]
 mod tests {
     use super::remote_shell_is_plain;
@@ -110,6 +122,8 @@ mod tests {
         rsync_shell_long_ssh: "rsync --rsh=ssh x:foo dst/",
         rsync_shell_cluster_ssh: "rsync -avessh x:foo dst/",
         rsync_shell_env_ssh: "RSYNC_RSH=ssh rsync x:foo dst/",
+        rsync_path_plain: "rsync --rsync-path=/usr/local/bin/rsync host:src/ dst/",
+        rsync_path_bare: "rsync --rsync-path rsync host:src/ dst/",
     }
 
     denied! {
@@ -124,6 +138,11 @@ mod tests {
         rsync_shell_env_make: "env RSYNC_RSH=make rsync x:foo dst/",
         rsync_shell_proxy_command: "rsync -e 'ssh -o ProxyCommand=id' x:foo dst/",
         rsync_shell_remote_sh: "rsync -a -M-esh src/ dst/",
+        rsync_path_shell: "rsync --rsync-path='sh -c id' host:src/ dst/",
+        rsync_path_spaced_shell: "rsync --rsync-path 'sudo rsync' host:src/ dst/",
+        rsync_path_other_program: "rsync --rsync-path=/bin/sh host:src/ dst/",
+        rsync_path_metacharacter: "rsync --rsync-path='rsync;id' host:src/ dst/",
+        rsync_path_remote_option: "rsync -a -M--rsync-path=sh src/ dst/",
     }
 
     #[test]
