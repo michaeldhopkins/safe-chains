@@ -99,6 +99,12 @@ deny	read-shield	cat ~/.qwen/oauth_creds.json
 deny	read-shield	cat ~/.grok/auth.json
 deny	read-shield	cat ~/.local/share/opencode/auth.json
 deny	read-shield	cat ~/.config/github-copilot/apps.json
+deny	read-shield	cat ~/.gemini/.env
+deny	read-shield	cat ~/.gemini/mcp-oauth-tokens.json
+deny	read-shield	cat ~/.copilot/config.json
+deny	read-shield	cat ~/.local/share/amp/secrets.json
+deny	read-shield	cat ~/.claude.json
+deny	read-shield	jq .mcpServers ~/.claude.json
 deny	read-shield	grep token ~/.codex/auth.json
 deny	read-shield	jq . ~/.claude/.credentials.json
 allow	read-home	cat ~/.codex/config.toml

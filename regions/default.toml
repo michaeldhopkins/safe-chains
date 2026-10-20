@@ -486,6 +486,31 @@ path = "~/.config/github-copilot/"
 role = "credential-store"
 note = "GitHub Copilot's OAuth tokens (hosts.json, apps.json), shared by the editor plugins and the CLI."
 researched = "2026-10-19"
+[[region]]
+path = "~/.copilot/"
+role = "credential-store"
+note = "GitHub Copilot CLI's folder: config.json holds its GitHub token in plain text when no system keychain is available, and the session store and logs keep what each session saw. Shielded whole, since config.json is too common a name to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.gemini/.env"
+role = "credential-store"
+note = "Gemini CLI's user-level environment file, where GEMINI_API_KEY and GOOGLE_API_KEY are kept."
+researched = "2026-10-20"
+[[region]]
+path = "~/.gemini/mcp-oauth-tokens.json"
+role = "credential-store"
+note = "Gemini CLI's OAuth tokens for the MCP servers it signs in to."
+researched = "2026-10-20"
+[[region]]
+path = "~/.local/share/amp/secrets.json"
+role = "credential-store"
+note = "Amp's API key and sign-in token."
+researched = "2026-10-20"
+[[region]]
+path = "~/.claude.json"
+role = "credential-store"
+note = "Claude Code's user state: its MCP server entries carry the environment and headers given to `claude mcp add`, often API keys, and an API-key sign-in may be kept here."
+researched = "2026-10-20"
 
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
