@@ -52,6 +52,9 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
         if !after_separator && matches!(word, "--" | "-" | "+") {
             after_separator = true;
         } else if !after_separator && word.len() > 1 && word.starts_with(['-', '+']) {
+            if !only_known_attributes(&word[1..]) {
+                return true;
+            }
             letters.push_str(&word[1..]);
         } else {
             names += 1;
@@ -65,6 +68,21 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
         return !(a_bare_name_prints && !letters.is_empty() && letters.chars().all(|c| matches!(c, 'f' | 'F')));
     }
     a_bare_name_prints && bare_name && letters.is_empty()
+}
+
+/// Whether every letter is an attribute flag bash or zsh documents, with digits only as the width,
+/// precision or base that follows `-E`, `-F`, `-L`, `-R`, `-Z` or `-i`. zsh reads a bare digit
+/// option (`typeset -1 X`) as a request to print, and an unknown letter may be one a later shell
+/// adds, so either counts as listing. `p` and `m` are known but list, and the caller judges them.
+fn only_known_attributes(letters: &str) -> bool {
+    let mut takes_digits = false;
+    letters.chars().all(|c| {
+        if c.is_ascii_digit() {
+            return takes_digits;
+        }
+        takes_digits = matches!(c, 'E' | 'F' | 'L' | 'R' | 'Z' | 'i');
+        "AEFHILRTUZafghilmnprtux".contains(c)
+    })
 }
 
 fn bsd_options_show_the_environment(word: &str) -> bool {
@@ -86,6 +104,8 @@ mod tests {
             "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
             "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE", "typeset -m 'OPENAI*' X=1",
             "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'", "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1",
+            "typeset -1 X", "typeset -1x X", "typeset -9 X", "typeset +9 X", "declare -0 X", "declare +1 X", "typeset -1 Y=2 X",
+            "typeset -x1 X", "export -1 X", "export -0 X", "typeset -Q X", "declare -1i X", "typeset +1x X",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
         }
@@ -98,7 +118,8 @@ mod tests {
             "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
             "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise env --help", "launchctl list",
-            "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e",
+            "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
+            "typeset -Z2 X=5", "typeset -E X", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }
