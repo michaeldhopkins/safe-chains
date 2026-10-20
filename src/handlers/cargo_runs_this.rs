@@ -1,7 +1,7 @@
 //! Which binary a `cargo run` starts, as far as it decides whether that binary is safe-chains.
 //!
 //! The rule-change check only matters when the binary run is this one, so it applies when `--bin`
-//! names it, when `-p` / `--package` names safe-chains and no `--bin` or `--example` is given, and
+//! names it, when `-p` / `--package` names safe-chains (in any case, with `_` read as `-`) and no `--bin` or `--example` is given, and
 //! otherwise when the package of the nearest `Cargo.toml` is safe-chains. A `--bin` or `--example`
 //! naming another target still reads that manifest, since any target of a package that is or uses
 //! safe-chains can reach its rule changes. The nearest manifest is the one above the folder cargo
@@ -19,16 +19,20 @@ pub(crate) fn runs_safe_chains(tokens: &[Token], arguments_at: usize) -> bool {
     let Some(target) = Target::of(&tokens[1..arguments_at.min(tokens.len())]) else {
         return true;
     };
-    if target.bin.is_some_and(|bin| bin.contains(THIS)) {
+    if target.bin.is_some_and(names_this) {
         return true;
     }
     if target.bin.is_none()
         && !target.example
         && let Some(package) = target.package
     {
-        return package.contains(THIS);
+        return names_this(package);
     }
     nearest_manifest_names_this(target.manifest_path, target.chdir)
+}
+
+fn names_this(name: &str) -> bool {
+    name.to_ascii_lowercase().replace('_', "-").contains(THIS)
 }
 
 #[derive(Default)]
@@ -178,7 +182,8 @@ mod tests {
             "cargo run -- config add x", "cargo run -q -- mcp", "cargo run --bin safe-chains -- mcp", "cargo run --bin=safe-chains -- mcp",
             "cargo run -p safe-chains -- mcp", "cargo run -psafe-chains -- mcp", "cargo run -qp safe-chains -- mcp",
             "cargo run -qpsafe-chains -- mcp", "cargo run --package=safe-chains -- mcp", "cargo run --package safe-chains -- mcp",
-            "cargo run -p $P -- mcp", "cargo run --bin $B -- mcp", "cargo run -- -- mcp",
+            "cargo run -p $P -- mcp", "cargo run --bin $B -- mcp", "cargo run -- -- mcp", "cargo run -p safe_chains -- mcp",
+            "cargo run --package=Safe_Chains -- mcp", "cargo run --bin safe_chains -- mcp",
         ] {
             assert!(!in_project(Some("safe-chains"), cmd), "{cmd} must not be approved in this project");
         }
@@ -186,6 +191,8 @@ mod tests {
             "cargo run -p safe-chains -- mcp",
             "cargo run -qpsafe-chains -- mcp",
             "cargo run --bin safe-chains -- mcp",
+            "cargo run -p safe_chains -- mcp",
+            "cargo run --bin safe_chains -- mcp",
             "cargo run --manifest-path ../../elsewhere/Cargo.toml -- mcp",
         ] {
             assert!(!in_project(Some("tool"), cmd), "{cmd} must not be approved from another project");
