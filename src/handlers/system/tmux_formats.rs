@@ -169,6 +169,7 @@ mod tests {
             "#{OPENAI_API_KEY}", "#{HOME}", "#{=3:GITHUB_TOKEN}", "#{t:SECRET}", "#{s/a/b/:SECRET}", "#{?SECRET,a,b}",
             "#{?0,a,SECRET,c,d}", "#{==:#{SECRET},x}", "#{session_name}#{SECRET}", "#{#{session_name}}", "#{q:SECRET}", "#{b;=5:SECRET}",
             "#{session_name", "#{s/a:b/c/:SECRET}", "#{http_proxy}",
+            "#{?0,#{session_name},SECRET,d}", "#{SECRET-KEY}", "#{a-b.c}", "#{a-b c}",
         ] {
             assert!(!reads_only_tmux_values(word), "{word}");
         }

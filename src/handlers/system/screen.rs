@@ -36,7 +36,7 @@ fn starts_a_session(arguments: &[Token], valued: &[String]) -> bool {
         if LISTINGS.contains(&word) || matches!(word, "--help" | "--version") {
             return false;
         }
-        let Some(cluster) = word.strip_prefix('-').filter(|c| !c.is_empty() && !c.starts_with('-')) else {
+        let Some(cluster) = word.strip_prefix('-').filter(|c| !c.starts_with('-')) else {
             continue;
         };
         for (at, c) in cluster.char_indices() {
@@ -114,6 +114,9 @@ mod tests {
         screen_new_quiet_session: "screen -q",
         screen_new_scrollback_session: "screen -h 5000",
         screen_new_session_glued_name: "screen -Swork",
+        screen_session_named_like_a_reattach: "screen -S -r",
+        screen_session_named_like_a_detach: "screen -S -d",
+        screen_scrollback_named_like_a_reattach: "screen -h -x",
     }
 
     proptest! {
