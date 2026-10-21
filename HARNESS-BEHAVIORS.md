@@ -20,7 +20,7 @@ independently exercised.
 
 | Harness  | Runtime hook | Status | Evidence / note |
 |----------|:------------:|--------|-----------------|
-| **Claude** | ✅ | ✅ **Verified live** (2026-07) + docs | Dogfooded — the allow envelope auto-approves, abstain→`additionalContext` surfaces the reason without blocking (this session). |
+| **Claude** | ✅ | ✅ **Docs-checked** v2.1.302 (2026-10-21); live drive 2026-07 | `claude --version` is 2.1.302. `allow` skips the prompt. Omitting the decision is the normal flow. Explicit `defer` ends the turn. See §Claude. |
 | **Codex** | ✅ | ✅ **Probe-verified** `PreToolUse` (v0.144.3, 2026-07-13) · ◻️ **Source-verified** `PermissionRequest` (v0.160.1, 2026-10-05) | `PreToolUse`: `deny` honored; `allow`/`ask` unsupported (still so in v0.160.1 source). `PermissionRequest` (v0.122.0+): `decision.behavior:"allow"` answers Codex's approval prompt; not yet driven end to end. Config nests under top-level `hooks`. See §Codex. |
 | **Antigravity (`agy`)** | ✅ | 📄 **Docs-checked** v1.4.3 (2026-10-21); last live drive v1.1.2 | CLI `agy --version` is 1.4.3. Not re-driven. `allow` delegates to the next hook or default policy. `auto_approve` is the documented grant. `deny`, `ask`, `force_ask`, and `deny_unless_prior_grant` are documented. See §Gemini. |
 | **Gemini** | (exit codes) | 📄 **Docs-checked** v0.64.0 (2026-10-21); binary not installed | Consumer accounts stopped 2026-06-18. Stable v0.64.0 (2026-10-13) still documents `BeforeTool` with `allow` / `deny` only. Target kept for that CLI. |
@@ -34,7 +34,7 @@ independently exercised.
 **Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
-Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude/Codex done; opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
+Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude is docs-checked at v2.1.302 (see §Claude); Codex done; opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
 
 ## The model we rely on
 
@@ -94,7 +94,7 @@ target looks like.
 
 | Target  | Tool / matcher          | Envelope shape                         | Decision field      | Values honored        | Timeout unit |
 |---------|-------------------------|----------------------------------------|---------------------|-----------------------|--------------|
-| Claude  | `Bash`                  | `{hookSpecificOutput: {...}}`          | `permissionDecision`| allow / deny / ask / (omit = defer) | — |
+| Claude  | `Bash` (exact match)    | `{hookSpecificOutput: {...}}`          | `permissionDecision`| `allow` / `deny` / `ask` / `defer`. Omit is the normal flow, not `defer` | seconds (command default 600) |
 | Codex `PreToolUse` | `Bash`; config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). `allow`/`ask` parsed-but-UNSUPPORTED (v0.144.3 through v0.160.1) | seconds |
 | Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* (everything else → Codex's own prompt) | seconds |
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
@@ -295,21 +295,34 @@ contract, CLI tab: [Hooks](https://antigravity.google/docs/hooks).
 
 Verified: agy 1.4.3 2026-10-21
 
-### Claude Code — VERIFIED LIVE, 2026-07 (in a running session)
+### Claude Code — docs-checked v2.1.302, 2026-10-21
 
-Previously verified only from the Claude Code hooks docs; now confirmed end-to-end by running the
-installed hook inside a live Claude Code session (this is the harness safe-chains dogfoods on):
-- **Allow envelope works.** An allowlisted command (`cargo test`, `grep`, …) returns
-  `{hookSpecificOutput: {permissionDecision: "allow", permissionDecisionReason}}` and is **auto-approved
-  silently** — no prompt. Observed hundreds of times.
-- **Abstain + context works.** A non-allowlisted command returns `additionalContext` with NO
-  `permissionDecision`; Claude injects the "did not auto-approve" text and the
-  command proceeds through the **normal permission flow** (the user's own allowlist / a prompt) —
-  exactly the abstain contract in `src/targets/claude.rs` (allow → `permissionDecision:"allow"`, else
-  `additionalContext` only). `permissionDecision: "deny"`/`"ask"` are supported by the shape but
-  safe-chains never emits them (allowlist-only, human keeps the review).
-- **Capability summary:** grant ✅ (allow) · deny (unused) · human-review-on-silence ✅ (abstain →
-  Claude's own prompt) · additionalContext ✅. Matches `src/targets/claude.rs`.
+`claude --version` is 2.1.302 (Claude Code). Current contract:
+[Hooks](https://code.claude.com/docs/en/hooks). The 2026-07 session below was not repeated.
+
+- **Config.** `PreToolUse` matcher `Bash` is an exact tool-name match. A value with any
+  other character is an unanchored JavaScript regular expression. Command, HTTP, and
+  MCP-tool hooks default to a 600 second timeout (30 seconds on `UserPromptSubmit`,
+  `PreModelSwitch`, and `PostModelSwitch`). A `PreToolUse` timeout does not block the
+  tool unless `onFailure` is `"block"`.
+- **Decisions.** `hookSpecificOutput.permissionDecision`: `allow`, `deny`, `ask`, `defer`.
+  `allow` skips the permission prompt, except for actions no mode auto-approves and
+  reads from network paths, and it does not bypass a settings deny rule. `deny` blocks
+  the call and the reason is shown to Claude. `ask` prompts, including in auto mode,
+  where the classifier can still deny and cannot approve silently. `defer` ends the
+  turn so the tool can be resumed, requires non-interactive `-p`, and drops
+  `updatedInput` and `additionalContext`. Precedence across hooks is deny, then defer,
+  then ask, then allow. Exit 0 with no JSON is no decision: the normal permission flow
+  runs. Exit 2 blocks the call even when the JSON says `allow`. `additionalContext` is
+  added beside the tool result and ignored when the decision is `defer`.
+- **What safe-chains emits.** `permissionDecision: "allow"` for a safe command. For
+  anything else, `additionalContext` and no decision, which is the normal flow. It does
+  not emit `deny`, `ask`, or `defer`.
+- **Live drive (2026-07).** An allow envelope auto-approved allowlisted commands with no
+  prompt. A gated command returned `additionalContext` only, and the command went
+  through Claude's own permission flow.
+
+Verified: claude 2.1.302 2026-10-21
 
 ### Cursor CLI (`cursor-agent`) — docs-checked CLI v2026.10.08, 2026-10-21
 
@@ -461,7 +474,7 @@ flow is untouched.
 
 | Target  | `additionalContext` support | What we do |
 |---------|-----------------------------|------------|
-| Claude  | Yes (verified LIVE this session + docs) | emit on the mixed-chain case |
+| Claude  | Yes ([Hooks](https://code.claude.com/docs/en/hooks), v2.1.302; also the 2026-07 drive) | emit on the mixed-chain case |
 | Grok    | Yes, on settings-file `PreToolUse` (`~/.grok/docs/user-guide/10-hooks.md`; clipped at 10,000 characters; dropped on hook deny, prompt reject, and `defer`) | default abstain |
 | Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
