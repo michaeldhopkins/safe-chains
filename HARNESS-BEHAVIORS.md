@@ -26,7 +26,7 @@ independently exercised.
 | **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
-| **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
+| **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
 | **Grok** | ✅ | ✅ **Verified live → DENY harness** (`grok` v0.2.106, 2026-07) | Native `~/.grok/hooks/safe-chains.json`; **camelCase** envelope (`toolInput.command`, `workspaceRoot`); top-level `decision` + exit 2. Drove the TUI: `cat /etc/hosts` **blocked** (didn't run; reason shown to UI *and* model), `ls -la` ran. `allow` only "declines to deny" (not a grant — like Cursor/Codex). ⚠ grok auto-loads the Claude hook via compat and fails open on it — set `[compat.claude] hooks=false`. See §Grok. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
@@ -34,8 +34,7 @@ independently exercised.
 **Remaining live-verification work:** only Qwen/Droid (both "assumed" Claude-Code mirrors) — optionally
 exercise to upgrade to "verified". Grok is now verified live (a DENY harness — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
-Cursor is done (a DENY harness, `allow` ignored
-on the CLI); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
+Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
 
 ## The model we rely on
 
@@ -101,7 +100,7 @@ target looks like.
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
 | Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
-| Cursor  | (settings `version: 1`) | flat object                            | `permission`        | **deny** honored; `allow`/`ask` IGNORED (allowlist wins — cursor bug) | — |
+| Cursor  | `beforeShellExecution` (matcher is the command string; safe-chains sets none) | flat object | `permission` | docs: `allow` / `deny` / `ask`. Live v2026.07.16: **deny** honored, `allow` ignored | seconds |
 | Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
 | Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
 
@@ -275,31 +274,43 @@ installed hook inside a live Claude Code session (this is the harness safe-chain
 - **Capability summary:** grant ✅ (allow) · deny (unused) · human-review-on-silence ✅ (abstain →
   Claude's own prompt) · additionalContext ✅. Matches `src/targets/claude.rs`.
 
-### Cursor CLI (`cursor-agent`) — VERIFIED LIVE, v2026.07.16, 2026-07 (with a finding)
+### Cursor CLI (`cursor-agent`) — docs-checked CLI v2026.10.08, 2026-10-21
 
-Driven end-to-end via TUI automation, with a logging wrapper around `safe-chains hook cursor` proving
-each invocation. Config: `~/.cursor/hooks.json` → `hooks.beforeShellExecution[].command`.
-- **Hook fires; envelope matches our parser.** cursor-agent sends the documented
-  `beforeShellExecution` payload — top-level `command`, `workspace_roots`, `cursor_version`, and
-  (observed) an EMPTY `cwd` (our parser already falls back to `workspace_roots[0]` for the root).
-- **`deny` WORKS.** A forced `{"permission":"deny", "user_message":...}` blocked even `echo`:
-  *"The command did not run. Cursor blocked it with this hook message: <our message>."* So cursor
-  honors `deny` and surfaces our text.
-- **`allow` is IGNORED (the finding).** With `{"permission":"allow"}` — both from real safe-chains
-  (`cat README.md`, a worktree read we allow) AND a forced always-allow wrapper — cursor STILL prompts
-  *"Run this command? Not in allowlist: cat"*. Its own per-user command allowlist runs regardless of a
-  hook `allow`. (Cursor's docs list `allow` as valid but don't say it bypasses the allowlist; live, it
-  does not.) The in-app tip even says "/run-everything to skip all approvals" — hooks don't grant.
-- **DECISION (2026-07): Cursor is a DENY harness** (`gated_policy() = Deny`). Since `allow` is the only
-  broken lever and `deny` works, `src/targets/cursor.rs` now emits `permission:"deny"` (with our reason
-  in `user_message`/`agent_message`) for a gated command, and keeps `permission:"allow"` for a safe one
-  (inert until cursor honors it). The forum confirms the ignored-`allow` behaviour is a bug
-  (forum.cursor.com/t/…/144244), so this is REVISITABLE: if cursor starts honoring `allow`, switch back
-  to allow-for-safe + Defer (abstain) for gated. The Cursor IDE may already differ from the CLI (untested).
-- **TRADE-OFF to remember:** like Codex, a Deny harness VETOES every not-allowlisted command — and on
-  Cursor the veto is a hard block (no in-app "approve once"), so the escape valve is a
-  `~/.config/safe-chains.toml` grant, not cursor's prompt. This is stricter than the prior abstain
-  (which let cursor prompt); it is the price of protection while `allow` is broken.
+`cursor-agent --version` could not be run. The published
+[CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08.
+Version directories beside the install are `2026.05.05-84a231c` and
+`2026.07.16-899851b`; the wrapper runs `index.js` next to itself and does not name
+which build that is. Current contract: [Hooks](https://cursor.com/docs/hooks).
+The live drive below is `cursor-agent` v2026.07.16 and was not repeated.
+
+- **Event safe-chains installs.** `~/.cursor/hooks.json` (`version: 1`) →
+  `hooks.beforeShellExecution[]`, timeout 30 seconds, no matcher. A matcher on this
+  event is tested against the shell command string. Input is top-level `command`,
+  `cwd`, and `sandbox`, plus the common fields `conversation_id`, `generation_id`,
+  `model`, `hook_event_name`, `cursor_version`, `workspace_roots`, `user_email`,
+  and `transcript_path`. Output is `permission` (`allow`, `deny`, or `ask`),
+  `user_message`, and `agent_message`. Any `deny` wins over `ask`, and `ask` wins
+  over `allow`. Exit 0 uses the JSON. Invalid JSON or a schema mismatch on a
+  permission hook blocks the action. Exit 2 is a deny. Any other non-zero exit
+  fails open unless `failClosed` is true. A timeout is seconds and fails open
+  the same way.
+- **Second shell event.** `preToolUse` with `tool_name` `Shell` carries
+  `tool_input.command` and `tool_input.working_directory`. Its output `permission`
+  is `allow` or `deny`; `ask` is accepted by the schema and not enforced. safe-chains
+  does not install that event. Its parser accepts `beforeShellExecution` only.
+- **Live drive (v2026.07.16, 2026-07).** The hook fired. `cwd` arrived empty and
+  the parser took `workspace_roots[0]` as the root. `permission: "deny"` blocked
+  `echo` and showed `user_message`. `permission: "allow"` did not skip the
+  command allowlist prompt ("Run this command? Not in allowlist: cat"), including
+  from a wrapper that always returned allow. The [CLI changelog](https://cursor.com/docs/cli/changelog)
+  through v2026.10.08 does not say that `allow` is now honored. The ignored-allow report is forum thread 144244.
+- **What safe-chains emits.** `permission: "deny"` with `user_message` and
+  `agent_message`, exit 0, for a gated command. `permission: "allow"` for a safe
+  command. It does not emit `ask`. While the v2026.07.16 result holds, the deny
+  is the protective lever and the allow is inert. A gated command is a hard block;
+  the escape is a safe-chains grant, not Cursor's prompt.
+
+Verified: cursor 2026.10.08 2026-10-21
 
 ### opencode — INERT (pattern generator is a stub), 2026-07
 
@@ -379,7 +390,7 @@ flow is untouched.
 | Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Droid   | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Codex   | Unverified                  | default abstain (emit nothing) |
-| Cursor  | Unverified / different shape | default abstain |
+| Cursor  | No `additionalContext` on `beforeShellExecution` ([Hooks](https://cursor.com/docs/hooks): `permission`, `user_message`, `agent_message`) | default abstain |
 | Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
 | Copilot | Not a `preToolUse` field (v1.0.101 [hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference): `postToolUse`, `sessionStart`, `subagentStart`) | default abstain |
 
