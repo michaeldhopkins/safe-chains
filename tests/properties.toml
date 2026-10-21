@@ -234,6 +234,8 @@ owed = [
   "a_remote_option_is_judged_as_the_same_option_given_locally",
 ]
 "src/handlers/coreutils/rsync_shell.rs" = [
+  "a_connect_program_is_refused_in_every_spelling",
+  "a_remote_shell_variable_agrees_with_its_flag_in_every_spelling",
   "a_remote_shell_other_than_ssh_is_never_approved",
 ]
 "src/handlers/coreutils/stdin_names.rs" = [

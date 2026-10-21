@@ -197,6 +197,36 @@ mod tests {
     }
 
     proptest! {
+        /// A program rsync would start to reach a daemon is a command line in every spelling, so
+        /// none of them is approved. The remote shell's spellings agree with `-e`.
+        #[test]
+        fn a_connect_program_is_refused_in_every_spelling(
+            value in prop::sample::select(vec!["id", "cat", "echo", "sh", "make", "ssh", "rsh", "./evil"]),
+            spelling in 0usize..3,
+        ) {
+            let line = match spelling {
+                0 => format!("RSYNC_CONNECT_PROG={value} rsync rsync://x/foo dst/"),
+                1 => format!("env RSYNC_CONNECT_PROG={value} rsync rsync://x/foo dst/"),
+                _ => format!("export RSYNC_CONNECT_PROG={value}; rsync rsync://x/foo dst/"),
+            };
+            prop_assert!(!is_safe_command(&line), "{}", line);
+        }
+
+        /// However RSYNC_RSH is set, it is the same choice as `-e`.
+        #[test]
+        fn a_remote_shell_variable_agrees_with_its_flag_in_every_spelling(
+            value in prop::sample::select(vec!["id", "cat", "echo", "sh", "make", "ssh", "rsh", "./evil", "./bin/tool"]),
+            spelling in 0usize..3,
+        ) {
+            let via_flag = format!("rsync -e {value} ./src/ ./dst/");
+            let line = match spelling {
+                0 => format!("RSYNC_RSH={value} rsync ./src/ ./dst/"),
+                1 => format!("env RSYNC_RSH={value} rsync ./src/ ./dst/"),
+                _ => format!("export RSYNC_RSH={value}; rsync ./src/ ./dst/"),
+            };
+            prop_assert_eq!(is_safe_command(&line), is_safe_command(&via_flag), "{} vs {}", line, via_flag);
+        }
+
         /// However the remote shell is spelled on the line, only ssh or rsh is approved.
         #[test]
         fn a_remote_shell_other_than_ssh_is_never_approved(

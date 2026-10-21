@@ -1175,8 +1175,8 @@ twin_flag = "xcrun --toolchain {v} swift-format lint Sources/"
 twin_base = "xcrun swift-format lint Sources/"
 because = "selects the xctoolchain xcrun dispatches tools from (the --toolchain twin)"
 [env.RSYNC_CONNECT_PROG]
-shape = "command"
-because = "rsync runs it through the shell, with %H replaced by the host, to reach an rsync daemon in place of a TCP connection"
+shape = "opaque"
+because = "rsync runs it through the shell, with %H replaced by the host, to reach an rsync daemon in place of a TCP connection, so any value is a command line"
 measured = false
 [env.KUBECONFIG]
 shape = "exec-path"
