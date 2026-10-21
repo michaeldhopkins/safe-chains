@@ -78,3 +78,20 @@ fn a_tree_with_too_many_entries_to_list_is_refused_to_a_following_read() {
     }
     assert!(at(&p, "rg x").is_allowed());
 }
+
+fn with_secret_link() -> Project {
+    let p = project();
+    std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", format!("{}/k", p.root)).expect("link to a secret");
+    p
+}
+
+#[test]
+fn a_y_inside_a_zip_option_value_does_not_stop_it_following_links() {
+    let p = with_secret_link();
+    for cmd in ["zip -r -n.y - .", "zip -rn.y - .", "zip -r -n .y - .", "zip -r -t2020-01-01y - ."] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+    for cmd in ["zip -r -y - .", "zip -ry - .", "zip -r -n.z -y - .", "zip -r --symlinks - ."] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused though it stores the link");
+    }
+}

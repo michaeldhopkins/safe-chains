@@ -65,14 +65,18 @@ fn trees_only(trees: Vec<String>) -> Read {
 }
 
 fn zip_roots(tokens: &[Token]) -> Option<Read> {
+    let (standalone, valued) = crate::registry::command_flag_sets("zip").unwrap_or((&[], &[]));
     let stores_links = tokens.iter().skip(1).take_while(|token| token.as_str() != "--").any(|token| {
         let word = token.as_str();
-        word == "--symlinks" || word.starts_with("--symlinks=") || (word.starts_with('-') && !word.starts_with("--") && word.contains('y'))
+        word == "--symlinks"
+            || word.starts_with("--symlinks=")
+            || word
+                .strip_prefix('-')
+                .is_some_and(|cluster| !cluster.starts_with('-') && cluster_stores_links(cluster, valued))
     });
     if stores_links {
         return None;
     }
-    let (standalone, valued) = crate::registry::command_flag_sets("zip").unwrap_or((&[], &[]));
     let mut positionals = Vec::new();
     let mut names_from_stdin = false;
     let mut i = 1;
@@ -99,6 +103,20 @@ fn zip_roots(tokens: &[Token]) -> Option<Read> {
         }
     }
     Some(Read { trees, places: Vec::new(), unresolved })
+}
+
+/// Whether a short cluster holds `-y`: a letter after one that takes a value is that value
+/// (`-n.y` names suffixes not to compress).
+fn cluster_stores_links(cluster: &str, valued: &[String]) -> bool {
+    for letter in cluster.chars() {
+        if letter == 'y' {
+            return true;
+        }
+        if valued.iter().any(|flag| flag.strip_prefix('-') == Some(letter.encode_utf8(&mut [0; 4]))) {
+            return false;
+        }
+    }
+    false
 }
 
 fn zip_value_step(word: &str, standalone: &[String], valued: &[String], next: Option<&Token>) -> Option<usize> {
