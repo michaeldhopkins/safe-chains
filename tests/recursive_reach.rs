@@ -239,6 +239,16 @@ fn tar_follows_a_link_from_the_directory_in_effect() {
 }
 
 #[test]
+fn zip_follows_links_in_names_read_from_stdin() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in ["git ls-files | zip -@ -", "git ls-files | zip -@ out.zip", "git ls-files | zip out.zip -@"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
 fn ag_follows_links_into_the_path_after_its_pattern() {
     let secret = "/etc/ssh/not-a-real-key";
     let plain = project(&["src"]);

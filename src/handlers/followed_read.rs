@@ -16,13 +16,16 @@ use crate::verdict::Verdict;
 struct Read {
     trees: Vec<String>,
     places: Vec<String>,
+    unresolved: bool,
 }
 
 pub(crate) fn follows_a_secret(tokens: &[Token]) -> bool {
     let Some(read) = roots(tokens) else {
         return false;
     };
-    read.places.iter().any(|path| read_tree_verdict(path) == Verdict::Denied) || read.trees.iter().any(|root| tree_holds_a_secret(root))
+    read.unresolved
+        || read.places.iter().any(|path| read_tree_verdict(path) == Verdict::Denied)
+        || read.trees.iter().any(|root| tree_holds_a_secret(root))
 }
 
 fn tree_holds_a_secret(root: &str) -> bool {
@@ -34,7 +37,7 @@ fn roots(tokens: &[Token]) -> Option<Read> {
     match name {
         "tar" => tar_roots(tokens),
         "cpio" => cpio_roots(tokens).map(trees_only),
-        "zip" => zip_roots(tokens).map(trees_only),
+        "zip" => zip_roots(tokens),
         "rg" => search::rg(tokens).map(trees_only),
         "ag" => search::ag(tokens).map(trees_only),
         _ => None,
@@ -42,10 +45,10 @@ fn roots(tokens: &[Token]) -> Option<Read> {
 }
 
 fn trees_only(trees: Vec<String>) -> Read {
-    Read { trees, places: Vec::new() }
+    Read { trees, places: Vec::new(), unresolved: false }
 }
 
-fn zip_roots(tokens: &[Token]) -> Option<Vec<String>> {
+fn zip_roots(tokens: &[Token]) -> Option<Read> {
     let stores_links = tokens.iter().skip(1).take_while(|token| token.as_str() != "--").any(|token| {
         let word = token.as_str();
         word == "--symlinks" || word.starts_with("--symlinks=") || (word.starts_with('-') && !word.starts_with("--") && word.contains('y'))
@@ -53,7 +56,9 @@ fn zip_roots(tokens: &[Token]) -> Option<Vec<String>> {
     if stores_links {
         return None;
     }
+    let (standalone, valued) = crate::registry::command_flag_sets("zip").unwrap_or((&[], &[]));
     let mut positionals = Vec::new();
+    let mut names_from_stdin = false;
     let mut i = 1;
     while i < tokens.len() {
         let word = tokens[i].as_str();
@@ -61,23 +66,56 @@ fn zip_roots(tokens: &[Token]) -> Option<Vec<String>> {
             positionals.extend(tokens[i + 1..].iter().map(|token| token.as_str().to_string()));
             break;
         }
-        if word.starts_with("--") {
-            if !word.contains('=')
-                && matches!(word, "--temp-path" | "--suffixes" | "--exclude" | "--include" | "--password" | "--split-size")
-            {
-                i += 1;
-            }
-        } else if word.starts_with('-') && word != "-" {
-            let cluster = &word[1..];
-            if cluster.chars().count() == 1 && matches!(cluster, "b" | "n" | "x" | "i" | "P" | "s" | "t" | "d") {
-                i += 1;
-            }
-        } else {
-            positionals.push(word.to_string());
+        names_from_stdin |= word == "--names-stdin" || (word.starts_with('-') && !word.starts_with("--") && word.contains('@'));
+        if let Some(step) = zip_value_step(word, standalone, valued, tokens.get(i + 1)) {
+            i += step;
+            continue;
         }
+        positionals.push(word.to_string());
         i += 1;
     }
-    Some(positionals.into_iter().skip(1).filter(|path| path != "-").collect())
+    let mut trees: Vec<String> = positionals.into_iter().skip(1).filter(|path| path != "-").collect();
+    let mut unresolved = false;
+    if names_from_stdin {
+        match stdin_name_root() {
+            Some(root) => trees.push(root),
+            None => unresolved = true,
+        }
+    }
+    Some(Read { trees, places: Vec::new(), unresolved })
+}
+
+fn zip_value_step(word: &str, standalone: &[String], valued: &[String], next: Option<&Token>) -> Option<usize> {
+    if word == "-" || word == "--" {
+        return None;
+    }
+    let long = word.strip_prefix("--").map(|body| body.split('=').next().unwrap_or(body));
+    if let Some(name) = long {
+        let dashed = format!("--{name}");
+        if valued.iter().any(|flag| flag == &dashed) && !word.contains('=') && crate::policy::consumes_next_value(next) {
+            return Some(2);
+        }
+        return Some(1);
+    }
+    if !word.starts_with('-') {
+        return None;
+    }
+    if standalone.iter().any(|flag| flag == word) || valued.iter().any(|flag| flag == word) {
+        let takes = valued.iter().any(|flag| flag == word) && crate::policy::consumes_next_value(next);
+        return Some(if takes { 2 } else { 1 });
+    }
+    let last = word.chars().next_back()?;
+    let short = format!("-{last}");
+    let takes = valued.iter().any(|flag| flag == &short) && crate::policy::consumes_next_value(next);
+    Some(if takes { 2 } else { 1 })
+}
+
+fn stdin_name_root() -> Option<String> {
+    let item = crate::pathctx::stdin_item_repr()?;
+    if item.contains(UNKNOWABLE_ITEM) {
+        return None;
+    }
+    placeholder_dir(&item).or_else(|| on_disk(&item).map(|_| item))
 }
 
 fn cpio_roots(tokens: &[Token]) -> Option<Vec<String>> {
@@ -139,7 +177,7 @@ fn tar_roots(tokens: &[Token]) -> Option<Read> {
         }
         i += 1;
     }
-    follow.then_some(Read { trees, places })
+    follow.then_some(Read { trees, places, unresolved: false })
 }
 
 fn tar_directory(word: &str, next: Option<&str>, dir: Option<&str>) -> Option<(String, usize)> {
@@ -161,5 +199,24 @@ fn note_tar_long(long: &str, follow: &mut bool, want_archive: &mut bool, archive
         } else {
             *want_archive = true;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tokens(words: &[&str]) -> Vec<Token> {
+        words.iter().map(|word| Token::from_raw((*word).to_string())).collect()
+    }
+
+    #[test]
+    fn zip_keeps_members_and_skips_option_values() {
+        let trees = |words: &[&str]| zip_roots(&tokens(words)).expect("reads").trees;
+        assert_eq!(trees(&["zip", "-r", "out.zip", "sub"]), vec!["sub".to_string()]);
+        assert_eq!(trees(&["zip", "-r", "-n", ".jpg", "out.zip", "sub"]), vec!["sub".to_string()]);
+        assert_eq!(trees(&["zip", "-rn", ".jpg", "out.zip", "sub"]), vec!["sub".to_string()]);
+        assert_eq!(trees(&["zip", "--quiet", "out.zip", "sub"]), vec!["sub".to_string()]);
+        assert_eq!(trees(&["zip", "--temp-path=/tmp", "out.zip", "sub"]), vec!["sub".to_string()]);
     }
 }
