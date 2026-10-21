@@ -182,16 +182,15 @@ mod tests {
     #[test]
     fn only_ssh_or_rsh_with_plain_options_is_a_plain_remote_shell() {
         for value in [
-            "ssh -o StrictHostKeyChecking=accept-new", "ssh -o User=a-b",
-            "ssh", "rsh", "ssh -p 22", "ssh -p22 -l me", "ssh -4 -q", "ssh -o BatchMode=yes", "ssh -oPort=22", "/usr/bin/ssh", "./bin/tool",
+            "ssh -o StrictHostKeyChecking=accept-new", "ssh -o User=a-b", "ssh", "rsh", "ssh -p 22", "ssh -p22 -l me", "ssh -4 -q",
+            "ssh -o BatchMode=yes", "ssh -oPort=22", "/usr/bin/ssh", "./bin/tool",
         ] {
             assert!(remote_shell_is_plain(value), "{value}");
         }
         for value in [
             "sh", "bash", "make", "just", "", "ssh -o ProxyCommand=id", "ssh -oProxyCommand=id", "ssh -o LocalCommand=id", "ssh -F ./cfg",
             "ssh -S /tmp/s", "ssh 'x'", "ssh \"-p\" 2", "ssh;id", "ssh -p", "/tmp/ssh", "sshd", "ssh -o", "ssh x id",
-            "ssh -o PermitLocalCommand=yes",
-            "ssh -o User=a=b", "ssh -o User=a.b", "ssh -o User=a_b", "ssh -o User=a/b", "ssh -o User=a@b",
+            "ssh -o PermitLocalCommand=yes", "ssh -o User=a=b", "ssh -o User=a.b", "ssh -o User=a_b", "ssh -o User=a/b", "ssh -o User=a@b",
         ] {
             assert!(!remote_shell_is_plain(value), "{value}");
         }

@@ -164,7 +164,14 @@ mod tests {
     fn a_prefix_can_begin_a_name_a_pattern_matches() {
         use super::could_start_with;
         for (pattern, prefix) in [
-            ("abc*", "abc"), ("ab*", "abcd"), ("abcd", "abc"), ("ABC*", "abc"), ("*", "anything"), ("a?", "abc"), ("a[bc]", "abc"), ("abc", ""),
+            ("abc*", "abc"),
+            ("ab*", "abcd"),
+            ("abcd", "abc"),
+            ("ABC*", "abc"),
+            ("*", "anything"),
+            ("a?", "abc"),
+            ("a[bc]", "abc"),
+            ("abc", ""),
             ("", ""),
         ] {
             assert!(could_start_with(pattern, prefix), "{pattern} could begin {prefix}");
@@ -190,10 +197,16 @@ mod tests {
     /// not whichever the table lists last.
     #[test]
     fn the_more_protective_of_two_roles_wins_whichever_comes_first() {
-        use super::{Role, most_protective};
         use super::super::Frozen;
+        use super::{Role, most_protective};
         let key = |r: Role| (r.reads_secret, r.write_locus, r.read_locus);
-        let role = |read, write, reads_secret| Role { read_locus: read, write_locus: write, rebind_locus: write, reads_secret, frozen: Frozen::Nothing };
+        let role = |read, write, reads_secret| Role {
+            read_locus: read,
+            write_locus: write,
+            rebind_locus: write,
+            reads_secret,
+            frozen: Frozen::Nothing,
+        };
         let (user, machine, device) = (LocalLocus::User, LocalLocus::Machine, LocalLocus::Device);
         let (low, high) = (role(user, machine, false), role(device, device, false));
         assert_eq!(key(most_protective(low, high)), key(high));
@@ -207,8 +220,14 @@ mod tests {
     fn the_role_is_the_most_protective_node_the_path_could_name() {
         use super::{REGIONS, could_name, home_spelling, pattern, shield_role};
         let mut paths = vec![];
-        for pre in ["", "/", "~/", "/dev/", "/etc/", "/usr/", "/Library/", "~/Library/", "~/.config/", "/proc/", "/System/", "/private/", "/var/", "/tmp/", ".git/", "/boot/", "/sys/", "/Volumes/", "/Users/", "/bin/", "/opt/", "~/.local/", "/Applications/", "/run/", "/lib/", "/root/", "/home/", "/cores/", "/sbin/"] {
-            for tail in ["\u{1F600}", "\u{1F600}/x", "x/\u{1F600}", "\u{1F600}/\u{1F600}", "a\u{1F600}", ".\u{1F600}"] { paths.push(format!("{pre}{tail}")); }
+        for pre in [
+            "", "/", "~/", "/dev/", "/etc/", "/usr/", "/Library/", "~/Library/", "~/.config/", "/proc/", "/System/", "/private/", "/var/",
+            "/tmp/", ".git/", "/boot/", "/sys/", "/Volumes/", "/Users/", "/bin/", "/opt/", "~/.local/", "/Applications/", "/run/", "/lib/",
+            "/root/", "/home/", "/cores/", "/sbin/",
+        ] {
+            for tail in ["\u{1F600}", "\u{1F600}/x", "x/\u{1F600}", "\u{1F600}/\u{1F600}", "a\u{1F600}", ".\u{1F600}"] {
+                paths.push(format!("{pre}{tail}"));
+            }
         }
         for path in paths.iter().map(String::as_str) {
             let spellings: Vec<Vec<String>> = home_spelling::shield_spellings(path).iter().map(|p| pattern(p)).collect();

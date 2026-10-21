@@ -56,8 +56,7 @@ impl<'a> Target<'a> {
             } else if word.starts_with("--") {
                 let value = if valued.iter().any(|v| v == word) { Some(words.next()?) } else { None };
                 (word, value)
-            } else if word.starts_with('-') {
-                let letters = &word[1..];
+            } else if let Some(letters) = word.strip_prefix('-') {
                 let Some(at) = letters.find(|c| short_valued.contains(&c)) else { continue };
                 let rest = &letters[at + 1..];
                 let value = if rest.is_empty() { words.next()? } else { rest };
