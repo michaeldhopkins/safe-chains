@@ -379,7 +379,11 @@ owed = [
   "convert_help_or_h_in_two_token_slice_is_inert",
   "convert_reordering_dash_r_and_dash_s_preserves_the_verdict",
 ]
-"src/handlers/system/screen.rs" = ["an_option_takes_one_session_name_and_never_starts_a_detached_session", "options_that_only_shape_a_new_session_never_pass"]
+"src/handlers/system/screen.rs" = [
+  "an_option_takes_one_session_name_and_never_starts_a_detached_session",
+  "options_that_only_shape_a_new_session_never_pass",
+  "a_reattach_with_a_valued_option_still_takes_one_session_name",
+]
 "src/handlers/system/open.rs" = [
   "an_operand_that_is_not_a_web_address_is_denied_without_a_document_flag",
   "a_document_flag_lets_the_same_operand_through",

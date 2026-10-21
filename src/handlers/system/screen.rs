@@ -13,15 +13,66 @@ pub(crate) fn check_screen(tokens: &[Token]) -> Verdict {
         return Verdict::Denied;
     }
     let mut kept = Vec::with_capacity(tokens.len());
-    let mut words = tokens.iter();
-    kept.extend(words.next().cloned());
+    kept.extend(tokens.first().cloned());
+    kept.extend(without_the_session_name(&tokens[1..], standalone, valued));
+    registry::try_fallback_grammar("screen", &kept).unwrap_or(Verdict::Denied)
+}
+
+/// A valued short glued to its value (`-h5000`, `-p0`) is the spaced form. The general grammar does
+/// not split that, so it is split here. Once a reattach or a listing has been seen, one following
+/// name is the session and is dropped. A second operand stays, so a program after the name is still
+/// refused. A name that is a valued option's own value (`-S work`, `-h 5000`) is kept.
+fn without_the_session_name(arguments: &[Token], standalone: &[String], valued: &[String]) -> Vec<Token> {
+    let expanded = expand_glued_values(arguments, valued);
+    let mut kept = Vec::with_capacity(expanded.len());
+    let mut seen_session = false;
+    let mut dropped_name = false;
+    let mut words = expanded.into_iter();
     while let Some(token) = words.next() {
-        kept.push(token.clone());
-        if names_a_session_next(token.as_str(), standalone) && words.as_slice().first().is_some_and(|next| !next.starts_with("-")) {
-            words.next();
+        if valued.iter().any(|flag| flag == token.as_str()) {
+            kept.push(token);
+            kept.extend(words.next());
+            continue;
+        }
+        if names_a_session_next(token.as_str(), standalone) {
+            seen_session = true;
+            kept.push(token);
+            continue;
+        }
+        if seen_session && !dropped_name && !token.as_str().starts_with('-') {
+            dropped_name = true;
+            continue;
+        }
+        kept.push(token);
+    }
+    kept
+}
+
+fn expand_glued_values(arguments: &[Token], valued: &[String]) -> Vec<Token> {
+    let mut expanded = Vec::with_capacity(arguments.len());
+    for token in arguments {
+        if let Some((flag, value)) = glued_short_value(token.as_str(), valued) {
+            expanded.push(Token::from_raw(flag));
+            expanded.push(Token::from_raw(value));
+        } else {
+            expanded.push(token.clone());
         }
     }
-    registry::try_fallback_grammar("screen", &kept).unwrap_or(Verdict::Denied)
+    expanded
+}
+
+/// `-h5000` is `-h` and `5000` when the first letter is a valued short. `-dr`, `-ls` and `-list`
+/// start with a letter that is not, so they stay one word.
+fn glued_short_value(word: &str, valued: &[String]) -> Option<(String, String)> {
+    let cluster = word.strip_prefix('-').filter(|rest| !rest.is_empty() && !rest.starts_with('-'))?;
+    let mut letters = cluster.chars();
+    let first = letters.next()?;
+    let rest = letters.as_str();
+    if rest.is_empty() {
+        return None;
+    }
+    let flag = format!("-{first}");
+    valued.iter().any(|known| known == &flag).then(|| (flag, rest.to_string()))
 }
 
 /// Unless it reattaches (`-r`, `-x`), lists, detaches with `-d` / `-D` alone, or prints its help or
@@ -119,6 +170,30 @@ mod tests {
         screen_scrollback_named_like_a_reattach: "screen -h -x",
     }
 
+    #[test]
+    fn a_session_name_after_a_valued_option_still_reattaches() {
+        for cmd in [
+            "screen -x -p 0 work",
+            "screen -r -h5000 work",
+            "screen -p 0 -x work",
+            "screen -h5000 -r work",
+            "screen -h 5000 -r work",
+            "screen -dr -p0 work",
+        ] {
+            assert!(check(cmd), "{cmd} was refused");
+        }
+        for cmd in [
+            "screen -r -h5000 work sh",
+            "screen -x -p 0 work sh",
+            "screen -h5000",
+            "screen -p 0",
+            "screen -h -x",
+            "screen -r work sh",
+        ] {
+            assert!(!check(cmd), "{cmd} was approved");
+        }
+    }
+
     proptest! {
         /// Whatever a session-naming option is spelled as, it takes one name and never a program,
         /// and a cluster with `m` never passes.
@@ -155,6 +230,24 @@ mod tests {
         ) {
             let line = if first { format!("screen {create} {reattach} work") } else { format!("screen {reattach} {create} work") };
             prop_assert!(!is_safe_command(&line), "{}", line);
+        }
+
+        /// A reattach keeps one session name when a valued option sits beside it, in either order,
+        /// including a value glued to its letter. A program after that name is still refused.
+        #[test]
+        fn a_reattach_with_a_valued_option_still_takes_one_session_name(
+            reattach in prop::sample::select(vec!["-r", "-x", "-dr"]),
+            option in prop::sample::select(vec!["-p 0", "-h 5000", "-h5000", "-p0"]),
+            option_first in proptest::bool::ANY,
+            name in "[a-z][a-z0-9]{0,6}",
+        ) {
+            let line = if option_first {
+                format!("screen {option} {reattach} {name}")
+            } else {
+                format!("screen {reattach} {option} {name}")
+            };
+            prop_assert!(is_safe_command(&line), "{}", line);
+            prop_assert!(!is_safe_command(&format!("{line} sh")), "{}", line);
         }
     }
 }

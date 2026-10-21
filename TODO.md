@@ -457,6 +457,10 @@ and that wants doing once rather than per-tool.
 
 Found by the review probe alongside `pax -w ~` and `ditto ~/.ssh ./s`, which ARE fixed.
 
+`git ls-files | tar -cf out.tar -T -` is that false refusal for tar. `-T` is worst-cased before the
+names from the pipe can be judged, and a handler cannot un-deny an engine denial. `tar -cf out.tar
+-T /etc/shadow` stays refused: the list file is named on the line.
+
 ## A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace
 
 `rg`, `ag`, `ack`, `ugrep`, `sift` and `pt` are gated `read_tree_after_first`: their path operand
