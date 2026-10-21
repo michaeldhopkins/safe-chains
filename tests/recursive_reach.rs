@@ -203,6 +203,36 @@ fn a_walk_that_follows_links_is_judged_where_they_lead() {
     }
 }
 
+fn with_secret_link(link: bool) -> Project {
+    let project = project(&["src"]);
+    if link {
+        std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", format!("{}/k", project.root)).expect("symlink to a fake secret");
+    }
+    project
+}
+
+#[test]
+fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "git ls-files | cpio -oL",
+        "tar -chf - .",
+        "tar -cf - --dereference .",
+        "rg -L x",
+        "rg --follow x",
+        "ag -f x",
+        "zip -r - .",
+        "zip -0r - .",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a project with no such link");
+    }
+    for cmd in ["git ls-files | cpio -o", "tar -cf - .", "rg x", "ag x", "zip -y -r - .", "zip -yr - ."] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused though it does not follow the link");
+    }
+}
+
 #[test]
 fn a_read_that_follows_links_is_judged_where_they_lead() {
     let p = project(&["src", "work/x"]);

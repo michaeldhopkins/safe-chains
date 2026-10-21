@@ -26,6 +26,7 @@ mod cargo_runs_this;
 pub mod coreutils;
 pub mod df;
 mod env_print;
+mod followed_read;
 pub mod fd;
 pub mod forges;
 pub mod fuzzy;
@@ -128,7 +129,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
     };
-    match crate::registry::canonical_name(first.command_name()) {
+    let specific = match crate::registry::canonical_name(first.command_name()) {
         "cargo" => safe_chains::cargo_run_reaches_a_rule_change(tokens),
         "chmod" => coreutils::chmod_mode::sets_an_id_bit(tokens),
         "mkdir" => coreutils::chmod_mode::mkdir_mode_sets_an_id_bit(tokens),
@@ -142,7 +143,8 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "ditto" | "xar" | "ptar" | "ptargrep" => coreutils::archive_extract::extracts(tokens),
         _ => false,
-    }
+    };
+    specific || followed_read::follows_a_secret(tokens)
 }
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {

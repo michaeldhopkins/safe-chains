@@ -589,6 +589,7 @@ owed = [
 "src/pathctx/lexical.rs" = "reads HOME, and the process-wide region table to keep a protected place absolute"
 "src/engine/resolve/frozen_reach.rs" = "lists the folders below a recursive operand on disk"
 "src/engine/resolve/frozen_walk.rs" = "walks the folders below a recursive operand on disk, following links when asked"
+"src/handlers/followed_read.rs" = "lists the tree a command that follows links would read"
 "src/pathctx/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
 "src/pathctx/placing.rs" = "reads the thread-local directory context and, through physical, the filesystem"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
