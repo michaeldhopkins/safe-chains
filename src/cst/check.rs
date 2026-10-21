@@ -542,10 +542,10 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 }
 
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
-    let rewritten = crate::handlers::direct_script::as_interpreter(tokens);
-    let tokens = rewritten.as_ref();
-    let legacy = handlers::dispatch(tokens);
-    super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
+    crate::handlers::direct_script::judged(tokens, |tokens| {
+        let legacy = handlers::dispatch(tokens);
+        super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
+    })
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {

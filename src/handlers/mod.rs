@@ -27,8 +27,8 @@ pub mod coreutils;
 pub mod df;
 pub(crate) mod direct_script;
 mod env_print;
-mod followed_read;
 pub mod fd;
+mod followed_read;
 pub mod forges;
 pub mod fuzzy;
 pub mod hadolint;
@@ -97,10 +97,12 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
     ])
 }
 
-pub fn dispatch(tokens: &[Token]) -> Verdict {
-    let cmd = tokens[0].command_name();
-    let verdict = None
-        .or_else(|| crate::registry::custom_dispatch(tokens))
+pub(crate) fn names_a_command(tokens: &[Token]) -> bool {
+    tokens.first().is_some_and(|first| named_verdict(first.command_name(), tokens).is_some())
+}
+
+fn named_verdict(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
+    None.or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
         .or_else(|| node::dispatch(cmd, tokens))
@@ -112,7 +114,11 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| vcs::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
-        .unwrap_or(Verdict::Denied);
+}
+
+pub fn dispatch(tokens: &[Token]) -> Verdict {
+    let cmd = tokens[0].command_name();
+    let verdict = named_verdict(cmd, tokens).unwrap_or(Verdict::Denied);
     // Cross-cutting path-operand gate (audit fix): a legacy content-reader/writer must not
     // read/write a sensitive path just because its own handler ignored the operand's locus.
     // Canonicalize through the alias map (`gtee` → `tee`) so a Homebrew g-alias hits the same

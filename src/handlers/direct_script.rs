@@ -1,9 +1,23 @@
 use std::borrow::Cow;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) fn is_relative_command_path(word: &str) -> bool {
     !word.is_empty() && !word.starts_with(['@', '/', '~']) && !word.contains('$') && word.contains('/')
+}
+
+pub(crate) fn judged(tokens: &[Token], judge: impl Fn(&[Token]) -> Verdict) -> Verdict {
+    let Some(first) = tokens.first().filter(|t| is_relative_command_path(t.as_str())) else {
+        return judge(tokens);
+    };
+    let script = judge(&as_interpreter(tokens));
+    let mut named = tokens.to_vec();
+    named[0] = Token::from_raw(first.command_name().to_string());
+    if named[0].as_str().is_empty() || !crate::handlers::names_a_command(&named) {
+        return script;
+    }
+    script.combine(judge(&named))
 }
 
 pub(crate) fn as_interpreter(tokens: &[Token]) -> Cow<'_, [Token]> {
@@ -89,8 +103,29 @@ mod tests {
         (verdict, crate::pathctx::folder::notes())
     }
 
+    fn spelled(path: &str) -> Option<String> {
+        let name = path.rsplit('/').next().unwrap_or(path);
+        let tokens = [crate::parse::Token::from_raw(name.to_string())];
+        (super::is_relative_command_path(path) && crate::handlers::names_a_command(&tokens)).then(|| name.to_string())
+    }
+
+    fn assert_no_better_than_its_name(path: &str, arg: &str, name: &str) {
+        let (direct, via) = pair(path, arg);
+        let bare = format!("{name}{arg}");
+        for level in crate::engine::authoring::default_levels() {
+            let (ceiling, engine) = crate::level_ceiling(&level.name).expect("level");
+            let d = crate::command_verdict_ceilinged(&direct, ceiling, engine);
+            let b = crate::command_verdict_ceilinged(&via, ceiling, engine);
+            let n = crate::command_verdict_ceilinged(&bare, ceiling, engine);
+            assert_eq!(d, b.combine(n), "{direct} at {}", level.name);
+        }
+    }
+
     fn assert_same(path: &str, arg: &str) {
         let _ctx = crate::pathctx::enter(project());
+        if let Some(name) = spelled(path) {
+            return assert_no_better_than_its_name(path, arg, &name);
+        }
         let (direct, via) = pair(path, arg);
         assert_eq!(crate::command_verdict(&direct), crate::command_verdict(&via), "{direct}");
         let routed = super::is_relative_command_path(path);
@@ -132,11 +167,30 @@ mod tests {
     }
 
     #[test]
+    fn a_path_that_spells_a_command_is_no_better_than_that_command() {
+        let _ctx = crate::pathctx::enter(project());
+        for cmd in [
+            "./target/debug/safe-chains config add rm", "target/release/safe-chains mcp", "./claude -p hi", "./rm -rf /",
+            "bin/bash -c 'rm -rf ~'", "node_modules/.bin/codex exec x",
+        ] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
+        }
+        for cmd in ["./cat src", "bin/git status", "./vendor/bin/phpunit --testsuite Unit"] {
+            assert!(crate::command_verdict(cmd).is_allowed(), "{cmd}");
+        }
+    }
+
+    #[test]
     fn a_vcs_hook_matches_bash() {
-        let cmd = ".git/hooks/pre-commit";
+        let cmd = ".git/hooks/post-checkout";
         let verdict = crate::command_verdict(cmd);
         assert_eq!(verdict, crate::command_verdict(&format!("bash {cmd}")));
         assert_eq!(verdict, Verdict::Allowed(SafetyLevel::SafeWrite));
+        let spelled = ".git/hooks/pre-commit";
+        assert_eq!(
+            crate::command_verdict(spelled),
+            crate::command_verdict(&format!("bash {spelled}")).combine(crate::command_verdict("pre-commit"))
+        );
     }
 
     #[test]
