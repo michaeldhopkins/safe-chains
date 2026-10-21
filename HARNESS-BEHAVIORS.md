@@ -24,14 +24,14 @@ independently exercised.
 | **Codex** | ✅ | ✅ **Probe-verified** `PreToolUse` (v0.144.3, 2026-07-13) · ◻️ **Source-verified** `PermissionRequest` (v0.160.1, 2026-10-05) | `PreToolUse`: `deny` honored; `allow`/`ask` unsupported (still so in v0.160.1 source). `PermissionRequest` (v0.122.0+): `decision.behavior:"allow"` answers Codex's approval prompt; not yet driven end to end. Config nests under top-level `hooks`. See §Codex. |
 | **Antigravity (`agy`)** | ✅ | 📄 **Docs-checked** v1.4.3 (2026-10-21); last live drive v1.1.2 | CLI `agy --version` is 1.4.3. Not re-driven. `allow` delegates to the next hook or default policy. `auto_approve` is the documented grant. `deny`, `ask`, `force_ask`, and `deny_unless_prior_grant` are documented. See §Gemini. |
 | **Gemini** | (exit codes) | 📄 **Docs-checked** v0.64.0 (2026-10-21); binary not installed | Consumer accounts stopped 2026-06-18. Stable v0.64.0 (2026-10-13) still documents `BeforeTool` with `allow` / `deny` only. Target kept for that CLI. |
-| **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
+| **Qwen** | ✅ | 📄 **Docs-checked** v0.25.3 (2026-10-21); binary not installed | English hooks doc: shell tool id is `run_shell_command`. `allow` does not skip the approval prompt. `ask` and `additionalContext` are documented. Not driven live. See §Qwen. |
 | **Droid** | ✅ | 📄 **Docs-checked** CLI v0.245.0 (2026-10-21); not installed, not driven live | `allow` can bypass the prompt; `deny` and `ask` are honored. Shell matcher is `Execute`. `additionalContext` is not listed on `PreToolUse`. See §Droid. |
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
 | **Grok** | ✅ | 📄 **Docs-checked** v1.0.62 (2026-10-21); last live drive v0.2.106 | `grok --version` could not be run. The installed build is 1.0.62. `allow` declines to deny. Settings-file hooks can `ask`, `defer`, and send `additionalContext`. safe-chains still only denies. See §Grok. |
 | **opencode** | ❌ | 📄 **Docs-checked** v2.0.26 (2026-10-21); install still skipped | `opencode --version` is v2.0.26. v1 `permission.ask` does not fire ([#7006](https://github.com/anomalyco/opencode/issues/7006)). v2 documents `ctx.permission.hook("evaluate")`. safe-chains does not install a plugin. See §opencode. |
 
-**Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
+**Remaining live-verification work:** Qwen is docs-checked at v0.25.3 and was not driven live (see §Qwen). Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
 Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude is docs-checked at v2.1.302 (see §Claude); Codex done; opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
@@ -97,7 +97,7 @@ target looks like.
 | Claude  | `Bash` (exact match)    | `{hookSpecificOutput: {...}}`          | `permissionDecision`| `allow` / `deny` / `ask` / `defer`. Omit is the normal flow, not `defer` | seconds (command default 600) |
 | Codex `PreToolUse` | `Bash`; config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). `allow`/`ask` parsed-but-UNSUPPORTED (v0.144.3 through v0.160.1) | seconds |
 | Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* (everything else → Codex's own prompt) | seconds |
-| Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
+| Qwen    | code matcher `^Bash$` (regex only); exact `Bash` is the alias; tool id `run_shell_command` | `{hookSpecificOutput: {...}}` | `permissionDecision` | `allow` (does not skip the prompt), **deny**, **ask** | seconds; a command value ≥ 1000 is still read as ms |
 | Droid   | `Execute` (regex or exact; optional `commandRegex` on the shell string) | `{hookSpecificOutput: {...}}` | `permissionDecision` | **allow** (can bypass the prompt), **deny**, **ask** | seconds (default 60) |
 | Gemini  | `^run_shell_command$` (`BeforeTool`) | `{decision: ...}` | `decision` | **allow** / **deny** (alias `block`). No `ask` | ms (examples use `5000`) |
 | agy     | `run_command`           | `{decision, reason}`                   | `decision`          | `allow` (delegates), `auto_approve`, `deny`, `ask`, `force_ask`, `deny_unless_prior_grant` | seconds (default 30) |
@@ -466,6 +466,50 @@ matching npm package. The live drive below is v1.0.71. Current contract:
 
 Verified: copilot 1.0.101 2026-10-21
 
+### Qwen Code — docs-checked v0.25.3, 2026-10-21
+
+The `qwen` binary is not installed. Stable v0.25.3 (2026-10-19) is the latest
+release that is not a preview. A preview v0.25.4-preview.1 exists (2026-10-20).
+Contract read from the English source at tag v0.25.3:
+[hooks.md](https://github.com/QwenLM/qwen-code/blob/v0.25.3/docs/users/features/hooks.md).
+Translated mirrors describe `allow` as skipping the prompt. This section follows
+the English source. Not driven live.
+
+- **Config.** `hooks.PreToolUse` in settings. The matcher target for tool events
+  is the tool id. The shell tool id is `run_shell_command`. An exact comparison
+  runs first; otherwise the matcher is a regular expression, unanchored unless
+  it starts with `^` or `(`. `timeout` for a command hook is seconds, default 60.
+  A command-hook value of 1000 or more is still read as milliseconds, so the
+  `60000` safe-chains writes is 60 seconds. `QWEN_PROJECT_DIR`,
+  `CLAUDE_PROJECT_DIR`, and `GEMINI_PROJECT_DIR` are set on the hook process.
+- **Decisions.** `hookSpecificOutput.permissionDecision`: `allow`, `deny`, or
+  `ask`. `permissionDecisionReason` is required. `allow` lets the call continue
+  and the usual permission checks and approval prompt still apply. `deny` blocks
+  the tool and returns an error to the model. `ask` prompts in the TUI and no
+  permission rule, approval mode (including YOLO), or `PermissionRequest` hook
+  approves the call instead. A `PermissionRequest` hook can still deny it. In
+  headless `--prompt` runs, background subagents, and ACP sessions, `ask` is
+  treated as `deny`. `updatedInput` replaces the whole tool input. It is not a
+  merge. `additionalContext` is appended to the tool result the model sees.
+  It is delivered whatever the decision, and dropped when the user declines an
+  `ask` or the call is cancelled. The output options mark `permissionDecision`
+  and `permissionDecisionReason` required.
+- **Exit codes.** Exit 0 with a JSON object controls the call. Exit 2 ignores
+  stdout and passes stderr to the model as the block reason. Any other non-zero
+  exit continues.
+- **What safe-chains emits.** A Claude-shaped `permissionDecision: "allow"` for
+  a safe command, an empty body otherwise, and `additionalContext` with no
+  decision for the mixed-chain note. The installed matcher is `^Bash$`. A
+  matcher that starts with `^` is only a regular expression, and the `Bash`
+  alias is compared exactly, so `^Bash$` does not select `run_shell_command`.
+  A present `tool_name` must be `Bash`. The payload's `tool_name` is the
+  runtime id.
+- **Other command surface.** In Code Mode, a call made from an `exec` script
+  returns its result to the script. Its `PreToolUse` context is appended to the
+  `exec` result.
+
+Verified: qwen 0.25.3 2026-10-21
+
 ## Model-visible context injection (`additionalContext`)
 
 This is what powers the chain-explainer feedback (`cst::explain`). It injects
@@ -476,7 +520,7 @@ flow is untouched.
 |---------|-----------------------------|------------|
 | Claude  | Yes ([Hooks](https://code.claude.com/docs/en/hooks), v2.1.302; also the 2026-07 drive) | emit on the mixed-chain case |
 | Grok    | Yes, on settings-file `PreToolUse` (`~/.grok/docs/user-guide/10-hooks.md`; clipped at 10,000 characters; dropped on hook deny, prompt reject, and `defer`) | default abstain |
-| Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
+| Qwen    | Yes on `PreToolUse` ([hooks.md](https://github.com/QwenLM/qwen-code/blob/v0.25.3/docs/users/features/hooks.md) at v0.25.3). Output options also mark `permissionDecision` and `permissionDecisionReason` required | emit on the mixed-chain case, with no decision |
 | Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | No `additionalContext` on `beforeShellExecution` ([Hooks](https://cursor.com/docs/hooks): `permission`, `user_message`, `agent_message`) | default abstain |
@@ -532,7 +576,7 @@ Kept as a menu for *future* safe-chains features, with the plausible use:
 | Field (varies in name/casing) | Harnesses | Possible safe-chains use |
 |---|---|---|
 | `command` / `tool_input.command` | all | the thing we classify (why we exist) |
-| `tool_name` | Claude, Gemini, Codex, Droid, Copilot | scope the hook to Bash; skip non-shell tools |
+| `tool_name` | Claude, Gemini, Codex, Droid, Copilot, Qwen | scope the hook to the shell tool; skip non-shell tools |
 | `cwd` | all but opencode | cwd-aware classification (HP-19 #1) |
 | project root (env / `workspace_roots`) | Claude, Cursor, Gemini, Droid, Qwen | the root HP-19 needs |
 | `session_id` / `conversation_id` | all but opencode | **unforgeable session key for HP-17** session grants |
