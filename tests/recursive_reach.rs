@@ -212,17 +212,38 @@ fn with_secret_link(link: bool) -> Project {
 }
 
 #[test]
+fn tar_follows_a_link_from_the_directory_in_effect() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let linked = project(&["src", "sub/deep"]);
+    std::os::unix::fs::symlink(secret, format!("{}/sub/deep/s", linked.root)).expect("link under the member");
+    let plain = project(&["src", "sub/deep"]);
+    for cmd in ["tar -chf - -C sub deep", "tar -chf - --directory=sub deep", "tar -h -c -f - -C sub deep", "tar -chf - -C sub -C deep ."] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+
+    let outside = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("directory beside the project");
+    let name = outside.path().file_name().and_then(|n| n.to_str()).expect("directory name");
+    let abs = outside.path().canonicalize().expect("canonical directory").to_str().expect("utf-8").to_string();
+    let beside = format!("tar -chf - -C ../{name} .");
+    let absolute = format!("tar -chf - -C {abs} .");
+    assert!(at(&plain, &beside).is_allowed(), "{beside} was refused with nothing linked there");
+    assert!(at(&plain, &absolute).is_allowed(), "an absolute directory with no link was refused");
+    std::os::unix::fs::symlink(secret, outside.path().join("s")).expect("link in the other directory");
+    assert!(!at(&plain, &beside).is_allowed(), "{beside} was approved over a link to a secret");
+    assert!(!at(&plain, &absolute).is_allowed(), "an absolute directory was approved over a link to a secret");
+    let replaced = format!("tar -chf - -C sub -C {abs} .");
+    assert!(!at(&plain, &replaced).is_allowed(), "a later absolute directory was ignored");
+    std::fs::remove_file(outside.path().join("s")).expect("remove the link");
+    assert!(at(&plain, &replaced).is_allowed(), "a later absolute directory with no link was refused");
+}
+
+#[test]
 fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
     let linked = with_secret_link(true);
     let plain = with_secret_link(false);
     for cmd in [
-        "git ls-files | cpio -oL",
-        "tar -chf - .",
-        "tar -cf - --dereference .",
-        "rg -L x",
-        "rg --follow x",
-        "ag -f x",
-        "zip -r - .",
+        "git ls-files | cpio -oL", "tar -chf - .", "tar -cf - --dereference .", "rg -L x", "rg --follow x", "ag -f x", "zip -r - .",
         "zip -0r - .",
     ] {
         assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");

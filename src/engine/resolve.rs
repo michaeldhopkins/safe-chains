@@ -987,7 +987,7 @@ type TarRef<'a> = (Option<&'a str>, &'a str);
 /// A tar member/archive path resolved against an active `-C` directory: `DIR/path` for a
 /// relative path, or `path` unchanged when there is no `-C` or the path is absolute (an
 /// absolute member ignores `-C`).
-fn tar_bound(dir: Option<&str>, path: &str) -> String {
+pub(crate) fn tar_bound(dir: Option<&str>, path: &str) -> String {
     match dir {
         Some(d) if !path.starts_with('/') && !path.starts_with('~') && !path.starts_with('-') => {
             format!("{}/{}", d.trim_end_matches('/'), path)
