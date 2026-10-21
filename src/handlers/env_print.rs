@@ -26,11 +26,25 @@ fn mise_set_shows_values(arguments: &[Token]) -> bool {
     if arguments.first().is_some_and(|t| *t == "--help" || *t == "-h") {
         return false;
     }
-    if arguments.iter().any(|t| *t == "--remove") {
-        return false;
+    // `--remove NAME` drops that one name. A removal on its own prints nothing; a name left beside
+    // it is printed, including when `--remove=NAME` glues the removed name and leaves the next word.
+    let mut names = Vec::new();
+    let mut removed = false;
+    let mut words = arguments.iter();
+    while let Some(word) = words.next() {
+        if *word == "--remove" {
+            removed = true;
+            words.next();
+            continue;
+        }
+        if !word.starts_with('-') {
+            names.push(word.as_str());
+        }
     }
-    let mut names = arguments.iter().filter(|t| !t.starts_with("-")).peekable();
-    names.peek().is_none() || names.any(|t| !t.contains("="))
+    if names.is_empty() {
+        return !removed;
+    }
+    names.iter().any(|name| !name.contains('='))
 }
 
 fn ps_shows_the_environment(arguments: &[Token]) -> bool {
@@ -104,7 +118,8 @@ mod tests {
             "export", "export -p", "export -n", "export -p FOO", "export -- ", "declare", "declare -p", "declare -p PATH", "declare -x",
             "declare -xp", "declare -r", "declare OPENAI_API_KEY", "typeset", "typeset -x", "typeset -p", "typeset GITHUB_TOKEN",
             "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
-            "mise set OPENAI_API_KEY", "mise set -g", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
+            "mise set OPENAI_API_KEY", "mise set -g", "mise set --remove X OPENAI_API_KEY", "mise set FAKEKEY --remove X",
+            "mise set --remove=X FAKEKEY", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
             "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
             "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE", "typeset -m 'OPENAI*' X=1",
             "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'", "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1",
@@ -121,7 +136,7 @@ mod tests {
             "export FOO=bar", "export FOO", "export -n FOO", "export PATH_EXTRA=./bin", "declare -i count=5", "declare -x FOO=bar",
             "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
-            "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise env --help", "launchctl list",
+            "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise set --remove FOO BAR=1", "mise env --help", "launchctl list",
             "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
             "typeset -Z2 X=5", "typeset -E X", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar",
         ] {
@@ -157,6 +172,23 @@ mod tests {
                 let matched_and_set = format!("{cmd} -m {} {} {}", flags.join(" "), names.join(" "), values.join(" "));
                 prop_assert!(!is_safe_command(&matched_and_set), "{}", matched_and_set);
             }
+        }
+
+        /// A name left after `--remove` is printed, wherever the removal sits. A removal alone is not.
+        #[test]
+        fn a_name_beside_remove_is_printed_and_a_removal_alone_is_not(
+            name in "[A-Z][A-Z0-9_]{0,12}",
+            removed in "[A-Z][A-Z0-9_]{0,8}",
+            spelling in 0usize..3,
+        ) {
+            let line = match spelling {
+                0 => format!("mise set --remove {removed} {name}"),
+                1 => format!("mise set {name} --remove {removed}"),
+                _ => format!("mise set --remove={removed} {name}"),
+            };
+            prop_assert!(!is_safe_command(&line), "{}", line);
+            prop_assert!(is_safe_command(&format!("mise set --remove {removed}")), "mise set --remove {}", removed);
+            prop_assert!(is_safe_command(&format!("mise set {name}={removed}")), "mise set {}={}", name, removed);
         }
     }
 }
