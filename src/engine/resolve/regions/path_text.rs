@@ -55,6 +55,14 @@ mod tests {
             prop_assert_eq!(ci_starts_with(&haystack, &prefix), oracle);
         }
 
+        /// `.` is the folder itself, not a hidden name.
+        #[test]
+        fn the_current_folder_is_not_a_hidden_component(parts in prop::collection::vec("[a-z]{1,4}", 0..4), at in 0usize..4) {
+            let mut with = parts.clone();
+            with.insert(at.min(parts.len()), ".".to_string());
+            prop_assert!(!has_hidden_component(&with.join("/")));
+        }
+
         /// A remainder holds a hidden component exactly when one of its components is a dot name.
         #[test]
         fn a_hidden_component_is_found_wherever_it_is(parts in prop::collection::vec("[a-z]{1,4}", 0..4), at in 0usize..4, name in "[a-z]{1,4}") {

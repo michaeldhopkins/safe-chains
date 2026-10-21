@@ -23,7 +23,12 @@ pub(super) fn shield_role(path: &str) -> Option<Role> {
         .filter(|n| n.applies_here() && n.fold)
         .filter(|n| spellings.iter().any(|p| could_name(&n.matcher, p)))
         .map(|n| n.role)
-        .reduce(|a, b| if (b.reads_secret, more_restrictive(b, a)) > (a.reads_secret, false) { b } else { a })
+        .reduce(most_protective)
+}
+
+/// Of two roles, the one that reads a secret, else the one whose write then read face is higher.
+fn most_protective(a: Role, b: Role) -> Role {
+    if (b.reads_secret, more_restrictive(b, a)) > (a.reads_secret, false) { b } else { a }
 }
 
 /// `component` with every character outside ASCII read as `*`, or `None` when it is all ASCII.
@@ -149,6 +154,74 @@ mod tests {
             }
         }
         out
+    }
+
+    fn names(parts: &[&str]) -> Vec<String> {
+        parts.iter().map(|p| p.to_string()).collect()
+    }
+
+    #[test]
+    fn a_prefix_can_begin_a_name_a_pattern_matches() {
+        use super::could_start_with;
+        for (pattern, prefix) in [
+            ("abc*", "abc"), ("ab*", "abcd"), ("abcd", "abc"), ("ABC*", "abc"), ("*", "anything"), ("a?", "abc"), ("a[bc]", "abc"), ("abc", ""),
+            ("", ""),
+        ] {
+            assert!(could_start_with(pattern, prefix), "{pattern} could begin {prefix}");
+        }
+        for (pattern, prefix) in [("abc", "abcd"), ("abx*", "abcd"), ("abd", "abc"), ("", "x"), ("b*", "a")] {
+            assert!(!could_start_with(pattern, prefix), "{pattern} cannot begin {prefix}");
+        }
+    }
+
+    #[test]
+    fn a_string_prefix_needs_its_folders_and_a_name_that_could_begin_it() {
+        use super::{Matcher, could_name};
+        let node = Matcher::StringPrefix("dir/last".to_string());
+        assert!(could_name(&node, &names(&["dir", "la*"])));
+        assert!(could_name(&node, &names(&["dir", "lastly"])));
+        assert!(could_name(&node, &names(&["*", "*"])));
+        assert!(!could_name(&node, &names(&["other", "last"])));
+        assert!(!could_name(&node, &names(&["dir", "zzz"])));
+        assert!(!could_name(&node, &names(&["dir"])));
+    }
+
+    /// The role handed back is the most protective of the nodes a wildcard-spelled path could name,
+    /// not whichever the table lists last.
+    #[test]
+    fn the_more_protective_of_two_roles_wins_whichever_comes_first() {
+        use super::{Role, most_protective};
+        use super::super::Frozen;
+        let key = |r: Role| (r.reads_secret, r.write_locus, r.read_locus);
+        let role = |read, write, reads_secret| Role { read_locus: read, write_locus: write, rebind_locus: write, reads_secret, frozen: Frozen::Nothing };
+        let (user, machine, device) = (LocalLocus::User, LocalLocus::Machine, LocalLocus::Device);
+        let (low, high) = (role(user, machine, false), role(device, device, false));
+        assert_eq!(key(most_protective(low, high)), key(high));
+        assert_eq!(key(most_protective(high, low)), key(high));
+        let (secret, louder) = (role(machine, machine, true), role(device, device, false));
+        assert_eq!(key(most_protective(secret, louder)), key(secret));
+        assert_eq!(key(most_protective(louder, secret)), key(secret));
+    }
+
+    #[test]
+    fn the_role_is_the_most_protective_node_the_path_could_name() {
+        use super::{REGIONS, could_name, home_spelling, pattern, shield_role};
+        let mut paths = vec![];
+        for pre in ["", "/", "~/", "/dev/", "/etc/", "/usr/", "/Library/", "~/Library/", "~/.config/", "/proc/", "/System/", "/private/", "/var/", "/tmp/", ".git/", "/boot/", "/sys/", "/Volumes/", "/Users/", "/bin/", "/opt/", "~/.local/", "/Applications/", "/run/", "/lib/", "/root/", "/home/", "/cores/", "/sbin/"] {
+            for tail in ["\u{1F600}", "\u{1F600}/x", "x/\u{1F600}", "\u{1F600}/\u{1F600}", "a\u{1F600}", ".\u{1F600}"] { paths.push(format!("{pre}{tail}")); }
+        }
+        for path in paths.iter().map(String::as_str) {
+            let spellings: Vec<Vec<String>> = home_spelling::shield_spellings(path).iter().map(|p| pattern(p)).collect();
+            let key = |r: super::Role| (r.reads_secret, r.write_locus, r.read_locus);
+            let best = REGIONS
+                .nodes
+                .iter()
+                .filter(|n| n.applies_here() && n.fold)
+                .filter(|n| spellings.iter().any(|p| could_name(&n.matcher, p)))
+                .map(|n| key(n.role))
+                .max();
+            assert_eq!(shield_role(path).map(key), best, "{path}");
+        }
     }
 
     #[test]
