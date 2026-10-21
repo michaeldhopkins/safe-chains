@@ -25,16 +25,16 @@ independently exercised.
 | **Antigravity (`agy`)** | ✅ | ✅ **Verified live** (v1.1.2, 2026-07-13) | `deny`/`ask`/`force_ask` work; fails closed. **Supersedes Gemini.** |
 | **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
-| **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
+| **Droid** | ✅ | 📄 **Docs-checked** CLI v0.245.0 (2026-10-21); not installed, not driven live | `allow` can bypass the prompt; `deny` and `ask` are honored. Shell matcher is `Execute`. `additionalContext` is not listed on `PreToolUse`. See §Droid. |
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
 | **Grok** | ✅ | ✅ **Verified live → DENY harness** (`grok` v0.2.106, 2026-07) | Native `~/.grok/hooks/safe-chains.json`; **camelCase** envelope (`toolInput.command`, `workspaceRoot`); top-level `decision` + exit 2. Drove the TUI: `cat /etc/hosts` **blocked** (didn't run; reason shown to UI *and* model), `ls -la` ran. `allow` only "declines to deny" (not a grant — like Cursor/Codex). ⚠ grok auto-loads the Claude hook via compat and fails open on it — set `[compat.claude] hooks=false`. See §Grok. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
-**Remaining live-verification work:** only Qwen/Droid (both "assumed" Claude-Code mirrors) — optionally
-exercise to upgrade to "verified". Grok is now verified live (a DENY harness — see §Grok); Copilot's
+**Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is now verified live (a DENY harness — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
-Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
+Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
+Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
 
 ## The model we rely on
 
@@ -98,14 +98,15 @@ target looks like.
 | Codex `PreToolUse` | `Bash`; config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). `allow`/`ask` parsed-but-UNSUPPORTED (v0.144.3 through v0.160.1) | seconds |
 | Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* (everything else → Codex's own prompt) | seconds |
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
-| Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
+| Droid   | `Execute` (regex or exact; optional `commandRegex` on the shell string) | `{hookSpecificOutput: {...}}` | `permissionDecision` | **allow** (can bypass the prompt), **deny**, **ask** | seconds (default 60) |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
 | Cursor  | `beforeShellExecution` (matcher is the command string; safe-chains sets none) | flat object | `permission` | docs: `allow` / `deny` / `ask`. Live v2026.07.16: **deny** honored, `allow` ignored | seconds |
 | Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
 | Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
 
 Notes:
-- **Droid**'s shell tool is `Execute`, not `Bash` — a `Bash` matcher never fires.
+- **Droid**'s shell tool is `Execute`, not `Bash`. A `Bash` matcher never fires.
+  See §Droid.
 - **Gemini/Cursor** use `decision` / `permission`, *not* `permissionDecision`.
 - **Copilot** honors `allow`, `deny`, and `ask` on `preToolUse`
   ([hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference)).
@@ -312,6 +313,38 @@ The live drive below is `cursor-agent` v2026.07.16 and was not repeated.
 
 Verified: cursor 2026.10.08 2026-10-21
 
+### Droid (Factory) — docs-checked CLI v0.245.0, 2026-10-21
+
+The `droid` CLI is not installed. CLI v0.245.0 (2026-10-20) is the latest entry on the
+[release notes](https://docs.factory.com/changelog/release-notes). Current contract:
+[hooks reference](https://docs.factory.com/reference/hooks-reference.md). Not driven live.
+
+- **Config.** A standalone `~/.factory/hooks.json` or `.factory/hooks.json` is keyed
+  by event name, with no outer `hooks` object. `settings.json` wraps the same map
+  in `hooks`. Legacy `.factory/hooks/hooks.json` still loads. Commands need absolute
+  paths. `timeout` is seconds, default 60. `matcher` is an exact tool name or a
+  case-sensitive regex; empty, omitted, or `*` matches every tool. `commandRegex`
+  is a second regex against the Execute command string. safe-chains writes the
+  wrapped form in `~/.factory/settings.json`, matcher `Execute`, timeout 60.
+  Common tool matchers include `Execute`, `Read`, `Edit`, `Create`, `ApplyPatch`,
+  `LS`, `Glob`, `Grep`, `Task`, `FetchUrl`, and `WebSearch`. The changelog's Script
+  runs are a separate command surface; `Execute` does not name them.
+- **Input.** `session_id`, `transcript_path`, `cwd`, `permission_mode`
+  (`off`, `spec`, `auto-low`, `auto-medium`, `auto-high`), `hook_event_name`,
+  and for tools `tool_name` plus `tool_input`. The project root is the
+  `FACTORY_PROJECT_DIR` environment variable.
+- **Decisions.** `hookSpecificOutput.permissionDecision`: `allow` (can bypass the
+  permission prompt), `deny` (the reason is sent to Droid), `ask` (forces a
+  confirmation). `updatedInput` rewrites tool parameters. Exit 0 is success. Exit 2
+  blocks `PreToolUse` and stderr is the reason. Any other non-zero exit is recorded
+  and does not block. `additionalContext` is documented for `PostToolUse`,
+  `UserPromptSubmit`, and `SessionStart`. It is not listed on `PreToolUse`.
+- **What safe-chains emits.** The Claude-shaped allow envelope for a safe command,
+  an empty body otherwise, and `additionalContext` on `PreToolUse` for the
+  mixed-chain note. It does not emit `deny` or `ask`.
+
+Verified: droid 0.245.0 2026-10-21
+
 ### opencode — INERT (pattern generator is a stub), 2026-07
 
 opencode has NO usable runtime hook: its `permission.ask` plugin hook is defined in the SDK but never
@@ -388,7 +421,7 @@ flow is untouched.
 |---------|-----------------------------|------------|
 | Claude  | Yes (verified LIVE this session + docs) | emit on the mixed-chain case |
 | Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
-| Droid   | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
+| Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | No `additionalContext` on `beforeShellExecution` ([Hooks](https://cursor.com/docs/hooks): `permission`, `user_message`, `agent_message`) | default abstain |
 | Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
