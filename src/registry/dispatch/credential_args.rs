@@ -116,6 +116,17 @@ mod tests {
     use crate::parse::Token;
     use proptest::prelude::*;
 
+    /// A `]` straight after `[` or `[!` is a member of the class, not its end.
+    #[test]
+    fn a_class_opening_with_a_closing_bracket_still_spells_the_name() {
+        let credential = vec!["secret".to_string()];
+        for pattern in ["[]s]ecret", "[!]x]ecret", "[]]ecret", "[!a]ecret", "[s]ecret", "[xs]ecret"] {
+            let tokens = [Token::from_test(pattern)];
+            let spells = pattern != "[]]ecret";
+            assert_eq!(names_a_credential(&tokens, &credential, &[]), spells, "{pattern}");
+        }
+    }
+
     proptest! {
         /// A credential name with any of its characters replaced by `?` or a one-letter class, or
         /// any run replaced by `*`, is still read as that name; a pattern whose literal letters

@@ -48,7 +48,7 @@ fn ps_shows_the_environment(arguments: &[Token]) -> bool {
 
 fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
     let mut letters = String::new();
-    let mut names = 0;
+    let mut named = false;
     let mut bare_name = false;
     let mut after_separator = false;
     for argument in arguments {
@@ -61,14 +61,14 @@ fn lists_variables(arguments: &[Token], a_bare_name_prints: bool) -> bool {
             }
             letters.push_str(&word[1..]);
         } else {
-            names += 1;
+            named = true;
             bare_name |= !word.contains('=');
         }
     }
     if letters.contains(['p', 'm']) {
         return true;
     }
-    if names == 0 {
+    if !named {
         return !(a_bare_name_prints && !letters.is_empty() && letters.chars().all(|c| matches!(c, 'f' | 'F')));
     }
     a_bare_name_prints && bare_name && letters.is_empty()

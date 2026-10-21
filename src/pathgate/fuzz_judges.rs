@@ -49,3 +49,25 @@ pub fn judge_for_positional(cmd: &str, value: &str) -> Option<Verdict> {
         Role::RemoteShell => Some(crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value)),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{judge_for_flag, judge_for_positional};
+    use crate::verdict::Verdict;
+
+    /// The seam must answer with the role's judge, or the `gate_prefilter` target compares the gate
+    /// against nothing and passes whatever the pre-filter skips.
+    #[test]
+    fn the_positional_judge_answers_with_the_declared_roles_verdict() {
+        assert_eq!(judge_for_positional("curl", "~/.ssh/id_rsa"), Some(Verdict::Denied));
+        assert_eq!(judge_for_positional("tilt", "~/.ssh/id_rsa"), Some(Verdict::Denied));
+        assert!(judge_for_positional("curl", "./notes.txt").is_some());
+        assert_eq!(judge_for_positional("no-such-command-anywhere", "x"), None);
+    }
+
+    #[test]
+    fn the_flag_judge_answers_with_the_declared_roles_verdict() {
+        assert_eq!(judge_for_flag("cargo", "--target-dir", "~/.ssh"), Some(Verdict::Denied));
+        assert_eq!(judge_for_flag("no-such-command-anywhere", "--x", "x"), None);
+    }
+}
