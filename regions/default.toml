@@ -595,6 +595,11 @@ role = "credential-store"
 os = ["macos"]
 note = "macOS root home."
 researched = "2026-07-12"
+[[region]]
+path = "/.vol/"
+role = "credential-store"
+note = "macOS volfs. /.vol/device/inode names any file by its inode, including one a path shield would refuse. The same tree is mounted at /System/Volumes/Data/.vol."
+researched = "2026-10-21"
 # Well-known credential stores NESTED under ~/.config (non-hidden, so the dotfile rule can't
 # catch them under an explicit `grant ~/.config/`). Not exhaustive — an explicit grant of a
 # config dir can still expose an unlisted app's secrets; the docs advise granting narrowly.
