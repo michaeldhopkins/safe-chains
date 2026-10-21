@@ -541,10 +541,9 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     sub_v.combine(cmd_v).combine(redir_v)
 }
 
-/// The command leaf's verdict. The behavioral-capability engine is authoritative for every
-/// command it can resolve; the legacy classifier handles the rest (`…-engine` §4). There is
-/// no opt-out — the engine is the default and only path.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
+    let rewritten = crate::handlers::direct_script::as_interpreter(tokens);
+    let tokens = rewritten.as_ref();
     let legacy = handlers::dispatch(tokens);
     super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
 }

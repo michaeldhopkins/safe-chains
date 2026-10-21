@@ -171,7 +171,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
 }
 
 fn resolve_command(tokens: &[Token]) -> Option<Profile> {
-    let arg0 = tokens.first()?;
+    let arg0 = tokens.first().filter(|t| !crate::handlers::direct_script::is_relative_command_path(t.as_str()))?;
     // Canonicalize the invoked token through the registry's alias map (`gcat` → `cat`) BEFORE the
     // resolver lookup: Homebrew installs GNU coreutils as g-prefixed aliases, and without this
     // they'd miss every resolver and fall through to the ungated legacy classifier (a fail-open —
@@ -298,7 +298,7 @@ fn resolve_command(tokens: &[Token]) -> Option<Profile> {
     // dd/tar/sed/grep declare a `hook`). No declaration → the command is unresearched for the
     // engine, so return `None` (the caller falls back to the legacy classifier).
     let spec = crate::registry::command_behavior(canonical)?;
-    // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`, `~/bin/grep`)
+    // A resolvable basename reached via a NON-STANDARD path (`/tmp/cat`, `~/bin/grep`)
     // is not necessarily the real tool — a planted binary named `cat` would be certified as safe
     // coreutils. Don't certify it; worst-case (§0). Bare names and standard bin paths are
     // trusted. (Legacy classifies purely by basename and inherits the spoof; the engine is
@@ -3184,10 +3184,10 @@ mod tests {
             vec!["rm", "--no-preserve-root", "-rf", "/"], // enables rm -rf / → must worst-case
             vec!["rm", "-Z", "x"],                        // unknown flag
             vec!["rm"],                                   // no operand (usage error)
-            vec!["./rm", "x"],                            // basename spoof
         ] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("resolves")), Verdict::Denied, "{cmd:?}");
         }
+        assert!(resolve(&toks(&["./rm", "x"])).is_none(), "a worktree path is a script, not rm");
     }
 
     #[test]
@@ -3204,8 +3204,8 @@ mod tests {
 
     #[test]
     fn a_resolvable_name_from_a_non_standard_path_worst_cases() {
-        // ./cat, /tmp/cat, ~/bin/grep may be impostors → worst-case, not certified safe
-        for cmd in [vec!["./cat", "x"], vec!["/tmp/cat", "x"], vec!["~/bin/grep", "foo", "f"]] {
+        assert!(resolve(&toks(&["./cat", "x"])).is_none(), "a worktree path is a script, not cat");
+        for cmd in [vec!["/tmp/cat", "x"], vec!["~/bin/grep", "foo", "f"]] {
             let p = resolve(&toks(&cmd)).expect("resolvable name");
             assert!(!read_local().admits(&p), "{cmd:?} from a non-standard path must worst-case");
         }

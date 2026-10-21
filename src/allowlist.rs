@@ -617,7 +617,7 @@ mod tests {
         fs::write(claude_dir.join("settings.json"), r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#).unwrap();
         let p = Matcher::load_from_home(home.path());
         assert!(all_covered("cargo test && ./generate-docs.sh", &p));
-        assert!(!all_covered("cargo test && ./evil.sh", &p));
+        assert!(!all_covered("cargo test && ../evil.sh", &p));
     }
 
     #[test]

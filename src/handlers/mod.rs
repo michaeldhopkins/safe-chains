@@ -25,6 +25,7 @@ pub mod android;
 mod cargo_runs_this;
 pub mod coreutils;
 pub mod df;
+pub(crate) mod direct_script;
 mod env_print;
 mod followed_read;
 pub mod fd;

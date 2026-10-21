@@ -140,6 +140,10 @@ pub(crate) fn judge_leaf(tokens: &[Token], with_env: bool, classify: impl FnOnce
     let Some(level) = level().filter(|l| *l > FolderLevel::Reads) else {
         return classify();
     };
+    // A relative path is classified as `bash` of that path. Account for it as that command, so the
+    // shell's `writes_cwd = "code"` covers the project's own script. The classifier rewrites too.
+    let rewritten = crate::handlers::direct_script::as_interpreter(tokens);
+    let tokens = rewritten.as_ref();
     let here_unknown = super::cwd().is_some_and(|c| is_unknown(&c));
     let declared = crate::registry::cwd_writes(tokens);
     let frame = FrameGuard::push(declared);

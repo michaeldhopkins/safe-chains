@@ -13,8 +13,10 @@ static classifier must not, and it would be TOCTOU-racy anyway):
 
 - A `$PATH` shadow or a planted binary named after a safe tool is classified as that
   tool. (Mitigation the capability engine applies: a resolvable name reached via a
-  *non-standard path* — `./cat`, `/tmp/cat` — is worst-cased; a bare name resolved via
-  `$PATH`, and standard bin paths, are trusted.)
+  *non-standard path* outside the worktree — `/tmp/cat`, `~/bin/grep` — is worst-cased; a
+  bare name resolved via `$PATH`, and standard bin paths, are trusted. A relative path
+  that lands inside the worktree is the project's own file, judged as `bash` running that
+  path, not as the tool its basename spells.)
 - A hard link is not seen: two names for one file are two paths.
 
 Four deliberate exceptions read the filesystem, all racing the shell (accepted in

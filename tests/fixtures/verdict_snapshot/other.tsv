@@ -27,9 +27,9 @@ ${cmd} log	denied
 (x=1)	inert
 (x=1; ls)	inert
 ./bin/rails db:migrate	safe-write
-./vendor/bin/pest --no-progress	safe-read
-./vendor/bin/phpstan analyse --no-progress	inert
-./vendor/bin/phpunit --testsuite Unit	safe-read
+./vendor/bin/pest --no-progress	safe-write
+./vendor/bin/phpstan analyse --no-progress	safe-write
+./vendor/bin/phpunit --testsuite Unit	safe-write
 /bin/chmod +s x	denied
 /usr/bin/env	denied
 /usr/bin/open x.command	denied

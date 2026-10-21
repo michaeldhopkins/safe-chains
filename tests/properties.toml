@@ -285,6 +285,7 @@ owed = [
   "every_documented_libxo_combination_is_allowed",
   "any_unlisted_libxo_token_is_denied",
 ]
+"src/handlers/direct_script.rs" = ["a_direct_worktree_script_matches_bash_on_every_level_and_target"]
 "src/handlers/fd.rs" = [
   "fd_exec_follows_the_inner_command_locus",
   "fd_batch_without_placeholder_gates_the_base",

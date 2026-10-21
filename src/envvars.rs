@@ -821,7 +821,7 @@ mod integration_tests {
             ("MAKEFLAGS='-f /tmp/m' ls", "MAKEFLAGS= ls"),
             ("npm_config_script_shell=/tmp/m npm test", "npm_config_script_shell=cat npm test"),
             ("NPM_CONFIG_SCRIPT_SHELL=/tmp/m npm test", "NPM_CONFIG_SCRIPT_SHELL=cat npm test"),
-            ("Npm_Config_Script-Shell=/tmp/m npm test", "npm_config_loglevel=silent npm test"),
+            ("env Npm_Config_Script-Shell=/tmp/m npm test", "npm_config_loglevel=silent npm test"),
             ("npm_config_shell=/tmp/m npm test", "npm_config_shell=cat npm test"),
             ("npm_config_git=/tmp/m npm test", "npm_config_git=cat npm test"),
             ("npm_config_node_options='--require /tmp/m.js' npm test", "npm_config_node_options=--no-warnings npm test"),

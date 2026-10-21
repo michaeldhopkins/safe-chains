@@ -114,10 +114,11 @@ follow, and the honest posture is to name them:
   is genuinely the tool it is named is *out of scope* — this is a string classifier, not
   an integrity checker (see `AGENTS.md` "Scope / trust model"). A bare `cat` trusts
   `$PATH` resolution to the real coreutils; a `$PATH` shadow is invisible. The resolver
-  *does* worst-case a resolvable name reached via a non-standard path (`./cat`,
-  `/tmp/cat`, `~/bin/grep`) — closing the planted-binary case — but a `$PATH`-shadowed
-  bare `cat` is inherently trusted. (The legacy classifier keys purely on basename and
-  hardens neither.)
+  *does* worst-case a resolvable name reached via a non-standard path outside the
+  worktree (`/tmp/cat`, `~/bin/grep`). A relative path that lands inside the worktree
+  (`./cat`, `bin/git`) is the project's own file, judged as `bash` running that path,
+  not as the tool its basename spells. A `$PATH`-shadowed bare `cat` is inherently
+  trusted. (The legacy classifier keys purely on basename and hardens neither.)
 - **TOCTOU.** Any static verdict can be invalidated by a filesystem change between check
   and exec. safe-chains is an allowlist gate, not a sandbox; it bounds what it *certifies*,
   not what the OS *enforces*.
