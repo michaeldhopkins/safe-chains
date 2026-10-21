@@ -36,71 +36,13 @@ fn roots(tokens: &[Token]) -> Option<Read> {
         "cpio" => cpio_roots(tokens).map(trees_only),
         "zip" => zip_roots(tokens).map(trees_only),
         "rg" => search::rg(tokens).map(trees_only),
-        "ag" => search_roots(tokens, b'f', false).map(trees_only),
+        "ag" => search::ag(tokens).map(trees_only),
         _ => None,
     }
 }
 
 fn trees_only(trees: Vec<String>) -> Read {
     Read { trees, places: Vec::new() }
-}
-
-/// `rg` follows on `-L` / `--follow` and takes its pattern from `-e`/`-f` or the first positional.
-/// `ag` follows on `-f` / `--follow` and the first positional is always the pattern. With no path
-/// left, both search the working directory.
-fn search_roots(tokens: &[Token], follow_byte: u8, pattern_flag: bool) -> Option<Vec<String>> {
-    let mut follow = false;
-    let mut supplied = false;
-    let mut positionals = Vec::new();
-    let mut i = 1;
-    while i < tokens.len() {
-        let word = tokens[i].as_str();
-        if word == "--" {
-            positionals.extend(tokens[i + 1..].iter().map(|token| token.as_str().to_string()));
-            break;
-        }
-        if let Some(long) = word.strip_prefix("--") {
-            let name = long.split('=').next().unwrap_or(long);
-            follow |= name.len() >= 3 && "follow".starts_with(name);
-            if pattern_flag && name.len() >= 3 && ("regexp".starts_with(name) || "file".starts_with(name)) {
-                supplied = true;
-            }
-            if !long.contains('=') && long_takes_value(name) {
-                i += 1;
-            }
-        } else if word.starts_with('-') && word != "-" {
-            let cluster = &word[1..];
-            follow |= cluster.bytes().any(|byte| byte == follow_byte);
-            if pattern_flag && cluster.bytes().any(|byte| byte == b'e' || byte == b'f') {
-                supplied = true;
-            }
-            if cluster.chars().next_back().is_some_and(valued_short) {
-                i += 1;
-            }
-        } else {
-            positionals.push(word.to_string());
-        }
-        i += 1;
-    }
-    if !follow {
-        return None;
-    }
-    if !supplied {
-        positionals.drain(..positionals.len().min(1));
-    }
-    Some(if positionals.is_empty() { vec![".".to_string()] } else { positionals })
-}
-
-fn valued_short(letter: char) -> bool {
-    matches!(letter, 'e' | 'f' | 'g' | 't' | 'T' | 'm' | 'M' | 'A' | 'B' | 'C' | 'r' | 'j' | 'G')
-}
-
-fn long_takes_value(name: &str) -> bool {
-    const VALUED: &[&str] = &[
-        "regexp", "regex", "file", "glob", "type", "type-not", "type-add", "max-count", "max-filesize", "replace", "context",
-        "after-context", "before-context", "threads",
-    ];
-    VALUED.iter().any(|flag| *flag == name || (name.len() >= 3 && flag.starts_with(name)))
 }
 
 fn zip_roots(tokens: &[Token]) -> Option<Vec<String>> {

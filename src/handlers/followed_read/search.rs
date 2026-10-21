@@ -24,6 +24,16 @@ const RG: Kind = Kind {
     optional_number: &[],
 };
 
+const AG: Kind = Kind {
+    follow_shorts: &['f'],
+    pattern_shorts: &[],
+    follow: &["follow"],
+    nofollow: &["nofollow", "no-follow"],
+    pattern: &[],
+    files: &[],
+    optional_number: &["A", "B", "C", "after", "before", "context"],
+};
+
 struct Scan {
     positionals: Vec<String>,
     follow: Option<bool>,
@@ -39,6 +49,10 @@ enum Leading {
 
 pub(super) fn rg(tokens: &[Token]) -> Option<Vec<String>> {
     walked(tokens, "rg", &RG)
+}
+
+pub(super) fn ag(tokens: &[Token]) -> Option<Vec<String>> {
+    walked(tokens, "ag", &AG)
 }
 
 fn walked(tokens: &[Token], cmd: &str, kind: &Kind) -> Option<Vec<String>> {
@@ -209,6 +223,22 @@ mod tests {
             let roots = rg(&tokens).unwrap_or_default();
             let supplies_pattern = matches!(flag, "-e" | "-f" | "--regexp" | "--file");
             if supplies_pattern {
+                prop_assert_eq!(roots, vec!["needle".to_string()]);
+            } else {
+                prop_assert!(roots.iter().any(|root| root == "."), "{} walked {:?}", flag, roots);
+                prop_assert!(!roots.iter().any(|root| root == "zz" || root == "needle"), "{} walked {:?}", flag, roots);
+            }
+        }
+
+        #[test]
+        fn every_valued_flag_is_consumed_when_ag_follows(n in 0..64usize) {
+            let valued = crate::registry::command_valued_flags("ag").expect("ag flags");
+            prop_assume!(!valued.is_empty());
+            let flag = valued[n % valued.len()].as_str();
+            let tokens = ["ag", "-f", flag, "zz", "needle"].map(|word| Token::from_raw(word.to_string()));
+            let roots = ag(&tokens).unwrap_or_default();
+            let optional = matches!(flag, "-A" | "-B" | "-C" | "--after" | "--before" | "--context");
+            if optional {
                 prop_assert_eq!(roots, vec!["needle".to_string()]);
             } else {
                 prop_assert!(roots.iter().any(|root| root == "."), "{} walked {:?}", flag, roots);

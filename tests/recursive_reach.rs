@@ -239,6 +239,40 @@ fn tar_follows_a_link_from_the_directory_in_effect() {
 }
 
 #[test]
+fn ag_follows_links_into_the_path_after_its_pattern() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let plain = project(&["src"]);
+    let parent = std::path::Path::new(&plain.root).parent().expect("project parent");
+    let other = parent.join("other");
+    let nested = parent.join("p2").join("sub");
+    let _ = std::fs::remove_dir_all(&other);
+    let _ = std::fs::remove_dir_all(parent.join("p2"));
+    std::fs::create_dir_all(&other).expect("sibling directory");
+    std::fs::create_dir_all(&nested).expect("nested sibling");
+    let abs = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("absolute directory");
+    let abs_path = abs.path().canonicalize().expect("canonical directory");
+    let absolute = format!("ag -f x {}", abs_path.display());
+    for cmd in ["ag -f x ../other", "ag -f x ../p2/sub", absolute.as_str()] {
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused with no link");
+    }
+    std::os::unix::fs::symlink(secret, other.join("s")).expect("link");
+    std::os::unix::fs::symlink(secret, nested.join("s")).expect("link");
+    std::os::unix::fs::symlink(secret, abs_path.join("s")).expect("link");
+    for cmd in ["ag -f x ../other", "ag -f x ../p2/sub", absolute.as_str()] {
+        assert!(!at(&plain, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+    let _ = std::fs::remove_dir_all(parent.join("p2"));
+    let _ = std::fs::remove_dir_all(&other);
+
+    let linked = with_secret_link(true);
+    let clean = with_secret_link(false);
+    for cmd in ["ag -f --depth 9 x", "ag -f --ignore foo x", "ag --follow --depth 9 x"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&clean, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
 fn ripgrep_follows_links_when_a_valued_option_precedes_the_pattern() {
     let linked = with_secret_link(true);
     let plain = with_secret_link(false);
