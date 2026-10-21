@@ -29,12 +29,12 @@ independently exercised.
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
 | **Grok** | ✅ | 📄 **Docs-checked** v1.0.62 (2026-10-21); last live drive v0.2.106 | `grok --version` could not be run. The installed build is 1.0.62. `allow` declines to deny. Settings-file hooks can `ask`, `defer`, and send `additionalContext`. safe-chains still only denies. See §Grok. |
-| **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
+| **opencode** | ❌ | 📄 **Docs-checked** v2.0.26 (2026-10-21); install still skipped | `opencode --version` is v2.0.26. v1 `permission.ask` does not fire ([#7006](https://github.com/anomalyco/opencode/issues/7006)). v2 documents `ctx.permission.hook("evaluate")`. safe-chains does not install a plugin. See §opencode. |
 
 **Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
-Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude/Codex done; opencode not integrable.
+Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude/Codex done; opencode v2.0.26 documents `permission.evaluate` and safe-chains still skips install (see §opencode).
 
 ## The model we rely on
 
@@ -381,27 +381,33 @@ The `droid` CLI is not installed. CLI v0.245.0 (2026-10-20) is the latest entry 
 
 Verified: droid 0.245.0 2026-10-21
 
-### opencode — INERT (pattern generator is a stub), 2026-07
+### opencode — docs-checked v2.0.26, 2026-10-21
 
-opencode has NO usable runtime hook: its `permission.ask` plugin hook is defined in the SDK but never
-fires ([#7006](https://github.com/anomalyco/opencode/issues/7006)), so the only integration is a static
-`opencode.json` `permission.bash` map (`"pattern" -> allow|ask|deny`, last match wins, `"*"` first).
-`safe-chains --opencode-config` renders that map. Two findings from the 2026-07 check:
-- **The generator is a NO-OP STUB.** `handlers::all_opencode_patterns()` builds an empty `Vec`,
-  sorts/dedups nothing, returns it. So the rendered config is just `{"bash": {"*": "ask"}}` — it
-  allowlists ZERO commands. safe-chains provides **no auto-approval** on opencode today. (No test
-  asserts the pattern set is non-empty, so it slipped through — a test gap.)
-- **Even filled in, the approach is FUNDAMENTALLY LOSSY.** opencode matches a command against glob
-  prefixes; safe-chains classifies per-argument. `"git *": "allow"` would allow `git push` (gated) as
-  well as `git status` (safe). The only SOUND patterns are commands safe for EVERY argument (the
-  always-inert set: `echo`, `pwd`, `date`, `whoami`, …) — a small subset. Anything richer over-allows.
-- **DECISION (2026-07): dropped `--opencode-config`.** It advertised an allowlist it never produced, so
-  it was removed (flag, the `all_opencode_patterns()` stub, and the `render_opencode_json_in` renderer).
-  `OpenCodeTarget` stays for DETECTION only: `install()` now returns a Skip that explains opencode has no
-  usable hook yet (see the reason string). REVISIT when opencode ships a real runtime hook (#7006) — then
-  a proper per-command integration (like the other targets) becomes possible; a static glob allowlist
-  never can. **Watch [opencode #7006](https://github.com/anomalyco/opencode/issues/7006)** and opencode's
-  permissions/plugin docs for that change.
+`opencode --version` is v2.0.26. Not driven live. Sources:
+[permissions](https://opencode.ai/v2/docs/permissions/),
+[plugin migration](https://opencode.ai/v2/docs/build/plugins/migrate-v1/),
+[plugin hooks](https://opencode.ai/v2/docs/build/plugins/).
+
+- **v1 `permission.ask`.** The plugin hook is defined and does not fire
+  ([#7006](https://github.com/anomalyco/opencode/issues/7006)). The 2026-07 check
+  removed `--opencode-config`, which rendered an empty `permission.bash` map.
+- **v2 permissions.** Rules are ordered `{action, resource, effect}` entries.
+  `effect` is `allow`, `ask`, or `deny`. The last match wins. The shell action's
+  resource is the scanner's command string, matched with `*` and `?` wildcards.
+  A glob such as `git *` covers `git status` and `git push` together. `--auto`
+  approves a request that is not an explicit deny. An explicit configured deny
+  is final.
+- **v2 plugin hook.** The migration table maps v1 `permission.ask` to
+  `ctx.permission.hook("evaluate")`. The hook runs for `allow` and `ask`
+  decisions and does not run for an explicit deny. It may set `effect` to
+  `allow`, `ask`, or `deny`, and `message` is the prompt text or the denial
+  reason. `ctx.shell.hook("create.before")` sees `command`, `cwd`, `timeout`,
+  `shell`, and `env` before the command runs. This was not driven on v2.0.26.
+- **What safe-chains does.** `install()` returns Skip. The skip text still says
+  there is no runtime hook because `permission.ask` does not fire. It does not
+  register `permission.evaluate`.
+
+Verified: opencode 2.0.26 2026-10-21
 
 ### GitHub Copilot CLI — docs-checked v1.0.101, 2026-10-21
 
@@ -498,11 +504,11 @@ e2e note):
 | Qwen     | ✅ | ✅ | `QWEN_PROJECT_DIR` env var |
 | Codex    | ✅ | ❌ | cwd only — no distinct root (`cwd` is the "project dir equivalent") |
 | Copilot  | ✅ | ❌ | cwd only — no documented root field/var |
-| opencode | ❌ | ❌ | not a runtime hook — we render static config patterns; no per-command signal |
+| opencode | ❌ in safe-chains | ❌ in safe-chains | v2 `permission.evaluate` receives the shell command as a resource; safe-chains installs no plugin |
 
 So **7 of 10 give a distinct project root** (env var for 4, payload for cursor,
-agy, and Grok); Codex/Copilot give `cwd` but no root; opencode gives nothing at
-eval time. When a root is unavailable, the classifier must fall back to today's
+agy, and Grok); Codex/Copilot give `cwd` but no root; opencode's evaluate hook
+can see the command, and safe-chains installs no plugin so nothing arrives. When a root is unavailable, the classifier must fall back to today's
 `relative == worktree` assumption — use the signal where present, never regress.
 Env-var roots are read from the hook *process* env (set by the harness, not the
 agent's shell), so they are reasonably tamper-resistant.
