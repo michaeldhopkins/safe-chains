@@ -92,7 +92,10 @@ pub(crate) fn remote_shell_is_plain(value: &str) -> bool {
         };
         let fits = match flag {
             "-p" => argument.chars().all(|c| c.is_ascii_digit()),
-            "-l" => argument.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.')),
+            "-l" => {
+                !argument.starts_with('-')
+                    && argument.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+            }
             "-o" => argument.split_once('=').is_some_and(|(key, setting)| {
                 SSH_OPTIONS.contains(&key.to_ascii_lowercase().as_str())
                     && !setting.is_empty()
@@ -220,8 +223,12 @@ mod tests {
             "sh", "bash", "make", "just", "", "ssh -o ProxyCommand=id", "ssh -oProxyCommand=id", "ssh -o LocalCommand=id", "ssh -F ./cfg",
             "ssh -S /tmp/s", "ssh 'x'", "ssh \"-p\" 2", "ssh;id", "ssh -p", "/tmp/ssh", "sshd", "ssh -o", "ssh x id",
             "ssh -o PermitLocalCommand=yes", "ssh -o User=a=b", "ssh -o User=a.b", "ssh -o User=a_b", "ssh -o User=a/b", "ssh -o User=a@b",
+            "ssh -l -F", "ssh -l-F", "ssh -l -o", "ssh -l --",
         ] {
             assert!(!remote_shell_is_plain(value), "{value}");
+        }
+        for cmd in ["rsync -e 'ssh -l -F' x:foo dst/", "rsync -e 'ssh -l-F' x:foo dst/", "RSYNC_RSH='ssh -l -F' rsync x:foo dst/"] {
+            assert!(!check(cmd), "{cmd} was approved");
         }
     }
 
@@ -342,6 +349,20 @@ mod tests {
                 _ => format!("RSYNC_RSH={program} rsync x:foo dst/"),
             };
             prop_assert_eq!(in_project(&line), allowed, "{}", line);
+        }
+
+        /// ssh takes the next word after `-l` as the login name, so a value that is itself an
+        /// option (`-l -F`, glued `-l-F`) is a different flag. A name may still contain a dash.
+        #[test]
+        fn a_login_name_that_is_an_option_is_refused(
+            login in prop::sample::select(vec!["user", "me", "a-b", "a_b", "a.b", "-F", "-o", "-l", "--"]),
+            glued in proptest::bool::ANY,
+        ) {
+            let allowed = !login.starts_with('-');
+            let value = if glued { format!("ssh -l{login}") } else { format!("ssh -l {login}") };
+            prop_assert_eq!(remote_shell_is_plain(&value), allowed, "{}", value);
+            let line = format!("rsync -e '{value}' x:foo dst/");
+            prop_assert_eq!(is_safe_command(&line), allowed, "{}", line);
         }
     }
 }
