@@ -56,7 +56,7 @@ impl<'a> Target<'a> {
             } else if word.starts_with("--") {
                 let value = if valued.iter().any(|v| v == word) { Some(words.next()?) } else { None };
                 (word, value)
-            } else if word.len() > 1 && word.starts_with('-') {
+            } else if word.starts_with('-') {
                 let letters = &word[1..];
                 let Some(at) = letters.find(|c| short_valued.contains(&c)) else { continue };
                 let rest = &letters[at + 1..];
@@ -220,6 +220,40 @@ mod tests {
             assert!(!in_manifest("dependent-target", dependent, cmd), "{cmd} must not be approved in a dependent");
             assert!(in_manifest("other-target", "[package]\nname = \"tool\"\n", cmd), "{cmd} should be approved in another project");
         }
+    }
+
+    /// `--example` sends the decision to the manifest, so a package named beside it says nothing.
+    #[test]
+    fn an_example_leaves_the_decision_to_the_manifest_whatever_package_is_named() {
+        let this = "[package]\nname = \"safe-chains\"\n";
+        let other = "[package]\nname = \"tool\"\n";
+        assert!(!in_manifest("example-package-this", this, "cargo run --example demo -p tool -- config add x"));
+        assert!(!in_manifest("example-package-this-eq", this, "cargo run -p tool --example=demo -- config add x"));
+        assert!(in_manifest("example-package-other", other, "cargo run --example demo -p safe-chains -- mcp"));
+    }
+
+    /// `-C` moves the folder cargo runs in, so it picks the manifest that decides.
+    #[test]
+    fn a_changed_directory_picks_the_manifest_that_decides() {
+        let root = std::env::temp_dir().join(format!("sc-cargo-run-{}-chdir", std::process::id()));
+        let (this, other) = (root.join("this"), root.join("other"));
+        for (dir, name) in [(&this, "safe-chains"), (&other, "tool")] {
+            std::fs::create_dir_all(dir).expect("project dir");
+            std::fs::write(dir.join("Cargo.toml"), format!("[package]\nname = \"{name}\"\n")).expect("manifest");
+        }
+        let (this, other) = (this.to_string_lossy().into_owned(), other.to_string_lossy().into_owned());
+        // `-C` goes before the subcommand, where only this check reads it, so it is called directly.
+        let runs_this = |dir: &str, line: String| {
+            let _cwd = crate::pathctx::enter_cwd(Some(dir.to_string()));
+            let tokens: Vec<_> = line.split(' ').map(crate::parse::Token::from_test).collect();
+            let at = tokens.iter().position(|t| t.as_str() == "--").map_or(tokens.len(), |p| p + 1);
+            super::runs_safe_chains(&tokens, at)
+        };
+        assert!(runs_this(&other, format!("cargo -C {this} run -- mcp")));
+        assert!(runs_this(&other, format!("cargo -C{this} run -- mcp")));
+        assert!(!runs_this(&other, format!("cargo -C {other} run -- mcp")));
+        assert!(!runs_this(&this, format!("cargo -C {other} run -- mcp")));
+        assert!(runs_this(&this, "cargo run -- mcp".to_string()));
     }
 
     #[test]
