@@ -66,6 +66,8 @@ pub(super) fn seven_zip(tokens: &[Token]) -> Option<Read> {
     let mut follow_l = false;
     let mut store_links = false;
     let mut positionals = Vec::new();
+    let mut included = Vec::new();
+    let mut unchecked = Vec::new();
     let mut i = 1;
     while i < tokens.len() {
         let word = tokens[i].as_str();
@@ -77,6 +79,11 @@ pub(super) fn seven_zip(tokens: &[Token]) -> Option<Read> {
             let lower = word.to_ascii_lowercase();
             follow_l |= lower == "-l";
             store_links |= lower == "-snl";
+            match seven_zip_names(word) {
+                Some(Named::List { archives }) => unchecked.push(archives),
+                Some(Named::Path { path, archives }) => included.push((path, archives)),
+                None => {}
+            }
             let listed = |flags: &[String]| flags.iter().any(|flag| flag == word);
             let takes = listed(valued) && !listed(standalone) && !word.contains('=') && consumes_next_value(tokens.get(i + 1));
             i += if takes { 2 } else { 1 };
@@ -86,17 +93,46 @@ pub(super) fn seven_zip(tokens: &[Token]) -> Option<Read> {
         i += 1;
     }
     let command = positionals.first()?.to_ascii_lowercase();
-    if command != "a" && command != "u" {
-        return None;
+    let adds = command == "a" || command == "u";
+    let mut named = included.into_iter().filter(|(_, archives)| adds || *archives).map(|(path, _)| path).peekable();
+    let lists = unchecked.iter().any(|archives| adds || *archives) || (adds && positionals.iter().skip(1).any(|p| p.starts_with('@')));
+    if lists {
+        return Some(Read { trees: Vec::new(), places: Vec::new(), unresolved: true });
     }
-    if !follow_l && store_links {
-        return None;
+    if !adds || (!follow_l && store_links) {
+        return named
+            .peek()
+            .is_some()
+            .then(|| Read { trees: Vec::new(), places: named.collect(), unresolved: false });
     }
     let mut trees: Vec<String> = positionals.into_iter().skip(2).filter(|path| path != "-").collect();
     if trees.is_empty() {
         trees.push(".".to_string());
     }
+    trees.extend(named);
     Some(Read { trees, places: Vec::new(), unresolved: false })
+}
+
+enum Named {
+    List { archives: bool },
+    Path { path: String, archives: bool },
+}
+
+/// A `7z` switch naming more to read: `-i` (files to add) or `-ai` (archives to open), then an
+/// optional recursion mark (`r`, `r-`, `r0`), then `@list` or `!path`.
+fn seven_zip_names(word: &str) -> Option<Named> {
+    let lower = word.to_ascii_lowercase();
+    let (archives, rest) = match lower.strip_prefix("-ai") {
+        Some(rest) => (true, rest),
+        None => (false, lower.strip_prefix("-i")?),
+    };
+    let rest = rest.strip_prefix('r').map_or(rest, |after| after.strip_prefix(['-', '0']).unwrap_or(after));
+    let at = word.len() - rest.len();
+    match rest.as_bytes().first()? {
+        b'@' => Some(Named::List { archives }),
+        b'!' => Some(Named::Path { path: word[at + 1..].to_string(), archives }),
+        _ => None,
+    }
 }
 
 struct DiffScan<'a> {
