@@ -4,6 +4,8 @@
 //! (`tar -h`, `cpio -oL`, `zip` unless `-y`, `rg -L`, `ag -f`) reads a secret through a link
 //! committed in the tree. The walk is the one those copies use.
 
+mod search;
+
 use crate::engine::resolve::frozen_reach::read_through;
 use crate::engine::resolve::frozen_walk::on_disk;
 use crate::engine::resolve::locus::UNKNOWABLE_ITEM;
@@ -33,7 +35,7 @@ fn roots(tokens: &[Token]) -> Option<Read> {
         "tar" => tar_roots(tokens),
         "cpio" => cpio_roots(tokens).map(trees_only),
         "zip" => zip_roots(tokens).map(trees_only),
-        "rg" => search_roots(tokens, b'L', true).map(trees_only),
+        "rg" => search::rg(tokens).map(trees_only),
         "ag" => search_roots(tokens, b'f', false).map(trees_only),
         _ => None,
     }

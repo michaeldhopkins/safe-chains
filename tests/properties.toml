@@ -547,6 +547,7 @@ owed = [
   "src/userconfig/tests.rs::normalizing_twice_is_normalizing_once",
   "src/userconfig/tests.rs::nothing_inside_a_credential_store_is_grantable",
 ]
+"src/handlers/followed_read/search.rs" = ["every_valued_flag_is_consumed_when_ripgrep_follows"]
 "src/verdict.rs" = [
   "combine_takes_the_max_of_levels_when_both_allowed",
   "combine_is_denied_iff_either_operand_is_denied",

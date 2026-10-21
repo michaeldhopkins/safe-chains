@@ -49,12 +49,16 @@ pub(crate) fn sub_valued_flags(cmd_name: &str, sub_name: &str) -> Option<&'stati
     }
 }
 
-pub(crate) fn command_valued_flags(cmd_name: &str) -> Option<&'static [String]> {
+pub(crate) fn command_flag_sets(cmd_name: &str) -> Option<(&'static [String], &'static [String])> {
     match &handler_spec(cmd_name)?.kind {
         DispatchKind::Policy { policy, .. }
         | DispatchKind::RequireAny { policy, .. }
         | DispatchKind::WriteFlagged { policy, .. }
-        | DispatchKind::Executor { policy, .. } => Some(policy.valued.as_slice()),
+        | DispatchKind::Executor { policy, .. } => Some((policy.standalone.as_slice(), policy.valued.as_slice())),
         _ => None,
     }
+}
+
+pub(crate) fn command_valued_flags(cmd_name: &str) -> Option<&'static [String]> {
+    command_flag_sets(cmd_name).map(|(_, valued)| valued)
 }

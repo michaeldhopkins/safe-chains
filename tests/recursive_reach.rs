@@ -239,6 +239,20 @@ fn tar_follows_a_link_from_the_directory_in_effect() {
 }
 
 #[test]
+fn ripgrep_follows_links_when_a_valued_option_precedes_the_pattern() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "rg -L --max-depth 9 x", "rg -L -E utf8 x", "rg -L --iglob '*' x", "rg -L --sort path x", "rg --follow --sort path x",
+        "rg -L --encoding utf8 x", "rg -L --color never x", "rg -L --colors 'match:fg:red' x", "rg -L --ignore-file .ignore x",
+        "rg -L --path-separator / x", "rg -L --engine default x", "rg -L --max-columns 10 x",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
 fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
     let linked = with_secret_link(true);
     let plain = with_secret_link(false);
