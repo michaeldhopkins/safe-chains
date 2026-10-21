@@ -7,7 +7,8 @@
 
 use std::collections::{HashSet, VecDeque};
 
-use super::frozen_reach::{Reach, Sight, fold_sight, sight_of, stops_before_matches};
+pub(crate) use super::frozen_reach::is_frozen;
+use super::frozen_reach::{Reach, Sight, cut_short, fold_sight, reads_a_secret, sight_of, stops_before_matches};
 
 pub(crate) const MAX_ENTRIES: usize = 20_000;
 const MAX_LINKS: usize = 64;
@@ -200,8 +201,8 @@ impl Walker<'_> {
             };
             for entry in entries {
                 *seen += 1;
-                let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(self.base)] };
-                let Ok(name) = entry.file_name().into_string() else { return vec![unlisted(self.base)] };
+                let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return cut_short(self.base, self.walk) };
+                let Ok(name) = entry.file_name().into_string() else { return cut_short(self.base, self.walk) };
                 if !self.walk.hidden && name.starts_with('.') {
                     continue;
                 }
@@ -245,6 +246,7 @@ impl Walker<'_> {
                         }
                     }
                     Ok(target) if !is_dir && target.starts_with(&walked) && clean_in_root(&target, root.as_deref()) => {}
+                    Ok(target) if is_dir && reads_a_secret(&target) => return cut_short(self.base, self.walk),
                     _ => {
                         if !self.push_link(if is_dir { format!("{shown}/.git/f") } else { shown }) {
                             return vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())];
@@ -254,7 +256,7 @@ impl Walker<'_> {
             }
         }
         let seen = fold_sight(sight_of(&self.reached), if missed { Sight::Unlisted } else { Sight::Empty });
-        if seen == Sight::Unlisted { vec![unlisted(self.base)] } else { self.reached }
+        if seen == Sight::Unlisted { cut_short(self.base, self.walk) } else { self.reached }
     }
 
     fn push_link(&mut self, item: String) -> bool {
@@ -377,13 +379,6 @@ fn outside_sandbox(base: &str) -> bool {
 fn clean_in_root(target: &std::path::Path, root: Option<&std::path::Path>) -> bool {
     root.and_then(|r| target.strip_prefix(r).ok())
         .is_some_and(|rel| rel.components().all(|c| c.as_os_str().to_str().is_some_and(|s| !is_frozen(s))))
-}
-
-pub(crate) fn is_frozen(name: &str) -> bool {
-    let fold = cfg!(target_os = "macos");
-    super::regions::metadata::frozen_names()
-        .iter()
-        .any(|n| if fold { n.eq_ignore_ascii_case(name) } else { *n == name })
 }
 
 pub(crate) fn on_disk(base: &str) -> Option<String> {

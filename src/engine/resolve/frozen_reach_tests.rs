@@ -97,6 +97,14 @@ fn a_linked_folder_is_not_walked_into() {
 }
 
 #[test]
+fn a_scratch_folder_is_not_a_secret_to_read() {
+    let dir = tempfile::tempdir_in("/tmp").expect("scratch");
+    let path = dir.path().canonicalize().expect("canonical");
+    assert!(!super::reads_a_secret(&path), "{path:?} was read as a secret");
+    assert!(super::reads_a_secret(std::path::Path::new("/etc")));
+}
+
+#[test]
 fn an_ungranted_folder_outside_the_workspace_is_not_walked() {
     use crate::engine::resolve::regions::with_grants;
     let (_d, root) = project(&["src"]);

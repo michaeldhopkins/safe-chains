@@ -9,7 +9,7 @@
 //! listed and the operand is judged as before. A command that follows links while it walks is also
 //! judged where each link out of the tree leads (`frozen_walk`).
 
-use super::frozen_walk::{Skip, Walk, is_frozen, reach_below};
+use super::frozen_walk::{Skip, Walk, reach_below};
 use crate::verdict::Verdict;
 
 /// What a walk below an operand turned up.
@@ -20,6 +20,22 @@ pub(crate) enum Reach {
     Found(String),
     /// A tree that could not be listed in full, stood for by a frozen name directly below it.
     Unlisted(String),
+}
+
+/// What a walk cut short reaches. A walk that follows links may have missed one leading anywhere,
+/// so no path stands for it; one that does not stands for a frozen name below its operand.
+pub(crate) fn cut_short(base: &str, walk: Walk) -> Vec<Reach> {
+    if walk.links == super::frozen_walk::WalkLinks::Follow {
+        vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())]
+    } else {
+        vec![super::frozen_walk::unlisted(base)]
+    }
+}
+
+/// Whether reading the folder a followed link leads to out of the tree reads a secret: the walk
+/// reports such a link as a frozen name below it, which says nothing about what lies in its target.
+pub(crate) fn reads_a_secret(target: &std::path::Path) -> bool {
+    target.to_str().is_none_or(|path| super::read_tree_verdict(path) == Verdict::Denied)
 }
 
 impl Reach {
@@ -203,6 +219,13 @@ pub(crate) fn frozen_below(base: &str, hidden: bool) -> Option<Reach> {
     let reached = reach_below(base, Walk::plain(hidden));
     let found = reached.iter().position(|r| matches!(r, Reach::Found(_))).unwrap_or(0);
     reached.into_iter().nth(found)
+}
+
+pub(crate) fn is_frozen(name: &str) -> bool {
+    let fold = cfg!(target_os = "macos");
+    super::regions::metadata::frozen_names()
+        .iter()
+        .any(|n| if fold { n.eq_ignore_ascii_case(name) } else { *n == name })
 }
 
 #[cfg(test)]
