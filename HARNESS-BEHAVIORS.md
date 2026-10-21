@@ -28,10 +28,10 @@ independently exercised.
 | **Droid** | ✅ | 📄 **Docs-checked** CLI v0.245.0 (2026-10-21); not installed, not driven live | `allow` can bypass the prompt; `deny` and `ask` are honored. Shell matcher is `Execute`. `additionalContext` is not listed on `PreToolUse`. See §Droid. |
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
 | **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
-| **Grok** | ✅ | ✅ **Verified live → DENY harness** (`grok` v0.2.106, 2026-07) | Native `~/.grok/hooks/safe-chains.json`; **camelCase** envelope (`toolInput.command`, `workspaceRoot`); top-level `decision` + exit 2. Drove the TUI: `cat /etc/hosts` **blocked** (didn't run; reason shown to UI *and* model), `ls -la` ran. `allow` only "declines to deny" (not a grant — like Cursor/Codex). ⚠ grok auto-loads the Claude hook via compat and fails open on it — set `[compat.claude] hooks=false`. See §Grok. |
+| **Grok** | ✅ | 📄 **Docs-checked** v1.0.62 (2026-10-21); last live drive v0.2.106 | `grok --version` could not be run. The installed build is 1.0.62. `allow` declines to deny. Settings-file hooks can `ask`, `defer`, and send `additionalContext`. safe-chains still only denies. See §Grok. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
-**Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is now verified live (a DENY harness — see §Grok); Copilot's
+**Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is docs-checked at v1.0.62 (the v0.2.106 drive is the last live result — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
 Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude/Codex done; opencode not integrable.
@@ -103,7 +103,7 @@ target looks like.
 | agy     | `run_command`           | `{decision, reason}`                   | `decision`          | `allow` (delegates), `auto_approve`, `deny`, `ask`, `force_ask`, `deny_unless_prior_grant` | seconds (default 30) |
 | Cursor  | `beforeShellExecution` (matcher is the command string; safe-chains sets none) | flat object | `permission` | docs: `allow` / `deny` / `ask`. Live v2026.07.16: **deny** honored, `allow` ignored | seconds |
 | Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
-| Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
+| Grok    | `Bash` (also matches `run_terminal_command`); config nests under `hooks` | camelCase `{toolInput: {command}, workspaceRoot}` | top-level `decision`, or `hookSpecificOutput.permissionDecision` when present | `allow` (not a grant), **deny**, **ask**, **defer** | seconds (default 5) |
 
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash`. A `Bash` matcher never fires.
@@ -117,16 +117,52 @@ Notes:
   fails closed, including when stdout says `allow`; a timeout fails open. A payload
   safe-chains cannot parse exits 0, so it does not trip that deny.
 
-### Grok — verified live 2026-07, `grok` v0.2.106
+### Grok — docs-checked v1.0.62, 2026-10-21
 
-- **What it is:** xAI's official Grok CLI ("Grok Build"), a closed-source Rust binary (`~/.local/bin/grok`), config root `~/.grok/`. Heavily Claude-compatible (`--allow`/`--deny`, `--permission-mode`, reads `.claude/settings.json`).
-- **Docs:** `~/.grok/docs/user-guide/10-hooks.md` (hooks), `22-permissions-and-safety.md` (the permission gauntlet).
-- **Config:** hooks are discovered from every `~/.grok/hooks/*.json` (global, **always trusted** — no folder-trust). We own a dedicated `~/.grok/hooks/safe-chains.json`, nested `{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"safe-chains hook grok"}]}]}}` (same nesting as Codex; a flat `PreToolUse` key would be rejected). `matcher:"Bash"` matches grok's real tool `run_terminal_command`.
-- **Input envelope (camelCase — differs from Claude/Codex snake_case):** command at `toolInput.command`, project root at `workspaceRoot` (also env `GROK_WORKSPACE_ROOT` / `CLAUDE_PROJECT_DIR`), `cwd`, `sessionId`. Getting the casing wrong parses to nothing and fails OPEN — pinned by `parse_input_rejects_snake_case_envelope`.
-- **Decision contract:** top-level **`decision`** (`"allow"`/`"deny"`), NOT `hookSpecificOutput`. Exit codes: 0=allow, **2=deny**, anything-else=fail-OPEN. A `deny` in stdout is honored regardless of exit code; we emit both (JSON + exit 2).
-- **Capability → DENY harness (like Cursor/Codex).** A hook `allow` is **not a grant**: `22-permissions-and-safety.md` — "a hook that allows a call does not skip the checks below; it only declines to deny." So safe-chains **cannot auto-approve** safe commands on grok (they still run grok's own gauntlet / prompt); its only lever is **deny**, and a gated command must be vetoed (else `bypassPermissions`/`dontAsk` mode runs it). No `additionalContext` channel → `render_context` stays abstain.
-- **Live verification (drove the TUI, 2026-07):** `cat /etc/hosts` → grok showed `⚠ run_terminal_command blocked by hook global/safe-chains…`, the command did **not** run, and our reason reached both the UI and the model. `ls -la` → ran (safe, not over-blocked).
-- **⚠ Compat trap:** grok auto-loads `~/.claude/settings.json` hooks by default (Claude compat), so with safe-chains installed as the Claude hook, grok also runs `safe-chains hook claude` on its **camelCase** envelope — the Claude parser can't read it and it fails OPEN (harmless, since our native grok hook's deny wins, but it's noise). The native `grok` target is required regardless. Silence the duplicate with `[compat.claude] hooks = false` in `~/.grok/config.toml`.
+`grok --version` could not be run. The installed build is 1.0.62 (changelog date
+2026-10-16). Sources: `~/.grok/docs/user-guide/10-hooks.md` and
+`22-permissions-and-safety.md`. The live drive below is v0.2.106 and was not repeated.
+
+- **Config.** Every `~/.grok/hooks/*.json` is loaded and those global files are
+  trusted. safe-chains writes `~/.grok/hooks/safe-chains.json` as
+  `{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"safe-chains hook grok","timeout":10}]}]}}`.
+  A flat `PreToolUse` key is rejected. `matcher: "Bash"` matches `Bash` and
+  `run_terminal_command`. `timeout` is seconds. The default is 5 (600 for `Stop`,
+  `SubagentStop`, and `PostToolUse`). `0` keeps the default.
+- **Input.** camelCase. `toolInput.command`, `toolName` (`run_terminal_command`),
+  `cwd`, `workspaceRoot` (also `GROK_WORKSPACE_ROOT` and `CLAUDE_PROJECT_DIR`),
+  `sessionId`, `permissionMode` (`default`, `auto`, `plan`, `bypassPermissions`),
+  `hookEventName` (`pre_tool_use`), `hook_event_name` (`PreToolUse`), `timestamp`,
+  plus `toolUseId` and `toolInputTruncated`. A snake_case envelope parses to
+  nothing and fails open.
+- **Decisions.** Top-level `decision` or `hookSpecificOutput.permissionDecision`.
+  When both are present, `permissionDecision` wins. Values: `allow`, `deny`,
+  `ask`, `defer` (legacy `approve` and `block` too). The message is
+  `permissionDecisionReason` when set, otherwise `reason`. `allow` declines to
+  deny and does not skip later permission checks. `ask` forces the permission
+  prompt over always-approve, auto mode, a saved grant, and the safe-command
+  list. A client that auto-answers every prompt still approves. `dontAsk` turns
+  an `ask` into a denial. `ask` does not override a policy deny, an auto-mode
+  block, or plan mode. `defer` is no opinion; `updatedInput` and
+  `additionalContext` beside a `defer` are dropped. `additionalContext` reaches
+  the model in a system reminder after the batch, unless the call is hook-denied
+  or rejected at the prompt, and is clipped at 10,000 characters. Settings-file
+  command and HTTP hooks can ask, defer, and send `additionalContext`. A
+  grok-agent-sdk hook can only allow or deny.
+- **Exit codes.** Exit 2 denies. Any other non-zero exit fails open unless stdout
+  JSON contains `deny` or `continue: false`, which are honored at any exit code.
+  A timeout, a crash, or malformed output fails open. An explicit deny, a reply
+  past the read limit, or an unusable `updatedInput` blocks.
+- **What safe-chains emits.** `{"decision":"allow"}` exit 0 for a safe command.
+  `{"decision":"deny","reason":...}` exit 2 for a gated command. It does not emit
+  `ask`, `defer`, or `additionalContext`.
+- **Live drive (v0.2.106, 2026-07).** `cat /etc/hosts` was blocked, the command
+  did not run, and the reason reached the UI and the model. `ls -la` ran.
+- **Compat.** `compat.claude.hooks` defaults to on, so Grok also loads
+  `~/.claude/settings.json` hooks. The Claude parser cannot read Grok's camelCase
+  envelope and fails open. Set `[compat.claude] hooks = false` to skip that load.
+
+Verified: grok 1.0.62 2026-10-21
 
 ### Codex — researched 2026-07-13, v0.144.3 (probe-verified)
 
@@ -420,6 +456,7 @@ flow is untouched.
 | Target  | `additionalContext` support | What we do |
 |---------|-----------------------------|------------|
 | Claude  | Yes (verified LIVE this session + docs) | emit on the mixed-chain case |
+| Grok    | Yes, on settings-file `PreToolUse` (`~/.grok/docs/user-guide/10-hooks.md`; clipped at 10,000 characters; dropped on hook deny, prompt reject, and `defer`) | default abstain |
 | Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
 | Codex   | Unverified                  | default abstain (emit nothing) |
@@ -456,15 +493,16 @@ e2e note):
 | Cursor   | ✅ | ✅ | `workspace_roots[]` in the payload JSON |
 | Gemini   | ✅ (also `GEMINI_CWD` env) | ✅ | `GEMINI_PROJECT_DIR` env var |
 | agy      | ✅ (`toolCall.args.Cwd`; safe-chains reads `workspacePaths[0]`) | ✅ | `workspacePaths[0]` in the payload |
+| Grok     | ✅ | ✅ | `workspaceRoot` in the payload (also `GROK_WORKSPACE_ROOT`) |
 | Droid    | ✅ | ✅ | `FACTORY_PROJECT_DIR` env var |
 | Qwen     | ✅ | ✅ | `QWEN_PROJECT_DIR` env var |
 | Codex    | ✅ | ❌ | cwd only — no distinct root (`cwd` is the "project dir equivalent") |
 | Copilot  | ✅ | ❌ | cwd only — no documented root field/var |
 | opencode | ❌ | ❌ | not a runtime hook — we render static config patterns; no per-command signal |
 
-So **6 of 9 give a distinct project root** (env var for 4, payload for cursor
-and agy); Codex/Copilot give `cwd` but no root; opencode gives nothing at eval
-time. When a root is unavailable, the classifier must fall back to today's
+So **7 of 10 give a distinct project root** (env var for 4, payload for cursor,
+agy, and Grok); Codex/Copilot give `cwd` but no root; opencode gives nothing at
+eval time. When a root is unavailable, the classifier must fall back to today's
 `relative == worktree` assumption — use the signal where present, never regress.
 Env-var roots are read from the hook *process* env (set by the harness, not the
 agent's shell), so they are reasonably tamper-resistant.
