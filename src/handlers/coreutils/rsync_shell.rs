@@ -108,18 +108,38 @@ pub(crate) fn remote_shell_is_plain(value: &str) -> bool {
 }
 
 /// The verdict on a remote shell rsync would start: ssh or rsh with plain options is allowed, and a
-/// program named by a relative path is judged as the file it runs. Shared by `-e`, `--rsh` and
-/// `RSYNC_RSH`, so the flag and the variable cannot disagree.
+/// program named by a relative path is judged as the file it runs. The path is normalised first. A
+/// `..` that leaves the project comes back absolute, and a frozen directory or `node_modules` is
+/// still in the relative path, and neither is a program the project may run. Shared by `-e`,
+/// `--rsh` and `RSYNC_RSH`, so the flag and the variable cannot disagree.
 pub(crate) fn remote_shell_verdict(value: &str) -> Verdict {
     if !remote_shell_is_plain(value) {
         return Verdict::Denied;
     }
     let program = value.split_ascii_whitespace().next().unwrap_or_default();
     if program.contains('/') && !program.starts_with('/') {
-        crate::engine::resolve::execute_file_verdict(program)
+        let placed = crate::pathctx::resolve(program);
+        if !relative_program_stays(&placed) {
+            return Verdict::Denied;
+        }
+        crate::engine::resolve::execute_file_verdict(&placed)
     } else {
         Verdict::Allowed(SafetyLevel::Inert)
     }
+}
+
+/// A relative program, after the working directory is joined on. Absolute means it climbed out.
+/// `..` left in the spelling was not joined, so it still climbs. A frozen directory runs its own
+/// code, and `node_modules/.bin` is a package's.
+fn relative_program_stays(placed: &str) -> bool {
+    if placed.starts_with('/') || placed.starts_with('~') {
+        return false;
+    }
+    let fold = cfg!(target_os = "macos");
+    placed.split('/').all(|part| {
+        let packaged = if fold { part.eq_ignore_ascii_case("node_modules") } else { part == "node_modules" };
+        part != ".." && !crate::engine::resolve::frozen_walk::is_frozen(part) && !packaged
+    })
 }
 
 /// A path whose last part is rsync, with nothing a shell would read as more than one word.
@@ -131,8 +151,17 @@ fn rsync_path_is_plain(value: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::remote_shell_is_plain;
+    use crate::command_verdict_in;
     use crate::is_safe_command;
+    use crate::pathctx::PathCtx;
     use proptest::prelude::*;
+
+    /// Two levels under `$HOME`, so a normalised `../` is a sibling project. The execute band admits
+    /// a sibling, which is how a relative path that climbs out was approved.
+    fn in_project(cmd: &str) -> bool {
+        let root = format!("{}/work/proj", std::env::var("HOME").unwrap_or_else(|_| "/Users/dev".into()));
+        command_verdict_in(cmd, PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None }).is_allowed()
+    }
 
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
@@ -196,6 +225,44 @@ mod tests {
         }
     }
 
+    #[test]
+    fn a_remote_shell_that_escapes_or_sits_in_a_frozen_path_is_refused() {
+        for cmd in [
+            "rsync -e 'scripts/../../evil' x:foo dst/",
+            "rsync -e '.git/hooks/x' x:foo dst/",
+            "rsync -e 'node_modules/.bin/x' x:foo dst/",
+            "RSYNC_RSH=scripts/../../evil rsync x:foo dst/",
+            "RSYNC_RSH=.git/hooks/x rsync x:foo dst/",
+            "RSYNC_RSH=node_modules/.bin/x rsync x:foo dst/",
+        ] {
+            assert!(!in_project(cmd), "{cmd} was approved");
+        }
+        for name in crate::engine::resolve::regions::metadata::frozen_names() {
+            let by_flag = format!("rsync -e {name}/hooks/x x:foo dst/");
+            let by_var = format!("RSYNC_RSH={name}/x rsync x:foo dst/");
+            assert!(!in_project(&by_flag), "{by_flag} was approved");
+            assert!(!in_project(&by_var), "{by_var} was approved");
+        }
+        for cmd in [
+            "rsync -e ./bin/tool x:foo dst/",
+            "rsync -e sub/dir/tool x:foo dst/",
+            "rsync -e sub/../bin/tool x:foo dst/",
+            "RSYNC_RSH=./bin/tool rsync x:foo dst/",
+        ] {
+            assert!(in_project(cmd), "{cmd} was refused");
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn a_frozen_remote_shell_is_refused_in_either_case() {
+        for name in crate::engine::resolve::regions::metadata::frozen_names() {
+            let cmd = format!("rsync -e {}/hooks/x x:foo dst/", name.to_ascii_uppercase());
+            assert!(!in_project(&cmd), "{cmd} was approved");
+        }
+        assert!(!in_project("rsync -e Node_Modules/.bin/x x:foo dst/"));
+    }
+
     proptest! {
         /// A program rsync would start to reach a daemon is a command line in every spelling, so
         /// none of them is approved. The remote shell's spellings agree with `-e`.
@@ -243,6 +310,38 @@ mod tests {
                 _ => format!("RSYNC_RSH={shell} rsync x:foo dst/"),
             };
             prop_assert!(!is_safe_command(&line), "{}", line);
+        }
+
+        /// A relative remote shell is approved only when it still names a file inside the project
+        /// after `..` is normalised. One that climbs out, or that sits under a frozen directory or
+        /// `node_modules`, is refused the same way through `-e` and `RSYNC_RSH`.
+        #[test]
+        fn a_relative_remote_shell_is_approved_only_inside_the_project(
+            case in prop::sample::select(vec![
+                ("scripts/../../evil", false),
+                ("scripts/foo/../../../evil", false),
+                ("../../x/ssh", false),
+                ("a/b/../../../evil", false),
+                (".git/hooks/x", false),
+                (".jj/bin/x", false),
+                (".hg/hooks/x", false),
+                (".sl/hooks/x", false),
+                (".envrc/x", false),
+                ("sub/.git/hooks/x", false),
+                ("node_modules/.bin/x", false),
+                ("sub/node_modules/.bin/x", false),
+                ("./bin/tool", true),
+                ("sub/dir/tool", true),
+                ("sub/../bin/tool", true),
+            ]),
+            spelling in 0usize..2,
+        ) {
+            let (program, allowed) = case;
+            let line = match spelling {
+                0 => format!("rsync -e {program} x:foo dst/"),
+                _ => format!("RSYNC_RSH={program} rsync x:foo dst/"),
+            };
+            prop_assert_eq!(in_project(&line), allowed, "{}", line);
         }
     }
 }

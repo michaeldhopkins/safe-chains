@@ -240,6 +240,7 @@ owed = [
   "a_connect_program_is_refused_in_every_spelling",
   "a_remote_shell_variable_agrees_with_its_flag_in_every_spelling",
   "a_remote_shell_other_than_ssh_is_never_approved",
+  "a_relative_remote_shell_is_approved_only_inside_the_project",
 ]
 "src/handlers/coreutils/stdin_names.rs" = [
   "a_name_from_stdin_is_approved_only_where_reading_it_is",
