@@ -355,6 +355,21 @@ fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
 }
 
 #[test]
+fn a_link_to_an_ordinary_outside_file_is_read() {
+    let linked = project(&["src"]);
+    let link = format!("{}/k", linked.root);
+    std::os::unix::fs::symlink("/etc/hosts", &link).expect("link to an ordinary file");
+    for cmd in ["zip -r out.zip .", "7z a out.7z .", "tar -chf - ."] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused over a link to an ordinary file");
+    }
+    std::fs::remove_file(&link).expect("remove the ordinary link");
+    std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", &link).expect("link to a secret");
+    for cmd in ["zip -r out.zip .", "7z a out.7z .", "tar -chf - ."] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+}
+
+#[test]
 fn a_read_that_follows_links_is_judged_where_they_lead() {
     let p = project(&["src", "work/x"]);
     let key = "/etc/ssh/ssh_host_ed25519_key";

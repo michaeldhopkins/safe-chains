@@ -11,7 +11,7 @@ mod search;
 use crate::engine::resolve::frozen_reach::read_through;
 use crate::engine::resolve::frozen_walk::on_disk;
 use crate::engine::resolve::locus::UNKNOWABLE_ITEM;
-use crate::engine::resolve::read_tree_verdict;
+use crate::engine::resolve::{read_content_verdict, read_tree_verdict};
 use crate::parse::Token;
 use crate::verdict::Verdict;
 
@@ -31,7 +31,17 @@ pub(crate) fn follows_a_secret(tokens: &[Token]) -> bool {
 }
 
 fn tree_holds_a_secret(root: &str) -> bool {
-    read_tree_verdict(root) == Verdict::Denied || read_through(root).iter().any(|path| read_tree_verdict(path) == Verdict::Denied)
+    read_tree_verdict(root) == Verdict::Denied || read_through(root).iter().any(|path| reached_verdict(path) == Verdict::Denied)
+}
+
+fn reached_verdict(path: &str) -> Verdict {
+    if link_to_one_file(path) { read_content_verdict(path) } else { read_tree_verdict(path) }
+}
+
+fn link_to_one_file(path: &str) -> bool {
+    let Some(placed) = crate::pathctx::on_the_link(|| on_disk(path)) else { return false };
+    std::fs::symlink_metadata(&placed).is_ok_and(|meta| meta.file_type().is_symlink())
+        && !std::fs::metadata(&placed).is_ok_and(|meta| meta.is_dir())
 }
 
 fn roots(tokens: &[Token]) -> Option<Read> {
@@ -211,9 +221,29 @@ fn note_tar_long(long: &str, follow: &mut bool, want_archive: &mut bool, archive
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::os::unix::fs::symlink;
 
     fn tokens(words: &[&str]) -> Vec<Token> {
         words.iter().map(|word| Token::from_raw((*word).to_string())).collect()
+    }
+
+    #[test]
+    fn a_link_to_a_folder_is_not_one_file() {
+        let dir = tempfile::tempdir().expect("scratch");
+        let root = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+        std::fs::write(format!("{root}/note"), "n").expect("file");
+        std::fs::create_dir(format!("{root}/sub")).expect("folder");
+        symlink("note", format!("{root}/file-link")).expect("file link");
+        symlink("sub", format!("{root}/dir-link")).expect("folder link");
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some(root.clone()),
+            root: Some(root),
+            session_id: None,
+        });
+        assert!(link_to_one_file("file-link"));
+        assert!(!link_to_one_file("dir-link"));
+        assert!(!link_to_one_file("note"));
+        assert!(!link_to_one_file("missing"));
     }
 
     #[test]
