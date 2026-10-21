@@ -22,8 +22,8 @@ independently exercised.
 |----------|:------------:|--------|-----------------|
 | **Claude** | ✅ | ✅ **Verified live** (2026-07) + docs | Dogfooded — the allow envelope auto-approves, abstain→`additionalContext` surfaces the reason without blocking (this session). |
 | **Codex** | ✅ | ✅ **Probe-verified** `PreToolUse` (v0.144.3, 2026-07-13) · ◻️ **Source-verified** `PermissionRequest` (v0.160.1, 2026-10-05) | `PreToolUse`: `deny` honored; `allow`/`ask` unsupported (still so in v0.160.1 source). `PermissionRequest` (v0.122.0+): `decision.behavior:"allow"` answers Codex's approval prompt; not yet driven end to end. Config nests under top-level `hooks`. See §Codex. |
-| **Antigravity (`agy`)** | ✅ | ✅ **Verified live** (v1.1.2, 2026-07-13) | `deny`/`ask`/`force_ask` work; fails closed. **Supersedes Gemini.** |
-| **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
+| **Antigravity (`agy`)** | ✅ | 📄 **Docs-checked** v1.4.3 (2026-10-21); last live drive v1.1.2 | CLI `agy --version` is 1.4.3. Not re-driven. `allow` delegates to the next hook or default policy. `auto_approve` is the documented grant. `deny`, `ask`, `force_ask`, and `deny_unless_prior_grant` are documented. See §Gemini. |
+| **Gemini** | (exit codes) | 📄 **Docs-checked** v0.64.0 (2026-10-21); binary not installed | Consumer accounts stopped 2026-06-18. Stable v0.64.0 (2026-10-13) still documents `BeforeTool` with `allow` / `deny` only. Target kept for that CLI. |
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | 📄 **Docs-checked** CLI v0.245.0 (2026-10-21); not installed, not driven live | `allow` can bypass the prompt; `deny` and `ask` are honored. Shell matcher is `Execute`. `additionalContext` is not listed on `PreToolUse`. See §Droid. |
 | **Cursor** | ✅ | 📄 **Docs-checked** CLI v2026.10.08 (2026-10-21); last live drive `cursor-agent` v2026.07.16 | `cursor-agent --version` could not be run. The [CLI changelog](https://cursor.com/docs/cli/changelog) latest entry is v2026.10.08. Docs list `allow`, `deny`, and `ask` on `beforeShellExecution`. The v2026.07.16 drive found `deny` honored and `allow` ignored. No changelog entry through v2026.10.08 says `allow` is honored. See §Cursor. |
@@ -34,7 +34,7 @@ independently exercised.
 **Remaining live-verification work:** Qwen is still an assumed Claude-Code mirror. Grok is now verified live (a DENY harness — see §Grok); Copilot's
 current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
 Cursor's schema is docs-checked at CLI v2026.10.08 (the v2026.07.16 drive is the last live result — see §Cursor);
-Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
+Droid is docs-checked at CLI v0.245.0 and was not driven live (see §Droid); Gemini CLI v0.64.0 and `agy` 1.4.3 are docs-checked (the v1.1.2 drive is the last live result — see §Gemini); Claude/Codex done; opencode not integrable.
 
 ## The model we rely on
 
@@ -99,7 +99,8 @@ target looks like.
 | Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* (everything else → Codex's own prompt) | seconds |
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
 | Droid   | `Execute` (regex or exact; optional `commandRegex` on the shell string) | `{hookSpecificOutput: {...}}` | `permissionDecision` | **allow** (can bypass the prompt), **deny**, **ask** | seconds (default 60) |
-| Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
+| Gemini  | `^run_shell_command$` (`BeforeTool`) | `{decision: ...}` | `decision` | **allow** / **deny** (alias `block`). No `ask` | ms (examples use `5000`) |
+| agy     | `run_command`           | `{decision, reason}`                   | `decision`          | `allow` (delegates), `auto_approve`, `deny`, `ask`, `force_ask`, `deny_unless_prior_grant` | seconds (default 30) |
 | Cursor  | `beforeShellExecution` (matcher is the command string; safe-chains sets none) | flat object | `permission` | docs: `allow` / `deny` / `ask`. Live v2026.07.16: **deny** honored, `allow` ignored | seconds |
 | Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
 | Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
@@ -107,7 +108,8 @@ target looks like.
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash`. A `Bash` matcher never fires.
   See §Droid.
-- **Gemini/Cursor** use `decision` / `permission`, *not* `permissionDecision`.
+- **Gemini, agy, and Cursor** use `decision` / `permission`, not `permissionDecision`.
+  agy's grant value is `auto_approve`. Gemini's hook `allow` is the other value beside `deny`.
 - **Copilot** honors `allow`, `deny`, and `ask` on `preToolUse`
   ([hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference)).
   Empty output is the default permission flow. safe-chains emits `allow` for a safe
@@ -206,58 +208,56 @@ Notes:
 - **To verify live:** with both entries trusted, under `-a untrusted`, `git status` should run with
   no prompt, and `cat /etc/hosts` should still be denied by `PreToolUse`.
 
-### Gemini → Antigravity — researched 2026-07-13
+### Gemini → Antigravity — docs-checked 2026-10-21
 
-- **Gemini CLI is RETIRED (2026-06-18)** for AI Pro/Ultra/free-tier users; it survives only under a
-  Gemini Code Assist Standard/Enterprise license. Our `gemini` target is therefore **DEPRECATED** —
-  keep it (enterprise remnant, can't become unsafe) but drop it from the active test matrix. Note:
-  the old `gemini` row above modeled a stdout `{decision}` shape, but Gemini actually blocked via
-  **shell exit codes** — an unverified assumption, now moot. Sources:
-  https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/
-- **Successor: Antigravity CLI, command `agy`** (closed-source Go binary, multi-agent). It HAS
-  PreToolUse hooks. Config via `hooks.json` in a customization root — `.agents/hooks.json` per
-  project, `~/.gemini/config/hooks.json` globally (both merged). Top-level keys are hook *names*
-  (`safe-chains`), each mapping to `{ "PreToolUse": [ { "matcher": "...", "hooks": [ { "type":
-  "command", "command": "..." } ] } ] }`. `/hooks` inspects active hooks. Sources:
-  https://medium.com/google-cloud/a-developers-guide-to-agent-hooks-in-antigravity-cli-4c1440febd11 ·
-  the bundled `~/.gemini/antigravity-cli/builtin/skills/agy-customizations/docs/hooks.md`.
+- **Gemini CLI.** The `gemini` binary is not installed. Stable v0.64.0 (2026-10-13) is the
+  latest release on [geminicli.com](https://geminicli.com/docs/changelogs/latest/). Consumer
+  Google AI Pro, Ultra, and free accounts stopped on 2026-06-18
+  ([announcement](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/)).
+  The [hooks reference](https://geminicli.com/docs/hooks/reference/) still documents
+  `BeforeTool`. `decision` is `allow` or `deny` (`block` is an alias). A `deny` `reason` is
+  sent to the agent. There is no hook `ask`. Exit 0 parses stdout JSON. Exit 2 blocks the
+  tool and uses stderr as the reason. The shell tool is `run_shell_command`. Matchers are
+  regular expressions. A configuration example sets `"timeout": 5000`, the same millisecond
+  unit safe-chains writes (`60000`). `GEMINI_PROJECT_DIR` is set on the hook process.
+  `additionalContext` is documented on `BeforeAgent`, not in the `BeforeTool` output fields.
+  safe-chains emits `{decision, reason}` with `allow` for a safe command and an empty body
+  otherwise. Not driven live on v0.64.0.
 
-#### Antigravity CLI (`agy`) — VERIFIED LIVE, v1.1.2, 2026-07-13
+Verified: gemini 0.64.0 2026-10-21
 
-Driven live via a TUI harness (Gemini 3.5 Flash).
+#### Antigravity CLI (`agy`) — docs-checked v1.4.3, 2026-10-21
 
-- **Matcher target = the tool NAME `run_command`** (the shell tool). The UI/log label it "Bash", but
-  the payload's `toolCall.name` is `run_command`, and the matcher matches that. Verified: matcher
-  `run_command` fires (log `jsonhook.go:189 Loaded hooks.json … 1 named hooks` immediately before the
-  confirmation). `"*"` / `""` also match all tools.
-- **Input (stdin, protojson/camelCase):** shell command at `toolCall.args.CommandLine`; workspace at
-  `workspacePaths[0]` (used as both cwd and root). Also carries `conversationId`, `stepIdx`,
-  `modelName`, `transcriptPath`.
-- **Output (stdout):** `{ "decision": <d>, "reason": <str>, "permissionOverrides": [...] }`.
-  Decisions and their **observed** effect on v1.1.2 CLI:
-  - `"deny"` → **hard block**; the model is told "Tool call denied by pre-tool hook: <reason>". WORKS
-    (verified: `cat /etc/hosts` blocked, our reason shown).
-  - `"force_ask"` → **forces a human prompt**, ignoring the Always-Allow cache. WORKS (verified:
-    `cat /etc/hosts` surfaced the permission prompt).
-  - `"ask"` → prompts, but **respects the Always-Allow cache** (a prior "always allow commands
-    starting with cat" would auto-run a gated `cat …`). We use `force_ask` instead to close that hole.
-  - `"allow"` → does **NOT** suppress agy's own confirmation in the CLI. Verified twice: `decision:
-    allow` (with and without `permissionOverrides:["command(cat README.md)"]`) still surfaced the
-    prompt. **So there is no effective GRANT on agy 1.1.2** — a safe command can't skip the prompt.
-    We still emit `allow` (semantically correct, harmless, future-proof).
-  - `"permissionOverrides"` → does **NOT** register a session grant either. Tested with a stateful
-    hook: call 1 emitted `{allow, permissionOverrides:["command(echo hello)"]}`; call 2 (same command)
-    emitted a cache-respecting `ask` — and **still prompted**. So the hook has NO way, current-call or
-    future-call, to make a safe command auto-run. agy's own native allowlist ("always allow …",
-    persisted to settings.json) and permission modes are the ONLY auto-approval paths, and they are
-    user-driven — safe-chains can't feed them from the hook.
-- **Human review on silence: YES.** Default setting `toolPermission=request-review` prompts for
-  `run_command`. So agy has per-command human review even with no hook decision.
-- **Fails CLOSED** on a missing/malformed decision (prompts rather than runs) — the opposite of
-  Codex. Every response therefore carries an explicit `decision`.
-- **Capability summary:** grant ❌ · deny ✅ · escalate/`ask`+`force_ask` ✅ · human-review-on-silence
-  ✅ · fail-closed ✅. → gated command policy = **Ask** (escalate via `force_ask`), not Deny: agy has
-  human review, so we escalate rather than hard-block. See `src/targets/agy.rs`.
+`agy --version` is 1.4.3. The live drive below is v1.1.2 and was not repeated. Current
+contract, CLI tab: [Hooks](https://antigravity.google/docs/hooks).
+
+- **Config.** Hook names are top-level keys in `.agents/hooks.json` (project) and
+  `~/.gemini/config/hooks.json` (global). The CLI also reads hooks inside
+  `~/.gemini/antigravity-cli/settings.json` and plugin `hooks.json`. `/hooks` lists them.
+  `timeout` is seconds, default 30. Matcher `""` or `"*"` matches every tool; a name matches
+  that tool; otherwise the field is a regular expression. safe-chains uses the name
+  `safe-chains`, event `PreToolUse`, matcher `run_command`.
+- **Shell tool.** `run_command` arguments are `CommandLine`, `Cwd`, `WaitMsBeforeAsync`,
+  and optional `RunPersistent` and `RequestedTerminalID`. `manage_task` can send input to
+  a background task. The payload's `toolCall.name` is `run_command`.
+- **Input.** camelCase. Command at `toolCall.args.CommandLine`. `toolCall.args.Cwd` is the
+  command's directory. `workspacePaths` lists workspace roots. Also `conversationId`,
+  `stepIdx`, `modelName`, `transcriptPath`, `artifactDirectoryPath`.
+- **Output.** `decision` is required. `allow` lets the call proceed and delegates to the
+  next hook or the default policy. `auto_approve` approves when that policy would prompt,
+  and still honors an explicit user rule. `deny` blocks. `ask` prompts and respects
+  Always Allow. `force_ask` prompts and ignores cached permissions.
+  `deny_unless_prior_grant` denies unless an earlier grant covered the resource. `reason`
+  is the explanation. `overwrite` shallow-merges into `toolCall.args`. `permissionOverrides`
+  is a list of resource strings.
+- **What safe-chains emits.** `decision: "allow"` for a safe command and `force_ask` for a
+  gated command. It does not emit `auto_approve`. It reads `workspacePaths[0]` as both cwd
+  and root and does not read `toolCall.args.Cwd`.
+- **Live drive (v1.1.2, 2026-07-13).** `deny` blocked `cat /etc/hosts` and showed the reason.
+  `force_ask` prompted. `ask` respected the Always Allow cache. `allow`, with and without
+  `permissionOverrides`, still prompted. A missing decision prompted rather than ran.
+
+Verified: agy 1.4.3 2026-10-21
 
 ### Claude Code — VERIFIED LIVE, 2026-07 (in a running session)
 
@@ -424,7 +424,8 @@ flow is untouched.
 | Droid   | Not listed on `PreToolUse` ([hooks reference](https://docs.factory.com/reference/hooks-reference.md) lists it on `PostToolUse`, `UserPromptSubmit`, `SessionStart`) | code still emits it on `PreToolUse` |
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | No `additionalContext` on `beforeShellExecution` ([Hooks](https://cursor.com/docs/hooks): `permission`, `user_message`, `agent_message`) | default abstain |
-| Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
+| Gemini  | Not a `BeforeTool` field ([hooks reference](https://geminicli.com/docs/hooks/reference/) puts `additionalContext` on `BeforeAgent`) | n/a |
+| agy     | No context field ([Hooks](https://antigravity.google/docs/hooks): `decision`, `reason`, `overwrite`, `permissionOverrides`) | n/a |
 | Copilot | Not a `preToolUse` field (v1.0.101 [hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference): `postToolUse`, `sessionStart`, `subagentStart`) | default abstain |
 
 Targets without verified support keep `HookFormat::render_context`'s default,
@@ -454,14 +455,15 @@ e2e note):
 | Claude   | ✅ | ✅ | `CLAUDE_PROJECT_DIR` env var (hook process) |
 | Cursor   | ✅ | ✅ | `workspace_roots[]` in the payload JSON |
 | Gemini   | ✅ (also `GEMINI_CWD` env) | ✅ | `GEMINI_PROJECT_DIR` env var |
+| agy      | ✅ (`toolCall.args.Cwd`; safe-chains reads `workspacePaths[0]`) | ✅ | `workspacePaths[0]` in the payload |
 | Droid    | ✅ | ✅ | `FACTORY_PROJECT_DIR` env var |
 | Qwen     | ✅ | ✅ | `QWEN_PROJECT_DIR` env var |
 | Codex    | ✅ | ❌ | cwd only — no distinct root (`cwd` is the "project dir equivalent") |
 | Copilot  | ✅ | ❌ | cwd only — no documented root field/var |
 | opencode | ❌ | ❌ | not a runtime hook — we render static config patterns; no per-command signal |
 
-So **5 of 8 give a distinct project root** (env var for 4, payload array for
-cursor); Codex/Copilot give `cwd` but no root; opencode gives nothing at eval
+So **6 of 9 give a distinct project root** (env var for 4, payload for cursor
+and agy); Codex/Copilot give `cwd` but no root; opencode gives nothing at eval
 time. When a root is unavailable, the classifier must fall back to today's
 `relative == worktree` assumption — use the signal where present, never regress.
 Env-var roots are read from the hook *process* env (set by the harness, not the
