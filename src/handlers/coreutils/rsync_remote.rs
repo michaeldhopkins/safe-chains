@@ -126,6 +126,8 @@ mod tests {
         rsync_remote_bare_long_flag: "rsync -a -M --temp-dir src/ dst/",
         rsync_remote_bare_cluster_flag: "rsync -a -M -ve src/ dst/",
         rsync_remote_server: "rsync -a -M--server src/ dst/",
+        rsync_remote_lone_dash: "rsync -a -M - src/ dst/",
+        rsync_remote_lone_dash_long: "rsync -a --remote-option=- src/ dst/",
     }
 
     #[test]
@@ -133,6 +135,12 @@ mod tests {
         assert_eq!(as_local_options(&words("rsync -avM--fake-super a b")), RemoteOptions::Judge(words("rsync -av --fake-super a b")));
         assert_eq!(as_local_options(&words("rsync -av a b")), RemoteOptions::None);
         assert_eq!(as_local_options(&words("rsync -a -- -Mx b")), RemoteOptions::None);
+    }
+
+    #[test]
+    fn a_remote_option_that_is_a_lone_dash_is_refused() {
+        assert_eq!(as_local_options(&words("rsync -a -M - a b")), RemoteOptions::Refuse);
+        assert_eq!(as_local_options(&words("rsync -a --remote-option=- a b")), RemoteOptions::Refuse);
     }
 
     /// A value-taking option handed to the other rsync without its value would take the next word

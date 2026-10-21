@@ -156,6 +156,7 @@ mod tests {
         chmod_absolute: "/bin/chmod +s x",
         chmod_quoted: "chmod '+s' x",
         chmod_after_separator: "chmod -- +s x",
+        chmod_after_a_lone_dash: "chmod - +s x",
         chmod_verbose: "chmod -v u+s x",
         chmod_recursive: "chmod -R g+s dir",
         chmod_variable_mode: "chmod \"$MODE\" x",
@@ -185,11 +186,33 @@ mod tests {
         rsync_chmod_list: "rsync -a --chmod=D2775,F644 src/ dst/",
     }
 
+    /// A word such as `-rw` is a mode that takes bits away; the files after it are not read as modes.
+    #[test]
+    fn a_mode_that_removes_bits_and_looks_like_a_flag_ends_the_search() {
+        use super::sets_an_id_bit;
+        let tokens = |line: &str| line.split(' ').map(crate::parse::Token::from_test).collect::<Vec<_>>();
+        for line in ["chmod -x script.sh", "chmod -rw notes.txt", "chmod -s bin/tool", "chmod -t dir"] {
+            assert!(!sets_an_id_bit(&tokens(line)), "{line}");
+        }
+        assert!(sets_an_id_bit(&tokens("chmod - +s x")));
+    }
+
     proptest! {
         #[test]
         fn an_octal_mode_sets_an_id_bit_exactly_when_its_value_has_one(value in 0u32..0o10000, pad in 0usize..3) {
             let mode = format!("{}{value:o}", "0".repeat(pad));
             prop_assert_eq!(mode_sets_an_id_bit(&mode), value & 0o6000 != 0, "{}", mode);
+        }
+
+        /// Bits named after a `-` are taken away, whatever the clause adds next.
+        #[test]
+        fn octal_bits_after_a_minus_are_never_set(
+            who in "[ugoa]{0,3}",
+            value in 0u32..0o10000,
+            perms in "[rwxXt]{0,3}",
+        ) {
+            let mode = format!("{who}-{value:o}+{perms}");
+            prop_assert!(!mode_sets_an_id_bit(&mode), "{}", mode);
         }
 
         #[test]
