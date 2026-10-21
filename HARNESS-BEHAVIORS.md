@@ -456,8 +456,9 @@ The `droid` CLI is not installed. CLI v0.245.0 (2026-10-20) is the latest entry 
   in `hooks`. Legacy `.factory/hooks/hooks.json` still loads. Commands need absolute
   paths. `timeout` is seconds, default 60. `matcher` is an exact tool name or a
   case-sensitive regex; empty, omitted, or `*` matches every tool. `commandRegex`
-  is a second regex against the Execute command string. safe-chains writes the
-  wrapped form in `~/.factory/settings.json`, matcher `Execute`, timeout 60.
+  is a second regex against the Execute command string. safe-chains writes into
+  `~/.factory/hooks.json`, unwrapped, when that file exists, and otherwise the
+  wrapped form in `~/.factory/settings.json`; matcher `Execute`, timeout 60.
   Common tool matchers include `Execute`, `Read`, `Edit`, `Create`, `ApplyPatch`,
   `LS`, `Glob`, `Grep`, `Task`, `FetchUrl`, and `WebSearch`. The changelog's Script
   runs are a separate command surface; `Execute` does not name them.
