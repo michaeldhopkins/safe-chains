@@ -27,13 +27,14 @@ independently exercised.
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
 | **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
-| **Copilot** | ✅ | ✅ **Verified live** (v1.0.71) | Hook FIRES (per-repo `.github/hooks/*.json`); allow AND deny BOTH honored (allow auto-runs + suppresses copilot's own prompt; deny blocks + shows our reason). Fixed two bugs: user path `~/.github/hooks` → **`~/.copilot/hooks`**, and the stale "deny-only" note. See §Copilot. |
+| **Copilot** | ✅ | 📄 **Docs-checked** v1.0.101 (2026-10-21); last live drive v1.0.71 | CLI not installed. `allow`, `deny`, and `ask` are documented. Autopilot denies `ask`; the cloud agent treats `ask` as `deny`. A command `preToolUse` hook fails closed on any non-zero exit; a timeout fails open. See §Copilot. |
 | **Grok** | ✅ | ✅ **Verified live → DENY harness** (`grok` v0.2.106, 2026-07) | Native `~/.grok/hooks/safe-chains.json`; **camelCase** envelope (`toolInput.command`, `workspaceRoot`); top-level `decision` + exit 2. Drove the TUI: `cat /etc/hosts` **blocked** (didn't run; reason shown to UI *and* model), `ls -la` ran. `allow` only "declines to deny" (not a grant — like Cursor/Codex). ⚠ grok auto-loads the Claude hook via compat and fails open on it — set `[compat.claude] hooks=false`. See §Grok. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
 **Remaining live-verification work:** only Qwen/Droid (both "assumed" Claude-Code mirrors) — optionally
-exercise to upgrade to "verified". Grok is now verified live (a DENY harness — see §Grok); Copilot is
-verified live (allow+deny both honored — see §Copilot); Cursor is done (a DENY harness, `allow` ignored
+exercise to upgrade to "verified". Grok is now verified live (a DENY harness — see §Grok); Copilot's
+current contract is docs-checked at v1.0.101 (the v1.0.71 drive is the last live result — see §Copilot);
+Cursor is done (a DENY harness, `allow` ignored
 on the CLI); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
 
 ## The model we rely on
@@ -101,15 +102,18 @@ target looks like.
 | Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
 | Cursor  | (settings `version: 1`) | flat object                            | `permission`        | **deny** honored; `allow`/`ask` IGNORED (allowlist wins — cursor bug) | — |
-| Copilot | (no matcher; self-filter on `toolName`) | flat object, `toolArgs` is a nested JSON string | `permissionDecision` | **allow AND deny honored** (v1.0.71; was thought deny-only) | `timeoutSec` |
+| Copilot | `bash` (self-filter; optional matcher is a full-string regex) | flat object; camelCase `toolArgs` is `unknown` | `permissionDecision` | **allow**, **deny**, **ask** (autopilot and the cloud agent deny `ask`) | `timeoutSec`, seconds (default 30) |
 | Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
 
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash` — a `Bash` matcher never fires.
 - **Gemini/Cursor** use `decision` / `permission`, *not* `permissionDecision`.
-- **Copilot** today only acts on `deny`; for a safe command the honest answer is
-  "no opinion" (empty), letting its allow-by-default apply. We still emit an
-  allow-shaped envelope so future Copilot releases that honor allow can use it.
+- **Copilot** honors `allow`, `deny`, and `ask` on `preToolUse`
+  ([hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference)).
+  Empty output is the default permission flow. safe-chains emits `allow` for a safe
+  command and an empty body for a gated one. A command hook that exits non-zero
+  fails closed, including when stdout says `allow`; a timeout fails open. A payload
+  safe-chains cannot parse exits 0, so it does not trip that deny.
 
 ### Grok — verified live 2026-07, `grok` v0.2.106
 
@@ -319,28 +323,49 @@ fires ([#7006](https://github.com/anomalyco/opencode/issues/7006)), so the only 
   never can. **Watch [opencode #7006](https://github.com/anomalyco/opencode/issues/7006)** and opencode's
   permissions/plugin docs for that change.
 
-### GitHub Copilot CLI — VERIFIED LIVE, v1.0.71, 2026-07
+### GitHub Copilot CLI — docs-checked v1.0.101, 2026-10-21
 
-Driven end-to-end via TUI with a logging wrapper around `safe-chains hook copilot`, using a per-repo
-`.github/hooks/safe-chains.json` (`{version, hooks.preToolUse[]}`, field `bash` = the script, no matcher).
-- **Hook FIRES.** Despite the reports about `hooks.json` not firing ([#2540](https://github.com/github/copilot-cli/issues/2540)),
-  the per-repo `.github/hooks/*.json` config fired on every bash tool call. The envelope matches our
-  parser: `{"toolName":"bash","toolArgs":"{…command…}","cwd":…}` with `toolArgs` a JSON-encoded STRING
-  (double-decode), and a flat response (no `hookSpecificOutput`).
-- **BOTH `allow` and `deny` are honored** (the "deny-only" belief was wrong): a forced `deny` blocked
-  `echo` — *"Denied by preToolUse hook: BLOCKED BY SAFE-CHAINS TEST"* — and a forced `allow` auto-ran
-  `cat /etc/hosts` with NO prompt, where our abstaining hook had made copilot show its own directory-access
-  prompt. So `allow` is a real grant and even suppresses copilot's own prompts.
-- **Two BUGS fixed in `src/targets/copilot.rs`:** (1) the user-global install path was `~/.github/hooks/`,
-  which does not exist — copilot's config root is **`~/.copilot/`**. The live drive used the per-repo
-  `.github/hooks/` config; the user-global path our installer writes, **`~/.copilot/hooks/`** (or
-  `$COPILOT_HOME/hooks/`), is confirmed by upstream's hooks-configuration docs, which state both the
-  per-repo `.github/hooks/*.json` and `~/.copilot/hooks/*.json` are loaded and "all hook entries from all
-  sources are run." (2) the `render_response` "only deny is processed" comment was stale.
-- **Model:** Copilot is a Defer/grant harness like Claude — safe → `allow` (a real grant), gated →
-  ABSTAIN (empty) → copilot's own per-command prompt (it has interactive review, so we don't hard-deny).
-  Current `targets/copilot.rs` already does exactly this. (`additionalContext` on gated is still not
-  wired — copilot may not pass it, [#2585](https://github.com/github/copilot-cli/issues/2585) — untested.)
+The `copilot` CLI is not installed. v1.0.101 (2026-10-20) is the latest
+[GitHub release](https://github.com/github/copilot-cli/releases/tag/v1.0.101) and the
+matching npm package. The live drive below is v1.0.71. Current contract:
+[hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference).
+
+- **Config.** `{version: 1, hooks.preToolUse[]}`. A command hook names its script in
+  `bash`, `powershell`, `command`, or `exec`. `timeoutSec` is seconds, default 30
+  (`timeout` is the alias). Loaded from policy `/etc/github-copilot/policy.d/*.json`,
+  repo `.github/hooks/*.json`, user `~/.copilot/hooks/` or `$COPILOT_HOME/hooks/`,
+  plugins, and an inline `hooks` block in `~/.copilot/settings.json` and
+  `.claude/settings.json`. The CLI does not read `~/.copilot/config.json` for hooks.
+  An optional `matcher` is a regex anchored as `^(?:PATTERN)$` against the whole
+  `toolName`. safe-chains writes `~/.copilot/hooks/safe-chains.json` with `bash`,
+  `timeoutSec` 60, and no matcher, and self-filters `toolName == "bash"`.
+- **Input.** camelCase `preToolUse` carries `sessionId`, `timestamp` (a number),
+  `cwd`, `toolName`, and `toolArgs` typed `unknown`. The v1.0.71 drive saw `toolArgs`
+  as a JSON string, and the parser still double-decodes a string. PascalCase
+  `PreToolUse` uses snake_case, Claude tool names (`bash` is reported as `Bash`),
+  and `tool_input` parsed from a JSON string when that parse succeeds. No project-root
+  field is documented.
+- **Decisions.** `permissionDecision` is `allow`, `deny`, or `ask`. Empty output is
+  the default permission flow. `permissionDecisionReason` is required on `deny` and
+  is shown to the agent. `modifiedArgs` replaces the tool arguments. CLI autopilot
+  denies `ask` (no prompt). The cloud agent treats `ask` as `deny`. A hook `allow`
+  does not pre-approve a sandbox escape (`requestSandboxBypass: true`); only `deny`
+  propagates for that request.
+- **Exit codes.** A command `preToolUse` hook fails closed: a crash or any non-zero
+  exit, including exit 2, denies the call even when stdout says `allow`. A timeout
+  fails open and the call continues through the normal permission flow. HTTP
+  `preToolUse` hooks fail open. safe-chains exits 0 on a payload it cannot parse,
+  so that path is not this deny.
+- **What safe-chains emits.** `allow` plus `permissionDecisionReason` for a safe
+  command, and an empty body for a gated command. It does not emit `ask`.
+  `additionalContext` is a `postToolUse`, `sessionStart`, and `subagentStart` field,
+  not a `preToolUse` field.
+- **Live drive (v1.0.71, 2026-07).** Per-repo `.github/hooks/*.json` fired on bash
+  calls. A forced `deny` blocked `echo` and showed the reason. A forced `allow` ran
+  `cat /etc/hosts` with no directory-access prompt. That is the last drive against
+  a running CLI.
+
+Verified: copilot 1.0.101 2026-10-21
 
 ## Model-visible context injection (`additionalContext`)
 
@@ -356,7 +381,7 @@ flow is untouched.
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | Unverified / different shape | default abstain |
 | Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
-| Copilot | Decision contract verified live (allow+deny); `additionalContext` likely not passed ([#2585](https://github.com/github/copilot-cli/issues/2585)) | default abstain |
+| Copilot | Not a `preToolUse` field (v1.0.101 [hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference): `postToolUse`, `sessionStart`, `subagentStart`) | default abstain |
 
 Targets without verified support keep `HookFormat::render_context`'s default,
 which emits an empty body — i.e. exactly the prior abstain behavior, no
