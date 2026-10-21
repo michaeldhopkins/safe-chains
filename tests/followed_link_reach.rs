@@ -95,3 +95,34 @@ fn a_y_inside_a_zip_option_value_does_not_stop_it_following_links() {
         assert!(at(&p, cmd).is_allowed(), "{cmd} was refused though it stores the link");
     }
 }
+
+#[test]
+fn a_ripgrep_config_path_set_for_later_commands_is_refused() {
+    let p = with_secret_link();
+    std::fs::write(format!("{}/rgrc", p.root), "--follow\n").expect("config");
+    for cmd in [
+        "export RIPGREP_CONFIG_PATH=./rgrc; rg x", "declare -x RIPGREP_CONFIG_PATH=./rgrc; rg x", "RIPGREP_CONFIG_PATH=./rgrc; rg x",
+        "export RIPGREP_CONFIG_PATH=./rgrc",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["export RIPGREP_CONFIG_PATH=; rg x", "RIPGREP_CONFIG_PATH= rg x", "export FOO=bar; rg x"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn ack_follows_links_when_a_config_file_it_reads_says_so() {
+    let p = with_secret_link();
+    std::fs::write(format!("{}/.ackrc", p.root), "# project settings\n--smart-case\n--follow\n").expect("project ackrc");
+    std::fs::write(format!("{}/other-ackrc", p.root), "--follow\n").expect("another ackrc");
+    for cmd in ["ack x", "ack -i x", "ACKRC=./other-ackrc ack x"] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+    for cmd in ["ack --noenv x", "ack --nofollow x", "ack x src/a.txt"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+    let plain = with_secret_link();
+    std::fs::write(format!("{}/.ackrc", plain.root), "--smart-case\n").expect("plain ackrc");
+    assert!(at(&plain, "ack x").is_allowed());
+}

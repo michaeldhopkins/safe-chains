@@ -679,8 +679,8 @@ because = "as ACK_PAGER, when output is colored"
 shape = "opaque"
 because = "ack parses this as options before its arguments, including --pager"
 [env.ACKRC]
-shape = "exec-path"
-because = "an ack config file, which can set --pager"
+shape = "opaque"
+because = "an ack config file, which can set --pager or --follow; the one the user already has is read where it is"
 [env.GHCRTS]
 shape = "opaque"
 twin_flag = "pandoc +RTS {v} -RTS README.md"

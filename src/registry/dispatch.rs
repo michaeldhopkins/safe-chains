@@ -265,7 +265,7 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
         .iter()
         .filter(|t| !t.starts_with('-'))
         .filter_map(|t| t.as_str().split_once('='))
-        .map(|(name, value)| crate::envvars::assignment_verdict(name, value))
+        .map(|(name, value)| crate::envvars::statement_assignment_verdict(name, value, true))
         .fold(verdict, Verdict::combine)
 }
 

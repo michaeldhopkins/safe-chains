@@ -501,7 +501,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     let env_name_v = cmd
         .env
         .iter()
-        .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
+        .map(|(name, value)| crate::envvars::statement_assignment_verdict(name, &value.eval(), cmd.words.is_empty()))
         .fold(crate::envvars::rebinding_verdict(&cmd.words).combine(super::arith::command_verdict(cmd)), Verdict::combine);
     let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v);
 

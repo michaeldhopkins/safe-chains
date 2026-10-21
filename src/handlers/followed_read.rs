@@ -5,6 +5,7 @@
 //! `7z` while it adds, `diff -r`) reads a secret through a link
 //! committed in the tree. The walk is the one those copies use.
 
+mod ackrc;
 mod archive;
 mod search;
 

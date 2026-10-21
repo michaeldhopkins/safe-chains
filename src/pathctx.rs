@@ -181,8 +181,29 @@ pub(crate) fn bind_ripgrep_config(follows: Option<bool>) -> RipgrepConfigGuard {
     RipgrepConfigGuard { pushed: follows.is_some() }
 }
 
+/// Whether rg's config file makes it follow links: the one its own prefix names, or else the one
+/// named in the environment it inherits from us.
 pub(crate) fn ripgrep_config_follows() -> bool {
-    RIPGREP_CONFIG.with(|v| v.borrow().last().copied().unwrap_or(false))
+    RIPGREP_CONFIG
+        .with(|v| v.borrow().last().copied())
+        .unwrap_or_else(|| config_file_follows(std::env::var_os(RIPGREP_CONFIG_PATH), cwd().as_deref()))
+}
+
+/// A config file that cannot be read may say anything, so it counts as following.
+fn config_file_follows(path: Option<std::ffi::OsString>, cwd: Option<&str>) -> bool {
+    let Some(path) = path.filter(|path| !path.is_empty()).map(std::path::PathBuf::from) else {
+        return false;
+    };
+    let path = match cwd {
+        _ if path.is_absolute() => path,
+        Some(cwd) => std::path::Path::new(cwd).join(path),
+        None => return true,
+    };
+    std::fs::read_to_string(path).map_or(true, |text| {
+        text.lines()
+            .map(str::trim)
+            .any(|line| line.starts_with("--follow") || (line.starts_with('-') && !line.starts_with("--") && line.contains('L')))
+    })
 }
 
 pub(crate) struct RipgrepConfigGuard {
@@ -272,6 +293,30 @@ pub fn join_cwd_mode(cur: Option<&str>, target: &str, physical: bool) -> Option<
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_inherited_ripgrep_config_follows_when_it_says_so_or_cannot_be_read() {
+        let dir = tempfile::tempdir().expect("scratch");
+        let cwd = dir.path().to_str().expect("utf-8");
+        for (name, text) in [
+            ("long", "--follow\n"),
+            ("short", "  -iL\n"),
+            ("plain", "--smart-case\n--max-columns=10\n"),
+            ("glob", "--glob=*L*\n--type-add=L:*.l\n"),
+        ] {
+            std::fs::write(dir.path().join(name), text).expect("config");
+        }
+        let follows = |path: Option<&str>, cwd: Option<&str>| config_file_follows(path.map(Into::into), cwd);
+        assert!(follows(Some("long"), Some(cwd)));
+        assert!(follows(Some("short"), Some(cwd)));
+        assert!(follows(Some("missing"), Some(cwd)));
+        assert!(follows(Some("plain"), None));
+        assert!(!follows(Some("plain"), Some(cwd)));
+        assert!(!follows(Some("glob"), Some(cwd)));
+        assert!(!follows(Some(dir.path().join("plain").to_str().expect("utf-8")), None));
+        assert!(!follows(Some(""), Some(cwd)));
+        assert!(!follows(None, Some(cwd)));
+    }
 
     const SID: &str = "7676dbc5-a265-43b3-a0f8-49666792bd9b";
 

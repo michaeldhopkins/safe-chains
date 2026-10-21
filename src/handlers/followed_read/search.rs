@@ -13,6 +13,7 @@ struct Kind {
     files: &'static [&'static str],
     optional_number: &'static [&'static str],
     config: bool,
+    rc_files: bool,
 }
 
 const RG: Kind = Kind {
@@ -24,6 +25,7 @@ const RG: Kind = Kind {
     files: &["files"],
     optional_number: &[],
     config: true,
+    rc_files: false,
 };
 
 const AG: Kind = Kind {
@@ -35,6 +37,7 @@ const AG: Kind = Kind {
     files: &[],
     optional_number: &["A", "B", "C", "after", "before", "context"],
     config: false,
+    rc_files: false,
 };
 
 const ACK: Kind = Kind {
@@ -46,6 +49,7 @@ const ACK: Kind = Kind {
     files: &[],
     optional_number: &[],
     config: false,
+    rc_files: true,
 };
 
 struct Scan {
@@ -107,8 +111,9 @@ fn walked(tokens: &[Token], cmd: &str, kind: &Kind) -> Option<Vec<String>> {
 }
 
 fn paths(scan: Scan, kind: &Kind) -> Option<Vec<String>> {
-    let configured = kind.config && crate::pathctx::ripgrep_config_follows() && !scan.ignore_config;
-    if scan.follow != Some(true) && !configured {
+    let configured =
+        !scan.ignore_config && ((kind.config && crate::pathctx::ripgrep_config_follows()) || (kind.rc_files && super::ackrc::follows()));
+    if !scan.follow.unwrap_or(configured) {
         return None;
     }
     let mut paths = scan.positionals;
@@ -180,7 +185,7 @@ fn note(flag: &str, kind: &Kind, scan: &mut Scan) {
     if kind.pattern.contains(&name) || kind.files.contains(&name) {
         scan.leading = Leading::Keep;
     }
-    if name == "no-config" {
+    if name == "no-config" || name == "noenv" {
         scan.ignore_config = true;
     }
 }
@@ -286,5 +291,24 @@ mod tests {
         let tokens = ["rg", "-L", "--made-up", "x"].map(|word| Token::from_raw(word.to_string()));
         let roots = rg(&tokens).expect("follow");
         assert!(roots.iter().any(|root| root == "."), "{roots:?}");
+    }
+
+    #[test]
+    fn an_abbreviation_of_follow_walks_the_working_directory() {
+        let tokens = ["ack", "--noenv", "--fol", "needle"].map(|word| Token::from_raw(word.to_string()));
+        assert_eq!(ack(&tokens), Some(vec![".".to_string()]));
+    }
+
+    #[test]
+    fn a_flag_named_in_both_lists_is_not_taken_as_either() {
+        let standalone = vec!["--follow".to_string()];
+        let valued = vec!["--follow".to_string()];
+        assert!(matches!(classify("follow", &standalone, &valued), Class::Unknown));
+    }
+
+    #[test]
+    fn a_number_after_a_context_option_is_not_a_path() {
+        let tokens = ["ag", "-f", "-A", "3", "sub"].map(|word| Token::from_raw(word.to_string()));
+        assert_eq!(ag(&tokens), Some(vec![".".to_string()]));
     }
 }

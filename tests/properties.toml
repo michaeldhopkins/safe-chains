@@ -602,6 +602,7 @@ owed = [
 "src/engine/resolve/frozen_reach.rs" = "lists the folders below a recursive operand on disk"
 "src/engine/resolve/frozen_walk.rs" = "walks the folders below a recursive operand on disk, following links when asked"
 "src/handlers/followed_read.rs" = "lists the tree a command that follows links would read"
+"src/handlers/followed_read/ackrc.rs" = "reads the environment and the ack config files it names"
 "src/handlers/followed_read/archive.rs" = "lists the trees pax, 7z and diff read when they follow links"
 "src/pathctx/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
 "src/pathctx/placing.rs" = "reads the thread-local directory context and, through physical, the filesystem"

@@ -236,6 +236,16 @@ pub(crate) fn shape_of(name: &str) -> Option<Shape> {
     rule_of(name).map(|r| r.shape)
 }
 
+/// The verdict for an assignment that may outlive one command: a bare `NAME=value` statement or
+/// `export`/`declare` (`lasting`), or a prefix to one command. `RIPGREP_CONFIG_PATH` can make rg
+/// follow links, which is judged only for the command it prefixes, so a lasting one is refused.
+pub(crate) fn statement_assignment_verdict(name: &str, value: &str, lasting: bool) -> Verdict {
+    if lasting && name.strip_suffix('+').unwrap_or(name) == crate::pathctx::RIPGREP_CONFIG_PATH && !value.is_empty() {
+        return Verdict::Denied;
+    }
+    assignment_verdict(name, value)
+}
+
 /// The verdict for one `NAME=value` assignment. `Inert` for any name not in the table — the
 /// overwhelmingly common case, and the reason this costs nothing for ordinary commands.
 pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
