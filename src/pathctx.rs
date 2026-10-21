@@ -167,6 +167,38 @@ impl Drop for StdinReprGuard {
     }
 }
 
+thread_local! {
+    static RIPGREP_CONFIG: RefCell<Vec<bool>> = const { RefCell::new(Vec::new()) };
+}
+
+pub(crate) const RIPGREP_CONFIG_PATH: &str = "RIPGREP_CONFIG_PATH";
+
+#[must_use]
+pub(crate) fn bind_ripgrep_config(follows: Option<bool>) -> RipgrepConfigGuard {
+    if let Some(follows) = follows {
+        RIPGREP_CONFIG.with(|v| v.borrow_mut().push(follows));
+    }
+    RipgrepConfigGuard { pushed: follows.is_some() }
+}
+
+pub(crate) fn ripgrep_config_follows() -> bool {
+    RIPGREP_CONFIG.with(|v| v.borrow().last().copied().unwrap_or(false))
+}
+
+pub(crate) struct RipgrepConfigGuard {
+    pushed: bool,
+}
+
+impl Drop for RipgrepConfigGuard {
+    fn drop(&mut self) {
+        if self.pushed {
+            RIPGREP_CONFIG.with(|v| {
+                v.borrow_mut().pop();
+            });
+        }
+    }
+}
+
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
 /// path the *existing* classifiers (`classify_locus`, `is_safe_write_target`) can score
 /// unchanged. When `cwd` and `root` are both known and absolute, a **relative** path is lexically

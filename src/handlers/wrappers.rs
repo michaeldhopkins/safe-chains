@@ -18,15 +18,20 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
     // another syntax, so they are classified identically — skipping them let `env
     // LD_PRELOAD=/tmp/evil.so ls` through while the prefix spelling denied.
     let mut assigned = Verdict::Allowed(SafetyLevel::Inert);
+    let mut config = None;
     while i < tokens.len() && !tokens[i].starts_with("-") && tokens[i].contains("=") {
         if let Some((name, value)) = tokens[i].as_str().split_once('=') {
             assigned = assigned.combine(crate::envvars::assignment_verdict(name, value));
+            if name == crate::pathctx::RIPGREP_CONFIG_PATH {
+                config = Some(!value.is_empty());
+            }
         }
         i += 1;
     }
     if i >= tokens.len() {
         return if cleared { assigned } else { Verdict::Denied };
     }
+    let _config = crate::pathctx::bind_ripgrep_config(config);
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
     assigned.combine(crate::command_verdict(&inner))
 }

@@ -297,6 +297,27 @@ fn ripgrep_follows_links_when_a_valued_option_precedes_the_pattern() {
 }
 
 #[test]
+fn ripgrep_follows_links_when_its_config_path_is_set() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "RIPGREP_CONFIG_PATH=./rgrc rg x", "RIPGREP_CONFIG_PATH=rgrc rg x", "env RIPGREP_CONFIG_PATH=./rgrc rg x",
+        "env RIPGREP_CONFIG_PATH=rgrc rg x",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+    for cmd in [
+        "rg x",
+        "RIPGREP_CONFIG_PATH= rg x",
+        "RIPGREP_CONFIG_PATH=./rgrc rg --no-config x",
+        "env RIPGREP_CONFIG_PATH=./rgrc rg --no-config x",
+    ] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
 fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
     let linked = with_secret_link(true);
     let plain = with_secret_link(false);

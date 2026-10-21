@@ -157,6 +157,7 @@ impl Shape {
 /// could be. `words[i]` holds the tokens `cmd.words[i]` expanded to; the command name is never
 /// probed (an unknown name is refused as unknown).
 pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: impl Fn(&[Token]) -> Verdict) -> Verdict {
+    let _config = crate::pathctx::bind_ripgrep_config(ripgrep_config(cmd));
     let (tokens, expanded, harvest) = shell_tokens(cmd, words);
     let _expanded = glob::replace_expanded(expanded);
     let mut verdict = classify(&tokens);
@@ -205,6 +206,16 @@ pub(crate) fn probed_verdict(cmd: &SimpleCmd, words: &[Vec<Token>], classify: im
         }
     }
     verdict
+}
+
+fn ripgrep_config(cmd: &SimpleCmd) -> Option<bool> {
+    let mut follows = None;
+    for (name, value) in &cmd.env {
+        if name == crate::pathctx::RIPGREP_CONFIG_PATH {
+            follows = Some(!value.eval().is_empty());
+        }
+    }
+    follows
 }
 
 /// Tokens the shell actually passes, and the matches an unquoted glob was replaced by. A result

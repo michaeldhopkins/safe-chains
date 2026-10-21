@@ -12,6 +12,7 @@ struct Kind {
     pattern: &'static [&'static str],
     files: &'static [&'static str],
     optional_number: &'static [&'static str],
+    config: bool,
 }
 
 const RG: Kind = Kind {
@@ -22,6 +23,7 @@ const RG: Kind = Kind {
     pattern: &["regexp", "file"],
     files: &["files"],
     optional_number: &[],
+    config: true,
 };
 
 const AG: Kind = Kind {
@@ -32,6 +34,7 @@ const AG: Kind = Kind {
     pattern: &[],
     files: &[],
     optional_number: &["A", "B", "C", "after", "before", "context"],
+    config: false,
 };
 
 struct Scan {
@@ -39,6 +42,7 @@ struct Scan {
     follow: Option<bool>,
     leading: Leading,
     closed: bool,
+    ignore_config: bool,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -57,7 +61,7 @@ pub(super) fn ag(tokens: &[Token]) -> Option<Vec<String>> {
 
 fn walked(tokens: &[Token], cmd: &str, kind: &Kind) -> Option<Vec<String>> {
     let (standalone, valued) = crate::registry::command_flag_sets(cmd).unwrap_or((&[], &[]));
-    let mut scan = Scan { positionals: Vec::new(), follow: None, leading: Leading::DropFirst, closed: false };
+    let mut scan = Scan { positionals: Vec::new(), follow: None, leading: Leading::DropFirst, closed: false, ignore_config: false };
     let mut i = 1;
     while i < tokens.len() {
         let word = tokens[i].as_str();
@@ -84,11 +88,12 @@ fn walked(tokens: &[Token], cmd: &str, kind: &Kind) -> Option<Vec<String>> {
         }
         i += 1;
     }
-    paths(scan)
+    paths(scan, kind)
 }
 
-fn paths(scan: Scan) -> Option<Vec<String>> {
-    if scan.follow != Some(true) {
+fn paths(scan: Scan, kind: &Kind) -> Option<Vec<String>> {
+    let configured = kind.config && crate::pathctx::ripgrep_config_follows() && !scan.ignore_config;
+    if scan.follow != Some(true) && !configured {
         return None;
     }
     let mut paths = scan.positionals;
@@ -159,6 +164,9 @@ fn note(flag: &str, kind: &Kind, scan: &mut Scan) {
     }
     if kind.pattern.contains(&name) || kind.files.contains(&name) {
         scan.leading = Leading::Keep;
+    }
+    if name == "no-config" {
+        scan.ignore_config = true;
     }
 }
 
