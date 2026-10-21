@@ -19,9 +19,10 @@ pub(crate) fn check_screen(tokens: &[Token]) -> Verdict {
 }
 
 /// A valued short glued to its value (`-h5000`, `-p0`) is the spaced form. The general grammar does
-/// not split that, so it is split here. Once a reattach or a listing has been seen, one following
-/// name is the session and is dropped. A second operand stays, so a program after the name is still
-/// refused. A name that is a valued option's own value (`-S work`, `-h 5000`) is kept.
+/// not split that, so it is split here. Screen 4 takes the word after a valued option as that
+/// option's value, not as the session name, so the value is kept. Once a reattach or a listing has
+/// been seen, one later operand is the session and is dropped. A second operand stays, so a program
+/// after the name is still refused.
 fn without_the_session_name(arguments: &[Token], standalone: &[String], valued: &[String]) -> Vec<Token> {
     let expanded = expand_glued_values(arguments, valued);
     let mut kept = Vec::with_capacity(expanded.len());
