@@ -1,9 +1,11 @@
 //! Commands that follow a symlink while they read, judged where the link leads.
 //!
 //! `cp -RL` and `find -L` already walk. An archiver or a searcher whose own flag follows links
-//! (`tar -h`, `cpio -oL`, `zip` unless `-y`, `rg -L`, `ag -f`) reads a secret through a link
+//! (`tar -h`, `cpio -oL`, `zip` unless `-y`, `rg -L`, `ag -f`, `ack --follow`, `pax -L`,
+//! `7z` while it adds, `diff -r`) reads a secret through a link
 //! committed in the tree. The walk is the one those copies use.
 
+mod archive;
 mod search;
 
 use crate::engine::resolve::frozen_reach::read_through;
@@ -40,6 +42,10 @@ fn roots(tokens: &[Token]) -> Option<Read> {
         "zip" => zip_roots(tokens),
         "rg" => search::rg(tokens).map(trees_only),
         "ag" => search::ag(tokens).map(trees_only),
+        "ack" => search::ack(tokens).map(trees_only),
+        "pax" => archive::pax(tokens),
+        "7z" => archive::seven_zip(tokens),
+        "diff" => archive::diff(tokens),
         _ => None,
     }
 }

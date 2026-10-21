@@ -318,6 +318,27 @@ fn ripgrep_follows_links_when_its_config_path_is_set() {
 }
 
 #[test]
+fn pax_7z_ack_and_diff_follow_links_in_the_tree_they_read() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let linked = project(&["src", "sub", "empty"]);
+    std::os::unix::fs::symlink(secret, format!("{}/sub/s", linked.root)).expect("link");
+    let plain = project(&["src", "sub", "empty"]);
+    for cmd in [
+        "pax -wL sub", "pax -w -L sub", "pax -w -H sub", "git ls-files | pax -wL", "7z a -l out.7z sub", "7z a out.7z sub",
+        "ack --follow x", "diff -rN sub empty", "diff -ruN empty sub",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+    for cmd in [
+        "pax -w sub", "pax -w -L -P sub", "7z a -snl out.7z sub", "ack x", "ack --follow --nofollow x", "diff sub empty",
+        "diff -rN --no-dereference sub empty",
+    ] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
 fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
     let linked = with_secret_link(true);
     let plain = with_secret_link(false);

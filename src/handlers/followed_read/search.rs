@@ -37,6 +37,17 @@ const AG: Kind = Kind {
     config: false,
 };
 
+const ACK: Kind = Kind {
+    follow_shorts: &[],
+    pattern_shorts: &[],
+    follow: &["follow"],
+    nofollow: &["nofollow", "no-follow"],
+    pattern: &[],
+    files: &[],
+    optional_number: &[],
+    config: false,
+};
+
 struct Scan {
     positionals: Vec<String>,
     follow: Option<bool>,
@@ -57,6 +68,10 @@ pub(super) fn rg(tokens: &[Token]) -> Option<Vec<String>> {
 
 pub(super) fn ag(tokens: &[Token]) -> Option<Vec<String>> {
     walked(tokens, "ag", &AG)
+}
+
+pub(super) fn ack(tokens: &[Token]) -> Option<Vec<String>> {
+    walked(tokens, "ack", &ACK)
 }
 
 fn walked(tokens: &[Token], cmd: &str, kind: &Kind) -> Option<Vec<String>> {
@@ -252,6 +267,17 @@ mod tests {
                 prop_assert!(roots.iter().any(|root| root == "."), "{} walked {:?}", flag, roots);
                 prop_assert!(!roots.iter().any(|root| root == "zz" || root == "needle"), "{} walked {:?}", flag, roots);
             }
+        }
+
+        #[test]
+        fn every_valued_flag_is_consumed_when_ack_follows(n in 0..64usize) {
+            let valued = crate::registry::command_valued_flags("ack").expect("ack flags");
+            prop_assume!(!valued.is_empty());
+            let flag = valued[n % valued.len()].as_str();
+            let tokens = ["ack", "--follow", flag, "zz", "needle"].map(|word| Token::from_raw(word.to_string()));
+            let roots = ack(&tokens).unwrap_or_default();
+            prop_assert!(roots.iter().any(|root| root == "."), "{} walked {:?}", flag, roots);
+            prop_assert!(!roots.iter().any(|root| root == "zz" || root == "needle"), "{} walked {:?}", flag, roots);
         }
     }
 
