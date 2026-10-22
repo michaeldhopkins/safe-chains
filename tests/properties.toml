@@ -15,6 +15,7 @@
 
 owed = [
   "src/cst/budget.rs",
+  "src/cst/functions.rs",
   "src/cst/reserved.rs",
   "src/engine/archetype.rs",
   "src/engine/resolve/flags.rs",
@@ -114,6 +115,7 @@ owed = [
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/brace.rs" = ["src/cst/brace_bash_tests.rs::a_brace_word_is_exact_or_unresolved", "src/cst/brace_bash_tests.rs::a_sequence_brace_is_exact_or_unresolved"]
 "src/cst/budget.rs" = []
+"src/cst/functions.rs" = []
 "src/cst/classify_budget.rs" = ["src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance"]
 "src/cst/scope_budget.rs" = ["src/cst/scope_budget.rs::sources_never_multiply_the_binding_set"]
 "src/cst/reserved.rs" = []

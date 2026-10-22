@@ -5,7 +5,7 @@ check_baseline_lints = true
 fuzz_min_targets = 8
 
 [rust_pinned]
-"src/cst/check.rs" = 889
+"src/cst/check.rs" = 816
 "src/cst/parse.rs" = 1064
 "src/engine/facet.rs" = 686
 "src/engine/resolve/locus.rs" = 587

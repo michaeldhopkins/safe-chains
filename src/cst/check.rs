@@ -1,5 +1,7 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
+use super::functions::{FuncScope, begin_resolving, define_function};
+pub(super) use super::functions::{lookup_function, poison_function};
 pub(super) use super::scope_budget::scope_budget_spent;
 use super::scope_budget::{ScopeWalk, UNCERTAIN_VALUE, rebind_uncertain};
 use super::*;
@@ -23,81 +25,6 @@ pub fn command_verdict(input: &str) -> Verdict {
 
 pub fn is_safe_command(input: &str) -> bool {
     command_verdict(input).is_allowed()
-}
-
-thread_local! {
-    /// Functions DEFINED so far in the current classification, so a later call resolves to its body
-    /// (and a definition SHADOWS a same-named built-in — `ls(){ rm -rf /; }; ls` runs rm). Owned
-    /// clones (small); a thread-local can't borrow the CST. Latest definition wins.
-    static FUNCTIONS: std::cell::RefCell<Vec<(String, Script)>> =
-        const { std::cell::RefCell::new(Vec::new()) };
-    /// Function names whose CURRENT body we cannot attribute — redefined inside a compound, where
-    /// the shell keeps the new body but we cannot say which one ran. `lookup_function` reports them
-    /// as unknown, so a call falls through to ordinary dispatch and denies (fail-closed) rather
-    /// than resolving to a stale, more permissive definition.
-    static POISONED_FUNCS: std::cell::RefCell<Vec<String>> =
-        const { std::cell::RefCell::new(Vec::new()) };
-    /// Names currently being resolved — bounds recursion (direct AND mutual) and total call depth,
-    /// so `f(){ f; }` or a deep chain can't blow the stack; hitting the bound denies (fail-closed).
-    static RESOLVING: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
-}
-
-const MAX_FUNC_DEPTH: usize = 32;
-
-struct FuncScope;
-impl Drop for FuncScope {
-    fn drop(&mut self) {
-        FUNCTIONS.with(|f| {
-            f.borrow_mut().pop();
-        });
-    }
-}
-
-fn define_function(name: String, body: Script) -> FuncScope {
-    FUNCTIONS.with(|f| f.borrow_mut().push((name, body)));
-    FuncScope
-}
-
-pub(super) fn lookup_function(name: &str) -> Option<Script> {
-    if POISONED_FUNCS.with(|p| p.borrow().iter().any(|n| n == name)) {
-        return None; // body unknown — deny rather than use a stale one
-    }
-    FUNCTIONS.with(|f| f.borrow().iter().rev().find(|(n, _)| n == name).map(|(_, b)| b.clone()))
-}
-
-/// Mark `name`'s body unknown for the rest of this evaluation. Not scoped by a guard: the shell's
-/// redefinition is not scoped either, and every classification starts with a fresh thread-local.
-pub(super) fn poison_function(name: String) {
-    POISONED_FUNCS.with(|p| p.borrow_mut().push(name));
-}
-
-struct ResolveScope;
-impl Drop for ResolveScope {
-    fn drop(&mut self) {
-        RESOLVING.with(|r| {
-            r.borrow_mut().pop();
-        });
-    }
-}
-
-/// Begin resolving a call to `name`, unless it recurses, exceeds the depth cap, or exhausts the
-/// per-invocation classification budget — then return `None` and the caller treats it as an ordinary
-/// (unknown) command, which denies. The budget is what stops exponential FAN-OUT (`f(){ f2; f2; };
-/// f2(){ f3; f3; }; …`): the depth cap alone bounds a linear chain, but branching multiplies, so each
-/// resolution charges the shared `CLASSIFY_WORK` counter that also caps delegating-handler recursion.
-fn begin_resolving(name: &str) -> Option<ResolveScope> {
-    if !charge_classify_work(1) {
-        return None;
-    }
-    RESOLVING.with(|r| {
-        let mut stack = r.borrow_mut();
-        if stack.len() >= MAX_FUNC_DEPTH || stack.iter().any(|n| n == name) {
-            None
-        } else {
-            stack.push(name.to_string());
-            Some(ResolveScope)
-        }
-    })
 }
 
 pub(super) fn script_verdict(script: &Script) -> Verdict {
