@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc c5730a5a9da7150611142251900454c6b75b281fb3f7d830da388cdd6c0f6e3e # shrinks to root = "/opt", dir = "a", file = "a.sh", verb = "cat", join = "; "

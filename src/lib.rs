@@ -67,6 +67,7 @@ mod handler_property_tests;
 mod handlers;
 pub mod mcp;
 pub mod netloc;
+mod operands;
 #[cfg(test)]
 mod overreach_property_tests;
 pub mod parse;
@@ -341,8 +342,10 @@ pub fn sanitize_display(s: &str) -> String {
     out
 }
 
-/// If a NOT-auto-approved command reaches a path OUTSIDE the workspace, return that path (its
-/// original spelling) and WHY, so the hook can nudge instead of silently prompting. Resolves against
+/// If a NOT-auto-approved command reaches a path OUTSIDE the workspace, return that path and WHY.
+/// The path is spelled as written, with the variables earlier statements bound put in; a relative
+/// path read after a `cd` is spelled as the place it names, since its spelling names another place
+/// from where the reader stands. Each is reported so the hook can nudge instead of silently prompting. Resolves against
 /// the ambient `cwd`/`root`: relative worktree paths, `/tmp`, and `/dev` streams are admitted and
 /// skipped; an absolute or home path that isn't admitted for read *or* write is the reach. A
 /// credential store outranks the hidden-peer wording; a hidden peer path outranks the generic
@@ -351,12 +354,12 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
     if let Some(found) = reach::repository_snapshot(command) {
         return Some(found);
     }
-    let tokens = operand_words(command)?;
-    tokens.into_iter().find_map(|t| {
-        if !policy::looks_like_path(&t) {
+    let operands = operands::operand_words(command)?;
+    operands.into_iter().find_map(|operands::Operand { text, resolved }| {
+        if !policy::looks_like_path(&text) {
             return None;
         }
-        let resolved = pathctx::resolve(&t).into_owned();
+        let t = if pathctx::resolve(&text) == resolved { text } else { resolved.clone() };
         // A temp path is READ/WRITE admitted, so the outside-test below never fires on it — but it
         // is not EXECUTABLE unless it is this session's scratchpad. When the command was denied,
         // that is the likely reason, and it is the one case where the fix is a grant rather than a
@@ -377,132 +380,6 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
         }
         Some((t, reach::classify(&resolved)))
     })
-}
-
-/// The words a command actually RUNS with, for explaining a denial.
-///
-/// This must agree with the parse the verdict came from, so it walks the CST. Splitting the raw
-/// string instead (`shell_words::split`) tokenizes text the shell never treats as an argument —
-/// above all a heredoc BODY, which is data. `git commit -m "$(cat <<'EOF' … EOF)"` whose message
-/// merely MENTIONS `/etc/hosts` was reported as "reaches /etc/hosts", naming a false reason for the
-/// denial and advising the reader to grant that path — a config widening the command never needed.
-///
-/// Falls back to the raw split only when the command does not parse, where a best-effort nudge on
-/// approximate tokens still beats none.
-fn operand_words(command: &str) -> Option<Vec<String>> {
-    let Some(script) = cst::parse(command) else {
-        return shell_words::split(command).ok();
-    };
-    let mut out = Vec::new();
-    collect_script_words(&script, &mut out);
-    Some(out)
-}
-
-/// A word contributes its own expansions AND the words of any command substitution inside it: the
-/// inner command runs, so `notacommand $(cat /etc/shadow)` really does read the file, even though
-/// `expand()` renders the substitution as an opaque stand-in and hides the path.
-fn collect_word(word: &cst::Word, out: &mut Vec<String>) {
-    out.extend(word.expand());
-    for part in &word.0 {
-        collect_part_subs(part, out);
-    }
-}
-
-/// The words of any command SUBSTITUTION inside a word part, and nothing else — the part's own
-/// literal text is the caller's business, because whether it counts as an operand depends on where
-/// the word came from (a heredoc body's literal text never does).
-fn collect_part_subs(part: &cst::WordPart, out: &mut Vec<String>) {
-    use cst::WordPart;
-    match part {
-        WordPart::CmdSub(script) | WordPart::ProcSub(script) => collect_script_words(script, out),
-        WordPart::DQuote(inner) => collect_word(inner, out),
-        // Arithmetic contributes no operand of its own — its value is a number — but a `$( )`
-        // inside it runs, and that command's words are operands the verdict layer classifies.
-        WordPart::Arith(inner) => collect_word(inner, out),
-        WordPart::Lit(_) | WordPart::Escape(_) | WordPart::SQuote(_) | WordPart::AnsiC(_) | WordPart::Backtick(_) => {}
-    }
-}
-
-fn collect_script_words(script: &cst::Script, out: &mut Vec<String>) {
-    for stmt in &script.0 {
-        for cmd in &stmt.pipeline.commands {
-            collect_cmd_words(cmd, out);
-        }
-    }
-}
-
-/// A redirect TARGET is a path the command opens, so it is a reach and must be reported —
-/// `notacommand > /etc/passwd` names `/etc/passwd`. A heredoc DELIMITER is not a path at all, and
-/// its body never appears in the CST, which is the whole point.
-fn collect_redir_words(redirs: &[cst::Redir], out: &mut Vec<String>) {
-    use cst::Redir;
-    for redir in redirs {
-        match redir {
-            Redir::Write { target, .. } | Redir::Read { target, .. } | Redir::ReadWrite { target, .. } | Redir::HereStr(target) => {
-                collect_word(target, out)
-            }
-            // Only the body's SUBSTITUTIONS, never its literal text. Behind a bare delimiter a
-            // `$(cat /etc/shadow)` in the body really runs, so it is a reach worth naming; the
-            // prose around it is data and naming it would state a false reason for the denial.
-            Redir::HereDoc { body, .. } => {
-                for part in &body.0 {
-                    collect_part_subs(part, out);
-                }
-            }
-            Redir::DupFd { .. } => {}
-        }
-    }
-}
-
-fn collect_cmd_words(cmd: &cst::Cmd, out: &mut Vec<String>) {
-    use cst::Cmd;
-    let words = |ws: &[cst::Word], out: &mut Vec<String>| {
-        for w in ws {
-            collect_word(w, out);
-        }
-    };
-    match cmd {
-        Cmd::Simple(s) => {
-            words(&s.words, out);
-            collect_redir_words(&s.redirs, out);
-        }
-        Cmd::Subshell { body, redirs } | Cmd::BraceGroup { body, redirs } => {
-            collect_script_words(body, out);
-            collect_redir_words(redirs, out);
-        }
-        Cmd::For { items, body, redirs, .. } => {
-            words(items, out);
-            collect_script_words(body, out);
-            collect_redir_words(redirs, out);
-        }
-        Cmd::While { cond, body, redirs } | Cmd::Until { cond, body, redirs } => {
-            collect_script_words(cond, out);
-            collect_script_words(body, out);
-            collect_redir_words(redirs, out);
-        }
-        Cmd::If { branches, else_body, redirs } => {
-            collect_redir_words(redirs, out);
-            for branch in branches {
-                collect_script_words(&branch.cond, out);
-                collect_script_words(&branch.body, out);
-            }
-            if let Some(body) = else_body {
-                collect_script_words(body, out);
-            }
-        }
-        Cmd::DoubleBracket { words: ws, redirs } => {
-            words(ws, out);
-            collect_redir_words(redirs, out);
-        }
-        Cmd::Case { subject, arms, redirs } => {
-            collect_word(subject, out);
-            for arm in arms {
-                collect_script_words(&arm.body, out);
-            }
-            collect_redir_words(redirs, out);
-        }
-        Cmd::FunctionDef { body, .. } => collect_script_words(body, out),
-    }
 }
 
 #[cfg(test)]

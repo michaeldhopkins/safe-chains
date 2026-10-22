@@ -35,4 +35,37 @@ proptest! {
         let reach = workspace_overreach(&format!("{verb} {scratch}"));
         prop_assert_eq!(reach, None, "{}", scratch);
     }
+
+    /// A path that reaches a command through an earlier statement is reported as that path.
+    ///
+    /// The same command with the path written in, and with its directory held in a variable bound
+    /// by an earlier statement: both reach the same place, so both must name it and give the same
+    /// reason. Read one statement at a time, the second named `$P/…`, which is no place at all.
+    #[test]
+    fn a_path_reached_through_an_earlier_statement_is_reported_as_itself(
+        root in proptest::sample::select(vec!["/opt", "/srv", "/Users/someone", "/home/someone", "/tmp", "/etc"]),
+        dir in "[a-z]{1,8}",
+        file in "[a-z]{1,8}\\.(sh|txt|py)",
+        verb in proptest::sample::select(vec!["cat", "bash", "head", "rm", "touch"]),
+        join in proptest::sample::select(vec!["; ", " && ", "; ls; "]),
+    ) {
+        let _g = crate::pathctx::enter(PathCtx {
+            cwd: Some("/work".into()),
+            root: Some("/work".into()),
+            session_id: None,
+        });
+        let place = format!("{root}/{dir}");
+        let path = format!("{place}/{file}");
+        let literal = workspace_overreach(&format!("{verb} {path}"));
+        prop_assert!(literal.is_some(), "{} {} is not reported at all", verb, path);
+        let held = workspace_overreach(&format!("P={place}{join}{verb} $P/{file}"));
+        prop_assert_eq!(held, literal, "{}", path);
+
+        let unknown = workspace_overreach(&format!("{verb} $X/{file}"));
+        let held_unknown = workspace_overreach(&format!("P=$X{join}{verb} $P/{file}"));
+        prop_assert_eq!(held_unknown, unknown, "a variable holding an unknown value named a place");
+        let moved_unknown = workspace_overreach(&format!("cd $(foo){join}{verb} ./{file}"));
+        let named = moved_unknown.map(|(path, _)| path);
+        prop_assert!(!named.as_deref().is_some_and(crate::cst::check::is_opaque_value), "{:?}", named);
+    }
 }

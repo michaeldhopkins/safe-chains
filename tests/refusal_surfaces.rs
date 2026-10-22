@@ -261,3 +261,41 @@ fn explain_settles_the_snapshot_reason_the_way_suggest_does() {
     assert!(!paranoid.contains("Add --ignore-working-copy"), "{paranoid}");
     assert!(paranoid.contains("safe-chains reads its permissions"), "{paranoid}");
 }
+
+/// Ways a path reaches a command through the statements before it, each a pair: what runs first,
+/// and how the command is wrapped. The variable form must be explained as the literal one is.
+const ROUTED: &[(&str, &str)] =
+    &[("P={path}; ", "{command}"), ("P={path} && ", "{command}"), ("P={path}; ls; ", "{command}"), ("P={path}; ", "{ {command}; }")];
+
+fn why_and_fix(text: &str) -> String {
+    let lines: Vec<&str> = text.lines().collect();
+    let fix = lines.iter().position(|l| l.starts_with("Fix:")).unwrap_or(lines.len());
+    lines
+        .iter()
+        .filter(|l| l.starts_with("Why:"))
+        .chain(&lines[fix..])
+        .copied()
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+#[test]
+fn a_path_held_in_a_variable_is_explained_as_the_path_itself() {
+    let home = bare_home();
+    for (command, reached, _) in REACHES {
+        let path = command
+            .split_whitespace()
+            .find(|w| w.contains(reached))
+            .expect("the reached path is a word of the command");
+        for (before, wrap) in ROUTED {
+            let literal = wrap.replace("{command}", command);
+            let routed = format!("{}{}", before.replace("{path}", path), wrap.replace("{command}", &command.replace(path, "$P")));
+            let expected = why_and_fix(&run(&["--explain", &literal], home.path(), None));
+            assert!(expected.contains(reached), "`{literal}` no longer names `{reached}`:\n{expected}");
+            let got = why_and_fix(&run(&["--explain", &routed], home.path(), None));
+            assert_eq!(got, expected, "`{routed}` is explained differently from `{literal}`");
+            let suggested = run(&["--suggest", &routed], home.path(), None);
+            assert!(suggested.contains(reached), "`--suggest` on `{routed}` never names `{reached}`:\n{suggested}");
+        }
+    }
+}

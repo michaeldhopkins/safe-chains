@@ -377,6 +377,7 @@ owed = [
 ]
 "src/mcp/args.rs" = ["an_undeclared_argument_is_always_refused"]
 "src/mcp/client_approval.rs" = ["only_editing_tools_count"]
+"src/operands.rs" = ["src/overreach_property_tests.rs::a_path_reached_through_an_earlier_statement_is_reported_as_itself"]
 "src/netloc.rs" = [
   "only_the_host_component_decides",
   "case_never_changes_the_verdict",

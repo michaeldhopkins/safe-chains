@@ -11,7 +11,6 @@ fuzz_min_targets = 8
 "src/engine/resolve/locus.rs" = 587
 "src/engine/resolve/regions.rs" = 932
 "src/engine/resolve.rs" = 1502
-"src/lib.rs" = 449
 "src/pathgate.rs" = 538
 "src/registry/build.rs" = 1364
 "src/registry/dispatch.rs" = 545

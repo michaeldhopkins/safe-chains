@@ -58,6 +58,23 @@ pub enum Because {
     Unparseable,
 }
 
+/// Runs `per_segment` on each segment of `command` (its index and text) with the scope the segments
+/// before it leave in force: their `cd`, their `VAR=` bindings and their function definitions.
+///
+/// A segment's fix has to be worked out there. Alone, `git -C $M status` names no place, and every
+/// grant asked about it fails, so `M=/elsewhere; git -C $M status` was told nothing in safe-chains'
+/// config would help, though a grant on `/elsewhere` approves it. `None` when `command` does not
+/// parse.
+pub fn in_segment_scope<T>(command: &str, mut per_segment: impl FnMut(usize, &str) -> T) -> Option<Vec<T>> {
+    let script = crate::cst::parse(command)?;
+    let mut index = 0;
+    Some(crate::cst::check::walk_with_scope(&script, |stmt| {
+        let fix = per_segment(index, &stmt.pipeline.to_string());
+        index += 1;
+        fix
+    }))
+}
+
 /// The fix for one refused command (a segment of a chain, or the whole command).
 ///
 /// `approved` answers "would this command be approved?" the way the caller's verdict does, at the
