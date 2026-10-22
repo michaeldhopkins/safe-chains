@@ -676,6 +676,23 @@ mod resolution {
             let nested = format!("{name}() {{ echo hi; }}; if true; then {name}() {{ rm -rf /; }}; fi; bash -c 'echo hi'; {name}");
             proptest::prop_assert!(!allowed(&nested), "a nested classification forgot the redefinition: {nested}");
         }
+
+        #[test]
+        fn a_call_whose_body_is_unknown_never_runs_the_command_it_shadows(
+            name in proptest::sample::select(&["ls", "echo", "pwd", "cat", "true"][..]),
+            form in 0..5usize,
+        ) {
+            let _w = workspace();
+            let def = format!("{name}() {{ rm -rf /; }}");
+            let line = match form {
+                0 => format!("{{ {def}; }}; {name}"),
+                1 => format!("if true; then {def}; fi; {name}"),
+                2 => format!("g() {{ {name}; {def}; }}; g; g"),
+                3 => format!("for i in 1 2; do {name}; {def}; done"),
+                _ => format!("while true; do {name}; {def}; done"),
+            };
+            proptest::prop_assert!(!allowed(&line), "{line}");
+        }
     }
 
     #[test]

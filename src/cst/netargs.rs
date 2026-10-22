@@ -201,7 +201,9 @@ fn may_rebind(var: &str, body: &str) -> bool {
         .split(|c: char| c.is_whitespace() || ";|&()<>\"'`".contains(c))
         .filter(|w| !w.is_empty())
         .collect();
-    if words.iter().any(|w| ASSIGNS_BY_NAME.contains(w) || super::check::lookup_function(w).is_some())
+    if words
+        .iter()
+        .any(|w| ASSIGNS_BY_NAME.contains(w) || super::check::lookup_function(w).is_some() || super::functions::body_unknown(w))
         || (words.contains(&"printf") && words.iter().any(|w| w.starts_with("-v")))
     {
         return true;

@@ -12,8 +12,8 @@
 //! `/etc/shadow` on its second pass.
 
 use super::check::{
-    MAX_CD_SCAN_DEPTH, ShellEffects, charge_classify_work, lookup_function, poison_function, redirect_verdict, scan_script_effects,
-    script_verdict, words_sub_verdict,
+    MAX_CD_SCAN_DEPTH, ShellEffects, charge_classify_work, poison_function, redirect_verdict, scan_script_effects, script_verdict,
+    words_sub_verdict,
 };
 use super::{Cmd, Script, Word, WordPart};
 use crate::verdict::Verdict;
@@ -152,9 +152,7 @@ impl Carried {
             scan_script_effects(body, MAX_CD_SCAN_DEPTH, &mut seen, &mut effects);
         }
         for name in effects.funcs {
-            if lookup_function(&name).is_some() {
-                poison_function(name);
-            }
+            poison_function(name);
         }
         let mut vars = Vec::new();
         super::scope_budget::rebind_uncertain(effects.vars.into_iter().filter(|n| Some(n.as_str()) != loop_var), &mut vars);

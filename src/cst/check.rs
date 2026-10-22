@@ -1,6 +1,6 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
-use super::functions::{FuncScope, begin_resolving, define_function};
+use super::functions::{FuncScope, define_function};
 pub(super) use super::functions::{forget_poisoned_functions, lookup_function, poison_function};
 pub(super) use super::scope_budget::scope_budget_spent;
 use super::scope_budget::{ScopeWalk, UNCERTAIN_VALUE, rebind_uncertain};
@@ -214,7 +214,7 @@ fn statement_assignments(pipeline: &Pipeline) -> Vec<(String, String)> {
 /// A word's CERTAIN literal value for binding, or the unpinnable sentinel when uncertain. Resolves
 /// `$refs` against the current scope first, then requires no residual `$` and no substitution
 /// sentinel — a substitution (`$(…)`), an unbound var, or a reassignment-to-uncertain all fail here.
-fn certain_value(word: &Word) -> String {
+pub(super) fn certain_value(word: &Word) -> String {
     let text = word.eval();
     if crate::pathctx::names_a_loop_var(&text) {
         return UNCERTAIN_VALUE.to_string();
@@ -565,23 +565,9 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
     let name = cmd.words[0].eval();
 
-    // Function CALL: a user function SHADOWS everything it names, INCLUDING builtins like `eval`
-    // (`eval(){ rm -rf /; }; eval "echo hi"` runs the function, not eval) — so resolve a defined name
-    // FIRST, before the eval special-case and the leaf dispatch. Classify its BODY with $1..$N bound
-    // to the call's args (certain literals; uncertain → unpinnable). The shadow is UNCONDITIONAL: if
-    // resolution is blocked (recursion / depth / budget) we FAIL CLOSED, never fall through to the
-    // real command — otherwise `…512 calls…; ls(){ rm -rf /; }; ls` would exhaust the budget and then
-    // run the real `ls` for the rebound name, a bypass.
-    if let Some(body) = lookup_function(&name) {
-        let Some(_resolving) = begin_resolving(&name) else {
-            return Verdict::Denied;
-        };
-        let _args: Vec<crate::pathctx::VarGuard> = cmd.words[1..]
-            .iter()
-            .enumerate()
-            .map(|(i, w)| crate::pathctx::enter_var((i + 1).to_string(), certain_value(w)))
-            .collect();
-        return sub_v.combine(super::netargs::with_args(cmd, || script_verdict(&body))).combine(redir_v);
+    // A function shadows everything it names, builtins like `eval` included, so it resolves first.
+    if let Some(call) = super::functions::call_verdict(cmd, &name) {
+        return sub_v.combine(call).combine(redir_v);
     }
 
     if name == "eval" {

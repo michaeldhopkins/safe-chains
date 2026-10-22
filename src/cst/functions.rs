@@ -1,7 +1,8 @@
 //! The functions a line defines, so a later call resolves to its body, and the bounds on resolving one.
 
-use super::Script;
 use super::classify_budget::charge_classify_work;
+use super::{Script, SimpleCmd};
+use crate::verdict::Verdict;
 
 thread_local! {
     /// Functions DEFINED so far in the current classification, so a later call resolves to its body
@@ -10,9 +11,8 @@ thread_local! {
     static FUNCTIONS: std::cell::RefCell<Vec<(String, Script)>> =
         const { std::cell::RefCell::new(Vec::new()) };
     /// Function names whose CURRENT body we cannot attribute — redefined inside a compound, where
-    /// the shell keeps the new body but we cannot say which one ran. `lookup_function` reports them
-    /// as unknown, so a call falls through to ordinary dispatch and denies (fail-closed) rather
-    /// than resolving to a stale, more permissive definition.
+    /// the shell keeps the new body but we cannot say which one ran. A call to one denies, rather
+    /// than resolving to a stale definition or to the command the name shadowed.
     static POISONED_FUNCS: std::cell::RefCell<Vec<String>> =
         const { std::cell::RefCell::new(Vec::new()) };
     /// Names currently being resolved — bounds recursion (direct AND mutual) and total call depth,
@@ -36,9 +36,14 @@ pub(super) fn define_function(name: String, body: Script) -> FuncScope {
     FuncScope
 }
 
+/// Whether `name` may have been redefined with a body we cannot attribute.
+pub(super) fn body_unknown(name: &str) -> bool {
+    POISONED_FUNCS.with(|p| p.borrow().iter().any(|n| n == name))
+}
+
 pub(super) fn lookup_function(name: &str) -> Option<Script> {
-    if POISONED_FUNCS.with(|p| p.borrow().iter().any(|n| n == name)) {
-        return None; // body unknown — deny rather than use a stale one
+    if body_unknown(name) {
+        return None;
     }
     FUNCTIONS.with(|f| f.borrow().iter().rev().find(|(n, _)| n == name).map(|(_, b)| b.clone()))
 }
@@ -55,7 +60,7 @@ pub(super) fn poison_function(name: String) {
     POISONED_FUNCS.with(|p| p.borrow_mut().push(name));
 }
 
-pub(super) struct ResolveScope;
+struct ResolveScope;
 impl Drop for ResolveScope {
     fn drop(&mut self) {
         RESOLVING.with(|r| {
@@ -69,7 +74,7 @@ impl Drop for ResolveScope {
 /// (unknown) command, which denies. The budget is what stops exponential FAN-OUT (`f(){ f2; f2; };
 /// f2(){ f3; f3; }; …`): the depth cap alone bounds a linear chain, but branching multiplies, so each
 /// resolution charges the shared `CLASSIFY_WORK` counter that also caps delegating-handler recursion.
-pub(super) fn begin_resolving(name: &str) -> Option<ResolveScope> {
+fn begin_resolving(name: &str) -> Option<ResolveScope> {
     if !charge_classify_work(1) {
         return None;
     }
@@ -82,4 +87,26 @@ pub(super) fn begin_resolving(name: &str) -> Option<ResolveScope> {
             Some(ResolveScope)
         }
     })
+}
+
+/// The verdict of a call to `name` when a definition rebinds it, `None` when none does.
+///
+/// The body is judged with $1..$N bound to the call's arguments (certain literals; uncertain →
+/// unpinnable). The shadow is UNCONDITIONAL: a body we cannot attribute, or a resolution blocked by
+/// recursion, depth or budget, denies and never falls through to the real command. Otherwise
+/// `…512 calls…; ls(){ rm -rf /; }; ls` would exhaust the budget and then run the real `ls`.
+pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
+    if body_unknown(name) {
+        return Some(Verdict::Denied);
+    }
+    let body = lookup_function(name)?;
+    let Some(_resolving) = begin_resolving(name) else {
+        return Some(Verdict::Denied);
+    };
+    let _args: Vec<crate::pathctx::VarGuard> = cmd.words[1..]
+        .iter()
+        .enumerate()
+        .map(|(i, w)| crate::pathctx::enter_var((i + 1).to_string(), super::check::certain_value(w)))
+        .collect();
+    Some(super::netargs::with_args(cmd, || super::check::script_verdict(&body)))
 }
