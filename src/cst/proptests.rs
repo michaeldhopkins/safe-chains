@@ -678,6 +678,20 @@ mod resolution {
         }
 
         #[test]
+        fn a_redirect_written_on_a_function_body_applies_to_each_call(
+            target in proptest::sample::select(&["~/.bashrc", "/etc/passwd", "~/.ssh/authorized_keys"][..]),
+            op in proptest::sample::select(&[">", ">>"][..]),
+            subshell in proptest::prelude::any::<bool>(),
+        ) {
+            let _w = workspace();
+            let body = if subshell { "( echo hi )" } else { "{ echo hi; }" };
+            let line = format!("g() {body} {op} {target}; g");
+            proptest::prop_assert!(!allowed(&line), "{line}");
+            let quiet = format!("g() {body} {op} /dev/null; g");
+            proptest::prop_assert!(allowed(&quiet), "{quiet}");
+        }
+
+        #[test]
         fn a_call_whose_body_is_unknown_never_runs_the_command_it_shadows(
             name in proptest::sample::select(&["ls", "echo", "pwd", "cat", "true"][..]),
             form in 0..5usize,

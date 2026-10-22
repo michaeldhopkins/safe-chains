@@ -1,8 +1,11 @@
+mod function;
+
 use super::budget::{self, DepthGuard};
 use super::escape::{self, dq_escape, escaped, fd_target, join_continuation, only_continuations, skip_continuation};
 use super::heredocs;
 use super::sub_close::find_sub_close;
 use super::*;
+use function::function_def;
 use winnow::ModalResult;
 use winnow::combinator::{alt, delimited, not, opt, preceded, repeat, separated, terminated};
 use winnow::error::{ContextError, ErrMode};
@@ -254,68 +257,9 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
     .parse_next(input)
 }
 
-/// `name() { body }` / `name() ( body )` (POSIX form) or `function name [()] { body }` (bash form).
-/// Tried before `simple_cmd`; a bare `name` with no `()` and no `function` keyword backtracks so an
-/// ordinary command is not misread as a definition.
-fn function_def(input: &mut &str) -> ModalResult<Cmd> {
-    let had_keyword = opt_function_keyword(input);
-    let name = function_name(input)?;
-    ws.parse_next(input)?;
-    let has_parens = opt_paren_pair(input);
-    if !had_keyword && !has_parens {
-        return backtrack();
-    }
-    // The body may sit on the next line (`foo()\n{ … }`); consume ws/newlines but not `;`.
-    blank(input)?;
-    let body = function_body(input)?;
-    Ok(Cmd::FunctionDef { name, body })
-}
-
-/// Consume a leading `function` keyword (must be followed by whitespace, else it's a command named
-/// `function`). Returns whether it was present; only commits `*input` when it was.
-fn opt_function_keyword(input: &mut &str) -> bool {
-    let mut probe = *input;
-    if eat_keyword(&mut probe, "function").is_ok() && probe.starts_with([' ', '\t', '\n']) && ws.parse_next(&mut probe).is_ok() {
-        *input = probe;
-        return true;
-    }
-    false
-}
-
-/// Consume a `(` ws `)` function-def paren pair. Commits `*input` only on a full match.
-fn opt_paren_pair(input: &mut &str) -> bool {
-    let mut probe = *input;
-    if let Some(rest) = probe.strip_prefix('(') {
-        probe = rest;
-        if ws.parse_next(&mut probe).is_ok()
-            && let Some(rest) = probe.strip_prefix(')')
-        {
-            *input = rest;
-            return true;
-        }
-    }
-    false
-}
-
-fn function_name(input: &mut &str) -> ModalResult<String> {
-    run(input, |c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':' | '+')).map(String::from)
-}
-
 /// A non-empty run of `pred` characters, charged to the step budget.
 fn run<'a>(input: &mut &'a str, pred: fn(char) -> bool) -> ModalResult<&'a str> {
     consumed(input, |i| take_while(1.., pred).parse_next(i))
-}
-
-/// The compound body of a function — `{ …; }` or `( … )`. Redirects attached to the definition
-/// itself (rare) are dropped, which is conservative for a construct classified Inert anyway.
-fn function_body(input: &mut &str) -> ModalResult<Script> {
-    if let Some(Cmd::BraceGroup { body, .. }) = opt(brace_group).parse_next(input)? {
-        return Ok(body);
-    }
-    if let Some(Cmd::Subshell { body, .. }) = opt(subshell).parse_next(input)? {
-        return Ok(body);
-    }
-    backtrack()
 }
 
 fn trailing_redirs(input: &mut &str) -> ModalResult<Vec<Redir>> {

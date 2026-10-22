@@ -76,6 +76,7 @@ owed = [
   "src/cst/netargs_tests.rs::a_quoted_dollar_never_trips_the_mark",
   "src/cst/netargs_tests.rs::a_request_item_reads_a_file_only_through_an_at_separator",
 ]
+"src/cst/parse/function.rs" = ["src/cst/proptests.rs::roundtrip", "src/cst/proptests.rs::a_redirect_written_on_a_function_body_applies_to_each_call"]
 "src/cst/parse.rs" = [
   "a_random_unclosed_nest_parses_in_linear_work",
   "src/cst/proptests.rs::roundtrip",
