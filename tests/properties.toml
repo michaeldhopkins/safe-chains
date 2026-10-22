@@ -63,6 +63,7 @@ owed = [
   "src/cst/proptests.rs::a_redefinition_in_one_command_does_not_reach_the_next",
   "src/cst/proptests.rs::a_call_whose_body_is_unknown_never_runs_the_command_it_shadows",
   "src/cst/proptests.rs::a_function_the_shell_runs_unnamed_is_judged_at_its_definition",
+  "src/cst/proptests.rs::an_alias_definition_is_refused_and_a_listing_is_not",
 ]
 "src/cst/explain.rs" = [
   "src/handler_property_tests.rs::explain_agrees_with_enforcement_whatever_the_call_order",

@@ -678,6 +678,20 @@ mod resolution {
         }
 
         #[test]
+        fn an_alias_definition_is_refused_and_a_listing_is_not(
+            name in proptest::sample::select(&["ls", "echo", "Q", "ll"][..]),
+            flag in proptest::sample::select(&["", "-g ", "-s ", "-r "][..]),
+            value in proptest::sample::select(&["ls -la", "rm -rf ~", "", "$X"][..]),
+            sep in proptest::sample::select(&["\n", "; ", " && "][..]),
+        ) {
+            let _w = workspace();
+            let line = format!("alias {flag}{name}=\"{value}\"{sep}echo done");
+            proptest::prop_assert!(!allowed(&line), "{line:?}");
+            let listing = format!("alias {flag}{name}{sep}echo done");
+            proptest::prop_assert!(allowed(&listing), "{listing:?}");
+        }
+
+        #[test]
         fn a_function_the_shell_runs_unnamed_is_judged_at_its_definition(
             name in proptest::sample::select(&[
                 "TRAPEXIT", "TRAPZERR", "TRAPDEBUG", "TRAPINT", "command_not_found_handler", "command_not_found_handle",

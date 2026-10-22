@@ -95,8 +95,11 @@ fn begin_resolving(name: &str) -> Option<ResolveScope> {
 /// unpinnable). The shadow is UNCONDITIONAL: a body we cannot attribute, or a resolution blocked by
 /// recursion, depth or budget, denies and never falls through to the real command. Otherwise
 /// `…512 calls…; ls(){ rm -rf /; }; ls` would exhaust the budget and then run the real `ls`.
+///
+/// A call to `alias` that defines one denies too: an alias rebinds a name for every later line,
+/// and zsh's global ones (`alias -g`) any word at all, which no call here can see. Listing does not.
 pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
-    if body_unknown(name) {
+    if body_unknown(name) || (name == "alias" && defines_an_alias(cmd)) {
         return Some(Verdict::Denied);
     }
     let body = lookup_function(name)?;
@@ -140,4 +143,12 @@ fn runs_unnamed(name: &str) -> bool {
                 | "zshaddhistory"
                 | "zsh_directory_name"
         )
+}
+
+/// Whether an `alias` call defines one: an argument holding `=`, or one we cannot read.
+fn defines_an_alias(cmd: &SimpleCmd) -> bool {
+    cmd.words[1..].iter().any(|w| {
+        let value = super::check::certain_value(w);
+        value == super::scope_budget::UNCERTAIN_VALUE || value.contains('=')
+    })
 }
