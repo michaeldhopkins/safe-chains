@@ -43,8 +43,14 @@ pub(super) fn lookup_function(name: &str) -> Option<Script> {
     FUNCTIONS.with(|f| f.borrow().iter().rev().find(|(n, _)| n == name).map(|(_, b)| b.clone()))
 }
 
+/// Called as an outermost scope walk starts: what one command redefined is no fact about the next.
+/// Never from a nested walk, whose caller still relies on the marks (`bash -c` inside a command).
+pub(super) fn forget_poisoned_functions() {
+    POISONED_FUNCS.with(|p| p.borrow_mut().clear());
+}
+
 /// Mark `name`'s body unknown for the rest of this evaluation. Not scoped by a guard: the shell's
-/// redefinition is not scoped either, and every classification starts with a fresh thread-local.
+/// redefinition is not scoped either, and the outermost scope walk clears the list.
 pub(super) fn poison_function(name: String) {
     POISONED_FUNCS.with(|p| p.borrow_mut().push(name));
 }

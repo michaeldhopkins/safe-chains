@@ -58,6 +58,7 @@ impl ScopeWalk {
         if top {
             SCOPE_BINDINGS.with(|c| c.set(0));
             SCOPE_SPENT.with(|s| s.set(false));
+            super::check::forget_poisoned_functions();
         }
         ScopeWalk
     }

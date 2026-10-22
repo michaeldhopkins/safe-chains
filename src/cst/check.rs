@@ -1,7 +1,7 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
 use super::functions::{FuncScope, begin_resolving, define_function};
-pub(super) use super::functions::{lookup_function, poison_function};
+pub(super) use super::functions::{forget_poisoned_functions, lookup_function, poison_function};
 pub(super) use super::scope_budget::scope_budget_spent;
 use super::scope_budget::{ScopeWalk, UNCERTAIN_VALUE, rebind_uncertain};
 use super::*;

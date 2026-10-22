@@ -663,6 +663,21 @@ mod resolution {
         assert!(allowed("ls; ls(){ rm -rf /; }"), "ls before its definition is the real ls");
     }
 
+    proptest::proptest! {
+        /// Each classification starts with no function marked unknown. A name redefined inside a
+        /// compound stayed marked for the life of the thread, so in a long-lived process every later
+        /// command calling that name was refused, whatever its own definition said.
+        #[test]
+        fn a_redefinition_in_one_command_does_not_reach_the_next(name in "fn_[a-z]{1,6}") {
+            let plain = format!("{name}() {{ echo hi; }}; {name}");
+            proptest::prop_assert!(allowed(&plain), "{plain}");
+            let _ = allowed(&format!("if true; then {name}() {{ echo hi; }}; fi; {name}"));
+            proptest::prop_assert!(allowed(&plain), "{plain} after a redefinition in an earlier command");
+            let nested = format!("{name}() {{ echo hi; }}; if true; then {name}() {{ rm -rf /; }}; fi; bash -c 'echo hi'; {name}");
+            proptest::prop_assert!(!allowed(&nested), "a nested classification forgot the redefinition: {nested}");
+        }
+    }
+
     #[test]
     fn call_resolves_body_and_binds_args() {
         let _w = workspace();
