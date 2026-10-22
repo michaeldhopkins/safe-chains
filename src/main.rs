@@ -124,11 +124,11 @@ fn run_explain(
 
 fn names_the_place(reason: &safe_chains::ReachReason) -> bool {
     use safe_chains::ReachReason::{
-        Credential, ForeignTemp, FrozenSystemIntegrity, FrozenTrustFile, FrozenTrustRoot, OutsideWorkspace, RawDevice, RepositorySnapshot,
-        Unconfined,
+        Credential, ForeignTemp, FrozenSystemIntegrity, FrozenTrustFile, FrozenTrustRoot, OtherUsersHome, OutsideWorkspace, RawDevice,
+        RepositorySnapshot, Unconfined,
     };
     match reason {
-        Credential | FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity | RawDevice => true,
+        Credential | OtherUsersHome | FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity | RawDevice => true,
         ForeignTemp | OutsideWorkspace | Unconfined | RepositorySnapshot => false,
     }
 }

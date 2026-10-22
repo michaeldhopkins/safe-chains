@@ -182,7 +182,8 @@ impl Fix {
             Fix::Nothing(because) => {
                 let by_hand = matches!(
                     because,
-                    Because::ProtectedPath { reason: ReachReason::Credential | ReachReason::RawDevice, .. } | Because::RunsLater { .. }
+                    Because::ProtectedPath { reason: ReachReason::Credential | ReachReason::OtherUsersHome | ReachReason::RawDevice, .. }
+                        | Because::RunsLater { .. }
                 );
                 let rewrite = matches!(because, Because::ProtectedPath { reason: ReachReason::RepositorySnapshot, .. });
                 let (lead, close) = if rewrite {
@@ -214,6 +215,10 @@ impl Because {
                 match reason {
                     ReachReason::Credential => format!(
                         "`{shown}` holds credentials, so neither `safe-chains config` nor its MCP tools will grant it. \
+                         A grant you write into ~/.config/safe-chains.toml by hand would. That is the user's decision, not an agent's."
+                    ),
+                    ReachReason::OtherUsersHome => format!(
+                        "`{shown}` is in another user's home folder, so neither `safe-chains config` nor its MCP tools will grant it. \
                          A grant you write into ~/.config/safe-chains.toml by hand would. That is the user's decision, not an agent's."
                     ),
                     ReachReason::RawDevice => format!(

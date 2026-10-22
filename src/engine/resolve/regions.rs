@@ -869,7 +869,7 @@ fn other_user_home_role(path: &str) -> Option<Role> {
 /// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
 /// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
 /// `canonicalize` has already folded it to `~/…`.
-fn absolute_other_home(path: &str) -> bool {
+pub(crate) fn absolute_other_home(path: &str) -> bool {
     let home = std::env::var("HOME").unwrap_or_default();
     let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
     // Both conventional roots, not just this host's: the classifier reads strings, and a Linux

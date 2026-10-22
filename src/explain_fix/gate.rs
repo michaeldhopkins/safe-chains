@@ -86,6 +86,7 @@ pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_
 fn is_boundary_reason(reason: ReachReason) -> bool {
     match reason {
         ReachReason::Credential
+        | ReachReason::OtherUsersHome
         | ReachReason::RawDevice
         | ReachReason::FrozenTrustFile
         | ReachReason::FrozenTrustRoot

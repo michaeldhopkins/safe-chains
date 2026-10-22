@@ -144,8 +144,10 @@ fn suggest_offers_the_snapshot_flag_only_where_the_flag_would_be_approved() {
     assert!(paranoid.contains("No grant changes this"), "{paranoid}");
 }
 
-const KNOWN_PLACES: &[&str] =
-    &[", a credential store", ", a raw device", "safe-chains reads its own permissions", "decides who may log in"];
+const KNOWN_PLACES: &[&str] = &[
+    ", a credential store", "inside another user's home folder", ", a raw device", "safe-chains reads its own permissions",
+    "decides who may log in",
+];
 
 const REACHES_A_KNOWN_PLACE: &[&str] = &[
     "cat ~/.ssh/id_rsa", "cat ~/.aws/credentials", "cat ~/.gnupg/secring.gpg", "cat /etc/shadow", "cat ~root/.bashrc",

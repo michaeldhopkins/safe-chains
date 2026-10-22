@@ -8,6 +8,10 @@ use crate::{pathctx, sanitize_display};
 pub enum ReachReason {
     /// A known credential store (`.ssh`, `.aws`, keychain…).
     Credential,
+    /// A place in another user's home folder that is not a credential store. It is kept as private
+    /// as one, but calling a source checkout "a credential store" is false, and the usual cause is
+    /// a command copied from someone else's machine.
+    OtherUsersHome,
     /// A file safe-chains reads its OWN permissions from (`~/.config/safe-chains.toml`,
     /// `~/.claude/settings.json`). Distinct from `OutsideWorkspace` because the generic remedy
     /// there — grant the path — is not merely unhelpful but FALSE: the write face is frozen, so
@@ -65,7 +69,7 @@ impl ReachReason {
     pub fn grant_helps(self) -> bool {
         match self {
             // A grant that NAMES the store clears the shield for reading it.
-            ReachReason::Credential | ReachReason::RawDevice => true,
+            ReachReason::Credential | ReachReason::OtherUsersHome | ReachReason::RawDevice => true,
             // "That IS my working directory" is the usual answer here.
             ReachReason::ForeignTemp | ReachReason::OutsideWorkspace => true,
             // Frozen faces stay frozen however specifically they are named: an agent that can edit
@@ -90,6 +94,12 @@ impl ReachReason {
                  one. If that was not intended, stop it. If you do want to allow it, name that path \
                  in ~/.config/safe-chains.toml. A grant on a parent directory does not reach a \
                  credential store"
+            ),
+            ReachReason::OtherUsersHome => format!(
+                "it reaches `{path}`, inside another user's home folder. safe-chains treats \
+                 everything there as that user's private files. If the path came from someone \
+                 else's machine, change it to the same place on this one. If you do want to allow \
+                 it, name that path in ~/.config/safe-chains.toml"
             ),
             ReachReason::RawDevice => format!(
                 "it reaches `{path}`, a raw device. Reading one is not reading a file — a disk \
@@ -144,6 +154,37 @@ impl ReachReason {
     }
 }
 
+/// What a path's leading `~word` stands for.
+enum Tilde {
+    /// Another user's home: the same place under ours (`~/rest` for `/Users/someone/rest` or
+    /// `~someone/rest`), so a refusal can tell a store of theirs (`.ssh`) from an ordinary folder.
+    Theirs(String),
+    /// `~ourname/rest`, which is `~/rest`.
+    Ours(String),
+    /// The directory stack's `~+`, `~-` and `~2`, whose value the line does not show.
+    Stack,
+}
+
+fn tilde_of(path: &str) -> Option<Tilde> {
+    let own = |rest: &str| if rest.is_empty() { "~".to_string() } else { format!("~/{rest}") };
+    if let Some(named) = path.strip_prefix('~').filter(|r| !r.is_empty() && !r.starts_with('/')) {
+        let (user, rest) = named.split_once('/').unwrap_or((named, ""));
+        let home = std::env::var("HOME").unwrap_or_default();
+        let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
+        Some(if user == ours {
+            Tilde::Ours(own(rest))
+        } else if user.starts_with(['+', '-']) || user.bytes().all(|b| b.is_ascii_digit()) {
+            Tilde::Stack
+        } else {
+            Tilde::Theirs(own(rest))
+        })
+    } else if crate::engine::resolve::regions::absolute_other_home(path) {
+        Some(Tilde::Theirs(own(path.splitn(4, '/').nth(3).unwrap_or(""))))
+    } else {
+        None
+    }
+}
+
 pub(crate) fn classify(resolved: &str) -> ReachReason {
     // Asked on the LITERAL structure, so an interpolated component cannot strip the credential
     // warning off a path that plainly names one. `cat ~/.ssh/$(id)` was reported as merely
@@ -156,7 +197,15 @@ pub(crate) fn classify(resolved: &str) -> ReachReason {
     // "grant that path" while meaning the ordinary parent-directory grant, which is exactly
     // the form a credential store does not accept. The Credential arm spells out the
     // difference instead.
-    if crate::engine::resolve::names_credential_store(resolved) {
+    let theirs = match tilde_of(resolved) {
+        Some(Tilde::Ours(own)) => return classify(&own),
+        Some(Tilde::Stack) => return ReachReason::Unconfined,
+        Some(Tilde::Theirs(own)) => Some(own),
+        None => None,
+    };
+    if theirs.as_deref().is_some_and(|own| !crate::engine::resolve::names_credential_store(own)) {
+        ReachReason::OtherUsersHome
+    } else if crate::engine::resolve::names_credential_store(resolved) {
         ReachReason::Credential
     } else if let Some(kind) = crate::engine::resolve::frozen_write_kind(resolved) {
         // Ahead of Unconfined and OutsideWorkspace for the same reason Credential is: both of
@@ -201,6 +250,7 @@ pub(crate) mod tests {
 
     pub(crate) const ALL: &[ReachReason] = &[
         ReachReason::Credential,
+        ReachReason::OtherUsersHome,
         ReachReason::FrozenTrustFile,
         ReachReason::FrozenTrustRoot,
         ReachReason::FrozenSystemIntegrity,
@@ -219,6 +269,49 @@ pub(crate) mod tests {
                 prop_assert_eq!(text.lines().count(), 1, "{:?}: {}", reason, text);
                 prop_assert!(text.contains(&crate::sanitize_display(&path)), "{:?}: {}", reason, text);
             }
+        }
+
+        /// A place in another user's home is a credential store exactly when the same place in ours
+        /// would be one, and otherwise it is that user's home, under either spelling of it.
+        #[test]
+        fn another_users_home_is_a_credential_store_only_where_ours_would_be(
+            user in "zz[a-z]{1,6}",
+            rest in proptest::sample::select(vec![
+                "", "Source/headmaster", "notes.txt", ".bashrc", ".ssh", ".ssh/id_rsa", ".aws/credentials",
+                ".gnupg/secring.gpg", "Library/Keychains/login.keychain-db", "projects/x/.env",
+            ]),
+            root in proptest::sample::select(vec!["/Users", "/home"]),
+        ) {
+            let tail = if rest.is_empty() { String::new() } else { format!("/{rest}") };
+            let own = if rest.is_empty() { "~".to_string() } else { format!("~/{rest}") };
+            let expected = if crate::engine::resolve::names_credential_store(&own) {
+                ReachReason::Credential
+            } else {
+                ReachReason::OtherUsersHome
+            };
+            for path in [format!("{root}/{user}{tail}"), format!("~{user}{tail}")] {
+                prop_assert_eq!(super::classify(&path), expected, "{}", path);
+            }
+        }
+
+        /// Our own name after `~` is explained as `~` itself, and the directory stack's `~+`, `~-`
+        /// and `~N` as a value the line does not show: neither is another user, nor a credential
+        /// store merely for being spelt with a tilde.
+        #[test]
+        fn a_tilde_that_names_us_or_the_directory_stack_is_no_other_users_home(
+            prefix in proptest::sample::select(vec!["ours", "+", "-", "+1", "-2", "3"]),
+            rest in proptest::sample::select(vec!["", "notes.txt", "Source/x", ".ssh/id_rsa"]),
+        ) {
+            let home = std::env::var("HOME").unwrap_or_default();
+            let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
+            prop_assume!(!ours.is_empty());
+            let tail = if rest.is_empty() { String::new() } else { format!("/{rest}") };
+            let (path, expected) = if prefix == "ours" {
+                (format!("~{ours}{tail}"), super::classify(&format!("~{tail}")))
+            } else {
+                (format!("~{prefix}{tail}"), ReachReason::Unconfined)
+            };
+            prop_assert_eq!(super::classify(&path), expected, "{}", path);
         }
 
         #[test]

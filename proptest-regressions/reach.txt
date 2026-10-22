@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc ca596787da159a4b589a3af140509982d750275c3a6a7ca28b76805702d8580b # shrinks to path = "~"
+cc 563bf847d7401468e5f7f24c623bb32b3d2e59070012312947edbb17379299b3 # shrinks to user = "zza", rest = "projects/x/.env", root = "/Users"

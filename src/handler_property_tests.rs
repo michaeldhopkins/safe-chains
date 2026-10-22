@@ -2193,7 +2193,7 @@ fn every_actionable_reach_reason_names_a_remedy() {
     /// cheapest thing that makes the claim true.
     fn owed(r: ReachReason) -> Remedy {
         match r {
-            Credential | ForeignTemp | OutsideWorkspace | RawDevice => Remedy::Grant,
+            Credential | OtherUsersHome | ForeignTemp | OutsideWorkspace | RawDevice => Remedy::Grant,
             FrozenTrustFile | FrozenTrustRoot | FrozenSystemIntegrity => Remedy::Manual,
             RepositorySnapshot => Remedy::ReadFlag,
             Unconfined => Remedy::Respell,
