@@ -87,7 +87,7 @@ fn run_explain(
     // unknown folder at `reads`) refuses was explained as approved.
     let uncapped = explanation.overall;
     let explanation = folder_cli::under_threshold(explanation, threshold);
-    print!("{}", explanation.render());
+    print!("{}", explanation.render_for_person());
     // The facet breakdown is CLI-only. `render()` also feeds the hook's injected context, where an
     // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
     // cannot act on. Someone who typed `--explain` is asking why, so they get why.

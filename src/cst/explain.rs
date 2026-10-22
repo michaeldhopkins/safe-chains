@@ -283,9 +283,23 @@ impl Explanation {
         denied > 0 && denied < total
     }
 
-    /// A model- and human-readable breakdown: which segments auto-approve, which
-    /// don't, and what to actually do about it.
+    /// The breakdown an agent reads after the hook let a chain through: which segments
+    /// auto-approve, which don't, and the chaining lesson for next time.
     pub fn render(&self) -> String {
+        let mut out = self.render_for_person();
+        if self.parsed
+            && let (total, denied) = self.counts()
+            && let Some(tip) = self.guidance(total, denied)
+        {
+            out.push_str(tip);
+            out.push('\n');
+        }
+        out
+    }
+
+    /// The same breakdown for a person who ran `--explain`, without the lesson addressed to an
+    /// agent whose command has already run.
+    pub fn render_for_person(&self) -> String {
         if !self.parsed {
             return "safe-chains: could not parse this command, so it will not be auto-approved.\n".to_string();
         }
@@ -298,10 +312,6 @@ impl Explanation {
         out.push_str(&header(total, denied));
         for s in &self.segments {
             out.push_str(&render_line(s));
-        }
-        if let Some(tip) = self.guidance(total, denied) {
-            out.push_str(tip);
-            out.push('\n');
         }
         out
     }

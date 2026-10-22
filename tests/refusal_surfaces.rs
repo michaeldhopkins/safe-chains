@@ -233,6 +233,24 @@ fn which_place_the_why_line_names_follows_the_order_of_the_paths() {
     );
 }
 
+const GUIDANCE_BRANCHES: &[&str] = &["cat /etc/shadow && cat /etc/shadow", "cd /tmp && cat /etc/shadow", "ls && cat /etc/shadow"];
+
+const AGENT_LESSONS: &[&str] = &["This is not a block", "already run", "Next time", "Bundling them", "Nothing to change"];
+
+#[test]
+fn explain_keeps_the_lessons_addressed_to_an_agent_out_of_what_a_person_reads() {
+    let home = bare_home();
+    for command in GUIDANCE_BRANCHES {
+        let agent = safe_chains::cst::explain(command).render();
+        assert!(agent.contains("This is not a block"), "`{command}` no longer reaches a guidance branch:\n{agent}");
+        let person = run(&["--explain", command], home.path(), None);
+        assert!(person.contains("did not auto-approve"), "`{command}` printed no verdict:\n{person}");
+        for lesson in AGENT_LESSONS {
+            assert!(!person.contains(lesson), "`--explain` on `{command}` tells a person `{lesson}`:\n{person}");
+        }
+    }
+}
+
 #[test]
 fn explain_settles_the_snapshot_reason_the_way_suggest_does() {
     let home = bare_home();
