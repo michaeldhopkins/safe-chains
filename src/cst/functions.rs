@@ -2,7 +2,7 @@
 
 use super::classify_budget::charge_classify_work;
 use super::{Script, SimpleCmd};
-use crate::verdict::Verdict;
+use crate::verdict::{SafetyLevel, Verdict};
 
 thread_local! {
     /// Functions DEFINED so far in the current classification, so a later call resolves to its body
@@ -114,4 +114,30 @@ pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
 /// Whether a definition so far rebinds `name`, its body known or not.
 pub(crate) fn names_a_function(name: &str) -> bool {
     body_unknown(name) || FUNCTIONS.with(|f| f.borrow().iter().any(|(n, _)| n == name))
+}
+
+/// Defining a function has NO effect, so a definition is Inert regardless of its body, which is
+/// judged only when the function is CALLED (`call_verdict`). A name the shell itself calls is the
+/// exception: its definition is judged as a call, since nothing else in the line need name it.
+pub(super) fn definition_verdict(name: &str, body: &Script) -> Verdict {
+    if runs_unnamed(name) { super::check::script_verdict(body) } else { Verdict::Allowed(SafetyLevel::Inert) }
+}
+
+/// A function the shell runs by its name alone: zsh's signal and exit traps (`TRAPEXIT`,
+/// `TRAPZERR`, `TRAPDEBUG` after every command), its hook functions, and both shells'
+/// command-not-found handlers.
+fn runs_unnamed(name: &str) -> bool {
+    name.starts_with("TRAP")
+        || matches!(
+            name,
+            "command_not_found_handler"
+                | "command_not_found_handle"
+                | "chpwd"
+                | "precmd"
+                | "preexec"
+                | "periodic"
+                | "zshexit"
+                | "zshaddhistory"
+                | "zsh_directory_name"
+        )
 }

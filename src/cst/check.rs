@@ -444,10 +444,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             v
         }
-        // Defining a function has NO effect — Inert regardless of the body. The body's safety is
-        // evaluated only when the function is CALLED (resolved in `simple_verdict`), so an UNCALLED
-        // definition never denies on its body.
-        Cmd::FunctionDef { .. } => Verdict::Allowed(SafetyLevel::Inert),
+        Cmd::FunctionDef { name, body } => super::functions::definition_verdict(name, body),
     }
 }
 

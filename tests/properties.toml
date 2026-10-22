@@ -59,7 +59,11 @@ owed = [
   "src/handler_property_tests.rs::a_flanked_atom_never_moves_where_the_write_lands",
   "src/handler_property_tests.rs::an_unflanked_atom_is_never_admitted",
 ]
-"src/cst/functions.rs" = ["src/cst/proptests.rs::a_redefinition_in_one_command_does_not_reach_the_next"]
+"src/cst/functions.rs" = [
+  "src/cst/proptests.rs::a_redefinition_in_one_command_does_not_reach_the_next",
+  "src/cst/proptests.rs::a_call_whose_body_is_unknown_never_runs_the_command_it_shadows",
+  "src/cst/proptests.rs::a_function_the_shell_runs_unnamed_is_judged_at_its_definition",
+]
 "src/cst/explain.rs" = [
   "src/handler_property_tests.rs::explain_agrees_with_enforcement_whatever_the_call_order",
   "src/handler_property_tests.rs::command_text_cannot_forge_a_segment_line",

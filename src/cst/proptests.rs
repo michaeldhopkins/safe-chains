@@ -678,6 +678,22 @@ mod resolution {
         }
 
         #[test]
+        fn a_function_the_shell_runs_unnamed_is_judged_at_its_definition(
+            name in proptest::sample::select(&[
+                "TRAPEXIT", "TRAPZERR", "TRAPDEBUG", "TRAPINT", "command_not_found_handler", "command_not_found_handle",
+                "chpwd", "precmd", "preexec", "periodic", "zshexit", "zshaddhistory", "zsh_directory_name",
+            ][..]),
+            keyword in proptest::prelude::any::<bool>(),
+        ) {
+            let _w = workspace();
+            let head = if keyword { format!("function {name}") } else { format!("{name}()") };
+            let line = format!("{head} {{ rm -rf /; }}");
+            proptest::prop_assert!(!allowed(&line), "{line}");
+            let quiet = format!("{head} {{ echo bye; }}");
+            proptest::prop_assert!(allowed(&quiet), "{quiet}");
+        }
+
+        #[test]
         fn a_redirect_written_on_a_function_body_applies_to_each_call(
             target in proptest::sample::select(&["~/.bashrc", "/etc/passwd", "~/.ssh/authorized_keys"][..]),
             op in proptest::sample::select(&[">", ">>"][..]),
