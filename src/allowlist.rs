@@ -1,8 +1,13 @@
 use std::collections::HashSet;
 use std::path::Path;
 
-use crate::cst::{Cmd, check};
+use std::cell::RefCell;
+use std::rc::Rc;
 
+use crate::cst::{Cmd, SimpleCmd, check};
+use crate::verdict::{SafetyLevel, Verdict};
+
+#[derive(Clone)]
 pub struct Matcher {
     exact: HashSet<String>,
     globs: Vec<Vec<String>>,
@@ -99,12 +104,20 @@ impl Matcher {
     }
 
     pub fn matches_cmd(&self, cmd: &Cmd) -> bool {
-        let Cmd::Simple(simple) = cmd else {
-            return false;
-        };
+        matches!(cmd, Cmd::Simple(simple) if self.matches(simple))
+    }
+
+    /// A rule covers a call only to the program it names: never one an earlier definition rebound
+    /// (`mkdir(){ rm -rf ~; }; mkdir x`), and never one carrying a substitution or a redirect the
+    /// built-in rules refuse, which run or write something the rule does not describe.
+    fn covers(&self, cmd: &SimpleCmd) -> bool {
+        cmd.words.first().is_some_and(|name| !check::names_a_function(&name.eval())) && !check::has_unsafe_syntax(cmd) && self.matches(cmd)
+    }
+
+    fn matches(&self, simple: &SimpleCmd) -> bool {
         // `None` = no unambiguous rendering (an env value with whitespace); such a command matches
         // no rule, rather than matching one it could be confused with.
-        let Some(normalized) = check::normalize_for_matching(simple) else {
+        let Some(normalized) = normalize_for_matching(simple) else {
             return false;
         };
         let normalized = canonicalize_home(normalized.trim(), &self.home);
@@ -137,10 +150,107 @@ impl Matcher {
 const TEST_HOME: &str = "/home/tester";
 
 pub fn is_cmd_covered(cmd: &Cmd, patterns: &Matcher) -> bool {
-    match cmd {
-        Cmd::Simple(_) => check::is_safe_cmd(cmd) || (!check::has_unsafe_syntax(cmd) && patterns.matches_cmd(cmd)),
-        _ => check::is_safe_cmd(cmd),
+    let _rules = in_force(patterns);
+    check::is_safe_cmd(cmd)
+}
+
+thread_local! {
+    /// The user's rules while a command they may cover is judged. Held for the whole judgement, so a
+    /// rule reaches each simple command where the shell runs it: inside a group, a loop, a branch or a
+    /// called function, with the `cd`, variables and definitions of the statements before it in scope.
+    static IN_FORCE: RefCell<Option<Rc<Matcher>>> = const { RefCell::new(None) };
+}
+
+pub(crate) struct RulesScope(Option<Rc<Matcher>>);
+
+impl Drop for RulesScope {
+    fn drop(&mut self) {
+        let previous = self.0.take();
+        IN_FORCE.with(|rules| *rules.borrow_mut() = previous);
     }
+}
+
+fn install(rules: Option<Rc<Matcher>>) -> RulesScope {
+    RulesScope(IN_FORCE.with(|current| current.replace(rules)))
+}
+
+pub(crate) fn in_force(patterns: &Matcher) -> RulesScope {
+    install(Some(Rc::new(patterns.clone())))
+}
+
+/// No rule applies to a command handed to another program as a string (`bash -c`, `find -exec`), or
+/// to the probes a handler builds to ask about a shape. The user's rule names a command they type,
+/// and Claude Code's own matcher never looks inside those either.
+pub(crate) fn suspended() -> RulesScope {
+    install(None)
+}
+
+/// Judges a command substitution with no rule in force. Its output becomes words of the command
+/// around it, and a rule names the command it covers, not what another command's words come from:
+/// `Bash(*)` never covered `echo $(rm -rf /)`.
+pub(crate) fn outside_rules<T>(judge: impl FnOnce() -> T) -> T {
+    let _rules = suspended();
+    judge()
+}
+
+/// A simple command's verdict, lifted to `SafeWrite` when a rule in force covers what built-in
+/// knowledge refused.
+///
+/// `SafeWrite`, the TOP of the auto-approve band — not `Inert`. A `permissions.allow` rule says the
+/// user accepts this command. It does NOT say the command is inert, and claiming so was a lie with
+/// teeth: `Inert` is the bottom of the ordering, so it cleared every threshold and a `Bash(rm:*)`
+/// rule out-ranked even `--level paranoid`. Granting at the band's top keeps the rule honoured
+/// wherever the band is while letting a stricter level clamp it.
+pub(crate) fn with_rules(cmd: &SimpleCmd, builtin: impl FnOnce(&SimpleCmd) -> Verdict) -> Verdict {
+    let verdict = builtin(cmd);
+    // Cloned out first: rendering the command can classify again, and that installs rules of its own.
+    if verdict.is_allowed() || !IN_FORCE.with(|rules| rules.borrow().clone()).is_some_and(|rules| rules.covers(cmd)) {
+        return verdict;
+    }
+    Verdict::Allowed(SafetyLevel::SafeWrite)
+}
+
+/// A command rendered for comparison against the user's own `Bash(...)` allow-rules.
+///
+/// Includes the LEADING ENV ASSIGNMENTS. Dropping them meant a rule written for one command
+/// silently covered a different one: `Bash(~/runner-scripts/x.sh:*)` matched
+/// `WRITE=1 ~/runner-scripts/x.sh`, so a rule intended for a dry run pre-approved the mutating run.
+/// The user had even written separate `Bash(WRITE=1 …)` entries — necessary at the harness's own
+/// matcher, and quietly redundant here.
+///
+/// The rule must describe the command as TYPED. That is not a judgement about which variable names
+/// are dangerous (nothing here knows `LD_PRELOAD` from `NODE_ENV`) — it is only the requirement that
+/// an allow-rule cover what it claims to. A command carrying an assignment therefore matches only a
+/// rule that carries it too, and otherwise falls through to the harness's normal approval flow.
+///
+/// This is the USER-ALLOWLIST path alone. safe-chains' own knowledge of a command is consulted
+/// first and short-circuits before reaching here, so `LD_PRELOAD=… ls` is unaffected — see
+/// `docs/design/env-prefix-classification.md` for that separate, unfixed hole.
+/// `None` when the command cannot be rendered UNAMBIGUOUSLY, which callers must treat as "matches
+/// nothing".
+///
+/// An env value containing whitespace has no unambiguous flat rendering: `WRITE='1 script.sh' rm
+/// -rf /` and `WRITE=1 script.sh rm -rf /` produce the same string, but the first runs `rm` and the
+/// second runs `script.sh`. Since assignments sit BEFORE the program name, a value that swallows
+/// the rest of a pattern lets a rule for one program match a different one —
+/// `Bash(WRITE=1 script.sh:*)` would match `WRITE='1 script.sh' rm -rf /`. Refusing to render is the
+/// only honest answer; the alternative is a rule that silently covers a program it never named.
+///
+/// Words with whitespace are NOT refused: `git commit -m 'a message'` is ordinary and a rule like
+/// `Bash(git commit -m:*)` should keep covering it. A quoted word can shift an argument boundary,
+/// which is a pre-existing looseness of this matcher, but it cannot change which program runs —
+/// the program is the first word either way.
+fn normalize_for_matching(cmd: &SimpleCmd) -> Option<String> {
+    let mut parts = Vec::with_capacity(cmd.env.len() + cmd.words.len());
+    for (name, value) in &cmd.env {
+        let value = value.eval();
+        if value.chars().any(char::is_whitespace) {
+            return None;
+        }
+        parts.push(format!("{name}={value}"));
+    }
+    parts.extend(cmd.words.iter().map(|w| w.eval()));
+    Some(parts.join(" "))
 }
 
 fn glob_matches(parts: &[String], text: &str) -> bool {
@@ -361,7 +471,7 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./script.sh *)");
         let c = cmd("./script.sh > /etc/passwd");
-        assert!(check::has_unsafe_syntax(&c));
+        assert!(matches!(&c, Cmd::Simple(s) if check::has_unsafe_syntax(s)));
         assert!(!is_covered(&c, &p));
     }
 
@@ -454,7 +564,7 @@ mod tests {
         p.add_pattern("Bash(bash *)");
         let c = cmd("bash -c 'safe-cmd && rm -rf /'");
         assert!(!check::is_safe_cmd(&c));
-        assert!(!check::has_unsafe_syntax(&c));
+        assert!(matches!(&c, Cmd::Simple(s) if !check::has_unsafe_syntax(s)));
         assert!(is_covered(&c, &p));
     }
 
@@ -782,3 +892,6 @@ mod env_prefix_matching_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod rule_scope_tests;

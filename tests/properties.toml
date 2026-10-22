@@ -536,6 +536,7 @@ owed = [
 "src/userconfig/mod.rs" = "reads and writes ~/.config/safe-chains.toml"
 
 [test_only]
+"src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"

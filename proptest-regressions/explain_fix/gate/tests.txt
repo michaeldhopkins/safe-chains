@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f698bb226ac3a29ac8611cb20ffc181cc08d876d9c7bc1a207c3c7d274d3fb59 # shrinks to a = "zzgatetool sync --dry-run", b = "echo hi > $(zzgen)", op = "&&", boundary_first = false

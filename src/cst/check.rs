@@ -1,5 +1,6 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
+pub(crate) use super::functions::names_a_function;
 use super::functions::{FuncScope, define_function};
 pub(super) use super::functions::{forget_poisoned_functions, lookup_function, poison_function};
 pub(super) use super::scope_budget::scope_budget_spent;
@@ -10,6 +11,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 use crate::{handlers, pathctx::judging};
 
 pub fn command_verdict(input: &str) -> Verdict {
+    let _rules = crate::allowlist::suspended();
     let Some(_guard) = ClassifyGuard::enter(input.len()) else {
         return Verdict::Denied; // classification budget spent — fail closed
     };
@@ -389,63 +391,17 @@ pub fn is_safe_pipeline(pipeline: &Pipeline) -> bool {
     pipeline_verdict(pipeline).is_allowed()
 }
 
-pub(crate) fn has_unsafe_syntax(cmd: &Cmd) -> bool {
-    match cmd {
-        Cmd::Simple(s) => !check_redirects(&s.redirs) || has_any_substitution(s),
-        _ => true,
-    }
+pub(crate) fn has_unsafe_syntax(cmd: &SimpleCmd) -> bool {
+    !check_redirects(&cmd.redirs) || has_any_substitution(cmd)
 }
 
 fn has_any_substitution(cmd: &SimpleCmd) -> bool {
     cmd.words.iter().any(has_substitution) || cmd.env.iter().any(|(_, v)| has_substitution(v))
 }
 
-/// A command rendered for comparison against the user's own `Bash(...)` allow-rules.
-///
-/// Includes the LEADING ENV ASSIGNMENTS. Dropping them meant a rule written for one command
-/// silently covered a different one: `Bash(~/runner-scripts/x.sh:*)` matched
-/// `WRITE=1 ~/runner-scripts/x.sh`, so a rule intended for a dry run pre-approved the mutating run.
-/// The user had even written separate `Bash(WRITE=1 …)` entries — necessary at the harness's own
-/// matcher, and quietly redundant here.
-///
-/// The rule must describe the command as TYPED. That is not a judgement about which variable names
-/// are dangerous (nothing here knows `LD_PRELOAD` from `NODE_ENV`) — it is only the requirement that
-/// an allow-rule cover what it claims to. A command carrying an assignment therefore matches only a
-/// rule that carries it too, and otherwise falls through to the harness's normal approval flow.
-///
-/// This is the USER-ALLOWLIST path alone. safe-chains' own knowledge of a command is consulted
-/// first and short-circuits before reaching here, so `LD_PRELOAD=… ls` is unaffected — see
-/// `docs/design/env-prefix-classification.md` for that separate, unfixed hole.
-/// `None` when the command cannot be rendered UNAMBIGUOUSLY, which callers must treat as "matches
-/// nothing".
-///
-/// An env value containing whitespace has no unambiguous flat rendering: `WRITE='1 script.sh' rm
-/// -rf /` and `WRITE=1 script.sh rm -rf /` produce the same string, but the first runs `rm` and the
-/// second runs `script.sh`. Since assignments sit BEFORE the program name, a value that swallows
-/// the rest of a pattern lets a rule for one program match a different one —
-/// `Bash(WRITE=1 script.sh:*)` would match `WRITE='1 script.sh' rm -rf /`. Refusing to render is the
-/// only honest answer; the alternative is a rule that silently covers a program it never named.
-///
-/// Words with whitespace are NOT refused: `git commit -m 'a message'` is ordinary and a rule like
-/// `Bash(git commit -m:*)` should keep covering it. A quoted word can shift an argument boundary,
-/// which is a pre-existing looseness of this matcher, but it cannot change which program runs —
-/// the program is the first word either way.
-pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> Option<String> {
-    let mut parts = Vec::with_capacity(cmd.env.len() + cmd.words.len());
-    for (name, value) in &cmd.env {
-        let value = value.eval();
-        if value.chars().any(char::is_whitespace) {
-            return None;
-        }
-        parts.push(format!("{name}={value}"));
-    }
-    parts.extend(cmd.words.iter().map(|w| w.eval()));
-    Some(parts.join(" "))
-}
-
 pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
     match cmd {
-        Cmd::Simple(s) => simple_verdict(s),
+        Cmd::Simple(s) => crate::allowlist::with_rules(s, simple_verdict),
         Cmd::Subshell { body, redirs } | Cmd::BraceGroup { body, redirs } => {
             let body_v = script_verdict(body);
             if let Verdict::Denied = body_v {
@@ -501,7 +457,7 @@ pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
 
 fn part_sub_verdict(part: &WordPart) -> Verdict {
     match part {
-        WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => script_verdict(inner),
+        WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => crate::allowlist::outside_rules(|| script_verdict(inner)),
         WordPart::Backtick(raw) => command_verdict(&super::escape::backtick_command(raw)),
         WordPart::DQuote(inner) => word_sub_verdict(inner),
         // Arithmetic is inert, but a `$( )` inside it runs — judged, not skipped.

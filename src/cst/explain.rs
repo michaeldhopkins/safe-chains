@@ -1,6 +1,6 @@
 use super::check::{cmd_verdict, pipeline_verdict};
 use super::*;
-use crate::allowlist::{Matcher, is_cmd_covered};
+use crate::allowlist::Matcher;
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
@@ -34,18 +34,20 @@ pub struct SegmentReport {
 
 /// Explain against the built-in classification only.
 pub fn explain(input: &str) -> Explanation {
-    explain_inner(input, |_| false)
+    let _rules = crate::allowlist::suspended();
+    explain_inner(input)
 }
 
 /// Explain with the user's allowlist patterns overlaid, so a command the user
 /// has allowed isn't reported as not-auto-approved. This mirrors the hook's own
-/// coverage check (`main.rs`): a segment counts as allowed when it is built-in
-/// safe *or* every command in it is covered by the user's patterns.
+/// coverage check (`main.rs`): each simple command the shell runs, at any depth, counts as allowed
+/// when it is built-in safe *or* a user rule covers it (`allowlist::with_rules`).
 pub fn explain_with_coverage(input: &str, patterns: &Matcher) -> Explanation {
-    explain_inner(input, |cmd| is_cmd_covered(cmd, patterns))
+    let _rules = crate::allowlist::in_force(patterns);
+    explain_inner(input)
 }
 
-fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
+fn explain_inner(input: &str) -> Explanation {
     // ONE work budget for the whole explanation, taken the same way `command_verdict` takes it.
     //
     // Without this, explaining had no budget of its own: brace-expansion fan-out charged the shared
@@ -76,7 +78,7 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     // definitions), so each segment is judged in the context of the ones before it. Without this the
     // per-segment view — and the hook's coverage fallback built on it — would re-allow a call whose
     // definition shadows a builtin (`ls(){ rm; }; ls`) that the whole-command verdict denies.
-    let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, |stmt| segment_report(stmt, &covered));
+    let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, segment_report);
     // The scope walk exceeded its uncertain-binding budget: too much shell state to track, so the
     // command is refused — the same fail-closed call `command_verdict` makes, so the explanation
     // can never describe a more permissive verdict than the one enforced (the `explain_render`
@@ -98,8 +100,8 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
     Explanation { overall, segments, parsed: true, stateful }
 }
 
-fn segment_report(stmt: &Stmt, covered: &impl Fn(&Cmd) -> bool) -> SegmentReport {
-    let verdict = effective_verdict(&stmt.pipeline, covered);
+fn segment_report(stmt: &Stmt) -> SegmentReport {
+    let verdict = pipeline_verdict(&stmt.pipeline);
     // A culprit is suppressed when it would only repeat the segment's own name: for a lone SIMPLE
     // command the segment text already IS `cat ~/.ssh/id_rsa`, so labelling it `cat` says nothing.
     //
@@ -108,39 +110,12 @@ fn segment_report(stmt: &Stmt, covered: &impl Fn(&Cmd) -> bool) -> SegmentReport
     // the whole loop; what the caller has to change is the command inside it, and suppressing that
     // is how a third of the author's decision-log denials came to read "no reason recorded".
     let redundant_with_segment_text = matches!(stmt.pipeline.commands.as_slice(), [Cmd::Simple(_)]);
-    let culprit = if verdict.is_allowed() || redundant_with_segment_text { None } else { first_denied_label(&stmt.pipeline, covered) };
+    let culprit = if verdict.is_allowed() || redundant_with_segment_text { None } else { first_denied_label(&stmt.pipeline) };
     SegmentReport { text: stmt.pipeline.to_string(), verdict, culprit }
 }
 
-fn effective_verdict(pipeline: &Pipeline, covered: &impl Fn(&Cmd) -> bool) -> Verdict {
-    let base = pipeline_verdict(pipeline);
-    if base.is_allowed() {
-        return base;
-    }
-    if !pipeline.commands.is_empty() && pipeline.commands.iter().all(covered) {
-        // `SafeWrite`, the TOP of the auto-approve band — not `Inert`.
-        //
-        // A `permissions.allow` rule says the user accepts this command. It does NOT say the command
-        // is inert, and claiming so was a lie with teeth: `Inert` is the bottom of the ordering, so it
-        // cleared every threshold and a `Bash(rm:*)` rule out-ranked even `--level paranoid`. A
-        // ceiling a per-command rule can lift is not a ceiling.
-        //
-        // Granting at the band's top keeps the rule honoured wherever the band is (the default
-        // threshold IS `SafeWrite`, so ordinary use is unchanged) while letting a stricter level
-        // clamp it: `paranoid` and `reader` now refuse a covered command, which is what someone
-        // asking for a read-only plan meant. The grant widens what is allowed; it no longer escapes
-        // the ceiling the user stated.
-        return Verdict::Allowed(SafetyLevel::SafeWrite);
-    }
-    base
-}
-
-fn first_denied_label(pipeline: &Pipeline, covered: &impl Fn(&Cmd) -> bool) -> Option<String> {
-    pipeline
-        .commands
-        .iter()
-        .find(|c| !cmd_verdict(c).is_allowed() && !covered(c))
-        .and_then(command_label)
+fn first_denied_label(pipeline: &Pipeline) -> Option<String> {
+    pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(command_label)
 }
 
 /// The name to report as the culprit for a denied command.
@@ -218,10 +193,16 @@ fn first_denied_simple(cmd: &Cmd) -> Option<Vec<String>> {
 }
 
 fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
-    script
-        .0
-        .iter()
-        .find_map(|stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(first_denied_simple))
+    first_denied_in(script, first_denied_simple)
+}
+
+/// `describe` applied to the first command in `script` denied in the scope the statements before
+/// it leave, so a call to a function defined earlier in the body is judged as the function.
+fn first_denied_in<T>(script: &Script, describe: fn(&Cmd) -> Option<T>) -> Option<T> {
+    super::check::walk_with_scope(script, |stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(describe))
+        .into_iter()
+        .flatten()
+        .next()
 }
 
 /// The first command inside `script` that is denied on its own, by name.
@@ -231,10 +212,7 @@ fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
 /// subtree than the command containing it — which is the same property the classifier's own walk
 /// relies on.
 fn denied_label_in(script: &Script) -> Option<String> {
-    script
-        .0
-        .iter()
-        .find_map(|stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(command_label))
+    first_denied_in(script, command_label)
 }
 
 fn simple_cmd_name(s: &SimpleCmd) -> Option<String> {

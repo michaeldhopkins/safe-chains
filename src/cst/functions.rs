@@ -110,3 +110,8 @@ pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
         .collect();
     Some(super::netargs::with_args(cmd, || super::check::script_verdict(&body)))
 }
+
+/// Whether a definition so far rebinds `name`, its body known or not.
+pub(crate) fn names_a_function(name: &str) -> bool {
+    body_unknown(name) || FUNCTIONS.with(|f| f.borrow().iter().any(|(n, _)| n == name))
+}
