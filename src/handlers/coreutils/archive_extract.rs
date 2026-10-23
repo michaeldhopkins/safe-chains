@@ -2,9 +2,9 @@ use crate::parse::Token;
 
 /// Extraction writes the paths and modes the archive names, set-id bits among them, which
 /// nothing here can see without opening the archive. `tar x` and `unzip` are refused for that
-/// reason, so pax, cpio and ditto are refused the same way when they extract. Listing stays
+/// reason, so pax, cpio, ditto and xar are refused the same way when they extract. Listing stays
 /// approved, and so do their copy modes: those keep the modes of files already on disk. xar strips
-/// set-id bits unless told to keep them, so only that option is refused there.
+/// set-id bits unless told to keep them, but the archive still names the paths it writes.
 ///
 /// A letter that makes a line safe (pax's `-w`, cpio's `-t` and `--list`) counts only in front of
 /// the first operand. bsdcpio stops reading options there, and so does pax when POSIXLY_CORRECT is
@@ -44,7 +44,7 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
             let given = given();
             !(given.leading.contains('l') || given.long_leading.contains(&"--list-only"))
         }
-        "xar" => tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
+        "xar" => given().anywhere.contains('x') || tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
         _ => false,
     }
 }
@@ -66,6 +66,7 @@ impl<'a> Given<'a> {
             "pax" => &['B', 'E', 'G', 'T', 'U', 'b', 'f', 'o', 'p', 's', 'x'],
             "ptar" => &['T', 'f'],
             "cpio" => &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W', 'f'],
+            "xar" => &['C', 'f', 'n', 's'],
             _ => &[],
         };
         let mut given = Given {
@@ -141,7 +142,9 @@ mod tests {
         cpio_list_file_named_i: "cpio -t -F i",
         ditto_copy: "ditto ./src ./dst",
         ditto_archive: "ditto -c -k ./src ./out.zip",
-        xar_extract: "xar -x -f ./archive.xar",
+        xar_list: "xar -t -f ./archive.xar",
+        xar_create: "xar -c -f ./out.xar ./src",
+        xar_create_glued_archive: "xar -cf./out.xar ./src",
         ptar_list: "ptar -t -f ./a.tar",
         ptar_create: "ptar -c -f ./out.tar ./src",
         ptar_list_archive_named_x: "ptar -t -f x",
@@ -167,6 +170,13 @@ mod tests {
         ditto_extract_zip: "ditto -xk ./archive.zip ./out",
         ditto_extract_spaced: "ditto -x -k ./archive.zip ./out",
         xar_extract_keeping_set_id_bits: "xar -x --keep-setuid -f ./archive.xar",
+        xar_extract: "xar -x -f ./archive.xar",
+        xar_extract_cluster: "xar -xf ./archive.xar",
+        xar_extract_into_a_key_folder: "xar -x -f ./a.xar -C ~/.ssh",
+        xar_archives_a_key_folder: "xar -c -f ./a.xar ~/.ssh",
+        xar_writes_the_archive_over_a_login_file: "xar -c -f ~/.zshrc ./src",
+        xar_dumps_the_header_over_a_login_file: "xar -t -f ./a.xar --dump-toc=~/.zshrc",
+        xar_adds_a_key_as_a_subdocument: "xar -c -f ./a.xar -s ~/.ssh/id_rsa ./src",
         pax_extract_write_letter_after_a_pattern: "pax -r -f ./archive.tar '*' -w",
         pax_extract_write_letter_after_an_operand: "pax -r ./a -w ./b",
         ptar_extract: "ptar -x -f ./a.tar",

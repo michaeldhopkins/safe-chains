@@ -33,29 +33,39 @@ xar --help	denied
 xar --keep-existing	safe-write
 xar --keep-setuid	denied
 xar --link-same	safe-write
-xar --list-subdocs x	safe-write
+xar --list-subdocs	safe-write
 xar --no-compress x	safe-write
 xar --prop-exclude x	safe-write
 xar --prop-include x	safe-write
 xar --rsize x	safe-write
 xar --toc-cksum x	safe-write
 xar --version	denied
-xar -C	safe-write
+xar -C x	safe-write
 xar -P	safe-write
 xar -a	safe-write
 xar -c	safe-write
-xar -f	safe-write
+xar -c -f ./a.xar -s ~/.ssh/id_rsa ./src	denied
+xar -c -f ./a.xar ~/.ssh	denied
+xar -c -f ./out.xar ./src	safe-write
+xar -c -f ~/.zshrc ./src	denied
+xar -cf./out.xar ./src	safe-write
+xar -f x	safe-write
 xar -j	safe-write
 xar -k	safe-write
 xar -l	safe-write
+xar -n x	safe-write
 xar -p	safe-write
-xar -s	safe-write
+xar -s x	safe-write
 xar -t	safe-write
+xar -t -f ./a.xar --dump-toc=~/.zshrc	denied
+xar -t -f ./archive.xar	safe-write
+xar -t -f file.xar	safe-write
 xar -v	safe-write
-xar -x	safe-write
+xar -x	denied
 xar -x --keep-setuid -f ./archive.xar	denied
-xar -x -f ./archive.xar	safe-write
-xar -x -f file.xar	safe-write
+xar -x -f ./a.xar -C ~/.ssh	denied
+xar -x -f ./archive.xar	denied
+xar -xf ./archive.xar	denied
 xar -z	safe-write
 xar x	safe-write
 xargs	inert

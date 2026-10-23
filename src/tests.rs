@@ -436,7 +436,7 @@ safe! {
     aa_list: "aa list",
     aa_archive: "aa archive -d src -o out.aar",
     aea_id: "aea id",
-    xar_extract: "xar -x -f file.xar",
+    xar_list: "xar -t -f file.xar",
     bzcmp_compare: "bzcmp a.bz2 b.bz2",
     xzdec_basic: "xzdec",
     zless_view: "zless file.gz",
