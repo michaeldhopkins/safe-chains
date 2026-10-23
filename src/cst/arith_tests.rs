@@ -200,6 +200,16 @@ fn every_other_place_a_shell_reads_arithmetic_is_refused_when_it_assigns() {
 }
 
 #[test]
+fn an_expansion_that_runs_what_a_variable_holds_is_refused() {
+    for cmd in ["x='$(touch f)'; echo ${x@P}", "echo ${x@P}", "x='$(touch f)'; echo ${(e)x}", "echo \"${(e)x}\""] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in ["echo ${x@Q}", "echo ${x@U}"] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
 fn a_descriptor_named_by_a_variable_is_refused() {
     for cmd in ["echo hi {HOME}>/dev/null; git status", "exec {fd}>/dev/null", ": {GIT_DIR}</dev/null; git log"] {
         assert!(!allowed(cmd), "should be refused: {cmd}");

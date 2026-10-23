@@ -190,14 +190,15 @@ fn bracketed(text: &str, open: char, close: char) -> &str {
 /// `::=` after the name assign it. A nested `${` is found by the caller's scan of the whole text.
 ///
 /// `${!x}` and zsh's `(P)` read the variable `x` names, and a subscript in that name is arithmetic:
-/// `x='a[HOME=1]'; echo ${!x}` assigns HOME.
+/// `x='a[HOME=1]'; echo ${!x}` assigns HOME. bash's `${x@P}` and zsh's `(e)` flag expand what `x`
+/// holds again, substitutions included, so `x='$(touch f)'; echo ${x@P}` runs `touch`.
 fn parameter_verdict(body: &str) -> Verdict {
     let mut indirect = body.starts_with('!');
     let mut rest = body.trim_start_matches(['#', '!', '^', '=', '~', '+']);
     let mut v = INERT;
     if let Some(flags) = rest.strip_prefix('(') {
         let flags = bracketed(flags, '(', ')');
-        v = v.combine(expression_verdict(flags));
+        v = v.combine(expression_verdict(flags)).combine(refuse_if(flags.contains('e')));
         indirect |= flags.contains('P');
         rest = rest.get(flags.len() + 2..).unwrap_or_default();
     }
@@ -216,7 +217,8 @@ fn parameter_verdict(body: &str) -> Verdict {
     }
     let assigns = rest.starts_with('=') || rest.starts_with(":=") || rest.starts_with("::=");
     let offset = rest.strip_prefix(':').filter(|r| !r.starts_with(['-', '+', '?', '#', '=', ':']));
-    v.combine(refuse_if(assigns)).combine(offset.map_or(INERT, expression_verdict))
+    v.combine(refuse_if(assigns || rest.starts_with("@P")))
+        .combine(offset.map_or(INERT, expression_verdict))
 }
 
 /// The variable holds a plain name, so reading through it evaluates nothing.
