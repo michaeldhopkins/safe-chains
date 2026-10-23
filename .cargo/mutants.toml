@@ -21,7 +21,10 @@ features = ["fuzz-gen"]
 # while the loop keeps pushing into a Vec, so they allocate without bound until the test timeout and
 # only ever read as TIMEOUT. On the runner that exhausted memory and cancelled the job at 10-11
 # minutes (runs 38633541332, both attempts). The function's other mutants stay.
+# `HookFormat::extra_decision_pointers`'s default body is `&[]`, and the `Vec::leak(Vec::new())`
+# mutant returns the same empty slice, so no caller can tell them apart.
 exclude_re = [
     'gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$',
     'src/parse\.rs:\d+:\d+: replace \+= with (-=|\*=) in Token::content_outside_double_quotes$',
+    "src/targets/mod\\.rs:\\d+:\\d+: replace HookFormat::extra_decision_pointers -> &'static\\[&'static str\\] with Vec::leak\\(Vec::new\\(\\)\\)$",
 ]
