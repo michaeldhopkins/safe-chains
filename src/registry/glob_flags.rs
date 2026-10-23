@@ -1,6 +1,30 @@
 //! The flag check for an invocation a `first_arg` glob admitted, out of `registry/mod.rs`.
 
+use super::types::TomlSub;
 use crate::parse::Token;
+
+fn inherit(toml: &mut TomlSub, standalone: &[String], valued: &[String]) {
+    let declared = !toml.first_arg_standalone.is_empty() || !toml.first_arg_valued.is_empty() || !toml.first_arg_loopback_valued.is_empty();
+    let tolerant = toml.tolerate_unknown_short.unwrap_or(false) || toml.tolerate_unknown_long.unwrap_or(false);
+    let own = !toml.standalone.is_empty() || !toml.valued.is_empty() || !toml.optional_valued.is_empty();
+    if !toml.first_arg.is_empty() && own && !declared && !tolerant {
+        toml.first_arg_standalone = toml.standalone.iter().chain(&toml.optional_valued).chain(standalone).cloned().collect();
+        toml.first_arg_valued = toml.valued.iter().chain(valued).cloned().collect();
+    }
+}
+
+pub(crate) fn inherit_sub_flags(mut toml: TomlSub) -> TomlSub {
+    inherit(&mut toml, &[], &[]);
+    toml
+}
+
+pub(crate) fn with_wrapper_flags(mut subs: Vec<TomlSub>, standalone: &[String], valued: &[String]) -> Vec<TomlSub> {
+    for sub in &mut subs {
+        sub.sub = with_wrapper_flags(std::mem::take(&mut sub.sub), standalone, valued);
+        inherit(sub, standalone, valued);
+    }
+    subs
+}
 
 /// Whether an invocation admitted by a `first_arg` GLOB carries a flag the family never declared.
 ///

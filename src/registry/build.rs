@@ -468,7 +468,7 @@ pub(super) fn build_sub(
         output,
         writes_cwd,
         name_match: if toml.per_database { NameMatch::WithDatabaseSuffix } else { NameMatch::Exact },
-        kind: super::passthrough_gate::build_sub_kind(parent, toml, handler_policies)?,
+        kind: super::passthrough_gate::build_sub_kind(parent, super::glob_flags::inherit_sub_flags(toml), handler_policies)?,
         policy_ref,
         profile,
         flags,
@@ -1082,7 +1082,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 env_assignment_positionals,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
-                    subs: filter_candidates(toml.sub)?
+                    subs: filter_candidates(super::glob_flags::with_wrapper_flags(toml.sub, &w.standalone, &w.valued))?
                         .map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
                         .collect::<Result<Vec<_>, _>>()?
                         .into_iter()

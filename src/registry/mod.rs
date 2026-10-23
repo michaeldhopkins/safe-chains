@@ -707,6 +707,8 @@ mod arity_tests;
 #[cfg(test)]
 mod gate_consistency;
 #[cfg(test)]
+mod glob_scope_tests;
+#[cfg(test)]
 mod overlap_tests;
 #[cfg(test)]
 mod tests;
