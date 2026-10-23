@@ -1,6 +1,6 @@
 [[command]]
 name = "kustomize"
-description = "Template-free customization tool for Kubernetes YAML configurations. The build subcommand is the core operation: it reads a kustomization.yaml and emits rendered manifests to stdout -- purely local file processing with no cluster or network interaction, unless Helm inflation or remote bases are enabled via flags. edit subcommands modify the kustomization.yaml file. The project targets biweekly-to-monthly releases, with kustomize v5.8.1 shipping in February 2026. New transformer types and field options are added periodically."
+description = "Template-free customization tool for Kubernetes YAML configurations. The build subcommand is the core operation: it reads a kustomization.yaml and emits rendered manifests to stdout -- purely local file processing with no cluster or network interaction, unless Helm inflation or remote bases are enabled via flags. `build --enable-exec` and `--enable-alpha-plugins` run the executables and containers a kustomization names as KRM functions or plugins, `--enable-helm` runs helm (or the `--helm-command` program), which can fetch charts over the network, and `--load-restrictor LoadRestrictionsNone` lets a kustomization read any file on the machine; the default, LoadRestrictionsRootOnly, keeps reads inside the kustomization root. edit subcommands modify the kustomization.yaml file. The project targets biweekly-to-monthly releases, with kustomize v5.8.1 shipping in February 2026. New transformer types and field options are added periodically."
 url = "https://kubectl.docs.kubernetes.io/references/kustomize/"
 bare_flags = ["--help", "-h"]
 examples_safe = [
@@ -8,12 +8,21 @@ examples_safe = [
     "kustomize build",
     "kustomize build ./overlays/dev",
     "kustomize build -o ./rendered.yaml",
+    "kustomize build --load-restrictor LoadRestrictionsRootOnly",
+]
+examples_denied = [
+    "kustomize build --enable-exec",
+    "kustomize build --enable-helm",
+    "kustomize build --enable-alpha-plugins",
+    "kustomize build --load-restrictor LoadRestrictionsNone",
+    "kustomize build --load-restrictor=LoadRestrictionsNone ./overlays/dev",
 ]
 
 [[command.sub]]
 name = "build"
-standalone = ["--enable-alpha-plugins", "--enable-exec", "--enable-helm", "--help", "--load-restrictor", "-h"]
-valued = ["--env", "--helm-command", "--mount", "--output", "-o"]
+standalone = ["--help", "-h"]
+valued = ["--env", "--helm-command", "--load-restrictor", "--mount", "--output", "-o"]
+flag_values = { "--load-restrictor" = ["LoadRestrictionsRootOnly"] }
 
 [[command.sub]]
 name = "version"
