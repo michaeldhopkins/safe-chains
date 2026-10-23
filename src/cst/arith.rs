@@ -182,7 +182,8 @@ fn expansions_verdict(text: &str) -> Verdict {
             v = v.combine(parameter_verdict(bracketed(body, '{', '}')));
         } else {
             let name = after.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_')).unwrap_or(after.len());
-            if let Some(subscript) = after[name..].strip_prefix('[').filter(|_| name > 0) {
+            // A `[` straight after the `$` is `$[…]`, read above, so a subscript here follows a name.
+            if let Some(subscript) = after[name..].strip_prefix('[') {
                 v = v.combine(expression_verdict(bracketed(subscript, '[', ']')));
             }
         }
