@@ -23,7 +23,7 @@ impl OwnedPolicy {
             bare: true,
             max_positional: None,
             min_positional: None,
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
             passthrough: None,
         }
     }
@@ -126,10 +126,24 @@ pub(super) fn check_with_passthrough(tokens: &[Token], policy: &OwnedPolicy, bas
 
 pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
     let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
-    check_flags(tokens, standalone, valued, policy.bare, policy.max_positional, policy.tolerance)
+    !(policy.tolerance.stdin_runs_commands && crate::cst::stdin_fed::fed())
+        && check_flags(tokens, standalone, valued, policy.bare, policy.max_positional, policy.tolerance)
         && policy
             .min_positional
             .is_none_or(|min| count_positionals(tokens, standalone, valued, policy.tolerance).is_some_and(|n| n >= min))
+}
+
+/// Reads `reads_commands_from`: `"plus"` limits a `+word` operand to a line number, and `"stdin"`
+/// refuses the command when anything feeds its standard input.
+pub(super) fn reads_commands_from(tolerance: &mut FlagTolerance, command: &str, sources: &[String]) -> Result<(), String> {
+    for source in sources {
+        match source.as_str() {
+            "plus" => tolerance.plus_runs_command = true,
+            "stdin" => tolerance.stdin_runs_commands = true,
+            other => return Err(format!("command '{command}': unknown reads_commands_from source `{other}` (known: plus, stdin)")),
+        }
+    }
+    Ok(())
 }
 
 /// Whether one of `wanted` is given AS A FLAG: not as the value of the flag before it, not glued

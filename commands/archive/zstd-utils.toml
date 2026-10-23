@@ -10,10 +10,24 @@ tolerate_unknown_short = true
 
 [[command]]
 name = "zstdless"
-description = "View zstandard-compressed (or uncompressed) files through less(1). Any flags are passed through to less."
+description = "View zstandard-compressed (or uncompressed) files through less(1). Any flags are passed through to less. The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
 url = "https://github.com/facebook/zstd"
 examples_safe = ["zstdless ./a.zst"]
 researched_version = "zstd 1.5.6"
 level = "Inert"
 bare = true
-tolerate_unknown_short = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]

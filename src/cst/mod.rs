@@ -34,6 +34,7 @@ mod proptests;
 mod reserved;
 mod scope_budget;
 mod search_quote;
+pub(crate) mod stdin_fed;
 mod sub_close;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

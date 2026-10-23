@@ -100,6 +100,19 @@
 #                                        #   (`exiftool -if EXPR` runs Perl and
 #                                        #   must not read as `-i -f`). Only
 #                                        #   on a flat command.
+# # reads_commands_from = ["plus", "stdin"]
+#                                        # optional; where a pager or editor
+#                                        #   takes commands besides its flags.
+#                                        #   "plus": a `+word` operand runs as a
+#                                        #   command (`less +!id`, `vim +!id`),
+#                                        #   so only `+N` and a bare `+` pass.
+#                                        #   "stdin": it reads keystrokes from a
+#                                        #   standard input that is not a
+#                                        #   terminal (`printf ':!id\n' | vim`),
+#                                        #   so anything feeding its input (a
+#                                        #   pipe, `<`, `<<<`, a heredoc, a
+#                                        #   redirected group) refuses it. Only
+#                                        #   on a flat command.
 # # env_assignment_positionals = true    # optional; this command PUTS its
 #                                        #   NAME=VALUE positionals into the
 #                                        #   ENVIRONMENT (`export`, `declare -x`,

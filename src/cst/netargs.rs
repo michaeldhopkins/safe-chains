@@ -97,7 +97,7 @@ pub(crate) fn with_stdin(pipeline: &Pipeline, position: usize, run: impl FnOnce(
         Cmd::Simple(_) | Cmd::FunctionDef { .. } => false,
     };
     let _mark = enter(piped || redirected);
-    run()
+    super::stdin_fed::with_stage(pipeline, position, run)
 }
 
 fn prints_literal_text(cmd: &Cmd) -> bool {

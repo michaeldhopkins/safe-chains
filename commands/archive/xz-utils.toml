@@ -50,10 +50,24 @@ standalone = ["--help", "--version"]
 [[command]]
 name = "xzless"
 aliases = ["xzmore", "lzless", "lzmore"]
-description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using less(1) (xzless / lzless) or more(1) (xzmore / lzmore). lzless / lzmore are deprecated LZMA-Utils aliases."
+description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using less(1) (xzless / lzless) or more(1) (xzmore / lzmore). lzless / lzmore are deprecated LZMA-Utils aliases. The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
 url = "https://tukaani.org/xz/"
 examples_safe = ["xzless ./a.xz"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = true
-tolerate_unknown_short = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]

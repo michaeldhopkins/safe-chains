@@ -89,6 +89,7 @@ opam list	--columns
 opam list	--separator
 pdm config	--project
 pdm show	--name
+pgbench	--log
 pigz	--name
 pijul log	--state
 pip-compile	--cache-dir

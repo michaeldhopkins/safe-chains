@@ -23,10 +23,24 @@ tolerate_unknown_short = true
 [[command]]
 name = "bzmore"
 aliases = ["bzless"]
-description = "Paginate bzip2-compressed (and uncompressed) text using more(1) or less(1)."
+description = "Paginate bzip2-compressed (and uncompressed) text using more(1) or less(1). The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
 url = "https://sourceware.org/bzip2/"
 examples_safe = ["bzmore ./a.bz2"]
 researched_version = "bzip2 1.0.x"
 level = "Inert"
 bare = true
-tolerate_unknown_short = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]

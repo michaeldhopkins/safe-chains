@@ -1,9 +1,12 @@
 [[command]]
 name = "less"
-description = "Interactive terminal pager for viewing file contents with forward and backward navigation. Strictly read-only: never modifies the files it displays. Loads files lazily, so it can handle very large inputs efficiently. Maintained as a standalone project by Mark Nudelman (greenwoodsoftware.com); releases are infrequent and the interface is very stable."
+description = "Interactive terminal pager for viewing file contents with forward and backward navigation. Strictly read-only: never modifies the files it displays. A `+` operand is a command it runs as each file opens (`less +G` jumps to the end, and `less '+!id'` runs `id` in a shell). Loads files lazily, so it can handle very large inputs efficiently. Maintained as a standalone project by Mark Nudelman (greenwoodsoftware.com); releases are infrequent and the interface is very stable."
 url = "https://man7.org/linux/man-pages/man1/less.1.html"
 level = "Inert"
 bare = true
+reads_commands_from = ["plus"]
+examples_safe = ["less +42 ./notes.md"]
+examples_denied = ["less '+!id' ./notes.md", "less +G ./notes.md"]
 standalone = [
     "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
     "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",

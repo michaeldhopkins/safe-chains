@@ -180,7 +180,6 @@ jupytext
 kinit
 layerutil
 ld
-less
 lesskey
 libnetcfg
 libtool
@@ -206,7 +205,6 @@ mkfifo
 mocha
 mongodump
 mongoexport
-more
 msgattrib
 msgcat
 msgcomm
@@ -221,7 +219,6 @@ msguniq
 mtree
 mutool
 mypy
-nano
 nbstripout
 ncu
 next

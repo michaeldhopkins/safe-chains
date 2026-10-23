@@ -36,19 +36,30 @@ impl UnknownTolerance {
 /// allowlist. `unknown` controls flag-shaped unknowns; `numeric_dash` opts
 /// into `-NUMBER` shorthand (e.g. `head -20`); `single_dash_words` stops a single-dash token
 /// being read as a cluster of short flags, for tools whose options are whole words (`exiftool -if`
-/// is one option that runs Perl, never `-i -f`).
+/// is one option that runs Perl, never `-i -f`). `plus_runs_command` is for a pager or editor that
+/// runs a `+word` operand as its first command (`less +!id`, `vim '+!id'`): only a line number
+/// (`+42`) or a bare `+` passes. `stdin_runs_commands` is for one that reads keystrokes from a
+/// standard input that is not a terminal (`printf ':!id\n' | vim`): fed anything, it is refused.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FlagTolerance {
     pub unknown: UnknownTolerance,
     pub numeric_dash: bool,
     pub single_dash_words: bool,
+    pub plus_runs_command: bool,
+    pub stdin_runs_commands: bool,
 }
 
 impl FlagTolerance {
     /// Strict allowlist: deny every unrecognized flag-shaped token.
     /// `const`-callable for use in static `FlagPolicy` literals.
     pub const fn strict() -> Self {
-        Self { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false }
+        Self {
+            unknown: UnknownTolerance::Strict,
+            numeric_dash: false,
+            single_dash_words: false,
+            plus_runs_command: false,
+            stdin_runs_commands: false,
+        }
     }
 }
 
@@ -233,6 +244,10 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
         if *t == "--" {
             positionals += tokens.len() - i - 1;
             break;
+        }
+
+        if tolerance.plus_runs_command && t.len() > 1 && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
+            return None;
         }
 
         if !t.starts_with('-') || (*t == "-" && !standalone.contains_flag(t)) {
@@ -589,7 +604,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: true,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
     };
 
     #[test]
@@ -638,7 +653,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
     };
 
     #[test]
@@ -679,7 +694,7 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
     };
 
     #[test]
@@ -729,7 +744,7 @@ mod tests {
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: Some(2),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
@@ -813,7 +828,7 @@ mod tests {
     fn single_dash_words_under_short_tolerance_count_unknowns_as_positionals() {
         let policy = FlagPolicy {
             max_positional: Some(1),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Short, single_dash_words: true, numeric_dash: false },
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Short, single_dash_words: true, numeric_dash: false, ..FlagTolerance::strict() },
             ..WORDS_POLICY
         };
         assert!(check(&toks(&["exiftool", "-if"]), &policy));
@@ -924,7 +939,7 @@ mod tests {
 
     #[test]
     fn describe_reports_tolerances() {
-        let lenient = FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false };
+        let lenient = FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false, ..FlagTolerance::strict() };
         assert_eq!(
             described(&[], &[], false, lenient),
             "- Hyphen-prefixed positional arguments accepted\n- Numeric shorthand accepted (e.g. -20 for -n 20)"

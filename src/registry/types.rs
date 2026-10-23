@@ -36,13 +36,11 @@ pub(super) struct TomlCommand {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
-    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`).
-    /// Each one is classified through `envvars.toml`, exactly as the `VAR=value cmd` prefix form is,
-    /// so the two spellings of one capability cannot disagree.
+    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`), each classified through
+    /// `envvars.toml` exactly as the `VAR=value cmd` prefix form is, so the two spellings of one capability cannot disagree.
     #[serde(default)]
     pub env_assignment_positionals: Option<bool>,
-    /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`; build panics if a TOML
-    /// still sets it (SAMPLE.toml has the migration), and keeping it here lets the panic name the command.
+    /// Removed for `tolerate_unknown_short`/`_long`; build panics if a TOML sets it, naming the command (SAMPLE.toml migrates).
     #[serde(default)]
     pub positional_style: Option<bool>,
     #[serde(default)]
@@ -53,6 +51,8 @@ pub(super) struct TomlCommand {
     pub numeric_dash: Option<bool>,
     #[serde(default)]
     pub single_dash_words: Option<bool>,
+    #[serde(default)]
+    pub reads_commands_from: Vec<String>,
     #[serde(default)]
     pub standalone: Vec<String>,
     #[serde(default)]

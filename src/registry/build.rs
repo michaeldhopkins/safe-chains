@@ -82,7 +82,7 @@ pub(super) fn build_policy(
         bare: bare.unwrap_or(true),
         max_positional,
         min_positional: None,
-        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false },
+        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false, ..FlagTolerance::strict() },
         passthrough: None,
     }
 }
@@ -836,6 +836,9 @@ fn assert_flat_or_structured(toml: &TomlCommand) -> Result<(), String> {
     if toml.single_dash_words.is_some() {
         conflicts.push("single_dash_words");
     }
+    if !toml.reads_commands_from.is_empty() {
+        conflicts.push("reads_commands_from");
+    }
     if !conflicts.is_empty() {
         fail!(
             "command '{}' mixes flat-style top-level fields ({}) with [[command.sub]] blocks. \
@@ -1156,6 +1159,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         toml.tolerate_unknown_long, toml.numeric_dash,
     );
     policy.tolerance.single_dash_words = toml.single_dash_words.unwrap_or(false);
+    super::policy::reads_commands_from(&mut policy.tolerance, &toml.name, &toml.reads_commands_from)?;
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
 
@@ -1343,6 +1347,15 @@ mod tests {
             "[[command]]\nname = \"tc\"\nsingle_dash_words = true\n[[command.sub]]\nname = \"ls\"\n",
             "single_dash_words",
         );
+    }
+
+    #[test]
+    fn reads_commands_from_is_flat_only_and_names_known_sources() {
+        crate::registry::tests::assert_rejected(
+            "[[command]]\nname = \"tc\"\nreads_commands_from = [\"plus\"]\n[[command.sub]]\nname = \"ls\"\n",
+            "reads_commands_from",
+        );
+        crate::registry::tests::assert_rejected("[[command]]\nname = \"tc\"\nreads_commands_from = [\"argv\"]\n", "argv");
     }
 
     /// Strategies for built-policy inputs. `flag_name` keeps test strings small and distinct

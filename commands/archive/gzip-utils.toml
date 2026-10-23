@@ -24,13 +24,27 @@ bare = false
 name = "zless"
 aliases = ["zmore"]
 examples_safe = ["zless ./a.gz"]
-examples_denied = ["zless ~/.ssh/id_ed25519"]
-description = "Paginate compress(1)- or gzip(1)-compressed text. zless uses less(1); zmore uses more(1) (or whatever $PAGER points to). Any flags are passed through to the pager."
+examples_denied = ["zless ~/.ssh/id_ed25519", "zless '+!id' ./a.gz", "zmore +!id ./a.gz", "zless -o ./log ./a.gz"]
+description = "Paginate compress(1)- or gzip(1)-compressed text. zless uses less(1); zmore uses more(1) (or whatever $PAGER points to). Any flags are passed through to the pager. The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
 url = "https://www.gnu.org/software/gzip/"
 researched_version = "gzip 1.x (macOS bundled)"
 level = "Inert"
 bare = true
-tolerate_unknown_short = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]
 
 [[command]]
 name = "znew"
