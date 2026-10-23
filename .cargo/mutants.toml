@@ -23,8 +23,15 @@ features = ["fuzz-gen"]
 # minutes (runs 38633541332, both attempts). The function's other mutants stay.
 # `HookFormat::extra_decision_pointers`'s default body is `&[]`, and the `Vec::leak(Vec::new())`
 # mutant returns the same empty slice, so no caller can tell them apart.
+# In the hook's `gated_policy`, `by_default` only lets `segment_kind` answer NotYet early. Every
+# Boundary `segment_kind` could give instead (an agent, an unconfined runner, a protected path, a
+# later run that writes) is already caught by `gate_kind`'s own word and reach checks, so `||` for
+# `&&` changes no gate kind. Those checks follow links in the workspace and read every place a
+# command reaches, not only the first; gate/tests.rs pins both with `by_default` true. The closure
+# stays as a backstop should those checks narrow.
 exclude_re = [
     'gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$',
     'src/parse\.rs:\d+:\d+: replace \+= with (-=|\*=) in Token::content_outside_double_quotes$',
     "src/targets/mod\\.rs:\\d+:\\d+: replace HookFormat::extra_decision_pointers -> &'static\\[&'static str\\] with Vec::leak\\(Vec::new\\(\\)\\)$",
+    'src/hook_cli\.rs:\d+:\d+: replace && with \|\| in gated_policy$',
 ]
