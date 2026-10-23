@@ -28,6 +28,7 @@ examples_denied = [
 # is the enum that picks the report's shape — the two are separate flags, and only `--output`
 # names a path.
 [command.path_gate]
+positional = "read"
 flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]

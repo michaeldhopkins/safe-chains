@@ -24,6 +24,7 @@ examples_denied = [
 # output", defaulting to stdout. So one command-level gate covers parse / print / strip / demangle
 # at once. `strip`'s `-d/--delete` names a custom SECTION, not a path, and is left ungated.
 [command.path_gate]
+positional = "read"
 flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]

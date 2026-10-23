@@ -102,8 +102,6 @@ ansible-lint	--profile	untriaged	-	-	-
 ansible-lint	--project-dir	untriaged	-	-	-	
 ansible-lint	--rulesdir	untriaged	-	-	-	
 ansible-lint	--show-relpath	untriaged	-	-	-	
-ansible-vault encrypt	--vault-password-file	untriaged	-	-	-	
-ansible-vault encrypt_string	--vault-password-file	untriaged	-	-	-	
 apkanalyzer dex packages	--files	untriaged	-	-	-	
 apkanalyzer dex packages	--proguard-folder	untriaged	-	-	-	
 arduino-cli compile	--build-cache-path	untriaged	-	-	-	
@@ -162,7 +160,6 @@ buf generate	--exclude-path	untriaged	-	-	-
 buf generate	--path	untriaged	-	-	-	
 buf lint	--exclude-path	untriaged	-	-	-	
 buf lint	--path	untriaged	-	-	-	
-bun build	--public-path	untriaged	-	-	-	
 bundle check	--gemfile	untriaged	-	-	-	
 bundle install	--gemfile	untriaged	-	-	-	
 bundler-audit check	--gemfile-lock	untriaged	-	-	-	
@@ -354,25 +351,6 @@ gitleaks detect	--gitleaks-ignore-path	untriaged	-	-	-
 gitleaks detect	--report-path	untriaged	-	-	-	
 gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-	
 gitleaks protect	--report-path	untriaged	-	-	-	
-go build	-modfile	untriaged	-	-	-	
-go build	-pkgdir	untriaged	-	-	-	
-go list	-modfile	untriaged	-	-	-	
-go list	-pkgdir	untriaged	-	-	-	
-go run	-modfile	untriaged	-	-	-	
-go run	-pkgdir	untriaged	-	-	-	
-go test	-blockprofile	untriaged	-	-	-	
-go test	-blockprofilerate	untriaged	-	-	-	
-go test	-coverprofile	untriaged	-	-	-	
-go test	-cpuprofile	untriaged	-	-	-	
-go test	-memprofile	untriaged	-	-	-	
-go test	-memprofilerate	untriaged	-	-	-	
-go test	-modfile	untriaged	-	-	-	
-go test	-mutexprofile	untriaged	-	-	-	
-go test	-mutexprofilefraction	untriaged	-	-	-	
-go test	-outputdir	untriaged	-	-	-	
-go test	-pkgdir	untriaged	-	-	-	
-go vet	-modfile	untriaged	-	-	-	
-go vet	-pkgdir	untriaged	-	-	-	
 golangci-lint run	--path-prefix	untriaged	-	-	-	
 golangci-lint run	--skip-dirs	untriaged	-	-	-	
 golangci-lint run	--skip-files	untriaged	-	-	-	
@@ -558,10 +536,6 @@ nix profile history	--profile	untriaged	-	-	-
 nix profile list	--profile	untriaged	-	-	-	
 nix-collect-garbage	--profile	untriaged	-	-	-	
 nixos-rebuild list-generations	--profile-name	untriaged	-	-	-	
-nomad alloc-status	-token-file	untriaged	-	-	-	
-nomad monitor	-token-file	untriaged	-	-	-	
-nomad node-status	-token-file	untriaged	-	-	-	
-nomad status	-token-file	untriaged	-	-	-	
 nox	--envdir	untriaged	-	-	-	
 nuget config	-ConfigFile	untriaged	-	-	-	
 nuget list	-ConfigFile	untriaged	-	-	-	
@@ -714,8 +688,8 @@ sequelize init	--config-path	untriaged	-	-	-
 sequelize init	--migrations-path	untriaged	-	-	-	
 sequelize init	--models-path	untriaged	-	-	-	
 sequelize init	--seeders-path	untriaged	-	-	-	
-shfmt	--filename	untriaged	-	-	-	
-shfmt	-filename	untriaged	-	-	-	
+shfmt	--filename	not-a-path	-	-	-	Names the standard input for dialect detection (shfmt man page: "provide a name for the standard input file"); the file is never opened.
+shfmt	-filename	not-a-path	-	-	-	Names the standard input for dialect detection (shfmt man page: "provide a name for the standard input file"); the file is never opened.
 skaffold diagnose	--filename	untriaged	-	-	-	
 skaffold find-configs	--directory	untriaged	-	-	-	
 skaffold inspect	--filename	untriaged	-	-	-	
@@ -865,18 +839,6 @@ tofu validate	--var-file	untriaged	-	-	-
 tofu validate	-var-file	untriaged	-	-	-	
 tree	--filelimit	untriaged	-	-	-	
 tree	--filesfrom	untriaged	-	-	-	
-trivy config	--ignorefile	untriaged	-	-	-	
-trivy config	--skip-dirs	untriaged	-	-	-	
-trivy config	--skip-files	untriaged	-	-	-	
-trivy fs	--cache-dir	untriaged	-	-	-	
-trivy fs	--ignorefile	untriaged	-	-	-	
-trivy fs	--skip-dirs	untriaged	-	-	-	
-trivy fs	--skip-files	untriaged	-	-	-	
-trivy image	--cache-dir	untriaged	-	-	-	
-trivy image	--ignorefile	untriaged	-	-	-	
-trivy image	--skip-dirs	untriaged	-	-	-	
-trivy image	--skip-files	untriaged	-	-	-	
-trivy sbom	--cache-dir	untriaged	-	-	-	
 tsup	--public-dir	untriaged	-	-	-	
 tuist build	--derived-data-path	untriaged	-	-	-	
 tuist build	--path	untriaged	-	-	-	
@@ -909,8 +871,6 @@ vite build	--assetsDir	untriaged	-	-	-
 vitepress build	--cache-dir	untriaged	-	-	-	
 vitest	--dir	untriaged	-	-	-	
 vyper	--root-folder	untriaged	-	-	-	
-wasmtime compile	--profile	untriaged	-	-	-	
-wasmtime wast	--profile	untriaged	-	-	-	
 webpack	--output-filename	untriaged	-	-	-	
 webpack	--output-public-path	untriaged	-	-	-	
 wget	--cut-dirs	untriaged	-	-	-	

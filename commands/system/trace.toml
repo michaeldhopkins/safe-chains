@@ -19,6 +19,7 @@ examples_denied = [
 # trimmed file to the specified path"). Both spellings are gated; the man page documents them as
 # one option.
 [command.path_gate]
+positional = "read"
 flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]

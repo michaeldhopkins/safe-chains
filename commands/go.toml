@@ -21,6 +21,7 @@ examples_denied = [
 ]
 
 [command.path_gate]
+positional = "read"
 flags = { "-o" = "write" }
 
 [[command.sub]]

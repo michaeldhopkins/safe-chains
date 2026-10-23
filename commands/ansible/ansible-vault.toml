@@ -7,6 +7,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 examples_safe = ["ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml"]
 
 [command.path_gate]
+positional = "write"
 flags = { "--output" = "write" }
 
 [[command.sub]]

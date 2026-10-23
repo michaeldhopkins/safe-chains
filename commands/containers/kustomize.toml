@@ -23,4 +23,5 @@ standalone = ["--help", "--short", "-h"]
 # `build -o/--output` is a PATH, not a format: kustomize writes the rendered manifests to that file
 # (or, if it names a directory, one file per resource inside it).
 [command.path_gate]
+positional = "read"
 flags = { "--helm-command" = "exec", "--output" = "write", "-o" = "write" }

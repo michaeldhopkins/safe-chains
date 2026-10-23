@@ -886,11 +886,13 @@ valued = ["-c"]
 # the gate ate the path as `-w`'s value) and left the real shape wide open:
 # `shfmt -w ./a.sh ~/.ssh/config` auto-approved, overwriting a credential file with formatted shell.
 #
-# `write_when`, not `positional = "write"`: without `-w` shfmt prints to stdout and `-d`/`-l` only
-# report, so the operands are reads and gating them unconditionally would deny ordinary inspection.
+# `write_when`, not `positional = "write"`: without `-w` shfmt prints the formatted file (or with
+# `-d` its diff) to stdout, so the operands are disclosing reads, gated by the read locus.
+# `--filename` only names standard input for dialect detection; shfmt never opens it.
 [roles."shfmt"]
-positional = "ignore"
+positional = "read"
 write_when = ["-w", "--write"]
+flags = { "--check" = "ignore", "--filename" = "ignore", "-filename" = "ignore", "--lang" = "ignore", "-lang" = "ignore", "-ln" = "ignore", "-i" = "ignore" }
 
 [roles."weasyprint"]
 shape = "last_write"

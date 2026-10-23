@@ -23,6 +23,7 @@ examples_denied = [
 # `fmt -w/--write` rewrites the HCL files named as positionals in place. Without it the run only
 # reports (`--check`/`--list`), so the operands are writes in the fixing mode alone.
 [command.path_gate]
+positional = "read"
 write_when = ["--write", "-w"]
 
 [[command.sub]]

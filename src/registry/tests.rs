@@ -7489,3 +7489,58 @@ proptest::proptest! {
         proptest::prop_assert!(load_toml(&source, "test").is_err(), "{}", source);
     }
 }
+
+/// A file operand is judged by where it points, in every command that takes one.
+///
+/// A content reader or writer with no path role (no `[command.path_gate]`, no `pathgates.toml`
+/// entry) takes ANY path: `funzip ~/.ssh/id_ed25519` printed the key while `zcat` of the same file
+/// was refused, and `ziptool ~/.ssh/k.zip add a b` rewrote a file outside the workspace. Nothing in
+/// the entry says which positionals are files, but its `examples_safe` do: an author who writes
+/// `funzip ./out.zip` has written a file operand. So every `./` or `../` operand of every example is
+/// replaced by a credential path, and the result must be refused.
+///
+/// Commands that name a path without reading or writing its content (`ls`, `stat`, `cd`) approve
+/// such a probe rightly; they are listed in `tests/fixtures/credential_operand_worklist.tsv`, which
+/// may only shrink. Examples whose file operands are spelled without `./` are not probed.
+#[test]
+fn a_credential_path_in_place_of_an_example_file_operand_is_refused() {
+    const SECRET: &str = "~/.ssh/id_ed25519";
+    let acknowledged: std::collections::BTreeSet<&str> = include_str!("../../tests/fixtures/credential_operand_worklist.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split('\t').next())
+        .collect();
+    let mut approved: std::collections::BTreeMap<&str, String> = std::collections::BTreeMap::new();
+    let mut probed = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        for example in &spec.examples_safe {
+            for word in example.split_whitespace().skip(1).filter(|w| w.starts_with("./") || w.starts_with("../")) {
+                let probe = example.replacen(word, SECRET, 1);
+                probed += 1;
+                if crate::is_safe_command(&probe) {
+                    approved.entry(name.as_str()).or_insert(probe);
+                }
+            }
+        }
+    }
+    assert!(probed > 200, "only {probed} example operands probed; the walk is not finding them");
+    let unlisted: Vec<String> = approved
+        .iter()
+        .filter(|(name, _)| !acknowledged.contains(*name))
+        .map(|(name, probe)| format!("{name}: {probe}"))
+        .collect();
+    assert!(
+        unlisted.is_empty(),
+        "a credential path in place of an example's file operand was APPROVED ({}). Give the operand a \
+             path role (pathgates.toml or `[command.path_gate]`), or, for a command that names a path \
+             without reading or writing it, list it in tests/fixtures/credential_operand_worklist.tsv:\n  {}",
+        unlisted.len(),
+        unlisted.join("\n  ")
+    );
+    let stale: Vec<&&str> = acknowledged.iter().filter(|name| !approved.contains_key(**name)).collect();
+    assert!(stale.is_empty(), "listed in credential_operand_worklist.tsv but now refused; remove them: {stale:?}");
+}

@@ -24,6 +24,7 @@ examples_denied = [
 # writes it with `fs::write`; `explore` declares the same field and `File::create`s it for the
 # HTML report. `-O` is `--optimize` and is a different token, so it is untouched.
 [command.path_gate]
+positional = "read"
 flags = { "--output" = "write", "-o" = "write" }
 
 [[command.sub]]
