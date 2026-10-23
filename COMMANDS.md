@@ -12579,15 +12579,28 @@ Aliases: `gprintf`
 - Allowed standalone flags: -C, -c, -h, -t, -v, -x, -z
 - Allowed valued flags: -T, -f
 
+**Examples:**
+
+- `ptar -c -f ./out.tar ./src`
+- `ptar -t -f ./a.tar`
+
 ### `ptardiff`
 <p class="cmd-url"><a href="https://metacpan.org/dist/Archive-Tar/view/bin/ptardiff">https://metacpan.org/dist/Archive-Tar/view/bin/ptardiff</a></p>
 
 - Allowed standalone flags: -h
 
+**Examples:**
+
+- `ptardiff ./a.tar`
+
 ### `ptargrep`
 <p class="cmd-url"><a href="https://metacpan.org/dist/Archive-Tar/view/bin/ptargrep">https://metacpan.org/dist/Archive-Tar/view/bin/ptargrep</a></p>
 
 - Allowed standalone flags: --basename, --help, --ignore-case, --list-only, --verbose, -?, -b, -i, -l, -v
+
+**Examples:**
+
+- `ptargrep -l pattern ./a.tar`
 
 ### `ptx`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ptx-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ptx-invocation</a></p>
@@ -17185,9 +17198,14 @@ Aliases: `gwhoami`
 ### `xar`
 <p class="cmd-url"><a href="https://mackyle.github.io/xar/">https://mackyle.github.io/xar/</a></p>
 
-- Allowed standalone flags: --coalesce-heap, --distribution, --dump-header, --dump-toc-cksum, --keep-existing, --keep-setuid, --link-same, -C, -P, -a, -c, -f, -j, -k, -l, -p, -s, -t, -v, -x, -z
-- Allowed valued flags: --compression, --compression-args, --dump-toc, --exclude, --extract-subdoc, --file-cksum, --list-subdocs, --no-compress, --prop-exclude, --prop-include, --rsize, --toc-cksum
+- Allowed standalone flags: --coalesce-heap, --distribution, --dump-header, --dump-toc-cksum, --keep-existing, --keep-setuid, --link-same, --list-subdocs, -P, -a, -c, -j, -k, -l, -p, -t, -v, -x, -z
+- Allowed valued flags: --compression, --compression-args, --dump-toc, --exclude, --extract-subdoc, --file-cksum, --no-compress, --prop-exclude, --prop-include, --rsize, --toc-cksum, -C, -f, -n, -s
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `xar -c -f ./out.xar ./src`
+- `xar -t -f ./archive.xar`
 
 ### `xargs`
 <p class="cmd-url"><a href="https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs">https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs</a></p>
@@ -17770,6 +17788,11 @@ Aliases: `zegrep`, `zfgrep`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/zipinfo">https://linux.die.net/man/1/zipinfo</a></p>
 
 - Allowed standalone flags: --help, --version, -1, -2, -C, -M, -T, -V, -Z, -h, -l, -m, -s, -t, -v, -z
+
+**Examples:**
+
+- `zipinfo ./archive.zip`
+- `zipinfo -1 ./archive.zip`
 
 ### `zipmerge`
 <p class="cmd-url"><a href="https://libzip.org/">https://libzip.org/</a></p>

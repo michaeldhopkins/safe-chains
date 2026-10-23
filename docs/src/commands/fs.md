@@ -529,3 +529,8 @@ Aliases: `gtouch`
 
 - Allowed standalone flags: --help, --version, -1, -2, -C, -M, -T, -V, -Z, -h, -l, -m, -s, -t, -v, -z
 
+**Examples:**
+
+- `zipinfo ./archive.zip`
+- `zipinfo -1 ./archive.zip`
+
