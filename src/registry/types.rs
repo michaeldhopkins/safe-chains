@@ -505,10 +505,7 @@ pub(super) struct TomlSub {
     pub require_any: Vec<String>,
     #[serde(default)]
     pub first_arg: Vec<String>,
-    /// Flags a `first_arg` GLOB family accepts. The glob admits an invocation on its first
-    /// positional alone, so without these it never examines the flags at all and
-    /// `--endpoint-url http://evil.com` rides along on a read. Empty = family not yet researched
-    /// (permissive, grandfathered — see `no_new_unresearched_first_arg_family`).
+    /// `first_arg` glob flags; empty = own and wrapper lists (`no_new_unresearched_first_arg_family`).
     #[serde(default)]
     pub first_arg_standalone: Vec<String>,
     #[serde(default)]
@@ -523,6 +520,8 @@ pub(super) struct TomlSub {
     /// (whole sub) — `kubectl get secret/x`, `aws configure get aws_secret_access_key`.
     #[serde(default)]
     pub credential_first_arg: Vec<String>,
+    #[serde(default)]
+    pub flag_values: std::collections::HashMap<String, Vec<String>>,
     #[serde(default)]
     pub write_flags: Vec<String>,
     #[serde(default)]
@@ -867,6 +866,7 @@ pub(super) struct SubSpec {
     pub loopback_valued: Vec<String>,
     /// What a loopback endpoint buys this sub; see `TomlSub::loopback_localizes`.
     pub loopback_effect: LoopbackEffect,
+    pub flag_values: Vec<(String, Vec<String>)>,
 }
 
 /// What a recognized loopback destination buys a sub. Gating the FLAG and re-classifying the

@@ -252,33 +252,7 @@ pub(super) fn build_subs(
     let canonical = build_sub(parent, toml, handler_policies)?;
     let mut out = Vec::with_capacity(1 + aliases.len());
     for alias in aliases {
-        out.push(SubSpec {
-            name: alias,
-            kind: canonical.kind.clone(),
-            name_match: canonical.name_match,
-            policy_ref: canonical.policy_ref.clone(),
-            profile: canonical.profile.clone(),
-            flags: canonical.flags.clone(),
-            // An alias must inherit the allowlist: an empty list reads as "not yet enumerated" and
-            // would let the alias spelling accept flags its canonical name rejects.
-            allowed_standalone: canonical.allowed_standalone.clone(),
-            allowed_valued: canonical.allowed_valued.clone(),
-            allowed_unknown: canonical.allowed_unknown,
-            eval_safe: canonical.eval_safe,
-            eval_safe_flags: canonical.eval_safe_flags.clone(),
-            eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
-            eval_safe_required_flags: canonical.eval_safe_required_flags.clone(),
-            // As with the flag allowlist: an alias spelling must carry the canonical sub's stdout
-            // claim, or `$(git diff --name-only)` would be bounded while an aliased spelling of the
-            // same sub fell back to unpinnable — the mirror of the sub-alias gate hole.
-            output: canonical.output.clone(),
-            network_destination: canonical.network_destination,
-            destination_flag: canonical.destination_flag.clone(),
-            loopback_valued: canonical.loopback_valued.clone(),
-            loopback_effect: canonical.loopback_effect,
-            output_path_flags: canonical.output_path_flags.clone(),
-            writes_cwd: canonical.writes_cwd,
-        });
+        out.push(SubSpec { name: alias, ..canonical.clone() });
     }
     out.push(canonical);
     Ok(out)
@@ -463,6 +437,7 @@ pub(super) fn build_sub(
     assert_sub_eval_safe_only_on_leaf(parent, &toml)?;
     let writes_cwd = super::cwd_writes::lower(parent, &name, toml.writes_cwd.as_deref(), &toml.output_dirs, toml.executor.as_deref())?;
     let output = lower_output(&format!("{parent} {name}"), toml.output.as_ref())?;
+    let flag_values = super::glob_flags::flag_values(parent, &name, &toml)?;
     Ok(SubSpec {
         name,
         output,
@@ -484,6 +459,7 @@ pub(super) fn build_sub(
         loopback_valued,
         loopback_effect,
         output_path_flags,
+        flag_values,
     })
 }
 

@@ -391,10 +391,6 @@ kramdown	--output
 kramdown	-o
 kubectl api-resources	--output
 kubectl api-resources	-o
-kubectl events	--output
-kubectl events	-o
-kubectl get	--output
-kubectl get	-o
 kubectl version	--output
 kubectl version	-o
 linkerd check	--output

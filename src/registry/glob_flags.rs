@@ -18,6 +18,73 @@ pub(crate) fn inherit_sub_flags(mut toml: TomlSub) -> TomlSub {
     toml
 }
 
+pub(crate) fn flag_values(parent: &str, name: &str, toml: &TomlSub) -> Result<Vec<(String, Vec<String>)>, String> {
+    let mut out: Vec<(String, Vec<String>)> = toml.flag_values.iter().map(|(f, v)| (f.clone(), v.clone())).collect();
+    out.sort();
+    for (flag, values) in &out {
+        if !toml.valued.iter().chain(&toml.first_arg_valued).any(|f| f == flag) || values.is_empty() {
+            return Err(format!(
+                "command '{parent}' sub `{name}` lists `{flag}` in `flag_values` without it in `valued`, or with no values"
+            ));
+        }
+    }
+    Ok(out)
+}
+
+fn flag_value<'a>(tokens: &'a [Token], idx: usize, flag: &str) -> Option<Option<&'a str>> {
+    let s = tokens[idx].as_str();
+    let rest = if s == flag {
+        ""
+    } else if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
+        return Some(Some(v));
+    } else {
+        let c = flag.strip_prefix('-').filter(|c| c.len() == 1 && !s.starts_with("--") && s.starts_with('-'))?;
+        &s[s[1..].find(c)? + 2..]
+    };
+    if rest.is_empty() {
+        return Some(tokens.get(idx + 1).map(Token::as_str));
+    }
+    Some(Some(rest.strip_prefix('=').unwrap_or(rest)))
+}
+
+pub(crate) fn value_outside(tokens: &[Token], values: &[(String, Vec<String>)]) -> bool {
+    let allowed = |v: &str, choices: &[String]| choices.iter().any(|c| c.strip_suffix('*').map_or(v == c, |p| v.starts_with(p)));
+    for idx in 0..tokens.len() {
+        if tokens[idx] == "--" {
+            break;
+        }
+        for (flag, choices) in values {
+            if let Some(value) = flag_value(tokens, idx, flag)
+                && !value.is_some_and(|v| allowed(v, choices))
+            {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+fn short_cluster_known(s: &str, standalone: &[String], valued: &[String]) -> bool {
+    for c in s[1..].chars() {
+        let flag = format!("-{c}");
+        if valued.contains(&flag) {
+            return true;
+        }
+        if !standalone.contains(&flag) {
+            return false;
+        }
+    }
+    true
+}
+
+pub(crate) fn gated(
+    tokens: &[Token],
+    sub: &super::types::SubSpec,
+    dispatch: impl FnOnce() -> crate::verdict::Verdict,
+) -> crate::verdict::Verdict {
+    if value_outside(tokens.get(1..).unwrap_or_default(), &sub.flag_values) { crate::verdict::Verdict::Denied } else { dispatch() }
+}
+
 pub(crate) fn with_wrapper_flags(mut subs: Vec<TomlSub>, standalone: &[String], valued: &[String]) -> Vec<TomlSub> {
     for sub in &mut subs {
         sub.sub = with_wrapper_flags(std::mem::take(&mut sub.sub), standalone, valued);
@@ -77,7 +144,7 @@ pub(crate) fn glob_presents_unlisted_flag(
         if known(head) {
             continue;
         }
-        if !s.starts_with("--") && s.len() > 2 && s[1..].chars().all(|c| known(&format!("-{c}"))) {
+        if !s.starts_with("--") && s.len() > 2 && short_cluster_known(s, standalone, valued) {
             continue;
         }
         return true;
@@ -113,6 +180,27 @@ mod tests {
             prop_assert!(!glob_presents_unlisted_flag(&tokens(&line), 1, &both, &[], &[]));
             let after = vec!["get-x".to_string(), "--".to_string(), flag];
             prop_assert!(!glob_presents_unlisted_flag(&tokens(&after), 1, &listed, &[], &[]));
+        }
+
+        /// A flag's value is judged the same in every spelling, and only a listed value passes.
+        #[test]
+        fn a_value_is_judged_alike_in_every_spelling(value in "(json|jsonpath=[a-z]{0,4}|[a-z][a-z=-]{0,8})", lead in "[a-z]{0,3}") {
+            let choices = vec![("--output".to_string(), vec!["json".to_string(), "jsonpath=*".to_string()]), ("-o".to_string(), vec!["json".to_string(), "jsonpath=*".to_string()])];
+            let listed = value == "json" || value.starts_with("jsonpath=");
+            let forms = [
+                vec![lead.clone(), "-o".to_string(), value.clone()],
+                vec![lead.clone(), format!("-o={value}")],
+                vec![lead.clone(), format!("-o{value}")],
+                vec![lead.clone(), "-Ao".to_string(), value.clone()],
+                vec![lead.clone(), format!("-Ao{value}")],
+                vec![lead.clone(), "--output".to_string(), value.clone()],
+                vec![lead.clone(), format!("--output={value}")],
+            ];
+            for form in &forms {
+                prop_assert_eq!(value_outside(&tokens(form), &choices), !listed, "{:?}", form);
+            }
+            prop_assert!(value_outside(&tokens(&[lead.clone(), "-o".to_string()]), &choices));
+            prop_assert!(!value_outside(&tokens(&[lead, "--".to_string(), "-o".to_string(), value]), &choices));
         }
     }
 }

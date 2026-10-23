@@ -34,6 +34,7 @@ struct Scope {
     globals: Flags,
     lists: Lists,
     branching: bool,
+    choices: std::collections::HashMap<String, Vec<String>>,
 }
 
 fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
@@ -68,6 +69,7 @@ fn sub_scopes(words: &[String], list: &[TomlSub], globals: &Flags, out: &mut Vec
                     Lists::Own
                 },
                 branching: !sub.sub.is_empty() || !sub.credential_first_arg.is_empty(),
+                choices: sub.flag_values.clone(),
             });
         }
         sub_scopes(&path, &sub.sub, globals, out);
@@ -98,8 +100,12 @@ fn admitted_arg(scope: &Scope) -> Option<String> {
     })
 }
 
-fn value_for(_scope: &Scope, _flag: &str) -> String {
-    "zv".to_string()
+fn value_for(scope: &Scope, flag: &str) -> String {
+    scope
+        .choices
+        .get(flag)
+        .and_then(|c| c.first())
+        .map_or_else(|| "zv".to_string(), |c| c.trim_end_matches('*').to_string())
 }
 
 fn check_scope(scope: &Scope, failures: &mut Vec<String>) -> bool {
@@ -166,6 +172,99 @@ fn a_flag_after_the_resource_is_judged_like_one_before_it() {
     for c in [
         "kubectl get pods", "kubectl get pods -o yaml", "kubectl get pods -n x -o wide", "kubectl get -n secrets pods",
         "scw instance volume list -o json", "exo compute instance list -O json", "vultr-cli dns domain list --help",
+    ] {
+        assert!(crate::is_safe_command(c), "must approve: {c}");
+    }
+}
+
+fn subs_with_values<'a>(words: &[String], list: &'a [TomlSub], out: &mut Vec<(Vec<String>, &'a TomlSub)>) {
+    for sub in list {
+        let mut path = words.to_vec();
+        path.push(sub.name.clone());
+        if !sub.flag_values.is_empty() {
+            out.push((path.clone(), sub));
+        }
+        subs_with_values(&path, &sub.sub, out);
+    }
+}
+
+fn spellings(flag: &str, value: &str) -> Vec<Vec<String>> {
+    let mut out = vec![vec![flag.to_string(), value.to_string()], vec![format!("{flag}={value}")]];
+    if flag.len() == 2 && !flag.starts_with("--") {
+        out.push(vec![format!("{flag}{value}")]);
+    }
+    out
+}
+
+#[test]
+fn every_listed_flag_value_is_the_only_one_admitted() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    let parsed: Vec<TomlFile> = files
+        .iter()
+        .map(|f| toml::from_str(&std::fs::read_to_string(f).expect("read toml")).expect("parse toml"))
+        .collect();
+    let mut found = Vec::new();
+    for file in &parsed {
+        for cmd in &file.command {
+            subs_with_values(std::slice::from_ref(&cmd.name), &cmd.sub, &mut found);
+        }
+    }
+    assert!(!found.is_empty(), "no sub declares flag_values — the walk is broken");
+    let mut failures = Vec::new();
+    for (path, sub) in &found {
+        let arg: Vec<String> = sub
+            .first_arg
+            .first()
+            .map(|p| p.strip_suffix('*').map_or_else(|| p.clone(), |x| format!("{x}zq")))
+            .into_iter()
+            .collect();
+        for (flag, choices) in &sub.flag_values {
+            let good = choices[0].trim_end_matches('*');
+            for spelled in spellings(flag, good) {
+                if !verdict(&line(path, &[&arg, &spelled])).is_allowed() {
+                    failures.push(format!("  {} {} {}: a listed value is refused", path.join(" "), arg.join(" "), spelled.join(" ")));
+                }
+            }
+            for spelled in spellings(flag, "go-template-file=/etc/zq") {
+                for words in [line(path, &[&arg, &spelled]), line(path, &[&spelled, &arg])] {
+                    if verdict(&words).is_allowed() {
+                        failures.push(format!("  {}: an unlisted value is approved", words.join(" ")));
+                    }
+                }
+            }
+            if verdict(&line(path, &[&arg, std::slice::from_ref(flag)])).is_allowed() {
+                failures.push(format!("  {} {flag}: a listed flag with no value is approved", path.join(" ")));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "flag_values not enforced:\n{}", failures.join("\n"));
+}
+
+#[test]
+fn kubectl_output_formats_that_read_a_file_are_refused() {
+    for c in [
+        "kubectl get -o go-template-file=$HOME/.ssh/id_rsa pods",
+        "kubectl get -o=go-template-file=/etc/passwd pods",
+        "kubectl get pods --output=jsonpath-file=/etc/passwd",
+        "kubectl get pods -o go-template-file --template=/etc/passwd",
+        "kubectl get pods -o go-template --template=/etc/passwd",
+        "kubectl get pods -Ao templatefile=/etc/passwd",
+        "kubectl get pods -ocustom-columns-file=/etc/passwd",
+        "kubectl config view -o go-template-file=/etc/passwd",
+        "kubectl events -o jsonpath-file=/etc/passwd",
+    ] {
+        assert!(!crate::is_safe_command(c), "must refuse: {c}");
+    }
+    for c in [
+        "kubectl get pods -o json",
+        "kubectl get pods -o=yaml",
+        "kubectl get pods -A -o wide",
+        "kubectl get pods -o 'jsonpath={.items[*].metadata.name}'",
+        "kubectl get pods -o custom-columns=NAME:.metadata.name",
+        "kubectl config view -o yaml",
+        "kubectl events -o json",
     ] {
         assert!(crate::is_safe_command(c), "must approve: {c}");
     }

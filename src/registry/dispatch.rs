@@ -107,14 +107,14 @@ fn dispatch_branching(
         }
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
-        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
+        return super::glob_flags::gated(&tokens[start..], sub, || dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS));
     }
     // A per-database variant: `db:migrate:primary` is `db:migrate` aimed at one of the databases
     // it would otherwise migrate all of. Only subs that OPT IN (`per_database`) match this way,
     // and only for a single trailing plain identifier — see `TomlSub::per_database` for why the
     // set cannot be enumerated and why inheriting the base's classification cannot widen it.
     if let Some(sub) = per_database_variant(subs, arg) {
-        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
+        return super::glob_flags::gated(&tokens[start..], sub, || dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS));
     }
     let glob_match = |p: &str| !arg.starts_with('-') && p.strip_suffix('*').map_or(arg == p, |prefix| arg.starts_with(prefix));
     // An argument naming secret material (`kubectl get secret`/`secret/x`, `aws configure get

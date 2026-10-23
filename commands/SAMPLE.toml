@@ -400,10 +400,12 @@
 # glob family like `kubectl get pods` names its resource positionally); use
 # credential_first_arg for positionals that must deny.
 #
-# Empty = the family is not yet researched and stays permissive. That is a
-# migration affordance for the ~250 cloud-service groups, not a default to
-# reach for: `no_new_unresearched_first_arg_family` pins the remaining set, so
-# a new undeclared family fails the build.
+# Empty = the sub's own standalone/valued (plus the command's [command.wrapper]
+# flags) are the list after the argument too, so a flag is judged the same on
+# either side of it. A sub with no flags of its own is not yet researched and
+# stays permissive. That is a migration affordance for the ~250 cloud-service
+# groups, not a default to reach for: `no_new_unresearched_first_arg_family`
+# pins the remaining set, so a new undeclared family fails the build.
 
 # [[command.sub]]
 # name = "iam"
@@ -436,6 +438,20 @@
 # first_arg_loopback_valued = ["--endpoint-url"]   # DynamoDB Local
 # first_arg_standalone = ["--debug", "--no-cli-pager"]
 # first_arg_valued = ["--output", "--query", "--region", "--table-name"]
+
+# FLAG_VALUES — the values a valued flag may take, on any sub. A flag whose
+# value changes what the command reads (kubectl's `-o go-template-file=PATH`
+# prints any file through a template with no actions) lists the values it may
+# take; any other value, or none, refuses. Checked in every spelling: `-o v`,
+# `-o=v`, `--output=v`, glued `-ov` and inside a short cluster (`-Ao v`), before
+# or after the first positional. A trailing `*` matches a prefix. Each key must
+# also be in `valued` (or `first_arg_valued`); the build fails otherwise.
+
+# [[command.sub]]
+# name = "get"
+# first_arg = ["*"]
+# valued = ["--output", "-o"]
+# flag_values = { "--output" = ["json", "yaml", "jsonpath=*"], "-o" = ["json", "yaml", "jsonpath=*"] }
 
 # LOOPBACK_VALUED / LOOPBACK_LOCALIZES (on a profiled sub) — the same endpoint
 # gate, plus whether a local destination changes the CLASSIFICATION.

@@ -492,7 +492,7 @@ pub fn try_sub_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
     };
     let arg = tokens.get(1)?.as_str();
     let sub = subs.iter().find(|s| s.name == arg)?;
-    Some(dispatch::dispatch_sub_kind(&tokens[1..], &sub.kind))
+    Some(glob_flags::gated(&tokens[1..], sub, || dispatch::dispatch_sub_kind(&tokens[1..], &sub.kind)))
 }
 
 /// Apply `cmd_name`'s TOML-declared `[command.fallback]` grammar.

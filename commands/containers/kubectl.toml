@@ -42,6 +42,7 @@ valued = ["--output", "-o"]
 name = "view"
 standalone = ["--flatten", "--help", "--minify", "-h"]
 valued = ["--output", "-o"]
+flag_values = { "--output" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"], "-o" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"] }
 
 [[command.sub]]
 name = "describe"
@@ -53,6 +54,7 @@ valued = ["--namespace", "--selector", "-l", "-n"]
 name = "events"
 standalone = ["--all-namespaces", "--help", "--watch", "-A", "-h", "-w"]
 valued = ["--for", "--namespace", "--output", "--types", "-n", "-o"]
+flag_values = { "--output" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"], "-o" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"] }
 
 [[command.sub]]
 name = "explain"
@@ -79,6 +81,7 @@ valued = [
     "--output", "--selector", "--sort-by",
     "-l", "-n", "-o",
 ]
+flag_values = { "--output" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"], "-o" = ["json", "yaml", "kyaml", "name", "wide", "go-template=*", "template=*", "jsonpath=*", "jsonpath-as-json=*", "custom-columns=*"] }
 
 [[command.sub]]
 name = "logs"
