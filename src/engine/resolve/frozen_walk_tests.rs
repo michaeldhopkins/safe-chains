@@ -714,3 +714,18 @@ fn a_filter_is_not_applied_to_an_operand_with_a_trailing_slash() {
     assert!(bare.is_empty(), "the pruned .git was reached: {bare:?}");
     assert!(matches!(slashed.as_slice(), [Reach::Found(p)] if p.ends_with("proj/.git/f")), "{slashed:?}");
 }
+
+/// A glob operand's matches are not trusted to the filters either: find matches `-name` against
+/// what the shell expanded, which the walk has not seen.
+#[test]
+fn a_filter_is_not_applied_through_a_glob_operand() {
+    use super::{Skip, Test, WalkLinks};
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/proj/.git")).expect("git");
+    let globbed = on_hook_stack(move || {
+        let _guard = pathctx::enter(ctx(&root));
+        let skip = Skip { pruned: vec![(Test::Name(".git".into(), false), false)], ..Skip::default() };
+        reach_below("pro*", Walk { hidden: true, links: WalkLinks::Ignore, skip: &skip })
+    });
+    assert!(matches!(globbed.as_slice(), [Reach::Found(p)] if p.ends_with("proj/.git/f")), "{globbed:?}");
+}

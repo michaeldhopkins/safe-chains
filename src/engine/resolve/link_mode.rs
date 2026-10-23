@@ -188,12 +188,23 @@ mod tests {
         }
     }
 
+    /// macOS `chmod -H` and `-L` act only beside `-R`; GNU's `--dereference` acts alone.
     #[test]
     fn chmod_follows_a_link_named_by_a_walk_flag() {
-        for line in ["chmod -hR -L 755 l", "chmod -RH 755 l", "chmod -h --dereference 755 l"] {
+        for line in ["chmod -R -L 755 l", "chmod -RH 755 l", "chmod -h --dereference 755 l"] {
             assert!(!on(line), "{line}");
         }
-        assert!(on("chmod -hR 755 l"));
+        assert!(on("chmod -R 755 l"));
+    }
+
+    /// `chflags -H` and `-L` act only beside `-R`, which `-h` refuses.
+    #[test]
+    fn chflags_follows_a_link_named_by_a_walk_flag() {
+        for line in ["chflags -R -L nodump l", "chflags -RH nodump l"] {
+            assert!(super::follows_links(&line.split_whitespace().collect::<Vec<_>>()), "{line}");
+        }
+        assert!(!super::follows_links(&["chflags", "-h", "nodump", "l"]));
+        assert!(on("chflags -h nodump l"));
     }
 
     #[test]
