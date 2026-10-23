@@ -21,7 +21,7 @@ fn launches_an_operand(tokens: &[Token]) -> bool {
             if !is_web_address(word) {
                 return true;
             }
-        } else if after_separator || !word.starts_with('-') || word == "-" {
+        } else if after_separator || !operands.is_empty() || !word.starts_with('-') || word == "-" {
             operands.push(word);
         } else if word == "--" {
             after_separator = true;
@@ -81,6 +81,10 @@ mod tests {
     }
 
     denied! {
+        open_reveal_after_the_operand: "open x.command -R",
+        open_editor_after_the_operand: "open x.command -e",
+        open_text_after_the_operand: "open Foo.app -t",
+        open_posix_order_editor_after_the_operand: "POSIXLY_CORRECT=1 open x.command -e",
         open_command_file: "open x.command",
         open_command_absolute: "/usr/bin/open x.command",
         open_command_quoted: "open 'x.command'",
