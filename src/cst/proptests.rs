@@ -2,7 +2,7 @@ use super::*;
 use proptest::prelude::*;
 
 const SHELL_KEYWORDS: &[&str] =
-    &["do", "done", "for", "while", "until", "if", "then", "elif", "else", "fi", "in", "case", "esac", "select"];
+    &["do", "done", "for", "while", "until", "if", "then", "elif", "else", "fi", "in", "case", "esac", "select", "function"];
 
 fn starts_with_keyword(s: &str) -> bool {
     SHELL_KEYWORDS
@@ -104,6 +104,15 @@ fn arb_simple_cmd(depth: u32) -> BoxedStrategy<SimpleCmd> {
         prop::collection::vec(arb_redir(), 0..2),
     )
         .prop_map(|(env, words, redirs)| SimpleCmd { env, words, redirs })
+        // Each part is filtered on its own, but `Lit("d"), Lit("o")` still renders as `do`.
+        .prop_filter("command word must not render as a shell keyword", |cmd| {
+            let leading: String = cmd.words[0]
+                .0
+                .iter()
+                .map_while(|p| if let WordPart::Lit(s) = p { Some(s.as_str()) } else { None })
+                .collect();
+            !starts_with_keyword(&leading)
+        })
         .boxed()
 }
 
@@ -151,6 +160,8 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
 fn arb_case_pattern() -> impl Strategy<Value = Word> {
     prop::string::string_regex("[a-z*?][a-z0-9*?.-]{0,5}")
         .expect("valid regex")
+        // Arms render without a leading `(`, so a pattern of `esac` would close the case.
+        .prop_filter("not a shell keyword", |s| !starts_with_keyword(s))
         .prop_map(|s| Word(vec![WordPart::Lit(s)]))
 }
 
