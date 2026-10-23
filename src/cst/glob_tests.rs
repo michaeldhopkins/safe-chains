@@ -31,6 +31,16 @@ fn matches_that_cannot_be_flags_are_classified_as_paths() {
     }
 }
 
+/// A loop variable bound to a glob's matches is not a number, and splitting it in a printf argument
+/// after a format with no numeric slot is harmless; reading it must not record it as a number.
+#[test]
+fn a_loop_over_matches_may_print_its_variable_unquoted() {
+    let dir = folder(&["a.txt", "b.txt"]);
+    for cmd in ["for f in *; do printf '%s\\n' $f; done", "for f in *.txt; do printf '%s\\n' $f; done"] {
+        assert!(allowed_in(dir.path(), cmd), "`{cmd}` refused");
+    }
+}
+
 #[test]
 fn a_match_that_could_be_a_flag_keeps_the_glob_unknown() {
     let cases: &[(&str, &[&str])] = &[

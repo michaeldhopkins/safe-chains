@@ -223,6 +223,8 @@ fn a_protected_place_is_named_by_the_home_folder_and_by_a_protected_path() {
     in_gate_probe(|| {
         assert!(names_a_protected_place("~"));
         assert!(names_a_protected_place("~/.config/safe-chains.toml"));
+        assert!(names_a_protected_place(&home()), "the home folder spelled out");
+        assert!(names_a_protected_place(&format!("{}/", home())), "the home folder with a trailing slash");
         assert!(!names_a_protected_place("notes"));
     });
 }
