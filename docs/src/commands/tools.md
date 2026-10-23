@@ -979,7 +979,7 @@ Aliases: `g++`, `cc`, `c++`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/man.1.html">https://man7.org/linux/man-pages/man1/man.1.html</a></p>
 
 - Allowed standalone flags: --all, --apropos, --default, --help, --local-file, --regex, --update, --version, --whatis, --where, --where-cat, --wildcard, -V, -a, -f, -h, -k, -l, -u, -w
-- Allowed valued flags: --config-file, --encoding, --extension, --locale, --manpath, --sections, --systems, -C, -E, -L, -M, -S, -e, -m
+- Allowed valued flags: --encoding, --extension, --locale, --manpath, --sections, --systems, -E, -L, -M, -S, -e, -m
 
 ### `markdownlint`
 <p class="cmd-url"><a href="https://github.com/igorshubovych/markdownlint-cli">https://github.com/igorshubovych/markdownlint-cli</a></p>
