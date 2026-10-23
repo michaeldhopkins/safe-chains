@@ -423,7 +423,6 @@ knex seed:make	--timestamp-filename-date	untriaged	-	-	-
 kotlinc	-classpath	untriaged	-	-	-	
 kotlinc	-Xfriend-paths	untriaged	-	-	-	
 kramdown	--config-file	untriaged	-	-	-	
-kubectl diff	--filename	untriaged	-	-	-	
 latexmk	--output-directory	untriaged	-	-	-	
 latexmk	-aux-directory	untriaged	-	-	-	
 latexmk	-output-directory	untriaged	-	-	-	

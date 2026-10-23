@@ -4,7 +4,7 @@ description = "Primary CLI for Kubernetes cluster management with a large and gr
 url = "https://kubernetes.io/docs/reference/kubectl/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = ["kubectl config view", "kubectl config view --flatten --minify"]
-examples_denied = ["kubectl config view --raw", "kubectl config view --flatten --raw", "kubectl config view --raw=true"]
+examples_denied = ["kubectl config view --raw", "kubectl config view --flatten --raw", "kubectl config view --raw=true", "kubectl diff -f ~/.ssh/id_rsa", "kubectl diff --filename=~/.aws/credentials", "kubectl diff -k ~/.ssh"]
 
 [[command.sub]]
 name = "api-resources"
@@ -117,3 +117,8 @@ bare = false
 tolerate_unknown_short = true
 standalone = ["--field-manager", "--force-conflicts", "--help", "--prune", "--server-side", "-h"]
 valued = ["-f", "--filename", "-k", "--kustomize", "-l", "--selector", "--prune-allowlist"]
+
+# `diff -f/--filename` and `-k/--kustomize` name local manifests that kubectl reads and sends to the
+# API server for a dry run, so their values are read paths.
+[command.path_gate]
+flags = { "-f" = "read", "--filename" = "read", "-k" = "read", "--kustomize" = "read" }

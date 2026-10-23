@@ -3543,12 +3543,17 @@ ktrace trace -x x	inert
 ktrace trace x	inert
 ktrace x	denied
 kubectl	denied
+kubectl --filename x	denied
 kubectl --help	inert
+kubectl --help --filename x	denied
 kubectl --help --version	denied
 kubectl --help x	denied
+kubectl --kustomize x	denied
 kubectl --version	inert
 kubectl -V	inert
+kubectl -f x	denied
 kubectl -h	inert
+kubectl -k x	denied
 kubectl api-resources	inert
 kubectl api-resources --api-group x	inert
 kubectl api-resources --help	inert
@@ -3642,6 +3647,7 @@ kubectl diff --field-manager --filename x	inert
 kubectl diff --field-manager --force-conflicts	inert
 kubectl diff --field-manager x	inert
 kubectl diff --filename x	inert
+kubectl diff --filename=~/.aws/credentials	denied
 kubectl diff --force-conflicts	inert
 kubectl diff --help	inert
 kubectl diff --kustomize x	inert
@@ -3650,8 +3656,10 @@ kubectl diff --prune-allowlist x	inert
 kubectl diff --selector x	inert
 kubectl diff --server-side	inert
 kubectl diff -f x	inert
+kubectl diff -f ~/.ssh/id_rsa	denied
 kubectl diff -h	inert
 kubectl diff -k x	inert
+kubectl diff -k ~/.ssh	denied
 kubectl diff -l x	inert
 kubectl diff x	inert
 kubectl events	inert
