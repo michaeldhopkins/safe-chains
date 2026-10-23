@@ -223,7 +223,7 @@ impl CommandSpec {
             DispatchKind::RequireAny { require_any, policy, .. } => {
                 let req = require_any.join(", ");
                 let summary = policy.describe();
-                if summary.is_empty() { format!("Requires {req}.") } else { format!("Requires {req}. {summary}") }
+                if summary.is_empty() { format!("Requires {req}.") } else { format!("Requires {req}.\n{summary}") }
             }
             DispatchKind::Branching { bare_flags, subs, bare_ok, first_arg, .. } => {
                 let mut lines = Vec::new();

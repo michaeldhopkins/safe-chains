@@ -5123,6 +5123,28 @@ fn researched_version_does_not_render_in_docs() {
 }
 
 #[test]
+fn require_any_keeps_each_policy_bullet_on_its_own_line() {
+    let spec = load_one(
+        r#"
+            [[command]]
+            name = "demo"
+            bare = false
+            require_any = ["-c", "-d", "-l", "-r"]
+            standalone = ["--help", "-c", "-d", "-l", "-r"]
+            valued = ["-q"]
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert_eq!(
+        doc.description,
+        "\
+- Requires -c, -d, -l, -r.
+- Allowed standalone flags: --help, -c, -d, -l, -r
+- Allowed valued flags: -q"
+    );
+}
+
+#[test]
 fn handler_command_with_doc_body_renders_body() {
     let spec = load_one(
         r#"
