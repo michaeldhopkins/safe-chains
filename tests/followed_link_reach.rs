@@ -11,7 +11,11 @@ struct Project {
 }
 
 fn project() -> Project {
-    let dir = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("scratch project");
+    project_in(env!("CARGO_TARGET_TMPDIR"))
+}
+
+fn project_in(parent: &str) -> Project {
+    let dir = tempfile::tempdir_in(parent).expect("scratch project");
     let root = dir.path().canonicalize().expect("canonical root").to_str().expect("utf-8 root").to_string();
     std::fs::create_dir_all(format!("{root}/src")).expect("project folder");
     std::fs::write(format!("{root}/src/a.txt"), "a").expect("project file");
@@ -133,7 +137,7 @@ const FOLLOWING_TREE_READS: [&str; 11] = [
 ];
 
 fn outside(secret: Option<&str>) -> Project {
-    let p = project();
+    let p = project_in("/tmp");
     std::fs::create_dir_all(format!("{}/out2/inner", p.root)).expect("outside folder");
     std::fs::write(format!("{}/out2/inner/note", p.root), "n").expect("outside file");
     if let Some(target) = secret {
