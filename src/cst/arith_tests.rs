@@ -263,12 +263,12 @@ fn every_other_place_a_shell_reads_arithmetic_is_refused_when_it_assigns() {
         "read {x,'a[HOME=1]'} < /dev/null; git log", "test {-v,'b[HOME=1]'}; git log", "[ {-v,'b[HOME=1]'} ]; git log",
         "printf %<->d HOME=1; git log", "printf %5<->d HOME=1; git log", "printf %.<->f HOME=1; git log", "test -v a*; git log",
         "test ?v 'a[HOME=1]'; git log", "[ -? 'a[HOME=1]' ]; git log", "test -* 'a[HOME=1]'; git log", "test *; git log",
-        "test $(cat f); git log", "x=$(cat f); test $x; git log", "[ $x ]; git log", "test -n y -a `cat f`; git log",
-        "o=-v; test $o 'a[HOME=1]'; git log", "o=-v; [ \"$o\" 'a[HOME=1]' ]; git log", "test $(echo -v) 'a[HOME=1]'; git log",
-        "test \"$1\" 'a[HOME=1]'; git log", "[ * ]; git log", "test -n x -a *; git log", "test *[!/]; git log", "test *.[ch]; git log",
-        "[ -v a? ]; git log", "printf ~+ HOME=1; git log", "printf ~1 HOME=1; git log", "[ -v 'a[HOME=1]' ]; git log",
-        "read 'a[HOME=1]' <<< x; git log", "unset 'a[HOME=1]'; git log", "x='a[HOME=1]'; echo ${!x}; git log",
-        "x='a[HOME=1]'; echo ${(P)x}; git log", "x='a[HOME=1]'; test -v \"$x\"; git log",
+        "test $(cat f); git log", "x=$(cat f); test $x; git log", "[ $x ]; git log", "test $$? 'a[HOME=1]'; git log", "test $* x; git log",
+        "test -n y -a `cat f`; git log", "o=-v; test $o 'a[HOME=1]'; git log", "o=-v; [ \"$o\" 'a[HOME=1]' ]; git log",
+        "test $(echo -v) 'a[HOME=1]'; git log", "test \"$1\" 'a[HOME=1]'; git log", "[ * ]; git log", "test -n x -a *; git log",
+        "test *[!/]; git log", "test *.[ch]; git log", "[ -v a? ]; git log", "printf ~+ HOME=1; git log", "printf ~1 HOME=1; git log",
+        "[ -v 'a[HOME=1]' ]; git log", "read 'a[HOME=1]' <<< x; git log", "unset 'a[HOME=1]'; git log",
+        "x='a[HOME=1]'; echo ${!x}; git log", "x='a[HOME=1]'; echo ${(P)x}; git log", "x='a[HOME=1]'; test -v \"$x\"; git log",
     ] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
@@ -355,7 +355,7 @@ fn printf_reads_only_its_numeric_slots_as_numbers() {
         "printf '%d %s\\n' 5 hello", "printf '%*s' 5 x", "printf '%s=%d\\n' a 1 b 2", "printf '%%d %s' x", "x=hi; printf '%s\\n' \"$x\"",
         "printf '%s\\n' {a,b}", "[ -f *.txt ]", "[ -e *.log ]", "[ -d src/* ]", "[ -z \"$(git status --porcelain)\" ]",
         "[ \"$(uname)\" = Darwin ]", "x=hi; printf '%s\\n' $x", "[ -n \"$x\" ]", "[ \"$a\" = \"$b\" ]", "[ -f *.txt -a -r x ]",
-        "test -f ~/x", "printf 'x%' 5",
+        "test -f ~/x", "printf 'x%' 5", "[ $? -ne 0 ]; git log", "test $? = 0", "test $$ -gt 0", "[ $# -eq 0 ]",
     ] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }

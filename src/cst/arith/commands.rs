@@ -134,11 +134,11 @@ fn name_verdict(word: &Word) -> Verdict {
 /// words too, so `$x` may be `-v a[HOME=1]`.
 fn fans_out(word: &Word) -> bool {
     let tilde = matches!(word.0.first(), Some(WordPart::Lit(s)) if s.strip_prefix('~').is_some_and(|rest| rest.starts_with(['+', '-']) || rest.starts_with(|c: char| c.is_ascii_digit())));
-    let split = word.0.iter().any(|part| match part {
-        WordPart::Lit(s) => s.match_indices('$').any(|(at, _)| !one_word(&s[at + 1..])),
-        WordPart::CmdSub(_) | WordPart::Backtick(_) => read_text(&Word(vec![part.clone()])).0.contains(UNKNOWN),
-        _ => false,
-    });
+    let split = literal_runs(word).iter().any(|s| literal(s).any(|(at, c)| c == '$' && !one_word(&s[at + 1..])))
+        || word.0.iter().any(|part| match part {
+            WordPart::CmdSub(_) | WordPart::Backtick(_) => read_text(&Word(vec![part.clone()])).0.contains(UNKNOWN),
+            _ => false,
+        });
     globbed(word) || tilde || split || word.expand() != [word.eval()]
 }
 
@@ -180,8 +180,35 @@ fn one_word(after: &str) -> bool {
     known || (holds_a_number(name) && !holds_an_expression(name))
 }
 
+/// The word's unquoted text, adjacent literal parts joined: the parser keeps `$$` as two parts.
+fn literal_runs(word: &Word) -> Vec<String> {
+    fn text(part: &WordPart) -> Option<&str> {
+        match part {
+            WordPart::Lit(s) => Some(s),
+            _ => None,
+        }
+    }
+    word.0
+        .chunk_by(|a, b| text(a).is_some() && text(b).is_some())
+        .filter_map(|run| run.iter().map(text).collect::<Option<String>>())
+        .collect()
+}
+
+/// Unquoted text's characters with their offsets, less the special parameter a `$` names: the
+/// `?` of `$?` is not a glob, and the second `$` of `$$` starts no expansion of its own.
+fn literal(s: &str) -> impl Iterator<Item = (usize, char)> + '_ {
+    s.char_indices()
+        .scan(false, |after_dollar, (at, c)| {
+            let named = *after_dollar && matches!(c, '$' | '?' | '*' | '#' | '!' | '@' | '-');
+            *after_dollar = c == '$' && !named;
+            Some((at, c, named))
+        })
+        .filter(|&(_, _, named)| !named)
+        .map(|(at, c, _)| (at, c))
+}
+
 fn globbed(word: &Word) -> bool {
-    word.0.iter().any(|part| matches!(part, WordPart::Lit(s) if s.contains(['*', '?', '['])))
+    literal_runs(word).iter().any(|s| literal(s).any(|(_, c)| matches!(c, '*' | '?' | '[')))
 }
 
 /// Text the shell finishes building when it runs: an expansion, or a substitution's output.
