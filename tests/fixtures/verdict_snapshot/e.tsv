@@ -284,8 +284,13 @@ echo -e	inert
 echo -e one\\ntwo	inert
 echo -n	inert
 echo -n done	inert
+echo ../../.zshrc | cpio -pd ./out	denied
 echo ./a ./b | xargs awk	denied
 echo ./a | xargs cat	safe-read
+echo ./notes.txt | cpio -o	safe-write
+echo .envrc | cpio -p ./dst	denied
+echo .git/hooks/pre-commit | cpio -pd ./dst	denied
+echo /etc/hosts | cpio -pd ./dst	safe-write
 echo /etc/shadow | xargs cat	denied
 echo `rm -rf /`	denied
 echo a | pcre2grep '(?C"sh|-c|whoami")a'	denied
@@ -320,6 +325,17 @@ echo x > /etc/passwd	denied
 echo x > ~/.ssh/authorized_keys	denied
 echo x >> .git/hooks/post-commit	denied
 echo x | xargs chmod +s	denied
+echo ~/.ssh/id_rsa | cpio --create	denied
+echo ~/.ssh/id_rsa | cpio --pass-through -d ./out	denied
+echo ~/.ssh/id_rsa | cpio -o	denied
+echo ~/.ssh/id_rsa | cpio -oO ./a.cpio	denied
+echo ~/.ssh/id_rsa | cpio -pd ./out	denied
+echo ~/.ssh/id_rsa | pax -rw ./out	denied
+echo ~/.ssh/id_rsa | pax -w	denied
+echo ~/.ssh/id_rsa | pax -w -f ./a.pax	denied
+echo ~/.ssh/id_rsa | zip --names-stdin ./a.zip	denied
+echo ~/.ssh/id_rsa | zip -@ ./a.zip	denied
+echo ~/.ssh/id_rsa | zip -q@ ./a.zip	denied
 ecpg	denied
 ecpg --help	safe-write
 ecpg --help --regression	safe-write
@@ -528,8 +544,10 @@ emacs --version	inert
 emacs -Q	inert
 emacs -h	inert
 emacs -nw	inert
+emacs -nw ./notes.md	inert
 emacs -q	inert
 emacs x	inert
+emacs ~/.ssh/id_ed25519	denied
 emar	denied
 emar --help	safe-write
 emar --help --version	safe-write
@@ -655,6 +673,7 @@ env FOO=bar BAZ=qux git status	inert
 env FOO=bar bash -c 'git status'	inert
 env FOO=bar ls -la	inert
 env FOO=bar rm -rf /	denied
+env RSYNC_RSH=make rsync x:foo dst/	denied
 env RUST_BACKTRACE=1 cargo test	safe-read
 env bash -c 'ls && rm -rf /'	denied
 env ls -la	inert
@@ -1247,15 +1266,14 @@ eval 'rm -rf /'	denied
 eval <(mise activate bash)	denied
 eval `mise activate bash`	inert
 ex	inert
+ex +!id	denied
 ex --clean	inert
 ex --clean --help	inert
 ex --clean -T x	inert
 ex --clean x	inert
 ex --help	inert
-ex --log	inert
 ex --noplugin	inert
 ex --not-a-term	inert
-ex --startuptime	inert
 ex --ttyfail	inert
 ex --version	inert
 ex -C	inert
@@ -1716,6 +1734,7 @@ export FOO=bar	inert
 export GIT_DIR=/tmp/evil	denied
 export LD_PRELOAD=/tmp/evil.so	denied
 export PATH_EXTRA=./bin	inert
+export PS1='$(id)'; tmux new -d	denied
 export RUSTC_WRAPPER=/tmp/evil	denied
 export x	inert
 expr	denied

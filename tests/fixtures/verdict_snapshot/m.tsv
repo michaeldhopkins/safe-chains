@@ -1583,14 +1583,14 @@ mise self-update	denied
 mise self-update x	denied
 mise set	denied
 mise set --file	denied
-mise set --file --global	denied
+mise set --file --help	denied
 mise set --file x	denied
-mise set --global	denied
-mise set --help	denied
+mise set --help	safe-write
 mise set --remove	safe-write
 mise set -f	denied
-mise set -g	denied
-mise set -h	denied
+mise set -h	safe-write
+mise set FOO --help	denied
+mise set help	denied
 mise set x	denied
 mise settings	inert
 mise settings add	denied
@@ -2991,6 +2991,8 @@ monolith -u x	inert
 monolith -v	inert
 monolith x	inert
 more	inert
+more '+!id' ./notes.md	denied
+more +42 ./notes.md	inert
 more --help	inert
 more --help --lines x	inert
 more --help --version	inert

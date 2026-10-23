@@ -2,6 +2,7 @@ ACKRC=/tmp/x ack foo	denied
 ACK_OPTIONS=--pager=/tmp/x ack foo	denied
 ACK_PAGER=/tmp/x ack foo	denied
 ACK_PAGER_COLOR=/tmp/x ack foo	denied
+ANSIBLE_VAULT_PASSWORD_FILE=./pw.sh ansible-vault encrypt ./a.yml	denied
 a2p	inert
 a2p --help	denied
 a2p --version	denied
@@ -1689,8 +1690,8 @@ ansible-vault encrypt --encrypt-vault-id x	safe-write
 ansible-vault encrypt --help	safe-write
 ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml	safe-write
 ansible-vault encrypt --output x	safe-write
-ansible-vault encrypt --vault-id x	safe-write
-ansible-vault encrypt --vault-password-file x	safe-write
+ansible-vault encrypt --vault-id dev@./pw.sh ./group_vars/all.yml	denied
+ansible-vault encrypt --vault-password-file ./pw.sh ./group_vars/all.yml	denied
 ansible-vault encrypt -h	safe-write
 ansible-vault encrypt x	safe-write
 ansible-vault encrypt_string	denied
@@ -1705,8 +1706,8 @@ ansible-vault encrypt_string --name x	safe-read
 ansible-vault encrypt_string --show-input	safe-read
 ansible-vault encrypt_string --stdin-name	safe-read
 ansible-vault encrypt_string --stdin-name x	safe-read
-ansible-vault encrypt_string --vault-id x	safe-read
-ansible-vault encrypt_string --vault-password-file x	safe-read
+ansible-vault encrypt_string --vault-pass-file /tmp/x.sh secret	denied
+ansible-vault encrypt_string --vault-password-file=/tmp/x.sh secret	denied
 ansible-vault encrypt_string -h	safe-read
 ansible-vault encrypt_string -n	safe-read
 ansible-vault encrypt_string x	safe-read
@@ -1722,9 +1723,6 @@ ansible-vault view --ask-vault-pass x	denied
 ansible-vault view --ask-vault-pass-file x	denied
 ansible-vault view --ask-vault-password	denied
 ansible-vault view --help	denied
-ansible-vault view --vault-id x	denied
-ansible-vault view --vault-password-file	denied
-ansible-vault view --vault-password-file x	denied
 ansible-vault view -h	denied
 ansible-vault view x	denied
 ansible-vault x	denied
@@ -3481,20 +3479,20 @@ astro version x	inert
 astro x	denied
 at	denied
 at --help	inert
-at --help -c	safe-write
+at --help -d	safe-write
 at --help -q x	denied
 at --help x	denied
 at --version	denied
 at -V	denied
 at -b	denied
-at -c	safe-write
-at -c --help	safe-write
-at -c -c	safe-write
-at -c -d	safe-write
-at -c -l	safe-write
-at -c -q x	safe-write
-at -c -r	safe-write
+at -c 3	denied
+at -c 3 now	denied
 at -d	safe-write
+at -d --help	safe-write
+at -d -d	safe-write
+at -d -l	safe-write
+at -d -q x	safe-write
+at -d -r	safe-write
 at -f x.sh now	denied
 at -l	safe-write
 at -l -f x.sh now	denied
@@ -3502,6 +3500,7 @@ at -m now + 1 minute	denied
 at -q a now	denied
 at -q x	denied
 at -r	safe-write
+at -r 3	safe-write
 at -t 202601010000	denied
 at now	denied
 at x	denied
@@ -3775,6 +3774,7 @@ atq --help x	inert
 atq --version	denied
 atq -V	inert
 atq -f x.sh	denied
+atq -q b	inert
 atq -q x	inert
 atq -v	inert
 atq x	inert
@@ -3784,6 +3784,7 @@ atrm --help -V	safe-write
 atrm --help x	safe-write
 atrm --version	denied
 atrm -V	safe-write
+atrm 3	safe-write
 atrm x	safe-write
 atuin	denied
 atuin --help	inert

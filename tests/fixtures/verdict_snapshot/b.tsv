@@ -321,7 +321,17 @@ bat -p	inert
 bat -r x	inert
 bat -u	inert
 bat x	inert
+batch	denied
+batch --help	inert
+batch --help --help	inert
+batch --help -f x.sh	denied
+batch --help -h	inert
+batch --help x	denied
+batch --version	denied
+batch -V	denied
 batch -f x.sh	denied
+batch -h	inert
+batch x	denied
 bazel	denied
 bazel --help	inert
 bazel --help --version	denied
@@ -2878,11 +2888,127 @@ bzip2recover -v	safe-write
 bzip2recover -z	safe-write
 bzip2recover x	safe-write
 bzless	inert
-bzless --help	denied
-bzless --version	denied
+bzless --LINE-NUMBERS x	inert
+bzless --LONG-PROMPT x	inert
+bzless --QUIT-AT-EOF	inert
+bzless --QUIT-AT-EOF --LINE-NUMBERS x	inert
+bzless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
+bzless --QUIT-AT-EOF x	inert
+bzless --RAW-CONTROL-CHARS	inert
+bzless --chop-long-lines	inert
+bzless --help	inert
+bzless --ignore-case	inert
+bzless --no-init	inert
+bzless --pattern x	inert
+bzless --prompt x	inert
+bzless --quiet	inert
+bzless --quit-at-eof	inert
+bzless --quit-if-one-screen	inert
+bzless --raw-control-chars	inert
+bzless --shift x	inert
+bzless --silent	inert
+bzless --squeeze-blank-lines	inert
+bzless --tabs x	inert
+bzless --tag x	inert
+bzless --version	inert
+bzless --window x	inert
+bzless -E	inert
+bzless -F	inert
+bzless -G	inert
+bzless -I	inert
+bzless -J	inert
+bzless -K	inert
+bzless -L	inert
+bzless -M	inert
+bzless -N	inert
+bzless -P x	inert
+bzless -Q	inert
+bzless -R	inert
+bzless -S	inert
+bzless -V	inert
+bzless -W	inert
+bzless -X	inert
+bzless -a	inert
+bzless -b x	inert
+bzless -c	inert
+bzless -e	inert
+bzless -f	inert
+bzless -g	inert
+bzless -h x	inert
+bzless -i	inert
+bzless -j x	inert
+bzless -m	inert
+bzless -n	inert
+bzless -p x	inert
+bzless -q	inert
+bzless -r	inert
+bzless -s	inert
+bzless -t x	inert
+bzless -w	inert
+bzless -x x	inert
+bzless -y x	inert
+bzless -z x	inert
 bzless x	inert
 bzmore	inert
-bzmore --help	denied
-bzmore --version	denied
+bzmore --LINE-NUMBERS x	inert
+bzmore --LONG-PROMPT x	inert
+bzmore --QUIT-AT-EOF	inert
+bzmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
+bzmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
+bzmore --QUIT-AT-EOF x	inert
+bzmore --RAW-CONTROL-CHARS	inert
+bzmore --chop-long-lines	inert
+bzmore --help	inert
+bzmore --ignore-case	inert
+bzmore --no-init	inert
+bzmore --pattern x	inert
+bzmore --prompt x	inert
+bzmore --quiet	inert
+bzmore --quit-at-eof	inert
+bzmore --quit-if-one-screen	inert
+bzmore --raw-control-chars	inert
+bzmore --shift x	inert
+bzmore --silent	inert
+bzmore --squeeze-blank-lines	inert
+bzmore --tabs x	inert
+bzmore --tag x	inert
+bzmore --version	inert
+bzmore --window x	inert
+bzmore -E	inert
+bzmore -F	inert
+bzmore -G	inert
+bzmore -I	inert
+bzmore -J	inert
+bzmore -K	inert
+bzmore -L	inert
+bzmore -M	inert
+bzmore -N	inert
+bzmore -P x	inert
+bzmore -Q	inert
+bzmore -R	inert
+bzmore -S	inert
+bzmore -V	inert
+bzmore -W	inert
+bzmore -X	inert
+bzmore -a	inert
+bzmore -b x	inert
+bzmore -c	inert
+bzmore -e	inert
+bzmore -f	inert
+bzmore -g	inert
+bzmore -h x	inert
+bzmore -i	inert
+bzmore -j x	inert
+bzmore -m	inert
+bzmore -n	inert
+bzmore -p x	inert
+bzmore -q	inert
+bzmore -r	inert
+bzmore -s	inert
+bzmore -t x	inert
+bzmore -w	inert
+bzmore -x x	inert
+bzmore -y x	inert
+bzmore -z x	inert
 bzmore ./a.bz2	inert
 bzmore x	inert

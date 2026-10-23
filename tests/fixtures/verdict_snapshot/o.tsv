@@ -1367,8 +1367,11 @@ open -F -u x	denied
 open -F x	denied
 open -R	safe-read
 open -R -- ssh://host	denied
+open -R 1a:b	safe-read
 open -R Build/Foo.app	safe-read
 open -R FILE:///tmp/x.command	denied
+open -R a_b:c	safe-read
+open -R dir/a:b	safe-read
 open -R file:///tmp/x.command	denied
 open -R https:x.command	denied
 open -R ssh://host	denied
@@ -1401,15 +1404,18 @@ open -u x	denied
 open -uW https://example.com x.command	denied
 open .	denied
 open Foo.app	denied
+open Foo.app -t	denied
 open HTTPS://example.com	safe-read
 open README.md	denied
 open file:///tmp/x.command	denied
-open http://localhost:8097/	safe-read
+open http://localhost:8000/	safe-read
 open https://example.com	safe-read
 open https://example.com --args -x	denied
 open https://example.com x.command	denied
 open x	denied
 open x.command	denied
+open x.command -R	denied
+open x.command -e	denied
 open x.sh	denied
 opencode	denied
 opencode --help	inert

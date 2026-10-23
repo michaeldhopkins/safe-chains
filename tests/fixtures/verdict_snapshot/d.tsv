@@ -2162,12 +2162,15 @@ direnv --help --version	denied
 direnv --help x	denied
 direnv --version	inert
 direnv -h	inert
+direnv dump	denied
 direnv export	denied
 direnv export --help	inert
 direnv export --help -h	inert
-direnv export --help x	inert
+direnv export --help x	denied
 direnv export -h	inert
-direnv export x	inert
+direnv export bash	denied
+direnv export json	denied
+direnv export x	denied
 direnv fetchurl	denied
 direnv fetchurl --help	inert
 direnv fetchurl --help -h	inert
@@ -2310,7 +2313,10 @@ ditto -h	safe-write
 ditto -j	safe-write
 ditto -k	safe-write
 ditto -v	safe-write
-ditto -x	safe-write
+ditto -x	denied
+ditto -x -k ./archive.zip ./out	denied
+ditto -x ./archive.cpio ./out	denied
+ditto -xk ./archive.zip ./out	denied
 ditto -z	safe-write
 ditto ./src ./dst	safe-write
 ditto src/ dest/	safe-write

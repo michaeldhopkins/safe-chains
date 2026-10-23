@@ -31,7 +31,7 @@ xar --extract-subdoc x	safe-write
 xar --file-cksum x	safe-write
 xar --help	denied
 xar --keep-existing	safe-write
-xar --keep-setuid	safe-write
+xar --keep-setuid	denied
 xar --link-same	safe-write
 xar --list-subdocs x	safe-write
 xar --no-compress x	safe-write
@@ -53,6 +53,8 @@ xar -s	safe-write
 xar -t	safe-write
 xar -v	safe-write
 xar -x	safe-write
+xar -x --keep-setuid -f ./archive.xar	denied
+xar -x -f ./archive.xar	safe-write
 xar -x -f file.xar	safe-write
 xar -z	safe-write
 xar x	safe-write
@@ -1467,11 +1469,127 @@ xzgrep TODO ./log.xz	inert
 xzgrep x	inert
 xzgrep x ~/.ssh/id_rsa	denied
 xzless	inert
-xzless --help	denied
-xzless --version	denied
+xzless --LINE-NUMBERS x	inert
+xzless --LONG-PROMPT x	inert
+xzless --QUIT-AT-EOF	inert
+xzless --QUIT-AT-EOF --LINE-NUMBERS x	inert
+xzless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
+xzless --QUIT-AT-EOF x	inert
+xzless --RAW-CONTROL-CHARS	inert
+xzless --chop-long-lines	inert
+xzless --help	inert
+xzless --ignore-case	inert
+xzless --no-init	inert
+xzless --pattern x	inert
+xzless --prompt x	inert
+xzless --quiet	inert
+xzless --quit-at-eof	inert
+xzless --quit-if-one-screen	inert
+xzless --raw-control-chars	inert
+xzless --shift x	inert
+xzless --silent	inert
+xzless --squeeze-blank-lines	inert
+xzless --tabs x	inert
+xzless --tag x	inert
+xzless --version	inert
+xzless --window x	inert
+xzless -E	inert
+xzless -F	inert
+xzless -G	inert
+xzless -I	inert
+xzless -J	inert
+xzless -K	inert
+xzless -L	inert
+xzless -M	inert
+xzless -N	inert
+xzless -P x	inert
+xzless -Q	inert
+xzless -R	inert
+xzless -S	inert
+xzless -V	inert
+xzless -W	inert
+xzless -X	inert
+xzless -a	inert
+xzless -b x	inert
+xzless -c	inert
+xzless -e	inert
+xzless -f	inert
+xzless -g	inert
+xzless -h x	inert
+xzless -i	inert
+xzless -j x	inert
+xzless -m	inert
+xzless -n	inert
+xzless -p x	inert
+xzless -q	inert
+xzless -r	inert
+xzless -s	inert
+xzless -t x	inert
+xzless -w	inert
+xzless -x x	inert
+xzless -y x	inert
+xzless -z x	inert
 xzless ./a.xz	inert
 xzless x	inert
 xzmore	inert
-xzmore --help	denied
-xzmore --version	denied
+xzmore --LINE-NUMBERS x	inert
+xzmore --LONG-PROMPT x	inert
+xzmore --QUIT-AT-EOF	inert
+xzmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
+xzmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
+xzmore --QUIT-AT-EOF x	inert
+xzmore --RAW-CONTROL-CHARS	inert
+xzmore --chop-long-lines	inert
+xzmore --help	inert
+xzmore --ignore-case	inert
+xzmore --no-init	inert
+xzmore --pattern x	inert
+xzmore --prompt x	inert
+xzmore --quiet	inert
+xzmore --quit-at-eof	inert
+xzmore --quit-if-one-screen	inert
+xzmore --raw-control-chars	inert
+xzmore --shift x	inert
+xzmore --silent	inert
+xzmore --squeeze-blank-lines	inert
+xzmore --tabs x	inert
+xzmore --tag x	inert
+xzmore --version	inert
+xzmore --window x	inert
+xzmore -E	inert
+xzmore -F	inert
+xzmore -G	inert
+xzmore -I	inert
+xzmore -J	inert
+xzmore -K	inert
+xzmore -L	inert
+xzmore -M	inert
+xzmore -N	inert
+xzmore -P x	inert
+xzmore -Q	inert
+xzmore -R	inert
+xzmore -S	inert
+xzmore -V	inert
+xzmore -W	inert
+xzmore -X	inert
+xzmore -a	inert
+xzmore -b x	inert
+xzmore -c	inert
+xzmore -e	inert
+xzmore -f	inert
+xzmore -g	inert
+xzmore -h x	inert
+xzmore -i	inert
+xzmore -j x	inert
+xzmore -m	inert
+xzmore -n	inert
+xzmore -p x	inert
+xzmore -q	inert
+xzmore -r	inert
+xzmore -s	inert
+xzmore -t x	inert
+xzmore -w	inert
+xzmore -x x	inert
+xzmore -y x	inert
+xzmore -z x	inert
 xzmore x	inert

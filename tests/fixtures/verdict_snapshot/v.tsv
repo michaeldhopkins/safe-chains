@@ -805,15 +805,14 @@ vercel whoami -h	inert
 vercel whoami x	inert
 vercel x	denied
 vi	inert
+vi + ./notes.md	inert
 vi --clean	inert
 vi --clean --help	inert
 vi --clean -T x	inert
 vi --clean x	inert
 vi --help	inert
-vi --log	inert
 vi --noplugin	inert
 vi --not-a-term	inert
-vi --startuptime	inert
 vi --ttyfail	inert
 vi --version	inert
 vi -C	inert
@@ -859,10 +858,8 @@ view --clean --help	inert
 view --clean -T x	inert
 view --clean x	inert
 view --help	inert
-view --log	inert
 view --noplugin	inert
 view --not-a-term	inert
-view --startuptime	inert
 view --ttyfail	inert
 view --version	inert
 view -C	inert
@@ -871,6 +868,7 @@ view -L	inert
 view -M	inert
 view -N	inert
 view -R	inert
+view -R ./notes.md	inert
 view -T x	inert
 view -Z	inert
 view -b	inert
@@ -893,15 +891,17 @@ viewdiagnostic --version	denied
 viewdiagnostic /tmp/crash.ips	inert
 viewdiagnostic x	inert
 vim	inert
+vim '+!id' ./notes.md	denied
+vim +42 ./notes.md	inert
+vim +q ./notes.md	denied
 vim --clean	inert
 vim --clean --help	inert
 vim --clean -T x	inert
 vim --clean x	inert
 vim --help	inert
-vim --log	inert
 vim --noplugin	inert
 vim --not-a-term	inert
-vim --startuptime	inert
+vim --startuptime ./log ./notes.md	denied
 vim --ttyfail	inert
 vim --version	inert
 vim -C	inert
@@ -925,6 +925,7 @@ vim -t x	inert
 vim -v	inert
 vim -x	inert
 vim -y	inert
+vim < ./keys	denied
 vim x	inert
 vimdiff	inert
 vimdiff --clean	inert
@@ -932,10 +933,8 @@ vimdiff --clean --help	inert
 vimdiff --clean -T x	inert
 vimdiff --clean x	inert
 vimdiff --help	inert
-vimdiff --log	inert
 vimdiff --noplugin	inert
 vimdiff --not-a-term	inert
-vimdiff --startuptime	inert
 vimdiff --ttyfail	inert
 vimdiff --version	inert
 vimdiff -C	inert

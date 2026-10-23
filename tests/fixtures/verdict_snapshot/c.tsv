@@ -1225,42 +1225,26 @@ cargo init -q	safe-write
 cargo init -v	safe-write
 cargo init x	safe-write
 cargo install	denied
-cargo install --all-features	safe-write
-cargo install --all-features --bin x	safe-write
-cargo install --all-features --bins	safe-write
-cargo install --all-features x	denied
-cargo install --bin x	safe-write
-cargo install --bins	safe-write
-cargo install --color x	safe-write
-cargo install --debug	safe-write
-cargo install --example x	safe-write
-cargo install --features x	safe-write
-cargo install --force	safe-write
-cargo install --frozen	safe-write
-cargo install --help	safe-write
-cargo install --ignore-rust-version	safe-write
-cargo install --jobs x	safe-write
-cargo install --keep-going	safe-write
-cargo install --locked	safe-write
-cargo install --message-format x	safe-write
-cargo install --no-default-features	safe-write
-cargo install --no-track	safe-write
-cargo install --offline	safe-write
-cargo install --path x	safe-write
-cargo install --profile x	safe-write
-cargo install --quiet	safe-write
-cargo install --root x	safe-write
-cargo install --target x	safe-write
-cargo install --target-dir x	safe-write
-cargo install --timings	safe-write
-cargo install --verbose	safe-write
-cargo install -F x	safe-write
-cargo install -Z x	safe-write
-cargo install -f	safe-write
-cargo install -h	safe-write
-cargo install -j x	safe-write
-cargo install -q	safe-write
-cargo install -v	safe-write
+cargo install --color x	denied
+cargo install --frozen	denied
+cargo install --frozen --color x	denied
+cargo install --frozen --help	denied
+cargo install --frozen x	denied
+cargo install --git https://github.com/x/y	denied
+cargo install --help	inert
+cargo install --list	inert
+cargo install --list --path .	denied
+cargo install --locked	denied
+cargo install --offline	denied
+cargo install --path .	denied
+cargo install --path . --force --bin safe-chains	denied
+cargo install --path . --root ./out	denied
+cargo install --quiet	denied
+cargo install --verbose	denied
+cargo install -h	inert
+cargo install -q	denied
+cargo install -v	denied
+cargo install ripgrep	denied
 cargo install x	denied
 cargo license	inert
 cargo license --color x	inert
@@ -2553,6 +2537,7 @@ cat -t	inert
 cat -u	inert
 cat -v	inert
 cat -z ./a.txt	denied
+cat ./list.txt | cpio -o	denied
 cat ./notes.txt	safe-read
 cat 3< /etc/shadow	denied
 cat < $(echo /etc/shadow)	denied
@@ -3141,6 +3126,7 @@ chmod +s x	denied
 chmod +t tmpdir	safe-write
 chmod +x .git/hooks/pre-commit	denied
 chmod +x scripts/build.sh	safe-write
+chmod - +s x	denied
 chmod -- +s x	denied
 chmod --changes	denied
 chmod --changes --dereference	denied
@@ -4954,30 +4940,63 @@ codesign_allocate -p x	safe-write
 codesign_allocate -r	safe-write
 codesign_allocate x	safe-write
 codex	denied
-codex --config x	denied
-codex --disable x	denied
-codex --enable x	denied
+codex --config x=y mcp list --help	denied
+codex --disable x login status	denied
+codex --enable x features list	denied
 codex --help	inert
-codex --help --config x	inert
 codex --help --version	denied
 codex --help x	denied
 codex --version	inert
 codex -V	inert
 codex -c approval_policy=never debug app-server send-message-v2 'rm -rf ~'	denied
 codex -c sandbox_mode=danger-full-access exec hi	denied
-codex -c x	denied
+codex -c x=y features list	denied
 codex -h	inert
-codex apply	safe-write
+codex apply	denied
+codex apply --help	safe-write
+codex apply --help -h	safe-write
+codex apply --help x	safe-write
+codex apply -h	safe-write
 codex apply x	safe-write
+codex apply x --config=notify=x	denied
 codex cloud	inert
-codex cloud apply	safe-write
+codex cloud apply	denied
+codex cloud apply --attempt x	safe-write
+codex cloud apply --help	safe-write
+codex cloud apply --help --attempt x	safe-write
+codex cloud apply --help -h	safe-write
+codex cloud apply --help x	safe-write
+codex cloud apply -h	safe-write
 codex cloud apply x	safe-write
 codex cloud diff	inert
+codex cloud diff --attempt x	inert
+codex cloud diff --help	inert
+codex cloud diff --help --attempt x	inert
+codex cloud diff --help -h	inert
+codex cloud diff --help x	inert
+codex cloud diff -h	inert
 codex cloud diff x	inert
 codex cloud list	inert
-codex cloud list x	inert
+codex cloud list --cursor x	inert
+codex cloud list --enable x	denied
+codex cloud list --env x	inert
+codex cloud list --help	inert
+codex cloud list --help --cursor x	inert
+codex cloud list --help --json	inert
+codex cloud list --help x	denied
+codex cloud list --json	inert
+codex cloud list --limit x	inert
+codex cloud list -c chatgpt_base_url=http://x	denied
+codex cloud list -h	inert
+codex cloud list x	denied
 codex cloud status	inert
+codex cloud status --help	inert
+codex cloud status --help -h	inert
+codex cloud status --help x	inert
+codex cloud status -c x=y	denied
+codex cloud status -h	inert
 codex cloud status x	inert
+codex cloud status x -c x=y	denied
 codex cloud x	denied
 codex completion	inert
 codex completion --help	inert
@@ -4997,8 +5016,16 @@ codex debug app-server -h	inert
 codex debug app-server send-message-v2 hi	denied
 codex debug app-server x	denied
 codex debug x	denied
+codex exec	denied
 codex exec --full-auto hi	denied
+codex exec --help	inert
+codex exec --help -h	inert
+codex exec --help hi	denied
+codex exec --help x	denied
+codex exec -h	inert
+codex exec help	denied
 codex exec hi	denied
+codex exec x	denied
 codex features	inert
 codex features disable x	denied
 codex features enable x	denied
@@ -5012,15 +5039,38 @@ codex features x	denied
 codex fork	denied
 codex mcp	inert
 codex mcp add x -- sh -c id	denied
-codex mcp get	inert
-codex mcp get x	inert
-codex mcp list	inert
-codex mcp list x	inert
+codex mcp get	denied
+codex mcp get --help	inert
+codex mcp get --help -h	inert
+codex mcp get --help x	denied
+codex mcp get -h	inert
+codex mcp get x	denied
+codex mcp list	denied
+codex mcp list --help	inert
+codex mcp list --help -h	inert
+codex mcp list --help x	denied
+codex mcp list --json	denied
+codex mcp list -h	inert
+codex mcp list x	denied
 codex mcp remove x	denied
 codex mcp x	denied
+codex resume	denied
+codex resume --help	inert
+codex resume --help -h	inert
+codex resume --help x	denied
 codex resume --last	denied
+codex resume --last --help -c x=y	denied
+codex resume -h	inert
+codex resume x	denied
 codex review	denied
+codex sandbox	denied
+codex sandbox --help	inert
+codex sandbox --help -h	inert
+codex sandbox --help macos ls	denied
+codex sandbox --help x	denied
+codex sandbox -h	inert
 codex sandbox macos rm -rf ~	denied
+codex sandbox x	denied
 codex x	denied
 codium	safe-read
 codium --add	safe-read
@@ -6500,12 +6550,13 @@ cpanm -h	inert
 cpanm x	denied
 cpio	denied
 cpio --binary	safe-write
-cpio --binary --create	safe-write
+cpio --binary --create	denied
 cpio --binary --file x	safe-write
 cpio --binary x	safe-write
-cpio --create	safe-write
+cpio --create	denied
 cpio --dot	safe-write
-cpio --extract	safe-write
+cpio --extract	denied
+cpio --extract --list	safe-write
 cpio --file x	safe-write
 cpio --format x	safe-write
 cpio --help	safe-write
@@ -6521,7 +6572,8 @@ cpio --no-preserve-owner	safe-write
 cpio --null	safe-write
 cpio --numeric-uid-gid	safe-write
 cpio --owner x	safe-write
-cpio --pass-through	safe-write
+cpio --pass-through	denied
+cpio --pass-through --insecure ./dst	denied
 cpio --passphrase x	safe-write
 cpio --preserve-modification-time	safe-write
 cpio --preserve-owner	safe-write
@@ -6538,6 +6590,7 @@ cpio -7	safe-write
 cpio -A	safe-write
 cpio -B	safe-write
 cpio -C x	safe-write
+cpio -Dt -i	denied
 cpio -E x	safe-write
 cpio -F x	safe-write
 cpio -F../../../../etc/passwd	denied
@@ -6549,26 +6602,42 @@ cpio -O x	safe-write
 cpio -O../../../../etc/cron.d/x	denied
 cpio -R x	safe-write
 cpio -V	safe-write
+cpio -W extract	denied
+cpio -Wextract	denied
 cpio -Z	safe-write
 cpio -a	safe-write
 cpio -c	safe-write
 cpio -d	safe-write
 cpio -f x	safe-write
-cpio -i	safe-write
-cpio -idv	safe-write
+cpio -i	denied
+cpio -i '*' -t	denied
+cpio -i -F ./archive.cpio	denied
+cpio -i -M t	denied
+cpio -i -t	safe-write
+cpio -i x --list	denied
+cpio -iMt	denied
+cpio -idm	denied
+cpio -im	denied
+cpio -it	safe-write
 cpio -j	safe-write
 cpio -l	safe-write
 cpio -m	safe-write
 cpio -n	safe-write
-cpio -o	safe-write
+cpio -o	denied
 cpio -o -O/etc/cron.d/x.cpio	denied
-cpio -oO ./archive.cpio	safe-write
+cpio -o < ./list.txt	denied
 cpio -oO/etc/cron.d/x.cpio	denied
-cpio -p	safe-write
+cpio -p	denied
+cpio -p --insecure ./dst	denied
+cpio -p ./dst	denied
+cpio -pd ./dst --insecure	denied
 cpio -r	safe-write
 cpio -t	safe-write
+cpio -t -F i	safe-write
+cpio -t -W extract	denied
 cpio -u	safe-write
 cpio -v	safe-write
+cpio -v -W ext	denied
 cpio -y	safe-write
 cpio -z	safe-write
 cpio x	safe-write

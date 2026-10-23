@@ -7488,6 +7488,7 @@ git ls-files -v	inert
 git ls-files -x x	inert
 git ls-files -z	inert
 git ls-files x	inert
+git ls-files | cpio -pdm ./dst	safe-write
 git ls-remote	inert
 git ls-remote --branches	inert
 git ls-remote --branches --exit-code	inert
@@ -12618,6 +12619,16 @@ gpg -v	denied
 gpg secret.gpg	denied
 gpg x	denied
 gprintenv	denied
+gprintenv --help	inert
+gprintenv --help --help	inert
+gprintenv --help --version	inert
+gprintenv --help -V	inert
+gprintenv --help -h	inert
+gprintenv --help x	denied
+gprintenv --version	inert
+gprintenv -V	inert
+gprintenv -h	inert
+gprintenv x	denied
 gprintf	denied
 gprintf --help	inert
 gprintf --help --version	inert

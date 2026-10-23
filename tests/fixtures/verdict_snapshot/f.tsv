@@ -793,12 +793,25 @@ find . -size -1M	inert
 find . -type f -flushcache	denied
 find . -type f -name '*.bak' -delete	safe-write
 find . -type f -name '*.py'	inert
+find ./src -name '*.rs' | cpio -pdm ./dst	safe-write
+find ./src | cpio --pass-through --insecure ./dst	denied
+find ./src | cpio --pass-through ./dst	safe-write
+find ./src | cpio -o	safe-write
+find ./src | cpio -o -O ./a.cpio	safe-write
+find ./src | cpio -oO ./archive.cpio	safe-write
+find ./src | cpio -p --insecure ./dst	denied
+find ./src | cpio -p ./dst	safe-write
+find ./src | pax -rw ./dst	safe-write
+find ./src | pax -w -f ./a.pax	safe-write
+find ./src | sed s@.*@/etc/master.passwd@ | cpio -o	denied
+find ./src | zip -@ ./a.zip	safe-write
 find /etc -delete	denied
 find /etc -delete --help	denied
 find /etc -delete --version	denied
 find /etc -mtime -7 -delete	denied
 find /etc -name '*.py' -delete | wc -l	denied
 find /etc -name '*.tmp' -delete	denied
+find /etc/ssh | cpio -o	denied
 find /tmp -maxdepth 2	inert
 find src -type f	inert
 find x	inert
@@ -2841,8 +2854,11 @@ funzip	inert
 funzip --help	denied
 funzip --version	denied
 funzip ./out.zip	inert
+funzip /etc/master.passwd	denied
 funzip archive.zip	inert
 funzip x	inert
+funzip ~/.aws/credentials	denied
+funzip ~/.ssh/id_ed25519	denied
 fuser	denied
 fuser --help	denied
 fuser --version	denied

