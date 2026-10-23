@@ -1,16 +1,18 @@
 [[command]]
 name = "at"
-description = "BSD/POSIX scheduled-job utility for queuing shell commands to run at a later time via launchd's atrun. `at <time>` reads commands from stdin or -f file and spools them to /usr/lib/cron/jobs/ for atrun to execute under the user's shell. atrun is disabled by default on macOS, but enabling it is a per-system decision and once enabled at-spooled jobs run with the invoking user's environment, working directory, and uid. Read-only forms — listing the queue (`at -l`), examining a queued job (`at -c <jobid>`), and removing a queue entry (`at -r`) — only affect the user's own at queue. POSIX surface; flags are essentially frozen."
+description = "BSD/POSIX scheduled-job utility for queuing shell commands to run at a later time via launchd's atrun. `at <time>` reads commands from stdin or -f file and spools them to /usr/lib/cron/jobs/ for atrun to execute under the user's shell. atrun is disabled by default on macOS, but enabling it is a per-system decision and once enabled at-spooled jobs run with the invoking user's environment, working directory, and uid. Listing the queue (`at -l`) and removing a queue entry (`at -r`) only affect the user's own at queue. Examining a queued job (`at -c <jobid>`) prints its script, which begins with an export line for every variable in the environment it was queued from, credentials included. POSIX surface; flags are essentially frozen."
 url = "https://man7.org/linux/man-pages/man1/at.1p.html"
 researched_version = "POSIX at(1); BSD implementation on macOS, surface frozen"
 level = "SafeWrite"
 bare = false
-require_any = ["-c", "-d", "-l", "-r"]
-standalone = ["--help", "-c", "-d", "-l", "-r"]
+require_any = ["-d", "-l", "-r"]
+standalone = ["--help", "-d", "-l", "-r"]
 valued = ["-q"]
-examples_safe = ["at -l", "at -c 3", "at -r 3"]
+examples_safe = ["at -l", "at -r 3"]
 examples_denied = [
     "echo ls | at now",
+    "at -c 3",
+    "at -c 3 now",
     "at now",
     "at -f x.sh now",
     "at -m now + 1 minute",
