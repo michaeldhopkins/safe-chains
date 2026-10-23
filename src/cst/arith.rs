@@ -37,10 +37,34 @@ pub(crate) fn expression_verdict(text: &str) -> Verdict {
         .replace("<=", "")
         .replace(">=", "");
     let assigns = compared.contains('=') || compared.contains("++") || compared.contains("--");
-    refuse_if(assigns || text.contains(UNKNOWN) || names(text).iter().any(|name| holds_an_expression(name)))
+    let every_argument = ["$@", "$*", "${@", "${*"].iter().any(|all| text.contains(all));
+    refuse_if(
+        assigns
+            || text.contains(UNKNOWN)
+            || names(text).iter().any(|name| holds_an_expression(name))
+            || (every_argument && any_argument_holds_an_expression()),
+    )
 }
 
+fn any_argument_holds_an_expression() -> bool {
+    let bound = |i: usize| !matches!(binding(&i.to_string()), Binding::Unbound);
+    bound(MAX_ARGUMENTS + 1) || (1..=MAX_ARGUMENTS).take_while(|&i| bound(i)).any(|i| holds_an_expression(&i.to_string()))
+}
+
+/// How many of a function's arguments `$@` is checked through; a call passing more is refused.
+const MAX_ARGUMENTS: usize = 64;
+
+/// Variables the shell itself sets from what the line holds: the last argument, what `read` or
+/// `select` took, a regex match, an option's value.
+const SHELL_SET: &[&str] = &[
+    "_", "REPLY", "reply", "BASH_REMATCH", "MATCH", "match", "MBEGIN", "MEND", "mbegin", "mend", "OPTARG", "MAPFILE", "BASH_COMMAND",
+    "BASH_ARGV", "FUNCNAME", "BASH_SOURCE", "PWD", "OLDPWD", "BUFFER", "LBUFFER", "RBUFFER",
+];
+
 fn holds_an_expression(name: &str) -> bool {
+    if SHELL_SET.contains(&name) {
+        return true;
+    }
     match binding(name) {
         Binding::Loop => !counted(name),
         Binding::Value(value) => !is_integer(&value) && !(value == super::scope_budget::UNCERTAIN_VALUE && counted(name)),
@@ -74,15 +98,21 @@ fn is_integer(value: &str) -> bool {
     digits.chars().all(|c| c.is_ascii_digit())
 }
 
-/// The identifiers in an expression. A run that starts with a digit is a number (`0x1F`, `16#ff`).
+/// The identifiers in an expression. A run that starts with a digit is a number (`0x1F`, `16#ff`),
+/// unless `$` or `${` names an argument by it: `$1` is one digit, `${12}` all of them.
 fn names(text: &str) -> Vec<&str> {
     let mut out = Vec::new();
     let mut rest = text;
     while let Some(start) = rest.find(|c: char| c.is_ascii_alphanumeric() || c == '_') {
         let run = &rest[start..];
         let len = run.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_' || c == '#')).unwrap_or(run.len());
+        let digits = run.find(|c: char| !c.is_ascii_digit()).unwrap_or(run.len());
         if !run.starts_with(|c: char| c.is_ascii_digit()) {
             out.push(run[..len].trim_end_matches('#'));
+        } else if rest[..start].ends_with("${") {
+            out.push(&run[..digits]);
+        } else if rest[..start].ends_with('$') {
+            out.push(&run[..1]);
         }
         rest = &run[len..];
     }

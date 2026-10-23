@@ -206,6 +206,40 @@ fn a_counter_kept_in_a_loop_is_read_as_the_number_it_is() {
 }
 
 #[test]
+fn a_value_set_without_an_assignment_is_never_counted_as_a_number() {
+    for cmd in [
+        "n=$(date +%s); for k in 1 2; do echo $((n)); declare n+='+(HOME=1)'; done; git log",
+        "n=$(date +%s); for k in 1 2; do echo $((n)); export n+='+(HOME=1)'; done; git log",
+        "read < f; echo $((REPLY)); git log",
+        "while read; do echo $((REPLY)); done < f; git log",
+        "REPLY=$((0)); for k in 1 2; do echo $((REPLY)); read < f; done; git log",
+        "read -ran < f; echo $((n)); git log",
+        "n=$(date +%s); for k in 1 2; do echo $((n)); read -ran < f; done; git log",
+        "echo HOME=1; echo $((_)); git log",
+        "[[ 'HOME=1' =~ .* ]]; echo $((BASH_REMATCH)); git log",
+        "[[ 'HOME=1' =~ .* ]]; echo $((MATCH)); git log",
+        "f() { echo $(( $1 )); }; f 'HOME=1'; git log",
+        "f() { echo $(( ${1} )); }; f 'HOME=1'; git log",
+        "f() { echo $(( $@ )); }; f 'HOME=1'; git log",
+        "f() { echo $(( $* )); }; f 1 'HOME=1'; git log",
+        "f() { [[ $2 -eq 1 ]]; }; f 1 'HOME=1'; git log",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in ["f() { echo $(( $1 + 1 )); }; f 5", "f() { echo $(( $@ )); }; f 5", "declare n=0; echo $((n + 1))"] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn the_explanation_refuses_a_number_contradicted_later_in_the_line() {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    let cmd = "i=0; while :; do echo $((i)); i='HOME=1'; done; git log";
+    assert!(!crate::cst::explain(cmd).is_allowed(), "should be refused: {cmd}");
+    assert!(crate::cst::explain("i=0; while :; do echo $((i)); i=$((i+1)); done").is_allowed());
+}
+
+#[test]
 fn the_shells_own_integer_variables_never_take_an_expression() {
     for cmd in [
         "RANDOM=HOME=10; git status", "OPTIND=HOME=1; git log", "SECONDS=HOME=1; git log", "x='HOME=1'; SECONDS=x; git log",

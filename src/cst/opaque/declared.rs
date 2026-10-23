@@ -37,15 +37,24 @@ pub(crate) fn named(cmd: &SimpleCmd) -> Option<Vec<String>> {
             let mut names = Vec::new();
             for arg in args {
                 let text = arg.eval();
-                let declared = text.split('=').next().unwrap_or_default();
+                let declared = text.split('=').next().unwrap_or_default().trim_end_matches('+');
                 let unknown = arg.expand().len() != 1 || declared.contains(['$', '*', '?', '[']) || declared.contains("__SAFE_CHAINS_");
                 if unknown || nameref(&name, &text) {
                     return any();
                 }
                 if text.starts_with(['-', '+']) {
+                    // `read -ran` names the array `n` inside the option cluster.
+                    let array = text[1..].split_once('a').map(|(_, rest)| rest).filter(|rest| name == "read" && !rest.is_empty());
+                    names.extend(array.map(str::to_string));
                     continue;
                 }
                 names.push(declared.to_string());
+            }
+            // With no name given these set REPLY and MAPFILE; an option's value can pass for a name.
+            match name.as_str() {
+                "read" => names.push("REPLY".to_string()),
+                "mapfile" | "readarray" => names.push("MAPFILE".to_string()),
+                _ => {}
             }
             Some(names)
         }

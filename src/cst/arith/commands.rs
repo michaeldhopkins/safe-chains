@@ -16,7 +16,7 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
     if declares {
         let operands = args.iter().filter(|w| !w.starts_with(['-', '+']));
         let refused: Vec<bool> = operands
-            .map(|w| w.split_once('=').unwrap_or((w, "")))
+            .map(|w| w.split_once('=').map_or((w.as_str(), ""), |(n, value)| (n.trim_end_matches('+'), value)))
             .map(|(n, value)| {
                 let refused = is_free(n) || !is_integer(value);
                 NUMERIC.with(|numeric| numeric.borrow_mut().push(n.to_string()));
@@ -29,11 +29,7 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
         return env.combine(refuse_if(refused.contains(&true)));
     }
     let set = match super::super::opaque::named(cmd) {
-        Some(_) => args
-            .iter()
-            .filter(|w| !w.starts_with(['-', '+']))
-            .map(|w| declared_verdict(name, w))
-            .fold(INERT, Verdict::combine),
+        Some(names) => names.iter().map(|n| declared_verdict(name, n, args)).fold(INERT, Verdict::combine),
         // Which names are set is not known: any numeric one could take an expression.
         None => {
             let names_numeric = args.iter().any(|w| is_numeric(w.split('=').next().unwrap_or_default()));
@@ -43,16 +39,21 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
     env.combine(set)
 }
 
-/// One name a setter names: `local n=0` gives it a number, `read n` or `local n=$x` anything.
-fn declared_verdict(command: &str, operand: &str) -> Verdict {
+/// One name a setter sets: `local n=0` gives it a number; `read n`, `local n=$x` and `n+=…` may give
+/// it anything.
+fn declared_verdict(command: &str, name: &str, args: &[String]) -> Verdict {
     let assigns = matches!(command, "declare" | "typeset" | "local" | "export" | "readonly");
-    match operand.split_once('=') {
-        Some((n, value)) if assigns && !value.is_empty() && is_integer(value) => {
-            INTEGER.with(|i| i.borrow_mut().push(n.to_string()));
-            INERT
-        }
-        _ => value_verdict(operand.split('=').next().unwrap_or_default(), "*"),
+    let mut values = args
+        .iter()
+        .filter(|w| !w.starts_with(['-', '+']) && w.split('=').next().unwrap_or_default().trim_end_matches('+') == name)
+        .map(|w| w.strip_prefix(name).and_then(|rest| rest.strip_prefix('=')))
+        .peekable();
+    let numbers = values.peek().is_some() && values.all(|v| v.is_some_and(|v| !v.is_empty() && is_integer(v)));
+    if assigns && numbers {
+        INTEGER.with(|i| i.borrow_mut().push(name.to_string()));
+        return INERT;
     }
+    value_verdict(name, "*")
 }
 
 /// The commands whose arguments are arithmetic, assignments through a subscript (`a[x]=1`), values
