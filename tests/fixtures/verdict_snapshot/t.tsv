@@ -3130,6 +3130,8 @@ tmux set -g pane-title-changed 'run-shell id'	denied
 tmux set -g status-right '#(id)'	denied
 tmux set -gF status-right '#{l:#}(id)'	denied
 tmux set -ga @x '(id)'	denied
+tmux set -ga status-left '{E:@x}'	denied
+tmux set -ga status-left '{HOME}'	denied
 tmux set -ga status-right ' #S'	safe-write
 tmux set -gt work default-command 'rm -rf /'	denied
 tmux set -gtwork default-command 'rm -rf /'	denied
