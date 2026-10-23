@@ -327,6 +327,8 @@ echo x >> .git/hooks/post-commit	denied
 echo x | xargs chmod +s	denied
 echo ~/.ssh/id_rsa | cpio --create	denied
 echo ~/.ssh/id_rsa | cpio --pass-through -d ./out	denied
+echo ~/.ssh/id_rsa | cpio -fo	denied
+echo ~/.ssh/id_rsa | cpio -fpd ./out	denied
 echo ~/.ssh/id_rsa | cpio -o	denied
 echo ~/.ssh/id_rsa | cpio -oO ./a.cpio	denied
 echo ~/.ssh/id_rsa | cpio -pd ./out	denied

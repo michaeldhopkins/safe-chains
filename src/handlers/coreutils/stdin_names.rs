@@ -13,10 +13,14 @@ use crate::parse::Token;
 /// no path stands for (a redirect from a list file, a here-string), nothing can be checked and the
 /// line is refused.
 pub(crate) fn reads_names_it_cannot_check(tokens: &[Token]) -> bool {
-    let destination = match names(tokens) {
+    readings(tokens).into_iter().any(|names| names_cannot_be_checked(&names))
+}
+
+fn names_cannot_be_checked(names: &Names<'_>) -> bool {
+    let destination = match names {
         Names::Unread => return false,
         Names::Read => None,
-        Names::ReadAndWrittenBelow(destination) => Some(destination),
+        Names::ReadAndWrittenBelow(destination) => Some(*destination),
     };
     let Some(item) = crate::pathctx::stdin_item_repr() else {
         return true;
@@ -36,6 +40,24 @@ enum Names<'a> {
     ReadAndWrittenBelow(&'a str),
 }
 
+fn readings(tokens: &[Token]) -> Vec<Names<'_>> {
+    match tokens.first().map(Token::command_name) {
+        Some("cpio") => Given::readings(&tokens[1..], "cpio").into_iter().map(cpio_names).collect(),
+        _ => vec![names(tokens)],
+    }
+}
+
+fn cpio_names(given: Given<'_>) -> Names<'_> {
+    let has = |letter: char, long: &str| given.anywhere.contains(letter) || given.long_anywhere.contains(&long);
+    if has('p', "--pass-through") {
+        given.operands.first().copied().map_or(Names::Read, Names::ReadAndWrittenBelow)
+    } else if has('o', "--create") {
+        Names::Read
+    } else {
+        Names::Unread
+    }
+}
+
 fn names(tokens: &[Token]) -> Names<'_> {
     let Some(first) = tokens.first() else {
         return Names::Unread;
@@ -43,17 +65,6 @@ fn names(tokens: &[Token]) -> Names<'_> {
     let command = first.command_name();
     let arguments = &tokens[1..];
     match command {
-        "cpio" => {
-            let given = Given::read(arguments, command);
-            let has = |letter: char, long: &str| given.anywhere.contains(letter) || given.long_anywhere.contains(&long);
-            if has('p', "--pass-through") {
-                given.operands.first().map_or(Names::Read, |destination| Names::ReadAndWrittenBelow(destination))
-            } else if has('o', "--create") {
-                Names::Read
-            } else {
-                Names::Unread
-            }
-        }
         "pax" => {
             let given = Given::read(arguments, command);
             match (given.anywhere.contains('r'), given.anywhere.contains('w'), given.operands.as_slice()) {
@@ -116,6 +127,8 @@ mod tests {
         zip_archives_a_key: "echo ~/.ssh/id_rsa | zip -@ ./a.zip",
         zip_archives_a_key_long: "echo ~/.ssh/id_rsa | zip --names-stdin ./a.zip",
         zip_archives_a_key_in_a_cluster: "echo ~/.ssh/id_rsa | zip -q@ ./a.zip",
+        cpio_archives_a_key_behind_a_gnu_nonmatching_letter: "echo ~/.ssh/id_rsa | cpio -fo",
+        cpio_copies_a_key_behind_a_gnu_nonmatching_letter: "echo ~/.ssh/id_rsa | cpio -fpd ./out",
     }
 
     proptest! {

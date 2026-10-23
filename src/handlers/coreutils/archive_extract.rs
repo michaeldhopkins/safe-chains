@@ -30,14 +30,7 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
             let given = given();
             given.anywhere.contains('s') || (given.anywhere.contains('r') && !given.leading.contains('w'))
         }
-        "cpio" => {
-            let given = given();
-            let extract = given.anywhere.contains('i') || given.long_anywhere.contains(&"--extract");
-            let passes = given.anywhere.contains('p') || given.long_anywhere.contains(&"--pass-through");
-            given.anywhere.contains('W')
-                || (passes && given.long_anywhere.contains(&"--insecure"))
-                || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
-        }
+        "cpio" => Given::readings(&tokens[1..], "cpio").iter().any(cpio_extracts),
         "ditto" => given().anywhere.contains('x'),
         "ptar" => given().anywhere.contains('x'),
         "ptargrep" => {
@@ -47,6 +40,14 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
         "xar" => given().anywhere.contains('x') || tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
         _ => false,
     }
+}
+
+fn cpio_extracts(given: &Given<'_>) -> bool {
+    let extract = given.anywhere.contains('i') || given.long_anywhere.contains(&"--extract");
+    let passes = given.anywhere.contains('p') || given.long_anywhere.contains(&"--pass-through");
+    given.anywhere.contains('W')
+        || (passes && given.long_anywhere.contains(&"--insecure"))
+        || (extract && !(given.leading.contains('t') || given.long_leading.contains(&"--list")))
 }
 
 /// The option letters and long options given, everywhere and in front of the first operand,
@@ -69,6 +70,21 @@ impl<'a> Given<'a> {
             "xar" => &['C', 'f', 'n', 's'],
             _ => &[],
         };
+        Given::read_with(arguments, command, takes_a_value)
+    }
+
+    /// Every way the line can be read. bsdcpio's `-f` takes a pattern and GNU cpio's `-f`
+    /// (`--nonmatching`) takes nothing, so `cpio -fidm` is a listing-free extraction to GNU cpio
+    /// and a pattern `idm` to bsdcpio. A caller judges each reading and refuses when any is refused.
+    pub(super) fn readings(arguments: &'a [Token], command: &str) -> Vec<Given<'a>> {
+        let mut readings = vec![Given::read(arguments, command)];
+        if command == "cpio" {
+            readings.push(Given::read_with(arguments, command, &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W']));
+        }
+        readings
+    }
+
+    fn read_with(arguments: &'a [Token], command: &str, takes_a_value: &[char]) -> Given<'a> {
         let mut given = Given {
             anywhere: String::new(),
             leading: String::new(),
@@ -200,6 +216,8 @@ mod tests {
         cpio_extract_into_a_directory_named_t: "cpio -Dt -i",
         cpio_extract_with_a_message_t: "cpio -iMt",
         cpio_extract_with_a_spaced_message: "cpio -i -M t",
+        cpio_extract_behind_a_gnu_nonmatching_letter: "cpio -fidm",
+        cpio_extract_behind_a_spaced_gnu_nonmatching_letter: "cpio -f -i",
     }
 
     safe! {
@@ -207,6 +225,7 @@ mod tests {
         pax_write_naming_a_second_source_after_the_first: "pax -w -f ./out.tar ./src ./docs",
         ptar_create_from_a_list: "ptar -c -T ./files.txt -f ./a.tar",
         ptar_create_to_stdout: "ptar -c -f - ./src",
+        cpio_list_leaving_out_a_pattern: "cpio -it -f '*.o'",
     }
 
     denied! {
@@ -232,6 +251,20 @@ mod tests {
             prop_assert!(!is_safe_command(&refused), "{}", refused);
             let plain = format!("pax {mode} {operands}");
             prop_assert!(is_safe_command(&plain), "{}", plain);
+        }
+
+        /// A letter whose arity differs between bsdcpio and GNU cpio (`-f`) hides nothing: put in
+        /// front of an extracting cluster, the line is still refused, and in front of a listing it
+        /// is still not refused for extracting.
+        #[test]
+        fn a_letter_only_one_cpio_reads_a_value_for_hides_no_extraction(
+            cluster in prop::sample::select(vec!["i", "id", "idm", "iv", "im"]),
+            spaced in any::<bool>(),
+        ) {
+            let line = if spaced { format!("cpio -f -{cluster}") } else { format!("cpio -f{cluster}") };
+            prop_assert!(!is_safe_command(&line), "{}", line);
+            let tokens: Vec<crate::parse::Token> = format!("cpio -t{cluster} -f x").split_whitespace().map(crate::parse::Token::from_test).collect();
+            prop_assert!(!super::extracts(&tokens));
         }
 
         /// Whatever else is given, a pax, cpio or ditto line that extracts is refused, and one

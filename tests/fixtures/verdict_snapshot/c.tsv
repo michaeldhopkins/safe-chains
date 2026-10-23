@@ -6608,7 +6608,9 @@ cpio -Z	safe-write
 cpio -a	safe-write
 cpio -c	safe-write
 cpio -d	safe-write
+cpio -f -i	denied
 cpio -f x	safe-write
+cpio -fidm	denied
 cpio -i	denied
 cpio -i '*' -t	denied
 cpio -i -F ./archive.cpio	denied
@@ -6619,6 +6621,7 @@ cpio -iMt	denied
 cpio -idm	denied
 cpio -im	denied
 cpio -it	safe-write
+cpio -it -f '*.o'	safe-write
 cpio -j	safe-write
 cpio -l	safe-write
 cpio -m	safe-write
