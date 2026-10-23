@@ -46,6 +46,17 @@ fn holds_an_expression(name: &str) -> bool {
     }
 }
 
+/// What [`holds_an_expression`] would answer negated, recording nothing.
+fn holds_a_number(name: &str) -> bool {
+    !SHELL_SET.contains(&name)
+        && match binding(name) {
+            Binding::Loop => counts(name),
+            Binding::Value(value) if value == super::scope_budget::UNCERTAIN_VALUE => counts(name),
+            Binding::Value(value) => is_integer(&value) && !given_other_than_a_number(name),
+            Binding::Unbound => ALWAYS_NUMBERS.contains(&name),
+        }
+}
+
 /// A name bound to a number, remembered: a loop's next pass may give it something else written
 /// further on, which [`numbers_contradicted`] sees once the line has been walked.
 fn read_as_number(name: &str) -> bool {

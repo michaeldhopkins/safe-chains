@@ -2,11 +2,12 @@
 //! may carry a subscript.
 
 use super::{
-    INERT, INTEGER, NUMERIC, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, holds_an_expression, is_free,
-    is_integer, is_numeric, read_text, refuse_if, value_verdict,
+    INERT, INTEGER, NUMERIC, UNKNOWN, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, holds_a_number,
+    holds_an_expression, is_free, is_integer, is_numeric, read_text, refuse_if, value_verdict,
 };
-use crate::cst::{SimpleCmd, Word};
+use crate::cst::{SimpleCmd, Word, WordPart};
 use crate::parse::Token;
+use crate::pathctx::item_shape::{Binding, binding};
 use crate::verdict::Verdict;
 
 fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
@@ -73,20 +74,30 @@ pub(crate) fn command_verdict(cmd: &SimpleCmd) -> Verdict {
     let args = &words[start + 1..];
     let arg_words = &cmd.words[start + 1..];
     let numeric = numeric_verdict(cmd, &name, args);
+    let fanned = || arg_words.iter().map(fans_out).collect::<Vec<bool>>();
     let arithmetic: Vec<usize> = match name.as_str() {
         "shift" | "return" | "break" | "continue" => (0..args.len()).collect(),
-        "printf" => formatted(args),
-        "print" => print_formatted(args),
+        "printf" => formatted(args, &fanned()),
+        "print" => print_formatted(args, &fanned()),
         "read" => option_values(args, &['t', 'k', 'u']),
         _ => Vec::new(),
     };
     let named: Vec<usize> = match name.as_str() {
         "read" | "getopts" | "unset" | "mapfile" | "readarray" => (0..args.len()).collect(),
-        "test" | "[" => tested_names(args),
+        // A word braces or a tilde fan out may be `-v` and the name it tests (`{-v,'a[x]'}`), and a
+        // glob may match files named `-v` and `a[HOME=1]` (see [`may_glob_a_name`]). A word the shell
+        // builds (`$o`, `$(echo -v)`) may be `-v`, so the word after it may be a name.
+        "test" | "[" if arg_words.iter().any(|w| fans_out(w) && !globbed(w)) => (0..args.len()).collect(),
+        "test" | "[" => {
+            let globs = arg_words.iter().enumerate().filter(|(_, w)| may_glob_a_name(w)).map(|(i, _)| i);
+            let after_built = args.iter().enumerate().filter(|(_, w)| built(w)).map(|(i, _)| i + 1).filter(|&i| i < args.len());
+            tested_names(args).into_iter().chain(globs).chain(after_built).collect()
+        }
         _ => Vec::new(),
     };
     let arithmetic = arithmetic.into_iter().map(|i| arithmetic_word_verdict(&arg_words[i]));
-    let named = named.into_iter().map(|i| name_verdict(&arg_words[i]));
+    // Outside `[[ ]]` a name is globbed, and can match a file named `a[HOME=1]`.
+    let named = named.into_iter().map(|i| name_verdict(&arg_words[i]).combine(refuse_if(globbed(&arg_words[i]))));
     arithmetic.chain(named).chain(subscripts).fold(numeric.combine(descriptor), Verdict::combine)
 }
 
@@ -103,13 +114,74 @@ fn descriptor_verdict(cmd: &SimpleCmd) -> Verdict {
 }
 
 /// A name a command sets or tests: `read 'a[HOME=1]'` and `test -v 'a[HOME=1]'` evaluate the
-/// subscript. A name held in a variable or a command's output could carry any subscript.
+/// subscript. A name held in a variable or a command's output could carry any subscript, and a
+/// brace expansion (`read {x,'a[HOME=1]'}`) may give several names, each read.
 fn name_verdict(word: &Word) -> Verdict {
     let text = word.eval();
     let (read, v) = read_text(word);
-    v.combine(refuse_if(built(&text)))
-        .combine(subscript_verdict(&text))
+    let names = word.expand();
+    let built = built(&text) || names.iter().any(|name| built(name));
+    names
+        .iter()
+        .map(|name| subscript_verdict(name))
+        .fold(v.combine(refuse_if(built)), Verdict::combine)
         .combine(subscript_verdict(&read))
+}
+
+/// A word the shell turns into a number of words it does not show: a brace expansion (`%{d,s}`,
+/// `{-v,x}`), an unquoted glob, which can match a file named `%d`, or a tilde, which can give a
+/// directory whose name holds one (`~+`, `~-`, `~1`; `~/x` is only the home directory). An unquoted expansion or substitution is split into
+/// words too, so `$x` may be `-v a[HOME=1]`.
+fn fans_out(word: &Word) -> bool {
+    let tilde = matches!(word.0.first(), Some(WordPart::Lit(s)) if s.strip_prefix('~').is_some_and(|rest| rest.starts_with(['+', '-']) || rest.starts_with(|c: char| c.is_ascii_digit())));
+    let split = word.0.iter().any(|part| match part {
+        WordPart::Lit(s) => s.match_indices('$').any(|(at, _)| !one_word(&s[at + 1..])),
+        WordPart::CmdSub(_) | WordPart::Backtick(_) => read_text(&Word(vec![part.clone()])).0.contains(UNKNOWN),
+        _ => false,
+    });
+    globbed(word) || tilde || split || word.expand() != [word.eval()]
+}
+
+/// A glob that may match `-v` or a subscripted name. One under a directory (`src/*`) gives paths
+/// (a bracket could hold the `/`, so one with a bracket does not count),
+/// and one with a `.` after its last glob character (`*.txt`) gives names ending in that text,
+/// never `-v` nor a name ending in `]`.
+fn may_glob_a_name(word: &Word) -> bool {
+    let text = word.eval();
+    let tail = text.rfind(['*', '?', '[', ']']).map_or("", |at| &text[at + 1..]);
+    let under_a_directory = text.contains('/') && !text.contains('[');
+    globbed(word) && !under_a_directory && !tail.contains('.')
+}
+
+/// Whether the expansion after a `$` gives one word: a count (`$#`, `${#x}`), a name holding a
+/// number, or a name whose known value holds nothing the default `IFS` or a glob acts on.
+fn one_word(after: &str) -> bool {
+    let braced = after.strip_prefix('{').map(|body| bracketed(body, '{', '}'));
+    let body = braced.unwrap_or(after);
+    let end = body.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_')).unwrap_or(body.len());
+    let name = &body[..end];
+    if name.is_empty() {
+        return body.starts_with(['#', '?', '$', '!']) && braced.is_none_or(|b| b.len() == 1 || b.starts_with('#'));
+    }
+    if braced.is_some_and(|b| b != name) {
+        return false;
+    }
+    let known = match binding(name) {
+        Binding::Value(value) => {
+            value != crate::cst::scope_budget::UNCERTAIN_VALUE
+                && !value.is_empty()
+                && !value.contains([' ', '\t', '\n', '*', '?', '['])
+                && matches!(binding("IFS"), Binding::Unbound)
+        }
+        _ => false,
+    };
+    // Asked only once the name is known to hold one: asking records the name, and a line that
+    // gives it something else elsewhere is then refused whole.
+    known || (holds_a_number(name) && !holds_an_expression(name))
+}
+
+fn globbed(word: &Word) -> bool {
+    word.0.iter().any(|part| matches!(part, WordPart::Lit(s) if s.contains(['*', '?', '['])))
 }
 
 /// Text the shell finishes building when it runs: an expansion, or a substitution's output.
@@ -137,8 +209,10 @@ fn tested_names(args: &[String]) -> Vec<usize> {
 
 /// The arguments a format string reads as numbers: every one after the format, unless the format
 /// is known to hold no numeric conversion. An option word the shell builds may be `-v` or the
-/// format itself, so every word after it counts.
-fn formatted(args: &[String]) -> Vec<usize> {
+/// format itself, so every word after it counts. A word that fans out (see [`fans_out`]) up to the
+/// format may hold an option, the format and arguments at once, so every word counts; one after the
+/// format shifts which argument fills which slot, so every argument counts.
+fn formatted(args: &[String], fanned: &[bool]) -> Vec<usize> {
     let mut i = 0;
     while let Some(arg) = args.get(i).filter(|w| w.starts_with('-') && w.len() > 1) {
         if built(arg) {
@@ -149,10 +223,16 @@ fn formatted(args: &[String]) -> Vec<usize> {
             break;
         }
     }
+    if fanned[..args.len().min(i + 1)].contains(&true) {
+        return (0..args.len()).collect();
+    }
     let Some(format) = args.get(i) else { return Vec::new() };
     let slots = numeric_slots(format);
     if !slots.contains(&true) {
         return Vec::new();
+    }
+    if fanned[i + 1..].contains(&true) {
+        return (i + 1..args.len()).collect();
     }
     // The format is reused until the arguments run out, so argument k fills slot k mod its length.
     (i + 1..args.len()).filter(|k| slots[(k - i - 1) % slots.len()]).collect()
@@ -161,8 +241,12 @@ fn formatted(args: &[String]) -> Vec<usize> {
 /// zsh's `print -f format`: the format is the option's value, attached (`-f%d`) or the next word,
 /// the last `-f` wins and options may follow it. So every format any `-f` could take is read, and
 /// when one reads a number every argument after the first `-f` counts. A word the shell builds may
-/// be `-f` or its format, so every argument after it counts too.
-fn print_formatted(args: &[String]) -> Vec<usize> {
+/// be `-f` or its format, so every argument after it counts too, and a word that fans out may be
+/// all of them, so every word counts.
+fn print_formatted(args: &[String], fanned: &[bool]) -> Vec<usize> {
+    if fanned.contains(&true) {
+        return (0..args.len()).collect();
+    }
     let mut first = None;
     let mut numeric = false;
     for (i, word) in args.iter().enumerate() {
@@ -196,7 +280,9 @@ fn numeric_slots(format: &str) -> Vec<bool> {
         slots.extend(spec[..spec.len() - width.len()].matches('*').map(|_| true));
         // A length (`%ld`, `%hd`, `%Lf`) still ends in the conversion that reads a number.
         let conversion = width.trim_start_matches(|c: char| "hlLqjzt".contains(c));
-        slots.push(conversion.starts_with(|c: char| "diouxXeEfFgGaAc".contains(c)));
+        // A `%` ending the format may be zsh's numeric glob, `%<1-9>d`, which the parser reads
+        // as a redirect, leaving the `%` and any flags, width or length behind (`%5<->d`).
+        slots.push(conversion.is_empty() || conversion.starts_with(|c: char| "diouxXeEfFgGaAc".contains(c)));
     }
     slots
 }

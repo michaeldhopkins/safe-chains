@@ -8,3 +8,4 @@ cc 379c33b8c26e23d3087208824e7e4a13dc5af98ef67a97ff9d170a235b06cb47 # shrinks to
 cc c16f7ebf54bed522b8ae1ac511d23ce52d83e59d9ef37a26b3e3a463e570dda8 # shrinks to context = "shift '{e}'", name = "HOME", op = "="
 cc 084588bec233632d9753049a9d8ec37ed7c5caec13f9520c87d71aeb09c72faa # shrinks to context = "printf '%*s' '{e}' x", name = "HOME", op = "="
 cc bcb6165d84e48d89817e33e0c9ae69579133ad121693eb1c8034a8a216b4c235 # shrinks to context = "read -t '{e}' v", name = "HOME", op = "="
+cc 17773299edc6401b60cc67a67502dcb882ef5348386e7116930967fcc0205317 # shrinks to context = "[[ -v a[{e}] ]]", name = "HOME", op = "="
