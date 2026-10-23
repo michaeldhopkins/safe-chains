@@ -512,3 +512,52 @@ fn the_words_a_builtin_reads_as_numbers_start_where_its_options_end() {
         assert!(!verdict(text), "should be refused: {text}");
     }
 }
+
+/// A name bound outside any assignment the line makes (a call's argument, a prefix assignment)
+/// holds a number when its value is one, though the line never recorded it as an integer.
+#[test]
+fn a_bound_value_that_is_an_integer_is_a_number_unless_the_line_gave_the_name_something_else() {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    super::forget_numeric_names();
+    let _bound = crate::pathctx::enter_var("zznum".into(), "5".into());
+    let _text = crate::pathctx::enter_var("zztext".into(), "five".into());
+    assert!(super::holds_a_number("zznum"));
+    assert!(!super::holds_a_number("zztext"));
+    super::mark_free("zznum");
+    assert!(!super::holds_a_number("zznum"), "the line gave it a value that may not be a number");
+}
+
+#[test]
+fn a_name_read_as_a_number_that_the_line_later_counts_differently_contradicts_the_walk() {
+    super::forget_numeric_names();
+    assert!(!super::numbers_contradicted());
+    super::COUNTED.with(|c| c.borrow_mut().push("zzcounted".into()));
+    assert!(super::numbers_contradicted(), "counted as a number, but nothing gave it one");
+    super::forget_numeric_names();
+    super::NUMBERS.with(|n| n.borrow_mut().push("zzread".into()));
+    super::mark_free("zzread");
+    assert!(super::numbers_contradicted(), "read as a number, then given something else");
+}
+
+#[test]
+fn a_braced_name_is_one_word_only_when_nothing_follows_it_inside_the_braces() {
+    assert!(allowed("n=5; printf '%s %d' HOME=1 ${n}"));
+    for cmd in ["n=5; printf '%s %d' HOME=1 ${n:-x}; git log", "n=5; printf '%s %d' HOME=1 ${n-x}; git log"] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+}
+
+#[test]
+fn printf_reads_the_slot_each_argument_fills_after_the_options_before_the_format() {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    let verdict = |text: &str| {
+        super::forget_numeric_names();
+        let script = crate::cst::parse::parse(text).expect("parses");
+        let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple: {text}") };
+        super::commands::command_verdict(cmd).is_allowed()
+    };
+    assert!(verdict("printf -- '%s %s %d' HOME=1 x 5"));
+    assert!(!verdict("printf -- '%s %s %d' x y HOME=1"));
+    assert!(!verdict("printf -v out '%s %s %d' x y HOME=1"));
+    assert!(verdict("printf -v out '%s %s %d' HOME=1 x 5"));
+}

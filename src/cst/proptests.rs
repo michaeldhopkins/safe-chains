@@ -867,6 +867,12 @@ mod resolution {
     }
 
     #[test]
+    fn a_function_calling_another_function_is_not_taken_for_recursion() {
+        assert!(allowed("f(){ g; }; g(){ echo hi; }; f"), "one call nested in another");
+        assert!(allowed("f(){ g; g; }; g(){ echo hi; }; f; f"), "the same callee twice");
+    }
+
+    #[test]
     fn recursion_and_depth_terminate_and_deny() {
         // Direct and mutual recursion must terminate (bounded) and deny — no hang, no stack blow-up.
         assert!(!allowed("f(){ f; }; f"), "direct recursion");

@@ -279,3 +279,26 @@ fn without_a_workspace_a_parent_path_is_read_as_written() {
     }
     assert!(!leaves_the_workspace("./x"));
 }
+
+#[test]
+fn a_segment_that_runs_an_agent_is_a_boundary_whatever_the_rest_of_the_command_says() {
+    assert_eq!(segment("gptme hi"), GateKind::Boundary);
+    assert_eq!(segment("zzgatetool sync"), GateKind::NotYet);
+}
+
+#[test]
+fn an_option_value_attached_to_a_directory_flag_is_opaque() {
+    assert!(text_is_opaque("zzgatetool -Csomewhere x"));
+    assert!(!text_is_opaque("zzgatetool -D x"));
+}
+
+#[test]
+fn a_relative_path_is_read_against_the_workspace_before_it_is_called_protected() {
+    in_gate_probe(|| {
+        assert!(names_a_protected_place("sub/../../../.ssh/id_rsa"), "a slash without a leading dot");
+        assert!(!names_a_protected_place("sub/../notes"));
+    });
+    in_project(format!("{}/.ssh/work", home()), || {
+        assert!(names_a_protected_place(".."), "a leading dot without a slash");
+    });
+}
