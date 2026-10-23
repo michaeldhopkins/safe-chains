@@ -23,7 +23,7 @@ fn names_7z_reads_from_a_list_or_an_include_switch_are_judged() {
     ] {
         assert!(!at(&root, cmd).is_allowed(), "{cmd} was approved");
     }
-    for cmd in ["7z a out.7z src", "7z a out.7z -i!src/*.rs", "7z a out.7z -x@list.txt src", "7z a out.7z -xr!*.o src", "7z x a.7z -i!x"] {
+    for cmd in ["7z a out.7z src", "7z a out.7z -i!src/*.rs", "7z a out.7z -x@list.txt src", "7z a out.7z -xr!*.o src", "7z l a.7z -i!x"] {
         assert!(at(&root, cmd).is_allowed(), "{cmd} was refused");
     }
 }

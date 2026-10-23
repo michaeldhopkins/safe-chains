@@ -152,7 +152,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
         "export" | "declare" | "ps" | "mise" => env_print::prints_the_environment(tokens),
         "pax" | "cpio" => coreutils::archive_extract::extracts(tokens) || coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
-        "ditto" | "xar" | "ptar" | "ptargrep" => coreutils::archive_extract::extracts(tokens),
+        "ditto" | "xar" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
         _ => false,
     };
     specific || followed_read::follows_a_secret(tokens)

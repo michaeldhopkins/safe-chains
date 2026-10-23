@@ -1,7 +1,8 @@
 [[command]]
+writes_cwd = "named"
 name = "7z"
 aliases = ["7zz", "7za"]
-description = "7-Zip archive tool. Subcommand-style first positional: a (add/create), x (extract with paths), e (extract flat), d (delete from archive), l (list), t (test integrity), u (update), rn (rename), b (benchmark), h (hash), i (info). a/x/e/d/u/rn modify archives or write extracted files (project-local SafeWrite). l/t/h/i/b are read-only."
+description = "7-Zip archive tool. Subcommand-style first positional: a (add/create), x (extract with paths), e (extract flat), d (delete from archive), l (list), t (test integrity), u (update), rn (rename), b (benchmark), h (hash), i (info). a/x/e/d/u/rn modify archives or write extracted files (project-local SafeWrite). l/t/h/i/b are read-only. Extracting (x or e, in either case) is refused, as tar extraction is: the archive decides the paths written."
 url = "https://7-zip.org/"
 researched_version = "7-Zip 24.x"
 level = "SafeWrite"

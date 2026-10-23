@@ -1,9 +1,6 @@
 7z
-7z x
 7za
-7za x
 7zz
-7zz x
 @11ty/eleventy
 @11ty/eleventy x
 PlistBuddy

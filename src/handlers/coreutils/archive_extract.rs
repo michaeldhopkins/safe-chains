@@ -38,8 +38,30 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
             !(given.leading.contains('l') || given.long_leading.contains(&"--list-only"))
         }
         "xar" => given().anywhere.contains('x') || tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
-        _ => false,
+        _ => crate::registry::canonical_name(first.command_name()) == "7z" && seven_zip_extracts(&tokens[1..]),
     }
+}
+
+/// 7-Zip's command is its first word that is not a switch; `x` and `e` extract, in either case.
+/// 7-Zip glues every switch value (`-odir`), but a word after a switch spelled alone that this
+/// registry reads as valued (`-o dir`) is judged as the command too.
+fn seven_zip_extracts(arguments: &[Token]) -> bool {
+    let (_, valued) = crate::registry::command_flag_sets("7z").unwrap_or((&[], &[]));
+    let mut after_valued = false;
+    for word in arguments.iter().map(Token::as_str) {
+        if word.starts_with('-') && word != "-" {
+            after_valued = valued.iter().any(|flag| flag == word);
+            continue;
+        }
+        if word.eq_ignore_ascii_case("x") || word.eq_ignore_ascii_case("e") {
+            return true;
+        }
+        if !after_valued {
+            return false;
+        }
+        after_valued = false;
+    }
+    false
 }
 
 fn cpio_extracts(given: &Given<'_>) -> bool {
@@ -218,6 +240,11 @@ mod tests {
         cpio_extract_with_a_spaced_message: "cpio -i -M t",
         cpio_extract_behind_a_gnu_nonmatching_letter: "cpio -fidm",
         cpio_extract_behind_a_spaced_gnu_nonmatching_letter: "cpio -f -i",
+        seven_zip_extract: "7z x ./a.7z",
+        seven_zip_extract_flat: "7z e ./a.7z -o./out",
+        seven_zip_extract_upper_case: "7z X ./a.7z",
+        seven_zip_extract_after_switches: "7zz -y x ./a.7z",
+        seven_zip_extract_after_a_spaced_switch_value: "7za -o ./out x ./a.7z",
     }
 
     safe! {
@@ -226,6 +253,9 @@ mod tests {
         ptar_create_from_a_list: "ptar -c -T ./files.txt -f ./a.tar",
         ptar_create_to_stdout: "ptar -c -f - ./src",
         cpio_list_leaving_out_a_pattern: "cpio -it -f '*.o'",
+        seven_zip_list: "7z l ./a.7z",
+        seven_zip_add_a_file_named_x: "7z a ./out.7z x",
+        seven_zip_test: "7z t ./a.7z",
     }
 
     denied! {
@@ -265,6 +295,23 @@ mod tests {
             prop_assert!(!is_safe_command(&line), "{}", line);
             let tokens: Vec<crate::parse::Token> = format!("cpio -t{cluster} -f x").split_whitespace().map(crate::parse::Token::from_test).collect();
             prop_assert!(!super::extracts(&tokens));
+        }
+
+        /// 7-Zip's command letter decides: under any of its names and after any switches, `x` and
+        /// `e` extract and are refused, and `l`, `t` and `a` do not extract.
+        #[test]
+        fn a_seven_zip_extraction_is_refused_whatever_switches_come_first(
+            name in prop::sample::select(vec!["7z", "7za", "7zz"]),
+            switches in prop::sample::subsequence(vec!["-y", "-bd", "-r", "-o ./out", "-p secret", "-snl"], 0..3),
+            command in prop::sample::select(vec!["x", "e", "X", "E", "l", "t", "a"]),
+        ) {
+            let line = format!("{name} {} {command} ./a.7z", switches.join(" "));
+            let tokens: Vec<crate::parse::Token> = line.split_whitespace().map(crate::parse::Token::from_test).collect();
+            let extracting = command.eq_ignore_ascii_case("x") || command.eq_ignore_ascii_case("e");
+            prop_assert_eq!(super::extracts(&tokens), extracting, "{}", line);
+            if extracting {
+                prop_assert!(!is_safe_command(&line), "{}", line);
+            }
         }
 
         /// Whatever else is given, a pax, cpio or ditto line that extracts is refused, and one
