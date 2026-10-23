@@ -78,3 +78,15 @@ proptest! {
         prop_assert_eq!(allowed_in(dir.path(), "find / *"), !flag_like, "{:?}", names);
     }
 }
+
+/// A line that turns on dot names gives `*` the dot names too: `rm *` in a folder holding `.envrc`
+/// deletes it after `shopt -s dotglob` or a `GLOBIGNORE`, and not otherwise.
+#[test]
+fn a_line_that_turns_on_dot_names_matches_them() {
+    let dir = folder(&["a.txt", ".envrc"]);
+    assert!(allowed_in(dir.path(), "rm *"), "`rm *` refused without dot names");
+    assert!(allowed_in(dir.path(), "shopt -s dotglob; rm a.txt"), "the setting alone was refused");
+    for cmd in ["shopt -s dotglob; rm *", "GLOBIGNORE=x; rm *"] {
+        assert!(!allowed_in(dir.path(), cmd), "`{cmd}` approved deleting .envrc");
+    }
+}

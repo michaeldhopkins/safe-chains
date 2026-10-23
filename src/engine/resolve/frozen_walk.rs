@@ -310,7 +310,7 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
         let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(base)] };
         let listed = entry.path();
         let Some(name) = entry.file_name().into_string().ok() else { return vec![unlisted(base)] };
-        if name.starts_with('.') && !pattern.starts_with('.') {
+        if name.starts_with('.') && !pattern.starts_with('.') && !crate::cst::opaque::glob::dot_names_matched() {
             continue;
         }
         match crate::cst::opaque::glob::matches(pattern.as_bytes(), name.as_bytes()) {

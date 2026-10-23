@@ -729,3 +729,31 @@ fn a_filter_is_not_applied_through_a_glob_operand() {
     });
     assert!(matches!(globbed.as_slice(), [Reach::Found(p)] if p.ends_with("proj/.git/f")), "{globbed:?}");
 }
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(24))]
+
+    /// A line that turns dot names on before its glob is judged with them on: in a project holding a
+    /// frozen name, `rm -rf *` after any spelling of `dotglob`, `GLOBIGNORE` is refused, and the same `rm -rf *` alone, which bash runs without dot names, is not.
+    #[test]
+    fn a_glob_after_the_line_turns_on_dot_names_reaches_frozen_names(
+        setting in prop::sample::select(vec![
+            "shopt -s dotglob;", "shopt -s extglob dotglob &&", "GLOBIGNORE=x;", "export GLOBIGNORE=.:..;",
+        ]),
+        frozen in prop::sample::select(FROZEN_NAMES.to_vec()),
+    ) {
+        let (_dir, root) = project();
+        std::fs::create_dir_all(format!("{root}/build")).expect("plain");
+        std::fs::create_dir_all(format!("{root}/{frozen}")).expect("frozen");
+        let line = format!("{setting} rm -rf *");
+        let root_for = root.clone();
+        let named = format!("{setting} rm -rf build");
+        let (with_dots, alone, named) = on_hook_stack(move || {
+            let verdict = |line: &str| command_verdict_in(line, ctx(&root_for)).is_allowed();
+            (verdict(&line), verdict("rm -rf *"), verdict(&named))
+        });
+        prop_assert!(named, "{setting} rm -rf build was refused, so the setting alone decides");
+        prop_assert!(!with_dots, "{setting} rm -rf * with {frozen} present was approved");
+        prop_assert!(alone, "rm -rf * without dot names was refused");
+    }
+}
