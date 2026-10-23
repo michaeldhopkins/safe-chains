@@ -155,7 +155,7 @@ fn explain_fixes(
         None => explanation
             .segments
             .iter()
-            .filter(|s| !explanation.parsed || !s.verdict.is_allowed())
+            .filter(|s| !s.verdict.is_allowed())
             .map(|s| (s.text.clone(), fix(&s.text)))
             .collect(),
     };
