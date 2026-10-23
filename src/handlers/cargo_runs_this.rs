@@ -419,9 +419,7 @@ mod tests {
         let root = format!("{ROOT}[workspace]\nmembers = [\"crates/*\"]\n");
         let members = [("crates/tool", dependent), ("crates/other", other)];
         for cmd in [
-            "cargo run -p tool -- config add x",
-            "cargo run --package=tool -- config add x",
-            "cargo run -p other -- config add x",
+            "cargo run -p tool -- config add x", "cargo run --package=tool -- config add x", "cargo run -p other -- config add x",
             "cargo +nightly run -p tool -- config add x",
         ] {
             assert!(!in_workspace("package-dependent", &root, &members, cmd), "{cmd} must not be approved");
