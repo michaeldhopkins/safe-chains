@@ -94,3 +94,17 @@ fn a_project_folder_on_the_search_path_is_the_projects_own_code() {
     assert!(allowed(&format!("PATH={ROOT}/bin:$PATH ls")));
     assert!(!allowed("PATH=/work/u/other/bin:$PATH ls"));
 }
+
+#[test]
+fn a_foreign_folder_between_two_braced_path_elements_is_refused() {
+    for cmd in [
+        "export PATH=${PATH}:$(mktemp -d):${PATH}; ls",
+        "declare -x PATH=${PATH}:$(mktemp -d):${PATH}; ls",
+        "typeset -x PATH=${PATH}:$(mktemp -d):${PATH}; ls",
+        "export PATH=${PATH}:/tmp/evil:${PATH}; ls",
+        "export LD_PRELOAD=${X}:$(mktemp -d)/a.so:${X}; ls",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    assert!(allowed("export PATH=${PATH}:/opt/homebrew/bin:${PATH}; ls"));
+}
