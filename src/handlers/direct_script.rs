@@ -11,13 +11,42 @@ pub(crate) fn judged(tokens: &[Token], judge: impl Fn(&[Token]) -> Verdict) -> V
     let Some(first) = tokens.first().filter(|t| is_relative_command_path(t.as_str())) else {
         return judge(tokens);
     };
-    let script = judge(&as_interpreter(tokens));
+    let mut verdict = judge(&as_interpreter(tokens));
     let mut named = tokens.to_vec();
-    named[0] = Token::from_raw(first.command_name().to_string());
-    if named[0].as_str().is_empty() || !crate::handlers::names_a_command(&named) {
-        return script;
+    for spelling in spellings(first.command_name()) {
+        named[0] = Token::from_raw(spelling);
+        if crate::handlers::names_a_command(&named) {
+            verdict = verdict.combine(judge(&named));
+        }
     }
-    script.combine(judge(&named))
+    verdict
+}
+
+fn spellings(name: &str) -> Vec<String> {
+    let folded = without_build_hash(&name.to_ascii_lowercase().replace('_', "-")).to_string();
+    let stem = folded
+        .split_once('.')
+        .map(|(stem, _)| without_build_hash(stem).to_string())
+        .filter(|stem| is_an_identity(stem));
+    let mut all = vec![name.to_string()];
+    for spelling in [Some(folded), stem].into_iter().flatten() {
+        if !spelling.is_empty() && !all.contains(&spelling) {
+            all.push(spelling);
+        }
+    }
+    all.retain(|s| !s.is_empty());
+    all
+}
+
+fn without_build_hash(name: &str) -> &str {
+    match name.rsplit_once('-') {
+        Some((stem, hash)) if !stem.is_empty() && hash.len() == 16 && hash.bytes().all(|b| b.is_ascii_hexdigit()) => stem,
+        _ => name,
+    }
+}
+
+fn is_an_identity(name: &str) -> bool {
+    name == "safe-chains" || crate::userconfig::AGENT_COMMANDS.contains(&name)
 }
 
 pub(crate) fn as_interpreter(tokens: &[Token]) -> Cow<'_, [Token]> {
@@ -170,14 +199,69 @@ mod tests {
     fn a_path_that_spells_a_command_is_no_better_than_that_command() {
         let _ctx = crate::pathctx::enter(project());
         for cmd in [
-            "./target/debug/safe-chains config add rm", "target/release/safe-chains mcp", "./claude -p hi", "./rm -rf /",
-            "bin/bash -c 'rm -rf ~'", "node_modules/.bin/codex exec x",
+            "./target/debug/safe-chains config add rm",
+            "target/release/safe-chains mcp",
+            "./claude -p hi",
+            "./rm -rf /",
+            "bin/bash -c 'rm -rf ~'",
+            "node_modules/.bin/codex exec x",
+            "target/debug/deps/safe_chains-b21ccc14c83abc81 config add x",
+            "target/debug/SAFE-CHAINS config add x",
+            "target/debug/Safe-Chains mcp",
+            "node_modules/.bin/CODEX exec x",
+            "node_modules/@openai/codex/bin/codex.js exec x",
         ] {
             assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
         }
-        for cmd in ["./cat src", "bin/git status", "./vendor/bin/phpunit --testsuite Unit"] {
+        for cmd in [
+            "./cat src", "bin/git status", "./vendor/bin/phpunit --testsuite Unit", "scripts/run.sh", "./bin/cat foo",
+            "target/debug/safe-chains config list", "scripts/install.sh", "./bin/Cat foo",
+        ] {
             assert!(crate::command_verdict(cmd).is_allowed(), "{cmd}");
         }
+    }
+
+    fn identity_spellings(name: &str) -> Vec<String> {
+        let upper = name.to_ascii_uppercase();
+        let capital = name[..1].to_ascii_uppercase() + &name[1..];
+        let snake = name.replace('-', "_");
+        vec![
+            upper.clone(),
+            capital.clone(),
+            snake.clone(),
+            format!("{snake}-0123456789abcdef"),
+            format!("{name}-b21ccc14c83abc81"),
+            format!("{name}.js"),
+            format!("{capital}.EXE"),
+            format!("{upper}-0123456789abcdef.cjs"),
+            format!("{name}.js.map"),
+        ]
+    }
+
+    #[test]
+    fn every_spelling_of_an_agent_or_rule_changing_name_is_no_better_than_that_name() {
+        let _ctx = crate::pathctx::enter(project());
+        let names: Vec<&str> = crate::userconfig::AGENT_COMMANDS.iter().copied().chain(["safe-chains"]).collect();
+        let mut checked = 0;
+        for name in names {
+            let bare = [crate::parse::Token::from_raw(name.to_string())];
+            if !crate::handlers::names_a_command(&bare) {
+                continue;
+            }
+            for spelling in identity_spellings(name) {
+                for dir in ["target/debug/deps/", "node_modules/.bin/", "./"] {
+                    for arg in [" exec x", " config add x", " mcp", " -p hi"] {
+                        let path = format!("{dir}{spelling}");
+                        let direct = crate::command_verdict(&format!("{path}{arg}"));
+                        let named = crate::command_verdict(&format!("{name}{arg}"));
+                        let script = crate::command_verdict(&format!("bash {path}{arg}"));
+                        assert_eq!(direct, script.combine(named), "{path}{arg}");
+                        checked += 1;
+                    }
+                }
+            }
+        }
+        assert!(checked > 100, "only {checked} spellings checked");
     }
 
     #[test]
@@ -216,6 +300,33 @@ mod tests {
             arg in prop::sample::select(ARGS.to_vec()),
         ) {
             assert_same(path, arg);
+        }
+
+        #[test]
+        fn a_decorated_identity_name_still_spells_that_name(
+            name in prop::sample::select(crate::userconfig::AGENT_COMMANDS.iter().copied().chain(["safe-chains"]).collect::<Vec<_>>()),
+            upper in prop::collection::vec(any::<bool>(), 16),
+            snake in any::<bool>(),
+            hash in prop::option::of("[0-9a-f]{16}"),
+            extension in prop::option::of("[a-zA-Z]{1,4}"),
+        ) {
+            let mut decorated: String = name.chars().zip(upper.iter().cycle()).map(|(c, up)| if *up { c.to_ascii_uppercase() } else { c }).collect();
+            if snake {
+                decorated = decorated.replace('-', "_");
+            }
+            if let Some(hash) = hash {
+                decorated = format!("{decorated}-{hash}");
+            }
+            if let Some(extension) = extension {
+                decorated = format!("{decorated}.{extension}");
+            }
+            prop_assert!(super::spellings(&decorated).iter().any(|s| s == name), "{decorated} -> {:?}", super::spellings(&decorated));
+        }
+
+        #[test]
+        fn an_extension_is_dropped_only_for_an_identity_name(stem in "[a-z]{1,8}", extension in "[a-z]{1,4}") {
+            let spelled = super::spellings(&format!("{stem}.{extension}"));
+            prop_assert_eq!(spelled.contains(&stem), super::is_an_identity(&stem));
         }
     }
 }

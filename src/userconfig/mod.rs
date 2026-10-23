@@ -22,6 +22,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub use edit::Access;
+pub(crate) use guard::AGENT_COMMANDS;
 pub use guard::Protected;
 pub use list::list;
 
