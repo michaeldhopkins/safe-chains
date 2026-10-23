@@ -1556,7 +1556,7 @@ zipcloak	description
 zipcmp	description
 zipdetails	description
 zipgrep	description,no-tolerance
-zipinfo	examples,version
+zipinfo	version
 zipmerge	description
 zipnote	description
 zipsplit	description

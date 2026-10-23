@@ -4,7 +4,12 @@ description = "Displays detailed metadata about ZIP archive contents, including 
 url = "https://linux.die.net/man/1/zipinfo"
 level = "Inert"
 bare = false
+examples_safe = ["zipinfo ./archive.zip", "zipinfo -1 ./archive.zip"]
+examples_denied = ["zipinfo ~/.ssh/keys.zip"]
 standalone = [
     "--help", "--version",
     "-1", "-2", "-C", "-M", "-T", "-V", "-Z", "-h", "-l", "-m", "-s", "-t", "-v", "-z",
 ]
+
+[command.path_gate]
+positional = "read"

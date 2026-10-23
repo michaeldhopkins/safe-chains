@@ -643,6 +643,7 @@ zipinfo --help --version	inert
 zipinfo --help x	inert
 zipinfo --version	inert
 zipinfo -1	inert
+zipinfo -1 ./archive.zip	inert
 zipinfo -2	inert
 zipinfo -C	inert
 zipinfo -M	inert
@@ -656,7 +657,9 @@ zipinfo -s	inert
 zipinfo -t	inert
 zipinfo -v	inert
 zipinfo -z	inert
+zipinfo ./archive.zip	inert
 zipinfo x	inert
+zipinfo ~/.ssh/keys.zip	denied
 zipmerge	denied
 zipmerge --help	denied
 zipmerge --version	denied
