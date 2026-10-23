@@ -24,15 +24,29 @@ pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
         }
         let (is_shell, value) = if let Some(long) = word.strip_prefix("--") {
             let (name, glued) = long.split_once('=').map_or((long, None), |(name, value)| (name, Some(value)));
-            if name != "rsh" && name != "rsync-path" {
+            if name != "rsh" && name != "rsync-path" && name != "filter" {
                 continue;
             }
-            (name == "rsh", if glued.is_some() { glued } else { words.next() })
+            let value = if glued.is_some() { glued } else { words.next() };
+            if name == "filter" {
+                if value.is_none_or(is_a_merge_rule) {
+                    return true;
+                }
+                continue;
+            }
+            (name == "rsh", value)
         } else if let Some(cluster) = word.strip_prefix('-') {
             let Some(at) = cluster.find(VALUED_SHORT) else {
                 continue;
             };
             let glued = &cluster[at + 1..];
+            if cluster[at..].starts_with('f') {
+                let value = if glued.is_empty() { words.next() } else { Some(glued) };
+                if value.is_none_or(is_a_merge_rule) {
+                    return true;
+                }
+                continue;
+            }
             if !cluster[at..].starts_with('e') {
                 if glued.is_empty() {
                     words.next();
@@ -45,7 +59,7 @@ pub(crate) fn names_a_program_to_run(tokens: &[Token]) -> bool {
         };
         let plain = match value {
             Some(value) if is_shell => remote_shell_verdict(value).is_allowed(),
-            Some(value) => rsync_path_is_plain(value),
+            Some(value) => rsync_path_verdict(value).is_allowed(),
             None => false,
         };
         if !plain {
@@ -145,10 +159,37 @@ fn relative_program_stays(placed: &str) -> bool {
     })
 }
 
-/// A path whose last part is rsync, with nothing a shell would read as more than one word.
-fn rsync_path_is_plain(value: &str) -> bool {
-    value.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '/' | '.' | '_' | '-' | '+'))
-        && value.rsplit('/').next() == Some("rsync")
+/// The verdict on an `--rsync-path`: rsync, bare or in a standard bin directory, or a relative path
+/// to a program named rsync, judged as the file it runs. A local copy runs it here, not on a far side.
+fn rsync_path_verdict(value: &str) -> Verdict {
+    let plain = value.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '/' | '.' | '_' | '-' | '+'))
+        && value.rsplit('/').next() == Some("rsync");
+    if !plain {
+        return Verdict::Denied;
+    }
+    if value == "rsync" || ["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"].iter().any(|dir| value.strip_prefix(dir) == Some("rsync")) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    if value.starts_with('/') || value.starts_with('~') {
+        return Verdict::Denied;
+    }
+    let placed = crate::pathctx::resolve(value);
+    if !relative_program_stays(&placed) {
+        return Verdict::Denied;
+    }
+    crate::engine::resolve::execute_file_verdict(&placed)
+}
+
+/// A filter rule that reads its rules from a file: `merge`, `dir-merge`, or their short forms `.`
+/// and `:`, with or without modifiers. rsync prints a line it cannot parse, and with `-` and
+/// `--debug=FILTER` every line, so the file is read out.
+fn is_a_merge_rule(rule: &str) -> bool {
+    let rule = rule.trim_start();
+    if rule.starts_with(['.', ':']) {
+        return true;
+    }
+    let name = rule.split([' ', ',', '_']).next().unwrap_or_default();
+    name.eq_ignore_ascii_case("merge") || name.eq_ignore_ascii_case("dir-merge")
 }
 
 #[cfg(test)]
@@ -183,6 +224,8 @@ mod tests {
         rsync_shell_ssh_in_usr_bin_with_a_user: "rsync -e '/usr/bin/ssh -l x' x:foo dst/",
         rsync_shell_long_ssh_with_a_port: "rsync --rsh='ssh -p 22 -o BatchMode=yes' x:foo dst/",
         rsync_shell_env_ssh_with_a_port: "RSYNC_RSH='ssh -p 22' rsync x:foo dst/",
+        rsync_filter_exclude: "rsync -n --filter='- *.o' src/ dst/",
+        rsync_filter_spaced_exclude: "rsync -n --filter '+ *.rs' src/ dst/",
     }
 
     denied! {
@@ -203,6 +246,16 @@ mod tests {
         rsync_path_metacharacter: "rsync --rsync-path='rsync;id' host:src/ dst/",
         rsync_path_remote_option: "rsync -a -M--rsync-path=sh src/ dst/",
         rsync_local_server: "rsync --server src/ dst/",
+        rsync_filter_merge: "rsync -n --filter='merge ~/.npmrc' src/ dst/",
+        rsync_filter_merge_spaced: "rsync -n --filter 'merge,- ~/.aws/credentials' src/ dst/",
+        rsync_filter_short_merge: "rsync -n --filter='. /etc/hosts' src/ dst/",
+        rsync_filter_dir_merge: "rsync -n --filter='dir-merge,n- x' src/ dst/",
+        rsync_filter_short_dir_merge: "rsync -n --filter=':n- x' src/ dst/",
+        rsync_filter_underscore: "rsync -n --filter=merge_x src/ dst/",
+        rsync_filter_short_flag_merge: "rsync -n -f '. x' src/ dst/",
+        rsync_filter_cluster_merge: "rsync -nf. src/ dst/",
+        rsync_filter_remote_merge: "rsync -n -M--filter=merge_x src/ dst/",
+        rsync_filter_missing_value: "rsync -n src/ dst/ --filter",
         rsync_local_server_sender: "rsync --server --sender -vlogDtpre.iLsfxC . src/",
         rsync_local_server_after_options: "rsync -a --server src/ dst/",
         rsync_shell_ssh_with_a_config_file: "rsync -e 'ssh -p 22 -F ./cfg' x:foo dst/",
@@ -229,6 +282,22 @@ mod tests {
         }
         for cmd in ["rsync -e 'ssh -l -F' x:foo dst/", "rsync -e 'ssh -l-F' x:foo dst/", "RSYNC_RSH='ssh -l -F' rsync x:foo dst/"] {
             assert!(!check(cmd), "{cmd} was approved");
+        }
+    }
+
+    #[test]
+    fn an_rsync_path_runs_only_rsync_from_a_standard_place_or_the_project() {
+        for dir in ["/tmp/x/", "/Users/someone/bin/", "~/bin/", ".git/hooks/", "scripts/../../", "node_modules/.bin/", "../", ".jj/"] {
+            for (src, dst) in [("./src/", "./dst/"), ("host:src/", "dst/")] {
+                for form in [format!("--rsync-path={dir}rsync"), format!("--rsync-path {dir}rsync")] {
+                    let cmd = format!("rsync {form} {src} {dst}");
+                    assert!(!in_project(&cmd), "{cmd} was approved");
+                }
+            }
+        }
+        for value in ["rsync", "/usr/bin/rsync", "/opt/homebrew/bin/rsync", "bin/rsync"] {
+            let cmd = format!("rsync --rsync-path={value} ./src/ ./dst/");
+            assert!(in_project(&cmd), "{cmd} was refused");
         }
     }
 
