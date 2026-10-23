@@ -382,6 +382,13 @@ measured = false
 shape = "command"
 because = "man pipes the page through this, ahead of PAGER"
 measured = false
+[env.WHATISPAGER]
+shape = "command"
+because = "man -k, man -f, apropos and whatis pipe their output through this on macOS"
+[env.MANOPT]
+shape = "opaque"
+because = "man-db parses this as options before its arguments, --pager and --config-file among them"
+measured = false
 [env.GH_PAGER]
 shape = "command"
 because = "gh pipes output through this, ahead of PAGER"
@@ -486,6 +493,36 @@ measured = false
 [env.VIMINIT]
 shape = "opaque"
 because = "Ex commands vim runs at startup in place of the vimrc, and :! runs a program"
+measured = false
+[env.VIM]
+shape = "opaque"
+because = "vim sources $VIM/vimrc at startup, as -u would"
+[env.VIMRUNTIME]
+shape = "opaque"
+because = "vim sources every $VIMRUNTIME/plugin/*.vim at startup"
+[env.GVIMINIT]
+shape = "opaque"
+because = "as VIMINIT, for gvim"
+measured = false
+[env.NVIM_APPNAME]
+shape = "opaque"
+because = "names the folder under XDG_CONFIG_HOME whose init.lua or init.vim nvim runs, and ../ climbs out of it"
+measured = false
+[env.EMACSLOADPATH]
+shape = "opaque"
+because = "emacs loads site-start.el and every library it requires from these folders"
+measured = false
+[env.EMACSPATH]
+shape = "opaque"
+because = "the folders emacs searches for the helper programs it runs"
+measured = false
+[env.EMACSDATA]
+shape = "opaque"
+because = "emacs's data folder, which holds files it loads at startup"
+measured = false
+[env.EMACSNATIVELOADPATH]
+shape = "opaque"
+because = "folders of natively compiled code emacs loads"
 measured = false
 [env.EXINIT]
 shape = "opaque"
@@ -1161,6 +1198,14 @@ measured = false
 [env.LESSKEY_CONTENT]
 shape = "opaque"
 because = "less parses the value as lesskey source, #env section included (measured: executes)"
+[env.LESSHISTFILE]
+shape = "data-write"
+because = "less writes its search and shell-command history to this file"
+measured = false
+[env.LESSEDIT]
+shape = "command"
+because = "the editor command less runs for its v key"
+measured = false
 [env.LESSGLOBALTAGS]
 shape = "command"
 because = "less runs this command to look up a tag for -t when the tags file is GTAGS"
