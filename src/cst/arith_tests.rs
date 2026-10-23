@@ -475,3 +475,40 @@ fn a_name_given_something_other_than_a_number_is_free_even_when_unbound() {
     super::mark_free("*");
     assert!(super::is_free("m"));
 }
+
+/// A word that stays one word is not read as a numeric slot, so an assignment in a text slot beside
+/// it passes; one that may split makes every argument count.
+#[test]
+fn printf_counts_every_argument_only_beside_a_word_that_may_split() {
+    for cmd in [
+        "printf '%s %s %d' HOME=1 ${#x} 1", "printf '%s %s %d' HOME=1 $$ 1", "x=abc; printf '%s %s %d' HOME=1 $x 1",
+        "x_y=5; printf '%s %s %d' HOME=1 $x_y 1", "printf 'HOME=1 %s %d' {1,2} 5",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+    for cmd in ["printf '%s %s %d' HOME=1 $@ 1; git log", "printf '%s %s %d' HOME=1 $y 1; git log"] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+}
+
+/// `printf`'s own options and `print`/`read` are checked on the command alone: the command
+/// classifier refuses most of them before the arithmetic reader is asked.
+#[test]
+fn the_words_a_builtin_reads_as_numbers_start_where_its_options_end() {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    let verdict = |text: &str| {
+        super::forget_numeric_names();
+        let script = crate::cst::parse::parse(text).expect("parses");
+        let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple: {text}") };
+        super::commands::command_verdict(cmd).is_allowed()
+    };
+    for text in [
+        "printf '%s %s %d' HOME=1 ${!} 1", "printf -$x 5", "printf 'HOME=1 %d' {1,2}", "print -f%d 1", "read -t", "read -r -t",
+        "printf -x -- %d 5",
+    ] {
+        assert!(verdict(text), "should be allowed: {text}");
+    }
+    for text in ["printf -x -y %d HOME=1", "printf -x -- %d HOME=1", "printf -v x %d HOME=1", "read -t HOME=1"] {
+        assert!(!verdict(text), "should be refused: {text}");
+    }
+}
