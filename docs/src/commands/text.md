@@ -285,6 +285,10 @@ Aliases: `gjoin`
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
 
+**Examples:**
+
+- `less +42 ./notes.md`
+
 ### `lessecho`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/lessecho.1.html">https://man7.org/linux/man-pages/man1/lessecho.1.html</a></p>
 
@@ -317,6 +321,10 @@ Aliases: `gjoin`
 - Allowed standalone flags: -V, -c, -d, -f, -h, -l, -p, -s, -u, --help, --version
 - Allowed valued flags: -n, --lines
 - Bare invocation allowed
+
+**Examples:**
+
+- `more +42 ./notes.md`
 
 ### `msgattrib`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gettext/manual/html_node/msgattrib-Invocation.html">https://www.gnu.org/software/gettext/manual/html_node/msgattrib-Invocation.html</a></p>

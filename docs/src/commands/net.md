@@ -74,7 +74,8 @@
 ### `dns-sd`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html</a></p>
 
-- Requires -E, -F, -B, -L, -q, -G, -Z, -V. - Allowed standalone flags: -E, -F, -B, -L, -q, -G, -Z, -V, -4, -6
+- Requires -E, -F, -B, -L, -q, -G, -Z, -V.
+- Allowed standalone flags: -E, -F, -B, -L, -q, -G, -Z, -V, -4, -6
 
 ### `doggo`
 <p class="cmd-url"><a href="https://doggo.mrkaran.dev/">https://doggo.mrkaran.dev/</a></p>
@@ -100,7 +101,8 @@
 ### `fping`
 <p class="cmd-url"><a href="https://www.fping.org/">https://www.fping.org/</a></p>
 
-- Requires -c, --count, -C, --vcount, -x, --reachable, -X, --fast-reachable. - Allowed standalone flags: --help, --version, --ipv4, --ipv6, --alive, --addr, --rdns, --timestamp, --elapsed, --dontfrag, --name, --netdata, --outage, --quiet, --random, --stats, --unreach, --loop, --all, -4, -6, -a, -A, -d, -D, -e, -h, -l, -M, -m, -n, -N, -o, -q, -R, -s, -u, -v
+- Requires -c, --count, -C, --vcount, -x, --reachable, -X, --fast-reachable.
+- Allowed standalone flags: --help, --version, --ipv4, --ipv6, --alive, --addr, --rdns, --timestamp, --elapsed, --dontfrag, --name, --netdata, --outage, --quiet, --random, --stats, --unreach, --loop, --all, -4, -6, -a, -A, -d, -D, -e, -h, -l, -M, -m, -n, -N, -o, -q, -R, -s, -u, -v
 - Allowed valued flags: --size, --backoff, --count, --vcount, --file, --generate, --ttl, --iface, --interval, --tos, --period, --squiet, --retry, --src, --timeout, --reachable, --fast-reachable, -b, -B, -c, -C, -f, -g, -H, -i, -I, -O, -p, -Q, -r, -S, -t, -T, -x, -X
 
 ### `grpcurl`
@@ -272,13 +274,15 @@
 ### `nc`
 <p class="cmd-url"><a href="https://man.openbsd.org/nc.1">https://man.openbsd.org/nc.1</a></p>
 
-- Requires -z. - Allowed standalone flags: --help, -h, -z, -v, -n, -u, -4, -6
+- Requires -z.
+- Allowed standalone flags: --help, -h, -z, -v, -n, -u, -4, -6
 - Allowed valued flags: -w
 
 ### `ncat`
 <p class="cmd-url"><a href="https://nmap.org/ncat/">https://nmap.org/ncat/</a></p>
 
-- Requires -z. - Allowed standalone flags: --help, -h, --version, -z, -v, -n, -u, -4, -6
+- Requires -z.
+- Allowed standalone flags: --help, -h, --version, -z, -v, -n, -u, -4, -6
 - Allowed valued flags: -w, --wait
 
 ### `netstat`
@@ -322,7 +326,8 @@
 ### `ping`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ping.8.html">https://man7.org/linux/man-pages/man8/ping.8.html</a></p>
 
-- Requires -c, --count. - Allowed standalone flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v, --help, -h, --version, -V
+- Requires -c, --count.
+- Allowed standalone flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v, --help, -h, --version, -V
 - Allowed valued flags: --count, --deadline, --interface, --interval, --ttl, -I, -Q, -S, -W, -c, -i, -l, -s, -t, -w
 
 ### `protoc`

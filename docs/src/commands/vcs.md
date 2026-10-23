@@ -108,7 +108,8 @@
 ### `git-cliff`
 <p class="cmd-url"><a href="https://git-cliff.org/">https://git-cliff.org/</a></p>
 
-- Requires --no-exec. - Allowed standalone flags: --bumped-version, --current, --help, --latest, --no-exec, --offline, --topo-order, --unreleased, --use-branch-tags, --verbose, --version, -V, -h, -l, -u, -v
+- Requires --no-exec.
+- Allowed standalone flags: --bumped-version, --current, --help, --latest, --no-exec, --offline, --topo-order, --unreleased, --use-branch-tags, --verbose, --version, -V, -h, -l, -u, -v
 - Allowed valued flags: --body, --bump, --config, --count-tags, --exclude-path, --from-context, --ignore-tags, --include-path, --repository, --skip-commit, --skip-tags, --sort, --strip, --tag, --tag-pattern, --with-commit, --with-tag-message, --workdir, -b, -c, -r, -s, -t, -w
 - Bare invocation allowed
 

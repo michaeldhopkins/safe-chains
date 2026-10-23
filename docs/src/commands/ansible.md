@@ -34,15 +34,16 @@
 ### `ansible-playbook`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html">https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html</a></p>
 
-- Requires --list-hosts, --list-tasks, --list-tags, --syntax-check. - Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
+- Requires --list-hosts, --list-tasks, --list-tags, --syntax-check.
+- Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
 - Allowed valued flags: --connection, --extra-vars, --inventory, --limit, --tags, --skip-tags, -C, -c, -e, -i, -l, -t
 
 ### `ansible-vault`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-vault.html">https://docs.ansible.com/ansible/latest/cli/ansible-vault.html</a></p>
 
 - **decrypt**
-- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output, --vault-id, --vault-password-file. Positional args accepted
-- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
+- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output. Positional args accepted
+- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name
 - **help**: Positional args accepted
 - **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v

@@ -45,7 +45,8 @@ Aliases: `sh`
 ### `command`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/command.1p.html">https://man7.org/linux/man-pages/man1/command.1p.html</a></p>
 
-- Requires -v, -V, --version. - Allowed standalone flags: --help, --version, -h
+- Requires -v, -V, --version.
+- Allowed standalone flags: --help, --version, -h
 - Allowed valued flags: -v, -V
 
 **Examples:**
@@ -59,15 +60,15 @@ Aliases: `sh`
 
 Aliases: `typeset`
 
-- Allowed standalone flags: -A, -F, -a, -f, -g, -i, -l, -n, -p, -r, -t, -u, -x
+- Allowed standalone flags: -A, -F, -a, -f, -g, -i, -l, -n, -r, -t, -u, -x
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 **Examples:**
 
-- `declare -p`
 - `declare -i count=5`
 - `declare -x FOO=bar`
+- `declare -f`
 
 ### `exit`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/exit.1p.html">https://man7.org/linux/man-pages/man1/exit.1p.html</a></p>
@@ -78,16 +79,16 @@ Aliases: `typeset`
 ### `export`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/export.1p.html">https://man7.org/linux/man-pages/man1/export.1p.html</a></p>
 
-- Allowed standalone flags: -f, -n, -p
+- Allowed standalone flags: -f, -n
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 **Examples:**
 
-- `export`
-- `export -p`
 - `export FOO=bar`
 - `export PATH_EXTRA=./bin`
+- `export FOO`
+- `export -n FOO`
 
 ### `false`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation</a></p>
@@ -101,9 +102,16 @@ Aliases: `gfalse`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/hash.1p.html">https://man7.org/linux/man-pages/man1/hash.1p.html</a></p>
 
 - Allowed standalone flags: -d, -l, -r, -t
-- Allowed valued flags: -p
 - Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `hash`
+- `hash -r`
+- `hash -l`
+- `hash -d`
+- `hash ls`
+- `hash -t ls`
 
 ### `hostname`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/hostname.1.html">https://man7.org/linux/man-pages/man1/hostname.1.html</a></p>
@@ -116,8 +124,14 @@ Aliases: `gfalse`
 
 Aliases: `gprintenv`
 
-- Allowed standalone flags: --help, --null, --version, -0, -V, -h
-- Bare invocation allowed
+- Requires --help, --version, -V, -h.
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `printenv --help`
+- `printenv --version`
+- `gprintenv -h`
 
 ### `read`
 <p class="cmd-url"><a href="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html">https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html</a></p>

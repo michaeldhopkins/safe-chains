@@ -21,7 +21,8 @@
 ### `dscacheutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/dscacheutil.html">https://ss64.com/mac/dscacheutil.html</a></p>
 
-- Requires -q, -cachedump, -configuration, -statistics, -h. - Allowed standalone flags: -h, -cachedump, -buckets, -configuration, -statistics
+- Requires -q, -cachedump, -configuration, -statistics, -h.
+- Allowed standalone flags: -h, -cachedump, -buckets, -configuration, -statistics
 - Allowed valued flags: -q, -entries, -a
 
 ### `dsmemberutil`

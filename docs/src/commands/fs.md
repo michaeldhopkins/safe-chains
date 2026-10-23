@@ -60,7 +60,6 @@ Aliases: `gchmod`
 
 - Edits its file operands in place within your workspace.
 - Allowed standalone flags: --changes, --dereference, --help, --no-dereference, --preserve-root, --quiet, --recursive, --silent, --verbose, --version, -P, -R, -c, -f, -h, -v
-- Allowed valued flags: --reference
 - Recurses into directory trees with: --recursive, -R
 
 **Examples:**
@@ -68,7 +67,6 @@ Aliases: `gchmod`
 - `chmod +x scripts/build.sh`
 - `chmod 644 README.md`
 - `chmod -R u+rwX,go-w src`
-- `chmod --reference=a.txt b.txt`
 - `gchmod -v 755 bin/tool`
 - `chmod --version`
 
@@ -261,7 +259,8 @@ Aliases: `exa`
 ### `gzip`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/gzip.1.html">https://man7.org/linux/man-pages/man1/gzip.1.html</a></p>
 
-- Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
+- Requires -l, --list, -t, --test.
+- Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
 
 ### `ln`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ln-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ln-invocation</a></p>
@@ -490,7 +489,8 @@ Aliases: `gtouch`
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
-- Requires -c, -l, -p, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
+- Requires -c, -l, -p, -t, -Z.
+- Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
 
 **Examples:**
 

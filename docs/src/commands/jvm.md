@@ -40,7 +40,8 @@ Aliases: `gradlew`
 ### `jarsigner`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html</a></p>
 
-- Requires -verify. - Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
+- Requires -verify.
+- Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
 
 ### `javap`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html</a></p>
