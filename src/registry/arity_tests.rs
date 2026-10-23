@@ -383,3 +383,20 @@ fn flag_present_matches_bare_glued_and_short_clusters_only() {
     assert!(!super::flag_present(&toks(&["-fa"]), "-file"));
     assert!(!super::flag_present(&toks(&["-ba"]), "ab"));
 }
+
+proptest::proptest! {
+    #[test]
+    fn a_multi_letter_short_flag_is_present_anywhere_in_a_cluster(
+        name in "[A-Z]{2,3}",
+        before in "[a-z]{0,3}",
+        after in "[a-z./]{0,4}",
+    ) {
+        let flag = format!("-{name}");
+        for token in [flag.clone(), format!("{flag}=x"), format!("-{before}{name}{after}"), format!("-{before}{name}=v")] {
+            proptest::prop_assert!(super::flag_present(&toks(&["zip", &token]), &flag), "{} hides {}", token, flag);
+        }
+        let (valued, long) = (format!("-{before}={name}"), format!("--{name}"));
+        proptest::prop_assert!(!super::flag_present(&toks(&["zip", &valued]), &flag));
+        proptest::prop_assert!(!super::flag_present(&toks(&["zip", &long]), &flag));
+    }
+}

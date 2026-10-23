@@ -419,18 +419,18 @@ fn output_flag_value<'a>(tokens: &'a [Token], flag: &'a str) -> Option<&'a str> 
 /// misses the dangerous flag inside it (a classifier/allowlist disagreement; a live bypass for any
 /// clustering tool with a classifying short flag).
 fn flag_present(tokens: &[Token], flag: &str) -> bool {
-    // A `-X` short flag (exactly two chars, leading `-`) can appear in a cluster; `--long` cannot.
-    let short_char = (flag.len() == 2 && flag.as_bytes()[0] == b'-').then(|| flag.as_bytes()[1]);
+    // A single-dash flag can appear in a cluster, `-X` or a longest-match `-XY` (zip's `-qTTcmd`); `--long` cannot.
+    let letters = flag.strip_prefix('-').filter(|l| !l.is_empty() && !l.starts_with('-'));
     tokens.iter().any(|t| {
         let s = t.as_str();
         if s == flag || s.strip_prefix(flag).is_some_and(|rest| rest.starts_with('=')) {
             return true;
         }
         // Short cluster `-<letters>` (single dash, not `--`): scan only the boolean-letter run BEFORE
-        // any `=value`, so a glued value (`-o=decrypted`) can't spuriously match the flag char.
-        matches!(short_char, Some(c)
+        // any `=value`, so a glued value (`-o=decrypted`) can't spuriously match the flag letters.
+        matches!(letters, Some(l)
             if s.len() > 1 && s.as_bytes()[0] == b'-' && s.as_bytes()[1] != b'-'
-            && s[1..].split('=').next().is_some_and(|run| run.as_bytes().contains(&c)))
+            && s[1..].split('=').next().is_some_and(|run| run.contains(l)))
     })
 }
 
