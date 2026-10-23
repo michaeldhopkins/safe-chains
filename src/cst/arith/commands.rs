@@ -42,8 +42,9 @@ pub(crate) fn command_verdict(cmd: &SimpleCmd) -> Verdict {
     let subscripts = cmd.env.iter().filter_map(|(name, _)| name.split_once('[')).map(|(_, s)| expression_verdict(s));
     let words: Vec<String> = cmd.words.iter().map(Word::eval).collect();
     let start = words.iter().take_while(|w| matches!(command_name(w).as_str(), "builtin" | "command")).count();
+    let descriptor = descriptor_verdict(cmd);
     let Some(name) = words.get(start).map(|w| command_name(w)) else {
-        return subscripts.fold(numeric_verdict(cmd, "", &[]), Verdict::combine);
+        return subscripts.fold(numeric_verdict(cmd, "", &[]).combine(descriptor), Verdict::combine);
     };
     let args = &words[start + 1..];
     let arg_words = &cmd.words[start + 1..];
@@ -62,7 +63,19 @@ pub(crate) fn command_verdict(cmd: &SimpleCmd) -> Verdict {
     };
     let arithmetic = arithmetic.into_iter().map(|i| arithmetic_word_verdict(&arg_words[i]));
     let named = named.into_iter().map(|i| name_verdict(&arg_words[i]));
-    arithmetic.chain(named).chain(subscripts).fold(numeric, Verdict::combine)
+    arithmetic.chain(named).chain(subscripts).fold(numeric.combine(descriptor), Verdict::combine)
+}
+
+/// `echo hi {HOME}>/dev/null` opens a descriptor and assigns its number to HOME, in bash and zsh.
+/// The parser keeps the `{HOME}` as a word, so any such word beside a redirect counts.
+fn descriptor_verdict(cmd: &SimpleCmd) -> Verdict {
+    let braced_name = |w: &Word| {
+        let text = w.eval();
+        text.strip_prefix('{')
+            .and_then(|t| t.strip_suffix('}'))
+            .is_some_and(|name| !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_'))
+    };
+    refuse_if(!cmd.redirs.is_empty() && cmd.words.iter().any(braced_name))
 }
 
 /// A name a command sets or tests: `read 'a[HOME=1]'` and `test -v 'a[HOME=1]'` evaluate the
