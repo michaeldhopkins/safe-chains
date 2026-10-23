@@ -2096,6 +2096,13 @@ mod tests {
         for cmd in [vec!["mkdir", "/etc/evil"], vec!["mkdir", "~/newdir"], vec!["mkdir", "$HOME/x"]] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("mkdir")), Verdict::Denied, "{cmd:?}");
         }
+        // Creating a protected path is the same write as putting a file there.
+        for cmd in ["mkdir .git", "mkdir -p a/.git", "mkdir /etc/foo"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
+        }
+        for cmd in ["mkdir build", "mkdir -p src/x"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd}");
+        }
         // a glued valued short (-m755) and its value must not be read as operands
         let g = resolve(&toks(&["mkdir", "-m755", "./x"])).expect("mkdir");
         assert_eq!(g.capabilities.len(), 1, "-m755 glued: only ./x is an operand");
