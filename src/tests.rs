@@ -2105,3 +2105,15 @@ fn a_refusal_offers_a_grant_only_when_one_would_work() {
     }
     assert!(checked >= 3, "only {checked} reach reasons probed — the sweep shrank");
 }
+
+/// An absolute path outside the workspace is named back as written, not as it resolves: `/etc/./hosts`
+/// names `/etc/./hosts` back to the reader, who typed it that way.
+#[test]
+fn workspace_overreach_reports_an_absolute_path_as_written() {
+    use crate::pathctx::{PathCtx, enter};
+    let _g = enter(PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() });
+    for path in ["/etc/./hosts", "/work/../etc/hosts"] {
+        let reach = crate::workspace_overreach(&format!("cat {path}"));
+        assert_eq!(reach.map(|(named, _)| named).as_deref(), Some(path), "{path} must be named as written");
+    }
+}
