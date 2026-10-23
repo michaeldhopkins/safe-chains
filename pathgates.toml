@@ -45,6 +45,11 @@ read = [
   "shasum", "cksum", "sum", "b2sum", "b3sum", "xxhsum", "rhash",
   # compressed-content viewers
   "zcat", "gzcat", "bzcat", "xzcat", "lzcat", "zstdcat", "zless", "bzless", "xzless", "zmore",
+  "bzmore", "xzmore", "lzless", "lzmore", "zstdless", "xzdec", "lzmainfo",
+  # compressed-content comparers (decompress, then cmp or diff the content)
+  "zcmp", "bzcmp", "xzcmp", "xzdiff", "lzcmp", "lzdiff",
+  # first-member extractor (`funzip x.zip` prints the member to stdout)
+  "funzip",
   # visible-encoding filters (`vis`/`unvis` print their file operands transformed)
   "vis", "unvis",
 ]
@@ -77,6 +82,8 @@ write = [
   # (`gtruncate`/`gunlink`/`gmknod` are standalone GNU-form commands, not aliases, so they're
   #  listed by their own names; `mkfifo`/`gmkfifo` share a spec via the alias map.)
   "mkfifo", "gmkfifo", "mknod", "gmknod", "unlink", "gunlink", "gtruncate",
+  # gzip's `zforce` renames each operand to end in .gz
+  "zforce",
   # in-place (re)compressors / optimizers that rewrite the file in its directory
   "bzip2", "xz", "lzma", "zstd", "lz4", "brotli", "compress", "zip",
   "pigz", "unpigz", "pbzip2", "plzip", "lzip", "optipng", "jpegoptim",
@@ -89,6 +96,9 @@ write = [
   # (`unzip` was here for `unzip -p ~/.ssh/id_rsa`. That is a READ, and it is gated as one in
   #  [roles.unzip] below — see the note there for why the write gate was the wrong instrument.)
   "7z", "7za", "7zr", "cpio",
+  # libzip's ziptool: the archive operand is rewritten, and `add_file`/`add_from_zip` read the files
+  # they name. Every operand is gated as a write, which also refuses those reads outside the workspace.
+  "ziptool",
   # other HTTP downloaders (curl/wget have richer grammars in [roles.*]). The blanket write
   # gate catches a `-o`/`-d`/`-P` path into a sensitive locus; a URL classifies worktree.
   "aria2c", "http", "https", "xh", "httpie",

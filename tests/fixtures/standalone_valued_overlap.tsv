@@ -1378,12 +1378,6 @@ xz	-C
 xz	-F
 xz	-T
 ytt	--symlink-allow
-zip	-n
-zip	-O
-zip	-P
-zip	-s
-zip	-t
-zip	-Z
 zstd	--adapt
 zstd	--filelist
 zstd	--format

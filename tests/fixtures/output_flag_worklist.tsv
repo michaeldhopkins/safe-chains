@@ -516,7 +516,6 @@ xattr	-d
 xattr	-w
 ytt	--output
 ytt	-o
-ziptool	-o
 jj backout	--destination
 jj duplicate	--destination
 jj duplicate	-o

@@ -23,6 +23,8 @@
 # wget's rows are checked against its option table: -c is --continue, -d --debug, -e --execute,
 # -h --help, -l --level, -p --page-requisites, -r --recursive, -w --wait; the table has no -s.
 #
+# zip's rows are checked against its option table: -l is --to-crlf, -o --latest-time, -t --from-date.
+#
 # FORMAT: <command>\t<short flag>\t<gated long flag>
 aria2c	-i	--input-file
 as	-M	--MD
@@ -100,3 +102,7 @@ yard	-m	--main
 yardoc	-m	--main
 yard	-d	--docroot
 tilt	-l	--layout
+zip	-l	--logfile-path
+zip	-o	--out
+zip	-o	--output-file
+zip	-t	--temp-path

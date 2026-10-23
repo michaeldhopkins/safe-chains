@@ -763,7 +763,6 @@ steep paths	--steepfile	untriaged	-	-	-
 steep project	--steepfile	untriaged	-	-	-	
 steep stats	--steepfile	untriaged	-	-	-	
 steep validate	--steepfile	untriaged	-	-	-	
-streamzip	-zipfile	untriaged	-	-	-	
 stylelint	--config-basedir	untriaged	-	-	-	
 stylelint	--ignore-path	untriaged	-	-	-	
 stz extract	--hashes-file	untriaged	-	-	-	
@@ -955,4 +954,3 @@ ytt	--data-value-file	untriaged	-	-	-
 ytt	--data-values-file	untriaged	-	-	-	
 ytt	--file-mark	untriaged	-	-	-	
 ytt	--ignored-paths	untriaged	-	-	-	
-zipcloak	--temp-path	untriaged	-	-	-	

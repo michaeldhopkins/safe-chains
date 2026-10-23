@@ -1093,7 +1093,6 @@ steep check
 steep init
 steep vendor
 streamzip
-streamzip x
 stree w
 stree write
 strip
@@ -1334,6 +1333,7 @@ youtube-dl x
 yt-dlp
 yt-dlp x
 ytt
+zforce
 zforce x
 zip
 zipcloak
