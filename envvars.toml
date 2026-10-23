@@ -760,6 +760,10 @@ because = "BSD grep, as macOS ships it, parses this as options before its argume
 [env.TAR_OPTIONS]
 shape = "opaque"
 because = "GNU tar parses this as options before its arguments, including --to-command and --use-compress-program, which run programs"
+[env.TAPE]
+shape = "opaque"
+because = "tar, cpio and mt use this as the archive when -f is absent, so it is the -f twin for both reading and writing"
+measured = false
 [env.ZIPOPT]
 shape = "opaque"
 because = "Info-ZIP zip parses this as options before its arguments, including -TT, which names a command to run"
@@ -1298,6 +1302,22 @@ measured = false
 [env.KUBECONFIG]
 shape = "exec-path"
 because = "a kubeconfig can carry a users[].user.exec credential plugin the client RUNS (the --kubeconfig twin)"
+[env.KUBECTL_EXTERNAL_DIFF]
+shape = "command"
+because = "kubectl diff runs this program, with its arguments, in place of diff -u -N"
+measured = false
+[env.KUBERC]
+shape = "opaque"
+because = "kubectl reads aliases and per-command default flags from this file (the --kuberc twin)"
+measured = false
+[env.KUBECTL_KUBERC]
+shape = "opaque"
+because = "switches kubectl's reading of a kuberc file on or off"
+measured = false
+[env.KUBECACHEDIR]
+shape = "opaque"
+because = "kubectl writes its discovery and HTTP caches here, and reads them back as API answers (the --cache-dir twin)"
+measured = false
 [env.HEAVY_SLOT_PERL]
 shape = "exec-path"
 single_value = true

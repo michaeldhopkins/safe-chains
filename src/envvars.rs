@@ -899,6 +899,26 @@ mod integration_tests {
     }
 
     #[test]
+    fn every_archive_and_kubectl_twin_of_the_third_audit_judges_its_value() {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work/u/proj".into()),
+            root: Some("/work/u/proj".into()),
+            ..Default::default()
+        });
+        for (foreign, benign) in [
+            ("TAPE=~/.zshrc tar -c .", "TAPE= ls"),
+            ("TAPE=x.tar tar -t", "TAPE= ls"),
+            ("KUBECTL_EXTERNAL_DIFF=/tmp/m kubectl version --client", "KUBECTL_EXTERNAL_DIFF=cat kubectl version --client"),
+            ("KUBERC=/tmp/m kubectl version --client", "KUBERC= kubectl version --client"),
+            ("KUBECTL_KUBERC=true kubectl version --client", "KUBECTL_KUBERC= kubectl version --client"),
+            ("KUBECACHEDIR=/tmp/c kubectl version --client", "KUBECACHEDIR= kubectl version --client"),
+        ] {
+            assert!(!crate::command_verdict(foreign).is_allowed(), "a foreign value was allowed: {foreign}");
+            assert!(crate::command_verdict(benign).is_allowed(), "a benign value was refused: {benign}");
+        }
+    }
+
+    #[test]
     fn an_audited_variable_with_a_project_value_still_allows() {
         for cmd in [
             "GCONV_PATH=./gconv ls", "GEM_HOME=./vendor/gems ls", "BUNDLE_GEMFILE=./Gemfile ls", "GIT_TRACE=1 git status",
