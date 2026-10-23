@@ -108,3 +108,15 @@ proptest! {
         prop_assert!(!verdict(&cmd).is_allowed(), "{}", cmd);
     }
 }
+
+#[test]
+fn typed_text_is_judged_where_the_pane_may_be_not_where_the_agent_is() {
+    let root = "/work/proj".to_string();
+    let ctx = || crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root.clone()), session_id: None };
+    for line in ["rm -rf src", "touch x", "echo x > notes.txt"] {
+        assert!(crate::command_verdict_in(line, ctx()).is_allowed(), "{line} is approved in the project");
+        let cmd = format!("tmux send -t x {} Enter", shell_words::quote(line));
+        assert!(!crate::command_verdict_in(&cmd, ctx()).is_allowed(), "{cmd} was approved");
+    }
+    assert!(crate::command_verdict_in("tmux send -t x 'git status' Enter", ctx()).is_allowed());
+}
