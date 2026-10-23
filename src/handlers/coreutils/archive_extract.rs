@@ -192,7 +192,32 @@ mod tests {
         cpio_extract_with_a_spaced_message: "cpio -i -M t",
     }
 
+    safe! {
+        pax_write_with_a_format_before_the_operands: "pax -w -x ustar -f ./out.tar ./src",
+        pax_write_naming_a_second_source_after_the_first: "pax -w -f ./out.tar ./src ./docs",
+    }
+
+    denied! {
+        pax_write_with_a_late_format_naming_a_key_folder: "pax -w ./src -x ~/.ssh",
+        pax_copy_with_late_options_naming_a_key_folder: "pax -rw ./src ./dst -o ~/.ssh",
+    }
+
     proptest! {
+        /// BSD pax stops reading options at the first operand, so every word after it is one more
+        /// hierarchy to archive or copy. A key folder there is refused whichever option letter is
+        /// in front of it, and the same line with the key folder left out is not.
+        #[test]
+        fn a_word_after_the_first_operand_is_judged_as_an_operand(
+            mode in prop::sample::select(vec!["-w", "-wL", "-rw", "-r -w", ""]),
+            letter in prop::sample::select(vec!["B", "E", "G", "T", "U", "b", "o", "p", "x", "L", "P", "v"]),
+        ) {
+            let operands = if mode.contains('r') { "./src ./dst" } else { "./src" };
+            let refused = format!("pax {mode} {operands} -{letter} ~/.ssh");
+            prop_assert!(!is_safe_command(&refused), "{}", refused);
+            let plain = format!("pax {mode} {operands}");
+            prop_assert!(is_safe_command(&plain), "{}", plain);
+        }
+
         /// Whatever else is given, a pax, cpio or ditto line that extracts is refused, and one
         /// that only lists is not refused for extracting. A letter after the first operand is a
         /// pattern to a parser that stops there (bsdcpio, or pax under POSIXLY_CORRECT), so a

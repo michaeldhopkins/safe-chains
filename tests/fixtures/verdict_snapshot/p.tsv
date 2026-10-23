@@ -1023,6 +1023,7 @@ pax -rf ./archive.tar	denied
 pax -rw -s ,.*,/x/.zshrc, ./x ./dst	denied
 pax -rw -s ,^,../../, ./src ./dst	denied
 pax -rw ./src ./dst	safe-write
+pax -rw ./src ./dst -o ~/.ssh	denied
 pax -s ,r,w, -f ./archive.tar	denied
 pax -s x	denied
 pax -t	safe-write
@@ -1031,8 +1032,11 @@ pax -v	safe-write
 pax -v -f ./archive.tar	safe-write
 pax -w	denied
 pax -w -f ./out.tar ./src	safe-write
+pax -w -f ./out.tar ./src ./docs	safe-write
 pax -w -s ,a,b, -f ./out.tar ./src	denied
+pax -w -x ustar -f ./out.tar ./src	safe-write
 pax -w ./src -f ./out.tar	safe-write
+pax -w ./src -x ~/.ssh	denied
 pax -x x	safe-write
 pax -z	safe-write
 pax x	safe-write

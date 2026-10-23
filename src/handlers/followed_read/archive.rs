@@ -1,4 +1,7 @@
 //! Trees read by pax, 7z and diff when they follow links.
+//!
+//! BSD pax reads a word after the first operand as one more operand, so a late `-P` never stops it
+//! following links, and the word is walked as a source too.
 
 use crate::parse::Token;
 use crate::policy::consumes_next_value;
@@ -20,7 +23,11 @@ pub(super) fn pax(tokens: &[Token]) -> Option<Read> {
             break;
         }
         if let Some(cluster) = word.strip_prefix('-').filter(|cluster| !cluster.is_empty()) {
-            let takes_next = pax_letters(cluster, &mut follow, &mut write, &mut extract);
+            let late = !operands.is_empty();
+            if late {
+                operands.push(word.to_string());
+            }
+            let takes_next = pax_letters(cluster, &mut follow, &mut write, &mut extract, late);
             let step = if takes_next && consumes_next_value(tokens.get(i + 1)) { 2 } else { 1 };
             i += step;
             continue;
@@ -38,11 +45,11 @@ pub(super) fn pax(tokens: &[Token]) -> Option<Read> {
     Some(Read { trees: sources, places: Vec::new(), unresolved: false })
 }
 
-fn pax_letters(cluster: &str, follow: &mut Option<bool>, write: &mut bool, extract: &mut bool) -> bool {
+fn pax_letters(cluster: &str, follow: &mut Option<bool>, write: &mut bool, extract: &mut bool, late: bool) -> bool {
     for (idx, ch) in cluster.char_indices() {
         match ch {
             'L' | 'H' => *follow = Some(true),
-            'P' => *follow = Some(false),
+            'P' if !late => *follow = Some(false),
             'w' => *write = true,
             'r' => *extract = true,
             _ => {}
@@ -220,6 +227,8 @@ mod tests {
         let read = pax(&tokens(&["pax", "-wL", "-f", "out.pax", "sub"])).expect("follow");
         assert_eq!(read.trees, vec!["sub".to_string()]);
         assert!(pax(&tokens(&["pax", "-w", "-L", "-P", "sub"])).is_none());
+        let late = pax(&tokens(&["pax", "-wL", "sub", "-P"])).expect("a late -P is an operand");
+        assert_eq!(late.trees, vec!["sub".to_string(), "-P".to_string()]);
         let unread = pax(&tokens(&["pax", "-wL"])).expect("names from stdin");
         assert!(unread.unresolved);
     }
