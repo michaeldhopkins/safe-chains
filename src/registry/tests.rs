@@ -7572,3 +7572,49 @@ fn a_credential_path_in_place_of_an_example_file_operand_is_refused() {
     let stale: Vec<&&str> = acknowledged.iter().filter(|name| !approved.contains_key(**name)).collect();
     assert!(stale.is_empty(), "listed in credential_operand_worklist.tsv but now refused; remove them: {stale:?}");
 }
+
+/// The example probe above reaches only commands whose `examples_safe` spell a file operand with
+/// `./`, so ptar, xar and zipinfo, whose examples did not, were never probed while each read or
+/// wrote a credential path it was given. So every command, and every subcommand, is also probed with
+/// a credential path as its only operand (`zipinfo ~/.ssh/id_ed25519`, `kubectl diff ~/.ssh/…`).
+/// One that approves it names the path without reading or writing its content, and is listed in
+/// `tests/fixtures/credential_operand_bare_probe.tsv` with the probe; the list may only shrink, and a
+/// command that starts refusing the probe must leave it.
+#[test]
+fn a_credential_path_as_the_only_operand_of_every_command_is_refused() {
+    const SECRET: &str = "~/.ssh/id_ed25519";
+    let listed: std::collections::BTreeSet<&str> = include_str!("../../tests/fixtures/credential_operand_bare_probe.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .collect();
+    let mut approved: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    let mut probed = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        let mut probes = vec![format!("{name} {SECRET}")];
+        if let DispatchKind::Branching { subs, .. } = &spec.kind {
+            probes.extend(subs.iter().map(|sub| format!("{name} {} {SECRET}", sub.name)));
+        }
+        for probe in probes {
+            probed += 1;
+            if crate::is_safe_command(&probe) {
+                approved.insert(probe);
+            }
+        }
+    }
+    assert!(probed > 2000, "only {probed} commands and subcommands probed; the walk is not finding them");
+    let unlisted: Vec<&String> = approved.iter().filter(|probe| !listed.contains(probe.as_str())).collect();
+    assert!(
+        unlisted.is_empty(),
+        "a credential path as the only operand was APPROVED ({}). Give the operand a path role, or, for a \
+             command that names a path without reading or writing it, list the probe in \
+             tests/fixtures/credential_operand_bare_probe.tsv:\n{}",
+        unlisted.len(),
+        unlisted.iter().map(|p| p.as_str()).collect::<Vec<_>>().join("\n")
+    );
+    let stale: Vec<&&str> = listed.iter().filter(|probe| !approved.contains(**probe)).collect();
+    assert!(stale.is_empty(), "listed in credential_operand_bare_probe.tsv but now refused; remove them: {stale:?}");
+}
