@@ -97,6 +97,10 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
     ])
 }
 
+pub(crate) fn judges_its_own_path(tokens: &[Token]) -> bool {
+    tokens.first().is_some_and(|first| first.command_name() == "heavy-slot.sh")
+}
+
 pub(crate) fn names_a_command(tokens: &[Token]) -> bool {
     tokens.first().is_some_and(|first| named_verdict(first.command_name(), tokens).is_some())
 }

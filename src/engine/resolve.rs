@@ -10,6 +10,7 @@
 //! stamp out each `Capability` with the facet pairing its operation warrants).
 
 use super::facet::*;
+use crate::handlers::direct_script::trusted_command_path;
 use crate::parse::{Token, has_flag};
 
 mod backup;
@@ -704,14 +705,6 @@ fn behavior_scale(spec: &crate::registry::types::BehaviorSpec, operands: &[&str]
 /// A name that will never be a real tool can never be silently repurposed.
 #[cfg(test)]
 pub(crate) const UNRESOLVED_CMD: &[&str] = &["safe-chains-unresolved-sentinel"];
-
-/// Whether `arg0` is a trusted way to invoke a standard tool: a bare name (found via
-/// `$PATH`) or an absolute path under a standard system bin directory. A path elsewhere
-/// (`./x`, `/tmp/x`, `~/bin/x`) may be an impostor.
-fn trusted_command_path(arg0: &str) -> bool {
-    const STD_BINS: &[&str] = &["/usr/bin/", "/bin/", "/usr/local/bin/", "/opt/homebrew/bin/", "/sbin/", "/usr/sbin/"];
-    !arg0.contains('/') || STD_BINS.iter().any(|p| arg0.starts_with(p))
-}
 
 /// The classified operand set of a `grep` invocation: the positional file operands (read at
 /// `scale`, empty = stdin) and the `-f`/`--file` pattern files (each read once). This is the

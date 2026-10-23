@@ -7,7 +7,25 @@ pub(crate) fn is_relative_command_path(word: &str) -> bool {
     !word.is_empty() && !word.starts_with(['@', '/', '~']) && !word.contains('$') && word.contains('/')
 }
 
+/// Whether `arg0` is a trusted way to invoke a standard tool: a bare name (found via `$PATH`) or a
+/// plain name directly inside a standard system bin directory. A path elsewhere (`./x`, `/tmp/x`,
+/// `~/bin/x`, `/usr/bin/../../tmp/x`) may be an impostor.
+pub(crate) fn trusted_command_path(arg0: &str) -> bool {
+    const STD_BINS: &[&str] = &["/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin", "/sbin", "/usr/sbin"];
+    !arg0.contains('/')
+        || arg0
+            .rsplit_once('/')
+            .is_some_and(|(dir, name)| STD_BINS.contains(&dir) && !matches!(name, "" | "." | ".."))
+}
+
+fn is_untrusted_command_path(word: &str) -> bool {
+    word.contains('/') && !word.starts_with('@') && !is_relative_command_path(word) && !trusted_command_path(word)
+}
+
 pub(crate) fn judged(tokens: &[Token], judge: impl Fn(&[Token]) -> Verdict) -> Verdict {
+    if tokens.first().is_some_and(|t| is_untrusted_command_path(t.as_str())) && !crate::handlers::judges_its_own_path(tokens) {
+        return Verdict::Denied;
+    }
     let Some(first) = tokens.first().filter(|t| is_relative_command_path(t.as_str())) else {
         return judge(tokens);
     };
