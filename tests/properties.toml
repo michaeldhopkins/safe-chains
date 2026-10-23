@@ -65,6 +65,9 @@ owed = [
 "src/cst/arith/commands.rs" = [
   "src/cst/arith_tests.rs::an_assignment_in_any_arithmetic_context_is_refused_and_a_comparison_is_not",
 ]
+"src/cst/arith/expression.rs" = [
+  "src/cst/arith_tests.rs::an_assignment_in_any_arithmetic_context_is_refused_and_a_comparison_is_not",
+]
 "src/cst/functions.rs" = [
   "src/cst/proptests.rs::a_redefinition_in_one_command_does_not_reach_the_next",
   "src/cst/proptests.rs::a_call_whose_body_is_unknown_never_runs_the_command_it_shadows",

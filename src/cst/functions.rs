@@ -18,6 +18,9 @@ thread_local! {
     /// Names currently being resolved — bounds recursion (direct AND mutual) and total call depth,
     /// so `f(){ f; }` or a deep chain can't blow the stack; hitting the bound denies (fail-closed).
     static RESOLVING: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+    /// Every name a definition in this evaluation bound, kept after its scope ends: a loop's next
+    /// pass calls a function defined further down its body.
+    static DEFINED: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 const MAX_FUNC_DEPTH: usize = 32;
@@ -32,6 +35,7 @@ impl Drop for FuncScope {
 }
 
 pub(super) fn define_function(name: String, body: Script) -> FuncScope {
+    DEFINED.with(|d| d.borrow_mut().push(name.clone()));
     FUNCTIONS.with(|f| f.borrow_mut().push((name, body)));
     FuncScope
 }
@@ -52,6 +56,7 @@ pub(super) fn lookup_function(name: &str) -> Option<Script> {
 /// Never from a nested walk, whose caller still relies on the marks (`bash -c` inside a command).
 pub(super) fn forget_poisoned_functions() {
     POISONED_FUNCS.with(|p| p.borrow_mut().clear());
+    DEFINED.with(|d| d.borrow_mut().clear());
 }
 
 /// Mark `name`'s body unknown for the rest of this evaluation. Not scoped by a guard: the shell's
@@ -191,4 +196,9 @@ fn may_split(word: &super::Word) -> bool {
                 part if substitutes(part) => true,
                 _ => false,
             }))
+}
+
+/// Whether any definition in this evaluation bound `name`, in scope now or not.
+pub(crate) fn ever_defined(name: &str) -> bool {
+    DEFINED.with(|d| d.borrow().iter().any(|n| n == name)) || names_a_function(name)
 }

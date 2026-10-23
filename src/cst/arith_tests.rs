@@ -329,7 +329,7 @@ fn a_name_the_line_never_set_is_not_read_as_a_number() {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
     for cmd in [
-        "echo $(( COLUMNS / 2 ))",
+        "echo $(( LINENO / 2 ))",
         "echo $(( RANDOM % 6 ))",
         "f() { echo $(( $1 + $2 )); }; f 2 3",
         "f() { echo $(( $1 + 1 )); }; f 5 *",
@@ -349,5 +349,42 @@ fn printf_reads_only_its_numeric_slots_as_numbers() {
     }
     for cmd in ["printf '%s=%d\\n' a 1 b HOME=1; git log", "printf '%1$s' HOME=1; git log", "printf '%s %*d' a HOME=1 2; git log"] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+}
+
+#[test]
+fn a_reading_that_reaches_text_no_call_set_is_refused() {
+    for cmd in [
+        "hBc='HOME=1'; echo $(( ${-} )); git log",
+        "[[ ${-} -eq 1 ]]; git log",
+        "f='HOME=1'; f() { echo $(( ${@:0:1} )); }; f 1; git log",
+        "f='HOME=1'; f() { echo $(( ${*:0:1} )); }; f 1; git log",
+        "f() { echo $(( ${@:0} )); }; f 1; git log",
+        "env KEYTIMEOUT='HOME=1' bash -c 'echo $((KEYTIMEOUT))'; git log",
+        "env COLUMNS='HOME=1' bash -c 'echo $((COLUMNS))'; git log",
+        "echo $(( UID )); git log",
+        "echo $(( COLUMNS / 2 )); git log",
+        "x=+; n=1; echo $(( n$x$x )); git log",
+        "x=-; echo $(( -$x SHLVL )); git log",
+        "x=--; n=5; echo $(( $x n )); git log",
+        "x=-5; n=1; echo $(( n-$x )); git log",
+        "n=$((0-5)); m=1; echo $(( m-$n )); git log",
+        "date() { echo HOME=1; }; x=$(date +%s); echo $((x)); git log",
+        "date() { echo HOME=1; }; echo $(( $(date +%s) )); git log",
+        "wc() { echo HOME=1; }; echo $(( $(wc -l) )); git log",
+        "for k in 1 2; do echo $(( $(seq 1) )); seq() { echo HOME=1; }; done; git log",
+        "printf '%ld\\n' HOME=1; git log",
+        "printf '%hd\\n' HOME=1; git log",
+        "printf \"%s %'d\\n\" a HOME=1; git log",
+        "echo \"${(l:HOME=1:)x}\"; git log",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in [
+        "echo \"${(U)x}\"", "x=a; echo \"${(U)x}\"", "echo \"${(j:,:)x}\"", "echo \"${(l:5::0:)x}\"", "n=$#; echo $(( n - 1 ))",
+        "echo $(( 10-$# ))", "f() { echo $(( ${@:1:1} )); }; f 2", "printf '%ld\\n' 5", "x=5; n=1; echo $(( n-$x ))",
+        "echo $(( RANDOM % 6 + SECONDS ))",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
     }
 }

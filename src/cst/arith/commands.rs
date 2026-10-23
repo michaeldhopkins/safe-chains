@@ -158,8 +158,10 @@ fn numeric_slots(format: &str) -> Vec<bool> {
     }
     let mut slots = Vec::new();
     for spec in format.replace("%%", "").split('%').skip(1) {
-        let conversion = spec.trim_start_matches(|c: char| "-+ #0123456789.*".contains(c));
-        slots.extend(spec[..spec.len() - conversion.len()].matches('*').map(|_| true));
+        let width = spec.trim_start_matches(|c: char| "-+ #0123456789.*'".contains(c));
+        slots.extend(spec[..spec.len() - width.len()].matches('*').map(|_| true));
+        // A length (`%ld`, `%hd`, `%Lf`) still ends in the conversion that reads a number.
+        let conversion = width.trim_start_matches(|c: char| "hlLqjzt".contains(c));
         slots.push(conversion.starts_with(|c: char| "diouxXeEfFgGaAc".contains(c)));
     }
     slots

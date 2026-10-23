@@ -8,10 +8,13 @@
 //! looks inert. Each such context is refused when it could assign.
 
 mod commands;
+mod expression;
 
 use std::cell::RefCell;
 
 pub(crate) use commands::{command_verdict, double_bracket_verdict};
+pub(crate) use expression::expression_verdict;
+use expression::{SHELL_SET, flag_arithmetic};
 
 use crate::cst::{Cmd, Pipeline, Redir, Script, Stmt, Word, WordPart};
 use crate::pathctx::item_shape::{Binding, binding};
@@ -26,54 +29,6 @@ fn refuse_if(refused: bool) -> Verdict {
     if refused { Verdict::Denied } else { INERT }
 }
 
-/// `text` evaluated as arithmetic could change a variable: it holds an assignment operator, `++` or
-/// `--`, or names a variable whose value this command line set to something other than a number.
-pub(crate) fn expression_verdict(text: &str) -> Verdict {
-    let compared = text
-        .replace("<<=", "=")
-        .replace(">>=", "=")
-        .replace("==", "")
-        .replace("!=", "")
-        .replace("<=", "")
-        .replace(">=", "");
-    let assigns = compared.contains('=') || compared.contains("++") || compared.contains("--");
-    let every_argument = ["$@", "$*", "${@", "${*"].iter().any(|all| text.contains(all));
-    refuse_if(
-        assigns
-            || text.contains(UNKNOWN)
-            || reads_through_a_flag(text)
-            || names(text).iter().any(|name| holds_an_expression(name))
-            || (every_argument && any_argument_holds_an_expression()),
-    )
-}
-
-/// The arguments are not known (`1` unbound: the shell's own, or a `bash -c` string's), a call
-/// passed more than are checked, or one of them holds an expression.
-fn any_argument_holds_an_expression() -> bool {
-    let bound = |i: usize| !matches!(binding(&i.to_string()), Binding::Unbound);
-    !bound(1) || bound(MAX_ARGUMENTS + 1) || (1..=MAX_ARGUMENTS).take_while(|&i| bound(i)).any(|i| holds_an_expression(&i.to_string()))
-}
-
-/// A flag or modifier between `$` and the name changes what is read: zsh's `$~x`, `$^x`, `$=x`,
-/// `${(P)x}` and `${(j: :)@}`, bash's `${!x}`, and `$-`, whose letters read as a name.
-fn reads_through_a_flag(text: &str) -> bool {
-    text.match_indices('$').any(|(at, _)| {
-        let after = &text[at + 1..];
-        after.starts_with(['~', '^', '=', '+', '-'])
-            || after.strip_prefix('{').is_some_and(|b| b.starts_with(['!', '~', '^', '=', '(', '+']))
-    })
-}
-
-/// How many of a function's arguments `$@` is checked through; a call passing more is refused.
-const MAX_ARGUMENTS: usize = 64;
-
-/// Variables the shell itself sets from what the line holds: the last argument, what `read` or
-/// `select` took, a regex match, an option's value.
-const SHELL_SET: &[&str] = &[
-    "_", "REPLY", "reply", "BASH_REMATCH", "MATCH", "match", "MBEGIN", "MEND", "mbegin", "mend", "OPTARG", "MAPFILE", "BASH_COMMAND",
-    "BASH_ARGV", "FUNCNAME", "BASH_SOURCE", "PWD", "OLDPWD", "BUFFER", "LBUFFER", "RBUFFER",
-];
-
 /// Only a value known to be a number is read as one. A name the line never set holds whatever the
 /// shell or its caller gave it, and that text can name a variable the line did set: bash's
 /// `HOSTTYPE` holds `aarch64`, so `aarch64='HOME=1'; echo $((HOSTTYPE))` assigns HOME. So can zsh's
@@ -87,7 +42,7 @@ fn holds_an_expression(name: &str) -> bool {
         Binding::Loop => !counted(name),
         Binding::Value(value) if value == super::scope_budget::UNCERTAIN_VALUE => !counted(name),
         Binding::Value(value) => !is_integer(&value) || !read_as_number(name),
-        Binding::Unbound => !SHELL_INTEGERS.contains(&name),
+        Binding::Unbound => !ALWAYS_NUMBERS.contains(&name),
     }
 }
 
@@ -115,6 +70,7 @@ fn counted(name: &str) -> bool {
 pub(super) fn numbers_contradicted() -> bool {
     COUNTED.with(|c| c.borrow().iter().any(|name| !counts(name)))
         || NUMBERS.with(|n| n.borrow().iter().any(|name| given_other_than_a_number(name)))
+        || TRUSTED.with(|t| t.borrow().iter().any(|name| crate::cst::functions::ever_defined(name)))
 }
 
 /// Every value this line gave `name` was a number, though not one known: `n=$(date +%s)`,
@@ -123,36 +79,12 @@ fn counts(name: &str) -> bool {
     !given_other_than_a_number(name) && INTEGER.with(|i| i.borrow().iter().any(|x| x == name))
 }
 
+/// One optional sign and at least one digit: `+`, `--5` and the empty string are not numbers, and
+/// would build `++` or `--` where they are substituted.
 fn is_integer(value: &str) -> bool {
-    let digits = value.trim().trim_start_matches(['-', '+']);
-    digits.chars().all(|c| c.is_ascii_digit())
-}
-
-/// The identifiers in an expression. A run that starts with a digit is a number (`0x1F`, `16#ff`),
-/// unless `$` or `${` names an argument by it: `${12}` is all of them, and `$12` is the first in
-/// bash and both in zsh. `${#x}` is a length, which reads no value.
-fn names(text: &str) -> Vec<&str> {
-    let mut out = Vec::new();
-    let mut rest = text;
-    while let Some(start) = rest.find(|c: char| c.is_ascii_alphanumeric() || c == '_') {
-        let run = &rest[start..];
-        let len = run.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_' || c == '#')).unwrap_or(run.len());
-        let digits = run.find(|c: char| !c.is_ascii_digit()).unwrap_or(run.len());
-        let before = &rest[..start];
-        if before.ends_with("${#") {
-            rest = &run[len..];
-            continue;
-        }
-        if !run.starts_with(|c: char| c.is_ascii_digit()) {
-            out.push(run[..len].trim_end_matches('#'));
-        } else if before.ends_with("${") {
-            out.push(&run[..digits]);
-        } else if before.ends_with('$') {
-            out.extend([&run[..1], &run[..digits]]);
-        }
-        rest = &run[len..];
-    }
-    out
+    let value = value.trim();
+    let digits = value.strip_prefix(['-', '+']).unwrap_or(value);
+    !digits.is_empty() && digits.chars().all(|c| c.is_ascii_digit())
 }
 
 /// The expansions in one word: `${…}`, `$name[…]`, `$[…]` and `$((…))`. A `$( )` inside is reached
@@ -218,13 +150,20 @@ fn numeric_output(script: &Script) -> bool {
             })
         })
     };
-    reads_only
+    let numeric = reads_only
         && match words.split_first() {
             Some((name, args)) if name == "date" => args.iter().all(|w| w == "-u" || numeric_format(w)),
             Some((name, args)) if name == "wc" => !args.is_empty() && args.iter().all(|w| matches!(w.as_str(), "-l" | "-c" | "-w" | "-m")),
             Some((name, args)) if name == "seq" => !args.is_empty() && args.iter().all(|w| !w.is_empty() && is_integer(w)),
             _ => false,
-        }
+        };
+    // A function of the same name prints what it likes; one defined later in a loop is found after
+    // the walk (`numbers_contradicted`).
+    numeric
+        && words.first().is_some_and(|name| {
+            TRUSTED.with(|t| t.borrow_mut().push(name.clone()));
+            !crate::cst::functions::ever_defined(name)
+        })
 }
 
 /// A word read as arithmetic: `printf %d "$x"`, a side of `[[ a -eq b ]]`.
@@ -279,7 +218,8 @@ fn parameter_verdict(body: &str) -> Verdict {
     let mut v = INERT;
     if let Some(flags) = rest.strip_prefix('(') {
         let flags = bracketed(flags, '(', ')');
-        v = v.combine(expression_verdict(flags)).combine(refuse_if(flags.contains('e')));
+        let arithmetic = flag_arithmetic(flags).into_iter().map(expression_verdict);
+        v = arithmetic.fold(v, Verdict::combine).combine(refuse_if(flags.contains('e')));
         indirect |= flags.contains('P');
         rest = rest.get(flags.len() + 2..).unwrap_or_default();
     }
@@ -325,6 +265,8 @@ thread_local! {
     static COUNTED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
     /// Names read as numbers while bound to a number the line wrote out.
     static NUMBERS: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+    /// Commands whose output was read as a number.
+    static TRUSTED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Called as an outermost scope walk starts, beside the function registry's reset.
@@ -334,6 +276,7 @@ pub(crate) fn forget_numeric_names() {
     INTEGER.with(|i| i.borrow_mut().clear());
     COUNTED.with(|c| c.borrow_mut().clear());
     NUMBERS.with(|n| n.borrow_mut().clear());
+    TRUSTED.with(|t| t.borrow_mut().clear());
 }
 
 /// The shells' own integer variables, numeric before any line declares them: bash's and zsh's.
@@ -342,6 +285,13 @@ const SHELL_INTEGERS: &[&str] = &[
     "LISTMAX", "MAILCHECK", "OPTIND", "PERIOD", "PPID", "RANDOM", "SAVEHIST", "SECONDS", "SHLVL", "SRANDOM", "TMOUT", "TRY_BLOCK_ERROR",
     "TRY_BLOCK_INTERRUPT", "UID", "ZLE_RPROMPT_INDENT",
 ];
+
+/// The integers no environment can set to an expression: bash 3.2 and 5 compute these whatever it
+/// says, zsh never evaluates what it imports, and dash refuses a value that is not a number. Only
+/// an unbound name counts: a string the line assigns is evaluated by bash for `HISTCMD`, `OPTIND`
+/// and `SHLVL` (bash 5 also `RANDOM`), and by zsh for `OPTIND`, `RANDOM`, `SECONDS` and `SHLVL`.
+/// The rest above are plain strings in some shell (bash takes `UID` and `COLUMNS` as given).
+const ALWAYS_NUMBERS: &[&str] = &["HISTCMD", "LINENO", "OPTIND", "PPID", "RANDOM", "SECONDS", "SHLVL"];
 
 fn is_numeric(name: &str) -> bool {
     SHELL_INTEGERS.contains(&name) || NUMERIC.with(|n| n.borrow().iter().any(|x| x == name))
@@ -369,7 +319,13 @@ fn value_verdict(name: &str, value: &str) -> Verdict {
 
 /// A value given to `name` by an assignment, read as the shell will produce it.
 fn assigned_verdict(name: &str, value: &Word) -> Verdict {
-    if is_integer(&read_text(value).0) {
+    let text = value.eval();
+    let count = matches!(text.as_str(), "$#" | "$?" | "$$" | "$!" | "${#}")
+        || text
+            .strip_prefix("${#")
+            .and_then(|t| t.strip_suffix('}'))
+            .is_some_and(|t| !t.contains(['$', '{', '}']));
+    if count || is_integer(&read_text(value).0) {
         INTEGER.with(|i| i.borrow_mut().push(name.to_string()));
         return INERT;
     }
