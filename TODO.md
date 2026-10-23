@@ -32,16 +32,6 @@ refusal. Find which lookup reads the live tree (`pathctx::physical`'s walk, or
 `under_temp_root`), make the tests hermetic, and decide whether a verdict should depend on what another process put in `$TMPDIR`.
 Until then, a remote mutation run sets `TMPDIR=$(mktemp -d /tmp/…)` inside its command.
 
-## `adding_a_capability_never_makes_the_projection_more_permissive` fails on a rare input
-
-`engine::bridge::tests` found, on one run, that an empty profile plus one capability projects as
-more permissive: `extra = Capability { operation: Create, locus: Locus { local: Process, .. },
-scale: Single, retrieval: Metadata, authority: User, persistence: Transient with an Immediate
-escape, .. }` (proptest seed
-`cc 315a57e010107d5602c41cdf24dfbc3b4f6d78c2d617e43b843fb16ec7b992ef`). main@origin fails the same
-way with that seed. Find why a Create on the Process locus loosens the projection, fix it, and
-commit the seed to `proptest-regressions/engine/bridge.txt` with the fix.
-
 ## AWAITING THE OWNER: words for a place safe-chains names
 
 `--explain` calls the `machine` place "a place safe-chains has no rule for". That term also holds

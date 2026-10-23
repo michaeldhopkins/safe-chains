@@ -458,13 +458,40 @@ mod tests {
     use crate::engine::testgen::{arb_capability, arb_profile};
     use proptest::prelude::*;
 
-    /// How permissive a projected verdict is: `Denied` the least, then the legacy
-    /// ladder Inert < SafeRead < SafeWrite.
+    /// How permissive a projected verdict is: `Denied` the least, then down the legacy ladder,
+    /// since an `Allowed(Inert)` is approved under every threshold and a `SafeWrite` only under
+    /// the highest.
     fn permissiveness(verdict: Verdict) -> u8 {
         match verdict {
             Verdict::Denied => 0,
-            Verdict::Allowed(sl) => sl as u8 + 1,
+            Verdict::Allowed(sl) => 3 - sl as u8,
         }
+    }
+
+    fn observing(local: LocalLocus) -> Capability {
+        let mut c = Capability::new(Operation::Observe);
+        c.locus.local = local;
+        c.disclosure.audience = DisclosureAudience::LocalProcess;
+        c
+    }
+
+    /// Capabilities the band admits, mixed into the generated ones: two generated capabilities
+    /// are almost never admitted together, which left the monotonicity property nearly vacuous.
+    fn mostly_admitted_capability() -> impl Strategy<Value = Capability> {
+        prop_oneof![
+            arb_capability(),
+            Just(observing(LocalLocus::Process)),
+            Just(observing(LocalLocus::Worktree)),
+            Just(observing(LocalLocus::User)),
+        ]
+    }
+
+    #[test]
+    fn reading_the_worktree_after_echoing_is_less_permissive_than_echoing() {
+        let echo = Profile::of(vec![observing(LocalLocus::Process)]);
+        let both = Profile::of(vec![observing(LocalLocus::Process), observing(LocalLocus::Worktree)]);
+        assert_eq!((project(&echo), project(&both)), (Verdict::Allowed(SafetyLevel::Inert), Verdict::Allowed(SafetyLevel::SafeRead)));
+        assert!(permissiveness(project(&both)) < permissiveness(project(&echo)));
     }
 
     /// The straightforward reading of `project`'s contract, written independently: the
@@ -510,12 +537,14 @@ mod tests {
 
         /// Monotonicity: a profile passes a level iff EVERY capability is admissible,
         /// so adding a capability can only shrink the admitting levels — the
-        /// projection can never become MORE permissive by doing more.
+        /// projection can never become MORE permissive by doing more. The empty profile is
+        /// denied by `project` on purpose, so profiles are drawn with at least one capability.
         #[test]
         fn adding_a_capability_never_makes_the_projection_more_permissive(
-            profile in arb_profile(),
-            extra in arb_capability(),
+            capabilities in prop::collection::vec(mostly_admitted_capability(), 1..4),
+            extra in mostly_admitted_capability(),
         ) {
+            let profile = Profile::of(capabilities);
             let mut more = profile.clone();
             more.capabilities.push(extra.clone());
             prop_assert!(
