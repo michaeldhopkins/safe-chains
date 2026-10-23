@@ -2,8 +2,8 @@
 //!
 //! The rule-change check only matters when the binary run is this one, so it applies when `--bin`
 //! names it, when `-p` / `--package` names safe-chains (in any case, with `_` read as `-`) and no `--bin` or `--example` is given, and
-//! otherwise when the package of the nearest `Cargo.toml` is safe-chains. A `--bin` or `--example`
-//! naming another target still reads that manifest, since any target of a package that is or uses
+//! otherwise when the package of the nearest `Cargo.toml` is safe-chains. A `-p`, `--bin` or `--example`
+//! naming another package or target still reads that manifest, since any target of a package that is or uses
 //! safe-chains can reach its rule changes. The nearest manifest is the one above the folder cargo
 //! runs in, found after symbolic links and `..` are resolved, read from disk:
 //! it is safe-chains when its package, one of its binaries or one of its dependencies is named
@@ -25,11 +25,8 @@ pub(crate) fn runs_safe_chains(tokens: &[Token], arguments_at: usize) -> bool {
     if target.bin.is_some_and(names_this) {
         return true;
     }
-    if target.bin.is_none()
-        && !target.example
-        && let Some(package) = target.package
-    {
-        return names_this(package);
+    if target.bin.is_none() && !target.example && target.package.is_some_and(names_this) {
+        return true;
     }
     nearest_manifest_names_this(target.manifest_path, target.chdir)
 }
@@ -337,14 +334,14 @@ mod tests {
     #[test]
     fn a_workspace_with_no_package_of_its_own_counts_as_this_one() {
         assert!(!in_project(None, "cargo run -- mcp"));
-        assert!(in_project(None, "cargo run -p tool -- mcp"));
+        assert!(!in_project(None, "cargo run -p tool -- mcp"));
     }
 
     #[test]
     fn an_unknown_working_directory_counts_as_this_project() {
         let _cwd = crate::pathctx::enter_cwd(None);
         assert!(!is_safe_command("cargo run -- mcp"));
-        assert!(is_safe_command("cargo run -p tool -- mcp"));
+        assert!(!is_safe_command("cargo run -p tool -- mcp"));
     }
 
     fn in_manifest(label: &str, manifest: &str, cmd: &str) -> bool {
@@ -413,6 +410,24 @@ mod tests {
             let members = [("crates/a", member.as_str()), ("crates/other", other)];
             assert!(!in_workspace(&format!("member-{label}"), &root, &members, "cargo run -- mcp"), "member {label} names this project");
         }
+    }
+
+    #[test]
+    fn a_package_named_in_a_workspace_with_a_member_using_this_project_counts_as_this_project() {
+        let dependent = "[package]\nname = \"tool\"\n[dependencies]\nsafe-chains = \"0.1\"\n";
+        let other = "[package]\nname = \"other\"\n";
+        let root = format!("{ROOT}[workspace]\nmembers = [\"crates/*\"]\n");
+        let members = [("crates/tool", dependent), ("crates/other", other)];
+        for cmd in [
+            "cargo run -p tool -- config add x",
+            "cargo run --package=tool -- config add x",
+            "cargo run -p other -- config add x",
+            "cargo +nightly run -p tool -- config add x",
+        ] {
+            assert!(!in_workspace("package-dependent", &root, &members, cmd), "{cmd} must not be approved");
+        }
+        let plain = [("crates/tool", "[package]\nname = \"tool\"\n"), ("crates/other", other)];
+        assert!(in_workspace("package-plain", &root, &plain, "cargo run -p tool -- config add x"));
     }
 
     #[test]
