@@ -63,7 +63,8 @@ proptest! {
         let bare = allowed(command);
         prop_assert!(bare, "the bare command must be allowed: {}", command);
         let value = joined(&elements);
-        for cmd in spellings(&value, command).into_iter().filter(|c| !value.contains('$') || c.starts_with("PATH")) {
+        let expands = |c: &String| !value.contains('$') || (c.starts_with("PATH") && !c.starts_with("PATH='"));
+        for cmd in spellings(&value, command).into_iter().filter(expands) {
             prop_assert!(allowed(&cmd),"should be allowed: {}", cmd);
         }
     }

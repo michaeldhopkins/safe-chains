@@ -1,5 +1,9 @@
 use crate::verdict::{SafetyLevel, Verdict};
 
+pub(crate) fn names_command_search(name: &str) -> bool {
+    super::rule_of(name).is_some_and(|rule| rule.shape == super::Shape::CommandSearch)
+}
+
 pub(super) fn command_search_verdict(name: &str, appends: bool, value: &str) -> Verdict {
     let value = if name == "path" { value.strip_prefix("${path}").unwrap_or(value) } else { value };
     if appends && name == "PATH" {

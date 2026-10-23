@@ -33,6 +33,7 @@ mod printed;
 mod proptests;
 mod reserved;
 mod scope_budget;
+mod search_quote;
 mod sub_close;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

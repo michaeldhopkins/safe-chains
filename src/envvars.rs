@@ -30,6 +30,7 @@ use serde::Deserialize;
 use crate::verdict::{SafetyLevel, Verdict};
 
 mod command_search;
+pub(crate) use command_search::names_command_search;
 mod config_dir;
 mod rebind;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
