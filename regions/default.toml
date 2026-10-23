@@ -226,6 +226,24 @@ role = "credential-store"
 os = ["linux"]
 note = "A process's argv, which routinely carries tokens passed as flags (`--password`, `--token`)."
 researched = "2026-08-12"
+[[region]]
+path = "/proc/*/task/*/environ"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process environment block, the same bytes as /proc/<pid>/environ."
+researched = "2026-10-23"
+[[region]]
+path = "/proc/*/task/*/mem"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process address space, the same memory as /proc/<pid>/mem."
+researched = "2026-10-23"
+[[region]]
+path = "/proc/*/task/*/cmdline"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process argv, the same as /proc/<pid>/cmdline."
+researched = "2026-10-23"
 # NOT shielded: safe-chains' own decision log at `~/.local/state/safe-chains/`.
 #
 # It was, for one release. The reasoning — it records command lines verbatim, so it accumulates
