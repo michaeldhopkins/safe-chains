@@ -126,3 +126,54 @@ fn ack_follows_links_when_a_config_file_it_reads_says_so() {
     std::fs::write(format!("{}/.ackrc", plain.root), "--smart-case\n").expect("plain ackrc");
     assert!(at(&plain, "ack x").is_allowed());
 }
+
+const FOLLOWING_TREE_READS: [&str; 11] = [
+    "rg -L foo", "tar -chf o.tar .", "zip -r o.zip .", "diff -r . .", "ag -f foo", "ack --follow foo", "pax -wL -f o.pax .", "7z a o.7z .",
+    "find -L . -type f -exec cat {} +", "cp -RL . y", "rsync -aL ./ y",
+];
+
+fn outside(secret: Option<&str>) -> Project {
+    let p = project();
+    std::fs::create_dir_all(format!("{}/out2/inner", p.root)).expect("outside folder");
+    std::fs::write(format!("{}/out2/inner/note", p.root), "n").expect("outside file");
+    if let Some(target) = secret {
+        std::os::unix::fs::symlink(target, format!("{}/out2/inner/k", p.root)).expect("link to a secret");
+    }
+    p
+}
+
+fn nest_linking_to(out: &Project) -> Project {
+    let nest = project();
+    std::fs::remove_dir_all(format!("{}/src", nest.root)).expect("empty nest");
+    std::os::unix::fs::symlink(format!("{}/out2", out.root), format!("{}/x", nest.root)).expect("link out of the project");
+    nest
+}
+
+fn secrets() -> [String; 2] {
+    ["/etc/ssh/not-a-real-key".to_string(), std::env::var("HOME").expect("HOME")]
+}
+
+#[test]
+fn a_link_to_an_outside_folder_is_judged_by_the_links_inside_that_folder() {
+    for secret in secrets() {
+        let out = outside(Some(&secret));
+        let nest = nest_linking_to(&out);
+        for cmd in FOLLOWING_TREE_READS {
+            assert!(!at(&nest, cmd).is_allowed(), "{cmd} was approved through an outside folder holding a link to {secret}");
+        }
+        for cmd in ["rg foo", "tar -cf o.tar .", "zip -y -r o.zip ."] {
+            assert!(at(&nest, cmd).is_allowed(), "{cmd} was refused though it does not follow the link");
+        }
+    }
+}
+
+#[test]
+fn a_link_to_a_clean_outside_folder_is_still_read() {
+    let out = outside(None);
+    let nest = nest_linking_to(&out);
+    for cmd in
+        ["rg -L foo", "tar -chf o.tar .", "zip -r o.zip .", "diff -r . .", "ag -f foo", "7z a o.7z .", "find -L . -type f -exec cat {} +"]
+    {
+        assert!(at(&nest, cmd).is_allowed(), "{cmd} was refused through a clean outside folder");
+    }
+}

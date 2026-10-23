@@ -2,7 +2,8 @@
 //!
 //! Without `follow`, links below the operand are not entered (`chmod -R`, `cp -r`, `find`). With it
 //! (`find -L`, `fd -L`, `cp -RL`, `rsync -L`), a link to a folder inside the project is entered once,
-//! and a link out of the tree is reported under its own name so the caller judges where it leads.
+//! and a link out of the tree is reported under its own name so the caller judges where it leads. A
+//! link to a folder outside the project is entered too, so the links inside it are judged as well.
 //! A traversal's own filters (`find -path ./.git -prune`) narrow what is reached; see [`Skip`].
 
 use std::collections::{HashSet, VecDeque};
@@ -250,9 +251,13 @@ impl Walker<'_> {
                     }
                     Ok(target) if !is_dir && target.starts_with(&walked) && clean_in_root(&target, root.as_deref()) => {}
                     Ok(target) if is_dir && reads_a_secret(&target) => return cut_short(self.base, self.walk),
-                    _ => {
+                    target => {
                         if !self.push_link(if is_dir { format!("{shown}/.git/f") } else { shown }) {
                             return vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())];
+                        }
+                        let out = target.ok().filter(|t| is_dir && !root.as_deref().is_some_and(|r| t.starts_with(r)));
+                        if out.is_some_and(|t| entered.insert(t)) {
+                            queue.push_back(below);
                         }
                     }
                 }
