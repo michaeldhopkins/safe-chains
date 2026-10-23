@@ -318,6 +318,8 @@ fn a_name_the_line_never_set_is_not_read_as_a_number() {
         "echo $(( $1 )); git log",
         "bash -c 'echo $(( $1 ))' _ 'HOME=1'; git log",
         "x='1 HOME=1'; f() { echo $(( $2 )); }; f $x; git log",
+        "IFS=x; n=1xHOME=1; f() { echo $(( $2 )); }; f $n; git log",
+        "n=4; f() { echo $(( $2 )); }; f $n* HOME=1; git log",
         "f() { echo $(( $2 )); }; f {1,HOME=1}; git log",
         "f() { echo $(( $3 )); }; f 1{,} 'HOME=1'; git log",
         "f() { echo $(( $2 )); }; f * 'HOME=1'; git log",
@@ -327,8 +329,14 @@ fn a_name_the_line_never_set_is_not_read_as_a_number() {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
     for cmd in [
-        "echo $(( COLUMNS / 2 ))", "echo $(( RANDOM % 6 ))", "f() { echo $(( $1 + $2 )); }; f 2 3", "f() { echo $(( $1 + 1 )); }; f 5 *",
-        "f() { echo $(( ${#1} )); }; f abc", "n=3; echo $(( n * 2 ))",
+        "echo $(( COLUMNS / 2 ))",
+        "echo $(( RANDOM % 6 ))",
+        "f() { echo $(( $1 + $2 )); }; f 2 3",
+        "f() { echo $(( $1 + 1 )); }; f 5 *",
+        "f() { echo $(( ${#1} )); }; f abc",
+        "n=3; echo $(( n * 2 ))",
+        "f() { echo $(( $1 )); }; n=4; f $n",
+        "f() { echo $(( $1 )); }; for i in 1 2; do f $i; done",
     ] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }

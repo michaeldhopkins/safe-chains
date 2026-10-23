@@ -167,14 +167,28 @@ fn rebinds_a_name(cmd: &SimpleCmd, name: &str) -> bool {
 
 /// Whether `word` may become other than one argument: a brace list, a glob (zsh's extended
 /// operators included), or anything unquoted that expands, which splits in bash and vanishes when
-/// empty in zsh. `"$@"` and `"${a[@]}"` give a word per element even when quoted.
+/// empty in zsh. `"$@"` and `"${a[@]}"` give a word per element even when quoted. A variable
+/// whose value is known, not empty, and holds nothing the default `IFS` or a glob acts on stays
+/// one word.
 fn may_split(word: &super::Word) -> bool {
     use super::WordPart;
+    use crate::pathctx::item_shape::{Binding, binding};
+    let substitutes =
+        |part: &WordPart| matches!(part, WordPart::CmdSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) | WordPart::ProcSub(_));
+    let one_known_word = || {
+        let value = super::check::certain_value(word);
+        !word.0.iter().any(substitutes)
+            && value != super::scope_budget::UNCERTAIN_VALUE
+            && !value.is_empty()
+            && !value.contains([' ', '\t', '\n', '*', '?', '[', '^', '#', '<', '~', '@'])
+            && matches!(binding("IFS"), Binding::Unbound)
+    };
     word.expand().len() != 1
-        || word.0.iter().any(|part| match part {
-            WordPart::Lit(s) => s.contains(['$', '*', '?', '[', '^', '#', '<']),
-            WordPart::DQuote(inner) => inner.eval().contains('@'),
-            WordPart::CmdSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) | WordPart::ProcSub(_) => true,
-            _ => false,
-        })
+        || (!one_known_word()
+            && word.0.iter().any(|part| match part {
+                WordPart::Lit(s) => s.contains(['$', '*', '?', '[', '^', '#', '<']),
+                WordPart::DQuote(inner) => inner.eval().contains('@'),
+                part if substitutes(part) => true,
+                _ => false,
+            }))
 }
