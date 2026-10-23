@@ -216,6 +216,10 @@ owed = [
   "a_path_without_a_lookup_prefix_is_left_alone",
 ]
 "src/envvars.rs" = []
+"src/envvars/command_search.rs" = [
+  "src/envvars/command_search_tests.rs::a_foreign_search_folder_anywhere_in_path_is_refused",
+  "src/envvars/command_search_tests.rs::a_path_of_standard_folders_keeps_the_commands_verdict",
+]
 "src/envvars/config_dir.rs" = [
   "src/envvars/config_dir_tests.rs::any_config_location_under_a_temp_root_is_refused",
   "src/envvars/config_dir_tests.rs::a_config_directory_outside_the_scratch_places_is_allowed",
@@ -639,6 +643,7 @@ owed = [
 [test_only]
 "src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
+"src/envvars/command_search_tests.rs" = "the command search path suite (#[cfg(test)] mod in envvars/command_search.rs)"
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"

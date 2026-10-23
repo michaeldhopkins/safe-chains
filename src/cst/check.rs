@@ -898,7 +898,7 @@ mod tests {
         assign_bare_param: "rc=$?",
         assign_bare_var: "x=$y",
         assign_bare_dollar_var_braced: "x=${y}",
-        assign_bare_path: "PATH=/foo",
+        assign_bare_path: "PATH=/usr/bin:/bin",
         assign_bare_multiple: "a=1 b=2 c=3",
         assign_bare_arith: "x=$((1 + 2))",
         assign_in_for_body: "for i in 1 2; do x=1; done",

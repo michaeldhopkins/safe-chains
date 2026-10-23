@@ -29,6 +29,7 @@ use serde::Deserialize;
 
 use crate::verdict::{SafetyLevel, Verdict};
 
+mod command_search;
 mod config_dir;
 mod rebind;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
@@ -68,6 +69,7 @@ pub(crate) enum Shape {
     /// The value is the remote shell rsync starts (`RSYNC_RSH`). Allowed only as ssh or rsh with
     /// plain options, the same rule as rsync's `-e`.
     RemoteShell,
+    CommandSearch,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -254,14 +256,14 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     // operator. Normalised here rather than at each call site, so every spelling inherits it —
     // `export LD_PRELOAD+=/tmp/evil.so` and `declare -x LD_PRELOAD+=…` both appended to the real
     // LD_PRELOAD while classifying as the unlisted name `LD_PRELOAD+`, and auto-approved.
-    let name = name.strip_suffix('+').unwrap_or(name);
+    let (name, appends) = name.strip_suffix('+').map_or((name, false), |n| (n, true));
     let Some(rule) = rule_of(name) else {
         return Verdict::Allowed(SafetyLevel::Inert);
     };
     // An EMPTY value un-sets the behaviour rather than pointing it anywhere: `GIT_PAGER=` disables
     // the pager, `LD_PRELOAD=` preloads nothing. Denying that would be a false positive on the one
     // spelling that is unambiguously inert.
-    if value.is_empty() {
+    if value.is_empty() && rule.shape != Shape::CommandSearch {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     match rule.shape {
@@ -275,6 +277,7 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
         Shape::ShellProgram => shell_program_verdict(value),
         Shape::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value),
+        Shape::CommandSearch => command_search::command_search_verdict(name, appends, value),
     }
 }
 

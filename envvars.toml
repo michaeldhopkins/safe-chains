@@ -44,6 +44,11 @@
 #   remote-shell the value is the remote shell rsync starts → allowed only as ssh or rsh with plain
 #                options (no ProxyCommand, LocalCommand or config file), then gated as exec-path,
 #                the same rule as rsync -e.
+#   command-search the value is the list of directories the shell searches for a bare command name
+#                → every element must be `$PATH` itself, a standard system bin directory (/bin,
+#                /usr/bin, /usr/local/bin, /opt/homebrew/bin, /sbin, /usr/sbin), or an absolute
+#                directory the exec-path rule admits (the project). An empty value or element, or a
+#                relative one, searches the working directory, which can change, so it is refused.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -243,6 +248,18 @@ because = "bash imports BASH_FUNC_<name>%% as a function definition, so the comm
 shape = "opaque"
 because = "the macOS /bin/bash spelling of BASH_FUNC_ (__BASH_FUNC<name>%%)"
 measured = false
+
+# ── Command lookup ───────────────────────────────────────────────────────────
+# A bare name is trusted because it is found through PATH, so a PATH that names another folder makes
+# every later bare name a program from that folder: `PATH=/tmp/evil ls` runs /tmp/evil/ls. An element
+# placed after `$PATH` still matters, since a name the earlier folders lack is found there. zsh ties
+# the `path` array to PATH, so `path+=/tmp/evil` appends a folder in the same way.
+[env.PATH]
+shape = "command-search"
+because = "the shell finds every bare command name in these folders, in order (measured: PATH=<dir> and an empty PATH both ran a planted program named after a safe tool)"
+[env.path]
+shape = "command-search"
+because = "zsh ties the path array to PATH, so assigning or appending to it changes where bare names are found (measured: path+=(.) ran a planted program)"
 
 # ── Terminal multiplexers ────────────────────────────────────────────────────
 # screen and tmux start the user's shell for every new window, and screen reads an rc file whose
