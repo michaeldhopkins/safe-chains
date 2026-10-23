@@ -666,6 +666,7 @@ owed = [
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
 "src/envvars/command_search_tests.rs" = "the command search path suite (#[cfg(test)] mod in envvars/command_search.rs)"
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
+"src/envvars/description_twins_tests.rs" = "the description variable-twin guard (#[cfg(test)] mod in envvars.rs)"
 "src/envvars/exported_tests.rs" = "the export operand suite (#[cfg(test)] mod in envvars/exported.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
 "src/envvars/shell_words_tests.rs" = "the shell program and shell text suite (#[cfg(test)] mod in envvars/shell_words.rs)"

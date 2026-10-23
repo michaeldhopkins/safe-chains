@@ -1422,3 +1422,7 @@ mod integration_tests {
         assert!(!crate::is_safe_command("LD_PRELOAD=/tmp/evil.so ls"), "loading it must not be");
     }
 }
+
+#[cfg(test)]
+#[path = "envvars/description_twins_tests.rs"]
+mod description_twins_tests;
