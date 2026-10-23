@@ -237,6 +237,11 @@ owed = [
   "src/envvars/rebind_tests.rs::reading_into_a_listed_variable_is_always_refused",
   "src/cst/proptests.rs::a_hook_array_filled_by_a_command_is_refused",
 ]
+"src/envvars/shell_words.rs" = [
+  "src/envvars/shell_words_tests.rs::only_a_named_shell_in_a_standard_bin_is_allowed",
+  "src/envvars/shell_words_tests.rs::every_standard_shell_is_allowed",
+  "src/envvars/shell_words_tests.rs::shell_text_is_refused_and_plain_text_is_not",
+]
 "src/handlers/android/adb.rs" = [
   "a_dash_s_prefix_serial_does_not_change_the_verdict",
   "a_shell_bare_command_is_inert_regardless_of_trailing_args",
@@ -394,6 +399,11 @@ owed = [
   "dispatch_returns_none_for_unhandled_commands",
   "a_cluster_holding_any_letter_outside_the_policy_never_approves",
   "src/cst/printed_tests.rs::the_utility_is_never_replaced",
+]
+"src/handlers/shell_text.rs" = [
+  "src/handlers/shell_text_tests.rs::a_word_the_man_script_would_evaluate_is_refused",
+  "src/handlers/shell_text_tests.rs::a_variable_the_man_script_would_evaluate_is_refused",
+  "src/handlers/shell_text_tests.rs::a_plain_word_is_not_shell_text",
 ]
 "src/handlers/system/plutil.rs" = [
   "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
@@ -658,6 +668,7 @@ owed = [
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
 "src/envvars/exported_tests.rs" = "the export operand suite (#[cfg(test)] mod in envvars/exported.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
+"src/envvars/shell_words_tests.rs" = "the shell program and shell text suite (#[cfg(test)] mod in envvars/shell_words.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/physical.rs)"
@@ -682,6 +693,7 @@ owed = [
 "src/cst/brace_bash_tests.rs" = "the brace-expansion-against-bash suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/glob_tests.rs" = "the glob-listing suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/handlers/shell_text_tests.rs" = "the man shell-text suite (#[cfg(test)] mod in handlers/shell_text.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/plain/tests.rs" = "the plain-words dictionary's test suite"

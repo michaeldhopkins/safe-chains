@@ -49,6 +49,10 @@
 #                /usr/bin, /usr/local/bin, /opt/homebrew/bin, /sbin, /usr/sbin), or an absolute
 #                directory the exec-path rule admits (the project). An empty value or element, or a
 #                relative one, searches the working directory, which can change, so it is refused.
+#   shell-text   the value is pasted into a shell command line the program evaluates (macOS man is a
+#                shell script that evaluates page paths and the output of `locale`) → refused when it
+#                holds a backtick, $, a double quote, a backslash, ; | & ( ) < > or a line break;
+#                otherwise inert.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -389,6 +393,18 @@ because = "man -k, man -f, apropos and whatis pipe their output through this on 
 shape = "opaque"
 because = "man-db parses this as options before its arguments, --pager and --config-file among them"
 measured = false
+[env.MANPATH]
+shape = "shell-text"
+because = "macOS man is a shell script that evaluates each page path it builds from these folders"
+measured = false
+[env.MANSECT]
+shape = "shell-text"
+because = "macOS man builds page paths from these sections and evaluates them"
+measured = false
+[env.LANG]
+shape = "shell-text"
+because = "macOS man evaluates the output of locale, which prints LANG exactly as set"
+measured = true
 [env.GH_PAGER]
 shape = "command"
 because = "gh pipes output through this, ahead of PAGER"

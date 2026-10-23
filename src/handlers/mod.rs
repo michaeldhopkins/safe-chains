@@ -47,6 +47,7 @@ pub mod ruby;
 pub mod safe_chains;
 pub mod shell;
 pub mod shellcheck;
+pub(crate) mod shell_text;
 #[cfg(test)]
 mod signal_tests;
 pub mod system;
@@ -158,6 +159,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
         }
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "ditto" | "xar" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
+        "man" | "apropos" | "manpath" => shell_text::man_evaluates_a_word(tokens),
         _ => false,
     };
     specific || followed_read::follows_a_secret(tokens)

@@ -35,6 +35,7 @@ mod config_dir;
 mod exported;
 pub(crate) use exported::exported_verdict;
 mod rebind;
+mod shell_words;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -73,6 +74,9 @@ pub(crate) enum Shape {
     /// plain options, the same rule as rsync's `-e`.
     RemoteShell,
     CommandSearch,
+    /// The value is pasted into a shell command line a program evaluates (`LANG` and `MANPATH` for
+    /// macOS man). Refused when it holds a character the shell would act on there.
+    ShellText,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -278,20 +282,11 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
-        Shape::ShellProgram => shell_program_verdict(value),
+        Shape::ShellProgram => shell_words::shell_program_verdict(value),
         Shape::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value),
         Shape::CommandSearch => command_search::command_search_verdict(name, appends, value),
+        Shape::ShellText => shell_words::shell_text_verdict(value),
     }
-}
-
-/// A shell another program starts: one of the shells by name, in a standard system bin directory.
-/// Anything else (a relative, home or temp path, a word with arguments, or another program in a bin
-/// directory, such as make reading a Makefile) may run a planted script.
-fn shell_program_verdict(value: &str) -> Verdict {
-    const STD_BINS: &[&str] = &["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
-    const SHELLS: &[&str] = &["sh", "bash", "zsh", "dash", "ksh", "tcsh", "csh", "fish"];
-    let shell = STD_BINS.iter().find_map(|p| value.strip_prefix(p));
-    if shell.is_some_and(|name| SHELLS.contains(&name)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 /// Every token of an interpreter flag string must match a researched-inert prefix.
