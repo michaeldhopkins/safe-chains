@@ -407,3 +407,21 @@ fn builtins_that_read_a_number_refuse_an_argument_that_assigns() {
         assert!(verdict(text), "should be allowed: {text}");
     }
 }
+
+#[test]
+fn each_boundary_of_the_arithmetic_reader_holds() {
+    for cmd in [
+        "x=abc; x=5; echo $((x)); git log", "echo $(( $(date +%s 2>&1) - 1 )); git log", "echo $(( $(TZ=UTC date +%s) - 1 )); git log",
+        "echo $(( $(cat 1) )); git log", "echo $a[LINENO[1]+(HOME=1)]; git log", "echo ${a[1]:HOME=1}; git log",
+        "read x; declare -i x=5; git log", "declare -i x+=5; git log", "printf -- %d y; git log", "printf '%s %s %d\\n' 1 2 y; git log",
+        "printf '%-*s|\\n' y x; git log", "[[ 1 -eq y ]]; git log", "echo $((RANDOM++)); git log",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in [
+        "echo $a[LINENO[1]]=1", "x='a b'; echo ${x}", "n=${#HOME}; echo $((n + 1))", "declare a=5 b=x; echo $((a + 1))",
+        "test -v '[HOME=1]'", "test -v", "printf - %d y", "printf 'x%*' 5",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
