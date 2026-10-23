@@ -23,7 +23,7 @@ pub(super) fn shield_spellings(path: &str) -> Vec<String> {
             out.push(p);
         }
     };
-    let on_data_volume = (current_os() == "macos").then(|| strip_prefix_ci(path, "/System/Volumes/Data")).flatten();
+    let on_data_volume = (current_os() == "macos").then(|| strip_prefix_could_be(path, "/System/Volumes/Data")).flatten();
     for spelling in std::iter::once(path).chain(on_data_volume) {
         offer(spelling.to_string());
         if let Some(folded) = crate::engine::resolve::locus::firmlink_fold_case_insensitive(spelling) {
@@ -36,11 +36,24 @@ pub(super) fn shield_spellings(path: &str) -> Vec<String> {
     out
 }
 
-/// `path` without `prefix`, matched ASCII-case-insensitively at a component boundary.
-pub(super) fn strip_prefix_ci<'a>(path: &'a str, prefix: &str) -> Option<&'a str> {
-    let head = path.get(..prefix.len())?;
-    let rest = &path[prefix.len()..];
-    (head.eq_ignore_ascii_case(prefix) && rest.starts_with('/')).then_some(rest)
+/// `path` without `prefix`, matched component by component: in any ASCII case, and with each
+/// character outside ASCII standing for any run of characters, as APFS folds them.
+pub(super) fn strip_prefix_could_be<'a>(path: &'a str, prefix: &str) -> Option<&'a str> {
+    let mut rest = path;
+    for want in prefix.split('/').filter(|c| !c.is_empty()) {
+        let after = rest.strip_prefix('/')?;
+        let end = after.find('/')?;
+        let component = &after[..end];
+        let fits = match super::unicode_spelling::wildcard_component(component) {
+            Some(pattern) => super::metadata::glob_may_match(&pattern, want),
+            None => component.eq_ignore_ascii_case(want),
+        };
+        if !fits {
+            return None;
+        }
+        rest = &after[end..];
+    }
+    Some(rest)
 }
 
 /// The `~/…` form of an absolute path under `$HOME` in any case, on macOS only, where the default
@@ -50,7 +63,7 @@ fn home_fold_case_insensitive(path: &str) -> Option<String> {
         return None;
     }
     let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1)?;
-    let rest = strip_prefix_ci(path, home.trim_end_matches('/'))?;
+    let rest = strip_prefix_could_be(path, home.trim_end_matches('/'))?;
     Some(format!("~{rest}"))
 }
 
@@ -67,9 +80,9 @@ pub(crate) fn absolute_other_home(path: &str) -> bool {
     // path handed to a macOS run must not come back with a different answer. The parent matches in
     // any case and below the data volume, as the default macOS volume does (`/users/someone` is
     // `/Users/someone`); the user's own name stays exact, so a case variant of ours is not ours.
-    let path = strip_prefix_ci(path, "/System/Volumes/Data").unwrap_or(path);
+    let path = strip_prefix_could_be(path, "/System/Volumes/Data").unwrap_or(path);
     ["/Users", "/home"].iter().any(|parent| {
-        strip_prefix_ci(path, parent)
+        strip_prefix_could_be(path, parent)
             .and_then(|r| r.strip_prefix('/'))
             .and_then(|r| r.split('/').next())
             .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
@@ -78,7 +91,7 @@ pub(crate) fn absolute_other_home(path: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::strip_prefix_ci;
+    use super::strip_prefix_could_be;
     use proptest::prelude::*;
 
     proptest! {
@@ -97,10 +110,10 @@ mod tests {
                 .map(|(c, &up)| if up { c.to_ascii_uppercase() } else { c })
                 .collect();
             let path = format!("{cased}{rest}");
-            prop_assert_eq!(strip_prefix_ci(&path, &prefix), Some(rest.as_str()));
+            prop_assert_eq!(strip_prefix_could_be(&path, &prefix), Some(rest.as_str()));
             let longer = format!("{cased}{glued}{rest}");
-            prop_assert_eq!(strip_prefix_ci(&longer, &prefix), None);
-            prop_assert_eq!(strip_prefix_ci(&cased, &prefix), None);
+            prop_assert_eq!(strip_prefix_could_be(&longer, &prefix), None);
+            prop_assert_eq!(strip_prefix_could_be(&cased, &prefix), None);
         }
     }
 }

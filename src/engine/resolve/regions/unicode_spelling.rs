@@ -243,6 +243,32 @@ mod tests {
         }
     }
 
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn a_home_store_whose_parent_folders_are_spelled_outside_ascii_stays_shielded() {
+        let home = std::env::var("HOME").unwrap_or_default();
+        let Some(user) = home.strip_prefix("/Users/").filter(|u| !u.is_empty() && !u.contains('/')) else { return };
+        let parents = [
+            format!("/U\u{17F}ers/{user}"),
+            format!("/\u{17F}ystem/Volumes/Data/Users/{user}"),
+            format!("/System/Volume\u{17F}/Data/U\u{17F}ers/{user}"),
+            format!("/Users/{user}"),
+        ];
+        for store in shielded_paths() {
+            let ascii = classify_region(&store);
+            for parent in &parents {
+                let spelled = format!("{parent}{}", &store[1..]);
+                let s = classify_region(&spelled);
+                assert!(s.reads_secret >= ascii.reads_secret, "{spelled} reads as {store}");
+                assert!(s.write_locus >= ascii.write_locus, "{spelled} writes as {store}");
+            }
+        }
+        for other in ["/U\u{17F}ers/someone/notes.txt", "/System/Volumes/Data/U\u{17F}ers/someone/notes.txt", "/\u{17F}ystem/Volumes/Data/.vol/1/2"]
+        {
+            assert!(classify_region(other).reads_secret || classify_region(other).read_locus > LocalLocus::Machine, "{other}");
+        }
+    }
+
     #[test]
     fn the_equivalents_are_found() {
         assert!(shielded_paths().len() > 20);

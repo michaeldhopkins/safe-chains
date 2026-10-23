@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 99b41b27886aeebbcfcdc5bf488bc3f1f44debb2591e96d34e6dbf0f6c592eaa # shrinks to which = 5, pick = 0
+cc 5ae2eb0e08a19bc17d5109ce202d22dda28ddd4a2f0e25042baf67546e486d70 # shrinks to which = 952, pick = 114
