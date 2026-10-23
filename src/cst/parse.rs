@@ -345,9 +345,9 @@ fn at_cmd_end(input: &str) -> bool {
 
 fn assignment(input: &mut &str) -> ModalResult<(String, Word)> {
     let n = run(input, |c| c.is_ascii_alphanumeric() || c == '_')?;
-    '='.parse_next(input)?;
+    let (appends, _) = (opt('+'), '=').parse_next(input)?;
     let value = opt(word).parse_next(input)?.unwrap_or(Word(vec![WordPart::Lit(String::new())]));
-    Ok((n.to_string(), value))
+    Ok((n.to_string(), Word(appends.map(|_| WordPart::Lit(format!("${{{n}}}"))).into_iter().chain(value.0).collect())))
 }
 
 // === Redirect ===
@@ -1620,6 +1620,19 @@ mod tests {
         let cmd = simple(&s);
         assert_eq!(cmd.env[0].0, "FOO");
         assert_eq!(cmd.env[0].1.eval(), "bar baz");
+    }
+    #[test]
+    fn an_appending_assignment_is_the_old_value_followed_by_the_new() {
+        for (src, name, value) in [
+            ("PATH+=:/tmp/evil; ls", "PATH", "${PATH}:/tmp/evil"),
+            ("LD_PRELOAD+=/tmp/e.so ls", "LD_PRELOAD", "${LD_PRELOAD}/tmp/e.so"),
+            ("X+='a b'", "X", "${X}a b"),
+            ("X+=", "X", "${X}"),
+        ] {
+            let s = p(src);
+            let cmd = simple(&s);
+            assert_eq!((cmd.env[0].0.as_str(), cmd.env[0].1.eval().as_str()), (name, value), "{src}");
+        }
     }
     #[test]
     fn cmd_substitution() {
