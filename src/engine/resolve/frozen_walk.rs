@@ -9,6 +9,9 @@ use std::collections::{HashSet, VecDeque};
 
 pub(crate) use super::frozen_reach::is_frozen;
 use super::frozen_reach::{Reach, Sight, cut_short, fold_sight, reads_a_secret, sight_of, stops_before_matches};
+use listing::{Opened, link_dir, open_dir, same_place};
+
+mod listing;
 
 pub(crate) const MAX_ENTRIES: usize = 20_000;
 const MAX_LINKS: usize = 64;
@@ -331,38 +334,6 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
         }
     }
     reached
-}
-
-enum Opened {
-    Entries(std::fs::ReadDir),
-    Unlisted,
-    Absent,
-}
-
-/// [`Opened::Unlisted`] when a directory cannot be listed. [`Opened::Absent`] for a missing path or a file.
-fn open_dir(path: &str) -> Opened {
-    match std::fs::read_dir(path) {
-        Ok(entries) => Opened::Entries(entries),
-        Err(err) if dir_unreadable(&err, path) => Opened::Unlisted,
-        Err(_) => Opened::Absent,
-    }
-}
-
-fn dir_unreadable(err: &std::io::Error, path: &str) -> bool {
-    !matches!(err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory)
-        && match std::fs::metadata(path) {
-            Ok(meta) => meta.is_dir(),
-            Err(stat_err) => !matches!(stat_err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory),
-        }
-}
-
-fn same_place(walked: &str, listed: &std::path::Path) -> bool {
-    listed.to_str() == Some(walked)
-}
-fn link_dir(listed: &std::path::Path) -> Option<String> {
-    let target = std::fs::read_link(listed).ok()?;
-    let joined = if target.is_absolute() { target } else { listed.parent()?.join(target) };
-    joined.is_dir().then(|| joined.to_str().map(str::to_string)).flatten()
 }
 
 fn outside_sandbox(base: &str) -> bool {
