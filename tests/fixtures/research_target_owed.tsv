@@ -67,7 +67,7 @@ ansible-galaxy	examples,version
 ansible-inventory	description,examples,version
 ansible-lint	description,examples,no-overlap
 ansible-playbook	examples,version
-ansible-vault	description,examples,no-overlap,no-tolerance,profiled
+ansible-vault	description,no-overlap,no-tolerance,profiled
 anvil	examples
 apkanalyzer	examples,version
 apksigner	examples,version
@@ -171,7 +171,7 @@ byebug	description,examples
 bzcmp	description,examples,no-tolerance
 bzgrep	description,examples,no-tolerance
 bzip2	description,examples
-bzmore	description,examples,no-tolerance
+bzmore	description,examples
 c8	description,examples
 c89	description,examples
 c99	description,examples
@@ -362,7 +362,7 @@ editorconfig-checker	description,examples,no-overlap,no-tolerance
 elan	description,examples,no-tolerance,profiled
 eleventy	examples,no-overlap
 elixir	description,examples,version
-emacs	description,examples
+emacs	description
 emar	description,examples,no-tolerance
 emcc	description,examples,no-tolerance
 emconfigure	description,examples
@@ -668,7 +668,7 @@ ktrace	description,examples,no-tolerance,profiled
 kubectl	no-tolerance,version
 kubectx	description,examples,version
 kubens	description,examples,version
-kustomize	examples,version
+kustomize	version
 lake	description,examples,no-tolerance,profiled
 lam	description,examples,no-tolerance
 lame	examples,no-tolerance
@@ -688,7 +688,7 @@ ldd	description,examples,version
 leaks	description,examples,no-tolerance
 lean	description,examples
 lein	description,examples,profiled
-less	description,examples,version
+less	description,version
 lessecho	description,examples,no-tolerance
 lesskey	description,examples
 libnetcfg	description,examples
@@ -820,7 +820,7 @@ mongostat	description,examples,no-overlap,no-tolerance
 mongotop	description,examples,no-overlap,no-tolerance
 mono	description,examples
 monolith	examples,version
-more	description,examples,version
+more	description,version
 mosh	examples
 mount	description,examples
 mountpoint	description,examples
@@ -853,7 +853,7 @@ mysqladmin	examples,no-overlap,no-tolerance
 mysqlcheck	description,examples,no-overlap,no-tolerance
 mysqldump	description,examples,no-overlap
 mythril	description,examples,no-overlap,no-tolerance
-nano	description,examples
+nano	description
 nasm	description,examples,no-tolerance
 nbqa	description,examples
 nbstripout	description,examples,no-overlap
@@ -912,7 +912,6 @@ nu	description,examples
 nuget	description,examples,no-overlap,no-tolerance,profiled
 nuke	description,examples
 numfmt	description,examples
-nvim	examples
 nvm	examples,version
 nvtop	description,examples
 nx	description,examples,version
@@ -1449,7 +1448,7 @@ vercel	examples,version
 vibe	examples,version
 vidir	description,examples
 viewdiagnostic	description,examples
-vim	description,examples
+vim	description
 vipe	description,examples
 vis	description,examples
 vite	description,examples,profiled
@@ -1529,7 +1528,7 @@ xz	description,examples,no-overlap
 xzcmp	description,examples,no-tolerance
 xzdec	description,examples
 xzgrep	description,examples,no-tolerance
-xzless	description,examples,no-tolerance
+xzless	description,examples
 yacc	description,examples
 yamllint	description,examples,no-tolerance
 yapf	description,examples
@@ -1562,7 +1561,7 @@ zipmerge	description
 zipnote	description
 zipsplit	description
 ziptool	description
-zless	description,no-tolerance
+zless	description
 zlib-flate	description,examples
 znew	description
 zola	description,examples,no-tolerance,profiled
@@ -1570,4 +1569,4 @@ zoxide	description
 zsh	description,examples
 zstd	description,examples,no-overlap
 zstdgrep	description,examples,no-tolerance
-zstdless	description,examples,no-tolerance
+zstdless	description,examples
