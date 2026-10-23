@@ -93,3 +93,31 @@ proptest! {
         prop_assert!(allowed(&place("+")), "should be allowed: {}", place("+"));
     }
 }
+
+const FEEDERS: &[&str] = &["echo x | {}", "{} < ./keys", "{} 0<> ./keys", "{} <<< ':!id'", "{} <&3", "{} 0>&3", "{} <<'EOF'\n:!id\nEOF"];
+const QUIET: &[&str] = &["{}", "{} < /dev/null", "{} 0>&-", "{} 3< ./keys", "{} | cat", "echo x | cat; {}"];
+const RUNNERS: &[&str] = &["{}", "sh -c '{}'", "timeout 5 {}", "env TERM=dumb {}"];
+const GROUPS: &[&str] = &["{}", "{ {}; }", "( {} )", "bash -c \"{}\""];
+
+fn wrap(template: &str, inner: &str) -> String {
+    template.replacen("{}", inner, 1)
+}
+
+proptest! {
+    /// Whatever feeds an editor's standard input reaches it through any wrapper around it, and a
+    /// stage whose input is the terminal, `/dev/null` or closed is left alone.
+    #[test]
+    fn an_editor_is_refused_exactly_when_its_standard_input_is_fed(
+        command in prop::sample::select(STDIN_COMMANDS),
+        feeder in prop::sample::select(FEEDERS),
+        quiet in prop::sample::select(QUIET),
+        inner in prop::sample::select(RUNNERS),
+        outer in prop::sample::select(GROUPS),
+    ) {
+        let wrapped = wrap(outer, &wrap(inner, command));
+        let fed_line = wrap(feeder, &wrapped);
+        prop_assert!(!allowed(&fed_line), "should be refused: {fed_line}");
+        let quiet_line = wrap(quiet, &wrapped);
+        prop_assert!(allowed(&quiet_line), "should be allowed: {quiet_line}");
+    }
+}

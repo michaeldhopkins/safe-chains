@@ -139,6 +139,7 @@ owed = [
 "src/cst/classify_budget.rs" = ["src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance"]
 "src/cst/scope_budget.rs" = ["src/cst/scope_budget.rs::sources_never_multiply_the_binding_set"]
 "src/cst/search_quote.rs" = ["src/cst/search_quote_tests.rs::a_dollar_the_shell_keeps_in_a_search_path_is_refused"]
+"src/cst/stdin_fed.rs" = ["src/cst/stdin_fed_tests.rs::an_editor_is_refused_exactly_when_its_standard_input_is_fed", "src/cst/stdin_fed_tests.rs::only_a_line_number_passes_as_a_plus_operand"]
 "src/cst/reserved.rs" = []
 "src/pathctx/anchor.rs" = [
   "src/pathctx/anchor_tests.rs::a_placed_write_is_plain_and_stays_put",
@@ -643,6 +644,7 @@ owed = [
 
 [test_only]
 "src/cst/search_quote_tests.rs" = "the kept-dollar search path suite (#[cfg(test)] mod in cst/search_quote.rs)"
+"src/cst/stdin_fed_tests.rs" = "the fed-standard-input suite (#[cfg(test)] mod in cst/stdin_fed.rs)"
 "src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
 "src/envvars/command_search_tests.rs" = "the command search path suite (#[cfg(test)] mod in envvars/command_search.rs)"
