@@ -189,6 +189,14 @@ mod tests {
     }
 
     #[test]
+    fn chmod_follows_a_link_named_by_a_walk_flag() {
+        for line in ["chmod -hR -L 755 l", "chmod -RH 755 l", "chmod -h --dereference 755 l"] {
+            assert!(!on(line), "{line}");
+        }
+        assert!(on("chmod -hR 755 l"));
+    }
+
+    #[test]
     fn a_value_is_not_read_as_a_flag() {
         for line in ["cp -tR l", "cp -t -R l", "cp --suffix -R l x", "cp -S -a l x", "cp l x", "cp -- -R x"] {
             assert!(!on(line), "{line}");

@@ -697,3 +697,20 @@ proptest! {
         }
     }
 }
+
+/// `find proj/ -name .git -prune` is matched against `proj/.git`, which find prints with the
+/// operand's trailing `/` kept, so the walk does not trust the filter there and still reports `.git`.
+#[test]
+fn a_filter_is_not_applied_to_an_operand_with_a_trailing_slash() {
+    use super::{Skip, Test, WalkLinks};
+    let (_dir, root) = project();
+    std::fs::create_dir_all(format!("{root}/proj/.git")).expect("git");
+    let (bare, slashed) = on_hook_stack(move || {
+        let _guard = pathctx::enter(ctx(&root));
+        let skip = Skip { pruned: vec![(Test::Name(".git".into(), false), false)], ..Skip::default() };
+        let walk = Walk { hidden: true, links: WalkLinks::Ignore, skip: &skip };
+        (reach_below("proj", walk), reach_below("proj/", walk))
+    });
+    assert!(bare.is_empty(), "the pruned .git was reached: {bare:?}");
+    assert!(matches!(slashed.as_slice(), [Reach::Found(p)] if p.ends_with("proj/.git/f")), "{slashed:?}");
+}

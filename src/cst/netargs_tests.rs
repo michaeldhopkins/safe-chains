@@ -461,3 +461,16 @@ fn a_loop_variable_the_body_may_rebind_is_not_taken_as_its_list() {
     let approved: Vec<&str> = rebound.into_iter().filter(|c| allowed(c)).collect();
     assert!(approved.is_empty(), "approved with a variable the body may have rebound: {approved:?}");
 }
+
+#[test]
+fn each_way_a_body_can_rebind_a_variable_is_read_on_its_own() {
+    for body in ["read x", "export Q=1", "printf -v Q x", "printf -vQ x", "printf '%s' -v"] {
+        assert!(may_rebind("h", body), "should rebind: {body}");
+    }
+    for body in ["printf '%s' x", "printf %s \"$h\"", "echo \"$h\"; ls", "dig \"${h}\""] {
+        assert!(!may_rebind("h", body), "should not rebind: {body}");
+    }
+    assert!(!may_rebind("h", "g"), "a name no function was defined under rebinds nothing");
+    crate::cst::functions::poison_function("g".to_string());
+    assert!(may_rebind("h", "g"), "a function redefined with a body nobody can read may assign anything");
+}

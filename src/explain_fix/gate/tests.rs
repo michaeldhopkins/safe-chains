@@ -226,3 +226,54 @@ fn a_protected_place_is_named_by_the_home_folder_and_by_a_protected_path() {
         assert!(!names_a_protected_place("notes"));
     });
 }
+
+#[test]
+fn an_approved_segment_that_cannot_be_read_makes_the_whole_command_a_boundary() {
+    assert_eq!(kind("echo $X && zzgatetool sync"), GateKind::Boundary, "opaque, not outside the workspace");
+    assert_eq!(kind("echo ../x && zzgatetool sync"), GateKind::Boundary, "outside the workspace, not opaque");
+    assert_eq!(kind("echo ./x && zzgatetool sync"), GateKind::NotYet);
+}
+
+/// The gate of `command`, with the one refused segment's text replaced by `text`.
+fn kind_of_refused_segment(command: &str, text: &str) -> GateKind {
+    in_gate_probe(|| {
+        let mut explanation = crate::explain_with_coverage_at_level(command, None);
+        explanation.segments.truncate(1);
+        explanation.segments[0].text = text.to_string();
+        gate_kind(command, &explanation, &|_| false, &|_| false)
+    })
+}
+
+#[test]
+fn a_refused_segment_that_cannot_be_read_or_leaves_the_workspace_is_a_boundary_on_its_own() {
+    assert_eq!(kind_of_refused_segment("zzgatetool sync", "zzgatetool sync"), GateKind::NotYet);
+    assert_eq!(kind_of_refused_segment("zzgatetool sync", "zzgatetool $X"), GateKind::Boundary, "opaque only");
+    assert_eq!(kind_of_refused_segment("zzgatetool sync", "zzgatetool ../x"), GateKind::Boundary, "outside the workspace only");
+}
+
+#[test]
+fn each_spelling_of_a_place_outside_the_workspace_is_outside_on_its_own() {
+    in_gate_probe(|| {
+        for word in ["/opt/elsewhere/x", "~/elsewhere", "..", "../x", "../../x"] {
+            assert!(leaves_the_workspace(word), "{word}");
+        }
+        for word in ["./x", "x/y", "../gateprobe/x"] {
+            assert!(!leaves_the_workspace(word), "{word}");
+        }
+        for word in ["/etc/sudoers", "~", "~/.ssh", "~/.zshrc"] {
+            assert!(names_a_protected_place(word), "{word}");
+        }
+        for word in ["/opt/elsewhere/x", "~/elsewhere", "x/y", "./x"] {
+            assert!(!names_a_protected_place(word), "{word}");
+        }
+    });
+}
+
+#[test]
+fn without_a_workspace_a_parent_path_is_read_as_written() {
+    // No context to join it to, so `resolve` returns the relative spelling and it must still count.
+    for word in ["..", "../x", "../../x"] {
+        assert!(leaves_the_workspace(word), "{word}");
+    }
+    assert!(!leaves_the_workspace("./x"));
+}

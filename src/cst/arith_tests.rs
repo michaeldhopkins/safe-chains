@@ -446,3 +446,31 @@ fn each_boundary_of_the_arithmetic_reader_holds() {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }
 }
+
+#[test]
+fn a_bracket_closes_at_its_own_depth() {
+    assert_eq!(super::bracketed("a[1]+HOME=1] tail", '[', ']'), "a[1]+HOME=1");
+    assert_eq!(super::bracketed("a[b[1]]]", '[', ']'), "a[b[1]]");
+    assert_eq!(super::bracketed("never closed", '[', ']'), "never closed");
+}
+
+#[test]
+fn a_parameter_flag_of_any_length_is_skipped_before_the_name() {
+    // The subscript after the flags is read only when the flags are skipped exactly.
+    for body in ["(U)a[HOME=1]", "(l:30:)a[HOME=1]", "(l:3:)a[HOME=1]", "(Ul:3:)a[HOME=1]"] {
+        assert!(!super::parameter_verdict(body).is_allowed(), "should be refused: {body}");
+    }
+    for body in ["(U)a[1]", "(l:30:)a[1]", "(l:3:)a[1]"] {
+        assert!(super::parameter_verdict(body).is_allowed(), "should be allowed: {body}");
+    }
+}
+
+#[test]
+fn a_name_given_something_other_than_a_number_is_free_even_when_unbound() {
+    assert!(!super::is_free("n"));
+    super::mark_free("n");
+    assert!(super::is_free("n"));
+    assert!(!super::is_free("m"));
+    super::mark_free("*");
+    assert!(super::is_free("m"));
+}
