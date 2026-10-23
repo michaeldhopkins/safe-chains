@@ -107,9 +107,14 @@ fn descriptor_verdict(cmd: &SimpleCmd) -> Verdict {
 fn name_verdict(word: &Word) -> Verdict {
     let text = word.eval();
     let (read, v) = read_text(word);
-    v.combine(refuse_if(text.contains('$') || text.contains("__SAFE_CHAINS_")))
+    v.combine(refuse_if(built(&text)))
         .combine(subscript_verdict(&text))
         .combine(subscript_verdict(&read))
+}
+
+/// Text the shell finishes building when it runs: an expansion, or a substitution's output.
+fn built(text: &str) -> bool {
+    text.contains('$') || text.contains("__SAFE_CHAINS_")
 }
 
 fn subscript_verdict(text: &str) -> Verdict {
@@ -131,10 +136,14 @@ fn tested_names(args: &[String]) -> Vec<usize> {
 }
 
 /// The arguments a format string reads as numbers: every one after the format, unless the format
-/// is known to hold no numeric conversion.
+/// is known to hold no numeric conversion. An option word the shell builds may be `-v` or the
+/// format itself, so every word after it counts.
 fn formatted(args: &[String]) -> Vec<usize> {
     let mut i = 0;
     while let Some(arg) = args.get(i).filter(|w| w.starts_with('-') && w.len() > 1) {
+        if built(arg) {
+            return (i + 1..args.len()).collect();
+        }
         i += if arg == "-v" { 2 } else { 1 };
         if arg == "--" {
             break;
@@ -151,11 +160,17 @@ fn formatted(args: &[String]) -> Vec<usize> {
 
 /// zsh's `print -f format`: the format is the option's value, attached (`-f%d`) or the next word,
 /// the last `-f` wins and options may follow it. So every format any `-f` could take is read, and
-/// when one reads a number every argument after the first `-f` counts.
+/// when one reads a number every argument after the first `-f` counts. A word the shell builds may
+/// be `-f` or its format, so every argument after it counts too.
 fn print_formatted(args: &[String]) -> Vec<usize> {
     let mut first = None;
     let mut numeric = false;
     for (i, word) in args.iter().enumerate() {
+        if built(word) {
+            first.get_or_insert(i);
+            numeric = true;
+            continue;
+        }
         let Some(cluster) = word.strip_prefix('-') else { continue };
         let Some(at) = cluster.find('f') else { continue };
         let format = if at + 1 == cluster.len() { args.get(i + 1).map(String::as_str) } else { Some(&cluster[at + 1..]) };
@@ -169,10 +184,10 @@ fn print_formatted(args: &[String]) -> Vec<usize> {
 }
 
 /// Whether each argument the format takes is read as a number, in order: a `*` width or precision
-/// takes one (`printf '%*s' 5 x`), then the conversion. A `%1$d` picks its argument by number, so
-/// every one counts.
+/// takes one (`printf '%*s' 5 x`), then the conversion. A `%1$d` picks its argument by number, and
+/// a format built when the shell runs (`"%s$(cat f)"`) may hold any conversion, so every one counts.
 fn numeric_slots(format: &str) -> Vec<bool> {
-    if format.contains('$') {
+    if built(format) {
         return vec![true];
     }
     let mut slots = Vec::new();

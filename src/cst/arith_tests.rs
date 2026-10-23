@@ -344,10 +344,16 @@ fn a_name_the_line_never_set_is_not_read_as_a_number() {
 
 #[test]
 fn printf_reads_only_its_numeric_slots_as_numbers() {
-    for cmd in ["printf '%d %s\\n' 5 hello", "printf '%*s' 5 x", "printf '%s=%d\\n' a 1 b 2", "printf '%%d %s' x"] {
+    for cmd in
+        ["printf '%d %s\\n' 5 hello", "printf '%*s' 5 x", "printf '%s=%d\\n' a 1 b 2", "printf '%%d %s' x", "x=hi; printf '%s\\n' \"$x\""]
+    {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }
-    for cmd in ["printf '%s=%d\\n' a 1 b HOME=1; git log", "printf '%1$s' HOME=1; git log", "printf '%s %*d' a HOME=1 2; git log"] {
+    for cmd in [
+        "printf '%s=%d\\n' a 1 b HOME=1; git log", "printf '%1$s' HOME=1; git log", "printf '%s %*d' a HOME=1 2; git log",
+        "printf \"%s$(cat f)\" a HOME=1; git log", "printf -- \"$(cat f)\" HOME=1; git log", "printf \"%s`cat f`\" a HOME=1; git log",
+        "o=-v; printf $o x %d HOME=1; git log",
+    ] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
 }
@@ -400,7 +406,9 @@ fn builtins_that_read_a_number_refuse_an_argument_that_assigns() {
         let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple: {text}") };
         super::commands::command_verdict(cmd).is_allowed()
     };
-    for text in ["return y", "shift y", "print -f %d y", "print -f%d y", "print -f %s -f %d y", "print -rf %d y"] {
+    for text in
+        ["return y", "shift y", "print -f %d y", "print -f%d y", "print -f %s -f %d y", "print -rf %d y", "print $o %d y", "print -r$x%d y"]
+    {
         assert!(!verdict(text), "should be refused: {text}");
     }
     for text in ["return 1", "print -f %s y"] {
