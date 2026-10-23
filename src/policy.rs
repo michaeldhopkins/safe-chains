@@ -36,17 +36,24 @@ impl UnknownTolerance {
 /// allowlist. `unknown` controls flag-shaped unknowns; `numeric_dash` opts
 /// into `-NUMBER` shorthand (e.g. `head -20`); `single_dash_words` stops a single-dash token
 /// being read as a cluster of short flags, for tools whose options are whole words (`exiftool -if`
-/// is one option that runs Perl, never `-i -f`). `plus_runs_command` is for a pager or editor that
+/// is one option that runs Perl, never `-i -f`). `reads_commands.plus` is for a pager or editor that
 /// runs a `+word` operand as its first command (`less +!id`, `vim '+!id'`): only a line number
-/// (`+42`) or a bare `+` passes. `stdin_runs_commands` is for one that reads keystrokes from a
+/// (`+42`) or a bare `+` passes. `reads_commands.stdin` is for one that reads keystrokes from a
 /// standard input that is not a terminal (`printf ':!id\n' | vim`): fed anything, it is refused.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FlagTolerance {
     pub unknown: UnknownTolerance,
     pub numeric_dash: bool,
     pub single_dash_words: bool,
-    pub plus_runs_command: bool,
-    pub stdin_runs_commands: bool,
+    pub reads_commands: CommandSources,
+}
+
+/// Where a pager or editor takes commands from besides its options: a `+word` operand, and a
+/// standard input that is not a terminal.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct CommandSources {
+    pub plus: bool,
+    pub stdin: bool,
 }
 
 impl FlagTolerance {
@@ -57,8 +64,7 @@ impl FlagTolerance {
             unknown: UnknownTolerance::Strict,
             numeric_dash: false,
             single_dash_words: false,
-            plus_runs_command: false,
-            stdin_runs_commands: false,
+            reads_commands: CommandSources { plus: false, stdin: false },
         }
     }
 }
@@ -246,7 +252,7 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
             break;
         }
 
-        if tolerance.plus_runs_command && t.len() > 1 && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
+        if tolerance.reads_commands.plus && t.len() > 1 && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
             return None;
         }
 

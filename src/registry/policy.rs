@@ -126,7 +126,7 @@ pub(super) fn check_with_passthrough(tokens: &[Token], policy: &OwnedPolicy, bas
 
 pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
     let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
-    !(policy.tolerance.stdin_runs_commands && crate::cst::stdin_fed::fed())
+    !(policy.tolerance.reads_commands.stdin && crate::cst::stdin_fed::fed())
         && check_flags(tokens, standalone, valued, policy.bare, policy.max_positional, policy.tolerance)
         && policy
             .min_positional
@@ -138,8 +138,8 @@ pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
 pub(super) fn reads_commands_from(tolerance: &mut FlagTolerance, command: &str, sources: &[String]) -> Result<(), String> {
     for source in sources {
         match source.as_str() {
-            "plus" => tolerance.plus_runs_command = true,
-            "stdin" => tolerance.stdin_runs_commands = true,
+            "plus" => tolerance.reads_commands.plus = true,
+            "stdin" => tolerance.reads_commands.stdin = true,
             other => return Err(format!("command '{command}': unknown reads_commands_from source `{other}` (known: plus, stdin)")),
         }
     }
