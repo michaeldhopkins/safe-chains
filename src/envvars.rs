@@ -32,6 +32,8 @@ use crate::verdict::{SafetyLevel, Verdict};
 mod command_search;
 pub(crate) use command_search::names_command_search;
 mod config_dir;
+mod exported;
+pub(crate) use exported::exported_verdict;
 mod rebind;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
 
