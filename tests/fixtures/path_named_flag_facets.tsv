@@ -434,7 +434,6 @@ llvm-otool	-object-tool-path	untriaged	-	-	-
 localedef	--inputfile	untriaged	-	-	-	
 madge	--basedir	untriaged	-	-	-	
 madge	--rankdir	untriaged	-	-	-	
-man	--config-file	untriaged	-	-	-	
 man	--manpath	untriaged	-	-	-	
 markdownlint	--ignore-path	untriaged	-	-	-	
 markdownlint-cli2	--directories	untriaged	-	-	-	
