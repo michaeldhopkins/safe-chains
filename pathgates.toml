@@ -28,6 +28,8 @@ read = [
   "expand", "unexpand", "colrm", "pr", "col", "column",
   # pagers / viewers
   "less", "more", "most", "bat", "cat",
+  # editors, which draw the file on standard output when it is not a terminal (nano: [roles."nano"])
+  "vim", "nvim", "nano", "emacs",
   # field / column / line tools
   "cut", "paste", "join", "comm", "sort", "uniq", "tsort", "ptx", "shuf", "numsum", "datamash",
   # encoding / format converters (read a file, emit transformed content)
@@ -556,7 +558,9 @@ flags = { "--output-file" = "write", "-o" = "write" }
 flags = { "--output-file" = "write", "-o" = "write" }
 
 [roles."nano"]
-flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "-o" = "write" }
+# nano draws the file on standard output when it is not a terminal, so the file is read.
+positional = "read"
+flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "-o" = "write", "-J" = "ignore", "-Q" = "ignore", "-T" = "ignore", "-X" = "ignore", "-Y" = "ignore", "-r" = "ignore" }
 
 [roles."nmedit"]
 flags = { "-o" = "write" }
