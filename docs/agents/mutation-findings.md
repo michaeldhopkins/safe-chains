@@ -47,3 +47,17 @@ What each rotating slice found and which tests killed it. Add an entry when you 
   by asserting the `SystemIntegrity` `Create` capability in `data_export_gates_its_output_file` (`src/engine/resolve.rs`)
   and by `output_flag_value_extracts_every_spelling_and_rejects_non_short_glued_forms` and
   `flag_present_matches_bare_glued_and_short_clusters_only` in `src/registry/arity_tests.rs`.
+- **Pre-release runs (2026-10-23):** the first run over the stack (763 mutants) missed 8 and the
+  second, over the link-following gate fix (40), missed 6, all killed by tests named in their
+  commits. Three were equivalent and went by refactor; one, `&&` to `||` in `gated_policy`, is
+  excluded in `.cargo/mutants.toml` with its reason. Traps met on the way:
+  - A prover that restores a file without touching it leaves cargo's stale build in place, so the
+    next mutant reports KILLED for the previous one's binary. Touch the file after restoring it,
+    and count a KILLED only when the unmutated baseline passed in the same run.
+  - Given a custom `--output`, the run script read the wrong `missed.txt` and passed a run with
+    21 MISSED; it now pins `--output .`.
+  - `functions.rs:88` (`||` to `&&`) was a TIMEOUT on a slow runner and MISSED on a fast one: a
+    timeout that ends a recursion cap is not always a catch, so give such a guard a test that
+    shows both sides of the cap.
+  - Setting the build directory under `/tmp` moves `CARGO_TARGET_TMPDIR` there too, and the
+    tests that build scratch projects in it then read them as temporary folders and fail.
