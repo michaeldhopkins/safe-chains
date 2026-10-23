@@ -18,11 +18,24 @@ struct Case {
     ignore_term: bool,
     budget: String,
     passes: bool,
+    args: Vec<&'static str>,
+    out: &'static str,
+    output_env: Option<&'static str>,
 }
 
 impl Case {
     fn new(rc: i32, missed: &'static str) -> Self {
-        Case { rc, missed: Some(missed), sleep: 0, ignore_term: false, budget: "60".into(), passes: false }
+        Case {
+            rc,
+            missed: Some(missed),
+            sleep: 0,
+            ignore_term: false,
+            budget: "60".into(),
+            passes: false,
+            args: Vec::new(),
+            out: ".",
+            output_env: None,
+        }
     }
 
     fn hanging(mut self, budget: &str) -> Self {
@@ -42,10 +55,19 @@ fn run(case: &Case) -> Run {
     let bin = dir.path().join("bin");
     std::fs::create_dir(&bin).expect("bin dir");
     let cargo = bin.join("cargo");
+    // Like cargo-mutants: `--output` outranks CARGO_MUTANTS_OUTPUT and the default (STUB_OUT stands
+    // for a config `output`, `--dir` or `--manifest-path`), and a second `--output` is a usage error.
     std::fs::write(
         &cargo,
         "#!/bin/bash\n\
-         [ -n \"$STUB_WRITE\" ] && { mkdir -p mutants.out; printf '%s' \"$STUB_MISSED\" > mutants.out/missed.txt; }\n\
+         out=\"${CARGO_MUTANTS_OUTPUT:-$STUB_OUT}\" given=0 previous=\n\
+         for arg in \"$@\"; do\n\
+           [ \"$arg\" = -- ] && break\n\
+           [ \"$previous\" = --output ] && { out=\"$arg\"; given=$((given + 1)); }\n\
+           previous=\"$arg\"\n\
+         done\n\
+         [ \"$given\" -gt 1 ] && exit 2\n\
+         [ -n \"$STUB_WRITE\" ] && { mkdir -p \"$out/mutants.out\"; printf '%s' \"$STUB_MISSED\" > \"$out/mutants.out/missed.txt\"; }\n\
          [ -n \"$STUB_IGNORE_TERM\" ] && trap '' TERM\n\
          [ \"$STUB_SLEEP\" -gt 0 ] && { for ((i = 0; i < STUB_SLEEP; i++)); do sleep 1; done; }\n\
          exit \"$STUB_RC\"\n",
@@ -55,13 +77,16 @@ fn run(case: &Case) -> Run {
     let path = format!("{}:{}", bin.display(), std::env::var("PATH").unwrap_or_default());
     let mut cmd = Command::new("/bin/bash");
     cmd.arg(script())
+        .args(&case.args)
         .current_dir(dir.path())
         .env_remove("MUTANTS_STATUS")
         .env_remove("MUTANTS_BUDGET_PASSES")
+        .env_remove("CARGO_MUTANTS_OUTPUT")
         .env("PATH", path)
         .env("STUB_RC", case.rc.to_string())
         .env("STUB_MISSED", case.missed.unwrap_or(""))
         .env("STUB_SLEEP", case.sleep.to_string())
+        .env("STUB_OUT", case.out)
         .env("MUTANTS_BUDGET", &case.budget)
         .env("MUTANTS_GRACE", "2");
     if case.missed.is_some() {
@@ -72,6 +97,9 @@ fn run(case: &Case) -> Run {
     }
     if case.passes {
         cmd.env("MUTANTS_BUDGET_PASSES", "1");
+    }
+    if let Some(output) = case.output_env {
+        cmd.env("CARGO_MUTANTS_OUTPUT", output);
     }
     let out = cmd.output().expect("run script");
     Run {
@@ -164,4 +192,33 @@ fn a_process_that_ignores_term_is_killed() {
     let r = run(&case);
     assert!(started.elapsed().as_secs() < 25, "TERM was never escalated to KILL");
     assert_eq!((r.code, r.status.as_deref()), (0, Some("budget")));
+}
+
+#[test]
+fn a_missed_mutant_fails_wherever_cargo_mutants_would_write_by_default() {
+    let mut case = Case::new(3, MISS);
+    case.out = "elsewhere";
+    assert_eq!(run(&case).code, 2, "a config output, --dir or --manifest-path");
+    case.output_env = Some("elsewhere");
+    assert_eq!(run(&case).code, 2, "CARGO_MUTANTS_OUTPUT");
+}
+
+#[test]
+fn a_caller_output_directory_is_a_usage_error_not_a_pass() {
+    let mut case = Case::new(3, MISS);
+    case.args = vec!["--output", "out"];
+    assert_eq!(run(&case).code, 1);
+}
+
+#[test]
+fn the_workflow_arguments_and_anything_after_a_double_dash_are_passed_through() {
+    for args in [
+        vec!["--no-shuffle", "-vV", "-j2", "--in-diff", "mutants.diff"],
+        vec!["--no-shuffle", "-vV", "-j2", "--shard", "1/8"],
+        vec!["-j2", "-Fparse_word", "-Dmutants.diff", "--", "--output", "x"],
+    ] {
+        let mut case = Case::new(0, "");
+        case.args = args.clone();
+        assert_eq!(run(&case).code, 0, "{args:?}");
+    }
 }

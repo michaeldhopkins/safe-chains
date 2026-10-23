@@ -5,6 +5,8 @@
 #
 # Usage: scripts/mutants-run.sh [cargo-mutants args...]
 #
+#   The script passes `--output .` itself, so a caller's own `--output` is a usage error.
+#
 #   MUTANTS_BUDGET         seconds cargo-mutants may run before it is stopped (default 900); the
 #                          rest of the 20-minute job (checkout, toolchain, cache restore and save,
 #                          summary, artifact) needs about five minutes
@@ -33,8 +35,12 @@ if [[ ! $budget =~ ^[0-9]+$ ]]; then
 fi
 status_file="${MUTANTS_STATUS:-mutants-run-status.txt}"
 hit_budget="$(mktemp -u)"
+results=mutants.out
 
-cargo mutants "$@" &
+# An explicit --output outranks CARGO_MUTANTS_OUTPUT, the config's `output`, --dir and
+# --manifest-path, any of which would otherwise leave this script reading an empty folder and
+# passing what was missed.
+cargo mutants --output . "$@" &
 miner=$!
 (
   deadline=$((SECONDS + budget))
@@ -64,13 +70,13 @@ fi
 
 if [ "$stopped" -eq 1 ]; then
   echo "budget" > "$status_file"
-  echo "::warning::cargo-mutants stopped after ${budget}s; the rest of this run went untested. Outcomes so far are in mutants.out."
+  echo "::warning::cargo-mutants stopped after ${budget}s; the rest of this run went untested. Outcomes so far are in $results."
 else
   echo "complete" > "$status_file"
 fi
 
-if [ -s mutants.out/missed.txt ]; then
-  echo "::error::mutants MISSED; see mutants.out/missed.txt"
+if [ -s "$results/missed.txt" ]; then
+  echo "::error::mutants MISSED; see $results/missed.txt"
   exit 2
 fi
 
@@ -82,7 +88,7 @@ fi
 case "$rc" in
   0) exit 0 ;;
   3)
-    echo "::notice::timeouts counted as caught; see mutants.out/timeout.txt"
+    echo "::notice::timeouts counted as caught; see $results/timeout.txt"
     exit 0
     ;;
   2)
