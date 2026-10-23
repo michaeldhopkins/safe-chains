@@ -169,7 +169,7 @@ fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
     if runs_a_command(option) || flags.contains('F') {
         return Verdict::Denied;
     }
-    if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with('(')) {
+    if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with(['(', '{'])) {
         return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::SafeWrite)
@@ -558,6 +558,8 @@ mod tests {
         tmux_set_format_flag_denied: "tmux set -gF status-right '#{l:#}(id)'",
         tmux_set_append_paren_denied: "tmux set -ga @x '(id)'",
         tmux_set_append_bundled_denied: "tmux set -a -g status-right '(id)'",
+        tmux_set_append_brace_denied: "tmux set -ga status-left '{HOME}'",
+        tmux_set_append_brace_modifier_denied: "tmux set -ga status-left '{E:@x}'",
         tmux_set_history_file_denied: "tmux set -g history-file ./x",
         tmux_set_command_error_hook_denied: "tmux set -g command-error 'run-shell id'",
         tmux_set_client_created_hook_denied: "tmux set -g client-created 'run-shell id'",
