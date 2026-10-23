@@ -7,7 +7,10 @@
 //! safe-chains can reach its rule changes. The nearest manifest is the one above the folder cargo
 //! runs in, found after symbolic links and `..` are resolved, read from disk:
 //! it is safe-chains when its package, one of its binaries or one of its dependencies is named
-//! safe-chains (with `_` read as `-`). Anything not known before the shell runs, an unknown or
+//! safe-chains (with `_` read as `-`), and when it holds a `[workspace]`, when any member it lists
+//! (globs expanded) or a workspace dependency is, so a `--bin` naming a member's binary is covered
+//! too. A member that cannot be read, a glob this does not expand, or more than 256 members counts
+//! as safe-chains. Anything not known before the shell runs, an unknown or
 //! missing working directory, or a manifest that does not parse or names no package of its own
 //! counts as safe-chains.
 use crate::parse::Token;
@@ -124,19 +127,95 @@ fn nearest_manifest_names_this(manifest_path: Option<&str>, chdir: Option<&str>)
 }
 
 fn manifest_names_this(path: &std::path::Path) -> bool {
-    let Some(manifest) = std::fs::read_to_string(path).ok().and_then(|text| toml::from_str::<toml::Table>(&text).ok()) else {
+    let Some(manifest) = read_manifest(path) else {
         return true;
     };
+    package_names_this(&manifest) || manifest.get("workspace").is_some_and(|workspace| workspace_names_this(path, workspace))
+}
+
+fn read_manifest(path: &std::path::Path) -> Option<toml::Table> {
+    std::fs::read_to_string(path).ok().and_then(|text| toml::from_str::<toml::Table>(&text).ok())
+}
+
+const MEMBER_LIMIT: usize = 256;
+
+fn workspace_names_this(path: &std::path::Path, workspace: &toml::Value) -> bool {
+    let (Some(workspace), Some(root)) = (workspace.as_table(), path.parent()) else {
+        return true;
+    };
+    if workspace.get("dependencies").and_then(toml::Value::as_table).is_some_and(|deps| {
+        deps.iter()
+            .any(|(name, spec)| is_this(name) || spec.get("package").and_then(toml::Value::as_str).is_some_and(is_this))
+    }) {
+        return true;
+    }
+    let mut members = Vec::new();
+    for key in ["members", "default-members"] {
+        let Some(patterns) = workspace.get(key) else { continue };
+        let Some(patterns) = patterns.as_array() else {
+            return true;
+        };
+        for pattern in patterns {
+            if !pattern.as_str().is_some_and(|pattern| expand_member(root, pattern, &mut members)) {
+                return true;
+            }
+        }
+    }
+    members
+        .iter()
+        .any(|member| read_manifest(&member.join("Cargo.toml")).is_none_or(|manifest| package_names_this(&manifest)))
+}
+
+fn expand_member(root: &std::path::Path, pattern: &str, members: &mut Vec<std::path::PathBuf>) -> bool {
+    let start = if pattern.starts_with('/') { std::path::PathBuf::from("/") } else { root.to_path_buf() };
+    let mut found = vec![start];
+    for part in pattern.split('/').filter(|part| !part.is_empty() && *part != ".") {
+        if part.contains("**") {
+            return false;
+        }
+        if !part.contains(['*', '?', '[']) {
+            found.iter_mut().for_each(|dir| dir.push(part));
+            continue;
+        }
+        let mut next = Vec::new();
+        for dir in &found {
+            let Ok(entries) = std::fs::read_dir(dir) else {
+                return false;
+            };
+            for entry in entries {
+                let Some(name) = entry.ok().and_then(|entry| entry.file_name().into_string().ok()) else {
+                    return false;
+                };
+                match crate::cst::opaque::glob::matches(part.as_bytes(), name.as_bytes()) {
+                    None => return false,
+                    Some(true) if dir.join(&name).is_dir() => next.push(dir.join(&name)),
+                    Some(_) => {}
+                }
+                if next.len() > MEMBER_LIMIT {
+                    return false;
+                }
+            }
+        }
+        found = next;
+    }
+    members.extend(found);
+    members.len() <= MEMBER_LIMIT
+}
+
+fn is_this(name: &str) -> bool {
+    name.replace('_', "-") == THIS
+}
+
+fn package_names_this(manifest: &toml::Table) -> bool {
     let Some(package) = manifest.get("package").and_then(toml::Value::as_table) else {
         return true;
     };
-    let is_this = |name: &str| name.replace('_', "-") == THIS;
     let field_is_this =
         |table: Option<&toml::Table>, field: &str| table.and_then(|t| t.get(field)).and_then(toml::Value::as_str).is_some_and(is_this);
     let mut binaries = manifest.get("bin").and_then(toml::Value::as_array).into_iter().flatten();
     field_is_this(Some(package), "name")
         || binaries.any(|bin| field_is_this(bin.as_table(), "name"))
-        || dependency_tables(&manifest)
+        || dependency_tables(manifest)
             .any(|deps| deps.iter().any(|(name, spec)| is_this(name) || field_is_this(spec.as_table(), "package")))
 }
 
@@ -276,10 +355,9 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn a_manifest_is_this_project_by_its_names_not_its_text() {
+    fn naming_this() -> Vec<(&'static str, String)> {
         let package = |rest: &str| format!("[package]\nname = \"tool\"\nversion = \"0.1.0\"\n{rest}");
-        for (label, manifest) in [
+        vec![
             ("comment", "[package] # the classifier\nname = \"safe-chains\"\nversion = \"0.1.0\"\n".to_string()),
             ("underscore", "[package]\nname = \"safe_chains\"\n".to_string()),
             ("dependency", package("[dependencies]\nsafe_chains = { path = \"..\" }\n")),
@@ -287,8 +365,97 @@ mod tests {
             ("dev", package("[dev-dependencies]\nsafe-chains = \"0.1\"\n")),
             ("target", package("[target.'cfg(unix)'.dependencies]\nsafe-chains = \"0.1\"\n")),
             ("binary", package("[[bin]]\nname = \"safe-chains\"\npath = \"src/main.rs\"\n")),
+            ("inherited", package("[dependencies]\nsafe-chains.workspace = true\n")),
             ("unparsed", "[package\nname = \"tool\"\n".to_string()),
+            ("virtual", "[workspace]\nmembers = []\n".to_string()),
+        ]
+    }
+
+    fn in_workspace(label: &str, root: &str, members: &[(&str, &str)], cmd: &str) -> bool {
+        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-ws-{label}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("src")).expect("workspace dir");
+        std::fs::write(dir.join("Cargo.toml"), root).expect("root manifest");
+        for (path, manifest) in members {
+            let member = dir.join(path);
+            std::fs::create_dir_all(&member).expect("member dir");
+            if !manifest.is_empty() {
+                std::fs::write(member.join("Cargo.toml"), manifest).expect("member manifest");
+            }
+        }
+        std::fs::create_dir_all(dir.join("crates")).expect("crates dir");
+        std::fs::write(dir.join("crates/README.md"), "notes\n").expect("file");
+        let _cwd = crate::pathctx::enter_cwd(Some(dir.to_string_lossy().into_owned()));
+        is_safe_command(cmd)
+    }
+
+    const ROOT: &str = "[package]\nname = \"wsroot\"\nversion = \"0.1.0\"\n";
+
+    #[test]
+    fn a_workspace_member_that_is_this_project_makes_the_workspace_this_project() {
+        let sc = "[package]\nname = \"safe-chains\"\n[[bin]]\nname = \"sc\"\npath = \"src/main.rs\"\n";
+        let other = "[package]\nname = \"other\"\n";
+        for (label, workspace) in [
+            ("defaults", "[workspace]\nmembers = [\"crates/*\"]\ndefault-members = [\"crates/sc\"]\n"),
+            ("glob", "[workspace]\nmembers = [\"crates/*\"]\n"),
+            ("listed", "[workspace]\nmembers = [\"crates/other\", \"./crates/sc/\"]\n"),
+            ("bracket", "[workspace]\nmembers = [\"crates/[os]*\"]\n"),
+            ("only-default", "[workspace]\ndefault-members = [\"crates/sc\"]\n"),
         ] {
+            let root = format!("{ROOT}{workspace}");
+            for cmd in ["cargo run -- config add x", "cargo run --bin sc -- config add x", "cargo run --bin sc -- mcp"] {
+                let members = [("crates/sc", sc), ("crates/other", other)];
+                assert!(!in_workspace(label, &root, &members, cmd), "{cmd} must not be approved in workspace {label}");
+            }
+        }
+        for (label, member) in naming_this() {
+            let root = format!("{ROOT}[workspace]\nmembers = [\"crates/*\"]\n");
+            let members = [("crates/a", member.as_str()), ("crates/other", other)];
+            assert!(!in_workspace(&format!("member-{label}"), &root, &members, "cargo run -- mcp"), "member {label} names this project");
+        }
+    }
+
+    #[test]
+    fn a_workspace_whose_members_cannot_all_be_read_counts_as_this_project() {
+        let other = "[package]\nname = \"other\"\n";
+        for (label, workspace, members) in [
+            ("no-manifest", "members = [\"crates/*\"]", vec![("crates/other", other), ("crates/empty", "")]),
+            ("missing", "members = [\"crates/gone\"]", vec![("crates/other", other)]),
+            ("deep-glob", "members = [\"crates/**\"]", vec![("crates/other", other)]),
+            ("not-a-list", "members = \"crates/*\"", vec![("crates/other", other)]),
+            ("not-a-string", "members = [1]", vec![("crates/other", other)]),
+            ("class", "members = [\"crates/[[:alpha:]]*\"]", vec![("crates/other", other)]),
+            ("dependency", "members = []\n[workspace.dependencies]\nsafe-chains = \"0.1\"", vec![]),
+        ] {
+            let root = format!("{ROOT}[workspace]\n{workspace}\n");
+            assert!(!in_workspace(label, &root, &members, "cargo run -- config add x"), "{label} must count as this project");
+        }
+        let many: Vec<(String, &str)> = (0..300).map(|i| (format!("crates/m{i}"), other)).collect();
+        let many: Vec<(&str, &str)> = many.iter().map(|(p, m)| (p.as_str(), *m)).collect();
+        assert!(!in_workspace("many", &format!("{ROOT}[workspace]\nmembers = [\"crates/*\"]\n"), &many, "cargo run -- mcp"));
+    }
+
+    #[test]
+    fn a_workspace_of_other_projects_may_be_run_with_any_arguments() {
+        let other = "[package]\nname = \"other\"\n";
+        let tool = "[package]\nname = \"tool\"\n[[bin]]\nname = \"sc\"\npath = \"src/main.rs\"\n";
+        for (label, workspace) in [
+            ("glob", "[workspace]\nmembers = [\"crates/*\"]\nexclude = []\n"),
+            ("self", "[workspace]\nmembers = [\".\", \"crates/*\"]\n"),
+            ("empty", "[workspace]\n"),
+        ] {
+            let root = format!("{ROOT}{workspace}");
+            for cmd in ["cargo run -- config add x", "cargo run --bin sc -- mcp"] {
+                let members = [("crates/other", other), ("crates/tool", tool)];
+                assert!(in_workspace(&format!("other-{label}"), &root, &members, cmd), "{cmd} should be approved in workspace {label}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_manifest_is_this_project_by_its_names_not_its_text() {
+        let package = |rest: &str| format!("[package]\nname = \"tool\"\nversion = \"0.1.0\"\n{rest}");
+        for (label, manifest) in naming_this() {
             assert!(!in_manifest(label, &manifest, "cargo run -- mcp"), "{label} must count as this project");
         }
         for (label, manifest) in [

@@ -37,7 +37,8 @@ Four deliberate exceptions read the filesystem, all racing the shell (accepted i
   unless `--bin safe-chains` or `-p` says which binary runs (a `--bin` or `--example` naming another
   target still reads it), so the check applies only to this
   project (`src/handlers/cargo_runs_this.rs`), after following links. An unknown or missing folder, or a
-  manifest that does not parse or has no package of its own, counts as this project.
+  manifest that does not parse or has no package of its own, counts as this project; so does a
+  workspace with a member that is, or one whose members cannot all be read.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`
