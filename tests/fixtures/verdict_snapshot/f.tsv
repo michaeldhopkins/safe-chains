@@ -798,6 +798,7 @@ find ./src | cpio --pass-through --insecure ./dst	denied
 find ./src | cpio --pass-through ./dst	safe-write
 find ./src | cpio -o	safe-write
 find ./src | cpio -o -O ./a.cpio	safe-write
+find ./src | cpio -o -O user@host:a.cpio	denied
 find ./src | cpio -oO ./archive.cpio	safe-write
 find ./src | cpio -p --insecure ./dst	denied
 find ./src | cpio -p ./dst	safe-write

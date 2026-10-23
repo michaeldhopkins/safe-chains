@@ -150,7 +150,12 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
                 || coreutils::rsync_shell::names_a_program_to_run(tokens)
         }
         "export" | "declare" | "ps" | "mise" => env_print::prints_the_environment(tokens),
-        "pax" | "cpio" => coreutils::archive_extract::extracts(tokens) || coreutils::stdin_names::reads_names_it_cannot_check(tokens),
+        "pax" => coreutils::archive_extract::extracts(tokens) || coreutils::stdin_names::reads_names_it_cannot_check(tokens),
+        "cpio" => {
+            coreutils::archive_extract::extracts(tokens)
+                || coreutils::stdin_names::reads_names_it_cannot_check(tokens)
+                || coreutils::archive_extract::opens_a_remote_archive(tokens)
+        }
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "ditto" | "xar" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
         _ => false,

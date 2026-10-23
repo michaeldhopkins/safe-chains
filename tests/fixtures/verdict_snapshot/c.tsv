@@ -6622,6 +6622,7 @@ cpio -idm	denied
 cpio -im	denied
 cpio -it	safe-write
 cpio -it -f '*.o'	safe-write
+cpio -itFhost:a.cpio	denied
 cpio -j	safe-write
 cpio -l	safe-write
 cpio -m	safe-write
@@ -6636,8 +6637,12 @@ cpio -p ./dst	denied
 cpio -pd ./dst --insecure	denied
 cpio -r	safe-write
 cpio -t	safe-write
+cpio -t --file=host:/tmp/a.cpio	denied
+cpio -t -F ./backups/a:b.cpio	safe-write
+cpio -t -F host:a.cpio	denied
 cpio -t -F i	safe-write
 cpio -t -W extract	denied
+cpio -t -f -F host:a.cpio	denied
 cpio -u	safe-write
 cpio -v	safe-write
 cpio -v -W ext	denied

@@ -20,6 +20,52 @@ use crate::parse::Token;
 ///
 /// ptar extracts with `-x`, and ptargrep extracts every member that matches unless `-l` or
 /// `--list-only` comes before the first operand (Getopt::Long stops there under POSIXLY_CORRECT).
+/// GNU cpio opens an archive named `host:path` or `user@host:path` (`-F`, `-I`, `-O`, `--file`)
+/// on another machine through rsh or ssh, unless `--force-local` is given. The name is judged under
+/// both cpios' option letters, as `extracts` judges them.
+pub(crate) fn opens_a_remote_archive(tokens: &[Token]) -> bool {
+    let arguments = tokens.get(1..).unwrap_or_default();
+    if arguments.iter().any(|token| token.as_str() == "--force-local") {
+        return false;
+    }
+    let remote = |name: &str| name.split('/').next().is_some_and(|head| head.contains(':'));
+    let bsd: &[char] = &['C', 'D', 'E', 'F', 'H', 'I', 'M', 'O', 'R', 'W', 'f'];
+    [bsd, &bsd[..bsd.len() - 1]].iter().any(|takes_a_value| {
+        let mut words = arguments.iter().map(Token::as_str);
+        while let Some(word) = words.next() {
+            if word == "--" {
+                return false;
+            }
+            if let Some(name) = word.strip_prefix("--file=") {
+                if remote(name) {
+                    return true;
+                }
+                continue;
+            }
+            if word == "--file" {
+                if words.next().is_some_and(remote) {
+                    return true;
+                }
+                continue;
+            }
+            let Some(cluster) = word.strip_prefix('-').filter(|c| !c.is_empty() && !c.starts_with('-')) else {
+                continue;
+            };
+            for (at, c) in cluster.char_indices() {
+                if takes_a_value.contains(&c) {
+                    let glued = &cluster[at + c.len_utf8()..];
+                    let value = if glued.is_empty() { words.next() } else { Some(glued) };
+                    if matches!(c, 'F' | 'I' | 'O') && value.is_some_and(remote) {
+                        return true;
+                    }
+                    break;
+                }
+            }
+        }
+        false
+    })
+}
+
 pub(crate) fn extracts(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else {
         return false;
@@ -245,6 +291,11 @@ mod tests {
         seven_zip_extract_upper_case: "7z X ./a.7z",
         seven_zip_extract_after_switches: "7zz -y x ./a.7z",
         seven_zip_extract_after_a_spaced_switch_value: "7za -o ./out x ./a.7z",
+        cpio_lists_a_remote_archive: "cpio -t -F host:a.cpio",
+        cpio_lists_a_remote_archive_glued: "cpio -itFhost:a.cpio",
+        cpio_writes_a_remote_archive: "find ./src | cpio -o -O user@host:a.cpio",
+        cpio_reads_a_remote_archive_long: "cpio -t --file=host:/tmp/a.cpio",
+        cpio_reads_a_remote_archive_behind_a_gnu_nonmatching_letter: "cpio -t -f -F host:a.cpio",
     }
 
     safe! {
@@ -256,6 +307,7 @@ mod tests {
         seven_zip_list: "7z l ./a.7z",
         seven_zip_add_a_file_named_x: "7z a ./out.7z x",
         seven_zip_test: "7z t ./a.7z",
+        cpio_lists_an_archive_with_a_colon_below_a_folder: "cpio -t -F ./backups/a:b.cpio",
     }
 
     denied! {
