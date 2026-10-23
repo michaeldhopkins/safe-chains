@@ -2,8 +2,8 @@
 //! may carry a subscript.
 
 use super::{
-    INERT, NUMERIC, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, is_free, is_integer, is_numeric, read_text,
-    refuse_if, value_verdict,
+    INERT, INTEGER, NUMERIC, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, is_free, is_integer, is_numeric,
+    read_text, refuse_if, value_verdict,
 };
 use crate::cst::{SimpleCmd, Word};
 use crate::parse::Token;
@@ -20,13 +20,20 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
             .map(|(n, value)| {
                 let refused = is_free(n) || !is_integer(value);
                 NUMERIC.with(|numeric| numeric.borrow_mut().push(n.to_string()));
+                if !refused {
+                    INTEGER.with(|i| i.borrow_mut().push(n.to_string()));
+                }
                 refused
             })
             .collect();
         return env.combine(refuse_if(refused.contains(&true)));
     }
     let set = match super::super::opaque::named(cmd) {
-        Some(names) => names.iter().map(|n| value_verdict(n, "*")).fold(INERT, Verdict::combine),
+        Some(_) => args
+            .iter()
+            .filter(|w| !w.starts_with(['-', '+']))
+            .map(|w| declared_verdict(name, w))
+            .fold(INERT, Verdict::combine),
         // Which names are set is not known: any numeric one could take an expression.
         None => {
             let names_numeric = args.iter().any(|w| is_numeric(w.split('=').next().unwrap_or_default()));
@@ -34,6 +41,18 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
         }
     };
     env.combine(set)
+}
+
+/// One name a setter names: `local n=0` gives it a number, `read n` or `local n=$x` anything.
+fn declared_verdict(command: &str, operand: &str) -> Verdict {
+    let assigns = matches!(command, "declare" | "typeset" | "local" | "export" | "readonly");
+    match operand.split_once('=') {
+        Some((n, value)) if assigns && !value.is_empty() && is_integer(value) => {
+            INTEGER.with(|i| i.borrow_mut().push(n.to_string()));
+            INERT
+        }
+        _ => value_verdict(operand.split('=').next().unwrap_or_default(), "*"),
+    }
 }
 
 /// The commands whose arguments are arithmetic, assignments through a subscript (`a[x]=1`), values

@@ -19,8 +19,8 @@ pub fn command_verdict(input: &str) -> Verdict {
         return Verdict::Denied;
     };
     let verdict = script_verdict(&script);
-    if scope_budget_spent() {
-        return Verdict::Denied; // shell state untrackable within budget — fail closed
+    if super::scope_budget::walk_untrusted() {
+        return Verdict::Denied; // shell state the walk could not track — fail closed
     }
     verdict
 }

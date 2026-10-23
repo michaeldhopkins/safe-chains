@@ -79,14 +79,14 @@ fn explain_inner(input: &str) -> Explanation {
     // per-segment view — and the hook's coverage fallback built on it — would re-allow a call whose
     // definition shadows a builtin (`ls(){ rm; }; ls`) that the whole-command verdict denies.
     let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, segment_report);
-    // The scope walk exceeded its uncertain-binding budget: too much shell state to track, so the
-    // command is refused — the same fail-closed call `command_verdict` makes, so the explanation
-    // can never describe a more permissive verdict than the one enforced (the `explain_render`
-    // target's first property). One denied segment for the whole input, as for an unparseable one:
+    // The scope walk exceeded its uncertain-binding budget (too much shell state to track), or a
+    // name it read as a number took something else later in the line, so the command is refused —
+    // the same fail-closed call `command_verdict` makes, so the explanation can never describe a
+    // more permissive verdict than the one enforced (the `explain_render` target's first property). One denied segment for the whole input, as for an unparseable one:
     // per-segment marks would claim a granularity the walk no longer earned. NOT liftable by the
     // coverage overlay above — a user rule cannot cover a refusal that exists because what the
     // command does to later segments cannot be bounded.
-    if super::check::scope_budget_spent() {
+    if super::scope_budget::walk_untrusted() {
         return Explanation {
             overall: Verdict::Denied,
             segments: vec![SegmentReport { text: input.trim().to_string(), verdict: Verdict::Denied, culprit: None }],

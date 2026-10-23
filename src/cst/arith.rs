@@ -42,15 +42,28 @@ pub(crate) fn expression_verdict(text: &str) -> Verdict {
 
 fn holds_an_expression(name: &str) -> bool {
     match binding(name) {
-        Binding::Loop => true,
-        Binding::Value(value) => !is_integer(&value) && !(value == super::scope_budget::UNCERTAIN_VALUE && counts(name)),
+        Binding::Loop => !counted(name),
+        Binding::Value(value) => !is_integer(&value) && !(value == super::scope_budget::UNCERTAIN_VALUE && counted(name)),
         Binding::Unbound => false,
     }
 }
 
+/// `counts`, remembering the name: a loop's next pass or a function called again may run an
+/// assignment written further on before this read, so [`numbers_contradicted`] asks again once the
+/// whole line has been walked.
+fn counted(name: &str) -> bool {
+    COUNTED.with(|c| c.borrow_mut().push(name.to_string()));
+    counts(name)
+}
+
+/// A name read as a number somewhere in the line took something else elsewhere in it. Checked by
+/// the verdict entry points after the walk, which refuse the line.
+pub(super) fn numbers_contradicted() -> bool {
+    COUNTED.with(|c| c.borrow().iter().any(|name| !counts(name)))
+}
+
 /// Every value this line gave `name` was a number, though not one known: `n=$(date +%s)`,
-/// `i=$((i + 1))`. A name that took anything else anywhere in the line does not count, since a loop
-/// or a function called later may run that assignment after this one.
+/// `i=$((i + 1))`.
 fn counts(name: &str) -> bool {
     let free = FREE.with(|f| f.borrow().iter().any(|x| x == name || x == "*"));
     !free && INTEGER.with(|i| i.borrow().iter().any(|x| x == name))
@@ -117,9 +130,10 @@ fn read_text(word: &Word) -> (String, Verdict) {
     (text, v)
 }
 
-/// A command whose output can only be a number: `date` printing numeric fields (`+%s`), and `wc`
-/// counting its input. Its output stands in arithmetic as the number it is, so the common
-/// `$(( $(date +%s) - start ))` keeps working; the command itself is judged where it stands.
+/// A command whose output can only be a number: `date` printing numeric fields (`+%s`), `wc`
+/// counting its input, and `seq` counting between integers. Its output stands in arithmetic as the
+/// number it is, so the common `$(( $(date +%s) - start ))` keeps working; the command itself is
+/// judged where it stands.
 fn numeric_output(script: &Script) -> bool {
     // A pipeline prints what its last command prints.
     let [Stmt { pipeline: Pipeline { commands, .. }, op: None }] = script.0.as_slice() else {
@@ -142,6 +156,7 @@ fn numeric_output(script: &Script) -> bool {
         && match words.split_first() {
             Some((name, args)) if name == "date" => args.iter().all(|w| w == "-u" || numeric_format(w)),
             Some((name, args)) if name == "wc" => !args.is_empty() && args.iter().all(|w| matches!(w.as_str(), "-l" | "-c" | "-w" | "-m")),
+            Some((name, args)) if name == "seq" => !args.is_empty() && args.iter().all(|w| !w.is_empty() && is_integer(w)),
             _ => false,
         }
 }
@@ -240,6 +255,8 @@ thread_local! {
     static FREE: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
     /// Names this line gave a number it cannot name: a command's count or an arithmetic result.
     static INTEGER: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+    /// Names read as numbers while their value was one this line gave but could not name.
+    static COUNTED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Called as an outermost scope walk starts, beside the function registry's reset.
@@ -247,6 +264,7 @@ pub(crate) fn forget_numeric_names() {
     NUMERIC.with(|n| n.borrow_mut().clear());
     FREE.with(|f| f.borrow_mut().clear());
     INTEGER.with(|i| i.borrow_mut().clear());
+    COUNTED.with(|c| c.borrow_mut().clear());
 }
 
 /// The shells' own integer variables, numeric before any line declares them: bash's and zsh's.
@@ -264,9 +282,8 @@ fn is_free(name: &str) -> bool {
     FREE.with(|f| f.borrow().iter().any(|x| x == name || x == "*")) || holds_an_expression(name)
 }
 
-/// `name` took a value that may not be a number: also called for each name the scope walk re-binds
-/// because something it cannot attribute (a loop's later pass, a called function) may change it.
-pub(super) fn mark_free(name: &str) {
+/// `name` took a value that may not be a number.
+fn mark_free(name: &str) {
     FREE.with(|f| f.borrow_mut().push(name.to_string()));
 }
 
@@ -293,7 +310,7 @@ pub(crate) fn loop_verdict(var: &str, items: &[Word]) -> Verdict {
     if items.is_empty() {
         return value_verdict(var, "*");
     }
-    items.iter().map(|item| value_verdict(var, &item.eval())).fold(INERT, Verdict::combine)
+    items.iter().map(|item| assigned_verdict(var, item)).fold(INERT, Verdict::combine)
 }
 
 #[cfg(test)]

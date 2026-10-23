@@ -98,7 +98,6 @@ fn enter_uncertain_binding() -> bool {
 /// tracking exists for. Over budget it stops: the classification denies.
 pub(super) fn rebind_uncertain(names: impl IntoIterator<Item = String>, vars: &mut Vec<pathctx::VarGuard>) {
     for name in names {
-        super::arith::mark_free(&name);
         if already_uncertain(&name) {
             continue;
         }
@@ -113,6 +112,12 @@ pub(super) fn rebind_uncertain(names: impl IntoIterator<Item = String>, vars: &m
 /// exactly as they do on a spent classification budget.
 pub(super) fn scope_budget_spent() -> bool {
     SCOPE_SPENT.with(std::cell::Cell::get)
+}
+
+/// What the finished walk could not vouch for: the budget above was spent, or a name read as a
+/// number took something else later in the line.
+pub(super) fn walk_untrusted() -> bool {
+    scope_budget_spent() || super::arith::numbers_contradicted()
 }
 
 #[cfg(test)]

@@ -152,6 +152,12 @@ fn a_command_output_read_as_arithmetic_is_refused() {
         "echo $(( $(date +%x) ))",
         "echo $(( $(wc -l f) ))",
         "echo $(( $(date -d x +%s) ))",
+        "echo $(( $(seq -f HOME=%g 1) ))",
+        "for i in $(seq 1 5) HOME=1; do echo $((i)); done; git log",
+        "f() { i='HOME=1'; }; for i in $(seq 1 5); do f; echo $((i)); done; git log",
+        "for i in $(seq 1 5); do :; done; i='HOME=1'; echo $((i)); git log",
+        "for i in $(seq 3); do while :; do echo $((i)); i='HOME=1'; done; done; git log",
+        "i=5; for i in *; do echo $((i)); done; git log",
     ] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
@@ -166,8 +172,36 @@ fn a_command_output_read_as_arithmetic_is_refused() {
         "echo $(( `date -u +%Y%m%d` ))",
         "n=$(date +%s); i=$((n % 7)); echo $((i + 1))",
         "count=$(wc -l < f); echo $((count+1))",
+        "for i in $(seq 1 5); do echo $((i+1)); done",
+        "for i in 1 $(seq 3); do echo $((i * 2)); done",
     ] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn a_counter_kept_in_a_loop_is_read_as_the_number_it_is() {
+    for cmd in [
+        "i=0; while [ $i -lt 3 ]; do echo $i; i=$((i+1)); done",
+        "n=5; while [ $n -gt 0 ]; do echo $n; n=$((n-1)); done",
+        "sum=0; for n in 1 2 3; do sum=$((sum+n)); done; echo $sum",
+        "i=0; for x in a b c; do i=$((i+1)); echo $i; done",
+        "declare -i c=0; echo $((c+1))",
+        "typeset -i n=5; echo $((n))",
+        "f() { n=0; while :; do n=$((n+1)); done; }; f",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+    for cmd in [
+        "i=0; while :; do echo $((i)); i='HOME=1'; done; git log",
+        "f() { echo $((n)); }; n=$(date +%s); f; n=$(cat v); f; git log",
+        "n=0; for k in 1 2; do echo $((n)); { n='HOME=1'; }; done; git log",
+        "n=0; while :; do echo $((n)); read n; done; git log",
+        "n=0; while :; do echo $((n)); . ./env; done; git log",
+        "n=0; while :; do echo $((n)); declare n=x; done; git log",
+        "declare n=0 n=x; while :; do echo $((n)); done; git log",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
     }
 }
 
