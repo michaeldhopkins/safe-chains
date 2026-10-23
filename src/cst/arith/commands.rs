@@ -148,7 +148,7 @@ fn fans_out(word: &Word) -> bool {
 /// never `-v` nor a name ending in `]`.
 fn may_glob_a_name(word: &Word) -> bool {
     let text = word.eval();
-    let tail = text.rfind(['*', '?', '[', ']']).map_or("", |at| &text[at + 1..]);
+    let tail = text.rsplit(['*', '?', '[', ']']).next().unwrap_or_default();
     let under_a_directory = text.contains('/') && !text.contains('[');
     globbed(word) && !under_a_directory && !tail.contains('.')
 }
@@ -258,7 +258,8 @@ fn formatted(args: &[String], fanned: &[bool]) -> Vec<usize> {
     if !slots.contains(&true) {
         return Vec::new();
     }
-    if fanned[i + 1..].contains(&true) {
+    // `fanned[i]`, the format, was looked at above.
+    if fanned[i..].contains(&true) {
         return (i + 1..args.len()).collect();
     }
     // The format is reused until the arguments run out, so argument k fills slot k mod its length.
@@ -283,8 +284,8 @@ fn print_formatted(args: &[String], fanned: &[bool]) -> Vec<usize> {
             continue;
         }
         let Some(cluster) = word.strip_prefix('-') else { continue };
-        let Some(at) = cluster.find('f') else { continue };
-        let format = if at + 1 == cluster.len() { args.get(i + 1).map(String::as_str) } else { Some(&cluster[at + 1..]) };
+        let Some((_, glued)) = cluster.split_once('f') else { continue };
+        let format = if glued.is_empty() { args.get(i + 1).map(String::as_str) } else { Some(glued) };
         first.get_or_insert(i);
         numeric |= format.is_some_and(|format| numeric_slots(format).contains(&true));
     }
