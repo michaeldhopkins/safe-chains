@@ -20,6 +20,11 @@ fn project(dirs: &[&str]) -> Project {
     Project { _dir: dir, root }
 }
 
+fn climb_to(p: &Project, target: &std::path::Path) -> String {
+    let depth = std::path::Path::new(&p.root).components().count() - 1;
+    format!("{}{}", "../".repeat(depth), target.to_str().expect("utf-8").trim_start_matches('/'))
+}
+
 fn at(p: &Project, cmd: &str) -> Verdict {
     command_verdict_in(cmd, PathCtx { cwd: Some(p.root.clone()), root: Some(p.root.clone()), session_id: None })
 }
@@ -222,10 +227,9 @@ fn tar_follows_a_link_from_the_directory_in_effect() {
         assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
     }
 
-    let outside = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("directory beside the project");
-    let name = outside.path().file_name().and_then(|n| n.to_str()).expect("directory name");
+    let outside = tempfile::tempdir_in("/tmp").expect("directory outside the project");
     let abs = outside.path().canonicalize().expect("canonical directory").to_str().expect("utf-8").to_string();
-    let beside = format!("tar -chf - -C ../{name} .");
+    let beside = format!("tar -chf - -C {} .", climb_to(&plain, std::path::Path::new(&abs)));
     let absolute = format!("tar -chf - -C {abs} .");
     assert!(at(&plain, &beside).is_allowed(), "{beside} was refused with nothing linked there");
     assert!(at(&plain, &absolute).is_allowed(), "an absolute directory with no link was refused");
@@ -252,27 +256,25 @@ fn zip_follows_links_in_names_read_from_stdin() {
 fn ag_follows_links_into_the_path_after_its_pattern() {
     let secret = "/etc/ssh/not-a-real-key";
     let plain = project(&["src"]);
-    let parent = std::path::Path::new(&plain.root).parent().expect("project parent");
+    let scratch = tempfile::tempdir_in("/tmp").expect("folder outside the project");
+    let parent = scratch.path().canonicalize().expect("canonical folder");
     let other = parent.join("other");
     let nested = parent.join("p2").join("sub");
-    let _ = std::fs::remove_dir_all(&other);
-    let _ = std::fs::remove_dir_all(parent.join("p2"));
     std::fs::create_dir_all(&other).expect("sibling directory");
     std::fs::create_dir_all(&nested).expect("nested sibling");
-    let abs = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("absolute directory");
+    let abs = tempfile::tempdir_in("/tmp").expect("absolute directory");
     let abs_path = abs.path().canonicalize().expect("canonical directory");
     let absolute = format!("ag -f x {}", abs_path.display());
-    for cmd in ["ag -f x ../other", "ag -f x ../p2/sub", absolute.as_str()] {
+    let (to_other, to_nested) = (format!("ag -f x {}", climb_to(&plain, &other)), format!("ag -f x {}", climb_to(&plain, &nested)));
+    for cmd in [to_other.as_str(), to_nested.as_str(), absolute.as_str()] {
         assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused with no link");
     }
     std::os::unix::fs::symlink(secret, other.join("s")).expect("link");
     std::os::unix::fs::symlink(secret, nested.join("s")).expect("link");
     std::os::unix::fs::symlink(secret, abs_path.join("s")).expect("link");
-    for cmd in ["ag -f x ../other", "ag -f x ../p2/sub", absolute.as_str()] {
+    for cmd in [to_other.as_str(), to_nested.as_str(), absolute.as_str()] {
         assert!(!at(&plain, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
     }
-    let _ = std::fs::remove_dir_all(parent.join("p2"));
-    let _ = std::fs::remove_dir_all(&other);
 
     let linked = with_secret_link(true);
     let clean = with_secret_link(false);
