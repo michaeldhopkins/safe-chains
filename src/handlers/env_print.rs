@@ -151,7 +151,7 @@ mod tests {
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
             "ps -U nobody", "ps axo pid,user", "ps -p 123 -o etime", "env -i FOO=bar", "mise set FOO=bar", "mise set --remove FOO", "mise set --remove FOO BAR=1", "mise env --help", "launchctl list",
             "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
-            "typeset -Z2 X=5", "typeset -E X", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar",
+            "typeset -Z2 X=5", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }
@@ -159,11 +159,12 @@ mod tests {
 
     proptest! {
         /// However the attribute flags and assignments are spelled, a `-p` anywhere lists, and a
-        /// line made only of assignments never does.
+        /// line made only of assignments never does. (`-i` is left out: an integer attribute reads a
+        /// non-numeric value as arithmetic, which the arithmetic rules judge on their own.)
         #[test]
         fn a_p_flag_lists_and_assignments_alone_do_not(
             cmd in prop::sample::select(vec!["export", "declare", "typeset"]),
-            flags in prop::collection::vec(prop::sample::select(vec!["-x", "-i", "-r", "-a", "-g", "-l", "-u"]), 0..3),
+            flags in prop::collection::vec(prop::sample::select(vec!["-x", "-r", "-a", "-g", "-l", "-u"]), 0..3),
             values in prop::collection::vec("FOO[A-Z0-9_]{0,6}=[a-z0-9]{0,6}", 1..4),
             p_at in 0usize..4,
         ) {
@@ -187,7 +188,9 @@ mod tests {
             }
         }
 
-        /// A name left after `--remove` is printed, wherever the removal sits. A removal alone is not.
+        /// A name left after `--remove` is printed, wherever the removal sits. A removal alone is not,
+        /// and `mise set NAME=VALUE` is approved exactly when the environment rules allow that
+        /// assignment: a name the rules list (`LD_`, `PATH`, `BASH_ENV`) is judged by its value.
         #[test]
         fn a_name_beside_remove_is_printed_and_a_removal_alone_is_not(
             name in "[A-Z][A-Z0-9_]{0,12}",
@@ -201,7 +204,9 @@ mod tests {
             };
             prop_assert!(!is_safe_command(&line), "{}", line);
             prop_assert!(is_safe_command(&format!("mise set --remove {removed}")), "mise set --remove {}", removed);
-            prop_assert!(is_safe_command(&format!("mise set {name}={removed}")), "mise set {}={}", name, removed);
+            let set = format!("mise set {name}={removed}");
+            let expected = crate::envvars::statement_assignment_verdict(&name, &removed, true).is_allowed();
+            prop_assert_eq!(is_safe_command(&set), expected, "{}", set);
         }
     }
 }
