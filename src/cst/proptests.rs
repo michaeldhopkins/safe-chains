@@ -692,6 +692,22 @@ mod resolution {
         }
 
         #[test]
+        fn a_hash_that_binds_a_name_to_a_path_is_refused_and_a_lookup_is_not(
+            name in proptest::sample::select(&["ls", "git", "echo"][..]),
+            binary in proptest::sample::select(&["/bin/rm", "./x.sh", "$X"][..]),
+            binding in proptest::sample::select(&["-p {b} {n}", "-rp {b} {n}", "{n}={b}", "-d {n}={b}"][..]),
+            sep in proptest::sample::select(&["\n", "; ", " && "][..]),
+        ) {
+            let _w = workspace();
+            let line = format!("hash {}{sep}echo done", binding.replace("{b}", binary).replace("{n}", name));
+            proptest::prop_assert!(!allowed(&line), "{line:?}");
+            for lookup in [format!("hash {name}"), format!("hash -t {name}"), "hash -r".to_string(), "hash".to_string()] {
+                let line = format!("{lookup}{sep}echo done");
+                proptest::prop_assert!(allowed(&line), "{line:?}");
+            }
+        }
+
+        #[test]
         fn a_function_the_shell_runs_unnamed_is_judged_at_its_definition(
             name in proptest::sample::select(&[
                 "TRAPEXIT", "TRAPZERR", "TRAPDEBUG", "TRAPINT", "command_not_found_handler", "command_not_found_handle",

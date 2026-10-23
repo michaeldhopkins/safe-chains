@@ -261,10 +261,10 @@ hash --help	denied
 hash --version	denied
 hash -d	inert
 hash -d -l	inert
-hash -d -p x	inert
+hash -d -p x	denied
 hash -d x	inert
 hash -l	inert
-hash -p x	inert
+hash -p x	denied
 hash -r	inert
 hash -t	inert
 hash x	inert

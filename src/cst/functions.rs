@@ -98,8 +98,10 @@ fn begin_resolving(name: &str) -> Option<ResolveScope> {
 ///
 /// A call to `alias` that defines one denies too: an alias rebinds a name for every later line,
 /// and zsh's global ones (`alias -g`) any word at all, which no call here can see. Listing does not.
+/// So does a `hash` that binds a name to a path (`hash -p /bin/rm ls`, zsh's `hash ls=/bin/rm`):
+/// the shell then runs that file for the name, ahead of PATH.
 pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
-    if body_unknown(name) || (name == "alias" && defines_an_alias(cmd)) {
+    if body_unknown(name) || rebinds_a_name(cmd, name) {
         return Some(Verdict::Denied);
     }
     let body = lookup_function(name)?;
@@ -145,10 +147,14 @@ fn runs_unnamed(name: &str) -> bool {
         )
 }
 
-/// Whether an `alias` call defines one: an argument holding `=`, or one we cannot read.
-fn defines_an_alias(cmd: &SimpleCmd) -> bool {
-    cmd.words[1..].iter().any(|w| {
-        let value = super::check::certain_value(w);
-        value == super::scope_budget::UNCERTAIN_VALUE || value.contains('=')
-    })
+/// Whether an `alias` or `hash` call binds a name: an argument holding `=`, one we cannot read, or
+/// `hash`'s `-p` in any cluster of its short flags.
+fn rebinds_a_name(cmd: &SimpleCmd, name: &str) -> bool {
+    let values = || cmd.words[1..].iter().map(super::check::certain_value);
+    let binds = || values().any(|v| v == super::scope_budget::UNCERTAIN_VALUE || v.contains('='));
+    match name {
+        "alias" => binds(),
+        "hash" => binds() || values().any(|v| v.starts_with('-') && !v.starts_with("--") && v.contains('p')),
+        _ => false,
+    }
 }
