@@ -814,31 +814,17 @@ fn assert_flat_or_structured(toml: &TomlCommand) -> Result<(), String> {
     if toml.sub.is_empty() {
         return Ok(());
     }
-    let mut conflicts = Vec::new();
-    if !toml.standalone.is_empty() {
-        conflicts.push("standalone");
-    }
-    if !toml.valued.is_empty() {
-        conflicts.push("valued");
-    }
-    if toml.max_positional.is_some() {
-        conflicts.push("max_positional");
-    }
-    if toml.tolerate_unknown_short.is_some() {
-        conflicts.push("tolerate_unknown_short");
-    }
-    if toml.tolerate_unknown_long.is_some() {
-        conflicts.push("tolerate_unknown_long");
-    }
-    if toml.numeric_dash.is_some() {
-        conflicts.push("numeric_dash");
-    }
-    if toml.single_dash_words.is_some() {
-        conflicts.push("single_dash_words");
-    }
-    if !toml.reads_commands_from.is_empty() {
-        conflicts.push("reads_commands_from");
-    }
+    let set = [
+        ("standalone", !toml.standalone.is_empty()),
+        ("valued", !toml.valued.is_empty()),
+        ("max_positional", toml.max_positional.is_some()),
+        ("tolerate_unknown_short", toml.tolerate_unknown_short.is_some()),
+        ("tolerate_unknown_long", toml.tolerate_unknown_long.is_some()),
+        ("numeric_dash", toml.numeric_dash.is_some()),
+        ("single_dash_words", toml.single_dash_words.is_some()),
+        ("reads_commands_from", !toml.reads_commands_from.is_empty()),
+    ];
+    let conflicts: Vec<&str> = set.iter().filter(|(_, present)| *present).map(|(name, _)| *name).collect();
     if !conflicts.is_empty() {
         fail!(
             "command '{}' mixes flat-style top-level fields ({}) with [[command.sub]] blocks. \

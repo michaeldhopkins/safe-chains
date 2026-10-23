@@ -288,10 +288,8 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
 fn shell_program_verdict(value: &str) -> Verdict {
     const STD_BINS: &[&str] = &["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
     const SHELLS: &[&str] = &["sh", "bash", "zsh", "dash", "ksh", "tcsh", "csh", "fish"];
-    let Some(name) = STD_BINS.iter().find_map(|p| value.strip_prefix(p)) else {
-        return Verdict::Denied;
-    };
-    if SHELLS.contains(&name) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+    let shell = STD_BINS.iter().find_map(|p| value.strip_prefix(p));
+    if shell.is_some_and(|name| SHELLS.contains(&name)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 /// Every token of an interpreter flag string must match a researched-inert prefix.
