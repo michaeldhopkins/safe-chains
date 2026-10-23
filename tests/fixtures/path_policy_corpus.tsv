@@ -106,6 +106,9 @@ deny	read-shield	cat ~/.local/share/amp/secrets.json
 deny	read-shield	cat ~/.claude.json
 deny	read-shield	jq .mcpServers ~/.claude.json
 deny	read-shield	grep token ~/.codex/auth.json
+deny	read-shield	cat ~/.claude.json.backup
+deny	read-shield	cat ~/.claude/backups/.claude.json.backup.1700000000
+deny	read-shield	grep -r key ~/.claude/backups
 deny	read-shield	jq . ~/.claude/.credentials.json
 deny	read-shield	cat ~/.config/hub
 deny	read-shield	cat ~/.s3cfg
