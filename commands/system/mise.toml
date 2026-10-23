@@ -132,7 +132,7 @@ standalone = ["--all", "--help", "-a", "-h"]
 [[command.sub]]
 name = "set"
 level = "SafeWrite"
-standalone = ["--file", "--global", "--help", "--remove", "-f", "-g", "-h"]
+standalone = ["--file", "--help", "--remove", "-f", "-h"]
 
 [[command.sub]]
 name = "unset"

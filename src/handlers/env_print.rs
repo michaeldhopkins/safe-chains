@@ -53,8 +53,12 @@ fn ps_shows_the_environment(arguments: &[Token]) -> bool {
     while let Some(word) = words.next() {
         if valued.iter().any(|v| v == word) {
             words.next();
+        } else if word.starts_with('-') {
+            continue;
         } else if bsd_options_show_the_environment(word) {
             return true;
+        } else if word.ends_with(['o', 'O']) && word.chars().all(|c| c.is_ascii_alphabetic()) {
+            words.next();
         }
     }
     false
@@ -103,8 +107,14 @@ fn only_known_attributes(letters: &str) -> bool {
     })
 }
 
+/// A word without a dash that macOS ps may read as BSD options: letters with a pid glued on, or a
+/// word whose text is not known until the shell expands it.
 fn bsd_options_show_the_environment(word: &str) -> bool {
-    !word.starts_with('-') && word.chars().all(|c| c.is_ascii_alphabetic()) && word.contains(['e', 'E'])
+    if word.contains(['$', '`']) || word.contains(crate::cst::eval::TAGGED_PREFIX) {
+        return true;
+    }
+    let letters: String = word.chars().filter(|c| !c.is_ascii_digit()).collect();
+    letters.chars().all(|c| c.is_ascii_alphabetic()) && letters.contains(['e', 'E'])
 }
 
 #[cfg(test)]
@@ -121,7 +131,10 @@ mod tests {
             "mise set OPENAI_API_KEY", "mise set -g", "mise set --remove X OPENAI_API_KEY", "mise set FAKEKEY --remove X",
             "mise set --remove=X FAKEKEY", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate",
             "export -", "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'",
-            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE", "typeset -m 'OPENAI*' X=1",
+            "declare -m 'A*'", "typeset -xm 'A*'", "typeset -m FOO", "ps E", "ps Eww", "ps axE", "ps E1", "ps axE1", "ps auxE123", "ps wwE1234", "ps e1", "ps wwE$$", "ps E12345", "ps Eww12345", "ps \"E$$\"", "ps $(echo e)",
+            "ps $(echo -E)", "ps \"$(echo a)e\"", "ps a$(echo e)", "ps `echo e`", "ps -o pid $(echo e)", "ps 1e2", "ps axo pid e", "env -i \"X=$OPENAI_API_KEY\"",
+            "env -i \"X=${OPENAI_API_KEY}\"", "env -i X=\"`cat k`\"", "COMMAND_MODE=legacy ps -ef", "env COMMAND_MODE=legacy ps -e",
+            "mise set -g RUSTC_WRAPPER=./w", "mise set --global BASH_ENV=./x.sh", "mise set -g FOO=1", "ps wwE$$", "ps E12345", "ps Eww12345", "ps \"E$$\"", "ps $(echo e)", "ps $(echo -E)", "ps \"$(echo a)e\"", "ps a$(echo e)", "ps `echo e`", "ps -o pid $(echo e)", "ps 1e2", "typeset -m 'OPENAI*' X=1",
             "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'", "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1",
             "typeset -1 X", "typeset -1x X", "typeset -9 X", "typeset +9 X", "declare -0 X", "declare +1 X", "typeset -1 Y=2 X",
             "typeset -x1 X", "export -1 X", "export -0 X", "typeset -Q X", "declare -1i X", "typeset +1x X",
@@ -136,7 +149,7 @@ mod tests {
             "export FOO=bar", "export FOO", "export -n FOO", "export PATH_EXTRA=./bin", "declare -i count=5", "declare -x FOO=bar",
             "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
-            "ps -U nobody", "mise set FOO=bar", "mise set --remove FOO", "mise set --remove FOO BAR=1", "mise env --help", "launchctl list",
+            "ps -U nobody", "ps axo pid,user", "ps -p 123 -o etime", "env -i FOO=bar", "mise set FOO=bar", "mise set --remove FOO", "mise set --remove FOO BAR=1", "mise env --help", "launchctl list",
             "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
             "typeset -Z2 X=5", "typeset -E X", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar",
         ] {
