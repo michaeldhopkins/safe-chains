@@ -20,7 +20,7 @@
 //!   outside the workspace but for a temporary folder, a project file that runs later (`.git`,
 //!   `.envrc`, an agent's or editor's project settings), an AI agent or its package, or safe-chains.
 //!   Removing them can only join or split words, so this finds every name the shell would see.
-//! - The whole command reaches no protected place by [`crate::workspace_overreach`].
+//! - No place the whole command reaches, by `workspace_reaches`, is protected.
 //! - Each refused segment's [`fix_for`] answer is an entry, a grant, a level, or a read of a
 //!   runs-later place, never a credential, a device, a frozen file, an agent or an interpolation.
 
@@ -97,7 +97,47 @@ fn is_boundary_reason(reason: ReachReason) -> bool {
 }
 
 fn reaches_a_boundary(command: &str) -> bool {
-    crate::workspace_overreach(command).is_some_and(|(_, reason)| is_boundary_reason(reason))
+    crate::workspace_reaches(command).any(|(_, reason)| is_boundary_reason(reason))
+}
+
+/// Whether `word`, read from the working directory, passes through a link on disk and leads to a
+/// protected place or out of the workspace. The other checks read a path as written, and `key`
+/// committed as a link to `~/.ssh/id_rsa` is written like any file name. A link whose end cannot
+/// be found counts as leading out.
+fn leads_out_through_a_link(word: &str) -> bool {
+    let (Some(cwd), Some(root)) = (crate::pathctx::cwd(), crate::pathctx::root()) else {
+        return false;
+    };
+    let expanded = expand_home(word);
+    let root = std::path::Path::new(&root);
+    let full = std::path::Path::new(&cwd).join(&expanded);
+    // Walked as written, so a path that ends outside the workspace is left to the other checks,
+    // which judge it as written; only links met inside the workspace count. The root's own place
+    // on disk is the workspace by definition.
+    let mut at = std::path::PathBuf::from("/");
+    let mut crossed = false;
+    for part in full.components() {
+        match part {
+            std::path::Component::ParentDir => {
+                at.pop();
+            }
+            std::path::Component::Normal(name) => {
+                at.push(name);
+                crossed |=
+                    at.starts_with(root) && at != root && std::fs::symlink_metadata(&at).is_ok_and(|meta| meta.file_type().is_symlink());
+            }
+            _ => {}
+        }
+    }
+    if !crossed || !at.starts_with(root) {
+        return false;
+    }
+    let (Ok(real), Ok(workspace)) = (std::fs::canonicalize(&full), std::fs::canonicalize(root)) else {
+        return true;
+    };
+    let text = real.to_string_lossy();
+    names_a_protected_place(&text)
+        || !(real.starts_with(&workspace) || crate::pathctx::under_temp_root(&text) || crate::pathctx::in_session_scratchpad(&text))
 }
 
 /// Whether a READ grant on `path` alone would get `segment` approved: the segment only reads the
@@ -166,6 +206,7 @@ fn words_name_a_boundary(text: &str) -> bool {
             || names_an_agent_package(&word)
             || path_parts(&word).any(|path| names_a_protected_place(path) || leaves_the_workspace(path))
             || path_parts(&word).any(names_a_place_that_runs_later_here)
+            || path_parts(&word).chain(option_cluster_suffixes(&word)).any(leads_out_through_a_link)
     })
 }
 
@@ -189,14 +230,27 @@ fn names_an_agent_package(word: &str) -> bool {
         .any(|name| word.contains(name))
 }
 
-/// The parts of a word that may be a path: the word, and for an option with its value attached
-/// (`-o../x`, `-t/usr/bin`) the value, from its first `/`, `.` or `~`.
+/// A short-option cluster's glued value can start at any letter after the first (`sort -orc`
+/// writes `rc`, `grep -fkey` reads `key`), so each such suffix is a name the command may open.
+fn option_cluster_suffixes(word: &str) -> impl Iterator<Item = &str> {
+    let cluster = word.strip_prefix('-').filter(|rest| !rest.starts_with('-')).unwrap_or("");
+    cluster.char_indices().skip(1).map(move |(at, _)| &cluster[at..])
+}
+
+/// The parts of a word that may be a path: the word; for an option with its value attached
+/// (`-o../x`, `-t/usr/bin`) the value, from its first `/`, `.` or `~`; and whatever follows each `@`,
+/// which curl, gcc and many others read as a file to open (`curl -d @key`).
 fn path_parts(word: &str) -> impl Iterator<Item = &str> {
     let attached = word
         .strip_prefix('-')
         .filter(|rest| !rest.starts_with('-'))
         .and_then(|rest| rest.find(['/', '.', '~']).map(|at| &rest[at..]));
-    std::iter::once(word).chain(attached)
+    // `pkg@~4.17` is a version range, not a home: nothing expands `~user` after an `@`.
+    let after_at = word
+        .match_indices('@')
+        .map(|(at, _)| &word[at + 1..])
+        .filter(|part| !part.starts_with('~') || part.starts_with("~/"));
+    std::iter::once(word).chain(attached).chain(after_at)
 }
 
 /// Whether `word`, read as a path, names somewhere outside the workspace other than a temporary
@@ -205,14 +259,19 @@ fn leaves_the_workspace(word: &str) -> bool {
     if !(word.starts_with(['~', '/', '.']) || word.contains('/')) {
         return false;
     }
-    let home = std::env::var("HOME").unwrap_or_default();
-    let expanded = match word.strip_prefix('~') {
-        Some(rest) if rest.is_empty() || rest.starts_with('/') => format!("{home}{rest}"),
-        _ => word.to_string(),
-    };
+    let expanded = expand_home(word);
     let resolved = crate::pathctx::resolve(&expanded);
     let outside = resolved.starts_with(['/', '~']) || resolved == ".." || resolved.starts_with("../");
     outside && !crate::pathctx::under_temp_root(&resolved) && !crate::pathctx::in_session_scratchpad(&resolved)
+}
+
+/// `word` with a leading `~` or `~/` read as the home folder, as the shell reads it.
+fn expand_home(word: &str) -> String {
+    let home = std::env::var("HOME").unwrap_or_default();
+    match word.strip_prefix('~') {
+        Some(rest) if rest.is_empty() || rest.starts_with('/') => format!("{home}{rest}"),
+        _ => word.to_string(),
+    }
 }
 
 fn names_a_protected_place(word: &str) -> bool {

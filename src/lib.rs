@@ -351,11 +351,15 @@ pub fn sanitize_display(s: &str) -> String {
 /// credential store outranks the hidden-peer wording; a hidden peer path outranks the generic
 /// outside-workspace reason.
 pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
-    if let Some(found) = reach::repository_snapshot(command) {
-        return Some(found);
-    }
-    let operands = operands::operand_words(command)?;
-    operands.into_iter().find_map(|operands::Operand { text, resolved }| {
+    workspace_reaches(command).next()
+}
+
+/// Every reach [`workspace_overreach`] could report for `command`, in its order: it reports the
+/// first, and an earlier temporary path would hide a later credential from anything that asks it.
+pub(crate) fn workspace_reaches(command: &str) -> impl Iterator<Item = (String, ReachReason)> {
+    let snapshot = reach::repository_snapshot(command);
+    let operands = operands::operand_words(command).unwrap_or_default();
+    snapshot.into_iter().chain(operands.into_iter().filter_map(|operands::Operand { text, resolved }| {
         if !policy::looks_like_path(&text) {
             return None;
         }
@@ -379,7 +383,7 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
             return None;
         }
         Some((t, reach::classify(&resolved)))
-    })
+    }))
 }
 
 #[cfg(test)]
