@@ -388,3 +388,22 @@ fn a_reading_that_reaches_text_no_call_set_is_refused() {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }
 }
+
+/// `print` and `return` are refused as commands today, so only the arithmetic verdict shows that
+/// their arguments are read as numbers.
+#[test]
+fn builtins_that_read_a_number_refuse_an_argument_that_assigns() {
+    let _g = enter(PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), session_id: None });
+    let verdict = |text: &str| {
+        super::forget_numeric_names();
+        let script = crate::cst::parse::parse(text).expect("parses");
+        let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple: {text}") };
+        super::commands::command_verdict(cmd).is_allowed()
+    };
+    for text in ["return y", "shift y", "print -f %d y", "print -f%d y", "print -f %s -f %d y", "print -rf %d y"] {
+        assert!(!verdict(text), "should be refused: {text}");
+    }
+    for text in ["return 1", "print -f %s y"] {
+        assert!(verdict(text), "should be allowed: {text}");
+    }
+}

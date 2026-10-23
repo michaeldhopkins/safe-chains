@@ -75,8 +75,8 @@ pub(crate) fn command_verdict(cmd: &SimpleCmd) -> Verdict {
     let numeric = numeric_verdict(cmd, &name, args);
     let arithmetic: Vec<usize> = match name.as_str() {
         "shift" | "return" | "break" | "continue" => (0..args.len()).collect(),
-        "printf" => formatted(args, |w| w == "-v"),
-        "print" if args.iter().any(|w| w.starts_with('-') && w.contains('f')) => formatted(args, |w| w.contains('f')),
+        "printf" => formatted(args),
+        "print" => print_formatted(args),
         "read" => option_values(args, &['t', 'k', 'u']),
         _ => Vec::new(),
     };
@@ -131,11 +131,11 @@ fn tested_names(args: &[String]) -> Vec<usize> {
 }
 
 /// The arguments a format string reads as numbers: every one after the format, unless the format
-/// is known to hold no numeric conversion. `takes_value` names the option whose value comes next.
-fn formatted(args: &[String], takes_value: fn(&str) -> bool) -> Vec<usize> {
+/// is known to hold no numeric conversion.
+fn formatted(args: &[String]) -> Vec<usize> {
     let mut i = 0;
     while let Some(arg) = args.get(i).filter(|w| w.starts_with('-') && w.len() > 1) {
-        i += if takes_value(arg) { 2 } else { 1 };
+        i += if arg == "-v" { 2 } else { 1 };
         if arg == "--" {
             break;
         }
@@ -147,6 +147,25 @@ fn formatted(args: &[String], takes_value: fn(&str) -> bool) -> Vec<usize> {
     }
     // The format is reused until the arguments run out, so argument k fills slot k mod its length.
     (i + 1..args.len()).filter(|k| slots[(k - i - 1) % slots.len()]).collect()
+}
+
+/// zsh's `print -f format`: the format is the option's value, attached (`-f%d`) or the next word,
+/// the last `-f` wins and options may follow it. So every format any `-f` could take is read, and
+/// when one reads a number every argument after the first `-f` counts.
+fn print_formatted(args: &[String]) -> Vec<usize> {
+    let mut first = None;
+    let mut numeric = false;
+    for (i, word) in args.iter().enumerate() {
+        let Some(cluster) = word.strip_prefix('-') else { continue };
+        let Some(at) = cluster.find('f') else { continue };
+        let format = if at + 1 == cluster.len() { args.get(i + 1).map(String::as_str) } else { Some(&cluster[at + 1..]) };
+        first.get_or_insert(i);
+        numeric |= format.is_some_and(|format| numeric_slots(format).contains(&true));
+    }
+    match first {
+        Some(first) if numeric => (first + 1..args.len()).collect(),
+        _ => Vec::new(),
+    }
 }
 
 /// Whether each argument the format takes is read as a number, in order: a `*` width or precision
