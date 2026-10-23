@@ -11,7 +11,9 @@
 //! `nocaseglob`, `GLOBIGNORE`, `nullglob`) when the session set them before this command: bash's
 //! defaults are assumed. A line that turns on dot names itself is judged with them on (`enter_dot_names`).
 
+mod dot_names;
 use crate::cst::{Word, WordPart};
+pub(crate) use dot_names::{dot_names_matched, enter_dot_names};
 
 /// More entries than this across the walk, or more matches in all, and the word stays unknown.
 const MAX_ENTRIES: usize = 4096;
@@ -65,7 +67,9 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
                 names.extend([".".to_string(), "..".to_string()]);
             }
             for name in names {
-                if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched()) && matches(component.as_bytes(), name.as_bytes())? {
+                if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched())
+                    && matches(component.as_bytes(), name.as_bytes())?
+                {
                     next.push(join(prefix, &name, absolute));
                 }
             }
@@ -99,29 +103,6 @@ thread_local! {
     static EXPANDED: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
     static TOKENS: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
     static UNRESOLVED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-    static DOT_NAMES: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-}
-
-/// While held, `*` also matches names that start with a dot. A line that turns on bash's `dotglob`,
-/// sets `GLOBIGNORE` (which turns `dotglob` on too) or turns on zsh's `GLOB_DOTS` anywhere is judged
-/// so throughout: the words are matched without reading the shell, so `shopt -s dotglob; rm -rf *`
-/// reaches `.git`. Entering never turns it off for a line an outer guard already marked.
-pub(crate) struct DotNamesGuard(bool);
-
-impl Drop for DotNamesGuard {
-    fn drop(&mut self) {
-        DOT_NAMES.with(|cell| cell.set(self.0));
-    }
-}
-
-pub(crate) fn enter_dot_names(line: &str) -> DotNamesGuard {
-    let folded: String = line.chars().filter(|c| *c != '_').flat_map(char::to_lowercase).collect();
-    let on = ["dotglob", "globdots", "globignore"].iter().any(|option| folded.contains(option));
-    DOT_NAMES.with(|cell| DotNamesGuard(cell.replace(cell.get() || on)))
-}
-
-pub(crate) fn dot_names_matched() -> bool {
-    DOT_NAMES.with(std::cell::Cell::get)
 }
 
 pub(super) struct ExpandedGuard(Vec<String>);
@@ -289,7 +270,8 @@ fn listed(dir: &str, component: &str, seen: &mut usize) -> Option<Vec<String>> {
     }
     let mut matched = Vec::new();
     for name in names {
-        if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched()) && matches(component.as_bytes(), name.as_bytes())? {
+        if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched()) && matches(component.as_bytes(), name.as_bytes())?
+        {
             matched.push(name);
             if matched.len() > MAX_MATCHES {
                 return None;

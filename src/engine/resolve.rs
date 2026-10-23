@@ -16,10 +16,12 @@ use crate::parse::{Token, has_flag};
 mod backup;
 mod capability;
 mod path_verdicts;
+mod tar_paths;
 mod transfer;
 pub(crate) use path_verdicts::{
     read_content_verdict, read_tree_verdict, rebind_is_stricter_than_write, worst_path_element, write_target_verdict,
 };
+pub(crate) use tar_paths::tar_bound;
 use transfer::resolve_transfer;
 mod flags;
 pub(crate) mod frozen_reach;
@@ -977,18 +979,6 @@ type TarPositional<'a> = (Option<String>, &'a str);
 /// A tar positional borrowed for classification: (`-C` dir, path).
 type TarRef<'a> = (Option<&'a str>, &'a str);
 
-/// A tar member/archive path resolved against an active `-C` directory: `DIR/path` for a
-/// relative path, or `path` unchanged when there is no `-C` or the path is absolute (an
-/// absolute member ignores `-C`).
-pub(crate) fn tar_bound(dir: Option<&str>, path: &str) -> String {
-    match dir {
-        Some(d) if !path.starts_with('/') && !path.starts_with('~') && !path.starts_with('-') => {
-            format!("{}/{}", d.trim_end_matches('/'), path)
-        }
-        _ => path.to_string(),
-    }
-}
-
 /// Accumulated `tar` parse: the mode, whether `-f` wants an archive, and `reject` — set by
 /// any option we can't model safely (an unknown letter, or a value-taking option like `-T`
 /// / `-X` whose ordered operand consumption we don't track). `-C` IS modeled (see
@@ -1067,7 +1057,7 @@ impl<'a> TarParse<'a> {
         };
         // A `-` archive (or none) is a stdout/stdin stream, not a file to gate.
         let archive_file = archive.filter(|(_, a)| *a != "-");
-        if archive_file.is_some_and(|(_, a)| a.split('/').next().is_some_and(|head| head.contains(':'))) {
+        if archive_file.is_some_and(|(_, a)| tar_paths::names_a_remote_archive(a)) {
             return worst("tar: GNU tar opens an archive named host:path on another machine over rsh or ssh — worst-cased (§0)");
         }
 

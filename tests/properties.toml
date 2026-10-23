@@ -266,6 +266,8 @@ owed = [
   "awk_operands_and_the_option_policy_count_the_same_operands",
 ]
 "src/engine/resolve/link_mode.rs" = ["a_follow_flag_before_the_operands_end_always_follows"]
+"src/engine/resolve/tar_paths.rs" = ["a_relative_path_lands_below_the_change_directory_and_an_anchored_one_ignores_it", "only_a_colon_before_the_first_slash_names_a_host"]
+"src/cst/opaque/glob/dot_names.rs" = ["src/engine/resolve/frozen_walk_tests.rs::a_glob_after_the_line_turns_on_dot_names_reaches_frozen_names"]
 "src/handlers/coreutils/find_skip.rs" = ["src/handlers/coreutils/find_skip_tests.rs::only_a_word_that_keeps_entries_away_keeps_any"]
 "src/handlers/coreutils/find.rs" = [
   "dispatch_routes_find_to_is_safe_find_with_some_wrapper",
