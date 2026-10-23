@@ -76,7 +76,7 @@ fn expansions_and_arithmetic_that_only_read_are_untouched() {
         "echo ${x%=*}",
         "echo ${x/a=/b}",
         "echo $((1 + 2 == 3))",
-        "echo $((n <= 4 && n >= 1 && n != 2))",
+        "n=3; echo $((n <= 4 && n >= 1 && n != 2))",
         "echo ${x: -1}",
         "echo ${a[@]}",
         "echo '${HOME::=/tmp/x}'",
@@ -88,7 +88,7 @@ fn expansions_and_arithmetic_that_only_read_are_untouched() {
         "declare -x FOO=bar",
         "declare -i count=5",
         "declare -i count=5; count=7; echo $count",
-        "declare -i count; for count in 1 2 3; do echo $count; done",
+        "declare -i count=0; for count in 1 2 3; do echo $count; done",
         "name=abc; declare -i count=0",
         "declare -i count=1; name=abc",
     ] {
@@ -114,7 +114,8 @@ mod properties {
         ) {
             let assign = format!("{}; git log", context.replace("{e}", &format!("{name}{op}1")));
             prop_assert!(!allowed(&assign), "should be refused: {}", assign);
-            let compare = format!("{}; git log", context.replace("{e}", &format!("{name}==1")));
+            // Only a name holding a known number reads as one.
+            let compare = format!("count=5; {}; git log", context.replace("{e}", "1==count"));
             prop_assert!(allowed(&compare), "should be allowed: {}", compare);
         }
     }
@@ -158,6 +159,7 @@ fn a_command_output_read_as_arithmetic_is_refused() {
         "for i in $(seq 1 5); do :; done; i='HOME=1'; echo $((i)); git log",
         "for i in $(seq 3); do while :; do echo $((i)); i='HOME=1'; done; done; git log",
         "i=5; for i in *; do echo $((i)); done; git log",
+        "for i in {1..3} HOME=1; do echo $((i)); done; git log",
     ] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
@@ -173,6 +175,7 @@ fn a_command_output_read_as_arithmetic_is_refused() {
         "n=$(date +%s); i=$((n % 7)); echo $((i + 1))",
         "count=$(wc -l < f); echo $((count+1))",
         "for i in $(seq 1 5); do echo $((i+1)); done",
+        "for i in {1..3}; do echo $((i*2)); done",
         "for i in 1 $(seq 3); do echo $((i * 2)); done",
     ] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
@@ -284,5 +287,59 @@ fn a_descriptor_named_by_a_variable_is_refused() {
     }
     for cmd in ["echo {a} b", "echo {a,b} > /dev/null"] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn a_name_the_line_never_set_is_not_read_as_a_number() {
+    for cmd in [
+        "aarch64='HOME=1'; echo $(( HOSTTYPE )); git log",
+        "aarch64='HOME=1'; echo $(( $HOSTTYPE )); git log",
+        "aarch64='HOME=1'; [[ HOSTTYPE -eq 0 ]]; git log",
+        "apple='HOME=1'; echo $(( VENDOR )); git log",
+        "f() { HOME=1; }; echo $(( functions[f] )); git log",
+        "f() { HOME=1; }; echo $(( ${functions[f]} )); git log",
+        "f() { HOME=1; }; [[ functions[f] -eq 0 ]]; git log",
+        "f() { echo $(( a )); }; a='HOME=1' f; git log",
+        "a='HOME=1' :; echo $(( a )); git log",
+        "a='HOME=1' export b; echo $(( a )); git log",
+        "f() { echo $(( argv[1] )); }; f 'HOME=1'; git log",
+        "f() { echo $(( $argv )); }; f 'HOME=1'; git log",
+        "f() { echo $(( ${argv[-1]} )); }; f 'HOME=1'; git log",
+        "f() { echo $(( $10 )); }; f 1 2 3 4 5 6 7 8 9 'HOME=1'; git log",
+        "f() { echo $(( $~1 )); }; f 1; git log",
+        "f() { echo $(( ${~1} )); }; f 1; git log",
+        "f() { echo $(( ${(P)1} )); }; f x; git log",
+        "f() { echo $(( ${!1} )); }; f x; git log",
+        "f() { echo $(( ${(j: :)@} )); }; f 1; git log",
+        "f() { echo $(( $^@ )); }; f 1; git log",
+        "echo $(( $- )); git log",
+        "for v; do echo $((v)); done; git log",
+        "echo $(( $1 )); git log",
+        "bash -c 'echo $(( $1 ))' _ 'HOME=1'; git log",
+        "x='1 HOME=1'; f() { echo $(( $2 )); }; f $x; git log",
+        "f() { echo $(( $2 )); }; f {1,HOME=1}; git log",
+        "f() { echo $(( $3 )); }; f 1{,} 'HOME=1'; git log",
+        "f() { echo $(( $2 )); }; f * 'HOME=1'; git log",
+        "n=1; for k in 1 2; do echo $((n)); n='HOME=1'; done; git log",
+        "aarch64='HOME=1'; typeset -i HOSTTYPE; git log",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in [
+        "echo $(( COLUMNS / 2 ))", "echo $(( RANDOM % 6 ))", "f() { echo $(( $1 + $2 )); }; f 2 3", "f() { echo $(( $1 + 1 )); }; f 5 *",
+        "f() { echo $(( ${#1} )); }; f abc", "n=3; echo $(( n * 2 ))",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn printf_reads_only_its_numeric_slots_as_numbers() {
+    for cmd in ["printf '%d %s\\n' 5 hello", "printf '%*s' 5 x", "printf '%s=%d\\n' a 1 b 2", "printf '%%d %s' x"] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+    for cmd in ["printf '%s=%d\\n' a 1 b HOME=1; git log", "printf '%1$s' HOME=1; git log", "printf '%s %*d' a HOME=1 2; git log"] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
     }
 }

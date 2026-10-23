@@ -2,8 +2,8 @@
 //! may carry a subscript.
 
 use super::{
-    INERT, INTEGER, NUMERIC, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, is_free, is_integer, is_numeric,
-    read_text, refuse_if, value_verdict,
+    INERT, INTEGER, NUMERIC, arithmetic_word_verdict, assigned_verdict, bracketed, expression_verdict, holds_an_expression, is_free,
+    is_integer, is_numeric, read_text, refuse_if, value_verdict,
 };
 use crate::cst::{SimpleCmd, Word};
 use crate::parse::Token;
@@ -16,9 +16,13 @@ fn numeric_verdict(cmd: &SimpleCmd, name: &str, args: &[String]) -> Verdict {
     if declares {
         let operands = args.iter().filter(|w| !w.starts_with(['-', '+']));
         let refused: Vec<bool> = operands
-            .map(|w| w.split_once('=').map_or((w.as_str(), ""), |(n, value)| (n.trim_end_matches('+'), value)))
+            .map(|w| w.split_once('=').map_or((w.as_str(), None), |(n, value)| (n, Some(value))))
             .map(|(n, value)| {
-                let refused = is_free(n) || !is_integer(value);
+                // zsh evaluates the value a name already holds when it is declared without one, and
+                // `+=` adds to it.
+                let reads_old = value.is_none() || n.ends_with('+');
+                let n = n.trim_end_matches('+');
+                let refused = is_free(n) || !is_integer(value.unwrap_or_default()) || (reads_old && holds_an_expression(n));
                 NUMERIC.with(|numeric| numeric.borrow_mut().push(n.to_string()));
                 if !refused {
                     INTEGER.with(|i| i.borrow_mut().push(n.to_string()));
@@ -136,19 +140,29 @@ fn formatted(args: &[String], takes_value: fn(&str) -> bool) -> Vec<usize> {
             break;
         }
     }
-    match args.get(i) {
-        Some(format) if numeric_conversion(format) => (i + 1..args.len()).collect(),
-        _ => Vec::new(),
+    let Some(format) = args.get(i) else { return Vec::new() };
+    let slots = numeric_slots(format);
+    if !slots.contains(&true) {
+        return Vec::new();
     }
+    // The format is reused until the arguments run out, so argument k fills slot k mod its length.
+    (i + 1..args.len()).filter(|k| slots[(k - i - 1) % slots.len()]).collect()
 }
 
-/// A `*` width or precision reads its number from the arguments too: `printf '%*s' 5 x`.
-fn numeric_conversion(format: &str) -> bool {
-    format.contains('$')
-        || format.split('%').skip(1).any(|spec| {
-            let conversion = spec.trim_start_matches(|c: char| "-+ #0123456789.*".contains(c));
-            spec[..spec.len() - conversion.len()].contains('*') || conversion.starts_with(|c: char| "diouxXeEfFgGaAc".contains(c))
-        })
+/// Whether each argument the format takes is read as a number, in order: a `*` width or precision
+/// takes one (`printf '%*s' 5 x`), then the conversion. A `%1$d` picks its argument by number, so
+/// every one counts.
+fn numeric_slots(format: &str) -> Vec<bool> {
+    if format.contains('$') {
+        return vec![true];
+    }
+    let mut slots = Vec::new();
+    for spec in format.replace("%%", "").split('%').skip(1) {
+        let conversion = spec.trim_start_matches(|c: char| "-+ #0123456789.*".contains(c));
+        slots.extend(spec[..spec.len() - conversion.len()].matches('*').map(|_| true));
+        slots.push(conversion.starts_with(|c: char| "diouxXeEfFgGaAc".contains(c)));
+    }
+    slots
 }
 
 /// The values of the options in `letters`: `-t 5` and `-t5` alike.

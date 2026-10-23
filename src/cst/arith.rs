@@ -41,14 +41,27 @@ pub(crate) fn expression_verdict(text: &str) -> Verdict {
     refuse_if(
         assigns
             || text.contains(UNKNOWN)
+            || reads_through_a_flag(text)
             || names(text).iter().any(|name| holds_an_expression(name))
             || (every_argument && any_argument_holds_an_expression()),
     )
 }
 
+/// The arguments are not known (`1` unbound: the shell's own, or a `bash -c` string's), a call
+/// passed more than are checked, or one of them holds an expression.
 fn any_argument_holds_an_expression() -> bool {
     let bound = |i: usize| !matches!(binding(&i.to_string()), Binding::Unbound);
-    bound(MAX_ARGUMENTS + 1) || (1..=MAX_ARGUMENTS).take_while(|&i| bound(i)).any(|i| holds_an_expression(&i.to_string()))
+    !bound(1) || bound(MAX_ARGUMENTS + 1) || (1..=MAX_ARGUMENTS).take_while(|&i| bound(i)).any(|i| holds_an_expression(&i.to_string()))
+}
+
+/// A flag or modifier between `$` and the name changes what is read: zsh's `$~x`, `$^x`, `$=x`,
+/// `${(P)x}` and `${(j: :)@}`, bash's `${!x}`, and `$-`, whose letters read as a name.
+fn reads_through_a_flag(text: &str) -> bool {
+    text.match_indices('$').any(|(at, _)| {
+        let after = &text[at + 1..];
+        after.starts_with(['~', '^', '=', '+', '-'])
+            || after.strip_prefix('{').is_some_and(|b| b.starts_with(['!', '~', '^', '=', '(', '+']))
+    })
 }
 
 /// How many of a function's arguments `$@` is checked through; a call passing more is refused.
@@ -61,15 +74,32 @@ const SHELL_SET: &[&str] = &[
     "BASH_ARGV", "FUNCNAME", "BASH_SOURCE", "PWD", "OLDPWD", "BUFFER", "LBUFFER", "RBUFFER",
 ];
 
+/// Only a value known to be a number is read as one. A name the line never set holds whatever the
+/// shell or its caller gave it, and that text can name a variable the line did set: bash's
+/// `HOSTTYPE` holds `aarch64`, so `aarch64='HOME=1'; echo $((HOSTTYPE))` assigns HOME. So can zsh's
+/// `argv`, its `functions` table, and a prefix assignment that outlives its command
+/// (`a='HOME=1' f`, `a='HOME=1' :`).
 fn holds_an_expression(name: &str) -> bool {
     if SHELL_SET.contains(&name) {
         return true;
     }
     match binding(name) {
         Binding::Loop => !counted(name),
-        Binding::Value(value) => !is_integer(&value) && !(value == super::scope_budget::UNCERTAIN_VALUE && counted(name)),
-        Binding::Unbound => false,
+        Binding::Value(value) if value == super::scope_budget::UNCERTAIN_VALUE => !counted(name),
+        Binding::Value(value) => !is_integer(&value) || !read_as_number(name),
+        Binding::Unbound => !SHELL_INTEGERS.contains(&name),
     }
+}
+
+/// A name bound to a number, remembered: a loop's next pass may give it something else written
+/// further on, which [`numbers_contradicted`] sees once the line has been walked.
+fn read_as_number(name: &str) -> bool {
+    NUMBERS.with(|n| n.borrow_mut().push(name.to_string()));
+    !given_other_than_a_number(name)
+}
+
+fn given_other_than_a_number(name: &str) -> bool {
+    FREE.with(|f| f.borrow().iter().any(|x| x == name || x == "*"))
 }
 
 /// `counts`, remembering the name: a loop's next pass or a function called again may run an
@@ -84,13 +114,13 @@ fn counted(name: &str) -> bool {
 /// the verdict entry points after the walk, which refuse the line.
 pub(super) fn numbers_contradicted() -> bool {
     COUNTED.with(|c| c.borrow().iter().any(|name| !counts(name)))
+        || NUMBERS.with(|n| n.borrow().iter().any(|name| given_other_than_a_number(name)))
 }
 
 /// Every value this line gave `name` was a number, though not one known: `n=$(date +%s)`,
 /// `i=$((i + 1))`.
 fn counts(name: &str) -> bool {
-    let free = FREE.with(|f| f.borrow().iter().any(|x| x == name || x == "*"));
-    !free && INTEGER.with(|i| i.borrow().iter().any(|x| x == name))
+    !given_other_than_a_number(name) && INTEGER.with(|i| i.borrow().iter().any(|x| x == name))
 }
 
 fn is_integer(value: &str) -> bool {
@@ -99,7 +129,8 @@ fn is_integer(value: &str) -> bool {
 }
 
 /// The identifiers in an expression. A run that starts with a digit is a number (`0x1F`, `16#ff`),
-/// unless `$` or `${` names an argument by it: `$1` is one digit, `${12}` all of them.
+/// unless `$` or `${` names an argument by it: `${12}` is all of them, and `$12` is the first in
+/// bash and both in zsh. `${#x}` is a length, which reads no value.
 fn names(text: &str) -> Vec<&str> {
     let mut out = Vec::new();
     let mut rest = text;
@@ -107,12 +138,17 @@ fn names(text: &str) -> Vec<&str> {
         let run = &rest[start..];
         let len = run.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_' || c == '#')).unwrap_or(run.len());
         let digits = run.find(|c: char| !c.is_ascii_digit()).unwrap_or(run.len());
+        let before = &rest[..start];
+        if before.ends_with("${#") {
+            rest = &run[len..];
+            continue;
+        }
         if !run.starts_with(|c: char| c.is_ascii_digit()) {
             out.push(run[..len].trim_end_matches('#'));
-        } else if rest[..start].ends_with("${") {
+        } else if before.ends_with("${") {
             out.push(&run[..digits]);
-        } else if rest[..start].ends_with('$') {
-            out.push(&run[..1]);
+        } else if before.ends_with('$') {
+            out.extend([&run[..1], &run[..digits]]);
         }
         rest = &run[len..];
     }
@@ -287,6 +323,8 @@ thread_local! {
     static INTEGER: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
     /// Names read as numbers while their value was one this line gave but could not name.
     static COUNTED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+    /// Names read as numbers while bound to a number the line wrote out.
+    static NUMBERS: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Called as an outermost scope walk starts, beside the function registry's reset.
@@ -295,6 +333,7 @@ pub(crate) fn forget_numeric_names() {
     FREE.with(|f| f.borrow_mut().clear());
     INTEGER.with(|i| i.borrow_mut().clear());
     COUNTED.with(|c| c.borrow_mut().clear());
+    NUMBERS.with(|n| n.borrow_mut().clear());
 }
 
 /// The shells' own integer variables, numeric before any line declares them: bash's and zsh's.
@@ -308,8 +347,10 @@ fn is_numeric(name: &str) -> bool {
     SHELL_INTEGERS.contains(&name) || NUMERIC.with(|n| n.borrow().iter().any(|x| x == name))
 }
 
+/// `name` took a value that is not a number. A name the line never set is not, here: declaring it
+/// numeric keeps any later value a number.
 fn is_free(name: &str) -> bool {
-    FREE.with(|f| f.borrow().iter().any(|x| x == name || x == "*")) || holds_an_expression(name)
+    given_other_than_a_number(name) || (!matches!(binding(name), Binding::Unbound) && holds_an_expression(name))
 }
 
 /// `name` took a value that may not be a number.
@@ -340,7 +381,15 @@ pub(crate) fn loop_verdict(var: &str, items: &[Word]) -> Verdict {
     if items.is_empty() {
         return value_verdict(var, "*");
     }
-    items.iter().map(|item| assigned_verdict(var, item)).fold(INERT, Verdict::combine)
+    let numbers = |item: &Word| item.expand().iter().all(|w| !w.is_empty() && is_integer(w));
+    let item_verdict = |item: &Word| {
+        if numbers(item) {
+            INTEGER.with(|i| i.borrow_mut().push(var.to_string()));
+            return INERT;
+        }
+        assigned_verdict(var, item)
+    };
+    items.iter().map(item_verdict).fold(INERT, Verdict::combine)
 }
 
 #[cfg(test)]

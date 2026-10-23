@@ -1968,6 +1968,8 @@ ln -v	denied
 ln -w	denied
 ln ./a ./b	safe-write
 ln x	denied
+ln=5; echo "line $((ln - 1))"	inert
+ln=5; prev=$((ln - 1))	inert
 lnav	denied
 lnav --help	inert
 lnav --help --version	inert

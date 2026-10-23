@@ -3544,8 +3544,8 @@ read -r -a x	inert
 read -r -s	inert
 read -r x	inert
 read -s	inert
-read -t x	inert
-read -u x	inert
+read -t x	denied
+read -u x	denied
 read x	inert
 readelf	denied
 readelf --all	inert

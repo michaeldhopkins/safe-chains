@@ -260,7 +260,6 @@ echo	inert
 echo "$(ls)"	inert
 echo "$(rm -rf /)"	denied
 echo "`rm -rf /`"	denied
-echo "line $((ln - 1))"	inert
 echo $(( (1 + 2) * 3 ))	inert
 echo $((1 + 2))	inert
 echo $(case A in *) echo a;; esac)	inert

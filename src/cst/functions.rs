@@ -108,10 +108,16 @@ pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
     let Some(_resolving) = begin_resolving(name) else {
         return Some(Verdict::Denied);
     };
+    // A word that may split or match files moves every later argument to a position not known.
+    let mut shifted = false;
     let _args: Vec<crate::pathctx::VarGuard> = cmd.words[1..]
         .iter()
         .enumerate()
-        .map(|(i, w)| crate::pathctx::enter_var((i + 1).to_string(), super::check::certain_value(w)))
+        .map(|(i, w)| {
+            shifted |= may_split(w);
+            let value = if shifted { super::scope_budget::UNCERTAIN_VALUE.to_string() } else { super::check::certain_value(w) };
+            crate::pathctx::enter_var((i + 1).to_string(), value)
+        })
         .collect();
     Some(super::netargs::with_args(cmd, || super::check::script_verdict(&body)))
 }
@@ -157,4 +163,18 @@ fn rebinds_a_name(cmd: &SimpleCmd, name: &str) -> bool {
         "hash" => binds() || values().any(|v| v.starts_with('-') && !v.starts_with("--") && v.contains('p')),
         _ => false,
     }
+}
+
+/// Whether `word` may become other than one argument: a brace list, a glob (zsh's extended
+/// operators included), or anything unquoted that expands, which splits in bash and vanishes when
+/// empty in zsh. `"$@"` and `"${a[@]}"` give a word per element even when quoted.
+fn may_split(word: &super::Word) -> bool {
+    use super::WordPart;
+    word.expand().len() != 1
+        || word.0.iter().any(|part| match part {
+            WordPart::Lit(s) => s.contains(['$', '*', '?', '[', '^', '#', '<']),
+            WordPart::DQuote(inner) => inner.eval().contains('@'),
+            WordPart::CmdSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) | WordPart::ProcSub(_) => true,
+            _ => false,
+        })
 }

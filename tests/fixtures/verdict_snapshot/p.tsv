@@ -9245,7 +9245,6 @@ prettier --version	denied
 prettier -c	inert
 prettier -l	inert
 prettier x	denied
-prev=$((ln - 1))	inert
 printafm	denied
 printafm --help	denied
 printafm --version	denied

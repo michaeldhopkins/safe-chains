@@ -953,9 +953,9 @@ mod tests {
         jj_diff_redirect_chain: "jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt",
 
         arith_basic: "echo $((1 + 2))",
-        arith_with_var: "prev=$((ln - 1))",
+        arith_with_var: "ln=5; prev=$((ln - 1))",
         arith_nested_parens: "echo $(( (1 + 2) * 3 ))",
-        arith_in_dquote: "echo \"line $((ln - 1))\"",
+        arith_in_dquote: "ln=5; echo \"line $((ln - 1))\"",
         arith_in_for_loop: "for i in 1 2; do echo $((i * 10)); done",
 
         dbracket_eq: "[[ \"a\" == \"a\" ]]",
