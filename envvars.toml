@@ -536,6 +536,17 @@ because = "git config can define aliases and core.pager, so a caller-controlled 
 [env.GIT_CONFIG_SYSTEM]
 shape = "config-file"
 because = "as GIT_CONFIG_GLOBAL"
+[env.ANSIBLE_CONFIG]
+shape = "config-file"
+because = "ansible.cfg can name a vault password file, which ansible runs when it is executable, and plugin and module folders it loads code from"
+[env.ANSIBLE_VAULT_PASSWORD_FILE]
+shape = "opaque"
+because = "ansible runs the named file when it is executable and reads its output as the vault password; a relative name is read from the working directory, not PATH"
+measured = false
+[env.ANSIBLE_VAULT_IDENTITY_LIST]
+shape = "opaque"
+because = "label@source pairs whose sources ansible runs when they are executable, as ANSIBLE_VAULT_PASSWORD_FILE"
+measured = false
 [env.ZDOTDIR]
 shape = "config-dir"
 because = "zsh sources .zshenv (and for a login or interactive shell .zprofile and .zshrc) from this directory"

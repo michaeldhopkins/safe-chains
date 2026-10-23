@@ -1,10 +1,17 @@
 [[command]]
 name = "ansible-vault"
-description = "Manages encrypted Ansible vault files. Subcommands: `view` / `decrypt` (read encrypted content), `encrypt` / `encrypt_string` / `rekey` (write — re-encrypt or replace files), `edit` (interactive — opens $EDITOR), `create` (interactive new). Each invocation reads or writes the local vault file with the configured password source."
+description = "Manages encrypted Ansible vault files. Subcommands: `view` / `decrypt` (read encrypted content), `encrypt` / `encrypt_string` / `rekey` (write — re-encrypt or replace files), `edit` (interactive — opens $EDITOR), `create` (interactive new). Each invocation reads or writes the local vault file with the configured password source. `--vault-password-file FILE` (alias `--vault-pass-file`) and `--vault-id label@FILE` run FILE when it is executable and read its output as the password, as do the ANSIBLE_VAULT_PASSWORD_FILE and ANSIBLE_VAULT_IDENTITY_LIST variables and an ansible.cfg `vault_password_file` setting."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
 researched_version = "Ansible 9.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 examples_safe = ["ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml"]
+examples_denied = [
+    "ansible-vault encrypt --vault-password-file ./pw.sh ./group_vars/all.yml",
+    "ansible-vault encrypt --vault-id dev@./pw.sh ./group_vars/all.yml",
+    "ansible-vault encrypt_string --vault-password-file=/tmp/x.sh secret",
+    "ansible-vault encrypt_string --vault-pass-file /tmp/x.sh secret",
+    "ANSIBLE_VAULT_PASSWORD_FILE=./pw.sh ansible-vault encrypt ./a.yml",
+]
 
 [command.path_gate]
 positional = "write"
@@ -18,8 +25,8 @@ source = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
 judgment = "Revealing a vault's decrypted contents to the model is a secret disclosure; conservative classification is decrypt-to-screen (credential exposure)."
 bare = false
 tolerate_unknown_short = true
-standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h", "--vault-password-file"]
-valued = ["--vault-id", "--vault-password-file", "--ask-vault-pass-file"]
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h"]
+valued = ["--ask-vault-pass-file"]
 
 [[command.sub]]
 name = "decrypt"
@@ -35,14 +42,14 @@ level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--encrypt-vault-id", "--help", "-h"]
-valued = ["--encrypt-vault-id", "--output", "--vault-id", "--vault-password-file"]
+valued = ["--encrypt-vault-id", "--output"]
 
 [[command.sub]]
 name = "encrypt_string"
 level = "SafeRead"
 bare = false
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "--show-input", "--stdin-name", "-h", "-n"]
-valued = ["--encrypt-vault-id", "--name", "--stdin-name", "--vault-id", "--vault-password-file"]
+valued = ["--encrypt-vault-id", "--name", "--stdin-name"]
 
 [[command.sub]]
 name = "create"
