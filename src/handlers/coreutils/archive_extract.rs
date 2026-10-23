@@ -205,11 +205,17 @@ mod tests {
     safe! {
         pax_write_with_a_format_before_the_operands: "pax -w -x ustar -f ./out.tar ./src",
         pax_write_naming_a_second_source_after_the_first: "pax -w -f ./out.tar ./src ./docs",
+        ptar_create_from_a_list: "ptar -c -T ./files.txt -f ./a.tar",
+        ptar_create_to_stdout: "ptar -c -f - ./src",
     }
 
     denied! {
         pax_write_with_a_late_format_naming_a_key_folder: "pax -w ./src -x ~/.ssh",
         pax_copy_with_late_options_naming_a_key_folder: "pax -rw ./src ./dst -o ~/.ssh",
+        ptar_archives_a_credential_file_to_stdout: "ptar -c -f - ~/.aws/credentials",
+        ptar_archives_the_files_a_key_lists: "ptar -c -T ~/.ssh/id_rsa -f ./a.tar",
+        ptar_writes_the_archive_over_a_login_file: "ptar -c -f ~/.zshrc ./src",
+        ptargrep_lists_a_key_archive: "ptargrep -l pattern ~/.ssh/keys.tar",
     }
 
     proptest! {

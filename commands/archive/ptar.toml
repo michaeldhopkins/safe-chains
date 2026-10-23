@@ -10,10 +10,13 @@ standalone = [
     "-v", "-x", "-z",
 ]
 valued = ["-T", "-f"]
+examples_safe = ["ptar -c -f ./out.tar ./src", "ptar -t -f ./a.tar"]
 
-# -f names the archive ptar creates in -c mode.
+# -f names the archive ptar creates in -c mode. The operands of -c are hierarchies ptar walks and
+# stores, and -T names a file listing more of them.
 [command.path_gate]
-flags = { "-f" = "write" }
+positional = "read_tree"
+flags = { "-f" = "write", "-T" = "read" }
 
 [[command]]
 name = "ptardiff"
@@ -24,6 +27,11 @@ level = "Inert"
 bare = false
 max_positional = 1
 standalone = ["-h"]
+examples_safe = ["ptardiff ./a.tar"]
+
+# ptardiff reads the archive it names.
+[command.path_gate]
+positional = "read"
 
 [[command]]
 name = "ptargrep"
@@ -37,3 +45,8 @@ standalone = [
     "--list-only", "--verbose",
     "-?", "-b", "-i", "-l", "-v",
 ]
+examples_safe = ["ptargrep -l pattern ./a.tar"]
+
+# The operands after the pattern are archives ptargrep reads; the pattern is gated as a read too.
+[command.path_gate]
+positional = "read"

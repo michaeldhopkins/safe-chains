@@ -10119,8 +10119,13 @@ ptar -C -c	safe-write
 ptar -C x	safe-write
 ptar -T x	safe-write
 ptar -c	safe-write
+ptar -c -T ./files.txt -f ./a.tar	safe-write
+ptar -c -T ~/.ssh/id_rsa -f ./a.tar	denied
+ptar -c -f - ./src	safe-write
+ptar -c -f - ~/.aws/credentials	denied
 ptar -c -f -x ./src	safe-write
 ptar -c -f ./out.tar ./src	safe-write
+ptar -c -f ~/.zshrc ./src	denied
 ptar -f ./a.tar -x	denied
 ptar -f x	safe-write
 ptar -h	safe-write
@@ -10139,6 +10144,7 @@ ptardiff --help	denied
 ptardiff --version	denied
 ptardiff -h	inert
 ptardiff -h x	inert
+ptardiff ./a.tar	inert
 ptardiff x	inert
 ptargrep	denied
 ptargrep -- pattern ./a.tar --list-only	denied
@@ -10156,6 +10162,7 @@ ptargrep -b	denied
 ptargrep -i	denied
 ptargrep -l	safe-write
 ptargrep -l pattern ./a.tar	safe-write
+ptargrep -l pattern ~/.ssh/keys.tar	denied
 ptargrep -v	denied
 ptargrep pattern ./a.tar	denied
 ptargrep pattern ./a.tar -l	denied
