@@ -877,7 +877,10 @@ mod resolution {
         // Direct and mutual recursion must terminate (bounded) and deny — no hang, no stack blow-up.
         assert!(!allowed("f(){ f; }; f"), "direct recursion");
         assert!(!allowed("f(){ g; }; g(){ f; }; f"), "mutual recursion");
-        let deep = (0..80).map(|i| format!("f{i}(){{ f{}; }}; ", i + 1)).collect::<String>() + "f0";
-        assert!(!allowed(&deep), "deep non-recursive chain past the depth cap denies, not overflows");
+        // The chain ends in a harmless call, so only the depth cap refuses the long one.
+        let chain =
+            |n: usize| (0..n).map(|i| format!("f{i}(){{ f{}; }}; ", i + 1)).collect::<String>() + &format!("f{n}(){{ echo hi; }}; f0");
+        assert!(allowed(&chain(10)), "a chain inside the depth cap resolves");
+        assert!(!allowed(&chain(80)), "deep non-recursive chain past the depth cap denies, not overflows");
     }
 }

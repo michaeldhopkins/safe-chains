@@ -789,6 +789,7 @@ mod tests {
         assert!(check("f(){ cat \"$2\"; }; f a ./ok"));
         assert!(check("f(){ cat \"$2\"; }; f \"$X\" ./ok"), "quoted, it stays one word");
         assert!(check("f(){ cat \"$2\"; }; IFS=,; f a ./ok"));
+        assert!(check("f(){ cat \"$2\"; }; f 'a b' ./ok"), "single-quoted, a space is not a split");
         let moved = [
             "f(){ cat \"$2\"; }; f $X ./ok", "f(){ cat \"$2\"; }; f x$X ./ok", "f(){ cat \"$2\"; }; f $(pwd) ./ok",
             "f(){ cat \"$2\"; }; f $(echo a) ./ok", "f(){ cat \"$2\"; }; f \"$@\" ./ok", "f(){ cat \"$2\"; }; f {a,b} ./ok",

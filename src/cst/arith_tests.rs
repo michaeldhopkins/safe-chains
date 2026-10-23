@@ -561,3 +561,30 @@ fn printf_reads_the_slot_each_argument_fills_after_the_options_before_the_format
     assert!(!verdict("printf -v out '%s %s %d' x y HOME=1"));
     assert!(verdict("printf -v out '%s %s %d' HOME=1 x 5"));
 }
+
+/// zsh's `(P)` flag reads the variable `x` names as `${!x}` does, so a name holding a subscript
+/// that assigns is refused. Tested here: no top-level command parses `${(P)x}` yet.
+#[test]
+fn the_p_flag_reads_the_variable_a_name_holds() {
+    let _bound = crate::pathctx::enter_var("zzref".into(), "a[HOME=1]".into());
+    assert!(!super::parameter_verdict("(P)zzref").is_allowed());
+    assert!(super::parameter_verdict("(U)zzref").is_allowed());
+}
+
+/// A function's `$@` is read through its first 64 arguments; none bound, or more than that, is
+/// unknown and refused.
+#[test]
+fn all_arguments_are_read_only_while_every_one_is_known_and_within_the_cap() {
+    let call = |args: usize| format!("f() {{ echo $(( $@ )); }}; f{}", " 1".repeat(args));
+    assert!(allowed(&call(64)));
+    assert!(!allowed(&call(65)));
+    assert!(!allowed("echo $(( $@ ))"));
+}
+
+/// `x#5` is a base constant or a name the shell reads whole, never the name `x` and a number;
+/// `x+y` is two names.
+#[test]
+fn a_name_in_arithmetic_ends_at_the_first_character_a_name_cannot_hold() {
+    assert!(!allowed("x=5; echo $((x#5))"));
+    assert!(allowed("x=5; y=6; echo $((x+y))"));
+}

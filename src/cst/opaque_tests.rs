@@ -370,3 +370,16 @@ fn a_quoted_name_is_one_literal_text() {
         assert!(is_safe_command(cmd), "{cmd} names its variable in plain sight");
     }
 }
+
+/// `mapfile` and `readarray` are counted as setting `MAPFILE` even when they name an array, which bash
+/// does not, so the error is a refusal. Tested on the names directly: the commands themselves are
+/// refused before a later read could show it.
+#[test]
+fn mapfile_and_readarray_count_as_setting_mapfile() {
+    for text in ["mapfile", "readarray -t", "mapfile arr"] {
+        let script = crate::cst::parse::parse(text).expect("parses");
+        let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple: {text}") };
+        let names = super::opaque::named(cmd).expect("names known");
+        assert!(names.contains(&"MAPFILE".to_string()), "{text}: {names:?}");
+    }
+}

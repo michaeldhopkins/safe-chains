@@ -410,6 +410,14 @@ mod tests {
     }
 
     #[test]
+    fn a_substitution_is_never_a_literal_word() {
+        let script = crate::cst::parse::parse("echo $(date) plain").expect("parses");
+        let Some(crate::cst::Cmd::Simple(cmd)) = script.0[0].pipeline.commands.first() else { panic!("not simple") };
+        assert!(!super::is_literal(&cmd.words[1]));
+        assert!(super::is_literal(&cmd.words[2]));
+    }
+
+    #[test]
     fn a_dot_pattern_matches_the_folder_and_its_parent() {
         let dir = tempfile::tempdir().expect("tempdir");
         std::fs::write(dir.path().join(".x"), "").expect("write");
