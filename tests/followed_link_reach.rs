@@ -177,3 +177,78 @@ fn a_link_to_a_clean_outside_folder_is_still_read() {
         assert!(at(&nest, cmd).is_allowed(), "{cmd} was refused through a clean outside folder");
     }
 }
+
+/// A home holding `out2`, which a hand-written grant lets the agent read, and a project elsewhere.
+struct Granted {
+    _base: tempfile::TempDir,
+    home: String,
+    work: String,
+}
+
+fn granted(secret: Option<&str>) -> Granted {
+    let base = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("scratch");
+    let root = base.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+    let (home, work) = (format!("{root}/home"), format!("{root}/work"));
+    for dir in [format!("{home}/.config"), format!("{home}/out2/inner"), work.clone()] {
+        std::fs::create_dir_all(dir).expect("folder");
+    }
+    std::fs::write(format!("{home}/out2/inner/note"), "n").expect("outside file");
+    if let Some(target) = secret {
+        std::os::unix::fs::symlink(target, format!("{home}/out2/inner/k")).expect("link to a secret");
+    }
+    std::fs::write(format!("{home}/.config/safe-chains.toml"), "[[grant]]\npath = \"~/out2\"\nread = true\n").expect("grant");
+    Granted { _base: base, home, work }
+}
+
+impl Granted {
+    fn approves(&self, command: &str) -> bool {
+        std::process::Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+            .args(["--cwd", &self.work, "--root", &self.work, command])
+            .current_dir(&self.work)
+            .env_clear()
+            .env("HOME", &self.home)
+            .env("PATH", "/usr/bin:/bin")
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .expect("run safe-chains")
+            .code()
+            == Some(0)
+    }
+
+    fn reads(&self) -> Vec<String> {
+        [format!("{}/out2", self.home), "~/out2".to_string()]
+            .into_iter()
+            .flat_map(|tree| {
+                [
+                    format!("rg -L foo {tree}"),
+                    format!("tar -chf o.tar {tree}"),
+                    format!("diff -r {tree} {tree}"),
+                    format!("ag -f foo {tree}"),
+                    format!("pax -wL -f o.pax {tree}"),
+                    format!("cp -RL {tree}/inner ."),
+                ]
+            })
+            .collect()
+    }
+}
+
+#[test]
+fn a_readable_outside_folder_named_to_a_following_read_is_judged_by_the_links_inside_it() {
+    for secret in secrets() {
+        let machine = granted(Some(&secret));
+        for cmd in machine.reads() {
+            assert!(!machine.approves(&cmd), "{cmd} was approved over an outside tree holding a link to {secret}");
+        }
+        assert!(machine.approves(&format!("rg foo {}/out2", machine.home)), "a read that does not follow the link was refused");
+    }
+}
+
+#[test]
+fn a_clean_readable_outside_folder_named_to_a_following_read_is_still_read() {
+    let machine = granted(None);
+    for cmd in machine.reads() {
+        assert!(machine.approves(&cmd), "{cmd} was refused over a clean outside tree");
+    }
+}

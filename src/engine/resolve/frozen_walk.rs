@@ -363,6 +363,9 @@ pub(crate) fn on_disk(base: &str) -> Option<String> {
         return None;
     }
     let placed = crate::pathctx::resolve(base);
+    if placed.starts_with('~') {
+        return crate::pathctx::join_cwd(None, &placed).filter(|home| home != crate::pathctx::UNRESOLVED_CWD);
+    }
     if placed.starts_with('/') {
         return Some(placed.into_owned());
     }
