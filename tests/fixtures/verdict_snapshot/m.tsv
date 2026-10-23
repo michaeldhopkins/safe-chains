@@ -231,10 +231,9 @@ mamba x	denied
 man	denied
 man --all	inert
 man --all --apropos	inert
-man --all --config-file x	inert
+man --all --encoding x	inert
 man --all x	inert
 man --apropos	inert
-man --config-file x	inert
 man --default	inert
 man --encoding x	inert
 man --extension x	inert
@@ -251,7 +250,6 @@ man --whatis	inert
 man --where	inert
 man --where-cat	inert
 man --wildcard	inert
-man -C x	inert
 man -E x	inert
 man -L x	inert
 man -M x	inert

@@ -10,7 +10,7 @@ standalone = [
     "-V", "-a", "-f", "-h", "-k", "-l", "-u", "-w",
 ]
 valued = [
-    "--config-file", "--encoding", "--extension", "--locale",
+    "--encoding", "--extension", "--locale",
     "--manpath", "--sections", "--systems",
-    "-C", "-E", "-L", "-M", "-S", "-e", "-m",
+    "-E", "-L", "-M", "-S", "-e", "-m",
 ]
