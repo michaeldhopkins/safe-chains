@@ -16,6 +16,8 @@ standalone = [
     "--quit-if-one-screen", "--raw-control-chars", "--silent",
     "--squeeze-blank-lines", "--version",
 ]
+# -t/--tag looks the tag up in ./tags, a project file read, which is deliberate. -T names any tags
+# file and is left out: the file decides which file less opens.
 valued = [
     "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
     "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
