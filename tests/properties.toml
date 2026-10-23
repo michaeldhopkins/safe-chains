@@ -199,6 +199,7 @@ owed = [
 "src/envvars/rebind.rs" = [
   "src/envvars/rebind_tests.rs::a_loop_variable_agrees_with_the_same_assignment",
   "src/envvars/rebind_tests.rs::reading_into_a_listed_variable_is_always_refused",
+  "src/cst/proptests.rs::a_hook_array_filled_by_a_command_is_refused",
 ]
 "src/handlers/android/adb.rs" = [
   "a_dash_s_prefix_serial_does_not_change_the_verdict",

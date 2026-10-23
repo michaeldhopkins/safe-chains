@@ -215,13 +215,32 @@ fn component_resolved(parent: &str, component: &str) -> bool {
 }
 
 fn unquoted_glob(word: &Word) -> bool {
-    fn plain(parts: &[WordPart]) -> bool {
-        parts.iter().all(|part| match part {
-            WordPart::Lit(_) | WordPart::SQuote(_) | WordPart::Escape(_) | WordPart::AnsiC(_) => true,
-            WordPart::DQuote(inner) => plain(&inner.0),
+    plain(&word.0) && has_glob_character(word)
+}
+
+/// Whether `word` is exactly the one text it shows: no substitution, variable, glob or brace
+/// fan-out. A variable stays in a `Lit` as `$x`, so a `$` outside single quotes counts.
+pub(crate) fn is_literal(word: &Word) -> bool {
+    fn dollar(parts: &[WordPart]) -> bool {
+        parts.iter().any(|part| match part {
+            WordPart::Lit(text) => text.contains('$'),
+            WordPart::DQuote(inner) => dollar(&inner.0),
             _ => false,
         })
     }
+    plain(&word.0) && !dollar(&word.0) && !has_glob_character(word) && word.expand().len() == 1
+}
+
+fn plain(parts: &[WordPart]) -> bool {
+    parts.iter().all(|part| match part {
+        WordPart::Lit(_) | WordPart::SQuote(_) | WordPart::Escape(_) | WordPart::AnsiC(_) => true,
+        WordPart::DQuote(inner) => plain(&inner.0),
+        _ => false,
+    })
+}
+
+/// Whether `word` holds a `*`, `?` or `[` the shell would match against file names.
+pub(crate) fn has_glob_character(word: &Word) -> bool {
     fn active(parts: &[WordPart], quoted: bool) -> bool {
         parts.iter().any(|part| match part {
             WordPart::Lit(text) => !quoted && text.contains(['*', '?', '[']),
@@ -229,7 +248,7 @@ fn unquoted_glob(word: &Word) -> bool {
             _ => false,
         })
     }
-    plain(&word.0) && active(&word.0, false)
+    active(&word.0, false)
 }
 
 fn listed(dir: &str, component: &str, seen: &mut usize) -> Option<Vec<String>> {

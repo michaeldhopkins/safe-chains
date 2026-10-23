@@ -708,6 +708,21 @@ mod resolution {
         }
 
         #[test]
+        fn a_hook_array_filled_by_a_command_is_refused(
+            hook in proptest::sample::select(&["chpwd", "precmd", "preexec", "periodic", "zshexit", "zshaddhistory"][..]),
+            setter in proptest::sample::select(&["read -A {a} <<< f", "read -rA {a} <<< f", "read -a {a} <<< f", "x={a}; read -A $x <<< f"][..]),
+        ) {
+            let _w = workspace();
+            let line = format!("f() {{ rm -rf /; }}; {}; cd src", setter.replace("{a}", &format!("{hook}_functions")));
+            proptest::prop_assert!(!allowed(&line), "{line:?}");
+            // An operand that expands is refused whatever it holds, so only a literal one has a twin.
+            if !setter.contains('$') {
+                let plain = format!("f() {{ rm -rf /; }}; {}; cd src", setter.replace("{a}", "words"));
+                proptest::prop_assert!(allowed(&plain), "{plain:?}");
+            }
+        }
+
+        #[test]
         fn a_function_the_shell_runs_unnamed_is_judged_at_its_definition(
             name in proptest::sample::select(&[
                 "TRAPEXIT", "TRAPZERR", "TRAPDEBUG", "TRAPINT", "command_not_found_handler", "command_not_found_handle",

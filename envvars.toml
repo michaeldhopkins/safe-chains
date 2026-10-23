@@ -141,6 +141,32 @@ because = "bash reads it at startup to turn options on, so SHELLOPTS=xtrace expa
 shape = "opaque"
 because = "bash reads it at startup to turn shopt options on, extdebug among them"
 measured = false
+[env.zshexit_functions]
+shape = "opaque"
+because = "zsh runs each function named in it as the shell exits, so `read -A zshexit_functions <<< f` runs f unnamed (measured: executes, non-interactive)"
+[env.chpwd_functions]
+shape = "opaque"
+because = "zsh runs each function named in it after every cd (measured: executes, non-interactive)"
+[env.precmd_functions]
+shape = "opaque"
+because = "zsh runs each function named in it before every prompt"
+measured = false
+[env.preexec_functions]
+shape = "opaque"
+because = "zsh runs each function named in it before every command line"
+measured = false
+[env.periodic_functions]
+shape = "opaque"
+because = "zsh runs each function named in it every PERIOD seconds, before a prompt"
+measured = false
+[env.zshaddhistory_functions]
+shape = "opaque"
+because = "zsh runs each function named in it as a line is added to history"
+measured = false
+[env.zsh_directory_name_functions]
+shape = "opaque"
+because = "zsh runs each function named in it to expand a ~[name] directory"
+measured = false
 [env.PS4]
 shape = "opaque"
 because = "expanded before each traced command, so a command substitution in it runs once tracing is on (measured: executes with SHELLOPTS=xtrace)"

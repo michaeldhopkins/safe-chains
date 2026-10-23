@@ -52,6 +52,22 @@ fn reading_into_a_listed_variable_is_refused_since_its_value_is_unknown() {
         "IFS= read -r GIT_CONFIG_GLOBAL <<< x",
         "read 'HOME?prompt' <<< /tmp/x; git log",
         "builtin read HOME <<< x",
+        "x=HOME; read $x <<< /tmp/x; git log",
+        "x=HOME; read -r \"$x\" <<< /tmp/x; git log",
+        "read -A zshexit_functions <<< f",
+        "touch HOME; read HOM? <<< /tmp; git log",
+        "read GIT_DI[R] <<< /tmp; git status",
+        "read -A *_functions <<< f",
+        "typeset -T X chpwd_functions; X=f; cd src",
+        "typeset -T X=f chpwd_functions; cd src",
+        "declare -T X zshexit_functions; X=f",
+        "export -T X chpwd_functions; X=f; cd src",
+        "readonly -T X=f chpwd_functions; cd src",
+        "typeset -gT X HOME",
+        "declare HOM?=x; git log",
+        "export GIT_DI[R]=x; git status",
+        "typeset HOM{E,}=x; git log",
+        "export $(echo HOME)=x; git log",
         "declare -n r=HOME; r=/tmp/x; git log",
         "typeset -n r=HOME; r=/tmp/x; git log",
         "declare -n r; r=HOME; r=/tmp/x; git log",
@@ -60,8 +76,34 @@ fn reading_into_a_listed_variable_is_refused_since_its_value_is_unknown() {
     ] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
     }
-    for cmd in ["read -r line <<< x", "read -p 'Name?' line <<< x", "read XHOME <<< x", "echo HOME"] {
+    for cmd in [
+        "read -r line <<< x", "read -p 'Name?' line <<< x", "read 'line?Name? ' <<< x", "read XHOME <<< x", "echo HOME",
+        "typeset -T X words; X=a:b", "export FOO=\"$BAR\"", "declare x=$(echo hi)",
+    ] {
         assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+#[test]
+fn an_option_that_is_not_its_own_text_is_refused() {
+    for option in ["-$x", "-$(echo T)", "-`echo n`", "\"-$x\"", "-g$(echo T)", "-n$x", "-a$(echo HOME)", "+$x"] {
+        for setter in ["read", "declare", "typeset", "local", "export", "readonly"] {
+            let cmd = format!("x=T; {setter} {option} X chpwd_functions; X=f; cd src");
+            assert!(!allowed(&cmd), "should be refused: {cmd}");
+        }
+    }
+}
+
+#[test]
+fn an_operand_that_is_not_its_own_text_never_names_a_variable() {
+    for var in ["HOME", "GIT_DIR", "chpwd_functions"] {
+        for spelling in ["$(echo V)", "`echo V`", "\"$(printf V)\"", "{V,zz}", "V{,}"] {
+            let operand = spelling.replace('V', var);
+            for setter in ["read -r S <<< /tmp/x", "read -A S <<< f", "typeset -T X S", "export -T X S", "declare -T X S"] {
+                let cmd = format!("{}; git status", setter.replace('S', &operand));
+                assert!(!allowed(&cmd), "should be refused: {cmd}");
+            }
+        }
     }
 }
 
