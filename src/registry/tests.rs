@@ -4500,6 +4500,18 @@ positional_shape = "not-a-real-shape"
 }
 
 #[test]
+fn a_sub_positional_shape_that_its_dispatch_would_ignore_is_rejected() {
+    for extra in ["write_flags = [\"-w\"]", "guard = \"--check\"", "first_arg = [\"x*\"]", "require_any = [\"--dry-run\"]"] {
+        let toml = format!(
+            "[[command]]\nname = \"demo-shape-{}\"\n\n[[command.sub]]\nname = \"build\"\nstandalone = [\"-w\", \"--check\", \"--dry-run\"]\npositional_shape = \"local-path\"\n{extra}\n",
+            extra.len()
+        );
+        let result = std::panic::catch_unwind(|| load_one(&toml));
+        assert!(result.is_err(), "positional_shape with `{extra}` loaded, though that dispatch never reads it");
+    }
+}
+
+#[test]
 fn handler_without_fallback_field_has_none() {
     // Regression: a handler-using TOML with no [command.fallback]
     // block must produce `fallback: None` so try_fallback_grammar

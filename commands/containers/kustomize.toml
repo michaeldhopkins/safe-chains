@@ -16,12 +16,15 @@ examples_denied = [
     "kustomize build --enable-alpha-plugins",
     "kustomize build --load-restrictor LoadRestrictionsNone",
     "kustomize build --load-restrictor=LoadRestrictionsNone ./overlays/dev",
+    "kustomize build github.com/kubernetes-sigs/kustomize//examples/helloWorld?ref=v5.8.1",
+    "kustomize build https://github.com/org/repo/overlays/dev",
 ]
 
 [[command.sub]]
 name = "build"
 standalone = ["--help", "-h"]
 valued = ["--env", "--helm-command", "--load-restrictor", "--mount", "--output", "-o"]
+positional_shape = "local-path"
 flag_values = { "--load-restrictor" = ["LoadRestrictionsRootOnly"] }
 
 [[command.sub]]

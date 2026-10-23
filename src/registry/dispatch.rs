@@ -181,7 +181,13 @@ fn dispatch_wrapper(
 
 fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -> Verdict {
     match kind {
-        DispatchKind::Policy { policy, level } => super::policy::check_with_passthrough(tokens, policy, *level),
+        DispatchKind::Policy { policy, level, shape } => {
+            if misshapen(*shape, tokens, policy) {
+                Verdict::Denied
+            } else {
+                super::policy::check_with_passthrough(tokens, policy, *level)
+            }
+        }
         DispatchKind::FirstArg { patterns, level, standalone, valued, loopback_valued } => {
             dispatch_first_arg(tokens, patterns, *level, standalone, valued, loopback_valued)
         }

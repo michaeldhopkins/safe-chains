@@ -3819,6 +3819,8 @@ kustomize build -h	inert
 kustomize build -o ./rendered.yaml	inert
 kustomize build -o x	inert
 kustomize build ./overlays/dev	inert
+kustomize build github.com/kubernetes-sigs/kustomize//examples/helloWorld?ref=v5.8.1	denied
+kustomize build https://github.com/org/repo/overlays/dev	denied
 kustomize build x	inert
 kustomize version	inert
 kustomize version --help	inert

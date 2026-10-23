@@ -768,11 +768,16 @@
 # level = "Inert"                       # SafetyLevel for matching invocations
 # bare = true                           # is bare invocation allowed
 # max_positional = 1                    # cap on non-flag arguments
-# positional_shape = "path"             # predicate over the first positional;
-#                                       # only "path" is supported today —
-#                                       # accepts tokens shaped like a file
+# positional_shape = "path"             # predicate over the first positional:
+#                                       # "path" accepts tokens shaped like a file
 #                                       # path (contain `/`, contain `.`, or
-#                                       # are `-` for stdin) and rejects flags
+#                                       # are `-` for stdin) and rejects flags;
+#                                       # "go-package" a local go package;
+#                                       # "local-path" a folder no tool could read
+#                                       # as a repository address (no scheme, `:`,
+#                                       # `@`, `?`, `//`, `.git`, or host-like first
+#                                       # component). A [[command.sub]] takes it too,
+#                                       # on a plain flag policy or an executor.
 # executor = "file"                     # the command runs code — gate the EXECUTOR
 #                                       # through the execution-origin engine instead
 #                                       # of the flat `level`: a WORKSPACE-local

@@ -681,7 +681,11 @@ pub(super) fn build_sub_kind_unchecked(
         });
     }
     if toml.allow_all.unwrap_or(false) {
-        return Ok(DispatchKind::Policy { policy: OwnedPolicy::allow_all(), level: toml.level.unwrap_or(TomlLevel::Inert).into() });
+        return Ok(DispatchKind::Policy {
+            policy: OwnedPolicy::allow_all(),
+            level: toml.level.unwrap_or(TomlLevel::Inert).into(),
+            shape: None,
+        });
     }
     if let Some(sep) = toml.delegate_after {
         return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
@@ -729,6 +733,7 @@ fn build_policy_sub_kind(
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Result<DispatchKind, String> {
+    let shape = sub_shape(parent, &toml)?;
     let mut policy = if let Some(key) = &toml.policy {
         if !toml.standalone.is_empty() || !toml.valued.is_empty() {
             fail!(
@@ -762,13 +767,6 @@ fn build_policy_sub_kind(
         let Some(kind) = ExecutorKind::from_name(name) else {
             fail!("command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)", toml.name)
         };
-        let shape = match toml.positional_shape.as_deref() {
-            None => None,
-            Some(s) => match crate::policy::PositionalShape::from_name(s) {
-                Some(shape) => Some(shape),
-                None => fail!("command '{parent}' sub `{}`: unknown positional_shape `{s}`", toml.name),
-            },
-        };
         return Ok(DispatchKind::Executor {
             policy,
             level,
@@ -800,7 +798,7 @@ fn build_policy_sub_kind(
     if !toml.require_any.is_empty() {
         return Ok(DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false });
     }
-    Ok(DispatchKind::Policy { policy, level })
+    Ok(DispatchKind::Policy { policy, level, shape })
 }
 
 /// Diagnostic for a configuration class that silently breaks flag dispatch:
@@ -958,7 +956,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             env_assignment_positionals,
-            kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert },
+            kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert, shape: None },
         });
     }
     if let Some(vc) = toml.verb_chain {
@@ -1246,7 +1244,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         behavior,
         output,
         writes_cwd,
-        kind: DispatchKind::Policy { policy, level },
+        kind: DispatchKind::Policy { policy, level, shape: None },
     })
 }
 

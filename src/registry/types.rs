@@ -2,10 +2,13 @@ use serde::Deserialize;
 
 use crate::verdict::SafetyLevel;
 
+#[path = "shapes.rs"]
+mod shapes;
 #[path = "types_tables.rs"]
 mod tables;
 #[path = "transfer.rs"]
 mod transfer;
+pub(super) use shapes::{misshapen, sub_shape};
 pub(super) use tables::*;
 pub(super) use transfer::TomlTransfer;
 pub(crate) use transfer::{TransferSource, TransferSpec};
@@ -887,6 +890,8 @@ pub(super) enum DispatchKind {
     Policy {
         policy: OwnedPolicy,
         level: SafetyLevel,
+        /// A predicate the first positional must meet, from the sub's `positional_shape`.
+        shape: Option<crate::policy::PositionalShape>,
     },
     FirstArg {
         patterns: Vec<String>,
@@ -997,16 +1002,6 @@ pub(super) enum DispatchKind {
 pub(super) enum ExecutorKind {
     File,
     Project,
-}
-
-impl ExecutorKind {
-    pub(super) fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "file" => Some(Self::File),
-            "project" => Some(Self::Project),
-            _ => None,
-        }
-    }
 }
 
 pub use super::policy::OwnedPolicy;

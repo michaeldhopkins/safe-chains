@@ -192,6 +192,9 @@ fn describe_fallback(f: &FallbackSpec) -> String {
         Some(crate::policy::PositionalShape::GoPackage) => {
             lines.push("- First positional must be a local package path (`.`, `./…`, `/…`, or a `*.go` file)".to_string());
         }
+        Some(crate::policy::PositionalShape::LocalPath) => {
+            lines.push("- First positional must be a local folder, not a repository address".to_string());
+        }
         None => {}
     }
     lines.join("\n")

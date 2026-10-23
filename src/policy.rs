@@ -84,6 +84,12 @@ pub enum PositionalShape {
     /// module system and, with `@version`, DOWNLOADS AND RUNS remote code, so
     /// it must not be treated as a worktree-local executor.
     GoPackage,
+    /// A local folder that cannot be read as a remote address. kustomize clones any target it can
+    /// parse as a git repository (`github.com/org/repo`, `https://…`, `git@host:…`, `gh:org/repo`,
+    /// `host/org/repo.git`) before it looks for a local folder, so a target with a scheme, a
+    /// colon, an `@`, a query, a `//` subpath, a `.git` component, or a host-like first component
+    /// is not a local path.
+    LocalPath,
 }
 
 impl PositionalShape {
@@ -91,6 +97,7 @@ impl PositionalShape {
         match self {
             Self::Path => looks_like_path(token),
             Self::GoPackage => is_go_local_package(token),
+            Self::LocalPath => is_local_path(token),
         }
     }
 
@@ -98,9 +105,25 @@ impl PositionalShape {
         match name {
             "path" => Some(Self::Path),
             "go-package" => Some(Self::GoPackage),
+            "local-path" => Some(Self::LocalPath),
             _ => None,
         }
     }
+}
+
+/// Whether `token` names a local folder that no tool could read as a remote address. See
+/// [`PositionalShape::LocalPath`].
+pub fn is_local_path(token: &str) -> bool {
+    if token.is_empty() || token.starts_with('-') || token.contains("//") {
+        return false;
+    }
+    if token.chars().any(|c| matches!(c, ':' | '@' | '?' | '\\')) {
+        return false;
+    }
+    let mut components = token.split('/');
+    let first = components.next().unwrap_or_default();
+    let host_like = !first.starts_with('.') && !first.starts_with('~') && first.contains('.');
+    !host_like && !token.split('/').any(|c| c == "_git" || c.ends_with(".git"))
 }
 
 /// Whether `token` is a go LOCAL package/file (a filesystem path), as opposed to a
@@ -910,6 +933,28 @@ mod tests {
     fn positional_shape_from_name() {
         assert_eq!(PositionalShape::from_name("path"), Some(PositionalShape::Path));
         assert_eq!(PositionalShape::from_name("nope"), None);
+        assert_eq!(PositionalShape::from_name("local-path"), Some(PositionalShape::LocalPath));
+    }
+
+    proptest::proptest! {
+        /// Every spelling kustomize reads as a git repository is refused as a local folder, and a
+        /// folder spelled with plain words, anchored or not, is accepted.
+        #[test]
+        fn a_repository_address_is_never_a_local_path(
+            host in proptest::string::string_regex("[a-z]{1,8}\\.(com|org|io)").unwrap(),
+            parts in proptest::collection::vec(proptest::string::string_regex("[a-z][a-z0-9_-]{0,7}").unwrap(), 1..4),
+            anchor in proptest::sample::select(vec!["", "./", "../", "~/", "/"]),
+            form in proptest::sample::select(vec![
+                "{h}/{p}", "https://{h}/{p}", "ssh://git@{h}/{p}", "git@{h}:{p}", "gh:{p}",
+                "{h}/{p}?ref=v1", "{h}/{p}//sub", "local/{p}.git", "{p}/_git/x", "file:///{p}",
+            ]),
+        ) {
+            let path = parts.join("/");
+            let remote = form.replace("{h}", &host).replace("{p}", &path);
+            proptest::prop_assert!(!is_local_path(&remote), "{}", remote);
+            let local = format!("{anchor}{path}");
+            proptest::prop_assert!(is_local_path(&local), "{}", local);
+        }
     }
 
     #[test]
