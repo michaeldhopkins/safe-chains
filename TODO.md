@@ -17,6 +17,21 @@ about one command is one wrong answer. A gap in the mechanism is every command t
 would have used it — which is why the backlog below is ordered by how much of the
 model a gap makes inexpressible, not by how many commands are waiting on it.
 
+## Three pipe-locus tests refuse when other tests' scratch projects share their TMPDIR
+
+On a 32-core Linux runner whose `TMPDIR` is a sibling of the checkout under `/work`, the full lib suite
+fails `cst::loops_tests::an_unknown_word_is_judged_as_a_relative_name_where_it_is_read_as_a_path`
+and, on some runs, `cst::proptests::resolution::{while_read_binds_the_loop_var_to_the_pipe_locus,
+passthrough_filters_carry_the_pipe_locus}`: `find . -name '*.txt' | xargs -I{} cp {} out/` and
+`find /work | head | while IFS= read -r f; do cat "$f"; done` are refused. main@origin fails the
+same way. Each passes alone, with `--test-threads` 1 or 4, and in the full suite with
+`TMPDIR=/tmp/<fresh>`; `cst::loops_tests cst::echoed` together reproduce it, so the scratch
+projects `echoed_tests::in_project` creates under `$TMPDIR` (with `.git` directories, and in some
+tests a link to `/etc`) change a verdict made with no path context. Every failure seen is a
+refusal. Find which lookup reads the live tree (`pathctx::physical`'s walk, or
+`under_temp_root`), make the tests hermetic, and decide whether a verdict should depend on what another process put in `$TMPDIR`.
+Until then, a remote mutation run sets `TMPDIR=$(mktemp -d /tmp/…)` inside its command.
+
 ## AWAITING THE OWNER: words for a place safe-chains names
 
 `--explain` calls the `machine` place "a place safe-chains has no rule for". That term also holds
