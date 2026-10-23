@@ -1145,14 +1145,25 @@ shape = "opaque"
 because = "less parses this as options before its arguments, including +cmd and -o log-file"
 measured = false
 [env.LESSKEYIN]
-shape = "exec-path"
-single_value = true
-because = "less reads key bindings and shell-escape macros from this file"
-measured = false
+shape = "opaque"
+because = "less reads key bindings from this file, and its #env section can set LESSOPEN, which less runs (measured: executes, even with output to a pipe)"
+[env.LESSKEYIN_SYSTEM]
+shape = "opaque"
+because = "as LESSKEYIN, for the system-wide lesskey file (measured: executes)"
 [env.LESSKEY]
-shape = "exec-path"
-single_value = true
-because = "older compiled lesskey file path"
+shape = "opaque"
+because = "an older compiled lesskey file, which can carry the same #env section as LESSKEYIN"
+measured = false
+[env.LESSKEY_SYSTEM]
+shape = "opaque"
+because = "as LESSKEY, for the system-wide compiled lesskey file"
+measured = false
+[env.LESSKEY_CONTENT]
+shape = "opaque"
+because = "less parses the value as lesskey source, #env section included (measured: executes)"
+[env.LESSGLOBALTAGS]
+shape = "command"
+because = "less runs this command to look up a tag for -t when the tags file is GTAGS"
 measured = false
 [env.DOCKER_HOST]
 shape = "opaque"
