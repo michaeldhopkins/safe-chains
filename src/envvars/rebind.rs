@@ -3,6 +3,10 @@ use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 pub(crate) fn loop_var_verdict(var: &str, items: &[Word]) -> Verdict {
+    crate::cst::arith::loop_verdict(var, items).combine(listed_loop_verdict(var, items))
+}
+
+fn listed_loop_verdict(var: &str, items: &[Word]) -> Verdict {
     if super::rule_of(var).is_none() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }

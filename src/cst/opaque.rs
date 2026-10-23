@@ -27,7 +27,7 @@ pub(crate) mod glob;
 mod items;
 mod walk;
 
-pub(crate) use declared::declared_names;
+pub(crate) use declared::{declared_names, named};
 pub(crate) use items::{enter_loop, enter_read_var, enter_stdin, prints_only_paths, stage_shape};
 use walk::shape;
 

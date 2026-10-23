@@ -429,7 +429,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             v
         }
-        Cmd::DoubleBracket { words, redirs } => words_sub_verdict(words).combine(redirect_verdict(redirs)),
+        Cmd::DoubleBracket { words, redirs } => super::arith::double_bracket_verdict(words).combine(redirect_verdict(redirs)),
         // Which arm runs is decided at runtime, so — exactly as for `If` — every arm body counts
         // and the case is only as safe as its worst arm. The patterns are matched, never executed,
         // but the SUBJECT is expanded, so its substitutions are gated like any other word.
@@ -464,7 +464,7 @@ fn part_sub_verdict(part: &WordPart) -> Verdict {
 }
 
 fn word_sub_verdict(word: &Word) -> Verdict {
-    word.0.iter().map(part_sub_verdict).fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+    word.0.iter().map(part_sub_verdict).fold(super::arith::word_verdict(word), Verdict::combine)
 }
 
 pub(super) fn words_sub_verdict(words: &[Word]) -> Verdict {
@@ -502,7 +502,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         .env
         .iter()
         .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
-        .fold(crate::envvars::rebinding_verdict(&cmd.words), Verdict::combine);
+        .fold(crate::envvars::rebinding_verdict(&cmd.words).combine(super::arith::command_verdict(cmd)), Verdict::combine);
     let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v);
 
     if let Verdict::Denied = sub_v {

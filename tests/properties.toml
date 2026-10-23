@@ -59,6 +59,12 @@ owed = [
   "src/handler_property_tests.rs::a_flanked_atom_never_moves_where_the_write_lands",
   "src/handler_property_tests.rs::an_unflanked_atom_is_never_admitted",
 ]
+"src/cst/arith.rs" = [
+  "src/cst/arith_tests.rs::an_assignment_in_any_arithmetic_context_is_refused_and_a_comparison_is_not",
+]
+"src/cst/arith/commands.rs" = [
+  "src/cst/arith_tests.rs::an_assignment_in_any_arithmetic_context_is_refused_and_a_comparison_is_not",
+]
 "src/cst/functions.rs" = [
   "src/cst/proptests.rs::a_redefinition_in_one_command_does_not_reach_the_next",
   "src/cst/proptests.rs::a_call_whose_body_is_unknown_never_runs_the_command_it_shadows",
@@ -557,6 +563,7 @@ owed = [
 "src/handlers/coreutils/find_skip_tests.rs" = "the find-filter suite (#[cfg(test)] mod in handlers/coreutils/find_skip.rs)"
 "src/composition.rs" = "the composition test suite (#[cfg(test)] mod in lib.rs)"
 "src/cst/echoed_tests.rs" = "the printed-item suite (#[cfg(test)] mod in cst/echoed.rs)"
+"src/cst/arith_tests.rs" = "the arithmetic-assignment suite (#[cfg(test)] mod in cst/arith.rs)"
 "src/cst/proptests.rs" = "the CST property suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/normalize_tests.rs" = "the CST normalization properties (#[cfg(test)] mod in cst/mod.rs)"
 "src/handlers/system/tmux_keys_tests.rs" = "the tmux send-keys suite (#[cfg(test)] mod in tmux_keys.rs)"

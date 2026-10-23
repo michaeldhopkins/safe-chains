@@ -13,16 +13,21 @@ use crate::parse::Token;
 /// is itself unknown, a sourced file, an arithmetic assignment), every name that matters: each one
 /// bound so far, the trusted session variables, and `IFS`.
 pub(crate) fn declared_names(cmd: &SimpleCmd) -> Vec<String> {
-    let any = || {
+    named(cmd).unwrap_or_else(|| {
         let mut names = crate::pathctx::item_shape::bound_names();
         names.extend(TRUSTED_VARS.iter().chain(&["IFS", "CDPATH", "cdpath"]).map(|s| (*s).to_string()));
         names
-    };
+    })
+}
+
+/// The names `cmd` sets, or `None` when which ones is not known.
+pub(crate) fn named(cmd: &SimpleCmd) -> Option<Vec<String>> {
+    let any = || None;
     if cmd.words.iter().any(assigns_in_arithmetic) {
         return any();
     }
     let Some(name) = cmd.words.first().map(|w| Token::from_raw(w.eval()).command_name().to_string()) else {
-        return Vec::new();
+        return Some(Vec::new());
     };
     let args = &cmd.words[1..];
     match name.as_str() {
@@ -42,9 +47,9 @@ pub(crate) fn declared_names(cmd: &SimpleCmd) -> Vec<String> {
                 }
                 names.push(declared.to_string());
             }
-            names
+            Some(names)
         }
-        _ => Vec::new(),
+        _ => Some(Vec::new()),
     }
 }
 

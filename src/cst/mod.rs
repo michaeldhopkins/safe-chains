@@ -1,4 +1,5 @@
 mod ansi_c;
+pub(crate) mod arith;
 mod brace;
 #[cfg(test)]
 mod brace_bash_tests;

@@ -59,6 +59,7 @@ impl ScopeWalk {
             SCOPE_BINDINGS.with(|c| c.set(0));
             SCOPE_SPENT.with(|s| s.set(false));
             super::check::forget_poisoned_functions();
+            super::arith::forget_numeric_names();
         }
         ScopeWalk
     }
@@ -97,6 +98,7 @@ fn enter_uncertain_binding() -> bool {
 /// tracking exists for. Over budget it stops: the classification denies.
 pub(super) fn rebind_uncertain(names: impl IntoIterator<Item = String>, vars: &mut Vec<pathctx::VarGuard>) {
     for name in names {
+        super::arith::mark_free(&name);
         if already_uncertain(&name) {
             continue;
         }
