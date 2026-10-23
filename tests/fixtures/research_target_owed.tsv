@@ -515,7 +515,7 @@ haml	description,examples
 haml-lint	description,examples
 haproxy	examples
 hardhat	description,examples,no-tolerance,profiled
-hash	description,examples,no-tolerance,version
+hash	description,version
 hatch	no-tolerance,profiled
 hdiutil	description,examples,profiled
 headerdoc2html	description,examples
