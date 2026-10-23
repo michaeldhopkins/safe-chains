@@ -135,3 +135,94 @@ proptest! {
         prop_assert_eq!(kind(&command), GateKind::Boundary, "{}", command);
     }
 }
+
+fn in_project<T>(root: String, body: impl FnOnce() -> T) -> T {
+    let _ctx = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
+    body()
+}
+
+fn in_gate_probe<T>(body: impl FnOnce() -> T) -> T {
+    in_project(format!("{}/projects/gateprobe", home()), body)
+}
+
+fn segment(text: &str) -> GateKind {
+    in_gate_probe(|| segment_kind(text, &|c| crate::is_safe_command(c), false))
+}
+
+#[test]
+fn a_refused_segment_is_a_boundary_only_when_its_reason_is() {
+    assert_eq!(segment("cat ~/.ssh/id_rsa"), GateKind::Boundary);
+    assert_eq!(segment("jj -R ~/.claude log"), GateKind::NotYet);
+}
+
+#[test]
+fn a_runs_later_place_is_a_boundary_unless_the_segment_only_reads_it() {
+    assert_eq!(segment("tee ~/Library/LaunchAgents/x.plist"), GateKind::Boundary);
+    assert_eq!(segment("cat ~/Library/LaunchAgents/x.plist"), GateKind::NotYet);
+}
+
+#[test]
+fn only_credentials_devices_and_frozen_places_are_boundary_reasons() {
+    let boundary = [
+        ReachReason::Credential,
+        ReachReason::OtherUsersHome,
+        ReachReason::RawDevice,
+        ReachReason::FrozenTrustFile,
+        ReachReason::FrozenTrustRoot,
+        ReachReason::FrozenSystemIntegrity,
+        ReachReason::Unconfined,
+    ];
+    for reason in boundary {
+        assert!(is_boundary_reason(reason), "{reason:?}");
+    }
+    for reason in [ReachReason::RepositorySnapshot, ReachReason::OutsideWorkspace, ReachReason::ForeignTemp] {
+        assert!(!is_boundary_reason(reason), "{reason:?}");
+    }
+}
+
+#[test]
+fn a_command_reaches_a_boundary_when_an_operand_names_one() {
+    in_gate_probe(|| {
+        assert!(reaches_a_boundary("cat ~/.ssh/id_rsa"));
+        assert!(!reaches_a_boundary("cat ./notes.txt"));
+    });
+}
+
+#[test]
+fn a_whole_command_that_cannot_be_read_is_a_boundary_though_its_refused_segment_can() {
+    assert_eq!(kind("zzgatetool sync"), GateKind::NotYet);
+    assert_eq!(kind("echo '*' && zzgatetool sync"), GateKind::Boundary);
+}
+
+#[test]
+fn only_a_user_name_after_a_tilde_is_opaque() {
+    assert!(!text_is_opaque("zzgatetool ~"));
+    assert!(!text_is_opaque("zzgatetool ~/notes"));
+    assert!(text_is_opaque("zzgatetool ~zzsomeone"));
+}
+
+#[test]
+fn a_word_leaves_the_workspace_when_it_resolves_outside_it() {
+    in_gate_probe(|| {
+        assert!(leaves_the_workspace(".."));
+        assert!(leaves_the_workspace("~"));
+        assert!(!leaves_the_workspace("~/projects/gateprobe/notes"));
+        assert!(!leaves_the_workspace("a/b"));
+    });
+}
+
+#[test]
+fn a_tilde_before_a_name_is_not_expanded_to_the_home_folder() {
+    in_project(format!("{}x", home()), || {
+        assert!(leaves_the_workspace("~x/y"));
+    });
+}
+
+#[test]
+fn a_protected_place_is_named_by_the_home_folder_and_by_a_protected_path() {
+    in_gate_probe(|| {
+        assert!(names_a_protected_place("~"));
+        assert!(names_a_protected_place("~/.config/safe-chains.toml"));
+        assert!(!names_a_protected_place("notes"));
+    });
+}

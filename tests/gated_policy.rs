@@ -107,3 +107,39 @@ fn grok_denies_as_before_outside_a_prompting_mode_and_at_a_boundary() {
         }
     }
 }
+
+/// The hook's HOME is a folder under the temporary directory, which no word is held to leave, so
+/// `~/notes` is only read that way once the `~` is expanded to it.
+#[test]
+fn grok_asks_about_a_not_yet_command_naming_a_path_under_a_home_in_a_temporary_folder() {
+    let (v, code) = grok_hook("zzgatetool ~/notes", Some("default"));
+    assert_eq!(code, 0, "{v}");
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(serde_json::Value::as_str), Some("ask"), "{v}");
+}
+
+/// Under a configured level, a refused segment the default would not approve keeps its own kind:
+/// running an agent stays a boundary, refused without a prompt.
+#[test]
+fn grok_refuses_an_agent_under_a_configured_level_without_asking() {
+    use std::io::Write;
+    let home = tempfile::tempdir().expect("tempdir");
+    std::fs::create_dir_all(home.path().join(".config")).expect("config dir");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), "level = \"developer\"\n").expect("config");
+    let mut child = std::process::Command::new(hooks::binary())
+        .args(["hook", "grok"])
+        .env("HOME", home.path())
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn safe-chains");
+    child
+        .stdin
+        .take()
+        .expect("stdin")
+        .write_all(grok_envelope("claude -p hi", Some("default")).as_bytes())
+        .expect("write");
+    let out = child.wait_with_output().expect("wait");
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_default();
+    assert_eq!(v.pointer("/decision").and_then(serde_json::Value::as_str), Some("deny"), "{v}");
+    assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision"), None, "{v}");
+}

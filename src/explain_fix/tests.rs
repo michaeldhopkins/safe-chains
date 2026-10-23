@@ -187,3 +187,9 @@ fn the_snapshot_fix_names_the_flag_only_when_the_flag_is_approved() {
     );
     assert!(!stricter.render().contains("--ignore-working-copy"));
 }
+
+#[test]
+fn another_users_home_is_said_to_be_another_users_home() {
+    let fix = Fix::Nothing(Because::ProtectedPath { path: "/Users/someone/notes".into(), reason: ReachReason::OtherUsersHome });
+    assert!(fix.render().contains("`/Users/someone/notes` is in another user's home folder"), "{}", fix.render());
+}
