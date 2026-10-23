@@ -15,6 +15,12 @@ use std::borrow::Cow;
 
 use super::regions::classify_region;
 use crate::engine::facet::LocalLocus;
+#[path = "lookup_prefix.rs"]
+pub(crate) mod lookup_prefix;
+#[path = "locus_url.rs"]
+mod url;
+pub(crate) use url::is_url;
+use url::{file_url_local, is_network_url};
 
 /// Which face of a region role a given operation reads: the use a path is put to.
 pub(crate) use crate::pathctx::anchor::Use as Face;
@@ -280,6 +286,9 @@ const SUB_STANDIN: &str = "sc_substitution_value";
 /// all reduce to the canonical `~/.config/safe-chains.toml`. `..` is left in place on purpose —
 /// `is_unpinnable` rejects it (a normalized `..` would silently defeat that guard).
 pub(crate) fn canonicalize(path: &str) -> Cow<'_, str> {
+    if let Some(stripped) = lookup_prefix::strip_lookup_prefixes(path) {
+        return Cow::Owned(canonicalize(&stripped).into_owned());
+    }
     match firmlink_fold(path) {
         Some(folded) => Cow::Owned(fold_spellings(&folded).into_owned()),
         None => fold_spellings(path),
@@ -349,52 +358,6 @@ fn fold_spellings(path: &str) -> Cow<'_, str> {
     let absolute = tilded.starts_with('/');
     let joined = tilded.split('/').filter(|seg| !seg.is_empty() && *seg != ".").collect::<Vec<_>>().join("/");
     Cow::Owned(if absolute { format!("/{joined}") } else { joined })
-}
-
-/// The LOCAL path a `file:` URL names, or `None` when `path` is not a `file:` URL. Schemes are
-/// case-insensitive; handles `file:///p`, `file://host/p`, and `file:/p`.
-fn file_url_local(path: &str) -> Option<&str> {
-    if path.len() < 5 || !path.as_bytes()[..5].eq_ignore_ascii_case(b"file:") {
-        return None;
-    }
-    let rest = &path[5..];
-    Some(
-        rest.strip_prefix("//")
-            .map_or(rest, |authority| authority.find('/').map_or("", |i| &authority[i..])),
-    )
-}
-
-/// Whether `path` is a network URL: a `scheme://…` whose scheme is well-formed (a letter, then
-/// letters / digits / `+` / `-` / `.`). A local path that merely contains `://` is not a URL.
-fn is_network_url(path: &str) -> bool {
-    let Some(idx) = path.find("://") else {
-        return false;
-    };
-    let scheme = &path[..idx];
-    let well_formed_scheme = scheme.starts_with(|c: char| c.is_ascii_alphabetic())
-        && scheme.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'+' | b'-' | b'.'));
-    well_formed_scheme && has_host(&path[idx + 3..])
-}
-
-/// A URL needs a HOST. `s3://../../.ssh/id_rsa` has none, so it is not a URL at all — it is a
-/// local path wearing a scheme, and a generic reader hands it straight to the OS, which walks the
-/// `..` and opens the key. Treating it as a URL meant skipping the local-path checks entirely,
-/// which was harmless only while every path it could climb to was refused anyway.
-///
-/// Deliberately narrow. A real `https://example.com/.ssh/id_rsa` still classifies as a URL and is
-/// the network handler's business, not the shield's.
-fn has_host(after_scheme: &str) -> bool {
-    let authority = after_scheme.split('/').next().unwrap_or("");
-    !authority.is_empty() && authority != "." && authority != ".."
-}
-
-/// Whether `path` is a URL rather than a filesystem path: a `scheme://…` or a `file:` URL.
-///
-/// Admitting a URL is right for a network OPERAND, where the command's own handler gates the
-/// network. It is wrong for an EXECUTOR, which has to be a local file the project owns — see
-/// `execute_file_verdict`.
-pub(crate) fn is_url(path: &str) -> bool {
-    file_url_local(path).is_some() || is_network_url(path)
 }
 
 /// The default (write) face — kept as `classify_locus` so every existing write-side call site
