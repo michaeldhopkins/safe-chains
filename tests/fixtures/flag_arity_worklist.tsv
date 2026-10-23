@@ -14,8 +14,8 @@
 #
 # IT IS A HEURISTIC, NOT A VERDICT. Some rows will be correct as written — a tool really can have a
 # boolean `--filter` when everyone else's takes a value. Resolving a row means checking that ONE
-# tool's grammar and then either moving the flag to `valued` / `optional_valued`, or deleting the
-# row because the declaration was right.
+# tool's grammar and then either moving the flag to `valued` / `optional_valued`, or moving the
+# row to flag_arity_confirmed.tsv with the reason the declaration is right.
 #
 # SHRINKS ONLY. `a_long_flag_is_not_standalone_where_it_is_valued_elsewhere` fails if a scope
 # appears that is not listed here, so a new mismodelling cannot land quietly. It also fails on a
@@ -89,7 +89,6 @@ opam list	--columns
 opam list	--separator
 pdm config	--project
 pdm show	--name
-pgbench	--log
 pigz	--name
 pijul log	--state
 pip-compile	--cache-dir

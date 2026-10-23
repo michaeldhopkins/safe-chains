@@ -2912,6 +2912,21 @@ fn every_output_locus_variant_states_whether_it_can_exceed_the_user_rung() {
 ///
 /// The threshold is evidence, not proof, so the fixture is a WORKLIST rather than a deny-list:
 /// a row means "check this one tool", and some rows will turn out correct as written.
+fn confirmed_arity_rows(path: &std::path::Path) -> std::collections::HashSet<(String, String)> {
+    let raw = std::fs::read_to_string(path).expect("read flag_arity_confirmed.tsv");
+    raw.lines()
+        .filter(|l| !l.starts_with('#') && !l.trim().is_empty())
+        .map(|l| {
+            let cols: Vec<&str> = l.split('\t').map(str::trim).collect();
+            assert!(
+                cols.len() == 3 && cols.iter().all(|c| !c.is_empty()),
+                "flag_arity_confirmed.tsv: row {l:?} must be <scope>\\t<flag>\\t<why the declaration is right>"
+            );
+            (cols[0].to_string(), cols[1].to_string())
+        })
+        .collect()
+}
+
 #[test]
 fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
     use super::types::TomlFile;
@@ -2980,8 +2995,21 @@ fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
         .map(|(scope, flag)| (scope.trim().to_string(), flag.trim().to_string()))
         .collect();
 
-    let mut unlisted: Vec<String> = candidates.difference(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
-    let mut stale: Vec<String> = listed.difference(&candidates).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    let confirmed = confirmed_arity_rows(&fixture.with_file_name("flag_arity_confirmed.tsv"));
+    let both: Vec<String> = confirmed.intersection(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    assert!(both.is_empty(), "these rows are both confirmed and still on the worklist; keep only one:\n{}", both.join("\n"));
+    let unconfirmed: HashSet<(String, String)> = candidates.difference(&confirmed).cloned().collect();
+    let mut stale_confirmed: Vec<String> = confirmed.difference(&candidates).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    stale_confirmed.sort();
+    assert!(
+        stale_confirmed.is_empty(),
+        "these flag_arity_confirmed.tsv rows are no longer candidates ({}) — delete them in the same change:\n{}",
+        stale_confirmed.len(),
+        stale_confirmed.join("\n"),
+    );
+
+    let mut unlisted: Vec<String> = unconfirmed.difference(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    let mut stale: Vec<String> = listed.difference(&unconfirmed).map(|(s, f)| format!("  {s}\t{f}")).collect();
     unlisted.sort();
     stale.sort();
 
@@ -2990,8 +3018,8 @@ fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
         unlisted.is_empty(),
         "these scopes declare a long flag `standalone` that is `valued` in many other \
              commands, and are not on the worklist ({}). Check the tool's grammar: move the flag \
-             to `valued` (or `optional_valued`), or add the row with a note saying the \
-             declaration is right:\n{}",
+             to `valued` (or `optional_valued`), or, when the tool's grammar shows the \
+             declaration is right, add it to flag_arity_confirmed.tsv with the reason:\n{}",
         unlisted.len(),
         unlisted.join("\n"),
     );

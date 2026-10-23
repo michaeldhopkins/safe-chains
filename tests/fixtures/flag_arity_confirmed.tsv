@@ -1,0 +1,9 @@
+# Long flags that `a_long_flag_is_not_standalone_where_it_is_valued_elsewhere` picks as candidates
+# whose `standalone` declaration was checked against the tool's own grammar and is right.
+#
+# Unlike flag_arity_worklist.tsv (scopes nobody has checked, which only shrinks), a row here is a
+# verdict with its reason. The test fails on a row that is no longer a candidate, or one that is
+# also on the worklist.
+#
+# FORMAT: <scope>\t<flag>\t<why the declaration is right>
+pgbench	--log	pgbench -l/--log takes no value: it turns on the per-transaction log, whose file name --log-prefix sets (PostgreSQL 18 pgbench reference)
