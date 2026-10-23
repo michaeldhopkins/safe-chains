@@ -1007,6 +1007,7 @@ ros use
 rspec
 rsync
 rsync x
+rsync x:foo
 rubycritic
 rufo
 rufo x
