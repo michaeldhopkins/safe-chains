@@ -1,6 +1,6 @@
 [[command]]
 name = "launchctl"
-description = "macOS interface to launchd, the system and service manager that replaces init/systemd on Darwin. The full command can load, unload, enable, disable, bootstrap, and kill launch daemons and agents, which controls what services run at boot and in user sessions -- modifying launchd state can start or stop arbitrary processes. The covered subcommands (blame, error, examine, help, hostinfo, list, print-cache, print-disabled, resolveport, version) report service state, configuration, and system information without starting, stopping, or reconfiguring any services. print and dumpstate also print each service's environment, and the environment launchd hands to every process it starts, which can hold credentials, so print is approved only as print --help or -h, which name no target. The interface ships with macOS and changes with OS releases."
+description = "macOS interface to launchd, the system and service manager that replaces init/systemd on Darwin. The full command can load, unload, enable, disable, bootstrap, and kill launch daemons and agents, which controls what services run at boot and in user sessions -- modifying launchd state can start or stop arbitrary processes. The covered subcommands (blame, error, help, hostinfo, list, print-cache, print-disabled, resolveport, version) report service state, configuration, and system information without starting, stopping, or reconfiguring any services. print and dumpstate also print each service's environment, and the environment launchd hands to every process it starts, which can hold credentials, so print is approved only as print --help or -h, which name no target. examine runs the tool it is given against a fork of launchd, so it is approved only as examine --help or -h. The interface ships with macOS and changes with OS releases."
 url = "https://ss64.com/mac/launchctl.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -14,6 +14,8 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "examine"
+bare = false
+max_positional = 0
 standalone = ["--help", "-h"]
 
 [[command.sub]]
