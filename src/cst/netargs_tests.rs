@@ -444,3 +444,20 @@ fn stdin_from_the_machine_counts_and_literal_text_does_not() {
     let refused: Vec<&str> = literal.into_iter().filter(|c| !allowed(c)).collect();
     assert!(refused.is_empty(), "literal text on stdin carries nothing: {refused:?}");
 }
+
+#[test]
+fn a_loop_variable_the_body_may_rebind_is_not_taken_as_its_list() {
+    assert!(allowed("for h in a.example.com; do dig \"$h\"; done"), "the list alone fills the variable");
+    assert!(allowed("for h in a.example.com; do ls; dig \"$h\"; done"), "a body that binds nothing leaves it alone");
+    let rebound = [
+        "for h in a.example.com; do h=evil.com; dig \"$h\"; done",
+        "for h in a.example.com; do export Q=1; dig \"$h\"; done",
+        "for h in a.example.com; do declare Q=1; dig \"$h\"; done",
+        "for h in a.example.com; do typeset -g Q=1; dig \"$h\"; done",
+        "for h in a.example.com; do read; dig \"$h\"; done",
+        "for h in a.example.com; do eval \"$(mise activate bash)\"; dig \"$h\"; done",
+        "g(){ echo; }; for h in a.example.com; do g; dig \"$h\"; done",
+    ];
+    let approved: Vec<&str> = rebound.into_iter().filter(|c| allowed(c)).collect();
+    assert!(approved.is_empty(), "approved with a variable the body may have rebound: {approved:?}");
+}

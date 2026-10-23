@@ -347,3 +347,26 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn a_variable_a_declaring_builtin_sets_without_naming_it_is_no_longer_trusted() {
+    for cmd in [
+        "REPLY=./ok; read; cat $REPLY", "REPLY=./ok; read -r; cat $REPLY", "REPLY=./ok; read x; cat $REPLY",
+        "MAPFILE=./ok; mapfile; cat $MAPFILE",
+    ] {
+        assert!(!is_safe_command(cmd), "{cmd} reads a variable the builtin may have set");
+    }
+}
+
+#[test]
+fn an_option_cluster_names_an_array_only_for_read() {
+    assert!(is_safe_command("x=./ok; declare -ax foo; cat $x"), "`x` there is an option letter of `declare`, not an array");
+    assert!(!is_safe_command("x=./ok; read -ax; cat $x"), "`read -ax` names the array `x`");
+}
+
+#[test]
+fn a_quoted_name_is_one_literal_text() {
+    for cmd in ["read \"x\"", "read \"x\"; ls", "export \"FOO\"=bar"] {
+        assert!(is_safe_command(cmd), "{cmd} names its variable in plain sight");
+    }
+}

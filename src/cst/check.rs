@@ -770,6 +770,35 @@ mod tests {
     }
 
     #[test]
+    fn a_function_defined_in_a_subshell_is_gone_when_it_ends() {
+        assert!(check("(ls(){ rm -rf /; }; true); ls"), "the subshell's `ls` is not the one run after it");
+        assert!(!check("(ls(){ rm -rf /; }; ls)"), "inside the subshell it is");
+    }
+
+    #[test]
+    fn a_name_defined_in_an_ended_scope_is_not_trusted_as_a_number() {
+        assert!(check("n=$(date +%s); echo $((n+1))"));
+        assert!(
+            !check("(date(){ echo x; }; true); n=$(date +%s); echo $((n+1))"),
+            "a name defined anywhere in the line is not trusted, whatever scope defined it"
+        );
+    }
+
+    #[test]
+    fn an_argument_that_may_split_moves_every_later_one_to_an_unknown_place() {
+        assert!(check("f(){ cat \"$2\"; }; f a ./ok"));
+        assert!(check("f(){ cat \"$2\"; }; f \"$X\" ./ok"), "quoted, it stays one word");
+        assert!(check("f(){ cat \"$2\"; }; IFS=,; f a ./ok"));
+        let moved = [
+            "f(){ cat \"$2\"; }; f $X ./ok", "f(){ cat \"$2\"; }; f x$X ./ok", "f(){ cat \"$2\"; }; f $(pwd) ./ok",
+            "f(){ cat \"$2\"; }; f $(echo a) ./ok", "f(){ cat \"$2\"; }; f \"$@\" ./ok", "f(){ cat \"$2\"; }; f {a,b} ./ok",
+            "f(){ cat \"$2\"; }; f *.x ./ok",
+        ];
+        let approved: Vec<&str> = moved.into_iter().filter(|c| check(c)).collect();
+        assert!(approved.is_empty(), "approved with `$2` read from the wrong place: {approved:?}");
+    }
+
+    #[test]
     fn the_fuzz_input_that_exhausted_memory_is_refused_quickly_in_both_layers() {
         let seed = String::from_utf8_lossy(include_bytes!("../../fuzz/corpus/explain_render/seed-oom-c54"));
         let started = std::time::Instant::now();
