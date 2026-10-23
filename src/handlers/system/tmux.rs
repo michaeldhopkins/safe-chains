@@ -72,7 +72,7 @@ fn find_command_arg(tokens: &[Token], sub: &str) -> Option<usize> {
             let mut i = 1;
             while i < tokens.len() {
                 let t = tokens[i].as_str();
-                if t == "-I" || t == "-O" {
+                if t == "-O" {
                     i += 1;
                     continue;
                 }
@@ -122,6 +122,15 @@ static COMMAND_OPTIONS: &[&str] = &[
     "window-pane-changed", "window-renamed", "window-resized", "window-unlinked",
 ];
 
+/// tmux takes any unique prefix of an option name, so a name is refused when it begins one tmux
+/// runs, or begins `after-`, or is begun by `after-`.
+fn runs_a_command(option: &str) -> bool {
+    if option.starts_with('@') {
+        return false;
+    }
+    option.starts_with("after-") || "after-".starts_with(option) || COMMAND_OPTIONS.iter().any(|known| known.starts_with(option))
+}
+
 /// `set-option [-aFgopqsuUw] [-t target] option [value]`: refused when the option is one tmux runs
 /// or writes to, when `-F` expands the value as a format before storing it, and when `-a` appends
 /// a value starting with `(` (which completes a `#(` begun by the stored value).
@@ -157,7 +166,7 @@ fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::SafeWrite).combine(crate::envvars::assignment_verdict(name, value));
     }
     let option = name.split('[').next().unwrap_or(name);
-    if option.starts_with("after-") || COMMAND_OPTIONS.contains(&option) || flags.contains('F') {
+    if runs_a_command(option) || flags.contains('F') {
         return Verdict::Denied;
     }
     if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with('(')) {
@@ -390,6 +399,19 @@ mod tests {
     }
 
     #[test]
+    fn every_prefix_of_an_option_tmux_runs_is_refused() {
+        for option in super::COMMAND_OPTIONS.iter().copied().chain(["after-new-window"]) {
+            for end in 1..=option.len() {
+                let cmd = format!("tmux set -g {} x", &option[..end]);
+                assert!(!check(&cmd), "{cmd} was approved");
+            }
+        }
+        for cmd in ["tmux set -g mouse on", "tmux set -g @my-option x", "tmux set -g status-left x", "tmux set -g history-limit 5000"] {
+            assert!(check(cmd), "{cmd} was refused");
+        }
+    }
+
+    #[test]
     fn a_spawned_command_runs_in_the_directory_dash_c_names() {
         let _ws =
             crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() });
@@ -502,6 +524,8 @@ mod tests {
         tmux_run_no_cmd_denied: "tmux run-shell",
         tmux_if_shell_format_unsafe_denied: "tmux if-shell -F '#{cond}' 'rm -rf /'",
         tmux_pipe_pane_output_unsafe_denied: "tmux pipe-pane -o /tmp/log 'rm -rf /'",
+        tmux_pipe_pane_input_denied: "tmux pipe-pane -I -t work 'printf x'",
+        tmux_pipep_input_denied: "tmux pipep -I 'echo id'",
         tmux_unknown_denied: "tmux load-buffer foo",
         tmux_new_session_command_denied: "tmux new-session 'rm -rf /'",
         tmux_new_session_detached_command_denied: "tmux new-session -d -s work rm -rf /",
