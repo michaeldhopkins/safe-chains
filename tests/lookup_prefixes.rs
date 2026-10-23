@@ -7,29 +7,22 @@ use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 
 fn at(cmd: &str) -> Verdict {
-    command_verdict_in(
-        cmd,
-        PathCtx { cwd: Some("/work/proj".into()), root: Some("/work/proj".into()), session_id: None },
-    )
+    command_verdict_in(cmd, PathCtx { cwd: Some("/work/proj".into()), root: Some("/work/proj".into()), session_id: None })
 }
 
 fn paths() -> Vec<String> {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/Users/me".into());
-    let mut out: Vec<String> = [
-        ".claude.json",
-        ".codex/auth.json",
-        "Library/Keychains/login.keychain-db",
-        ".s3cfg",
-        ".aws/credentials",
-        ".zshrc",
-        "notes.txt",
-    ]
-    .iter()
-    .map(|p| format!("{home}/{p}"))
-    .collect();
+    let mut out: Vec<String> =
+        [".claude.json", ".codex/auth.json", "Library/Keychains/login.keychain-db", ".s3cfg", ".aws/credentials", ".zshrc", "notes.txt"]
+            .iter()
+            .map(|p| format!("{home}/{p}"))
+            .collect();
     out.extend(
-        ["/.vol/1/2", "/Users/someone/notes.txt", "/private/etc/master.passwd", "/etc/hosts", "/usr/share/dict/words", "/work/proj/README.md"]
-            .map(String::from),
+        [
+            "/.vol/1/2", "/Users/someone/notes.txt", "/private/etc/master.passwd", "/etc/hosts", "/usr/share/dict/words",
+            "/work/proj/README.md",
+        ]
+        .map(String::from),
     );
     out
 }

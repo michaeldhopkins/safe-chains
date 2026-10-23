@@ -82,7 +82,12 @@ pub(super) fn build_policy(
         bare: bare.unwrap_or(true),
         max_positional,
         min_positional: None,
-        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false, ..FlagTolerance::strict() },
+        tolerance: FlagTolerance {
+            unknown,
+            numeric_dash: numeric_dash.unwrap_or(false),
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
         passthrough: None,
     }
 }

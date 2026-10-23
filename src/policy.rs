@@ -604,7 +604,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: true,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Both,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -653,7 +658,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Short,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -694,7 +704,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Long,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -744,7 +759,12 @@ mod tests {
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: Some(2),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() },
+            tolerance: FlagTolerance {
+                unknown: UnknownTolerance::Both,
+                numeric_dash: false,
+                single_dash_words: false,
+                ..FlagTolerance::strict()
+            },
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
@@ -828,7 +848,12 @@ mod tests {
     fn single_dash_words_under_short_tolerance_count_unknowns_as_positionals() {
         let policy = FlagPolicy {
             max_positional: Some(1),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Short, single_dash_words: true, numeric_dash: false, ..FlagTolerance::strict() },
+            tolerance: FlagTolerance {
+                unknown: UnknownTolerance::Short,
+                single_dash_words: true,
+                numeric_dash: false,
+                ..FlagTolerance::strict()
+            },
             ..WORDS_POLICY
         };
         assert!(check(&toks(&["exiftool", "-if"]), &policy));
@@ -939,7 +964,8 @@ mod tests {
 
     #[test]
     fn describe_reports_tolerances() {
-        let lenient = FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false, ..FlagTolerance::strict() };
+        let lenient =
+            FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false, ..FlagTolerance::strict() };
         assert_eq!(
             described(&[], &[], false, lenient),
             "- Hyphen-prefixed positional arguments accepted\n- Numeric shorthand accepted (e.g. -20 for -n 20)"

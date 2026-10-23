@@ -254,11 +254,7 @@ mod tests {
         std::fs::create_dir(format!("{root}/sub")).expect("folder");
         symlink("note", format!("{root}/file-link")).expect("file link");
         symlink("sub", format!("{root}/dir-link")).expect("folder link");
-        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
-            cwd: Some(root.clone()),
-            root: Some(root),
-            session_id: None,
-        });
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
         assert!(link_to_one_file("file-link"));
         assert!(!link_to_one_file("dir-link"));
         assert!(!link_to_one_file("note"));

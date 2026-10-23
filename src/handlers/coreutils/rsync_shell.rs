@@ -106,10 +106,7 @@ pub(crate) fn remote_shell_is_plain(value: &str) -> bool {
         };
         let fits = match flag {
             "-p" => argument.chars().all(|c| c.is_ascii_digit()),
-            "-l" => {
-                !argument.starts_with('-')
-                    && argument.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
-            }
+            "-l" => !argument.starts_with('-') && argument.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.')),
             "-o" => argument.split_once('=').is_some_and(|(key, setting)| {
                 SSH_OPTIONS.contains(&key.to_ascii_lowercase().as_str())
                     && !setting.is_empty()
@@ -167,7 +164,11 @@ fn rsync_path_verdict(value: &str) -> Verdict {
     if !plain {
         return Verdict::Denied;
     }
-    if value == "rsync" || ["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"].iter().any(|dir| value.strip_prefix(dir) == Some("rsync")) {
+    if value == "rsync"
+        || ["/bin/", "/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"]
+            .iter()
+            .any(|dir| value.strip_prefix(dir) == Some("rsync"))
+    {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     if value.starts_with('/') || value.starts_with('~') {
@@ -304,11 +305,8 @@ mod tests {
     #[test]
     fn a_remote_shell_that_escapes_or_sits_in_a_frozen_path_is_refused() {
         for cmd in [
-            "rsync -e 'scripts/../../evil' x:foo dst/",
-            "rsync -e '.git/hooks/x' x:foo dst/",
-            "rsync -e 'node_modules/.bin/x' x:foo dst/",
-            "RSYNC_RSH=scripts/../../evil rsync x:foo dst/",
-            "RSYNC_RSH=.git/hooks/x rsync x:foo dst/",
+            "rsync -e 'scripts/../../evil' x:foo dst/", "rsync -e '.git/hooks/x' x:foo dst/", "rsync -e 'node_modules/.bin/x' x:foo dst/",
+            "RSYNC_RSH=scripts/../../evil rsync x:foo dst/", "RSYNC_RSH=.git/hooks/x rsync x:foo dst/",
             "RSYNC_RSH=node_modules/.bin/x rsync x:foo dst/",
         ] {
             assert!(!in_project(cmd), "{cmd} was approved");
@@ -320,9 +318,7 @@ mod tests {
             assert!(!in_project(&by_var), "{by_var} was approved");
         }
         for cmd in [
-            "rsync -e ./bin/tool x:foo dst/",
-            "rsync -e sub/dir/tool x:foo dst/",
-            "rsync -e sub/../bin/tool x:foo dst/",
+            "rsync -e ./bin/tool x:foo dst/", "rsync -e sub/dir/tool x:foo dst/", "rsync -e sub/../bin/tool x:foo dst/",
             "RSYNC_RSH=./bin/tool rsync x:foo dst/",
         ] {
             assert!(in_project(cmd), "{cmd} was refused");

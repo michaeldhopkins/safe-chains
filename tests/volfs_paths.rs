@@ -5,10 +5,7 @@ use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 
 fn at(cmd: &str) -> Verdict {
-    command_verdict_in(
-        cmd,
-        PathCtx { cwd: Some("/work/proj".into()), root: Some("/work/proj".into()), session_id: None },
-    )
+    command_verdict_in(cmd, PathCtx { cwd: Some("/work/proj".into()), root: Some("/work/proj".into()), session_id: None })
 }
 
 #[test]

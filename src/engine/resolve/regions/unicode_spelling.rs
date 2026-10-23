@@ -263,7 +263,8 @@ mod tests {
                 assert!(s.write_locus >= ascii.write_locus, "{spelled} writes as {store}");
             }
         }
-        for other in ["/U\u{17F}ers/someone/notes.txt", "/System/Volumes/Data/U\u{17F}ers/someone/notes.txt", "/\u{17F}ystem/Volumes/Data/.vol/1/2"]
+        for other in
+            ["/U\u{17F}ers/someone/notes.txt", "/System/Volumes/Data/U\u{17F}ers/someone/notes.txt", "/\u{17F}ystem/Volumes/Data/.vol/1/2"]
         {
             assert!(classify_region(other).reads_secret || classify_region(other).read_locus > LocalLocus::Machine, "{other}");
         }

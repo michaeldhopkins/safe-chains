@@ -174,23 +174,14 @@ mod tests {
     #[test]
     fn a_session_name_after_a_valued_option_still_reattaches() {
         for cmd in [
-            "screen -x -p 0 work",
-            "screen -r -h5000 work",
-            "screen -p 0 -x work",
-            "screen -h5000 -r work",
-            "screen -h 5000 -r work",
+            "screen -x -p 0 work", "screen -r -h5000 work", "screen -p 0 -x work", "screen -h5000 -r work", "screen -h 5000 -r work",
             "screen -dr -p0 work",
         ] {
             assert!(check(cmd), "{cmd} was refused");
         }
-        for cmd in [
-            "screen -r -h5000 work sh",
-            "screen -x -p 0 work sh",
-            "screen -h5000",
-            "screen -p 0",
-            "screen -h -x",
-            "screen -r work sh",
-        ] {
+        for cmd in
+            ["screen -r -h5000 work sh", "screen -x -p 0 work sh", "screen -h5000", "screen -p 0", "screen -h -x", "screen -r work sh"]
+        {
             assert!(!check(cmd), "{cmd} was approved");
         }
     }

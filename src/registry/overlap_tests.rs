@@ -150,7 +150,8 @@ fn tokens(words: &[&str]) -> Vec<Token> {
     words.iter().map(|w| Token::from_test(w)).collect()
 }
 
-const STRICT: FlagTolerance = FlagTolerance { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() };
+const STRICT: FlagTolerance =
+    FlagTolerance { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() };
 
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(512))]
