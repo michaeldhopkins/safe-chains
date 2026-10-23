@@ -686,6 +686,33 @@ shape = "opaque"
 twin_flag = "pandoc +RTS {v} -RTS README.md"
 twin_base = "pandoc README.md"
 because = "GHC runtime options in the environment (the +RTS twin): -t, -s and -S write statistics to a named file"
+[env.COMMAND_MODE]
+shape = "opaque"
+because = "macOS commands read it to pick legacy behaviour, where ps -e shows each process's environment as -E does"
+[env.GREP_OPTIONS]
+shape = "opaque"
+because = "BSD grep, as macOS ships it, parses this as options before its arguments, so -r turns a read of one file into a sweep of the folder"
+[env.TAR_OPTIONS]
+shape = "opaque"
+because = "GNU tar parses this as options before its arguments, including --to-command and --use-compress-program, which run programs"
+[env.ZIPOPT]
+shape = "opaque"
+because = "Info-ZIP zip parses this as options before its arguments, including -TT, which names a command to run"
+[env.ZIP]
+shape = "opaque"
+because = "as ZIPOPT, read by Info-ZIP zip"
+[env.UNZIP]
+shape = "opaque"
+because = "Info-ZIP unzip parses this as options before its arguments, including -d, which sets where it extracts"
+[env.UNZIPOPT]
+shape = "opaque"
+because = "as UNZIP, read by Info-ZIP unzip"
+[env.ZIPINFO]
+shape = "opaque"
+because = "Info-ZIP zipinfo parses this as options before its arguments"
+[env.ZIPINFOOPT]
+shape = "opaque"
+because = "as ZIPINFO, read by Info-ZIP zipinfo"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
@@ -1174,6 +1201,12 @@ single_value = true
 twin_flag = "xcrun --toolchain {v} swift-format lint Sources/"
 twin_base = "xcrun swift-format lint Sources/"
 because = "selects the xctoolchain xcrun dispatches tools from (the --toolchain twin)"
+[env.RSYNC_PARTIAL_DIR]
+shape = "data-write"
+single_value = true
+twin_flag = "rsync --partial --partial-dir={v} ./src/ ./dst/"
+twin_base = "rsync --partial ./src/ ./dst/"
+because = "the folder rsync keeps partly sent files in when --partial is given (the --partial-dir twin)"
 [env.RSYNC_CONNECT_PROG]
 shape = "opaque"
 because = "rsync runs it through the shell, with %H replaced by the host, to reach an rsync daemon in place of a TCP connection, so any value is a command line"

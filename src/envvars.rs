@@ -619,6 +619,25 @@ mod integration_tests {
         }
     }
 
+    /// grep, tar and the Info-ZIP tools read an option string from the environment ahead of their
+    /// own arguments, so a flag refused on the command line must not arrive that way.
+    #[test]
+    fn an_archive_or_search_tool_takes_no_options_from_the_environment() {
+        for (cmd, bare) in [
+            ("GREP_OPTIONS=-r grep key ~", "grep key notes.txt"),
+            ("TAR_OPTIONS=--to-command=sh tar -tf a.tar", "tar -tf a.tar"),
+            ("ZIPOPT=-TTsh zip -T o.zip f", "zip -T o.zip f"),
+            ("ZIP=-TTsh zip -T o.zip f", "zip -T o.zip f"),
+            ("UNZIP=-d/etc unzip -l a.zip", "unzip -l a.zip"),
+            ("UNZIPOPT=-d/etc unzip -l a.zip", "unzip -l a.zip"),
+            ("ZIPINFO=-v zipinfo a.zip", "zipinfo a.zip"),
+            ("ZIPINFOOPT=-v zipinfo a.zip", "zipinfo a.zip"),
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} was allowed");
+            assert!(crate::is_safe_command(bare), "{bare} should still be allowed");
+        }
+    }
+
     /// screen and tmux start `$SHELL` for a new window, and screen reads its rc file from
     /// `SCREENRC` or `SYSSCREENRC`. Measured on screen 4.00.03 and tmux 3.6: each ran a planted script.
     #[test]
