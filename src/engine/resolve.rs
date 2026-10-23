@@ -1067,6 +1067,9 @@ impl<'a> TarParse<'a> {
         };
         // A `-` archive (or none) is a stdout/stdin stream, not a file to gate.
         let archive_file = archive.filter(|(_, a)| *a != "-");
+        if archive_file.is_some_and(|(_, a)| a.split('/').next().is_some_and(|head| head.contains(':'))) {
+            return worst("tar: GNU tar opens an archive named host:path on another machine over rsh or ssh — worst-cased (§0)");
+        }
 
         match mode {
             b'c' | b'r' | b'u' => {

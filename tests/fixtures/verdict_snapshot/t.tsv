@@ -288,6 +288,8 @@ tar	denied
 tar --help	denied
 tar --list --file archive.tar	safe-read
 tar --version	denied
+tar -c --file=host:/tmp/a.tar src	denied
+tar -c -f user@host:a.tar src	denied
 tar -cf archive.tar files/	safe-write
 tar -cf out.tar --directory=./build a.o	safe-write
 tar -cf out.tar -C ./src main.rs lib.rs	safe-write
@@ -296,12 +298,14 @@ tar -cf out.tar -C /tmp /etc/shadow	denied
 tar -cf out.tar -C ~/.ssh id_rsa	denied
 tar -cf out.tar -C./src main.rs	safe-write
 tar -cf out.tar -T /etc/shadow	denied
+tar -cfhost:a.tar src	denied
 tar -f archive.tar	denied
 tar -rf archive.tar newfile	safe-write
 tar -t -f archive.tar	safe-read
 tar -t -v -f archive.tar	safe-read
 tar -tJf archive.tar.xz	safe-read
 tar -tcf archive.tar	safe-write
+tar -tf ./backups/a:b.tar	safe-read
 tar -tf archive.tar	safe-read
 tar -tjf archive.tar.bz2	safe-read
 tar -tvf archive.tar	safe-read
@@ -319,6 +323,7 @@ tar cf out.tar -C / -C root -C .ssh id_rsa	denied
 tar cf out.tar -C /home -C victim .ssh/id_rsa	denied
 tar tf ./archive.tar	safe-read
 tar tf archive.tar	safe-read
+tar tf host:a.tar	denied
 tar tjf archive.tar.bz2	safe-read
 tar tvf archive.tar	safe-read
 tar tz	inert
