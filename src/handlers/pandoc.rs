@@ -24,7 +24,7 @@ pub fn check_pandoc(tokens: &[Token]) -> Verdict {
     registry::try_fallback_grammar("pandoc", tokens).unwrap_or(Verdict::Denied)
 }
 
-fn is_runtime_option(token: &str) -> bool {
+pub(super) fn is_runtime_option(token: &str) -> bool {
     token.starts_with("+RTS") || matches!(token, "-RTS" | "--RTS")
 }
 

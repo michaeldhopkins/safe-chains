@@ -1234,7 +1234,7 @@ shar	description,examples
 shards	description,examples,no-tolerance,profiled
 shasum	examples,version
 shazam	description,examples,profiled
-shellcheck	description,examples,no-overlap,version
+shellcheck	description,version
 shfmt	description,no-overlap
 shopt	examples,no-tolerance,version
 shred	description,examples

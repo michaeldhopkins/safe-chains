@@ -716,8 +716,6 @@ sequelize init	--config-path	untriaged	-	-	-
 sequelize init	--migrations-path	untriaged	-	-	-	
 sequelize init	--models-path	untriaged	-	-	-	
 sequelize init	--seeders-path	untriaged	-	-	-	
-shellcheck	--rcfile	untriaged	-	-	-	
-shellcheck	--source-path	untriaged	-	-	-	
 shfmt	--filename	untriaged	-	-	-	
 shfmt	-filename	untriaged	-	-	-	
 skaffold diagnose	--filename	untriaged	-	-	-	

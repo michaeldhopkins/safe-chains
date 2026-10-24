@@ -364,7 +364,9 @@ owed = [
   "a_plain_name_with_extensions_is_accepted_unless_it_is_pdf",
   "pdf_is_refused_with_any_extensions",
   "a_writer_flag_with_a_path_value_is_denied_in_every_spelling",
+  "any_runtime_option_token_is_denied",
 ]
+"src/handlers/shellcheck.rs" = ["any_runtime_option_token_is_denied"]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",
