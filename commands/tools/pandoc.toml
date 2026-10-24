@@ -4,7 +4,7 @@ description = "Universal document converter that parses markup and structured fo
 url = "https://pandoc.org/MANUAL.html"
 researched_version = "pandoc 3.12.1"
 handler = "pandoc"
-doc_body = "Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists."
+doc_body = "Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). Any `+RTS`, `-RTS` or `--RTS` argument is denied (GHC runtime options can write statistics to a named file). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists."
 examples_safe = [
     "pandoc README.md",
     "pandoc -f markdown -t html README.md",
@@ -17,6 +17,8 @@ examples_safe = [
     "pandoc --version",
 ]
 examples_denied = [
+    "pandoc README.md +RTS -tpwned",
+    "pandoc +RTS -sout -RTS README.md",
     "pandoc README.md -o out.html",
     "pandoc README.md --output=out.pdf",
     "pandoc --output out.docx README.md",

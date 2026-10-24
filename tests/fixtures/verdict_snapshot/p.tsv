@@ -293,6 +293,10 @@ pal2rgb -r	safe-write
 pal2rgb x	safe-write
 pandoc	safe-read
 pandoc "https://example.com/?q=$HOME"	denied
+pandoc +RTS -sout -RTS README.md	denied
+pandoc +RTS -tpwned README.md	denied
+pandoc -- README.md +RTS -tpwned	denied
+pandoc --RTS README.md	denied
 pandoc --abbreviations x	safe-read
 pandoc --ascii	safe-read
 pandoc --ascii --abbreviations x	safe-read
@@ -468,9 +472,14 @@ pandoc -v	safe-read
 pandoc -w ./w.lua README.md	denied
 pandoc -w x	safe-read
 pandoc README.md	safe-read
+pandoc README.md '+RTS' -tpwned	denied
+pandoc README.md +RTS -s -RTS	denied
+pandoc README.md +RTS -tpwned	denied
 pandoc README.md --output=out.pdf	denied
+pandoc README.md -RTS	denied
 pandoc README.md -o out.html	denied
 pandoc README.md -t	denied
+pandoc README.md -t html	safe-read
 pandoc lua	denied
 pandoc lua x.lua	denied
 pandoc server	denied

@@ -15,10 +15,17 @@ pub fn check_pandoc(tokens: &[Token]) -> Verdict {
     if matches!(tokens.get(1).map(Token::as_str), Some("lua" | "server")) {
         return Verdict::Denied;
     }
+    if tokens.iter().any(|t| is_runtime_option(t.as_str())) {
+        return Verdict::Denied;
+    }
     if !format_values_are_plain(tokens) {
         return Verdict::Denied;
     }
     registry::try_fallback_grammar("pandoc", tokens).unwrap_or(Verdict::Denied)
+}
+
+fn is_runtime_option(token: &str) -> bool {
+    token.starts_with("+RTS") || matches!(token, "-RTS" | "--RTS")
 }
 
 /// A format name with optional `+ext` / `-ext` suffixes: `[a-z0-9_]+([+-][a-z0-9_]+)*`. Nothing
@@ -111,6 +118,7 @@ mod tests {
         template_by_format: "pandoc -D html",
         long_template_by_format: "pandoc --print-default-template=latex",
         a_file_named_like_a_flag_value: "pandoc -V title=lua README.md",
+        plain_writer_with_html_target: "pandoc README.md -t html",
     }
 
     denied! {
@@ -123,6 +131,14 @@ mod tests {
         missing_value: "pandoc README.md -t",
         equals_form_short: "pandoc -t=html README.md",
         trailing_separator: "pandoc -t html+ README.md",
+        runtime_options_stats_file: "pandoc README.md +RTS -tpwned",
+        runtime_options_first: "pandoc +RTS -tpwned README.md",
+        runtime_options_closed: "pandoc README.md +RTS -s -RTS",
+        runtime_options_glued_file: "pandoc +RTS -sout -RTS README.md",
+        runtime_options_after_separator: "pandoc -- README.md +RTS -tpwned",
+        runtime_options_end_marker: "pandoc --RTS README.md",
+        runtime_options_bare_end: "pandoc README.md -RTS",
+        runtime_options_quoted: "pandoc README.md '+RTS' -tpwned",
     }
 
     #[test]
@@ -131,6 +147,15 @@ mod tests {
     }
 
     proptest! {
+        #[test]
+        fn any_runtime_option_token_is_denied(
+            before in "[a-zA-Z.]{0,6}", after in "[a-zA-Z0-9.-]{0,8}",
+            marker in prop::sample::select(vec!["+RTS", "-RTS", "--RTS", "+RTSx"]),
+        ) {
+            let cmd = format!("pandoc {before} {marker} {after}");
+            prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
+        }
+
         #[test]
         fn a_value_with_a_path_character_is_never_a_plain_format(
             head in "[a-z0-9_]{0,6}", sep in "[/.~\\\\]", tail in "[a-z0-9_./]{0,6}",
