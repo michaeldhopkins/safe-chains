@@ -145,6 +145,7 @@ pub(crate) fn judge_leaf(tokens: &[Token], with_env: bool, classify: impl FnOnce
     let frame = FrameGuard::push(declared);
     let verdict = classify();
     let frame = frame.pop();
+    let verdict = if verdict.is_allowed() { verdict.combine(folder_code_verdict(declared)) } else { verdict };
     let writes = matches!(verdict, Verdict::Allowed(l) if l > SafetyLevel::SafeRead);
     if !writes {
         return verdict;
@@ -189,6 +190,21 @@ fn cwd_write_verdict(declared: Option<Anchor>, named_write: bool) -> Verdict {
     let verdict = crate::engine::resolve::write_target_verdict(".");
     frame.pop();
     verdict
+}
+
+/// The verdict for the code a leaf runs from the folder it runs in (`cargo run`, a `rake` task) or
+/// builds there (`cargo build` runs build scripts): once a `cd` has moved the line, that folder is
+/// judged as the place code is loaded from, so a temporary folder asks as `/tmp/x.py` would, though
+/// writing there would be approved.
+fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
+    let runs = matches!(declared, Some(Anchor::ImplicitOutput | Anchor::RunsFolderCode));
+    if !runs || !super::moved_by_cd() || super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    let frame = FrameGuard::push(None);
+    let trusted = crate::engine::resolve::execute_file_verdict(".").is_allowed();
+    frame.pop();
+    if trusted { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 fn within_root(cwd: &str) -> bool {

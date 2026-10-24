@@ -165,6 +165,7 @@ valued = [
 
 [[command.sub]]
 name = "bench"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--workspace",
@@ -231,6 +232,7 @@ valued = [
 
 [[command.sub]]
 name = "check"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
@@ -248,6 +250,7 @@ valued = [
 
 [[command.sub]]
 name = "clippy"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
@@ -455,6 +458,7 @@ valued = ["--color", "--index", "--limit", "--registry"]
 
 [[command.sub]]
 name = "test"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all",
@@ -529,6 +533,7 @@ valued = ["--color", "--manifest-path"]
 # imply cargo-mutants accepts `-V` as a version flag — it does not.
 [[command.sub]]
 name = "mutants"
+writes_cwd = "code"
 level = "SafeRead"
 max_positional = 0
 standalone = [
@@ -558,6 +563,7 @@ nested_bare = true
 standalone = ["--help", "--version", "-V", "-h"]
 [[command.sub.sub]]
 name = "run"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all-features", "--all-targets", "--help", "--lib",
@@ -709,6 +715,7 @@ valued = [
 
 [[command.sub]]
 name = "llvm-cov"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all-features", "--all-targets", "--help", "--html", "--json",
@@ -853,6 +860,7 @@ valued = [
 
 [[command.sub]]
 name = "udeps"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches",

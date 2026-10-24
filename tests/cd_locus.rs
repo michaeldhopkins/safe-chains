@@ -25,6 +25,11 @@ fn the_reported_lines_ask() {
         "pushd ~ && cargo fmt",
         "cd ~ && cargo build",
         "(cd ~ && cargo fmt)",
+        "cd /tmp/x && cargo run",
+        "cd /tmp/x && cargo build",
+        "cd /tmp/x && cargo test",
+        "cd ~/other && cargo check",
+        "cd /private/tmp/x && cargo clippy",
     ] {
         assert!(!approved(command), "`{command}` was approved");
     }

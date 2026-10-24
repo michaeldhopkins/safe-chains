@@ -168,3 +168,34 @@ fn a_named_write_and_a_fixed_target_do_not_take_the_folder() {
         assert!(verdict_in(ROOT, &line).is_allowed(), "{line}");
     }
 }
+
+/// Every sub the registry declares as running the folder's code, or building into it (which runs
+/// build scripts): approved in the workspace, it must ask once a `cd` has taken it to a folder whose
+/// code is not the project's, a temporary one included, where a plain write would be approved.
+#[test]
+fn a_declared_folder_code_runner_follows_the_working_directory_to_a_temporary_folder() {
+    let mut checked = 0;
+    let mut wrong = Vec::new();
+    for (command, anchor) in crate::registry::declared_writers() {
+        if !matches!(anchor, Anchor::ImplicitOutput | Anchor::RunsFolderCode) {
+            continue;
+        }
+        let at_root = verdict_in(ROOT, &command);
+        if !at_root.is_allowed() {
+            continue;
+        }
+        checked += 1;
+        for dir in ["/tmp/x", "/private/tmp/x", "/var/folders/ab/T/x"] {
+            let line = format!("cd {dir} && {command}");
+            if verdict_in(ROOT, &line).is_allowed() {
+                wrong.push(format!("`{line}`"));
+            }
+        }
+        let line = format!("cd src && {command}");
+        if verdict_in(ROOT, &line) != at_root {
+            wrong.push(format!("`{line}` changed its verdict inside the workspace"));
+        }
+    }
+    assert!(checked > 50, "only {checked} declared folder code runners are approved at the root");
+    assert!(wrong.is_empty(), "{} wrong, first:\n{}", wrong.len(), wrong.iter().take(25).cloned().collect::<Vec<_>>().join("\n"));
+}
