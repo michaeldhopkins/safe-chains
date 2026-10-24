@@ -2000,6 +2000,7 @@ mise which -q	inert
 mise which -v	inert
 mise which x	inert
 mise x	denied
+mise x x	denied
 mix	denied
 mix --help	inert
 mix --help --version	inert

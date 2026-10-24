@@ -502,6 +502,7 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "exec"
+aliases = ["x"]
 delegate_after = "--"
 refuse_operands = ["*[*", "*@path:*"]
 

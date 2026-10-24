@@ -941,6 +941,7 @@ Aliases: `fly`
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
+- **x**: delegates to inner command
 - Allowed standalone flags: --help, --version, -V, -h
 
 **Examples:**
