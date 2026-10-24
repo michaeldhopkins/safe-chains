@@ -589,6 +589,8 @@ pub(super) struct TomlSub {
     /// adds.
     #[serde(default)]
     pub output: Option<TomlOutput>,
+    #[serde(default)]
+    pub passthrough: Option<TomlPassthrough>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -1014,13 +1016,6 @@ pub(super) struct MatrixSpec {
     pub parents: Vec<String>,
     pub level: SafetyLevel,
     pub actions: std::collections::HashMap<String, MatrixAction>,
-}
-
-#[derive(Debug, Clone)]
-pub(super) struct MatrixAction {
-    pub policy_key: String,
-    pub guard: Option<String>,
-    pub guard_short: Option<String>,
 }
 
 #[derive(Debug, Clone)]

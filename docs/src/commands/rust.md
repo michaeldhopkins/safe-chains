@@ -52,7 +52,7 @@
 - **doc**: Flags: --all, --all-features, --bins, --document-private-items, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-deps, --offline, --open, --release, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
 - **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
 - **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --target, -Z
-- **fmt**: Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
+- **fmt**: Flags: --all, --check, --help, --version, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
 - **fuzz**: Flags: --help, --version, -V, -h
 - **geiger**: Flags: --all, --all-dependencies, --all-features, --all-targets, --build-dependencies, --dev-dependencies, --forbid-only, --frozen, --help, --include-tests, --invert, --locked, --no-default-features, --no-indent, --offline, --prefix-depth, --quiet, --verbose, --version, -V, -a, -f, -h, -i, -q, -v. Valued: --color, --features, --format, --manifest-path, --output-format, --package, --section-name, --target, -Z, -p
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
@@ -128,6 +128,10 @@
 - `cargo fmt`
 - `cargo fmt --all`
 - `cargo fmt --check`
+- `cargo fmt --all -- --check`
+- `cargo fmt -p foo -- --check`
+- `cargo fmt --package foo -- --check -l`
+- `cargo fmt -- --check --edition 2024`
 - `cargo fmt --manifest-path ./crates/core/Cargo.toml`
 - `cargo about --version`
 - `cargo about --help`

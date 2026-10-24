@@ -12,10 +12,10 @@ fuzz_min_targets = 8
 "src/engine/resolve/regions.rs" = 932
 "src/engine/resolve.rs" = 1502
 "src/pathgate.rs" = 538
-"src/registry/build.rs" = 1364
-"src/registry/dispatch.rs" = 545
+"src/registry/build.rs" = 1356
+"src/registry/dispatch.rs" = 539
 "src/registry/mod.rs" = 663
-"src/registry/types.rs" = 1050
+"src/registry/types.rs" = 1045
 
 [pinned_thresholds]
 "cognitive-complexity-threshold" = 30

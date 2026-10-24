@@ -1059,21 +1059,38 @@ cargo fetch -v	safe-write
 cargo fetch x	safe-write
 cargo fix	denied
 cargo fmt	safe-write
+cargo fmt -- --check --edition 2024	safe-read
+cargo fmt -- --check --edition 2024 --color never	safe-read
+cargo fmt -- --check /tmp/evil.rs	denied
+cargo fmt -- --check src/lib.rs	denied
 cargo fmt -- /tmp/evil.rs	denied
 cargo fmt --all	safe-write
-cargo fmt --all --check	safe-write
+cargo fmt --all -- --check	safe-read
+cargo fmt --all -- --emit files	denied
+cargo fmt --all -- --print-config default /tmp/rustfmt.toml	denied
+cargo fmt --all -- -l	denied
+cargo fmt --all --check	safe-read
 cargo fmt --all --manifest-path x	safe-write
 cargo fmt --all x	denied
-cargo fmt --check	safe-write
+cargo fmt --check	safe-read
 cargo fmt --help	safe-write
 cargo fmt --manifest-path ./crates/core/Cargo.toml	safe-write
 cargo fmt --manifest-path /tmp/other/Cargo.toml	denied
+cargo fmt --manifest-path fuzz/Cargo.toml --all -- --check	safe-read
 cargo fmt --manifest-path x	safe-write
 cargo fmt --manifest-path ~/other/Cargo.toml	denied
 cargo fmt --message-format x	safe-write
+cargo fmt --package foo -- --check -l	safe-read
+cargo fmt --package safe-chains -- --check --files-with-diff	safe-read
 cargo fmt --package x	safe-write
 cargo fmt --quiet	safe-write
+cargo fmt --version	safe-write
 cargo fmt -h	safe-write
+cargo fmt -p -- --check	denied
+cargo fmt -p foo	safe-write
+cargo fmt -p foo -- --backup	denied
+cargo fmt -p foo -- --check	safe-read
+cargo fmt -p safe-chains -- --check	safe-read
 cargo fmt -p x	safe-write
 cargo fmt -q	safe-write
 cargo fmt -v	safe-write

@@ -327,6 +327,19 @@
 # bare = false                           # must have at least the guard flag
 # standalone = ["--all", "--check", "-h"]
 # valued = ["--package", "-p"]
+#
+# When the unguarded subcommand is itself allowed at a higher level (e.g.
+# "cargo fmt" at SafeWrite with max_positional = 0) and also accepts a
+# guarded read-only flag grammar after "--" (e.g. "cargo fmt --all -- --check"),
+# attach a [command.sub.passthrough] block:
+#
+# [command.sub.passthrough]
+# guard = "--check"
+# level = "SafeRead"
+# bare = false
+# max_positional = 0
+# standalone = ["--check", "--files-with-diff", "-l", "-q", "-v"]
+# valued = ["--color", "--config", "--edition", "--style-edition"]
 
 # ─────────────────────────────────────────────────────────────────────
 # NESTED SUBCOMMANDS — subcommand has its own subcommands

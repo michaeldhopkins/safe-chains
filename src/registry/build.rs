@@ -83,6 +83,7 @@ pub(super) fn build_policy(
         max_positional,
         min_positional: None,
         tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false },
+        passthrough: None,
     }
 }
 
@@ -779,6 +780,7 @@ fn build_policy_sub_kind(
         )
     };
     policy.min_positional = toml.min_positional;
+    policy.passthrough = toml.passthrough.map(super::policy::build_passthrough);
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     if let Some(name) = toml.executor.as_deref() {
         let Some(kind) = ExecutorKind::from_name(name) else {
@@ -991,17 +993,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             env_assignment_positionals,
-            kind: DispatchKind::Policy {
-                policy: OwnedPolicy {
-                    standalone: Vec::new(),
-                    valued: Vec::new(),
-                    bare: false,
-                    max_positional: Some(0),
-                    min_positional: None,
-                    tolerance: FlagTolerance::default(),
-                },
-                level: SafetyLevel::Inert,
-            },
+            kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert },
         });
     }
     if let Some(vc) = toml.verb_chain {

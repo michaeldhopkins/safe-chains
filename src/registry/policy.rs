@@ -1,5 +1,8 @@
 use crate::parse::Token;
 use crate::policy::{FlagSet, FlagTolerance, UnknownTolerance, check_flags, consumes_next_value, count_positionals};
+use crate::verdict::{SafetyLevel, Verdict};
+
+use super::types::{PassthroughSpec, TomlLevel, TomlPassthrough};
 
 #[derive(Debug, Clone)]
 pub struct OwnedPolicy {
@@ -9,6 +12,7 @@ pub struct OwnedPolicy {
     pub max_positional: Option<usize>,
     pub min_positional: Option<usize>,
     pub tolerance: FlagTolerance,
+    pub passthrough: Option<Box<PassthroughSpec>>,
 }
 
 impl OwnedPolicy {
@@ -20,7 +24,113 @@ impl OwnedPolicy {
             max_positional: None,
             min_positional: None,
             tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+            passthrough: None,
         }
+    }
+
+    pub(super) fn deny_all() -> Self {
+        OwnedPolicy {
+            standalone: Vec::new(),
+            valued: Vec::new(),
+            bare: false,
+            max_positional: Some(0),
+            min_positional: None,
+            tolerance: FlagTolerance::default(),
+            passthrough: None,
+        }
+    }
+}
+
+pub(super) fn build_passthrough(toml: TomlPassthrough) -> Box<PassthroughSpec> {
+    let policy = super::build::build_policy(
+        toml.standalone, toml.valued, toml.optional_valued, toml.bare, toml.max_positional, toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long, toml.numeric_dash,
+    );
+    let mut require_any = toml.require_any;
+    if let Some(guard) = toml.guard {
+        require_any.push(guard);
+    }
+    if let Some(short) = toml.guard_short {
+        require_any.push(short);
+    }
+    let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
+    Box::new(PassthroughSpec { policy, require_any, level })
+}
+
+fn has_unvalued_flag(tokens: &[Token], policy: &OwnedPolicy) -> bool {
+    let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            break;
+        }
+        if !t.starts_with('-') || t == "-" {
+            i += 1;
+            continue;
+        }
+        if valued.contains_flag(t) {
+            if !consumes_next_value(tokens.get(i + 1)) {
+                return true;
+            }
+            i += 2;
+            continue;
+        }
+        if !t.starts_with("--") && !policy.tolerance.single_dash_words {
+            let bytes = t.as_bytes();
+            for (j, &b) in bytes.iter().enumerate().skip(1) {
+                if standalone.contains_short(b) {
+                    continue;
+                }
+                if valued.contains_short(b) {
+                    if j == bytes.len() - 1 {
+                        if !consumes_next_value(tokens.get(i + 1)) {
+                            return true;
+                        }
+                        i += 1;
+                    }
+                    break;
+                }
+                break;
+            }
+        }
+        i += 1;
+    }
+    false
+}
+
+pub(super) fn check_with_passthrough(tokens: &[Token], policy: &OwnedPolicy, base_level: SafetyLevel) -> Verdict {
+    if let Some(pass) = &policy.passthrough
+        && let Some(rel) = tokens[1..].iter().position(|t| t == "--")
+    {
+        let sep = rel + 1;
+        let prefix = &tokens[..sep];
+        let tail = &tokens[sep..];
+        if !check_owned(prefix, policy)
+            || has_unvalued_flag(prefix, policy)
+            || tail[1..].iter().any(|t| t == "--")
+            || !check_owned(tail, &pass.policy)
+            || has_unvalued_flag(tail, &pass.policy)
+        {
+            return Verdict::Denied;
+        }
+        let guarded = pass.require_any.is_empty()
+            || flag_given(tail, &pass.policy, &pass.require_any)
+            || flag_given(prefix, policy, &pass.require_any);
+        return if guarded { Verdict::Allowed(pass.level) } else { Verdict::Denied };
+    }
+    if check_owned(tokens, policy) {
+        if let Some(pass) = &policy.passthrough {
+            if has_unvalued_flag(tokens, policy) {
+                return Verdict::Denied;
+            }
+            if !pass.require_any.is_empty() && flag_given(tokens, policy, &pass.require_any) {
+                return Verdict::Allowed(pass.level);
+            }
+        }
+        Verdict::Allowed(base_level)
+    } else {
+        Verdict::Denied
     }
 }
 
@@ -173,6 +283,7 @@ mod tests {
             max_positional,
             min_positional: None,
             tolerance: FlagTolerance::strict(),
+            passthrough: None,
         }
     }
 
@@ -400,6 +511,7 @@ mod flag_given_tests {
             max_positional: None,
             min_positional,
             tolerance: FlagTolerance::strict(),
+            passthrough: None,
         }
     }
 

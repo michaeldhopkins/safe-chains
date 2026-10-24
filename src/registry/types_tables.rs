@@ -87,3 +87,45 @@ pub(in crate::registry) struct TomlWrapper {
     #[serde(default)]
     pub toolchain_selector: Option<bool>,
 }
+
+#[derive(Debug, Deserialize)]
+pub(in crate::registry) struct TomlPassthrough {
+    #[serde(default)]
+    pub level: Option<TomlLevel>,
+    #[serde(default)]
+    pub bare: Option<bool>,
+    #[serde(default)]
+    pub max_positional: Option<usize>,
+    #[serde(default)]
+    pub guard: Option<String>,
+    #[serde(default)]
+    pub guard_short: Option<String>,
+    #[serde(default)]
+    pub require_any: Vec<String>,
+    #[serde(default)]
+    pub standalone: Vec<String>,
+    #[serde(default)]
+    pub valued: Vec<String>,
+    #[serde(default)]
+    pub optional_valued: Vec<String>,
+    #[serde(default)]
+    pub tolerate_unknown_short: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_long: Option<bool>,
+    #[serde(default)]
+    pub numeric_dash: Option<bool>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PassthroughSpec {
+    pub policy: super::OwnedPolicy,
+    pub require_any: Vec<String>,
+    pub level: crate::verdict::SafetyLevel,
+}
+
+#[derive(Debug, Clone)]
+pub(in crate::registry) struct MatrixAction {
+    pub policy_key: String,
+    pub guard: Option<String>,
+    pub guard_short: Option<String>,
+}
