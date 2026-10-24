@@ -291,181 +291,158 @@ pal2rgb -h	safe-write
 pal2rgb -p	safe-write
 pal2rgb -r	safe-write
 pal2rgb x	safe-write
-pandoc	safe-write
-pandoc --abbreviations x	safe-write
-pandoc --ascii	safe-write
-pandoc --ascii --abbreviations x	safe-write
-pandoc --ascii --atx-headers	safe-write
-pandoc --ascii x	safe-write
-pandoc --atx-headers	safe-write
-pandoc --bash-completion	safe-write
-pandoc --biblatex	safe-write
-pandoc --bibliography	safe-write
-pandoc --bibliography x	safe-write
-pandoc --citation-abbreviations x	safe-write
-pandoc --columns	safe-write
-pandoc --columns x	safe-write
-pandoc --csl	safe-write
-pandoc --csl x	safe-write
-pandoc --data-dir x	safe-write
-pandoc --datadir	safe-write
-pandoc --default-image-extension x	safe-write
-pandoc --dpi x	safe-write
-pandoc --dump-args	safe-write
-pandoc --email-obfuscation x	safe-write
-pandoc --embed-resources	safe-write
-pandoc --eol	safe-write
-pandoc --epub-chapter-level	safe-write
-pandoc --epub-chapter-level x	safe-write
-pandoc --epub-cover-image	safe-write
-pandoc --epub-cover-image x	safe-write
-pandoc --epub-embed-font	safe-write
-pandoc --epub-embed-font x	safe-write
-pandoc --epub-metadata	safe-write
-pandoc --epub-metadata x	safe-write
-pandoc --epub-stylesheet	safe-write
-pandoc --epub-stylesheet x	safe-write
-pandoc --epub-subdirectory	safe-write
-pandoc --epub-subdirectory x	safe-write
-pandoc --extract-media	safe-write
-pandoc --extract-media x	safe-write
-pandoc --fail-if-warnings	safe-write
-pandoc --file-scope	safe-write
-pandoc --file-scope x	safe-write
-pandoc --from	safe-write
-pandoc --from x	safe-write
-pandoc --gladtex	safe-write
-pandoc --gladtex x	safe-write
-pandoc --help	safe-write
-pandoc --highlight-style	safe-write
-pandoc --html-q-tags	safe-write
-pandoc --id-prefix	safe-write
-pandoc --id-prefix x	safe-write
-pandoc --ignore-args	safe-write
-pandoc --include-after-body	safe-write
-pandoc --include-after-body x	safe-write
-pandoc --include-before-body	safe-write
-pandoc --include-before-body x	safe-write
-pandoc --include-in-header	safe-write
-pandoc --include-in-header x	safe-write
-pandoc --incremental	safe-write
-pandoc --indented-code-classes	safe-write
-pandoc --ipynb-output	safe-write
-pandoc --ipynb-output x	safe-write
-pandoc --katex	safe-write
-pandoc --katex x	safe-write
-pandoc --katex-stylesheet	safe-write
-pandoc --katex-stylesheet x	safe-write
-pandoc --latex-engine	safe-write
-pandoc --latex-engine x	safe-write
-pandoc --list-extensions	safe-write
-pandoc --list-highlight-languages	safe-write
-pandoc --list-highlight-styles	safe-write
-pandoc --list-input-formats	safe-write
-pandoc --list-output-formats	safe-write
-pandoc --listings	safe-write
-pandoc --log	safe-write
-pandoc --log x	safe-write
-pandoc --lua-filter x	safe-write
-pandoc --mathjax	safe-write
-pandoc --mathjax x	safe-write
-pandoc --mathml	safe-write
-pandoc --mathml x	safe-write
-pandoc --metadata	safe-write
-pandoc --metadata x	safe-write
-pandoc --metadata-file x	safe-write
-pandoc --mimex	safe-write
-pandoc --natbib	safe-write
-pandoc --natbib x	safe-write
-pandoc --no-check-certificate	safe-write
-pandoc --no-highlight	safe-write
-pandoc --number-offset	safe-write
-pandoc --number-offset x	safe-write
-pandoc --number-sections	safe-write
-pandoc --output	safe-write
-pandoc --output x	safe-write
-pandoc --parse-raw	safe-write
-pandoc --pdf-engine	safe-write
-pandoc --pdf-engine x	safe-write
-pandoc --pdf-engine-opt x	safe-write
-pandoc --preserve-tabs	safe-write
-pandoc --quiet	safe-write
-pandoc --read	safe-write
-pandoc --read x	safe-write
-pandoc --reference-doc	safe-write
-pandoc --reference-doc x	safe-write
-pandoc --reference-links	safe-write
-pandoc --reference-location	safe-write
-pandoc --reference-location x	safe-write
-pandoc --request-header x	safe-write
-pandoc --resource-path	safe-write
-pandoc --resource-path x	safe-write
-pandoc --sandbox	safe-write
-pandoc --section-divs	safe-write
-pandoc --self-contained	safe-write
-pandoc --shift-heading-level-by	safe-write
-pandoc --shift-heading-level-by x	safe-write
-pandoc --slide-level	safe-write
-pandoc --slide-level x	safe-write
-pandoc --smart	safe-write
-pandoc --standalone	safe-write
-pandoc --strip-comments	safe-write
-pandoc --strip-empty-paragraphs	safe-write
-pandoc --syntax-definition	safe-write
-pandoc --syntax-definition x	safe-write
-pandoc --tab-stop	safe-write
-pandoc --tab-stop x	safe-write
-pandoc --table-of-contents	safe-write
-pandoc --template	safe-write
-pandoc --template x	safe-write
-pandoc --to	safe-write
-pandoc --to x	safe-write
-pandoc --toc	safe-write
-pandoc --toc-depth	safe-write
-pandoc --toc-depth x	safe-write
-pandoc --top-level-division	safe-write
-pandoc --top-level-division x	safe-write
-pandoc --trace	safe-write
-pandoc --track-changes	safe-write
-pandoc --track-changes x	safe-write
-pandoc --variable	safe-write
-pandoc --variable x	safe-write
-pandoc --verbose	safe-write
-pandoc --version	safe-write
-pandoc --webtex	safe-write
-pandoc --webtex x	safe-write
-pandoc --wrap	safe-write
-pandoc --wrap x	safe-write
-pandoc --write	safe-write
-pandoc --write x	safe-write
-pandoc -C	safe-write
-pandoc -D	safe-write
-pandoc -D x	safe-write
-pandoc -F	safe-write
-pandoc -H	safe-write
-pandoc -H x	safe-write
-pandoc -M x	safe-write
-pandoc -N	safe-write
-pandoc -N x	safe-write
-pandoc -R	safe-write
-pandoc -S	safe-write
-pandoc -V	safe-write
-pandoc -V x	safe-write
-pandoc -f x	safe-write
-pandoc -h	safe-write
-pandoc -i	safe-write
-pandoc -i x	safe-write
-pandoc -o	safe-write
-pandoc -o x	safe-write
-pandoc -p	safe-write
-pandoc -r	safe-write
-pandoc -s	safe-write
-pandoc -t	safe-write
-pandoc -t x	safe-write
-pandoc -v	safe-write
-pandoc -w	safe-write
-pandoc -w x	safe-write
-pandoc x	safe-write
+pandoc	safe-read
+pandoc --abbreviations x	safe-read
+pandoc --ascii	safe-read
+pandoc --ascii --abbreviations x	safe-read
+pandoc --ascii --atx-headers	safe-read
+pandoc --ascii x	safe-read
+pandoc --atx-headers	safe-read
+pandoc --base-header-level x	safe-read
+pandoc --bash-completion	safe-read
+pandoc --biblatex	safe-read
+pandoc --bibliography x	safe-read
+pandoc --citation-abbreviations x	safe-read
+pandoc --citeproc	safe-read
+pandoc --citeproc --bibliography=refs.bib --csl=ieee.csl paper.md	safe-read
+pandoc --columns x	safe-read
+pandoc --csl x	safe-read
+pandoc --css x	safe-read
+pandoc --data-dir x	safe-read
+pandoc --datadir	safe-read
+pandoc --default-image-extension x	safe-read
+pandoc --defaults=defaults.yaml README.md	denied
+pandoc --dpi x	safe-read
+pandoc --dump-args	safe-read
+pandoc --email-obfuscation x	safe-read
+pandoc --embed-resources	safe-read
+pandoc --eol x	safe-read
+pandoc --epub-chapter-level x	safe-read
+pandoc --epub-cover-image x	safe-read
+pandoc --epub-embed-font x	safe-read
+pandoc --epub-metadata x	safe-read
+pandoc --epub-stylesheet x	safe-read
+pandoc --epub-subdirectory x	safe-read
+pandoc --epub-title-page	safe-read
+pandoc --extract-media ./media README.docx	denied
+pandoc --extract-media=./media README.docx	denied
+pandoc --fail-if-warnings	safe-read
+pandoc --figure-caption-position x	safe-read
+pandoc --file-scope	safe-read
+pandoc --filter=pandoc-crossref README.md	denied
+pandoc --from x	safe-read
+pandoc --from=gfm --to=plain --wrap=none README.md	safe-read
+pandoc --gladtex	safe-read
+pandoc --help	safe-read
+pandoc --highlight-style x	safe-read
+pandoc --html-q-tags	safe-read
+pandoc --id-prefix x	safe-read
+pandoc --ignore-args	safe-read
+pandoc --include-after-body x	safe-read
+pandoc --include-before-body x	safe-read
+pandoc --include-in-header x	safe-read
+pandoc --incremental	safe-read
+pandoc --indented-code-classes x	safe-read
+pandoc --ipynb-output x	safe-read
+pandoc --katex	safe-read
+pandoc --katex-stylesheet x	safe-read
+pandoc --link-images	safe-read
+pandoc --list-extensions	safe-read
+pandoc --list-highlight-languages	safe-read
+pandoc --list-highlight-styles	safe-read
+pandoc --list-input-formats	safe-read
+pandoc --list-output-formats	safe-read
+pandoc --listings	safe-read
+pandoc --log=out.json README.md	denied
+pandoc --lua-filter=filter.lua README.md	denied
+pandoc --markdown-headings x	safe-read
+pandoc --mathjax	safe-read
+pandoc --mathml	safe-read
+pandoc --metadata x	safe-read
+pandoc --metadata-file x	safe-read
+pandoc --mimex	safe-read
+pandoc --natbib	safe-read
+pandoc --no-check-certificate	safe-read
+pandoc --no-highlight	safe-read
+pandoc --number-offset x	safe-read
+pandoc --number-sections	safe-read
+pandoc --output out.docx README.md	denied
+pandoc --parse-raw	safe-read
+pandoc --pdf-engine=xelatex README.md	denied
+pandoc --preserve-tabs	safe-read
+pandoc --print-default-data-file x	safe-read
+pandoc --print-default-template x	safe-read
+pandoc --print-highlight-style x	safe-read
+pandoc --quiet	safe-read
+pandoc --read x	safe-read
+pandoc --reference-doc x	safe-read
+pandoc --reference-links	safe-read
+pandoc --reference-location x	safe-read
+pandoc --request-header x	safe-read
+pandoc --resource-path x	safe-read
+pandoc --sandbox	safe-read
+pandoc --section-divs	safe-read
+pandoc --self-contained	safe-read
+pandoc --shift-heading-level-by x	safe-read
+pandoc --slide-level x	safe-read
+pandoc --smart	safe-read
+pandoc --split-level x	safe-read
+pandoc --standalone	safe-read
+pandoc --standalone --mathjax --syntax-highlighting=pygments notes.md	safe-read
+pandoc --strip-comments	safe-read
+pandoc --strip-empty-paragraphs	safe-read
+pandoc --syntax-definition x	safe-read
+pandoc --syntax-highlighting x	safe-read
+pandoc --tab-stop x	safe-read
+pandoc --table-caption-position x	safe-read
+pandoc --table-of-contents	safe-read
+pandoc --template x	safe-read
+pandoc --title-prefix x	safe-read
+pandoc --to x	safe-read
+pandoc --toc	safe-read
+pandoc --toc-depth x	safe-read
+pandoc --top-level-division x	safe-read
+pandoc --trace	safe-read
+pandoc --track-changes x	safe-read
+pandoc --variable x	safe-read
+pandoc --variable-json x	safe-read
+pandoc --verbose	safe-read
+pandoc --version	safe-read
+pandoc --webtex	safe-read
+pandoc --wrap x	safe-read
+pandoc --write x	safe-read
+pandoc -A x	safe-read
+pandoc -B x	safe-read
+pandoc -C	safe-read
+pandoc -D x	safe-read
+pandoc -F ./my-filter.py README.md	denied
+pandoc -H x	safe-read
+pandoc -L filter.lua README.md	denied
+pandoc -M x	safe-read
+pandoc -N	safe-read
+pandoc -R	safe-read
+pandoc -S	safe-read
+pandoc -T x	safe-read
+pandoc -V x	safe-read
+pandoc -c x	safe-read
+pandoc -d defaults.yaml README.md	denied
+pandoc -f markdown -t html README.md	safe-read
+pandoc -f x	safe-read
+pandoc -h	safe-read
+pandoc -i	safe-read
+pandoc -oout.html README.md	denied
+pandoc -p	safe-read
+pandoc -r x	safe-read
+pandoc -s	safe-read
+pandoc -s --toc --toc-depth=2 -V title=Spec docs/spec.md	safe-read
+pandoc -t x	safe-read
+pandoc -v	safe-read
+pandoc -w x	safe-read
+pandoc README.md	safe-read
+pandoc README.md --output=out.pdf	denied
+pandoc README.md -o out.html	denied
+pandoc x	safe-read
+pandoc ~/.ssh/id_rsa	denied
 pants	denied
 pants --help	inert
 pants --help --version	denied

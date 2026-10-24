@@ -960,7 +960,6 @@ pagesize	description,examples
 pagestuff	examples,no-tolerance
 paket	examples,no-tolerance,profiled
 pal2rgb	description,examples
-pandoc	description,examples,no-overlap
 pants	description,examples,profiled
 papermill	description,examples
 par.pl	description,examples

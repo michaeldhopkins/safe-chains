@@ -771,8 +771,6 @@ packwerk init
 packwerk update-todo
 pal2rgb
 pal2rgb x
-pandoc
-pandoc x
 pants fmt
 par.pl
 par.pl x
