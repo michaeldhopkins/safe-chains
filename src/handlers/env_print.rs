@@ -28,12 +28,26 @@ fn mise_set_shows_values(arguments: &[Token]) -> bool {
     }
     // `--remove NAME` drops that one name. A removal on its own prints nothing; a name left beside
     // it is printed, including when `--remove=NAME` glues the removed name and leaves the next word.
+    let valued = crate::registry::sub_valued_flags("mise", "set").unwrap_or_default();
     let mut names = Vec::new();
     let mut removed = false;
+    let mut after_options = false;
     let mut words = arguments.iter();
     while let Some(word) = words.next() {
+        if after_options {
+            names.push(word.as_str());
+            continue;
+        }
+        if *word == "--" {
+            after_options = true;
+            continue;
+        }
         if *word == "--remove" {
             removed = true;
+            words.next();
+            continue;
+        }
+        if valued.iter().any(|flag| flag == word.as_str()) {
             words.next();
             continue;
         }
@@ -140,7 +154,8 @@ mod tests {
             "ps -o pid $(echo e)", "ps 1e2", "typeset -m 'OPENAI*' X=1", "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'",
             "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1", "typeset -1 X", "typeset -1x X", "typeset -9 X",
             "typeset +9 X", "declare -0 X", "declare +1 X", "typeset -1 Y=2 X", "typeset -x1 X", "export -1 X", "export -0 X",
-            "typeset -Q X", "declare -1i X", "typeset +1x X",
+            "typeset -Q X", "declare -1i X", "typeset +1x X", "mise set -E staging", "mise set --file ./mise.toml",
+            "mise set -f ./mise.toml OPENAI_API_KEY", "mise set -E staging OPENAI_API_KEY", "mise set --env=staging OPENAI_API_KEY",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
         }
@@ -155,7 +170,8 @@ mod tests {
             "ps -U nobody", "ps axo pid,user", "ps -p 123 -o etime", "env -i FOO=bar", "mise set FOO=bar", "mise set --remove FOO",
             "mise set --remove FOO BAR=1", "mise env --help", "launchctl list", "launchctl print-disabled gui/501", "export - FOO=bar",
             "ps axww", "ps -e", "typeset -U path", "typeset -L10 X", "typeset -Z2 X=5", "typeset -F3 X=1", "typeset -i16 X=255",
-            "typeset -gx FOO=bar",
+            "typeset -gx FOO=bar", "mise set --file ./mise.toml FOO=bar", "mise set -E staging FOO=bar", "mise set -f ./mise.toml FOO=bar",
+            "mise set --env=staging FOO=bar",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }

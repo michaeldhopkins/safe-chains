@@ -1600,7 +1600,7 @@ mise set "FOO=$X"	denied
 mise set -- _.source=./x.sh	denied
 mise set --env x	denied
 mise set --file ./mise.toml FOO='{{ exec(command="touch pwned") }}'	denied
-mise set --file ./mise.toml FOO=bar	denied
+mise set --file ./mise.toml FOO=bar	safe-write
 mise set --file x	denied
 mise set --file ~/.config/mise/conf.d/x.toml FOO=bar	denied
 mise set --file='./mise.toml' 'FOO={{ exec(command="id") }}'	denied
@@ -1611,7 +1611,7 @@ mise set --help --remove	safe-write
 mise set --help x	safe-write
 mise set --remove	safe-write
 mise set -E prod 'FOO={{ exec(command="id") }}'	denied
-mise set -E staging FOO=bar	denied
+mise set -E staging FOO=bar	safe-write
 mise set -E x	denied
 mise set -f x	denied
 mise set -h	safe-write
