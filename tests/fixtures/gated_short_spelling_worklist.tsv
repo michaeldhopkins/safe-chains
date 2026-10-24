@@ -71,6 +71,7 @@ re2c	-h	--header
 re2c	-i	--include
 redis-benchmark	-c	--cacert
 restic	-c	--cacert
+rg	-i	--ignore-file
 rollup	-f	--file
 rsync	-f	--files-from
 rsync	-l	--log-file

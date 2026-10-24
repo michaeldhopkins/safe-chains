@@ -4,6 +4,10 @@ description = "Ripgrep, a fast recursive regex search tool; full flag support fo
 url = "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md"
 level = "Inert"
 bare = false
+examples_denied = [
+    "rg --ignore-file ~/.ssh/id_rsa foo",
+    "rg --ignore-file /etc/shadow foo",
+]
 standalone = [
     "--binary", "--block-buffered", "--byte-offset", "--case-sensitive",
     "--column", "--count", "--count-matches", "--crlf", "--debug",
@@ -37,3 +41,6 @@ valued = [
     "-A", "-B", "-C", "-E", "-M", "-T",
     "-e", "-f", "-g", "-j", "-m", "-r", "-t",
 ]
+
+[command.path_gate]
+flags = { "--ignore-file" = "read" }

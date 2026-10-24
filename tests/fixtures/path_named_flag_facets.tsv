@@ -645,7 +645,6 @@ restic snapshots	--path	untriaged	-	-	-
 restic stats	--path	untriaged	-	-	-	
 revive	--max_open_files	untriaged	-	-	-	
 revive	-max_open_files	untriaged	-	-	-	
-rg	--ignore-file	untriaged	-	-	-	
 rg	--max-filesize	untriaged	-	-	-	
 rg	--path-separator	untriaged	-	-	-	
 rollup	--amd.basePath	untriaged	-	-	-	

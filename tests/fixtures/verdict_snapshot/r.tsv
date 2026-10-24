@@ -4596,7 +4596,9 @@ rg --help	inert
 rg --hidden	inert
 rg --iglob x	inert
 rg --ignore-case	inert
+rg --ignore-file /etc/shadow foo	denied
 rg --ignore-file x	inert
+rg --ignore-file ~/.ssh/id_rsa foo	denied
 rg --ignore-file-case-insensitive	inert
 rg --include-zero	inert
 rg --invert-match	inert
