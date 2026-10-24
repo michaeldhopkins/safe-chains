@@ -596,6 +596,10 @@ because = "ansible.cfg can name a vault password file, which ansible runs when i
 shape = "opaque"
 because = "ansible runs the named file when it is executable and reads its output as the vault password; a relative name is read from the working directory, not PATH"
 measured = false
+[env.ANSIBLE_LOG_PATH]
+shape = "data-write"
+because = "ansible appends a line for every message it displays to this file, creating it when absent"
+measured = false
 [env.ANSIBLE_VAULT_IDENTITY_LIST]
 shape = "opaque"
 because = "label@source pairs whose sources ansible runs when they are executable, as ANSIBLE_VAULT_PASSWORD_FILE"
@@ -1012,6 +1016,10 @@ allowed = [
 ]
 path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
 because = "passed to the JVM running the Gradle client and daemon"
+measured = false
+[env.MAVEN_ARGS]
+shape = "opaque"
+because = "Maven 3.9+ adds these words to its command line, so the phases, -D properties, settings and extension paths the mvn handler refuses as arguments arrive through it unread"
 measured = false
 [env.MAVEN_OPTS]
 shape = "option-string"

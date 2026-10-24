@@ -765,6 +765,10 @@ mod integration_tests {
             "GIT_TRACE=/etc/m git status",
             "GIT_TRACE_PACKET=/etc/m git status",
             "SSLKEYLOGFILE=/etc/m curl https://example.com",
+            "MAVEN_ARGS=-Dmaven.ext.class.path=/tmp/e.jar mvn test",
+            "MAVEN_ARGS=deploy mvn test",
+            "ANSIBLE_LOG_PATH=~/.bashrc ansible-vault --version",
+            "ANSIBLE_LOG_PATH=/etc/m ansible-doc -l",
             "BROWSER='sh -c m' ls",
         ] {
             assert!(!crate::is_safe_command(cmd), "an audited variable was allowed: {cmd}");
@@ -918,8 +922,15 @@ mod integration_tests {
     #[test]
     fn an_audited_variable_with_a_project_value_still_allows() {
         for cmd in [
-            "GCONV_PATH=./gconv ls", "GEM_HOME=./vendor/gems ls", "BUNDLE_GEMFILE=./Gemfile ls", "GIT_TRACE=1 git status",
-            "GIT_TRACE=trace.log git status", "SSLKEYLOGFILE=keys.log ls", "BROWSER=cat ls", "LD_PRELOAD= ls",
+            "GCONV_PATH=./gconv ls",
+            "GEM_HOME=./vendor/gems ls",
+            "BUNDLE_GEMFILE=./Gemfile ls",
+            "GIT_TRACE=1 git status",
+            "GIT_TRACE=trace.log git status",
+            "SSLKEYLOGFILE=keys.log ls",
+            "BROWSER=cat ls",
+            "LD_PRELOAD= ls",
+            "ANSIBLE_LOG_PATH=./ansible.log ansible-vault --version",
         ] {
             assert!(crate::is_safe_command(cmd), "a project value was denied: {cmd}");
         }
