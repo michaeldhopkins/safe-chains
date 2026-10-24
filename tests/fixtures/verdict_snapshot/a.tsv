@@ -1685,7 +1685,8 @@ ansible-vault encrypt --ask-vault-pass --ask-vault-password	safe-write
 ansible-vault encrypt --ask-vault-pass --encrypt-vault-id x	safe-write
 ansible-vault encrypt --ask-vault-pass x	safe-write
 ansible-vault encrypt --ask-vault-password	safe-write
-ansible-vault encrypt --encrypt-vault-id	safe-write
+ansible-vault encrypt --encrypt-vault-id dev ./a.yml	safe-write
+ansible-vault encrypt --encrypt-vault-id dev ~/.bashrc	denied
 ansible-vault encrypt --encrypt-vault-id x	safe-write
 ansible-vault encrypt --help	safe-write
 ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml	safe-write
@@ -1704,7 +1705,7 @@ ansible-vault encrypt_string --encrypt-vault-id x	safe-read
 ansible-vault encrypt_string --help	safe-read
 ansible-vault encrypt_string --name x	safe-read
 ansible-vault encrypt_string --show-input	safe-read
-ansible-vault encrypt_string --stdin-name	safe-read
+ansible-vault encrypt_string --stdin-name db_pass	safe-read
 ansible-vault encrypt_string --stdin-name x	safe-read
 ansible-vault encrypt_string --vault-pass-file /tmp/x.sh secret	denied
 ansible-vault encrypt_string --vault-password-file=/tmp/x.sh secret	denied

@@ -560,8 +560,8 @@ Aliases: `muse`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-vault.html">https://docs.ansible.com/ansible/latest/cli/ansible-vault.html</a></p>
 
 - **decrypt**
-- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output. Positional args accepted
-- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name
+- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h. Valued: --encrypt-vault-id, --output. Positional args accepted
+- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name
 - **help**: Positional args accepted
 - **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
@@ -569,6 +569,8 @@ Aliases: `muse`
 **Examples:**
 
 - `ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml`
+- `ansible-vault encrypt --encrypt-vault-id dev ./a.yml`
+- `ansible-vault encrypt_string --stdin-name db_pass`
 
 ### `anvil`
 <p class="cmd-url"><a href="https://book.getfoundry.sh/reference/anvil/">https://book.getfoundry.sh/reference/anvil/</a></p>

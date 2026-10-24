@@ -67,7 +67,7 @@ ansible-galaxy	examples,version
 ansible-inventory	description,examples,version
 ansible-lint	description,examples,no-overlap
 ansible-playbook	examples,version
-ansible-vault	description,no-overlap,no-tolerance,profiled
+ansible-vault	description,no-tolerance,profiled
 anvil	examples
 apkanalyzer	examples,version
 apksigner	examples,version

@@ -26,8 +26,6 @@
 7z	-stx
 ameba	--fail-level
 ansible-lint	--profile
-ansible-vault encrypt	--encrypt-vault-id
-ansible-vault encrypt_string	--stdin-name
 ar	--plugin
 ar	--target
 arduino-cli compile	--show-properties

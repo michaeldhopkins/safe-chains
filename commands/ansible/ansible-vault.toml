@@ -4,13 +4,18 @@ description = "Manages encrypted Ansible vault files. Subcommands: `view` / `dec
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
 researched_version = "Ansible 9.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
-examples_safe = ["ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml"]
+examples_safe = [
+    "ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml",
+    "ansible-vault encrypt --encrypt-vault-id dev ./a.yml",
+    "ansible-vault encrypt_string --stdin-name db_pass",
+]
 examples_denied = [
     "ansible-vault encrypt --vault-password-file ./pw.sh ./group_vars/all.yml",
     "ansible-vault encrypt --vault-id dev@./pw.sh ./group_vars/all.yml",
     "ansible-vault encrypt_string --vault-password-file=/tmp/x.sh secret",
     "ansible-vault encrypt_string --vault-pass-file /tmp/x.sh secret",
     "ANSIBLE_VAULT_PASSWORD_FILE=./pw.sh ansible-vault encrypt ./a.yml",
+    "ansible-vault encrypt --encrypt-vault-id dev ~/.bashrc",
 ]
 
 [command.path_gate]
@@ -41,14 +46,14 @@ name = "encrypt"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--ask-vault-pass", "--ask-vault-password", "--encrypt-vault-id", "--help", "-h"]
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h"]
 valued = ["--encrypt-vault-id", "--output"]
 
 [[command.sub]]
 name = "encrypt_string"
 level = "SafeRead"
 bare = false
-standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "--show-input", "--stdin-name", "-h", "-n"]
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "--show-input", "-h", "-n"]
 valued = ["--encrypt-vault-id", "--name", "--stdin-name"]
 
 [[command.sub]]
