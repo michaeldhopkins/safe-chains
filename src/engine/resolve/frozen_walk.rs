@@ -255,7 +255,7 @@ impl Walker<'_> {
                         if !self.push_link(if is_dir { format!("{shown}/.git/f") } else { shown }) {
                             return vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())];
                         }
-                        let out = target.ok().filter(|t| is_dir && !root.as_deref().is_some_and(|r| t.starts_with(r)));
+                        let out = target.ok().filter(|t| !root.as_deref().is_some_and(|r| t.starts_with(r)));
                         if out.is_some_and(|t| entered.insert(t)) {
                             queue.push_back(below);
                         }

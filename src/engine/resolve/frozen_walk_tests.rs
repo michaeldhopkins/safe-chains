@@ -757,3 +757,52 @@ proptest! {
         prop_assert!(alone, "rm -rf * without dot names was refused");
     }
 }
+
+fn walk_in(root: &str, base: &'static str, walk: Walk<'static>) -> Vec<Reach> {
+    let root = root.to_string();
+    on_hook_stack(move || {
+        let _guard = pathctx::enter(ctx(&root));
+        reach_below(base, walk)
+    })
+}
+
+#[test]
+fn a_followed_link_to_a_file_inside_the_walked_folder_reaches_nothing() {
+    let (_dir, root) = project();
+    std::fs::create_dir(format!("{root}/sub")).expect("sub");
+    std::fs::write(format!("{root}/sub/real.txt"), "x").expect("file");
+    symlink("real.txt", format!("{root}/sub/alias.txt")).expect("link to a file inside");
+    let reached = walk_in(&root, "sub", Walk::follow());
+    assert!(reached.is_empty(), "a link to a file inside the walked folder was reported: {reached:?}");
+}
+
+#[test]
+fn a_followed_link_to_a_file_outside_the_walked_folder_is_reported_even_when_clean() {
+    let (_dir, root) = project();
+    std::fs::create_dir(format!("{root}/sub")).expect("sub");
+    std::fs::write(format!("{root}/top.txt"), "x").expect("file");
+    symlink("../top.txt", format!("{root}/sub/out.txt")).expect("link to a file beside the folder");
+    let reached = walk_in(&root, "sub", Walk::follow());
+    assert!(matches!(reached.as_slice(), [Reach::Found(p)] if p.ends_with("sub/out.txt")), "link out of the walked folder: {reached:?}");
+}
+
+#[test]
+fn a_followed_link_to_a_file_outside_the_project_is_reported_and_not_walked() {
+    let (_dir, root) = project();
+    let (_elsewhere, outside) = project();
+    std::fs::write(format!("{outside}/secret.txt"), "x").expect("file");
+    std::fs::create_dir(format!("{root}/sub")).expect("sub");
+    symlink(format!("{outside}/secret.txt"), format!("{root}/sub/out.txt")).expect("link to a file elsewhere");
+    let reached = walk_in(&root, "sub", Walk::follow());
+    assert!(matches!(reached.as_slice(), [Reach::Found(p)] if p.ends_with("sub/out.txt")), "link to a file elsewhere: {reached:?}");
+    assert!(finished(&reached), "a file was treated as a folder to list: {reached:?}");
+}
+
+#[test]
+fn a_star_does_not_match_a_hidden_name_unless_dot_names_are_matched() {
+    let (_dir, root) = project();
+    std::fs::create_dir(format!("{root}/.git")).expect("git");
+    std::fs::write(format!("{root}/plain.txt"), "x").expect("file");
+    let reached = walk_in(&root, "*", Walk::plain(true));
+    assert!(reached.is_empty(), "a star matched a hidden .git: {reached:?}");
+}

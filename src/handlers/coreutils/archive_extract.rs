@@ -209,6 +209,14 @@ mod tests {
         is_safe_command(cmd)
     }
 
+    #[test]
+    fn only_a_single_dash_cluster_names_a_remote_archive() {
+        let line = |words: &[&str]| words.iter().map(|w| crate::parse::Token::from_test(w)).collect::<Vec<_>>();
+        assert!(super::opens_a_remote_archive(&line(&["cpio", "-Ihost:a.cpio"])));
+        assert!(!super::opens_a_remote_archive(&line(&["cpio", "--XIhost:a.cpio"])));
+        assert!(!super::opens_a_remote_archive(&line(&["cpio", "-", "-t"])));
+    }
+
     safe! {
         pax_list: "pax -f ./archive.tar",
         pax_list_verbose: "pax -v -f ./archive.tar",
@@ -251,6 +259,8 @@ mod tests {
         cpio_extract_directories: "cpio -idm",
         cpio_extract_long: "cpio --extract",
         cpio_extract_from_file: "cpio -i -F ./archive.cpio",
+        cpio_extract_with_bsdcpio_pattern_letter_t: "cpio -ift",
+        cpio_extract_with_glued_directory_named_t: "cpio -iDt",
         ditto_extract: "ditto -x ./archive.cpio ./out",
         ditto_extract_zip: "ditto -xk ./archive.zip ./out",
         ditto_extract_spaced: "ditto -x -k ./archive.zip ./out",
