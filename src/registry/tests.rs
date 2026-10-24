@@ -7322,3 +7322,68 @@ mod loopback_host_properties {
         }
     }
 }
+
+#[test]
+fn a_passthrough_on_a_sub_that_is_not_a_plain_policy_is_rejected() {
+    for extra in [
+        "handler = \"php\"", "executor = \"file\"", "guard = \"--check\"", "require_any = [\"--check\"]", "write_flags = [\"-w\"]",
+        "first_arg = [\"a\"]", "delegate_skip = 0", "allow_all = true",
+    ] {
+        let source = format!(
+            r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "fmt"
+            {extra}
+            [command.sub.passthrough]
+            guard = "--check"
+            standalone = ["--check"]
+            "#
+        );
+        assert_rejected(&source, "passthrough");
+    }
+}
+
+#[test]
+fn a_passthrough_on_a_plain_policy_sub_is_accepted() {
+    load_one(
+        r#"
+        [[command]]
+        name = "demo"
+        [[command.sub]]
+        name = "fmt"
+        bare = false
+        max_positional = 0
+        [command.sub.passthrough]
+        guard = "--check"
+        standalone = ["--check"]
+        "#,
+    );
+}
+
+proptest::proptest! {
+    /// Whatever non-policy modifiers a sub carries, a passthrough beside them is never accepted.
+    #[test]
+    fn a_passthrough_beside_any_non_policy_modifier_is_never_accepted(
+        picks in proptest::sample::subsequence(
+            vec![
+                "handler = \"php\"",
+                "executor = \"file\"",
+                "guard = \"--check\"",
+                "require_any = [\"--check\"]",
+                "write_flags = [\"-w\"]",
+                "first_arg = [\"a\"]",
+                "delegate_skip = 0",
+                "allow_all = true",
+            ],
+            1..=3,
+        ),
+    ) {
+        let extra = picks.join("\n");
+        let source = format!(
+            "[[command]]\nname = \"demo\"\n[[command.sub]]\nname = \"fmt\"\n{extra}\n[command.sub.passthrough]\nguard = \"--check\"\nstandalone = [\"--check\"]\n"
+        );
+        proptest::prop_assert!(load_toml(&source, "test").is_err(), "{}", source);
+    }
+}

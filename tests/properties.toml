@@ -26,6 +26,7 @@ owed = [
 ]
 
 [pure]
+"src/registry/passthrough_gate.rs" = ["src/registry/tests.rs::a_passthrough_beside_any_non_policy_modifier_is_never_accepted"]
 "src/cst/cd.rs" = ["cdpath_redirects_only_an_unanchored_name"]
 "src/cst/check.rs" = [
   "src/cst/proptests.rs::safe_redirects_always_pass",

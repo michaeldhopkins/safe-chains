@@ -468,7 +468,7 @@ pub(super) fn build_sub(
         output,
         writes_cwd,
         name_match: if toml.per_database { NameMatch::WithDatabaseSuffix } else { NameMatch::Exact },
-        kind: build_sub_kind(parent, toml, handler_policies)?,
+        kind: super::passthrough_gate::build_sub_kind(parent, toml, handler_policies)?,
         policy_ref,
         profile,
         flags,
@@ -687,7 +687,7 @@ fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) -> Result<(), Strin
     Ok(())
 }
 
-fn build_sub_kind(
+pub(super) fn build_sub_kind_unchecked(
     parent: &str,
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,

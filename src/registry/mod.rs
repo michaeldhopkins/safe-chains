@@ -10,11 +10,11 @@ mod flag_sets;
 pub(crate) use flag_sets::{fallback_flag_sets, handler_policy_flag_sets};
 mod glob_flags;
 use glob_flags::glob_presents_unlisted_flag;
+mod passthrough_gate;
 mod policy;
 pub(crate) mod types;
 
-use std::collections::HashMap;
-use std::sync::LazyLock;
+use std::{collections::HashMap, sync::LazyLock};
 
 use crate::parse::Token;
 use crate::verdict::Verdict;
