@@ -3797,7 +3797,9 @@ dotenv -f .env.test cat README.md	safe-read
 dotenv -f /etc/shadow ls	denied
 dotenv -f /tmp/evil.env ls	denied
 dotenv -f x	denied
-dotenv -v x	denied
+dotenv -v GIT_PAGER=/tmp/evil -- git log	denied
+dotenv -v LD_PRELOAD=/tmp/x.so -- ls	denied
+dotenv -v PATH=/tmp/evil -- git log	denied
 dotenv bash -c 'ls && rm -rf /'	denied
 dotenv bundle exec rspec spec/foo_spec.rb	safe-read
 dotenv ls	inert
