@@ -1,8 +1,8 @@
 [[command]]
 name = "mise"
-description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also provides environment variable management and a task runner. The full CLI can install/uninstall tool versions, modify config files, run arbitrary tasks, and self-update. The covered subcommands span a wide range: read-only queries (list, current, which, where, doctor, outdated, search, registry, latest, ls-remote, bin-paths, env (prints every variable mise sets, values included, and those may come from secrets files), tool, completion, backends ls, tasks list/deps/info), config/settings management (config get/list/set, settings get/list/set/add/unset), plugin operations (plugins list/ls-remote/install/uninstall/update), task execution (tasks run/add/edit), cache management (cache path/clear/prune), and exec delegation (exec with --). The exec subcommand delegates to arbitrary downstream commands. Mise releases very frequently, often multiple times per week, with a YYYY.M.P versioning scheme; new subcommands appear regularly and coverage should be reviewed often."
+description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also manages environment variables and runs tasks. State: tools live under ~/.local/share/mise, settings and config in mise.toml files (project, ~/.config/mise), caches under ~/.cache/mise; reads are free of side effects, writes are recoverable by editing the file or reinstalling. Network: install, upgrade, use, uninstall, ls-remote, latest, search, registry, outdated, lock and plugins fetch version lists and downloads from GitHub, registries and package indexes; install and upgrade then run the backend's own code (a plugin script, ruby-build, npm, pipx, cargo or go install), so what they run comes from the network and persists as installed executables and shims. Read-only queries: ls/list, current, which, where, latest, ls-remote, outdated, registry, search, bin-paths, env (prints every variable mise sets, values included, and those may come from secrets files), tool, doctor, completion, config get/ls, settings get/ls, tasks ls/deps/info, cache path, backends ls. Config writers: use, set, unset, config set, settings set/add/unset, tool-alias and shell-alias set/unset, trust/untrust, tasks add/edit, edit, fmt. Executors: exec (and x), run (and r), tasks run, watch, en and shell run commands under mise's environment (activate only prints a shell script). Config is code: a mise.toml value may hold a template whose exec() runs a command, and [env] directives, hooks and tasks run commands, so a file must be trusted first; trust is granted by mise trust and automatically by mise install, exec, run and watch for the active config. self-update downloads the newest release (or VERSION) from GitHub Releases, verifies its signature and replaces the running binary and installed plugins; implode deletes mise and all its data. Releases come very often, several times a week, on a YYYY.M.N scheme (v2026.10.18 on 2026-10-23), and new subcommands (bootstrap, deps, dotfiles, install-into, oci, ssh, tool-stub, packslip) keep appearing."
 url = "https://mise.jdx.dev/cli/"
-researched_version = "v2026.5.3 (May 2026; YYYY.M.P scheme)"
+researched_version = "v2026.10.18 (2026-10-23; YYYY.M.N scheme)"
 env_assignment_positionals = true
 # `mise set NAME=VALUE` writes the variable into mise.toml's [env], which mise then injects
 # into every command run in that directory — persistently, across sessions. That is the
@@ -34,6 +34,8 @@ examples_denied = [
     "mise trust --ignore",
     "mise trust -a -q",
     "mise tasks run my-task",
+    "mise self-update",
+    "mise self-update --yes",
     "eval \"$(mise activate --help)\"",
     "eval \"$(mise list)\"",
     "eval \"$(mise activate $SHELL)\"",
@@ -141,7 +143,12 @@ standalone = ["--file", "--global", "--help", "-f", "-g", "-h"]
 
 [[command.sub]]
 name = "self-update"
-candidate = true
+profile = "supply-chain-build"
+fact = "`mise self-update [VERSION]` installs the newest stable release (or VERSION) from GitHub Releases, verifies its signature, replaces the running mise binary, and also updates installed plugins unless --no-plugins is given."
+source = "https://mise.jdx.dev/cli/self-update.html"
+judgment = "The nearest archetype: network-sourced code is fetched and installed as an executable that runs later. The locus is the mise binary's own directory rather than a worktree, and the download is signature-checked, which the archetype does not say."
+standalone = ["--force", "--help", "--no-plugins", "--yes", "-f", "-h", "-y"]
+valued = ["--minimum-release-age"]
 
 [[command.sub]]
 name = "u"

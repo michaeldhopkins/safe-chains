@@ -798,7 +798,6 @@ migcom	examples
 migrate	description,examples,profiled
 mill	examples
 minikube	examples,version
-mise	profiled
 mix	examples,version
 mkbom	description,examples
 mkcert	description,examples,no-overlap,no-tolerance

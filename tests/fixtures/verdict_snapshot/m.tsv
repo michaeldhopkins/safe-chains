@@ -1578,6 +1578,17 @@ mise search --help x	inert
 mise search -h	inert
 mise search x	inert
 mise self-update	denied
+mise self-update --force	denied
+mise self-update --force --help	denied
+mise self-update --force --minimum-release-age x	denied
+mise self-update --force x	denied
+mise self-update --help	denied
+mise self-update --minimum-release-age x	denied
+mise self-update --no-plugins	denied
+mise self-update --yes	denied
+mise self-update -f	denied
+mise self-update -h	denied
+mise self-update -y	denied
 mise self-update x	denied
 mise set	denied
 mise set --file	denied

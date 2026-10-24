@@ -901,6 +901,7 @@ Aliases: `fly`
 - **rm**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
+- **self-update**
 - **set**: Flags: --file, --help, --remove, -f, -h
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
