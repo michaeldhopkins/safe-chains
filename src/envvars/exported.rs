@@ -9,10 +9,20 @@
 use crate::verdict::{SafetyLevel, Verdict};
 
 pub(crate) fn exported_verdict<'a>(operands: impl Iterator<Item = &'a str>) -> Verdict {
+    operands_verdict(operands, |name, value| super::statement_assignment_verdict(name, value, true))
+}
+
+/// The operands of a tool that stores each assignment for later shells (`mise set`), judged by
+/// `stored_assignment_verdict`.
+pub(crate) fn stored_verdict<'a>(operands: impl Iterator<Item = &'a str>) -> Verdict {
+    operands_verdict(operands, super::stored_assignment_verdict)
+}
+
+fn operands_verdict<'a>(operands: impl Iterator<Item = &'a str>, judge: impl Fn(&str, &str) -> Verdict) -> Verdict {
     let mut verdict = Verdict::Allowed(SafetyLevel::Inert);
     for operand in operands.filter(|word| !word.starts_with('-')) {
         let judged = match operand.split_once('=') {
-            Some((name, value)) => super::statement_assignment_verdict(name, value, true),
+            Some((name, value)) => judge(name, value),
             None if hides_an_assignment(operand) => Verdict::Denied,
             None => Verdict::Allowed(SafetyLevel::Inert),
         };

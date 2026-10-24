@@ -127,6 +127,12 @@
 #                                        #   `LD_PRELOAD=/tmp/evil.so ls` denied.
 #                                        #   Set this on ANY command that exports
 #                                        #   a caller-named variable.
+#                                        #   Write `"stored"` instead when the
+#                                        #   command STORES them in a file later
+#                                        #   shells export (`mise set`): each is
+#                                        #   classified as above, and a name in
+#                                        #   envvars.toml's [stored] list is
+#                                        #   refused whatever the value.
 #                                        #   Only for commands with POSIX -number legacy syntax.
 # standalone = [                         # flags that take no value
 #     "--count", "--help", "--recursive", "--version",

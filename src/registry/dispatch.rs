@@ -6,6 +6,9 @@ use super::policy::{check_owned, flag_given};
 use super::types::*;
 use super::{CMD_HANDLERS, SUB_HANDLERS};
 use pre_flags::skip_pre_flags;
+#[path = "env_assignments.rs"]
+mod env_assignments;
+pub(crate) use env_assignments::{DeclaredEnvAssignments, EnvAssignments};
 
 type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 
@@ -261,10 +264,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
     let verdict = dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS);
-    if !spec.env_assignment_positionals {
-        return verdict;
-    }
-    crate::envvars::exported_verdict(tokens[1..].iter().map(Token::as_str)).combine(verdict)
+    spec.env_assignment_positionals.verdict(&tokens[1..]).combine(verdict)
 }
 
 /// A sub, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs) and for a branching command.

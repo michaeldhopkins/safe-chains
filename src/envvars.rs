@@ -33,10 +33,12 @@ mod command_search;
 pub(crate) use command_search::names_command_search;
 mod config_dir;
 mod exported;
-pub(crate) use exported::exported_verdict;
+pub(crate) use exported::{exported_verdict, stored_verdict};
 mod rebind;
 mod shell_words;
+mod stored;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
+pub(crate) use stored::stored_assignment_verdict;
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]

@@ -45,10 +45,10 @@ pub(super) struct TomlCommand {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
-    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`), each classified through
-    /// `envvars.toml` exactly as the `VAR=value cmd` prefix form is, so the two spellings of one capability cannot disagree.
+    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`) or, as `"stored"`, into a file later
+    /// shells export (`mise set`), each classified through `envvars.toml` as the `VAR=value cmd` prefix form is (`EnvAssignments`).
     #[serde(default)]
-    pub env_assignment_positionals: Option<bool>,
+    pub env_assignment_positionals: Option<super::dispatch::DeclaredEnvAssignments>,
     /// Removed for `tolerate_unknown_short`/`_long`; build panics if a TOML sets it, naming the command (SAMPLE.toml migrates).
     #[serde(default)]
     pub positional_style: Option<bool>,
@@ -420,11 +420,11 @@ pub struct CommandSpec {
     /// yields a bounded path instead of the unpinnable sentinel.
     pub(super) output: Option<OutputSpec>,
     pub(super) writes_cwd: Option<crate::pathctx::anchor::Anchor>,
-    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
-    /// `declare -x`). `dispatch_spec` then classifies each through `envvars::assignment_verdict`
-    /// and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
+    /// Whether the command's `NAME=VALUE` positionals become environment variables (`export`,
+    /// `declare -x`) or are stored for later shells (`mise set`). `dispatch_spec` then classifies
+    /// each through `envvars` and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
     /// `LD_PRELOAD=/tmp/evil.so ls` does.
-    pub(super) env_assignment_positionals: bool,
+    pub(super) env_assignment_positionals: super::dispatch::EnvAssignments,
     pub(super) kind: DispatchKind,
 }
 
