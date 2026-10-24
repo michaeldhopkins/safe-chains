@@ -1594,30 +1594,28 @@ mise self-update -f	denied
 mise self-update -h	denied
 mise self-update -y	denied
 mise self-update x	denied
+mise set	denied
 mise set "FOO=$(cat payload.txt)"	denied
 mise set "FOO=$X"	denied
 mise set -- _.source=./x.sh	denied
-mise set --env x	safe-write
+mise set --env x	denied
 mise set --file ./mise.toml FOO='{{ exec(command="touch pwned") }}'	denied
-mise set --file ./mise.toml FOO=bar	safe-write
+mise set --file ./mise.toml FOO=bar	denied
+mise set --file x	denied
 mise set --file ~/.config/mise/conf.d/x.toml FOO=bar	denied
 mise set --file='./mise.toml' 'FOO={{ exec(command="id") }}'	denied
 mise set --file=/etc/mise/config.toml FOO=bar	denied
-mise set --global --env x	safe-write
-mise set --global --help	safe-write
-mise set --global x	safe-write
-mise set	denied
-mise set --file	denied
-mise set --file --help	denied
-mise set --file x	denied
 mise set --help	safe-write
+mise set --help --env x	safe-write
+mise set --help --remove	safe-write
+mise set --help x	safe-write
 mise set --remove	safe-write
 mise set -E prod 'FOO={{ exec(command="id") }}'	denied
-mise set -E staging FOO=bar	safe-write
-mise set -E x	safe-write
-mise set -f x	safe-write
-mise set -f	denied
+mise set -E staging FOO=bar	denied
+mise set -E x	denied
+mise set -f x	denied
 mise set -h	safe-write
+mise set FOO --help	denied
 mise set FOO='x{{ env.HOME }}'	denied
 mise set FOO='{# comment #}'	denied
 mise set FOO='{% if true %}x{% endif %}'	denied
@@ -1630,7 +1628,6 @@ mise set _.path=/tmp/bin	denied
 mise set _.source=./x.sh	denied
 mise set _=x	denied
 mise set _{\\.,}source=./x.sh	denied
-mise set FOO --help	denied
 mise set help	denied
 mise set x	denied
 mise settings	inert
@@ -2063,22 +2060,22 @@ mkdir --parents	denied
 mkdir --verbose	denied
 mkdir --version	inert
 mkdir -Z	denied
-mkdir -m 755 ./dist	safe-write
 mkdir -m 2775 -p d	denied
 mkdir -m 4755 d	denied
+mkdir -m 755 ./dist	safe-write
 mkdir -m 755 d	safe-write
 mkdir -m x	denied
 mkdir -m4755 d	denied
 mkdir -p	denied
 mkdir -p ./a/../../x	denied
 mkdir -p .git/hooks	denied
+mkdir -p a/b	safe-write
 mkdir -p out/logs/archive	safe-write
 mkdir -p ~/newdir	denied
-mkdir -pv ./a ./b	safe-write
-mkdir -p a/b	safe-write
 mkdir -pm 0755 d	safe-write
 mkdir -pm 2775 d	denied
 mkdir -pm2775 d	denied
+mkdir -pv ./a ./b	safe-write
 mkdir -v	denied
 mkdir ../outside	denied
 mkdir /etc/evil	denied
