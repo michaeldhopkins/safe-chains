@@ -25,6 +25,13 @@ examples_safe = [
     "eval \"$(mise activate bash)\"",
     "eval \"$(mise activate bash --shims)\"",
     "eval \"$(mise activate /bin/zsh --quiet)\"",
+    "mise set FOO=bar",
+    "mise set NODE_ENV=production",
+    "mise set --file ./mise.toml FOO=bar",
+    "mise set -E staging FOO=bar",
+    "mise unset FOO",
+    "mise use --path ./mise.toml ruby@4.0.3",
+    "mise u -p ./mise.toml ruby@4.0.3",
 ]
 examples_denied = [
     "mise exec",
@@ -39,6 +46,22 @@ examples_denied = [
     "eval \"$(mise activate --help)\"",
     "eval \"$(mise list)\"",
     "eval \"$(mise activate $SHELL)\"",
+    "mise set --file ./mise.toml FOO='{{ exec(command=\"touch pwned\") }}'",
+    "mise set FOO='{{ exec(command=\"id\") }}'",
+    "mise set FOO='x{{ env.HOME }}'",
+    "mise set FOO='{% if true %}x{% endif %}'",
+    "mise set FOO='{# comment #}'",
+    "mise set -E prod 'FOO={{ exec(command=\"id\") }}'",
+    "mise set --file='./mise.toml' 'FOO={{ exec(command=\"id\") }}'",
+    "mise set _.source=./x.sh",
+    "mise set _.path=/tmp/bin",
+    "mise set _=x",
+    "mise set -- _.source=./x.sh",
+    "mise use 'node@{{ exec(command=\"id\") }}'",
+    "mise u 'node@{% if true %}20{% endif %}'",
+    "mise use 'node@{# x #}'",
+    "mise use 'cargo:ripgrep[features=pcre2]'",
+    "mise u 'cargo:ripgrep[postinstall=id]'",
 ]
 
 [[command.sub]]
@@ -84,11 +107,11 @@ name = "use"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
-    "--pin", "--quiet", "--remove", "--verbose",
-    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin", "--quiet",
+    "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
-valued = ["--cd"]
+valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*"]
 
 [[command.sub]]
 name = "install"
@@ -134,12 +157,15 @@ standalone = ["--all", "--help", "-a", "-h"]
 [[command.sub]]
 name = "set"
 level = "SafeWrite"
-standalone = ["--file", "--help", "--remove", "-f", "-h"]
+standalone = ["--help", "--remove", "-h"]
+valued = ["--env", "--file", "-E", "-f"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
 
 [[command.sub]]
 name = "unset"
 level = "SafeWrite"
-standalone = ["--file", "--global", "--help", "-f", "-g", "-h"]
+standalone = ["--global", "--help", "-g", "-h"]
+valued = ["--file", "-f"]
 
 [[command.sub]]
 name = "self-update"
@@ -156,11 +182,11 @@ writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
-    "--pin", "--quiet", "--remove", "--verbose",
-    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin", "--quiet",
+    "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
-valued = ["--cd"]
+valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*"]
 
 [[command.sub]]
 name = "i"

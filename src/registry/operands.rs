@@ -140,6 +140,7 @@ mod tests {
             refusing_subs(&mut vec![name.clone()], &spec.kind, &mut declared);
             found.extend(declared);
         }
+        assert!(found.iter().any(|(path, _)| path.join(" ") == "mise set"), "mise set declares no refuse_operands");
         for (path, patterns) in found {
             for pattern in patterns {
                 let operand = pattern.replace('*', "x");

@@ -9530,7 +9530,7 @@ Aliases: `gmd5sum`
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
 - **self-update**
-- **set**: Flags: --file, --help, --remove, -f, -h
+- **set**: Flags: --help, --remove, -h. Valued: --env, --file, -E, -f
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
@@ -9558,14 +9558,14 @@ Aliases: `gmd5sum`
 - **tool-alias set**: Flags: --help, -h
 - **tool-alias unset**: Flags: --help, -h
 - **trust** (requires --show): Flags: --all, --help, --quiet, --show, -a, -h, -q
-- **u**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **u**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **uninstall**: Flags: --all, --dry-run, --help, -a, -n, -h
-- **unset**: Flags: --file, --global, --help, -f, -g, -h
+- **unset**: Flags: --global, --help, -g, -h. Valued: --file, -f
 - **untrust**: Flags: --all, --help, -a, -h
 - **unuse**: Flags: --help, -h
 - **up**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
 - **upgrade**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
-- **use**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **use**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
@@ -9586,6 +9586,13 @@ Aliases: `gmd5sum`
 - `eval "$(mise activate bash)"`
 - `eval "$(mise activate bash --shims)"`
 - `eval "$(mise activate /bin/zsh --quiet)"`
+- `mise set FOO=bar`
+- `mise set NODE_ENV=production`
+- `mise set --file ./mise.toml FOO=bar`
+- `mise set -E staging FOO=bar`
+- `mise unset FOO`
+- `mise use --path ./mise.toml ruby@4.0.3`
+- `mise u -p ./mise.toml ruby@4.0.3`
 
 ### `mix`
 <p class="cmd-url"><a href="https://hexdocs.pm/mix/Mix.html">https://hexdocs.pm/mix/Mix.html</a></p>

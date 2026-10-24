@@ -78,8 +78,6 @@ mc find	--ignore
 minikube status	--format
 minikube status	--output
 minikube version	--output
-mise set	--file
-mise unset	--file
 ncu	--target
 ncu	--timeout
 next lint	--dir
@@ -88,6 +86,7 @@ ollama show	--template
 opam list	--columns
 opam list	--separator
 pdm config	--project
+pdm info	--env
 pdm show	--name
 pigz	--name
 pijul log	--state
@@ -123,6 +122,7 @@ vite build	--app
 vitest	--reporter
 w	--from
 wc	--lines
+webpack	--env
 webpack	--mode
 webpack	--target
 who	--message

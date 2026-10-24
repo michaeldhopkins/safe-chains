@@ -1590,14 +1590,35 @@ mise self-update -f	denied
 mise self-update -h	denied
 mise self-update -y	denied
 mise self-update x	denied
+mise set -- _.source=./x.sh	denied
+mise set --env x	safe-write
+mise set --file ./mise.toml FOO='{{ exec(command="touch pwned") }}'	denied
+mise set --file ./mise.toml FOO=bar	safe-write
+mise set --file='./mise.toml' 'FOO={{ exec(command="id") }}'	denied
+mise set --global --env x	safe-write
+mise set --global --help	safe-write
+mise set --global x	safe-write
 mise set	denied
 mise set --file	denied
 mise set --file --help	denied
 mise set --file x	denied
 mise set --help	safe-write
 mise set --remove	safe-write
+mise set -E prod 'FOO={{ exec(command="id") }}'	denied
+mise set -E staging FOO=bar	safe-write
+mise set -E x	safe-write
+mise set -f x	safe-write
 mise set -f	denied
 mise set -h	safe-write
+mise set FOO='x{{ env.HOME }}'	denied
+mise set FOO='{# comment #}'	denied
+mise set FOO='{% if true %}x{% endif %}'	denied
+mise set FOO='{{ exec(command="id") }}'	denied
+mise set FOO=bar	safe-write
+mise set NODE_ENV=production	safe-write
+mise set _.path=/tmp/bin	denied
+mise set _.source=./x.sh	denied
+mise set _=x	denied
 mise set FOO --help	denied
 mise set help	denied
 mise set x	denied
@@ -1809,25 +1830,29 @@ mise trust -q	denied
 mise trust .	denied
 mise trust x	denied
 mise u	denied
+mise u 'cargo:ripgrep[postinstall=id]'	denied
+mise u 'node@{% if true %}20{% endif %}'	denied
 mise u --cd x	safe-write
-mise u --env	safe-write
-mise u --env --cd x	safe-write
-mise u --env --force	safe-write
 mise u --env x	safe-write
 mise u --force	safe-write
+mise u --force --cd x	safe-write
+mise u --force --fuzzy	safe-write
+mise u --force x	safe-write
 mise u --fuzzy	safe-write
 mise u --global	safe-write
 mise u --help	safe-write
-mise u --path	safe-write
+mise u --path x	safe-write
 mise u --pin	safe-write
 mise u --quiet	safe-write
 mise u --remove	safe-write
 mise u --verbose	safe-write
-mise u -E	safe-write
+mise u -E x	safe-write
+mise u -e x	safe-write
 mise u -f	safe-write
 mise u -g	safe-write
 mise u -h	safe-write
-mise u -p	safe-write
+mise u -p ./mise.toml ruby@4.0.3	safe-write
+mise u -p x	safe-write
 mise u -q	safe-write
 mise u -v	safe-write
 mise u ruby@4.0.3	safe-write
@@ -1844,14 +1869,16 @@ mise uninstall -n	safe-write
 mise uninstall ruby@4	safe-write
 mise uninstall x	safe-write
 mise unset	safe-write
-mise unset --file	safe-write
-mise unset --file --global	safe-write
 mise unset --file x	safe-write
 mise unset --global	safe-write
+mise unset --global --file x	safe-write
+mise unset --global --help	safe-write
+mise unset --global x	safe-write
 mise unset --help	safe-write
-mise unset -f	safe-write
+mise unset -f x	safe-write
 mise unset -g	safe-write
 mise unset -h	safe-write
+mise unset FOO	safe-write
 mise unset x	safe-write
 mise untrust	safe-write
 mise untrust --all	safe-write
@@ -1894,25 +1921,30 @@ mise upgrade -j x	safe-write
 mise upgrade -n	safe-write
 mise upgrade x	safe-write
 mise use	denied
+mise use 'cargo:ripgrep[features=pcre2]'	denied
+mise use 'node@{# x #}'	denied
+mise use 'node@{{ exec(command="id") }}'	denied
 mise use --cd x	safe-write
-mise use --env	safe-write
-mise use --env --cd x	safe-write
-mise use --env --force	safe-write
 mise use --env x	safe-write
 mise use --force	safe-write
+mise use --force --cd x	safe-write
+mise use --force --fuzzy	safe-write
+mise use --force x	safe-write
 mise use --fuzzy	safe-write
 mise use --global	safe-write
 mise use --help	safe-write
-mise use --path	safe-write
+mise use --path ./mise.toml ruby@4.0.3	safe-write
+mise use --path x	safe-write
 mise use --pin	safe-write
 mise use --quiet	safe-write
 mise use --remove	safe-write
 mise use --verbose	safe-write
-mise use -E	safe-write
+mise use -E x	safe-write
+mise use -e x	safe-write
 mise use -f	safe-write
 mise use -g	safe-write
 mise use -h	safe-write
-mise use -p	safe-write
+mise use -p x	safe-write
 mise use -q	safe-write
 mise use -v	safe-write
 mise use ruby@4.0.3	safe-write
