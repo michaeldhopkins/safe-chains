@@ -33,7 +33,18 @@ fn candidates(arg: &str) -> impl Iterator<Item = &str> {
         Some((name, value)) => (Some(name), Some(value)),
         None => (None, None),
     };
-    (!is_flag).then_some(arg).into_iter().chain((!is_flag).then_some(name).flatten()).chain(value)
+    (!is_flag)
+        .then_some(arg)
+        .into_iter()
+        .chain((!is_flag).then_some(name).flatten())
+        .chain(value)
+        .chain(glued_short_value(arg))
+}
+
+fn glued_short_value(arg: &str) -> Option<&str> {
+    let rest = arg.strip_prefix('-').filter(|rest| !rest.starts_with('-'))?;
+    let letter = rest.chars().next()?;
+    Some(&rest[letter.len_utf8()..]).filter(|value| !value.is_empty())
 }
 
 fn decided_by_the_shell(arg: &str) -> bool {
@@ -258,6 +269,9 @@ refuse_operands = ["*[*"]
         }
         assert!(!verdict_of(&spec, &["writer", "set", "--file", "{{x}}", "FOO=bar"]).is_allowed());
         assert!(!verdict_of(&spec, &["writer", "set", "--file={{x}}", "FOO=bar"]).is_allowed());
+        assert!(!crate::command_verdict("mise set -f'{{x}}' FOO=bar").is_allowed());
+        assert!(!crate::command_verdict("mise use -p'a[b' node@20").is_allowed());
+        assert!(crate::command_verdict("mise set -fa.toml FOO=bar").is_allowed());
         assert!(verdict_of(&spec, &["writer", "group", "add", "a@1"]).is_allowed());
         assert!(!verdict_of(&spec, &["writer", "group", "add", "a[x=1]"]).is_allowed());
     }
@@ -294,6 +308,19 @@ refuse_operands = ["*[*"]
         ) {
             let patterns: Vec<String> = ["*{{*", "*{%*", "*{#*", "*[*"].map(String::from).to_vec();
             prop_assert!(!presents_refused_operand(&line("set", &operands), &patterns));
+        }
+
+        /// A value glued to a short flag (`-f'{{x}}'`) is tested as the separate word would be.
+        #[test]
+        fn a_marker_glued_to_a_short_flag_is_refused(
+            letter in "[A-Za-z]",
+            before in "[A-Za-z0-9_.@/]{0,8}",
+            after in "[A-Za-z0-9_.@/]{0,8}",
+            marker in prop::sample::select(vec!["{{", "{%", "{#", "["]),
+        ) {
+            let patterns: Vec<String> = ["*{{*", "*{%*", "*{#*", "*[*"].map(String::from).to_vec();
+            let glued = format!("-{letter}{before}{marker}{after}");
+            prop_assert!(presents_refused_operand(&line("set", &[glued, "FOO=bar".to_string()]), &patterns));
         }
 
         /// No patterns refuse nothing.
