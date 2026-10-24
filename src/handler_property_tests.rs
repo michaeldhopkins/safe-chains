@@ -800,6 +800,31 @@ fn site_witnesses(root: &str, reach: Reach) -> Vec<String> {
 /// the one pairing that mattered.
 #[test]
 fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let canonical = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+    let base = match canonical.strip_prefix("/private") {
+        Some(rest) if rest.starts_with("/var/") || rest.starts_with("/tmp/") || rest.starts_with("/etc/") => rest.to_string(),
+        _ => canonical,
+    };
+    let work = format!("{base}/.work");
+    std::fs::create_dir_all(format!("{work}/app/sub")).expect("mkdir");
+    std::fs::create_dir_all(format!("{work}/sub")).expect("mkdir");
+    std::fs::create_dir_all(format!("{base}/sub")).expect("mkdir");
+    for file in [
+        format!("{work}/plain.txt"),
+        format!("{work}/sub/plain.txt"),
+        format!("{work}/app/plain.txt"),
+        format!("{work}/app/sub/plain.txt"),
+        format!("{work}/src.txt"),
+        format!("{work}/in.adoc"),
+        format!("{base}/plain.txt"),
+        format!("{base}/sub/plain.txt"),
+    ] {
+        std::fs::write(file, "").expect("write");
+    }
+    let ctx = || PathCtx { cwd: Some(work.clone()), root: Some(work.clone()), ..Default::default() };
+    let roots: Vec<&str> = ABSTRACTION_ROOTS.iter().map(|&r| if r == "/work" { work.as_str() } else { r }).collect();
+
     let mut violations = Vec::new();
     let mut unconstrained_sites = Vec::new();
 
@@ -809,12 +834,12 @@ fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
             if *shell_construct && !site.takes_shell_ops {
                 continue;
             }
-            for root in ABSTRACTION_ROOTS {
+            for &root in &roots {
                 let abstracted = (site.build)(op, root);
-                let abstract_allowed = command_verdict_in(&abstracted, workspace()).is_allowed();
+                let abstract_allowed = command_verdict_in(&abstracted, ctx()).is_allowed();
                 for witness in site_witnesses(root, site.reach) {
                     let concrete = op.replace('@', &witness);
-                    if command_verdict_in(&concrete, workspace()).is_allowed() {
+                    if command_verdict_in(&concrete, ctx()).is_allowed() {
                         continue;
                     }
                     constrained += 1;
