@@ -380,6 +380,7 @@ fn flag_present_matches_bare_glued_and_short_clusters_only() {
     assert!(!super::flag_present(&toks(&["-o=d"]), "-d"));
     assert!(!super::flag_present(&toks(&["--other"]), "--force"));
     assert!(!super::flag_present(&toks(&["-a-b"]), "--force"));
+    assert!(!super::flag_present(&toks(&["-x-force"]), "--force"));
     assert!(!super::flag_present(&toks(&["-fa"]), "-file"));
     assert!(!super::flag_present(&toks(&["-ba"]), "ab"));
 }

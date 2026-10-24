@@ -144,7 +144,7 @@ pub(crate) fn glob_presents_unlisted_flag(
         if known(head) {
             continue;
         }
-        if !s.starts_with("--") && s.len() > 2 && short_cluster_known(s, standalone, valued) {
+        if !s.starts_with("--") && short_cluster_known(s, standalone, valued) {
             continue;
         }
         return true;
@@ -159,6 +159,78 @@ mod tests {
 
     fn tokens(words: &[String]) -> Vec<Token> {
         words.iter().cloned().map(Token::from_raw).collect()
+    }
+
+    fn strings(words: &[&str]) -> Vec<String> {
+        words.iter().map(|w| w.to_string()).collect()
+    }
+
+    fn sub(extra: &str) -> TomlSub {
+        toml::from_str(&format!("name = \"x\"\nfirst_arg = [\"get-*\"]\n{extra}")).expect("sub parses")
+    }
+
+    #[test]
+    fn a_sub_with_flags_of_its_own_and_none_for_its_glob_inherits_the_wrapper_flags() {
+        for own in ["standalone = [\"-a\"]", "valued = [\"-b\"]", "optional_valued = [\"-c\"]"] {
+            let mut s = sub(own);
+            inherit(&mut s, &strings(&["-w"]), &strings(&["-v"]));
+            assert!(s.first_arg_standalone.contains(&"-w".to_string()), "{own}");
+            assert!(s.first_arg_valued.contains(&"-v".to_string()), "{own}");
+        }
+    }
+
+    #[test]
+    fn a_sub_with_no_flags_of_its_own_inherits_nothing() {
+        let mut s = sub("");
+        inherit(&mut s, &strings(&["-w"]), &strings(&["-v"]));
+        assert!(s.first_arg_standalone.is_empty() && s.first_arg_valued.is_empty());
+    }
+
+    #[test]
+    fn a_glob_that_declares_any_flag_list_keeps_it() {
+        for declared in ["first_arg_standalone = [\"-s\"]", "first_arg_valued = [\"-s\"]", "first_arg_loopback_valued = [\"-s\"]"] {
+            let mut s = sub(&format!("standalone = [\"-a\"]\n{declared}"));
+            inherit(&mut s, &strings(&["-w"]), &strings(&["-v"]));
+            assert!(!s.first_arg_standalone.contains(&"-w".to_string()), "{declared}");
+            assert!(!s.first_arg_valued.contains(&"-v".to_string()), "{declared}");
+        }
+    }
+
+    #[test]
+    fn a_sub_that_tolerates_unknown_flags_inherits_nothing() {
+        for tolerant in ["tolerate_unknown_short = true", "tolerate_unknown_long = true"] {
+            let mut s = sub(&format!("standalone = [\"-a\"]\n{tolerant}"));
+            inherit(&mut s, &strings(&["-w"]), &strings(&["-v"]));
+            assert!(s.first_arg_standalone.is_empty(), "{tolerant}");
+        }
+    }
+
+    #[test]
+    fn flag_values_need_the_flag_in_valued_and_at_least_one_value() {
+        let with_values = |extra: &str| sub(&format!("{extra}\nflag_values = {{ \"--out\" = [\"json\"] }}"));
+        assert!(flag_values("c", "x", &with_values("valued = [\"--out\"]")).is_ok());
+        assert!(flag_values("c", "x", &with_values("first_arg_valued = [\"--out\"]")).is_ok());
+        assert!(flag_values("c", "x", &with_values("valued = [\"--other\"]")).is_err());
+        assert!(flag_values("c", "x", &sub("valued = [\"--out\"]\nflag_values = { \"--out\" = [] }")).is_err());
+    }
+
+    #[test]
+    fn a_short_cluster_is_known_only_when_every_letter_is_declared_up_to_a_valued_one() {
+        let (standalone, valued) = (strings(&["-a", "-b"]), strings(&["-v"]));
+        assert!(short_cluster_known("-ab", &standalone, &valued));
+        assert!(short_cluster_known("-av", &standalone, &valued));
+        assert!(short_cluster_known("-avzzz", &standalone, &valued));
+        assert!(!short_cluster_known("-abz", &standalone, &valued));
+        assert!(!short_cluster_known("-zv", &standalone, &valued));
+    }
+
+    #[test]
+    fn only_a_single_dash_cluster_of_declared_letters_is_read_as_flags() {
+        let (standalone, valued) = (strings(&["--", "-a", "-b"]), Vec::new());
+        let line = |words: &[&str]| tokens(&strings(words));
+        assert!(!glob_presents_unlisted_flag(&line(&["get-x", "-ab"]), 1, &standalone, &valued, &[]));
+        assert!(glob_presents_unlisted_flag(&line(&["get-x", "-abz"]), 1, &standalone, &valued, &[]));
+        assert!(glob_presents_unlisted_flag(&line(&["get-x", "--ab"]), 1, &standalone, &valued, &[]));
     }
 
     proptest! {

@@ -275,7 +275,7 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
             break;
         }
 
-        if tolerance.reads_commands.plus && t.len() > 1 && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
+        if tolerance.reads_commands.plus && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
             return None;
         }
 
@@ -365,6 +365,16 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn local_path_refuses_an_empty_word_a_flag_and_a_double_slash() {
+        for refused in ["", "-x", "a//b"] {
+            assert!(!is_local_path(refused), "{refused:?} is not a local folder");
+        }
+        for local in ["src", "./docs", "a/b"] {
+            assert!(is_local_path(local), "{local} is a local folder");
+        }
+    }
 
     #[test]
     fn go_local_package_each_alternative_alone() {
