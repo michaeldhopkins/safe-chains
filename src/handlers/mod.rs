@@ -31,6 +31,7 @@ pub mod jvm;
 pub mod magick;
 pub mod network;
 pub mod node;
+pub mod pandoc;
 pub(crate) mod pattern_flags;
 pub mod perl;
 mod perl_load;
@@ -60,6 +61,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("glab", forges::glab::is_safe_glab as HandlerFn),
         ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),
+        ("pandoc", pandoc::check_pandoc as HandlerFn),
         ("awk", coreutils::awk::check_awk as HandlerFn),
         ("curl", network::is_safe_curl as HandlerFn),
         ("fd", fd::check_fd as HandlerFn),

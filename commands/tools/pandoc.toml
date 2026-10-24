@@ -3,8 +3,8 @@ name = "pandoc"
 description = "Universal document converter that parses markup and structured formats (Markdown, CommonMark, reStructuredText, HTML, LaTeX, Org, DocBook, Typst, DOCX, EPUB, ODT, Jupyter notebooks, CSV, TSV, JSON) into an AST and renders target formats to stdout by default. Writing to the filesystem requires explicit flags: `-o` / `--output` writes the converted document to a file, `--extract-media` writes embedded media assets into a directory, and `--log` writes JSON log messages to a file. Passing `-F` / `--filter` or `-L` / `--lua-filter` executes external filter programs or Lua scripts over the AST, `--pdf-engine` / `--latex-engine` invokes an external TeX or HTML-to-PDF engine binary, and `-d` / `--defaults` loads YAML option files that can enable filters, engines, or output files. When restricted to stdout conversion without output, media-extraction, log, defaults, engine, or filter flags, it operates as a local converter; local file operands, templates, headers, metadata files, and bibliographies are read from disk (while URL operands or `--request-header` can fetch remote HTTP resources). Actively maintained with frequent point releases and a well-documented option surface."
 url = "https://pandoc.org/MANUAL.html"
 researched_version = "pandoc 3.12.1"
-level = "SafeRead"
-bare = true
+handler = "pandoc"
+doc_body = "Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists."
 examples_safe = [
     "pandoc README.md",
     "pandoc -f markdown -t html README.md",
@@ -31,18 +31,54 @@ examples_denied = [
     "pandoc --pdf-engine=xelatex README.md",
     "pandoc --log=out.json README.md",
     "pandoc ~/.ssh/id_rsa",
+    "pandoc lua x.lua",
+    "pandoc lua",
+    "pandoc server",
+    "pandoc server -p 8080",
+    "pandoc -t ./w.lua README.md",
+    "pandoc --to=./w.lua README.md",
+    "pandoc --to ./w.lua README.md",
+    "pandoc -w ./w.lua README.md",
+    "pandoc --write=w.lua README.md",
+    "pandoc -t w.lua README.md",
+    "pandoc -s -t./w.lua README.md",
+    "pandoc -st ./w.lua README.md",
+    "pandoc -f ./r.lua README.md",
+    "pandoc --from=./r.lua README.md",
+    "pandoc -r ./r.lua README.md",
+    "pandoc --read=r.lua README.md",
+    "pandoc -D d.lua",
+    "pandoc --print-default-template=d.lua",
+    "pandoc --print-default-template d.lua",
+    "pandoc -t pdf README.md",
+    "pandoc --to=pdf README.md",
+    "pandoc -t pdf+smart README.md",
+    "pandoc -t html -t pdf README.md",
+    "pandoc -t",
+    "pandoc --embed-resources README.md",
+    "pandoc --self-contained README.md",
+    "pandoc -s --embed-resources README.md",
+    "pandoc --smart README.md",
+    "pandoc --parse-raw README.md",
+    "pandoc --mimex README.md",
+    "pandoc --datadir=d README.md",
+    "pandoc --strip-empty-paragraphs README.md",
+    "pandoc --dump-args README.md",
+    "pandoc --ignore-args README.md",
+    "pandoc \"https://example.com/?q=$HOME\"",
 ]
+[command.fallback]
+level = "SafeRead"
+bare = true
 standalone = [
     "--bash-completion", "--biblatex", "--citeproc",
-    "--datadir", "--dump-args",
-    "--help", "--ignore-args",
+    "--help",
     "--list-highlight-languages", "--list-highlight-styles",
     "--list-input-formats", "--list-output-formats",
-    "--mimex", "--natbib", "--no-highlight",
-    "--parse-raw", "--quiet", "--smart",
-    "--standalone", "--strip-empty-paragraphs",
+    "--natbib", "--no-highlight", "--quiet",
+    "--standalone",
     "--verbose", "--version",
-    "-C", "-N", "-R", "-S",
+    "-C", "-N",
     "-h", "-i", "-p", "-s", "-v",
 ]
 valued = [
@@ -69,13 +105,13 @@ valued = [
     "-c", "-f", "-r", "-t", "-w",
 ]
 optional_valued = [
-    "--ascii", "--atx-headers", "--embed-resources",
+    "--ascii", "--atx-headers",
     "--epub-title-page", "--fail-if-warnings", "--file-scope",
     "--gladtex", "--html-q-tags", "--incremental", "--katex",
     "--link-images", "--list-extensions", "--listings",
     "--mathjax", "--mathml", "--no-check-certificate",
     "--number-sections", "--preserve-tabs", "--reference-links",
-    "--sandbox", "--section-divs", "--self-contained",
+    "--sandbox", "--section-divs",
     "--strip-comments", "--table-of-contents", "--toc",
     "--trace", "--webtex",
 ]

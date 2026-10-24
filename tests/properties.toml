@@ -359,6 +359,12 @@ owed = [
   "src/handlers/system/tmux_keys_tests.rs::submitted_text_is_never_more_permissive_than_running_it",
   "src/handlers/system/tmux_keys_tests.rs::text_left_unsubmitted_is_refused",
 ]
+"src/handlers/pandoc.rs" = [
+  "a_value_with_a_path_character_is_never_a_plain_format",
+  "a_plain_name_with_extensions_is_accepted_unless_it_is_pdf",
+  "pdf_is_refused_with_any_extensions",
+  "a_writer_flag_with_a_path_value_is_denied_in_every_spelling",
+]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",

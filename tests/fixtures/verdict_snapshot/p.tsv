@@ -292,6 +292,7 @@ pal2rgb -p	safe-write
 pal2rgb -r	safe-write
 pal2rgb x	safe-write
 pandoc	safe-read
+pandoc "https://example.com/?q=$HOME"	denied
 pandoc --abbreviations x	safe-read
 pandoc --ascii	safe-read
 pandoc --ascii --abbreviations x	safe-read
@@ -309,13 +310,13 @@ pandoc --columns x	safe-read
 pandoc --csl x	safe-read
 pandoc --css x	safe-read
 pandoc --data-dir x	safe-read
-pandoc --datadir	safe-read
+pandoc --datadir=d README.md	denied
 pandoc --default-image-extension x	safe-read
 pandoc --defaults=defaults.yaml README.md	denied
 pandoc --dpi x	safe-read
-pandoc --dump-args	safe-read
+pandoc --dump-args README.md	denied
 pandoc --email-obfuscation x	safe-read
-pandoc --embed-resources	safe-read
+pandoc --embed-resources README.md	denied
 pandoc --eol x	safe-read
 pandoc --epub-chapter-level x	safe-read
 pandoc --epub-cover-image x	safe-read
@@ -331,13 +332,14 @@ pandoc --figure-caption-position x	safe-read
 pandoc --file-scope	safe-read
 pandoc --filter=pandoc-crossref README.md	denied
 pandoc --from x	safe-read
+pandoc --from=./r.lua README.md	denied
 pandoc --from=gfm --to=plain --wrap=none README.md	safe-read
 pandoc --gladtex	safe-read
 pandoc --help	safe-read
 pandoc --highlight-style x	safe-read
 pandoc --html-q-tags	safe-read
 pandoc --id-prefix x	safe-read
-pandoc --ignore-args	safe-read
+pandoc --ignore-args README.md	denied
 pandoc --include-after-body x	safe-read
 pandoc --include-before-body x	safe-read
 pandoc --include-in-header x	safe-read
@@ -360,21 +362,25 @@ pandoc --mathjax	safe-read
 pandoc --mathml	safe-read
 pandoc --metadata x	safe-read
 pandoc --metadata-file x	safe-read
-pandoc --mimex	safe-read
+pandoc --mimex README.md	denied
 pandoc --natbib	safe-read
 pandoc --no-check-certificate	safe-read
 pandoc --no-highlight	safe-read
 pandoc --number-offset x	safe-read
 pandoc --number-sections	safe-read
 pandoc --output out.docx README.md	denied
-pandoc --parse-raw	safe-read
+pandoc --parse-raw README.md	denied
 pandoc --pdf-engine=xelatex README.md	denied
 pandoc --preserve-tabs	safe-read
 pandoc --print-default-data-file x	safe-read
+pandoc --print-default-template d.lua	denied
 pandoc --print-default-template x	safe-read
+pandoc --print-default-template=d.lua	denied
+pandoc --print-default-template=latex	safe-read
 pandoc --print-highlight-style x	safe-read
 pandoc --quiet	safe-read
 pandoc --read x	safe-read
+pandoc --read=r.lua README.md	denied
 pandoc --reference-doc x	safe-read
 pandoc --reference-links	safe-read
 pandoc --reference-location x	safe-read
@@ -382,15 +388,15 @@ pandoc --request-header x	safe-read
 pandoc --resource-path x	safe-read
 pandoc --sandbox	safe-read
 pandoc --section-divs	safe-read
-pandoc --self-contained	safe-read
+pandoc --self-contained README.md	denied
 pandoc --shift-heading-level-by x	safe-read
 pandoc --slide-level x	safe-read
-pandoc --smart	safe-read
+pandoc --smart README.md	denied
 pandoc --split-level x	safe-read
 pandoc --standalone	safe-read
 pandoc --standalone --mathjax --syntax-highlighting=pygments notes.md	safe-read
 pandoc --strip-comments	safe-read
-pandoc --strip-empty-paragraphs	safe-read
+pandoc --strip-empty-paragraphs README.md	denied
 pandoc --syntax-definition x	safe-read
 pandoc --syntax-highlighting x	safe-read
 pandoc --tab-stop x	safe-read
@@ -398,7 +404,10 @@ pandoc --table-caption-position x	safe-read
 pandoc --table-of-contents	safe-read
 pandoc --template x	safe-read
 pandoc --title-prefix x	safe-read
+pandoc --to ./w.lua README.md	denied
 pandoc --to x	safe-read
+pandoc --to=./w.lua README.md	denied
+pandoc --to=pdf README.md	denied
 pandoc --toc	safe-read
 pandoc --toc-depth x	safe-read
 pandoc --top-level-division x	safe-read
@@ -411,36 +420,61 @@ pandoc --version	safe-read
 pandoc --webtex	safe-read
 pandoc --wrap x	safe-read
 pandoc --write x	safe-read
+pandoc --write=w.lua README.md	denied
 pandoc -A x	safe-read
 pandoc -B x	safe-read
 pandoc -C	safe-read
+pandoc -D d.lua	denied
+pandoc -D html	safe-read
 pandoc -D x	safe-read
 pandoc -F ./my-filter.py README.md	denied
 pandoc -H x	safe-read
 pandoc -L filter.lua README.md	denied
 pandoc -M x	safe-read
 pandoc -N	safe-read
-pandoc -R	safe-read
-pandoc -S	safe-read
 pandoc -T x	safe-read
+pandoc -V title=lua README.md	safe-read
 pandoc -V x	safe-read
 pandoc -c x	safe-read
 pandoc -d defaults.yaml README.md	denied
+pandoc -f ./r.lua README.md	denied
 pandoc -f markdown -t html README.md	safe-read
 pandoc -f x	safe-read
+pandoc -fmarkdown README.md	safe-read
 pandoc -h	safe-read
 pandoc -i	safe-read
 pandoc -oout.html README.md	denied
 pandoc -p	safe-read
+pandoc -r ./r.lua README.md	denied
 pandoc -r x	safe-read
 pandoc -s	safe-read
+pandoc -s --embed-resources README.md	denied
 pandoc -s --toc --toc-depth=2 -V title=Spec docs/spec.md	safe-read
+pandoc -s -t./w.lua README.md	denied
+pandoc -st ./w.lua README.md	denied
+pandoc -st html README.md	safe-read
+pandoc -t	denied
+pandoc -t ./w.lua README.md	denied
+pandoc -t gfm+smart-raw_html README.md	safe-read
+pandoc -t html -t pdf README.md	denied
+pandoc -t html README.md	safe-read
+pandoc -t html+ README.md	denied
+pandoc -t pdf README.md	denied
+pandoc -t pdf+smart README.md	denied
+pandoc -t w.lua README.md	denied
 pandoc -t x	safe-read
+pandoc -t=html README.md	denied
 pandoc -v	safe-read
+pandoc -w ./w.lua README.md	denied
 pandoc -w x	safe-read
 pandoc README.md	safe-read
 pandoc README.md --output=out.pdf	denied
 pandoc README.md -o out.html	denied
+pandoc README.md -t	denied
+pandoc lua	denied
+pandoc lua x.lua	denied
+pandoc server	denied
+pandoc server -p 8080	denied
 pandoc x	safe-read
 pandoc ~/.ssh/id_rsa	denied
 pants	denied

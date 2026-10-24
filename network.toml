@@ -17,7 +17,7 @@
 
 commands = [
   # HTTP and file transfer
-  "curl", "wget", "http", "https", "xh", "xhs", "aria2c", "yt-dlp", "monolith", "httpyac", "hurl", "grpcurl", "ipfs",
+  "curl", "wget", "http", "https", "xh", "xhs", "aria2c", "yt-dlp", "monolith", "httpyac", "hurl", "grpcurl", "ipfs", "pandoc",
   "rclone", "rsync", "scp", "sftp", "sshfs", "ftp", "tftp", "lftp", "smbutil", "mc", "restic", "borg",
   # remote shells and tunnels
   "ssh", "mosh", "autossh", "ssh-copy-id", "ssh-keyscan", "telnet", "socat", "nc", "ncat", "netcat",
