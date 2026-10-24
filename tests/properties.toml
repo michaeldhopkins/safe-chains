@@ -544,6 +544,7 @@ owed = [
   "no_entry_with_only_assignments_uses_the_trimmed_input_and_no_swallow",
 ]
 "src/registry/build_eval_safe.rs" = ["bare_literal_eval_safe_values_are_accepted", "a_non_literal_eval_safe_value_is_rejected"]
+"src/registry/build_sub.rs" = ["aliases_inherit_the_canonical_declaration"]
 "src/registry/build.rs" = [
   "build_policy_optional_valued_mechanism_appends_to_both_lists",
   "build_policy_unknown_tolerance_tracks_the_boolean_pair",
@@ -658,6 +659,7 @@ owed = [
 "src/registry/transfer.rs" = "type declarations and their serde shapes only"
 "src/registry/types_tables.rs" = "type declarations and their serde shapes only"
 "src/registry/types_behavior.rs" = "type declarations only"
+"src/registry/types_sub.rs" = "type declarations and their serde shapes only"
 "src/suggest_cli.rs" = "reads and writes .safe-chains.toml for --suggest"
 "src/targets/agy.rs" = "reads and writes the harness's settings file"
 "src/targets/claude.rs" = "reads and writes the harness's settings file"
