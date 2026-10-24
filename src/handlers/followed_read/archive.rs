@@ -275,6 +275,13 @@ mod tests {
     }
 
     #[test]
+    fn seven_zip_follows_on_update_as_on_add() {
+        let updated = seven_zip(&tokens(&["7z", "u", "-l", "out.7z", "sub"])).expect("follow");
+        assert_eq!(updated.trees, vec!["sub".to_string()]);
+        assert!(seven_zip(&tokens(&["7z", "l", "-l", "out.7z", "sub"])).is_none());
+    }
+
+    #[test]
     fn diff_reads_operands_and_the_files_an_option_names() {
         let ended = diff(&tokens(&["diff", "-r", "--", "sub", "empty"])).expect("follow");
         assert_eq!(ended.trees, vec!["sub".to_string(), "empty".to_string()]);
