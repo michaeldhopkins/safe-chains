@@ -2,7 +2,7 @@ use crate::parse::Token;
 
 /// Extraction writes the paths and modes the archive names, set-id bits among them, which
 /// nothing here can see without opening the archive. `tar x` and `unzip` are refused for that
-/// reason, so pax, cpio, ditto and xar are refused the same way when they extract. Listing stays
+/// reason, so pax, cpio, ditto, xar and xip are refused the same way when they extract. Listing stays
 /// approved, and so do their copy modes: those keep the modes of files already on disk. xar strips
 /// set-id bits unless told to keep them, but the archive still names the paths it writes.
 ///
@@ -84,6 +84,7 @@ pub(crate) fn extracts(tokens: &[Token]) -> bool {
             !(given.leading.contains('l') || given.long_leading.contains(&"--list-only"))
         }
         "xar" => given().anywhere.contains('x') || tokens[1..].iter().any(|t| t.as_str() == "--keep-setuid"),
+        "xip" => tokens[1..].iter().any(|t| t.as_str() == "--expand" || t.as_str().starts_with("--expand=")),
         _ => crate::registry::canonical_name(first.command_name()) == "7z" && seven_zip_extracts(&tokens[1..]),
     }
 }
@@ -286,6 +287,9 @@ mod tests {
         cpio_extract_with_a_spaced_message: "cpio -i -M t",
         cpio_extract_behind_a_gnu_nonmatching_letter: "cpio -fidm",
         cpio_extract_behind_a_spaced_gnu_nonmatching_letter: "cpio -f -i",
+        xip_expand: "xip --expand ./a.xip",
+        xip_expand_from_downloads: "xip --expand ~/Downloads/a.xip",
+        xip_expand_glued: "xip --expand=./a.xip",
         seven_zip_extract: "7z x ./a.7z",
         seven_zip_extract_flat: "7z e ./a.7z -o./out",
         seven_zip_extract_upper_case: "7z X ./a.7z",
@@ -366,13 +370,13 @@ mod tests {
             }
         }
 
-        /// Whatever else is given, a pax, cpio or ditto line that extracts is refused, and one
+        /// Whatever else is given, a pax, cpio, ditto or xip line that extracts is refused, and one
         /// that only lists is not refused for extracting. A letter after the first operand is a
         /// pattern to a parser that stops there (bsdcpio, or pax under POSIXLY_CORRECT), so a
         /// listing or copy letter only counts in front of the operands.
         #[test]
         fn an_extraction_is_refused_and_a_listing_is_not(
-            command in prop::sample::select(vec!["pax -r", "pax -rv", "cpio -i", "cpio -iv", "cpio --extract", "ditto -x", "ditto -xk"]),
+            command in prop::sample::select(vec!["pax -r", "pax -rv", "cpio -i", "cpio -iv", "cpio --extract", "ditto -x", "ditto -xk", "xip --expand"]),
             extra in prop::sample::subsequence(vec!["-v", "-k", "-p e", "-m", "-d"], 0..3),
         ) {
             let extracts = |line: &str| {
@@ -382,7 +386,7 @@ mod tests {
             let line = format!("{command} {} ./archive ./out", extra.join(" "));
             prop_assert!(extracts(&line), "{}", line);
             prop_assert!(!is_safe_command(&line), "{}", line);
-            if !command.starts_with("ditto") {
+            if !command.starts_with("ditto") && !command.starts_with("xip") {
                 let safe_letter = if command.starts_with("pax") { "-w" } else { "-t" };
                 let before = format!("{command} {safe_letter} {} ./archive ./out", extra.join(" "));
                 prop_assert!(!extracts(&before), "{}", before);

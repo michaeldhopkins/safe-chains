@@ -855,10 +855,12 @@ xh -s	safe-read
 xh -v	safe-read
 xh x	safe-read
 xip	denied
-xip --expand archive.xip	safe-write
-xip --expand x	safe-write
+xip --expand ./a.xip	denied
+xip --expand x	denied
+xip --expand ~/Downloads/a.xip	denied
+xip --expand=./a.xip	denied
 xip --help	safe-write
-xip --help --expand x	safe-write
+xip --help --expand x	denied
 xip --help -h	safe-write
 xip --help x	safe-write
 xip --version	denied

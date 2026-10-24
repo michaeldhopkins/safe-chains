@@ -158,7 +158,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
                 || coreutils::archive_extract::opens_a_remote_archive(tokens)
         }
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
-        "ditto" | "xar" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
+        "ditto" | "xar" | "xip" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
         "man" | "apropos" | "manpath" => shell_text::man_evaluates_a_word(tokens),
         _ => false,
     };

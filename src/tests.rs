@@ -430,7 +430,6 @@ safe! {
     wdutil_info: "wdutil info",
     assetutil_info: "assetutil -I Assets.car",
     logger_msg: "logger 'test message'",
-    xip_expand: "xip --expand archive.xip",
     screen_list: "screen -ls",
 
     aa_list: "aa list",
