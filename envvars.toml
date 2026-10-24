@@ -1299,6 +1299,41 @@ measured = false
 shape = "command"
 because = "borg runs this command and reads the new passphrase from its output when a key is created or changed"
 measured = false
+[env.BORG_BASE_DIR]
+shape = "exec-path"
+single_value = true
+because = "the base of borg's config, keys, cache and security folders, which borg writes and trusts on the next run"
+measured = false
+[env.BORG_CONFIG_DIR]
+shape = "exec-path"
+single_value = true
+because = "where borg keeps its keys and security records, written and trusted on the next run"
+measured = false
+[env.BORG_KEYS_DIR]
+shape = "exec-path"
+single_value = true
+because = "where borg reads and writes the keys of keyfile-mode repositories"
+measured = false
+[env.BORG_KEY_FILE]
+shape = "exec-path"
+single_value = true
+because = "the key file borg decrypts a repository with, and writes when one is created"
+measured = false
+[env.BORG_SECURITY_DIR]
+shape = "exec-path"
+single_value = true
+because = "borg's record of each repository's location and key type, written and checked on the next run, so another one hides a relocated or downgraded repository"
+measured = false
+[env.BORG_CACHE_DIR]
+shape = "exec-path"
+single_value = true
+because = "borg's chunk and file cache, written and trusted on the next run to decide what is already stored"
+measured = false
+[env.TASK_TEMP_DIR]
+shape = "exec-path"
+single_value = true
+because = "where go-task writes the checksums that decide whether a task is skipped as up to date"
+measured = false
 [env.RESTIC_PASSWORD_COMMAND]
 shape = "exec-path"
 single_value = true
