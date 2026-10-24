@@ -3,6 +3,23 @@ name = "printf"
 aliases = ["gprintf"]
 description = "Formats and prints data according to a format string, writing to stdout. No filesystem writes, no network access, and no ability to execute commands. Output destination is controlled by shell redirection, not by printf itself. Ships with GNU coreutils and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation"
+handler = "printf"
+examples_denied = [
+    "printf",
+    "printf -v name value",
+    "printf '%n' count",
+    "printf 'abc%5n' count",
+    "printf -- '%1$n' count",
+    "printf '%(%n)x' count",
+    "printf '%n' 'a[$(touch x)]'",
+    "printf '%s' $(id)",
+    "printf -x",
+]
+
+# The handler (src/handlers/printf.rs) refuses a format holding a %n conversion and leaves the rest
+# to this grammar. The format is the first word that is not a dash-word, or the word after `--`;
+# -h and -V are listed because the GNU program prints them as a format, never as an option.
+[command.fallback]
 level = "Inert"
 bare = false
 standalone = ["--help", "--version", "-V", "-h"]

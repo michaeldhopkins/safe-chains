@@ -43,6 +43,7 @@ pub mod perl;
 mod perl_load;
 mod perl_regex;
 pub mod php;
+pub mod printf;
 pub mod ruby;
 pub mod safe_chains;
 pub mod shell;
@@ -79,6 +80,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("php", php::is_safe_php as HandlerFn),
         ("open", system::open::check_open as HandlerFn),
         ("screen", system::screen::check_screen as HandlerFn),
+        ("printf", printf::check_printf as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
         ("safe_chains", safe_chains::check_safe_chains as HandlerFn),

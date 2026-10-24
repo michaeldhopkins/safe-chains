@@ -152,7 +152,19 @@ Aliases: `gnumfmt`
 
 Aliases: `gprintf`
 
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `printf hello`
+- `printf '%s\n' one two`
+- `printf '%5d|%-5s|\n' 42 ab`
+- `printf -- '%s\n' -x`
+- `printf '%%n is a literal\n'`
+- `gprintf '%b' 'a\tb'`
+- `printf --version`
+- `printf --help`
 
 ### `seq`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation</a></p>

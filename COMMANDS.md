@@ -12423,7 +12423,19 @@ Aliases: `gprintenv`
 
 Aliases: `gprintf`
 
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `printf hello`
+- `printf '%s\n' one two`
+- `printf '%5d|%-5s|\n' 42 ab`
+- `printf -- '%s\n' -x`
+- `printf '%%n is a literal\n'`
+- `gprintf '%b' 'a\tb'`
+- `printf --version`
+- `printf --help`
 
 ### `prisma`
 <p class="cmd-url"><a href="https://www.prisma.io/docs/orm/reference/prisma-cli-reference">https://www.prisma.io/docs/orm/reference/prisma-cli-reference</a></p>

@@ -12631,6 +12631,7 @@ gprintenv -V	inert
 gprintenv -h	inert
 gprintenv x	denied
 gprintf	denied
+gprintf '%b' 'a\\tb'	inert
 gprintf --help	inert
 gprintf --help --version	inert
 gprintf --help x	inert

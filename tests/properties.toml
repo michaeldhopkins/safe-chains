@@ -453,6 +453,13 @@ owed = [
 ]
 "src/handlers/hadolint.rs" = ["any_runtime_option_token_is_denied"]
 "src/handlers/shellcheck.rs" = ["any_runtime_option_token_is_denied"]
+"src/handlers/printf.rs" = [
+  "any_spelling_of_the_store_conversion_is_refused",
+  "a_format_without_a_percent_is_never_refused",
+  "an_escaped_percent_never_starts_a_conversion",
+  "a_store_inside_parentheses_is_refused_unless_they_close_a_time_conversion",
+  "no_format_makes_the_scan_panic",
+]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",
