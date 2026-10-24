@@ -1,6 +1,7 @@
 use proptest::prelude::*;
 
 use super::{SHELL_TEXT, holds_shell_text};
+use crate::parse::Token;
 use crate::pathctx::{PathCtx, enter};
 
 const ROOT: &str = "/work/u/proj";
@@ -72,6 +73,54 @@ fn the_reviewed_man_spellings() {
         "man ls", "man 3 printf", "man -k grep", "LANG=en_US.UTF-8 man ls", "MANPATH=/usr/share/man man ls", "man ./docs/a.1",
         "apropos grep",
     ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+}
+
+fn tokens(words: &[&str]) -> Vec<Token> {
+    words.iter().map(|w| Token::from_test(w)).collect()
+}
+
+proptest! {
+    /// A flag zless pastes unquoted into the pager's command line is refused when the shell would
+    /// split it or expand it, under either name and whatever flags come before it.
+    #[test]
+    fn a_zless_flag_the_shell_would_split_is_refused(
+        program in prop::sample::select(&["zless", "zmore", "zcmp", "zdiff", "bzcmp", "bzdiff"][..]),
+        before in prop::sample::subsequence(vec!["-i", "-R", "-S"], 0..3),
+        flag in prop::sample::select(&["--prompt=", "--pattern=", "-P", "-p"][..]),
+        value in "[a-z.]{0,4}",
+        c in prop::sample::select(&[' ', '\t', '*', '?', '['][..]),
+        rest in "[a-z.=-]{0,6}",
+    ) {
+        let word = format!("{flag}{value}{c}{rest}");
+        let line = format!("{program} {} {} ./a.gz", before.join(" "), quoted(&word));
+        prop_assert!(!allowed(&line), "should be refused: {}", line);
+        let mut words = vec![program];
+        words.extend(before.iter().copied());
+        words.push(&word);
+        prop_assert!(super::splits_a_flag(&tokens(&words)));
+    }
+
+    /// A flag word with nothing to split, or a word after the first file, is not refused for it.
+    #[test]
+    fn a_zless_word_the_shell_keeps_whole_is_not_refused_for_splitting(flag in "-[A-Za-z0-9=.-]{1,10}", after in "[a-z *?]{1,6}") {
+        prop_assert!(!super::splits_a_flag(&tokens(&["zless", &flag, "./a.gz", &after])));
+        prop_assert!(!super::splits_a_flag(&tokens(&["zless", "--", &after])));
+    }
+}
+
+#[test]
+fn the_reviewed_zless_spellings() {
+    for cmd in [
+        "zless --prompt='x --lesskey-src=./k' ./a.gz", "zmore '-P x -o./log' ./a.gz", "zless '--prompt=*' ./a.gz",
+        "zdiff '-u *' ./a.gz ./b.gz", "bzdiff -- '-u -x' ./a ./b",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
+    }
+    for cmd in
+        ["zless ./a.gz", "zless -R ./a.gz", "zless --prompt=x ./a.gz", "zmore -i ./a.gz", "zdiff -u ./a.gz ./b.gz", "bzcmp ./a.bz2 ./b.bz2"]
+    {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }
 }

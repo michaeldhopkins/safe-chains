@@ -404,6 +404,8 @@ owed = [
   "src/handlers/shell_text_tests.rs::a_word_the_man_script_would_evaluate_is_refused",
   "src/handlers/shell_text_tests.rs::a_variable_the_man_script_would_evaluate_is_refused",
   "src/handlers/shell_text_tests.rs::a_plain_word_is_not_shell_text",
+  "src/handlers/shell_text_tests.rs::a_zless_flag_the_shell_would_split_is_refused",
+  "src/handlers/shell_text_tests.rs::a_zless_word_the_shell_keeps_whole_is_not_refused_for_splitting",
 ]
 "src/handlers/system/plutil.rs" = [
   "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
