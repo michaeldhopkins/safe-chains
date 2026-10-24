@@ -63,9 +63,19 @@ fn valued_verdict(flag: &str, value: &str) -> Option<Verdict> {
         });
     }
     if MVN_LOG_FILES.contains(flag) {
+        if names_build_input(value) {
+            return Some(Verdict::Denied);
+        }
         return Some(crate::engine::resolve::write_target_verdict(value));
     }
     None
+}
+
+/// A log written over the build itself: a `pom.xml`, or anything under `.mvn/` (`jvm.config`,
+/// `maven.config`, `extensions.xml`), which the next build reads as its code and options.
+fn names_build_input(path: &str) -> bool {
+    let mut parts = path.split('/').filter(|p| !p.is_empty());
+    parts.clone().any(|p| p.eq_ignore_ascii_case(".mvn")) || parts.next_back().is_some_and(|p| p.eq_ignore_ascii_case("pom.xml"))
 }
 
 fn token_verdict(tokens: &[Token], i: usize) -> Option<(Verdict, usize)> {
@@ -200,6 +210,10 @@ mod tests {
         mvn_foreign_log_long_denied: "mvn compile --log-file /etc/x.log",
         mvn_foreign_log_equals_denied: "mvn compile --log-file=~/.bashrc",
         mvn_log_into_git_denied: "mvn compile -l .git/hooks/pre-commit",
+        mvn_log_over_pom_denied: "mvn compile -l pom.xml",
+        mvn_log_over_module_pom_denied: "mvn compile --log-file=core/POM.xml",
+        mvn_log_into_mvn_config_denied: "mvn compile -l .mvn/jvm.config",
+        mvn_log_into_mvn_extensions_denied: "mvn compile -l ./sub/.mvn/extensions.xml",
         mvn_exec_executable_denied: "mvn test -Dexec.executable=/tmp/evil",
         mvn_exec_args_denied: "mvn test -Dexec.args=-c",
         mvn_repo_local_denied: "mvn test -Dmaven.repo.local=/tmp/repo",
@@ -392,7 +406,9 @@ mod tests {
                 if flag.starts_with("--") {
                     prop_assert_eq!(is_safe_mvn(&tokens(&["mvn", "test", &format!("{flag}={value}")])), spaced);
                 }
-                let judged = if MVN_LOG_FILES.contains(flag) {
+                let judged = if MVN_LOG_FILES.contains(flag) && super::super::names_build_input(value) {
+                    Verdict::Denied
+                } else if MVN_LOG_FILES.contains(flag) {
                     crate::engine::resolve::write_target_verdict(value)
                 } else {
                     crate::engine::resolve::execute_file_verdict(value)

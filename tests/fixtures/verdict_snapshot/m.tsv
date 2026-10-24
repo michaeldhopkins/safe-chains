@@ -3846,10 +3846,14 @@ mvn / mvnw x	denied
 mvn clean	denied
 mvn compile	safe-write
 mvn compile --log-file /etc/x.log	denied
+mvn compile --log-file=core/POM.xml	denied
 mvn compile --log-file=~/.bashrc	denied
 mvn compile -Dmaven.compiler.fork=true -Dmaven.compiler.executable=/tmp/javac	denied
+mvn compile -l ./sub/.mvn/extensions.xml	denied
 mvn compile -l .git/hooks/pre-commit	denied
+mvn compile -l .mvn/jvm.config	denied
 mvn compile -l build.log	safe-write
+mvn compile -l pom.xml	denied
 mvn compile -l ~/x.log	denied
 mvn compile test	safe-write
 mvn dependency:list	inert
