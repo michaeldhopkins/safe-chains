@@ -267,6 +267,14 @@ mod tests {
     }
 
     #[test]
+    fn seven_zip_skips_the_value_of_a_spaced_valued_switch_but_not_of_one_also_standalone() {
+        let spaced = seven_zip(&tokens(&["7z", "a", "-l", "-o", "dest", "out.7z", "sub"])).expect("follow");
+        assert_eq!(spaced.trees, vec!["sub".to_string()]);
+        let both = seven_zip(&tokens(&["7z", "a", "-l", "-bb", "out.7z", "sub"])).expect("follow");
+        assert_eq!(both.trees, vec!["sub".to_string()]);
+    }
+
+    #[test]
     fn diff_reads_operands_and_the_files_an_option_names() {
         let ended = diff(&tokens(&["diff", "-r", "--", "sub", "empty"])).expect("follow");
         assert_eq!(ended.trees, vec!["sub".to_string(), "empty".to_string()]);
