@@ -542,6 +542,10 @@ Aliases: `muse`
 - **--list**: Flags: --help, --yaml, --toml, --export, -h, -y. Valued: --inventory, --limit, -i, -l
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `ansible-inventory --list -i ./inventory/hosts.yml`
+
 ### `ansible-lint`
 <p class="cmd-url"><a href="https://ansible.readthedocs.io/projects/lint/">https://ansible.readthedocs.io/projects/lint/</a></p>
 
@@ -555,6 +559,10 @@ Aliases: `muse`
 - Requires --list-hosts, --list-tasks, --list-tags, --syntax-check.
 - Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
 - Allowed valued flags: --connection, --extra-vars, --inventory, --limit, --tags, --skip-tags, -C, -c, -e, -i, -l, -t
+
+**Examples:**
+
+- `ansible-playbook --syntax-check site.yml -i ./inventory/hosts.yml`
 
 ### `ansible-vault`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-vault.html">https://docs.ansible.com/ansible/latest/cli/ansible-vault.html</a></p>

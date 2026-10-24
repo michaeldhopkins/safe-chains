@@ -1544,6 +1544,7 @@ ansible-inventory --graph -i x	inert
 ansible-inventory --graph -l x	inert
 ansible-inventory --graph x	inert
 ansible-inventory --help	inert
+ansible-inventory --help --inventory x	denied
 ansible-inventory --help --version	denied
 ansible-inventory --help x	denied
 ansible-inventory --host	denied
@@ -1555,6 +1556,7 @@ ansible-inventory --host --inventory x	inert
 ansible-inventory --host -h	inert
 ansible-inventory --host -i x	inert
 ansible-inventory --host x	inert
+ansible-inventory --inventory x	denied
 ansible-inventory --list	inert
 ansible-inventory --list --export	inert
 ansible-inventory --list --export --help	inert
@@ -1566,12 +1568,14 @@ ansible-inventory --list --limit x	inert
 ansible-inventory --list --toml	inert
 ansible-inventory --list --yaml	inert
 ansible-inventory --list -h	inert
+ansible-inventory --list -i ./inventory/hosts.yml	inert
 ansible-inventory --list -i x	inert
 ansible-inventory --list -l x	inert
 ansible-inventory --list -y	inert
 ansible-inventory --list x	inert
 ansible-inventory --version	inert
 ansible-inventory -h	inert
+ansible-inventory -i x	denied
 ansible-inventory x	denied
 ansible-lint	safe-read
 ansible-lint --config-file x	safe-read
@@ -1650,6 +1654,7 @@ ansible-playbook --list-tags	inert
 ansible-playbook --list-tasks	inert
 ansible-playbook --skip-tags x	denied
 ansible-playbook --syntax-check	inert
+ansible-playbook --syntax-check site.yml -i ./inventory/hosts.yml	inert
 ansible-playbook --tags x	denied
 ansible-playbook --version	denied
 ansible-playbook -C x	denied

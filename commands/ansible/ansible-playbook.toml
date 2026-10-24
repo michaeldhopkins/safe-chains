@@ -2,6 +2,7 @@
 name = "ansible-playbook"
 description = "Executes Ansible playbooks, which run arbitrary tasks (commands, file operations, package installs, service management) on local or remote hosts over SSH. A normal playbook run can modify any system it targets. The --list-hosts, --list-tasks, and --list-tags flags are read-only, showing what would run without executing anything. The --syntax-check flag validates YAML without execution. Even in check mode (--check/-C), some tasks may still execute if flagged always_run. Part of ansible-core, which releases two major versions per year."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html"
+examples_safe = ["ansible-playbook --syntax-check site.yml -i ./inventory/hosts.yml"]
 level = "Inert"
 bare = false
 require_any = ["--list-hosts", "--list-tasks", "--list-tags", "--syntax-check"]
@@ -15,3 +16,6 @@ valued = [
     "--tags", "--skip-tags",
     "-C", "-c", "-e", "-i", "-l", "-t",
 ]
+
+[command.path_gate]
+flags = { "--inventory" = "exec", "-i" = "exec" }
