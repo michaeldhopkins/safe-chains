@@ -2536,6 +2536,9 @@ fourmolu -c	safe-read
 fourmolu -h	safe-read
 fourmolu -i	safe-write
 fourmolu -o x	safe-read
+fourmolu a.hs '+RTS' -tpwned	denied
+fourmolu a.hs +RTS -tpwned	denied
+fourmolu a.hs -- +RTS -tpwned	denied
 fourmolu x	safe-read
 fping	denied
 fping --addr	denied

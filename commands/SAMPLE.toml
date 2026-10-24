@@ -127,6 +127,16 @@
 #                                        #   `LD_PRELOAD=/tmp/evil.so ls` denied.
 #                                        #   Set this on ANY command that exports
 #                                        #   a caller-named variable.
+# # ghc_rts = true                      # optional; this command is a program
+#                                        #   built with GHC. Its runtime reads
+#                                        #   `+RTS` options from the arguments
+#                                        #   and lets them write statistics to a
+#                                        #   named file, so any argument equal to
+#                                        #   `+RTS`, `-RTS` or `--RTS` denies the
+#                                        #   whole invocation. `GHCRTS` in the
+#                                        #   environment is refused by
+#                                        #   envvars.toml. Set it on every
+#                                        #   GHC-built tool.
 #                                        #   Only for commands with POSIX -number legacy syntax.
 # standalone = [                         # flags that take no value
 #     "--count", "--help", "--recursive", "--version",

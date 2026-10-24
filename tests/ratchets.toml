@@ -13,7 +13,7 @@ fuzz_min_targets = 8
 "src/engine/resolve.rs" = 1502
 "src/pathgate.rs" = 538
 "src/registry/build.rs" = 1356
-"src/registry/dispatch.rs" = 539
+"src/registry/dispatch.rs" = 530
 "src/registry/mod.rs" = 663
 "src/registry/types.rs" = 589
 

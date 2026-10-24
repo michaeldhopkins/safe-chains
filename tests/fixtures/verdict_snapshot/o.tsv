@@ -2081,6 +2081,9 @@ ormolu -c	safe-read
 ormolu -h	safe-read
 ormolu -i	safe-write
 ormolu -o x	safe-read
+ormolu a.hs '+RTS' -tpwned	denied
+ormolu a.hs +RTS -tpwned	denied
+ormolu a.hs -- +RTS -tpwned	denied
 ormolu x	safe-read
 osacompile	safe-write
 osacompile --help	denied

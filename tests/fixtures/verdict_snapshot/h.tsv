@@ -3621,6 +3621,9 @@ hlint -q	safe-read
 hlint -r	safe-read
 hlint -t	safe-read
 hlint -v	safe-read
+hlint src '+RTS' -tpwned	denied
+hlint src +RTS -tpwned	denied
+hlint src -- +RTS -tpwned	denied
 hlint x	safe-read
 home-manager	denied
 home-manager --help	inert

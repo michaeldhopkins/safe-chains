@@ -19,6 +19,8 @@ pub(super) use sub::*;
 pub(super) use tables::*;
 pub(super) use transfer::TomlTransfer;
 pub(crate) use transfer::{TransferSource, TransferSpec};
+mod hooks;
+pub(super) use hooks::SpecHooks;
 
 #[derive(Debug, Deserialize)]
 pub(super) struct TomlFile {
@@ -51,6 +53,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub env_assignment_positionals: Option<bool>,
     /// Removed for `tolerate_unknown_short`/`_long`; build panics if a TOML sets it, naming the command (SAMPLE.toml migrates).
+    #[serde(default)]
+    pub ghc_rts: Option<bool>,
     #[serde(default)]
     pub positional_style: Option<bool>,
     #[serde(default)]
@@ -421,11 +425,7 @@ pub struct CommandSpec {
     /// yields a bounded path instead of the unpinnable sentinel.
     pub(super) output: Option<OutputSpec>,
     pub(super) writes_cwd: Option<crate::pathctx::anchor::Anchor>,
-    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
-    /// `declare -x`). `dispatch_spec` then classifies each through `envvars::assignment_verdict`
-    /// and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
-    /// `LD_PRELOAD=/tmp/evil.so ls` does.
-    pub(super) env_assignment_positionals: bool,
+    pub(super) hooks: SpecHooks,
     pub(super) kind: DispatchKind,
 }
 

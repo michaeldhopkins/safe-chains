@@ -516,7 +516,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
-    let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
+    let hooks = SpecHooks::lower(toml.env_assignment_positionals, toml.ghc_rts);
     let archetype_flags = archetype_flags::lower(&toml.name, toml.flag, &toml.flag_valued, &toml.valued, toml.wrapper.as_ref())?;
     if toml.deny.unwrap_or(false) {
         return Ok(CommandSpec {
@@ -537,7 +537,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert, shape: None },
         });
     }
@@ -560,7 +560,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         });
     }
@@ -597,7 +597,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body, subs, fallback, handler_policies, matrices },
         });
     }
@@ -624,7 +624,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 behavior: behavior.clone(),
                 output,
                 writes_cwd,
-                env_assignment_positionals,
+                hooks,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(super::glob_flags::with_wrapper_flags(toml.sub, &w.standalone, &w.valued))?
@@ -664,7 +664,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -696,7 +696,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)?
@@ -748,7 +748,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -778,7 +778,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags },
         });
     }
@@ -802,13 +802,13 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            hooks,
             kind: DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false },
         });
     }
 
     Ok(CommandSpec {
-        env_assignment_positionals,
+        hooks,
         name: toml.name,
         description: desc,
         aliases: toml.aliases,
@@ -872,7 +872,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
                 // Carried, not defaulted: `typeset` is an alias of `declare`, and dropping this here
                 // would let the alias put a variable into the environment unclassified while the
                 // canonical spelling denied.
-                env_assignment_positionals: spec.env_assignment_positionals,
+                hooks: spec.hooks,
                 name: spec.name.clone(),
                 description: spec.description.clone(),
                 aliases: vec![],

@@ -1,5 +1,11 @@
 [[command]]
 name = "cabal"
+ghc_rts = true
+examples_denied = [
+    "cabal list foo +RTS -tpwned",
+    "cabal list foo '+RTS' -tpwned",
+    "cabal list foo -- +RTS -tpwned",
+]
 description = "Common Architecture for Building Applications and Libraries — Haskell project tool. `build`, `run`, `test`, `bench`, `repl`, `exec` execute project Haskell code. `update` and `install`, `fetch`, `get`, `list`, `info`, `outdated` contact Hackage (network). `freeze` writes cabal.project.freeze. `init` scaffolds a project. `check`, `report`, `path` are read-only diagnostics. Carve-out covers the diagnostic and read-only inspection forms."
 url = "https://cabal.readthedocs.io/"
 researched_version = "cabal-install 3.x"

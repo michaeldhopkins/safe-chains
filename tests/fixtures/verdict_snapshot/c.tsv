@@ -106,6 +106,9 @@ cabal list --help --simple-output	safe-read
 cabal list --help x	safe-read
 cabal list --simple-output	safe-read
 cabal list -h	safe-read
+cabal list foo '+RTS' -tpwned	denied
+cabal list foo +RTS -tpwned	denied
+cabal list foo -- +RTS -tpwned	denied
 cabal list x	safe-read
 cabal list-bin	denied
 cabal list-bin --help	safe-read

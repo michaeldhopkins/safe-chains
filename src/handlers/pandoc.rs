@@ -19,9 +19,6 @@ pub fn check_pandoc(tokens: &[Token]) -> Verdict {
     if matches!(tokens.get(1).map(Token::as_str), Some("lua" | "server")) {
         return Verdict::Denied;
     }
-    if tokens.iter().any(|t| is_runtime_option(t.as_str())) {
-        return Verdict::Denied;
-    }
     if !format_values_are_plain(tokens) {
         return Verdict::Denied;
     }
@@ -225,15 +222,6 @@ mod tests {
     }
 
     proptest! {
-        #[test]
-        fn any_runtime_option_token_is_denied(
-            before in "[a-zA-Z.]{0,6}", after in "[a-zA-Z0-9.-]{0,8}",
-            marker in prop::sample::select(vec!["+RTS", "-RTS", "--RTS", "+RTSx"]),
-        ) {
-            let cmd = format!("pandoc {before} {marker} {after}");
-            prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
-        }
-
         #[test]
         fn a_value_with_a_path_character_is_never_a_plain_format(
             head in "[a-z0-9_]{0,6}", sep in "[/.~\\\\]", tail in "[a-z0-9_./]{0,6}",

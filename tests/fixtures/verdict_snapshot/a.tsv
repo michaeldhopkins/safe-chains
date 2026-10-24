@@ -673,6 +673,9 @@ agda --help	inert
 agda --help --version	inert
 agda --help x	denied
 agda --version	inert
+agda --version '+RTS' -tpwned	denied
+agda --version +RTS -tpwned	denied
+agda --version -- +RTS -tpwned	denied
 agda -?	inert
 agda -V	inert
 agda -h	inert

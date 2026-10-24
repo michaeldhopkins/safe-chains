@@ -1,5 +1,11 @@
 [[command]]
 name = "stack"
+ghc_rts = true
+examples_denied = [
+    "stack path +RTS -tpwned",
+    "stack path '+RTS' -tpwned",
+    "stack path -- +RTS -tpwned",
+]
 description = "Curated Haskell project tool that pins to LTS snapshots. `build`, `test`, `bench`, `run`, `exec`, `ghci`, `repl`, `install` execute Haskell project code. `setup`, `update`, `unpack`, `templates` contact Stackage / Hackage / GitHub (network). `path`, `ls`, `dot`, `query`, `script-interpreter`, `config env` are read-only. `init`, `new` scaffold projects. The carve-out covers diagnostic forms."
 url = "https://docs.haskellstack.org/"
 researched_version = "stack 2.x or 3.x"

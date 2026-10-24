@@ -470,6 +470,7 @@ render whoami	-o
 render workspaces	--output
 render workspaces	-o
 scp	-o
+shellcheck	-o
 slither	--checklist
 sntp	-o
 ssh-copy-id	-o

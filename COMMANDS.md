@@ -324,6 +324,7 @@ Aliases: `7zz`, `7za`
 <p class="cmd-url"><a href="https://agda.readthedocs.io/en/latest/tools/command-line-options.html">https://agda.readthedocs.io/en/latest/tools/command-line-options.html</a></p>
 
 - Allowed standalone flags: --help, --version, -?, -V, -h
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `age`
 <p class="cmd-url"><a href="https://age-encryption.org/">https://age-encryption.org/</a></p>
@@ -2539,6 +2540,7 @@ Aliases: `bzless`
 - **path**: Flags: --help, -h. Valued: --output-format
 - **user-config**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, --numeric-version, -V, -h
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `caddy`
 <p class="cmd-url"><a href="https://caddyserver.com/docs/command-line">https://caddyserver.com/docs/command-line</a></p>
@@ -5443,6 +5445,7 @@ Aliases: `gfold`
 - Allowed standalone flags: --check-idempotence, --color, --help, --inplace, --no-cabal, -c, -h, -i
 - Allowed valued flags: --config, --ghc-opt, --mode, --package-name, --start-line, --start-column, --end-line, --end-column, -o
 - Bare invocation allowed
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `fping`
 <p class="cmd-url"><a href="https://www.fping.org/">https://www.fping.org/</a></p>
@@ -6075,6 +6078,7 @@ Aliases: `g++`, `cc`, `c++`
 <p class="cmd-url"><a href="https://www.haskell.org/ghc/">https://www.haskell.org/ghc/</a></p>
 
 - Allowed standalone flags: --help, --info, --numeric-version, --print-global-package-db, --print-libdir, --print-project-version, --supported-extensions, --supported-languages, --version, -?
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `ghostty`
 <p class="cmd-url"><a href="https://ghostty.org/docs/help/cli">https://ghostty.org/docs/help/cli</a></p>
@@ -7020,6 +7024,7 @@ Aliases: `ghead`
 - Allowed standalone flags: --cc, --check, --cpp-simple, --cross, --default, --help, --no-exit-code, --no-summary, --no-utf8, --print-test, --quiet, --report, --serialise, --show, --test, --verbose, --version, --with-group, -?, -c, -q, -r, -t, -v
 - Allowed valued flags: --cpp-define, --cpp-file, --cpp-include, --data-dir, --encoding, --extension, --git, --hint, --ignore, --language, --lints, --match, --only, --path, --threads, --utf8, --with-refact, -X, -c, -e, -h, -i, -j, -l
 - Bare invocation allowed
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `home-manager`
 <p class="cmd-url"><a href="https://nix-community.github.io/home-manager/">https://nix-community.github.io/home-manager/</a></p>
@@ -11131,6 +11136,7 @@ Aliases: `god`
 - Allowed standalone flags: --check-idempotence, --color, --help, --inplace, --no-cabal, --unsafe, -c, -h, -i
 - Allowed valued flags: --cabal-default-extensions, --cabal-extension, --ghc-opt, --mode, --package-name, --start-line, --start-column, --end-line, --end-column, -o
 - Bare invocation allowed
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `osacompile`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/osacompile.1.html">https://keith.github.io/xcode-man-pages/osacompile.1.html</a></p>
@@ -11265,10 +11271,12 @@ Aliases: `god`
 ### `pandoc`
 <p class="cmd-url"><a href="https://pandoc.org/MANUAL.html">https://pandoc.org/MANUAL.html</a></p>
 
+- Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only built-in format names, so a path or a bare name that would load a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists.
+
 - **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: --bash-completion, --biblatex, --citeproc, --help, --list-highlight-languages, --list-highlight-styles, --list-input-formats, --list-output-formats, --natbib, --no-highlight, --quiet, --standalone, --verbose, --version, -C, -N, -h, -i, -p, -s, -v, --ascii, --atx-headers, --epub-title-page, --fail-if-warnings, --file-scope, --gladtex, --html-q-tags, --incremental, --katex, --link-images, --list-extensions, --listings, --mathjax, --mathml, --no-check-certificate, --number-sections, --preserve-tabs, --reference-links, --sandbox, --section-divs, --strip-comments, --table-of-contents, --toc, --trace, --webtex
-- Allowed valued flags: --abbreviations, --base-header-level, --bibliography, --citation-abbreviations, --columns, --csl, --css, --data-dir, --default-image-extension, --dpi, --email-obfuscation, --eol, --epub-chapter-level, --epub-cover-image, --epub-embed-font, --epub-metadata, --epub-stylesheet, --epub-subdirectory, --figure-caption-position, --from, --highlight-style, --id-prefix, --include-after-body, --include-before-body, --include-in-header, --indented-code-classes, --ipynb-output, --katex-stylesheet, --markdown-headings, --metadata, --metadata-file, --number-offset, --print-default-data-file, --print-default-template, --print-highlight-style, --read, --reference-doc, --reference-location, --request-header, --resource-path, --shift-heading-level-by, --slide-level, --split-level, --syntax-definition, --syntax-highlighting, --tab-stop, --table-caption-position, --template, --title-prefix, --to, --toc-depth, --top-level-division, --track-changes, --variable, --variable-json, --wrap, --write, -A, -B, -D, -H, -M, -T, -V, -c, -f, -r, -t, -w, --ascii, --atx-headers, --epub-title-page, --fail-if-warnings, --file-scope, --gladtex, --html-q-tags, --incremental, --katex, --link-images, --list-extensions, --listings, --mathjax, --mathml, --no-check-certificate, --number-sections, --preserve-tabs, --reference-links, --sandbox, --section-divs, --strip-comments, --table-of-contents, --toc, --trace, --webtex
+- Allowed valued flags: --abbreviations, --base-header-level, --bibliography, --citation-abbreviations, --columns, --csl, --css, --data-dir, --default-image-extension, --dpi, --email-obfuscation, --eol, --epub-chapter-level, --epub-cover-image, --epub-embed-font, --epub-metadata, --epub-stylesheet, --epub-subdirectory, --figure-caption-position, --from, --highlight-style, --id-prefix, --include-after-body, --include-before-body, --include-in-header, --indented-code-classes, --ipynb-output, --katex-stylesheet, --markdown-headings, --metadata, --metadata-file, --number-offset, --print-default-data-file, --print-default-template, --print-highlight-style, --read, --reference-doc, --reference-location, --request-header, --resource-path, --shift-heading-level-by, --slide-level, --split-level, --syntax-definition, --syntax-highlighting, --tab-stop, --table-caption-position, --template, --title-prefix, --to, --toc-depth, --top-level-division, --track-changes, --variable, --variable-json, --wrap, --write, -A, -B, -D, -H, -M, -T, -V, -c, -f, -r, -t, -w, --ascii, --atx-headers, --epub-title-page, --fail-if-warnings, --file-scope, --gladtex, --html-q-tags, --incremental, --katex, --link-images, --list-extensions, --listings, --mathjax, --mathml, --no-check-certificate, --number-sections, --preserve-tabs, --reference-links, --sandbox, --section-divs, --strip-comments, --table-of-contents, --toc, --trace, --webtex Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -14273,6 +14281,7 @@ Aliases: `gsha512sum`
 - **Without a subcommand:**
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
 - Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -14932,6 +14941,7 @@ Aliases: `gsort`
 - **query**: Flags: --help, -h. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, --numeric-version, -V, -h
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 ### `stackprof`
 <p class="cmd-url"><a href="https://github.com/tmm1/stackprof">https://github.com/tmm1/stackprof</a></p>

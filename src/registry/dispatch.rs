@@ -250,11 +250,10 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 }
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
-    let verdict = dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS);
-    if !spec.env_assignment_positionals {
-        return verdict;
+    if spec.hooks.refuses(tokens) {
+        return Verdict::Denied;
     }
-    crate::envvars::exported_verdict(tokens[1..].iter().map(Token::as_str)).combine(verdict)
+    spec.hooks.classify_exports(tokens, dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS))
 }
 
 /// A sub, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs) and for a branching command.

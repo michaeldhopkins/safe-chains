@@ -3205,9 +3205,6 @@ shazam signature -h	safe-write
 shazam signature x	safe-write
 shazam x	denied
 shellcheck	denied
-shellcheck +RTS -sout -RTS script.sh	denied
-shellcheck +RTS -tpwned script.sh	denied
-shellcheck --RTS script.sh	denied
 shellcheck --color	inert
 shellcheck --color --enable x	inert
 shellcheck --color --external-sources	inert
@@ -3221,10 +3218,12 @@ shellcheck --include x	inert
 shellcheck --list-optional	inert
 shellcheck --norc	inert
 shellcheck --rcfile x	inert
+shellcheck --severity	inert
 shellcheck --severity x	inert
 shellcheck --shell x	inert
 shellcheck --source-path x	inert
 shellcheck --version	inert
+shellcheck --wiki-link-count	inert
 shellcheck --wiki-link-count x	inert
 shellcheck -C	inert
 shellcheck -P x	inert
@@ -3239,13 +3238,10 @@ shellcheck -i x	inert
 shellcheck -o x	inert
 shellcheck -s x	inert
 shellcheck -x	inert
-shellcheck -x -s bash script.sh	inert
 shellcheck script.sh	inert
-shellcheck script.sh +RTS -s -RTS	denied
-shellcheck script.sh +RTS -sout	denied
+shellcheck script.sh '+RTS' -tpwned	denied
 shellcheck script.sh +RTS -tpwned	denied
-shellcheck script.sh --RTS	denied
-shellcheck script.sh -RTS	denied
+shellcheck script.sh -- +RTS -tpwned	denied
 shellcheck x	inert
 shfmt	safe-read
 shfmt --apply-ignore	safe-read
@@ -6504,6 +6500,9 @@ stack ls x	denied
 stack new	denied
 stack new x	denied
 stack path	safe-read
+stack path '+RTS' -tpwned	denied
+stack path +RTS -tpwned	denied
+stack path -- +RTS -tpwned	denied
 stack path --bin-path	safe-read
 stack path --bin-path --compiler-bin	safe-read
 stack path --bin-path x	safe-read

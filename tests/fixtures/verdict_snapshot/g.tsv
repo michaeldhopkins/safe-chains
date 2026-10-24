@@ -6268,6 +6268,9 @@ ghc --print-project-version	inert
 ghc --supported-extensions	inert
 ghc --supported-languages	inert
 ghc --version	inert
+ghc --version '+RTS' -tpwned	denied
+ghc --version +RTS -tpwned	denied
+ghc --version -- +RTS -tpwned	denied
 ghc -?	inert
 ghc x	denied
 ghead	inert

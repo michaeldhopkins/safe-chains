@@ -206,6 +206,7 @@ impl CommandSpec {
         // authoritative classification — rather than its legacy fallback fields (which drift:
         // e.g. cat's legacy `standalone` lists -V/-h/-l, which the behavior grammar denies).
         let description = if let Some(b) = &self.behavior { describe_behavior(b) } else { self.describe_kind() };
+        let description = self.hooks.describe(description);
         let mut doc = crate::docs::CommandDoc::handler(
             // These were `Box::leak`ed to satisfy a `&'static str`. `CommandDoc` owns both now,
             // so the clone is the whole cost — the leak bought nothing and paid per call.
