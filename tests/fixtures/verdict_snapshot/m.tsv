@@ -1340,6 +1340,7 @@ mise env --help x	denied
 mise env -h	inert
 mise env x	denied
 mise exec	denied
+mise exec 'node[postinstall=touch pwned]' -- true	denied
 mise exec -- bin/rails db:create	safe-write
 mise exec x	denied
 mise fmt	denied
@@ -1356,6 +1357,7 @@ mise generate --help x	denied
 mise generate -h	inert
 mise generate x	denied
 mise i	safe-write
+mise i 'node@20[postinstall=touch pwned]'	denied
 mise i --force	safe-write
 mise i --force --help	safe-write
 mise i --force --jobs x	safe-write
@@ -1378,6 +1380,7 @@ mise implode --help x	denied
 mise implode -h	inert
 mise implode x	denied
 mise install	safe-write
+mise install 'cargo:ripgrep[postinstall=touch pwned]'	denied
 mise install --force	safe-write
 mise install --force --help	safe-write
 mise install --force --jobs x	safe-write
@@ -1391,6 +1394,7 @@ mise install -h	safe-write
 mise install -j x	safe-write
 mise install -q	safe-write
 mise install -v	safe-write
+mise install cargo:rg{\\[,}x	denied
 mise install ruby@4	safe-write
 mise install x	safe-write
 mise latest	inert
@@ -1905,6 +1909,7 @@ mise unuse --help x	denied
 mise unuse -h	inert
 mise unuse x	denied
 mise up	safe-write
+mise up 'node[postinstall=touch pwned]'	denied
 mise up --dry-run	safe-write
 mise up --dry-run --help	safe-write
 mise up --dry-run --jobs x	safe-write
@@ -1918,6 +1923,7 @@ mise up -j x	safe-write
 mise up -n	safe-write
 mise up x	safe-write
 mise upgrade	safe-write
+mise upgrade 'cargo:ripgrep[postinstall=touch pwned]'	denied
 mise upgrade --dry-run	safe-write
 mise upgrade --dry-run --help	safe-write
 mise upgrade --dry-run --jobs x	safe-write

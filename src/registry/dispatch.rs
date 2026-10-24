@@ -269,7 +269,7 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
 
 /// A sub, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs) and for a branching command.
 pub(super) fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
-    super::glob_flags::gated(tokens, sub, || super::operands::unless_refused(tokens, &sub.refuse_operands, || dispatch_kind(tokens, &sub.kind, &SUB_HANDLERS)))
+    super::operands::gated_sub(tokens, sub, || dispatch_kind(tokens, &sub.kind, &SUB_HANDLERS))
 }
 
 pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {

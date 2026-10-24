@@ -34,6 +34,12 @@ examples_safe = [
     "mise u -p ./mise.toml ruby@4.0.3",
 ]
 examples_denied = [
+    "mise install 'cargo:ripgrep[postinstall=touch pwned]'",
+    "mise i 'node@20[postinstall=touch pwned]'",
+    "mise upgrade 'cargo:ripgrep[postinstall=touch pwned]'",
+    "mise up 'node[postinstall=touch pwned]'",
+    "mise install cargo:rg{\\[,}x",
+    "mise exec 'node[postinstall=touch pwned]' -- true",
     "mise exec",
     "mise trust",
     "mise trust .",
@@ -135,6 +141,7 @@ standalone = [
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*"]
 
 [[command.sub]]
 name = "uninstall"
@@ -149,6 +156,7 @@ writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*"]
 
 [[command.sub]]
 name = "prune"
@@ -210,6 +218,7 @@ standalone = [
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*"]
 
 [[command.sub]]
 name = "rm"
@@ -231,6 +240,7 @@ writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*"]
 
 [[command.sub]]
 name = "env"
@@ -470,6 +480,7 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "exec"
 delegate_after = "--"
+refuse_operands = ["*[*"]
 
 [[command.sub]]
 name = "activate"

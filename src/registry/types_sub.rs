@@ -184,7 +184,8 @@ pub(in crate::registry) struct TomlSub {
     /// Globs (`*` matches any run, including none) that make this sub refuse an invocation: tested
     /// against every argument that is not a flag, against the name and the value either side of an
     /// `=`, and against the value of a `--flag=value`. An argument whose text the shell decides
-    /// (`$VAR`, a substitution) is refused whatever the globs say. For a sub that writes what a
+    /// (`$VAR`, a substitution) is refused whatever the globs say. A `delegate_after` sub is tested
+    /// only on the arguments before its separator. For a sub that writes what a
     /// later command runs (`mise set FOO='{{ exec(command="id") }}'`).
     #[serde(default)]
     pub refuse_operands: Vec<String>,

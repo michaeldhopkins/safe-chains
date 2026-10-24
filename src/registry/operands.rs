@@ -3,6 +3,8 @@
 use crate::parse::Token;
 use crate::verdict::Verdict;
 
+use super::types::{DispatchKind, SubSpec};
+
 pub(super) fn glob_matches(pattern: &str, text: &str) -> bool {
     let (pattern, text) = (pattern.as_bytes(), text.as_bytes());
     let (mut p, mut t) = (0, 0);
@@ -48,8 +50,21 @@ pub(super) fn presents_refused_operand(tokens: &[Token], patterns: &[String]) ->
                 .any(|text| patterns.iter().any(|pattern| glob_matches(pattern, text))))
 }
 
-pub(super) fn unless_refused(tokens: &[Token], patterns: &[String], otherwise: impl FnOnce() -> Verdict) -> Verdict {
-    if presents_refused_operand(tokens, patterns) { Verdict::Denied } else { otherwise() }
+fn own_operands<'a>(tokens: &'a [Token], kind: &DispatchKind) -> &'a [Token] {
+    match kind {
+        DispatchKind::DelegateAfterSeparator { separator } => {
+            tokens.iter().position(|t| t.as_str() == separator.as_str()).map_or(tokens, |end| &tokens[..end])
+        }
+        _ => tokens,
+    }
+}
+
+pub(super) fn unless_sub_refuses(tokens: &[Token], sub: &SubSpec, otherwise: impl FnOnce() -> Verdict) -> Verdict {
+    if presents_refused_operand(own_operands(tokens, &sub.kind), &sub.refuse_operands) { Verdict::Denied } else { otherwise() }
+}
+
+pub(super) fn gated_sub(tokens: &[Token], sub: &SubSpec, dispatch: impl FnOnce() -> Verdict) -> Verdict {
+    super::glob_flags::gated(tokens, sub, || unless_sub_refuses(tokens, sub, dispatch))
 }
 
 pub(super) fn check_declaration(parent: &str, name: &str, patterns: &[String], profiled: bool) -> Result<(), String> {
@@ -125,12 +140,16 @@ mod tests {
         }
     }
 
-    fn refusing_subs(path: &mut Vec<String>, kind: &DispatchKind, out: &mut Vec<(Vec<String>, Vec<String>)>) {
+    fn refusing_subs(path: &mut Vec<String>, kind: &DispatchKind, out: &mut Vec<(Vec<String>, Vec<String>, Option<String>)>) {
         let DispatchKind::Branching { subs, .. } = kind else { return };
         for sub in subs {
             path.push(sub.name.clone());
             if !sub.refuse_operands.is_empty() {
-                out.push((path.clone(), sub.refuse_operands.clone()));
+                let separator = match &sub.kind {
+                    DispatchKind::DelegateAfterSeparator { separator } => Some(separator.clone()),
+                    _ => None,
+                };
+                out.push((path.clone(), sub.refuse_operands.clone(), separator));
             }
             refusing_subs(path, &sub.kind, out);
             path.pop();
@@ -145,20 +164,33 @@ mod tests {
             refusing_subs(&mut vec![name.clone()], &spec.kind, &mut declared);
             found.extend(declared);
         }
-        assert!(found.iter().any(|(path, _)| path.join(" ") == "mise set"), "mise set declares no refuse_operands");
-        for (path, patterns) in found {
+        assert!(found.iter().any(|(path, _, _)| path.join(" ") == "mise set"), "mise set declares no refuse_operands");
+        assert!(found.iter().any(|(_, _, separator)| separator.is_some()), "no delegating sub declares refuse_operands");
+        for (path, patterns, separator) in found {
             for pattern in patterns {
                 let operand = pattern.replace('*', "x");
                 let mut words = path.clone();
                 words.push(operand.clone());
+                if let Some(separator) = &separator {
+                    words.extend([separator.clone(), "true".to_string()]);
+                }
                 let line = shell_words::join(&words);
                 assert!(!crate::command_verdict(&line).is_allowed(), "`{line}` matches `{pattern}` and must be refused");
             }
             for unknown in UNKNOWN_SPELLINGS {
-                let line = format!("{} {unknown}", shell_words::join(&path));
+                let tail = separator.as_ref().map(|separator| format!(" {separator} true")).unwrap_or_default();
+                let line = format!("{} {unknown}{tail}", shell_words::join(&path));
                 assert!(!crate::command_verdict(&line).is_allowed(), "`{line}` holds text the shell decides and must be refused");
             }
         }
+    }
+
+    #[test]
+    fn a_delegating_sub_refuses_only_the_operands_before_its_separator() {
+        assert!(crate::command_verdict("mise exec node@20 -- true").is_allowed());
+        assert!(crate::command_verdict("mise exec -- grep '[x]' README.md").is_allowed());
+        assert!(crate::command_verdict("mise exec -- echo \"$HOME\"").is_allowed());
+        assert!(!crate::command_verdict("mise exec 'node[postinstall=touch pwned]' -- true").is_allowed());
     }
 
     const UNKNOWN_SPELLINGS: [&str; 10] = [
