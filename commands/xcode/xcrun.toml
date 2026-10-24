@@ -97,6 +97,10 @@ name = "stapler"
 delegate_skip = 0
 
 [[command.sub]]
+name = "swift-format"
+delegate_skip = 0
+
+[[command.sub]]
 name = "xcresulttool"
 delegate_skip = 0
 

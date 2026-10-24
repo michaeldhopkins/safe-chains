@@ -1,0 +1,45 @@
+[[command]]
+name = "swift-format"
+description = "Apple's official Swift syntax formatter and linter shipped inside the Swift toolchain and invoked directly or via `xcrun swift-format`. Exposes three subcommands: `lint` parses Swift source files (or stdin) with SwiftSyntax and prints style and lint diagnostics to stderr without modifying any files; `format` (the default subcommand when none is named) reformats Swift source code to stdout or rewrites source files in place when `-i` / `--in-place` is passed; `dump-configuration` prints the effective JSON configuration to stdout. Operates completely offline on local source files and optional JSON configuration files (`--configuration`), makes no network requests, and executes no external programs or build scripts. Actively maintained by the Swift project with releases aligned to Swift toolchain versions."
+url = "https://github.com/swiftlang/swift-format"
+researched_version = "Apple Swift 6.4 (swiftlang-6.4.0.34.1) / xcrun 72"
+bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "xcrun swift-format lint Sources/",
+    "xcrun swift-format lint -r -p -s Sources/ Tests/",
+    "xcrun swift-format lint --recursive --parallel --strict Sources/",
+    "xcrun swift-format lint --configuration .swift-format.json Sources/App.swift",
+    "xcrun swift-format lint --color-diagnostics --follow-symlinks --ignore-unparsable-files Sources/",
+    "xcrun swift-format lint --lines 10:25 --offsets 0:120 --assume-filename Main.swift",
+    "swift-format lint -r Sources/",
+    "swift-format --version",
+]
+examples_denied = [
+    "xcrun swift-format format -i Sources/App.swift",
+    "xcrun swift-format format --in-place -r Sources/",
+    "xcrun swift-format -i Sources/App.swift",
+    "xcrun swift-format format Sources/App.swift",
+    "xcrun swift-format dump-configuration",
+    "xcrun swift-format lint ~/.ssh/id_rsa",
+    "xcrun swift-format lint --configuration ~/.ssh/id_rsa Sources/",
+    "swift-format format -i Sources/App.swift",
+]
+
+[command.path_gate]
+positional = "read"
+flags = { "--assume-filename" = "read", "--configuration" = "read", "--enable-experimental-feature" = "ignore", "--lines" = "ignore", "--offsets" = "ignore" }
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color-diagnostics", "--follow-symlinks", "--help",
+    "--ignore-unparsable-files", "--no-color-diagnostics",
+    "--parallel", "--recursive", "--strict",
+    "-h", "-p", "-r", "-s",
+]
+valued = [
+    "--assume-filename", "--configuration",
+    "--enable-experimental-feature", "--lines", "--offsets",
+]

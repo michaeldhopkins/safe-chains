@@ -491,6 +491,7 @@ xcrun --help --sdk x	inert
 xcrun --help x	denied
 xcrun --log	denied
 xcrun --no-cache	denied
+xcrun --sdk macosx swift-format lint --recursive --strict Sources/	safe-read
 xcrun --sdk x	denied
 xcrun --show-sdk-build-version	inert
 xcrun --show-sdk-build-version x	inert
@@ -542,6 +543,23 @@ xcrun stapler	denied
 xcrun stapler x	denied
 xcrun swift	denied
 xcrun swift x	denied
+xcrun swift-format	denied
+xcrun swift-format -i Sources/App.swift	denied
+xcrun swift-format dump-configuration	denied
+xcrun swift-format format --in-place -r Sources/	denied
+xcrun swift-format format -i Sources/App.swift	denied
+xcrun swift-format format Sources/App.swift	denied
+xcrun swift-format lint --color-diagnostics --follow-symlinks --ignore-unparsable-files Sources/	safe-read
+xcrun swift-format lint --configuration .swift-format.json Sources/App.swift	safe-read
+xcrun swift-format lint --configuration ~/.ssh/id_rsa Sources/	denied
+xcrun swift-format lint --lines 10:25 --offsets 0:120 --assume-filename Main.swift	safe-read
+xcrun swift-format lint --recursive --parallel --strict Sources/	safe-read
+xcrun swift-format lint -r -p -s --color-diagnostics Sources/ Tests/	safe-read
+xcrun swift-format lint -r -p -s Sources/ Tests/	safe-read
+xcrun swift-format lint -r Sources/	safe-read
+xcrun swift-format lint Sources/	safe-read
+xcrun swift-format lint ~/.ssh/id_rsa	denied
+xcrun swift-format x	denied
 xcrun x	denied
 xcrun xcodebuild	denied
 xcrun xcodebuild x	safe-write

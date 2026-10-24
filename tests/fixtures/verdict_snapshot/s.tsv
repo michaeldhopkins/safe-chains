@@ -9442,6 +9442,45 @@ swift test -l	safe-read
 swift test -v	safe-read
 swift test x	safe-read
 swift x	denied
+swift-format	denied
+swift-format --assume-filename x	denied
+swift-format --configuration x	denied
+swift-format --enable-experimental-feature x	denied
+swift-format --help	inert
+swift-format --help --assume-filename x	denied
+swift-format --help --version	denied
+swift-format --help x	denied
+swift-format --lines x	denied
+swift-format --offsets x	denied
+swift-format --version	inert
+swift-format -h	inert
+swift-format -v	inert
+swift-format format -i Sources/App.swift	denied
+swift-format lint	safe-read
+swift-format lint --assume-filename x	safe-read
+swift-format lint --color-diagnostics	safe-read
+swift-format lint --color-diagnostics --assume-filename x	safe-read
+swift-format lint --color-diagnostics --follow-symlinks	safe-read
+swift-format lint --color-diagnostics x	safe-read
+swift-format lint --configuration x	safe-read
+swift-format lint --enable-experimental-feature x	safe-read
+swift-format lint --follow-symlinks	safe-read
+swift-format lint --help	safe-read
+swift-format lint --ignore-unparsable-files	safe-read
+swift-format lint --lines x	safe-read
+swift-format lint --no-color-diagnostics	safe-read
+swift-format lint --offsets x	safe-read
+swift-format lint --parallel	safe-read
+swift-format lint --recursive	safe-read
+swift-format lint --strict	safe-read
+swift-format lint -h	safe-read
+swift-format lint -p	safe-read
+swift-format lint -r	safe-read
+swift-format lint -r Sources/	safe-read
+swift-format lint -s	safe-read
+swift-format lint Sources/	safe-read
+swift-format lint x	safe-read
+swift-format x	denied
 swiftformat	denied
 swiftformat --config .swiftformat Sources/	safe-write
 swiftformat --config x	safe-write

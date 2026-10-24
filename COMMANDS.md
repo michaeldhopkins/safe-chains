@@ -15101,6 +15101,23 @@ Aliases: `gsum`
 - **test**: Flags: --enable-code-coverage, --help, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose, -h, -l, -v. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output, -c, -j
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `swift-format`
+<p class="cmd-url"><a href="https://github.com/swiftlang/swift-format">https://github.com/swiftlang/swift-format</a></p>
+
+- **lint**: Flags: --color-diagnostics, --follow-symlinks, --help, --ignore-unparsable-files, --no-color-diagnostics, --parallel, --recursive, --strict, -h, -p, -r, -s. Valued: --assume-filename, --configuration, --enable-experimental-feature, --lines, --offsets
+- Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `xcrun swift-format lint Sources/`
+- `xcrun swift-format lint -r -p -s Sources/ Tests/`
+- `xcrun swift-format lint --recursive --parallel --strict Sources/`
+- `xcrun swift-format lint --configuration .swift-format.json Sources/App.swift`
+- `xcrun swift-format lint --color-diagnostics --follow-symlinks --ignore-unparsable-files Sources/`
+- `xcrun swift-format lint --lines 10:25 --offsets 0:120 --assume-filename Main.swift`
+- `swift-format lint -r Sources/`
+- `swift-format --version`
+
 ### `swiftformat`
 <p class="cmd-url"><a href="https://github.com/nicklockwood/SwiftFormat">https://github.com/nicklockwood/SwiftFormat</a></p>
 
@@ -17151,6 +17168,7 @@ Aliases: `gwhoami`
 - **spctl**: delegates to inner command
 - **stapler**: delegates to inner command
 - **swift**: delegates to inner command
+- **swift-format**: delegates to inner command
 - **xcodebuild**: delegates to inner command
 - **xcresulttool**: delegates to inner command
 - **xctest**: delegates to inner command
