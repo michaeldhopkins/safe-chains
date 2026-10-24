@@ -171,7 +171,7 @@ fn rsync_path_verdict(value: &str) -> Verdict {
     {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    if value.starts_with('/') || value.starts_with('~') {
+    if value.starts_with('/') {
         return Verdict::Denied;
     }
     let placed = crate::pathctx::resolve(value);

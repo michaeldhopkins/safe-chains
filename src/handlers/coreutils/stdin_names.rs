@@ -94,6 +94,19 @@ mod tests {
         is_safe_command(cmd)
     }
 
+    #[test]
+    fn zip_reads_names_from_stdin_only_by_a_long_option_or_a_short_cluster_holding_an_at_sign() {
+        let line = |words: &[&str]| words.iter().map(|w| crate::parse::Token::from_test(w)).collect::<Vec<_>>();
+        for reads in [&["zip", "-@", "a.zip"][..], &["zip", "--names-stdin", "a.zip"], &["zip", "-q@", "a.zip"], &["zip", "-@q", "a.zip"]] {
+            assert!(super::reads_names_it_cannot_check(&line(reads)), "{reads:?} reads names from stdin");
+        }
+        for unread in
+            [&["zip", "a.zip", "n.txt"][..], &["zip", "a.zip", "--", "-@"], &["zip", "--x@y", "a.zip"], &["zip", "--out=a@b", "a.zip"]]
+        {
+            assert!(!super::reads_names_it_cannot_check(&line(unread)), "{unread:?} reads no names from stdin");
+        }
+    }
+
     safe! {
         cpio_archives_found_names: "find ./src | cpio -o -O ./a.cpio",
         cpio_archives_an_echoed_name: "echo ./notes.txt | cpio -o",
