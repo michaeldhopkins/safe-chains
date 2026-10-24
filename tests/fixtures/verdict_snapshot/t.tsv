@@ -331,53 +331,79 @@ tar tzf archive.tar.gz	safe-read
 tar x	denied
 tar xf archive.tar	denied
 task	denied
-task --color	safe-read
-task --color --concurrency	safe-read
-task --color --dir x	safe-read
+task --color	denied
+task --color --dir x	denied
+task --color --dry	denied
 task --color x	denied
-task --concurrency	safe-read
-task --dir x	safe-read
-task --dry	safe-read
+task --dir x	denied
+task --dry	denied
 task --dry --list	safe-read
-task --exit-code	safe-read
-task --force	safe-read
-task --global	safe-read
-task --help	safe-read
-task --init	safe-read
-task --insecure	safe-read
-task --interval	safe-read
-task --json	safe-read
+task --exit-code	denied
+task --force	denied
+task --global	denied
+task --help	inert
+task --help --color	safe-read
+task --help --dir x	safe-read
+task --help --dry	safe-read
+task --help --help	safe-read
+task --help --insecure	safe-read
+task --help --json	safe-read
+task --help --list	safe-read
+task --help --list-all	safe-read
+task --help --no-color	safe-read
+task --help --offline	safe-read
+task --help --output x	safe-read
+task --help --silent	safe-read
+task --help --taskfile x	safe-read
+task --help --verbose	safe-read
+task --help --version	safe-read
+task --help -a	safe-read
+task --help -d x	safe-read
+task --help -h	safe-read
+task --help -j	safe-read
+task --help -l	safe-read
+task --help -n	safe-read
+task --help -o x	safe-read
+task --help -s	safe-read
+task --help -t x	safe-read
+task --help -v	safe-read
+task --init	denied
+task --insecure	denied
+task --json	denied
 task --list	safe-read
+task --list --json	safe-read
+task --list -t=/etc/passwd	denied
 task --list-all	safe-read
-task --no-color	safe-read
-task --offline	safe-read
-task --output x	safe-read
-task --parallel	safe-read
-task --silent	safe-read
-task --status	safe-read
-task --summary	safe-read
-task --taskfile x	safe-read
-task --verbose	safe-read
+task --no-color	denied
+task --offline	denied
+task --output x	denied
+task --parallel	denied
+task --silent	denied
+task --status	denied
+task --status --dir=/tmp/evil	denied
+task --taskfile x	denied
+task --verbose	denied
 task --version	safe-read
-task --watch	safe-read
-task -C	safe-read
+task --watch	denied
 task -a	safe-read
-task -d	safe-read
+task -d /tmp/evil --list	denied
 task -d x	denied
-task -f	safe-read
-task -g	safe-read
-task -h	safe-read
-task -i	safe-read
-task -j	safe-read
+task -dl	denied
+task -g	denied
+task -h	inert
+task -i	denied
+task -i --dir=/etc	denied
+task -j	denied
 task -l	safe-read
-task -n	safe-read
-task -o x	safe-read
-task -p	safe-read
-task -s	safe-read
-task -t	safe-read
+task -l --taskfile ./Taskfile.yml	safe-read
+task -l --taskfile=~/.ssh/id_rsa	denied
+task -l -d ./sub	safe-read
+task -n	denied
+task -o x	denied
+task -s	denied
 task -t x	denied
-task -v	safe-read
-task -w	safe-read
+task -tl	denied
+task -v	denied
 task FOO=bar	denied
 task build	denied
 task default	denied

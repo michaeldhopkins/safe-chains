@@ -15476,7 +15476,8 @@ Aliases: `gtar`
 ### `task`
 <p class="cmd-url"><a href="https://taskfile.dev/">https://taskfile.dev/</a></p>
 
-- Allowed standalone flags: --color, --concurrency, --dry, --exit-code, --force, --global, --help, --init, --insecure, --interval, --json, --list, --list-all, --no-color, --offline, --parallel, --silent, --status, --summary, --verbose, --version, --watch, -C, -d, -f, -g, -h, -i, -j, -l, -n, -p, -s, -t, -v, -w, -a
+- Requires --help, --list, --list-all, --version, -a, -h, -l.
+- Allowed standalone flags: --color, --dry, --help, --insecure, --json, --list, --list-all, --no-color, --offline, --silent, --verbose, --version, -a, -h, -j, -l, -n, -s, -v
 - Allowed valued flags: --dir, --output, --taskfile, -d, -o, -t
 
 **Examples:**
@@ -15486,6 +15487,9 @@ Aliases: `gtar`
 - `task --list-all`
 - `task --version`
 - `task --dry --list`
+- `task -l -d ./sub`
+- `task -l --taskfile ./Taskfile.yml`
+- `task --list --json`
 
 ### `taskinfo`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/taskinfo.1.html">https://keith.github.io/xcode-man-pages/taskinfo.1.html</a></p>

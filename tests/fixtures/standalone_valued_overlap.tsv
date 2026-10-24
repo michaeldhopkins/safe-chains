@@ -1201,8 +1201,6 @@ svn proplist	-r
 svn status	--changelist
 svn status	--config-dir
 svn status	--depth
-task	-d
-task	-t
 tcpdump	-B
 tcpdump	-c
 tcpdump	-C

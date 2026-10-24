@@ -794,8 +794,6 @@ swiftlint analyze	--compiler-log-path	untriaged	-	-	-
 swiftlint analyze	--path	untriaged	-	-	-	
 swiftlint lint	--path	untriaged	-	-	-	
 syft	--file	untriaged	-	-	-	
-task	--dir	untriaged	-	-	-	
-task	--taskfile	untriaged	-	-	-	
 terraform-docs	--lockfile	untriaged	-	-	-	
 terraform-docs	--recursive-path	untriaged	-	-	-	
 tflint	--var-file	untriaged	-	-	-	

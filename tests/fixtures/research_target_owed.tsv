@@ -1326,7 +1326,6 @@ tabs	description,examples
 tac	description,examples,version
 tailscale	examples,no-tolerance,version
 tap	description,examples,no-tolerance,profiled
-task	description,no-overlap
 taskinfo	description,examples
 taskpolicy	description,examples
 tbtdiagnose	description,examples

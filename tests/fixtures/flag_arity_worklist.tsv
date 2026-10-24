@@ -109,8 +109,6 @@ skopeo inspect	--config
 swiftlint fix	--format
 systemctl status	--lines
 tac	--before
-task	--concurrency
-task	--interval
 terraform-docs	--indent
 terraform-docs	--type
 tofu show	--config
