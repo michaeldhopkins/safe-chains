@@ -9948,7 +9948,7 @@ Aliases: `gmv`
 ### `mvn / mvnw`
 <p class="cmd-url"><a href="https://maven.apache.org/ref/current/maven-embedder/cli.html">https://maven.apache.org/ref/current/maven-embedder/cli.html</a></p>
 
-- Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
+- Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Properties (-D): cmd, detail, excludedGroups, excludes, failIfNoTests, goal, groups, includes, it.test, maven.compiler.release, maven.compiler.source, maven.compiler.target, maven.javadoc.skip, maven.main.skip, maven.test.failure.ignore, maven.test.skip, medium, minimal, plugin, scope, skipITs, skipTests, style.color, surefire.failIfNoSpecifiedTests, test, verbose.
 
 ### `mycli`
 <p class="cmd-url"><a href="https://www.mycli.net/docs">https://www.mycli.net/docs</a></p>

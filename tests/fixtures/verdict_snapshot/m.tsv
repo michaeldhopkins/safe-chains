@@ -3762,18 +3762,56 @@ mvn / mvnw --version	denied
 mvn / mvnw x	denied
 mvn clean	denied
 mvn compile	safe-write
+mvn compile --log-file /etc/x.log	denied
+mvn compile --log-file=~/.bashrc	denied
+mvn compile -Dmaven.compiler.fork=true -Dmaven.compiler.executable=/tmp/javac	denied
+mvn compile -l .git/hooks/pre-commit	denied
+mvn compile -l build.log	safe-write
+mvn compile -l ~/x.log	denied
+mvn compile test	safe-write
 mvn dependency:list	inert
 mvn dependency:tree	inert
 mvn dependency:tree --offline	inert
+mvn dependency:tree -DoutputFile=/tmp/tree.txt	denied
 mvn deploy	denied
 mvn help:describe -Dplugin=compiler	inert
 mvn install	denied
 mvn test	safe-read
 mvn test --batch-mode	safe-read
+mvn test --define exec.executable=/tmp/evil	denied
+mvn test --define=maven.repo.local=/tmp/repo	denied
+mvn test --define=test=FooTest	safe-read
+mvn test --file /tmp/x/pom.xml	denied
+mvn test --file=/tmp/x/pom.xml	denied
+mvn test --file=sub/pom.xml	safe-read
+mvn test --global-settings /tmp/settings.xml	denied
+mvn test --settings /tmp/settings.xml	denied
+mvn test --toolchains /tmp/toolchains.xml	denied
+mvn test -D exec.executable=/tmp/evil	denied
+mvn test -D skipTests	safe-read
+mvn test -DargLine=-javaagent:/tmp/evil.jar	denied
+mvn test -Dexec.args=-c	denied
+mvn test -Dexec.executable=/tmp/evil	denied
+mvn test -Djvm=/tmp/java	denied
+mvn test -Dmaven.ext.class.path=/tmp/evil.jar	denied
+mvn test -Dmaven.repo.local=/tmp/repo	denied
 mvn test -Dtest=MyTest	safe-read
+mvn test -f /tmp/x/pom.xml	denied
+mvn test -f sub/pom.xml	safe-read
+mvn test -f ~/other/pom.xml	denied
+mvn test -gs /tmp/settings.xml	denied
+mvn test -q exec:java	denied
+mvn test -s .mvn/settings.xml	safe-read
+mvn test -s /tmp/settings.xml	denied
+mvn test -s/tmp/settings.xml	denied
+mvn test -t /tmp/toolchains.xml	denied
+mvn test dependency:tree	safe-read
+mvn test exec:exec	denied
+mvn test install	denied
 mvn test-compile	safe-write
 mvn validate	safe-read
 mvn verify	safe-read
+mvn verify -P ci -T 4 --projects core	safe-read
 mvnw --version	inert
 mvnw test	safe-read
 mycli	denied

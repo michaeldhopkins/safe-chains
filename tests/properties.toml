@@ -348,6 +348,9 @@ owed = [
   "unknown_phase_is_always_denied",
   "appending_a_standalone_flag_preserves_verdict_and_level",
   "version_phase_is_inert_only_when_solitary",
+  "an_operand_that_is_not_a_listed_phase_or_goal_denies",
+  "an_unlisted_property_denies_in_every_spelling",
+  "a_file_flag_judges_its_value_the_same_in_every_spelling",
 ]
 "src/handlers/magick.rs" = [
   "magick_with_fewer_than_two_tokens_is_denied",
