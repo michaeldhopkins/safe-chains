@@ -420,14 +420,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
             }
-            let mut v = redir_v;
-            for b in branches {
-                v = v.combine(script_verdict(&b.cond)).combine(script_verdict(&b.body));
-            }
-            if let Some(eb) = else_body {
-                v = v.combine(script_verdict(eb));
-            }
-            v
+            redir_v.combine(super::loops::if_verdict(branches, else_body.as_ref()))
         }
         Cmd::DoubleBracket { words, redirs } => super::arith::double_bracket_verdict(words).combine(redirect_verdict(redirs)),
         // Which arm runs is decided at runtime, so — exactly as for `If` — every arm body counts

@@ -39,3 +39,19 @@ fn a_cd_that_stays_inside_or_ends_with_its_subshell_keeps_the_verdict() {
         }
     }
 }
+
+#[test]
+fn what_an_if_condition_leaves_in_the_shell_reaches_its_branches() {
+    for command in [
+        "if cd ~; then cargo fmt; fi",
+        "if cd ~; then true; else cargo fmt; fi",
+        "if false; then true; elif cd ~; then cargo fmt; fi",
+        "if cd ~; then true; elif cargo fmt; then true; fi",
+        "X=./a; if X=~/.ssh/id_rsa; then cat \"$X\"; fi",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in ["if cargo fmt; then cargo fmt; fi", "if test -d src; then cargo fmt; else cargo fmt; fi"] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}
