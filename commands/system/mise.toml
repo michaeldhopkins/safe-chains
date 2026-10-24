@@ -29,6 +29,8 @@ examples_safe = [
     "mise set NODE_ENV=production",
     "mise set --file ./mise.toml FOO=bar",
     "mise set -E staging FOO=bar",
+    "mise use -E production node@20",
+    "mise set --env=dev FOO=bar",
     "mise unset FOO",
     "mise use --path ./mise.toml ruby@4.0.3",
     "mise u -p ./mise.toml ruby@4.0.3",
@@ -81,6 +83,22 @@ examples_denied = [
     "mise use --path ~/.config/mise/config.toml node@20",
     "mise u -p ~/mise.toml node@20",
     "mise use --cd ~ node@20",
+    "mise set -E /../../out/evil FOO=bar",
+    "mise set -Ex/../../y FOO=1",
+    "mise set --env=../x FOO=1",
+    "mise use --env=/../../x node@20",
+    "mise u -e /../x node@20",
+    "mise use -g node@20",
+    "mise use --global node@20",
+    "mise u -g node@20",
+    "mise use -gf node@20",
+    "mise unset -g FOO",
+    "mise use node@path:/tmp/evil",
+    "mise u git@path:/tmp/evil",
+    "mise install node@path:/tmp/evil",
+    "mise i node@path:/tmp/evil",
+    "mise upgrade node@path:/tmp/evil",
+    "mise exec node@path:/tmp/evil -- true",
 ]
 
 [[command.sub]]
@@ -126,11 +144,12 @@ name = "use"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--force", "--fuzzy", "--global", "--help", "--pin", "--quiet",
-    "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--help", "--pin", "--quiet",
+    "--remove", "--verbose", "-f", "-q", "-v", "-h",
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
-refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
+flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-e" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
 
 [[command.sub]]
 name = "install"
@@ -141,7 +160,7 @@ standalone = [
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
-refuse_operands = ["*[*"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "uninstall"
@@ -156,7 +175,7 @@ writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
-refuse_operands = ["*[*"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "prune"
@@ -181,11 +200,12 @@ level = "SafeWrite"
 standalone = ["--help", "--remove", "-h"]
 valued = ["--env", "--file", "-E", "-f"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
+flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
 
 [[command.sub]]
 name = "unset"
 level = "SafeWrite"
-standalone = ["--global", "--help", "-g", "-h"]
+standalone = ["--help", "-h"]
 valued = ["--file", "-f"]
 
 [[command.sub]]
@@ -203,11 +223,12 @@ writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--force", "--fuzzy", "--global", "--help", "--pin", "--quiet",
-    "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--help", "--pin", "--quiet",
+    "--remove", "--verbose", "-f", "-q", "-v", "-h",
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
-refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
+flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-e" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
 
 [[command.sub]]
 name = "i"
@@ -218,7 +239,7 @@ standalone = [
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
-refuse_operands = ["*[*"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "rm"
@@ -240,7 +261,7 @@ writes_cwd = "source"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
-refuse_operands = ["*[*"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "env"
@@ -480,7 +501,7 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "exec"
 delegate_after = "--"
-refuse_operands = ["*[*"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "activate"
