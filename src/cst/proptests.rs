@@ -546,7 +546,7 @@ proptest! {
                 && !s.starts_with('/')
                 && !s.starts_with('~')
                 && !s.contains('$')
-                && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".jj" || seg == ".envrc")
+                && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".jj" || seg == ".hg" || seg == ".sl" || seg == ".envrc")
         }),
         fd in 0..3u32,
         mode in arb_write_mode(),
