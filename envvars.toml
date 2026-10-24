@@ -604,6 +604,102 @@ measured = false
 shape = "opaque"
 because = "label@source pairs whose sources ansible runs when they are executable, as ANSIBLE_VAULT_PASSWORD_FILE"
 measured = false
+[env.ANSIBLE_ACTION_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for action plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_BECOME_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for become plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CACHE_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for cache plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CALLBACK_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for callback plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CLICONF_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for cliconf plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CONNECTION_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for connection plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_DOC_FRAGMENT_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for doc fragment plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_FILTER_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for filter plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_HTTPAPI_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for httpapi plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_INVENTORY_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for inventory plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_LOOKUP_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for lookup plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_NETCONF_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for netconf plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_STRATEGY_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for strategy plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_TERMINAL_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for terminal plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_TEST_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for test plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_VARS_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for vars plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_LIBRARY]
+shape = "exec-path"
+because = "folders ansible searches for modules, which it runs when a task names them"
+measured = false
+[env.ANSIBLE_MODULE_UTILS]
+shape = "exec-path"
+because = "folders of module_utils that ansible bundles into the modules it runs"
+measured = false
+[env.ANSIBLE_COLLECTIONS_PATH]
+shape = "exec-path"
+because = "folders ansible loads collections from, whose plugins it imports and runs"
+measured = false
+[env.ANSIBLE_COLLECTIONS_PATHS]
+shape = "exec-path"
+because = "the older spelling of ANSIBLE_COLLECTIONS_PATH, still read"
+measured = false
+[env.ANSIBLE_ROLES_PATH]
+shape = "exec-path"
+because = "folders ansible loads roles from, whose tasks and bundled plugins it runs"
+measured = false
+[env.ANSIBLE_HOME]
+shape = "exec-path"
+because = "the folder under which ansible looks for collections and plugins by default"
+measured = false
+[env.ANSIBLE_PLAYBOOK_DIR]
+shape = "exec-path"
+because = "the folder ansible treats as the playbook's, loading the collections and plugins beside it"
+measured = false
+[env.ANSIBLE_INVENTORY]
+shape = "opaque"
+because = "comma-separated inventory sources; ansible runs any that is an executable script to list the hosts"
+measured = false
 [env.ZDOTDIR]
 shape = "config-dir"
 because = "zsh sources .zshenv (and for a login or interactive shell .zprofile and .zshrc) from this directory"

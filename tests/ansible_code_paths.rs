@@ -34,3 +34,36 @@ fn an_inventory_source_outside_the_project_asks() {
         }
     }
 }
+
+const CODE_FOLDERS: [&str; 23] = [
+    "ANSIBLE_ACTION_PLUGINS", "ANSIBLE_BECOME_PLUGINS", "ANSIBLE_CACHE_PLUGINS", "ANSIBLE_CALLBACK_PLUGINS", "ANSIBLE_CLICONF_PLUGINS",
+    "ANSIBLE_COLLECTIONS_PATH", "ANSIBLE_COLLECTIONS_PATHS", "ANSIBLE_CONNECTION_PLUGINS", "ANSIBLE_DOC_FRAGMENT_PLUGINS",
+    "ANSIBLE_FILTER_PLUGINS", "ANSIBLE_HOME", "ANSIBLE_HTTPAPI_PLUGINS", "ANSIBLE_INVENTORY_PLUGINS", "ANSIBLE_LIBRARY",
+    "ANSIBLE_LOOKUP_PLUGINS", "ANSIBLE_MODULE_UTILS", "ANSIBLE_NETCONF_PLUGINS", "ANSIBLE_PLAYBOOK_DIR", "ANSIBLE_ROLES_PATH",
+    "ANSIBLE_STRATEGY_PLUGINS", "ANSIBLE_TERMINAL_PLUGINS", "ANSIBLE_TEST_PLUGINS", "ANSIBLE_VARS_PLUGINS",
+];
+
+#[test]
+fn a_plugin_folder_outside_the_project_asks() {
+    let inside = format!("{}/plugins", env!("CARGO_MANIFEST_DIR"));
+    for command in INVENTORY_READERS {
+        for name in CODE_FOLDERS {
+            for value in ["/tmp/evil", "/private/tmp/x", "../../elsewhere", "./plugins:/tmp/evil"] {
+                let line = format!("{name}={value} {command}");
+                assert!(!approved(&line), "`{line}` was approved");
+            }
+            let line = format!("{name}={inside} {command}");
+            assert!(approved(&line), "`{line}` should stay approved");
+        }
+    }
+}
+
+#[test]
+fn an_inventory_named_by_the_environment_asks() {
+    for command in INVENTORY_READERS {
+        for value in ["/tmp/inv.py", "./hosts.ini,/tmp/inv.py", "./hosts.ini"] {
+            let line = format!("ANSIBLE_INVENTORY={value} {command}");
+            assert!(!approved(&line), "`{line}` was approved");
+        }
+    }
+}
