@@ -1986,30 +1986,41 @@ mkcert -uninstall	safe-write
 mkcert -version	safe-write
 mkcert x	safe-write
 mkdir	denied
-mkdir --context x	denied
+mkdir --context	denied
+mkdir --context --help	inert
+mkdir --context --mode x	denied
+mkdir --context /etc/evil ok	denied
+mkdir --context x	safe-write
 mkdir --help	inert
-mkdir --help --context x	inert
-mkdir --help --parents	inert
-mkdir --help x	safe-write
 mkdir --mode g+s d	denied
 mkdir --mode x	denied
+mkdir --mode=700 ./private	safe-write
 mkdir --mode=u+rwx d	safe-write
 mkdir --mode=u+s d	denied
 mkdir --parents	denied
 mkdir --verbose	denied
 mkdir --version	inert
 mkdir -Z	denied
+mkdir -m 755 ./dist	safe-write
 mkdir -m 2775 -p d	denied
 mkdir -m 4755 d	denied
 mkdir -m 755 d	safe-write
 mkdir -m x	denied
 mkdir -m4755 d	denied
 mkdir -p	denied
+mkdir -p ./a/../../x	denied
+mkdir -p .git/hooks	denied
+mkdir -p out/logs/archive	safe-write
+mkdir -p ~/newdir	denied
+mkdir -pv ./a ./b	safe-write
 mkdir -p a/b	safe-write
 mkdir -pm 0755 d	safe-write
 mkdir -pm 2775 d	denied
 mkdir -pm2775 d	denied
 mkdir -v	denied
+mkdir ../outside	denied
+mkdir /etc/evil	denied
+mkdir build	safe-write
 mkdir x	safe-write
 mkdocs	denied
 mkdocs --config-file x	denied

@@ -11275,11 +11275,12 @@ gmd5sum -w	inert
 gmd5sum -z	inert
 gmd5sum x	inert
 gmkdir	denied
-gmkdir --context x	denied
+gmkdir --context	denied
+gmkdir --context --help	inert
+gmkdir --context --mode x	denied
+gmkdir --context ./labelled	safe-write
+gmkdir --context x	safe-write
 gmkdir --help	inert
-gmkdir --help --context x	inert
-gmkdir --help --parents	inert
-gmkdir --help x	safe-write
 gmkdir --mode x	denied
 gmkdir --parents	denied
 gmkdir --verbose	denied

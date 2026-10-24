@@ -324,8 +324,18 @@ Aliases: `gdir`, `gvdir`, `dir`, `vdir`
 Aliases: `gmkdir`
 
 - Creates or updates its file operands within your workspace.
-- Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
-- Allowed valued flags: --context, --mode, -m
+- Allowed standalone flags: --context, --help, --parents, --verbose, --version, -Z, -p, -v
+- Allowed valued flags: --mode, -m
+
+**Examples:**
+
+- `mkdir build`
+- `mkdir -p out/logs/archive`
+- `mkdir -pv ./a ./b`
+- `mkdir -m 755 ./dist`
+- `mkdir --mode=700 ./private`
+- `gmkdir --context ./labelled`
+- `mkdir --version`
 
 ### `mkfifo`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkfifo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkfifo-invocation</a></p>
