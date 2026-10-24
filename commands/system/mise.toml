@@ -62,6 +62,13 @@ examples_denied = [
     "mise use 'node@{# x #}'",
     "mise use 'cargo:ripgrep[features=pcre2]'",
     "mise u 'cargo:ripgrep[postinstall=id]'",
+    'mise set "FOO=$(cat payload.txt)"',
+    'mise set FOO=`cat payload.txt`',
+    'mise set "FOO=$X"',
+    'mise set FOO={\{x}}',
+    'mise set _{\.,}source=./x.sh',
+    'mise use node@{\{x}}',
+    'mise u cargo:rg{\[,}x',
 ]
 
 [[command.sub]]

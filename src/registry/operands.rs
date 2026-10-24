@@ -34,13 +34,18 @@ fn candidates(arg: &str) -> impl Iterator<Item = &str> {
     (!is_flag).then_some(arg).into_iter().chain((!is_flag).then_some(name).flatten()).chain(value)
 }
 
+fn decided_by_the_shell(arg: &str) -> bool {
+    arg.contains('$') || arg.contains("__SAFE_CHAINS_")
+}
+
 pub(super) fn presents_refused_operand(tokens: &[Token], patterns: &[String]) -> bool {
     !patterns.is_empty()
-        && tokens
-            .iter()
-            .skip(1)
-            .flat_map(|token| candidates(token.as_str()))
-            .any(|text| patterns.iter().any(|pattern| glob_matches(pattern, text)))
+        && (tokens.iter().skip(1).any(|token| decided_by_the_shell(token.as_str()))
+            || tokens
+                .iter()
+                .skip(1)
+                .flat_map(|token| candidates(token.as_str()))
+                .any(|text| patterns.iter().any(|pattern| glob_matches(pattern, text))))
 }
 
 pub(super) fn unless_refused(tokens: &[Token], patterns: &[String], otherwise: impl FnOnce() -> Verdict) -> Verdict {
@@ -149,7 +154,29 @@ mod tests {
                 let line = shell_words::join(&words);
                 assert!(!crate::command_verdict(&line).is_allowed(), "`{line}` matches `{pattern}` and must be refused");
             }
+            for unknown in UNKNOWN_SPELLINGS {
+                let line = format!("{} {unknown}", shell_words::join(&path));
+                assert!(!crate::command_verdict(&line).is_allowed(), "`{line}` holds text the shell decides and must be refused");
+            }
         }
+    }
+
+    const UNKNOWN_SPELLINGS: [&str; 10] = [
+        "\"FOO=$(printf x)\"", "FOO=`printf x`", "\"FOO=$X\"", "\"$X=1\"", "FOO={\\{x}}", "FOO={'{'x}}", "_{\\.,}source=x", "x{\\[,}y",
+        "FOO=$((1))", "--file=\"$(printf x)\"",
+    ];
+
+    #[test]
+    fn an_argument_whose_text_the_shell_decides_is_refused() {
+        let patterns = ["*{{*".to_string()];
+        for text in [
+            "FOO=__SAFE_CHAINS_CMDSUB__", "FOO=$X", "$X", "--file=__SAFE_CHAINS_CMDSUB__", "-E__SAFE_CHAINS_CMDSUB__",
+            "FOO=__SAFE_CHAINS_CMDSUB_WORKTREE__", "a__SAFE_CHAINS_UNRESOLVED_BRACE__",
+        ] {
+            assert!(presents_refused_operand(&line("set", &[text.into()]), &patterns), "{text}");
+        }
+        assert!(!presents_refused_operand(&line("set", &["FOO=$X".into()]), &[]));
+        assert!(!presents_refused_operand(&line("set", &["FOO=SAFE_CHAINS".into()]), &patterns));
     }
 
     #[test]

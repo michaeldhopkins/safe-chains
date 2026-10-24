@@ -526,7 +526,10 @@
 # any glob matches an argument that is not a flag, either side of the `=` in
 # such an argument (`NAME=VALUE`: the name, and the value), or the value of a
 # `--flag=value`. The values of separate valued flags are plain arguments, so
-# they are tested too. Use it on a sub that writes text a later command
+# they are tested too. An argument whose text the shell decides (a `$VAR`, a
+# `$(…)` or backtick substitution, arithmetic, or a brace group the classifier
+# cannot expand) is refused whatever the globs say, since it could hold any of
+# them. Use it on a sub that writes text a later command
 # executes: `mise set FOO='{{ exec(command="id") }}'` stores a template that
 # mise runs the next time it loads the file.
 #
