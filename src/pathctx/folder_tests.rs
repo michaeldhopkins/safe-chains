@@ -102,3 +102,69 @@ fn a_frame_is_popped_even_when_classification_unwinds() {
     assert!(caught.is_err());
     assert!(FRAMES.with(|f| f.borrow().is_empty()));
 }
+
+fn verdict_in(cwd: &str, command: &str) -> Verdict {
+    let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(cwd.to_string()), root: Some(ROOT.to_string()), session_id: None });
+    crate::cst::command_verdict(command)
+}
+
+fn outside_the_workspace() -> Vec<String> {
+    let home = std::env::var("HOME").expect("HOME");
+    vec![home.clone(), "/".to_string(), format!("{home}/.config/mise"), "/work/projects/other".to_string()]
+}
+
+/// Every sub the registry declares as writing, or running code from, the folder it runs in: approved
+/// in the workspace, it must ask once a `cd` has taken it out, or when the harness says it already
+/// runs out there, and keep its verdict after a `cd` that stays inside.
+#[test]
+fn a_declared_folder_write_follows_the_working_directory() {
+    let mut checked = 0;
+    let mut wrong = Vec::new();
+    for (command, anchor) in crate::registry::declared_writers() {
+        if !matches!(anchor, Anchor::ImplicitSource | Anchor::ImplicitOutput | Anchor::RunsFolderCode) {
+            continue;
+        }
+        let at_root = verdict_in(ROOT, &command);
+        if !writes(at_root) {
+            continue;
+        }
+        checked += 1;
+        for dir in outside_the_workspace() {
+            for (cwd, line) in [(ROOT.to_string(), format!("cd {dir} && {command}")), (dir.clone(), command.clone())] {
+                if verdict_in(&cwd, &line).is_allowed() {
+                    wrong.push(format!("`{line}` in {cwd}"));
+                }
+            }
+        }
+        for line in [format!("cd src && {command}"), format!("(cd /; true) && {command}")] {
+            if verdict_in(ROOT, &line) != at_root {
+                wrong.push(format!("`{line}` changed its verdict inside the workspace"));
+            }
+        }
+    }
+    assert!(checked > 100, "only {checked} declared folder writers are approved at the root");
+    assert!(wrong.is_empty(), "{} wrong, first:\n{}", wrong.len(), wrong.iter().take(25).cloned().collect::<Vec<_>>().join("\n"));
+}
+
+/// A `cd` whose target the classifier cannot name leaves the folder unknown, so a folder write after
+/// it asks.
+#[test]
+fn a_folder_write_after_an_unfollowable_cd_asks() {
+    for cd in ["cd -", "cd", "cd \"$UNSET_DIR\"", "{ cd ~; }", "if true; then cd /; fi", "popd", "pushd ~"] {
+        for command in ["cargo fmt", "git commit -m x", "mise set X=1", "cargo build"] {
+            assert!(writes(verdict_in(ROOT, command)), "precondition: `{command}`");
+            let line = format!("{cd}; {command}");
+            assert!(!verdict_in(ROOT, &line).is_allowed(), "`{line}` was approved");
+        }
+    }
+}
+
+#[test]
+fn a_named_write_and_a_fixed_target_do_not_take_the_folder() {
+    let home = std::env::var("HOME").expect("HOME");
+    for command in ["touch /tmp/x", "echo x > /tmp/y", "ls", "git status"] {
+        let line = format!("cd {home} && {command}");
+        assert_eq!(verdict_in(ROOT, &line), verdict_in(&home, command), "{line}");
+        assert!(verdict_in(ROOT, &line).is_allowed(), "{line}");
+    }
+}

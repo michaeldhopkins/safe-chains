@@ -86,6 +86,28 @@ pub(crate) fn cwd_writes(tokens: &[Token]) -> Option<Anchor> {
     }
 }
 
+/// Every command and sub path the registry knows, with the folder write it declares, as the words
+/// that reach it (`cargo fmt`, `git stash push`).
+#[cfg(test)]
+pub(crate) fn declared_writers() -> Vec<(String, Anchor)> {
+    fn walk(prefix: &str, kind: &DispatchKind, found: Option<Anchor>, out: &mut Vec<(String, Anchor)>) {
+        if let Some(anchor) = found {
+            out.push((prefix.to_string(), anchor));
+        }
+        let (DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. }) = kind else { return };
+        for sub in subs {
+            walk(&format!("{prefix} {}", sub.name), &sub.kind, sub.writes_cwd, out);
+        }
+    }
+    let mut out = Vec::new();
+    for (name, spec) in CUSTOM_REGISTRY.iter().chain(TOML_REGISTRY.iter()) {
+        walk(name, &spec.kind, spec.writes_cwd, &mut out);
+    }
+    out.sort_by(|a, b| a.0.cmp(&b.0));
+    out.dedup_by(|a, b| a.0 == b.0);
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

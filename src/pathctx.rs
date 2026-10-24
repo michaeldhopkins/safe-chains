@@ -45,21 +45,26 @@ pub struct PathCtx {
 
 thread_local! {
     static CURRENT: RefCell<PathCtx> = RefCell::new(PathCtx::default());
+    static REPORTED: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
 /// Install `ctx` as the ambient context for the duration of the returned guard; the previous
 /// context is restored on drop (panic-safe, so a failing test can't leak into the next).
 #[must_use]
 pub fn enter(ctx: PathCtx) -> Guard {
-    Guard(CURRENT.with(|c| c.replace(ctx)))
+    let reported = REPORTED.with(|r| r.replace(ctx.cwd.clone()));
+    Guard(CURRENT.with(|c| c.replace(ctx)), Some(reported))
 }
 
 /// Restores the previous [`PathCtx`] when dropped.
-pub struct Guard(PathCtx);
+pub struct Guard(PathCtx, Option<Option<String>>);
 
 impl Drop for Guard {
     fn drop(&mut self) {
         CURRENT.with(|c| *c.borrow_mut() = std::mem::take(&mut self.0));
+        if let Some(reported) = self.1.take() {
+            REPORTED.with(|r| *r.borrow_mut() = reported);
+        }
     }
 }
 
@@ -67,12 +72,21 @@ impl Drop for Guard {
 /// `cd` tracking as it walks a chain's statements. Restored on drop.
 #[must_use]
 pub fn enter_cwd(cwd: Option<String>) -> Guard {
-    Guard(CURRENT.with(|c| {
-        let mut b = c.borrow_mut();
-        // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
-        // recognition (the session is the same session whatever directory it walks into).
-        PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone(), session_id: b.session_id.clone() }
-    }))
+    Guard(
+        CURRENT.with(|c| {
+            let mut b = c.borrow_mut();
+            // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
+            // recognition (the session is the same session whatever directory it walks into).
+            PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone(), session_id: b.session_id.clone() }
+        }),
+        None,
+    )
+}
+
+/// Whether a `cd` earlier on the line moved the working directory away from the one the harness
+/// reported.
+pub(crate) fn moved_by_cd() -> bool {
+    REPORTED.with(|r| *r.borrow() != cwd())
 }
 
 /// The ambient working directory, if known.

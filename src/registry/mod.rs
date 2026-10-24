@@ -4,6 +4,8 @@ mod cwd_writes;
 pub mod folder_config;
 pub use custom::fuzz_load_config;
 pub(crate) use cwd_writes::cwd_writes;
+#[cfg(test)]
+pub(crate) use cwd_writes::declared_writers;
 mod dispatch;
 mod docs;
 mod flag_sets;

@@ -144,7 +144,7 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
                 return; // a bare `VAR=x` — handled precisely by `statement_assignments`
             };
             out.vars.extend(super::opaque::declared_names(s));
-            if name == "cd" {
+            if matches!(name.as_str(), "cd" | "pushd" | "popd") {
                 out.cwd = true;
                 return;
             }
