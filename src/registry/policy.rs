@@ -23,7 +23,7 @@ impl OwnedPolicy {
             bare: true,
             max_positional: None,
             min_positional: None,
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, single_dash_words: false, ..FlagTolerance::strict() },
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, ..FlagTolerance::strict() },
             passthrough: None,
         }
     }
