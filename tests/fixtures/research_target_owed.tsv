@@ -299,7 +299,6 @@ detekt	examples,version
 devbox	description,examples,version
 devenv	examples,no-tolerance,profiled
 devicectl	description,examples,no-tolerance,profiled
-df	examples,version
 dict	description,examples,no-tolerance
 diesel	description,examples,no-tolerance,profiled
 diff	examples,version

@@ -4011,9 +4011,23 @@ Aliases: `dependency-cruise`
 
 Aliases: `gdf`
 
-- Allowed standalone flags: --all, --help, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, --version, -H, -P, -T, -V, -a, -h, -i, -k, -l
-- Allowed valued flags: --block-size, --exclude-type, --output, --type, -B, -t, -x
+- Allowed standalone flags: --all, --help, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, --version, -,, -H, -I, -P, -T, -V, -Y, -a, -b, -c, -g, -h, -i, -k, -l, -m, -n, -v
+- Allowed valued flags: --block-size, --exclude-type, --libxo, --output, --type, -B, -t, -x
 - Bare invocation allowed
+
+**Examples:**
+
+- `df`
+- `df -h`
+- `df -h /`
+- `df -Pk .`
+- `df -lhT`
+- `df -b -c -g -I -m -n -Y -,`
+- `df --libxo json .`
+- `df --libxo=xml -h`
+- `df --output=source,size,used,avail,pcent,target -h`
+- `df -B 1M -t apfs -x devfs`
+- `gdf -h --total --inodes`
 
 ### `dict`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/dict.1.html">https://man7.org/linux/man-pages/man1/dict.1.html</a></p>

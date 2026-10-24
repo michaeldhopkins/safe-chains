@@ -56,6 +56,16 @@ safe! {
     mountpoint_quiet: "mountpoint -q /tmp",
     mountpoint_show: "mountpoint --show /tmp",
 
+    df_bare: "df",
+    df_human: "df -h",
+    df_posix_k: "df -Pk .",
+    df_bsd_flags: "df -b -c -g -I -m -n -Y -,",
+    df_bsd_libxo: "df --libxo json .",
+    df_bsd_libxo_glued: "df --libxo=xml -h",
+    df_gnu_output: "df --output=source,size,used,avail,pcent,target -h",
+    df_gnu_types: "df -B 1M -t apfs -x devfs -T --total --inodes",
+    gdf_human_total: "gdf -h --total --local --no-sync",
+
     apropos_keyword: "apropos foo",
     apropos_section: "apropos -s 1 grep",
     apropos_debug: "apropos -d foo",
@@ -1200,6 +1210,8 @@ denied! {
     findmnt_unknown_flag: "findmnt --evil",
     mountpoint_bare: "mountpoint",
     mountpoint_two_paths: "mountpoint /tmp /var",
+    df_unknown_long: "df --unknown-flag",
+    df_unknown_short: "df -Z",
 
     apropos_bare: "apropos",
     whatis_bare: "whatis",
@@ -1496,6 +1508,8 @@ inert! {
     level_env_bare: "env",
     level_timeout_ls: "timeout 5 ls -la",
     level_bash_version: "bash --version",
+    level_df_bare: "df",
+    level_df_libxo: "df --libxo json -h .",
 
     assign_bare_inert: "x=1",
     assign_bare_param_inert: "rc=$?",

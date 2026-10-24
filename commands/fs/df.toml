@@ -1,17 +1,37 @@
 [[command]]
 name = "df"
 aliases = ["gdf"]
-description = "Reports disk space usage for mounted filesystems. Strictly read-only: queries the kernel for filesystem statistics and prints them to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
+description = "Reports free and used disk space and inode counts for mounted filesystems across GNU coreutils and BSD/macOS implementations. Purely observes local kernel mount tables and statfs metadata and prints formatted tables (or structured libxo records on BSD) to stdout; never reads file contents, never modifies or mutates filesystem state, executes no external programs, and makes no network connections (passing -l/--local restricts queries to locally mounted filesystems without polling remote NFS/SMB mounts). GNU -T prints filesystem types (BSD uses -Y for type display and -t for type filtering), and GNU --output selects display columns rather than a destination file. Part of POSIX, BSD base, and GNU coreutils with a stable, rarely changing option surface across releases."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation"
+researched_version = "GNU coreutils 9.12 + BSD df (macOS 27)"
 level = "Inert"
 bare = true
+examples_safe = [
+    "df",
+    "df -h",
+    "df -h /",
+    "df -Pk .",
+    "df -lhT",
+    "df -b -c -g -I -m -n -Y -,",
+    "df --libxo json .",
+    "df --libxo=xml -h",
+    "df --output=source,size,used,avail,pcent,target -h",
+    "df -B 1M -t apfs -x devfs",
+    "gdf -h --total --inodes",
+]
+examples_denied = [
+    "df --unknown-flag",
+    "df -Z",
+]
 standalone = [
     "--all", "--help", "--human-readable", "--inodes", "--local",
     "--no-sync", "--portability", "--print-type",
     "--si", "--sync", "--total", "--version",
-    "-H", "-P", "-T", "-V", "-a", "-h", "-i", "-k", "-l",
+    "-,", "-H", "-I", "-P", "-T", "-V", "-Y",
+    "-a", "-b", "-c", "-g", "-h", "-i", "-k", "-l", "-m", "-n", "-v",
 ]
 valued = [
-    "--block-size", "--exclude-type", "--output", "--type",
+    "--block-size", "--exclude-type", "--libxo", "--output", "--type",
     "-B", "-t", "-x",
 ]
+

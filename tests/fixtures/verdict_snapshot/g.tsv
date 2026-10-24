@@ -2236,15 +2236,17 @@ gdbmtool --version	denied
 gdbmtool foo.db	denied
 gdbmtool x	denied
 gdf	inert
+gdf -,	inert
+gdf -, --all	inert
+gdf -, --block-size x	inert
+gdf -, x	inert
 gdf --all	inert
-gdf --all --block-size x	inert
-gdf --all --help	inert
-gdf --all x	inert
 gdf --block-size x	inert
 gdf --exclude-type x	inert
 gdf --help	inert
 gdf --human-readable	inert
 gdf --inodes	inert
+gdf --libxo x	inert
 gdf --local	inert
 gdf --no-sync	inert
 gdf --output x	inert
@@ -2257,15 +2259,25 @@ gdf --type x	inert
 gdf --version	inert
 gdf -B x	inert
 gdf -H	inert
+gdf -I	inert
 gdf -P	inert
 gdf -T	inert
 gdf -V	inert
+gdf -Y	inert
 gdf -a	inert
+gdf -b	inert
+gdf -c	inert
+gdf -g	inert
 gdf -h	inert
+gdf -h --total --inodes	inert
+gdf -h --total --local --no-sync	inert
 gdf -i	inert
 gdf -k	inert
 gdf -l	inert
+gdf -m	inert
+gdf -n	inert
 gdf -t x	inert
+gdf -v	inert
 gdf -x x	inert
 gdf x	inert
 gdir	inert

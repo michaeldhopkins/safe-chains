@@ -1677,36 +1677,58 @@ devicectl manage pair	denied
 devicectl manage x	denied
 devicectl x	denied
 df	inert
+df -,	inert
+df -, --all	inert
+df -, --block-size x	inert
+df -, x	inert
 df --all	inert
-df --all --block-size x	inert
-df --all --help	inert
-df --all x	inert
 df --block-size x	inert
 df --exclude-type x	inert
 df --help	inert
 df --human-readable	inert
 df --inodes	inert
+df --libxo json -h .	inert
+df --libxo json .	inert
+df --libxo x	inert
+df --libxo=xml -h	inert
 df --local	inert
 df --no-sync	inert
 df --output x	inert
+df --output=source,size,used,avail,pcent,target -h	inert
 df --portability	inert
 df --print-type	inert
 df --si	inert
 df --sync	inert
 df --total	inert
 df --type x	inert
+df --unknown-flag	denied
 df --version	inert
+df -B 1M -t apfs -x devfs	inert
+df -B 1M -t apfs -x devfs -T --total --inodes	inert
 df -B x	inert
 df -H	inert
+df -I	inert
 df -P	inert
+df -Pk .	inert
 df -T	inert
 df -V	inert
+df -Y	inert
+df -Z	denied
 df -a	inert
+df -b	inert
+df -b -c -g -I -m -n -Y -,	inert
+df -c	inert
+df -g	inert
 df -h	inert
+df -h /	inert
 df -i	inert
 df -k	inert
 df -l	inert
+df -lhT	inert
+df -m	inert
+df -n	inert
 df -t x	inert
+df -v	inert
 df -x x	inert
 df x	inert
 dict	denied
