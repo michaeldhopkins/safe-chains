@@ -545,6 +545,7 @@ owed = [
 ]
 "src/registry/build_eval_safe.rs" = ["bare_literal_eval_safe_values_are_accepted", "a_non_literal_eval_safe_value_is_rejected"]
 "src/registry/build_sub.rs" = ["aliases_inherit_the_canonical_declaration"]
+"src/registry/operands.rs" = ["an_operand_holding_a_marker_is_refused", "operands_without_a_marker_are_unaffected", "no_patterns_refuse_nothing", "glob_agrees_with_a_recursive_reading", "a_literal_name_matches_its_assignment_only"]
 "src/registry/build.rs" = [
   "build_policy_optional_valued_mechanism_appends_to_both_lists",
   "build_policy_unknown_tolerance_tracks_the_boolean_pair",

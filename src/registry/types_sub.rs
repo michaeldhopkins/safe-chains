@@ -181,6 +181,12 @@ pub(in crate::registry) struct TomlSub {
     pub credential_first_arg: Vec<String>,
     #[serde(default)]
     pub flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Globs (`*` matches any run, including none) that make this sub refuse an invocation: tested
+    /// against every argument that is not a flag, against the name and the value either side of an
+    /// `=`, and against the value of a `--flag=value`. For a sub that writes what a later command
+    /// runs (`mise set FOO='{{ exec(command="id") }}'`).
+    #[serde(default)]
+    pub refuse_operands: Vec<String>,
     #[serde(default)]
     pub write_flags: Vec<String>,
     #[serde(default)]
@@ -342,6 +348,8 @@ pub(in crate::registry) struct SubSpec {
     /// What a loopback endpoint buys this sub; see `TomlSub::loopback_localizes`.
     pub loopback_effect: LoopbackEffect,
     pub flag_values: Vec<(String, Vec<String>)>,
+    /// Globs an invocation of this sub may not match; see `TomlSub::refuse_operands`.
+    pub refuse_operands: Vec<String>,
 }
 
 /// What a recognized loopback destination buys a sub. Gating the FLAG and re-classifying the

@@ -9,7 +9,7 @@ mod docs;
 mod flag_sets;
 pub(crate) use flag_sets::{command_flag_sets, command_valued_flags, fallback_flag_sets, handler_policy_flag_sets, sub_valued_flags};
 mod glob_flags;
-use glob_flags::glob_presents_unlisted_flag;
+mod operands;
 mod passthrough_gate;
 mod policy;
 pub(crate) mod types;
@@ -492,7 +492,7 @@ pub fn try_sub_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
     };
     let arg = tokens.get(1)?.as_str();
     let sub = subs.iter().find(|s| s.name == arg)?;
-    Some(glob_flags::gated(&tokens[1..], sub, || dispatch::dispatch_sub_kind(&tokens[1..], &sub.kind)))
+    Some(dispatch::dispatch_sub(&tokens[1..], sub))
 }
 
 /// Apply `cmd_name`'s TOML-declared `[command.fallback]` grammar.

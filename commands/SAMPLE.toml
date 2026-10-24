@@ -518,6 +518,29 @@
 # level = "SafeRead"
 
 # ─────────────────────────────────────────────────────────────────────
+# REFUSE OPERANDS — a sub that must not take certain argument text
+# ─────────────────────────────────────────────────────────────────────
+#
+# `refuse_operands` is a list of globs; `*` matches any run of characters,
+# including none, and every other character is literal. The sub is refused when
+# any glob matches an argument that is not a flag, either side of the `=` in
+# such an argument (`NAME=VALUE`: the name, and the value), or the value of a
+# `--flag=value`. The values of separate valued flags are plain arguments, so
+# they are tested too. Use it on a sub that writes text a later command
+# executes: `mise set FOO='{{ exec(command="id") }}'` stores a template that
+# mise runs the next time it loads the file.
+#
+# It works on any sub, nested ones included, and is read before the sub's
+# flags are checked. It is not read on a `profile` sub, and the build rejects
+# the combination.
+
+# [[command.sub]]
+# name = "set"
+# level = "SafeWrite"
+# valued = ["--file"]
+# refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
+
+# ─────────────────────────────────────────────────────────────────────
 # REQUIRE ANY — subcommand needs at least one of several flags
 # ─────────────────────────────────────────────────────────────────────
 #

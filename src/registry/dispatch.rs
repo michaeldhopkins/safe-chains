@@ -48,7 +48,7 @@ fn dispatch_first_arg(
     if !matches {
         return Verdict::Denied;
     }
-    if super::glob_presents_unlisted_flag(tokens, 2, standalone, valued, loopback_valued) {
+    if super::glob_flags::glob_presents_unlisted_flag(tokens, 2, standalone, valued, loopback_valued) {
         return Verdict::Denied;
     }
     Verdict::Allowed(level)
@@ -107,14 +107,14 @@ fn dispatch_branching(
         }
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
-        return super::glob_flags::gated(&tokens[start..], sub, || dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS));
+        return dispatch_sub(&tokens[start..], sub);
     }
     // A per-database variant: `db:migrate:primary` is `db:migrate` aimed at one of the databases
     // it would otherwise migrate all of. Only subs that OPT IN (`per_database`) match this way,
     // and only for a single trailing plain identifier — see `TomlSub::per_database` for why the
     // set cannot be enumerated and why inheriting the base's classification cannot widen it.
     if let Some(sub) = per_database_variant(subs, arg) {
-        return super::glob_flags::gated(&tokens[start..], sub, || dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS));
+        return dispatch_sub(&tokens[start..], sub);
     }
     let glob_match = |p: &str| !arg.starts_with('-') && p.strip_suffix('*').map_or(arg == p, |prefix| arg.starts_with(prefix));
     // An argument naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
@@ -124,7 +124,7 @@ fn dispatch_branching(
         return Verdict::Denied;
     }
     if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {
-        if super::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued) {
+        if super::glob_flags::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued) {
             return Verdict::Denied;
         }
         return Verdict::Allowed(glob.level);
@@ -267,9 +267,9 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
     crate::envvars::exported_verdict(tokens[1..].iter().map(Token::as_str)).combine(verdict)
 }
 
-/// A sub's kind, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs).
-pub(super) fn dispatch_sub_kind(tokens: &[Token], kind: &DispatchKind) -> Verdict {
-    dispatch_kind(tokens, kind, &SUB_HANDLERS)
+/// A sub, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs) and for a branching command.
+pub(super) fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
+    super::glob_flags::gated(tokens, sub, || super::operands::unless_refused(tokens, &sub.refuse_operands, || dispatch_kind(tokens, &sub.kind, &SUB_HANDLERS)))
 }
 
 pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {

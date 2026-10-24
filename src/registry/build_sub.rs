@@ -194,6 +194,8 @@ pub(super) fn build_sub(
     let output_path_flags = toml.output_path_flags.clone();
     let loopback_valued = toml.loopback_valued.clone();
     let loopback_effect = if toml.loopback_localizes.unwrap_or(false) { LoopbackEffect::Localizes } else { LoopbackEffect::AdmitOnly };
+    let refuse_operands = toml.refuse_operands.clone();
+    crate::registry::operands::check_declaration(parent, &name, &refuse_operands, profile.is_some())?;
     assert_loopback_localizes_is_coherent(parent, &name, &toml)?;
     let valued_for_check = toml.valued.clone();
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags)?;
@@ -225,6 +227,7 @@ pub(super) fn build_sub(
         destination_flag,
         loopback_valued,
         loopback_effect,
+        refuse_operands,
         output_path_flags,
         flag_values,
     })
