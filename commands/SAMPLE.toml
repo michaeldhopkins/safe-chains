@@ -339,7 +339,7 @@
 # bare = false
 # max_positional = 0
 # standalone = ["--check", "--files-with-diff", "-l", "-q", "-v"]
-# valued = ["--color", "--config", "--edition", "--style-edition"]
+# valued = ["--color", "--edition", "--style-edition"]
 
 # ─────────────────────────────────────────────────────────────────────
 # NESTED SUBCOMMANDS — subcommand has its own subcommands

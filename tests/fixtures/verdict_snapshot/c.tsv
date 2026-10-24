@@ -1059,6 +1059,9 @@ cargo fetch -v	safe-write
 cargo fetch x	safe-write
 cargo fix	denied
 cargo fmt	safe-write
+cargo fmt -- --check --config emit_mode=files	denied
+cargo fmt -- --check --config make_backup=true	denied
+cargo fmt -- --check --config=make_backup=true	denied
 cargo fmt -- --check --edition 2024	safe-read
 cargo fmt -- --check --edition 2024 --color never	safe-read
 cargo fmt -- --check /tmp/evil.rs	denied
@@ -1066,6 +1069,7 @@ cargo fmt -- --check src/lib.rs	denied
 cargo fmt -- /tmp/evil.rs	denied
 cargo fmt --all	safe-write
 cargo fmt --all -- --check	safe-read
+cargo fmt --all -- --check --config make_backup=true	denied
 cargo fmt --all -- --emit files	denied
 cargo fmt --all -- --print-config default /tmp/rustfmt.toml	denied
 cargo fmt --all -- -l	denied
