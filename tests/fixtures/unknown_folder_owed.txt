@@ -124,8 +124,6 @@ bison grammar.y
 bison x
 bitcode_strip
 bitcode_strip x
-borg check
-borg config
 brakeman
 brotli
 brotli x

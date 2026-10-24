@@ -35,8 +35,6 @@
 #   xattr -w                  `-w NAME VALUE FILE`: the probe's tokens land as the attribute NAME
 #                             and VALUE, so no file is touched. Same artifact already noted for
 #                             xattr on the output-flag worklist.
-borg check	--repair
-borg config	--delete
 depcruise	--init
 gomodifytags	--w
 gomodifytags	-w

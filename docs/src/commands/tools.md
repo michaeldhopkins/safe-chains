@@ -266,8 +266,8 @@ Aliases: `@biomejs/biome`
 ### `borg`
 <p class="cmd-url"><a href="https://borgbackup.readthedocs.io/en/stable/usage/general.html">https://borgbackup.readthedocs.io/en/stable/usage/general.html</a></p>
 
-- **check**: Flags: --archives-only, --help, --repair, --repository-only, --save-space, --verify-data, -h. Valued: --first, --last, --match-archives, --max-duration, --prefix, --sort-by, -a. Positional args accepted
-- **config**: Flags: --cache, --delete, --help, --list, -c, -h. Positional args accepted
+- **check**: Flags: --archives-only, --help, --repository-only, --save-space, --verify-data, -h. Valued: --first, --last, --match-archives, --max-duration, --prefix, --sort-by, -a. Positional args accepted
+- **config**: Flags: --cache, --help, --list, -c, -h
 - **diff**: Flags: --exclude-caches, --help, --json-lines, --numeric-ids, --sort, -h. Valued: --exclude, --exclude-from, --exclude-if-present, --patterns-from. Positional args accepted
 - **help**: Positional args accepted
 - **info**: Flags: --help, --json, -h. Valued: --exclude, --exclude-from, --first, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted

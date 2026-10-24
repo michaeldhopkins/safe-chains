@@ -1,6 +1,6 @@
 [[command]]
 name = "borg"
-description = "BorgBackup — deduplicating backup tool. Most subcommands contact the configured repository (local path or remote SSH — network for remote). Read-side: `info`, `list`, `extract --dry-run`, `check --verify-data`, `version`, `help`, `mount` (FUSE — interactive). Write-side: `init`, `create`, `delete`, `prune`, `recreate`, `compact`, `key`, `serve`, `umount`, `with-lock`, `import-tar`, `export-tar`."
+description = "BorgBackup — deduplicating backup tool. Most subcommands contact the configured repository (local path or remote SSH — network for remote). Read-side: `info`, `list`, `extract --dry-run`, `check --verify-data`, `version`, `help`, `mount` (FUSE — interactive). Write-side: `init`, `create`, `delete`, `prune`, `recreate`, `compact`, `key`, `serve`, `umount`, `with-lock`, `import-tar`, `export-tar`. `check --repair` rewrites the repository to fix what it finds; `config` changes a repository or cache setting when given a value or `--delete` (`-d`)."
 url = "https://borgbackup.readthedocs.io/en/stable/usage/general.html"
 researched_version = "borgbackup 1.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
@@ -23,6 +23,13 @@ examples_denied = [
     "borg --bypass-lock serve version",
     "BORG_PASSCOMMAND=/tmp/evil borg list repo",
     "borg config repo append_only 0",
+    "borg config -d repo k",
+    "borg config --delete ~/repo k",
+    "borg config --delete repo",
+    "borg config -d repo",
+    "borg config -l -d repo",
+    "borg check --repair repo",
+    "borg check --repair --archives-only repo",
 ]
 
 [command.wrapper]
@@ -72,17 +79,14 @@ name = "check"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--archives-only", "--help", "--repair", "--repository-only", "--save-space", "--verify-data", "-h"]
+standalone = ["--archives-only", "--help", "--repository-only", "--save-space", "--verify-data", "-h"]
 valued = ["--first", "--last", "--match-archives", "--max-duration", "--prefix", "--sort-by", "-a"]
-write_flags = ["--repair"]
 
 [[command.sub]]
 name = "config"
 level = "SafeRead"
 bare = false
-tolerate_unknown_short = true
-standalone = ["--cache", "--delete", "--help", "--list", "-c", "-h"]
-write_flags = ["--delete"]
+standalone = ["--cache", "--help", "--list", "-c", "-h"]
 max_positional = 2
 
 [[command.sub]]

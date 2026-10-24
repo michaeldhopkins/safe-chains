@@ -312,8 +312,6 @@ bazel aquery	--output
 bazel cquery	--output
 bazel query	--output
 bombardier	-o
-borg check	--repair
-borg config	--delete
 cargo udeps	--output
 cjpeg	-o
 clever activity	-o

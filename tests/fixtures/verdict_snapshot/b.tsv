@@ -813,7 +813,8 @@ borg check --last x	safe-read
 borg check --match-archives x	safe-read
 borg check --max-duration x	safe-read
 borg check --prefix x	safe-read
-borg check --repair	safe-write
+borg check --repair --archives-only repo	denied
+borg check --repair repo	denied
 borg check --repository-only	safe-read
 borg check --save-space	safe-read
 borg check --sort-by x	safe-read
@@ -826,13 +827,17 @@ borg compact	denied
 borg compact x	denied
 borg config	denied
 borg config --cache	safe-read
-borg config --cache --delete	safe-write
+borg config --cache --help	safe-read
 borg config --cache x	safe-read
-borg config --delete	safe-write
+borg config --delete repo	denied
+borg config --delete ~/repo k	denied
 borg config --help	safe-read
 borg config --list	safe-read
 borg config -c	safe-read
+borg config -d repo	denied
+borg config -d repo k	denied
 borg config -h	safe-read
+borg config -l -d repo	denied
 borg config repo	safe-read
 borg config repo append_only	safe-read
 borg config repo append_only 0	denied
