@@ -69,6 +69,12 @@ examples_denied = [
     'mise set _{\.,}source=./x.sh',
     'mise use node@{\{x}}',
     'mise u cargo:rg{\[,}x',
+    "mise set --file ~/.config/mise/conf.d/x.toml FOO=bar",
+    "mise set --file=/etc/mise/config.toml FOO=bar",
+    "mise unset --file ~/.config/mise/config.toml FOO",
+    "mise use --path ~/.config/mise/config.toml node@20",
+    "mise u -p ~/mise.toml node@20",
+    "mise use --cd ~ node@20",
 ]
 
 [[command.sub]]

@@ -450,10 +450,6 @@ minikube addons list	--profile	untriaged	-	-	-
 minikube ip	--profile	untriaged	-	-	-	
 minikube service list	--profile	untriaged	-	-	-	
 minikube status	--profile	untriaged	-	-	-	
-mise set	--file	pending-gate	configure	user	reconfiguring	writes the TOML file it names, which can be any path
-mise u	--path	pending-gate	configure	user	reconfiguring	writes the config file it names, which can be any path
-mise unset	--file	pending-gate	configure	user	reconfiguring	edits the TOML file it names, which can be any path
-mise use	--path	pending-gate	configure	user	reconfiguring	writes the config file it names, which can be any path
 mkcert	--p12-file	untriaged	-	-	-	
 mkcert	-p12-file	untriaged	-	-	-	
 mktemp	--tmpdir	untriaged	-	-	-	

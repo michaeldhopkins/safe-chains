@@ -810,6 +810,22 @@ positional = "write"
 [roles."swiftlint autocorrect"]
 positional = "write"
 
+# `mise set --file F`, `mise unset --file F` and `mise use --path F` rewrite the TOML file F, which
+# need not be a mise config at all, and `mise use --cd DIR` writes DIR's mise.toml. Without a role
+# `mise set --file ~/.config/mise/conf.d/x.toml …` reconfigured every project. `-f` on set is not a
+# mise flag but is declared valued there, so it is gated with `--file`.
+[roles."mise set"]
+flags = { "--file" = "write", "-f" = "write" }
+
+[roles."mise unset"]
+flags = { "--file" = "write", "-f" = "write" }
+
+[roles."mise use"]
+flags = { "--path" = "write", "-p" = "write", "--cd" = "write" }
+
+[roles."mise u"]
+flags = { "--path" = "write", "-p" = "write", "--cd" = "write" }
+
 # `git diff` prints the CONTENT of the files it is given, and with two paths outside the worktree it
 # stops being a VCS command at all: `git diff --no-index /etc/shadow /dev/null` renders a credential
 # file into the caller's context as a unified diff. git engages that mode implicitly too — its own

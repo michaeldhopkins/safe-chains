@@ -3642,8 +3642,7 @@ predate that work. The unknown folder refuses all of them.
 - **A run-time item is judged by a stand-in name.** `echo .git/hooks/pre-commit | xargs touch` and
   `ls -A | while read f; do echo x >> "$f"; done` are approved in a project: the xargs or loop item
   is classified as an ordinary name, while the real item can be a hook or `.envrc`.
-- **A path in a flag or an environment variable a resolver does not gate.** `mise set --file
-  ~/.zshrc FOO=1`, `mise use --path .envrc node@20`, `GIT_INDEX_FILE=.envrc git add .`.
+- **A path in an environment variable a resolver does not gate.** `GIT_INDEX_FILE=.envrc git add .`.
 - **A brace-expanded redirect target.** `echo x > {.,}envrc` is approved; zsh's MULTIOS writes it
   to `.envrc` (bash refuses it as an ambiguous redirect).
 
@@ -3666,6 +3665,6 @@ Dropping the two flags would deny rule lines such as `echo "--- section ---"`, w
 
 What is missing is either a local caller-inline execution archetype, or a wrapper declaration on a subcommand (as `watchexec` has at command level) that classifies the inner command from `-x`, `-s` and the `--` tail. Until then `watch` keeps `candidate = true`, the archetype test would otherwise need a new neighbour annotation, and `tests/fixtures/research_target_owed.tsv` pins cargo as owing `profiled`. cargo-watch itself is in maintenance mode (last release 8.5.3, 2024-10-02), so it is not urgent.
 
-## `mise set` and `mise use` write to a file named by a flag, or to the global config
+## `mise use -g` and `mise set -g` write the global config
 
-`--file` (`set`, `unset`), `--path` and `-p` (`use`) take a value in mise and are declared that way, but the path they name is not gated: `mise set --file ~/.zshrc FOO=1` and `mise use --path .envrc node@20` are approved, as are `mise use -g`, `mise set -g` and `mise set --file ~/.config/mise/config.toml`, which write the global config outside the project. Each is recorded in `tests/fixtures/path_named_flag_facets.tsv` as `pending-gate`. The fix is a path role on those flags (a write at the file's locus), and a decision on whether `-g` and `--override` stay approved. `mise trust` stays approved on purpose: `install` and `exec` trust their active config themselves, so the content the write subs accept is what is gated (`refuse_operands` on `set`, `use` and `u`).
+`--file` (`set`, `unset`), `--path`, `-p` and `--cd` (`use`, `u`) are gated as writes at the locus they name (`pathgates.toml`), but `mise use -g node@20` and `mise set -g FOO=1` still write `~/.config/mise/config.toml`, which every project reads, and are approved. A decision: whether `-g` stays approved (`--override` is unlisted). `mise trust` stays approved on purpose: `install` and `exec` trust their active config themselves, so the content the write subs accept is what is gated (`refuse_operands` on `set`, `use` and `u`).

@@ -1596,7 +1596,9 @@ mise set -- _.source=./x.sh	denied
 mise set --env x	safe-write
 mise set --file ./mise.toml FOO='{{ exec(command="touch pwned") }}'	denied
 mise set --file ./mise.toml FOO=bar	safe-write
+mise set --file ~/.config/mise/conf.d/x.toml FOO=bar	denied
 mise set --file='./mise.toml' 'FOO={{ exec(command="id") }}'	denied
+mise set --file=/etc/mise/config.toml FOO=bar	denied
 mise set --global --env x	safe-write
 mise set --global --help	safe-write
 mise set --global x	safe-write
@@ -1858,6 +1860,7 @@ mise u -g	safe-write
 mise u -h	safe-write
 mise u -p ./mise.toml ruby@4.0.3	safe-write
 mise u -p x	safe-write
+mise u -p ~/mise.toml node@20	denied
 mise u -q	safe-write
 mise u -v	safe-write
 mise u cargo:rg{\\[,}x	denied
@@ -1876,6 +1879,7 @@ mise uninstall ruby@4	safe-write
 mise uninstall x	safe-write
 mise unset	safe-write
 mise unset --file x	safe-write
+mise unset --file ~/.config/mise/config.toml FOO	denied
 mise unset --global	safe-write
 mise unset --global --file x	safe-write
 mise unset --global --help	safe-write
@@ -1931,6 +1935,7 @@ mise use 'cargo:ripgrep[features=pcre2]'	denied
 mise use 'node@{# x #}'	denied
 mise use 'node@{{ exec(command="id") }}'	denied
 mise use --cd x	safe-write
+mise use --cd ~ node@20	denied
 mise use --env x	safe-write
 mise use --force	safe-write
 mise use --force --cd x	safe-write
@@ -1941,6 +1946,7 @@ mise use --global	safe-write
 mise use --help	safe-write
 mise use --path ./mise.toml ruby@4.0.3	safe-write
 mise use --path x	safe-write
+mise use --path ~/.config/mise/config.toml node@20	denied
 mise use --pin	safe-write
 mise use --quiet	safe-write
 mise use --remove	safe-write

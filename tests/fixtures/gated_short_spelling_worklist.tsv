@@ -53,6 +53,7 @@ jest	-o	--outputFile
 jest	-t	--testRunner
 kinit	-p	--password-file
 kustomize	-h	--helm-command
+mise	-c	--cd
 mkdocs	-c	--config-file
 mkdocs	-s	--site-dir
 mocha	-c	--config
