@@ -42,6 +42,9 @@ pub(super) fn skip_pre_flags(
         if !s.starts_with('-') {
             break;
         }
+        if pre_valued.contains_flag(s) && pre_standalone.contains_flag(s) {
+            break;
+        }
         if pre_valued.contains_flag(s) {
             i += 2;
             continue;
@@ -112,6 +115,25 @@ mod tests {
             words.push("rest".into());
             let tokens: Vec<Token> = words.iter().map(|w| Token::from_test(w)).collect();
             prop_assert_eq!(skip_pre_flags(&tokens, &standalone, &valued, false, 1), flags_end, "{:?}", words);
+        }
+
+        /// A bare flag listed both standalone and valued stops the skip at itself, so neither the
+        /// word after it nor the one after that is taken for the subcommand.
+        #[test]
+        fn a_flag_listed_both_ways_stops_the_skip_at_itself(
+            before in prop::collection::vec(prop::sample::select(vec!["-v", "--verbose"]), 0..4),
+            dual in prop::sample::select(vec!["-l", "--lock"]),
+        ) {
+            let standalone = vec!["-v".to_string(), "--verbose".to_string(), "-l".to_string(), "--lock".to_string()];
+            let valued = vec!["-l".to_string(), "--lock".to_string()];
+            let mut words: Vec<String> = vec!["borg".into()];
+            words.extend(before.iter().map(|w| w.to_string()));
+            let at = words.len();
+            words.extend([dual.to_string(), "delete".into(), "info".into()]);
+            let tokens: Vec<Token> = words.iter().map(|w| Token::from_test(w)).collect();
+            prop_assert_eq!(skip_pre_flags(&tokens, &standalone, &valued, false, 1), at, "{:?}", words);
+            let glued: Vec<Token> = ["borg", &format!("{dual}=5"), "info"].iter().map(|w| Token::from_test(w)).collect();
+            prop_assert_eq!(skip_pre_flags(&glued, &standalone, &valued, false, 1), 2);
         }
     }
 }

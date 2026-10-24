@@ -7,7 +7,7 @@ static MVN_STANDALONE: WordSet = WordSet::new(&[
     "--fail-fast", "--fail-never", "--no-transfer-progress",
     "--offline", "--quiet", "--show-version",
     "--strict-checksums", "--update-snapshots",
-    "-B", "-U", "-X", "-e", "-f", "-o", "-q",
+    "-B", "-U", "-X", "-e", "-o", "-q",
 ]);
 
 static MVN_VALUED: WordSet = WordSet::new(&[
