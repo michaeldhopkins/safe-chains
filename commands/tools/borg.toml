@@ -10,17 +10,34 @@ examples_safe = [
     "borg list repo",
     "borg info repo",
     "borg version",
+    "borg --bypass-lock list repo",
+    "borg --lock-wait 5 list repo",
+    "borg list --first 3 repo",
+    "borg list --format '{name}' repo",
+    "borg check --archives-only repo",
+    "borg config repo append_only",
+]
+examples_denied = [
+    "borg --bypass-lock delete info ./repo",
+    "borg --bypass-lock create check ./repo::a /",
+    "borg --bypass-lock serve version",
+    "BORG_PASSCOMMAND=/tmp/evil borg list repo",
+    "borg config repo append_only 0",
 ]
 
 [command.wrapper]
-standalone = ["--bypass-lock", "--consider-checkpoints", "--debug", "--info", "--lock-wait", "--no-cache-sync", "--progress", "--show-rc", "--show-version", "--verbose", "--warning"]
-valued = ["--bypass-lock", "--debug-topic", "--lock-wait", "--remote-path", "--remote-ratelimit", "--rsh", "--umask"]
+standalone = ["--bypass-lock", "--consider-checkpoints", "--debug", "--info", "--no-cache-sync", "--progress", "--show-rc", "--show-version", "--verbose", "--warning"]
+valued = ["--debug-topic", "--lock-wait", "--remote-path", "--remote-ratelimit", "--rsh", "--umask"]
 
 # `--rsh` is the command borg RUNS to reach the repository (default `ssh`), and `--remote-path`
 # is the borg executable invoked on the far side. Both name a program, so both take the executor
 # gate: `read`/`write` would admit `/tmp`, which is exactly where a fetched script lands.
+# `--patterns-from` and `--exclude-from` name a local file borg opens and reads line by line.
+# `-e`/`--exclude` take a pattern, not a file; they are gated `read` as well so the short spelling
+# beside `--exclude-from` is never the ungated one, which can only refuse a pattern spelled like a
+# sensitive path.
 [command.path_gate]
-flags = { "--rsh" = "exec", "--remote-path" = "exec" }
+flags = { "--rsh" = "exec", "--remote-path" = "exec", "--patterns-from" = "read", "--exclude-from" = "read", "--exclude" = "read", "-e" = "read" }
 
 [[command.sub]]
 name = "version"
@@ -31,7 +48,7 @@ name = "info"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--first", "--help", "--json", "--last", "--sort-by", "-h"]
+standalone = ["--help", "--json", "-h"]
 valued = ["--exclude", "--exclude-from", "--first", "--last", "--match-archives", "--patterns-from", "--sort-by", "-a", "-e"]
 
 [[command.sub]]
@@ -39,7 +56,7 @@ name = "list"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--first", "--format", "--help", "--json", "--json-lines", "--last", "--short", "--sort-by", "-h"]
+standalone = ["--help", "--json", "--json-lines", "--short", "-h"]
 valued = ["--exclude", "--exclude-from", "--first", "--format", "--last", "--match-archives", "--patterns-from", "--sort-by", "-a", "-e"]
 
 [[command.sub]]
@@ -47,16 +64,16 @@ name = "diff"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--help", "--json-lines", "--numeric-ids", "--sort", "-h"]
-valued = ["--exclude", "--exclude-from", "--patterns-from", "--exclude-caches", "--exclude-if-present"]
+standalone = ["--exclude-caches", "--help", "--json-lines", "--numeric-ids", "--sort", "-h"]
+valued = ["--exclude", "--exclude-from", "--exclude-if-present", "--patterns-from"]
 
 [[command.sub]]
 name = "check"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--archives-only", "--first", "--help", "--last", "--repair", "--repository-only", "--save-space", "--sort-by", "--verify-data", "-h"]
-valued = ["--archives-only", "--first", "--last", "--match-archives", "--max-duration", "--prefix", "--sort-by", "-a"]
+standalone = ["--archives-only", "--help", "--repair", "--repository-only", "--save-space", "--verify-data", "-h"]
+valued = ["--first", "--last", "--match-archives", "--max-duration", "--prefix", "--sort-by", "-a"]
 write_flags = ["--repair"]
 
 [[command.sub]]
@@ -66,6 +83,7 @@ bare = false
 tolerate_unknown_short = true
 standalone = ["--cache", "--delete", "--help", "--list", "-c", "-h"]
 write_flags = ["--delete"]
+max_positional = 2
 
 [[command.sub]]
 name = "help"

@@ -147,19 +147,6 @@ biber	--output-indent
 biber	--output-resolve
 biber	--output-safecharsset
 biber	--recodedata
-borg [wrapper]	--bypass-lock
-borg [wrapper]	--lock-wait
-borg check	--archives-only
-borg check	--first
-borg check	--last
-borg check	--sort-by
-borg info	--first
-borg info	--last
-borg info	--sort-by
-borg list	--first
-borg list	--format
-borg list	--last
-borg list	--sort-by
 brotli	--quality
 brotli	--suffix
 brotli	--window

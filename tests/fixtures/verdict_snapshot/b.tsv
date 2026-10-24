@@ -1,3 +1,4 @@
+BORG_PASSCOMMAND=/tmp/evil borg list repo	denied
 b2sum	inert
 b2sum --binary	inert
 b2sum --binary --check	inert
@@ -765,17 +766,24 @@ bombardier -v	safe-read
 bombardier x	safe-read
 borg	denied
 borg --bypass-lock	denied
-borg --bypass-lock --bypass-lock x	denied
 borg --bypass-lock --consider-checkpoints	denied
+borg --bypass-lock --debug-topic x	denied
+borg --bypass-lock create check ./repo::a /	denied
+borg --bypass-lock delete info ./repo	denied
+borg --bypass-lock list repo	safe-read
+borg --bypass-lock serve version	denied
 borg --bypass-lock x	denied
 borg --consider-checkpoints	denied
 borg --debug	denied
 borg --debug-topic x	denied
+borg --exclude x	denied
+borg --exclude-from x	denied
 borg --help	inert
 borg --info	denied
-borg --lock-wait	denied
+borg --lock-wait 5 list repo	safe-read
 borg --lock-wait x	denied
 borg --no-cache-sync	denied
+borg --patterns-from x	denied
 borg --progress	denied
 borg --remote-path x	denied
 borg --remote-ratelimit x	denied
@@ -787,6 +795,7 @@ borg --verbose	denied
 borg --version	inert
 borg --warning	denied
 borg -V	inert
+borg -e x	denied
 borg -h	inert
 borg benchmark	denied
 borg benchmark x	denied
@@ -794,13 +803,12 @@ borg break-lock	denied
 borg break-lock x	denied
 borg check	denied
 borg check --archives-only	safe-read
-borg check --archives-only --archives-only x	safe-read
-borg check --archives-only --first	safe-read
+borg check --archives-only --first x	safe-read
+borg check --archives-only --help	safe-read
+borg check --archives-only repo	safe-read
 borg check --archives-only x	safe-read
-borg check --first	safe-read
 borg check --first x	safe-read
 borg check --help	safe-read
-borg check --last	safe-read
 borg check --last x	safe-read
 borg check --match-archives x	safe-read
 borg check --max-duration x	safe-read
@@ -808,7 +816,6 @@ borg check --prefix x	safe-read
 borg check --repair	safe-write
 borg check --repository-only	safe-read
 borg check --save-space	safe-read
-borg check --sort-by	safe-read
 borg check --sort-by x	safe-read
 borg check --verify-data	safe-read
 borg check -a x	safe-read
@@ -827,6 +834,8 @@ borg config --list	safe-read
 borg config -c	safe-read
 borg config -h	safe-read
 borg config repo	safe-read
+borg config repo append_only	safe-read
+borg config repo append_only 0	denied
 borg config x	safe-read
 borg create	denied
 borg create x	denied
@@ -836,13 +845,13 @@ borg delete	denied
 borg delete x	denied
 borg diff	denied
 borg diff --exclude x	safe-read
+borg diff --exclude-caches	safe-read
+borg diff --exclude-caches --exclude x	safe-read
+borg diff --exclude-caches --help	safe-read
 borg diff --exclude-caches x	safe-read
 borg diff --exclude-from x	safe-read
 borg diff --exclude-if-present x	safe-read
 borg diff --help	safe-read
-borg diff --help --exclude x	safe-read
-borg diff --help --json-lines	safe-read
-borg diff --help x	safe-read
 borg diff --json-lines	safe-read
 borg diff --numeric-ids	safe-read
 borg diff --patterns-from x	safe-read
@@ -860,17 +869,15 @@ borg import-tar x	denied
 borg info	denied
 borg info --exclude x	safe-read
 borg info --exclude-from x	safe-read
-borg info --first	safe-read
-borg info --first --exclude x	safe-read
-borg info --first --help	safe-read
 borg info --first x	safe-read
 borg info --help	safe-read
+borg info --help --exclude x	safe-read
+borg info --help --json	safe-read
+borg info --help x	safe-read
 borg info --json	safe-read
-borg info --last	safe-read
 borg info --last x	safe-read
 borg info --match-archives x	safe-read
 borg info --patterns-from x	safe-read
-borg info --sort-by	safe-read
 borg info --sort-by x	safe-read
 borg info -a x	safe-read
 borg info -e x	safe-read
@@ -884,21 +891,20 @@ borg key x	denied
 borg list	denied
 borg list --exclude x	safe-read
 borg list --exclude-from x	safe-read
-borg list --first	safe-read
-borg list --first --exclude x	safe-read
-borg list --first --format	safe-read
+borg list --first 3 repo	safe-read
 borg list --first x	safe-read
-borg list --format	safe-read
+borg list --format '{name}' repo	safe-read
 borg list --format x	safe-read
 borg list --help	safe-read
+borg list --help --exclude x	safe-read
+borg list --help --json	safe-read
+borg list --help x	safe-read
 borg list --json	safe-read
 borg list --json-lines	safe-read
-borg list --last	safe-read
 borg list --last x	safe-read
 borg list --match-archives x	safe-read
 borg list --patterns-from x	safe-read
 borg list --short	safe-read
-borg list --sort-by	safe-read
 borg list --sort-by x	safe-read
 borg list -a x	safe-read
 borg list -e x	safe-read

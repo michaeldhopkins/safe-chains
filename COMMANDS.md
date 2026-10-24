@@ -2199,12 +2199,12 @@ Aliases: `@biomejs/biome`
 ### `borg`
 <p class="cmd-url"><a href="https://borgbackup.readthedocs.io/en/stable/usage/general.html">https://borgbackup.readthedocs.io/en/stable/usage/general.html</a></p>
 
-- **check**: Flags: --archives-only, --first, --help, --last, --repair, --repository-only, --save-space, --sort-by, --verify-data, -h. Valued: --archives-only, --first, --last, --match-archives, --max-duration, --prefix, --sort-by, -a. Positional args accepted
+- **check**: Flags: --archives-only, --help, --repair, --repository-only, --save-space, --verify-data, -h. Valued: --first, --last, --match-archives, --max-duration, --prefix, --sort-by, -a. Positional args accepted
 - **config**: Flags: --cache, --delete, --help, --list, -c, -h. Positional args accepted
-- **diff**: Flags: --help, --json-lines, --numeric-ids, --sort, -h. Valued: --exclude, --exclude-from, --patterns-from, --exclude-caches, --exclude-if-present. Positional args accepted
+- **diff**: Flags: --exclude-caches, --help, --json-lines, --numeric-ids, --sort, -h. Valued: --exclude, --exclude-from, --exclude-if-present, --patterns-from. Positional args accepted
 - **help**: Positional args accepted
-- **info**: Flags: --first, --help, --json, --last, --sort-by, -h. Valued: --exclude, --exclude-from, --first, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
-- **list**: Flags: --first, --format, --help, --json, --json-lines, --last, --short, --sort-by, -h. Valued: --exclude, --exclude-from, --first, --format, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
+- **info**: Flags: --help, --json, -h. Valued: --exclude, --exclude-from, --first, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
+- **list**: Flags: --help, --json, --json-lines, --short, -h. Valued: --exclude, --exclude-from, --first, --format, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
@@ -2215,6 +2215,12 @@ Aliases: `@biomejs/biome`
 - `borg list repo`
 - `borg info repo`
 - `borg version`
+- `borg --bypass-lock list repo`
+- `borg --lock-wait 5 list repo`
+- `borg list --first 3 repo`
+- `borg list --format '{name}' repo`
+- `borg check --archives-only repo`
+- `borg config repo append_only`
 
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>

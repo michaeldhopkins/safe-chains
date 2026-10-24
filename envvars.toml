@@ -1283,6 +1283,14 @@ single_value = true
 twin_flag = "borg --remote-path {v} list repo"
 twin_base = "borg list repo"
 because = "the borg executable invoked on the far side (the --remote-path twin)"
+[env.BORG_PASSCOMMAND]
+shape = "command"
+because = "borg runs this command and reads the repository passphrase from its output"
+measured = false
+[env.BORG_NEW_PASSCOMMAND]
+shape = "command"
+because = "borg runs this command and reads the new passphrase from its output when a key is created or changed"
+measured = false
 [env.RESTIC_PASSWORD_COMMAND]
 shape = "exec-path"
 single_value = true

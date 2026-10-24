@@ -145,7 +145,7 @@ bitcode_strip	description,examples
 bitcoin-cli	examples
 black	description,examples,version
 bombardier	examples,no-tolerance
-borg	examples,no-overlap,no-tolerance,profiled
+borg	no-tolerance,profiled
 brakeman	description,examples
 branchdiff	description,examples,version
 break	entry
