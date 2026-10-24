@@ -504,6 +504,8 @@ standalone = ["--help", "-h"]
 name = "exec"
 aliases = ["x"]
 delegate_after = "--"
+standalone = ["--raw", "-q", "--quiet", "-v", "--verbose"]
+valued = ["--jobs", "-j"]
 refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]

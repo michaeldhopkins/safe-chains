@@ -270,7 +270,7 @@ pub(super) fn build_sub_kind_unchecked(
         });
     }
     if let Some(sep) = toml.delegate_after {
-        return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
+        return Ok(DispatchKind::DelegateAfterSeparator(DelegateAfter::new(sep, toml.standalone, toml.valued)));
     }
     if let Some(skip) = toml.delegate_skip {
         return Ok(DispatchKind::DelegateSkip { skip });

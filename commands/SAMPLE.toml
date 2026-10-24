@@ -650,7 +650,8 @@
 #
 # delegate_after: Find a separator token (usually "--"), then validate
 #   everything after it as a complete command. Used for
-#   "mise exec -- git status" where the separator is "--".
+#   "mise exec -- git status" where the separator is "--". A flag before
+#   the separator must be one the sub lists in standalone or valued.
 
 # [[command.sub]]
 # name = "run"
@@ -659,6 +660,8 @@
 # [[command.sub]]
 # name = "exec"
 # delegate_after = "--"                  # validate everything after "--"
+# standalone = ["--raw"]                 # flags allowed before "--"
+# valued = ["--jobs"]
 
 # ─────────────────────────────────────────────────────────────────────
 # STRUCTURED + WRAPPER — global flags stripped before sub dispatch

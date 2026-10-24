@@ -15,7 +15,7 @@ fuzz_min_targets = 8
 "src/registry/build.rs" = 1356
 "src/registry/dispatch.rs" = 539
 "src/registry/mod.rs" = 663
-"src/registry/types.rs" = 590
+"src/registry/types.rs" = 589
 
 [pinned_thresholds]
 "cognitive-complexity-threshold" = 30

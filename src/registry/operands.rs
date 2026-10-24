@@ -3,7 +3,7 @@
 use crate::parse::Token;
 use crate::verdict::Verdict;
 
-use super::types::{DispatchKind, SubSpec};
+use super::types::{DelegateAfter, DispatchKind, SubSpec};
 
 pub(super) fn glob_matches(pattern: &str, text: &str) -> bool {
     let (pattern, text) = (pattern.as_bytes(), text.as_bytes());
@@ -63,7 +63,7 @@ pub(super) fn presents_refused_operand(tokens: &[Token], patterns: &[String]) ->
 
 fn own_operands<'a>(tokens: &'a [Token], kind: &DispatchKind) -> &'a [Token] {
     match kind {
-        DispatchKind::DelegateAfterSeparator { separator } => {
+        DispatchKind::DelegateAfterSeparator(DelegateAfter { separator, .. }) => {
             tokens.iter().position(|t| t.as_str() == separator.as_str()).map_or(tokens, |end| &tokens[..end])
         }
         _ => tokens,
@@ -157,7 +157,7 @@ mod tests {
             path.push(sub.name.clone());
             if !sub.refuse_operands.is_empty() {
                 let separator = match &sub.kind {
-                    DispatchKind::DelegateAfterSeparator { separator } => Some(separator.clone()),
+                    DispatchKind::DelegateAfterSeparator(DelegateAfter { separator, .. }) => Some(separator.clone()),
                     _ => None,
                 };
                 out.push((path.clone(), sub.refuse_operands.clone(), separator));

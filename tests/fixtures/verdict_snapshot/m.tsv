@@ -1342,6 +1342,16 @@ mise env x	denied
 mise exec	denied
 mise exec 'node[postinstall=touch pwned]' -- true	denied
 mise exec -- bin/rails db:create	safe-write
+mise exec --jobs x	denied
+mise exec --quiet	denied
+mise exec --quiet --jobs x	denied
+mise exec --quiet --raw	denied
+mise exec --quiet x	denied
+mise exec --raw	denied
+mise exec --verbose	denied
+mise exec -j x	denied
+mise exec -q	denied
+mise exec -v	denied
 mise exec node@path:/tmp/evil -- true	denied
 mise exec x	denied
 mise fmt	denied
@@ -2000,6 +2010,16 @@ mise which -q	inert
 mise which -v	inert
 mise which x	inert
 mise x	denied
+mise x --jobs x	denied
+mise x --quiet	denied
+mise x --quiet --jobs x	denied
+mise x --quiet --raw	denied
+mise x --quiet x	denied
+mise x --raw	denied
+mise x --verbose	denied
+mise x -j x	denied
+mise x -q	denied
+mise x -v	denied
 mise x x	denied
 mix	denied
 mix --help	inert

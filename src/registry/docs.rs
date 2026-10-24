@@ -260,7 +260,7 @@ impl CommandSpec {
                 format!("- Read-only verb chain (`verb [args] {} verb …`). Allowed verbs: {}", spec.separator, verbs.join(", "),)
             }
             DispatchKind::Executor { policy, kind, .. } => describe_executor(policy, *kind),
-            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
+            DispatchKind::DelegateAfterSeparator(_) | DispatchKind::DelegateSkip { .. } => String::new(),
         }
     }
 }
@@ -361,7 +361,7 @@ impl SubSpec {
                     out.push(format!("- **{label}**: {summary}"));
                 }
             }
-            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {
+            DispatchKind::DelegateAfterSeparator(_) | DispatchKind::DelegateSkip { .. } => {
                 out.push(format!("- **{label}**: delegates to inner command"));
             }
             DispatchKind::Custom { doc_body, .. } => {

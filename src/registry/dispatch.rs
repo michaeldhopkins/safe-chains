@@ -1,6 +1,7 @@
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 mod credential_args;
+pub(super) mod delegate;
 mod pre_flags;
 use super::policy::{check_owned, flag_given};
 use super::types::*;
@@ -232,18 +233,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             }
             write_flagged(tokens, *base_level, write_flags)
         }
-        DispatchKind::DelegateAfterSeparator { separator } => {
-            let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
-            let Some(pos) = sep_pos else {
-                return Verdict::Denied;
-            };
-            let inner_start = pos + 2;
-            if inner_start >= tokens.len() {
-                return Verdict::Denied;
-            }
-            let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
-            crate::command_verdict(&inner)
-        }
+        DispatchKind::DelegateAfterSeparator(delegate) => delegate.verdict(tokens),
         DispatchKind::DelegateSkip { skip } => {
             if tokens.len() <= *skip {
                 return Verdict::Denied;

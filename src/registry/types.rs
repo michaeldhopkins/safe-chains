@@ -1,3 +1,4 @@
+pub(crate) use super::dispatch::delegate::DelegateAfter;
 use serde::Deserialize;
 
 use crate::verdict::SafetyLevel;
@@ -476,9 +477,7 @@ pub(super) enum DispatchKind {
         base_level: SafetyLevel,
         write_flags: Vec<String>,
     },
-    DelegateAfterSeparator {
-        separator: String,
-    },
+    DelegateAfterSeparator(DelegateAfter),
     DelegateSkip {
         skip: usize,
     },
