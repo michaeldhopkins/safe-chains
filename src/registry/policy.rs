@@ -639,3 +639,127 @@ mod flag_given_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod passthrough_tests {
+    use super::*;
+    use crate::policy::FlagTolerance;
+    use proptest::prelude::*;
+
+    fn spec() -> OwnedPolicy {
+        let inner = |standalone: &[&str], valued: &[&str]| OwnedPolicy {
+            standalone: standalone.iter().map(|s| s.to_string()).collect(),
+            valued: valued.iter().map(|s| s.to_string()).collect(),
+            bare: false,
+            max_positional: Some(0),
+            min_positional: None,
+            tolerance: FlagTolerance::strict(),
+            passthrough: None,
+        };
+        let mut outer = inner(&["--all"], &["-p"]);
+        outer.bare = true;
+        outer.passthrough = Some(Box::new(PassthroughSpec {
+            policy: inner(&["--check", "--quiet", "-l"], &["--edition", "--color"]),
+            require_any: vec!["--check".to_string()],
+            level: SafetyLevel::SafeRead,
+        }));
+        outer
+    }
+
+    fn verdict(words: &[String]) -> Verdict {
+        let tokens: Vec<Token> = words.iter().cloned().map(Token::from_raw).collect();
+        check_with_passthrough(&tokens, &spec(), SafetyLevel::SafeWrite)
+    }
+
+    /// One whole unit of the passthrough grammar: a standalone flag or a valued flag with its value.
+    fn allowed_unit() -> impl Strategy<Value = Vec<&'static str>> {
+        prop_oneof![
+            prop::sample::select(vec!["--quiet", "-l", "--check"]).prop_map(|f| vec![f]),
+            prop::sample::select(vec!["--edition", "--color"])
+                .prop_flat_map(|f| { prop::sample::select(vec!["2024", "never", "always"]).prop_map(move |v| vec![f, v]) }),
+        ]
+    }
+
+    /// A token the passthrough lists do not hold: an unknown flag, a path or a bare word.
+    fn outsider() -> impl Strategy<Value = String> {
+        prop_oneof![
+            "--[a-z]{3,8}".prop_filter("not a listed flag", |f| !["--check", "--quiet", "--edition", "--color"].contains(&f.as_str())),
+            "-[a-km-z]{1,3}",
+            "[a-z]{1,6}(\\.rs)?",
+            "(/|~/)[a-z]{1,6}",
+            prop::sample::select(vec![
+                "--emit".to_string(),
+                "--backup".to_string(),
+                "--config=emit_mode=files".to_string(),
+                "--print-config".to_string(),
+            ]),
+        ]
+    }
+
+    fn assemble(units: &[Vec<&str>], outsider_at: Option<(usize, String)>) -> Vec<String> {
+        let mut words: Vec<String> = ["cmd", "--all", "--"].iter().map(|s| s.to_string()).collect();
+        words.push("--check".to_string());
+        for (i, unit) in units.iter().enumerate() {
+            if let Some((at, word)) = &outsider_at
+                && *at == i
+            {
+                words.push(word.clone());
+            }
+            words.extend(unit.iter().map(|s| s.to_string()));
+        }
+        if let Some((at, word)) = outsider_at
+            && at >= units.len()
+        {
+            words.push(word);
+        }
+        words
+    }
+
+    proptest! {
+        /// Never Allowed when the tail holds a token outside the passthrough lists, wherever it sits.
+        #[test]
+        fn a_tail_token_outside_the_passthrough_lists_is_never_allowed(
+            units in prop::collection::vec(allowed_unit(), 0..5),
+            at in 0usize..6,
+            word in outsider(),
+        ) {
+            let words = assemble(&units, Some((at, word)));
+            prop_assert_eq!(verdict(&words), Verdict::Denied, "{:?}", words);
+        }
+
+        /// The same tails without the outsider are approved at the passthrough's level, so the
+        /// property above cannot pass by denying everything.
+        #[test]
+        fn a_tail_of_listed_flags_with_the_guard_is_allowed_at_the_passthrough_level(
+            units in prop::collection::vec(allowed_unit(), 0..5),
+        ) {
+            let words = assemble(&units, None);
+            prop_assert_eq!(verdict(&words), Verdict::Allowed(SafetyLevel::SafeRead), "{:?}", words);
+        }
+
+        /// A valued flag at the end of the tail with no value is never Allowed.
+        #[test]
+        fn a_valued_flag_with_no_value_in_the_tail_is_never_allowed(
+            units in prop::collection::vec(allowed_unit(), 0..4),
+            flag in prop::sample::select(vec!["--edition", "--color"]),
+        ) {
+            let mut words = assemble(&units, None);
+            words.push(flag.to_string());
+            prop_assert_eq!(verdict(&words), Verdict::Denied, "{:?}", words);
+        }
+
+        /// A second `--` anywhere in the tail is never Allowed.
+        #[test]
+        fn a_second_separator_is_never_allowed(units in prop::collection::vec(allowed_unit(), 0..4)) {
+            let mut words = assemble(&units, None);
+            words.push("--".to_string());
+            prop_assert_eq!(verdict(&words), Verdict::Denied, "{:?}", words);
+        }
+    }
+
+    #[test]
+    fn an_unvalued_valued_flag_before_the_separator_is_denied() {
+        let words: Vec<String> = ["cmd", "-p", "--", "--check"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(verdict(&words), Verdict::Denied);
+    }
+}

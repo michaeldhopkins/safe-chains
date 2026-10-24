@@ -457,6 +457,10 @@ owed = [
 ]
 "src/registry/docs.rs" = []
 "src/registry/policy.rs" = [
+  "a_tail_token_outside_the_passthrough_lists_is_never_allowed",
+  "a_tail_of_listed_flags_with_the_guard_is_allowed_at_the_passthrough_level",
+  "a_valued_flag_with_no_value_in_the_tail_is_never_allowed",
+  "a_second_separator_is_never_allowed",
   "first_positional_and_first_positional_at_agree_on_the_returned_string",
   "first_positional_at_index_points_at_the_returned_token",
   "first_positional_with_empty_grammars_matches_a_simple_scan",
