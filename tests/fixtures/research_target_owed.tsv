@@ -1509,7 +1509,7 @@ xclip	description,examples,no-overlap,no-tolerance
 xcode-select	examples,version
 xcodebuild	description,examples,no-tolerance
 xcresulttool	examples,profiled
-xcrun	description,examples,no-tolerance,profiled
+xcrun	description,no-tolerance,profiled
 xctest	description,examples
 xctrace	description,examples,profiled
 xgettext	description,examples,no-tolerance

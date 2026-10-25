@@ -484,6 +484,7 @@ xcresulttool version x	denied
 xcresulttool x	denied
 xcrun	denied
 xcrun --find	denied
+xcrun --find clang	inert
 xcrun --find x	inert
 xcrun --help	inert
 xcrun --help --log	inert
@@ -505,7 +506,13 @@ xcrun --show-sdk-version	inert
 xcrun --show-sdk-version x	inert
 xcrun --show-toolchain-path	inert
 xcrun --show-toolchain-path x	inert
+xcrun --toolchain ./Toolchains/Local.xctoolchain --find swift	inert
+xcrun --toolchain /tmp/evil --find clang	denied
+xcrun --toolchain /tmp/evil swift-format lint Sources/	denied
+xcrun --toolchain default --find swift	inert
 xcrun --toolchain x	denied
+xcrun --toolchain=/tmp/evil --show-sdk-path	denied
+xcrun --toolchain=/tmp/evil swift-format lint Sources/	denied
 xcrun --verbose	denied
 xcrun --version	inert
 xcrun -h	inert

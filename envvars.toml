@@ -1060,6 +1060,16 @@ single_value = true
 twin_flag = "rsync -e {v} ./src/ ./dst/"
 twin_base = "rsync ./src/ ./dst/"
 because = "the remote shell rsync executes (the --rsh/-e twin)"
+[env.DEVELOPER_DIR]
+shape = "exec-path"
+single_value = true
+because = "retargets the developer directory xcrun and the /usr/bin/git, clang and swift stubs dispatch into"
+[env.TOOLCHAINS]
+shape = "exec-path"
+single_value = true
+twin_flag = "xcrun --toolchain {v} swift-format lint Sources/"
+twin_base = "xcrun swift-format lint Sources/"
+because = "selects the xctoolchain xcrun dispatches tools from (the --toolchain twin)"
 [env.KUBECONFIG]
 shape = "exec-path"
 because = "a kubeconfig can carry a users[].user.exec credential plugin the client RUNS (the --kubeconfig twin)"

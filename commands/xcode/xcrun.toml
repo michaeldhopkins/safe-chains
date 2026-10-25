@@ -4,6 +4,23 @@ description = "macOS developer tool dispatcher that locates and executes tools w
 url = "https://ss64.com/mac/xcrun.html"
 researched_version = "Xcode 16 / xcrun 16.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+  "xcrun --find clang",
+  "xcrun --show-sdk-path",
+  "xcrun --toolchain default --find swift",
+  "xcrun --toolchain ./Toolchains/Local.xctoolchain --find swift",
+  "xcrun swift-format lint Sources/",
+]
+examples_denied = [
+  "xcrun --toolchain /tmp/evil --find clang",
+  "xcrun --toolchain=/tmp/evil --show-sdk-path",
+  "xcrun --toolchain /tmp/evil swift-format lint Sources/",
+  "xcrun --toolchain=/tmp/evil swift-format lint Sources/",
+]
+
+[command.path_gate]
+flags = { "--toolchain" = "exec" }
+
 [command.wrapper]
 standalone = ["-l", "-n", "-v", "--log", "--no-cache", "--verbose"]
 valued = ["--sdk", "--toolchain"]

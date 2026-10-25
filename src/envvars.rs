@@ -442,7 +442,7 @@ mod tests {
                 "{listy} stopped splitting; an out-of-workspace element now rides in behind a prefix"
             );
         }
-        for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH", "RUSTFMT"] {
+        for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH", "RUSTFMT", "DEVELOPER_DIR", "TOOLCHAINS"] {
             assert!(!assignment_verdict(single, "/tmp/evil").is_allowed(), "{single} must still refuse a foreign executor");
             assert!(assignment_verdict(single, "ssh").is_allowed(), "{single} must still accept a bare name on $PATH");
         }
@@ -651,6 +651,8 @@ mod integration_tests {
             ("RUSTDOC=/tmp/m cargo doc", "RUSTDOC= cargo doc"),
             ("CARGO_BUILD_RUSTDOC=/tmp/m cargo doc", "CARGO_BUILD_RUSTDOC= cargo doc"),
             ("RUSTFMT=/tmp/evil cargo fmt --check", "RUSTFMT=rustfmt cargo fmt --check"),
+            ("DEVELOPER_DIR=/tmp/evil xcrun --find clang", "DEVELOPER_DIR=./Developer xcrun --find clang"),
+            ("TOOLCHAINS=/tmp/evil xcrun --find clang", "TOOLCHAINS=default xcrun --find clang"),
             ("CARGO_ENCODED_RUSTFLAGS='-Clinker=/tmp/m' cargo build", "CARGO_ENCODED_RUSTFLAGS=-Dwarnings cargo build"),
             ("CARGO_ENCODED_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_ENCODED_RUSTDOCFLAGS=-Dwarnings cargo doc"),
             ("CARGO_BUILD_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_BUILD_RUSTDOCFLAGS=-Dwarnings cargo doc"),
