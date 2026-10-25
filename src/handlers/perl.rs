@@ -667,4 +667,215 @@ mod tests {
             proptest::prop_assert!(!check(&assign_line), "special variable assignment approved: {assign_line}");
         }
     }
+
+    #[test]
+    fn perl_read_only_and_inplace_table() {
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        let read_only_approved = [
+            "perl -e 'print \"hello\\n\"'",
+            "perl -E 'say \"hello\"'",
+            "perl -ne 'print if /pattern/' file.txt",
+            "perl -ne 'say $1 if /^key=(\\w+)/' file.txt",
+            "perl -ne 'chomp; print join(\",\", sort(split(/\\t/))), \"\\n\"' file.txt",
+            "perl -e 'my @a = sort split /:/, \"b:a:c\"; print join(\"-\", @a)'",
+            "perl -e 'print q{hello}'",
+            "perl -e 'print qq[hello $x]'",
+            "perl -ne 'print if m!pattern!' file.txt",
+            "perl -0 -ne 'print if /pattern/' file.txt",
+            "perl -0777 -ne 'print if /pattern/' file.txt",
+            "perl -0ne 'print if /pattern/' file.txt",
+            "perl -0777ne 'print if /pattern/' file.txt",
+            "perl -00ne 'print if /pattern/' file.txt",
+            "perl -l -ne 'print' file.txt",
+            "perl -l012 -ne 'print' file.txt",
+            "perl -l012ne 'print' file.txt",
+            "perl -ne 'BEGIN { $n = 0 } $n++; END { print \"$n\\n\" }' file.txt",
+            "perl -MList::Util -e 'print 1'",
+            "perl -MFile::Basename=dirname -e 'print 1'",
+            "perl -ne 'print if /x/' file.txt",
+            "perl -lane 'print $F[0]' file.txt",
+            "perl -lane 'print \"$F[0]\\t$F[-1]\"' file.txt",
+            "perl -F: -lane 'print $F[0], $F[2]' file.txt",
+            "perl -ne 'END { print \"$.\\n\" }' file.txt",
+            "perl -ne '$c++ if /pattern/; END { print \"$c\\n\" }' file.txt",
+            "perl -0777 -ne 'print \"$1\\n\" while /fn\\s+(\\w+)/g' src/lib.rs",
+            "perl -0777ne 'print \"$1\\n\" while /fn\\s+(\\w+)/g' src/lib.rs",
+            "perl -00 -ne 'print if /paragraph/' file.txt",
+            "perl -lne 'print $1 if /^name\\s*=\\s*\"([^\"]+)\"/' Cargo.toml",
+            "perl -e 'my @a; push @a, @ARGV; print scalar @a' file.txt",
+            "perl -e 'my @a = @ARGV; print scalar @a' file.txt",
+        ];
+        for cmd in read_only_approved {
+            let verdict = crate::command_verdict(cmd);
+            assert!(
+                matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead),
+                "expected read-only approval (<= SafeRead) for `{cmd}`, got {verdict:?}"
+            );
+        }
+
+        let inplace_worktree_write_only = [
+            "perl -i -pe 's/foo/bar/' file.txt", "perl -i.bak -pe 's/foo/bar/' file.txt", "perl -0i -pe 's/foo/bar/' file.txt",
+            "perl -0777i.bak -pe 's/foo/bar/' file.txt",
+        ];
+        for cmd in inplace_worktree_write_only {
+            let verdict = crate::command_verdict(cmd);
+            assert_eq!(
+                verdict,
+                Verdict::Allowed(SafetyLevel::SafeWrite),
+                "expected worktree -i to require SafeWrite (not read-only approved) for `{cmd}`"
+            );
+            assert!(
+                !matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead),
+                "`{cmd}` must not auto-approve at SafeRead"
+            );
+        }
+    }
+
+    #[test]
+    fn perl_filesystem_exec_eval_and_network_denied_table() {
+        use crate::verdict::Verdict;
+
+        let denied_cases = [
+            "perl -i -pe 's/foo/bar/' /etc/hosts",
+            "perl -i.bak -pe 's/foo/bar/' ~/.bashrc",
+            "perl -0i -pe 's/foo/bar/' /etc/hosts",
+            "perl -pe 'BEGIN { $^I = \".bak\" } s/foo/bar/' file.txt",
+            "perl -pe 'BEGIN { ${^I} = \"\" } s/foo/bar/' file.txt",
+            "perl -pe 'BEGIN { ($^I, $h{a}) = (\".bak\", 1) } s/foo/bar/' file.txt",
+            "perl -e 'open(my $fh, \">\", \"out.txt\")'",
+            "perl -e 'open(my $fh, \">>\", \"out.txt\")'",
+            "perl -e 'open(FH, \">out.txt\")'",
+            "perl -e 'open(FH, \">>out.txt\")'",
+            "perl -e 'sysopen(FH, \"out.txt\", 1)'",
+            "perl -e 'unlink(\"file.txt\")'",
+            "perl -e 'rename(\"a.txt\", \"b.txt\")'",
+            "perl -e 'mkdir(\"newdir\")'",
+            "perl -e 'rmdir(\"olddir\")'",
+            "perl -e 'chmod(0755, \"file.txt\")'",
+            "perl -e 'utime(undef, undef, \"file.txt\")'",
+            "perl -e 'system(\"id\")'",
+            "perl -e 'exec(\"id\")'",
+            "perl -e 'print `id`'",
+            "perl -e 'print qx(id)'",
+            "perl -e 'print qx{id}'",
+            "perl -e 'print qx/id/'",
+            "perl -e 'open(my $fh, \"|-\", \"sh\")'",
+            "perl -e 'open(my $fh, \"-|\", \"id\")'",
+            "perl -e 'open(FH, \"|sh\")'",
+            "perl -ne 'BEGIN { @ARGV = (\"id|\") } print'",
+            "perl -e 'fork()'",
+            "perl -e 'eval \"system(q(id))\"'",
+            "perl -e 'eval($code)'",
+            "perl -e 'eval { 1 }'",
+            "perl -e 'do \"script.pl\"'",
+            "perl -e 'do \"./script.pl\"'",
+            "perl -e 'require POSIX'",
+            "perl -e 'require \"script.pl\"'",
+            "perl -e 'use POSIX'",
+            "perl -e 'use File::Path'",
+            "perl -Mre=eval -ne 'my $w = \"(?{1})\"; print if /$w/' file.txt",
+            "perl -mre=eval -e 'print 1'",
+            "perl -Mblib=/tmp -MMod -e 'print 1'",
+            "perl -Mlib=/tmp -MMod -e 'print 1'",
+            "perl -I/tmp -MMod -e 'print 1'",
+            "perl '-MList::Util;system(\"id\")' -e 1",
+            "perl '-MFoo=a;b{system(\"id\")}' -e 1",
+            "perl -e 'socket(S, 2, 1, 0)'",
+            "perl -e 'connect(S, $addr)'",
+            "perl -e 'use IO::Socket::INET; IO::Socket::INET->new(\"example.com:80\")'",
+            "perl -MIO::Socket::INET -e 'IO::Socket::INET->new(\"example.com:80\")'",
+            "perl -MIO::Socket::INET -e '$s->send(\"x\")'",
+            "perl -e 'use LWP::Simple; getprint(\"http://example.com\")'",
+            "perl -MLWP::Simple -e 'getprint(\"http://example.com\")'",
+            "perl -MHTTP::Tiny -e 'HTTP::Tiny->new->get(\"http://example.com\")'",
+        ];
+        for cmd in denied_cases {
+            let verdict = crate::command_verdict(cmd);
+            assert_eq!(verdict, Verdict::Denied, "expected Denied for `{cmd}`, got {verdict:?}");
+        }
+    }
+
+    #[test]
+    fn perl_hidden_calls_switches_and_sources_denied_table() {
+        use crate::verdict::Verdict;
+
+        let denied_cases = [
+            "perl -e '&{\"system\"}(\"id\")'",
+            "perl -e '&{$f}(\"id\")'",
+            "perl -e '&$f(\"id\")'",
+            "perl -e '$f->(\"id\")'",
+            "perl -e '$f->&*'",
+            "perl -e '$a[0](\"id\")'",
+            "perl -e '$h{a}(\"id\")'",
+            "perl -e '${h}{a}(\"id\")'",
+            "perl -e '$r->{a}(\"id\")'",
+            "perl -e '$x->$m(\"id\")'",
+            "perl -e '$x->$m'",
+            "perl -e 'f(\"id\")'",
+            "perl -e '${\"f\"} = 1'",
+            "perl -pe 'BEGIN { ${\"^I\"} = \".bak\" } s/a/b/' file.txt",
+            "perl -ne 'BEGIN { @{\"ARGV\"} = (\"/etc/passwd\") } print' file.txt",
+            "perl -ne 'BEGIN { @\n{\"ARGV\"} = (\"/etc/passwd\") } print' file.txt",
+            "perl -pe 'BEGIN { *{\"\\t\"} = \\.bak } s/a/b/' file.txt",
+            "perl -e '*f = \"CORE::unlink\"; &f(\"file\")'",
+            "perl -ne 'BEGIN { *ARGV = [\"/etc/passwd\"] } print' file.txt",
+            "perl -ne 'BEGIN { $::{ARGV} = [\"/etc/passwd\"] } print' file.txt",
+            "perl -e '$$x = 1'",
+            "perl -e '$\n$x = 1'",
+            "perl -pe 'BEGIN { $ # comment\n ^I = \".bak\" } s/a/b/' file.txt",
+            "perl -pe '$' -e '^I = \".bak\"' file.txt",
+            "perl -e 'my $f = \"sys\" . \"tem\"; &$f(\"id\")'",
+            "perl -e 'my $f = join(\"\", \"sys\", \"tem\"); &{$f}(\"id\")'",
+            "perl -e 'my $f = \"sys\" . \"tem\"; $f->(\"id\")'",
+            "perl -e '&{\"\\x73\\x79\\x73\\x74\\x65\\x6d\"}(\"id\")'",
+            "perl -e '&{\"\\N{U+0073}ystem\"}(\"id\")'",
+            "perl -e '\\x73ystem(\"id\")'",
+            "perl -e 'my $f = \"\\x73ystem\"; &$f(\"id\")'",
+            "perl -e 'my $f = \"\\N{LATIN SMALL LETTER S}ystem\"; &$f(\"id\")'",
+            "perl -e 'q{/}; unlink(\"file\"); q{/}'",
+            "perl -e 'print qq[@{[system(\"id\")]}]'",
+            "perl -e 'print qq[${\\system(\"id\")}]'",
+            "perl -ne 'print if m!(?{system(\"id\")})!' file.txt",
+            "perl -ne 'print if m!(??{system(\"id\")})!' file.txt",
+            "perl -ne 'print if qr!(?{system(\"id\")})!' file.txt",
+            "perl -pe 's!a!system(\"id\")!e' file.txt",
+            "perl -e 'print <<EOF;\nhello\nEOF'",
+            "perl -e 'print <<\"EOF\";\n@{[system(\"id\")]}\nEOF'",
+            "perl -e 'print << \"EOF\";\n;/\nEOF\nunlink 1; /'",
+            "perl -e \"print << 'EOF';\n;/\nEOF\nunlink 1; /\"",
+            "perl -e 'print <<\\EOF;\n;/\nEOF\nunlink 1; /'",
+            "perl -e 'print <<~EOF;\nhello\nEOF'",
+            "perl -e 'print <<`EOF`;\nid\nEOF'",
+            "perl -x file.txt",
+            "perl -x -e 'print 1' file.txt",
+            "perl -0x -e 'print 1' file.txt",
+            "perl -l0x -e 'print 1' file.txt",
+            "perl -0e 'system(\"id\")' -e 1",
+            "perl '-0esystem(\"id\")' -e 1",
+            "perl '-l012esystem(\"id\")' -e 1",
+            "perl -a '-F/(?{system(\"id\")})/' -ne 'print $F[0]' file.txt",
+            "perl -a '-F\"@{[system(q(id))]}\"' -ne 'print $F[0]' file.txt",
+            "perl -ne 'BEGIN { system(\"id\") } print' file.txt",
+            "perl -ne 'END { unlink(\"file.txt\") } print' file.txt",
+            "perl -ne 'BEGIN { ($x, @ARGV) = (1, \"/etc/passwd\") } print' file.txt",
+            "perl -ne 'BEGIN { ($ARGV[0], $h{a}) = (\"/etc/passwd\", 1) } print' file.txt",
+            "perl -ne 'BEGIN { for ($x, @ARGV) { $_ = \"/etc/passwd\" } } print' file.txt",
+            "perl -ne 'BEGIN { for my $x (@ARGV) { $x = \"/etc/passwd\" } } print' file.txt",
+            "perl -ne 'BEGIN { local ($x, $/) } print' file.txt",
+            "perl -ne 'BEGIN { map $_ = \"/etc/passwd\", @ARGV } print' file.txt",
+            "perl script.pl",
+            "perl ./script.pl",
+            "perl -- script.pl",
+            "perl -",
+            "perl - file.txt",
+            "echo 'print 1' | perl",
+            "echo 'print 1' | perl -",
+            "perl < script.pl",
+        ];
+        for cmd in denied_cases {
+            let verdict = crate::command_verdict(cmd);
+            assert_eq!(verdict, Verdict::Denied, "expected Denied for `{cmd}`, got {verdict:?}");
+        }
+    }
 }
