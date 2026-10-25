@@ -442,7 +442,7 @@ mod tests {
                 "{listy} stopped splitting; an out-of-workspace element now rides in behind a prefix"
             );
         }
-        for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH"] {
+        for single in ["BORG_RSH", "RSYNC_RSH", "RESTIC_PASSWORD_COMMAND", "BORG_REMOTE_PATH", "RUSTFMT"] {
             assert!(!assignment_verdict(single, "/tmp/evil").is_allowed(), "{single} must still refuse a foreign executor");
             assert!(assignment_verdict(single, "ssh").is_allowed(), "{single} must still accept a bare name on $PATH");
         }
@@ -650,6 +650,7 @@ mod integration_tests {
             ("CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER=/tmp/m cargo build", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER= cargo build"),
             ("RUSTDOC=/tmp/m cargo doc", "RUSTDOC= cargo doc"),
             ("CARGO_BUILD_RUSTDOC=/tmp/m cargo doc", "CARGO_BUILD_RUSTDOC= cargo doc"),
+            ("RUSTFMT=/tmp/evil cargo fmt --check", "RUSTFMT=rustfmt cargo fmt --check"),
             ("CARGO_ENCODED_RUSTFLAGS='-Clinker=/tmp/m' cargo build", "CARGO_ENCODED_RUSTFLAGS=-Dwarnings cargo build"),
             ("CARGO_ENCODED_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_ENCODED_RUSTDOCFLAGS=-Dwarnings cargo doc"),
             ("CARGO_BUILD_RUSTDOCFLAGS='-Clinker=/tmp/m' cargo doc", "CARGO_BUILD_RUSTDOCFLAGS=-Dwarnings cargo doc"),

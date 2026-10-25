@@ -249,6 +249,10 @@ measured = false
 shape = "command"
 because = "the CARGO_* config-mirror spelling of RUSTDOC"
 measured = false
+[env.RUSTFMT]
+shape = "exec-path"
+single_value = true
+because = "replaces the rustfmt binary cargo fmt invokes"
 [env.CARGO_HOME]
 shape = "config-dir"
 because = "cargo reads config.toml from here, which can name a rustc wrapper, a linker, aliases and credential providers"
