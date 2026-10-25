@@ -36,14 +36,7 @@ fn libxo_values_are_known(tokens: &[Token]) -> bool {
                 None => (t.to_string(), None),
             };
             if name == "--libxo" {
-                let value = match inline {
-                    Some(v) => Some(v),
-                    None => {
-                        let v = tokens.get(i).map(Token::as_str);
-                        i += 1;
-                        v
-                    }
-                };
+                let value = inline.or_else(|| tokens.get(i).map(Token::as_str));
                 if !value.is_some_and(is_libxo_value) {
                     return false;
                 }
@@ -52,7 +45,7 @@ fn libxo_values_are_known(tokens: &[Token]) -> bool {
             }
             continue;
         }
-        if !t.starts_with('-') || t == "-" {
+        if !t.starts_with('-') {
             continue;
         }
         let bytes = t.as_bytes();
@@ -88,6 +81,7 @@ mod tests {
         libxo_html_xpath: "df --libxo=html,xpath,underscores /",
         libxo_after_double_dash_is_operand: "df -h -- --libxo=evil",
         libxo_as_value_of_type_flag: "df -t --libxo=evil",
+        libxo_as_value_of_long_type_flag: "df --type --libxo=evil",
         alias_gdf_libxo_json: "gdf --libxo=json,pretty",
     }
 
@@ -101,6 +95,9 @@ mod tests {
         libxo_trailing_comma: "df --libxo=json, .",
         libxo_leading_comma: "df --libxo=,json .",
         libxo_missing_value: "df --libxo",
+        libxo_after_long_standalone: "df --human-readable --libxo=bogus",
+        libxo_after_inline_long_valued: "df --type=apfs --libxo=bogus",
+        libxo_after_glued_short_type: "df -tapfs --libxo=bogus",
         alias_gdf_libxo_unknown: "gdf --libxo=bogus",
     }
 

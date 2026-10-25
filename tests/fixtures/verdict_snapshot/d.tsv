@@ -1686,6 +1686,7 @@ df --block-size x	inert
 df --exclude-type x	inert
 df --help	inert
 df --human-readable	inert
+df --human-readable --libxo=bogus	denied
 df --inodes	inert
 df --libxo	denied
 df --libxo bogus .	denied
@@ -1711,7 +1712,9 @@ df --print-type	inert
 df --si	inert
 df --sync	inert
 df --total	inert
+df --type --libxo=evil	inert
 df --type x	inert
+df --type=apfs --libxo=bogus	denied
 df --unknown-flag	denied
 df --version	inert
 df -B 1M -t apfs -x devfs	inert
@@ -1741,6 +1744,7 @@ df -m	inert
 df -n	inert
 df -t --libxo=evil	inert
 df -t x	inert
+df -tapfs --libxo=bogus	denied
 df -v	inert
 df -x x	inert
 df x	inert
