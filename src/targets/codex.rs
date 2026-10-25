@@ -96,11 +96,13 @@ struct ToolInput {
 
 #[derive(Deserialize)]
 struct CodexHookEnvelope {
+    #[serde(default)]
+    hook_event_name: Option<String>,
     /// Optional so a harness that omits it still works; when present and naming another tool we
     /// abstain (see parse_input).
     #[serde(default)]
     tool_name: Option<String>,
-    tool_input: ToolInput,
+    tool_input: Option<ToolInput>,
     #[serde(default)]
     cwd: Option<String>,
 }
@@ -108,6 +110,14 @@ struct CodexHookEnvelope {
 impl HookFormat for CodexHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
         let envelope: CodexHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
+        if let Some(event) = &envelope.hook_event_name
+            && event != "PreToolUse"
+        {
+            return Err(ParseError { message: format!("not a PreToolUse: {event}") });
+        }
+        let Some(tool_input) = envelope.tool_input else {
+            return Err(ParseError { message: "missing field `tool_input`".to_string() });
+        };
         // Self-filter on the tool: the hook can be delivered for a non-shell call by a
         // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
         if let Some(name) = &envelope.tool_name
@@ -116,7 +126,7 @@ impl HookFormat for CodexHookFormat {
             return Err(ParseError { message: format!("not a shell tool: {name}") });
         }
         Ok(HookInput {
-            command: envelope.tool_input.command,
+            command: tool_input.command,
             cwd: envelope.cwd,
             root: None, // codex sends cwd but no distinct project root (HARNESS-BEHAVIORS.md)
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
@@ -514,6 +524,54 @@ mod tests {
     }
 
     #[test]
+    fn abstains_on_model_request_and_other_unhandled_events() {
+        let t = target();
+        let routed = |stdin: &str| t.hook_format_for(stdin).map(|f| f.parse_input(stdin));
+        let pre_model = json!({
+            "session_id": "s",
+            "turn_id": "t",
+            "cwd": "/w",
+            "transcript_path": null,
+            "model": "gpt-5",
+            "hook_event_name": "PreModelRequest",
+        })
+        .to_string();
+        let post_model = json!({
+            "session_id": "s",
+            "turn_id": "t",
+            "cwd": "/w",
+            "transcript_path": null,
+            "model": "gpt-5",
+            "hook_event_name": "PostModelRequest",
+            "status": "completed",
+            "error": null,
+            "token_usage": {
+                "cached_input_tokens": 0,
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "reasoning_output_tokens": 0,
+                "total_tokens": 15,
+            },
+        })
+        .to_string();
+        for payload in [&pre_model, &post_model] {
+            let err = routed(payload).expect("format").err().expect("model-request must abstain");
+            assert!(err.message.contains("not a PreToolUse"), "{}", err.message);
+        }
+        for event in ["PreModelRequest", "PostModelRequest", "PostToolUse", "SessionStart", "SessionEnd", "UserPromptSubmit", "Stop"] {
+            let with_tool = json!({
+                "hook_event_name": event,
+                "tool_name": "Bash",
+                "tool_input": {"command": "rm -rf /"},
+                "cwd": "/w",
+            })
+            .to_string();
+            assert!(matches!(routed(&with_tool), Some(Err(_))), "{event} must abstain");
+        }
+        assert!(CodexHookFormat.parse_input(&permission_request("Bash", "ls")).is_err());
+    }
+
+    #[test]
     fn permission_request_allows_exactly_the_documented_shape() {
         for level in [SafetyLevel::Inert, SafetyLevel::SafeRead, SafetyLevel::SafeWrite] {
             let r = CodexPermissionRequestFormat.render_response(Verdict::Allowed(level));
@@ -654,6 +712,20 @@ mod tests {
             payload["tool_input"]["description"] = description.map_or(Value::Null, Value::String);
             let parsed = CodexPermissionRequestFormat.parse_input(&payload.to_string());
             proptest::prop_assert_eq!(parsed.map(|p| p.command).ok(), Some(command));
+        }
+
+        #[test]
+        fn every_unhandled_event_abstains(event in "\\PC*", command in "\\PC*") {
+            proptest::prop_assume!(!EVENTS.contains(&event.as_str()));
+            let payload = json!({
+                "hook_event_name": event,
+                "tool_name": "Bash",
+                "tool_input": { "command": command },
+                "cwd": "/w",
+            })
+            .to_string();
+            let parsed = target().hook_format_for(&payload).map(|f| f.parse_input(&payload));
+            proptest::prop_assert!(matches!(parsed, Some(Err(_))));
         }
     }
 }

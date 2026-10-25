@@ -187,6 +187,11 @@ fn other_tools_and_malformed_payloads_abstain() {
         r#"{"hook_event_name":"PermissionRequest","tool_name":"Bash","tool_input":{"command":"ls"},"cwd":"/"}"#,
         r#"{"hook_event_name":"PermissionRequest","tool_name":"Bash","tool_input":{"command":"ls"},"cwd":"/."}"#,
         r#"{"hook_event_name":"PermissionRequest","tool_name":"Bash","tool_input":{"command":"ls"},"cwd":"/Users/.."}"#,
+        r#"{"session_id":"s","turn_id":"t","cwd":"/work/proj","transcript_path":null,"model":"m","hook_event_name":"PreModelRequest"}"#,
+        r#"{"session_id":"s","turn_id":"t","cwd":"/work/proj","transcript_path":null,"model":"m","hook_event_name":"PostModelRequest","status":"completed","error":null,"token_usage":null}"#,
+        r#"{"session_id":"s","turn_id":"t","cwd":"/work/proj","transcript_path":null,"model":"m","hook_event_name":"PreModelRequest","tool_name":"Bash","tool_input":{"command":"rm -rf /"}}"#,
+        r#"{"session_id":"s","turn_id":"t","cwd":"/work/proj","transcript_path":null,"model":"m","hook_event_name":"PostModelRequest","status":"completed","error":null,"token_usage":null,"tool_name":"Bash","tool_input":{"command":"rm -rf /"}}"#,
+        r#"{"session_id":"s","turn_id":"t","cwd":"/work/proj","transcript_path":null,"model":"m","permission_mode":"default","hook_event_name":"PostToolUse","tool_name":"Bash","tool_use_id":"u","tool_input":{"command":"rm -rf /"},"tool_response":"x"}"#,
     ] {
         assert_eq!(codex(malformed), "", "{malformed}");
     }
