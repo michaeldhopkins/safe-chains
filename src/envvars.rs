@@ -494,7 +494,11 @@ mod tests {
                 }
                 verdicts.push(by_flag);
             }
-            if verdicts.iter().all(|v| *v) || verdicts.iter().all(|v| !*v) {
+            if super::shape_of(name) == Some(super::Shape::Opaque) {
+                if !crate::is_safe_command(base) || !verdicts.iter().all(|v| !*v) {
+                    failures.push(format!("{name}: opaque twin must allow `{base}` and refuse every non-empty value"));
+                }
+            } else if verdicts.iter().all(|v| *v) || verdicts.iter().all(|v| !*v) {
                 failures.push(format!(
                     "{name}: the pair never discriminates (every value classifies the same), so \
                      agreement between the spellings proves nothing"
@@ -778,6 +782,9 @@ mod integration_tests {
                 "git -c core.pager='sh -c evil' log",
                 "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.pager GIT_CONFIG_VALUE_0='sh -c evil' git log",
             ),
+            ("pandoc +RTS -tpwned README.md", "GHCRTS=-tpwned pandoc README.md"),
+            ("pandoc +RTS -tpwned README.md", "env GHCRTS=-tpwned pandoc README.md"),
+            ("pandoc +RTS -tpwned README.md", "export GHCRTS=-tpwned && pandoc README.md"),
         ] {
             assert!(!crate::is_safe_command(flag_form), "sanity: the flag form should deny: {flag_form}");
             assert!(!crate::is_safe_command(env_form), "the env twin was allowed: {env_form}");

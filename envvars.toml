@@ -573,6 +573,11 @@ because = "ack parses this as options before its arguments, including --pager"
 [env.ACKRC]
 shape = "exec-path"
 because = "an ack config file, which can set --pager"
+[env.GHCRTS]
+shape = "opaque"
+twin_flag = "pandoc +RTS {v} -RTS README.md"
+twin_base = "pandoc README.md"
+because = "GHC runtime options in the environment (the +RTS twin): -t, -s and -S write statistics to a named file"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
