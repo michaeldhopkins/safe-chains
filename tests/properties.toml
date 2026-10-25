@@ -362,6 +362,7 @@ owed = [
 "src/handlers/pandoc.rs" = [
   "a_value_with_a_path_character_is_never_a_plain_format",
   "a_plain_name_with_extensions_is_accepted_unless_it_is_pdf",
+  "a_lua_suffixed_writer_is_refused_in_every_spelling",
   "pdf_is_refused_with_any_extensions",
   "a_writer_flag_with_a_path_value_is_denied_in_every_spelling",
   "any_runtime_option_token_is_denied",

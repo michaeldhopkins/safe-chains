@@ -8,8 +8,12 @@ use crate::policy::FlagSet;
 use crate::registry;
 use crate::verdict::Verdict;
 
-const FORMAT_LONG: &[&str] = &["--from", "--read", "--to", "--write", "--print-default-template"];
-const FORMAT_SHORT: &[u8] = b"frtwD";
+const READER_LONG: &[&str] = &["--from", "--read"];
+const WRITER_LONG: &[&str] = &["--to", "--write", "--print-default-template"];
+const READER_SHORT: &[u8] = b"fr";
+const WRITER_SHORT: &[u8] = b"twD";
+const INPUT_FORMATS: &str = include_str!("../../tests/fixtures/pandoc/3.12.1/input-formats.txt");
+const OUTPUT_FORMATS: &str = include_str!("../../tests/fixtures/pandoc/3.12.1/output-formats.txt");
 
 pub fn check_pandoc(tokens: &[Token]) -> Verdict {
     if matches!(tokens.get(1).map(Token::as_str), Some("lua" | "server")) {
@@ -28,6 +32,22 @@ pub(super) fn is_runtime_option(token: &str) -> bool {
     token.starts_with("+RTS") || matches!(token, "-RTS" | "--RTS")
 }
 
+fn parse_format_list(raw: &str) -> Vec<&str> {
+    raw.lines().map(str::trim).filter(|l| !l.is_empty()).collect()
+}
+
+fn is_reader_format(value: &str) -> bool {
+    is_named_format(value, INPUT_FORMATS)
+}
+
+fn is_writer_format(value: &str) -> bool {
+    is_named_format(value, OUTPUT_FORMATS)
+}
+
+fn is_named_format(value: &str, formats: &str) -> bool {
+    is_plain_format(value) && value.split(['+', '-']).next().is_some_and(|base| parse_format_list(formats).contains(&base))
+}
+
 /// A format name with optional `+ext` / `-ext` suffixes: `[a-z0-9_]+([+-][a-z0-9_]+)*`. Nothing
 /// with a `/` or `.` can name a script, and `pdf` runs a TeX engine.
 fn is_plain_format(value: &str) -> bool {
@@ -40,6 +60,26 @@ fn is_plain_format(value: &str) -> bool {
         }
     }
     !previous_separator && value.split(['+', '-']).next() != Some("pdf")
+}
+
+fn long_format_check(name: &str) -> Option<fn(&str) -> bool> {
+    if READER_LONG.contains(&name) {
+        Some(is_reader_format)
+    } else if WRITER_LONG.contains(&name) {
+        Some(is_writer_format)
+    } else {
+        None
+    }
+}
+
+fn short_format_check(flag: u8) -> Option<fn(&str) -> bool> {
+    if READER_SHORT.contains(&flag) {
+        Some(is_reader_format)
+    } else if WRITER_SHORT.contains(&flag) {
+        Some(is_writer_format)
+    } else {
+        None
+    }
 }
 
 fn format_values_are_plain(tokens: &[Token]) -> bool {
@@ -58,16 +98,19 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
                 Some((name, value)) => (format!("--{name}"), Some(value)),
                 None => (t.to_string(), None),
             };
-            let takes_value = valued.contains_flag(&name) || FORMAT_LONG.contains(&name.as_str());
+            let format_check = long_format_check(&name);
+            let takes_value = valued.contains_flag(&name) || format_check.is_some();
             if inline.is_none() && takes_value {
                 let value = tokens.get(i).map(Token::as_str);
                 i += 1;
-                if FORMAT_LONG.contains(&name.as_str()) && !value.is_some_and(is_plain_format) {
+                if let Some(check) = format_check
+                    && !value.is_some_and(check)
+                {
                     return false;
                 }
             } else if let Some(value) = inline
-                && FORMAT_LONG.contains(&name.as_str())
-                && !is_plain_format(value)
+                && let Some(check) = format_check
+                && !check(value)
             {
                 return false;
             }
@@ -81,15 +124,17 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
             if standalone.contains_short(b) {
                 continue;
             }
-            let is_format = FORMAT_SHORT.contains(&b);
-            if is_format || valued.contains_short(b) {
+            let format_check = short_format_check(b);
+            if format_check.is_some() || valued.contains_short(b) {
                 let value = if j + 1 < bytes.len() {
                     t.get(j + 1..)
                 } else {
                     i += 1;
                     tokens.get(i - 1).map(Token::as_str)
                 };
-                if is_format && !value.is_some_and(is_plain_format) {
+                if let Some(check) = format_check
+                    && !value.is_some_and(check)
+                {
                     return false;
                 }
             }
@@ -103,7 +148,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
 mod tests {
     use proptest::prelude::*;
 
-    use super::is_plain_format;
+    use super::{is_plain_format, is_reader_format, is_writer_format};
 
     fn check(cmd: &str) -> bool {
         crate::is_safe_command(cmd)
@@ -119,14 +164,23 @@ mod tests {
         long_template_by_format: "pandoc --print-default-template=latex",
         a_file_named_like_a_flag_value: "pandoc -V title=lua README.md",
         plain_writer_with_html_target: "pandoc README.md -t html",
+        extension_on_known_reader: "pandoc -f commonmark_x+smart README.md",
     }
 
     denied! {
         lua_interpreter: "pandoc lua x.lua",
         server: "pandoc server",
         lua_writer: "pandoc -t ./w.lua README.md",
+        lua_bare_writer: "pandoc -t lua README.md",
+        lua_suffixed_writer: "pandoc -t xlua README.md",
+        lua_long_to_writer: "pandoc --to=my_lua README.md",
+        lua_short_w_writer: "pandoc -w mylua README.md",
+        lua_long_write_writer: "pandoc --write lua README.md",
+        lua_clustered_writer: "pandoc -st lua README.md",
+        lua_suffixed_writer_with_extension: "pandoc -t xlua+smart README.md",
         lua_reader_long: "pandoc --from=./r.lua README.md",
         lua_template: "pandoc -D d.lua",
+        lua_bare_template: "pandoc -D lua",
         pdf_writer: "pandoc -t pdf README.md",
         missing_value: "pandoc README.md -t",
         equals_form_short: "pandoc -t=html README.md",
@@ -162,6 +216,8 @@ mod tests {
         ) {
             let value = format!("{head}{sep}{tail}");
             prop_assert!(!is_plain_format(&value));
+            prop_assert!(!is_reader_format(&value));
+            prop_assert!(!is_writer_format(&value));
         }
 
         #[test]
@@ -175,9 +231,29 @@ mod tests {
         }
 
         #[test]
+        fn a_lua_suffixed_writer_is_refused_in_every_spelling(
+            prefix in "[a-z0-9_]{0,6}",
+            ext in "([+-][a-z][a-z0-9_]{0,6}){0,2}",
+            flag in prop::sample::select(vec!["-t", "-w", "-D", "-st", "--to", "--write", "--print-default-template"]),
+            glued in any::<bool>(),
+        ) {
+            let value = format!("{prefix}lua{ext}");
+            prop_assert!(!is_writer_format(&value));
+            let cmd = if flag.starts_with("--") && glued {
+                format!("pandoc {flag}={value} README.md")
+            } else if !flag.starts_with("--") && glued {
+                format!("pandoc {flag}{value} README.md")
+            } else {
+                format!("pandoc {flag} {value} README.md")
+            };
+            prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
+        }
+
+        #[test]
         fn pdf_is_refused_with_any_extensions(ext in "([+-][a-z][a-z0-9_]{0,6}){0,3}") {
             let value = format!("pdf{ext}");
             prop_assert!(!is_plain_format(&value));
+            prop_assert!(!is_writer_format(&value));
         }
 
         #[test]

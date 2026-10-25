@@ -335,7 +335,7 @@ pandoc --fail-if-warnings	safe-read
 pandoc --figure-caption-position x	safe-read
 pandoc --file-scope	safe-read
 pandoc --filter=pandoc-crossref README.md	denied
-pandoc --from x	safe-read
+pandoc --from x	denied
 pandoc --from=./r.lua README.md	denied
 pandoc --from=gfm --to=plain --wrap=none README.md	safe-read
 pandoc --gladtex	safe-read
@@ -378,12 +378,12 @@ pandoc --pdf-engine=xelatex README.md	denied
 pandoc --preserve-tabs	safe-read
 pandoc --print-default-data-file x	safe-read
 pandoc --print-default-template d.lua	denied
-pandoc --print-default-template x	safe-read
+pandoc --print-default-template x	denied
 pandoc --print-default-template=d.lua	denied
 pandoc --print-default-template=latex	safe-read
 pandoc --print-highlight-style x	safe-read
 pandoc --quiet	safe-read
-pandoc --read x	safe-read
+pandoc --read x	denied
 pandoc --read=r.lua README.md	denied
 pandoc --reference-doc x	safe-read
 pandoc --reference-links	safe-read
@@ -409,8 +409,9 @@ pandoc --table-of-contents	safe-read
 pandoc --template x	safe-read
 pandoc --title-prefix x	safe-read
 pandoc --to ./w.lua README.md	denied
-pandoc --to x	safe-read
+pandoc --to x	denied
 pandoc --to=./w.lua README.md	denied
+pandoc --to=my_lua README.md	denied
 pandoc --to=pdf README.md	denied
 pandoc --toc	safe-read
 pandoc --toc-depth x	safe-read
@@ -423,14 +424,16 @@ pandoc --verbose	safe-read
 pandoc --version	safe-read
 pandoc --webtex	safe-read
 pandoc --wrap x	safe-read
-pandoc --write x	safe-read
+pandoc --write lua README.md	denied
+pandoc --write x	denied
 pandoc --write=w.lua README.md	denied
 pandoc -A x	safe-read
 pandoc -B x	safe-read
 pandoc -C	safe-read
 pandoc -D d.lua	denied
 pandoc -D html	safe-read
-pandoc -D x	safe-read
+pandoc -D lua	denied
+pandoc -D x	denied
 pandoc -F ./my-filter.py README.md	denied
 pandoc -H x	safe-read
 pandoc -L filter.lua README.md	denied
@@ -442,35 +445,41 @@ pandoc -V x	safe-read
 pandoc -c x	safe-read
 pandoc -d defaults.yaml README.md	denied
 pandoc -f ./r.lua README.md	denied
+pandoc -f commonmark_x+smart README.md	safe-read
 pandoc -f markdown -t html README.md	safe-read
-pandoc -f x	safe-read
+pandoc -f x	denied
 pandoc -fmarkdown README.md	safe-read
 pandoc -h	safe-read
 pandoc -i	safe-read
 pandoc -oout.html README.md	denied
 pandoc -p	safe-read
 pandoc -r ./r.lua README.md	denied
-pandoc -r x	safe-read
+pandoc -r x	denied
 pandoc -s	safe-read
 pandoc -s --embed-resources README.md	denied
 pandoc -s --toc --toc-depth=2 -V title=Spec docs/spec.md	safe-read
 pandoc -s -t./w.lua README.md	denied
 pandoc -st ./w.lua README.md	denied
 pandoc -st html README.md	safe-read
+pandoc -st lua README.md	denied
 pandoc -t	denied
 pandoc -t ./w.lua README.md	denied
 pandoc -t gfm+smart-raw_html README.md	safe-read
 pandoc -t html -t pdf README.md	denied
 pandoc -t html README.md	safe-read
 pandoc -t html+ README.md	denied
+pandoc -t lua README.md	denied
 pandoc -t pdf README.md	denied
 pandoc -t pdf+smart README.md	denied
 pandoc -t w.lua README.md	denied
-pandoc -t x	safe-read
+pandoc -t x	denied
+pandoc -t xlua README.md	denied
+pandoc -t xlua+smart README.md	denied
 pandoc -t=html README.md	denied
 pandoc -v	safe-read
 pandoc -w ./w.lua README.md	denied
-pandoc -w x	safe-read
+pandoc -w mylua README.md	denied
+pandoc -w x	denied
 pandoc README.md	safe-read
 pandoc README.md '+RTS' -tpwned	denied
 pandoc README.md +RTS -s -RTS	denied
