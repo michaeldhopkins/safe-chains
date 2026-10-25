@@ -99,8 +99,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
                 None => (t.to_string(), None),
             };
             let format_check = long_format_check(&name);
-            let takes_value = valued.contains_flag(&name) || format_check.is_some();
-            if inline.is_none() && takes_value {
+            if inline.is_none() && valued.contains_flag(&name) {
                 let value = tokens.get(i).map(Token::as_str);
                 i += 1;
                 if let Some(check) = format_check
@@ -116,7 +115,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
             }
             continue;
         }
-        if !t.starts_with('-') || t == "-" {
+        if !t.starts_with('-') {
             continue;
         }
         let bytes = t.as_bytes();
@@ -125,7 +124,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
                 continue;
             }
             let format_check = short_format_check(b);
-            if format_check.is_some() || valued.contains_short(b) {
+            if valued.contains_short(b) {
                 let value = if j + 1 < bytes.len() {
                     t.get(j + 1..)
                 } else {
@@ -163,6 +162,9 @@ mod tests {
         template_by_format: "pandoc -D html",
         long_template_by_format: "pandoc --print-default-template=latex",
         a_file_named_like_a_flag_value: "pandoc -V title=lua README.md",
+        writer_flag_as_value_of_long_variable: "pandoc --variable --to=lua README.md",
+        writer_flag_as_value_of_short_variable: "pandoc -V --to=lua README.md",
+        lua_flag_after_double_dash_is_operand: "pandoc -t html -- --to=lua",
         plain_writer_with_html_target: "pandoc README.md -t html",
         extension_on_known_reader: "pandoc -f commonmark_x+smart README.md",
         worktree_data_dir: "pandoc --data-dir=./data README.md",
@@ -182,6 +184,9 @@ mod tests {
         lua_reader_long: "pandoc --from=./r.lua README.md",
         lua_template: "pandoc -D d.lua",
         lua_bare_template: "pandoc -D lua",
+        lua_writer_after_long_standalone: "pandoc --standalone --to=lua README.md",
+        lua_writer_after_inline_long_valued: "pandoc --variable=x --to=lua README.md",
+        lua_writer_after_glued_short_valued: "pandoc -Vx --to=lua README.md",
         foreign_data_dir_equals: "pandoc --data-dir=/tmp/evil README.md",
         foreign_data_dir_space: "pandoc --data-dir /tmp/evil README.md",
         home_data_dir: "pandoc --data-dir=~/.pandoc README.md",
@@ -189,6 +194,7 @@ mod tests {
         missing_value: "pandoc README.md -t",
         equals_form_short: "pandoc -t=html README.md",
         trailing_separator: "pandoc -t html+ README.md",
+        double_extension_separator: "pandoc -t html++smart README.md",
         runtime_options_stats_file: "pandoc README.md +RTS -tpwned",
         runtime_options_first: "pandoc +RTS -tpwned README.md",
         runtime_options_closed: "pandoc README.md +RTS -s -RTS",

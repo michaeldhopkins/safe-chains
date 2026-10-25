@@ -403,6 +403,7 @@ pandoc --smart README.md	denied
 pandoc --split-level x	safe-read
 pandoc --standalone	safe-read
 pandoc --standalone --mathjax --syntax-highlighting=pygments notes.md	safe-read
+pandoc --standalone --to=lua README.md	denied
 pandoc --strip-comments	safe-read
 pandoc --strip-empty-paragraphs README.md	denied
 pandoc --syntax-definition x	safe-read
@@ -422,8 +423,10 @@ pandoc --toc-depth x	safe-read
 pandoc --top-level-division x	safe-read
 pandoc --trace	safe-read
 pandoc --track-changes x	safe-read
+pandoc --variable --to=lua README.md	safe-read
 pandoc --variable x	safe-read
 pandoc --variable-json x	safe-read
+pandoc --variable=x --to=lua README.md	denied
 pandoc --verbose	safe-read
 pandoc --version	safe-read
 pandoc --webtex	safe-read
@@ -444,8 +447,10 @@ pandoc -L filter.lua README.md	denied
 pandoc -M x	safe-read
 pandoc -N	safe-read
 pandoc -T x	safe-read
+pandoc -V --to=lua README.md	safe-read
 pandoc -V title=lua README.md	safe-read
 pandoc -V x	safe-read
+pandoc -Vx --to=lua README.md	denied
 pandoc -c x	safe-read
 pandoc -d defaults.yaml README.md	denied
 pandoc -f ./r.lua README.md	denied
@@ -469,9 +474,11 @@ pandoc -st lua README.md	denied
 pandoc -t	denied
 pandoc -t ./w.lua README.md	denied
 pandoc -t gfm+smart-raw_html README.md	safe-read
+pandoc -t html -- --to=lua	safe-read
 pandoc -t html -t pdf README.md	denied
 pandoc -t html README.md	safe-read
 pandoc -t html+ README.md	denied
+pandoc -t html++smart README.md	denied
 pandoc -t lua README.md	denied
 pandoc -t pdf README.md	denied
 pandoc -t pdf+smart README.md	denied
