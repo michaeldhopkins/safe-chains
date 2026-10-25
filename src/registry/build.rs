@@ -516,7 +516,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
-    let env_assignment_positionals = super::dispatch::EnvAssignments::lower(toml.env_assignment_positionals);
+    let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
     let archetype_flags = archetype_flags::lower(&toml.name, toml.flag, &toml.flag_valued, &toml.valued, toml.wrapper.as_ref())?;
     if toml.deny.unwrap_or(false) {
         return Ok(CommandSpec {

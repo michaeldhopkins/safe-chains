@@ -47,3 +47,10 @@ proptest! {
 fn a_plain_name_and_a_flag_are_inert() {
     assert!(exported_verdict(["-x", "FOO", "-n"].into_iter()).is_allowed());
 }
+
+#[test]
+fn mise_set_judges_variable_names_through_the_export_table() {
+    assert!(crate::is_safe_command("mise set PROMPT_COMMAND=id"));
+    assert!(!crate::is_safe_command("mise set PROMPT_COMMAND='rm -rf ~'"));
+    assert!(!crate::is_safe_command("mise set LD_PRELOAD=/tmp/evil.so"));
+}

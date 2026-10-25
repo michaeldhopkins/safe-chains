@@ -1498,30 +1498,3 @@ because = "internal descriptor number heavy-slot.sh locks and closes on release"
 [env.HEAVY_SLOT_FD_BASE]
 shape = "opaque"
 because = "first descriptor number heavy-slot.sh opens slot files on"
-
-# ── Stored for later shells ──────────────────────────────────────────────────
-# `mise set NAME=VALUE` writes the variable into a mise.toml, and `mise activate` exports it into
-# every later shell and command started below that file. A stored value is no longer judged against
-# one command: it changes what every later command runs, where it looks for programs and code, and
-# which servers and certificates it trusts, in folders that may not exist yet. Storing a name that
-# matches one of these asks whatever the value, an empty one included; every other stored name is
-# judged as `export NAME=VALUE` is. Names match in any letter case, and a single `*` matches any run
-# of characters.
-[stored]
-because = "exported into every later shell by mise activate, so it changes what later commands run or trust"
-names = [
-    "PROMPT_COMMAND", "PS0", "PS1", "PS2", "PS3", "PS4",
-    "PROMPT", "PROMPT2", "PROMPT3", "PROMPT4", "RPROMPT", "RPROMPT2", "RPS1", "RPS2", "SPROMPT",
-    "ENV", "BASH_ENV", "ZDOTDIR", "BASH_FUNC_*", "__BASH_FUNC*",
-    "*PATH", "LD_PRELOAD", "LD_AUDIT", "DYLD_INSERT_LIBRARIES", "*_ASKPASS",
-    "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "FTP_PROXY",
-    "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE", "NODE_EXTRA_CA_CERTS", "CURL_CA_BUNDLE",
-    "GIT_SSL_CAINFO", "GIT_SSL_CAPATH", "GIT_SSL_NO_VERIFY", "NODE_TLS_REJECT_UNAUTHORIZED", "CARGO_HTTP_CAINFO",
-    "NPM_CONFIG_*", "YARN_NPM_REGISTRY_SERVER", "YARN_REGISTRY",
-    "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_TRUSTED_HOST", "PIP_FIND_LINKS", "PIP_CERT",
-    "UV_INDEX", "UV_INDEX_URL", "UV_DEFAULT_INDEX", "UV_EXTRA_INDEX_URL", "UV_FIND_LINKS", "UV_INSECURE_HOST",
-    "CARGO_REGISTRIES_*", "CARGO_REGISTRY_*",
-    "GEM_HOST", "RUBYGEMS_HOST", "BUNDLE_MIRROR__*",
-    "COMPOSER", "COMPOSER_HOME", "COMPOSER_AUTH", "COMPOSER_CAFILE",
-    "GOPROXY", "GOSUMDB", "GONOSUMDB", "GONOSUMCHECK", "GOINSECURE", "GOPRIVATE",
-]

@@ -3,15 +3,13 @@ name = "mise"
 description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also manages environment variables and runs tasks. State: tools live under ~/.local/share/mise, settings and config in mise.toml files (project, ~/.config/mise), caches under ~/.cache/mise; reads are free of side effects, writes are recoverable by editing the file or reinstalling. Network: install, upgrade, use, uninstall, ls-remote, latest, search, registry, outdated, lock and plugins fetch version lists and downloads from GitHub, registries and package indexes; install and upgrade then run the backend's own code (a plugin script, ruby-build, npm, pipx, cargo or go install), so what they run comes from the network and persists as installed executables and shims. Read-only queries: ls/list, current, which, where, latest, ls-remote, outdated, registry, search, bin-paths, env (prints every variable mise sets, values included, and those may come from secrets files), tool, doctor, completion, config get/ls, settings get/ls, tasks ls/deps/info, cache path, backends ls. Config writers: use, set, unset, config set, settings set/add/unset, tool-alias and shell-alias set/unset, trust/untrust, tasks add/edit, edit, fmt. Executors: exec (and x), run (and r), tasks run, watch, en and shell run commands under mise's environment (activate only prints a shell script). Config is code: a mise.toml value may hold a template whose exec() runs a command, and [env] directives, hooks and tasks run commands, so a file must be trusted first; trust is granted by mise trust and automatically by mise install, exec, run and watch for the active config. self-update downloads the newest release (or VERSION) from GitHub Releases, verifies its signature and replaces the running binary and installed plugins; implode deletes mise and all its data. Releases come very often, several times a week, on a YYYY.M.N scheme (v2026.10.18 on 2026-10-23), and new subcommands (bootstrap, deps, dotfiles, install-into, oci, ssh, tool-stub, packslip) keep appearing."
 url = "https://mise.jdx.dev/cli/"
 researched_version = "v2026.10.18 (2026-10-23; YYYY.M.N scheme)"
-env_assignment_positionals = "stored"
+env_assignment_positionals = true
 # `mise set NAME=VALUE` writes the variable into mise.toml's [env], which mise then injects
 # into every command run in that directory — persistently, across sessions. That is the
 # `VAR=value cmd` prefix with a config file behind it, so the values are classified the same
 # way. Declared at command level rather than on the `set` sub, so any future sub that assigns a
 # variable is covered too; an unlisted NAME classifies Inert, so an unrelated assignment is
-# unaffected (`mise set FOO=bar` and `mise set NODE_ENV=production` still allow). A name in
-# envvars.toml's [stored] list asks whatever the value: later shells export it, so it changes what
-# every later command runs or trusts.
+# unaffected (`mise set FOO=bar` and `mise set NODE_ENV=production` still allow).
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
     "mise list",

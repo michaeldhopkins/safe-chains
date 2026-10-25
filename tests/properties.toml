@@ -155,7 +155,6 @@ owed = [
   "an_unknown_component_is_never_normalized_away",
 ]
 "src/engine/resolve/path_verdicts.rs" = ["src/cst/proptests.rs::redirect_to_auto_executed_target_is_denied", "src/cst/proptests.rs::file_redirect_promotes_to_safewrite"]
-"src/registry/env_assignments.rs" = ["storing_is_never_looser_than_exporting"]
 "src/registry/cwd_writes.rs" = ["only_a_well_formed_declaration_lowers"]
 "src/registry/build_archetype_flags.rs" = ["valued_joins_the_flag_and_command_lists"]
 "src/registry/build_lower.rs" = ["output_lowers_only_a_known_source"]
@@ -233,10 +232,6 @@ owed = [
 "src/envvars/exported.rs" = [
   "src/envvars/exported_tests.rs::an_operand_that_could_be_any_assignment_is_refused",
   "src/envvars/exported_tests.rs::an_exported_assignment_agrees_with_the_statement",
-]
-"src/envvars/stored.rs" = [
-  "src/envvars/stored_tests.rs::every_stored_name_is_refused_whatever_the_value",
-  "src/envvars/stored_tests.rs::an_unlisted_name_is_judged_as_an_export",
 ]
 "src/envvars/rebind.rs" = [
   "src/envvars/rebind_tests.rs::a_loop_variable_agrees_with_the_same_assignment",
@@ -691,7 +686,6 @@ owed = [
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
 "src/envvars/description_twins_tests.rs" = "the description variable-twin guard (#[cfg(test)] mod in envvars.rs)"
 "src/envvars/exported_tests.rs" = "the export operand suite (#[cfg(test)] mod in envvars/exported.rs)"
-"src/envvars/stored_tests.rs" = "the stored-variable suite (#[cfg(test)] mod in envvars/stored.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
 "src/envvars/shell_words_tests.rs" = "the shell program and shell text suite (#[cfg(test)] mod in envvars/shell_words.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
