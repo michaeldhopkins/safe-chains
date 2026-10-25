@@ -11,6 +11,109 @@ static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
     "unshift", "until", "values", "wantarray", "warn", "while",
 ]);
 
+pub(super) fn special_scalar_at(bytes: &[u8], i: usize) -> Option<usize> {
+    let mut j = i + 1;
+    while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
+        j += 1;
+    }
+    if bytes.get(j) == Some(&b'{') {
+        let close = j + 1 + bytes.get(j + 1..)?.iter().position(|&b| b == b'}' || b == b'{')?;
+        let inner = bytes[j + 1..close].trim_ascii();
+        return (bytes[close] == b'}' && matches!(inner, b"^I" | b"/" | b"\\" | b",")).then_some(close + 1);
+    }
+    if bytes.get(j..j + 2) == Some(b"^I") {
+        return Some(j + 2);
+    }
+    matches!(bytes.get(j), Some(b'/' | b'\\' | b',')).then_some(j + 1)
+}
+
+pub(super) fn is_interp_punct_var(b: Option<u8>) -> bool {
+    b.is_some_and(|c| c.is_ascii_punctuation() && !matches!(c, b'(' | b')' | b'[' | b']' | b'{' | b'}' | b'<' | b'>' | b'\\' | b'|' | b'"'))
+}
+
+pub(super) fn skip_interp_var_head(bytes: &[u8], mut i: usize) -> Option<usize> {
+    if bytes.get(i) == Some(&b'^') {
+        return Some(i + 1 + usize::from(bytes.get(i + 1).is_some_and(u8::is_ascii_alphabetic)));
+    }
+    if bytes.get(i).is_some_and(|b| b.is_ascii_punctuation() && !matches!(b, b'"' | b'\\' | b'_')) {
+        return Some(i + 1);
+    }
+    let name = i;
+    while i < bytes.len() && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric()) {
+        i += 1;
+    }
+    (!bytes[name..i].starts_with(b"CORE::")).then_some(i)
+}
+
+fn is_assignment_eq(bytes: &[u8], k: usize) -> bool {
+    if bytes.get(k) != Some(&b'=') || matches!(bytes.get(k + 1), Some(b'=' | b'~' | b'>')) {
+        return false;
+    }
+    if k == 0 {
+        return true;
+    }
+    match bytes[k - 1] {
+        b'=' | b'!' => false,
+        b'<' | b'>' => k >= 2 && bytes[k - 2] == bytes[k - 1],
+        _ => true,
+    }
+}
+
+fn mutates_argv(bytes: &[u8], start: usize, end: usize) -> bool {
+    let mut j = end;
+    while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
+        j += 1;
+    }
+    if bytes.get(j) == Some(&b'}') {
+        j += 1;
+    }
+    while j < bytes.len() && !matches!(bytes[j], b';' | b'{' | b'}') {
+        if is_assignment_eq(bytes, j) || matches!(bytes.get(j..j + 2), Some(b"++" | b"--" | b"=~" | b"!~")) {
+            return true;
+        }
+        j += 1;
+    }
+    let mut p = start;
+    while p > 0
+        && (bytes[p - 1].is_ascii_alphanumeric()
+            || matches!(bytes[p - 1], b'_' | b':' | b' ' | b'\t' | b'\n' | b'$' | b'@' | b'%' | b'#' | b'*' | b'{' | b'('))
+    {
+        if bytes[p - 1].is_ascii_alphanumeric() || bytes[p - 1] == b'_' {
+            let mut w = p;
+            while w > 0 && (bytes[w - 1].is_ascii_alphanumeric() || bytes[w - 1] == b'_') {
+                w -= 1;
+            }
+            if matches!(
+                &bytes[w..p],
+                b"local"
+                    | b"our"
+                    | b"my"
+                    | b"undef"
+                    | b"push"
+                    | b"unshift"
+                    | b"splice"
+                    | b"pop"
+                    | b"shift"
+                    | b"delete"
+                    | b"chomp"
+                    | b"chop"
+                    | b"substr"
+                    | b"for"
+                    | b"foreach"
+            ) {
+                return true;
+            }
+            if !bytes[p..start].starts_with(b"::") {
+                break;
+            }
+            p = w;
+        } else {
+            p -= 1;
+        }
+    }
+    p > 0 && (bytes[p - 1] == b'\\' || bytes[p - 1] == b'}' || (p >= 2 && matches!(&bytes[p - 2..p], b"++" | b"--")))
+}
+
 pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
     if crate::parse::has_unknown_content(token) || has_substitution_eval(token.as_str()) {
         return false;
@@ -22,11 +125,57 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
     let bytes = stripped.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
+        if bytes[i] == b'&' {
+            if bytes.get(i + 1) == Some(&b'&') {
+                i += 2;
+                continue;
+            }
+            let mut j = i + 1;
+            while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
+                j += 1;
+            }
+            if bytes.get(j).is_some_and(|b| matches!(b, b'{' | b'$' | b'_' | b':') || b.is_ascii_alphabetic()) {
+                return false;
+            }
+            i += 1;
+            continue;
+        }
+        if bytes.get(i..i + 2) == Some(b"->") || bytes[i] == b']' {
+            let mut j = i + if bytes[i] == b']' { 1 } else { 2 };
+            while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
+                j += 1;
+            }
+            if bytes.get(j) == Some(&b'(') {
+                return false;
+            }
+        }
         if bytes[i] == b'$' || bytes[i] == b'@' || bytes[i] == b'%' {
             i += 1;
+            while matches!(bytes.get(i), Some(b'#' | b' ' | b'\t')) {
+                i += 1;
+            }
+            if bytes.get(i) == Some(&b'$') {
+                return false;
+            }
+            if bytes.get(i) == Some(&b'{') {
+                let start = i + 1;
+                let mut end = start;
+                while bytes.get(end).is_some_and(|b| *b == b'_' || b.is_ascii_alphanumeric()) {
+                    end += 1;
+                }
+                if end == start || bytes.get(end) != Some(&b'}') || (&bytes[start..end] == b"ARGV" && mutates_argv(bytes, start, end)) {
+                    return false;
+                }
+                i = end + 1;
+                continue;
+            }
             if i < bytes.len() && (bytes[i] == b'_' || bytes[i].is_ascii_alphabetic()) {
+                let start = i;
                 while i < bytes.len() && (bytes[i] == b'_' || bytes[i].is_ascii_alphanumeric()) {
                     i += 1;
+                }
+                if &bytes[start..i] == b"ARGV" && mutates_argv(bytes, start, i) {
+                    return false;
                 }
             }
             continue;
@@ -37,6 +186,9 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
                 i += 1;
             }
             let word = &stripped[start..i];
+            if word == "ARGV" && mutates_argv(bytes, start, i) {
+                return false;
+            }
             if word.len() > 1 && !SAFE_PERL_WORDS.contains(word) {
                 return false;
             }
@@ -86,6 +238,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
     }
 
     let (mut has_code, mut code_all_safe) = (false, true);
+    let mut pieces = Vec::new();
     let mut flags_done = false;
     let mut i = 1;
     while i < tokens.len() {
@@ -126,7 +279,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
                         Some(Token::from_raw(glued.to_string()))
                     };
                     match code {
-                        Some(code) if perl_code_is_safe(&code) => {}
+                        Some(code) if perl_code_is_safe(&code) => pieces.push(code.as_str().to_string()),
                         _ => code_all_safe = false,
                     }
                     break;
@@ -142,7 +295,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
         }
         i += 1 + usize::from(consumed_next);
     }
-    if has_code && code_all_safe {
+    if has_code && code_all_safe && (pieces.len() <= 1 || perl_code_is_safe(&Token::from_raw(pieces.join("\n")))) {
         scan.code = PerlCode::Inspectable;
     }
     Some(scan)
@@ -253,6 +406,51 @@ mod tests {
         perl_interp_backtick: "perl -e 'print \"@{[`id`]}\"'",
         perl_interp_hash_subscript: "perl -e 'print \"$h{`id`}\"'",
         perl_interp_array_subscript: "perl -e 'print \"$a[`id`]\"'",
+        perl_subref_block_string_denied: "perl -e '&{\"system\"}(\"id\")'",
+        perl_subref_block_var_denied: "perl -e '&{$f}(\"id\")'",
+        perl_subref_block_spaced_denied: "perl -e '& { $f }(\"id\")'",
+        perl_subref_scalar_denied: "perl -e '&$x(\"id\")'",
+        perl_subref_scalar_bare_denied: "perl -e '&$x'",
+        perl_subref_scalar_spaced_denied: "perl -e '& $x(\"id\")'",
+        perl_ampersand_named_sub_denied: "perl -e '&foo(\"id\")'",
+        perl_ampersand_safe_word_sub_denied: "perl -e '&print(\"hi\")'",
+        perl_ampersand_single_char_sub_denied: "perl -e '&f(\"id\")'",
+        perl_ampersand_root_pkg_sub_denied: "perl -e '&::print(\"hi\")'",
+        perl_arrow_call_denied: "perl -e '$x->(\"id\")'",
+        perl_arrow_call_empty_denied: "perl -e '$x->()'",
+        perl_arrow_call_spaced_denied: "perl -e '$x -> (\"id\")'",
+        perl_subscript_arrow_call_denied: "perl -e '$a[0]->(\"id\")'",
+        perl_subscript_implicit_arrow_call_denied: "perl -e '$a[0](\"id\")'",
+        perl_core_call_denied: "perl -e 'CORE::system(\"id\")'",
+        perl_core_safe_word_call_denied: "perl -e 'CORE::print(\"hi\")'",
+        perl_core_global_call_denied: "perl -e 'CORE::GLOBAL::system(\"id\")'",
+        perl_core_global_safe_word_call_denied: "perl -e 'CORE::GLOBAL::print(\"hi\")'",
+        perl_interp_subref_block_denied: "perl -e 'print \"@{[&{q(system)}(q(id))]}\"'",
+        perl_interp_subref_scalar_denied: "perl -e 'print \"@{[&$x]}\"'",
+        perl_interp_ampersand_name_denied: "perl -e 'print \"@{[&print(1)]}\"'",
+        perl_interp_arrow_call_denied: "perl -e 'print \"@{[$x->()]}\"'",
+        perl_interp_core_call_denied: "perl -e 'print \"@{[CORE::print(1)]}\"'",
+        perl_interp_core_global_call_denied: "perl -e 'print \"@{[CORE::GLOBAL::print(1)]}\"'",
+        perl_interp_subscript_core_call_denied: "perl -e 'print \"$a[CORE::shift]\"'",
+        perl_interp_punct_subscript_ampersand_denied: "perl -e 'print \"$+{&print}\"'",
+        perl_interp_braced_arrow_subscript_denied: "perl -e 'print \"${a}->[CORE::shift]\"'",
+        perl_qq_interp_core_denied: "perl -e 'print qq{${CORE::shift}}'",
+        perl_qq_interp_punct_subscript_denied: "perl -e 'print qq{$+{&print}}'",
+        perl_assign_argv_denied: "perl -ne 'BEGIN { @ARGV = (\"/etc/passwd\") } print' file.txt",
+        perl_assign_argv_element_denied: "perl -ne 'BEGIN { $ARGV[0] = \"/etc/passwd\" } print' file.txt",
+        perl_assign_argv_last_index_denied: "perl -ne 'BEGIN { $#ARGV = 0 } print' file.txt",
+        perl_push_argv_denied: "perl -ne 'BEGIN { push @ARGV, \"/etc/passwd\" } print' file.txt",
+        perl_assign_inplace_var_denied: "perl -pe 'BEGIN { $^I = \".bak\" } s/a/b/' file.txt",
+        perl_assign_inplace_var_braced_denied: "perl -pe 'BEGIN { ${^I} = \"\" } s/a/b/' file.txt",
+        perl_assign_input_record_sep_denied: "perl -ne 'BEGIN { $/ = undef } print' file.txt",
+        perl_local_input_record_sep_denied: "perl -ne 'BEGIN { local $/ } print' file.txt",
+        perl_assign_output_record_sep_denied: "perl -ne 'BEGIN { $\\ = \"\\n\" } print' file.txt",
+        perl_assign_output_field_sep_denied: "perl -ne 'BEGIN { $, = \",\" } print' file.txt",
+        perl_assign_list_special_vars_denied: "perl -ne 'BEGIN { ($/, $\\, $,) = (\"a\", \"b\", \"c\") } print' file.txt",
+        perl_split_e_assign_inplace_denied: "perl -pe '$^I' -e '= \".bak\"' file.txt",
+        perl_assign_inplace_glued_op_denied: "perl -pe 'BEGIN { $^Ix=1 } s/a/b/' file.txt",
+        perl_symref_inplace_denied: "perl -pe 'BEGIN { ${\"^I\"} = \".bak\" } s/a/b/' file.txt",
+        perl_symref_argv_denied: "perl -ne 'BEGIN { @{\"ARGV\"} = (\"/etc/passwd\") } print' file.txt",
     }
 
     use crate::parse::Token;
@@ -331,6 +529,84 @@ mod tests {
                 code,
                 expected,
             );
+        }
+
+        #[test]
+        fn a_sub_call_or_special_variable_assignment_is_never_approved(
+            benign in proptest::sample::select(&[
+                "print if /x/",
+                "my $n = 1; print $n",
+                "chomp; print",
+                "print $/; print $\"",
+            ][..]),
+            flag in proptest::sample::select(&["-e", "-E", "-ne", "-pe"][..]),
+            call in proptest::sample::select(&[
+                "&{\"system\"}(\"id\")",
+                "&{$f} (\"id\")",
+                "& { $f }()",
+                "&$x(\"id\")",
+                "&$x",
+                "& $x()",
+                "&foo(\"id\")",
+                "&print(\"hi\")",
+                "&f()",
+                "&::print(1)",
+                "$x->(\"id\")",
+                "$x->()",
+                "$x -> ()",
+                "$a[0]->(\"id\")",
+                "$a[0](\"id\")",
+                "CORE::system(\"id\")",
+                "CORE::print(1)",
+                "CORE::GLOBAL::system(\"id\")",
+                "CORE::GLOBAL::print(1)",
+            ][..]),
+            interp_wrap in proptest::sample::select(&[
+                "print \"@{[ EXPR ]}\"",
+                "print \"${\\ EXPR }\"",
+                "print \"${ EXPR }\"",
+                "print \"$a[EXPR]\"",
+                "print \"$h{EXPR}\"",
+                "print \"$+{EXPR}\"",
+                "print \"${a}->[EXPR]\"",
+                "print qq{@{[ EXPR ]}}",
+                "print qq{$+{EXPR}}",
+            ][..]),
+            assign in proptest::sample::select(&[
+                "@ARGV = (\"x\")",
+                "$ARGV[0] = \"x\"",
+                "$#ARGV = 0",
+                "@{ARGV} = (\"x\")",
+                "push @ARGV, \"x\"",
+                "unshift @ARGV, \"x\"",
+                "$^I = \".bak\"",
+                "${^I} = \"\"",
+                "$ ^I = \"\"",
+                "$/ = undef",
+                "${/} = \"\"",
+                "$ / = \"\"",
+                "local $/",
+                "$\\ = \"\\n\"",
+                "${\\} = \"\\n\"",
+                "$ \\ = \"\\n\"",
+                "$, = \",\"",
+                "${,} = \",\"",
+                "$ , = \",\"",
+                "($/, $\\, $,) = (\"a\", \"b\", \"c\")",
+            ][..]),
+        ) {
+            let safe_line = format!("perl {flag} {} file.txt", shell_words::quote(benign));
+            proptest::prop_assert!(check(&safe_line), "benign one-liner refused: {safe_line}");
+
+            let direct_call = format!("perl {flag} {} file.txt", shell_words::quote(&format!("{benign}; {call}")));
+            proptest::prop_assert!(!check(&direct_call), "sub call approved: {direct_call}");
+
+            let interpolated = interp_wrap.replacen("EXPR", call, 1);
+            let interp_line = format!("perl {flag} {} file.txt", shell_words::quote(&format!("{benign}; {interpolated}")));
+            proptest::prop_assert!(!check(&interp_line), "interpolated sub call approved: {interp_line}");
+
+            let assign_line = format!("perl {flag} {} file.txt", shell_words::quote(&format!("{benign}; {assign}")));
+            proptest::prop_assert!(!check(&assign_line), "special variable assignment approved: {assign_line}");
         }
     }
 }

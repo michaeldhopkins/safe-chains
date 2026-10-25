@@ -137,12 +137,19 @@ pub(super) fn strip_inert_text(code: &str) -> Option<String> {
 
     while i < bytes.len() {
         match bytes[i] {
+            b'$' if bytes.get(i + 1) != Some(&b'$')
+                && let Some(end) = super::perl::special_scalar_at(bytes, i) =>
+            {
+                result.extend_from_slice(b" $ARGV ");
+                i = end;
+                continue;
+            }
             b'$' if bytes.get(i + 1).is_some_and(|b| {
                 (b.is_ascii_punctuation() && !matches!(b, b'{' | b'_' | b'$' | b'#'))
                     || (*b == b'$' && !bytes.get(i + 2).is_some_and(|c| is_name_byte(*c) || matches!(c, b'{' | b'$')))
             }) =>
             {
-                result.extend_from_slice(b" 1 ");
+                result.extend_from_slice(b" $a ");
                 i += 2;
                 continue;
             }
@@ -270,15 +277,16 @@ fn strip_double_quoted(bytes: &[u8], start: usize, out: &mut Vec<u8>) -> Option<
                     out.extend_from_slice(&bytes[i + 1..end - 1]);
                     out.push(b' ');
                     i = end;
-                    continue;
-                }
-                while i < bytes.len() && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric()) {
-                    i += 1;
+                } else {
+                    i = super::perl::skip_interp_var_head(bytes, i)?;
                 }
                 while matches!(bytes.get(i), Some(b'[' | b'{'))
-                    || (bytes.get(i..i + 2) == Some(b"->") && matches!(bytes.get(i + 2), Some(b'[' | b'{')))
+                    || (bytes.get(i..i + 2) == Some(b"->") && matches!(bytes.get(i + 2), Some(b'[' | b'{' | b'(')))
                 {
                     if bytes.get(i) == Some(&b'-') {
+                        if bytes.get(i + 2) == Some(&b'(') {
+                            return None;
+                        }
                         i += 2;
                     }
                     let end = skip_delimited(bytes, i)?;
@@ -327,11 +335,16 @@ pub(super) fn runs_code(section: &[u8]) -> bool {
                 while section.get(j).is_some_and(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b':')) {
                     j += 1;
                 }
+                if section[name..j].starts_with(b"CORE::") {
+                    return true;
+                }
                 if braced {
                     if j == name || section.get(j) != Some(&b'}') {
                         return true;
                     }
                     j += 1;
+                } else if j == name && super::perl::is_interp_punct_var(section.get(j).copied()) {
+                    j += 1 + usize::from(section[j] == b'^' && section.get(j + 1).is_some_and(u8::is_ascii_alphabetic));
                 }
                 if (braced || j > name) && (matches!(section.get(j), Some(b'[' | b'{')) || section[j..].starts_with(b"->")) {
                     return true;

@@ -320,6 +320,7 @@ owed = [
   "closing_delimiter_is_identity_exactly_on_non_paired_bytes",
   "scan_perl_with_unknown_long_flag_returns_none",
   "has_substitution_eval_matches_e_flag_for_isolated_substitution",
+  "a_sub_call_or_special_variable_assignment_is_never_approved",
 ]
 "src/handlers/perl_regex.rs" = [
   "a_regex_that_evaluates_code_is_never_approved",

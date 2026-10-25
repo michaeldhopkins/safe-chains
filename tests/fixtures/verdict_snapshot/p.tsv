@@ -2161,6 +2161,25 @@ perl -e "print 'x;/'; unlink 1; '/'"	denied
 perl -e "print /'/; unlink 1; print /'/"	denied
 perl -e "q,'/,, unlink 1, q,'/,"	denied
 perl -e '"a" =~ /(?{ 1 })/'	denied
+perl -e '$a[0]("id")'	denied
+perl -e '$a[0]->("id")'	denied
+perl -e '$x -> ("id")'	denied
+perl -e '$x->("id")'	denied
+perl -e '$x->()'	denied
+perl -e '& $x("id")'	denied
+perl -e '& { $f }("id")'	denied
+perl -e '&$x'	denied
+perl -e '&$x("id")'	denied
+perl -e '&::print("hi")'	denied
+perl -e '&f("id")'	denied
+perl -e '&foo("id")'	denied
+perl -e '&print("hi")'	denied
+perl -e '&{"system"}("id")'	denied
+perl -e '&{$f}("id")'	denied
+perl -e 'CORE::GLOBAL::print("hi")'	denied
+perl -e 'CORE::GLOBAL::system("id")'	denied
+perl -e 'CORE::print("hi")'	denied
+perl -e 'CORE::system("id")'	denied
 perl -e 'chmod(0755, "file")'	denied
 perl -e 'eval("bad code")'	denied
 perl -e 'exec("bad")'	denied
@@ -2173,14 +2192,23 @@ perl -e 'my %h; print $h{s}; print $h{y}'	inert
 perl -e 'my %h; print keys %h'	inert
 perl -e 'open(FH, ">file")'	denied
 perl -e 'print "$#{[unlink 1]}"'	denied
+perl -e 'print "$+{&print}"'	denied
+perl -e 'print "$a[CORE::shift]"'	denied
 perl -e 'print "$a[`id`]"'	denied
 perl -e 'print "$h{`id`}"'	denied
 perl -e 'print "$h{q(}); unlink 1}"'	denied
 perl -e 'print "$r->{unlink 1}"'	denied
 perl -e 'print "${\\ system(q(id))}"'	denied
+perl -e 'print "${a}->[CORE::shift]"'	denied
 perl -e 'print "8" / 2; unlink 1; print 1 / 2'	denied
 perl -e 'print "@{[ /(?{ 1 })/ ]}"'	denied
 perl -e 'print "@{[ q(}); unlink 1 ]}"'	denied
+perl -e 'print "@{[$x->()]}"'	denied
+perl -e 'print "@{[&$x]}"'	denied
+perl -e 'print "@{[&print(1)]}"'	denied
+perl -e 'print "@{[&{q(system)}(q(id))]}"'	denied
+perl -e 'print "@{[CORE::GLOBAL::print(1)]}"'	denied
+perl -e 'print "@{[CORE::print(1)]}"'	denied
 perl -e 'print "@{[`id`]}"'	denied
 perl -e 'print "@{[system(q(id))]}"'	denied
 perl -e 'print "a'	denied
@@ -2200,6 +2228,8 @@ perl -e 'print 1; #;/\nunlink 1;\n/'	denied
 perl -e 'print <<"E";\n;/\nE\nunlink 1; /'	denied
 perl -e 'print `ls`'	denied
 perl -e 'print for qw(a/b c)'	inert
+perl -e 'print qq{$+{&print}}'	denied
+perl -e 'print qq{${CORE::shift}}'	denied
 perl -e 'print qq{@{[ 1 ]}}'	denied
 perl -e 'qx(ls)'	denied
 perl -e 'q{/}; unlink 1; q{/}'	denied
@@ -2223,6 +2253,16 @@ perl -i.bake -pe 's/foo/bar/' file.txt	safe-write
 perl -i.orig -pe 's/foo/bar/' file.txt	safe-write
 perl -lane 'print $F[0]' file.txt	safe-read
 perl -n file.txt	denied
+perl -ne 'BEGIN { $#ARGV = 0 } print' file.txt	denied
+perl -ne 'BEGIN { $, = "," } print' file.txt	denied
+perl -ne 'BEGIN { $/ = undef } print' file.txt	denied
+perl -ne 'BEGIN { $ARGV[0] = "/etc/passwd" } print' file.txt	denied
+perl -ne 'BEGIN { $\\ = "\\n" } print' file.txt	denied
+perl -ne 'BEGIN { ($/, $\\, $,) = ("a", "b", "c") } print' file.txt	denied
+perl -ne 'BEGIN { @ARGV = ("/etc/passwd") } print' file.txt	denied
+perl -ne 'BEGIN { @{"ARGV"} = ("/etc/passwd") } print' file.txt	denied
+perl -ne 'BEGIN { local $/ } print' file.txt	denied
+perl -ne 'BEGIN { push @ARGV, "/etc/passwd" } print' file.txt	denied
 perl -ne 'BEGIN{$n=0} $n++; END{print $n}'	inert
 perl -ne 'chomp; print join(",", split(/\\t/)), "\\n"'	inert
 perl -ne 'my $w = 1; print if /$w/' a.txt	safe-read
@@ -2244,6 +2284,11 @@ perl -ne 'print unless /^#/' file.txt	safe-read
 perl -ne 'print' /etc/shadow	denied
 perl -ne 'split /(?{ 1 })/' a.txt	denied
 perl -ne print ./file.txt	safe-read
+perl -pe '$^I' -e '= ".bak"' file.txt	denied
+perl -pe 'BEGIN { $^I = ".bak" } s/a/b/' file.txt	denied
+perl -pe 'BEGIN { $^Ix=1 } s/a/b/' file.txt	denied
+perl -pe 'BEGIN { ${"^I"} = ".bak" } s/a/b/' file.txt	denied
+perl -pe 'BEGIN { ${^I} = "" } s/a/b/' file.txt	denied
 perl -pe 's /a/"unlink 1"/ee' a.txt	denied
 perl -pe 's/(\\d+)/$1x/' a.txt	safe-read
 perl -pe 's/(\\d+)/${1}x/' a.txt	safe-read
