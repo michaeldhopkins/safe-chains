@@ -61,3 +61,10 @@ What each rotating slice found and which tests killed it. Add an entry when you 
     shows both sides of the cap.
   - Setting the build directory under `/tmp` moves `CARGO_TARGET_TMPDIR` there too, and the
     tests that build scratch projects in it then read them as temporary folders and fail.
+- **Pre-release run (2026-10-25):** 24 MISSED of 132 viable (154 total: 96 caught, 24 missed, 12
+  timeouts, 22 unviable) across `src/handlers/df.rs` (5), `src/handlers/pandoc.rs` (5), and
+  `src/registry/policy.rs` (14). Killed by tests for separate-word and glued valued flags before
+  `--libxo` and `--to`, repeated separators in pandoc format strings (`html++smart`), short-flag
+  clusters and prefix guards in `passthrough_tests`, and by dropping redundant index increments and
+  unreachable or duplicate checks in `libxo_values_are_known`, `format_values_are_plain`,
+  `has_unvalued_flag`, and `check_with_passthrough`.
