@@ -59,42 +59,32 @@ pub(super) fn build_passthrough(toml: TomlPassthrough) -> Box<PassthroughSpec> {
 
 fn has_unvalued_flag(tokens: &[Token], policy: &OwnedPolicy) -> bool {
     let (standalone, valued) = (policy.standalone.as_slice(), policy.valued.as_slice());
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if t == "--" {
-            break;
-        }
-        if !t.starts_with('-') || t == "-" {
-            i += 1;
+    for (i, token) in tokens.iter().enumerate().skip(1) {
+        let t = token.as_str();
+        if !t.starts_with('-') {
             continue;
         }
         if valued.contains_flag(t) {
             if !consumes_next_value(tokens.get(i + 1)) {
                 return true;
             }
-            i += 2;
             continue;
         }
-        if !t.starts_with("--") && !policy.tolerance.single_dash_words {
+        if !policy.tolerance.single_dash_words {
             let bytes = t.as_bytes();
             for (j, &b) in bytes.iter().enumerate().skip(1) {
                 if standalone.contains_short(b) {
                     continue;
                 }
                 if valued.contains_short(b) {
-                    if j == bytes.len() - 1 {
-                        if !consumes_next_value(tokens.get(i + 1)) {
-                            return true;
-                        }
-                        i += 1;
+                    if j + 1 == bytes.len() && !consumes_next_value(tokens.get(i + 1)) {
+                        return true;
                     }
                     break;
                 }
                 break;
             }
         }
-        i += 1;
     }
     false
 }
@@ -124,7 +114,7 @@ pub(super) fn check_with_passthrough(tokens: &[Token], policy: &OwnedPolicy, bas
             if has_unvalued_flag(tokens, policy) {
                 return Verdict::Denied;
             }
-            if !pass.require_any.is_empty() && flag_given(tokens, policy, &pass.require_any) {
+            if flag_given(tokens, policy, &pass.require_any) {
                 return Verdict::Allowed(pass.level);
             }
         }
@@ -656,7 +646,7 @@ mod passthrough_tests {
             tolerance: FlagTolerance::strict(),
             passthrough: None,
         };
-        let mut outer = inner(&["--all"], &["-p"]);
+        let mut outer = inner(&["--all", "--check", "-q"], &["-p"]);
         outer.bare = true;
         outer.passthrough = Some(Box::new(PassthroughSpec {
             policy: inner(&["--check", "--quiet", "-l"], &["--edition", "--color"]),
@@ -669,6 +659,11 @@ mod passthrough_tests {
     fn verdict(words: &[String]) -> Verdict {
         let tokens: Vec<Token> = words.iter().cloned().map(Token::from_raw).collect();
         check_with_passthrough(&tokens, &spec(), SafetyLevel::SafeWrite)
+    }
+
+    fn verdict_strs(words: &[&str]) -> Verdict {
+        let owned: Vec<String> = words.iter().map(|s| (*s).to_string()).collect();
+        verdict(&owned)
     }
 
     /// One whole unit of the passthrough grammar: a standalone flag or a valued flag with its value.
@@ -759,7 +754,14 @@ mod passthrough_tests {
 
     #[test]
     fn an_unvalued_valued_flag_before_the_separator_is_denied() {
-        let words: Vec<String> = ["cmd", "-p", "--", "--check"].iter().map(|s| s.to_string()).collect();
-        assert_eq!(verdict(&words), Verdict::Denied);
+        assert_eq!(verdict_strs(&["cmd", "-p", "--", "--check"]), Verdict::Denied);
+        assert_eq!(verdict_strs(&["cmd", "-qp", "--", "--check"]), Verdict::Denied);
+        assert_eq!(verdict_strs(&["cmd", "-p"]), Verdict::Denied);
+        assert_eq!(verdict_strs(&["cmd", "-p", "xp", "--", "--check"]), Verdict::Allowed(SafetyLevel::SafeRead));
+        assert_eq!(verdict_strs(&["cmd", "-qp", "xp", "--", "--check"]), Verdict::Allowed(SafetyLevel::SafeRead));
+        assert_eq!(verdict_strs(&["cmd", "-qpx", "--", "--check"]), Verdict::Allowed(SafetyLevel::SafeRead));
+        assert_eq!(verdict_strs(&["cmd", "--check", "--", "-l"]), Verdict::Allowed(SafetyLevel::SafeRead));
+        assert_eq!(verdict_strs(&["cmd", "--check"]), Verdict::Allowed(SafetyLevel::SafeRead));
+        assert_eq!(verdict_strs(&["cmd", "--all"]), Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 }
