@@ -23,7 +23,8 @@ pub(crate) fn load_flag(tokens: &[Token], i: usize, load_paths: &mut Vec<String>
     }
     let module = value.trim_start_matches('-');
     let (name, args) = module.split_once('=').unwrap_or((module, ""));
-    if crate::parse::has_unknown_content(value) || !is_module_name(name) || args.contains(['{', '}', '\\']) {
+    if crate::parse::has_unknown_content(value) || !is_module_name(name) || matches!(name, "re" | "blib") || args.contains(['{', '}', '\\'])
+    {
         return None;
     }
     if let Some(dirs) = module.strip_prefix("lib=") {
@@ -65,6 +66,10 @@ mod tests {
         assert_eq!(run("perl -Mlib=.,t/lib -e 1"), (Some(Some(1)), dirs(&[".", "t/lib"])));
         assert_eq!(run("perl -M-lib=x -e 1"), (Some(Some(1)), dirs(&["x"])));
         assert_eq!(run("perl -Mlibrary -e 1"), (Some(Some(1)), dirs(&[])));
+        assert_eq!(run("perl -Mre=eval -e 1"), (None, dirs(&[])));
+        assert_eq!(run("perl -mre -e 1"), (None, dirs(&[])));
+        assert_eq!(run("perl -Mblib=/tmp -e 1"), (None, dirs(&[])));
+        assert_eq!(run("perl -mblib -e 1"), (None, dirs(&[])));
         assert_eq!(run("perl -Mlib~qw(.) -e 1"), (None, dirs(&[])));
         assert_eq!(run("perl -I"), (None, dirs(&[])));
         assert_eq!(run("perl -pe 1"), (Some(None), dirs(&[])));

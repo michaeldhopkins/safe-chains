@@ -168,9 +168,7 @@ pub(super) fn strip_inert_text(code: &str) -> Option<String> {
                 i = bytes[i..].iter().position(|b| *b == b'\n').map_or(bytes.len(), |n| i + n);
                 continue;
             }
-            b'<' if bytes.get(i + 1) == Some(&b'<')
-                && bytes.get(i + 2).is_some_and(|b| matches!(b, b'"' | b'\'' | b'~' | b'_') || b.is_ascii_alphabetic()) =>
-            {
+            b'<' if bytes.get(i + 1) == Some(&b'<') && super::perl::is_heredoc_after_lt_lt(&bytes[i + 2..]) => {
                 return None;
             }
             b'=' if (i == 0 || bytes[i - 1] == b'\n') && bytes.get(i + 1).is_some_and(u8::is_ascii_alphabetic) => return None,
@@ -244,7 +242,7 @@ fn simple_interpolated(slice: &[u8]) -> bool {
     !slice.is_empty()
         && slice
             .iter()
-            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b':' | b'$' | b'@' | b' ' | b'\t'))
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b':' | b'$' | b'@' | b'-' | b' ' | b'\t'))
 }
 
 /// Copies the double-quoted string starting at `start` into `out` as blanks, keeping the

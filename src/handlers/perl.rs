@@ -12,23 +12,24 @@ static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
 ]);
 
 pub(super) fn special_scalar_at(bytes: &[u8], i: usize) -> Option<usize> {
-    let mut j = i + 1;
-    while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
-        j += 1;
-    }
+    let j = i + 1 + bytes[i + 1..].iter().take_while(|b| b.is_ascii_whitespace()).count();
     if bytes.get(j) == Some(&b'{') {
         let close = j + 1 + bytes.get(j + 1..)?.iter().position(|&b| b == b'}' || b == b'{')?;
         let inner = bytes[j + 1..close].trim_ascii();
         return (bytes[close] == b'}' && matches!(inner, b"^I" | b"/" | b"\\" | b",")).then_some(close + 1);
     }
-    if bytes.get(j..j + 2) == Some(b"^I") {
-        return Some(j + 2);
-    }
-    matches!(bytes.get(j), Some(b'/' | b'\\' | b',')).then_some(j + 1)
+    (bytes.get(j..j + 2) == Some(b"^I"))
+        .then_some(j + 2)
+        .or_else(|| matches!(bytes.get(j), Some(b'/' | b'\\' | b',')).then_some(j + 1))
 }
 
 pub(super) fn is_interp_punct_var(b: Option<u8>) -> bool {
     b.is_some_and(|c| c.is_ascii_punctuation() && !matches!(c, b'(' | b')' | b'[' | b']' | b'{' | b'}' | b'<' | b'>' | b'\\' | b'|' | b'"'))
+}
+
+pub(super) fn is_heredoc_after_lt_lt(rest: &[u8]) -> bool {
+    rest.first().is_some_and(|b| *b == b'_' || b.is_ascii_alphabetic())
+        || rest.trim_ascii_start().first().is_some_and(|b| matches!(b, b'"' | b'\'' | b'`' | b'~' | b'\\'))
 }
 
 pub(super) fn skip_interp_var_head(bytes: &[u8], mut i: usize) -> Option<usize> {
@@ -46,72 +47,129 @@ pub(super) fn skip_interp_var_head(bytes: &[u8], mut i: usize) -> Option<usize> 
 }
 
 fn is_assignment_eq(bytes: &[u8], k: usize) -> bool {
-    if bytes.get(k) != Some(&b'=') || matches!(bytes.get(k + 1), Some(b'=' | b'~' | b'>')) {
-        return false;
-    }
-    if k == 0 {
-        return true;
-    }
-    match bytes[k - 1] {
-        b'=' | b'!' => false,
-        b'<' | b'>' => k >= 2 && bytes[k - 2] == bytes[k - 1],
-        _ => true,
+    bytes.get(k) == Some(&b'=')
+        && !matches!(bytes.get(k + 1), Some(b'=' | b'~' | b'>'))
+        && (k == 0
+            || match bytes[k - 1] {
+                b'=' | b'!' => false,
+                b'<' | b'>' => k >= 2 && bytes[k - 2] == bytes[k - 1],
+                _ => true,
+            })
+}
+
+fn subscript_calls_code(bytes: &[u8], mut j: usize) -> bool {
+    let mut had_sub = bytes.get(j) == Some(&b']');
+    j += usize::from(had_sub);
+    loop {
+        j += bytes[j..].iter().take_while(|b| b.is_ascii_whitespace()).count();
+        if bytes.get(j..j + 2) == Some(b"->") {
+            j += 2 + bytes[j + 2..].iter().take_while(|b| b.is_ascii_whitespace()).count();
+            if !matches!(bytes.get(j), Some(b'[' | b'{')) {
+                return true;
+            }
+        } else if !matches!(bytes.get(j), Some(b'[' | b'{')) {
+            return had_sub && bytes.get(j) == Some(&b'(');
+        }
+        let Some(next) = super::perl_regex::skip_delimited(bytes, j) else { return true };
+        (j, had_sub) = (next, true);
     }
 }
 
-fn mutates_argv(bytes: &[u8], start: usize, end: usize) -> bool {
-    let mut j = end;
-    while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
-        j += 1;
-    }
-    if bytes.get(j) == Some(&b'}') {
-        j += 1;
-    }
-    while j < bytes.len() && !matches!(bytes[j], b';' | b'{' | b'}') {
+fn mutates_argv_forward(bytes: &[u8], end: usize) -> bool {
+    let mut j = end + bytes[end..].iter().take_while(|b| b.is_ascii_whitespace()).count();
+    j += usize::from(bytes.get(j) == Some(&b'}'));
+    while j < bytes.len() && !matches!(bytes[j], b';' | b'}') {
+        if bytes[j] == b'{' {
+            if j > 0 && (bytes[j - 1].is_ascii_alphanumeric() || matches!(bytes[j - 1], b'_' | b'$' | b'@' | b'%' | b']' | b'>')) {
+                let Some(next) = super::perl_regex::skip_delimited(bytes, j) else { return true };
+                j = next;
+                continue;
+            }
+            break;
+        }
         if is_assignment_eq(bytes, j) || matches!(bytes.get(j..j + 2), Some(b"++" | b"--" | b"=~" | b"!~")) {
             return true;
         }
         j += 1;
     }
+    false
+}
+
+fn is_argv_mutating_keyword(word: &[u8], saw_comma: bool) -> bool {
+    matches!(word, b"local" | b"our" | b"my" | b"undef" | b"delete" | b"chomp" | b"chop" | b"for" | b"foreach" | b"map" | b"grep")
+        || (!saw_comma && matches!(word, b"push" | b"unshift" | b"splice" | b"pop" | b"shift" | b"substr"))
+}
+
+fn mutates_argv(bytes: &[u8], start: usize, end: usize) -> bool {
+    if mutates_argv_forward(bytes, end) {
+        return true;
+    }
+    let prefix = bytes[..start]
+        .iter()
+        .rposition(|b| !matches!(b, b' ' | b'\t' | b'\n' | b'$' | b'@' | b'%' | b'#' | b'*' | b'{' | b':'));
+    if prefix.is_some_and(|q| bytes[q] == b'\\' || bytes[q] == b'}' || (q >= 1 && matches!(&bytes[q - 1..=q], b"++" | b"--"))) {
+        return true;
+    }
     let mut p = start;
-    while p > 0
-        && (bytes[p - 1].is_ascii_alphanumeric()
-            || matches!(bytes[p - 1], b'_' | b':' | b' ' | b'\t' | b'\n' | b'$' | b'@' | b'%' | b'#' | b'*' | b'{' | b'('))
-    {
-        if bytes[p - 1].is_ascii_alphanumeric() || bytes[p - 1] == b'_' {
+    let mut saw_comma = false;
+    while p > 0 && !matches!(bytes[p - 1], b';' | b'}') {
+        if bytes[p - 1] == b'=' && !saw_comma {
+            break;
+        }
+        if bytes[p - 1] == b',' {
+            saw_comma = true;
+            p -= 1;
+        } else if bytes[p - 1].is_ascii_alphanumeric() || bytes[p - 1] == b'_' {
             let mut w = p;
             while w > 0 && (bytes[w - 1].is_ascii_alphanumeric() || bytes[w - 1] == b'_') {
                 w -= 1;
             }
-            if matches!(
-                &bytes[w..p],
-                b"local"
-                    | b"our"
-                    | b"my"
-                    | b"undef"
-                    | b"push"
-                    | b"unshift"
-                    | b"splice"
-                    | b"pop"
-                    | b"shift"
-                    | b"delete"
-                    | b"chomp"
-                    | b"chop"
-                    | b"substr"
-                    | b"for"
-                    | b"foreach"
-            ) {
+            if is_argv_mutating_keyword(&bytes[w..p], saw_comma) {
                 return true;
-            }
-            if !bytes[p..start].starts_with(b"::") {
-                break;
             }
             p = w;
         } else {
             p -= 1;
         }
     }
-    p > 0 && (bytes[p - 1] == b'\\' || bytes[p - 1] == b'}' || (p >= 2 && matches!(&bytes[p - 2..p], b"++" | b"--")))
+    false
+}
+
+fn check_sigil_var(bytes: &[u8], sigil: u8, mut i: usize) -> Option<usize> {
+    while bytes.get(i).is_some_and(|b| *b == b'#' || b.is_ascii_whitespace()) {
+        i += 1;
+    }
+    if bytes.get(i) == Some(&b'$') {
+        return None;
+    }
+    if bytes.get(i) == Some(&b'{') {
+        let start = i + 1;
+        let end = start + bytes[start..].iter().take_while(|b| **b == b'_' || b.is_ascii_alphanumeric()).count();
+        if end == start
+            || bytes.get(end) != Some(&b'}')
+            || (&bytes[start..end] == b"ARGV" && mutates_argv(bytes, start, end))
+            || subscript_calls_code(bytes, end + 1)
+        {
+            return None;
+        }
+        return Some(end + 1);
+    }
+    let start = i;
+    i += bytes[start..].iter().take_while(|b| **b == b'_' || b.is_ascii_alphanumeric()).count();
+    if (sigil != b'%' && i == start)
+        || (&bytes[start..i] == b"ARGV" && mutates_argv(bytes, start, i))
+        || (i > start && subscript_calls_code(bytes, i))
+    {
+        return None;
+    }
+    Some(i)
+}
+
+fn is_typeglob_at(bytes: &[u8], i: usize) -> bool {
+    let j = i + 1 + bytes[i + 1..].iter().take_while(|b| b.is_ascii_whitespace()).count();
+    (i > 0 && bytes[i - 1] == b'\\')
+        || bytes.get(j) == Some(&b'{')
+        || (bytes.get(j).is_some_and(|b| *b == b'_' || b.is_ascii_alphabetic()) && mutates_argv(bytes, j, j))
 }
 
 pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
@@ -119,7 +177,7 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
         return false;
     }
     let Some(stripped) = strip_inert_text(token.as_str()) else { return false };
-    if stripped.contains('`') {
+    if stripped.contains('`') || stripped.contains("::") {
         return false;
     }
     let bytes = stripped.as_bytes();
@@ -130,66 +188,42 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
                 i += 2;
                 continue;
             }
-            let mut j = i + 1;
-            while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
-                j += 1;
-            }
-            if bytes.get(j).is_some_and(|b| matches!(b, b'{' | b'$' | b'_' | b':') || b.is_ascii_alphabetic()) {
-                return false;
-            }
-            i += 1;
-            continue;
-        }
-        if bytes.get(i..i + 2) == Some(b"->") || bytes[i] == b']' {
-            let mut j = i + if bytes[i] == b']' { 1 } else { 2 };
-            while bytes.get(j).is_some_and(u8::is_ascii_whitespace) {
-                j += 1;
-            }
-            if bytes.get(j) == Some(&b'(') {
+            if bytes[i + 1..]
+                .trim_ascii_start()
+                .first()
+                .is_some_and(|b| matches!(b, b'{' | b'$' | b'_' | b':') || b.is_ascii_alphabetic())
+            {
                 return false;
             }
         }
-        if bytes[i] == b'$' || bytes[i] == b'@' || bytes[i] == b'%' {
-            i += 1;
-            while matches!(bytes.get(i), Some(b'#' | b' ' | b'\t')) {
-                i += 1;
-            }
-            if bytes.get(i) == Some(&b'$') {
-                return false;
-            }
-            if bytes.get(i) == Some(&b'{') {
-                let start = i + 1;
-                let mut end = start;
-                while bytes.get(end).is_some_and(|b| *b == b'_' || b.is_ascii_alphanumeric()) {
-                    end += 1;
-                }
-                if end == start || bytes.get(end) != Some(&b'}') || (&bytes[start..end] == b"ARGV" && mutates_argv(bytes, start, end)) {
-                    return false;
-                }
-                i = end + 1;
+        if bytes[i] == b'*' {
+            if bytes.get(i + 1) == Some(&b'*') {
+                i += 2;
                 continue;
             }
-            if i < bytes.len() && (bytes[i] == b'_' || bytes[i].is_ascii_alphabetic()) {
-                let start = i;
-                while i < bytes.len() && (bytes[i] == b'_' || bytes[i].is_ascii_alphanumeric()) {
-                    i += 1;
-                }
-                if &bytes[start..i] == b"ARGV" && mutates_argv(bytes, start, i) {
-                    return false;
-                }
+            if is_typeglob_at(bytes, i) {
+                return false;
             }
+        }
+        if (bytes.get(i..i + 2) == Some(b"->") || bytes[i] == b']') && subscript_calls_code(bytes, i) {
+            return false;
+        }
+        if bytes[i] == b'$' || bytes[i] == b'@' || bytes[i] == b'%' {
+            let Some(next) = check_sigil_var(bytes, bytes[i], i + 1) else { return false };
+            i = next;
             continue;
         }
         if bytes[i] == b'_' || bytes[i].is_ascii_alphabetic() {
             let start = i;
-            while i < bytes.len() && (bytes[i] == b'_' || bytes[i].is_ascii_alphanumeric()) {
-                i += 1;
-            }
+            i += bytes[start..].iter().take_while(|b| **b == b'_' || b.is_ascii_alphanumeric()).count();
             let word = &stripped[start..i];
-            if word == "ARGV" && mutates_argv(bytes, start, i) {
-                return false;
-            }
-            if word.len() > 1 && !SAFE_PERL_WORDS.contains(word) {
+            if (word == "ARGV" && mutates_argv(bytes, start, i))
+                || (word.len() == 1
+                    && word != "x"
+                    && (start == 0 || bytes[start - 1] != b'-')
+                    && bytes[i..].trim_ascii_start().starts_with(b"("))
+                || (word.len() > 1 && !SAFE_PERL_WORDS.contains(word))
+            {
                 return false;
             }
             continue;
@@ -288,8 +322,14 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
                     scan.in_place = true;
                     break;
                 }
-                'F' | 'C' | '0' => break,
-                'a' | 'c' | 'l' | 'n' | 'p' | 't' | 'T' | 'w' | 'W' | 'X' | '1'..='9' => {}
+                'F' => {
+                    if crate::parse::has_unknown_content(token) || super::perl_regex::runs_code(&flags.as_bytes()[at + 1..]) {
+                        return None;
+                    }
+                    break;
+                }
+                'C' => break,
+                'a' | 'c' | 'l' | 'n' | 'p' | 't' | 'T' | 'w' | 'W' | 'X' | '0'..='9' => {}
                 _ => return None,
             }
         }
@@ -554,8 +594,15 @@ mod tests {
                 "$x->(\"id\")",
                 "$x->()",
                 "$x -> ()",
+                "$x->$m(\"id\")",
+                "$x->$m",
+                "$x->&*",
                 "$a[0]->(\"id\")",
                 "$a[0](\"id\")",
+                "$h{a}(\"id\")",
+                "${h}{a}(\"id\")",
+                "$r->{a}(\"id\")",
+                "f(\"id\")",
                 "CORE::system(\"id\")",
                 "CORE::print(1)",
                 "CORE::GLOBAL::system(\"id\")",
@@ -577,15 +624,26 @@ mod tests {
                 "$ARGV[0] = \"x\"",
                 "$#ARGV = 0",
                 "@{ARGV} = (\"x\")",
+                "@\n{\"ARGV\"} = (\"x\")",
+                "($x, @ARGV) = (1, \"x\")",
+                "($ARGV[0], $h{a}) = (\"x\", 1)",
+                "for ($x, @ARGV) { $_ = \"x\" }",
+                "for my $x (@ARGV) { $x = \"x\" }",
+                "map $_ = \"x\", @ARGV",
+                "*ARGV = [\"x\"]",
+                "$::{ARGV} = [\"x\"]",
                 "push @ARGV, \"x\"",
                 "unshift @ARGV, \"x\"",
                 "$^I = \".bak\"",
                 "${^I} = \"\"",
                 "$ ^I = \"\"",
+                "($^I, $h{a}) = (\".bak\", 1)",
+                "*{\"\\t\"} = \\.bak",
                 "$/ = undef",
                 "${/} = \"\"",
                 "$ / = \"\"",
                 "local $/",
+                "local ($x, $/)",
                 "$\\ = \"\\n\"",
                 "${\\} = \"\\n\"",
                 "$ \\ = \"\\n\"",
