@@ -472,6 +472,19 @@
 # valued = ["--output", "-o"]
 # flag_values = { "--output" = ["json", "yaml", "jsonpath=*"], "-o" = ["json", "yaml", "jsonpath=*"] }
 
+# ASCII_LETTER_FLAGS — valued flags whose value must be one or more ASCII
+# letters (`A-Z`, `a-z`), on any sub. For a flag that names an environment or
+# profile from which the tool builds a file name (`mise use -E staging` writes
+# `mise.staging.toml`, while `-E /../../x` escapes the project): callers can use
+# their own names, and slashes, dots, digits, punctuation, or an empty value
+# refuse. Checked in the same spellings as `flag_values`, and each flag must
+# also be in `valued` (or `first_arg_valued`) and not in `flag_values`.
+
+# [[command.sub]]
+# name = "use"
+# valued = ["--env", "-E", "-e"]
+# ascii_letter_flags = ["--env", "-E", "-e"]
+
 # LOOPBACK_VALUED / LOOPBACK_LOCALIZES (on a profiled sub) — the same endpoint
 # gate, plus whether a local destination changes the CLASSIFICATION.
 #

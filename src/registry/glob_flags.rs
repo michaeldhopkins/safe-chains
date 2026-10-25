@@ -18,47 +18,75 @@ pub(crate) fn inherit_sub_flags(mut toml: TomlSub) -> TomlSub {
     toml
 }
 
-pub(crate) fn flag_values(parent: &str, name: &str, toml: &TomlSub) -> Result<Vec<(String, Vec<String>)>, String> {
-    let mut out: Vec<(String, Vec<String>)> = toml.flag_values.iter().map(|(f, v)| (f.clone(), v.clone())).collect();
-    out.sort();
-    for (flag, values) in &out {
-        if !toml.valued.iter().chain(&toml.first_arg_valued).any(|f| f == flag) || values.is_empty() {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub(in crate::registry) enum FlagValues {
+    Listed(Vec<String>),
+    AsciiLetters,
+}
+
+pub(crate) fn flag_values(parent: &str, name: &str, toml: &TomlSub) -> Result<Vec<(String, FlagValues)>, String> {
+    let declared = |flag: &str| toml.valued.iter().chain(&toml.first_arg_valued).any(|f| f == flag);
+    let mut out: Vec<(String, FlagValues)> = Vec::new();
+    for (flag, values) in &toml.flag_values {
+        if !declared(flag) || values.is_empty() {
             return Err(format!(
                 "command '{parent}' sub `{name}` lists `{flag}` in `flag_values` without it in `valued`, or with no values"
             ));
         }
+        out.push((flag.clone(), FlagValues::Listed(values.clone())));
     }
+    for flag in &toml.ascii_letter_flags {
+        if !declared(flag) || toml.flag_values.contains_key(flag) {
+            return Err(format!(
+                "command '{parent}' sub `{name}` lists `{flag}` in `ascii_letter_flags` without it in `valued`, or also in `flag_values`"
+            ));
+        }
+        out.push((flag.clone(), FlagValues::AsciiLetters));
+    }
+    out.sort();
     Ok(out)
 }
 
-fn flag_value<'a>(tokens: &'a [Token], idx: usize, flag: &str) -> Option<Option<&'a str>> {
+fn matched_flag<'a, 'b>(tokens: &'a [Token], idx: usize, values: &'b [(String, FlagValues)]) -> Option<(&'b FlagValues, Option<&'a str>)> {
     let s = tokens[idx].as_str();
-    let rest = if s == flag {
-        ""
-    } else if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
-        return Some(Some(v));
-    } else {
-        let c = flag.strip_prefix('-').filter(|c| c.len() == 1 && !s.starts_with("--") && s.starts_with('-'))?;
-        &s[s[1..].find(c)? + 2..]
-    };
-    if rest.is_empty() {
-        return Some(tokens.get(idx + 1).map(Token::as_str));
+    for (flag, rule) in values {
+        if s == flag {
+            return Some((rule, tokens.get(idx + 1).map(Token::as_str)));
+        }
+        if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
+            return Some((rule, Some(v)));
+        }
     }
-    Some(Some(rest.strip_prefix('=').unwrap_or(rest)))
+    if s.starts_with("--") || !s.starts_with('-') {
+        return None;
+    }
+    for (offset, ch) in s[1..].char_indices().take_while(|(_, c)| *c != '=') {
+        let short = format!("-{ch}");
+        if let Some((_, rule)) = values.iter().find(|(f, _)| *f == short) {
+            let rest = &s[1 + offset + ch.len_utf8()..];
+            let value = if rest.is_empty() { tokens.get(idx + 1).map(Token::as_str) } else { Some(rest) };
+            return Some((rule, value));
+        }
+    }
+    None
 }
 
-pub(crate) fn value_outside(tokens: &[Token], values: &[(String, Vec<String>)]) -> bool {
-    let allowed = |v: &str, choices: &[String]| choices.iter().any(|c| c.strip_suffix('*').map_or(v == c, |p| v.starts_with(p)));
+fn allowed_value(v: &str, rule: &FlagValues) -> bool {
+    match rule {
+        FlagValues::Listed(choices) => choices.iter().any(|c| c.strip_suffix('*').map_or(v == c, |p| v.starts_with(p))),
+        FlagValues::AsciiLetters => !v.is_empty() && v.bytes().all(|b| b.is_ascii_alphabetic()),
+    }
+}
+
+pub(crate) fn value_outside(tokens: &[Token], values: &[(String, FlagValues)]) -> bool {
     for idx in 0..tokens.len() {
         if tokens[idx] == "--" {
             break;
         }
-        for (flag, choices) in values {
-            if let Some(value) = flag_value(tokens, idx, flag)
-                && !value.is_some_and(|v| allowed(v, choices))
-            {
-                return true;
-            }
+        if let Some((rule, value)) = matched_flag(tokens, idx, values)
+            && !value.is_some_and(|v| allowed_value(v, rule))
+        {
+            return true;
         }
     }
     false
@@ -212,6 +240,11 @@ mod tests {
         assert!(flag_values("c", "x", &with_values("first_arg_valued = [\"--out\"]")).is_ok());
         assert!(flag_values("c", "x", &with_values("valued = [\"--other\"]")).is_err());
         assert!(flag_values("c", "x", &sub("valued = [\"--out\"]\nflag_values = { \"--out\" = [] }")).is_err());
+        let with_letters = |extra: &str| sub(&format!("{extra}\nascii_letter_flags = [\"--env\"]"));
+        assert!(flag_values("c", "x", &with_letters("valued = [\"--env\"]")).is_ok());
+        assert!(flag_values("c", "x", &with_letters("first_arg_valued = [\"--env\"]")).is_ok());
+        assert!(flag_values("c", "x", &with_letters("valued = [\"--other\"]")).is_err());
+        assert!(flag_values("c", "x", &with_letters("valued = [\"--env\"]\nflag_values = { \"--env\" = [\"dev\"] }")).is_err());
     }
 
     #[test]
@@ -257,7 +290,8 @@ mod tests {
         /// A flag's value is judged the same in every spelling, and only a listed value passes.
         #[test]
         fn a_value_is_judged_alike_in_every_spelling(value in "(json|jsonpath=[a-z]{0,4}|[a-z][a-z=-]{0,8})", lead in "[a-z]{0,3}") {
-            let choices = vec![("--output".to_string(), vec!["json".to_string(), "jsonpath=*".to_string()]), ("-o".to_string(), vec!["json".to_string(), "jsonpath=*".to_string()])];
+            let rule = || FlagValues::Listed(vec!["json".to_string(), "jsonpath=*".to_string()]);
+            let choices = vec![("--output".to_string(), rule()), ("-o".to_string(), rule())];
             let listed = value == "json" || value.starts_with("jsonpath=");
             let forms = [
                 vec![lead.clone(), "-o".to_string(), value.clone()],
@@ -273,6 +307,93 @@ mod tests {
             }
             prop_assert!(value_outside(&tokens(&[lead.clone(), "-o".to_string()]), &choices));
             prop_assert!(!value_outside(&tokens(&[lead, "--".to_string(), "-o".to_string(), value]), &choices));
+        }
+
+        /// An `ascii_letter_flags` value made only of ASCII letters passes in every spelling.
+        #[test]
+        fn ascii_letter_flag_admits_any_letter_word_in_every_spelling(word in "[A-Za-z]{1,16}", lead in "[a-z]{0,3}") {
+            let choices = vec![
+                ("--env".to_string(), FlagValues::AsciiLetters),
+                ("-E".to_string(), FlagValues::AsciiLetters),
+                ("-e".to_string(), FlagValues::AsciiLetters),
+            ];
+            for form in [
+                vec![lead.clone(), "-E".to_string(), word.clone()],
+                vec![lead.clone(), format!("-E={word}")],
+                vec![lead.clone(), format!("-E{word}")],
+                vec![lead.clone(), "-fE".to_string(), word.clone()],
+                vec![lead.clone(), format!("-fE{word}")],
+                vec![lead.clone(), "-e".to_string(), word.clone()],
+                vec![lead.clone(), format!("-e={word}")],
+                vec![lead.clone(), format!("-e{word}")],
+                vec![lead.clone(), "-fe".to_string(), word.clone()],
+                vec![lead.clone(), format!("-fe{word}")],
+                vec![lead.clone(), "--env".to_string(), word.clone()],
+                vec![lead, format!("--env={word}")],
+            ] {
+                prop_assert!(!value_outside(&tokens(&form), &choices), "{:?}", form);
+            }
+            for cmd in [
+                format!("mise use -E {word} node@20"),
+                format!("mise use -E{word} node@20"),
+                format!("mise use --env={word} node@20"),
+                format!("mise use --env {word} node@20"),
+                format!("mise use -fE {word} node@20"),
+                format!("mise u -e {word} node@20"),
+                format!("mise u -e{word} node@20"),
+                format!("mise set -E {word} FOO=bar"),
+                format!("mise set -E{word} FOO=bar"),
+                format!("mise set --env={word} FOO=bar"),
+                format!("mise set --env {word} FOO=bar"),
+            ] {
+                prop_assert!(crate::is_safe_command(&cmd), "{}", cmd);
+            }
+        }
+
+        /// An `ascii_letter_flags` value with any non-letter character, or empty, is refused in every spelling.
+        #[test]
+        fn ascii_letter_flag_refuses_any_non_letter_in_every_spelling(
+            before in "[A-Za-z]{0,4}",
+            bad in "[^A-Za-z\\s'\"`\\\\$]{1,3}",
+            after in "[A-Za-z]{0,4}",
+            lead in "[a-z]{0,3}",
+        ) {
+            let choices = vec![
+                ("--env".to_string(), FlagValues::AsciiLetters),
+                ("-E".to_string(), FlagValues::AsciiLetters),
+                ("-e".to_string(), FlagValues::AsciiLetters),
+            ];
+            let value = format!("{before}{bad}{after}");
+            for v in [value.as_str(), ""] {
+                for form in [
+                    vec![lead.clone(), "-E".to_string(), v.to_string()],
+                    vec![lead.clone(), format!("-E={v}")],
+                    vec![lead.clone(), "-fE".to_string(), v.to_string()],
+                    vec![lead.clone(), "--env".to_string(), v.to_string()],
+                    vec![lead.clone(), format!("--env={v}")],
+                ] {
+                    prop_assert!(value_outside(&tokens(&form), &choices), "{:?}", form);
+                }
+            }
+            if !value.starts_with('=') {
+                prop_assert!(value_outside(&tokens(&[lead.clone(), format!("-E{value}")]), &choices), "-E{value}");
+                prop_assert!(!crate::is_safe_command(&format!("mise use -E'{value}' node@20")), "mise use -E'{value}' node@20");
+            }
+            prop_assert!(value_outside(&tokens(&[lead, format!("-fE{value}")]), &choices), "-fE{value}");
+            for cmd in [
+                format!("mise use -E '{value}' node@20"),
+                format!("mise use -fE'{value}' node@20"),
+                format!("mise use --env='{value}' node@20"),
+                format!("mise use --env '{value}' node@20"),
+                format!("mise use -fE '{value}' node@20"),
+                format!("mise u -e '{value}' node@20"),
+                format!("mise set -E '{value}' FOO=bar"),
+                format!("mise set --env='{value}' FOO=bar"),
+                "mise use --env='' node@20".to_string(),
+                "mise set -E '' FOO=bar".to_string(),
+            ] {
+                prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
+            }
         }
     }
 }

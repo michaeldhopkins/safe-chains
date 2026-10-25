@@ -181,7 +181,7 @@ fn subs_with_values<'a>(words: &[String], list: &'a [TomlSub], out: &mut Vec<(Ve
     for sub in list {
         let mut path = words.to_vec();
         path.push(sub.name.clone());
-        if !sub.flag_values.is_empty() {
+        if !sub.flag_values.is_empty() || !sub.ascii_letter_flags.is_empty() {
             out.push((path.clone(), sub));
         }
         subs_with_values(&path, &sub.sub, out);
@@ -220,8 +220,12 @@ fn every_listed_flag_value_is_the_only_one_admitted() {
             .map(|p| p.strip_suffix('*').map_or_else(|| p.clone(), |x| format!("{x}zq")))
             .into_iter()
             .collect();
-        for (flag, choices) in &sub.flag_values {
-            let good = choices[0].trim_end_matches('*');
+        let pairs = sub
+            .flag_values
+            .iter()
+            .map(|(f, c)| (f, c[0].trim_end_matches('*')))
+            .chain(sub.ascii_letter_flags.iter().map(|f| (f, "staging")));
+        for (flag, good) in pairs {
             for spelled in spellings(flag, good) {
                 if !verdict(&line(path, &[&arg, &spelled])).is_allowed() {
                     failures.push(format!("  {} {} {}: a listed value is refused", path.join(" "), arg.join(" "), spelled.join(" ")));

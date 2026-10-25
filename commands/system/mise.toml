@@ -32,6 +32,7 @@ examples_safe = [
     "mise set --file ./mise.toml FOO=bar",
     "mise set -E staging FOO=bar",
     "mise use -E production node@20",
+    "mise use -e sandbox node@20",
     "mise set --env=dev FOO=bar",
     "mise unset FOO",
     "mise use --path ./mise.toml ruby@4.0.3",
@@ -151,7 +152,7 @@ standalone = [
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
-flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-e" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
+ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "install"
@@ -202,7 +203,7 @@ level = "SafeWrite"
 standalone = ["--help", "--remove", "-h"]
 valued = ["--env", "--file", "-E", "-f"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
-flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
+ascii_letter_flags = ["--env", "-E"]
 
 [[command.sub]]
 name = "unset"
@@ -230,7 +231,7 @@ standalone = [
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
-flag_values = { "--env" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-E" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"], "-e" = ["ci", "dev", "development", "local", "preview", "prod", "production", "qa", "stage", "staging", "test", "testing"] }
+ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "i"

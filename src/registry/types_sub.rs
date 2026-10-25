@@ -181,6 +181,8 @@ pub(in crate::registry) struct TomlSub {
     pub credential_first_arg: Vec<String>,
     #[serde(default)]
     pub flag_values: std::collections::HashMap<String, Vec<String>>,
+    #[serde(default)]
+    pub ascii_letter_flags: Vec<String>,
     /// Globs (`*` matches any run, including none) that make this sub refuse an invocation: tested
     /// against every argument that is not a flag, against the name and the value either side of an
     /// `=`, and against the value of a `--flag=value`. An argument whose text the shell decides
@@ -349,7 +351,7 @@ pub(in crate::registry) struct SubSpec {
     pub loopback_valued: Vec<String>,
     /// What a loopback endpoint buys this sub; see `TomlSub::loopback_localizes`.
     pub loopback_effect: LoopbackEffect,
-    pub flag_values: Vec<(String, Vec<String>)>,
+    pub flag_values: Vec<(String, crate::registry::glob_flags::FlagValues)>,
     /// Globs an invocation of this sub may not match; see `TomlSub::refuse_operands`.
     pub refuse_operands: Vec<String>,
 }
