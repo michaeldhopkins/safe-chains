@@ -313,7 +313,11 @@ pandoc --citeproc --bibliography=refs.bib --csl=ieee.csl paper.md	safe-read
 pandoc --columns x	safe-read
 pandoc --csl x	safe-read
 pandoc --css x	safe-read
+pandoc --data-dir /tmp/evil README.md	denied
 pandoc --data-dir x	safe-read
+pandoc --data-dir=./data README.md	safe-read
+pandoc --data-dir=/tmp/evil README.md	denied
+pandoc --data-dir=~/.pandoc README.md	denied
 pandoc --datadir=d README.md	denied
 pandoc --default-image-extension x	safe-read
 pandoc --defaults=defaults.yaml README.md	denied

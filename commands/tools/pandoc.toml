@@ -12,6 +12,7 @@ examples_safe = [
     "pandoc -s --toc --toc-depth=2 -V title=Spec docs/spec.md",
     "pandoc --citeproc --bibliography=refs.bib --csl=ieee.csl paper.md",
     "pandoc --standalone --mathjax --syntax-highlighting=pygments notes.md",
+    "pandoc --data-dir=./data README.md",
     "pandoc --list-input-formats",
     "pandoc --list-output-formats",
     "pandoc --version",
@@ -71,11 +72,17 @@ examples_denied = [
     "pandoc --parse-raw README.md",
     "pandoc --mimex README.md",
     "pandoc --datadir=d README.md",
+    "pandoc --data-dir=/tmp/evil README.md",
+    "pandoc --data-dir /tmp/evil README.md",
     "pandoc --strip-empty-paragraphs README.md",
     "pandoc --dump-args README.md",
     "pandoc --ignore-args README.md",
     "pandoc \"https://example.com/?q=$HOME\"",
 ]
+
+[command.path_gate]
+flags = { "--data-dir" = "exec" }
+
 [command.fallback]
 level = "SafeRead"
 bare = true

@@ -165,6 +165,7 @@ mod tests {
         a_file_named_like_a_flag_value: "pandoc -V title=lua README.md",
         plain_writer_with_html_target: "pandoc README.md -t html",
         extension_on_known_reader: "pandoc -f commonmark_x+smart README.md",
+        worktree_data_dir: "pandoc --data-dir=./data README.md",
     }
 
     denied! {
@@ -181,6 +182,9 @@ mod tests {
         lua_reader_long: "pandoc --from=./r.lua README.md",
         lua_template: "pandoc -D d.lua",
         lua_bare_template: "pandoc -D lua",
+        foreign_data_dir_equals: "pandoc --data-dir=/tmp/evil README.md",
+        foreign_data_dir_space: "pandoc --data-dir /tmp/evil README.md",
+        home_data_dir: "pandoc --data-dir=~/.pandoc README.md",
         pdf_writer: "pandoc -t pdf README.md",
         missing_value: "pandoc README.md -t",
         equals_form_short: "pandoc -t=html README.md",
