@@ -2246,7 +2246,9 @@ gdf --exclude-type x	inert
 gdf --help	inert
 gdf --human-readable	inert
 gdf --inodes	inert
-gdf --libxo x	inert
+gdf --libxo x	denied
+gdf --libxo=bogus	denied
+gdf --libxo=json,pretty	inert
 gdf --local	inert
 gdf --no-sync	inert
 gdf --output x	inert

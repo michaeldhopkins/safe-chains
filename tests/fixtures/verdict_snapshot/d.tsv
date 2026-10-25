@@ -1687,9 +1687,20 @@ df --exclude-type x	inert
 df --help	inert
 df --human-readable	inert
 df --inodes	inert
+df --libxo	denied
+df --libxo bogus .	denied
 df --libxo json -h .	inert
 df --libxo json .	inert
-df --libxo x	inert
+df --libxo json,pretty,warn .	inert
+df --libxo x	denied
+df --libxo:J .	denied
+df --libxo= .	denied
+df --libxo=,json .	denied
+df --libxo=bogus -h	denied
+df --libxo=encoder=test .	denied
+df --libxo=html,xpath,underscores /	inert
+df --libxo=json, .	denied
+df --libxo=json,bogus .	denied
 df --libxo=xml -h	inert
 df --local	inert
 df --no-sync	inert
@@ -1720,6 +1731,7 @@ df -b -c -g -I -m -n -Y -,	inert
 df -c	inert
 df -g	inert
 df -h	inert
+df -h -- --libxo=evil	inert
 df -h /	inert
 df -i	inert
 df -k	inert
@@ -1727,6 +1739,7 @@ df -l	inert
 df -lhT	inert
 df -m	inert
 df -n	inert
+df -t --libxo=evil	inert
 df -t x	inert
 df -v	inert
 df -x x	inert

@@ -4,8 +4,7 @@ aliases = ["gdf"]
 description = "Reports free and used disk space and inode counts for mounted filesystems across GNU coreutils and BSD/macOS implementations. Purely observes local kernel mount tables and statfs metadata and prints formatted tables (or structured libxo records on BSD) to stdout; never reads file contents, never modifies or mutates filesystem state, executes no external programs, and makes no network connections (passing -l/--local restricts queries to locally mounted filesystems without polling remote NFS/SMB mounts). GNU -T prints filesystem types (BSD uses -Y for type display and -t for type filtering), and GNU --output selects display columns rather than a destination file. Part of POSIX, BSD base, and GNU coreutils with a stable, rarely changing option surface across releases."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation"
 researched_version = "GNU coreutils 9.12 + BSD df (macOS 27)"
-level = "Inert"
-bare = true
+handler = "df"
 examples_safe = [
     "df",
     "df -h",
@@ -15,6 +14,7 @@ examples_safe = [
     "df -b -c -g -I -m -n -Y -,",
     "df --libxo json .",
     "df --libxo=xml -h",
+    "df --libxo json,pretty,warn .",
     "df --output=source,size,used,avail,pcent,target -h",
     "df -B 1M -t apfs -x devfs",
     "gdf -h --total --inodes",
@@ -22,7 +22,14 @@ examples_safe = [
 examples_denied = [
     "df --unknown-flag",
     "df -Z",
+    "df --libxo bogus .",
+    "df --libxo=bogus -h",
+    "df --libxo=encoder=test .",
+    "df --libxo=json,bogus .",
 ]
+[command.fallback]
+level = "Inert"
+bare = true
 standalone = [
     "--all", "--help", "--human-readable", "--inodes", "--local",
     "--no-sync", "--portability", "--print-type",

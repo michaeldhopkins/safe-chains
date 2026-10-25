@@ -23,6 +23,7 @@ macro_rules! handler_module {
 
 pub mod android;
 pub mod coreutils;
+pub mod df;
 pub mod fd;
 pub mod forges;
 pub mod fuzzy;
@@ -66,6 +67,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("shellcheck", shellcheck::check_shellcheck as HandlerFn),
         ("awk", coreutils::awk::check_awk as HandlerFn),
         ("curl", network::is_safe_curl as HandlerFn),
+        ("df", df::check_df as HandlerFn),
         ("fd", fd::check_fd as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),

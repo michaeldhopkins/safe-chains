@@ -348,7 +348,6 @@ dart format	-o
 dbt list	--output
 dbt ls	--output
 depcruise	--init
-df	--output
 duf	--output
 findmnt	--output
 findmnt	-o
