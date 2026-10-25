@@ -37,6 +37,11 @@ examples_safe = [
     "mise unset FOO",
     "mise use --path ./mise.toml ruby@4.0.3",
     "mise u -p ./mise.toml ruby@4.0.3",
+    "mise use -g node@20",
+    "mise use --global node@20",
+    "mise u -g node@20",
+    "mise use -gf node@20",
+    "mise unset -g FOO",
 ]
 examples_denied = [
     "mise install 'cargo:ripgrep[postinstall=touch pwned]'",
@@ -91,11 +96,6 @@ examples_denied = [
     "mise set --env=../x FOO=1",
     "mise use --env=/../../x node@20",
     "mise u -e /../x node@20",
-    "mise use -g node@20",
-    "mise use --global node@20",
-    "mise u -g node@20",
-    "mise use -gf node@20",
-    "mise unset -g FOO",
     "mise use node@path:/tmp/evil",
     "mise u git@path:/tmp/evil",
     "mise install node@path:/tmp/evil",
@@ -147,8 +147,8 @@ name = "use"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--force", "--fuzzy", "--help", "--pin", "--quiet",
-    "--remove", "--verbose", "-f", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin",
+    "--quiet", "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
@@ -208,7 +208,7 @@ ascii_letter_flags = ["--env", "-E"]
 [[command.sub]]
 name = "unset"
 level = "SafeWrite"
-standalone = ["--help", "-h"]
+standalone = ["--global", "--help", "-g", "-h"]
 valued = ["--file", "-f"]
 
 [[command.sub]]
@@ -226,8 +226,8 @@ writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--force", "--fuzzy", "--help", "--pin", "--quiet",
-    "--remove", "--verbose", "-f", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin",
+    "--quiet", "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
 valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]

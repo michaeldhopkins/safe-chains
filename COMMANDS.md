@@ -9566,14 +9566,14 @@ Aliases: `gmd5sum`
 - **tool-alias set**: Flags: --help, -h
 - **tool-alias unset**: Flags: --help, -h
 - **trust** (requires --show): Flags: --all, --help, --quiet, --show, -a, -h, -q
-- **u**: Flags: --force, --fuzzy, --help, --pin, --quiet, --remove, --verbose, -f, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
+- **u**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **uninstall**: Flags: --all, --dry-run, --help, -a, -n, -h
-- **unset**: Flags: --help, -h. Valued: --file, -f
+- **unset**: Flags: --global, --help, -g, -h. Valued: --file, -f
 - **untrust**: Flags: --all, --help, -a, -h
 - **unuse**: Flags: --help, -h
 - **up**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
 - **upgrade**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
-- **use**: Flags: --force, --fuzzy, --help, --pin, --quiet, --remove, --verbose, -f, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
+- **use**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
@@ -9600,10 +9600,16 @@ Aliases: `gmd5sum`
 - `mise set --file ./mise.toml FOO=bar`
 - `mise set -E staging FOO=bar`
 - `mise use -E production node@20`
+- `mise use -e sandbox node@20`
 - `mise set --env=dev FOO=bar`
 - `mise unset FOO`
 - `mise use --path ./mise.toml ruby@4.0.3`
 - `mise u -p ./mise.toml ruby@4.0.3`
+- `mise use -g node@20`
+- `mise use --global node@20`
+- `mise u -g node@20`
+- `mise use -gf node@20`
+- `mise unset -g FOO`
 
 ### `mix`
 <p class="cmd-url"><a href="https://hexdocs.pm/mix/Mix.html">https://hexdocs.pm/mix/Mix.html</a></p>
