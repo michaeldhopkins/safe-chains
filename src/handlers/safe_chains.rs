@@ -131,6 +131,15 @@ mod tests {
     }
 
     #[test]
+    fn asking_config_for_help_only_reads() {
+        assert_eq!(verdict("safe-chains config -h"), Verdict::Allowed(SafetyLevel::Inert));
+        assert_eq!(verdict("safe-chains config --help"), Verdict::Allowed(SafetyLevel::Inert));
+        for cmd in ["safe-chains config add -h", "safe-chains config -h add", "safe-chains mcp -h", "safe-chains --log config -h"] {
+            assert!(!verdict(cmd).is_allowed(), "{cmd} must not be approved");
+        }
+    }
+
+    #[test]
     fn checking_a_command_that_mentions_config_is_unaffected() {
         assert!(verdict("safe-chains 'git config --get user.name'").is_allowed());
         assert!(verdict("safe-chains --explain 'cat foo'").is_allowed());
@@ -149,13 +158,16 @@ mod properties {
     use proptest::prelude::*;
 
     proptest! {
-        /// Whatever surrounds it, a `config` edit or `mcp` is never approved.
+        /// Whatever surrounds it, a `config` edit or `mcp` is never approved. `config -h` and
+        /// `config --help` only print help, so they are left out here and pinned in
+        /// `asking_config_for_help_only_reads`.
         #[test]
         fn no_rule_change_is_ever_approved(
             before in prop::collection::vec(prop::sample::select(vec!["--log", "--explain", "--level yolo", "--cwd /w", "-v"]), 0..3),
             sub in prop::sample::select(vec!["config add", "config remove command", "config remove grant", "config grant", "mcp", "config", "$'mcp'", "m*", "$(printf mcp)", "c* add", "`echo mcp`", "[m]cp"]),
             after in prop::collection::vec("[a-z~/.-]{1,8}", 0..4),
         ) {
+            prop_assume!(!(before.is_empty() && sub == "config" && matches!(after.as_slice(), [flag] if flag == "-h" || flag == "--help")));
             let cmd = format!("safe-chains {} {sub} {}", before.join(" "), after.join(" "));
             prop_assert!(!crate::command_verdict(&cmd).is_allowed(), "{}", cmd);
         }
