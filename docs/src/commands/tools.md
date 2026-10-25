@@ -1190,7 +1190,7 @@ Aliases: `run-p`, `run-s`
 ### `pandoc`
 <p class="cmd-url"><a href="https://pandoc.org/MANUAL.html">https://pandoc.org/MANUAL.html</a></p>
 
-- Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists.
+- Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). Any `+RTS`, `-RTS` or `--RTS` argument is denied (GHC runtime options can write statistics to a named file). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists.
 
 - **Without a subcommand:**
 - Bare invocation allowed
@@ -1205,6 +1205,7 @@ Aliases: `run-p`, `run-s`
 - `pandoc -s --toc --toc-depth=2 -V title=Spec docs/spec.md`
 - `pandoc --citeproc --bibliography=refs.bib --csl=ieee.csl paper.md`
 - `pandoc --standalone --mathjax --syntax-highlighting=pygments notes.md`
+- `pandoc --data-dir=./data README.md`
 - `pandoc --list-input-formats`
 - `pandoc --list-output-formats`
 - `pandoc --version`
@@ -1660,8 +1661,14 @@ Aliases: `python`
 ### `shellcheck`
 <p class="cmd-url"><a href="https://www.shellcheck.net/wiki/">https://www.shellcheck.net/wiki/</a></p>
 
-- Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --severity, --version, --wiki-link-count, -C, -V, -a, -h, -x
+- **Without a subcommand:**
+- Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
 - Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
+
+**Examples:**
+
+- `shellcheck script.sh`
+- `shellcheck -x -s bash script.sh`
 
 ### `shfmt`
 <p class="cmd-url"><a href="https://github.com/mvdan/sh">https://github.com/mvdan/sh</a></p>

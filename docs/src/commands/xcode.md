@@ -468,6 +468,14 @@
 - **xctrace**: delegates to inner command
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `xcrun --find clang`
+- `xcrun --show-sdk-path`
+- `xcrun --toolchain default --find swift`
+- `xcrun --toolchain ./Toolchains/Local.xctoolchain --find swift`
+- `xcrun swift-format lint Sources/`
+
 ### `xctest`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctest.1.html">https://keith.github.io/xcode-man-pages/xctest.1.html</a></p>
 
