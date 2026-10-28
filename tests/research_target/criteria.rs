@@ -49,6 +49,7 @@ fn list_len(table: &Value, key: &str) -> usize {
 /// Every table of the entry: the command itself and every `sub`, however deep.
 fn nodes(table: &Value) -> Vec<&Value> {
     let mut out = vec![table];
+    out.extend(table.get("fallback"));
     for sub in table.get("sub").and_then(Value::as_array).into_iter().flatten() {
         out.extend(nodes(sub));
     }
@@ -215,6 +216,8 @@ mod tests {
     fn tolerance_anywhere_in_the_tree_is_owed() {
         assert!(!no_tolerance_ok(&entry("[[sub]]\nname = \"a\"\ntolerate_unknown_long = true\n")));
         assert!(!no_tolerance_ok(&entry("tolerate_unknown_short = true")));
+        assert!(!no_tolerance_ok(&entry("[fallback]\ntolerate_unknown_short = true\n")));
+        assert!(!no_tolerance_ok(&entry("[[sub]]\nname = \"a\"\n[sub.fallback]\ntolerate_unknown_long = true\n")));
         assert!(no_tolerance_ok(&entry("tolerate_unknown_short = false")));
     }
 
