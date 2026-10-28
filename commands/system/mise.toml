@@ -198,7 +198,7 @@ standalone = ["--all", "--help", "-a", "-h"]
 [[command.sub]]
 name = "set"
 level = "SafeWrite"
-standalone = ["--help", "--remove", "-h"]
+standalone = ["--global", "--help", "--remove", "-g", "-h"]
 valued = ["--env", "--file", "-E", "-f"]
 refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
 ascii_letter_flags = ["--env", "-E"]
