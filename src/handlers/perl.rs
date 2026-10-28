@@ -165,6 +165,14 @@ fn check_sigil_var(bytes: &[u8], sigil: u8, mut i: usize) -> Option<usize> {
     Some(i)
 }
 
+/// `sort $name LIST` calls the sub whose name or reference `$name` holds, CORE subs such as
+/// `CORE::mkdir` included.
+fn sorts_by_a_named_sub(rest: &[u8]) -> bool {
+    rest.iter()
+        .find(|b| !b.is_ascii_whitespace() && **b != b'(')
+        .is_some_and(|b| matches!(b, b'$' | b'#'))
+}
+
 fn is_typeglob_at(bytes: &[u8], i: usize) -> bool {
     let j = i + 1 + bytes[i + 1..].iter().take_while(|b| b.is_ascii_whitespace()).count();
     (i > 0 && bytes[i - 1] == b'\\')
@@ -223,6 +231,7 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
                     && (start == 0 || bytes[start - 1] != b'-')
                     && bytes[i..].trim_ascii_start().starts_with(b"("))
                 || (word.len() > 1 && !SAFE_PERL_WORDS.contains(word))
+                || (word == "sort" && sorts_by_a_named_sub(&bytes[i..]))
             {
                 return false;
             }
@@ -919,6 +928,19 @@ mod tests {
             let cmd = if glued { format!("perl '-i{backup}' -pe 1 file.txt") } else { format!("perl -pe 1 '-i{backup}' file.txt") };
             proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
             let plain = format!("perl '-i.{prefix}' -pe 1 file.txt");
+            proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
+        }
+
+        #[test]
+        fn sort_by_a_sub_named_in_a_variable_is_never_approved(
+            var in "[a-z]{1,4}",
+            gap in proptest::sample::select(vec![" ", "  ", "\t", "(", " ( ", "\n"]),
+            spelling in proptest::sample::select(vec!["${}", "${{{}}}", "$ {}", "$::{}"]),
+        ) {
+            let name = spelling.replace("{}", &var);
+            let cmd = format!("perl -e '@x = sort{gap}{name} 1, 2'");
+            proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
+            let plain = format!("perl -e '@x = sort{gap}@{var}'");
             proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
         }
     }
