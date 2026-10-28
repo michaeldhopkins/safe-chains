@@ -233,6 +233,14 @@ pub(crate) fn perl_code_is_safe(token: &Token) -> bool {
     true
 }
 
+/// Whether perl's `<>` would read this operand as an open mode rather than a file name: the
+/// two-argument open behind `-n`, `-p` and `<>` trims surrounding blanks, then runs a name ending in
+/// `|` as a shell command, pipes to one starting with `|`, and writes a name starting with `>`.
+fn names_an_open_mode(operand: &str) -> bool {
+    let trimmed = operand.trim_ascii();
+    trimmed.starts_with(['<', '>', '+', '|', '&']) || trimmed.ends_with('|') || trimmed.len() != operand.len()
+}
+
 /// What a `perl` invocation asks for, once its flag grammar is walked: whether every `-e`/`-E`
 /// one-liner passed the identifier gate, whether `-i` turns the operands into in-place rewrites,
 /// and which operands are the FILES. The engine (`resolve_perl`) gates those files by locus; this
@@ -278,6 +286,9 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
     while i < tokens.len() {
         let token = &tokens[i];
         if flags_done || !token.starts_with("-") || *token == "-" {
+            if names_an_open_mode(token.as_str()) {
+                return None;
+            }
             scan.files.push(token.as_str().to_string());
             i += 1;
             continue;
@@ -876,6 +887,21 @@ mod tests {
         for cmd in denied_cases {
             let verdict = crate::command_verdict(cmd);
             assert_eq!(verdict, Verdict::Denied, "expected Denied for `{cmd}`, got {verdict:?}");
+        }
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn an_operand_read_as_an_open_mode_is_never_approved(
+            switches in proptest::sample::select(vec!["-ne 'print'", "-pe 1", "-i -pe 1", "-ne 'print' --", "-e 'print <>'"]),
+            name in "[a-z]{1,6}",
+            form in proptest::sample::select(vec!["{} |", "{}|", "|{}", "| {}", ">{}", ">>{}", "+<{}", "<&{}", " {}", "{} ", "<{}"]),
+        ) {
+            let operand = form.replace("{}", &name);
+            let cmd = format!("perl {switches} file.txt '{operand}'");
+            proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
+            let plain = format!("perl {switches} file.txt {name}.txt");
+            proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
         }
     }
 }
