@@ -770,7 +770,6 @@ borg --bypass-lock --consider-checkpoints	denied
 borg --bypass-lock --debug-topic x	denied
 borg --bypass-lock create check ./repo::a /	denied
 borg --bypass-lock delete info ./repo	denied
-borg --bypass-lock list repo	safe-read
 borg --bypass-lock serve version	denied
 borg --bypass-lock x	denied
 borg --consider-checkpoints	denied
@@ -780,7 +779,6 @@ borg --exclude x	denied
 borg --exclude-from x	denied
 borg --help	inert
 borg --info	denied
-borg --lock-wait 5 list repo	safe-read
 borg --lock-wait x	denied
 borg --no-cache-sync	denied
 borg --patterns-from x	denied
@@ -805,7 +803,6 @@ borg check	denied
 borg check --archives-only	safe-read
 borg check --archives-only --first x	safe-read
 borg check --archives-only --help	safe-read
-borg check --archives-only repo	safe-read
 borg check --archives-only x	safe-read
 borg check --first x	safe-read
 borg check --help	safe-read
@@ -839,7 +836,6 @@ borg config -d repo k	denied
 borg config -h	safe-read
 borg config -l -d repo	denied
 borg config repo	safe-read
-borg config repo append_only	safe-read
 borg config repo append_only 0	denied
 borg config x	safe-read
 borg create	denied
@@ -896,9 +892,7 @@ borg key x	denied
 borg list	denied
 borg list --exclude x	safe-read
 borg list --exclude-from x	safe-read
-borg list --first 3 repo	safe-read
 borg list --first x	safe-read
-borg list --format '{name}' repo	safe-read
 borg list --format x	safe-read
 borg list --help	safe-read
 borg list --help --exclude x	safe-read

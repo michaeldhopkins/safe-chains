@@ -877,6 +877,20 @@ mod integration_tests {
             ("NPM_CONFIG_NODE_OPTIONS='--require /tmp/m.js' npm test", "NPM_CONFIG_NODE_OPTIONS=--no-warnings npm test"),
             ("npm_config_userconfig=/tmp/m npm test", "npm_config_userconfig=/work/u/proj/npmrc npm test"),
             ("npm_config_globalconfig=/tmp/m npm test", "npm_config_globalconfig=/work/u/proj/npmrc npm test"),
+        ] {
+            assert!(!crate::command_verdict(foreign).is_allowed(), "a foreign value was allowed: {foreign}");
+            assert!(crate::command_verdict(benign).is_allowed(), "a benign value was refused: {benign}");
+        }
+    }
+
+    #[test]
+    fn every_variable_of_the_second_audit_judges_its_value_part_two() {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work/u/proj".into()),
+            root: Some("/work/u/proj".into()),
+            ..Default::default()
+        });
+        for (foreign, benign) in [
             ("MANPAGER='sh -c m' ls", "MANPAGER=cat ls"),
             ("GH_PAGER='sh -c m' ls", "GH_PAGER=cat ls"),
             ("SSH_ASKPASS=/tmp/m ls", "SSH_ASKPASS= ls"),

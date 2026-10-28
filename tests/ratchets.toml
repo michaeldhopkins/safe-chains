@@ -10,12 +10,12 @@ fuzz_min_targets = 8
 "src/engine/facet.rs" = 686
 "src/engine/resolve/locus.rs" = 550
 "src/engine/resolve/regions.rs" = 873
-"src/engine/resolve.rs" = 1502
-"src/pathgate.rs" = 538
-"src/registry/build.rs" = 1356
-"src/registry/dispatch.rs" = 530
+"src/engine/resolve.rs" = 1488
+"src/pathgate.rs" = 494
+"src/registry/build.rs" = 902
+"src/registry/dispatch.rs" = 457
 "src/registry/mod.rs" = 663
-"src/registry/types.rs" = 589
+"src/registry/types.rs" = 582
 
 [pinned_thresholds]
 "cognitive-complexity-threshold" = 30

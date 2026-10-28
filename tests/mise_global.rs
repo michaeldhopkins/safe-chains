@@ -48,7 +48,9 @@ fn global_listing_the_values_is_refused() {
 
 #[test]
 fn environment_names_are_letters_only() {
-    for command in ["mise set -E staging FOO=bar", "mise use -E production node@20", "mise use -e sandbox node@20", "mise set --env=dev FOO=bar"] {
+    for command in
+        ["mise set -E staging FOO=bar", "mise use -E production node@20", "mise use -e sandbox node@20", "mise set --env=dev FOO=bar"]
+    {
         assert!(approved(command), "{command} must pass");
     }
     for command in [

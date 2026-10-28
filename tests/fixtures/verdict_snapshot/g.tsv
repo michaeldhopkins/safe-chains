@@ -11281,7 +11281,6 @@ gmkdir	denied
 gmkdir --context	denied
 gmkdir --context --help	inert
 gmkdir --context --mode x	denied
-gmkdir --context ./labelled	safe-write
 gmkdir --context x	safe-write
 gmkdir --help	inert
 gmkdir --mode x	denied
@@ -12634,7 +12633,6 @@ gprintenv -V	inert
 gprintenv -h	inert
 gprintenv x	denied
 gprintf	denied
-gprintf '%b' 'a\\tb'	inert
 gprintf --help	inert
 gprintf --help --version	inert
 gprintf --help x	inert

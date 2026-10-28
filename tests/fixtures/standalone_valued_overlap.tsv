@@ -1075,8 +1075,6 @@ scp	-D
 scp	-P
 selene	--display-style
 selene	--num-threads
-shellcheck	--severity
-shellcheck	--wiki-link-count
 shfmt	-i
 shfmt	-ln
 siege	--config

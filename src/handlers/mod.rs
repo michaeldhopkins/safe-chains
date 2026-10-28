@@ -47,8 +47,8 @@ pub mod printf;
 pub mod ruby;
 pub mod safe_chains;
 pub mod shell;
-pub mod shellcheck;
 pub(crate) mod shell_text;
+pub mod shellcheck;
 #[cfg(test)]
 mod signal_tests;
 pub mod system;
@@ -71,7 +71,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),
         ("pandoc", pandoc::check_pandoc as HandlerFn),
-         ("shellcheck", shellcheck::check_shellcheck as HandlerFn),
+        ("shellcheck", shellcheck::check_shellcheck as HandlerFn),
         ("hadolint", hadolint::check_hadolint as HandlerFn),
         ("awk", coreutils::awk::check_awk as HandlerFn),
         ("curl", network::is_safe_curl as HandlerFn),

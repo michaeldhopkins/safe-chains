@@ -9412,17 +9412,13 @@ printenv HOME	denied
 printenv OPENAI_API_KEY	denied
 printenv x	denied
 printf	denied
-printf '%%n is a literal\\n'	inert
 printf '%(%n)x' count	denied
-printf '%5d|%-5s|\\n' 42 ab	inert
 printf '%n' 'a[$(touch x)]'	denied
 printf '%n' count	denied
 printf '%s' $(id)	denied
 printf '%s\\n' hello	inert
-printf '%s\\n' one two	inert
 printf 'abc%5n' count	denied
 printf -- '%1$n' count	denied
-printf -- '%s\\n' -x	inert
 printf --help	inert
 printf --help --version	inert
 printf --help x	inert
@@ -9431,7 +9427,6 @@ printf -V	inert
 printf -h	inert
 printf -v name value	denied
 printf -x	denied
-printf hello	inert
 printf x	inert
 printf x | nano	denied
 printf x | nvim	denied

@@ -217,7 +217,4 @@
 - `task --list-all`
 - `task --version`
 - `task --dry --list`
-- `task -l -d ./sub`
-- `task -l --taskfile ./Taskfile.yml`
-- `task --list --json`
 

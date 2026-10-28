@@ -2226,12 +2226,6 @@ Aliases: `@biomejs/biome`
 - `borg list repo`
 - `borg info repo`
 - `borg version`
-- `borg --bypass-lock list repo`
-- `borg --lock-wait 5 list repo`
-- `borg list --first 3 repo`
-- `borg list --format '{name}' repo`
-- `borg check --archives-only repo`
-- `borg config repo append_only`
 
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
@@ -6629,7 +6623,7 @@ Aliases: `ggroups`
 
 - **Without a subcommand:**
 - Allowed standalone flags: --disable-ignore-pragma, --help, --no-color, --no-fail, --strict-labels, --verbose, --version, -V, -h, -v
-- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
+- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -9543,7 +9537,7 @@ Aliases: `gmd5sum`
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
 - **self-update**
-- **set**: Flags: --help, --remove, -h. Valued: --env, --file, -E, -f
+- **set**: Flags: --global, --help, --remove, -g, -h. Valued: --env, --file, -E, -f
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
@@ -9647,16 +9641,6 @@ Aliases: `gmkdir`
 - Creates or updates its file operands within your workspace.
 - Allowed standalone flags: --context, --help, --parents, --verbose, --version, -Z, -p, -v
 - Allowed valued flags: --mode, -m
-
-**Examples:**
-
-- `mkdir build`
-- `mkdir -p out/logs/archive`
-- `mkdir -pv ./a ./b`
-- `mkdir -m 755 ./dist`
-- `mkdir --mode=700 ./private`
-- `gmkdir --context ./labelled`
-- `mkdir --version`
 
 ### `mkdocs`
 <p class="cmd-url"><a href="https://www.mkdocs.org/">https://www.mkdocs.org/</a></p>
@@ -12459,17 +12443,6 @@ Aliases: `gprintf`
 - **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
 
-**Examples:**
-
-- `printf hello`
-- `printf '%s\n' one two`
-- `printf '%5d|%-5s|\n' 42 ab`
-- `printf -- '%s\n' -x`
-- `printf '%%n is a literal\n'`
-- `gprintf '%b' 'a\tb'`
-- `printf --version`
-- `printf --help`
-
 ### `prisma`
 <p class="cmd-url"><a href="https://www.prisma.io/docs/orm/reference/prisma-cli-reference">https://www.prisma.io/docs/orm/reference/prisma-cli-reference</a></p>
 
@@ -14280,8 +14253,7 @@ Aliases: `gsha512sum`
 
 - **Without a subcommand:**
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
-- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
-- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -15552,9 +15524,6 @@ Aliases: `gtar`
 - `task --list-all`
 - `task --version`
 - `task --dry --list`
-- `task -l -d ./sub`
-- `task -l --taskfile ./Taskfile.yml`
-- `task --list --json`
 
 ### `taskinfo`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/taskinfo.1.html">https://keith.github.io/xcode-man-pages/taskinfo.1.html</a></p>

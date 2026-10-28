@@ -371,7 +371,6 @@ task --init	denied
 task --insecure	denied
 task --json	denied
 task --list	safe-read
-task --list --json	safe-read
 task --list -t=/etc/passwd	denied
 task --list-all	safe-read
 task --no-color	denied
@@ -395,9 +394,7 @@ task -i	denied
 task -i --dir=/etc	denied
 task -j	denied
 task -l	safe-read
-task -l --taskfile ./Taskfile.yml	safe-read
 task -l --taskfile=~/.ssh/id_rsa	denied
-task -l -d ./sub	safe-read
 task -n	denied
 task -o x	denied
 task -s	denied

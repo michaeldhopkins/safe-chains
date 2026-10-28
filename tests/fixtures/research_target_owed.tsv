@@ -1230,7 +1230,7 @@ shar	description,examples
 shards	description,examples,no-tolerance,profiled
 shasum	examples,version
 shazam	description,examples,profiled
-shellcheck	description,examples,no-overlap,version
+shellcheck	description,version
 shfmt	description,no-overlap
 shopt	examples,no-tolerance,version
 shred	description,examples
@@ -1325,6 +1325,7 @@ tabs	description,examples
 tac	description,examples,version
 tailscale	examples,no-tolerance,version
 tap	description,examples,no-tolerance,profiled
+task	description
 taskinfo	description,examples
 taskpolicy	description,examples
 tbtdiagnose	description,examples

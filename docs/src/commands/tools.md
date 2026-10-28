@@ -282,12 +282,6 @@ Aliases: `@biomejs/biome`
 - `borg list repo`
 - `borg info repo`
 - `borg version`
-- `borg --bypass-lock list repo`
-- `borg --lock-wait 5 list repo`
-- `borg list --first 3 repo`
-- `borg list --format '{name}' repo`
-- `borg check --archives-only repo`
-- `borg config repo append_only`
 
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
@@ -1686,8 +1680,7 @@ Aliases: `python`
 
 - **Without a subcommand:**
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
-- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
-- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 

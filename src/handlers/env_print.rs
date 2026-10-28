@@ -149,12 +149,11 @@ mod tests {
             "ps wwE$$", "ps E12345", "ps Eww12345", "ps \"E$$\"", "ps $(echo e)", "ps $(echo -E)", "ps \"$(echo a)e\"", "ps a$(echo e)",
             "ps `echo e`", "ps -o pid $(echo e)", "ps 1e2", "ps axo pid e", "env -i \"X=$OPENAI_API_KEY\"",
             "env -i \"X=${OPENAI_API_KEY}\"", "env -i X=\"`cat k`\"", "COMMAND_MODE=legacy ps -ef", "env COMMAND_MODE=legacy ps -e",
-            "mise set -g RUSTC_WRAPPER=./w", "mise set --global BASH_ENV=./x.sh", "ps wwE$$", "ps E12345",
-            "ps Eww12345", "ps \"E$$\"", "ps $(echo e)", "ps $(echo -E)", "ps \"$(echo a)e\"", "ps a$(echo e)", "ps `echo e`",
-            "ps -o pid $(echo e)", "ps 1e2", "typeset -m 'OPENAI*' X=1", "typeset -m 'OPENAI*' X=", "declare -m X=1 'OPENAI*'",
-            "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1", "typeset -1 X", "typeset -1x X", "typeset -9 X",
-            "typeset +9 X", "declare -0 X", "declare +1 X", "typeset -1 Y=2 X", "typeset -x1 X", "export -1 X", "export -0 X",
-            "typeset -Q X", "declare -1i X", "typeset +1x X", "mise set -E staging", "mise set --file ./mise.toml",
+            "ps wwE$$", "ps E12345", "ps Eww12345", "ps \"E$$\"", "ps $(echo e)", "ps $(echo -E)", "ps \"$(echo a)e\"", "ps a$(echo e)",
+            "ps `echo e`", "ps -o pid $(echo e)", "ps 1e2", "typeset -m 'OPENAI*' X=1", "typeset -m 'OPENAI*' X=",
+            "declare -m X=1 'OPENAI*'", "typeset -mx 'O*' X=1", "typeset +m 'O*' X=1", "typeset -m X=1", "typeset -1 X", "typeset -1x X",
+            "typeset -9 X", "typeset +9 X", "declare -0 X", "declare +1 X", "typeset -1 Y=2 X", "typeset -x1 X", "export -1 X",
+            "export -0 X", "typeset -Q X", "declare -1i X", "typeset +1x X", "mise set -E staging", "mise set --file ./mise.toml",
             "mise set -f ./mise.toml OPENAI_API_KEY", "mise set -E staging OPENAI_API_KEY", "mise set --env=staging OPENAI_API_KEY",
         ] {
             assert!(!is_safe_command(cmd), "{cmd} must not be approved");
@@ -167,11 +166,12 @@ mod tests {
             "export FOO=bar", "export FOO", "export -n FOO", "export PATH_EXTRA=./bin", "declare -i count=5", "declare -x FOO=bar",
             "declare -ix FOO=42", "declare -a list", "declare FOO=bar", "declare -f", "declare -F", "declare -f my_function",
             "typeset -x FOO=bar", "ps", "ps aux", "ps -ef", "ps -o pid,command -p 123", "ps 123", "ps -o user,pid", "ps -o user -p 123",
-            "ps -U nobody", "ps axo pid,user", "ps -p 123 -o etime", "env -i FOO=bar", "mise set FOO=bar", "mise set -g FOO=bar", "mise set --global FOO=bar", "mise set --remove FOO",
-            "mise set --remove FOO BAR=1", "mise env --help", "launchctl list", "launchctl print-disabled gui/501", "export - FOO=bar",
-            "ps axww", "ps -e", "typeset -U path", "typeset -L10 X", "typeset -Z2 X=5", "typeset -F3 X=1", "typeset -i16 X=255",
-            "typeset -gx FOO=bar", "mise set --file ./mise.toml FOO=bar", "mise set -E staging FOO=bar", "mise set -f ./mise.toml FOO=bar",
-            "mise set --env=staging FOO=bar",
+            "ps -U nobody", "ps axo pid,user", "ps -p 123 -o etime", "env -i FOO=bar", "mise set FOO=bar", "mise set -g FOO=bar",
+            "mise set --global FOO=bar", "mise set --remove FOO", "mise set --remove FOO BAR=1", "mise env --help", "launchctl list",
+            "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
+            "typeset -Z2 X=5", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar", "mise set --file ./mise.toml FOO=bar",
+            "mise set -E staging FOO=bar", "mise set -f ./mise.toml FOO=bar", "mise set --env=staging FOO=bar",
+            "mise set -g RUSTC_WRAPPER=./w", "mise set --global BASH_ENV=./x.sh",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }

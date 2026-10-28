@@ -902,7 +902,7 @@ Aliases: `fly`
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
 - **self-update**
-- **set**: Flags: --help, --remove, -h. Valued: --env, --file, -E, -f
+- **set**: Flags: --global, --help, --remove, -g, -h. Valued: --env, --file, -E, -f
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
