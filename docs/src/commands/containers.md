@@ -180,9 +180,14 @@
 ### `hadolint`
 <p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
 
-- Allowed standalone flags: --config, --disable-ignore-pragma, --failure-threshold, --format, --help, --ignore, --no-color, --no-fail, --require-label, --strict-labels, --trusted-registry, --verbose, --version, -V, -c, -h, -t, -v
+- **Without a subcommand:**
+- Allowed standalone flags: --disable-ignore-pragma, --help, --no-color, --no-fail, --strict-labels, --verbose, --version, -V, -h, -v
 - Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
-- Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `hadolint Dockerfile`
+- `hadolint --no-fail -f json Dockerfile`
 
 ### `helm`
 <p class="cmd-url"><a href="https://helm.sh/docs/helm/">https://helm.sh/docs/helm/</a></p>

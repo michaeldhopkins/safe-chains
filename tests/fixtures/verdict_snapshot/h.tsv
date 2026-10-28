@@ -77,35 +77,38 @@ h2xs -v	safe-write
 h2xs -x	safe-write
 h2xs x	safe-write
 hadolint	denied
-hadolint --config	safe-read
-hadolint --config --config x	safe-read
-hadolint --config --disable-ignore-pragma	safe-read
+hadolint +RTS -sout -RTS Dockerfile	denied
+hadolint +RTS -tpwned Dockerfile	denied
+hadolint --RTS Dockerfile	denied
 hadolint --config x	safe-read
 hadolint --disable-ignore-pragma	safe-read
-hadolint --failure-threshold	safe-read
+hadolint --disable-ignore-pragma --config x	safe-read
+hadolint --disable-ignore-pragma --help	safe-read
+hadolint --disable-ignore-pragma x	safe-read
 hadolint --failure-threshold x	safe-read
-hadolint --format	safe-read
 hadolint --format x	safe-read
 hadolint --help	safe-read
-hadolint --ignore	safe-read
 hadolint --ignore x	safe-read
 hadolint --no-color	safe-read
 hadolint --no-fail	safe-read
-hadolint --require-label	safe-read
+hadolint --no-fail -f json Dockerfile	safe-read
 hadolint --require-label x	safe-read
 hadolint --strict-labels	safe-read
-hadolint --trusted-registry	safe-read
 hadolint --trusted-registry x	safe-read
 hadolint --verbose	safe-read
 hadolint --version	safe-read
 hadolint -V	safe-read
-hadolint -c	safe-read
 hadolint -c x	safe-read
 hadolint -f x	safe-read
 hadolint -h	safe-read
-hadolint -t	safe-read
 hadolint -t x	safe-read
 hadolint -v	safe-read
+hadolint -z Dockerfile	safe-read
+hadolint Dockerfile	safe-read
+hadolint Dockerfile +RTS -Sx	denied
+hadolint Dockerfile +RTS -s -RTS	denied
+hadolint Dockerfile --RTS	denied
+hadolint Dockerfile -RTS	denied
 hadolint x	safe-read
 haml	denied
 haml --help	inert

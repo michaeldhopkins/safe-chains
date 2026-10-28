@@ -372,6 +372,7 @@ owed = [
   "a_writer_flag_with_a_path_value_is_denied_in_every_spelling",
   "any_runtime_option_token_is_denied",
 ]
+"src/handlers/hadolint.rs" = ["any_runtime_option_token_is_denied"]
 "src/handlers/shellcheck.rs" = ["any_runtime_option_token_is_denied"]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",

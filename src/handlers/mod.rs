@@ -27,6 +27,7 @@ pub mod df;
 pub mod fd;
 pub mod forges;
 pub mod fuzzy;
+pub mod hadolint;
 pub mod interpreter;
 pub mod jvm;
 pub mod magick;
@@ -65,6 +66,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("magick", magick::is_safe_magick as HandlerFn),
         ("pandoc", pandoc::check_pandoc as HandlerFn),
         ("shellcheck", shellcheck::check_shellcheck as HandlerFn),
+        ("hadolint", hadolint::check_hadolint as HandlerFn),
         ("awk", coreutils::awk::check_awk as HandlerFn),
         ("curl", network::is_safe_curl as HandlerFn),
         ("df", df::check_df as HandlerFn),

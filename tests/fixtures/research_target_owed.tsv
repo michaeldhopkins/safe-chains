@@ -511,7 +511,7 @@ gunlink	description,examples
 gzip	examples,version
 h2ph	description,examples
 h2xs	description,examples
-hadolint	description,examples,no-overlap,no-tolerance
+hadolint	description,no-tolerance
 haml	description,examples
 haml-lint	description,examples
 haproxy	examples

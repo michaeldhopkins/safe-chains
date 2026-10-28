@@ -439,14 +439,6 @@ grpcurl	-rpc-header
 grpcurl	-servername
 grpcurl	-unix
 grpcurl	-userconfig
-hadolint	--config
-hadolint	--failure-threshold
-hadolint	--format
-hadolint	--ignore
-hadolint	--require-label
-hadolint	--trusted-registry
-hadolint	-c
-hadolint	-t
 helmfile list	--output
 helmfile version	--output
 hg diff	--change
