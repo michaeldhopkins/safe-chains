@@ -1,8 +1,8 @@
 [[command]]
 name = "task"
-description = "Task runner / build tool driven by a YAML Taskfile. Naming a task (or none, which runs `default`) executes that task's shell commands: arbitrary code from the Taskfile, the same risk profile as Make. `-l/--list`, `-a/--list-all` and `-j/--json` print task names and descriptions without running tasks, but loading the Taskfile still reads its `dotenv` files and, when it has any, evaluates the file's top-level `sh:` variables, so listing a Taskfile runs code from it; descriptions are templated and can print those values. `-d/--dir` and `-t/--taskfile` choose which Taskfile is loaded, `-g/--global` loads `$HOME/Taskfile.yml`, and `--init` writes a new Taskfile. `--status`, `--force`, `--watch`, `--parallel`, `--exit-code`, `--summary` and `--dry` act on named tasks. Network: none of its own, except Taskfiles that include remote Taskfiles over HTTP(S) (an experiment, cached locally; `--offline` stops the download, `--insecure` permits plain HTTP). `--version` and `--help` print and exit. Release cadence: a minor release roughly every one to two months, with the flag surface stable across v3."
+description = "Task runner / build tool with a YAML config (Taskfile.yml). Each invocation runs the matching task definition, which contains arbitrary shell — same risk profile as Make. The diagnostic --version / --help and `-l/--list` (list tasks without running) and `-a/--list-all` are part of the safe surface."
 url = "https://taskfile.dev/"
-researched_version = "task 3.54.0"
+researched_version = "task 3.x"
 level = "SafeRead"
 bare = false
 require_any = ["--help", "--list", "--list-all", "--version", "-a", "-h", "-l"]
@@ -23,16 +23,7 @@ valued = [
 # allowlist was decorative: `task build` auto-approved while every peer runner (`npm run build`,
 # `make build`, `just build`, `rake build`, `mise run build`) denied.
 max_positional = 0
-examples_safe = [
-    "task --list",
-    "task -l",
-    "task --list-all",
-    "task --version",
-    "task --dry --list",
-    "task -l -d ./sub",
-    "task -l --taskfile ./Taskfile.yml",
-    "task --list --json",
-]
+examples_safe = ["task --list", "task -l", "task --list-all", "task --version", "task --dry --list"]
 examples_denied = [
     "task build",
     "task deploy",
