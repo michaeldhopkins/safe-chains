@@ -145,6 +145,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use crate::policy::FlagSet;
     use proptest::prelude::*;
 
     use super::{is_plain_format, is_reader_format, is_writer_format};
@@ -208,6 +209,19 @@ mod tests {
     #[test]
     fn a_plain_format_is_read_only() {
         assert_eq!(crate::command_verdict("pandoc -t html README.md"), Verdict::Allowed(SafetyLevel::SafeRead));
+    }
+
+    #[test]
+    fn every_format_flag_takes_a_value_in_the_flag_lists() {
+        let (standalone, valued) = crate::registry::fallback_flag_sets("pandoc").expect("pandoc fallback");
+        for flag in super::READER_LONG.iter().chain(super::WRITER_LONG) {
+            assert!(valued.contains_flag(flag), "{flag} must be valued, or its value is never checked");
+            assert!(!standalone.contains_flag(flag), "{flag} must not also be standalone");
+        }
+        for &short in super::READER_SHORT.iter().chain(super::WRITER_SHORT) {
+            assert!(valued.contains_short(short), "-{} must be valued", short as char);
+            assert!(!standalone.contains_short(short), "-{} must not also be standalone", short as char);
+        }
     }
 
     proptest! {
