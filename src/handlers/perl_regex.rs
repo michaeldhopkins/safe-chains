@@ -442,6 +442,7 @@ mod tests {
         unterminated_string: "perl -e 'print \"a'",
         interpolating_quote_like: "perl -e 'print qq{@{[ 1 ]}}'",
         heredoc: "perl -e 'print <<\"E\";\n;/\nE\nunlink 1; /'",
+        bare_heredoc: "perl -e 'print <<E;\n;/\nE\nunlink 1; /'",
         pod_block: "perl -e 'print 1;\n=pod\n;/\n=cut\nunlink 1; /'",
         postmatch_variable_hides_nothing: "perl -e \"print $'; unlink 1; print $'\"",
         list_separator_variable_hides_nothing: "perl -e 'print $\"; unlink 1; print $\"'",

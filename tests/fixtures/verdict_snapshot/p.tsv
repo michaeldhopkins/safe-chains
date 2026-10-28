@@ -2161,11 +2161,13 @@ perl -e "print 'x;/'; unlink 1; '/'"	denied
 perl -e "print /'/; unlink 1; print /'/"	denied
 perl -e "q,'/,, unlink 1, q,'/,"	denied
 perl -e '"a" =~ /(?{ 1 })/'	denied
+perl -e '$ARGV{ x } = 1'	denied
 perl -e '$a[0]("id")'	denied
 perl -e '$a[0]->("id")'	denied
 perl -e '$x -> ("id")'	denied
 perl -e '$x->("id")'	denied
 perl -e '$x->()'	denied
+perl -e '${foo} = 1; print ${foo}'	inert
 perl -e '& $x("id")'	denied
 perl -e '& { $f }("id")'	denied
 perl -e '&$x'	denied
@@ -2176,6 +2178,9 @@ perl -e '&foo("id")'	denied
 perl -e '&print("hi")'	denied
 perl -e '&{"system"}("id")'	denied
 perl -e '&{$f}("id")'	denied
+perl -e '(1)->()'	denied
+perl -e '*foo = *bar'	denied
+perl -e '++$ARGV'	denied
 perl -e 'CORE::GLOBAL::print("hi")'	denied
 perl -e 'CORE::GLOBAL::system("id")'	denied
 perl -e 'CORE::print("hi")'	denied
@@ -2186,18 +2191,30 @@ perl -e 'exec("bad")'	denied
 perl -e 'fork()'	denied
 perl -e 'm=(?{ 1 })='	denied
 perl -e 'mkdir("dir")'	denied
+perl -e 'my $f; print $f  ->[0]'	inert
+perl -e 'my $f; print $f-> [0]'	inert
+perl -e 'my $f; print $f->[0]'	inert
+perl -e 'my $foo = 1; print ${foo}'	inert
 perl -e 'my $x = 1; print $x'	inert
+perl -e 'my $x; print "$x a(b)"'	inert
+perl -e 'my $x; print "$x->[0]"'	inert
+perl -e 'my $x; print \\*$x'	denied
 perl -e 'my %h; $h{s}; unlink 1; $h{s}'	denied
 perl -e 'my %h; print $h{s}; print $h{y}'	inert
 perl -e 'my %h; print keys %h'	inert
+perl -e 'my @x; print $x[0] (1)'	denied
 perl -e 'open(FH, ">file")'	denied
 perl -e 'print "$#{[unlink 1]}"'	denied
 perl -e 'print "$+{&print}"'	denied
+perl -e 'print "$^W[system 1]"'	denied
+perl -e 'print "$_[system 1]"'	denied
 perl -e 'print "$a[CORE::shift]"'	denied
 perl -e 'print "$a[`id`]"'	denied
+perl -e 'print "$foo[system 1]"'	denied
 perl -e 'print "$h{`id`}"'	denied
 perl -e 'print "$h{q(}); unlink 1}"'	denied
 perl -e 'print "$r->{unlink 1}"'	denied
+perl -e 'print "$x->(1)"'	denied
 perl -e 'print "${\\ system(q(id))}"'	denied
 perl -e 'print "${a}->[CORE::shift]"'	denied
 perl -e 'print "8" / 2; unlink 1; print 1 / 2'	denied
@@ -2220,17 +2237,33 @@ perl -e 'print $$ / 2; unlink 1; print 1 / 2'	denied
 perl -e 'print $/; print $"'	inert
 perl -e 'print $; / 2; unlink 1; print 1 / 2'	denied
 perl -e 'print $main'\\''x'	denied
+perl -e 'print $main::x'	denied
+perl -e 'print ${/}'	inert
+perl -e 'print ${}'	denied
+perl -e 'print * {"STDOUT"}'	denied
+perl -e 'print *{"STDOUT"}'	denied
+perl -e 'print -e("x")'	inert
 perl -e 'print -s "a.txt"'	inert
+perl -e 'print 1 && system 1'	denied
+perl -e 'print 1 < "2"'	inert
 perl -e 'print 1 << 2'	inert
 perl -e 'print 1;\n=pod\n;/\n=cut\nunlink 1; /'	denied
 perl -e 'print 1; # a/b'	inert
 perl -e 'print 1; #;/\nunlink 1;\n/'	denied
+perl -e 'print 1; print 2**3; system 1'	denied
+perl -e 'print 2**3'	inert
 perl -e 'print <<"E";\n;/\nE\nunlink 1; /'	denied
+perl -e 'print <<E;\n;/\nE\nunlink 1; /'	denied
+perl -e 'print <<END'	denied
+perl -e 'print [1](2)'	denied
+perl -e 'print \\$ARGV'	denied
 perl -e 'print `ls`'	denied
 perl -e 'print for qw(a/b c)'	inert
+perl -e 'print map { $_ } (1, 2)'	inert
 perl -e 'print qq{$+{&print}}'	denied
 perl -e 'print qq{${CORE::shift}}'	denied
 perl -e 'print qq{@{[ 1 ]}}'	denied
+perl -e 'print(1,<<"EOF")'	denied
 perl -e 'qx(ls)'	denied
 perl -e 'q{/}; unlink 1; q{/}'	denied
 perl -e 'rename("a", "b")'	denied
@@ -2253,6 +2286,7 @@ perl -i.bake -pe 's/foo/bar/' file.txt	safe-write
 perl -i.orig -pe 's/foo/bar/' file.txt	safe-write
 perl -lane 'print $F[0]' file.txt	safe-read
 perl -n file.txt	denied
+perl -ne '$ARGV <<= 1; print' file.txt	denied
 perl -ne 'BEGIN { $#ARGV = 0 } print' file.txt	denied
 perl -ne 'BEGIN { $, = "," } print' file.txt	denied
 perl -ne 'BEGIN { $/ = undef } print' file.txt	denied
@@ -2266,7 +2300,11 @@ perl -ne 'BEGIN { push @ARGV, "/etc/passwd" } print' file.txt	denied
 perl -ne 'BEGIN{$n=0} $n++; END{print $n}'	inert
 perl -ne 'chomp; print join(",", split(/\\t/)), "\\n"'	inert
 perl -ne 'my $w = 1; print if /$w/' a.txt	safe-read
+perl -ne 'print $ARGV, "\\n"' file.txt	safe-read
 perl -ne 'print /a/ / 2; unlink 1; print /a/' a.txt	denied
+perl -ne 'print 1 if $ARGV != 0' file.txt	safe-read
+perl -ne 'print 1 if $ARGV <= 1' file.txt	safe-read
+perl -ne 'print 1 if $ARGV == 0' file.txt	safe-read
 perl -ne 'print if /"(?{ 1 })"/' a.txt	denied
 perl -ne 'print if /(?:ab)+/' a.txt	safe-read
 perl -ne 'print if /(??{ 1 })/' a.txt	denied
@@ -2275,6 +2313,7 @@ perl -ne 'print if /@{[ 1 ]}/' a.txt	denied
 perl -ne 'print if /TODO/' file.txt	safe-read
 perl -ne 'print if /\\berror\\b/' log.txt	safe-read
 perl -ne 'print if /a' a.txt	denied
+perl -ne 'print if /a/ && /b/' file.txt	safe-read
 perl -ne 'print if /a@b\\.com/' a.txt	safe-read
 perl -ne 'print if /a{2,3}/' a.txt	safe-read
 perl -ne 'print if /foo$/' a.txt	safe-read
@@ -2292,6 +2331,7 @@ perl -pe 'BEGIN { ${^I} = "" } s/a/b/' file.txt	denied
 perl -pe 's /a/"unlink 1"/ee' a.txt	denied
 perl -pe 's/(\\d+)/$1x/' a.txt	safe-read
 perl -pe 's/(\\d+)/${1}x/' a.txt	safe-read
+perl -pe 's/a/$^W[0]/' file.txt	denied
 perl -pe 's/a/$h{1}/' a.txt	denied
 perl -pe 's/a/${\\ 1}/' a.txt	denied
 perl -pe 's/a/@{[ 1 ]}/' a.txt	denied

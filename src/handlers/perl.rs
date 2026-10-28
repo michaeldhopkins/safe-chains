@@ -112,24 +112,25 @@ fn mutates_argv(bytes: &[u8], start: usize, end: usize) -> bool {
     }
     let mut p = start;
     let mut saw_comma = false;
-    while p > 0 && !matches!(bytes[p - 1], b';' | b'}') {
-        if bytes[p - 1] == b'=' && !saw_comma {
-            break;
-        }
-        if bytes[p - 1] == b',' {
-            saw_comma = true;
-            p -= 1;
-        } else if bytes[p - 1].is_ascii_alphanumeric() || bytes[p - 1] == b'_' {
-            let mut w = p;
-            while w > 0 && (bytes[w - 1].is_ascii_alphanumeric() || bytes[w - 1] == b'_') {
-                w -= 1;
+    while p > 0 {
+        match bytes[p - 1] {
+            b';' | b'}' => break,
+            b'=' if !saw_comma => break,
+            b',' => {
+                saw_comma = true;
+                p -= 1;
             }
-            if is_argv_mutating_keyword(&bytes[w..p], saw_comma) {
-                return true;
+            b if b.is_ascii_alphanumeric() || b == b'_' => {
+                let mut w = p;
+                while w > 0 && (bytes[w - 1].is_ascii_alphanumeric() || bytes[w - 1] == b'_') {
+                    w -= 1;
+                }
+                if is_argv_mutating_keyword(&bytes[w..p], saw_comma) {
+                    return true;
+                }
+                p = w;
             }
-            p = w;
-        } else {
-            p -= 1;
+            _ => p -= 1,
         }
     }
     false
@@ -339,7 +340,7 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
                     break;
                 }
                 'i' => {
-                    if flags[at + 1..].contains(['/', '*']) {
+                    if flags[at..].contains(['/', '*']) {
                         return None;
                     }
                     scan.in_place = true;
@@ -943,5 +944,50 @@ mod tests {
             let plain = format!("perl -e '@x = sort{gap}@{var}'");
             proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
         }
+    }
+
+    safe! {
+        scanner_braced_plain_name: r#"perl -e 'my $foo = 1; print ${foo}'"#,
+        scanner_braced_plain_name_assigned: r#"perl -e '${foo} = 1; print ${foo}'"#,
+        scanner_braced_special_scalar_read: r#"perl -e 'print ${/}'"#,
+        scanner_power_operator: r#"perl -e 'print 2**3'"#,
+        scanner_logical_and: r#"perl -ne 'print if /a/ && /b/' file.txt"#,
+        scanner_block_before_list: r#"perl -e 'print map { $_ } (1, 2)'"#,
+        scanner_file_test_call: r#"perl -e 'print -e("x")'"#,
+        scanner_less_than_string: r#"perl -e 'print 1 < "2"'"#,
+        scanner_string_with_parenthesised_word: r#"perl -e 'my $x; print "$x a(b)"'"#,
+        scanner_string_arrow_subscript: r#"perl -e 'my $x; print "$x->[0]"'"#,
+        scanner_argv_read_in_list: r#"perl -ne 'print $ARGV, "\n"' file.txt"#,
+        scanner_argv_numeric_equal: r#"perl -ne 'print 1 if $ARGV == 0' file.txt"#,
+        scanner_argv_numeric_not_equal: r#"perl -ne 'print 1 if $ARGV != 0' file.txt"#,
+        scanner_argv_less_or_equal: r#"perl -ne 'print 1 if $ARGV <= 1' file.txt"#,
+        scanner_arrow_subscript: r#"perl -e 'my $f; print $f->[0]'"#,
+        scanner_arrow_then_space_subscript: r#"perl -e 'my $f; print $f-> [0]'"#,
+        scanner_spaces_then_arrow_subscript: r#"perl -e 'my $f; print $f  ->[0]'"#,
+    }
+
+    denied! {
+        scanner_empty_braced_name_denied: r#"perl -e 'print ${}'"#,
+        scanner_glob_block_denied: r#"perl -e 'print *{"STDOUT"}'"#,
+        scanner_glob_spaced_block_denied: r#"perl -e 'print * {"STDOUT"}'"#,
+        scanner_glob_reference_denied: r#"perl -e 'my $x; print \*$x'"#,
+        scanner_glob_assignment_denied: r#"perl -e '*foo = *bar'"#,
+        scanner_package_qualified_name_denied: r#"perl -e 'print $main::x'"#,
+        scanner_call_after_logical_and_denied: r#"perl -e 'print 1 && system 1'"#,
+        scanner_call_after_power_denied: r#"perl -e 'print 1; print 2**3; system 1'"#,
+        scanner_arrow_call_denied: r#"perl -e '(1)->()'"#,
+        scanner_subscript_call_denied: r#"perl -e 'print [1](2)'"#,
+        scanner_spaced_subscript_call_denied: r#"perl -e 'my @x; print $x[0] (1)'"#,
+        scanner_heredoc_after_comma_denied: r#"perl -e 'print(1,<<"EOF")'"#,
+        scanner_bare_heredoc_denied: r#"perl -e 'print <<END'"#,
+        scanner_string_arrow_call_denied: r#"perl -e 'print "$x->(1)"'"#,
+        scanner_replacement_caret_subscript_denied: r#"perl -pe 's/a/$^W[0]/' file.txt"#,
+        scanner_string_caret_subscript_denied: r#"perl -e 'print "$^W[system 1]"'"#,
+        scanner_string_named_subscript_denied: r#"perl -e 'print "$foo[system 1]"'"#,
+        scanner_string_underscore_subscript_denied: r#"perl -e 'print "$_[system 1]"'"#,
+        scanner_argv_shift_assign_denied: r#"perl -ne '$ARGV <<= 1; print' file.txt"#,
+        scanner_argv_spaced_hash_assign_denied: r#"perl -e '$ARGV{ x } = 1'"#,
+        scanner_argv_reference_denied: r#"perl -e 'print \$ARGV'"#,
+        scanner_argv_preincrement_denied: r#"perl -e '++$ARGV'"#,
     }
 }
