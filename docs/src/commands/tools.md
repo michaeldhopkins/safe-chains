@@ -1190,8 +1190,6 @@ Aliases: `run-p`, `run-s`
 ### `pandoc`
 <p class="cmd-url"><a href="https://pandoc.org/MANUAL.html">https://pandoc.org/MANUAL.html</a></p>
 
-- Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). Any `+RTS`, `-RTS` or `--RTS` argument is denied (GHC runtime options can write statistics to a named file). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only plain format names, so a path to a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists.
-
 - **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: --bash-completion, --biblatex, --citeproc, --help, --list-highlight-languages, --list-highlight-styles, --list-input-formats, --list-output-formats, --natbib, --no-highlight, --quiet, --standalone, --verbose, --version, -C, -N, -h, -i, -p, -s, -v, --ascii, --atx-headers, --epub-title-page, --fail-if-warnings, --file-scope, --gladtex, --html-q-tags, --incremental, --katex, --link-images, --list-extensions, --listings, --mathjax, --mathml, --no-check-certificate, --number-sections, --preserve-tabs, --reference-links, --sandbox, --section-divs, --strip-comments, --table-of-contents, --toc, --trace, --webtex
