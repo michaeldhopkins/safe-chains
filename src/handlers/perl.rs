@@ -330,6 +330,9 @@ pub(crate) fn scan_perl(tokens: &[Token]) -> Option<PerlScan> {
                     break;
                 }
                 'i' => {
+                    if flags[at + 1..].contains(['/', '*']) {
+                        return None;
+                    }
                     scan.in_place = true;
                     break;
                 }
@@ -883,6 +886,7 @@ mod tests {
             "echo 'print 1' | perl",
             "echo 'print 1' | perl -",
             "perl < script.pl",
+            "perl \"-i$SUFFIX\" -pe 1 file.txt",
         ];
         for cmd in denied_cases {
             let verdict = crate::command_verdict(cmd);
@@ -901,6 +905,20 @@ mod tests {
             let cmd = format!("perl {switches} file.txt '{operand}'");
             proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
             let plain = format!("perl {switches} file.txt {name}.txt");
+            proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
+        }
+
+        #[test]
+        fn an_in_place_backup_name_that_can_leave_the_directory_is_never_approved(
+            prefix in "[a-z.]{0,4}",
+            escape in proptest::sample::select(vec!["/", "*", "/tmp/", "../", "*/"]),
+            suffix in "[a-z.]{0,4}",
+            glued in proptest::bool::ANY,
+        ) {
+            let backup = format!("{prefix}{escape}{suffix}");
+            let cmd = if glued { format!("perl '-i{backup}' -pe 1 file.txt") } else { format!("perl -pe 1 '-i{backup}' file.txt") };
+            proptest::prop_assert_eq!(crate::command_verdict(&cmd), crate::verdict::Verdict::Denied, "{}", cmd);
+            let plain = format!("perl '-i.{prefix}' -pe 1 file.txt");
             proptest::prop_assert_ne!(crate::command_verdict(&plain), crate::verdict::Verdict::Denied, "{}", plain);
         }
     }

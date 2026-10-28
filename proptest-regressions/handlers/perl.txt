@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 84a22c0633cc7362a74a27a8372e25ad9773be64fec4e5cf6825650d0df59172 # shrinks to switches = "-ne 'print'", name = "a", form = "{} |"
+cc 690d1fd6f04bfc3f0309d2adde4befb3046162a43baaba77544b1f9bfd8abeab # shrinks to prefix = "", escape = "/", suffix = "", glued = true
