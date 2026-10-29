@@ -85,3 +85,51 @@ fn a_tool_that_runs_the_folders_code_keeps_its_verdict_inside_the_project() {
     }
     assert!(approved("cd /tmp/x && mvn --version"), "the version query runs no folder code");
 }
+
+/// make parses the makefile, `$(shell …)` included, even under `-n`; Bundler evaluates the Gemfile
+/// for every subcommand that reads the bundle; Gradle runs the build scripts for every task; nox
+/// imports the noxfile to list its sessions. Each runs the code of the folder it is pointed at.
+#[test]
+fn a_build_tool_that_evaluates_the_folders_files_follows_a_cd_and_its_folder_flags() {
+    for command in [
+        "make -n", "make -n all", "make -nq", "make -p -n", "bundle list", "bundle check", "bundle show", "bundle info rake",
+        "bundle install", "bundle exec rake -T", "gradle tasks", "gradle dependencies", "gradle properties", "gradle test", "gradle check",
+        "gradle build", "nox -l", "nox --list",
+    ] {
+        for line in [format!("cd /Users/Shared/evil-sc && {command}"), format!("cd /tmp/x && {command}")] {
+            assert!(!approved(&line), "`{line}` was approved");
+        }
+    }
+    for command in [
+        "make -n -C /Users/Shared/evil-sc", "make -C /x -n", "make -n -C /tmp/x", "make -n --directory=/tmp/x", "make -nC /tmp/x",
+        "make -n -f /tmp/x/Makefile", "make -n --file=/tmp/x/Makefile", "make -n --makefile /tmp/x/Makefile", "make -n -f ../../Makefile",
+        "bundle check --gemfile=/tmp/x/Gemfile", "bundle install --gemfile /tmp/x/Gemfile",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+}
+
+/// A make command-line assignment is evaluated before any rule (`A:=$(shell id)`), and a makefile
+/// read from standard input is whatever the line pipes in, so neither is the project's makefile.
+#[test]
+fn a_make_assignment_or_a_makefile_from_stdin_is_refused() {
+    for command in [
+        "make -n 'A:=$(shell echo pwned >&2)'", "make -n 'A:=$(info $(OPENAI_API_KEY))'", "make -n -f /dev/null 'A:=$(info x)'",
+        "make -n MAKEFLAGS=p", "make -n GNUMAKEFLAGS=p", "make -n A=1", "make -n -f /dev/stdin <<< '$(info x)'",
+        "echo '$(info x)' | make -n -f -", "make -n -f-", "make -n --file=-", "make -n --makefile -", "make -n -f /dev/fd/0", "make -nf -",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+}
+
+#[test]
+fn a_build_tool_that_evaluates_the_folders_files_keeps_its_verdict_inside_the_project() {
+    for command in ["make -n", "make -n -C src", "make -n -f Makefile", "make -nq", "bundle list", "gradle tasks", "nox -l"] {
+        assert!(approved(command), "precondition: `{command}`");
+        let line = format!("cd src && {command}");
+        assert!(approved(&line), "`{line}` should stay approved");
+    }
+    for command in ["cd /tmp/x && gradle --version", "cd /tmp/x && gradle --help"] {
+        assert!(approved(command), "`{command}` runs no build script");
+    }
+}

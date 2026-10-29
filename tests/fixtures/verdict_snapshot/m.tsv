@@ -162,14 +162,21 @@ make -n --print-data-base	inert
 make -n --question	inert
 make -n --recon	inert
 make -n --version	inert
+make -n -C /tmp/x	denied
+make -n -C src	inert
 make -n -C x	inert
 make -n -V	inert
+make -n -f -	denied
+make -n -f /tmp/x/Makefile	denied
+make -n -f Makefile	inert
 make -n -f x	inert
 make -n -h	inert
 make -n -j x	inert
 make -n -n	inert
 make -n -p	inert
 make -n -q	inert
+make -n A=1	denied
+make -nq	inert
 make -p	inert
 make -q	denied
 make x	denied

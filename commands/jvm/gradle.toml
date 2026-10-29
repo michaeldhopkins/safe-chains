@@ -21,6 +21,7 @@ valued = ["--exclude-task", "--max-workers", "-x"]
 
 [[command.sub]]
 name = "check"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--build-cache", "--configure-on-demand", "--console",
@@ -34,6 +35,7 @@ valued = ["--exclude-task", "--max-workers", "-x"]
 
 [[command.sub]]
 name = "dependencies"
+writes_cwd = "code"
 standalone = [
     "--console", "--help", "--info", "--no-rebuild",
     "--quiet", "--stacktrace", "--warning-mode",
@@ -43,6 +45,7 @@ valued = ["--configuration"]
 
 [[command.sub]]
 name = "properties"
+writes_cwd = "code"
 standalone = [
     "--console", "--help", "--info", "--no-rebuild",
     "--quiet", "--stacktrace", "--warning-mode",
@@ -51,6 +54,7 @@ standalone = [
 
 [[command.sub]]
 name = "tasks"
+writes_cwd = "code"
 standalone = [
     "--all", "--console", "--help", "--info", "--no-rebuild",
     "--quiet", "--stacktrace", "--warning-mode",
@@ -60,6 +64,7 @@ valued = ["--group"]
 
 [[command.sub]]
 name = "test"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--build-cache", "--configure-on-demand", "--console",

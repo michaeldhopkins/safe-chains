@@ -5,10 +5,11 @@ url = "https://bundler.io/man/bundle.1.html"
 bare_flags = ["--help", "--version", "-V", "-h", "-v"]
 
 [command.path_gate]
-flags = { "--path" = "write" }
+flags = { "--gemfile" = "exec", "--path" = "write" }
 
 [[command.sub]]
 name = "check"
+writes_cwd = "code"
 standalone = ["--dry-run", "--help", "-h"]
 valued = ["--gemfile", "--path"]
 
@@ -22,7 +23,7 @@ handler = "bundle_exec"
 
 [[command.sub]]
 name = "install"
-writes_cwd = "source"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--clean", "--deployment", "--frozen", "--full-index",
@@ -38,12 +39,15 @@ valued = [
 
 [[command.sub]]
 name = "info"
+writes_cwd = "code"
 standalone = ["--help", "--path", "-h"]
 
 [[command.sub]]
 name = "list"
+writes_cwd = "code"
 standalone = ["--help", "--name-only", "--paths", "-h"]
 
 [[command.sub]]
 name = "show"
+writes_cwd = "code"
 standalone = ["--help", "--paths", "-h"]

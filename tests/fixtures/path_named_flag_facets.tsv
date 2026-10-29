@@ -160,8 +160,6 @@ buf generate	--exclude-path	untriaged	-	-	-
 buf generate	--path	untriaged	-	-	-	
 buf lint	--exclude-path	untriaged	-	-	-	
 buf lint	--path	untriaged	-	-	-	
-bundle check	--gemfile	untriaged	-	-	-	
-bundle install	--gemfile	untriaged	-	-	-	
 bundler-audit check	--gemfile-lock	untriaged	-	-	-	
 bundletool dump config	--xpath	untriaged	-	-	-	
 bundletool dump manifest	--xpath	untriaged	-	-	-	

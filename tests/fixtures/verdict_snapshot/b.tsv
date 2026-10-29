@@ -2089,8 +2089,9 @@ bun x tsc	denied
 bun x tsc --noEmit	inert
 bun x x	denied
 bundle	denied
+bundle --gemfile x	denied
 bundle --help	inert
-bundle --help --path x	denied
+bundle --help --gemfile x	denied
 bundle --help --version	denied
 bundle --help x	denied
 bundle --path x	denied

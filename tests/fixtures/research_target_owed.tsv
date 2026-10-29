@@ -771,7 +771,7 @@ machine	description,examples
 madge	description,examples,version
 mage	description,examples
 magick	examples,no-tolerance,version
-make	description,examples,version
+make	description,version
 malloc_history	description,examples,no-tolerance
 man	description,examples,version
 mandoc	description,examples

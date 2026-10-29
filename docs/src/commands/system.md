@@ -837,6 +837,13 @@ Aliases: `fly`
 - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
 - Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
 
+**Examples:**
+
+- `make -n`
+- `make -n -C src`
+- `make -n -f Makefile`
+- `make -nq`
+
 ### `malloc_history`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/malloc_history.1.html">https://keith.github.io/xcode-man-pages/malloc_history.1.html</a></p>
 

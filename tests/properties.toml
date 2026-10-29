@@ -262,6 +262,11 @@ owed = [
 "src/handlers/coreutils/rsync_remote.rs" = [
   "a_remote_option_is_judged_as_the_same_option_given_locally",
 ]
+"src/handlers/make_text.rs" = [
+  "an_assignment_operand_is_refused",
+  "a_makefile_from_stdin_is_refused",
+  "a_target_is_not_refused",
+]
 "src/handlers/mise_global.rs" = ["no_audited_variable_is_set_globally_in_any_spelling"]
 "src/handlers/coreutils/rsync_shell.rs" = [
   "a_connect_program_is_refused_in_every_spelling",
