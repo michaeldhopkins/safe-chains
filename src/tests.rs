@@ -1087,6 +1087,9 @@ safe! {
 
 denied! {
     env_bare_prints_the_environment: "env",
+    cmpdylib_credential_after_double_dash: "cmpdylib -- ~/.ssh/id_ed25519 x",
+    cmpdylib_credential_operand: "cmpdylib ~/.ssh/id_ed25519 ./new.dylib",
+    cmpdylib_system_secret: "cmpdylib ./old.dylib /etc/shadow",
     dltest_loads_a_library: "dltest /usr/lib/libc.dylib printf",
     dltest_loads_a_folder_library: "dltest ./x.dylib sym",
     printenv_bare_prints_the_environment: "printenv",

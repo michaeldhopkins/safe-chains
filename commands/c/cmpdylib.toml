@@ -1,0 +1,12 @@
+[[command]]
+name = "cmpdylib"
+description = "Compares two dynamic shared libraries to determine whether they are ABI-compatible: verifies architectures match, that every global symbol defined in the old library is still defined in the new one, and that compatibility version numbers monotonically increase. Read-only: takes two file arguments, prints any incompatibilities to stdout, sets a non-zero exit status when incompatible. No network. Surface frozen since 1997."
+url = "https://keith.github.io/xcode-man-pages/cmpdylib.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 1997-11-03)"
+level = "Inert"
+bare = false
+max_positional = 2
+examples_safe = ["cmpdylib old.dylib new.dylib", "cmpdylib ./a.dylib ./b.dylib"]
+
+[command.path_gate]
+positional = "read"

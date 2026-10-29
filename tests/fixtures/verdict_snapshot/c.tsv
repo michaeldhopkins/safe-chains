@@ -4609,10 +4609,14 @@ cmp -n x	inert
 cmp -s	inert
 cmp x	inert
 cmpdylib	denied
+cmpdylib -- ~/.ssh/id_ed25519 x	denied
 cmpdylib --help	denied
 cmpdylib --version	denied
+cmpdylib ./a.dylib ./b.dylib	inert
+cmpdylib ./old.dylib /etc/shadow	denied
 cmpdylib old.dylib new.dylib	inert
 cmpdylib x	inert
+cmpdylib ~/.ssh/id_ed25519 ./new.dylib	denied
 cockroach	denied
 cockroach --help	inert
 cockroach --help --version	denied

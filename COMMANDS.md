@@ -3145,6 +3145,11 @@ Aliases: `clojure`
 
 - Positional arguments only
 
+**Examples:**
+
+- `cmpdylib old.dylib new.dylib`
+- `cmpdylib ./a.dylib ./b.dylib`
+
 ### `cockroach`
 <p class="cmd-url"><a href="https://www.cockroachlabs.com/docs/stable/cockroach-commands.html">https://www.cockroachlabs.com/docs/stable/cockroach-commands.html</a></p>
 
