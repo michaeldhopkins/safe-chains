@@ -171,7 +171,6 @@ mod tests {
             "launchctl print-disabled gui/501", "export - FOO=bar", "ps axww", "ps -e", "typeset -U path", "typeset -L10 X",
             "typeset -Z2 X=5", "typeset -F3 X=1", "typeset -i16 X=255", "typeset -gx FOO=bar", "mise set --file ./mise.toml FOO=bar",
             "mise set -E staging FOO=bar", "mise set -f ./mise.toml FOO=bar", "mise set --env=staging FOO=bar",
-            "mise set -g RUSTC_WRAPPER=./w", "mise set --global BASH_ENV=./x.sh",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }

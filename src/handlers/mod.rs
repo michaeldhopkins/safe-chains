@@ -35,6 +35,7 @@ pub mod hadolint;
 pub mod interpreter;
 pub mod jvm;
 pub mod magick;
+mod mise_global;
 pub mod network;
 pub mod node;
 pub mod pandoc;
@@ -152,7 +153,8 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
                 || coreutils::rsync_remote::refuses_its_remote_options(tokens)
                 || coreutils::rsync_shell::names_a_program_to_run(tokens)
         }
-        "export" | "declare" | "ps" | "mise" => env_print::prints_the_environment(tokens),
+        "mise" => env_print::prints_the_environment(tokens) || mise_global::sets_an_audited_variable_globally(tokens),
+        "export" | "declare" | "ps" => env_print::prints_the_environment(tokens),
         "pax" => coreutils::archive_extract::extracts(tokens) || coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "cpio" => {
             coreutils::archive_extract::extracts(tokens)

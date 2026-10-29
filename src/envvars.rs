@@ -226,8 +226,7 @@ fn rule_of(name: &str) -> Option<&'static Rule> {
     if let Some(r) = TABLE.exact.get(name) {
         return Some(r);
     }
-    // npm matches `npm_config_` in any letter case and reads the rest as a lowercase key in which
-    // `_` and `-` are the same.
+    // npm matches `npm_config_` in any letter case and reads the rest as a lowercase key in which `_` and `-` are the same.
     if name.get(..NPM_CONFIG.len()).is_some_and(|p| p.eq_ignore_ascii_case(NPM_CONFIG)) {
         return TABLE.exact.get(&name.to_ascii_lowercase().replace('-', "_"));
     }
@@ -238,9 +237,7 @@ fn rule_of(name: &str) -> Option<&'static Rule> {
     })
 }
 
-/// The shape of a listed variable's value, or `None` for a name we do not inspect. Test-only: the
-/// classifier itself goes through `rule_of`, which also carries the option-string allowlist.
-#[cfg(test)]
+/// The shape of a listed variable's value, or `None` for a name we do not inspect.
 pub(crate) fn shape_of(name: &str) -> Option<Shape> {
     rule_of(name).map(|r| r.shape)
 }

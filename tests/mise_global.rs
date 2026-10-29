@@ -29,13 +29,18 @@ fn mise_unset_passes_with_global() {
 
 #[test]
 fn global_is_judged_as_the_project_file_is() {
-    for assignment in [
-        "FOO=bar", "RUSTC_WRAPPER=./w", "RUSTC_WRAPPER=/tmp/w", "LD_PRELOAD=/tmp/x.so", "PATH=/tmp/x", "BASH_ENV=./x.sh",
-        "FOO='{{ exec(command=\"id\") }}'", "_.source=./x.sh",
-    ] {
+    for assignment in ["FOO=bar", "FOO='{{ exec(command=\"id\") }}'", "_.source=./x.sh"] {
         let local = approved(&format!("mise set {assignment}"));
         assert_eq!(approved(&format!("mise set -g {assignment}")), local, "-g changes the verdict of {assignment}");
         assert_eq!(approved(&format!("mise set --global {assignment}")), local, "--global changes the verdict of {assignment}");
+    }
+}
+
+#[test]
+fn global_refuses_an_audited_variable_the_project_file_may_hold() {
+    for assignment in ["RUSTC_WRAPPER=./w", "RUSTC_WRAPPER=/tmp/w", "LD_PRELOAD=/tmp/x.so", "PATH=/tmp/x", "BASH_ENV=./x.sh"] {
+        assert!(!approved(&format!("mise set -g {assignment}")), "mise set -g {assignment} must not pass");
+        assert!(!approved(&format!("mise set --global {assignment}")), "mise set --global {assignment} must not pass");
     }
 }
 

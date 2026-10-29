@@ -8,8 +8,7 @@ use std::path::Path;
 const LESS_TAKES_AN_ARGUMENT: &[&str] = &[
     "-b", "--buffers", "-h", "--max-back-scroll", "-j", "--jump-target", "-k", "--lesskey-file", "-o", "--log-file", "-O", "--LOG-FILE",
     "-p", "--pattern", "-P", "--prompt", "-t", "--tag", "-T", "--tag-file", "-x", "--tabs", "-y", "--max-forw-scroll", "-z", "--window",
-    "-#", "--shift", "-D", "--color", "--header", "--rscroll", "--intr", "--line-num-width", "--status-col-width",
-    "--wheel-lines",
+    "-#", "--shift", "-D", "--color", "--header", "--rscroll", "--intr", "--line-num-width", "--status-col-width", "--wheel-lines",
 ];
 
 fn toml_files(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
