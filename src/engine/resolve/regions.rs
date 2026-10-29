@@ -29,12 +29,10 @@ pub(crate) use protection::{
     granted_for_writing, home_nodes, keeps_absolute, lies_in_root, names_a_region, names_a_secret, protection_covers,
 };
 
-/// Which faces a user grant may NOT widen.
-///
-/// Two distinct needs, and collapsing them was a real over-deny. safe-chains' own config must not
-/// be WRITTEN at all, because any write to it decides what gets approved next. Its parent directory
-/// is different: writing a file into `~/.config` is ordinary, and what must not happen is the
-/// directory being replaced by something pointing elsewhere.
+/// Which faces a user grant may NOT widen. Two distinct needs, and collapsing them was a real
+/// over-deny. safe-chains' own config must not be WRITTEN at all, because any write to it decides
+/// what gets approved next. Its parent directory is different: writing a file into `~/.config` is
+/// ordinary, and what must not happen is the directory being replaced by something pointing elsewhere.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum Frozen {
     /// A grant widens every face. The default.
