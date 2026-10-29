@@ -4210,11 +4210,6 @@ Aliases: `gdirname`
 - Allowed standalone flags: --help, -h, --version, -V, --quiet, -q, --verbose, -v, --allow_partial_files, --print_info, --print_read_bytes, --disable_output, --norender_spotcolors, --print_profile, --allow_more_progressive_steps
 - Allowed valued flags: --num_threads, --num_reps, --bits_per_sample, --display_nits, --color_space, --downsampling, --pixels_to_jpeg_quality, --jpeg_quality, --tone_map, --render_spotcolors, --preview_out, --icc_out, --orig_icc_out, --metadata_out, --output_format
 
-### `dltest`
-<p class="cmd-url"><a href="https://www.unixodbc.org/doc/dltest.html">https://www.unixodbc.org/doc/dltest.html</a></p>
-
-- Bare invocation allowed
-
 ### `dlv`
 <p class="cmd-url"><a href="https://github.com/go-delve/delve">https://github.com/go-delve/delve</a></p>
 

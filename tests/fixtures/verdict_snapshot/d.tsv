@@ -2410,11 +2410,8 @@ djxl -h	safe-write
 djxl -q	safe-write
 djxl -v	safe-write
 djxl x	safe-write
-dltest	inert
-dltest --help	denied
-dltest --version	denied
-dltest /usr/lib/libc.dylib printf	inert
-dltest x	inert
+dltest ./x.dylib sym	denied
+dltest /usr/lib/libc.dylib printf	denied
 dlv	denied
 dlv --help	inert
 dlv --help --version	inert

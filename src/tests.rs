@@ -349,7 +349,6 @@ safe! {
     pagestuff_all: "pagestuff binary -a",
     unwinddump_basic: "unwinddump binary",
     lorder_files: "lorder a.o b.o c.o",
-    dltest_lib: "dltest /usr/lib/libc.dylib printf",
     lldb_version: "lldb --version",
     lldb_help: "lldb --help",
 
@@ -1088,6 +1087,8 @@ safe! {
 
 denied! {
     env_bare_prints_the_environment: "env",
+    dltest_loads_a_library: "dltest /usr/lib/libc.dylib printf",
+    dltest_loads_a_folder_library: "dltest ./x.dylib sym",
     printenv_bare_prints_the_environment: "printenv",
     printenv_named_variable: "printenv OPENAI_API_KEY",
     printenv_gnu_alias: "gprintenv",

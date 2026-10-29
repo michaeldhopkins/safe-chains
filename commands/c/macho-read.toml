@@ -127,12 +127,3 @@ url = "https://keith.github.io/xcode-man-pages/lorder.1.html"
 researched_version = "macOS 14 (man page dated 2024-02-27)"
 level = "Inert"
 bare = false
-
-[[command]]
-name = "dltest"
-description = "Tiny unixODBC utility that checks whether a given symbol can be resolved in a given shared object. Read-only: dlopens the library, dlsyms the symbol, prints whether the symbol was found, exits. Takes either no arguments (prints help) or exactly two: an absolute library path and a symbol name. No network."
-url = "https://www.unixodbc.org/doc/dltest.html"
-researched_version = "unixODBC 2.3.12"
-level = "Inert"
-bare = true
-max_positional = 2

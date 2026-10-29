@@ -311,7 +311,6 @@ ditto	description,examples,no-tolerance
 dive	examples,no-overlap
 djpeg	examples
 djxl	examples
-dltest	description,examples
 dlv	description,examples
 dns-sd	examples
 docfx	description,examples,no-overlap,no-tolerance,profiled
