@@ -6,3 +6,4 @@ researched_version = "qpdf 12.2.0"
 level = "SafeWrite"
 bare = true
 max_positional = 2
+examples_safe = ["fix-qdf x out.pdf"]

@@ -5237,6 +5237,10 @@ Aliases: `gfalse`
 
 - Bare invocation allowed
 
+**Examples:**
+
+- `fix-qdf x out.pdf`
+
 ### `flake8`
 <p class="cmd-url"><a href="https://flake8.pycqa.org/en/latest/user/invocation.html">https://flake8.pycqa.org/en/latest/user/invocation.html</a></p>
 
@@ -12548,6 +12552,10 @@ Aliases: `gprintf`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
 
 - Bare invocation allowed
+
+**Examples:**
+
+- `ps2ascii input.pdf output.txt`
 
 ### `ps2epsi`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>

@@ -7093,6 +7093,13 @@ fn positional_and_output_dir_writers_gate_sensitive_paths() {
         format!("wkhtmltopdf in.html {S}"),
         format!("gdbm_dump db.gdbm {S}"),
         format!("pkgbuild --root ./r {S}"),
+        format!("ps2ascii in.ps {S}"),
+        format!("ps2ascii -- in.ps {S}"),
+        "ps2ascii in.ps /usr/local/bin/x".to_string(),
+        format!("fix-qdf in.pdf {S}"),
+        format!("fix-qdf -- in.pdf {S}"),
+        "ps2ascii ~/.ssh/id_rsa ./out.txt".to_string(),
+        "fix-qdf ~/.ssh/id_rsa ./out.pdf".to_string(),
         // in-place mutators: sensitive as the sole/last positional …
         format!("wasm-strip {S}"),
         format!("llvm-strip {S}"),
@@ -7110,7 +7117,8 @@ fn positional_and_output_dir_writers_gate_sensitive_paths() {
     for c in [
         "pdfunite a.pdf b.pdf ./out.pdf", "sphinx-build src ./_build", "weasyprint in.html ./out.pdf", "tiffcp in.tif ./out.tif",
         "mkdocs build -d ./site", "gs -o ./out.pdf x.ps", "dvipdf in.dvi ./out.pdf", "tiff2bw in.tif ./out.tif", "jpgicc in.jpg ./out.jpg",
-        "wasm-strip ./mod.wasm", "nbstripout ./a.ipynb ./b.ipynb",
+        "wasm-strip ./mod.wasm", "nbstripout ./a.ipynb ./b.ipynb", "ps2ascii in.ps ./out.txt", "ps2ascii in.ps",
+        "fix-qdf in.pdf ./out.pdf", "fix-qdf in.pdf",
     ] {
         assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
     }

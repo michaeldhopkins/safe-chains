@@ -981,6 +981,12 @@ shape = "last_write"
 shape = "last_write"
 [roles."ps2epsi"]
 shape = "last_write"
+[roles."ps2ascii"]
+positional = "read"
+shape = "last_write"
+[roles."fix-qdf"]
+positional = "read"
+shape = "last_write"
 [roles."ps2pdf12"]
 shape = "last_write"
 [roles."ps2pdf13"]

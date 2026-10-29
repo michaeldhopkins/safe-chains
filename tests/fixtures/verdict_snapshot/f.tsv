@@ -947,6 +947,7 @@ fix-qdf --help	denied
 fix-qdf --version	denied
 fix-qdf < broken.pdf > fixed.pdf	safe-write
 fix-qdf x	safe-write
+fix-qdf x out.pdf	safe-write
 flake8	safe-read
 flake8 --benchmark	safe-read
 flake8 --benchmark --config x	safe-read
