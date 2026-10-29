@@ -141,7 +141,7 @@ make --help	inert
 make --jobs x	denied
 make --just-print	inert
 make --makefile x	denied
-make --print-data-base	inert
+make --print-data-base	denied
 make --question	denied
 make --recon	inert
 make --version	denied
@@ -177,7 +177,7 @@ make -n -p	inert
 make -n -q	inert
 make -n A=1	denied
 make -nq	inert
-make -p	inert
+make -p	denied
 make -q	denied
 make x	denied
 malloc_history	denied

@@ -9287,7 +9287,7 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 ### `make`
 <p class="cmd-url"><a href="https://www.gnu.org/software/make/manual/make.html">https://www.gnu.org/software/make/manual/make.html</a></p>
 
-- Requires -n, --dry-run, --just-print, --recon, -p, --print-data-base.
+- Requires -n, --dry-run, --just-print, --recon.
 - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
 - Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
 

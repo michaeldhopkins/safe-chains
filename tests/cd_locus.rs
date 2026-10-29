@@ -150,3 +150,14 @@ fn make_folders_given_more_than_once_are_refused() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+/// `-p` prints make's rule database and then builds as usual, so on its own it runs the recipes.
+#[test]
+fn make_print_database_alone_is_refused() {
+    for command in ["make -p", "make --print-data-base", "make -p all", "make -pq"] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in ["make -p -n", "make -pn", "make -n --print-data-base"] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}
