@@ -103,6 +103,14 @@ pub fn root() -> Option<String> {
     })
 }
 
+/// Whether the absolute, already placed `abs` lies at or below the project root as the kernel sees
+/// it, including a root that is itself a protected place.
+pub(crate) fn placed_in_root(abs: &str) -> bool {
+    root()
+        .filter(|root| root.starts_with('/'))
+        .is_some_and(|root| crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)))
+}
+
 /// Whether `path` lies inside THIS session's scratchpad — the harness's own per-session working
 /// directory (e.g. Claude Code's `/private/tmp/claude-<uid>/<project-slug>/<session-id>/scratchpad`).
 ///

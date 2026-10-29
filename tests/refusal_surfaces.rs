@@ -49,6 +49,13 @@ fn bare_home() -> tempfile::TempDir {
     tempfile::tempdir().expect("tempdir")
 }
 
+/// A hand-written grant on `~/.claude`: the repository there is then the user's own to open, and
+/// only its writes stay refused.
+fn grant_the_trust_root(home: &std::path::Path) {
+    std::fs::create_dir_all(home.join(".config")).expect("config folder");
+    std::fs::write(home.join(".config/safe-chains.toml"), "[[grant]]\npath = \"~/.claude\"\nread = true\nwrite = true\n").expect("grant");
+}
+
 fn run(args: &[&str], home: &std::path::Path, stdin_payload: Option<&str>) -> String {
     let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
         .args(args)
@@ -137,6 +144,9 @@ fn a_grammar_refusal_still_points_at_custom_commands() {
 fn suggest_offers_the_snapshot_flag_only_where_the_flag_would_be_approved() {
     let home = bare_home();
     let command = "jj -R ~/.claude log";
+    let ungranted = run(&["--suggest", command], home.path(), None);
+    assert!(!ungranted.contains("--ignore-working-copy"), "an ungranted repository outside the project is not opened:\n{ungranted}");
+    grant_the_trust_root(home.path());
     let default = run(&["--suggest", command], home.path(), None);
     assert!(default.contains("--ignore-working-copy"), "the default level approves the flagged read:\n{default}");
     let paranoid = run(&["--level", "paranoid", "--suggest", command], home.path(), None);
@@ -257,6 +267,9 @@ fn explain_keeps_the_lessons_addressed_to_an_agent_out_of_what_a_person_reads() 
 fn explain_settles_the_snapshot_reason_the_way_suggest_does() {
     let home = bare_home();
     let command = "jj -R ~/.claude log";
+    let ungranted = run(&["--explain", command], home.path(), None);
+    assert!(!ungranted.contains("Add --ignore-working-copy"), "{ungranted}");
+    grant_the_trust_root(home.path());
     let default = run(&["--explain", command], home.path(), None);
     assert!(default.contains("Add --ignore-working-copy"), "{default}");
     let paranoid = run(&["--level", "paranoid", "--explain", command], home.path(), None);

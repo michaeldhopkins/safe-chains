@@ -6,6 +6,10 @@
 //! refused for a credential store. A mutating subcommand writes DIR's store with or without the
 //! flag, so it stays refused outside the workspace.
 //!
+//! Where the project is known, opening a repository outside it is refused with or without the flag
+//! unless a grant names it, since jj obeys that repository's own config (`tests/cd_locus.rs`). The
+//! tests here without a project judge only the path gate.
+//!
 //! Every sub in `commands/vcs/jj.toml` must be classified here, so a sub added later is looked
 //! at before it ships.
 
@@ -174,7 +178,7 @@ fn a_cd_into_an_outside_repository_is_judged_like_its_repository_flag() {
     for (sub, args) in OBSERVING {
         assert!(approved(&format!("cd ./sub && jj {args}")), "{sub}: a cd inside the workspace stays approved");
         for dir in OUTSIDE {
-            assert!(approved(&format!("cd {dir} && jj --ignore-working-copy {args}")), "{sub}: only reads {dir}");
+            assert!(!approved(&format!("cd {dir} && jj --ignore-working-copy {args}")), "{sub}: loads {dir}'s repository config");
             assert!(!approved(&format!("cd {dir} && jj {args}")), "{sub}: snapshots into {dir}");
         }
     }
@@ -235,7 +239,7 @@ fn only_the_destination_of_init_and_add_is_judged_as_a_path() {
     for command in ["jj git init ./sub", "jj workspace add ./ws", "jj workspace add --name n ./ws"] {
         assert!(approved_in_project(command), "{command} stays inside the workspace");
     }
-    for dir in OUTSIDE {
+    for dir in ["./sub", "."] {
         for args in ["git remote list", "workspace list", "workspace root"] {
             let command = format!("cd {dir} && jj --ignore-working-copy {args}");
             assert!(approved_in_project(&command), "{command}: a subcommand word is not a path");

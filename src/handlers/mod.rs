@@ -156,7 +156,9 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
                 || coreutils::rsync_shell::names_a_program_to_run(tokens)
         }
         "git" => vcs::git::runs_in_a_repository_outside_the_project(tokens),
-        name @ ("branchdiff" | "tig" | "hg" | "git-lfs" | "gitleaks") => vcs::git::opens_a_repository_outside_the_project(name, tokens),
+        name @ ("branchdiff" | "tig" | "hg" | "git-lfs" | "gitleaks" | "jj" | "jjpr") => {
+            vcs::git::opens_a_repository_outside_the_project(name, tokens)
+        }
         "bundle" => ruby::gemfile::loads_a_gemfile_out_of_sight(tokens),
         "make" => {
             make_text::evaluates_text_from_the_line(tokens)

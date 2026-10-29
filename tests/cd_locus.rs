@@ -235,13 +235,26 @@ fn a_tool_that_opens_a_repository_outside_the_project_is_refused() {
         "gitleaks detect -s. -s../jjt",
         "gitleaks detect --source=. --source=../jjt",
         "gitleaks protect -s . -s ../jjt",
+        "cd ../other && jj diff",
+        "jj -R /tmp/x/repo diff",
+        "jj --repository=/tmp/x/repo diff",
+        "jj --repository /tmp/x/repo log",
+        "jj -R/tmp/x/repo log",
+        "jj -R . -R /tmp/x/repo log",
+        "jj log -R /tmp/x/repo",
+        "cd /tmp/x/repo && jj log",
+        "cd ~/other && jj diff",
+        "cd /tmp/x/repo && jj --version",
+        "cd ../other && jjpr",
+        "cd /tmp/x/repo && jjpr status",
     ] {
         assert!(!approved(command), "`{command}` was approved");
     }
     for command in [
         "branchdiff -p --no-auto-fetch", "branchdiff -p", "branchdiff -p .", "cd src && branchdiff -p", "tig", "cd src && tig",
         "git-lfs ls-files", "gitleaks detect", "gitleaks detect -s src", "cd /tmp/x && tig --version", "cd /tmp/x && gitleaks version",
-        "tig -Csrc", "gitleaks detect -s src -s .",
+        "tig -Csrc", "gitleaks detect -s src -s .", "jj diff", "jj log", "cd src && jj status", "jj -R . log", "jj -R src diff",
+        "jj --repository=. log", "jj log -R .", "jjpr status", "cd src && jjpr status",
     ] {
         assert!(approved(command), "`{command}` should stay approved");
     }
@@ -252,7 +265,7 @@ proptest::proptest! {
     /// wherever that folder is.
     #[test]
     fn a_repository_opener_refuses_every_folder_outside_the_project(
-        tool in proptest::sample::select(vec!["branchdiff -p", "tig", "hg status", "git-lfs ls-files", "gitleaks detect"]),
+        tool in proptest::sample::select(vec!["branchdiff -p", "tig", "hg status", "git-lfs ls-files", "gitleaks detect", "jj log", "jj diff", "jjpr", "jjpr status"]),
         dir in "/(tmp|Users/Shared|opt|var)/[a-z]{1,6}",
         spelling in proptest::sample::select(vec!["cd {d} && {t}", "pushd {d} && {t}", "(cd {d}; {t})", "cd src && cd {d} && {t}"]),
     ) {
@@ -268,6 +281,7 @@ proptest::proptest! {
             ("tig", "-C{d}"), ("tig", "-C {d}"),
             ("gitleaks detect", "-s {d}"), ("gitleaks protect", "-s{d}"),
             ("gitleaks detect", "--source={d}"), ("gitleaks detect", "--source {d}"),
+            ("jj log", "-R {d}"), ("jj", "-R{d}"), ("jj diff", "--repository={d}"), ("jj", "--repository {d}"),
         ]),
         inside in proptest::sample::select(vec![".", "src", "tests"]),
         outside in proptest::sample::select(vec!["../../jjt", "/tmp/x/repo", "../../..", "~/other"]),

@@ -76,7 +76,12 @@ fn a_grant_still_opens_an_ordinary_repository() {
     let machine = Machine::with_grants(&["~/notes"]);
     assert!(machine.approves("jj -R ~/notes new"));
     assert!(machine.approves("cd ~/notes && jj new"));
-    assert!(!Machine::with_grants(&[]).approves("jj -R ~/notes new"), "without a grant an outside repository must stay refused");
+    assert!(machine.approves("git -C ~/notes status"));
+    assert!(machine.approves("jj --ignore-working-copy -R ~/notes log"));
+    let ungranted = Machine::with_grants(&[]);
+    assert!(!ungranted.approves("jj -R ~/notes new"), "without a grant an outside repository must stay refused");
+    assert!(!ungranted.approves("jj --ignore-working-copy -R ~/notes log"), "without a grant its config is not loaded");
+    assert!(!ungranted.approves("git -C ~/notes status"));
 }
 
 #[test]
@@ -86,6 +91,9 @@ fn a_session_working_at_the_trust_root_keeps_its_own_repository() {
     let claude = claude.to_str().expect("utf-8 path");
     assert!(machine.approves_in(claude, "jj new"));
     assert!(machine.approves_in(claude, "jj describe -m x"));
+    assert!(machine.approves_in(claude, "git status"));
+    assert!(machine.approves_in(claude, "tig"));
+    assert!(!machine.approves_in(claude, "cd .. && jj log"));
 }
 
 #[test]
