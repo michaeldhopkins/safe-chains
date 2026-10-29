@@ -163,7 +163,8 @@ fn describe_custom(
     }
     // Reader-friendly order: named subs → bare-flag forms → sub × action grid → shared sets.
     if let Some(f) = fallback {
-        sections.push(describe_fallback(f));
+        let alone = sections.is_empty() && matrices.is_empty();
+        sections.push(describe_fallback(f, !alone));
     }
     if let Some(s) = describe_matrices(matrices, handler_policies) {
         sections.push(s);
@@ -174,8 +175,11 @@ fn describe_custom(
     sections.join("\n\n")
 }
 
-fn describe_fallback(f: &FallbackSpec) -> String {
-    let mut lines = vec!["**Without a subcommand:**".to_string()];
+fn describe_fallback(f: &FallbackSpec, with_header: bool) -> String {
+    let mut lines = Vec::new();
+    if with_header {
+        lines.push("**Without a subcommand:**".to_string());
+    }
     if f.policy.bare {
         lines.push("- Bare invocation allowed".to_string());
     }

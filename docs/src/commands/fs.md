@@ -129,7 +129,6 @@ Aliases: `gdate`
 
 Aliases: `gdf`
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: --all, --help, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, --version, -,, -H, -I, -P, -T, -V, -Y, -a, -b, -c, -g, -h, -i, -k, -l, -m, -n, -v
 - Allowed valued flags: --block-size, --exclude-type, --libxo, --output, --type, -B, -t, -x

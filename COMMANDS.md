@@ -4055,7 +4055,6 @@ Aliases: `dependency-cruise`
 
 Aliases: `gdf`
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: --all, --help, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, --version, -,, -H, -I, -P, -T, -V, -Y, -a, -b, -c, -g, -h, -i, -k, -l, -m, -n, -v
 - Allowed valued flags: --block-size, --exclude-type, --libxo, --output, --type, -B, -t, -x
@@ -6621,9 +6620,9 @@ Aliases: `ggroups`
 ### `hadolint`
 <p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
 
-- **Without a subcommand:**
 - Allowed standalone flags: --disable-ignore-pragma, --help, --no-color, --no-fail, --strict-labels, --verbose, --version, -V, -h, -v
-- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -10960,7 +10959,6 @@ Aliases: `god`
 ### `open`
 <p class="cmd-url"><a href="https://ss64.com/mac/open.html">https://ss64.com/mac/open.html</a></p>
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: -e, -t, -f, -F, -W, -R, -n, -g, -j, -h
 - Allowed valued flags: -u
@@ -12440,7 +12438,6 @@ Aliases: `gprintenv`
 
 Aliases: `gprintf`
 
-- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `prisma`
@@ -13871,7 +13868,6 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 ### `screen`
 <p class="cmd-url"><a href="https://www.gnu.org/software/screen/manual/screen.html">https://www.gnu.org/software/screen/manual/screen.html</a></p>
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: -a, -A, -d, -D, --help, -l, -L, -list, -ls, -O, -q, -r, -R, -U, -v, --version, -wipe, -x
 - Allowed valued flags: -e, -h, -p, -S, -t, -T
@@ -14251,9 +14247,9 @@ Aliases: `gsha512sum`
 ### `shellcheck`
 <p class="cmd-url"><a href="https://www.shellcheck.net/wiki/">https://www.shellcheck.net/wiki/</a></p>
 
-- **Without a subcommand:**
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
-- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 

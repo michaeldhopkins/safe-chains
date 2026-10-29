@@ -152,7 +152,6 @@ Aliases: `gnumfmt`
 
 Aliases: `gprintf`
 
-- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `seq`

@@ -5434,6 +5434,25 @@ standalone = ["--help"]
 }
 
 #[test]
+fn handler_command_with_only_a_fallback_renders_no_subcommand_header() {
+    let spec = load_one(
+        r#"
+[[command]]
+name = "demo-flat"
+handler = "demo_handler"
+
+[command.fallback]
+level = "Inert"
+bare = false
+standalone = ["--help", "--version"]
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(!doc.description.contains("Without a subcommand"), "a command with no subcommands needs no header: {}", doc.description);
+    assert!(doc.description.contains("- Allowed standalone flags: --help, --version"), "fallback flags must render: {}", doc.description);
+}
+
+#[test]
 fn handler_command_renders_subs_and_fallback_data() {
     // Auto-render: a handler-using command's [[command.sub]] and
     // [command.fallback] data must surface in the doc description

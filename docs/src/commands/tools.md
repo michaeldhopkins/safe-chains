@@ -1164,7 +1164,6 @@ Aliases: `run-p`, `run-s`
 ### `open`
 <p class="cmd-url"><a href="https://ss64.com/mac/open.html">https://ss64.com/mac/open.html</a></p>
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: -e, -t, -f, -F, -W, -R, -n, -g, -j, -h
 - Allowed valued flags: -u
@@ -1571,7 +1570,6 @@ Aliases: `python`
 ### `screen`
 <p class="cmd-url"><a href="https://www.gnu.org/software/screen/manual/screen.html">https://www.gnu.org/software/screen/manual/screen.html</a></p>
 
-- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: -a, -A, -d, -D, --help, -l, -L, -list, -ls, -O, -q, -r, -R, -U, -v, --version, -wipe, -x
 - Allowed valued flags: -e, -h, -p, -S, -t, -T
@@ -1678,9 +1676,9 @@ Aliases: `python`
 ### `shellcheck`
 <p class="cmd-url"><a href="https://www.shellcheck.net/wiki/">https://www.shellcheck.net/wiki/</a></p>
 
-- **Without a subcommand:**
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --version, -C, -V, -a, -h, -x
-- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 

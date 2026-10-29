@@ -180,9 +180,9 @@
 ### `hadolint`
 <p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
 
-- **Without a subcommand:**
 - Allowed standalone flags: --disable-ignore-pragma, --help, --no-color, --no-fail, --strict-labels, --verbose, --version, -V, -h, -v
-- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
+- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
