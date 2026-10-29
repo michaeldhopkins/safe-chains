@@ -70,3 +70,31 @@ fn a_cd_into_installed_packages_or_a_frozen_folder_judges_what_runs_there() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+#[test]
+fn a_package_or_frozen_folder_spelled_with_a_folding_character_is_refused() {
+    for command in [
+        "bash node_module\u{17F}/pkg/a.sh", "sh node_module\u{17F}/pkg/a.sh", "./node_module\u{17F}/pkg/a.sh",
+        "cd node_module\u{17F}/pkg && bash a.sh", "cd node_module\u{17F}/pkg && task -l", "bash .g\u{131}t/hooks/pre-commit",
+        "cd .g\u{131}t/hooks && ./pre-commit",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    assert!(approved("bash r\u{E9}sum\u{E9}/a.sh"), "a name outside ASCII that cannot be node_modules stays approved");
+}
+
+proptest::proptest! {
+    /// Every spelling of `node_modules` APFS opens as that folder, each letter in either case and its
+    /// `s` as the long s that folds to it, is refused as the folder a script runs from.
+    #[test]
+    fn every_folded_spelling_of_node_modules_is_refused(upper in proptest::collection::vec(proptest::bool::ANY, 12)) {
+        let name: String = "node_modules"
+            .chars()
+            .zip(upper)
+            .map(|(c, up)| if c == 's' { '\u{17F}' } else if up { c.to_ascii_uppercase() } else { c })
+            .collect();
+        for command in [format!("bash {name}/pkg/a.sh"), format!("./{name}/pkg/a.sh"), format!("cd {name}/pkg && bash a.sh")] {
+            proptest::prop_assert!(!approved(&command), "`{}` was approved", command);
+        }
+    }
+}

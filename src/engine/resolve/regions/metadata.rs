@@ -39,7 +39,9 @@ pub(crate) fn frozen_names() -> Vec<&'static str> {
         .collect()
 }
 
-fn component_may_name(component: &str, name: &str, fold: bool) -> bool {
+/// Whether `component` could open the folder `name`: a glob that may match it, a spelling outside
+/// ASCII that may fold to it (`unicode_spelling`), or the name itself, in any case when `fold`.
+pub(crate) fn component_may_name(component: &str, name: &str, fold: bool) -> bool {
     if let Some(pattern) = super::unicode_spelling::wildcard_component(component) {
         return glob_may_match(&pattern, name);
     }

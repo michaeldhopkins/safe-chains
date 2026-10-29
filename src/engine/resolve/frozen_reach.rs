@@ -10,6 +10,7 @@
 //! judged where each link out of the tree leads (`frozen_walk`).
 
 use super::frozen_walk::{Skip, Walk, reach_below};
+use super::regions::metadata::component_may_name;
 use crate::verdict::Verdict;
 
 /// What a walk below an operand turned up.
@@ -221,16 +222,17 @@ pub(crate) fn frozen_below(base: &str, hidden: bool) -> Option<Reach> {
     reached.into_iter().nth(found)
 }
 
+/// Whether `name` could open a write-frozen folder, spelled in any case or with a character outside
+/// ASCII that the file system may fold to one.
 pub(crate) fn is_frozen(name: &str) -> bool {
     let fold = cfg!(target_os = "macos");
-    super::regions::metadata::frozen_names()
-        .iter()
-        .any(|n| if fold { n.eq_ignore_ascii_case(name) } else { *n == name })
+    super::regions::metadata::frozen_names().iter().any(|n| component_may_name(name, n, fold))
 }
 
-/// Whether `name` is the folder a package manager installs into (`node_modules`).
+/// Whether `name` could open the folder a package manager installs into (`node_modules`), spelled as
+/// `is_frozen` reads a frozen name.
 pub(crate) fn is_packaged(name: &str) -> bool {
-    if cfg!(target_os = "macos") { name.eq_ignore_ascii_case("node_modules") } else { name == "node_modules" }
+    component_may_name(name, "node_modules", cfg!(target_os = "macos"))
 }
 
 /// Whether running the file or folder `path` runs code from installed packages or a frozen folder,
