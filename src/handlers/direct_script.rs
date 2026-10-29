@@ -85,14 +85,8 @@ pub(crate) fn runs_packaged_or_frozen(tokens: &[Token]) -> bool {
             other => break other,
         }
     };
-    let fold = cfg!(target_os = "macos");
-    script.is_some_and(|path| {
-        path.contains('/')
-            && path.split('/').any(|part| {
-                crate::engine::resolve::frozen_walk::is_frozen(part)
-                    || if fold { part.eq_ignore_ascii_case("node_modules") } else { part == "node_modules" }
-            })
-    })
+    use crate::engine::resolve::frozen_reach::{is_frozen, is_packaged};
+    script.is_some_and(|path| path.contains('/') && path.split('/').any(|part| is_frozen(part) || is_packaged(part)))
 }
 
 pub(crate) fn as_interpreter(tokens: &[Token]) -> Cow<'_, [Token]> {

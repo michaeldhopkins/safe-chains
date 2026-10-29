@@ -228,6 +228,20 @@ pub(crate) fn is_frozen(name: &str) -> bool {
         .any(|n| if fold { n.eq_ignore_ascii_case(name) } else { *n == name })
 }
 
+/// Whether `name` is the folder a package manager installs into (`node_modules`).
+pub(crate) fn is_packaged(name: &str) -> bool {
+    if cfg!(target_os = "macos") { name.eq_ignore_ascii_case("node_modules") } else { name == "node_modules" }
+}
+
+/// Whether running the file or folder `path` runs code from installed packages or a frozen folder,
+/// once the folder a `cd` moved to is joined on. No commit of the project's own shows that code. A
+/// frozen folder named last is the folder itself (`GIT_DIR=.git`), which its tool reads as its own.
+pub(crate) fn runs_unreviewed_code(path: &str) -> bool {
+    let placed = crate::pathctx::resolve(path);
+    let (dirs, last) = placed.rsplit_once('/').unwrap_or(("", &placed));
+    is_packaged(last) || dirs.split('/').any(|part| is_frozen(part) || is_packaged(part))
+}
+
 #[cfg(test)]
 #[path = "frozen_reach_tests.rs"]
 mod tests;

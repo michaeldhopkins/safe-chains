@@ -118,9 +118,9 @@ pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
     // command's own handler gates the network, and a URL's `..` is a path segment rather than a
     // filesystem escape. In an EXECUTOR slot that reasoning inverts: the thing has to be a local
     // file the project owns, and `http://…` is not one however harmless its `..` are. Third member
-    // of the same family as the glob and process-substitution rules above.
-    if crate::engine::resolve::locus::is_url(path) {
-        return crate::engine::bridge::project(&worst("URL executor — the code that would run is not a workspace file (§6)"));
+    // of the same family as the glob and process-substitution rules above, as is any file below `node_modules` or `.git`.
+    if crate::engine::resolve::locus::is_url(path) || frozen_reach::runs_unreviewed_code(path) {
+        return crate::engine::bridge::project(&worst("URL, package or frozen-folder executor — the code is not the project's own (§6)"));
     }
     // An executor slot names a PATH. A value carrying whitespace is a command LINE, and judging it
     // as one path is how `BORG_RSH='sh -c evil'` and `rsync -e 'sh -c evil'` were auto-approved:

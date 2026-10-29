@@ -149,11 +149,8 @@ fn relative_program_stays(placed: &str) -> bool {
     if placed.starts_with('/') || placed.starts_with('~') {
         return false;
     }
-    let fold = cfg!(target_os = "macos");
-    placed.split('/').all(|part| {
-        let packaged = if fold { part.eq_ignore_ascii_case("node_modules") } else { part == "node_modules" };
-        part != ".." && !crate::engine::resolve::frozen_walk::is_frozen(part) && !packaged
-    })
+    use crate::engine::resolve::frozen_reach::{is_frozen, is_packaged};
+    placed.split('/').all(|part| part != ".." && !is_frozen(part) && !is_packaged(part))
 }
 
 /// The verdict on an `--rsync-path`: rsync, bare or in a standard bin directory, or a relative path

@@ -47,3 +47,26 @@ fn a_script_from_installed_packages_or_a_frozen_folder_is_refused() {
         assert!(!approved(command), "`{command}` was approved");
     }
 }
+
+#[test]
+fn a_cd_into_installed_packages_or_a_frozen_folder_judges_what_runs_there() {
+    for command in [
+        "cd node_modules/pkg && bash a.sh",
+        "cd node_modules/pkg && ./a.sh",
+        "cd node_modules/pkg && sh ./a.sh",
+        "cd node_modules && bash pkg/a.sh",
+        "cd src && bash ../node_modules/pkg/a.sh",
+        "cd node_modules/pkg && mvn validate",
+        "cd node_modules/pkg && task -l",
+        "cd node_modules/pkg && ansible-inventory --list",
+        "cd node_modules/pkg && mise exec -- ls",
+        "cd .git/hooks && mvn validate",
+        "cd .git/hooks && task -l",
+        "cd .git/hooks && ./pre-commit",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in ["cd src && bash a.sh", "cd src && ./a.sh", "cd src && task -l", "bash src/a.sh"] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}
