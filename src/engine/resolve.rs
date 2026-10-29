@@ -867,13 +867,12 @@ fn grep_long_known(flag: &str) -> bool {
     KNOWN.contains(&name)
 }
 
-/// The long spelling of the dangerous grep short `-R`: `--dereference-recursive` (follows
-/// symlinks out of the classified locus, M2). Recognized so both spellings worst-case; every
-/// OTHER unrecognized `--token` is a search pattern, not a flag. (`--perl-regexp`/`-P` is NOT
-/// here — PCRE2 executes no code, so it is benign, like `-E`/`-F`.)
+/// `--dereference-recursive`, the long `-R` (follows symlinks out of the classified locus, M2), and `--file`. GNU grep
+/// takes any unambiguous prefix of a long option, so a prefix counts too. Every OTHER unrecognized `--token` is a
+/// search pattern, not a flag. (`--perl-regexp`/`-P` is NOT here — PCRE2 executes no code, so it is benign, like `-E`.)
 fn grep_long_dangerous(flag: &str) -> bool {
     let name = flag.split('=').next().unwrap_or(flag);
-    matches!(name, "--dereference-recursive")
+    name.len() > 3 && ["--dereference-recursive", "--file"].iter().any(|option| option.starts_with(name))
 }
 
 /// `dd if=IN of=OUT bs=… …` — the operand-model breaker: `dd` takes NO getopt flags or
