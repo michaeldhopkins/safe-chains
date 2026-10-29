@@ -8,7 +8,8 @@ use std::path::Path;
 const LESS_TAKES_AN_ARGUMENT: &[&str] = &[
     "-b", "--buffers", "-h", "--max-back-scroll", "-j", "--jump-target", "-k", "--lesskey-file", "-o", "--log-file", "-O", "--LOG-FILE",
     "-p", "--pattern", "-P", "--prompt", "-t", "--tag", "-T", "--tag-file", "-x", "--tabs", "-y", "--max-forw-scroll", "-z", "--window",
-    "-#", "--shift", "-D", "--color",
+    "-#", "--shift", "-D", "--color", "--header", "--rscroll", "--intr", "--line-num-width", "--status-col-width",
+    "--wheel-lines",
 ];
 
 fn toml_files(dir: &Path, out: &mut Vec<std::path::PathBuf>) {
@@ -80,5 +81,22 @@ fn a_plus_command_after_any_switch_is_refused() {
                 assert!(!safe_chains::is_safe_command(&command), "{command} must be refused: less runs the + operand");
             }
         }
+    }
+}
+
+/// The more macOS ships is less in more mode, where `-p` takes a command to run at startup, as a
+/// `+` operand does. `LESS_IS_MORE` puts any less-family pager in that mode.
+#[test]
+fn a_more_mode_startup_command_is_refused() {
+    for command in ["more -p '!id' ./a", "more -p'!id' ./a", "more -p '!rm -rf ~' ./a", "LESS_IS_MORE=1 less -p '!id' ./a"] {
+        assert!(!safe_chains::is_safe_command(command), "{command} must be refused: more mode runs the -p value");
+    }
+    for (name, ..) in less_family() {
+        for command in [format!("LESS_IS_MORE=1 {name} -p '!id' ./a"), format!("LESS_IS_MORE=1 {name} ./a")] {
+            assert!(!safe_chains::is_safe_command(&command), "{command} must be refused: more mode runs the -p value");
+        }
+    }
+    for command in ["more ./a", "more -n 5 ./a", "more +42 ./a", "less -p pattern ./a"] {
+        assert!(safe_chains::is_safe_command(command), "{command} must stay approved");
     }
 }

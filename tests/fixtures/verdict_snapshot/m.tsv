@@ -3111,7 +3111,6 @@ more -f	inert
 more -h	inert
 more -l	inert
 more -n x	inert
-more -p	inert
 more -s	inert
 more -u	inert
 more x	inert

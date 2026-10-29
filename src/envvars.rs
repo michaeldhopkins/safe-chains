@@ -844,6 +844,7 @@ mod integration_tests {
             ("DELTA_PAGER='sh -c m' ls", "DELTA_PAGER=cat ls"),
             ("BAT_CONFIG_PATH=/tmp/m ls", "BAT_CONFIG_PATH=./bat.conf ls"),
             ("LESS='+/!m' ls", "LESS= ls"),
+            ("LESS_IS_MORE=1 less -p '!m' x", "LESS_IS_MORE= ls"),
             ("LESSKEYIN=./lesskey ls", "LESSKEYIN= ls"),
             ("LESSKEYIN_SYSTEM=./lesskey ls", "LESSKEYIN_SYSTEM= ls"),
             ("LESSKEY=./lesskey ls", "LESSKEY= ls"),

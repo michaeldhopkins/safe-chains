@@ -7,5 +7,5 @@ bare = true
 reads_commands_from = ["plus"]
 examples_safe = ["more +42 ./notes.md"]
 examples_denied = ["more '+!id' ./notes.md"]
-standalone = ["-V", "-c", "-d", "-f", "-h", "-l", "-p", "-s", "-u", "--help", "--version"]
+standalone = ["-V", "-c", "-d", "-f", "-h", "-l", "-s", "-u", "--help", "--version"]
 valued = ["-n", "--lines"]

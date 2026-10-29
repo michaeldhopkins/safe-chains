@@ -318,7 +318,7 @@ Aliases: `gjoin`
 ### `more`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/more.1.html">https://man7.org/linux/man-pages/man1/more.1.html</a></p>
 
-- Allowed standalone flags: -V, -c, -d, -f, -h, -l, -p, -s, -u, --help, --version
+- Allowed standalone flags: -V, -c, -d, -f, -h, -l, -s, -u, --help, --version
 - Allowed valued flags: -n, --lines
 - Bare invocation allowed
 
