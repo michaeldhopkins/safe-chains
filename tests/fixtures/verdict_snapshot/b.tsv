@@ -2893,12 +2893,12 @@ bzip2recover -v	safe-write
 bzip2recover -z	safe-write
 bzip2recover x	safe-write
 bzless	inert
+bzless --LINE-NUMBERS	inert
+bzless --LINE-NUMBERS --LONG-PROMPT	inert
+bzless --LINE-NUMBERS --pattern x	inert
 bzless --LINE-NUMBERS x	inert
-bzless --LONG-PROMPT x	inert
+bzless --LONG-PROMPT	inert
 bzless --QUIT-AT-EOF	inert
-bzless --QUIT-AT-EOF --LINE-NUMBERS x	inert
-bzless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-bzless --QUIT-AT-EOF x	inert
 bzless --RAW-CONTROL-CHARS	inert
 bzless --chop-long-lines	inert
 bzless --help	inert
@@ -2955,12 +2955,12 @@ bzless -y x	inert
 bzless -z x	inert
 bzless x	inert
 bzmore	inert
+bzmore --LINE-NUMBERS	inert
+bzmore --LINE-NUMBERS --LONG-PROMPT	inert
+bzmore --LINE-NUMBERS --pattern x	inert
 bzmore --LINE-NUMBERS x	inert
-bzmore --LONG-PROMPT x	inert
+bzmore --LONG-PROMPT	inert
 bzmore --QUIT-AT-EOF	inert
-bzmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
-bzmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-bzmore --QUIT-AT-EOF x	inert
 bzmore --RAW-CONTROL-CHARS	inert
 bzmore --chop-long-lines	inert
 bzmore --help	inert

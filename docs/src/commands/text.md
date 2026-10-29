@@ -281,8 +281,8 @@ Aliases: `gjoin`
 ### `less`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/less.1.html">https://man7.org/linux/man-pages/man1/less.1.html</a></p>
 
-- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
-- Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
+- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
+- Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
 
 **Examples:**

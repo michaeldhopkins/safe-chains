@@ -738,12 +738,12 @@ ziptool x	safe-write
 ziptool ~/.ssh/k.zip add a b	denied
 zless	inert
 zless '+!id' ./a.gz	denied
+zless --LINE-NUMBERS	inert
+zless --LINE-NUMBERS --LONG-PROMPT	inert
+zless --LINE-NUMBERS --pattern x	inert
 zless --LINE-NUMBERS x	inert
-zless --LONG-PROMPT x	inert
+zless --LONG-PROMPT	inert
 zless --QUIT-AT-EOF	inert
-zless --QUIT-AT-EOF --LINE-NUMBERS x	inert
-zless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-zless --QUIT-AT-EOF x	inert
 zless --RAW-CONTROL-CHARS	inert
 zless --chop-long-lines	inert
 zless --help	inert
@@ -815,12 +815,12 @@ zlib-flate -uncompress	inert
 zlib-flate x	inert
 zmore	inert
 zmore +!id ./a.gz	denied
+zmore --LINE-NUMBERS	inert
+zmore --LINE-NUMBERS --LONG-PROMPT	inert
+zmore --LINE-NUMBERS --pattern x	inert
 zmore --LINE-NUMBERS x	inert
-zmore --LONG-PROMPT x	inert
+zmore --LONG-PROMPT	inert
 zmore --QUIT-AT-EOF	inert
-zmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
-zmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-zmore --QUIT-AT-EOF x	inert
 zmore --RAW-CONTROL-CHARS	inert
 zmore --chop-long-lines	inert
 zmore --help	inert
@@ -1189,12 +1189,12 @@ zstdgrep TODO ./log.zst	inert
 zstdgrep x	inert
 zstdgrep x ~/.ssh/id_rsa	denied
 zstdless	inert
+zstdless --LINE-NUMBERS	inert
+zstdless --LINE-NUMBERS --LONG-PROMPT	inert
+zstdless --LINE-NUMBERS --pattern x	inert
 zstdless --LINE-NUMBERS x	inert
-zstdless --LONG-PROMPT x	inert
+zstdless --LONG-PROMPT	inert
 zstdless --QUIT-AT-EOF	inert
-zstdless --QUIT-AT-EOF --LINE-NUMBERS x	inert
-zstdless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-zstdless --QUIT-AT-EOF x	inert
 zstdless --RAW-CONTROL-CHARS	inert
 zstdless --chop-long-lines	inert
 zstdless --help	inert

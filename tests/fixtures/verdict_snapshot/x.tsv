@@ -1481,12 +1481,12 @@ xzgrep TODO ./log.xz	inert
 xzgrep x	inert
 xzgrep x ~/.ssh/id_rsa	denied
 xzless	inert
+xzless --LINE-NUMBERS	inert
+xzless --LINE-NUMBERS --LONG-PROMPT	inert
+xzless --LINE-NUMBERS --pattern x	inert
 xzless --LINE-NUMBERS x	inert
-xzless --LONG-PROMPT x	inert
+xzless --LONG-PROMPT	inert
 xzless --QUIT-AT-EOF	inert
-xzless --QUIT-AT-EOF --LINE-NUMBERS x	inert
-xzless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-xzless --QUIT-AT-EOF x	inert
 xzless --RAW-CONTROL-CHARS	inert
 xzless --chop-long-lines	inert
 xzless --help	inert
@@ -1544,12 +1544,12 @@ xzless -z x	inert
 xzless ./a.xz	inert
 xzless x	inert
 xzmore	inert
+xzmore --LINE-NUMBERS	inert
+xzmore --LINE-NUMBERS --LONG-PROMPT	inert
+xzmore --LINE-NUMBERS --pattern x	inert
 xzmore --LINE-NUMBERS x	inert
-xzmore --LONG-PROMPT x	inert
+xzmore --LONG-PROMPT	inert
 xzmore --QUIT-AT-EOF	inert
-xzmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
-xzmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-xzmore --QUIT-AT-EOF x	inert
 xzmore --RAW-CONTROL-CHARS	inert
 xzmore --chop-long-lines	inert
 xzmore --help	inert

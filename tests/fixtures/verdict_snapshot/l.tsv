@@ -798,12 +798,12 @@ less	inert
 less '+!id' ./notes.md	denied
 less +42 ./notes.md	inert
 less +G ./notes.md	denied
+less --LINE-NUMBERS	inert
+less --LINE-NUMBERS --LONG-PROMPT	inert
+less --LINE-NUMBERS --pattern x	inert
 less --LINE-NUMBERS x	inert
-less --LONG-PROMPT x	inert
+less --LONG-PROMPT	inert
 less --QUIT-AT-EOF	inert
-less --QUIT-AT-EOF --LINE-NUMBERS x	inert
-less --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-less --QUIT-AT-EOF x	inert
 less --RAW-CONTROL-CHARS	inert
 less --chop-long-lines	inert
 less --help	inert
@@ -3345,12 +3345,12 @@ lzip -v	safe-write
 lzip -z	safe-write
 lzip x	safe-write
 lzless	inert
+lzless --LINE-NUMBERS	inert
+lzless --LINE-NUMBERS --LONG-PROMPT	inert
+lzless --LINE-NUMBERS --pattern x	inert
 lzless --LINE-NUMBERS x	inert
-lzless --LONG-PROMPT x	inert
+lzless --LONG-PROMPT	inert
 lzless --QUIT-AT-EOF	inert
-lzless --QUIT-AT-EOF --LINE-NUMBERS x	inert
-lzless --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-lzless --QUIT-AT-EOF x	inert
 lzless --RAW-CONTROL-CHARS	inert
 lzless --chop-long-lines	inert
 lzless --help	inert
@@ -3525,12 +3525,12 @@ lzmainfo --version	inert
 lzmainfo ./a.lzma	inert
 lzmainfo x	inert
 lzmore	inert
+lzmore --LINE-NUMBERS	inert
+lzmore --LINE-NUMBERS --LONG-PROMPT	inert
+lzmore --LINE-NUMBERS --pattern x	inert
 lzmore --LINE-NUMBERS x	inert
-lzmore --LONG-PROMPT x	inert
+lzmore --LONG-PROMPT	inert
 lzmore --QUIT-AT-EOF	inert
-lzmore --QUIT-AT-EOF --LINE-NUMBERS x	inert
-lzmore --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-lzmore --QUIT-AT-EOF x	inert
 lzmore --RAW-CONTROL-CHARS	inert
 lzmore --chop-long-lines	inert
 lzmore --help	inert
