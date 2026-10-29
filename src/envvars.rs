@@ -842,6 +842,7 @@ mod integration_tests {
             ("BAT_CONFIG_PATH=/tmp/m ls", "BAT_CONFIG_PATH=./bat.conf ls"),
             ("LESS='+/!m' ls", "LESS= ls"),
             ("LESS_IS_MORE=1 less -p '!m' x", "LESS_IS_MORE= ls"),
+            ("MORE='+!m' more x", "MORE= ls"),
             ("LESSKEYIN=./lesskey ls", "LESSKEYIN= ls"),
             ("LESSKEYIN_SYSTEM=./lesskey ls", "LESSKEYIN_SYSTEM= ls"),
             ("LESSKEY=./lesskey ls", "LESSKEY= ls"),

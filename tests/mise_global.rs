@@ -38,7 +38,7 @@ fn global_is_judged_as_the_project_file_is() {
 
 #[test]
 fn global_refuses_an_audited_variable_the_project_file_may_hold() {
-    for assignment in ["RUSTC_WRAPPER=./w", "RUSTC_WRAPPER=/tmp/w", "LD_PRELOAD=/tmp/x.so", "PATH=/tmp/x", "BASH_ENV=./x.sh"] {
+    for assignment in ["RUSTC_WRAPPER=./w", "RUSTC_WRAPPER=/tmp/w", "LD_PRELOAD=/tmp/x.so", "PATH=/tmp/x", "BASH_ENV=./x.sh", "MORE=--lesskey-src=./lk.txt"] {
         assert!(!approved(&format!("mise set -g {assignment}")), "mise set -g {assignment} must not pass");
         assert!(!approved(&format!("mise set --global {assignment}")), "mise set --global {assignment} must not pass");
     }

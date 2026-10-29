@@ -99,3 +99,19 @@ fn a_more_mode_startup_command_is_refused() {
         assert!(safe_chains::is_safe_command(command), "{command} must stay approved");
     }
 }
+
+/// `MORE` is more mode's copy of `LESS`: options read before the arguments, a startup command among
+/// them, on every pager that runs in more mode.
+#[test]
+fn a_more_options_variable_is_refused() {
+    for command in [
+        "MORE='--lesskey-src=./lk.txt' more a.txt | head -1",
+        "export MORE=--lesskey-src=./lk.txt; more a.txt | head -1",
+        "MORE='+!id' more a.txt",
+        "MORE='-p!id' more a.txt",
+        "MORE='+!id' zmore a.txt",
+        "mise set -g MORE=--lesskey-src=./lk.txt",
+    ] {
+        assert!(!safe_chains::is_safe_command(command), "{command} must be refused: more reads MORE as options");
+    }
+}

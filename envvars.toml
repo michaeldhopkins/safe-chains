@@ -1308,6 +1308,9 @@ measured = false
 [env.LESS_IS_MORE]
 shape = "opaque"
 because = "puts less in more mode, where -p takes a command less runs at startup instead of a search pattern (measured: executes)"
+[env.MORE]
+shape = "opaque"
+because = "more parses this as options before its arguments, as less does LESS, including +cmd, -p cmd and --lesskey-src (measured: executes)"
 [env.LESSKEYIN]
 shape = "opaque"
 because = "less reads key bindings from this file, and its #env section can set LESSOPEN, which less runs (measured: executes, even with output to a pipe)"
