@@ -190,7 +190,10 @@ struct Granted {
 }
 
 fn granted(secret: Option<&str>) -> Granted {
-    let base = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("scratch");
+    // Not CARGO_TARGET_TMPDIR: a copy of the tree under the system temp folder (cargo-mutants builds
+    // one) puts it below /private/var/folders, where a home's grant is not honoured, so the same
+    // test would pass or fail by where the checkout lives.
+    let base = tempfile::tempdir_in("/tmp").expect("scratch");
     let root = base.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
     let (home, work) = (format!("{root}/home"), format!("{root}/work"));
     for dir in [format!("{home}/.config"), format!("{home}/out2/inner"), work.clone()] {
