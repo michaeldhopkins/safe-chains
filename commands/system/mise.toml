@@ -164,7 +164,7 @@ ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "install"
-writes_cwd = "none"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
@@ -182,7 +182,7 @@ standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "upgrade"
-writes_cwd = "source"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
@@ -243,7 +243,7 @@ ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "i"
-writes_cwd = "none"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
@@ -268,7 +268,7 @@ standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "up"
-writes_cwd = "source"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
@@ -512,6 +512,7 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "exec"
 aliases = ["x"]
+writes_cwd = "code"
 delegate_after = "--"
 standalone = ["--raw", "-q", "--quiet", "-v", "--verbose"]
 valued = ["--jobs", "-j"]

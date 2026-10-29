@@ -10,16 +10,19 @@ flags = { "--inventory" = "exec", "-i" = "exec" }
 
 [[command.sub]]
 name = "--list"
+writes_cwd = "code"
 standalone = ["--help", "--yaml", "--toml", "--export", "-h", "-y"]
 valued = ["--inventory", "--limit", "-i", "-l"]
 
 [[command.sub]]
 name = "--graph"
+writes_cwd = "code"
 standalone = ["--help", "--vars", "-h"]
 valued = ["--inventory", "--limit", "-i", "-l"]
 
 [[command.sub]]
 name = "--host"
+writes_cwd = "code"
 bare = false
 standalone = ["--help", "-h"]
 valued = ["--inventory", "-i"]

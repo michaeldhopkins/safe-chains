@@ -668,8 +668,6 @@ mutool poster
 mutool recolor
 mutool sign
 mutool trim
-mvn compile
-mvn test-compile
 mysqlcheck
 mysqlcheck x
 nasm

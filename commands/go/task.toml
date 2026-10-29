@@ -1,5 +1,6 @@
 [[command]]
 name = "task"
+writes_cwd = "code"
 description = "Task runner / build tool with a YAML config (Taskfile.yml). Each invocation runs the matching task definition, which contains arbitrary shell — same risk profile as Make. The diagnostic --version / --help and `-l/--list` (list tasks without running) and `-a/--list-all` are part of the safe surface."
 url = "https://taskfile.dev/"
 researched_version = "task 3.x"

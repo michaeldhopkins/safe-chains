@@ -60,3 +60,28 @@ fn what_an_if_condition_leaves_in_the_shell_reaches_its_branches() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+/// A tool that runs code the folder holds (a pom's plugins, a Taskfile, a dynamic inventory, a
+/// mise.toml's tasks and hooks) runs the code of the folder a `cd` moved to.
+#[test]
+fn a_tool_that_runs_the_folders_code_follows_a_cd() {
+    for command in [
+        "mvn test", "mvn verify", "mvn validate", "mvn dependency:tree", "task -l", "task --list", "ansible-inventory --list",
+        "ansible-playbook --syntax-check site.yml", "ansible-playbook --list-tasks site.yml", "mise exec -- ls", "mise x -- ls",
+        "mise install", "mise upgrade", "mise run build",
+    ] {
+        for line in [format!("cd /Users/Shared/evil && {command}"), format!("cd /tmp/x && {command}")] {
+            assert!(!approved(&line), "`{line}` was approved");
+        }
+    }
+}
+
+#[test]
+fn a_tool_that_runs_the_folders_code_keeps_its_verdict_inside_the_project() {
+    for command in ["mvn test", "mvn --version", "task -l", "ansible-inventory --list", "mise install", "mise exec -- ls"] {
+        assert!(approved(command), "precondition: `{command}`");
+        let line = format!("cd src && {command}");
+        assert!(approved(&line), "`{line}` should stay approved");
+    }
+    assert!(approved("cd /tmp/x && mvn --version"), "the version query runs no folder code");
+}

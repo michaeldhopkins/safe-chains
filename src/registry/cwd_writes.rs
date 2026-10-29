@@ -59,12 +59,22 @@ fn is_owned_subtree(dir: &str) -> bool {
     !dir.is_empty() && !dir.starts_with('/') && !dir.starts_with('~') && dir.split('/').all(|s| !s.is_empty() && s != "." && s != "..")
 }
 
+/// The folder declaration of a command judged only by a Rust handler, which has no TOML to carry
+/// one. Every mvn phase runs the plugins the folder's pom.xml and .mvn name; only the version
+/// query reads nothing there.
+fn handler_writes(canonical: &str, tokens: &[Token]) -> Option<Anchor> {
+    let version_only = tokens.len() == 2 && matches!(tokens[1].as_str(), "--version" | "-v");
+    (matches!(canonical, "mvn" | "mvnw") && !version_only).then_some(Anchor::RunsFolderCode)
+}
+
 /// The declared write of the deepest sub `tokens` reach, when that sub declares one. A sub that
 /// declares nothing does not inherit its parent's declaration: `git stash` writing source says
 /// nothing researched about `git stash drop`. `None` leaves the write unaccounted for.
 pub(crate) fn cwd_writes(tokens: &[Token]) -> Option<Anchor> {
     let canonical = canonical_name(tokens.first()?.command_name());
-    let spec = CUSTOM_REGISTRY.get(canonical).or_else(|| TOML_REGISTRY.get(canonical))?;
+    let Some(spec) = CUSTOM_REGISTRY.get(canonical).or_else(|| TOML_REGISTRY.get(canonical)) else {
+        return handler_writes(canonical, tokens);
+    };
     let mut rest = &tokens[1..];
     if rest.first().is_some_and(|t| t.as_str().starts_with('+')) {
         rest = &rest[1..];
