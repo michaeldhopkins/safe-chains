@@ -99,6 +99,11 @@ pub(crate) fn landing(cmd: &str, tokens: &[Token]) -> Option<String> {
     cwd
 }
 
+/// The folder a command lands in from `cur` once it moves into `dir`, as a `-C` flag moves git.
+pub(crate) fn moved_into(cur: Option<String>, dir: &str) -> Option<String> {
+    moved(cur, &spelled(dir))
+}
+
 /// The two variables a shell always sets to a directory, spelled the way the gate already reads:
 /// `git -C "$PWD"` stays where it is and `git -C "$HOME/x"` is `~/x`. Any other variable stays
 /// unresolved, and the read gate refuses it.

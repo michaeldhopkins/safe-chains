@@ -205,3 +205,76 @@ fn git_in_a_repository_outside_the_project_is_refused() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+/// The tools that open the repository they run in obey its configuration as git does: branchdiff and
+/// tig run git there (`core.fsmonitor`), hg runs the hooks in `.hg/hgrc`, git-lfs and gitleaks call
+/// git in it. A repository outside the project is refused for each, however the tool is pointed at it.
+#[test]
+fn a_tool_that_opens_a_repository_outside_the_project_is_refused() {
+    for command in [
+        "cd /tmp/x/repo && branchdiff -p --no-auto-fetch",
+        "branchdiff -p /tmp/x/repo",
+        "branchdiff ~/projects/other",
+        "branchdiff -p ..",
+        "cd /tmp/x/repo && tig",
+        "tig -C /tmp/x/repo",
+        "cd /tmp/x/repo && tig log",
+        "cd /tmp/x/repo && hg status",
+        "cd /Users/Shared/repo && hg log",
+        "cd /tmp/x/repo && git-lfs ls-files",
+        "cd /tmp/x/repo && git-lfs status",
+        "cd /tmp/x/repo && gitleaks detect",
+        "gitleaks detect -s /tmp/x/repo",
+        "gitleaks detect --source=/tmp/x/repo",
+        "gitleaks detect --source /tmp/x/repo",
+        "cd src && gitleaks detect -s ../..",
+        "tig -C. -C../jjt",
+        "tig -Csrc -C../..",
+        "tig -C. -C/tmp/x/repo",
+        "gitleaks detect -s . -s ../jjt",
+        "gitleaks detect -s. -s../jjt",
+        "gitleaks detect --source=. --source=../jjt",
+        "gitleaks protect -s . -s ../jjt",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in [
+        "branchdiff -p --no-auto-fetch", "branchdiff -p", "branchdiff -p .", "cd src && branchdiff -p", "tig", "cd src && tig",
+        "git-lfs ls-files", "gitleaks detect", "gitleaks detect -s src", "cd /tmp/x && tig --version", "cd /tmp/x && gitleaks version",
+        "tig -Csrc", "gitleaks detect -s src -s .",
+    ] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}
+
+proptest::proptest! {
+    /// Every way of pointing a repository-opening tool at a folder outside the project is refused,
+    /// wherever that folder is.
+    #[test]
+    fn a_repository_opener_refuses_every_folder_outside_the_project(
+        tool in proptest::sample::select(vec!["branchdiff -p", "tig", "hg status", "git-lfs ls-files", "gitleaks detect"]),
+        dir in "/(tmp|Users/Shared|opt|var)/[a-z]{1,6}",
+        spelling in proptest::sample::select(vec!["cd {d} && {t}", "pushd {d} && {t}", "(cd {d}; {t})", "cd src && cd {d} && {t}"]),
+    ) {
+        let line = spelling.replace("{d}", &dir).replace("{t}", tool);
+        proptest::prop_assert!(!approved(&line), "`{}` was approved", line);
+    }
+
+    /// A tool given its repository flag more than once is judged by every one of them: tig moves
+    /// through each `-C` in turn, and gitleaks scans every source it is given.
+    #[test]
+    fn a_repeated_repository_flag_is_judged_in_full(
+        (tool, flag) in proptest::sample::select(vec![
+            ("tig", "-C{d}"), ("tig", "-C {d}"),
+            ("gitleaks detect", "-s {d}"), ("gitleaks protect", "-s{d}"),
+            ("gitleaks detect", "--source={d}"), ("gitleaks detect", "--source {d}"),
+        ]),
+        inside in proptest::sample::select(vec![".", "src", "tests"]),
+        outside in proptest::sample::select(vec!["../../jjt", "/tmp/x/repo", "../../..", "~/other"]),
+        outside_first in proptest::bool::ANY,
+    ) {
+        let (first, second) = if outside_first { (outside, inside) } else { (inside, outside) };
+        let line = format!("{tool} {} {}", flag.replace("{d}", first), flag.replace("{d}", second));
+        proptest::prop_assert!(!approved(&line), "`{}` was approved", line);
+    }
+}

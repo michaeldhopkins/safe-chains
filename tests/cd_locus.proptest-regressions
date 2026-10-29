@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 6853ba8b32f848b4acc19324ea48e2a8be7ef80c09ff7db48e2d5b550194b2a3 # shrinks to (tool, flag) = ("tig", "-C{d}"), inside = ".", outside = "../../jjt", outside_first = false

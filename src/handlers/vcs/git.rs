@@ -95,10 +95,56 @@ pub fn is_safe_git(tokens: &[Token]) -> Verdict {
 /// `--version`, which reads no repository, is left to run anywhere. A folder that cannot be placed
 /// counts as outside.
 pub(crate) fn runs_in_a_repository_outside_the_project(tokens: &[Token]) -> bool {
-    if only_asks_the_version(tokens) {
+    !only_asks_the_version(tokens) && lands_outside_the_project(crate::pathgate::chdir::landing("git", tokens))
+}
+
+/// Whether a tool that opens a repository and obeys its configuration opens one outside the
+/// project: branchdiff and tig run git there, hg runs the hooks and extensions its `.hg/hgrc`
+/// names, git-lfs and gitleaks call git in it. The repository is the folder the tool runs in, or
+/// the one it is pointed at: branchdiff's operand, every `tig -C` in turn, each `gitleaks --source`. Only asking a
+/// tool other than hg for its version or help is left to run anywhere, since hg loads the
+/// repository's extensions before it reads its options.
+pub(crate) fn opens_a_repository_outside_the_project(cmd: &str, tokens: &[Token]) -> bool {
+    if cmd != "hg" && tokens.len() == 2 && matches!(tokens[1].as_str(), "--version" | "-V" | "-v" | "version" | "--help" | "-h") {
         return false;
     }
-    let (Some(root), Some(dir)) = (crate::pathctx::root(), crate::pathgate::chdir::landing("git", tokens)) else {
+    let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).collect();
+    let here = crate::pathctx::cwd();
+    match cmd {
+        "branchdiff" => lands_outside_the_project(match words.iter().copied().find(|word| !word.starts_with('-')) {
+            Some(dir) => crate::pathgate::chdir::moved_into(here, dir),
+            None => here,
+        }),
+        "tig" => lands_outside_the_project(flag_values(&words, &["-C"]).into_iter().fold(here, crate::pathgate::chdir::moved_into)),
+        "gitleaks" => {
+            let sources = flag_values(&words, &["-s", "--source"]);
+            if sources.is_empty() {
+                return lands_outside_the_project(here);
+            }
+            sources
+                .into_iter()
+                .any(|dir| lands_outside_the_project(crate::pathgate::chdir::moved_into(here.clone(), dir)))
+        }
+        _ => lands_outside_the_project(here),
+    }
+}
+
+fn flag_values<'a>(words: &[&'a str], names: &[&str]) -> Vec<&'a str> {
+    words
+        .iter()
+        .enumerate()
+        .filter_map(|(at, word)| {
+            names.iter().find_map(|name| match word.strip_prefix(name) {
+                Some("") => words.get(at + 1).copied(),
+                Some(rest) => rest.strip_prefix('=').or(if name.starts_with("--") { None } else { Some(rest) }),
+                None => None,
+            })
+        })
+        .collect()
+}
+
+fn lands_outside_the_project(dir: Option<String>) -> bool {
+    let (Some(root), Some(dir)) = (crate::pathctx::root(), dir) else {
         return false;
     };
     if crate::pathctx::folder::is_unknown(&dir) {
