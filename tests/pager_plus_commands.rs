@@ -115,3 +115,60 @@ fn a_more_options_variable_is_refused() {
         assert!(!safe_chains::is_safe_command(command), "{command} must be refused: more reads MORE as options");
     }
 }
+
+#[test]
+fn a_system_lesskey_source_variable_is_refused() {
+    for command in [
+        "LESSKEY_CONTENT_SYSTEM=$'#env\\nLESSOPEN=|touch m10 %s' less a.txt | head -1",
+        "export LESSKEY_CONTENT_SYSTEM=x; less a.txt",
+        "LESSKEY_CONTENT_SYSTEM='#env' more a.txt",
+        "LESSKEY_CONTENT_SYSTEM='#env' git log",
+        "mise set -g 'LESSKEY_CONTENT_SYSTEM=#env'",
+    ] {
+        assert!(!safe_chains::is_safe_command(command), "{command} must be refused: less reads it as lesskey source");
+    }
+}
+
+/// Every variable less reads whose name says it is less's own (its manual's ENVIRONMENT
+/// VARIABLES), each either audited in envvars.toml or named here with why its value cannot run or
+/// load anything when less is not interactive.
+#[test]
+fn every_variable_less_reads_is_audited_or_explained() {
+    const NOT_AUDITED: &[(&str, &str)] = &[
+        ("LESSANSIENDCHARS", "characters that end an ANSI sequence"),
+        ("LESSANSIMIDCHARS", "characters inside an ANSI sequence"),
+        ("LESSBINFMT", "how binary characters are shown"),
+        ("LESSCHARDEF", "a character set definition"),
+        ("LESSCHARSET", "a character set name"),
+        ("LESSECHO", "the program less runs to expand a file name typed at :e, an interactive command"),
+        ("LESSHISTSIZE", "how many history lines to keep"),
+        ("LESSMETACHARS", "which characters LESSOPEN's command quotes, read only when LESSOPEN is set"),
+        ("LESSMETAESCAPE", "how LESSOPEN's command quotes them, read only when LESSOPEN is set"),
+        ("LESSSECURE", "turns features off"),
+        ("LESSSECURE_ALLOW", "turns back on features LESSSECURE turned off, which only LESSSECURE can"),
+        ("LESSSEPARATOR", "the separator between file names"),
+        ("LESSUTFBINFMT", "how binary UTF-8 characters are shown"),
+        ("LESSUTFCHARDEF", "a UTF-8 character definition"),
+        ("LESS_COLUMNS", "the screen width"),
+        ("LESS_DATA_DELAY", "a delay"),
+        ("LESS_LINES", "the screen height"),
+        ("LESS_OSC8_ANY", "the command for an OSC 8 link, run only by the interactive ^O^O"),
+        ("LESS_SHELL_LINES", "the prompt's height"),
+        ("LESS_TERMCAP_md", "a terminal capability, one of the LESS_TERMCAP_xx family"),
+        ("LESS_UNSUPPORT", "turns options off"),
+    ];
+    const LESS_READS: &[&str] = &[
+        "LESS", "LESSANSIENDCHARS", "LESSANSIMIDCHARS", "LESSBINFMT", "LESSCHARDEF", "LESSCHARSET", "LESSCLOSE", "LESSECHO", "LESSEDIT",
+        "LESSGLOBALTAGS", "LESSHISTFILE", "LESSHISTSIZE", "LESSKEY", "LESSKEYIN", "LESSKEYIN_SYSTEM", "LESSKEY_CONTENT",
+        "LESSKEY_CONTENT_SYSTEM", "LESSKEY_SYSTEM", "LESSMETACHARS", "LESSMETAESCAPE", "LESSOPEN", "LESSSECURE", "LESSSECURE_ALLOW",
+        "LESSSEPARATOR", "LESSUTFBINFMT", "LESSUTFCHARDEF", "LESS_COLUMNS", "LESS_DATA_DELAY", "LESS_IS_MORE", "LESS_LINES",
+        "LESS_OSC8_ANY", "LESS_SHELL_LINES", "LESS_TERMCAP_md", "LESS_UNSUPPORT", "MORE",
+    ];
+    let text = std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("envvars.toml")).expect("readable envvars.toml");
+    let doc = text.parse::<toml::Table>().expect("envvars.toml parses");
+    let audited = doc.get("env").and_then(toml::Value::as_table).expect("an [env] table");
+    for name in LESS_READS {
+        let explained = NOT_AUDITED.iter().any(|(n, _)| n == name);
+        assert!(audited.contains_key(*name) != explained, "{name} must be audited in envvars.toml or explained here, not both or neither");
+    }
+}

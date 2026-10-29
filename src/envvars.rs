@@ -848,6 +848,7 @@ mod integration_tests {
             ("LESSKEY=./lesskey ls", "LESSKEY= ls"),
             ("LESSKEY_SYSTEM=./lesskey ls", "LESSKEY_SYSTEM= ls"),
             ("LESSKEY_CONTENT='#env' ls", "LESSKEY_CONTENT= ls"),
+            ("LESSKEY_CONTENT_SYSTEM='#env' ls", "LESSKEY_CONTENT_SYSTEM= ls"),
             ("LESSGLOBALTAGS='sh -c m' less -t x", "LESSGLOBALTAGS=cat less -t x"),
             ("LESSHISTFILE=~/.zshrc less x", "LESSHISTFILE=./.lesshst less x"),
             ("LESSEDIT='sh -c m' less x", "LESSEDIT=cat less x"),

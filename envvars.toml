@@ -1328,6 +1328,9 @@ measured = false
 [env.LESSKEY_CONTENT]
 shape = "opaque"
 because = "less parses the value as lesskey source, #env section included (measured: executes)"
+[env.LESSKEY_CONTENT_SYSTEM]
+shape = "opaque"
+because = "as LESSKEY_CONTENT, for the system-wide lesskey source (measured: executes)"
 [env.LESSHISTFILE]
 shape = "data-write"
 because = "less writes its search and shell-command history to this file"
