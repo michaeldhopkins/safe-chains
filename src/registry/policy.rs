@@ -148,7 +148,8 @@ pub(super) fn reads_commands_from(tolerance: &mut FlagTolerance, command: &str, 
 
 /// Whether one of `wanted` is given AS A FLAG: not as the value of the flag before it, not glued
 /// into a short cluster after a flag that takes the rest as its value (`-rm` is `-r m`), and not
-/// after `--`.
+/// after `--`. A valued flag with nothing glued to it takes the next word whatever it looks like,
+/// as getopt does: `make -f -n` reads a makefile named `-n`.
 ///
 /// A required flag that only appears to be present is how a guarded sub runs its unguarded form:
 /// `jj describe -rm` names revision `m` and opens the editor.
@@ -173,13 +174,13 @@ pub(super) fn flag_given(tokens: &[Token], policy: &OwnedPolicy, wanted: &[Strin
             if wants(name) {
                 return true;
             }
-            if !t.contains('=') && valued.contains_flag(name) && consumes_next_value(tokens.get(i)) {
+            if !t.contains('=') && valued.contains_flag(name) {
                 i += 1;
             }
             continue;
         }
         if policy.tolerance.single_dash_words || valued.contains_flag(t) {
-            if valued.contains_flag(t) && consumes_next_value(tokens.get(i)) {
+            if valued.contains_flag(t) {
                 i += 1;
             }
             continue;
@@ -190,7 +191,7 @@ pub(super) fn flag_given(tokens: &[Token], policy: &OwnedPolicy, wanted: &[Strin
                 return true;
             }
             if valued.contains_short(b) {
-                if j == bytes.len() - 1 && consumes_next_value(tokens.get(i)) {
+                if j == bytes.len() - 1 {
                     i += 1;
                 }
                 break;
@@ -536,7 +537,20 @@ mod flag_given_tests {
 
     #[test]
     fn a_flag_that_only_looks_given_is_not() {
-        for words in [&[][..], &["-rm"], &["-r", "m"], &["--", "-m", "x"], &["--revision=-m"], &["--revision", "m"], &["m"]] {
+        for words in [
+            &[][..],
+            &["-rm"],
+            &["-r", "m"],
+            &["--", "-m", "x"],
+            &["--revision=-m"],
+            &["--revision", "m"],
+            &["m"],
+            &["-r", "-m"],
+            &["--revision", "-m"],
+            &["--revision", "--message"],
+            &["-ar", "-m"],
+            &["-r", "--message=x"],
+        ] {
             assert!(!given(words), "{words:?}");
         }
     }
@@ -610,7 +624,8 @@ mod flag_given_tests {
         let value = prop::sample::select(vec!["m", "x", "mx", "@-"]);
         prop_oneof![
             prop::sample::select(vec!["-a", "-k", "-ak", "--quiet"]).prop_map(Unit::Standalone),
-            (prop::sample::select(vec!["-r", "--revision"]), value.clone()).prop_map(|(f, v)| Unit::Valued(f, v)),
+            (prop::sample::select(vec!["-r", "--revision", "-ar"]), prop::sample::select(vec!["m", "@-", "-m", "--message", "-k", "--"]))
+                .prop_map(|(f, v)| Unit::Valued(f, v)),
             prop::sample::select(vec!["-rm", "-rx", "-arm", "--revision=m", "--revision=-m"]).prop_map(Unit::Glued),
             value.prop_map(Unit::Operand),
             prop::sample::select(vec![vec!["-m", "x"], vec!["-mx"], vec!["-am", "x"], vec!["--message", "m"], vec!["--message=m"]])

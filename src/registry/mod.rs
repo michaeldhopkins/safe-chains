@@ -711,6 +711,8 @@ mod gate_consistency;
 #[cfg(test)]
 mod glob_scope_tests;
 #[cfg(test)]
+mod guard_values;
+#[cfg(test)]
 mod overlap_tests;
 #[cfg(test)]
 mod tests;

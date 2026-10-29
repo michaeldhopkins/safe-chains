@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc cddb4eb536490d76e6988f52bcbb635503152f635c5684dd67d77c75cf8a898a # shrinks to units = [], at = 0, word = "--aaa"
+cc 6e7fdf0cc0ae67c1a4c9578b1ff7014d41a0707212d4fff918ffc519dda7f2e2 # shrinks to units = [Valued("-r", "-m")]
