@@ -58,15 +58,18 @@ fn cmd_turns_on(cmd: &Cmd) -> bool {
 }
 
 fn simple_turns_on(s: &SimpleCmd) -> bool {
-    if s.env.iter().any(|(name, _)| names_an_option(name)) || s.words.iter().any(|w| names_an_option(&w.eval())) {
+    let expanded: Vec<String> = s.words.iter().flat_map(Word::expand).collect();
+    if s.env.iter().any(|(name, _)| names_an_option(name)) || expanded.iter().any(|w| names_an_option(w)) {
         return true;
     }
-    let mut words = s.words.iter().skip_while(|w| matches!(w.eval().as_str(), "builtin" | "command"));
-    let Some(name) = words.next() else {
+    let Some(at) = expanded.iter().position(|w| !PREFIXES.contains(&w.as_str())) else {
         return false;
     };
-    SETTERS.contains(&name.eval().as_str()) && words.any(|w| !is_plain(w))
+    SETTERS.contains(&expanded[at].as_str()) && s.words.iter().any(|w| !is_plain(w))
 }
+
+/// Words a shell or an approved wrapper reads before the command they run.
+const PREFIXES: &[&str] = &["builtin", "command", "time", "-p", "--", "exec", "noglob", "nocorrect", "-"];
 
 fn is_plain(word: &Word) -> bool {
     match word.0.as_slice() {

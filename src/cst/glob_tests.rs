@@ -100,6 +100,8 @@ fn a_dot_names_option_is_seen_however_it_is_spelt() {
         "shopt -s dot''glob", "shopt -s dot\\glob", "shopt -s \"dot\"glob", "shopt -s {dot,x}glob", "shopt -s dot{glob,}",
         "shopt -s $'\\x64otglob'", "sh''opt -s dot\"\"glob", "builtin shopt -s dot''glob", "command shopt -s dot''glob",
         "setopt glob\\_dots", "unsetopt no''globdots", "export GLOB''IGNORE=x", "export GLOB{IGNORE,}=x", "{ shopt -s dot''glob; }",
+        "time shopt -s {dot,x}glob", "time -p shopt -s {dot,x}glob", "{ time shopt -s {dot,x}glob; }", "{shopt,-s} {dot,x}glob",
+        "{time,shopt} -s {dot,x}glob", "time setopt glob\\_dots", "exec shopt -s dot''glob", "noglob setopt glob''dots",
     ] {
         let cmd = format!("{setting}; rm *");
         assert!(!allowed_in(dir.path(), &cmd), "`{cmd}` approved deleting .envrc");
@@ -130,10 +132,12 @@ proptest! {
             spellings_of("dotglob").prop_map(|o| format!("shopt -s {o}")),
             spellings_of("GLOB_DOTS").prop_map(|o| format!("setopt {o}")),
             spellings_of("GLOBIGNORE").prop_map(|o| format!("{o}=x")),
-        ]
+        ],
+        prefix in prop::sample::select(vec!["", "time ", "time -p ", "builtin ", "command ", "{ time "]),
     ) {
         let dir = folder(&["a.txt", ".envrc"]);
-        let cmd = format!("{setting}; rm *");
+        let close = if prefix.starts_with('{') { "; }" } else { "" };
+        let cmd = format!("{prefix}{setting}{close}; rm *");
         prop_assert!(!allowed_in(dir.path(), &cmd), "`{}` approved deleting .envrc", cmd);
     }
 }
