@@ -16,6 +16,8 @@ pub(crate) mod eval;
 mod explain;
 mod functions;
 #[cfg(test)]
+mod funsub_tests;
+#[cfg(test)]
 mod glob_tests;
 pub(crate) mod heredocs;
 mod loops;

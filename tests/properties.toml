@@ -95,6 +95,7 @@ owed = [
 "src/cst/parse/function.rs" = ["src/cst/proptests.rs::roundtrip", "src/cst/proptests.rs::a_redirect_written_on_a_function_body_applies_to_each_call"]
 "src/cst/parse.rs" = [
   "a_random_unclosed_nest_parses_in_linear_work",
+  "src/cst/funsub_tests.rs::a_function_substitution_is_never_approved",
   "src/cst/proptests.rs::roundtrip",
   "src/cst/proptests.rs::parse_never_panics",
   "src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict",
@@ -695,6 +696,7 @@ owed = [
 "src/userconfig/mod.rs" = "reads and writes ~/.config/safe-chains.toml"
 
 [test_only]
+"src/cst/funsub_tests.rs" = "the function substitution suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/search_quote_tests.rs" = "the kept-dollar search path suite (#[cfg(test)] mod in cst/search_quote.rs)"
 "src/cst/stdin_fed_tests.rs" = "the fed-standard-input suite (#[cfg(test)] mod in cst/stdin_fed.rs)"
 "src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
