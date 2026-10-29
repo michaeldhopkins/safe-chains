@@ -8370,10 +8370,13 @@ git-lfs version x	inert
 git-lfs x	denied
 gitleaks	denied
 gitleaks --help	inert
+gitleaks --help --report-path x	denied
 gitleaks --help --version	denied
 gitleaks --help x	denied
+gitleaks --report-path x	denied
 gitleaks --version	inert
 gitleaks -h	inert
+gitleaks -r x	denied
 gitleaks detect	safe-read
 gitleaks detect --baseline-path x	safe-read
 gitleaks detect --config x	safe-read
@@ -8384,7 +8387,6 @@ gitleaks detect --help --baseline-path x	safe-read
 gitleaks detect --help --no-banner	safe-read
 gitleaks detect --help x	safe-read
 gitleaks detect --log-level x	safe-read
-gitleaks detect --log-opts x	safe-read
 gitleaks detect --max-target-megabytes x	safe-read
 gitleaks detect --no-banner	safe-read
 gitleaks detect --no-color	safe-read

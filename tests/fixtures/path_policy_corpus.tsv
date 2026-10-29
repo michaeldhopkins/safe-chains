@@ -134,6 +134,8 @@ allow	write-workspace	touch out.txt
 allow	write-workspace	touch ./build/artifact.o
 allow	write-workspace	cp a.txt sub/b.txt
 allow	write-workspace	rm ./build/artifact.o
+allow	write-workspace	gitleaks detect --report-path report.json
+allow	write-workspace	gitleaks protect -r ./build/report.json
 
 # ── Writes: sibling workspaces. Create and mutate yes; DESTROY is deliberately withheld —
 # DECIDED 2026-08-16, marked for revisit on feel. See TODO.md. ─────────────────────────────
@@ -155,6 +157,9 @@ deny	write-home	touch ~/x
 deny	write-home	cp a.txt ~/notes.txt
 deny	write-home	echo hi > ~/.zshrc
 deny	write-home	rm ~/notes.txt
+deny	write-home	gitleaks detect --report-path ~/.zshrc
+deny	write-home	gitleaks protect -r ~/.zshrc
+deny	write-home	gitleaks detect --log-opts=--output=~/.zshrc
 
 # ── Writes: the shield and the machine stay closed ─────────────────────────────────────────
 deny	write-shield	echo x > ~/.ssh/authorized_keys
@@ -170,6 +175,10 @@ deny	write-autoexec	echo x >> .jj/repo/config.toml
 deny	write-autoexec	tee .jj/workspace-config.toml
 deny	write-autoexec	cp conf.toml sub/.jj/repo/config.toml
 deny	write-autoexec	echo x > .git/config
+deny	write-autoexec	gitleaks detect -r.git/config
+deny	write-autoexec	gitleaks detect --report-path=.git/config
+deny	write-autoexec	gitleaks detect --log-opts=-o.git/config
+deny	write-autoexec	gitleaks detect --log-opts="--all --output=.git/config"
 deny	write-autoexec	echo x > .hg/hgrc
 deny	write-autoexec	echo x > .sl/config
 deny	write-autoexec	jj git init /tmp/r && printf x > /tmp/r/.jj/repo/config.toml && jj -R /tmp/r diff

@@ -346,9 +346,7 @@ git status	--untracked-files	untriaged	-	-	-
 git-lfs locks	--path	untriaged	-	-	-	
 gitleaks detect	--baseline-path	untriaged	-	-	-	
 gitleaks detect	--gitleaks-ignore-path	untriaged	-	-	-	
-gitleaks detect	--report-path	untriaged	-	-	-	
-gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-	
-gitleaks protect	--report-path	untriaged	-	-	-	
+gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-
 golangci-lint run	--path-prefix	untriaged	-	-	-	
 golangci-lint run	--skip-dirs	untriaged	-	-	-	
 golangci-lint run	--skip-files	untriaged	-	-	-	

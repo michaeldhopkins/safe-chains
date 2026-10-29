@@ -685,10 +685,16 @@ Aliases: `g++`, `cc`, `c++`
 ### `gitleaks`
 <p class="cmd-url"><a href="https://github.com/gitleaks/gitleaks">https://github.com/gitleaks/gitleaks</a></p>
 
-- **detect**: Flags: --help, --no-banner, --no-color, --redact, --verbose, -h, -v. Valued: --baseline-path, --config, --exit-code, --gitleaks-ignore-path, --log-level, --log-opts, --max-target-megabytes, --report-format, --report-path, --source, -c, -l, -r, -s
+- **detect**: Flags: --help, --no-banner, --no-color, --redact, --verbose, -h, -v. Valued: --baseline-path, --config, --exit-code, --gitleaks-ignore-path, --log-level, --max-target-megabytes, --report-format, --report-path, --source, -c, -l, -r, -s
 - **protect**: Flags: --help, --no-banner, --no-color, --redact, --staged, --verbose, -h, -v. Valued: --config, --exit-code, --gitleaks-ignore-path, --log-level, --max-target-megabytes, --report-format, --report-path, --source, -c, -l, -r, -s
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `gitleaks detect`
+- `gitleaks detect --report-path report.json`
+- `gitleaks protect --staged -r build/report.json`
 
 ### `gpg`
 <p class="cmd-url"><a href="https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html">https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html</a></p>
