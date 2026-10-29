@@ -30,6 +30,10 @@ features = ["fuzz-gen"]
 # command reaches, not only the first; gate/tests.rs pins both with `by_default` true. The closure
 # stays as a backstop should those checks narrow.
 exclude_re = [
+    # `i += step` / `i += 1` turned into `-=` or `*=` never advances the scan, and every pass pushes
+    # onto `positionals`, so the loop allocates without bound (44 GB before the Mac hung, 2026-10-29)
+    # instead of timing out. A hang that eats memory is not a safe detection.
+    'src/handlers/followed_read\.rs:\d+:\d+: replace \+= with (-=|\*=) in zip_roots$',
     'gen_fuzz_corpus\.rs:\d+:\d+: replace main with \(\)$',
     'src/parse\.rs:\d+:\d+: replace \+= with (-=|\*=) in Token::content_outside_double_quotes$',
     "src/targets/mod\\.rs:\\d+:\\d+: replace HookFormat::extra_decision_pointers -> &'static\\[&'static str\\] with Vec::leak\\(Vec::new\\(\\)\\)$",
