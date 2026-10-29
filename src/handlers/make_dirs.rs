@@ -9,7 +9,22 @@ use crate::parse::Token;
 /// Whether a make line moves its folder more than once, or moves it and names a relative makefile.
 pub(crate) fn moves_its_folder_out_of_sight(tokens: &[Token]) -> bool {
     let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).collect();
-    let mut moves = 0usize;
+    let (moves, relative_makefile) = folder_options(&words);
+    moves.len() > 1 || (moves.len() == 1 && relative_makefile)
+}
+
+/// Whether a make line moves into a frozen folder or an installed package, whose makefile no commit
+/// of the project shows.
+pub(crate) fn moves_into_an_unreviewed_folder(tokens: &[Token]) -> bool {
+    let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).collect();
+    folder_options(&words)
+        .0
+        .iter()
+        .any(|dir| crate::engine::resolve::frozen_reach::is_unreviewed_folder(dir))
+}
+
+fn folder_options<'a>(words: &[&'a str]) -> (Vec<&'a str>, bool) {
+    let mut moves = Vec::new();
     let mut relative_makefile = false;
     let mut at = 0;
     while at < words.len() {
@@ -28,7 +43,7 @@ pub(crate) fn moves_its_folder_out_of_sight(tokens: &[Token]) -> bool {
                 at += 1;
             }
             if name == "directory" {
-                moves += 1;
+                moves.push(value.unwrap_or_default());
             } else {
                 relative_makefile |= value.is_none_or(|v| !v.starts_with('/'));
             }
@@ -49,14 +64,14 @@ pub(crate) fn moves_its_folder_out_of_sight(tokens: &[Token]) -> bool {
                 Some(rest)
             };
             match letter {
-                'C' => moves += 1,
+                'C' => moves.push(value.unwrap_or_default()),
                 'f' => relative_makefile |= value.is_none_or(|v| !v.starts_with('/')),
                 _ => {}
             }
             break;
         }
     }
-    moves > 1 || (moves == 1 && relative_makefile)
+    (moves, relative_makefile)
 }
 
 #[cfg(test)]

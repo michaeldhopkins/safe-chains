@@ -198,7 +198,13 @@ fn cwd_write_verdict(declared: Option<Anchor>, named_write: bool) -> Verdict {
 /// writing there would be approved.
 fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
     let runs = matches!(declared, Some(Anchor::ImplicitOutput | Anchor::RunsFolderCode));
-    if !runs || !super::moved_by_cd() || super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+    if !runs || super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    if crate::engine::resolve::frozen_reach::is_unreviewed_folder(".") {
+        return Verdict::Denied;
+    }
+    if !super::moved_by_cd() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     let frame = FrameGuard::push(None);

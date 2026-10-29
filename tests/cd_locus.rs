@@ -161,3 +161,27 @@ fn make_print_database_alone_is_refused() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+/// A frozen folder (`.git`, `.jj`, `.hg`, `.sl`) or an installed package folder holds files no
+/// commit of the project shows, so a tool that runs the code of the folder it runs in is refused
+/// there, however the name is spelled. A case or Unicode variant names the same folder only where the
+/// file system folds names, as macOS does.
+#[test]
+fn a_tool_that_runs_the_folders_code_is_refused_in_a_frozen_folder() {
+    let mut folders = vec![".git", ".jj", ".hg", ".sl", ".git/hooks", "node_modules/x", "src/.git"];
+    if cfg!(target_os = "macos") {
+        folders.extend([".GIT", ".ſl"]);
+    }
+    for command in ["make -n", "bundle list", "nox -l", "mvn validate", "task -l", "gradle tasks", "bundle exec rake -T"] {
+        for folder in &folders {
+            let line = format!("cd {folder} && {command}");
+            assert!(!approved(&line), "`{line}` was approved");
+        }
+    }
+    for command in ["make -n -C .git", "make -n -C .jj", "make -nC.git", "make -n --directory=.git", "make -n -C node_modules/x"] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in ["cd .git && ls", "cd .git && git log", "cd .git && cat HEAD", "cd src && make -n"] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}
