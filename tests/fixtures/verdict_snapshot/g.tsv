@@ -8387,18 +8387,22 @@ gitleaks detect --help --baseline-path x	safe-read
 gitleaks detect --help --no-banner	safe-read
 gitleaks detect --help x	safe-read
 gitleaks detect --log-level x	safe-read
+gitleaks detect --log-opts=--output=x	denied
 gitleaks detect --max-target-megabytes x	safe-read
 gitleaks detect --no-banner	safe-read
 gitleaks detect --no-color	safe-read
 gitleaks detect --redact	safe-read
 gitleaks detect --report-format x	safe-read
+gitleaks detect --report-path report.json	safe-read
 gitleaks detect --report-path x	safe-read
+gitleaks detect --report-path ~/.zshrc	denied
 gitleaks detect --source x	safe-read
 gitleaks detect --verbose	safe-read
 gitleaks detect -c x	safe-read
 gitleaks detect -h	safe-read
 gitleaks detect -l x	safe-read
 gitleaks detect -r x	safe-read
+gitleaks detect -r.git/config	denied
 gitleaks detect -s x	safe-read
 gitleaks detect -v	safe-read
 gitleaks detect x	safe-read
@@ -8419,6 +8423,7 @@ gitleaks protect --report-format x	safe-read
 gitleaks protect --report-path x	safe-read
 gitleaks protect --source x	safe-read
 gitleaks protect --staged	safe-read
+gitleaks protect --staged -r build/report.json	safe-read
 gitleaks protect --verbose	safe-read
 gitleaks protect -c x	safe-read
 gitleaks protect -h	safe-read
