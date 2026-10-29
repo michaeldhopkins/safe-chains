@@ -19,6 +19,7 @@ handler = "bundle_config"
 
 [[command.sub]]
 name = "exec"
+writes_cwd = "code"
 handler = "bundle_exec"
 
 [[command.sub]]

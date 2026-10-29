@@ -19,7 +19,7 @@ static classifier must not, and it would be TOCTOU-racy anyway):
   path, not as the tool its basename spells.)
 - A hard link is not seen: two names for one file are two paths.
 
-Four deliberate exceptions read the filesystem, all racing the shell (accepted in
+Five deliberate exceptions read the filesystem, all racing the shell (accepted in
 `docs/design/hard-problems.md` HP-5); keep them the only ones:
 
 - A glob starting with a pattern character (`ls *`) is listed against the known working directory at
@@ -39,6 +39,10 @@ Four deliberate exceptions read the filesystem, all racing the shell (accepted i
   project (`src/handlers/cargo_runs_this.rs`), after following links. An unknown or missing folder, or a
   manifest that does not parse or has no package of its own, counts as this project; so does a
   workspace with a member that is, or one whose members cannot all be read.
+- A Bundler subcommand that loads the bundle (`list`, `check`, `exec`, …) looks for `gems.rb` or
+  `Gemfile` in the folder it runs in and each folder above, as Bundler does, and judges the one it
+  finds as code run from that file (`src/handlers/ruby/gemfile.rs`), so a project with no Gemfile
+  does not load one from outside it.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`
