@@ -67,6 +67,34 @@ fn is_an_identity(name: &str) -> bool {
     name == "safe-chains" || crate::userconfig::AGENT_COMMANDS.contains(&name)
 }
 
+/// A shell handed a script from installed packages (`node_modules`) or a frozen folder (`.git`,
+/// `.envrc`), whose code no commit of the project's own shows, runs that code unjudged.
+pub(crate) fn runs_packaged_or_frozen(tokens: &[Token]) -> bool {
+    let mut words = tokens.iter().skip(1).map(Token::as_str);
+    let script = loop {
+        match words.next() {
+            Some("-o" | "+o" | "-O" | "+O") => {
+                words.next();
+            }
+            Some("--") => break words.next(),
+            Some(flag) if flag.starts_with(['-', '+']) && flag.len() > 1 => {
+                if !flag.starts_with("--") && flag.contains('c') {
+                    return false;
+                }
+            }
+            other => break other,
+        }
+    };
+    let fold = cfg!(target_os = "macos");
+    script.is_some_and(|path| {
+        path.contains('/')
+            && path.split('/').any(|part| {
+                crate::engine::resolve::frozen_walk::is_frozen(part)
+                    || if fold { part.eq_ignore_ascii_case("node_modules") } else { part == "node_modules" }
+            })
+    })
+}
+
 pub(crate) fn as_interpreter(tokens: &[Token]) -> Cow<'_, [Token]> {
     if tokens.first().is_some_and(|t| is_relative_command_path(t.as_str())) {
         let mut owned = Vec::with_capacity(tokens.len() + 1);
@@ -287,7 +315,7 @@ mod tests {
         let cmd = ".git/hooks/post-checkout";
         let verdict = crate::command_verdict(cmd);
         assert_eq!(verdict, crate::command_verdict(&format!("bash {cmd}")));
-        assert_eq!(verdict, Verdict::Allowed(SafetyLevel::SafeWrite));
+        assert_eq!(verdict, Verdict::Denied);
         let spelled = ".git/hooks/pre-commit";
         assert_eq!(
             crate::command_verdict(spelled),

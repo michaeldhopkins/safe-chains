@@ -165,6 +165,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
         "ditto" | "xar" | "xip" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
         "man" | "apropos" | "manpath" => shell_text::man_evaluates_a_word(tokens),
         "zless" | "zcmp" | "bzcmp" => shell_text::splits_a_flag(tokens),
+        "bash" | "sh" | "zsh" | "dash" | "ksh" => direct_script::runs_packaged_or_frozen(tokens),
         _ => false,
     };
     specific || followed_read::follows_a_secret(tokens)
