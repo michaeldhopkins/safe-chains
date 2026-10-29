@@ -32,6 +32,20 @@ pub(crate) fn splits_a_flag(tokens: &[Token]) -> bool {
         .any(|word| word.contains(SPLIT))
 }
 
+/// macOS `zless` starts `$PAGER`, less only when it is unset, with the flags it gathered. Set to
+/// more, `-p` is a command more runs at startup (`-p'!sh'`), so on a line that may set `PAGER` a
+/// zless `-p` or `--pattern` is refused in every spelling.
+pub(crate) fn hands_a_pattern_to_another_pager(tokens: &[Token]) -> bool {
+    crate::cst::pager_may_be_set() && tokens.iter().skip(1).map(Token::as_str).any(names_a_pattern)
+}
+
+fn names_a_pattern(word: &str) -> bool {
+    match word.strip_prefix("--") {
+        Some(long) => long.split_once('=').map_or(long, |(name, _)| name) == "pattern",
+        None => word.strip_prefix('-').is_some_and(|letters| letters.contains('p')),
+    }
+}
+
 #[cfg(test)]
 #[path = "shell_text_tests.rs"]
 mod tests;

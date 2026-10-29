@@ -48,9 +48,9 @@ pub(super) fn script_verdict(script: &Script) -> Verdict {
 /// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
 pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
     let (_walk, _dot_names) = (ScopeWalk::enter(), super::opaque::glob::enter_dot_names(script));
+    let _pager = super::pager_set::enter_pager_set(script);
     let mut running = crate::pathctx::cwd();
-    let mut _vars: Vec<crate::pathctx::VarGuard> = Vec::new();
-    let mut _funcs: Vec<FuncScope> = Vec::new();
+    let (mut _vars, mut _funcs): (Vec<crate::pathctx::VarGuard>, Vec<FuncScope>) = (Vec::new(), Vec::new());
     let mut out = Vec::with_capacity(script.0.len());
     for stmt in &script.0 {
         out.push({

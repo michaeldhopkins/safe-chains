@@ -172,7 +172,8 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
         "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
         "ditto" | "xar" | "xip" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
         "man" | "apropos" | "manpath" => shell_text::man_evaluates_a_word(tokens),
-        "zless" | "zmore" | "zcmp" | "bzcmp" => shell_text::splits_a_flag(tokens),
+        "zless" => shell_text::splits_a_flag(tokens) || shell_text::hands_a_pattern_to_another_pager(tokens),
+        "zmore" | "zcmp" | "bzcmp" => shell_text::splits_a_flag(tokens),
         "bash" | "sh" | "zsh" | "dash" | "ksh" => direct_script::runs_packaged_or_frozen(tokens),
         _ => false,
     };

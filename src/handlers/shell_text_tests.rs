@@ -124,3 +124,19 @@ fn the_reviewed_zless_spellings() {
         assert!(allowed(cmd), "should be allowed: {cmd}");
     }
 }
+
+proptest! {
+    /// Once the line may set `PAGER`, a zless pattern in every spelling is refused, and without it
+    /// the same pattern stays a less search.
+    #[test]
+    fn a_zless_pattern_follows_whether_the_line_sets_the_pager(
+        pattern in "[A-Za-z0-9]{1,8}",
+        spelling in prop::sample::select(vec!["-p{}", "-p {}", "--pattern={}", "--pattern {}", "-ip{}", "-i -p{}"]),
+        setter in prop::sample::select(vec!["PAGER=more ", "export PAGER=more; ", "PAGER=/usr/bin/more; ", "env PAGER=more "]),
+    ) {
+        let invocation = format!("zless {} ./a.gz", spelling.replace("{}", &pattern));
+        prop_assert!(allowed(&invocation), "{}", invocation);
+        let line = format!("{setter}{invocation}");
+        prop_assert!(!allowed(&line), "{}", line);
+    }
+}
