@@ -468,7 +468,7 @@ gifsicle	description,examples,no-overlap
 git	no-tolerance,profiled,version
 git-cliff	examples,version
 git-lfs	examples,version
-gitleaks	examples,version
+gitleaks	version
 gkill	description,examples
 glab	description,examples,no-overlap
 glances	description,examples
