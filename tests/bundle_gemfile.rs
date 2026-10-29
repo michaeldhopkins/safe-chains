@@ -64,3 +64,18 @@ fn bundle_exec_runs_the_folder_code_of_a_folder_a_cd_moved_to() {
         }
     }
 }
+
+#[test]
+fn naming_its_gemfile_stops_bundler_looking_above_the_project_except_for_exec() {
+    let layout = layout();
+    let bare = layout.outer.join("bare");
+    for command in [
+        "bundle install --gemfile=src/Gemfile", "bundle install --gemfile src/Gemfile", "bundle check --gemfile=src/Gemfile",
+        "bundle check --gemfile src/Gemfile",
+    ] {
+        assert!(approved_in(&bare, command), "`{command}` names its Gemfile and should be approved");
+    }
+    for command in ["bundle exec --gemfile=src/Gemfile gem --version", "bundle exec --gemfile src/Gemfile gem --version"] {
+        assert!(!approved_in(&bare, command), "`{command}` was approved");
+    }
+}

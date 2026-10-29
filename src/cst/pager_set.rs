@@ -86,6 +86,24 @@ mod tests {
         }
     }
 
+    #[test]
+    fn a_setter_in_either_half_of_a_loop_or_branch_marks_the_line() {
+        let set = "declare -x P\"AGER\"=more";
+        for form in [
+            format!("while {set}; do :; done"),
+            format!("while true; do {set}; done"),
+            format!("until {set}; do :; done"),
+            format!("until true; do {set}; done"),
+            format!("if {set}; then :; fi"),
+            format!("if true; then {set}; fi"),
+            format!("if false; then :; elif {set}; then :; fi"),
+            format!("if false; then :; elif true; then {set}; fi"),
+            format!("if false; then :; else {set}; fi"),
+        ] {
+            assert!(sets(&form), "{form}");
+        }
+    }
+
     proptest! {
         /// Every way of putting `PAGER` into the line marks it, wherever it sits.
         #[test]

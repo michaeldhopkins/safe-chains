@@ -141,7 +141,7 @@ mod tests {
         for cmd in [
             "export", "export -p", "export -n", "export -p FOO", "export -- ", "declare", "declare -p", "declare -p PATH", "declare -x",
             "declare -xp", "declare -r", "declare OPENAI_API_KEY", "typeset", "typeset -x", "typeset -p", "typeset GITHUB_TOKEN",
-            "typeset +x", "ps eww", "ps e", "ps auxe", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
+            "typeset +x", "ps eww", "ps e", "ps auxe", "ps a e", "ps aux e", "ps ax eww", "ps -o command e", "mise env", "mise env -s bash", "mise env --json", "mise set",
             "mise set OPENAI_API_KEY", "mise set -g", "mise set --remove X OPENAI_API_KEY", "mise set FAKEKEY --remove X",
             "mise set --remove=X FAKEKEY", "launchctl print gui/501", "launchctl print system", "launchctl dumpstate", "export -",
             "export +", "declare -", "declare +", "typeset -", "typeset +", "typeset -m '*'", "typeset -m 'OPENAI*'", "declare -m 'A*'",

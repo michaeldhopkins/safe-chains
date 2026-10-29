@@ -441,3 +441,22 @@ fn every_spelling_of_a_pax_copy_into_frozen_metadata_is_refused() {
         assert!(at(&p, &cmd).is_allowed(), "{cmd} was refused");
     }
 }
+
+#[test]
+fn zip_reading_names_from_a_pipe_is_refused_when_the_source_of_names_is_unknown() {
+    let plain = with_secret_link(false);
+    for cmd in ["cat names.txt | zip -@ out.zip", "cat names.txt | zip -y -@ out.zip", "cat names.txt | zip -y --names-stdin out.zip"] {
+        assert!(!at(&plain, cmd).is_allowed(), "{cmd} was approved with names nothing can check");
+    }
+}
+
+#[test]
+fn zip_after_the_option_terminator_reads_its_operands_but_not_the_terminator() {
+    let linked = with_secret_link(true);
+    for cmd in ["zip -r out.zip -- k", "zip -r -- out.zip k"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+    // A file named `--` is no operand: the terminator itself is not read as an input.
+    std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", format!("{}/--", linked.root)).expect("link named as the terminator");
+    assert!(at(&linked, "zip -r out.zip -- src").is_allowed(), "the option terminator was read as an input");
+}
