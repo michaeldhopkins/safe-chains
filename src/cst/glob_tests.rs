@@ -90,3 +90,50 @@ fn a_line_that_turns_on_dot_names_matches_them() {
         assert!(!allowed_in(dir.path(), cmd), "`{cmd}` approved deleting .envrc");
     }
 }
+
+/// The shell removes quotes and escapes and expands braces before `shopt` sees its option, so no
+/// spelling of a dot-names option turns it on unnoticed.
+#[test]
+fn a_dot_names_option_is_seen_however_it_is_spelt() {
+    let dir = folder(&["a.txt", ".envrc"]);
+    for setting in [
+        "shopt -s dot''glob", "shopt -s dot\\glob", "shopt -s \"dot\"glob", "shopt -s {dot,x}glob", "shopt -s dot{glob,}",
+        "shopt -s $'\\x64otglob'", "sh''opt -s dot\"\"glob", "builtin shopt -s dot''glob", "command shopt -s dot''glob",
+        "setopt glob\\_dots", "unsetopt no''globdots", "export GLOB''IGNORE=x", "export GLOB{IGNORE,}=x", "{ shopt -s dot''glob; }",
+    ] {
+        let cmd = format!("{setting}; rm *");
+        assert!(!allowed_in(dir.path(), &cmd), "`{cmd}` approved deleting .envrc");
+    }
+    for cmd in ["shopt -s nullglob; rm *", "shopt -s extglob; rm *", "shopt -s globstar; rm *", "export FOO=bar; rm *"] {
+        assert!(allowed_in(dir.path(), cmd), "`{cmd}` refused though it leaves dot names off");
+    }
+}
+
+fn spellings_of(name: &'static str) -> impl Strategy<Value = String> {
+    prop::collection::vec(prop::sample::select(vec!["", "''", "\"\"", "\\"]), name.len()).prop_map(move |cuts| {
+        let mut out = String::new();
+        for (c, cut) in name.chars().zip(cuts) {
+            if c.is_ascii_alphabetic() {
+                out.push_str(cut);
+            }
+            out.push(c);
+        }
+        out
+    })
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(64))]
+    #[test]
+    fn no_quoting_of_dotglob_hides_it(
+        setting in prop_oneof![
+            spellings_of("dotglob").prop_map(|o| format!("shopt -s {o}")),
+            spellings_of("GLOB_DOTS").prop_map(|o| format!("setopt {o}")),
+            spellings_of("GLOBIGNORE").prop_map(|o| format!("{o}=x")),
+        ]
+    ) {
+        let dir = folder(&["a.txt", ".envrc"]);
+        let cmd = format!("{setting}; rm *");
+        prop_assert!(!allowed_in(dir.path(), &cmd), "`{}` approved deleting .envrc", cmd);
+    }
+}

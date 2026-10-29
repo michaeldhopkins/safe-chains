@@ -47,7 +47,7 @@ pub(super) fn script_verdict(script: &Script) -> Verdict {
 /// per-segment explain classified the `ls` call without the definition in scope, the hook's coverage
 /// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
 pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
-    let (_walk, _dot_names) = (ScopeWalk::enter(), super::opaque::glob::enter_dot_names(&script.to_string()));
+    let (_walk, _dot_names) = (ScopeWalk::enter(), super::opaque::glob::enter_dot_names(script));
     let mut running = crate::pathctx::cwd();
     let mut _vars: Vec<crate::pathctx::VarGuard> = Vec::new();
     let mut _funcs: Vec<FuncScope> = Vec::new();
