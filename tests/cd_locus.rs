@@ -133,3 +133,20 @@ fn a_build_tool_that_evaluates_the_folders_files_keeps_its_verdict_inside_the_pr
         assert!(approved(command), "`{command}` runs no build script");
     }
 }
+
+/// make applies each `-C` in turn, each relative to the last, and reads a relative `-f` from the
+/// folder the last one reached, so a line with more than one `-C`, or a `-C` and a relative `-f`,
+/// names a folder no single operand shows.
+#[test]
+fn make_folders_given_more_than_once_are_refused() {
+    for command in [
+        "cd src && make -n -C .. -C ..", "make -n -C src -C ..", "make -n -C src -C .. -C ..", "cd src && make -n -C .. -f ../Makefile",
+        "make -n -C src -f Makefile", "make -n --directory=src --directory=..", "cd src && make -nC .. -C ..", "make -nCsrc -C..",
+        "make -n --directory src -C ..", "make -n -C src --file=../Makefile",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in ["cd src && make -n -C ..", "make -n -C src", "make -nC src", "make -n -f Makefile", "make -n -C src all"] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}

@@ -262,6 +262,10 @@ owed = [
 "src/handlers/coreutils/rsync_remote.rs" = [
   "a_remote_option_is_judged_as_the_same_option_given_locally",
 ]
+"src/handlers/make_dirs.rs" = [
+  "a_second_move_is_refused",
+  "a_move_with_a_relative_makefile_is_refused",
+]
 "src/handlers/make_text.rs" = [
   "an_assignment_operand_is_refused",
   "a_makefile_from_stdin_is_refused",
