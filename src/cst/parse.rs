@@ -10,7 +10,7 @@ use winnow::ModalResult;
 use winnow::combinator::{alt, delimited, not, opt, preceded, repeat, separated, terminated};
 use winnow::error::{ContextError, ErrMode};
 use winnow::prelude::*;
-use winnow::token::{any, one_of, take_while};
+use winnow::token::{any, take_while};
 
 pub fn parse(input: &str) -> Option<Script> {
     heredocs::reset();
@@ -738,7 +738,7 @@ fn lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<WordPart>
 
 fn dollar_lit(pred: fn(char) -> bool) -> impl FnMut(&mut &str) -> ModalResult<WordPart> {
     move |input: &mut &str| {
-        (not(("${", one_of([' ', '\t', '\n', '|']))), '$', not('(')).void().parse_next(input)?;
+        (not(escape::opens_function_substitution), '$', not('(')).void().parse_next(input)?;
         let rest: &str = consumed(input, |i| take_while(0.., pred).parse_next(i))?;
         Ok(WordPart::Lit(format!("${rest}")))
     }

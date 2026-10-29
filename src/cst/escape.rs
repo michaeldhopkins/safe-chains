@@ -264,6 +264,18 @@ pub(super) fn dq_escape(input: &mut &str) -> ModalResult<WordPart> {
         .parse_next(input)
 }
 
+/// bash 5.3's `${ cmd; }` and `${| cmd; }`, with any line continuations after the `${` that a
+/// double-quoted or here-document word drops before bash reads the expansion.
+pub(super) fn opens_function_substitution(input: &mut &str) -> ModalResult<()> {
+    let Some(mut rest) = input.strip_prefix("${") else {
+        return Err(ErrMode::Backtrack(ContextError::new()));
+    };
+    while let Some(after) = rest.strip_prefix("\\\n") {
+        rest = after;
+    }
+    if rest.starts_with([' ', '\t', '\n', '|']) { Ok(()) } else { Err(ErrMode::Backtrack(ContextError::new())) }
+}
+
 #[cfg(test)]
 #[path = "escape_tests.rs"]
 mod tests;

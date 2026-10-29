@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc c6961bd26f478034637a393247f2bd12195d320fa95029a3113b5d783c91848f # shrinks to context = "echo X", opener = "${ ", body = ""
+cc 1c36057b924c3f60fba1c8f5c451ac7eea4cb255261b60417d3ec41eb616ae48 # shrinks to context = "echo \"X\"", opener = "${\\\n ", body = ""
