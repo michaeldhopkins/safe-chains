@@ -181,11 +181,11 @@ fn every_variable_less_reads_is_audited_or_explained() {
     }
 }
 
-/// The zless macOS ships runs `$PAGER`, less only by default, and hands it its flags. Set to more,
-/// `-p` is a command more runs at startup, so a line that sets `PAGER` anywhere keeps `-p` from
-/// zless.
+/// The zless and zmore macOS ships run `$PAGER`, less or more only by default, and hand it their
+/// flags. Set to more, `-p` is a command more runs at startup, and set to pax, `-r` extracts the
+/// archive, so a line that sets `PAGER` anywhere keeps every flag from zless and zmore.
 #[test]
-fn a_zless_pattern_is_refused_when_the_line_sets_the_pager() {
+fn a_zless_flag_is_refused_when_the_line_sets_the_pager() {
     for command in [
         "PAGER=more zless -p'!sh<../evil/x' b.txt.gz",
         "PAGER=more zless -p'!{touch,ZL3}' b.txt.gz",
@@ -200,12 +200,18 @@ fn a_zless_pattern_is_refused_when_the_line_sets_the_pager() {
         "env PAGER=more zless -p'!id' b.txt.gz",
         "declare -x P\"AGER\"=more; zless -p'!id' b.txt.gz",
         "bash -c \"PAGER=more zless -p'!id' b.txt.gz\"",
+        "PAGER=pax zless -r a.gz",
+        "PAGER=pax zmore -r a.gz",
+        "export PAGER=pax; zless -r a.gz",
+        "env PAGER=pax zless -r a.gz",
+        "PAGER=less zless -i a.gz",
     ] {
-        assert!(!safe_chains::is_safe_command(command), "{command} must be refused: the pager may be more");
+        assert!(!safe_chains::is_safe_command(command), "{command} must be refused: the pager may be another program");
     }
-    for command in
-        ["zless -p TODO a.gz", "zless -p'TODO' a.gz", "zless --pattern=TODO a.gz", "PAGER=more zless a.gz", "PAGER=less zless -i a.gz"]
-    {
+    for command in [
+        "zless -p TODO a.gz", "zless -p'TODO' a.gz", "zless --pattern=TODO a.gz", "PAGER=more zless a.gz", "zless -r a.gz",
+        "zmore -r a.gz", "PAGER=cat zless a.gz",
+    ] {
         assert!(safe_chains::is_safe_command(command), "{command} must stay approved");
     }
 }

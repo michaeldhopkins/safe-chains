@@ -126,17 +126,59 @@ fn the_reviewed_zless_spellings() {
 }
 
 proptest! {
-    /// Once the line may set `PAGER`, a zless pattern in every spelling is refused, and without it
-    /// the same pattern stays a less search.
+    /// Once the line may set `PAGER`, any flag zless or zmore would hand the pager is refused, and
+    /// without it the same flag stays a flag for less or more.
     #[test]
-    fn a_zless_pattern_follows_whether_the_line_sets_the_pager(
-        pattern in "[A-Za-z0-9]{1,8}",
-        spelling in prop::sample::select(vec!["-p{}", "-p {}", "--pattern={}", "--pattern {}", "-ip{}", "-i -p{}"]),
-        setter in prop::sample::select(vec!["PAGER=more ", "export PAGER=more; ", "PAGER=/usr/bin/more; ", "env PAGER=more "]),
+    fn a_zless_flag_follows_whether_the_line_sets_the_pager(
+        value in "[A-Za-z0-9]{1,8}",
+        program in prop::sample::select(vec!["zless", "zmore"]),
+        (spelling, zless_only) in prop::sample::select(vec![
+            ("-r", false), ("-R", false), ("-i", false), ("-S -N", false), ("--quiet", false), ("--raw-control-chars", false),
+            ("-P {}", false), ("-x{}", false), ("--prompt={}", false), ("-i -- ", false),
+            ("-p{}", true), ("-p {}", true), ("--pattern={}", true), ("--pattern {}", true), ("-ip{}", true), ("-i -p{}", true),
+        ]),
+        setter in prop::sample::select(vec![
+            "PAGER=more ", "export PAGER=more; ", "PAGER=/usr/bin/more; ", "env PAGER=more ", "PAGER=pax ", "export PAGER=pax; ",
+            "env PAGER=pax ",
+        ]),
     ) {
-        let invocation = format!("zless {} ./a.gz", spelling.replace("{}", &pattern));
+        let program = if zless_only { "zless" } else { program };
+        let invocation = format!("{program} {} ./a.gz", spelling.replace("{}", &value));
         prop_assert!(allowed(&invocation), "{}", invocation);
         let line = format!("{setter}{invocation}");
         prop_assert!(!allowed(&line), "{}", line);
+    }
+
+    /// Once the line may set `PAGER`, a first argument the shell could still turn into a flag (a
+    /// brace, a pattern, a quoted or substituted word) is refused as a flag would be.
+    #[test]
+    fn a_zless_first_word_that_may_become_a_flag_follows_the_pager(
+        program in prop::sample::select(vec!["zless", "zmore"]),
+        first in prop::sample::select(vec![
+            "{,-r}", "{,,-r}", "{,-pid}", "{,-psX}", "[-]r", "?r", "*", "-r", "'-r'", "\"-r\"", "''", "$x", "$(echo -r)",
+            "{-r,a}", "a*",
+        ]),
+        setter in prop::sample::select(vec!["PAGER=pax ", "export PAGER=pax; ", "env PAGER=pax ", "PAGER=more "]),
+    ) {
+        let line = format!("{setter}{program} {first} ./a.gz");
+        prop_assert!(!allowed(&line), "{}", line);
+    }
+}
+
+#[test]
+fn a_set_pager_still_pages_without_flags() {
+    for cmd in [
+        "PAGER=cat zless ./a.gz", "PAGER=cat zmore ./a.gz", "PAGER=cat zless -- ./a.gz", "export PAGER=cat; zless ./a.gz",
+        "PAGER=cat zless a.gz", "PAGER=pax zless -- a.gz", "zless {,-r} a.gz",
+    ] {
+        assert!(allowed(cmd), "should be allowed: {cmd}");
+    }
+    for cmd in [
+        "PAGER=pax zless -r a.tar.gz", "PAGER=pax zmore -r a.tar.gz", "export PAGER=pax; zless -r a.gz", "env PAGER=pax zless -r a.gz",
+        "PAGER=pax zless {,-r} a.tar.gz", "PAGER=pax zmore {,-r} a.gz", "PAGER=pax zless {,,-r} a.gz",
+        "export PAGER=pax; zless {,-r} a.gz", "env PAGER=pax zless {,-r} a.gz", "touch ./-r; PAGER=pax zless [-]r a.tar.gz",
+        "touch ./-r; PAGER=pax zless ?r a.tar.gz", "PAGER=more zless {,-pid} a.gz", "PAGER=more zless {,-psX} a.gz",
+    ] {
+        assert!(!allowed(cmd), "should be refused: {cmd}");
     }
 }

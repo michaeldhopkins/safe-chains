@@ -32,18 +32,18 @@ pub(crate) fn splits_a_flag(tokens: &[Token]) -> bool {
         .any(|word| word.contains(SPLIT))
 }
 
-/// macOS `zless` starts `$PAGER`, less only when it is unset, with the flags it gathered. Set to
-/// more, `-p` is a command more runs at startup (`-p'!sh'`), so on a line that may set `PAGER` a
-/// zless `-p` or `--pattern` is refused in every spelling.
-pub(crate) fn hands_a_pattern_to_another_pager(tokens: &[Token]) -> bool {
-    crate::cst::pager_may_be_set() && tokens.iter().skip(1).map(Token::as_str).any(names_a_pattern)
+/// macOS `zless` and `zmore` start `$PAGER`, less or more only when it is unset, with the flags
+/// they gathered. Set to another program, those flags are that program's: `PAGER=pax zless -r` has
+/// pax extract the archive, and set to more, `-p` is a command more runs at startup (`-p'!sh'`).
+/// So on a line that may set `PAGER`, the first argument must be `--` or a plain file name: one
+/// that starts with `-`, or that a brace, a pattern or a substitution could still turn into a flag
+/// (`{,-r}`, `[-]r`), is refused, and so is no argument at all.
+pub(crate) fn hands_flags_to_another_pager(tokens: &[Token]) -> bool {
+    crate::cst::pager_may_be_set() && !tokens.get(1).map(Token::as_str).is_some_and(|word| word == "--" || is_plain_file_name(word))
 }
 
-fn names_a_pattern(word: &str) -> bool {
-    match word.strip_prefix("--") {
-        Some(long) => long.split_once('=').map_or(long, |(name, _)| name) == "pattern",
-        None => word.strip_prefix('-').is_some_and(|letters| letters.contains('p')),
-    }
+fn is_plain_file_name(word: &str) -> bool {
+    !word.is_empty() && !word.starts_with('-') && !word.contains(['{', '}', '*', '?', '[', '$', '`']) && !word.contains("__SAFE_CHAINS_")
 }
 
 #[cfg(test)]

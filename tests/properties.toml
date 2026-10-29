@@ -422,7 +422,7 @@ owed = [
   "src/cst/printed_tests.rs::the_utility_is_never_replaced",
 ]
 "src/handlers/shell_text.rs" = [
-  "src/handlers/shell_text_tests.rs::a_zless_pattern_follows_whether_the_line_sets_the_pager",
+  "src/handlers/shell_text_tests.rs::a_zless_flag_follows_whether_the_line_sets_the_pager",
   "src/handlers/shell_text_tests.rs::a_word_the_man_script_would_evaluate_is_refused",
   "src/handlers/shell_text_tests.rs::a_variable_the_man_script_would_evaluate_is_refused",
   "src/handlers/shell_text_tests.rs::a_plain_word_is_not_shell_text",
