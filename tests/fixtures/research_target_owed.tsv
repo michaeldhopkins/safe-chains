@@ -168,10 +168,9 @@ bunx	entry
 bw	description,examples,no-overlap,no-tolerance,profiled
 byacc	description,examples
 byebug	description,examples
-bzcmp	description,examples,no-tolerance
-bzgrep	description,examples,no-tolerance
+bzcmp	description,no-tolerance
+bzgrep	description,no-tolerance
 bzip2	description,examples
-bzmore	description,examples
 c8	description,examples
 c89	description,examples
 c99	description,examples
@@ -764,7 +763,7 @@ lua	examples,version
 luarocks	description,examples,no-tolerance,profiled
 lz4	description,examples,no-overlap
 lzip	description,examples,no-overlap
-lzmainfo	description,examples
+lzmainfo	description
 m	description,examples
 m4	description,examples,profiled
 macbinary	description,examples,no-tolerance
@@ -1524,10 +1523,10 @@ xsv	description,examples,no-tolerance,version
 xv	description,examples,no-tolerance,version
 xxd	description,examples,version
 xz	description,examples,no-overlap
-xzcmp	description,examples,no-tolerance
-xzdec	description,examples
-xzgrep	description,examples,no-tolerance
-xzless	description,examples
+xzcmp	description,no-tolerance
+xzdec	description
+xzgrep	description,no-tolerance
+xzless	description
 yacc	description,examples
 yamllint	description,examples,no-tolerance
 yapf	description,examples

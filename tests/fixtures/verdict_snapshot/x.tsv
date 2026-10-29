@@ -1439,6 +1439,7 @@ xzcmp --help x	inert
 xzcmp --version	inert
 xzcmp ./a.xz ./b.xz	inert
 xzcmp x	inert
+xzcmp ~/.ssh/id_ed25519 ./b.xz	denied
 xzdec	inert
 xzdec --decompress	inert
 xzdec --decompress --help	inert
@@ -1460,6 +1461,7 @@ xzdec -k	inert
 xzdec -q	inert
 xzdec ./a.xz	inert
 xzdec x	inert
+xzdec ~/.ssh/id_ed25519	denied
 xzdiff	denied
 xzdiff --help	inert
 xzdiff --help --version	inert
@@ -1479,8 +1481,10 @@ xzgrep --help	denied
 xzgrep --version	denied
 xzgrep TODO ./log.xz	inert
 xzgrep x	inert
+xzgrep x ~/.ssh/id_ed25519	denied
 xzgrep x ~/.ssh/id_rsa	denied
 xzless	inert
+xzless '+!id' ./a.xz	denied
 xzless --LINE-NUMBERS	inert
 xzless --LINE-NUMBERS --LONG-PROMPT	inert
 xzless --LINE-NUMBERS --pattern x	inert
@@ -1532,6 +1536,7 @@ xzless -i	inert
 xzless -j x	inert
 xzless -m	inert
 xzless -n	inert
+xzless -o ./log ./a.xz	denied
 xzless -p x	inert
 xzless -q	inert
 xzless -r	inert
@@ -1544,9 +1549,10 @@ xzless -z x	inert
 xzless ./a.xz	inert
 xzless x	inert
 xzmore	inert
+xzmore '+!id' ./a.xz	denied
 xzmore --LINE-NUMBERS	inert
 xzmore --LINE-NUMBERS --LONG-PROMPT	inert
-xzmore --LINE-NUMBERS --pattern x	inert
+xzmore --LINE-NUMBERS --prompt x	inert
 xzmore --LINE-NUMBERS x	inert
 xzmore --LONG-PROMPT	inert
 xzmore --QUIT-AT-EOF	inert
@@ -1555,7 +1561,6 @@ xzmore --chop-long-lines	inert
 xzmore --help	inert
 xzmore --ignore-case	inert
 xzmore --no-init	inert
-xzmore --pattern x	inert
 xzmore --prompt x	inert
 xzmore --quiet	inert
 xzmore --quit-at-eof	inert
@@ -1595,7 +1600,7 @@ xzmore -i	inert
 xzmore -j x	inert
 xzmore -m	inert
 xzmore -n	inert
-xzmore -p x	inert
+xzmore -p '!id' ./a.xz	denied
 xzmore -q	inert
 xzmore -r	inert
 xzmore -s	inert
@@ -1604,4 +1609,5 @@ xzmore -w	inert
 xzmore -x x	inert
 xzmore -y x	inert
 xzmore -z x	inert
+xzmore ./a.xz	inert
 xzmore x	inert

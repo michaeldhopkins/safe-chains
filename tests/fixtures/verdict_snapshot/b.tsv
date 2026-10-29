@@ -2791,6 +2791,7 @@ bzcmp --version	denied
 bzcmp ./a.bz2 ./b.bz2	inert
 bzcmp a.bz2 b.bz2	inert
 bzcmp x	inert
+bzcmp ~/.ssh/id_ed25519 ./b.bz2	denied
 bzdiff	denied
 bzdiff --help	denied
 bzdiff --version	denied
@@ -2809,6 +2810,7 @@ bzgrep --help	denied
 bzgrep --version	denied
 bzgrep TODO ./log.bz2	inert
 bzgrep x	inert
+bzgrep x ~/.ssh/id_ed25519	denied
 bzgrep x ~/.ssh/id_rsa	denied
 bzip2	safe-write
 bzip2 --compress	safe-write
@@ -2893,6 +2895,7 @@ bzip2recover -v	safe-write
 bzip2recover -z	safe-write
 bzip2recover x	safe-write
 bzless	inert
+bzless '+!id' ./a.bz2	denied
 bzless --LINE-NUMBERS	inert
 bzless --LINE-NUMBERS --LONG-PROMPT	inert
 bzless --LINE-NUMBERS --pattern x	inert
@@ -2944,6 +2947,8 @@ bzless -i	inert
 bzless -j x	inert
 bzless -m	inert
 bzless -n	inert
+bzless -o ./log ./a.bz2	denied
+bzless -p TODO ./a.bz2	inert
 bzless -p x	inert
 bzless -q	inert
 bzless -r	inert
@@ -2953,11 +2958,13 @@ bzless -w	inert
 bzless -x x	inert
 bzless -y x	inert
 bzless -z x	inert
+bzless ./a.bz2	inert
 bzless x	inert
 bzmore	inert
+bzmore '+!id' ./a.bz2	denied
 bzmore --LINE-NUMBERS	inert
 bzmore --LINE-NUMBERS --LONG-PROMPT	inert
-bzmore --LINE-NUMBERS --pattern x	inert
+bzmore --LINE-NUMBERS --prompt x	inert
 bzmore --LINE-NUMBERS x	inert
 bzmore --LONG-PROMPT	inert
 bzmore --QUIT-AT-EOF	inert
@@ -2966,7 +2973,6 @@ bzmore --chop-long-lines	inert
 bzmore --help	inert
 bzmore --ignore-case	inert
 bzmore --no-init	inert
-bzmore --pattern x	inert
 bzmore --prompt x	inert
 bzmore --quiet	inert
 bzmore --quit-at-eof	inert
@@ -3006,7 +3012,7 @@ bzmore -i	inert
 bzmore -j x	inert
 bzmore -m	inert
 bzmore -n	inert
-bzmore -p x	inert
+bzmore -p '!id' ./a.bz2	denied
 bzmore -q	inert
 bzmore -r	inert
 bzmore -s	inert

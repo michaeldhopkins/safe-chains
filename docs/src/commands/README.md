@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1619 commands across 75 categories.
+safe-chains knows 1622 commands across 75 categories.
 
 ## Glossary
 
@@ -21,7 +21,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Android](android.md) (10 commands)
 - [Ansible](ansible.md) (7 commands)
 - [API / Load Testing](api.md) (12 commands)
-- [Compression / Archive](archive.md) (51 commands)
+- [Compression / Archive](archive.md) (54 commands)
 - [Binary Analysis](binary.md) (8 commands)
 - [Blockchain / Crypto](blockchain.md) (20 commands)
 - [Build Systems](build.md) (25 commands)

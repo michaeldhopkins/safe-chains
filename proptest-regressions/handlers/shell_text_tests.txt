@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 21858dcd343aa1842cc790441f7c7c062da42d1adac75244dc25be6d4f097745 # shrinks to program = "man", word = "\""
+cc 29217a9a71f6835d74985a2ab45ab265ff7809e79393b05fd9960160f902cee5 # shrinks to program = "zmore", before = [], flag = "--prompt=", value = "", c = ' ', rest = ""

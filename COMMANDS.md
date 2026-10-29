@@ -2491,13 +2491,23 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - Allowed standalone flags: --compress, --decompress, --exponential, --fast, --force, --help, --keep, --license, --quiet, --repetitive-best, --repetitive-fast, --small, --stdout, --test, --verbose, --version, -1, -2, -3, -4, -5, -6, -7, -8, -9, -L, -V, -c, -d, -f, -h, -k, -q, -s, -t, -v, -z
 - Bare invocation allowed
 
-### `bzmore`
+### `bzless`
 <p class="cmd-url"><a href="https://sourceware.org/bzip2/">https://sourceware.org/bzip2/</a></p>
-
-Aliases: `bzless`
 
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --pattern, --prompt, --shift, --tabs, --tag, --window
+- Bare invocation allowed
+
+**Examples:**
+
+- `bzless ./a.bz2`
+- `bzless -p TODO ./a.bz2`
+
+### `bzmore`
+<p class="cmd-url"><a href="https://sourceware.org/bzip2/">https://sourceware.org/bzip2/</a></p>
+
+- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
+- Allowed valued flags: -P, -b, -h, -j, -t, -x, -y, -z, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
 
 **Examples:**
@@ -17541,7 +17551,7 @@ Aliases: `xzegrep`, `xzfgrep`, `lzgrep`, `lzegrep`, `lzfgrep`
 ### `xzless`
 <p class="cmd-url"><a href="https://tukaani.org/xz/">https://tukaani.org/xz/</a></p>
 
-Aliases: `xzmore`, `lzless`, `lzmore`
+Aliases: `lzless`
 
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --pattern, --prompt, --shift, --tabs, --tag, --window
@@ -17550,6 +17560,19 @@ Aliases: `xzmore`, `lzless`, `lzmore`
 **Examples:**
 
 - `xzless ./a.xz`
+
+### `xzmore`
+<p class="cmd-url"><a href="https://tukaani.org/xz/">https://tukaani.org/xz/</a></p>
+
+Aliases: `lzmore`
+
+- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
+- Allowed valued flags: -P, -b, -h, -j, -t, -x, -y, -z, --prompt, --shift, --tabs, --tag, --window
+- Bare invocation allowed
+
+**Examples:**
+
+- `xzmore ./a.xz`
 
 ### `yacc`
 <p class="cmd-url"><a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/yacc.html">https://pubs.opengroup.org/onlinepubs/9699919799/utilities/yacc.html</a></p>
@@ -17870,8 +17893,6 @@ Aliases: `zegrep`, `zfgrep`
 ### `zless`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gzip/">https://www.gnu.org/software/gzip/</a></p>
 
-Aliases: `zmore`
-
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
@@ -17886,6 +17907,17 @@ Aliases: `zmore`
 - Allowed standalone flags: -compress, -uncompress
 - Allowed valued flags: -level
 - Bare invocation allowed
+
+### `zmore`
+<p class="cmd-url"><a href="https://www.gnu.org/software/gzip/">https://www.gnu.org/software/gzip/</a></p>
+
+- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --LINE-NUMBERS, --LONG-PROMPT, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
+- Allowed valued flags: -P, -b, -h, -j, -t, -x, -y, -z, --prompt, --shift, --tabs, --tag, --window
+- Bare invocation allowed
+
+**Examples:**
+
+- `zmore ./a.gz`
 
 ### `znew`
 <p class="cmd-url"><a href="https://www.gnu.org/software/gzip/">https://www.gnu.org/software/gzip/</a></p>

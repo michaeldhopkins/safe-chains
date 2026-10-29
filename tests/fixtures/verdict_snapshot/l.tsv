@@ -3524,10 +3524,11 @@ lzmainfo --help x	inert
 lzmainfo --version	inert
 lzmainfo ./a.lzma	inert
 lzmainfo x	inert
+lzmainfo ~/.ssh/id_ed25519	denied
 lzmore	inert
 lzmore --LINE-NUMBERS	inert
 lzmore --LINE-NUMBERS --LONG-PROMPT	inert
-lzmore --LINE-NUMBERS --pattern x	inert
+lzmore --LINE-NUMBERS --prompt x	inert
 lzmore --LINE-NUMBERS x	inert
 lzmore --LONG-PROMPT	inert
 lzmore --QUIT-AT-EOF	inert
@@ -3536,7 +3537,6 @@ lzmore --chop-long-lines	inert
 lzmore --help	inert
 lzmore --ignore-case	inert
 lzmore --no-init	inert
-lzmore --pattern x	inert
 lzmore --prompt x	inert
 lzmore --quiet	inert
 lzmore --quit-at-eof	inert
@@ -3576,7 +3576,6 @@ lzmore -i	inert
 lzmore -j x	inert
 lzmore -m	inert
 lzmore -n	inert
-lzmore -p x	inert
 lzmore -q	inert
 lzmore -r	inert
 lzmore -s	inert

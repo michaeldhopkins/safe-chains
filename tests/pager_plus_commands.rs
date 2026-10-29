@@ -41,7 +41,7 @@ fn less_family() -> Vec<(String, Vec<String>, Vec<String>)> {
             let Some(table) = command.as_table() else { continue };
             let plus = strings(table, "reads_commands_from").iter().any(|s| s == "plus");
             let valued = strings(table, "valued");
-            if plus && valued.iter().any(|f| f == "--pattern") {
+            if plus && valued.iter().any(|f| f == "--prompt") {
                 let name = table.get("name").and_then(toml::Value::as_str).expect("named command").to_string();
                 for spelling in std::iter::once(name).chain(strings(table, "aliases")) {
                     found.push((spelling, strings(table, "standalone"), valued.clone()));
@@ -95,7 +95,15 @@ fn a_more_mode_startup_command_is_refused() {
             assert!(!safe_chains::is_safe_command(&command), "{command} must be refused: more mode runs the -p value");
         }
     }
-    for command in ["more ./a", "more -n 5 ./a", "more +42 ./a", "less -p pattern ./a"] {
+    for (name, ..) in less_family().into_iter().filter(|(name, ..)| name.ends_with("more")) {
+        for flag in ["-p'!id'", "-p '!id'", "'-p!id>m14'", "--pattern='!id'", "--pattern '!id'"] {
+            let command = format!("{name} {flag} ./a.gz");
+            assert!(!safe_chains::is_safe_command(&command), "{command} must be refused: {name} hands -p to more");
+        }
+        let plain = format!("{name} ./a.gz");
+        assert!(safe_chains::is_safe_command(&plain), "{plain} must stay approved");
+    }
+    for command in ["more ./a", "more -n 5 ./a", "more +42 ./a", "less -p pattern ./a", "zless -p pattern ./a.gz", "bzless -p x ./a"] {
         assert!(safe_chains::is_safe_command(command), "{command} must stay approved");
     }
 }

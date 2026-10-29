@@ -4,6 +4,7 @@ aliases = ["bzdiff"]
 description = "Wrappers that invoke cmp or diff on bzip2-compressed files. Any options are passed through to cmp(1) or diff(1). With one filename, compares it against the corresponding .bz2; with two filenames, decompresses as needed and compares."
 url = "https://sourceware.org/bzip2/"
 examples_safe = ["bzcmp ./a.bz2 ./b.bz2"]
+examples_denied = ["bzcmp ~/.ssh/id_ed25519 ./b.bz2"]
 researched_version = "bzip2 1.0.x"
 level = "Inert"
 bare = false
@@ -15,6 +16,7 @@ aliases = ["bzegrep", "bzfgrep"]
 description = "grep / egrep / fgrep wrappers that decompress bzip2-compressed input on the fly. All grep options are passed through; behaves like grep(1) on the decompressed text."
 url = "https://sourceware.org/bzip2/"
 examples_safe = ["bzgrep TODO ./log.bz2"]
+examples_denied = ["bzgrep x ~/.ssh/id_ed25519"]
 researched_version = "bzip2 1.0.x"
 level = "Inert"
 bare = false
@@ -22,11 +24,36 @@ tolerate_unknown_short = true
 
 [[command]]
 name = "bzmore"
-aliases = ["bzless"]
-description = "Paginate bzip2-compressed (and uncompressed) text using more(1) or less(1). The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
+description = "Paginate bzip2-compressed (and uncompressed) text using more(1), or whatever $PAGER names. Offline: it reads the named files and reaches no network. The pager gets the flags and operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and the more macOS ships is less in more mode, where `-p` and `--pattern` take a command to run at startup instead of a search pattern. bzip2 releases rarely; the wrapper script is stable."
 url = "https://sourceware.org/bzip2/"
 examples_safe = ["bzmore ./a.bz2"]
-researched_version = "bzip2 1.0.x"
+examples_denied = ["bzmore '+!id' ./a.bz2", "bzmore -p '!id' ./a.bz2"]
+researched_version = "bzip2 1.0.8"
+level = "Inert"
+bare = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-t", "-x", "-y", "-z",
+    "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]
+
+[[command]]
+name = "bzless"
+description = "Paginate bzip2-compressed (and uncompressed) text using less(1). Offline: it reads the named files and reaches no network. The pager gets the flags and operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE. bzip2 releases rarely; the wrapper script is stable."
+url = "https://sourceware.org/bzip2/"
+examples_safe = ["bzless ./a.bz2", "bzless -p TODO ./a.bz2"]
+examples_denied = ["bzless '+!id' ./a.bz2", "bzless -o ./log ./a.bz2"]
+researched_version = "bzip2 1.0.8"
 level = "Inert"
 bare = true
 reads_commands_from = ["plus"]

@@ -814,10 +814,10 @@ zlib-flate -level x	inert
 zlib-flate -uncompress	inert
 zlib-flate x	inert
 zmore	inert
-zmore +!id ./a.gz	denied
+zmore '+!id' ./a.gz	denied
 zmore --LINE-NUMBERS	inert
 zmore --LINE-NUMBERS --LONG-PROMPT	inert
-zmore --LINE-NUMBERS --pattern x	inert
+zmore --LINE-NUMBERS --prompt x	inert
 zmore --LINE-NUMBERS x	inert
 zmore --LONG-PROMPT	inert
 zmore --QUIT-AT-EOF	inert
@@ -826,7 +826,6 @@ zmore --chop-long-lines	inert
 zmore --help	inert
 zmore --ignore-case	inert
 zmore --no-init	inert
-zmore --pattern x	inert
 zmore --prompt x	inert
 zmore --quiet	inert
 zmore --quit-at-eof	inert
@@ -866,7 +865,7 @@ zmore -i	inert
 zmore -j x	inert
 zmore -m	inert
 zmore -n	inert
-zmore -p x	inert
+zmore -p '!id' ./a.gz	denied
 zmore -q	inert
 zmore -r	inert
 zmore -s	inert
@@ -875,7 +874,9 @@ zmore -w	inert
 zmore -x x	inert
 zmore -y x	inert
 zmore -z x	inert
+zmore ./a.gz	inert
 zmore x	inert
+zmore ~/.ssh/id_ed25519	denied
 znew	denied
 znew --help	denied
 znew --version	denied
