@@ -8,7 +8,8 @@
 //! sub-scoped gates and handlers — resolves against the directory the tool will really be in. DIR
 //! itself is gated as a READ first: git renders the content of the repository it is pointed at
 //! (`git -C ~/.ssh log -p`), whatever the operands say. A read, not a tree: `git -C /other/repo
-//! status` stays as approvable as `cd /other/repo && git status`.
+//! status` is judged as `cd /other/repo && git status` is, and git's handler refuses both, since
+//! the repository there carries configuration that names programs git runs.
 
 use std::collections::HashSet;
 
@@ -80,6 +81,24 @@ pub(super) fn should_deny(spec: Option<&Chdir>, tokens: &[Token], rest: impl FnO
     rest()
 }
 
+/// The folder `cmd` runs in once its directory-changing global options (`git -C`) have moved it, or
+/// the ambient one when none did.
+pub(crate) fn landing(cmd: &str, tokens: &[Token]) -> Option<String> {
+    let mut cwd = crate::pathctx::cwd();
+    for dir in super::GATES
+        .chdir
+        .get(cmd)
+        .map(|spec| dirs(spec, tokens))
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|d| !d.is_empty())
+        .map(spelled)
+    {
+        cwd = moved(cwd, &dir);
+    }
+    cwd
+}
+
 /// The two variables a shell always sets to a directory, spelled the way the gate already reads:
 /// `git -C "$PWD"` stays where it is and `git -C "$HOME/x"` is `~/x`. Any other variable stays
 /// unresolved, and the read gate refuses it.
@@ -143,9 +162,10 @@ mod tests {
         for cmd in ["git -C $HOME/.ssh log -p", "git -C ${HOME}/.aws status", "git -C $PWD/../../../etc diff shadow"] {
             assert!(denied(cmd), "{cmd}");
         }
-        for cmd in ["git -C /some/repo status", "git -C ~/projects/other log -p", "git -C \"$PWD\" log --oneline", "git -C $HOME status"] {
-            assert!(!denied(cmd), "{cmd}");
+        for cmd in ["git -C /some/repo status", "git -C ~/projects/other log -p", "git -C $HOME status"] {
+            assert!(denied(cmd), "{cmd}: a repository outside the project carries its own configuration");
         }
+        assert!(!denied("git -C \"$PWD\" log --oneline"));
     }
 
     #[test]

@@ -90,6 +90,43 @@ pub fn is_safe_git(tokens: &[Token]) -> Verdict {
     crate::registry::toml_dispatch(&filtered).unwrap_or(Verdict::Denied)
 }
 
+/// Whether git runs in a folder outside the project, where the repository it finds carries
+/// configuration no one reviewed: `core.fsmonitor` and `core.pager` name programs git runs. Only
+/// `--version`, which reads no repository, is left to run anywhere. A folder that cannot be placed
+/// counts as outside.
+pub(crate) fn runs_in_a_repository_outside_the_project(tokens: &[Token]) -> bool {
+    if only_asks_the_version(tokens) {
+        return false;
+    }
+    let (Some(root), Some(dir)) = (crate::pathctx::root(), crate::pathgate::chdir::landing("git", tokens)) else {
+        return false;
+    };
+    if crate::pathctx::folder::is_unknown(&dir) {
+        return false;
+    }
+    if dir == crate::pathctx::UNRESOLVED_CWD {
+        return true;
+    }
+    let _here = crate::pathctx::enter_cwd(Some(dir));
+    let placed = crate::pathctx::resolve(".");
+    root.is_empty() || placed.starts_with(['/', '~']) || placed.contains("__SAFE_CHAINS_") || placed.split('/').any(|part| part == "..")
+}
+
+fn only_asks_the_version(tokens: &[Token]) -> bool {
+    let mut asked = false;
+    let mut words = tokens.iter().skip(1).map(Token::as_str);
+    while let Some(word) = words.next() {
+        match word {
+            "-C" | "-c" => {
+                words.next();
+            }
+            "--version" => asked = true,
+            _ => return false,
+        }
+    }
+    asked
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;

@@ -162,7 +162,7 @@ fn a_folder_write_after_an_unfollowable_cd_asks() {
 #[test]
 fn a_named_write_and_a_fixed_target_do_not_take_the_folder() {
     let home = std::env::var("HOME").expect("HOME");
-    for command in ["touch /tmp/x", "echo x > /tmp/y", "ls", "git status"] {
+    for command in ["touch /tmp/x", "echo x > /tmp/y", "ls", "git --version"] {
         let line = format!("cd {home} && {command}");
         assert_eq!(verdict_in(ROOT, &line), verdict_in(&home, command), "{line}");
         assert!(verdict_in(ROOT, &line).is_allowed(), "{line}");

@@ -185,3 +185,23 @@ fn a_tool_that_runs_the_folders_code_is_refused_in_a_frozen_folder() {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }
+
+/// git obeys the configuration of the repository it runs in (`core.fsmonitor` and `core.pager` run
+/// programs), so a repository outside the project is not one whose configuration anyone reviewed.
+#[test]
+fn git_in_a_repository_outside_the_project_is_refused() {
+    for command in [
+        "git -C /Users/Shared/repo status", "git -C /tmp/x/repo log", "cd /tmp/x/repo && git status",
+        "cd /Users/Shared/repo && git log -p", "cd src && git -C .. -C ../grepo status", "git -C .. status",
+        "git -C src -C ../.. diff --stat", "git -C ~/projects/other log -p", "git -C $HOME status", "cd / && git status",
+        "pushd /tmp/x && git status", "git --git-dir=/tmp/x/.git -C /tmp/x log",
+    ] {
+        assert!(!approved(command), "`{command}` was approved");
+    }
+    for command in [
+        "git status", "git log", "cd src && git status", "git -C src status", "git -C src -C .. log", "cd .git && git log",
+        "git -C \"$PWD\" log --oneline", "cd /tmp/x && git --version", "git -C /tmp/x --version",
+    ] {
+        assert!(approved(command), "`{command}` should stay approved");
+    }
+}

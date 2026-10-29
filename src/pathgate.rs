@@ -607,7 +607,7 @@ fn gate(role: Role, path: &str) -> bool {
     judge(role, path) == Verdict::Denied
 }
 
-mod chdir;
+pub(crate) mod chdir;
 mod role;
 pub(crate) use role::Role;
 mod flag_match;

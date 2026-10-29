@@ -155,6 +155,7 @@ pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
                 || coreutils::rsync_remote::refuses_its_remote_options(tokens)
                 || coreutils::rsync_shell::names_a_program_to_run(tokens)
         }
+        "git" => vcs::git::runs_in_a_repository_outside_the_project(tokens),
         "bundle" => ruby::gemfile::loads_a_gemfile_out_of_sight(tokens),
         "make" => {
             make_text::evaluates_text_from_the_line(tokens)
