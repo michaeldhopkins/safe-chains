@@ -1,5 +1,5 @@
 use crate::parse::Token;
-use crate::policy::{FlagSet, FlagTolerance, UnknownTolerance, check_flags, consumes_next_value, count_positionals};
+use crate::policy::{FlagSet, FlagTolerance, UnknownTolerance, check_flags, consumes_next_value, count_positionals, takes_next_word};
 use crate::verdict::{SafetyLevel, Verdict};
 
 use super::types::{PassthroughSpec, TomlLevel, TomlPassthrough};
@@ -64,7 +64,7 @@ fn has_unvalued_flag(tokens: &[Token], policy: &OwnedPolicy) -> bool {
         if !t.starts_with('-') {
             continue;
         }
-        if valued.contains_flag(t) {
+        if takes_next_word(standalone, valued, t) {
             if !consumes_next_value(tokens.get(i + 1)) {
                 return true;
             }
@@ -159,13 +159,13 @@ pub(super) fn flag_given(tokens: &[Token], policy: &OwnedPolicy, wanted: &[Strin
             if wants(name) {
                 return true;
             }
-            if !t.contains('=') && valued.contains_flag(name) && consumes_next_value(tokens.get(i)) {
+            if !t.contains('=') && takes_next_word(standalone, valued, name) && consumes_next_value(tokens.get(i)) {
                 i += 1;
             }
             continue;
         }
         if policy.tolerance.single_dash_words || valued.contains_flag(t) {
-            if valued.contains_flag(t) && consumes_next_value(tokens.get(i)) {
+            if takes_next_word(standalone, valued, t) && consumes_next_value(tokens.get(i)) {
                 i += 1;
             }
             continue;

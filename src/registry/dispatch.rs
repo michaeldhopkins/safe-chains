@@ -102,7 +102,7 @@ fn skip_pre_flags(tokens: &[Token], pre_standalone: &[String], pre_valued: &[Str
         if !s.starts_with('-') {
             break;
         }
-        if pre_valued.contains_flag(s) {
+        if crate::policy::takes_next_word(pre_standalone, pre_valued, s) {
             i += 2;
             continue;
         }

@@ -1,5 +1,5 @@
 use crate::parse::Token;
-use crate::policy::FlagSet;
+use crate::policy::{FlagSet, takes_next_word};
 use crate::registry;
 use crate::verdict::Verdict;
 
@@ -40,7 +40,7 @@ fn libxo_values_are_known(tokens: &[Token]) -> bool {
                 if !value.is_some_and(is_libxo_value) {
                     return false;
                 }
-            } else if inline.is_none() && valued.contains_flag(&name) {
+            } else if inline.is_none() && takes_next_word(standalone, valued, &name) {
                 i += 1;
             }
             continue;

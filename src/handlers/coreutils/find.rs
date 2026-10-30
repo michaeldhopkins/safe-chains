@@ -126,7 +126,7 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             continue;
         }
         // A read-only VALUED primary consumes its value; `-newer`/`-newerXY` take a reference.
-        if safe_valued.contains_flag(s) || s.starts_with("-newer") {
+        if crate::policy::takes_next_word(safe_standalone, safe_valued, s) || s.starts_with("-newer") {
             i += 2;
             continue;
         }

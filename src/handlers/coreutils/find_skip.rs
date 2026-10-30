@@ -147,9 +147,9 @@ fn alternates(expr: &[&str]) -> bool {
 
 /// The words one primary takes at `words[0]`: two for a primary with a value, else one.
 fn width(words: &[&str]) -> usize {
-    let valued = crate::registry::fallback_flag_sets("find").map_or(&[][..], |(_, valued)| valued);
+    let (standalone, valued) = crate::registry::fallback_flag_sets("find").unwrap_or((&[], &[]));
     let w = words.first().copied().unwrap_or("");
-    if w.starts_with("-newer") || valued.iter().any(|v| v == w) { 2 } else { 1 }
+    if w.starts_with("-newer") || crate::policy::takes_next_word(standalone, valued, w) { 2 } else { 1 }
 }
 
 /// The filters ANDed before the first action. A negated primary that is not a test is stepped

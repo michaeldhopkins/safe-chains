@@ -29,7 +29,7 @@ pub fn check_safe_chains(tokens: &[Token]) -> Verdict {
         let word = tokens[i].as_str();
         if !after_separator && word == "--" {
             after_separator = true;
-        } else if !after_separator && valued.iter().any(|v| v == word) {
+        } else if !after_separator && crate::policy::takes_next_word(standalone, valued, word) {
             i += 1;
         } else if after_separator || !word.starts_with('-') || word == "-" {
             first_positional_at.get_or_insert(i);

@@ -403,6 +403,16 @@ mod tests {
     }
 
     #[test]
+    fn only_a_flag_that_requires_a_value_takes_the_next_word() {
+        let standalone: Vec<String> = ["--toc", "--both"].map(String::from).to_vec();
+        let valued: Vec<String> = ["--to", "--both"].map(String::from).to_vec();
+        assert!(super::takes_next_word(&standalone, &valued, "--to"));
+        assert!(!super::takes_next_word(&standalone, &valued, "--both"));
+        assert!(!super::takes_next_word(&standalone, &valued, "--toc"));
+        assert!(!super::takes_next_word(&standalone, &valued, "--unknown"));
+    }
+
+    #[test]
     fn standalone_long_flag() {
         assert!(check(&toks(&["grep", "--recursive", "pattern", "."]), &TEST_POLICY));
     }
