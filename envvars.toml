@@ -945,6 +945,18 @@ shape = "data-write"
 single_value = true
 because = "rustup writes trace files into this directory"
 measured = false
+# rustup's proxies decide what they are from argv[0]; this overrides that, so `cargo` acts as
+# `rustup` and an approved `cargo run …` becomes `rustup run <toolchain> <program>`, running any
+# program or toolchain directory the arguments name.
+[env.RUSTUP_FORCE_ARG0]
+shape = "opaque"
+because = "makes a rustup proxy act as another proxy or as rustup itself, so `cargo run stable /tmp/evil` runs /tmp/evil"
+measured = false
+[env.RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS]
+shape = "config-file"
+single_value = true
+because = "replaces /etc/rustup/settings.toml, the fallback settings file that names the default toolchain and per-directory overrides, so it chooses which toolchain's binaries every proxy runs"
+measured = false
 [env.CC]
 shape = "exec-path"
 single_value = true

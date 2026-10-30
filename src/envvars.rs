@@ -589,6 +589,30 @@ mod tests {
     }
 
     #[test]
+    fn a_rustup_proxy_cannot_be_told_to_act_as_rustup() {
+        for base in ["cargo run stable /tmp/evil", "cargo run /tmp/evil cargo", "cargo build", "rustc --version", "cargo fmt --check"] {
+            for value in ["rustup", "cargo", "rustc"] {
+                for spelling in [
+                    format!("RUSTUP_FORCE_ARG0={value} {base}"),
+                    format!("export RUSTUP_FORCE_ARG0={value}; {base}"),
+                    format!("env RUSTUP_FORCE_ARG0={value} {base}"),
+                    format!("declare -x RUSTUP_FORCE_ARG0={value}; {base}"),
+                ] {
+                    assert!(!crate::is_safe_command(&spelling), "{spelling}");
+                }
+            }
+        }
+        for value in ["/tmp/settings.toml", "~/settings.toml", "../other/settings.toml"] {
+            for base in ["cargo build", "rustc --version"] {
+                let cmd = format!("RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS={value} {base}");
+                assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                let exported = format!("export RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS={value}; {base}");
+                assert!(!crate::is_safe_command(&exported), "{exported}");
+            }
+        }
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",
