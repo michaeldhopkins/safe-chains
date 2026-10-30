@@ -34,6 +34,9 @@
 #                refused, since either sets it without an assignment.
 #   config-file  the value names a config file or repository that can name programs to run → the
 #                exec-path rule, and never a temp root or sibling project either.
+#   toolchain-name  the value names a rustup toolchain → allowed only in the shape `cargo +name`
+#                accepts (letters, digits, `.`, `_`, `-`, starting with a letter or digit); rustup
+#                reads a value with a path separator as a toolchain directory and runs its binaries.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -886,6 +889,11 @@ shape = "config-dir"
 single_value = true
 because = "rustup resolves toolchains under $RUSTUP_HOME/toolchains, so pointing it at a scratch directory runs binaries from there"
 measured = false
+[env.RUSTUP_TOOLCHAIN]
+shape = "toolchain-name"
+twin_flag = "cargo +{v} fmt --check"
+twin_base = "cargo fmt --check"
+because = "selects the toolchain rustup proxies (cargo, rustc, rustfmt) run; a value with a path separator names a toolchain directory whose binaries run (the +toolchain twin)"
 [env.CC]
 shape = "exec-path"
 single_value = true

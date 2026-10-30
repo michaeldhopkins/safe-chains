@@ -62,6 +62,9 @@ pub(crate) enum Shape {
     OptionString,
     ConfigDir,
     ConfigFile,
+    /// The value names a rustup toolchain, as `cargo +name` does. A path selects a toolchain
+    /// directory whose binaries then run, so only the name shape the `+name` selector admits passes.
+    ToolchainName,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -257,6 +260,13 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
+        Shape::ToolchainName => {
+            if is_toolchain_name(value) {
+                Verdict::Allowed(SafetyLevel::Inert)
+            } else {
+                Verdict::Denied
+            }
+        }
     }
 }
 
@@ -360,6 +370,12 @@ fn flag_matches(token: &str, entry: &str) -> bool {
 ///
 /// A colon-separated list is judged by its WORST element: one attacker-controlled entry is enough,
 /// because the loader searches all of them.
+pub(crate) fn is_toolchain_name(name: &str) -> bool {
+    !name.is_empty()
+        && name.starts_with(|c: char| c.is_ascii_alphanumeric())
+        && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
+}
+
 fn exec_path_verdict(value: &str, split_list: bool) -> Verdict {
     // `execute_file_verdict` IS the executor-locus rule — the same function pathgate's `exec` role
     // uses for `cargo --manifest-path`. Reused rather than re-derived: an earlier cut compared
@@ -509,11 +525,39 @@ mod tests {
     }
 
     #[test]
+    fn a_rustup_toolchain_is_a_name_never_a_path() {
+        for base in ["cargo fmt --check", "cargo build", "rustc --version", "cargo clippy"] {
+            for value in ["stable", "nightly", "nightly-2026-10-01", "1.97.1", "stable-aarch64-apple-darwin", "my_toolchain"] {
+                let cmd = format!("RUSTUP_TOOLCHAIN={value} {base}");
+                assert_eq!(crate::is_safe_command(&cmd), crate::is_safe_command(base), "{cmd}");
+            }
+            for value in
+                ["/tmp/evil", "./evil", "evil/", "../evil", "~/evil", "a/b", "a\\\\b", ".", "..", ".hidden", "-x", "$HOME", "'a b'"]
+            {
+                let cmd = format!("RUSTUP_TOOLCHAIN={value} {base}");
+                assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                let exported = format!("export RUSTUP_TOOLCHAIN={value}; {base}");
+                assert!(!crate::is_safe_command(&exported), "{exported}");
+            }
+        }
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn a_rustup_toolchain_with_a_path_separator_is_refused(
+            head in "[a-z0-9._-]{0,6}", sep in "[/\\\\]", tail in "[a-z0-9._/-]{0,6}",
+        ) {
+            let value = format!("{head}{sep}{tail}");
+            proptest::prop_assert_eq!(assignment_verdict("RUSTUP_TOOLCHAIN", &value), Verdict::Denied, "{}", value);
+        }
+    }
+
+    #[test]
     fn an_unlisted_name_is_inert() {
         assert!(shape_of("PROJECT").is_none());
         assert!(shape_of("NODE_ENV").is_none());
-        assert!(shape_of("RUSTUP_TOOLCHAIN").is_none());
-        for n in ["PROJECT", "NODE_ENV", "RUSTUP_TOOLCHAIN", "WRITE", "FOO"] {
+        assert!(shape_of("RUST_BACKTRACE").is_none());
+        for n in ["PROJECT", "NODE_ENV", "RUST_BACKTRACE", "WRITE", "FOO"] {
             assert_eq!(assignment_verdict(n, "anything"), Verdict::Allowed(SafetyLevel::Inert));
         }
     }

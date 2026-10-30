@@ -78,10 +78,7 @@ fn dispatch_require_any(
 /// be. `/`, `~`, `$`, `.` and `..` are excluded by construction rather than by exclusion: only
 /// alphanumerics and `._-` are admitted, and a name must start alphanumeric so `+..` cannot form.
 fn is_toolchain_selector(s: &str) -> bool {
-    let Some(name) = s.strip_prefix('+') else { return false };
-    !name.is_empty()
-        && name.starts_with(|c: char| c.is_ascii_alphanumeric())
-        && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
+    s.strip_prefix('+').is_some_and(crate::envvars::is_toolchain_name)
 }
 
 fn skip_pre_flags(tokens: &[Token], pre_standalone: &[String], pre_valued: &[String], toolchain_selector: bool, start: usize) -> usize {
