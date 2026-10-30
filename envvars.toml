@@ -688,6 +688,19 @@ shape = "option-string"
 allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
 because = "cargo reads this ahead of RUSTDOCFLAGS and build.rustdocflags"
 measured = false
+[env."CARGO_TARGET_*_RUSTFLAGS"]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
+because = "the per-target spelling of RUSTFLAGS (target.<triple>.rustflags); -C linker= runs an arbitrary binary"
+measured = false
+[env."CARGO_TARGET_*_RUSTDOCFLAGS"]
+shape = "option-string"
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
+because = "the per-target spelling of RUSTDOCFLAGS (target.<triple>.rustdocflags); --test-runtool runs an arbitrary binary"
+measured = false
 [env.CFLAGS]
 shape = "option-string"
 allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic", "-Wshadow", "-Wconversion",
@@ -874,6 +887,24 @@ because = "arms the CoreCLR profiler pair; the library it loads is named by CORE
 shape = "command"
 because = "cargo runs this executable to obtain registry credentials"
 measured = false
+[env."CARGO_REGISTRIES_*_CREDENTIAL_PROVIDER"]
+shape = "command"
+because = "cargo runs this executable to obtain credentials for that named registry"
+measured = false
+[env.CARGO_REGISTRY_GLOBAL_CREDENTIAL_PROVIDERS]
+shape = "opaque"
+because = "a space-separated list of credential providers cargo may run, each a command line or a built-in name"
+measured = false
+[env."CARGO_REGISTRIES_*_INDEX"]
+shape = "opaque"
+because = "the index URL of a named registry, so the crates a build downloads and compiles (build scripts included) come from there"
+measured = false
+# `cargo fmt` and `cargo clippy` are external subcommands, and a user alias may shadow an external
+# subcommand (cargo warns and still runs the alias), so `CARGO_ALIAS_FMT='run --manifest-path …'`
+# turns an approved `cargo fmt --check` into running another project's code.
+[env."CARGO_ALIAS_*"]
+shape = "opaque"
+because = "defines a cargo alias; one named after an external subcommand (fmt, clippy) replaces it with any cargo command line (measured: CARGO_ALIAS_FMT ran in place of cargo fmt, with a warning)"
 [env.CARGO_TARGET_DIR]
 shape = "data-write"
 single_value = true
@@ -894,6 +925,26 @@ shape = "toolchain-name"
 twin_flag = "cargo +{v} fmt --check"
 twin_base = "cargo fmt --check"
 because = "selects the toolchain rustup proxies (cargo, rustc, rustfmt) run; a value with a path separator names a toolchain directory whose binaries run (the +toolchain twin)"
+# Since rustup 1.28.1 a missing toolchain, target or component is installed on first use, so a
+# proxy invocation with a valid toolchain NAME downloads and then runs whatever these servers
+# serve; the download is checked only against hashes from the same server.
+[env.RUSTUP_DIST_SERVER]
+shape = "opaque"
+because = "the root URL rustup downloads toolchains, components and targets from, auto-installing on first use"
+measured = false
+[env.RUSTUP_DIST_ROOT]
+shape = "opaque"
+because = "the deprecated spelling of RUSTUP_DIST_SERVER's download root, still honoured"
+measured = false
+[env.RUSTUP_UPDATE_ROOT]
+shape = "opaque"
+because = "the root URL rustup downloads its own self-update from"
+measured = false
+[env.RUSTUP_TRACE_DIR]
+shape = "data-write"
+single_value = true
+because = "rustup writes trace files into this directory"
+measured = false
 [env.CC]
 shape = "exec-path"
 single_value = true

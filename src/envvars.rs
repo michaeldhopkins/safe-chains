@@ -538,7 +538,76 @@ mod tests {
                 assert!(!crate::is_safe_command(&cmd), "{cmd}");
                 let exported = format!("export RUSTUP_TOOLCHAIN={value}; {base}");
                 assert!(!crate::is_safe_command(&exported), "{exported}");
+                let via_env = format!("env RUSTUP_TOOLCHAIN={value} {base}");
+                assert!(!crate::is_safe_command(&via_env), "{via_env}");
+                let run = format!("rustup run {value} {base}");
+                assert!(!crate::is_safe_command(&run), "{run}");
             }
+        }
+    }
+
+    #[test]
+    fn every_rustup_toolchain_spelling_takes_a_name_and_refuses_a_path() {
+        let spellings = [
+            "RUSTUP_TOOLCHAIN={v} cargo build",
+            "env RUSTUP_TOOLCHAIN={v} cargo build",
+            "cargo +{v} build",
+            "rustup run {v} cargo build",
+            "rustup doc --toolchain {v} --std",
+            "rustup doc --toolchain={v} --std",
+            "rustup component list --toolchain {v}",
+            "rustup target list --toolchain {v}",
+            "rustup target add --toolchain {v} wasm32-unknown-unknown",
+            "rustup target remove --toolchain={v} wasm32-unknown-unknown",
+            "rustup toolchain list --toolchain {v}",
+            "rustup which --toolchain {v} cargo",
+        ];
+        for spelling in spellings {
+            for name in ["stable", "nightly-2026-10-01", "1.97.1"] {
+                let cmd = spelling.replace("{v}", name);
+                assert!(crate::is_safe_command(&cmd), "{cmd}");
+            }
+            for path in ["/tmp/evil", "./evil", "~/evil", "../evil", "\"/tmp/evil\"", "stable-x/../../tmp/evil", "-x"] {
+                let cmd = spelling.replace("{v}", path);
+                assert!(!crate::is_safe_command(&cmd), "{cmd}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_rustup_download_location_is_never_inert() {
+        for name in ["RUSTUP_DIST_SERVER", "RUSTUP_DIST_ROOT", "RUSTUP_UPDATE_ROOT"] {
+            for base in
+                ["cargo +nightly-2099-01-01 build", "RUSTUP_TOOLCHAIN=nightly cargo build", "rustup target add wasm32-unknown-unknown"]
+            {
+                let cmd = format!("{name}=http://mirror.example {base}");
+                assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                let exported = format!("export {name}=https://static.rust-lang.org; {base}");
+                assert!(!crate::is_safe_command(&exported), "{exported}");
+            }
+        }
+    }
+
+    #[test]
+    fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
+        for cmd in [
+            "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",
+            "CARGO_ALIAS_CLIPPY=build cargo clippy",
+            "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUSTFLAGS='-Clinker=/tmp/evil' cargo build",
+            "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS='-C linker=/tmp/evil' cargo build",
+            "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUSTDOCFLAGS='--test-runtool /tmp/evil' cargo test",
+            "CARGO_REGISTRIES_MINE_INDEX=sparse+https://mirror.example/ cargo build",
+            "CARGO_REGISTRIES_MINE_CREDENTIAL_PROVIDER=/tmp/evil cargo build",
+            "CARGO_REGISTRY_GLOBAL_CREDENTIAL_PROVIDERS=/tmp/evil cargo build",
+            "RUSTUP_TRACE_DIR=/etc/x cargo build",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        for cmd in [
+            "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUSTFLAGS='-Ctarget-cpu=native' cargo build",
+            "CARGO_TARGET_AARCH64_APPLE_DARWIN_RUSTDOCFLAGS='-Dwarnings' cargo doc",
+        ] {
+            assert!(crate::is_safe_command(cmd), "{cmd}");
         }
     }
 
@@ -549,6 +618,20 @@ mod tests {
         ) {
             let value = format!("{head}{sep}{tail}");
             proptest::prop_assert_eq!(assignment_verdict("RUSTUP_TOOLCHAIN", &value), Verdict::Denied, "{}", value);
+        }
+
+        #[test]
+        fn a_path_shaped_toolchain_after_rustup_run_is_refused(
+            head in "[a-z0-9._-]{0,6}", sep in "[/\\\\~]", tail in "[a-z0-9._/-]{0,6}",
+            inner in proptest::sample::select(vec!["cargo build", "cargo --version", "rustc --version", "cargo fmt --check"]),
+            quoted in proptest::bool::ANY,
+        ) {
+            let value = format!("{head}{sep}{tail}");
+            let word = if quoted || value.contains('\\') { format!("'{value}'") } else { value.clone() };
+            let cmd = format!("rustup run {word} {inner}");
+            proptest::prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
+            let flag = format!("rustup doc --toolchain={word} --std");
+            proptest::prop_assert!(!crate::is_safe_command(&flag), "{}", flag);
         }
     }
 
