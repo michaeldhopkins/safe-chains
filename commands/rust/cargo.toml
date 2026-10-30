@@ -118,7 +118,9 @@ toolchain_selector = true
 [command.path_gate]
 # `--fuzz-dir` sits beside `--manifest-path` for the same reason: it names the directory whose
 # Cargo.toml is compiled and whose targets are then EXECUTED, so it selects whose code runs.
-flags = { "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec", "--fuzz-dir" = "exec" }
+# `--target` takes a triple or a path to a target specification file, whose `linker` runs at link
+# time, so its value is gated the same way: a triple reads as a name in the worktree and passes.
+flags ={ "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec", "--fuzz-dir" = "exec", "--target" = "exec" }
 
 # cargo-fuzz: a third-party cargo subcommand driving libFuzzer over targets in `fuzz/`.
 # Researched against cargo-fuzz 0.13.2.

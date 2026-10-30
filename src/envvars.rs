@@ -715,6 +715,30 @@ mod tests {
     }
 
     #[test]
+    fn a_foreign_target_specification_is_refused_in_the_flag_and_the_variable() {
+        for sub in ["build", "check", "test", "clippy", "doc", "bench", "run"] {
+            let base = format!("cargo +nightly {sub} -Zbuild-std");
+            assert!(crate::is_safe_command(&base), "{base}");
+            for spec in ["/tmp/evil.json", "~/evil.json", "/etc/evil.json"] {
+                for cmd in
+                    [format!("{base} --target {spec}"), format!("{base} --target={spec}"), format!("CARGO_BUILD_TARGET={spec} {base}")]
+                {
+                    assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+            for triple in ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown", "aarch64-apple-darwin", "host-tuple"] {
+                for cmd in [
+                    format!("{base} --target {triple}"),
+                    format!("{base} --target={triple}"),
+                    format!("CARGO_BUILD_TARGET={triple} {base}"),
+                ] {
+                    assert!(crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+        }
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",

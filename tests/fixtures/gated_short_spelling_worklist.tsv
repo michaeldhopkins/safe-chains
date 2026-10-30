@@ -20,6 +20,8 @@
 # Seeded 2026-10-14 with 85 rows. `hugo -c` is --contentDir, `-l` --layoutDir and `-t` --theme, so their rows
 # are right as listed.
 #
+# cargo -t is --timeout (cargo mutants) and --time (cargo sweep), never --target or --target-dir.
+#
 # wget's rows are checked against its option table: -c is --continue, -d --debug, -e --execute,
 # -h --help, -l --level, -p --page-requisites, -r --recursive, -w --wait; the table has no -s.
 #
@@ -30,6 +32,7 @@ asciidoctor	-d	--destination-dir
 cargo	-f	--fuzz-dir
 cargo	-m	--manifest-path
 cargo	-t	--target-dir
+cargo	-t	--target
 ditto	-k	--keepBinariesList
 flex	-h	--header-file
 flex	-s	--skel
