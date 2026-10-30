@@ -94,6 +94,21 @@ write = [
   "aria2c", "http", "https", "xh", "httpie",
 ]
 
+# ── Tools that take code or configuration from the folder they run in ──────────────────────
+#    `cargo --version` in a folder whose `rust-toolchain.toml` says `path = "./tc"` runs
+#    `./tc/bin/cargo`; `cargo build` there obeys `.cargo/config.toml` (`rustc-wrapper`); `npm test`
+#    runs the folder's `package.json`; `python3 -c` imports from it. So the folder is the code's
+#    origin, and from a temporary directory that is neither this session's scratchpad nor granted
+#    these ask, the way `sh ./x.sh` there does. The project and folders inside it are unaffected.
+#    git and jj are not here: a repository under temp is an open question (TODO.md).
+folder_code = [
+  "bazel", "bun", "bundle", "cabal", "cargo", "cmake", "composer", "deno", "dotnet", "dune",
+  "eslint", "go", "gradle", "hatch", "jest", "just", "lein", "make", "meson", "mise", "mix",
+  "ninja", "nox", "npm", "npx", "pdm", "pnpm", "poetry", "pre-commit", "prettier", "pytest",
+  "python", "python3", "rails", "rake", "rspec", "rustc", "rustup", "sbt", "stack", "swift",
+  "task", "terraform", "tofu", "tox", "tsc", "uv", "vitest", "xcodebuild", "yarn", "zig",
+]
+
 # ── Argument-role grammar: tools whose path arguments take DIFFERENT roles by flag/position,
 #    so a flat read/write list mis-gates them. `positional` is the role of bare operands
 #    (read | write | ignore); `flags` maps a path-bearing flag to its value's role; `shape`

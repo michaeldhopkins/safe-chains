@@ -336,10 +336,15 @@ struct Gates {
     chdir: HashMap<String, chdir::Chdir>,
 }
 
-static GATES: LazyLock<Gates> = LazyLock::new(|| {
-    let src = include_str!("../pathgates.toml");
-    toml::from_str(src).expect("pathgates.toml is invalid TOML")
-});
+static GATES: LazyLock<Gates> =
+    LazyLock::new(|| toml::from_str(include_str!("../pathgates.toml")).expect("pathgates.toml is invalid TOML"));
+
+#[cfg(test)]
+fn folder_code_names() -> Vec<&'static str> {
+    let mut names: Vec<&'static str> = folder_code::NAMES.iter().map(String::as_str).collect();
+    names.sort_unstable();
+    names
+}
 
 /// Commands owning at least one sub-scoped role (`[roles."<cmd> <sub>"]`).
 ///
@@ -353,7 +358,7 @@ static SUB_SCOPED: LazyLock<HashSet<&'static str>> =
 /// Whether `cmd`'s already-allowed verdict must be overridden to `Denied` because one of its
 /// path arguments reads/writes a sensitive locus. Returns `false` for commands in no gate.
 pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
-    chdir::should_deny(GATES.chdir.get(cmd), tokens, || deny_in_place(cmd, tokens))
+    chdir::should_deny(GATES.chdir.get(cmd), tokens, || folder_code::denies(cmd) || deny_in_place(cmd, tokens))
 }
 
 fn deny_in_place(cmd: &str, tokens: &[Token]) -> bool {
@@ -655,6 +660,7 @@ fn gate(role: Role, path: &str) -> bool {
 
 mod chdir;
 mod flag_match;
+mod folder_code;
 mod fuzz_judges;
 pub(crate) mod handlers;
 

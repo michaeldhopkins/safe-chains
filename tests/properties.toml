@@ -434,6 +434,7 @@ owed = [
   "textutil_convert_never_more_permissive_than_info",
 ]
 "src/pathgate/chdir.rs" = ["a_move_and_an_operand_judge_as_their_join"]
+"src/pathgate/folder_code.rs" = ["a_folder_code_tool_asks_from_a_foreign_temp_folder_and_not_from_the_project"]
 "src/pathgate/flag_match.rs" = ["every_spelling_of_a_mapped_flag_yields_the_same_value"]
 "src/pathgate/handlers.rs" = [
   "src/pathgate.rs::ar_write_never_more_permissive_than_read",
