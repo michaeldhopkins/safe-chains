@@ -67,6 +67,10 @@ pub enum PositionalShape {
     /// module system and, with `@version`, DOWNLOADS AND RUNS remote code, so
     /// it must not be treated as a worktree-local executor.
     GoPackage,
+    /// A rustup toolchain NAME (`stable`, `nightly-2026-10-01`, `1.97.1`), never a path: rustup
+    /// reads a toolchain argument with a path separator as a toolchain directory and runs its
+    /// binaries. The shape `cargo +name` admits.
+    ToolchainName,
 }
 
 impl PositionalShape {
@@ -74,6 +78,7 @@ impl PositionalShape {
         match self {
             Self::Path => looks_like_path(token),
             Self::GoPackage => is_go_local_package(token),
+            Self::ToolchainName => crate::envvars::is_toolchain_name(token),
         }
     }
 
@@ -81,8 +86,15 @@ impl PositionalShape {
         match name {
             "path" => Some(Self::Path),
             "go-package" => Some(Self::GoPackage),
+            "toolchain-name" => Some(Self::ToolchainName),
             _ => None,
         }
+    }
+
+    /// A TOML `positional_shape`, absent or a known name; `owner` names where it was written.
+    pub fn from_toml(name: Option<&str>, owner: &str) -> Result<Option<Self>, String> {
+        name.map(|n| Self::from_name(n).ok_or_else(|| format!("{owner}: unknown positional_shape `{n}`")))
+            .transpose()
     }
 }
 

@@ -1,9 +1,10 @@
 //! The `[command.handler_policy]`, `[command.fallback]` and `[command.wrapper]` tables as written in
-//! a command TOML, out of `types.rs`.
+//! a command TOML, out of `types.rs`, and the whole-line checks (`LineChecks`) a command declares.
 
 use serde::Deserialize;
 
 use super::TomlLevel;
+use crate::verdict::Verdict;
 
 #[derive(Debug, Deserialize)]
 pub(in crate::registry) struct TomlHandlerPolicy {
@@ -128,4 +129,68 @@ pub(in crate::registry) struct MatrixAction {
     pub policy_key: String,
     pub guard: Option<String>,
     pub guard_short: Option<String>,
+}
+
+/// What `dispatch_spec` checks across the whole line, beside the command's own grammar.
+#[derive(Debug, Clone, Default)]
+pub(in crate::registry) struct LineChecks {
+    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
+    /// `declare -x`). Each is classified through `envvars::assignment_verdict` and combined, so
+    /// `export LD_PRELOAD=/tmp/evil.so` denies as `LD_PRELOAD=/tmp/evil.so ls` does.
+    pub env_assignment_positionals: bool,
+    /// `flag_value_shapes = { "--toolchain" = "toolchain-name" }`: each named long flag's VALUE,
+    /// as `--flag value` or `--flag=value`, must match its shape wherever it appears on the line.
+    /// The whole line is scanned, inner commands included: a false refusal there only asks, where
+    /// stopping early could miss the flag.
+    pub flag_value_shapes: Vec<(String, crate::policy::PositionalShape)>,
+}
+
+impl LineChecks {
+    pub(in crate::registry) fn lower(
+        command: &str,
+        env_assignment_positionals: Option<bool>,
+        flag_value_shapes: &std::collections::BTreeMap<String, String>,
+    ) -> Result<Self, String> {
+        let mut shapes = Vec::new();
+        for (flag, name) in flag_value_shapes {
+            let Some(shape) = crate::policy::PositionalShape::from_name(name) else {
+                return Err(format!("command '{command}': unknown flag_value_shapes shape `{name}` for `{flag}`"));
+            };
+            if !flag.starts_with("--") {
+                return Err(format!("command '{command}': flag_value_shapes names `{flag}`; only long flags are checked"));
+            }
+            shapes.push((flag.clone(), shape));
+        }
+        Ok(Self { env_assignment_positionals: env_assignment_positionals.unwrap_or(false), flag_value_shapes: shapes })
+    }
+
+    pub(in crate::registry) fn judge(&self, tokens: &[crate::parse::Token], grammar: impl FnOnce() -> Verdict) -> Verdict {
+        if !self.flag_values_match(tokens) {
+            return Verdict::Denied;
+        }
+        let verdict = grammar();
+        if !self.env_assignment_positionals {
+            return verdict;
+        }
+        tokens[1..]
+            .iter()
+            .filter(|t| !t.starts_with('-'))
+            .filter_map(|t| t.as_str().split_once('='))
+            .map(|(name, value)| crate::envvars::assignment_verdict(name, value))
+            .fold(verdict, Verdict::combine)
+    }
+
+    fn flag_values_match(&self, tokens: &[crate::parse::Token]) -> bool {
+        self.flag_value_shapes.iter().all(|(flag, shape)| {
+            tokens.iter().enumerate().skip(1).all(|(i, t)| {
+                let t = t.as_str();
+                if t == flag {
+                    return tokens.get(i + 1).is_some_and(|v| shape.matches(v.as_str()));
+                }
+                t.strip_prefix(flag.as_str())
+                    .and_then(|rest| rest.strip_prefix('='))
+                    .is_none_or(|v| shape.matches(v))
+            })
+        })
+    }
 }

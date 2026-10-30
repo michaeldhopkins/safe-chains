@@ -13450,6 +13450,10 @@ Aliases: `grmdir`
 - `rustup component list`
 - `rustup toolchain list`
 - `rustup show`
+- `rustup run stable cargo --version`
+- `rustup run nightly-2026-10-01 cargo fmt --check`
+- `rustup doc --toolchain stable --std`
+- `rustup which --toolchain=1.97.1 cargo`
 
 ### `rvm`
 <p class="cmd-url"><a href="https://rvm.io/rvm/cli">https://rvm.io/rvm/cli</a></p>

@@ -1420,6 +1420,72 @@ fn delegate_skip_no_inner() {
     assert_eq!(dispatch_spec(&toks(&["rustup", "run", "stable"]), &spec), Verdict::Denied,);
 }
 
+#[test]
+fn delegate_skip_checks_every_skipped_word_against_its_shape() {
+    let spec = load_one(
+        r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "run"
+            delegate_skip = 3
+            positional_shape = "toolchain-name"
+        "#,
+    );
+    assert_eq!(dispatch_spec(&toks(&["tool", "run", "a", "b", "echo", "hi"]), &spec), Verdict::Allowed(SafetyLevel::Inert));
+    assert_eq!(dispatch_spec(&toks(&["tool", "run", "/x", "b", "echo", "hi"]), &spec), Verdict::Denied);
+    assert_eq!(dispatch_spec(&toks(&["tool", "run", "a", "/x", "echo", "hi"]), &spec), Verdict::Denied);
+}
+
+#[test]
+fn a_shape_on_a_delegate_that_skips_nothing_fails_the_build() {
+    assert_rejected(
+        r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "run"
+            delegate_skip = 1
+            positional_shape = "toolchain-name"
+        "#,
+        "positional_shape needs delegate_skip of 2 or more",
+    );
+}
+
+#[test]
+fn a_flag_value_shape_holds_both_spellings_of_the_flag() {
+    let spec = load_one(
+        r#"
+            [[command]]
+            name = "tool"
+            flag_value_shapes = { "--toolchain" = "toolchain-name" }
+
+            [[command.sub]]
+            name = "show"
+            level = "Inert"
+            valued = ["--toolchain"]
+        "#,
+    );
+    let inert = Verdict::Allowed(SafetyLevel::Inert);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show", "--toolchain", "stable"]), &spec), inert);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show", "--toolchain=stable"]), &spec), inert);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show"]), &spec), inert);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show", "--toolchain", "/x"]), &spec), Verdict::Denied);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show", "--toolchain=/x"]), &spec), Verdict::Denied);
+    assert_eq!(dispatch_spec(&toks(&["tool", "show", "--toolchain"]), &spec), Verdict::Denied);
+}
+
+#[test]
+fn a_flag_value_shape_names_a_known_shape_and_a_long_flag() {
+    for (table, why) in
+        [(r#"{ "--toolchain" = "nope" }"#, "unknown flag_value_shapes shape"), (r#"{ "-t" = "toolchain-name" }"#, "only long flags")]
+    {
+        assert_rejected(&format!("[[command]]\nname = \"tool\"\nflag_value_shapes = {table}\n"), why);
+    }
+}
+
 // Aliases
 
 #[test]

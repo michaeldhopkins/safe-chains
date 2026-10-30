@@ -583,7 +583,10 @@
 #
 # delegate_skip: Skip N tokens after the subcommand name, then validate
 #   the rest as a complete command. Used for "rustup run stable echo hello"
-#   where skip=2 skips the toolchain name.
+#   where skip=2 skips the toolchain name. A skipped word is never judged,
+#   so when it selects what runs (rustup runs /tmp/x/bin/cargo for
+#   `rustup run /tmp/x cargo`), give the sub a `positional_shape`: every
+#   skipped word must match it, or the invocation denies.
 #
 # delegate_after: Find a separator token (usually "--"), then validate
 #   everything after it as a complete command. Used for
@@ -592,6 +595,15 @@
 # [[command.sub]]
 # name = "run"
 # delegate_skip = 2                      # skip 2 tokens, validate the rest
+# positional_shape = "toolchain-name"    # the skipped word must be a toolchain name
+#
+# A command-level `flag_value_shapes` holds a long flag's VALUE to a shape
+# wherever the flag appears (`--flag v` and `--flag=v`), across every sub
+# that lists it in `valued`:
+#
+# [[command]]
+# name = "rustup"
+# flag_value_shapes = { "--toolchain" = "toolchain-name" }
 #
 # [[command.sub]]
 # name = "exec"

@@ -192,6 +192,9 @@ fn describe_fallback(f: &FallbackSpec) -> String {
         Some(crate::policy::PositionalShape::GoPackage) => {
             lines.push("- First positional must be a local package path (`.`, `./…`, `/…`, or a `*.go` file)".to_string());
         }
+        Some(crate::policy::PositionalShape::ToolchainName) => {
+            lines.push("- First positional must be a toolchain name (letters, digits, `.`, `_`, `-`)".to_string());
+        }
         None => {}
     }
     lines.join("\n")

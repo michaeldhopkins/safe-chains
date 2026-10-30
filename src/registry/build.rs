@@ -126,13 +126,7 @@ fn build_fallback(parent: &str, toml: TomlFallback) -> Result<FallbackSpec, Stri
         toml.tolerate_unknown_long, toml.numeric_dash,
     );
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
-    let positional_shape = match toml.positional_shape.as_deref() {
-        None => None,
-        Some(name) => match crate::policy::PositionalShape::from_name(name) {
-            Some(shape) => Some(shape),
-            None => fail!("{parent}: unknown fallback positional_shape `{name}` (known: path)"),
-        },
-    };
+    let positional_shape = crate::policy::PositionalShape::from_toml(toml.positional_shape.as_deref(), &format!("{parent} fallback"))?;
     let executor = match toml.executor.as_deref() {
         None => None,
         Some(name) => match ExecutorKind::from_name(name) {
@@ -711,7 +705,14 @@ pub(super) fn build_sub_kind_unchecked(
         return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
     }
     if let Some(skip) = toml.delegate_skip {
-        return Ok(DispatchKind::DelegateSkip { skip });
+        let shape = crate::policy::PositionalShape::from_toml(
+            toml.positional_shape.as_deref(),
+            &format!("command '{parent}' sub `{}`", toml.name),
+        )?;
+        if shape.is_some() && skip < 2 {
+            fail!("command '{parent}' sub `{}`: positional_shape needs delegate_skip of 2 or more", toml.name);
+        }
+        return Ok(DispatchKind::DelegateSkip { skip, shape });
     }
     // A `credential_first_arg` gate forces the Branching path even with no sub-subs: only Branching
     // runs `skip_pre_flags`, so the credential check sees the real resource arg (`get -o yaml secret`),
@@ -786,13 +787,10 @@ fn build_policy_sub_kind(
         let Some(kind) = ExecutorKind::from_name(name) else {
             fail!("command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)", toml.name)
         };
-        let shape = match toml.positional_shape.as_deref() {
-            None => None,
-            Some(s) => match crate::policy::PositionalShape::from_name(s) {
-                Some(shape) => Some(shape),
-                None => fail!("command '{parent}' sub `{}`: unknown positional_shape `{s}`", toml.name),
-            },
-        };
+        let shape = crate::policy::PositionalShape::from_toml(
+            toml.positional_shape.as_deref(),
+            &format!("command '{parent}' sub `{}`", toml.name),
+        )?;
         return Ok(DispatchKind::Executor {
             policy,
             level,
@@ -971,7 +969,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
-    let env_assignment_positionals = toml.env_assignment_positionals.unwrap_or(false);
+    let line_checks = LineChecks::lower(&toml.name, toml.env_assignment_positionals, &toml.flag_value_shapes)?;
     let archetype_flags = archetype_flags::lower(&toml.name, toml.flag, &toml.flag_valued, &toml.valued, toml.wrapper.as_ref())?;
     if toml.deny.unwrap_or(false) {
         return Ok(CommandSpec {
@@ -992,7 +990,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert },
         });
     }
@@ -1015,7 +1013,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         });
     }
@@ -1052,7 +1050,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body, subs, fallback, handler_policies, matrices },
         });
     }
@@ -1079,7 +1077,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 behavior: behavior.clone(),
                 output,
                 writes_cwd,
-                env_assignment_positionals,
+                line_checks: line_checks.clone(),
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub)?
@@ -1119,7 +1117,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -1151,7 +1149,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)?
@@ -1202,7 +1200,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -1232,7 +1230,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags },
         });
     }
@@ -1256,13 +1254,13 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             behavior: behavior.clone(),
             output,
             writes_cwd,
-            env_assignment_positionals,
+            line_checks: line_checks.clone(),
             kind: DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false },
         });
     }
 
     Ok(CommandSpec {
-        env_assignment_positionals,
+        line_checks: line_checks.clone(),
         name: toml.name,
         description: desc,
         aliases: toml.aliases,
@@ -1326,7 +1324,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
                 // Carried, not defaulted: `typeset` is an alias of `declare`, and dropping this here
                 // would let the alias put a variable into the environment unclassified while the
                 // canonical spelling denied.
-                env_assignment_positionals: spec.env_assignment_positionals,
+                line_checks: spec.line_checks.clone(),
                 name: spec.name.clone(),
                 description: spec.description.clone(),
                 aliases: vec![],

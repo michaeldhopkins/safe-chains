@@ -41,6 +41,9 @@ pub(super) struct TomlCommand {
     /// so the two spellings of one capability cannot disagree.
     #[serde(default)]
     pub env_assignment_positionals: Option<bool>,
+    /// Lowered into [`LineChecks::flag_value_shapes`].
+    #[serde(default)]
+    pub flag_value_shapes: std::collections::BTreeMap<String, String>,
     /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`; build panics if a TOML
     /// still sets it (SAMPLE.toml has the migration), and keeping it here lets the panic name the command.
     #[serde(default)]
@@ -658,11 +661,7 @@ pub struct CommandSpec {
     /// yields a bounded path instead of the unpinnable sentinel.
     pub(super) output: Option<OutputSpec>,
     pub(super) writes_cwd: Option<crate::pathctx::anchor::Anchor>,
-    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
-    /// `declare -x`). `dispatch_spec` then classifies each through `envvars::assignment_verdict`
-    /// and combines the result, so `export LD_PRELOAD=/tmp/evil.so` denies as
-    /// `LD_PRELOAD=/tmp/evil.so ls` does.
-    pub(super) env_assignment_positionals: bool,
+    pub(super) line_checks: LineChecks,
     pub(super) kind: DispatchKind,
 }
 
@@ -933,6 +932,7 @@ pub(super) enum DispatchKind {
     },
     DelegateSkip {
         skip: usize,
+        shape: Option<crate::policy::PositionalShape>,
     },
     Wrapper {
         standalone: Vec<String>,

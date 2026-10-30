@@ -301,8 +301,13 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
             crate::command_verdict(&inner)
         }
-        DispatchKind::DelegateSkip { skip } => {
+        DispatchKind::DelegateSkip { skip, shape } => {
             if tokens.len() <= *skip {
+                return Verdict::Denied;
+            }
+            if let Some(shape) = shape
+                && !tokens[1..*skip].iter().all(|t| shape.matches(t.as_str()))
+            {
                 return Verdict::Denied;
             }
             let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
@@ -320,19 +325,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 }
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
-    let verdict = dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS);
-    if !spec.env_assignment_positionals {
-        return verdict;
-    }
-    // `export LD_PRELOAD=/tmp/evil.so` puts the variable in the environment of every command the
-    // shell spawns afterwards, so it is the `LD_PRELOAD=/tmp/evil.so cmd` prefix wearing different
-    // syntax. Classify each assignment the same way rather than letting the second spelling through.
-    tokens[1..]
-        .iter()
-        .filter(|t| !t.starts_with('-'))
-        .filter_map(|t| t.as_str().split_once('='))
-        .map(|(name, value)| crate::envvars::assignment_verdict(name, value))
-        .fold(verdict, Verdict::combine)
+    spec.line_checks.judge(tokens, || dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS))
 }
 
 /// A sub's kind, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs).

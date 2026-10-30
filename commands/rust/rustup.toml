@@ -3,6 +3,7 @@ name = "rustup"
 description = "Rust toolchain installer and manager; supports listing components, targets, toolchains, opening docs, and delegating via run."
 url = "https://rust-lang.github.io/rustup/"
 bare_flags = ["--help", "--version", "-V", "-h"]
+flag_value_shapes = { "--toolchain" = "toolchain-name" }
 
 examples_safe = [
   "rustup target list",
@@ -12,11 +13,23 @@ examples_safe = [
   "rustup component list",
   "rustup toolchain list",
   "rustup show",
+  "rustup run stable cargo --version",
+  "rustup run nightly-2026-10-01 cargo fmt --check",
+  "rustup doc --toolchain stable --std",
+  "rustup which --toolchain=1.97.1 cargo",
 ]
 examples_denied = [
   "rustup self update",
   "rustup update",
   "rustup toolchain install nightly",
+  "rustup run /tmp/evil cargo build",
+  "rustup run ./evil cargo --version",
+  "rustup run stable-x/../../../../tmp/evil cargo build",
+  "rustup run --install stable cargo build",
+  "rustup doc --toolchain /tmp/evil",
+  "rustup doc --toolchain=/tmp/evil",
+  "rustup target add --toolchain ~/evil wasm32-unknown-unknown",
+  "rustup which --toolchain ../evil cargo",
 ]
 
 [[command.sub]]
@@ -42,6 +55,7 @@ valued = ["--toolchain"]
 [[command.sub]]
 name = "run"
 delegate_skip = 2
+positional_shape = "toolchain-name"
 
 [[command.sub]]
 name = "show"

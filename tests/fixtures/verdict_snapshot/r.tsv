@@ -5741,11 +5741,20 @@ rustup doc --rustc	inert
 rustup doc --rustdoc	inert
 rustup doc --std	inert
 rustup doc --test	inert
+rustup doc --toolchain /tmp/evil	denied
+rustup doc --toolchain stable --std	inert
 rustup doc --toolchain x	inert
+rustup doc --toolchain=/tmp/evil	denied
 rustup doc --unstable-book	inert
 rustup doc -h	inert
 rustup doc x	inert
 rustup run	denied
+rustup run --install stable cargo build	denied
+rustup run ./evil cargo --version	denied
+rustup run /tmp/evil cargo build	denied
+rustup run nightly-2026-10-01 cargo fmt --check	safe-read
+rustup run stable cargo --version	inert
+rustup run stable-x/../../../../tmp/evil cargo build	denied
 rustup run x	denied
 rustup self update	denied
 rustup show	inert
@@ -5763,6 +5772,7 @@ rustup target add --help --toolchain x	safe-write
 rustup target add --help -h	safe-write
 rustup target add --help x	safe-write
 rustup target add --toolchain x	safe-write
+rustup target add --toolchain ~/evil wasm32-unknown-unknown	denied
 rustup target add -h	safe-write
 rustup target add wasm32-unknown-unknown	safe-write
 rustup target add x	safe-write
@@ -5805,7 +5815,9 @@ rustup which --help	inert
 rustup which --help --toolchain x	inert
 rustup which --help -h	inert
 rustup which --help x	inert
+rustup which --toolchain ../evil cargo	denied
 rustup which --toolchain x	inert
+rustup which --toolchain=1.97.1 cargo	inert
 rustup which -h	inert
 rustup which x	inert
 rustup x	denied
