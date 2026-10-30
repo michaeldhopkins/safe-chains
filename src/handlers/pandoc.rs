@@ -62,8 +62,14 @@ fn is_plain_format(value: &str) -> bool {
     !previous_separator && value.split(['+', '-']).next() != Some("pdf")
 }
 
+fn is_any_format(value: &str) -> bool {
+    is_reader_format(value) || is_writer_format(value)
+}
+
 fn long_format_check(name: &str) -> Option<fn(&str) -> bool> {
-    if READER_LONG.contains(&name) {
+    if name == "--list-extensions" {
+        Some(is_any_format)
+    } else if READER_LONG.contains(&name) {
         Some(is_reader_format)
     } else if WRITER_LONG.contains(&name) {
         Some(is_writer_format)
@@ -171,6 +177,9 @@ mod tests {
         worktree_data_dir: "pandoc --data-dir=./data README.md",
         optional_value_flag_then_writer: "pandoc --toc -t html README.md",
         glued_optional_value_then_writer: "pandoc --toc=true -t html README.md",
+        list_extensions_bare: "pandoc --list-extensions",
+        list_extensions_of_reader: "pandoc --list-extensions=markdown",
+        list_extensions_of_writer: "pandoc --list-extensions=gfm",
     }
 
     denied! {
@@ -212,6 +221,9 @@ mod tests {
         pdf_writer_after_bare_number_sections: "pandoc --number-sections -t pdf in.md",
         long_lua_writer_after_bare_optional_value_flag: "pandoc --toc --to ./w.lua in.md",
         glued_lua_writer_after_bare_optional_value_flag: "pandoc --toc --to=./w.lua in.md",
+        list_extensions_of_a_lua_path: "pandoc --list-extensions=./w.lua",
+        list_extensions_of_lua: "pandoc --list-extensions=lua",
+        list_extensions_of_an_unknown_name: "pandoc --list-extensions=nosuchformat",
     }
 
     #[test]
@@ -230,6 +242,58 @@ mod tests {
             assert!(valued.contains_short(short), "-{} must be valued", short as char);
             assert!(!standalone.contains_short(short), "-{} must not also be standalone", short as char);
         }
+    }
+
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+    enum Arity {
+        None,
+        Optional,
+        Required,
+    }
+
+    fn pandoc_arities() -> std::collections::BTreeMap<String, Arity> {
+        let help = include_str!("../../tests/fixtures/pandoc/3.12.1/help.txt");
+        let mut arities = std::collections::BTreeMap::new();
+        for line in help.lines() {
+            let words: Vec<&str> = line.split([' ', ',']).filter(|w| !w.is_empty()).collect();
+            for (k, word) in words.iter().enumerate() {
+                if let Some(long) = word.strip_prefix("--") {
+                    let end = long.find(['=', '[']).unwrap_or(long.len());
+                    let arity = match long.as_bytes().get(end) {
+                        Some(b'=') => Arity::Required,
+                        Some(b'[') => Arity::Optional,
+                        _ => Arity::None,
+                    };
+                    arities.insert(format!("--{}", &long[..end]), arity);
+                } else if word.len() >= 2 && word.starts_with('-') && word.as_bytes()[1].is_ascii_alphabetic() {
+                    let arity = if word.as_bytes().get(2) == Some(&b'[') {
+                        Arity::Optional
+                    } else if word.len() == 2 && words.get(k + 1).is_some_and(|n| n.starts_with(|c: char| c.is_ascii_uppercase())) {
+                        Arity::Required
+                    } else {
+                        Arity::None
+                    };
+                    arities.insert(word[..2].to_string(), arity);
+                }
+            }
+        }
+        arities
+    }
+
+    #[test]
+    fn a_flag_that_takes_the_next_word_takes_a_required_value_in_pandoc() {
+        let arities = pandoc_arities();
+        assert!(arities.get("--toc") == Some(&Arity::Optional) && arities.get("-t") == Some(&Arity::Required), "{arities:?}");
+        let (standalone, valued) = crate::registry::fallback_flag_sets("pandoc").expect("pandoc fallback");
+        let mut wrong = Vec::new();
+        for flag in valued.iter().chain(standalone.iter()) {
+            let Some(&arity) = arities.get(flag.as_str()) else { continue };
+            let takes_next = super::takes_next_word(standalone, valued, flag);
+            if takes_next != (arity == Arity::Required) {
+                wrong.push(format!("{flag}: pandoc {arity:?}, takes next word here: {takes_next}"));
+            }
+        }
+        assert!(wrong.is_empty(), "flag lists disagree with pandoc --help:\n  {}", wrong.join("\n  "));
     }
 
     fn optional_value_flags() -> Vec<String> {

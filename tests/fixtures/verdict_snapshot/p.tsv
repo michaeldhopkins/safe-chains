@@ -358,6 +358,11 @@ pandoc --katex	safe-read
 pandoc --katex-stylesheet x	safe-read
 pandoc --link-images	safe-read
 pandoc --list-extensions	safe-read
+pandoc --list-extensions=./w.lua	denied
+pandoc --list-extensions=gfm	safe-read
+pandoc --list-extensions=lua	denied
+pandoc --list-extensions=markdown	safe-read
+pandoc --list-extensions=nosuchformat	denied
 pandoc --list-highlight-languages	safe-read
 pandoc --list-highlight-styles	safe-read
 pandoc --list-input-formats	safe-read
