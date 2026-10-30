@@ -150,6 +150,11 @@ struct Entry {
     #[allow(dead_code)] // read by the twin-pairing guard (cfg(test))
     #[serde(default)]
     twin_base: Option<String>,
+    /// The build crates (`cc`, `pkg-config`, `cmake`) look the name up under four more spellings
+    /// first: `NAME_<target>`, `NAME_<target_with_underscores>`, then `HOST_NAME` or `TARGET_NAME`.
+    /// Each gets this entry's rule, so no target spelling carries a value the plain name is refused.
+    #[serde(default)]
+    target_spellings: bool,
 }
 
 /// Declared (env-name, flag-template, base-command) triples, for the pairing guard. Re-parses the
@@ -168,7 +173,7 @@ struct Table {
     env: HashMap<String, Entry>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Rule {
     pub(crate) shape: Shape,
     pub(crate) single_value: bool,
@@ -191,23 +196,30 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
     let parsed: Table = toml::from_str(src).expect("embedded envvars.toml must parse");
     let mut exact = HashMap::new();
     let mut globs = Vec::new();
+    let mut spelled = Vec::new();
     for (name, entry) in parsed.env {
+        let rule = Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags };
         match name.split_once('*') {
             Some((pre, suf)) => {
                 assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
-                globs.push((
-                    pre.to_string(),
-                    suf.to_string(),
-                    Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags },
-                ));
+                assert!(!entry.target_spellings, "envvars.toml: `{name}` is a pattern and cannot take target_spellings");
+                globs.push((pre.to_string(), suf.to_string(), rule));
             }
             None => {
-                exact.insert(
-                    name,
-                    Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags },
-                );
+                if entry.target_spellings {
+                    spelled.push((name.clone(), rule.clone()));
+                }
+                exact.insert(name, rule);
             }
         }
+    }
+    for (name, rule) in spelled {
+        for kind in ["HOST", "TARGET"] {
+            let alias = format!("{kind}_{name}");
+            assert!(!exact.contains_key(&alias), "envvars.toml: `{alias}` is listed and also spelled from `{name}`");
+            exact.insert(alias, rule.clone());
+        }
+        globs.push((format!("{name}_"), String::new(), rule));
     }
     Compiled { exact, globs }
 });
@@ -588,6 +600,56 @@ mod tests {
     }
 
     #[test]
+    fn the_build_crates_target_spellings_are_judged_in_every_form() {
+        let cases: [(&str, &[&str], &[&str]); 20] = [
+            ("CC_aarch64_apple_darwin", &["/tmp/evil", "~/evil"], &["clang", "./tools/cc"]),
+            ("HOST_CC", &["/tmp/evil"], &["clang"]),
+            ("TARGET_CC", &["/tmp/evil"], &["clang"]),
+            ("CXX_aarch64_apple_darwin", &["/tmp/evil"], &["clang++"]),
+            ("TARGET_CXX", &["/tmp/evil"], &["clang++"]),
+            ("AR_aarch64_apple_darwin", &["/tmp/evil"], &["llvm-ar"]),
+            ("TARGET_AR", &["/tmp/evil"], &["llvm-ar"]),
+            ("RANLIB", &["/tmp/evil"], &["llvm-ranlib"]),
+            ("RANLIB_x86_64_unknown_linux_gnu", &["/tmp/evil"], &["llvm-ranlib"]),
+            ("CFLAGS_aarch64_apple_darwin", &["-fplugin=/tmp/evil.dylib", "'-B /tmp/evil'"], &["-O2", "'-O2 -Wall'"]),
+            ("TARGET_CFLAGS", &["-fplugin=/tmp/evil.dylib"], &["-O2"]),
+            ("HOST_CXXFLAGS", &["-fplugin=/tmp/evil.dylib"], &["-O2"]),
+            ("ARFLAGS", &["'--plugin /tmp/evil.so'", "@/tmp/flags"], &["-D", "'-D -s'"]),
+            ("PKG_CONFIG", &["/tmp/evil"], &["pkg-config"]),
+            ("PKG_CONFIG_aarch64_apple_darwin", &["/tmp/evil"], &["pkg-config"]),
+            ("CMAKE", &["/tmp/evil"], &["cmake"]),
+            ("CMAKE_TOOLCHAIN_FILE", &["/tmp/evil.cmake"], &["./cmake/toolchain.cmake"]),
+            ("PROTOC", &["/tmp/evil"], &["protoc"]),
+            ("LIBCLANG_PATH", &["/tmp/evil"], &["./vendor/llvm/lib"]),
+            ("CROSS_COMPILE", &["/tmp/evil/"], &["aarch64-linux-gnu-"]),
+        ];
+        let base = "cargo build";
+        assert!(crate::is_safe_command(base));
+        for (name, refused, allowed) in cases {
+            for value in refused {
+                for cmd in
+                    [format!("{name}={value} {base}"), format!("export {name}={value}; {base}"), format!("env {name}={value} {base}")]
+                {
+                    assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+            for value in allowed {
+                for cmd in
+                    [format!("{name}={value} {base}"), format!("export {name}={value}; {base}"), format!("env {name}={value} {base}")]
+                {
+                    assert!(crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+        }
+        for cmd in
+            ["env CC_aarch64-apple-darwin=/tmp/evil cargo build", "env CFLAGS_aarch64-apple-darwin=-fplugin=/tmp/evil.dylib cargo build"]
+        {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        assert!(crate::is_safe_command("env CC_aarch64-apple-darwin=clang cargo build"));
+    }
+
+    #[test]
     fn cargos_remaining_program_path_and_url_settings_are_judged() {
         let cases: [(&str, &str, &[&str], &[&str]); 9] = [
             ("CARGO_HTTP_PROXY_CAINFO", "cargo build", &["/tmp/ca.pem", "./ca.pem"], &[]),
@@ -731,6 +793,57 @@ mod tests {
     fn an_empty_value_is_inert_even_for_a_listed_name() {
         for n in ["GIT_PAGER", "LD_PRELOAD", "GIT_DIR"] {
             assert_eq!(assignment_verdict(n, ""), Verdict::Allowed(SafetyLevel::Inert));
+        }
+    }
+
+    fn target_spelled() -> Vec<String> {
+        let parsed: Table = toml::from_str(include_str!("../envvars.toml")).expect("embedded envvars.toml must parse");
+        let mut out: Vec<String> = parsed.env.into_iter().filter(|(_, e)| e.target_spellings).map(|(name, _)| name).collect();
+        out.sort();
+        out
+    }
+
+    #[test]
+    fn every_name_the_build_crates_read_by_target_is_spelled_by_target() {
+        let spelled = target_spelled();
+        for name in [
+            "CC", "CXX", "AR", "RANLIB", "NVCC", "CFLAGS", "CXXFLAGS", "ARFLAGS", "RANLIBFLAGS", "PKG_CONFIG", "PKG_CONFIG_PATH",
+            "PKG_CONFIG_LIBDIR", "PKG_CONFIG_SYSROOT_DIR", "CMAKE", "CMAKE_TOOLCHAIN_FILE", "CMAKE_PREFIX_PATH",
+        ] {
+            assert!(spelled.iter().any(|s| s == name), "{name} is read under target spellings but not marked target_spellings");
+        }
+    }
+
+    #[test]
+    fn every_target_spelling_carries_the_plain_names_rule() {
+        let spelled = target_spelled();
+        assert!(spelled.len() >= 16, "only {} entries carry target_spellings", spelled.len());
+        for name in &spelled {
+            let plain = rule_of(name).expect("a marked entry is in the table");
+            for target in
+                ["aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "wasm32-wasip1", "thumbv7em-none-eabihf", "x86_64-pc-windows-msvc"]
+            {
+                let underscored = target.replace(['-', '.'], "_");
+                for spelling in
+                    [format!("{name}_{target}"), format!("{name}_{underscored}"), format!("HOST_{name}"), format!("TARGET_{name}")]
+                {
+                    assert_eq!(rule_of(&spelling), Some(plain), "{spelling} is not judged as {name} is");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn overlapping_name_patterns_share_one_rule() {
+        let globs = &TABLE.globs;
+        for (i, (p1, s1, r1)) in globs.iter().enumerate() {
+            for (p2, s2, r2) in &globs[i + 1..] {
+                let prefixes_meet = p1.starts_with(p2.as_str()) || p2.starts_with(p1.as_str());
+                let suffixes_meet = s1.ends_with(s2.as_str()) || s2.ends_with(s1.as_str());
+                if prefixes_meet && suffixes_meet {
+                    assert_eq!(r1, r2, "`{p1}*{s1}` and `{p2}*{s2}` can match one name with different rules");
+                }
+            }
         }
     }
 }

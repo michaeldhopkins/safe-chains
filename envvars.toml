@@ -45,6 +45,11 @@
 # verdict for a foreign path, a workspace path and a bare name. Tag every pair: gating one spelling
 # and leaving the other open is a complete bypass that reads as a closed gate — which is exactly how
 # `borg --rsh /tmp/evil` came to deny while `BORG_RSH=/tmp/evil borg` was approved.
+#
+# `target_spellings = true` gives the entry's rule to the four other names the build crates (`cc`,
+# `pkg-config`, `cmake`) look it up under before the plain one: `NAME_<target>`,
+# `NAME_<target_with_underscores>`, `HOST_NAME` and `TARGET_NAME`. `CC_aarch64_apple_darwin=/tmp/evil`
+# runs /tmp/evil as the C compiler exactly as `CC=/tmp/evil` does.
 
 # Every entry's `because` is the measured behaviour where one was taken; see
 # docs/design/env-prefix-classification.md for the probes. Entries marked `measured = false` are
@@ -341,6 +346,7 @@ measured = false
 shape = "exec-path"
 because = "pkg-config reads .pc files from here, and the compiler and linker flags they hold (-fplugin, -Wl,…) reach the build"
 measured = false
+target_spellings = true
 [env.TERMINFO]
 shape = "exec-path"
 because = "curses reads compiled terminal descriptions from here, parsed binary files"
@@ -772,6 +778,7 @@ allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic",
 path_flags = [{ flag = "-I", role = "exec", sep = "space" }, { flag = "-L", role = "exec", sep = "space" }]
 because = "C compiler flags read by make and cargo build scripts; -fplugin, -B, --specs and -Wl, load code or invoke a linker"
 measured = false
+target_spellings = true
 [env.CXXFLAGS]
 shape = "option-string"
 allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic", "-Wshadow", "-Wconversion",
@@ -780,6 +787,27 @@ allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic",
 path_flags = [{ flag = "-I", role = "exec", sep = "space" }, { flag = "-L", role = "exec", sep = "space" }]
 because = "as CFLAGS, for C++"
 measured = false
+target_spellings = true
+[env.BINDGEN_EXTRA_CLANG_ARGS]
+shape = "option-string"
+allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-w", "-std=*", "-pedantic", "-fno-*",
+           "-march=*", "-mtune=*", "-D*", "-U*", "-x", "-xc", "-xc++", "--target=*"]
+path_flags = [{ flag = "-I", role = "exec", sep = "space" }]
+because = "bindgen hands these to libclang; -fplugin, -load and -Xclang load code into the build script"
+measured = false
+target_spellings = true
+[env.ARFLAGS]
+shape = "option-string"
+allowed = ["-D", "-U", "-T", "-v", "-s", "--thin"]
+because = "flags cc adds to the archiver; --plugin loads a shared object into ar, and @file reads more flags from a file"
+measured = false
+target_spellings = true
+[env.RANLIBFLAGS]
+shape = "option-string"
+allowed = ["-D", "-U", "-t", "-c", "-no_warning_for_no_symbols"]
+because = "flags cc adds to ranlib; --plugin loads a shared object into it"
+measured = false
+target_spellings = true
 [env.CPPFLAGS]
 shape = "option-string"
 allowed = ["-Wall", "-Wextra", "-Werror*", "-Wno-*", "-w", "-D*", "-U*"]
@@ -1081,11 +1109,13 @@ shape = "exec-path"
 single_value = true
 because = "the C compiler invoked by make and cargo build scripts"
 measured = false
+target_spellings = true
 [env.CXX]
 shape = "exec-path"
 single_value = true
 because = "the C++ compiler invoked by make and cargo build scripts"
 measured = false
+target_spellings = true
 [env.LD]
 shape = "exec-path"
 single_value = true
@@ -1095,6 +1125,77 @@ measured = false
 shape = "exec-path"
 single_value = true
 because = "the archiver invoked by make and cargo build scripts"
+measured = false
+target_spellings = true
+[env.RANLIB]
+shape = "exec-path"
+single_value = true
+because = "the ranlib cc runs over each archive it builds"
+measured = false
+target_spellings = true
+[env.NVCC]
+shape = "exec-path"
+single_value = true
+because = "the CUDA compiler cc runs for .cu sources"
+measured = false
+target_spellings = true
+[env.CROSS_COMPILE]
+shape = "exec-path"
+single_value = true
+because = "cc prefixes this to gcc, ar and ranlib when cross compiling, so a path prefix names the programs it runs"
+measured = false
+[env.PKG_CONFIG]
+shape = "exec-path"
+because = "the pkg-config program the pkg-config crate runs from build scripts"
+measured = false
+target_spellings = true
+[env.PKG_CONFIG_LIBDIR]
+shape = "exec-path"
+because = "replaces pkg-config's default search path for .pc files, whose flags reach the build"
+measured = false
+target_spellings = true
+[env.PKG_CONFIG_SYSROOT_DIR]
+shape = "exec-path"
+because = "pkg-config prefixes this to every -I and -L path it reports, so it chooses the headers and libraries linked"
+measured = false
+target_spellings = true
+[env.CMAKE]
+shape = "exec-path"
+because = "the cmake program the cmake crate runs from build scripts"
+measured = false
+target_spellings = true
+[env.CMAKE_TOOLCHAIN_FILE]
+shape = "exec-path"
+because = "a CMake script cmake runs before configuring, which can run any program"
+measured = false
+target_spellings = true
+[env.CMAKE_PREFIX_PATH]
+shape = "exec-path"
+because = "the directories find_package loads <Name>Config.cmake scripts from, which cmake runs"
+measured = false
+target_spellings = true
+[env.PROTOC]
+shape = "exec-path"
+single_value = true
+because = "the protoc program prost-build and other build scripts run"
+measured = false
+[env.LIBCLANG_PATH]
+shape = "exec-path"
+because = "the directory clang-sys and bindgen load libclang from into the build script"
+measured = false
+[env.LIBCLANG_STATIC_PATH]
+shape = "exec-path"
+because = "the directory clang-sys links libclang statically from"
+measured = false
+[env.CLANG_PATH]
+shape = "exec-path"
+single_value = true
+because = "the clang program clang-sys runs"
+measured = false
+[env.LLVM_CONFIG_PATH]
+shape = "exec-path"
+single_value = true
+because = "the llvm-config program clang-sys runs to find libclang"
 measured = false
 [env.JAVA_HOME]
 shape = "exec-path"
