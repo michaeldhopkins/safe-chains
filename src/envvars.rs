@@ -676,6 +676,45 @@ mod tests {
     }
 
     #[test]
+    fn cargos_remaining_program_path_and_url_settings_are_judged() {
+        let cases: [(&str, &str, &[&str], &[&str]); 9] = [
+            ("CARGO_HTTP_PROXY_CAINFO", "cargo build", &["/tmp/ca.pem", "./ca.pem"], &[]),
+            ("CARGO_CREDENTIAL_ALIAS_MINE", "cargo build", &["/tmp/evil", "'sh -c evil'"], &[]),
+            ("CARGO_CREDENTIAL_ALIAS_my_alias", "cargo build", &["/tmp/evil"], &[]),
+            (
+                "CARGO_RESOLVER_LOCKFILE_PATH",
+                "cargo build",
+                &["/tmp/x/Cargo.lock", "~/x/Cargo.lock", "../other/Cargo.lock", "./Cargo.lock"],
+                &[],
+            ),
+            ("CARGO", "cargo nextest run", &["/tmp/evil", "~/evil", "../other/cargo"], &["./tools/cargo"]),
+            (
+                "CARGO_BUILD_TARGET",
+                "cargo +nightly build -Zbuild-std",
+                &["/tmp/evil.json", "./specs/evil.json", "../evil.json", "'[\"/tmp/evil.json\"]'", "'a /tmp/evil.json'"],
+                &["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown", "host-tuple", "my-target.json"],
+            ),
+            ("RUST_TARGET_PATH", "cargo +nightly build -Zbuild-std", &["/tmp", "./specs:/tmp", "~/specs"], &["./specs"]),
+            ("CARGO_BUILD_ARTIFACT_DIR", "cargo build", &["~/bin", "/usr/local/bin", "../sibling"], &["out"]),
+            ("CARGO_BUILD_OUT_DIR", "cargo build", &["~/bin", "/usr/local/bin"], &["out"]),
+        ];
+        for (name, base, refused, allowed) in cases {
+            assert!(crate::is_safe_command(base), "{base}");
+            for value in refused {
+                for cmd in
+                    [format!("{name}={value} {base}"), format!("export {name}={value}; {base}"), format!("env {name}={value} {base}")]
+                {
+                    assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+            for value in allowed {
+                let cmd = format!("{name}={value} {base}");
+                assert!(crate::is_safe_command(&cmd), "{cmd}");
+            }
+        }
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",

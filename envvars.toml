@@ -995,6 +995,45 @@ measured = false
 shape = "opaque"
 because = "http.cainfo: the CA bundle cargo trusts for downloads, so a planted certificate lets a proxy or mirror serve altered crates"
 measured = false
+[env.CARGO_HTTP_PROXY_CAINFO]
+shape = "opaque"
+because = "http.proxy-cainfo: the CA bundle cargo trusts for the proxy's own TLS"
+measured = false
+[env."CARGO_CREDENTIAL_ALIAS_*"]
+shape = "command"
+because = "credential-alias.<name>: a provider command line that a registry's credential-provider can name by alias, which cargo then runs"
+measured = false
+[env.CARGO_RESOLVER_LOCKFILE_PATH]
+shape = "config-file"
+single_value = true
+because = "resolver.lockfile-path: the lockfile cargo reads pinned versions from and writes back, so a foreign one chooses which published versions are compiled and run"
+measured = false
+[env.CARGO]
+shape = "exec-path"
+single_value = true
+because = "cargo passes this on as the cargo binary to build scripts and external subcommands (cargo-nextest, cargo-llvm-cov and others run it to build)"
+measured = false
+# `build.target` may name a target specification file, whose `linker` and `pre-link-args` run at
+# link time; a bare name that is not a built-in target is looked up as `<name>.json` along
+# RUST_TARGET_PATH. A built-in triple is a plain name, so only that shape is admitted.
+[env.CARGO_BUILD_TARGET]
+shape = "toolchain-name"
+because = "build.target: a target triple, or a path to a target specification file that names the linker to run"
+measured = false
+[env.RUST_TARGET_PATH]
+shape = "exec-path"
+because = "the directories rustc searches for <target>.json specification files, which name the linker to run"
+measured = false
+[env.CARGO_BUILD_ARTIFACT_DIR]
+shape = "data-write"
+single_value = true
+because = "build.artifact-dir (nightly): the directory cargo copies final artifacts into"
+measured = false
+[env.CARGO_BUILD_OUT_DIR]
+shape = "data-write"
+single_value = true
+because = "build.out-dir, the earlier name of build.artifact-dir"
+measured = false
 [env.RUSTUP_HOME]
 shape = "config-dir"
 single_value = true
