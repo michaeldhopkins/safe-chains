@@ -652,6 +652,30 @@ mod tests {
     }
 
     #[test]
+    fn cargos_browser_build_dir_proxy_and_ca_bundle_are_judged() {
+        let cases: [(&str, &str, &[&str], &[&str]); 4] = [
+            ("CARGO_DOC_BROWSER", "cargo doc --open", &["/tmp/evil", "'sh -c evil'", "./evil"], &["cat"]),
+            ("CARGO_BUILD_BUILD_DIR", "cargo build", &["~/x", "/etc/x", "../sibling"], &["build", "./target/build"]),
+            ("CARGO_HTTP_PROXY", "cargo build", &["http://evil.example:8080", "socks5://127.0.0.1:1080"], &[]),
+            ("CARGO_HTTP_CAINFO", "cargo build", &["/tmp/ca.pem", "./ca.pem"], &[]),
+        ];
+        for (name, base, refused, allowed) in cases {
+            assert!(crate::is_safe_command(base), "{base}");
+            for value in refused {
+                for cmd in
+                    [format!("{name}={value} {base}"), format!("export {name}={value}; {base}"), format!("env {name}={value} {base}")]
+                {
+                    assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+            for value in allowed {
+                let cmd = format!("{name}={value} {base}");
+                assert!(crate::is_safe_command(&cmd), "{cmd}");
+            }
+        }
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",

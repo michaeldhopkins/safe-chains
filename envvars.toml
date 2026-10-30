@@ -978,6 +978,23 @@ shape = "data-write"
 single_value = true
 because = "the CARGO_* config-mirror spelling of CARGO_TARGET_DIR"
 measured = false
+[env.CARGO_BUILD_BUILD_DIR]
+shape = "data-write"
+single_value = true
+because = "build.build-dir: the directory cargo writes intermediate build artifacts into, beside the target directory"
+measured = false
+[env.CARGO_DOC_BROWSER]
+shape = "command"
+because = "doc.browser: the program `cargo doc --open` runs to open the docs, ahead of BROWSER"
+measured = false
+[env.CARGO_HTTP_PROXY]
+shape = "opaque"
+because = "http.proxy: every registry and git request goes through this proxy, which sees and can alter what cargo downloads"
+measured = false
+[env.CARGO_HTTP_CAINFO]
+shape = "opaque"
+because = "http.cainfo: the CA bundle cargo trusts for downloads, so a planted certificate lets a proxy or mirror serve altered crates"
+measured = false
 [env.RUSTUP_HOME]
 shape = "config-dir"
 single_value = true
