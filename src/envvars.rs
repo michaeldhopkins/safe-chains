@@ -613,6 +613,45 @@ mod tests {
     }
 
     #[test]
+    fn cargos_nightly_profile_unstable_and_host_settings_are_judged() {
+        let base = "cargo +nightly build -Zprofile-rustflags -Zcodegen-backend -Zhost-config -Ztarget-applies-to-host";
+        assert!(crate::is_safe_command(base), "{base}");
+        let segments = ["DEV", "RELEASE", "my_profile", "DEV_BUILD_OVERRIDE", "DEV_PACKAGE_serde", "Dev_Package_Foo_Bar"];
+        let mut refused: Vec<String> = Vec::new();
+        let mut allowed: Vec<String> = Vec::new();
+        for seg in segments {
+            refused.push(format!("CARGO_PROFILE_{seg}_RUSTFLAGS='-Clinker=/tmp/evil'"));
+            refused.push(format!("CARGO_PROFILE_{seg}_RUSTFLAGS='-C linker=/tmp/evil'"));
+            refused.push(format!("CARGO_PROFILE_{seg}_RUSTFLAGS='-Zcodegen-backend=/tmp/evil.dylib'"));
+            refused.push(format!("CARGO_PROFILE_{seg}_CODEGEN_BACKEND=/tmp/evil.dylib"));
+            refused.push(format!("CARGO_PROFILE_{seg}_CODEGEN_BACKEND=cranelift"));
+            allowed.push(format!("CARGO_PROFILE_{seg}_RUSTFLAGS='-Ctarget-cpu=native -Dwarnings'"));
+            allowed.push(format!("CARGO_PROFILE_{seg}_OPT_LEVEL=3"));
+        }
+        for unstable in ["BUILD_STD", "CONFIG_INCLUDE", "HOST_CONFIG", "build_std", "Codegen_Backend"] {
+            refused.push(format!("CARGO_UNSTABLE_{unstable}=true"));
+        }
+        for triple in ["", "AARCH64_APPLE_DARWIN_", "x86_64_unknown_linux_gnu_", "Aarch64_Apple_Darwin_"] {
+            refused.push(format!("CARGO_HOST_{triple}LINKER=/tmp/evil"));
+            refused.push(format!("CARGO_HOST_{triple}RUNNER=/tmp/evil"));
+            refused.push(format!("CARGO_HOST_{triple}RUNNER='sh -c evil'"));
+            refused.push(format!("CARGO_HOST_{triple}RUSTFLAGS='-Clinker=/tmp/evil'"));
+            refused.push(format!("CARGO_HOST_{triple}RUSTDOCFLAGS='--test-runtool /tmp/evil'"));
+            allowed.push(format!("CARGO_HOST_{triple}RUSTFLAGS='-Ctarget-cpu=native'"));
+            allowed.push(format!("CARGO_HOST_{triple}RUSTDOCFLAGS=-Dwarnings"));
+        }
+        for assignment in refused {
+            for cmd in [format!("{assignment} {base}"), format!("export {assignment}; {base}"), format!("env {assignment} {base}")] {
+                assert!(!crate::is_safe_command(&cmd), "{cmd}");
+            }
+        }
+        for assignment in allowed {
+            let cmd = format!("{assignment} {base}");
+            assert!(crate::is_safe_command(&cmd), "{cmd}");
+        }
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",

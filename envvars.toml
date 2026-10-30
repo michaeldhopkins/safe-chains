@@ -701,6 +701,69 @@ shape = "option-string"
 allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
 because = "the per-target spelling of RUSTDOCFLAGS (target.<triple>.rustdocflags); --test-runtool runs an arbitrary binary"
 measured = false
+# Nightly settings with an environment spelling. `profile.<name>.rustflags` (-Zprofile-rustflags)
+# also covers `profile.<name>.build-override.rustflags` and `profile.<name>.package.<crate>.rustflags`,
+# whose crate segment keeps its own letter case under -Zadvanced-env.
+[env."CARGO_PROFILE_*_RUSTFLAGS"]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
+because = "the per-profile spelling of RUSTFLAGS (profile.<name>.rustflags, -Zprofile-rustflags); -C linker= runs an arbitrary binary"
+measured = false
+[env."CARGO_PROFILE_*_CODEGEN_BACKEND"]
+shape = "opaque"
+because = "profile.<name>.codegen-backend (-Zcodegen-backend) is passed to rustc's -Zcodegen-backend, which loads a path as a dylib into the compiler"
+measured = false
+[env."CARGO_UNSTABLE_*"]
+shape = "opaque"
+because = "the [unstable] table: each variable switches on a nightly feature as -Z would, several of which read further config that names programs or dylibs"
+measured = false
+# `[host]` (-Zhost-config) mirrors `[target.<triple>]` for build scripts and proc macros, in a generic
+# table and a per-triple one.
+[env.CARGO_HOST_LINKER]
+shape = "command"
+because = "host.linker: cargo invokes this as the linker for build scripts and proc macros (-Zhost-config)"
+measured = false
+[env."CARGO_HOST_*_LINKER"]
+shape = "command"
+because = "host.<triple>.linker, the per-triple spelling of host.linker"
+measured = false
+[env.CARGO_HOST_RUNNER]
+shape = "command"
+because = "host.runner: cargo runs build scripts through this (-Zhost-config)"
+measured = false
+[env."CARGO_HOST_*_RUNNER"]
+shape = "command"
+because = "host.<triple>.runner, the per-triple spelling of host.runner"
+measured = false
+[env.CARGO_HOST_RUSTFLAGS]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
+because = "host.rustflags, RUSTFLAGS for build scripts and proc macros (-Zhost-config); -C linker= runs an arbitrary binary"
+measured = false
+[env."CARGO_HOST_*_RUSTFLAGS"]
+shape = "option-string"
+allowed = ["-Copt-level", "-Cdebuginfo", "-Cdebug-assertions", "-Coverflow-checks",
+           "-Ctarget-cpu", "-Ctarget-feature", "-Ccodegen-units", "-Cpanic", "-Cstrip",
+           "-Clto", "-D*", "-W*", "-A*", "-F*", "--cfg"]
+path_flags = [{ flag = "-Cincremental", role = "write" }]
+because = "host.<triple>.rustflags, the per-triple spelling of host.rustflags"
+measured = false
+[env.CARGO_HOST_RUSTDOCFLAGS]
+shape = "option-string"
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
+because = "host.rustdocflags (-Zhost-config); --test-runtool runs an arbitrary binary"
+measured = false
+[env."CARGO_HOST_*_RUSTDOCFLAGS"]
+shape = "option-string"
+allowed = ["-D*", "-W*", "-A*", "-F*", "--cfg", "--document-private-items"]
+because = "host.<triple>.rustdocflags, the per-triple spelling of host.rustdocflags"
+measured = false
 [env.CFLAGS]
 shape = "option-string"
 allowed = ["-O*", "-g*", "-Wall", "-Wextra", "-Werror*", "-Wno-*", "-Wpedantic", "-Wshadow", "-Wconversion",
