@@ -155,6 +155,19 @@ struct Entry {
     /// Each gets this entry's rule, so no target spelling carries a value the plain name is refused.
     #[serde(default)]
     target_spellings: bool,
+    /// `judged` when the program acts on the variable being set at all, so an empty value is judged
+    /// like any other: git turns certificate checks off for `GIT_SSL_NO_VERIFY=` as for
+    /// `GIT_SSL_NO_VERIFY=1`.
+    #[serde(default)]
+    empty: Empty,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[serde(rename_all = "kebab-case")]
+enum Empty {
+    #[default]
+    Inert,
+    Judged,
 }
 
 /// Declared (env-name, flag-template, base-command) triples, for the pairing guard. Re-parses the
@@ -179,6 +192,7 @@ pub(crate) struct Rule {
     pub(crate) single_value: bool,
     allowed: Vec<String>,
     path_flags: Vec<PathFlagEntry>,
+    presence: bool,
 }
 
 struct Compiled {
@@ -198,7 +212,13 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
     let mut globs = Vec::new();
     let mut spelled = Vec::new();
     for (name, entry) in parsed.env {
-        let rule = Rule { shape: entry.shape, single_value: entry.single_value, allowed: entry.allowed, path_flags: entry.path_flags };
+        let rule = Rule {
+            shape: entry.shape,
+            single_value: entry.single_value,
+            allowed: entry.allowed,
+            path_flags: entry.path_flags,
+            presence: entry.empty == Empty::Judged,
+        };
         match name.split_once('*') {
             Some((pre, suf)) => {
                 assert!(!suf.contains('*'), "envvars.toml: `{name}` has more than one `*`");
@@ -262,7 +282,7 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     // An EMPTY value un-sets the behaviour rather than pointing it anywhere: `GIT_PAGER=` disables
     // the pager, `LD_PRELOAD=` preloads nothing. Denying that would be a false positive on the one
     // spelling that is unambiguously inert.
-    if value.is_empty() {
+    if value.is_empty() && !rule.presence {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     match rule.shape {
@@ -647,6 +667,37 @@ mod tests {
             assert!(!crate::is_safe_command(cmd), "{cmd}");
         }
         assert!(crate::is_safe_command("env CC_aarch64-apple-darwin=clang cargo build"));
+    }
+
+    #[test]
+    fn settings_that_lower_trust_in_downloads_are_refused_in_every_form() {
+        let cases: [(&str, &[&str]); 9] = [
+            ("GIT_SSL_NO_VERIFY", &["1", "true", "0", "''"]),
+            ("GIT_SSL_CAINFO", &["/tmp/ca.pem", "./ca.pem"]),
+            ("GIT_SSL_CAPATH", &["/tmp/certs"]),
+            ("GIT_SSL_VERSION", &["tlsv1.0"]),
+            ("GIT_SSL_CIPHER_LIST", &["NULL"]),
+            ("CARGO_HTTP_SSL_VERSION", &["tlsv1"]),
+            ("CARGO_HTTP_SSL_VERSION_MIN", &["tlsv1"]),
+            ("CARGO_HTTP_SSL_VERSION_MAX", &["tlsv1"]),
+            ("CARGO_HTTP_CHECK_REVOKE", &["false"]),
+        ];
+        for base in ["cargo build", "CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build", "git fetch"] {
+            assert!(crate::is_safe_command(base), "{base}");
+            for (name, values) in cases {
+                for value in values {
+                    for cmd in
+                        [format!("{name}={value} {base}"), format!("export {name}={value}; {base}"), format!("env {name}={value} {base}")]
+                    {
+                        assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                    }
+                }
+            }
+        }
+        for cmd in ["GIT_SSL_NO_VERIFY= git fetch", "export GIT_SSL_NO_VERIFY=; git fetch", "env GIT_SSL_NO_VERIFY= git fetch"] {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        assert!(crate::is_safe_command("GIT_PAGER= git log"));
     }
 
     #[test]

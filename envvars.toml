@@ -50,6 +50,9 @@
 # `pkg-config`, `cmake`) look it up under before the plain one: `NAME_<target>`,
 # `NAME_<target_with_underscores>`, `HOST_NAME` and `TARGET_NAME`. `CC_aarch64_apple_darwin=/tmp/evil`
 # runs /tmp/evil as the C compiler exactly as `CC=/tmp/evil` does.
+#
+# An empty value is inert, since it usually un-sets the behaviour. `empty = "judged"` marks a variable
+# a program acts on merely being set (`GIT_SSL_NO_VERIFY=`), whose empty value is judged like any other.
 
 # Every entry's `because` is the measured behaviour where one was taken; see
 # docs/design/env-prefix-classification.md for the probes. Entries marked `measured = false` are
@@ -1026,6 +1029,45 @@ measured = false
 [env.CARGO_HTTP_PROXY_CAINFO]
 shape = "opaque"
 because = "http.proxy-cainfo: the CA bundle cargo trusts for the proxy's own TLS"
+measured = false
+[env.CARGO_HTTP_SSL_VERSION]
+shape = "opaque"
+because = "http.ssl-version: the TLS versions cargo accepts, so an old one lets a proxy downgrade and alter downloads"
+measured = false
+[env.CARGO_HTTP_SSL_VERSION_MIN]
+shape = "opaque"
+because = "http.ssl-version.min, the lowest TLS version cargo accepts"
+measured = false
+[env.CARGO_HTTP_SSL_VERSION_MAX]
+shape = "opaque"
+because = "http.ssl-version.max, the highest TLS version cargo accepts"
+measured = false
+[env.CARGO_HTTP_CHECK_REVOKE]
+shape = "opaque"
+because = "http.check-revoke: false makes cargo accept a revoked certificate"
+measured = false
+# git reads these for every https transport, including the git cargo runs under
+# CARGO_NET_GIT_FETCH_WITH_CLI.
+[env.GIT_SSL_NO_VERIFY]
+shape = "opaque"
+empty = "judged"
+because = "git skips certificate verification whenever this is set, to any value or none, so any proxy can alter what it fetches"
+measured = false
+[env.GIT_SSL_CAINFO]
+shape = "opaque"
+because = "the CA bundle git trusts for https, so a planted certificate lets a forged server pass"
+measured = false
+[env.GIT_SSL_CAPATH]
+shape = "opaque"
+because = "as GIT_SSL_CAINFO, a directory of CA certificates"
+measured = false
+[env.GIT_SSL_VERSION]
+shape = "opaque"
+because = "the TLS version git asks curl for, so an old one allows a downgrade"
+measured = false
+[env.GIT_SSL_CIPHER_LIST]
+shape = "opaque"
+because = "the ciphers git lets curl use, so a weak list allows a downgrade"
 measured = false
 [env."CARGO_CREDENTIAL_ALIAS_*"]
 shape = "command"
