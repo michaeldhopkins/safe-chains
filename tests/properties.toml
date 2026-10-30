@@ -19,6 +19,7 @@ owed = [
   "src/engine/archetype.rs",
   "src/engine/resolve/flags.rs",
   "src/envvars.rs",
+  "src/envvars/option_string.rs",
   "src/handlers/coreutils/sed.rs",
   "src/handlers/forges/glab.rs",
   "src/handlers/ruby/bundle.rs",
@@ -200,6 +201,7 @@ owed = [
   "src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape",
 ]
 "src/envvars.rs" = []
+"src/envvars/option_string.rs" = []
 "src/envvars/config_dir.rs" = [
   "src/envvars/config_dir_tests.rs::any_config_location_under_a_temp_root_is_refused",
   "src/envvars/config_dir_tests.rs::a_config_directory_outside_the_scratch_places_is_allowed",
