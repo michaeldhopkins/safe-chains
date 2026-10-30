@@ -19,6 +19,13 @@ fn check_version(version: &str) {
         assert!(safe_chains::is_safe_command(&format!("pandoc --from={reader}+smart README.md")), "reader `{reader}+smart` rejected");
     }
     for writer in &writers {
+        for prefix in ["", "--toc ", "--number-sections ", "--mathjax "] {
+            assert_eq!(
+                safe_chains::is_safe_command(&format!("pandoc {prefix}-t {writer} README.md")),
+                safe_chains::is_safe_command(&format!("pandoc -t {writer} README.md")),
+                "`{prefix}` changed the verdict for writer `{writer}`"
+            );
+        }
         if *writer == "pdf" {
             assert!(!safe_chains::is_safe_command(&format!("pandoc -t {writer} README.md")), "pdf writer must remain refused");
         } else {

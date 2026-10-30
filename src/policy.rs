@@ -120,6 +120,12 @@ pub trait FlagSet {
     fn contains_short(&self, byte: u8) -> bool;
 }
 
+/// Whether `flag`, written without an inline `=value`, takes the next word as its value. An
+/// optional-value flag sits in both sets and takes a value only when glued, as getopt reads it.
+pub(crate) fn takes_next_word<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(standalone: &S, valued: &V, flag: &str) -> bool {
+    valued.contains_flag(flag) && !standalone.contains_flag(flag)
+}
+
 impl FlagSet for WordSet {
     fn contains_flag(&self, token: &str) -> bool {
         self.contains(token)

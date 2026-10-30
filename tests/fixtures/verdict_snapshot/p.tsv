@@ -367,6 +367,7 @@ pandoc --log=out.json README.md	denied
 pandoc --lua-filter=filter.lua README.md	denied
 pandoc --markdown-headings x	safe-read
 pandoc --mathjax	safe-read
+pandoc --mathjax -f ./r.lua in.md	denied
 pandoc --mathml	safe-read
 pandoc --metadata x	safe-read
 pandoc --metadata-file x	safe-read
@@ -376,6 +377,7 @@ pandoc --no-check-certificate	safe-read
 pandoc --no-highlight	safe-read
 pandoc --number-offset x	safe-read
 pandoc --number-sections	safe-read
+pandoc --number-sections -t pdf in.md	denied
 pandoc --output out.docx README.md	denied
 pandoc --parse-raw README.md	denied
 pandoc --pdf-engine=xelatex README.md	denied
@@ -419,7 +421,13 @@ pandoc --to=./w.lua README.md	denied
 pandoc --to=my_lua README.md	denied
 pandoc --to=pdf README.md	denied
 pandoc --toc	safe-read
+pandoc --toc --to ./w.lua in.md	denied
+pandoc --toc --to=./w.lua in.md	denied
+pandoc --toc -t ./w.lua in.md	denied
+pandoc --toc -t html README.md	safe-read
+pandoc --toc -t pdf in.md	denied
 pandoc --toc-depth x	safe-read
+pandoc --toc=true -t html README.md	safe-read
 pandoc --top-level-division x	safe-read
 pandoc --trace	safe-read
 pandoc --track-changes x	safe-read

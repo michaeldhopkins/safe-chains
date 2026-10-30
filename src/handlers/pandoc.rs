@@ -4,7 +4,7 @@
 //! path. `-t pdf` runs TeX. The first word and the format values are checked here; every other flag
 //! is checked against the lists in `commands/tools/pandoc.toml`.
 use crate::parse::Token;
-use crate::policy::FlagSet;
+use crate::policy::{FlagSet, takes_next_word};
 use crate::registry;
 use crate::verdict::Verdict;
 
@@ -99,7 +99,7 @@ fn format_values_are_plain(tokens: &[Token]) -> bool {
                 None => (t.to_string(), None),
             };
             let format_check = long_format_check(&name);
-            if inline.is_none() && valued.contains_flag(&name) {
+            if inline.is_none() && takes_next_word(standalone, valued, &name) {
                 let value = tokens.get(i).map(Token::as_str);
                 i += 1;
                 if let Some(check) = format_check
@@ -169,6 +169,8 @@ mod tests {
         plain_writer_with_html_target: "pandoc README.md -t html",
         extension_on_known_reader: "pandoc -f commonmark_x+smart README.md",
         worktree_data_dir: "pandoc --data-dir=./data README.md",
+        optional_value_flag_then_writer: "pandoc --toc -t html README.md",
+        glued_optional_value_then_writer: "pandoc --toc=true -t html README.md",
     }
 
     denied! {
@@ -204,6 +206,12 @@ mod tests {
         runtime_options_end_marker: "pandoc --RTS README.md",
         runtime_options_bare_end: "pandoc README.md -RTS",
         runtime_options_quoted: "pandoc README.md '+RTS' -tpwned",
+        lua_writer_after_bare_optional_value_flag: "pandoc --toc -t ./w.lua in.md",
+        lua_reader_after_bare_optional_value_flag: "pandoc --mathjax -f ./r.lua in.md",
+        pdf_writer_after_bare_toc: "pandoc --toc -t pdf in.md",
+        pdf_writer_after_bare_number_sections: "pandoc --number-sections -t pdf in.md",
+        long_lua_writer_after_bare_optional_value_flag: "pandoc --toc --to ./w.lua in.md",
+        glued_lua_writer_after_bare_optional_value_flag: "pandoc --toc --to=./w.lua in.md",
     }
 
     #[test]
@@ -224,7 +232,48 @@ mod tests {
         }
     }
 
+    fn optional_value_flags() -> Vec<String> {
+        let (standalone, valued) = crate::registry::fallback_flag_sets("pandoc").expect("pandoc fallback");
+        standalone.iter().filter(|f| f.starts_with("--") && valued.contains_flag(f)).cloned().collect()
+    }
+
+    #[test]
+    fn every_optional_value_flag_leaves_the_next_format_flag_checked() {
+        let flags = optional_value_flags();
+        assert!(flags.len() >= 20, "pandoc's optional-value flags were not found: {flags:?}");
+        let mut approved = Vec::new();
+        for flag in &flags {
+            for format in [
+                "-t ./w.lua", "-w ./w.lua", "--to ./w.lua", "--to=./w.lua", "--write ./w.lua", "-f ./r.lua", "-r ./r.lua",
+                "--from ./r.lua", "--read=./r.lua", "-t pdf", "--to pdf", "-t lua", "-D ./t.lua",
+            ] {
+                let cmd = format!("pandoc {flag} {format} in.md");
+                if check(&cmd) {
+                    approved.push(cmd);
+                }
+            }
+            let plain = format!("pandoc {flag} -t html in.md");
+            assert!(check(&plain), "{plain} must stay approved");
+        }
+        assert!(approved.is_empty(), "approved:\n  {}", approved.join("\n  "));
+    }
+
     proptest! {
+        #[test]
+        fn an_optional_value_flag_before_a_lua_or_pdf_format_is_refused(
+            index in any::<prop::sample::Index>(),
+            format_flag in prop::sample::select(vec!["-t", "-w", "-f", "-r", "-D", "--to", "--write", "--from", "--read"]),
+            value in prop::sample::select(vec!["./w.lua", "w.lua", "lua", "xlua+smart", "pdf", "pdf+smart", "/tmp/w.lua"]),
+            glued in any::<bool>(),
+            before in prop::sample::select(vec!["", "-s", "--standalone", "-V x"]),
+        ) {
+            let flags = optional_value_flags();
+            let flag = index.get(&flags);
+            let format = if glued && format_flag.starts_with("--") { format!("{format_flag}={value}") } else { format!("{format_flag} {value}") };
+            let cmd = format!("pandoc {before} {flag} {format} in.md");
+            prop_assert!(!crate::is_safe_command(&cmd), "{}", cmd);
+        }
+
         #[test]
         fn any_runtime_option_token_is_denied(
             before in "[a-zA-Z.]{0,6}", after in "[a-zA-Z0-9.-]{0,8}",

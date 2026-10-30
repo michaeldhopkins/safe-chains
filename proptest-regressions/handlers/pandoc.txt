@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 16798e71cee9547153871589209ad36ad0b7f80c62067ee5ede6000e74d07e42 # shrinks to index = Index(0), format_flag = "-t", value = "./w.lua", glued = false, before = ""
