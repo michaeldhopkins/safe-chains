@@ -102,11 +102,14 @@ write = [
 #    these ask, the way `sh ./x.sh` there does. The project and folders inside it are unaffected.
 #    git and jj are not here: a repository under temp is an open question (TODO.md).
 folder_code = [
-  "bazel", "bun", "bundle", "cabal", "cargo", "cmake", "composer", "deno", "dotnet", "dune",
-  "eslint", "go", "gradle", "hatch", "jest", "just", "lein", "make", "meson", "mise", "mix",
-  "ninja", "nox", "npm", "npx", "pdm", "pnpm", "poetry", "pre-commit", "prettier", "pytest",
-  "python", "python3", "rails", "rake", "rspec", "rustc", "rustup", "sbt", "stack", "swift",
-  "task", "terraform", "tofu", "tox", "tsc", "uv", "vitest", "xcodebuild", "yarn", "zig",
+  "ansible-lint", "astro", "ava", "bazel", "bun", "bundle", "cabal", "cargo", "cmake",
+  "composer", "coverage", "cucumber", "deno", "dotnet", "dune", "eslint", "flake8", "go",
+  "gradle", "hatch", "jest", "just", "lein", "make", "meson", "mise", "mix", "mkdocs", "mocha",
+  "mvn", "mypy", "next", "ninja", "nox", "npm", "npx", "pdm", "php", "phpstan", "phpunit",
+  "pnpm", "pod", "poetry", "pre-commit", "prettier", "pylint", "pytest", "python", "python3",
+  "rails", "rake", "rollup", "rspec", "rubocop", "rustc", "rustup", "sbt", "sphinx-build",
+  "stack", "stylelint", "swift", "task", "terraform", "tofu", "tox", "tsc", "tsup", "tuist",
+  "uv", "vite", "vitest", "webpack", "xcodebuild", "yarn", "zig",
 ]
 
 # ── Argument-role grammar: tools whose path arguments take DIFFERENT roles by flag/position,

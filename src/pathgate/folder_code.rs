@@ -25,9 +25,13 @@ pub(super) fn denies(cmd: &str) -> bool {
 
 /// Whether the ambient folder is a temporary directory whose code would not be run: outside the
 /// project root, under a temp root, and refused at the executor locus (so neither this session's
-/// scratchpad nor a grant).
+/// scratchpad nor a grant). A `cd` the line made to a place nobody can pin (a CDPATH lookup, a
+/// substitution) counts as foreign, since it may be one.
 fn is_foreign() -> bool {
     let Some(cwd) = crate::pathctx::cwd() else { return false };
+    if cwd == crate::pathctx::UNRESOLVED_CWD {
+        return true;
+    }
     if !cwd.starts_with('/') || !crate::pathctx::under_temp_root(&format!("{}/", cwd.trim_end_matches('/'))) {
         return false;
     }
@@ -66,7 +70,10 @@ mod tests {
     }
 
     fn known_names() -> Vec<String> {
-        let mut names: Vec<String> = crate::handlers::handler_docs().into_iter().map(|d| d.name).collect();
+        let mut names: Vec<String> = crate::handlers::handler_docs()
+            .into_iter()
+            .flat_map(|d| d.name.split(" / ").map(str::to_string).collect::<Vec<_>>())
+            .collect();
         names.extend(crate::registry::toml_command_names().into_iter().map(str::to_string));
         names
     }
@@ -108,6 +115,32 @@ mod tests {
             assert!(judged_from(&format!("/private/tmp/claude-501/x/{SESSION}/scratchpad"), command), "scratchpad: {command}");
         }
         assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"), "a folder in temp is still readable");
+    }
+
+    #[test]
+    fn a_folder_code_tool_asks_where_the_folder_it_runs_in_is_unknown() {
+        let root = project();
+        for command in [
+            "CDPATH=/tmp; cd y && cargo --version", "CDPATH=/tmp cd y && cargo build", "export CDPATH=/tmp; cd y && npm test",
+            "cdpath=/tmp; cd y && go test ./...",
+        ] {
+            assert!(!judged_from(&root, command), "{command}");
+        }
+        for command in ["CDPATH=/tmp; cd ./sub && cargo build", "cd sub && cargo build", "cargo build"] {
+            assert!(judged_from(&root, command), "{command}");
+        }
+    }
+
+    #[test]
+    fn tools_that_run_their_folders_config_or_tests_ask_from_a_foreign_temp_folder() {
+        for command in [
+            "vite build", "webpack", "rollup -c", "tsup", "mocha", "ava", "stylelint a.css", "pylint x.py", "flake8", "phpunit",
+            "phpstan analyse", "rubocop", "mypy .", "next build", "astro build", "coverage run -m pytest", "cucumber", "php artisan test",
+            "pod install", "tuist build", "mvn test", "sphinx-build docs out", "mkdocs build", "ansible-lint",
+        ] {
+            assert!(judged_from(&project(), command), "in the project: {command}");
+            assert!(!judged_from("/tmp/y", command), "from /tmp/y: {command}");
+        }
     }
 
     #[test]
