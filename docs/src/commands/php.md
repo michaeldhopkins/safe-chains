@@ -91,12 +91,22 @@
 - **diagnose**: Flags: --debug, --help, -h. Valued: --autoload-file, --configuration, --level, --memory-limit, -a, -c, -l
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `phpstan analyse -c ./phpstan.neon src`
+- `phpstan analyse --autoload-file ./vendor/autoload.php src`
+
 ### `phpunit`
 <p class="cmd-url"><a href="https://docs.phpunit.de/">https://docs.phpunit.de/</a></p>
 
 - Allowed standalone flags: --cache-result, --check-version, --debug, --disable-coverage-ignore, --disallow-test-output, --display-all-issues, --display-deprecations, --display-errors, --display-incomplete, --display-notices, --display-phpunit-deprecations, --display-phpunit-notices, --display-skipped, --display-warnings, --do-not-cache-result, --do-not-report-useless-tests, --enforce-time-limit, --fail-on-all-issues, --fail-on-deprecation, --fail-on-empty-test-suite, --fail-on-incomplete, --fail-on-notice, --fail-on-phpunit-deprecation, --fail-on-phpunit-notice, --fail-on-phpunit-warning, --fail-on-risky, --fail-on-skipped, --fail-on-warning, --globals-backup, --help, --ignore-baseline, --ignore-dependencies, --list-groups, --list-suites, --list-test-files, --list-test-ids, --list-tests, --no-configuration, --no-coverage, --no-extensions, --no-logging, --no-output, --no-progress, --no-results, --path-coverage, --process-isolation, --random-order, --resolve-dependencies, --reverse-list, --reverse-order, --static-backup, --stderr, --strict-coverage, --strict-global-state, --stop-on-defect, --stop-on-deprecation, --stop-on-error, --stop-on-failure, --stop-on-incomplete, --stop-on-notice, --stop-on-risky, --stop-on-skipped, --stop-on-warning, --teamcity, --testdox, --testdox-summary, --validate-configuration, --version, --warm-coverage-cache, --with-telemetry, -h
-- Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-openclover, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --diff-context, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-otr, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --run-test-id, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c, -d
+- Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-openclover, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --diff-context, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-otr, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --run-test-id, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c
 - Bare invocation allowed
+
+**Examples:**
+
+- `phpunit -c ./phpunit.xml tests`
+- `phpunit --log-junit ./junit.xml tests/UnitTest.php`
 
 ### `please`
 <p class="cmd-url"><a href="https://statamic.dev/cli">https://statamic.dev/cli</a></p>

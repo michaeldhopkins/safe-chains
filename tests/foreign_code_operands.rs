@@ -107,3 +107,15 @@ fn a_valued_flag_that_is_not_a_path_still_takes_any_value() {
         assert!(approved_in_project(command), "{command}");
     }
 }
+
+#[test]
+fn rollup_watch_mode_cannot_name_a_command_to_run() {
+    for hook in ["onStart", "onBundleStart", "onBundleEnd", "onEnd", "onError"] {
+        for command in [
+            format!("rollup -w --watch.{hook} 'touch out.txt' -i src/main.js -o dist/out.js"),
+            format!("rollup -w --watch.{hook}='touch out.txt' -i src/main.js -o dist/out.js"),
+        ] {
+            assert!(!approved_in_project(&command), "{command}");
+        }
+    }
+}

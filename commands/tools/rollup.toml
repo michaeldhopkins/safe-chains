@@ -34,7 +34,7 @@ valued = [
     "--sourcemapBaseUrl", "--sourcemapExcludeSources",
     "--sourcemapFile", "--watch.buildDelay",
     "--watch.chokidar.useFsEvents", "--watch.exclude",
-    "--watch.include", "--watch.onEnd",
+    "--watch.include",
     "--watch.skipWrite",
     "-d", "-e", "-f", "-i", "-m", "-n", "-o", "-p",
 ]

@@ -5032,7 +5032,6 @@ rollup --watch.buildDelay x	safe-write
 rollup --watch.chokidar.useFsEvents x	safe-write
 rollup --watch.exclude x	safe-write
 rollup --watch.include x	safe-write
-rollup --watch.onEnd x	safe-write
 rollup --watch.skipWrite x	safe-write
 rollup -c	safe-write
 rollup -d x	safe-write

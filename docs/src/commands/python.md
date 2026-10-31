@@ -420,8 +420,13 @@ Aliases: `pip3`
 <p class="cmd-url"><a href="https://docs.pytest.org/">https://docs.pytest.org/</a></p>
 
 - Allowed standalone flags: --cache-clear, --cache-show, --co, --collect-only, --doctest-modules, --help, --last-failed, --lf, --markers, --new-first, --nf, --no-header, --quiet, --showlocals, --stepwise, --strict-markers, --verbose, --version, -h, -l, -q, -v, -x
-- Allowed valued flags: --basetemp, --color, --confcutdir, --deselect, --durations, --ignore, --import-mode, --junitxml, --log-cli-level, --maxfail, --override-ini, --rootdir, --timeout, -c, -k, -m, -o, -p, -r, -W
+- Allowed valued flags: --basetemp, --color, --confcutdir, --deselect, --durations, --ignore, --import-mode, --junitxml, --log-cli-level, --maxfail, --rootdir, --timeout, -c, -k, -m, -p, -r, -W
 - Bare invocation allowed
+
+**Examples:**
+
+- `pytest tests`
+- `pytest -c ./pytest.ini --junitxml ./junit.xml tests`
 
 ### `pyupgrade`
 <p class="cmd-url"><a href="https://github.com/asottile/pyupgrade">https://github.com/asottile/pyupgrade</a></p>
@@ -461,8 +466,8 @@ Aliases: `pip3`
 ### `sphinx-build`
 <p class="cmd-url"><a href="https://www.sphinx-doc.org/">https://www.sphinx-doc.org/</a></p>
 
-- Allowed standalone flags: --builders, --color, --exception-on-warning, --fail-on-warning, --fresh-env, --full-traceback, --help, --keep-going, --no-color, --quiet, --really-quiet, --show-traceback, --silent, --verbose, --version, --write-all, -E, -M, -N, -P, -Q, -T, -W, -a, -b, -h, -n, -q, -v
-- Allowed valued flags: --builder, --conf-dir, --define, --doctree-dir, --filenames, --html-define, --include, --isolated, --jobs, --language, --name-suffix, --nitpicky, --pdb, --tag, --warning-file, -A, -D, -c, -d, -j, -t, -w
+- Allowed standalone flags: --builders, --color, --exception-on-warning, --fail-on-warning, --fresh-env, --full-traceback, --help, --isolated, --keep-going, --nitpicky, --no-color, --pdb, --quiet, --really-quiet, --show-traceback, --silent, --verbose, --version, --write-all, -E, -I, -M, -N, -P, -Q, -T, -W, -a, -b, -h, -n, -q, -v
+- Allowed valued flags: --builder, --conf-dir, --define, --doctree-dir, --filenames, --html-define, --include, --jobs, --language, --name-suffix, --tag, --warning-file, -A, -D, -c, -d, -j, -t, -w
 
 ### `sphinx-quickstart`
 <p class="cmd-url"><a href="https://www.sphinx-doc.org/en/master/man/sphinx-quickstart.html">https://www.sphinx-doc.org/en/master/man/sphinx-quickstart.html</a></p>

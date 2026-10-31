@@ -10,3 +10,8 @@
 - **test**: Flags: --enable-code-coverage, --help, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose, -h, -l, -v. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output, -c, -j
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `swift build --package-path ./Package`
+- `swift test --package-path ./Package`
+

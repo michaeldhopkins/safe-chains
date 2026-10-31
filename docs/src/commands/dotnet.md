@@ -28,7 +28,7 @@
 ### `dotnet`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/tools/">https://learn.microsoft.com/en-us/dotnet/core/tools/</a></p>
 
-- **build**: Flags: --force, --help, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
+- **build**: Flags: --force, --help, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -r, -s, -v
 - **clean**: Flags: --help, --nologo, --tl, -h. Valued: --artifacts-path, --configuration, --framework, --output, --runtime, --verbosity, -c, -f, -o, -r, -v
 - **format**: Flags: --exclude-generated, --folder, --help, --include-generated, --no-restore, --verify-no-changes, -h. Valued: --binarylog, --diagnostics, --exclude, --exclude-diagnostics, --include, --report, --severity, --verbosity, -v
 - **help**: Positional args accepted
@@ -37,14 +37,14 @@
 - **nuget list**: Flags: --help, -h
 - **nuget verify**: Flags: --help, -h, --all. Valued: --certificate-fingerprint, --configfile, --verbosity, -v. Positional args accepted
 - **nuget**: Flags: --help, -h
-- **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --property, --runtime, --source, --verbosity, --version-suffix, -c, -o, -p, -r, -s, -v
-- **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
+- **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --runtime, --source, --verbosity, --version-suffix, -c, -o, -r, -s, -v
+- **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -r, -s, -v
 - **restore**: Flags: --disable-build-servers, --disable-parallel, --force, --force-evaluate, --help, --ignore-failed-sources, --interactive, --no-cache, --no-dependencies, --no-http-cache, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configfile, --lock-file-path, --locked-mode, --os, --packages, --runtime, --source, --verbosity, -a, -r, -s, -v
 - **sln add**: Flags: --help, --in-root, -h. Valued: --solution-folder, -s
 - **sln list**: Flags: --help, --solution-folders, -h
 - **sln remove**: Flags: --help, -h
 - **sln**: Flags: --help, -h
-- **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -e, -f, -l, -o, -r, -s, -v
+- **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --filter, --framework, --logger, --os, --output, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -f, -l, -o, -r, -s, -v
 - **tool list**: Flags: --global, --help, --local, -g, -h. Valued: --tool-path
 - **tool**: Flags: --help, -h
 - **workload list**: Flags: --help, -h. Valued: --verbosity, -v

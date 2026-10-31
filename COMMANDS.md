@@ -832,6 +832,11 @@ Aliases: `gas`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `astro build --root ./site`
+- `astro build --config ./astro.config.mjs`
+
 ### `at`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/at.1p.html">https://man7.org/linux/man-pages/man1/at.1p.html</a></p>
 
@@ -1002,9 +1007,14 @@ Aliases: `gas`
 ### `ava`
 <p class="cmd-url"><a href="https://github.com/avajs/ava">https://github.com/avajs/ava</a></p>
 
-- Allowed standalone flags: --color, --config, --fail-fast, --help, --match, --no-color, --node-arguments, --reset-cache, --serial, --tap, --update-snapshots, --verbose, --version, --watch, -c, -h, -m, -s, -t, -u, -v, -w
-- Allowed valued flags: --concurrency, --config, --node-arguments, --timeout, --watch, --watcher-debug, -T
+- Allowed standalone flags: --color, --config, --fail-fast, --help, --match, --no-color, --reset-cache, --serial, --tap, --update-snapshots, --verbose, --version, --watch, -c, -h, -m, -s, -t, -u, -v, -w
+- Allowed valued flags: --concurrency, --config, --timeout, --watch, --watcher-debug, -T
 - Bare invocation allowed
+
+**Examples:**
+
+- `ava test/a.js`
+- `ava --config ./ava.config.js`
 
 ### `avbanalyse`
 <p class="cmd-url"><a href="https://ss64.com/mac/avbanalyse.html">https://ss64.com/mac/avbanalyse.html</a></p>
@@ -4385,7 +4395,7 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 ### `dotnet`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/dotnet/core/tools/">https://learn.microsoft.com/en-us/dotnet/core/tools/</a></p>
 
-- **build**: Flags: --force, --help, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
+- **build**: Flags: --force, --help, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -r, -s, -v
 - **clean**: Flags: --help, --nologo, --tl, -h. Valued: --artifacts-path, --configuration, --framework, --output, --runtime, --verbosity, -c, -f, -o, -r, -v
 - **format**: Flags: --exclude-generated, --folder, --help, --include-generated, --no-restore, --verify-no-changes, -h. Valued: --binarylog, --diagnostics, --exclude, --exclude-diagnostics, --include, --report, --severity, --verbosity, -v
 - **help**: Positional args accepted
@@ -4394,14 +4404,14 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 - **nuget list**: Flags: --help, -h
 - **nuget verify**: Flags: --help, -h, --all. Valued: --certificate-fingerprint, --configfile, --verbosity, -v. Positional args accepted
 - **nuget**: Flags: --help, -h
-- **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --property, --runtime, --source, --verbosity, --version-suffix, -c, -o, -p, -r, -s, -v
-- **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
+- **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --runtime, --source, --verbosity, --version-suffix, -c, -o, -r, -s, -v
+- **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -r, -s, -v
 - **restore**: Flags: --disable-build-servers, --disable-parallel, --force, --force-evaluate, --help, --ignore-failed-sources, --interactive, --no-cache, --no-dependencies, --no-http-cache, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configfile, --lock-file-path, --locked-mode, --os, --packages, --runtime, --source, --verbosity, -a, -r, -s, -v
 - **sln add**: Flags: --help, --in-root, -h. Valued: --solution-folder, -s
 - **sln list**: Flags: --help, --solution-folders, -h
 - **sln remove**: Flags: --help, -h
 - **sln**: Flags: --help, -h
-- **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -e, -f, -l, -o, -r, -s, -v
+- **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --filter, --framework, --logger, --os, --output, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -f, -l, -o, -r, -s, -v
 - **tool list**: Flags: --global, --help, --local, -g, -h. Valued: --tool-path
 - **tool**: Flags: --help, -h
 - **workload list**: Flags: --help, -h. Valued: --verbosity, -v
@@ -9617,7 +9627,7 @@ Aliases: `gmktemp`
 <p class="cmd-url"><a href="https://mochajs.org/">https://mochajs.org/</a></p>
 
 - Allowed standalone flags: --bail, --check-leaks, --color, --diff, --dry-run, --exit, --forbid-only, --forbid-pending, --full-trace, --help, --inline-diffs, --invert, --list-files, --list-reporters, --no-color, --no-diff, --no-timeouts, --parallel, --quiet, --recursive, --sort, --version, -A, -R, -V, -b, -c, -h
-- Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --node-option, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -n, -r, -s, -t, -u
+- Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -r, -s, -t, -u
 - Bare invocation allowed
 
 ### `molecule`
@@ -11677,12 +11687,22 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - **diagnose**: Flags: --debug, --help, -h. Valued: --autoload-file, --configuration, --level, --memory-limit, -a, -c, -l
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `phpstan analyse -c ./phpstan.neon src`
+- `phpstan analyse --autoload-file ./vendor/autoload.php src`
+
 ### `phpunit`
 <p class="cmd-url"><a href="https://docs.phpunit.de/">https://docs.phpunit.de/</a></p>
 
 - Allowed standalone flags: --cache-result, --check-version, --debug, --disable-coverage-ignore, --disallow-test-output, --display-all-issues, --display-deprecations, --display-errors, --display-incomplete, --display-notices, --display-phpunit-deprecations, --display-phpunit-notices, --display-skipped, --display-warnings, --do-not-cache-result, --do-not-report-useless-tests, --enforce-time-limit, --fail-on-all-issues, --fail-on-deprecation, --fail-on-empty-test-suite, --fail-on-incomplete, --fail-on-notice, --fail-on-phpunit-deprecation, --fail-on-phpunit-notice, --fail-on-phpunit-warning, --fail-on-risky, --fail-on-skipped, --fail-on-warning, --globals-backup, --help, --ignore-baseline, --ignore-dependencies, --list-groups, --list-suites, --list-test-files, --list-test-ids, --list-tests, --no-configuration, --no-coverage, --no-extensions, --no-logging, --no-output, --no-progress, --no-results, --path-coverage, --process-isolation, --random-order, --resolve-dependencies, --reverse-list, --reverse-order, --static-backup, --stderr, --strict-coverage, --strict-global-state, --stop-on-defect, --stop-on-deprecation, --stop-on-error, --stop-on-failure, --stop-on-incomplete, --stop-on-notice, --stop-on-risky, --stop-on-skipped, --stop-on-warning, --teamcity, --testdox, --testdox-summary, --validate-configuration, --version, --warm-coverage-cache, --with-telemetry, -h
-- Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-openclover, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --diff-context, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-otr, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --run-test-id, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c, -d
+- Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-openclover, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --diff-context, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-otr, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --run-test-id, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c
 - Bare invocation allowed
+
+**Examples:**
+
+- `phpunit -c ./phpunit.xml tests`
+- `phpunit --log-junit ./junit.xml tests/UnitTest.php`
 
 ### `pick`
 <p class="cmd-url"><a href="https://github.com/mptre/pick">https://github.com/mptre/pick</a></p>
@@ -12300,6 +12320,11 @@ Aliases: `upsun`
 - Requires --check, --list-different, -c, -l. - Allowed standalone flags: --check, --list-different, --no-config, --no-editorconfig, --no-semi, --single-quote, --jsx-single-quote, --bracket-same-line, --help, --version, -c, -l
 - Allowed valued flags: --config, --ignore-path, --parser, --plugin, --print-width, --tab-width, --trailing-comma, --end-of-line, --prose-wrap
 
+**Examples:**
+
+- `prettier --check --config ./.prettierrc.js src`
+- `prettier --check --plugin ./plugin.js src`
+
 ### `printafm`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
 
@@ -12632,6 +12657,10 @@ Aliases: `gpwd`
 - Allowed standalone flags: --errors-only, --help, --list-msgs, --list-msgs-enabled, --long-help, --persistent, --py-version, --recursive, --verbose, --version, -E, -V, -h, -v
 - Allowed valued flags: --disable, --enable, --extension-pkg-allow-list, --fail-under, --generated-members, --ignore, --ignore-paths, --ignore-patterns, --jobs, --load-plugins, --max-line-length, --msg-template, --output-format, --rcfile, --reports, -d, -e, -f, -j
 
+**Examples:**
+
+- `pylint --rcfile ./.pylintrc src`
+
 ### `pyright`
 <p class="cmd-url"><a href="https://github.com/microsoft/pyright">https://github.com/microsoft/pyright</a></p>
 
@@ -12643,8 +12672,13 @@ Aliases: `gpwd`
 <p class="cmd-url"><a href="https://docs.pytest.org/">https://docs.pytest.org/</a></p>
 
 - Allowed standalone flags: --cache-clear, --cache-show, --co, --collect-only, --doctest-modules, --help, --last-failed, --lf, --markers, --new-first, --nf, --no-header, --quiet, --showlocals, --stepwise, --strict-markers, --verbose, --version, -h, -l, -q, -v, -x
-- Allowed valued flags: --basetemp, --color, --confcutdir, --deselect, --durations, --ignore, --import-mode, --junitxml, --log-cli-level, --maxfail, --override-ini, --rootdir, --timeout, -c, -k, -m, -o, -p, -r, -W
+- Allowed valued flags: --basetemp, --color, --confcutdir, --deselect, --durations, --ignore, --import-mode, --junitxml, --log-cli-level, --maxfail, --rootdir, --timeout, -c, -k, -m, -p, -r, -W
 - Bare invocation allowed
+
+**Examples:**
+
+- `pytest tests`
+- `pytest -c ./pytest.ini --junitxml ./junit.xml tests`
 
 ### `python3`
 <p class="cmd-url"><a href="https://docs.python.org/3/using/cmdline.html">https://docs.python.org/3/using/cmdline.html</a></p>
@@ -13313,7 +13347,7 @@ Aliases: `grmdir`
 <p class="cmd-url"><a href="https://rollupjs.org/">https://rollupjs.org/</a></p>
 
 - Allowed standalone flags: --bundleConfigAsCjs, --compact, --config, --context, --esModule, --exports, --extend, --externalImportAttributes, --externalLiveBindings, --failAfterWarnings, --filterLogs, --forceExit, --freeze, --generatedCode, --help, --inlineDynamicImports, --input, --logLevel, --noConflict, --no-treeshake, --outro, --perf, --preserveEntrySignatures, --preserveModules, --preserveSymlinks, --silent, --sourcemap, --sourcemapDebugIds, --strict, --strictDeprecations, --treeshake, --validate, --version, --waitForBundleInput, --watch, -c, -h, -v, -w
-- Allowed valued flags: --amd.autoId, --amd.basePath, --amd.define, --amd.id, --assetFileNames, --banner, --chunkFileNames, --dir, --entryFileNames, --exports, --external, --file, --footer, --format, --globals, --hashCharacters, --input, --intro, --name, --outro, --plugin, --sourcemap, --sourcemapBaseUrl, --sourcemapExcludeSources, --sourcemapFile, --watch.buildDelay, --watch.chokidar.useFsEvents, --watch.exclude, --watch.include, --watch.onEnd, --watch.skipWrite, -d, -e, -f, -i, -m, -n, -o, -p
+- Allowed valued flags: --amd.autoId, --amd.basePath, --amd.define, --amd.id, --assetFileNames, --banner, --chunkFileNames, --dir, --entryFileNames, --exports, --external, --file, --footer, --format, --globals, --hashCharacters, --input, --intro, --name, --outro, --plugin, --sourcemap, --sourcemapBaseUrl, --sourcemapExcludeSources, --sourcemapFile, --watch.buildDelay, --watch.chokidar.useFsEvents, --watch.exclude, --watch.include, --watch.skipWrite, -d, -e, -f, -i, -m, -n, -o, -p
 
 ### `ros`
 <p class="cmd-url"><a href="https://github.com/roswell/roswell">https://github.com/roswell/roswell</a></p>
@@ -14588,8 +14622,8 @@ Aliases: `gsort`
 ### `sphinx-build`
 <p class="cmd-url"><a href="https://www.sphinx-doc.org/">https://www.sphinx-doc.org/</a></p>
 
-- Allowed standalone flags: --builders, --color, --exception-on-warning, --fail-on-warning, --fresh-env, --full-traceback, --help, --keep-going, --no-color, --quiet, --really-quiet, --show-traceback, --silent, --verbose, --version, --write-all, -E, -M, -N, -P, -Q, -T, -W, -a, -b, -h, -n, -q, -v
-- Allowed valued flags: --builder, --conf-dir, --define, --doctree-dir, --filenames, --html-define, --include, --isolated, --jobs, --language, --name-suffix, --nitpicky, --pdb, --tag, --warning-file, -A, -D, -c, -d, -j, -t, -w
+- Allowed standalone flags: --builders, --color, --exception-on-warning, --fail-on-warning, --fresh-env, --full-traceback, --help, --isolated, --keep-going, --nitpicky, --no-color, --pdb, --quiet, --really-quiet, --show-traceback, --silent, --verbose, --version, --write-all, -E, -I, -M, -N, -P, -Q, -T, -W, -a, -b, -h, -n, -q, -v
+- Allowed valued flags: --builder, --conf-dir, --define, --doctree-dir, --filenames, --html-define, --include, --jobs, --language, --name-suffix, --tag, --warning-file, -A, -D, -c, -d, -j, -t, -w
 
 ### `sphinx-quickstart`
 <p class="cmd-url"><a href="https://www.sphinx-doc.org/en/master/man/sphinx-quickstart.html">https://www.sphinx-doc.org/en/master/man/sphinx-quickstart.html</a></p>
@@ -15135,6 +15169,11 @@ Aliases: `gsum`
 - **package show-dependencies**: Flags: --help, -h. Valued: --format, --package-path
 - **test**: Flags: --enable-code-coverage, --help, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose, -h, -l, -v. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output, -c, -j
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `swift build --package-path ./Package`
+- `swift test --package-path ./Package`
 
 ### `swift-format`
 <p class="cmd-url"><a href="https://github.com/swiftlang/swift-format">https://github.com/swiftlang/swift-format</a></p>

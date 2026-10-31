@@ -94,7 +94,7 @@
 <p class="cmd-url"><a href="https://mochajs.org/">https://mochajs.org/</a></p>
 
 - Allowed standalone flags: --bail, --check-leaks, --color, --diff, --dry-run, --exit, --forbid-only, --forbid-pending, --full-trace, --help, --inline-diffs, --invert, --list-files, --list-reporters, --no-color, --no-diff, --no-timeouts, --parallel, --quiet, --recursive, --sort, --version, -A, -R, -V, -b, -c, -h
-- Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --node-option, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -n, -r, -s, -t, -u
+- Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -r, -s, -t, -u
 - Bare invocation allowed
 
 ### `next`

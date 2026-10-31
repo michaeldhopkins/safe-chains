@@ -230,6 +230,11 @@ Aliases: `muse`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `astro build --root ./site`
+- `astro build --config ./astro.config.mjs`
+
 ### `automator`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/automator.1.html">https://keith.github.io/xcode-man-pages/automator.1.html</a></p>
 
@@ -239,9 +244,14 @@ Aliases: `muse`
 ### `ava`
 <p class="cmd-url"><a href="https://github.com/avajs/ava">https://github.com/avajs/ava</a></p>
 
-- Allowed standalone flags: --color, --config, --fail-fast, --help, --match, --no-color, --node-arguments, --reset-cache, --serial, --tap, --update-snapshots, --verbose, --version, --watch, -c, -h, -m, -s, -t, -u, -v, -w
-- Allowed valued flags: --concurrency, --config, --node-arguments, --timeout, --watch, --watcher-debug, -T
+- Allowed standalone flags: --color, --config, --fail-fast, --help, --match, --no-color, --reset-cache, --serial, --tap, --update-snapshots, --verbose, --version, --watch, -c, -h, -m, -s, -t, -u, -v, -w
+- Allowed valued flags: --concurrency, --config, --timeout, --watch, --watcher-debug, -T
 - Bare invocation allowed
+
+**Examples:**
+
+- `ava test/a.js`
+- `ava --config ./ava.config.js`
 
 ### `biome`
 <p class="cmd-url"><a href="https://biomejs.dev/reference/cli/">https://biomejs.dev/reference/cli/</a></p>
@@ -1283,6 +1293,11 @@ Aliases: `run-p`, `run-s`
 - Requires --check, --list-different, -c, -l. - Allowed standalone flags: --check, --list-different, --no-config, --no-editorconfig, --no-semi, --single-quote, --jsx-single-quote, --bracket-same-line, --help, --version, -c, -l
 - Allowed valued flags: --config, --ignore-path, --parser, --plugin, --print-width, --tab-width, --trailing-comma, --end-of-line, --prose-wrap
 
+**Examples:**
+
+- `prettier --check --config ./.prettierrc.js src`
+- `prettier --check --plugin ./plugin.js src`
+
 ### `prisma`
 <p class="cmd-url"><a href="https://www.prisma.io/docs/orm/reference/prisma-cli-reference">https://www.prisma.io/docs/orm/reference/prisma-cli-reference</a></p>
 
@@ -1335,6 +1350,10 @@ Aliases: `run-p`, `run-s`
 
 - Allowed standalone flags: --errors-only, --help, --list-msgs, --list-msgs-enabled, --long-help, --persistent, --py-version, --recursive, --verbose, --version, -E, -V, -h, -v
 - Allowed valued flags: --disable, --enable, --extension-pkg-allow-list, --fail-under, --generated-members, --ignore, --ignore-paths, --ignore-patterns, --jobs, --load-plugins, --max-line-length, --msg-template, --output-format, --rcfile, --reports, -d, -e, -f, -j
+
+**Examples:**
+
+- `pylint --rcfile ./.pylintrc src`
 
 ### `pyright`
 <p class="cmd-url"><a href="https://github.com/microsoft/pyright">https://github.com/microsoft/pyright</a></p>
@@ -1456,7 +1475,7 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://rollupjs.org/">https://rollupjs.org/</a></p>
 
 - Allowed standalone flags: --bundleConfigAsCjs, --compact, --config, --context, --esModule, --exports, --extend, --externalImportAttributes, --externalLiveBindings, --failAfterWarnings, --filterLogs, --forceExit, --freeze, --generatedCode, --help, --inlineDynamicImports, --input, --logLevel, --noConflict, --no-treeshake, --outro, --perf, --preserveEntrySignatures, --preserveModules, --preserveSymlinks, --silent, --sourcemap, --sourcemapDebugIds, --strict, --strictDeprecations, --treeshake, --validate, --version, --waitForBundleInput, --watch, -c, -h, -v, -w
-- Allowed valued flags: --amd.autoId, --amd.basePath, --amd.define, --amd.id, --assetFileNames, --banner, --chunkFileNames, --dir, --entryFileNames, --exports, --external, --file, --footer, --format, --globals, --hashCharacters, --input, --intro, --name, --outro, --plugin, --sourcemap, --sourcemapBaseUrl, --sourcemapExcludeSources, --sourcemapFile, --watch.buildDelay, --watch.chokidar.useFsEvents, --watch.exclude, --watch.include, --watch.onEnd, --watch.skipWrite, -d, -e, -f, -i, -m, -n, -o, -p
+- Allowed valued flags: --amd.autoId, --amd.basePath, --amd.define, --amd.id, --assetFileNames, --banner, --chunkFileNames, --dir, --entryFileNames, --exports, --external, --file, --footer, --format, --globals, --hashCharacters, --input, --intro, --name, --outro, --plugin, --sourcemap, --sourcemapBaseUrl, --sourcemapExcludeSources, --sourcemapFile, --watch.buildDelay, --watch.chokidar.useFsEvents, --watch.exclude, --watch.include, --watch.skipWrite, -d, -e, -f, -i, -m, -n, -o, -p
 
 ### `rspec`
 <p class="cmd-url"><a href="https://rspec.info/documentation/">https://rspec.info/documentation/</a></p>
