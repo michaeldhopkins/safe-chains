@@ -764,6 +764,22 @@ mod tests {
     }
 
     #[test]
+    fn cargo_settings_that_swap_where_dependencies_come_from_are_judged() {
+        for name in [
+            "CARGO_SOURCE_CRATES_IO_REPLACE_WITH", "CARGO_SOURCE_VENDORED_DIRECTORY", "CARGO_SOURCE_MIRROR_REGISTRY",
+            "CARGO_SOURCE_MIRROR_LOCAL_REGISTRY", "CARGO_SOURCE_MIRROR_GIT", "CARGO_PATCH_CRATES_IO_SERDE_PATH",
+            "CARGO_PATCH_CRATES_IO_SERDE_GIT",
+        ] {
+            for base in ["cargo build", "cargo test", "cargo check"] {
+                for cmd in [format!("{name}=/tmp/x {base}"), format!("export {name}=/tmp/x; {base}"), format!("env {name}=/tmp/x {base}")] {
+                    assert!(!crate::is_safe_command(&cmd), "{cmd}");
+                }
+            }
+        }
+        assert!(crate::is_safe_command("CARGO_SOURCE_CRATES_IO_REPLACE_WITH= cargo build"));
+    }
+
+    #[test]
     fn cargo_config_twins_that_run_or_fetch_code_are_judged() {
         for cmd in [
             "CARGO_ALIAS_FMT='run --manifest-path /tmp/evil/Cargo.toml' cargo fmt --check",

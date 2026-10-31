@@ -989,6 +989,16 @@ measured = false
 shape = "opaque"
 because = "a space-separated list of credential providers cargo may run, each a command line or a built-in name"
 measured = false
+# `[source.<name>]` and `[patch.<registry>]` reach the environment for a table a config file
+# already holds, and for any name under -Zadvanced-env.
+[env."CARGO_SOURCE_*"]
+shape = "opaque"
+because = "source.<name>: replace-with, directory, local-registry, registry and git choose where a build's dependencies come from, so a replacement compiles and runs another copy of each crate (build scripts included)"
+measured = false
+[env."CARGO_PATCH_*"]
+shape = "opaque"
+because = "patch.<registry>.<crate>: a path or git source that takes the place of a published crate, whose build script and code then run"
+measured = false
 [env."CARGO_REGISTRIES_*_INDEX"]
 shape = "opaque"
 because = "the index URL of a named registry, so the crates a build downloads and compiles (build scripts included) come from there"
