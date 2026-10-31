@@ -28,3 +28,7 @@ valued = [
     "--public-dir", "--target",
     "--tsconfig",
 ]
+
+# tsup.config.ts is code tsup evaluates.
+[command.path_gate]
+flags = { "--config" = "exec" }

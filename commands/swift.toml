@@ -2,7 +2,12 @@
 name = "swift"
 description = "Compiler driver and package manager for the Swift language. swift build compiles source code and executes build plugins, which can run arbitrary code. swift test compiles and runs test targets, executing arbitrary user-authored code. swift package subcommands like describe, dump-package, and show-dependencies are read-only introspection of package metadata. swift run (not listed here) executes compiled targets. Package resolution fetches dependencies from the network. Swift follows Apple's annual release cadence tied to WWDC/Xcode, with point releases throughout the year; new SwiftPM subcommands (e.g. generate-sbom in Swift 6.3) are added regularly."
 url = "https://www.swift.org/documentation/swift-compiler/"
+examples_safe = ["swift build --package-path ./Package", "swift test --package-path ./Package"]
 bare_flags = ["--help", "--version", "-V", "-h"]
+
+# The package path holds Package.swift, which is compiled and run, along with any build plugins.
+[command.path_gate]
+flags = { "--package-path" = "exec" }
 
 [[command.sub]]
 name = "build"

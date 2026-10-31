@@ -233,8 +233,6 @@ coverage combine	--data-file	untriaged	-	-	-
 coverage html	--data-file	untriaged	-	-	-	
 coverage json	--data-file	untriaged	-	-	-	
 coverage report	--data-file	untriaged	-	-	-	
-coverage run	--data-file	untriaged	-	-	-	
-coverage run	--rcfile	untriaged	-	-	-	
 cppcheck	--cppcheck-build-dir	untriaged	-	-	-	
 cppcheck	--includes-file	untriaged	-	-	-	
 cppcheck	--rule-file	untriaged	-	-	-	
@@ -287,18 +285,8 @@ docfx build	--logFile	untriaged	-	-	-
 docfx build	--templateFolder	untriaged	-	-	-	
 docfx metadata	--logFile	untriaged	-	-	-	
 docker-compose config	--profile	untriaged	-	-	-	
-dotnet build	--artifacts-path	untriaged	-	-	-	
-dotnet clean	--artifacts-path	untriaged	-	-	-	
 dotnet nuget verify	--configfile	untriaged	-	-	-	
-dotnet pack	--artifacts-path	untriaged	-	-	-	
-dotnet publish	--artifacts-path	untriaged	-	-	-	
-dotnet restore	--artifacts-path	untriaged	-	-	-	
-dotnet restore	--configfile	untriaged	-	-	-	
-dotnet restore	--lock-file-path	untriaged	-	-	-	
 dotnet sln add	--solution-folder	untriaged	-	-	-	
-dotnet test	--artifacts-path	untriaged	-	-	-	
-dotnet test	--results-directory	untriaged	-	-	-	
-dotnet test	--test-adapter-path	untriaged	-	-	-	
 dotnet tool list	--tool-path	untriaged	-	-	-	
 dotnet-ef migrations list	--msbuildprojectextensionspath	untriaged	-	-	-	
 dotnet-symbol	--authenticated-server-path	untriaged	-	-	-	
@@ -362,17 +350,9 @@ go list	-modfile	untriaged	-	-	-
 go list	-pkgdir	untriaged	-	-	-	
 go run	-modfile	untriaged	-	-	-	
 go run	-pkgdir	untriaged	-	-	-	
-go test	-blockprofile	untriaged	-	-	-	
 go test	-blockprofilerate	untriaged	-	-	-	
-go test	-coverprofile	untriaged	-	-	-	
-go test	-cpuprofile	untriaged	-	-	-	
-go test	-memprofile	untriaged	-	-	-	
 go test	-memprofilerate	untriaged	-	-	-	
-go test	-modfile	untriaged	-	-	-	
-go test	-mutexprofile	untriaged	-	-	-	
 go test	-mutexprofilefraction	untriaged	-	-	-	
-go test	-outputdir	untriaged	-	-	-	
-go test	-pkgdir	untriaged	-	-	-	
 go vet	-modfile	untriaged	-	-	-	
 go vet	-pkgdir	untriaged	-	-	-	
 golangci-lint run	--path-prefix	untriaged	-	-	-	
@@ -525,7 +505,6 @@ msbuild	/profileEvaluation	untriaged	-	-	-
 msgcat	--files-from	untriaged	-	-	-	
 msgfmt	--directory	untriaged	-	-	-	
 mypy	--cache-dir	untriaged	-	-	-	
-mypy	--config-file	untriaged	-	-	-	
 mysqladmin	--character-sets-dir	untriaged	-	-	-	
 mysqladmin	--login-path	untriaged	-	-	-	
 mysqladmin	--ssl-capath	untriaged	-	-	-	
@@ -615,12 +594,7 @@ pg_verifybackup	--wal-directory	untriaged	-	-	-
 pg_waldump	--path	untriaged	-	-	-	
 pgbench	--file	untriaged	-	-	-	
 pgrep	--pidfile	untriaged	-	-	-	
-phpstan analyse	--autoload-file	untriaged	-	-	-	
 phpstan analyse	--tmp-file	untriaged	-	-	-	
-phpstan clear-result-cache	--autoload-file	untriaged	-	-	-	
-phpstan diagnose	--autoload-file	untriaged	-	-	-	
-phpunit	--cache-directory	untriaged	-	-	-	
-phpunit	--include-path	untriaged	-	-	-	
 pijul ls	--repo-path	untriaged	-	-	-	
 pio check	--project-dir	untriaged	-	-	-	
 pio pkg list	--storage-dir	untriaged	-	-	-	
@@ -647,11 +621,8 @@ pulumi preview	--config-file	untriaged	-	-	-
 pycodestyle	--filename	untriaged	-	-	-	
 pydocstyle	--match-dir	untriaged	-	-	-	
 pylint	--ignore-paths	untriaged	-	-	-	
-pylint	--rcfile	untriaged	-	-	-	
 pyright	--pythonpath	untriaged	-	-	-	
 pyright	--typeshedpath	untriaged	-	-	-	
-pytest	--confcutdir	untriaged	-	-	-	
-pytest	--rootdir	untriaged	-	-	-	
 railway logs	--path	untriaged	-	-	-	
 railway metrics	--path	untriaged	-	-	-	
 rbs prototype	--base-dir	untriaged	-	-	-	
@@ -682,7 +653,6 @@ rollup	--amd.basePath	untriaged	-	-	-
 rollup	--assetFileNames	untriaged	-	-	-	
 rollup	--chunkFileNames	untriaged	-	-	-	
 rollup	--entryFileNames	untriaged	-	-	-	
-rspec	--default-path	untriaged	-	-	-	
 rspec	--profile	untriaged	-	-	-	
 rufo	--filename	untriaged	-	-	-	
 rvm install	--with-openssl-dir	untriaged	-	-	-	
@@ -815,12 +785,7 @@ swc	--filename	untriaged	-	-	-
 swc	--out-file	untriaged	-	-	-	
 swc	--source-file-name	untriaged	-	-	-	
 swift build	--build-path	untriaged	-	-	-	
-swift build	--package-path	untriaged	-	-	-	
-swift package describe	--package-path	untriaged	-	-	-	
-swift package dump-package	--package-path	untriaged	-	-	-	
-swift package show-dependencies	--package-path	untriaged	-	-	-	
 swift test	--build-path	untriaged	-	-	-	
-swift test	--package-path	untriaged	-	-	-	
 swiftlint analyze	--compiler-log-path	untriaged	-	-	-	
 swiftlint analyze	--path	untriaged	-	-	-	
 swiftlint lint	--path	untriaged	-	-	-	
@@ -882,27 +847,7 @@ trivy image	--skip-files	untriaged	-	-	-
 trivy sbom	--cache-dir	untriaged	-	-	-	
 tsup	--public-dir	untriaged	-	-	-	
 tuist build	--derived-data-path	untriaged	-	-	-	
-tuist build	--path	untriaged	-	-	-	
-tuist clean	--path	untriaged	-	-	-	
-tuist dump	--path	untriaged	-	-	-	
-tuist edit	--path	untriaged	-	-	-	
-tuist fetch	--path	untriaged	-	-	-	
-tuist generate	--path	untriaged	-	-	-	
-tuist graph	--path	untriaged	-	-	-	
-tuist hash cache	--path	untriaged	-	-	-	
-tuist hash selective-testing	--path	untriaged	-	-	-	
-tuist inspect build	--path	untriaged	-	-	-	
-tuist inspect bundle	--path	untriaged	-	-	-	
-tuist inspect dependencies	--path	untriaged	-	-	-	
-tuist inspect implicit-imports	--path	untriaged	-	-	-	
-tuist inspect redundant-imports	--path	untriaged	-	-	-	
-tuist inspect test	--path	untriaged	-	-	-	
-tuist install	--path	untriaged	-	-	-	
-tuist migration check-empty-settings	--path	untriaged	-	-	-	
-tuist migration list-targets	--path	untriaged	-	-	-	
-tuist scaffold list	--path	untriaged	-	-	-	
 tuist test	--derived-data-path	untriaged	-	-	-	
-tuist test	--path	untriaged	-	-	-	
 tuist test	--result-bundle-path	untriaged	-	-	-	
 turbo run	--profile	untriaged	-	-	-	
 typedoc	--basePath	untriaged	-	-	-	

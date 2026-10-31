@@ -5,7 +5,8 @@ url = "https://nextjs.org/docs/api-reference/cli"
 bare_flags = ["--help", "--version", "-h"]
 
 [command.path_gate]
-flags = { "--output-file" = "write" }
+positional = "exec"
+flags = { "--output-file" = "write", "--cache-location" = "write", "--resolve-plugins-relative-to" = "exec", "-c" = "exec", "--ext" = "ignore", "--max-warnings" = "ignore" }
 
 [[command.sub]]
 name = "info"

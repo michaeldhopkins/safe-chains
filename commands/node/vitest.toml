@@ -20,4 +20,4 @@ valued = [
 # --config/-c names the Vite config vitest loads and executes; gate it as an executor so a
 # worktree config runs but a foreign or /tmp one denies (a bare value isn't path-shaped and passes).
 [command.path_gate]
-flags = { "--config" = "exec", "-c" = "exec" }
+flags = { "--config" = "exec", "-c" = "exec", "--root" = "exec", "-r" = "exec" }

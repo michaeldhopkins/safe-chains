@@ -2,19 +2,26 @@
 name = "ava"
 description = "Concurrent test runner for Node.js. Bare invocation runs the configured test files (executes project test code — same risk profile as jest/vitest). `--watch` keeps a long-running process. The diagnostic flags --version, --help, and the read-only modes are part of the safe surface."
 url = "https://github.com/avajs/ava"
+examples_safe = ["ava test/a.js", "ava --config ./ava.config.js"]
 researched_version = "ava 6.x"
 level = "SafeRead"
 bare = true
 standalone = [
     "--color", "--config", "--fail-fast",
     "--help", "--match", "--no-color",
-    "--node-arguments", "--reset-cache",
+    "--reset-cache",
     "--serial", "--tap", "--update-snapshots",
     "--verbose", "--version", "--watch",
     "-c", "-h", "-m", "-s", "-t", "-u", "-v", "-w",
 ]
 valued = [
-    "--concurrency", "--config", "--node-arguments",
+    "--concurrency", "--config",
     "--timeout", "--watch", "--watcher-debug",
     "-T",
 ]
+
+# Test files are run, and the config file is JavaScript ava evaluates. `--node-arguments` is left
+# out: it passes Node options such as `--require`.
+[command.path_gate]
+positional = "exec"
+flags = { "--config" = "exec", "--concurrency" = "ignore", "--timeout" = "ignore", "--watch" = "ignore", "--watcher-debug" = "ignore", "-T" = "ignore" }

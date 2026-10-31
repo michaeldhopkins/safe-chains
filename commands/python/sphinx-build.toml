@@ -8,19 +8,20 @@ bare = false
 standalone = [
     "--builders", "--color", "--exception-on-warning",
     "--fail-on-warning", "--fresh-env", "--full-traceback",
-    "--help", "--keep-going", "--no-color",
+    "--help", "--isolated", "--keep-going", "--nitpicky",
+    "--no-color", "--pdb",
     "--quiet", "--really-quiet", "--show-traceback",
     "--silent", "--verbose", "--version",
     "--write-all",
-    "-E", "-M", "-N", "-P", "-Q", "-T",
+    "-E", "-I", "-M", "-N", "-P", "-Q", "-T",
     "-W", "-a", "-b", "-h", "-n", "-q", "-v",
 ]
 valued = [
     "--builder", "--conf-dir",
     "--define", "--doctree-dir", "--filenames",
-    "--html-define", "--include", "--isolated",
+    "--html-define", "--include",
     "--jobs", "--language", "--name-suffix",
-    "--nitpicky", "--pdb", "--tag",
+    "--tag",
     "--warning-file",
     "-A", "-D", "-c", "-d", "-j", "-t", "-w",
 ]

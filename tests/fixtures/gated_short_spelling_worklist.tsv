@@ -58,7 +58,6 @@ mkdocs	-c	--config-file
 mkdocs	-s	--site-dir
 mocha	-c	--config
 mocha	-f	--file
-mocha	-u	--ui
 mypy	-p	--python-executable
 nano	-b	--backupdir
 ocsptool	-i	--infile
@@ -98,3 +97,13 @@ yard	-m	--main
 yardoc	-m	--main
 yard	-d	--docroot
 tilt	-l	--layout
+# ava -c is --concurrency, prettier -c is --check, pytest -r selects the summary report characters,
+# dotnet -a/-c/-l/-r are --arch, --configuration, --logger and --runtime, and mocha -s is --slow.
+ava	-c	--config
+prettier	-c	--config
+pytest	-r	--rootdir
+dotnet	-a	--artifacts-path
+dotnet	-c	--configfile
+dotnet	-l	--lock-file-path
+dotnet	-r	--results-directory
+mocha	-s	--spec

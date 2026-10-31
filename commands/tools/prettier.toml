@@ -2,6 +2,7 @@
 name = "prettier"
 description = "Opinionated code formatter for JavaScript, TypeScript, CSS, HTML, JSON, and more. Without --write, prettier prints formatted output to stdout; --check and --list-different only report whether files are formatted without modifying them. Requiring --check or --list-different here ensures no file writes occur. Stable project with a few releases per year."
 url = "https://prettier.io/docs/en/cli.html"
+examples_safe = ["prettier --check --config ./.prettierrc.js src", "prettier --check --plugin ./plugin.js src"]
 level = "Inert"
 bare = false
 require_any = ["--check", "--list-different", "-c", "-l"]
@@ -17,3 +18,7 @@ valued = [
     "--print-width", "--tab-width", "--trailing-comma",
     "--end-of-line", "--prose-wrap",
 ]
+
+# A prettier config may be JavaScript it evaluates, and a plugin is a module it loads.
+[command.path_gate]
+flags = { "--config" = "exec", "--plugin" = "exec" }

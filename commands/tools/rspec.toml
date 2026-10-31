@@ -25,3 +25,9 @@ valued = [
     "-e", "-f", "-o", "-p", "-r", "-t",
 ]
 write_flags = ["--deprecation-out", "--out", "-o"]
+
+# Spec files and `--require`d or `-I` include paths are Ruby rspec loads and runs, so they are
+# judged where that code comes from.
+[command.path_gate]
+positional = "exec"
+flags = { "--require" = "exec", "-r" = "exec", "-I" = "exec", "--default-path" = "exec", "--options" = "read", "-O" = "read", "--bisect" = "ignore", "--drb-port" = "ignore", "--error-exit-code" = "ignore", "--example" = "ignore", "--example-matches" = "ignore", "--exclude-pattern" = "ignore", "--fail-fast" = "ignore", "--failure-exit-code" = "ignore", "--format" = "ignore", "--order" = "ignore", "--pattern" = "ignore", "--profile" = "ignore", "--seed" = "ignore", "--tag" = "ignore", "-E" = "ignore", "-P" = "ignore", "-e" = "ignore", "-f" = "ignore", "-p" = "ignore", "-t" = "ignore" }

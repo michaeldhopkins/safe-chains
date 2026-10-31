@@ -3072,12 +3072,17 @@ newrelic workload list x	inert
 newrelic workload x	denied
 newrelic x	denied
 next	denied
+next --cache-location x	denied
+next --ext x	denied
 next --help	inert
-next --help --output-file x	denied
+next --help --cache-location x	denied
 next --help --version	denied
 next --help x	denied
+next --max-warnings x	denied
 next --output-file x	denied
+next --resolve-plugins-relative-to x	denied
 next --version	inert
+next -c x	denied
 next -h	inert
 next build	safe-write
 next build --debug	safe-write

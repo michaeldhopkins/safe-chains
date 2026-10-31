@@ -3827,7 +3827,6 @@ dotnet build --nologo	safe-write
 dotnet build --os x	safe-write
 dotnet build --output ./bin/out	safe-write
 dotnet build --output x	safe-write
-dotnet build --property x	safe-write
 dotnet build --runtime x	safe-write
 dotnet build --self-contained	safe-write
 dotnet build --source x	safe-write
@@ -3840,7 +3839,6 @@ dotnet build -c x	safe-write
 dotnet build -f x	safe-write
 dotnet build -h	safe-write
 dotnet build -o x	safe-write
-dotnet build -p x	safe-write
 dotnet build -r x	safe-write
 dotnet build -s x	safe-write
 dotnet build -v x	safe-write
@@ -4005,7 +4003,6 @@ dotnet pack --no-dependencies	safe-write
 dotnet pack --no-restore	safe-write
 dotnet pack --nologo	safe-write
 dotnet pack --output x	safe-write
-dotnet pack --property x	safe-write
 dotnet pack --runtime x	safe-write
 dotnet pack --serviceable	safe-write
 dotnet pack --source x	safe-write
@@ -4015,7 +4012,6 @@ dotnet pack --version-suffix x	safe-write
 dotnet pack -c x	safe-write
 dotnet pack -h	safe-write
 dotnet pack -o x	safe-write
-dotnet pack -p x	safe-write
 dotnet pack -r x	safe-write
 dotnet pack -s x	safe-write
 dotnet pack -v x	safe-write
@@ -4038,7 +4034,6 @@ dotnet publish --no-restore	safe-write
 dotnet publish --nologo	safe-write
 dotnet publish --os x	safe-write
 dotnet publish --output x	safe-write
-dotnet publish --property x	safe-write
 dotnet publish --runtime x	safe-write
 dotnet publish --self-contained	safe-write
 dotnet publish --source x	safe-write
@@ -4052,7 +4047,6 @@ dotnet publish -f x	safe-write
 dotnet publish -h	safe-write
 dotnet publish -o ./publish	safe-write
 dotnet publish -o x	safe-write
-dotnet publish -p x	safe-write
 dotnet publish -r x	safe-write
 dotnet publish -s x	safe-write
 dotnet publish -v x	safe-write
@@ -4137,7 +4131,6 @@ dotnet test --blame-hang-timeout x	safe-read
 dotnet test --collect x	safe-read
 dotnet test --configuration x	safe-read
 dotnet test --diag x	safe-read
-dotnet test --environment x	safe-read
 dotnet test --filter x	safe-read
 dotnet test --force	safe-read
 dotnet test --framework x	safe-read
@@ -4150,7 +4143,6 @@ dotnet test --no-restore	safe-read
 dotnet test --nologo	safe-read
 dotnet test --os x	safe-read
 dotnet test --output x	safe-read
-dotnet test --property x	safe-read
 dotnet test --results-directory x	safe-read
 dotnet test --runtime x	safe-read
 dotnet test --settings x	safe-read
@@ -4159,7 +4151,6 @@ dotnet test --verbosity x	safe-read
 dotnet test -a x	safe-read
 dotnet test -c x	safe-read
 dotnet test -d x	safe-read
-dotnet test -e x	safe-read
 dotnet test -f x	safe-read
 dotnet test -h	safe-read
 dotnet test -l x	safe-read

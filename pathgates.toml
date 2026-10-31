@@ -624,8 +624,10 @@ flags = { "--depfile" = "write", "--header" = "write", "--include" = "read", "--
 [roles."rex"]
 flags = { "--output-file" = "write", "-o" = "write" }
 
+# A positional is what `-c` names when it takes a config file, and rollup evaluates that file.
 [roles."rollup"]
-flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-d" = "write", "-o" = "write" }
+positional = "exec"
+flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-d" = "write", "-o" = "write", "--input" = "read", "-i" = "read", "--plugin" = "exec", "-p" = "exec", "--amd.autoId" = "ignore", "--amd.basePath" = "ignore", "--amd.define" = "ignore", "--amd.id" = "ignore", "--assetFileNames" = "ignore", "--banner" = "ignore", "--chunkFileNames" = "ignore", "--entryFileNames" = "ignore", "--exports" = "ignore", "--external" = "ignore", "-e" = "ignore", "--footer" = "ignore", "--format" = "ignore", "-f" = "ignore", "--globals" = "ignore", "--hashCharacters" = "ignore", "--intro" = "ignore", "--name" = "ignore", "-n" = "ignore", "--outro" = "ignore", "--sourcemap" = "ignore", "-m" = "ignore", "--sourcemapBaseUrl" = "ignore", "--sourcemapExcludeSources" = "ignore", "--watch.buildDelay" = "ignore", "--watch.chokidar.useFsEvents" = "ignore", "--watch.exclude" = "ignore", "--watch.include" = "ignore", "--watch.onEnd" = "ignore", "--watch.skipWrite" = "ignore" }
 
 [roles."rspec"]
 flags = { "--deprecation-out" = "write", "--out" = "write", "-o" = "write" }
@@ -927,7 +929,9 @@ shape = "last_write"
 shape = "last_write"
 
 [roles."sphinx-build"]
+positional = "exec"
 shape = "last_write"
+flags = { "--conf-dir" = "exec", "-c" = "exec", "--doctree-dir" = "write", "-d" = "write", "--warning-file" = "write", "-w" = "write", "--filenames" = "read", "--builder" = "ignore", "--define" = "ignore", "-D" = "ignore", "--html-define" = "ignore", "-A" = "ignore", "--include" = "ignore", "--jobs" = "ignore", "-j" = "ignore", "--language" = "ignore", "--name-suffix" = "ignore", "--tag" = "ignore", "-t" = "ignore" }
 
 [roles."pdfcrop"]
 shape = "last_write"
@@ -1294,3 +1298,43 @@ handler = "tsc_response_file"
 # all rather than ignored.
 [roles."ghostty +validate-config"]
 flags = { "--config-file" = "read" }
+
+# A test runner's operands are the code it compiles and runs: a package for `go test`, test files
+# for `bun test`, a project for the dotnet build family (its MSBuild targets run), a script for
+# `coverage run`. Judged where that code comes from, as are the flags naming more code to load: a
+# preload, an rc file, a go.mod or overlay, a package source, a test adapter.
+[roles."go test"]
+positional = "exec"
+flags = { "-o" = "write", "-outputdir" = "write", "-coverprofile" = "write", "-cpuprofile" = "write", "-memprofile" = "write", "-blockprofile" = "write", "-mutexprofile" = "write", "-trace" = "write", "-pkgdir" = "write", "-modfile" = "exec", "-overlay" = "exec", "-pgo" = "read", "-asmflags" = "ignore", "-bench" = "ignore", "-benchtime" = "ignore", "-blockprofilerate" = "ignore", "-buildmode" = "ignore", "-buildvcs" = "ignore", "-compiler" = "ignore", "-count" = "ignore", "-covermode" = "ignore", "-coverpkg" = "ignore", "-cpu" = "ignore", "-fuzz" = "ignore", "-fuzzminimizetime" = "ignore", "-fuzztime" = "ignore", "-gccgoflags" = "ignore", "-gcflags" = "ignore", "-installsuffix" = "ignore", "-ldflags" = "ignore", "-list" = "ignore", "-memprofilerate" = "ignore", "-mod" = "ignore", "-mutexprofilefraction" = "ignore", "-p" = "ignore", "-parallel" = "ignore", "-run" = "ignore", "-shuffle" = "ignore", "-skip" = "ignore", "-tags" = "ignore", "-timeout" = "ignore" }
+
+[roles."bun test"]
+positional = "exec"
+flags = { "--preload" = "exec", "--timeout" = "ignore", "-t" = "ignore" }
+
+[roles."coverage run"]
+positional = "exec"
+flags = { "--rcfile" = "exec", "--data-file" = "write", "--context" = "ignore", "--include" = "ignore", "--omit" = "ignore", "--source" = "ignore" }
+
+[roles."dotnet build"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--source" = "exec", "-s" = "exec", "--arch" = "ignore", "-a" = "ignore", "--configuration" = "ignore", "-c" = "ignore", "--framework" = "ignore", "-f" = "ignore", "--os" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore", "--version-suffix" = "ignore" }
+
+[roles."dotnet publish"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--source" = "exec", "-s" = "exec", "--manifest" = "read", "--arch" = "ignore", "-a" = "ignore", "--configuration" = "ignore", "-c" = "ignore", "--framework" = "ignore", "-f" = "ignore", "--os" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore", "--version-suffix" = "ignore" }
+
+[roles."dotnet pack"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--source" = "exec", "-s" = "exec", "--configuration" = "ignore", "-c" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore", "--version-suffix" = "ignore" }
+
+[roles."dotnet clean"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--configuration" = "ignore", "-c" = "ignore", "--framework" = "ignore", "-f" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore" }
+
+[roles."dotnet restore"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--lock-file-path" = "write", "--packages" = "write", "--configfile" = "exec", "--source" = "exec", "-s" = "exec", "--arch" = "ignore", "-a" = "ignore", "--locked-mode" = "ignore", "--os" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore" }
+
+[roles."dotnet test"]
+positional = "exec"
+flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--results-directory" = "write", "--diag" = "write", "-d" = "write", "--settings" = "exec", "-s" = "exec", "--test-adapter-path" = "exec", "--arch" = "ignore", "-a" = "ignore", "--blame-crash-collect-always" = "ignore", "--blame-crash-dump-type" = "ignore", "--blame-hang-dump-type" = "ignore", "--blame-hang-timeout" = "ignore", "--collect" = "ignore", "--configuration" = "ignore", "-c" = "ignore", "--filter" = "ignore", "--framework" = "ignore", "-f" = "ignore", "--logger" = "ignore", "-l" = "ignore", "--os" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore" }

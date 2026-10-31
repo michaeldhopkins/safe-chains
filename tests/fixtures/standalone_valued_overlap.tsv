@@ -132,7 +132,6 @@ automake	-o
 automake	-W
 autopep8	--global-config
 ava	--config
-ava	--node-arguments
 ava	--watch
 avrdude	-l
 avrdude	-V

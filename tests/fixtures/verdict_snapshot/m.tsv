@@ -2390,7 +2390,6 @@ mocha --list-reporters	safe-read
 mocha --no-color	safe-read
 mocha --no-diff	safe-read
 mocha --no-timeouts	safe-read
-mocha --node-option x	safe-read
 mocha --package x	safe-read
 mocha --parallel	safe-read
 mocha --quiet	safe-read
@@ -2414,7 +2413,6 @@ mocha -f x	safe-read
 mocha -g x	safe-read
 mocha -h	safe-read
 mocha -j x	safe-read
-mocha -n x	safe-read
 mocha -r x	safe-read
 mocha -s x	safe-read
 mocha -t x	safe-read

@@ -30,7 +30,7 @@ examples_denied = [
 ]
 
 [command.path_gate]
-flags = { "--destination" = "ignore" }
+flags = { "--destination" = "ignore", "--path" = "exec", "-p" = "exec" }
 
 [[command.sub]]
 name = "dump"

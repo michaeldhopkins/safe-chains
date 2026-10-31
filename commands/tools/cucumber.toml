@@ -20,3 +20,8 @@ valued = [
     "--require-module", "--retry", "--tags",
     "-f", "-i", "-l", "-n", "-o", "-p", "-r", "-t",
 ]
+
+# Feature directories bring their step definitions, and `--require` names Ruby to load: both run.
+[command.path_gate]
+positional = "exec"
+flags = { "--require" = "exec", "-r" = "exec", "--ci-environment" = "ignore", "--format" = "ignore", "--format-options" = "ignore", "--language" = "ignore", "--lines" = "ignore", "--name" = "ignore", "--order" = "ignore", "--profile" = "ignore", "--require-module" = "ignore", "--retry" = "ignore", "--tags" = "ignore", "-f" = "ignore", "-i" = "ignore", "-l" = "ignore", "-n" = "ignore", "-p" = "ignore", "-t" = "ignore" }

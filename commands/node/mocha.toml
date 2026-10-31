@@ -13,16 +13,18 @@ standalone = [
 ]
 valued = [
     "--config", "--delay", "--extension", "--fgrep", "--file",
-    "--grep", "--ignore", "--jobs", "--node-option", "--package",
+    "--grep", "--ignore", "--jobs", "--package",
     "--reporter", "--reporter-option", "--require", "--retries",
     "--slow", "--spec", "--timeout", "--ui",
-    "-f", "-g", "-j", "-n", "-r", "-s", "-t", "-u",
+    "-f", "-g", "-j", "-r", "-s", "-t", "-u",
 ]
 
 # Flags whose value is a module mocha loads and executes in-process before/around the tests:
 # --require/-r (the classic mocha RCE vector), --config, --file (a setup file loaded before the
 # root suite), and the custom --reporter/--ui modules. Gated as executors — a worktree module runs,
 # a foreign or /tmp one denies; a bare builtin name (--reporter spec, --ui bdd) passes untouched.
-# Test-file SELECTION (--spec, positionals) is left ungated: running the project's tests is mocha's job.
+# Test files (--spec, positionals) run too, so they are judged the same way. `--node-option`/`-n`
+# are left out: they pass Node options such as `--require` and `--import`.
 [command.path_gate]
-flags = { "--require" = "exec", "-r" = "exec", "--config" = "exec", "--file" = "exec", "--reporter" = "exec", "--ui" = "exec" }
+positional = "exec"
+flags = { "--require" = "exec", "-r" = "exec", "--config" = "exec", "--file" = "exec", "--reporter" = "exec", "--ui" = "exec", "--spec" = "exec", "-f" = "ignore", "-g" = "ignore", "-j" = "ignore", "-s" = "ignore", "-t" = "ignore", "-u" = "exec", "--delay" = "ignore", "--extension" = "ignore", "--fgrep" = "ignore", "--grep" = "ignore", "--ignore" = "ignore", "--jobs" = "ignore", "--package" = "read", "--reporter-option" = "ignore", "--retries" = "ignore", "--slow" = "ignore", "--timeout" = "ignore" }

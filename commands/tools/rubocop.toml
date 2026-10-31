@@ -45,3 +45,7 @@ write_flags = [
     "--fix-layout", "--safe-auto-correct", "--safe-autocorrect",
     "-A", "-a", "-x",
 ]
+
+# A config may `require` Ruby or name plugins, which rubocop loads.
+[command.path_gate]
+flags = { "--config" = "exec", "-c" = "exec", "--require" = "exec", "-r" = "exec" }

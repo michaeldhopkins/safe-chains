@@ -5,6 +5,8 @@ url = "https://learn.microsoft.com/en-us/dotnet/core/tools/"
 bare_flags = ["--help", "--info", "--list-runtimes", "--list-sdks", "--version", "-V", "-h"]
 examples_safe = ["dotnet build --output ./bin/out", "dotnet publish -o ./publish"]
 
+# `--property`/`-p` and `dotnet test --environment`/`-e` are left out: an MSBuild property can
+# import a targets file from anywhere, and an environment variable can load a startup hook.
 [command.path_gate]
 flags = { "--output" = "write", "-o" = "write" }
 
@@ -21,9 +23,9 @@ standalone = [
 ]
 valued = [
     "--arch", "--artifacts-path", "--configuration", "--framework",
-    "--os", "--output", "--property", "--runtime", "--source",
+    "--os", "--output", "--runtime", "--source",
     "--verbosity", "--version-suffix",
-    "-a", "-c", "-f", "-o", "-p", "-r", "-s", "-v",
+    "-a", "-c", "-f", "-o", "-r", "-s", "-v",
 ]
 
 [[command.sub]]
@@ -52,11 +54,11 @@ valued = [
     "--arch", "--artifacts-path", "--blame-crash-collect-always",
     "--blame-crash-dump-type", "--blame-hang-dump-type",
     "--blame-hang-timeout", "--collect", "--configuration",
-    "--diag", "--environment", "--filter", "--framework",
-    "--logger", "--os", "--output", "--property",
+    "--diag", "--filter", "--framework",
+    "--logger", "--os", "--output",
     "--results-directory", "--runtime", "--settings",
     "--test-adapter-path", "--verbosity",
-    "-a", "-c", "-d", "-e", "-f", "-l", "-o", "-r", "-s", "-v",
+    "-a", "-c", "-d", "-f", "-l", "-o", "-r", "-s", "-v",
 ]
 
 [[command.sub]]
@@ -96,9 +98,9 @@ standalone = [
 valued = [
     "--arch", "--artifacts-path", "--configuration",
     "--framework", "--manifest", "--os",
-    "--output", "--property", "--runtime",
+    "--output", "--runtime",
     "--source", "--verbosity", "--version-suffix",
-    "-a", "-c", "-f", "-o", "-p", "-r", "-s", "-v",
+    "-a", "-c", "-f", "-o", "-r", "-s", "-v",
 ]
 
 [[command.sub]]
@@ -115,9 +117,9 @@ standalone = [
 ]
 valued = [
     "--artifacts-path", "--configuration",
-    "--output", "--property", "--runtime",
+    "--output", "--runtime",
     "--source", "--verbosity", "--version-suffix",
-    "-c", "-o", "-p", "-r", "-s", "-v",
+    "-c", "-o", "-r", "-s", "-v",
 ]
 
 [[command.sub]]

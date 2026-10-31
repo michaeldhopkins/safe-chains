@@ -4561,9 +4561,11 @@ tuist --help	inert
 tuist --help --destination x	denied
 tuist --help --version	denied
 tuist --help x	denied
+tuist --path x	denied
 tuist --version	inert
 tuist -V	inert
 tuist -h	inert
+tuist -p x	denied
 tuist build	safe-write
 tuist build --build-output-path	safe-write
 tuist build --build-output-path --clean	safe-write

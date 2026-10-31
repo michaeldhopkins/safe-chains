@@ -18,4 +18,4 @@ valued = [
 ]
 
 [command.path_gate]
-flags = { "--output-file" = "write" }
+flags = { "--output-file" = "write", "--config" = "exec", "--append-config" = "exec" }

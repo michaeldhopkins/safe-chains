@@ -3382,15 +3382,19 @@ assetutil -s x	inert
 assetutil -t x	inert
 assetutil x	inert
 astro	denied
+astro --config x	denied
 astro --help	inert
+astro --help --config x	denied
 astro --help --version	denied
 astro --help x	denied
+astro --root x	denied
 astro --version	inert
 astro -h	inert
 astro -v	inert
 astro add	denied
 astro add x	denied
 astro build	safe-write
+astro build --config ./astro.config.mjs	safe-write
 astro build --config x	safe-write
 astro build --devOutput	safe-write
 astro build --devOutput --config x	safe-write
@@ -3400,6 +3404,7 @@ astro build --force	safe-write
 astro build --help	safe-write
 astro build --mode x	safe-write
 astro build --no-deploy	safe-write
+astro build --root ./site	safe-write
 astro build --root x	safe-write
 astro build --site x	safe-write
 astro build -h	safe-write
@@ -4209,13 +4214,12 @@ ava --color --config	safe-read
 ava --color x	safe-read
 ava --concurrency x	safe-read
 ava --config	safe-read
+ava --config ./ava.config.js	safe-read
 ava --config x	safe-read
 ava --fail-fast	safe-read
 ava --help	safe-read
 ava --match	safe-read
 ava --no-color	safe-read
-ava --node-arguments	safe-read
-ava --node-arguments x	safe-read
 ava --reset-cache	safe-read
 ava --serial	safe-read
 ava --tap	safe-read
@@ -4235,6 +4239,7 @@ ava -t	safe-read
 ava -u	safe-read
 ava -v	safe-read
 ava -w	safe-read
+ava test/a.js	safe-read
 ava x	safe-read
 avbanalyse	inert
 avbanalyse --help	inert

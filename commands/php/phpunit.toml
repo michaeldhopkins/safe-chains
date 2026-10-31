@@ -2,6 +2,7 @@
 name = "phpunit"
 description = "PHP unit testing framework. Executes PHP test files, which can perform arbitrary operations within tests. By default only writes to stdout. --log-*, --coverage-*, --generate-baseline, --testdox-* flags write report files. --generate-configuration and --migrate-configuration create/modify XML config. One major release per year (early February); frequent patches."
 url = "https://docs.phpunit.de/"
+examples_safe = ["phpunit -c ./phpunit.xml tests", "phpunit --log-junit ./junit.xml tests/UnitTest.php"]
 level = "SafeRead"
 standalone = [
     "--cache-result", "--check-version",
@@ -54,5 +55,12 @@ valued = [
     "--random-order-seed", "--requires-php-extension", "--run-test-id",
     "--test-suffix", "--testdox-html", "--testdox-text", "--testsuite",
     "--use-baseline", "--uses",
-    "-c", "-d",
+    "-c",
 ]
+
+# The configuration names a bootstrap script and test files, which run, as do the test files and
+# include path given here. `-d` is left out: an ini setting such as `auto_prepend_file` reaches the
+# child processes `--process-isolation` starts.
+[command.path_gate]
+positional = "exec"
+flags = { "--bootstrap" = "exec", "--configuration" = "exec", "-c" = "exec", "--include-path" = "exec", "--cache-directory" = "write", "--coverage-clover" = "write", "--coverage-cobertura" = "write", "--coverage-crap4j" = "write", "--coverage-html" = "write", "--coverage-openclover" = "write", "--coverage-php" = "write", "--coverage-text" = "write", "--coverage-xml" = "write", "--generate-baseline" = "write", "--log-events-text" = "write", "--log-events-verbose-text" = "write", "--log-junit" = "write", "--log-otr" = "write", "--log-teamcity" = "write", "--testdox-html" = "write", "--testdox-text" = "write", "--use-baseline" = "read", "--coverage-filter" = "read", "--colors" = "ignore", "--columns" = "ignore", "--covers" = "ignore", "--default-time-limit" = "ignore", "--diff-context" = "ignore", "--exclude-filter" = "ignore", "--exclude-group" = "ignore", "--exclude-testsuite" = "ignore", "--extension" = "ignore", "--filter" = "ignore", "--group" = "ignore", "--order-by" = "ignore", "--random-order-seed" = "ignore", "--requires-php-extension" = "ignore", "--run-test-id" = "ignore", "--test-suffix" = "ignore", "--testsuite" = "ignore", "--uses" = "ignore" }

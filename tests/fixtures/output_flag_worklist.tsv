@@ -455,7 +455,6 @@ platform team:project:list	-o
 platform team:user:list	-o
 platform teams	-o
 ps	-o
-pytest	-o
 qemu-img check	--output
 qemu-img info	--output
 qemu-img map	--output

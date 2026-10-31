@@ -21,4 +21,4 @@ valued = [
 
 # mypy RUNS this interpreter to inspect the target environment, so the value is a program.
 [command.path_gate]
-flags = { "--python-executable" = "exec" }
+flags = { "--python-executable" = "exec", "--config-file" = "exec" }

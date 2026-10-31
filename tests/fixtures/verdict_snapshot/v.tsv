@@ -994,9 +994,11 @@ vis f.txt	inert
 vis x	inert
 vis ~/.ssh/id_rsa	denied
 vite	denied
+vite --assetsDir x	denied
+vite --assetsInlineLimit x	denied
 vite --base x	denied
 vite --clearScreen	denied
-vite --clearScreen --base x	denied
+vite --clearScreen --assetsDir x	denied
 vite --clearScreen --debug	denied
 vite --clearScreen x	denied
 vite --config x	denied
@@ -1004,9 +1006,12 @@ vite --debug	denied
 vite --filter	denied
 vite --force	denied
 vite --help	inert
+vite --host x	denied
 vite --logLevel x	denied
 vite --mode x	denied
+vite --port x	denied
 vite --profile	denied
+vite --target x	denied
 vite --version	inert
 vite -c x	denied
 vite -d	denied

@@ -2,7 +2,12 @@
 name = "phpstan"
 description = "PHP static analysis tool. Reads PHP source files and reports type errors without executing them. Purely read-only by default — the result cache is written to a temp directory automatically. --generate-baseline writes a .neon baseline file. PHPStan Pro features (--fix, --watch, --pro) launch a web UI and are not safe for allowlisting. Quarterly minor releases; frequent patches."
 url = "https://phpstan.org/user-guide/command-line-usage"
+examples_safe = ["phpstan analyse -c ./phpstan.neon src", "phpstan analyse --autoload-file ./vendor/autoload.php src"]
 bare_flags = ["--help", "--version", "-V", "-h"]
+
+# The configuration may list bootstrap and autoload files, PHP that phpstan runs before analysing.
+[command.path_gate]
+flags = { "--autoload-file" = "exec", "-a" = "exec", "--configuration" = "exec", "-c" = "exec" }
 
 [[command.sub]]
 name = "analyse"

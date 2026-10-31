@@ -2,8 +2,13 @@
 name = "astro"
 description = "Astro — modern web framework / static-or-server site builder. `build` writes the rendered site to dist/ (project-local SafeWrite). `dev`/`preview` run long-running dev/preview servers. `check` runs type checks (read). `add <integration>` installs an integration (npm install — network). `sync` writes generated TypeScript types into the project. `info` is read-only diagnostic. `telemetry enable/disable/reset` toggles a local config flag. `create-key` writes an encryption key. `db <push|gen|verify|execute|export>` interact with Astro DB. astro.config.mjs is loaded at every command (arbitrary Node)."
 url = "https://docs.astro.build/en/reference/cli-reference/"
+examples_safe = ["astro build --root ./site", "astro build --config ./astro.config.mjs"]
 researched_version = "astro 5.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+
+# The root holds astro.config.mjs, which every command evaluates, as does an explicit --config.
+[command.path_gate]
+flags = { "--root" = "exec", "--config" = "exec" }
 
 [[command.sub]]
 name = "info"

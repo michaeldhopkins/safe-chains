@@ -5485,14 +5485,14 @@ sphinx-build --full-traceback	safe-write
 sphinx-build --help	safe-write
 sphinx-build --html-define x	safe-write
 sphinx-build --include x	safe-write
-sphinx-build --isolated x	safe-write
+sphinx-build --isolated	safe-write
 sphinx-build --jobs x	safe-write
 sphinx-build --keep-going	safe-write
 sphinx-build --language x	safe-write
 sphinx-build --name-suffix x	safe-write
-sphinx-build --nitpicky x	safe-write
+sphinx-build --nitpicky	safe-write
 sphinx-build --no-color	safe-write
-sphinx-build --pdb x	safe-write
+sphinx-build --pdb	safe-write
 sphinx-build --quiet	safe-write
 sphinx-build --really-quiet	safe-write
 sphinx-build --show-traceback	safe-write
@@ -5505,6 +5505,7 @@ sphinx-build --write-all	safe-write
 sphinx-build -A x	safe-write
 sphinx-build -D x	safe-write
 sphinx-build -E	safe-write
+sphinx-build -I	safe-write
 sphinx-build -M	safe-write
 sphinx-build -N	safe-write
 sphinx-build -P	safe-write
@@ -9359,8 +9360,10 @@ swc -w	safe-write
 swc x	safe-write
 swift	denied
 swift --help	inert
+swift --help --package-path x	denied
 swift --help --version	denied
 swift --help x	denied
+swift --package-path x	denied
 swift --version	inert
 swift -V	inert
 swift -h	inert
@@ -9374,6 +9377,7 @@ swift build --enable-code-coverage --help	safe-write
 swift build --enable-code-coverage x	safe-write
 swift build --help	safe-write
 swift build --jobs x	safe-write
+swift build --package-path ./Package	safe-write
 swift build --package-path x	safe-write
 swift build --product x	safe-write
 swift build --sanitize x	safe-write
@@ -9430,6 +9434,7 @@ swift test --help	safe-read
 swift test --jobs x	safe-read
 swift test --list-tests	safe-read
 swift test --num-workers x	safe-read
+swift test --package-path ./Package	safe-read
 swift test --package-path x	safe-read
 swift test --parallel	safe-read
 swift test --sanitize x	safe-read

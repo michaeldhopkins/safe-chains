@@ -3613,11 +3613,16 @@ php please x	denied
 php somescript.php	denied
 php x	denied
 phpstan	denied
+phpstan --autoload-file x	denied
+phpstan --configuration x	denied
 phpstan --help	inert
+phpstan --help --autoload-file x	denied
 phpstan --help --version	denied
 phpstan --help x	denied
 phpstan --version	inert
 phpstan -V	inert
+phpstan -a x	denied
+phpstan -c x	denied
 phpstan -h	inert
 phpstan analyse	inert
 phpstan analyse --allow-empty-baseline	inert
@@ -3625,6 +3630,7 @@ phpstan analyse --allow-empty-baseline --ansi	inert
 phpstan analyse --allow-empty-baseline --autoload-file x	inert
 phpstan analyse --allow-empty-baseline x	inert
 phpstan analyse --ansi	inert
+phpstan analyse --autoload-file ./vendor/autoload.php src	inert
 phpstan analyse --autoload-file x	inert
 phpstan analyse --configuration x	inert
 phpstan analyse --debug	inert
@@ -3646,6 +3652,7 @@ phpstan analyse --xdebug	inert
 phpstan analyse -V	inert
 phpstan analyse -a x	inert
 phpstan analyse -b x	inert
+phpstan analyse -c ./phpstan.neon src	inert
 phpstan analyse -c x	inert
 phpstan analyse -h	inert
 phpstan analyse -l x	inert
@@ -3756,6 +3763,7 @@ phpunit --list-test-ids	safe-read
 phpunit --list-tests	safe-read
 phpunit --log-events-text x	safe-read
 phpunit --log-events-verbose-text x	safe-read
+phpunit --log-junit ./junit.xml tests/UnitTest.php	safe-read
 phpunit --log-junit x	safe-read
 phpunit --log-otr x	safe-read
 phpunit --log-teamcity x	safe-read
@@ -3802,8 +3810,8 @@ phpunit --validate-configuration	safe-read
 phpunit --version	safe-read
 phpunit --warm-coverage-cache	safe-read
 phpunit --with-telemetry	safe-read
+phpunit -c ./phpunit.xml tests	safe-read
 phpunit -c x	safe-read
-phpunit -d x	safe-read
 phpunit -h	safe-read
 phpunit x	safe-read
 pick	inert
@@ -9344,6 +9352,7 @@ prettier --bracket-same-line x	denied
 prettier --check	inert
 prettier --check --bracket-same-line	inert
 prettier --check --check	inert
+prettier --check --config ./.prettierrc.js src	inert
 prettier --check --config x	inert
 prettier --check --end-of-line x	inert
 prettier --check --help	inert
@@ -9354,6 +9363,7 @@ prettier --check --no-config	inert
 prettier --check --no-editorconfig	inert
 prettier --check --no-semi	inert
 prettier --check --parser x	inert
+prettier --check --plugin ./plugin.js src	inert
 prettier --check --plugin x	inert
 prettier --check --print-width x	inert
 prettier --check --prose-wrap x	inert
@@ -10702,6 +10712,7 @@ pylint --msg-template x	safe-read
 pylint --output-format x	safe-read
 pylint --persistent	safe-read
 pylint --py-version	safe-read
+pylint --rcfile ./.pylintrc src	safe-read
 pylint --rcfile x	safe-read
 pylint --recursive	safe-read
 pylint --reports x	safe-read
@@ -10768,7 +10779,6 @@ pytest --maxfail x	safe-read
 pytest --new-first	safe-read
 pytest --nf	safe-read
 pytest --no-header	safe-read
-pytest --override-ini x	safe-read
 pytest --quiet	safe-read
 pytest --rootdir x	safe-read
 pytest --showlocals	safe-read
@@ -10778,17 +10788,18 @@ pytest --timeout x	safe-read
 pytest --verbose	safe-read
 pytest --version	safe-read
 pytest -W x	safe-read
+pytest -c ./pytest.ini --junitxml ./junit.xml tests	safe-read
 pytest -c x	safe-read
 pytest -h	safe-read
 pytest -k x	safe-read
 pytest -l	safe-read
 pytest -m x	safe-read
-pytest -o x	safe-read
 pytest -p x	safe-read
 pytest -q	safe-read
 pytest -r x	safe-read
 pytest -v	safe-read
 pytest -x	safe-read
+pytest tests	safe-read
 pytest x	safe-read
 python	denied
 python --help	inert
