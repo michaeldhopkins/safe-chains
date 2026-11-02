@@ -53,10 +53,11 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
     let mut _funcs: Vec<FuncScope> = Vec::new();
     let mut out = Vec::with_capacity(script.0.len());
     for stmt in &script.0 {
-        out.push({
-            let _cwd = crate::pathctx::enter_cwd(running.clone());
-            per_stmt(stmt)
-        });
+        // Held across the `cd` update: `$(pwd)` is claimed from the directory the shell is in now,
+        // not the one it started in. Dropping the guard first tagged `cd /tmp/y && cd $(pwd)` as
+        // the project.
+        let _cwd = crate::pathctx::enter_cwd(running.clone());
+        out.push(per_stmt(stmt));
         let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
         let next = super::cd::cd_target(&stmt.pipeline).and_then(|(t, p)| crate::pathctx::join_cwd_mode(running.as_deref(), &t, p));
         if next.is_some() {

@@ -179,6 +179,39 @@ mod tests {
     }
 
     #[test]
+    fn cd_pwd_after_leaving_the_project_does_not_count_as_the_project() {
+        let root = project();
+        let outside = [
+            "cd /tmp/y && cd $(pwd) && cargo build",
+            "cd /tmp/y && cd \"$(pwd)\" && cargo build",
+            "cd /tmp/y && cd `pwd` && cargo build",
+            "cd /tmp/y && cd $(pwd) && cargo test",
+            "cd /tmp/y && cd $(pwd) && pytest",
+            "cd /TMP/y && cd $(pwd) && cargo build",
+            "cd /etc && cd $(pwd) && cargo test",
+            "cd /etc && cd $(pwd) && pytest",
+            "cd /private/var/folders/xx/yy/T/y && cd $(pwd) && cargo build",
+            "cd /System/Volumes/Data/tmp/y && cd $(pwd) && cargo build",
+            "cd /tmp/y && cd $(pwd)/src && cargo build",
+            "cd /tmp/y && cd $(pwd) && sh ./x.sh",
+            "cd /tmp/y && cd $(pwd) && bash ./x.sh",
+            "cd /tmp/y && cd $(pwd) && python3 ./x.py",
+            "cd /tmp/y && cd $(pwd) && node ./x.js",
+        ];
+        let still: Vec<_> = outside.into_iter().filter(|command| judged_from(&root, command)).collect();
+        assert!(still.is_empty(), "still approved: {still:?}");
+        for command in [
+            "cd $(pwd) && cargo build", "cd $(pwd) && cargo test", "cd $(pwd) && cat f", "cd $(pwd) && npm test", "cd $(pwd) && pytest",
+            "cd $(pwd) && rustup show", "cd $(pwd) && jest", "cd \"$(pwd)\" && eslint src/", "cd sub && cd $(pwd) && cargo build",
+            "cd ./sub && cargo test", "cd /tmp/y && cat notes.txt", "cd /tmp/y && cd $(pwd) && cat notes.txt", "sh ./x.sh",
+            "cd $(pwd) && sh ./x.sh", "cd $(pwd) && bash ./x.sh", "cd $(pwd) && node ./x.js", "cargo build", "cargo test", "npm test",
+            "pytest", "rustup show", "jest", "eslint src/",
+        ] {
+            assert!(judged_from(&root, command), "{command}");
+        }
+    }
+
+    #[test]
     fn a_folder_code_tool_asks_where_the_folder_it_runs_in_is_unknown() {
         let root = project();
         for command in [

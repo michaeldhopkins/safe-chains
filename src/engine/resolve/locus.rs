@@ -177,7 +177,16 @@ fn classify_one(path: &str, want_write: Face) -> LocalLocus {
     };
 
     let plain = classify_pinned(&base, want_write);
-    [operand_tag, cwd_tag].into_iter().flatten().fold(plain, LocalLocus::max)
+    let tags = [operand_tag, cwd_tag];
+    let folded = tags.into_iter().flatten().fold(plain, LocalLocus::max);
+    // A temp directory must not be lifted into the band where executing a file is approved.
+    // `Temp.max(Worktree)` is `Worktree`. A residue that is already worktree-trusted (`.git`)
+    // keeps that rung: pulling it down to temp would open a frozen write.
+    let temp_in_play = plain == LocalLocus::Temp || tags.iter().flatten().any(|tag| *tag == LocalLocus::Temp);
+    if temp_in_play && folded >= LocalLocus::SandboxScope && folded <= LocalLocus::WorktreeTrusted && plain < LocalLocus::WorktreeTrusted {
+        return LocalLocus::Temp;
+    }
+    folded
 }
 
 /// Whether a READ of `path` lands somewhere the credential shield cannot be consulted about: the
@@ -613,10 +622,23 @@ fn is_parent_escape(path: &str) -> bool {
 mod tests {
     use super::*;
     use crate::engine::facet::LocalLocus;
+    use proptest::prelude::*;
 
     // The detailed path→role table is tested in `regions.rs` and end-to-end in the HP-20
     // scenario suite. Here we pin the SEAM: the fail-closed guard, the read/write asymmetry,
     // and that the write face reproduces the pre-HP-20 rungs.
+
+    proptest! {
+        #[test]
+        fn a_temp_directory_is_not_lifted_into_the_worktree_by_a_substitution_tag(
+            dir in "[a-z]{1,6}",
+            tag in prop::sample::select(vec!["WORKTREE", "SANDBOX_SCOPE", "ADJACENT", "WORKTREE_TRUSTED"]),
+        ) {
+            let path = format!("/tmp/{dir}/{}{tag}__/x.sh", crate::cst::eval::TAGGED_PREFIX);
+            prop_assert_eq!(read_locus(&path), LocalLocus::Temp);
+            prop_assert_eq!(write_locus(&path), LocalLocus::Temp);
+        }
+    }
 
     #[test]
     fn the_unpinnable_guard_worst_cases_both_faces() {
@@ -769,7 +791,6 @@ mod tests {
         assert!(!names_credential_store("~/projects/other/__SAFE_CHAINS_CMDSUB__"));
     }
 
-    use proptest::prelude::*;
     proptest! {
         #[test]
         fn a_dollar_anywhere_forces_machine(s in ".{0,30}") {

@@ -276,19 +276,49 @@ pub fn join_cwd_mode(cur: Option<&str>, target: &str, physical: bool) -> Option<
     // cannot name. Fail closed rather than pretend it stayed put.
     //
     // A DECLARED substitution (`cd $(pwd)`) is deliberately not in that set. Its sentinel carries a
-    // locus, so letting it through the joins below keeps the cwd at that locus — `cd $(pwd) && cat
-    // f` stays a worktree read, while `cd $(fd d /etc) && cat f` is a machine one. Refusing both
-    // would have been sound but needlessly coarse.
+    // locus. When that locus is the directory we are already in, the `cd` is identity — appending
+    // the sentinel would invent a child whose tag can later outrank the real directory. A tag that
+    // would move a directory from outside the execute band into it is unresolvable.
     if names_no_known_directory(&expanded) {
         return Some(UNRESOLVED_CWD.to_string());
     }
-    let raw = if expanded.starts_with('/') {
+    let raw = if let Some(landed) = declared_substitution_directory(cur, &expanded) {
+        landed
+    } else if expanded.starts_with('/') {
         expanded.into_owned()
     } else {
         let c = cur.filter(|c| c.starts_with('/'))?;
         format!("{c}/{expanded}")
     };
     Some(if physical { physical::resolve(&raw, true).unwrap_or_else(|| lexical_join("/", &raw)) } else { lexical_join("/", &raw) })
+}
+
+/// Where `cd` of a declared substitution lands. `None` when `expanded` is not one of those sentinels.
+fn declared_substitution_directory(cur: Option<&str>, expanded: &str) -> Option<String> {
+    use crate::engine::facet::{FacetTerm, LocalLocus};
+    let after = expanded.strip_prefix(crate::cst::eval::TAGGED_PREFIX)?;
+    let (term, tail) = after.split_once("__").unwrap_or(("", ""));
+    let Some(tag) = LocalLocus::from_term(&term.to_lowercase().replace('_', "-")) else {
+        return Some(UNRESOLVED_CWD.to_string());
+    };
+    let Some(cur) = cur.filter(|c| c.starts_with('/') && *c != UNRESOLVED_CWD) else {
+        return Some(UNRESOLVED_CWD.to_string());
+    };
+    let here = crate::engine::resolve::locus::read_locus(cur);
+    if here == tag {
+        let rel = tail.trim_start_matches('/');
+        return Some(if rel.is_empty() { cur.to_string() } else { lexical::lexical_join(cur, rel) });
+    }
+    let in_band = |locus: LocalLocus| locus >= LocalLocus::SandboxScope && locus <= LocalLocus::WorktreeTrusted;
+    if in_band(tag) && !in_band(here) {
+        return Some(UNRESOLVED_CWD.to_string());
+    }
+    let base = match tag {
+        LocalLocus::Temp => "/tmp",
+        _ => return Some(UNRESOLVED_CWD.to_string()),
+    };
+    let rel = tail.trim_start_matches('/');
+    Some(if rel.is_empty() { base.to_string() } else { lexical::lexical_join(base, rel) })
 }
 
 #[cfg(test)]
