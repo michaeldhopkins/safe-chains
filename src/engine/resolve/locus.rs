@@ -16,6 +16,9 @@ use std::borrow::Cow;
 use super::regions::classify_region;
 use crate::engine::facet::LocalLocus;
 
+/// Temporary-directory recognition shared with `pathctx` and config-dir checks. Not a write admit.
+pub(crate) use crate::pathctx::under_temp;
+
 /// Which face of a region role a given operation reads: the use a path is put to.
 pub(crate) use crate::pathctx::anchor::Use as Face;
 

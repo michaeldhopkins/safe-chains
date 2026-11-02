@@ -124,17 +124,71 @@ pub fn in_session_scratchpad(path: &str) -> bool {
     path.split('/').any(|seg| seg == id)
 }
 
+const TEMP_ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/"];
+const TEMP_ROOTS_ANY_CASE: &[&str] =
+    &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
+
 /// Whether `path` is under a temporary-filesystem root. macOS's `/tmp` is a symlink to
 /// `/private/tmp`, and harnesses report either spelling, so both are accepted (as is `$TMPDIR`).
+///
+/// The match is exact, including case. Scratchpad recognition uses this and not [`under_temp`]:
+/// folding `/TMP` into the scratchpad on a case-sensitive volume would treat a different directory
+/// as this session's.
 pub fn under_temp_root(path: &str) -> bool {
-    const ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/"];
-    if ROOTS.iter().any(|r| path.starts_with(r)) {
+    if TEMP_ROOTS.iter().any(|r| path.starts_with(r)) {
         return true;
     }
     std::env::var("TMPDIR").ok().is_some_and(|t| {
         let t = t.trim_end_matches('/');
         !t.is_empty() && t.starts_with('/') && path.starts_with(&format!("{t}/"))
     })
+}
+
+/// Whether `path` names a temporary directory, including a case variant, the macOS data-volume
+/// firmlink spelling (`/System/Volumes/Data/tmp`), and `/var/folders`. Shared by folder-code,
+/// config-dir and locus checks. This recognizes a place to refuse; it does not admit the path
+/// as scratch storage. A case variant of `/tmp` stays `machine` for writes on a case-sensitive volume.
+pub fn under_temp(path: &str) -> bool {
+    let folded = strip_data_volume(path).to_ascii_lowercase();
+    let dir = if folded.ends_with('/') { folded } else { format!("{folded}/") };
+    TEMP_ROOTS_ANY_CASE.iter().any(|root| dir.starts_with(root)) || tmpdir_spellings().iter().any(|root| dir.starts_with(root))
+}
+
+fn strip_data_volume(path: &str) -> String {
+    let mut rest = path;
+    const PREFIX: &str = "/system/volumes/data";
+    while rest.len() >= PREFIX.len() && rest[..PREFIX.len()].eq_ignore_ascii_case(PREFIX) {
+        let after = &rest[PREFIX.len()..];
+        if after.is_empty() || after.starts_with('/') {
+            rest = after;
+            continue;
+        }
+        break;
+    }
+    rest.to_string()
+}
+
+fn tmpdir_spellings() -> Vec<String> {
+    let Ok(raw) = std::env::var("TMPDIR") else { return Vec::new() };
+    let dir = raw.trim_end_matches('/').to_ascii_lowercase();
+    if dir.len() <= 1 || !dir.starts_with('/') {
+        return Vec::new();
+    }
+    let mut out = vec![format!("{dir}/")];
+    if let Some(rest) = dir.strip_prefix("/private/") {
+        out.push(format!("/{rest}/"));
+    } else if dir == "/tmp" || dir.starts_with("/tmp/") || dir == "/var" || dir.starts_with("/var/") {
+        out.push(format!("/private{dir}/"));
+    }
+    out
+}
+
+/// The directory the kernel would open for absolute `path`, or `path` when nothing on it is a link.
+pub(crate) fn physical_directory(path: &str) -> String {
+    if !path.starts_with('/') {
+        return path.to_string();
+    }
+    physical::resolve(path, true).unwrap_or_else(|| path.to_string())
 }
 
 thread_local! {
@@ -278,6 +332,11 @@ mod tests {
             // anonymous temp files carry no id at all
             "/tmp/evil.sh".into(),
             "/private/tmp/downloaded.sh".into(),
+            // a case variant, a firmlink spelling, or /var/folders is a different directory on a
+            // case-sensitive volume, so the id there must not become this session's scratchpad
+            format!("/TMP/{SID}/x.sh"),
+            format!("/System/Volumes/Data/tmp/{SID}/x.sh"),
+            format!("/private/var/folders/xx/yy/T/{SID}/x.sh"),
         ];
         with_session(Some(SID), || {
             for p in matching {
@@ -302,6 +361,22 @@ mod tests {
                 assert!(!in_session_scratchpad(&format!("/tmp/{weak}/x.sh")), "weak id {weak:?} must not anchor recognition",);
             });
         }
+    }
+
+    #[test]
+    fn under_temp_folds_case_firmlinks_and_var_folders_without_admitting_them() {
+        for path in [
+            "/TMP/y", "/Tmp/y", "/PRIVATE/TMP/y", "/private/TMP/y", "/System/Volumes/Data/tmp/y", "/System/Volumes/Data/private/tmp/y",
+            "/private/var/folders/xx/yy/T/y", "/var/folders/xx/yy/T/y", "/VAR/folders/xx/yy/T/y", "/Var/Folders/xx/yy/T/y",
+        ] {
+            assert!(under_temp(path), "{path}");
+            assert!(crate::engine::resolve::locus::under_temp(path), "locus: {path}");
+            assert!(!under_temp_root(path), "exact prefix must stay strict: {path}");
+        }
+        assert!(under_temp("/tmp/y"));
+        assert!(under_temp_root("/tmp/y"));
+        assert!(!under_temp("/etc/y"));
+        assert!(!under_temp("/tmpfile/y"));
     }
 
     #[test]

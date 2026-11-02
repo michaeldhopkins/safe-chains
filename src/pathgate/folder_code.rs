@@ -3,9 +3,10 @@
 //!
 //! `cargo --version` from a folder holding `rust-toolchain.toml` with `path = "./tc"` runs
 //! `./tc/bin/cargo`; `cargo build` there reads `.cargo/config.toml`, whose `rustc-wrapper` runs; and
-//! `npm test` runs the folder's `package.json`. From a temporary directory that is not this
-//! session's scratchpad, that is foreign code, so these ask just as `sh ./x.sh` there does. The
-//! project root, any folder inside it, and a folder the user granted are unaffected.
+//! `npm test` runs the folder's `package.json`. From a folder outside this project whose code
+//! would not be executed — a temporary directory, a system directory, or another user's folder —
+//! that is foreign code, so these ask just as `sh ./x.sh` there does. The project root, any folder
+//! inside it, and a folder the user granted are unaffected.
 
 #[derive(serde::Deserialize)]
 struct Lists {
@@ -23,20 +24,29 @@ pub(super) fn denies(cmd: &str) -> bool {
     NAMES.contains(cmd) && is_foreign()
 }
 
-/// Whether the ambient folder is a temporary directory whose code would not be run: outside the
-/// project root, under a temp root, and refused at the executor locus (so neither this session's
-/// scratchpad nor a grant). A `cd` the line made to a place nobody can pin (a CDPATH lookup, a
-/// substitution) counts as foreign, since it may be one.
+/// Whether the ambient folder's code would not be run. A directory inside the physically resolved
+/// project root is the project. Anywhere else is foreign when executing a file there would be
+/// refused, and a temporary directory is foreign even when its spelling is not the exact temp
+/// prefix, except this session's scratchpad. A `cd` to a place nobody can pin counts as foreign.
 fn is_foreign() -> bool {
     let Some(cwd) = crate::pathctx::cwd() else { return false };
     if cwd == crate::pathctx::UNRESOLVED_CWD {
         return true;
     }
-    if !cwd.starts_with('/') || !crate::pathctx::under_temp_root(&format!("{}/", cwd.trim_end_matches('/'))) {
+    if !cwd.starts_with('/') {
         return false;
     }
-    if crate::pathctx::root().is_some_and(|root| inside(&cwd, &root)) {
+    let cwd = crate::pathctx::physical_directory(&cwd);
+    if cwd == crate::pathctx::UNRESOLVED_CWD {
+        return true;
+    }
+    let root = crate::pathctx::root().map(|root| crate::pathctx::physical_directory(&root));
+    if root.as_deref().is_some_and(|root| inside(&cwd, root)) {
         return false;
+    }
+    let dir = format!("{}/", cwd.trim_end_matches('/'));
+    if crate::engine::resolve::locus::under_temp(&dir) && !crate::pathctx::in_session_scratchpad(&cwd) {
+        return true;
     }
     !crate::engine::resolve::execute_file_verdict(&cwd).is_allowed()
 }
@@ -118,6 +128,57 @@ mod tests {
     }
 
     #[test]
+    fn a_folder_code_tool_asks_from_a_folder_outside_the_project() {
+        let root = project();
+        let outside = [
+            "cd /etc && cargo test",
+            "cd /etc && pytest",
+            "cd /TMP/y && cargo build",
+            "cd /Tmp/y && cargo build",
+            "cd /PRIVATE/TMP/y && cargo build",
+            "cd /private/TMP/y && cargo build",
+            "cd /System/Volumes/Data/tmp/y && cargo build",
+            "cd /System/Volumes/Data/private/tmp/y && cargo build",
+            "cd /private/var/folders/xx/yy/T/y && cargo build",
+            "cd /var/folders/xx/yy/T/y && cargo build",
+            "cd /VAR/folders/xx/yy/T/y && cargo build",
+            "cd /Var/Folders/xx/yy/T/y && cargo build",
+            "cd ~/Downloads && cargo test",
+            "cd /Users/Shared/evil && pytest",
+            "cd /opt/y && npm test",
+        ];
+        let still: Vec<_> = outside.into_iter().filter(|command| judged_from(&root, command)).collect();
+        assert!(still.is_empty(), "still approved outside the project: {still:?}");
+        for command in ["cargo build", "cargo test", "npm test", "pytest", "rustup show", "jest", "eslint src/"] {
+            assert!(judged_from(&root, command), "{command}");
+            assert!(judged_from(&root, &format!("cd sub && {command}")), "cd sub && {command}");
+        }
+        assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"));
+    }
+
+    #[test]
+    fn a_symlinked_temp_directory_is_foreign_for_folder_code() {
+        let proj = tempfile::tempdir().expect("project dir");
+        let root = proj.path().canonicalize().expect("project path").to_string_lossy().into_owned();
+        let target = format!("/tmp/sc-fix-02413-{}", std::process::id());
+        std::fs::create_dir_all(&target).expect("temp target");
+        let _cleanup = RemoveDir(target.clone());
+        std::os::unix::fs::symlink(&target, format!("{root}/tmp_link")).expect("tmp_link");
+        let _g = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: Some(SESSION.to_string()) });
+        assert!(crate::is_safe_command("cargo build"), "the project itself stays the project");
+        assert!(!crate::is_safe_command("cd ./tmp_link && cargo build"), "cd ./tmp_link && cargo build");
+        assert!(!crate::is_safe_command("cd tmp_link && cargo test"), "cd tmp_link && cargo test");
+    }
+
+    struct RemoveDir(String);
+
+    impl Drop for RemoveDir {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
     fn a_folder_code_tool_asks_where_the_folder_it_runs_in_is_unknown() {
         let root = project();
         for command in [
@@ -153,6 +214,28 @@ mod tests {
     }
 
     proptest! {
+        #[test]
+        fn a_folder_code_tool_asks_from_a_directory_outside_the_project(
+            place in prop::sample::select(vec![
+                "/etc", "/TMP/y", "/Tmp/z", "/PRIVATE/TMP/y", "/System/Volumes/Data/tmp/y",
+                "/private/var/folders/xx/yy/T/y", "/VAR/folders/aa/bb/T/y", "/opt/y", "/Users/Shared/y",
+            ]),
+        ) {
+            let root = project();
+            let cargo_test = format!("cd {place} && cargo test");
+            let pytest_cmd = format!("cd {place} && pytest");
+            prop_assert!(!judged_from(&root, &cargo_test));
+            prop_assert!(!judged_from(&root, &pytest_cmd));
+            prop_assert!(judged_from(&root, "cargo build"));
+            prop_assert!(judged_from(&root, "cargo test"));
+            prop_assert!(judged_from(&root, "cd sub && cargo test"));
+            prop_assert!(judged_from(&root, "npm test"));
+            prop_assert!(judged_from(&root, "pytest"));
+            prop_assert!(judged_from(&root, "rustup show"));
+            prop_assert!(judged_from(&root, "jest"));
+            prop_assert!(judged_from(&root, "eslint src/"));
+        }
+
         #[test]
         fn a_folder_code_tool_asks_from_a_foreign_temp_folder_and_not_from_the_project(
             pick in any::<prop::sample::Index>(),

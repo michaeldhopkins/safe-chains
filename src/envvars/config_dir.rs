@@ -29,8 +29,6 @@ fn in_a_normal_folder(value: &str) -> bool {
         .all(|p| matches!(read_locus(p), LocalLocus::Worktree | LocalLocus::WorktreeTrusted | LocalLocus::User))
 }
 
-const TEMP_ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
-
 pub(super) fn in_scratch(value: &str) -> bool {
     if !value.starts_with('/') && value != "~" && !value.starts_with("~/") {
         return true;
@@ -39,7 +37,7 @@ pub(super) fn in_scratch(value: &str) -> bool {
         return true;
     };
     let dir = format!("{}/", abs.trim_end_matches('/'));
-    if is_unpinnable(&abs) || crate::pathctx::under_temp_root(&dir) || under_temp_root_any_case(&dir) {
+    if is_unpinnable(&abs) || crate::pathctx::under_temp(&dir) {
         return true;
     }
     let mut spellings = vec![abs.clone()];
@@ -48,15 +46,6 @@ pub(super) fn in_scratch(value: &str) -> bool {
         .iter()
         .flat_map(|p| [p.clone(), format!("{}/x", p.trim_end_matches('/'))])
         .any(|p| matches!(write_locus(&p), LocalLocus::Temp | LocalLocus::SandboxScope | LocalLocus::Adjacent))
-}
-
-fn under_temp_root_any_case(dir: &str) -> bool {
-    let lower = dir.to_ascii_lowercase();
-    let tmpdir = std::env::var("TMPDIR")
-        .ok()
-        .map(|t| t.trim_end_matches('/').to_ascii_lowercase())
-        .filter(|t| t.len() > 1);
-    TEMP_ROOTS.iter().any(|r| lower.starts_with(r)) || tmpdir.is_some_and(|t| t.starts_with('/') && lower.starts_with(&format!("{t}/")))
 }
 
 fn spelled_as_the_projects_parent(abs: &str) -> Option<String> {
