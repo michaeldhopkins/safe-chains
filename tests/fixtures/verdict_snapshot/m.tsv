@@ -1350,7 +1350,7 @@ mise env -h	inert
 mise env -s x	inert
 mise env x	inert
 mise exec	denied
-mise exec -- bin/rails db:create	safe-write
+mise exec -- bin/rails db:create	denied
 mise exec x	denied
 mise fmt	denied
 mise fmt --check	inert
@@ -3763,12 +3763,26 @@ mvn help:describe -Dplugin=compiler	inert
 mvn install	denied
 mvn test	safe-read
 mvn test --batch-mode	safe-read
+mvn test --log-file /etc/cron.d/x	denied
+mvn test --log-file target/mvn.log	safe-read
+mvn test -Dfailsafe.jvm=/tmp/y/evil	denied
+mvn test -Dfoo=bar	safe-read
+mvn test -Djvm.home=/tmp/y/evil	denied
+mvn test -Dmaven.ext.class.path=/tmp/y/evil.jar	denied
+mvn test -Dmaven.test.skip=true	safe-read
+mvn test -DskipTests	safe-read
+mvn test -Dsurefire.jvm=/tmp/y/evil	denied
 mvn test -Dtest=MyTest	safe-read
+mvn test -l /etc/cron.d/x	denied
+mvn test -l target/mvn.log	safe-read
+mvn test exec:exec -Dexec.executable=/tmp/y/evil	denied
 mvn test-compile	safe-write
 mvn validate	safe-read
+mvn validate deploy	denied
 mvn verify	safe-read
 mvnw --version	inert
 mvnw test	safe-read
+mvnw test -l /etc/cron.d/x	denied
 mycli	denied
 mycli --help	inert
 mycli --help --version	inert

@@ -492,7 +492,7 @@ unset x	inert
 until [[ "$(gh run view 12345 --json status --jq .status)" == "completed" ]]; do sleep 30; done	inert
 until [[ "$(node /tmp/bad.js)" == "x" ]]; do sleep 1; done	denied
 until [[ "a" == "b" ]]; do sleep 1; done	inert
-until docker compose ps --format json | grep -q healthy; do sleep 1; done; mise exec -- bin/rails db:create	safe-write
+until docker compose ps --format json | grep -q healthy; do sleep 1; done; mise exec -- bin/rails db:create	denied
 until test -f /tmp/ready; do sleep 1; done	inert
 unvis	inert
 unvis --help	denied

@@ -506,8 +506,7 @@ biber -h	safe-write
 biber -q	safe-write
 biber -v	safe-write
 biber x	safe-write
-bin/rails db:create	safe-write
-bin/rails db:test:prepare	safe-write
+bin/rails db:create	denied
 binhex	denied
 binhex --directory x	safe-write
 binhex --force	safe-write
@@ -2522,11 +2521,13 @@ bunx -- eslint src/	safe-read
 bunx --bun eslint src/	safe-read
 bunx --help	denied
 bunx --no-install eslint .	safe-read
+bunx --package /tmp/y/evil eslint src/	denied
 bunx --package eslint eslint src/	safe-read
 bunx --version	inert
 bunx biome check src/	safe-read
 bunx cowsay hello	denied
 bunx eslint src/	safe-read
+bunx eslint@file:/tmp/y/evil src/	denied
 bunx evil-package --help	denied
 bunx prettier --check src/	inert
 bunx tsc	denied

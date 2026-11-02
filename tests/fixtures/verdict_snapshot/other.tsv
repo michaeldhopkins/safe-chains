@@ -24,10 +24,10 @@ ${cmd} log	denied
 (rm -rf /)	denied
 (x=1)	inert
 (x=1; ls)	inert
-./bin/rails db:migrate	safe-write
-./vendor/bin/pest --no-progress	safe-read
-./vendor/bin/phpstan analyse --no-progress	inert
-./vendor/bin/phpunit --testsuite Unit	safe-read
+./bin/rails db:migrate	denied
+./vendor/bin/pest --no-progress	denied
+./vendor/bin/phpstan analyse --no-progress	denied
+./vendor/bin/phpunit --testsuite Unit	denied
 :	inert
 : && echo hello	inert
 : --help	denied
