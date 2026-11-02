@@ -87,11 +87,16 @@ fn a_cd_to_a_known_place_is_judged_as_a_known_folder() {
     );
 }
 
+/// Outside the mode and at `reads`, a command the folder mode does not touch keeps its verdict.
+/// A folder-code write is the exception: with no level it asks, and at `reads` the library still
+/// calls it a write so the ceiling can explain the prompt.
 #[test]
-fn outside_the_mode_and_at_reads_nothing_changes() {
-    for command in ["echo x > out.txt", "cargo build", "rm -rf build", "echo x >> .zshrc", "cat notes.md", "git status"] {
+fn outside_the_mode_matches_reads_except_a_folder_code_write() {
+    for command in ["echo x > out.txt", "rm -rf build", "echo x >> .zshrc", "cat notes.md", "git status"] {
         assert_eq!(verdict_at(None, command), verdict_at(Some(FolderLevel::Reads), command), "{command}");
     }
+    assert!(!verdict_at(None, "cargo build").is_allowed(), "no level: folder code asks");
+    assert!(writes(verdict_at(Some(FolderLevel::Reads), "cargo build")), "reads: still a write");
 }
 
 #[test]

@@ -24,6 +24,40 @@ pub(super) fn denies(cmd: &str) -> bool {
     NAMES.contains(cmd) && is_foreign()
 }
 
+/// A read or an inert command in the unknown folder at `reads`. The ceiling would approve it,
+/// so it asks here. A write stays allowed: that ceiling is what sends it to the prompt, and it
+/// says why.
+pub(super) fn denies_read(cmd: &str, tokens: &[crate::parse::Token]) -> bool {
+    if tokens.is_empty() || !NAMES.contains(cmd) || !unknown_at_reads() || READING_UNSCOPED.with(std::cell::Cell::get) {
+        return false;
+    }
+    let verdict = unscoped_verdict(tokens);
+    matches!(verdict, crate::verdict::Verdict::Allowed(level) if level <= crate::verdict::SafetyLevel::SafeRead)
+}
+
+fn unknown_at_reads() -> bool {
+    let Some(cwd) = crate::pathctx::cwd() else { return false };
+    crate::pathctx::folder::is_unknown(&cwd) && crate::pathctx::folder::level() == Some(crate::pathctx::anchor::FolderLevel::Reads)
+}
+
+std::thread_local! {
+    static READING_UNSCOPED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// The verdict before this read check. The engine's own verdict does not consult the gate; the
+/// legacy one does, so a second look skips this check and cannot recurse.
+fn unscoped_verdict(tokens: &[crate::parse::Token]) -> crate::verdict::Verdict {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            READING_UNSCOPED.with(|cell| cell.set(self.0));
+        }
+    }
+    let previous = READING_UNSCOPED.with(|cell| cell.replace(true));
+    let _restore = Restore(previous);
+    crate::engine::bridge::engine_verdict(tokens).unwrap_or_else(|| crate::handlers::dispatch(tokens))
+}
+
 /// Whether the ambient folder's code would not be run. A directory inside the physically resolved
 /// project root is the project. Anywhere else is foreign when executing a file there would be
 /// refused, and a temporary directory is foreign even when its spelling is not the exact temp
@@ -33,10 +67,11 @@ fn is_foreign() -> bool {
     if cwd == crate::pathctx::UNRESOLVED_CWD {
         return true;
     }
-    // The harness places a command here when it does not know the folder. The path is a sentinel,
-    // not a directory on disk, so it is not foreign code. A real temp or system directory still is.
+    // The harness places a command here when it does not know the folder. With no level in
+    // force, a tool that runs the folder's own code asks. Developer and workspace treat the
+    // sentinel as that folder. At reads a write stays a write, so the ceiling can explain it.
     if crate::pathctx::folder::is_unknown(&cwd) {
-        return false;
+        return crate::pathctx::folder::level().is_none();
     }
     if !cwd.starts_with('/') {
         return false;
@@ -177,18 +212,45 @@ mod tests {
         }
     }
 
-    /// The unknown workdir is the harness sentinel, so a build there is the project's build.
+    /// The unknown-folder sentinel is not a directory the harness has pinned. A folder-code tool
+    /// asks there until a level that approves writes in that folder is in force. At `reads` a
+    /// write stays allowed in the library, because that ceiling sends it to the prompt and says
+    /// why; a read asks here, because the ceiling would approve it.
     #[test]
-    fn the_unknown_workdir_sentinel_is_not_a_foreign_folder() {
+    fn a_folder_code_tool_asks_in_the_unknown_folder_until_a_write_level() {
+        use crate::pathctx::anchor::FolderLevel;
+        use crate::pathctx::folder::enter as enter_folder;
         let root = project();
         let cwd = crate::targets::UNKNOWN_WORKDIR.to_string();
-        let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
-        assert!(crate::is_safe_command("cargo build"));
-        assert!(crate::is_safe_command("cargo fmt"));
-        assert!(crate::is_safe_command("npm test"));
-        drop(_unknown);
+        let reads = ["pytest", "npm test", "cargo --version"];
+        {
+            let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
+            for command in reads {
+                assert!(!crate::is_safe_command(command), "no level: {command}");
+            }
+            assert!(!crate::is_safe_command("cargo fmt"), "no level: cargo fmt");
+            assert!(crate::is_safe_command("cat notes.txt"));
+        }
+        {
+            let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
+            let _reads = enter_folder(FolderLevel::Reads);
+            for command in reads {
+                assert!(!crate::is_safe_command(command), "reads: {command}");
+            }
+            assert!(crate::is_safe_command("cargo fmt"), "reads: cargo fmt stays a write");
+            assert!(crate::is_safe_command("cat notes.txt"));
+        }
+        {
+            let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
+            let _developer = enter_folder(FolderLevel::Developer);
+            for command in reads {
+                assert!(crate::is_safe_command(command), "developer: {command}");
+            }
+            assert!(crate::is_safe_command("cargo fmt"), "developer: cargo fmt");
+        }
         let _project = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
-        assert!(crate::is_safe_command(&format!("cd {cwd} && cargo fmt")));
+        assert!(!crate::is_safe_command(&format!("cd {cwd} && cargo fmt")));
+        assert!(crate::is_safe_command(&format!("cd {cwd} && cat notes.txt")));
         assert!(!crate::is_safe_command("cd /tmp/y && cargo fmt"));
     }
 

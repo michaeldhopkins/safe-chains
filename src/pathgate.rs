@@ -363,7 +363,9 @@ static SUB_SCOPED: LazyLock<HashSet<&'static str>> =
 /// Whether `cmd`'s already-allowed verdict must be overridden to `Denied` because one of its
 /// path arguments reads/writes a sensitive locus. Returns `false` for commands in no gate.
 pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
-    chdir::should_deny(GATES.chdir.get(cmd), tokens, || folder_code::denies(cmd) || deny_in_place(cmd, tokens))
+    chdir::should_deny(GATES.chdir.get(cmd), tokens, || {
+        folder_code::denies(cmd) || folder_code::denies_read(cmd, tokens) || deny_in_place(cmd, tokens)
+    })
 }
 
 fn deny_in_place(cmd: &str, tokens: &[Token]) -> bool {

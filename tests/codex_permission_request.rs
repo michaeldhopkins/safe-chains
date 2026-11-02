@@ -329,7 +329,7 @@ fn a_read_is_approved_exactly_when_claude_would_approve_it_without_the_folder() 
         "echo x >> .zshrc",
         "rm -rf /",
     ];
-    let writes_claude_would_approve = ["git commit -am x", "cargo fmt", "touch /work/proj/x", "git add ."];
+    let writes_claude_would_approve = ["git commit -am x", "touch /work/proj/x", "git add ."];
     for command in reads {
         assert!(claude_with_the_folder_unknown(command), "precondition: Claude approves `{command}`");
         assert_eq!(behavior(&codex(&permission_request("Bash", command))).as_deref(), Some("allow"), "`{command}`");
@@ -344,6 +344,15 @@ fn a_read_is_approved_exactly_when_claude_would_approve_it_without_the_folder() 
         assert_eq!(at_reads, "", "`{command}` writes, so at reads it must go to Codex's prompt");
         assert_eq!(behavior(&codex(&permission_request("Bash", command))).as_deref(), Some("allow"), "`{command}` at developer");
     }
+    // The sentinel is not a folder anyone has pinned. With no level in force, a tool that runs
+    // the folder's own code asks. Codex at developer has that level, so the same write is approved.
+    assert!(!claude_with_the_folder_unknown("cargo fmt"), "folder code asks when no level is in force");
+    assert_eq!(
+        codex_with(&["--unknown-folder", "reads"], &permission_request("Bash", "cargo fmt")),
+        "",
+        "cargo fmt writes, so at reads it must go to Codex's prompt"
+    );
+    assert_eq!(behavior(&codex(&permission_request("Bash", "cargo fmt"))).as_deref(), Some("allow"), "cargo fmt at developer");
 }
 
 /// A host-level network approval arrives as the command with a `network-access <host>`
