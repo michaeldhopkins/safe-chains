@@ -134,4 +134,5 @@ examples_safe = [
 
 [command.path_gate]
 # `-project`, `-workspace`, `-xctestrun`, and `-testPlan` select the project whose build phases run.
-flags = { "-destination" = "ignore", "-derivedDataPath" = "write", "-archivePath" = "write", "-resultBundlePath" = "write", "-exportPath" = "write", "-exportOptionsPlist" = "read", "-xcconfig" = "read", "-project" = "exec", "-workspace" = "exec", "-xctestrun" = "exec", "-testPlan" = "exec" }
+# `-xcconfig` is a settings file the build applies, and `-toolchain` selects the tools it runs.
+flags = { "-destination" = "ignore", "-derivedDataPath" = "write", "-archivePath" = "write", "-resultBundlePath" = "write", "-exportPath" = "write", "-exportOptionsPlist" = "read", "-xcconfig" = "exec", "-toolchain" = "exec", "-project" = "exec", "-workspace" = "exec", "-xctestrun" = "exec", "-testPlan" = "exec" }

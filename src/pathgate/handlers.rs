@@ -15,7 +15,7 @@ mod plist;
 #[cfg(test)]
 pub(super) const NAMES: &[&str] = &[
     "ar_archive", "defaults_domain", "exiftool_mode", "jj_destination", "jj_repository", "jq_program", "jupytext_mode", "mtree_mode",
-    "ncu_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "yq_program",
+    "ncu_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "xcodebuild_settings", "yq_program",
 ];
 
 pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
@@ -34,6 +34,7 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "textutil_mode" => textutil_mode(tokens),
         "tsc_response_file" => tsc_response_file(tokens),
         "xattr_mode" => xattr_mode(tokens),
+        "xcodebuild_settings" => xcodebuild_settings(tokens),
         "yq_program" => jq::yq_program(tokens),
         // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
         // misconfigured name so a typo can never silently ungate a command.
@@ -362,4 +363,153 @@ fn textutil_mode(tokens: &[Token]) -> bool {
         }
     }
     false
+}
+
+/// `xcodebuild` takes actions and `KEY=VALUE` build settings as bare words. A setting that names
+/// the compiler, the linker, or the install root runs or writes wherever that value says, and
+/// `install` / `installsrc` write the product to `$DSTROOT`. Other settings and the ordinary
+/// build actions are left to the command's own flag gate.
+///
+/// A valued flag's argument is skipped, so a scheme or target named `install` is not an action.
+fn xcodebuild_settings(tokens: &[Token]) -> bool {
+    // The valued flags from the command definition. A value is never an action or a setting.
+    const VALUED: &[&str] = &[
+        "-arch",
+        "-archivePath",
+        "-buildVersion",
+        "-configuration",
+        "-defaultLanguage",
+        "-defaultPackageRegistryURL",
+        "-derivedDataPath",
+        "-destination",
+        "-destination-timeout",
+        "-exportArchive",
+        "-exportFormat",
+        "-exportLanguage",
+        "-exportLocalizations",
+        "-exportNotarizedApp",
+        "-exportOptionsPlist",
+        "-exportPath",
+        "-find-executable",
+        "-find-library",
+        "-importComponent",
+        "-importLocalizations",
+        "-importPath",
+        "-jobs",
+        "-localizationPath",
+        "-maximum-concurrent-test-device-destinations",
+        "-maximum-concurrent-test-simulator-destinations",
+        "-maximum-parallel-testing-workers",
+        "-only-testing",
+        "-only-testing:TEST-IDENTIFIER",
+        "-onlyTesting",
+        "-packageAuthorizationProvider",
+        "-packageCachePath",
+        "-packageDependencySCMToRegistryTransformation",
+        "-packageFingerprintPolicy",
+        "-packageSigningEntityPolicy",
+        "-parallel-testing-enabled",
+        "-parallel-testing-worker-count",
+        "-prepareDeviceSupport",
+        "-project",
+        "-resultBundlePath",
+        "-resultBundleVersion",
+        "-resultStreamPath",
+        "-retry-tests-on-failure",
+        "-runDestination",
+        "-runDestinationTimeout",
+        "-scheme",
+        "-scmProvider",
+        "-sdk",
+        "-skip-testing",
+        "-skip-testing:TEST-IDENTIFIER",
+        "-skipTesting",
+        "-target",
+        "-test-enumeration-format",
+        "-test-enumeration-output-path",
+        "-test-enumeration-style",
+        "-test-iterations",
+        "-test-repetition-relaunch-enabled",
+        "-test-timeouts-enabled",
+        "-testLanguage",
+        "-testPlan",
+        "-testProductsPath",
+        "-testRegion",
+        "-toolchain",
+        "-workspace",
+        "-xcconfig",
+        "-xctestrun",
+    ];
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            return tokens[i + 1..].iter().any(|token| names_a_compiler_or_install(token.as_str()));
+        }
+        if let Some(glued) = valued_assignment(t, VALUED) {
+            i += if glued { 1 } else { 2 };
+            continue;
+        }
+        if t.starts_with('-') && t != "-" {
+            i += 1;
+            continue;
+        }
+        if names_a_compiler_or_install(t) {
+            return true;
+        }
+        i += 1;
+    }
+    false
+}
+
+/// `Some(true)` when `token` is `flag=value`; `Some(false)` when it is a valued flag whose
+/// value is the next token.
+fn valued_assignment(token: &str, valued: &[&str]) -> Option<bool> {
+    valued.iter().find_map(|flag| {
+        if token == *flag { Some(false) } else { token.strip_prefix(flag).filter(|rest| rest.starts_with('=')).map(|_| true) }
+    })
+}
+
+fn names_a_compiler_or_install(token: &str) -> bool {
+    matches!(token, "install" | "installsrc")
+        || token.split_once('=').is_some_and(|(key, _)| matches!(key, "CC" | "LD" | "SWIFT_EXEC" | "DSTROOT"))
+}
+
+#[cfg(test)]
+mod tests {
+    fn allows(command: &str) -> bool {
+        crate::is_safe_command(command)
+    }
+
+    #[test]
+    fn a_build_setting_that_names_a_compiler_or_an_install_root_asks() {
+        for command in [
+            "xcodebuild build CC=/tmp/y/evil",
+            "xcodebuild build LD=/tmp/y/evil",
+            "xcodebuild build SWIFT_EXEC=/tmp/y/evil",
+            "xcodebuild build DSTROOT=/etc",
+            "xcodebuild build DSTROOT=/etc install",
+            "xcodebuild install",
+            "xcodebuild installsrc",
+            "xcodebuild -toolchain /tmp/y/Evil.xctoolchain build",
+            "xcodebuild -xcconfig /tmp/y/evil.xcconfig build",
+        ] {
+            assert!(!allows(command), "{command}");
+        }
+        for command in [
+            "xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug -destination 'platform=macOS' build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=\"\"",
+            "xcodebuild -workspace Foo.xcworkspace -scheme Foo -configuration Release archive -archivePath build/Foo.xcarchive",
+            "xcodebuild -project Foo.xcodeproj -scheme Foo test -destination 'platform=iOS Simulator,name=iPhone 15' -enableCodeCoverage",
+            "xcodebuild -project Foo.xcodeproj -scheme Foo clean",
+            "xcodebuild -project Foo.xcodeproj -scheme Foo analyze",
+            "xcodebuild -project Foo.xcodeproj -scheme Foo docbuild",
+            "xcodebuild -scheme install build",
+            "xcodebuild -destination 'platform=macOS' build",
+            "xcodebuild -xcconfig Config.xcconfig build",
+            "xcodebuild -toolchain Local.xctoolchain build",
+            "xcodebuild build CODE_SIGNING_ALLOWED=NO",
+        ] {
+            assert!(allows(command), "{command}");
+        }
+    }
 }
