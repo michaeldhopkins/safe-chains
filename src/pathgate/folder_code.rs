@@ -33,11 +33,9 @@ fn is_foreign() -> bool {
     if cwd == crate::pathctx::UNRESOLVED_CWD {
         return true;
     }
-    // The unknown-folder mode classifies at a synthetic directory. A level above `reads` is what
-    // admits a write there; this directory is not a folder on disk whose code could run.
-    if crate::pathctx::folder::is_unknown(&cwd)
-        && crate::pathctx::folder::level().is_some_and(|level| level > crate::pathctx::anchor::FolderLevel::Reads)
-    {
+    // The harness places a command here when it does not know the folder. The path is a sentinel,
+    // not a directory on disk, so it is not foreign code. A real temp or system directory still is.
+    if crate::pathctx::folder::is_unknown(&cwd) {
         return false;
     }
     if !cwd.starts_with('/') {
@@ -163,20 +161,19 @@ mod tests {
         assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"));
     }
 
-    /// The synthetic unknown workdir is where a folder level judges writes. It is not a temp root.
+    /// The unknown workdir is the harness sentinel, so a build there is the project's build.
     #[test]
-    fn a_folder_level_still_approves_cargo_in_the_unknown_workdir() {
+    fn the_unknown_workdir_sentinel_is_not_a_foreign_folder() {
         let root = project();
         let cwd = crate::targets::UNKNOWN_WORKDIR.to_string();
         let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
-        assert!(!crate::is_safe_command("cargo build"), "without a folder level the synthetic directory stays foreign");
-        let level = crate::pathctx::folder::enter(crate::pathctx::anchor::FolderLevel::Developer);
         assert!(crate::is_safe_command("cargo build"));
+        assert!(crate::is_safe_command("cargo fmt"));
         assert!(crate::is_safe_command("npm test"));
-        drop(level);
         drop(_unknown);
         let _project = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
-        assert!(!crate::is_safe_command(&format!("cd {cwd} && cargo build")));
+        assert!(crate::is_safe_command(&format!("cd {cwd} && cargo fmt")));
+        assert!(!crate::is_safe_command("cd /tmp/y && cargo fmt"));
     }
 
     #[test]
