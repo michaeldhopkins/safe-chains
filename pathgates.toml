@@ -625,9 +625,11 @@ flags = { "--depfile" = "write", "--header" = "write", "--include" = "read", "--
 flags = { "--output-file" = "write", "-o" = "write" }
 
 # A positional is what `-c` names when it takes a config file, and rollup evaluates that file.
+# `--plugin` / `-p` are `plugin`, not `exec`: an inline `{...}` or `name={...}` is JavaScript, and
+# `exec` would read a whitespace-free expression as a file in the project.
 [roles."rollup"]
 positional = "exec"
-flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-d" = "write", "-o" = "write", "--input" = "read", "-i" = "read", "--plugin" = "exec", "-p" = "exec", "--amd.autoId" = "ignore", "--amd.basePath" = "ignore", "--amd.define" = "ignore", "--amd.id" = "ignore", "--assetFileNames" = "ignore", "--banner" = "ignore", "--chunkFileNames" = "ignore", "--entryFileNames" = "ignore", "--exports" = "ignore", "--external" = "ignore", "-e" = "ignore", "--footer" = "ignore", "--format" = "ignore", "-f" = "ignore", "--globals" = "ignore", "--hashCharacters" = "ignore", "--intro" = "ignore", "--name" = "ignore", "-n" = "ignore", "--outro" = "ignore", "--sourcemap" = "ignore", "-m" = "ignore", "--sourcemapBaseUrl" = "ignore", "--sourcemapExcludeSources" = "ignore", "--watch.buildDelay" = "ignore", "--watch.chokidar.useFsEvents" = "ignore", "--watch.exclude" = "ignore", "--watch.include" = "ignore", "--watch.skipWrite" = "ignore" }
+flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-d" = "write", "-o" = "write", "--input" = "read", "-i" = "read", "--plugin" = "plugin", "-p" = "plugin", "--amd.autoId" = "ignore", "--amd.basePath" = "ignore", "--amd.define" = "ignore", "--amd.id" = "ignore", "--assetFileNames" = "ignore", "--banner" = "ignore", "--chunkFileNames" = "ignore", "--entryFileNames" = "ignore", "--exports" = "ignore", "--external" = "ignore", "-e" = "ignore", "--footer" = "ignore", "--format" = "ignore", "-f" = "ignore", "--globals" = "ignore", "--hashCharacters" = "ignore", "--intro" = "ignore", "--name" = "ignore", "-n" = "ignore", "--outro" = "ignore", "--sourcemap" = "ignore", "-m" = "ignore", "--sourcemapBaseUrl" = "ignore", "--sourcemapExcludeSources" = "ignore", "--watch.buildDelay" = "ignore", "--watch.chokidar.useFsEvents" = "ignore", "--watch.exclude" = "ignore", "--watch.include" = "ignore", "--watch.skipWrite" = "ignore" }
 
 [roles."rspec"]
 flags = { "--deprecation-out" = "write", "--out" = "write", "-o" = "write" }

@@ -6693,6 +6693,7 @@ fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
             Role::ReadTree => crate::engine::resolve::read_tree_verdict,
             Role::Write => crate::engine::resolve::write_target_verdict,
             Role::Exec => crate::engine::resolve::execute_file_verdict,
+            Role::Plugin => crate::pathgate::plugin_verdict,
         };
         for value in VALUES {
             let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
@@ -6760,7 +6761,7 @@ fn every_declared_path_flag_actually_gates() {
             Role::ReadTree => "~/.ssh/id_rsa",
             // A /tmp executor is the discriminating hot path: `write` would ALLOW it
             // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
-            Role::Exec => "/tmp/sc-probe/Cargo.toml",
+            Role::Exec | Role::Plugin => "/tmp/sc-probe/Cargo.toml",
             Role::Ignore => continue,
         };
         // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must

@@ -264,6 +264,12 @@ fn ordinary_in_project_tool_invocations_stay_approved() {
         "yarn vitest run",
         "npm_config_prefix=. npm run test",
         "npm_config_prefix= npm run test",
+        "rollup -i src/main.js -o dist/out.js -f es -p node-resolve",
+        "rollup -i src/index.js --plugin node-resolve",
+        "rollup -i src/index.js --plugin @rollup/plugin-node-resolve",
+        "rollup -i src/index.js -p ./plugin.js",
+        "rollup -i src/index.js --plugin=./plugin.js",
+        "rollup -i src/index.js --plugin ./plugin.js",
         "pytest",
         "rustup show",
         "jest",
@@ -316,10 +322,24 @@ fn a_symlinked_temp_directory_is_foreign_code() {
     std::os::unix::fs::symlink(&target, format!("{root}/tmp_link")).expect("tmp_link");
     let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
     for command in [
-        "jest tmp_link/evil.test.js", "vitest tmp_link/evil.test.ts", "webpack tmp_link/entry.js", "tsup tmp_link/index.ts",
-        "eslint --rulesdir tmp_link/rules src/", "deno test tmp_link/evil_test.ts", "cargo install --path tmp_link", "make -n -C tmp_link",
-        "php tmp_link/artisan test", "cd tmp_link && mvnw test", "npm run test --prefix tmp_link", "npm run test --prefix=tmp_link",
-        "yarn test --cwd tmp_link", "yarn test --cwd=tmp_link", "npm_config_prefix=tmp_link npm run test",
+        "jest tmp_link/evil.test.js",
+        "vitest tmp_link/evil.test.ts",
+        "webpack tmp_link/entry.js",
+        "tsup tmp_link/index.ts",
+        "eslint --rulesdir tmp_link/rules src/",
+        "deno test tmp_link/evil_test.ts",
+        "cargo install --path tmp_link",
+        "make -n -C tmp_link",
+        "php tmp_link/artisan test",
+        "cd tmp_link && mvnw test",
+        "npm run test --prefix tmp_link",
+        "npm run test --prefix=tmp_link",
+        "yarn test --cwd tmp_link",
+        "yarn test --cwd=tmp_link",
+        "npm_config_prefix=tmp_link npm run test",
+        "rollup -i src/index.js --plugin tmp_link/plugin.js",
+        "rollup -i src/index.js -p tmp_link/plugin.js",
+        "rollup -i src/index.js --plugin=tmp_link/plugin.js",
     ] {
         assert!(!safe_chains::is_safe_command(command), "{command}");
     }
@@ -409,6 +429,53 @@ proptest! {
             prop_assert!(!approved_in_project(&spaced), "{}", spaced);
             prop_assert!(!approved_in_project(&glued), "{}", glued);
         }
+    }
+}
+
+/// Rollup evaluates a `--plugin` / `-p` value that contains `{`, `=`, or `,` as JavaScript.
+/// A package name or a file in the project does not, and stays approved.
+#[test]
+fn an_inline_rollup_plugin_asks() {
+    for command in [
+        r#"rollup -i src/index.js --plugin="{buildStart(){require(\"child_process\").execSync(\"id\")}}""#,
+        r#"rollup -i src/index.js --plugin "{buildStart(){require(\"child_process\").execSync(\"id\")}}""#,
+        r#"rollup -i src/index.js -p "{buildStart(){require(\"child_process\").execSync(\"id\")}}""#,
+        r#"rollup -i src/index.js -p="{buildStart(){require(\"child_process\").execSync(\"id\")}}""#,
+        r#"rollup -i src/index.js --plugin "alias={buildStart(){require(\"child_process\").execSync(\"id\")}}""#,
+        r#"rollup -i src/index.js --plugin="alias={buildStart(){}}""#,
+        "rollup -i src/index.js --plugin '{a(){},b(){}}'",
+        "rollup -i src/index.js -p '{a(){},b(){}}'",
+        "rollup -i src/index.js --plugin /tmp/y/plugin.js",
+        "rollup -i src/index.js --plugin=/tmp/y/plugin.js",
+        "rollup -i src/index.js -p /tmp/y/plugin.js",
+        "rollup -i src/index.js -p=/tmp/y/plugin.js",
+        "rollup -i src/index.js --plugin /TMP/y/plugin.js",
+        "rollup -i src/index.js --plugin /private/tmp/y/plugin.js",
+        "rollup -i src/index.js --plugin /System/Volumes/Data/tmp/y/plugin.js",
+        "rollup -i src/index.js --plugin /private/var/folders/xx/yy/T/y/plugin.js",
+    ] {
+        assert!(!approved_in_project(command), "{command}");
+    }
+}
+
+proptest! {
+    /// An inline plugin expression is refused in either spelling. A package-shaped name is not.
+    #[test]
+    fn an_inline_rollup_plugin_expression_is_not_a_project_file(name in "[a-z][a-z0-9-]{0,16}", body in "[A-Za-z]{0,8}") {
+        let inline = format!("rollup -i src/index.js --plugin '{{build{body}(){{}}}}'");
+        let glued = format!("rollup -i src/index.js --plugin={{build{body}(){{}}}}");
+        let short = format!("rollup -i src/index.js -p '{{build{body}(){{}}}}'");
+        let with_eq = format!("rollup -i src/index.js --plugin {name}={{build(){{}}}}");
+        let with_comma = format!("rollup -i src/index.js -p '{name},{name}'");
+        prop_assert!(!approved_in_project(&inline), "{}", inline);
+        prop_assert!(!approved_in_project(&glued), "{}", glued);
+        prop_assert!(!approved_in_project(&short), "{}", short);
+        prop_assert!(!approved_in_project(&with_eq), "{}", with_eq);
+        prop_assert!(!approved_in_project(&with_comma), "{}", with_comma);
+        let package = format!("rollup -i src/index.js -p {name}");
+        let scoped = format!("rollup -i src/index.js --plugin @{name}/plugin-{name}");
+        prop_assert!(approved_in_project(&package), "{}", package);
+        prop_assert!(approved_in_project(&scoped), "{}", scoped);
     }
 }
 

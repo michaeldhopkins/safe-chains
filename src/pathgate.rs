@@ -48,6 +48,10 @@ pub(crate) enum Role {
     /// (the execution-origin band), where `write` would allow `/tmp`. See
     /// docs/design/behavioral-taxonomy-execution-origin.md.
     Exec,
+    /// An executor path that rollup will also accept as inline JavaScript. `--plugin` / `-p`
+    /// values containing `{`, `=`, or `,` are evaluated as a function body (`commandPlugins.ts`);
+    /// a package name or a project file has none of those, and is judged as `exec`.
+    Plugin,
     /// Never gate — a URL, an `-i` identity, a converter's non-disclosing transcode input. The
     /// default, so a command declaring only path-bearing flags leaves its positionals ungated.
     #[default]
@@ -68,6 +72,7 @@ impl Role {
             Role::ReadTree => 2,
             Role::Write => 3,
             Role::Exec => 4,
+            Role::Plugin => 5,
         }
     }
 }
@@ -648,7 +653,15 @@ fn judge(role: Role, path: &str) -> Verdict {
         Role::ReadTree => crate::engine::resolve::read_tree_verdict(path),
         Role::Write => crate::engine::resolve::write_target_verdict(path),
         Role::Exec => crate::engine::resolve::execute_file_verdict(path),
+        Role::Plugin => plugin_verdict(path),
     }
+}
+
+/// Rollup evaluates a plugin value that contains `{`, `=`, or `,` as JavaScript. Those characters
+/// are what separate an inline expression from a package name or a file, so the check stays on this
+/// role rather than on every executor path (`webpack --entry name=src/index.js` is a file).
+pub(crate) fn plugin_verdict(path: &str) -> Verdict {
+    if path.contains(['{', '=', ',']) { Verdict::Denied } else { crate::engine::resolve::execute_file_verdict(path) }
 }
 
 fn gate(role: Role, path: &str) -> bool {
