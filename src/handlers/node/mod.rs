@@ -13,9 +13,7 @@ pub(super) fn find_runner_package_index(tokens: &[Token], start: usize, flags: &
     while i < tokens.len() {
         if tokens[i] == "--package" || tokens[i] == "-p" {
             let spec = tokens.get(i + 1)?.as_str();
-            if package_name(spec).is_none() {
-                return None;
-            }
+            package_name(spec)?;
             specs.push(spec);
             i += 2;
             continue;
@@ -97,10 +95,10 @@ fn package_name(pkg: &str) -> Option<&str> {
     if !plain_segment(name) {
         return None;
     }
-    if let Some(version) = version {
-        if !safe_version(version) {
-            return None;
-        }
+    if let Some(version) = version
+        && !safe_version(version)
+    {
+        return None;
     }
     Some(name)
 }

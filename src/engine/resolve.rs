@@ -2603,8 +2603,8 @@ mod tests {
             &format!("{home}/.cargo/bin/grep foo file.txt"),
             &format!("{home}/.rustup/toolchains/stable/bin/grep foo file.txt"),
             &format!("{home}/.local/share/mise/installs/ripgrep/14.1.0/bin/grep foo file.txt"),
-            &format!("~/.cargo/bin/grep foo file.txt"),
-            &format!("~/.local/share/mise/installs/ripgrep/14.1.0/bin/grep foo file.txt"),
+            "~/.cargo/bin/grep foo file.txt",
+            "~/.local/share/mise/installs/ripgrep/14.1.0/bin/grep foo file.txt",
         ] {
             assert!(crate::is_safe_command(allowed), "toolchain path stopped approving: {allowed}");
         }
