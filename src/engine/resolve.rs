@@ -1446,9 +1446,13 @@ fn stage_output_locus(cmd: &crate::cst::Cmd) -> Option<StageOutput> {
         // leaf being `.` or `..`. Both halves of that are enforced in `locus::neutralize_atoms`;
         // on its own this claim widens nothing, since an atom sentinel is `is_unpinnable`.
         OutputLocus::Atom => Some(StageOutput::Atom),
-        // The cwd is the workspace root by construction (the harness passes it), so `$(pwd)` is a
-        // worktree path. `pathctx` is what decides whether the cwd itself escaped the root.
-        OutputLocus::Cwd => Some(StageOutput::Locus(read_locus("."))),
+        // The cwd is a worktree path only while it is one. At `user` or above the claim names a
+        // directory, not a file, and a suffix such as `/shadow` would never be shown to the shield.
+        // Same bound as `Operands`.
+        OutputLocus::Cwd => {
+            let locus = read_locus(".");
+            (locus < LocalLocus::User).then_some(StageOutput::Locus(locus))
+        }
         // Output descends the command's own path operands, so it is bounded by their worst read
         // locus. `fd x app/ lib/` → worktree; `fd x /` → machine.
         OutputLocus::Operands => {
@@ -2547,6 +2551,20 @@ mod tests {
                 "`{untrusted}` is not a trusted path to git and must earn no output claim",
             );
         }
+    }
+
+    #[test]
+    fn a_pwd_outside_the_worktree_does_not_stand_in_for_a_file_there() {
+        let home = std::env::var("HOME").expect("HOME");
+        let root = format!("{}/projects/app", home.trim_end_matches('/'));
+        let _guard = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
+        for command in
+            ["cd /etc && cat $(pwd)/shadow", "cd /var/log && cat $(pwd)/auth.log", "cd ~/Library && cat $(pwd)/Keychains/login.keychain-db"]
+        {
+            assert!(!crate::is_safe_command(command), "{command}");
+        }
+        assert!(crate::is_safe_command("cat $(pwd)/notes.txt"));
+        assert!(crate::is_safe_command("cd /tmp/y && cat $(pwd)/notes.txt"));
     }
 
     #[test]
