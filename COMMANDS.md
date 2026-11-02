@@ -2409,7 +2409,7 @@ Aliases: `bundle-audit`
 <p class="cmd-url"><a href="https://bun.sh/docs/cli/bunx">https://bun.sh/docs/cli/bunx</a></p>
 
 - Delegates to the inner command's safety rules.
-- Skips flags: --bun/--no-install/--package/-p.
+- Skips flags: --bun/--no-install. A --package/-p spec must name the same package as the command, and its version must not be a path.
 
 ### `bw`
 <p class="cmd-url"><a href="https://bitwarden.com/help/cli/">https://bitwarden.com/help/cli/</a></p>
@@ -3615,6 +3615,10 @@ Aliases: `@cucumber/cucumber`
 - Allowed standalone flags: --dry-run, --exit, --fail-fast, --force-exit, --help, --profile, --publish, --publish-quiet, --strict, --no-strict, --version, -V, -h, -x
 - Allowed valued flags: --backtrace, --config, --format, --format-options, --i18n-keywords, --language, --name, --order, --paths, --require, --require-module, --retry, --retry-tag-filter, --tags, --world-parameters, -b, -c, -f, -i, -n, -p, -r, -t, -w
 - Bare invocation allowed
+
+**Examples:**
+
+- `cucumber-js`
 
 ### `cupstestppd`
 <p class="cmd-url"><a href="https://www.cups.org/doc/man-cupstestppd.html">https://www.cups.org/doc/man-cupstestppd.html</a></p>
@@ -7562,6 +7566,10 @@ Aliases: `iperf`
 - Allowed valued flags: --config, --reporter, --require
 - Bare invocation allowed
 
+**Examples:**
+
+- `jasmine`
+
 ### `jasper`
 <p class="cmd-url"><a href="https://www.ece.uvic.ca/~frodo/jasper/">https://www.ece.uvic.ca/~frodo/jasper/</a></p>
 
@@ -10586,7 +10594,7 @@ Aliases: `run-p`, `run-s`
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli/commands/npx">https://docs.npmjs.com/cli/commands/npx</a></p>
 
 - Delegates to the inner command's safety rules.
-- Skips flags: --yes/-y/--no/--package/-p.
+- Skips flags: --yes/-y/--no. A --package/-p spec must name the same package as the command, and its version must not be a path.
 
 ### `nroff`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/nroff.1.html">https://man7.org/linux/man-pages/man1/nroff.1.html</a></p>
