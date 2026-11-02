@@ -18,7 +18,7 @@ const NOT_COVERED: &str = "curl -X POST https://example.com";
 /// Each wraps `{}` in one of the shell's compound forms.
 const WRAPPERS: &[&str] = &[
     "{}", "{ {}; }", "( {} )", "if true; then {}; fi", "if false; then :; else {}; fi", "for i in 1 2; do {}; done",
-    "while false; do {}; done", "case x in x) {} ;; esac", "true && {}", "echo hi | {}", "cd src; {}",
+    "while false; do {}; done", "case x in x) {} ;; esac", "true && {}", "echo hi | {}",
 ];
 
 fn wrap(inner: &str, layers: &[usize]) -> String {
@@ -36,7 +36,18 @@ fn rules() -> Matcher {
 }
 
 fn approved(command: &str) -> bool {
+    // A relative `cd` with no starting directory leaves the folder unpinned, and a folder-code
+    // tool there asks. These rules are about where a covered command runs in the shell, so judge
+    // them from a project directory, where `cd src` stays inside the project.
+    let root = format!("{}/projects/scproj", std::env::var("HOME").expect("HOME"));
+    let _scope = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
     explain_with_coverage(command, &rules()).overall.is_allowed()
+}
+
+#[test]
+fn a_rule_covers_a_command_after_moving_into_a_project_subdirectory() {
+    assert!(approved("cd src; terraform apply -auto-approve"));
+    assert!(approved("cd src && npm publish --dry-run"));
 }
 
 #[test]
@@ -120,5 +131,28 @@ proptest! {
         let call = COVERED.iter().find(|c| c.starts_with(name)).copied().unwrap_or_default();
         let line = format!("{name}() {{ {NOT_COVERED}; }}; {}", wrap(call, &layers));
         prop_assert!(!approved(&line), "{line}");
+    }
+}
+
+/// A rule covers a command the built-in rules refuse. It does not cover one a path gate or a
+/// foreign folder refuses: those name a place, and the rule names a command.
+#[test]
+fn a_rule_does_not_skip_a_path_gate_or_a_foreign_folder() {
+    let root = format!("{}/projects/scproj", std::env::var("HOME").expect("HOME"));
+    let rules = Matcher::from_allow_patterns(&["npm test", "npm run:*", "tee:*"]);
+    let under = |cwd: &str, command: &str, covered: bool| {
+        let _scope =
+            crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(cwd.to_string()), root: Some(root.clone()), session_id: None });
+        if covered { explain_with_coverage(command, &rules).overall.is_allowed() } else { explain(command).overall.is_allowed() }
+    };
+
+    assert!(!under(&root, "npm run deploy", false), "npm run deploy needs the rule");
+    assert!(under(&root, "npm run deploy", true), "an in-project script the rule names stays covered");
+    assert!(under(&root, "npm test", true), "npm test in the project");
+    assert!(under(&root, "tee ./out.log", true), "tee of a worktree file");
+
+    for command in ["cd /tmp/y && npm test", "tee /etc/hosts"] {
+        assert!(!under(&root, command, false), "{command} is approved with no rule");
+        assert!(!under(&root, command, true), "{command} was approved by a rule");
     }
 }

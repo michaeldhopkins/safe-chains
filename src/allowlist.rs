@@ -5,6 +5,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::cst::{Cmd, SimpleCmd, check};
+use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 #[derive(Clone)]
@@ -53,7 +54,11 @@ impl Matcher {
     pub fn load() -> Self {
         // Claude's OWN permission file, so it counts only when Claude is the harness being served.
         // Loaded unconditionally, it granted commands under Codex and every other target — see
-        // `crate::trust_claude_config`.
+        // `crate::trust_claude_config`. The same switch that skips every other local file skips
+        // this one: with it set there is nothing to honour.
+        if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
+            return Matcher { exact: HashSet::new(), globs: Vec::new(), home: String::new() };
+        }
         match std::env::var_os("HOME").filter(|_| crate::claude_config_trusted()) {
             Some(home) => Self::load_from_home(Path::new(&home)),
             None => Matcher { exact: HashSet::new(), globs: Vec::new(), home: String::new() },
@@ -207,7 +212,30 @@ pub(crate) fn with_rules(cmd: &SimpleCmd, builtin: impl FnOnce(&SimpleCmd) -> Ve
     if verdict.is_allowed() || !IN_FORCE.with(|rules| rules.borrow().clone()).is_some_and(|rules| rules.covers(cmd)) {
         return verdict;
     }
+    // A rule names a command. It does not name a place: a path gate (a foreign folder included)
+    // still asks, and so does a run that has local config switched off.
+    if local_config_off() || path_gate_denies(cmd) {
+        return verdict;
+    }
     Verdict::Allowed(SafetyLevel::SafeWrite)
+}
+
+fn local_config_off() -> bool {
+    std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some()
+}
+
+/// Whether the path gate would refuse this command, under the same names the leaf classifiers use.
+fn path_gate_denies(cmd: &SimpleCmd) -> bool {
+    let tokens: Vec<Token> = cmd.words.iter().flat_map(|word| word.expand().into_iter().map(Token::from_raw)).collect();
+    let Some(first) = tokens.first() else {
+        return false;
+    };
+    let basename = crate::registry::canonical_name(first.command_name());
+    if crate::pathgate::should_deny(basename, &tokens) {
+        return true;
+    }
+    let spelled = crate::engine::resolve::dispatch_name(first);
+    spelled != first.command_name() && crate::pathgate::should_deny(crate::registry::canonical_name(spelled), &tokens)
 }
 
 /// A command rendered for comparison against the user's own `Bash(...)` allow-rules.

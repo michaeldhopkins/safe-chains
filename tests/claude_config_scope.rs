@@ -134,6 +134,31 @@ fn the_cli_and_the_claude_hook_agree_about_a_user_covered_command() {
     assert!(hook_allows, "the user's own Bash(curl:*)/Bash(sh:*) rules should cover this");
 }
 
+/// `SAFE_CHAINS_NO_LOCAL` drops every local grant, including an allow rule that would otherwise
+/// cover a command the built-in rules refuse. The rule still covers that command when the switch
+/// is off: the switch is what changes the answer.
+#[test]
+fn local_config_off_ignores_an_allow_rule() {
+    let home = tempfile::tempdir().expect("tempdir");
+    std::fs::create_dir_all(home.path().join(".claude")).expect("mkdir .claude");
+    std::fs::create_dir_all(home.path().join(".config")).expect("mkdir .config");
+    std::fs::write(home.path().join(".claude/settings.json"), r#"{"permissions":{"allow":["Bash(npm run:*)"]}}"#)
+        .expect("write settings.json");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), "").expect("write config");
+
+    let covered = |off: bool| {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_safe-chains"));
+        cmd.args(["--cwd", "/work", "--root", "/work", "npm run deploy"]).env("HOME", home.path());
+        if off {
+            cmd.env("SAFE_CHAINS_NO_LOCAL", "1");
+        }
+        cmd.output().expect("run safe-chains").status.success()
+    };
+
+    assert!(covered(false), "the allow rule covers npm run deploy");
+    assert!(!covered(true), "SAFE_CHAINS_NO_LOCAL left npm run deploy approved");
+}
+
 /// And no OTHER target may inherit them, whatever its capability model happens to be. Enumerated so
 /// a target added later cannot quietly start borrowing another tool's grants.
 #[test]
