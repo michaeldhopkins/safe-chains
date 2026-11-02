@@ -26,7 +26,10 @@ pub(crate) fn named(cmd: &SimpleCmd) -> Option<Vec<String>> {
     if cmd.words.iter().any(assigns_in_arithmetic) {
         return any();
     }
-    let Some(name) = cmd.words.first().map(|w| Token::from_raw(w.eval()).command_name().to_string()) else {
+    let Some(name) = cmd.words.first().map(|w| {
+        let token = Token::from_raw(w.eval());
+        crate::engine::resolve::invocation_name(&token).to_string()
+    }) else {
         return Some(Vec::new());
     };
     let args = &cmd.words[1..];

@@ -974,11 +974,7 @@ safe! {
     rails_assets_precompile: "rails assets:precompile",
     rails_cache_clear: "rails cache:clear",
     rails_help: "rails --help",
-    rails_via_bin: "bin/rails db:create",
-    rails_via_bin_migrate: "./bin/rails db:migrate",
-    rails_via_mise_exec: "mise exec -- bin/rails db:create",
     rails_via_bundle: "bundle exec rails db:create",
-    rails_until_loop: "until docker compose ps --format json | grep -q healthy; do sleep 1; done; mise exec -- bin/rails db:create",
 
     brace_group_simple: "{ echo a; echo b; }",
     brace_group_with_redirect: "{ echo a; echo b; } > /tmp/out.txt",
@@ -1081,18 +1077,22 @@ safe! {
 
     pest_bare: "pest",
     pest_filter: "pest --filter UserTest --bail",
-    vendor_bin_pest: "./vendor/bin/pest --no-progress",
 
     phpstan_analyse: "phpstan analyse",
     phpstan_analyse_flags: "phpstan analyse --no-progress --memory-limit=512M",
-    vendor_bin_phpstan: "./vendor/bin/phpstan analyse --no-progress",
 
     phpunit_bare: "phpunit",
     phpunit_filter: "phpunit --filter UserTest --colors=auto",
-    vendor_bin_phpunit: "./vendor/bin/phpunit --testsuite Unit",
 }
 
 denied! {
+    rails_via_bin: "bin/rails db:create",
+    rails_via_bin_migrate: "./bin/rails db:migrate",
+    rails_via_mise_exec: "mise exec -- bin/rails db:create",
+    rails_until_loop: "until docker compose ps --format json | grep -q healthy; do sleep 1; done; mise exec -- bin/rails db:create",
+    vendor_bin_pest: "./vendor/bin/pest --no-progress",
+    vendor_bin_phpstan: "./vendor/bin/phpstan analyse --no-progress",
+    vendor_bin_phpunit: "./vendor/bin/phpunit --testsuite Unit",
     workon_destroy_no_save_denied: "workon destroy --no-save",
     workon_unknown_sub_denied: "workon frobnicate",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",

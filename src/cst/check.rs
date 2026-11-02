@@ -280,7 +280,8 @@ pub(super) fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
     let Some(first) = words.first() else {
         return UNKNOWN_ITEM.to_string();
     };
-    let name = Token::from_raw(first.clone()).command_name().to_string();
+    let token = Token::from_raw(first.clone());
+    let name = crate::engine::resolve::invocation_name(&token).to_string();
     let args: Vec<&str> = words[1..].iter().map(String::as_str).collect();
     let through = || input.unwrap_or(UNKNOWN_ITEM).to_string();
     match name.as_str() {

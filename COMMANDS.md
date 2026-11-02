@@ -12856,7 +12856,6 @@ Aliases: `python`
 
 - `rails db:test:prepare`
 - `rails db:test:load`
-- `bin/rails db:test:prepare`
 
 ### `railway`
 <p class="cmd-url"><a href="https://docs.railway.com/guides/cli">https://docs.railway.com/guides/cli</a></p>

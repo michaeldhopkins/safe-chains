@@ -41,7 +41,14 @@ pub(crate) fn stage_shape(cmd: &Cmd, input: ItemShape) -> ItemShape {
     let Cmd::Simple(s) = cmd else {
         return UNKNOWN;
     };
-    let name = s.words.first().map(|w| Token::from_raw(w.eval()).command_name().to_string()).unwrap_or_default();
+    let name = s
+        .words
+        .first()
+        .map(|w| {
+            let token = Token::from_raw(w.eval());
+            crate::engine::resolve::invocation_name(&token).to_string()
+        })
+        .unwrap_or_default();
     let filter = matches!(name.as_str(), "sort" | "uniq" | "cat" | "tac" | "head" | "tail" | "tee");
     if filter && crate::cst::check::stage_output_repr(cmd, Some(PASSTHROUGH)) == PASSTHROUGH {
         return input;

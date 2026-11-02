@@ -92,7 +92,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
 }
 
 pub fn dispatch(tokens: &[Token]) -> Verdict {
-    let cmd = tokens[0].command_name();
+    let cmd = crate::engine::resolve::dispatch_name(&tokens[0]);
     let verdict = None
         .or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
@@ -158,7 +158,7 @@ fn full_registry() -> Vec<&'static CommandEntry> {
 /// list missed them and `config add 'bash -c x'` drafted an override for bash.
 pub(crate) fn is_built_in(name: &str) -> bool {
     let tokens = [Token::from_raw(name.to_string())];
-    let cmd = tokens[0].command_name();
+    let cmd = crate::engine::resolve::dispatch_name(&tokens[0]);
     shell::dispatch(cmd, &tokens).is_some()
         || wrappers::dispatch(cmd, &tokens).is_some()
         || node::dispatch(cmd, &tokens).is_some()

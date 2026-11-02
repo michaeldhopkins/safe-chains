@@ -63,7 +63,7 @@ fn is_owned_subtree(dir: &str) -> bool {
 /// declares nothing does not inherit its parent's declaration: `git stash` writing source says
 /// nothing researched about `git stash drop`. `None` leaves the write unaccounted for.
 pub(crate) fn cwd_writes(tokens: &[Token]) -> Option<Anchor> {
-    let canonical = canonical_name(tokens.first()?.command_name());
+    let canonical = canonical_name(crate::engine::resolve::invocation_name(tokens.first()?));
     let spec = CUSTOM_REGISTRY.get(canonical).or_else(|| TOML_REGISTRY.get(canonical))?;
     let mut rest = &tokens[1..];
     if rest.first().is_some_and(|t| t.as_str().starts_with('+')) {

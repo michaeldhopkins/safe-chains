@@ -705,12 +705,165 @@ fn behavior_scale(spec: &crate::registry::types::BehaviorSpec, operands: &[&str]
 #[cfg(test)]
 pub(crate) const UNRESOLVED_CMD: &[&str] = &["safe-chains-unresolved-sentinel"];
 
-/// Whether `arg0` is a trusted way to invoke a standard tool: a bare name (found via
-/// `$PATH`) or an absolute path under a standard system bin directory. A path elsewhere
-/// (`./x`, `/tmp/x`, `~/bin/x`) may be an impostor.
-fn trusted_command_path(arg0: &str) -> bool {
-    const STD_BINS: &[&str] = &["/usr/bin/", "/bin/", "/usr/local/bin/", "/opt/homebrew/bin/", "/sbin/", "/usr/sbin/"];
-    !arg0.contains('/') || STD_BINS.iter().any(|p| arg0.starts_with(p))
+/// Whether `arg0` is a trusted way to name a tool the registry already knows.
+///
+/// A bare name is trusted: the shell resolves it through `$PATH`, and this classifier does not
+/// look at the filesystem. An absolute path is trusted only after `~` expansion and a lexical
+/// `.`/`..` collapse, and only when what remains is one plain filename in a directory that
+/// ships programs: the system bin directories, Homebrew's link farm and the real formula
+/// binary under it, a mise install (not its shims), or a rustup proxy or toolchain. Anything
+/// else (`./x`, `/tmp/x`, a path that only looks like it starts in `/bin`) is a different program.
+pub(crate) fn trusted_command_path(arg0: &str) -> bool {
+    if arg0.is_empty() || arg0.contains('\0') || arg0.contains('$') {
+        return false;
+    }
+    if !arg0.contains('/') && !arg0.starts_with('~') {
+        return plain_tool_name(arg0);
+    }
+    if !(arg0.starts_with('/') || arg0.starts_with("~/")) {
+        return false;
+    }
+    let Some(expanded) = expand_tilde(arg0) else {
+        return false;
+    };
+    let Some(normalized) = lexical_absolute(&expanded) else {
+        return false;
+    };
+    trusted_normalized(&normalized)
+}
+
+/// The registry key for this invocation. A trusted spelling is the tool it names. Any other
+/// spelling is its own program, matched only by a rule that names that path.
+pub(crate) fn invocation_name(token: &Token) -> &str {
+    if trusted_command_path(token.as_str()) { token.command_name() } else { token.as_str() }
+}
+
+pub(crate) fn dispatch_name(token: &Token) -> &str {
+    let basename = token.command_name();
+    if basename == "heavy-slot.sh" { basename } else { invocation_name(token) }
+}
+
+fn plain_tool_name(s: &str) -> bool {
+    !s.is_empty()
+        && s != "."
+        && s != ".."
+        && !s.starts_with('-')
+        && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-' | '+' | '@'))
+}
+
+fn expand_tilde(arg0: &str) -> Option<String> {
+    let Some(rest) = arg0.strip_prefix("~/") else {
+        return Some(arg0.to_string());
+    };
+    let home = std::env::var("HOME").ok()?;
+    let home = home.trim_end_matches('/');
+    if !home.starts_with('/') || home.contains('\0') {
+        return None;
+    }
+    Some(format!("{home}/{rest}"))
+}
+
+fn lexical_absolute(path: &str) -> Option<String> {
+    if !path.starts_with('/') {
+        return None;
+    }
+    let mut parts: Vec<&str> = Vec::new();
+    for seg in path.split('/') {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                parts.pop();
+            }
+            s => parts.push(s),
+        }
+    }
+    if parts.iter().any(|s| !plain_tool_name(s)) {
+        return None;
+    }
+    Some(format!("/{}", parts.join("/")))
+}
+
+fn trusted_normalized(path: &str) -> bool {
+    let parts: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+    let Some((name, dirs)) = parts.split_last() else {
+        return false;
+    };
+    if !plain_tool_name(name) {
+        return false;
+    }
+    let parent = format!("/{}", dirs.join("/"));
+    const SYSTEM_BIN_DIRS: &[&str] = &[
+        "/bin", "/usr/bin", "/sbin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin", "/opt/bin", "/opt/homebrew/bin",
+        "/opt/homebrew/sbin", "/home/linuxbrew/.linuxbrew/bin", "/home/linuxbrew/.linuxbrew/sbin", "/usr/local/cargo/bin",
+    ];
+    if SYSTEM_BIN_DIRS.contains(&parent.as_str()) {
+        return true;
+    }
+    formula_bin(dirs) || mise_install_bin(dirs) || rustup_toolchain_bin(dirs)
+}
+
+fn formula_bin(dirs: &[&str]) -> bool {
+    let Some((leaf, mid)) = dirs.split_last() else {
+        return false;
+    };
+    if !matches!(*leaf, "bin" | "sbin") {
+        return false;
+    }
+    const ROOTS: &[&[&str]] = &[&["opt", "homebrew"], &["usr", "local"], &["home", "linuxbrew", ".linuxbrew"]];
+    ROOTS.iter().any(|root| {
+        let opt = mid.len() == root.len() + 2
+            && mid.get(..root.len()) == Some(*root)
+            && mid[root.len()] == "opt"
+            && plain_tool_name(mid[root.len() + 1]);
+        let cellar = mid.len() == root.len() + 3
+            && mid.get(..root.len()) == Some(*root)
+            && mid[root.len()] == "Cellar"
+            && plain_tool_name(mid[root.len() + 1])
+            && plain_tool_name(mid[root.len() + 2]);
+        opt || cellar
+    })
+}
+
+fn home_dirs() -> Option<Vec<String>> {
+    let home = std::env::var("HOME").ok()?;
+    let home = home.trim_end_matches('/');
+    if !home.starts_with('/') || home.contains('\0') {
+        return None;
+    }
+    Some(home.split('/').filter(|s| !s.is_empty()).map(str::to_string).collect())
+}
+
+fn mise_install_bin(dirs: &[&str]) -> bool {
+    let Some(home) = home_dirs() else {
+        return false;
+    };
+    let home_ref: Vec<&str> = home.iter().map(String::as_str).collect();
+    let Some(rest) = dirs.strip_prefix(home_ref.as_slice()) else {
+        return false;
+    };
+    rest.len() == 7
+        && rest[0] == ".local"
+        && rest[1] == "share"
+        && rest[2] == "mise"
+        && rest[3] == "installs"
+        && plain_tool_name(rest[4])
+        && plain_tool_name(rest[5])
+        && rest[6] == "bin"
+}
+
+fn rustup_toolchain_bin(dirs: &[&str]) -> bool {
+    if dirs.len() == 6 && dirs[..4] == ["usr", "local", "rustup", "toolchains"] && dirs[5] == "bin" && plain_tool_name(dirs[4]) {
+        return true;
+    }
+    let Some(home) = home_dirs() else {
+        return false;
+    };
+    let home_ref: Vec<&str> = home.iter().map(String::as_str).collect();
+    let Some(rest) = dirs.strip_prefix(home_ref.as_slice()) else {
+        return false;
+    };
+    rest == [".cargo", "bin"]
+        || (rest.len() == 4 && rest[0] == ".rustup" && rest[1] == "toolchains" && rest[3] == "bin" && plain_tool_name(rest[2]))
 }
 
 /// The classified operand set of a `grep` invocation: the positional file operands (read at
@@ -2394,6 +2547,56 @@ mod tests {
                 "`{untrusted}` is not a trusted path to git and must earn no output claim",
             );
         }
+    }
+
+    #[test]
+    fn a_program_named_by_a_path_is_the_tool_only_inside_a_known_location() {
+        for denied in [
+            "./.scratch/cargo test", "./x/ls", "/tmp/x/memory_pressure", "/bin/../tmp/x/cat", "/opt/homebrew/bin/../../../../tmp/x/cat",
+            "/bin/../tmp/x/ls",
+        ] {
+            assert!(!crate::is_safe_command(denied), "approved from outside a known location: {denied}");
+        }
+        for allowed in ["/bin/ls", "/usr/bin/grep foo file.txt", "/bin/./ls", "/usr/bin/../bin/ls", "/opt/homebrew/bin/ls"] {
+            assert!(crate::is_safe_command(allowed), "known location stopped approving: {allowed}");
+        }
+        let home = std::env::var("HOME").expect("HOME");
+        let home = home.trim_end_matches('/');
+        for allowed in [
+            "/opt/homebrew/opt/ripgrep/bin/grep foo file.txt",
+            "/opt/homebrew/Cellar/ripgrep/14.1.0/bin/grep foo file.txt",
+            "/usr/local/opt/grep/bin/grep foo file.txt",
+            "/usr/local/Cellar/grep/3.11/bin/grep foo file.txt",
+            "/home/linuxbrew/.linuxbrew/bin/grep foo file.txt",
+            "/home/linuxbrew/.linuxbrew/Cellar/grep/3.11/bin/grep foo file.txt",
+            "/opt/bin/grep foo file.txt",
+            "/usr/local/cargo/bin/grep foo file.txt",
+            "/usr/local/rustup/toolchains/stable/bin/grep foo file.txt",
+            &format!("{home}/.cargo/bin/grep foo file.txt"),
+            &format!("{home}/.rustup/toolchains/stable/bin/grep foo file.txt"),
+            &format!("{home}/.local/share/mise/installs/ripgrep/14.1.0/bin/grep foo file.txt"),
+            &format!("~/.cargo/bin/grep foo file.txt"),
+            &format!("~/.local/share/mise/installs/ripgrep/14.1.0/bin/grep foo file.txt"),
+        ] {
+            assert!(crate::is_safe_command(allowed), "toolchain path stopped approving: {allowed}");
+        }
+        let rules = "\
+[[command]]
+name = \"scripts/attest\"
+level = \"SafeRead\"
+bare = true
+
+[[command]]
+name = \"bin/check.sh\"
+level = \"SafeRead\"
+bare = true
+";
+        crate::registry::with_test_commands(rules, || {
+            assert!(crate::is_safe_command("scripts/attest"), "a rule that names the path");
+            assert!(crate::is_safe_command("bin/check.sh"), "a rule that names the path");
+            assert!(!crate::is_safe_command("attest"), "the rule is the path, not the last component");
+            assert!(!crate::is_safe_command("./scripts/attest"), "a different spelling is a different program");
+        });
     }
 
     /// A claim gated on `requires` must be DEAD without its flag. `git diff` prints a patch and

@@ -14,7 +14,10 @@ mod passthrough_gate;
 mod policy;
 pub(crate) mod types;
 
-use std::{collections::HashMap, sync::LazyLock};
+#[cfg(test)]
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::sync::LazyLock;
 
 use crate::parse::Token;
 use crate::verdict::Verdict;
@@ -41,7 +44,7 @@ static CUSTOM_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|
 });
 
 pub fn toml_dispatch(tokens: &[Token]) -> Option<Verdict> {
-    let cmd = tokens[0].command_name();
+    let cmd = crate::engine::resolve::invocation_name(&tokens[0]);
     TOML_REGISTRY.get(cmd).map(|spec| dispatch_spec(tokens, spec))
 }
 
@@ -50,8 +53,49 @@ pub fn toml_dispatch(tokens: &[Token]) -> Option<Verdict> {
 /// A match here wins over the built-in hardcoded handlers, which is how
 /// an override of `gh` takes effect.
 pub fn custom_dispatch(tokens: &[Token]) -> Option<Verdict> {
-    let cmd = tokens[0].command_name();
+    let cmd = crate::engine::resolve::invocation_name(&tokens[0]);
+    #[cfg(test)]
+    if let Some(verdict) = dispatch_test_command(tokens, cmd) {
+        return Some(verdict);
+    }
     CUSTOM_REGISTRY.get(cmd).map(|spec| dispatch_spec(tokens, spec))
+}
+
+#[cfg(test)]
+thread_local! {
+    static TEST_COMMANDS: RefCell<HashMap<String, CommandSpec>> = RefCell::new(HashMap::new());
+}
+
+#[cfg(test)]
+pub(crate) fn with_test_commands<R>(source: &str, body: impl FnOnce() -> R) -> R {
+    let specs = load_toml(source, "test").unwrap_or_else(|e| panic!("test commands: {e}"));
+    TEST_COMMANDS.with(|slot| {
+        let mut map = slot.borrow_mut();
+        map.clear();
+        for spec in specs {
+            map.insert(spec.name.clone(), spec);
+        }
+    });
+    let _guard = TestCommandGuard;
+    body()
+}
+
+#[cfg(test)]
+struct TestCommandGuard;
+
+#[cfg(test)]
+impl Drop for TestCommandGuard {
+    fn drop(&mut self) {
+        TEST_COMMANDS.with(|slot| slot.borrow_mut().clear());
+    }
+}
+
+#[cfg(test)]
+fn dispatch_test_command(tokens: &[Token], cmd: &str) -> Option<Verdict> {
+    TEST_COMMANDS.with(|slot| {
+        let map = slot.borrow();
+        map.get(cmd).map(|spec| dispatch_spec(tokens, spec))
+    })
 }
 
 /// The canonical command name `cmd` resolves to via the registry's alias map (`gcat` → `cat`,
@@ -584,7 +628,7 @@ pub fn is_eval_safe_invocation(tokens: &[Token]) -> bool {
     if tokens.is_empty() {
         return false;
     }
-    let cmd = tokens[0].command_name();
+    let cmd = crate::engine::resolve::invocation_name(&tokens[0]);
     let Some(spec) = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)) else {
         return false;
     };

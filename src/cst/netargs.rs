@@ -228,7 +228,7 @@ fn may_rebind(var: &str, body: &str) -> bool {
 /// Whether this invocation reaches another host, by `network.toml`.
 pub(crate) fn reaches_network(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else { return false };
-    let name = crate::registry::canonical_name(first.command_name());
+    let name = crate::registry::canonical_name(crate::engine::resolve::invocation_name(first));
     if LIST.commands.contains(name) {
         return true;
     }
@@ -244,7 +244,7 @@ fn names_word(token: &str, word: &str) -> bool {
 /// Whether a flag makes the command read its targets or payload from a file (`wget -i FILE`).
 pub(crate) fn reads_targets_from_file(tokens: &[Token]) -> bool {
     let Some(first) = tokens.first() else { return false };
-    let name = crate::registry::canonical_name(first.command_name());
+    let name = crate::registry::canonical_name(crate::engine::resolve::invocation_name(first));
     if let Some(valued) = LIST.request_item_files.get(name) {
         let words: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
         let item_reads = words.iter().enumerate().any(|(i, w)| {

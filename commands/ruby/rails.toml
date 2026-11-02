@@ -6,7 +6,6 @@ bare_flags = ["--help", "--version", "-V", "-h", "-v"]
 examples_safe = [
     "rails db:test:prepare",
     "rails db:test:load",
-    "bin/rails db:test:prepare",
 ]
 examples_denied = [
     "rails db:migrate:redo VERSION=1",
