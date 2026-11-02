@@ -451,6 +451,11 @@ measured = false
 shape = "command"
 because = "the shell npm runs package scripts with. npm reads its npm_config_* variables in any letter case"
 measured = false
+[env.npm_config_prefix]
+shape = "exec-path"
+single_value = true
+because = "npm runs package.json scripts from this directory, the environment spelling of --prefix"
+measured = false
 [env.npm_config_shell]
 shape = "command"
 because = "the shell npm exec and npm explore start"

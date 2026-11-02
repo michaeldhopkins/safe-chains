@@ -105,14 +105,27 @@ name = "list"
 level = "Inert"
 standalone = ["--help", "--json", "--long", "-h", "-l"]
 
+# A `first_arg` family with no flag list never looks at tokens after the script name, so
+# `--prefix` and `--script-shell` would be ignored. Only flags that cannot choose the package
+# directory or the shell are listed. Arguments for the script follow `--`.
 [[command.sub]]
 name = "run"
 first_arg = ["test", "test:*"]
+first_arg_standalone = [
+    "--foreground-scripts", "--help", "--if-present", "--ignore-scripts",
+    "--include-workspace-root", "--json", "--silent", "--workspaces",
+    "-h", "-s",
+]
 level = "SafeRead"
 
 [[command.sub]]
 name = "run-script"
 first_arg = ["test", "test:*"]
+first_arg_standalone = [
+    "--foreground-scripts", "--help", "--if-present", "--ignore-scripts",
+    "--include-workspace-root", "--json", "--silent", "--workspaces",
+    "-h", "-s",
+]
 level = "SafeRead"
 
 # `npm ci` is the PINNED, reproducible install (installs exactly package-lock.json, fails if it

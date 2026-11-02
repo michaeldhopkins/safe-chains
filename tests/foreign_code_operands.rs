@@ -3,6 +3,8 @@
 //! flag value is judged where the code comes from, so a temporary directory that is not this
 //! session's asks, while the same spelling naming a file in the project is approved.
 
+use proptest::prelude::*;
+
 fn approved_in_project(command: &str) -> bool {
     use safe_chains::pathctx::{PathCtx, enter};
     let project = format!("{}/projects/foreigncodeprobe", std::env::var("HOME").expect("HOME"));
@@ -245,6 +247,23 @@ fn ordinary_in_project_tool_invocations_stay_approved() {
         "cargo install --path .",
         "cargo msrv find --path .",
         "npm test",
+        "npm run test",
+        "npm run test:unit",
+        "npm run-script test",
+        "npm run test extra",
+        "npm run test -- --watch",
+        "npm run test --silent",
+        "npm run test --if-present",
+        "yarn test",
+        "yarn test:unit",
+        "yarn test extra",
+        "yarn test -- --watch",
+        "yarn test --silent",
+        "yarn jest spec/date_range_filter_controller.test.js",
+        "yarn karma start --single-run",
+        "yarn vitest run",
+        "npm_config_prefix=. npm run test",
+        "npm_config_prefix= npm run test",
         "pytest",
         "rustup show",
         "jest",
@@ -299,12 +318,98 @@ fn a_symlinked_temp_directory_is_foreign_code() {
     for command in [
         "jest tmp_link/evil.test.js", "vitest tmp_link/evil.test.ts", "webpack tmp_link/entry.js", "tsup tmp_link/index.ts",
         "eslint --rulesdir tmp_link/rules src/", "deno test tmp_link/evil_test.ts", "cargo install --path tmp_link", "make -n -C tmp_link",
-        "php tmp_link/artisan test", "cd tmp_link && mvnw test",
+        "php tmp_link/artisan test", "cd tmp_link && mvnw test", "npm run test --prefix tmp_link", "npm run test --prefix=tmp_link",
+        "yarn test --cwd tmp_link", "yarn test --cwd=tmp_link", "npm_config_prefix=tmp_link npm run test",
     ] {
         assert!(!safe_chains::is_safe_command(command), "{command}");
     }
     assert!(safe_chains::is_safe_command("cargo build"));
     assert!(safe_chains::is_safe_command("jest"));
+    assert!(safe_chains::is_safe_command("npm run test"));
+    assert!(safe_chains::is_safe_command("yarn test"));
+}
+
+/// `npm run` and `yarn <script>` admit the script name and used to ignore every flag after it.
+/// `--script-shell` chooses the shell, and `--prefix` / `--cwd` choose the package whose scripts run.
+const NPM_SCRIPT_FLAGS: &[&str] = &[
+    "--foreground-scripts", "--help", "--if-present", "--ignore-scripts", "--include-workspace-root", "--json", "--silent", "--workspaces",
+    "-h", "-s",
+];
+const YARN_SCRIPT_FLAGS: &[&str] = &[
+    "--frozen-lockfile", "--help", "--ignore-scripts", "--json", "--no-progress", "--non-interactive", "--offline", "--prefer-offline",
+    "--prod", "--production", "--silent", "-h", "-s",
+];
+
+#[test]
+fn a_script_runner_flag_that_retargets_the_package_asks() {
+    for command in [
+        "npm run test --script-shell=/tmp/y/evil.sh",
+        "npm run test --script-shell /tmp/y/evil.sh",
+        "npm run test --script-shell=/TMP/y/evil.sh",
+        "npm run test --script-shell=/private/tmp/y/evil.sh",
+        "npm run test --script-shell=/System/Volumes/Data/tmp/y/evil.sh",
+        "npm run test --script-shell=/private/var/folders/xx/yy/T/y/evil.sh",
+        "npm run test --prefix /tmp/y",
+        "npm run test --prefix=/tmp/y",
+        "npm run test --prefix /TMP/y",
+        "npm run test --prefix /private/tmp/y",
+        "npm run test --prefix /System/Volumes/Data/tmp/y",
+        "npm run test --prefix /private/var/folders/xx/yy/T/y",
+        "npm run-script test --script-shell=/tmp/y/evil.sh",
+        "npm run-script test --prefix /tmp/y",
+        "npm run-script test --prefix=/tmp/y",
+        "npm run --prefix /tmp/y test",
+        "npm run --prefix=/tmp/y test",
+        "npm --prefix /tmp/y run test",
+        "npm --prefix=/tmp/y run test",
+        "npm test --prefix /tmp/y",
+        "npm test --script-shell=/tmp/y/evil.sh",
+        "npm run test --watch",
+        "yarn test --cwd /tmp/y",
+        "yarn test --cwd=/tmp/y",
+        "yarn test --cwd /TMP/y",
+        "yarn test --cwd /private/tmp/y",
+        "yarn test --cwd /System/Volumes/Data/tmp/y",
+        "yarn test --cwd /private/var/folders/xx/yy/T/y",
+        "yarn test:unit --cwd /tmp/y",
+        "yarn test:unit --cwd=/tmp/y",
+        "yarn --cwd /tmp/y test",
+        "yarn --cwd=/tmp/y test",
+        "yarn test --watch",
+        "npm_config_script_shell=/tmp/y/evil.sh npm run test",
+        "NPM_CONFIG_SCRIPT_SHELL=/tmp/y/evil.sh npm run test",
+        "export npm_config_script_shell=/tmp/y/evil.sh && npm run test",
+        "env npm_config_script_shell=/tmp/y/evil.sh npm run test",
+        "npm_config_prefix=/tmp/y npm run test",
+        "NPM_CONFIG_PREFIX=/tmp/y npm run test",
+        "npm_config_prefix=/TMP/y npm test",
+        "npm_config_prefix=/private/tmp/y npm run test",
+        "npm_config_prefix=/System/Volumes/Data/tmp/y npm run test",
+        "npm_config_prefix=/private/var/folders/xx/yy/T/y npm run test",
+        "export npm_config_prefix=/tmp/y && npm run test",
+        "env npm_config_prefix=/tmp/y npm run test",
+    ] {
+        assert!(!approved_in_project(command), "{command}");
+    }
+}
+
+proptest! {
+    /// A flag the script family did not declare is not ignored, in either spelling.
+    #[test]
+    fn an_undeclared_script_runner_flag_is_not_ignored(flag in "--[a-z]{3,12}") {
+        if !NPM_SCRIPT_FLAGS.contains(&flag.as_str()) {
+            let spaced = format!("npm run test {flag} /tmp/y");
+            let glued = format!("npm run test {flag}=/tmp/y");
+            prop_assert!(!approved_in_project(&spaced), "{}", spaced);
+            prop_assert!(!approved_in_project(&glued), "{}", glued);
+        }
+        if !YARN_SCRIPT_FLAGS.contains(&flag.as_str()) {
+            let spaced = format!("yarn test {flag} /tmp/y");
+            let glued = format!("yarn test {flag}=/tmp/y");
+            prop_assert!(!approved_in_project(&spaced), "{}", spaced);
+            prop_assert!(!approved_in_project(&glued), "{}", glued);
+        }
+    }
 }
 
 struct RemoveDir(std::path::PathBuf);
