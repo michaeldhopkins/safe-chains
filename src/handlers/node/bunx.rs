@@ -15,7 +15,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         "https://bun.sh/docs/cli/bunx",
         DocBuilder::new()
             .section("Delegates to the inner command's safety rules.")
-            .section("Skips flags: --bun/--no-install/--package/-p.")
+            .section("Skips flags: --bun/--no-install. A --package/-p spec must name the same package as the command, and its version must not be a path.")
             .build(),
         "node",
     )]
@@ -47,6 +47,8 @@ mod tests {
         bunx_tsc_with_other_flags_denied: "bunx tsc --pretty",
         bunx_cowsay_denied: "bunx cowsay hello",
         bare_bunx_denied: "bunx",
+        bunx_version_path_denied: "bunx eslint@file:/tmp/y/evil src/",
+        bunx_package_path_denied: "bunx --package /tmp/y/evil eslint src/",
     }
 
     use crate::parse::Token;
