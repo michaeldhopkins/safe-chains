@@ -33,6 +33,13 @@ fn is_foreign() -> bool {
     if cwd == crate::pathctx::UNRESOLVED_CWD {
         return true;
     }
+    // The unknown-folder mode classifies at a synthetic directory. A level above `reads` is what
+    // admits a write there; this directory is not a folder on disk whose code could run.
+    if crate::pathctx::folder::is_unknown(&cwd)
+        && crate::pathctx::folder::level().is_some_and(|level| level > crate::pathctx::anchor::FolderLevel::Reads)
+    {
+        return false;
+    }
     if !cwd.starts_with('/') {
         return false;
     }
@@ -154,6 +161,22 @@ mod tests {
             assert!(judged_from(&root, &format!("cd sub && {command}")), "cd sub && {command}");
         }
         assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"));
+    }
+
+    /// The synthetic unknown workdir is where a folder level judges writes. It is not a temp root.
+    #[test]
+    fn a_folder_level_still_approves_cargo_in_the_unknown_workdir() {
+        let root = project();
+        let cwd = crate::targets::UNKNOWN_WORKDIR.to_string();
+        let _unknown = enter(PathCtx { cwd: Some(cwd.clone()), root: Some(root.clone()), session_id: None });
+        assert!(!crate::is_safe_command("cargo build"), "without a folder level the synthetic directory stays foreign");
+        let level = crate::pathctx::folder::enter(crate::pathctx::anchor::FolderLevel::Developer);
+        assert!(crate::is_safe_command("cargo build"));
+        assert!(crate::is_safe_command("npm test"));
+        drop(level);
+        drop(_unknown);
+        let _project = enter(PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
+        assert!(!crate::is_safe_command(&format!("cd {cwd} && cargo build")));
     }
 
     #[test]
