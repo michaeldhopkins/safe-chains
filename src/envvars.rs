@@ -152,7 +152,9 @@ struct Entry {
     twin_base: Option<String>,
     /// The build crates (`cc`, `pkg-config`, `cmake`) look the name up under four more spellings
     /// first: `NAME_<target>`, `NAME_<target_with_underscores>`, then `HOST_NAME` or `TARGET_NAME`.
-    /// Each gets this entry's rule, so no target spelling carries a value the plain name is refused.
+    /// Each gets this entry's rule, except a `NAME_<target>` form a catch-all pattern already owns
+    /// (`LD_*`). That pattern refuses every value, and a second glob with the same prefix would
+    /// disagree with it. `HOST_NAME` and `TARGET_NAME` are exact names and still take the rule.
     #[serde(default)]
     target_spellings: bool,
     /// `judged` when the program acts on the variable being set at all, so an empty value is judged
@@ -239,7 +241,13 @@ static TABLE: LazyLock<Compiled> = LazyLock::new(|| {
             assert!(!exact.contains_key(&alias), "envvars.toml: `{alias}` is listed and also spelled from `{name}`");
             exact.insert(alias, rule.clone());
         }
-        globs.push((format!("{name}_"), String::new(), rule));
+        // A catch-all with this prefix and an empty suffix already owns `NAME_<target>` (`LD_*`).
+        // A second glob would disagree with it, and winning would judge `LD_DEBUG` as a linker path.
+        let prefix = format!("{name}_");
+        let owned = globs.iter().any(|(pre, suf, _)| pre == &prefix && suf.is_empty());
+        if !owned {
+            globs.push((prefix, String::new(), rule));
+        }
     }
     Compiled { exact, globs }
 });
@@ -669,6 +677,72 @@ mod tests {
         assert!(crate::is_safe_command("env CC_aarch64-apple-darwin=clang cargo build"));
     }
 
+    /// `cc`, clang-sys, and prost-build also read these per target. The plain name was already
+    /// judged; `NAME_<target>` was not, so a foreign linker or clang was inert.
+    #[test]
+    fn a_per_target_build_variable_is_judged_like_its_plain_name() {
+        let base = "cargo build";
+        assert!(crate::is_safe_command(base));
+        assert!(crate::is_safe_command("cargo test"));
+        let refused = [
+            r#"LDFLAGS_x86_64_unknown_linux_gnu="-fuse-ld=/tmp/evil" cargo build"#,
+            r#"LDFLAGS_x86_64_unknown_linux_gnu=-fuse-ld=/tmp/evil cargo build"#,
+            r#"LDFLAGS_x86_64-unknown-linux-gnu="-fuse-ld=/tmp/evil" cargo build"#,
+            r#"export LDFLAGS_x86_64_unknown_linux_gnu="-fuse-ld=/tmp/evil"; cargo build"#,
+            r#"env LDFLAGS_x86_64_unknown_linux_gnu="-fuse-ld=/tmp/evil" cargo build"#,
+            "HOST_LDFLAGS='-fuse-ld=/tmp/evil' cargo build",
+            "TARGET_LDFLAGS='-fuse-ld=/tmp/evil' cargo build",
+            "CPPFLAGS_x86_64_unknown_linux_gnu=-I/tmp/evil cargo build",
+            "CPPFLAGS_x86_64_unknown_linux_gnu='-I /tmp/evil' cargo build",
+            "CPPFLAGS_x86_64-unknown-linux-gnu=-I/tmp/evil cargo build",
+            "export CPPFLAGS_x86_64_unknown_linux_gnu=-I/tmp/evil; cargo build",
+            "env CPPFLAGS_x86_64_unknown_linux_gnu=-I/tmp/evil cargo build",
+            "HOST_CPPFLAGS=-I/tmp/evil cargo build",
+            "LD_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "LD_x86_64-unknown-linux-gnu=/tmp/evil cargo build",
+            "export LD_x86_64_unknown_linux_gnu=/tmp/evil; cargo build",
+            "env LD_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "HOST_LD=/tmp/evil cargo build",
+            "TARGET_LD=/tmp/evil cargo build",
+            "CLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "CLANG_PATH_x86_64-unknown-linux-gnu=/tmp/evil cargo build",
+            "CLANG_PATH_x86_64_unknown_linux_gnu=/TMP/evil cargo build",
+            "CLANG_PATH_x86_64_unknown_linux_gnu=/private/tmp/evil cargo build",
+            "CLANG_PATH_x86_64_unknown_linux_gnu=/System/Volumes/Data/tmp/evil cargo build",
+            "CLANG_PATH_x86_64_unknown_linux_gnu=/private/var/folders/xx/yy/T/evil cargo build",
+            "export CLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil; cargo build",
+            "env CLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "HOST_CLANG_PATH=/tmp/evil cargo build",
+            "TARGET_CLANG_PATH=/tmp/evil cargo build",
+            "LIBCLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "export LIBCLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil; cargo build",
+            "env LIBCLANG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "HOST_LIBCLANG_PATH=/tmp/evil cargo build",
+            "LLVM_CONFIG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "export LLVM_CONFIG_PATH_x86_64_unknown_linux_gnu=/tmp/evil; cargo build",
+            "env LLVM_CONFIG_PATH_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "TARGET_LLVM_CONFIG_PATH=/tmp/evil cargo build",
+            "PROTOC_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "PROTOC_x86_64-unknown-linux-gnu=/tmp/evil cargo build",
+            "export PROTOC_x86_64_unknown_linux_gnu=/tmp/evil; cargo build",
+            "env PROTOC_x86_64_unknown_linux_gnu=/tmp/evil cargo build",
+            "HOST_PROTOC=/tmp/evil cargo build",
+            "TARGET_PROTOC=/tmp/evil cargo build",
+        ];
+        for cmd in refused {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        for cmd in [
+            "cargo build", "cargo test", "LDFLAGS=-s cargo build", "LDFLAGS='-L ./lib' cargo build", "HOST_LDFLAGS=-s cargo build",
+            "CPPFLAGS=-DDEBUG cargo build", "CPPFLAGS='-I ./include' cargo build", "LD=ld cargo build", "HOST_LD=ld cargo build",
+            "CLANG_PATH=clang cargo build", "TARGET_CLANG_PATH=./clang cargo build", "LIBCLANG_PATH=./vendor/llvm/lib cargo build",
+            "LLVM_CONFIG_PATH=llvm-config cargo build", "PROTOC=protoc cargo build", "HOST_PROTOC=protoc cargo build", "rustup show",
+            "npm test", "pytest",
+        ] {
+            assert!(crate::is_safe_command(cmd), "{cmd}");
+        }
+    }
+
     #[test]
     fn settings_that_lower_trust_in_downloads_are_refused_in_every_form() {
         let cases: [(&str, &[&str]); 9] = [
@@ -874,8 +948,9 @@ mod tests {
     fn every_name_the_build_crates_read_by_target_is_spelled_by_target() {
         let spelled = target_spelled();
         for name in [
-            "CC", "CXX", "AR", "RANLIB", "NVCC", "CFLAGS", "CXXFLAGS", "ARFLAGS", "RANLIBFLAGS", "PKG_CONFIG", "PKG_CONFIG_PATH",
-            "PKG_CONFIG_LIBDIR", "PKG_CONFIG_SYSROOT_DIR", "CMAKE", "CMAKE_TOOLCHAIN_FILE", "CMAKE_PREFIX_PATH",
+            "CC", "CXX", "AR", "RANLIB", "NVCC", "CFLAGS", "CXXFLAGS", "ARFLAGS", "RANLIBFLAGS", "CPPFLAGS", "LDFLAGS", "LD", "PKG_CONFIG",
+            "PKG_CONFIG_PATH", "PKG_CONFIG_LIBDIR", "PKG_CONFIG_SYSROOT_DIR", "CMAKE", "CMAKE_TOOLCHAIN_FILE", "CMAKE_PREFIX_PATH",
+            "CLANG_PATH", "LIBCLANG_PATH", "LLVM_CONFIG_PATH", "PROTOC",
         ] {
             assert!(spelled.iter().any(|s| s == name), "{name} is read under target spellings but not marked target_spellings");
         }
@@ -891,10 +966,19 @@ mod tests {
                 ["aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "wasm32-wasip1", "thumbv7em-none-eabihf", "x86_64-pc-windows-msvc"]
             {
                 let underscored = target.replace(['-', '.'], "_");
-                for spelling in
-                    [format!("{name}_{target}"), format!("{name}_{underscored}"), format!("HOST_{name}"), format!("TARGET_{name}")]
-                {
+                for spelling in [format!("HOST_{name}"), format!("TARGET_{name}")] {
                     assert_eq!(rule_of(&spelling), Some(plain), "{spelling} is not judged as {name} is");
+                }
+                for spelling in [format!("{name}_{target}"), format!("{name}_{underscored}")] {
+                    let got = rule_of(&spelling).unwrap_or_else(|| panic!("{spelling} has no rule"));
+                    if name == "LD" {
+                        // `LD_*` already owns this prefix and refuses every value. Replacing it
+                        // with the linker rule would allow `LD_DEBUG=1`.
+                        assert_eq!(got.shape, Shape::Opaque, "{spelling} left the loader catch-all");
+                        assert_ne!(got, plain, "{spelling} took the linker rule");
+                    } else {
+                        assert_eq!(got, plain, "{spelling} is not judged as {name} is");
+                    }
                 }
             }
         }

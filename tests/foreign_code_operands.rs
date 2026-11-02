@@ -340,6 +340,12 @@ fn a_symlinked_temp_directory_is_foreign_code() {
         "rollup -i src/index.js --plugin tmp_link/plugin.js",
         "rollup -i src/index.js -p tmp_link/plugin.js",
         "rollup -i src/index.js --plugin=tmp_link/plugin.js",
+        "CLANG_PATH_x86_64_unknown_linux_gnu=tmp_link/clang cargo build",
+        "PROTOC_x86_64_unknown_linux_gnu=tmp_link/protoc cargo build",
+        "LD_x86_64_unknown_linux_gnu=tmp_link/ld cargo build",
+        "CPPFLAGS_x86_64_unknown_linux_gnu='-I tmp_link/include' cargo build",
+        "LDFLAGS_x86_64_unknown_linux_gnu='-L tmp_link/lib' cargo build",
+        "LDFLAGS_x86_64_unknown_linux_gnu=-fuse-ld=tmp_link/ld cargo build",
     ] {
         assert!(!safe_chains::is_safe_command(command), "{command}");
     }

@@ -49,7 +49,8 @@
 # `target_spellings = true` gives the entry's rule to the four other names the build crates (`cc`,
 # `pkg-config`, `cmake`) look it up under before the plain one: `NAME_<target>`,
 # `NAME_<target_with_underscores>`, `HOST_NAME` and `TARGET_NAME`. `CC_aarch64_apple_darwin=/tmp/evil`
-# runs /tmp/evil as the C compiler exactly as `CC=/tmp/evil` does.
+# runs /tmp/evil as the C compiler exactly as `CC=/tmp/evil` does. A catch-all that already owns the
+# `NAME_` prefix keeps it (`LD_*` refuses every value); `HOST_LD` and `TARGET_LD` still take the rule.
 #
 # An empty value is inert, since it usually un-sets the behaviour. `empty = "judged"` marks a variable
 # a program acts on merely being set (`GIT_SSL_NO_VERIFY=`), whose empty value is judged like any other.
@@ -822,12 +823,14 @@ allowed = ["-Wall", "-Wextra", "-Werror*", "-Wno-*", "-w", "-D*", "-U*"]
 path_flags = [{ flag = "-I", role = "exec", sep = "space" }]
 because = "as CFLAGS, for the C preprocessor"
 measured = false
+target_spellings = true
 [env.LDFLAGS]
 shape = "option-string"
 allowed = ["-s", "-S", "-pthread", "-rdynamic", "-shared", "-static", "-pie", "-no-pie", "-flto*"]
 path_flags = [{ flag = "-L", role = "exec", sep = "space" }]
 because = "linker flags read by make and build scripts"
 measured = false
+target_spellings = true
 [env.PYTEST_ADDOPTS]
 shape = "option-string"
 allowed = ["-v", "-q", "-s", "-x", "--tb=*", "-k", "-m", "--maxfail", "--durations", "--strict-markers", "--no-header", "-r*"]
@@ -1178,6 +1181,7 @@ shape = "exec-path"
 single_value = true
 because = "the linker invoked by make and build scripts"
 measured = false
+target_spellings = true
 [env.AR]
 shape = "exec-path"
 single_value = true
@@ -1236,10 +1240,12 @@ shape = "exec-path"
 single_value = true
 because = "the protoc program prost-build and other build scripts run"
 measured = false
+target_spellings = true
 [env.LIBCLANG_PATH]
 shape = "exec-path"
 because = "the directory clang-sys and bindgen load libclang from into the build script"
 measured = false
+target_spellings = true
 [env.LIBCLANG_STATIC_PATH]
 shape = "exec-path"
 because = "the directory clang-sys links libclang statically from"
@@ -1249,11 +1255,13 @@ shape = "exec-path"
 single_value = true
 because = "the clang program clang-sys runs"
 measured = false
+target_spellings = true
 [env.LLVM_CONFIG_PATH]
 shape = "exec-path"
 single_value = true
 because = "the llvm-config program clang-sys runs to find libclang"
 measured = false
+target_spellings = true
 [env.JAVA_HOME]
 shape = "exec-path"
 single_value = true
