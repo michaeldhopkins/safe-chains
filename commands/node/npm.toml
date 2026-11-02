@@ -18,6 +18,10 @@ examples_denied = [
     "npm i react",
 ]
 
+# `--prefix` / `-C` select the package directory whose scripts and config npm runs.
+[command.path_gate]
+flags = { "--prefix" = "exec", "-C" = "exec" }
+
 [[command.sub]]
 name = "list"
 level = "Inert"

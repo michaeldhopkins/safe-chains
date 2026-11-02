@@ -163,6 +163,8 @@ const CASES: &[&str] = &[
     "cucumber-js --require-module {d}/mod.js",
     "cucumber-js --paths {d}",
     "gotestsum --packages {d}",
+    "npm ci --ignore-scripts --prefix {d}",
+    "npm ci --ignore-scripts --prefix={d}",
 ];
 
 #[test]
@@ -174,6 +176,14 @@ fn a_named_entry_is_the_path_after_the_equals_when_that_comes_first() {
     assert!(!approved_in_project("webpack --entry main=*.js"));
     assert!(approved_in_project("webpack --entry name=src/index.js"));
     assert!(approved_in_project("tsup --entry name=src/index.ts"));
+}
+
+#[test]
+fn npm_prefix_outside_the_project_asks() {
+    assert!(!approved_in_project("npm ci --ignore-scripts --prefix /etc"));
+    assert!(!approved_in_project("npm ls --prefix /etc"));
+    assert!(approved_in_project("npm ci --ignore-scripts --prefix ./vendor"));
+    assert!(approved_in_project("npm ci --ignore-scripts"));
 }
 
 #[test]
