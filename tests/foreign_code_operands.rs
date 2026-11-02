@@ -320,6 +320,7 @@ fn a_symlinked_temp_directory_is_foreign_code() {
     std::fs::create_dir_all(&target).expect("temp target");
     let _target = RemoveDir(std::path::PathBuf::from(&target));
     std::os::unix::fs::symlink(&target, format!("{root}/tmp_link")).expect("tmp_link");
+    let linked = format!("XDG_DATA_HOME={root}/tmp_link pandoc README.md");
     let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
     for command in [
         "jest tmp_link/evil.test.js",
@@ -346,9 +347,11 @@ fn a_symlinked_temp_directory_is_foreign_code() {
         "CPPFLAGS_x86_64_unknown_linux_gnu='-I tmp_link/include' cargo build",
         "LDFLAGS_x86_64_unknown_linux_gnu='-L tmp_link/lib' cargo build",
         "LDFLAGS_x86_64_unknown_linux_gnu=-fuse-ld=tmp_link/ld cargo build",
+        "XDG_DATA_HOME=tmp_link pandoc README.md",
     ] {
         assert!(!safe_chains::is_safe_command(command), "{command}");
     }
+    assert!(!safe_chains::is_safe_command(&linked), "{linked}");
     assert!(safe_chains::is_safe_command("cargo build"));
     assert!(safe_chains::is_safe_command("jest"));
     assert!(safe_chains::is_safe_command("npm run test"));

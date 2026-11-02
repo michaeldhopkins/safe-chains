@@ -422,6 +422,13 @@ because = "git reads $HOME/.gitconfig and jj $HOME/.config/jj, and both can name
 [env.XDG_CONFIG_HOME]
 shape = "config-dir"
 because = "git reads $XDG_CONFIG_HOME/git/config and jj $XDG_CONFIG_HOME/jj/config.toml"
+# Pandoc's user data directory is `$XDG_DATA_HOME/pandoc` when `--data-dir` is omitted. One
+# directory, not a search path.
+[env.XDG_DATA_HOME]
+shape = "config-dir"
+single_value = true
+because = "pandoc's user data directory is $XDG_DATA_HOME/pandoc when --data-dir is omitted"
+measured = false
 [env.GIT_CONFIG_GLOBAL]
 shape = "config-file"
 because = "git config can define aliases and core.pager, so a caller-controlled config file is code execution"

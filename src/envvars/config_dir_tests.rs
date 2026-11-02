@@ -94,6 +94,40 @@ fn a_config_location_in_a_scratch_folder_is_refused() {
     }
 }
 
+/// Pandoc's user data directory is `$XDG_DATA_HOME/pandoc` when `--data-dir` is omitted.
+#[test]
+fn xdg_data_home_is_the_pandoc_data_directory() {
+    let home = std::env::var("HOME").expect("the home case needs HOME");
+    for cmd in [
+        "XDG_DATA_HOME=/tmp/evil pandoc README.md",
+        "XDG_DATA_HOME=/TMP/evil pandoc README.md",
+        "XDG_DATA_HOME=/private/tmp/evil pandoc README.md",
+        "XDG_DATA_HOME=/System/Volumes/Data/tmp/evil pandoc README.md",
+        "XDG_DATA_HOME=/private/var/folders/xx/yy/T/evil pandoc README.md",
+        "export XDG_DATA_HOME=/tmp/evil; pandoc README.md",
+        "env XDG_DATA_HOME=/tmp/evil pandoc README.md",
+        "XDG_DATA_HOME=share pandoc README.md",
+    ] {
+        assert!(!in_project(cmd), "should be refused: {cmd}");
+    }
+    for cmd in [
+        "pandoc README.md",
+        "pandoc --list-extensions",
+        "pandoc --list-extensions=markdown",
+        "XDG_DATA_HOME= pandoc README.md",
+        "XDG_DATA_HOME=/work/u/proj/.local pandoc README.md",
+        "cargo build",
+        "cargo test",
+        "npm test",
+        "pytest",
+        "rustup show",
+    ] {
+        assert!(in_project(cmd), "should be allowed: {cmd}");
+    }
+    let home_data = format!("XDG_DATA_HOME={home}/.local/share pandoc README.md");
+    assert!(in_project(&home_data), "should be allowed: {home_data}");
+}
+
 #[test]
 fn a_case_variant_of_a_scratch_folder_is_refused_since_macos_folds_case() {
     let s = scratchpad().replacen("/private/tmp", "/PRIVATE/tmp", 1);
@@ -179,7 +213,9 @@ proptest! {
         root in prop::sample::select(vec!["/tmp", "/private/tmp", "/var/tmp", "/private/var/tmp", "/var/folders", "/private/var/folders"]),
         a in segment(),
         b in segment(),
-        var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME", "GIT_CONFIG_GLOBAL", "JJ_CONFIG", "GIT_DIR", "GIT_EXEC_PATH"]),
+        var in prop::sample::select(vec![
+            "HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "GIT_CONFIG_GLOBAL", "JJ_CONFIG", "GIT_DIR", "GIT_EXEC_PATH",
+        ]),
         tool in prop::sample::select(vec!["git log", "jj log", "git status", "jj st"]),
     ) {
         let cmd = format!("{var}={root}/{a}/{b} {tool}");
@@ -192,7 +228,9 @@ proptest! {
     fn any_relative_config_location_is_refused(
         a in segment(),
         b in segment(),
-        var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME", "GIT_CONFIG_GLOBAL", "JJ_CONFIG", "GIT_DIR", "GIT_EXEC_PATH"]),
+        var in prop::sample::select(vec![
+            "HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "GIT_CONFIG_GLOBAL", "JJ_CONFIG", "GIT_DIR", "GIT_EXEC_PATH",
+        ]),
     ) {
         let cmd = format!("{var}={a}/{b} git log");
         prop_assert!(!in_project(&cmd), "should be refused: {}", cmd);
@@ -202,7 +240,7 @@ proptest! {
     fn a_config_directory_outside_the_scratch_places_is_allowed(
         a in segment(),
         b in segment(),
-        var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME"]),
+        var in prop::sample::select(vec!["HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME"]),
         tool in prop::sample::select(vec!["git log", "jj log"]),
     ) {
         let cmd = format!("{var}=/work/u/proj/{a}/{b} {tool}");
