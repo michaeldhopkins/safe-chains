@@ -25,3 +25,10 @@ valued = [
     "-b", "-c", "-f", "-i", "-n",
     "-p", "-r", "-t", "-w",
 ]
+examples_safe = ["cucumber-js"]
+
+# A feature, a config, or a required module is code cucumber-js loads. `--format` / `-f`
+# name the report file. The other values are languages, tags, counts, and names.
+[command.path_gate]
+positional = "exec"
+flags = { "--config" = "exec", "-c" = "exec", "--require" = "exec", "-r" = "exec", "--require-module" = "exec", "--paths" = "exec", "--format" = "write", "-f" = "write", "--backtrace" = "ignore", "-b" = "ignore", "--format-options" = "ignore", "--i18n-keywords" = "ignore", "--language" = "ignore", "-i" = "ignore", "--name" = "ignore", "-n" = "ignore", "--order" = "ignore", "--retry" = "ignore", "--retry-tag-filter" = "ignore", "--tags" = "ignore", "-t" = "ignore", "--world-parameters" = "ignore", "-w" = "ignore", "-p" = "ignore" }

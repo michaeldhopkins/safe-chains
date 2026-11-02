@@ -15,3 +15,9 @@ valued = [
     "--config", "--reporter",
     "--require",
 ]
+examples_safe = ["jasmine"]
+
+# A spec, a config, a required helper, or a reporter is code jasmine loads.
+[command.path_gate]
+positional = "exec"
+flags = { "--config" = "exec", "--reporter" = "exec", "--require" = "exec" }

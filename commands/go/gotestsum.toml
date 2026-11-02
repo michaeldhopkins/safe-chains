@@ -45,5 +45,7 @@ examples_safe = [
 # `--junitfile` and `--rerun-fails-report` each name the FILE the report is written to.
 # `--junitfile-hide-empty-pkg` only shapes what goes INTO that report — it is boolean upstream and
 # causes no write of its own, so it is neither valued nor a write flag.
+# A package path is code `go test` runs. The remaining values are format names and counts.
 [command.path_gate]
-flags = { "--raw-command" = "exec", "--post-run-command" = "exec", "--junitfile" = "write", "--rerun-fails-report" = "write" }
+positional = "exec"
+flags = { "--packages" = "exec", "--raw-command" = "exec", "--post-run-command" = "exec", "--junitfile" = "write", "--rerun-fails-report" = "write", "--format" = "ignore", "--format-hivis" = "ignore", "--format-icons" = "ignore", "--hide-summary" = "ignore", "--junitfile-project-name" = "ignore", "--junitfile-testcase-classname" = "ignore", "--junitfile-testsuite-name" = "ignore", "--max-fails" = "ignore", "--rerun-fails" = "ignore", "--rerun-fails-max-failures" = "ignore", "--rerun-fails-run-root-test" = "ignore", "--watch-skip-tests" = "ignore" }

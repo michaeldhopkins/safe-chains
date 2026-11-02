@@ -35,6 +35,8 @@ cargo	-m	--manifest-path
 cargo	-p	--path
 cargo	-t	--target-dir
 cargo	-t	--target
+# cucumber-js -p is --profile, a profile name, never --paths.
+cucumber-js	-p	--paths
 ditto	-k	--keepBinariesList
 flex	-h	--header-file
 flex	-s	--skel

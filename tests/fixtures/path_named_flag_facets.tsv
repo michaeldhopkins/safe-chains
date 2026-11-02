@@ -231,7 +231,6 @@ cppcheck	--includes-file	untriaged	-	-	-
 cppcheck	--rule-file	untriaged	-	-	-	
 credo	--config-file	untriaged	-	-	-	
 cucumber	--profile	untriaged	-	-	-	
-cucumber-js	--paths	untriaged	-	-	-	
 dart analyze	--directory	untriaged	-	-	-	
 dawn scan	--config-file	untriaged	-	-	-	
 dbmate status	--config-file	untriaged	-	-	-	

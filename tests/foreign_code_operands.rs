@@ -153,6 +153,16 @@ const CASES: &[&str] = &[
     "mvn test -s {d}/settings.xml",
     "mvn test -s={d}/settings.xml",
     "php {d}/artisan test",
+    "jasmine {d}/evil.spec.js",
+    "jasmine --config {d}/jasmine.json",
+    "jasmine --require {d}/helper.js",
+    "jasmine --reporter {d}/rep.js",
+    "cucumber-js {d}/evil.feature",
+    "cucumber-js --config {d}/cucumber.js",
+    "cucumber-js --require {d}/steps.js",
+    "cucumber-js --require-module {d}/mod.js",
+    "cucumber-js --paths {d}",
+    "gotestsum --packages {d}",
 ];
 
 #[test]

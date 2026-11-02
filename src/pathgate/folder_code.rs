@@ -161,6 +161,22 @@ mod tests {
         assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"));
     }
 
+    #[test]
+    fn a_sibling_runner_asks_outside_the_project() {
+        let root = project();
+        for command in [
+            "cd /tmp/y && jasmine", "cd /tmp/y && cucumber-js", "cd /tmp/y && gotestsum", "cd /tmp/y && karma start --single-run",
+            "cd /tmp/y && turbo run build --dry-run", "cd /tmp/y && artisan test", "cd /tmp/y && please list",
+        ] {
+            assert!(!judged_from(&root, command), "{command}");
+        }
+        for command in
+            ["jasmine", "cucumber-js", "gotestsum", "karma start --single-run", "turbo run build --dry-run", "artisan test", "please list"]
+        {
+            assert!(judged_from(&root, command), "{command}");
+        }
+    }
+
     /// The unknown workdir is the harness sentinel, so a build there is the project's build.
     #[test]
     fn the_unknown_workdir_sentinel_is_not_a_foreign_folder() {

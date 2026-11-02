@@ -102,13 +102,13 @@ write = [
 #    these ask, the way `sh ./x.sh` there does. The project and folders inside it are unaffected.
 #    git and jj are not here: a repository under temp is an open question (TODO.md).
 folder_code = [
-  "ansible-lint", "astro", "ava", "bazel", "bun", "bundle", "cabal", "cargo", "cmake",
-  "composer", "coverage", "cucumber", "deno", "dotnet", "dune", "eslint", "flake8", "go",
-  "gradle", "hatch", "jest", "just", "lein", "make", "meson", "mise", "mix", "mkdocs", "mocha",
-  "mvn", "mvnw", "mypy", "next", "ninja", "nox", "npm", "npx", "pdm", "php", "phpstan", "phpunit",
+  "ansible-lint", "artisan", "astro", "ava", "bazel", "bun", "bundle", "cabal", "cargo", "cmake",
+  "composer", "coverage", "cucumber", "cucumber-js", "deno", "dotnet", "dune", "eslint", "flake8", "go",
+  "gotestsum", "gradle", "hatch", "jasmine", "jest", "just", "karma", "lein", "make", "meson", "mise", "mix", "mkdocs", "mocha",
+  "mvn", "mvnw", "mypy", "next", "ninja", "nox", "npm", "npx", "pdm", "php", "phpstan", "phpunit", "please",
   "pnpm", "pod", "poetry", "pre-commit", "prettier", "pylint", "pytest", "python", "python3",
   "rails", "rake", "rollup", "rspec", "rubocop", "rustc", "rustup", "sbt", "sphinx-build",
-  "stack", "stylelint", "swift", "task", "terraform", "tofu", "tox", "tsc", "tsup", "tuist",
+  "stack", "stylelint", "swift", "task", "terraform", "tofu", "tox", "tsc", "tsup", "turbo", "tuist",
   "uv", "vite", "vitest", "webpack", "xcodebuild", "yarn", "zig",
 ]
 
