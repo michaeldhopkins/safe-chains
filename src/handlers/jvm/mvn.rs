@@ -35,10 +35,16 @@ pub fn is_safe_mvn(tokens: &[Token]) -> Verdict {
     while i < tokens.len() {
         let t = &tokens[i];
         if !t.starts_with('-') {
+            if !MVN_SAFE_PHASES.contains(t) {
+                return Verdict::Denied;
+            }
             i += 1;
             continue;
         }
-        if t.starts_with("-D") && t.len() > 2 {
+        if let Some(spec) = attached_define(t) {
+            if property_loads_code(spec) {
+                return Verdict::Denied;
+            }
             i += 1;
             continue;
         }
@@ -47,12 +53,23 @@ pub fn is_safe_mvn(tokens: &[Token]) -> Verdict {
             continue;
         }
         if MVN_VALUED.contains(t) {
+            if is_define_flag(t.as_str()) {
+                let Some(value) = tokens.get(i + 1) else {
+                    return Verdict::Denied;
+                };
+                if property_loads_code(value.as_str()) {
+                    return Verdict::Denied;
+                }
+            }
             i += 2;
             continue;
         }
-        if let Some((flag, _)) = t.as_str().split_once('=')
+        if let Some((flag, value)) = t.as_str().split_once('=')
             && MVN_VALUED.contains(flag)
         {
+            if is_define_flag(flag) && property_loads_code(value) {
+                return Verdict::Denied;
+            }
             i += 1;
             continue;
         }
@@ -64,6 +81,23 @@ pub fn is_safe_mvn(tokens: &[Token]) -> Verdict {
         _ => SafetyLevel::Inert,
     };
     Verdict::Allowed(level)
+}
+
+/// `-Dname` or `-Dname=value` written as one word. `-D` alone is the valued form.
+fn attached_define(token: &Token) -> Option<&str> {
+    token.as_str().strip_prefix("-D").filter(|rest| !rest.is_empty())
+}
+
+fn is_define_flag(flag: &str) -> bool {
+    flag == "-D" || flag == "--define"
+}
+
+/// A property whose value is loaded as code or used to spawn a process.
+fn property_loads_code(spec: &str) -> bool {
+    let name = spec.split_once('=').map(|(name, _)| name).unwrap_or(spec);
+    matches!(name, "maven.ext.class.path" | "surefire.jvm" | "failsafe.jvm")
+        || name.starts_with("exec.")
+        || name.starts_with("jvm.")
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -108,7 +142,12 @@ mod tests {
         mvn_validate: "mvn validate",
         mvn_test: "mvn test",
         mvn_test_define: "mvn test -Dtest=MyTest",
+        mvn_test_skip: "mvn test -DskipTests",
+        mvn_test_skip_property: "mvn test -Dmaven.test.skip=true",
+        mvn_test_plain_property: "mvn test -Dfoo=bar",
         mvn_test_batch: "mvn test --batch-mode",
+        mvn_test_log_in_project: "mvn test --log-file target/mvn.log",
+        mvn_test_short_log_in_project: "mvn test -l target/mvn.log",
         mvn_compile: "mvn compile",
         mvn_verify: "mvn verify",
         mvn_test_compile: "mvn test-compile",
@@ -121,6 +160,15 @@ mod tests {
         mvn_install_denied: "mvn install",
         mvn_clean_denied: "mvn clean",
         bare_mvn_denied: "mvn",
+        mvn_later_phase_denied: "mvn validate deploy",
+        mvn_later_goal_denied: "mvn test exec:exec -Dexec.executable=/tmp/y/evil",
+        mvn_ext_classpath_denied: "mvn test -Dmaven.ext.class.path=/tmp/y/evil.jar",
+        mvn_surefire_jvm_denied: "mvn test -Dsurefire.jvm=/tmp/y/evil",
+        mvn_failsafe_jvm_denied: "mvn test -Dfailsafe.jvm=/tmp/y/evil",
+        mvn_jvm_property_denied: "mvn test -Djvm.home=/tmp/y/evil",
+        mvn_log_file_denied: "mvn test --log-file /etc/cron.d/x",
+        mvn_short_log_denied: "mvn test -l /etc/cron.d/x",
+        mvnw_short_log_denied: "mvnw test -l /etc/cron.d/x",
     }
 
     mod proptests {

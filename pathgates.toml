@@ -1349,7 +1349,7 @@ flags = { "--config" = "exec", "-c" = "exec", "--import-map" = "exec" }
 
 # A pom (`-f`/`--file`) is the build Maven runs. `-s` names settings that select plugins.
 [roles.mvn]
-flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec" }
+flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec", "--log-file" = "write", "-l" = "write" }
 
 [roles.mvnw]
-flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec" }
+flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec", "--log-file" = "write", "-l" = "write" }
