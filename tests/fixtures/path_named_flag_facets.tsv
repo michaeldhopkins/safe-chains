@@ -163,8 +163,6 @@ buf generate	--path	untriaged	-	-	-
 buf lint	--exclude-path	untriaged	-	-	-	
 buf lint	--path	untriaged	-	-	-	
 bun build	--public-path	untriaged	-	-	-	
-bundle check	--gemfile	untriaged	-	-	-	
-bundle install	--gemfile	untriaged	-	-	-	
 bundler-audit check	--gemfile-lock	untriaged	-	-	-	
 bundletool dump config	--xpath	untriaged	-	-	-	
 bundletool dump manifest	--xpath	untriaged	-	-	-	
@@ -184,14 +182,9 @@ cargo criterion	--criterion-manifest-path	untriaged	-	-	-
 cargo cyclonedx	--override-filename	untriaged	-	-	-	
 cargo doc	--profile	untriaged	-	-	-	
 cargo fetch	--lockfile-path	untriaged	-	-	-	
-cargo install	--path	untriaged	-	-	-	
 cargo install	--profile	untriaged	-	-	-	
 cargo llvm-cov	--ignore-filename-regex	untriaged	-	-	-	
 cargo llvm-cov	--profile	untriaged	-	-	-	
-cargo msrv find	--path	untriaged	-	-	-	
-cargo msrv list	--path	untriaged	-	-	-	
-cargo msrv show	--path	untriaged	-	-	-	
-cargo msrv verify	--path	untriaged	-	-	-	
 cargo mutants	--file	untriaged	-	-	-	
 cargo mutants	--profile	untriaged	-	-	-	
 cargo nextest archive	--archive-file	untriaged	-	-	-	
@@ -306,7 +299,6 @@ eb status	--profile	untriaged	-	-	-
 eleventy	--pathprefix	untriaged	-	-	-	
 erb_lint	--custom-rule-files	untriaged	-	-	-	
 eslint	--ignore-path	untriaged	-	-	-	
-eslint	--rulesdir	untriaged	-	-	-	
 espeak-ng	--path	untriaged	-	-	-	
 eza	--group-directories-first-dirs	untriaged	-	-	-	
 file	--files-from	untriaged	-	-	-	
@@ -736,7 +728,6 @@ steep project	--steepfile	untriaged	-	-	-
 steep stats	--steepfile	untriaged	-	-	-	
 steep validate	--steepfile	untriaged	-	-	-	
 streamzip	-zipfile	untriaged	-	-	-	
-stylelint	--config-basedir	untriaged	-	-	-	
 stylelint	--ignore-path	untriaged	-	-	-	
 stz extract	--hashes-file	untriaged	-	-	-	
 supabase branches get	--workdir	untriaged	-	-	-	
@@ -845,7 +836,6 @@ trivy image	--ignorefile	untriaged	-	-	-
 trivy image	--skip-dirs	untriaged	-	-	-	
 trivy image	--skip-files	untriaged	-	-	-	
 trivy sbom	--cache-dir	untriaged	-	-	-	
-tsup	--public-dir	untriaged	-	-	-	
 tuist build	--derived-data-path	untriaged	-	-	-	
 tuist test	--derived-data-path	untriaged	-	-	-	
 tuist test	--result-bundle-path	untriaged	-	-	-	
@@ -855,7 +845,6 @@ units	--file	untriaged	-	-	-
 velero logs	--caCertFile	untriaged	-	-	-	
 vite build	--assetsDir	untriaged	-	-	-	
 vitepress build	--cache-dir	untriaged	-	-	-	
-vitest	--dir	untriaged	-	-	-	
 vyper	--root-folder	untriaged	-	-	-	
 wasmtime compile	--profile	untriaged	-	-	-	
 wasmtime wast	--profile	untriaged	-	-	-	
