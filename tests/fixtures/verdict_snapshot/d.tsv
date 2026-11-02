@@ -1204,11 +1204,15 @@ demandoc -w x	inert
 demandoc /usr/share/man/man1/ls.1	inert
 demandoc x	inert
 deno	denied
+deno --config x	denied
 deno --help	inert
+deno --help --config x	denied
 deno --help --version	denied
 deno --help x	denied
+deno --import-map x	denied
 deno --version	inert
 deno -V	inert
+deno -c x	denied
 deno -h	inert
 deno check	safe-read
 deno check --config x	safe-read
@@ -1245,6 +1249,7 @@ deno fmt	denied
 deno fmt --check	inert
 deno fmt --check --config x	inert
 deno fmt --check --help	inert
+deno fmt --check src/main.ts	inert
 deno fmt --check x	inert
 deno fmt --config x	denied
 deno fmt --ext x	denied
@@ -1290,6 +1295,7 @@ deno lint --unstable	safe-read
 deno lint -c x	safe-read
 deno lint -h	safe-read
 deno lint -q	safe-read
+deno lint src/main.ts	safe-read
 deno lint x	safe-read
 deno test	safe-read
 deno test --config x	safe-read
@@ -1305,6 +1311,7 @@ deno test --unstable	safe-read
 deno test -c x	safe-read
 deno test -h	safe-read
 deno test -q	safe-read
+deno test src/app_test.ts	safe-read
 deno test x	safe-read
 deno x	denied
 depcheck	safe-read

@@ -483,6 +483,7 @@ cargo --help x	denied
 cargo --manifest-path x	denied
 cargo --output-dir x	denied
 cargo --output-path x	denied
+cargo --path x	denied
 cargo --target x	denied
 cargo --version	inert
 cargo --version 2>&1	inert

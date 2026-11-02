@@ -5026,12 +5026,40 @@ npm root --json	inert
 npm root -h	inert
 npm root x	inert
 npm run	denied
+npm run --foreground-scripts	denied
+npm run --foreground-scripts --help	denied
+npm run --foreground-scripts x	denied
+npm run --help	inert
+npm run --if-present	denied
+npm run --ignore-scripts	denied
+npm run --include-workspace-root	denied
+npm run --json	denied
+npm run --silent	denied
+npm run --workspaces	denied
+npm run -h	inert
+npm run -s	denied
 npm run test	safe-read
+npm run test --foreground-scripts	safe-read
 npm run test:x	safe-read
+npm run test:x --foreground-scripts	safe-read
 npm run x	denied
 npm run-script	denied
+npm run-script --foreground-scripts	denied
+npm run-script --foreground-scripts --help	denied
+npm run-script --foreground-scripts x	denied
+npm run-script --help	inert
+npm run-script --if-present	denied
+npm run-script --ignore-scripts	denied
+npm run-script --include-workspace-root	denied
+npm run-script --json	denied
+npm run-script --silent	denied
+npm run-script --workspaces	denied
+npm run-script -h	inert
+npm run-script -s	denied
 npm run-script test	safe-read
+npm run-script test --foreground-scripts	safe-read
 npm run-script test:x	safe-read
+npm run-script test:x --foreground-scripts	safe-read
 npm run-script x	denied
 npm test	safe-read
 npm test --help	safe-read

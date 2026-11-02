@@ -374,12 +374,23 @@ yardoc -r ~/.ssh/id_rsa	denied
 yardoc -t ../../../../tmp/evil	denied
 yardoc x	safe-write
 yarn	denied
+yarn --frozen-lockfile	denied
+yarn --frozen-lockfile --help	denied
+yarn --frozen-lockfile x	denied
 yarn --help	inert
-yarn --help --version	denied
-yarn --help x	denied
+yarn --ignore-scripts	denied
+yarn --json	denied
+yarn --no-progress	denied
+yarn --non-interactive	denied
+yarn --offline	denied
+yarn --prefer-offline	denied
+yarn --prod	denied
+yarn --production	denied
+yarn --silent	denied
 yarn --version	inert
 yarn -V	inert
 yarn -h	inert
+yarn -s	denied
 yarn add left-pad	denied
 yarn dlx cowsay	denied
 yarn info	inert
@@ -424,9 +435,9 @@ yarn mocha	safe-read
 yarn mocha x	safe-read
 yarn publish	denied
 yarn test	safe-read
-yarn test --help	safe-read
+yarn test --frozen-lockfile	safe-read
 yarn test:x	safe-read
-yarn test:x --help	safe-read
+yarn test:x --frozen-lockfile	safe-read
 yarn vitest	safe-read
 yarn vitest run	safe-read
 yarn vitest x	safe-read

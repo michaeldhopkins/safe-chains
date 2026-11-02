@@ -3474,9 +3474,9 @@ php -d include_path=. artisan view:clear	denied
 php -d memory_limit artisan view:clear	denied
 php -d memory_limit=512M -d max_execution_time=300 artisan view:clear	safe-write
 php -d memory_limit=512M -l pages/team.php	safe-read
-php -d memory_limit=512M /Users/me/projects/site/please stache:clear	safe-write
-php -d memory_limit=512M /path/please cache:clear --store=file	safe-write
-php -d memory_limit=512M /path/please cache:clear file	safe-write
+php -d memory_limit=512M /Users/me/projects/site/please stache:clear	denied
+php -d memory_limit=512M /path/please cache:clear --store=file	denied
+php -d memory_limit=512M /path/please cache:clear file	denied
 php -d memory_limit=512M artisan view:clear	safe-write
 php -d memory_limit=512M please stache:clear	safe-write
 php -d open_basedir=/ artisan view:clear	denied
@@ -3495,13 +3495,17 @@ php -l ~/.ssh/id_rsa	denied
 php -m	inert
 php -r 'echo 1;'	denied
 php -v	inert
-php /Users/me/projects/blog/please stache:clear	safe-write
-php /path/please cache:clear --store=file	safe-write
-php /path/please cache:clear file	safe-write
+php ./artisan test	safe-read
+php /System/Volumes/Data/tmp/y/artisan test	denied
+php /TMP/y/artisan test	denied
+php /Users/me/projects/blog/please stache:clear	denied
+php /path/please cache:clear --store=file	denied
+php /path/please cache:clear file	denied
 php /tmp/please-bak stache:clear	denied
 php /tmp/random.php	denied
 php /tmp/script.php arg	denied
-php /var/www/app/artisan view:clear	safe-write
+php /tmp/y/artisan test	denied
+php /var/www/app/artisan view:clear	denied
 php artisan	denied
 php artisan about	inert
 php artisan about --json	inert
@@ -3551,6 +3555,7 @@ php artisan route:list	inert
 php artisan route:list --json --except-vendor	inert
 php artisan schedule:list --json	inert
 php artisan serve	denied
+php artisan test	safe-read
 php artisan test --filter UserTest	safe-read
 php artisan test --parallel --processes=4	safe-read
 php artisan tinker	denied
