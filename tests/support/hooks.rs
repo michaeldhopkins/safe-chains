@@ -31,6 +31,7 @@ pub fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
     let mut child = Command::new(binary())
         .args(args)
         .env("HOME", bare_home())
+        .env_remove("XDG_CONFIG_HOME")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

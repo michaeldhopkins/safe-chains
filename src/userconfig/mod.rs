@@ -209,8 +209,16 @@ pub fn entry_level(name: &str) -> Result<&'static str, EditError> {
 
 /// `~/.config/safe-chains.toml` under `$HOME`. The same rule as the loader: never `XDG_CONFIG_HOME`.
 pub fn user_config_path() -> Result<PathBuf, EditError> {
-    let home = std::env::var_os("HOME").filter(|h| !h.is_empty()).ok_or(EditError::NoHome)?;
-    Ok(PathBuf::from(home).join(".config/safe-chains.toml"))
+    Ok(home_dir()?.join(".config/safe-chains.toml"))
+}
+
+fn home_dir() -> Result<PathBuf, EditError> {
+    #[cfg(test)]
+    {
+        Ok(crate::registry::custom::config_home())
+    }
+    #[cfg(not(test))]
+    std::env::var_os("HOME").filter(|home| !home.is_empty()).map(PathBuf::from).ok_or(EditError::NoHome)
 }
 
 fn read_existing(path: &Path) -> Result<String, EditError> {

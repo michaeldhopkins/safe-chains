@@ -30,18 +30,41 @@ struct TrustedConfig {
     level: Option<String>,
 }
 
-/// Walk up from CWD looking for a project-level custom TOML.
+/// Walk up from the process's current directory looking for a project-level custom TOML.
+/// Tests start at the harness root and do not climb: a file above it belongs to the machine
+/// running the suite.
 fn find_repo_custom() -> Option<PathBuf> {
-    let mut dir = env::current_dir().ok()?;
+    let mut dir = search_start()?;
     loop {
         let candidate = dir.join(REPO_FILENAME);
         if candidate.is_file() {
             return Some(candidate);
         }
-        if !dir.pop() {
+        if !climbs() || !dir.pop() {
             return None;
         }
     }
+}
+
+/// The binary walks to the filesystem root. Tests stay in the harness root.
+fn climbs() -> bool {
+    #[cfg(test)]
+    {
+        false
+    }
+    #[cfg(not(test))]
+    {
+        true
+    }
+}
+
+fn search_start() -> Option<PathBuf> {
+    #[cfg(test)]
+    {
+        Some(harness::repo_search_root())
+    }
+    #[cfg(not(test))]
+    env::current_dir().ok()
 }
 
 /// `~/.config/safe-chains.toml` — the ONLY user-config location. `XDG_CONFIG_HOME` is
@@ -51,9 +74,19 @@ fn find_repo_custom() -> Option<PathBuf> {
 /// only from the real home directory closes that off — a common stance for a security-sensitive
 /// CLI. Trades away XDG relocation until a protected third-party config location exists.
 pub(super) fn find_user_custom() -> Option<PathBuf> {
-    let dir = env::var_os("HOME").map(|h| PathBuf::from(h).join(".config"))?;
-    let candidate = dir.join(USER_FILENAME);
+    let candidate = config_root()?.join(".config").join(USER_FILENAME);
     candidate.is_file().then_some(candidate)
+}
+
+/// `$HOME` in the binary. Tests get the harness root instead, so a suite does not read the
+/// config of whoever ran it. `XDG_CONFIG_HOME` is not a location here, in either build.
+fn config_root() -> Option<PathBuf> {
+    #[cfg(test)]
+    {
+        Some(harness::config_home())
+    }
+    #[cfg(not(test))]
+    env::var_os("HOME").map(PathBuf::from)
 }
 
 fn parse_trusted(source: &str) -> Vec<TrustedEntry> {
@@ -204,6 +237,9 @@ pub(crate) fn project_config() -> Option<(PathBuf, bool)> {
 /// (`~/.config/safe-chains.toml`) is trusted as-is and also carries the
 /// `[[trusted]]` list that pins repo files.
 pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
+    // Filled once per process. A fixture on the thread that first loads it must not stick.
+    #[cfg(test)]
+    let _isolate = harness::ForceEmpty::install();
     if env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return;
     }
@@ -228,6 +264,13 @@ pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "harness.rs"]
+mod harness;
+
+#[cfg(test)]
+pub(crate) use harness::config_home;
 
 #[cfg(test)]
 mod tests {
@@ -424,5 +467,127 @@ locus_from = "cwd"
         let body = "[[command]]\nname = \"myco\"\n";
         let f = write_repo_file(dir.path(), body);
         assert!(!repo_is_trusted(&f, body.as_bytes(), &[]));
+    }
+
+    /// The loader's default root is an empty temporary directory. Removing that redirect makes
+    /// this read `$HOME` (and a project search start at the process's current directory), which
+    /// fails here whether or not that home holds a config file.
+    #[test]
+    fn the_loader_does_not_read_the_ambient_home() {
+        let root = config_root().expect("a config root");
+        let home = PathBuf::from(env::var_os("HOME").expect("HOME"));
+        assert_ne!(root, home, "the test config root is the ambient home");
+        if home.as_os_str() != "/" {
+            assert!(!root.starts_with(&home), "the test config root is inside the ambient home: {}", root.display());
+        }
+        if let Some(xdg) = env::var_os("XDG_CONFIG_HOME").filter(|value| !value.is_empty()) {
+            let xdg = PathBuf::from(xdg);
+            assert_ne!(root, xdg, "the test config root is XDG_CONFIG_HOME");
+            if xdg.as_os_str() != "/" {
+                assert!(!root.starts_with(&xdg), "the test config root is inside XDG_CONFIG_HOME: {}", root.display());
+            }
+        }
+        let start = search_start().expect("a project search start");
+        assert_eq!(start, super::harness::repo_search_root());
+        let cwd = env::current_dir().expect("cwd");
+        assert_ne!(start, cwd, "a project config search starts at the process's current directory");
+        let file = root.join(".config").join(USER_FILENAME);
+        let filled = fs::read_to_string(&file).is_ok_and(|text| !text.trim().is_empty());
+        assert!(!filled, "the default test config is not empty");
+        if let Some(found) = find_user_custom() {
+            assert!(found.starts_with(&root), "find_user_custom left the harness root: {}", found.display());
+        }
+        let path = crate::userconfig::user_config_path().expect("a config path");
+        assert!(path.starts_with(&root), "the config CLI reads outside the harness root: {}", path.display());
+    }
+
+    /// A file above the harness root is the machine's, not the test's, even when the search could
+    /// walk to it.
+    #[test]
+    fn a_project_search_does_not_leave_the_harness_root() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let parent_file = "[[command]]\nname = \"attest\"\nlevel = \"SafeWrite\"\nbare = true\n";
+        fs::write(dir.path().join(REPO_FILENAME), parent_file).expect("write parent config");
+        let child = dir.path().join("child");
+        fs::create_dir(&child).expect("mkdir child");
+        super::harness::with_root(&child, || {
+            assert!(find_repo_custom().is_none(), "the search climbed out of the harness root");
+            assert!(!crate::is_safe_command("attest"), "a parent project file approved a command");
+        });
+    }
+
+    /// The default config approves nothing of the caller's. A fixture widens only the closure it
+    /// wraps, and the readers that re-open the file (the level, the folder setting, `config list`)
+    /// see that same fixture.
+    #[test]
+    fn a_fixture_widens_only_the_test_that_passes_it() {
+        assert!(!crate::is_safe_command("attest"), "bare attest is not a built-in approval");
+        assert!(!crate::is_safe_command("attest --xyzzy-unknown-42"));
+        assert!(user_config_level().is_none(), "the default harness root has a level");
+        assert_eq!(crate::registry::folder_config::user_setting(), crate::registry::folder_config::Setting::Unset);
+        let source = "\
+level = \"yolo\"
+
+[unknown_folder]
+writes = \"developer\"
+
+[[command]]
+name = \"attest\"
+level = \"SafeWrite\"
+bare = true
+tolerate_unknown_long = true
+";
+        super::harness::with_user_config(source, || {
+            assert_eq!(user_config_level().as_deref(), Some("yolo"));
+            assert_eq!(
+                crate::registry::folder_config::user_setting().level(),
+                crate::pathctx::anchor::FolderLevel::parse("developer").expect("developer"),
+            );
+            assert!(crate::is_safe_command("attest"), "the fixture's bare attest");
+            assert!(crate::is_safe_command("attest --xyzzy-unknown-42"), "the fixture tolerates an unknown long flag");
+            assert!(crate::userconfig::list().contains("level yolo"), "config list did not read the fixture");
+            let path = crate::userconfig::user_config_path().expect("fixture path");
+            assert!(path.starts_with(config_home()), "the config CLI left the fixture: {}", path.display());
+        });
+        assert!(user_config_level().is_none(), "the fixture's level leaked");
+        assert_eq!(crate::registry::folder_config::user_setting(), crate::registry::folder_config::Setting::Unset);
+        assert!(!crate::is_safe_command("attest"), "the fixture's command leaked");
+        assert!(!crate::is_safe_command("attest --xyzzy-unknown-42"));
+    }
+
+    /// A project file's commands apply only when the fixture's user config pins that file. An
+    /// unpinned file, or a pin whose hash does not match, leaves the built-in verdict.
+    #[test]
+    fn a_project_file_applies_only_when_the_fixture_pins_it() {
+        let project = "[[command]]\nname = \"attest\"\nlevel = \"SafeWrite\"\nbare = true\n";
+        super::harness::with_project_config(
+            project,
+            |_dir, _hash| String::new(),
+            || {
+                assert!(!crate::is_safe_command("attest"), "an unpinned project file approved a command");
+                let (_path, trusted) = project_config().expect("the project file is visible");
+                assert!(!trusted, "an unpinned project file was trusted");
+            },
+        );
+        super::harness::with_project_config(
+            project,
+            |dir, _hash| format!("[[trusted]]\npath = \"{}\"\nsha256 = \"{}\"\n", dir.display(), "0".repeat(64)),
+            || {
+                assert!(!crate::is_safe_command("attest"), "a pin with the wrong hash approved a command");
+                let (_path, trusted) = project_config().expect("the project file is visible");
+                assert!(!trusted, "a wrong hash counted as a pin");
+            },
+        );
+        super::harness::with_project_config(
+            project,
+            |dir, hash| format!("[[trusted]]\npath = \"{}\"\nsha256 = \"{hash}\"\n", dir.display()),
+            || {
+                assert!(crate::is_safe_command("attest"), "a matching pin did not apply the project file");
+                let (_path, trusted) = project_config().expect("the project file is visible");
+                assert!(trusted, "a matching pin was not trusted");
+            },
+        );
+        assert!(!crate::is_safe_command("attest"), "the project fixture leaked");
+        assert!(project_config().is_none(), "a project file survived the fixture");
     }
 }

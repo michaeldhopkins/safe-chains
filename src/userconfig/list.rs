@@ -7,7 +7,7 @@ use super::SHOWN_PATH;
 
 /// The listing, ready to print. Reads the files afresh every call.
 pub fn list() -> String {
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = listed_home();
     let mut out = String::new();
     if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         out.push_str("SAFE_CHAINS_NO_LOCAL is set, so safe-chains is ignoring every file below and using only its built-in rules.\n\n");
@@ -43,6 +43,15 @@ pub fn list() -> String {
         super::step(super::Step::RemoveGrant("PATH"))
     );
     out
+}
+
+fn listed_home() -> String {
+    #[cfg(test)]
+    {
+        crate::registry::custom::config_home().to_string_lossy().into_owned()
+    }
+    #[cfg(not(test))]
+    std::env::var("HOME").unwrap_or_default()
 }
 
 fn tilde(path: &str, home: &str) -> String {

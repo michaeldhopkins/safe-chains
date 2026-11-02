@@ -32,6 +32,7 @@ fn hook_at_level(level: &str, command: &str) -> (String, i32) {
     let mut child = Command::new(binary())
         .args(["hook", "claude"])
         .env("HOME", &home)
+        .env_remove("XDG_CONFIG_HOME")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -292,7 +293,12 @@ fn unknown_tool_in_hook_subcommand_errors() {
 
 #[test]
 fn list_tools_includes_every_supported_target() {
-    let out = Command::new(binary()).arg("--list-tools").output().expect("run");
+    let out = Command::new(binary())
+        .arg("--list-tools")
+        .env("HOME", hooks::bare_home())
+        .env_remove("XDG_CONFIG_HOME")
+        .output()
+        .expect("run");
     let s = String::from_utf8_lossy(&out.stdout);
     for tool in ["claude", "codex", "cursor", "gemini", "copilot", "qwen", "droid", "opencode"] {
         assert!(s.contains(tool), "list-tools missing `{tool}`: {s}");

@@ -15,6 +15,13 @@
 //! filesystem, and (1) is decided from the real `current_dir`.
 use std::process::Command;
 
+/// An empty home for the spawned binary. The process home holds the machine's own config.
+fn bare_home() -> &'static std::path::Path {
+    use std::sync::OnceLock;
+    static HOME: OnceLock<tempfile::TempDir> = OnceLock::new();
+    HOME.get_or_init(|| tempfile::tempdir().expect("tempdir")).path()
+}
+
 /// A command no registry entry can match, so `--suggest` reaches its generating path.
 const UNKNOWN: &str = "frobnicatezzz --wibble";
 
@@ -23,6 +30,8 @@ fn suggest_in(dir: &std::path::Path) -> std::process::Output {
         .arg("--suggest")
         .arg(UNKNOWN)
         .current_dir(dir)
+        .env("HOME", bare_home())
+        .env_remove("XDG_CONFIG_HOME")
         .output()
         .expect("spawn safe-chains")
 }

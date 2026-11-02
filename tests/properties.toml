@@ -581,6 +581,7 @@ owed = [
 "src/userconfig/mod.rs" = "reads and writes ~/.config/safe-chains.toml"
 
 [test_only]
+"src/registry/harness.rs" = "the in-process config harness (#[cfg(test)] mod in registry/custom.rs)"
 "src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"

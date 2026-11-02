@@ -45,6 +45,17 @@ fn canonicalize_home(text: &str, home: &str) -> String {
         .join(" ")
 }
 
+/// `$HOME` for `~/.claude/settings.json`. Tests read the harness root, never the ambient home
+/// and never `XDG_CONFIG_HOME`.
+fn settings_home() -> Option<std::path::PathBuf> {
+    #[cfg(test)]
+    {
+        Some(crate::registry::custom::config_home())
+    }
+    #[cfg(not(test))]
+    std::env::var_os("HOME").map(std::path::PathBuf::from)
+}
+
 impl Matcher {
     /// Load allowlist patterns from trusted home config only
     /// (`~/.claude/settings.json`). A project's `.claude/settings.json` is
@@ -59,8 +70,8 @@ impl Matcher {
         if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
             return Matcher { exact: HashSet::new(), globs: Vec::new(), home: String::new() };
         }
-        match std::env::var_os("HOME").filter(|_| crate::claude_config_trusted()) {
-            Some(home) => Self::load_from_home(Path::new(&home)),
+        match settings_home().filter(|_| crate::claude_config_trusted()) {
+            Some(home) => Self::load_from_home(&home),
             None => Matcher { exact: HashSet::new(), globs: Vec::new(), home: String::new() },
         }
     }
@@ -608,6 +619,19 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./script *)");
         assert!(all_covered("./script 'arg && rm -rf /'", &p));
+    }
+
+    /// `Matcher::load` reads `~/.claude/settings.json` from this directory once Claude's config is
+    /// trusted. It is the harness root, so deleting the test redirect makes the assertion compare
+    /// equal to `$HOME`.
+    #[test]
+    fn claude_settings_are_not_read_from_the_ambient_home() {
+        let home = settings_home().expect("a settings home");
+        let ambient = std::path::PathBuf::from(std::env::var_os("HOME").expect("HOME"));
+        assert_ne!(home, ambient, "Claude settings would be read from the ambient home");
+        if ambient.as_os_str() != "/" {
+            assert!(!home.starts_with(&ambient), "Claude settings would be read from inside the ambient home: {}", home.display());
+        }
     }
 
     #[test]

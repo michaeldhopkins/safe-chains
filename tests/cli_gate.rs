@@ -9,6 +9,16 @@ use std::process::{Command, Stdio};
 mod hooks;
 use hooks::run_hook;
 
+/// The binary, pointed at an empty home. A spawn that inherits the process home reads
+/// `~/.config/safe-chains.toml` and classifies with the machine's own rules. A caller that passes
+/// its own `HOME` afterwards overrides this one.
+fn spawn() -> Command {
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_safe-chains"));
+    cmd.env("HOME", hooks::bare_home());
+    cmd.env_remove("XDG_CONFIG_HOME");
+    cmd
+}
+
 /// Run the binary in claude-hook mode (bare, JSON on stdin) and return its stdout.
 ///
 /// `home` is required rather than inherited: the hook reads `~/.claude/settings.json` and
@@ -17,7 +27,7 @@ use hooks::run_hook;
 /// `cwd` is likewise explicit, so a guard comparing the hook against the CLI can stand both in the
 /// same directory.
 fn hook_stdout(payload: &str, cwd: &str, home: &std::path::Path) -> String {
-    let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let mut child = spawn()
         .current_dir(cwd)
         .env("HOME", home)
         .stdin(Stdio::piped())
@@ -59,7 +69,7 @@ fn overreach_nudge_names_the_working_directory() {
 }
 
 fn exit_code(args: &[&str]) -> i32 {
-    Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    spawn()
         .args(args)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
@@ -128,7 +138,7 @@ fn suggest_output_cannot_be_forged_by_a_directory_name() {
     let dir = tmp.path().join(hostile);
     std::fs::create_dir_all(&dir).expect("create hostile dir");
 
-    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let out = spawn()
         .args(["--suggest", "frobnicate build"])
         .current_dir(&dir)
         .stdin(Stdio::null())
@@ -161,7 +171,7 @@ fn suggest_refuses_a_config_it_cannot_parse() {
     let cfg = broken.join(".safe-chains.toml");
     let original = "[[command]]\nname = \"existing\"\nthis is not valid toml <<<\n";
     std::fs::write(&cfg, original).expect("write");
-    let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let code = spawn()
         .args(["--suggest", "frobnicate build"])
         .current_dir(&broken)
         .stdin(Stdio::null())
@@ -183,7 +193,7 @@ fn suggest_refuses_a_config_it_cannot_parse() {
     let cfg = good.join(".safe-chains.toml");
     let original = "[[command]]\nname = \"existing\"\nmax_positional = 1\n";
     std::fs::write(&cfg, original).expect("write");
-    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let out = spawn()
         .args(["--suggest", "frobnicate build"])
         .current_dir(&good)
         .stdin(Stdio::null())
@@ -211,7 +221,7 @@ fn suggest_creates_no_file_in_a_fresh_project() {
     let proj = tmp.path().join("proj");
     std::fs::create_dir_all(proj.join(".git")).expect("mkdir .git");
 
-    let out = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+    let out = spawn()
         .args(["--suggest", "frobnicate build"])
         .current_dir(&proj)
         .stdin(Stdio::null())
@@ -246,7 +256,7 @@ fn levels_admit_strictly_more_as_they_loosen() {
     let root = cwd.display().to_string();
     for (level, expected) in STAIRCASE {
         for (command, want) in COMMANDS.iter().zip(expected) {
-            let code = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+            let code = spawn()
                 .args(["--cwd", &root, "--root", &root, "--level", level, command])
                 .stdin(Stdio::null())
                 .stdout(Stdio::null())
@@ -312,7 +322,7 @@ fn the_cli_and_the_hook_agree_in_the_same_directory() {
 
     let (mut allowed_seen, mut refused_seen) = (false, false);
     for command in &cases {
-        let cli_allowed = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        let cli_allowed = spawn()
             .arg(command)
             .current_dir(workspace)
             .env("HOME", home.path())
