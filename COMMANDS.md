@@ -3933,6 +3933,15 @@ Aliases: `tiged`
 - **test**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `deno test`
+- `deno test src/app_test.ts`
+- `deno check src/main.ts`
+- `deno fmt --check src/main.ts`
+- `deno lint src/main.ts`
+- `deno info`
+
 ### `depcheck`
 <p class="cmd-url"><a href="https://github.com/depcheck/depcheck">https://github.com/depcheck/depcheck</a></p>
 
@@ -9216,6 +9225,14 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 
 - Requires -n, --dry-run, --just-print, --recon, -p, --print-data-base. - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
 - Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
+
+**Examples:**
+
+- `make -n`
+- `make -n -j 4`
+- `make -n -C .`
+- `make -n -f Makefile`
+- `make -p`
 
 ### `malloc_history`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/malloc_history.1.html">https://keith.github.io/xcode-man-pages/malloc_history.1.html</a></p>

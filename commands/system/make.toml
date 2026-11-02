@@ -5,6 +5,13 @@ url = "https://www.gnu.org/software/make/manual/make.html"
 level = "Inert"
 bare = false
 require_any = ["-n", "--dry-run", "--just-print", "--recon", "-p", "--print-data-base"]
+examples_safe = [
+  "make -n",
+  "make -n -j 4",
+  "make -n -C .",
+  "make -n -f Makefile",
+  "make -p",
+]
 standalone = [
     "--dry-run", "--help", "--just-print", "--print-data-base",
     "--question", "--recon", "--version",
@@ -14,3 +21,8 @@ valued = [
     "--directory", "--file", "--jobs", "--makefile",
     "-C", "-f", "-j",
 ]
+
+# `-n` still evaluates `$(shell …)` while reading the Makefile, so the directory (`-C`) and the
+# makefile (`-f`) select code. `-j` is a job count.
+[command.path_gate]
+flags = { "-C" = "exec", "--directory" = "exec", "-f" = "exec", "--file" = "exec", "--makefile" = "exec", "-j" = "ignore", "--jobs" = "ignore" }

@@ -29,6 +29,8 @@ valued = [
     "--tsconfig",
 ]
 
-# tsup.config.ts is code tsup evaluates.
+# tsup.config.ts is code tsup evaluates. A positional or `--entry` is an input module, and
+# `--inject` is a module spliced into every bundle. `--out-dir`/`-d` are writes.
 [command.path_gate]
-flags = { "--config" = "exec" }
+positional = "exec"
+flags = { "--config" = "exec", "--entry" = "exec", "--inject" = "exec", "--out-dir" = "write", "-d" = "write", "--public-dir" = "read", "--tsconfig" = "read", "--cjs-interop" = "ignore", "--define" = "ignore", "--env" = "ignore", "--external" = "ignore", "--format" = "ignore", "--name" = "ignore", "--no-external" = "ignore", "--platform" = "ignore", "--target" = "ignore" }

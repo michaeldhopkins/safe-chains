@@ -50,6 +50,15 @@
 - **test**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - Allowed standalone flags: --help, --version, -V, -h
 
+**Examples:**
+
+- `deno test`
+- `deno test src/app_test.ts`
+- `deno check src/main.ts`
+- `deno fmt --check src/main.ts`
+- `deno lint src/main.ts`
+- `deno info`
+
 ### `fnm`
 <p class="cmd-url"><a href="https://github.com/Schniz/fnm#readme">https://github.com/Schniz/fnm#readme</a></p>
 

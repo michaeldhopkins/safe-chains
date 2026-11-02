@@ -105,7 +105,7 @@ folder_code = [
   "ansible-lint", "astro", "ava", "bazel", "bun", "bundle", "cabal", "cargo", "cmake",
   "composer", "coverage", "cucumber", "deno", "dotnet", "dune", "eslint", "flake8", "go",
   "gradle", "hatch", "jest", "just", "lein", "make", "meson", "mise", "mix", "mkdocs", "mocha",
-  "mvn", "mypy", "next", "ninja", "nox", "npm", "npx", "pdm", "php", "phpstan", "phpunit",
+  "mvn", "mvnw", "mypy", "next", "ninja", "nox", "npm", "npx", "pdm", "php", "phpstan", "phpunit",
   "pnpm", "pod", "poetry", "pre-commit", "prettier", "pylint", "pytest", "python", "python3",
   "rails", "rake", "rollup", "rspec", "rubocop", "rustc", "rustup", "sbt", "sphinx-build",
   "stack", "stylelint", "swift", "task", "terraform", "tofu", "tox", "tsc", "tsup", "tuist",
@@ -1338,3 +1338,16 @@ flags = { "--artifacts-path" = "write", "--lock-file-path" = "write", "--package
 [roles."dotnet test"]
 positional = "exec"
 flags = { "--artifacts-path" = "write", "--output" = "write", "-o" = "write", "--results-directory" = "write", "--diag" = "write", "-d" = "write", "--settings" = "exec", "-s" = "exec", "--test-adapter-path" = "exec", "--arch" = "ignore", "-a" = "ignore", "--blame-crash-collect-always" = "ignore", "--blame-crash-dump-type" = "ignore", "--blame-hang-dump-type" = "ignore", "--blame-hang-timeout" = "ignore", "--collect" = "ignore", "--configuration" = "ignore", "-c" = "ignore", "--filter" = "ignore", "--framework" = "ignore", "-f" = "ignore", "--logger" = "ignore", "-l" = "ignore", "--os" = "ignore", "--runtime" = "ignore", "-r" = "ignore", "--verbosity" = "ignore", "-v" = "ignore" }
+
+# `deno test` runs each named file. Config and import maps select more code. The other deno
+# subcommands keep their operands (a fmt path is not a program).
+[roles."deno test"]
+positional = "exec"
+flags = { "--config" = "exec", "-c" = "exec", "--import-map" = "exec" }
+
+# A pom (`-f`/`--file`) is the build Maven runs. `-s` names settings that select plugins.
+[roles.mvn]
+flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec" }
+
+[roles.mvnw]
+flags = { "-f" = "exec", "--file" = "exec", "-s" = "exec" }

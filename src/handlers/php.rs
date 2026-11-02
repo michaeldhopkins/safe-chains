@@ -99,6 +99,11 @@ pub fn is_safe_php(tokens: &[Token]) -> Verdict {
         }
     }
 
+    // The script path is the code php runs. Dispatching on the basename alone turned
+    // `/tmp/y/artisan` into `artisan` and approved it. Judge the path first.
+    if !crate::engine::resolve::execute_file_verdict(arg_str).is_allowed() {
+        return Verdict::Denied;
+    }
     // Delegate-by-basename: the script path's basename must match a
     // declared sub (`artisan`, `please`). delegate_skip = 0 on the sub
     // dispatches the (normalized) token tail to command_verdict so the
@@ -196,9 +201,8 @@ mod tests {
         php_d_memory_then_artisan: "php -d memory_limit=512M artisan view:clear",
         php_d_attached_then_artisan: "php -dmemory_limit=512M artisan view:clear",
         php_d_then_please: "php -d memory_limit=512M please stache:clear",
-        php_d_then_path_please: "php -d memory_limit=512M /Users/me/projects/site/please stache:clear",
-        php_path_artisan: "php /var/www/app/artisan view:clear",
-        php_path_please: "php /Users/me/projects/blog/please stache:clear",
+        php_artisan_test: "php artisan test",
+        php_relative_artisan_test: "php ./artisan test",
         php_two_d_flags: "php -d memory_limit=512M -d max_execution_time=300 artisan view:clear",
         php_d_diagnostic_then_version: "php -d display_errors=1 --version",
         php_d_timezone: "php -d date.timezone=UTC artisan view:clear",
@@ -207,15 +211,11 @@ mod tests {
         php_artisan_cache_clear_null: "php artisan cache:clear --store=null",
         php_artisan_cache_clear_file_space: "php artisan cache:clear --store file",
         php_please_cache_clear_file: "php please cache:clear --store=file",
-        php_path_please_cache_clear: "php /path/please cache:clear --store=file",
-        php_d_then_cache_clear: "php -d memory_limit=512M /path/please cache:clear --store=file",
         php_artisan_cache_clear_help: "php artisan cache:clear --help",
         php_artisan_cache_clear_positional_file: "php artisan cache:clear file",
         php_artisan_cache_clear_positional_array: "php artisan cache:clear array",
         php_artisan_cache_clear_positional_null: "php artisan cache:clear null",
         php_please_cache_clear_positional_file: "php please cache:clear file",
-        php_path_please_cache_clear_positional: "php /path/please cache:clear file",
-        php_d_then_cache_clear_positional: "php -d memory_limit=512M /path/please cache:clear file",
         php_artisan_cache_clear_bare: "php artisan cache:clear",
         php_please_cache_clear_bare: "php please cache:clear",
         php_artisan_cache_clear_redis: "php artisan cache:clear --store=redis",
@@ -243,6 +243,16 @@ mod tests {
         php_run_code: "php -r 'echo 1;'",
         php_script_random: "php /tmp/random.php",
         php_basename_not_allowed: "php /tmp/script.php arg",
+        php_foreign_artisan: "php /tmp/y/artisan test",
+        php_foreign_artisan_case: "php /TMP/y/artisan test",
+        php_foreign_artisan_firmlink: "php /System/Volumes/Data/tmp/y/artisan test",
+        php_foreign_please: "php /var/www/app/artisan view:clear",
+        php_path_please: "php /Users/me/projects/blog/please stache:clear",
+        php_d_then_path_please: "php -d memory_limit=512M /Users/me/projects/site/please stache:clear",
+        php_path_please_cache_clear: "php /path/please cache:clear --store=file",
+        php_d_then_cache_clear: "php -d memory_limit=512M /path/please cache:clear --store=file",
+        php_path_please_cache_clear_positional: "php /path/please cache:clear file",
+        php_d_then_cache_clear_positional: "php -d memory_limit=512M /path/please cache:clear file",
         php_d_unsafe_directive: "php -d auto_prepend_file=/etc/passwd artisan view:clear",
         php_d_disable_functions: "php -d disable_functions= artisan view:clear",
         php_d_open_basedir: "php -d open_basedir=/ artisan view:clear",
@@ -460,6 +470,19 @@ mod tests {
                 "base [cache:clear, {:?}] with extras {:?} must stay SafeWrite",
                 pos, extras,
             );
+        }
+
+        // A script path is approved only where executing that file would be. The basename
+        // (`artisan`) is not enough: the directory is the code.
+        #[test]
+        fn a_script_outside_the_project_is_not_run_under_its_basename(
+            dir in "[a-z]{1,6}",
+            root in prop::sample::select(vec!["/tmp", "/TMP", "/private/tmp", "/var/tmp", "/private/var/folders/xx/yy/T"]),
+        ) {
+            let foreign = format!("php {root}/{dir}/artisan test");
+            let relative = "php ./artisan test";
+            prop_assert!(!crate::is_safe_command(&foreign), "{}", foreign);
+            prop_assert!(crate::is_safe_command(relative), "{}", relative);
         }
     }
 }

@@ -28,5 +28,9 @@ valued = [
 # /tmp one denies — where a plain read gate would wrongly admit /tmp. A bare builtin name
 # (`--reporters default`) isn't path-shaped, so it passes untouched. --outputFile/--coverageDirectory
 # are out-of-workspace WRITES (the camelCase spellings the hyphenated conservation guard missed).
+# A positional is a test file jest loads. `--projects` and `--roots` name more of those trees.
+# Non-path values stay `ignore`: under a positional gate an unmapped valued flag is boolean, and
+# its value is then judged as a test file (`--testMatch '**/*.test.js'` would refuse).
 [command.path_gate]
-flags = { "--config" = "exec", "-c" = "exec", "--testRunner" = "exec", "--reporters" = "exec", "--filter" = "exec", "--outputFile" = "write", "--coverageDirectory" = "write" }
+positional = "exec"
+flags = { "--config" = "exec", "-c" = "exec", "--testRunner" = "exec", "--reporters" = "exec", "--filter" = "exec", "--projects" = "exec", "--roots" = "exec", "--outputFile" = "write", "--coverageDirectory" = "write", "--changedSince" = "ignore", "--collectCoverageFrom" = "ignore", "--coverageProvider" = "ignore", "--maxConcurrency" = "ignore", "--maxWorkers" = "ignore", "--shard" = "ignore", "--testMatch" = "ignore", "--testNamePattern" = "ignore", "--testPathPattern" = "ignore", "--testTimeout" = "ignore", "-t" = "ignore" }

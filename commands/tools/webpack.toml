@@ -26,6 +26,8 @@ valued = ["-c", "-o",
     "--source-map", "--stats",
 ]
 
+# A webpack config is JavaScript that webpack EVALUATES, and a positional or `--entry` is the
+# module graph's root. `-o` is the short form of `--output-path` (a write, including the central role).
 [command.path_gate]
-# A webpack config is JavaScript that webpack EVALUATES, so `--config`/`-c` select code.
-flags = { "--output-path" = "write", "--config" = "exec", "-c" = "exec" }
+positional = "exec"
+flags = { "--output-path" = "write", "-o" = "write", "--config" = "exec", "-c" = "exec", "--entry" = "exec", "--config-name" = "ignore", "--merge" = "ignore", "--name" = "ignore", "--node-env" = "ignore", "--output-clean" = "ignore", "--output-filename" = "ignore", "--output-public-path" = "ignore", "--source-map" = "ignore", "--stats" = "ignore" }

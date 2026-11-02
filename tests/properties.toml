@@ -336,6 +336,7 @@ owed = [
   "is_safe_ini_pair_rejects_any_string_without_equals",
   "check_laravel_cache_clear_denies_two_positionals",
   "check_laravel_cache_clear_safe_write_survives_inert_flag_insertion",
+  "a_script_outside_the_project_is_not_run_under_its_basename",
 ]
 "src/handlers/ruby/bundle.rs" = []
 "src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved"]

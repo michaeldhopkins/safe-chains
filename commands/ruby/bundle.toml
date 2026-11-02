@@ -4,8 +4,9 @@ description = "Ruby dependency manager (Bundler). Read-only inspection (list, sh
 url = "https://bundler.io/man/bundle.1.html"
 bare_flags = ["--help", "--version", "-V", "-h", "-v"]
 
+# `--gemfile` names a Gemfile, which Bundler evaluates as Ruby.
 [command.path_gate]
-flags = { "--path" = "write" }
+flags = { "--path" = "write", "--gemfile" = "exec" }
 
 [[command.sub]]
 name = "check"
