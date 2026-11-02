@@ -7,9 +7,11 @@ static MVN_STANDALONE: WordSet = WordSet::new(&[
     "--fail-fast", "--fail-never", "--no-transfer-progress",
     "--offline", "--quiet", "--show-version",
     "--strict-checksums", "--update-snapshots",
-    "-B", "-U", "-X", "-e", "-f", "-o", "-q",
+    "-B", "-U", "-X", "-e", "-o", "-q",
 ]);
 
+// `-f` / `--file` name the pom. They are valued only: a boolean `-f` would leave the
+// pom path to be read as a later phase.
 static MVN_VALUED: WordSet = WordSet::new(&[
     "--activate-profiles", "--define", "--file",
     "--log-file", "--projects", "--threads",
