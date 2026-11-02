@@ -91,9 +91,13 @@ const CASES: &[&str] = &[
     "webpack {d}/entry.js",
     "webpack --entry {d}/entry.js",
     "webpack --entry={d}/entry.js",
+    "webpack --entry main={d}/entry.js",
+    "webpack --entry=main={d}/entry.js",
     "tsup {d}/index.ts",
     "tsup --entry {d}/index.ts",
     "tsup --entry={d}/index.ts",
+    "tsup --entry main={d}/index.ts",
+    "tsup --entry=main={d}/index.ts",
     "tsup --inject {d}/shim.ts",
     "eslint --rulesdir {d}/rules src/",
     "eslint --rulesdir={d}/rules src/",
@@ -150,6 +154,17 @@ const CASES: &[&str] = &[
     "mvn test -s={d}/settings.xml",
     "php {d}/artisan test",
 ];
+
+#[test]
+fn a_named_entry_is_the_path_after_the_equals_when_that_comes_first() {
+    assert!(!approved_in_project("webpack --entry /tmp/foo=bar/ok.js"), "a slash before = is the path itself");
+    assert!(!approved_in_project("tsup --entry /tmp/foo=bar/index.ts"), "a slash before = is the path itself");
+    assert!(!approved_in_project("webpack --entry main="));
+    assert!(!approved_in_project("tsup --entry name="));
+    assert!(!approved_in_project("webpack --entry main=*.js"));
+    assert!(approved_in_project("webpack --entry name=src/index.js"));
+    assert!(approved_in_project("tsup --entry name=src/index.ts"));
+}
 
 #[test]
 fn a_tool_pointed_at_code_in_a_foreign_temp_folder_asks() {
@@ -283,8 +298,10 @@ fn ordinary_in_project_tool_invocations_stay_approved() {
         "webpack",
         "webpack src/index.js",
         "webpack --entry src/index.js",
+        "webpack --entry name=src/index.js",
         "webpack -o dist",
         "tsup src/index.ts",
+        "tsup --entry name=src/index.ts",
         "tsup --out-dir dist src/index.ts",
         "eslint src/",
         "eslint --max-warnings 0 src/",

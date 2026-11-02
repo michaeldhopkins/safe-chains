@@ -90,6 +90,16 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
 /// beyond cwd → `machine`) denies. `CallerFile` trust (code from a named file). See
 /// docs/design/behavioral-taxonomy-execution-origin.md.
 pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
+    // `name=/tmp/y/entry.js` is the file after `=`. The `=` separates a name from a path only
+    // when it comes before any slash; `/tmp/foo=bar/ok.js` is one path and is judged whole.
+    if let Some((name, rhs)) = path.split_once('=')
+        && !name.contains('/')
+    {
+        if rhs.is_empty() {
+            return crate::engine::bridge::project(&worst("named entry has no file"));
+        }
+        return execute_file_verdict(rhs);
+    }
     // A GLOB executor (`bash *.sh`) names no specific file — the matched code is unknown, so
     // it cannot be pinned to a worktree executor; deny (design §6). ($VAR/../cmdsub are already
     // worst-cased by classify_locus.) A glob stays fine as a read/write OPERAND, where every
