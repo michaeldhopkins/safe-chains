@@ -401,6 +401,10 @@ Aliases: `@cucumber/cucumber`
 - Allowed valued flags: --backtrace, --config, --format, --format-options, --i18n-keywords, --language, --name, --order, --paths, --require, --require-module, --retry, --retry-tag-filter, --tags, --world-parameters, -b, -c, -f, -i, -n, -p, -r, -t, -w
 - Bare invocation allowed
 
+**Examples:**
+
+- `cucumber-js`
+
 ### `dasel`
 <p class="cmd-url"><a href="https://daseldocs.tomwright.me/">https://daseldocs.tomwright.me/</a></p>
 
@@ -882,6 +886,10 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --color, --filter, --help, --no-color, --random, --seed, --stop-on-failure, --version, -h
 - Allowed valued flags: --config, --reporter, --require
 - Bare invocation allowed
+
+**Examples:**
+
+- `jasmine`
 
 ### `java`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html</a></p>

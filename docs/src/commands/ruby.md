@@ -287,7 +287,6 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 
 - `rails db:test:prepare`
 - `rails db:test:load`
-- `bin/rails db:test:prepare`
 
 ### `rake`
 <p class="cmd-url"><a href="https://github.com/ruby/rake">https://github.com/ruby/rake</a></p>

@@ -37,7 +37,7 @@
 <p class="cmd-url"><a href="https://bun.sh/docs/cli/bunx">https://bun.sh/docs/cli/bunx</a></p>
 
 - Delegates to the inner command's safety rules.
-- Skips flags: --bun/--no-install/--package/-p.
+- Skips flags: --bun/--no-install. A --package/-p spec must name the same package as the command, and its version must not be a path.
 
 ### `deno`
 <p class="cmd-url"><a href="https://docs.deno.com/runtime/reference/cli/">https://docs.deno.com/runtime/reference/cli/</a></p>
@@ -179,7 +179,7 @@
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli/commands/npx">https://docs.npmjs.com/cli/commands/npx</a></p>
 
 - Delegates to the inner command's safety rules.
-- Skips flags: --yes/-y/--no/--package/-p.
+- Skips flags: --yes/-y/--no. A --package/-p spec must name the same package as the command, and its version must not be a path.
 
 ### `nvm`
 <p class="cmd-url"><a href="https://github.com/nvm-sh/nvm#readme">https://github.com/nvm-sh/nvm#readme</a></p>
