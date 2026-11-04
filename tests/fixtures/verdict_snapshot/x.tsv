@@ -214,11 +214,15 @@ xcodebuild -allowProvisioningUpdates	safe-write
 xcodebuild -alltargets	safe-write
 xcodebuild -arch x	safe-write
 xcodebuild -archivePath x	safe-write
+xcodebuild -authenticationKeyID x	safe-write
+xcodebuild -authenticationKeyIssuerID x	safe-write
+xcodebuild -authenticationKeyPath x	safe-write
 xcodebuild -buildVersion x	safe-write
 xcodebuild -checkFirstLaunchStatus	safe-write
+xcodebuild -clonedSourcePackagesDirPath x	safe-write
 xcodebuild -configuration x	safe-write
 xcodebuild -defaultLanguage x	safe-write
-xcodebuild -defaultPackageRegistryURL x	safe-write
+xcodebuild -defaultPackageRegistryURL x	denied
 xcodebuild -derivedDataPath x	safe-write
 xcodebuild -destination x	safe-write
 xcodebuild -destination-timeout x	safe-write
@@ -229,11 +233,11 @@ xcodebuild -enableAddressSanitizer	safe-write
 xcodebuild -enableCodeCoverage	safe-write
 xcodebuild -enableThreadSanitizer	safe-write
 xcodebuild -enableUndefinedBehaviorSanitizer	safe-write
-xcodebuild -exportArchive x	safe-write
+xcodebuild -exportArchive	safe-write
 xcodebuild -exportFormat x	safe-write
 xcodebuild -exportLanguage x	safe-write
-xcodebuild -exportLocalizations x	safe-write
-xcodebuild -exportNotarizedApp x	safe-write
+xcodebuild -exportLocalizations	safe-write
+xcodebuild -exportNotarizedApp	safe-write
 xcodebuild -exportOptionsPlist x	safe-write
 xcodebuild -exportPath x	safe-write
 xcodebuild -find-executable x	safe-write
@@ -241,7 +245,7 @@ xcodebuild -find-library x	safe-write
 xcodebuild -h	safe-write
 xcodebuild -hideShellScriptEnvironment	safe-write
 xcodebuild -importComponent x	safe-write
-xcodebuild -importLocalizations x	safe-write
+xcodebuild -importLocalizations	safe-write
 xcodebuild -importPath x	safe-write
 xcodebuild -jobs x	safe-write
 xcodebuild -json	safe-write
@@ -279,7 +283,7 @@ xcodebuild -resolvePackageDependencies	safe-write
 xcodebuild -resultBundlePath x	safe-write
 xcodebuild -resultBundleVersion x	safe-write
 xcodebuild -resultStreamPath x	safe-write
-xcodebuild -retry-tests-on-failure x	safe-write
+xcodebuild -retry-tests-on-failure	safe-write
 xcodebuild -runDestination x	safe-write
 xcodebuild -runDestinationTimeout x	safe-write
 xcodebuild -runFirstLaunch	safe-write
