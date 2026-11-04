@@ -157,7 +157,8 @@ pub fn under_temp(path: &str) -> bool {
 fn strip_data_volume(path: &str) -> String {
     let mut rest = path;
     const PREFIX: &str = "/system/volumes/data";
-    while rest.len() >= PREFIX.len() && rest[..PREFIX.len()].eq_ignore_ascii_case(PREFIX) {
+    // `get`, not a slice: a multi-byte character can straddle the prefix length.
+    while rest.get(..PREFIX.len()).is_some_and(|head| head.eq_ignore_ascii_case(PREFIX)) {
         let after = &rest[PREFIX.len()..];
         if after.is_empty() || after.starts_with('/') {
             rest = after;
@@ -391,6 +392,18 @@ mod tests {
                 assert!(!in_session_scratchpad(&format!("/tmp/{weak}/x.sh")), "weak id {weak:?} must not anchor recognition",);
             });
         }
+    }
+
+    #[test]
+    fn under_temp_never_slices_inside_a_multibyte_character() {
+        let prefix = "/system/volumes/data";
+        for filler in ["\u{fffd}", "\u{e9}", "\u{1f600}"] {
+            for cut in 0..=prefix.len() {
+                let path = format!("{}{filler}{}", &prefix[..cut], &prefix[cut..]);
+                assert!(!under_temp(&path), "{path}");
+            }
+        }
+        assert!(under_temp("/System/Volumes/Data/tmp/x"));
     }
 
     #[test]
