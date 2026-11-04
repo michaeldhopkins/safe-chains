@@ -173,6 +173,9 @@ mod tests {
             ("\\U0001F600", "\u{1F600}"),
             ("\\9", "\\9"),
             ("\\t\\n", "\t\n"),
+            ("\\a\\b\\f\\r\\v", "\u{7}\u{8}\u{c}\r\u{b}"),
+            ("\\", "\\"),
+            ("a\\", "a\\"),
         ];
         for (raw, want) in cases {
             assert_eq!(decode(raw), *want, "$'{raw}'");
