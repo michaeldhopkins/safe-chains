@@ -7,6 +7,11 @@ researched_version = "Xcode 16 / xcodebuild 16.x"
 level = "SafeWrite"
 bare = false
 standalone = [
+    "-exportArchive",
+    "-exportLocalizations",
+    "-exportNotarizedApp",
+    "-importLocalizations",
+    "-retry-tests-on-failure",
     "-alltargets",
     "-allowProvisioningDeviceRegistration",
     "-allowProvisioningUpdates",
@@ -50,6 +55,10 @@ standalone = [
 ]
 valued = [
     "-arch",
+    "-authenticationKeyID",
+    "-authenticationKeyIssuerID",
+    "-authenticationKeyPath",
+    "-clonedSourcePackagesDirPath",
     "-archivePath",
     "-buildVersion",
     "-configuration",
@@ -58,17 +67,13 @@ valued = [
     "-derivedDataPath",
     "-destination",
     "-destination-timeout",
-    "-exportArchive",
     "-exportFormat",
     "-exportLanguage",
-    "-exportLocalizations",
-    "-exportNotarizedApp",
     "-exportOptionsPlist",
     "-exportPath",
     "-find-executable",
     "-find-library",
     "-importComponent",
-    "-importLocalizations",
     "-importPath",
     "-jobs",
     "-localizationPath",
@@ -90,7 +95,6 @@ valued = [
     "-resultBundlePath",
     "-resultBundleVersion",
     "-resultStreamPath",
-    "-retry-tests-on-failure",
     "-runDestination",
     "-runDestinationTimeout",
     "-scheme",
@@ -134,5 +138,6 @@ examples_safe = [
 
 [command.path_gate]
 # `-project`, `-workspace`, `-xctestrun`, and `-testPlan` select the project whose build phases run.
-# `-xcconfig` is a settings file the build applies, and `-toolchain` selects the tools it runs.
-flags = { "-destination" = "ignore", "-derivedDataPath" = "write", "-archivePath" = "write", "-resultBundlePath" = "write", "-exportPath" = "write", "-exportOptionsPlist" = "read", "-xcconfig" = "exec", "-toolchain" = "exec", "-project" = "exec", "-workspace" = "exec", "-xctestrun" = "exec", "-testPlan" = "exec" }
+# `-xcconfig` is a settings file the build applies, and `-toolchain` and `-sdk` select the tools it runs.
+# Derived data, the package cache, cloned package sources and test products hold code the build runs.
+flags = { "-destination" = "ignore", "-derivedDataPath" = "exec", "-archivePath" = "write", "-resultBundlePath" = "write", "-resultStreamPath" = "write", "-test-enumeration-output-path" = "write", "-localizationPath" = "write", "-exportPath" = "write", "-exportOptionsPlist" = "read", "-importPath" = "read", "-authenticationKeyPath" = "read", "-xcconfig" = "exec", "-toolchain" = "exec", "-sdk" = "exec", "-project" = "exec", "-workspace" = "exec", "-xctestrun" = "exec", "-testPlan" = "exec", "-testProductsPath" = "exec", "-packageCachePath" = "exec", "-clonedSourcePackagesDirPath" = "exec" }

@@ -1136,7 +1136,7 @@ positional = "write"
 # ── Operation-aware gates (the archive/mode selector decides read vs write; see pathgate::handlers).
 #    r/q/d/m/s write the .a, t/p/x read it — matters at an in-workspace protected path (.git/config:
 #    readable, write-denied), where an all-write gate would over-deny the read ops.
-# Build settings that name a compiler, a linker, or an install root, and the install actions.
+# Every bare word by its shape: a tool setting, an install action, or a word that leaves the project.
 # The command's own `[command.path_gate]` still gates its path flags.
 [roles."xcodebuild"]
 handler = "xcodebuild_settings"

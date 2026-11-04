@@ -860,12 +860,6 @@ xccov diff	--path-equivalence	untriaged	-	-	-
 xccov view	--file	untriaged	-	-	-	
 xccov view	--files-for-target	untriaged	-	-	-	
 xccov view	--functions-for-file	untriaged	-	-	-	
-xcodebuild	-importPath	untriaged	-	-	-	
-xcodebuild	-localizationPath	untriaged	-	-	-	
-xcodebuild	-packageCachePath	untriaged	-	-	-	
-xcodebuild	-resultStreamPath	untriaged	-	-	-	
-xcodebuild	-test-enumeration-output-path	untriaged	-	-	-	
-xcodebuild	-testProductsPath	untriaged	-	-	-	
 xcodegen generate	--cache-path	untriaged	-	-	-	
 xcresulttool compare	--baseline-path	untriaged	-	-	-	
 xcresulttool export	--path	untriaged	-	-	-	

