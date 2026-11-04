@@ -480,6 +480,51 @@ measured = false
 shape = "config-file"
 because = "as npm_config_userconfig, for the global npmrc"
 measured = false
+[env.XCODE_XCCONFIG_FILE]
+shape = "config-file"
+because = "xcodebuild applies this xcconfig to every target it builds, and an xcconfig can name the compiler and linker"
+measured = false
+[env.npm_config_registry]
+shape = "opaque"
+because = "the registry npm, npx and pnpm fetch packages from, whose install scripts and bins then run"
+measured = false
+[env.npm_config_strict_ssl]
+shape = "opaque"
+because = "false turns off certificate checks on every registry fetch, so a package can be swapped in transit"
+measured = false
+[env.npm_config_cafile]
+shape = "opaque"
+because = "the certificate authorities npm trusts for registry fetches"
+measured = false
+[env.npm_config_ca]
+shape = "opaque"
+because = "as npm_config_cafile, given inline"
+measured = false
+[env.npm_config_proxy]
+shape = "opaque"
+because = "every registry request goes through this proxy, which sees and can alter what npm downloads"
+measured = false
+[env.npm_config_https_proxy]
+shape = "opaque"
+because = "as npm_config_proxy, for https requests"
+measured = false
+[env.npm_config_onload_script]
+shape = "exec-path"
+single_value = true
+because = "npm 6 and earlier require this module at startup"
+measured = false
+[env.BUN_CONFIG_REGISTRY]
+shape = "opaque"
+because = "the registry bun and bunx fetch packages from"
+measured = false
+[env.YARN_NPM_REGISTRY_SERVER]
+shape = "opaque"
+because = "the registry yarn fetches packages from (yarn 2 and later)"
+measured = false
+[env.YARN_REGISTRY]
+shape = "opaque"
+because = "the registry yarn 1 fetches packages from"
+measured = false
 [env.GIT_TEMPLATE_DIR]
 shape = "config-file"
 because = "git init and git clone copy this directory's hooks into the new repository, where git later runs them"
