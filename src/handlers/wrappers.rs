@@ -106,15 +106,6 @@ fn is_plain_cmd_name(s: &str) -> bool {
         && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-' | '+'))
 }
 
-fn is_safe_segment(s: &str) -> bool {
-    !s.is_empty()
-        && s != "."
-        && s != ".."
-        && !crate::cst::check::is_opaque_value(s)
-        && !s.contains("__SAFE_CHAINS_")
-        && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
-}
-
 fn trusted_inner_command(arg0: &str) -> bool {
     const STD_BINS: &[&str] = &["/usr/bin/", "/bin/", "/usr/local/bin/", "/opt/homebrew/bin/", "/opt/bin/", "/sbin/", "/usr/sbin/"];
     if !arg0.contains('/') {
@@ -137,16 +128,10 @@ fn strip_env_home(s: &str) -> Option<&str> {
     (!canon.is_empty() && canon.starts_with('/')).then(|| s.strip_prefix(canon)?.strip_prefix('/'))?
 }
 
+const HOME_HEAVY_SLOT_INSTALLS: &[&str] = &["bin/heavy-slot.sh", "runner-scripts/lib/heavy-slot.sh"];
+
 fn valid_home_rel_heavy_slot(rel: &str) -> bool {
-    let mut segs = rel.split('/');
-    let Some(first) = segs.next() else {
-        return false;
-    };
-    if matches!(first, "projects" | "Downloads" | "Desktop" | "Public" | "tmp") || !is_safe_segment(first) {
-        return false;
-    }
-    let rest: Vec<&str> = segs.collect();
-    !rest.is_empty() && rest.last() == Some(&"heavy-slot.sh") && rest.iter().copied().all(is_safe_segment)
+    HOME_HEAVY_SLOT_INSTALLS.contains(&rel)
 }
 
 fn trusted_heavy_slot_path(arg0: &str) -> bool {
@@ -370,11 +355,14 @@ mod tests {
             "$HOME/bin/heavy-slot.sh".to_string(),
             "${HOME}/bin/heavy-slot.sh".to_string(),
             "/opt/bin/heavy-slot.sh".to_string(),
+            tilde("/runner-scripts/lib/heavy-slot.sh"),
+            "$HOME/runner-scripts/lib/heavy-slot.sh".to_string(),
         ];
         if let Ok(home) = std::env::var("HOME")
             && home.starts_with('/')
         {
             paths.push(format!("{}/bin/heavy-slot.sh", home.trim_end_matches('/')));
+            paths.push(format!("{}/runner-scripts/lib/heavy-slot.sh", home.trim_end_matches('/')));
         }
         for p in &paths {
             assert_eq!(
@@ -439,6 +427,15 @@ mod tests {
             tilde("/Downloads/heavy-slot.sh"),
             tilde("/bin/../tmp/heavy-slot.sh"),
             tilde("/$(pwd)/heavy-slot.sh"),
+            tilde("/.worktrees/evil/heavy-slot.sh"),
+            tilde("/Library/Caches/evil/heavy-slot.sh"),
+            tilde("/code/evil/heavy-slot.sh"),
+            tilde("/bin/evil/heavy-slot.sh"),
+            tilde("/runner-scripts/heavy-slot.sh"),
+            tilde("/runner-scripts/evil/heavy-slot.sh"),
+            tilde("/runner-scripts/lib/evil/heavy-slot.sh"),
+            "$HOME/.worktrees/evil/heavy-slot.sh".to_string(),
+            "/opt/bin/evil/heavy-slot.sh".to_string(),
         ] {
             let cmd = format!("{untrusted_path} run -- git status");
             assert_eq!(crate::command_verdict(&cmd), Verdict::Denied, "{cmd}");
@@ -464,6 +461,24 @@ mod tests {
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(500))]
+
+        /// INVARIANT: a `heavy-slot.sh` under the home folder is trusted at its installed
+        /// locations only. Any other folder under `~`, however plain its segments, is refused.
+        #[test]
+        fn a_heavy_slot_under_home_is_trusted_only_where_it_is_installed(
+            segments in prop::collection::vec("[a-zA-Z0-9._-]{1,8}", 1..4),
+        ) {
+            let rel = segments.join("/");
+            let installed = rel == "bin" || rel == "runner-scripts/lib";
+            for spelled in [format!("~/{rel}/heavy-slot.sh"), format!("$HOME/{rel}/heavy-slot.sh")] {
+                let verdict = crate::command_verdict(&format!("{spelled} run -- git status"));
+                if installed {
+                    prop_assert_eq!(verdict, Verdict::Allowed(SafetyLevel::Inert), "{}", spelled);
+                } else {
+                    prop_assert_eq!(verdict, Verdict::Denied, "{}", spelled);
+                }
+            }
+        }
 
         /// INVARIANT (dispatch-table closure). `dispatch` only forwards to the wrapper
         /// handlers it is wired to (`env`, `heavy-slot.sh`, and `hyperfine`). For every OTHER
