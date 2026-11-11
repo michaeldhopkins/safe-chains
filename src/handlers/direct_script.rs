@@ -274,6 +274,19 @@ mod tests {
     }
 
     #[test]
+    fn a_shell_handed_a_packaged_script_is_refused_in_every_spelling() {
+        for shell in ["bash", "sh", "zsh", "dash", "ksh"] {
+            for form in ["", "-x ", "-o pipefail ", "+o errexit ", "-- "] {
+                for script in ["node_modules/pkg/run.sh", "./node_modules/.bin/run", "sub/node_modules/x/y.sh"] {
+                    let cmd = format!("{shell} {form}{script}");
+                    assert_eq!(crate::command_verdict(&cmd), Verdict::Denied, "{cmd}");
+                }
+            }
+        }
+        assert_eq!(crate::command_verdict("bash scripts/run.sh"), Verdict::Allowed(SafetyLevel::SafeWrite));
+    }
+
+    #[test]
     fn a_bare_name_stays_a_path_lookup() {
         assert_eq!(crate::command_verdict("push_main_test.sh"), Verdict::Denied);
         assert_eq!(crate::command_verdict("bash push_main_test.sh"), Verdict::Allowed(SafetyLevel::SafeWrite));

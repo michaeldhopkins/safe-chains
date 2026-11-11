@@ -27,6 +27,11 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
 - **Equivalent, not excluded:** `delete !` in `sed_cluster`'s `-f` arm (`consumes_next: !has`).
   `scan_sed` flags every `-f` spelling and `resolve_sed` worst-cases before the cluster parser runs,
   so the `ScriptFile` arm's word count is never observed. A slice that lands on it reports it.
+- **Equivalent, not excluded:** the `"bash" | "sh" | "zsh" | "dash" | "ksh"` arm of
+  `refuses_its_arguments` (`direct_script::runs_packaged_or_frozen`). The shells' executor already
+  refuses a script under `node_modules` or a frozen folder through `frozen_reach`, so deleting the arm
+  changes no verdict; `a_shell_handed_a_packaged_script_is_refused_in_every_spelling` pins the
+  behaviour either way. Reported by the 0.242.0 release slice (2026-11-11).
 - **Findings of past slices** are in `docs/agents/mutation-findings.md`; add an entry there when you kill a slice's misses.
 - **Hermeticity it surfaced:** cargo-mutants builds in a copy under `$TMPDIR`, and
   `the_path_policy_corpus_holds` used the checkout itself as the workspace under the real `$HOME`, so
