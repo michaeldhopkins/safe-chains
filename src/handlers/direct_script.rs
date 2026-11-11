@@ -287,6 +287,41 @@ mod tests {
     }
 
     #[test]
+    fn only_the_tool_and_the_agents_are_identities() {
+        assert!(super::is_an_identity("safe-chains"));
+        assert!(crate::userconfig::AGENT_COMMANDS.iter().all(|agent| super::is_an_identity(agent)));
+        for name in ["", "safe", "chains", "git", "bash", "safe-chains.sh", "SAFE-CHAINS"] {
+            assert!(!super::is_an_identity(name), "{name}");
+        }
+        assert_eq!(super::spellings("git.sh"), vec!["git.sh".to_string()]);
+        assert_eq!(super::spellings("safe-chains.sh"), vec!["safe-chains.sh".to_string(), "safe-chains".to_string()]);
+    }
+
+    #[test]
+    fn only_a_sixteen_digit_hex_suffix_is_a_build_hash() {
+        assert_eq!(super::without_build_hash("safe-chains-0123456789abcdef"), "safe-chains");
+        for unchanged in [
+            "safe-chains", "safe-chains-0123456789abcde", "safe-chains-0123456789abcdefg", "safe-chains-0123456789abcdeg",
+            "-0123456789abcdef", "git", "",
+        ] {
+            assert_eq!(super::without_build_hash(unchanged), unchanged);
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn spellings_hold_no_duplicate_and_no_empty_entry(name in "[A-Za-z0-9_.-]{1,12}") {
+            let spelled = super::spellings(&name);
+            prop_assert_eq!(spelled.first(), Some(&name));
+            prop_assert!(spelled.iter().all(|s| !s.is_empty()), "{:?}", spelled);
+            let mut unique = spelled.clone();
+            unique.sort();
+            unique.dedup();
+            prop_assert_eq!(unique.len(), spelled.len(), "{:?}", spelled);
+        }
+    }
+
+    #[test]
     fn a_bare_name_stays_a_path_lookup() {
         assert_eq!(crate::command_verdict("push_main_test.sh"), Verdict::Denied);
         assert_eq!(crate::command_verdict("bash push_main_test.sh"), Verdict::Allowed(SafetyLevel::SafeWrite));
