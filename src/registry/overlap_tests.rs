@@ -293,3 +293,22 @@ proptest! {
         }
     }
 }
+
+/// A flag a `Branching` command lists in front of its subcommands is standalone for the path gate
+/// whether or not any subcommand lists it too, and so is a flag only a subcommand lists.
+#[test]
+fn a_branching_command_declares_its_pre_flags_and_its_subcommands_flags_standalone() {
+    let mut checked = 0;
+    for spec in super::TOML_REGISTRY.values().chain(super::CUSTOM_REGISTRY.values()) {
+        let DispatchKind::Branching { subs, pre_standalone, .. } = &spec.kind else { continue };
+        let sub_flags = subs.iter().filter_map(|sub| match &sub.kind {
+            DispatchKind::Policy { policy, .. } => Some(policy.standalone.as_slice()),
+            _ => None,
+        });
+        for flag in pre_standalone.iter().chain(sub_flags.flatten()) {
+            assert!(spec.kind.declares_standalone(flag), "{}: {flag} is listed standalone but not declared so", spec.name);
+            checked += 1;
+        }
+    }
+    assert!(checked > 100, "only {checked} branching flags checked — the registry walk is broken");
+}
